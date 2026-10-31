@@ -1,15 +1,37 @@
-# Gene Wars — native Android reconstruction 0.1
+# Gene Wars для Android — 0.3-3D
 
-Development build, not a complete restoration of the original Gene Wars.
-No DOS emulation or additional launcher is required. Target device: Samsung Galaxy S23 Ultra; a physical S23 Ultra has not been tested.
+Самостоятельный APK с настоящей трёхмерной сценой на OpenGL ES 3. Установка одним файлом, игровые данные включены. DOS-эмуляции и внешнего движка в приложении нет.
 
-Downloads:
-- Genewars_Android_0_1.apk — installable APK.
-- Genewars_Android_APK.zip — the same APK inside ZIP.
-- Genewars_Android_Source.zip — complete source and resources for this build.
+## Что изменилось
 
-Validated: Android 35 install/launch, construction command, save/load, fresh-process restore; 24 Python tests, 19 JVM core checks and 38 original-scenario import checks.
+- 55 объёмных моделей: 25 существ и гибридов, четыре специалиста, 14 построек, 12 растений.
+- Иерархические скелеты: ожидание, ходьба, атака и работа персонажей; движение механизмов и растений. 131 клип также экспортирован в GLB вместе с моделями.
+- Перспективная камера с поворотом, масштабом и перемещением; выбор и команды учитывают реальную 3D-проекцию и рельеф.
+- Девять материалов, освещение, карта теней 1024×1024, свечение и анимированная вода.
+- Новый русский интерфейс, обозначение загрузки планеты, обновление HUD только при изменении текста.
+- Игровое ядро и формат GWSV v3 сохранены. Старый слот версии 0.1 загружается через «Продолжить».
 
-Limitations: full original campaign, exact AI/mechanics, all animation states and original lighting are not fully reconstructed. Graphics use original sprites and a simplified native terrain renderer. Some mechanics are newly implemented and simplified. See source documentation for the exact coverage.
+Модели выполнены в стилизованной low-poly манере. Фотореализм и качество современных AAA-игр не заявляются. Восстановление всех правил, ИИ и событий оригинальной кампании остаётся незавершённым; 38 импортированных карт не означают 38 полностью восстановленных миссий. См. `docs/native-engine-status.md` в архиве исходников.
 
-Code is GPL-2.0-or-later. Original game asset rights are unchanged. This package uses resources supplied for this project; it is not an official Bullfrog release.
+## Установка
+
+Скачайте `Genewars_Android_0_3_3D.apk` и откройте на телефоне. Требования: Android 8.0+ и OpenGL ES 3. Samsung Galaxy S23 Ultra соответствует этим требованиям. Версию можно устанавливать поверх предыдущего APK 0.1, подписанного тем же ключом. Это сборка разработки с локальной подписью; публикация в магазине не выполнялась.
+
+## Проверено
+
+| Проверка | Результат |
+|---|---|
+| Android 15 / API 35, установка APK | Успешно |
+| Android instrumentation | 7 из 7: меню, карта, реальный GLES3-кадр и поворот, строительство со списанием ресурсов, private save, перезапуск Activity и восстановление ресурсов |
+| Ресурсы после перезапуска | Биогель 1350/5000, древесина 50, целлюлоза 0, энергия 0/0; строки до и после совпадают |
+| Сохранение 0.1 | 68 207 байт; загрузка и контрольная сумма без изменения |
+| Android GLES3 | Шейдеры скомпилированы, 45 объектов в тестовой сцене, тени включены, GL ошибок нет |
+| Геометрия и скелеты | 55 моделей, 138 190 треугольников, 0 вырожденных; движение всех 55 rigs |
+| Камера и рельеф | 300 project/pick проверок; 2 572 284 атрибута оптимизированной сетки побитно совпадают с исходным алгоритмом |
+| GLB | 55 файлов, 131 клип; геометрия и движения соответствуют нативным моделям |
+| Python | 39 тестов прошли |
+| Упаковка | Подпись APK v2/v3 и ZIP проверены; контрольные суммы в SHA256SUMS |
+
+Android-проверки выполнены в программном эмуляторе без аппаратного ускорения CPU. Это не измерение производительности телефона: первый кадр тестовой сцены занял около 41 с, включая подготовку рельефа; кадр нового ракурса — около 3,5 с. Физический S23 Ultra не подключён и не проверялся.
+
+Архив исходников содержит модели GLB, исходные изображения, код, инструменты сборки и результаты проверок в `release-evidence/`. Локальные ключи подписи и SDK в архив не включены. Код — GPL-2.0-or-later; права на исходные игровые данные не изменяются.
