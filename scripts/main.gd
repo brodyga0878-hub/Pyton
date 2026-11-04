@@ -22,6 +22,9 @@ const StationView=preload("res://scripts/station_visual.gd")
 const SpaceEnvironment=preload("res://scripts/space_environment.gd")
 const FlightTheme=preload("res://scripts/flight_theme.gd")
 const FlightReticle=preload("res://scripts/flight_reticle.gd")
+const BuildInfo=preload("res://scripts/build_info.gd")
+const Diagnostics=preload("res://scripts/game_diagnostics.gd")
+const ReportExport=preload("res://scripts/report_export.gd")
 var ship:RefCounted
 var nav:RefCounted
 var world:RefCounted
@@ -75,11 +78,24 @@ var worker:Thread
 var presentation_key:=""
 var last_external:=false
 var graphics_return:Dictionary={}
+var diagnostics:Node
+var report_export:Node
+var report_description:TextEdit
+var report_feedback:Label
+var report_retry:Button
+var report_include_save:=false
+var report_draft:=""
+var current_report:Dictionary={}
+var diagnostic_timer:=0.0
+var last_flight_sample:Dictionary={}
 
 func _ready()->void:
 	get_tree().auto_accept_quit=false
 	automated="--rebuild-smoke" in OS.get_cmdline_user_args() or "--rebuild-capture" in OS.get_cmdline_user_args()
 	saving_enabled=not automated
+	diagnostics=Diagnostics.new();add_child(diagnostics)
+	if not automated:diagnostics.initialize(BuildInfo.VERSION)
+	report_export=ReportExport.new();add_child(report_export);report_export.completed.connect(_report_export_completed)
 	settings.load_file();_new_models();_build_world();_build_ui();_apply_settings()
 	if not automated:_load_game()
 	_apply_system();_refresh_hud()
@@ -237,6 +253,20 @@ func _process(dt:float)->void:
 	if hud_timer>0.15:hud_timer=0;_refresh_hud()
 	lever.display_value(ship.target_speed)
 	flight_reticle.update_state(ship.hull,ship.velocity.length())
+	if not automated and not blocked:
+		diagnostic_timer+=dt
+		if diagnostic_timer>=2.0:
+			diagnostic_timer=0;last_flight_sample=_flight_diagnostic_sample();_record_event("flight_sample",last_flight_sample)
+
+func _record_event(event:String,details:Dictionary={})->void:
+	if diagnostics!=null and not automated:diagnostics.record(event,details)
+func _input_diagnostic_state()->Dictionary:
+	return {"stick":[stick.value.x,stick.value.y] if stick!=null else [],"stick_pointer":stick.pointer_id if stick!=null else -1,"throttle_pointer":lever.pointer_id if lever!=null else -1,"lift_up":lift_up,"lift_down":lift_down,"active":active,"busy":busy}
+func _flight_diagnostic_sample()->Dictionary:
+	if ship==null or nav==null or world==null or surface==null:return {}
+	return {"ship_id":ship.ship_id,"position":[ship.position.x,ship.position.y,ship.position.z],"velocity":[ship.velocity.x,ship.velocity.y,ship.velocity.z],"target_speed":ship.target_speed,"hull":ship.hull,"docked":ship.docked,"autopilot":ship.autopilot,"system_id":nav.current_id,"focus_id":world.focus_id,"site_id":world.site_id,"jump_remaining":nav.remaining,"transfer_remaining":world.transfer_remaining,"surface":surface.active,"landed":surface.landed,"flight_phase":surface.flight_phase,"controls":_input_diagnostic_state()}
+func _diagnostic_context()->Dictionary:
+	return {"build":{"version":BuildInfo.VERSION,"code":BuildInfo.VERSION_CODE,"channel":BuildInfo.CHANNEL},"mode":"graphics_preview" if not graphics_return.is_empty() else ("surface" if surface!=null and surface.active else "space"),"flight":_flight_diagnostic_sample(),"last_flight_sample":last_flight_sample,"settings":settings.snapshot(),"session":{"saving_enabled":saving_enabled,"save_generation":saves.sequence,"elapsed_days":nav.elapsed_days if nav!=null else 0},"display":{"fps":Engine.get_frames_per_second(),"viewport":[get_viewport().get_visible_rect().size.x,get_viewport().get_visible_rect().size.y]}}
 
 func _station_here()->bool:return not surface.active and (world.is_orbital_site() or (world.site_id.is_empty() and world.focus_id==world.default_id and nav.has_station()))
 func _apply_system()->void:
@@ -291,6 +321,7 @@ func _refresh_hud()->void:
 	fps_label.visible=settings.show_fps;fps_label.text="%d FPS"%Engine.get_frames_per_second()
 
 func _announce(text:String)->void:
+	_record_event("notice",{"text":text})
 	if notice:notice.text=text;notice_timer=7
 	if menu_feedback:menu_feedback.text=text
 	if settings_panel and settings_panel.visible:settings_panel.feedback.text=text
@@ -351,8 +382,11 @@ func _finish_ascent()->void:
 	if not surface.leave(ship,world,nav.elapsed_days):_announce(surface.message);return
 	_apply_system();_announce("Выход на орбиту. Положение над планетой сохранено.");_save_game()
 
-func _open_menu(title:String)->void:
-	_release_inputs();_save_game();menu_title.text=title
+func _open_menu(title:String,save_progress:bool=true)->void:
+	_record_event("menu_open",{"title":title,"controls_before_release":_input_diagnostic_state()})
+	_release_inputs()
+	if save_progress:_save_game()
+	menu_title.text=title
 	for child in menu_rows.get_children():menu_rows.remove_child(child);child.queue_free()
 	menu.show()
 func _menu_text(text:String)->void:
@@ -366,6 +400,7 @@ func _show_menu()->void:
 		_menu_text("Графический полёт: осмотрите корабль, станцию и астероиды. Основной полёт приостановлен; этот просмотр не заменяет его сохранение.")
 		_menu_action("Продолжить графический полёт",_close_menu)
 		_menu_action("Вернуться к основному полёту",_end_graphics_demo)
+		_menu_action("Отчёт об ошибке / логи",_show_bug_report)
 		_menu_action("Настройки телефона",func():menu.hide();settings_panel.configure(settings);settings_panel.show())
 		return
 	_menu_action("Продолжить полёт",_close_menu)
@@ -378,6 +413,7 @@ func _show_menu()->void:
 		if _save_game():_announce("Полёт сохранён.");_close_menu()
 	)
 	_menu_action("Резервная копия",_show_backup)
+	_menu_action("Отчёт об ошибке / логи",_show_bug_report)
 	_menu_action("Управление и сведения о сборке",_show_help)
 	_menu_action("Начать новый полёт…",_confirm_new_game)
 func _begin_graphics_demo()->void:
@@ -453,7 +489,47 @@ func _show_help()->void:
 	_open_menu("УПРАВЛЕНИЕ И СБОРКА")
 	_menu_text("Левый стик меняет направление носа. Правая шкала задаёт скорость. «Тормозить» включает плавную остановку; «Авто» ведёт к станции или посадочной площадке. Кнопки подъёма и снижения помогают висеть над землёй.")
 	_menu_text("Клавиатура: стрелки — поворот, W/S — скорость, Q/E — крен, R/F — подъём, пробел — тормоз, A — авто, L — поверхность/орбита, D — стыковка/взлёт, V — вид, Esc — меню.")
-	_menu_text("Графическое обновление 0.11.1. Осмотрите новый корабль, планеты и станцию через «Графический полёт» в меню. Полёт и данные исходных миров возвращены частично. Карта маршрутов, физика орбит, три лётных профиля и учебная торговля — адаптации. Полная кампания, исходная экономика и ИИ ещё не готовы. Проверка на настоящем телефоне нужна отдельно.")
+	_menu_text("Сборка %s. Отчёт об ошибке и журналы можно сохранить ZIP-архивом через меню. Осмотрите корабль, планеты и станцию через «Графический полёт». Полёт и данные исходных миров возвращены частично. Карта маршрутов, физика орбит, три лётных профиля и учебная торговля — адаптации. Полная кампания, исходная экономика и ИИ ещё не готовы. Проверка на настоящем телефоне нужна отдельно."%BuildInfo.VERSION)
+
+func _show_bug_report()->void:
+	if busy:return
+	settings_panel.hide();_open_menu("ОТЧЁТ ОБ ОШИБКЕ",false)
+	_menu_text("Опишите проблему и действия перед ней. ZIP содержит версию, параметры устройства, настройки, последние события и ошибки игры. Сохраните архив в «Загрузки» и прикрепите его к сообщению в ChatGPT.")
+	report_description=TextEdit.new();report_description.custom_minimum_size=Vector2(900,180);report_description.wrap_mode=TextEdit.LINE_WRAPPING_BOUNDARY
+	report_description.placeholder_text="Что произошло? Как повторить ошибку?";report_description.text=report_draft;report_description.add_theme_font_size_override("font_size",21)
+	report_description.text_changed.connect(func():report_draft=report_description.text.left(8000));menu_rows.add_child(report_description)
+	var include:=CheckBox.new();include.text="Добавить сохранение текущего полёта для воспроизведения";include.button_pressed=report_include_save;include.custom_minimum_size=Vector2(900,60)
+	include.toggled.connect(func(value:bool):report_include_save=value);menu_rows.add_child(include)
+	_menu_action("Собрать ZIP и сохранить…",func():_create_bug_report(true))
+	report_retry=_button("Повторно сохранить последний ZIP",_export_bug_report,900);report_retry.disabled=not current_report.get("ok",false);menu_rows.add_child(report_retry)
+	report_feedback=_label("",20);report_feedback.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;report_feedback.custom_minimum_size.x=900;menu_rows.add_child(report_feedback)
+	if current_report.get("ok",false):report_feedback.text="Последний архив: %s"%current_report.filename
+func _report_status(text:String)->void:
+	if is_instance_valid(report_feedback) and not report_feedback.is_queued_for_deletion():report_feedback.text=text
+	_announce(text)
+func _create_bug_report(export_after:bool=true)->void:
+	if busy or report_export.is_busy():return
+	var description:=report_draft.left(8000)
+	var snapshot:Dictionary=_payload().duplicate(true) if report_include_save else {}
+	var context:=_diagnostic_context()
+	busy=true;_release_inputs();_report_status("Собираю ZIP-отчёт…")
+	await get_tree().process_frame
+	var result:Dictionary=diagnostics.build_report(description,context,report_include_save,snapshot)
+	busy=false
+	if not result.get("ok",false):_report_status(str(result.get("error","Не удалось создать ZIP-отчёт.")));return
+	current_report=result
+	if is_instance_valid(report_retry) and not report_retry.is_queued_for_deletion():report_retry.disabled=false
+	_report_status("Архив готов: %s · %.0f КБ"%[result.filename,maxf(1.0,float(result.get("report_bytes",0))/1024.0)])
+	if export_after:_export_bug_report()
+func _export_bug_report()->void:
+	if busy or report_export.is_busy():return
+	if not current_report.get("ok",false):_report_status("Сначала создайте ZIP-отчёт.");return
+	_report_status("Выберите место для ZIP-отчёта. Удобно сохранить его в «Загрузки».")
+	var result:Dictionary=report_export.export_report(str(current_report.get("absolute_path",current_report.path)),str(current_report.filename))
+	if not result.get("ok",false):_report_status(str(result.get("message",result.get("error","Не удалось открыть сохранение ZIP."))))
+func _report_export_completed(result:Dictionary)->void:
+	_record_event("report_export",{"ok":result.get("ok",false),"cancelled":result.get("cancelled",false),"verified":result.get("verified",false)})
+	_report_status(str(result.get("message","Сохранение отчёта завершено.")))
 func _confirm_new_game()->void:
 	_open_menu("НОВЫЙ ПОЛЁТ")
 	_menu_text("Текущий прогресс будет заменён новым полётом. При необходимости сначала сделайте резервную копию.")
@@ -483,6 +559,7 @@ func _commit_state(data:Dictionary)->void:
 func _save_game()->bool:
 	if not saving_enabled or busy:return false
 	var ok:=saves.write(_payload())
+	_record_event("save_result",{"ok":ok,"generation":saves.sequence})
 	if not ok:_announce(saves.last_error)
 	return ok
 func _load_game()->bool:
@@ -509,7 +586,7 @@ func _import_backup()->void:
 func _apply_settings()->void:
 	Engine.max_fps=settings.fps;get_viewport().msaa_3d=settings.msaa();ground_view.set_quality(settings.quality);celestial.set_quality(settings.quality);stick.deadzone=settings.deadzone;presentation_key=""
 	player.set_quality(settings.quality);station.configure(settings.quality);space_environment.configure(ship.STATION,settings.quality)
-func _settings_changed()->void:_apply_settings();settings.save_file()
+func _settings_changed()->void:_apply_settings();settings.save_file();_record_event("settings_changed",settings.snapshot())
 func _close_settings()->void:settings_panel.hide();_release_inputs();_save_game()
 
 func _unhandled_key_input(event:InputEvent)->void:
@@ -529,9 +606,12 @@ func _unhandled_key_input(event:InputEvent)->void:
 		KEY_M:_show_system()
 func _notification(what:int)->void:
 	if what==NOTIFICATION_APPLICATION_PAUSED or what==NOTIFICATION_APPLICATION_FOCUS_OUT:
+		if diagnostics!=null and not automated:diagnostics.lifecycle("paused" if what==NOTIFICATION_APPLICATION_PAUSED else "focus_out")
 		active=false;_release_inputs()
-		if ship!=null:_save_game()
-	elif what==NOTIFICATION_APPLICATION_RESUMED or what==NOTIFICATION_APPLICATION_FOCUS_IN:active=true
+		if ship!=null and (report_export==null or not report_export.is_busy()):_save_game()
+	elif what==NOTIFICATION_APPLICATION_RESUMED or what==NOTIFICATION_APPLICATION_FOCUS_IN:
+		active=true
+		if diagnostics!=null and not automated:diagnostics.lifecycle("resumed" if what==NOTIFICATION_APPLICATION_RESUMED else "focus_in")
 	elif what==NOTIFICATION_WM_GO_BACK_REQUEST:
 		if menu!=null:
 			if settings_panel.visible:_close_settings()
@@ -540,6 +620,7 @@ func _notification(what:int)->void:
 	elif what==NOTIFICATION_WM_CLOSE_REQUEST:
 		_save_game();get_tree().quit()
 func _exit_tree()->void:
+	if diagnostics!=null:diagnostics.shutdown(true)
 	if worker!=null and worker.is_started():worker.wait_to_finish()
 
 func _run_smoke()->void:

@@ -1,0 +1,20 @@
+{
+  "scope": "Original F883..F887 complete standalone paths, explicit atomic non-naming/settlement gate; no fullF881 or liveworld integration",
+  "engine": "Godot4.6.3",
+  "checks": 20637,
+  "failures": 0,
+  "native_cases": 3060,
+  "accepted": 2224,
+  "gated": 836,
+  "helper_counts": {
+    "893": 818,
+    "892": 18
+  },
+  "fresh_process_runs": 3,
+  "reverse_repeat_count": 3060,
+  "fixture_sha256": "084693382bb600a66a71c1dd305a4d72b27d3bbc45896246013cfb39cf1eec35",
+  "native_ordered_output_sha256": "7bf1f35935b308a548509c44e0c42110903a0249661e05735fbd19e7595d8389",
+  "fixture_reproduced_byte_identically": true,
+  "physical_device_tested": false,
+  "live_world_integrated": false
+}

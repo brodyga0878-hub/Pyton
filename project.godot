@@ -27,3 +27,10 @@ pointing/emulate_mouse_from_touch=true
 
 [audio]
 driver/enable_input=false
+
+[debug]
+settings/gdscript/always_track_call_stacks=true
+file_logging/enable_file_logging=false
+file_logging/enable_file_logging.pc=false
+file_logging/log_path="user://logs/godot.log"
+file_logging/max_log_files=3

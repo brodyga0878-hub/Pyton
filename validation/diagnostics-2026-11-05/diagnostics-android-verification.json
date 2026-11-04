@@ -1,0 +1,61 @@
+{
+  "package": "org.starfrontier.rebuild",
+  "version": "0.11.2-diagnostics-alpha1",
+  "version_code": 24,
+  "apk": "starfrontier-rebuild-arm64-alpha.apk",
+  "bytes": 26642484,
+  "sha256": "c53b93007e9d259b72d33304531ba27503921202876e54c9a91b9610fa70856b",
+  "abi": "arm64-v8a",
+  "min_sdk": 24,
+  "target_sdk": 36,
+  "signature_verified": true,
+  "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+  "test_key_only": true,
+  "zipalign_16k": true,
+  "elf_load_alignment": {
+    "lib/arm64-v8a/libc++_shared.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/arm64-v8a/libgodot_android.so": [
+      16384,
+      16384,
+      16384
+    ]
+  },
+  "forbidden_permissions_absent": true,
+  "debuggable": false,
+  "native_data_checked": true,
+  "native_data_assets": [
+    "ffe_ground_coordinates",
+    "ffe_ground_pads",
+    "ffe_ship_registry",
+    "ffe_world_models",
+    "ffe_worlds"
+  ],
+  "graphics_runtime_assets_sha256": {
+    "ship_visual.gdc": "fca8698ba74f407b482af3463cd404b9e648c5dc88303ea96058861b1e777e90",
+    "ship_hull.gdshader": "3bc3b1f96550e0f3a29bb7b21758e9c9a756314898facc7ec5ebe9d4b1910856",
+    "ship_exhaust.gdshader": "7c99ef81f2cb6f371871d0affe1f07e5d80d47474ceee8a750d8a1a28c76b5ae",
+    "ship_halo.gdshader": "f1dfa4528e2ab40319e97e4c81226ed96c67452ced72326d675a4b4979783a3c",
+    "station_visual.gdc": "a45b1e7dc065df0f3d64142d1eb65d2d6e22dcda5a17f96ee2f6984f1807fe14",
+    "station_solar.gdshader": "99460e3ba9782ffab445d5215955be8d1f8631f5a2d2bb2b2b9d0e93a80cb086",
+    "space_environment.gdc": "a800dc1e8e366e8ccdd608d1f14e7a8f96fff3a03fd2d18ca05c5e23d88206c4",
+    "asteroid_surface.gdshader": "aa48cdbd5331287ad3c07b493f7434d424e3c4fce0abc750c8cbbd30fb0ac96f",
+    "space_sky.gdshader": "f91797913b04ff61dc8897c27b477845607248e87f36363869c30fc39f5117bd",
+    "flight_theme.gdc": "0f18d0f4af096321e52e697e8d2bc0df6307246f653edcf4e462ed1aaaa4f488",
+    "flight_reticle.gdc": "2cfdbbb3309b07ec2a5496aa4fea2daaeee9abbf1a22e7404930b83ee95826cc"
+  },
+  "diagnostics_runtime_assets_sha256": {
+    "build_info.gdc": "6fd1f500647ce79887f55a857fd805dd64b85652e1345cbf6f5a01c9ac4b46b4",
+    "game_diagnostics.gdc": "51d657ed662cef5b8ab425cbfacd69a0ac8e3c10cefe6fc2b27f11b567920e7b",
+    "diagnostics_logger.gdc": "f0e61955122e3fdf38a72261a51022a1fd12604ac6afca8ea57eaecce67515d9",
+    "report_export.gdc": "646bb7027e996505810ccac7902ec3e0414af9e3f0f34e71f6d22640f52afa59"
+  },
+  "toolchain_smoke_only": false,
+  "physical_device_tested": false,
+  "full_original_port_complete": false,
+  "production_signing_key_configured": false,
+  "publication_ready": false
+}

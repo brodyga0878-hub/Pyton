@@ -1,0 +1,21 @@
+test_actual_collector_error_and_save (test_inspect_bug_report.ReportInspectionTests.test_actual_collector_error_and_save) ... ok
+test_bad_crc (test_inspect_bug_report.ReportInspectionTests.test_bad_crc) ... ok
+test_bad_json_utf8_and_nonfinite (test_inspect_bug_report.ReportInspectionTests.test_bad_json_utf8_and_nonfinite) ... ok
+test_budgets (test_inspect_bug_report.ReportInspectionTests.test_budgets) ... ok
+test_duplicate_manifest_name (test_inspect_bug_report.ReportInspectionTests.test_duplicate_manifest_name) ... ok
+test_duplicate_name (test_inspect_bug_report.ReportInspectionTests.test_duplicate_name) ... ok
+test_invalid_cli_returns_structured_error (test_inspect_bug_report.ReportInspectionTests.test_invalid_cli_returns_structured_error) ... ok
+test_json_cli (test_inspect_bug_report.ReportInspectionTests.test_json_cli) ... ok
+test_legacy_unicode_log_name (test_inspect_bug_report.ReportInspectionTests.test_legacy_unicode_log_name) ... ok
+test_optional_save_absent_valid (test_inspect_bug_report.ReportInspectionTests.test_optional_save_absent_valid) ... ok
+test_partial_old_event_and_unclean_note (test_inspect_bug_report.ReportInspectionTests.test_partial_old_event_and_unclean_note) ... ok
+test_save_flag_mismatch (test_inspect_bug_report.ReportInspectionTests.test_save_flag_mismatch) ... ok
+test_symlink (test_inspect_bug_report.ReportInspectionTests.test_symlink) ... ok
+test_tampered_payload (test_inspect_bug_report.ReportInspectionTests.test_tampered_payload) ... ok
+test_unknown_schema (test_inspect_bug_report.ReportInspectionTests.test_unknown_schema) ... ok
+test_unsafe_and_unknown_paths (test_inspect_bug_report.ReportInspectionTests.test_unsafe_and_unknown_paths) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.175s
+
+OK

@@ -277,7 +277,7 @@
     },
     {
       "path": "scripts/main.gd",
-      "current_sha256": "4a5ce7daa46a05064060fe96a6af1de467db7a918e0f5bbcf4ab30c29ba2c5ba",
+      "current_sha256": "367d646bd79f5562a877cc2fd323d4b8e79753650485cc2b1df4cc8cbb201604",
       "current_kind": "new_reconstruction",
       "provenance_note": "See module docs for retained fragments, new behavior and independent controls."
     },
@@ -401,6 +401,42 @@
       "current_kind": "new_authored_graphics",
       "provenance_note": "Original authored graphics; no reference-game assets copied.",
       "current_sha256": "608accaa7fe953793b88c5d975279016b5d372a061fb12b1b2d93dde49196716"
+    },
+    {
+      "path": "scripts/build_info.gd",
+      "current_kind": "new_application_feature",
+      "provenance_note": "See module documentation and independent validation reports.",
+      "current_sha256": "c49700ee323a3af53782093cf28eed7edf57f729603543872e707a8bf65596fc"
+    },
+    {
+      "path": "scripts/diagnostics_logger.gd",
+      "current_kind": "new_application_feature",
+      "provenance_note": "See module documentation and independent validation reports.",
+      "current_sha256": "a0a2a4a993613f3f864d669f862229db29293793a6084636bee1d4eabbf7a052"
+    },
+    {
+      "path": "scripts/game_diagnostics.gd",
+      "current_kind": "new_application_feature",
+      "provenance_note": "See module documentation and independent validation reports.",
+      "current_sha256": "deeebf19f52ddd5223acaeac816c51006fbdcdeb61daebe1869c2142c3f366d2"
+    },
+    {
+      "path": "scripts/planetary_classifier.gd",
+      "current_kind": "new_original_procedure_port",
+      "provenance_note": "See module documentation and independent validation reports.",
+      "current_sha256": "d8d419c2a15077766cb1393348c433e8b4e92efca48f6e723f2de938f590736c"
+    },
+    {
+      "path": "scripts/report_export.gd",
+      "current_kind": "new_application_feature",
+      "provenance_note": "See module documentation and independent validation reports.",
+      "current_sha256": "7e9ed1f49f4206cc38684f2bbd155ab09cfdecce8d0a050963a26555b899f48d"
+    },
+    {
+      "path": "scripts/stellar_body_factory.gd",
+      "current_kind": "new_original_procedure_port",
+      "provenance_note": "See module documentation and independent validation reports.",
+      "current_sha256": "cb96e2a6b480f559a49dcbe4ead8a59c5a0b23c0fb6e95a2596a049121d4e144"
     }
   ]
 }

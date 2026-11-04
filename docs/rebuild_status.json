@@ -30,7 +30,7 @@
   "current_reconstruction": {
     "implementation_kind": "New integration and newly written missing modules around preserved historical source; not discovery of the complete former source tree",
     "application_version": "0.11.0-rebuild-alpha1",
-    "application_integration_status": "Graphics0.11.1: actual game GLES captures, targeted regressions, gameplay smoke and ARM64 package verification passed; physical device untested",
+    "application_integration_status": "Diagnostics0.11.2: real report UI/ZIP and checked export logic, targeted regression and gameplay smoke passed; native Android SAF verified by official source, physical device untested",
     "native_android_runtime": "Godot ARM64; no DOS or x86 emulator in the game",
     "modules_present": [
       "New main scene controller and Russian phone interface",
@@ -157,20 +157,20 @@
     },
     "whole_application_smoke_passed": true,
     "whole_application_smoke_scope": "Actual scene: source Sol/Earth, training auto dock/delivery, original New Moscow84 entry/landing, atomic disk save/reload and persistent source-city view; desktop Godot only",
-    "whole_application_smoke_log": "validation/graphics-2026-11-04/app-smoke.log",
+    "whole_application_smoke_log": "validation/diagnostics-2026-11-05/app-smoke.log",
     "desktop_gles_render_passed": true,
     "desktop_gles_render_scope": "Four actual GLES captures: space, system menu, native city approach and landed ship; no Android hardware measurements",
     "desktop_gles_render_log": "validation/graphics-2026-11-04/render.log",
     "android_apk_built": true,
     "android_apk_technically_verified": true,
     "android_artifact_status": "Final current reconstruction game exported after controller/pointer fixes and technically verified without toolchain-only smoke option",
-    "final_android_candidate_hash": "5886cde95201050a1c2a35d3d47e3d0ce0ec5531d02214e757a412dfc613e9e1",
+    "final_android_candidate_hash": "c53b93007e9d259b72d33304531ba27503921202876e54c9a91b9610fa70856b",
     "final_android_candidate": {
-      "file": "deliverables/0.11.1-graphics-alpha1/StarFrontier-0.11.1-graphics-arm64.apk",
-      "bytes": 26604534,
+      "file": "deliverables/0.11.2-diagnostics-alpha1/StarFrontier-0.11.2-diagnostics-arm64.apk",
+      "bytes": 26642484,
       "package": "org.starfrontier.rebuild",
-      "version": "0.11.1-graphics-alpha1",
-      "version_code": 23,
+      "version": "0.11.2-diagnostics-alpha1",
+      "version_code": 24,
       "abi": "arm64-v8a",
       "min_sdk": 24,
       "target_sdk": 36,
@@ -180,7 +180,7 @@
       "native_data_assets_verified": true,
       "debuggable": false,
       "toolchain_smoke_only": false,
-      "verification_report": "validation/graphics-2026-11-04/graphics-android-verification.json"
+      "verification_report": "validation/diagnostics-2026-11-05/diagnostics-android-verification.json"
     },
     "physical_device_tested": false,
     "new_russian_name_labels": 133,
@@ -198,7 +198,7 @@
       "Three adapted flight profiles and training services do not complete original ships, equipment, economy, combat, AI or campaign",
       "Russian interface and new proper-name labels do not complete the original text corpus or editorial review"
     ],
-    "application_version_planned": "0.11.1-graphics-alpha1",
+    "application_version_planned": "0.11.2-diagnostics-alpha1",
     "graphics_update": {
       "version": "0.11.1-graphics-alpha1",
       "checks": 1408,
@@ -228,6 +228,34 @@
       "included_in_published_graphics_apk": false,
       "documentation": "docs/STAGE10_STELLAR_FACTORY_RU.md",
       "validation_report": "validation/stage10-stellar-factory/curated-validation.json"
+    },
+    "diagnostics_update": {
+      "version": "0.11.2-diagnostics-alpha1",
+      "schema": "starfrontier-diagnostics-v1",
+      "godot_checks": 357,
+      "godot_suites": 6,
+      "python_inspector_tests": 16,
+      "failures": 0,
+      "validation_report": "validation/diagnostics-2026-11-05/diagnostics-validation.json",
+      "export": "Android SAF ACTION_CREATE_DOCUMENT + FileAccess content URI; no storage permissions",
+      "physical_android_save_dialog_tested": false,
+      "bounded_native_logger": true,
+      "native_file_logger_disabled": true,
+      "full_progress_requires_checkbox": true,
+      "archive_payload_limit_bytes": 4194304,
+      "archive_limit_bytes": 8388608,
+      "retained_archives": 5
+    },
+    "planetary_classifier_followup": {
+      "source_procedures": "F883..F887 and F894",
+      "native_cases": 3060,
+      "completed_paths": 2224,
+      "explicit_unsupported_gates": 836,
+      "checks": 20637,
+      "failures": 0,
+      "live_world_integrated": false,
+      "documentation": "docs/STAGE10_PLANETARY_CLASSIFIER_RU.md",
+      "validation_report": "validation/stage10-planetary-classifier/summary.json"
     }
   },
   "target_device": "Samsung S23 Ultra 12/512",
@@ -257,5 +285,6 @@
   "current_prerequisite": "Preserve and publish current source, verified test APK and validation reports; continue block10 with explicit source-versus-adapter boundaries while physical phone testing remains pending",
   "historical_statistics_are_current_validation": false,
   "full_release_date": null,
-  "detailed_audit": "docs/RECOVERY_AND_ROADMAP_RU.md"
+  "detailed_audit": "docs/RECOVERY_AND_ROADMAP_RU.md",
+  "last_updated_moscow": "2026-11-05"
 }

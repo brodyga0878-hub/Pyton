@@ -48,6 +48,7 @@ SUITES = [
     Suite('body_initializer', 'tests/test_rebuilt_body_initializer.gd', 'Complete original F882 packed-record initialization versus 1424 native contexts; isolated from the live analytic world and ephemerides.'),
     Suite('body_rotation', 'tests/test_rebuilt_body_rotation.gd', 'Exact F880 initialization/F866 orientation slice with F1675/F1914/F1521 versus 1542 native contexts; excludes full F866, original clock epoch, animations and orbital updates.'),
     Suite('stellar_factory', 'tests/test_stellar_body_factory.gd', 'Bounded original F881 stellar-name domain plus F882/remnant callbacks/F894 against 760 independent native contexts; excludes planetary generation, brown-dwarf naming and live-world integration.'),
+    Suite('planetary_classifier', 'tests/test_planetary_classifier.gd', 'Original bounded F883..887 planetary classification versus 3060 native controls; supported paths match full records/RNG, naming and settlement paths reject atomically.'),
     Suite('worlds', 'tests/test_rebuilt_worlds.gd', 'Handcrafted original records and explicit analytic world/navigation adapter.'),
     Suite('flight', 'tests/test_rebuilt_flight.gd', 'Rebuilt flight, phone steering inputs, adapted training economy, atomic flight saves.'),
     Suite('cities', 'tests/test_rebuilt_cities.gd', 'Source3 city geometry, pad selection, collision, landing/takeoff/restore integration.'),
@@ -61,6 +62,9 @@ SUITES = [
     Suite('graphics_ship', 'tests/test_ship_graphics.gd', 'Authored detailed ship geometry, normal/span contracts, cache/lifecycle, exhaust, and landing gear; not the complete original ship catalogue or device rendering.'),
     Suite('graphics_environment', 'tests/test_graphics_space_environment.gd', 'Batched orbital-station geometry, deterministic asteroid placement, clear approach/planet-view cones and distance/quality LOD; visual scenery only.'),
     Suite('graphics_integration', 'tests/test_graphics_integration.gd', 'Actual Main graphics-flight entry/return, isolated original progress/save bytes, save-failure guard, controls/quality and native city return; private test save directory.', user_args=('--rebuild-capture',)),
+    Suite('diagnostics', 'tests/test_game_diagnostics.gd', 'Bounded persistent diagnostics, real isolated engine/script errors, archive CRC/hash/retention, session markers and explicit save opt-in.'),
+    Suite('report_export', 'tests/test_report_export.gd', 'Checked multiblock ZIP export, errors/cancel/retry, source preservation; Android SAF separately source-verified, physical device untested.'),
+    Suite('bug_report_ui', 'tests/test_bug_report_ui.gd', 'Actual Main report buttons, report description/context/save opt-in, verified export callback, direct retry and original progress isolation.', user_args=('--rebuild-capture',)),
 ]
 
 

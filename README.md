@@ -3,7 +3,7 @@
 Ветка `development/starfrontier-rebuild` содержит **новую запускаемую основу** нативного Android-проекта на Godot 4.6.3. Она собрана из частично восстановленных исторических модулей, повторно извлечённых исходных данных FFE и заново написанного недостающего кода. Полный прежний проект и APK версии 0.10.8 не найдены.
 
 
-[Скачать Android APK 0.11.1](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/development/starfrontier-rebuild/deliverables/0.11.1-graphics-alpha1/StarFrontier-0.11.1-graphics-arm64.apk) · [Скачать исходники этой сборки](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/development/starfrontier-rebuild/deliverables/0.11.1-graphics-alpha1/StarFrontier-0.11.1-graphics-source.zip) · [Что доступно в сборке](docs/GRAPHICS_0_11_1_RU.md)
+[Скачать Android APK 0.11.2](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/development/starfrontier-rebuild/deliverables/0.11.2-diagnostics-alpha1/StarFrontier-0.11.2-diagnostics-arm64.apk) · [Скачать исходники этой сборки](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/development/starfrontier-rebuild/deliverables/0.11.2-diagnostics-alpha1/StarFrontier-0.11.2-diagnostics-source.zip) · [Что доступно в сборке](docs/DIAGNOSTICS_0_11_2_RU.md)
 
 Работают полёт, сенсорный стик с независимыми пальцами для скорости и подъёма, автоподход/стыковка, переходы между 11 системами, выбор объектов и космопортов, исходные открытые города, посадка/взлёт и двухслотовое сохранение с проверкой целостности. Интерфейс русский. Игра использует ARM64 Godot без DOS/x86-эмулятора.
 
@@ -36,3 +36,6 @@ python3 tools/verify_rebuilt_android.py build/starfrontier-rebuild-arm64-alpha.a
 
 
 В0.11.1 добавлены новый корпус, выхлоп/шасси, станция, астероиды и планеты. «Меню → Графический полёт» позволяет осмотреть оформление, сохранив основной прогресс. [Снимки настоящей игровой сцены](validation/graphics-2026-11-04/screenshots/) сняты через desktop GLES; это не измерения телефона.
+
+
+В0.11.2: «Меню → Отчёт об ошибке / логи → Собрать ZIP и сохранить…». Выберите «Загрузки», затем прикрепите ZIP к сообщению в ChatGPT. Снимок полёта добавляется отдельной галочкой. [Диагностика и ограничения](docs/DIAGNOSTICS_0_11_2_RU.md), [инструмент чтения ZIP](tools/inspect_bug_report.py).
