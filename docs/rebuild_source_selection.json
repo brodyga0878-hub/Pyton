@@ -1,0 +1,141 @@
+{
+  "scope": "Starting selection of preserved code; new code tracked separately in Git",
+  "files": [
+    {
+      "path": "scripts/surface_model.gd",
+      "recovered_from": "recovered-history/geographic_descent_model/scripts/surface_model.gd"
+    },
+    {
+      "path": "scripts/spherical_terrain.gd",
+      "recovered_from": "recovered-history/geographic_descent_model/scripts/spherical_terrain.gd"
+    },
+    {
+      "path": "scripts/surface_orbit_link.gd",
+      "recovered_from": "recovered-history/geographic_descent_model/scripts/surface_orbit_link.gd"
+    },
+    {
+      "path": "scripts/near_surface_view.gd",
+      "recovered_from": "recovered-history/geographic_descent_model/scripts/near_surface_view.gd"
+    },
+    {
+      "path": "scripts/celestial_renderer.gd",
+      "recovered_from": "recovered-history/geographic_descent_model/scripts/celestial_renderer.gd"
+    },
+    {
+      "path": "scripts/world_presentation.gd",
+      "recovered_from": "recovered-history/geographic_descent_model/scripts/world_presentation.gd"
+    },
+    {
+      "path": "scripts/segment_box.gd",
+      "recovered_from": "recovered-history/geography_regression/scripts/segment_box.gd"
+    },
+    {
+      "path": "scripts/segment_triangle.gd",
+      "recovered_from": "recovered-history/geography_regression/scripts/segment_triangle.gd"
+    },
+    {
+      "path": "tests/test_segment_triangle.gd",
+      "recovered_from": "recovered-history/geography_regression/tests/test_segment_triangle.gd"
+    },
+    {
+      "path": "scripts/surface_visual.gd",
+      "recovered_from": "recovered-history/worlds_completion_audit/scripts/surface_visual.gd"
+    },
+    {
+      "path": "scripts/device_settings.gd",
+      "recovered_from": "recovered-history/worlds_completion_audit/scripts/device_settings.gd"
+    },
+    {
+      "path": "scripts/source_city_view.gd",
+      "recovered_from": "recovered-history/worlds_completion_audit/scripts/source_city_view.gd"
+    },
+    {
+      "path": "tests/test_source_city_view.gd",
+      "recovered_from": "recovered-history/worlds_completion_audit/tests/test_source_city_view.gd"
+    },
+    {
+      "path": "scripts/terrain.gdshader",
+      "recovered_from": "recovered-history/coverage_shaders/scripts/terrain.gdshader"
+    },
+    {
+      "path": "scripts/terrain_transition.gdshader",
+      "recovered_from": "recovered-history/coverage_shaders/scripts/terrain_transition.gdshader"
+    },
+    {
+      "path": "scripts/planet.gdshader",
+      "recovered_from": "recovered-history/coverage_shaders/scripts/planet.gdshader"
+    },
+    {
+      "path": "scripts/atmosphere.gdshader",
+      "recovered_from": "recovered-history/coverage_shaders/scripts/atmosphere.gdshader"
+    },
+    {
+      "path": "scripts/rings.gdshader",
+      "recovered_from": "recovered-history/coverage_shaders/scripts/rings.gdshader"
+    },
+    {
+      "path": "scripts/landing_pad.gdshader",
+      "recovered_from": "recovered-history/coverage_shaders/scripts/landing_pad.gdshader"
+    },
+    {
+      "path": "scripts/building.gdshader",
+      "recovered_from": "recovered-history/coverage_shaders/scripts/building.gdshader"
+    },
+    {
+      "path": "scripts/settings_panel.gd",
+      "recovered_from": "recovered-history/coverage_shaders/scripts/settings_panel.gd"
+    },
+    {
+      "path": "scripts/source_city_profile.gd",
+      "recovered_from": "recovered-history/root/scripts/source_city_profile.gd"
+    },
+    {
+      "path": "scripts/source_units.gd",
+      "recovered_from": "recovered-history/root/scripts/source_units.gd"
+    },
+    {
+      "path": "scripts/source_model_visual.gd",
+      "recovered_from": "recovered-history/root/scripts/source_model_visual.gd"
+    },
+    {
+      "path": "scripts/source_model.gdshader",
+      "recovered_from": "recovered-history/root/scripts/source_model.gdshader"
+    },
+    {
+      "path": "scripts/source_city_runtime.gd",
+      "recovered_from": "recovered-history/ground_vector_source/scripts/source_city_runtime.gd"
+    },
+    {
+      "path": "scripts/source_model_mesh.gd",
+      "recovered_from": "recovered-history/ground_vector_source/scripts/source_model_mesh.gd"
+    },
+    {
+      "path": "scripts/source_model_vm.gd",
+      "recovered_from": "recovered-history/ground_vector_source/scripts/source_model_vm.gd"
+    },
+    {
+      "path": "scripts/source_model_vertices.gd",
+      "recovered_from": "recovered-history/ground_vector_source/scripts/source_model_vertices.gd"
+    },
+    {
+      "path": "tests/test_source_city_runtime.gd",
+      "recovered_from": "recovered-history/ground_vector_source/tests/test_source_city_runtime.gd"
+    },
+    {
+      "path": "tests/test_source_model_mesh.gd",
+      "recovered_from": "recovered-history/ground_vector_source/tests/test_source_model_mesh.gd"
+    },
+    {
+      "path": "scripts/source_polygon.gd",
+      "recovered_from": "recovered-history/source_terrain_revision/scripts/source_polygon.gd"
+    },
+    {
+      "path": "scripts/ground_coordinates.gd",
+      "recovered_from": "recovered-history/source_terrain_revision/scripts/ground_coordinates.gd"
+    },
+    {
+      "path": "scripts/source_ground_pads.gd",
+      "recovered_from": "recovered-history/ground_harness/scripts/source_ground_pads.gd"
+    }
+  ]
+}

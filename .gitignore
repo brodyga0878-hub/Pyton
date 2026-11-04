@@ -1,0 +1,10 @@
+.godot/
+build/
+**/__pycache__/
+*.pyc
+*.keystore
+*.jks
+*.pem
+*.key
+.env*
+

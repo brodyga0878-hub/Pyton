@@ -1,0 +1,114 @@
+{
+  "audit_date_moscow": "2026-11-04",
+  "snapshot_scope": "Historical recovery baseline plus explicitly separated current reconstruction in progress",
+  "recovery_commit": "2f91ec7500e2da0f86abd95f9d2c0917072fe48e",
+  "recovered_history_files": 301,
+  "identified_original_paths": 105,
+  "full_previous_project_restored": false,
+  "old_source_zip_found": false,
+  "old_apk_found": false,
+  "historical_last_built_version_reported": "0.10.8-alpha1",
+  "historical_unreleased_city_work": "10.21-10.22 / planned 0.10.9",
+  "historical_source_city_integration": {
+    "checks": 347,
+    "failures": 10,
+    "rerun_in_recovered_workspace": false,
+    "failure_categories": [
+      "Six insufficient actual city grading footprints",
+      "Four pending atomic rejection checks for underground model96"
+    ]
+  },
+  "recovery_validation": {
+    "scope": "Initial recovery archive checks, not the current rebuilt application",
+    "segment_triangle_analytic_checks": 144,
+    "source_city_view_synthetic_checks": 33,
+    "failures": 0,
+    "historical_surface_model_parse_only": true,
+    "full_game_tested": false,
+    "android_apk_tested": false
+  },
+  "current_reconstruction": {
+    "implementation_kind": "New integration and newly written missing modules around preserved historical source; not discovery of the complete former source tree",
+    "application_version_planned": "0.11.0 reconstruction alpha",
+    "application_integration_status": "Common scene/controller integration and smoke verification in progress",
+    "native_android_runtime": "Godot ARM64; no DOS or x86 emulator in the game",
+    "modules_present": [
+      "New main scene controller and Russian phone interface",
+      "Reassembled Flight with newly written missing behavior and adapted training services",
+      "New bounded Galaxy, Navigation and analytic PlanetarySystem",
+      "Reintegrated Surface, Near and OrbitLink with source city models81..90",
+      "New independent-reference-checked FFE arithmetic",
+      "New two-slot atomic SaveStore and rebuild-game-v1 candidate decoding"
+    ],
+    "original_data_regeneration": {
+      "provenance_file": "data/ffe_data_provenance.json",
+      "original_archive_sha256": "8495ca9a5c7714816c62255810bb88b878dab8f33b09090ef5e57a3ffafcd7fd",
+      "original_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+      "handcrafted_systems": 11,
+      "mapped_handcrafted_objects": 130,
+      "unmapped_riedquat_fallback_objects": 3,
+      "mapped_settlements": 38,
+      "source_ship_records": 57,
+      "source_ship_selection_pools": 19,
+      "world_model_programs": 150,
+      "source_terrain_models": 17,
+      "native_handcrafted_record_checks": {
+        "records": 133,
+        "bytes_per_record": 68,
+        "buffer_slots_including_zero_slot146": 147,
+        "fresh_process_repetitions": 3,
+        "all_records_buffer_and_final_rng_equal": true,
+        "scope": "Independent actual F872/F873/F874/F875 execution, not full ephemerides or procedural galaxy validation"
+      }
+    },
+    "current_module_validation": {
+      "engine": "Godot 4.6.3",
+      "worlds_navigation": {"checks": 719, "failures": 0, "test": "tests/test_rebuilt_worlds.gd"},
+      "flight": {"checks": 94, "failures": 0, "test": "tests/test_rebuilt_flight.gd"},
+      "cities_surface": {"checks": 374, "failures": 0, "test": "tests/test_rebuilt_cities.gd"},
+      "ffe_arithmetic": {"checks": 142987, "failures": 0, "test": "tests/test_rebuilt_ffe_math.gd"},
+      "adapted_catalogues": {"checks": 22, "failures": 0},
+      "synthetic_city_view": {"checks": 33, "failures": 0, "test": "tests/test_source_city_view.gd"},
+      "scope": "Current modular desktop headless checks; not evidence of full original FFE completion, new APK verification or physical phone behavior"
+    },
+    "whole_application_smoke_passed": false,
+    "android_apk_built": false,
+    "android_apk_technically_verified": false,
+    "physical_device_tested": false,
+    "new_russian_name_labels": 133,
+    "adapted_flight_profiles": 3,
+    "original_port_services_available": false,
+    "new_game_save_schema": "starfrontier-rebuild-game-v1",
+    "complete_old_game_save_import_verified": false,
+    "original_commandr_progress_import_verified": false,
+    "known_boundaries": [
+      "11 original handcrafted systems on an explicitly adapted connected map; full original procedural galaxy missing",
+      "Physical radii, orbits, clocks, generic arrival docks and navigation fuel rules remain analytic or gameplay adapters",
+      "Source cities81..90 and native pads work in current tested surface integration; model96 underground entrance is not implemented",
+      "Surrounding terrain, city-root altitude and grading policy remain adaptations; source F879 and full physical surface integration incomplete",
+      "Three adapted flight profiles and training services do not complete original ships, equipment, economy, combat, AI or campaign",
+      "Russian interface and new proper-name labels do not complete the original text corpus or editorial review"
+    ]
+  },
+  "target_device": "Samsung S23 Ultra 12/512",
+  "android_version_user_reported": "17",
+  "one_ui_version_user_reported": "9",
+  "physical_device_tested": false,
+  "full_original_port_complete": false,
+  "full_russian_localization_complete": false,
+  "publication_ready": false,
+  "remaining_major_blocks": 6,
+  "major_block_order": [10, 9, 11, 12, 13, 14],
+  "block_titles": {
+    "9": "Ships and equipment",
+    "10": "Worlds and settlements",
+    "11": "Economy, factions and AI",
+    "12": "Campaign",
+    "13": "Full Russian localization",
+    "14": "Device testing and release"
+  },
+  "current_prerequisite": "Complete common application integration, verify smoke/save/phone controls, build and technically verify a fresh ARM64 test APK; then continue block10 with explicit source-versus-adapter boundaries",
+  "historical_statistics_are_current_validation": false,
+  "full_release_date": null,
+  "detailed_audit": "docs/RECOVERY_AND_ROADMAP_RU.md"
+}

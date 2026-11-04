@@ -1,0 +1,191 @@
+{
+  "schema": 1,
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_procedure_hashes": {
+    "650": "798e079aaa4357dd629a2f6f6a6c68856183858794521feedc2b09ef20c0ccc7",
+    "1521": "ba18bd552b16196d550b9a49e7b86be8fdc49bac0bdee173c0ae9132ad2f3e88",
+    "1669": "e12b5dce42d79454bec2ef0b4c900f3159ae204d2b60f58e3a82ed1cb4b6d427",
+    "1674": "7082b924bbc73b4834ee21ae92de909ffb1b9086302cf900c4c25530c8bfa257",
+    "1914": "2fec2b6bb618c1a2708966ad2ae676b977d6ce6b4aaf6d33cb6f83d2c586c5e3"
+  },
+  "f880_count_snippet_sha256": "1e4357ea228de1182870c752088bb528c7caaf66457e323729a950dbd1714add",
+  "tables_offset": "0xc7e0c",
+  "tables_byte_length": 192,
+  "tables_sha256": "5421099a2660f2916b5a35790b5d6e16fd865ee7da6676d928871304ba1d1cbd",
+  "tables": {
+    "6175": {
+      "label": "DATA_006175",
+      "offset": "0xc7e0c",
+      "byte_length": 24,
+      "sha256": "6efbe532d837eaae6eb5651b707368776735806ae2e9ae0180d7f5af7b53b474",
+      "vectors_i32": [
+        [
+          200,
+          0,
+          -200
+        ],
+        [
+          -200,
+          0,
+          -200
+        ]
+      ]
+    },
+    "6176": {
+      "label": "DATA_006176",
+      "offset": "0xc7e24",
+      "byte_length": 24,
+      "sha256": "e6ef0412332aaa47768e7a2f2e36771695c037ef76df1b602825fadea0732e99",
+      "vectors_i32": [
+        [
+          262,
+          0,
+          0
+        ],
+        [
+          -200,
+          0,
+          -200
+        ]
+      ]
+    },
+    "6177": {
+      "label": "DATA_006177",
+      "offset": "0xc7e3c",
+      "byte_length": 24,
+      "sha256": "08d79f7f1f95fb102845ff70d180925eff4199e0ccc796e4ebe28d2ce852d0de",
+      "vectors_i32": [
+        [
+          250,
+          0,
+          250
+        ],
+        [
+          -250,
+          0,
+          250
+        ]
+      ]
+    },
+    "6178": {
+      "label": "DATA_006178",
+      "offset": "0xc7e54",
+      "byte_length": 48,
+      "sha256": "ba6d2b29cf8ab820e583e69359daf9106fb3251db5b51644e3c6ccf028193006",
+      "vectors_i32": [
+        [
+          -480,
+          0,
+          -60
+        ],
+        [
+          480,
+          0,
+          -60
+        ],
+        [
+          -840,
+          0,
+          -900
+        ],
+        [
+          840,
+          0,
+          -900
+        ]
+      ]
+    },
+    "6179": {
+      "label": "DATA_006179",
+      "offset": "0xc7e84",
+      "byte_length": 72,
+      "sha256": "28bbacb0efe69bb55d9ac3ad7c6879e1278a1aae7f7aba516129a0eaaf0da566",
+      "vectors_i32": [
+        [
+          -960,
+          0,
+          -560
+        ],
+        [
+          -960,
+          0,
+          560
+        ],
+        [
+          0,
+          0,
+          -1120
+        ],
+        [
+          0,
+          0,
+          1120
+        ],
+        [
+          960,
+          0,
+          -560
+        ],
+        [
+          960,
+          0,
+          560
+        ]
+      ]
+    }
+  },
+  "scope": "Original F650 open-air ground pad vectors. Table triples are signed int32 before F1669 matrix transformation and 32-bit SHL10/sign extension to Vec64. F880 pad counts match all model81..90 mappings. No terrain height, player UI, landing permission or rendered model312 inference.",
+  "coordinate_shift_after_matrix": 10,
+  "models": {
+    "81": {
+      "table": "6178",
+      "pad_count": 4,
+      "last_pad_index": 3
+    },
+    "82": {
+      "table": "6178",
+      "pad_count": 4,
+      "last_pad_index": 3
+    },
+    "83": {
+      "table": "6179",
+      "pad_count": 6,
+      "last_pad_index": 5
+    },
+    "84": {
+      "table": "6179",
+      "pad_count": 6,
+      "last_pad_index": 5
+    },
+    "85": {
+      "table": "6177",
+      "pad_count": 2,
+      "last_pad_index": 1
+    },
+    "86": {
+      "table": "6175",
+      "pad_count": 2,
+      "last_pad_index": 1
+    },
+    "87": {
+      "table": "6179",
+      "pad_count": 6,
+      "last_pad_index": 5
+    },
+    "88": {
+      "table": "6179",
+      "pad_count": 6,
+      "last_pad_index": 5
+    },
+    "89": {
+      "table": "6176",
+      "pad_count": 2,
+      "last_pad_index": 1
+    },
+    "90": {
+      "table": "6179",
+      "pad_count": 6,
+      "last_pad_index": 5
+    }
+  }
+}

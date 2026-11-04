@@ -1,0 +1,1553 @@
+{
+  "schema": 1,
+  "scope": "New host-native F872/F873/F874/F875 reproduction. Uploaded EXE supplies constant constructor arguments and exact original name bytes. This is not a complete native engine or a claim of every source procedure being binary-identical to EXE.",
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_procedure_hashes": {
+    "872": "e4530d393cf79a1a4d7f1606f031e7ddc64da4b18ae844976851b23f8718249f",
+    "873": "8d44617e51e93d3aca2e3ec54c231ad8e1889fa228de929dcfad338a4678989f",
+    "874": "dd7820e824790af8f604fe6a68e80ef5f3080c4967dba918c30922908d5de9c3",
+    "875": "98162dc80de13ec6b74313dfbdc55ed11f2ba41006f1a7a0cbdd440c19cad13e"
+  },
+  "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+  "assembly_sha256": "7280fcebaf1bec651856e0ae52951db53072e7cf360d4450c759540a3b567461",
+  "binary_sha256": "6e3e2c05fd83ef578ccc29e91fe8975f798c10845d8e956e8deddafac2b1a363",
+  "names_resource": {
+    "source_exe_offset": "0xd5fd0",
+    "source_virtual_address": "0x4ec3d0",
+    "bytes": 7750,
+    "sha256": "6697bb57ab35e5a9c26d54fabf16afff275e9225395178c13395925f53d57b66",
+    "all_133_name_arguments_verified": true
+  },
+  "original_record_buffer_virtual_address": "0x6350d8",
+  "host_adaptations": {
+    "stack_slots_4_to_8_bytes": true,
+    "all_pointer_buffers_below_2GiB": true,
+    "negative_32bit_push_immediates_equivalent_signed_encoding": [
+      {
+        "unsigned_u32": 4294954128,
+        "signed_i32": -13168
+      },
+      {
+        "unsigned_u32": 4294952881,
+        "signed_i32": -14415
+      },
+      {
+        "unsigned_u32": 4294935791,
+        "signed_i32": -31505
+      },
+      {
+        "unsigned_u32": 4294925913,
+        "signed_i32": -41383
+      },
+      {
+        "unsigned_u32": 4294948664,
+        "signed_i32": -18632
+      },
+      {
+        "unsigned_u32": 4294963180,
+        "signed_i32": -4116
+      },
+      {
+        "unsigned_u32": 4294926628,
+        "signed_i32": -40668
+      },
+      {
+        "unsigned_u32": 4294964790,
+        "signed_i32": -2506
+      },
+      {
+        "unsigned_u32": 4294939813,
+        "signed_i32": -27483
+      },
+      {
+        "unsigned_u32": 4294950169,
+        "signed_i32": -17127
+      },
+      {
+        "unsigned_u32": 3168665610,
+        "signed_i32": -1126301686
+      },
+      {
+        "unsigned_u32": 4294935791,
+        "signed_i32": -31505
+      },
+      {
+        "unsigned_u32": 4294954128,
+        "signed_i32": -13168
+      },
+      {
+        "unsigned_u32": 3777185127,
+        "signed_i32": -517782169
+      },
+      {
+        "unsigned_u32": 4294967146,
+        "signed_i32": -150
+      },
+      {
+        "unsigned_u32": 4294967141,
+        "signed_i32": -155
+      },
+      {
+        "unsigned_u32": 4294967151,
+        "signed_i32": -145
+      },
+      {
+        "unsigned_u32": 4294967137,
+        "signed_i32": -159
+      },
+      {
+        "unsigned_u32": 4294967136,
+        "signed_i32": -160
+      },
+      {
+        "unsigned_u32": 4294967136,
+        "signed_i32": -160
+      },
+      {
+        "unsigned_u32": 4294967116,
+        "signed_i32": -180
+      },
+      {
+        "unsigned_u32": 4288741667,
+        "signed_i32": -6225629
+      },
+      {
+        "unsigned_u32": 4294967106,
+        "signed_i32": -190
+      },
+      {
+        "unsigned_u32": 4294967106,
+        "signed_i32": -190
+      },
+      {
+        "unsigned_u32": 4294967106,
+        "signed_i32": -190
+      },
+      {
+        "unsigned_u32": 4294967106,
+        "signed_i32": -190
+      },
+      {
+        "unsigned_u32": 4294967106,
+        "signed_i32": -190
+      },
+      {
+        "unsigned_u32": 4294967128,
+        "signed_i32": -168
+      },
+      {
+        "unsigned_u32": 4294967105,
+        "signed_i32": -191
+      },
+      {
+        "unsigned_u32": 4294967105,
+        "signed_i32": -191
+      },
+      {
+        "unsigned_u32": 4294967086,
+        "signed_i32": -210
+      },
+      {
+        "unsigned_u32": 4294967081,
+        "signed_i32": -215
+      },
+      {
+        "unsigned_u32": 4294967081,
+        "signed_i32": -215
+      },
+      {
+        "unsigned_u32": 4294967081,
+        "signed_i32": -215
+      },
+      {
+        "unsigned_u32": 4294967081,
+        "signed_i32": -215
+      },
+      {
+        "unsigned_u32": 4294967081,
+        "signed_i32": -215
+      },
+      {
+        "unsigned_u32": 4294967076,
+        "signed_i32": -220
+      },
+      {
+        "unsigned_u32": 4294967106,
+        "signed_i32": -190
+      },
+      {
+        "unsigned_u32": 4294967070,
+        "signed_i32": -226
+      },
+      {
+        "unsigned_u32": 4294967064,
+        "signed_i32": -232
+      },
+      {
+        "unsigned_u32": 4294967064,
+        "signed_i32": -232
+      },
+      {
+        "unsigned_u32": 4294967088,
+        "signed_i32": -208
+      },
+      {
+        "unsigned_u32": 4294967079,
+        "signed_i32": -217
+      },
+      {
+        "unsigned_u32": 4294967051,
+        "signed_i32": -245
+      },
+      {
+        "unsigned_u32": 4294967043,
+        "signed_i32": -253
+      },
+      {
+        "unsigned_u32": 4294946102,
+        "signed_i32": -21194
+      },
+      {
+        "unsigned_u32": 4294967046,
+        "signed_i32": -250
+      },
+      {
+        "unsigned_u32": 4275878552,
+        "signed_i32": -19088744
+      },
+      {
+        "unsigned_u32": 4294946102,
+        "signed_i32": -21194
+      },
+      {
+        "unsigned_u32": 4294966143,
+        "signed_i32": -1153
+      },
+      {
+        "unsigned_u32": 4294966143,
+        "signed_i32": -1153
+      },
+      {
+        "unsigned_u32": 4294946102,
+        "signed_i32": -21194
+      },
+      {
+        "unsigned_u32": 4294967046,
+        "signed_i32": -250
+      },
+      {
+        "unsigned_u32": 4294967036,
+        "signed_i32": -260
+      },
+      {
+        "unsigned_u32": 4294967036,
+        "signed_i32": -260
+      },
+      {
+        "unsigned_u32": 4294967083,
+        "signed_i32": -213
+      },
+      {
+        "unsigned_u32": 4294967026,
+        "signed_i32": -270
+      },
+      {
+        "unsigned_u32": 3472988277,
+        "signed_i32": -821979019
+      },
+      {
+        "unsigned_u32": 4294954128,
+        "signed_i32": -13168
+      },
+      {
+        "unsigned_u32": 4294946102,
+        "signed_i32": -21194
+      },
+      {
+        "unsigned_u32": 4294942595,
+        "signed_i32": -24701
+      },
+      {
+        "unsigned_u32": 4294925913,
+        "signed_i32": -41383
+      },
+      {
+        "unsigned_u32": 4294948665,
+        "signed_i32": -18631
+      },
+      {
+        "unsigned_u32": 4294952881,
+        "signed_i32": -14415
+      },
+      {
+        "unsigned_u32": 4294942595,
+        "signed_i32": -24701
+      },
+      {
+        "unsigned_u32": 4294967047,
+        "signed_i32": -249
+      },
+      {
+        "unsigned_u32": 2369812735,
+        "signed_i32": -1925154561
+      },
+      {
+        "unsigned_u32": 4294967111,
+        "signed_i32": -185
+      }
+    ],
+    "no_constructor_or_rng_stubs": true,
+    "initial_record_buffer": "zeroed ELF BSS, matching fresh initialization",
+    "note": "147slots include explicit terminator146 after last initialized record145"
+  },
+  "source_seed_words_initial": [
+    4660,
+    22136
+  ],
+  "source_seed_words_final": [
+    53157,
+    58170
+  ],
+  "fresh_process_repetitions_identical": 3,
+  "slots": 147,
+  "initialized_records": 133,
+  "zero_slots": [
+    53,
+    54,
+    55,
+    67,
+    74,
+    86,
+    97,
+    118,
+    126,
+    130,
+    134,
+    138,
+    142,
+    146
+  ],
+  "slots_sha256": "900b5b0a321400cfc599b9ea4e13b570eef1eb8423a00a1982cbc167fe7c5fbf",
+  "records": {
+    "0": {
+      "record_hex": "01c2eb0b78563412000016008d0000000000000000000000000000000000000000000000b917536f6c000000000000000000000000000000000000000000020000000000",
+      "source_seed": 305419896,
+      "model_index": 141,
+      "type_code": 22,
+      "name_en": "Sol",
+      "source_rotation_raw": 2,
+      "source_orientation_u16": 0
+    },
+    "1": {
+      "record_hex": "22000000312bc9cb01000300780072541a005515000000000000000000000000ce00fa046f024d6572637572790000000000000000000000000000000000000100000000",
+      "source_seed": 3418958641,
+      "model_index": 120,
+      "type_code": 3,
+      "name_en": "Mercury",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "2": {
+      "record_hex": "0100000023921ae3020020004800dc0000008e2300000000000000000000000000000040200144616564616c7573000000000000000000000000000000000c0200000000",
+      "source_seed": 3810169379,
+      "model_index": 72,
+      "type_code": 32,
+      "name_en": "Daedalus",
+      "source_rotation_raw": 12,
+      "source_orientation_u16": 0
+    },
+    "3": {
+      "record_hex": "e8010000a3eab04f01000c007b0023343100719c00000000000000000000000001006a02f10256656e757300000000000000000000000000000000000000000100000000",
+      "source_seed": 1336994467,
+      "model_index": 123,
+      "type_code": 12,
+      "name_en": "Venus",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "4": {
+      "record_hex": "570200003412bc0a01000a008100bb0744000040000000000000000000000000110000002701456172746800000000000000000000000000000000000000010100000000",
+      "source_seed": 180097588,
+      "model_index": 129,
+      "type_code": 10,
+      "name_en": "Earth",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "5": {
+      "record_hex": "0000f6ff37b98d5f050023005400000000009b4b0000000000000000000000000000651425014c6f6e646f6e000000000000000000000000000000000000000300000000",
+      "source_seed": 1603123511,
+      "model_index": 84,
+      "type_code": 35,
+      "name_en": "London",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "6": {
+      "record_hex": "0000f6ffec319d6c050023005300000000007a5400000000000000000000000000001d0e2501506172697300000000000000000000000000000000000000000300000000",
+      "source_seed": 1822241260,
+      "model_index": 83,
+      "type_code": 35,
+      "name_en": "Paris",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "7": {
+      "record_hex": "0000f6ff82af5f95050023005a000000000001ce0000000000000000000000000000fe102501546f6b796f00000000000000000000000000000000000000000300000000",
+      "source_seed": 2506076034,
+      "model_index": 90,
+      "type_code": 35,
+      "name_en": "Tokyo",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "8": {
+      "record_hex": "0000f6ff2025a88f050023005400000000003f140000000000000000000000000000960425014e657720596f726b00000000000000000000000000000000000300000000",
+      "source_seed": 2410161440,
+      "model_index": 84,
+      "type_code": 35,
+      "name_en": "New York",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "9": {
+      "record_hex": "0000f6ff2eaad3bd0500230054000000000076720000000000000000000000000000c11c25014e6577204d6f73636f770000000000000000000000000000000300000000",
+      "source_seed": 3184765486,
+      "model_index": 84,
+      "type_code": 35,
+      "name_en": "New Moscow",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "10": {
+      "record_hex": "0000f6ff8e781b71050023005a00000000002a0f0000000000000000000000000000c3b425014e65772053616e204672616e636973636f00000000000000000300000000",
+      "source_seed": 1897625742,
+      "model_index": 90,
+      "type_code": 35,
+      "name_en": "New San Francisco",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "11": {
+      "record_hex": "0000f6ffece08b03050023005a000000000067b1000000000000000000000000000036c025015379646e6579000000000000000000000000000000000000000300000000",
+      "source_seed": 59498732,
+      "model_index": 90,
+      "type_code": 35,
+      "name_en": "Sydney",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "12": {
+      "record_hex": "01000000caabcc20050022005000e904000055550000000000000000000000000000b61020014162726168616d204c696e636f6c6e0000000000000000000a0200000000",
+      "source_seed": 550284234,
+      "model_index": 80,
+      "type_code": 34,
+      "name_en": "Abraham Lincoln",
+      "source_rotation_raw": 10,
+      "source_orientation_u16": 0
+    },
+    "13": {
+      "record_hex": "0100000001fa5d71050022005000e9040000aaaa0000000000000000000000000000b61020014d2e476f72626163686576000000000000000000000000000a0200000000",
+      "source_seed": 1901984257,
+      "model_index": 80,
+      "type_code": 34,
+      "name_en": "M.Gorbachev",
+      "source_rotation_raw": 10,
+      "source_orientation_u16": 0
+    },
+    "14": {
+      "record_hex": "01000000498d8f18050022005000e904000000000000000000000000000000000000b61020014c692051696e67204a616f000000000000000000000000000a0200000000",
+      "source_seed": 412061001,
+      "model_index": 80,
+      "type_code": 34,
+      "name_en": "Li Qing Jao",
+      "source_rotation_raw": 10,
+      "source_orientation_u16": 0
+    },
+    "15": {
+      "record_hex": "0800000000003412050003007800c02c0000aa6a0000000000000000000000003600a003fd004d6f6f6e0000000000000000000000000000000000000000000200000000",
+      "source_seed": 305397760,
+      "model_index": 120,
+      "type_code": 3,
+      "name_en": "Moon",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "16": {
+      "record_hex": "0000f6ff6564d7d110002300600000000000c36700000000000000000000000000003106250141706f6c6c6f6e6975732043697479000000000000000000000300000000",
+      "source_seed": 3520554085,
+      "model_index": 96,
+      "type_code": 35,
+      "name_en": "Apollonius City",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "17": {
+      "record_hex": "01000000538ba3d0100021004900fa000000000000000000000000000000000000000040200147616c696c656f00000000000000000000000000000000000b0200000000",
+      "source_seed": 3500378963,
+      "model_index": 73,
+      "type_code": 33,
+      "name_en": "Galileo",
+      "source_rotation_raw": 11,
+      "source_orientation_u16": 0
+    },
+    "18": {
+      "record_hex": "41000000debc0a00010009007d000da36700e3380000000000000000000000005d00590120014d6172730000000000000000000000000000000000000000010100000000",
+      "source_seed": 703710,
+      "model_index": 125,
+      "type_code": 9,
+      "name_en": "Mars",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "19": {
+      "record_hex": "0000f6fff0efbf0f1300230054000000000001ce0000000000000000000000000000fe1025014f6c796d7075732056696c6c616765000000000000000000000300000000",
+      "source_seed": 264237040,
+      "model_index": 84,
+      "type_code": 35,
+      "name_en": "Olympus Village",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "20": {
+      "record_hex": "0000f6ff674523e1130023005300000000009b4b0000000000000000000000000000651425015175656e6973736574000000000000000000000000000000000300000000",
+      "source_seed": 3777185127,
+      "model_index": 83,
+      "type_code": 35,
+      "name_en": "Quenisset",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "21": {
+      "record_hex": "01000000abc6916e130022005000b400000000000000000000000000000000000000004020014d61727320486967680000000000000000000000000000000a0200000000",
+      "source_seed": 1855047339,
+      "model_index": 80,
+      "type_code": 34,
+      "name_en": "Mars High",
+      "source_rotation_raw": 10,
+      "source_orientation_u16": 0
+    },
+    "22": {
+      "record_hex": "010000000e0023f11300010070001701000000000000000000000000000000001500c800cf0050686f626f73000000000000000000000000000000000000050200000000",
+      "source_seed": 4045602830,
+      "model_index": 112,
+      "type_code": 1,
+      "name_en": "Phobos",
+      "source_rotation_raw": 5,
+      "source_orientation_u16": 0
+    },
+    "23": {
+      "record_hex": "0100000005008967130001007000bc020000000000000000000000000000000003004701cf004465696d6f73000000000000000000000000000000000000040200000000",
+      "source_seed": 1737031685,
+      "model_index": 112,
+      "type_code": 1,
+      "name_en": "Deimos",
+      "source_rotation_raw": 4,
+      "source_orientation_u16": 0
+    },
+    "24": {
+      "record_hex": "020000000e0023f10100020077002ebeba00388e0000000000000000000000004f0089079900436572657300000000000000000000000000000000000000000100000000",
+      "source_seed": 4045602830,
+      "model_index": 119,
+      "type_code": 2,
+      "name_en": "Ceres",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "25": {
+      "record_hex": "cde502000060341201000f0086000bee610155d50000000000000000000000003100ec007b004a7570697465720000000000000000000000000000000000020100000000",
+      "source_seed": 305422336,
+      "model_index": 134,
+      "type_code": 15,
+      "name_en": "Jupiter",
+      "source_rotation_raw": 2,
+      "source_orientation_u16": 0
+    },
+    "26": {
+      "record_hex": "01000000096c94341a000100700012150000e37800000000000000000000000003008f027600416d616c7468656100000000000000000000000000000000020200000000",
+      "source_seed": 882142217,
+      "model_index": 112,
+      "type_code": 1,
+      "name_en": "Amalthea",
+      "source_rotation_raw": 2,
+      "source_orientation_u16": 0
+    },
+    "27": {
+      "record_hex": "0a000000e7f1cabd1a0005007a0021310000e338000000000000000000000000040034028000496f00000000000000000000000000000000000000000000000200000000",
+      "source_seed": 3184194023,
+      "model_index": 122,
+      "type_code": 5,
+      "name_en": "Io",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "28": {
+      "record_hex": "01000000a1013d6e1c00210049008c0000000040000000000000000000000000000000402001436f6c756d627573000000000000000000000000000000000b0200000000",
+      "source_seed": 1849491873,
+      "model_index": 73,
+      "type_code": 33,
+      "name_en": "Columbus",
+      "source_rotation_raw": 11,
+      "source_orientation_u16": 0
+    },
+    "29": {
+      "record_hex": "060000000583d5191a0002007700204e000000c000000000000000000000000009008f0272004575726f7061000000000000000000000000000000000000000200000000",
+      "source_seed": 433423109,
+      "model_index": 119,
+      "type_code": 2,
+      "name_en": "Europa",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "30": {
+      "record_hex": "10000000030067451a0003007800907c0000555500000000000000000000000002005802710047616e796d65646500000000000000000000000000000000000200000000",
+      "source_seed": 1164378115,
+      "model_index": 120,
+      "type_code": 3,
+      "name_en": "Ganymede",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "31": {
+      "record_hex": "0b000000010045231a0003007800dcda00001c0700000000000000000000000007008f02710043616c6c6973746f00000000000000000000000000000000000200000000",
+      "source_seed": 591724545,
+      "model_index": 120,
+      "type_code": 3,
+      "name_en": "Callisto",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "32": {
+      "record_hex": "1dde0000a1ff230101000e008600aaec8802719c0000000000000000000000003700c7015d0053617475726e000000000000000000000000000000000000020100000000",
+      "source_seed": 19136417,
+      "model_index": 134,
+      "type_code": 14,
+      "name_en": "Saturn",
+      "source_rotation_raw": 2,
+      "source_orientation_u16": 0
+    },
+    "33": {
+      "record_hex": "02000000ac2aa439210002007700a7150000c7b10000000000000000000000001400000053004d696d617300000000000000000000000000000000000000020200000000",
+      "source_seed": 967060140,
+      "model_index": 119,
+      "type_code": 2,
+      "name_en": "Mimas",
+      "source_rotation_raw": 2,
+      "source_orientation_u16": 0
+    },
+    "34": {
+      "record_hex": "020000005968735a210002007700b41b0000711c000000000000000000000000040000005300456e63656c61647573000000000000000000000000000000000200000000",
+      "source_seed": 1517512793,
+      "model_index": 119,
+      "type_code": 2,
+      "name_en": "Enceladus",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "35": {
+      "record_hex": "020000004cc9c5cc210002007700582200000040000000000000000000000000000000005300546574687973000000000000000000000000000000000000000200000000",
+      "source_seed": 3435514188,
+      "model_index": 119,
+      "type_code": 2,
+      "name_en": "Tethys",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "36": {
+      "record_hex": "020000007e3f5733210002007700e32b00008e6300000000000000000000000002000000530044696f6e6500000000000000000000000000000000000000000200000000",
+      "source_seed": 861355902,
+      "model_index": 119,
+      "type_code": 2,
+      "name_en": "Dione",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "37": {
+      "record_hex": "020000000df3db58210002007700593d0000c7f1000000000000000000000000010000005300526865610000000000000000000000000000000000000000000200000000",
+      "source_seed": 1490809613,
+      "model_index": 119,
+      "type_code": 2,
+      "name_en": "Rhea",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "38": {
+      "record_hex": "0f000000015edc4a210007007c00428e0000388e0000000000000000000000001d0000006900546974616e00000000000000000000000000000000000000000200000000",
+      "source_seed": 1255955969,
+      "model_index": 124,
+      "type_code": 7,
+      "name_en": "Titan",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "39": {
+      "record_hex": "010000004989ffd5270021004900f4010000c731000000000000000000000000000000402001546974616e204369747900000000000000000000000000000b0200000000",
+      "source_seed": 3590293833,
+      "model_index": 73,
+      "type_code": 33,
+      "name_en": "Titan City",
+      "source_rotation_raw": 11,
+      "source_orientation_u16": 0
+    },
+    "40": {
+      "record_hex": "01000000a7226c2321000100750069ac0000e3380000000000000000000000006800e81452004879706572696f6e00000000000000000000000000000000000200000000",
+      "source_seed": 594289319,
+      "model_index": 117,
+      "type_code": 1,
+      "name_en": "Hyperion",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "41": {
+      "record_hex": "020000004ae356472100020077008e9e010055550000000000000000000000001c00d2075200496170657475730000000000000000000000000000000000000200000000",
+      "source_seed": 1196876618,
+      "model_index": 119,
+      "type_code": 2,
+      "name_en": "Iapetus",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "42": {
+      "record_hex": "d5210000807f341201000d00870068f11805c7310000000000000000000000002f0091003f005572616e7573000000000000000000000000000000000000020100000000",
+      "source_seed": 305430400,
+      "model_index": 135,
+      "type_code": 13,
+      "name_en": "Uranus",
+      "source_rotation_raw": 2,
+      "source_orientation_u16": 0
+    },
+    "43": {
+      "record_hex": "01000000336acbb62b0001007500220f000038ce0000000000000000000000001100b0453a004d6972616e64610000000000000000000000000000000000000200000000",
+      "source_seed": 3066784307,
+      "model_index": 117,
+      "type_code": 1,
+      "name_en": "Miranda",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "44": {
+      "record_hex": "020000003a5ef8332b00020077005a160000711c0000000000000000000000000300b0453a00417269656c00000000000000000000000000000000000000000200000000",
+      "source_seed": 871915066,
+      "model_index": 119,
+      "type_code": 2,
+      "name_en": "Ariel",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "45": {
+      "record_hex": "02000000329b1e8c2b0002007700151f00001c470000000000000000000000000400b0453a00556d627269656c0000000000000000000000000000000000000200000000",
+      "source_seed": 2350816050,
+      "model_index": 119,
+      "type_code": 2,
+      "name_en": "Umbriel",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "46": {
+      "record_hex": "0200000046c3589d2b0002007700fd320000aa6a0000000000000000000000000200b0453a00546974616e69610000000000000000000000000000000000000200000000",
+      "source_seed": 2639840070,
+      "model_index": 119,
+      "type_code": 2,
+      "name_en": "Titania",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "47": {
+      "record_hex": "02000000fe5a88192b000200770038440000380e0000000000000000000000000100b0453a004f6265726f6e000000000000000000000000000000000000000200000000",
+      "source_seed": 428366590,
+      "model_index": 119,
+      "type_code": 2,
+      "name_en": "Oberon",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "48": {
+      "record_hex": "3d280000407d9a7801000d00870023d1fc07aa6a0000000000000000000000000900470135004e657074756e650000000000000000000000000000000000020100000000",
+      "source_seed": 2023390528,
+      "model_index": 135,
+      "type_code": 13,
+      "name_en": "Neptune",
+      "source_rotation_raw": 2,
+      "source_orientation_u16": 0
+    },
+    "49": {
+      "record_hex": "07000000020056343100040079005329000071dc0000000000000000000000000000b4715300547269746f6e000000000000000000000000000000000000000200000000",
+      "source_seed": 878051330,
+      "model_index": 121,
+      "type_code": 4,
+      "name_en": "Triton",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "50": {
+      "record_hex": "0100000009971f2131000100750080870200aa2a000000000000000000000000ed0257132f004e6572656964000000000000000000000000000000000000000200000000",
+      "source_seed": 555718409,
+      "model_index": 117,
+      "type_code": 1,
+      "name_en": "Nereid",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "51": {
+      "record_hex": "02000000a574cb8b01000200770066027b0ae378000000000000000000000000fa003b0c2900506c75746f00000000000000000000000000000000000000000100000000",
+      "source_seed": 2345366693,
+      "model_index": 119,
+      "type_code": 2,
+      "name_en": "Pluto",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "52": {
+      "record_hex": "0200000068a6eb8234000200770036020000380e0000000000000000000000000000382e2900436861726f6e000000000000000000000000000000000000000200000000",
+      "source_seed": 2196481640,
+      "model_index": 119,
+      "type_code": 2,
+      "name_en": "Charon",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "56": {
+      "record_hex": "81ffb81709497eaf000000001700000000000000000000000000000000000000000000001101416c7068612043656e746175726920412c42000000000000000000000000",
+      "source_seed": 2944289033,
+      "model_index": 23,
+      "type_code": 0,
+      "name_en": "Alpha Centauri A,B",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "57": {
+      "record_hex": "01ef1c0da5f2dce0010016008d0041e919030000000000000000000000000000000000001d18416c7068612043656e746175726920410000000000000000000100000000",
+      "source_seed": 3772576421,
+      "model_index": 141,
+      "type_code": 22,
+      "name_en": "Alpha Centauri A",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "58": {
+      "record_hex": "81109c0a543dec98010015008c0041e919030080000000000000000000000000000000009914416c7068612043656e746175726920420000000000000000000100000000",
+      "source_seed": 2565619028,
+      "model_index": 140,
+      "type_code": 21,
+      "name_en": "Alpha Centauri B",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "59": {
+      "record_hex": "21bf0200ffffffff01000f00860082d2330600400000000000000000000000000300240041004c616772616e676500000000000000000000000000000000010100000000",
+      "source_seed": 4294967295,
+      "model_index": 134,
+      "type_code": 15,
+      "name_en": "Lagrange",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "60": {
+      "record_hex": "07000000fb4417b1040002007700204e000000000000000000000000000000000300bc3a380032303432204c310000000000000000000000000000000000000200000000",
+      "source_seed": 2971092219,
+      "model_index": 119,
+      "type_code": 2,
+      "name_en": "2042 L1",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "61": {
+      "record_hex": "1127000081ac176301000d00870000e9a43500000000000000000000000000005700e3081c00323037312041433300000000000000000000000000000000000100000000",
+      "source_seed": 1662495873,
+      "model_index": 135,
+      "type_code": 13,
+      "name_en": "2071 AC3",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "62": {
+      "record_hex": "020000008133178d0600020077002a1e00000000000000000000000000000000b200e9331400323037352041433361000000000000000000000000000000000200000000",
+      "source_seed": 2367107969,
+      "model_index": 119,
+      "type_code": 2,
+      "name_en": "2075 AC3a",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "63": {
+      "record_hex": "012d3101c32ea1ec010012008a00ffffffff0000000000000000000000000000c201e338f50d50726f78696d612043656e74617572690000000000000000020100000000",
+      "source_seed": 3969986243,
+      "model_index": 138,
+      "type_code": 18,
+      "name_en": "Proxima Centauri",
+      "source_rotation_raw": 2,
+      "source_orientation_u16": 0
+    },
+    "64": {
+      "record_hex": "c901000052b14a58080008008000801a060000000000000000000000000000000a00e53614014564656e0000000000000000000000000000000000000000020200000000",
+      "source_seed": 1481290066,
+      "model_index": 128,
+      "type_code": 8,
+      "name_en": "Eden",
+      "source_rotation_raw": 2,
+      "source_orientation_u16": 0
+    },
+    "65": {
+      "record_hex": "01000000ebb6b01c0900200048002c01000000000000000000000000000000000000000020014564656e2053746174696f6e0000000000000000000000000c0200000000",
+      "source_seed": 481343211,
+      "model_index": 72,
+      "type_code": 32,
+      "name_en": "Eden Station",
+      "source_rotation_raw": 12,
+      "source_orientation_u16": 0
+    },
+    "66": {
+      "record_hex": "070000002b79662208000200770040420f0000000000000000000000000000005e01e635c000323034352050433200000000000000000000000000000000010200000000",
+      "source_seed": 577141035,
+      "model_index": 119,
+      "type_code": 2,
+      "name_en": "2045 PC2",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "68": {
+      "record_hex": "814838274112e9f30000000017000000000000000000000000000000000000000000000011015369726975732c2053697269757320420000000000000000000000000000",
+      "source_seed": 4092138049,
+      "model_index": 23,
+      "type_code": 0,
+      "name_en": "Sirius, Sirius B",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "69": {
+      "record_hex": "818f891b44bccea9010018008f00d61fb0020000000000000000000000000000000000003924536972697573000000000000000000000000000000000000020100000000",
+      "source_seed": 2848898116,
+      "model_index": 143,
+      "type_code": 24,
+      "name_en": "Sirius",
+      "source_rotation_raw": 2,
+      "source_orientation_u16": 0
+    },
+    "70": {
+      "record_hex": "01b9ae0b50274211010019009400d61fb002008000000000000000000000000000000000092c5369726975732042000000000000000000000000000000000d0100000000",
+      "source_seed": 289548112,
+      "model_index": 148,
+      "type_code": 25,
+      "name_en": "Sirius B",
+      "source_rotation_raw": 13,
+      "source_orientation_u16": 0
+    },
+    "71": {
+      "record_hex": "24000000225abb7e030005007a00c966030000000000000000000000000000000e00bb1bab014c7563696665720000000000000000000000000000000000050200000000",
+      "source_seed": 2126207522,
+      "model_index": 122,
+      "type_code": 5,
+      "name_en": "Lucifer",
+      "source_rotation_raw": 5,
+      "source_orientation_u16": 0
+    },
+    "72": {
+      "record_hex": "0000f6ffe951285a04002300600000000000ae840000000000000000000000000000af0c2501466163746f72792043656e7472616c000000000000000000000300000000",
+      "source_seed": 1512591849,
+      "model_index": 96,
+      "type_code": 35,
+      "name_en": "Factory Central",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "73": {
+      "record_hex": "5134030084bce3b401000f008600aa91025d00000000000000000000000000001b0140171700576179706f696e7400000000000000000000000000000000000100000000",
+      "source_seed": 3034823812,
+      "model_index": 134,
+      "type_code": 15,
+      "name_en": "Waypoint",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "75": {
+      "record_hex": "0183400a6c3b9698000000001700000000000000000000000000000000000000000000001101576f6c662036333020412c42000000000000000000000000000000000000",
+      "source_seed": 2559982444,
+      "model_index": 23,
+      "type_code": 0,
+      "name_en": "Wolf 630 A,B",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "76": {
+      "record_hex": "019a6f05a6abb595010014008a00c639fe01000000000000000000000000000000008e43590e576f6c662036333020410000000000000000000000000000010100000000",
+      "source_seed": 2511711142,
+      "model_index": 138,
+      "type_code": 20,
+      "name_en": "Wolf 630 A",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "77": {
+      "record_hex": "01e9d004b2ee0aab010014008a00c639fe01008000000000000000000000000000008e43270e576f6c662036333020420000000000000000000000000000010100000000",
+      "source_seed": 2869620402,
+      "model_index": 138,
+      "type_code": 20,
+      "name_en": "Wolf 630 B",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "78": {
+      "record_hex": "a172f80834727f56010019009400f02a1b2e1c4700000000000000000000000000000000dd2a56616e204269657362726f65636b203800000000000000000c0100000000",
+      "source_seed": 1451192884,
+      "model_index": 148,
+      "type_code": 25,
+      "name_en": "Van Biesbroeck 8",
+      "source_rotation_raw": 12,
+      "source_orientation_u16": 0
+    },
+    "79": {
+      "record_hex": "21f40e00dcfe98ba040011008900e00a000100000000000000000000000000005a005555c1054d6343617274687900000000000000000000000000000000030200000000",
+      "source_seed": 3130588892,
+      "model_index": 137,
+      "type_code": 17,
+      "name_en": "McCarthy",
+      "source_rotation_raw": 3,
+      "source_orientation_u16": 0
+    },
+    "80": {
+      "record_hex": "6d0200000500214305000a007e00e943010000000000000000000000000000000e00bb1b29014c616e6466616c6c00000000000000000000000000000000030200000000",
+      "source_seed": 1126236165,
+      "model_index": 126,
+      "type_code": 10,
+      "name_en": "Landfall",
+      "source_rotation_raw": 3,
+      "source_orientation_u16": 0
+    },
+    "81": {
+      "record_hex": "0000f6ffabffe07506002300530000000000ae840000000000000000000000000000af0c25014d6179666c6f776572204369747900000000000000000000000300000000",
+      "source_seed": 1977679787,
+      "model_index": 83,
+      "type_code": 35,
+      "name_en": "Mayflower City",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "82": {
+      "record_hex": "01000000e1545288060021004900f401000000000000000000000000000000000000000020014d6179666c6f7765722048696768000000000000000000000b0200000000",
+      "source_seed": 2287097057,
+      "model_index": 73,
+      "type_code": 33,
+      "name_en": "Mayflower High",
+      "source_rotation_raw": 11,
+      "source_orientation_u16": 0
+    },
+    "83": {
+      "record_hex": "814838274fabda67010000001700ffffffffe3b80000000000000000000000000000ca4e1101576f6c662036323920412c42000000000000000000000000000100000000",
+      "source_seed": 1742383951,
+      "model_index": 23,
+      "type_code": 0,
+      "name_en": "Wolf 629 A,B",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "84": {
+      "record_hex": "613d79025cd33b11090014008a0035382c000000000000000000000000000000000058e2910d576f6c662036323920410000000000000000000000000000010200000000",
+      "source_seed": 289133404,
+      "model_index": 138,
+      "type_code": 20,
+      "name_en": "Wolf 629 A",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "85": {
+      "record_hex": "419c7102e168817c090014008a0035382c000080000000000000000000000000000058e25f0d576f6c662036323920420000000000000000000000000000010200000000",
+      "source_seed": 2088855777,
+      "model_index": 138,
+      "type_code": 20,
+      "name_en": "Wolf 629 B",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "87": {
+      "record_hex": "816afe0c07f4aaa40000000017000000000000000000000000000000000000000000000011013631204379676e6920412c42000000000000000000000000000000000000",
+      "source_seed": 2762667015,
+      "model_index": 23,
+      "type_code": 0,
+      "name_en": "61 Cygni A,B",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "88": {
+      "record_hex": "818908078eac3b6e010015008c0014744a0a00000000000000000000000000000000000099143631204379676e6920410000000000000000000000000000010100000000",
+      "source_seed": 1849404558,
+      "model_index": 140,
+      "type_code": 21,
+      "name_en": "61 Cygni A",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "89": {
+      "record_hex": "01e1f50597373219010015008c0014744a0a00800000000000000000000000000000000035143631204379676e6920420000000000000000000000000000010100000000",
+      "source_seed": 422721431,
+      "model_index": 140,
+      "type_code": 21,
+      "name_en": "61 Cygni B",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "90": {
+      "record_hex": "770200006b77bd0503000b007f00737622000000000000000000000000000000530036100c0153636f747400000000000000000000000000000000000000020200000000",
+      "source_seed": 96302955,
+      "model_index": 127,
+      "type_code": 11,
+      "name_en": "Scott",
+      "source_rotation_raw": 2,
+      "source_orientation_u16": 0
+    },
+    "91": {
+      "record_hex": "0000f6ff7d85bed304002300550000000000ae840000000000000000000000000000af0c2501416d756e6473656e00000000000000000000000000000000000300000000",
+      "source_seed": 3552478589,
+      "model_index": 85,
+      "type_code": 35,
+      "name_en": "Amundsen",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "92": {
+      "record_hex": "b18f06003ff1b36b0100000017001a7c357500000000000000000000000000001b01152d17003631204379676e6920412c4220312c320000000000000000000100000000",
+      "source_seed": 1806954815,
+      "model_index": 23,
+      "type_code": 0,
+      "name_en": "61 Cygni A,B 1,2",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "93": {
+      "record_hex": "71820300d8ccdd4a06000f008600080b34000000000000000000000000000000000022720d003631204379676e6920412c42203100000000000000000000010200000000",
+      "source_seed": 1256049880,
+      "model_index": 134,
+      "type_code": 15,
+      "name_en": "61 Cygni A,B 1",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "94": {
+      "record_hex": "410d0300ca5c51d606000f008600080b34000080000000000000000000000000000022720d003631204379676e6920412c42203200000000000000000000010200000000",
+      "source_seed": 3595656394,
+      "model_index": 134,
+      "type_code": 15,
+      "name_en": "61 Cygni A,B 2",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "95": {
+      "record_hex": "240000009227883d080005007a00e02e000000000000000000000000000000005400a1723c003631204379676e6920412c42203261000000000000000000020200000000",
+      "source_seed": 1032333202,
+      "model_index": 122,
+      "type_code": 5,
+      "name_en": "61 Cygni A,B 2a",
+      "source_rotation_raw": 2,
+      "source_orientation_u16": 0
+    },
+    "96": {
+      "record_hex": "04000000df6e95970600020077004863d40100000000000000000000000000005c00e17a03003631204379676e6920412c4220312c326100000000000000010200000000",
+      "source_seed": 2543152863,
+      "model_index": 119,
+      "type_code": 2,
+      "name_en": "61 Cygni A,B 1,2a",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "98": {
+      "record_hex": "61a5020c04d6e143000016008d00000000000000000000000000000000000000000000001d184574612043617373696f7065696100000000000000000000020000000000",
+      "source_seed": 1138873860,
+      "model_index": 141,
+      "type_code": 22,
+      "name_en": "Eta Cassiopeia",
+      "source_rotation_raw": 2,
+      "source_orientation_u16": 0
+    },
+    "99": {
+      "record_hex": "27000000893e009d01000300780022cd0f0000000000000000000000000000000201053bdd02526f636b0000000000000000000000000000000000000000000100000000",
+      "source_seed": 2634038921,
+      "model_index": 120,
+      "type_code": 3,
+      "name_en": "Rock",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "100": {
+      "record_hex": "c1b0070001cf7598010010008800bb3c500000000000000000000000000000000000b6001f014265747765656e0000000000000000000000000000000000010100000000",
+      "source_seed": 2557857537,
+      "model_index": 136,
+      "type_code": 16,
+      "name_en": "Between",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "101": {
+      "record_hex": "410000002a01febc030009007d00edca000000000000000000000000000000006800470120014e6176792043656e7472616c000000000000000000000000010200000000",
+      "source_seed": 3170763050,
+      "model_index": 125,
+      "type_code": 9,
+      "name_en": "Navy Central",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "102": {
+      "record_hex": "0100000012a683fd040022005000b4000000000000000000000000000000000000001b0820014d6f726775652773204d6f727475617279000000000000000a0200000000",
+      "source_seed": 4253263378,
+      "model_index": 80,
+      "type_code": 34,
+      "name_en": "Morgue's Mortuary",
+      "source_rotation_raw": 10,
+      "source_orientation_u16": 0
+    },
+    "103": {
+      "record_hex": "630200008307364501000a007e00bb3c500055d50000000000000000000000000000b600290154726f6a616e000000000000000000000000000000000000010100000000",
+      "source_seed": 1161168771,
+      "model_index": 126,
+      "type_code": 10,
+      "name_en": "Trojan",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "104": {
+      "record_hex": "0000f6ff032e74b8060023005400000000009b4b0000000000000000000000000000651425014e6577204b796f746f000000000000000000000000000000000300000000",
+      "source_seed": 3094621699,
+      "model_index": 84,
+      "type_code": 35,
+      "name_en": "New Kyoto",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "105": {
+      "record_hex": "0000f6fffe744bbb06002300530000000000ae840000000000000000000000000000af0c250153756e6e7976696c6c650000000000000000000000000000000300000000",
+      "source_seed": 3142284542,
+      "model_index": 83,
+      "type_code": 35,
+      "name_en": "Sunnyville",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "106": {
+      "record_hex": "0000f6ff5fc2c7a2060023005300000000009f9d0000000000000000000000000000871c250156656e696365206f6e204c616e6400000000000000000000000300000000",
+      "source_seed": 2731000415,
+      "model_index": 83,
+      "type_code": 35,
+      "name_en": "Venice on Land",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "107": {
+      "record_hex": "0000f6ff691270d4060023005200000000003f140000000000000000000000000000960425014d616e636865737465720000000000000000000000000000000300000000",
+      "source_seed": 3564114537,
+      "model_index": 82,
+      "type_code": 35,
+      "name_en": "Manchester",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "108": {
+      "record_hex": "0000f6ffd6c861a40600230051000000000075720000000000000000000000000000c11c2501457070696e67204e6577746f776e00000000000000000000000300000000",
+      "source_seed": 2757871830,
+      "model_index": 81,
+      "type_code": 35,
+      "name_en": "Epping Newtown",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "109": {
+      "record_hex": "010000006b1afd560600220050007402000055550000000000000000000000000000384e20014a2e462e4b656e6e656479000000000000000000000000000a0200000000",
+      "source_seed": 1459427947,
+      "model_index": 80,
+      "type_code": 34,
+      "name_en": "J.F.Kennedy",
+      "source_rotation_raw": 10,
+      "source_orientation_u16": 0
+    },
+    "110": {
+      "record_hex": "0600000012003445060002007700800d000000000000000000000000000000003600a003fd004e6577204d6f6f6e00000000000000000000000000000000000200000000",
+      "source_seed": 1161035794,
+      "model_index": 119,
+      "type_code": 2,
+      "name_en": "New Moon",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "111": {
+      "record_hex": "fa010000cf015fd701000a007e00bb3c5000aa2a0000000000000000000000000000b6001b014665796e6d616e0000000000000000000000000000000000010100000000",
+      "source_seed": 3613327823,
+      "model_index": 126,
+      "type_code": 10,
+      "name_en": "Feynman",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "112": {
+      "record_hex": "0000f6fff34ca9b20e0023005400000000007a5400000000000000000000000000001d0e25014e61756e746f6e2045737461746573000000000000000000000300000000",
+      "source_seed": 2997439731,
+      "model_index": 84,
+      "type_code": 35,
+      "name_en": "Naunton Estates",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "113": {
+      "record_hex": "0000f6ff7a2d17e30e0023005300000000009f9d0000000000000000000000000000871c25015461726269742773204c616e64696e670000000000000000000300000000",
+      "source_seed": 3809947002,
+      "model_index": 83,
+      "type_code": 35,
+      "name_en": "Tarbit's Landing",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "114": {
+      "record_hex": "01000000f249bb4e0e00210049007402000055550000000000000000000000000000c7b12001416e677573204d616e776172696e670000000000000000000b0200000000",
+      "source_seed": 1320897010,
+      "model_index": 73,
+      "type_code": 33,
+      "name_en": "Angus Manwaring",
+      "source_rotation_raw": 11,
+      "source_orientation_u16": 0
+    },
+    "115": {
+      "record_hex": "c1ea2101db3b8a11010014008a0010ab4f10388e0000000000000000000000002d008e03910d4574612043617373696f7065696120420000000000000000020100000000",
+      "source_seed": 294271963,
+      "model_index": 138,
+      "type_code": 20,
+      "name_en": "Eta Cassiopeia B",
+      "source_rotation_raw": 2,
+      "source_orientation_u16": 0
+    },
+    "116": {
+      "record_hex": "0a00000087cea89512000300780040420f0000000000000000000000000000005e01e635c000466972696e672052616e6765000000000000000000000000010200000000",
+      "source_seed": 2510868103,
+      "model_index": 120,
+      "type_code": 3,
+      "name_en": "Firing Range",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "117": {
+      "record_hex": "29230000807f341201000d008700976e9a3800000000000000000000000000003700b60018004574612043617373696f7065696120350000000000000000020100000000",
+      "source_seed": 305430400,
+      "model_index": 135,
+      "type_code": 13,
+      "name_en": "Eta Cassiopeia 5",
+      "source_rotation_raw": 2,
+      "source_orientation_u16": 0
+    },
+    "119": {
+      "record_hex": "e18b290136e4e7a6000012008a00000000000000000000000000000000000000c201e338910d526f73732031353400000000000000000000000000000000000000000000",
+      "source_seed": 2800215094,
+      "model_index": 138,
+      "type_code": 18,
+      "name_en": "Ross 154",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "120": {
+      "record_hex": "290000005ab4ae2401000200770092cd0600000000000000000000000000000009008f02de00447573742042616c6c000000000000000000000000000000000100000000",
+      "source_seed": 615429210,
+      "model_index": 119,
+      "type_code": 2,
+      "name_en": "Dust Ball",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "121": {
+      "record_hex": "41000100408dff7801000d0087003ead1600386e0000000000000000000000000900fd01fd00417374657200000000000000000000000000000000000000030100000000",
+      "source_seed": 2030013760,
+      "model_index": 135,
+      "type_code": 13,
+      "name_en": "Aster",
+      "source_rotation_raw": 3,
+      "source_orientation_u16": 0
+    },
+    "122": {
+      "record_hex": "1a000000bdaaddad03000a007f00471a00001c670000000000000000000000001a0055150d014d65726c696e000000000000000000000000000000000000010200000000",
+      "source_seed": 2916985533,
+      "model_index": 127,
+      "type_code": 10,
+      "name_en": "Merlin",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "123": {
+      "record_hex": "0000f6ff7ca5165c04002300550000000000708300000000000000000000000000002dee25015369726f63636f2053746174696f6e000000000000000000000300000000",
+      "source_seed": 1544988028,
+      "model_index": 85,
+      "type_code": 35,
+      "name_en": "Sirocco Station",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "124": {
+      "record_hex": "08000000e2fe2f52030003007800971f000000000000000000000000000000001a00820de90057696c6c6f77000000000000000000000000000000000000010200000000",
+      "source_seed": 1378877154,
+      "model_index": 120,
+      "type_code": 3,
+      "name_en": "Willow",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "125": {
+      "record_hex": "1e000000ba15042b010003007800c853c70000000000000000000000000000009200c4035800526f73732031353420330000000000000000000000000000010100000000",
+      "source_seed": 721687994,
+      "model_index": 120,
+      "type_code": 3,
+      "name_en": "Ross 154 3",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "127": {
+      "record_hex": "8189080798d353b2000015008c000000000000000000000000000000000000000000000099144c6176650000000000000000000000000000000000000000000000000000",
+      "source_seed": 2991838104,
+      "model_index": 140,
+      "type_code": 21,
+      "name_en": "Lave",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "128": {
+      "record_hex": "570200002c01351801000a007e00fb7522000000000000000000000000000000260000001f01506c616e6574204c61766500000000000000000000000000010100000000",
+      "source_seed": 406126892,
+      "model_index": 126,
+      "type_code": 10,
+      "name_en": "Planet Lave",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "129": {
+      "record_hex": "01000000bb7bb5c70200200048007402000055550000000000000000000000000000c7b120014c6176652053746174696f6e0000000000000000000000000c0200000000",
+      "source_seed": 3350559675,
+      "model_index": 72,
+      "type_code": 32,
+      "name_en": "Lave Station",
+      "source_rotation_raw": 12,
+      "source_orientation_u16": 0
+    },
+    "131": {
+      "record_hex": "01c2eb0b5fe0ae96000016008d000000000000000000000000000000000000000000000099144469736f0000000000000000000000000000000000000000000000000000",
+      "source_seed": 2528043103,
+      "model_index": 141,
+      "type_code": 22,
+      "name_en": "Diso",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "132": {
+      "record_hex": "570200002c01351801000a007f009b9b4800000000000000000000000000000026000000f9004269726d696e6768616d0000000000000000000000000000010100000000",
+      "source_seed": 406126892,
+      "model_index": 127,
+      "type_code": 10,
+      "name_en": "Birmingham",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "133": {
+      "record_hex": "010000007d7f53fa0200200048007402000055550000000000000000000000000000c7b12001536869666e616c706f7274000000000000000000000000000c0200000000",
+      "source_seed": 4199776125,
+      "model_index": 72,
+      "type_code": 32,
+      "name_en": "Shifnalport",
+      "source_rotation_raw": 12,
+      "source_orientation_u16": 0
+    },
+    "135": {
+      "record_hex": "012d3101a20ea2b4000014008a000000000000000000000000000000000000000000000099144c6565737469000000000000000000000000000000000000000000000000",
+      "source_seed": 3030519458,
+      "model_index": 138,
+      "type_code": 20,
+      "name_en": "Leesti",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "136": {
+      "record_hex": "570200002c0135180100030078009bc7170000000000000000000000000000002600000021014c6565737469203100000000000000000000000000000000010100000000",
+      "source_seed": 406126892,
+      "model_index": 120,
+      "type_code": 3,
+      "name_en": "Leesti 1",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "137": {
+      "record_hex": "010000000099e3830200200048007402000055550000000000000000000000000000c7b1200147656f726765204c756361730000000000000000000000000c0200000000",
+      "source_seed": 2212731136,
+      "model_index": 72,
+      "type_code": 32,
+      "name_en": "George Lucas",
+      "source_rotation_raw": 12,
+      "source_orientation_u16": 0
+    },
+    "139": {
+      "record_hex": "012d3101b11275fe000017008e000000000000000000000000000000000000000000000099145a616f6e6365000000000000000000000000000000000000000000000000",
+      "source_seed": 4269085361,
+      "model_index": 142,
+      "type_code": 23,
+      "name_en": "Zaonce",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "140": {
+      "record_hex": "570200002c0135180100030078009bc717000000000000000000000000000000260000002101496e64757374727900000000000000000000000000000000010100000000",
+      "source_seed": 406126892,
+      "model_index": 120,
+      "type_code": 3,
+      "name_en": "Industry",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "141": {
+      "record_hex": "0100000075df82050200200048007402000055550000000000000000000000000000c7b120015269646c65792053636f74740000000000000000000000000c0200000000",
+      "source_seed": 92462965,
+      "model_index": 72,
+      "type_code": 32,
+      "name_en": "Ridley Scott",
+      "source_rotation_raw": 12,
+      "source_orientation_u16": 0
+    },
+    "143": {
+      "record_hex": "01c2eb0bf735f5c0000016008d00000000000000000000000000000000000000000000009914526965647175617400000000000000000000000000000000000000000000",
+      "source_seed": 3237295607,
+      "model_index": 141,
+      "type_code": 22,
+      "name_en": "Riedquat",
+      "source_rotation_raw": 0,
+      "source_orientation_u16": 0
+    },
+    "144": {
+      "record_hex": "570200002c01351801000a007e00fb7522000000000000000000000000000000260000002e0157617465726c6f6f00000000000000000000000000000000010100000000",
+      "source_seed": 406126892,
+      "model_index": 126,
+      "type_code": 10,
+      "name_en": "Waterloo",
+      "source_rotation_raw": 1,
+      "source_orientation_u16": 0
+    },
+    "145": {
+      "record_hex": "01000000b5f478700200210049007402000055550000000000000000000000000000c7b120014c6120536f6575722064752044616e2048616d00000000000b0200000000",
+      "source_seed": 1886975157,
+      "model_index": 73,
+      "type_code": 33,
+      "name_en": "La Soeur du Dan Ham",
+      "source_rotation_raw": 11,
+      "source_orientation_u16": 0
+    }
+  },
+  "preserved_old_native_records_exact_matches": [
+    {
+      "global_index": 5,
+      "name": "London",
+      "full_68_byte_record_and_uid_match": true
+    },
+    {
+      "global_index": 9,
+      "name": "New Moscow",
+      "full_68_byte_record_and_uid_match": true
+    },
+    {
+      "global_index": 10,
+      "name": "New San Francisco",
+      "full_68_byte_record_and_uid_match": true
+    },
+    {
+      "global_index": 108,
+      "name": "Epping Newtown",
+      "full_68_byte_record_and_uid_match": true
+    }
+  ],
+  "preserved_old_native_records_text_sha256": "2960b69a7b445a85d5415743269f9198dcab02d84b84f53193a6a0550ff4c09b"
+}

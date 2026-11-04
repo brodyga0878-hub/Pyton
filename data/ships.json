@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "profile": "reconstructed-adapted-loadouts-v1",
+  "provenance": "New reconstruction of three prototype loadouts. This is not the original FFE ship catalogue or a recovered copy of the lost JSON.",
+  "ships": [
+    {
+      "id": "cobra",
+      "name": "Кобра Mk III",
+      "name_ru": "Кобра Mk III",
+      "name_en": "Cobra Mk III",
+      "description": "Универсальный корабль с вместительным трюмом и умеренной манёвренностью.",
+      "cargo_capacity": 60,
+      "acceleration": 18.0,
+      "turn_rate": 1.2,
+      "jump_range": 20.0,
+      "visual_span_m": 42.0,
+      "color": "57b6cf",
+      "loadout_source": "adapted-reconstruction"
+    },
+    {
+      "id": "eagle",
+      "name": "Игл Mk II",
+      "name_ru": "Игл Mk II",
+      "name_en": "Eagle Mk II",
+      "description": "Лёгкий манёвренный корабль. Быстро набирает скорость, но перевозит мало груза.",
+      "cargo_capacity": 12,
+      "acceleration": 24.0,
+      "turn_rate": 1.8,
+      "jump_range": 16.0,
+      "visual_span_m": 26.0,
+      "color": "e7b45d",
+      "loadout_source": "adapted-reconstruction"
+    },
+    {
+      "id": "shuttle",
+      "name": "Орбитальный челнок",
+      "name_ru": "Орбитальный челнок",
+      "name_en": "Orbital Shuttle",
+      "description": "Простой небольшой транспорт для коротких маршрутов и малых грузов.",
+      "cargo_capacity": 4,
+      "acceleration": 12.0,
+      "turn_rate": 0.8,
+      "jump_range": 8.0,
+      "visual_span_m": 24.0,
+      "color": "a9b9c8",
+      "loadout_source": "adapted-reconstruction"
+    }
+  ]
+}
