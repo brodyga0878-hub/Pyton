@@ -1,0 +1,58 @@
+		ship.position+=ship.velocity*dt
+		if altitude(ship)>=35:taking_off=false;ship.brake()
+	elif landing:
+		var pad:=pad_position()
+		var horizontal:=Vector3(pad.x-ship.position.x,0,pad.z-ship.position.z)
+		var height:=maxf(0,ship.position.y-pad.y-clearance(ship))
+		var reserve:=maxf(0.1,ship.acceleration()-gravity)
+		var desired:=horizontal.normalized()*minf(60,sqrt(horizontal.length()*reserve))
+		var cruise:float=maxf(350.0,float(city_data.cruise_height_m)) if not city_data.is_empty() else 200.0
+		desired.y=-minf(25,sqrt(maxf(0,height-0.3)*reserve)) if horizontal.length()<80 else clampf((height_at(ship.position.x,ship.position.z)+cruise+(clearance(ship) if not city_data.is_empty() else 0.0)-ship.position.y)*0.1,-20,20)
+		var climb_threshold:float=cruise-20.0 if not city_data.is_empty() else 100.0
+		if globe and horizontal.length()>80 and altitude(ship)<climb_threshold:
+			# Clear nearby hills before accelerating horizontally after a wilderness takeoff.
+			desired=Vector3.UP*minf(20,sqrt(maxf(0,(cruise if not city_data.is_empty() else 180.0)-altitude(ship))*reserve))
+		ship.velocity=ship.velocity.move_toward(desired,reserve*dt)
+		ship.attitude=ship.attitude.slerp(Quaternion.IDENTITY,minf(1,dt*1.5)).normalized()
+		ship.position+=ship.velocity*dt
+	else:
+		ship.step(dt,steering,roll,Vector3.DOWN*gravity,lift)
+	_clip_buildings(previous,ship)
+	if ship.hull<=0:return
+	var radial:=Vector2(ship.position.x,ship.position.z)
+	if not globe and radial.length()>LIMIT:
+		var edge:=radial.normalized()*LIMIT
+		ship.position.x=edge.x;ship.position.z=edge.y
+		ship.velocity.x=0;ship.velocity.z=0
+		ship.target_speed=0
+		message="Граница посадочного района. Вернитесь к площадке или на орбиту."
+	var ceiling:=height_at(ship.position.x,ship.position.z)+clearance(ship)+(MAX_FLIGHT_HEIGHT if extended_flight else 4000.0) if globe else 4000.0
+	if ship.position.y>ceiling:
+		ship.position.y=ceiling;ship.velocity.y=minf(ship.velocity.y,0);ship.target_speed=0
+	if landing and altitude(ship)<=0.6 and ship.velocity.length()<=6 and (not globe or pad_distance(ship)<80):
+		ship.position.y=height_at(ship.position.x,ship.position.z)+clearance(ship)
+		ship.velocity=Vector3.ZERO;ship.target_speed=0;landing=false;landed=true
+		message="Посадка выполнена. «Взлететь» — подъём над поверхностью."
+	if altitude(ship)<=0 and not landed:
+		var impact: float=ship.velocity.length()
+		ship.position.y=height_at(ship.position.x,ship.position.z)+clearance(ship)
+		ship.velocity=Vector3.ZERO;ship.target_speed=0;landing=false
+		if impact>6:
+			ship.hull=maxf(0,ship.hull-(impact-6)*3)
+			message="Жёсткое касание: %.0f м/с. Проверьте корпус."%impact
+		else:message="Посадка выполнена. «Взлететь» — подъём над поверхностью."
+		landed=true
+
+	if globe and radial.length()>REBASE_DISTANCE:recenter(ship)
+
+func touch_down(ship: RefCounted) -> bool:
+	if not active or landed or ship.hull<=0 or altitude(ship)>3 or ship.velocity.length()>6:return false
+	ship.position.y=height_at(ship.position.x,ship.position.z)+clearance(ship)
+	ship.velocity=Vector3.ZERO;ship.target_speed=0;ship.attitude=Quaternion.IDENTITY
+	landed=true;landing=false
+	message="Мягкая посадка выполнена."
+	return true
+
+func take_off(ship: RefCounted) -> bool:
+	if not active or not landed or ship.hull<=0:return false
+	landed=false;landing=false;taking_off=true

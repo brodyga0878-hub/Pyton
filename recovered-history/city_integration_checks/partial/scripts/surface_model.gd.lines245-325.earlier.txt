@@ -1,0 +1,81 @@
+	return state
+
+func restore(data: Dictionary, ship: RefCounted, system: RefCounted) -> bool:
+	if data.get("version",0)==6:
+		if not data.get("flight_phase") is String or data.flight_phase not in ["","ascent","descent"]:return false
+		if data.get("landed")==true and not data.flight_phase.is_empty():return false
+		if not data.flight_phase.is_empty() and (ship.velocity.length()>301 or not ship.assisted or absf(ship.target_speed)>0.01):return false
+		if not _restore_globe(data,ship,system,MAX_FLIGHT_HEIGHT+1):return false
+		extended_flight=true;flight_phase=data.flight_phase
+		return true
+	if data.get("version",0)==5:
+		if not data.get("active") is bool or not data.get("landed") is bool or data.active or data.landed or data.get("body_id")!=system.focus_id or not OrbitLink.valid(data.get("orbit_link"),system):return false
+		var old:=data.duplicate(true);old.version=3;old.erase("orbit_link")
+		var candidate:RefCounted=get_script().new()
+		if not candidate.restore(old,ship,system):return false
+		if not restore(old,ship,system):return false
+		orbit_link=data.orbit_link.duplicate(true)
+		return true
+	if data.get("version",0)==4:
+		if data.has("flight_phase"):return false
+		return _restore_globe(data,ship,system)
+	if data.has("terrain_revision") or data.has("layout"):return false
+	if (data.get("version",0)!=1 and data.get("version",0)!=2 and data.get("version",0)!=3) or not data.get("active") is bool or not data.get("landed") is bool:return false
+	for key in ["orbit_position","orbit_attitude"]:
+		var values: Variant=data.get(key)
+		if not values is Array or values.size()!=(4 if key=="orbit_attitude" else 3):return false
+		for value in values:
+			if not (value is int or value is float) or not is_finite(float(value)) or absf(float(value))>1e9:return false
+	var rotation:=Quaternion(data.orbit_attitude[0],data.orbit_attitude[1],data.orbit_attitude[2],data.orbit_attitude[3])
+	if rotation.length_squared()<0.01:return false
+	if data.active:
+		if data.get("body_id","")!=system.focus_id or ship.docked:return false
+		if str(system.by_id[system.focus_id].kind) in ["gas","ice_gas","star","barycenter"]:return false
+		if Vector2(ship.position.x,ship.position.z).length()>LIMIT+1 or ship.position.y>4001 or ship.position.y< -200:return false
+		var candidate: RefCounted=get_script().new()
+		candidate.seed_value=system.system_id^system.focus_id.hash()
+		if not system.site_id.is_empty():candidate.seed_value^=system.site_id.hash()
+		var site:Dictionary=system.current_site()
+		if not site.is_empty() and int(site.type_code)==35:candidate.site_name=str(site.name)
+		if data.version==3 and candidate.overlaps_building(ship):return false
+		var altitude_now: float=candidate.altitude(ship)
+		if data.get("version",0)==1:altitude_now=ship.position.y-candidate.raw_height_at(ship.position.x,ship.position.z)-candidate.clearance(ship)
+		if altitude_now < -1 or (data.landed and (absf(altitude_now)>1 or ship.velocity.length()>0.1)):return false
+	elif data.landed:return false
+	orbit_link={}
+	extended_flight=false;flight_phase="";ready_for_orbit=false
+	globe=null;frame_index=0
+	site_name=""
+	active=data.active;landed=data.landed;landing=false;body_id=str(data.get("body_id",""))
+	orbit_position=Vector3(data.orbit_position[0],data.orbit_position[1],data.orbit_position[2]);orbit_attitude=rotation.normalized()
+	if active:
+		var body: Dictionary=system.by_id[system.focus_id]
+		kind=str(body.kind);seed_value=system.system_id^body_id.hash()
+		site_name=""
+		var site:Dictionary=system.current_site()
+		if not site.is_empty() and int(site.type_code)==35:seed_value^=str(site.id).hash();site_name=str(site.name)
+		gravity=G*float(body.mass_solar)*SOLAR_MASS/pow(float(body.radius_km)*1000,2)
+	taking_off=false
+	if active and data.get("version",0)==1:
+		ship.position.y=maxf(ship.position.y,height_at(ship.position.x,ship.position.z)+clearance(ship))
+		if landed:ship.position.y=height_at(ship.position.x,ship.position.z)+clearance(ship)
+	if active and data.version!=3 and overlaps_building(ship):
+		evacuate_building(ship);landed=false
+		message="Старое сохранение: корабль безопасно поднят над зданием. Прогресс и корпус сохранены."
+	ship.surface_mode=active
+	return true
+
+func buildings()->Array[AABB]:
+	var result:Array[AABB]=[]
+	if site_name.is_empty():return result
+	var pad:=pad_position()
+	if globe and Vector2(pad.x,pad.z).length()>GRID_WIDTH:return result
+	for i in range(10):
+		var height:=20.0+float((seed_value+i*53)&63)
+		var x:=float(-180 if i<5 else 180);var z:=float((i%5)*130-260)
+		x+=pad.x;z+=pad.z
+		result.append(AABB(Vector3(x-16,height_at(x,z),z-20),Vector3(32,height,40)))
+	return result
+func collision_radius(ship:RefCounted)->float:return float(ship.profile().visual_span_m)*0.55
+func overlaps_building(ship:RefCounted)->bool:
+	for box in buildings():

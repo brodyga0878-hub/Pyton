@@ -1,0 +1,17 @@
+	var landing_point:Vector3=surface.pad_position() if surface.has_method("pad_position") else Vector3.ZERO
+	# Source city meshes have their own persistent view and native pad layout.
+	# Keeping these outside the terrain builder preserves them across rebases.
+	var source_city:Variant=surface.get("city_data")
+	if source_city is Dictionary and not source_city.is_empty():
+		if Vector2(landing_point.x,landing_point.z).length()<=width*0.45:
+			var marker:=Label3D.new();marker.name="SourcePadMarker"
+			marker.text=current_site.to_upper();marker.font_size=64;marker.pixel_size=0.08
+			marker.position=landing_point+Vector3(0,22,0);marker.billboard=BaseMaterial3D.BILLBOARD_ENABLED
+			marker.no_depth_test=false;add_child(marker)
+		return
+	if spherical and Vector2(landing_point.x,landing_point.z).length()>width*0.45:return
+	var pad:=MeshInstance3D.new()
+	var box:=BoxMesh.new();box.size=Vector3(100,0.3,100)
+	pad.mesh=box;pad.position=landing_point+Vector3(0,0.2,0)
+	var pm:=ShaderMaterial.new();pm.shader=PadShader
+	pad.material_override=pm;add_child(pad)

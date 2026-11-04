@@ -1,0 +1,287 @@
+{
+  "recovery_date": "2026-11-04",
+  "original_repository_edited": false,
+  "full_project_recovered": false,
+  "files": [
+    {
+      "path": "PROVENANCE.md",
+      "category": "new_recovery_metadata",
+      "bytes": 11212,
+      "lines": 79,
+      "sha256": "826dcefd092831ec97588d7bcddddea1076f365ef286734dfbddd8bd25c5be48"
+    },
+    {
+      "path": "docs/ORIGINAL_DISTANCE_UNITS_RU.md",
+      "category": "complete_historical_text",
+      "bytes": 11209,
+      "lines": 71,
+      "sha256": "26f7c81bf9e9ba557250e69e6a030d951596a2dc2d66e5cbb84e8106ec659254"
+    },
+    {
+      "path": "docs/ORIGINAL_TERRAIN_RESEARCH_RU.md",
+      "category": "complete_historical_text",
+      "bytes": 20354,
+      "lines": 65,
+      "sha256": "607a5ff7d81922f66ddf0fcf45b638b9eafe70e580961b59e81e5f1ba782c22a"
+    },
+    {
+      "path": "docs/RELEASE_ROADMAP_RU.md",
+      "category": "complete_historical_text",
+      "bytes": 5868,
+      "lines": 22,
+      "sha256": "6925a6daf0e37e29f93f4b740332397bc0f349daa3d97b72da73f93e7dc88276"
+    },
+    {
+      "path": "docs/SOURCE_TERRAIN_PROVIDER_POLICY_RU.md",
+      "category": "complete_historical_text",
+      "bytes": 15287,
+      "lines": 54,
+      "sha256": "1274b70f5d3af6e9b8e7ec447c997b57e2058c4612c266de8ab1a61b76c0f8fb"
+    },
+    {
+      "path": "docs/STAGE10_19_20_RU.md",
+      "category": "complete_historical_text",
+      "bytes": 9572,
+      "lines": 48,
+      "sha256": "7b08ad63704e8d89fab098defb373c22a175912145732f18d560a3b1b3594f31"
+    },
+    {
+      "path": "docs/STAGE10_21_22_RU.md",
+      "category": "complete_historical_text",
+      "bytes": 15872,
+      "lines": 57,
+      "sha256": "c62914aadf97401cbe27dd239e55dd5baa949c0001d7ceac0d65c59e839f5773"
+    },
+    {
+      "path": "partials/scripts/main.gd.lines1153-1164.fragment",
+      "category": "partial_original_read",
+      "bytes": 875,
+      "lines": 12,
+      "sha256": "d1485daaf90cf586c3d898714622302086a179bec1fd1d22b36eb04f63808ad0"
+    },
+    {
+      "path": "partials/scripts/main.gd.lines1208-1235.fragment",
+      "category": "partial_original_read",
+      "bytes": 1849,
+      "lines": 28,
+      "sha256": "ffd71a5606b7e0f2a5170fc0b17458c1a1ba022ceab4f8bb47a0bacfa0801af4"
+    },
+    {
+      "path": "partials/scripts/main.gd.lines1445-1467.fragment",
+      "category": "partial_original_read",
+      "bytes": 1333,
+      "lines": 23,
+      "sha256": "331409d0fecdca729a3d12e316f63735251f2f64315d86a2d13f0d05c749b8c5"
+    },
+    {
+      "path": "partials/scripts/main.gd.lines1779-1814.fragment",
+      "category": "partial_original_read",
+      "bytes": 1933,
+      "lines": 36,
+      "sha256": "acc1f728569944f61633fdcb9020512c5e7ef8e03fd162799d9e506acd5cfd51"
+    },
+    {
+      "path": "partials/scripts/main.gd.lines2149-2159.fragment",
+      "category": "partial_original_read",
+      "bytes": 692,
+      "lines": 11,
+      "sha256": "62b0a8e46758e6425fae1ea5406bb3fabfa5e011d584f4f39d0c1d7a670d46ff"
+    },
+    {
+      "path": "partials/scripts/main.gd.lines2336-2349.fragment",
+      "category": "partial_original_read",
+      "bytes": 801,
+      "lines": 14,
+      "sha256": "d5b54e6163587effdedb75e4ff4bba29ff63281a22e82a8e63561852e270c303"
+    },
+    {
+      "path": "partials/scripts/main.gd.lines2521-2537.fragment",
+      "category": "partial_original_read",
+      "bytes": 845,
+      "lines": 17,
+      "sha256": "318684655698821e2d8c1769e5992903474194096e40ceb85cc3639fecd82d7d"
+    },
+    {
+      "path": "partials/scripts/main.gd.lines2578-2635.fragment",
+      "category": "partial_original_read",
+      "bytes": 3802,
+      "lines": 58,
+      "sha256": "c0f4f9131b223d1b4690135b936385a64685bd397a997485dbc9cc018aa1b5e1"
+    },
+    {
+      "path": "partials/scripts/surface_model.gd.lines193-360.fragment",
+      "category": "partial_original_read",
+      "bytes": 9967,
+      "lines": 168,
+      "sha256": "a54d37b1fdddf6e44475f5207e2461d1f5b160d032ec996e6faacae9b783f355"
+    },
+    {
+      "path": "scripts/device_settings.gd",
+      "category": "complete_historical_text",
+      "bytes": 2104,
+      "lines": 41,
+      "sha256": "890be6e61f0bb5d3cdc1fbceed75ba546485d85b46daf1dbde02da4897559c42"
+    },
+    {
+      "path": "scripts/near_surface_view.gd",
+      "category": "complete_historical_text",
+      "bytes": 4933,
+      "lines": 79,
+      "sha256": "5dc6b8f8d342b0d243767c6f5987da48906ce5829ef92e4a96b992ef6356716b"
+    },
+    {
+      "path": "scripts/source_city_profile.gd",
+      "category": "complete_historical_text",
+      "bytes": 2899,
+      "lines": 46,
+      "sha256": "3a53275a5663de4206bf77c2adf816f308386dc469f942173be3e94912939416"
+    },
+    {
+      "path": "scripts/source_city_view.gd",
+      "category": "complete_historical_text",
+      "bytes": 3497,
+      "lines": 102,
+      "sha256": "c381e770fa25b3dad3606ab799dc15e12a2bf52d8d54e7edf727b532a023796d"
+    },
+    {
+      "path": "scripts/source_model.gdshader",
+      "category": "complete_historical_text",
+      "bytes": 789,
+      "lines": 19,
+      "sha256": "266c1bae942a10b715eddb6668c117a85b31b689f150954945e6622d809804cc"
+    },
+    {
+      "path": "scripts/source_model_visual.gd",
+      "category": "complete_historical_text",
+      "bytes": 6092,
+      "lines": 102,
+      "sha256": "3e711454a28ff862638ef84e82a2dc41daa8837ef56143623358729ab3bc82a2"
+    },
+    {
+      "path": "scripts/source_units.gd",
+      "category": "complete_historical_text",
+      "bytes": 705,
+      "lines": 11,
+      "sha256": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24"
+    },
+    {
+      "path": "scripts/spherical_terrain.gd",
+      "category": "complete_historical_text",
+      "bytes": 4522,
+      "lines": 90,
+      "sha256": "ac7e11881b649129f09d916cbf48c5b025119aef7735f92f6473f19709c10975"
+    },
+    {
+      "path": "scripts/surface_orbit_link.gd",
+      "category": "complete_historical_text",
+      "bytes": 4483,
+      "lines": 59,
+      "sha256": "6a358b2030a0480035caa7a5263d0db96385394740672b18b18a306c30bec12c"
+    },
+    {
+      "path": "scripts/surface_visual.gd",
+      "category": "complete_historical_text",
+      "bytes": 8893,
+      "lines": 147,
+      "sha256": "6a1756daad279e0bfeb7e4e71021a5aa8957bcdcd0395f6c1e87234b6c365e70"
+    },
+    {
+      "path": "scripts/terrain_surface_point.gd",
+      "category": "complete_historical_text",
+      "bytes": 6727,
+      "lines": 143,
+      "sha256": "48bbfd3f3789cd0d5d4865c22977fef20cfa721ba440a7a7bf14431ce6cdfe57"
+    },
+    {
+      "path": "scripts/world_presentation.gd",
+      "category": "complete_historical_text",
+      "bytes": 2603,
+      "lines": 45,
+      "sha256": "06ca6bdd7d156f7c71e8854ed5363996cfb72468dc6acf2389f02ca1c64aa828"
+    },
+    {
+      "path": "tests/test_city_collision.gd",
+      "category": "complete_historical_text",
+      "bytes": 4680,
+      "lines": 69,
+      "sha256": "ead6da7d44e6bf365468275bec91551d4cefec4ff7d5378451a4d9ebddb463ac"
+    },
+    {
+      "path": "tests/test_global_surface.gd",
+      "category": "complete_historical_text",
+      "bytes": 7919,
+      "lines": 110,
+      "sha256": "34fb7a80a2c0da480adee7fabdb4a7097695ff3f5b8764bfd1d1109ec8d81bb8"
+    },
+    {
+      "path": "tests/test_source_city_view.gd",
+      "category": "complete_historical_text",
+      "bytes": 6655,
+      "lines": 92,
+      "sha256": "d3ecbbbfeb4ee0e6e650980ca65b716621ea6d82115a3de6c54cd7cf9134ec2f"
+    },
+    {
+      "path": "tests/test_terrain_additional_query.py",
+      "category": "complete_historical_text",
+      "bytes": 4071,
+      "lines": 72,
+      "sha256": "49f432e4007e2365e5abb69c355780d2f9433ec542840324f990234e765aca4a"
+    },
+    {
+      "path": "tests/test_terrain_game_query.py",
+      "category": "complete_historical_text",
+      "bytes": 3404,
+      "lines": 49,
+      "sha256": "6497eb632fc29a9a5d354dcfd0edb390af512b8886a9ccc166b240f70c4dbcf2"
+    },
+    {
+      "path": "tests/test_terrain_provider.py",
+      "category": "complete_historical_text",
+      "bytes": 5777,
+      "lines": 103,
+      "sha256": "22e0ae87a44f0e26a4618e32f54fb58257e6f1ceb495cbdf21e819ca93d6e772"
+    },
+    {
+      "path": "tests/test_terrain_provider_points.gd",
+      "category": "complete_historical_text",
+      "bytes": 3885,
+      "lines": 64,
+      "sha256": "54f410effaf9337be420e17366fa8d6ca8dcb515acacac6d888259b6acda6d42"
+    },
+    {
+      "path": "tests/test_terrain_surface_point.gd",
+      "category": "complete_historical_text",
+      "bytes": 3193,
+      "lines": 42,
+      "sha256": "0775c80f35d6786cc2bc778065b99354cd9269f94bace1fd4887619108b50345"
+    },
+    {
+      "path": "tools/build_terrain_additional_query_reference.py",
+      "category": "complete_historical_text",
+      "bytes": 3055,
+      "lines": 57,
+      "sha256": "31b8d53d22ac032105cb40f7aa52e92d90385eaf049122094c5e458b8dd7da95"
+    },
+    {
+      "path": "tools/build_terrain_game_query_reference.py",
+      "category": "complete_historical_text",
+      "bytes": 11017,
+      "lines": 202,
+      "sha256": "299e1ff0b93579375607979f29a7cd30bbb2869e1300b20b4bd85f18110f434c"
+    },
+    {
+      "path": "tools/build_terrain_provider_reference.py",
+      "category": "complete_historical_text",
+      "bytes": 12668,
+      "lines": 208,
+      "sha256": "49d3f90bf738b2c276543a454229b3a8c65d32928175dfe74e856b5ac46e223b"
+    },
+    {
+      "path": "tools/check.sh",
+      "category": "complete_historical_text",
+      "bytes": 3305,
+      "lines": 60,
+      "sha256": "a4ea3f91a923acaf5f526aa9fb9d381c462bdb13a3ea11f7500753e2f9e00dc9"
+    }
+  ]
+}

@@ -1,0 +1,2566 @@
+{
+  "date": "2026-11-04",
+  "label": "expanded",
+  "scope": "PARTIAL SOURCE RECOVERY FROM AGENT HISTORY",
+  "full_game_restored": false,
+  "old_packaged_source_zip_found": false,
+  "old_apk_found": false,
+  "files_recovered_in_this_snapshot": 301,
+  "identified_original_paths": [
+    "docs/GROUND_COORDINATES_RESEARCH_RU.md",
+    "docs/GROUND_COORDINATES_SOURCE_RU.md",
+    "docs/ORIGINAL_CITY_PLACEMENT_RU.md",
+    "docs/ORIGINAL_DISTANCE_UNITS_RU.md",
+    "docs/ORIGINAL_TERRAIN_RESEARCH_RU.md",
+    "docs/ORIGINAL_WORLD_MODELS_RU.md",
+    "docs/RELEASE_ROADMAP_RU.md",
+    "docs/REMAINING_PLAN_RU.md",
+    "docs/S23_ULTRA_TEST_RU.md",
+    "docs/SOURCE_TERRAIN_PROVIDER_POLICY_RU.md",
+    "docs/STAGE10_17_RU.md",
+    "docs/STAGE10_18_RU.md",
+    "docs/STAGE10_19_20_RU.md",
+    "docs/STAGE10_21_22_RU.md",
+    "docs/WORLDS_RELEASE_GAPS_RU.md",
+    "docs/release_readiness.json",
+    "export_presets.cfg",
+    "project.godot",
+    "scripts/atmosphere.gdshader",
+    "scripts/body_initializer.gd",
+    "scripts/body_rotation.gd",
+    "scripts/building.gdshader",
+    "scripts/celestial_renderer.gd",
+    "scripts/device_settings.gd",
+    "scripts/ground_coordinates.gd",
+    "scripts/landing_pad.gdshader",
+    "scripts/near_surface_view.gd",
+    "scripts/original_worlds.gd",
+    "scripts/planet.gdshader",
+    "scripts/procedural_worlds.gd",
+    "scripts/rings.gdshader",
+    "scripts/segment_box.gd",
+    "scripts/segment_triangle.gd",
+    "scripts/settings_panel.gd",
+    "scripts/ship_catalog.gd",
+    "scripts/source_city_anchor.gd",
+    "scripts/source_city_profile.gd",
+    "scripts/source_city_runtime.gd",
+    "scripts/source_city_view.gd",
+    "scripts/source_ground_pads.gd",
+    "scripts/source_model.gdshader",
+    "scripts/source_model_mesh.gd",
+    "scripts/source_model_vertices.gd",
+    "scripts/source_model_visual.gd",
+    "scripts/source_model_vm.gd",
+    "scripts/source_polygon.gd",
+    "scripts/source_units.gd",
+    "scripts/spherical_terrain.gd",
+    "scripts/surface_model.gd",
+    "scripts/surface_orbit_link.gd",
+    "scripts/surface_visual.gd",
+    "scripts/terrain.gdshader",
+    "scripts/terrain_math.gd",
+    "scripts/terrain_query.gd",
+    "scripts/terrain_surface_point.gd",
+    "scripts/terrain_transition.gdshader",
+    "scripts/world_presentation.gd",
+    "tests/surface_visual_reference_v0102.gd",
+    "tests/test_body_rotation.gd",
+    "tests/test_city_collision.gd",
+    "tests/test_city_placement.py",
+    "tests/test_far_surface_transition.gd",
+    "tests/test_geographic_descent.gd",
+    "tests/test_global_surface.gd",
+    "tests/test_ground_coordinates.gd",
+    "tests/test_near_surface_view.gd",
+    "tests/test_segment_triangle.gd",
+    "tests/test_source_city_anchor.gd",
+    "tests/test_source_city_integration.gd",
+    "tests/test_source_city_runtime.gd",
+    "tests/test_source_city_view.gd",
+    "tests/test_source_ground_pads.gd",
+    "tests/test_source_model_aux_rotation.gd",
+    "tests/test_source_model_child_frame.gd",
+    "tests/test_source_model_mesh.gd",
+    "tests/test_source_model_vm.gd",
+    "tests/test_surface_orbit_link.gd",
+    "tests/test_terrain_additional_query.py",
+    "tests/test_terrain_game_query.py",
+    "tests/test_terrain_provider.py",
+    "tests/test_terrain_provider_points.gd",
+    "tests/test_terrain_query.gd",
+    "tests/test_terrain_surface_point.gd",
+    "tests/test_vertical_flight.gd",
+    "tests/test_world_model_assets.py",
+    "tests/test_world_presentation.gd",
+    "tools/build_android.sh",
+    "tools/build_city_placement_reference.py",
+    "tools/build_ground_pads_reference.py",
+    "tools/build_ground_reference.py",
+    "tools/build_legacy_geography_fixture.gd",
+    "tools/build_model_child_frame_reference.py",
+    "tools/build_terrain_additional_query_reference.py",
+    "tools/build_terrain_game_query_reference.py",
+    "tools/build_terrain_provider_reference.py",
+    "tools/build_terrain_query_reference.py",
+    "tools/check.sh",
+    "tools/extract_settlement_rules.py",
+    "tools/extract_ship_registry.py",
+    "tools/extract_world_models.py",
+    "tools/extract_worlds.py",
+    "tools/native_reference.py",
+    "tools/preview_world_model.gd",
+    "tools/release_candidate.py",
+    "tools/verify_android.py"
+  ],
+  "distinct_identified_original_paths": 105,
+  "distinct_content_hashes": 246,
+  "python_syntax_errors": [],
+  "validation": [
+    {
+      "log": "validation/segment-triangle-validation-2026-11-04.log",
+      "checks": 144,
+      "passed": true,
+      "scope": "Analytic collision unit cases only"
+    },
+    {
+      "log": "validation/city-view-validation-2026-11-04.log",
+      "checks": 33,
+      "passed": true,
+      "scope": "Synthetic city view geometry only; no original data assets"
+    },
+    {
+      "log": "validation/surface-model-parse-validation-2026-11-04.log",
+      "kind": "parse_only",
+      "passed": true,
+      "scope": "Recovered historical SurfaceModel and its matching dependency versions; no flight simulation"
+    }
+  ],
+  "known_missing_core_examples": [
+    "scripts/main.gd",
+    "scripts/flight_model.gd",
+    "scripts/navigation.gd",
+    "scripts/planetary_system.gd",
+    "scripts/galaxy.gd",
+    "data/ffe_world_models.json",
+    "data/ffe_ground_coordinates.json"
+  ],
+  "whole_project_original_hash_comparison_available": false,
+  "one_historical_file_hash_check": {
+    "file": "/workspace/recovery/from-agent-history/release_audit/versions/v0.10.2-read/scripts/surface_visual.gd",
+    "expected_hash_from_preserved_old_report": "b2ebdbd0bf6e54fe491bee91ba4a292d381ee2975c547766ad10142705daa583",
+    "actual_sha256": "b2ebdbd0bf6e54fe491bee91ba4a292d381ee2975c547766ad10142705daa583",
+    "matches": true,
+    "scope": "One historical surface_visual.gd version, not the whole project"
+  },
+  "files": [
+    {
+      "path": "history/approach_docs/PROVENANCE.md",
+      "bytes": 6986,
+      "sha256": "7e40e14e46212d60a2921bc4f4b19aee2afda73bbae3fb61aa7ff7887833b1ff",
+      "agent": "approach_docs",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/approach_docs/docs/GROUND_COORDINATES_SOURCE_RU.md",
+      "bytes": 8711,
+      "sha256": "798e38a9834f8d20194bd939b114076ac627111f1c409731cf55adcdcf5cb408",
+      "agent": "approach_docs",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/GROUND_COORDINATES_SOURCE_RU.md"
+    },
+    {
+      "path": "history/approach_docs/docs/RELEASE_ROADMAP_RU.md",
+      "bytes": 5868,
+      "sha256": "6925a6daf0e37e29f93f4b740332397bc0f349daa3d97b72da73f93e7dc88276",
+      "agent": "approach_docs",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/RELEASE_ROADMAP_RU.md"
+    },
+    {
+      "path": "history/approach_docs/docs/REMAINING_PLAN_RU.md",
+      "bytes": 11465,
+      "sha256": "769364ab70692e55a99a146dea9f74621341c46d1c62c656f374d2ecbc5b867d",
+      "agent": "approach_docs",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/REMAINING_PLAN_RU.md"
+    },
+    {
+      "path": "history/approach_docs/docs/S23_ULTRA_TEST_RU.md",
+      "bytes": 17323,
+      "sha256": "ea23ea724bc5a0f2485d35865be6b7ebb04f491a9b748fa5f20e2643a040fc0f",
+      "agent": "approach_docs",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/S23_ULTRA_TEST_RU.md"
+    },
+    {
+      "path": "history/approach_docs/docs/STAGE10_18_RU.md",
+      "bytes": 8919,
+      "sha256": "f62bbce07bf93111dbb3477e39f3c9e7b3ea1929bfa956e8dbf623f814a9c443",
+      "agent": "approach_docs",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/STAGE10_18_RU.md"
+    },
+    {
+      "path": "history/approach_docs/docs/STAGE10_19_20_RU.md",
+      "bytes": 9572,
+      "sha256": "7b08ad63704e8d89fab098defb373c22a175912145732f18d560a3b1b3594f31",
+      "agent": "approach_docs",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/STAGE10_19_20_RU.md"
+    },
+    {
+      "path": "history/approach_docs/docs/WORLDS_RELEASE_GAPS_RU.md",
+      "bytes": 9915,
+      "sha256": "c6f23f266c6518170aff8f697a4c7c2ba454a96ca6ef851d7ade4e7987f2606a",
+      "agent": "approach_docs",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/WORLDS_RELEASE_GAPS_RU.md"
+    },
+    {
+      "path": "history/approach_docs/partial/README.prefix.md",
+      "bytes": 4547,
+      "sha256": "a6540ec2a686b5e3f42b81a9a2937da04b477ece65f0c7adbba3ff8254e6fd10",
+      "agent": "approach_docs",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/approach_docs/partial/docs/COMPLETION_MATRIX_RU.prefix.md",
+      "bytes": 4825,
+      "sha256": "330ef1effe6d41a52e92a2f6c2a6fc661bd6811e9496f7e52ee9c552bbc6323b",
+      "agent": "approach_docs",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/approach_docs/partial/docs/ORIGINAL_BODY_ROTATION_RESEARCH_RU.tail.md",
+      "bytes": 6855,
+      "sha256": "a1e6fd1e59b5e180a6270855150c35d2a835284efa3df360c23a0e0d0db9f28e",
+      "agent": "approach_docs",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/approach_docs/partial/docs/STATUS_RU.prefix.md",
+      "bytes": 18617,
+      "sha256": "c4eadee78d6be11007a880a603faa53810b5773f9f19f27be2115c004fc57fc9",
+      "agent": "approach_docs",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/approach_docs/versions/v0.10.6-read/docs/release_readiness.json",
+      "bytes": 8072,
+      "sha256": "76f4b277d14fd1724806932d870ffe01341166e17b5b58d929905e4ad472df9b",
+      "agent": "approach_docs",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/release_readiness.json"
+    },
+    {
+      "path": "history/approach_review/PROVENANCE.md",
+      "bytes": 3123,
+      "sha256": "74431300f907494e709e8050da863ee140046d84b2694682c26f392550477b3a",
+      "agent": "approach_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/approach_review/RECOVERED_FILES.json",
+      "bytes": 3555,
+      "sha256": "f4ee19d8ba26608557f118c15ddedfae0a77ed74462f1d11055b71a886d679e1",
+      "agent": "approach_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/approach_review/docs/REMAINING_PLAN_RU.md",
+      "bytes": 9509,
+      "sha256": "968c80150e0c3ad4877add8ebbe319440f150a88f5755f07e01f3db13d7842da",
+      "agent": "approach_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/REMAINING_PLAN_RU.md"
+    },
+    {
+      "path": "history/approach_review/docs/STAGE10_17_RU.md",
+      "bytes": 8772,
+      "sha256": "983bbfe3ad93c03465dfbae31f5f5b80a2645bc3ecc49797c310909f3986e708",
+      "agent": "approach_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/STAGE10_17_RU.md"
+    },
+    {
+      "path": "history/approach_review/partial/scripts/flight_model.equipment.v0106.gd",
+      "bytes": 1046,
+      "sha256": "de4f546250d5616f196185ea1d763ed3a34bdee23fa7d56e8f1277f8c91a8e0e",
+      "agent": "approach_review",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/approach_review/partial/scripts/main.apply_system.v0106.gd",
+      "bytes": 2251,
+      "sha256": "0296b1f9d38704105c3f5ebf0bf00ee9e08184235502ab988d8424a93ffc49e0",
+      "agent": "approach_review",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/approach_review/partial/scripts/main.approach_views.v0107.txt",
+      "bytes": 1382,
+      "sha256": "0524303e15822c329bb09cdd194a6a0adf1a863e919c56cf8c177dbcffe425ea",
+      "agent": "approach_review",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/approach_review/partial/scripts/main.controls.v0107.gd",
+      "bytes": 1936,
+      "sha256": "9d747cde8d023f3010119b943e50b84c0389fbabfe38004fe0c9dfbd93218c56",
+      "agent": "approach_review",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/approach_review/partial/scripts/main.far_surface_smoke.v0107.gd",
+      "bytes": 3028,
+      "sha256": "424c7d343bddfbfd415f87ff7b433238f356f2fa55b7843c6d20827eb4982d33",
+      "agent": "approach_review",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/approach_review/partial/scripts/main.finish_ascent.v0107.gd",
+      "bytes": 845,
+      "sha256": "318684655698821e2d8c1769e5992903474194096e40ceb85cc3639fecd82d7d",
+      "agent": "approach_review",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/approach_review/partial/scripts/main.geographic_descent_smoke.v0107.gd",
+      "bytes": 5654,
+      "sha256": "5d337208402efcd0c50d3668d2fe822ea774c01aa96df4f7935aff20cda5e333",
+      "agent": "approach_review",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/approach_review/partial/scripts/main.header.v0106.txt",
+      "bytes": 4160,
+      "sha256": "4731d2510d9b5239126668ef0960005259711c0e8bb6fbf8bee4cf5e97d6c992",
+      "agent": "approach_review",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/approach_review/partial/scripts/main.physics_body.v0107.txt",
+      "bytes": 3083,
+      "sha256": "04e1a98b3d2424604f6bc7ce4b5666fb8c0ffd974e0c100b3579af83259287b5",
+      "agent": "approach_review",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/approach_review/partial/scripts/main.process_prefix.v0106.txt",
+      "bytes": 2071,
+      "sha256": "45670ca24fd42deec3684c8c481e05c2e1ba1781ba9c1d3738d0a298b60a5537",
+      "agent": "approach_review",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/approach_review/partial/scripts/main.surface_action.v0107.gd",
+      "bytes": 1933,
+      "sha256": "acc1f728569944f61633fdcb9020512c5e7ef8e03fd162799d9e506acd5cfd51",
+      "agent": "approach_review",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/approach_review/partial/scripts/planetary_system.protect_surface.v0106.gd",
+      "bytes": 910,
+      "sha256": "1d64e3439abbc653095c15fa62ae8ccf81142b2afbcb148a610b2c29a202d0c5",
+      "agent": "approach_review",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/approach_review/scripts/atmosphere.gdshader",
+      "bytes": 1464,
+      "sha256": "9a3c1a236dd5e09a0cda485b6b9de9969cd1bdd8eb583d6a1dff094bde63f207",
+      "agent": "approach_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/atmosphere.gdshader"
+    },
+    {
+      "path": "history/approach_review/scripts/planet.gdshader",
+      "bytes": 2995,
+      "sha256": "73cbabacb8914c1d8ead73ce3d56f6a193df638f9efe9084ff55059fe17c0cd1",
+      "agent": "approach_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/planet.gdshader"
+    },
+    {
+      "path": "history/city_integration_checks/MANIFEST.json",
+      "bytes": 2655,
+      "sha256": "29cb8ac3ebca4559e64d4e4e265871872219d8c4ea206c105a024a56be1cd56a",
+      "agent": "city_integration_checks",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/city_integration_checks/PROVENANCE.md",
+      "bytes": 6820,
+      "sha256": "cea76f9df3526123862d41df53263b95c8c8d6dbfa7658e9f5e7a9a01edbafdb",
+      "agent": "city_integration_checks",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/city_integration_checks/partial/data/ffe_handcrafted_records.selected-native-records.txt",
+      "bytes": 1007,
+      "sha256": "2960b69a7b445a85d5415743269f9198dcab02d84b84f53193a6a0550ff4c09b",
+      "agent": "city_integration_checks",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/city_integration_checks/partial/scripts/flight_model.gd.lines001-105.txt",
+      "bytes": 4334,
+      "sha256": "1a96f370c59f4d27b1c2f6050336331bd15e7dcf48792d729b0504077710e21c",
+      "agent": "city_integration_checks",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/city_integration_checks/partial/scripts/planetary_system.gd.lines001-140.txt",
+      "bytes": 7151,
+      "sha256": "2782b838c6082b2cdf0d38b455dac079808a434f2fef3698a739480c888674a5",
+      "agent": "city_integration_checks",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/city_integration_checks/partial/scripts/surface_model.gd.lines075-150.txt",
+      "bytes": 4414,
+      "sha256": "69ba1267fc6a8192fd7a625bd8878489d9158a04ebb7ea242e837dee2ab67a47",
+      "agent": "city_integration_checks",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/city_integration_checks/partial/scripts/surface_model.gd.lines151-208.txt",
+      "bytes": 3512,
+      "sha256": "41442cc8d728934abe9355bd4401b949e13d28a65224a61cf2c5a672cb9b9302",
+      "agent": "city_integration_checks",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/city_integration_checks/partial/scripts/surface_model.gd.lines245-325.earlier.txt",
+      "bytes": 4855,
+      "sha256": "ff8f7912b281c51e6af2bce8c0ed24ef8cd4251e6b6a9e7d7706f5c8ca126121",
+      "agent": "city_integration_checks",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/city_integration_checks/partial/scripts/surface_model.gd.lines325-390.later.txt",
+      "bytes": 3511,
+      "sha256": "ce6f507946e714fd7f7170884696a6b5aa395e61da63f3e6aa34223e6bda0ac9",
+      "agent": "city_integration_checks",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/city_integration_checks/partial/scripts/surface_model.gd.lines398-488.txt",
+      "bytes": 6237,
+      "sha256": "d676d6f9c2aa1d27fc03c8083c1dce35d650c772ee4fc6d1c6ec8a1b95edc97a",
+      "agent": "city_integration_checks",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/city_integration_checks/partial/scripts/surface_model.gd.lines489-545.txt",
+      "bytes": 3620,
+      "sha256": "60bc83791fcbc34f094a756e6a207fd027167daf4c59e480d329db7ac94662bc",
+      "agent": "city_integration_checks",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/city_integration_checks/scripts/original_worlds.gd",
+      "bytes": 5911,
+      "sha256": "254dde12555bac40dc751d161fb347f6da5f9a3ac8fce29630c0dde8aa64f10a",
+      "agent": "city_integration_checks",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/original_worlds.gd"
+    },
+    {
+      "path": "history/city_integration_checks/scripts/ship_catalog.gd",
+      "bytes": 337,
+      "sha256": "923ebbabb6a99bf8f03a142b790f75776c89004511cc7433c5116f972e9c6abb",
+      "agent": "city_integration_checks",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/ship_catalog.gd"
+    },
+    {
+      "path": "history/city_integration_checks/tests/test_source_city_integration.gd",
+      "bytes": 18452,
+      "sha256": "4192be569854011a395bd0c82722925fbd5aab94881d9c3882776726e82127f4",
+      "agent": "city_integration_checks",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_source_city_integration.gd"
+    },
+    {
+      "path": "history/coverage_shaders/PROVENANCE.md",
+      "bytes": 6028,
+      "sha256": "4374181c566068eb01e19122af4cc6ff1a3e226e091241c418f926995757bc68",
+      "agent": "coverage_shaders",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/coverage_shaders/partial/scripts/flight_model.v0104.known_full_functions.gd",
+      "bytes": 1037,
+      "sha256": "65de0bceb0991d2c6fd11ba029cc6a6bb3145d1956c2688efb78fd5f18e3f014",
+      "agent": "coverage_shaders",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/coverage_shaders/partial/scripts/main.v0105.near_surface_smoke.gd",
+      "bytes": 2868,
+      "sha256": "a429bf1832c93db493bc5c77e836a76ca1c6bda082b53111fefcfa429df41a50",
+      "agent": "coverage_shaders",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/coverage_shaders/partial/scripts/main.v0105.sync_planet_visuals.gd",
+      "bytes": 1874,
+      "sha256": "883f24813aefdaae61365c9bc3cb3a3d0f10b692f52c62523519fb2273a54772",
+      "agent": "coverage_shaders",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/coverage_shaders/recovered-files.json",
+      "bytes": 2546,
+      "sha256": "b1199188ff58952ce9859db4d7c828d09dba0bde2a1d51617ea872213da8c30b",
+      "agent": "coverage_shaders",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/coverage_shaders/scripts/atmosphere.gdshader",
+      "bytes": 1464,
+      "sha256": "9a3c1a236dd5e09a0cda485b6b9de9969cd1bdd8eb583d6a1dff094bde63f207",
+      "agent": "coverage_shaders",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/atmosphere.gdshader"
+    },
+    {
+      "path": "history/coverage_shaders/scripts/building.gdshader",
+      "bytes": 1134,
+      "sha256": "f6a91617ad438f3a119ebca321023d04d1c22550111b22764cb5d899d3f08e28",
+      "agent": "coverage_shaders",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/building.gdshader"
+    },
+    {
+      "path": "history/coverage_shaders/scripts/landing_pad.gdshader",
+      "bytes": 935,
+      "sha256": "e10339c7125a1d07981144a1c4836db86721f3b899fa361f0acc4df337d81905",
+      "agent": "coverage_shaders",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/landing_pad.gdshader"
+    },
+    {
+      "path": "history/coverage_shaders/scripts/planet.gdshader",
+      "bytes": 2995,
+      "sha256": "73cbabacb8914c1d8ead73ce3d56f6a193df638f9efe9084ff55059fe17c0cd1",
+      "agent": "coverage_shaders",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/planet.gdshader"
+    },
+    {
+      "path": "history/coverage_shaders/scripts/rings.gdshader",
+      "bytes": 839,
+      "sha256": "962fcd8994b152bcf8599203307e9caf6f830190a6ecbb99b42abf712939e07e",
+      "agent": "coverage_shaders",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/rings.gdshader"
+    },
+    {
+      "path": "history/coverage_shaders/scripts/settings_panel.gd",
+      "bytes": 4752,
+      "sha256": "408e3470e3aab2b84c40a0556fe92fa139b7bf5dc253441876cf1155faf2b05d",
+      "agent": "coverage_shaders",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/settings_panel.gd"
+    },
+    {
+      "path": "history/coverage_shaders/scripts/terrain.gdshader",
+      "bytes": 3237,
+      "sha256": "6f8fdb202fbe8641a4af26daee4a15c264d16a8548cb398c53b480b72d6d9641",
+      "agent": "coverage_shaders",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/terrain.gdshader"
+    },
+    {
+      "path": "history/coverage_shaders/scripts/terrain_transition.gdshader",
+      "bytes": 2944,
+      "sha256": "06d7599aec1f67b1a743e942002a4aefbc393efa0b908390f842a404dab7dcab",
+      "agent": "coverage_shaders",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/terrain_transition.gdshader"
+    },
+    {
+      "path": "history/coverage_shaders/scripts/world_presentation.gd",
+      "bytes": 2256,
+      "sha256": "5af4d7ccd8e5591d1d67dd4243eb8404dea36f4d76e3145b3b341b900f315b06",
+      "agent": "coverage_shaders",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/world_presentation.gd"
+    },
+    {
+      "path": "history/coverage_shaders/versions/pre-coverage/scripts/atmosphere.gdshader",
+      "bytes": 579,
+      "sha256": "d49b841c874838331bdf8b40e4171a27ae8ea3ac3bf2e620e3e7b2c9fa6532e4",
+      "agent": "coverage_shaders",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/atmosphere.gdshader"
+    },
+    {
+      "path": "history/coverage_shaders/versions/pre-coverage/scripts/planet.gdshader",
+      "bytes": 2110,
+      "sha256": "b02f98200c8e1a99646e5f8d356a16bd57d299ce2531287656b6c5976af0fa0b",
+      "agent": "coverage_shaders",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/planet.gdshader"
+    },
+    {
+      "path": "history/coverage_shaders/versions/pre-coverage/scripts/terrain.gdshader",
+      "bytes": 2283,
+      "sha256": "2a2092614220dbb81b928a3f35485dc6574874cbb18c7e00a2280cd4babb41bc",
+      "agent": "coverage_shaders",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/terrain.gdshader"
+    },
+    {
+      "path": "history/descent_transition_tests/PROVENANCE.md",
+      "bytes": 8142,
+      "sha256": "07159fe9770ffa88e1afbf3bcc01bda245ea0e1c26a784929eb333b966f77245",
+      "agent": "descent_transition_tests",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/descent_transition_tests/RECOVERED_FILES.json",
+      "bytes": 2783,
+      "sha256": "8c58684da5c2d7a6ed1e3e697cb8fadb06394dc567f3b7701fa1bbcd0f7297ce",
+      "agent": "descent_transition_tests",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/descent_transition_tests/partial/scripts/flight_model.brake-and-dock.v0106.fragment.gd",
+      "bytes": 443,
+      "sha256": "ff092bcc5ed39e961c99141c326b0c4e195ba355f313d9cc7072ffdd33bb1453",
+      "agent": "descent_transition_tests",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/descent_transition_tests/partial/scripts/flight_model.lines150-220.v0106.fragment.gd",
+      "bytes": 3935,
+      "sha256": "3e1bd0adec042d22fd9e4063255374aa143ecc3588426dd525ba8d236df14471",
+      "agent": "descent_transition_tests",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/descent_transition_tests/partial/scripts/flight_model.prefix.v0106.fragment.gd",
+      "bytes": 3456,
+      "sha256": "d987de959502a905b55e32a8cb08b5383fb8a2a5461b46538c4f85521f73affe",
+      "agent": "descent_transition_tests",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/descent_transition_tests/partial/scripts/flight_model.quantity-and-equipment.v0106.fragment.gd",
+      "bytes": 2356,
+      "sha256": "65926cb659a3822cb74ce134f09e5d702a023a778bf6aa11a4f1b34786ae05a2",
+      "agent": "descent_transition_tests",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/descent_transition_tests/partial/scripts/main.combat-and-surface-actions.v0106.fragment.gd",
+      "bytes": 2349,
+      "sha256": "e8d1f0d0b1554c9f069aa202ef1dc26333f84f3be990fd5018cb73144814da30",
+      "agent": "descent_transition_tests",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/descent_transition_tests/partial/scripts/main.physics-camera-prefix.v0106.fragment.gd",
+      "bytes": 2071,
+      "sha256": "45670ca24fd42deec3684c8c481e05c2e1ba1781ba9c1d3738d0a298b60a5537",
+      "agent": "descent_transition_tests",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/descent_transition_tests/partial/scripts/main.stage5-smoke-prefix.v0106.fragment.gd",
+      "bytes": 2139,
+      "sha256": "f70891e3dedbc64a453576889253bfb98e4746fc0782fe9fb44bc23052e110e4",
+      "agent": "descent_transition_tests",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/descent_transition_tests/partial/scripts/planetary_system.prefix.v0106.fragment.gd",
+      "bytes": 5654,
+      "sha256": "b79034c5cbc668d394250ebfc8b948393d288c78ce4eda91448b2ee37f8e9a59",
+      "agent": "descent_transition_tests",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/descent_transition_tests/tests/test_far_surface_transition.gd",
+      "bytes": 9649,
+      "sha256": "a04b24f8041e7fa2817dd18081e37295df0e491743e99a0dc6d666c45ee02762",
+      "agent": "descent_transition_tests",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_far_surface_transition.gd"
+    },
+    {
+      "path": "history/descent_transition_tests/tests/test_geographic_descent.gd",
+      "bytes": 18106,
+      "sha256": "53685c0dbb471eb3034151aeb9516da3781bdced550c84d36282c2a14e8c21a2",
+      "agent": "descent_transition_tests",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_geographic_descent.gd"
+    },
+    {
+      "path": "history/descent_transition_tests/versions/v0.10.6/scripts/near_surface_view.gd",
+      "bytes": 4253,
+      "sha256": "2bc6e543cdafa3c3d2c3d8a4751b1d2de858cc3f555eff1c37564332ef1f8cfb",
+      "agent": "descent_transition_tests",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/near_surface_view.gd"
+    },
+    {
+      "path": "history/geographic_descent_model/PROVENANCE.md",
+      "bytes": 6653,
+      "sha256": "a9c3c896eb4d9f6769f5b6da72da39754e598d3fde673a69c6247247ee2dd1bd",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/geographic_descent_model/RECOVERED_FILES.json",
+      "bytes": 2976,
+      "sha256": "e4f47a418fefcee9c9f9330b8b2740175e3d85168e50cd7c2ec7842c61f63aa9",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/geographic_descent_model/partial/scripts/main.finish_vertical_ascent_before_high_return.gd",
+      "bytes": 790,
+      "sha256": "4d3a2b88d59fb430b23458ddbdd25d2d8bc668c94cfcd94ae7623703db0fb899",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/geographic_descent_model/partial/scripts/main.surface_action_before_high_return.gd",
+      "bytes": 1510,
+      "sha256": "fefddbd5733cdaf33ffd8d625719aca9a627c1a52ff92ae6dc4d191215a97f9e",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/geographic_descent_model/partial/scripts/main.sync_planet_visuals.gd",
+      "bytes": 3802,
+      "sha256": "c0f4f9131b223d1b4690135b936385a64685bd397a997485dbc9cc018aa1b5e1",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/geographic_descent_model/partial/scripts/planetary_system.fragments.gd",
+      "bytes": 2595,
+      "sha256": "308f0822f3a71dd8dc7985834955b9fc17759a9646373bad69e23a036d6d9a25",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/geographic_descent_model/partial/scripts/surface_model.clip_tail.gd",
+      "bytes": 679,
+      "sha256": "342545dfdc785ca713bffcd4843dd38c1156c7743bb25c457d131f9657f4fd0e",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/geographic_descent_model/partial/scripts/surface_model.prefix.gd",
+      "bytes": 15884,
+      "sha256": "fa6f1c023503e345a8b5695927da2344c4d6a1256079901f74d2db2d8369406f",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/geographic_descent_model/partial/scripts/surface_model.suffix.gd",
+      "bytes": 9327,
+      "sha256": "59eac35614124f01533a64413c98e44f526c23ccdc6d07f98c54b145a8589c5d",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/geographic_descent_model/scripts/celestial_renderer.gd",
+      "bytes": 5397,
+      "sha256": "94a658884866b427921d87dc400ca5680cb9257b346bed92062b8d8639e9b8f6",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/celestial_renderer.gd"
+    },
+    {
+      "path": "history/geographic_descent_model/scripts/near_surface_view.gd",
+      "bytes": 4740,
+      "sha256": "cd107045c3733aeb37fcb574f4f1c15f3fae09eb0cec35284489427cdfa55bd5",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/near_surface_view.gd"
+    },
+    {
+      "path": "history/geographic_descent_model/scripts/spherical_terrain.gd",
+      "bytes": 3725,
+      "sha256": "69560787d5947535e8c10b75d781826628991e737539f164ff6aa326cf8b6037",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/spherical_terrain.gd"
+    },
+    {
+      "path": "history/geographic_descent_model/scripts/surface_model.gd",
+      "bytes": 26824,
+      "sha256": "9068a7f5a16dd0450e07e35a80a439f63ffb70e21061d2e52751b99defca0226",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_model.gd"
+    },
+    {
+      "path": "history/geographic_descent_model/scripts/surface_orbit_link.gd",
+      "bytes": 4071,
+      "sha256": "8cd141e0bd668ea0fcf3c65ee7c88db14be6037385b18c13f44d0dc0766e532c",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_orbit_link.gd"
+    },
+    {
+      "path": "history/geographic_descent_model/scripts/world_presentation.gd",
+      "bytes": 2603,
+      "sha256": "06ca6bdd7d156f7c71e8854ed5363996cfb72468dc6acf2389f02ca1c64aa828",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/world_presentation.gd"
+    },
+    {
+      "path": "history/geographic_descent_model/tests/test_surface_orbit_link.gd",
+      "bytes": 6423,
+      "sha256": "30afd53b7413a37235b8b4e5835ba5a219bf04cddea9115ac853cc62f2339dbf",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_surface_orbit_link.gd"
+    },
+    {
+      "path": "history/geographic_descent_model/tests/test_vertical_flight.gd",
+      "bytes": 6555,
+      "sha256": "5a9e61348905c948de21463dfba2bf3926c05b3392c9d5482d5fbbfdaeaf04ce",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_vertical_flight.gd"
+    },
+    {
+      "path": "history/geographic_descent_model/tools/build_android.sh",
+      "bytes": 1320,
+      "sha256": "ca004d5164c7f313a9483a282b3e781fdf1ff087deecccb882283c8641706ac8",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_android.sh"
+    },
+    {
+      "path": "history/geography_regression/export_presets.cfg",
+      "bytes": 950,
+      "sha256": "d7e524c27d273b9266251d3e1987e54529f65b539529948c04a25982bdb77c30",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "export_presets.cfg"
+    },
+    {
+      "path": "history/geography_regression/provenance/limitations.md",
+      "bytes": 7446,
+      "sha256": "1886a968ec3e5c2930ea4e05f364eb80d0c94afe21a65e49df448d1ed22b8485",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/geography_regression/provenance/recovered-files.json",
+      "bytes": 4707,
+      "sha256": "42a4b822b1eea8376e2e6570ca13e79a30b9e924b95a3447c4438d9f409959b3",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/geography_regression/scripts/ground_coordinates.gd",
+      "bytes": 2432,
+      "sha256": "b61afd67aa89f65c7bde5548c31516ac61ed6cc4e0c5e8b55280a055075ccd71",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/ground_coordinates.gd"
+    },
+    {
+      "path": "history/geography_regression/scripts/near_surface_view.gd",
+      "bytes": 4933,
+      "sha256": "5dc6b8f8d342b0d243767c6f5987da48906ce5829ef92e4a96b992ef6356716b",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/near_surface_view.gd"
+    },
+    {
+      "path": "history/geography_regression/scripts/segment_box.gd",
+      "bytes": 1084,
+      "sha256": "c859146608a6e8208620078a12742c07e1fdafa04761ec5abcffa2cfd0501fad",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/segment_box.gd"
+    },
+    {
+      "path": "history/geography_regression/scripts/segment_triangle.gd",
+      "bytes": 8104,
+      "sha256": "c1f000e1481ba9654ab9cf27db7b30e6eaeef46a35d533a01dffb2d86bece346",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/segment_triangle.gd"
+    },
+    {
+      "path": "history/geography_regression/scripts/spherical_terrain.gd",
+      "bytes": 4522,
+      "sha256": "ac7e11881b649129f09d916cbf48c5b025119aef7735f92f6473f19709c10975",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/spherical_terrain.gd"
+    },
+    {
+      "path": "history/geography_regression/scripts/surface_orbit_link.gd",
+      "bytes": 4483,
+      "sha256": "6a358b2030a0480035caa7a5263d0db96385394740672b18b18a306c30bec12c",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_orbit_link.gd"
+    },
+    {
+      "path": "history/geography_regression/tests/test_ground_coordinates.gd",
+      "bytes": 16329,
+      "sha256": "d2416edcc1058600c4771111d9d91e73ab19e548a4b87aba4ee18f0c2c8d3640",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_ground_coordinates.gd"
+    },
+    {
+      "path": "history/geography_regression/tests/test_segment_triangle.gd",
+      "bytes": 9681,
+      "sha256": "ef35496233fb895ce0e46bcb0446d4e051100b12346df64e9530a13074b978c6",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_segment_triangle.gd"
+    },
+    {
+      "path": "history/geography_regression/tools/build_android.sh",
+      "bytes": 1320,
+      "sha256": "ca004d5164c7f313a9483a282b3e781fdf1ff087deecccb882283c8641706ac8",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_android.sh"
+    },
+    {
+      "path": "history/geography_regression/tools/build_legacy_geography_fixture.gd",
+      "bytes": 5065,
+      "sha256": "75ba9b1eb37454d9c8e32faf498b80a6c23344551cbe7de7b289450dc6b109f4",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_legacy_geography_fixture.gd"
+    },
+    {
+      "path": "history/geography_regression/tools/check.sh",
+      "bytes": 3243,
+      "sha256": "26bf8b31f5cd6ea437bbdb574bb4fb52832c32f3fc44c0abb32196ee4906f3a2",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/check.sh"
+    },
+    {
+      "path": "history/geography_regression/tools/release_candidate.py",
+      "bytes": 13728,
+      "sha256": "055a4797fd1f81c3668de4a771a603c11ce1fdfd745948b89ba45dfc19e08228",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/release_candidate.py"
+    },
+    {
+      "path": "history/geography_regression/tools/verify_android.py",
+      "bytes": 4579,
+      "sha256": "f2014e2d41e5f4601eb9af3db2647589b656f14a8ff2975749955ee5d4c330ea",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/verify_android.py"
+    },
+    {
+      "path": "history/ground_harness/PROVENANCE.md",
+      "bytes": 7902,
+      "sha256": "134310fc49103679780d52edaa08ae695d99c7d6ffd1e24a24bac4e4a507f735",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/ground_harness/SHA256SUMS",
+      "bytes": 2738,
+      "sha256": "dbefc61c687a9c269910ecb3fe9fd8b59096799d7408f27595f02553e8c51452",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/ground_harness/docs/ORIGINAL_CITY_PLACEMENT_RU.md",
+      "bytes": 10297,
+      "sha256": "49315a2e9425bb289c0b1b6afd1ce4553f20f77612fc322b85fef5576efb6dbe",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/ORIGINAL_CITY_PLACEMENT_RU.md"
+    },
+    {
+      "path": "history/ground_harness/scripts/ground_coordinates.gd",
+      "bytes": 2432,
+      "sha256": "b61afd67aa89f65c7bde5548c31516ac61ed6cc4e0c5e8b55280a055075ccd71",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/ground_coordinates.gd"
+    },
+    {
+      "path": "history/ground_harness/scripts/source_city_anchor.gd",
+      "bytes": 5544,
+      "sha256": "acf475a6a22e27be592aa1f4b3ca45775cefbd60d9f2faaefed7e249eb8f334e",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_city_anchor.gd"
+    },
+    {
+      "path": "history/ground_harness/scripts/source_ground_pads.gd",
+      "bytes": 3793,
+      "sha256": "5bbb93864a95d2865da12e2315e9aa9b57d8d27bc50ea1e7536e489357f1299c",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_ground_pads.gd"
+    },
+    {
+      "path": "history/ground_harness/scripts/source_model_vm.gd",
+      "bytes": 5191,
+      "sha256": "c676724f91eae910bf0c318c04ee7426905e7e372fdcd4a68c547f81043f0f2e",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_model_vm.gd"
+    },
+    {
+      "path": "history/ground_harness/scripts/terrain_surface_point.gd",
+      "bytes": 6727,
+      "sha256": "48bbfd3f3789cd0d5d4865c22977fef20cfa721ba440a7a7bf14431ce6cdfe57",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/terrain_surface_point.gd"
+    },
+    {
+      "path": "history/ground_harness/source_evidence/ORIGINAL_DISTANCE_UNITS_RECOVERY_NOTES.md",
+      "bytes": 2910,
+      "sha256": "f1dac636204292e1a4671d39d0d7f3484387f2e464e41a7323c286efd35dc5ba",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/ground_harness/source_evidence/build_terrain_provider_reference.uid_representatives.txt",
+      "bytes": 1960,
+      "sha256": "057cbcc8a00a773424dd4c94f52caa822c5403ecc92e2ccf689eb1142361e678",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/ground_harness/tests/test_city_placement.py",
+      "bytes": 5988,
+      "sha256": "fc2b7c366764e5df7385d9f98ed76e24e295ba3ee8084c6acfca0bee6a2db6e7",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_city_placement.py"
+    },
+    {
+      "path": "history/ground_harness/tests/test_source_city_anchor.gd",
+      "bytes": 3354,
+      "sha256": "2d91f396f3341f74fde774f196b1fbe75cfde8bbdefa20751e98757d017488f2",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_source_city_anchor.gd"
+    },
+    {
+      "path": "history/ground_harness/tests/test_source_ground_pads.gd",
+      "bytes": 3763,
+      "sha256": "fce15e08f304f86478bb0f4ddfcef7e8343d8f2c2088f83e17807bfec2857842",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_source_ground_pads.gd"
+    },
+    {
+      "path": "history/ground_harness/tests/test_source_model_aux_rotation.gd",
+      "bytes": 2181,
+      "sha256": "b99c0f817ba5cd2d81e12e69dcd1350638bfcae988f1ac3caf8262ecdc524ee7",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_source_model_aux_rotation.gd"
+    },
+    {
+      "path": "history/ground_harness/tests/test_source_model_child_frame.gd",
+      "bytes": 4136,
+      "sha256": "762cd6026b929aade38668b9561099d4f3b0161a11cb102a2af5ecf1dbca88c3",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_source_model_child_frame.gd"
+    },
+    {
+      "path": "history/ground_harness/tests/test_source_model_vm.gd",
+      "bytes": 3180,
+      "sha256": "1658e7ff5150bf2fd26f238e7747aa15430874037a179a6d15a8ffe2db0a1a33",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_source_model_vm.gd"
+    },
+    {
+      "path": "history/ground_harness/tests/test_terrain_game_query.py",
+      "bytes": 3404,
+      "sha256": "6497eb632fc29a9a5d354dcfd0edb390af512b8886a9ccc166b240f70c4dbcf2",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_terrain_game_query.py"
+    },
+    {
+      "path": "history/ground_harness/tests/test_terrain_provider.py",
+      "bytes": 5777,
+      "sha256": "22e0ae87a44f0e26a4618e32f54fb58257e6f1ceb495cbdf21e819ca93d6e772",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_terrain_provider.py"
+    },
+    {
+      "path": "history/ground_harness/tests/test_terrain_surface_point.gd",
+      "bytes": 3193,
+      "sha256": "0775c80f35d6786cc2bc778065b99354cd9269f94bace1fd4887619108b50345",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_terrain_surface_point.gd"
+    },
+    {
+      "path": "history/ground_harness/tools/build_city_placement_reference.py",
+      "bytes": 25091,
+      "sha256": "bb10984407625dbac42cbae8af47c3aec9ec93045a5d16ee3391c06effe4dfb7",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_city_placement_reference.py"
+    },
+    {
+      "path": "history/ground_harness/tools/build_ground_pads_reference.py",
+      "bytes": 20616,
+      "sha256": "890762910d6aa72d13afa6dbd7950d7a7aea6bc42dea8083062b0f97bd52a11b",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_ground_pads_reference.py"
+    },
+    {
+      "path": "history/ground_harness/tools/build_ground_reference.py",
+      "bytes": 9728,
+      "sha256": "56c47c6e173fcd709de6fdfdc3ecbeaa7a4abad86e123f400b68cbe54365d9e3",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_ground_reference.py"
+    },
+    {
+      "path": "history/ground_harness/tools/build_model_child_frame_reference.py",
+      "bytes": 20495,
+      "sha256": "59abd11124ae37b73d99fb94267529f7ddf9d6a393403131646e67b6f29dbbc1",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_model_child_frame_reference.py"
+    },
+    {
+      "path": "history/ground_harness/tools/build_terrain_game_query_reference.py",
+      "bytes": 11017,
+      "sha256": "299e1ff0b93579375607979f29a7cd30bbb2869e1300b20b4bd85f18110f434c",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_terrain_game_query_reference.py"
+    },
+    {
+      "path": "history/ground_harness/tools/build_terrain_query_reference.py",
+      "bytes": 16135,
+      "sha256": "46bbaf8fb4d80bea2c73cac728bb7385e2b46618dd908e111c632cdafda0c2cc",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_terrain_query_reference.py"
+    },
+    {
+      "path": "history/ground_harness/tools/extract_ship_registry.py",
+      "bytes": 6442,
+      "sha256": "11c717720ba0f0e0fe3bd4cc17e825d57f2e620e9e6c155870d65896a1dd5712",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/extract_ship_registry.py"
+    },
+    {
+      "path": "history/ground_harness/tools/extract_world_models.py",
+      "bytes": 5646,
+      "sha256": "1f153b367dd3da819864e8cca66ba32cd7abb60edef0cfdf428084afa1ae67ac",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/extract_world_models.py"
+    },
+    {
+      "path": "history/ground_harness/tools/native_reference.py",
+      "bytes": 1678,
+      "sha256": "50a1757168b4b886b1b48db6798d60feb4b73f6fb04176a0840a941ebdf6a1eb",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/native_reference.py"
+    },
+    {
+      "path": "history/ground_vector_source/PROVENANCE.md",
+      "bytes": 5506,
+      "sha256": "b9abad7b923f8b27b30c2f6a4d24abab198bd1f0320100a3d91365185a77f145",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/ground_vector_source/RECOVERY_SHA256SUMS.txt",
+      "bytes": 1873,
+      "sha256": "8ff401eb4697a8387c40167163eb897fbcb624bde16296c5267150241e0b764a",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/ground_vector_source/docs/ORIGINAL_WORLD_MODELS_RU.md",
+      "bytes": 25254,
+      "sha256": "ca9da27347ceccf068c71976ea6fbb0de0539f3cdf93f04fb264f1dfe7945517",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/ORIGINAL_WORLD_MODELS_RU.md"
+    },
+    {
+      "path": "history/ground_vector_source/historical_snapshots/scripts/ground_coordinates.gd",
+      "bytes": 2432,
+      "sha256": "b61afd67aa89f65c7bde5548c31516ac61ed6cc4e0c5e8b55280a055075ccd71",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/ground_coordinates.gd"
+    },
+    {
+      "path": "history/ground_vector_source/historical_snapshots/scripts/segment_triangle.gd",
+      "bytes": 8104,
+      "sha256": "c1f000e1481ba9654ab9cf27db7b30e6eaeef46a35d533a01dffb2d86bece346",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/segment_triangle.gd"
+    },
+    {
+      "path": "history/ground_vector_source/historical_snapshots/scripts/source_city_profile.gd",
+      "bytes": 2899,
+      "sha256": "3a53275a5663de4206bf77c2adf816f308386dc469f942173be3e94912939416",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_city_profile.gd"
+    },
+    {
+      "path": "history/ground_vector_source/historical_snapshots/scripts/source_ground_pads.gd",
+      "bytes": 3793,
+      "sha256": "5bbb93864a95d2865da12e2315e9aa9b57d8d27bc50ea1e7536e489357f1299c",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_ground_pads.gd"
+    },
+    {
+      "path": "history/ground_vector_source/historical_snapshots/scripts/source_model_visual.gd",
+      "bytes": 4137,
+      "sha256": "def2959f58ab3eb3f1980c9e1a6aaa516322016e5211822c6d67c045ab58389f",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_model_visual.gd"
+    },
+    {
+      "path": "history/ground_vector_source/historical_snapshots/scripts/source_units.gd",
+      "bytes": 705,
+      "sha256": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_units.gd"
+    },
+    {
+      "path": "history/ground_vector_source/historical_snapshots/scripts/spherical_terrain.gd",
+      "bytes": 4522,
+      "sha256": "ac7e11881b649129f09d916cbf48c5b025119aef7735f92f6473f19709c10975",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/spherical_terrain.gd"
+    },
+    {
+      "path": "history/ground_vector_source/scripts/source_city_runtime.gd",
+      "bytes": 9156,
+      "sha256": "69060a73c0c68f1038808ce369574dc0c20dbec8e0b9ce5c0b76d9a7d26c805b",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_city_runtime.gd"
+    },
+    {
+      "path": "history/ground_vector_source/scripts/source_model_mesh.gd",
+      "bytes": 29224,
+      "sha256": "6642ce62a1a8046c71a57fb08325304c8d12c3bc61b90921d458ef84ad21472e",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_model_mesh.gd"
+    },
+    {
+      "path": "history/ground_vector_source/scripts/source_model_vertices.gd",
+      "bytes": 5207,
+      "sha256": "bfd236cbee940167f882a85a461911aad672fd7c292b6f58619e87cf6ecc7e33",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_model_vertices.gd"
+    },
+    {
+      "path": "history/ground_vector_source/scripts/source_model_vm.gd",
+      "bytes": 5191,
+      "sha256": "c676724f91eae910bf0c318c04ee7426905e7e372fdcd4a68c547f81043f0f2e",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_model_vm.gd"
+    },
+    {
+      "path": "history/ground_vector_source/tests/test_source_city_runtime.gd",
+      "bytes": 10432,
+      "sha256": "29927274559d761dada752d1af5d4425b30ca7247a2d819bc7d6a9f4e906cc31",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_source_city_runtime.gd"
+    },
+    {
+      "path": "history/ground_vector_source/tests/test_source_model_child_frame.gd",
+      "bytes": 4136,
+      "sha256": "762cd6026b929aade38668b9561099d4f3b0161a11cb102a2af5ecf1dbca88c3",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_source_model_child_frame.gd"
+    },
+    {
+      "path": "history/ground_vector_source/tests/test_source_model_mesh.gd",
+      "bytes": 6410,
+      "sha256": "f86251c42419ad074c937fc1a5212550cec1f8d6d5930e33e7f9380ccf24d113",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_source_model_mesh.gd"
+    },
+    {
+      "path": "history/ground_vector_source/tests/test_world_model_assets.py",
+      "bytes": 2875,
+      "sha256": "ade81f582661eb434d472cf6c588dc99284bfe40e397c30940a35259f8a99c93",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_world_model_assets.py"
+    },
+    {
+      "path": "history/ground_vector_source/tools/extract_world_models.py",
+      "bytes": 5646,
+      "sha256": "1f153b367dd3da819864e8cca66ba32cd7abb60edef0cfdf428084afa1ae67ac",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/extract_world_models.py"
+    },
+    {
+      "path": "history/multiplicity_reference/PROVENANCE.md",
+      "bytes": 10597,
+      "sha256": "c450a965178a7411a026c7eaa048dc653256c2a003f7eb4a0675a359b809d415",
+      "agent": "multiplicity_reference",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/multiplicity_reference/RECOVERED_SHA256SUMS",
+      "bytes": 636,
+      "sha256": "624431cc82698c5b613d8e6dc21d92fbc86fc3d4aca5d585e1731c0a2194ba1a",
+      "agent": "multiplicity_reference",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/multiplicity_reference/partial/scripts/main.gd.lines2582-2632.txt",
+      "bytes": 3566,
+      "sha256": "2d8087271a7e03e3d4d04bb537005a32d06c7c5aa8028f85ff0427e3b1bf88a7",
+      "agent": "multiplicity_reference",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/multiplicity_reference/partial/scripts/near_surface_view.gd.lines24-69.txt",
+      "bytes": 3276,
+      "sha256": "7726fac59b34ba20adfedb270dca3d2ac3a941e58c8b70547af60b0f55e25c83",
+      "agent": "multiplicity_reference",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/multiplicity_reference/partial/scripts/surface_visual.gd.lines77-93.txt",
+      "bytes": 1055,
+      "sha256": "bd8672a7d28da99498e89a83549622afe4d0178c3a40a92193a7aae9186aac48",
+      "agent": "multiplicity_reference",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/multiplicity_reference/partial/tests/test_source_city_view.gd.lines31-92.txt",
+      "bytes": 5664,
+      "sha256": "955a9d7caf7892f2b3fd75e9626aeb74ca1b7034e6dadd66c311045f27805050",
+      "agent": "multiplicity_reference",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/multiplicity_reference/scripts/source_city_view.gd",
+      "bytes": 3497,
+      "sha256": "c381e770fa25b3dad3606ab799dc15e12a2bf52d8d54e7edf727b532a023796d",
+      "agent": "multiplicity_reference",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_city_view.gd"
+    },
+    {
+      "path": "history/preview_review/PROVENANCE.md",
+      "bytes": 5448,
+      "sha256": "db2e47d4d074ce733bdf9011b3771f19af384b356380208cb045985404081c14",
+      "agent": "preview_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/preview_review/SHA256SUMS",
+      "bytes": 1140,
+      "sha256": "afe7da919aaa5263f4bcdd46046142033c2c0cbef482c4ab0ab0f9a030c4cb03",
+      "agent": "preview_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/preview_review/partial/scripts/main.v0101.map_help_functions.gd",
+      "bytes": 4854,
+      "sha256": "474fef4bef75ba698df5f235d5bd9ddd2c76f2f9c62c627a048fa3453fee5a0a",
+      "agent": "preview_review",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/preview_review/partial/scripts/main.v0104._apply_system.gd",
+      "bytes": 1288,
+      "sha256": "a2504011283314f3d798606c368fd1a8b47d23861e7c53fd5bcb2589207a0a98",
+      "agent": "preview_review",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/preview_review/partial/scripts/main.v0104._jump_action.gd",
+      "bytes": 541,
+      "sha256": "3aee80d0f0269502599a80396eed02ba592062bd933e929c1bcbd2a5c293de18",
+      "agent": "preview_review",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/preview_review/partial/scripts/main.v0104._physics_process.gd",
+      "bytes": 3626,
+      "sha256": "88660b89a7cd9c65af5621d95bd0783e76a77b0749dec108dcc913836031c453",
+      "agent": "preview_review",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/preview_review/partial/scripts/main.v0104._process.gd",
+      "bytes": 4659,
+      "sha256": "6dfacf6898460bd65ea8b8696f60b08ee000c09fa909ba074d27487b86b84c7a",
+      "agent": "preview_review",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/preview_review/recovered-files.json",
+      "bytes": 1782,
+      "sha256": "1b04188ad9ba5593ca669d06a3ba3f1e637f96dc0b2f6122913a656684bf730e",
+      "agent": "preview_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/preview_review/scripts/celestial_renderer.gd",
+      "bytes": 3396,
+      "sha256": "bb2178f8e400b8d5daff89b21d5d4cc2a2474b11bbcf2ce9cec0d49cdda2b249",
+      "agent": "preview_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/celestial_renderer.gd"
+    },
+    {
+      "path": "history/preview_review/scripts/surface_model.gd",
+      "bytes": 24564,
+      "sha256": "0fac545ee59da0b67b88ea85a1a848471d1d739c6916b4d5ad2f4f9c7764e472",
+      "agent": "preview_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_model.gd"
+    },
+    {
+      "path": "history/preview_review/tests/test_near_surface_view.gd",
+      "bytes": 12313,
+      "sha256": "31d05a17798605bec3e6c7ebd4de076fdb11c77024f2db68bc964050a3e86d0c",
+      "agent": "preview_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_near_surface_view.gd"
+    },
+    {
+      "path": "history/preview_review/versions/pre-v2/scripts/near_surface_view.gd",
+      "bytes": 3349,
+      "sha256": "5e7fd1f56368e4751150f1af0d5c7f34ad8069ac4c78a29d7ac10cd1e31ed1ed",
+      "agent": "preview_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/near_surface_view.gd"
+    },
+    {
+      "path": "history/preview_review/versions/pre-v2/scripts/surface_orbit_link.gd",
+      "bytes": 3404,
+      "sha256": "762f656ae766df4ca449ab961788c91935b4b893940e6a78fafd8883b3c4cde8",
+      "agent": "preview_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_orbit_link.gd"
+    },
+    {
+      "path": "history/release_audit/PROVENANCE.md",
+      "bytes": 8466,
+      "sha256": "0fcb2f25e3a012cb2b4c58a8a33e908302ddb229b23e55bce7917d0e6030ea7f",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/release_audit/RECOVERED_FILES.json",
+      "bytes": 7558,
+      "sha256": "7169fb2d6b6cd33008f239f9b8f217717fa818a91ecd03d427d169c5676957dd",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/release_audit/docs/RELEASE_ROADMAP_RU.md",
+      "bytes": 5164,
+      "sha256": "88ab8acf0ee9629d001c3acc0cae1648f6670baca52ec5c5a2dda2f2191089d6",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/RELEASE_ROADMAP_RU.md"
+    },
+    {
+      "path": "history/release_audit/history_patches/surface_model_v0101_to_v0102.py",
+      "bytes": 8910,
+      "sha256": "16d1eed2c0caa8143d883760e8afedacccf0d084977c8c432de17c657f9a1b81",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/release_audit/history_patches/surface_model_v0102_to_v0103.py",
+      "bytes": 3817,
+      "sha256": "1f1d5ea21a297f03c5f005b583f5f3674f3a28d57620a7562afb049399dd2721",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/release_audit/history_patches/surface_model_v0103_to_v0104.py",
+      "bytes": 6473,
+      "sha256": "9da21ff70b43a7b16703c298d924ea832f0604f2c760a3cff67462d134e8c66a",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/release_audit/history_patches/visuals_v0100_to_v0104.py",
+      "bytes": 5005,
+      "sha256": "3a5562919c67a8416b8e6bd0a4c6d9674a991ee904008ba20721508fe4a8074d",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/release_audit/partial/scripts/flight_model.gd.observed-functions.txt",
+      "bytes": 1033,
+      "sha256": "8e9655270b42d4a1ae4a4d9606100de43f4de6b88726d133b4d077a004b13610",
+      "agent": "release_audit",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/release_audit/partial/scripts/flight_model.gd.step-prefix.txt",
+      "bytes": 2155,
+      "sha256": "d098552016a732b4cf21299987318ecd7fc11d9c90b229c42523b3da1c0a08c4",
+      "agent": "release_audit",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/release_audit/partial/scripts/main.gd.vertical-functions-v0104.txt",
+      "bytes": 1893,
+      "sha256": "10c81e477daba77feb4af5a048a64c58be134ade8d3f791c1793f8154e8e2e6c",
+      "agent": "release_audit",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/release_audit/partial/scripts/planetary_system.gd.transfer-functions-v0103.txt",
+      "bytes": 4615,
+      "sha256": "875efde47f6e040ba06a0f0f4f8a3ee45ae7a3bd12a1cc1d7fa9fd81db9c2df0",
+      "agent": "release_audit",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/release_audit/project.godot",
+      "bytes": 866,
+      "sha256": "0e19be398c18cf04fd392ed4f03245a79ff403e0cdd27bdd91f47ef99fb45c9c",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "project.godot"
+    },
+    {
+      "path": "history/release_audit/scripts/atmosphere.gdshader",
+      "bytes": 579,
+      "sha256": "d49b841c874838331bdf8b40e4171a27ae8ea3ac3bf2e620e3e7b2c9fa6532e4",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/atmosphere.gdshader"
+    },
+    {
+      "path": "history/release_audit/scripts/building.gdshader",
+      "bytes": 1134,
+      "sha256": "f6a91617ad438f3a119ebca321023d04d1c22550111b22764cb5d899d3f08e28",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/building.gdshader"
+    },
+    {
+      "path": "history/release_audit/scripts/celestial_renderer.gd",
+      "bytes": 3396,
+      "sha256": "bb2178f8e400b8d5daff89b21d5d4cc2a2474b11bbcf2ce9cec0d49cdda2b249",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/celestial_renderer.gd"
+    },
+    {
+      "path": "history/release_audit/scripts/device_settings.gd",
+      "bytes": 2104,
+      "sha256": "890be6e61f0bb5d3cdc1fbceed75ba546485d85b46daf1dbde02da4897559c42",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/device_settings.gd"
+    },
+    {
+      "path": "history/release_audit/scripts/landing_pad.gdshader",
+      "bytes": 935,
+      "sha256": "e10339c7125a1d07981144a1c4836db86721f3b899fa361f0acc4df337d81905",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/landing_pad.gdshader"
+    },
+    {
+      "path": "history/release_audit/scripts/planet.gdshader",
+      "bytes": 2110,
+      "sha256": "b02f98200c8e1a99646e5f8d356a16bd57d299ce2531287656b6c5976af0fa0b",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/planet.gdshader"
+    },
+    {
+      "path": "history/release_audit/scripts/settings_panel.gd",
+      "bytes": 4752,
+      "sha256": "408e3470e3aab2b84c40a0556fe92fa139b7bf5dc253441876cf1155faf2b05d",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/settings_panel.gd"
+    },
+    {
+      "path": "history/release_audit/scripts/spherical_terrain.gd",
+      "bytes": 3722,
+      "sha256": "8de7b4e649cf7f8c2fc9418965d7472dd1311037bb41336ac95234ddfe68dc11",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/spherical_terrain.gd"
+    },
+    {
+      "path": "history/release_audit/scripts/surface_model.gd",
+      "bytes": 24564,
+      "sha256": "0fac545ee59da0b67b88ea85a1a848471d1d739c6916b4d5ad2f4f9c7764e472",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_model.gd"
+    },
+    {
+      "path": "history/release_audit/scripts/surface_orbit_link.gd",
+      "bytes": 3404,
+      "sha256": "762f656ae766df4ca449ab961788c91935b4b893940e6a78fafd8883b3c4cde8",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_orbit_link.gd"
+    },
+    {
+      "path": "history/release_audit/scripts/surface_visual.gd",
+      "bytes": 7697,
+      "sha256": "0a42336b1adc6537bc6f5e57095b7b85fa1af2522a906e925c60e650436ca8f3",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_visual.gd"
+    },
+    {
+      "path": "history/release_audit/scripts/terrain.gdshader",
+      "bytes": 2283,
+      "sha256": "2a2092614220dbb81b928a3f35485dc6574874cbb18c7e00a2280cd4babb41bc",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/terrain.gdshader"
+    },
+    {
+      "path": "history/release_audit/scripts/world_presentation.gd",
+      "bytes": 2256,
+      "sha256": "5af4d7ccd8e5591d1d67dd4243eb8404dea36f4d76e3145b3b341b900f315b06",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/world_presentation.gd"
+    },
+    {
+      "path": "history/release_audit/tests/surface_visual_reference_v0102.gd",
+      "bytes": 7441,
+      "sha256": "b2ebdbd0bf6e54fe491bee91ba4a292d381ee2975c547766ad10142705daa583",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/surface_visual_reference_v0102.gd"
+    },
+    {
+      "path": "history/release_audit/tests/test_surface_orbit_link.gd",
+      "bytes": 6423,
+      "sha256": "0ea0b102a4846b618dc8cb0e50f884c8d2c70d84125c8f16ff9da8dc5808e154",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_surface_orbit_link.gd"
+    },
+    {
+      "path": "history/release_audit/tests/test_vertical_flight.gd",
+      "bytes": 6555,
+      "sha256": "5a9e61348905c948de21463dfba2bf3926c05b3392c9d5482d5fbbfdaeaf04ce",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_vertical_flight.gd"
+    },
+    {
+      "path": "history/release_audit/tests/test_world_presentation.gd",
+      "bytes": 3346,
+      "sha256": "93db531c8d1e77a9c8c6cacc423495aa46e294779dfd0a64fbd0ed4c54b28250",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_world_presentation.gd"
+    },
+    {
+      "path": "history/release_audit/tools/build_android.sh",
+      "bytes": 1320,
+      "sha256": "ca004d5164c7f313a9483a282b3e781fdf1ff087deecccb882283c8641706ac8",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_android.sh"
+    },
+    {
+      "path": "history/release_audit/tools/check.sh",
+      "bytes": 2776,
+      "sha256": "32f49fcb4925126e2c6412ac3d29f19d8e534ba6505e640dcdb62858a9132ff8",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/check.sh"
+    },
+    {
+      "path": "history/release_audit/versions/v0.10.0-read/scripts/celestial_renderer.gd",
+      "bytes": 2839,
+      "sha256": "c45450645c00b2fa0c18b54944a49857c5bd3d3b420136bc2f52b45b61f90522",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/celestial_renderer.gd"
+    },
+    {
+      "path": "history/release_audit/versions/v0.10.0-read/scripts/planet.gdshader",
+      "bytes": 1743,
+      "sha256": "f9d3e10df8b6d008a664464c61421553face6eedddf43122293874e2f6bdf5a3",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/planet.gdshader"
+    },
+    {
+      "path": "history/release_audit/versions/v0.10.0-read/scripts/settings_panel.gd",
+      "bytes": 4702,
+      "sha256": "60fde51235167d93fb254180fd7034e4ecf7b3cb2f75c95b5a567493441104dc",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/settings_panel.gd"
+    },
+    {
+      "path": "history/release_audit/versions/v0.10.1-read/scripts/surface_model.gd",
+      "bytes": 12617,
+      "sha256": "d67ac076565b8994c60d6d222476d94a7339d8734c6220e90a1a218bd6a2c59a",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_model.gd"
+    },
+    {
+      "path": "history/release_audit/versions/v0.10.1-written/scripts/world_presentation.gd",
+      "bytes": 1117,
+      "sha256": "30a2f1556859d98399c27cf15d55bc8f407cb6714d5ce3755fc1f13a25018ede",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/world_presentation.gd"
+    },
+    {
+      "path": "history/release_audit/versions/v0.10.2-history-patches/scripts/surface_model.gd",
+      "bytes": 18229,
+      "sha256": "e6498e21c0109842edfcda460da3c3505dade775d410baf913ca04d5f5785290",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_model.gd"
+    },
+    {
+      "path": "history/release_audit/versions/v0.10.2-read/scripts/spherical_terrain.gd",
+      "bytes": 3294,
+      "sha256": "4a4f2838d01b4dd56fb59ad23fb045b40acab474e88ae757271c4bd772273d95",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/spherical_terrain.gd"
+    },
+    {
+      "path": "history/release_audit/versions/v0.10.2-read/scripts/surface_visual.gd",
+      "bytes": 7441,
+      "sha256": "b2ebdbd0bf6e54fe491bee91ba4a292d381ee2975c547766ad10142705daa583",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_visual.gd"
+    },
+    {
+      "path": "history/release_audit/versions/v0.10.3-history-patches/scripts/surface_model.gd",
+      "bytes": 20408,
+      "sha256": "4d76f417755486df37cc418ee7a1373ca8023e9ecbee78c4decea7df98968e21",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_model.gd"
+    },
+    {
+      "path": "history/release_audit/versions/v0.10.3-history-patches/scripts/surface_visual.gd",
+      "bytes": 7400,
+      "sha256": "028c2df8bc8371be3ed6aca6c00aeac7fd08df14c56d1ca33ad36583add43978",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_visual.gd"
+    },
+    {
+      "path": "history/release_audit/versions/v0.10.4-history-patches/scripts/surface_model.gd",
+      "bytes": 24564,
+      "sha256": "0fac545ee59da0b67b88ea85a1a848471d1d739c6916b4d5ad2f4f9c7764e472",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_model.gd"
+    },
+    {
+      "path": "history/root/PROVENANCE.md",
+      "bytes": 1926,
+      "sha256": "1100c830bfa8df59a67f7e2a84332f382a63a498dab236940440ed5a0e0a9f1f",
+      "agent": "root",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/root/partial/surface_model.city_collision_block.PROVENANCE.md",
+      "bytes": 718,
+      "sha256": "34ec850fde5248ba0bf69710849a6df17ccc8a55c5ddf543c6ef02c2f5cd6fac",
+      "agent": "root",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/root/partial/surface_model.city_collision_block.gd.txt",
+      "bytes": 1883,
+      "sha256": "3ca31858a2c0e69098abac43aae6f40770c701aa4737e096e0ef2cf996bf3a92",
+      "agent": "root",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/root/scripts/source_city_profile.gd",
+      "bytes": 4162,
+      "sha256": "b10585673d6f2d59ce45c1ee178220b2260cb1067c97ac5425723e7e3fa32446",
+      "agent": "root",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_city_profile.gd"
+    },
+    {
+      "path": "history/root/scripts/source_model.gdshader",
+      "bytes": 789,
+      "sha256": "266c1bae942a10b715eddb6668c117a85b31b689f150954945e6622d809804cc",
+      "agent": "root",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_model.gdshader"
+    },
+    {
+      "path": "history/root/scripts/source_model_visual.gd",
+      "bytes": 6940,
+      "sha256": "fdba99f3b37a6f253236b5ffd606e9108a372d8e4a5d6c83b8bced61f23a9d0d",
+      "agent": "root",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_model_visual.gd"
+    },
+    {
+      "path": "history/root/scripts/source_units.gd",
+      "bytes": 705,
+      "sha256": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24",
+      "agent": "root",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_units.gd"
+    },
+    {
+      "path": "history/root/tools/preview_world_model.gd",
+      "bytes": 2111,
+      "sha256": "a764b2e6816dd7e40100af0c1d2468733341c811478321c57885dced81be82c9",
+      "agent": "root",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/preview_world_model.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/PROVENANCE.md",
+      "bytes": 5716,
+      "sha256": "cbd07549bcaefac64c338e2304dacd445c2eddf4aee4938b9e5d1bbbb3eb4af4",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/source_terrain_revision/SHA256SUMS",
+      "bytes": 1614,
+      "sha256": "38e69b917d757fc64aceee82d850091a180d975a78f00d8c06d0e248e6390a68",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/source_terrain_revision/partial/SURFACE_MODEL_RECOVERY_NOTES.md",
+      "bytes": 4014,
+      "sha256": "52d615512b2aa6c1726a0ce0a66585c9c33fbd62869f4b2f6d6ae9b9ed365971",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/source_terrain_revision/partial/worker_functions.gd.txt",
+      "bytes": 5126,
+      "sha256": "44738694045a3b28973c57adea33da3247ca49e5dd5949fafeb38952a65f0c34",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/source_terrain_revision/partial/worker_functions.provenance.md",
+      "bytes": 662,
+      "sha256": "90fc8c6aa9d8b1d337c3829458cdd6d99f0a3c8dc0f9e91f107cfe796079c3cd",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/source_terrain_revision/scripts/body_rotation.gd",
+      "bytes": 2917,
+      "sha256": "b5d4e63331728681d1f34c73fe83cdd57120e29b352e09090da4ff147b22ed34",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/body_rotation.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/scripts/ground_coordinates.gd",
+      "bytes": 2432,
+      "sha256": "b61afd67aa89f65c7bde5548c31516ac61ed6cc4e0c5e8b55280a055075ccd71",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/ground_coordinates.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/scripts/near_surface_view.gd",
+      "bytes": 5006,
+      "sha256": "d1ef30cb8cc865555f946623ae17d680598c605483ec6547273910ecd3d1f6df",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/near_surface_view.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/scripts/source_polygon.gd",
+      "bytes": 5197,
+      "sha256": "9e83a719b5a13a22fcba53417cb3c4006d310804eda3e69aba543a9551c07a43",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_polygon.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/scripts/source_units.gd",
+      "bytes": 705,
+      "sha256": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_units.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/scripts/spherical_terrain.gd",
+      "bytes": 5775,
+      "sha256": "6da1c61aac47df2f8921ab459a962c9853bd5d327c86264d7fc28c46b8d7986e",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/spherical_terrain.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/scripts/surface_orbit_link.gd",
+      "bytes": 4483,
+      "sha256": "6a358b2030a0480035caa7a5263d0db96385394740672b18b18a306c30bec12c",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_orbit_link.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/scripts/terrain_math.gd",
+      "bytes": 1267,
+      "sha256": "0e62c6768996164a45752dcc55c6b0c8b49d50940390fd50994094b5fe51f637",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/terrain_math.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/scripts/terrain_query.gd",
+      "bytes": 18648,
+      "sha256": "c270f1b1e31fefc5e9c840aeda836f698049aa72d17d4c66d4379edcde26d006",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/terrain_query.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/scripts/terrain_surface_point.gd",
+      "bytes": 6727,
+      "sha256": "48bbfd3f3789cd0d5d4865c22977fef20cfa721ba440a7a7bf14431ce6cdfe57",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/terrain_surface_point.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/tests/test_body_rotation.gd",
+      "bytes": 3922,
+      "sha256": "4ef52b120bf3dae5e9a4b9c33e98cc2d07f681658d25fda3174ecb60007117cf",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_body_rotation.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/tests/test_terrain_query.gd",
+      "bytes": 4197,
+      "sha256": "5718ec03553a799fdf06f5cdc80ec50354674547dea3c39095cae20e8cb2ea20",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_terrain_query.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/tests/test_terrain_surface_point.gd",
+      "bytes": 3193,
+      "sha256": "0775c80f35d6786cc2bc778065b99354cd9269f94bace1fd4887619108b50345",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_terrain_surface_point.gd"
+    },
+    {
+      "path": "history/transition_review/PROVENANCE.md",
+      "bytes": 3969,
+      "sha256": "47a079d6701ca015ddfd2365bfb93856714f67755dcdd875d5b4a8e4ec534954",
+      "agent": "transition_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/transition_review/RECOVERED_FILES.json",
+      "bytes": 2113,
+      "sha256": "39fbb392e53496f21e63bbf385dfa9330372ebda2be5eb3c4d36e759c5ceb43f",
+      "agent": "transition_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/transition_review/SHA256SUMS",
+      "bytes": 1111,
+      "sha256": "f9c7b9f4f487d8259072d61c30133fd2e9b3ea5fb6f309d0896ca42dd8e8e7e6",
+      "agent": "transition_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/transition_review/partial/scripts/celestial_renderer.transition-functions.intermediate-v0.10.6.gd",
+      "bytes": 2554,
+      "sha256": "725ba8504bc80f95e7537588862548252a16366926d95c67c06559bcdcb02a3a",
+      "agent": "transition_review",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/transition_review/partial/scripts/main._sync_planet_visuals.intermediate-v0.10.6.gd",
+      "bytes": 2766,
+      "sha256": "cd0c5c4b1046debf51bf39a3fb987973c63cf3f6a655f0aaad582250f0c0d590",
+      "agent": "transition_review",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/transition_review/tests/test_far_surface_transition.gd",
+      "bytes": 9649,
+      "sha256": "a04b24f8041e7fa2817dd18081e37295df0e491743e99a0dc6d666c45ee02762",
+      "agent": "transition_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_far_surface_transition.gd"
+    },
+    {
+      "path": "history/transition_review/tests/test_world_presentation.gd",
+      "bytes": 3346,
+      "sha256": "93db531c8d1e77a9c8c6cacc423495aa46e294779dfd0a64fbd0ed4c54b28250",
+      "agent": "transition_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_world_presentation.gd"
+    },
+    {
+      "path": "history/transition_review/versions/v0.10.5/scripts/atmosphere.gdshader",
+      "bytes": 579,
+      "sha256": "d49b841c874838331bdf8b40e4171a27ae8ea3ac3bf2e620e3e7b2c9fa6532e4",
+      "agent": "transition_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/atmosphere.gdshader"
+    },
+    {
+      "path": "history/transition_review/versions/v0.10.5/scripts/near_surface_view.gd",
+      "bytes": 4023,
+      "sha256": "82173ec0594d8de4159c4841c5b2a9b371d666a412c5700a5b95602b601267ab",
+      "agent": "transition_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/near_surface_view.gd"
+    },
+    {
+      "path": "history/transition_review/versions/v0.10.5/scripts/planet.gdshader",
+      "bytes": 2110,
+      "sha256": "b02f98200c8e1a99646e5f8d356a16bd57d299ce2531287656b6c5976af0fa0b",
+      "agent": "transition_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/planet.gdshader"
+    },
+    {
+      "path": "history/transition_review/versions/v0.10.5/scripts/terrain.gdshader",
+      "bytes": 2283,
+      "sha256": "2a2092614220dbb81b928a3f35485dc6574874cbb18c7e00a2280cd4babb41bc",
+      "agent": "transition_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/terrain.gdshader"
+    },
+    {
+      "path": "history/transition_review/versions/v0.10.5/scripts/world_presentation.gd",
+      "bytes": 2256,
+      "sha256": "5af4d7ccd8e5591d1d67dd4243eb8404dea36f4d76e3145b3b341b900f315b06",
+      "agent": "transition_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/world_presentation.gd"
+    },
+    {
+      "path": "history/world_gap_audit/PROVENANCE.md",
+      "bytes": 4298,
+      "sha256": "1f96179561147ebcac17c7825644c77257466ad5a51b2be2f7121f4e5c702bb5",
+      "agent": "world_gap_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/world_gap_audit/SHA256SUMS",
+      "bytes": 1330,
+      "sha256": "a5cb7836bb6a67c71338b8f0373571426b43193c78fdcbddb75347fa345d87b7",
+      "agent": "world_gap_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/world_gap_audit/docs/GROUND_COORDINATES_RESEARCH_RU.md",
+      "bytes": 8058,
+      "sha256": "cedf4d4d8f9111bf916ad797635c7b5fbf2bb174c05bffd408e7d4414a8de122",
+      "agent": "world_gap_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/GROUND_COORDINATES_RESEARCH_RU.md"
+    },
+    {
+      "path": "history/world_gap_audit/partial/data/ffe_settlement_rules.observed.json",
+      "bytes": 2146,
+      "sha256": "4fac5273738151b8ee6948d6962274b2d4209b2bb1e2667a9e2c899b310af3d7",
+      "agent": "world_gap_audit",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/world_gap_audit/partial/scripts/inhabited_world_rules.observed_functions.gd",
+      "bytes": 1432,
+      "sha256": "20de2f1437f636c597056052fb9380c7d0e5538453d2d63161cb43effef618dd",
+      "agent": "world_gap_audit",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/world_gap_audit/partial/scripts/main.surface_action.v0106.gd",
+      "bytes": 1484,
+      "sha256": "ae937700f0c9e1e9e2de0dbfa7c6d87fac42f7180f11eafe3ed63e1f52c91c83",
+      "agent": "world_gap_audit",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/world_gap_audit/partial/scripts/planetary_system.observed_functions.gd",
+      "bytes": 1936,
+      "sha256": "fc099b9f62acf4859e4a74f4b3aa53fade9d9b59620e30373ddc6cfeab9a66df",
+      "agent": "world_gap_audit",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/world_gap_audit/scripts/body_initializer.gd",
+      "bytes": 2530,
+      "sha256": "53e5e825cd48223054beb7a31155a01a897b624861beb2cb81dac028335adb2e",
+      "agent": "world_gap_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/body_initializer.gd"
+    },
+    {
+      "path": "history/world_gap_audit/scripts/original_worlds.gd",
+      "bytes": 5072,
+      "sha256": "1d08427c0e7a277cca8dcf28c088fe35626851689bc5e2cae70f038228e2d585",
+      "agent": "world_gap_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/original_worlds.gd"
+    },
+    {
+      "path": "history/world_gap_audit/scripts/procedural_worlds.gd",
+      "bytes": 4732,
+      "sha256": "2471b2deb80dd4734f948cf11d546d94afd73390d073928c6cec36065f6f532c",
+      "agent": "world_gap_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/procedural_worlds.gd"
+    },
+    {
+      "path": "history/world_gap_audit/tools/extract_settlement_rules.py",
+      "bytes": 3109,
+      "sha256": "5ecf2276451f2498b47a504c618458815999cd7964694c81dc9328a768c06c22",
+      "agent": "world_gap_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/extract_settlement_rules.py"
+    },
+    {
+      "path": "history/world_gap_audit/tools/extract_worlds.py",
+      "bytes": 5171,
+      "sha256": "8977da7b090539b2412d3a04850785a6a3ddda58378b3ed2e0f88f1013eb310a",
+      "agent": "world_gap_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/extract_worlds.py"
+    },
+    {
+      "path": "history/world_gap_audit/tools/native_reference.py",
+      "bytes": 1678,
+      "sha256": "50a1757168b4b886b1b48db6798d60feb4b73f6fb04176a0840a941ebdf6a1eb",
+      "agent": "world_gap_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/native_reference.py"
+    },
+    {
+      "path": "history/worlds_completion_audit/PROVENANCE.md",
+      "bytes": 11212,
+      "sha256": "826dcefd092831ec97588d7bcddddea1076f365ef286734dfbddd8bd25c5be48",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/worlds_completion_audit/docs/ORIGINAL_DISTANCE_UNITS_RU.md",
+      "bytes": 11209,
+      "sha256": "26f7c81bf9e9ba557250e69e6a030d951596a2dc2d66e5cbb84e8106ec659254",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/ORIGINAL_DISTANCE_UNITS_RU.md"
+    },
+    {
+      "path": "history/worlds_completion_audit/docs/ORIGINAL_TERRAIN_RESEARCH_RU.md",
+      "bytes": 20354,
+      "sha256": "607a5ff7d81922f66ddf0fcf45b638b9eafe70e580961b59e81e5f1ba782c22a",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/ORIGINAL_TERRAIN_RESEARCH_RU.md"
+    },
+    {
+      "path": "history/worlds_completion_audit/docs/RELEASE_ROADMAP_RU.md",
+      "bytes": 5868,
+      "sha256": "6925a6daf0e37e29f93f4b740332397bc0f349daa3d97b72da73f93e7dc88276",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/RELEASE_ROADMAP_RU.md"
+    },
+    {
+      "path": "history/worlds_completion_audit/docs/SOURCE_TERRAIN_PROVIDER_POLICY_RU.md",
+      "bytes": 15287,
+      "sha256": "1274b70f5d3af6e9b8e7ec447c997b57e2058c4612c266de8ab1a61b76c0f8fb",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/SOURCE_TERRAIN_PROVIDER_POLICY_RU.md"
+    },
+    {
+      "path": "history/worlds_completion_audit/docs/STAGE10_19_20_RU.md",
+      "bytes": 9572,
+      "sha256": "7b08ad63704e8d89fab098defb373c22a175912145732f18d560a3b1b3594f31",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/STAGE10_19_20_RU.md"
+    },
+    {
+      "path": "history/worlds_completion_audit/docs/STAGE10_21_22_RU.md",
+      "bytes": 15872,
+      "sha256": "c62914aadf97401cbe27dd239e55dd5baa949c0001d7ceac0d65c59e839f5773",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/STAGE10_21_22_RU.md"
+    },
+    {
+      "path": "history/worlds_completion_audit/recovered-files.json",
+      "bytes": 9485,
+      "sha256": "c70bbfdf54adefa55aee7a681799d7fa1f0e1ac890677b108b7f602e97fcc7af",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/device_settings.gd",
+      "bytes": 2104,
+      "sha256": "890be6e61f0bb5d3cdc1fbceed75ba546485d85b46daf1dbde02da4897559c42",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/device_settings.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/near_surface_view.gd",
+      "bytes": 4933,
+      "sha256": "5dc6b8f8d342b0d243767c6f5987da48906ce5829ef92e4a96b992ef6356716b",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/near_surface_view.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/source_city_profile.gd",
+      "bytes": 2899,
+      "sha256": "3a53275a5663de4206bf77c2adf816f308386dc469f942173be3e94912939416",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_city_profile.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/source_city_view.gd",
+      "bytes": 3497,
+      "sha256": "c381e770fa25b3dad3606ab799dc15e12a2bf52d8d54e7edf727b532a023796d",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_city_view.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/source_model.gdshader",
+      "bytes": 789,
+      "sha256": "266c1bae942a10b715eddb6668c117a85b31b689f150954945e6622d809804cc",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_model.gdshader"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/source_model_visual.gd",
+      "bytes": 6092,
+      "sha256": "3e711454a28ff862638ef84e82a2dc41daa8837ef56143623358729ab3bc82a2",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_model_visual.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/source_units.gd",
+      "bytes": 705,
+      "sha256": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_units.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/spherical_terrain.gd",
+      "bytes": 4522,
+      "sha256": "ac7e11881b649129f09d916cbf48c5b025119aef7735f92f6473f19709c10975",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/spherical_terrain.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/surface_orbit_link.gd",
+      "bytes": 4483,
+      "sha256": "6a358b2030a0480035caa7a5263d0db96385394740672b18b18a306c30bec12c",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_orbit_link.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/surface_visual.gd",
+      "bytes": 8893,
+      "sha256": "6a1756daad279e0bfeb7e4e71021a5aa8957bcdcd0395f6c1e87234b6c365e70",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_visual.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/terrain_surface_point.gd",
+      "bytes": 6727,
+      "sha256": "48bbfd3f3789cd0d5d4865c22977fef20cfa721ba440a7a7bf14431ce6cdfe57",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/terrain_surface_point.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/world_presentation.gd",
+      "bytes": 2603,
+      "sha256": "06ca6bdd7d156f7c71e8854ed5363996cfb72468dc6acf2389f02ca1c64aa828",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/world_presentation.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/tests/test_city_collision.gd",
+      "bytes": 4680,
+      "sha256": "ead6da7d44e6bf365468275bec91551d4cefec4ff7d5378451a4d9ebddb463ac",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_city_collision.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/tests/test_global_surface.gd",
+      "bytes": 7919,
+      "sha256": "34fb7a80a2c0da480adee7fabdb4a7097695ff3f5b8764bfd1d1109ec8d81bb8",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_global_surface.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/tests/test_source_city_view.gd",
+      "bytes": 6655,
+      "sha256": "d3ecbbbfeb4ee0e6e650980ca65b716621ea6d82115a3de6c54cd7cf9134ec2f",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_source_city_view.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/tests/test_terrain_additional_query.py",
+      "bytes": 4071,
+      "sha256": "49f432e4007e2365e5abb69c355780d2f9433ec542840324f990234e765aca4a",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_terrain_additional_query.py"
+    },
+    {
+      "path": "history/worlds_completion_audit/tests/test_terrain_game_query.py",
+      "bytes": 3404,
+      "sha256": "6497eb632fc29a9a5d354dcfd0edb390af512b8886a9ccc166b240f70c4dbcf2",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_terrain_game_query.py"
+    },
+    {
+      "path": "history/worlds_completion_audit/tests/test_terrain_provider.py",
+      "bytes": 5777,
+      "sha256": "22e0ae87a44f0e26a4618e32f54fb58257e6f1ceb495cbdf21e819ca93d6e772",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_terrain_provider.py"
+    },
+    {
+      "path": "history/worlds_completion_audit/tests/test_terrain_provider_points.gd",
+      "bytes": 3885,
+      "sha256": "54f410effaf9337be420e17366fa8d6ca8dcb515acacac6d888259b6acda6d42",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_terrain_provider_points.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/tests/test_terrain_surface_point.gd",
+      "bytes": 3193,
+      "sha256": "0775c80f35d6786cc2bc778065b99354cd9269f94bace1fd4887619108b50345",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_terrain_surface_point.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/tools/build_terrain_additional_query_reference.py",
+      "bytes": 3055,
+      "sha256": "31b8d53d22ac032105cb40f7aa52e92d90385eaf049122094c5e458b8dd7da95",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_terrain_additional_query_reference.py"
+    },
+    {
+      "path": "history/worlds_completion_audit/tools/build_terrain_game_query_reference.py",
+      "bytes": 11017,
+      "sha256": "299e1ff0b93579375607979f29a7cd30bbb2869e1300b20b4bd85f18110f434c",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_terrain_game_query_reference.py"
+    },
+    {
+      "path": "history/worlds_completion_audit/tools/build_terrain_provider_reference.py",
+      "bytes": 12668,
+      "sha256": "49d3f90bf738b2c276543a454229b3a8c65d32928175dfe74e856b5ac46e223b",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_terrain_provider_reference.py"
+    },
+    {
+      "path": "history/worlds_completion_audit/tools/check.sh",
+      "bytes": 3305,
+      "sha256": "a4ea3f91a923acaf5f526aa9fb9d381c462bdb13a3ea11f7500753e2f9e00dc9",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/check.sh"
+    }
+  ]
+}

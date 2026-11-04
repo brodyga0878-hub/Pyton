@@ -1,0 +1,87 @@
+[
+  {
+    "path": "PROVENANCE.md",
+    "bytes": 6653,
+    "sha256_recovered_text": "a9c3c896eb4d9f6769f5b6da72da39754e598d3fde673a69c6247247ee2dd1bd"
+  },
+  {
+    "path": "partial/scripts/main.finish_vertical_ascent_before_high_return.gd",
+    "bytes": 790,
+    "sha256_recovered_text": "4d3a2b88d59fb430b23458ddbdd25d2d8bc668c94cfcd94ae7623703db0fb899"
+  },
+  {
+    "path": "partial/scripts/main.surface_action_before_high_return.gd",
+    "bytes": 1510,
+    "sha256_recovered_text": "fefddbd5733cdaf33ffd8d625719aca9a627c1a52ff92ae6dc4d191215a97f9e"
+  },
+  {
+    "path": "partial/scripts/main.sync_planet_visuals.gd",
+    "bytes": 3802,
+    "sha256_recovered_text": "c0f4f9131b223d1b4690135b936385a64685bd397a997485dbc9cc018aa1b5e1"
+  },
+  {
+    "path": "partial/scripts/planetary_system.fragments.gd",
+    "bytes": 2595,
+    "sha256_recovered_text": "308f0822f3a71dd8dc7985834955b9fc17759a9646373bad69e23a036d6d9a25"
+  },
+  {
+    "path": "partial/scripts/surface_model.clip_tail.gd",
+    "bytes": 679,
+    "sha256_recovered_text": "342545dfdc785ca713bffcd4843dd38c1156c7743bb25c457d131f9657f4fd0e"
+  },
+  {
+    "path": "partial/scripts/surface_model.prefix.gd",
+    "bytes": 15884,
+    "sha256_recovered_text": "fa6f1c023503e345a8b5695927da2344c4d6a1256079901f74d2db2d8369406f"
+  },
+  {
+    "path": "partial/scripts/surface_model.suffix.gd",
+    "bytes": 9327,
+    "sha256_recovered_text": "59eac35614124f01533a64413c98e44f526c23ccdc6d07f98c54b145a8589c5d"
+  },
+  {
+    "path": "scripts/celestial_renderer.gd",
+    "bytes": 5397,
+    "sha256_recovered_text": "94a658884866b427921d87dc400ca5680cb9257b346bed92062b8d8639e9b8f6"
+  },
+  {
+    "path": "scripts/near_surface_view.gd",
+    "bytes": 4740,
+    "sha256_recovered_text": "cd107045c3733aeb37fcb574f4f1c15f3fae09eb0cec35284489427cdfa55bd5"
+  },
+  {
+    "path": "scripts/spherical_terrain.gd",
+    "bytes": 3725,
+    "sha256_recovered_text": "69560787d5947535e8c10b75d781826628991e737539f164ff6aa326cf8b6037"
+  },
+  {
+    "path": "scripts/surface_model.gd",
+    "bytes": 26824,
+    "sha256_recovered_text": "9068a7f5a16dd0450e07e35a80a439f63ffb70e21061d2e52751b99defca0226"
+  },
+  {
+    "path": "scripts/surface_orbit_link.gd",
+    "bytes": 4071,
+    "sha256_recovered_text": "8cd141e0bd668ea0fcf3c65ee7c88db14be6037385b18c13f44d0dc0766e532c"
+  },
+  {
+    "path": "scripts/world_presentation.gd",
+    "bytes": 2603,
+    "sha256_recovered_text": "06ca6bdd7d156f7c71e8854ed5363996cfb72468dc6acf2389f02ca1c64aa828"
+  },
+  {
+    "path": "tests/test_surface_orbit_link.gd",
+    "bytes": 6423,
+    "sha256_recovered_text": "30afd53b7413a37235b8b4e5835ba5a219bf04cddea9115ac853cc62f2339dbf"
+  },
+  {
+    "path": "tests/test_vertical_flight.gd",
+    "bytes": 6555,
+    "sha256_recovered_text": "5a9e61348905c948de21463dfba2bf3926c05b3392c9d5482d5fbbfdaeaf04ce"
+  },
+  {
+    "path": "tools/build_android.sh",
+    "bytes": 1320,
+    "sha256_recovered_text": "ca004d5164c7f313a9483a282b3e781fdf1ff087deecccb882283c8641706ac8"
+  }
+]

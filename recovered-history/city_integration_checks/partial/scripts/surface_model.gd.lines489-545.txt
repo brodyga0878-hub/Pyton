@@ -1,0 +1,57 @@
+		message="Для автоподъёма: высота от 500 м, скорость до 20 м/с."
+		return false
+	extended_flight=true;flight_phase="ascent";ready_for_orbit=false;landing=false;taking_off=false
+	ship.assisted=true;ship.target_speed=0;ship.autopilot=false
+	message="Автоподъём к 20 км. «Тормозить» или ручное управление отменяют подъём."
+	return true
+func begin_descent(ship:RefCounted,system:RefCounted,days:float)->bool:
+	if not is_finite(days):message="Невозможно определить время входа.";return false
+	message=entry_error(ship,system)
+	if not message.is_empty():return false
+	var linked:=OrbitLink.matches(orbit_link,system)
+	var height:float=ship.position.distance_to(system.local_meters(system.focus_id,days))-float(system.by_id[system.focus_id].radius_km)*1000.0
+	# Distant, previously unlinked district visits retain the existing fast approach.
+	# Nearby first arrivals use the same physical geographic descent as return flights.
+	if not linked and height>MAX_DESCENT_HEIGHT:return enter(ship,system,true)
+	if height>MAX_DESCENT_HEIGHT or height<MIN_DESCENT_HEIGHT:
+		message="Для автоспуска подойдите на высоту от 1,8 до 60 км над планетой."
+		return false
+	var ll:Array=OrbitLink.coordinates(orbit_link,ship,system,days)
+	if ll.is_empty():message="Невозможно определить точку входа над планетой.";return false
+	var anchor:String=OrbitLink.anchor(orbit_link,system)
+	var terrain_revision:String=OrbitLink.terrain_revision(orbit_link) if linked else SphereTerrain.CURRENT_REVISION
+	var velocity:Vector3=ship.velocity
+	var attitude:Quaternion=ship.attitude
+	var previous_site:String=system.site_id
+	system.site_id=anchor
+	if not enter(ship,system,true,terrain_revision):system.site_id=previous_site;return false
+	globe.latitude=ll[0];globe.longitude=ll[1];frame_index+=1
+	var world_basis:Basis=Basis(Vector3.UP,OrbitLink.spin(system.by_id[body_id],days))*globe.basis_at(ll[0],ll[1])
+	ship.position=Vector3(0,height,0)
+	ship.velocity=world_basis.inverse()*velocity
+	ship.attitude=(world_basis.inverse()*Basis(attitude)).get_rotation_quaternion().normalized()
+	extended_flight=true;flight_phase="descent"
+	message="Управляемый спуск к высоте 1500 м. «Тормозить» отменяет спуск."
+	return true
+func resume_descent(ship:RefCounted)->bool:
+	if not active or not globe or landed or ship.hull<=0:return false
+	extended_flight=true;flight_phase="descent";ready_for_orbit=false;landing=false;taking_off=false
+	ship.assisted=true;ship.target_speed=0;ship.autopilot=false
+	message="Управляемое снижение к 1500 м."
+	return true
+func _step_vertical(dt:float,ship:RefCounted)->void:
+	var height:=altitude(ship)
+	var target:=1500.0
+	if flight_phase=="ascent":
+		var ll:Array=geographic_position(ship)
+		target=OrbitLink.ALTITUDE-globe.elevation(ll[0],ll[1])-clearance(ship)
+	var error:=target-height
+	var reserve:=maxf(0.1,ship.acceleration()-gravity)
+	var speed:=minf(300.0,sqrt(2.0*reserve*absf(error))*0.65)
+	ship.velocity=ship.velocity.move_toward(Vector3.UP*signf(error)*speed,reserve*dt)
+	ship.attitude=ship.attitude.slerp(Quaternion(Vector3.RIGHT,0.15 if flight_phase=="ascent" else -0.35),minf(1,dt)).normalized()
+	ship.position+=ship.velocity*dt
+	if absf(error)<0.6 and ship.velocity.length()<2:
+		ship.position.y=height_at(ship.position.x,ship.position.z)+clearance(ship)+target
+		ship.velocity=Vector3.ZERO
+		if flight_phase=="ascent":ready_for_orbit=true

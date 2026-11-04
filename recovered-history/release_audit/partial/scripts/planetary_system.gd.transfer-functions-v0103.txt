@@ -1,0 +1,88 @@
+# Exact observed function blocks plus the exact 0.10.3 same-focus station-route patch.
+# Not the entire planetary_system.gd; missing constants/configuration/generation/restoration.
+func origin_au(days: float) -> Array:
+	var center := position_au(focus_id,days)
+	var radius: float = by_id[focus_id].radius_km*1000.0
+	var direction := ARRIVAL_DIRECTION.normalized()
+	var offset := maxf(radius*4.0,3000000.0)/AU_METERS
+	return [center[0]-direction.x*offset,center[1]-direction.y*offset,center[2]-direction.z*offset]
+
+func local_meters(id: String, days: float) -> Vector3:
+	var p := position_au(id,days)
+	var origin := origin_au(days)
+	# Subtract in double precision before constructing the float32 Vector3.
+	return Vector3((p[0]-origin[0])*AU_METERS,(p[1]-origin[1])*AU_METERS,(p[2]-origin[2])*AU_METERS)
+
+func can_transfer(ship: RefCounted, nav: RefCounted, destination_site:String="") -> String:
+	if transfer_remaining>0: return "Автоперелёт уже готовится."
+	if ship.hull<=0: return "Корабль потерян."
+	if ship.surface_mode: return "Сначала вернитесь на орбиту."
+	if ship.combat_active: return "Сначала выйдите из боя."
+	if ship.docked: return "Сначала вылетите со станции."
+	if nav.remaining>0: return "Сначала отмените гиперпереход."
+	if selected_id==focus_id and destination_site.is_empty() and site_id.is_empty():
+		if not (focus_id==default_id and nav.has_station() and ship.position.distance_to(ship.STATION)>1000):return "Вы уже у выбранного объекта."
+	if str(by_id[selected_id].kind) in ["star","barycenter"]: return "Непосредственный подлёт к звезде заблокирован."
+	if ship.velocity.length()>20: return "Затормозите до 20 м/с."
+	if ship.station_available and ship.position.distance_to(ship.STATION)<400: return "Отойдите от станции минимум на 400 м."
+	return ""
+
+func begin_transfer(ship: RefCounted, nav: RefCounted, destination_site:String="") -> bool:
+	if not destination_site.is_empty():
+		var target:=get_site(destination_site)
+		if target.is_empty() or target.parent!=selected_id:return false
+	message = can_transfer(ship,nav,destination_site)
+	if message!="": return false
+	pending_id = selected_id
+	pending_site_id=destination_site
+	transfer_remaining = 3.0
+	ship.brake()
+	message = "Подготовка автоперелёта. Повторное нажатие отменяет его."
+	return true
+
+func cancel_transfer() -> void:
+	pending_site_id=""
+	transfer_remaining = 0
+	pending_id = ""
+	message = "Автоперелёт отменён."
+
+func step_transfer(dt: float, ship: RefCounted, nav: RefCounted) -> bool:
+	if transfer_remaining<=0: return false
+	if ship.hull<=0 or ship.surface_mode or ship.combat_active or ship.docked or nav.remaining>0 or ship.velocity.length()>20 or (ship.station_available and ship.position.distance_to(ship.STATION)<400):
+		cancel_transfer()
+		return false
+	transfer_remaining = maxf(0,transfer_remaining-dt)
+	if transfer_remaining>0: return false
+	if pending_id=="" or not by_id.has(pending_id):
+		cancel_transfer()
+		return false
+	var old_pos := position_au(focus_id,nav.elapsed_days)
+	var target_pos := position_au(pending_id,nav.elapsed_days)
+	var distance := sqrt(pow(old_pos[0]-target_pos[0],2)+pow(old_pos[1]-target_pos[1],2)+pow(old_pos[2]-target_pos[2],2))
+	nav.elapsed_days += maxf(0.02,distance*0.35)
+	focus_id = pending_id
+	site_id=pending_site_id;pending_site_id=""
+	selected_id = pending_id
+	pending_id = ""
+	ship.position = Vector3.ZERO
+	ship.velocity = Vector3.ZERO
+	ship.attitude = Quaternion.IDENTITY
+	ship.target_speed = 0
+	ship.autopilot = false
+	ship.station_available = is_orbital_site() or (site_id.is_empty() and nav.has_station() and focus_id==default_id)
+	message = "Прибытие к объекту: %s." % by_id[focus_id].name
+	return true
+
+func protect_surface(ship: RefCounted, days: float) -> bool:
+	var center := local_meters(focus_id,days)
+	var offset: Vector3 = ship.position-center
+	var safe: float = by_id[focus_id].radius_km*1000.0+2000.0
+	if offset.length()>=safe: return false
+	var direction := offset.normalized() if offset.length()>0.1 else Vector3.UP
+	ship.position = center+direction*(safe+50.0)
+	ship.velocity = direction*10.0
+	ship.target_speed = 0
+	ship.autopilot = false
+	ship.hull = maxf(0,ship.hull-10)
+	message = "Опасное сближение с поверхностью. Для посадки используйте «К поверхности»."
+	return true

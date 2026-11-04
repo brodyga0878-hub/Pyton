@@ -1,0 +1,248 @@
+[
+  {
+    "path": "PROVENANCE.md",
+    "bytes": 8466,
+    "sha256": "0fcb2f25e3a012cb2b4c58a8a33e908302ddb229b23e55bce7917d0e6030ea7f",
+    "partial": false
+  },
+  {
+    "path": "docs/RELEASE_ROADMAP_RU.md",
+    "bytes": 5164,
+    "sha256": "88ab8acf0ee9629d001c3acc0cae1648f6670baca52ec5c5a2dda2f2191089d6",
+    "partial": false
+  },
+  {
+    "path": "history_patches/surface_model_v0101_to_v0102.py",
+    "bytes": 8910,
+    "sha256": "16d1eed2c0caa8143d883760e8afedacccf0d084977c8c432de17c657f9a1b81",
+    "partial": false
+  },
+  {
+    "path": "history_patches/surface_model_v0102_to_v0103.py",
+    "bytes": 3817,
+    "sha256": "1f1d5ea21a297f03c5f005b583f5f3674f3a28d57620a7562afb049399dd2721",
+    "partial": false
+  },
+  {
+    "path": "history_patches/surface_model_v0103_to_v0104.py",
+    "bytes": 6473,
+    "sha256": "9da21ff70b43a7b16703c298d924ea832f0604f2c760a3cff67462d134e8c66a",
+    "partial": false
+  },
+  {
+    "path": "history_patches/visuals_v0100_to_v0104.py",
+    "bytes": 5005,
+    "sha256": "3a5562919c67a8416b8e6bd0a4c6d9674a991ee904008ba20721508fe4a8074d",
+    "partial": false
+  },
+  {
+    "path": "partial/scripts/flight_model.gd.observed-functions.txt",
+    "bytes": 1033,
+    "sha256": "8e9655270b42d4a1ae4a4d9606100de43f4de6b88726d133b4d077a004b13610",
+    "partial": true
+  },
+  {
+    "path": "partial/scripts/flight_model.gd.step-prefix.txt",
+    "bytes": 2155,
+    "sha256": "d098552016a732b4cf21299987318ecd7fc11d9c90b229c42523b3da1c0a08c4",
+    "partial": true
+  },
+  {
+    "path": "partial/scripts/main.gd.vertical-functions-v0104.txt",
+    "bytes": 1893,
+    "sha256": "10c81e477daba77feb4af5a048a64c58be134ade8d3f791c1793f8154e8e2e6c",
+    "partial": true
+  },
+  {
+    "path": "partial/scripts/planetary_system.gd.transfer-functions-v0103.txt",
+    "bytes": 4615,
+    "sha256": "875efde47f6e040ba06a0f0f4f8a3ee45ae7a3bd12a1cc1d7fa9fd81db9c2df0",
+    "partial": true
+  },
+  {
+    "path": "project.godot",
+    "bytes": 866,
+    "sha256": "0e19be398c18cf04fd392ed4f03245a79ff403e0cdd27bdd91f47ef99fb45c9c",
+    "partial": false
+  },
+  {
+    "path": "scripts/atmosphere.gdshader",
+    "bytes": 579,
+    "sha256": "d49b841c874838331bdf8b40e4171a27ae8ea3ac3bf2e620e3e7b2c9fa6532e4",
+    "partial": false
+  },
+  {
+    "path": "scripts/building.gdshader",
+    "bytes": 1134,
+    "sha256": "f6a91617ad438f3a119ebca321023d04d1c22550111b22764cb5d899d3f08e28",
+    "partial": false
+  },
+  {
+    "path": "scripts/celestial_renderer.gd",
+    "bytes": 3396,
+    "sha256": "bb2178f8e400b8d5daff89b21d5d4cc2a2474b11bbcf2ce9cec0d49cdda2b249",
+    "partial": false
+  },
+  {
+    "path": "scripts/device_settings.gd",
+    "bytes": 2104,
+    "sha256": "890be6e61f0bb5d3cdc1fbceed75ba546485d85b46daf1dbde02da4897559c42",
+    "partial": false
+  },
+  {
+    "path": "scripts/landing_pad.gdshader",
+    "bytes": 935,
+    "sha256": "e10339c7125a1d07981144a1c4836db86721f3b899fa361f0acc4df337d81905",
+    "partial": false
+  },
+  {
+    "path": "scripts/planet.gdshader",
+    "bytes": 2110,
+    "sha256": "b02f98200c8e1a99646e5f8d356a16bd57d299ce2531287656b6c5976af0fa0b",
+    "partial": false
+  },
+  {
+    "path": "scripts/settings_panel.gd",
+    "bytes": 4752,
+    "sha256": "408e3470e3aab2b84c40a0556fe92fa139b7bf5dc253441876cf1155faf2b05d",
+    "partial": false
+  },
+  {
+    "path": "scripts/spherical_terrain.gd",
+    "bytes": 3722,
+    "sha256": "8de7b4e649cf7f8c2fc9418965d7472dd1311037bb41336ac95234ddfe68dc11",
+    "partial": false
+  },
+  {
+    "path": "scripts/surface_model.gd",
+    "bytes": 24564,
+    "sha256": "0fac545ee59da0b67b88ea85a1a848471d1d739c6916b4d5ad2f4f9c7764e472",
+    "partial": false
+  },
+  {
+    "path": "scripts/surface_orbit_link.gd",
+    "bytes": 3404,
+    "sha256": "762f656ae766df4ca449ab961788c91935b4b893940e6a78fafd8883b3c4cde8",
+    "partial": false
+  },
+  {
+    "path": "scripts/surface_visual.gd",
+    "bytes": 7697,
+    "sha256": "0a42336b1adc6537bc6f5e57095b7b85fa1af2522a906e925c60e650436ca8f3",
+    "partial": false
+  },
+  {
+    "path": "scripts/terrain.gdshader",
+    "bytes": 2283,
+    "sha256": "2a2092614220dbb81b928a3f35485dc6574874cbb18c7e00a2280cd4babb41bc",
+    "partial": false
+  },
+  {
+    "path": "scripts/world_presentation.gd",
+    "bytes": 2256,
+    "sha256": "5af4d7ccd8e5591d1d67dd4243eb8404dea36f4d76e3145b3b341b900f315b06",
+    "partial": false
+  },
+  {
+    "path": "tests/surface_visual_reference_v0102.gd",
+    "bytes": 7441,
+    "sha256": "b2ebdbd0bf6e54fe491bee91ba4a292d381ee2975c547766ad10142705daa583",
+    "partial": false
+  },
+  {
+    "path": "tests/test_surface_orbit_link.gd",
+    "bytes": 6423,
+    "sha256": "0ea0b102a4846b618dc8cb0e50f884c8d2c70d84125c8f16ff9da8dc5808e154",
+    "partial": false
+  },
+  {
+    "path": "tests/test_vertical_flight.gd",
+    "bytes": 6555,
+    "sha256": "5a9e61348905c948de21463dfba2bf3926c05b3392c9d5482d5fbbfdaeaf04ce",
+    "partial": false
+  },
+  {
+    "path": "tests/test_world_presentation.gd",
+    "bytes": 3346,
+    "sha256": "93db531c8d1e77a9c8c6cacc423495aa46e294779dfd0a64fbd0ed4c54b28250",
+    "partial": false
+  },
+  {
+    "path": "tools/build_android.sh",
+    "bytes": 1320,
+    "sha256": "ca004d5164c7f313a9483a282b3e781fdf1ff087deecccb882283c8641706ac8",
+    "partial": false
+  },
+  {
+    "path": "tools/check.sh",
+    "bytes": 2776,
+    "sha256": "32f49fcb4925126e2c6412ac3d29f19d8e534ba6505e640dcdb62858a9132ff8",
+    "partial": false
+  },
+  {
+    "path": "versions/v0.10.0-read/scripts/celestial_renderer.gd",
+    "bytes": 2839,
+    "sha256": "c45450645c00b2fa0c18b54944a49857c5bd3d3b420136bc2f52b45b61f90522",
+    "partial": false
+  },
+  {
+    "path": "versions/v0.10.0-read/scripts/planet.gdshader",
+    "bytes": 1743,
+    "sha256": "f9d3e10df8b6d008a664464c61421553face6eedddf43122293874e2f6bdf5a3",
+    "partial": false
+  },
+  {
+    "path": "versions/v0.10.0-read/scripts/settings_panel.gd",
+    "bytes": 4702,
+    "sha256": "60fde51235167d93fb254180fd7034e4ecf7b3cb2f75c95b5a567493441104dc",
+    "partial": false
+  },
+  {
+    "path": "versions/v0.10.1-read/scripts/surface_model.gd",
+    "bytes": 12617,
+    "sha256": "d67ac076565b8994c60d6d222476d94a7339d8734c6220e90a1a218bd6a2c59a",
+    "partial": false
+  },
+  {
+    "path": "versions/v0.10.1-written/scripts/world_presentation.gd",
+    "bytes": 1117,
+    "sha256": "30a2f1556859d98399c27cf15d55bc8f407cb6714d5ce3755fc1f13a25018ede",
+    "partial": false
+  },
+  {
+    "path": "versions/v0.10.2-history-patches/scripts/surface_model.gd",
+    "bytes": 18229,
+    "sha256": "e6498e21c0109842edfcda460da3c3505dade775d410baf913ca04d5f5785290",
+    "partial": false
+  },
+  {
+    "path": "versions/v0.10.2-read/scripts/spherical_terrain.gd",
+    "bytes": 3294,
+    "sha256": "4a4f2838d01b4dd56fb59ad23fb045b40acab474e88ae757271c4bd772273d95",
+    "partial": false
+  },
+  {
+    "path": "versions/v0.10.2-read/scripts/surface_visual.gd",
+    "bytes": 7441,
+    "sha256": "b2ebdbd0bf6e54fe491bee91ba4a292d381ee2975c547766ad10142705daa583",
+    "partial": false
+  },
+  {
+    "path": "versions/v0.10.3-history-patches/scripts/surface_model.gd",
+    "bytes": 20408,
+    "sha256": "4d76f417755486df37cc418ee7a1373ca8023e9ecbee78c4decea7df98968e21",
+    "partial": false
+  },
+  {
+    "path": "versions/v0.10.3-history-patches/scripts/surface_visual.gd",
+    "bytes": 7400,
+    "sha256": "028c2df8bc8371be3ed6aca6c00aeac7fd08df14c56d1ca33ad36583add43978",
+    "partial": false
+  },
+  {
+    "path": "versions/v0.10.4-history-patches/scripts/surface_model.gd",
+    "bytes": 24564,
+    "sha256": "0fac545ee59da0b67b88ea85a1a848471d1d739c6916b4d5ad2f4f9c7764e472",
+    "partial": false
+  }
+]

@@ -1,0 +1,140 @@
+class_name PlanetarySystem
+extends RefCounted
+
+const AU_METERS := 149597870700.0
+const EARTHS_PER_SUN := 332946.0
+const YEAR_DAYS := 365.256
+const ARRIVAL_DIRECTION := Vector3(0.48,-0.28,-1.0)
+const ProceduralWorlds=preload("res://scripts/procedural_worlds.gd")
+const OriginalWorlds=preload("res://scripts/original_worlds.gd")
+var original_worlds:=OriginalWorlds.new()
+var procedural_worlds:=ProceduralWorlds.new()
+var source_digest:=""
+var preferred_layout_cache:=""
+var star_context:Dictionary={}
+var layout_mode:="prototype_v1"
+var settlements:Array=[]
+var system_id := -1
+var bodies: Array = []
+var by_id := {}
+var focus_id := ""
+var selected_id := ""
+var default_id := ""
+var transfer_remaining := 0.0
+var pending_id := ""
+var site_id:=""
+var pending_site_id:=""
+var message := ""
+var rng := 1
+
+func _random() -> float:
+	rng = (rng*1664525+1013904223)&0xffffffff
+	return float(rng)/4294967296.0
+
+func configure(star: Dictionary, layout: String="current") -> void:
+	star_context=star.duplicate(true)
+	layout_mode="prototype_v1";source_digest="";preferred_layout_cache=""
+	settlements.clear()
+	site_id="";pending_site_id=""
+	system_id = int(star.id)
+	bodies.clear()
+	by_id.clear()
+	transfer_remaining = 0
+	pending_id = ""
+	var type_code := int(star.type_code)&31
+	var star_mass: float = [0.15,0.25,0.4,0.75,1.0,1.3,2.0,0.6,1.5,3.0,8.0,12.0,18.0,1.2][mini(type_code,13)]
+	if str(star.original_name)=="Sol": star_mass = 1.0
+	var radius_factor: float = [0.2,0.3,0.5,0.75,1.0,1.3,2.0,0.012,30.0,70.0,5.0,200.0,300.0,1.2][mini(type_code,13)]
+	if str(star.original_name)=="Sol": radius_factor = 1.0
+	_add({"id":"star","name":str(star.name),"parent":"","kind":"star","radius_km":696340.0*radius_factor,"mass_solar":star_mass,"a_au":0.0,"eccentricity":0.0,"inclination":0.0,"node":0.0,"periapsis":0.0,"phase":0.0,"period_days":0.0,"rotation_hours":600.0,"rings":false})
+	if str(star.original_name)=="Sol":
+		_solar_system()
+		default_id = "earth"
+	else:
+		rng = (system_id^0x6c8e9cf5)&0xffffffff
+		_generate(star_mass)
+		default_id = "p2"
+	if layout in ["current","original_v1","original_v2"] and original_worlds.apply(self,star,layout!="original_v1"):
+		layout_mode="original_v1" if layout=="original_v1" else "original_v2"
+	elif layout in ["current","source_v1"] and procedural_worlds.apply(self,star):layout_mode="source_v1"
+	focus_id = default_id
+	selected_id = default_id
+
+func preferred_layout()->String:
+	if not preferred_layout_cache.is_empty():return preferred_layout_cache
+	if layout_mode in ["original_v2","source_v1"]:preferred_layout_cache=layout_mode
+	else:
+		var candidate:RefCounted=get_script().new();candidate.configure(star_context)
+		preferred_layout_cache=candidate.layout_mode
+	return preferred_layout_cache
+
+func _add(body: Dictionary) -> void:
+	bodies.append(body)
+	by_id[str(body.id)] = body
+
+func _planet(id: String, name: String, parent: String, radius: float, mass_earth: float, a: float, e: float, inclination: float, phase: float, kind: String, rings := false) -> void:
+	var parent_mass: float = by_id[parent].mass_solar
+	_add({"id":id,"name":name,"parent":parent,"kind":kind,"radius_km":radius,"mass_solar":mass_earth/EARTHS_PER_SUN,"a_au":a,"eccentricity":e,"inclination":deg_to_rad(inclination),"node":phase*0.31,"periapsis":phase*0.57,"phase":phase,"period_days":YEAR_DAYS*sqrt(pow(a,3)/(parent_mass+mass_earth/EARTHS_PER_SUN)),"rotation_hours":24.0+phase*8.0,"rings":rings})
+
+func _solar_system() -> void:
+	# Rounded physical parameters; conditional phase zero, not original FFE ephemerides.
+	_planet("mercury","Меркурий","star",2439.7,0.0553,0.3871,0.2056,7.0,0.4,"rock")
+	_planet("venus","Венера","star",6051.8,0.815,0.7233,0.0068,3.39,2.0,"desert")
+	_planet("earth","Земля","star",6371.0,1.0,1.0,0.0167,0.0,3.0,"earth")
+	_planet("mars","Марс","star",3389.5,0.1074,1.5237,0.0934,1.85,4.0,"desert")
+	_planet("jupiter","Юпитер","star",69911.0,317.8,5.2028,0.0489,1.30,5.0,"gas")
+	_planet("saturn","Сатурн","star",58232.0,95.16,9.5388,0.0565,2.49,1.1,"gas",true)
+	_planet("uranus","Уран","star",25362.0,14.54,19.1914,0.0463,0.77,2.1,"ice_gas")
+	_planet("neptune","Нептун","star",24622.0,17.15,30.0611,0.0095,1.77,3.1,"ice_gas")
+	_planet("pluto","Плутон","star",1188.3,0.00218,39.482,0.2488,17.16,4.1,"ice")
+	_planet("moon","Луна","earth",1737.4,0.0123,384400000.0/AU_METERS,0.0549,5.145,0.8,"rock")
+	_planet("io","Ио","jupiter",1821.6,0.01495,421700000.0/AU_METERS,0.0041,0.05,0.0,"desert")
+	_planet("europa","Европа","jupiter",1560.8,0.00804,671034000.0/AU_METERS,0.009,0.47,2.0,"ice")
+	_planet("ganymede","Ганимед","jupiter",2634.1,0.0248,1070412000.0/AU_METERS,0.0013,0.2,3.1,"rock")
+	_planet("callisto","Каллисто","jupiter",2410.3,0.018,1882709000.0/AU_METERS,0.0074,0.19,4.0,"rock")
+	_planet("titan","Титан","saturn",2574.7,0.0225,1221870000.0/AU_METERS,0.0288,0.35,1.0,"desert")
+
+func _generate(star_mass: float) -> void:
+	var count := 3+int(_random()*5)
+	var a := maxf(0.22+_random()*0.12,float(by_id.star.radius_km)*1000/AU_METERS*4.0)
+	for i in range(count):
+		var n := i+1
+		var gas := a>2.5 and _random()>0.4
+		var radius := 25000.0+_random()*45000.0 if gas else 1800.0+_random()*6400.0
+		var mass := 25.0+_random()*250.0 if gas else pow(radius/6371.0,3)*0.9
+		var heat := 278.5*pow(star_mass,0.875)/sqrt(a)
+		var kind := "gas" if gas else ("earth" if heat>240 and heat<320 else ("ice" if heat<180 else "desert"))
+		_planet("p%d"%n,"Планета %d"%n,"star",radius,mass,a,_random()*0.09,_random()*6.0,_random()*TAU,kind,gas and _random()>0.65)
+		a *= 1.65+_random()*0.55
+	var planets := bodies.duplicate()
+	for body in planets:
+		if str(body.parent)!="star" or _random()<0.45: continue
+		var hill: float = body.a_au*pow(float(body.mass_solar)/(3*star_mass),1.0/3.0)
+		var minimum: float = body.radius_km*1000*4.0/AU_METERS
+		if minimum>=hill*0.2: continue
+		var orbit := minf(minimum*(1+_random()),hill*0.2)
+		_planet(str(body.id)+"m",str(body.name)+" · спутник",str(body.id),250+_random()*1200,0.0001+_random()*0.004,orbit,0.02,3.0,_random()*TAU,"rock")
+
+static func eccentric_anomaly(mean: float, eccentricity: float) -> float:
+	var m := fposmod(mean,TAU)
+	var e := m
+	for i in range(12):
+		var correction := (e-eccentricity*sin(e)-m)/(1-eccentricity*cos(e))
+		e -= correction
+		if absf(correction)<1.0e-13: break
+	return e
+
+func relative_au(body: Dictionary, days: float) -> Array:
+	if str(body.parent)=="": return [0.0,0.0,0.0]
+	var eccentricity: float = body.eccentricity
+	var period:=float(body.period_days)
+	var mean:=float(body.phase)+(TAU*fposmod(days,period)/period if period>0 else 0.0)
+	var anomaly := eccentric_anomaly(mean,eccentricity)
+	var x: float = body.a_au*(cos(anomaly)-eccentricity)
+	var y: float = body.a_au*sqrt(1-eccentricity*eccentricity)*sin(anomaly)
+	var longitude: float = body.periapsis
+	var inclination: float = body.inclination
+	var xp := x*cos(longitude)-y*sin(longitude)
+	var yp := x*sin(longitude)+y*cos(longitude)
+	var flat := yp*cos(inclination)
+	return [xp*cos(float(body.node))-flat*sin(float(body.node)),yp*sin(inclination),xp*sin(float(body.node))+flat*cos(float(body.node))]

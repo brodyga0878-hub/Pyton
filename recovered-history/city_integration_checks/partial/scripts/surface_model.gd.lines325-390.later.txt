@@ -1,0 +1,66 @@
+	for i in range(10):
+		var height:=20.0+float((seed_value+i*53)&63)
+		var x:=float(-180 if i<5 else 180);var z:=float((i%5)*130-260)
+		x+=pad.x;z+=pad.z
+		result.append(AABB(Vector3(x-16,height_at(x,z),z-20),Vector3(32,height,40)))
+	return result
+func collision_radius(ship:RefCounted)->float:return float(ship.profile().visual_span_m)*0.55
+func collision_radii(ship:RefCounted)->Vector3:
+	var span:float=ship.profile().visual_span_m
+	return Vector3(span*0.55,maxf(1.0,span*0.12),span*0.55)
+func overlaps_building(ship:RefCounted)->bool:
+	if globe and globe.revision==SphereTerrain.CITY_REVISION:
+		return false if city_data.is_empty() else CityRuntime.overlaps(city_data,globe,ship.position,collision_radii(ship))
+	for box in buildings():
+		if box.grow(collision_radius(ship)-0.02).has_point(ship.position):return true
+	return false
+func evacuate_building(ship:RefCounted)->void:
+	if globe and globe.revision==SphereTerrain.CITY_REVISION:
+		if not city_data.is_empty():
+			ship.position.y=height_at(ship.position.x,ship.position.z)+clearance(ship)+maxf(350.0,float(city_data.cruise_height_m))
+		ship.velocity=Vector3.ZERO;ship.target_speed=0;ship.autopilot=false
+		return
+	for box in buildings():
+		var expanded:AABB=box.grow(collision_radius(ship))
+		if expanded.has_point(ship.position):ship.position.y=expanded.end.y+0.05
+	ship.velocity=Vector3.ZERO;ship.target_speed=0;ship.autopilot=false
+func _clip_buildings(previous:Vector3,ship:RefCounted)->void:
+	if globe and globe.revision==SphereTerrain.CITY_REVISION:
+		_clip_source_city(previous,ship)
+		return
+	var best:Dictionary={};var first:=2.0
+	for box in buildings():
+		var expanded:AABB=box.grow(collision_radius(ship))
+		var contact:=SegmentBox.intersect(previous,ship.position,expanded)
+		if not contact.is_empty() and float(contact.time)<first:
+			best=contact;first=float(contact.time)
+			if contact.inside:best.position=Vector3(previous.x,expanded.end.y+0.05,previous.z)
+	if best.is_empty():return
+	ship.position=Vector3(best.position)+Vector3(best.normal)*0.05
+	var inward:float=ship.velocity.dot(best.normal)
+	if inward<0:
+		ship.hull=maxf(0,ship.hull-maxf(0,-inward-6)*2)
+		ship.velocity-=Vector3(best.normal)*inward
+	ship.brake();landing=false;taking_off=false
+	message="Столкновение со зданием. Снизьте скорость и отойдите от фасада."
+
+func _clip_source_city(previous:Vector3,ship:RefCounted)->void:
+	if city_data.is_empty():return
+	var radii:=collision_radii(ship)
+	var contact:Dictionary=CityRuntime.sweep(city_data,globe,previous,ship.position,radii)
+	if contact.is_empty():return
+	var ground:=height_at(contact.position.x,contact.position.z)
+	var floor_contact:bool=contact.normal.dot(Vector3.UP)>0.9 and absf(float(contact.position.y)-radii.y-ground)<=0.2
+	if floor_contact:
+		var impact:float=ship.velocity.length()
+		ship.position=Vector3(contact.position.x,ground+clearance(ship),contact.position.z)
+		ship.velocity=Vector3.ZERO;ship.target_speed=0;landing=false;taking_off=false;landed=true;cancel_vertical()
+		if impact>6:
+			ship.hull=maxf(0,ship.hull-(impact-6)*3)
+			message="Жёсткое касание: %.0f м/с. Проверьте корпус."%impact
+		else:message="Посадка выполнена. «Взлететь» — подъём над поверхностью."
+		return
+	ship.position=Vector3(contact.position)+Vector3(contact.normal)*0.05
+	var inward:float=ship.velocity.dot(contact.normal)
+	if inward<0:
+		ship.hull=maxf(0,ship.hull-maxf(0,-inward-6)*2)

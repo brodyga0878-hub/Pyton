@@ -1,0 +1,7 @@
+{
+  "file": "/workspace/recovery/from-agent-history/release_audit/versions/v0.10.2-read/scripts/surface_visual.gd",
+  "expected_hash_from_preserved_old_report": "b2ebdbd0bf6e54fe491bee91ba4a292d381ee2975c547766ad10142705daa583",
+  "actual_sha256": "b2ebdbd0bf6e54fe491bee91ba4a292d381ee2975c547766ad10142705daa583",
+  "matches": true,
+  "scope": "One historical surface_visual.gd version, not the whole project"
+}

@@ -1,0 +1,64 @@
+	var steering: Vector2 = device_settings.steer(stick.value)
+	if keyboard_rearmed:steering += Vector2(float(Input.is_physical_key_pressed(KEY_RIGHT)) - float(Input.is_physical_key_pressed(KEY_LEFT)), float(Input.is_physical_key_pressed(KEY_DOWN)) - float(Input.is_physical_key_pressed(KEY_UP)))
+	var roll := float(roll_right or (keyboard_rearmed and Input.is_physical_key_pressed(KEY_D))) - float(roll_left or (keyboard_rearmed and Input.is_physical_key_pressed(KEY_A)))
+	if keyboard_rearmed and Input.is_physical_key_pressed(KEY_W):
+		surface.cancel_vertical()
+		model.target_speed = minf(600, model.target_speed + dt*120)
+		model.autopilot = false
+	if keyboard_rearmed and Input.is_physical_key_pressed(KEY_S):
+		surface.cancel_vertical()
+		model.target_speed = maxf(-100, model.target_speed - dt*120)
+		model.autopilot = false
+	if nav.remaining > 0 or planetary.transfer_remaining>0 or campaign.remaining>0:
+		steering = Vector2.ZERO
+		roll = 0
+	if campaign.step(dt,model,nav,planetary,economy):
+		_apply_system()
+		camera.position=model.position;camera.quaternion=model.attitude
+		_announce(campaign.message);_save_game(false)
+	if nav.step(dt,model):
+		_apply_system()
+		camera.position = model.position
+		camera.quaternion = model.attitude
+		_announce(nav.message)
+		_save_game(false)
+	if planetary.step_transfer(dt,model,nav):
+		_finish_site_arrival()
+		_apply_system()
+		camera.position = model.position
+		camera.quaternion = model.attitude
+		_announce(planetary.message)
+		_save_game(false)
+	_tick_economy()
+	if surface.active:
+		var was_landed:=surface.landed
+		var old_frame:int=surface.frame_index
+		surface.step(dt,model,steering.limit_length(),roll,float(lift_up)-float(lift_down))
+		if surface.frame_index!=old_frame:
+			camera.position=surface.rebase_to+surface.frame_rotation*(camera.position-surface.rebase_from)
+			camera.quaternion=(surface.frame_rotation*camera.quaternion).normalized()
+		if surface.ready_for_orbit:_finish_vertical_ascent()
+		if surface.landed and not was_landed: _save_game(false)
+		if surface.message!="":
+			_announce(surface.message);surface.message=""
+	else:
+		combat.guide_aim(dt,model,steering,roll)
+		model.step(dt, steering.limit_length(), roll,planetary.gravity_at(model.position,nav.elapsed_days) if device_settings.orbital_gravity else Vector3.ZERO)
+	var was_active:=combat.active
+	combat.step(dt,model)
+	if fire_held or (keyboard_rearmed and Input.is_physical_key_pressed(KEY_SPACE)): _fire()
+	if was_active and not combat.active: _announce(combat.message);_save_game(false)
+	if not surface.active and planetary.protect_surface(model,nav.elapsed_days):
+		_announce(planetary.message)
+	if model.last_notice != "":
+		_announce(model.last_notice)
+		model.last_notice = ""
+	if model.docked and not station_panel.visible:
+		station_panel.show()
+		_save_game()
+	if model.hull <= 0 and not last_dead:
+		combat.finish(model,"Корабль потерян.")
+		fire_held=false
+		_save_game(false)
+		last_dead = true
+		_announce("Корабль потерян. Нажмите «Заново», чтобы начать новый полёт.")

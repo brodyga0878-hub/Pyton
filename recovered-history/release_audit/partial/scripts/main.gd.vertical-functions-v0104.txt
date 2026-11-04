@@ -1,0 +1,35 @@
+# Exact complete function fragments written in historical v0.10.4 tool inputs.
+# They are not a complete main.gd and require its original members/imports/UI.
+func _finish_vertical_ascent()->void:
+	if not surface.ready_for_orbit:return
+	if not surface.leave(model,planetary,nav.elapsed_days):return
+	planetary.site_id="";_apply_system()
+	camera.position=model.position;camera.quaternion=model.attitude
+	_announce("Подъём завершён: 20 км над планетой.");_save_game(false)
+func _settle_vertical_for_test()->void:
+	if OS.has_feature("android"):return
+	for step in range(4000):
+		if surface.flight_phase.is_empty():return
+		nav.elapsed_days+=0.25/86400.0;_tick_economy()
+		surface.step(0.25,model,Vector2.ZERO,0)
+		if surface.ready_for_orbit:_finish_vertical_ascent()
+	push_error("Vertical flight scenario did not settle")
+
+func _surface_action() -> void:
+	_release_inputs()
+	if campaign.guard_available(nav):_announce("Сначала устраните угрозу охраны INRA через панель «Контакт».");return
+	if not app_active or help_panel.visible or map_overlay.visible or system_panel.visible or hangar_panel.visible or services_panel.visible or story_panel.visible or model.hull<=0:return
+	stick.release();roll_left=false;roll_right=false
+	if campaign.remaining>0 or nav.remaining>0 or planetary.transfer_remaining>0 or combat.active:return
+	fire_held=false
+	if surface.active:
+		if surface.landed:surface.take_off(model)
+		elif not surface.flight_phase.is_empty():surface.cancel_vertical();model.brake()
+		elif surface.globe:surface.begin_ascent(model)
+		elif surface.leave(model,planetary,nav.elapsed_days):planetary.site_id=""
+	else:surface.begin_descent(model,planetary,nav.elapsed_days)
+	_apply_system()
+	camera.position=model.position;camera.quaternion=model.attitude
+	_announce(surface.message)
+	_save_game(false)
+	_refresh_hud()

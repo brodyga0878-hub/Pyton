@@ -1,0 +1,121 @@
+[
+  {
+    "path": "PROVENANCE.md",
+    "bytes": 3123,
+    "lines": 26,
+    "sha256": "74431300f907494e709e8050da863ee140046d84b2694682c26f392550477b3a",
+    "kind": "complete historical file"
+  },
+  {
+    "path": "docs/REMAINING_PLAN_RU.md",
+    "bytes": 9509,
+    "lines": 30,
+    "sha256": "968c80150e0c3ad4877add8ebbe319440f150a88f5755f07e01f3db13d7842da",
+    "kind": "complete historical file"
+  },
+  {
+    "path": "docs/STAGE10_17_RU.md",
+    "bytes": 8772,
+    "lines": 37,
+    "sha256": "983bbfe3ad93c03465dfbae31f5f5b80a2645bc3ecc49797c310909f3986e708",
+    "kind": "complete historical file"
+  },
+  {
+    "path": "partial/scripts/flight_model.equipment.v0106.gd",
+    "bytes": 1046,
+    "lines": 29,
+    "sha256": "de4f546250d5616f196185ea1d763ed3a34bdee23fa7d56e8f1277f8c91a8e0e",
+    "kind": "fragment"
+  },
+  {
+    "path": "partial/scripts/main.apply_system.v0106.gd",
+    "bytes": 2251,
+    "lines": 38,
+    "sha256": "0296b1f9d38704105c3f5ebf0bf00ee9e08184235502ab988d8424a93ffc49e0",
+    "kind": "fragment"
+  },
+  {
+    "path": "partial/scripts/main.approach_views.v0107.txt",
+    "bytes": 1382,
+    "lines": 15,
+    "sha256": "0524303e15822c329bb09cdd194a6a0adf1a863e919c56cf8c177dbcffe425ea",
+    "kind": "fragment"
+  },
+  {
+    "path": "partial/scripts/main.controls.v0107.gd",
+    "bytes": 1936,
+    "lines": 41,
+    "sha256": "9d747cde8d023f3010119b943e50b84c0389fbabfe38004fe0c9dfbd93218c56",
+    "kind": "fragment"
+  },
+  {
+    "path": "partial/scripts/main.far_surface_smoke.v0107.gd",
+    "bytes": 3028,
+    "lines": 30,
+    "sha256": "424c7d343bddfbfd415f87ff7b433238f356f2fa55b7843c6d20827eb4982d33",
+    "kind": "fragment"
+  },
+  {
+    "path": "partial/scripts/main.finish_ascent.v0107.gd",
+    "bytes": 845,
+    "lines": 17,
+    "sha256": "318684655698821e2d8c1769e5992903474194096e40ceb85cc3639fecd82d7d",
+    "kind": "fragment"
+  },
+  {
+    "path": "partial/scripts/main.geographic_descent_smoke.v0107.gd",
+    "bytes": 5654,
+    "lines": 47,
+    "sha256": "5d337208402efcd0c50d3668d2fe822ea774c01aa96df4f7935aff20cda5e333",
+    "kind": "fragment"
+  },
+  {
+    "path": "partial/scripts/main.header.v0106.txt",
+    "bytes": 4160,
+    "lines": 130,
+    "sha256": "4731d2510d9b5239126668ef0960005259711c0e8bb6fbf8bee4cf5e97d6c992",
+    "kind": "fragment"
+  },
+  {
+    "path": "partial/scripts/main.physics_body.v0107.txt",
+    "bytes": 3083,
+    "lines": 64,
+    "sha256": "04e1a98b3d2424604f6bc7ce4b5666fb8c0ffd974e0c100b3579af83259287b5",
+    "kind": "fragment"
+  },
+  {
+    "path": "partial/scripts/main.process_prefix.v0106.txt",
+    "bytes": 2071,
+    "lines": 41,
+    "sha256": "45670ca24fd42deec3684c8c481e05c2e1ba1781ba9c1d3738d0a298b60a5537",
+    "kind": "fragment"
+  },
+  {
+    "path": "partial/scripts/main.surface_action.v0107.gd",
+    "bytes": 1933,
+    "lines": 36,
+    "sha256": "acc1f728569944f61633fdcb9020512c5e7ef8e03fd162799d9e506acd5cfd51",
+    "kind": "fragment"
+  },
+  {
+    "path": "partial/scripts/planetary_system.protect_surface.v0106.gd",
+    "bytes": 910,
+    "lines": 18,
+    "sha256": "1d64e3439abbc653095c15fa62ae8ccf81142b2afbcb148a610b2c29a202d0c5",
+    "kind": "fragment"
+  },
+  {
+    "path": "scripts/atmosphere.gdshader",
+    "bytes": 1464,
+    "lines": 30,
+    "sha256": "9a3c1a236dd5e09a0cda485b6b9de9969cd1bdd8eb583d6a1dff094bde63f207",
+    "kind": "complete historical file"
+  },
+  {
+    "path": "scripts/planet.gdshader",
+    "bytes": 2995,
+    "lines": 63,
+    "sha256": "73cbabacb8914c1d8ead73ce3d56f6a193df638f9efe9084ff55059fe17c0cd1",
+    "kind": "complete historical file"
+  }
+]

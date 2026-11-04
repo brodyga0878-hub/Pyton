@@ -1,0 +1,36 @@
+# Exact observed prefix only: the function continues beyond the final line here.
+func step(dt: float, steering: Vector2, roll: float = 0.0, gravity := Vector3.ZERO, lift := 0.0) -> void:
+	if docked or hull<=0:
+		return
+	if not station_available: autopilot = false
+	if autopilot:
+		var offset := STATION - position
+		var distance := offset.length()
+		var direction := offset.normalized()
+		if distance > 1.0:
+			var desired_basis := Basis.looking_at(direction, Vector3.UP if absf(direction.y) < 0.98 else Vector3.RIGHT)
+			attitude = attitude.slerp(desired_basis.get_rotation_quaternion(), minf(dt * 2.5, 1.0)).normalized()
+		var available:=maxf(0,acceleration()-gravity.length())
+		var approach_speed := minf(300.0, sqrt(available * maxf(distance - 60.0, 0.0)))
+		target_speed = approach_speed
+		velocity = velocity.move_toward(direction * approach_speed, available * dt)
+		if gravity.length()>acceleration():velocity+=gravity.normalized()*(gravity.length()-acceleration())*dt
+		if can_dock():
+			dock()
+			return
+	else:
+		var local_rotation := Quaternion(Vector3.UP, -steering.x * dt * float(profile().turn_rate)) * Quaternion(Vector3.RIGHT, -steering.y * dt * float(profile().turn_rate)) * Quaternion(Vector3.FORWARD, roll * dt * float(profile().turn_rate)/1.2)
+		attitude = (attitude * local_rotation).normalized()
+		if assisted:
+			velocity = velocity.move_toward(forward() * target_speed+Vector3.UP*clampf(lift,-1,1)*60, maxf(0,acceleration()-gravity.length()) * dt)
+			if gravity.length()>acceleration(): velocity+=gravity.normalized()*(gravity.length()-acceleration())*dt
+		else:
+			# Inertial mode: the slider sets axial thrust, not a hidden velocity clamp.
+			velocity += (forward() * (target_speed / MAX_SPEED) * acceleration()+gravity+Vector3.UP*clampf(lift,-1,1)*acceleration()*0.5) * dt
+	var previous:=position
+	position += velocity * dt
+	var movement:=position-previous
+	var fraction:=clampf((STATION-previous).dot(movement)/movement.length_squared(),0,1) if movement.length_squared()>0.001 else 0.0
+	var closest:=previous+movement*fraction
+	if station_available and closest.distance_to(STATION) < 38.0:
+		if velocity.length() > DOCK_SPEED:

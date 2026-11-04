@@ -1,0 +1,130 @@
+extends Node3D
+
+const TouchThrottle = preload("res://scripts/touch_throttle.gd")
+const HoldButton = preload("res://scripts/hold_button.gd")
+var hold_buttons: Array=[]
+
+const SaveStore = preload("res://scripts/save_store.gd")
+const DeviceSettings = preload("res://scripts/device_settings.gd")
+const SettingsPanel = preload("res://scripts/settings_panel.gd")
+const ScreenLayout = preload("res://scripts/screen_layout.gd")
+var save_store := SaveStore.new()
+var device_settings := DeviceSettings.new()
+var settings_panel: Control
+var resume_panel: ColorRect
+var pause_message: Label
+var lift_controls: Control
+var lift_up:=false
+var lift_down:=false
+var application_paused:=false
+var window_focused:=true
+var keyboard_rearmed:=true
+var saving_enabled:=true
+var has_live_session:=false
+var fps_label: Label
+var benchmarking:=false
+var flight_widgets: Array=[]
+var flight_widgets_hidden:=false
+
+const Campaign = preload("res://scripts/campaign_model.gd")
+const StoryPanel = preload("res://scripts/story_panel.gd")
+const ThargoidVisual = preload("res://scripts/thargoid_visual.gd")
+var campaign := Campaign.new()
+var story_panel: Control
+var enemy_alien: Node3D
+var alien_fleet: Node3D
+var alien_leader: Node3D
+var alien_escorts: Array=[]
+
+const Economy = preload("res://scripts/economy_model.gd")
+const Services = preload("res://scripts/station_services.gd")
+var economy := Economy.new()
+var services_panel: Control
+
+const Combat = preload("res://scripts/combat_model.gd")
+const Surface = preload("res://scripts/surface_model.gd")
+const WorldPresentation=preload("res://scripts/world_presentation.gd")
+var world_presentation:=WorldPresentation.new()
+const NearSurfaceView=preload("res://scripts/near_surface_view.gd")
+var near_surface_view:=NearSurfaceView.new()
+var presentation_key:=""
+var star_field:MultiMeshInstance3D
+const SurfaceVisual = preload("res://scripts/surface_visual.gd")
+var combat := Combat.new()
+var surface := Surface.new()
+var surface_root: Node3D
+var enemy_root: Node3D
+var enemy_ship: Node3D
+var enemy_laser: MeshInstance3D
+var combat_button: Button
+var surface_button: Button
+var combat_readout: Label
+var enemy_label: Label
+var fire_held := false
+var fire_button: Control
+var app_active := true
+var world_environment: WorldEnvironment
+
+const ShipVisual = preload("res://scripts/ship_visual.gd")
+const HangarUI = preload("res://scripts/hangar_panel.gd")
+const Planetary = preload("res://scripts/planetary_system.gd")
+const CelestialRenderer = preload("res://scripts/celestial_renderer.gd")
+const SystemPanel = preload("res://scripts/system_panel.gd")
+const Flight = preload("res://scripts/flight_model.gd")
+const Navigation = preload("res://scripts/navigation.gd")
+const GalaxyMap = preload("res://scripts/galaxy_map.gd")
+const Stick = preload("res://scripts/flight_stick.gd")
+var player_root: Node3D
+var player_ship: Node3D
+var hangar_panel: Control
+var ship_heading: Label
+var aim_reticle: Label
+var last_external_view := false
+var model := Flight.new()
+var nav := Navigation.new()
+var planetary := Planetary.new()
+var celestial_root: Node3D
+var system_panel: Control
+var camera: Camera3D
+var stick: Control
+var ui: Control
+var hud: Label
+var status: Label
+var speed_slider: HSlider
+var auto_button: Button
+var assist_button: Button
+var dock_button: Button
+var station_panel: PanelContainer
+var station_info: Label
+var station_status: Label
+var help_panel: PanelContainer
+var target_label: Label
+var notice: Label
+var laser: MeshInstance3D
+var laser_time := 0.0
+var drone: Node3D
+var drone_health := 3
+var drone_hits := 0
+var flash := 0.0
+var save_time := 0.0
+var hud_time := 0.0
+var roll_left := false
+var roll_right := false
+var last_dead := false
+var screenshot_frames := -1
+var audio_player: AudioStreamPlayer
+var station_root: Node3D
+var planet_visual: MeshInstance3D
+var sun_light: DirectionalLight3D
+var station_title: Label
+var medical_prices: Label
+var prototype_service_controls:Array=[]
+var local_delivery_button: Button
+var courier_button: Button
+var repair_button: Button
+var refuel_button: Button
+var jump_button: Button
+var station_target_button: Button
+var map_overlay: ColorRect
+var map_canvas: Control
+var map_info: Label

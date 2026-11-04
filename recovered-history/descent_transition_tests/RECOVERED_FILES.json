@@ -1,0 +1,86 @@
+[
+  {
+    "path": "PROVENANCE.md",
+    "bytes": 8142,
+    "lines": 30,
+    "sha256": "07159fe9770ffa88e1afbf3bcc01bda245ea0e1c26a784929eb333b966f77245",
+    "complete_historical_file": false
+  },
+  {
+    "path": "partial/scripts/flight_model.brake-and-dock.v0106.fragment.gd",
+    "bytes": 443,
+    "lines": 19,
+    "sha256": "ff092bcc5ed39e961c99141c326b0c4e195ba355f313d9cc7072ffdd33bb1453",
+    "complete_historical_file": false
+  },
+  {
+    "path": "partial/scripts/flight_model.lines150-220.v0106.fragment.gd",
+    "bytes": 3935,
+    "lines": 71,
+    "sha256": "3e1bd0adec042d22fd9e4063255374aa143ecc3588426dd525ba8d236df14471",
+    "complete_historical_file": false
+  },
+  {
+    "path": "partial/scripts/flight_model.prefix.v0106.fragment.gd",
+    "bytes": 3456,
+    "lines": 90,
+    "sha256": "d987de959502a905b55e32a8cb08b5383fb8a2a5461b46538c4f85521f73affe",
+    "complete_historical_file": false
+  },
+  {
+    "path": "partial/scripts/flight_model.quantity-and-equipment.v0106.fragment.gd",
+    "bytes": 2356,
+    "lines": 56,
+    "sha256": "65926cb659a3822cb74ce134f09e5d702a023a778bf6aa11a4f1b34786ae05a2",
+    "complete_historical_file": false
+  },
+  {
+    "path": "partial/scripts/main.combat-and-surface-actions.v0106.fragment.gd",
+    "bytes": 2349,
+    "lines": 40,
+    "sha256": "e8d1f0d0b1554c9f069aa202ef1dc26333f84f3be990fd5018cb73144814da30",
+    "complete_historical_file": false
+  },
+  {
+    "path": "partial/scripts/main.physics-camera-prefix.v0106.fragment.gd",
+    "bytes": 2071,
+    "lines": 41,
+    "sha256": "45670ca24fd42deec3684c8c481e05c2e1ba1781ba9c1d3738d0a298b60a5537",
+    "complete_historical_file": false
+  },
+  {
+    "path": "partial/scripts/main.stage5-smoke-prefix.v0106.fragment.gd",
+    "bytes": 2139,
+    "lines": 38,
+    "sha256": "f70891e3dedbc64a453576889253bfb98e4746fc0782fe9fb44bc23052e110e4",
+    "complete_historical_file": false
+  },
+  {
+    "path": "partial/scripts/planetary_system.prefix.v0106.fragment.gd",
+    "bytes": 5654,
+    "lines": 110,
+    "sha256": "b79034c5cbc668d394250ebfc8b948393d288c78ce4eda91448b2ee37f8e9a59",
+    "complete_historical_file": false
+  },
+  {
+    "path": "tests/test_far_surface_transition.gd",
+    "bytes": 9649,
+    "lines": 113,
+    "sha256": "a04b24f8041e7fa2817dd18081e37295df0e491743e99a0dc6d666c45ee02762",
+    "complete_historical_file": true
+  },
+  {
+    "path": "tests/test_geographic_descent.gd",
+    "bytes": 18106,
+    "lines": 193,
+    "sha256": "53685c0dbb471eb3034151aeb9516da3781bdced550c84d36282c2a14e8c21a2",
+    "complete_historical_file": true
+  },
+  {
+    "path": "versions/v0.10.6/scripts/near_surface_view.gd",
+    "bytes": 4253,
+    "lines": 72,
+    "sha256": "2bc6e543cdafa3c3d2c3d8a4751b1d2de858cc3f555eff1c37564332ef1f8cfb",
+    "complete_historical_file": true
+  }
+]

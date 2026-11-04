@@ -1,0 +1,113 @@
+{
+  "recovery_date": "2026-11-04",
+  "agent": "/root/geography_regression",
+  "scope": "Partial historical source-text recovery; not a complete project",
+  "files_recovered": 14,
+  "files": [
+    {
+      "path": "export_presets.cfg",
+      "bytes": 950,
+      "current_recovery_sha256": "d7e524c27d273b9266251d3e1987e54529f65b539529948c04a25982bdb77c30",
+      "source_kind": "own_full_historical_file_read_output",
+      "original_filesystem_byte_identity_verified": false
+    },
+    {
+      "path": "scripts/ground_coordinates.gd",
+      "bytes": 2432,
+      "current_recovery_sha256": "b61afd67aa89f65c7bde5548c31516ac61ed6cc4e0c5e8b55280a055075ccd71",
+      "source_kind": "own_full_historical_file_read_output",
+      "original_filesystem_byte_identity_verified": false
+    },
+    {
+      "path": "scripts/near_surface_view.gd",
+      "bytes": 4933,
+      "current_recovery_sha256": "5dc6b8f8d342b0d243767c6f5987da48906ce5829ef92e4a96b992ef6356716b",
+      "source_kind": "own_full_historical_file_read_output",
+      "original_filesystem_byte_identity_verified": false
+    },
+    {
+      "path": "scripts/segment_box.gd",
+      "bytes": 1084,
+      "current_recovery_sha256": "c859146608a6e8208620078a12742c07e1fdafa04761ec5abcffa2cfd0501fad",
+      "source_kind": "own_full_historical_file_read_output",
+      "original_filesystem_byte_identity_verified": false
+    },
+    {
+      "path": "scripts/segment_triangle.gd",
+      "bytes": 8104,
+      "current_recovery_sha256": "c1f000e1481ba9654ab9cf27db7b30e6eaeef46a35d533a01dffb2d86bece346",
+      "source_kind": "own_full_apply_patch_history_with_visible_final_edits",
+      "original_filesystem_byte_identity_verified": false
+    },
+    {
+      "path": "scripts/spherical_terrain.gd",
+      "bytes": 4522,
+      "current_recovery_sha256": "ac7e11881b649129f09d916cbf48c5b025119aef7735f92f6473f19709c10975",
+      "source_kind": "own_full_historical_file_read_output",
+      "original_filesystem_byte_identity_verified": false
+    },
+    {
+      "path": "scripts/surface_orbit_link.gd",
+      "bytes": 4483,
+      "current_recovery_sha256": "6a358b2030a0480035caa7a5263d0db96385394740672b18b18a306c30bec12c",
+      "source_kind": "own_full_historical_file_read_output",
+      "original_filesystem_byte_identity_verified": false
+    },
+    {
+      "path": "tests/test_ground_coordinates.gd",
+      "bytes": 16329,
+      "current_recovery_sha256": "d2416edcc1058600c4771111d9d91e73ab19e548a4b87aba4ee18f0c2c8d3640",
+      "source_kind": "own_full_apply_patch_history_with_visible_final_edits",
+      "original_filesystem_byte_identity_verified": false
+    },
+    {
+      "path": "tests/test_segment_triangle.gd",
+      "bytes": 9681,
+      "current_recovery_sha256": "ef35496233fb895ce0e46bcb0446d4e051100b12346df64e9530a13074b978c6",
+      "source_kind": "own_full_apply_patch_history_with_visible_final_edits",
+      "original_filesystem_byte_identity_verified": false
+    },
+    {
+      "path": "tools/build_android.sh",
+      "bytes": 1320,
+      "current_recovery_sha256": "ca004d5164c7f313a9483a282b3e781fdf1ff087deecccb882283c8641706ac8",
+      "source_kind": "own_full_historical_file_read_output",
+      "original_filesystem_byte_identity_verified": false
+    },
+    {
+      "path": "tools/build_legacy_geography_fixture.gd",
+      "bytes": 5065,
+      "current_recovery_sha256": "75ba9b1eb37454d9c8e32faf498b80a6c23344551cbe7de7b289450dc6b109f4",
+      "source_kind": "own_full_apply_patch_history_with_visible_final_edits",
+      "original_filesystem_byte_identity_verified": false
+    },
+    {
+      "path": "tools/check.sh",
+      "bytes": 3243,
+      "current_recovery_sha256": "26bf8b31f5cd6ea437bbdb574bb4fb52832c32f3fc44c0abb32196ee4906f3a2",
+      "source_kind": "own_full_historical_file_read_output",
+      "original_filesystem_byte_identity_verified": false
+    },
+    {
+      "path": "tools/release_candidate.py",
+      "bytes": 13728,
+      "current_recovery_sha256": "055a4797fd1f81c3668de4a771a603c11ce1fdfd745948b89ba45dfc19e08228",
+      "source_kind": "own_full_apply_patch_history_with_visible_final_edits",
+      "original_filesystem_byte_identity_verified": false
+    },
+    {
+      "path": "tools/verify_android.py",
+      "bytes": 4579,
+      "current_recovery_sha256": "f2014e2d41e5f4601eb9af3db2647589b656f14a8ff2975749955ee5d4c330ea",
+      "source_kind": "own_full_historical_file_read_output",
+      "original_filesystem_byte_identity_verified": false
+    }
+  ],
+  "not_recovered": [
+    "tests/fixtures/surface_geography_v0107.json",
+    "tests/fixtures/ground_coordinates_reference.json",
+    "data/ffe_ground_coordinates.json"
+  ],
+  "old_environment_readable": false,
+  "working_repository_modified": false
+}

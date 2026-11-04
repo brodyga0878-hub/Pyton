@@ -1,0 +1,3 @@
+This is an exact contiguous file-read output visible in the root agent's current conversation. It was read from `scripts/surface_model.gd` using `sed -n '284,364p'` immediately before live Source3 integration. The original file at this point supported sphere-v1/source-sites-v2 and still used the same ten-box city routines.
+
+Only the complete city collision functions and the trailing `grid_cells` boundary are saved here. This fragment alone is not a complete SurfaceModel. It may fill a gap in another independently recovered snapshot only when the surrounding visible text agrees; no old full-file hash is available. Source3 later changed these functions. Do not label the merged older snapshot as latest Source3.

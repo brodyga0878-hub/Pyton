@@ -1,0 +1,62 @@
+[
+  {
+    "path": "PROVENANCE.md",
+    "bytes": 3969,
+    "sha256": "47a079d6701ca015ddfd2365bfb93856714f67755dcdd875d5b4a8e4ec534954",
+    "classification": "provenance"
+  },
+  {
+    "path": "partial/scripts/celestial_renderer.transition-functions.intermediate-v0.10.6.gd",
+    "bytes": 2554,
+    "sha256": "725ba8504bc80f95e7537588862548252a16366926d95c67c06559bcdcb02a3a",
+    "classification": "partial"
+  },
+  {
+    "path": "partial/scripts/main._sync_planet_visuals.intermediate-v0.10.6.gd",
+    "bytes": 2766,
+    "sha256": "cd0c5c4b1046debf51bf39a3fb987973c63cf3f6a655f0aaad582250f0c0d590",
+    "classification": "partial"
+  },
+  {
+    "path": "tests/test_far_surface_transition.gd",
+    "bytes": 9649,
+    "sha256": "a04b24f8041e7fa2817dd18081e37295df0e491743e99a0dc6d666c45ee02762",
+    "classification": "complete_authored_test"
+  },
+  {
+    "path": "tests/test_world_presentation.gd",
+    "bytes": 3346,
+    "sha256": "93db531c8d1e77a9c8c6cacc423495aa46e294779dfd0a64fbd0ed4c54b28250",
+    "classification": "complete_historical"
+  },
+  {
+    "path": "versions/v0.10.5/scripts/atmosphere.gdshader",
+    "bytes": 579,
+    "sha256": "d49b841c874838331bdf8b40e4171a27ae8ea3ac3bf2e620e3e7b2c9fa6532e4",
+    "classification": "complete_historical"
+  },
+  {
+    "path": "versions/v0.10.5/scripts/near_surface_view.gd",
+    "bytes": 4023,
+    "sha256": "82173ec0594d8de4159c4841c5b2a9b371d666a412c5700a5b95602b601267ab",
+    "classification": "complete_historical"
+  },
+  {
+    "path": "versions/v0.10.5/scripts/planet.gdshader",
+    "bytes": 2110,
+    "sha256": "b02f98200c8e1a99646e5f8d356a16bd57d299ce2531287656b6c5976af0fa0b",
+    "classification": "complete_historical"
+  },
+  {
+    "path": "versions/v0.10.5/scripts/terrain.gdshader",
+    "bytes": 2283,
+    "sha256": "2a2092614220dbb81b928a3f35485dc6574874cbb18c7e00a2280cd4babb41bc",
+    "classification": "complete_historical"
+  },
+  {
+    "path": "versions/v0.10.5/scripts/world_presentation.gd",
+    "bytes": 2256,
+    "sha256": "5af4d7ccd8e5591d1d67dd4243eb8404dea36f4d76e3145b3b341b900f315b06",
+    "classification": "complete_historical"
+  }
+]

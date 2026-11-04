@@ -1,0 +1,31 @@
+Preserved exact function excerpt from tools/build_terrain_provider_reference.py.
+The complete provider module was NOT read; this is not an executable replacement module.
+
+def uid_representatives(project):
+    """Use actual original body UID/model pairs wherever source controls exist."""
+    result = {}
+    handcrafted_path = project/'data/ffe_handcrafted_records.json'
+    handcrafted = json.loads(handcrafted_path.read_text())
+    for slot, row in handcrafted['records'].items():
+        model = row['model_index']
+        if model in UNIFORM_MODELS and model not in result:
+            result[model] = {'seed': row['seed_u32'], 'kind': 'original_F875_record',
+                             'path': 'data/ffe_handcrafted_records.json', 'slot': int(slot),
+                             'name_en': row['name_en'], 'record_hex': row['record_hex']}
+    for name in ['inhabited_system_reference', 'special_system_reference']:
+        path = project/f'tests/fixtures/{name}.json'
+        document = json.loads(path.read_text())
+        for case_index, case in enumerate(document['cases']):
+            for record_index, raw_hex in enumerate(case['result']['records']):
+                raw = bytes.fromhex(raw_hex)
+                model = struct.unpack_from('<H', raw, 12)[0]
+                if model in UNIFORM_MODELS and model not in result:
+                    result[model] = {'seed': struct.unpack_from('<I', raw, 4)[0],
+                                     'kind': 'original_generator_record',
+                                     'path': f'tests/fixtures/{name}.json',
+                                     'case_index': case_index, 'record_index': record_index,
+                                     'record_hex': raw_hex}
+    for model in UNIFORM_MODELS:
+        result.setdefault(model, {'seed': 1, 'kind': 'explicit_synthetic_seed',
+                                   'reason': 'No actual UID/model pair in current native body controls'})
+    return result

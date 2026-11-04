@@ -1,0 +1,57 @@
+[
+  {
+    "path": "PROVENANCE.md",
+    "bytes": 5448,
+    "sha256": "db2e47d4d074ce733bdf9011b3771f19af384b356380208cb045985404081c14"
+  },
+  {
+    "path": "partial/scripts/main.v0101.map_help_functions.gd",
+    "bytes": 4854,
+    "sha256": "474fef4bef75ba698df5f235d5bd9ddd2c76f2f9c62c627a048fa3453fee5a0a"
+  },
+  {
+    "path": "partial/scripts/main.v0104._apply_system.gd",
+    "bytes": 1288,
+    "sha256": "a2504011283314f3d798606c368fd1a8b47d23861e7c53fd5bcb2589207a0a98"
+  },
+  {
+    "path": "partial/scripts/main.v0104._jump_action.gd",
+    "bytes": 541,
+    "sha256": "3aee80d0f0269502599a80396eed02ba592062bd933e929c1bcbd2a5c293de18"
+  },
+  {
+    "path": "partial/scripts/main.v0104._physics_process.gd",
+    "bytes": 3626,
+    "sha256": "88660b89a7cd9c65af5621d95bd0783e76a77b0749dec108dcc913836031c453"
+  },
+  {
+    "path": "partial/scripts/main.v0104._process.gd",
+    "bytes": 4659,
+    "sha256": "6dfacf6898460bd65ea8b8696f60b08ee000c09fa909ba074d27487b86b84c7a"
+  },
+  {
+    "path": "scripts/celestial_renderer.gd",
+    "bytes": 3396,
+    "sha256": "bb2178f8e400b8d5daff89b21d5d4cc2a2474b11bbcf2ce9cec0d49cdda2b249"
+  },
+  {
+    "path": "scripts/surface_model.gd",
+    "bytes": 24564,
+    "sha256": "0fac545ee59da0b67b88ea85a1a848471d1d739c6916b4d5ad2f4f9c7764e472"
+  },
+  {
+    "path": "tests/test_near_surface_view.gd",
+    "bytes": 12313,
+    "sha256": "31d05a17798605bec3e6c7ebd4de076fdb11c77024f2db68bc964050a3e86d0c"
+  },
+  {
+    "path": "versions/pre-v2/scripts/near_surface_view.gd",
+    "bytes": 3349,
+    "sha256": "5e7fd1f56368e4751150f1af0d5c7f34ad8069ac4c78a29d7ac10cd1e31ed1ed"
+  },
+  {
+    "path": "versions/pre-v2/scripts/surface_orbit_link.gd",
+    "bytes": 3404,
+    "sha256": "762f656ae766df4ca449ab961788c91935b4b893940e6a78fafd8883b3c4cde8"
+  }
+]

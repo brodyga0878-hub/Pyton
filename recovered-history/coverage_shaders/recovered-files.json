@@ -1,0 +1,82 @@
+[
+  {
+    "path": "PROVENANCE.md",
+    "bytes": 6028,
+    "sha256": "4374181c566068eb01e19122af4cc6ff1a3e226e091241c418f926995757bc68"
+  },
+  {
+    "path": "partial/scripts/flight_model.v0104.known_full_functions.gd",
+    "bytes": 1037,
+    "sha256": "65de0bceb0991d2c6fd11ba029cc6a6bb3145d1956c2688efb78fd5f18e3f014"
+  },
+  {
+    "path": "partial/scripts/main.v0105.near_surface_smoke.gd",
+    "bytes": 2868,
+    "sha256": "a429bf1832c93db493bc5c77e836a76ca1c6bda082b53111fefcfa429df41a50"
+  },
+  {
+    "path": "partial/scripts/main.v0105.sync_planet_visuals.gd",
+    "bytes": 1874,
+    "sha256": "883f24813aefdaae61365c9bc3cb3a3d0f10b692f52c62523519fb2273a54772"
+  },
+  {
+    "path": "scripts/atmosphere.gdshader",
+    "bytes": 1464,
+    "sha256": "9a3c1a236dd5e09a0cda485b6b9de9969cd1bdd8eb583d6a1dff094bde63f207"
+  },
+  {
+    "path": "scripts/building.gdshader",
+    "bytes": 1134,
+    "sha256": "f6a91617ad438f3a119ebca321023d04d1c22550111b22764cb5d899d3f08e28"
+  },
+  {
+    "path": "scripts/landing_pad.gdshader",
+    "bytes": 935,
+    "sha256": "e10339c7125a1d07981144a1c4836db86721f3b899fa361f0acc4df337d81905"
+  },
+  {
+    "path": "scripts/planet.gdshader",
+    "bytes": 2995,
+    "sha256": "73cbabacb8914c1d8ead73ce3d56f6a193df638f9efe9084ff55059fe17c0cd1"
+  },
+  {
+    "path": "scripts/rings.gdshader",
+    "bytes": 839,
+    "sha256": "962fcd8994b152bcf8599203307e9caf6f830190a6ecbb99b42abf712939e07e"
+  },
+  {
+    "path": "scripts/settings_panel.gd",
+    "bytes": 4752,
+    "sha256": "408e3470e3aab2b84c40a0556fe92fa139b7bf5dc253441876cf1155faf2b05d"
+  },
+  {
+    "path": "scripts/terrain.gdshader",
+    "bytes": 3237,
+    "sha256": "6f8fdb202fbe8641a4af26daee4a15c264d16a8548cb398c53b480b72d6d9641"
+  },
+  {
+    "path": "scripts/terrain_transition.gdshader",
+    "bytes": 2944,
+    "sha256": "06d7599aec1f67b1a743e942002a4aefbc393efa0b908390f842a404dab7dcab"
+  },
+  {
+    "path": "scripts/world_presentation.gd",
+    "bytes": 2256,
+    "sha256": "5af4d7ccd8e5591d1d67dd4243eb8404dea36f4d76e3145b3b341b900f315b06"
+  },
+  {
+    "path": "versions/pre-coverage/scripts/atmosphere.gdshader",
+    "bytes": 579,
+    "sha256": "d49b841c874838331bdf8b40e4171a27ae8ea3ac3bf2e620e3e7b2c9fa6532e4"
+  },
+  {
+    "path": "versions/pre-coverage/scripts/planet.gdshader",
+    "bytes": 2110,
+    "sha256": "b02f98200c8e1a99646e5f8d356a16bd57d299ce2531287656b6c5976af0fa0b"
+  },
+  {
+    "path": "versions/pre-coverage/scripts/terrain.gdshader",
+    "bytes": 2283,
+    "sha256": "2a2092614220dbb81b928a3f35485dc6574874cbb18c7e00a2280cd4babb41bc"
+  }
+]

@@ -1,0 +1,102 @@
+# F1849..F1867 shared semantic workers. Parent provides depth_control,
+# feature_schedule, _s32, _qmul, _avg, _table_i32, _table_i16 and _map_sample.
+# Integer helpers deliberately preserve x86 ADD/SAR/NEG wrap and signed words.
+func _midpoint_s16(value:int)->int:
+	var low:=value&65535
+	return low-65536 if low>=32768 else low
+
+func _midpoint_msb(value:int)->int:
+	var low:int=value&0xffffffff
+	var result:=0
+	while low>1:
+		low>>=1
+		result+=1
+	return result
+
+func _midpoint_uv(a:Dictionary,b:Dictionary,depth:int,uv:Array)->void:
+	# F1858..65 refresh these UV words even when their shared midpoint exists.
+	# The edge cache owner should call this helper again on a cached feature edge.
+	for channel in range(2):
+		var descriptor:Dictionary=feature_schedule[channel][depth]
+		if str(descriptor.get("height_map","")).is_empty():continue
+		var first:Vector2i=a.uv[channel]
+		var second:Vector2i=b.uv[channel]
+		uv[channel]=Vector2i(_midpoint_s16((_midpoint_s16(first.x)+_midpoint_s16(second.x))>>1),_midpoint_s16((_midpoint_s16(first.y)+_midpoint_s16(second.y))>>1))
+
+func _midpoint_apply_features(height:int,uv:Array,depth:int)->int:
+	var result:=height
+	for channel in range(2):
+		var descriptor:Dictionary=feature_schedule[channel][depth]
+		var height_map:String=str(descriptor.get("height_map",""))
+		if height_map.is_empty():continue
+		var coordinate:Vector2i=uv[channel]
+		var u:=_midpoint_s16(coordinate.x)
+		var v:=_midpoint_s16(coordinate.y)
+		# The original JNC after MOVSX excludes negative coordinates as unsigned.
+		if u<0 or u>=128 or v<0 or v>=128:continue
+		var index:=u+(v<<7)
+		result>>=7
+		var mask_map:String=str(descriptor.get("mask_map",""))
+		if not mask_map.is_empty():result=_s32(result*_map_sample(mask_map,index,false))
+		result=_s32(result+_s32(_map_sample(height_map,index,true)<<21))
+	return result
+
+func _midpoint(a:Dictionary,b:Dictionary,c:Dictionary,depth:int,worker:int)->Dictionary:
+	var feature_worker:bool=worker>=1858 and worker<=1865
+	var normalized:bool=worker==1849 or worker==1867 or (worker>=1854 and worker<=1857) or (worker>=1862 and worker<=1865)
+	# family0/1: jitter only changes the scalar field; family2 moves all heights;
+	# family3 moves clamped positive heights and refines the coastline one level.
+	# -1 (1849) is a sphere without scalar noise, -2 (1866/7) averages scalars.
+	var family:=-1 if worker==1849 else (-2 if worker>=1866 else ((worker-1850)&3))
+	var m:Dictionary={"p":PackedInt64Array([0,0,0]),"n":PackedInt64Array([0,0,0]),"height":0,"land":0,"depth":1,"uv":[Vector2i.ZERO,Vector2i.ZERO],"screen":Vector2i.ZERO}
+	if feature_worker:_midpoint_uv(a,b,depth,m.uv)
+	var coefficient:=0
+	if normalized:
+		var normalize_coefficient:int=_table_i32(7840,depth)
+		for axis in range(3):m.n[axis]=_qmul(_s32(int(a.n[axis])+int(b.n[axis])),normalize_coefficient)
+		coefficient=_table_i32(7839,depth)
+	else:
+		m.n=a.n.duplicate()
+	var effective_depth:=depth
+	if family==1 or family==3:
+		if _s32(_s32(int(a.height)-1)^_s32(int(b.height)-1))<0:effective_depth-=1
+	var fast:bool=effective_depth>int(a.depth) and effective_depth>int(b.depth)
+	var averaged_height:int=_avg(int(a.height),int(b.height))
+	if fast:
+		if family==3:
+			if int(a.land)!=0 or int(b.land)!=0:
+				m.land=_avg(int(a.land),int(b.land));m.height=m.land
+			else:
+				m.height=averaged_height;m.land=0
+		elif family!=-1:m.height=averaged_height
+		for axis in range(3):m.p[axis]=_avg(int(a.p[axis]),int(b.p[axis]))
+		# Packed screen correction affects only rendering fields; the flag-1 query
+		# observes physical p, scalar/land and depth, never these packed screen words.
+		if int(a.p[2])>=64 and int(b.p[2])>=64:
+			var sa:Vector2i=a.get("screen",Vector2i.ZERO)
+			var sb:Vector2i=b.get("screen",Vector2i.ZERO)
+			var sc:Vector2i=c.get("screen",Vector2i.ZERO)
+			var x:=(_midpoint_s16(sa.x)+_midpoint_s16(sb.x))>>1
+			var y:=(_midpoint_s16(sa.y)+_midpoint_s16(sb.y))>>1
+			if int(c.p[2])>64:
+				var x_order:=int(_midpoint_s16(sa.x)>_midpoint_s16(sb.x))
+				var y_order:=int(_midpoint_s16(sa.y)>_midpoint_s16(sb.y))
+				var left:int=_s32((_midpoint_s16(sc.x)-_midpoint_s16(sa.x))*(_midpoint_s16(sb.y)-_midpoint_s16(sa.y)))
+				var right:int=_s32((_midpoint_s16(sb.x)-_midpoint_s16(sa.x))*(_midpoint_s16(sc.y)-_midpoint_s16(sa.y)))
+				var table_index:=y_order*8+x_order*4+int(left>right)*2
+				var table:=7854+(worker-1849)*2
+				x+=_table_i16(table,table_index);y+=_table_i16(table+1,table_index)
+			m.screen=Vector2i(_midpoint_s16(x),_midpoint_s16(y))
+	else:
+		if family>=0:
+			m.height=_s32(averaged_height+TerrainMath.jitter(int(a.height),int(b.height),depth))
+			if feature_worker:m.height=_midpoint_apply_features(int(m.height),m.uv,depth)
+			if family==2:
+				coefficient=_s32(coefficient+(_s32(int(m.height)-averaged_height)>>3))
+			elif family==3:
+				m.land=maxi(0,int(m.height))
+				coefficient=_s32(coefficient+(_s32(int(m.land)-_avg(int(a.land),int(b.land)))>>3))
+		elif family==-2:m.height=averaged_height
+		for axis in range(3):m.p[axis]=_s32(_avg(int(a.p[axis]),int(b.p[axis]))+_qmul(int(m.n[axis]),coefficient))
+	m.depth=maxi(1,depth_control-_midpoint_msb(maxi(1024,int(m.p[2]))))
+	return m

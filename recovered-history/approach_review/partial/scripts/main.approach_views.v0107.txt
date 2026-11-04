@@ -1,0 +1,15 @@
+		if "--approach-before-view" in OS.get_cmdline_user_args() or "--approach-after-view" in OS.get_cmdline_user_args() or "--approach-low-view" in OS.get_cmdline_user_args():
+			help_panel.hide();model=Flight.new();model.docked=false;model.external_view=true;nav=Navigation.new();surface=Surface.new();planetary.configure(nav.current());planetary.site_id="site10"
+			var globe:=Surface.SphereTerrain.new();globe.configure(planetary,planetary.focus_id,planetary.site_id)
+			globe.latitude=0.45;globe.longitude=1.23
+			var entry_frame:Transform3D=NearSurfaceView.world_frame(globe,planetary,nav.elapsed_days)
+			model.position=entry_frame*Vector3(0,41900,0);model.attitude=entry_frame.basis.get_rotation_quaternion()*Quaternion(Vector3.RIGHT,-0.35);model.velocity=Vector3.ZERO
+			_apply_system();camera.position=model.position+Basis(model.attitude)*Vector3(0,22,110);camera.quaternion=model.attitude;last_external_view=true
+			if "--approach-before-view" not in OS.get_cmdline_user_args():
+				_surface_action()
+				if "--approach-low-view" in OS.get_cmdline_user_args():
+					for tick in range(1600):
+						nav.elapsed_days+=0.25/86400.0;surface.step(0.25,model,Vector2.ZERO,0)
+						if surface.altitude(model)<15000:break
+					camera.position=model.position+Basis(model.attitude)*Vector3(0,22,110);camera.quaternion=model.attitude
+			_sync_planet_visuals();set_physics_process(false)

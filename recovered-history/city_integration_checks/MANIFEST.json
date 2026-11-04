@@ -1,0 +1,84 @@
+{
+  "recovery_only": true,
+  "historical_tests_rerun": false,
+  "files": [
+    {
+      "path": "PROVENANCE.md",
+      "bytes": 6820,
+      "lines": 55,
+      "sha256": "cea76f9df3526123862d41df53263b95c8c8d6dbfa7658e9f5e7a9a01edbafdb"
+    },
+    {
+      "path": "partial/data/ffe_handcrafted_records.selected-native-records.txt",
+      "bytes": 1007,
+      "lines": 1,
+      "sha256": "2960b69a7b445a85d5415743269f9198dcab02d84b84f53193a6a0550ff4c09b"
+    },
+    {
+      "path": "partial/scripts/flight_model.gd.lines001-105.txt",
+      "bytes": 4334,
+      "lines": 105,
+      "sha256": "1a96f370c59f4d27b1c2f6050336331bd15e7dcf48792d729b0504077710e21c"
+    },
+    {
+      "path": "partial/scripts/planetary_system.gd.lines001-140.txt",
+      "bytes": 7151,
+      "lines": 140,
+      "sha256": "2782b838c6082b2cdf0d38b455dac079808a434f2fef3698a739480c888674a5"
+    },
+    {
+      "path": "partial/scripts/surface_model.gd.lines075-150.txt",
+      "bytes": 4414,
+      "lines": 76,
+      "sha256": "69ba1267fc6a8192fd7a625bd8878489d9158a04ebb7ea242e837dee2ab67a47"
+    },
+    {
+      "path": "partial/scripts/surface_model.gd.lines151-208.txt",
+      "bytes": 3512,
+      "lines": 58,
+      "sha256": "41442cc8d728934abe9355bd4401b949e13d28a65224a61cf2c5a672cb9b9302"
+    },
+    {
+      "path": "partial/scripts/surface_model.gd.lines245-325.earlier.txt",
+      "bytes": 4855,
+      "lines": 81,
+      "sha256": "ff8f7912b281c51e6af2bce8c0ed24ef8cd4251e6b6a9e7d7706f5c8ca126121"
+    },
+    {
+      "path": "partial/scripts/surface_model.gd.lines325-390.later.txt",
+      "bytes": 3511,
+      "lines": 66,
+      "sha256": "ce6f507946e714fd7f7170884696a6b5aa395e61da63f3e6aa34223e6bda0ac9"
+    },
+    {
+      "path": "partial/scripts/surface_model.gd.lines398-488.txt",
+      "bytes": 6237,
+      "lines": 91,
+      "sha256": "d676d6f9c2aa1d27fc03c8083c1dce35d650c772ee4fc6d1c6ec8a1b95edc97a"
+    },
+    {
+      "path": "partial/scripts/surface_model.gd.lines489-545.txt",
+      "bytes": 3620,
+      "lines": 57,
+      "sha256": "60bc83791fcbc34f094a756e6a207fd027167daf4c59e480d329db7ac94662bc"
+    },
+    {
+      "path": "scripts/original_worlds.gd",
+      "bytes": 5911,
+      "lines": 90,
+      "sha256": "254dde12555bac40dc751d161fb347f6da5f9a3ac8fce29630c0dde8aa64f10a"
+    },
+    {
+      "path": "scripts/ship_catalog.gd",
+      "bytes": 337,
+      "lines": 11,
+      "sha256": "923ebbabb6a99bf8f03a142b790f75776c89004511cc7433c5116f972e9c6abb"
+    },
+    {
+      "path": "tests/test_source_city_integration.gd",
+      "bytes": 18452,
+      "lines": 239,
+      "sha256": "4192be569854011a395bd0c82722925fbd5aab94881d9c3882776726e82127f4"
+    }
+  ]
+}

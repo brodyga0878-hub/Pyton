@@ -1,0 +1,58 @@
+func _sync_planet_visuals()->void:
+	var draw:RefCounted=surface if surface.active else null
+	if surface.active:near_surface_view.clear()
+	elif near_surface_view.update(surface,model,planetary,nav.elapsed_days):draw=near_surface_view.drawing
+	var preview:bool=near_surface_view.active
+	var local_high:bool=surface.active and surface.globe!=null and surface.extended_flight
+	var layered:bool=preview or local_high
+	var frame:Transform3D=near_surface_view.frame if preview else (NearSurfaceView.world_frame(surface.globe,planetary,nav.elapsed_days) if local_high else Transform3D.IDENTITY)
+	var to_scene:Transform3D=frame.affine_inverse() if local_high else Transform3D.IDENTITY
+	var observer:Vector3=frame*model.position if local_high else model.position
+	var blend:float=near_surface_view.space_blend if preview else (NearSurfaceView.far_blend(surface.geoid_height(model)) if local_high else 0.0)
+	position=-model.position if not surface.active else Vector3.ZERO
+	surface_root.visible=draw!=null
+	surface_root.transform=near_surface_view.frame if preview else Transform3D.IDENTITY
+	if layered:
+		# The same physical sky is expressed in orbital or local coordinates on either
+		# side of entry. Keeping the planet underneath avoids holes at high horizons.
+		var turn:Quaternion=frame.basis.get_rotation_quaternion().slerp(Quaternion.IDENTITY,blend)
+		var star_origin:Vector3=frame.origin.lerp(observer,blend)
+		star_field.transform=to_scene*Transform3D(Basis(turn).scaled(Vector3.ONE*32.0),observer+(star_origin-observer)*32.0)
+	else:
+		star_field.transform=Transform3D(Basis.IDENTITY,model.position if not surface.active else Vector3.ZERO)
+	celestial_root.transform=to_scene
+	celestial_root.visible=not surface.active or local_high
+	celestial_root.set_surface_transition(layered,blend if layered else 1.0)
+	station_root.visible=_station_here() and not preview;drone.visible=station_root.visible
+	var key:="space" if draw==null else ("preview:" if preview else "surface:")+str(draw.kind)+":"+str(device_settings.quality)
+	if key!=presentation_key:
+		world_presentation.apply(world_environment.environment,draw if draw!=null else surface,device_settings.quality)
+		presentation_key=key
+	var sky_basis:Basis=to_scene.basis*Basis(frame.basis.get_rotation_quaternion().slerp(Quaternion.IDENTITY,blend)) if layered else Basis.IDENTITY
+	world_environment.environment.sky_rotation=sky_basis.get_euler()
+	if draw!=null:
+		surface_root.configure(draw)
+		surface_root.set_view_coverage(1.0-blend if layered else 1.0)
+		var height:float=near_surface_view.height if preview else surface.altitude(model)
+		camera.far=6000000.0 if draw.extended_flight else 180000.0
+		camera.near=2.0 if height>5000 else 0.5
+		world_presentation.update_height(world_environment.environment,draw,height,device_settings.quality,blend)
+		star_field.visible=draw.kind!="earth" or (draw.extended_flight and height>15000)
+		var local_light:=Basis.from_euler(Vector3(-50,-30,0)*PI/180.0)
+		if layered:
+			var sunlight:Vector3=planetary.local_meters("star",nav.elapsed_days)-observer
+			var direction:Vector3=sunlight.normalized()
+			var far_light:Basis=Basis.looking_at(-direction,Vector3.UP if absf(direction.y)<0.98 else Vector3.RIGHT)
+			var close_light:Basis=frame.basis*local_light
+			sun_light.basis=to_scene.basis*Basis(close_light.get_rotation_quaternion().slerp(far_light.get_rotation_quaternion(),blend))
+		else:sun_light.basis=local_light
+	else:
+		camera.far=180000.0;camera.near=0.5;star_field.visible=true
+	_update_celestial_view()
+
+func _update_celestial_view()->void:
+	if not celestial_root.visible:return
+	var observer:Vector3=camera.position
+	if surface.active and surface.globe:
+		observer=NearSurfaceView.world_frame(surface.globe,planetary,nav.elapsed_days)*observer
+	celestial_root.update_view(nav.elapsed_days,observer)

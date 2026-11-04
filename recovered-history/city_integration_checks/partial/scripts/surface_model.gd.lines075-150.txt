@@ -1,0 +1,76 @@
+	if system.transfer_remaining>0:return "Сначала отмените перелёт."
+	var body: Dictionary=system.by_id[system.focus_id]
+	if str(body.kind) in ["star","barycenter","gas","ice_gas"]:return "У этого объекта нет доступной твёрдой поверхности."
+	if ship.velocity.length()>20:return "Затормозите до 20 м/с."
+	var g:=G*float(body.mass_solar)*SOLAR_MASS/pow(float(body.radius_km)*1000,2)
+	if g>ship.acceleration()*0.8:return "Недостаточно тяги для безопасного взлёта при этой гравитации."
+	return ""
+
+func enter(ship: RefCounted, system: RefCounted, spherical:=false, terrain_revision:String=SphereTerrain.CURRENT_REVISION) -> bool:
+	message=entry_error(ship,system)
+	if message!="":return false
+	if spherical and not SphereTerrain.supports_revision(terrain_revision):message="Неизвестная ревизия поверхности.";return false
+	var body: Dictionary=system.by_id[system.focus_id]
+	var site:Dictionary=system.current_site()
+	var candidate_globe:RefCounted=null
+	var prepared:Dictionary={"ok":true,"data":{}}
+	if spherical:
+		candidate_globe=SphereTerrain.new();candidate_globe.configure(system,system.focus_id,system.site_id,terrain_revision)
+		prepared=_prepare_city(candidate_globe,site)
+		if not prepared.ok:message=str(prepared.error);return false
+	body_id=system.focus_id
+	kind=str(body.kind)
+	seed_value=system.system_id^body_id.hash()
+	site_name=""
+	if not site.is_empty() and int(site.type_code)==35:
+		seed_value^=str(site.id).hash();site_name=str(site.name)
+	orbit_link={}
+	extended_flight=false;flight_phase="";ready_for_orbit=false
+	globe=candidate_globe;frame_index=0;city_data=prepared.data
+	gravity=G*float(body.mass_solar)*SOLAR_MASS/pow(float(body.radius_km)*1000,2)
+	orbit_position=ship.position;orbit_attitude=ship.attitude
+	active=true;landed=false;landing=false
+	ship.surface_mode=true;ship.station_available=false;ship.autopilot=false
+	ship.position=Vector3(0,1500,800)
+	if globe and globe.revision==SphereTerrain.CITY_REVISION:ship.position.y=height_at(0,800)+clearance(ship)+1500.0
+	ship.velocity=Vector3.ZERO;ship.target_speed=0;ship.assisted=true
+	ship.attitude=Quaternion(Vector3.RIGHT,-0.35)
+	if globe:recenter(ship)
+	message="Посадочная зона: %s. «Автопилот» — заход; «Стыковка» — мягкая посадка."%(site_name if not site_name.is_empty() else body.name)
+	return true
+
+func _prepare_city(terrain:RefCounted,site:Dictionary)->Dictionary:
+	if terrain==null or terrain.revision!=SphereTerrain.CITY_REVISION:return {"ok":true,"data":{}}
+	if site.is_empty() or int(site.get("type_code",-1))!=35 or int(site.get("model_index",-1))<81 or int(site.get("model_index",-1))>90:return {"ok":true,"data":{}}
+	var profile:Dictionary=terrain.city_profiles.get(str(site.id),{})
+	if profile.is_empty():return {"ok":false,"error":"Нет проверенных данных исходного города."}
+	var prepared:Dictionary=CityRuntime.prepare(profile)
+	if not prepared.get("ok",false):return {"ok":false,"error":"Не удалось подготовить исходный город: "+str(prepared.get("error","неизвестная ошибка"))}
+	return {"ok":true,"data":prepared}
+func bind_city(site:Dictionary)->bool:
+	var prepared:=_prepare_city(globe,site)
+	if not prepared.ok:message=str(prepared.error);return false
+	city_data=prepared.data
+	return true
+
+func begin_landing(ship: RefCounted) -> bool:
+	if not active or landed or ship.hull<=0:return false
+	cancel_vertical()
+	taking_off=false
+	landing=not landing
+	ship.autopilot=false;ship.target_speed=0
+	message="Автоматический заход на площадку." if landing else "Заход отменён."
+	return true
+
+func step(dt: float, ship: RefCounted, steering: Vector2, roll: float, lift := 0.0) -> void:
+	if not active or dt<=0 or ship.hull<=0:return
+	if landed:
+		ship.velocity=Vector3.ZERO;ship.target_speed=0
+		return
+	var previous:Vector3=ship.position
+	if not flight_phase.is_empty() and (steering.length()>0.05 or absf(roll)>0.05 or absf(lift)>0.1):cancel_vertical()
+	if absf(lift)>0.1:landing=false;taking_off=false
+	if not flight_phase.is_empty():
+		_step_vertical(dt,ship)
+	elif taking_off:
+		ship.velocity=ship.velocity.move_toward(Vector3.UP*15,maxf(0.1,ship.acceleration()-gravity)*dt)

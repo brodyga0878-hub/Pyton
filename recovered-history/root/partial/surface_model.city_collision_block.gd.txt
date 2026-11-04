@@ -1,0 +1,39 @@
+func buildings()->Array[AABB]:
+	var result:Array[AABB]=[]
+	if site_name.is_empty():return result
+	var pad:=pad_position()
+	if globe and Vector2(pad.x,pad.z).length()>GRID_WIDTH:return result
+	for i in range(10):
+		var height:=20.0+float((seed_value+i*53)&63)
+		var x:=float(-180 if i<5 else 180);var z:=float((i%5)*130-260)
+		x+=pad.x;z+=pad.z
+		result.append(AABB(Vector3(x-16,height_at(x,z),z-20),Vector3(32,height,40)))
+	return result
+func collision_radius(ship:RefCounted)->float:return float(ship.profile().visual_span_m)*0.55
+func overlaps_building(ship:RefCounted)->bool:
+	for box in buildings():
+		if box.grow(collision_radius(ship)-0.02).has_point(ship.position):return true
+	return false
+func evacuate_building(ship:RefCounted)->void:
+	for box in buildings():
+		var expanded:AABB=box.grow(collision_radius(ship))
+		if expanded.has_point(ship.position):ship.position.y=expanded.end.y+0.05
+	ship.velocity=Vector3.ZERO;ship.target_speed=0;ship.autopilot=false
+func _clip_buildings(previous:Vector3,ship:RefCounted)->void:
+	var best:Dictionary={};var first:=2.0
+	for box in buildings():
+		var expanded:AABB=box.grow(collision_radius(ship))
+		var contact:=SegmentBox.intersect(previous,ship.position,expanded)
+		if not contact.is_empty() and float(contact.time)<first:
+			best=contact;first=float(contact.time)
+			if contact.inside:best.position=Vector3(previous.x,expanded.end.y+0.05,previous.z)
+	if best.is_empty():return
+	ship.position=Vector3(best.position)+Vector3(best.normal)*0.05
+	var inward:float=ship.velocity.dot(best.normal)
+	if inward<0:
+		ship.hull=maxf(0,ship.hull-maxf(0,-inward-6)*2)
+		ship.velocity-=Vector3(best.normal)*inward
+	ship.brake();landing=false;taking_off=false
+	message="Столкновение со зданием. Снизьте скорость и отойдите от фасада."
+
+func grid_cells()->int:return 64 if globe else GRID_CELLS
