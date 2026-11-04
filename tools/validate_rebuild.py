@@ -40,10 +40,13 @@ class Suite:
     kind: str = 'godot'
     timeout: int = 180
     optional: bool = False
+    user_args: tuple[str, ...] = ()
 
 
 SUITES = [
     Suite('math', 'tests/test_rebuilt_ffe_math.gd', 'Reconstructed source integer and packed arithmetic, independent native controls.'),
+    Suite('body_initializer', 'tests/test_rebuilt_body_initializer.gd', 'Complete original F882 packed-record initialization versus 1424 native contexts; isolated from the live analytic world and ephemerides.'),
+    Suite('body_rotation', 'tests/test_rebuilt_body_rotation.gd', 'Exact F880 initialization/F866 orientation slice with F1675/F1914/F1521 versus 1542 native contexts; excludes full F866, original clock epoch, animations and orbital updates.'),
     Suite('worlds', 'tests/test_rebuilt_worlds.gd', 'Handcrafted original records and explicit analytic world/navigation adapter.'),
     Suite('flight', 'tests/test_rebuilt_flight.gd', 'Rebuilt flight, phone steering inputs, adapted training economy, atomic flight saves.'),
     Suite('cities', 'tests/test_rebuilt_cities.gd', 'Source3 city geometry, pad selection, collision, landing/takeoff/restore integration.'),
@@ -52,7 +55,8 @@ SUITES = [
     Suite('triangle_ccd', 'tests/test_segment_triangle.gd', 'Independent triangle/edge/vertex swept ellipsoid collision controls.'),
     Suite('ground_pads', 'recovered-history/ground_harness/tests/test_source_ground_pads.gd', 'Preserved test explicitly loaded against current scripts and regenerated native F650 controls.'),
     Suite('terrain_native', 'tools/data_validate_terrain.py', 'Isolated preserved terrain research modules versus 336 raw and 630 native caller controls; not live terrain integration.', kind='python', timeout=300),
-    Suite('save_touch', 'tests/test_rebuilt_save_touch.gd', 'Current complete save-store decoding, atomic writes/fallback and multi-finger phone input/release behavior; separate from app/device smoke.', optional=True),
+    Suite('save_touch', 'tests/test_rebuilt_save_touch.gd', 'Current complete save-store decoding, atomic writes/fallback and multi-finger phone input/release behavior; separate from app/device smoke.'),
+    Suite('app_transitions', 'tests/test_rebuilt_app_transitions.gd', 'Actual Main transition locks, pending-save resume and asynchronous New Moscow entry; capture mode disables user progress loading/writing.', user_args=('--rebuild-capture',)),
 ]
 
 
@@ -114,6 +118,16 @@ def fingerprint(path: Path) -> dict:
     return {'path': str(path.relative_to(PROJECT)), 'bytes': len(raw), 'sha256': hashlib.sha256(raw).hexdigest()}
 
 
+def engine_version(value: str) -> str:
+    # Startup font-cache diagnostics can appear on stderr before --version.
+    # Compare the actual version line, not the unrelated combined probe output.
+    candidates = [line.strip() for line in value.splitlines()
+                  if re.fullmatch(r'\d+\.\d+(?:\.[A-Za-z0-9_+-]+)*', line.strip())]
+    if len(candidates) != 1:
+        raise ValueError('Godot did not return one unambiguous engine version')
+    return candidates[0]
+
+
 def run_suite(suite: Suite, godot: str, output: Path, max_bytes: int) -> dict:
     script = PROJECT/suite.script
     result = {'name': suite.name, 'scope': suite.scope, 'status': 'failed', 'checks': 0, 'failures': 0,
@@ -124,6 +138,8 @@ def run_suite(suite: Suite, godot: str, output: Path, max_bytes: int) -> dict:
     result['suite_source'] = fingerprint(script)
     command = ([sys.executable, str(script), '--godot', godot] if suite.kind == 'python' else
                [godot, '--headless', '--path', str(PROJECT), '--script', 'res://'+suite.script])
+    if suite.user_args:
+        command.extend(['--', *suite.user_args])
     state = output/'state'/suite.name
     environment = dict(os.environ, XDG_DATA_HOME=str(state/'data'), XDG_CACHE_HOME=str(state/'cache'),
                        XDG_CONFIG_HOME=str(state/'config'))
@@ -248,8 +264,14 @@ def main():
                 parser.error('Previously tested suite source changed: %s; start a fresh relevant validation run' % row['name'])
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
-    version = subprocess.run([godot, '--version'], text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=10, check=True).stdout.strip()
-    if previous is not None and previous.get('godot_version') != version:
+    probe_state = output/'state'/'runner'
+    for name in ['data', 'cache', 'config']:
+        (probe_state/name).mkdir(parents=True, exist_ok=True)
+    probe_env = dict(os.environ, XDG_DATA_HOME=str(probe_state/'data'), XDG_CACHE_HOME=str(probe_state/'cache'),
+                     XDG_CONFIG_HOME=str(probe_state/'config'))
+    version = engine_version(subprocess.run([godot, '--version'], env=probe_env, text=True, stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT, timeout=10, check=True).stdout)
+    if previous is not None and engine_version(previous.get('godot_version', '')) != version:
         parser.error('Existing summary used another Godot version; start a fresh validation run')
     started_utc = dt.datetime.now(dt.timezone.utc).isoformat()
     started = time.monotonic()
@@ -278,8 +300,12 @@ def main():
     # A missing optional new suite is a visible coverage limitation, not a pass.
     batch_duration = round(time.monotonic()-started, 3)
     batches = [] if previous is None else previous.get('validation_batches', [{'started_utc': previous['started_utc'],
-                 'duration_seconds': previous['duration_seconds'], 'executed_suites': [row['name'] for row in previous['suites']]}])
-    batches.append({'started_utc': started_utc, 'duration_seconds': batch_duration, 'executed_suites': executed_names})
+                 'duration_seconds': previous['duration_seconds'],
+                 'requested_suites': [row['name'] for row in previous['suites']],
+                 'executed_suites': [row['name'] for row in previous['suites'] if row.get('command')]}])
+    batches.append({'started_utc': started_utc, 'duration_seconds': batch_duration,
+                    'requested_suites': executed_names,
+                    'executed_suites': [name for name in executed_names if results[name].get('command')]})
     coverage = limitations()
     report = {'schema': 1, 'scope': 'Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.',
               'started_utc': previous['started_utc'] if previous else started_utc,

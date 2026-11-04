@@ -1,0 +1,470 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-04T20:10:01.615905+00:00",
+  "updated_utc": "2026-11-04T20:20:27.711753+00:00",
+  "duration_seconds": 14.101,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-04T20:10:01.615905+00:00",
+      "duration_seconds": 10.442,
+      "executed_suites": [
+        "math",
+        "worlds",
+        "flight",
+        "cities",
+        "city_runtime",
+        "city_view",
+        "triangle_ccd",
+        "ground_pads",
+        "terrain_native"
+      ],
+      "requested_suites": [
+        "math",
+        "worlds",
+        "flight",
+        "cities",
+        "city_runtime",
+        "city_view",
+        "triangle_ccd",
+        "ground_pads",
+        "terrain_native",
+        "save_touch"
+      ],
+      "unavailable_suites": [
+        "save_touch"
+      ]
+    },
+    {
+      "started_utc": "2026-11-04T20:12:26.563980+00:00",
+      "duration_seconds": 0.421,
+      "executed_suites": [
+        "save_touch"
+      ],
+      "requested_suites": [
+        "save_touch"
+      ]
+    },
+    {
+      "started_utc": "2026-11-04T20:13:25.175504+00:00",
+      "duration_seconds": 2.748,
+      "executed_suites": [
+        "app_transitions"
+      ],
+      "requested_suites": [
+        "app_transitions"
+      ]
+    },
+    {
+      "started_utc": "2026-11-04T20:15:02.160858+00:00",
+      "duration_seconds": 0.238,
+      "requested_suites": [
+        "body_initializer"
+      ],
+      "executed_suites": [
+        "body_initializer"
+      ]
+    },
+    {
+      "started_utc": "2026-11-04T20:20:27.459323+00:00",
+      "duration_seconds": 0.252,
+      "requested_suites": [
+        "body_rotation"
+      ],
+      "executed_suites": [
+        "body_rotation"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 1,
+  "status": "passed_with_coverage_limitations",
+  "passed_suites": 13,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 212493,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "math",
+      "scope": "Reconstructed source integer and packed arithmetic, independent native controls.",
+      "status": "passed",
+      "checks": 142987,
+      "failures": 0,
+      "suite_source": {
+        "path": "tests/test_rebuilt_ffe_math.gd",
+        "bytes": 2283,
+        "sha256": "c8e28258eceeaa1d2b6d3069851ee6929b8c4c2c71a4a956c7004e370ac15318"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_ffe_math.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.33,
+      "timed_out": false,
+      "output_bytes": 123,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/math.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "body_initializer",
+      "scope": "Complete original F882 packed-record initialization versus 1424 native contexts; isolated from the live analytic world and ephemerides.",
+      "status": "passed",
+      "checks": 5723,
+      "failures": 0,
+      "executed_utc": "2026-11-04T20:15:02.162628+00:00",
+      "suite_source": {
+        "path": "tests/test_rebuilt_body_initializer.gd",
+        "bytes": 3568,
+        "sha256": "c0956a4714dd28e4e2ecbdca05725c8902ae3dc2ff30589c54b037e871a70d68"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_body_initializer.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.235,
+      "timed_out": false,
+      "output_bytes": 171,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/body_initializer.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "body_rotation",
+      "scope": "Exact F880 initialization/F866 orientation slice with F1675/F1914/F1521 versus 1542 native contexts; excludes full F866, original clock epoch, animations and orbital updates.",
+      "status": "passed",
+      "checks": 10799,
+      "failures": 0,
+      "executed_utc": "2026-11-04T20:20:27.463339+00:00",
+      "suite_source": {
+        "path": "tests/test_rebuilt_body_rotation.gd",
+        "bytes": 3846,
+        "sha256": "c587765035263c604d1a0cfa316fb8a3360628ea8a39ca3cc7ab0d5321ed8d0b"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_body_rotation.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.247,
+      "timed_out": false,
+      "output_bytes": 164,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/body_rotation.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "worlds",
+      "scope": "Handcrafted original records and explicit analytic world/navigation adapter.",
+      "status": "passed",
+      "checks": 719,
+      "failures": 0,
+      "suite_source": {
+        "path": "tests/test_rebuilt_worlds.gd",
+        "bytes": 8348,
+        "sha256": "ef5fb5442062e2c617d35386a69fbb910a28b54640d58d33571ff5b572ee179b"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_worlds.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.237,
+      "timed_out": false,
+      "output_bytes": 117,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/worlds.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "flight",
+      "scope": "Rebuilt flight, phone steering inputs, adapted training economy, atomic flight saves.",
+      "status": "passed",
+      "checks": 94,
+      "failures": 0,
+      "suite_source": {
+        "path": "tests/test_rebuilt_flight.gd",
+        "bytes": 11797,
+        "sha256": "4866c51adf55cf9f4ad31f0fdb17ddc10c26a76e0052a2357d64e085e5ef4e57"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_flight.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.137,
+      "timed_out": false,
+      "output_bytes": 117,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/flight.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "cities",
+      "scope": "Source3 city geometry, pad selection, collision, landing/takeoff/restore integration.",
+      "status": "passed",
+      "checks": 374,
+      "failures": 0,
+      "suite_source": {
+        "path": "tests/test_rebuilt_cities.gd",
+        "bytes": 20832,
+        "sha256": "b7cb4566b09c4c4a3b6e8b4ebd23e9e62b4c076c866f8b78927065960cab6b64"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_cities.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 10.3,
+      "timed_out": false,
+      "output_bytes": 170,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/cities.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "city_runtime",
+      "scope": "Original city runtime and analytic ellipsoid collision controls.",
+      "status": "passed",
+      "checks": 45,
+      "failures": 0,
+      "suite_source": {
+        "path": "tests/test_source_city_runtime.gd",
+        "bytes": 10432,
+        "sha256": "29927274559d761dada752d1af5d4425b30ca7247a2d819bc7d6a9f4e906cc31"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_city_runtime.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.011,
+      "timed_out": false,
+      "output_bytes": 122,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/city_runtime.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "city_view",
+      "scope": "City rendering lifetime and presentation contract with synthetic geometry.",
+      "status": "passed",
+      "checks": 33,
+      "failures": 0,
+      "suite_source": {
+        "path": "tests/test_source_city_view.gd",
+        "bytes": 6655,
+        "sha256": "d3ecbbbfeb4ee0e6e650980ca65b716621ea6d82115a3de6c54cd7cf9134ec2f"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_city_view.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.243,
+      "timed_out": false,
+      "output_bytes": 144,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/city_view.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "triangle_ccd",
+      "scope": "Independent triangle/edge/vertex swept ellipsoid collision controls.",
+      "status": "passed",
+      "checks": 144,
+      "failures": 0,
+      "suite_source": {
+        "path": "tests/test_segment_triangle.gd",
+        "bytes": 9681,
+        "sha256": "ef35496233fb895ce0e46bcb0446d4e051100b12346df64e9530a13074b978c6"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_segment_triangle.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.137,
+      "timed_out": false,
+      "output_bytes": 120,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/triangle_ccd.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "ground_pads",
+      "scope": "Preserved test explicitly loaded against current scripts and regenerated native F650 controls.",
+      "status": "passed",
+      "checks": 42167,
+      "failures": 0,
+      "suite_source": {
+        "path": "recovered-history/ground_harness/tests/test_source_ground_pads.gd",
+        "bytes": 3763,
+        "sha256": "fce15e08f304f86478bb0f4ddfcef7e8343d8f2c2088f83e17807bfec2857842"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://recovered-history/ground_harness/tests/test_source_ground_pads.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.698,
+      "timed_out": false,
+      "output_bytes": 123,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/ground_pads.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "terrain_native",
+      "scope": "Isolated preserved terrain research modules versus 336 raw and 630 native caller controls; not live terrain integration.",
+      "status": "passed",
+      "checks": 9285,
+      "failures": 0,
+      "suite_source": {
+        "path": "tools/data_validate_terrain.py",
+        "bytes": 5190,
+        "sha256": "7be3ac1903f182dd650db94cdcb204102fe09079f797c3d3e4970c1b30c058cf"
+      },
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/Pyton/tools/data_validate_terrain.py",
+        "--godot",
+        "/usr/local/bin/godot"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.863,
+      "timed_out": false,
+      "output_bytes": 165,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/terrain_native.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "save_touch",
+      "scope": "Current complete save-store decoding, atomic writes/fallback and multi-finger phone input/release behavior; separate from app/device smoke.",
+      "status": "passed",
+      "checks": 69,
+      "failures": 0,
+      "executed_utc": "2026-11-04T20:12:26.565637+00:00",
+      "suite_source": {
+        "path": "tests/test_rebuilt_save_touch.gd",
+        "bytes": 16016,
+        "sha256": "42f0917b1f6b2c44ac84d197e706c7cafb8e99b4af6986f91fee8cf914f53bce"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_save_touch.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.419,
+      "timed_out": false,
+      "output_bytes": 121,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/save_touch.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "app_transitions",
+      "scope": "Actual Main transition locks, pending-save resume and asynchronous New Moscow entry; capture mode disables user progress loading/writing.",
+      "status": "passed",
+      "checks": 54,
+      "failures": 0,
+      "executed_utc": "2026-11-04T20:13:25.177048+00:00",
+      "suite_source": {
+        "path": "tests/test_rebuilt_app_transitions.gd",
+        "bytes": 10994,
+        "sha256": "36420e4a3cfb6cfc5c94334ebf71ca031f11fd8b4d02aa257155770d6eb002b9"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_app_transitions.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.745,
+      "timed_out": false,
+      "output_bytes": 120,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/app_transitions.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "unavailable",
+      "reason": "The preserved tests/test_source_model_mesh.gd requires model_vertices_reference.json; original city geometry is exercised by the current city suites, which does not replace this missing independent leaf fixture."
+    },
+    {
+      "scope": "Full application, Android installation and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner covers current standalone suites and isolated native terrain controls only."
+    }
+  ]
+}

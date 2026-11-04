@@ -1,0 +1,31 @@
+Verified cached platform35
+Verified cached build-tools
+Verified cached platform-tools
+Verified cached jdk17
+Verified cached godot-templates
+openjdk version "17.0.16" 2025-07-15
+OpenJDK Runtime Environment Temurin-17.0.16+8 (build 17.0.16+8)
+OpenJDK 64-Bit Server VM Temurin-17.0.16+8 (build 17.0.16+8, mixed mode, sharing)
+javac 17.0.16
+Android Debug Bridge version 1.0.41
+Version 37.0.2-16765528
+Installed as /workspace/toolchains/android-sdk/platform-tools/adb
+Running on Linux 6.18.57 (x86_64)
+{
+  "godot": "4.6.3.stable",
+  "java_home": "/workspace/toolchains/jdk17",
+  "android_sdk": "/workspace/toolchains/android-sdk",
+  "build_tools": "/workspace/toolchains/android-sdk/build-tools/36.0.0",
+  "templates": "/workspace/toolchains/godot-data/godot/export_templates/4.6.3.stable",
+  "test_keystore": "/workspace/toolchains/keys/starfrontier-rebuild-test.keystore",
+  "test_alias": "starfrontier-rebuild-test",
+  "test_key_only": true,
+  "production_signing": false,
+  "emulator_installed": false
+}
+flight: passed; 94 checks, 0 failures
+worlds: passed; 719 checks, 0 failures
+Validation passed_with_coverage_limitations: 813 current checks; 2 passed suites; 0 failed; 0 unavailable. Report: build/setup-validation.json
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+REBUILD APP SMOKE PASS: native source Sol/Earth, training auto dock/delivery, original New Moscow84 entry/landing, atomic disk save/reload, persistent original city view

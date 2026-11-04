@@ -44,7 +44,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
         names=archive.namelist()
         assert sorted({n.split('/')[1] for n in names if n.startswith('lib/')})==['arm64-v8a'],'APK is not ARM64-only'
         assert not any(n.lower().endswith(('.exe','.asm','.keystore','.jks','.argosmodel')) for n in names),'Non-runtime/secret file in APK'
-        forbidden=['assets/tests/','assets/tools/','assets/docs/','assets/recovered-history/','assets/recovery/','assets/validation/','assets/localization/']
+        forbidden=['assets/tests/','assets/tools/','assets/docs/','assets/recovered-history/','assets/recovery/','assets/validation/','assets/deliverables/','assets/localization/']
         assert not any(n.startswith(tuple(forbidden)) for n in names),'Development history included in APK'
         if not smoke:
             for name in ['ffe_worlds','ffe_world_models','ffe_ship_registry','ffe_ground_coordinates','ffe_ground_pads']:

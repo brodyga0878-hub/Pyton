@@ -1,141 +1,340 @@
 {
-  "scope": "Starting selection of preserved code; new code tracked separately in Git",
+  "scope": "Current runtime provenance against the initial selected recovered files. A modified file is not a byte-exact recovery of the former latest version. New reconstruction entries may preserve documented fragments.",
   "files": [
     {
       "path": "scripts/surface_model.gd",
-      "recovered_from": "recovered-history/geographic_descent_model/scripts/surface_model.gd"
+      "recovered_from": "recovered-history/geographic_descent_model/scripts/surface_model.gd",
+      "current_sha256": "524c3e6fe09e4572b8c7913c2265fa085595c6fd40907ab6256cf77177862ad1",
+      "byte_equal_to_selected_history": false,
+      "current_kind": "modified_or_reassembled_historical_module"
     },
     {
       "path": "scripts/spherical_terrain.gd",
-      "recovered_from": "recovered-history/geographic_descent_model/scripts/spherical_terrain.gd"
+      "recovered_from": "recovered-history/geographic_descent_model/scripts/spherical_terrain.gd",
+      "current_sha256": "6da1c61aac47df2f8921ab459a962c9853bd5d327c86264d7fc28c46b8d7986e",
+      "byte_equal_to_selected_history": false,
+      "current_kind": "modified_or_reassembled_historical_module"
     },
     {
       "path": "scripts/surface_orbit_link.gd",
-      "recovered_from": "recovered-history/geographic_descent_model/scripts/surface_orbit_link.gd"
+      "recovered_from": "recovered-history/geographic_descent_model/scripts/surface_orbit_link.gd",
+      "current_sha256": "6a358b2030a0480035caa7a5263d0db96385394740672b18b18a306c30bec12c",
+      "byte_equal_to_selected_history": false,
+      "current_kind": "modified_or_reassembled_historical_module"
     },
     {
       "path": "scripts/near_surface_view.gd",
-      "recovered_from": "recovered-history/geographic_descent_model/scripts/near_surface_view.gd"
+      "recovered_from": "recovered-history/geographic_descent_model/scripts/near_surface_view.gd",
+      "current_sha256": "d19aeb3d71fbb17a8fa03a54e0c7a51efa5d7cd9ba99694b6a1d317efbf213f8",
+      "byte_equal_to_selected_history": false,
+      "current_kind": "modified_or_reassembled_historical_module"
     },
     {
       "path": "scripts/celestial_renderer.gd",
-      "recovered_from": "recovered-history/geographic_descent_model/scripts/celestial_renderer.gd"
+      "recovered_from": "recovered-history/geographic_descent_model/scripts/celestial_renderer.gd",
+      "current_sha256": "94a658884866b427921d87dc400ca5680cb9257b346bed92062b8d8639e9b8f6",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/world_presentation.gd",
-      "recovered_from": "recovered-history/geographic_descent_model/scripts/world_presentation.gd"
+      "recovered_from": "recovered-history/geographic_descent_model/scripts/world_presentation.gd",
+      "current_sha256": "06ca6bdd7d156f7c71e8854ed5363996cfb72468dc6acf2389f02ca1c64aa828",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/segment_box.gd",
-      "recovered_from": "recovered-history/geography_regression/scripts/segment_box.gd"
+      "recovered_from": "recovered-history/geography_regression/scripts/segment_box.gd",
+      "current_sha256": "c859146608a6e8208620078a12742c07e1fdafa04761ec5abcffa2cfd0501fad",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/segment_triangle.gd",
-      "recovered_from": "recovered-history/geography_regression/scripts/segment_triangle.gd"
+      "recovered_from": "recovered-history/geography_regression/scripts/segment_triangle.gd",
+      "current_sha256": "c1f000e1481ba9654ab9cf27db7b30e6eaeef46a35d533a01dffb2d86bece346",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "tests/test_segment_triangle.gd",
-      "recovered_from": "recovered-history/geography_regression/tests/test_segment_triangle.gd"
+      "recovered_from": "recovered-history/geography_regression/tests/test_segment_triangle.gd",
+      "current_sha256": "ef35496233fb895ce0e46bcb0446d4e051100b12346df64e9530a13074b978c6",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/surface_visual.gd",
-      "recovered_from": "recovered-history/worlds_completion_audit/scripts/surface_visual.gd"
+      "recovered_from": "recovered-history/worlds_completion_audit/scripts/surface_visual.gd",
+      "current_sha256": "3120036bddce0318d5d3c1131ba1ce4a2932a82b7dd2ce0e4f11b43c8e6a7712",
+      "byte_equal_to_selected_history": false,
+      "current_kind": "modified_or_reassembled_historical_module"
     },
     {
       "path": "scripts/device_settings.gd",
-      "recovered_from": "recovered-history/worlds_completion_audit/scripts/device_settings.gd"
+      "recovered_from": "recovered-history/worlds_completion_audit/scripts/device_settings.gd",
+      "current_sha256": "890be6e61f0bb5d3cdc1fbceed75ba546485d85b46daf1dbde02da4897559c42",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/source_city_view.gd",
-      "recovered_from": "recovered-history/worlds_completion_audit/scripts/source_city_view.gd"
+      "recovered_from": "recovered-history/worlds_completion_audit/scripts/source_city_view.gd",
+      "current_sha256": "c381e770fa25b3dad3606ab799dc15e12a2bf52d8d54e7edf727b532a023796d",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "tests/test_source_city_view.gd",
-      "recovered_from": "recovered-history/worlds_completion_audit/tests/test_source_city_view.gd"
+      "recovered_from": "recovered-history/worlds_completion_audit/tests/test_source_city_view.gd",
+      "current_sha256": "d3ecbbbfeb4ee0e6e650980ca65b716621ea6d82115a3de6c54cd7cf9134ec2f",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/terrain.gdshader",
-      "recovered_from": "recovered-history/coverage_shaders/scripts/terrain.gdshader"
+      "recovered_from": "recovered-history/coverage_shaders/scripts/terrain.gdshader",
+      "current_sha256": "6f8fdb202fbe8641a4af26daee4a15c264d16a8548cb398c53b480b72d6d9641",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/terrain_transition.gdshader",
-      "recovered_from": "recovered-history/coverage_shaders/scripts/terrain_transition.gdshader"
+      "recovered_from": "recovered-history/coverage_shaders/scripts/terrain_transition.gdshader",
+      "current_sha256": "06d7599aec1f67b1a743e942002a4aefbc393efa0b908390f842a404dab7dcab",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/planet.gdshader",
-      "recovered_from": "recovered-history/coverage_shaders/scripts/planet.gdshader"
+      "recovered_from": "recovered-history/coverage_shaders/scripts/planet.gdshader",
+      "current_sha256": "73cbabacb8914c1d8ead73ce3d56f6a193df638f9efe9084ff55059fe17c0cd1",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/atmosphere.gdshader",
-      "recovered_from": "recovered-history/coverage_shaders/scripts/atmosphere.gdshader"
+      "recovered_from": "recovered-history/coverage_shaders/scripts/atmosphere.gdshader",
+      "current_sha256": "9a3c1a236dd5e09a0cda485b6b9de9969cd1bdd8eb583d6a1dff094bde63f207",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/rings.gdshader",
-      "recovered_from": "recovered-history/coverage_shaders/scripts/rings.gdshader"
+      "recovered_from": "recovered-history/coverage_shaders/scripts/rings.gdshader",
+      "current_sha256": "962fcd8994b152bcf8599203307e9caf6f830190a6ecbb99b42abf712939e07e",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/landing_pad.gdshader",
-      "recovered_from": "recovered-history/coverage_shaders/scripts/landing_pad.gdshader"
+      "recovered_from": "recovered-history/coverage_shaders/scripts/landing_pad.gdshader",
+      "current_sha256": "e10339c7125a1d07981144a1c4836db86721f3b899fa361f0acc4df337d81905",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/building.gdshader",
-      "recovered_from": "recovered-history/coverage_shaders/scripts/building.gdshader"
+      "recovered_from": "recovered-history/coverage_shaders/scripts/building.gdshader",
+      "current_sha256": "f6a91617ad438f3a119ebca321023d04d1c22550111b22764cb5d899d3f08e28",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/settings_panel.gd",
-      "recovered_from": "recovered-history/coverage_shaders/scripts/settings_panel.gd"
+      "recovered_from": "recovered-history/coverage_shaders/scripts/settings_panel.gd",
+      "current_sha256": "8a002836d211e9e78d86b51f6a8803571897cd04e52f622eaf5323b15c112d5f",
+      "byte_equal_to_selected_history": false,
+      "current_kind": "modified_or_reassembled_historical_module"
     },
     {
       "path": "scripts/source_city_profile.gd",
-      "recovered_from": "recovered-history/root/scripts/source_city_profile.gd"
+      "recovered_from": "recovered-history/root/scripts/source_city_profile.gd",
+      "current_sha256": "b5015f8252aa611cc9a2c93158495a3d12d6bad66affbd5635d501cbaa96d8b4",
+      "byte_equal_to_selected_history": false,
+      "current_kind": "modified_or_reassembled_historical_module"
     },
     {
       "path": "scripts/source_units.gd",
-      "recovered_from": "recovered-history/root/scripts/source_units.gd"
+      "recovered_from": "recovered-history/root/scripts/source_units.gd",
+      "current_sha256": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/source_model_visual.gd",
-      "recovered_from": "recovered-history/root/scripts/source_model_visual.gd"
+      "recovered_from": "recovered-history/root/scripts/source_model_visual.gd",
+      "current_sha256": "fdba99f3b37a6f253236b5ffd606e9108a372d8e4a5d6c83b8bced61f23a9d0d",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/source_model.gdshader",
-      "recovered_from": "recovered-history/root/scripts/source_model.gdshader"
+      "recovered_from": "recovered-history/root/scripts/source_model.gdshader",
+      "current_sha256": "266c1bae942a10b715eddb6668c117a85b31b689f150954945e6622d809804cc",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/source_city_runtime.gd",
-      "recovered_from": "recovered-history/ground_vector_source/scripts/source_city_runtime.gd"
+      "recovered_from": "recovered-history/ground_vector_source/scripts/source_city_runtime.gd",
+      "current_sha256": "a0a5bcbfc37adda1d46ff968c88eac752ccddbe268556520dbf2c83c7b1f12ba",
+      "byte_equal_to_selected_history": false,
+      "current_kind": "modified_or_reassembled_historical_module"
     },
     {
       "path": "scripts/source_model_mesh.gd",
-      "recovered_from": "recovered-history/ground_vector_source/scripts/source_model_mesh.gd"
+      "recovered_from": "recovered-history/ground_vector_source/scripts/source_model_mesh.gd",
+      "current_sha256": "6642ce62a1a8046c71a57fb08325304c8d12c3bc61b90921d458ef84ad21472e",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/source_model_vm.gd",
-      "recovered_from": "recovered-history/ground_vector_source/scripts/source_model_vm.gd"
+      "recovered_from": "recovered-history/ground_vector_source/scripts/source_model_vm.gd",
+      "current_sha256": "c676724f91eae910bf0c318c04ee7426905e7e372fdcd4a68c547f81043f0f2e",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/source_model_vertices.gd",
-      "recovered_from": "recovered-history/ground_vector_source/scripts/source_model_vertices.gd"
+      "recovered_from": "recovered-history/ground_vector_source/scripts/source_model_vertices.gd",
+      "current_sha256": "bfd236cbee940167f882a85a461911aad672fd7c292b6f58619e87cf6ecc7e33",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "tests/test_source_city_runtime.gd",
-      "recovered_from": "recovered-history/ground_vector_source/tests/test_source_city_runtime.gd"
+      "recovered_from": "recovered-history/ground_vector_source/tests/test_source_city_runtime.gd",
+      "current_sha256": "29927274559d761dada752d1af5d4425b30ca7247a2d819bc7d6a9f4e906cc31",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "tests/test_source_model_mesh.gd",
-      "recovered_from": "recovered-history/ground_vector_source/tests/test_source_model_mesh.gd"
+      "recovered_from": "recovered-history/ground_vector_source/tests/test_source_model_mesh.gd",
+      "current_sha256": "f86251c42419ad074c937fc1a5212550cec1f8d6d5930e33e7f9380ccf24d113",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/source_polygon.gd",
-      "recovered_from": "recovered-history/source_terrain_revision/scripts/source_polygon.gd"
+      "recovered_from": "recovered-history/source_terrain_revision/scripts/source_polygon.gd",
+      "current_sha256": "9e83a719b5a13a22fcba53417cb3c4006d310804eda3e69aba543a9551c07a43",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/ground_coordinates.gd",
-      "recovered_from": "recovered-history/source_terrain_revision/scripts/ground_coordinates.gd"
+      "recovered_from": "recovered-history/source_terrain_revision/scripts/ground_coordinates.gd",
+      "current_sha256": "b61afd67aa89f65c7bde5548c31516ac61ed6cc4e0c5e8b55280a055075ccd71",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     },
     {
       "path": "scripts/source_ground_pads.gd",
-      "recovered_from": "recovered-history/ground_harness/scripts/source_ground_pads.gd"
+      "recovered_from": "recovered-history/ground_harness/scripts/source_ground_pads.gd",
+      "current_sha256": "5bbb93864a95d2865da12e2315e9aa9b57d8d27bc50ea1e7536e489357f1299c",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
+    },
+    {
+      "path": "scripts/body_initializer.gd",
+      "current_sha256": "24fe4896190f8c2f1d4174b57f9966b7f16e6918f63cf5eb96a0ece538f8a5a8",
+      "current_kind": "new_reconstruction",
+      "provenance_note": "See module docs for retained fragments, new behavior and independent controls."
+    },
+    {
+      "path": "scripts/economy_catalog.gd",
+      "current_sha256": "bb91fcfaf70f8fe75afc6e06f0e104a9120e33ee0ddbf6c3c36c83fffadd670e",
+      "current_kind": "new_reconstruction",
+      "provenance_note": "See module docs for retained fragments, new behavior and independent controls."
+    },
+    {
+      "path": "scripts/ffe_math.gd",
+      "current_sha256": "d3cb103361e4039fd2b0942d84af042d69c9e19b8a856c7d830b82827827f228",
+      "current_kind": "new_reconstruction",
+      "provenance_note": "See module docs for retained fragments, new behavior and independent controls."
+    },
+    {
+      "path": "scripts/flight_model.gd",
+      "current_sha256": "07eba1809d89f83a8cf5f65310256df0211fc42cd1dea2fbda339cb19b0b74db",
+      "current_kind": "new_reconstruction",
+      "provenance_note": "See module docs for retained fragments, new behavior and independent controls."
+    },
+    {
+      "path": "scripts/galaxy.gd",
+      "current_sha256": "ca24443095a3f741f4714d55f7235df63c7e44ad844056d9a191e91ba5ed9214",
+      "current_kind": "new_reconstruction",
+      "provenance_note": "See module docs for retained fragments, new behavior and independent controls."
+    },
+    {
+      "path": "scripts/hold_button.gd",
+      "current_sha256": "5f4d2c4c38c3788df9a6e094596d499e729e624ec7fe016e1bd84e6c7a97f9de",
+      "current_kind": "new_reconstruction",
+      "provenance_note": "See module docs for retained fragments, new behavior and independent controls."
+    },
+    {
+      "path": "scripts/main.gd",
+      "current_sha256": "3053ddb46c23ddd1f6c52de6b65433b906a8a37e4a4c62ab80fafa726e077a14",
+      "current_kind": "new_reconstruction",
+      "provenance_note": "See module docs for retained fragments, new behavior and independent controls."
+    },
+    {
+      "path": "scripts/navigation.gd",
+      "current_sha256": "9a96b9daaa9cf82c565026f792cfa361d9e4ce6fcea661554a366f9ebcf0a448",
+      "current_kind": "new_reconstruction",
+      "provenance_note": "See module docs for retained fragments, new behavior and independent controls."
+    },
+    {
+      "path": "scripts/planetary_system.gd",
+      "current_sha256": "83e9d4af51aaf796b0f5366965dc25c8e4d5b25ef82192124f60492573941fd8",
+      "current_kind": "new_reconstruction",
+      "provenance_note": "See module docs for retained fragments, new behavior and independent controls."
+    },
+    {
+      "path": "scripts/pointer_control.gd",
+      "current_sha256": "2ee4b5f39939d90c4001515aeac7b5b5665966b8741b7c035ba0538875f69f68",
+      "current_kind": "new_reconstruction",
+      "provenance_note": "See module docs for retained fragments, new behavior and independent controls."
+    },
+    {
+      "path": "scripts/save_store.gd",
+      "current_sha256": "8af7d350fcd3eaa1dc32f5aacf5e9afdf3424b181ef5964468f584412cd52634",
+      "current_kind": "new_reconstruction",
+      "provenance_note": "See module docs for retained fragments, new behavior and independent controls."
+    },
+    {
+      "path": "scripts/ship_catalog.gd",
+      "current_sha256": "c3c077d107336a8ffe30165291f6e3bee785ee8a262b88ef48262ff38dad7a06",
+      "current_kind": "new_reconstruction",
+      "provenance_note": "See module docs for retained fragments, new behavior and independent controls."
+    },
+    {
+      "path": "scripts/ship_visual.gd",
+      "current_sha256": "06b50511ed11a747ddff1b97d0ef38a1d62cdc70c9c54e91c29aa9d2fd4c3fde",
+      "current_kind": "new_reconstruction",
+      "provenance_note": "See module docs for retained fragments, new behavior and independent controls."
+    },
+    {
+      "path": "scripts/speed_lever.gd",
+      "current_sha256": "35baca92c81f6397ca14b1c576e1b661beec60ea83143d228a6d73c03e4c4f54",
+      "current_kind": "new_reconstruction",
+      "provenance_note": "See module docs for retained fragments, new behavior and independent controls."
+    },
+    {
+      "path": "scripts/touch_stick.gd",
+      "current_sha256": "5f0434e6632ab6955bff3572366b78e9ab720473e9e622b41f33a2a7f2fb8ca9",
+      "current_kind": "new_reconstruction",
+      "provenance_note": "See module docs for retained fragments, new behavior and independent controls."
+    },
+    {
+      "path": "scripts/body_rotation.gd",
+      "recovered_from": "recovered-history/source_terrain_revision/scripts/body_rotation.gd",
+      "current_sha256": "b5d4e63331728681d1f34c73fe83cdd57120e29b352e09090da4ff147b22ed34",
+      "byte_equal_to_selected_history": true,
+      "current_kind": "preserved_historical_text"
     }
   ]
 }

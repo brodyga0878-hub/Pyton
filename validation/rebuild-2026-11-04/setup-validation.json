@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-04T20:19:16.840371+00:00",
+  "updated_utc": "2026-11-04T20:19:17.072593+00:00",
+  "duration_seconds": 0.232,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-04T20:19:16.840371+00:00",
+      "duration_seconds": 0.232,
+      "requested_suites": [
+        "worlds",
+        "flight"
+      ],
+      "executed_suites": [
+        "worlds",
+        "flight"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 3,
+  "status": "passed_with_coverage_limitations",
+  "passed_suites": 2,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 813,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "worlds",
+      "scope": "Handcrafted original records and explicit analytic world/navigation adapter.",
+      "status": "passed",
+      "checks": 719,
+      "failures": 0,
+      "executed_utc": "2026-11-04T20:19:16.842164+00:00",
+      "suite_source": {
+        "path": "tests/test_rebuilt_worlds.gd",
+        "bytes": 8348,
+        "sha256": "ef5fb5442062e2c617d35386a69fbb910a28b54640d58d33571ff5b572ee179b"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_worlds.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.229,
+      "timed_out": false,
+      "output_bytes": 117,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/worlds.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "flight",
+      "scope": "Rebuilt flight, phone steering inputs, adapted training economy, atomic flight saves.",
+      "status": "passed",
+      "checks": 94,
+      "failures": 0,
+      "executed_utc": "2026-11-04T20:19:16.842798+00:00",
+      "suite_source": {
+        "path": "tests/test_rebuilt_flight.gd",
+        "bytes": 11797,
+        "sha256": "4866c51adf55cf9f4ad31f0fdb17ddc10c26a76e0052a2357d64e085e5ef4e57"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_flight.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.138,
+      "timed_out": false,
+      "output_bytes": 117,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/flight.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "unavailable",
+      "reason": "The preserved tests/test_source_model_mesh.gd requires model_vertices_reference.json; original city geometry is exercised by the current city suites, which does not replace this missing independent leaf fixture."
+    },
+    {
+      "scope": "Full application, Android installation and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner covers current standalone suites and isolated native terrain controls only."
+    }
+  ]
+}

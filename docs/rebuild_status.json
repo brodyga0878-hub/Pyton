@@ -29,8 +29,8 @@
   },
   "current_reconstruction": {
     "implementation_kind": "New integration and newly written missing modules around preserved historical source; not discovery of the complete former source tree",
-    "application_version_planned": "0.11.0 reconstruction alpha",
-    "application_integration_status": "Common scene/controller integration and smoke verification in progress",
+    "application_version": "0.11.0-rebuild-alpha1",
+    "application_integration_status": "Runnable reconstruction, app smoke, desktop GLES captures and native ARM64 game package verification passed; physical device untested",
     "native_android_runtime": "Godot ARM64; no DOS or x86 emulator in the game",
     "modules_present": [
       "New main scene controller and Russian phone interface",
@@ -63,17 +63,125 @@
     },
     "current_module_validation": {
       "engine": "Godot 4.6.3",
-      "worlds_navigation": {"checks": 719, "failures": 0, "test": "tests/test_rebuilt_worlds.gd"},
-      "flight": {"checks": 94, "failures": 0, "test": "tests/test_rebuilt_flight.gd"},
-      "cities_surface": {"checks": 374, "failures": 0, "test": "tests/test_rebuilt_cities.gd"},
-      "ffe_arithmetic": {"checks": 142987, "failures": 0, "test": "tests/test_rebuilt_ffe_math.gd"},
-      "adapted_catalogues": {"checks": 22, "failures": 0},
-      "synthetic_city_view": {"checks": 33, "failures": 0, "test": "tests/test_source_city_view.gd"},
-      "scope": "Current modular desktop headless checks; not evidence of full original FFE completion, new APK verification or physical phone behavior"
+      "worlds_navigation": {
+        "checks": 719,
+        "failures": 0,
+        "test": "tests/test_rebuilt_worlds.gd"
+      },
+      "flight": {
+        "checks": 94,
+        "failures": 0,
+        "test": "tests/test_rebuilt_flight.gd"
+      },
+      "cities_surface": {
+        "checks": 374,
+        "failures": 0,
+        "test": "tests/test_rebuilt_cities.gd"
+      },
+      "ffe_arithmetic": {
+        "checks": 142987,
+        "failures": 0,
+        "test": "tests/test_rebuilt_ffe_math.gd"
+      },
+      "application_transitions": {
+        "checks": 54,
+        "failures": 0,
+        "test": "tests/test_rebuilt_app_transitions.gd",
+        "arguments": [
+          "--rebuild-capture"
+        ]
+      },
+      "adapted_catalogues": {
+        "checks": 22,
+        "failures": 0
+      },
+      "synthetic_city_view": {
+        "checks": 33,
+        "failures": 0,
+        "test": "tests/test_source_city_view.gd"
+      },
+      "source_ground_pads": {
+        "checks": 42167,
+        "failures": 0
+      },
+      "source_city_runtime_controls": {
+        "checks": 45,
+        "failures": 0
+      },
+      "source_terrain_query_chain": {
+        "checks": 9285,
+        "failures": 0
+      },
+      "save_touch": {
+        "checks": 69,
+        "failures": 0,
+        "test": "tests/test_rebuilt_save_touch.gd"
+      },
+      "triangle_ccd": {
+        "checks": 144,
+        "failures": 0,
+        "test": "tests/test_segment_triangle.gd"
+      },
+      "body_initializer_followup": {
+        "checks": 5723,
+        "failures": 0,
+        "test": "tests/test_rebuilt_body_initializer.gd",
+        "native_contexts": 1424,
+        "integrated_in_live_world": false
+      },
+      "scope": "Current modular desktop headless checks; not evidence of full original FFE completion, new APK verification or physical phone behavior",
+      "body_rotation_followup": {
+        "checks": 10799,
+        "failures": 0,
+        "test": "tests/test_rebuilt_body_rotation.gd",
+        "native_contexts": 1542,
+        "integrated_in_live_world": false,
+        "scope": "Orientation slice, not full F866/F880 or ephemerides"
+      }
     },
-    "whole_application_smoke_passed": false,
-    "android_apk_built": false,
-    "android_apk_technically_verified": false,
+    "curated_validation": {
+      "checks": 212493,
+      "passed_suites": 13,
+      "failures": 0,
+      "engine_error_or_leak_diagnostics": false,
+      "status": "passed_with_coverage_limitations",
+      "report": "validation/rebuild-2026-11-04/validation-summary.json",
+      "documentation": "docs/VALIDATION_REBUILD_RU.md",
+      "scope": "Nine main suites plus save_touch, app_transitions and isolated F882 supplemental batches with per-suite timestamps; not an atomic repository snapshot or a phone test",
+      "apk_preparation_checkpoint": {
+        "checks": 195971,
+        "passed_suites": 11,
+        "failures": 0
+      },
+      "missing_independent_fixture": "tests/fixtures/model_vertices_reference.json"
+    },
+    "whole_application_smoke_passed": true,
+    "whole_application_smoke_scope": "Actual scene: source Sol/Earth, training auto dock/delivery, original New Moscow84 entry/landing, atomic disk save/reload and persistent source-city view; desktop Godot only",
+    "whole_application_smoke_log": "validation/rebuild-2026-11-04/app-smoke.log",
+    "desktop_gles_render_passed": true,
+    "desktop_gles_render_scope": "Four actual GLES captures: space, system menu, native city approach and landed ship; no Android hardware measurements",
+    "desktop_gles_render_log": "validation/rebuild-2026-11-04/render.log",
+    "android_apk_built": true,
+    "android_apk_technically_verified": true,
+    "android_artifact_status": "Final current reconstruction game exported after controller/pointer fixes and technically verified without toolchain-only smoke option",
+    "final_android_candidate_hash": "c42d77b87a9be247f0d96f639071aadb84d5478dd0c6cb626346cc9bf503bc2c",
+    "final_android_candidate": {
+      "file": "deliverables/0.11.0-rebuild-alpha1/StarFrontier-0.11.0-rebuild-arm64.apk",
+      "bytes": 26566444,
+      "package": "org.starfrontier.rebuild",
+      "version": "0.11.0-rebuild-alpha1",
+      "version_code": 22,
+      "abi": "arm64-v8a",
+      "min_sdk": 24,
+      "target_sdk": 36,
+      "test_signature_verified": true,
+      "production_signing_key_configured": false,
+      "zip_and_elf_alignment_16k": true,
+      "native_data_assets_verified": true,
+      "debuggable": false,
+      "toolchain_smoke_only": false,
+      "verification_report": "validation/rebuild-2026-11-04/android-verification.json"
+    },
     "physical_device_tested": false,
     "new_russian_name_labels": 133,
     "adapted_flight_profiles": 3,
@@ -81,6 +189,7 @@
     "new_game_save_schema": "starfrontier-rebuild-game-v1",
     "complete_old_game_save_import_verified": false,
     "original_commandr_progress_import_verified": false,
+    "block10_followup_status": "F882 independently revalidated on1424 native contexts; orientation primitive on1542 new native slices. Neither is wired into the current analytic world; full factory, original units/clocks and ephemerides remain open.",
     "known_boundaries": [
       "11 original handcrafted systems on an explicitly adapted connected map; full original procedural galaxy missing",
       "Physical radii, orbits, clocks, generic arrival docks and navigation fuel rules remain analytic or gameplay adapters",
@@ -88,7 +197,8 @@
       "Surrounding terrain, city-root altitude and grading policy remain adaptations; source F879 and full physical surface integration incomplete",
       "Three adapted flight profiles and training services do not complete original ships, equipment, economy, combat, AI or campaign",
       "Russian interface and new proper-name labels do not complete the original text corpus or editorial review"
-    ]
+    ],
+    "application_version_planned": "0.11.0-rebuild-alpha1"
   },
   "target_device": "Samsung S23 Ultra 12/512",
   "android_version_user_reported": "17",
@@ -98,7 +208,14 @@
   "full_russian_localization_complete": false,
   "publication_ready": false,
   "remaining_major_blocks": 6,
-  "major_block_order": [10, 9, 11, 12, 13, 14],
+  "major_block_order": [
+    10,
+    9,
+    11,
+    12,
+    13,
+    14
+  ],
   "block_titles": {
     "9": "Ships and equipment",
     "10": "Worlds and settlements",
@@ -107,7 +224,7 @@
     "13": "Full Russian localization",
     "14": "Device testing and release"
   },
-  "current_prerequisite": "Complete common application integration, verify smoke/save/phone controls, build and technically verify a fresh ARM64 test APK; then continue block10 with explicit source-versus-adapter boundaries",
+  "current_prerequisite": "Preserve and publish current source, verified test APK and validation reports; continue block10 with explicit source-versus-adapter boundaries while physical phone testing remains pending",
   "historical_statistics_are_current_validation": false,
   "full_release_date": null,
   "detailed_audit": "docs/RECOVERY_AND_ROADMAP_RU.md"

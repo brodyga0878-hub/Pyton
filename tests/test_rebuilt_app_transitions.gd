@@ -48,6 +48,13 @@ func save_candidates()->void:
 	game.ship.position=game.ship.STATION;game.ship.velocity=Vector3.ZERO
 	check(game.ship.dock(),"Control fixture uses an actual valid dock action")
 	check(not game._decode_state(json_copy(game._payload())).is_empty(),"Actual docked state loads in the default training dock context")
+	var docked:Dictionary=json_copy(game._payload())
+	bad=docked.duplicate(true);bad.flight.position=[0,0,0]
+	check(game._decode_state(bad).is_empty(),"A docked flag cannot move the ship far from its actual dock")
+	bad=docked.duplicate(true);bad.flight.velocity=[1,0,0]
+	check(game._decode_state(bad).is_empty(),"A docked snapshot cannot retain flight velocity")
+	bad=docked.duplicate(true);bad.flight.target_speed=1
+	check(game._decode_state(bad).is_empty(),"A docked snapshot cannot keep a live throttle target")
 
 func jump_and_transfer_controls()->void:
 	reset_models()
@@ -88,6 +95,17 @@ func jump_and_transfer_controls()->void:
 	game._start_jump(first);game._choose_body("mars");game._choose_site("site10")
 	check(game.nav.remaining==0 and game.world.transfer_remaining==0,"Busy preparation rejects route, body and source-site actions")
 	game.busy=false
+	var resumed:Dictionary=game._decode_state(pending)
+	game._commit_state(resumed);game._apply_system();game._tick(3.0,Vector2.ZERO,0)
+	check(game.nav.current_id==first and game.world.system_id==first and not game.surface.active,"Resumed hypercharge arrives with navigation and source world in the same system")
+	check(game.nav.fuel==initial_fuel-2 and game.nav.remaining==0,"Resumed hypercharge consumes its committed fuel exactly once")
+	check(not game._decode_state(json_copy(game._payload())).is_empty(),"Arrived source-world state is immediately loadable")
+	game._tick(0.1,Vector2.ZERO,0)
+	check(game.nav.fuel==initial_fuel-2,"The next application tick cannot charge arrival fuel again")
+	resumed=game._decode_state(transit)
+	game._commit_state(resumed);game._apply_system();game._tick(3.0,Vector2.ZERO,0)
+	check(game.world.focus_id=="mars" and game.world.transfer_remaining==0 and not game.ship.station_available,"Resumed planetary transfer arrives without a phantom dock")
+	check(not game._decode_state(json_copy(game._payload())).is_empty(),"Arrived planetary-transfer state also remains loadable")
 
 func charge_entry_guard()->void:
 	reset_models()
