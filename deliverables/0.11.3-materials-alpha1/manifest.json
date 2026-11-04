@@ -1,0 +1,24 @@
+{
+  "version": "0.11.3-materials-alpha1",
+  "source_commit": "b5368bf2ad1075484382d49ca5b24a7d23de8b45",
+  "files": {
+    "StarFrontier-0.11.3-materials-source.zip": {
+      "bytes": 21402864,
+      "sha256": "babe312994346abe64fa627f3abef320c9dc27a7cebfdd98eab1445be7e2ac8a"
+    },
+    "StarFrontier-0.11.3-materials-arm64.apk": {
+      "bytes": 31751399,
+      "sha256": "36bd768487a253ccca3c020a663668c713517992254ddea15cbecabbd0b0527e"
+    }
+  },
+  "checks": 2474,
+  "passed_suites": 15,
+  "failure_count": 0,
+  "material_maps": 24,
+  "ordinary_flight_decorative_asteroids": false,
+  "reference_visual_quality_achieved": false,
+  "physical_device_tested": false,
+  "test_signing_key_only": true,
+  "full_original_port_complete": false,
+  "publication_ready": false
+}
