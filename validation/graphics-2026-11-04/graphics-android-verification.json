@@ -34,6 +34,19 @@
     "ffe_world_models",
     "ffe_worlds"
   ],
+  "graphics_runtime_assets_sha256": {
+    "ship_visual.gdc": "fca8698ba74f407b482af3463cd404b9e648c5dc88303ea96058861b1e777e90",
+    "ship_hull.gdshader": "3bc3b1f96550e0f3a29bb7b21758e9c9a756314898facc7ec5ebe9d4b1910856",
+    "ship_exhaust.gdshader": "7c99ef81f2cb6f371871d0affe1f07e5d80d47474ceee8a750d8a1a28c76b5ae",
+    "ship_halo.gdshader": "f1dfa4528e2ab40319e97e4c81226ed96c67452ced72326d675a4b4979783a3c",
+    "station_visual.gdc": "a45b1e7dc065df0f3d64142d1eb65d2d6e22dcda5a17f96ee2f6984f1807fe14",
+    "station_solar.gdshader": "99460e3ba9782ffab445d5215955be8d1f8631f5a2d2bb2b2b9d0e93a80cb086",
+    "space_environment.gdc": "a800dc1e8e366e8ccdd608d1f14e7a8f96fff3a03fd2d18ca05c5e23d88206c4",
+    "asteroid_surface.gdshader": "aa48cdbd5331287ad3c07b493f7434d424e3c4fce0abc750c8cbbd30fb0ac96f",
+    "space_sky.gdshader": "f91797913b04ff61dc8897c27b477845607248e87f36363869c30fc39f5117bd",
+    "flight_theme.gdc": "0f18d0f4af096321e52e697e8d2bc0df6307246f653edcf4e462ed1aaaa4f488",
+    "flight_reticle.gdc": "2cfdbbb3309b07ec2a5496aa4fea2daaeee9abbf1a22e7404930b83ee95826cc"
+  },
   "toolchain_smoke_only": false,
   "physical_device_tested": false,
   "full_original_port_complete": false,
