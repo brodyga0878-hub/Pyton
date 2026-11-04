@@ -6,6 +6,8 @@ from pathlib import Path
 
 FORBIDDEN_PERMISSIONS=['INTERNET','RECORD_AUDIO','READ_EXTERNAL_STORAGE','WRITE_EXTERNAL_STORAGE','MANAGE_EXTERNAL_STORAGE']
 SOURCE_IMAGE_SHA256='d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72'
+MATERIAL_KINDS=('painted_alloy','brushed_metal','concrete','asphalt','rock','ice','rubber','glass')
+MATERIAL_CHANNELS=('albedo','normal','orm')
 
 def run(*command):
     return subprocess.check_output([str(v) for v in command],text=True,stderr=subprocess.STDOUT)
@@ -19,6 +21,57 @@ def preset_values(path):
     found=re.search(r'^version/code=(\d+)\s*$',text,re.M)
     if not found:raise ValueError('Export preset missing version/code')
     return {'package':quoted('package/unique_name'),'version':quoted('version/name'),'version_code':int(found[1])}
+
+def verify_material_assets(archive,project):
+    """Follow exported texture imports to actual runtime data, without extraction.
+
+    These checks establish packaging and source consistency, not visual quality.
+    Lossless maps share the imported CTEX across desktop and Android; if an
+    imported feature variant is selected, compare that exact referenced file.
+    """
+    names=set(archive.namelist())
+    assert not any('texture_contact_sheet' in name for name in names),'Documentation contact sheet included in runtime APK'
+    manifest_path=project/'assets/materials/manifest.json'
+    manifest=json.loads(manifest_path.read_text())
+    packed_manifest='assets/assets/materials/manifest.json'
+    assert packed_manifest in names,'Missing runtime material metadata'
+    assert archive.read(packed_manifest)==manifest_path.read_bytes(),'Runtime material metadata differs from source'
+    assert manifest['resolution']==512 and set(manifest['materials'])==set(MATERIAL_KINDS),'Unexpected authored material manifest'
+    runtime='assets/scripts/material_library.gdc'
+    assert runtime in names and len(archive.read(runtime))>64,'Missing material library runtime'
+    result={'runtime_sha256':hashlib.sha256(archive.read(runtime)).hexdigest(),'maps':{}}
+    for kind in MATERIAL_KINDS:
+        for channel in MATERIAL_CHANNELS:
+            relative='assets/materials/'+kind+'/'+channel+'.png'
+            source=project/relative
+            png=source.read_bytes()
+            source_hash=hashlib.sha256(png).hexdigest()
+            assert manifest['materials'][kind]['files'][channel]['sha256']==source_hash,'Material source differs from authored manifest '+relative
+            assert png[:8]==b'\x89PNG\r\n\x1a\n' and png[12:16]==b'IHDR','Invalid source material PNG '+relative
+            assert struct.unpack_from('>II',png,16)==(512,512),'Unexpected material map dimensions '+relative
+            local_import=Path(str(source)+'.import').read_text()
+            assert re.search(r'^mipmaps/generate=true\s*$',local_import,re.M),'Missing material mipmap import '+relative
+            if channel=='normal':
+                assert re.search(r'^compress/normal_map=1\s*$',local_import,re.M),'Material normal import not forced '+relative
+                assert re.search(r'^process/normal_map_invert_y=false\s*$',local_import,re.M),'Unexpected material normal Y inversion '+relative
+            imported='assets/'+relative+'.import'
+            assert imported in names,'Missing exported material import '+relative
+            remap=archive.read(imported).decode('utf-8').rstrip('\0')
+            assert 'importer="texture"' in remap and 'type="CompressedTexture2D"' in remap,'Invalid material import '+relative
+            found=re.search(r'^path="(res://\.godot/imported/[^"\r\n]+\.ctex)"\s*$',remap,re.M)
+            assert found and '..' not in found[1].split('/'),'Missing material runtime remap '+relative
+            resource=found[1].removeprefix('res://')
+            packed_path='assets/'+resource
+            assert packed_path in names,'Missing material CTEX '+relative
+            packed=archive.read(packed_path)
+            assert len(packed)>52 and packed[:4]==b'GST2','Invalid material CTEX '+relative
+            assert struct.unpack_from('<II',packed,8)==(512,512),'Wrong packed material dimensions '+relative
+            local=project/resource
+            assert local.is_file() and packed==local.read_bytes(),'Material CTEX differs from imported source '+relative
+            result['maps'][kind+'/'+channel]={'source_png_sha256':source_hash,'runtime_resource':resource,'runtime_bytes':len(packed),'runtime_sha256':hashlib.sha256(packed).hexdigest(),'width':512,'height':512,'mipmap_import_enabled':True}
+    result['map_count']=len(result['maps'])
+    assert result['map_count']==24
+    return result
 
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     expected=preset_values(presets)
@@ -38,7 +91,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -77,6 +130,8 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
                     path='assets/scripts/'+name
                     assert path in names and len(archive.read(path))>64,'Missing diagnostics runtime asset '+name
                     diagnostic_assets[name]=hashlib.sha256(archive.read(path)).hexdigest()
+            if expected['version_code']>=25:
+                material_assets=verify_material_assets(archive,presets.parent)
         for name in names:
             if not name.startswith('lib/') or not name.endswith('.so'):continue
             data=archive.read(name)
@@ -94,7 +149,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

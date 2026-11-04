@@ -2,13 +2,22 @@ extends Node3D
 # New authored training/orbital station visual. The unchanged dock target is local
 # origin. All physical-looking structures stay behind z=-110 or outside r=120.
 const SolarShader=preload("res://scripts/station_solar.gdshader")
+const MaterialLibrary=preload("res://scripts/material_library.gd")
 var quality:=-1
 var geometry_batches:=0
 var _surfaces:Dictionary={}
 var _materials:Dictionary={}
 
-func _material(colour:Color,metal:=0.7,rough:=0.34,emission:=0.0)->StandardMaterial3D:
-	var m:=StandardMaterial3D.new();m.albedo_color=colour;m.metallic=metal;m.roughness=rough
+func _material(colour:Color,metal:=0.7,rough:=0.34,emission:=0.0,kind:="painted_alloy")->StandardMaterial3D:
+	var m:=StandardMaterial3D.new()
+	if emission<=0:
+		MaterialLibrary.apply_standard(m,kind,0.25 if kind=="painted_alloy" else 0.65)
+		m.normal_enabled=quality>0;m.normal_scale=0.18 if quality>1 else 0.1
+		# Compensate sRGB map mean while retaining the station's existing palette.
+		var gain:float=MaterialLibrary.albedo_gain(kind)
+		var alpha:float=colour.a;colour=(colour.srgb_to_linear()*gain).linear_to_srgb();colour.a=alpha
+		rough=clampf(rough/MaterialLibrary.roughness_mean(kind),0.0,1.0)
+	m.albedo_color=colour;m.metallic=metal;m.roughness=rough
 	if emission>0:m.emission_enabled=true;m.emission=colour;m.emission_energy_multiplier=emission
 	return m
 func _add_mesh(mesh:Mesh,key:String,at:Vector3,basis:=Basis.IDENTITY)->void:
@@ -34,11 +43,11 @@ func configure(value:=2)->void:
 	for child in get_children():remove_child(child);child.queue_free()
 	_surfaces.clear();_materials.clear()
 	_materials["shell"]=_material(Color("c5cdd2"),0.65,0.37)
-	_materials["dark"]=_material(Color("202e3c"),0.8,0.3)
-	_materials["gold"]=_material(Color("c99342"),0.73,0.32)
+	_materials["dark"]=_material(Color("202e3c"),0.8,0.3,0.0,"brushed_metal")
+	_materials["gold"]=_material(Color("c99342"),0.73,0.32,0.0,"brushed_metal")
 	_materials["light"]=_material(Color("a4e9ff"),0.1,0.3,2.5)
 	_materials["amber"]=_material(Color("ff9545"),0.1,0.4,2.0)
-	var solar:=ShaderMaterial.new();solar.shader=SolarShader;_materials["solar"]=solar
+	var solar:=ShaderMaterial.new();solar.shader=SolarShader;MaterialLibrary.apply_shader(solar,"brushed_metal",0.6);solar.set_shader_parameter("detail_level",quality);_materials["solar"]=solar
 	# Layered annulus gives a 240m clear central aperture.
 	_ring("dark",Vector3(0,0,-145),134,184)
 	_ring("shell",Vector3(0,0,-157),148,180)

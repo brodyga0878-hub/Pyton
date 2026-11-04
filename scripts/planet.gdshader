@@ -11,6 +11,11 @@ uniform int body_kind = 0;
 uniform int detail_level = 2;
 uniform bool inhabited = false;
 uniform float seed_offset = 0.0;
+uniform sampler2D material_albedo : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform sampler2D material_normal : hint_normal, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform sampler2D material_orm : filter_linear_mipmap_anisotropic, repeat_enable;
+uniform float material_scale = 48.0;
+uniform float material_gain = 1.6;
 varying vec3 world_normal;
 void vertex() { world_normal=normalize((MODEL_MATRIX*vec4(NORMAL,0.0)).xyz); }
 float hash(vec3 p) {
@@ -33,12 +38,20 @@ float view_dither_threshold(vec2 screen_pixel) {
  int high=((pixel.x >> 1) ^ (pixel.y >> 1))*2+(pixel.y >> 1);
  return (float(low*4+high)+0.5)/16.0;
 }
+vec3 surface_finish(vec3 p) {
+ vec3 w=pow(abs(p),vec3(4.0));w/=max(w.x+w.y+w.z,0.00001);
+ vec3 t=p*material_scale;
+ return clamp((texture(material_albedo,t.zy).rgb*w.x+texture(material_albedo,t.xz).rgb*w.y+texture(material_albedo,t.xy).rgb*w.z)*material_gain,vec3(0.60),vec3(1.30));
+}
+mat3 texture_frame(vec3 normal,vec3 position,vec2 tex_uv) {
+ vec3 dx=dFdx(position),dy=dFdy(position);
+ vec2 ux=dFdx(tex_uv),uy=dFdy(tex_uv);
+ vec3 py=cross(dy,normal),px=cross(normal,dx);
+ vec3 tangent=py*ux.x+px*uy.x,bitangent=py*ux.y+px*uy.y;
+ float gain=inversesqrt(max(max(dot(tangent,tangent),dot(bitangent,bitangent)),0.0000000001));
+ return mat3(tangent*gain,bitangent*gain,normal);
+}
 void fragment() {
- if(view_coverage<1.0) {
-  float coverage=clamp(view_coverage,0.0,1.0);
-  float threshold=view_dither_threshold(FRAGCOORD.xy);
-  if(coverage<=0.0 || (coverage_invert ? threshold<1.0-coverage : threshold>=coverage)) discard;
- }
  vec3 p=vec3(sin(UV.x*6.283185)*sin(UV.y*3.141593),cos(UV.y*3.141593),cos(UV.x*6.283185)*sin(UV.y*3.141593));
  vec3 q=p+vec3(seed_offset,seed_offset*0.17,2.3);
  vec3 wn=normalize(world_normal);
@@ -67,6 +80,9 @@ void fragment() {
   ground=mix(ground,vec3(0.29,0.28,0.24),smoothstep(0.67,0.89,ridges)*0.46);
   float snow=smoothstep(0.76,0.95,latitude+climate*0.13);
   ground=mix(ground,vec3(0.75,0.83,0.83),snow);
+  // Microtexture modulates existing land only. Original continents, climate,
+  // coast, snow mask and drifting clouds keep the same inputs and thresholds.
+  if(detail_level>0) ground*=mix(vec3(1.0),surface_finish(p),0.46);
   vec3 sea=mix(ocean*0.78+vec3(0.002,0.014,0.032),vec3(0.018,0.20,0.27),smoothstep(0.49,0.545,continent));
   col=mix(sea,ground,coast);
   if(detail_level>0) {
@@ -109,7 +125,30 @@ void fragment() {
   float detail=detail_level>0?noise(q*93.0):0.5;
   float fractures=pow(abs(noise(q*18.0)*2.0-1.0),0.5);
   col=base*(0.50+n*0.72)*(0.79+detail*0.31)*(0.84+fractures*0.19);
-  col*=vec3(0.014,0.02,0.027)+vec3(1.27,1.21,1.10)*diffuse;
+  float surface_diffuse=diffuse;
+  float material_ao=1.0;
+  if(detail_level>0) {
+   col*=surface_finish(p);
+   vec3 axis=abs(p);
+   vec2 tex_uv=(axis.y>=max(axis.x,axis.z)?p.xz:(axis.x>=axis.z?p.zy:p.xy))*material_scale;
+   vec3 orm=texture(material_orm,tex_uv).rgb;
+   material_ao=mix(1.0,orm.r,0.45);
+   if(detail_level>1) {
+    vec3 bump=texture(material_normal,tex_uv).rgb*2.0-1.0;
+    bump.xy*=0.35;
+    vec3 mapped_normal=normalize(texture_frame(normalize(NORMAL),VERTEX,tex_uv)*normalize(bump));
+    vec3 view_sun=normalize((VIEW_MATRIX*vec4(sun,0.0)).xyz);
+    surface_diffuse=mix(diffuse,pow(max(0.0,dot(mapped_normal,view_sun)),0.58),0.45);
+    vec3 half_direction=normalize(normalize(VIEW)+view_sun+vec3(0.00001));
+    col+=vec3(0.22,0.28,0.31)*pow(max(0.0,dot(mapped_normal,half_direction)),mix(80.0,10.0,orm.g))*(1.0-orm.g)*day*0.12;
+   }
+  }
+  col*=vec3(0.014,0.02,0.027)*material_ao+vec3(1.27,1.21,1.10)*surface_diffuse;
+ }
+ if(view_coverage<1.0) {
+  float coverage=clamp(view_coverage,0.0,1.0);
+  float threshold=view_dither_threshold(FRAGCOORD.xy);
+  if(coverage<=0.0 || (coverage_invert ? threshold<1.0-coverage : threshold>=coverage)) discard;
  }
  ALBEDO=max(col,vec3(0.0));
 }

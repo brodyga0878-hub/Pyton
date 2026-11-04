@@ -105,7 +105,7 @@ func _ready()->void:
 	if "--rebuild-smoke" in OS.get_cmdline_user_args():call_deferred("_run_smoke")
 
 func _new_models()->void:
-	ship=Flight.new();ship.external_view=true;nav=NavigationData.new();world=World.new();world.configure(nav.current());surface=Surface.new();near.clear()
+	ship=Flight.new();nav=NavigationData.new();world=World.new();world.configure(nav.current());surface=Surface.new();near.clear()
 
 func _build_world()->void:
 	environment=WorldEnvironment.new();environment.environment=Environment.new()
@@ -120,7 +120,7 @@ func _build_world()->void:
 	city_view=CityView.new();add_child(city_view);city_view.hide()
 	player=ShipView.new();add_child(player);player.configure(ship.profile())
 	station=StationView.new();add_child(station);station.configure(settings.quality)
-	space_environment=SpaceEnvironment.new();add_child(space_environment);space_environment.configure(ship.STATION,settings.quality)
+	space_environment=SpaceEnvironment.new();add_child(space_environment);space_environment.hide()
 	stars=MultiMeshInstance3D.new();var star_mesh:=SphereMesh.new();star_mesh.radius=22;star_mesh.height=44;star_mesh.radial_segments=4;star_mesh.rings=2
 	var star_material:=StandardMaterial3D.new();star_material.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED;star_material.vertex_color_use_as_albedo=true;star_mesh.material=star_material
 	var multi:=MultiMesh.new();multi.transform_format=MultiMesh.TRANSFORM_3D;multi.use_colors=true;multi.mesh=star_mesh;multi.instance_count=3200
@@ -272,7 +272,8 @@ func _station_here()->bool:return not surface.active and (world.is_orbital_site(
 func _apply_system()->void:
 	ship.original_port=not world.current_site().is_empty();ship.station_available=_station_here()
 	celestial.configure(world);celestial.set_quality(settings.quality);player.configure(ship.profile())
-	player.set_quality(settings.quality);station.configure(settings.quality);space_environment.configure(ship.STATION,settings.quality)
+	player.set_quality(settings.quality);station.configure(settings.quality);city_view.set_quality(settings.quality)
+	if not graphics_return.is_empty():space_environment.configure(ship.STATION,settings.quality)
 	station.position=ship.STATION;camera.position=ship.position;camera.quaternion=ship.attitude;presentation_key="";_sync_scene()
 
 func _sync_scene()->void:
@@ -291,7 +292,7 @@ func _sync_scene()->void:
 	celestial.transform=to_scene;celestial.visible=not surface.active or high;celestial.set_surface_transition(layered,blend if layered else 1.0)
 	station.visible=_station_here() and not preview
 	planet_fill.visible=not surface.active or high
-	space_environment.visible=station.visible
+	space_environment.visible=station.visible and not graphics_return.is_empty()
 	if space_environment.visible:space_environment.update_view(ship.position)
 	if layered:
 		var turn:Quaternion=frame.basis.get_rotation_quaternion().slerp(Quaternion.IDENTITY,blend)
@@ -421,7 +422,7 @@ func _begin_graphics_demo()->void:
 	if saving_enabled and not _save_game():return
 	_release_inputs()
 	graphics_return={"ship":ship,"nav":nav,"world":world,"surface":surface,"saving_enabled":saving_enabled}
-	saving_enabled=false;_new_models();nav.elapsed_days=225.0;ship.target_speed=0;ship.attitude=Quaternion(Vector3.UP,-0.38)
+	saving_enabled=false;_new_models();ship.external_view=true;nav.elapsed_days=225.0;ship.target_speed=0;ship.attitude=Quaternion(Vector3.UP,-0.38)
 	_close_menu();_apply_system();_refresh_hud();_announce("Осмотрите обновлённый корабль и станцию. Вернуться к основному полёту можно через меню.")
 func _end_graphics_demo()->void:
 	if busy or graphics_return.is_empty():return
@@ -585,7 +586,8 @@ func _import_backup()->void:
 	_commit_state(loaded);saving_enabled=true;_close_menu();_apply_system();_save_game();_announce("Резервная копия восстановлена.")
 func _apply_settings()->void:
 	Engine.max_fps=settings.fps;get_viewport().msaa_3d=settings.msaa();ground_view.set_quality(settings.quality);celestial.set_quality(settings.quality);stick.deadzone=settings.deadzone;presentation_key=""
-	player.set_quality(settings.quality);station.configure(settings.quality);space_environment.configure(ship.STATION,settings.quality)
+	player.set_quality(settings.quality);station.configure(settings.quality);city_view.set_quality(settings.quality)
+	if not graphics_return.is_empty():space_environment.configure(ship.STATION,settings.quality)
 func _settings_changed()->void:_apply_settings();settings.save_file();_record_event("settings_changed",settings.snapshot())
 func _close_settings()->void:settings_panel.hide();_release_inputs();_save_game()
 

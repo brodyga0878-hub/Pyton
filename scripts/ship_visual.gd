@@ -4,6 +4,7 @@ extends Node3D
 const HullShader=preload("res://scripts/ship_hull.gdshader")
 const ExhaustShader=preload("res://scripts/ship_exhaust.gdshader")
 const HaloShader=preload("res://scripts/ship_halo.gdshader")
+const MaterialLibrary=preload("res://scripts/material_library.gd")
 static var _mesh_cache:Dictionary={}
 static var _material_cache:Dictionary={}
 var _groups:Dictionary={}
@@ -97,17 +98,30 @@ func _face(group:String,points:Array)->void:
 	if points.size()<3:return
 	for i in range(1,points.size()-1):_triangle(group,points[0],points[i],points[i+1])
 func _material(group:String)->Material:
-	if _material_cache.has(group):return _material_cache[group]
+	# Shader detail is quality-specific: changing one ship must not alter another.
+	var cache_key:="%s:%d"%[group,_quality]
+	if _material_cache.has(cache_key):return _material_cache[cache_key]
 	var palette:={"frame":[Color("354b57"),0.40,0.44],"armour":[Color("b6c4c7"),0.12,0.33],"edge":[Color("c2d0d2"),0.52,0.29],"navy":[Color("45677c"),0.12,0.39],"gold":[Color("e6b354"),0.45,0.33],"copper":[Color("88614b"),0.8,0.35],"rubber":[Color("0b141b"),0.08,0.72]}
 	if palette.has(group):
-		var row:Array=palette[group];var material:=ShaderMaterial.new();material.shader=HullShader;material.set_shader_parameter("paint",row[0]);material.set_shader_parameter("metalness",row[1]);material.set_shader_parameter("finish",row[2]);_material_cache[group]=material
+		var row:Array=palette[group];var material:=ShaderMaterial.new();material.shader=HullShader
+		var kind:="rubber" if group=="rubber" else ("painted_alloy" if group in ["armour","navy"] else "brushed_metal")
+		# Repeats per metre, independent of hull span, UV seams and camera distance.
+		MaterialLibrary.apply_shader(material,kind,0.33 if kind=="painted_alloy" else 1.25)
+		material.set_shader_parameter("paint",row[0]);material.set_shader_parameter("metalness",row[1]);material.set_shader_parameter("finish",row[2])
+		material.set_shader_parameter("detail_level",_quality)
+		material.set_shader_parameter("normal_strength",0.26 if kind=="painted_alloy" else 0.18)
+		_material_cache[cache_key]=material
 	else:
 		var material:=StandardMaterial3D.new()
-		if group=="glass":material.albedo_color=Color("10384e");material.metallic=0.72;material.roughness=0.12;material.metallic_specular=0.85;material.clearcoat_enabled=true;material.clearcoat=0.9
+		if group=="glass":
+			MaterialLibrary.apply_standard(material,"glass",0.6)
+			material.normal_enabled=_quality>0;material.normal_scale=0.08
+			var glass_tint:Color=(Color("10384e").srgb_to_linear()*MaterialLibrary.albedo_gain("glass")).linear_to_srgb();glass_tint.a=1.0
+			material.albedo_color=glass_tint;material.metallic=0.72;material.roughness=clampf(0.12/MaterialLibrary.roughness_mean("glass"),0.0,1.0);material.metallic_specular=0.85;material.clearcoat_enabled=true;material.clearcoat=0.9
 		else:
 			material.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED;material.albedo_color={"cyan":Color("7eeaff"),"white":Color("d9faff"),"amber":Color("ffb549"),"red":Color("ff5052")}.get(group,Color.WHITE)
-		_material_cache[group]=material
-	return _material_cache[group]
+		_material_cache[cache_key]=material
+	return _material_cache[cache_key]
 func _sample(values:Array,z:float)->float:
 	for i in range(RIB_Z.size()-1):
 		if z<=RIB_Z[i+1]:return lerpf(float(values[i]),float(values[i+1]),clampf((z-RIB_Z[i])/(RIB_Z[i+1]-RIB_Z[i]),0,1))

@@ -1,0 +1,206 @@
+{
+  "version": 1,
+  "resolution": 512,
+  "license": "CC0-1.0",
+  "authoring": "Original deterministic authored periodic PBR surfaces; no downloaded artwork or baked illumination.",
+  "normal_convention": "OpenGL +Y; image Y grows down; no Y inversion on import",
+  "orm_channels": {
+    "r": "ambient_occlusion",
+    "g": "roughness",
+    "b": "metallic"
+  },
+  "materials": {
+    "painted_alloy": {
+      "seed": 534021,
+      "mean_linear_luminance": 0.64684838,
+      "normal_strength": 1.0,
+      "mean_roughness": 0.46855072,
+      "mean_metallic": 0.1599583,
+      "files": {
+        "albedo": {
+          "sha256": "16f54465872aa464b0571f4d94f11080c9e6c6a3775ad2fb925ec70a746f0da1",
+          "bytes": 89741,
+          "seam_gradient_ratio": 5.173
+        },
+        "normal": {
+          "sha256": "6b001916c2790823c829482691631c0c5fb1016a0ff989430fe56065bb22f05a",
+          "bytes": 301653,
+          "seam_gradient_ratio": 5.689
+        },
+        "orm": {
+          "sha256": "66e91f1a16024894b27eb65f206fb316bff13c2f4bd289fabbcbf66317fc1c46",
+          "bytes": 159635,
+          "seam_gradient_ratio": 4.418
+        }
+      }
+    },
+    "brushed_metal": {
+      "seed": 541940,
+      "mean_linear_luminance": 0.63048953,
+      "normal_strength": 1.0,
+      "mean_roughness": 0.34119101,
+      "mean_metallic": 0.94117647,
+      "files": {
+        "albedo": {
+          "sha256": "52069a8050fc8077c10fcdd5b6625c83f4893b92287fffa56b4265644d52250e",
+          "bytes": 45843,
+          "seam_gradient_ratio": 0.951
+        },
+        "normal": {
+          "sha256": "e80164b02cb995b733ae07bcd246d4432c181ac898acca4c408fd73296d321e5",
+          "bytes": 116242,
+          "seam_gradient_ratio": 0.807
+        },
+        "orm": {
+          "sha256": "ae51b49d38a122d38aac40e36a2644808b4b4027bc17177404d96d44a691265f",
+          "bytes": 54562,
+          "seam_gradient_ratio": 0.912
+        }
+      }
+    },
+    "concrete": {
+      "seed": 549859,
+      "mean_linear_luminance": 0.53733064,
+      "normal_strength": 1.0,
+      "mean_roughness": 0.85832171,
+      "mean_metallic": 0.0,
+      "files": {
+        "albedo": {
+          "sha256": "873493e82b46536b4ca31c665e531afb731c46069a8f02962d9f2009eaf025af",
+          "bytes": 210357,
+          "seam_gradient_ratio": 1.303
+        },
+        "normal": {
+          "sha256": "45262cc50fe01cdeedbb90a9583625bd0db32e04a128a3eadbb7ad9c4554d1e8",
+          "bytes": 517188,
+          "seam_gradient_ratio": 1.491
+        },
+        "orm": {
+          "sha256": "9aacf5c445f30124e647b055f803b8d78f65a2e5cd774fecf8278efefaf2c0d2",
+          "bytes": 275167,
+          "seam_gradient_ratio": 1.735
+        }
+      }
+    },
+    "asphalt": {
+      "seed": 557778,
+      "mean_linear_luminance": 0.53048184,
+      "normal_strength": 1.0,
+      "mean_roughness": 0.92992626,
+      "mean_metallic": 0.0,
+      "files": {
+        "albedo": {
+          "sha256": "c34a433a70152dce90512e5e7e0744f78d8b5042877bad2684a352b36695e374",
+          "bytes": 172558,
+          "seam_gradient_ratio": 0.828
+        },
+        "normal": {
+          "sha256": "87f838c51f7e26421fffbf794e9b7d772700b24c46939af868064e0b759692a4",
+          "bytes": 381640,
+          "seam_gradient_ratio": 1.104
+        },
+        "orm": {
+          "sha256": "5d163c654cba6dbd0632b32b2a3d0539885c7e411d972614d964ce9f89eb24eb",
+          "bytes": 170158,
+          "seam_gradient_ratio": 0.72
+        }
+      }
+    },
+    "rock": {
+      "seed": 565697,
+      "mean_linear_luminance": 0.62018226,
+      "normal_strength": 1.0,
+      "mean_roughness": 0.86943964,
+      "mean_metallic": 0.0,
+      "files": {
+        "albedo": {
+          "sha256": "f07a50247fc0499ecd138eb0ef6c3b8413a9f8ca9c0aadd22294ede23b26bc2c",
+          "bytes": 129653,
+          "seam_gradient_ratio": 0.811
+        },
+        "normal": {
+          "sha256": "bb30d76c591be70dcde3bfc084f7a4e52c956c1a57e143686bf0c8382529bb4a",
+          "bytes": 321995,
+          "seam_gradient_ratio": 0.913
+        },
+        "orm": {
+          "sha256": "944e48f1e68119befe0bf9c5dc5e5b81f496db68d003d736afeaad6fd3d776aa",
+          "bytes": 150275,
+          "seam_gradient_ratio": 0.612
+        }
+      }
+    },
+    "ice": {
+      "seed": 573616,
+      "mean_linear_luminance": 0.722252,
+      "normal_strength": 1.0,
+      "mean_roughness": 0.33244937,
+      "mean_metallic": 0.0,
+      "files": {
+        "albedo": {
+          "sha256": "7473ccaa9e1f3f69487e1580eb296c24d4f312ebb243a8286f16aee58fb08620",
+          "bytes": 180585,
+          "seam_gradient_ratio": 0.695
+        },
+        "normal": {
+          "sha256": "a6c96d12f8d4e4ffd501bef30f69af8dbd287a27e1405a344409b39092da6bcb",
+          "bytes": 178588,
+          "seam_gradient_ratio": 0.814
+        },
+        "orm": {
+          "sha256": "ccae7a8980bf1902d8656be541631f491a0de98377646751a94a3bae0d3c151e",
+          "bytes": 83161,
+          "seam_gradient_ratio": 0.137
+        }
+      }
+    },
+    "rubber": {
+      "seed": 581535,
+      "mean_linear_luminance": 0.60026456,
+      "normal_strength": 1.0,
+      "mean_roughness": 0.84015681,
+      "mean_metallic": 0.0,
+      "files": {
+        "albedo": {
+          "sha256": "1ef38a321e51170b890e09a4c9c77e8240b0fc6d9a6a7ee00ff5fc2587232b21",
+          "bytes": 138086,
+          "seam_gradient_ratio": 0.987
+        },
+        "normal": {
+          "sha256": "a5bbc92c4fc529fb0ef65dba823ae06fff0e1cc965f750ed8a91194e9511f5ac",
+          "bytes": 310546,
+          "seam_gradient_ratio": 0.785
+        },
+        "orm": {
+          "sha256": "8fd3ec3f55aa2a27afe8b3ea5b1f7492c77eff222723aeb0af28feb18519a10b",
+          "bytes": 206518,
+          "seam_gradient_ratio": 0.883
+        }
+      }
+    },
+    "glass": {
+      "seed": 589454,
+      "mean_linear_luminance": 0.87559079,
+      "normal_strength": 1.0,
+      "mean_roughness": 0.1144621,
+      "mean_metallic": 0.0,
+      "files": {
+        "albedo": {
+          "sha256": "19f46ccc170ac5cdaae1b2470e36350268abe09f967e301151029ea3a7daaa2a",
+          "bytes": 10328,
+          "seam_gradient_ratio": 0.023
+        },
+        "normal": {
+          "sha256": "74f2525fcad42d873f6bda5afb6c2b327d227129f17a8c2a910a167280d49109",
+          "bytes": 77476,
+          "seam_gradient_ratio": 1.032
+        },
+        "orm": {
+          "sha256": "1a073513e54240596600437ac743a2bd6e0003d961864f2685dcdfa3c025ad9f",
+          "bytes": 22797,
+          "seam_gradient_ratio": 0.031
+        }
+      }
+    }
+  }
+}

@@ -8,8 +8,13 @@ const LEGACY_REVISIONS:=["sphere-v1","sphere-source-sites-v2"]
 var last_error:=""
 var active_key:=""
 var build_count:=0
+var quality:=2
 var cached_cities:Dictionary={}
 var _recent:Array[String]=[]
+
+func set_quality(value:int)->void:
+	quality=clampi(value,0,2)
+	for city in cached_cities.values():city.set_quality(quality)
 
 func current_visual()->Node3D:
 	return cached_cities.get(active_key,null)
@@ -84,6 +89,7 @@ func configure(draw:RefCounted,outer_frame:Transform3D,view_coverage:=1.0)->bool
 		return true
 	if not cached_cities.has(key):
 		var city:=Visual.new()
+		city.set_quality(quality)
 		if not city.configure(data.compiled,data.conversion_basis):
 			city.free()
 			return _fail("Source city visual rejected compiled geometry for "+key)

@@ -1,7 +1,8 @@
 extends Node3D
-# New authored orbital scenery. Visual asteroids do not add mining, damage or
-# collision gameplay. Deterministic geometry; no alteration of saved world data.
+# Optional graphics-preview scenery only. Ordinary flight never creates this
+# field. No mining, damage, collisions or alteration of saved world data.
 const RockShader=preload("res://scripts/asteroid_surface.gdshader")
+const Materials=preload("res://scripts/material_library.gd")
 const BackdropShader=preload("res://scripts/space_backdrop.gdshader")
 const VARIANTS:=8
 var quality:=-1
@@ -47,6 +48,8 @@ func configure(station_anchor:Vector3,value:=2,new_seed:=7124901)->void:
 	for child in get_children():remove_child(child);child.queue_free()
 	rocks.clear();_batches.clear()
 	var material:=ShaderMaterial.new();material.shader=RockShader
+	Materials.apply_shader(material,"rock",0.2)
+	material.set_shader_parameter("detail_level",quality)
 	for lod in range(2):
 		for variant in range(VARIANTS):
 			var visual:=MultiMeshInstance3D.new();visual.name="Asteroids_%d_%d"%[lod,variant]

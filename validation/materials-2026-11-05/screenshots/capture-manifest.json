@@ -1,0 +1,149 @@
+[
+	{
+		"camera_position": [
+			-19.0,
+			62.0,
+			-1527.0
+		],
+		"camera_target": [
+			0.0,
+			45.0,
+			-1553.0
+		],
+		"decorative_asteroids_visible": false,
+		"file": "01-ship-materials.png",
+		"graphics_demo": false,
+		"hud": false,
+		"phone_capture": false,
+		"quality": 2,
+		"renderer": "gl_compatibility",
+		"source": "actual scenes/main.tscn",
+		"terrain_coverage": 1.0
+	},
+	{
+		"camera_position": [
+			220.0,
+			170.0,
+			-2170.0
+		],
+		"camera_target": [
+			0.0,
+			0.0,
+			-2610.0
+		],
+		"decorative_asteroids_visible": false,
+		"file": "02-station-materials.png",
+		"graphics_demo": false,
+		"hud": false,
+		"phone_capture": false,
+		"quality": 2,
+		"renderer": "gl_compatibility",
+		"source": "actual scenes/main.tscn",
+		"terrain_coverage": 1.0
+	},
+	{
+		"camera_position": [
+			150.0,
+			110.123794555664,
+			-110.997436523438
+		],
+		"camera_target": [
+			0.0,
+			8.12379169464111,
+			-285.997436523438
+		],
+		"decorative_asteroids_visible": false,
+		"file": "03-city-materials.png",
+		"graphics_demo": false,
+		"hud": false,
+		"phone_capture": false,
+		"quality": 2,
+		"renderer": "gl_compatibility",
+		"source": "actual scenes/main.tscn",
+		"terrain_coverage": 1.0
+	},
+	{
+		"camera_position": [
+			-27.0,
+			23.1237926483154,
+			-250.997436523438
+		],
+		"camera_target": [
+			0.0,
+			8.00879096984863,
+			-288.993072509766
+		],
+		"decorative_asteroids_visible": false,
+		"file": "04-pad-and-ship.png",
+		"graphics_demo": false,
+		"hud": false,
+		"phone_capture": false,
+		"quality": 2,
+		"renderer": "gl_compatibility",
+		"source": "actual scenes/main.tscn",
+		"terrain_coverage": 1.0
+	},
+	{
+		"camera_position": [
+			1136.6513671875,
+			159.708587646484,
+			-172.500152587891
+		],
+		"camera_target": [
+			1071.6513671875,
+			104.70858001709,
+			-262.500152587891
+		],
+		"decorative_asteroids_visible": false,
+		"file": "05-source-city-roof.png",
+		"graphics_demo": false,
+		"hud": false,
+		"phone_capture": false,
+		"quality": 2,
+		"renderer": "gl_compatibility",
+		"source": "actual scenes/main.tscn",
+		"terrain_coverage": 1.0
+	},
+	{
+		"camera_position": [
+			550.0,
+			12.0971612930298,
+			280.002563476562
+		],
+		"camera_target": [
+			550.0,
+			0.0971610248088837,
+			264.002563476562
+		],
+		"decorative_asteroids_visible": false,
+		"file": "06-ground-materials.png",
+		"graphics_demo": false,
+		"hud": false,
+		"phone_capture": false,
+		"quality": 2,
+		"renderer": "gl_compatibility",
+		"source": "actual scenes/main.tscn",
+		"terrain_coverage": 1.0
+	},
+	{
+		"camera_position": [
+			550.0,
+			12.0971612930298,
+			280.002563476562
+		],
+		"camera_target": [
+			550.0,
+			0.0971610248088837,
+			264.002563476562
+		],
+		"decorative_asteroids_visible": false,
+		"file": "07-ground-transition.png",
+		"graphics_demo": false,
+		"hud": false,
+		"phone_capture": false,
+		"quality": 2,
+		"renderer": "gl_compatibility",
+		"source": "actual scenes/main.tscn",
+		"terrain_coverage": 0.8
+	}
+]

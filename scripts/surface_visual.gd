@@ -3,13 +3,14 @@ const TransitionShader=preload("res://scripts/terrain_transition.gdshader")
 const TerrainShader=preload("res://scripts/terrain.gdshader")
 const PadShader=preload("res://scripts/landing_pad.gdshader")
 const BuildingShader=preload("res://scripts/building.gdshader")
+const Materials=preload("res://scripts/material_library.gd")
 var quality:=2
 var view_coverage:=1.0
 func set_quality(value:int)->void:
 	quality=clampi(value,0,2)
 	for child in get_children():
 		if child is MeshInstance3D and child.material_override is ShaderMaterial:
-			if child.material_override.shader in [TerrainShader,TransitionShader,BuildingShader]:
+			if child.material_override.shader in [TerrainShader,TransitionShader,BuildingShader,PadShader]:
 				child.material_override.set_shader_parameter("detail_level",quality)
 
 
@@ -63,6 +64,12 @@ func configure(surface: RefCounted) -> void:
 	mat.set_shader_parameter("detail_level",quality)
 	mat.set_shader_parameter("spherical_coordinates",spherical)
 	mat.set_shader_parameter("surface_kind",int({"earth":0,"rock":1,"desert":2,"ice":3}.get(surface.kind,1)))
+	Materials.apply_shader(mat,"ice" if surface.kind=="ice" else "rock",0.03125 if surface.kind=="ice" else 0.0625)
+	if spherical:
+		var origin_sample:PackedFloat64Array=surface.globe.sample(0,0)
+		# Exactly an integer number of every texture tile; adjacent terrain rings
+		# share this material and streaming rebases preserve body-fixed phase.
+		mat.set_shader_parameter("material_origin",Vector3(floor(origin_sample[2]/1024.0)*1024.0,floor(origin_sample[3]/1024.0)*1024.0,floor(origin_sample[4]/1024.0)*1024.0))
 	terrain.material_override=mat
 	terrain.set_meta("terrain_layer",true)
 	add_child(terrain)
@@ -86,6 +93,8 @@ func configure(surface: RefCounted) -> void:
 	var box:=BoxMesh.new();box.size=Vector3(100,0.3,100)
 	pad.mesh=box;pad.position=landing_point+Vector3(0,0.2,0)
 	var pm:=ShaderMaterial.new();pm.shader=PadShader
+	Materials.apply_shader(pm,"asphalt",0.25)
+	pm.set_shader_parameter("detail_level",quality)
 	pad.material_override=pm;add_child(pad)
 	for i in range(4):
 		var beacon:=MeshInstance3D.new()
@@ -101,6 +110,7 @@ func configure(surface: RefCounted) -> void:
 			block.size=volume.size;building.mesh=block
 			building.position=volume.get_center();building.name="CityBlock%d"%index;index+=1
 			var wall:=ShaderMaterial.new();wall.shader=BuildingShader
+			Materials.apply_shader(wall,"concrete",0.16)
 			wall.set_shader_parameter("detail_level",quality);wall.set_shader_parameter("building_seed",float(index)+float(surface.seed_value&255))
 			building.material_override=wall;add_child(building)
 	var marker:=Label3D.new();marker.text="ПОСАДОЧНАЯ ПЛОЩАДКА" if site_name.is_empty() else site_name.to_upper();marker.font_size=64;marker.pixel_size=0.08

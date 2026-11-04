@@ -3,6 +3,7 @@ extends Node3D
 # Raw source model execution and geographic placement have separate contracts.
 const Units=preload("res://scripts/source_units.gd")
 const MaterialShader=preload("res://scripts/source_model.gdshader")
+const Materials=preload("res://scripts/material_library.gd")
 # Default: source ground axes [north,up,east] -> surface [east,up,south].
 # Live cities are compiled in body-fixed orientation and supply its inverse.
 const DEFAULT_CONVERSION:=Basis(Vector3(0,0,-1),Vector3.UP,Vector3.RIGHT)
@@ -11,6 +12,25 @@ var source_model_index:=-1
 var unresolved_texture_indices:Array=[]
 var retained_event_kinds:Dictionary={}
 var local_bounds:=AABB()
+var quality:=2
+
+func set_quality(value:int)->void:
+	quality=clampi(value,0,2)
+	for child in get_children():
+		if child is MeshInstance3D and child.material_override is ShaderMaterial:
+			child.material_override.set_shader_parameter("detail_level",quality)
+
+static func material_slot(appearance:Dictionary,normal:Vector3)->int:
+	# Provisional modern finish, not a decoded FFE material semantic. Preserve
+	# source palette and illumination; only classify texture response by colour
+	# and face orientation. Source palette has no named road/window/roof tags.
+	var colour:Color=appearance.colour
+	var brightness:float=maxf(colour.r,maxf(colour.g,colour.b))
+	var saturation:float=brightness-minf(colour.r,minf(colour.g,colour.b))
+	if absf(normal.y)>0.75 and brightness<0.48:return 1 # dark horizontal paving
+	if saturation>0.18:return 2 # coloured alloy retains source paint
+	if absf(normal.y)>0.75 and brightness>0.65:return 3 # light roof alloy
+	return 0 # neutral mineral facade / remaining source faces
 
 static func palette_colour(rgb:Array)->Color:
 	return Color(clampf(float(rgb[0])/8.0,0,1),clampf(float(rgb[1])/8.0,0,1),clampf(float(rgb[2])/8.0,0,1))
@@ -47,7 +67,7 @@ func configure(compiled:Dictionary,conversion_basis:Basis=DEFAULT_CONVERSION)->b
 		var batch:Dictionary=batches[appearance.unlit]
 		var colour:Color=appearance.colour.srgb_to_linear();colour.a=1.0 if appearance.unlit else 0.0
 		for point in vertices:
-			batch.vertices.append(point);batch.normals.append(normal);batch.colours.append(colour);batch.layers.append(Vector2(layers[face_index],0))
+			batch.vertices.append(point);batch.normals.append(normal);batch.colours.append(colour);batch.layers.append(Vector2(layers[face_index],material_slot(appearance,normal)))
 			if first:local_bounds=AABB(point,Vector3.ZERO);first=false
 			else:local_bounds=local_bounds.expand(point)
 		triangle_count+=1
@@ -60,6 +80,11 @@ func configure(compiled:Dictionary,conversion_basis:Basis=DEFAULT_CONVERSION)->b
 		var mesh:=ArrayMesh.new();mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,arrays)
 		var visual:=MeshInstance3D.new();visual.name="SourceUnlit" if unlit else "SourceLit";visual.mesh=mesh
 		var material:=ShaderMaterial.new();material.shader=MaterialShader
+		material.set_shader_parameter("detail_level",quality)
+		for kind in ["concrete","asphalt","painted_alloy","brushed_metal"]:
+			for channel in ["albedo","normal","orm"]:
+				material.set_shader_parameter(kind+"_"+channel,Materials.texture(kind,channel))
+			material.set_shader_parameter(kind+"_gain",Materials.albedo_gain(kind))
 		visual.material_override=material;add_child(visual)
 	for event in compiled.source_events:
 		var kind:String=str(event.kind)
@@ -70,6 +95,7 @@ func configure(compiled:Dictionary,conversion_basis:Basis=DEFAULT_CONVERSION)->b
 			var visual:=MeshInstance3D.new();visual.mesh=sphere;visual.position=_point(event.center_raw,conversion_basis)
 			var material:=StandardMaterial3D.new();var appearance:=face_material(event)
 			material.albedo_color=appearance.colour;material.roughness=0.5;material.metallic=0.1
+			if not appearance.unlit:Materials.apply_standard(material,"painted_alloy",0.25)
 			if appearance.unlit:material.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED
 			visual.material_override=material;add_child(visual)
 	return triangle_count>0

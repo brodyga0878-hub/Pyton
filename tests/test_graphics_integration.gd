@@ -90,9 +90,15 @@ func quality_and_controls()->void:
 	var old_quality:int=game.settings.quality
 	for quality in [0,2]:
 		game.settings.quality=quality;game._apply_settings()
-		check(game.player.get("_quality")==quality and game.station.quality==quality and game.space_environment.quality==quality,"Phone graphics quality reaches ship, station and asteroids: %d"%quality)
+		check(game.player.get("_quality")==quality and game.station.quality==quality and not game.space_environment.visible,"Normal graphics quality updates existing objects without enabling asteroid scenery: %d"%quality)
 		check(game.player.geometry_stats.triangles>10,"Configured ship uses authored detailed geometry")
-	check(game.space_environment.asteroid_count==275,"High quality uses the tested batched asteroid count")
+	game._begin_graphics_demo()
+	for quality in [0,2]:
+		game.settings.quality=quality;game._apply_settings()
+		check(game.space_environment.quality==quality,"Only the optional demo configures asteroid quality: %d"%quality)
+	check(game.space_environment.asteroid_count==275 and game.space_environment.visible,"High quality scenery belongs to the optional demo")
+	game._end_graphics_demo()
+	check(not game.space_environment.visible,"Normal flight stays clear after leaving the demo")
 	game._show_menu();game._process(0.05)
 	check(not game.stick.input_allowed and not game.lever.input_allowed,"Overlay menu prevents steering and throttle capture")
 	game._close_menu();game._process(0.05)

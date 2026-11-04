@@ -7,6 +7,7 @@ var focus_surface_preview:=false
 var surface_space_blend:=0.0
 const RingShader=preload("res://scripts/rings.gdshader")
 const AtmosphereShader=preload("res://scripts/atmosphere.gdshader")
+const Materials=preload("res://scripts/material_library.gd")
 func set_quality(value:int)->void:
 	quality=clampi(value,0,2)
 	for entry in visuals.values():
@@ -44,6 +45,9 @@ func configure(system: RefCounted) -> void:
 		mat.set_shader_parameter("detail_level",quality)
 		mat.set_shader_parameter("inhabited",inhabited.has(str(body.id)))
 		var kind := str(body.kind)
+		# Mineral maps add fine surface response only; procedural geography,
+		# cloud placement, body radii/orbits and source records are untouched.
+		Materials.apply_shader(mat,"ice" if kind=="ice" else "rock",48.0)
 		var code := {"earth":0,"rock":1,"desert":2,"gas":3,"ice_gas":4,"ice":5,"star":6}
 		mat.set_shader_parameter("body_kind",int(code.get(kind,1)))
 		var tint := Color.from_hsv(float((context.system_id+str(body.id).hash())&255)/255.0,0.36,0.4)
