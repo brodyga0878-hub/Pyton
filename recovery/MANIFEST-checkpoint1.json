@@ -1,0 +1,1105 @@
+{
+  "date": "2026-11-04",
+  "label": "checkpoint1",
+  "scope": "PARTIAL SOURCE RECOVERY FROM AGENT HISTORY",
+  "full_game_restored": false,
+  "old_packaged_source_zip_found": false,
+  "old_apk_found": false,
+  "files_recovered_in_this_snapshot": 125,
+  "identified_original_paths": [
+    "docs/ORIGINAL_WORLD_MODELS_RU.md",
+    "export_presets.cfg",
+    "scripts/body_rotation.gd",
+    "scripts/celestial_renderer.gd",
+    "scripts/device_settings.gd",
+    "scripts/ground_coordinates.gd",
+    "scripts/near_surface_view.gd",
+    "scripts/planet.gdshader",
+    "scripts/segment_box.gd",
+    "scripts/segment_triangle.gd",
+    "scripts/source_city_anchor.gd",
+    "scripts/source_city_profile.gd",
+    "scripts/source_city_runtime.gd",
+    "scripts/source_city_view.gd",
+    "scripts/source_ground_pads.gd",
+    "scripts/source_model.gdshader",
+    "scripts/source_model_mesh.gd",
+    "scripts/source_model_vertices.gd",
+    "scripts/source_model_visual.gd",
+    "scripts/source_model_vm.gd",
+    "scripts/source_polygon.gd",
+    "scripts/source_units.gd",
+    "scripts/spherical_terrain.gd",
+    "scripts/surface_model.gd",
+    "scripts/surface_orbit_link.gd",
+    "scripts/surface_visual.gd",
+    "scripts/terrain_math.gd",
+    "scripts/terrain_query.gd",
+    "scripts/terrain_surface_point.gd",
+    "scripts/world_presentation.gd",
+    "tests/test_body_rotation.gd",
+    "tests/test_city_collision.gd",
+    "tests/test_global_surface.gd",
+    "tests/test_ground_coordinates.gd",
+    "tests/test_segment_triangle.gd",
+    "tests/test_source_city_anchor.gd",
+    "tests/test_source_city_runtime.gd",
+    "tests/test_source_city_view.gd",
+    "tests/test_source_ground_pads.gd",
+    "tests/test_source_model_aux_rotation.gd",
+    "tests/test_source_model_child_frame.gd",
+    "tests/test_source_model_mesh.gd",
+    "tests/test_terrain_additional_query.py",
+    "tests/test_terrain_game_query.py",
+    "tests/test_terrain_provider.py",
+    "tests/test_terrain_provider_points.gd",
+    "tests/test_terrain_query.gd",
+    "tests/test_terrain_surface_point.gd",
+    "tests/test_world_model_assets.py",
+    "tools/build_android.sh",
+    "tools/build_city_placement_reference.py",
+    "tools/build_ground_pads_reference.py",
+    "tools/build_ground_reference.py",
+    "tools/build_legacy_geography_fixture.gd",
+    "tools/build_model_child_frame_reference.py",
+    "tools/build_terrain_additional_query_reference.py",
+    "tools/build_terrain_game_query_reference.py",
+    "tools/build_terrain_provider_reference.py",
+    "tools/check.sh",
+    "tools/extract_ship_registry.py",
+    "tools/extract_world_models.py",
+    "tools/native_reference.py",
+    "tools/preview_world_model.gd",
+    "tools/release_candidate.py",
+    "tools/verify_android.py"
+  ],
+  "distinct_identified_original_paths": 65,
+  "distinct_content_hashes": 102,
+  "python_syntax_errors": [],
+  "validation": [
+    {
+      "log": "validation/segment-triangle-validation-2026-11-04.log",
+      "checks": 144,
+      "passed": true,
+      "scope": "Analytic collision unit cases only"
+    },
+    {
+      "log": "validation/city-view-validation-2026-11-04.log",
+      "checks": 33,
+      "passed": true,
+      "scope": "Synthetic city view geometry only; no original data assets"
+    }
+  ],
+  "known_missing_core_examples": [
+    "scripts/main.gd",
+    "scripts/flight_model.gd",
+    "scripts/navigation.gd",
+    "scripts/planetary_system.gd",
+    "scripts/galaxy.gd",
+    "data/ffe_world_models.json",
+    "data/ffe_ground_coordinates.json"
+  ],
+  "original_file_hash_comparison_available": false,
+  "files": [
+    {
+      "path": "history/geographic_descent_model/partial/scripts/main.finish_vertical_ascent_before_high_return.gd",
+      "bytes": 790,
+      "sha256": "4d3a2b88d59fb430b23458ddbdd25d2d8bc668c94cfcd94ae7623703db0fb899",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/geographic_descent_model/partial/scripts/main.surface_action_before_high_return.gd",
+      "bytes": 1510,
+      "sha256": "fefddbd5733cdaf33ffd8d625719aca9a627c1a52ff92ae6dc4d191215a97f9e",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/geographic_descent_model/partial/scripts/main.sync_planet_visuals.gd",
+      "bytes": 3802,
+      "sha256": "c0f4f9131b223d1b4690135b936385a64685bd397a997485dbc9cc018aa1b5e1",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/geographic_descent_model/partial/scripts/planetary_system.fragments.gd",
+      "bytes": 2595,
+      "sha256": "308f0822f3a71dd8dc7985834955b9fc17759a9646373bad69e23a036d6d9a25",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/geographic_descent_model/partial/scripts/surface_model.clip_tail.gd",
+      "bytes": 679,
+      "sha256": "342545dfdc785ca713bffcd4843dd38c1156c7743bb25c457d131f9657f4fd0e",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/geographic_descent_model/partial/scripts/surface_model.prefix.gd",
+      "bytes": 15884,
+      "sha256": "fa6f1c023503e345a8b5695927da2344c4d6a1256079901f74d2db2d8369406f",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/geographic_descent_model/partial/scripts/surface_model.suffix.gd",
+      "bytes": 9327,
+      "sha256": "59eac35614124f01533a64413c98e44f526c23ccdc6d07f98c54b145a8589c5d",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/geographic_descent_model/scripts/celestial_renderer.gd",
+      "bytes": 5397,
+      "sha256": "94a658884866b427921d87dc400ca5680cb9257b346bed92062b8d8639e9b8f6",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/celestial_renderer.gd"
+    },
+    {
+      "path": "history/geographic_descent_model/scripts/near_surface_view.gd",
+      "bytes": 4740,
+      "sha256": "cd107045c3733aeb37fcb574f4f1c15f3fae09eb0cec35284489427cdfa55bd5",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/near_surface_view.gd"
+    },
+    {
+      "path": "history/geographic_descent_model/scripts/spherical_terrain.gd",
+      "bytes": 3725,
+      "sha256": "69560787d5947535e8c10b75d781826628991e737539f164ff6aa326cf8b6037",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/spherical_terrain.gd"
+    },
+    {
+      "path": "history/geographic_descent_model/scripts/surface_model.gd",
+      "bytes": 26824,
+      "sha256": "9068a7f5a16dd0450e07e35a80a439f63ffb70e21061d2e52751b99defca0226",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_model.gd"
+    },
+    {
+      "path": "history/geographic_descent_model/scripts/surface_orbit_link.gd",
+      "bytes": 4071,
+      "sha256": "8cd141e0bd668ea0fcf3c65ee7c88db14be6037385b18c13f44d0dc0766e532c",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_orbit_link.gd"
+    },
+    {
+      "path": "history/geographic_descent_model/scripts/world_presentation.gd",
+      "bytes": 2603,
+      "sha256": "06ca6bdd7d156f7c71e8854ed5363996cfb72468dc6acf2389f02ca1c64aa828",
+      "agent": "geographic_descent_model",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/world_presentation.gd"
+    },
+    {
+      "path": "history/geography_regression/export_presets.cfg",
+      "bytes": 950,
+      "sha256": "d7e524c27d273b9266251d3e1987e54529f65b539529948c04a25982bdb77c30",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "export_presets.cfg"
+    },
+    {
+      "path": "history/geography_regression/provenance/limitations.md",
+      "bytes": 7446,
+      "sha256": "1886a968ec3e5c2930ea4e05f364eb80d0c94afe21a65e49df448d1ed22b8485",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/geography_regression/provenance/recovered-files.json",
+      "bytes": 4707,
+      "sha256": "42a4b822b1eea8376e2e6570ca13e79a30b9e924b95a3447c4438d9f409959b3",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/geography_regression/scripts/ground_coordinates.gd",
+      "bytes": 2432,
+      "sha256": "b61afd67aa89f65c7bde5548c31516ac61ed6cc4e0c5e8b55280a055075ccd71",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/ground_coordinates.gd"
+    },
+    {
+      "path": "history/geography_regression/scripts/near_surface_view.gd",
+      "bytes": 4933,
+      "sha256": "5dc6b8f8d342b0d243767c6f5987da48906ce5829ef92e4a96b992ef6356716b",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/near_surface_view.gd"
+    },
+    {
+      "path": "history/geography_regression/scripts/segment_box.gd",
+      "bytes": 1084,
+      "sha256": "c859146608a6e8208620078a12742c07e1fdafa04761ec5abcffa2cfd0501fad",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/segment_box.gd"
+    },
+    {
+      "path": "history/geography_regression/scripts/segment_triangle.gd",
+      "bytes": 8104,
+      "sha256": "c1f000e1481ba9654ab9cf27db7b30e6eaeef46a35d533a01dffb2d86bece346",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/segment_triangle.gd"
+    },
+    {
+      "path": "history/geography_regression/scripts/spherical_terrain.gd",
+      "bytes": 4522,
+      "sha256": "ac7e11881b649129f09d916cbf48c5b025119aef7735f92f6473f19709c10975",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/spherical_terrain.gd"
+    },
+    {
+      "path": "history/geography_regression/scripts/surface_orbit_link.gd",
+      "bytes": 4483,
+      "sha256": "6a358b2030a0480035caa7a5263d0db96385394740672b18b18a306c30bec12c",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_orbit_link.gd"
+    },
+    {
+      "path": "history/geography_regression/tests/test_ground_coordinates.gd",
+      "bytes": 16329,
+      "sha256": "d2416edcc1058600c4771111d9d91e73ab19e548a4b87aba4ee18f0c2c8d3640",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_ground_coordinates.gd"
+    },
+    {
+      "path": "history/geography_regression/tests/test_segment_triangle.gd",
+      "bytes": 9681,
+      "sha256": "ef35496233fb895ce0e46bcb0446d4e051100b12346df64e9530a13074b978c6",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_segment_triangle.gd"
+    },
+    {
+      "path": "history/geography_regression/tools/build_android.sh",
+      "bytes": 1320,
+      "sha256": "ca004d5164c7f313a9483a282b3e781fdf1ff087deecccb882283c8641706ac8",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_android.sh"
+    },
+    {
+      "path": "history/geography_regression/tools/build_legacy_geography_fixture.gd",
+      "bytes": 5065,
+      "sha256": "75ba9b1eb37454d9c8e32faf498b80a6c23344551cbe7de7b289450dc6b109f4",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_legacy_geography_fixture.gd"
+    },
+    {
+      "path": "history/geography_regression/tools/check.sh",
+      "bytes": 3243,
+      "sha256": "26bf8b31f5cd6ea437bbdb574bb4fb52832c32f3fc44c0abb32196ee4906f3a2",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/check.sh"
+    },
+    {
+      "path": "history/geography_regression/tools/release_candidate.py",
+      "bytes": 13728,
+      "sha256": "055a4797fd1f81c3668de4a771a603c11ce1fdfd745948b89ba45dfc19e08228",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/release_candidate.py"
+    },
+    {
+      "path": "history/geography_regression/tools/verify_android.py",
+      "bytes": 4579,
+      "sha256": "f2014e2d41e5f4601eb9af3db2647589b656f14a8ff2975749955ee5d4c330ea",
+      "agent": "geography_regression",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/verify_android.py"
+    },
+    {
+      "path": "history/ground_harness/scripts/ground_coordinates.gd",
+      "bytes": 2432,
+      "sha256": "b61afd67aa89f65c7bde5548c31516ac61ed6cc4e0c5e8b55280a055075ccd71",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/ground_coordinates.gd"
+    },
+    {
+      "path": "history/ground_harness/scripts/source_city_anchor.gd",
+      "bytes": 5544,
+      "sha256": "acf475a6a22e27be592aa1f4b3ca45775cefbd60d9f2faaefed7e249eb8f334e",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_city_anchor.gd"
+    },
+    {
+      "path": "history/ground_harness/scripts/source_ground_pads.gd",
+      "bytes": 3793,
+      "sha256": "5bbb93864a95d2865da12e2315e9aa9b57d8d27bc50ea1e7536e489357f1299c",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_ground_pads.gd"
+    },
+    {
+      "path": "history/ground_harness/scripts/terrain_surface_point.gd",
+      "bytes": 6727,
+      "sha256": "48bbfd3f3789cd0d5d4865c22977fef20cfa721ba440a7a7bf14431ce6cdfe57",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/terrain_surface_point.gd"
+    },
+    {
+      "path": "history/ground_harness/tests/test_source_city_anchor.gd",
+      "bytes": 3354,
+      "sha256": "2d91f396f3341f74fde774f196b1fbe75cfde8bbdefa20751e98757d017488f2",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_source_city_anchor.gd"
+    },
+    {
+      "path": "history/ground_harness/tests/test_source_ground_pads.gd",
+      "bytes": 3763,
+      "sha256": "fce15e08f304f86478bb0f4ddfcef7e8343d8f2c2088f83e17807bfec2857842",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_source_ground_pads.gd"
+    },
+    {
+      "path": "history/ground_harness/tests/test_source_model_aux_rotation.gd",
+      "bytes": 2181,
+      "sha256": "b99c0f817ba5cd2d81e12e69dcd1350638bfcae988f1ac3caf8262ecdc524ee7",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_source_model_aux_rotation.gd"
+    },
+    {
+      "path": "history/ground_harness/tests/test_source_model_child_frame.gd",
+      "bytes": 4136,
+      "sha256": "762cd6026b929aade38668b9561099d4f3b0161a11cb102a2af5ecf1dbca88c3",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_source_model_child_frame.gd"
+    },
+    {
+      "path": "history/ground_harness/tools/build_city_placement_reference.py",
+      "bytes": 25091,
+      "sha256": "bb10984407625dbac42cbae8af47c3aec9ec93045a5d16ee3391c06effe4dfb7",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_city_placement_reference.py"
+    },
+    {
+      "path": "history/ground_harness/tools/build_ground_pads_reference.py",
+      "bytes": 20616,
+      "sha256": "890762910d6aa72d13afa6dbd7950d7a7aea6bc42dea8083062b0f97bd52a11b",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_ground_pads_reference.py"
+    },
+    {
+      "path": "history/ground_harness/tools/build_ground_reference.py",
+      "bytes": 9728,
+      "sha256": "56c47c6e173fcd709de6fdfdc3ecbeaa7a4abad86e123f400b68cbe54365d9e3",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_ground_reference.py"
+    },
+    {
+      "path": "history/ground_harness/tools/build_model_child_frame_reference.py",
+      "bytes": 20495,
+      "sha256": "59abd11124ae37b73d99fb94267529f7ddf9d6a393403131646e67b6f29dbbc1",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_model_child_frame_reference.py"
+    },
+    {
+      "path": "history/ground_harness/tools/extract_ship_registry.py",
+      "bytes": 6442,
+      "sha256": "11c717720ba0f0e0fe3bd4cc17e825d57f2e620e9e6c155870d65896a1dd5712",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/extract_ship_registry.py"
+    },
+    {
+      "path": "history/ground_harness/tools/extract_world_models.py",
+      "bytes": 5646,
+      "sha256": "1f153b367dd3da819864e8cca66ba32cd7abb60edef0cfdf428084afa1ae67ac",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/extract_world_models.py"
+    },
+    {
+      "path": "history/ground_harness/tools/native_reference.py",
+      "bytes": 1678,
+      "sha256": "50a1757168b4b886b1b48db6798d60feb4b73f6fb04176a0840a941ebdf6a1eb",
+      "agent": "ground_harness",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/native_reference.py"
+    },
+    {
+      "path": "history/ground_vector_source/PROVENANCE.md",
+      "bytes": 4856,
+      "sha256": "a258fbae1c62ef2b70dd70ccd3ef60cf25d3161cd1753f621fc92a0888b686ad",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/ground_vector_source/docs/ORIGINAL_WORLD_MODELS_RU.md",
+      "bytes": 25254,
+      "sha256": "ca9da27347ceccf068c71976ea6fbb0de0539f3cdf93f04fb264f1dfe7945517",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "docs/ORIGINAL_WORLD_MODELS_RU.md"
+    },
+    {
+      "path": "history/ground_vector_source/historical_snapshots/scripts/ground_coordinates.gd",
+      "bytes": 2432,
+      "sha256": "b61afd67aa89f65c7bde5548c31516ac61ed6cc4e0c5e8b55280a055075ccd71",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/ground_coordinates.gd"
+    },
+    {
+      "path": "history/ground_vector_source/historical_snapshots/scripts/segment_triangle.gd",
+      "bytes": 8104,
+      "sha256": "c1f000e1481ba9654ab9cf27db7b30e6eaeef46a35d533a01dffb2d86bece346",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/segment_triangle.gd"
+    },
+    {
+      "path": "history/ground_vector_source/historical_snapshots/scripts/source_city_profile.gd",
+      "bytes": 2899,
+      "sha256": "3a53275a5663de4206bf77c2adf816f308386dc469f942173be3e94912939416",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_city_profile.gd"
+    },
+    {
+      "path": "history/ground_vector_source/historical_snapshots/scripts/source_ground_pads.gd",
+      "bytes": 3793,
+      "sha256": "5bbb93864a95d2865da12e2315e9aa9b57d8d27bc50ea1e7536e489357f1299c",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_ground_pads.gd"
+    },
+    {
+      "path": "history/ground_vector_source/historical_snapshots/scripts/source_units.gd",
+      "bytes": 705,
+      "sha256": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_units.gd"
+    },
+    {
+      "path": "history/ground_vector_source/scripts/source_city_runtime.gd",
+      "bytes": 9156,
+      "sha256": "69060a73c0c68f1038808ce369574dc0c20dbec8e0b9ce5c0b76d9a7d26c805b",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_city_runtime.gd"
+    },
+    {
+      "path": "history/ground_vector_source/scripts/source_model_mesh.gd",
+      "bytes": 29224,
+      "sha256": "6642ce62a1a8046c71a57fb08325304c8d12c3bc61b90921d458ef84ad21472e",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_model_mesh.gd"
+    },
+    {
+      "path": "history/ground_vector_source/scripts/source_model_vertices.gd",
+      "bytes": 5207,
+      "sha256": "bfd236cbee940167f882a85a461911aad672fd7c292b6f58619e87cf6ecc7e33",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_model_vertices.gd"
+    },
+    {
+      "path": "history/ground_vector_source/scripts/source_model_vm.gd",
+      "bytes": 5191,
+      "sha256": "c676724f91eae910bf0c318c04ee7426905e7e372fdcd4a68c547f81043f0f2e",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_model_vm.gd"
+    },
+    {
+      "path": "history/ground_vector_source/tests/test_source_city_runtime.gd",
+      "bytes": 10432,
+      "sha256": "29927274559d761dada752d1af5d4425b30ca7247a2d819bc7d6a9f4e906cc31",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_source_city_runtime.gd"
+    },
+    {
+      "path": "history/ground_vector_source/tests/test_source_model_child_frame.gd",
+      "bytes": 4136,
+      "sha256": "762cd6026b929aade38668b9561099d4f3b0161a11cb102a2af5ecf1dbca88c3",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_source_model_child_frame.gd"
+    },
+    {
+      "path": "history/ground_vector_source/tests/test_source_model_mesh.gd",
+      "bytes": 6410,
+      "sha256": "f86251c42419ad074c937fc1a5212550cec1f8d6d5930e33e7f9380ccf24d113",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_source_model_mesh.gd"
+    },
+    {
+      "path": "history/ground_vector_source/tests/test_world_model_assets.py",
+      "bytes": 2875,
+      "sha256": "ade81f582661eb434d472cf6c588dc99284bfe40e397c30940a35259f8a99c93",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_world_model_assets.py"
+    },
+    {
+      "path": "history/ground_vector_source/tools/extract_world_models.py",
+      "bytes": 5646,
+      "sha256": "1f153b367dd3da819864e8cca66ba32cd7abb60edef0cfdf428084afa1ae67ac",
+      "agent": "ground_vector_source",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/extract_world_models.py"
+    },
+    {
+      "path": "history/multiplicity_reference/PROVENANCE.md",
+      "bytes": 10597,
+      "sha256": "c450a965178a7411a026c7eaa048dc653256c2a003f7eb4a0675a359b809d415",
+      "agent": "multiplicity_reference",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/multiplicity_reference/RECOVERED_SHA256SUMS",
+      "bytes": 636,
+      "sha256": "624431cc82698c5b613d8e6dc21d92fbc86fc3d4aca5d585e1731c0a2194ba1a",
+      "agent": "multiplicity_reference",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/multiplicity_reference/partial/scripts/main.gd.lines2582-2632.txt",
+      "bytes": 3566,
+      "sha256": "2d8087271a7e03e3d4d04bb537005a32d06c7c5aa8028f85ff0427e3b1bf88a7",
+      "agent": "multiplicity_reference",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/multiplicity_reference/partial/scripts/near_surface_view.gd.lines24-69.txt",
+      "bytes": 3276,
+      "sha256": "7726fac59b34ba20adfedb270dca3d2ac3a941e58c8b70547af60b0f55e25c83",
+      "agent": "multiplicity_reference",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/multiplicity_reference/partial/scripts/surface_visual.gd.lines77-93.txt",
+      "bytes": 1055,
+      "sha256": "bd8672a7d28da99498e89a83549622afe4d0178c3a40a92193a7aae9186aac48",
+      "agent": "multiplicity_reference",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/multiplicity_reference/partial/tests/test_source_city_view.gd.lines31-92.txt",
+      "bytes": 5664,
+      "sha256": "955a9d7caf7892f2b3fd75e9626aeb74ca1b7034e6dadd66c311045f27805050",
+      "agent": "multiplicity_reference",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/multiplicity_reference/scripts/source_city_view.gd",
+      "bytes": 3497,
+      "sha256": "c381e770fa25b3dad3606ab799dc15e12a2bf52d8d54e7edf727b532a023796d",
+      "agent": "multiplicity_reference",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_city_view.gd"
+    },
+    {
+      "path": "history/preview_review/scripts/celestial_renderer.gd",
+      "bytes": 3396,
+      "sha256": "bb2178f8e400b8d5daff89b21d5d4cc2a2474b11bbcf2ce9cec0d49cdda2b249",
+      "agent": "preview_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/celestial_renderer.gd"
+    },
+    {
+      "path": "history/preview_review/versions/pre-v2/scripts/near_surface_view.gd",
+      "bytes": 3349,
+      "sha256": "5e7fd1f56368e4751150f1af0d5c7f34ad8069ac4c78a29d7ac10cd1e31ed1ed",
+      "agent": "preview_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/near_surface_view.gd"
+    },
+    {
+      "path": "history/preview_review/versions/pre-v2/scripts/surface_orbit_link.gd",
+      "bytes": 3404,
+      "sha256": "762f656ae766df4ca449ab961788c91935b4b893940e6a78fafd8883b3c4cde8",
+      "agent": "preview_review",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_orbit_link.gd"
+    },
+    {
+      "path": "history/release_audit/scripts/device_settings.gd",
+      "bytes": 2104,
+      "sha256": "890be6e61f0bb5d3cdc1fbceed75ba546485d85b46daf1dbde02da4897559c42",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/device_settings.gd"
+    },
+    {
+      "path": "history/release_audit/scripts/surface_model.gd",
+      "bytes": 12617,
+      "sha256": "d67ac076565b8994c60d6d222476d94a7339d8734c6220e90a1a218bd6a2c59a",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_model.gd"
+    },
+    {
+      "path": "history/release_audit/versions/v0.10.0-read/scripts/celestial_renderer.gd",
+      "bytes": 2839,
+      "sha256": "c45450645c00b2fa0c18b54944a49857c5bd3d3b420136bc2f52b45b61f90522",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/celestial_renderer.gd"
+    },
+    {
+      "path": "history/release_audit/versions/v0.10.0-read/scripts/planet.gdshader",
+      "bytes": 1743,
+      "sha256": "f9d3e10df8b6d008a664464c61421553face6eedddf43122293874e2f6bdf5a3",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/planet.gdshader"
+    },
+    {
+      "path": "history/release_audit/versions/v0.10.1-read/scripts/surface_model.gd",
+      "bytes": 12617,
+      "sha256": "d67ac076565b8994c60d6d222476d94a7339d8734c6220e90a1a218bd6a2c59a",
+      "agent": "release_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_model.gd"
+    },
+    {
+      "path": "history/root/PROVENANCE.md",
+      "bytes": 1926,
+      "sha256": "1100c830bfa8df59a67f7e2a84332f382a63a498dab236940440ed5a0e0a9f1f",
+      "agent": "root",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/root/partial/surface_model.city_collision_block.PROVENANCE.md",
+      "bytes": 718,
+      "sha256": "34ec850fde5248ba0bf69710849a6df17ccc8a55c5ddf543c6ef02c2f5cd6fac",
+      "agent": "root",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/root/partial/surface_model.city_collision_block.gd.txt",
+      "bytes": 1883,
+      "sha256": "3ca31858a2c0e69098abac43aae6f40770c701aa4737e096e0ef2cf996bf3a92",
+      "agent": "root",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/root/scripts/source_city_profile.gd",
+      "bytes": 4162,
+      "sha256": "b10585673d6f2d59ce45c1ee178220b2260cb1067c97ac5425723e7e3fa32446",
+      "agent": "root",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_city_profile.gd"
+    },
+    {
+      "path": "history/root/scripts/source_model.gdshader",
+      "bytes": 789,
+      "sha256": "266c1bae942a10b715eddb6668c117a85b31b689f150954945e6622d809804cc",
+      "agent": "root",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_model.gdshader"
+    },
+    {
+      "path": "history/root/scripts/source_model_visual.gd",
+      "bytes": 6940,
+      "sha256": "fdba99f3b37a6f253236b5ffd606e9108a372d8e4a5d6c83b8bced61f23a9d0d",
+      "agent": "root",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_model_visual.gd"
+    },
+    {
+      "path": "history/root/scripts/source_units.gd",
+      "bytes": 705,
+      "sha256": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24",
+      "agent": "root",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_units.gd"
+    },
+    {
+      "path": "history/root/tools/preview_world_model.gd",
+      "bytes": 2111,
+      "sha256": "a764b2e6816dd7e40100af0c1d2468733341c811478321c57885dced81be82c9",
+      "agent": "root",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/preview_world_model.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/PROVENANCE.md",
+      "bytes": 5716,
+      "sha256": "cbd07549bcaefac64c338e2304dacd445c2eddf4aee4938b9e5d1bbbb3eb4af4",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/source_terrain_revision/SHA256SUMS",
+      "bytes": 1614,
+      "sha256": "38e69b917d757fc64aceee82d850091a180d975a78f00d8c06d0e248e6390a68",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/source_terrain_revision/partial/SURFACE_MODEL_RECOVERY_NOTES.md",
+      "bytes": 4014,
+      "sha256": "52d615512b2aa6c1726a0ce0a66585c9c33fbd62869f4b2f6d6ae9b9ed365971",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/source_terrain_revision/partial/worker_functions.gd.txt",
+      "bytes": 5126,
+      "sha256": "44738694045a3b28973c57adea33da3247ca49e5dd5949fafeb38952a65f0c34",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/source_terrain_revision/partial/worker_functions.provenance.md",
+      "bytes": 662,
+      "sha256": "90fc8c6aa9d8b1d337c3829458cdd6d99f0a3c8dc0f9e91f107cfe796079c3cd",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": true,
+      "original_path_if_identified": null
+    },
+    {
+      "path": "history/source_terrain_revision/scripts/body_rotation.gd",
+      "bytes": 2917,
+      "sha256": "b5d4e63331728681d1f34c73fe83cdd57120e29b352e09090da4ff147b22ed34",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/body_rotation.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/scripts/ground_coordinates.gd",
+      "bytes": 2432,
+      "sha256": "b61afd67aa89f65c7bde5548c31516ac61ed6cc4e0c5e8b55280a055075ccd71",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/ground_coordinates.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/scripts/near_surface_view.gd",
+      "bytes": 5006,
+      "sha256": "d1ef30cb8cc865555f946623ae17d680598c605483ec6547273910ecd3d1f6df",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/near_surface_view.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/scripts/source_polygon.gd",
+      "bytes": 5197,
+      "sha256": "9e83a719b5a13a22fcba53417cb3c4006d310804eda3e69aba543a9551c07a43",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_polygon.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/scripts/source_units.gd",
+      "bytes": 705,
+      "sha256": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_units.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/scripts/spherical_terrain.gd",
+      "bytes": 5775,
+      "sha256": "6da1c61aac47df2f8921ab459a962c9853bd5d327c86264d7fc28c46b8d7986e",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/spherical_terrain.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/scripts/surface_orbit_link.gd",
+      "bytes": 4483,
+      "sha256": "6a358b2030a0480035caa7a5263d0db96385394740672b18b18a306c30bec12c",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_orbit_link.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/scripts/terrain_math.gd",
+      "bytes": 1267,
+      "sha256": "0e62c6768996164a45752dcc55c6b0c8b49d50940390fd50994094b5fe51f637",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/terrain_math.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/scripts/terrain_query.gd",
+      "bytes": 18648,
+      "sha256": "c270f1b1e31fefc5e9c840aeda836f698049aa72d17d4c66d4379edcde26d006",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/terrain_query.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/scripts/terrain_surface_point.gd",
+      "bytes": 6727,
+      "sha256": "48bbfd3f3789cd0d5d4865c22977fef20cfa721ba440a7a7bf14431ce6cdfe57",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/terrain_surface_point.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/tests/test_body_rotation.gd",
+      "bytes": 3922,
+      "sha256": "4ef52b120bf3dae5e9a4b9c33e98cc2d07f681658d25fda3174ecb60007117cf",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_body_rotation.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/tests/test_terrain_query.gd",
+      "bytes": 4197,
+      "sha256": "5718ec03553a799fdf06f5cdc80ec50354674547dea3c39095cae20e8cb2ea20",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_terrain_query.gd"
+    },
+    {
+      "path": "history/source_terrain_revision/tests/test_terrain_surface_point.gd",
+      "bytes": 3193,
+      "sha256": "0775c80f35d6786cc2bc778065b99354cd9269f94bace1fd4887619108b50345",
+      "agent": "source_terrain_revision",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_terrain_surface_point.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/device_settings.gd",
+      "bytes": 2104,
+      "sha256": "890be6e61f0bb5d3cdc1fbceed75ba546485d85b46daf1dbde02da4897559c42",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/device_settings.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/near_surface_view.gd",
+      "bytes": 4933,
+      "sha256": "5dc6b8f8d342b0d243767c6f5987da48906ce5829ef92e4a96b992ef6356716b",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/near_surface_view.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/source_city_profile.gd",
+      "bytes": 2899,
+      "sha256": "3a53275a5663de4206bf77c2adf816f308386dc469f942173be3e94912939416",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_city_profile.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/source_city_view.gd",
+      "bytes": 3497,
+      "sha256": "c381e770fa25b3dad3606ab799dc15e12a2bf52d8d54e7edf727b532a023796d",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_city_view.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/source_model.gdshader",
+      "bytes": 789,
+      "sha256": "266c1bae942a10b715eddb6668c117a85b31b689f150954945e6622d809804cc",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_model.gdshader"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/source_model_visual.gd",
+      "bytes": 6092,
+      "sha256": "3e711454a28ff862638ef84e82a2dc41daa8837ef56143623358729ab3bc82a2",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_model_visual.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/source_units.gd",
+      "bytes": 705,
+      "sha256": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/source_units.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/spherical_terrain.gd",
+      "bytes": 4522,
+      "sha256": "ac7e11881b649129f09d916cbf48c5b025119aef7735f92f6473f19709c10975",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/spherical_terrain.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/surface_orbit_link.gd",
+      "bytes": 4483,
+      "sha256": "6a358b2030a0480035caa7a5263d0db96385394740672b18b18a306c30bec12c",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_orbit_link.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/surface_visual.gd",
+      "bytes": 8893,
+      "sha256": "6a1756daad279e0bfeb7e4e71021a5aa8957bcdcd0395f6c1e87234b6c365e70",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/surface_visual.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/terrain_surface_point.gd",
+      "bytes": 6727,
+      "sha256": "48bbfd3f3789cd0d5d4865c22977fef20cfa721ba440a7a7bf14431ce6cdfe57",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/terrain_surface_point.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/scripts/world_presentation.gd",
+      "bytes": 2603,
+      "sha256": "06ca6bdd7d156f7c71e8854ed5363996cfb72468dc6acf2389f02ca1c64aa828",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "scripts/world_presentation.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/tests/test_city_collision.gd",
+      "bytes": 4680,
+      "sha256": "ead6da7d44e6bf365468275bec91551d4cefec4ff7d5378451a4d9ebddb463ac",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_city_collision.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/tests/test_global_surface.gd",
+      "bytes": 7919,
+      "sha256": "34fb7a80a2c0da480adee7fabdb4a7097695ff3f5b8764bfd1d1109ec8d81bb8",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_global_surface.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/tests/test_source_city_view.gd",
+      "bytes": 6655,
+      "sha256": "d3ecbbbfeb4ee0e6e650980ca65b716621ea6d82115a3de6c54cd7cf9134ec2f",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_source_city_view.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/tests/test_terrain_additional_query.py",
+      "bytes": 4071,
+      "sha256": "49f432e4007e2365e5abb69c355780d2f9433ec542840324f990234e765aca4a",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_terrain_additional_query.py"
+    },
+    {
+      "path": "history/worlds_completion_audit/tests/test_terrain_game_query.py",
+      "bytes": 3404,
+      "sha256": "6497eb632fc29a9a5d354dcfd0edb390af512b8886a9ccc166b240f70c4dbcf2",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_terrain_game_query.py"
+    },
+    {
+      "path": "history/worlds_completion_audit/tests/test_terrain_provider.py",
+      "bytes": 5777,
+      "sha256": "22e0ae87a44f0e26a4618e32f54fb58257e6f1ceb495cbdf21e819ca93d6e772",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_terrain_provider.py"
+    },
+    {
+      "path": "history/worlds_completion_audit/tests/test_terrain_provider_points.gd",
+      "bytes": 3885,
+      "sha256": "54f410effaf9337be420e17366fa8d6ca8dcb515acacac6d888259b6acda6d42",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_terrain_provider_points.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/tests/test_terrain_surface_point.gd",
+      "bytes": 3193,
+      "sha256": "0775c80f35d6786cc2bc778065b99354cd9269f94bace1fd4887619108b50345",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tests/test_terrain_surface_point.gd"
+    },
+    {
+      "path": "history/worlds_completion_audit/tools/build_terrain_additional_query_reference.py",
+      "bytes": 3055,
+      "sha256": "31b8d53d22ac032105cb40f7aa52e92d90385eaf049122094c5e458b8dd7da95",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_terrain_additional_query_reference.py"
+    },
+    {
+      "path": "history/worlds_completion_audit/tools/build_terrain_game_query_reference.py",
+      "bytes": 11017,
+      "sha256": "299e1ff0b93579375607979f29a7cd30bbb2869e1300b20b4bd85f18110f434c",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_terrain_game_query_reference.py"
+    },
+    {
+      "path": "history/worlds_completion_audit/tools/build_terrain_provider_reference.py",
+      "bytes": 12668,
+      "sha256": "49d3f90bf738b2c276543a454229b3a8c65d32928175dfe74e856b5ac46e223b",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/build_terrain_provider_reference.py"
+    },
+    {
+      "path": "history/worlds_completion_audit/tools/check.sh",
+      "bytes": 3305,
+      "sha256": "a4ea3f91a923acaf5f526aa9fb9d381c462bdb13a3ea11f7500753e2f9e00dc9",
+      "agent": "worlds_completion_audit",
+      "partial_or_fragment_path": false,
+      "original_path_if_identified": "tools/check.sh"
+    }
+  ]
+}
