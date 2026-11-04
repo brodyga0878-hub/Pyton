@@ -1,0 +1,19 @@
+{
+  "scope": "Independent bounded stellar-name F881 domain only, not full planetary factory or live world",
+  "current_godot_checks": 10719,
+  "failures": 0,
+  "native_cases": 760,
+  "native_fresh_process_runs": 3,
+  "native_reverse_repeat_cases": 760,
+  "unchanged_other_records": true,
+  "accepted_mass_bins": 12,
+  "capacity_cases": 31,
+  "rng_changed_cases": 561,
+  "remnant_model148_cases": 182,
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "native_output_sha256": "4acd69229cd16e6e67a56e2b7d4f1a7f125932535237bcc340c4e2f9f361cef1",
+  "fixture_sha256": "213ccdfe5c9e00db66a930f2d6b6d2f603f22005bb845eb053e60a68340d88f3",
+  "integrated_in_live_world": false,
+  "included_in_published_0_11_1_apk": false,
+  "documentation": "docs/STAGE10_STELLAR_FACTORY_RU.md"
+}

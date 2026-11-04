@@ -213,6 +213,21 @@
       "asteroids_collision_gameplay": false,
       "graphics_demo_preserves_original_progress": true,
       "exact_reference_visual_quality_achieved": false
+    },
+    "stellar_factory_followup": {
+      "implemented": true,
+      "source_procedure": "F881 stellar-name domain; F882/F888/F889/F890/F894",
+      "native_cases": 760,
+      "checks": 10719,
+      "failures": 0,
+      "mass_domain_raw": [
+        "0x01036640",
+        "0xfffffffe"
+      ],
+      "live_world_integrated": false,
+      "included_in_published_graphics_apk": false,
+      "documentation": "docs/STAGE10_STELLAR_FACTORY_RU.md",
+      "validation_report": "validation/stage10-stellar-factory/curated-validation.json"
     }
   },
   "target_device": "Samsung S23 Ultra 12/512",

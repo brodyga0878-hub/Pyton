@@ -47,6 +47,7 @@ SUITES = [
     Suite('math', 'tests/test_rebuilt_ffe_math.gd', 'Reconstructed source integer and packed arithmetic, independent native controls.'),
     Suite('body_initializer', 'tests/test_rebuilt_body_initializer.gd', 'Complete original F882 packed-record initialization versus 1424 native contexts; isolated from the live analytic world and ephemerides.'),
     Suite('body_rotation', 'tests/test_rebuilt_body_rotation.gd', 'Exact F880 initialization/F866 orientation slice with F1675/F1914/F1521 versus 1542 native contexts; excludes full F866, original clock epoch, animations and orbital updates.'),
+    Suite('stellar_factory', 'tests/test_stellar_body_factory.gd', 'Bounded original F881 stellar-name domain plus F882/remnant callbacks/F894 against 760 independent native contexts; excludes planetary generation, brown-dwarf naming and live-world integration.'),
     Suite('worlds', 'tests/test_rebuilt_worlds.gd', 'Handcrafted original records and explicit analytic world/navigation adapter.'),
     Suite('flight', 'tests/test_rebuilt_flight.gd', 'Rebuilt flight, phone steering inputs, adapted training economy, atomic flight saves.'),
     Suite('cities', 'tests/test_rebuilt_cities.gd', 'Source3 city geometry, pad selection, collision, landing/takeoff/restore integration.'),

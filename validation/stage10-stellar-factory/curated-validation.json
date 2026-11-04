@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-04T21:06:49.789227+00:00",
+  "updated_utc": "2026-11-04T21:06:50.025002+00:00",
+  "duration_seconds": 0.236,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-04T21:06:49.789227+00:00",
+      "duration_seconds": 0.236,
+      "requested_suites": [
+        "stellar_factory"
+      ],
+      "executed_suites": [
+        "stellar_factory"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 3,
+  "status": "passed_with_coverage_limitations",
+  "passed_suites": 1,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 10719,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "stellar_factory",
+      "scope": "Bounded original F881 stellar-name domain plus F882/remnant callbacks/F894 against 760 independent native contexts; excludes planetary generation, brown-dwarf naming and live-world integration.",
+      "status": "passed",
+      "checks": 10719,
+      "failures": 0,
+      "executed_utc": "2026-11-04T21:06:49.790795+00:00",
+      "suite_source": {
+        "path": "tests/test_stellar_body_factory.gd",
+        "bytes": 4771,
+        "sha256": "8bc7e8593c0d1f727ed66e9d6048a54422c6d6a57fef48d65945a8e62a7ceceb"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_stellar_body_factory.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.233,
+      "timed_out": false,
+      "output_bytes": 171,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/stage10-stellar-validation/logs/stellar_factory.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "unavailable",
+      "reason": "The preserved tests/test_source_model_mesh.gd requires model_vertices_reference.json; original city geometry is exercised by the current city suites, which does not replace this missing independent leaf fixture."
+    },
+    {
+      "scope": "Full application, Android installation and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner covers current standalone suites and isolated native terrain controls only."
+    }
+  ]
+}
