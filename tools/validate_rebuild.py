@@ -57,6 +57,9 @@ SUITES = [
     Suite('terrain_native', 'tools/data_validate_terrain.py', 'Isolated preserved terrain research modules versus 336 raw and 630 native caller controls; not live terrain integration.', kind='python', timeout=300),
     Suite('save_touch', 'tests/test_rebuilt_save_touch.gd', 'Current complete save-store decoding, atomic writes/fallback and multi-finger phone input/release behavior; separate from app/device smoke.'),
     Suite('app_transitions', 'tests/test_rebuilt_app_transitions.gd', 'Actual Main transition locks, pending-save resume and asynchronous New Moscow entry; capture mode disables user progress loading/writing.', user_args=('--rebuild-capture',)),
+    Suite('graphics_ship', 'tests/test_ship_graphics.gd', 'Authored detailed ship geometry, normal/span contracts, cache/lifecycle, exhaust, and landing gear; not the complete original ship catalogue or device rendering.'),
+    Suite('graphics_environment', 'tests/test_graphics_space_environment.gd', 'Batched orbital-station geometry, deterministic asteroid placement, clear approach/planet-view cones and distance/quality LOD; visual scenery only.'),
+    Suite('graphics_integration', 'tests/test_graphics_integration.gd', 'Actual Main graphics-flight entry/return, isolated original progress/save bytes, save-failure guard, controls/quality and native city return; private test save directory.', user_args=('--rebuild-capture',)),
 ]
 
 

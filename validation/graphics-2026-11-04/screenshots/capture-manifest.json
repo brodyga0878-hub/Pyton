@@ -1,0 +1,70 @@
+[
+	{
+		"camera_offset": [
+			-15.0,
+			18.0,
+			35.0
+		],
+		"elapsed_days": 225.0,
+		"file": "01-cobra-orbit.png",
+		"hud": false,
+		"renderer": "gl_compatibility",
+		"ship_position": [
+			0.0,
+			0.0,
+			0.0
+		],
+		"source": "actual scenes/main.tscn"
+	},
+	{
+		"camera_offset": [
+			0.0,
+			14.2799997329712,
+			69.3000030517578
+		],
+		"elapsed_days": 225.0,
+		"file": "02-flight-hud.png",
+		"hud": true,
+		"renderer": "gl_compatibility",
+		"ship_position": [
+			0.0,
+			25.0,
+			-1100.0
+		],
+		"source": "actual scenes/main.tscn"
+	},
+	{
+		"camera_offset": [
+			35.0,
+			24.0,
+			35.0
+		],
+		"elapsed_days": 225.0,
+		"file": "03-station-approach.png",
+		"hud": false,
+		"renderer": "gl_compatibility",
+		"ship_position": [
+			0.0,
+			45.0,
+			-1550.0
+		],
+		"source": "actual scenes/main.tscn"
+	},
+	{
+		"camera_offset": [
+			-19.0,
+			17.0,
+			23.0
+		],
+		"elapsed_days": 225.0,
+		"file": "04-cobra-detail.png",
+		"hud": false,
+		"renderer": "gl_compatibility",
+		"ship_position": [
+			0.0,
+			45.0,
+			-1550.0
+		],
+		"source": "actual scenes/main.tscn"
+	}
+]

@@ -12,6 +12,7 @@ func set_quality(value:int)->void:
 	for entry in visuals.values():
 		entry.mesh.material_override.set_shader_parameter("detail_level",quality)
 		if entry.has("air"):entry.air.visible=quality>0
+		if entry.has("rings"):entry.rings.material_override.set_shader_parameter("detail_level",quality)
 
 const PlanetShader = preload("res://scripts/planet.gdshader")
 
@@ -22,11 +23,16 @@ func configure(system: RefCounted) -> void:
 		remove_child(child)
 		child.queue_free()
 	visuals.clear()
+	var inhabited:Dictionary={}
+	for site in context.settlements:
+		if int(site.get("type_code",0))==35:inhabited[str(site.get("parent",""))]=true
 	for body in context.bodies:
 		if body.kind=="barycenter":continue
 		var anchor := Node3D.new()
 		add_child(anchor)
 		var mesh := MeshInstance3D.new()
+		# Far planets are compressed for rendering and must not fill local shadow maps.
+		mesh.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		var sphere := SphereMesh.new()
 		sphere.radius = 1
 		sphere.height = 2
@@ -36,12 +42,13 @@ func configure(system: RefCounted) -> void:
 		var mat := ShaderMaterial.new()
 		mat.shader = PlanetShader
 		mat.set_shader_parameter("detail_level",quality)
+		mat.set_shader_parameter("inhabited",inhabited.has(str(body.id)))
 		var kind := str(body.kind)
 		var code := {"earth":0,"rock":1,"desert":2,"gas":3,"ice_gas":4,"ice":5,"star":6}
 		mat.set_shader_parameter("body_kind",int(code.get(kind,1)))
 		var tint := Color.from_hsv(float((context.system_id+str(body.id).hash())&255)/255.0,0.36,0.4)
-		mat.set_shader_parameter("land",Color("285a3f") if body.id=="earth" else tint)
-		mat.set_shader_parameter("ocean",Color("133751"))
+		mat.set_shader_parameter("land",Color("315336") if body.id=="earth" else tint)
+		mat.set_shader_parameter("ocean",Color("07314b"))
 		mat.set_shader_parameter("seed_offset",float(str(body.id).hash()&255)/30.0)
 		mesh.material_override = mat
 		anchor.add_child(mesh)
@@ -49,7 +56,8 @@ func configure(system: RefCounted) -> void:
 		if kind in ["earth","gas","ice_gas"]:
 			var air := MeshInstance3D.new()
 			air.mesh = sphere
-			air.scale = Vector3.ONE*1.025
+			air.scale = Vector3.ONE*1.014
+			air.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			var am := ShaderMaterial.new()
 			am.shader = AtmosphereShader
 			am.set_shader_parameter("atmosphere_color",Color("72b6e5") if kind=="earth" else (Color("cfad7c") if kind=="gas" else Color("63c0d4")))
@@ -64,9 +72,11 @@ func configure(system: RefCounted) -> void:
 			ring.rings = 96
 			ring.ring_segments = 12
 			rings.mesh = ring
+			rings.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			rings.scale = Vector3(1,0.025,1)
 			rings.rotation.z = 0.47
 			var rm:=ShaderMaterial.new();rm.shader=RingShader;rm.set_shader_parameter("ring_color",Color("bfa984"))
+			rm.set_shader_parameter("detail_level",quality)
 			rings.material_override = rm
 			anchor.add_child(rings)
 		visuals[str(body.id)] = {"anchor":anchor,"mesh":mesh}
@@ -89,9 +99,14 @@ func update_view(days: float, observer: Vector3) -> void:
 		if focus_surface_preview and str(body.id)==context.focus_id:
 			entry.anchor.position=center
 			entry.anchor.scale=Vector3.ONE*maxf(1.0,float(body.radius_km)*1000.0-350.0*(1.0-surface_space_blend))
+		var to_sun:Vector3=context.local_meters("star",days)-center
+		var sunlight:Vector3=(global_basis*to_sun).normalized()
+		if sunlight.length_squared()<0.5:sunlight=Vector3(0.3,0.5,0.8).normalized()
+		entry.mesh.material_override.set_shader_parameter("sun_direction_world",sunlight)
 		if entry.has("air"):
-			var to_sun:Vector3=context.local_meters("star",days)-center
-			entry.air.material_override.set_shader_parameter("sun_direction_world",(global_basis*to_sun).normalized())
+			entry.air.material_override.set_shader_parameter("sun_direction_world",sunlight)
+		if entry.has("rings"):
+			entry.rings.material_override.set_shader_parameter("sun_direction_local",entry.rings.global_basis.orthonormalized().inverse()*sunlight)
 		entry.mesh.rotation.y = fposmod(days*TAU*24.0/float(body.rotation_hours),TAU)
 
 func suppress_focus_surface(suppress:bool)->void:

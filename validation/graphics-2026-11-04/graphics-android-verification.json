@@ -1,0 +1,42 @@
+{
+  "package": "org.starfrontier.rebuild",
+  "version": "0.11.1-graphics-alpha1",
+  "version_code": 23,
+  "apk": "starfrontier-rebuild-arm64-alpha.apk",
+  "bytes": 26604534,
+  "sha256": "5886cde95201050a1c2a35d3d47e3d0ce0ec5531d02214e757a412dfc613e9e1",
+  "abi": "arm64-v8a",
+  "min_sdk": 24,
+  "target_sdk": 36,
+  "signature_verified": true,
+  "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+  "test_key_only": true,
+  "zipalign_16k": true,
+  "elf_load_alignment": {
+    "lib/arm64-v8a/libc++_shared.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/arm64-v8a/libgodot_android.so": [
+      16384,
+      16384,
+      16384
+    ]
+  },
+  "forbidden_permissions_absent": true,
+  "debuggable": false,
+  "native_data_checked": true,
+  "native_data_assets": [
+    "ffe_ground_coordinates",
+    "ffe_ground_pads",
+    "ffe_ship_registry",
+    "ffe_world_models",
+    "ffe_worlds"
+  ],
+  "toolchain_smoke_only": false,
+  "physical_device_tested": false,
+  "full_original_port_complete": false,
+  "production_signing_key_configured": false,
+  "publication_ready": false
+}

@@ -32,16 +32,16 @@
     {
       "path": "scripts/celestial_renderer.gd",
       "recovered_from": "recovered-history/geographic_descent_model/scripts/celestial_renderer.gd",
-      "current_sha256": "94a658884866b427921d87dc400ca5680cb9257b346bed92062b8d8639e9b8f6",
-      "byte_equal_to_selected_history": true,
-      "current_kind": "preserved_historical_text"
+      "current_sha256": "76b88f79ccb4e78df391483eda603bd1bbf317db8aefb79d42df224409bc0bfa",
+      "byte_equal_to_selected_history": false,
+      "current_kind": "modified_or_reassembled_historical_module"
     },
     {
       "path": "scripts/world_presentation.gd",
       "recovered_from": "recovered-history/geographic_descent_model/scripts/world_presentation.gd",
-      "current_sha256": "06ca6bdd7d156f7c71e8854ed5363996cfb72468dc6acf2389f02ca1c64aa828",
-      "byte_equal_to_selected_history": true,
-      "current_kind": "preserved_historical_text"
+      "current_sha256": "5802810a0d228dd55c433c3bd73ae5a0eb00a5095b90cd1ea1906e907cba8250",
+      "byte_equal_to_selected_history": false,
+      "current_kind": "modified_or_reassembled_historical_module"
     },
     {
       "path": "scripts/segment_box.gd",
@@ -109,23 +109,23 @@
     {
       "path": "scripts/planet.gdshader",
       "recovered_from": "recovered-history/coverage_shaders/scripts/planet.gdshader",
-      "current_sha256": "73cbabacb8914c1d8ead73ce3d56f6a193df638f9efe9084ff55059fe17c0cd1",
-      "byte_equal_to_selected_history": true,
-      "current_kind": "preserved_historical_text"
+      "current_sha256": "23738223cb134c93cac486abe01b6c2ca316cfaaf3845be0aec103a98bd14434",
+      "byte_equal_to_selected_history": false,
+      "current_kind": "modified_or_reassembled_historical_module"
     },
     {
       "path": "scripts/atmosphere.gdshader",
       "recovered_from": "recovered-history/coverage_shaders/scripts/atmosphere.gdshader",
-      "current_sha256": "9a3c1a236dd5e09a0cda485b6b9de9969cd1bdd8eb583d6a1dff094bde63f207",
-      "byte_equal_to_selected_history": true,
-      "current_kind": "preserved_historical_text"
+      "current_sha256": "d88a7e712e9b8d7ee3237c762ebb3b58cc5a95fc520236327ed614ff5f0c1835",
+      "byte_equal_to_selected_history": false,
+      "current_kind": "modified_or_reassembled_historical_module"
     },
     {
       "path": "scripts/rings.gdshader",
       "recovered_from": "recovered-history/coverage_shaders/scripts/rings.gdshader",
-      "current_sha256": "962fcd8994b152bcf8599203307e9caf6f830190a6ecbb99b42abf712939e07e",
-      "byte_equal_to_selected_history": true,
-      "current_kind": "preserved_historical_text"
+      "current_sha256": "5af463ab4db8ab37b563377cb16fdaec1cc0408becd098efcbe98977caad96cf",
+      "byte_equal_to_selected_history": false,
+      "current_kind": "modified_or_reassembled_historical_module"
     },
     {
       "path": "scripts/landing_pad.gdshader",
@@ -277,7 +277,7 @@
     },
     {
       "path": "scripts/main.gd",
-      "current_sha256": "3053ddb46c23ddd1f6c52de6b65433b906a8a37e4a4c62ab80fafa726e077a14",
+      "current_sha256": "4a5ce7daa46a05064060fe96a6af1de467db7a918e0f5bbcf4ab30c29ba2c5ba",
       "current_kind": "new_reconstruction",
       "provenance_note": "See module docs for retained fragments, new behavior and independent controls."
     },
@@ -313,7 +313,7 @@
     },
     {
       "path": "scripts/ship_visual.gd",
-      "current_sha256": "06b50511ed11a747ddff1b97d0ef38a1d62cdc70c9c54e91c29aa9d2fd4c3fde",
+      "current_sha256": "fd44ca93bcbb4af870bab8cb94544762415b96ca1b834d55d121193eefc8a70e",
       "current_kind": "new_reconstruction",
       "provenance_note": "See module docs for retained fragments, new behavior and independent controls."
     },
@@ -335,6 +335,72 @@
       "current_sha256": "b5d4e63331728681d1f34c73fe83cdd57120e29b352e09090da4ff147b22ed34",
       "byte_equal_to_selected_history": true,
       "current_kind": "preserved_historical_text"
+    },
+    {
+      "path": "scripts/asteroid_surface.gdshader",
+      "current_kind": "new_authored_graphics",
+      "provenance_note": "Original authored graphics; no reference-game assets copied.",
+      "current_sha256": "aa48cdbd5331287ad3c07b493f7434d424e3c4fce0abc750c8cbbd30fb0ac96f"
+    },
+    {
+      "path": "scripts/flight_reticle.gd",
+      "current_kind": "new_authored_graphics",
+      "provenance_note": "Original authored graphics; no reference-game assets copied.",
+      "current_sha256": "d25918f69e2857a4ee8283d1d267a2a126f72dfc680197b73f0f0a6c85c5ac7a"
+    },
+    {
+      "path": "scripts/flight_theme.gd",
+      "current_kind": "new_authored_graphics",
+      "provenance_note": "Original authored graphics; no reference-game assets copied.",
+      "current_sha256": "86d7fbe201cd846e26d5fb404e48c87ad46e453ef84f8f0090042c61b1bc5b8c"
+    },
+    {
+      "path": "scripts/ship_exhaust.gdshader",
+      "current_kind": "new_authored_graphics",
+      "provenance_note": "Original authored graphics; no reference-game assets copied.",
+      "current_sha256": "7c99ef81f2cb6f371871d0affe1f07e5d80d47474ceee8a750d8a1a28c76b5ae"
+    },
+    {
+      "path": "scripts/ship_halo.gdshader",
+      "current_kind": "new_authored_graphics",
+      "provenance_note": "Original authored graphics; no reference-game assets copied.",
+      "current_sha256": "f1dfa4528e2ab40319e97e4c81226ed96c67452ced72326d675a4b4979783a3c"
+    },
+    {
+      "path": "scripts/ship_hull.gdshader",
+      "current_kind": "new_authored_graphics",
+      "provenance_note": "Original authored graphics; no reference-game assets copied.",
+      "current_sha256": "3bc3b1f96550e0f3a29bb7b21758e9c9a756314898facc7ec5ebe9d4b1910856"
+    },
+    {
+      "path": "scripts/space_backdrop.gdshader",
+      "current_kind": "new_authored_graphics",
+      "provenance_note": "Original authored graphics; no reference-game assets copied.",
+      "current_sha256": "873f2e08248dec198d3c89fbd8e4a8aa1c0ae428e2a8ee6986d86fe80819d2b6"
+    },
+    {
+      "path": "scripts/space_environment.gd",
+      "current_kind": "new_authored_graphics",
+      "provenance_note": "Original authored graphics; no reference-game assets copied.",
+      "current_sha256": "0747946fcbaf6e1203c78fa8188645a40f4fb28eae79632c8e25f72a828255b9"
+    },
+    {
+      "path": "scripts/space_sky.gdshader",
+      "current_kind": "new_authored_graphics",
+      "provenance_note": "Original authored graphics; no reference-game assets copied.",
+      "current_sha256": "f91797913b04ff61dc8897c27b477845607248e87f36363869c30fc39f5117bd"
+    },
+    {
+      "path": "scripts/station_solar.gdshader",
+      "current_kind": "new_authored_graphics",
+      "provenance_note": "Original authored graphics; no reference-game assets copied.",
+      "current_sha256": "99460e3ba9782ffab445d5215955be8d1f8631f5a2d2bb2b2b9d0e93a80cb086"
+    },
+    {
+      "path": "scripts/station_visual.gd",
+      "current_kind": "new_authored_graphics",
+      "provenance_note": "Original authored graphics; no reference-game assets copied.",
+      "current_sha256": "608accaa7fe953793b88c5d975279016b5d372a061fb12b1b2d93dde49196716"
     }
   ]
 }

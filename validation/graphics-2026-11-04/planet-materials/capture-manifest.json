@@ -1,0 +1,59 @@
+{
+	"captures": [
+		{
+			"atmosphere_instances": 0,
+			"body_kinds": [
+				"earth",
+				"rock",
+				"desert",
+				"gas",
+				"ice_gas",
+				"ice",
+				"star"
+			],
+			"file": "planet-materials-quality0.png",
+			"inhabited_body_kinds": [
+				"earth"
+			],
+			"quality": 0,
+			"ring_instances": 1
+		},
+		{
+			"atmosphere_instances": 3,
+			"body_kinds": [
+				"earth",
+				"rock",
+				"desert",
+				"gas",
+				"ice_gas",
+				"ice",
+				"star"
+			],
+			"file": "planet-materials-quality2.png",
+			"inhabited_body_kinds": [
+				"earth"
+			],
+			"quality": 2,
+			"ring_instances": 1
+		}
+	],
+	"display_server": "X11",
+	"engine": "4.6.3-stable (official)",
+	"gameplay_screenshot": false,
+	"image_source": "direct Godot viewport; no compositing",
+	"kind": "diagnostic_material_probe",
+	"physical_android_device_tested": false,
+	"renderer": "gl_compatibility",
+	"shader_time": "Real shader TIME, decorative clouds only; images are not asserted byte-identical across runs",
+	"sun_direction": [
+		0.444444477558136,
+		0.444444477558136,
+		0.777777791023254
+	],
+	"user_progress_read": false,
+	"user_progress_written": false,
+	"viewport_size": [
+		1050,
+		700
+	]
+}

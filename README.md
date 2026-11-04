@@ -3,7 +3,7 @@
 Ветка `development/starfrontier-rebuild` содержит **новую запускаемую основу** нативного Android-проекта на Godot 4.6.3. Она собрана из частично восстановленных исторических модулей, повторно извлечённых исходных данных FFE и заново написанного недостающего кода. Полный прежний проект и APK версии 0.10.8 не найдены.
 
 
-[Скачать Android APK 0.11.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/development/starfrontier-rebuild/deliverables/0.11.0-rebuild-alpha1/StarFrontier-0.11.0-rebuild-arm64.apk) · [Скачать исходники этой сборки](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/development/starfrontier-rebuild/deliverables/0.11.0-rebuild-alpha1/StarFrontier-0.11.0-rebuild-source.zip) · [Что доступно в сборке](docs/REBUILD_0_11_0_RU.md)
+[Скачать Android APK 0.11.1](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/development/starfrontier-rebuild/deliverables/0.11.1-graphics-alpha1/StarFrontier-0.11.1-graphics-arm64.apk) · [Скачать исходники этой сборки](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/development/starfrontier-rebuild/deliverables/0.11.1-graphics-alpha1/StarFrontier-0.11.1-graphics-source.zip) · [Что доступно в сборке](docs/GRAPHICS_0_11_1_RU.md)
 
 Работают полёт, сенсорный стик с независимыми пальцами для скорости и подъёма, автоподход/стыковка, переходы между 11 системами, выбор объектов и космопортов, исходные открытые города, посадка/взлёт и двухслотовое сохранение с проверкой целостности. Интерфейс русский. Игра использует ARM64 Godot без DOS/x86-эмулятора.
 
@@ -33,3 +33,6 @@ python3 tools/verify_rebuilt_android.py build/starfrontier-rebuild-arm64-alpha.a
 Сохранения этой сборки используют `starfrontier-rebuild-game-v1`. Старый полный формат и оригинальный COMMANDR пока не импортируются. В меню есть резервная копия в виде кода для сохранения вне приложения. Пакет `org.starfrontier.rebuild` устанавливается рядом с прежней версией; подпись пока тестовая.
 
 Оставшийся порядок крупных блоков: **10 → 9 → 11 → 12 → 13 → 14**. Работа продолжается с миров и поселений после возврата запускаемой основы. Исходники и подтверждённые результаты сохраняются в GitHub; другие ветки с Genewars не изменяются.
+
+
+В0.11.1 добавлены новый корпус, выхлоп/шасси, станция, астероиды и планеты. «Меню → Графический полёт» позволяет осмотреть оформление, сохранив основной прогресс. [Снимки настоящей игровой сцены](validation/graphics-2026-11-04/screenshots/) сняты через desktop GLES; это не измерения телефона.

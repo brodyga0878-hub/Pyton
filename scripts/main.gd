@@ -18,6 +18,10 @@ const Stick=preload("res://scripts/touch_stick.gd")
 const Hold=preload("res://scripts/hold_button.gd")
 const Lever=preload("res://scripts/speed_lever.gd")
 const ShipView=preload("res://scripts/ship_visual.gd")
+const StationView=preload("res://scripts/station_visual.gd")
+const SpaceEnvironment=preload("res://scripts/space_environment.gd")
+const FlightTheme=preload("res://scripts/flight_theme.gd")
+const FlightReticle=preload("res://scripts/flight_reticle.gd")
 var ship:RefCounted
 var nav:RefCounted
 var world:RefCounted
@@ -29,17 +33,20 @@ var presentation:=Presentation.new()
 var camera:Camera3D
 var environment:WorldEnvironment
 var sunlight:DirectionalLight3D
+var planet_fill:DirectionalLight3D
 var celestial:Node3D
 var ground_view:Node3D
 var city_view:Node3D
 var station:Node3D
 var player:Node3D
 var stars:MultiMeshInstance3D
+var space_environment:Node3D
 var ui:Control
 var hud:Label
 var notice:Label
 var target_label:Label
 var fps_label:Label
+var flight_reticle:Control
 var stick:Control
 var lever:Control
 var holds:Array=[]
@@ -67,6 +74,7 @@ var notice_timer:=0.0
 var worker:Thread
 var presentation_key:=""
 var last_external:=false
+var graphics_return:Dictionary={}
 
 func _ready()->void:
 	get_tree().auto_accept_quit=false
@@ -81,32 +89,30 @@ func _ready()->void:
 	if "--rebuild-smoke" in OS.get_cmdline_user_args():call_deferred("_run_smoke")
 
 func _new_models()->void:
-	ship=Flight.new();nav=NavigationData.new();world=World.new();world.configure(nav.current());surface=Surface.new();near.clear()
+	ship=Flight.new();ship.external_view=true;nav=NavigationData.new();world=World.new();world.configure(nav.current());surface=Surface.new();near.clear()
 
 func _build_world()->void:
 	environment=WorldEnvironment.new();environment.environment=Environment.new()
 	environment.environment.background_mode=Environment.BG_COLOR;environment.environment.background_color=Color("020712")
 	environment.environment.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR;environment.environment.ambient_light_color=Color("91b5cf");environment.environment.ambient_light_energy=0.3
 	environment.environment.tonemap_mode=Environment.TONE_MAPPER_FILMIC;add_child(environment)
-	sunlight=DirectionalLight3D.new();sunlight.light_color=Color("ffe9ca");sunlight.light_energy=2;sunlight.rotation_degrees=Vector3(-50,-30,0);add_child(sunlight)
+	sunlight=DirectionalLight3D.new();sunlight.light_color=Color("ffe9ca");sunlight.light_energy=2.0;sunlight.rotation_degrees=Vector3(-48,-35,0);add_child(sunlight)
+	planet_fill=DirectionalLight3D.new();planet_fill.light_color=Color("81bfe8");planet_fill.light_energy=0.65;planet_fill.rotation_degrees=Vector3(-25,145,0);add_child(planet_fill)
 	camera=Camera3D.new();camera.fov=74;camera.near=0.5;camera.far=180000;add_child(camera);camera.make_current()
 	celestial=Celestial.new();add_child(celestial)
 	ground_view=SurfaceView.new();add_child(ground_view);ground_view.hide()
 	city_view=CityView.new();add_child(city_view);city_view.hide()
 	player=ShipView.new();add_child(player);player.configure(ship.profile())
-	station=Node3D.new();add_child(station)
-	var ring:=MeshInstance3D.new();var torus:=TorusMesh.new();torus.inner_radius=27;torus.outer_radius=44;torus.rings=64;torus.ring_segments=12;ring.mesh=torus;ring.rotation.x=PI/2
-	var metal:=StandardMaterial3D.new();metal.albedo_color=Color("bda77d");metal.metallic=0.6;metal.roughness=0.35;ring.material_override=metal;station.add_child(ring)
-	for angle in range(4):
-		var light:=MeshInstance3D.new();var box:=BoxMesh.new();box.size=Vector3(5,5,5);light.mesh=box;light.position=Vector3(cos(angle*PI/2)*48,sin(angle*PI/2)*48,0)
-		var glow:=StandardMaterial3D.new();glow.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED;glow.albedo_color=Color("65e5cb");light.material_override=glow;station.add_child(light)
-	stars=MultiMeshInstance3D.new();var star_mesh:=SphereMesh.new();star_mesh.radius=12;star_mesh.height=24;star_mesh.radial_segments=4;star_mesh.rings=2
-	var star_material:=StandardMaterial3D.new();star_material.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED;star_material.albedo_color=Color("c9d9e9");star_mesh.material=star_material
-	var multi:=MultiMesh.new();multi.transform_format=MultiMesh.TRANSFORM_3D;multi.mesh=star_mesh;multi.instance_count=1800
+	station=StationView.new();add_child(station);station.configure(settings.quality)
+	space_environment=SpaceEnvironment.new();add_child(space_environment);space_environment.configure(ship.STATION,settings.quality)
+	stars=MultiMeshInstance3D.new();var star_mesh:=SphereMesh.new();star_mesh.radius=22;star_mesh.height=44;star_mesh.radial_segments=4;star_mesh.rings=2
+	var star_material:=StandardMaterial3D.new();star_material.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED;star_material.vertex_color_use_as_albedo=true;star_mesh.material=star_material
+	var multi:=MultiMesh.new();multi.transform_format=MultiMesh.TRANSFORM_3D;multi.use_colors=true;multi.mesh=star_mesh;multi.instance_count=3200
 	var rng:=RandomNumberGenerator.new();rng.seed=784112
 	for i in range(multi.instance_count):
 		var direction:=Vector3(rng.randf_range(-1,1),rng.randf_range(-1,1),rng.randf_range(-1,1)).normalized()
-		multi.set_instance_transform(i,Transform3D(Basis.IDENTITY.scaled(Vector3.ONE*rng.randf_range(0.5,1.6)),direction*50000))
+		multi.set_instance_transform(i,Transform3D(Basis.IDENTITY.scaled(Vector3.ONE*rng.randf_range(0.35,1.6)),direction*50000))
+		multi.set_instance_color(i,Color("c5dcf6").lerp(Color("ffe3b5"),rng.randf()*0.65))
 	stars.multimesh=multi;add_child(stars)
 
 func _button(text:String,callback:Callable,width:=150.0)->Button:
@@ -119,9 +125,10 @@ func _anchored(node:Control,preset:int,offsets:Vector4)->void:
 	node.offset_left=offsets.x;node.offset_top=offsets.y;node.offset_right=offsets.z;node.offset_bottom=offsets.w
 
 func _build_ui()->void:
-	var layer:=CanvasLayer.new();add_child(layer);ui=Control.new();ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);ui.mouse_filter=Control.MOUSE_FILTER_IGNORE;layer.add_child(ui)
-	var top:=HBoxContainer.new();_anchored(top,Control.PRESET_TOP_WIDE,Vector4(18,10,-18,92));top.add_theme_constant_override("separation",12)
-	flight_widgets.append(top)
+	var layer:=CanvasLayer.new();add_child(layer);ui=Control.new();ui.theme=FlightTheme.build();ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);ui.mouse_filter=Control.MOUSE_FILTER_IGNORE;layer.add_child(ui)
+	flight_reticle=FlightReticle.new();_anchored(flight_reticle,Control.PRESET_FULL_RECT,Vector4.ZERO);flight_widgets.append(flight_reticle)
+	var top_panel:=PanelContainer.new();_anchored(top_panel,Control.PRESET_TOP_WIDE,Vector4(18,10,-18,102));flight_widgets.append(top_panel)
+	var top:=HBoxContainer.new();top_panel.add_child(top);top.add_theme_constant_override("separation",12)
 	hud=_label("",21);hud.size_flags_horizontal=Control.SIZE_EXPAND_FILL;top.add_child(hud)
 	top.add_child(_button("Система",_show_system,145));top.add_child(_button("Маршруты",_show_routes,155));top.add_child(_button("Меню",_show_menu,130))
 	stick=Stick.new();_anchored(stick,Control.PRESET_BOTTOM_LEFT,Vector4(20,-250,250,-20));flight_widgets.append(stick)
@@ -134,7 +141,7 @@ func _build_ui()->void:
 	controls.add_child(_button("Тормозить",_brake,175));dock_button=_button("Стыковка",_dock_action,175);controls.add_child(dock_button);flight_widgets.append(controls)
 	surface_button=_button("К поверхности",_surface_action,215);_anchored(surface_button,Control.PRESET_TOP_RIGHT,Vector4(-240,110,-25,190));flight_widgets.append(surface_button)
 	var view_button:=_button("Вид",func():ship.external_view=not ship.external_view,110);_anchored(view_button,Control.PRESET_TOP_RIGHT,Vector4(-135,205,-25,281));flight_widgets.append(view_button)
-	var cross:=_label("＋",30);cross.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(cross,Control.PRESET_CENTER,Vector4(-25,-25,25,25));cross.mouse_filter=Control.MOUSE_FILTER_IGNORE;flight_widgets.append(cross)
+	var cross:=_label("·",27);cross.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(cross,Control.PRESET_CENTER,Vector4(-15,-20,15,20));cross.mouse_filter=Control.MOUSE_FILTER_IGNORE;flight_widgets.append(cross)
 	target_label=_label("",19);target_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(target_label,Control.PRESET_CENTER_TOP,Vector4(-330,100,330,150));target_label.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	flight_widgets.append(target_label)
 	notice=_label("",21);notice.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;notice.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(notice,Control.PRESET_CENTER_BOTTOM,Vector4(-430,-190,430,-115));notice.mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -216,10 +223,12 @@ func _process(dt:float)->void:
 	for hold in holds:hold.input_allowed=stick.input_allowed
 	if not busy:_sync_scene()
 	player.position=ship.position;player.quaternion=ship.attitude;player.visible=ship.external_view
+	player.set_thrust(0.0 if ship.docked or surface.landed else clampf(maxf(absf(ship.target_speed),ship.velocity.length())/ship.MAX_SPEED,0.04,1.0))
+	player.set_landed(surface.landed)
 	var desired:Vector3=ship.position;var attitude:Quaternion=ship.attitude
 	if ship.external_view:
-		var span:float=ship.profile().visual_span_m;desired+=Basis(ship.attitude)*Vector3(0,span*0.55,span*2.8)
-		attitude=(ship.attitude*Quaternion(Vector3.RIGHT,-atan(0.55/3.5))).normalized()
+		var span:float=ship.profile().visual_span_m;desired+=Basis(ship.attitude)*Vector3(0,span*0.34,span*1.65)
+		attitude=(ship.attitude*Quaternion(Vector3.RIGHT,-atan(0.25/1.65))).normalized()
 	if last_external!=ship.external_view:camera.position=desired;camera.quaternion=attitude;last_external=ship.external_view
 	camera.position=camera.position.lerp(desired,minf(1,dt*30));camera.quaternion=camera.quaternion.slerp(attitude,minf(1,dt*25))
 	notice_timer=maxf(0,notice_timer-dt);notice.visible=notice_timer>0 and not menu.visible and not settings_panel.visible
@@ -227,11 +236,13 @@ func _process(dt:float)->void:
 	hud_timer+=dt
 	if hud_timer>0.15:hud_timer=0;_refresh_hud()
 	lever.display_value(ship.target_speed)
+	flight_reticle.update_state(ship.hull,ship.velocity.length())
 
 func _station_here()->bool:return not surface.active and (world.is_orbital_site() or (world.site_id.is_empty() and world.focus_id==world.default_id and nav.has_station()))
 func _apply_system()->void:
 	ship.original_port=not world.current_site().is_empty();ship.station_available=_station_here()
 	celestial.configure(world);celestial.set_quality(settings.quality);player.configure(ship.profile())
+	player.set_quality(settings.quality);station.configure(settings.quality);space_environment.configure(ship.STATION,settings.quality)
 	station.position=ship.STATION;camera.position=ship.position;camera.quaternion=ship.attitude;presentation_key="";_sync_scene()
 
 func _sync_scene()->void:
@@ -249,6 +260,9 @@ func _sync_scene()->void:
 	if not city_view.configure(draw,ground_view.transform,1.0-blend if layered else 1.0):push_error(city_view.last_error)
 	celestial.transform=to_scene;celestial.visible=not surface.active or high;celestial.set_surface_transition(layered,blend if layered else 1.0)
 	station.visible=_station_here() and not preview
+	planet_fill.visible=not surface.active or high
+	space_environment.visible=station.visible
+	if space_environment.visible:space_environment.update_view(ship.position)
 	if layered:
 		var turn:Quaternion=frame.basis.get_rotation_quaternion().slerp(Quaternion.IDENTITY,blend)
 		var origin:Vector3=frame.origin.lerp(observer,blend)
@@ -268,7 +282,7 @@ func _sync_scene()->void:
 func _refresh_hud()->void:
 	var state:="СТЫКОВКА" if ship.docked else ("ПОСАДКА" if surface.landed else ("АВТО" if ship.autopilot or surface.landing or not surface.flight_phase.is_empty() else "ПОЛЁТ"))
 	if ship.hull<=0:state="КОРАБЛЬ ПОТЕРЯН"
-	hud.text="%s · %s · %s\n%.0f м/с  |  Корпус %.0f%%  |  %d кр.  |  Топливо %d/%d"%[nav.current().name,ship.profile().name,state,ship.velocity.length(),ship.hull,ship.credits,nav.fuel,nav.FUEL_CAPACITY]
+	hud.text="%s · %s · %s\n%.0f м/с  |  Корпус %.0f%%  |  %d кр.  |  Топливо %d/%d"%["Графический полёт" if not graphics_return.is_empty() else nav.current().name,ship.profile().name,state,ship.velocity.length(),ship.hull,ship.credits,nav.fuel,nav.FUEL_CAPACITY]
 	auto_button.text="Отменить авто" if ship.autopilot or surface.landing or not surface.flight_phase.is_empty() else "Авто"
 	dock_button.text="Взлететь" if surface.landed else ("Вылететь" if ship.docked else "Посадка" if surface.active else "Стыковка")
 	surface_button.text="На орбиту" if surface.active else "К поверхности"
@@ -279,6 +293,7 @@ func _refresh_hud()->void:
 func _announce(text:String)->void:
 	if notice:notice.text=text;notice_timer=7
 	if menu_feedback:menu_feedback.text=text
+	if settings_panel and settings_panel.visible:settings_panel.feedback.text=text
 func _set_speed(value:float)->void:
 	ship.autopilot=false;ship.target_speed=clampf(value,-100,ship.MAX_SPEED)
 	if surface.active:surface.landing=false;surface.cancel_vertical()
@@ -347,7 +362,14 @@ func _menu_action(text:String,callback:Callable)->void:
 func _close_menu()->void:menu.hide();backup_edit=null;_release_inputs()
 func _show_menu()->void:
 	_open_menu("КОМАНДИР")
+	if not graphics_return.is_empty():
+		_menu_text("Графический полёт: осмотрите корабль, станцию и астероиды. Основной полёт приостановлен; этот просмотр не заменяет его сохранение.")
+		_menu_action("Продолжить графический полёт",_close_menu)
+		_menu_action("Вернуться к основному полёту",_end_graphics_demo)
+		_menu_action("Настройки телефона",func():menu.hide();settings_panel.configure(settings);settings_panel.show())
+		return
 	_menu_action("Продолжить полёт",_close_menu)
+	_menu_action("Графический полёт · осмотреть обновление",_begin_graphics_demo)
 	_menu_action("Космопорты и объекты системы",_show_system)
 	_menu_action("Маршруты между системами",_show_routes)
 	if ship.docked:_menu_action("Службы станции и корабли",_show_services)
@@ -358,6 +380,17 @@ func _show_menu()->void:
 	_menu_action("Резервная копия",_show_backup)
 	_menu_action("Управление и сведения о сборке",_show_help)
 	_menu_action("Начать новый полёт…",_confirm_new_game)
+func _begin_graphics_demo()->void:
+	if busy or not graphics_return.is_empty():return
+	if saving_enabled and not _save_game():return
+	_release_inputs()
+	graphics_return={"ship":ship,"nav":nav,"world":world,"surface":surface,"saving_enabled":saving_enabled}
+	saving_enabled=false;_new_models();nav.elapsed_days=225.0;ship.target_speed=0;ship.attitude=Quaternion(Vector3.UP,-0.38)
+	_close_menu();_apply_system();_refresh_hud();_announce("Осмотрите обновлённый корабль и станцию. Вернуться к основному полёту можно через меню.")
+func _end_graphics_demo()->void:
+	if busy or graphics_return.is_empty():return
+	_release_inputs();ship=graphics_return.ship;nav=graphics_return.nav;world=graphics_return.world;surface=graphics_return.surface;saving_enabled=graphics_return.saving_enabled
+	graphics_return={};near.clear();_close_menu();_apply_system();_refresh_hud();_announce("Основной полёт продолжен.")
 func _show_system()->void:
 	_open_menu("%s · ОБЪЕКТЫ И КОСМОПОРТЫ"%nav.current().name)
 	_menu_text("Для автоперелёта остановитесь. После вылета отойдите от станции минимум на 400 м.")
@@ -420,7 +453,7 @@ func _show_help()->void:
 	_open_menu("УПРАВЛЕНИЕ И СБОРКА")
 	_menu_text("Левый стик меняет направление носа. Правая шкала задаёт скорость. «Тормозить» включает плавную остановку; «Авто» ведёт к станции или посадочной площадке. Кнопки подъёма и снижения помогают висеть над землёй.")
 	_menu_text("Клавиатура: стрелки — поворот, W/S — скорость, Q/E — крен, R/F — подъём, пробел — тормоз, A — авто, L — поверхность/орбита, D — стыковка/взлёт, V — вид, Esc — меню.")
-	_menu_text("Восстановительная альфа 0.11.0. Полёт и данные исходных миров возвращены частично. Карта маршрутов, физика орбит, три лётных профиля и учебная торговля — адаптации. Полная кампания, исходная экономика и ИИ ещё не готовы. Проверка на настоящем телефоне нужна отдельно.")
+	_menu_text("Графическое обновление 0.11.1. Осмотрите новый корабль, планеты и станцию через «Графический полёт» в меню. Полёт и данные исходных миров возвращены частично. Карта маршрутов, физика орбит, три лётных профиля и учебная торговля — адаптации. Полная кампания, исходная экономика и ИИ ещё не готовы. Проверка на настоящем телефоне нужна отдельно.")
 func _confirm_new_game()->void:
 	_open_menu("НОВЫЙ ПОЛЁТ")
 	_menu_text("Текущий прогресс будет заменён новым полётом. При необходимости сначала сделайте резервную копию.")
@@ -459,6 +492,7 @@ func _load_game()->bool:
 		saving_enabled=false;_announce("Сохранение не прочитано. Копии оставлены; новый полёт можно начать через меню.")
 	return false
 func _show_backup()->void:
+	if not graphics_return.is_empty():_announce("Для резервной копии вернитесь к основному полёту через меню.");return
 	settings_panel.hide();_open_menu("РЕЗЕРВНАЯ КОПИЯ")
 	_menu_text("Скопируйте код и сохраните его вне приложения. Для восстановления вставьте код сюда. Формат относится к этой восстановительной сборке.")
 	backup_edit=TextEdit.new();backup_edit.custom_minimum_size=Vector2(900,230);backup_edit.add_theme_font_size_override("font_size",settings.reading_size);backup_edit.text=saves.encode(_payload(),0);menu_rows.add_child(backup_edit)
@@ -467,12 +501,14 @@ func _show_backup()->void:
 	_menu_action("Восстановить из кода",_import_backup)
 func _import_backup()->void:
 	if busy:return
+	if not graphics_return.is_empty():_announce("Сначала вернитесь к основному полёту через меню.");return
 	var entry:Dictionary=saves.decode(backup_edit.text)
 	var loaded:Dictionary={} if entry.is_empty() else _decode_state(entry.payload)
 	if loaded.is_empty():_announce("Код повреждён или несовместим. Текущий полёт не изменён.");return
 	_commit_state(loaded);saving_enabled=true;_close_menu();_apply_system();_save_game();_announce("Резервная копия восстановлена.")
 func _apply_settings()->void:
 	Engine.max_fps=settings.fps;get_viewport().msaa_3d=settings.msaa();ground_view.set_quality(settings.quality);celestial.set_quality(settings.quality);stick.deadzone=settings.deadzone;presentation_key=""
+	player.set_quality(settings.quality);station.configure(settings.quality);space_environment.configure(ship.STATION,settings.quality)
 func _settings_changed()->void:_apply_settings();settings.save_file()
 func _close_settings()->void:settings_panel.hide();_release_inputs();_save_game()
 
