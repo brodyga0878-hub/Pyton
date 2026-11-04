@@ -1,0 +1,2 @@
+c53b93007e9d259b72d33304531ba27503921202876e54c9a91b9610fa70856b  StarFrontier-0.11.2-diagnostics-arm64.apk
+b8a8fe5faf27ddce75a77242e7ecf3033ea7958eb6e32cb61083b23a1dc6dbe2  StarFrontier-0.11.2-diagnostics-source.zip
