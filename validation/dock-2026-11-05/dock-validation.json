@@ -1,0 +1,769 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-05T20:32:50.279860+00:00",
+  "updated_utc": "2026-11-05T20:33:07.446418+00:00",
+  "duration_seconds": 17.166,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-05T20:32:50.279860+00:00",
+      "duration_seconds": 17.166,
+      "requested_suites": [
+        "worlds",
+        "flight",
+        "cities",
+        "city_runtime",
+        "city_view",
+        "save_touch",
+        "app_transitions",
+        "graphics_integration",
+        "space_materials",
+        "graphics_scope",
+        "surface_detail_scope",
+        "station_finish",
+        "offpad_takeoff",
+        "surface_action_controls",
+        "touch_actions",
+        "flight_console",
+        "departure_cycle",
+        "training_dock_services",
+        "dock_services_view",
+        "dock_service_actions",
+        "diagnostics",
+        "report_export",
+        "bug_report_ui"
+      ],
+      "executed_suites": [
+        "worlds",
+        "flight",
+        "cities",
+        "city_runtime",
+        "city_view",
+        "save_touch",
+        "app_transitions",
+        "graphics_integration",
+        "space_materials",
+        "graphics_scope",
+        "surface_detail_scope",
+        "station_finish",
+        "offpad_takeoff",
+        "surface_action_controls",
+        "touch_actions",
+        "flight_console",
+        "departure_cycle",
+        "training_dock_services",
+        "dock_services_view",
+        "dock_service_actions",
+        "diagnostics",
+        "report_export",
+        "bug_report_ui"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 3,
+  "status": "passed_with_coverage_limitations",
+  "passed_suites": 23,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 3225,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "worlds",
+      "scope": "Handcrafted original records and explicit analytic world/navigation adapter.",
+      "status": "passed",
+      "checks": 719,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:32:50.281570+00:00",
+      "suite_source": {
+        "path": "tests/test_rebuilt_worlds.gd",
+        "bytes": 8348,
+        "sha256": "ef5fb5442062e2c617d35386a69fbb910a28b54640d58d33571ff5b572ee179b"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_worlds.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.236,
+      "timed_out": false,
+      "output_bytes": 117,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/worlds.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "flight",
+      "scope": "Rebuilt flight, phone steering inputs, adapted training economy, atomic flight saves.",
+      "status": "passed",
+      "checks": 94,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:32:50.281782+00:00",
+      "suite_source": {
+        "path": "tests/test_rebuilt_flight.gd",
+        "bytes": 11797,
+        "sha256": "4866c51adf55cf9f4ad31f0fdb17ddc10c26a76e0052a2357d64e085e5ef4e57"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_flight.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.139,
+      "timed_out": false,
+      "output_bytes": 117,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/flight.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "cities",
+      "scope": "Source3 city geometry, pad selection, collision, landing/takeoff/restore integration.",
+      "status": "passed",
+      "checks": 374,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:32:50.282118+00:00",
+      "suite_source": {
+        "path": "tests/test_rebuilt_cities.gd",
+        "bytes": 20832,
+        "sha256": "b7cb4566b09c4c4a3b6e8b4ebd23e9e62b4c076c866f8b78927065960cab6b64"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_cities.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 14.057,
+      "timed_out": false,
+      "output_bytes": 171,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/cities.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "city_runtime",
+      "scope": "Original city runtime and analytic ellipsoid collision controls.",
+      "status": "passed",
+      "checks": 45,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:32:50.421613+00:00",
+      "suite_source": {
+        "path": "tests/test_source_city_runtime.gd",
+        "bytes": 10432,
+        "sha256": "29927274559d761dada752d1af5d4425b30ca7247a2d819bc7d6a9f4e906cc31"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_city_runtime.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.906,
+      "timed_out": false,
+      "output_bytes": 122,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/city_runtime.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "city_view",
+      "scope": "City rendering lifetime and presentation contract with synthetic geometry.",
+      "status": "passed",
+      "checks": 33,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:32:50.518998+00:00",
+      "suite_source": {
+        "path": "tests/test_source_city_view.gd",
+        "bytes": 6655,
+        "sha256": "d3ecbbbfeb4ee0e6e650980ca65b716621ea6d82115a3de6c54cd7cf9134ec2f"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_city_view.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.232,
+      "timed_out": false,
+      "output_bytes": 144,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/city_view.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "save_touch",
+      "scope": "Current complete save-store decoding, atomic writes/fallback and multi-finger phone input/release behavior; separate from app/device smoke.",
+      "status": "passed",
+      "checks": 69,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:32:50.751471+00:00",
+      "suite_source": {
+        "path": "tests/test_rebuilt_save_touch.gd",
+        "bytes": 16016,
+        "sha256": "42f0917b1f6b2c44ac84d197e706c7cafb8e99b4af6986f91fee8cf914f53bce"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_save_touch.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.419,
+      "timed_out": false,
+      "output_bytes": 121,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/save_touch.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "app_transitions",
+      "scope": "Actual Main transition locks, pending-save resume and asynchronous New Moscow entry; capture mode disables user progress loading/writing.",
+      "status": "passed",
+      "checks": 54,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:32:51.171092+00:00",
+      "suite_source": {
+        "path": "tests/test_rebuilt_app_transitions.gd",
+        "bytes": 11061,
+        "sha256": "f81dad10e23e7169ba5e5046567b335720be7e93cfe95f7445e897f25cc436a5"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_app_transitions.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 3.028,
+      "timed_out": false,
+      "output_bytes": 120,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/app_transitions.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "graphics_integration",
+      "scope": "Actual Main graphics-flight entry/return, isolated original progress/save bytes, save-failure guard, controls/quality and native city return; private test save directory.",
+      "status": "passed",
+      "checks": 44,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:32:52.327964+00:00",
+      "suite_source": {
+        "path": "tests/test_graphics_integration.gd",
+        "bytes": 9877,
+        "sha256": "07803e334be7ce9c9feea54a6ca2a942971f99b206c213f3aed53c28c31cb34c"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_graphics_integration.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 3.956,
+      "timed_out": false,
+      "output_bytes": 123,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/graphics_integration.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "space_materials",
+      "scope": "Real hull/station material map assignments, palette/finish and quality isolation on existing geometry.",
+      "status": "passed",
+      "checks": 82,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:32:54.199991+00:00",
+      "suite_source": {
+        "path": "tests/test_space_material_bindings.gd",
+        "bytes": 4743,
+        "sha256": "3e649a4d9ed0c61c3504a2c628f190a03a75080b603b0f876f06e734bff4b50a"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_space_material_bindings.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.327,
+      "timed_out": false,
+      "output_bytes": 126,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/space_materials.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "graphics_scope",
+      "scope": "Actual Main normal flight excludes decorative asteroid scenery, preserves flight/navigation/surface data and restores optional graphics preview.",
+      "status": "passed",
+      "checks": 87,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:32:54.527489+00:00",
+      "suite_source": {
+        "path": "tests/test_graphics_scope.gd",
+        "bytes": 8672,
+        "sha256": "222ad1fc4b32ecb896c751945e2d50ca9b5432f63780a3cd6821e3dda91558b8"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_graphics_scope.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.897,
+      "timed_out": false,
+      "output_bytes": 355,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/graphics_scope.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "surface_detail_scope",
+      "scope": "Bespoke hull projection/profile isolation, independent0.11.3 geometry fingerprints, actual Main gameplay and progress preservation.",
+      "status": "passed",
+      "checks": 199,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:32:55.424998+00:00",
+      "suite_source": {
+        "path": "tests/test_surface_detail_scope.gd",
+        "bytes": 11525,
+        "sha256": "57fd76c7517e7b376a9dbb0998cecf33745845219cd871713a5a9f034b279604"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_surface_detail_scope.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.994,
+      "timed_out": false,
+      "output_bytes": 124,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/surface_detail_scope.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "station_finish",
+      "scope": "Dedicated industrial station maps, quality/finish settings and independent unchanged mesh fingerprints.",
+      "status": "passed",
+      "checks": 89,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:32:56.284485+00:00",
+      "suite_source": {
+        "path": "tests/test_station_finish.gd",
+        "bytes": 5228,
+        "sha256": "7125abc791db1e809326acaaf91cc539d07a42bb96b53dc31112fa82813b2782"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_station_finish.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.733,
+      "timed_out": false,
+      "output_bytes": 117,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/station_finish.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "offpad_takeoff",
+      "scope": "Healthy manual off-pad landings, positive lift departure, restore, slopes, surviving impacts and destroyed-hull rejection.",
+      "status": "passed",
+      "checks": 109,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:32:57.018621+00:00",
+      "suite_source": {
+        "path": "tests/test_offpad_takeoff.gd",
+        "bytes": 6215,
+        "sha256": "20f95381e09b9467225e6038f4d33fa4b5f0c9f279f4f9e738e9c0d668011c27"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_offpad_takeoff.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 4.695,
+      "timed_out": false,
+      "output_bytes": 118,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/offpad_takeoff.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "surface_action_controls",
+      "scope": "Actual phone surface actions, stale held inputs, independent second-finger takeoff, focus/report lifecycle and explicit destroyed-hull feedback.",
+      "status": "passed",
+      "checks": 66,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:32:57.420867+00:00",
+      "suite_source": {
+        "path": "tests/test_surface_action_controls.gd",
+        "bytes": 9432,
+        "sha256": "9408e25188442cd113ff5b8070c06a88e506c6104d102b43ad346e0cb1c35260"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_surface_action_controls.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.407,
+      "timed_out": false,
+      "output_bytes": 126,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/surface_action_controls.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "touch_actions",
+      "scope": "Independent action-button pointers, cancel/outside/disabled cases and emulated-mouse deduplication.",
+      "status": "passed",
+      "checks": 34,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:32:59.828677+00:00",
+      "suite_source": {
+        "path": "tests/test_touch_action_button.gd",
+        "bytes": 8049,
+        "sha256": "40afdbef075c307e80c73cfa9ca8b357aa9bc20271ef96e81256c26aae8e98a8"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_touch_action_button.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.273,
+      "timed_out": false,
+      "output_bytes": 122,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/touch_actions.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "flight_console",
+      "scope": "Classic instrument panel values, actual working command signals and phone layout bounds.",
+      "status": "passed",
+      "checks": 116,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:33:00.102408+00:00",
+      "suite_source": {
+        "path": "tests/test_flight_console.gd",
+        "bytes": 6015,
+        "sha256": "fe549a2a5809ca677633607c0f6bce6d68ad6cb97effe5000706750a2af2d56f"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_flight_console.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.232,
+      "timed_out": false,
+      "output_bytes": 118,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/flight_console.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "departure_cycle",
+      "scope": "Healthy automatic ground-to-orbit departure, v6 save/resume, cancellation and real source-city to training-dock cycle.",
+      "status": "passed",
+      "checks": 228,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:33:00.334880+00:00",
+      "suite_source": {
+        "path": "tests/test_departure_cycle.gd",
+        "bytes": 15964,
+        "sha256": "2f5d140277fffd793358e379feb59b373064f6f26f2490c04c7785545818e351"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_departure_cycle.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 7.11,
+      "timed_out": false,
+      "output_bytes": 119,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/departure_cycle.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "training_dock_services",
+      "scope": "Read-only real-model training service quotes and atomic repair/market/refuel/delivery/exchange transactions.",
+      "status": "passed",
+      "checks": 449,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:33:01.714139+00:00",
+      "suite_source": {
+        "path": "tests/test_training_dock_services.gd",
+        "bytes": 11541,
+        "sha256": "cce856c030059d5a817da127de5d20ed815df8f6cddee321561bdf14213161ba"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_training_dock_services.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.276,
+      "timed_out": false,
+      "output_bytes": 197,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/training_dock_services.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "dock_services_view",
+      "scope": "Actual quoted dock-service rows, touch commands, visible unavailable reasons and original-port gating.",
+      "status": "passed",
+      "checks": 78,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:33:01.990999+00:00",
+      "suite_source": {
+        "path": "tests/test_dock_services_view.gd",
+        "bytes": 8003,
+        "sha256": "e41e70c2a334ad55e1924b76d31ae05a8fd3f427401a91cff67822fdc08fc3a0"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_dock_services_view.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.556,
+      "timed_out": false,
+      "output_bytes": 121,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/dock_services_view.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "dock_service_actions",
+      "scope": "Real Main service commands, current-context revalidation, touch/scroll lifecycle and game-state preservation.",
+      "status": "passed",
+      "checks": 63,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:33:02.547363+00:00",
+      "suite_source": {
+        "path": "tests/test_dock_service_actions.gd",
+        "bytes": 11298,
+        "sha256": "933f030cb852c277d832e4f69c47e7560a7fc1460d4812681f352b349cf7f817"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_dock_service_actions.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.307,
+      "timed_out": false,
+      "output_bytes": 123,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/dock_service_actions.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "diagnostics",
+      "scope": "Bounded persistent diagnostics, real isolated engine/script errors, archive CRC/hash/retention, session markers and explicit save opt-in.",
+      "status": "passed",
+      "checks": 71,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:33:04.340620+00:00",
+      "suite_source": {
+        "path": "tests/test_game_diagnostics.gd",
+        "bytes": 12723,
+        "sha256": "8633e58548a1c9467e2dcbbc87274cb55e47d0628ef45f000655d1a46a94cc2d"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_game_diagnostics.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.554,
+      "timed_out": false,
+      "output_bytes": 164,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/diagnostics.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "report_export",
+      "scope": "Checked multiblock ZIP export, errors/cancel/retry, source preservation; Android SAF separately source-verified, physical device untested.",
+      "status": "passed",
+      "checks": 27,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:33:04.854627+00:00",
+      "suite_source": {
+        "path": "tests/test_report_export.gd",
+        "bytes": 4905,
+        "sha256": "c7ccee21fb27c906336abebc9897acf6eb5b7479a30d934e69d0c3b8a55a7e80"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_report_export.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.336,
+      "timed_out": false,
+      "output_bytes": 116,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/report_export.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "bug_report_ui",
+      "scope": "Actual Main report buttons, report description/context/save opt-in, verified export callback, direct retry and original progress isolation.",
+      "status": "passed",
+      "checks": 95,
+      "failures": 0,
+      "executed_utc": "2026-11-05T20:33:05.191899+00:00",
+      "suite_source": {
+        "path": "tests/test_bug_report_ui.gd",
+        "bytes": 14022,
+        "sha256": "abbf72aa2a6d355b425f6ffd5f52d07b4183e6d1cab31e76f22563236209a618"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_bug_report_ui.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.533,
+      "timed_out": false,
+      "output_bytes": 116,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/dock-validation-final/logs/bug_report_ui.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "unavailable",
+      "reason": "The preserved tests/test_source_model_mesh.gd requires model_vertices_reference.json; original city geometry is exercised by the current city suites, which does not replace this missing independent leaf fixture."
+    },
+    {
+      "scope": "Full application, Android installation and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner covers current standalone suites and isolated native terrain controls only."
+    }
+  ]
+}

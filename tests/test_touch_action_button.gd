@@ -93,12 +93,28 @@ func toggles()->void:
 	check(b.button_pressed and states==[true],"Cancel preserves prior toggle state")
 	touch(32,pb);touch(32,pb,false)
 	check(not b.button_pressed and states==[true,false],"Second completed toggle clears its state once")
+func detach_during_action()->void:
+	for use_mouse in [false,true]:
+		var transient:=Action.new();transient.position=Vector2(1030,60);transient.size=Vector2(150,80);transient.text="Перейти";root.add_child(transient)
+		var presses:Array=[0]
+		transient.pressed.connect(func():
+			presses[0]+=1
+			root.remove_child(transient)
+			transient.queue_free()
+		)
+		var point:=transient.get_global_rect().get_center()
+		if use_mouse:mouse(point,true);mouse(point,false)
+		else:touch(50,point,true);touch(50,point,false)
+		check(presses[0]==1 and transient.pointer_id==-1,"A pressed callback can detach its own action node after a completed capture")
+		check(not transient.is_inside_tree(),"The navigation/refresh callback removes its old action from the tree")
+		check(root.is_input_handled(),"Release stays consumed when its callback detaches the action node")
+		await process_frame
 func run()->void:
 	root.size=Vector2i(1440,720);layer=CanvasLayer.new();layer.transform=Transform2D(0.03,Vector2(20,25));root.add_child(layer)
 	var parent:=Control.new();parent.position=Vector2(35,20);parent.scale=Vector2(1.2,0.9);parent.rotation=-0.06;parent.mouse_filter=Control.MOUSE_FILTER_IGNORE;layer.add_child(parent)
 	a=button(parent,Vector2(0,0));b=button(parent,Vector2(220,0))
 	a.pressed.connect(func():counts.a+=1);b.pressed.connect(func():counts.b+=1)
 	await process_frame
-	basic_ownership();await lifecycle();await real_emulation_route();await scrolling_and_clipping();toggles()
+	basic_ownership();await lifecycle();await real_emulation_route();await scrolling_and_clipping();toggles();await detach_during_action()
 	layer.queue_free();await process_frame
 	print("TOUCH ACTION BUTTON TESTS: %d checks, %d failures"%[checks,failures]);quit(1 if failures else 0)

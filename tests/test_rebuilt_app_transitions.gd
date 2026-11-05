@@ -16,10 +16,12 @@ func check(ok:bool,message:String)->void:
 func json_copy(value:Dictionary)->Dictionary:return JSON.parse_string(JSON.stringify(value))
 func reset_models()->void:
 	game._new_models();game._close_menu();game._apply_system()
-func button_count()->int:
+func button_count(node:Node=null)->int:
+	if node==null:node=game.menu_rows
 	var count:=0
-	for item in game.menu_rows.get_children():
+	for item in node.get_children():
 		if item is Button:count+=1
+		count+=button_count(item)
 	return count
 
 func save_candidates()->void:

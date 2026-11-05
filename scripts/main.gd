@@ -27,6 +27,8 @@ const FlightReticle=preload("res://scripts/flight_reticle.gd")
 const BuildInfo=preload("res://scripts/build_info.gd")
 const Diagnostics=preload("res://scripts/game_diagnostics.gd")
 const ReportExport=preload("res://scripts/report_export.gd")
+const DockServices=preload("res://scripts/training_dock_services.gd")
+const DockServicesView=preload("res://scripts/dock_services_view.gd")
 var ship:RefCounted
 var nav:RefCounted
 var world:RefCounted
@@ -69,6 +71,7 @@ var auto_button:Button
 var dock_button:Button
 var surface_button:Button
 var flight_console:Control
+var dock_services_view:Control
 var action_buttons:Array=[]
 var flight_widgets:Array=[]
 var busy:=false
@@ -194,6 +197,7 @@ func _release_inputs()->void:
 	for button in action_buttons:
 		if is_instance_valid(button):button.release_pointer()
 	if flight_console!=null:flight_console.release_pointers()
+	if is_instance_valid(dock_services_view):dock_services_view.release_pointers()
 	lift_up=false;lift_down=false;roll_left=false;roll_right=false
 func _blocked()->bool:return busy or not active or menu.visible or settings_panel.visible
 func _physics_process(dt:float)->void:
@@ -247,6 +251,8 @@ func _update_flight_controls()->void:
 	flight_console.set_actions_enabled(not blocked)
 	for button in action_buttons:
 		if is_instance_valid(button):button.input_allowed=active and not busy
+	if is_instance_valid(dock_services_view):
+		for button in dock_services_view.action_buttons:button.input_allowed=active and not busy
 func _process(dt:float)->void:
 	_update_flight_controls()
 	if not active:return
@@ -328,7 +334,7 @@ func _refresh_hud()->void:
 	var state:="СТЫКОВКА" if ship.docked else ("ПОСАДКА" if surface.landed else ("АВТО" if ship.autopilot or surface.landing or not surface.flight_phase.is_empty() else "ПОЛЁТ"))
 	if ship.hull<=0:state="КОРАБЛЬ ПОТЕРЯН"
 	hud.text="%s · %s · %s"%["Графический полёт" if not graphics_return.is_empty() else nav.current().name,ship.profile().name,state]
-	auto_button.text="Отмена" if ship.autopilot or surface.landing or not surface.flight_phase.is_empty() else "Авто"
+	auto_button.text="Службы" if ship.docked else ("На орбиту" if surface.active and surface.landed and surface.globe!=null else ("Отмена" if ship.autopilot or surface.landing or not surface.flight_phase.is_empty() else "Авто"))
 	dock_button.text="Взлететь" if surface.landed else ("Вылететь" if ship.docked else "Посадка" if surface.active else "Стыковка")
 	surface_button.text="Взлететь" if surface.active and surface.landed else ("На орбиту" if surface.active else "К поверхности")
 	if surface.active:target_label.text="%s · высота %.0f м\nДо площадки %.0f м"%[surface.site_name if not surface.site_name.is_empty() else world.by_id[world.focus_id].name,maxf(0,surface.altitude(ship)),surface.pad_distance(ship)]
@@ -354,11 +360,23 @@ func _brake()->void:
 func _toggle_auto()->void:
 	if ship.hull<=0:return
 	if surface.active:
-		if surface.landing or not surface.flight_phase.is_empty():surface.landing=false;surface.cancel_vertical();_announce("Автоматический полёт отменён.")
+		if surface.landed:_begin_departure_action()
+		elif surface.landing or not surface.flight_phase.is_empty():surface.landing=false;surface.cancel_vertical();_announce("Автоматический полёт отменён.")
 		else:surface.begin_landing(ship);_announce(surface.message)
-	elif ship.docked:_announce("Сначала вылетите со станции.")
+	elif ship.docked:_show_services()
 	elif not _station_here():_announce("Автоподход доступен у станции. Выберите объект в системе.")
 	else:ship.autopilot=not ship.autopilot;_announce("Автоподход к станции." if ship.autopilot else "Автоподход отменён.")
+func _begin_departure_action()->bool:
+	if busy:return false
+	_release_inputs()
+	var accepted:bool=surface.begin_departure(ship)
+	var departure_message:String=surface.message
+	if accepted:
+		_close_menu()
+		if saving_enabled and not _save_game():departure_message+=" Текущий полёт пока не удалось сохранить."
+	_record_event("surface_departure",{"accepted":accepted,"flight_phase":surface.flight_phase,"hull":ship.hull})
+	_announce(departure_message);_refresh_hud()
+	return accepted
 func _takeoff_action()->bool:
 	var previous_controls:=_input_diagnostic_state()
 	_release_inputs()
@@ -379,6 +397,9 @@ func _surface_action()->void:
 	if busy:return
 	if surface.active:
 		if surface.landed:_takeoff_action()
+		elif surface.globe!=null:
+			if surface.flight_phase=="ascent":_announce("Автоподъём уже выполняется. «Тормозить» или «Отмена» остановят его.")
+			else:_begin_departure_action()
 		elif surface.begin_ascent(ship):_announce(surface.message)
 		else:_announce(surface.message)
 	else:await _enter_surface()
@@ -412,6 +433,7 @@ func _open_menu(title:String,save_progress:bool=true)->void:
 	if save_progress:_save_game()
 	menu_title.text=title
 	for child in menu_rows.get_children():menu_rows.remove_child(child);child.queue_free()
+	dock_services_view=null
 	menu.show()
 	_update_flight_controls()
 func _menu_text(text:String)->void:
@@ -432,6 +454,7 @@ func _show_menu()->void:
 	_menu_action("Графический полёт · осмотреть обновление",_begin_graphics_demo)
 	_menu_action("Космопорты и объекты системы",_show_system)
 	_menu_action("Маршруты между системами",_show_routes)
+	if surface.active and surface.globe!=null:_menu_action("Автовылет на орбиту",_begin_departure_action)
 	if ship.docked:_menu_action("Службы станции и корабли",_show_services)
 	_menu_action("Настройки телефона",func():menu.hide();settings_panel.configure(settings);settings_panel.show())
 	_menu_action("Сохранить сейчас",func():
@@ -498,21 +521,30 @@ func _start_jump(id:int)->void:
 	nav.select(id)
 	if nav.begin_jump(ship):_close_menu()
 	_announce(nav.message)
-func _show_services()->void:
-	_open_menu("СЛУЖБЫ СТАНЦИИ")
-	_menu_text("Баланс: %d кр. · груз: %d/%d т"%[ship.credits,ship.total_cargo(),ship.cargo_capacity()])
-	if ship.original_port:
-		_menu_text("Службы исходных космопортов ещё восстанавливаются. Учебный рынок доступен у тренировочного стыковочного узла.");return
-	_menu_action("Сдать учебный груз лекарств",func():_announce("Учебная доставка завершена." if ship.deliver() else "Нет подходящего груза для доставки.");_save_game();_show_services())
-	_menu_action("Купить 1 т лекарств · 100 кр.",func():_announce("Груз загружен." if ship.buy() else "Покупка недоступна: проверьте деньги и трюм.");_save_game();_show_services())
-	_menu_action("Продать 1 т лекарств",func():_announce("Груз продан." if ship.sell() else "Нет груза для продажи.");_save_game();_show_services())
-	_menu_action("Заправить гипердвигатель",func():nav.refuel(ship);_announce(nav.message);_save_game();_show_services())
-	for profile in ship.catalog.all():
-		var id:String=str(profile.id)
-		_menu_action("Корабль: %s · трюм %d т"%[profile.name,profile.cargo_capacity],func():_announce("Корабль заменён." if ship.trade_ship(id) else "Обмен недоступен: проверьте средства, груз и оборудование.");_apply_system();_save_game();_show_services())
+func _show_services(save_progress:bool=true)->void:
+	menu_feedback.text=""
+	_open_menu("СЛУЖБЫ СТАНЦИИ",save_progress)
+	dock_services_view=DockServicesView.new()
+	dock_services_view.configure_state(DockServices.service_state(ship,nav))
+	dock_services_view.command.connect(_service_command)
+	menu_rows.add_child(dock_services_view)
+func _service_command(action:String,id:String="")->void:
+	if busy:return
+	if surface.active or not _station_here() or not ship.docked:
+		_announce("Для обслуживания сначала выполните стыковку с доступной станцией.")
+		return
+	_release_inputs()
+	var result:Dictionary=DockServices.execute(ship,nav,action,id)
+	var feedback:String=str(result.message)
+	if result.ok:
+		if result.get("ship_changed",false):_apply_system()
+		if saving_enabled and not _save_game():feedback+=" Текущие изменения пока не удалось сохранить."
+	_record_event("dock_service",{"action":action,"id":id,"accepted":result.ok,"status":result.status})
+	if is_instance_valid(dock_services_view):dock_services_view.configure_state(DockServices.service_state(ship,nav))
+	_refresh_hud();_announce(feedback)
 func _show_help()->void:
 	_open_menu("УПРАВЛЕНИЕ И СБОРКА")
-	_menu_text("Левый стик меняет направление носа. Правая шкала задаёт скорость. «Тормозить» включает плавную остановку; «Авто» ведёт к станции или посадочной площадке. Кнопки подъёма и снижения помогают висеть над землёй.")
+	_menu_text("Левый стик меняет направление носа. Правая шкала задаёт скорость. «Тормозить» отменяет автоматический полёт и плавно останавливает корабль. «Авто» ведёт к станции или площадке; после посадки команда «На орбиту» выполняет автоматический вылет. «Взлететь» оставляет управление вам после короткого подъёма. Кнопки подъёма и снижения помогают лететь над землёй. В доке кнопка «Службы» открывает обслуживание.")
 	_menu_text("Клавиатура: стрелки — поворот, W/S — скорость, Q/E — крен, R/F — подъём, пробел — тормоз, A — авто, L — поверхность/орбита, D — стыковка/взлёт, V — вид, Esc — меню.")
 	_menu_text("Сборка %s. Отчёт об ошибке и журналы можно сохранить ZIP-архивом через меню. Осмотрите корабль, планеты и станцию через «Графический полёт». Полёт и данные исходных миров возвращены частично. Карта маршрутов, физика орбит, три лётных профиля и учебная торговля — адаптации. Полная кампания, исходная экономика и ИИ ещё не готовы. Проверка на настоящем телефоне нужна отдельно."%BuildInfo.VERSION)
 

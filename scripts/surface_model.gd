@@ -497,12 +497,47 @@ func enter_from_orbit(ship:RefCounted,system:RefCounted,days:float)->bool:
 func cancel_vertical()->void:
 	if not flight_phase.is_empty():message="Вертикальный автополёт отменён. Торможение доступно отдельной кнопкой."
 	flight_phase="";ready_for_orbit=false
+func begin_departure(ship:RefCounted)->bool:
+	# Automatic departure reuses the existing saved ascent phase. The ordinary
+	# take_off command remains a short lift; this command continues to orbit.
+	if not active or globe==null:
+		message="Для этой посадки используйте «Взлететь», затем наберите высоту для выхода на орбиту."
+		return false
+	if not is_finite(ship.hull) or ship.hull<=0 or ship.hull>100 or ship.docked or ship.combat_active:
+		message="Автовылет недоступен в текущем состоянии корабля.";return false
+	if not ship.position.is_finite() or not ship.velocity.is_finite() or not ship.attitude.is_finite() or ship.attitude.length_squared()<0.0001 or not is_finite(ship.target_speed) or ship.velocity.length()>20:
+		message="Для автовылета остановитесь до 20 м/с.";return false
+	var thrust:float=ship.acceleration()
+	if not is_finite(gravity) or gravity<0 or not is_finite(thrust) or thrust<=0 or gravity>thrust*0.8:
+		message="Недостаточно тяги для безопасного автовылета при этой гравитации.";return false
+	var height:float=altitude(ship)
+	if not is_finite(height) or height< -1 or height>MAX_FLIGHT_HEIGHT or overlaps_building(ship):
+		message="Для автовылета отойдите от здания и освободите путь над кораблём.";return false
+	if not _departure_column_clear(ship):
+		message="Путь вверх перекрыт зданием. Сначала перелетите на свободный участок.";return false
+	if landed and not take_off(ship):return false
+	_engage_ascent(ship)
+	message="Автовылет на орбиту. «Тормозить» или ручное управление отменяют подъём."
+	return true
+func _departure_column_clear(ship:RefCounted)->bool:
+	# Use the same ellipsoid/triangle and box tests as live flight. A 0.3-m
+	# start separation matches take_off; no position or collision data is changed.
+	var start:Vector3=ship.position+Vector3.UP*0.3 if landed else ship.position
+	var climb:float=maxf(1000.0,float(city_data.get("cruise_height_m",350.0))+100.0)
+	var end:Vector3=start+Vector3.UP*climb
+	if globe.revision==SphereTerrain.CITY_REVISION:
+		return city_data.is_empty() or CityRuntime.sweep(city_data,globe,start,end,collision_radii(ship)).is_empty()
+	for box in buildings():
+		if not SegmentBox.intersect(start,end,box.grow(collision_radius(ship))).is_empty():return false
+	return true
+func _engage_ascent(ship:RefCounted)->void:
+	extended_flight=true;flight_phase="ascent";ready_for_orbit=false;landing=false;taking_off=false
+	ship.assisted=true;ship.target_speed=0;ship.autopilot=false
 func begin_ascent(ship:RefCounted)->bool:
 	if not active or not globe or landed or ship.hull<=0 or altitude(ship)<500 or ship.velocity.length()>20:
 		message="Для автоподъёма: высота от 500 м, скорость до 20 м/с."
 		return false
-	extended_flight=true;flight_phase="ascent";ready_for_orbit=false;landing=false;taking_off=false
-	ship.assisted=true;ship.target_speed=0;ship.autopilot=false
+	_engage_ascent(ship)
 	message="Автоподъём к 20 км. «Тормозить» или ручное управление отменяют подъём."
 	return true
 func begin_descent(ship:RefCounted,system:RefCounted,days:float)->bool:

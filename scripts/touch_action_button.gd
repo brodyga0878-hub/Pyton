@@ -77,23 +77,25 @@ func _input(event:InputEvent)->void:
 	if not _enabled():release_pointer();return
 	if event is InputEventScreenTouch:
 		if event.canceled:
-			if event.index==pointer_id:release_pointer();get_viewport().set_input_as_handled()
+			if event.index==pointer_id:get_viewport().set_input_as_handled();release_pointer()
 		elif event.pressed:
 			if pointer_id==-1 and _contains(event.position):
-				_capture(event.index,event.position);get_viewport().set_input_as_handled()
+				get_viewport().set_input_as_handled();_capture(event.index,event.position)
 		elif event.index==pointer_id:
-			_finish(event.position);get_viewport().set_input_as_handled()
+			# A command may rebuild its menu and detach this button synchronously.
+			# Consume the event while it still belongs to a viewport.
+			get_viewport().set_input_as_handled();_finish(event.position)
 	elif event is InputEventScreenDrag and event.index==pointer_id:
-		_motion(event.position);get_viewport().set_input_as_handled()
+		get_viewport().set_input_as_handled();_motion(event.position)
 	elif event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT:
 		if event.device==-1 or pointer_id>=0:return
 		if event.pressed:
 			if pointer_id==-1 and _contains(event.position):
-				_capture(-2,event.position);get_viewport().set_input_as_handled()
+				get_viewport().set_input_as_handled();_capture(-2,event.position)
 		elif pointer_id==-2:
-			_finish(event.position);get_viewport().set_input_as_handled()
+			get_viewport().set_input_as_handled();_finish(event.position)
 	elif event is InputEventMouseMotion and pointer_id==-2:
 		if event.device==-1:return
+		get_viewport().set_input_as_handled()
 		if not event.button_mask&MOUSE_BUTTON_MASK_LEFT:release_pointer()
 		else:_motion(event.position)
-		get_viewport().set_input_as_handled()

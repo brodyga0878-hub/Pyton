@@ -1,0 +1,92 @@
+{
+	"frames": [
+		{
+			"credits": 1000,
+			"docked": false,
+			"file": "01-ground-departure-command.png",
+			"flight_phase": "",
+			"fuel": 12,
+			"hull": 100.0,
+			"landed": true,
+			"menu_visible": false,
+			"phone_capture": false,
+			"site_id": "site10",
+			"source": "actual scenes/main.tscn",
+			"surface": true
+		},
+		{
+			"credits": 1000,
+			"docked": false,
+			"file": "02-automatic-ascent.png",
+			"flight_phase": "ascent",
+			"fuel": 12,
+			"hull": 100.0,
+			"landed": false,
+			"menu_visible": false,
+			"phone_capture": false,
+			"site_id": "site10",
+			"source": "actual scenes/main.tscn",
+			"surface": true
+		},
+		{
+			"credits": 1000,
+			"docked": true,
+			"file": "03-dock-repair-and-refuel.png",
+			"flight_phase": "",
+			"fuel": 7,
+			"hull": 64.5,
+			"landed": false,
+			"menu_visible": true,
+			"phone_capture": false,
+			"site_id": "",
+			"source": "actual scenes/main.tscn",
+			"surface": false
+		},
+		{
+			"credits": 879,
+			"docked": true,
+			"file": "04-serviced-ship.png",
+			"flight_phase": "",
+			"fuel": 12,
+			"hull": 100.0,
+			"landed": false,
+			"menu_visible": true,
+			"phone_capture": false,
+			"site_id": "",
+			"source": "actual scenes/main.tscn",
+			"surface": false
+		},
+		{
+			"credits": 879,
+			"docked": true,
+			"file": "05-commodity-market.png",
+			"flight_phase": "",
+			"fuel": 12,
+			"hull": 100.0,
+			"landed": false,
+			"menu_visible": true,
+			"phone_capture": false,
+			"site_id": "",
+			"source": "actual scenes/main.tscn",
+			"surface": false
+		},
+		{
+			"credits": 879,
+			"docked": true,
+			"file": "06-ship-exchange-quotes.png",
+			"flight_phase": "",
+			"fuel": 12,
+			"hull": 100.0,
+			"landed": false,
+			"menu_visible": true,
+			"phone_capture": false,
+			"site_id": "",
+			"source": "actual scenes/main.tscn",
+			"surface": false
+		}
+	],
+	"renderer": "Mesa llvmpipe/OpenGL Compatibility",
+	"service_review_fixture_fuel": 7,
+	"service_review_fixture_hull": 64.5,
+	"user_progress_io": false
+}

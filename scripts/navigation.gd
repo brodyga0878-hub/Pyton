@@ -72,7 +72,9 @@ func step(dt:float,ship:RefCounted)->bool:
 	return true
 
 func refuel(ship:RefCounted)->bool:
-	if not ship.docked or not has_station() or remaining>0:return false
+	if ship.original_port:message="Заправка этого космопорта пока недоступна.";return false
+	if not ship.docked or not has_station() or remaining>0 or ship.surface_mode or ship.combat_active or not ship.station_available or not is_finite(ship.hull) or ship.hull<=0:
+		message="Заправка доступна после стыковки с учебным узлом.";return false
 	var missing:=FUEL_CAPACITY-fuel
 	if missing<=0:message="Баки полны.";return false
 	var cost:=missing*10

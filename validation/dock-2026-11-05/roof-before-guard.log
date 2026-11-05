@@ -1,0 +1,15 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+ERROR: An automatic departure refuses the obstructed vertical route before climbing into a roof
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_departure_cycle.gd:14)
+       [1] roof_obstruction (res://tests/test_departure_cycle.gd:120)
+       [2] run (res://tests/test_departure_cycle.gd:172)
+ERROR: Obstruction refusal preserves position, grounded state, hull and route atomically
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_departure_cycle.gd:14)
+       [1] roof_obstruction (res://tests/test_departure_cycle.gd:121)
+       [2] run (res://tests/test_departure_cycle.gd:172)
+DEPARTURE CYCLE TESTS: 210 checks, 2 failures

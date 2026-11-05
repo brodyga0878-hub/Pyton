@@ -208,6 +208,11 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
                     path='assets/scripts/'+name
                     assert path in names and len(archive.read(path))>64,'Missing flight control runtime '+name
                     flight_ui_assets[name]=hashlib.sha256(archive.read(path)).hexdigest()
+            if expected['version_code']>=28:
+                for name in ['dock_services_view.gdc','training_dock_services.gdc','navigation.gdc']:
+                    path='assets/scripts/'+name
+                    assert path in names and len(archive.read(path))>64,'Missing dock service runtime '+name
+                    flight_ui_assets[name]=hashlib.sha256(archive.read(path)).hexdigest()
         for name in names:
             if not name.startswith('lib/') or not name.endswith('.so'):continue
             data=archive.read(name)

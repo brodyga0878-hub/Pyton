@@ -132,6 +132,8 @@ func configure_state(state:Dictionary)->void:
 	labels.cargo.text="Груз %d т · %d кр."%[int(maxf(0,_number("cargo_t"))),int(maxf(0,_number("totalcredits")))]
 	var mode:="СТАБИЛИЗАЦИЯ" if bool(state.get("assisted",true)) else "РУЧНОЕ УПРАВЛЕНИЕ"
 	if bool(state.get("autopilot",false)) or bool(state.get("landing",false)) or not str(state.get("flight_phase","")).is_empty():mode="АВТОПИЛОТ"
+	if str(state.get("flight_phase",""))=="ascent":mode="ПОДЪЁМ НА ОРБИТУ"
+	elif str(state.get("flight_phase",""))=="descent":mode="СПУСК К ПОВЕРХНОСТИ"
 	if bool(state.get("taking_off",false)):mode="ВЗЛЁТ"
 	if bool(state.get("landed",false)):mode="НА ПОВЕРХНОСТИ"
 	if bool(state.get("docked",false)):mode="В ДОКЕ"
