@@ -1,0 +1,38 @@
+{
+  "version": "0.11.10-orbits-alpha1",
+  "version_code": 32,
+  "source_commit": "1643fab8997f0c977055443aa11c90b8c0da2861",
+  "source_archive_scope": "Current full Godot source/project/data,51material PNGs, tests/native fixtures/tools/docs and recovered history; excludes deliverables, validation, caches, SDK and signing key.",
+  "source_archive_files": 967,
+  "source_archive_below_32MiB": true,
+  "files": {
+    "StarFrontier-0.11.10-orbits-arm64.apk": {
+      "bytes": 49233174,
+      "sha256": "236fe41a14fc04280f779c72b4a6d46043683c18c9be766c834c4e7cf118bcf7"
+    },
+    "StarFrontier-0.11.10-orbits-source.zip": {
+      "bytes": 23603134,
+      "sha256": "1dfc2f21086c11541f511781142573aacd8cc3c21662a67267a1c67c30be2b1d"
+    }
+  },
+  "checks": 32935,
+  "passed_suites": 25,
+  "failures": 0,
+  "validation_status": "passed_with_coverage_limitations",
+  "validation_report": "validation/orbits-2026-11-06/orbit-validation.json",
+  "android_verification": "validation/orbits-2026-11-06/orbit-android-verification.json",
+  "source_variant": "jjffe-7e54034-q31-orbit",
+  "native_contract": "jjffe-f880-3250-anchor-f866-orbit-xyz-v1",
+  "live_native_celestial_bodies": 92,
+  "handcrafted_systems": 11,
+  "legacy_v1_layouts_preserved": true,
+  "radius_mass_gravity_spin": "analytic_si_rebuild_v1",
+  "complete_original_physics": false,
+  "runtime_material_maps": 51,
+  "physical_device_tested": false,
+  "test_key_only": true,
+  "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+  "production_signing_key_configured": false,
+  "full_original_port_complete": false,
+  "publication_ready": false
+}
