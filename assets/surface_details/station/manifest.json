@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "resolution": 1024,
+  "seed": 713550,
+  "license": "CC0-1.0",
+  "authoring": "Original authored periodic industrial station panels; no downloaded imagery or baked light. Original5x7 Cyrillic pixel glyphs.",
+  "normal_convention": "OpenGL +Y; image Y increases down; no Y inversion",
+  "orm_channels": {
+    "r": "ambient_occlusion",
+    "g": "roughness",
+    "b": "metallic"
+  },
+  "mean_linear_luminance": 0.54578283,
+  "mean_roughness": 0.52583594,
+  "tile_size_m": 16,
+  "files": {
+    "albedo": {
+      "bytes": 199350,
+      "sha256": "7eff9d51005d10e7fe582dc4430e85bf288640308504fe7603622b8542ef2c9d"
+    },
+    "normal": {
+      "bytes": 342644,
+      "sha256": "3a85b42255686ddcbfc697e3c00e17bd70550025d76c0160cb8c5cbf70a42d6b"
+    },
+    "orm": {
+      "bytes": 297853,
+      "sha256": "4e7b41f13f26c8731061e7b3deb228e91a999640fe34bd88bd760d9df3f386e4"
+    }
+  }
+}

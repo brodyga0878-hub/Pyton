@@ -22,6 +22,12 @@ func standard_maps(material:StandardMaterial3D,kind:String)->void:
 	check(material.roughness_texture==Library.texture(kind,"orm"),"Standard surface binds shared roughness map")
 	check(material.metallic_texture==Library.texture(kind,"orm"),"Standard surface binds shared metalness map")
 	check(material.uv1_triplanar,"Existing geometry receives textures without adding tangent or UV streams")
+func station_finish_maps(material:StandardMaterial3D)->void:
+	check(material.albedo_texture==Station.finish_texture("albedo"),"Station shell/dark use the dedicated authored albedo")
+	check(material.normal_texture==Station.finish_texture("normal"),"Station shell/dark use the dedicated authored normal")
+	for map in [material.ao_texture,material.roughness_texture,material.metallic_texture]:
+		check(map==Station.finish_texture("orm"),"Station finish uses the shared physical ORM")
+	check(material.uv1_triplanar and not material.uv1_world_triplanar,"Station textures remain attached to existing object coordinates")
 func run()->void:
 	var ship:=Ship.new();root.add_child(ship);ship.configure({"id":"cobra","visual_span_m":42.0})
 	check(int(ship.geometry_stats.triangles)==7534,"Material upgrade preserves the existing high-detail 7534-triangle hull")
@@ -40,8 +46,8 @@ func run()->void:
 	check(int(high_material.get_shader_parameter("detail_level"))==2,"High-detail cached material survives economy configuration")
 	check(not ship._material("glass").normal_enabled,"Economy glazing skips normal detail")
 	var station:=Station.new();root.add_child(station);station.configure(2)
-	standard_maps(station._materials.shell,"painted_alloy")
-	standard_maps(station._materials.dark,"brushed_metal")
+	station_finish_maps(station._materials.shell)
+	station_finish_maps(station._materials.dark)
 	standard_maps(station._materials.gold,"brushed_metal")
 	shader_maps(station._materials.solar,"brushed_metal")
 	check(station._materials.light.albedo_texture==null and station._materials.amber.albedo_texture==null,"Navigation lamps retain their clean emissive colours")

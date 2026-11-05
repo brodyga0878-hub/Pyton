@@ -1,0 +1,3 @@
+Original ship surface atlas artwork and authored bitmap stencil: CC0 1.0 Universal.
+No third-party artwork or fonts are embedded in these assets.
+https://creativecommons.org/publicdomain/zero/1.0/

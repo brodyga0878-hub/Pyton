@@ -1,0 +1,2 @@
+CC0 1.0 Universal
+Original station surface maps and original pixel glyphs authored for this project. No third-party photographs or game textures.

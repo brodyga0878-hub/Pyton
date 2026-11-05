@@ -66,6 +66,8 @@ SUITES = [
     Suite('space_materials', 'tests/test_space_material_bindings.gd', 'Real hull/station material map assignments, palette/finish and quality isolation on existing geometry.'),
     Suite('world_materials', 'tests/test_world_materials.gd', 'City palette and mesh preservation, real terrain/fallback maps and quality propagation.'),
     Suite('graphics_scope', 'tests/test_graphics_scope.gd', 'Actual Main normal flight excludes decorative asteroid scenery, preserves flight/navigation/surface data and restores optional graphics preview.', user_args=('--rebuild-capture',)),
+    Suite('surface_detail_scope', 'tests/test_surface_detail_scope.gd', 'Bespoke hull projection/profile isolation, independent0.11.3 geometry fingerprints, actual Main gameplay and progress preservation.', user_args=('--rebuild-capture',)),
+    Suite('station_finish', 'tests/test_station_finish.gd', 'Dedicated industrial station maps, quality/finish settings and independent unchanged mesh fingerprints.'),
     Suite('diagnostics', 'tests/test_game_diagnostics.gd', 'Bounded persistent diagnostics, real isolated engine/script errors, archive CRC/hash/retention, session markers and explicit save opt-in.'),
     Suite('report_export', 'tests/test_report_export.gd', 'Checked multiblock ZIP export, errors/cancel/retry, source preservation; Android SAF separately source-verified, physical device untested.'),
     Suite('bug_report_ui', 'tests/test_bug_report_ui.gd', 'Actual Main report buttons, report description/context/save opt-in, verified export callback, direct retry and original progress isolation.', user_args=('--rebuild-capture',)),

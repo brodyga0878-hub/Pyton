@@ -1,0 +1,194 @@
+[
+	{
+		"asteroid_count": 0,
+		"camera_fov": 58.0,
+		"camera_position": [
+			-18.8999996185303,
+			61.8000030517578,
+			-1526.90002441406
+		],
+		"camera_target": [
+			0.0,
+			45.0,
+			-1552.93994140625
+		],
+		"elapsed_days": 225.0,
+		"file": "01-cobra-hull.png",
+		"graphics_demo": false,
+		"phone_capture": false,
+		"quality": 2,
+		"renderer": "gl_compatibility",
+		"revision": "0.11.4",
+		"ship_profile": "cobra",
+		"ship_span_m": 42.0,
+		"source": "actual scenes/main.tscn"
+	},
+	{
+		"asteroid_count": 0,
+		"camera_fov": 52.0,
+		"camera_position": [
+			0.0,
+			79.4400024414062,
+			-1540.33996582031
+		],
+		"camera_target": [
+			0.0,
+			45.0,
+			-1551.68005371094
+		],
+		"elapsed_days": 225.0,
+		"file": "02-cobra-plating.png",
+		"graphics_demo": false,
+		"phone_capture": false,
+		"quality": 2,
+		"renderer": "gl_compatibility",
+		"revision": "0.11.4",
+		"ship_profile": "cobra",
+		"ship_span_m": 42.0,
+		"source": "actual scenes/main.tscn"
+	},
+	{
+		"asteroid_count": 0,
+		"camera_fov": 58.0,
+		"camera_position": [
+			-11.6999998092651,
+			55.4000015258789,
+			-1535.69995117188
+		],
+		"camera_target": [
+			0.0,
+			45.0,
+			-1551.81994628906
+		],
+		"elapsed_days": 225.0,
+		"file": "03-eagle-hull.png",
+		"graphics_demo": false,
+		"phone_capture": false,
+		"quality": 2,
+		"renderer": "gl_compatibility",
+		"revision": "0.11.4",
+		"ship_profile": "eagle",
+		"ship_span_m": 26.0,
+		"source": "actual scenes/main.tscn"
+	},
+	{
+		"asteroid_count": 0,
+		"camera_fov": 52.0,
+		"camera_position": [
+			0.0,
+			66.3199996948242,
+			-1544.02001953125
+		],
+		"camera_target": [
+			0.0,
+			45.0,
+			-1551.0400390625
+		],
+		"elapsed_days": 225.0,
+		"file": "04-eagle-plating.png",
+		"graphics_demo": false,
+		"phone_capture": false,
+		"quality": 2,
+		"renderer": "gl_compatibility",
+		"revision": "0.11.4",
+		"ship_profile": "eagle",
+		"ship_span_m": 26.0,
+		"source": "actual scenes/main.tscn"
+	},
+	{
+		"asteroid_count": 0,
+		"camera_fov": 58.0,
+		"camera_position": [
+			-10.7999992370605,
+			54.5999984741211,
+			-1536.80004882812
+		],
+		"camera_target": [
+			0.0,
+			45.0,
+			-1551.68005371094
+		],
+		"elapsed_days": 225.0,
+		"file": "05-shuttle-hull.png",
+		"graphics_demo": false,
+		"phone_capture": false,
+		"quality": 2,
+		"renderer": "gl_compatibility",
+		"revision": "0.11.4",
+		"ship_profile": "shuttle",
+		"ship_span_m": 24.0,
+		"source": "actual scenes/main.tscn"
+	},
+	{
+		"asteroid_count": 0,
+		"camera_fov": 52.0,
+		"camera_position": [
+			0.0,
+			64.6800003051758,
+			-1544.47998046875
+		],
+		"camera_target": [
+			0.0,
+			45.0,
+			-1550.9599609375
+		],
+		"elapsed_days": 225.0,
+		"file": "06-shuttle-plating.png",
+		"graphics_demo": false,
+		"phone_capture": false,
+		"quality": 2,
+		"renderer": "gl_compatibility",
+		"revision": "0.11.4",
+		"ship_profile": "shuttle",
+		"ship_span_m": 24.0,
+		"source": "actual scenes/main.tscn"
+	},
+	{
+		"asteroid_count": 0,
+		"camera_fov": 58.0,
+		"camera_position": [
+			220.0,
+			170.0,
+			-2170.0
+		],
+		"camera_target": [
+			0.0,
+			0.0,
+			-2610.0
+		],
+		"elapsed_days": 225.0,
+		"file": "07-station-overview.png",
+		"graphics_demo": false,
+		"phone_capture": false,
+		"quality": 2,
+		"renderer": "gl_compatibility",
+		"revision": "0.11.4",
+		"ship_profile": "shuttle",
+		"ship_span_m": 24.0,
+		"source": "actual scenes/main.tscn"
+	},
+	{
+		"asteroid_count": 0,
+		"camera_fov": 52.0,
+		"camera_position": [
+			225.0,
+			70.0,
+			-2525.0
+		],
+		"camera_target": [
+			150.0,
+			0.0,
+			-2650.0
+		],
+		"elapsed_days": 225.0,
+		"file": "08-station-closeup.png",
+		"graphics_demo": false,
+		"phone_capture": false,
+		"quality": 2,
+		"renderer": "gl_compatibility",
+		"revision": "0.11.4",
+		"ship_profile": "shuttle",
+		"ship_span_m": 24.0,
+		"source": "actual scenes/main.tscn"
+	}
+]

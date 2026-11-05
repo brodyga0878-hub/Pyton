@@ -29,8 +29,8 @@
   },
   "current_reconstruction": {
     "implementation_kind": "New integration and newly written missing modules around preserved historical source; not discovery of the complete former source tree",
-    "application_version": "0.11.3-materials-alpha1",
-    "application_integration_status": "Materials0.11.3: original PBR maps on existing surfaces, decorative asteroid field confined to optional preview, 2474 targeted checks plus application smoke and desktop software rendering passed; Android packaging verified, physical device pending.",
+    "application_version": "0.11.4-surfaces-alpha1",
+    "application_integration_status": "Surfaces0.11.4: dedicated ship/station texture art, independent unchanged geometry, economy coldboot fixed;2061 targeted checks plus real scene smoke and matched before/after desktop renders passed; physical Android validation pending.",
     "native_android_runtime": "Godot ARM64; no DOS or x86 emulator in the game",
     "modules_present": [
       "New main scene controller and Russian phone interface",
@@ -157,20 +157,20 @@
     },
     "whole_application_smoke_passed": true,
     "whole_application_smoke_scope": "Actual scene: source Sol/Earth, training auto dock/delivery, original New Moscow84 entry/landing, atomic disk save/reload and persistent source-city view; desktop Godot only",
-    "whole_application_smoke_log": "validation/materials-2026-11-05/app-smoke.log",
+    "whole_application_smoke_log": "validation/surfaces-2026-11-05/app-smoke.log",
     "desktop_gles_render_passed": true,
-    "desktop_gles_render_scope": "Seven real game frames, ordinary flight and native city; desktop OpenGL Compatibility using Mesa llvmpipe software rendering, not physical Android or hardware performance.",
-    "desktop_gles_render_log": "validation/materials-2026-11-05/render.log",
+    "desktop_gles_render_scope": "Eight actual ordinary-flight scene frames compared against8 same-pose/date/quality0.11.3 frames, software Mesa llvmpipe OpenGL Compatibility; not Android hardware performance.",
+    "desktop_gles_render_log": "validation/surfaces-2026-11-05/render-after.log",
     "android_apk_built": true,
     "android_apk_technically_verified": true,
-    "android_artifact_status": "Materials0.11.3 ARM64 alpha technically verified, all24 map imports and runtime metadata checked; TEST signature, no physical Android validation.",
-    "final_android_candidate_hash": "36bd768487a253ccca3c020a663668c713517992254ddea15cbecabbd0b0527e",
+    "android_artifact_status": "Surfaces0.11.4 ARM64 alpha technically verified including all36 maps and runtime metadata; TEST signing, physical Android validation pending.",
+    "final_android_candidate_hash": "bfd45850f1568de3452af706e703c8863f48e374030a0b06756411308e94a9c4",
     "final_android_candidate": {
-      "file": "deliverables/0.11.3-materials-alpha1/StarFrontier-0.11.3-materials-arm64.apk",
-      "bytes": 31751399,
+      "file": "deliverables/0.11.4-surfaces-alpha1/StarFrontier-0.11.4-surfaces-arm64.apk",
+      "bytes": 36051108,
       "package": "org.starfrontier.rebuild",
-      "version": "0.11.3-materials-alpha1",
-      "version_code": 25,
+      "version": "0.11.4-surfaces-alpha1",
+      "version_code": 26,
       "abi": "arm64-v8a",
       "min_sdk": 24,
       "target_sdk": 36,
@@ -178,10 +178,10 @@
       "production_signing_key_configured": false,
       "zip_and_elf_alignment_16k": true,
       "native_data_assets_verified": true,
-      "material_map_count_verified": 24,
+      "material_map_count_verified": 36,
       "debuggable": false,
       "toolchain_smoke_only": false,
-      "verification_report": "validation/materials-2026-11-05/materials-android-verification.json"
+      "verification_report": "validation/surfaces-2026-11-05/surfaces-android-verification.json"
     },
     "physical_device_tested": false,
     "new_russian_name_labels": 133,
@@ -199,7 +199,7 @@
       "Three adapted flight profiles and training services do not complete original ships, equipment, economy, combat, AI or campaign",
       "Russian interface and new proper-name labels do not complete the original text corpus or editorial review"
     ],
-    "application_version_planned": "0.11.3-materials-alpha1",
+    "application_version_planned": "0.11.4-surfaces-alpha1",
     "graphics_update": {
       "version": "0.11.1-graphics-alpha1",
       "checks": 1408,
@@ -280,6 +280,36 @@
       "reference_visual_quality_achieved": false,
       "physical_device_tested": false,
       "documentation": "docs/MATERIALS_0_11_3_RU.md"
+    },
+    "individual_surfaces_update": {
+      "version": "0.11.4-surfaces-alpha1",
+      "ship_profiles": [
+        "cobra",
+        "eagle",
+        "shuttle"
+      ],
+      "ship_maps": 9,
+      "station_maps": 3,
+      "resolution": [
+        1024,
+        1024
+      ],
+      "total_map_count_with_generic": 36,
+      "source_png_bytes": 3710762,
+      "checks": 2061,
+      "passed_suites": 12,
+      "failures": 0,
+      "validation_report": "validation/surfaces-2026-11-05/surfaces-validation.json",
+      "geometry_reference_commit": "9241a473c8eb80f2202bd6b00de7eac853f63c85",
+      "independent_ship_geometry_cases": 9,
+      "independent_station_quality_cases": 3,
+      "unchanged_geometry_verified": true,
+      "economy_boot_avoids_detailed_ship_atlas_load": true,
+      "capture_comparison_manifest": "validation/surfaces-2026-11-05/screenshots/comparison-manifest.json",
+      "reference_visual_quality_achieved": false,
+      "physical_device_tested": false,
+      "world_surface_individual_art_pending": true,
+      "documentation": "docs/SURFACES_0_11_4_RU.md"
     }
   },
   "target_device": "Samsung S23 Ultra 12/512",
@@ -306,7 +336,7 @@
     "13": "Full Russian localization",
     "14": "Device testing and release"
   },
-  "current_prerequisite": "Preserve and publish current source, verified test APK and validation reports; continue block10 with explicit source-versus-adapter boundaries while physical phone testing remains pending",
+  "current_prerequisite": "Continue requested individual art for cities and world surfaces, then continue original world/settlement block10 with source-versus-adapter boundaries; retain checkpoint backups and physical phone test as pending.",
   "historical_statistics_are_current_validation": false,
   "full_release_date": null,
   "detailed_audit": "docs/RECOVERY_AND_ROADMAP_RU.md",

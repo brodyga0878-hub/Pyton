@@ -5,6 +5,7 @@ const HullShader=preload("res://scripts/ship_hull.gdshader")
 const ExhaustShader=preload("res://scripts/ship_exhaust.gdshader")
 const HaloShader=preload("res://scripts/ship_halo.gdshader")
 const MaterialLibrary=preload("res://scripts/material_library.gd")
+const SurfaceDetails=preload("res://scripts/surface_detail_library.gd")
 static var _mesh_cache:Dictionary={}
 static var _material_cache:Dictionary={}
 var _groups:Dictionary={}
@@ -99,7 +100,7 @@ func _face(group:String,points:Array)->void:
 	for i in range(1,points.size()-1):_triangle(group,points[0],points[i],points[i+1])
 func _material(group:String)->Material:
 	# Shader detail is quality-specific: changing one ship must not alter another.
-	var cache_key:="%s:%d"%[group,_quality]
+	var cache_key:="%s:%.3f:%s:%d"%[_id,_span,group,_quality]
 	if _material_cache.has(cache_key):return _material_cache[cache_key]
 	var palette:={"frame":[Color("354b57"),0.40,0.44],"armour":[Color("b6c4c7"),0.12,0.33],"edge":[Color("c2d0d2"),0.52,0.29],"navy":[Color("45677c"),0.12,0.39],"gold":[Color("e6b354"),0.45,0.33],"copper":[Color("88614b"),0.8,0.35],"rubber":[Color("0b141b"),0.08,0.72]}
 	if palette.has(group):
@@ -110,6 +111,8 @@ func _material(group:String)->Material:
 		material.set_shader_parameter("paint",row[0]);material.set_shader_parameter("metalness",row[1]);material.set_shader_parameter("finish",row[2])
 		material.set_shader_parameter("detail_level",_quality)
 		material.set_shader_parameter("normal_strength",0.26 if kind=="painted_alloy" else 0.18)
+		if _quality>0 and group in ["frame","armour","navy"]:
+			SurfaceDetails.bind_hull(material,_id,_span)
 		_material_cache[cache_key]=material
 	else:
 		var material:=StandardMaterial3D.new()

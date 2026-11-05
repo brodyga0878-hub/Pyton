@@ -1,0 +1,98 @@
+{
+  "baseline_commit": "9241a473c8eb80f2202bd6b00de7eac853f63c85",
+  "current_version": "0.11.4-surfaces-alpha1",
+  "capture_tool_sha256": "a634c7bbe7a4bfca5aafbac7343d8b4e8e12ec7c6d77dfc6f439cc723e55f9c8",
+  "matching_cameras_dates_quality_and_scene": true,
+  "software_renderer": "Mesa llvmpipe OpenGL Compatibility",
+  "physical_phone_capture": false,
+  "pairs": [
+    {
+      "name": "01-cobra-hull.png",
+      "before": {
+        "path": "validation/surfaces-2026-11-05/screenshots/before/01-cobra-hull.png",
+        "sha256": "7b546267fd94fd42456ceceedab83f5d32c718c8f2a8f5912305995fd7ee6236"
+      },
+      "after": {
+        "path": "validation/surfaces-2026-11-05/screenshots/after/01-cobra-hull.png",
+        "sha256": "77ef9ad9d5341f7f0bc5960f654b092529100f23a0aebc2c9a807c242e8cd075"
+      }
+    },
+    {
+      "name": "02-cobra-plating.png",
+      "before": {
+        "path": "validation/surfaces-2026-11-05/screenshots/before/02-cobra-plating.png",
+        "sha256": "c223790edf32095c97e94ba7577755fbf7b89c80adafd4aab5930a333edfef22"
+      },
+      "after": {
+        "path": "validation/surfaces-2026-11-05/screenshots/after/02-cobra-plating.png",
+        "sha256": "648d9d224e0239a915cb3f68cc2ceb4f6c030074a03267dec250a3109c8b7b62"
+      }
+    },
+    {
+      "name": "03-eagle-hull.png",
+      "before": {
+        "path": "validation/surfaces-2026-11-05/screenshots/before/03-eagle-hull.png",
+        "sha256": "858fcbdf4be0d1aae3eb3a41551dc4fe6cef0bfa03e260c4369df0fef92a8965"
+      },
+      "after": {
+        "path": "validation/surfaces-2026-11-05/screenshots/after/03-eagle-hull.png",
+        "sha256": "820a773526d82c7f3442dcfc415a29174b4c793424f9aa45e636329211ac09c2"
+      }
+    },
+    {
+      "name": "04-eagle-plating.png",
+      "before": {
+        "path": "validation/surfaces-2026-11-05/screenshots/before/04-eagle-plating.png",
+        "sha256": "9696bdb60ed916083b3ba0b9483f894cde5f7c65a6b9be19270e669e2e2e5cd1"
+      },
+      "after": {
+        "path": "validation/surfaces-2026-11-05/screenshots/after/04-eagle-plating.png",
+        "sha256": "0482741ef69b2aff24a4440c8b859cf5500a0e165330242a0d42229d2c6107b3"
+      }
+    },
+    {
+      "name": "05-shuttle-hull.png",
+      "before": {
+        "path": "validation/surfaces-2026-11-05/screenshots/before/05-shuttle-hull.png",
+        "sha256": "fba9ab909ca3ea4d8dea97ffbf1ab4a8ecd31c5b46bceb54a3cc21ca749ce9bb"
+      },
+      "after": {
+        "path": "validation/surfaces-2026-11-05/screenshots/after/05-shuttle-hull.png",
+        "sha256": "d39f6a06fdbb6613c195d19a3ddfed81d16f1b41a9b2cab8a5c9f7143d62dfb3"
+      }
+    },
+    {
+      "name": "06-shuttle-plating.png",
+      "before": {
+        "path": "validation/surfaces-2026-11-05/screenshots/before/06-shuttle-plating.png",
+        "sha256": "084f7870f9303071737408781fa114beeb450fd4288cea0e93308b927f915381"
+      },
+      "after": {
+        "path": "validation/surfaces-2026-11-05/screenshots/after/06-shuttle-plating.png",
+        "sha256": "ee5a9e52b26f4b850d14ee29a60fd4edc36fea4b9852c316296e1048f33618b7"
+      }
+    },
+    {
+      "name": "07-station-overview.png",
+      "before": {
+        "path": "validation/surfaces-2026-11-05/screenshots/before/07-station-overview.png",
+        "sha256": "2c71bbdc0d8b70d4ac5ea4eddc056deb483e54407f6cf68d4076db05325a8960"
+      },
+      "after": {
+        "path": "validation/surfaces-2026-11-05/screenshots/after/07-station-overview.png",
+        "sha256": "c70b7ec5ba932284597a46f94672d5bba0d903f0a97a494df96630f8640891c8"
+      }
+    },
+    {
+      "name": "08-station-closeup.png",
+      "before": {
+        "path": "validation/surfaces-2026-11-05/screenshots/before/08-station-closeup.png",
+        "sha256": "c7d62b2bce512180964ce11a415db0f738a5f6b981311d29e4cfa7cdb3c8ada6"
+      },
+      "after": {
+        "path": "validation/surfaces-2026-11-05/screenshots/after/08-station-closeup.png",
+        "sha256": "9fd679d9af25caf8c4fa73b57691cfb8ff1555f11c9f9de386af946d86035247"
+      }
+    }
+  ]
+}

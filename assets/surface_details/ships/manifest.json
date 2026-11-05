@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "resolution": 1024,
+  "license": "CC0-1.0",
+  "authoring": "Original deterministic object-projected ship finish layouts; no downloaded artwork, system font or baked illumination. Authored Cyrillic bitmap stencils.",
+  "projection": {
+    "canonical_bounds_m": [
+      -21.0,
+      21.0
+    ],
+    "u": "canonical_x/42+0.5",
+    "v": "canonical_z/42+0.5",
+    "wrap": false,
+    "shape_normalization": "canonical = object_point / ((span/42) * shape)"
+  },
+  "normal_convention": "OpenGL +Y; image Y grows down; no import inversion",
+  "orm_channels": {
+    "r": "ambient_occlusion",
+    "g": "roughness",
+    "b": "metallic"
+  },
+  "profiles": {
+    "cobra": {
+      "seed": 913357,
+      "shape_x": 1.0,
+      "shape_z": 1.0,
+      "registry": "03",
+      "mean_linear_luminance": 0.62447681,
+      "mean_roughness": 0.4327479,
+      "files": {
+        "albedo": {
+          "sha256": "fe18b7cdd30efe229b90bebbfaea4badf4378be3ca2323957b0f331dea0eb264",
+          "bytes": 677521
+        },
+        "normal": {
+          "sha256": "d87c0ac3ef5f520b4589e9360ec45a449b4f1338e84e270ec0f5a90bdb7358ce",
+          "bytes": 164206
+        },
+        "orm": {
+          "sha256": "3ee033cdf2380d146eeadef4f0604a1f7dcd362daa8893f2c5b260c8bf47dcd1",
+          "bytes": 113047
+        }
+      }
+    },
+    "eagle": {
+      "seed": 915066,
+      "shape_x": 0.9,
+      "shape_z": 1.2,
+      "registry": "02",
+      "mean_linear_luminance": 0.62315908,
+      "mean_roughness": 0.43566428,
+      "files": {
+        "albedo": {
+          "sha256": "cdceadb95bebc72c8af8acd6983658667c0189560f0b2c1da5b487cb7201d905",
+          "bytes": 681548
+        },
+        "normal": {
+          "sha256": "3336ff074edf33eeab2905ab7dfd315ea5c6580ff7b517a4d323f24b301b9eb1",
+          "bytes": 167629
+        },
+        "orm": {
+          "sha256": "5ab0c4bb4a7d642e175bc528909f3e4381e6e7da854fb14685d67283c161684f",
+          "bytes": 114662
+        }
+      }
+    },
+    "shuttle": {
+      "seed": 916775,
+      "shape_x": 0.82,
+      "shape_z": 0.96,
+      "registry": "01",
+      "mean_linear_luminance": 0.62549946,
+      "mean_roughness": 0.43710548,
+      "files": {
+        "albedo": {
+          "sha256": "8864fbfeae5f82846c6c3df010a29114de9d875116b8a7877616ba31e8e96012",
+          "bytes": 677766
+        },
+        "normal": {
+          "sha256": "fdf49877ab7f0127974616a860e28f2b61233471eccc0bc87cb1d3a3614318c9",
+          "bytes": 162012
+        },
+        "orm": {
+          "sha256": "044f932dccfb565f2e35a6aadd5ef9609b90b40d0a2198fc524a62ac9148e927",
+          "bytes": 112524
+        }
+      }
+    }
+  }
+}

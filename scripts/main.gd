@@ -118,7 +118,7 @@ func _build_world()->void:
 	celestial=Celestial.new();add_child(celestial)
 	ground_view=SurfaceView.new();add_child(ground_view);ground_view.hide()
 	city_view=CityView.new();add_child(city_view);city_view.hide()
-	player=ShipView.new();add_child(player);player.configure(ship.profile())
+	player=ShipView.new();add_child(player);player.set_quality(settings.quality);player.configure(ship.profile())
 	station=StationView.new();add_child(station);station.configure(settings.quality)
 	space_environment=SpaceEnvironment.new();add_child(space_environment);space_environment.hide()
 	stars=MultiMeshInstance3D.new();var star_mesh:=SphereMesh.new();star_mesh.radius=22;star_mesh.height=44;star_mesh.radial_segments=4;star_mesh.rings=2

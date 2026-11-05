@@ -3,20 +3,43 @@ extends Node3D
 # origin. All physical-looking structures stay behind z=-110 or outside r=120.
 const SolarShader=preload("res://scripts/station_solar.gdshader")
 const MaterialLibrary=preload("res://scripts/material_library.gd")
+const FINISH_ROOT:="res://assets/surface_details/station/"
+static var _finish_textures:Dictionary={}
+static var _finish_metadata:Dictionary={}
 var quality:=-1
 var geometry_batches:=0
 var _surfaces:Dictionary={}
 var _materials:Dictionary={}
 
-func _material(colour:Color,metal:=0.7,rough:=0.34,emission:=0.0,kind:="painted_alloy")->StandardMaterial3D:
+static func finish_texture(channel:String)->Texture2D:
+	if not channel in ["albedo","normal","orm"]:return null
+	if not _finish_textures.has(channel):_finish_textures[channel]=load(FINISH_ROOT+channel+".png") as Texture2D
+	return _finish_textures[channel] as Texture2D
+static func finish_metadata()->Dictionary:
+	if _finish_metadata.is_empty():
+		var entry:Variant=JSON.parse_string(FileAccess.get_file_as_string(FINISH_ROOT+"manifest.json"))
+		if entry is Dictionary:_finish_metadata=entry
+	return _finish_metadata.duplicate(true)
+func _material(colour:Color,metal:=0.7,rough:=0.34,emission:=0.0,kind:="painted_alloy",use_finish:=false)->StandardMaterial3D:
 	var m:=StandardMaterial3D.new()
 	if emission<=0:
 		MaterialLibrary.apply_standard(m,kind,0.25 if kind=="painted_alloy" else 0.65)
 		m.normal_enabled=quality>0;m.normal_scale=0.18 if quality>1 else 0.1
 		# Compensate sRGB map mean while retaining the station's existing palette.
 		var gain:float=MaterialLibrary.albedo_gain(kind)
+		var roughness_mean:float=MaterialLibrary.roughness_mean(kind)
+		if use_finish:
+			var metadata:Dictionary=finish_metadata()
+			m.albedo_texture=finish_texture("albedo");m.normal_texture=finish_texture("normal")
+			var orm:Texture2D=finish_texture("orm");m.ao_texture=orm;m.roughness_texture=orm;m.metallic_texture=orm
+			# Existing batched torus/cylinder/box vertices have no common unwrap.
+			# Stable object-space projection keeps industrial panels at16m/tile.
+			m.uv1_scale=Vector3.ONE/float(metadata.get("tile_size_m",16))
+			m.normal_scale=0.55 if quality>1 else 0.3
+			gain=1.0/maxf(float(metadata.get("mean_linear_luminance",0.60)),0.01)
+			roughness_mean=maxf(float(metadata.get("mean_roughness",0.52)),0.01)
 		var alpha:float=colour.a;colour=(colour.srgb_to_linear()*gain).linear_to_srgb();colour.a=alpha
-		rough=clampf(rough/MaterialLibrary.roughness_mean(kind),0.0,1.0)
+		rough=clampf(rough/roughness_mean,0.0,1.0)
 	m.albedo_color=colour;m.metallic=metal;m.roughness=rough
 	if emission>0:m.emission_enabled=true;m.emission=colour;m.emission_energy_multiplier=emission
 	return m
@@ -42,8 +65,8 @@ func configure(value:=2)->void:
 	quality=value
 	for child in get_children():remove_child(child);child.queue_free()
 	_surfaces.clear();_materials.clear()
-	_materials["shell"]=_material(Color("c5cdd2"),0.65,0.37)
-	_materials["dark"]=_material(Color("202e3c"),0.8,0.3,0.0,"brushed_metal")
+	_materials["shell"]=_material(Color("c5cdd2"),0.65,0.37,0.0,"painted_alloy",true)
+	_materials["dark"]=_material(Color("202e3c"),0.8,0.3,0.0,"brushed_metal",true)
 	_materials["gold"]=_material(Color("c99342"),0.73,0.32,0.0,"brushed_metal")
 	_materials["light"]=_material(Color("a4e9ff"),0.1,0.3,2.5)
 	_materials["amber"]=_material(Color("ff9545"),0.1,0.4,2.0)
