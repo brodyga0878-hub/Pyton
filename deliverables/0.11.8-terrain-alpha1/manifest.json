@@ -1,0 +1,45 @@
+{
+  "version": "0.11.8-terrain-alpha1",
+  "source_commit": "5fa5aae01315168df4607d29baa24f4b86ef34dc",
+  "files": {
+    "StarFrontier-0.11.8-terrain-source.zip": {
+      "bytes": 22618940,
+      "sha256": "cf1ce7a5365612686f18b7701783143a609bf3939719bb1ffed82e4d6adb4a56"
+    },
+    "StarFrontier-0.11.8-terrain-arm64.apk": {
+      "bytes": 49207918,
+      "sha256": "bc7071f0dfc1cbabb37742069132bb68e53f75c41da0c22beaf9a989ff1cab44"
+    }
+  },
+  "checks": 4004,
+  "passed_suites": 25,
+  "failure_count": 0,
+  "controlled_renderer_checks": 48,
+  "controlled_renderer_failures": 0,
+  "natural_surface_kinds": [
+    "earth",
+    "rock",
+    "desert",
+    "ice"
+  ],
+  "natural_surface_maps": 12,
+  "natural_surface_resolution": 1024,
+  "total_runtime_material_maps": 51,
+  "source_geometry_and_physics_preserved": true,
+  "existing_planet_geography_preserved": true,
+  "classic_lower_console_preserved": true,
+  "capture_only_decorative_shader_time_fixture": 0,
+  "explicit_solar_pluto_ice_fixture": true,
+  "new_native_ice_classification": false,
+  "source_archive_excludes": [
+    "deliverables",
+    "validation"
+  ],
+  "test_signing_key_only": true,
+  "physical_device_tested": false,
+  "reference_visual_quality_achieved": false,
+  "all_game_textures_finished": false,
+  "full_original_port_complete": false,
+  "publication_ready": false,
+  "validation_path": "validation/world-surfaces-2026-11-06"
+}
