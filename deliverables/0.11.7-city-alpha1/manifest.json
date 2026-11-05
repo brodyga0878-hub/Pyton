@@ -1,0 +1,38 @@
+{
+  "version": "0.11.7-city-alpha1",
+  "source_commit": "1834d4f5523e07a3be908ffc187f2d00b2aec15d",
+  "files": {
+    "StarFrontier-0.11.7-city-source.zip": {
+      "bytes": 13563746,
+      "sha256": "4285687f1ecbac074b9a145d4c225676dc13b0cbe338f4b160df17b472ded7a8"
+    },
+    "StarFrontier-0.11.7-city-arm64.apk": {
+      "bytes": 38129519,
+      "sha256": "dd3166f8f4e3040864efe9816731515c53ad4698a81a8852eaddc775fca451c9"
+    }
+  },
+  "checks": 106628,
+  "passed_suites": 18,
+  "failure_count": 0,
+  "controlled_renderer_checks": 13,
+  "controlled_renderer_failures": 0,
+  "city_roles": 4,
+  "city_atlas_maps": 3,
+  "total_runtime_material_maps": 39,
+  "city_atlas_resolution": 2048,
+  "source_geometry_and_physics_preserved": true,
+  "original_F650_targets_preserved": true,
+  "classic_lower_console_preserved": true,
+  "compatibility_colour_normalization_fixed": true,
+  "source_archive_excludes": [
+    "deliverables",
+    "validation"
+  ],
+  "test_signing_key_only": true,
+  "physical_device_tested": false,
+  "reference_visual_quality_achieved": false,
+  "all_game_textures_finished": false,
+  "full_original_port_complete": false,
+  "publication_ready": false,
+  "validation_path": "validation/city-2026-11-05"
+}
