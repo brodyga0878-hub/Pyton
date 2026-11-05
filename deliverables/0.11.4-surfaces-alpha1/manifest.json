@@ -1,0 +1,35 @@
+{
+  "version": "0.11.4-surfaces-alpha1",
+  "source_commit": "b9c2f1330c8f9f2305b0c38e8280a147ba4e2902",
+  "files": {
+    "StarFrontier-0.11.4-surfaces-source.zip": {
+      "bytes": 11850427,
+      "sha256": "bd120cd7fb5e3af4e9966c4ccc65c761e2bf89660d0fb37455c03dbd199593c9"
+    },
+    "StarFrontier-0.11.4-surfaces-arm64.apk": {
+      "bytes": 36051108,
+      "sha256": "bfd45850f1568de3452af706e703c8863f48e374030a0b06756411308e94a9c4"
+    }
+  },
+  "checks": 2061,
+  "passed_suites": 12,
+  "failure_count": 0,
+  "generic_material_maps": 24,
+  "individual_surface_maps": 12,
+  "total_texture_maps": 36,
+  "ordinary_flight_decorative_asteroids": false,
+  "unchanged_geometry_independently_verified": true,
+  "economy_boot_avoids_individual_ship_atlas_load": true,
+  "matched_before_after_game_frames": 8,
+  "physical_device_tested": false,
+  "test_signing_key_only": true,
+  "reference_visual_quality_achieved": false,
+  "full_original_port_complete": false,
+  "publication_ready": false,
+  "source_archive_excludes": [
+    "deliverables",
+    "validation"
+  ],
+  "source_archive_content_documentation": "SOURCE_ARCHIVE_RU.md",
+  "validation_path": "validation/surfaces-2026-11-05"
+}
