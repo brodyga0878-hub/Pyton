@@ -140,7 +140,13 @@ func celestial_data(renderer:Node3D,world:RefCounted)->String:
    values.append([kind,child.transform,child.visible,child.cast_shadow,digest(child.mesh.surface_get_arrays(0))])
    for key in ["sun_direction_world","sun_direction_local","view_coverage","coverage_invert","detail_level","atmosphere_color","ring_color"]:values.append(child.material_override.get_shader_parameter(key))
   rows.append(values)
- return digest([world.bodies,world.settlements,world.snapshot(),rows])
+ # Since0.11.9, separately native-verified derived record metadata is appended.
+ # Exclude only these new fields from the frozen0.11.7 presentation fingerprint;
+ # retain every original field, transform, mesh, light and source-template byte.
+ var bodies:Array=world.bodies.duplicate(true);var sites:Array=world.settlements.duplicate(true)
+ for record in bodies+sites:
+  for key in ["runtime_record_hex","runtime_record_source","runtime_record_domain","source_record_domain"]:record.erase(key)
+ return digest([bodies,sites,world.snapshot(),rows])
 var checks:=0
 var failures:=0
 var packs:Script

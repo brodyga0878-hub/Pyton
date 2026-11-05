@@ -1,0 +1,76 @@
+[
+	{
+		"console_label": "12:00:00 1-янв-3250",
+		"elapsed_days": 0.0,
+		"file": "01-original-3250-clock.png",
+		"fixture": "Fixed review camera and explicit elapsed-days snapshot; no image compositing.",
+		"gameplay_progress_read": false,
+		"gameplay_progress_written": false,
+		"layout": "handcrafted_analytic_rebuild_v1",
+		"phone_capture": false,
+		"physical_orbit_backend": "unchanged analytic_si_rebuild_v1",
+		"quality": 2,
+		"scene": "actual scenes/main.tscn",
+		"source_clock": {
+			"date_ru": "1-янв-3250",
+			"day": 1,
+			"day_u32": 1187063,
+			"elapsed_days": 0.0,
+			"hour": 12,
+			"label_ru": "12:00:00 1-янв-3250",
+			"minute": 0,
+			"month": 1,
+			"second": 0,
+			"tick_u32": 2147483648,
+			"time_ru": "12:00:00",
+			"year": 3250
+		},
+		"source_runtime": {
+			"body_count_byte": 43,
+			"count": 53,
+			"orbital_port_count_byte": 8,
+			"physical_layout_changed": false,
+			"port_count_byte": 18,
+			"record_domain": "packed_runtime_records",
+			"records_sha256": "b2d99151c651ea8792b66352fa021ff5cda60c0666db3dc98dcde1fdac7cec5d",
+			"source": "ffe_f878_handcrafted_suffix"
+		}
+	},
+	{
+		"console_label": "00:00:00 3-янв-3250",
+		"elapsed_days": 1.5,
+		"file": "02-calendar-and-original-city.png",
+		"fixture": "Fixed review camera and explicit elapsed-days snapshot; no image compositing.",
+		"gameplay_progress_read": false,
+		"gameplay_progress_written": false,
+		"layout": "handcrafted_analytic_rebuild_v1",
+		"phone_capture": false,
+		"physical_orbit_backend": "unchanged analytic_si_rebuild_v1",
+		"quality": 2,
+		"scene": "actual scenes/main.tscn",
+		"source_clock": {
+			"date_ru": "3-янв-3250",
+			"day": 3,
+			"day_u32": 1187065,
+			"elapsed_days": 1.5,
+			"hour": 0,
+			"label_ru": "00:00:00 3-янв-3250",
+			"minute": 0,
+			"month": 1,
+			"second": 0,
+			"tick_u32": 0,
+			"time_ru": "00:00:00",
+			"year": 3250
+		},
+		"source_runtime": {
+			"body_count_byte": 43,
+			"count": 53,
+			"orbital_port_count_byte": 8,
+			"physical_layout_changed": false,
+			"port_count_byte": 18,
+			"record_domain": "packed_runtime_records",
+			"records_sha256": "b2d99151c651ea8792b66352fa021ff5cda60c0666db3dc98dcde1fdac7cec5d",
+			"source": "ffe_f878_handcrafted_suffix"
+		}
+	}
+]

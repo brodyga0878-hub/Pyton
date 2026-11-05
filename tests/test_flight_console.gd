@@ -18,7 +18,7 @@ func telemetry()->void:
 	check(var_to_bytes(state)==before,"Rendering does not mutate the provided model snapshot")
 	check(console.labels.speed.text=="Факт: 12.2 м/с" and console.labels.set_speed.text=="Задано: -100.0 м/с","Actual and signed requested speed retain units and distinct values")
 	check(console.labels.height.text=="Высота: 321 м","Surface altitude comes from the provided model")
-	check(console.labels.clock.text=="ПОЛЁТ 1 д 12:00:00","Elapsed virtual days are displayed without an invented calendar epoch")
+	check(console.labels.clock.text=="00:00:00 3-янв-3250","Elapsed virtual days use the independently verified original FFE epoch and calendar")
 	check(console.labels.resources.text.contains("72%") and console.labels.resources.text.contains("5/8"),"Actual hull and fuel values are visible")
 	check(console.labels.cargo.text.contains("71923") and console.labels.context.text=="Новая Москва","Cargo/account/context belong to the supplied flight")
 	check(console.buttons.dock.text=="Взлететь" and console.labels.mode.text=="НА ПОВЕРХНОСТИ","Landed console offers takeoff explicitly")

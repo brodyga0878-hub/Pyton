@@ -207,6 +207,42 @@ def verify_world_surfaces(archive,project):
     assert result['map_count']==12
     return result
 
+def verify_source_world_runtime(archive,project):
+    """Verify native-Godot source-world modules and their exact source tables.
+
+    This establishes package consistency, not a complete procedural galaxy,
+    source ephemeris integration or physical Android execution.
+    """
+    names=set(archive.namelist())
+    result={'scripts_sha256':{},'data':{},'clock_constants':{}}
+    scripts=['source_body_factory.gdc','handcrafted_runtime_builder.gdc',
+             'source_clock.gdc','stellar_body_factory.gdc','planetary_classifier.gdc',
+             'body_initializer.gdc','ffe_math.gdc','planetary_system.gdc',
+             'flight_console.gdc','main.gdc']
+    for name in scripts:
+        path='assets/scripts/'+name
+        assert path in names,'Missing source-world runtime '+name
+        packed=archive.read(path)
+        assert len(packed)>64 and packed[:4]==b'GDSC','Invalid compiled source-world module '+name
+        result['scripts_sha256'][name]=hashlib.sha256(packed).hexdigest()
+    for name in ['ffe_handcrafted_records','ffe_stellar_factory','ffe_math']:
+        relative='data/'+name+'.json'
+        raw=(project/relative).read_bytes()
+        exported='assets/'+relative
+        assert exported in names and archive.read(exported)==raw,'Runtime source-world data differs from source '+name
+        metadata=json.loads(raw)
+        assert metadata.get('source_sha256')==SOURCE_IMAGE_SHA256,'Unexpected source-world executable provenance '+name
+        result['data'][name]={'runtime_path':exported,'bytes':len(raw),
+                              'source_json_sha256':hashlib.sha256(raw).hexdigest(),
+                              'source_executable_sha256':metadata['source_sha256']}
+    clock=(project/'scripts/source_clock.gd').read_text()
+    for name,value in [('EPOCH_DAY_U32',0x121cf7),('EPOCH_TICK_U32',0x80000000),
+                       ('TICKS_PER_DAY',0x100000000),('TICKS_PER_DISPLAY_SECOND',0xc22e)]:
+        matched=re.search(r'^const\s+'+name+r'\s*:=\s*(0x[0-9a-fA-F]+|\d+)\s*$',clock,re.M)
+        assert matched and int(matched[1],0)==value,'Unexpected source-clock constant '+name
+        result['clock_constants'][name]=value
+    return result
+
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     expected=preset_values(presets)
     signature=run(build_tools/'apksigner','verify','--verbose','--print-certs',apk)
@@ -225,7 +261,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -284,6 +320,8 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             if expected['version_code']>=30:
                 world_surface_assets=verify_world_surfaces(archive,presets.parent)
                 assert material_assets['map_count']+surface_detail_assets['map_count']+city_surface_assets['map_count']+world_surface_assets['map_count']==51,'Incomplete terrain/planet runtime material collection'
+            if expected['version_code']>=31:
+                source_world_assets=verify_source_world_runtime(archive,presets.parent)
         for name in names:
             if not name.startswith('lib/') or not name.endswith('.so'):continue
             data=archive.read(name)
@@ -301,7 +339,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

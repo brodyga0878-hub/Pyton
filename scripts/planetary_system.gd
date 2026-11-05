@@ -12,6 +12,7 @@ const ARRIVAL_DIRECTION:=Vector3(0.48,-0.28,-1.0)
 const SOURCE_LAYOUT:="handcrafted_analytic_rebuild_v1"
 const SOLAR_LAYOUT:="reconstructed_solar_v1"
 const EMPTY_LAYOUT:="source_unavailable_rebuild_v1"
+const RuntimeBuilder=preload("res://scripts/handcrafted_runtime_builder.gd")
 var source_digest:=""
 var star_context:Dictionary={}
 var layout_mode:=SOLAR_LAYOUT
@@ -31,6 +32,8 @@ var _source_worlds:Dictionary={}
 var _source_records:Dictionary={}
 var _translations:Dictionary={}
 var _source_hash:=""
+var source_runtime_state:Dictionary={}
+var _runtime_by_global:Dictionary={}
 
 func _read_object(path:String)->Dictionary:
 	if not FileAccess.file_exists(path):return {}
@@ -49,6 +52,7 @@ func configure(star:Dictionary,layout:String="current")->void:
 	star_context=star.duplicate(true)
 	system_id=int(star.get("id",SOL_ID))
 	bodies.clear();by_id.clear();settlements.clear();site_id="";pending_site_id="";pending_id="";transfer_remaining=0;message=""
+	source_runtime_state.clear();_runtime_by_global.clear()
 	_load_sources()
 	var applied:=false
 	if layout in ["current",SOURCE_LAYOUT]:
@@ -58,9 +62,11 @@ func configure(star:Dictionary,layout:String="current")->void:
 	if applied:
 		layout_mode=SOURCE_LAYOUT;source_digest=(SOURCE_LAYOUT+str(system_id)+_source_hash).sha256_text()
 	elif system_id==SOL_ID and layout in ["current",SOLAR_LAYOUT]:
+		source_runtime_state.clear();_runtime_by_global.clear()
 		bodies.clear();by_id.clear();settlements.clear()
 		_reconstructed_solar();layout_mode=SOLAR_LAYOUT;source_digest="physical-solar-adapter-v1".sha256_text()
 	else:
+		source_runtime_state.clear();_runtime_by_global.clear()
 		bodies.clear();by_id.clear();settlements.clear()
 		_add(_star_body(str(star.get("name","Звезда"))))
 		default_id="star";layout_mode=EMPTY_LAYOUT;source_digest=(EMPTY_LAYOUT+str(system_id)).sha256_text()
@@ -81,6 +87,7 @@ func _translate(title:String)->String:
 
 func _apply_handcrafted(entry:Dictionary)->bool:
 	if not entry.get("objects") is Array or entry.objects.is_empty():return false
+	_prepare_source_runtime(entry)
 	var ids:Dictionary={};var candidate:Array=[];var candidate_index:Dictionary={};var sites:Array=[]
 	var solar:=system_id==SOL_ID
 	var solar_ids:Dictionary={"Sol":"star","Mercury":"mercury","Venus":"venus","Earth":"earth","Mars":"mars","Jupiter":"jupiter","Saturn":"saturn","Uranus":"uranus","Neptune":"neptune","Pluto":"pluto","Moon":"moon","Io":"io","Europa":"europa","Ganymede":"ganymede","Callisto":"callisto","Titan":"titan"}
@@ -135,6 +142,24 @@ func _apply_handcrafted(entry:Dictionary)->bool:
 	bodies=candidate;by_id=candidate_index;settlements=sites;default_id=arrival
 	return true
 
+func _prepare_source_runtime(entry:Dictionary)->void:
+	source_runtime_state.clear();_runtime_by_global.clear()
+	var templates:Array=[]
+	for row in entry.get("objects",[]):
+		if not row is Dictionary or int(row.get("local_index",-1))!=templates.size()+1:return
+		var stored:Variant=_source_records.get(str(int(row.get("global_index",-1))))
+		if not stored is Dictionary:return
+		var encoded:=str(stored.get("record_hex",""))
+		if encoded.length()!=136 or int(stored.get("model_index",-1))!=int(row.get("model_index",-2)):return
+		var record:=encoded.hex_decode()
+		if record.size()!=68:return
+		templates.append(record)
+	var converted:=RuntimeBuilder.build(templates)
+	if not converted.get("ok",false):return
+	for index in range(templates.size()):
+		_runtime_by_global[int(entry.objects[index].global_index)]=converted.records[index].hex_encode()
+	source_runtime_state={"source":"ffe_f878_handcrafted_suffix","record_domain":"packed_runtime_records","count":converted.count,"body_count_byte":converted.body_count_byte,"port_count_byte":converted.port_count_byte,"orbital_port_count_byte":converted.orbital_port_count_byte,"records_sha256":var_to_bytes(converted.records).hex_encode().sha256_text(),"physical_layout_changed":false}
+
 func _attach_record(target:Dictionary,row:Dictionary)->void:
 	var record:Variant=_source_records.get(str(int(row.get("global_index",-1))))
 	if not record is Dictionary:return
@@ -145,6 +170,12 @@ func _attach_record(target:Dictionary,row:Dictionary)->void:
 	target.record_hex=encoded;target.source_seed=int(record.seed_u32)
 	target.source_rotation_raw=int(raw[62]);target.source_orientation_u16=int(raw.decode_u16(66))
 	target.source_record_source="regenerated_ffe_f875_record"
+	target.source_record_domain="constructor_template"
+	var global_index:=int(row.get("global_index",-1))
+	if _runtime_by_global.has(global_index):
+		target.runtime_record_hex=_runtime_by_global[global_index]
+		target.runtime_record_source="ffe_f878_handcrafted_suffix"
+		target.runtime_record_domain="packed_runtime_records"
 
 func _planet(id:String,title:String,parent:String,radius:float,mass_earth:float,a:float,e:float,inclination:float,phase:float,kind:String,rings:=false)->void:
 	var parent_mass:=float(by_id[parent].mass_solar)
@@ -330,6 +361,7 @@ func restore(data:Dictionary)->bool:
 	elif not str(data.pending_id).is_empty() or not str(data.pending_site_id).is_empty():return false
 	bodies=candidate.bodies;by_id=candidate.by_id;settlements=candidate.settlements;default_id=candidate.default_id
 	layout_mode=candidate.layout_mode;source_digest=candidate.source_digest
+	source_runtime_state=candidate.source_runtime_state.duplicate(true);_runtime_by_global=candidate._runtime_by_global.duplicate(true)
 	focus_id=str(data.focus_id);selected_id=str(data.selected_id);site_id=str(data.site_id)
 	pending_id=str(data.pending_id);pending_site_id=str(data.pending_site_id);transfer_remaining=float(remaining);message=""
 	return true

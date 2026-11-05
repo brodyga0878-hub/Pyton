@@ -2,6 +2,7 @@ extends Control
 # Original instrument layout inspired by the classic lower flight console.
 # Displays actual model data and emits actions; never advances physics or saves.
 const TouchAction=preload("res://scripts/touch_action_button.gd")
+const SourceClock=preload("res://scripts/source_clock.gd")
 const HEIGHT:=184.0
 const ACTIONS:=["system","routes","auto","brake","dock","view","menu"]
 signal system_requested
@@ -125,8 +126,8 @@ func configure_state(state:Dictionary)->void:
 	labels.set_speed.text="Задано: %.1f м/с"%_number("target_speed_mps")
 	var surface_active:bool=bool(state.get("surface_active",false))
 	labels.height.text=("Высота: "+_distance(maxf(0,_number("altitude_m")))) if surface_active else ("До цели: "+_distance(_number("target_distance_m",-1)))
-	var seconds:=int(clampf(_number("elapsed_days"),0,1000000000.0)*86400.0);var days:int=seconds/86400;var within:int=seconds%86400
-	labels.clock.text="ПОЛЁТ "+("%d д "%days if days>0 else "")+"%02d:%02d:%02d"%[within/3600,(within%3600)/60,within%60]
+	var calendar:=SourceClock.from_elapsed_days(clampf(_number("elapsed_days"),0,SourceClock.MAX_ELAPSED_DAYS))
+	labels.clock.text=str(calendar.get("label_ru","—"))
 	var hull:=clampf(_number("hull_percent",100),0,100)
 	labels.resources.text="Корпус %.0f%% · Топливо %d/%d"%[hull,int(maxf(0,_number("fuel"))),int(maxf(0,_number("fuel_capacity")))]
 	labels.cargo.text="Груз %d т · %d кр."%[int(maxf(0,_number("cargo_t"))),int(maxf(0,_number("totalcredits")))]

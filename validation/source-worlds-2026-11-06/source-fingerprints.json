@@ -1,0 +1,370 @@
+{
+  "recorded_utc": "2026-11-05T22:14:05.648574+00:00",
+  "files": [
+    {
+      "path": "scripts/body_initializer.gd",
+      "bytes": 2801,
+      "sha256": "24fe4896190f8c2f1d4174b57f9966b7f16e6918f63cf5eb96a0ece538f8a5a8"
+    },
+    {
+      "path": "scripts/body_rotation.gd",
+      "bytes": 2917,
+      "sha256": "b5d4e63331728681d1f34c73fe83cdd57120e29b352e09090da4ff147b22ed34"
+    },
+    {
+      "path": "scripts/build_info.gd",
+      "bytes": 204,
+      "sha256": "f688767e3f92383a47f533915a87d16cf9ab3616a2bbd89424d5bb5a3304aaeb"
+    },
+    {
+      "path": "scripts/celestial_renderer.gd",
+      "bytes": 7122,
+      "sha256": "616b5c21772fa268ccb79b2b9aa25cf3df20d62890b50cbc85d17a5f182105b4"
+    },
+    {
+      "path": "scripts/city_material_roles.gd",
+      "bytes": 6138,
+      "sha256": "2deafe3880ed20b430f4db4e5bcb6ecbc888b386a6b66987ef13863ddac98759"
+    },
+    {
+      "path": "scripts/city_surface_library.gd",
+      "bytes": 2483,
+      "sha256": "1047eaf5a23674a6ea0df412b2a876ad04f9204bae1c217f5115b3f6edb0fad0"
+    },
+    {
+      "path": "scripts/device_settings.gd",
+      "bytes": 2104,
+      "sha256": "890be6e61f0bb5d3cdc1fbceed75ba546485d85b46daf1dbde02da4897559c42"
+    },
+    {
+      "path": "scripts/diagnostics_logger.gd",
+      "bytes": 2093,
+      "sha256": "a0a2a4a993613f3f864d669f862229db29293793a6084636bee1d4eabbf7a052"
+    },
+    {
+      "path": "scripts/dock_services_view.gd",
+      "bytes": 8321,
+      "sha256": "58904b9bd2862b5a755717933a385609189a1ee59f0206716a395626e73e6943"
+    },
+    {
+      "path": "scripts/economy_catalog.gd",
+      "bytes": 2614,
+      "sha256": "bb91fcfaf70f8fe75afc6e06f0e104a9120e33ee0ddbf6c3c36c83fffadd670e"
+    },
+    {
+      "path": "scripts/ffe_math.gd",
+      "bytes": 5995,
+      "sha256": "d3cb103361e4039fd2b0942d84af042d69c9e19b8a856c7d830b82827827f228"
+    },
+    {
+      "path": "scripts/flight_console.gd",
+      "bytes": 10916,
+      "sha256": "f543da1c3e2c05d05838c36b380f00dccec82e45c23905c84594942596287c67"
+    },
+    {
+      "path": "scripts/flight_model.gd",
+      "bytes": 14968,
+      "sha256": "07eba1809d89f83a8cf5f65310256df0211fc42cd1dea2fbda339cb19b0b74db"
+    },
+    {
+      "path": "scripts/flight_reticle.gd",
+      "bytes": 945,
+      "sha256": "d25918f69e2857a4ee8283d1d267a2a126f72dfc680197b73f0f0a6c85c5ac7a"
+    },
+    {
+      "path": "scripts/flight_theme.gd",
+      "bytes": 1654,
+      "sha256": "86d7fbe201cd846e26d5fb404e48c87ad46e453ef84f8f0090042c61b1bc5b8c"
+    },
+    {
+      "path": "scripts/galaxy.gd",
+      "bytes": 3331,
+      "sha256": "ca24443095a3f741f4714d55f7235df63c7e44ad844056d9a191e91ba5ed9214"
+    },
+    {
+      "path": "scripts/game_diagnostics.gd",
+      "bytes": 16233,
+      "sha256": "deeebf19f52ddd5223acaeac816c51006fbdcdeb61daebe1869c2142c3f366d2"
+    },
+    {
+      "path": "scripts/ground_coordinates.gd",
+      "bytes": 2432,
+      "sha256": "b61afd67aa89f65c7bde5548c31516ac61ed6cc4e0c5e8b55280a055075ccd71"
+    },
+    {
+      "path": "scripts/handcrafted_runtime_builder.gd",
+      "bytes": 3348,
+      "sha256": "783d29e8968be93a3d4818c30291f34cd17905f2363948c39feca795dab4b994"
+    },
+    {
+      "path": "scripts/hold_button.gd",
+      "bytes": 853,
+      "sha256": "5f4d2c4c38c3788df9a6e094596d499e729e624ec7fe016e1bd84e6c7a97f9de"
+    },
+    {
+      "path": "scripts/main.gd",
+      "bytes": 53880,
+      "sha256": "8ad2153e7ec5497707b1a9f93b8d2ce53ded62495e6f5bd71d1b3a3e51c24b01"
+    },
+    {
+      "path": "scripts/material_library.gd",
+      "bytes": 3450,
+      "sha256": "e86f05ffa304fe97a412cd074cc07baea34f4f772deefc1949a48a39921d42a4"
+    },
+    {
+      "path": "scripts/navigation.gd",
+      "bytes": 6608,
+      "sha256": "9864d065469d9478cc9930fa060ae29121016118b0959132b145e438f8deb139"
+    },
+    {
+      "path": "scripts/near_surface_view.gd",
+      "bytes": 5041,
+      "sha256": "d19aeb3d71fbb17a8fa03a54e0c7a51efa5d7cd9ba99694b6a1d317efbf213f8"
+    },
+    {
+      "path": "scripts/planetary_classifier.gd",
+      "bytes": 3521,
+      "sha256": "d8d419c2a15077766cb1393348c433e8b4e92efca48f6e723f2de938f590736c"
+    },
+    {
+      "path": "scripts/planetary_system.gd",
+      "bytes": 24053,
+      "sha256": "6c4b6f4fc8018261740c586762a21c38f5275185a532a3677da1a51cfcddc1ca"
+    },
+    {
+      "path": "scripts/pointer_control.gd",
+      "bytes": 2241,
+      "sha256": "2ee4b5f39939d90c4001515aeac7b5b5665966b8741b7c035ba0538875f69f68"
+    },
+    {
+      "path": "scripts/report_export.gd",
+      "bytes": 7592,
+      "sha256": "7e9ed1f49f4206cc38684f2bbd155ab09cfdecce8d0a050963a26555b899f48d"
+    },
+    {
+      "path": "scripts/save_store.gd",
+      "bytes": 2824,
+      "sha256": "8af7d350fcd3eaa1dc32f5aacf5e9afdf3424b181ef5964468f584412cd52634"
+    },
+    {
+      "path": "scripts/segment_box.gd",
+      "bytes": 1084,
+      "sha256": "c859146608a6e8208620078a12742c07e1fdafa04761ec5abcffa2cfd0501fad"
+    },
+    {
+      "path": "scripts/segment_triangle.gd",
+      "bytes": 8104,
+      "sha256": "c1f000e1481ba9654ab9cf27db7b30e6eaeef46a35d533a01dffb2d86bece346"
+    },
+    {
+      "path": "scripts/settings_panel.gd",
+      "bytes": 4769,
+      "sha256": "8a002836d211e9e78d86b51f6a8803571897cd04e52f622eaf5323b15c112d5f"
+    },
+    {
+      "path": "scripts/ship_catalog.gd",
+      "bytes": 3405,
+      "sha256": "c3c077d107336a8ffe30165291f6e3bee785ee8a262b88ef48262ff38dad7a06"
+    },
+    {
+      "path": "scripts/ship_visual.gd",
+      "bytes": 19243,
+      "sha256": "674f0be53f51205813b396591c110dd5e5e982fe35a78287db17d04c4d9e7bae"
+    },
+    {
+      "path": "scripts/source_body_factory.gd",
+      "bytes": 6045,
+      "sha256": "b54631b5b822fdf371efa93a3b50f183d63f26505aba59bbbe9f52d540e6b67c"
+    },
+    {
+      "path": "scripts/source_city_profile.gd",
+      "bytes": 4481,
+      "sha256": "b5015f8252aa611cc9a2c93158495a3d12d6bad66affbd5635d501cbaa96d8b4"
+    },
+    {
+      "path": "scripts/source_city_runtime.gd",
+      "bytes": 10257,
+      "sha256": "a0a5bcbfc37adda1d46ff968c88eac752ccddbe268556520dbf2c83c7b1f12ba"
+    },
+    {
+      "path": "scripts/source_city_view.gd",
+      "bytes": 3829,
+      "sha256": "c47ef2ad72edee6bdb205a9ef4ef94602e66f4184f9b038ef279a02bd16cbdc8"
+    },
+    {
+      "path": "scripts/source_clock.gd",
+      "bytes": 2583,
+      "sha256": "b2d206a9e2e6db21635fe37d6f61ba75d2fb9f56d92f8851a77c9b11fc4dbe09"
+    },
+    {
+      "path": "scripts/source_ground_pads.gd",
+      "bytes": 3793,
+      "sha256": "5bbb93864a95d2865da12e2315e9aa9b57d8d27bc50ea1e7536e489357f1299c"
+    },
+    {
+      "path": "scripts/source_model_mesh.gd",
+      "bytes": 29224,
+      "sha256": "6642ce62a1a8046c71a57fb08325304c8d12c3bc61b90921d458ef84ad21472e"
+    },
+    {
+      "path": "scripts/source_model_vertices.gd",
+      "bytes": 5207,
+      "sha256": "bfd236cbee940167f882a85a461911aad672fd7c292b6f58619e87cf6ecc7e33"
+    },
+    {
+      "path": "scripts/source_model_visual.gd",
+      "bytes": 8591,
+      "sha256": "d8f5c42cc10e0ad8f7f179d824bb8c0aa94e63833cf0bfd62f2594f29bc5c774"
+    },
+    {
+      "path": "scripts/source_model_vm.gd",
+      "bytes": 5191,
+      "sha256": "c676724f91eae910bf0c318c04ee7426905e7e372fdcd4a68c547f81043f0f2e"
+    },
+    {
+      "path": "scripts/source_polygon.gd",
+      "bytes": 5197,
+      "sha256": "9e83a719b5a13a22fcba53417cb3c4006d310804eda3e69aba543a9551c07a43"
+    },
+    {
+      "path": "scripts/source_units.gd",
+      "bytes": 705,
+      "sha256": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24"
+    },
+    {
+      "path": "scripts/space_environment.gd",
+      "bytes": 6645,
+      "sha256": "06e3fe16e29d388dd1b9a138672e8d2d47264e5d4924573d04b6604b99fca21e"
+    },
+    {
+      "path": "scripts/speed_lever.gd",
+      "bytes": 1045,
+      "sha256": "35baca92c81f6397ca14b1c576e1b661beec60ea83143d228a6d73c03e4c4f54"
+    },
+    {
+      "path": "scripts/spherical_terrain.gd",
+      "bytes": 5775,
+      "sha256": "6da1c61aac47df2f8921ab459a962c9853bd5d327c86264d7fc28c46b8d7986e"
+    },
+    {
+      "path": "scripts/station_visual.gd",
+      "bytes": 7458,
+      "sha256": "d0ff30405fd55a181d79103468d5aa04129c831d43abb31320f9682257bd7d67"
+    },
+    {
+      "path": "scripts/stellar_body_factory.gd",
+      "bytes": 5300,
+      "sha256": "cb96e2a6b480f559a49dcbe4ead8a59c5a0b23c0fb6e95a2596a049121d4e144"
+    },
+    {
+      "path": "scripts/surface_detail_library.gd",
+      "bytes": 2216,
+      "sha256": "c5d565295f8ef52521a1f1cfccc25e3bfe7d4bcc986c10becf80b08be502a22a"
+    },
+    {
+      "path": "scripts/surface_model.gd",
+      "bytes": 35849,
+      "sha256": "6fafc751b98a1fac6a880f863f9c3419aa88215b71d6160838a2326c3b2ded2f"
+    },
+    {
+      "path": "scripts/surface_orbit_link.gd",
+      "bytes": 4483,
+      "sha256": "6a358b2030a0480035caa7a5263d0db96385394740672b18b18a306c30bec12c"
+    },
+    {
+      "path": "scripts/surface_visual.gd",
+      "bytes": 10687,
+      "sha256": "f8e32c94ccf1bf8c33851aa30b782dfb155f4f421579bc4f2cf31cffeaabbf9a"
+    },
+    {
+      "path": "scripts/touch_action_button.gd",
+      "bytes": 4154,
+      "sha256": "8aaf97622f0b5ba3d96b52e2aacb3a51b99c15dd48934fa2bb532bab033e696b"
+    },
+    {
+      "path": "scripts/touch_stick.gd",
+      "bytes": 939,
+      "sha256": "5f0434e6632ab6955bff3572366b78e9ab720473e9e622b41f33a2a7f2fb8ca9"
+    },
+    {
+      "path": "scripts/training_dock_services.gd",
+      "bytes": 10835,
+      "sha256": "b3a9a519837b737bb4826f7176aac2eb378cb1f0fa0393fb3116e731f852199c"
+    },
+    {
+      "path": "scripts/world_presentation.gd",
+      "bytes": 2857,
+      "sha256": "5802810a0d228dd55c433c3bd73ae5a0eb00a5095b90cd1ea1906e907cba8250"
+    },
+    {
+      "path": "scripts/world_surface_library.gd",
+      "bytes": 1982,
+      "sha256": "45824d82d0269a92a027ddcf5967321a8f784f000eabadb583e67a79a85a5aa2"
+    },
+    {
+      "path": "tests/test_source_body_factory.gd",
+      "bytes": 7497,
+      "sha256": "dcb7b7db01dae53c9a26c80da96e5ed1488c47b645af86bbd937ad2d34b7528b"
+    },
+    {
+      "path": "tests/test_source_city_runtime.gd",
+      "bytes": 10432,
+      "sha256": "29927274559d761dada752d1af5d4425b30ca7247a2d819bc7d6a9f4e906cc31"
+    },
+    {
+      "path": "tests/test_source_city_view.gd",
+      "bytes": 6655,
+      "sha256": "d3ecbbbfeb4ee0e6e650980ca65b716621ea6d82115a3de6c54cd7cf9134ec2f"
+    },
+    {
+      "path": "tests/test_source_clock.gd",
+      "bytes": 4954,
+      "sha256": "f1e4d59b064070a66df4ec727c8e045e76e6eb9be158c7d1def6efb8ba3de1df"
+    },
+    {
+      "path": "tests/test_source_model_mesh.gd",
+      "bytes": 6410,
+      "sha256": "f86251c42419ad074c937fc1a5212550cec1f8d6d5930e33e7f9380ccf24d113"
+    },
+    {
+      "path": "tests/test_source_world_bridge.gd",
+      "bytes": 34939,
+      "sha256": "2f51fd5f405a8d2977e96de2d6823dbe26523590456c2f1ec3f5b8f06a7be820"
+    },
+    {
+      "path": "tests/test_flight_console.gd",
+      "bytes": 6027,
+      "sha256": "3c8837547417461c9c4c4db4439f9b5a7bf8b63ea95b29a403f700c5a22b1be1"
+    },
+    {
+      "path": "tests/fixtures/handcrafted_runtime_native.json",
+      "bytes": 2162366,
+      "sha256": "e09016da974e0e9e188bff12d463784bb2c1f2b23588bbe64632e137f8e486cd"
+    },
+    {
+      "path": "tests/fixtures/source_clock_native.json",
+      "bytes": 246855,
+      "sha256": "5723041b95b10f26e4b0638a4e593a1d43e7110cbf6bf80be9febb9a27023223"
+    },
+    {
+      "path": "tests/fixtures/source_body_factory_native.json",
+      "bytes": 2864574,
+      "sha256": "832f4d48b6db296ce941b4bcbf958f26b3d50545f351a6210cf5103b9757f2c3"
+    },
+    {
+      "path": "tools/rebuild_source_clock_native.py",
+      "bytes": 9282,
+      "sha256": "46d3ae487d2e4dafe0b9b27946c0503d15dad25221316fc9af535ea06baa4111"
+    },
+    {
+      "path": "tools/rebuild_source_body_factory_native.py",
+      "bytes": 14401,
+      "sha256": "7c6e90e3fb512ae40eed9106974b0bc34f702c9007ea045ee3d485ff229bab42"
+    },
+    {
+      "path": "tools/rebuild_handcrafted_runtime_native.py",
+      "bytes": 14181,
+      "sha256": "4aa1bf64012cc3958a80562202d0d475d55ab318c5c37a652dd8b5f0c488529b"
+    }
+  ]
+}
