@@ -3,6 +3,7 @@ extends Node3D
 # This consumes already compiled city_data and never invokes the source model VM.
 const Visual=preload("res://scripts/source_model_visual.gd")
 const Runtime=preload("res://scripts/source_city_runtime.gd")
+const Roles=preload("res://scripts/city_material_roles.gd")
 const CACHE_LIMIT:=8
 const LEGACY_REVISIONS:=["sphere-v1","sphere-source-sites-v2"]
 var last_error:=""
@@ -90,7 +91,8 @@ func configure(draw:RefCounted,outer_frame:Transform3D,view_coverage:=1.0)->bool
 	if not cached_cities.has(key):
 		var city:=Visual.new()
 		city.set_quality(quality)
-		if not city.configure(data.compiled,data.conversion_basis):
+		var material_context:=Roles.context_for(profile,data.conversion_basis,data.compiled)
+		if not city.configure(data.compiled,data.conversion_basis,material_context):
 			city.free()
 			return _fail("Source city visual rejected compiled geometry for "+key)
 		city.name="SourceCity%d"%build_count

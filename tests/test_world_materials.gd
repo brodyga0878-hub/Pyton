@@ -3,6 +3,7 @@ extends SceneTree
 const Visual=preload("res://scripts/source_model_visual.gd")
 const SurfaceVisual=preload("res://scripts/surface_visual.gd")
 const Materials=preload("res://scripts/material_library.gd")
+const CityMaterials=preload("res://scripts/city_surface_library.gd")
 const Units=preload("res://scripts/source_units.gd")
 class FakeSurface extends RefCounted:
  const GRID_WIDTH:=32.0
@@ -40,11 +41,14 @@ func run()->void:
  check(absf(palette[0].r-expected_colour.r)<=1.0/255.0 and absf(palette[0].g-expected_colour.g)<=1.0/255.0 and absf(palette[0].b-expected_colour.b)<=1.0/255.0 and is_equal_approx(palette[0].a,0.0),"Original source linear RGB retained with unlit encoded separately")
  var slots:PackedVector2Array=arrays[Mesh.ARRAY_TEX_UV2]
  for index in range(4):check(is_equal_approx(slots[index*3].y,float(index)),"Provisional palette/orientation slot %d assigned without source vertex changes"%index)
- for kind in ["concrete","asphalt","painted_alloy","brushed_metal"]:
-  for channel in ["albedo","normal","orm"]:check(Materials.texture(kind,channel)!=null and lit.material_override.get_shader_parameter(kind+"_"+channel)==Materials.texture(kind,channel),"City uses real %s %s map"%[kind,channel])
+ for channel in ["albedo","normal","orm"]:
+  check(CityMaterials.texture(channel)!=null and lit.material_override.get_shader_parameter("city_"+channel)==CityMaterials.texture(channel),"City uses padded four-role %s atlas"%channel)
  var original_mesh:Mesh=lit.mesh
  visual.set_quality(0)
  check(int(lit.material_override.get_shader_parameter("detail_level"))==0 and lit.mesh==original_mesh and visual.local_bounds==source_bounds,"Low quality changes material only and retains original mesh/bounds")
+ for channel in ["albedo","normal","orm"]:check(lit.material_override.get_shader_parameter("city_"+channel)==null,"Low city quality releases material reference to %s atlas"%channel)
+ visual.set_quality(2)
+ check(lit.mesh==original_mesh and lit.material_override.get_shader_parameter("city_albedo")==CityMaterials.texture("albedo"),"High city quality rebinds shared atlas without rebuilding source mesh")
  var unlit:MeshInstance3D=visual.get_node("SourceUnlit")
  var unlit_colours:PackedColorArray=unlit.mesh.surface_get_arrays(0)[Mesh.ARRAY_COLOR]
  check(is_equal_approx(unlit_colours[0].a,1.0),"Original unlit flags retained")

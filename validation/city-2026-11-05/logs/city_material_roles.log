@@ -1,0 +1,22 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+city_material_roles root81 roles=[1839, 750, 16, 1576] clean=0 ground_lit/unlit=6/760
+city_material_roles root82 roles=[8320, 1300, 16, 2927] clean=0 ground_lit/unlit=30/1286
+city_material_roles root83 roles=[15080, 2027, 24, 3509] clean=0 ground_lit/unlit=52/1999
+city_material_roles root84 roles=[17764, 3130, 24, 4448] clean=0 ground_lit/unlit=672/2482
+city_material_roles root85 roles=[1627, 163, 89, 442] clean=0 ground_lit/unlit=0/252
+city_material_roles root86 roles=[1605, 52, 4, 775] clean=0 ground_lit/unlit=24/32
+city_material_roles root87 roles=[2025, 908, 24, 687] clean=0 ground_lit/unlit=58/874
+city_material_roles root88 roles=[2066, 932, 24, 1526] clean=27 ground_lit/unlit=82/874
+city_material_roles root89 roles=[1771, 100, 2, 1071] clean=0 ground_lit/unlit=70/32
+city_material_roles root90 roles=[17800, 3071, 24, 4491] clean=0 ground_lit/unlit=613/2482
+city_material_roles actual_triangles=104029 clean=27 ground_lit/unlit=1607/11073
+city_material_roles actual Epping Newtown native_target_height=1.218816m roles=[2175, 753, 16, 1654]
+city_material_roles actual Manchester native_target_height=0.350959m roles=[4066, 1088, 16, 2209]
+city_material_roles actual Paris native_target_height=1.396641m roles=[16423, 2337, 24, 3765]
+city_material_roles actual London native_target_height=0.610652m roles=[14837, 2737, 24, 4934]
+city_material_roles actual Amundsen native_target_height=1.399302m roles=[1538, 144, 89, 594]
+city_material_roles actual Tokyo native_target_height=-1.701358m roles=[15071, 2654, 24, 5031]
+city_material_roles actual New Moscow native_target_height=0.387755m roles=[17764, 3410, 24, 4448]
+city_material_roles catalogue_triangles=107849
+city_material_roles: 104350 checks, 0 failures

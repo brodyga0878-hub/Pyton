@@ -9,6 +9,7 @@ SOURCE_IMAGE_SHA256='d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bc
 MATERIAL_KINDS=('painted_alloy','brushed_metal','concrete','asphalt','rock','ice','rubber','glass')
 MATERIAL_CHANNELS=('albedo','normal','orm')
 SURFACE_PROFILES=('cobra','eagle','shuttle')
+CITY_ROLES=('facade','road','pad','roof')
 
 def run(*command):
     return subprocess.check_output([str(v) for v in command],text=True,stderr=subprocess.STDOUT)
@@ -142,6 +143,38 @@ def verify_surface_details(archive,project):
     assert result['map_count']==12
     return result
 
+def verify_city_surfaces(archive,project):
+    """Verify the four-role city atlas and the exact runtime material adapter."""
+    names=set(archive.namelist())
+    relative='assets/city_surfaces/manifest.json'
+    raw=(project/relative).read_bytes()
+    exported='assets/'+relative
+    assert exported in names and archive.read(exported)==raw,'Runtime city surface metadata differs from source'
+    manifest=json.loads(raw)
+    assert (manifest['resolution'],manifest['tile_size'],manifest['content_size'],manifest['gutter'],manifest['max_safe_lod'])==(2048,1024,992,16,4),'Unexpected city atlas layout'
+    assert manifest['orm_channels']=={'r':'ambient_occlusion','g':'roughness','b':'metallic'},'Unexpected city ORM channel convention'
+    assert set(manifest['roles'])==set(CITY_ROLES),'Unexpected city role set'
+    assert set(manifest['files'])==set(MATERIAL_CHANNELS),'Incomplete city atlas map set'
+    for index,role in enumerate(CITY_ROLES):
+        entry=manifest['roles'][role]
+        assert entry['index']==index and entry['origin_px']==[(index%2)*1024,(index//2)*1024],'Unexpected city tile placement '+role
+        assert 0<entry['mean_linear_luminance']<=1,'Invalid city albedo normalization '+role
+        assert 0<=entry['mean_roughness']<=1 and 0<=entry['mean_metallic']<=1,'Invalid city material response '+role
+    result={'manifest_sha256':hashlib.sha256(raw).hexdigest(),'runtime_manifest':exported,'runtime_assets_sha256':{},'maps':{}}
+    for name in ['city_surface_library.gdc','city_material_roles.gdc','source_model_visual.gdc','source_city_view.gdc','source_model.gdshader']:
+        path='assets/scripts/'+name
+        assert path in names and len(archive.read(path))>64,'Missing city material runtime '+name
+        packed=archive.read(path)
+        if name.endswith('.gdshader'):
+            assert packed==(project/'scripts'/name).read_bytes(),'City shader differs from current source '+name
+        result['runtime_assets_sha256'][name]=hashlib.sha256(packed).hexdigest()
+    for channel in MATERIAL_CHANNELS:
+        relative='assets/city_surfaces/'+channel+'.png'
+        result['maps'][channel]=verify_surface_map(archive,names,project,relative,manifest['files'][channel],2048)
+    result['map_count']=len(result['maps'])
+    assert result['map_count']==3
+    return result
+
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     expected=preset_values(presets)
     signature=run(build_tools/'apksigner','verify','--verbose','--print-certs',apk)
@@ -160,7 +193,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -213,6 +246,9 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
                     path='assets/scripts/'+name
                     assert path in names and len(archive.read(path))>64,'Missing dock service runtime '+name
                     flight_ui_assets[name]=hashlib.sha256(archive.read(path)).hexdigest()
+            if expected['version_code']>=29:
+                city_surface_assets=verify_city_surfaces(archive,presets.parent)
+                assert material_assets['map_count']+surface_detail_assets['map_count']+city_surface_assets['map_count']==39,'Incomplete runtime material map collection'
         for name in names:
             if not name.startswith('lib/') or not name.endswith('.so'):continue
             data=archive.read(name)
@@ -230,7 +266,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

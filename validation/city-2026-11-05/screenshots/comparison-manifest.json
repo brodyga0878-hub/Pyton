@@ -1,0 +1,83 @@
+{
+  "baseline_commit": "8ca06bd26a78e2ed7758417bc099ff241708701c",
+  "baseline_version": "0.11.6-dock-alpha1",
+  "current_version": "0.11.7-city-alpha1",
+  "source": "actual scenes/main.tscn",
+  "renderer": "OpenGL4.5 Compatibility, Mesa llvmpipe software",
+  "phone_capture": false,
+  "reference_art_composited": false,
+  "capture_tool": "tools/capture_city_surfaces.gd",
+  "geometry_only_selection_and_original_palette": true,
+  "frames": [
+    {
+      "file": "01-city-and-classic-console.png",
+      "identical_camera_and_scene_metadata": true,
+      "before": {
+        "path": "before/01-city-and-classic-console.png",
+        "bytes": 537100,
+        "sha256": "3ff236003858ef3fc4aeb4d856624d72a82c711c85268de9827391eefe701efd"
+      },
+      "after": {
+        "path": "after/01-city-and-classic-console.png",
+        "bytes": 681677,
+        "sha256": "e73250190b56ca296d80db97c599b378b7b929ea2a6c713ad8c2d32d79e4209b"
+      }
+    },
+    {
+      "file": "02-pad-and-ship.png",
+      "identical_camera_and_scene_metadata": true,
+      "before": {
+        "path": "before/02-pad-and-ship.png",
+        "bytes": 553718,
+        "sha256": "af617eed895439000f8565fe03acde26f0a32add6caee89c30f7a3653f168899"
+      },
+      "after": {
+        "path": "after/02-pad-and-ship.png",
+        "bytes": 825060,
+        "sha256": "6b4a985e029dc80fc8cce91b614da0939953d2d5860bc3c2ce4f0a2fa18b0cbb"
+      }
+    },
+    {
+      "file": "03-road.png",
+      "identical_camera_and_scene_metadata": true,
+      "before": {
+        "path": "before/03-road.png",
+        "bytes": 101165,
+        "sha256": "5e4e04c246b25be46db2b1af824968e26229b387828f92cf841bf4d0e26be31e"
+      },
+      "after": {
+        "path": "after/03-road.png",
+        "bytes": 968201,
+        "sha256": "e117f4716f34a9cc690ce08e966d722cfb7b8d4e45e0d034ff8258a122acac8a"
+      }
+    },
+    {
+      "file": "04-facade.png",
+      "identical_camera_and_scene_metadata": true,
+      "before": {
+        "path": "before/04-facade.png",
+        "bytes": 1895423,
+        "sha256": "ac6e6a9b35da89bf0487de8c66d80943c68df6c4aa3a0b3ac7de6fcea6bb5f0d"
+      },
+      "after": {
+        "path": "after/04-facade.png",
+        "bytes": 993619,
+        "sha256": "2c344b5f701c0543caa4a306ab463a49fe4183fec55b5eb82807d7a4dcd15a18"
+      }
+    },
+    {
+      "file": "05-roof.png",
+      "identical_camera_and_scene_metadata": true,
+      "before": {
+        "path": "before/05-roof.png",
+        "bytes": 1659123,
+        "sha256": "7ff9d99fd8aa4d7fbba20a0890a66515135003c1b5b25fe3a68b2728dbdc6aff"
+      },
+      "after": {
+        "path": "after/05-roof.png",
+        "bytes": 911792,
+        "sha256": "c617a25755e9e3d47216dc243b924f004349966078ca15dddd5065b4c4eba748"
+      }
+    }
+  ]
+}

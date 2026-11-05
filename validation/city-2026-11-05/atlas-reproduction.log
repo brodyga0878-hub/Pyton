@@ -1,0 +1,5 @@
+authored facade: luminance=0.3422
+authored road: luminance=0.2528
+authored pad: luminance=0.5365
+authored roof: luminance=0.5022
+CITY SURFACE ATLAS PASS:4 roles,3 maps2048x2048,wrapped16pxgutters,4xvectorcoverage,1.55MiB; byte reproduction and physical checks passed

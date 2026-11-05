@@ -4,6 +4,8 @@ extends Node3D
 const Units=preload("res://scripts/source_units.gd")
 const MaterialShader=preload("res://scripts/source_model.gdshader")
 const Materials=preload("res://scripts/material_library.gd")
+const CityMaterials=preload("res://scripts/city_surface_library.gd")
+const Roles=preload("res://scripts/city_material_roles.gd")
 # Default: source ground axes [north,up,east] -> surface [east,up,south].
 # Live cities are compiled in body-fixed orientation and supply its inverse.
 const DEFAULT_CONVERSION:=Basis(Vector3(0,0,-1),Vector3.UP,Vector3.RIGHT)
@@ -19,6 +21,8 @@ func set_quality(value:int)->void:
 	for child in get_children():
 		if child is MeshInstance3D and child.material_override is ShaderMaterial:
 			child.material_override.set_shader_parameter("detail_level",quality)
+			if quality>0:CityMaterials.bind_shader(child.material_override)
+			else:CityMaterials.clear_material(child.material_override)
 
 static func material_slot(appearance:Dictionary,normal:Vector3)->int:
 	# Provisional modern finish, not a decoded FFE material semantic. Preserve
@@ -46,7 +50,7 @@ static func face_material(face:Dictionary)->Dictionary:
 		colour=Color("758892")
 	return {"colour":colour,"unlit":bool(source.get("unlit",(code&0x2000)!=0)),"texture":int(source.get("texture_index",-1)) if source.get("textured",false) else -1}
 
-func configure(compiled:Dictionary,conversion_basis:Basis=DEFAULT_CONVERSION)->bool:
+func configure(compiled:Dictionary,conversion_basis:Basis=DEFAULT_CONVERSION,material_context:Dictionary={})->bool:
 	if not compiled.get("ok",false):return false
 	for child in get_children():remove_child(child);child.queue_free()
 	triangle_count=0;source_model_index=int(compiled.model_index)
@@ -66,8 +70,9 @@ func configure(compiled:Dictionary,conversion_basis:Basis=DEFAULT_CONVERSION)->b
 		if appearance.texture>=0 and not appearance.texture in unresolved_texture_indices:unresolved_texture_indices.append(appearance.texture)
 		var batch:Dictionary=batches[appearance.unlit]
 		var colour:Color=appearance.colour.srgb_to_linear();colour.a=1.0 if appearance.unlit else 0.0
+		var role:=Roles.classify(face,normal,vertices,source_model_index,material_context)
 		for point in vertices:
-			batch.vertices.append(point);batch.normals.append(normal);batch.colours.append(colour);batch.layers.append(Vector2(layers[face_index],material_slot(appearance,normal)))
+			batch.vertices.append(point);batch.normals.append(normal);batch.colours.append(colour);batch.layers.append(Vector2(layers[face_index],role))
 			if first:local_bounds=AABB(point,Vector3.ZERO);first=false
 			else:local_bounds=local_bounds.expand(point)
 		triangle_count+=1
@@ -78,13 +83,10 @@ func configure(compiled:Dictionary,conversion_basis:Basis=DEFAULT_CONVERSION)->b
 		arrays[Mesh.ARRAY_VERTEX]=batch.vertices;arrays[Mesh.ARRAY_NORMAL]=batch.normals;arrays[Mesh.ARRAY_COLOR]=batch.colours
 		arrays[Mesh.ARRAY_TEX_UV2]=batch.layers
 		var mesh:=ArrayMesh.new();mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,arrays)
-		var visual:=MeshInstance3D.new();visual.name="SourceUnlit" if unlit else "SourceLit";visual.mesh=mesh
 		var material:=ShaderMaterial.new();material.shader=MaterialShader
 		material.set_shader_parameter("detail_level",quality)
-		for kind in ["concrete","asphalt","painted_alloy","brushed_metal"]:
-			for channel in ["albedo","normal","orm"]:
-				material.set_shader_parameter(kind+"_"+channel,Materials.texture(kind,channel))
-			material.set_shader_parameter(kind+"_gain",Materials.albedo_gain(kind))
+		if quality>0 and not CityMaterials.bind_shader(material):return false
+		var visual:=MeshInstance3D.new();visual.name="SourceUnlit" if unlit else "SourceLit";visual.mesh=mesh
 		visual.material_override=material;add_child(visual)
 	for event in compiled.source_events:
 		var kind:String=str(event.kind)

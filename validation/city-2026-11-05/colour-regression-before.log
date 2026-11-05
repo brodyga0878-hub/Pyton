@@ -1,0 +1,41 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+ERROR: Role0 preserves neutral source brightness within12% after linear normalization
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_city_surface_colour_render.gd:12)
+       [1] run (res://tests/test_city_surface_colour_render.gd:51)
+       [2] stats (res://tests/test_city_surface_colour_render.gd:26)
+       [3] frame (res://tests/test_city_surface_colour_render.gd:15)
+ERROR: Role1 preserves neutral source brightness within12% after linear normalization
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_city_surface_colour_render.gd:12)
+       [1] run (res://tests/test_city_surface_colour_render.gd:51)
+       [2] stats (res://tests/test_city_surface_colour_render.gd:26)
+       [3] frame (res://tests/test_city_surface_colour_render.gd:15)
+ERROR: Role1 retains measurable texture variation instead of clipping flat
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_city_surface_colour_render.gd:12)
+       [1] run (res://tests/test_city_surface_colour_render.gd:52)
+       [2] stats (res://tests/test_city_surface_colour_render.gd:26)
+       [3] frame (res://tests/test_city_surface_colour_render.gd:15)
+ERROR: Role2 preserves neutral source brightness within12% after linear normalization
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_city_surface_colour_render.gd:12)
+       [1] run (res://tests/test_city_surface_colour_render.gd:51)
+       [2] stats (res://tests/test_city_surface_colour_render.gd:26)
+       [3] frame (res://tests/test_city_surface_colour_render.gd:15)
+ERROR: Role3 preserves neutral source brightness within12% after linear normalization
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_city_surface_colour_render.gd:12)
+       [1] run (res://tests/test_city_surface_colour_render.gd:51)
+       [2] stats (res://tests/test_city_surface_colour_render.gd:26)
+       [3] frame (res://tests/test_city_surface_colour_render.gd:15)
+CITY COLOUR RENDER TESTS: 13 checks, 5 failures; controlled actual renderer, not gameplay screenshots

@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "resolution": 2048,
+  "tile_size": 1024,
+  "content_size": 992,
+  "gutter": 16,
+  "max_safe_lod": 4,
+  "license": "CC0-1.0",
+  "authoring": "Original deterministic geometric city surfaces; original bitmap stencil, no borrowed imagery, external font or baked directional illumination.",
+  "normal_convention": "OpenGL +Y; image rows grow down; no green inversion on import",
+  "orm_channels": {
+    "r": "ambient_occlusion",
+    "g": "roughness",
+    "b": "metallic"
+  },
+  "uv_formula": "(tile_origin_px+16+fract(local_uv)*992)/2048; use derivatives before fract; clamp texture LOD <=4",
+  "roles": {
+    "facade": {
+      "index": 0,
+      "seed": 731405,
+      "origin_px": [
+        0,
+        0
+      ],
+      "mean_linear_luminance": 0.34224065,
+      "mean_roughness": 0.50580292,
+      "mean_metallic": 0.27458565
+    },
+    "road": {
+      "index": 1,
+      "seed": 739324,
+      "origin_px": [
+        1024,
+        0
+      ],
+      "mean_linear_luminance": 0.25276055,
+      "mean_roughness": 0.87157301,
+      "mean_metallic": 0.01937651
+    },
+    "pad": {
+      "index": 2,
+      "seed": 747243,
+      "origin_px": [
+        0,
+        1024
+      ],
+      "mean_linear_luminance": 0.53649861,
+      "mean_roughness": 0.80837143,
+      "mean_metallic": 0.02703187
+    },
+    "roof": {
+      "index": 3,
+      "seed": 755162,
+      "origin_px": [
+        1024,
+        1024
+      ],
+      "mean_linear_luminance": 0.50218255,
+      "mean_roughness": 0.46172407,
+      "mean_metallic": 0.67976321
+    }
+  },
+  "files": {
+    "albedo": {
+      "sha256": "46080062e17bd0fb65a95b427b4f3a5641bc9135e5cf818dde3071baac2cb822",
+      "bytes": 596091
+    },
+    "normal": {
+      "sha256": "5abde4a87d7a2270e3e8e3944ef8b74b90e1e1cf88c2463dfa53b911c37f76b0",
+      "bytes": 566466
+    },
+    "orm": {
+      "sha256": "817c575883d3e380f5a4b491fdbe14907bcf5c3af16de7d5f89a10a6a94ef962",
+      "bytes": 461972
+    }
+  }
+}

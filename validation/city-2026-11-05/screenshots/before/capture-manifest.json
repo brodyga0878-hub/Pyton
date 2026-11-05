@@ -1,0 +1,172 @@
+[
+	{
+		"camera_fov": 58,
+		"camera_position": [
+			60.0,
+			45.1237907409668,
+			-215.997436523438
+		],
+		"camera_target": [
+			0.0,
+			8.12379169464111,
+			-285.997436523438
+		],
+		"decorative_asteroids_visible": false,
+		"elapsed_days": 0.0,
+		"file": "01-city-and-classic-console.png",
+		"fixture": "Real source city entered and landed through existing Surface model; fixed camera only.",
+		"graphics_demo": false,
+		"hud": true,
+		"label": "0.11.6-dock-alpha1",
+		"phone_capture": false,
+		"quality": 2,
+		"renderer": "gl_compatibility",
+		"selection": {
+
+		},
+		"site": "Earth/site10 New Moscow",
+		"source": "actual scenes/main.tscn",
+		"source_model": 84
+	},
+	{
+		"camera_fov": 58,
+		"camera_position": [
+			-27.0,
+			23.1237926483154,
+			-250.997436523438
+		],
+		"camera_target": [
+			0.0,
+			8.00879096984863,
+			-288.993072509766
+		],
+		"decorative_asteroids_visible": false,
+		"elapsed_days": 0.0,
+		"file": "02-pad-and-ship.png",
+		"fixture": "Real source city entered and landed through existing Surface model; fixed camera only.",
+		"graphics_demo": false,
+		"hud": false,
+		"label": "0.11.6-dock-alpha1",
+		"phone_capture": false,
+		"quality": 2,
+		"renderer": "gl_compatibility",
+		"selection": {
+
+		},
+		"site": "Earth/site10 New Moscow",
+		"source": "actual scenes/main.tscn",
+		"source_model": 84
+	},
+	{
+		"camera_fov": 58,
+		"camera_position": [
+			159.148849487305,
+			9.1027307510376,
+			-11.6035766601562
+		],
+		"camera_target": [
+			159.148849487305,
+			0.102730832993984,
+			-23.6035766601562
+		],
+		"decorative_asteroids_visible": false,
+		"elapsed_days": 0.0,
+		"file": "03-road.png",
+		"fixture": "Real source city entered and landed through existing Surface model; fixed camera only.",
+		"graphics_demo": false,
+		"hud": false,
+		"label": "0.11.6-dock-alpha1",
+		"phone_capture": false,
+		"quality": 2,
+		"renderer": "gl_compatibility",
+		"selection": {
+			"area_m2": 15884.794921875,
+			"batch": "SourceUnlit",
+			"height_m": 0.050060898065567,
+			"inradius_m": 29.3028883434837,
+			"instance_path": "84/252@64/382@122",
+			"material_code": 9284,
+			"offset": 24,
+			"source_model_index": 382,
+			"triangle_index": 521
+		},
+		"site": "Earth/site10 New Moscow",
+		"source": "actual scenes/main.tscn",
+		"source_model": 84
+	},
+	{
+		"camera_fov": 58,
+		"camera_position": [
+			490.727569580078,
+			9.92924118041992,
+			-395.513519287109
+		],
+		"camera_target": [
+			511.51416015625,
+			6.9327826499939,
+			-407.510101318359
+		],
+		"decorative_asteroids_visible": false,
+		"elapsed_days": 0.0,
+		"file": "04-facade.png",
+		"fixture": "Real source city entered and landed through existing Surface model; fixed camera only.",
+		"graphics_demo": false,
+		"hud": false,
+		"label": "0.11.6-dock-alpha1",
+		"phone_capture": false,
+		"quality": 2,
+		"renderer": "gl_compatibility",
+		"selection": {
+			"area_m2": 212.834701538086,
+			"batch": "SourceLit",
+			"height_m": 14.0877733230591,
+			"inradius_m": 5.48211580298461,
+			"instance_path": "84/252@64/382@122/368@96/235@124",
+			"material_code": 16393,
+			"offset": 210,
+			"selection_rule": "Original palette: prefer neutral lit wall, moderate height, then distance.",
+			"source_model_index": 235,
+			"triangle_index": 126
+		},
+		"site": "Earth/site10 New Moscow",
+		"source": "actual scenes/main.tscn",
+		"source_model": 84
+	},
+	{
+		"camera_fov": 58,
+		"camera_position": [
+			1084.6513671875,
+			115.70858001709,
+			-244.500152587891
+		],
+		"camera_target": [
+			1071.6513671875,
+			104.70858001709,
+			-262.500152587891
+		],
+		"decorative_asteroids_visible": false,
+		"elapsed_days": 0.0,
+		"file": "05-roof.png",
+		"fixture": "Real source city entered and landed through existing Surface model; fixed camera only.",
+		"graphics_demo": false,
+		"hud": false,
+		"label": "0.11.6-dock-alpha1",
+		"phone_capture": false,
+		"quality": 2,
+		"renderer": "gl_compatibility",
+		"selection": {
+			"area_m2": 26295.412109375,
+			"batch": "SourceLit",
+			"height_m": 0.031829833984375,
+			"inradius_m": 59.1012281511789,
+			"instance_path": "84/252@64/302@190",
+			"material_code": 16406,
+			"offset": 102,
+			"source_model_index": 302,
+			"triangle_index": 346
+		},
+		"site": "Earth/site10 New Moscow",
+		"source": "actual scenes/main.tscn",
+		"source_model": 84
+	}
+]
