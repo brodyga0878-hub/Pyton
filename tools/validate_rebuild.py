@@ -52,6 +52,8 @@ SUITES = [
     Suite('source_body_factory', 'tests/test_source_body_factory.gd', 'Original F881 all23 mass-bin dispatch, supported ordinal planet names, exact records/counters and atomic unsupported helpers; no full procedural hierarchy.', timeout=300),
     Suite('source_clock', 'tests/test_source_clock.gd', 'Original F1357 calendar, F1363 display time and explicit elapsed-days bridge to the verified3250 epoch.'),
     Suite('source_world_bridge', 'tests/test_source_world_bridge.gd', 'Native F878 handcrafted runtime-record conversion, all11 source-world integration and independent unchanged0.11.8 physical layouts, saves and calendar HUD.', timeout=300, user_args=('--rebuild-capture',)),
+    Suite('source_orbit', 'tests/test_source_orbit.gd', 'Pinned JJFFE integer orbital rate, phase and coordinate procedures against independent native instruction controls; not full original gravity or dynamics.', timeout=300),
+    Suite('source_orbit_integration', 'tests/test_source_orbit_integration.gd', 'All11 versioned orbital worlds, native coordinate hierarchy, preserved0.11.9 v1 saves, stable source epoch and actual Main transitions.', timeout=300, user_args=('--rebuild-capture',)),
     Suite('worlds', 'tests/test_rebuilt_worlds.gd', 'Handcrafted original records and explicit analytic world/navigation adapter.'),
     Suite('flight', 'tests/test_rebuilt_flight.gd', 'Rebuilt flight, phone steering inputs, adapted training economy, atomic flight saves.'),
     Suite('cities', 'tests/test_rebuilt_cities.gd', 'Source3 city geometry, pad selection, collision, landing/takeoff/restore integration.'),

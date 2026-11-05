@@ -113,7 +113,7 @@ func _ready()->void:
 	if "--rebuild-smoke" in OS.get_cmdline_user_args():call_deferred("_run_smoke")
 
 func _new_models()->void:
-	ship=Flight.new();nav=NavigationData.new();world=World.new();world.configure(nav.current());surface=Surface.new();near.clear()
+	ship=Flight.new();nav=NavigationData.new();world=World.new();world.configure(nav.current(),World.NATIVE_LAYOUT);surface=Surface.new();near.clear()
 
 func _build_world()->void:
 	environment=WorldEnvironment.new();environment.environment=Environment.new()
@@ -219,7 +219,7 @@ func _tick(dt:float,steering:Vector2,roll:float,lift:=0.0)->void:
 		if surface.active:surface.landing=false
 	if nav.remaining>0:
 		if nav.step(dt,ship):
-			world.configure(nav.current());surface=Surface.new();near.clear();_apply_system();_announce(nav.message);_save_game()
+			world.configure(nav.current(),world.preferred_layout());surface=Surface.new();near.clear();_apply_system();_announce(nav.message);_save_game()
 	elif world.transfer_remaining>0:
 		if world.step_transfer(dt,ship,nav):
 			_apply_system();_announce(world.message)
@@ -287,7 +287,7 @@ func _flight_diagnostic_sample()->Dictionary:
 	if ship==null or nav==null or world==null or surface==null:return {}
 	return {"ship_id":ship.ship_id,"position":[ship.position.x,ship.position.y,ship.position.z],"velocity":[ship.velocity.x,ship.velocity.y,ship.velocity.z],"target_speed":ship.target_speed,"hull":ship.hull,"docked":ship.docked,"autopilot":ship.autopilot,"system_id":nav.current_id,"focus_id":world.focus_id,"site_id":world.site_id,"jump_remaining":nav.remaining,"transfer_remaining":world.transfer_remaining,"surface":surface.active,"landed":surface.landed,"flight_phase":surface.flight_phase,"surface_motion":{"landing":surface.landing,"taking_off":surface.taking_off,"altitude_m":surface.altitude(ship) if surface.active else 0.0,"pad_distance_m":surface.pad_distance(ship) if surface.active else 0.0},"controls":_input_diagnostic_state()}
 func _diagnostic_context()->Dictionary:
-	return {"build":{"version":BuildInfo.VERSION,"code":BuildInfo.VERSION_CODE,"channel":BuildInfo.CHANNEL},"mode":"graphics_preview" if not graphics_return.is_empty() else ("surface" if surface!=null and surface.active else "space"),"flight":_flight_diagnostic_sample(),"last_flight_sample":last_flight_sample,"settings":settings.snapshot(),"session":{"saving_enabled":saving_enabled,"save_generation":saves.sequence,"elapsed_days":nav.elapsed_days if nav!=null else 0,"source_clock":SourceClock.from_elapsed_days(nav.elapsed_days) if nav!=null else {},"source_runtime":world.source_runtime_state.duplicate(true) if world!=null else {}},"display":{"fps":Engine.get_frames_per_second(),"viewport":[get_viewport().get_visible_rect().size.x,get_viewport().get_visible_rect().size.y]}}
+	return {"build":{"version":BuildInfo.VERSION,"code":BuildInfo.VERSION_CODE,"channel":BuildInfo.CHANNEL},"mode":"graphics_preview" if not graphics_return.is_empty() else ("surface" if surface!=null and surface.active else "space"),"flight":_flight_diagnostic_sample(),"last_flight_sample":last_flight_sample,"settings":settings.snapshot(),"session":{"saving_enabled":saving_enabled,"save_generation":saves.sequence,"elapsed_days":nav.elapsed_days if nav!=null else 0,"source_clock":SourceClock.from_elapsed_days(nav.elapsed_days) if nav!=null else {},"source_runtime":world.source_runtime_state.duplicate(true) if world!=null else {},"source_orbit":world.orbit_backend_state.duplicate(true) if world!=null else {},"world_layout":world.layout_mode if world!=null else "","preferred_world_layout":world.preferred_layout() if world!=null else ""},"display":{"fps":Engine.get_frames_per_second(),"viewport":[get_viewport().get_visible_rect().size.x,get_viewport().get_visible_rect().size.y]}}
 
 func _station_here()->bool:return not surface.active and (world.is_orbital_site() or (world.site_id.is_empty() and world.focus_id==world.default_id and nav.has_station()))
 func _apply_system()->void:
@@ -547,7 +547,7 @@ func _show_help()->void:
 	_open_menu("УПРАВЛЕНИЕ И СБОРКА")
 	_menu_text("Левый стик меняет направление носа. Правая шкала задаёт скорость. «Тормозить» отменяет автоматический полёт и плавно останавливает корабль. «Авто» ведёт к станции или площадке; после посадки команда «На орбиту» выполняет автоматический вылет. «Взлететь» оставляет управление вам после короткого подъёма. Кнопки подъёма и снижения помогают лететь над землёй. В доке кнопка «Службы» открывает обслуживание.")
 	_menu_text("Клавиатура: стрелки — поворот, W/S — скорость, Q/E — крен, R/F — подъём, пробел — тормоз, A — авто, L — поверхность/орбита, D — стыковка/взлёт, V — вид, Esc — меню.")
-	_menu_text("Сборка %s. Отчёт об ошибке и журналы можно сохранить ZIP-архивом через меню. Осмотрите корабль, планеты и станцию через «Графический полёт». Полёт и данные исходных миров возвращены частично. Карта маршрутов, физика орбит, три лётных профиля и учебная торговля — адаптации. Полная кампания, исходная экономика и ИИ ещё не готовы. Проверка на настоящем телефоне нужна отдельно."%BuildInfo.VERSION)
+	_menu_text("Сборка %s. Отчёт об ошибке и журналы можно сохранить ZIP-архивом через меню. Осмотрите корабль, планеты и станцию через «Графический полёт». Полёт и данные исходных миров возвращены частично. Новые полёты используют исходные расчёты орбит JJFFE. Радиусы, гравитация, карта маршрутов, три лётных профиля и учебная торговля пока используют адаптации. Полная кампания, исходная экономика и ИИ ещё не готовы. Проверка на настоящем телефоне нужна отдельно."%BuildInfo.VERSION)
 
 func _show_bug_report()->void:
 	if busy:return

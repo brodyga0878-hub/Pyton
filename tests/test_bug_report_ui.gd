@@ -103,6 +103,8 @@ func normal_report()->void:
 	var report:Dictionary=JSON.parse_string(files["report.json"].get_string_from_utf8())
 	check(report.version==BuildInfo.VERSION and report.context.build.code==BuildInfo.VERSION_CODE,"Archive identifies the actual runtime release")
 	check(report.context.mode=="space" and report.context.flight.system_id==game.nav.current_id,"Archive contains the actual active flight context")
+	check(report.context.session.world_layout==game.world.NATIVE_LAYOUT and report.context.session.preferred_world_layout==game.world.NATIVE_LAYOUT,"Report identifies the native orbital layout and its persistent preference")
+	check(report.context.session.source_orbit==JSON.parse_string(JSON.stringify(game.world.orbit_backend_state)),"Report preserves the actual source-orbit contract and explicit local-physics adapters")
 	check(not report.included_save and not files.has("game-save.json"),"Default report excludes full saved progress")
 	check(files["description.txt"].get_string_from_utf8()==game.report_draft,"Russian multiline description survives the complete UI-to-ZIP path")
 	check(files.has("events/current-events.jsonl") and files["events/current-events.jsonl"].get_string_from_utf8().contains("ui_report_fixture"),"Collected application events are in the real archive")
@@ -115,15 +117,18 @@ func optional_save_and_export_callbacks()->void:
 	var option:=include_box()
 	if option!=null:option.button_pressed=true;option.toggled.emit(true)
 	check(game.report_include_save,"Explicit checkbox opts in to the current flight snapshot")
+	check(game.diagnostics._json_safe(game._payload()),"Native world snapshot contains only strict JSON values and String keys")
 	var before:=payload()
+	var previous_path:String=game.current_report.path
 	await game._create_bug_report(false)
-	check(not game.busy and game.current_report.get("ok",false),"Archive-only path completes without opening a picker")
+	check(not game.busy and game.current_report.get("ok",false) and game.current_report.path!=previous_path,"Archive-only path creates a fresh report without opening a picker")
 	var files:=open_report(game.current_report.path)
 	var report:Dictionary=JSON.parse_string(files["report.json"].get_string_from_utf8())
 	check(report.included_save and files.has("game-save.json"),"Opted-in archive contains the requested saved flight")
 	if files.has("game-save.json"):
 		var saved:Dictionary=JSON.parse_string(files["game-save.json"].get_string_from_utf8())
 		check(saved==JSON.parse_string(before),"Opted-in snapshot matches the exact active whole-game payload after JSON decoding")
+		check(saved.planetary.schema=="starfrontier-rebuild-world-v2" and saved.planetary.preferred_layout==game.world.NATIVE_LAYOUT,"Opted-in flight retains the native world schema and future-jump backend")
 	var source:String=game.current_report.path;var source_bytes:=FileAccess.get_file_as_bytes(source)
 	game.report_export._busy=true;game.report_export._source_path=source;game.report_export._filename=game.current_report.filename
 	game.report_export._on_native_selected(false,PackedStringArray(),0)

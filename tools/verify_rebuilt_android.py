@@ -6,6 +6,8 @@ from pathlib import Path
 
 FORBIDDEN_PERMISSIONS=['INTERNET','RECORD_AUDIO','READ_EXTERNAL_STORAGE','WRITE_EXTERNAL_STORAGE','MANAGE_EXTERNAL_STORAGE']
 SOURCE_IMAGE_SHA256='d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72'
+SOURCE_ASSEMBLY_SHA256='d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a'
+SOURCE_ASSEMBLY_COMMIT='7e540341d4e09aa3c92877b87d49e7f2c143ad8d'
 MATERIAL_KINDS=('painted_alloy','brushed_metal','concrete','asphalt','rock','ice','rubber','glass')
 MATERIAL_CHANNELS=('albedo','normal','orm')
 SURFACE_PROFILES=('cobra','eagle','shuttle')
@@ -243,6 +245,141 @@ def verify_source_world_runtime(archive,project):
         result['clock_constants'][name]=value
     return result
 
+def verify_source_orbit_runtime(archive,project):
+    """Check orbital packaging and local native-fixture provenance.
+
+    The fixture is a development reference, never an Android runtime asset.
+    This check does not execute its native oracle or establish original
+    radius, mass, gravity, spin, full procedural generation or phone behavior.
+    """
+    names=set(archive.namelist())
+    result={'scripts':{},'data':{}}
+    scripts=['source_orbit','planetary_system','main','source_clock','source_units',
+             'ground_coordinates','ffe_math','handcrafted_runtime_builder']
+    source_text={}
+    for name in scripts:
+        relative='scripts/'+name+'.gd'
+        raw=(project/relative).read_bytes()
+        source_text[name]=raw.decode('utf-8')
+        exported='assets/scripts/'+name+'.gdc'
+        assert exported in names,'Missing source-orbit runtime '+name
+        packed=archive.read(exported)
+        assert len(packed)>64 and packed[:4]==b'GDSC','Invalid compiled source-orbit module '+name
+        result['scripts'][name]={'runtime_path':exported,'runtime_bytes':len(packed),
+                                 'runtime_sha256':hashlib.sha256(packed).hexdigest(),
+                                 'local_source_sha256':hashlib.sha256(raw).hexdigest()}
+    metadata={}
+    for name in ['ffe_worlds','ffe_handcrafted_records','ffe_ground_coordinates','ffe_math','world_names_ru']:
+        relative='data/'+name+'.json'
+        raw=(project/relative).read_bytes()
+        exported='assets/'+relative
+        assert exported in names and archive.read(exported)==raw,'Runtime source-orbit data differs from source '+name
+        entry=json.loads(raw)
+        assert isinstance(entry,dict),'Invalid source-orbit data '+name
+        if name!='world_names_ru':
+            assert entry.get('source_sha256')==SOURCE_IMAGE_SHA256,'Unexpected source-orbit executable provenance '+name
+        metadata[name]=entry
+        result['data'][name]={'runtime_path':exported,'bytes':len(raw),
+                              'source_json_sha256':hashlib.sha256(raw).hexdigest()}
+        if name!='world_names_ru':result['data'][name]['source_executable_sha256']=entry['source_sha256']
+
+    def string_constant(text,name):
+        matched=re.search(r'^const\s+'+re.escape(name)+r'\s*:=\s*"([^"\r\n]+)"\s*$',text,re.M)
+        assert matched,'Missing source-orbit string constant '+name
+        return matched[1]
+
+    def u32_constant(text,name):
+        matched=re.search(r'^const\s+'+re.escape(name)+r'\s*:=\s*(0x[0-9a-fA-F]+|\d+)\s*$',text,re.M)
+        assert matched,'Missing source-orbit clock constant '+name
+        value=int(matched[1],0)
+        assert 0<=value<=0xffffffff,'Invalid source-orbit clock constant '+name
+        return value
+
+    variant=string_constant(source_text['source_orbit'],'SOURCE_VARIANT')
+    contract=string_constant(source_text['planetary_system'],'NATIVE_CONTRACT')
+    epoch_tick=u32_constant(source_text['source_orbit'],'SOURCE_EPOCH_TICK')
+    epoch_day=u32_constant(source_text['source_orbit'],'SOURCE_EPOCH_DAY')
+    assert epoch_tick==u32_constant(source_text['source_clock'],'EPOCH_TICK_U32'),'Orbital epoch tick differs from source clock'
+    assert epoch_day==u32_constant(source_text['source_clock'],'EPOCH_DAY_U32'),'Orbital epoch day differs from source clock'
+    assert re.search(r'SourceOrbit\.evaluate_from_epoch\(\s*record\s*,\s*clock\.tick_u32\s*,\s*clock\.day_u32\s*,\s*SourceClock\.EPOCH_TICK_U32\s*,\s*SourceClock\.EPOCH_DAY_U32\s*\)',source_text['planetary_system']),'World does not evaluate native orbits from the fixed source-clock epoch'
+    layouts={name:string_constant(source_text['planetary_system'],name)
+             for name in ['NATIVE_LAYOUT','SOURCE_LAYOUT','SOLAR_LAYOUT','EMPTY_LAYOUT']}
+    assert len(set(layouts.values()))==4,'Source-orbit and legacy layouts must remain distinct'
+    assert layouts['SOURCE_LAYOUT']=='handcrafted_analytic_rebuild_v1','Legacy handcrafted layout changed'
+    assert layouts['SOLAR_LAYOUT']=='reconstructed_solar_v1','Legacy solar layout changed'
+    assert layouts['EMPTY_LAYOUT']=='source_unavailable_rebuild_v1','Legacy unavailable-world layout changed'
+    assert re.search(r'world\.configure\(\s*nav\.current\(\)\s*,\s*World\.NATIVE_LAYOUT\s*\)',source_text['main']),'New game does not request the native orbital layout'
+    adapter=re.search(r'"radius_mass_gravity_spin"\s*:\s*"([^"\r\n]+)"',source_text['planetary_system'])
+    assert adapter and adapter[1]=='analytic_si_rebuild_v1','Missing explicit retained local physics adapter'
+    assert re.search(r'"complete_original_physics"\s*:\s*false',source_text['planetary_system']),'Orbital backend must identify incomplete original physics'
+    units=re.search(r'^const\s+METRES_PER_RAW\s*:=\s*16785(?:\.0)?\s*/\s*16777216(?:\.0)?\s*$',source_text['source_units'],re.M)
+    assert units,'Unexpected source geometry-to-metres calibration'
+
+    fixture_relative='tests/fixtures/source_orbit_native.json'
+    fixture_raw=(project/fixture_relative).read_bytes()
+    fixture=json.loads(fixture_raw)
+    assert fixture.get('schema')==1,'Unexpected native orbital fixture schema'
+    assert fixture.get('source_variant')==variant,'Native orbital fixture differs from runtime SOURCE_VARIANT'
+    assert fixture.get('source_sha256')==SOURCE_IMAGE_SHA256,'Unexpected native orbital executable provenance'
+    assert fixture.get('source_assembly_sha256')==SOURCE_ASSEMBLY_SHA256,'Unexpected native orbital assembly provenance'
+    assert fixture.get('source_commit')==SOURCE_ASSEMBLY_COMMIT,'Unexpected native orbital source revision'
+    assert fixture.get('ordinary_epoch_tick_u32')==epoch_tick and fixture.get('ordinary_epoch_day_u32')==epoch_day,'Native orbital fixture differs from runtime epoch anchor'
+    initializer=fixture.get('dos_f880_rate_and_initialization_slice')
+    update=fixture.get('pinned_f866_ordinary_orbital_slice')
+    assert isinstance(initializer,dict) and isinstance(update,dict),'Missing native initializer/update slice provenance'
+    for value,key in [(initializer,'executable_block_sha256'),(initializer,'pinned_executed_slice_sha256'),
+                      (initializer,'pinned_full_f880_sha256'),(initializer,'host_entry_sha256'),
+                      (update,'pinned_executed_orbital_slice_sha256'),(update,'pinned_full_f866_sha256'),
+                      (update,'host_entry_sha256')]:
+        assert isinstance(value.get(key),str) and re.fullmatch(r'[0-9a-f]{64}',value[key]),'Invalid native initializer/update provenance '+key
+    assert type(initializer.get('executable_offset')) is int and initializer['executable_offset']>=0,'Invalid F880 executable slice offset'
+    assert type(initializer.get('byte_length')) is int and initializer['byte_length']>0,'Invalid F880 executable slice length'
+    assert isinstance(initializer.get('entry_signature'),str) and re.fullmatch(r'(?:[0-9a-f]{2})+',initializer['entry_signature']),'Invalid F880 executable entry signature'
+    for value,key in [(initializer,'phase_call_word_order'),(update,'scope'),(update,'position_dispatch')]:
+        assert isinstance(value.get(key),str) and value[key].strip(),'Missing native initializer/update policy '+key
+    packed_relative='tests/fixtures/handcrafted_runtime_native.json'
+    packed_raw=(project/packed_relative).read_bytes()
+    assert fixture.get('packed_record_fixture')==packed_relative,'Unexpected native orbital input fixture'
+    assert fixture.get('packed_record_fixture_sha256')==hashlib.sha256(packed_raw).hexdigest(),'Native orbital input fixture differs from local packed records'
+    required_procedures={'1333','1338','1341','1483','1494','1496','1506','1507','1508','1509','1510','1521','1661','1914'}
+    for key in ['source_procedure_hashes','pinned_procedure_hashes']:
+        hashes=fixture.get(key,{})
+        assert isinstance(hashes,dict) and required_procedures<=hashes.keys(),'Incomplete native orbital procedure provenance '+key
+        assert all(isinstance(value,str) and re.fullmatch(r'[0-9a-f]{64}',value) for value in hashes.values()),'Invalid native orbital procedure digest '+key
+    for count_key,cases_key in [('case_count','cases'),('vector_add_case_count','vector_add_cases'),('epoch_update_case_count','epoch_update_cases')]:
+        count=fixture.get(count_key)
+        assert type(count) is int and count>0 and isinstance(fixture.get(cases_key),list) and count==len(fixture[cases_key]),'Incomplete native orbital fixture '+cases_key
+    assert fixture.get('reverse_repeat_count')==fixture['case_count'],'Incomplete native orbital reverse repeat check'
+    assert fixture.get('vector_add_reverse_repeat_count')==fixture['vector_add_case_count'],'Incomplete parent-vector reverse repeat check'
+    assert fixture.get('epoch_update_reverse_repeat_count')==fixture['epoch_update_case_count']*2,'Incomplete single/stepped orbital epoch reverse repeat check'
+    assert fixture.get('epoch_single_step_matches_stepped') is True,'Native orbital updates depend on intermediate epoch steps'
+    for row in fixture['epoch_update_cases']:
+        assert isinstance(row,dict) and row.get('epoch_tick_u32')==epoch_tick and row.get('epoch_day_u32')==epoch_day,'Native orbital epoch case uses a different anchor'
+    for key in ['fresh_process_runs','vector_add_fresh_process_runs','epoch_update_fresh_process_runs']:
+        assert type(fixture.get(key)) is int and fixture[key]>=2,'Missing native orbital fresh-process comparison '+key
+    assert fixture.get('object_canaries_unchanged') is True and fixture.get('non_target_object_bytes_unchanged') is True,'Native orbital object-boundary checks failed'
+    sine=metadata['ffe_ground_coordinates'].get('sin_quarter_q31')
+    assert isinstance(sine,list) and len(sine)==16384 and all(type(value) is int and 0<=value<=0x7fffffff for value in sine),'Invalid source-orbit Sin32 table'
+    sine_sha256=hashlib.sha256(struct.pack('<16384i',*sine)).hexdigest()
+    assert sine_sha256==metadata['ffe_ground_coordinates'].get('sine_table_sha256')==fixture.get('sine_sha256'),'Native orbital fixture uses a different Sin32 table'
+    for key in ['native_ordered_output_sha256','native_vector_add_output_sha256','native_epoch_update_output_sha256','adapted_assembly_sha256']:
+        assert isinstance(fixture.get(key),str) and re.fullmatch(r'[0-9a-f]{64}',fixture[key]),'Missing native orbital output provenance '+key
+    result.update({'source_variant':variant,'native_contract':contract,'layouts':layouts,
+                   'new_game_requested_layout':layouts['NATIVE_LAYOUT'],
+                   'epoch_anchor':{'tick_u32':epoch_tick,'day_u32':epoch_day,
+                                   'source_clock_constants_agree':True,
+                                   'world_calls_evaluate_from_epoch':True},
+                   'retained_local_physics_adapter':adapter[1],
+                   'metres_per_raw':16785/16777216,
+                   'active_scope':'Fixed-epoch native F880 initialization followed by ordinary F866 orbital updates, source clock and parent translations; retained analytic SI radius/mass/gravity/spin and legacy saved layouts.',
+                   'complete_original_physics':False,
+                   'compiled_source_correspondence_rebuilt_by_verifier':False,
+                   'native_fixture':{'local_path':fixture_relative,'bytes':len(fixture_raw),
+                                     'sha256':hashlib.sha256(fixture_raw).hexdigest(),
+                                     'provenance_checked':True,'oracle_executed_by_apk_verifier':False,
+                                     **{key:fixture[key] for key in ['revision','source_variant','source_sha256','source_assembly_sha256','source_commit','scope','source_procedure_hashes','pinned_procedure_hashes','dos_f880_rate_and_initialization_slice','pinned_f866_ordinary_orbital_slice','packed_record_fixture','packed_record_fixture_sha256','case_count','vector_add_case_count','epoch_update_case_count','fresh_process_runs','vector_add_fresh_process_runs','epoch_update_fresh_process_runs','epoch_update_reverse_repeat_count','epoch_single_step_matches_stepped','ordinary_epoch_tick_u32','ordinary_epoch_day_u32','native_ordered_output_sha256','native_vector_add_output_sha256','native_epoch_update_output_sha256','adapted_assembly_sha256','sine_sha256']}}})
+    return result
+
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     expected=preset_values(presets)
     signature=run(build_tools/'apksigner','verify','--verbose','--print-certs',apk)
@@ -261,7 +398,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -322,6 +459,8 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
                 assert material_assets['map_count']+surface_detail_assets['map_count']+city_surface_assets['map_count']+world_surface_assets['map_count']==51,'Incomplete terrain/planet runtime material collection'
             if expected['version_code']>=31:
                 source_world_assets=verify_source_world_runtime(archive,presets.parent)
+            if expected['version_code']>=32:
+                source_orbit_assets=verify_source_orbit_runtime(archive,presets.parent)
         for name in names:
             if not name.startswith('lib/') or not name.endswith('.so'):continue
             data=archive.read(name)
@@ -339,7 +478,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

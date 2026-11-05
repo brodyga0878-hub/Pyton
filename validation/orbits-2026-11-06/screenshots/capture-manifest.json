@@ -1,0 +1,228 @@
+[
+	{
+		"console_label": "12:00:00 1-янв-3250",
+		"earth_position_au": [
+			-1.00043612888702,
+			0.0,
+			-0.00000475509144683098
+		],
+		"elapsed_days": 0.0,
+		"file": "01-jjffe-orbits-3250.png",
+		"fixture": "Fixed review camera. Existing51material maps; no new graphics or compositing. SI radius/mass/gravity/spin remain adapters.",
+		"gameplay_progress_read": false,
+		"gameplay_progress_written": false,
+		"layout": "handcrafted_jjffe_orbits_v2",
+		"moon_position_au": [
+			-1.00171619503126,
+			0.000114191056983238,
+			-0.00223108362132809
+		],
+		"phone_capture": false,
+		"quality": 2,
+		"scene": "actual scenes/main.tscn",
+		"source_clock": {
+			"date_ru": "1-янв-3250",
+			"day": 1,
+			"day_u32": 1187063,
+			"elapsed_days": 0.0,
+			"hour": 12,
+			"label_ru": "12:00:00 1-янв-3250",
+			"minute": 0,
+			"month": 1,
+			"second": 0,
+			"tick_u32": 2147483648,
+			"time_ru": "12:00:00",
+			"year": 3250
+		},
+		"source_orbit": {
+			"celestial_parent_composition": "non-rotating signed64 translation",
+			"clock": "fixed F880 initialization at3250 epoch then ordinary F866 orbital updates via elapsed-days bridge",
+			"complete_original_physics": false,
+			"contract": "jjffe-f880-3250-anchor-f866-orbit-xyz-v1",
+			"coordinate_units": "raw geometry calibrated by16785/2^24 metres",
+			"epoch_day_u32": 1187063,
+			"epoch_tick_u32": 2147483648,
+			"layout": "handcrafted_jjffe_orbits_v2",
+			"orbital_ports_rendered": false,
+			"radius_mass_gravity_spin": "analytic_si_rebuild_v1",
+			"source_variant": "jjffe-7e54034-q31-orbit"
+		},
+		"source_runtime": {
+			"body_count_byte": 43,
+			"count": 53,
+			"orbital_port_count_byte": 8,
+			"physical_layout_changed": true,
+			"port_count_byte": 18,
+			"record_domain": "packed_runtime_records",
+			"records_sha256": "b2d99151c651ea8792b66352fa021ff5cda60c0666db3dc98dcde1fdac7cec5d",
+			"source": "ffe_f878_handcrafted_suffix"
+		}
+	},
+	{
+		"console_label": "12:00:00 31-янв-3250",
+		"earth_position_au": [
+			-0.870123870679472,
+			0.0,
+			-0.493633454368796
+		],
+		"elapsed_days": 30.0,
+		"file": "02-jjffe-orbits-day30.png",
+		"fixture": "Fixed review camera. Existing51material maps; no new graphics or compositing. SI radius/mass/gravity/spin remain adapters.",
+		"gameplay_progress_read": false,
+		"gameplay_progress_written": false,
+		"layout": "handcrafted_jjffe_orbits_v2",
+		"moon_position_au": [
+			-0.870010329888139,
+			-0.0000101286509853266,
+			-0.496201659216162
+		],
+		"phone_capture": false,
+		"quality": 2,
+		"scene": "actual scenes/main.tscn",
+		"source_clock": {
+			"date_ru": "31-янв-3250",
+			"day": 31,
+			"day_u32": 1187093,
+			"elapsed_days": 30.0,
+			"hour": 12,
+			"label_ru": "12:00:00 31-янв-3250",
+			"minute": 0,
+			"month": 1,
+			"second": 0,
+			"tick_u32": 2147483648,
+			"time_ru": "12:00:00",
+			"year": 3250
+		},
+		"source_orbit": {
+			"celestial_parent_composition": "non-rotating signed64 translation",
+			"clock": "fixed F880 initialization at3250 epoch then ordinary F866 orbital updates via elapsed-days bridge",
+			"complete_original_physics": false,
+			"contract": "jjffe-f880-3250-anchor-f866-orbit-xyz-v1",
+			"coordinate_units": "raw geometry calibrated by16785/2^24 metres",
+			"epoch_day_u32": 1187063,
+			"epoch_tick_u32": 2147483648,
+			"layout": "handcrafted_jjffe_orbits_v2",
+			"orbital_ports_rendered": false,
+			"radius_mass_gravity_spin": "analytic_si_rebuild_v1",
+			"source_variant": "jjffe-7e54034-q31-orbit"
+		},
+		"source_runtime": {
+			"body_count_byte": 43,
+			"count": 53,
+			"orbital_port_count_byte": 8,
+			"physical_layout_changed": true,
+			"port_count_byte": 18,
+			"record_domain": "packed_runtime_records",
+			"records_sha256": "b2d99151c651ea8792b66352fa021ff5cda60c0666db3dc98dcde1fdac7cec5d",
+			"source": "ffe_f878_handcrafted_suffix"
+		}
+	},
+	{
+		"console_label": "12:00:00 31-янв-3250",
+		"earth_position_au": [
+			-0.870123870679472,
+			0.0,
+			-0.493633454368796
+		],
+		"elapsed_days": 30.0,
+		"file": "03-v2-original-city.png",
+		"fixture": "Fixed review camera. Existing51material maps; no new graphics or compositing. SI radius/mass/gravity/spin remain adapters.",
+		"gameplay_progress_read": false,
+		"gameplay_progress_written": false,
+		"layout": "handcrafted_jjffe_orbits_v2",
+		"moon_position_au": [
+			-0.870010329888139,
+			-0.0000101286509853266,
+			-0.496201659216162
+		],
+		"phone_capture": false,
+		"quality": 2,
+		"scene": "actual scenes/main.tscn",
+		"source_clock": {
+			"date_ru": "31-янв-3250",
+			"day": 31,
+			"day_u32": 1187093,
+			"elapsed_days": 30.0,
+			"hour": 12,
+			"label_ru": "12:00:00 31-янв-3250",
+			"minute": 0,
+			"month": 1,
+			"second": 0,
+			"tick_u32": 2147483648,
+			"time_ru": "12:00:00",
+			"year": 3250
+		},
+		"source_orbit": {
+			"celestial_parent_composition": "non-rotating signed64 translation",
+			"clock": "fixed F880 initialization at3250 epoch then ordinary F866 orbital updates via elapsed-days bridge",
+			"complete_original_physics": false,
+			"contract": "jjffe-f880-3250-anchor-f866-orbit-xyz-v1",
+			"coordinate_units": "raw geometry calibrated by16785/2^24 metres",
+			"epoch_day_u32": 1187063,
+			"epoch_tick_u32": 2147483648,
+			"layout": "handcrafted_jjffe_orbits_v2",
+			"orbital_ports_rendered": false,
+			"radius_mass_gravity_spin": "analytic_si_rebuild_v1",
+			"source_variant": "jjffe-7e54034-q31-orbit"
+		},
+		"source_runtime": {
+			"body_count_byte": 43,
+			"count": 53,
+			"orbital_port_count_byte": 8,
+			"physical_layout_changed": true,
+			"port_count_byte": 18,
+			"record_domain": "packed_runtime_records",
+			"records_sha256": "b2d99151c651ea8792b66352fa021ff5cda60c0666db3dc98dcde1fdac7cec5d",
+			"source": "ffe_f878_handcrafted_suffix"
+		}
+	},
+	{
+		"console_label": "12:00:00 1-янв-3250",
+		"earth_position_au": [
+			0.0000000000000000612323399573677,
+			0.0,
+			1.0
+		],
+		"elapsed_days": 0.0,
+		"file": "04-restored-v1-layout.png",
+		"fixture": "Fixed review camera. Existing51material maps; no new graphics or compositing. SI radius/mass/gravity/spin remain adapters.",
+		"gameplay_progress_read": false,
+		"gameplay_progress_written": false,
+		"layout": "handcrafted_analytic_rebuild_v1",
+		"moon_position_au": [
+			-0.00222526622635164,
+			0.000114207663925186,
+			1.0012796717817
+		],
+		"phone_capture": false,
+		"quality": 2,
+		"scene": "actual scenes/main.tscn",
+		"source_clock": {
+			"date_ru": "1-янв-3250",
+			"day": 1,
+			"day_u32": 1187063,
+			"elapsed_days": 0.0,
+			"hour": 12,
+			"label_ru": "12:00:00 1-янв-3250",
+			"minute": 0,
+			"month": 1,
+			"second": 0,
+			"tick_u32": 2147483648,
+			"time_ru": "12:00:00",
+			"year": 3250
+		},
+		"source_orbit": {
+
+		},
+		"source_runtime": {
+			"body_count_byte": 43,
+			"count": 53,
+			"orbital_port_count_byte": 8,
+			"physical_layout_changed": false,
+			"port_count_byte": 18,
+			"record_domain": "packed_runtime_records",
+			"records_sha256": "b2d99151c651ea8792b66352fa021ff5cda60c0666db3dc98dcde1fdac7cec5d",
+			"source": "ffe_f878_handcrafted_suffix"
+		}
+	}
+]

@@ -1,7 +1,7 @@
 class_name PlanetarySystem
 extends RefCounted
-# Rebuilt integration of recovered analytic flight code and original source
-# constructor records. This is not the original FFE ephemeris/physics engine.
+# Original JJFFE orbital coordinates for new v2 worlds, with explicit analytic
+# SI surface/gravity adapters and preserved v1 analytic saved-world layouts.
 const AU_METERS:=149597870700.0
 const EARTHS_PER_SUN:=332946.0
 const YEAR_DAYS:=365.256
@@ -10,9 +10,15 @@ const SOLAR_MASS:=1.98847e30
 const SOL_ID:=0x02a49718
 const ARRIVAL_DIRECTION:=Vector3(0.48,-0.28,-1.0)
 const SOURCE_LAYOUT:="handcrafted_analytic_rebuild_v1"
+const NATIVE_LAYOUT:="handcrafted_jjffe_orbits_v2"
+const NATIVE_CONTRACT:="jjffe-f880-3250-anchor-f866-orbit-xyz-v1"
 const SOLAR_LAYOUT:="reconstructed_solar_v1"
 const EMPTY_LAYOUT:="source_unavailable_rebuild_v1"
 const RuntimeBuilder=preload("res://scripts/handcrafted_runtime_builder.gd")
+const SourceOrbit=preload("res://scripts/source_orbit.gd")
+const SourceClock=preload("res://scripts/source_clock.gd")
+const SourceUnits=preload("res://scripts/source_units.gd")
+const SourceMath=preload("res://scripts/ffe_math.gd")
 var source_digest:=""
 var star_context:Dictionary={}
 var layout_mode:=SOLAR_LAYOUT
@@ -34,6 +40,17 @@ var _translations:Dictionary={}
 var _source_hash:=""
 var source_runtime_state:Dictionary={}
 var _runtime_by_global:Dictionary={}
+var requested_layout:=SOURCE_LAYOUT
+var orbit_backend_state:Dictionary={}
+var native_evaluation_count:=0
+var _native_cache_tick:=-1
+var _native_cache_day:=-1
+var _native_positions_raw:Dictionary={}
+var _native_relative_raw:Dictionary={}
+
+func _clear_orbit_cache()->void:
+	_native_cache_tick=-1;_native_cache_day=-1
+	_native_positions_raw.clear();_native_relative_raw.clear();native_evaluation_count=0
 
 func _read_object(path:String)->Dictionary:
 	if not FileAccess.file_exists(path):return {}
@@ -53,27 +70,76 @@ func configure(star:Dictionary,layout:String="current")->void:
 	system_id=int(star.get("id",SOL_ID))
 	bodies.clear();by_id.clear();settlements.clear();site_id="";pending_site_id="";pending_id="";transfer_remaining=0;message=""
 	source_runtime_state.clear();_runtime_by_global.clear()
+	orbit_backend_state.clear();_clear_orbit_cache()
+	requested_layout=SOURCE_LAYOUT if layout=="current" else layout
 	_load_sources()
 	var applied:=false
-	if layout in ["current",SOURCE_LAYOUT]:
+	if layout in ["current",SOURCE_LAYOUT,NATIVE_LAYOUT]:
 		for entry in _source_worlds.get("systems",[]):
 			if entry is Dictionary and int(entry.get("system_id",-1))==system_id:
 				applied=_apply_handcrafted(entry);break
+	if applied and layout==NATIVE_LAYOUT:applied=_enable_native_orbits()
 	if applied:
-		layout_mode=SOURCE_LAYOUT;source_digest=(SOURCE_LAYOUT+str(system_id)+_source_hash).sha256_text()
+		layout_mode=NATIVE_LAYOUT if layout==NATIVE_LAYOUT else SOURCE_LAYOUT
+		source_digest=(layout_mode+str(system_id)+_source_hash+(SourceOrbit.SOURCE_VARIANT+NATIVE_CONTRACT+String.num(SourceUnits.METRES_PER_RAW,16) if layout_mode==NATIVE_LAYOUT else "")).sha256_text()
 	elif system_id==SOL_ID and layout in ["current",SOLAR_LAYOUT]:
 		source_runtime_state.clear();_runtime_by_global.clear()
 		bodies.clear();by_id.clear();settlements.clear()
 		_reconstructed_solar();layout_mode=SOLAR_LAYOUT;source_digest="physical-solar-adapter-v1".sha256_text()
 	else:
 		source_runtime_state.clear();_runtime_by_global.clear()
+		orbit_backend_state.clear();_clear_orbit_cache()
 		bodies.clear();by_id.clear();settlements.clear()
 		_add(_star_body(str(star.get("name","Звезда"))))
 		default_id="star";layout_mode=EMPTY_LAYOUT;source_digest=(EMPTY_LAYOUT+str(system_id)).sha256_text()
 		message="Для этой системы пока не восстановлены исходные данные миров."
 	focus_id=default_id;selected_id=default_id
 
-func preferred_layout()->String:return layout_mode
+func preferred_layout()->String:
+	# Legacy jumps always selected the current source adapter, including jumps
+	# out of an explicitly restored Solar adapter. Only v2 opts into new orbits.
+	return NATIVE_LAYOUT if requested_layout==NATIVE_LAYOUT else SOURCE_LAYOUT
+
+func _enable_native_orbits()->bool:
+	if source_runtime_state.is_empty():return false
+	for body in bodies:
+		var raw:=str(body.get("runtime_record_hex","")).hex_decode()
+		if raw.size()!=68:return false
+		var packed_orbit:=int(raw.decode_u32(14));var packed_period:=int(raw.decode_u32(20))
+		var distance:=SourceUnits.metres(SourceMath.real(packed_orbit))
+		var seconds:=SourceMath.real(packed_period)
+		if not is_finite(distance) or not is_finite(seconds) or distance<0 or seconds<0:return false
+		body.a_au=distance/AU_METERS;body.period_days=seconds/86400.0
+		body.inclination=float(SourceMath.s16(raw.decode_u16(34)))*TAU/65536.0
+		body.orbit_backend=SourceOrbit.SOURCE_VARIANT
+		body.physical_adapter="analytic_si_rebuild_v1"
+	if not _prepare_native_positions(0.0):return false
+	source_runtime_state.physical_layout_changed=true
+	orbit_backend_state={"source_variant":SourceOrbit.SOURCE_VARIANT,"contract":NATIVE_CONTRACT,"layout":NATIVE_LAYOUT,"coordinate_units":"raw geometry calibrated by16785/2^24 metres","celestial_parent_composition":"non-rotating signed64 translation","clock":"fixed F880 initialization at3250 epoch then ordinary F866 orbital updates via elapsed-days bridge","epoch_tick_u32":SourceClock.EPOCH_TICK_U32,"epoch_day_u32":SourceClock.EPOCH_DAY_U32,"radius_mass_gravity_spin":"analytic_si_rebuild_v1","orbital_ports_rendered":false,"complete_original_physics":false}
+	return true
+
+func _prepare_native_positions(days:float)->bool:
+	var clock:=SourceClock.from_elapsed_days(days)
+	if clock.is_empty():return false
+	if _native_cache_tick==int(clock.tick_u32) and _native_cache_day==int(clock.day_u32):return true
+	var relative:Dictionary={};var absolute:Dictionary={}
+	for body in bodies:
+		var record:=str(body.get("runtime_record_hex","")).hex_decode()
+		if record.size()!=68:return false
+		var evaluated:=SourceOrbit.evaluate_from_epoch(record,clock.tick_u32,clock.day_u32,SourceClock.EPOCH_TICK_U32,SourceClock.EPOCH_DAY_U32)
+		if evaluated.is_empty():return false
+		var point:PackedInt64Array=evaluated.position_raw
+		var parent:=str(body.parent)
+		if not parent.is_empty() and not absolute.has(parent):return false
+		relative[str(body.id)]=point.duplicate()
+		absolute[str(body.id)]=SourceOrbit.add_positions(absolute[parent],point) if not parent.is_empty() else point.duplicate()
+	_native_relative_raw=relative;_native_positions_raw=absolute
+	_native_cache_tick=int(clock.tick_u32);_native_cache_day=int(clock.day_u32)
+	native_evaluation_count+=bodies.size()
+	return true
+
+static func _source_au(point:PackedInt64Array)->Array:
+	return [SourceUnits.metres(float(point[0]))/AU_METERS,SourceUnits.metres(float(point[1]))/AU_METERS,SourceUnits.metres(float(point[2]))/AU_METERS]
 
 func _star_body(title:String)->Dictionary:
 	return {"id":"star","name":title,"name_en":str(star_context.get("original_name",title)),"parent":"","kind":"star","radius_km":696340.0,"mass_solar":1.0,"a_au":0.0,"eccentricity":0.0,"inclination":0.0,"node":0.0,"periapsis":0.0,"phase":0.0,"period_days":0.0,"rotation_hours":600.0,"rings":false,"source":"reconstructed_arrival_star"}
@@ -204,6 +270,9 @@ static func eccentric_anomaly(mean:float,eccentricity:float)->float:
 	return e
 
 func relative_au(body:Dictionary,days:float)->Array:
+	if layout_mode==NATIVE_LAYOUT:
+		if not _prepare_native_positions(days) or not _native_relative_raw.has(str(body.get("id",""))):return []
+		return _source_au(_native_relative_raw[str(body.id)])
 	if str(body.parent).is_empty():return [0.0,0.0,0.0]
 	var ecc:=float(body.eccentricity);var period:=float(body.period_days)
 	var mean:=float(body.phase)+(TAU*fposmod(days,period)/period if period>0 else 0.0)
@@ -215,6 +284,9 @@ func relative_au(body:Dictionary,days:float)->Array:
 
 func position_au(id:String,days:float)->Array:
 	if not by_id.has(id) or not is_finite(days):return []
+	if layout_mode==NATIVE_LAYOUT:
+		if not _prepare_native_positions(days):return []
+		return _source_au(_native_positions_raw[id])
 	var result:Array=[0.0,0.0,0.0];var cursor:=id
 	for _depth in range(32):
 		var body:Dictionary=by_id[cursor];var relative:=relative_au(body,days)
@@ -239,6 +311,7 @@ func local_meters(id:String,days:float)->Vector3:
 
 func gravity_at(position:Vector3,days:float)->Vector3:
 	if not position.is_finite() or not is_finite(days):return Vector3.ZERO
+	if layout_mode==NATIVE_LAYOUT and not _prepare_native_positions(days):return Vector3.ZERO
 	var gravity:=Vector3.ZERO
 	for body in bodies:
 		if body.kind=="barycenter":continue
@@ -337,11 +410,20 @@ func protect_surface(ship:RefCounted,days:float)->bool:
 	return true
 
 func snapshot()->Dictionary:
-	return {"schema":"starfrontier-rebuild-world-v1","version":1,"layout":layout_mode,"source_digest":source_digest,"system_id":system_id,"focus_id":focus_id,"selected_id":selected_id,"site_id":site_id,"pending_id":pending_id,"pending_site_id":pending_site_id,"transfer_remaining":transfer_remaining}
+	var result:={"schema":"starfrontier-rebuild-world-v1","version":1,"layout":layout_mode,"source_digest":source_digest,"system_id":system_id,"focus_id":focus_id,"selected_id":selected_id,"site_id":site_id,"pending_id":pending_id,"pending_site_id":pending_site_id,"transfer_remaining":transfer_remaining}
+	if requested_layout==NATIVE_LAYOUT:
+		result.schema="starfrontier-rebuild-world-v2";result.version=2;result["preferred_layout"]=NATIVE_LAYOUT
+	return result
 
 func restore(data:Dictionary)->bool:
-	if data.get("schema")!="starfrontier-rebuild-world-v1" or data.get("version")!=1 or not (data.get("system_id") is int or data.get("system_id") is float) or not is_finite(float(data.system_id)) or float(data.system_id)!=float(system_id):return false
-	if data.get("layout") not in [SOURCE_LAYOUT,SOLAR_LAYOUT,EMPTY_LAYOUT] or not data.get("source_digest") is String:return false
+	var native_save:bool=data.get("schema")=="starfrontier-rebuild-world-v2" and data.get("version")==2
+	var legacy_save:bool=data.get("schema")=="starfrontier-rebuild-world-v1" and data.get("version")==1
+	if not native_save and not legacy_save:return false
+	if not (data.get("system_id") is int or data.get("system_id") is float) or not is_finite(float(data.system_id)) or float(data.system_id)!=float(system_id):return false
+	if not data.get("source_digest") is String:return false
+	if native_save:
+		if data.get("layout") not in [NATIVE_LAYOUT,EMPTY_LAYOUT] or data.get("preferred_layout")!=NATIVE_LAYOUT:return false
+	elif data.get("layout") not in [SOURCE_LAYOUT,SOLAR_LAYOUT,EMPTY_LAYOUT] or data.has("preferred_layout"):return false
 	for key in ["focus_id","selected_id","site_id","pending_id","pending_site_id"]:
 		if not data.get(key) is String:return false
 	var remaining:Variant=data.get("transfer_remaining")
@@ -361,6 +443,10 @@ func restore(data:Dictionary)->bool:
 	elif not str(data.pending_id).is_empty() or not str(data.pending_site_id).is_empty():return false
 	bodies=candidate.bodies;by_id=candidate.by_id;settlements=candidate.settlements;default_id=candidate.default_id
 	layout_mode=candidate.layout_mode;source_digest=candidate.source_digest
+	requested_layout=NATIVE_LAYOUT if native_save else (SOURCE_LAYOUT if layout_mode==EMPTY_LAYOUT else layout_mode)
+	orbit_backend_state=candidate.orbit_backend_state.duplicate(true)
+	_native_cache_tick=candidate._native_cache_tick;_native_cache_day=candidate._native_cache_day
+	_native_positions_raw=candidate._native_positions_raw.duplicate(true);_native_relative_raw=candidate._native_relative_raw.duplicate(true);native_evaluation_count=candidate.native_evaluation_count
 	source_runtime_state=candidate.source_runtime_state.duplicate(true);_runtime_by_global=candidate._runtime_by_global.duplicate(true)
 	focus_id=str(data.focus_id);selected_id=str(data.selected_id);site_id=str(data.site_id)
 	pending_id=str(data.pending_id);pending_site_id=str(data.pending_site_id);transfer_remaining=float(remaining);message=""

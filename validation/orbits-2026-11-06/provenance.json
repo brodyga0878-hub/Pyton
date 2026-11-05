@@ -1,0 +1,28 @@
+{
+  "scope": "Current native JJFFE orbital integration and immutable legacy controls. Standalone tests, actualMain smoke, rendered frames and APK verification; no physicalphone/fullphysics claim.",
+  "version": "0.11.10-orbits-alpha1",
+  "validation": "orbit-validation.json",
+  "apk_verification": "orbit-android-verification.json",
+  "screenshots": "screenshots/capture-manifest.json",
+  "legacy_baseline_commit": "c0d6f0153994ce1bd94eae441a4007ab0c6ac33d",
+  "source_variant": "jjffe-7e54034-q31-orbit",
+  "source_contract": "jjffe-f880-3250-anchor-f866-orbit-xyz-v1",
+  "source_files_sha256": {
+    "scripts/main.gd": "3531575b79046c63a327a1282fdca5ff22404a31e4ef1d27f9a1f826415f43d6",
+    "scripts/planetary_system.gd": "9e295c944f877ad1e028dbe8359dc161688b2bdfd95fdabe225a4be7dcb36c5c",
+    "scripts/source_orbit.gd": "7091ed3bbb88e79434ce21d53b3c98bf7f01391ee8a20a736c5e7c56eef55579",
+    "scripts/source_clock.gd": "b2d206a9e2e6db21635fe37d6f61ba75d2fb9f56d92f8851a77c9b11fc4dbe09",
+    "scripts/source_units.gd": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24",
+    "tests/test_source_orbit.gd": "ca1bf98b1ba2ac1051118a5b402f11f28e2eb9827ed15cc8e2a559c5bb3d01bb",
+    "tests/test_source_orbit_integration.gd": "fc14244811d67ab42b00eda6ef950da262e9b1947efc0a081073854f4a3f8012",
+    "tests/test_bug_report_ui.gd": "e1796b55efd7c4d6703b886096e0b9e56bd80d36dae8f3d105f440d063fbbe6f",
+    "tools/rebuild_source_orbit_native.py": "8ade24cd884773b354ff6178f3b7f4937bcfe2ded0d3f1362362013928faa1e2",
+    "tools/verify_rebuilt_android.py": "be5f06d04f283dd92e57b44ff69f3687882daec179a4902be23339753318719d"
+  },
+  "native_fixtures_sha256": {
+    "source_orbit_native.json": "9ccb21258ad4ec5796de75bb357d63f4f7711312ca61f06200d89480f42fc0a9",
+    "handcrafted_runtime_native.json": "e09016da974e0e9e188bff12d463784bb2c1f2b23588bbe64632e137f8e486cd"
+  },
+  "physical_device_tested": false,
+  "complete_original_physics": false
+}
