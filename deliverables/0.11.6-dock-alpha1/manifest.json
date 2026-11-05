@@ -1,0 +1,35 @@
+{
+  "version": "0.11.6-dock-alpha1",
+  "source_commit": "cea5f59db6460edea20a8dc6b5a39653c0f0f5a4",
+  "files": {
+    "StarFrontier-0.11.6-dock-source.zip": {
+      "bytes": 11924396,
+      "sha256": "59611f1ef9a4e44db86f8e854af49728e0b1f0c2f0f49f2411c45aded76e1ecb"
+    },
+    "StarFrontier-0.11.6-dock-arm64.apk": {
+      "bytes": 36080466,
+      "sha256": "d4b0231675580a6a4ba6c8b9ea07f8644f446f743a6b002372a3c72809eb9139"
+    }
+  },
+  "checks": 3225,
+  "passed_suites": 23,
+  "failure_count": 0,
+  "classic_lower_console_preserved": true,
+  "automatic_ground_departure": true,
+  "existing_ascent_save_resume": true,
+  "roof_preflight_uses_live_collision": true,
+  "training_goods_exposed": 6,
+  "training_hull_repair": true,
+  "full_original_docking_implemented": false,
+  "full_original_port_services_implemented": false,
+  "full_original_economy_implemented": false,
+  "physical_device_tested": false,
+  "test_signing_key_only": true,
+  "full_original_port_complete": false,
+  "publication_ready": false,
+  "source_archive_excludes": [
+    "deliverables",
+    "validation"
+  ],
+  "validation_path": "validation/dock-2026-11-05"
+}
