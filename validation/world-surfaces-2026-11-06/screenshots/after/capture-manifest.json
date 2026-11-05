@@ -1,0 +1,348 @@
+{
+	"captures": [
+		{
+			"body_id": "earth",
+			"body_kind": "earth",
+			"body_name": "Земля",
+			"body_source": "ffe_constructor_parameters",
+			"camera_fov": 58,
+			"camera_position": [
+				680.0,
+				95.3639831542969,
+				636.0
+			],
+			"camera_target": [
+				680.0,
+				87.3639831542969,
+				620.0
+			],
+			"decorative_asteroids_visible": false,
+			"dry_run": false,
+			"elapsed_days": 0.0,
+			"file": "01-earth-ground-and-classic-console.png",
+			"game_payload_sha256": "412fc684901ae4c2cb65e936c890ad51600cc127710321b7a3789fae1927ba4d",
+			"graphics_demo": false,
+			"hud": true,
+			"image_composited": false,
+			"kind": "actual Main with fixed review camera and explicit shader-clock fixture",
+			"label": "0.11.8-terrain-alpha1",
+			"layout_mode": "handcrafted_analytic_rebuild_v1",
+			"original_type": 10,
+			"phone_capture": false,
+			"quality": 2,
+			"review": {
+				"adapter_layout": false,
+				"body_kind_is_unmodified": true,
+				"camera_review_pose": true,
+				"scope": "existing natural ground, outside initial420m pad grading",
+				"target_height_m": 87.3639831542969
+			},
+			"scene": "actual scenes/main.tscn",
+			"shader_clock_fixture": {
+				"all_existing_uniform_values_preserved": true,
+				"frozen_shader_sha256": "b3eb2771e860a114a79212fbf9d41c7719f9e41cb57121cc3b3e0206ef701e25",
+				"mode": "capture-only PlanetShader clone: TIME token fixed to literal0.0",
+				"physics_elapsed_days_unchanged": true,
+				"source_shader_sha256": "547e5bb5c25340519eb90e7f5c78b788b9c7e07ad949118f75dda45005ce6bad"
+			},
+			"source_digest": "7e9565c29346efe1e9071cbb2b233fe4b88441638a059431bf1313cea741cddd",
+			"surface_active": true,
+			"surface_kind": "earth",
+			"surface_revision": "sphere-source-cities-v3",
+			"surface_seed": 234702593,
+			"system_id": 44341016,
+			"user_progress_read": false,
+			"user_progress_written": false
+		},
+		{
+			"body_id": "moon",
+			"body_kind": "rock",
+			"body_name": "Луна",
+			"body_source": "ffe_constructor_parameters",
+			"camera_fov": 58,
+			"camera_position": [
+				680.0,
+				-52.0498657226562,
+				636.0
+			],
+			"camera_target": [
+				680.0,
+				-60.5450897216797,
+				620.0
+			],
+			"decorative_asteroids_visible": false,
+			"dry_run": false,
+			"elapsed_days": 0.0,
+			"file": "02-moon-rock-ground.png",
+			"game_payload_sha256": "aa78d32b90d4b57daa2e73403760f334a557e68f81142a7767ade8cbed06a1d1",
+			"graphics_demo": false,
+			"hud": false,
+			"image_composited": false,
+			"kind": "actual Main with fixed review camera and explicit shader-clock fixture",
+			"label": "0.11.8-terrain-alpha1",
+			"layout_mode": "handcrafted_analytic_rebuild_v1",
+			"original_type": 3,
+			"phone_capture": false,
+			"quality": 2,
+			"review": {
+				"adapter_layout": false,
+				"body_kind_is_unmodified": true,
+				"camera_review_pose": true,
+				"scope": "existing natural ground, outside initial420m pad grading",
+				"target_height_m": -60.5450897216797
+			},
+			"scene": "actual scenes/main.tscn",
+			"shader_clock_fixture": {
+				"all_existing_uniform_values_preserved": true,
+				"frozen_shader_sha256": "b3eb2771e860a114a79212fbf9d41c7719f9e41cb57121cc3b3e0206ef701e25",
+				"mode": "capture-only PlanetShader clone: TIME token fixed to literal0.0",
+				"physics_elapsed_days_unchanged": true,
+				"source_shader_sha256": "547e5bb5c25340519eb90e7f5c78b788b9c7e07ad949118f75dda45005ce6bad"
+			},
+			"source_digest": "7e9565c29346efe1e9071cbb2b233fe4b88441638a059431bf1313cea741cddd",
+			"surface_active": true,
+			"surface_kind": "rock",
+			"surface_revision": "sphere-source-cities-v3",
+			"surface_seed": 2118003878,
+			"system_id": 44341016,
+			"user_progress_read": false,
+			"user_progress_written": false
+		},
+		{
+			"body_id": "venus",
+			"body_kind": "desert",
+			"body_name": "Венера",
+			"body_source": "ffe_constructor_parameters",
+			"camera_fov": 58,
+			"camera_position": [
+				680.0,
+				-71.2813262939453,
+				636.0
+			],
+			"camera_target": [
+				680.0,
+				-81.2055358886719,
+				620.0
+			],
+			"decorative_asteroids_visible": false,
+			"dry_run": false,
+			"elapsed_days": 0.0,
+			"file": "03-venus-desert-ground.png",
+			"game_payload_sha256": "06e398ef977fcabc75a450c9019961e9eb87e760a398a1fdeed6666fd5c4a050",
+			"graphics_demo": false,
+			"hud": false,
+			"image_composited": false,
+			"kind": "actual Main with fixed review camera and explicit shader-clock fixture",
+			"label": "0.11.8-terrain-alpha1",
+			"layout_mode": "handcrafted_analytic_rebuild_v1",
+			"original_type": 12,
+			"phone_capture": false,
+			"quality": 2,
+			"review": {
+				"adapter_layout": false,
+				"body_kind_is_unmodified": true,
+				"camera_review_pose": true,
+				"scope": "existing natural ground, outside initial420m pad grading",
+				"target_height_m": -81.2055358886719
+			},
+			"scene": "actual scenes/main.tscn",
+			"shader_clock_fixture": {
+				"all_existing_uniform_values_preserved": true,
+				"frozen_shader_sha256": "b3eb2771e860a114a79212fbf9d41c7719f9e41cb57121cc3b3e0206ef701e25",
+				"mode": "capture-only PlanetShader clone: TIME token fixed to literal0.0",
+				"physics_elapsed_days_unchanged": true,
+				"source_shader_sha256": "547e5bb5c25340519eb90e7f5c78b788b9c7e07ad949118f75dda45005ce6bad"
+			},
+			"source_digest": "7e9565c29346efe1e9071cbb2b233fe4b88441638a059431bf1313cea741cddd",
+			"surface_active": true,
+			"surface_kind": "desert",
+			"surface_revision": "sphere-source-cities-v3",
+			"surface_seed": 304809550,
+			"system_id": 44341016,
+			"user_progress_read": false,
+			"user_progress_written": false
+		},
+		{
+			"body_id": "pluto",
+			"body_kind": "ice",
+			"body_name": "Плутон",
+			"body_source": "reconstructed_solar_adapter",
+			"camera_fov": 58,
+			"camera_position": [
+				680.0,
+				1.8397216796875,
+				636.0
+			],
+			"camera_target": [
+				680.0,
+				-6.1602783203125,
+				620.0
+			],
+			"decorative_asteroids_visible": false,
+			"dry_run": false,
+			"elapsed_days": 0.0,
+			"file": "04-pluto-ice-ground-explicit-solar-adapter.png",
+			"game_payload_sha256": "cce23b8f0624a2e0a4b358ed39c0cb5a0234f0569bf53d355f275f82f42582e7",
+			"graphics_demo": false,
+			"hud": false,
+			"image_composited": false,
+			"kind": "actual Main with fixed review camera and explicit shader-clock fixture",
+			"label": "0.11.8-terrain-alpha1",
+			"layout_mode": "reconstructed_solar_v1",
+			"original_type": -1,
+			"phone_capture": false,
+			"quality": 2,
+			"review": {
+				"adapter_layout": true,
+				"body_kind_is_unmodified": true,
+				"camera_review_pose": true,
+				"scope": "existing natural ground, outside initial420m pad grading",
+				"target_height_m": -6.1602783203125
+			},
+			"scene": "actual scenes/main.tscn",
+			"shader_clock_fixture": {
+				"all_existing_uniform_values_preserved": true,
+				"frozen_shader_sha256": "b3eb2771e860a114a79212fbf9d41c7719f9e41cb57121cc3b3e0206ef701e25",
+				"mode": "capture-only PlanetShader clone: TIME token fixed to literal0.0",
+				"physics_elapsed_days_unchanged": true,
+				"source_shader_sha256": "547e5bb5c25340519eb90e7f5c78b788b9c7e07ad949118f75dda45005ce6bad"
+			},
+			"source_digest": "8e8529b64f3128f885d75ae86913fc0efd11730c5ab3d87e16389f4331730026",
+			"surface_active": true,
+			"surface_kind": "ice",
+			"surface_revision": "sphere-source-cities-v3",
+			"surface_seed": 310535553,
+			"system_id": 44341016,
+			"user_progress_read": false,
+			"user_progress_written": false
+		},
+		{
+			"body_id": "earth",
+			"body_kind": "earth",
+			"body_name": "Земля",
+			"body_source": "ffe_constructor_parameters",
+			"camera_fov": 58,
+			"camera_position": [
+				10692326.0,
+				-6237190.0,
+				-43299980.0
+			],
+			"camera_target": [
+				10692326.0,
+				-6237190.0,
+				-43233176.0
+			],
+			"decorative_asteroids_visible": false,
+			"dry_run": false,
+			"elapsed_days": 0.0,
+			"file": "05-earth-from-orbit.png",
+			"game_payload_sha256": "a80cc5b4baa4cb39921f1bd24f5b32b97b85f35a13c2e498cc4a0bab1d7a5a2d",
+			"graphics_demo": false,
+			"hud": false,
+			"image_composited": false,
+			"kind": "actual Main with fixed review camera and explicit shader-clock fixture",
+			"label": "0.11.8-terrain-alpha1",
+			"layout_mode": "handcrafted_analytic_rebuild_v1",
+			"original_type": 10,
+			"phone_capture": false,
+			"quality": 2,
+			"review": {
+				"adapter_layout": false,
+				"body_kind_is_unmodified": true,
+				"camera_review_pose": true,
+				"observer_relative_to_body_radii": 3.3,
+				"scope": "existing compressed orbital planet renderer"
+			},
+			"scene": "actual scenes/main.tscn",
+			"shader_clock_fixture": {
+				"all_existing_uniform_values_preserved": true,
+				"frozen_shader_sha256": "b3eb2771e860a114a79212fbf9d41c7719f9e41cb57121cc3b3e0206ef701e25",
+				"mode": "capture-only PlanetShader clone: TIME token fixed to literal0.0",
+				"physics_elapsed_days_unchanged": true,
+				"source_shader_sha256": "547e5bb5c25340519eb90e7f5c78b788b9c7e07ad949118f75dda45005ce6bad"
+			},
+			"source_digest": "7e9565c29346efe1e9071cbb2b233fe4b88441638a059431bf1313cea741cddd",
+			"surface_active": false,
+			"surface_kind": "",
+			"surface_revision": "",
+			"surface_seed": 0,
+			"system_id": 44341016,
+			"user_progress_read": false,
+			"user_progress_written": false
+		},
+		{
+			"body_id": "moon",
+			"body_kind": "rock",
+			"body_name": "Луна",
+			"body_source": "ffe_constructor_parameters",
+			"camera_fov": 58,
+			"camera_position": [
+				2928586.75,
+				-1701563.5,
+				-11808082.0
+			],
+			"camera_target": [
+				2928444.0,
+				-1701556.125,
+				-11743887.0
+			],
+			"decorative_asteroids_visible": false,
+			"dry_run": false,
+			"elapsed_days": 0.0,
+			"file": "06-moon-from-orbit.png",
+			"game_payload_sha256": "41c8392da629a05c7e3f10bb5f62ca2d14e7ad59f6292ab900517f07de8cc746",
+			"graphics_demo": false,
+			"hud": false,
+			"image_composited": false,
+			"kind": "actual Main with fixed review camera and explicit shader-clock fixture",
+			"label": "0.11.8-terrain-alpha1",
+			"layout_mode": "handcrafted_analytic_rebuild_v1",
+			"original_type": 3,
+			"phone_capture": false,
+			"quality": 2,
+			"review": {
+				"adapter_layout": false,
+				"body_kind_is_unmodified": true,
+				"camera_review_pose": true,
+				"observer_relative_to_body_radii": 3.3,
+				"scope": "existing compressed orbital planet renderer"
+			},
+			"scene": "actual scenes/main.tscn",
+			"shader_clock_fixture": {
+				"all_existing_uniform_values_preserved": true,
+				"frozen_shader_sha256": "b3eb2771e860a114a79212fbf9d41c7719f9e41cb57121cc3b3e0206ef701e25",
+				"mode": "capture-only PlanetShader clone: TIME token fixed to literal0.0",
+				"physics_elapsed_days_unchanged": true,
+				"source_shader_sha256": "547e5bb5c25340519eb90e7f5c78b788b9c7e07ad949118f75dda45005ce6bad"
+			},
+			"source_digest": "7e9565c29346efe1e9071cbb2b233fe4b88441638a059431bf1313cea741cddd",
+			"surface_active": false,
+			"surface_kind": "",
+			"surface_revision": "",
+			"surface_seed": 0,
+			"system_id": 44341016,
+			"user_progress_read": false,
+			"user_progress_written": false
+		}
+	],
+	"display_server": "X11",
+	"dry_run": false,
+	"engine": "4.6.3-stable (official)",
+	"explicit_reconstructed_solar_ice_fixture": true,
+	"image_composited": false,
+	"kind": "actual Main material comparison with fixed camera/clock review fixtures",
+	"label": "0.11.8-terrain-alpha1",
+	"native_source_kinds_shown": [
+		"earth",
+		"rock",
+		"desert"
+	],
+	"phone_capture": false,
+	"renderer": "gl_compatibility",
+	"user_progress_read": false,
+	"user_progress_written": false,
+	"viewport_size": [
+		1920,
+		1080
+	]
+}

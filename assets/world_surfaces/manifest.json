@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "resolution": 1024,
+  "license": "CC0-1.0",
+  "authoring": "Original deterministic toroidal natural PBR art: soil/organic cover/mineral pebbles, fractured strata, sand ripples/dry clay and fissured frozen layers. No borrowed imagery, baked directional illumination, macro geography or geometry.",
+  "normal_convention": "OpenGL +Y; image rows grow down; no green inversion on import",
+  "orm_channels": {
+    "r": "ambient_occlusion",
+    "g": "roughness",
+    "b": "metallic"
+  },
+  "edge_antialiasing": "Analytic subpixel coverage on pebble and fissure distance fields, mipmapped lossless imports",
+  "materials": {
+    "earth": {
+      "seed": 1186207,
+      "mean_linear_luminance": 0.32054058,
+      "mean_roughness": 0.88638562,
+      "mean_metallic": 0.0,
+      "files": {
+        "albedo": {
+          "sha256": "44d51d80cdafd253b92c019bccca1e0e31f3ef3663ff36903eb9ec5792a7f258",
+          "bytes": 849016,
+          "seam_gradient_ratio": 0.63647
+        },
+        "normal": {
+          "sha256": "cda378b31bd962e81ed2f84ce25a098a0cf82c95561cc3d144409eb970785740",
+          "bytes": 1056950,
+          "seam_gradient_ratio": 0.81465
+        },
+        "orm": {
+          "sha256": "060a42ebc2aa8e010033c39065ac8e5d2af11060024032c8cbbdbe98fdb82914",
+          "bytes": 645434,
+          "seam_gradient_ratio": 0.60878
+        }
+      }
+    },
+    "rock": {
+      "seed": 1194134,
+      "mean_linear_luminance": 0.42705578,
+      "mean_roughness": 0.84210699,
+      "mean_metallic": 0.0,
+      "files": {
+        "albedo": {
+          "sha256": "ab87abd92bc7e160de97723a1cddfc29ab9f5bbb7cdc5d0ba74cdb3fde24987f",
+          "bytes": 820947,
+          "seam_gradient_ratio": 1.27368
+        },
+        "normal": {
+          "sha256": "5cbee4649d5e3f63687f5d2ea6f750687340602b6e4a116e9877984c255776a3",
+          "bytes": 957497,
+          "seam_gradient_ratio": 1.32125
+        },
+        "orm": {
+          "sha256": "e94b71f50aa1ff02a155e466a61b63ebb8e538df30493399a0b32ad9afb73546",
+          "bytes": 507514,
+          "seam_gradient_ratio": 1.41059
+        }
+      }
+    },
+    "desert": {
+      "seed": 1202061,
+      "mean_linear_luminance": 0.48721403,
+      "mean_roughness": 0.923769,
+      "mean_metallic": 0.0,
+      "files": {
+        "albedo": {
+          "sha256": "01a3e4f236acabe01192596373d858844477314d6b297b454a3f8ef8052100ac",
+          "bytes": 877732,
+          "seam_gradient_ratio": 1.61746
+        },
+        "normal": {
+          "sha256": "2fadba22305a4e52a94f08bb38d87adf27251efdee9898a2377083f51adc6edc",
+          "bytes": 1112536,
+          "seam_gradient_ratio": 1.61886
+        },
+        "orm": {
+          "sha256": "d23403ae60c8931cba7d68aef5d8ac2da6d15ac0d3bd2cb9ef34262d0c748da3",
+          "bytes": 330112,
+          "seam_gradient_ratio": 2.17995
+        }
+      }
+    },
+    "ice": {
+      "seed": 1209988,
+      "mean_linear_luminance": 0.61190843,
+      "mean_roughness": 0.39937706,
+      "mean_metallic": 0.0,
+      "files": {
+        "albedo": {
+          "sha256": "14d20f61d7a1e9e03c23ef4bee7742fedb83268e73d92182ca28aa75ad6a998f",
+          "bytes": 704756,
+          "seam_gradient_ratio": 1.09396
+        },
+        "normal": {
+          "sha256": "5271e4439828ffea08eb332341087090c37a9c77d15994cac99cca4b9a2c0239",
+          "bytes": 683878,
+          "seam_gradient_ratio": 1.56095
+        },
+        "orm": {
+          "sha256": "45e744827c6b0ca553270a285743c3607ed8ba8558caf105b992773967ff3cd9",
+          "bytes": 450911,
+          "seam_gradient_ratio": 0.56683
+        }
+      }
+    }
+  }
+}

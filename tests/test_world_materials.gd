@@ -4,6 +4,7 @@ const Visual=preload("res://scripts/source_model_visual.gd")
 const SurfaceVisual=preload("res://scripts/surface_visual.gd")
 const Materials=preload("res://scripts/material_library.gd")
 const CityMaterials=preload("res://scripts/city_surface_library.gd")
+const WorldMaterials=preload("res://scripts/world_surface_library.gd")
 const Units=preload("res://scripts/source_units.gd")
 class FakeSurface extends RefCounted:
  const GRID_WIDTH:=32.0
@@ -57,9 +58,9 @@ func run()->void:
  var ground:MeshInstance3D=terrain.get_child(0)
  var ground_mesh:Mesh=ground.mesh
  var ground_arrays:Array=ground_mesh.surface_get_arrays(0)
- check(ground.material_override.get_shader_parameter("material_albedo")==Materials.texture("rock","albedo"),"Rock terrain has real albedo texture")
- check(ground.material_override.get_shader_parameter("material_normal")==Materials.texture("rock","normal"),"Rock terrain has real normal texture")
- check(ground.material_override.get_shader_parameter("material_orm")==Materials.texture("rock","orm"),"Rock terrain has packed AO/roughness/metallic texture")
+ check(ground.material_override.get_shader_parameter("material_albedo")==WorldMaterials.texture("rock","albedo"),"Rock terrain has dedicated natural albedo texture")
+ check(ground.material_override.get_shader_parameter("material_normal")==WorldMaterials.texture("rock","normal"),"Rock terrain has dedicated natural normal texture")
+ check(ground.material_override.get_shader_parameter("material_orm")==WorldMaterials.texture("rock","orm"),"Rock terrain has dedicated natural packed AO/roughness/metallic texture")
  var pad_found:=false;var building_found:=false
  for child in terrain.get_children():
   if child is MeshInstance3D and child.material_override is ShaderMaterial:
@@ -69,13 +70,15 @@ func run()->void:
     building_found=child.material_override.get_shader_parameter("material_albedo")==Materials.texture("concrete","albedo")
  check(pad_found and building_found,"Existing fallback pad/building receive asphalt and concrete maps")
  terrain.set_view_coverage(0.35)
- check(ground.material_override.shader==terrain.TransitionShader and ground.material_override.get_shader_parameter("material_albedo")==Materials.texture("rock","albedo"),"Transition retains the same terrain texture resources")
+ check(ground.material_override.shader==terrain.TransitionShader and ground.material_override.get_shader_parameter("material_albedo")==WorldMaterials.texture("rock","albedo"),"Transition retains the same terrain texture resources")
  terrain.set_view_coverage(1.0);terrain.set_quality(0)
  check(ground.mesh==ground_mesh and ground.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]==ground_arrays[Mesh.ARRAY_VERTEX] and ground.mesh.surface_get_arrays(0)[Mesh.ARRAY_NORMAL]==ground_arrays[Mesh.ARRAY_NORMAL],"Coverage and material quality do not change terrain coordinates/normals")
  check(int(ground.material_override.get_shader_parameter("detail_level"))==0,"Low terrain quality disables map shading branch")
  surface.kind="ice";terrain.configure(surface)
  ground=terrain.get_child(0)
- check(ground.material_override.get_shader_parameter("material_albedo")==Materials.texture("ice","albedo"),"Existing ice terrain selects ice texture pack")
+ check(ground.material_override.get_shader_parameter("material_albedo")==null,"New ice terrain at low quality keeps its maps unbound")
+ terrain.set_quality(2)
+ check(ground.material_override.get_shader_parameter("material_albedo")==WorldMaterials.texture("ice","albedo"),"Existing ice terrain selects dedicated ice texture pack")
  visual.queue_free();terrain.queue_free();await process_frame
  print("WORLD MATERIAL TESTS: %d checks, %d failures; synthetic render adapter geometry only"%[checks,failures])
  quit(1 if failures else 0)

@@ -4,14 +4,24 @@ const TerrainShader=preload("res://scripts/terrain.gdshader")
 const PadShader=preload("res://scripts/landing_pad.gdshader")
 const BuildingShader=preload("res://scripts/building.gdshader")
 const Materials=preload("res://scripts/material_library.gd")
+const WorldMaterials=preload("res://scripts/world_surface_library.gd")
 var quality:=2
 var view_coverage:=1.0
+var world_material_kind:="rock"
 func set_quality(value:int)->void:
 	quality=clampi(value,0,2)
 	for child in get_children():
 		if child is MeshInstance3D and child.material_override is ShaderMaterial:
 			if child.material_override.shader in [TerrainShader,TransitionShader,BuildingShader,PadShader]:
 				child.material_override.set_shader_parameter("detail_level",quality)
+				if child.material_override.shader in [TerrainShader,TransitionShader]:_bind_ground_material(child.material_override)
+
+func _bind_ground_material(material:ShaderMaterial)->void:
+	if quality==0:WorldMaterials.clear_material(material);return
+	var scale:=0.03125 if world_material_kind=="ice" else 0.0625
+	if not WorldMaterials.bind_shader(material,world_material_kind,scale):
+		material.set_shader_parameter("detail_level",0)
+		push_error("World surface material could not be loaded: "+world_material_kind)
 
 
 func configure(surface: RefCounted) -> void:
@@ -20,6 +30,7 @@ func configure(surface: RefCounted) -> void:
 	if get_meta("terrain_key","")==cache_key and get_child_count()>0:return
 	for child in get_children():remove_child(child);child.queue_free()
 	set_meta("terrain_key",cache_key)
+	world_material_kind=WorldMaterials.canonical_kind(str(surface.kind))
 	var base: Color={"earth":Color("426b51"),"ice":Color("a5c5cf"),"desert":Color("aa714d"),"rock":Color("737984")}.get(surface.kind,Color("737984"))
 	var count:int=surface.grid_cells() if surface.has_method("grid_cells") else surface.GRID_CELLS
 	var width: float=surface.GRID_WIDTH
@@ -64,7 +75,7 @@ func configure(surface: RefCounted) -> void:
 	mat.set_shader_parameter("detail_level",quality)
 	mat.set_shader_parameter("spherical_coordinates",spherical)
 	mat.set_shader_parameter("surface_kind",int({"earth":0,"rock":1,"desert":2,"ice":3}.get(surface.kind,1)))
-	Materials.apply_shader(mat,"ice" if surface.kind=="ice" else "rock",0.03125 if surface.kind=="ice" else 0.0625)
+	_bind_ground_material(mat)
 	if spherical:
 		var origin_sample:PackedFloat64Array=surface.globe.sample(0,0)
 		# Exactly an integer number of every texture tile; adjacent terrain rings
@@ -158,6 +169,7 @@ func set_view_coverage(value:float)->void:
 				child.material_override.set_shader_parameter("detail_level",quality)
 				child.material_override.set_shader_parameter("spherical_coordinates",bool(get_meta("material_spherical",false)))
 				child.material_override.set_shader_parameter("surface_kind",int(get_meta("material_kind",1)))
+				_bind_ground_material(child.material_override)
 				child.material_override.set_shader_parameter("view_coverage",view_coverage)
 				child.material_override.set_shader_parameter("coverage_invert",true)
 		else:child.visible=view_coverage>=0.5

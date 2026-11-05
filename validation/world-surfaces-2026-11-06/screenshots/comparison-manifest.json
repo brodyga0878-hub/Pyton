@@ -1,0 +1,120 @@
+{
+  "baseline_commit": "fad822558bf9be6a54e8be242473a5cceb6d0cad",
+  "baseline_version": "0.11.7-city-alpha1",
+  "current_version": "0.11.8-terrain-alpha1",
+  "source": "actual scenes/main.tscn",
+  "fixture": "Fixed review cameras; capture-only planet shader clone with decorative TIME token0 and all existing uniforms retained; physics time unchanged",
+  "renderer": "Mesa llvmpipe OpenGL4.5 Compatibility software",
+  "phone_capture": false,
+  "reference_art_composited": false,
+  "native_source_kinds": [
+    "earth",
+    "rock",
+    "desert"
+  ],
+  "explicit_solar_adapter_ice_fixture": "Pluto; does not change the current source body classification",
+  "frames": [
+    {
+      "file": "01-earth-ground-and-classic-console.png",
+      "identical_camera_game_payload_and_body_source": true,
+      "body_id": "earth",
+      "body_kind": "earth",
+      "layout": "handcrafted_analytic_rebuild_v1",
+      "before": {
+        "file": "before/01-earth-ground-and-classic-console.png",
+        "bytes": 1224949,
+        "sha256": "53dcf6f3323900c93b5d18f6f6b4f1e358a8629e683ba19f5b4e5c328a4c8b76"
+      },
+      "after": {
+        "file": "after/01-earth-ground-and-classic-console.png",
+        "bytes": 1456058,
+        "sha256": "413037f4d1f6b09f514677c4647d56fcfbeb08e9b8e0fef4b50d1b4c2d2133d5"
+      }
+    },
+    {
+      "file": "02-moon-rock-ground.png",
+      "identical_camera_game_payload_and_body_source": true,
+      "body_id": "moon",
+      "body_kind": "rock",
+      "layout": "handcrafted_analytic_rebuild_v1",
+      "before": {
+        "file": "before/02-moon-rock-ground.png",
+        "bytes": 1490864,
+        "sha256": "95adaca5506f240dce7320062ac805e82f4758e863c4f3d39e83d6e1c3b26a78"
+      },
+      "after": {
+        "file": "after/02-moon-rock-ground.png",
+        "bytes": 1664429,
+        "sha256": "653f121aa563261c104b70bc6eb6f99155ba3cd8ac67685d8f895f9586b7e2aa"
+      }
+    },
+    {
+      "file": "03-venus-desert-ground.png",
+      "identical_camera_game_payload_and_body_source": true,
+      "body_id": "venus",
+      "body_kind": "desert",
+      "layout": "handcrafted_analytic_rebuild_v1",
+      "before": {
+        "file": "before/03-venus-desert-ground.png",
+        "bytes": 1353358,
+        "sha256": "e93570763a9dd2cf3dc96b79741727413e8aed9ad05ddd6a91110eddd0d7902e"
+      },
+      "after": {
+        "file": "after/03-venus-desert-ground.png",
+        "bytes": 1365031,
+        "sha256": "94efd47411b180ba49908a14a3ff7615e58bd0de2751b312781f3a9b519271e8"
+      }
+    },
+    {
+      "file": "04-pluto-ice-ground-explicit-solar-adapter.png",
+      "identical_camera_game_payload_and_body_source": true,
+      "body_id": "pluto",
+      "body_kind": "ice",
+      "layout": "reconstructed_solar_v1",
+      "before": {
+        "file": "before/04-pluto-ice-ground-explicit-solar-adapter.png",
+        "bytes": 450194,
+        "sha256": "2c5f1e6ede178db612a663f9741da28e4224eb779033555da9df02fe38695818"
+      },
+      "after": {
+        "file": "after/04-pluto-ice-ground-explicit-solar-adapter.png",
+        "bytes": 1195771,
+        "sha256": "a83b86753d4cc639e5b7570806125693ab0dacd76952f5540f04c118234cd48b"
+      }
+    },
+    {
+      "file": "05-earth-from-orbit.png",
+      "identical_camera_game_payload_and_body_source": true,
+      "body_id": "earth",
+      "body_kind": "earth",
+      "layout": "handcrafted_analytic_rebuild_v1",
+      "before": {
+        "file": "before/05-earth-from-orbit.png",
+        "bytes": 596332,
+        "sha256": "fd6a63356c16786c1fe0f128d03e498a8e30831dc1d1fc3fdf5fd0a191d91764"
+      },
+      "after": {
+        "file": "after/05-earth-from-orbit.png",
+        "bytes": 603498,
+        "sha256": "52710362703af2e9d827026ea8aafee9246d9e59f9a3c85f0c7bc86aa6ef61b1"
+      }
+    },
+    {
+      "file": "06-moon-from-orbit.png",
+      "identical_camera_game_payload_and_body_source": true,
+      "body_id": "moon",
+      "body_kind": "rock",
+      "layout": "handcrafted_analytic_rebuild_v1",
+      "before": {
+        "file": "before/06-moon-from-orbit.png",
+        "bytes": 585942,
+        "sha256": "d8fa1949e145e58494f9f7b75ba9d038e477c1b6195eb7511e087a29a27f7906"
+      },
+      "after": {
+        "file": "after/06-moon-from-orbit.png",
+        "bytes": 590142,
+        "sha256": "c9d99cc208425f96a599ca2206ae9c54419f4d6339dac69f3c8ce01ae8f4781d"
+      }
+    }
+  ]
+}

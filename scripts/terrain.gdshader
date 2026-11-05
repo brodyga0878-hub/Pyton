@@ -43,6 +43,19 @@ mat3 texture_frame(vec3 normal,vec3 position,vec2 tex_uv) {
  float gain=inversesqrt(max(max(dot(tangent,tangent),dot(bitangent,bitangent)),0.0000000001));
  return mat3(tangent*gain,bitangent*gain,normal);
 }
+vec3 world_decode_srgb(vec3 colour) {
+ return mix(colour/12.92,pow((colour+vec3(0.055))/1.055,vec3(2.4)),step(vec3(0.04045),colour));
+}
+vec3 world_encode_srgb(vec3 colour) {
+ colour=max(colour,vec3(0.0));
+ return mix(colour*12.92,1.055*pow(colour,vec3(1.0/2.4))-vec3(0.055),step(vec3(0.0031308),colour));
+}
+vec3 world_colour_sample(vec2 uv,vec2 grad_x,vec2 grad_y) {
+ vec3 colour=textureGrad(material_albedo,uv,grad_x,grad_y).rgb;
+ // Compatibility's custom fragment uses sRGB; the manifest's mean is linear.
+ // Forward/Mobile already decode source_color samples and must not decode twice.
+ return OUTPUT_IS_SRGB?world_decode_srgb(colour):colour;
+}
 // Stable Bayer 4x4 thresholds (pixel centres); no time-dependent noise.
 float view_dither_threshold(vec2 screen_pixel) {
  ivec2 pixel=ivec2(floor(screen_pixel)) & ivec2(3);
@@ -78,16 +91,32 @@ void fragment() {
   vec3 weights=pow(abs(normalize(material_axis)),vec3(4.0));
   weights/=max(weights.x+weights.y+weights.z,0.00001);
   vec3 tp=material_position*material_scale;
-  vec3 finish=(texture(material_albedo,tp.zy).rgb*weights.x+texture(material_albedo,tp.xz).rgb*weights.y+texture(material_albedo,tp.xy).rgb*weights.z)*material_gain;
-  orm=texture(material_orm,tp.zy).rgb*weights.x+texture(material_orm,tp.xz).rgb*weights.y+texture(material_orm,tp.xy).rgb*weights.z;
-  ground*=clamp(finish,vec3(0.55),vec3(1.35));
-  if(detail_level>1) {
-   // Dominant projection normal uses the geometric derivatives, so a rebased
-   // tangent frame and body-fixed texture coordinates need no axis assumption.
-   vec2 tex_uv=weights.y>=max(weights.x,weights.z)?tp.xz:(weights.x>=weights.z?tp.zy:tp.xy);
-   vec3 bump=texture(material_normal,tex_uv).rgb*2.0-1.0;
-   bump.xy*=0.48;
-   NORMAL=normalize(texture_frame(normalize(NORMAL),VERTEX,tex_uv)*normalize(bump));
+  // Continuous body-fixed coordinates are differentiated before any coverage
+  // discard. A conservative footprint fades detail that no longer fits a pixel.
+  vec2 map_size=vec2(textureSize(material_albedo,0));
+  vec3 texture_dx=dFdx(tp),texture_dy=dFdy(tp);
+  float texel_footprint=max(length(texture_dx),length(texture_dy))*max(map_size.x,map_size.y);
+  float detail_visibility=1.0-smoothstep(4.0,16.0,texel_footprint);
+  vec2 tex_uv=weights.y>=max(weights.x,weights.z)?tp.xz:(weights.x>=weights.z?tp.zy:tp.xy);
+  vec2 normal_dx=weights.y>=max(weights.x,weights.z)?texture_dx.xz:(weights.x>=weights.z?texture_dx.zy:texture_dx.xy);
+  vec2 normal_dy=weights.y>=max(weights.x,weights.z)?texture_dy.xz:(weights.x>=weights.z?texture_dy.zy:texture_dy.xy);
+  mat3 projected_frame=mat3(1.0);
+  if(detail_level>1) projected_frame=texture_frame(normalize(NORMAL),VERTEX,tex_uv);
+  if(detail_visibility>0.0) {
+   // Decode each triplanar albedo sample before blending and linear gain.
+   vec3 finish=(world_colour_sample(tp.zy,texture_dx.zy,texture_dy.zy)*weights.x+world_colour_sample(tp.xz,texture_dx.xz,texture_dy.xz)*weights.y+world_colour_sample(tp.xy,texture_dx.xy,texture_dy.xy)*weights.z)*material_gain;
+   finish=mix(vec3(1.0),clamp(finish,vec3(0.50),vec3(1.50)),detail_visibility);
+   vec3 sampled_orm=textureGrad(material_orm,tp.zy,texture_dx.zy,texture_dy.zy).rgb*weights.x+textureGrad(material_orm,tp.xz,texture_dx.xz,texture_dy.xz).rgb*weights.y+textureGrad(material_orm,tp.xy,texture_dx.xy,texture_dy.xy).rgb*weights.z;
+   orm=mix(orm,sampled_orm,detail_visibility);
+   // Keep the existing neutral procedural tint; modulate it in linear light.
+   ground=OUTPUT_IS_SRGB?world_encode_srgb(world_decode_srgb(ground)*finish):ground*finish;
+   if(detail_level>1) {
+    vec3 bump=textureGrad(material_normal,tex_uv,normal_dx,normal_dy).rgb*2.0-1.0;
+    // This cotangent frame follows increasing image V, while OpenGL +Y points up.
+    bump.y=-bump.y;
+    bump.xy*=0.48*detail_visibility;
+    NORMAL=normalize(projected_frame*normalize(bump));
+   }
   }
  }
  // Defaults preserve full opaque coverage; endpoints do not leave stray pixels.

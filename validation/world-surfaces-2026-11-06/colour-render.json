@@ -1,0 +1,204 @@
+{
+	"checks": 48,
+	"controlled_material_fixture": true,
+	"device": "llvmpipe (LLVM 19.1.7, 256 bits)",
+	"failures": 0,
+	"measurements": [
+		{
+			"kind": "earth",
+			"neutral": {
+				"clipped": 0,
+				"count": 61504,
+				"mean": 0.20053240893899,
+				"std": 0.00780741892090058
+			},
+			"textured": {
+				"clipped": 0,
+				"count": 61504,
+				"mean": 0.197164967983617,
+				"std": 0.0195378476619665
+			},
+			"transition": false
+		},
+		{
+			"kind": "earth",
+			"neutral": {
+				"clipped": 0,
+				"count": 61504,
+				"mean": 0.20053240893899,
+				"std": 0.00780741892090058
+			},
+			"textured": {
+				"clipped": 0,
+				"count": 61504,
+				"mean": 0.197164967983617,
+				"std": 0.0195378476619665
+			},
+			"transition": true
+		},
+		{
+			"kind": "earth",
+			"neutral": {
+				"clipped": 179,
+				"count": 28035,
+				"mean": 0.255655599869263,
+				"std": 0.218580481239729
+			},
+			"planet": true,
+			"textured": {
+				"clipped": 179,
+				"count": 28035,
+				"mean": 0.255344364264798,
+				"std": 0.218559554813585
+			}
+		},
+		{
+			"kind": "rock",
+			"neutral": {
+				"clipped": 0,
+				"count": 61504,
+				"mean": 0.20053240893899,
+				"std": 0.00780741892090058
+			},
+			"textured": {
+				"clipped": 0,
+				"count": 61504,
+				"mean": 0.199602388185798,
+				"std": 0.0166822040750457
+			},
+			"transition": false
+		},
+		{
+			"kind": "rock",
+			"neutral": {
+				"clipped": 0,
+				"count": 61504,
+				"mean": 0.20053240893899,
+				"std": 0.00780741892090058
+			},
+			"textured": {
+				"clipped": 0,
+				"count": 61504,
+				"mean": 0.199602388185798,
+				"std": 0.0166822040750457
+			},
+			"transition": true
+		},
+		{
+			"kind": "rock",
+			"neutral": {
+				"clipped": 0,
+				"count": 27984,
+				"mean": 0.201693923447397,
+				"std": 0.050372796018701
+			},
+			"planet": true,
+			"textured": {
+				"clipped": 0,
+				"count": 27984,
+				"mean": 0.201798184742482,
+				"std": 0.0507895324329612
+			}
+		},
+		{
+			"kind": "desert",
+			"neutral": {
+				"clipped": 0,
+				"count": 61504,
+				"mean": 0.20053240893899,
+				"std": 0.00780741892090058
+			},
+			"textured": {
+				"clipped": 0,
+				"count": 61504,
+				"mean": 0.198755830827748,
+				"std": 0.0110333347143767
+			},
+			"transition": false
+		},
+		{
+			"kind": "desert",
+			"neutral": {
+				"clipped": 0,
+				"count": 61504,
+				"mean": 0.20053240893899,
+				"std": 0.00780741892090058
+			},
+			"textured": {
+				"clipped": 0,
+				"count": 61504,
+				"mean": 0.198755830827748,
+				"std": 0.0110333347143767
+			},
+			"transition": true
+		},
+		{
+			"kind": "desert",
+			"neutral": {
+				"clipped": 0,
+				"count": 28007,
+				"mean": 0.216504609258867,
+				"std": 0.0543882113360156
+			},
+			"planet": true,
+			"textured": {
+				"clipped": 0,
+				"count": 28008,
+				"mean": 0.21818309210009,
+				"std": 0.0549696833063398
+			}
+		},
+		{
+			"kind": "ice",
+			"neutral": {
+				"clipped": 0,
+				"count": 61504,
+				"mean": 0.203907416389168,
+				"std": 0.00886414619381843
+			},
+			"textured": {
+				"clipped": 0,
+				"count": 61504,
+				"mean": 0.204040422245387,
+				"std": 0.0147107488111517
+			},
+			"transition": false
+		},
+		{
+			"kind": "ice",
+			"neutral": {
+				"clipped": 0,
+				"count": 61504,
+				"mean": 0.203907416389168,
+				"std": 0.00886414619381843
+			},
+			"textured": {
+				"clipped": 0,
+				"count": 61504,
+				"mean": 0.204040422245387,
+				"std": 0.0147107488111517
+			},
+			"transition": true
+		},
+		{
+			"kind": "ice",
+			"neutral": {
+				"clipped": 0,
+				"count": 28035,
+				"mean": 0.425546042527851,
+				"std": 0.100838469507374
+			},
+			"planet": true,
+			"textured": {
+				"clipped": 0,
+				"count": 28035,
+				"mean": 0.427860749710077,
+				"std": 0.1014516807988
+			}
+		}
+	],
+	"phone_test": false,
+	"planet_shader_time_fixture": 0,
+	"renderer": "gl_compatibility",
+	"terrain_lighting_removed_for_colour_measurement": true
+}

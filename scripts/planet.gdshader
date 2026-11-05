@@ -17,6 +17,25 @@ uniform sampler2D material_orm : filter_linear_mipmap_anisotropic, repeat_enable
 uniform float material_scale = 48.0;
 uniform float material_gain = 1.6;
 varying vec3 world_normal;
+vec3 planet_decode_srgb(vec3 colour) {
+ return mix(colour/12.92,pow((colour+vec3(0.055))/1.055,vec3(2.4)),step(vec3(0.04045),colour));
+}
+vec3 planet_encode_srgb(vec3 colour) {
+ colour=max(colour,vec3(0.0));
+ return mix(colour*12.92,1.055*pow(colour,vec3(1.0/2.4))-vec3(0.055),step(vec3(0.0031308),colour));
+}
+vec3 planet_sample_albedo(vec2 tex_uv) {
+ vec3 sampled=texture(material_albedo,tex_uv).rgb;
+ // Compatibility's custom fragment contract and source_color samples are sRGB;
+ // Forward/Mobile source_color samples are already linear. Gains are measured
+ // in linear light, so only Compatibility needs this explicit decoding.
+ return OUTPUT_IS_SRGB?planet_decode_srgb(sampled):sampled;
+}
+vec3 planet_modulate(vec3 base,vec3 finish) {
+ // A neutral ratio preserves the existing procedural tint. This changes fine
+ // surface colour only; water, clouds, gas bands and stars never call it.
+ return OUTPUT_IS_SRGB?planet_encode_srgb(planet_decode_srgb(base)*finish):base*finish;
+}
 void vertex() { world_normal=normalize((MODEL_MATRIX*vec4(NORMAL,0.0)).xyz); }
 float hash(vec3 p) {
  p=fract(p*0.1031); p+=dot(p,p.yzx+33.33);
@@ -41,7 +60,10 @@ float view_dither_threshold(vec2 screen_pixel) {
 vec3 surface_finish(vec3 p) {
  vec3 w=pow(abs(p),vec3(4.0));w/=max(w.x+w.y+w.z,0.00001);
  vec3 t=p*material_scale;
- return clamp((texture(material_albedo,t.zy).rgb*w.x+texture(material_albedo,t.xz).rgb*w.y+texture(material_albedo,t.xy).rgb*w.z)*material_gain,vec3(0.60),vec3(1.30));
+ // Decode each projection before blending: mixing encoded values would change
+ // the mean brightness near a triplanar seam. Implicit mip/anisotropic sampling
+ // filters the repeating individual maps without atlas borders or wrapped UV.
+ return clamp((planet_sample_albedo(t.zy)*w.x+planet_sample_albedo(t.xz)*w.y+planet_sample_albedo(t.xy)*w.z)*material_gain,vec3(0.60),vec3(1.30));
 }
 mat3 texture_frame(vec3 normal,vec3 position,vec2 tex_uv) {
  vec3 dx=dFdx(position),dy=dFdy(position);
@@ -82,7 +104,7 @@ void fragment() {
   ground=mix(ground,vec3(0.75,0.83,0.83),snow);
   // Microtexture modulates existing land only. Original continents, climate,
   // coast, snow mask and drifting clouds keep the same inputs and thresholds.
-  if(detail_level>0) ground*=mix(vec3(1.0),surface_finish(p),0.46);
+  if(detail_level>0) ground=planet_modulate(ground,mix(vec3(1.0),surface_finish(p),0.46));
   vec3 sea=mix(ocean*0.78+vec3(0.002,0.014,0.032),vec3(0.018,0.20,0.27),smoothstep(0.49,0.545,continent));
   col=mix(sea,ground,coast);
   if(detail_level>0) {
@@ -128,13 +150,16 @@ void fragment() {
   float surface_diffuse=diffuse;
   float material_ao=1.0;
   if(detail_level>0) {
-   col*=surface_finish(p);
+   col=planet_modulate(col,surface_finish(p));
    vec3 axis=abs(p);
    vec2 tex_uv=(axis.y>=max(axis.x,axis.z)?p.xz:(axis.x>=axis.z?p.zy:p.xy))*material_scale;
    vec3 orm=texture(material_orm,tex_uv).rgb;
    material_ao=mix(1.0,orm.r,0.45);
    if(detail_level>1) {
     vec3 bump=texture(material_normal,tex_uv).rgb*2.0-1.0;
+    // This cotangent frame follows increasing image V; OpenGL +Y points up
+    // the image, so invert its green component in this explicitly built frame.
+    bump.y=-bump.y;
     bump.xy*=0.35;
     vec3 mapped_normal=normalize(texture_frame(normalize(NORMAL),VERTEX,tex_uv)*normalize(bump));
     vec3 view_sun=normalize((VIEW_MATRIX*vec4(sun,0.0)).xyz);

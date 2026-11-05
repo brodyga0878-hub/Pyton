@@ -1,0 +1,608 @@
+{
+  "package": "org.starfrontier.rebuild",
+  "version": "0.11.8-terrain-alpha1",
+  "version_code": 30,
+  "apk": "starfrontier-rebuild-arm64-alpha.apk",
+  "bytes": 49207918,
+  "sha256": "bc7071f0dfc1cbabb37742069132bb68e53f75c41da0c22beaf9a989ff1cab44",
+  "abi": "arm64-v8a",
+  "min_sdk": 24,
+  "target_sdk": 36,
+  "signature_verified": true,
+  "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+  "test_key_only": true,
+  "zipalign_16k": true,
+  "elf_load_alignment": {
+    "lib/arm64-v8a/libc++_shared.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/arm64-v8a/libgodot_android.so": [
+      16384,
+      16384,
+      16384
+    ]
+  },
+  "forbidden_permissions_absent": true,
+  "debuggable": false,
+  "native_data_checked": true,
+  "native_data_assets": [
+    "ffe_ground_coordinates",
+    "ffe_ground_pads",
+    "ffe_ship_registry",
+    "ffe_world_models",
+    "ffe_worlds"
+  ],
+  "graphics_runtime_assets_sha256": {
+    "ship_visual.gdc": "eb7b6504f1db74a8aa0a88e4cc7b007166c1fd92af332874140e4526234d00b7",
+    "ship_hull.gdshader": "9e0820d3704a50d7f1769ee142ac56146e8c9cbf4b3d943f2fee32c8bb0e8994",
+    "ship_exhaust.gdshader": "7c99ef81f2cb6f371871d0affe1f07e5d80d47474ceee8a750d8a1a28c76b5ae",
+    "ship_halo.gdshader": "f1dfa4528e2ab40319e97e4c81226ed96c67452ced72326d675a4b4979783a3c",
+    "station_visual.gdc": "680495189eef4e188ef5dc6cc775046d263d027aadf40fb8f762dc9f506577bb",
+    "station_solar.gdshader": "6e9aa211d0a4d56646ca192c2f9fe424158a10f393381acd0e527342ef4be9ba",
+    "space_environment.gdc": "c29e7325a2c26d7eb64bc58a850caf976d890e0fe3aed46e6dd90e156cd2fdcf",
+    "asteroid_surface.gdshader": "4c7e9d95fb217d0189a01482b59714d7c98affec7c9a8e5a5056798b097b7df4",
+    "space_sky.gdshader": "f91797913b04ff61dc8897c27b477845607248e87f36363869c30fc39f5117bd",
+    "flight_theme.gdc": "0f18d0f4af096321e52e697e8d2bc0df6307246f653edcf4e462ed1aaaa4f488",
+    "flight_reticle.gdc": "2cfdbbb3309b07ec2a5496aa4fea2daaeee9abbf1a22e7404930b83ee95826cc"
+  },
+  "diagnostics_runtime_assets_sha256": {
+    "build_info.gdc": "161ae5f1be715fcd998cfe735b2c35af93070b15bd36e762e3a30a36c5192fdf",
+    "game_diagnostics.gdc": "51d657ed662cef5b8ab425cbfacd69a0ac8e3c10cefe6fc2b27f11b567920e7b",
+    "diagnostics_logger.gdc": "f0e61955122e3fdf38a72261a51022a1fd12604ac6afca8ea57eaecce67515d9",
+    "report_export.gdc": "646bb7027e996505810ccac7902ec3e0414af9e3f0f34e71f6d22640f52afa59"
+  },
+  "material_assets": {
+    "runtime_sha256": "6c67d54a3054fd9d44ae01e1b3a7c89dfc4aa1c5ddd28304dd53ca18f4a4a359",
+    "maps": {
+      "painted_alloy/albedo": {
+        "source_png_sha256": "16f54465872aa464b0571f4d94f11080c9e6c6a3775ad2fb925ec70a746f0da1",
+        "runtime_resource": ".godot/imported/albedo.png-0c6e255ffe14735c6155b3301910d33f.ctex",
+        "runtime_bytes": 94162,
+        "runtime_sha256": "ec714c95909fc6dcc3cab63a8b9f6d744bfeb6c5df61e44a4f7a6e1e56a45870",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "painted_alloy/normal": {
+        "source_png_sha256": "6b001916c2790823c829482691631c0c5fb1016a0ff989430fe56065bb22f05a",
+        "runtime_resource": ".godot/imported/normal.png-756cef30cee9fd00c098a9af75bdd483.ctex",
+        "runtime_bytes": 376184,
+        "runtime_sha256": "4ca5eb550932c29f258f97d6f5dccc5cd06da4f15ce8d0201859d28346e3382f",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "painted_alloy/orm": {
+        "source_png_sha256": "66e91f1a16024894b27eb65f206fb316bff13c2f4bd289fabbcbf66317fc1c46",
+        "runtime_resource": ".godot/imported/orm.png-f3ebce7bd30d71f10a039eda6c5604df.ctex",
+        "runtime_bytes": 210098,
+        "runtime_sha256": "cdc34e772b571ebd49bf7894c755802f973db688cc42747b975ab5149d6d47ee",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "brushed_metal/albedo": {
+        "source_png_sha256": "52069a8050fc8077c10fcdd5b6625c83f4893b92287fffa56b4265644d52250e",
+        "runtime_resource": ".godot/imported/albedo.png-046b870a4a74553e0dbba33f47a5c027.ctex",
+        "runtime_bytes": 53384,
+        "runtime_sha256": "0d124f12cc80b5b1b95db4ba3a3f2badb82c02edc9b0fa0100bdba22e8e6bf62",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "brushed_metal/normal": {
+        "source_png_sha256": "e80164b02cb995b733ae07bcd246d4432c181ac898acca4c408fd73296d321e5",
+        "runtime_resource": ".godot/imported/normal.png-27bd409c304f7a14769176bc7abeafef.ctex",
+        "runtime_bytes": 156442,
+        "runtime_sha256": "e447d16aa01d129159fabfaa8e761e70221e8fbabc4bf51a6369e16d3799ba23",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "brushed_metal/orm": {
+        "source_png_sha256": "ae51b49d38a122d38aac40e36a2644808b4b4027bc17177404d96d44a691265f",
+        "runtime_resource": ".godot/imported/orm.png-b403516d4e30015973885251d600c69d.ctex",
+        "runtime_bytes": 73786,
+        "runtime_sha256": "da3c319b04fc23327d1844e3de0869030f67b88889077bb622c62f3e9dd776f5",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "concrete/albedo": {
+        "source_png_sha256": "873493e82b46536b4ca31c665e531afb731c46069a8f02962d9f2009eaf025af",
+        "runtime_resource": ".godot/imported/albedo.png-9f253d0a8dbae2b36aa8a36174b7dde4.ctex",
+        "runtime_bytes": 202830,
+        "runtime_sha256": "50ed2aca528b39bdf86b928b8f7ef78991e8aff5f6d4913ace06f992d78c6b6c",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "concrete/normal": {
+        "source_png_sha256": "45262cc50fe01cdeedbb90a9583625bd0db32e04a128a3eadbb7ad9c4554d1e8",
+        "runtime_resource": ".godot/imported/normal.png-537363d05f9224540b679bd4ae7c0abc.ctex",
+        "runtime_bytes": 667434,
+        "runtime_sha256": "92be1b1aa03147a8ee761920d0a869a78461b6ec5ca62cc2746625d1e47b1a5a",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "concrete/orm": {
+        "source_png_sha256": "9aacf5c445f30124e647b055f803b8d78f65a2e5cd774fecf8278efefaf2c0d2",
+        "runtime_resource": ".godot/imported/orm.png-d5a1d0fa4afc8055414b94f8f45432d9.ctex",
+        "runtime_bytes": 311640,
+        "runtime_sha256": "2cade2bbc8f39604e5e79bbee98932ae57af1ba9d69342c75ba94fbf695b9980",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "asphalt/albedo": {
+        "source_png_sha256": "c34a433a70152dce90512e5e7e0744f78d8b5042877bad2684a352b36695e374",
+        "runtime_resource": ".godot/imported/albedo.png-dca2209625d3985987fdc75ccab63bfc.ctex",
+        "runtime_bytes": 177784,
+        "runtime_sha256": "66d1c93df29cd458360b8559673a96bd56a21dba7f493aa0c938d6d4dc256443",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "asphalt/normal": {
+        "source_png_sha256": "87f838c51f7e26421fffbf794e9b7d772700b24c46939af868064e0b759692a4",
+        "runtime_resource": ".godot/imported/normal.png-1035f2cd74ecd046577f3b682fad0b90.ctex",
+        "runtime_bytes": 476068,
+        "runtime_sha256": "6e017f2c4f7343f4b77ee7b25f8aa6ca28184499eafb70c6f1295edff53c335e",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "asphalt/orm": {
+        "source_png_sha256": "5d163c654cba6dbd0632b32b2a3d0539885c7e411d972614d964ce9f89eb24eb",
+        "runtime_resource": ".godot/imported/orm.png-c11f50d9c6f5e38eedb23e3a42f3d0bf.ctex",
+        "runtime_bytes": 190516,
+        "runtime_sha256": "e9ac98ff1d35be60e30f866fa6d2f8526206ea083bbe4d16baa64ad3b6ace9bc",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "rock/albedo": {
+        "source_png_sha256": "f07a50247fc0499ecd138eb0ef6c3b8413a9f8ca9c0aadd22294ede23b26bc2c",
+        "runtime_resource": ".godot/imported/albedo.png-3ca92f8771892b8cdcd74e5b66ad69bc.ctex",
+        "runtime_bytes": 130334,
+        "runtime_sha256": "cc6039b7e6a0d9ca481eb42f7858eab9a52b4bf0c77ee3cd36c408e03eaee235",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "rock/normal": {
+        "source_png_sha256": "bb30d76c591be70dcde3bfc084f7a4e52c956c1a57e143686bf0c8382529bb4a",
+        "runtime_resource": ".godot/imported/normal.png-047a2b95bcf62403f7b2a333c4d34dd0.ctex",
+        "runtime_bytes": 396984,
+        "runtime_sha256": "fe66924fbb2b25d3dd93971da419f26ed751408633183f47638eac39fe2fade5",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "rock/orm": {
+        "source_png_sha256": "944e48f1e68119befe0bf9c5dc5e5b81f496db68d003d736afeaad6fd3d776aa",
+        "runtime_resource": ".godot/imported/orm.png-402c7d01a3ff334c295d8787222d1094.ctex",
+        "runtime_bytes": 180230,
+        "runtime_sha256": "9feb0439f0752149e1d56c4fa2355bfeee10a478abff1fc03f0261091e7b66b0",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "ice/albedo": {
+        "source_png_sha256": "7473ccaa9e1f3f69487e1580eb296c24d4f312ebb243a8286f16aee58fb08620",
+        "runtime_resource": ".godot/imported/albedo.png-066b987db03faca136d9737e74e6d77d.ctex",
+        "runtime_bytes": 217502,
+        "runtime_sha256": "89ed06ddfb6e053cc5796bcdaa6a0c3cd454723dbdecbf04d30320312a311190",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "ice/normal": {
+        "source_png_sha256": "a6c96d12f8d4e4ffd501bef30f69af8dbd287a27e1405a344409b39092da6bcb",
+        "runtime_resource": ".godot/imported/normal.png-26d4df54ee4880295d1345075819908c.ctex",
+        "runtime_bytes": 222964,
+        "runtime_sha256": "25ab09e8700c0d1e7dc3bdf87d664c5fa2897f5cc5691e5754faf9f216381abb",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "ice/orm": {
+        "source_png_sha256": "ccae7a8980bf1902d8656be541631f491a0de98377646751a94a3bae0d3c151e",
+        "runtime_resource": ".godot/imported/orm.png-63817564e96c31e36fec853a8cb3aee3.ctex",
+        "runtime_bytes": 104576,
+        "runtime_sha256": "63f9160e27d0e44a77a6eaebf3b2c2a7c6b2128b1333e60ed229ae4d28829cc0",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "rubber/albedo": {
+        "source_png_sha256": "1ef38a321e51170b890e09a4c9c77e8240b0fc6d9a6a7ee00ff5fc2587232b21",
+        "runtime_resource": ".godot/imported/albedo.png-95d1c6bbfe0e811793f31f175a37389a.ctex",
+        "runtime_bytes": 125068,
+        "runtime_sha256": "3e4b436c8bf5a6af1946da3efadf3f0d7fa509452295b8ee97384f8d1a848d01",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "rubber/normal": {
+        "source_png_sha256": "a5bbc92c4fc529fb0ef65dba823ae06fff0e1cc965f750ed8a91194e9511f5ac",
+        "runtime_resource": ".godot/imported/normal.png-5225058e54915a3240e140479a5b6498.ctex",
+        "runtime_bytes": 346710,
+        "runtime_sha256": "821c901cbccc757a594e2eefa6f0ded3318c6a777d5ba4ebf746da03cb54165d",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "rubber/orm": {
+        "source_png_sha256": "8fd3ec3f55aa2a27afe8b3ea5b1f7492c77eff222723aeb0af28feb18519a10b",
+        "runtime_resource": ".godot/imported/orm.png-77de7af176305fc5267a5ae45a3e0a15.ctex",
+        "runtime_bytes": 241394,
+        "runtime_sha256": "21dd2e81768a488480f95d761ece3aa996c24f5d460fc064a26a792d359dfc8c",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "glass/albedo": {
+        "source_png_sha256": "19f46ccc170ac5cdaae1b2470e36350268abe09f967e301151029ea3a7daaa2a",
+        "runtime_resource": ".godot/imported/albedo.png-156c20cfd941c98349ed49970f60099d.ctex",
+        "runtime_bytes": 11246,
+        "runtime_sha256": "d7d9e2baf6432598e578ea64dc300ca95de52139e8e91e37a5c1680a5d499ac0",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "glass/normal": {
+        "source_png_sha256": "74f2525fcad42d873f6bda5afb6c2b327d227129f17a8c2a910a167280d49109",
+        "runtime_resource": ".godot/imported/normal.png-b6a22047a93ed03ffb8ed5a9c9ea88fd.ctex",
+        "runtime_bytes": 70924,
+        "runtime_sha256": "264fc3c1b3868d5ed977aac2382fe9377cde03625e3e89f7cc14d92e1b586d02",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "glass/orm": {
+        "source_png_sha256": "1a073513e54240596600437ac743a2bd6e0003d961864f2685dcdfa3c025ad9f",
+        "runtime_resource": ".godot/imported/orm.png-6951e4af45508790951bb46e26ecec72.ctex",
+        "runtime_bytes": 31608,
+        "runtime_sha256": "f8c100847abf9f06997475f9a139253a0f47c297b20942f9b8ce4e48f8c71ec9",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      }
+    },
+    "map_count": 24
+  },
+  "surface_detail_assets": {
+    "runtime_sha256": "0ac723bea4a58ecd7abd94afc0d578b6bf8d5783e34f616499aa4f5026b2df71",
+    "manifests": {
+      "ships": {
+        "source_sha256": "635c355901ba9311e5d244a1624ffd4f3dd5e1c2de7424ed54430e4caacb4280",
+        "runtime_path": "assets/assets/surface_details/ships/manifest.json"
+      },
+      "station": {
+        "source_sha256": "7d1c95dec02dd51987b0111b2a65f420090441529ab5f88a020810145fc867e8",
+        "runtime_path": "assets/assets/surface_details/station/manifest.json"
+      }
+    },
+    "maps": {
+      "ships/cobra/albedo": {
+        "source_png_sha256": "fe18b7cdd30efe229b90bebbfaea4badf4378be3ca2323957b0f331dea0eb264",
+        "source_png_bytes": 677521,
+        "runtime_resource": ".godot/imported/albedo.png-60d8231fc414ff591d121d328932636c.ctex",
+        "runtime_bytes": 648670,
+        "runtime_sha256": "9467a86b508454e7b1ac4dbd79cca1216447c22f7e5ae9bac84e5728b8d46979",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ships/cobra/normal": {
+        "source_png_sha256": "d87c0ac3ef5f520b4589e9360ec45a449b4f1338e84e270ec0f5a90bdb7358ce",
+        "source_png_bytes": 164206,
+        "runtime_resource": ".godot/imported/normal.png-6b235c4a99000b8cbe8351d91a8af65f.ctex",
+        "runtime_bytes": 211398,
+        "runtime_sha256": "23c35cd3b60441687bacb016e56932bcfeb8c4215a23f365db480a178d8b391c",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ships/cobra/orm": {
+        "source_png_sha256": "3ee033cdf2380d146eeadef4f0604a1f7dcd362daa8893f2c5b260c8bf47dcd1",
+        "source_png_bytes": 113047,
+        "runtime_resource": ".godot/imported/orm.png-f1dd54478a77cf135f2b41e65c36dd48.ctex",
+        "runtime_bytes": 143256,
+        "runtime_sha256": "ceb21f5b98d58d317cc38fa6570a8b5d086a8a1909e76637a539777b17b623ac",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ships/eagle/albedo": {
+        "source_png_sha256": "cdceadb95bebc72c8af8acd6983658667c0189560f0b2c1da5b487cb7201d905",
+        "source_png_bytes": 681548,
+        "runtime_resource": ".godot/imported/albedo.png-058663806f4e9de324d705549f7c8587.ctex",
+        "runtime_bytes": 649500,
+        "runtime_sha256": "cbbc5439d66499d9a247249e67a04e42feada59cbedb17862ca4dc3631359c02",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ships/eagle/normal": {
+        "source_png_sha256": "3336ff074edf33eeab2905ab7dfd315ea5c6580ff7b517a4d323f24b301b9eb1",
+        "source_png_bytes": 167629,
+        "runtime_resource": ".godot/imported/normal.png-8e3b1e5fad3717ca838a5b820378c425.ctex",
+        "runtime_bytes": 214300,
+        "runtime_sha256": "2f4117e4f8c6c94371cfd2157fcdf796ca37a3a32766e29e7e30183b0fbe8c1b",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ships/eagle/orm": {
+        "source_png_sha256": "5ab0c4bb4a7d642e175bc528909f3e4381e6e7da854fb14685d67283c161684f",
+        "source_png_bytes": 114662,
+        "runtime_resource": ".godot/imported/orm.png-abcd2fe01e39e3943d6bb59b87c1eeae.ctex",
+        "runtime_bytes": 143502,
+        "runtime_sha256": "92a18877a6a7b44cb1395c5b20f7bdfc4a690b1ec214ef3e0e00f8dbc88d844c",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ships/shuttle/albedo": {
+        "source_png_sha256": "8864fbfeae5f82846c6c3df010a29114de9d875116b8a7877616ba31e8e96012",
+        "source_png_bytes": 677766,
+        "runtime_resource": ".godot/imported/albedo.png-5edcde93808289e9b41fd24a2123f3d4.ctex",
+        "runtime_bytes": 645922,
+        "runtime_sha256": "706a55f555419b37050f4d78f038c5d26339b464efa7ac2665215aaebc4312c8",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ships/shuttle/normal": {
+        "source_png_sha256": "fdf49877ab7f0127974616a860e28f2b61233471eccc0bc87cb1d3a3614318c9",
+        "source_png_bytes": 162012,
+        "runtime_resource": ".godot/imported/normal.png-172552d16e1f10b9d7b183dcf0af1926.ctex",
+        "runtime_bytes": 210054,
+        "runtime_sha256": "62ab4534dbae0c83322bc7ecc47ff687c6672405ba466e0dda124e6f13fcc27c",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ships/shuttle/orm": {
+        "source_png_sha256": "044f932dccfb565f2e35a6aadd5ef9609b90b40d0a2198fc524a62ac9148e927",
+        "source_png_bytes": 112524,
+        "runtime_resource": ".godot/imported/orm.png-f1b1940052795ff31966398b60a14bbf.ctex",
+        "runtime_bytes": 140734,
+        "runtime_sha256": "eb4b727803057f6fc7fec9509649a92096011ee79698a99838ede9c9ddeb884b",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "station/albedo": {
+        "source_png_sha256": "7eff9d51005d10e7fe582dc4430e85bf288640308504fe7603622b8542ef2c9d",
+        "source_png_bytes": 199350,
+        "runtime_resource": ".godot/imported/albedo.png-a43f167ac0f2585f27982713ce9987ed.ctex",
+        "runtime_bytes": 272596,
+        "runtime_sha256": "57843fa24a1623d0b14df08469fd9272ad66f11e8917b402bc55bbd2cef22fc0",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "station/normal": {
+        "source_png_sha256": "3a85b42255686ddcbfc697e3c00e17bd70550025d76c0160cb8c5cbf70a42d6b",
+        "source_png_bytes": 342644,
+        "runtime_resource": ".godot/imported/normal.png-1b0108e6246ce049665dca773e9096da.ctex",
+        "runtime_bytes": 574382,
+        "runtime_sha256": "d52f7dc7eddb24e0e76679606cae0ce2bbf22640cd03ec08decd304357f1b7af",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "station/orm": {
+        "source_png_sha256": "4e7b41f13f26c8731061e7b3deb228e91a999640fe34bd88bd760d9df3f386e4",
+        "source_png_bytes": 297853,
+        "runtime_resource": ".godot/imported/orm.png-a1863a1a423bc2a626971de5b266e43b.ctex",
+        "runtime_bytes": 425740,
+        "runtime_sha256": "013379458e1a41b16a846ba2e8d1d5f162caab1b5fa7f6111ec1803e174d2fbd",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      }
+    },
+    "map_count": 12
+  },
+  "city_surface_assets": {
+    "manifest_sha256": "3cf93fe506d5abb12c870347da5140109d97732514e8c0a48f35df1b57ab1b44",
+    "runtime_manifest": "assets/assets/city_surfaces/manifest.json",
+    "runtime_assets_sha256": {
+      "city_surface_library.gdc": "7b4b961a9c5f9caf5a389066a2ee32a273246920120bbc0d7bb8d3898000078d",
+      "city_material_roles.gdc": "113d82f3afa672c8655838d2e1287bab56ba80bb3bef0786a857a00939fce8f6",
+      "source_model_visual.gdc": "0ab03df14972c75157e92a05659d96b9d914bebc630df859f13d7fd59fe133ba",
+      "source_city_view.gdc": "0b7e9b6aef94d450020f7b123bb8d9d3d5b6ed48b7972eaa6d21605478cd0a22",
+      "source_model.gdshader": "50d24307abf77a4c2128a13ed76d4495ec73be30b15bb776cf4849ea92f95039"
+    },
+    "maps": {
+      "albedo": {
+        "source_png_sha256": "46080062e17bd0fb65a95b427b4f3a5641bc9135e5cf818dde3071baac2cb822",
+        "source_png_bytes": 596091,
+        "runtime_resource": ".godot/imported/albedo.png-c7afb95875b1c2de8dd198eab07dfc24.ctex",
+        "runtime_bytes": 720800,
+        "runtime_sha256": "83b06a4071f061aa47c541738f1631fbc0d390406c423624379cccebc53f24b6",
+        "width": 2048,
+        "height": 2048,
+        "mipmap_import_enabled": true
+      },
+      "normal": {
+        "source_png_sha256": "5abde4a87d7a2270e3e8e3944ef8b74b90e1e1cf88c2463dfa53b911c37f76b0",
+        "source_png_bytes": 566466,
+        "runtime_resource": ".godot/imported/normal.png-7233c6da70c4df72894206dccce9db8e.ctex",
+        "runtime_bytes": 685422,
+        "runtime_sha256": "77f85e198aaba4ecc023f7bffd5c7c74da8b6e27b5feeaa0e4b2c582f1d4fc19",
+        "width": 2048,
+        "height": 2048,
+        "mipmap_import_enabled": true
+      },
+      "orm": {
+        "source_png_sha256": "817c575883d3e380f5a4b491fdbe14907bcf5c3af16de7d5f89a10a6a94ef962",
+        "source_png_bytes": 461972,
+        "runtime_resource": ".godot/imported/orm.png-5092a5207753478775b50ca82902076d.ctex",
+        "runtime_bytes": 630004,
+        "runtime_sha256": "d89e5a6f2a5da1146f7f6e9592d47d83d192d6a7f24629b2e9d10e9cf04fd250",
+        "width": 2048,
+        "height": 2048,
+        "mipmap_import_enabled": true
+      }
+    },
+    "map_count": 3
+  },
+  "world_surface_assets": {
+    "manifest_sha256": "390391393381752105f824321a1ea5186cab2683bc103bf6761d9bfb35a5b1e6",
+    "runtime_manifest": "assets/assets/world_surfaces/manifest.json",
+    "runtime_assets_sha256": {
+      "world_surface_library.gdc": "886ddcb6e7a6c38df087556104c011a345ce45e66cb06cf06693d5501434d9c9",
+      "surface_visual.gdc": "e7d7f2b10c3226f7a5fcef5ea27cb63d0e610f6fc28ba49b0124dd7ce604324d",
+      "celestial_renderer.gdc": "08790a9a84e5ce76a577a651b593821c504d9c60ab96ddd2b1b06d742de0edc6",
+      "terrain.gdshader": "cc4940dab7625f4af4a70181dcfcf5fa6c9e42fc71dc2d0c7f8615a98c4f4443",
+      "terrain_transition.gdshader": "3e110c62eafb224342b863bc71a1b9cb9f5584b196d9e5584f7812c620952cc6",
+      "planet.gdshader": "547e5bb5c25340519eb90e7f5c78b788b9c7e07ad949118f75dda45005ce6bad"
+    },
+    "maps": {
+      "earth/albedo": {
+        "source_png_sha256": "44d51d80cdafd253b92c019bccca1e0e31f3ef3663ff36903eb9ec5792a7f258",
+        "source_png_bytes": 849016,
+        "runtime_resource": ".godot/imported/albedo.png-f61eec341a48cff94587e17556b8bd7b.ctex",
+        "runtime_bytes": 1014212,
+        "runtime_sha256": "d6fb7584c2176a36c39da8c1801e0332166d130bb0f255e54be9a3bb96a98042",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "earth/normal": {
+        "source_png_sha256": "cda378b31bd962e81ed2f84ce25a098a0cf82c95561cc3d144409eb970785740",
+        "source_png_bytes": 1056950,
+        "runtime_resource": ".godot/imported/normal.png-56bf8ad99c9d9378b4fa14a58309aaf6.ctex",
+        "runtime_bytes": 1417724,
+        "runtime_sha256": "56d886ddb9f6c0fc09f9fb098cc456857b6d48b0ca7d3d032a655064bb30d33c",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "earth/orm": {
+        "source_png_sha256": "060a42ebc2aa8e010033c39065ac8e5d2af11060024032c8cbbdbe98fdb82914",
+        "source_png_bytes": 645434,
+        "runtime_resource": ".godot/imported/orm.png-5ae400a84a7c3d9736821661e895b702.ctex",
+        "runtime_bytes": 801642,
+        "runtime_sha256": "46bbcc9845f32c9276e83da538783e8d4533d4f9d46bc2d7dd95ff1a5e85dacf",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "rock/albedo": {
+        "source_png_sha256": "ab87abd92bc7e160de97723a1cddfc29ab9f5bbb7cdc5d0ba74cdb3fde24987f",
+        "source_png_bytes": 820947,
+        "runtime_resource": ".godot/imported/albedo.png-21ed65075b57b555b4d87f85083468b7.ctex",
+        "runtime_bytes": 911246,
+        "runtime_sha256": "32bbe76d4fe1c0fdeb5344a371db1d0d82db9044de4c93ca591c9568fd96f939",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "rock/normal": {
+        "source_png_sha256": "5cbee4649d5e3f63687f5d2ea6f750687340602b6e4a116e9877984c255776a3",
+        "source_png_bytes": 957497,
+        "runtime_resource": ".godot/imported/normal.png-7fa20f84f2cdfe3af0fac9811b50f31b.ctex",
+        "runtime_bytes": 1314402,
+        "runtime_sha256": "82a9d455c61ba4eb4f42a6aa1674d7a43dc4551947cd48d16b4b6e264e7a557c",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "rock/orm": {
+        "source_png_sha256": "e94b71f50aa1ff02a155e466a61b63ebb8e538df30493399a0b32ad9afb73546",
+        "source_png_bytes": 507514,
+        "runtime_resource": ".godot/imported/orm.png-4a290131e338117f1c3b1598b53a0ae2.ctex",
+        "runtime_bytes": 657874,
+        "runtime_sha256": "d642a30f943c58ad9cf7f3daed976d3835c7cf8264a1677ff588cbfacc857e51",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "desert/albedo": {
+        "source_png_sha256": "01a3e4f236acabe01192596373d858844477314d6b297b454a3f8ef8052100ac",
+        "source_png_bytes": 877732,
+        "runtime_resource": ".godot/imported/albedo.png-278cc5263b331d654604f3bafb4caa94.ctex",
+        "runtime_bytes": 910250,
+        "runtime_sha256": "9aa4a414a709d7a2eadf66b94b13a1a730d269bbc6e15d46989d359f9257d8a6",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "desert/normal": {
+        "source_png_sha256": "2fadba22305a4e52a94f08bb38d87adf27251efdee9898a2377083f51adc6edc",
+        "source_png_bytes": 1112536,
+        "runtime_resource": ".godot/imported/normal.png-f9ea63be202d3cbd53babe2237089e6a.ctex",
+        "runtime_bytes": 1356458,
+        "runtime_sha256": "588da0f33510d6dac550f2dc58130f57d3ff73d9870c9f72a31fc78a9112f7a1",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "desert/orm": {
+        "source_png_sha256": "d23403ae60c8931cba7d68aef5d8ac2da6d15ac0d3bd2cb9ef34262d0c748da3",
+        "source_png_bytes": 330112,
+        "runtime_resource": ".godot/imported/orm.png-8ef4e7e07295f820d234db6c2b5356e9.ctex",
+        "runtime_bytes": 406118,
+        "runtime_sha256": "4f38036bc8d5b424aa32af69f7d437cee3d1e7235bfceb4c2aa8b1ab934639c0",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ice/albedo": {
+        "source_png_sha256": "14d20f61d7a1e9e03c23ef4bee7742fedb83268e73d92182ca28aa75ad6a998f",
+        "source_png_bytes": 704756,
+        "runtime_resource": ".godot/imported/albedo.png-701b1c37fa5500049b7acc9b7ed6fd08.ctex",
+        "runtime_bytes": 862024,
+        "runtime_sha256": "eb1dbb883a55687d64b52937342a062517ae9e5443be2530f3e5b08be646b3d6",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ice/normal": {
+        "source_png_sha256": "5271e4439828ffea08eb332341087090c37a9c77d15994cac99cca4b9a2c0239",
+        "source_png_bytes": 683878,
+        "runtime_resource": ".godot/imported/normal.png-c5d89d89fed119aaf72056a3bdc3503f.ctex",
+        "runtime_bytes": 838002,
+        "runtime_sha256": "72c69fb1be649bd9536601ed62cd51c4059d81b445bab3b7a49fb7db99f6e97d",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ice/orm": {
+        "source_png_sha256": "45e744827c6b0ca553270a285743c3607ed8ba8558caf105b992773967ff3cd9",
+        "source_png_bytes": 450911,
+        "runtime_resource": ".godot/imported/orm.png-41de001e407d27f33dd8a4359870afb8.ctex",
+        "runtime_bytes": 570516,
+        "runtime_sha256": "05dd854d0f2e6a1a2a97985c0a1d8aa830ff9d9290fbd597fe3c8a7f6d6ebfd9",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      }
+    },
+    "map_count": 12
+  },
+  "runtime_material_map_count": 51,
+  "flight_ui_runtime_assets_sha256": {
+    "flight_console.gdc": "b7e6d9f028eb6e74fe9a990c29e98a436574bde8fc080071ebbd9a0274a7edd4",
+    "touch_action_button.gdc": "2bd3f52c25ed488f252f9ac0ef0937146706baaf3351701fa5427ff674cd509a",
+    "main.gdc": "940a0c24ec7594e3d910be43f615d9f05d298b027e9fc213d24a4a498a5feb85",
+    "surface_model.gdc": "39e58c7ac5abab616ffdc4fe23a0d35c00b3b54ae5eb8f35972ff99e149f56bb",
+    "dock_services_view.gdc": "c3f4b466cefcfb8d266768913138a7dbdc4826453c6613e367e46e954a327cdf",
+    "training_dock_services.gdc": "a0dd0f21fe5403e52806c1972282be0db06661539a581a56a530a3a37116c8ef",
+    "navigation.gdc": "8cba3b00148b399c64efb09161a9e726d541d3e1bf32d99cdcd77a19473e2066"
+  },
+  "toolchain_smoke_only": false,
+  "physical_device_tested": false,
+  "full_original_port_complete": false,
+  "production_signing_key_configured": false,
+  "publication_ready": false
+}

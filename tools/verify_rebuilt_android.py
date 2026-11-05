@@ -10,6 +10,7 @@ MATERIAL_KINDS=('painted_alloy','brushed_metal','concrete','asphalt','rock','ice
 MATERIAL_CHANNELS=('albedo','normal','orm')
 SURFACE_PROFILES=('cobra','eagle','shuttle')
 CITY_ROLES=('facade','road','pad','roof')
+WORLD_SURFACE_KINDS=('earth','rock','desert','ice')
 
 def run(*command):
     return subprocess.check_output([str(v) for v in command],text=True,stderr=subprocess.STDOUT)
@@ -175,6 +176,37 @@ def verify_city_surfaces(archive,project):
     assert result['map_count']==3
     return result
 
+def verify_world_surfaces(archive,project):
+    """Check dedicated terrain/planet resources, not geography or phone speed."""
+    names=set(archive.namelist())
+    relative='assets/world_surfaces/manifest.json'
+    raw=(project/relative).read_bytes()
+    exported='assets/'+relative
+    assert exported in names and archive.read(exported)==raw,'Runtime world surface metadata differs from source'
+    manifest=json.loads(raw)
+    assert manifest['resolution']==1024,'Unexpected world surface resolution'
+    assert manifest['orm_channels']=={'r':'ambient_occlusion','g':'roughness','b':'metallic'},'Unexpected world surface ORM channels'
+    assert set(manifest['materials'])==set(WORLD_SURFACE_KINDS),'Unexpected world surface kind set'
+    result={'manifest_sha256':hashlib.sha256(raw).hexdigest(),'runtime_manifest':exported,'runtime_assets_sha256':{},'maps':{}}
+    for name in ['world_surface_library.gdc','surface_visual.gdc','celestial_renderer.gdc','terrain.gdshader','terrain_transition.gdshader','planet.gdshader']:
+        path='assets/scripts/'+name
+        assert path in names and len(archive.read(path))>64,'Missing world surface runtime '+name
+        packed=archive.read(path)
+        if name.endswith('.gdshader'):
+            assert packed==(project/'scripts'/name).read_bytes(),'World surface shader differs from current source '+name
+        result['runtime_assets_sha256'][name]=hashlib.sha256(packed).hexdigest()
+    for kind in WORLD_SURFACE_KINDS:
+        entry=manifest['materials'][kind]
+        assert 0<entry['mean_linear_luminance']<=1,'Invalid world surface normalization '+kind
+        assert 0<=entry['mean_roughness']<=1 and 0<=entry['mean_metallic']<=1,'Invalid world surface response '+kind
+        assert set(entry['files'])==set(MATERIAL_CHANNELS),'Incomplete world surface map set '+kind
+        for channel in MATERIAL_CHANNELS:
+            relative='assets/world_surfaces/'+kind+'/'+channel+'.png'
+            result['maps'][kind+'/'+channel]=verify_surface_map(archive,names,project,relative,entry['files'][channel],1024)
+    result['map_count']=len(result['maps'])
+    assert result['map_count']==12
+    return result
+
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     expected=preset_values(presets)
     signature=run(build_tools/'apksigner','verify','--verbose','--print-certs',apk)
@@ -193,7 +225,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -249,6 +281,9 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             if expected['version_code']>=29:
                 city_surface_assets=verify_city_surfaces(archive,presets.parent)
                 assert material_assets['map_count']+surface_detail_assets['map_count']+city_surface_assets['map_count']==39,'Incomplete runtime material map collection'
+            if expected['version_code']>=30:
+                world_surface_assets=verify_world_surfaces(archive,presets.parent)
+                assert material_assets['map_count']+surface_detail_assets['map_count']+city_surface_assets['map_count']+world_surface_assets['map_count']==51,'Incomplete terrain/planet runtime material collection'
         for name in names:
             if not name.startswith('lib/') or not name.endswith('.so'):continue
             data=archive.read(name)
@@ -266,7 +301,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

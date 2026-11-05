@@ -7,15 +7,23 @@ var focus_surface_preview:=false
 var surface_space_blend:=0.0
 const RingShader=preload("res://scripts/rings.gdshader")
 const AtmosphereShader=preload("res://scripts/atmosphere.gdshader")
-const Materials=preload("res://scripts/material_library.gd")
+const Materials=preload("res://scripts/world_surface_library.gd")
 func set_quality(value:int)->void:
 	quality=clampi(value,0,2)
 	for entry in visuals.values():
 		entry.mesh.material_override.set_shader_parameter("detail_level",quality)
+		_bind_body_material(entry.mesh.material_override,str(entry.get("material_kind","rock")))
 		if entry.has("air"):entry.air.visible=quality>0
 		if entry.has("rings"):entry.rings.material_override.set_shader_parameter("detail_level",quality)
 
 const PlanetShader = preload("res://scripts/planet.gdshader")
+
+func _bind_body_material(material:ShaderMaterial,kind:String)->void:
+	if quality==0 or kind in ["gas","ice_gas","star","barycenter"]:
+		Materials.clear_material(material);return
+	if not Materials.bind_shader(material,Materials.canonical_kind(kind),48.0):
+		material.set_shader_parameter("detail_level",0)
+		push_error("Planet surface material could not be loaded: "+kind)
 
 func configure(system: RefCounted) -> void:
 	last_high_focus=""
@@ -47,7 +55,7 @@ func configure(system: RefCounted) -> void:
 		var kind := str(body.kind)
 		# Mineral maps add fine surface response only; procedural geography,
 		# cloud placement, body radii/orbits and source records are untouched.
-		Materials.apply_shader(mat,"ice" if kind=="ice" else "rock",48.0)
+		_bind_body_material(mat,kind)
 		var code := {"earth":0,"rock":1,"desert":2,"gas":3,"ice_gas":4,"ice":5,"star":6}
 		mat.set_shader_parameter("body_kind",int(code.get(kind,1)))
 		var tint := Color.from_hsv(float((context.system_id+str(body.id).hash())&255)/255.0,0.36,0.4)
@@ -83,7 +91,7 @@ func configure(system: RefCounted) -> void:
 			rm.set_shader_parameter("detail_level",quality)
 			rings.material_override = rm
 			anchor.add_child(rings)
-		visuals[str(body.id)] = {"anchor":anchor,"mesh":mesh}
+		visuals[str(body.id)] = {"anchor":anchor,"mesh":mesh,"material_kind":kind}
 		if atmosphere:visuals[str(body.id)].air=atmosphere
 		for child in anchor.get_children():
 			if child is MeshInstance3D and child.mesh is TorusMesh:visuals[str(body.id)].rings=child
