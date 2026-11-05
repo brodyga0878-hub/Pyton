@@ -17,6 +17,8 @@ const SaveStore=preload("res://scripts/save_store.gd")
 const Stick=preload("res://scripts/touch_stick.gd")
 const Hold=preload("res://scripts/hold_button.gd")
 const Lever=preload("res://scripts/speed_lever.gd")
+const ActionButton=preload("res://scripts/touch_action_button.gd")
+const FlightConsole=preload("res://scripts/flight_console.gd")
 const ShipView=preload("res://scripts/ship_visual.gd")
 const StationView=preload("res://scripts/station_visual.gd")
 const SpaceEnvironment=preload("res://scripts/space_environment.gd")
@@ -66,6 +68,8 @@ var backup_edit:TextEdit
 var auto_button:Button
 var dock_button:Button
 var surface_button:Button
+var flight_console:Control
+var action_buttons:Array=[]
 var flight_widgets:Array=[]
 var busy:=false
 var active:=true
@@ -132,7 +136,9 @@ func _build_world()->void:
 	stars.multimesh=multi;add_child(stars)
 
 func _button(text:String,callback:Callable,width:=150.0)->Button:
-	var button:=Button.new();button.text=text;button.custom_minimum_size=Vector2(width,76);button.focus_mode=Control.FOCUS_NONE
+	action_buttons=action_buttons.filter(func(item):return is_instance_valid(item) and not item.is_queued_for_deletion())
+	var button:=ActionButton.new();button.text=text;button.custom_minimum_size=Vector2(width,76);button.focus_mode=Control.FOCUS_NONE
+	action_buttons.append(button)
 	button.add_theme_font_size_override("font_size",22);button.pressed.connect(callback);return button
 func _label(text:String,size_value:=20)->Label:
 	var label:=Label.new();label.text=text;label.add_theme_font_size_override("font_size",size_value);return label
@@ -143,25 +149,24 @@ func _anchored(node:Control,preset:int,offsets:Vector4)->void:
 func _build_ui()->void:
 	var layer:=CanvasLayer.new();add_child(layer);ui=Control.new();ui.theme=FlightTheme.build();ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);ui.mouse_filter=Control.MOUSE_FILTER_IGNORE;layer.add_child(ui)
 	flight_reticle=FlightReticle.new();_anchored(flight_reticle,Control.PRESET_FULL_RECT,Vector4.ZERO);flight_widgets.append(flight_reticle)
-	var top_panel:=PanelContainer.new();_anchored(top_panel,Control.PRESET_TOP_WIDE,Vector4(18,10,-18,102));flight_widgets.append(top_panel)
-	var top:=HBoxContainer.new();top_panel.add_child(top);top.add_theme_constant_override("separation",12)
-	hud=_label("",21);hud.size_flags_horizontal=Control.SIZE_EXPAND_FILL;top.add_child(hud)
-	top.add_child(_button("Система",_show_system,145));top.add_child(_button("Маршруты",_show_routes,155));top.add_child(_button("Меню",_show_menu,130))
-	stick=Stick.new();_anchored(stick,Control.PRESET_BOTTOM_LEFT,Vector4(20,-250,250,-20));flight_widgets.append(stick)
-	lever=Lever.new();_anchored(lever,Control.PRESET_BOTTOM_RIGHT,Vector4(-115,-315,-25,-20));lever.target_changed.connect(_set_speed);flight_widgets.append(lever)
-	var caption:=_label("СКОРОСТЬ",16);caption.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(caption,Control.PRESET_BOTTOM_RIGHT,Vector4(-125,-350,-15,-318));flight_widgets.append(caption)
-	var lift1:=Hold.new();lift1.text="ПОДЪЁМ";_anchored(lift1,Control.PRESET_BOTTOM_RIGHT,Vector4(-275,-230,-135,-145));lift1.state_changed.connect(func(value:bool):lift_up=value);holds.append(lift1);flight_widgets.append(lift1)
-	var lift2:=Hold.new();lift2.text="СНИЖЕНИЕ";_anchored(lift2,Control.PRESET_BOTTOM_RIGHT,Vector4(-275,-125,-135,-40));lift2.state_changed.connect(func(value:bool):lift_down=value);holds.append(lift2);flight_widgets.append(lift2)
-	var controls:=HBoxContainer.new();controls.add_theme_constant_override("separation",12);_anchored(controls,Control.PRESET_CENTER_BOTTOM,Vector4(-330,-106,330,-24))
-	auto_button=_button("Авто",_toggle_auto,150);controls.add_child(auto_button)
-	controls.add_child(_button("Тормозить",_brake,175));dock_button=_button("Стыковка",_dock_action,175);controls.add_child(dock_button);flight_widgets.append(controls)
+	hud=_label("",20);_anchored(hud,Control.PRESET_TOP_WIDE,Vector4(18,8,-260,38));hud.mouse_filter=Control.MOUSE_FILTER_IGNORE;flight_widgets.append(hud)
+	var console_height:float=FlightConsole.HEIGHT
+	stick=Stick.new();_anchored(stick,Control.PRESET_BOTTOM_LEFT,Vector4(20,-250-console_height,250,-20-console_height));flight_widgets.append(stick)
+	lever=Lever.new();_anchored(lever,Control.PRESET_BOTTOM_RIGHT,Vector4(-115,-315-console_height,-25,-20-console_height));lever.target_changed.connect(_set_speed);flight_widgets.append(lever)
+	var caption:=_label("СКОРОСТЬ",16);caption.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(caption,Control.PRESET_BOTTOM_RIGHT,Vector4(-125,-350-console_height,-15,-318-console_height));flight_widgets.append(caption)
+	var lift1:=Hold.new();lift1.text="ПОДЪЁМ";_anchored(lift1,Control.PRESET_BOTTOM_RIGHT,Vector4(-275,-230-console_height,-135,-145-console_height));lift1.state_changed.connect(func(value:bool):lift_up=value);holds.append(lift1);flight_widgets.append(lift1)
+	var lift2:=Hold.new();lift2.text="СНИЖЕНИЕ";_anchored(lift2,Control.PRESET_BOTTOM_RIGHT,Vector4(-275,-125-console_height,-135,-40-console_height));lift2.state_changed.connect(func(value:bool):lift_down=value);holds.append(lift2);flight_widgets.append(lift2)
+	flight_console=FlightConsole.new();_anchored(flight_console,Control.PRESET_BOTTOM_WIDE,Vector4(0,-console_height,0,0));flight_widgets.append(flight_console)
+	flight_console.system_requested.connect(_show_system);flight_console.routes_requested.connect(_show_routes);flight_console.menu_requested.connect(_show_menu)
+	flight_console.view_requested.connect(func():ship.external_view=not ship.external_view)
+	flight_console.auto_requested.connect(_toggle_auto);flight_console.brake_requested.connect(_brake);flight_console.dock_requested.connect(_dock_action)
+	auto_button=flight_console.buttons.auto;dock_button=flight_console.buttons.dock
 	surface_button=_button("К поверхности",_surface_action,215);_anchored(surface_button,Control.PRESET_TOP_RIGHT,Vector4(-240,110,-25,190));flight_widgets.append(surface_button)
-	var view_button:=_button("Вид",func():ship.external_view=not ship.external_view,110);_anchored(view_button,Control.PRESET_TOP_RIGHT,Vector4(-135,205,-25,281));flight_widgets.append(view_button)
 	var cross:=_label("·",27);cross.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(cross,Control.PRESET_CENTER,Vector4(-15,-20,15,20));cross.mouse_filter=Control.MOUSE_FILTER_IGNORE;flight_widgets.append(cross)
-	target_label=_label("",19);target_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(target_label,Control.PRESET_CENTER_TOP,Vector4(-330,100,330,150));target_label.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	target_label=_label("",18);target_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(target_label,Control.PRESET_CENTER_TOP,Vector4(-330,40,330,94));target_label.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	flight_widgets.append(target_label)
-	notice=_label("",21);notice.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;notice.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(notice,Control.PRESET_CENTER_BOTTOM,Vector4(-430,-190,430,-115));notice.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	fps_label=_label("",16);_anchored(fps_label,Control.PRESET_BOTTOM_LEFT,Vector4(25,-280,230,-250))
+	notice=_label("",21);notice.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;notice.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(notice,Control.PRESET_CENTER_BOTTOM,Vector4(-430,-190-console_height,430,-115-console_height));notice.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	fps_label=_label("",16);_anchored(fps_label,Control.PRESET_BOTTOM_LEFT,Vector4(25,-280-console_height,230,-250-console_height))
 	menu=PanelContainer.new();_anchored(menu,Control.PRESET_FULL_RECT,Vector4(140,40,-140,-40))
 	var panel_style:=StyleBoxFlat.new();panel_style.bg_color=Color("0c1725");panel_style.content_margin_left=20;panel_style.content_margin_right=20;panel_style.content_margin_top=14;panel_style.content_margin_bottom=14
 	panel_style.corner_radius_top_left=12;panel_style.corner_radius_top_right=12;panel_style.corner_radius_bottom_left=12;panel_style.corner_radius_bottom_right=12;menu.add_theme_stylebox_override("panel",panel_style)
@@ -186,6 +191,9 @@ func _release_inputs()->void:
 	if stick:stick.release_pointer()
 	if lever:lever.release_pointer()
 	for hold in holds:hold.release_pointer()
+	for button in action_buttons:
+		if is_instance_valid(button):button.release_pointer()
+	if flight_console!=null:flight_console.release_pointers()
 	lift_up=false;lift_down=false;roll_left=false;roll_right=false
 func _blocked()->bool:return busy or not active or menu.visible or settings_panel.visible
 func _physics_process(dt:float)->void:
@@ -230,13 +238,19 @@ func _tick(dt:float,steering:Vector2,roll:float,lift:=0.0)->void:
 	save_timer+=dt
 	if save_timer>20:save_timer=0;_save_game()
 
-func _process(dt:float)->void:
-	if not active:return
+func _update_flight_controls()->void:
 	var blocked:=_blocked()
 	for item in flight_widgets:item.visible=not blocked
 	stick.input_allowed=not blocked and not ship.docked and ship.hull>0
 	lever.input_allowed=stick.input_allowed
 	for hold in holds:hold.input_allowed=stick.input_allowed
+	flight_console.set_actions_enabled(not blocked)
+	for button in action_buttons:
+		if is_instance_valid(button):button.input_allowed=active and not busy
+func _process(dt:float)->void:
+	_update_flight_controls()
+	if not active:return
+	var blocked:=_blocked()
 	if not busy:_sync_scene()
 	player.position=ship.position;player.quaternion=ship.attitude;player.visible=ship.external_view
 	player.set_thrust(0.0 if ship.docked or surface.landed else clampf(maxf(absf(ship.target_speed),ship.velocity.length())/ship.MAX_SPEED,0.04,1.0))
@@ -261,10 +275,10 @@ func _process(dt:float)->void:
 func _record_event(event:String,details:Dictionary={})->void:
 	if diagnostics!=null and not automated:diagnostics.record(event,details)
 func _input_diagnostic_state()->Dictionary:
-	return {"stick":[stick.value.x,stick.value.y] if stick!=null else [],"stick_pointer":stick.pointer_id if stick!=null else -1,"throttle_pointer":lever.pointer_id if lever!=null else -1,"lift_up":lift_up,"lift_down":lift_down,"active":active,"busy":busy}
+	return {"stick":[stick.value.x,stick.value.y] if stick!=null else [],"stick_pointer":stick.pointer_id if stick!=null else -1,"throttle_pointer":lever.pointer_id if lever!=null else -1,"lift_up":lift_up,"lift_down":lift_down,"active":active,"busy":busy,"menu_open":menu!=null and menu.visible,"settings_open":settings_panel!=null and settings_panel.visible}
 func _flight_diagnostic_sample()->Dictionary:
 	if ship==null or nav==null or world==null or surface==null:return {}
-	return {"ship_id":ship.ship_id,"position":[ship.position.x,ship.position.y,ship.position.z],"velocity":[ship.velocity.x,ship.velocity.y,ship.velocity.z],"target_speed":ship.target_speed,"hull":ship.hull,"docked":ship.docked,"autopilot":ship.autopilot,"system_id":nav.current_id,"focus_id":world.focus_id,"site_id":world.site_id,"jump_remaining":nav.remaining,"transfer_remaining":world.transfer_remaining,"surface":surface.active,"landed":surface.landed,"flight_phase":surface.flight_phase,"controls":_input_diagnostic_state()}
+	return {"ship_id":ship.ship_id,"position":[ship.position.x,ship.position.y,ship.position.z],"velocity":[ship.velocity.x,ship.velocity.y,ship.velocity.z],"target_speed":ship.target_speed,"hull":ship.hull,"docked":ship.docked,"autopilot":ship.autopilot,"system_id":nav.current_id,"focus_id":world.focus_id,"site_id":world.site_id,"jump_remaining":nav.remaining,"transfer_remaining":world.transfer_remaining,"surface":surface.active,"landed":surface.landed,"flight_phase":surface.flight_phase,"surface_motion":{"landing":surface.landing,"taking_off":surface.taking_off,"altitude_m":surface.altitude(ship) if surface.active else 0.0,"pad_distance_m":surface.pad_distance(ship) if surface.active else 0.0},"controls":_input_diagnostic_state()}
 func _diagnostic_context()->Dictionary:
 	return {"build":{"version":BuildInfo.VERSION,"code":BuildInfo.VERSION_CODE,"channel":BuildInfo.CHANNEL},"mode":"graphics_preview" if not graphics_return.is_empty() else ("surface" if surface!=null and surface.active else "space"),"flight":_flight_diagnostic_sample(),"last_flight_sample":last_flight_sample,"settings":settings.snapshot(),"session":{"saving_enabled":saving_enabled,"save_generation":saves.sequence,"elapsed_days":nav.elapsed_days if nav!=null else 0},"display":{"fps":Engine.get_frames_per_second(),"viewport":[get_viewport().get_visible_rect().size.x,get_viewport().get_visible_rect().size.y]}}
 
@@ -313,12 +327,14 @@ func _sync_scene()->void:
 func _refresh_hud()->void:
 	var state:="СТЫКОВКА" if ship.docked else ("ПОСАДКА" if surface.landed else ("АВТО" if ship.autopilot or surface.landing or not surface.flight_phase.is_empty() else "ПОЛЁТ"))
 	if ship.hull<=0:state="КОРАБЛЬ ПОТЕРЯН"
-	hud.text="%s · %s · %s\n%.0f м/с  |  Корпус %.0f%%  |  %d кр.  |  Топливо %d/%d"%["Графический полёт" if not graphics_return.is_empty() else nav.current().name,ship.profile().name,state,ship.velocity.length(),ship.hull,ship.credits,nav.fuel,nav.FUEL_CAPACITY]
-	auto_button.text="Отменить авто" if ship.autopilot or surface.landing or not surface.flight_phase.is_empty() else "Авто"
+	hud.text="%s · %s · %s"%["Графический полёт" if not graphics_return.is_empty() else nav.current().name,ship.profile().name,state]
+	auto_button.text="Отмена" if ship.autopilot or surface.landing or not surface.flight_phase.is_empty() else "Авто"
 	dock_button.text="Взлететь" if surface.landed else ("Вылететь" if ship.docked else "Посадка" if surface.active else "Стыковка")
-	surface_button.text="На орбиту" if surface.active else "К поверхности"
+	surface_button.text="Взлететь" if surface.active and surface.landed else ("На орбиту" if surface.active else "К поверхности")
 	if surface.active:target_label.text="%s · высота %.0f м\nДо площадки %.0f м"%[surface.site_name if not surface.site_name.is_empty() else world.by_id[world.focus_id].name,maxf(0,surface.altitude(ship)),surface.pad_distance(ship)]
 	else:target_label.text="%s · до станции %.0f м"%[world.by_id[world.focus_id].name,ship.position.distance_to(ship.STATION)] if _station_here() else str(world.by_id[world.focus_id].name)
+	var target:Vector3=surface.pad_position() if surface.active else (ship.STATION if _station_here() else world.local_meters(world.focus_id,nav.elapsed_days))
+	flight_console.configure_state({"actual_speed_mps":ship.velocity.length(),"target_speed_mps":ship.target_speed,"surface_active":surface.active,"altitude_m":surface.altitude(ship) if surface.active else 0.0,"target_distance_m":ship.position.distance_to(target),"target_local":Basis(ship.attitude).inverse()*(target-ship.position),"hull_percent":ship.hull,"fuel":nav.fuel,"fuel_capacity":nav.FUEL_CAPACITY,"cargo_t":ship.total_cargo(),"totalcredits":ship.credits,"elapsed_days":nav.elapsed_days,"assisted":ship.assisted,"autopilot":ship.autopilot,"landing":surface.landing,"taking_off":surface.taking_off,"landed":surface.landed,"docked":ship.docked,"flight_phase":surface.flight_phase,"external_view":ship.external_view,"contextlabel":surface.site_name if surface.active and not surface.site_name.is_empty() else str(world.by_id[world.focus_id].name),"auto_text":auto_button.text,"dock_text":dock_button.text})
 	fps_label.visible=settings.show_fps;fps_label.text="%d FPS"%Engine.get_frames_per_second()
 
 func _announce(text:String)->void:
@@ -343,10 +359,17 @@ func _toggle_auto()->void:
 	elif ship.docked:_announce("Сначала вылетите со станции.")
 	elif not _station_here():_announce("Автоподход доступен у станции. Выберите объект в системе.")
 	else:ship.autopilot=not ship.autopilot;_announce("Автоподход к станции." if ship.autopilot else "Автоподход отменён.")
+func _takeoff_action()->bool:
+	var previous_controls:=_input_diagnostic_state()
+	_release_inputs()
+	var accepted:bool=surface.take_off(ship)
+	_record_event("surface_takeoff",{"accepted":accepted,"controls_before_release":previous_controls,"hull":ship.hull,"landed":surface.landed,"taking_off":surface.taking_off})
+	_announce(surface.message);_refresh_hud()
+	return accepted
 func _dock_action()->void:
 	if surface.active:
-		if surface.landed:surface.take_off(ship)
-		elif not surface.touch_down(ship):surface.begin_landing(ship)
+		if surface.landed:_takeoff_action();return
+		if not surface.touch_down(ship):surface.begin_landing(ship)
 		_announce(surface.message)
 	elif ship.docked:ship.launch();_announce("Вылет выполнен. Корабль направлен от станции.")
 	elif ship.dock():_announce("Стыковка выполнена. Службы доступны в меню.");_save_game()
@@ -355,7 +378,7 @@ func _dock_action()->void:
 func _surface_action()->void:
 	if busy:return
 	if surface.active:
-		if surface.landed:surface.take_off(ship);_announce(surface.message)
+		if surface.landed:_takeoff_action()
 		elif surface.begin_ascent(ship):_announce(surface.message)
 		else:_announce(surface.message)
 	else:await _enter_surface()
@@ -390,11 +413,12 @@ func _open_menu(title:String,save_progress:bool=true)->void:
 	menu_title.text=title
 	for child in menu_rows.get_children():menu_rows.remove_child(child);child.queue_free()
 	menu.show()
+	_update_flight_controls()
 func _menu_text(text:String)->void:
 	var label:=_label(text,21);label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;label.custom_minimum_size.x=900;menu_rows.add_child(label)
 func _menu_action(text:String,callback:Callable)->void:
 	menu_rows.add_child(_button(text,callback,900))
-func _close_menu()->void:menu.hide();backup_edit=null;_release_inputs()
+func _close_menu()->void:menu.hide();backup_edit=null;_release_inputs();_update_flight_controls()
 func _show_menu()->void:
 	_open_menu("КОМАНДИР")
 	if not graphics_return.is_empty():

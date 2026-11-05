@@ -146,10 +146,15 @@ func begin_landing(ship: RefCounted) -> bool:
 	return true
 
 func step(dt: float, ship: RefCounted, steering: Vector2, roll: float, lift := 0.0) -> void:
-	if not active or dt<=0 or ship.hull<=0:return
+	if not active or not is_finite(dt) or dt<=0 or ship.hull<=0:return
 	if landed:
-		ship.velocity=Vector3.ZERO;ship.target_speed=0
-		return
+		if is_finite(lift) and lift>0.1:
+			# The visible phone lift control must also work from a healthy landing.
+			# Negative lift, steering and throttle alone keep the ship parked.
+			if not take_off(ship):return
+		else:
+			ship.velocity=Vector3.ZERO;ship.target_speed=0
+			return
 	var previous:Vector3=ship.position
 	if not flight_phase.is_empty() and (steering.length()>0.05 or absf(roll)>0.05 or absf(lift)>0.1):cancel_vertical()
 	if absf(lift)>0.1:landing=false;taking_off=false
@@ -213,8 +218,11 @@ func touch_down(ship: RefCounted) -> bool:
 	return true
 
 func take_off(ship: RefCounted) -> bool:
-	if not active or not landed or ship.hull<=0:return false
+	if not active:message="Взлёт доступен после посадки на поверхность.";return false
+	if ship.hull<=0:message="Взлёт невозможен: корпус корабля разрушен (0%).";return false
+	if not landed:message="Корабль уже находится над поверхностью.";return false
 	landed=false;landing=false;taking_off=true
+	flight_phase="";ready_for_orbit=false;ship.autopilot=false
 	ship.position.y+=0.3
 	ship.velocity=Vector3.UP
 	ship.attitude=Quaternion(Vector3.RIGHT,0.35)

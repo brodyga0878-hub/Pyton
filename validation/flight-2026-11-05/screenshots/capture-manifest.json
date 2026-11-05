@@ -1,0 +1,72 @@
+[
+	{
+		"altitude_m": 0.0,
+		"console_height": 184.0,
+		"docked": false,
+		"file": "01-classic-space-console.png",
+		"hull": 100.0,
+		"landed": false,
+		"menu_visible": false,
+		"phone_capture": false,
+		"renderer": "OpenGL Compatibility/Mesa llvmpipe",
+		"source": "actual scenes/main.tscn",
+		"surface": false,
+		"taking_off": false
+	},
+	{
+		"altitude_m": 0.0,
+		"console_height": 184.0,
+		"docked": true,
+		"file": "02-dock-services.png",
+		"hull": 100.0,
+		"landed": false,
+		"menu_visible": true,
+		"phone_capture": false,
+		"renderer": "OpenGL Compatibility/Mesa llvmpipe",
+		"source": "actual scenes/main.tscn",
+		"surface": false,
+		"taking_off": false
+	},
+	{
+		"altitude_m": 0.00500211486660795,
+		"console_height": 184.0,
+		"docked": false,
+		"file": "03-offpad-landed-console.png",
+		"hull": 100.0,
+		"landed": true,
+		"menu_visible": false,
+		"phone_capture": false,
+		"renderer": "OpenGL Compatibility/Mesa llvmpipe",
+		"source": "actual scenes/main.tscn",
+		"surface": true,
+		"taking_off": false
+	},
+	{
+		"altitude_m": 48.5453310943588,
+		"console_height": 184.0,
+		"docked": false,
+		"file": "04-offpad-takeoff-console.png",
+		"hull": 100.0,
+		"landed": false,
+		"menu_visible": false,
+		"phone_capture": false,
+		"renderer": "OpenGL Compatibility/Mesa llvmpipe",
+		"source": "actual scenes/main.tscn",
+		"surface": true,
+		"taking_off": false
+	},
+	{
+		"altitude_m": 48.5453310943588,
+		"console_height": 184.0,
+		"docked": false,
+		"file": "05-report-page.png",
+		"hull": 100.0,
+		"landed": false,
+		"menu_visible": true,
+		"phone_capture": false,
+		"renderer": "OpenGL Compatibility/Mesa llvmpipe",
+		"source": "actual scenes/main.tscn",
+		"surface": true,
+		"taking_off": false
+	}
+]

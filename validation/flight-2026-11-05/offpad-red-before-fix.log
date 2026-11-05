@@ -1,0 +1,123 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+ERROR: Holding the enabled positive-lift control lifts a healthy landed ship after restore: local cobra
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_offpad_takeoff.gd:15)
+       [1] case_for (res://tests/test_offpad_takeoff.gd:56)
+       [2] run (res://tests/test_offpad_takeoff.gd:90)
+ERROR: Positive lift works before any reload as well: local cobra
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_offpad_takeoff.gd:15)
+       [1] case_for (res://tests/test_offpad_takeoff.gd:61)
+       [2] run (res://tests/test_offpad_takeoff.gd:90)
+ERROR: Holding the enabled positive-lift control lifts a healthy landed ship after restore: local eagle
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_offpad_takeoff.gd:15)
+       [1] case_for (res://tests/test_offpad_takeoff.gd:56)
+       [2] run (res://tests/test_offpad_takeoff.gd:90)
+ERROR: Positive lift works before any reload as well: local eagle
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_offpad_takeoff.gd:15)
+       [1] case_for (res://tests/test_offpad_takeoff.gd:61)
+       [2] run (res://tests/test_offpad_takeoff.gd:90)
+ERROR: Holding the enabled positive-lift control lifts a healthy landed ship after restore: local shuttle
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_offpad_takeoff.gd:15)
+       [1] case_for (res://tests/test_offpad_takeoff.gd:56)
+       [2] run (res://tests/test_offpad_takeoff.gd:90)
+ERROR: Positive lift works before any reload as well: local shuttle
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_offpad_takeoff.gd:15)
+       [1] case_for (res://tests/test_offpad_takeoff.gd:61)
+       [2] run (res://tests/test_offpad_takeoff.gd:90)
+ERROR: Holding the enabled positive-lift control lifts a healthy landed ship after restore: globe cobra
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_offpad_takeoff.gd:15)
+       [1] case_for (res://tests/test_offpad_takeoff.gd:56)
+       [2] run (res://tests/test_offpad_takeoff.gd:90)
+ERROR: Positive lift works before any reload as well: globe cobra
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_offpad_takeoff.gd:15)
+       [1] case_for (res://tests/test_offpad_takeoff.gd:61)
+       [2] run (res://tests/test_offpad_takeoff.gd:90)
+ERROR: Holding the enabled positive-lift control lifts a healthy landed ship after restore: globe eagle
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_offpad_takeoff.gd:15)
+       [1] case_for (res://tests/test_offpad_takeoff.gd:56)
+       [2] run (res://tests/test_offpad_takeoff.gd:90)
+ERROR: Positive lift works before any reload as well: globe eagle
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_offpad_takeoff.gd:15)
+       [1] case_for (res://tests/test_offpad_takeoff.gd:61)
+       [2] run (res://tests/test_offpad_takeoff.gd:90)
+ERROR: Holding the enabled positive-lift control lifts a healthy landed ship after restore: globe shuttle
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_offpad_takeoff.gd:15)
+       [1] case_for (res://tests/test_offpad_takeoff.gd:56)
+       [2] run (res://tests/test_offpad_takeoff.gd:90)
+ERROR: Positive lift works before any reload as well: globe shuttle
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_offpad_takeoff.gd:15)
+       [1] case_for (res://tests/test_offpad_takeoff.gd:61)
+       [2] run (res://tests/test_offpad_takeoff.gd:90)
+ERROR: Holding the enabled positive-lift control lifts a healthy landed ship after restore: source_city cobra
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_offpad_takeoff.gd:15)
+       [1] case_for (res://tests/test_offpad_takeoff.gd:56)
+       [2] run (res://tests/test_offpad_takeoff.gd:90)
+ERROR: Positive lift works before any reload as well: source_city cobra
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_offpad_takeoff.gd:15)
+       [1] case_for (res://tests/test_offpad_takeoff.gd:61)
+       [2] run (res://tests/test_offpad_takeoff.gd:90)
+ERROR: Holding the enabled positive-lift control lifts a healthy landed ship after restore: source_city eagle
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_offpad_takeoff.gd:15)
+       [1] case_for (res://tests/test_offpad_takeoff.gd:56)
+       [2] run (res://tests/test_offpad_takeoff.gd:90)
+ERROR: Positive lift works before any reload as well: source_city eagle
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_offpad_takeoff.gd:15)
+       [1] case_for (res://tests/test_offpad_takeoff.gd:61)
+       [2] run (res://tests/test_offpad_takeoff.gd:90)
+ERROR: Holding the enabled positive-lift control lifts a healthy landed ship after restore: source_city shuttle
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_offpad_takeoff.gd:15)
+       [1] case_for (res://tests/test_offpad_takeoff.gd:56)
+       [2] run (res://tests/test_offpad_takeoff.gd:90)
+ERROR: Positive lift works before any reload as well: source_city shuttle
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_offpad_takeoff.gd:15)
+       [1] case_for (res://tests/test_offpad_takeoff.gd:61)
+       [2] run (res://tests/test_offpad_takeoff.gd:90)
+ERROR: Positive lift clears a sloping terrain cell without a pad permission check
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_offpad_takeoff.gd:15)
+       [1] steep_ground (res://tests/test_offpad_takeoff.gd:73)
+       [2] run (res://tests/test_offpad_takeoff.gd:91)
+ERROR: A damaged surviving ship can lift without repeatedly taking contact damage
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_offpad_takeoff.gd:15)
+       [1] damaged_and_destroyed (res://tests/test_offpad_takeoff.gd:81)
+       [2] run (res://tests/test_offpad_takeoff.gd:91)
+OFFPAD TAKEOFF TESTS: 109 checks, 20 failures

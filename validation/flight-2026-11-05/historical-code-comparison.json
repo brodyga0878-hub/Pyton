@@ -1,0 +1,8 @@
+{
+  "user_reported_version": "0.11.1",
+  "source_commit": "545d0c688e3835c3e2fadd9e1660169a18c15d76",
+  "surface_model_sha256": "524c3e6fe09e4572b8c7913c2265fa085595c6fd40907ab6256cf77177862ad1",
+  "surface_model_identical_to_0_11_4": true,
+  "main_takeoff_handlers_identical": true,
+  "exact_user_save_or_phone_not_available": true
+}

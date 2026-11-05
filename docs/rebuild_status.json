@@ -29,8 +29,8 @@
   },
   "current_reconstruction": {
     "implementation_kind": "New integration and newly written missing modules around preserved historical source; not discovery of the complete former source tree",
-    "application_version": "0.11.4-surfaces-alpha1",
-    "application_integration_status": "Surfaces0.11.4: dedicated ship/station texture art, independent unchanged geometry, economy coldboot fixed;2061 targeted checks plus real scene smoke and matched before/after desktop renders passed; physical Android validation pending.",
+    "application_version": "0.11.5-flight-alpha1",
+    "application_integration_status": "Flight0.11.5: classic lower instruments, independent multi-finger action buttons and healthy off-pad lift/takeoff fix.1682 targeted checks18suites and real application smoke passed; physical phone pending.",
     "native_android_runtime": "Godot ARM64; no DOS or x86 emulator in the game",
     "modules_present": [
       "New main scene controller and Russian phone interface",
@@ -157,20 +157,20 @@
     },
     "whole_application_smoke_passed": true,
     "whole_application_smoke_scope": "Actual scene: source Sol/Earth, training auto dock/delivery, original New Moscow84 entry/landing, atomic disk save/reload and persistent source-city view; desktop Godot only",
-    "whole_application_smoke_log": "validation/surfaces-2026-11-05/app-smoke.log",
+    "whole_application_smoke_log": "validation/flight-2026-11-05/app-smoke.log",
     "desktop_gles_render_passed": true,
-    "desktop_gles_render_scope": "Eight actual ordinary-flight scene frames compared against8 same-pose/date/quality0.11.3 frames, software Mesa llvmpipe OpenGL Compatibility; not Android hardware performance.",
-    "desktop_gles_render_log": "validation/surfaces-2026-11-05/render-after.log",
+    "desktop_gles_render_scope": "Five actual Main frames: lower flight console, autonomous dock/services, healthy off-pad landing/takeoff and report UI; Mesa llvmpipe software desktop rendering, not phone performance.",
+    "desktop_gles_render_log": "validation/flight-2026-11-05/render.log",
     "android_apk_built": true,
     "android_apk_technically_verified": true,
-    "android_artifact_status": "Surfaces0.11.4 ARM64 alpha technically verified including all36 maps and runtime metadata; TEST signing, physical Android validation pending.",
-    "final_android_candidate_hash": "bfd45850f1568de3452af706e703c8863f48e374030a0b06756411308e94a9c4",
+    "android_artifact_status": "Flight0.11.5 ARM64 alpha technically verified: all36 textures plus console and touch-action runtime, TEST signing; physical Android pending.",
+    "final_android_candidate_hash": "6e605410e7694fe8c71e13fa117274b545367b7fbe5ea81a3fd39197e68c5742",
     "final_android_candidate": {
-      "file": "deliverables/0.11.4-surfaces-alpha1/StarFrontier-0.11.4-surfaces-arm64.apk",
-      "bytes": 36051108,
+      "file": "deliverables/0.11.5-flight-alpha1/StarFrontier-0.11.5-flight-arm64.apk",
+      "bytes": 36063732,
       "package": "org.starfrontier.rebuild",
-      "version": "0.11.4-surfaces-alpha1",
-      "version_code": 26,
+      "version": "0.11.5-flight-alpha1",
+      "version_code": 27,
       "abi": "arm64-v8a",
       "min_sdk": 24,
       "target_sdk": 36,
@@ -179,9 +179,10 @@
       "zip_and_elf_alignment_16k": true,
       "native_data_assets_verified": true,
       "material_map_count_verified": 36,
+      "flight_ui_runtime_verified": true,
       "debuggable": false,
       "toolchain_smoke_only": false,
-      "verification_report": "validation/surfaces-2026-11-05/surfaces-android-verification.json"
+      "verification_report": "validation/flight-2026-11-05/flight-android-verification.json"
     },
     "physical_device_tested": false,
     "new_russian_name_labels": 133,
@@ -199,7 +200,7 @@
       "Three adapted flight profiles and training services do not complete original ships, equipment, economy, combat, AI or campaign",
       "Russian interface and new proper-name labels do not complete the original text corpus or editorial review"
     ],
-    "application_version_planned": "0.11.4-surfaces-alpha1",
+    "application_version_planned": "0.11.5-flight-alpha1",
     "graphics_update": {
       "version": "0.11.1-graphics-alpha1",
       "checks": 1408,
@@ -310,6 +311,40 @@
       "physical_device_tested": false,
       "world_surface_individual_art_pending": true,
       "documentation": "docs/SURFACES_0_11_4_RU.md"
+    },
+    "flight_controls_update": {
+      "version": "0.11.5-flight-alpha1",
+      "checks": 1682,
+      "passed_suites": 18,
+      "failures": 0,
+      "validation_report": "validation/flight-2026-11-05/flight-validation.json",
+      "user_bug_version": "0.11.1",
+      "historical_surface_code_matches_0_11_4": true,
+      "module_before_fix": {
+        "checks": 109,
+        "failures": 20
+      },
+      "module_after_fix": {
+        "checks": 109,
+        "failures": 0
+      },
+      "real_main_touch_checks": 66,
+      "touch_action_checks": 28,
+      "console_checks": 116,
+      "healthy_offpad_positive_lift_supported": true,
+      "explicit_takeoff_releases_held_inputs": true,
+      "second_finger_buttons_independent": true,
+      "modal_blocks_commands_synchronously": true,
+      "classic_lower_console_requested": true,
+      "indicators_use_actual_flight_data": true,
+      "save_schema_unchanged": true,
+      "diagnostics_surface_motion_included": true,
+      "full_original_docking_implemented": false,
+      "full_original_port_services_implemented": false,
+      "exact_user_save_reproduced": false,
+      "physical_device_tested": false,
+      "capture_manifest": "validation/flight-2026-11-05/screenshots/capture-manifest.json",
+      "documentation": "docs/FLIGHT_0_11_5_RU.md"
     }
   },
   "target_device": "Samsung S23 Ultra 12/512",
@@ -336,7 +371,7 @@
     "13": "Full Russian localization",
     "14": "Device testing and release"
   },
-  "current_prerequisite": "Continue requested individual art for cities and world surfaces, then continue original world/settlement block10 with source-versus-adapter boundaries; retain checkpoint backups and physical phone test as pending.",
+  "current_prerequisite": "Retain classic lower console and verify repaired takeoff on target phone; continue individual world-surface art then original world/settlement block10 with explicit source-versus-adapter boundaries.",
   "historical_statistics_are_current_validation": false,
   "full_release_date": null,
   "detailed_audit": "docs/RECOVERY_AND_ROADMAP_RU.md",

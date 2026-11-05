@@ -35,6 +35,9 @@ if [ ! -f "$GODOT_ANDROID_KEYSTORE_RELEASE_PATH" ]; then
     exit 1
 fi
 mkdir -p "$BUILD_PROJECT/build"
+# Exclude generated test projects, logs and screenshots from the editor scan.
+# The export filter alone runs after some resource/dependency discovery.
+: > "$BUILD_PROJECT/build/.gdignore"
 BUILD_OUTPUT="$BUILD_PROJECT/build/starfrontier-rebuild-arm64-alpha.apk"
 BUILD_LOG="$BUILD_PROJECT/build/android-export.log"
 rm -f "$BUILD_OUTPUT"

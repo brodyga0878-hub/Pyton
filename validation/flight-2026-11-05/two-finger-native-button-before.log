@@ -1,0 +1,8 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+BUTTON rect=[P: (739.0, 614.0), S: (175.0, 82.0)] viewport=[P: (0.0, 0.0), S: (1440.0, 720.0)]
+PUSH TOUCH presses=0
+PUSH MOUSE presses=1
+PARSE TOUCH presses=2
+Held=true pointer=-2
+SECOND TOUCH presses=2
