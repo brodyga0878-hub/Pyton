@@ -1,0 +1,38 @@
+{
+  "version": "0.11.9-worlds-alpha1",
+  "source_commit": "1fafdc03ac7ac93b111eb454237e8aaf9621d118",
+  "files": {
+    "StarFrontier-0.11.9-worlds-source.zip": {
+      "bytes": 23003297,
+      "sha256": "a73afae906150681c2346eb4e3053cccc18c4d49802b7b2049b986aa2f07135a"
+    },
+    "StarFrontier-0.11.9-worlds-arm64.apk": {
+      "bytes": 49220727,
+      "sha256": "a1bbbea481cc0e21ee01b2ce1501ec6f385853d2a10302dca55294a4d312bb37"
+    }
+  },
+  "checks": 69252,
+  "passed_suites": 25,
+  "failures": 0,
+  "F881_native_contexts": 2497,
+  "F878_native_contexts": 122,
+  "clock_native_contexts": 1453,
+  "handcrafted_runtime_records_mapped": 130,
+  "handcrafted_systems": 11,
+  "unmapped_Riedquat_templates_native_controls": 3,
+  "source_calendar_epoch": "3250-01-01 12:00:00",
+  "original_time_accumulator_integrated": false,
+  "original_physical_ephemeris_backend_integrated": false,
+  "old_analytic_physics_and_save_layout_preserved": true,
+  "full_procedural_galaxy_complete": false,
+  "material_maps_unchanged": 51,
+  "source_archive_excludes": [
+    "deliverables",
+    "validation"
+  ],
+  "physical_device_tested": false,
+  "test_signing_key_only": true,
+  "full_original_port_complete": false,
+  "publication_ready": false,
+  "validation_path": "validation/source-worlds-2026-11-06"
+}
