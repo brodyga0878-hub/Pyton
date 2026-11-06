@@ -1,7 +1,7 @@
 class_name PlanetarySystem
 extends RefCounted
-# Original JJFFE orbital coordinates for new v2 worlds, with explicit analytic
-# SI surface/gravity adapters and preserved v1 analytic saved-world layouts.
+# Source celestial/port centres and versioned station-following frames. Legacy
+# v1/v2 layouts and analytic SI surface/gravity adapters remain explicit.
 const AU_METERS:=149597870700.0
 const EARTHS_PER_SUN:=332946.0
 const YEAR_DAYS:=365.256
@@ -12,6 +12,9 @@ const ARRIVAL_DIRECTION:=Vector3(0.48,-0.28,-1.0)
 const SOURCE_LAYOUT:="handcrafted_analytic_rebuild_v1"
 const NATIVE_LAYOUT:="handcrafted_jjffe_orbits_v2"
 const NATIVE_CONTRACT:="jjffe-f880-3250-anchor-f866-orbit-xyz-v1"
+const PORT_LAYOUT:="handcrafted_jjffe_ports_v3"
+const PORT_CONTRACT:="source-orbital-centres-station-following-v1"
+const ORBITAL_DOCK_LOCAL:=Vector3(0,0,-2500)
 const SOLAR_LAYOUT:="reconstructed_solar_v1"
 const EMPTY_LAYOUT:="source_unavailable_rebuild_v1"
 const RuntimeBuilder=preload("res://scripts/handcrafted_runtime_builder.gd")
@@ -19,6 +22,7 @@ const SourceOrbit=preload("res://scripts/source_orbit.gd")
 const SourceClock=preload("res://scripts/source_clock.gd")
 const SourceUnits=preload("res://scripts/source_units.gd")
 const SourceMath=preload("res://scripts/ffe_math.gd")
+const SourceGravity=preload("res://scripts/source_gravity.gd")
 var source_digest:=""
 var star_context:Dictionary={}
 var layout_mode:=SOLAR_LAYOUT
@@ -42,6 +46,8 @@ var source_runtime_state:Dictionary={}
 var _runtime_by_global:Dictionary={}
 var requested_layout:=SOURCE_LAYOUT
 var orbit_backend_state:Dictionary={}
+var port_backend_state:Dictionary={}
+var source_physics_state:Dictionary={}
 var native_evaluation_count:=0
 var _native_cache_tick:=-1
 var _native_cache_day:=-1
@@ -70,25 +76,25 @@ func configure(star:Dictionary,layout:String="current")->void:
 	system_id=int(star.get("id",SOL_ID))
 	bodies.clear();by_id.clear();settlements.clear();site_id="";pending_site_id="";pending_id="";transfer_remaining=0;message=""
 	source_runtime_state.clear();_runtime_by_global.clear()
-	orbit_backend_state.clear();_clear_orbit_cache()
+	orbit_backend_state.clear();port_backend_state.clear();source_physics_state.clear();_clear_orbit_cache()
 	requested_layout=SOURCE_LAYOUT if layout=="current" else layout
 	_load_sources()
 	var applied:=false
-	if layout in ["current",SOURCE_LAYOUT,NATIVE_LAYOUT]:
+	if layout in ["current",SOURCE_LAYOUT,NATIVE_LAYOUT,PORT_LAYOUT]:
 		for entry in _source_worlds.get("systems",[]):
 			if entry is Dictionary and int(entry.get("system_id",-1))==system_id:
 				applied=_apply_handcrafted(entry);break
-	if applied and layout==NATIVE_LAYOUT:applied=_enable_native_orbits()
+	if applied and layout in [NATIVE_LAYOUT,PORT_LAYOUT]:applied=_enable_native_orbits()
 	if applied:
-		layout_mode=NATIVE_LAYOUT if layout==NATIVE_LAYOUT else SOURCE_LAYOUT
-		source_digest=(layout_mode+str(system_id)+_source_hash+(SourceOrbit.SOURCE_VARIANT+NATIVE_CONTRACT+String.num(SourceUnits.METRES_PER_RAW,16) if layout_mode==NATIVE_LAYOUT else "")).sha256_text()
+		layout_mode=layout if layout in [NATIVE_LAYOUT,PORT_LAYOUT] else SOURCE_LAYOUT
+		source_digest=(layout_mode+str(system_id)+_source_hash+(SourceOrbit.SOURCE_VARIANT+NATIVE_CONTRACT+String.num(SourceUnits.METRES_PER_RAW,16) if layout_mode in [NATIVE_LAYOUT,PORT_LAYOUT] else "")+(PORT_CONTRACT+SourceGravity.SOURCE_VARIANT if layout_mode==PORT_LAYOUT else "")).sha256_text()
 	elif system_id==SOL_ID and layout in ["current",SOLAR_LAYOUT]:
 		source_runtime_state.clear();_runtime_by_global.clear()
 		bodies.clear();by_id.clear();settlements.clear()
 		_reconstructed_solar();layout_mode=SOLAR_LAYOUT;source_digest="physical-solar-adapter-v1".sha256_text()
 	else:
 		source_runtime_state.clear();_runtime_by_global.clear()
-		orbit_backend_state.clear();_clear_orbit_cache()
+		orbit_backend_state.clear();port_backend_state.clear();source_physics_state.clear();_clear_orbit_cache()
 		bodies.clear();by_id.clear();settlements.clear()
 		_add(_star_body(str(star.get("name","Звезда"))))
 		default_id="star";layout_mode=EMPTY_LAYOUT;source_digest=(EMPTY_LAYOUT+str(system_id)).sha256_text()
@@ -98,7 +104,7 @@ func configure(star:Dictionary,layout:String="current")->void:
 func preferred_layout()->String:
 	# Legacy jumps always selected the current source adapter, including jumps
 	# out of an explicitly restored Solar adapter. Only v2 opts into new orbits.
-	return NATIVE_LAYOUT if requested_layout==NATIVE_LAYOUT else SOURCE_LAYOUT
+	return requested_layout if requested_layout in [NATIVE_LAYOUT,PORT_LAYOUT] else SOURCE_LAYOUT
 
 func _enable_native_orbits()->bool:
 	if source_runtime_state.is_empty():return false
@@ -113,9 +119,20 @@ func _enable_native_orbits()->bool:
 		body.inclination=float(SourceMath.s16(raw.decode_u16(34)))*TAU/65536.0
 		body.orbit_backend=SourceOrbit.SOURCE_VARIANT
 		body.physical_adapter="analytic_si_rebuild_v1"
+		if requested_layout==PORT_LAYOUT:
+			var coefficient:=SourceGravity.coefficient(raw)
+			if coefficient.is_empty():return false
+			body["source_a4_packed"]=int(coefficient.a4_u32)
 	if not _prepare_native_positions(0.0):return false
 	source_runtime_state.physical_layout_changed=true
 	orbit_backend_state={"source_variant":SourceOrbit.SOURCE_VARIANT,"contract":NATIVE_CONTRACT,"layout":NATIVE_LAYOUT,"coordinate_units":"raw geometry calibrated by16785/2^24 metres","celestial_parent_composition":"non-rotating signed64 translation","clock":"fixed F880 initialization at3250 epoch then ordinary F866 orbital updates via elapsed-days bridge","epoch_tick_u32":SourceClock.EPOCH_TICK_U32,"epoch_day_u32":SourceClock.EPOCH_DAY_U32,"radius_mass_gravity_spin":"analytic_si_rebuild_v1","orbital_ports_rendered":false,"complete_original_physics":false}
+	if requested_layout==PORT_LAYOUT:
+		orbit_backend_state.layout=PORT_LAYOUT;orbit_backend_state.orbital_ports_rendered=true
+		var ports:=0
+		for site in settlements:
+			if int(site.type_code) in [32,33,34]:ports+=1
+		port_backend_state={"contract":PORT_CONTRACT,"source_variant":SourceOrbit.SOURCE_VARIANT,"orbital_ports":ports,"position":"native source centres with non-rotating parent translation","local_frame":"non-rotating station-following origin","dock_local":[0,0,-2500],"render_scope":"selected orbital port only","geometry_orientation_services":"existing adapted station; source spin and full dock geometry/services remain separate","complete_original_docking":false}
+		source_physics_state={"source_variant":SourceGravity.SOURCE_VARIANT,"F880_a4_initialized":true,"body_count":bodies.size(),"F603_velocity_kernel_available":true,"F1511_F1512_kernel_available":true,"live_gravity":"analytic_si_rebuild_v1","live_surface_radius":"analytic_si_rebuild_v1","descriptor_bounds_are_surface_radius":false,"source_time_policy_integrated":false,"complete_original_physics":false}
 	return true
 
 func _prepare_native_positions(days:float)->bool:
@@ -123,7 +140,11 @@ func _prepare_native_positions(days:float)->bool:
 	if clock.is_empty():return false
 	if _native_cache_tick==int(clock.tick_u32) and _native_cache_day==int(clock.day_u32):return true
 	var relative:Dictionary={};var absolute:Dictionary={}
-	for body in bodies:
+	var objects:Array=bodies.duplicate()
+	if requested_layout==PORT_LAYOUT:
+		for site in settlements:
+			if int(site.type_code) in [32,33,34]:objects.append(site)
+	for body in objects:
 		var record:=str(body.get("runtime_record_hex","")).hex_decode()
 		if record.size()!=68:return false
 		var evaluated:=SourceOrbit.evaluate_from_epoch(record,clock.tick_u32,clock.day_u32,SourceClock.EPOCH_TICK_U32,SourceClock.EPOCH_DAY_U32)
@@ -135,7 +156,7 @@ func _prepare_native_positions(days:float)->bool:
 		absolute[str(body.id)]=SourceOrbit.add_positions(absolute[parent],point) if not parent.is_empty() else point.duplicate()
 	_native_relative_raw=relative;_native_positions_raw=absolute
 	_native_cache_tick=int(clock.tick_u32);_native_cache_day=int(clock.day_u32)
-	native_evaluation_count+=bodies.size()
+	native_evaluation_count+=objects.size()
 	return true
 
 static func _source_au(point:PackedInt64Array)->Array:
@@ -184,6 +205,9 @@ func _apply_handcrafted(entry:Dictionary)->bool:
 		if not parent.is_empty():period=YEAR_DAYS*sqrt(pow(a,3)/(float(candidate_index[parent].mass_solar)+mass))
 		var body:={"id":ids[int(row.local_index)],"name":_translate(str(row.name_en)),"name_en":str(row.name_en),"parent":parent,"kind":kind,"radius_km":radius,"mass_solar":mass,"a_au":a,"eccentricity":0.0,"inclination":deg_to_rad(float(row.inclination_tenths_raw)/10.0),"node":0.0,"periapsis":0.0,"phase":deg_to_rad(float(row.phase_degrees)),"period_days":period,"rotation_hours":24.0,"rings":str(row.name_en)=="Saturn","source":"ffe_constructor_parameters","physical_adapter":"analytic_si_rebuild_v1","original_index":int(row.local_index),"original_type":type_code,"model_index":int(row.model_index),"temperature_c":int(row.temperature_c)}
 		_attach_record(body,row)
+		if requested_layout==PORT_LAYOUT:
+			body["source_outer_bound_m"]=SourceUnits.metres(float(row.model_radius_raw)*pow(2.0,float(row.model_scale_raw)))
+			body["source_bound_role"]="descriptor_outer_sphere_not_surface_radius"
 		candidate.append(body);candidate_index[str(body.id)]=body
 	for row in entry.objects:
 		if int(row.type_code)<32:continue
@@ -270,7 +294,7 @@ static func eccentric_anomaly(mean:float,eccentricity:float)->float:
 	return e
 
 func relative_au(body:Dictionary,days:float)->Array:
-	if layout_mode==NATIVE_LAYOUT:
+	if layout_mode in [NATIVE_LAYOUT,PORT_LAYOUT]:
 		if not _prepare_native_positions(days) or not _native_relative_raw.has(str(body.get("id",""))):return []
 		return _source_au(_native_relative_raw[str(body.id)])
 	if str(body.parent).is_empty():return [0.0,0.0,0.0]
@@ -284,7 +308,7 @@ func relative_au(body:Dictionary,days:float)->Array:
 
 func position_au(id:String,days:float)->Array:
 	if not by_id.has(id) or not is_finite(days):return []
-	if layout_mode==NATIVE_LAYOUT:
+	if layout_mode in [NATIVE_LAYOUT,PORT_LAYOUT]:
 		if not _prepare_native_positions(days):return []
 		return _source_au(_native_positions_raw[id])
 	var result:Array=[0.0,0.0,0.0];var cursor:=id
@@ -297,6 +321,9 @@ func position_au(id:String,days:float)->Array:
 	return []
 
 func origin_au(days:float)->Array:
+	if layout_mode==PORT_LAYOUT and is_orbital_site():
+		var station:=site_position_au(site_id,days)
+		if station.size()==3:return [float(station[0])-ORBITAL_DOCK_LOCAL.x/AU_METERS,float(station[1])-ORBITAL_DOCK_LOCAL.y/AU_METERS,float(station[2])-ORBITAL_DOCK_LOCAL.z/AU_METERS]
 	var center:=position_au(focus_id,days)
 	if center.size()!=3:return [0.0,0.0,0.0]
 	var radius:=float(by_id[focus_id].radius_km)*1000.0;var direction:=ARRIVAL_DIRECTION.normalized()
@@ -309,9 +336,24 @@ func local_meters(id:String,days:float)->Vector3:
 	var origin:=origin_au(days)
 	return Vector3((float(p[0])-float(origin[0]))*AU_METERS,(float(p[1])-float(origin[1]))*AU_METERS,(float(p[2])-float(origin[2]))*AU_METERS)
 
+func site_position_au(id:String,days:float)->Array:
+	if layout_mode!=PORT_LAYOUT:return []
+	var site:=get_site(id)
+	if site.is_empty() or int(site.type_code) not in [32,33,34]:return []
+	if not _prepare_native_positions(days) or not _native_positions_raw.has(id):return []
+	return _source_au(_native_positions_raw[id])
+
+func site_local_meters(id:String,days:float)->Vector3:
+	var point:=site_position_au(id,days)
+	if point.size()!=3:return Vector3.ZERO
+	# Avoid cancellation through AU coordinates for the current local target.
+	if is_orbital_site() and id==site_id:return ORBITAL_DOCK_LOCAL
+	var origin:=origin_au(days)
+	return Vector3((float(point[0])-float(origin[0]))*AU_METERS,(float(point[1])-float(origin[1]))*AU_METERS,(float(point[2])-float(origin[2]))*AU_METERS)
+
 func gravity_at(position:Vector3,days:float)->Vector3:
 	if not position.is_finite() or not is_finite(days):return Vector3.ZERO
-	if layout_mode==NATIVE_LAYOUT and not _prepare_native_positions(days):return Vector3.ZERO
+	if layout_mode in [NATIVE_LAYOUT,PORT_LAYOUT] and not _prepare_native_positions(days):return Vector3.ZERO
 	var gravity:=Vector3.ZERO
 	for body in bodies:
 		if body.kind=="barycenter":continue
@@ -413,15 +455,20 @@ func snapshot()->Dictionary:
 	var result:={"schema":"starfrontier-rebuild-world-v1","version":1,"layout":layout_mode,"source_digest":source_digest,"system_id":system_id,"focus_id":focus_id,"selected_id":selected_id,"site_id":site_id,"pending_id":pending_id,"pending_site_id":pending_site_id,"transfer_remaining":transfer_remaining}
 	if requested_layout==NATIVE_LAYOUT:
 		result.schema="starfrontier-rebuild-world-v2";result.version=2;result["preferred_layout"]=NATIVE_LAYOUT
+	elif requested_layout==PORT_LAYOUT:
+		result.schema="starfrontier-rebuild-world-v3";result.version=3;result["preferred_layout"]=PORT_LAYOUT
 	return result
 
 func restore(data:Dictionary)->bool:
 	var native_save:bool=data.get("schema")=="starfrontier-rebuild-world-v2" and data.get("version")==2
+	var port_save:bool=data.get("schema")=="starfrontier-rebuild-world-v3" and data.get("version")==3
 	var legacy_save:bool=data.get("schema")=="starfrontier-rebuild-world-v1" and data.get("version")==1
-	if not native_save and not legacy_save:return false
+	if not native_save and not port_save and not legacy_save:return false
 	if not (data.get("system_id") is int or data.get("system_id") is float) or not is_finite(float(data.system_id)) or float(data.system_id)!=float(system_id):return false
 	if not data.get("source_digest") is String:return false
-	if native_save:
+	if port_save:
+		if data.get("layout") not in [PORT_LAYOUT,EMPTY_LAYOUT] or data.get("preferred_layout")!=PORT_LAYOUT:return false
+	elif native_save:
 		if data.get("layout") not in [NATIVE_LAYOUT,EMPTY_LAYOUT] or data.get("preferred_layout")!=NATIVE_LAYOUT:return false
 	elif data.get("layout") not in [SOURCE_LAYOUT,SOLAR_LAYOUT,EMPTY_LAYOUT] or data.has("preferred_layout"):return false
 	for key in ["focus_id","selected_id","site_id","pending_id","pending_site_id"]:
@@ -443,8 +490,9 @@ func restore(data:Dictionary)->bool:
 	elif not str(data.pending_id).is_empty() or not str(data.pending_site_id).is_empty():return false
 	bodies=candidate.bodies;by_id=candidate.by_id;settlements=candidate.settlements;default_id=candidate.default_id
 	layout_mode=candidate.layout_mode;source_digest=candidate.source_digest
-	requested_layout=NATIVE_LAYOUT if native_save else (SOURCE_LAYOUT if layout_mode==EMPTY_LAYOUT else layout_mode)
+	requested_layout=PORT_LAYOUT if port_save else (NATIVE_LAYOUT if native_save else (SOURCE_LAYOUT if layout_mode==EMPTY_LAYOUT else layout_mode))
 	orbit_backend_state=candidate.orbit_backend_state.duplicate(true)
+	port_backend_state=candidate.port_backend_state.duplicate(true);source_physics_state=candidate.source_physics_state.duplicate(true)
 	_native_cache_tick=candidate._native_cache_tick;_native_cache_day=candidate._native_cache_day
 	_native_positions_raw=candidate._native_positions_raw.duplicate(true);_native_relative_raw=candidate._native_relative_raw.duplicate(true);native_evaluation_count=candidate.native_evaluation_count
 	source_runtime_state=candidate.source_runtime_state.duplicate(true);_runtime_by_global=candidate._runtime_by_global.duplicate(true)

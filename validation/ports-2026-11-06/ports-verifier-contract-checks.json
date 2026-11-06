@@ -1,0 +1,19 @@
+{
+  "scope": "In-memory package-contract and local-source negative checks only; synthetic GDSC headers used, not an APK/engine/native-oracle run.",
+  "positive_checks": 3,
+  "negative_checks": 9,
+  "results": [
+    "positive_v33_orbit_contract",
+    "positive_v33_physics_ports_contract",
+    "positive_v32_original_contract",
+    "reject_missing_gravity_module",
+    "reject_tampered_JSON",
+    "reject_native_variant",
+    "reject_wrong_epoch",
+    "reject_false_live_gravity_scope",
+    "reject_false_completed_time_scope",
+    "reject_wrong_dock_target",
+    "reject_wrong_newflight_layout33",
+    "reject_accidental_live_raw_kick"
+  ]
+}

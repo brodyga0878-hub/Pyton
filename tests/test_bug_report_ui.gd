@@ -103,7 +103,7 @@ func normal_report()->void:
 	var report:Dictionary=JSON.parse_string(files["report.json"].get_string_from_utf8())
 	check(report.version==BuildInfo.VERSION and report.context.build.code==BuildInfo.VERSION_CODE,"Archive identifies the actual runtime release")
 	check(report.context.mode=="space" and report.context.flight.system_id==game.nav.current_id,"Archive contains the actual active flight context")
-	check(report.context.session.world_layout==game.world.NATIVE_LAYOUT and report.context.session.preferred_world_layout==game.world.NATIVE_LAYOUT,"Report identifies the native orbital layout and its persistent preference")
+	check(report.context.session.world_layout==game.world.PORT_LAYOUT and report.context.session.preferred_world_layout==game.world.PORT_LAYOUT,"Report identifies the native orbital layout and its persistent preference")
 	check(report.context.session.source_orbit==JSON.parse_string(JSON.stringify(game.world.orbit_backend_state)),"Report preserves the actual source-orbit contract and explicit local-physics adapters")
 	check(not report.included_save and not files.has("game-save.json"),"Default report excludes full saved progress")
 	check(files["description.txt"].get_string_from_utf8()==game.report_draft,"Russian multiline description survives the complete UI-to-ZIP path")
@@ -128,7 +128,7 @@ func optional_save_and_export_callbacks()->void:
 	if files.has("game-save.json"):
 		var saved:Dictionary=JSON.parse_string(files["game-save.json"].get_string_from_utf8())
 		check(saved==JSON.parse_string(before),"Opted-in snapshot matches the exact active whole-game payload after JSON decoding")
-		check(saved.planetary.schema=="starfrontier-rebuild-world-v2" and saved.planetary.preferred_layout==game.world.NATIVE_LAYOUT,"Opted-in flight retains the native world schema and future-jump backend")
+		check(saved.planetary.schema=="starfrontier-rebuild-world-v3" and saved.planetary.preferred_layout==game.world.PORT_LAYOUT,"Opted-in flight retains the native world schema and future-jump backend")
 	var source:String=game.current_report.path;var source_bytes:=FileAccess.get_file_as_bytes(source)
 	game.report_export._busy=true;game.report_export._source_path=source;game.report_export._filename=game.current_report.filename
 	game.report_export._on_native_selected(false,PackedStringArray(),0)

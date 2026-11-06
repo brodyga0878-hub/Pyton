@@ -1,0 +1,456 @@
+{
+	"orbital_to_surface_bug": {
+		"entered": true,
+		"left": true,
+		"link_site_id": "site13",
+		"link_valid": false,
+		"retained_world_site_id": "site13",
+		"surface_restore": false,
+		"surface_version": 5
+	},
+	"port_count": 17,
+	"ports": [
+		{
+			"model": 72,
+			"name": "Daedalus",
+			"parent": "mercury",
+			"parent_radius_m": 2439700.0,
+			"samples": [
+				{
+					"clearance_m": 4945349.84460525,
+					"days": 0.0,
+					"orbital_radius_m": 7385049.84460525
+				},
+				{
+					"clearance_m": 4945461.61300085,
+					"days": 0.25,
+					"orbital_radius_m": 7385161.61300085
+				},
+				{
+					"clearance_m": 4945586.95486408,
+					"days": 365.25,
+					"orbital_radius_m": 7385286.95486408
+				}
+			],
+			"site": "site3",
+			"system": 44341016,
+			"type": 32
+		},
+		{
+			"model": 80,
+			"name": "Abraham Lincoln",
+			"parent": "earth",
+			"parent_radius_m": 6371000.0,
+			"samples": [
+				{
+					"clearance_m": 35823614.9194558,
+					"days": 0.0,
+					"orbital_radius_m": 42194614.9194558
+				},
+				{
+					"clearance_m": 35824352.3533067,
+					"days": 0.25,
+					"orbital_radius_m": 42195352.3533067
+				},
+				{
+					"clearance_m": 35825442.7264844,
+					"days": 365.25,
+					"orbital_radius_m": 42196442.7264844
+				}
+			],
+			"site": "site13",
+			"system": 44341016,
+			"type": 34
+		},
+		{
+			"model": 80,
+			"name": "M.Gorbachev",
+			"parent": "earth",
+			"parent_radius_m": 6371000.0,
+			"samples": [
+				{
+					"clearance_m": 35823620.6366426,
+					"days": 0.0,
+					"orbital_radius_m": 42194620.6366426
+				},
+				{
+					"clearance_m": 35824361.7998001,
+					"days": 0.25,
+					"orbital_radius_m": 42195361.7998001
+				},
+				{
+					"clearance_m": 35823698.2090475,
+					"days": 365.25,
+					"orbital_radius_m": 42194698.2090475
+				}
+			],
+			"site": "site14",
+			"system": 44341016,
+			"type": 34
+		},
+		{
+			"model": 80,
+			"name": "Li Qing Jao",
+			"parent": "earth",
+			"parent_radius_m": 6371000.0,
+			"samples": [
+				{
+					"clearance_m": 35826477.057857,
+					"days": 0.0,
+					"orbital_radius_m": 42197477.057857
+				},
+				{
+					"clearance_m": 35825003.5996678,
+					"days": 0.25,
+					"orbital_radius_m": 42196003.5996678
+				},
+				{
+					"clearance_m": 35824040.8230463,
+					"days": 365.25,
+					"orbital_radius_m": 42195040.8230463
+				}
+			],
+			"site": "site15",
+			"system": 44341016,
+			"type": 34
+		},
+		{
+			"model": 73,
+			"name": "Galileo",
+			"parent": "moon",
+			"parent_radius_m": 1737400.0,
+			"samples": [
+				{
+					"clearance_m": 6655095.9216745,
+					"days": 0.0,
+					"orbital_radius_m": 8392495.9216745
+				},
+				{
+					"clearance_m": 6654839.83162516,
+					"days": 0.25,
+					"orbital_radius_m": 8392239.83162516
+				},
+				{
+					"clearance_m": 6654780.41248273,
+					"days": 365.25,
+					"orbital_radius_m": 8392180.41248273
+				}
+			],
+			"site": "site18",
+			"system": 44341016,
+			"type": 33
+		},
+		{
+			"model": 80,
+			"name": "Mars High",
+			"parent": "mars",
+			"parent_radius_m": 3389500.0,
+			"samples": [
+				{
+					"clearance_m": 2653092.91852208,
+					"days": 0.0,
+					"orbital_radius_m": 6042592.91852208
+				},
+				{
+					"clearance_m": 2653057.34428782,
+					"days": 0.25,
+					"orbital_radius_m": 6042557.34428782
+				},
+				{
+					"clearance_m": 2652834.90884219,
+					"days": 365.25,
+					"orbital_radius_m": 6042334.90884219
+				}
+			],
+			"site": "site22",
+			"system": 44341016,
+			"type": 34
+		},
+		{
+			"model": 73,
+			"name": "Columbus",
+			"parent": "io",
+			"parent_radius_m": 1821600.0,
+			"samples": [
+				{
+					"clearance_m": 2878196.29429847,
+					"days": 0.0,
+					"orbital_radius_m": 4699796.29429847
+				},
+				{
+					"clearance_m": 2878014.59836086,
+					"days": 0.25,
+					"orbital_radius_m": 4699614.59836086
+				},
+				{
+					"clearance_m": 2878136.83074207,
+					"days": 365.25,
+					"orbital_radius_m": 4699736.83074207
+				}
+			],
+			"site": "site29",
+			"system": 44341016,
+			"type": 33
+		},
+		{
+			"model": 73,
+			"name": "Titan City",
+			"parent": "titan",
+			"parent_radius_m": 2574700.0,
+			"samples": [
+				{
+					"clearance_m": 14209781.8466067,
+					"days": 0.0,
+					"orbital_radius_m": 16784481.8466067
+				},
+				{
+					"clearance_m": 14209540.2396789,
+					"days": 0.25,
+					"orbital_radius_m": 16784240.2396789
+				},
+				{
+					"clearance_m": 14210101.2281159,
+					"days": 365.25,
+					"orbital_radius_m": 16784801.2281159
+				}
+			],
+			"site": "site40",
+			"system": 44341016,
+			"type": 33
+		},
+		{
+			"model": 72,
+			"name": "Eden Station",
+			"parent": "hc9",
+			"parent_radius_m": 5384085.22422127,
+			"samples": [
+				{
+					"clearance_m": 4686899.21258251,
+					"days": 0.0,
+					"orbital_radius_m": 10070984.4368038
+				},
+				{
+					"clearance_m": 4686429.04920707,
+					"days": 0.25,
+					"orbital_radius_m": 10070514.2734283
+				},
+				{
+					"clearance_m": 4686851.94450442,
+					"days": 365.25,
+					"orbital_radius_m": 10070937.1687257
+				}
+			],
+			"site": "site10",
+			"system": 111449880,
+			"type": 32
+		},
+		{
+			"model": 73,
+			"name": "Mayflower High",
+			"parent": "hc6",
+			"parent_radius_m": 5473688.10418904,
+			"samples": [
+				{
+					"clearance_m": 11311295.7008598,
+					"days": 0.0,
+					"orbital_radius_m": 16784983.8050488
+				},
+				{
+					"clearance_m": 11311151.9675297,
+					"days": 0.25,
+					"orbital_radius_m": 16784840.0717187
+				},
+				{
+					"clearance_m": 11310890.3274615,
+					"days": 365.25,
+					"orbital_radius_m": 16784578.4316505
+				}
+			],
+			"site": "site8",
+			"system": 245659414,
+			"type": 33
+		},
+		{
+			"model": 80,
+			"name": "Morgue's Mortuary",
+			"parent": "hc4",
+			"parent_radius_m": 3050881.8306928,
+			"samples": [
+				{
+					"clearance_m": 2991711.07553059,
+					"days": 0.0,
+					"orbital_radius_m": 6042592.90622339
+				},
+				{
+					"clearance_m": 2991674.94724875,
+					"days": 0.25,
+					"orbital_radius_m": 6042556.77794156
+				},
+				{
+					"clearance_m": 2991420.27483101,
+					"days": 365.25,
+					"orbital_radius_m": 6042302.10552381
+				}
+			],
+			"site": "site5",
+			"system": 111466264,
+			"type": 34
+		},
+		{
+			"model": 80,
+			"name": "J.F.Kennedy",
+			"parent": "hc6",
+			"parent_radius_m": 5473688.10418904,
+			"samples": [
+				{
+					"clearance_m": 15606901.1632304,
+					"days": 0.0,
+					"orbital_radius_m": 21080589.2674195
+				},
+				{
+					"clearance_m": 15607623.0593163,
+					"days": 0.25,
+					"orbital_radius_m": 21081311.1635053
+				},
+				{
+					"clearance_m": 15607547.386502,
+					"days": 365.25,
+					"orbital_radius_m": 21081235.4906911
+				}
+			],
+			"site": "site12",
+			"system": 111466264,
+			"type": 34
+		},
+		{
+			"model": 73,
+			"name": "Angus Manwaring",
+			"parent": "hc14",
+			"parent_radius_m": 5473688.10418904,
+			"samples": [
+				{
+					"clearance_m": 15606902.745088,
+					"days": 0.0,
+					"orbital_radius_m": 21080590.8492771
+				},
+				{
+					"clearance_m": 15608067.1947014,
+					"days": 0.25,
+					"orbital_radius_m": 21081755.2988905
+				},
+				{
+					"clearance_m": 15607690.6468217,
+					"days": 365.25,
+					"orbital_radius_m": 21081378.7510107
+				}
+			],
+			"site": "site17",
+			"system": 111466264,
+			"type": 33
+		},
+		{
+			"model": 72,
+			"name": "Lave Station",
+			"parent": "hc2",
+			"parent_radius_m": 5473688.10418904,
+			"samples": [
+				{
+					"clearance_m": 15606901.1392151,
+					"days": 0.0,
+					"orbital_radius_m": 21080589.2434041
+				},
+				{
+					"clearance_m": 15607711.8814841,
+					"days": 0.25,
+					"orbital_radius_m": 21081399.9856732
+				},
+				{
+					"clearance_m": 15606944.137132,
+					"days": 365.25,
+					"orbital_radius_m": 21080632.2413211
+				}
+			],
+			"site": "site3",
+			"system": 44291861,
+			"type": 32
+		},
+		{
+			"model": 72,
+			"name": "Shifnalport",
+			"parent": "hc2",
+			"parent_radius_m": 5653107.71348013,
+			"samples": [
+				{
+					"clearance_m": 15427481.529924,
+					"days": 0.0,
+					"orbital_radius_m": 21080589.2434041
+				},
+				{
+					"clearance_m": 15428292.272193,
+					"days": 0.25,
+					"orbital_radius_m": 21081399.9856732
+				},
+				{
+					"clearance_m": 15427524.5278409,
+					"days": 365.25,
+					"orbital_radius_m": 21080632.2413211
+				}
+			],
+			"site": "site3",
+			"system": 111400725,
+			"type": 32
+		},
+		{
+			"model": 72,
+			"name": "George Lucas",
+			"parent": "hc2",
+			"parent_radius_m": 3589247.58324382,
+			"samples": [
+				{
+					"clearance_m": 17491341.6601603,
+					"days": 0.0,
+					"orbital_radius_m": 21080589.2434041
+				},
+				{
+					"clearance_m": 17492152.4024294,
+					"days": 0.25,
+					"orbital_radius_m": 21081399.9856732
+				},
+				{
+					"clearance_m": 17491384.6580772,
+					"days": 365.25,
+					"orbital_radius_m": 21080632.2413211
+				}
+			],
+			"site": "site3",
+			"system": 245618453,
+			"type": 32
+		},
+		{
+			"model": 72,
+			"name": "Ridley Scott",
+			"parent": "hc2",
+			"parent_radius_m": 3589247.58324382,
+			"samples": [
+				{
+					"clearance_m": 17491341.6601603,
+					"days": 0.0,
+					"orbital_radius_m": 21080589.2434041
+				},
+				{
+					"clearance_m": 17492152.4024294,
+					"days": 0.25,
+					"orbital_radius_m": 21081399.9856732
+				},
+				{
+					"clearance_m": 17491384.6580772,
+					"days": 365.25,
+					"orbital_radius_m": 21080632.2413211
+				}
+			],
+			"site": "site3",
+			"system": 44291862,
+			"type": 32
+		}
+	]
+}

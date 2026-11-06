@@ -525,27 +525,27 @@ func actual_main()->void:
 	var game:Node3D=load("res://scenes/main.tscn").instantiate();var settings:=MemorySettings.new();settings.quality=0;game.settings=settings
 	root.add_child(game);game.set_process(false);game.set_physics_process(false);await process_frame
 	check(game.automated and not game.saving_enabled,"Actual Main is isolated from player saves and settings")
-	check(game.world.layout_mode==World.NATIVE_LAYOUT,"Actual first new game, rather than only helper models, enables source centres")
+	check(game.world.layout_mode==World.PORT_LAYOUT,"Actual first new game, rather than only helper models, enables source centres")
 	private_directory="user://source-orbit-integration-%d"%OS.get_process_id();game.saves.directory=private_directory
 	var payload:=json_copy(game._payload());game.saving_enabled=true
-	check(game._save_game(),"Actual Main writes the full new v2 world into a private test save")
+	check(game._save_game(),"Actual Main writes the full new v3 world into a private test save")
 	game.saving_enabled=false
 	var loaded:Dictionary=game.saves.load_valid(game._decode_state)
 	check(not loaded.is_empty(),"Actual Main reads its new native-family full save")
 	if not loaded.is_empty():
 		game._commit_state(loaded);game._apply_system()
-		check(json_copy(game._payload())==payload and game.world.preferred_layout()==World.NATIVE_LAYOUT,"Full new save restores identical progress with explicit source orbit family")
-	check(jump(game,111449880) and game.world.layout_mode==World.NATIVE_LAYOUT,"Actual Main hyperjump preserves native family in another known source system")
+		check(json_copy(game._payload())==payload and game.world.preferred_layout()==World.PORT_LAYOUT,"Full new save restores identical progress with explicit source orbit family")
+	check(jump(game,111449880) and game.world.layout_mode==World.PORT_LAYOUT,"Actual Main hyperjump preserves native family in another known source system")
 	game.nav.galaxy.by_id[EMPTY_ID]=empty_star()
-	check(jump(game,EMPTY_ID) and game.world.layout_mode==World.EMPTY_LAYOUT and game.world.preferred_layout()==World.NATIVE_LAYOUT,"Actual Main hyperjump retains native family in an unavailable source system")
+	check(jump(game,EMPTY_ID) and game.world.layout_mode==World.EMPTY_LAYOUT and game.world.preferred_layout()==World.PORT_LAYOUT,"Actual Main hyperjump retains native family in an unavailable source system")
 	var nav_save:=json_copy(game.nav.snapshot());var nav_copy:=Nav.new();nav_copy.galaxy.by_id[EMPTY_ID]=empty_star()
 	check(nav_copy.restore(nav_save) and nav_copy.current_id==EMPTY_ID,"Navigation round trip retains an empty-system journey with the same explicit test catalogue")
-	check(jump(game,Galaxy.SOL_ID) and game.world.layout_mode==World.NATIVE_LAYOUT,"Actual Main returns from empty fallback to native Solar centres")
+	check(jump(game,Galaxy.SOL_ID) and game.world.layout_mode==World.PORT_LAYOUT,"Actual Main returns from empty fallback to native Solar centres")
 	game._confirm_new_game();var activated:=false
 	for control in game.menu_rows.get_children():
 		if control is Button and control.text=="Начать новый полёт":control.pressed.emit();activated=true;break
 	game.saving_enabled=false
-	check(activated and game.world.layout_mode==World.NATIVE_LAYOUT and game.nav.current_id==Galaxy.SOL_ID,"Actual new-game menu starts a fresh native-family flight")
+	check(activated and game.world.layout_mode==World.PORT_LAYOUT and game.nav.current_id==Galaxy.SOL_ID,"Actual new-game menu starts a fresh native-family flight")
 	var old_world:=World.new();old_world.configure(game.nav.current());var old_payload:=json_copy(game._payload());old_payload.planetary=old_world.snapshot()
 	var old_loaded:Dictionary=game._decode_state(old_payload)
 	check(not old_loaded.is_empty(),"Actual complete decoder still accepts an old unmodified v1 world save")
@@ -569,7 +569,7 @@ func actual_main()->void:
 		for tick in range(10000):
 			game._tick(0.05,Vector2.ZERO,0)
 			if not game.surface.active:break
-		check(not game.surface.active and game.ship.hull==100 and game.world.layout_mode==World.NATIVE_LAYOUT,"City ascent completes a healthy geographic orbit handoff in the native centre frame")
+		check(not game.surface.active and game.ship.hull==100 and game.world.layout_mode==World.PORT_LAYOUT,"City ascent completes a healthy geographic orbit handoff in the native port-capable centre frame")
 		check(Link.valid(game.surface.orbit_link,game.world) and not game._decode_state(json_copy(game._payload())).is_empty(),"Completed native orbit handoff preserves a valid source-anchor link and full save")
 	check(not game.saving_enabled,"All flight and departure work finishes with user persistence disabled")
 	game.queue_free();await process_frame;remove_private(private_directory)

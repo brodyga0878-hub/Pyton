@@ -1,0 +1,222 @@
+[
+	{
+		"elapsed_days": 0.02,
+		"file": "01-abraham-lincoln-earth.png",
+		"fixture": "Fixed review camera looking toward the real parent from an adapted station. Original port centre, existing51maps, generic station geometry/orientation. No compositing.",
+		"gameplay_progress_read": false,
+		"gameplay_progress_written": false,
+		"layout": "handcrafted_jjffe_ports_v3",
+		"local_parent": [
+			30780778.0,
+			-13384265.0,
+			25566794.0
+		],
+		"local_station": [
+			0.0,
+			0.0,
+			-2500.0
+		],
+		"phone_capture": false,
+		"quality": 2,
+		"scene": "actual scenes/main.tscn",
+		"ship_docked": false,
+		"site_id": "site13",
+		"site_name": "Авраам Линкольн",
+		"source_physics": {
+			"F1511_F1512_kernel_available": true,
+			"F603_velocity_kernel_available": true,
+			"F880_a4_initialized": true,
+			"body_count": 35,
+			"complete_original_physics": false,
+			"descriptor_bounds_are_surface_radius": false,
+			"live_gravity": "analytic_si_rebuild_v1",
+			"live_surface_radius": "analytic_si_rebuild_v1",
+			"source_time_policy_integrated": false,
+			"source_variant": "jjffe-7e54034-gravity"
+		},
+		"source_ports": {
+			"complete_original_docking": false,
+			"contract": "source-orbital-centres-station-following-v1",
+			"dock_local": [
+				0,
+				0,
+				-2500
+			],
+			"geometry_orientation_services": "existing adapted station; source spin and full dock geometry/services remain separate",
+			"local_frame": "non-rotating station-following origin",
+			"orbital_ports": 8,
+			"position": "native source centres with non-rotating parent translation",
+			"source_variant": "jjffe-7e54034-q31-orbit"
+		},
+		"source_site_position_au": [
+			-1.00064158865806,
+			0.0000894682857744014,
+			-0.000519831776175978
+		]
+	},
+	{
+		"elapsed_days": 3.59738099674303,
+		"file": "02-titan-city-original-orbit.png",
+		"fixture": "Fixed review camera looking toward the real parent from an adapted station. Original port centre, existing51maps, generic station geometry/orientation. No compositing.",
+		"gameplay_progress_read": false,
+		"gameplay_progress_written": false,
+		"layout": "handcrafted_jjffe_ports_v3",
+		"local_parent": [
+			0.0,
+			-10790995.0,
+			12853002.0
+		],
+		"local_station": [
+			0.0,
+			0.0,
+			-2500.0
+		],
+		"phone_capture": false,
+		"quality": 2,
+		"scene": "actual scenes/main.tscn",
+		"ship_docked": false,
+		"site_id": "site40",
+		"site_name": "Город Титан",
+		"source_physics": {
+			"F1511_F1512_kernel_available": true,
+			"F603_velocity_kernel_available": true,
+			"F880_a4_initialized": true,
+			"body_count": 35,
+			"complete_original_physics": false,
+			"descriptor_bounds_are_surface_radius": false,
+			"live_gravity": "analytic_si_rebuild_v1",
+			"live_surface_radius": "analytic_si_rebuild_v1",
+			"source_time_policy_integrated": false,
+			"source_variant": "jjffe-7e54034-gravity"
+		},
+		"source_ports": {
+			"complete_original_docking": false,
+			"contract": "source-orbital-centres-station-following-v1",
+			"dock_local": [
+				0,
+				0,
+				-2500
+			],
+			"geometry_orientation_services": "existing adapted station; source spin and full dock geometry/services remain separate",
+			"local_frame": "non-rotating station-following origin",
+			"orbital_ports": 8,
+			"position": "native source centres with non-rotating parent translation",
+			"source_variant": "jjffe-7e54034-q31-orbit"
+		},
+		"source_site_position_au": [
+			6.1511073579206,
+			-0.268076311397864,
+			-7.29590406646921
+		]
+	},
+	{
+		"elapsed_days": 3.5976958115578,
+		"file": "03-native-centre-auto-dock.png",
+		"fixture": "Fixed review camera looking toward the real parent from an adapted station. Original port centre, existing51maps, generic station geometry/orientation. No compositing.",
+		"gameplay_progress_read": false,
+		"gameplay_progress_written": false,
+		"layout": "handcrafted_jjffe_ports_v3",
+		"local_parent": [
+			0.0,
+			-10775475.0,
+			12866013.0
+		],
+		"local_station": [
+			0.0,
+			0.0,
+			-2500.0
+		],
+		"phone_capture": false,
+		"quality": 2,
+		"scene": "actual scenes/main.tscn",
+		"ship_docked": true,
+		"site_id": "site40",
+		"site_name": "Город Титан",
+		"source_physics": {
+			"F1511_F1512_kernel_available": true,
+			"F603_velocity_kernel_available": true,
+			"F880_a4_initialized": true,
+			"body_count": 35,
+			"complete_original_physics": false,
+			"descriptor_bounds_are_surface_radius": false,
+			"live_gravity": "analytic_si_rebuild_v1",
+			"live_surface_radius": "analytic_si_rebuild_v1",
+			"source_time_policy_integrated": false,
+			"source_variant": "jjffe-7e54034-gravity"
+		},
+		"source_ports": {
+			"complete_original_docking": false,
+			"contract": "source-orbital-centres-station-following-v1",
+			"dock_local": [
+				0,
+				0,
+				-2500
+			],
+			"geometry_orientation_services": "existing adapted station; source spin and full dock geometry/services remain separate",
+			"local_frame": "non-rotating station-following origin",
+			"orbital_ports": 8,
+			"position": "native source centres with non-rotating parent translation",
+			"source_variant": "jjffe-7e54034-q31-orbit"
+		},
+		"source_site_position_au": [
+			6.15110850823175,
+			-0.268076473801852,
+			-7.29590202755049
+		]
+	},
+	{
+		"elapsed_days": 3.5976958115578,
+		"file": "04-restored-native-port-launch.png",
+		"fixture": "Fixed review camera looking toward the real parent from an adapted station. Original port centre, existing51maps, generic station geometry/orientation. No compositing.",
+		"gameplay_progress_read": false,
+		"gameplay_progress_written": false,
+		"layout": "handcrafted_jjffe_ports_v3",
+		"local_parent": [
+			0.0,
+			-10775475.0,
+			12866013.0
+		],
+		"local_station": [
+			0.0,
+			0.0,
+			-2500.0
+		],
+		"phone_capture": false,
+		"quality": 2,
+		"scene": "actual scenes/main.tscn",
+		"ship_docked": false,
+		"site_id": "site40",
+		"site_name": "Город Титан",
+		"source_physics": {
+			"F1511_F1512_kernel_available": true,
+			"F603_velocity_kernel_available": true,
+			"F880_a4_initialized": true,
+			"body_count": 35,
+			"complete_original_physics": false,
+			"descriptor_bounds_are_surface_radius": false,
+			"live_gravity": "analytic_si_rebuild_v1",
+			"live_surface_radius": "analytic_si_rebuild_v1",
+			"source_time_policy_integrated": false,
+			"source_variant": "jjffe-7e54034-gravity"
+		},
+		"source_ports": {
+			"complete_original_docking": false,
+			"contract": "source-orbital-centres-station-following-v1",
+			"dock_local": [
+				0,
+				0,
+				-2500
+			],
+			"geometry_orientation_services": "existing adapted station; source spin and full dock geometry/services remain separate",
+			"local_frame": "non-rotating station-following origin",
+			"orbital_ports": 8,
+			"position": "native source centres with non-rotating parent translation",
+			"source_variant": "jjffe-7e54034-q31-orbit"
+		},
+		"source_site_position_au": [
+			6.15110850823175,
+			-0.268076473801852,
+			-7.29590202755049
+		]
+	}
+]

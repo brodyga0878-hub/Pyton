@@ -92,12 +92,17 @@ func enter(ship: RefCounted, system: RefCounted, spherical:=false, terrain_revis
 	if spherical and not SphereTerrain.supports_revision(terrain_revision):message="Неизвестная ревизия поверхности.";return false
 	var body: Dictionary=system.by_id[system.focus_id]
 	var site:Dictionary=system.current_site()
+	# An orbital station is not a ground anchor. Prepare the spherical entry
+	# without its id, but do not change the live orbital frame until success.
+	var entry_site_id:String=str(system.site_id)
+	if spherical and not site.is_empty() and int(site.get("type_code",-1)) in [32,33,34]:entry_site_id=""
 	var candidate_globe:RefCounted=null
 	var prepared:Dictionary={"ok":true,"data":{}}
 	if spherical:
-		candidate_globe=SphereTerrain.new();candidate_globe.configure(system,system.focus_id,system.site_id,terrain_revision)
+		candidate_globe=SphereTerrain.new();candidate_globe.configure(system,system.focus_id,entry_site_id,terrain_revision)
 		prepared=_prepare_city(candidate_globe,site)
 		if not prepared.ok:message=str(prepared.error);return false
+		system.site_id=entry_site_id
 	body_id=system.focus_id
 	kind=str(body.kind)
 	seed_value=system.system_id^body_id.hash()
@@ -235,6 +240,10 @@ func leave(ship: RefCounted,system:RefCounted=null,days:=0.0) -> bool:
 		message="Для выхода на орбиту: высота от 500 м, скорость до 20 м/с."
 		return false
 	if globe and system:
+		# Older active spherical saves could retain the station selected before
+		# descent. Drop that orbit-only anchor before creating the ground link.
+		var site:Dictionary=system.current_site()
+		if not site.is_empty() and int(site.get("type_code",-1)) in [32,33,34]:system.site_id=""
 		orbit_link=OrbitLink.make(self,ship,system,days)
 		var ll:Array=geographic_position(ship)
 		var world_basis:Basis=Basis(Vector3.UP,OrbitLink.spin(system.by_id[body_id],days))*globe.basis_at(globe.latitude,globe.longitude)

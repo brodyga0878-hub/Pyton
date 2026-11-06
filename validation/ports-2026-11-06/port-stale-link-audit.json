@@ -1,0 +1,13 @@
+{
+	"entered": true,
+	"left": true,
+	"link_after": false,
+	"link_before": true,
+	"load_before": true,
+	"payload_restored_after": true,
+	"selected_port": "site13",
+	"surface_version": 3,
+	"transfer_began": true,
+	"transfer_remaining": 0.0,
+	"world_layout": "handcrafted_jjffe_ports_v3"
+}

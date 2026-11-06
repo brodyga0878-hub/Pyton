@@ -1,0 +1,8 @@
+{
+	"clock_samples": 85,
+	"errors": [],
+	"max_scalar_frame_error_m": 0.0318285571411252,
+	"max_vector3_frame_error_m": 1.45050036907196,
+	"ports": 17,
+	"rejected_restore_atomic": 17
+}

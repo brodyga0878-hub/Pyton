@@ -245,7 +245,7 @@ def verify_source_world_runtime(archive,project):
         result['clock_constants'][name]=value
     return result
 
-def verify_source_orbit_runtime(archive,project):
+def verify_source_orbit_runtime(archive,project,version_code=32):
     """Check orbital packaging and local native-fixture provenance.
 
     The fixture is a development reference, never an Android runtime asset.
@@ -302,13 +302,15 @@ def verify_source_orbit_runtime(archive,project):
     assert epoch_tick==u32_constant(source_text['source_clock'],'EPOCH_TICK_U32'),'Orbital epoch tick differs from source clock'
     assert epoch_day==u32_constant(source_text['source_clock'],'EPOCH_DAY_U32'),'Orbital epoch day differs from source clock'
     assert re.search(r'SourceOrbit\.evaluate_from_epoch\(\s*record\s*,\s*clock\.tick_u32\s*,\s*clock\.day_u32\s*,\s*SourceClock\.EPOCH_TICK_U32\s*,\s*SourceClock\.EPOCH_DAY_U32\s*\)',source_text['planetary_system']),'World does not evaluate native orbits from the fixed source-clock epoch'
-    layouts={name:string_constant(source_text['planetary_system'],name)
-             for name in ['NATIVE_LAYOUT','SOURCE_LAYOUT','SOLAR_LAYOUT','EMPTY_LAYOUT']}
-    assert len(set(layouts.values()))==4,'Source-orbit and legacy layouts must remain distinct'
+    layout_names=['NATIVE_LAYOUT','SOURCE_LAYOUT','SOLAR_LAYOUT','EMPTY_LAYOUT']
+    if version_code>=33:layout_names.append('PORT_LAYOUT')
+    layouts={name:string_constant(source_text['planetary_system'],name) for name in layout_names}
+    assert len(set(layouts.values()))==len(layout_names),'Source-orbit and legacy layouts must remain distinct'
     assert layouts['SOURCE_LAYOUT']=='handcrafted_analytic_rebuild_v1','Legacy handcrafted layout changed'
     assert layouts['SOLAR_LAYOUT']=='reconstructed_solar_v1','Legacy solar layout changed'
     assert layouts['EMPTY_LAYOUT']=='source_unavailable_rebuild_v1','Legacy unavailable-world layout changed'
-    assert re.search(r'world\.configure\(\s*nav\.current\(\)\s*,\s*World\.NATIVE_LAYOUT\s*\)',source_text['main']),'New game does not request the native orbital layout'
+    requested='PORT_LAYOUT' if version_code>=33 else 'NATIVE_LAYOUT'
+    assert re.search(r'world\.configure\(\s*nav\.current\(\)\s*,\s*World\.'+requested+r'\s*\)',source_text['main']),'New game does not request the expected native orbital layout'
     adapter=re.search(r'"radius_mass_gravity_spin"\s*:\s*"([^"\r\n]+)"',source_text['planetary_system'])
     assert adapter and adapter[1]=='analytic_si_rebuild_v1','Missing explicit retained local physics adapter'
     assert re.search(r'"complete_original_physics"\s*:\s*false',source_text['planetary_system']),'Orbital backend must identify incomplete original physics'
@@ -365,7 +367,7 @@ def verify_source_orbit_runtime(archive,project):
     for key in ['native_ordered_output_sha256','native_vector_add_output_sha256','native_epoch_update_output_sha256','adapted_assembly_sha256']:
         assert isinstance(fixture.get(key),str) and re.fullmatch(r'[0-9a-f]{64}',fixture[key]),'Missing native orbital output provenance '+key
     result.update({'source_variant':variant,'native_contract':contract,'layouts':layouts,
-                   'new_game_requested_layout':layouts['NATIVE_LAYOUT'],
+                   'new_game_requested_layout':layouts[requested],
                    'epoch_anchor':{'tick_u32':epoch_tick,'day_u32':epoch_day,
                                    'source_clock_constants_agree':True,
                                    'world_calls_evaluate_from_epoch':True},
@@ -378,6 +380,120 @@ def verify_source_orbit_runtime(archive,project):
                                      'sha256':hashlib.sha256(fixture_raw).hexdigest(),
                                      'provenance_checked':True,'oracle_executed_by_apk_verifier':False,
                                      **{key:fixture[key] for key in ['revision','source_variant','source_sha256','source_assembly_sha256','source_commit','scope','source_procedure_hashes','pinned_procedure_hashes','dos_f880_rate_and_initialization_slice','pinned_f866_ordinary_orbital_slice','packed_record_fixture','packed_record_fixture_sha256','case_count','vector_add_case_count','epoch_update_case_count','fresh_process_runs','vector_add_fresh_process_runs','epoch_update_fresh_process_runs','epoch_update_reverse_repeat_count','epoch_single_step_matches_stepped','ordinary_epoch_tick_u32','ordinary_epoch_day_u32','native_ordered_output_sha256','native_vector_add_output_sha256','native_epoch_update_output_sha256','adapted_assembly_sha256','sine_sha256']}}})
+    return result
+
+def verify_source_physics_ports_runtime(archive,project):
+    """Check v3 port-frame packaging and bounded raw-physics provenance.
+
+    Local fixtures establish which controls were used by development tests.
+    This verifier neither runs the oracle nor treats packaged raw F603/F1511
+    primitives as the live SI gravity, surface or original docking backend.
+    """
+    names=set(archive.namelist())
+    result={'scripts':{}}
+    source={}
+    for name in ['source_gravity','source_orbit','planetary_system','flight_model',
+                 'surface_model','surface_orbit_link','main','source_units','source_clock']:
+        relative='scripts/'+name+'.gd'
+        raw=(project/relative).read_bytes();source[name]=raw.decode('utf-8')
+        exported='assets/scripts/'+name+'.gdc'
+        assert exported in names,'Missing source-physics/port runtime '+name
+        packed=archive.read(exported)
+        assert len(packed)>64 and packed[:4]==b'GDSC','Invalid compiled source-physics/port module '+name
+        result['scripts'][name]={'runtime_path':exported,'runtime_bytes':len(packed),
+                                 'runtime_sha256':hashlib.sha256(packed).hexdigest(),
+                                 'local_source_sha256':hashlib.sha256(raw).hexdigest()}
+
+    def string_constant(text,name):
+        matched=re.search(r'^const\s+'+re.escape(name)+r'\s*:=\s*"([^"\r\n]+)"\s*$',text,re.M)
+        assert matched,'Missing source-physics/port string constant '+name
+        return matched[1]
+
+    def integer_constant(text,name):
+        matched=re.search(r'^const\s+'+re.escape(name)+r'\s*:=\s*(0x[0-9a-fA-F]+|\d+)\s*$',text,re.M)
+        assert matched,'Missing source-physics/port integer constant '+name
+        return int(matched[1],0)
+
+    def vector_constant(text,name):
+        number=r'([-+]?\d+(?:\.\d+)?)'
+        matched=re.search(r'^const\s+'+re.escape(name)+r'\s*:=\s*Vector3\(\s*'+number+r'\s*,\s*'+number+r'\s*,\s*'+number+r'\s*\)\s*$',text,re.M)
+        assert matched,'Missing source-physics/port vector constant '+name
+        return [float(value) for value in matched.groups()]
+
+    def digest(value,label):
+        assert isinstance(value,str) and re.fullmatch(r'[0-9a-f]{64}',value),'Invalid native source-physics digest '+label
+        return value
+
+    world=source['planetary_system']
+    variant=string_constant(source['source_gravity'],'SOURCE_VARIANT')
+    port_layout=string_constant(world,'PORT_LAYOUT')
+    contract=string_constant(world,'PORT_CONTRACT')
+    assert port_layout=='handcrafted_jjffe_ports_v3','Unexpected port layout version'
+    assert re.search(r'world\.configure\(\s*nav\.current\(\)\s*,\s*World\.PORT_LAYOUT\s*\)',source['main']),'New flight does not select the port-following layout'
+    dock=vector_constant(world,'ORBITAL_DOCK_LOCAL')
+    assert dock==vector_constant(source['flight_model'],'STATION')==[0.0,0.0,-2500.0],'Port frame target differs from the flight docking target'
+    assert re.search(r'SourceGravity\.coefficient\(\s*raw\s*\)',world) and 'source_a4_packed' in world,'Prepared native source coefficient is missing from v3 bodies'
+    assert not re.search(r'SourceGravity\.(?:update|integrate)\s*\(',world+source['main']),'Raw source-gravity kernel unexpectedly became live flight physics'
+    for key in ['live_gravity','live_surface_radius']:
+        assert re.search(r'"'+key+r'"\s*:\s*"analytic_si_rebuild_v1"',world),'Missing retained SI adapter declaration '+key
+    for key in ['descriptor_bounds_are_surface_radius','source_time_policy_integrated','complete_original_physics','complete_original_docking']:
+        assert re.search(r'"'+key+r'"\s*:\s*false',world),'Unexpected source-physics/port completion claim '+key
+    assert 'descriptor_outer_sphere_not_surface_radius' in world,'Source descriptor bounds must remain distinct from surface radii'
+    assert 'non-rotating station-following origin' in world,'Missing explicit non-rotating port frame contract'
+    assert re.search(r'SourceClock\.EPOCH_TICK_U32\s*,\s*SourceClock\.EPOCH_DAY_U32',world),'Port positions lost the fixed source-clock epoch'
+    epoch={'tick_u32':integer_constant(source['source_clock'],'EPOCH_TICK_U32'),
+           'day_u32':integer_constant(source['source_clock'],'EPOCH_DAY_U32')}
+    assert epoch=={'tick_u32':0x80000000,'day_u32':0x121cf7},'Unexpected source-physics/port clock anchor'
+    assert integer_constant(source['source_clock'],'TICKS_PER_DAY')==0x100000000,'Unexpected nominal day clock'
+    assert integer_constant(source['source_clock'],'TICKS_PER_DISPLAY_SECOND')==0xc22e,'Unexpected source display-clock divisor'
+    assert re.search(r'^const\s+METRES_PER_RAW\s*:=\s*16785(?:\.0)?\s*/\s*16777216(?:\.0)?\s*$',source['source_units'],re.M),'Unexpected source-physics geometry calibration'
+
+    relative='tests/fixtures/source_gravity_native.json'
+    fixture_raw=(project/relative).read_bytes();fixture=json.loads(fixture_raw)
+    assert fixture.get('schema')==1,'Unexpected native source-gravity fixture schema'
+    assert fixture.get('source_variant')==variant,'Native gravity fixture differs from runtime SOURCE_VARIANT'
+    assert fixture.get('source_sha256')==SOURCE_IMAGE_SHA256,'Unexpected native gravity executable provenance'
+    assert fixture.get('source_assembly_sha256')==SOURCE_ASSEMBLY_SHA256,'Unexpected native gravity source provenance'
+    assert fixture.get('source_commit')==SOURCE_ASSEMBLY_COMMIT,'Unexpected native gravity source revision'
+    size=integer_constant(source['source_gravity'],'OBJECT_BYTES')
+    assert fixture.get('object_bytes')==fixture.get('object_bank_stride_bytes')==size==338,'Unexpected native gravity object size'
+    assert fixture.get('object_bank_header_bytes')==116,'Unexpected native gravity object-bank header'
+    assert fixture.get('object_state_offsets')=={'position_signed64_xyz':0x3e,'parent_index_u8':0x56,'velocity_signed32_xyz':0x8c,'gravity_coefficient_packed':0xa4,'velocity_fraction_u16_xyz':0xec},'Native gravity state layout differs from the source contract'
+    procedures={'603','1333','1338','1466','1482','1483','1496','1502','1511','1512','1521','1532','1656','1657','1658','1660','1661'}
+    for key in ['source_procedure_hashes','pinned_procedure_hashes']:
+        hashes=fixture.get(key)
+        assert isinstance(hashes,dict) and procedures<=hashes.keys(),'Incomplete native gravity procedure provenance '+key
+        for number,value in hashes.items():digest(value,key+'/'+number)
+    coefficient=fixture.get('F880_coefficient_slice')
+    assert isinstance(coefficient,dict) and isinstance(coefficient.get('scope'),str) and coefficient['scope'].strip(),'Missing native F880 coefficient slice provenance'
+    for key in ['pinned_full_f880_sha256','pinned_executed_slice_sha256','host_entry_sha256']:digest(coefficient.get(key),'F880/'+key)
+    inputs=fixture.get('input_fixtures_sha256')
+    expected_inputs=['tests/fixtures/handcrafted_runtime_native.json','tests/fixtures/source_orbit_native.json']
+    assert isinstance(inputs,dict) and set(inputs)==set(expected_inputs),'Unexpected source-gravity native inputs'
+    for name in expected_inputs:
+        assert digest(inputs[name],name)==hashlib.sha256((project/name).read_bytes()).hexdigest(),'Native source-gravity input fixture changed '+name
+    orbital=json.loads((project/expected_inputs[1]).read_bytes())
+    assert coefficient['pinned_full_f880_sha256']==orbital['dos_f880_rate_and_initialization_slice']['pinned_full_f880_sha256'],'Gravity and orbit controls use different F880 source'
+    for count_key,cases_key,repeat_key in [('case_count','cases','reverse_repeat_count'),('mass_case_count','mass_cases','mass_reverse_repeat_count'),('integration_case_count','integration_cases','integration_reverse_repeat_count')]:
+        count=fixture.get(count_key)
+        assert type(count) is int and count>0 and isinstance(fixture.get(cases_key),list) and len(fixture[cases_key])==count,'Incomplete native source-gravity cases '+cases_key
+        assert fixture.get(repeat_key)==count,'Incomplete native source-gravity reverse repeat '+repeat_key
+    assert type(fixture.get('fresh_process_runs')) is int and fixture['fresh_process_runs']>=2,'Missing native source-gravity fresh-process reproduction'
+    for key in ['object_canaries_unchanged','parent_bank_unchanged_except_mass_initializer','non_target_object_bytes_unchanged']:
+        assert fixture.get(key) is True,'Native source-gravity boundary check failed '+key
+    for key in ['native_gravity_output_sha256','native_mass_output_sha256','native_integration_output_sha256','adapted_assembly_sha256']:digest(fixture.get(key),key)
+    assert isinstance(fixture.get('scope'),str) and fixture['scope'].strip(),'Missing native source-gravity scope'
+    result.update({'source_variant':variant,'port_layout':port_layout,'port_contract':contract,
+                   'dock_local_m':dock,'flight_dock_target_equal':True,'source_epoch':epoch,
+                   'active_scope':'Native orbital station centres in a non-rotating station-following frame; prepared F880 a4 fields and separately available raw F603/F1511/F1512 primitives.',
+                   'live_gravity':'analytic_si_rebuild_v1','live_surface_radius':'analytic_si_rebuild_v1',
+                   'source_time_accumulator_integrated':False,'original_station_spin_integrated':False,
+                   'original_dock_geometry_services_integrated':False,'complete_original_physics':False,
+                   'complete_original_docking':False,'compiled_source_correspondence_rebuilt_by_verifier':False,
+                   'native_fixture':{'local_path':relative,'bytes':len(fixture_raw),
+                                     'sha256':hashlib.sha256(fixture_raw).hexdigest(),
+                                     'provenance_checked':True,'oracle_executed_by_apk_verifier':False,
+                                     **{key:fixture[key] for key in ['revision','source_variant','source_sha256','source_assembly_sha256','source_commit','scope','object_bytes','object_bank_stride_bytes','object_bank_header_bytes','object_state_offsets','source_procedure_hashes','pinned_procedure_hashes','F880_coefficient_slice','case_count','mass_case_count','integration_case_count','fresh_process_runs','reverse_repeat_count','mass_reverse_repeat_count','integration_reverse_repeat_count','native_gravity_output_sha256','native_mass_output_sha256','native_integration_output_sha256','adapted_assembly_sha256','input_fixtures_sha256']}}})
     return result
 
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
@@ -398,7 +514,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -460,7 +576,9 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             if expected['version_code']>=31:
                 source_world_assets=verify_source_world_runtime(archive,presets.parent)
             if expected['version_code']>=32:
-                source_orbit_assets=verify_source_orbit_runtime(archive,presets.parent)
+                source_orbit_assets=verify_source_orbit_runtime(archive,presets.parent,expected['version_code'])
+            if expected['version_code']>=33:
+                source_physics_ports_assets=verify_source_physics_ports_runtime(archive,presets.parent)
         for name in names:
             if not name.startswith('lib/') or not name.endswith('.so'):continue
             data=archive.read(name)
@@ -478,7 +596,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

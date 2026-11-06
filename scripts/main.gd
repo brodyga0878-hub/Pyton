@@ -113,7 +113,7 @@ func _ready()->void:
 	if "--rebuild-smoke" in OS.get_cmdline_user_args():call_deferred("_run_smoke")
 
 func _new_models()->void:
-	ship=Flight.new();nav=NavigationData.new();world=World.new();world.configure(nav.current(),World.NATIVE_LAYOUT);surface=Surface.new();near.clear()
+	ship=Flight.new();nav=NavigationData.new();world=World.new();world.configure(nav.current(),World.PORT_LAYOUT);surface=Surface.new();near.clear()
 
 func _build_world()->void:
 	environment=WorldEnvironment.new();environment.environment=Environment.new()
@@ -222,6 +222,9 @@ func _tick(dt:float,steering:Vector2,roll:float,lift:=0.0)->void:
 			world.configure(nav.current(),world.preferred_layout());surface=Surface.new();near.clear();_apply_system();_announce(nav.message);_save_game()
 	elif world.transfer_remaining>0:
 		if world.step_transfer(dt,ship,nav):
+			# An explicit transfer starts a new local flight. A geographic link
+			# from the previous departure belongs to its previous origin/focus.
+			surface=Surface.new();near.clear()
 			_apply_system();_announce(world.message)
 			if not world.current_site().is_empty() and int(world.current_site().type_code)==35:_enter_surface()
 			else:_save_game()
@@ -287,7 +290,7 @@ func _flight_diagnostic_sample()->Dictionary:
 	if ship==null or nav==null or world==null or surface==null:return {}
 	return {"ship_id":ship.ship_id,"position":[ship.position.x,ship.position.y,ship.position.z],"velocity":[ship.velocity.x,ship.velocity.y,ship.velocity.z],"target_speed":ship.target_speed,"hull":ship.hull,"docked":ship.docked,"autopilot":ship.autopilot,"system_id":nav.current_id,"focus_id":world.focus_id,"site_id":world.site_id,"jump_remaining":nav.remaining,"transfer_remaining":world.transfer_remaining,"surface":surface.active,"landed":surface.landed,"flight_phase":surface.flight_phase,"surface_motion":{"landing":surface.landing,"taking_off":surface.taking_off,"altitude_m":surface.altitude(ship) if surface.active else 0.0,"pad_distance_m":surface.pad_distance(ship) if surface.active else 0.0},"controls":_input_diagnostic_state()}
 func _diagnostic_context()->Dictionary:
-	return {"build":{"version":BuildInfo.VERSION,"code":BuildInfo.VERSION_CODE,"channel":BuildInfo.CHANNEL},"mode":"graphics_preview" if not graphics_return.is_empty() else ("surface" if surface!=null and surface.active else "space"),"flight":_flight_diagnostic_sample(),"last_flight_sample":last_flight_sample,"settings":settings.snapshot(),"session":{"saving_enabled":saving_enabled,"save_generation":saves.sequence,"elapsed_days":nav.elapsed_days if nav!=null else 0,"source_clock":SourceClock.from_elapsed_days(nav.elapsed_days) if nav!=null else {},"source_runtime":world.source_runtime_state.duplicate(true) if world!=null else {},"source_orbit":world.orbit_backend_state.duplicate(true) if world!=null else {},"world_layout":world.layout_mode if world!=null else "","preferred_world_layout":world.preferred_layout() if world!=null else ""},"display":{"fps":Engine.get_frames_per_second(),"viewport":[get_viewport().get_visible_rect().size.x,get_viewport().get_visible_rect().size.y]}}
+	return {"build":{"version":BuildInfo.VERSION,"code":BuildInfo.VERSION_CODE,"channel":BuildInfo.CHANNEL},"mode":"graphics_preview" if not graphics_return.is_empty() else ("surface" if surface!=null and surface.active else "space"),"flight":_flight_diagnostic_sample(),"last_flight_sample":last_flight_sample,"settings":settings.snapshot(),"session":{"saving_enabled":saving_enabled,"save_generation":saves.sequence,"elapsed_days":nav.elapsed_days if nav!=null else 0,"source_clock":SourceClock.from_elapsed_days(nav.elapsed_days) if nav!=null else {},"source_runtime":world.source_runtime_state.duplicate(true) if world!=null else {},"source_orbit":world.orbit_backend_state.duplicate(true) if world!=null else {},"source_ports":world.port_backend_state.duplicate(true) if world!=null else {},"source_physics":world.source_physics_state.duplicate(true) if world!=null else {},"world_layout":world.layout_mode if world!=null else "","preferred_world_layout":world.preferred_layout() if world!=null else "","source_port_position_au":world.site_position_au(world.site_id,nav.elapsed_days) if world!=null and nav!=null else [],"origin_au":world.origin_au(nav.elapsed_days) if world!=null and nav!=null else []},"display":{"fps":Engine.get_frames_per_second(),"viewport":[get_viewport().get_visible_rect().size.x,get_viewport().get_visible_rect().size.y]}}
 
 func _station_here()->bool:return not surface.active and (world.is_orbital_site() or (world.site_id.is_empty() and world.focus_id==world.default_id and nav.has_station()))
 func _apply_system()->void:
@@ -332,6 +335,8 @@ func _sync_scene()->void:
 	if celestial.visible:celestial.update_view(nav.elapsed_days,camera.position)
 
 func _refresh_hud()->void:
+	var space_context:String=str(world.by_id[world.focus_id].name)
+	if world.layout_mode==World.PORT_LAYOUT and world.is_orbital_site():space_context=str(world.current_site().name)
 	var state:="СТЫКОВКА" if ship.docked else ("ПОСАДКА" if surface.landed else ("АВТО" if ship.autopilot or surface.landing or not surface.flight_phase.is_empty() else "ПОЛЁТ"))
 	if ship.hull<=0:state="КОРАБЛЬ ПОТЕРЯН"
 	hud.text="%s · %s · %s"%["Графический полёт" if not graphics_return.is_empty() else nav.current().name,ship.profile().name,state]
@@ -339,9 +344,9 @@ func _refresh_hud()->void:
 	dock_button.text="Взлететь" if surface.landed else ("Вылететь" if ship.docked else "Посадка" if surface.active else "Стыковка")
 	surface_button.text="Взлететь" if surface.active and surface.landed else ("На орбиту" if surface.active else "К поверхности")
 	if surface.active:target_label.text="%s · высота %.0f м\nДо площадки %.0f м"%[surface.site_name if not surface.site_name.is_empty() else world.by_id[world.focus_id].name,maxf(0,surface.altitude(ship)),surface.pad_distance(ship)]
-	else:target_label.text="%s · до станции %.0f м"%[world.by_id[world.focus_id].name,ship.position.distance_to(ship.STATION)] if _station_here() else str(world.by_id[world.focus_id].name)
+	else:target_label.text="%s · до станции %.0f м"%[space_context,ship.position.distance_to(ship.STATION)] if _station_here() else space_context
 	var target:Vector3=surface.pad_position() if surface.active else (ship.STATION if _station_here() else world.local_meters(world.focus_id,nav.elapsed_days))
-	flight_console.configure_state({"actual_speed_mps":ship.velocity.length(),"target_speed_mps":ship.target_speed,"surface_active":surface.active,"altitude_m":surface.altitude(ship) if surface.active else 0.0,"target_distance_m":ship.position.distance_to(target),"target_local":Basis(ship.attitude).inverse()*(target-ship.position),"hull_percent":ship.hull,"fuel":nav.fuel,"fuel_capacity":nav.FUEL_CAPACITY,"cargo_t":ship.total_cargo(),"totalcredits":ship.credits,"elapsed_days":nav.elapsed_days,"assisted":ship.assisted,"autopilot":ship.autopilot,"landing":surface.landing,"taking_off":surface.taking_off,"landed":surface.landed,"docked":ship.docked,"flight_phase":surface.flight_phase,"external_view":ship.external_view,"contextlabel":surface.site_name if surface.active and not surface.site_name.is_empty() else str(world.by_id[world.focus_id].name),"auto_text":auto_button.text,"dock_text":dock_button.text})
+	flight_console.configure_state({"actual_speed_mps":ship.velocity.length(),"target_speed_mps":ship.target_speed,"surface_active":surface.active,"altitude_m":surface.altitude(ship) if surface.active else 0.0,"target_distance_m":ship.position.distance_to(target),"target_local":Basis(ship.attitude).inverse()*(target-ship.position),"hull_percent":ship.hull,"fuel":nav.fuel,"fuel_capacity":nav.FUEL_CAPACITY,"cargo_t":ship.total_cargo(),"totalcredits":ship.credits,"elapsed_days":nav.elapsed_days,"assisted":ship.assisted,"autopilot":ship.autopilot,"landing":surface.landing,"taking_off":surface.taking_off,"landed":surface.landed,"docked":ship.docked,"flight_phase":surface.flight_phase,"external_view":ship.external_view,"contextlabel":surface.site_name if surface.active and not surface.site_name.is_empty() else space_context,"auto_text":auto_button.text,"dock_text":dock_button.text})
 	fps_label.visible=settings.show_fps;fps_label.text="%d FPS"%Engine.get_frames_per_second()
 
 func _announce(text:String)->void:
@@ -547,7 +552,7 @@ func _show_help()->void:
 	_open_menu("УПРАВЛЕНИЕ И СБОРКА")
 	_menu_text("Левый стик меняет направление носа. Правая шкала задаёт скорость. «Тормозить» отменяет автоматический полёт и плавно останавливает корабль. «Авто» ведёт к станции или площадке; после посадки команда «На орбиту» выполняет автоматический вылет. «Взлететь» оставляет управление вам после короткого подъёма. Кнопки подъёма и снижения помогают лететь над землёй. В доке кнопка «Службы» открывает обслуживание.")
 	_menu_text("Клавиатура: стрелки — поворот, W/S — скорость, Q/E — крен, R/F — подъём, пробел — тормоз, A — авто, L — поверхность/орбита, D — стыковка/взлёт, V — вид, Esc — меню.")
-	_menu_text("Сборка %s. Отчёт об ошибке и журналы можно сохранить ZIP-архивом через меню. Осмотрите корабль, планеты и станцию через «Графический полёт». Полёт и данные исходных миров возвращены частично. Новые полёты используют исходные расчёты орбит JJFFE. Радиусы, гравитация, карта маршрутов, три лётных профиля и учебная торговля пока используют адаптации. Полная кампания, исходная экономика и ИИ ещё не готовы. Проверка на настоящем телефоне нужна отдельно."%BuildInfo.VERSION)
+	_menu_text("Сборка %s. Отчёт об ошибке и журналы можно сохранить ZIP-архивом через меню. Осмотрите корабль, планеты и станцию через «Графический полёт». Полёт и данные исходных миров возвращены частично. Новые полёты используют исходные расчёты орбит JJFFE и положения орбитальных портов. Форма станции и стыковочный коридор пока адаптированы. Радиусы, гравитация, карта маршрутов, три лётных профиля и учебная торговля пока используют адаптации. Полная кампания, исходная экономика и ИИ ещё не готовы. Проверка на настоящем телефоне нужна отдельно."%BuildInfo.VERSION)
 
 func _show_bug_report()->void:
 	if busy:return

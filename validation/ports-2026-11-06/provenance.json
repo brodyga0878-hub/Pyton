@@ -1,0 +1,32 @@
+{
+  "scope": "Current source orbital-port integration, original raw dynamics primitives and immutable published0.11.10 v1/v2 controls. Desktop application/GLES and APK packaging; not physicalphone or full sourcephysics.",
+  "version": "0.11.11-ports-alpha1",
+  "validation": "ports-validation.json",
+  "apk_verification": "ports-android-verification.json",
+  "screenshots": "screenshots/capture-manifest.json",
+  "legacy_baseline_commit": "1de4beba3f48858fa59702d780aa2f73a35b2102",
+  "source_port_contract": "source-orbital-centres-station-following-v1",
+  "source_files_sha256": {
+    "scripts/main.gd": "a1604738f13f0f162209645a3f35b28e767c38972f8f0124bf46dc674d19e850",
+    "scripts/planetary_system.gd": "146577e60f1732662bf46de28715b30c2ee8c67e871ab7b33519b9cf874a6a31",
+    "scripts/surface_model.gd": "e154c3804545d34a39238a88d999764c81632a7e640279a46414a65f5a7e02a1",
+    "scripts/surface_orbit_link.gd": "6a358b2030a0480035caa7a5263d0db96385394740672b18b18a306c30bec12c",
+    "scripts/flight_model.gd": "07eba1809d89f83a8cf5f65310256df0211fc42cd1dea2fbda339cb19b0b74db",
+    "scripts/source_gravity.gd": "058db4e5cbebd07e7420274ca07b24ccaec620f46c440081d1d6855326dc3872",
+    "scripts/source_orbit.gd": "7091ed3bbb88e79434ce21d53b3c98bf7f01391ee8a20a736c5e7c56eef55579",
+    "tests/test_source_gravity.gd": "a249d2f736843c2e8023f1cf2f5f1d4cd6c8de15fbda06e757ff846efb73b086",
+    "tests/test_source_physics_integration.gd": "6c6ac952eabb204d6bb3a410b0c2b38e4a050a2f13a0f03bffbf36f49d3e587e",
+    "tests/test_orbital_port_surface.gd": "c9cdccbde5f39c7f5969b022f2f5a158af527529e512538bdba2546b8f206b5a",
+    "tools/rebuild_source_gravity_native.py": "b8203ea0b4581cd3c91c062e0e4c7343da18b0eeffb06c25f9cc7a1d79445ef3",
+    "tools/verify_rebuilt_android.py": "fb48e84122473794c2a904820509a3a2ef522d6d5c92c816696bfba3d8b686db",
+    "tools/capture_source_ports.gd": "1a177b0c9932691f717f4231e8c5412b9a1a4eb97ee75c8cb680681b4a63f0fb"
+  },
+  "native_fixtures_sha256": {
+    "source_gravity_native.json": "8d12101d57b6792c465d84103c6d84cbf85a5d664b4287a9fc25da0dcd841405",
+    "source_orbit_native.json": "9ccb21258ad4ec5796de75bb357d63f4f7711312ca61f06200d89480f42fc0a9",
+    "handcrafted_runtime_native.json": "e09016da974e0e9e188bff12d463784bb2c1f2b23588bbe64632e137f8e486cd"
+  },
+  "physical_device_tested": false,
+  "complete_original_physics": false,
+  "complete_original_docking": false
+}
