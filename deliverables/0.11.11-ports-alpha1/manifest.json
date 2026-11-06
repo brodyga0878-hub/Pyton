@@ -1,0 +1,42 @@
+{
+  "version": "0.11.11-ports-alpha1",
+  "version_code": 33,
+  "source_commit": "fbe989549a0b7a6593f4233d665a3adbad57121a",
+  "source_archive_scope": "Current full Godot project/source/data,51material PNGs, tests/native fixtures/tools/docs and recovered history; excludes deliverables, validation, caches, SDK and signing key.",
+  "source_archive_files": 984,
+  "source_archive_below_32MiB": true,
+  "files": {
+    "StarFrontier-0.11.11-ports-arm64.apk": {
+      "bytes": 49245625,
+      "sha256": "6b5938b942a9b323e8e45e14c950caf7b065729953dc9918ec8053ab761b6d2c"
+    },
+    "StarFrontier-0.11.11-ports-source.zip": {
+      "bytes": 25033037,
+      "sha256": "e3a366ea40b55d4f79956af0982707d6f99652ca95d35ab1732224c295fffde6"
+    }
+  },
+  "checks": 55103,
+  "passed_suites": 28,
+  "failures": 0,
+  "validation_status": "passed_with_coverage_limitations",
+  "validation_report": "validation/ports-2026-11-06/ports-validation.json",
+  "android_verification": "validation/ports-2026-11-06/ports-android-verification.json",
+  "source_port_contract": "source-orbital-centres-station-following-v1",
+  "source_orbital_ports": 17,
+  "selected_source_port_frame_active": true,
+  "original_station_spin_geometry_services_integrated": false,
+  "legacy_v1_v2_worlds_preserved": true,
+  "raw_F603_F880_F1511_F1512_checks": 20205,
+  "raw_gravity_activated_in_live_SI": false,
+  "live_gravity_radius_mass_spin": "analytic_si_rebuild_v1",
+  "native_gravity_fixture_sha256": "8d12101d57b6792c465d84103c6d84cbf85a5d664b4287a9fc25da0dcd841405",
+  "complete_original_physics": false,
+  "complete_original_docking": false,
+  "runtime_material_maps": 51,
+  "physical_device_tested": false,
+  "test_key_only": true,
+  "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+  "production_signing_key_configured": false,
+  "full_original_port_complete": false,
+  "publication_ready": false
+}
