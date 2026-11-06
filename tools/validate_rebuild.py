@@ -44,6 +44,21 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_galaxy', 'tests/test_source_galaxy.gd', 'Actual original sector density, buffers, coordinates and RNG against504 native sectors/4243 positions.', timeout=300),
+    Suite('source_definition', 'tests/test_source_system_definition.gd', 'Actual F830 names and F860 source headers against4234 independent native callers.', timeout=300),
+    Suite('source_names', 'tests/test_source_planet_names.gd', 'Original populated-body names and text expansion against native contexts.', timeout=300),
+    Suite('source_settlements', 'tests/test_source_settlement_builder.gd', 'Full128-record ground/orbital settlement constructors and original names/RNG.', timeout=300),
+    Suite('source_classifier_full', 'tests/test_source_body_classifier_full.gd', 'Complete populated planetary classifier callbacks versus native records and globals.', timeout=300),
+    Suite('source_system_builder', 'tests/test_source_system_builder.gd', 'Actual full F877/F878/F897 system hierarchy and F868/F869/F871 metadata.', timeout=600),
+    Suite('source_world_catalogue', 'tests/test_source_world_catalogue.gd', 'Runtime128-record hierarchy, original descriptors and native-system adapter.', timeout=300),
+    Suite('source_ground_surface', 'tests/test_source_ground_surface.gd', 'Actual F879 placement and F574 ground collision against independent original instructions.', timeout=600),
+    Suite('source_surface_terrain', 'tests/test_source_surface_terrain.gd', 'Shared native height adapter, all17natural models,21ports and explicit117caller correction.', timeout=600),
+    Suite('source_physics_bridge', 'tests/test_source_physics_bridge.gd', 'Sampled F603 acceleration with explicit nominal-day SI unit policy.', timeout=300),
+    Suite('source_station_geometry', 'tests/test_source_station_geometry.gd', 'Actual72/73/80 geometry, source contact/door/spin and swept hull controls.', timeout=600),
+    Suite('source_docking_flight', 'tests/test_source_docking_flight.gd', 'Physical source-station docking/launch and opt-in flightv5 restore.', timeout=300),
+    Suite('source_underground', 'tests/test_source_underground_port.gd', 'Original96 enclosed hangar, hatch geometry, vertical path and source reservation controls.', timeout=600),
+    Suite('native_navigation', 'tests/test_native_navigation.gd', 'Paged original-coordinate navigation with bounded cache and atomicv2 saves.', timeout=300),
+    Suite('block10_legacy', 'tests/test_block10_integration.gd', 'Immutable published0.11.11 v1/v2/v3 world, port, surface and save controls.', timeout=600),
     Suite('math', 'tests/test_rebuilt_ffe_math.gd', 'Reconstructed source integer and packed arithmetic, independent native controls.'),
     Suite('body_initializer', 'tests/test_rebuilt_body_initializer.gd', 'Complete original F882 packed-record initialization versus 1424 native contexts; isolated from the live analytic world and ephemerides.'),
     Suite('body_rotation', 'tests/test_rebuilt_body_rotation.gd', 'Exact F880 initialization/F866 orientation slice with F1675/F1914/F1521 versus 1542 native contexts; excludes full F866, original clock epoch, animations and orbital updates.'),

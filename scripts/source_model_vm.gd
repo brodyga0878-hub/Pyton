@@ -4,6 +4,9 @@ extends RefCounted
 const Vertices=preload("res://scripts/source_model_vertices.gd")
 const Ground=preload("res://scripts/ground_coordinates.gd")
 static var assets:Dictionary={}
+static var _underground_assets:Dictionary={}
+static var _underground_checked:=false
+static var _underground_mutex:=Mutex.new()
 var error:=""
 static func s16(value:int)->int:
 	var n:=value&65535
@@ -88,4 +91,16 @@ static func material_base(code:int,local_rgb4:Array)->Dictionary:
 	return {"rgb4_base":rgb,"texture_index":texture,"textured":bool(code>>14),"unlit":bool(code&0x2000),"local_colour":bool(code&0x1000),"source_lighting_applied":false}
 static func model(index:int)->Dictionary:
 	if assets.is_empty():assets=JSON.parse_string(FileAccess.get_file_as_string("res://data/ffe_world_models.json")).models
-	return assets.get(str(index),{})
+	if assets.has(str(index)):return assets[str(index)]
+	# The original model96 closure is an optional append-only resource. Existing
+	# open-city/station assets keep their exact records and lookup precedence.
+	if not _underground_checked:
+		_underground_mutex.lock()
+		if not _underground_checked:
+			var path:="res://data/ffe_underground_models.json"
+			if FileAccess.file_exists(path):
+				var parsed:Variant=JSON.parse_string(FileAccess.get_file_as_string(path))
+				if parsed is Dictionary and parsed.get("schema")==1 and parsed.get("source_sha256")=="d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72" and parsed.get("models") is Dictionary:_underground_assets=parsed.models
+			_underground_checked=true
+		_underground_mutex.unlock()
+	return _underground_assets.get(str(index),{})

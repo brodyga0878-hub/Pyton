@@ -5,6 +5,8 @@ extends RefCounted
 const Catalog = preload("res://scripts/ship_catalog.gd")
 var catalog := Catalog.new()
 const EconomyCatalog = preload("res://scripts/economy_catalog.gd")
+const SourceStation = preload("res://scripts/source_station_geometry.gd")
+const SOURCE_PILOT_PROFILE:="source-bay-phone-pilot-v1"
 var economy_catalog := EconomyCatalog.new()
 var goods := {"medicines":2,"food":0,"metals":0,"machines":0,"electronics":0,"luxury":0}
 var equipment: Array = []
@@ -37,6 +39,120 @@ var cargo: int:
 var delivered := false
 var shots := 0
 var last_notice := ""
+var _source_station:Dictionary={}
+var _source_basis:=Basis.IDENTITY
+var _source_pilot_phase:=""
+var _source_clear_key:=""
+var _source_clear:=false
+
+func has_source_station()->bool:return not _source_station.is_empty()
+
+func configure_source_station(geometry:Dictionary,basis:Basis)->bool:
+	if not geometry.get("ok") is bool or not geometry.get("revision") is String:return false
+	if not SourceStation._valid_geometry(geometry) or int(geometry.get("model_index",-1)) not in SourceStation.MODELS or not basis.is_finite():return false
+	if not SourceStation._u32(geometry.get("source_seed")) or not SourceStation._u16(geometry.get("door_u16")) or not geometry.get("descriptor_sha256") is String or str(geometry.descriptor_sha256).length()!=64 or not geometry.get("cache_key") is String or not geometry.get("approach_waypoint") is Vector3 or not geometry.approach_waypoint.is_finite() or geometry.triangles.is_empty() or not geometry.bounds.position.is_finite() or not geometry.bounds.size.is_finite():return false
+	if absf(basis.determinant()-1.0)>0.001 or absf(basis.x.length_squared()-1.0)>0.001 or absf(basis.y.length_squared()-1.0)>0.001 or absf(basis.z.length_squared()-1.0)>0.001 or absf(basis.x.dot(basis.y))>0.001 or absf(basis.x.dot(basis.z))>0.001 or absf(basis.y.dot(basis.z))>0.001:return false
+	if not has_source_station() or int(_source_station.model_index)!=int(geometry.model_index) or int(_source_station.source_seed)!=int(geometry.source_seed):_source_pilot_phase=""
+	_source_station=geometry;_source_basis=basis
+	if docked:position=STATION;velocity=Vector3.ZERO;attitude=basis.get_rotation_quaternion().normalized()
+	return true
+
+func clear_source_station()->void:
+	_source_station={};_source_basis=Basis.IDENTITY;_source_pilot_phase="";_source_clear_key=""
+
+func _source_approach_clear()->bool:
+	var key:="%s:%s"%[str(_source_station.get("cache_key","")),ship_id]
+	if key!=_source_clear_key:_source_clear=SourceStation.approach_clear(_source_station,source_collision_radii());_source_clear_key=key
+	return _source_clear
+
+func source_station_state()->Dictionary:
+	if not has_source_station():return {}
+	return {"revision":SourceStation.REVISION,"model_index":int(_source_station.model_index),"source_seed":int(_source_station.source_seed),"descriptor_sha256":str(_source_station.descriptor_sha256),"pilot_profile":SOURCE_PILOT_PROFILE}
+
+func source_collision_radii(id:String="")->Vector3:
+	var span:=float(catalog.get_ship(ship_id if id.is_empty() else id).get("visual_span_m",0.0))
+	return Vector3(span*0.55,span*0.14+2.0,span*0.55) if span>0 else Vector3.ZERO
+
+func _source_local(point:Vector3)->Vector3:return _source_basis.transposed()*(point-STATION)
+
+func _source_shape_sweep(start:Vector3,finish:Vector3,rotation:Quaternion,id:String="")->Dictionary:
+	var radii:=source_collision_radii(id)
+	if radii==Vector3.ZERO:return {}
+	var broad:=AABB(start.min(finish),start.max(finish)-start.min(finish)).grow(maxf(radii.x,maxf(radii.y,radii.z)))
+	if not broad.intersects(_source_station.bounds):return {}
+	var local_basis:=_source_basis.transposed()*Basis(rotation.normalized())
+	# Horizontal radii are equal. Yaw does not change this ellipsoid, whereas
+	# roll/pitch need the actual oriented triangle transform, not a thin fixed Y.
+	if absf(local_basis.y.dot(Vector3.UP))>0.999999:return SourceStation.sweep(_source_station,start,finish,radii)
+	var inverse:=local_basis.transposed();var transformed:=_source_station.duplicate();var triangles:Array=[];var boxes:Array=[];var bounds:=AABB();var first:=true
+	for triangle:Array in _source_station.triangles:
+		var vertices:Array[Vector3]=[]
+		for point:Vector3 in triangle:vertices.append(inverse*point)
+		var box:=AABB(vertices[0],Vector3.ZERO)
+		for point:Vector3 in vertices:box=box.expand(point)
+		triangles.append(vertices);boxes.append(box);bounds=box if first else bounds.merge(box);first=false
+	transformed.triangles=triangles;transformed.triangle_bounds=boxes;transformed.bounds=bounds
+	var hit:=SourceStation.sweep(transformed,inverse*start,inverse*finish,radii)
+	if not hit.is_empty():hit.position=local_basis*hit.position;hit.normal=local_basis*hit.normal
+	return hit
+
+func source_dock_pose_valid(candidate_position:Vector3,candidate_velocity:Vector3,candidate_attitude:Quaternion,candidate_id:String="")->bool:
+	if not has_source_station() or not candidate_position.is_finite() or not candidate_velocity.is_finite() or not candidate_attitude.is_finite() or candidate_attitude.length_squared()<0.01:return false
+	var local_basis:=_source_basis.transposed()*Basis(candidate_attitude.normalized())
+	var radii:=source_collision_radii(candidate_id)
+	var fitted:=Vector3.ZERO
+	for axis in range(3):fitted[axis]=sqrt(pow(float(local_basis.x[axis])*radii.x,2)+pow(float(local_basis.y[axis])*radii.y,2)+pow(float(local_basis.z[axis])*radii.z,2))
+	# A docked source port may legitimately close its outer gate. Validate the
+	# interior pose against the open bay contract and the ACTUAL current solids.
+	var open_geometry:=_source_station if int(_source_station.door_u16)==0 else SourceStation.prepare(int(_source_station.model_index),int(_source_station.source_seed),0)
+	var point:=_source_local(candidate_position)
+	return SourceStation.mobile_dock_ready(open_geometry,point,_source_basis.transposed()*candidate_velocity,-local_basis.z,local_basis.y,fitted) and _source_shape_sweep(point,point,candidate_attitude,candidate_id).is_empty()
+
+func _source_collide(previous:Vector3)->void:
+	var hit:=_source_shape_sweep(_source_local(previous),_source_local(position),attitude)
+	if hit.is_empty():return
+	var normal:Vector3=(_source_basis*hit.normal).normalized();var speed:=velocity.length()
+	position=STATION+_source_basis*hit.position+normal*0.02
+	var inward:=velocity.dot(normal)
+	if inward<0:velocity-=normal*inward*1.2
+	if speed>DOCK_SPEED:hull=maxf(0.0,hull-speed*0.15)
+	target_speed=0.0;autopilot=false;_source_pilot_phase=""
+	last_notice="Столкновение с корпусом станции. Выровняйте корабль по проёму."
+
+func _source_autopilot_step(dt:float,gravity:Vector3)->bool:
+	if can_dock():dock();return true
+	var local:=_source_local(position);var waypoint:Vector3=_source_station.approach_waypoint
+	var clear:=_source_approach_clear()
+	if _source_pilot_phase.is_empty():_source_pilot_phase="staging"
+	if _source_pilot_phase=="enter" and (absf(local.x)>8.0 or absf(local.y)>4.0 or local.z<(-8.0)):_source_pilot_phase="staging"
+	if _source_pilot_phase=="staging" and local.distance_to(waypoint)<5.0 and velocity.length()<2.0:_source_pilot_phase="align"
+	var target:=waypoint
+	if _source_pilot_phase=="enter":
+		if not clear:
+			velocity=velocity.move_toward(Vector3.ZERO,acceleration()*dt);target_speed=0;last_notice="Проём закрыт. Автопилот остановлен.";autopilot=false;_source_pilot_phase=""
+			return false
+		target=Vector3.ZERO
+	var offset:Vector3=STATION+_source_basis*target-position;var distance:=offset.length()
+	var direction:=offset.normalized() if distance>0.0001 else Vector3.ZERO
+	var desired_basis:=_source_basis
+	if _source_pilot_phase=="staging" and distance>1.0:
+		var up:Vector3=_source_basis.y if absf(direction.dot(_source_basis.y))<0.98 else _source_basis.x
+		desired_basis=Basis.looking_at(direction,up)
+	attitude=attitude.slerp(desired_basis.get_rotation_quaternion(),minf(dt*2.5,1.0)).normalized()
+	var available:=maxf(0,acceleration()-gravity.length())
+	var speed:=minf(DOCK_SPEED,sqrt(available*maxf(distance-1.0,0.0)))
+	if _source_pilot_phase=="align":
+		speed=0.0
+		var local_orientation:=_source_basis.transposed()*Basis(attitude)
+		if velocity.length()<0.5 and -local_orientation.z.dot(Vector3.FORWARD)>0.999 and local_orientation.y.dot(Vector3.UP)>0.999:
+			if clear:_source_pilot_phase="enter"
+			else:last_notice="Ожидание открытия стыковочного проёма."
+	elif _source_pilot_phase=="enter":
+		var local_orientation:=_source_basis.transposed()*Basis(attitude)
+		if -local_orientation.z.dot(Vector3.FORWARD)<0.99 or local_orientation.y.dot(Vector3.UP)<0.99:speed=0.0
+	target_speed=speed;velocity=velocity.move_toward(direction*speed,available*dt)
+	if gravity.length()>acceleration():velocity+=gravity.normalized()*(gravity.length()-acceleration())*dt
+	return false
 
 func profile() -> Dictionary:
 	return catalog.get_ship(ship_id)
@@ -71,21 +187,25 @@ func step(dt: float, steering: Vector2, roll: float = 0.0, gravity := Vector3.ZE
 	steering=steering.limit_length();roll=clampf(roll,-1,1)
 	target_speed=clampf(target_speed,-100.0,MAX_SPEED)
 	if not station_available or surface_mode or combat_active: autopilot = false
+	if not autopilot:_source_pilot_phase=""
 	if autopilot:
-		var offset := STATION - position
-		var distance := offset.length()
-		var direction := offset.normalized()
-		if distance > 1.0:
-			var desired_basis := Basis.looking_at(direction, Vector3.UP if absf(direction.y) < 0.98 else Vector3.RIGHT)
-			attitude = attitude.slerp(desired_basis.get_rotation_quaternion(), minf(dt * 2.5, 1.0)).normalized()
-		var available:=maxf(0,acceleration()-gravity.length())
-		var approach_speed := minf(300.0, sqrt(available * maxf(distance - 60.0, 0.0)))
-		target_speed = approach_speed
-		velocity = velocity.move_toward(direction * approach_speed, available * dt)
-		if gravity.length()>acceleration():velocity+=gravity.normalized()*(gravity.length()-acceleration())*dt
-		if can_dock():
-			dock()
-			return
+		if has_source_station():
+			if _source_autopilot_step(dt,gravity):return
+		else:
+			var offset := STATION - position
+			var distance := offset.length()
+			var direction := offset.normalized()
+			if distance > 1.0:
+				var desired_basis := Basis.looking_at(direction, Vector3.UP if absf(direction.y) < 0.98 else Vector3.RIGHT)
+				attitude = attitude.slerp(desired_basis.get_rotation_quaternion(), minf(dt * 2.5, 1.0)).normalized()
+			var available:=maxf(0,acceleration()-gravity.length())
+			var approach_speed := minf(300.0, sqrt(available * maxf(distance - 60.0, 0.0)))
+			target_speed = approach_speed
+			velocity = velocity.move_toward(direction * approach_speed, available * dt)
+			if gravity.length()>acceleration():velocity+=gravity.normalized()*(gravity.length()-acceleration())*dt
+			if can_dock():
+				dock()
+				return
 	else:
 		var local_rotation := Quaternion(Vector3.UP, -steering.x * dt * float(profile().turn_rate)) * Quaternion(Vector3.RIGHT, -steering.y * dt * float(profile().turn_rate)) * Quaternion(Vector3.FORWARD, roll * dt * float(profile().turn_rate)/1.2)
 		attitude = (attitude * local_rotation).normalized()
@@ -97,6 +217,9 @@ func step(dt: float, steering: Vector2, roll: float = 0.0, gravity := Vector3.ZE
 			velocity += (forward() * (target_speed / MAX_SPEED) * acceleration()+gravity+Vector3.UP*clampf(lift,-1,1)*acceleration()*0.5) * dt
 	var previous:=position
 	position += velocity * dt
+	if has_source_station():
+		if station_available and not surface_mode:_source_collide(previous)
+		return
 	var movement:=position-previous
 	var fraction:=clampf((STATION-previous).dot(movement)/movement.length_squared(),0,1) if movement.length_squared()>0.001 else 0.0
 	var closest:=previous+movement*fraction
@@ -115,6 +238,7 @@ func brake() -> void:
 	autopilot = false
 
 func can_dock() -> bool:
+	if has_source_station():return is_finite(hull) and hull>0 and station_available and not surface_mode and not combat_active and int(_source_station.door_u16)==0 and source_dock_pose_valid(position,velocity,attitude)
 	return position.is_finite() and velocity.is_finite() and is_finite(hull) and not surface_mode and not combat_active and hull>0 and station_available and position.distance_to(STATION) <= DOCK_RADIUS and velocity.length() <= DOCK_SPEED
 
 func dock() -> bool:
@@ -124,11 +248,19 @@ func dock() -> bool:
 	autopilot = false
 	velocity = Vector3.ZERO
 	target_speed = 0.0
+	if has_source_station():position=STATION;attitude=_source_basis.get_rotation_quaternion().normalized();_source_pilot_phase=""
 	return true
 
 # New reconstruction of the missing launch/training-market section.
 func launch() -> void:
 	if not docked or hull<=0:return
+	if has_source_station():
+		if not _source_approach_clear():last_notice="Вылет ожидает открытия стыковочного проёма.";return
+		position=STATION
+		attitude=Basis.looking_at(_source_basis.z,_source_basis.y).get_rotation_quaternion().normalized()
+		velocity=_source_basis.z*DOCK_SPEED;target_speed=DOCK_SPEED;docked=false;autopilot=false;assisted=true;_source_pilot_phase=""
+		last_notice="Вылет выполнен через открытый проём. Корабль отходит от станции."
+		return
 	var away:Vector3=(position-STATION).normalized()
 	if away.length_squared()<0.5:away=Vector3.BACK
 	position=STATION+away*maxf(150.0,float(profile().get("visual_span_m",42.0))*2.0+DOCK_RADIUS)
@@ -172,7 +304,9 @@ func fire() -> bool:
 	return true
 
 func snapshot() -> Dictionary:
-	return {"version": 4,"story_cargo":story_cargo, "goods":goods.duplicate(),"equipment":equipment.duplicate(),"mission_cargo":mission_cargo.duplicate(),"ship_id":ship_id,"external_view":external_view, "position": [position.x, position.y, position.z], "velocity": [velocity.x, velocity.y, velocity.z], "attitude": [attitude.x, attitude.y, attitude.z, attitude.w], "target_speed": target_speed, "assisted": assisted, "docked": docked, "hull": hull, "credits": credits, "cargo": cargo, "delivered": delivered}
+	var result:={"version": 4,"story_cargo":story_cargo, "goods":goods.duplicate(),"equipment":equipment.duplicate(),"mission_cargo":mission_cargo.duplicate(),"ship_id":ship_id,"external_view":external_view, "position": [position.x, position.y, position.z], "velocity": [velocity.x, velocity.y, velocity.z], "attitude": [attitude.x, attitude.y, attitude.z, attitude.w], "target_speed": target_speed, "assisted": assisted, "docked": docked, "hull": hull, "credits": credits, "cargo": cargo, "delivered": delivered}
+	if has_source_station():result.version=5;result.source_station=source_station_state()
+	return result
 
 func restore(data: Dictionary) -> bool:
 	# New validation is completed before the preserved commit block below.
@@ -183,10 +317,10 @@ func restore(data: Dictionary) -> bool:
 		if data.has(field) and not data[field] is bool:return false
 	if not (data.get("hull") is float or data.get("hull") is int) or not is_finite(float(data.hull)) or float(data.hull)<0 or float(data.hull)>100:return false
 	if not (data.get("target_speed") is float or data.get("target_speed") is int) or not is_finite(float(data.target_speed)) or absf(float(data.target_speed))>1.0e9:return false
-	if data.get("version",0)!=1 and data.get("version",0)!=2 and data.get("version",0)!=3 and data.get("version",0)!=4:
+	if data.get("version",0)!=1 and data.get("version",0)!=2 and data.get("version",0)!=3 and data.get("version",0)!=4 and data.get("version",0)!=5:
 		return false
 	var saved_id := "cobra"
-	if data.get("version",0)==2 or data.get("version",0)==3 or data.get("version",0)==4:
+	if data.get("version",0)==2 or data.get("version",0)==3 or data.get("version",0)==4 or data.get("version",0)==5:
 		if not data.get("ship_id") is String or catalog.get_ship(data.ship_id).is_empty():return false
 		saved_id=data.ship_id
 	for key in ["position", "velocity", "attitude"]:
@@ -208,7 +342,7 @@ func restore(data: Dictionary) -> bool:
 	loaded_goods.medicines=int(data.cargo)
 	var loaded_equipment: Array=[]
 	var loaded_missions: Dictionary={}
-	if data.get("version",0)==3 or data.get("version",0)==4:
+	if data.get("version",0)==3 or data.get("version",0)==4 or data.get("version",0)==5:
 		if not data.get("goods") is Dictionary or not data.get("equipment") is Array or not data.get("mission_cargo") is Dictionary:return false
 		for id in data.goods:
 			if not economy_catalog.goods.has(id) or not _whole_quantity(data.goods[id]):return false
@@ -222,7 +356,7 @@ func restore(data: Dictionary) -> bool:
 			if not id is String or id.is_empty() or id.length()>100 or not _whole_quantity(data.mission_cargo[id]) or data.mission_cargo[id]<=0:return false
 			loaded_missions[id]=int(data.mission_cargo[id])
 	var loaded_story:=0
-	if data.get("version",0)==4:
+	if data.get("version",0)==4 or data.get("version",0)==5:
 		if not _whole_quantity(data.get("story_cargo")) or (data.story_cargo!=0 and data.story_cargo!=2):return false
 		loaded_story=int(data.story_cargo)
 	var used:=loaded_story
@@ -236,6 +370,18 @@ func restore(data: Dictionary) -> bool:
 		return false
 	var p: Array = data.position
 	var v: Array = data.velocity
+	if int(version)==5:
+		if not has_source_station() or not data.get("source_station") is Dictionary:return false
+		var expected:=source_station_state()
+		for key in expected:
+			var supplied:Variant=data.source_station.get(key)
+			if expected[key] is int:
+				if not SourceStation._u32(supplied) or int(supplied)!=int(expected[key]):return false
+			elif not supplied is String or supplied!=expected[key]:return false
+		var candidate_position:=Vector3(p[0],p[1],p[2]);var candidate_velocity:=Vector3(v[0],v[1],v[2])
+		if not _source_shape_sweep(_source_local(candidate_position),_source_local(candidate_position),restored_q,saved_id).is_empty():return false
+		if bool(data.get("docked",false)) and (float(data.hull)<=0 or not source_dock_pose_valid(candidate_position,candidate_velocity,restored_q,saved_id)):return false
+	else:clear_source_station()
 	original_port=false
 	story_cargo=loaded_story
 	goods=loaded_goods;equipment=loaded_equipment;mission_cargo=loaded_missions
@@ -253,6 +399,7 @@ func restore(data: Dictionary) -> bool:
 	delivered=bool(data.get("delivered",false))
 	autopilot=false;surface_mode=false;combat_active=false;station_available=true
 	shots=0;last_notice=""
+	_source_pilot_phase=""
 	return true
 
 

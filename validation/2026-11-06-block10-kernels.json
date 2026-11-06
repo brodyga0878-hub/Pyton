@@ -1,0 +1,474 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-06T12:10:54.012642+00:00",
+  "updated_utc": "2026-11-06T12:11:04.963743+00:00",
+  "duration_seconds": 10.951,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-06T12:10:54.012642+00:00",
+      "duration_seconds": 10.951,
+      "requested_suites": [
+        "source_galaxy",
+        "source_definition",
+        "source_names",
+        "source_settlements",
+        "source_classifier_full",
+        "source_system_builder",
+        "source_world_catalogue",
+        "source_ground_surface",
+        "source_surface_terrain",
+        "source_physics_bridge",
+        "source_station_geometry",
+        "source_docking_flight",
+        "source_underground",
+        "native_navigation"
+      ],
+      "executed_suites": [
+        "source_galaxy",
+        "source_definition",
+        "source_names",
+        "source_settlements",
+        "source_classifier_full",
+        "source_system_builder",
+        "source_world_catalogue",
+        "source_ground_surface",
+        "source_surface_terrain",
+        "source_physics_bridge",
+        "source_station_geometry",
+        "source_docking_flight",
+        "source_underground",
+        "native_navigation"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 3,
+  "status": "passed_with_coverage_limitations",
+  "passed_suites": 14,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 358966,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "source_galaxy",
+      "scope": "Actual original sector density, buffers, coordinates and RNG against504 native sectors/4243 positions.",
+      "status": "passed",
+      "checks": 20512,
+      "failures": 0,
+      "executed_utc": "2026-11-06T12:10:54.014627+00:00",
+      "suite_source": {
+        "path": "tests/test_source_galaxy.gd",
+        "bytes": 3316,
+        "sha256": "1f6a9160d3f1db93bd92ea2d37eed73d72e7d39bbf2c3e0292d3c050313a2c0f"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_galaxy.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.236,
+      "timed_out": false,
+      "output_bytes": 191,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/source_galaxy.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_definition",
+      "scope": "Actual F830 names and F860 source headers against4234 independent native callers.",
+      "status": "passed",
+      "checks": 29630,
+      "failures": 0,
+      "executed_utc": "2026-11-06T12:10:54.015100+00:00",
+      "suite_source": {
+        "path": "tests/test_source_system_definition.gd",
+        "bytes": 1995,
+        "sha256": "6068be7b3715111a86a120a0e848577b0374ceeca7b01b9c3c8d5b253d31b44d"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_system_definition.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.625,
+      "timed_out": false,
+      "output_bytes": 130,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/source_definition.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_names",
+      "scope": "Original populated-body names and text expansion against native contexts.",
+      "status": "passed",
+      "checks": 9550,
+      "failures": 0,
+      "executed_utc": "2026-11-06T12:10:54.015714+00:00",
+      "suite_source": {
+        "path": "tests/test_source_planet_names.gd",
+        "bytes": 4227,
+        "sha256": "2543952b9389f33aca013f12c3316b92d35c39c23bffb1dce2000c24b565d89d"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_planet_names.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.247,
+      "timed_out": false,
+      "output_bytes": 182,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/source_names.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_settlements",
+      "scope": "Full128-record ground/orbital settlement constructors and original names/RNG.",
+      "status": "passed",
+      "checks": 16627,
+      "failures": 0,
+      "executed_utc": "2026-11-06T12:10:54.251149+00:00",
+      "suite_source": {
+        "path": "tests/test_source_settlement_builder.gd",
+        "bytes": 8358,
+        "sha256": "5cc7254fdfd8f9d66e07905b537ee9dc047f49d75fbca246569997d10bedc252"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_settlement_builder.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.327,
+      "timed_out": false,
+      "output_bytes": 185,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/source_settlements.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_classifier_full",
+      "scope": "Complete populated planetary classifier callbacks versus native records and globals.",
+      "status": "passed",
+      "checks": 44823,
+      "failures": 0,
+      "executed_utc": "2026-11-06T12:10:54.263120+00:00",
+      "suite_source": {
+        "path": "tests/test_source_body_classifier_full.gd",
+        "bytes": 7975,
+        "sha256": "44ee3d3b7faea57848f39f8a60217a11a520f954b3a712e237bdf0e8e24972dd"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_body_classifier_full.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.074,
+      "timed_out": false,
+      "output_bytes": 193,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/source_classifier_full.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_system_builder",
+      "scope": "Actual full F877/F878/F897 system hierarchy and F868/F869/F871 metadata.",
+      "status": "passed",
+      "checks": 112912,
+      "failures": 0,
+      "executed_utc": "2026-11-06T12:10:54.578232+00:00",
+      "suite_source": {
+        "path": "tests/test_source_system_builder.gd",
+        "bytes": 8259,
+        "sha256": "f03665ee4ccbba8dfd8fa602c24df56afa12587d7d98a15234829e4bf2cf72c1"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_system_builder.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.451,
+      "timed_out": false,
+      "output_bytes": 128,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/source_system_builder.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_world_catalogue",
+      "scope": "Runtime128-record hierarchy, original descriptors and native-system adapter.",
+      "status": "passed",
+      "checks": 45950,
+      "failures": 0,
+      "executed_utc": "2026-11-06T12:10:54.640769+00:00",
+      "suite_source": {
+        "path": "tests/test_source_world_catalogue.gd",
+        "bytes": 13497,
+        "sha256": "bc9d186512586d40813cf7ed215ba175dfb4b21d165beb30ebf8e0ff4ea2b187"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_world_catalogue.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.445,
+      "timed_out": false,
+      "output_bytes": 159,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/source_world_catalogue.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_ground_surface",
+      "scope": "Actual F879 placement and F574 ground collision against independent original instructions.",
+      "status": "passed",
+      "checks": 30476,
+      "failures": 0,
+      "executed_utc": "2026-11-06T12:10:55.337563+00:00",
+      "suite_source": {
+        "path": "tests/test_source_ground_surface.gd",
+        "bytes": 13675,
+        "sha256": "a0ff249e67b24ba22bf9b55a0dd6bf081a6b12311b1b0fe0940547822fd3d94c"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_ground_surface.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 3.303,
+      "timed_out": false,
+      "output_bytes": 189,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/source_ground_surface.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_surface_terrain",
+      "scope": "Shared native height adapter, all17natural models,21ports and explicit117caller correction.",
+      "status": "passed",
+      "checks": 1009,
+      "failures": 0,
+      "executed_utc": "2026-11-06T12:10:56.029576+00:00",
+      "suite_source": {
+        "path": "tests/test_source_surface_terrain.gd",
+        "bytes": 8088,
+        "sha256": "48136cca66d06e5c8d87aea897d75844766fd3d2ffbab66677d74d978a7acefd"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_surface_terrain.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.349,
+      "timed_out": false,
+      "output_bytes": 127,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/source_surface_terrain.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_physics_bridge",
+      "scope": "Sampled F603 acceleration with explicit nominal-day SI unit policy.",
+      "status": "passed",
+      "checks": 37002,
+      "failures": 0,
+      "executed_utc": "2026-11-06T12:10:56.086112+00:00",
+      "suite_source": {
+        "path": "tests/test_source_physics_bridge.gd",
+        "bytes": 11017,
+        "sha256": "51546a111268e82a7e661117f4ed4d6e5787f789291afd9c48558056a0db6b8d"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_physics_bridge.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.511,
+      "timed_out": false,
+      "output_bytes": 220,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/source_physics_bridge.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_station_geometry",
+      "scope": "Actual72/73/80 geometry, source contact/door/spin and swept hull controls.",
+      "status": "passed",
+      "checks": 5778,
+      "failures": 0,
+      "executed_utc": "2026-11-06T12:10:56.597640+00:00",
+      "suite_source": {
+        "path": "tests/test_source_station_geometry.gd",
+        "bytes": 12475,
+        "sha256": "f1e944b3b0c18ec855f512fbc1644dadf50ba53de707fdb58316249869082401"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_station_geometry.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 4.234,
+      "timed_out": false,
+      "output_bytes": 201,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/source_station_geometry.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_docking_flight",
+      "scope": "Physical source-station docking/launch and opt-in flightv5 restore.",
+      "status": "passed",
+      "checks": 143,
+      "failures": 0,
+      "executed_utc": "2026-11-06T12:10:57.379597+00:00",
+      "suite_source": {
+        "path": "tests/test_source_docking_flight.gd",
+        "bytes": 10159,
+        "sha256": "9485c241adb59e9085ad194617e1fafa0881227846b0f7e328fbc109e3367c2a"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_docking_flight.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 7.583,
+      "timed_out": false,
+      "output_bytes": 125,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/source_docking_flight.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_underground",
+      "scope": "Original96 enclosed hangar, hatch geometry, vertical path and source reservation controls.",
+      "status": "passed",
+      "checks": 4335,
+      "failures": 0,
+      "executed_utc": "2026-11-06T12:10:58.641570+00:00",
+      "suite_source": {
+        "path": "tests/test_source_underground_port.gd",
+        "bytes": 12818,
+        "sha256": "d46645276f8f8f173b382773541bae653d206df5208e55e912237dd7bf3da00b"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_underground_port.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 4.605,
+      "timed_out": false,
+      "output_bytes": 128,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/source_underground.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "native_navigation",
+      "scope": "Paged original-coordinate navigation with bounded cache and atomicv2 saves.",
+      "status": "passed",
+      "checks": 219,
+      "failures": 0,
+      "executed_utc": "2026-11-06T12:11:00.832548+00:00",
+      "suite_source": {
+        "path": "tests/test_native_navigation.gd",
+        "bytes": 10393,
+        "sha256": "5fe983525880c0366ad48adc28fde6cce2506aa03016b4fa98a18ebf498a3a04"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_native_navigation.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.417,
+      "timed_out": false,
+      "output_bytes": 121,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/validation/logs/native_navigation.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "unavailable",
+      "reason": "The preserved tests/test_source_model_mesh.gd requires model_vertices_reference.json; original city geometry is exercised by the current city suites, which does not replace this missing independent leaf fixture."
+    },
+    {
+      "scope": "Full application, Android installation and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner covers current standalone suites and isolated native terrain controls only."
+    }
+  ]
+}
