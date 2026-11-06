@@ -1,0 +1,54 @@
+{
+  "recorded_utc": "2026-11-06T18:50:07.080580+00:00",
+  "publication_status": "local_package_complete; remote publication pending because of prior automatic approval rejection",
+  "source_commit": "932d641055f4fb587d4dd278ad986804b63dd754",
+  "artifact_commit": "09b48fc9829e40bef133b4a996c110b7ca4881cf",
+  "files": {
+    "StarFrontier-0.12.1-console-arm64.apk": {
+      "bytes": 49640658,
+      "sha256": "e80448ff28edfcf39f5d2eae3e0666087dd4bc0587f7fbd5d66cc2dba7b55dbd"
+    },
+    "StarFrontier-0.12.1-console-source.zip": {
+      "bytes": 28010224,
+      "sha256": "a0b9f45d3b910dae075dfd7ab0d87b2d1dbd1a55d2866936dc498ac064e28b25"
+    }
+  },
+  "canonical_targeted_validation": {
+    "checks": 47037,
+    "passed_suites": 17,
+    "failures": 0,
+    "historical_0_12_0_totals_included": false
+  },
+  "separate_python_packaging_tests": 24,
+  "source_archive": {
+    "files": 1055,
+    "zip_crc_verified": true,
+    "below_32MiB": true,
+    "fresh_isolated_import_passed": true,
+    "isolated_native_startup_checks": 10,
+    "isolated_native_startup_failures": 0
+  },
+  "target_repository": "https://github.com/brodyga0878-hub/Pyton.git",
+  "target_branch": "development/starfrontier-rebuild",
+  "last_known_verified_remote_commit": "19475aed2534f1c1e6b5bda9b58691e9a35fe09c",
+  "remote_rechecked_this_turn": false,
+  "pending_versions_in_push_ancestry": [
+    "0.12.0-worlds-alpha1",
+    "0.12.1-console-alpha1"
+  ],
+  "previous_0_12_0_artifact_commit": "3eb5e6061dc99c11c6215f338faef5d2376588c1",
+  "automatic_review_reason_summary": "The previous root review accepted permission for recovered sources on a recovery branch only, and rejected the broader rebuilt source ZIP/APK/screenshots/validation payload on development/starfrontier-rebuild. Current user requests authorize more local development, not a new explicit publication scope. No new push, upload, workaround or approval-review attempts occurred.",
+  "required_next_authorization_scope": "Explicit user permission to upload the rebuilt sources, source ZIPs, Android APKs, screenshots, validation reports/checksums/manifests and supporting commits for BOTH0.12.0 and0.12.1 already in the branch ancestry to brodyga0878-hub/Pyton on development/starfrontier-rebuild.",
+  "remote_upload_performed": false,
+  "fresh_push_review_attempted_this_turn": false,
+  "download_links_available_for_this_release": false,
+  "immutable_https_links_verified": false,
+  "artifact_files_modified_after_artifact_commit": false,
+  "physical_device_tested": false,
+  "production_signing_key_configured": false,
+  "mb4_integrated_gameplay": false,
+  "all_solid_body_landing_implemented": false,
+  "star_fuel_scoop_integrated": false,
+  "complete_original_interface": false,
+  "full_original_ffe_complete": false
+}
