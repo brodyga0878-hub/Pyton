@@ -1,0 +1,4 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+SOURCE CONSOLE PAUSE EVIDENCE: {"core_after":"(625.0, 187.5)","core_before":"(0.0, 812.5)","jobs_finished_after":2,"jobs_finished_before":1,"mock_geometry":false,"source_days":3.77001157407407,"source_model":129,"worker_real":true}
+SOURCE CONSOLE PAUSE TESTS: 30 checks, 0 failures; 5.292s

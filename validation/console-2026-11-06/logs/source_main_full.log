@@ -1,0 +1,9 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+Main FULL: native jump and pending save/cancel
+Main FULL: orbital transfer, physical autopilot, services and launch
+Main FULL: New Moscow original terrain, offpad landing and phone lift
+Main FULL: Moon model96 physical hatch approach, save and launch
+Main96 frame=300 phase=approach alt=712.403471963459 hull=100.0
+Main FULL: actual diagnostic ZIP with complete saved source world
+SOURCE MAIN FULL TESTS: 153 checks, 0 failures; 36.311s

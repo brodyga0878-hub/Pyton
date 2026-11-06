@@ -44,6 +44,10 @@ class Suite:
 
 
 SUITES = [
+    Suite('classic_console_main', 'tests/test_classic_console_main.gd', 'Actual Main console hooks, principal cameras, session pause, independent fingers, offpad takeoff and pending-jump/save boundaries.', timeout=300, user_args=('--rebuild-capture',)),
+    Suite('source_console_pause', 'tests/test_source_console_pause.gd', 'Actual Worldv4 pending terrain worker publication is deferred during console pause and resumes without losing physical contact.', timeout=600, user_args=('--rebuild-capture',)),
+    Suite('source_mining_machine', 'tests/test_source_mining_machine.gd', 'Standalone original MB4 weekly/loading transitions versus independently executed native controls; deployment and gameplay inventory integration remain future work.', timeout=300),
+    Suite('source_asteroid_mesh_spike', 'tools/source_asteroid_mesh_check.gd', 'Original model112 mesh vertices versus native F1470/F1478 and geometric ray hits; not live asteroid landing or original F582/F583 collision proof.', timeout=300),
     Suite('source_packet_clip', 'tests/test_source_surface_packet_clip.gd', 'Actual117 coarse/fine overlap and packet-shader clip contracts; rendered pixel controls are verified separately.', timeout=300),
     Suite('source_full_startup', 'tests/test_source_full_startup.gd', 'Actual normal startup selects Worldv4/native navigation and restores a private native save; no player progress access.', timeout=300, user_args=('--source-startup-isolated',)),
     Suite('source_surface_streaming', 'tests/test_source_surface_streaming.gd', 'Actual Earth/117 worker mesh publication, coherent core collision and bounded high-speed geographic streaming.', timeout=600),

@@ -60,9 +60,75 @@ func actions_and_release()->void:
 	console.set_actions_enabled(true);touch(console.buttons.auto,64,true);console.hide()
 	check(console.buttons.auto.pointer_id==-1,"Hiding the console releases its owned finger")
 	console.show()
+func complete_console_banks()->void:
+	for width in [720,960,1440,2400]:
+		console.size=Vector2(width,Console.HEIGHT);console._layout()
+		var rectangles:Array[Rect2]=[]
+		for button in console._all_pointer_buttons():
+			var rectangle:Rect2=button.get_rect()
+			check(rectangle.size.x>=64 and rectangle.size.y>=64,"Every classic bank and scanner control has64px touch bounds at%d: %s"%[width,button.name])
+			check(Rect2(Vector2.ZERO,console.size).encloses(rectangle),"Full console control fits at%d: %s"%[width,button.name])
+			var intersects:=false
+			for previous in rectangles:intersects=intersects or previous.intersects(rectangle)
+			check(not intersects,"Full console controls have independent nonoverlapping touch regions at%d: %s"%[width,button.name])
+			rectangles.append(rectangle)
+		check(console._scan_rect.size.x>=200,"Central scanner retains useful width beside both banks at%d"%width)
+	console.size=Vector2(1440,Console.HEIGHT);console._layout()
+	for key in Console.EXTRA_ACTIONS:console.connect(key+"_requested",func():events.append(key))
+	console.configure_state({"assisted":false,"simulation_paused":true,"view_label":"ВИД НАЗАД","control_enabled":false})
+	check(console.labels.mode.text=="ПАУЗА · ИНЕРЦИОННЫЙ РЕЖИМ","Real pause and inertial control are distinguished from unavailable original engines-off")
+	check(console.labels.view.text=="ВИД НАЗАД" and console.buttons.pause.text=="Продолжить","Controller camera and resume operation reach the complete console")
+	var before:=events.size();touch(console.buttons.control,90,true);touch(console.buttons.control,90,false)
+	check(events.size()==before and console.buttons.control.pointer_id==-1,"A controller-disabled control-mode action cannot execute through touch")
+	for key in ["auto","brake","dock","surface"]:
+		touch(console.buttons[key],90,true);touch(console.buttons[key],90,false)
+		check(console.buttons[key].disabled and events.size()==before,"Paused simulation disables physics-changing console command: "+key)
+	console.set_actions_enabled(false);console.set_actions_enabled(true)
+	check(console.buttons.surface.disabled and not console.buttons.pause.disabled,"Unblocking menu input preserves simulation-specific availability while resume remains available")
+	touch(console.buttons.pause,90,true);touch(console.buttons.pause,90,false)
+	check(events.size()==before+1 and events[-1]=="pause","The real resume command remains touch-operable during simulation pause")
+	console.configure_state({"surface_text":"Взлететь","surface_enabled":false,"cargo_t":12,"cargo_capacity_t":60})
+	check(console.buttons.surface.text=="Взлететь" and console.buttons.surface.disabled,"Controller-authoritative surface label and availability reach the console")
+	check(console.labels.cargo.text.contains("12/60"),"Cargo display distinguishes actual load from actual configured capacity")
+	console.configure_state({"assisted":true,"simulation_paused":false,"control_enabled":true})
+	for key in Console.EXTRA_ACTIONS:
+		before=events.size();touch(console.buttons[key],91,true);touch(console.buttons[key],91,false)
+		check(events.size()==before+1 and events[-1]==key,"New classic console command emits its real controller hook exactly once: "+key)
+	check(console.buttons.pause.text=="Пауза" and console.labels.mode.text=="СТАБИЛИЗАЦИЯ","Leaving pause restores live presentation without leaving stale text")
+func actual_scanner_and_scale()->void:
+	var snapshot:={"target_local":Vector3(80,20,-120),"range_m":400.0,"elapsed_days":4.0,"scanner_contacts":[{"position":Vector3(10,-1,-20),"kind":"friendly"},{"position":Vector3(-8,3,40),"kind":"hostile"},{"position":Vector3(INF,0,0)},null,{"position":"invented"}]}
+	var original:=var_to_bytes(snapshot)
+	console.configure_state(snapshot)
+	check(console._contacts.size()==2,"Scanner accepts only supplied finite physical contacts and rejects invalid entries")
+	check(console._contacts[0].position==Vector3(10,-1,-20) and console._target==snapshot.target_local,"Scanner retains actual contact and target coordinates")
+	var before:=events.size();var clock:String=console.labels.clock.text
+	for step in range(4):touch(console.scanner_buttons["in"],100,true);touch(console.scanner_buttons["in"],100,false)
+	check(console._scanner_zoom==16.0 and console.scanner_buttons["in"].disabled,"Real scale buttons reach the bounded nearest scanner scale")
+	touch(console.scanner_buttons["in"],101,true)
+	check(console.scanner_buttons["in"].pointer_id==-1,"At the scale bound a disabled plus button cannot capture a finger")
+	check(console.labels.scanner_range.text=="ШКАЛА\n25 м","Scanner scale labels use the real physical input range divided by presentation zoom")
+	for step in range(6):touch(console.scanner_buttons["out"],102,true);touch(console.scanner_buttons["out"],102,false)
+	check(console._scanner_zoom==0.25 and console.scanner_buttons["out"].disabled,"Real scale buttons reach the bounded farthest scanner scale")
+	check(var_to_bytes(snapshot)==original and events.size()==before and console.labels.clock.text==clock,"Local scanner scaling neither modifies model telemetry nor emits a physics or time command")
+	console.configure_state({})
+	check(console._contacts.is_empty() and not console._has_target,"An empty physical snapshot leaves the scanner empty")
+	var center:=Vector2(720,124);var radii:=Vector2(220,34)
+	console.configure_state({"range_m":400.0})
+	console._scanner_zoom=1.0
+	var below:Dictionary=console._project_contact(Vector3(0,-400,400),center,radii)
+	check(below.top.y<=164 and below.clipped,"A real lower-hemisphere contact is bounded above the scale and64px zoom controls")
+	check(below.outside,"A contact farther than the physical scanner range is marked as beyond-scale instead of an ordinary nearby contact")
+	var ahead:Dictionary=console._project_contact(Vector3(0,0,-200),center,radii)
+	check(ahead.foot.is_equal_approx(Vector2(720,107)) and ahead.top==ahead.foot and not ahead.outside and not ahead.clipped,"An in-range forward contact retains its real bearing with no invented elevation or boundary mark")
+	console._zoom_scanner(1)
+	touch(console.scanner_buttons["in"],103,true);touch(console.buttons.pause,104,true)
+	check(console.scanner_buttons["in"].pointer_id==103 and console.buttons.pause.pointer_id==104,"Range and pause buttons can own simultaneous independent fingers")
+	before=events.size();console.set_actions_enabled(false)
+	check(console.scanner_buttons["in"].pointer_id==-1 and console.buttons.pause.pointer_id==-1 and events.size()==before,"Controller blocking cancels scanner and console touches without executing commands")
+	console.set_actions_enabled(true)
 func run()->void:
 	root.size=Vector2i(1440,720);console=Console.new();root.add_child(console);console.size=Vector2(1440,Console.HEIGHT)
 	await process_frame
-	telemetry();responsive_hit_regions();actions_and_release()
+	telemetry();responsive_hit_regions();actions_and_release();complete_console_banks();actual_scanner_and_scale()
 	console.queue_free();await process_frame
 	print("FLIGHT CONSOLE TESTS: %d checks, %d failures"%[checks,failures]);quit(1 if failures else 0)

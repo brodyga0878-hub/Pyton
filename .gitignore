@@ -8,3 +8,6 @@ build/
 *.key
 .env*
 
+# Private isolated test saves and host font/resource caches are not evidence.
+validation/**/state/
+

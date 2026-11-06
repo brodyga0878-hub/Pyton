@@ -1,0 +1,42 @@
+{
+  "reviewed_at_moscow": "2026-11-06T21:37:21.601607+03:00",
+  "actual_scene": "scenes/main.tscn",
+  "composited": false,
+  "phone_capture": false,
+  "renderer": "desktop OpenGL Compatibility / Mesa llvmpipe",
+  "runtime_frozen": true,
+  "checks": [
+    "Lower console with two working command banks and central red spatial target display",
+    "Forward/rear/external camera state matches actual camera",
+    "Pause leaves resume accessible and dims motion commands",
+    "Cargo/equipment screen shows actual hold data",
+    "Wide landscape2316x1080 inspected",
+    "Duplicate floating surface button removed; throttle caption unobstructed"
+  ],
+  "limitations": [
+    "Original complete F274/F275 scanner and combat/turret/missile command banks not implemented",
+    "No physical S23 Ultra rendering, touch, FPS or temperature measurement"
+  ],
+  "frames": [
+    {
+      "file": "01-classic-console-external.png",
+      "sha256": "6c9e3ddc8d07d493e5634e927785fc93b0d7ee26e40e9afae52db57846b29f9f"
+    },
+    {
+      "file": "02-classic-console-rear.png",
+      "sha256": "32ab4d5b0c2bda3d6a5777d73b053416953e3ed0ef6eb2f253e5271e63a5ba08"
+    },
+    {
+      "file": "03-classic-console-pause.png",
+      "sha256": "437022254d5d6f7c8ebf36185c83e508445bc1f9ae58868f286a5529718963ca"
+    },
+    {
+      "file": "04-real-cargo-and-equipment.png",
+      "sha256": "9ce4c3ceba096bcefab0785798c3fea144914f7b11271a61af4bd97bbf9f5d28"
+    },
+    {
+      "file": "05-classic-console-wide-landscape.png",
+      "sha256": "ffa115b6013cacdce24e901a5c21ff63d330978b91c576b1ff8ba5acd160cc70"
+    }
+  ]
+}

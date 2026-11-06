@@ -39,6 +39,9 @@ FULL_SOURCE_TABLES=(
     'ffe_system_names','ffe_terrain_query','ffe_underground_models','ffe_world_models','ffe_worlds',
 )
 FULL_SOURCE_SHADERS=('source_terrain_packet.gdshader','source_terrain_packet_transition.gdshader')
+CLASSIC_CONSOLE_ACTIONS=('system','routes','auto','brake','dock','view','menu','status','equipment','control','surface','pause')
+CLASSIC_CONSOLE_MODULES=('flight_console','touch_action_button','flight_instruments','main')
+SOURCE_MINING_KERNEL_MODULE='source_mining_machine'
 DEVELOPMENT_ASSET_PREFIXES=(
     'assets/tests/','assets/tools/','assets/docs/','assets/recovered-history/',
     'assets/recovery/','assets/validation/','assets/deliverables/',
@@ -650,6 +653,58 @@ def verify_source_full_runtime(archive,project):
     result.update({'compiled_module_count':len(FULL_SOURCE_MODULES),'streaming_shader_count':len(FULL_SOURCE_SHADERS),'raw_json_count':len(result['data']),'natural_model_indices':ground['parent_models'],'orbital_station_model_indices':orbital_models,'source_control_specification_sha256':spec_sha,'world_layout':'source_jjffe_systems_v4','live_gravity':'sampled-f603-nominal-day-si-v1','gravity_parent_policy':'single_current_focus_parent_f603_v1','live_terrain':'sphere-source-ground-v4','surface_streaming_packet':'source-surface-render-packet-v1','surface_streaming_state':'source-surface-render-state-v1','station_session':'selected-source-station-session-v1','native_development_fixtures_packaged':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'original_per_frame_dynamics':False,'complete_original_physics':False,'physical_device_tested':False})
     return result
 
+def verify_classic_console_runtime(archive,project):
+    """Check v35 console resources and declared live command connections.
+
+    This checks packaging plus the local API contract. Independent Main/touch
+    tests establish behavior; it does not decompile GDSC or claim every FFE
+    instrument, mobile hit target or hardware scenario has been reproduced.
+    """
+    names=set(archive.namelist())
+    result={'scripts':{},'compiled_source_correspondence_rebuilt_by_verifier':False}
+    for name in CLASSIC_CONSOLE_MODULES:
+        raw=(project/'scripts'/f'{name}.gd').read_bytes()
+        exported=f'assets/scripts/{name}.gdc'
+        assert exported in names,'Missing classic console runtime module '+name
+        packed=archive.read(exported)
+        assert len(packed)>64 and packed[:4]==b'GDSC','Invalid compiled classic console runtime module '+name
+        result['scripts'][name]={'runtime_path':exported,'runtime_bytes':len(packed),'runtime_sha256':hashlib.sha256(packed).hexdigest(),'local_source_sha256':hashlib.sha256(raw).hexdigest()}
+    console=(project/'scripts/flight_console.gd').read_text()
+    main=(project/'scripts/main.gd').read_text()
+    height=re.search(r'^const\s+HEIGHT\s*:=\s*(\d+(?:\.\d+)?)\s*$',console,re.M)
+    assert height and float(height[1])==240,'Classic console logical height must be240'
+    actions=[]
+    for label in ['ACTIONS','EXTRA_ACTIONS']:
+        declaration=re.search(r'^const\s+'+label+r'\s*:=\s*\[([^\]]+)\]',console,re.M)
+        assert declaration,'Missing classic console command list '+label
+        actions.extend(re.findall(r'"([^"\r\n]+)"',declaration[1]))
+    assert len(actions)==len(set(actions)) and set(actions)==set(CLASSIC_CONSOLE_ACTIONS),'Classic console command set differs from the live12-action contract'
+    for action in CLASSIC_CONSOLE_ACTIONS:
+        assert re.search(r'^signal\s+'+action+r'_requested\b',console,re.M),'Missing classic console command signal '+action
+        assert re.search(r'flight_console\.'+action+r'_requested\.connect\s*\(',main),'Classic console command is not connected to Main '+action
+    result.update({'console_height_logical_px':240,'live_command_count':len(actions),'live_commands':actions,'compiled_module_count':len(CLASSIC_CONSOLE_MODULES),'complete_original_interface':False,'original_per_frame_dynamics':False,'physical_device_tested':False})
+    return result
+
+def verify_mining_kernel_runtime(archive,project):
+    """Check the standalone MB4 record kernel without claiming gameplay."""
+    name=SOURCE_MINING_KERNEL_MODULE
+    raw=(project/'scripts'/f'{name}.gd').read_bytes();text=raw.decode('utf-8')
+    exported=f'assets/scripts/{name}.gdc'
+    assert exported in set(archive.namelist()),'Missing standalone MB4 record kernel'
+    packed=archive.read(exported)
+    assert len(packed)>64 and packed[:4]==b'GDSC','Invalid compiled standalone MB4 record kernel'
+    weekly=json.loads((project/'tests/fixtures/source_mining_weekly_native.json').read_text())
+    loading=json.loads((project/'tests/fixtures/source_mining_load_native.json').read_text())
+    for fixture in [weekly,loading]:
+        assert fixture['source_commit']==SOURCE_ASSEMBLY_COMMIT and fixture['source_assembly_sha256']==SOURCE_ASSEMBLY_SHA256,'Wrong standalone MB4 native fixture provenance'
+        assert len(fixture['cases'])==fixture['case_count'] and fixture['fresh_process_runs']==3 and fixture['record_guards_unchanged'] is True,'Incomplete standalone MB4 native fixture'
+    expected={'SOURCE_ASM_SHA256':SOURCE_ASSEMBLY_SHA256,'F243_SHA256':weekly['f243_sha256'],'F247_SHA256':loading['source_function_sha256']['247'],'F252_SHA256':loading['source_function_sha256']['252']}
+    for constant,digest in expected.items():
+        assert re.search(r'^const\s+'+constant+r'\s*:=\s*"'+re.escape(digest)+r'"\s*$',text,re.M),'Standalone MB4 provenance constant differs '+constant
+    mapping=re.search(r'^const\s+COMMODITY_BY_PROSPECT\s*:=\s*\[([\d,\s]+)\]\s*$',text,re.M)
+    assert mapping and [int(value) for value in mapping[1].split(',') if value.strip()]==loading['commodity_map'],'Standalone MB4 commodity map differs from original native fixture'
+    return {'runtime_path':exported,'runtime_bytes':len(packed),'runtime_sha256':hashlib.sha256(packed).hexdigest(),'local_source_sha256':hashlib.sha256(raw).hexdigest(),'native_fixture_provenance_checked':True,'native_weekly_case_count':weekly['case_count'],'native_load_case_count':loading['case_count'],'oracle_executed_by_apk_verifier':False,'integrated_gameplay':False,'physical_deployment_implemented':False,'weekly_world_scheduler_integrated':False,'star_fuel_scoop_integrated':False,'physical_device_tested':False}
+
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     expected=preset_values(presets)
     signature=run(build_tools/'apksigner','verify','--verbose','--print-certs',apk)
@@ -668,7 +723,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -734,6 +789,9 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
                 source_physics_ports_assets=verify_source_physics_ports_runtime(archive,presets.parent,expected['version_code'])
             if expected['version_code']>=34:
                 source_full_assets=verify_source_full_runtime(archive,presets.parent)
+            if expected['version_code']>=35:
+                classic_console_assets=verify_classic_console_runtime(archive,presets.parent)
+                mining_kernel_assets=verify_mining_kernel_runtime(archive,presets.parent)
         for name in names:
             if not name.startswith('lib/') or not name.endswith('.so'):continue
             data=archive.read(name)
@@ -751,7 +809,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

@@ -30,6 +30,9 @@ func _input(event:InputEvent)->void:
 	elif event is InputEventScreenDrag and event.index==pointer_id:
 		_pointer_at(get_global_transform_with_canvas().affine_inverse()*event.position);get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT:
+		# Godot may deliver an emulated mouse press before the corresponding
+		# touch. Owning that synthetic mouse would lose the real finger index.
+		if event.device==-1:return
 		if pointer_id>=0:return
 		var local:Vector2=get_global_transform_with_canvas().affine_inverse()*event.position
 		if event.pressed and Rect2(Vector2.ZERO,size).has_point(local):
@@ -37,6 +40,7 @@ func _input(event:InputEvent)->void:
 		elif not event.pressed and pointer_id==-2:
 			release_pointer();get_viewport().set_input_as_handled()
 	elif event is InputEventMouseMotion and pointer_id==-2:
+		if event.device==-1:return
 		if not event.button_mask&MOUSE_BUTTON_MASK_LEFT:release_pointer()
 		else:_pointer_at(get_global_transform_with_canvas().affine_inverse()*event.position)
 		get_viewport().set_input_as_handled()

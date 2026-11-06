@@ -1,6 +1,6 @@
 {
   "audit_date_moscow": "2026-11-06",
-  "snapshot_scope": "Historical recovery evidence separated from accepted rebuilt block10/0.12.0; full FFE and physical device readiness remain false",
+  "snapshot_scope": "Accepted Worldv4/block10 base plus started block9 console/mining research; historical recovery evidence and prior validation kept separate; full FFE/device/publication readiness remain false",
   "recovery_commit": "2f91ec7500e2da0f86abd95f9d2c0917072fe48e",
   "recovered_history_files": 301,
   "identified_original_paths": 105,
@@ -29,8 +29,8 @@
   },
   "current_reconstruction": {
     "implementation_kind": "New integration and newly written missing modules around preserved historical source; not discovery of the complete former source tree",
-    "application_version": "0.12.0-worlds-alpha1",
-    "application_integration_status": "Block10 accepted: full native-coordinate Worldv4, original system construction, source terrain shared by rendered/collision packets, physical station models69/72..80, underground96, time/save/context integration and bounded asynchronous streaming. Canonical current report: 931938 checks in85 suites,0 failures; actual Main153/0, production startup10/0, four fresh desktop GLES frames and the actual ARM64 APK verified. Legacyv1/v2/v3 expectations preserved; mobile LOD, nominal-day SI bridge and remaining ship/fuel adaptations are explicit.",
+    "application_version": "0.12.1-console-alpha1",
+    "application_integration_status": "Block9 started: real classic lower console with12 commands and principal camera/pause consumers; accepted Worldv4/physical ports and legacy contracts retained; MB4 record kernel and model112 offline geometry are not live mining/landing gameplay.",
     "native_android_runtime": "Godot ARM64; no DOS or x86 emulator in the game",
     "modules_present": [
       "Main scene and Russian mobile controls with independently tracked pointers",
@@ -39,7 +39,9 @@
       "Independent three-vertex saved source contact validation before cold packet publication",
       "Source station69/72..80 physical docking/doors/spin and original96 enclosed hangar route",
       "Atomic two-slot SaveStore, full World-before-Flight restore and opt-in exact save in diagnostics ZIP",
-      "Explicit source F603 focused-parent nominal-day SI force bridge and conservative native Cobra control profile; legacy adapters retained in legacy worlds"
+      "Explicit source F603 focused-parent nominal-day SI force bridge and conservative native Cobra control profile; legacy adapters retained in legacy worlds",
+      "Classic lower console with12 genuine Main actions, principal front/rear/external cameras and session pause including deferred physics-affecting terrain publication",
+      "Standalone MB4 F243/F247/F252 record kernel with independent native controls; no live deployment or economy consumer"
     ],
     "original_data_regeneration": {
       "provenance_file": "data/ffe_data_provenance.json",
@@ -63,27 +65,27 @@
       }
     },
     "whole_application_smoke_passed": true,
-    "whole_application_smoke_scope": "Actual frozen Main153checks: native jump/cancel/save, physical selected station dock/basic refuel, closed-door launch save/cancel/retry, nonzero navigation-time Q31 restoration, original96 touch landing/save/launch and actual diagnostics ZIP with hash-checked complete save; normal production startup10checks separately passed.",
-    "whole_application_smoke_log": "validation/worlds-2026-11-06/source_main_full.log",
+    "whole_application_smoke_scope": "Actual Main42 console-hook checks plus153 FULLworld scenarios and30 real pending-source-worker pause checks; canonical targeted report, private/capture-mode progress only.",
+    "whole_application_smoke_log": "validation/console-ui-final-2026-11-06/logs/classic_console_main.log",
     "desktop_gles_render_passed": true,
-    "desktop_gles_render_scope": "Four fresh visually inspected actual Main frames: original orbital80, Cobra at native station entrance, New Moscow84 and enclosed96 hangar. Desktop Mesa llvmpipe Compatibility, no compositing/player progress access/phone-performance claim.",
-    "desktop_gles_render_log": "validation/worlds-2026-11-06/render.log",
+    "desktop_gles_render_scope": "Five visually inspected actual Main frames, including external/rear/pause/equipment and2316x1080 landscape; desktop llvmpipe, not physical phone measurements.",
+    "desktop_gles_render_log": "validation/console-2026-11-06/render.log",
     "android_apk_built": true,
     "android_apk_technically_verified": true,
-    "android_artifact_status": "Actual0.12.0/code34 ARM64 TEST candidate verified:59compiled modules,2exact shaders,21exactJSON,51materialmaps, minSDK24/target36 and16KiB ZIP/ELF alignment; physical phone pending.",
-    "final_android_candidate_hash": "b74c18b1a83263e2ed96720e839e6c4f99f15e3e454603e6fa87e387f292c5cc",
+    "android_artifact_status": "Actual0.12.1/code35 ARM64 TEST candidate built from frozen runtime and technically verified:59 core source modules,4 console modules(Main shared),standalone MB4 record kernel,12 live command connections,2 exact shaders,21 exactJSON,51 materialmaps,minSDK24/target36,16KiB ZIP/ELF,nondebuggable,no extra permissions; local only,physical phone pending.",
+    "final_android_candidate_hash": "e80448ff28edfcf39f5d2eae3e0666087dd4bc0587f7fbd5d66cc2dba7b55dbd",
     "final_android_candidate": {
-      "bytes": 49623926,
+      "bytes": 49640658,
       "package": "org.starfrontier.rebuild",
-      "version": "0.12.0-worlds-alpha1",
-      "version_code": 34,
+      "version": "0.12.1-console-alpha1",
+      "version_code": 35,
       "abi": "arm64-v8a",
       "min_sdk": 24,
       "target_sdk": 36,
       "debuggable": false,
       "toolchain_smoke_only": false,
       "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
-      "file": "deliverables/0.12.0-worlds-alpha1/StarFrontier-0.12.0-worlds-arm64.apk",
+      "file": "deliverables/0.12.1-console-alpha1/StarFrontier-0.12.1-console-arm64.apk",
       "test_signature_verified": true,
       "production_signing_key_configured": false,
       "zip_and_elf_alignment_16k": true,
@@ -92,7 +94,13 @@
       "source_compiled_modules_verified": 59,
       "source_exact_shaders_verified": 2,
       "source_exact_json_verified": 21,
-      "verification_report": "validation/worlds-2026-11-06/android-verification.json"
+      "classic_console_modules_verified": 4,
+      "classic_console_live_commands_verified": 12,
+      "standalone_mb4_kernel_verified": true,
+      "mb4_integrated_gameplay": false,
+      "star_fuel_scoop_integrated": false,
+      "verification_report": "validation/console-2026-11-06/android-verification.json",
+      "publication_status": "local_only; prior automatic approval blocked remote artifact publication; no new upload authorization"
     },
     "physical_device_tested": false,
     "new_russian_name_labels": 133,
@@ -101,7 +109,7 @@
     "new_game_save_schema": "starfrontier-rebuild-game-v1",
     "complete_old_game_save_import_verified": false,
     "original_commandr_progress_import_verified": false,
-    "block10_followup_status": "Accepted0.12.0 Worldv4; next major block9 plan prepared but implementation not started. Five major blocks remain:9,11,12,13,14.",
+    "block10_followup_status": "Block10 accepted at0.12.0 with documented boundaries. Block9 now started; five major blocks9/11/12/13/14 remain. Broad solid-body landing includes additional112..116/comet work and site material/thermal rules.",
     "known_boundaries": [
       "Full original per-frame integrator not claimed: selected source F603 focused-parent force uses an explicit nominal-day SI bridge; original normalization quirks remain documented.",
       "Mobile source terrain uses explicit bounded LOD (117:8km/32cells; others4km/64cells), worker queues and published-triangle collision; this is not an exact replay of every original renderer frame.",
@@ -111,7 +119,7 @@
       "Full previous project/APK0.10.8 not found; original COMMANDR progress import, full Russian text/editorial review and reference visual quality remain unverified or unfinished.",
       "Physical Samsung S23 Ultra installation/update/touch/background/SAF/FPS/heat untested; test signing only, production release not ready."
     ],
-    "application_version_planned": "0.12.0-worlds-alpha1",
+    "application_version_planned": "0.12.1-console-alpha1",
     "graphics_update": {
       "version": "0.11.1-graphics-alpha1",
       "checks": 1408,
@@ -439,14 +447,13 @@
       "missing_independent_leaf_fixture": "tests/fixtures/model_vertices_reference.json"
     },
     "latest_targeted_validation": {
-      "checks": 931938,
-      "passed_suites": 85,
+      "checks": 47037,
+      "passed_suites": 17,
       "failures": 0,
       "status": "passed",
       "engine_error_or_leak_diagnostics": false,
-      "report": "validation/2026-11-06-worlds-final.json",
-      "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
-      "independent_leaf_fixture_status": "Regenerated from actual original F1470/F1478 instructions and passed in both preserved mesh/direct vertex suites"
+      "report": "validation/2026-11-06-console-final.json",
+      "scope": "Final15 UI/Main groups plus2 unchanged same-session native-reference groups; unique suites only, report timestamps retained; historical931938 excluded; not a complete rerun of all source kernels."
     },
     "source_ports_physics_update": {
       "version": "0.11.11-ports-alpha1",
@@ -578,296 +585,31 @@
     },
     "current_module_validation": {
       "engine": "4.6.3.stable.official.7d41c59c4",
-      "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
-      "report": "validation/2026-11-06-worlds-final.json",
+      "scope": "Final15 UI/Main groups plus2 unchanged same-session native-reference groups; unique suites only, report timestamps retained; historical931938 excluded; not a complete rerun of all source kernels.",
+      "report": "validation/2026-11-06-console-final.json",
       "suites": {
-        "source_packet_clip": {
-          "checks": 5,
+        "classic_console_main": {
+          "checks": 42,
           "failures": 0,
-          "test": "tests/test_source_surface_packet_clip.gd"
+          "test": "tests/test_classic_console_main.gd"
+        },
+        "source_console_pause": {
+          "checks": 30,
+          "failures": 0,
+          "test": "tests/test_source_console_pause.gd"
         },
         "source_full_startup": {
           "checks": 10,
           "failures": 0,
           "test": "tests/test_source_full_startup.gd"
         },
-        "source_surface_streaming": {
-          "checks": 2378,
-          "failures": 0,
-          "test": "tests/test_source_surface_streaming.gd"
-        },
-        "source_render_packet": {
-          "checks": 4222,
-          "failures": 0,
-          "test": "tests/test_source_surface_render_packet.gd"
-        },
-        "source_render_state": {
-          "checks": 1108,
-          "failures": 0,
-          "test": "tests/test_source_surface_render_state.gd"
-        },
-        "source_surface_contact_patch": {
-          "checks": 32,
-          "failures": 0,
-          "test": "tests/test_source_surface_contact_patch.gd"
-        },
-        "source_surface_cap": {
-          "checks": 86,
-          "failures": 0,
-          "test": "tests/test_source_surface_cap.gd"
-        },
-        "source_high_gravity": {
-          "checks": 26,
-          "failures": 0,
-          "test": "tests/test_source_high_gravity_surface.gd"
-        },
-        "source_orbit_surface_guard": {
-          "checks": 56,
-          "failures": 0,
-          "test": "tests/test_source_orbit_surface_guard.gd"
-        },
-        "source_generated_worlds": {
-          "checks": 7121,
-          "failures": 0,
-          "test": "tests/test_source_generated_worlds.gd"
-        },
-        "source_galaxy_population": {
-          "checks": 51556,
-          "failures": 0,
-          "test": "tests/test_source_galaxy_population.gd"
-        },
-        "source_surface_integration": {
-          "checks": 60,
-          "failures": 0,
-          "test": "tests/test_source_surface_integration.gd"
-        },
-        "source_station_session": {
-          "checks": 391,
-          "failures": 0,
-          "test": "tests/test_source_station_session.gd"
-        },
-        "source_underground_controller": {
-          "checks": 197,
-          "failures": 0,
-          "test": "tests/test_source_underground_controller.gd"
-        },
-        "source_enclosed_city_visual": {
-          "checks": 22,
-          "failures": 0,
-          "test": "tests/test_source_enclosed_city_visual.gd"
-        },
-        "source_celestial_renderer": {
-          "checks": 150,
-          "failures": 0,
-          "test": "tests/test_source_celestial_renderer.gd"
-        },
-        "source_cobra_control": {
-          "checks": 79,
-          "failures": 0,
-          "test": "tests/test_source_ship_control_profile.gd"
-        },
-        "source_port_refuel": {
-          "checks": 85,
-          "failures": 0,
-          "test": "tests/test_source_port_refuel.gd"
-        },
         "source_main_full": {
           "checks": 153,
           "failures": 0,
           "test": "tests/test_source_main_full.gd"
         },
-        "source_model_mesh": {
-          "checks": 5348,
-          "failures": 0,
-          "test": "tests/test_source_model_mesh.gd"
-        },
-        "source_model_vertices": {
-          "checks": 4829,
-          "failures": 0,
-          "test": "tests/test_source_model_vertices_native.gd"
-        },
-        "source_galaxy": {
-          "checks": 20512,
-          "failures": 0,
-          "test": "tests/test_source_galaxy.gd"
-        },
-        "source_definition": {
-          "checks": 29630,
-          "failures": 0,
-          "test": "tests/test_source_system_definition.gd"
-        },
-        "source_names": {
-          "checks": 9550,
-          "failures": 0,
-          "test": "tests/test_source_planet_names.gd"
-        },
-        "source_settlements": {
-          "checks": 16627,
-          "failures": 0,
-          "test": "tests/test_source_settlement_builder.gd"
-        },
-        "source_classifier_full": {
-          "checks": 44823,
-          "failures": 0,
-          "test": "tests/test_source_body_classifier_full.gd"
-        },
-        "source_system_builder": {
-          "checks": 113101,
-          "failures": 0,
-          "test": "tests/test_source_system_builder.gd"
-        },
-        "source_world_catalogue": {
-          "checks": 47396,
-          "failures": 0,
-          "test": "tests/test_source_world_catalogue.gd"
-        },
-        "source_ground_surface": {
-          "checks": 30476,
-          "failures": 0,
-          "test": "tests/test_source_ground_surface.gd"
-        },
-        "source_surface_terrain": {
-          "checks": 1054,
-          "failures": 0,
-          "test": "tests/test_source_surface_terrain.gd"
-        },
-        "source_physics_bridge": {
-          "checks": 37002,
-          "failures": 0,
-          "test": "tests/test_source_physics_bridge.gd"
-        },
-        "source_station_geometry": {
-          "checks": 50429,
-          "failures": 0,
-          "test": "tests/test_source_station_geometry.gd"
-        },
-        "source_docking_flight": {
-          "checks": 402,
-          "failures": 0,
-          "test": "tests/test_source_docking_flight.gd"
-        },
-        "source_underground": {
-          "checks": 4335,
-          "failures": 0,
-          "test": "tests/test_source_underground_port.gd"
-        },
-        "native_navigation": {
-          "checks": 219,
-          "failures": 0,
-          "test": "tests/test_native_navigation.gd"
-        },
-        "block10_legacy": {
-          "checks": 1445,
-          "failures": 0,
-          "test": "tests/test_block10_integration.gd"
-        },
-        "math": {
-          "checks": 142987,
-          "failures": 0,
-          "test": "tests/test_rebuilt_ffe_math.gd"
-        },
-        "body_initializer": {
-          "checks": 5723,
-          "failures": 0,
-          "test": "tests/test_rebuilt_body_initializer.gd"
-        },
-        "body_rotation": {
-          "checks": 10799,
-          "failures": 0,
-          "test": "tests/test_rebuilt_body_rotation.gd"
-        },
-        "stellar_factory": {
-          "checks": 10719,
-          "failures": 0,
-          "test": "tests/test_stellar_body_factory.gd"
-        },
-        "planetary_classifier": {
-          "checks": 20637,
-          "failures": 0,
-          "test": "tests/test_planetary_classifier.gd"
-        },
-        "source_body_factory": {
-          "checks": 35979,
-          "failures": 0,
-          "test": "tests/test_source_body_factory.gd"
-        },
-        "source_clock": {
-          "checks": 7312,
-          "failures": 0,
-          "test": "tests/test_source_clock.gd"
-        },
-        "source_world_bridge": {
-          "checks": 1634,
-          "failures": 0,
-          "test": "tests/test_source_world_bridge.gd"
-        },
-        "source_orbit": {
-          "checks": 24528,
-          "failures": 0,
-          "test": "tests/test_source_orbit.gd"
-        },
-        "source_orbit_integration": {
-          "checks": 2630,
-          "failures": 0,
-          "test": "tests/test_source_orbit_integration.gd"
-        },
-        "source_gravity": {
-          "checks": 20205,
-          "failures": 0,
-          "test": "tests/test_source_gravity.gd"
-        },
-        "source_physics_integration": {
-          "checks": 1877,
-          "failures": 0,
-          "test": "tests/test_source_physics_integration.gd"
-        },
-        "orbital_port_surface": {
-          "checks": 86,
-          "failures": 0,
-          "test": "tests/test_orbital_port_surface.gd"
-        },
-        "worlds": {
-          "checks": 719,
-          "failures": 0,
-          "test": "tests/test_rebuilt_worlds.gd"
-        },
-        "flight": {
-          "checks": 94,
-          "failures": 0,
-          "test": "tests/test_rebuilt_flight.gd"
-        },
-        "cities": {
-          "checks": 374,
-          "failures": 0,
-          "test": "tests/test_rebuilt_cities.gd"
-        },
-        "city_runtime": {
-          "checks": 45,
-          "failures": 0,
-          "test": "tests/test_source_city_runtime.gd"
-        },
-        "city_view": {
-          "checks": 33,
-          "failures": 0,
-          "test": "tests/test_source_city_view.gd"
-        },
-        "triangle_ccd": {
-          "checks": 144,
-          "failures": 0,
-          "test": "tests/test_segment_triangle.gd"
-        },
-        "ground_pads": {
-          "checks": 42167,
-          "failures": 0,
-          "test": "recovered-history/ground_harness/tests/test_source_ground_pads.gd"
-        },
-        "terrain_native": {
-          "checks": 9285,
-          "failures": 0,
-          "test": "tools/data_validate_terrain.py"
-        },
         "save_touch": {
-          "checks": 69,
+          "checks": 71,
           "failures": 0,
           "test": "tests/test_rebuilt_save_touch.gd"
         },
@@ -876,80 +618,15 @@
           "failures": 0,
           "test": "tests/test_rebuilt_app_transitions.gd"
         },
-        "graphics_ship": {
-          "checks": 108,
-          "failures": 0,
-          "test": "tests/test_ship_graphics.gd"
-        },
-        "graphics_environment": {
-          "checks": 1136,
-          "failures": 0,
-          "test": "tests/test_graphics_space_environment.gd"
-        },
         "graphics_integration": {
           "checks": 44,
           "failures": 0,
           "test": "tests/test_graphics_integration.gd"
         },
-        "material_library": {
-          "checks": 218,
-          "failures": 0,
-          "test": "tests/test_material_library.gd"
-        },
-        "space_materials": {
-          "checks": 82,
-          "failures": 0,
-          "test": "tests/test_space_material_bindings.gd"
-        },
-        "world_materials": {
-          "checks": 27,
-          "failures": 0,
-          "test": "tests/test_world_materials.gd"
-        },
-        "world_terrain_shader": {
-          "checks": 40,
-          "failures": 0,
-          "test": "tests/test_world_terrain_shader.gd"
-        },
-        "world_planet_shader": {
-          "checks": 29,
-          "failures": 0,
-          "test": "tests/test_world_planet_shader.gd"
-        },
-        "world_surface_invariants": {
-          "checks": 681,
-          "failures": 0,
-          "test": "tests/test_world_surface_invariants.gd"
-        },
-        "city_material_roles": {
-          "checks": 104350,
-          "failures": 0,
-          "test": "tests/test_city_material_roles.gd"
-        },
-        "city_surface_shader": {
-          "checks": 11,
-          "failures": 0,
-          "test": "tests/test_city_surface_shader.gd"
-        },
-        "city_surface_invariants": {
-          "checks": 482,
-          "failures": 0,
-          "test": "tests/test_city_surface_invariants.gd"
-        },
         "graphics_scope": {
           "checks": 87,
           "failures": 0,
           "test": "tests/test_graphics_scope.gd"
-        },
-        "surface_detail_scope": {
-          "checks": 199,
-          "failures": 0,
-          "test": "tests/test_surface_detail_scope.gd"
-        },
-        "station_finish": {
-          "checks": 89,
-          "failures": 0,
-          "test": "tests/test_station_finish.gd"
         },
         "offpad_takeoff": {
           "checks": 109,
@@ -967,7 +644,7 @@
           "test": "tests/test_touch_action_button.gd"
         },
         "flight_console": {
-          "checks": 116,
+          "checks": 318,
           "failures": 0,
           "test": "tests/test_flight_console.gd"
         },
@@ -975,26 +652,6 @@
           "checks": 228,
           "failures": 0,
           "test": "tests/test_departure_cycle.gd"
-        },
-        "training_dock_services": {
-          "checks": 449,
-          "failures": 0,
-          "test": "tests/test_training_dock_services.gd"
-        },
-        "dock_services_view": {
-          "checks": 78,
-          "failures": 0,
-          "test": "tests/test_dock_services_view.gd"
-        },
-        "dock_service_actions": {
-          "checks": 63,
-          "failures": 0,
-          "test": "tests/test_dock_service_actions.gd"
-        },
-        "diagnostics": {
-          "checks": 71,
-          "failures": 0,
-          "test": "tests/test_game_diagnostics.gd"
         },
         "report_export": {
           "checks": 27,
@@ -1005,6 +662,16 @@
           "checks": 99,
           "failures": 0,
           "test": "tests/test_bug_report_ui.gd"
+        },
+        "source_mining_machine": {
+          "checks": 45441,
+          "failures": 0,
+          "test": "tests/test_source_mining_machine.gd"
+        },
+        "source_asteroid_mesh_spike": {
+          "checks": 224,
+          "failures": 0,
+          "test": "tools/source_asteroid_mesh_check.gd"
         }
       }
     },
@@ -1026,16 +693,15 @@
       "snapshot_version": "0.11.0-rebuild-alpha1"
     },
     "curated_validation": {
-      "checks": 931938,
-      "passed_suites": 85,
+      "checks": 47037,
+      "passed_suites": 17,
       "failures": 0,
       "status": "passed",
       "engine_error_or_leak_diagnostics": false,
-      "report": "validation/2026-11-06-worlds-final.json",
-      "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
-      "independent_leaf_fixture_status": "Regenerated from actual original F1470/F1478 instructions and passed in both preserved mesh/direct vertex suites"
+      "report": "validation/2026-11-06-console-final.json",
+      "scope": "Final15 UI/Main groups plus2 unchanged same-session native-reference groups; unique suites only, report timestamps retained; historical931938 excluded; not a complete rerun of all source kernels."
     },
-    "desktop_gles_capture_manifest": "validation/worlds-2026-11-06/screenshots/capture-manifest.json",
+    "desktop_gles_capture_manifest": "validation/console-2026-11-06/screenshots/capture-manifest.json",
     "original_port_services_scope": "Basic refuel in the actual selected source orbital port; full original economy/market/equipment services remain pending.",
     "source_full_worlds_update": {
       "version": "0.12.0-worlds-alpha1",
@@ -1097,6 +763,512 @@
       "full_original_port_complete": false,
       "reference_visual_quality_achieved": false,
       "package_manifest": "deliverables/0.12.0-worlds-alpha1/manifest.json"
+    },
+    "worlds_0_12_0_validation_snapshot": {
+      "current_module_validation": {
+        "engine": "4.6.3.stable.official.7d41c59c4",
+        "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+        "report": "validation/2026-11-06-worlds-final.json",
+        "suites": {
+          "source_packet_clip": {
+            "checks": 5,
+            "failures": 0,
+            "test": "tests/test_source_surface_packet_clip.gd"
+          },
+          "source_full_startup": {
+            "checks": 10,
+            "failures": 0,
+            "test": "tests/test_source_full_startup.gd"
+          },
+          "source_surface_streaming": {
+            "checks": 2378,
+            "failures": 0,
+            "test": "tests/test_source_surface_streaming.gd"
+          },
+          "source_render_packet": {
+            "checks": 4222,
+            "failures": 0,
+            "test": "tests/test_source_surface_render_packet.gd"
+          },
+          "source_render_state": {
+            "checks": 1108,
+            "failures": 0,
+            "test": "tests/test_source_surface_render_state.gd"
+          },
+          "source_surface_contact_patch": {
+            "checks": 32,
+            "failures": 0,
+            "test": "tests/test_source_surface_contact_patch.gd"
+          },
+          "source_surface_cap": {
+            "checks": 86,
+            "failures": 0,
+            "test": "tests/test_source_surface_cap.gd"
+          },
+          "source_high_gravity": {
+            "checks": 26,
+            "failures": 0,
+            "test": "tests/test_source_high_gravity_surface.gd"
+          },
+          "source_orbit_surface_guard": {
+            "checks": 56,
+            "failures": 0,
+            "test": "tests/test_source_orbit_surface_guard.gd"
+          },
+          "source_generated_worlds": {
+            "checks": 7121,
+            "failures": 0,
+            "test": "tests/test_source_generated_worlds.gd"
+          },
+          "source_galaxy_population": {
+            "checks": 51556,
+            "failures": 0,
+            "test": "tests/test_source_galaxy_population.gd"
+          },
+          "source_surface_integration": {
+            "checks": 60,
+            "failures": 0,
+            "test": "tests/test_source_surface_integration.gd"
+          },
+          "source_station_session": {
+            "checks": 391,
+            "failures": 0,
+            "test": "tests/test_source_station_session.gd"
+          },
+          "source_underground_controller": {
+            "checks": 197,
+            "failures": 0,
+            "test": "tests/test_source_underground_controller.gd"
+          },
+          "source_enclosed_city_visual": {
+            "checks": 22,
+            "failures": 0,
+            "test": "tests/test_source_enclosed_city_visual.gd"
+          },
+          "source_celestial_renderer": {
+            "checks": 150,
+            "failures": 0,
+            "test": "tests/test_source_celestial_renderer.gd"
+          },
+          "source_cobra_control": {
+            "checks": 79,
+            "failures": 0,
+            "test": "tests/test_source_ship_control_profile.gd"
+          },
+          "source_port_refuel": {
+            "checks": 85,
+            "failures": 0,
+            "test": "tests/test_source_port_refuel.gd"
+          },
+          "source_main_full": {
+            "checks": 153,
+            "failures": 0,
+            "test": "tests/test_source_main_full.gd"
+          },
+          "source_model_mesh": {
+            "checks": 5348,
+            "failures": 0,
+            "test": "tests/test_source_model_mesh.gd"
+          },
+          "source_model_vertices": {
+            "checks": 4829,
+            "failures": 0,
+            "test": "tests/test_source_model_vertices_native.gd"
+          },
+          "source_galaxy": {
+            "checks": 20512,
+            "failures": 0,
+            "test": "tests/test_source_galaxy.gd"
+          },
+          "source_definition": {
+            "checks": 29630,
+            "failures": 0,
+            "test": "tests/test_source_system_definition.gd"
+          },
+          "source_names": {
+            "checks": 9550,
+            "failures": 0,
+            "test": "tests/test_source_planet_names.gd"
+          },
+          "source_settlements": {
+            "checks": 16627,
+            "failures": 0,
+            "test": "tests/test_source_settlement_builder.gd"
+          },
+          "source_classifier_full": {
+            "checks": 44823,
+            "failures": 0,
+            "test": "tests/test_source_body_classifier_full.gd"
+          },
+          "source_system_builder": {
+            "checks": 113101,
+            "failures": 0,
+            "test": "tests/test_source_system_builder.gd"
+          },
+          "source_world_catalogue": {
+            "checks": 47396,
+            "failures": 0,
+            "test": "tests/test_source_world_catalogue.gd"
+          },
+          "source_ground_surface": {
+            "checks": 30476,
+            "failures": 0,
+            "test": "tests/test_source_ground_surface.gd"
+          },
+          "source_surface_terrain": {
+            "checks": 1054,
+            "failures": 0,
+            "test": "tests/test_source_surface_terrain.gd"
+          },
+          "source_physics_bridge": {
+            "checks": 37002,
+            "failures": 0,
+            "test": "tests/test_source_physics_bridge.gd"
+          },
+          "source_station_geometry": {
+            "checks": 50429,
+            "failures": 0,
+            "test": "tests/test_source_station_geometry.gd"
+          },
+          "source_docking_flight": {
+            "checks": 402,
+            "failures": 0,
+            "test": "tests/test_source_docking_flight.gd"
+          },
+          "source_underground": {
+            "checks": 4335,
+            "failures": 0,
+            "test": "tests/test_source_underground_port.gd"
+          },
+          "native_navigation": {
+            "checks": 219,
+            "failures": 0,
+            "test": "tests/test_native_navigation.gd"
+          },
+          "block10_legacy": {
+            "checks": 1445,
+            "failures": 0,
+            "test": "tests/test_block10_integration.gd"
+          },
+          "math": {
+            "checks": 142987,
+            "failures": 0,
+            "test": "tests/test_rebuilt_ffe_math.gd"
+          },
+          "body_initializer": {
+            "checks": 5723,
+            "failures": 0,
+            "test": "tests/test_rebuilt_body_initializer.gd"
+          },
+          "body_rotation": {
+            "checks": 10799,
+            "failures": 0,
+            "test": "tests/test_rebuilt_body_rotation.gd"
+          },
+          "stellar_factory": {
+            "checks": 10719,
+            "failures": 0,
+            "test": "tests/test_stellar_body_factory.gd"
+          },
+          "planetary_classifier": {
+            "checks": 20637,
+            "failures": 0,
+            "test": "tests/test_planetary_classifier.gd"
+          },
+          "source_body_factory": {
+            "checks": 35979,
+            "failures": 0,
+            "test": "tests/test_source_body_factory.gd"
+          },
+          "source_clock": {
+            "checks": 7312,
+            "failures": 0,
+            "test": "tests/test_source_clock.gd"
+          },
+          "source_world_bridge": {
+            "checks": 1634,
+            "failures": 0,
+            "test": "tests/test_source_world_bridge.gd"
+          },
+          "source_orbit": {
+            "checks": 24528,
+            "failures": 0,
+            "test": "tests/test_source_orbit.gd"
+          },
+          "source_orbit_integration": {
+            "checks": 2630,
+            "failures": 0,
+            "test": "tests/test_source_orbit_integration.gd"
+          },
+          "source_gravity": {
+            "checks": 20205,
+            "failures": 0,
+            "test": "tests/test_source_gravity.gd"
+          },
+          "source_physics_integration": {
+            "checks": 1877,
+            "failures": 0,
+            "test": "tests/test_source_physics_integration.gd"
+          },
+          "orbital_port_surface": {
+            "checks": 86,
+            "failures": 0,
+            "test": "tests/test_orbital_port_surface.gd"
+          },
+          "worlds": {
+            "checks": 719,
+            "failures": 0,
+            "test": "tests/test_rebuilt_worlds.gd"
+          },
+          "flight": {
+            "checks": 94,
+            "failures": 0,
+            "test": "tests/test_rebuilt_flight.gd"
+          },
+          "cities": {
+            "checks": 374,
+            "failures": 0,
+            "test": "tests/test_rebuilt_cities.gd"
+          },
+          "city_runtime": {
+            "checks": 45,
+            "failures": 0,
+            "test": "tests/test_source_city_runtime.gd"
+          },
+          "city_view": {
+            "checks": 33,
+            "failures": 0,
+            "test": "tests/test_source_city_view.gd"
+          },
+          "triangle_ccd": {
+            "checks": 144,
+            "failures": 0,
+            "test": "tests/test_segment_triangle.gd"
+          },
+          "ground_pads": {
+            "checks": 42167,
+            "failures": 0,
+            "test": "recovered-history/ground_harness/tests/test_source_ground_pads.gd"
+          },
+          "terrain_native": {
+            "checks": 9285,
+            "failures": 0,
+            "test": "tools/data_validate_terrain.py"
+          },
+          "save_touch": {
+            "checks": 69,
+            "failures": 0,
+            "test": "tests/test_rebuilt_save_touch.gd"
+          },
+          "app_transitions": {
+            "checks": 54,
+            "failures": 0,
+            "test": "tests/test_rebuilt_app_transitions.gd"
+          },
+          "graphics_ship": {
+            "checks": 108,
+            "failures": 0,
+            "test": "tests/test_ship_graphics.gd"
+          },
+          "graphics_environment": {
+            "checks": 1136,
+            "failures": 0,
+            "test": "tests/test_graphics_space_environment.gd"
+          },
+          "graphics_integration": {
+            "checks": 44,
+            "failures": 0,
+            "test": "tests/test_graphics_integration.gd"
+          },
+          "material_library": {
+            "checks": 218,
+            "failures": 0,
+            "test": "tests/test_material_library.gd"
+          },
+          "space_materials": {
+            "checks": 82,
+            "failures": 0,
+            "test": "tests/test_space_material_bindings.gd"
+          },
+          "world_materials": {
+            "checks": 27,
+            "failures": 0,
+            "test": "tests/test_world_materials.gd"
+          },
+          "world_terrain_shader": {
+            "checks": 40,
+            "failures": 0,
+            "test": "tests/test_world_terrain_shader.gd"
+          },
+          "world_planet_shader": {
+            "checks": 29,
+            "failures": 0,
+            "test": "tests/test_world_planet_shader.gd"
+          },
+          "world_surface_invariants": {
+            "checks": 681,
+            "failures": 0,
+            "test": "tests/test_world_surface_invariants.gd"
+          },
+          "city_material_roles": {
+            "checks": 104350,
+            "failures": 0,
+            "test": "tests/test_city_material_roles.gd"
+          },
+          "city_surface_shader": {
+            "checks": 11,
+            "failures": 0,
+            "test": "tests/test_city_surface_shader.gd"
+          },
+          "city_surface_invariants": {
+            "checks": 482,
+            "failures": 0,
+            "test": "tests/test_city_surface_invariants.gd"
+          },
+          "graphics_scope": {
+            "checks": 87,
+            "failures": 0,
+            "test": "tests/test_graphics_scope.gd"
+          },
+          "surface_detail_scope": {
+            "checks": 199,
+            "failures": 0,
+            "test": "tests/test_surface_detail_scope.gd"
+          },
+          "station_finish": {
+            "checks": 89,
+            "failures": 0,
+            "test": "tests/test_station_finish.gd"
+          },
+          "offpad_takeoff": {
+            "checks": 109,
+            "failures": 0,
+            "test": "tests/test_offpad_takeoff.gd"
+          },
+          "surface_action_controls": {
+            "checks": 66,
+            "failures": 0,
+            "test": "tests/test_surface_action_controls.gd"
+          },
+          "touch_actions": {
+            "checks": 34,
+            "failures": 0,
+            "test": "tests/test_touch_action_button.gd"
+          },
+          "flight_console": {
+            "checks": 116,
+            "failures": 0,
+            "test": "tests/test_flight_console.gd"
+          },
+          "departure_cycle": {
+            "checks": 228,
+            "failures": 0,
+            "test": "tests/test_departure_cycle.gd"
+          },
+          "training_dock_services": {
+            "checks": 449,
+            "failures": 0,
+            "test": "tests/test_training_dock_services.gd"
+          },
+          "dock_services_view": {
+            "checks": 78,
+            "failures": 0,
+            "test": "tests/test_dock_services_view.gd"
+          },
+          "dock_service_actions": {
+            "checks": 63,
+            "failures": 0,
+            "test": "tests/test_dock_service_actions.gd"
+          },
+          "diagnostics": {
+            "checks": 71,
+            "failures": 0,
+            "test": "tests/test_game_diagnostics.gd"
+          },
+          "report_export": {
+            "checks": 27,
+            "failures": 0,
+            "test": "tests/test_report_export.gd"
+          },
+          "bug_report_ui": {
+            "checks": 99,
+            "failures": 0,
+            "test": "tests/test_bug_report_ui.gd"
+          }
+        }
+      },
+      "curated_validation": {
+        "checks": 931938,
+        "passed_suites": 85,
+        "failures": 0,
+        "status": "passed",
+        "engine_error_or_leak_diagnostics": false,
+        "report": "validation/2026-11-06-worlds-final.json",
+        "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+        "independent_leaf_fixture_status": "Regenerated from actual original F1470/F1478 instructions and passed in both preserved mesh/direct vertex suites"
+      }
+    },
+    "last_verified_0_12_0_android_candidate": {
+      "bytes": 49623926,
+      "package": "org.starfrontier.rebuild",
+      "version": "0.12.0-worlds-alpha1",
+      "version_code": 34,
+      "abi": "arm64-v8a",
+      "min_sdk": 24,
+      "target_sdk": 36,
+      "debuggable": false,
+      "toolchain_smoke_only": false,
+      "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+      "file": "deliverables/0.12.0-worlds-alpha1/StarFrontier-0.12.0-worlds-arm64.apk",
+      "test_signature_verified": true,
+      "production_signing_key_configured": false,
+      "zip_and_elf_alignment_16k": true,
+      "native_data_assets_verified": true,
+      "material_map_count_verified": 51,
+      "source_compiled_modules_verified": 59,
+      "source_exact_shaders_verified": 2,
+      "source_exact_json_verified": 21,
+      "verification_report": "validation/worlds-2026-11-06/android-verification.json"
+    },
+    "last_verified_0_12_0_android_candidate_hash": "b74c18b1a83263e2ed96720e839e6c4f99f15e3e454603e6fa87e387f292c5cc",
+    "classic_console_update": {
+      "version": "0.12.1-console-alpha1",
+      "document": "docs/CLASSIC_CONSOLE_AND_MECHANICS_RU.md",
+      "live_actions": 12,
+      "console_height_logical_px": 240,
+      "minimum_touch_regions_tested_px": 64,
+      "original_principal_views": [
+        "front",
+        "rear",
+        "external"
+      ],
+      "simulation_pause_includes_worker_publication": true,
+      "full_original_console_commands_complete": false,
+      "full_original_scanner_complete": false,
+      "physical_device_tested": false
+    },
+    "mining_kernel_update": {
+      "runtime": "scripts/source_mining_machine.gd",
+      "document": "docs/SOURCE_MINING_AND_SCOOP_AUDIT_RU.md",
+      "native_weekly_cases": 2816,
+      "native_loading_cases": 990,
+      "checks": 45441,
+      "failures": 0,
+      "integrated_in_main": false,
+      "physical_deployment_complete": false,
+      "physical_retrieval_complete": false,
+      "star_fuel_scoop_integrated": false
+    },
+    "solid_small_body_update": {
+      "document": "docs/SOURCE_ASTEROID_SURFACE_SPIKE_RU.md",
+      "verified_model": 112,
+      "native_vertex_points": 200,
+      "mesh_triangles": 60,
+      "checks": 224,
+      "failures": 0,
+      "live_landing_integrated": false,
+      "original_comet_system_type_established": false,
+      "user_requested_comet_solid_surface_retained": true
     }
   },
   "target_device": "Samsung S23 Ultra 12/512",
@@ -1122,11 +1294,12 @@
     "13": "Full Russian localization",
     "14": "Device testing and release"
   },
-  "current_prerequisite": "Reached block9: original ships and equipment. Plan docs/BLOCK9_PLAN_RU.md is prepared; block9 implementation has not started. Preserve accepted Worldv4 and all saved legacy contracts.",
+  "current_prerequisite": "Block9 in progress: complete original ship shapes/specifications/equipment, solid small-body landing backend, physical MB4 deployment/persistence/retrieval and original fuel/thermal loops; keep real classic-console consumers and legacy saves compatible.",
   "historical_statistics_are_current_validation": false,
   "full_release_date": null,
   "detailed_audit": "docs/RECOVERY_AND_ROADMAP_RU.md",
   "last_updated_moscow": "2026-11-06",
   "block10_status": "accepted_with_documented_mobile_units_and_force_policies",
-  "block9_status": "plan_prepared_implementation_not_started"
+  "block9_status": "implementation_started_classic_console_and_verified_mb4_kernel_not_complete",
+  "publication_status": "Blocked by automatic approval review: broader APK/source ZIP/screenshots/reports in development branch await explicit scope authorization; no final0.12.0/0.12.1 upload or verified HTTPS downloads"
 }

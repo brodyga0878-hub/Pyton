@@ -7,6 +7,7 @@ packaging checker's rejection paths only.
 from __future__ import annotations
 import importlib.util
 from pathlib import Path
+import tempfile
 import unittest
 
 PROJECT=Path(__file__).resolve().parents[1]
@@ -16,6 +17,8 @@ verifier=importlib.util.module_from_spec(spec);spec.loader.exec_module(verifier)
 class MockArchive:
     def __init__(self):
         self.entries={f'assets/scripts/{name}.gdc':b'GDSC'+b'unit-mock-not-an-exported-module'*4 for name in verifier.FULL_SOURCE_MODULES}
+        self.entries.update({f'assets/scripts/{name}.gdc':b'GDSC'+b'unit-mock-not-an-exported-module'*4 for name in verifier.CLASSIC_CONSOLE_MODULES})
+        self.entries[f'assets/scripts/{verifier.SOURCE_MINING_KERNEL_MODULE}.gdc']=b'GDSC'+b'unit-mock-not-an-exported-module'*4
         for name in verifier.FULL_SOURCE_TABLES+('ships','world_names_ru'):
             self.entries[f'assets/data/{name}.json']=(PROJECT/'data'/f'{name}.json').read_bytes()
         for name in verifier.FULL_SOURCE_SHADERS:
@@ -73,18 +76,22 @@ class FullPackagingChecks(unittest.TestCase):
         self.assertFalse(result['physical_device_tested'])
 
     def test_retained_orbit_native_provenance_still_runs_for_v34(self):
-        result=verifier.verify_source_orbit_runtime(self.archive,PROJECT,34)
-        self.assertEqual(result['new_game_requested_layout'],'source_jjffe_systems_v4')
-        self.assertTrue(result['native_fixture']['provenance_checked'])
-        self.assertFalse(result['native_fixture']['oracle_executed_by_apk_verifier'])
-        self.assertEqual(result['retained_local_physics_adapter'],'analytic_si_rebuild_v1')
+        for code in [34,35]:
+            with self.subTest(version_code=code):
+                result=verifier.verify_source_orbit_runtime(self.archive,PROJECT,code)
+                self.assertEqual(result['new_game_requested_layout'],'source_jjffe_systems_v4')
+                self.assertTrue(result['native_fixture']['provenance_checked'])
+                self.assertFalse(result['native_fixture']['oracle_executed_by_apk_verifier'])
+                self.assertEqual(result['retained_local_physics_adapter'],'analytic_si_rebuild_v1')
 
     def test_retained_v3_raw_physics_checks_are_not_relaxed(self):
-        result=verifier.verify_source_physics_ports_runtime(self.archive,PROJECT,34)
-        self.assertEqual(result['reported_layout_scope'],'retained-v3-layout')
-        self.assertEqual(result['live_gravity'],'analytic_si_rebuild_v1')
-        self.assertTrue(result['native_fixture']['provenance_checked'])
-        self.assertFalse(result['complete_original_physics'])
+        for code in [34,35]:
+            with self.subTest(version_code=code):
+                result=verifier.verify_source_physics_ports_runtime(self.archive,PROJECT,code)
+                self.assertEqual(result['reported_layout_scope'],'retained-v3-layout')
+                self.assertEqual(result['live_gravity'],'analytic_si_rebuild_v1')
+                self.assertTrue(result['native_fixture']['provenance_checked'])
+                self.assertFalse(result['complete_original_physics'])
 
     def test_missing_new_kernel_rejects(self):
         for name in ['source_station_session','source_surface_render_packet','source_surface_render_state','source_surface_contact_patch']:
@@ -132,5 +139,52 @@ class FullPackagingChecks(unittest.TestCase):
         self.archive.entries['assets/native-oracle.elf']=b'ELF'
         with self.assertRaisesRegex(AssertionError,'Host/development binary included'):
             verifier.verify_source_full_runtime(self.archive,PROJECT)
+
+    def test_classic_console_packaging_is_explicitly_bounded(self):
+        result=verifier.verify_classic_console_runtime(self.archive,PROJECT)
+        self.assertEqual(result['console_height_logical_px'],240)
+        self.assertEqual(result['live_command_count'],12)
+        self.assertEqual(set(result['live_commands']),set(verifier.CLASSIC_CONSOLE_ACTIONS))
+        self.assertFalse(result['complete_original_interface'])
+        self.assertFalse(result['compiled_source_correspondence_rebuilt_by_verifier'])
+        self.assertFalse(result['physical_device_tested'])
+
+    def test_missing_classic_console_compiled_module_rejects(self):
+        for name in verifier.CLASSIC_CONSOLE_MODULES:
+            with self.subTest(module=name):
+                archive=MockArchive();del archive.entries[f'assets/scripts/{name}.gdc']
+                with self.assertRaisesRegex(AssertionError,'Missing classic console runtime module '+name):
+                    verifier.verify_classic_console_runtime(archive,PROJECT)
+
+    def test_invalid_classic_console_compiled_header_rejects(self):
+        self.archive.entries['assets/scripts/flight_console.gdc']=b'not-GDSC'+b'x'*100
+        with self.assertRaisesRegex(AssertionError,'Invalid compiled classic console runtime module flight_console'):
+            verifier.verify_classic_console_runtime(self.archive,PROJECT)
+
+    def test_classic_console_command_without_main_consumer_rejects(self):
+        with tempfile.TemporaryDirectory() as directory:
+            project=Path(directory);(project/'scripts').mkdir()
+            for name in verifier.CLASSIC_CONSOLE_MODULES:
+                raw=(PROJECT/'scripts'/f'{name}.gd').read_text()
+                if name=='main':raw=raw.replace('flight_console.pause_requested.connect','flight_console.unconnected_pause_requested.connect')
+                (project/'scripts'/f'{name}.gd').write_text(raw)
+            with self.assertRaisesRegex(AssertionError,'Classic console command is not connected to Main pause'):
+                verifier.verify_classic_console_runtime(self.archive,project)
+
+    def test_standalone_mining_kernel_packaging_does_not_claim_gameplay(self):
+        result=verifier.verify_mining_kernel_runtime(self.archive,PROJECT)
+        self.assertTrue(result['native_fixture_provenance_checked'])
+        self.assertEqual(result['native_weekly_case_count'],2816)
+        self.assertEqual(result['native_load_case_count'],990)
+        self.assertFalse(result['oracle_executed_by_apk_verifier'])
+        self.assertFalse(result['integrated_gameplay'])
+        self.assertFalse(result['physical_deployment_implemented'])
+        self.assertFalse(result['weekly_world_scheduler_integrated'])
+        self.assertFalse(result['star_fuel_scoop_integrated'])
+
+    def test_standalone_mining_kernel_missing_module_rejects(self):
+        del self.archive.entries[f'assets/scripts/{verifier.SOURCE_MINING_KERNEL_MODULE}.gdc']
+        with self.assertRaisesRegex(AssertionError,'Missing standalone MB4 record kernel'):
+            verifier.verify_mining_kernel_runtime(self.archive,PROJECT)
 
 if __name__=='__main__':unittest.main()

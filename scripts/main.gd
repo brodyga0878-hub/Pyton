@@ -19,6 +19,7 @@ const Hold=preload("res://scripts/hold_button.gd")
 const Lever=preload("res://scripts/speed_lever.gd")
 const ActionButton=preload("res://scripts/touch_action_button.gd")
 const FlightConsole=preload("res://scripts/flight_console.gd")
+const FlightInstruments=preload("res://scripts/flight_instruments.gd")
 const ShipView=preload("res://scripts/ship_visual.gd")
 const StationView=preload("res://scripts/station_visual.gd")
 const SourceStationView=preload("res://scripts/source_station_visual.gd")
@@ -77,6 +78,8 @@ var auto_button:Button
 var dock_button:Button
 var surface_button:Button
 var flight_console:Control
+var instruments:=FlightInstruments.new()
+var last_view:=""
 var dock_services_view:Control
 var action_buttons:Array=[]
 var flight_widgets:Array=[]
@@ -120,6 +123,7 @@ func _ready()->void:
 	if "--rebuild-smoke" in OS.get_cmdline_user_args():call_deferred("_run_smoke")
 
 func _new_models(layout:String=World.PORT_LAYOUT)->void:
+	instruments.reset();last_view=""
 	ship=Flight.new();nav=NavigationData.new()
 	if layout==World.FULL_LAYOUT and not nav.configure_native():push_error("Original galaxy could not be initialized")
 	world=World.new();world.configure(nav.current(),layout);surface=Surface.new();near.clear()
@@ -173,10 +177,14 @@ func _build_ui()->void:
 	var lift2:=Hold.new();lift2.text="СНИЖЕНИЕ";_anchored(lift2,Control.PRESET_BOTTOM_RIGHT,Vector4(-275,-125-console_height,-135,-40-console_height));lift2.state_changed.connect(func(value:bool):lift_down=value);holds.append(lift2);flight_widgets.append(lift2)
 	flight_console=FlightConsole.new();_anchored(flight_console,Control.PRESET_BOTTOM_WIDE,Vector4(0,-console_height,0,0));flight_widgets.append(flight_console)
 	flight_console.system_requested.connect(_show_system);flight_console.routes_requested.connect(_show_routes);flight_console.menu_requested.connect(_show_menu)
-	flight_console.view_requested.connect(func():ship.external_view=not ship.external_view)
+	flight_console.view_requested.connect(_cycle_view)
 	flight_console.auto_requested.connect(_toggle_auto);flight_console.brake_requested.connect(_brake);flight_console.dock_requested.connect(_dock_action)
+	flight_console.status_requested.connect(_show_status);flight_console.equipment_requested.connect(_show_equipment)
+	flight_console.control_requested.connect(_toggle_control_mode);flight_console.surface_requested.connect(_surface_action);flight_console.pause_requested.connect(_toggle_pause)
 	auto_button=flight_console.buttons.auto;dock_button=flight_console.buttons.dock
-	surface_button=_button("К поверхности",_surface_action,215);_anchored(surface_button,Control.PRESET_TOP_RIGHT,Vector4(-240,110,-25,190));flight_widgets.append(surface_button)
+	# Preserve the public action reference while using the actual lower-console
+	# button. A duplicate floating button would overlap the throttle caption.
+	surface_button=flight_console.buttons.surface
 	var cross:=_label("·",27);cross.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(cross,Control.PRESET_CENTER,Vector4(-15,-20,15,20));cross.mouse_filter=Control.MOUSE_FILTER_IGNORE;flight_widgets.append(cross)
 	target_label=_label("",18);target_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(target_label,Control.PRESET_CENTER_TOP,Vector4(-330,40,330,94));target_label.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	flight_widgets.append(target_label)
@@ -213,7 +221,7 @@ func _release_inputs()->void:
 	lift_up=false;lift_down=false;roll_left=false;roll_right=false
 func _blocked()->bool:return busy or not active or menu.visible or settings_panel.visible
 func _physics_process(dt:float)->void:
-	if automated or _blocked():return
+	if automated or _blocked() or instruments.paused:return
 	var steering:Vector2=stick.value
 	steering.x+=float(Input.is_physical_key_pressed(KEY_RIGHT))-float(Input.is_physical_key_pressed(KEY_LEFT))
 	steering.y+=float(Input.is_physical_key_pressed(KEY_DOWN))-float(Input.is_physical_key_pressed(KEY_UP))
@@ -224,7 +232,7 @@ func _physics_process(dt:float)->void:
 	_tick(minf(dt,0.1),settings.steer(steering.limit_length()),roll,lift)
 
 func _tick(dt:float,steering:Vector2,roll:float,lift:=0.0)->void:
-	if ship.hull<=0:return
+	if instruments.paused or ship.hull<=0:return
 	if steering.length()>0.04 or absf(roll)>0.05 or absf(lift)>0.1:
 		ship.autopilot=false
 		if surface.active:surface.landing=false
@@ -266,7 +274,7 @@ func _tick(dt:float,steering:Vector2,roll:float,lift:=0.0)->void:
 func _update_flight_controls()->void:
 	var blocked:=_blocked()
 	for item in flight_widgets:item.visible=not blocked
-	stick.input_allowed=not blocked and not ship.docked and ship.hull>0
+	stick.input_allowed=not blocked and not instruments.paused and not ship.docked and ship.hull>0
 	lever.input_allowed=stick.input_allowed
 	for hold in holds:hold.input_allowed=stick.input_allowed
 	flight_console.set_actions_enabled(not blocked)
@@ -277,18 +285,21 @@ func _update_flight_controls()->void:
 func _process(dt:float)->void:
 	_update_flight_controls()
 	if not active:return
-	_pump_underground_geometry()
 	var blocked:=_blocked()
-	if not busy:_sync_scene()
-	if surface.active:camera.position+=surface.consume_render_frame_shift()
+	# Completed source geometry can move the physical contact frame. Defer its
+	# publication during explicit pause, just like simulation and hatch updates.
+	if not instruments.paused:
+		_pump_underground_geometry()
+		if not busy:_sync_scene()
+		if surface.active:camera.position+=surface.consume_render_frame_shift()
 	player.position=ship.position;player.quaternion=ship.attitude;player.visible=ship.external_view
 	player.set_thrust(0.0 if ship.docked or surface.landed else clampf(maxf(absf(ship.target_speed),ship.velocity.length())/ship.MAX_SPEED,0.04,1.0))
 	player.set_landed(surface.landed)
-	var desired:Vector3=ship.position;var attitude:Quaternion=ship.attitude
-	if ship.external_view:
-		var span:float=ship.profile().visual_span_m;desired+=Basis(ship.attitude)*Vector3(0,span*0.34,span*1.65)
-		attitude=(ship.attitude*Quaternion(Vector3.RIGHT,-atan(0.25/1.65))).normalized()
-	if last_external!=ship.external_view:camera.position=desired;camera.quaternion=attitude;last_external=ship.external_view
+	var pose:=instruments.camera_pose(ship.position,ship.attitude,ship.external_view,float(ship.profile().visual_span_m))
+	var desired:Vector3=pose.position;var attitude:Quaternion=pose.attitude
+	var current_view:=instruments.view_key(ship.external_view)
+	if last_view!=current_view:camera.position=desired;camera.quaternion=attitude;last_view=current_view
+	last_external=ship.external_view
 	camera.position=camera.position.lerp(desired,minf(1,dt*30));camera.quaternion=camera.quaternion.slerp(attitude,minf(1,dt*25))
 	notice_timer=maxf(0,notice_timer-dt);notice.visible=notice_timer>0 and not menu.visible and not settings_panel.visible
 	menu_feedback.visible=notice_timer>0 and not menu_feedback.text.is_empty()
@@ -304,7 +315,7 @@ func _process(dt:float)->void:
 func _record_event(event:String,details:Dictionary={})->void:
 	if diagnostics!=null and not automated:diagnostics.record(event,details)
 func _input_diagnostic_state()->Dictionary:
-	return {"stick":[stick.value.x,stick.value.y] if stick!=null else [],"stick_pointer":stick.pointer_id if stick!=null else -1,"throttle_pointer":lever.pointer_id if lever!=null else -1,"lift_up":lift_up,"lift_down":lift_down,"active":active,"busy":busy,"menu_open":menu!=null and menu.visible,"settings_open":settings_panel!=null and settings_panel.visible}
+	return {"stick":[stick.value.x,stick.value.y] if stick!=null else [],"stick_pointer":stick.pointer_id if stick!=null else -1,"throttle_pointer":lever.pointer_id if lever!=null else -1,"lift_up":lift_up,"lift_down":lift_down,"active":active,"busy":busy,"menu_open":menu!=null and menu.visible,"settings_open":settings_panel!=null and settings_panel.visible,"camera_view":instruments.view_key(ship.external_view) if ship!=null else "front","simulation_paused":instruments.paused}
 func _flight_diagnostic_sample()->Dictionary:
 	if ship==null or nav==null or world==null or surface==null:return {}
 	return {"ship_id":ship.ship_id,"position":[ship.position.x,ship.position.y,ship.position.z],"velocity":[ship.velocity.x,ship.velocity.y,ship.velocity.z],"target_speed":ship.target_speed,"hull":ship.hull,"docked":ship.docked,"autopilot":ship.autopilot,"system_id":nav.current_id,"focus_id":world.focus_id,"site_id":world.site_id,"jump_remaining":nav.remaining,"transfer_remaining":world.transfer_remaining,"surface":surface.active,"landed":surface.landed,"flight_phase":surface.flight_phase,"surface_motion":{"landing":surface.landing,"taking_off":surface.taking_off,"altitude_m":surface.altitude(ship) if surface.active else 0.0,"pad_distance_m":surface.pad_distance(ship) if surface.active else 0.0},"controls":_input_diagnostic_state()}
@@ -413,7 +424,18 @@ func _refresh_hud()->void:
 	if surface.active:target_label.text="%s · высота %.0f м\nДо площадки %.0f м"%[surface.site_name if not surface.site_name.is_empty() else world.by_id[world.focus_id].name,maxf(0,surface.altitude(ship)),surface.pad_distance(ship)]
 	else:target_label.text="%s · до станции %.0f м"%[space_context,ship.position.distance_to(ship.STATION)] if _station_here() else space_context
 	var target:Vector3=surface.pad_position() if surface.active else (ship.STATION if _station_here() else world.local_meters(world.focus_id,nav.elapsed_days))
-	flight_console.configure_state({"actual_speed_mps":ship.velocity.length(),"target_speed_mps":ship.target_speed,"surface_active":surface.active,"altitude_m":surface.altitude(ship) if surface.active else 0.0,"target_distance_m":ship.position.distance_to(target),"target_local":Basis(ship.attitude).inverse()*(target-ship.position),"hull_percent":ship.hull,"fuel":nav.fuel,"fuel_capacity":nav.FUEL_CAPACITY,"cargo_t":ship.total_cargo(),"totalcredits":ship.credits,"elapsed_days":nav.elapsed_days,"assisted":ship.assisted,"autopilot":ship.autopilot,"landing":surface.landing,"taking_off":surface.taking_off,"landed":surface.landed,"docked":ship.docked,"flight_phase":surface.flight_phase,"external_view":ship.external_view,"contextlabel":surface.site_name if surface.active and not surface.site_name.is_empty() else space_context,"auto_text":auto_button.text,"dock_text":dock_button.text})
+	flight_console.configure_state({
+		"actual_speed_mps":ship.velocity.length(),"target_speed_mps":ship.target_speed,
+		"surface_active":surface.active,"altitude_m":surface.altitude(ship) if surface.active else 0.0,
+		"target_distance_m":ship.position.distance_to(target),"target_local":Basis(ship.attitude).inverse()*(target-ship.position),
+		"hull_percent":ship.hull,"fuel":nav.fuel,"fuel_capacity":nav.FUEL_CAPACITY,
+		"cargo_t":ship.total_cargo(),"cargo_capacity_t":ship.cargo_capacity(),"totalcredits":ship.credits,"elapsed_days":nav.elapsed_days,
+		"assisted":ship.assisted,"autopilot":ship.autopilot,"landing":surface.landing,"taking_off":surface.taking_off,
+		"landed":surface.landed,"docked":ship.docked,"flight_phase":surface.flight_phase,"external_view":ship.external_view,
+		"view_label":instruments.view_label(ship.external_view),"simulation_paused":instruments.paused,
+		"control_enabled":_control_mode_available(),"surface_enabled":not instruments.paused and ship.hull>0,
+		"contextlabel":surface.site_name if surface.active and not surface.site_name.is_empty() else space_context,
+		"auto_text":auto_button.text,"dock_text":dock_button.text,"surface_text":surface_button.text})
 	fps_label.visible=settings.show_fps;fps_label.text="%d FPS"%Engine.get_frames_per_second()
 
 func _announce(text:String)->void:
@@ -422,9 +444,11 @@ func _announce(text:String)->void:
 	if menu_feedback:menu_feedback.text=text
 	if settings_panel and settings_panel.visible:settings_panel.feedback.text=text
 func _set_speed(value:float)->void:
+	if instruments.paused:return
 	ship.autopilot=false;ship.target_speed=clampf(value,-100,ship.MAX_SPEED)
 	if surface.active:surface.landing=false;surface.cancel_vertical()
 func _brake()->void:
+	if _paused_command():return
 	ship.brake();_release_inputs()
 	if surface.active:surface.landing=false;surface.cancel_vertical()
 	if nav.remaining>0:nav.cancel_jump()
@@ -432,6 +456,7 @@ func _brake()->void:
 	if world.layout_mode==World.FULL_LAYOUT:world.cancel_station_launch()
 	_announce("Торможение и удержание скорости.")
 func _toggle_auto()->void:
+	if _paused_command():return
 	if ship.hull<=0:return
 	if surface.active:
 		if surface.landed:_begin_departure_action()
@@ -444,6 +469,7 @@ func _toggle_auto()->void:
 		if ship.autopilot and world.layout_mode==World.FULL_LAYOUT and not world.request_station_open(nav.elapsed_days):ship.autopilot=false
 		_announce("Автоподход к станции." if ship.autopilot else "Автоподход отменён.")
 func _begin_departure_action()->bool:
+	if _paused_command():return false
 	if busy:return false
 	_release_inputs()
 	var accepted:bool=surface.begin_departure(ship)
@@ -455,6 +481,7 @@ func _begin_departure_action()->bool:
 	_announce(departure_message);_refresh_hud()
 	return accepted
 func _takeoff_action()->bool:
+	if _paused_command():return false
 	var previous_controls:=_input_diagnostic_state()
 	_release_inputs()
 	var accepted:bool=surface.take_off(ship)
@@ -462,6 +489,7 @@ func _takeoff_action()->bool:
 	_announce(surface.message);_refresh_hud()
 	return accepted
 func _dock_action()->void:
+	if _paused_command():return
 	if surface.active:
 		if surface.landed:_takeoff_action();return
 		if not surface.touch_down(ship):surface.begin_landing(ship)
@@ -478,6 +506,7 @@ func _dock_action()->void:
 	else:_announce("Для стыковки: дистанция до 100 м и скорость до 12 м/с. Используйте «Авто».")
 
 func _surface_action()->void:
+	if _paused_command():return
 	if busy:return
 	if surface.active:
 		if surface.landed:_takeoff_action()
@@ -488,6 +517,7 @@ func _surface_action()->void:
 		else:_announce(surface.message)
 	else:await _enter_surface()
 func _enter_surface()->void:
+	if _paused_command():return
 	if busy:return
 	if nav.remaining>0:_announce("Сначала отмените гиперпереход кнопкой «Тормозить».");return
 	if world.transfer_remaining>0:_announce("Сначала отмените автоперелёт кнопкой «Тормозить».");return
@@ -538,6 +568,63 @@ func _menu_text(text:String)->void:
 func _menu_action(text:String,callback:Callable)->void:
 	menu_rows.add_child(_button(text,callback,900))
 func _close_menu()->void:menu.hide();backup_edit=null;_release_inputs();_update_flight_controls()
+
+func _cycle_view()->void:
+	if _blocked():return
+	_release_inputs();ship.external_view=instruments.cycle_view(ship.external_view)
+	last_view="";_refresh_hud();_record_event("camera_view",{"view":instruments.view_key(ship.external_view)})
+
+func _toggle_pause()->void:
+	if busy or not active:return
+	instruments.paused=not instruments.paused;_release_inputs();_update_flight_controls();_refresh_hud()
+	_record_event("simulation_pause",{"paused":instruments.paused})
+	_announce("Полёт приостановлен. Кнопка «Продолжить» возвращает управление." if instruments.paused else "Полёт продолжен.")
+
+func _paused_command()->bool:
+	if not instruments.paused:return false
+	_announce("Полёт приостановлен. Сначала нажмите «Продолжить».");return true
+
+func _control_mode_available()->bool:
+	return not busy and not instruments.paused and ship.hull>0 and not ship.docked and not surface.landed and nav.remaining<=0 and world.transfer_remaining<=0
+
+func _toggle_control_mode()->void:
+	if not _control_mode_available() or _blocked():return
+	_release_inputs();ship.autopilot=false
+	if surface.active:surface.landing=false;surface.cancel_vertical()
+	ship.assisted=not ship.assisted
+	# Entering inertial flight releases axial thrust. Returning to assistance
+	# adopts the current forward speed instead of an old slider command.
+	ship.target_speed=clampf(ship.velocity.dot(ship.forward()),-100,ship.MAX_SPEED) if ship.assisted else 0.0
+	_refresh_hud();_record_event("control_mode",{"assisted":ship.assisted})
+	_announce("Стабилизация скорости включена." if ship.assisted else "Инерционный режим. Шкала скорости задаёт осевую тягу.")
+
+func _show_status()->void:
+	_open_menu("БОРТОВОЙ КОМПЬЮТЕР")
+	_menu_text("%s · система %s"%[ship.profile().name,nav.current().name])
+	var context:String=surface.site_name if surface.active and not surface.site_name.is_empty() else str(world.by_id[world.focus_id].name)
+	_menu_text("Объект: %s\nКорпус: %.0f%%\nСкорость: %.1f м/с · задано %.1f м/с\nТопливо гиперпереходов: %d/%d\nГруз: %d/%d т\nСчёт: %d кр."%[context,ship.hull,ship.velocity.length(),ship.target_speed,nav.fuel,nav.FUEL_CAPACITY,ship.total_cargo(),ship.cargo_capacity(),ship.credits])
+	_menu_text("%s · %s"%[instruments.view_label(ship.external_view),"ПАУЗА" if instruments.paused else ("Стабилизация скорости" if ship.assisted else "Инерционный режим")])
+	_menu_action("Груз и оборудование",_show_equipment)
+	_menu_action("Объекты и космопорты",_show_system)
+	_menu_action("Маршруты",_show_routes)
+	if ship.docked:_menu_action("Службы космопорта",_show_services)
+
+func _show_equipment()->void:
+	_open_menu("ГРУЗ И ОБОРУДОВАНИЕ")
+	_menu_text("Грузовой отсек: %d/%d т · оборудование занимает %d т"%[ship.total_cargo(),ship.cargo_capacity(),ship.equipment_space()])
+	for id in ship.goods:
+		if int(ship.goods[id])>0:_menu_text("%s: %d т"%[str(ship.economy_catalog.good(str(id)).get("name_ru",id)),int(ship.goods[id])])
+	if ship.story_cargo>0:_menu_text("Специальный груз: %d т"%ship.story_cargo)
+	if not ship.mission_cargo.is_empty():
+		for id in ship.mission_cargo:_menu_text("Груз задания %s: %d т"%[str(id),int(ship.mission_cargo[id])])
+	if ship.equipment.is_empty():_menu_text("Дополнительное оборудование не установлено.")
+	else:
+		for id in ship.equipment:
+			var item:Dictionary=ship.economy_catalog.item(str(id))
+			_menu_text("%s · %d т"%[str(item.get("name_ru",id)),int(item.get("space",0))])
+	if ship.docked:_menu_action("Службы космопорта",_show_services)
+	_menu_action("Бортовой компьютер",_show_status)
+
 func _show_menu()->void:
 	_open_menu("КОМАНДИР")
 	if not graphics_return.is_empty():
@@ -548,6 +635,8 @@ func _show_menu()->void:
 		_menu_action("Настройки телефона",func():menu.hide();settings_panel.configure(settings);settings_panel.show())
 		return
 	_menu_action("Продолжить полёт",_close_menu)
+	_menu_action("Бортовой компьютер",_show_status)
+	_menu_action("Груз и оборудование",_show_equipment)
 	_menu_action("Графический полёт · осмотреть обновление",_begin_graphics_demo)
 	_menu_action("Космопорты и объекты системы",_show_system)
 	_menu_action("Маршруты между системами",_show_routes)
@@ -584,6 +673,7 @@ func _show_system()->void:
 			var site_id:String=str(site.id)
 			_menu_action("    %s · %s"%[site.name,"наземный порт" if int(site.type_code)==35 else "орбитальный порт"],func():_choose_site(site_id))
 func _choose_body(id:String)->void:
+	if _paused_command():return
 	if busy:return
 	if surface.active:_announce("Сначала вернитесь на орбиту.");return
 	if world.transfer_remaining>0:
@@ -594,6 +684,7 @@ func _choose_body(id:String)->void:
 	if world.begin_transfer(ship,nav):_close_menu()
 	_announce(world.message)
 func _choose_site(id:String)->void:
+	if _paused_command():return
 	if busy:return
 	if surface.active:_announce("Сначала вернитесь на орбиту.");return
 	if world.transfer_remaining>0:
@@ -609,6 +700,7 @@ func _show_routes()->void:
 		var id:int=int(star.id);var distance:float=nav.galaxy.distance(nav.current_id,id)
 		_menu_action("%s · %.1f св. лет"%[star.name,distance],func():_start_jump(id))
 func _start_jump(id:int)->void:
+	if _paused_command():return
 	if busy:return
 	if world.transfer_remaining>0:_announce("Сначала отмените автоперелёт.");return
 	if nav.remaining>0:
@@ -646,7 +738,7 @@ func _dock_services_state()->Dictionary:
 func _show_help()->void:
 	_open_menu("УПРАВЛЕНИЕ И СБОРКА")
 	_menu_text("Левый стик меняет направление носа. Правая шкала задаёт скорость. «Тормозить» отменяет автоматический полёт и плавно останавливает корабль. «Авто» ведёт к станции или площадке; после посадки команда «На орбиту» выполняет автоматический вылет. «Взлететь» оставляет управление вам после короткого подъёма. Кнопки подъёма и снижения помогают лететь над землёй. В доке кнопка «Службы» открывает обслуживание.")
-	_menu_text("Клавиатура: стрелки — поворот, W/S — скорость, Q/E — крен, R/F — подъём, пробел — тормоз, A — авто, L — поверхность/орбита, D — стыковка/взлёт, V — вид, Esc — меню.")
+	_menu_text("Клавиатура: стрелки — поворот, W/S — скорость, Q/E — крен, R/F — подъём, пробел — тормоз, A — авто, L — поверхность/орбита, D — стыковка/взлёт, V — передняя/задняя/внешняя камера, C — стабилизация/инерция, P — пауза/продолжение, Esc — меню.")
 	_menu_text("Сборка %s. Через меню можно сохранить ZIP с отчётом об ошибке и журналами. Новый полёт использует исходные сектора, системы, рельеф, орбиты и модели космопортов; прежние сохранения сохраняют свою версию мира. Управление адаптировано для телефона, тяга «Кобры» ограничена проверенным исходным значением. Полный каталог кораблей, оборудование, экономика, кампания и ИИ ещё в разработке. Проверка на настоящем телефоне выполняется отдельно."%BuildInfo.VERSION)
 
 func _show_bug_report()->void:
@@ -719,7 +811,7 @@ func _decode_state(data:Dictionary)->Dictionary:
 		elif candidate_ship.position.distance_to(candidate_ship.STATION)>candidate_ship.DOCK_RADIUS+0.01 or candidate_ship.velocity.length()>0.001 or absf(candidate_ship.target_speed)>0.001:return {}
 	return {"ship":candidate_ship,"nav":candidate_nav,"world":candidate_world,"surface":candidate_surface}
 func _commit_state(data:Dictionary)->void:
-	ship=data.ship;nav=data.nav;world=data.world;surface=data.surface;near.clear()
+	ship=data.ship;nav=data.nav;world=data.world;surface=data.surface;near.clear();instruments.reset();last_view=""
 func _save_game()->bool:
 	if not saving_enabled or busy:return false
 	var ok:=saves.write(_payload())
@@ -767,7 +859,9 @@ func _unhandled_key_input(event:InputEvent)->void:
 		KEY_A:_toggle_auto()
 		KEY_D:_dock_action()
 		KEY_L:_surface_action()
-		KEY_V:ship.external_view=not ship.external_view
+		KEY_V:_cycle_view()
+		KEY_P:_toggle_pause()
+		KEY_C:_toggle_control_mode()
 		KEY_M:_show_system()
 func _notification(what:int)->void:
 	if what==NOTIFICATION_APPLICATION_PAUSED or what==NOTIFICATION_APPLICATION_FOCUS_OUT:
