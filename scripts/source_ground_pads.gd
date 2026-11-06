@@ -4,10 +4,13 @@ extends RefCounted
 # The caller supplies the city anchor, body rotation and landing permissions.
 const Ground=preload("res://scripts/ground_coordinates.gd")
 static var _assets:Dictionary={}
+static var _asset_mutex:=Mutex.new()
 
 static func _load()->void:
+	_asset_mutex.lock()
 	if _assets.is_empty():
 		_assets=JSON.parse_string(FileAccess.get_file_as_string("res://data/ffe_ground_pads.json"))
+	_asset_mutex.unlock()
 
 static func pad_count(model:int)->int:
 	_load()

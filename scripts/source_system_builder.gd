@@ -14,6 +14,7 @@ var _factory:=Factory.new()
 var _data:Dictionary={}
 var _failed:=false
 var _steps:=0
+var last_failure:Dictionary={}
 
 static func empty_bank()->Array:
  var records:Array=[]
@@ -53,7 +54,7 @@ func _body(state:Dictionary,mass:int,parent:int,multiplier:int,distance:int,name
  for key in ordinals:request[key]=ordinals[key]
  var result:=_factory.construct_full(state.records,request)
  if result.is_empty() or (not result.get("ok",false) and result.get("reason")!="capacity"):
-  _failed=true;return 65535
+  last_failure={"helper":881,"mass":mass,"parent":parent,"index":int(state.index),"request":request.duplicate(true)};_failed=true;return 65535
  state.records=result.records
  for key in ["index","seed_a","seed_b","depth","counter","body_count_byte","star_count_byte","port_count_byte","orbital_count_byte"]:state[key]=result[key]
  for key in ordinals:ordinals[key]=result[key]
@@ -70,7 +71,7 @@ func _binary(state:Dictionary,parent:int,mass:int,multiplier:int,distance:int,se
   extra=maxi(extra,Stellar.MIN_MASS)
   var index:=int(state.index)
   var initialized:=_factory.initialize_full(state.records,index,parent,multiplier,distance,(mass+extra)&MASK,int(state.seed_a),int(state.seed_b),int(state.depth),int(state.counter))
-  if initialized.is_empty():_failed=true;return 65535
+  if initialized.is_empty():last_failure={"helper":882,"mass":(mass+extra)&MASK,"parent":parent,"index":index};_failed=true;return 65535
   var body:PackedByteArray=initialized.record
   state.counter=int(initialized.counter);body.encode_u16(10,0);body.encode_u16(12,23)
   for i in range(name.size()):body[38+i]=name[i]
@@ -94,12 +95,12 @@ func _children(state:Dictionary,parent:int,random_value:int,start_radius:int,mas
  if _failed:return
  # A validation guard rejects the entire candidate; valid source controls do
  # not reach it. Source capacity and RNG behavior are not changed by this guard.
- if level>64:_failed=true;return
+ if level>64:last_failure={"reason":"depth","level":level};_failed=true;return
  var limit:=MASK if mass_limit>0x7fffffff else (mass_limit*2)&MASK
  var previous:=orbit_lookup(start_radius);var spacing:=0;var radius:=start_radius&65535
  while true:
   _steps+=1
-  if _steps>1000000:_failed=true;return
+  if _steps>1000000:last_failure={"reason":"steps","steps":_steps};_failed=true;return
   spacing+=radius
   if spacing>=65536:return
   var random:=(_rng(state)&65535)>>3;random+=(random_value&65535)
@@ -170,7 +171,16 @@ func construct_children(records:Array,request:Dictionary)->Dictionary:
  if _failed:return {}
  state.return_word=0;state.ok=true;state.source_variant=SOURCE_VARIANT;return state
 
+static func root_radius_would_not_advance(request:Dictionary)->bool:
+ for key in ["seed_a","mass","num_stars"]:
+  if not Factory._u32(request.get(key)):return false
+ if int(request.seed_a)==0 or int(request.num_stars)==0:return false
+ var first:=Stellar.rng_step(int(request.seed_a),int(request.mass))
+ # These are the exact two F878 starting-radius formulas, before F897.
+ return (int(first[1])&65535)<(8 if int(request.num_stars)==1 else 256)
+
 func build(request:Dictionary,destination:Array=[])->Dictionary:
+ last_failure.clear()
  if not _load():return {}
  for key in ["seed_a","mass","num_stars","system_id","population_raw"]:
   if not Factory._u32(request.get(key)):return {}
@@ -180,11 +190,13 @@ func build(request:Dictionary,destination:Array=[])->Dictionary:
   if request.has(key) and not Factory._u32(request[key]):return {}
  if int(request.get("initial_star_quota",0))>255:return {}
  if int(request.seed_a)!=0 and (int(request.mass)<Stellar.MIN_MASS or int(request.mass)>Stellar.MAX_MASS):return {}
+ if root_radius_would_not_advance(request):
+  last_failure={"reason":"nonterminating_source_root_radius","helper":897,"start_radius":0,"system_id":int(request.system_id)};return {}
  var metadata:=Metadata.query(request.system_id)
  if metadata.is_empty():return {}
  var records:=empty_bank() if destination.is_empty() else destination.duplicate()
  var state:={"records":records,"index":0,"seed_a":int(request.seed_a),"seed_b":0,"depth":0,"counter":0,"body_count_byte":0,"star_count_byte":0,"planet_counter":0,"moon_counter":0,"third_counter":0,"port_count_byte":0,"orbital_count_byte":0,"language":int(metadata.language),"star_quota":int(request.num_stars)&255,"largest_mass":int(request.mass),"population_raw":int(request.population_raw),"system_id":int(request.system_id)}
- _failed=false;_steps=0
+ _failed=false;_steps=0;last_failure.clear()
  if int(request.seed_a)==0:
   # The source's handcrafted branch preserves its incoming global RNG words;
   # explicit diagnostic state is optional and does not enter system parameters.

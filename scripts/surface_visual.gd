@@ -86,16 +86,19 @@ func configure(surface: RefCounted) -> void:
 	add_child(terrain)
 	if spherical:
 		var inner:=width*0.5
+		var maximum:float=surface.globe.maximum_patch_extent() if surface.globe.has_method("maximum_patch_extent") else INF
 		for outer in [8000.0,32000.0,128000.0]:
-			var ring:=_far_ring(surface,inner,outer,mat,base);ring.set_meta("terrain_layer",true);add_child(ring);inner=outer
+			var bound:=minf(float(outer),maximum)
+			if bound<=inner:break
+			var ring:=_far_ring(surface,inner,bound,mat,base);ring.set_meta("terrain_layer",true);add_child(ring);inner=bound
 		if surface.get("extended_flight")==true:
-			var outer:float=minf(512000.0,float(surface.globe.radius)*0.7)
+			var outer:float=minf(maximum,minf(512000.0,float(surface.globe.radius)*0.7))
 			if outer>inner:
 				var ring:=_far_ring(surface,inner,outer,mat,base);ring.set_meta("terrain_layer",true);add_child(ring)
 	var landing_point:Vector3=surface.pad_position() if surface.has_method("pad_position") else Vector3.ZERO
 	if spherical and Vector2(landing_point.x,landing_point.z).length()>width*0.45:return
 	# Source3 cities already contain their original pad geometry and buildings.
-	if spherical and surface.globe.revision==surface.SphereTerrain.CITY_REVISION and not surface.city_data.is_empty():
+	if spherical and surface.source_city() and not surface.city_data.is_empty():
 		var label:=Label3D.new();label.text=surface.site_name.to_upper();label.font_size=64;label.pixel_size=0.08
 		label.position=landing_point+Vector3(0,22,0);label.billboard=BaseMaterial3D.BILLBOARD_ENABLED
 		add_child(label)

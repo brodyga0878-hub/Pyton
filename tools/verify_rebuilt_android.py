@@ -13,6 +13,35 @@ MATERIAL_CHANNELS=('albedo','normal','orm')
 SURFACE_PROFILES=('cobra','eagle','shuttle')
 CITY_ROLES=('facade','road','pad','roof')
 WORLD_SURFACE_KINDS=('earth','rock','desert','ice')
+FULL_SOURCE_MODULES=(
+    'source_galaxy','source_system_definition','source_system_metadata',
+    'source_system_builder','source_body_classifier_full','source_planet_names',
+    'source_settlement_builder','source_world_catalogue','source_body_factory',
+    'handcrafted_runtime_builder','stellar_body_factory','planetary_classifier',
+    'body_initializer','body_rotation','ffe_math','source_clock','source_units','ground_coordinates',
+    'source_orbit','source_gravity','source_physics_bridge','source_ship_control_profile',
+    'source_ground_surface','source_terrain_query','source_terrain_point','source_terrain_math',
+    'source_surface_terrain','source_global_body_mesh','source_ground_pads',
+    'source_model_vm','source_model_vertices','source_model_mesh','source_polygon',
+    'source_station_geometry','source_station_session','source_station_visual',
+    'source_underground_port','source_underground_controller','source_enclosed_city_visual',
+    'source_city_profile','source_city_runtime','source_city_view','source_model_visual',
+    'galaxy','navigation','planetary_system','flight_model','surface_model',
+    'spherical_terrain','celestial_renderer','near_surface_view','surface_orbit_link',
+    'segment_triangle','segment_box','main',
+)
+FULL_SOURCE_TABLES=(
+    'ffe_data_provenance','ffe_galaxy','ffe_ground_collision','ffe_ground_coordinates',
+    'ffe_ground_pads','ffe_handcrafted_records','ffe_math','ffe_planet_names',
+    'ffe_runtime_model_descriptors','ffe_settlement_rules','ffe_ship_registry',
+    'ffe_special_station_models','ffe_stellar_factory','ffe_system_metadata',
+    'ffe_system_names','ffe_terrain_query','ffe_underground_models','ffe_world_models','ffe_worlds',
+)
+DEVELOPMENT_ASSET_PREFIXES=(
+    'assets/tests/','assets/tools/','assets/docs/','assets/recovered-history/',
+    'assets/recovery/','assets/validation/','assets/deliverables/',
+    'assets/localization/','assets/build/',
+)
 
 def run(*command):
     return subprocess.check_output([str(v) for v in command],text=True,stderr=subprocess.STDOUT)
@@ -26,6 +55,32 @@ def preset_values(path):
     found=re.search(r'^version/code=(\d+)\s*$',text,re.M)
     if not found:raise ValueError('Export preset missing version/code')
     return {'package':quoted('package/unique_name'),'version':quoted('version/name'),'version_code':int(found[1])}
+
+def source_function(text,name):
+    found=re.search(r'^(?:static\s+)?func\s+'+re.escape(name)+r'\([^\n]*\)[^\n]*:\s*\n',text,re.M)
+    assert found,'Missing source function '+name
+    following=re.search(r'^(?:static\s+)?func\s+',text[found.end():],re.M)
+    return text[found.start():found.end()+following.start() if following else len(text)]
+
+def verify_full_startup(main,world):
+    """Pin v34 startup and the explicit legacy entry point, not just a token."""
+    ready=source_function(main,'_ready')
+    helper=source_function(main,'_new_models')
+    new_game=source_function(main,'_confirm_new_game')
+    assert re.search(r'_new_models\(\s*World\.PORT_LAYOUT\s+if\s+automated\s+else\s+World\.FULL_LAYOUT\s*\)',ready),'Normal v34 startup must select FULL while automated capture preserves PORT'
+    assert re.search(r'func\s+_new_models\(\s*layout\s*:\s*String\s*=\s*World\.PORT_LAYOUT\s*\)',helper),'Legacy helper/graphics preview must retain explicit PORT default'
+    assert re.search(r'if\s+layout\s*==\s*World\.FULL_LAYOUT\s+and\s+not\s+nav\.configure_native\(\)',helper),'Full startup must initialize the native navigation catalogue'
+    assert re.search(r'world\.configure\(\s*nav\.current\(\)\s*,\s*layout\s*\)',helper),'World must receive the explicitly selected layout'
+    assert re.search(r'_new_models\(\s*World\.FULL_LAYOUT\s*\)',new_game),'User New Game action must select FULL'
+    expected={'SOURCE_LAYOUT':'handcrafted_analytic_rebuild_v1','NATIVE_LAYOUT':'handcrafted_jjffe_orbits_v2','PORT_LAYOUT':'handcrafted_jjffe_ports_v3','FULL_LAYOUT':'source_jjffe_systems_v4','SOLAR_LAYOUT':'reconstructed_solar_v1','EMPTY_LAYOUT':'source_unavailable_rebuild_v1'}
+    for name,value in expected.items():
+        assert re.search(r'^const\s+'+name+r'\s*:=\s*"'+re.escape(value)+r'"\s*$',world,re.M),'Changed explicit world layout '+name
+    restore=source_function(world,'restore');snapshot=source_function(world,'snapshot')
+    for version in [1,2,3,4]:
+        assert 'starfrontier-rebuild-world-v'+str(version) in restore,'World restore lost saved schema v'+str(version)
+        assert 'starfrontier-rebuild-world-v'+str(version) in snapshot,'World snapshot lost saved schema v'+str(version)
+    assert 'requested_layout' in restore and 'PORT_LAYOUT if port_save' in restore and 'NATIVE_LAYOUT if native_save' in restore,'Legacy restore must retain the requested saved layout'
+    return {'normal_startup_layout':expected['FULL_LAYOUT'],'user_new_game_layout':expected['FULL_LAYOUT'],'automated_and_helper_layout':expected['PORT_LAYOUT'],'legacy_saved_layouts_retained':[expected[key] for key in ['SOURCE_LAYOUT','NATIVE_LAYOUT','PORT_LAYOUT','SOLAR_LAYOUT','EMPTY_LAYOUT']]}
 
 def verify_material_assets(archive,project):
     """Follow exported texture imports to actual runtime data, without extraction.
@@ -304,13 +359,17 @@ def verify_source_orbit_runtime(archive,project,version_code=32):
     assert re.search(r'SourceOrbit\.evaluate_from_epoch\(\s*record\s*,\s*clock\.tick_u32\s*,\s*clock\.day_u32\s*,\s*SourceClock\.EPOCH_TICK_U32\s*,\s*SourceClock\.EPOCH_DAY_U32\s*\)',source_text['planetary_system']),'World does not evaluate native orbits from the fixed source-clock epoch'
     layout_names=['NATIVE_LAYOUT','SOURCE_LAYOUT','SOLAR_LAYOUT','EMPTY_LAYOUT']
     if version_code>=33:layout_names.append('PORT_LAYOUT')
+    if version_code>=34:layout_names.append('FULL_LAYOUT')
     layouts={name:string_constant(source_text['planetary_system'],name) for name in layout_names}
     assert len(set(layouts.values()))==len(layout_names),'Source-orbit and legacy layouts must remain distinct'
     assert layouts['SOURCE_LAYOUT']=='handcrafted_analytic_rebuild_v1','Legacy handcrafted layout changed'
     assert layouts['SOLAR_LAYOUT']=='reconstructed_solar_v1','Legacy solar layout changed'
     assert layouts['EMPTY_LAYOUT']=='source_unavailable_rebuild_v1','Legacy unavailable-world layout changed'
-    requested='PORT_LAYOUT' if version_code>=33 else 'NATIVE_LAYOUT'
-    assert re.search(r'world\.configure\(\s*nav\.current\(\)\s*,\s*World\.'+requested+r'\s*\)',source_text['main']),'New game does not request the expected native orbital layout'
+    requested='FULL_LAYOUT' if version_code>=34 else ('PORT_LAYOUT' if version_code>=33 else 'NATIVE_LAYOUT')
+    if version_code>=34:
+        result['startup_contract']=verify_full_startup(source_text['main'],source_text['planetary_system'])
+    else:
+        assert re.search(r'world\.configure\(\s*nav\.current\(\)\s*,\s*World\.'+requested+r'\s*\)',source_text['main']),'New game does not request the expected native orbital layout'
     adapter=re.search(r'"radius_mass_gravity_spin"\s*:\s*"([^"\r\n]+)"',source_text['planetary_system'])
     assert adapter and adapter[1]=='analytic_si_rebuild_v1','Missing explicit retained local physics adapter'
     assert re.search(r'"complete_original_physics"\s*:\s*false',source_text['planetary_system']),'Orbital backend must identify incomplete original physics'
@@ -382,7 +441,7 @@ def verify_source_orbit_runtime(archive,project,version_code=32):
                                      **{key:fixture[key] for key in ['revision','source_variant','source_sha256','source_assembly_sha256','source_commit','scope','source_procedure_hashes','pinned_procedure_hashes','dos_f880_rate_and_initialization_slice','pinned_f866_ordinary_orbital_slice','packed_record_fixture','packed_record_fixture_sha256','case_count','vector_add_case_count','epoch_update_case_count','fresh_process_runs','vector_add_fresh_process_runs','epoch_update_fresh_process_runs','epoch_update_reverse_repeat_count','epoch_single_step_matches_stepped','ordinary_epoch_tick_u32','ordinary_epoch_day_u32','native_ordered_output_sha256','native_vector_add_output_sha256','native_epoch_update_output_sha256','adapted_assembly_sha256','sine_sha256']}}})
     return result
 
-def verify_source_physics_ports_runtime(archive,project):
+def verify_source_physics_ports_runtime(archive,project,version_code=33):
     """Check v3 port-frame packaging and bounded raw-physics provenance.
 
     Local fixtures establish which controls were used by development tests.
@@ -429,7 +488,10 @@ def verify_source_physics_ports_runtime(archive,project):
     port_layout=string_constant(world,'PORT_LAYOUT')
     contract=string_constant(world,'PORT_CONTRACT')
     assert port_layout=='handcrafted_jjffe_ports_v3','Unexpected port layout version'
-    assert re.search(r'world\.configure\(\s*nav\.current\(\)\s*,\s*World\.PORT_LAYOUT\s*\)',source['main']),'New flight does not select the port-following layout'
+    if version_code>=34:
+        result['startup_contract']=verify_full_startup(source['main'],world)
+    else:
+        assert re.search(r'world\.configure\(\s*nav\.current\(\)\s*,\s*World\.PORT_LAYOUT\s*\)',source['main']),'New flight does not select the port-following layout'
     dock=vector_constant(world,'ORBITAL_DOCK_LOCAL')
     assert dock==vector_constant(source['flight_model'],'STATION')==[0.0,0.0,-2500.0],'Port frame target differs from the flight docking target'
     assert re.search(r'SourceGravity\.coefficient\(\s*raw\s*\)',world) and 'source_a4_packed' in world,'Prepared native source coefficient is missing from v3 bodies'
@@ -484,6 +546,7 @@ def verify_source_physics_ports_runtime(archive,project):
     for key in ['native_gravity_output_sha256','native_mass_output_sha256','native_integration_output_sha256','adapted_assembly_sha256']:digest(fixture.get(key),key)
     assert isinstance(fixture.get('scope'),str) and fixture['scope'].strip(),'Missing native source-gravity scope'
     result.update({'source_variant':variant,'port_layout':port_layout,'port_contract':contract,
+                   'reported_layout_scope':'retained-v3-layout' if version_code>=34 else 'default-v3-layout',
                    'dock_local_m':dock,'flight_dock_target_equal':True,'source_epoch':epoch,
                    'active_scope':'Native orbital station centres in a non-rotating station-following frame; prepared F880 a4 fields and separately available raw F603/F1511/F1512 primitives.',
                    'live_gravity':'analytic_si_rebuild_v1','live_surface_radius':'analytic_si_rebuild_v1',
@@ -494,6 +557,85 @@ def verify_source_physics_ports_runtime(archive,project):
                                      'sha256':hashlib.sha256(fixture_raw).hexdigest(),
                                      'provenance_checked':True,'oracle_executed_by_apk_verifier':False,
                                      **{key:fixture[key] for key in ['revision','source_variant','source_sha256','source_assembly_sha256','source_commit','scope','object_bytes','object_bank_stride_bytes','object_bank_header_bytes','object_state_offsets','source_procedure_hashes','pinned_procedure_hashes','F880_coefficient_slice','case_count','mass_case_count','integration_case_count','fresh_process_runs','reverse_repeat_count','mass_reverse_repeat_count','integration_reverse_repeat_count','native_gravity_output_sha256','native_mass_output_sha256','native_integration_output_sha256','adapted_assembly_sha256','input_fixtures_sha256']}}})
+    return result
+
+def verify_source_full_runtime(archive,project):
+    """Check v34 runtime/data packaging and declared caller policies.
+
+    Compiled bytes are checked as GDSC and hashed; they are not decompiled or
+    proven equivalent to local scripts by this checker. Native/Godot behavior
+    and physical-device validation remain separate from APK package evidence.
+    """
+    names=set(archive.namelist())
+    for name in names:
+        assert not name.startswith(DEVELOPMENT_ASSET_PREFIXES),'Development material included in full runtime APK '+name
+        assert not (name.startswith('assets/') and 'fixtures' in name.lower().split('/')),'Native development fixture included in APK '+name
+        assert not (name.startswith('assets/') and name.lower().endswith(('.py','.asm','.exe','.o','.elf','.apk'))),'Host/development binary included in APK '+name
+    result={'scripts':{},'data':{},'source_executable_sha256':SOURCE_IMAGE_SHA256}
+    text={}
+    for name in FULL_SOURCE_MODULES:
+        raw=(project/'scripts'/f'{name}.gd').read_bytes();text[name]=raw.decode('utf-8')
+        exported=f'assets/scripts/{name}.gdc'
+        assert exported in names,'Missing full source runtime module '+name
+        packed=archive.read(exported)
+        assert len(packed)>64 and packed[:4]==b'GDSC','Invalid compiled full source runtime module '+name
+        result['scripts'][name]={'runtime_path':exported,'runtime_bytes':len(packed),'runtime_sha256':hashlib.sha256(packed).hexdigest(),'local_source_sha256':hashlib.sha256(raw).hexdigest()}
+    result['startup_contract']=verify_full_startup(text['main'],text['planetary_system'])
+    assert set(path.stem for path in (project/'data').glob('ffe_*.json'))==set(FULL_SOURCE_TABLES),'Full packaging verifier list omits a source table or names a missing table'
+    tables={}
+    for name in FULL_SOURCE_TABLES+('ships','world_names_ru'):
+        raw=(project/'data'/f'{name}.json').read_bytes();exported=f'assets/data/{name}.json'
+        assert exported in names and archive.read(exported)==raw,'Full runtime JSON differs from local source '+name
+        metadata=json.loads(raw);assert isinstance(metadata,dict),'Invalid full runtime JSON '+name
+        if name.startswith('ffe_'):
+            image=metadata.get('original_executable_sha256') if name=='ffe_data_provenance' else metadata.get('source_sha256')
+            assert image==SOURCE_IMAGE_SHA256,'Wrong original executable provenance '+name
+            if 'source_assembly_sha256' in metadata:assert metadata['source_assembly_sha256']==SOURCE_ASSEMBLY_SHA256,'Wrong pinned assembly provenance '+name
+            if 'source_commit' in metadata:assert metadata['source_commit']==SOURCE_ASSEMBLY_COMMIT,'Wrong pinned source revision '+name
+        tables[name]=metadata
+        result['data'][name]={'runtime_path':exported,'bytes':len(raw),'source_json_sha256':hashlib.sha256(raw).hexdigest()}
+    ground=tables['ffe_ground_collision']
+    assert ground.get('parent_models')==list(range(117,134)),'Full runtime lost a natural model terrain resource'
+    assert ground['models']['117'].get('non_spherical_source_model') is True,'Source model117 must retain its non-spherical role'
+    for model in ground['models'].values():
+        for data_key,digest_key in [('descriptor_hex','descriptor_sha256'),('vertices_hex','vertices_sha256'),('collision_bytes_hex','collision_bytes_sha256'),('collision_preceding_hex','collision_preceding_sha256')]:
+            assert hashlib.sha256(bytes.fromhex(model[data_key])).hexdigest()==model[digest_key],'Invalid ground resource component digest '+data_key
+    special=tables['ffe_special_station_models']
+    assert special.get('roots')==[69] and set(special.get('models',{}))=={'69','225'},'Missing actual special orbital port69 closure'
+    assert tables['ffe_underground_models'].get('roots')==[96] and '96' in tables['ffe_underground_models'].get('models',{}),'Missing actual underground port96 closure'
+    orbital_models=[69]+list(range(72,81))
+    descriptors=tables['ffe_runtime_model_descriptors']
+    assert descriptors.get('model_count')==149 and set(descriptors.get('models',{}))==set(map(str,range(149))),'Incomplete original runtime descriptor resource'
+    for model in orbital_models:
+        resource=special if model==69 else tables['ffe_world_models']
+        assert str(model) in resource['models'],'Missing actual orbital station model '+str(model)
+        record=resource['models'][str(model)]
+        assert hashlib.sha256(bytes.fromhex(record['mesh_hex'])).hexdigest()==record['mesh_sha256'],'Wrong original orbital model program digest '+str(model)
+        assert record['descriptor_sha256']==descriptors['models'][str(model)]['descriptor_sha256'],'Station geometry descriptor differs from source world catalogue '+str(model)
+    models=re.search(r'^const\s+MODELS\s*:=\s*\[([\d,\s]+)\]\s*$',text['source_station_geometry'],re.M)
+    assert models and [int(value) for value in models[1].split(',') if value.strip()]==orbital_models,'Full runtime station backend omits an actual source orbital root'
+    assert 'ffe_special_station_models.json' in text['source_model_vm'],'Special orbital model resource is not reachable by runtime lookup'
+    assert 'source-root69-faces110-through160-v1' in text['source_station_geometry'] and 'source-root79-faces602-through734-v1' in text['source_station_geometry'],'Special integrated source dock bays lost their explicit original-face policies'
+    assert 'explicit-zero-eight-root-locals-v1' in text['source_station_geometry'],'Missing explicit static source model parameter policy'
+    assert re.search(r'^const\s+REFERENCE_STEP_TICKS\s*:=\s*49710\s*$',text['source_physics_bridge'],re.M),'Sampled F603 reference step changed'
+    assert re.search(r'^const\s+CONTRACT\s*:=\s*"sampled-f603-nominal-day-si-v1"\s*$',text['source_physics_bridge'],re.M),'Sampled SI bridge contract changed'
+    assert 'single_current_focus_parent_f603_v1' in text['planetary_system'],'Live gravity parent-selection policy is missing'
+    gravity=source_function(text['planetary_system'],'_full_gravity_at')
+    assert 'by_id[focus_id]' in gravity and 'PhysicsBridge.sample_prepared' in gravity and not re.search(r'for\s+body\s*:',gravity),'Full gravity must sample its one current focus parent'
+    assert 'sphere-source-ground-v4' in text['source_surface_terrain'] and 'source_exterior_probe_125pct_axes_v1' in text['source_surface_terrain'],'Shared source terrain and explicit model117 caller policy are missing'
+    assert 'continuous_q31_source_probe_grid_v1' in text['source_surface_terrain'],'Shared source render/collision sampling policy changed'
+    assert 'source_surface_terrain.gd' in text['source_global_body_mesh'] and 'source-height-global-lod-v1' in text['source_global_body_mesh'],'Celestial global LOD is not bound to shared source surface heights'
+    assert 'source_motion_profile=full' in text['source_station_session'] and 'if source_motion_profile:' in source_function(text['flight_model'],'acceleration'),'Source ship controls must be selected by world version'
+    assert 'SourceControlProfile.acceleration(ship_id)' in source_function(text['flight_model'],'acceleration'),'Source control profile is disconnected from Flight'
+    cobra=next((row for row in tables['ffe_ship_registry']['ships'] if row['index']==38),None)
+    assert cobra is not None,'Original Cobra38 specification is missing'
+    spec=bytes.fromhex(cobra['spec_hex']);spec_sha=hashlib.sha256(spec).hexdigest()
+    assert len(spec)==24 and spec_sha=='b0f77d55db624b023accc8542f6b990d95515ab3e4c23bdd4e1d6e30c4cf2656' and spec_sha in text['source_ship_control_profile'],'Source control profile differs from actual original Cobra38 specification'
+    decode=source_function(text['main'],'_decode_state')
+    assert decode.index('candidate_world.restore(')<decode.index('StationSession.restore_flight(')<decode.index('candidate_surface.restore('),'Full save load order must remain World then Flight then Surface'
+    tick=source_function(text['main'],'_tick')
+    assert tick.index('StationSession.refresh(')<tick.index('ship.step(') and 'surface.set_source_time(nav.elapsed_days)' in tick,'Frame update must precede orbital Flight and source surface step'
+    result.update({'compiled_module_count':len(FULL_SOURCE_MODULES),'raw_json_count':len(result['data']),'natural_model_indices':ground['parent_models'],'orbital_station_model_indices':orbital_models,'source_control_specification_sha256':spec_sha,'world_layout':'source_jjffe_systems_v4','live_gravity':'sampled-f603-nominal-day-si-v1','gravity_parent_policy':'single_current_focus_parent_f603_v1','live_terrain':'sphere-source-ground-v4','station_session':'selected-source-station-session-v1','native_development_fixtures_packaged':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'original_per_frame_dynamics':False,'complete_original_physics':False,'physical_device_tested':False})
     return result
 
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
@@ -514,14 +656,13 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
         assert sorted({n.split('/')[1] for n in names if n.startswith('lib/')})==['arm64-v8a'],'APK is not ARM64-only'
         assert not any(n.lower().endswith(('.exe','.asm','.keystore','.jks','.argosmodel')) for n in names),'Non-runtime/secret file in APK'
-        forbidden=['assets/tests/','assets/tools/','assets/docs/','assets/recovered-history/','assets/recovery/','assets/validation/','assets/deliverables/','assets/localization/','assets/build/']
-        assert not any(n.startswith(tuple(forbidden)) for n in names),'Development history included in APK'
+        assert not any(n.startswith(DEVELOPMENT_ASSET_PREFIXES) for n in names),'Development history included in APK'
         if not smoke:
             for name in ['ffe_worlds','ffe_world_models','ffe_ship_registry','ffe_ground_coordinates','ffe_ground_pads']:
                 path='assets/data/'+name+'.json'
@@ -578,7 +719,9 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             if expected['version_code']>=32:
                 source_orbit_assets=verify_source_orbit_runtime(archive,presets.parent,expected['version_code'])
             if expected['version_code']>=33:
-                source_physics_ports_assets=verify_source_physics_ports_runtime(archive,presets.parent)
+                source_physics_ports_assets=verify_source_physics_ports_runtime(archive,presets.parent,expected['version_code'])
+            if expected['version_code']>=34:
+                source_full_assets=verify_source_full_runtime(archive,presets.parent)
         for name in names:
             if not name.startswith('lib/') or not name.endswith('.so'):continue
             data=archive.read(name)
@@ -596,7 +739,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

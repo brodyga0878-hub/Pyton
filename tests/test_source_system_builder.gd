@@ -71,7 +71,7 @@ func run()->void:
  var fixture:Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://tests/fixtures/source_system_native.json"))
  check(fixture.source_sha256==Meta.SOURCE_SHA and fixture.source_commit=="7e540341d4e09aa3c92877b87d49e7f2c143ad8d","Native oracle pins executable and source revision")
  check(fixture.source_assembly_sha256=="d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a","Native hierarchy pins original assembly")
- check(fixture.case_count==5824 and fixture.fresh_process_runs==3 and fixture.reverse_repeat_count==5824 and fixture.guard_canaries_unchanged==true,"Every complete native hierarchy repeats in3fresh processes and reverse order with bank guards")
+ check(fixture.case_count==5829 and fixture.fresh_process_runs==3 and fixture.reverse_repeat_count==5829 and fixture.guard_canaries_unchanged==true,"Every complete native hierarchy repeats in3fresh processes and reverse order with bank guards")
  check(fixture.record_bank_slots==128 and fixture.source_f881_entry_limit==60,"Bank and source body-entry capacities remain distinct")
  for procedure in ["877","878","881","882","883","884","885","886","887","888","889","890","894","896","897"]:check(fixture.source_procedure_hashes.has(procedure),"Actual native procedure provenance "+procedure)
  metadata_cases(fixture);guards_and_lookup(fixture)
@@ -89,6 +89,13 @@ func run()->void:
     var request:=row.duplicate();request.initial_seed_b=int(row.seed_b);request.initial_star_quota=int(row.star_quota)
     result=builder.build(request,bank)
    compare(row,result,bank);check(before==var_to_bytes([bank,row]),"Full hierarchy candidate preserves inputs")
+ var corrected:=0
+ for row:Dictionary in fixture.system_cases:
+  if row.group!="actual_f860_zero_radius_caller_fix":continue
+  corrected+=1;var raw:=row.duplicate();raw.seed_a=int(row.original_seed_a)
+  check(Builder.root_radius_would_not_advance(raw) and not Builder.root_radius_would_not_advance(row),"Actual raw zero-radius header and effective safe header remain distinct")
+  check(Builder.new().build(raw).is_empty(),"Original infinite source loop rejects before iteration")
+ check(corrected==4,"All four native effective zero-radius correction banks are present")
  var largest:=0;var handcrafted:=0;var populated:=0;var multiple:=0
  for row:Dictionary in fixture.system_cases:
   largest=maxi(largest,int(row.expected.index))

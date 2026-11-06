@@ -501,6 +501,17 @@ def make_cases(data):
                 row=available[position];chosen.append(row);seen_ids.add(row['system_id'])
         if len(chosen)!=42:raise ValueError('Expected42 independent real system headers')
         rows.extend(chosen)
+        for row in candidates:
+            if row['system_id']==0x02ae1718 and row['system_id'] not in seen_ids:
+                special=dict(row);special['group']='actual_f860_special_polaris';rows.append(special);break
+        # Caller-only corrections to four original zero-radius F897 loops.
+        # Inputs are explicit; the unchanged native F878 supplies every expected
+        # output byte. The corresponding raw headers are witnessed separately.
+        safe_seeds={1919437698:461500744,44586598:1382453576,44578542:3303985480,111736477:983390536}
+        for row in candidates:
+            if row['system_id'] not in safe_seeds:continue
+            fixed=dict(row);fixed['original_seed_a']=row['seed_a'];fixed['seed_a']=safe_seeds[row['system_id']]
+            fixed['group']='actual_f860_zero_radius_caller_fix';fixed['caller_correction_policy']='zero-root-orbit-radius-seed-step-v1';rows.append(fixed)
     return rows
 
 def bank_for(row):
@@ -552,6 +563,8 @@ def main():
     for operation,name in enumerate(['factory_cases','binary_cases','children_cases','system_cases','callback_cases']):fixture[name]=[row for row in rows if row['operation']==operation]
     fixture['case_count']=len(rows)
     fixture['input_resources_sha256']={str(path.relative_to(PROJECT)):sha(path.read_bytes()) for path in [PROJECT/'data/ffe_handcrafted_records.json',PROJECT/'data/ffe_stellar_factory.json',PROJECT/'data/ffe_settlement_rules.json',PROJECT/'data/ffe_planet_names.json',PROJECT/'data/ffe_system_metadata.json']}
+    definition_path=PROJECT/'tests/fixtures/source_system_definition_native.json'
+    if definition_path.exists():fixture['definition_header_corpus']={'path':str(definition_path.relative_to(PROJECT)),'sha256':sha(definition_path.read_bytes()),'selected_native_cases':42,'undefined_source_headers_rejected':[{'system_id':0x02af3686,'mass':0xffffffff,'source_f881_out_of_bounds_callback_u32':0x1234}]}
     args.output.write_text(json.dumps(fixture,separators=(',',':'))+'\n')
     print('SOURCE SYSTEM NATIVE:',len(rows),'full constructor/hierarchy/callback cases;',fixture['metadata_case_count'],'metadata controls; threefresh/reverse agree')
 

@@ -4,6 +4,7 @@ extends Node3D
 const Visual=preload("res://scripts/source_model_visual.gd")
 const Runtime=preload("res://scripts/source_city_runtime.gd")
 const Roles=preload("res://scripts/city_material_roles.gd")
+const EnclosedVisual=preload("res://scripts/source_enclosed_city_visual.gd")
 const CACHE_LIMIT:=8
 const LEGACY_REVISIONS:=["sphere-v1","sphere-source-sites-v2"]
 var last_error:=""
@@ -77,6 +78,8 @@ func configure(draw:RefCounted,outer_frame:Transform3D,view_coverage:=1.0)->bool
 		return _fail("Incomplete source city runtime data")
 	var profile:Dictionary=data.profile
 	var key:String=str(profile.get("key",""))
+	var enclosed:bool=data.get("static_compiled") is Dictionary and data.get("dynamic_compiled") is Dictionary and not str(data.get("static_key","")).is_empty()
+	if enclosed:key=str(data.static_key)
 	if key.is_empty() or not data.compiled.get("ok",false):
 		return _fail("Missing source city identity or unsuccessful compiled model")
 	var placement:Transform3D=Runtime.transform_to_frame(profile,globe)
@@ -89,10 +92,11 @@ func configure(draw:RefCounted,outer_frame:Transform3D,view_coverage:=1.0)->bool
 		if not active_key.is_empty():cached_cities[key].transform=placement
 		return true
 	if not cached_cities.has(key):
-		var city:=Visual.new()
+		var city:Node3D=EnclosedVisual.new() if enclosed else Visual.new()
 		city.set_quality(quality)
 		var material_context:=Roles.context_for(profile,data.conversion_basis,data.compiled)
-		if not city.configure(data.compiled,data.conversion_basis,material_context):
+		var accepted:bool=city.configure_data(data) if enclosed else city.configure(data.compiled,data.conversion_basis,material_context)
+		if not accepted:
 			city.free()
 			return _fail("Source city visual rejected compiled geometry for "+key)
 		city.name="SourceCity%d"%build_count
@@ -100,6 +104,7 @@ func configure(draw:RefCounted,outer_frame:Transform3D,view_coverage:=1.0)->bool
 		add_child(city)
 		cached_cities[key]=city
 		build_count+=1
+	elif enclosed and not cached_cities[key].configure_data(data):return _fail("Source hatch visual rejected paired geometry")
 	_touch(key)
 	_trim_cache()
 	active_key=key

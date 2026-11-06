@@ -44,6 +44,18 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_generated_worlds', 'tests/test_source_generated_worlds.gd', 'Complete source Worldv4, native body/port frames and explicit original-source caller corrections.', timeout=600),
+    Suite('source_galaxy_population', 'tests/test_source_galaxy_population.gd', 'All4231 valid native-header systems through actual runtime construction/catalogue with documented caller corrections.', timeout=600),
+    Suite('source_surface_integration', 'tests/test_source_surface_integration.gd', 'Native source terrain/force frame, actual117 and ground-port entry, geography, ascent, load and return.', timeout=600),
+    Suite('source_station_session', 'tests/test_source_station_session.gd', 'Actual selected station context, spin/door persistence and isolated World-before-Flight restore.', timeout=600),
+    Suite('source_underground_controller', 'tests/test_source_underground_controller.gd', 'Exact96 static237 replay and atomic worker/state/collider publication.', timeout=600),
+    Suite('source_enclosed_city_visual', 'tests/test_source_enclosed_city_visual.gd', 'Actual96/237 rendering retains immutable city meshes while updating hatch poses.', timeout=300),
+    Suite('source_celestial_renderer', 'tests/test_source_celestial_renderer.gd', 'Native body pose/light, source-height global LOD, bounded asynchronous publication and local overlap.', timeout=600),
+    Suite('source_cobra_control', 'tests/test_source_ship_control_profile.gd', 'Original F601 six-axis Cobra thrust versus native controls with explicit conservative mobile policy.', timeout=300),
+    Suite('source_port_refuel', 'tests/test_source_port_refuel.gd', 'Actual selected source-port basic refuel without synthetic training market.', timeout=300),
+    Suite('source_main_full', 'tests/test_source_main_full.gd', 'Actual Main native jump/cancel/save, physical station dock/refuel/launch, offpad takeoff and enclosed96 touch/save/launch.', timeout=600, user_args=('--rebuild-capture',)),
+    Suite('source_model_mesh', 'tests/test_source_model_mesh.gd', 'Preserved full mesh suite with independently regenerated original vertex fixture.', timeout=300),
+    Suite('source_model_vertices', 'tests/test_source_model_vertices_native.gd', 'All1392 original leaf coordinates against108 independent native instruction cases.', timeout=300),
     Suite('source_galaxy', 'tests/test_source_galaxy.gd', 'Actual original sector density, buffers, coordinates and RNG against504 native sectors/4243 positions.', timeout=300),
     Suite('source_definition', 'tests/test_source_system_definition.gd', 'Actual F830 names and F860 source headers against4234 independent native callers.', timeout=300),
     Suite('source_names', 'tests/test_source_planet_names.gd', 'Original populated-body names and text expansion against native contexts.', timeout=300),
@@ -270,7 +282,7 @@ def limitations() -> list[dict]:
     items = [{
         'scope': 'Full original model-mesh leaf native controls',
         'status': 'unavailable' if not (PROJECT/'tests/fixtures/model_vertices_reference.json').is_file() else 'not_in_this_curated_run',
-        'reason': 'The preserved tests/test_source_model_mesh.gd requires model_vertices_reference.json; original city geometry is exercised by the current city suites, which does not replace this missing independent leaf fixture.',
+        'reason': 'The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage.' if (PROJECT/'tests/fixtures/model_vertices_reference.json').is_file() else 'Independent original leaf fixture is unavailable.',
     }]
     items.append({'scope': 'Full application, Android installation and physical Samsung S23 Ultra', 'status': 'separate_validation',
                   'reason': 'This runner covers current standalone suites and isolated native terrain controls only.'})

@@ -51,6 +51,51 @@ static func repair(ship:RefCounted)->Dictionary:
 static func _whole(value:Variant,maximum:=1000000)->bool:
 	return _number(value) and float(value)>=0.0 and float(value)<=maximum and float(value)==floorf(float(value))
 
+static func _native_navigation(nav:RefCounted)->bool:
+	return nav!=null and nav.has_method("is_native") and nav.is_native()==true
+
+static func _source_refuel_context(ship:RefCounted,nav:RefCounted)->bool:
+	return ship!=null and ship.get("original_port") is bool and ship.original_port and _native_navigation(nav) and nav.has_method("has_station") and nav.has_station()==true
+
+static func _source_refuel_state(ship:RefCounted,nav:RefCounted,selected_port:bool)->Dictionary:
+	var hull:Variant=ship.get("hull") if ship!=null else 0.0
+	var credits:Variant=ship.get("credits") if ship!=null else 0
+	var error:=""
+	var validation:=repair_quote(ship)
+	if validation.status in ["invalid_state","destroyed"]:error=validation.message
+	elif not selected_port:error="Для заправки выберите доступный космопорт и выполните стыковку."
+	elif not ship.docked or ship.surface_mode or ship.combat_active or not ship.station_available:error="Заправка доступна после стыковки с выбранным космопортом."
+	elif nav==null or not _number(nav.get("remaining")) or float(nav.get("remaining"))!=0.0:error="Заправка недоступна во время гиперперехода."
+	var state:Dictionary={"original_port":ship!=null and ship.get("original_port") is bool and ship.original_port,"source_refuel_only":selected_port,"source_port_name":"Выбранный космопорт","docked":ship!=null and ship.get("docked") is bool and ship.docked,"hull":float(hull) if _number(hull) else 0.0,"credits":int(credits) if _whole(credits,MAX_CREDITS) else 0,"cargo_used":0,"cargo_capacity":0,"fuel":0,"fuel_capacity":0,"profile_name":"—","goods":[],"ships":[],"repair":{"price":0,"can_repair":false,"reason":"Ремонт в этом космопорте недоступен."},"refuel":{"price":0,"can_refuel":false,"reason":error},"delivery":{"reward":0,"can_deliver":false,"reason":"Учебные доставки в этом космопорте не принимаются."},"context_error":error}
+	if not selected_port:state.native_services_unavailable=true
+	if ship!=null and ship.has_method("profile"):
+		var profile:Dictionary=ship.profile();state.profile_name=str(profile.get("name","—"))
+		if profile.is_empty() and error.is_empty():error="Не удалось определить корабль."
+	# Never pass a malformed manifest into the model's typed integer sum.
+	var valid_inventory:bool=ship!=null and ship.get("goods") is Dictionary and ship.get("mission_cargo") is Dictionary and ship.get("equipment") is Array and _whole(ship.get("story_cargo"))
+	if valid_inventory:
+		for count in ship.goods.values():
+			if not _whole(count):valid_inventory=false;break
+	if valid_inventory:
+		for count in ship.mission_cargo.values():
+			if not _whole(count):valid_inventory=false;break
+	if valid_inventory:
+		for id in ship.equipment:
+			if not id is String or not ship.economy_catalog.equipment.has(id):valid_inventory=false;break
+	if valid_inventory and ship.has_method("total_cargo") and ship.has_method("cargo_capacity"):
+		state.cargo_used=ship.total_cargo();state.cargo_capacity=ship.cargo_capacity()
+	elif error.is_empty():error="Неверное состояние груза."
+	if nav!=null and _whole(nav.FUEL_CAPACITY) and _whole(nav.get("fuel"),int(nav.FUEL_CAPACITY)):
+		state.fuel=int(nav.fuel);state.fuel_capacity=int(nav.FUEL_CAPACITY)
+	elif error.is_empty():error="Неверное состояние гипертоплива."
+	var missing:int=state.fuel_capacity-state.fuel;var price:=missing*10
+	state.context_error=error
+	if error.is_empty():
+		if missing<=0:error="Баки полны."
+		elif state.credits<price:error="Недостаточно средств на заправку."
+	state.refuel={"price":price,"can_refuel":error.is_empty(),"reason":error}
+	return state
+
 static func _service_error(ship:RefCounted,nav:RefCounted)->String:
 	var repair_state:=repair_quote(ship)
 	if repair_state.status in ["invalid_state","destroyed","context_unavailable"]:return repair_state.message
@@ -64,6 +109,7 @@ static func _service_error(ship:RefCounted,nav:RefCounted)->String:
 	return ""
 
 static func service_state(ship:RefCounted,nav:RefCounted)->Dictionary:
+	if _native_navigation(nav):return _source_refuel_state(ship,nav,_source_refuel_context(ship,nav))
 	var error:=_service_error(ship,nav)
 	var hull:Variant=ship.get("hull") if ship!=null else 0.0
 	var credits:Variant=ship.get("credits") if ship!=null else 0
@@ -126,6 +172,13 @@ static func execute(ship:RefCounted,nav:RefCounted,action:String,id:="")->Dictio
 	var result:Dictionary={"ok":false,"status":"unavailable","message":"Служба недоступна.","ship_changed":false}
 	if action not in ["buy","sell","repair","refuel","deliver","trade_ship"]:
 		result.status="unknown_action";result.message="Неизвестная служба.";return result
+	if _native_navigation(nav):
+		var source_state:=_source_refuel_state(ship,nav,_source_refuel_context(ship,nav))
+		if action!="refuel":result.message="В этом космопорте доступна базовая заправка.";return result
+		if not source_state.refuel.can_refuel:result.message=source_state.refuel.reason;return result
+		result.ok=nav.refuel(ship);result.message="Гипертопливо пополнено." if result.ok else "Заправка недоступна."
+		if result.ok:result.status="completed"
+		return result
 	var error:=_service_error(ship,nav)
 	if not error.is_empty():result.message=error;return result
 	var state:=service_state(ship,nav)

@@ -9,7 +9,7 @@ const Rotation=preload("res://scripts/body_rotation.gd")
 const Ground=preload("res://scripts/ground_coordinates.gd")
 const REVISION:="source-station-solid-v1"
 const SPIN_REVISION:="source-station-spin-state-v1"
-const MODELS:=[72,73,80]
+const MODELS:=[69,72,73,74,75,76,77,78,79,80]
 const OUTER_APPROACH_RAW:=4000*1024 # F741 ordinary orbital-station waypoint.
 const SOURCE_CONTACT_ALIGNMENT:=0x78000000
 const SOURCE_CONTACT_L1_SPEED:=0x258
@@ -31,7 +31,9 @@ static func prepare(model_index:int,source_seed:Variant=0,door_u16:Variant=0)->D
 	if _cache.has(key):return _cache[key].duplicate(true)
 	var entity:Array=[];entity.resize(64);entity.fill(0)
 	entity[1]=int(door_u16);entity[2]=int(source_seed)&65535;entity[3]=(int(source_seed)>>16)&65535
-	var compiled:=Compiler.new().compile(model_index,{"source_seed":int(source_seed),"entity_variables_u16":entity})
+	# The static station mesh caller supplies all eight root model locals.
+	# Procedural74/76/77 propagate otherwise undefined locals into submodels.
+	var compiled:=Compiler.new().compile(model_index,{"source_seed":int(source_seed),"entity_variables_u16":entity,"frame_parameters":[0,0,0,0,0,0,0,0]})
 	if not compiled.get("ok",false):return {}
 	var triangles:Array=[];var boxes:Array=[];var bay:=AABB();var bounds:=AABB();var first:=true;var first_bay:=true
 	for face:Dictionary in compiled.triangles_raw:
@@ -42,7 +44,9 @@ static func prepare(model_index:int,source_seed:Variant=0,door_u16:Variant=0)->D
 		for point:Vector3 in triangle:box=box.expand(point)
 		triangles.append(triangle);boxes.append(box)
 		bounds=box if first else bounds.merge(box);first=false
-		if int(face.model_index)==227:
+		# Model79 integrates its docking interior in the root program instead of
+		# calling227. These actual source faces delimit its bay (+Z entrance).
+		if int(face.model_index)==227 or (model_index==79 and int(face.model_index)==79 and int(face.offset)>=602 and int(face.offset)<=734) or (model_index==69 and int(face.model_index)==69 and int(face.offset)>=110 and int(face.offset)<=160):
 			bay=box if first_bay else bay.merge(box);first_bay=false
 	if triangles.is_empty() or first_bay:return {}
 	var asset:=VM.model(model_index)
@@ -51,6 +55,7 @@ static func prepare(model_index:int,source_seed:Variant=0,door_u16:Variant=0)->D
 		"approach_waypoint":Vector3(0,0,Units.metres(float(OUTER_APPROACH_RAW))),"source_units":"16785/2^24 metres per raw unit; direct source XYZ",
 		"descriptor_sha256":str(asset.descriptor_sha256),"mesh_sha256":str(asset.mesh_sha256),
 		"collision_profile":"modern-ellipsoid-vs-source-solid-triangles-v1","original_collision_vm":false,"decorative_collision":false,
+		"root_parameter_policy":"explicit-zero-eight-root-locals-v1","bay_geometry_policy":"source-root79-faces602-through734-v1" if model_index==79 else ("source-root69-faces110-through160-v1" if model_index==69 else "source-submodel227-triangle-bounds-v1"),
 		"original_autopilot":false,"source_dock_target":"F650 ordinary-port sentinel resolves to station centre","cache_key":key}
 	# Only a few selected sites are needed; all callers receive independent
 	# containers so diagnostics or render configuration cannot poison the cache.

@@ -80,7 +80,7 @@ func complete_native_controls()->void:
 		var actual:=builder.build({"seed_a":int(row.seed_a),"mass":int(row.mass),"num_stars":int(row.num_stars),"system_id":int(row.system_id),"population_raw":int(row.population_raw),"system_name":str(row.system_name)})
 		check(actual.get("ok",false) and actual.records==bank,"Complete source builder emits the independently native catalogue bank")
 		if actual.get("ok",false):check(catalogue.build(star,actual).get("ok",false),"Actual builder result contract is accepted")
-	check(fixture.system_cases.size()==204 and mapped_systems.size()==11 and max_count==61,"All procedural,11mapped,42realF860headers and fallback complete native systems, including61active records")
+	check(fixture.system_cases.size()==209 and mapped_systems.size()==11 and max_count==61,"All procedural,11mapped,42realF860headers,4callerfixes,Polaris and fallback complete native systems, including61active records")
 func mapped_native_variants()->void:
 	var fixture:Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://tests/fixtures/handcrafted_runtime_native.json"));var catalogue:=Catalogue.new();var accepted:=0
 	for row:Dictionary in fixture.cases:

@@ -10,7 +10,7 @@ const Pads=preload("res://scripts/source_ground_pads.gd")
 const Units=preload("res://scripts/source_units.gd")
 const Underground=preload("res://scripts/source_underground_port.gd")
 const CELL_METRES:=256.0
-const CACHE_LIMIT:=8192
+const CACHE_LIMIT:=32768
 const SOURCE_DETAIL:=1
 var source_record:=PackedByteArray()
 var source_model_index:=-1
@@ -157,6 +157,61 @@ func site_coordinates(id:String)->Array:
 	# Uninhabited entry is deterministic geography, without artificial flattening.
 	return super.site_coordinates(id)
 
+func coordinates_at_height(x:float,z:float,height:float)->Array:
+	# Exact tangent-frame point around referenceR; scalar doubles retain
+	# centimetres even when the real surface is hundreds of kilometres lower.
+	var up:=radius+height
+	var sl:=sin(latitude);var cl:=cos(latitude);var sn:=sin(longitude);var cs:=cos(longitude)
+	var bx:=-sn*x+cl*cs*up+sl*cs*z
+	var by:=sl*up-cl*z
+	var bz:=-cs*x-cl*sn*up-sl*sn*z
+	return [atan2(by,sqrt(bx*bx+bz*bz)),atan2(-bz,bx)]
+
+func _surface_height(x:float,z:float)->float:
+	if not is_finite(x) or not is_finite(z) or not configured_ok:return NAN
+	var height:=elevation(latitude,longitude)
+	var tangent_sq:=x*x+z*z
+	if tangent_sq<1e-12:return height
+	# Solve a vertical ray against the same radial source field used by the
+	# global planet mesh. This replaces the old R*angle approximation onlyv4.
+	for iteration in range(8):
+		var ll:=coordinates_at_height(x,z,height)
+		var target_radius:=radius+elevation(ll[0],ll[1])
+		if target_radius<=0 or target_radius*target_radius<=tangent_sq:return NAN
+		var next:=sqrt(target_radius*target_radius-tangent_sq)-radius
+		if absf(next-height)<0.00001:return next
+		height=next
+	return height
+
+func coordinates(x:float,z:float)->Array:
+	return coordinates_at_height(x,z,_surface_height(x,z))
+
+func raw_height(x:float,z:float)->float:return _surface_height(x,z)
+
+func sample(x:float,z:float)->PackedFloat64Array:
+	var height:=_surface_height(x,z)
+	var ll:=coordinates_at_height(x,z,height)
+	var actual_radius:=sqrt(x*x+z*z+pow(radius+height,2))
+	return PackedFloat64Array([height,actual_radius-radius,actual_radius*cos(ll[0])*cos(ll[1]),actual_radius*sin(ll[0]),actual_radius*cos(ll[0])*sin(ll[1])])
+
+func project(lat:float,lon:float)->Vector2:
+	var actual_radius:=radius+elevation(lat,lon)
+	var dl:=lon-longitude
+	return Vector2(actual_radius*cos(lat)*sin(dl),actual_radius*(sin(latitude)*cos(lat)*cos(dl)-cos(latitude)*sin(lat)))
+
+func distance_to(lat:float,lon:float)->float:
+	var delta:=pow(sin((lat-latitude)*0.5),2)+cos(latitude)*cos(lat)*pow(sin((lon-longitude)*0.5),2)
+	var mean_radius:=radius+0.5*(elevation(latitude,longitude)+elevation(lat,lon))
+	return 2.0*mean_radius*asin(sqrt(clampf(delta,0.0,1.0)))
+
+func maximum_patch_extent()->float:
+	# Heightmaps cannot represent the back side of a nonspherical body. The
+	# global source-height planet mesh remains visible beyond this local patch.
+	var minimum_axis:=2147483647
+	for axis in source_policy.get("static_axes_raw",[]):minimum_axis=mini(minimum_axis,int(axis))
+	var minimum_radius:=Units.metres(float(minimum_axis)*pow(2.0,int(source_policy.get("mesh_zoom",0))))
+	return minimum_radius*0.45
+
 func _sample_direction_unlocked(radial:PackedInt64Array)->Dictionary:
 	if radial.size()!=3 or radial==PackedInt64Array([0,0,0]) or not configured_ok:return {}
 	for value in radial:
@@ -206,6 +261,31 @@ func cache_stats()->Dictionary:
 	_mutex.lock()
 	var result:={"entries":_cache.size(),"limit":CACHE_LIMIT,"source_samples":_source_samples,"hits":_cache_hits,"evictions":_cache_evictions,"generation":_generation,"cell_metres":CELL_METRES,"policy":SAMPLE_POLICY}
 	_mutex.unlock();return result
+
+func capture_worker_state()->Dictionary:
+	# Plain immutable value graph: no mutable kernel, mutex, World or nodes.
+	_mutex.lock()
+	var result:={"revision":REVISION_NAME,"source_record":source_record.duplicate(),"source_policy":source_policy.duplicate(true),"parent":_parent.duplicate(),"probe":_probe.duplicate(),"cache":_cache.duplicate(),"lat_cells":_lat_cells,"lon_cells":_lon_cells,"configured_ok":configured_ok}
+	for field in ["radius","seed_value","latitude","longitude","pad_latitude","pad_longitude","selected_site_id"]:result[field]=get(field)
+	result.city_profiles=city_profiles.duplicate(true);result.source_site_coordinates=source_site_coordinates.duplicate(true)
+	_mutex.unlock();return result
+
+static func from_worker_state(snapshot:Dictionary)->RefCounted:
+	if snapshot.get("revision")!=REVISION_NAME or snapshot.get("configured_ok")!=true or not snapshot.get("source_record") is PackedByteArray or not supported_model(snapshot.source_record) or not snapshot.get("source_policy") is Dictionary or not snapshot.get("parent") is PackedByteArray or snapshot.parent.size()!=SourceKernel.OBJECT_BYTES or not snapshot.get("probe") is PackedByteArray or snapshot.probe.size()!=SourceKernel.OBJECT_BYTES or not snapshot.get("cache") is Dictionary or snapshot.cache.size()>CACHE_LIMIT:return null
+	if snapshot.source_policy!=geometry_metadata(snapshot.source_record) or not snapshot.get("city_profiles") is Dictionary or not snapshot.get("source_site_coordinates") is Dictionary:return null
+	if not snapshot.get("seed_value") is int or not snapshot.get("selected_site_id") is String:return null
+	for field in ["radius","latitude","longitude","pad_latitude","pad_longitude"]:
+		if not (snapshot.get(field) is float or snapshot.get(field) is int) or not is_finite(float(snapshot[field])):return null
+	if float(snapshot.radius)!=float(snapshot.source_policy.reference_radius_m) or absf(float(snapshot.latitude))>PI*0.5 or int(snapshot.get("lat_cells",0))!=maxi(2,ceili(PI*float(snapshot.radius)/CELL_METRES)) or int(snapshot.get("lon_cells",0))!=maxi(4,ceili(TAU*float(snapshot.radius)/CELL_METRES)):return null
+	var result:RefCounted=load("res://scripts/source_surface_terrain.gd").new()
+	result.source_record=snapshot.source_record.duplicate();result.source_model_index=int(snapshot.source_record.decode_u16(12));result.source_policy=snapshot.source_policy.duplicate(true)
+	result._parent=snapshot.parent.duplicate();result._probe=snapshot.probe.duplicate();result._lat_cells=int(snapshot.lat_cells);result._lon_cells=int(snapshot.lon_cells)
+	for field in ["radius","seed_value","latitude","longitude","pad_latitude","pad_longitude","selected_site_id"]:result.set(field,snapshot[field])
+	result.city_profiles=snapshot.city_profiles.duplicate(true);result.source_site_coordinates=snapshot.source_site_coordinates.duplicate(true);result.configured_ok=true
+	if not result._kernel.point_kernel.kernel._load_resources():return null
+	var patch:={"revision":REVISION_NAME,"record_hex":result.source_record.hex_encode(),"cell_metres":CELL_METRES,"height_policy":SAMPLE_POLICY,"source_policy":result.source_policy.duplicate(true),"nodes":snapshot.cache.duplicate()}
+	if not result.install_patch(patch):return null
+	return result
 
 func _node_key(x:int,y:int)->String:
 	return str(0 if y==0 or y==_lat_cells else posmod(x,_lon_cells))+":"+str(y)
@@ -270,6 +350,11 @@ func prepare_patch(center_lat:float,center_lon:float,width_m:float,step_m:float=
 	_mutex.unlock();return result
 
 func install_patch(patch:Dictionary)->bool:
+	_mutex.lock()
+	var result:=_install_patch_locked(patch)
+	_mutex.unlock();return result
+
+func _install_patch_locked(patch:Dictionary)->bool:
 	# Validate the whole incoming cache before replacing anything.
 	if not configured_ok or patch.get("revision")!=REVISION_NAME or patch.get("record_hex")!=source_record.hex_encode() or patch.get("height_policy")!=SAMPLE_POLICY or patch.get("cell_metres")!=CELL_METRES or patch.get("source_policy")!=source_policy:return false
 	var nodes:Variant=patch.get("nodes")
@@ -282,5 +367,5 @@ func install_patch(patch:Dictionary)->bool:
 		var x:=int(coordinates_key[0]);var y:=int(coordinates_key[1])
 		if x<0 or x>=_lon_cells or y<0 or y>_lat_cells or key!=_node_key(x,y):return false
 		prepared[key]=float(nodes[key]);order.append(key)
-	_mutex.lock();_cache=prepared;_cache_order=order;_generation+=1;_mutex.unlock()
+	_cache=prepared;_cache_order=order;_generation+=1
 	return true

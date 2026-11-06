@@ -4,6 +4,12 @@ render_mode unshaded;
 // are not inferred from this artwork. Coverage pairs with the near terrain.
 uniform float view_coverage : hint_range(0.0, 1.0) = 1.0;
 uniform bool coverage_invert = false;
+// Native v4 only: the detailed source terrain owns this angular neighbourhood.
+// Defaults preserve every legacy material and its original opaque globe path.
+uniform bool source_surface_cap_enabled = false;
+uniform vec3 source_surface_cap_direction_world = vec3(0.0,1.0,0.0);
+uniform float source_surface_cap_cosine = 1.0;
+uniform float source_surface_cap_coverage : hint_range(0.0, 1.0) = 1.0;
 uniform vec3 ocean : source_color = vec3(0.015,0.09,0.23);
 uniform vec3 land : source_color = vec3(0.12,0.28,0.19);
 uniform vec3 sun_direction_world = vec3(0.0,1.0,0.0);
@@ -169,6 +175,18 @@ void fragment() {
    }
   }
   col*=vec3(0.014,0.02,0.027)*material_ao+vec3(1.27,1.21,1.10)*surface_diffuse;
+ }
+ // Native local cap: retain the original vertex / geography / light blocks.
+ // The relative world-space position works for both the ready source mesh and
+ // its temporary SphereMesh, without UV assumptions or extra texture samples.
+ if(source_surface_cap_enabled) {
+  vec3 cap_world_position=(INV_VIEW_MATRIX*vec4(VERTEX,1.0)).xyz;
+  vec3 cap_radial=normalize(cap_world_position-NODE_POSITION_WORLD);
+  if(dot(cap_radial,source_surface_cap_direction_world)>=source_surface_cap_cosine) {
+   float cap_coverage=clamp(source_surface_cap_coverage,0.0,1.0);
+   float cap_threshold=view_dither_threshold(FRAGCOORD.xy);
+   if(cap_coverage<=0.0 || cap_threshold<1.0-cap_coverage) discard;
+  }
  }
  if(view_coverage<1.0) {
   float coverage=clamp(view_coverage,0.0,1.0);

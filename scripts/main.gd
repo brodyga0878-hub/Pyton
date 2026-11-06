@@ -21,6 +21,9 @@ const ActionButton=preload("res://scripts/touch_action_button.gd")
 const FlightConsole=preload("res://scripts/flight_console.gd")
 const ShipView=preload("res://scripts/ship_visual.gd")
 const StationView=preload("res://scripts/station_visual.gd")
+const SourceStationView=preload("res://scripts/source_station_visual.gd")
+const StationSession=preload("res://scripts/source_station_session.gd")
+const SourceTerrain=preload("res://scripts/source_surface_terrain.gd")
 const SpaceEnvironment=preload("res://scripts/space_environment.gd")
 const FlightTheme=preload("res://scripts/flight_theme.gd")
 const FlightReticle=preload("res://scripts/flight_reticle.gd")
@@ -46,6 +49,8 @@ var celestial:Node3D
 var ground_view:Node3D
 var city_view:Node3D
 var station:Node3D
+var source_station:Node3D
+var source_station_key:=""
 var player:Node3D
 var stars:MultiMeshInstance3D
 var space_environment:Node3D
@@ -83,6 +88,8 @@ var save_timer:=0.0
 var hud_timer:=0.0
 var notice_timer:=0.0
 var worker:Thread
+var hatch_worker:Thread
+var hatch_owner:RefCounted
 var presentation_key:=""
 var last_external:=false
 var graphics_return:Dictionary={}
@@ -104,7 +111,7 @@ func _ready()->void:
 	diagnostics=Diagnostics.new();add_child(diagnostics)
 	if not automated:diagnostics.initialize(BuildInfo.VERSION)
 	report_export=ReportExport.new();add_child(report_export);report_export.completed.connect(_report_export_completed)
-	settings.load_file();_new_models();_build_world();_build_ui();_apply_settings()
+	settings.load_file();_new_models(World.PORT_LAYOUT if automated else World.FULL_LAYOUT);_build_world();_build_ui();_apply_settings()
 	if not automated:_load_game()
 	_apply_system();_refresh_hud()
 	if notice_timer<=0:_announce("Стик — поворот. Справа — скорость. «Авто» помогает подойти к станции.")
@@ -112,8 +119,11 @@ func _ready()->void:
 	_safe_area()
 	if "--rebuild-smoke" in OS.get_cmdline_user_args():call_deferred("_run_smoke")
 
-func _new_models()->void:
-	ship=Flight.new();nav=NavigationData.new();world=World.new();world.configure(nav.current(),World.PORT_LAYOUT);surface=Surface.new();near.clear()
+func _new_models(layout:String=World.PORT_LAYOUT)->void:
+	ship=Flight.new();nav=NavigationData.new()
+	if layout==World.FULL_LAYOUT and not nav.configure_native():push_error("Original galaxy could not be initialized")
+	world=World.new();world.configure(nav.current(),layout);surface=Surface.new();near.clear()
+	StationSession.configure_flight(ship,world,nav)
 
 func _build_world()->void:
 	environment=WorldEnvironment.new();environment.environment=Environment.new()
@@ -128,6 +138,7 @@ func _build_world()->void:
 	city_view=CityView.new();add_child(city_view);city_view.hide()
 	player=ShipView.new();add_child(player);player.set_quality(settings.quality);player.configure(ship.profile())
 	station=StationView.new();add_child(station);station.configure(settings.quality)
+	source_station=SourceStationView.new();add_child(source_station);source_station.hide()
 	space_environment=SpaceEnvironment.new();add_child(space_environment);space_environment.hide()
 	stars=MultiMeshInstance3D.new();var star_mesh:=SphereMesh.new();star_mesh.radius=22;star_mesh.height=44;star_mesh.radial_segments=4;star_mesh.rings=2
 	var star_material:=StandardMaterial3D.new();star_material.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED;star_material.vertex_color_use_as_albedo=true;star_mesh.material=star_material
@@ -232,6 +243,7 @@ func _tick(dt:float,steering:Vector2,roll:float,lift:=0.0)->void:
 		nav.elapsed_days+=dt/86400.0
 		if surface.active:
 			var frame:int=surface.frame_index;var was_landed:bool=surface.landed
+			surface.set_source_time(nav.elapsed_days)
 			surface.step(dt,ship,steering,roll,lift)
 			if frame!=surface.frame_index:
 				camera.position=surface.rebase_to+surface.frame_rotation*(camera.position-surface.rebase_from)
@@ -240,6 +252,11 @@ func _tick(dt:float,steering:Vector2,roll:float,lift:=0.0)->void:
 			if surface.landed and not was_landed:_save_game()
 			if not surface.message.is_empty():_announce(surface.message);surface.message=""
 		else:
+			if world.layout_mode==World.FULL_LAYOUT:
+				var context:=StationSession.refresh(ship,world,nav,dt)
+				if not context.ok:ship.brake();_announce("Не удалось подготовить станцию. Сохраните отчёт об ошибке.");return
+				if ship.docked and world.station_launch_ready():
+					ship.launch();world.finish_station_launch(not ship.docked)
 			ship.step(dt,steering,roll,world.gravity_at(ship.position,nav.elapsed_days) if settings.orbital_gravity else Vector3.ZERO,lift)
 			if world.protect_surface(ship,nav.elapsed_days):_announce(world.message)
 	if not ship.last_notice.is_empty():_announce(ship.last_notice);ship.last_notice=""
@@ -260,6 +277,7 @@ func _update_flight_controls()->void:
 func _process(dt:float)->void:
 	_update_flight_controls()
 	if not active:return
+	_pump_underground_geometry()
 	var blocked:=_blocked()
 	if not busy:_sync_scene()
 	player.position=ship.position;player.quaternion=ship.attitude;player.visible=ship.external_view
@@ -290,20 +308,56 @@ func _flight_diagnostic_sample()->Dictionary:
 	if ship==null or nav==null or world==null or surface==null:return {}
 	return {"ship_id":ship.ship_id,"position":[ship.position.x,ship.position.y,ship.position.z],"velocity":[ship.velocity.x,ship.velocity.y,ship.velocity.z],"target_speed":ship.target_speed,"hull":ship.hull,"docked":ship.docked,"autopilot":ship.autopilot,"system_id":nav.current_id,"focus_id":world.focus_id,"site_id":world.site_id,"jump_remaining":nav.remaining,"transfer_remaining":world.transfer_remaining,"surface":surface.active,"landed":surface.landed,"flight_phase":surface.flight_phase,"surface_motion":{"landing":surface.landing,"taking_off":surface.taking_off,"altitude_m":surface.altitude(ship) if surface.active else 0.0,"pad_distance_m":surface.pad_distance(ship) if surface.active else 0.0},"controls":_input_diagnostic_state()}
 func _diagnostic_context()->Dictionary:
+	var context:=_base_diagnostic_context()
+	if world!=null and world.layout_mode==World.FULL_LAYOUT:
+		context.session["source_station"]=StationSession.diagnostics(ship,world,nav)
+		context.session["source_world_contract"]=world.full_system_state.duplicate(true)
+	return context
+func _base_diagnostic_context()->Dictionary:
 	return {"build":{"version":BuildInfo.VERSION,"code":BuildInfo.VERSION_CODE,"channel":BuildInfo.CHANNEL},"mode":"graphics_preview" if not graphics_return.is_empty() else ("surface" if surface!=null and surface.active else "space"),"flight":_flight_diagnostic_sample(),"last_flight_sample":last_flight_sample,"settings":settings.snapshot(),"session":{"saving_enabled":saving_enabled,"save_generation":saves.sequence,"elapsed_days":nav.elapsed_days if nav!=null else 0,"source_clock":SourceClock.from_elapsed_days(nav.elapsed_days) if nav!=null else {},"source_runtime":world.source_runtime_state.duplicate(true) if world!=null else {},"source_orbit":world.orbit_backend_state.duplicate(true) if world!=null else {},"source_ports":world.port_backend_state.duplicate(true) if world!=null else {},"source_physics":world.source_physics_state.duplicate(true) if world!=null else {},"world_layout":world.layout_mode if world!=null else "","preferred_world_layout":world.preferred_layout() if world!=null else "","source_port_position_au":world.site_position_au(world.site_id,nav.elapsed_days) if world!=null and nav!=null else [],"origin_au":world.origin_au(nav.elapsed_days) if world!=null and nav!=null else []},"display":{"fps":Engine.get_frames_per_second(),"viewport":[get_viewport().get_visible_rect().size.x,get_viewport().get_visible_rect().size.y]}}
 
 func _station_here()->bool:return not surface.active and (world.is_orbital_site() or (world.site_id.is_empty() and world.focus_id==world.default_id and nav.has_station()))
 func _apply_system()->void:
 	ship.original_port=not world.current_site().is_empty();ship.station_available=_station_here()
+	if world.layout_mode==World.FULL_LAYOUT:
+		var context:=StationSession.configure_flight(ship,world,nav)
+		if not context.ok:_announce("Не удалось подготовить исходную станцию. Сохраните отчёт об ошибке.")
+	else:ship.clear_source_station()
 	celestial.configure(world);celestial.set_quality(settings.quality);player.configure(ship.profile())
 	player.set_quality(settings.quality);station.configure(settings.quality);city_view.set_quality(settings.quality)
 	if not graphics_return.is_empty():space_environment.configure(ship.STATION,settings.quality)
 	station.position=ship.STATION;camera.position=ship.position;camera.quaternion=ship.attitude;presentation_key="";_sync_scene()
 
+func _sync_source_station()->void:
+	var visible_source:bool=_station_here() and world.layout_mode==World.FULL_LAYOUT and not near.active
+	source_station.visible=visible_source
+	if not visible_source:return
+	var state:Dictionary=world.source_station_state(nav.elapsed_days)
+	var site:Dictionary=world.current_site()
+	var key:="%s:%s:%d:%d"%[world.source_digest,world.site_id,int(site.get("source_seed",0)),int(state.get("door_u16",0))]
+	if key!=source_station_key:
+		var geometry:Dictionary=world.source_station_geometry(nav.elapsed_days)
+		if not source_station.configure(geometry):source_station.hide();return
+		source_station_key=key
+	source_station.set_quality(settings.quality)
+	source_station.transform=Transform3D(world.source_station_basis(nav.elapsed_days),ship.STATION)
+
+func _pump_underground_geometry()->void:
+	if hatch_worker!=null:
+		if hatch_worker.is_alive():return
+		var bundle:Variant=hatch_worker.wait_to_finish();hatch_worker=null
+		if hatch_owner==surface and surface.active and bundle is Dictionary:
+			surface.publish_underground_geometry(bundle,ship)
+		hatch_owner=null
+	if surface.active and surface.underground!=null and surface.underground.dirty:
+		hatch_owner=surface
+		var controller:RefCounted=surface.underground
+		hatch_worker=Thread.new();hatch_worker.start(func():return controller.prepare_pending())
+
 func _sync_scene()->void:
 	var draw:RefCounted=surface if surface.active else null
 	if surface.active:near.clear()
-	elif near.update(surface,ship,world,nav.elapsed_days):draw=near.drawing
+	elif not busy and near.update(surface,ship,world,nav.elapsed_days):draw=near.drawing
 	var preview:bool=near.active;var high:bool=surface.active and surface.globe!=null and surface.extended_flight
 	var layered:bool=preview or high
 	var frame:Transform3D=near.frame if preview else (Near.world_frame(surface.globe,world,nav.elapsed_days) if high else Transform3D.IDENTITY)
@@ -313,8 +367,11 @@ func _sync_scene()->void:
 	position=-ship.position if not surface.active else Vector3.ZERO
 	ground_view.visible=draw!=null;ground_view.transform=near.frame if preview else Transform3D.IDENTITY
 	if not city_view.configure(draw,ground_view.transform,1.0-blend if layered else 1.0):push_error(city_view.last_error)
-	celestial.transform=to_scene;celestial.visible=not surface.active or high;celestial.set_surface_transition(layered,blend if layered else 1.0)
-	station.visible=_station_here() and not preview
+	celestial.transform=to_scene;celestial.visible=not surface.active or high
+	celestial.set_source_ground_patch(draw.globe if layered and draw!=null else null)
+	celestial.set_surface_transition(layered,blend if layered else 1.0)
+	station.visible=_station_here() and not preview and world.layout_mode!=World.FULL_LAYOUT
+	_sync_source_station()
 	planet_fill.visible=not surface.active or high
 	space_environment.visible=station.visible and not graphics_return.is_empty()
 	if space_environment.visible:space_environment.update_view(ship.position)
@@ -333,10 +390,17 @@ func _sync_scene()->void:
 		stars.visible=draw.kind!="earth" or (draw.extended_flight and height>15000)
 	else:camera.far=180000;camera.near=0.5;stars.visible=true
 	if celestial.visible:celestial.update_view(nav.elapsed_days,camera.position)
+	if world.layout_mode==World.FULL_LAYOUT:
+		var light:Dictionary=celestial.source_light(world.focus_id,nav.elapsed_days)
+		if not light.is_empty():
+			var direction:Vector3=light.direction_world
+			if direction.is_finite() and direction.length_squared()>0.5:
+				var up:=Vector3.RIGHT if absf(direction.dot(Vector3.UP))>0.99 else Vector3.UP
+				sunlight.global_basis=Basis.looking_at(-direction,up)
 
 func _refresh_hud()->void:
 	var space_context:String=str(world.by_id[world.focus_id].name)
-	if world.layout_mode==World.PORT_LAYOUT and world.is_orbital_site():space_context=str(world.current_site().name)
+	if world.layout_mode in [World.PORT_LAYOUT,World.FULL_LAYOUT] and world.is_orbital_site():space_context=str(world.current_site().name)
 	var state:="СТЫКОВКА" if ship.docked else ("ПОСАДКА" if surface.landed else ("АВТО" if ship.autopilot or surface.landing or not surface.flight_phase.is_empty() else "ПОЛЁТ"))
 	if ship.hull<=0:state="КОРАБЛЬ ПОТЕРЯН"
 	hud.text="%s · %s · %s"%["Графический полёт" if not graphics_return.is_empty() else nav.current().name,ship.profile().name,state]
@@ -362,6 +426,7 @@ func _brake()->void:
 	if surface.active:surface.landing=false;surface.cancel_vertical()
 	if nav.remaining>0:nav.cancel_jump()
 	if world.transfer_remaining>0:world.cancel_transfer()
+	if world.layout_mode==World.FULL_LAYOUT:world.cancel_station_launch()
 	_announce("Торможение и удержание скорости.")
 func _toggle_auto()->void:
 	if ship.hull<=0:return
@@ -371,7 +436,10 @@ func _toggle_auto()->void:
 		else:surface.begin_landing(ship);_announce(surface.message)
 	elif ship.docked:_show_services()
 	elif not _station_here():_announce("Автоподход доступен у станции. Выберите объект в системе.")
-	else:ship.autopilot=not ship.autopilot;_announce("Автоподход к станции." if ship.autopilot else "Автоподход отменён.")
+	else:
+		ship.autopilot=not ship.autopilot
+		if ship.autopilot and world.layout_mode==World.FULL_LAYOUT and not world.request_station_open(nav.elapsed_days):ship.autopilot=false
+		_announce("Автоподход к станции." if ship.autopilot else "Автоподход отменён.")
 func _begin_departure_action()->bool:
 	if busy:return false
 	_release_inputs()
@@ -395,7 +463,14 @@ func _dock_action()->void:
 		if surface.landed:_takeoff_action();return
 		if not surface.touch_down(ship):surface.begin_landing(ship)
 		_announce(surface.message)
-	elif ship.docked:ship.launch();_announce("Вылет выполнен. Корабль направлен от станции.")
+	elif ship.docked:
+		_release_inputs()
+		if ship.has_source_station() and world.layout_mode==World.FULL_LAYOUT:
+			if not world.request_station_open(nav.elapsed_days,true):_announce("Не удалось запросить открытие стыковочного проёма.");return
+		ship.launch()
+		if world.layout_mode==World.FULL_LAYOUT:world.finish_station_launch(not ship.docked)
+		_announce("Люк закрыт: вылет ожидает открытия." if ship.docked else "Вылет начат. Корабль выходит из ангара.")
+		_save_game()
 	elif ship.dock():_announce("Стыковка выполнена. Службы доступны в меню.");_save_game()
 	else:_announce("Для стыковки: дистанция до 100 м и скорость до 12 м/с. Используйте «Авто».")
 
@@ -413,10 +488,23 @@ func _enter_surface()->void:
 	if busy:return
 	if nav.remaining>0:_announce("Сначала отмените гиперпереход кнопкой «Тормозить».");return
 	if world.transfer_remaining>0:_announce("Сначала отмените автоперелёт кнопкой «Тормозить».");return
+	surface.set_source_time(nav.elapsed_days)
 	if not surface.entry_error(ship,world).is_empty():_announce(surface.entry_error(ship,world));return
 	var site:Dictionary=world.current_site()
 	var entry_ship:RefCounted=ship;var entry_world:RefCounted=world
-	if not site.is_empty() and int(site.get("model_index",-1))>=81 and int(site.get("model_index",-1))<=90:
+	if world.layout_mode==World.FULL_LAYOUT:
+		var snapshot:=Surface.create_entry_snapshot(world,ship,nav.elapsed_days)
+		if snapshot.is_empty():_announce("Не удалось подготовить исходную поверхность.");return
+		busy=true;_release_inputs();_announce("Подготовка поверхности и космопорта…")
+		await get_tree().process_frame
+		worker=Thread.new();worker.start(func():return Surface.prepare_entry(snapshot))
+		while worker.is_alive():await get_tree().process_frame
+		var result:Variant=worker.wait_to_finish();worker=null;busy=false
+		if ship!=entry_ship or world!=entry_world or nav.remaining>0 or world.transfer_remaining>0:return
+		if not result is Dictionary or not result.get("ok",false):_announce("Не удалось подготовить исходный космопорт.");return
+		if not surface.entry_error(ship,world).is_empty():_announce(surface.entry_error(ship,world));return
+		if not surface.install_prepared_entry(result,world,ship):_announce("Условия входа изменились. Повторите команду.");return
+	elif not site.is_empty() and int(site.get("model_index",-1))>=81 and int(site.get("model_index",-1))<=90:
 		var profile:Dictionary=CityProfile.describe(site,float(world.by_id[world.focus_id].radius_km)*1000.0)
 		if profile.is_empty():_announce("Не удалось подготовить посадочную площадку.");return
 		busy=true;_release_inputs();_announce("Подготовка космопорта…")
@@ -513,7 +601,7 @@ func _choose_site(id:String)->void:
 	_announce(world.message)
 func _show_routes()->void:
 	_open_menu("МАРШРУТЫ ВОССТАНОВЛЕННЫХ СИСТЕМ")
-	_menu_text("Здесь доступны 11 восстановленных систем. Это временная схема маршрутов; полная исходная карта галактики ещё не возвращена.")
+	_menu_text("Показаны исходные системы текущего и соседних секторов. Расстояния рассчитаны по исходным координатам; запас топлива и оборудование пока используют упрощённые правила." if nav.is_native() else "Здесь доступны 11 восстановленных систем прежнего режима полёта.")
 	for star in nav.galaxy.all():
 		var id:int=int(star.id);var distance:float=nav.galaxy.distance(nav.current_id,id)
 		_menu_action("%s · %.1f св. лет"%[star.name,distance],func():_start_jump(id))
@@ -531,7 +619,7 @@ func _show_services(save_progress:bool=true)->void:
 	menu_feedback.text=""
 	_open_menu("СЛУЖБЫ СТАНЦИИ",save_progress)
 	dock_services_view=DockServicesView.new()
-	dock_services_view.configure_state(DockServices.service_state(ship,nav))
+	dock_services_view.configure_state(_dock_services_state())
 	dock_services_view.command.connect(_service_command)
 	menu_rows.add_child(dock_services_view)
 func _service_command(action:String,id:String="")->void:
@@ -546,13 +634,17 @@ func _service_command(action:String,id:String="")->void:
 		if result.get("ship_changed",false):_apply_system()
 		if saving_enabled and not _save_game():feedback+=" Текущие изменения пока не удалось сохранить."
 	_record_event("dock_service",{"action":action,"id":id,"accepted":result.ok,"status":result.status})
-	if is_instance_valid(dock_services_view):dock_services_view.configure_state(DockServices.service_state(ship,nav))
+	if is_instance_valid(dock_services_view):dock_services_view.configure_state(_dock_services_state())
 	_refresh_hud();_announce(feedback)
+func _dock_services_state()->Dictionary:
+	var state:Dictionary=DockServices.service_state(ship,nav)
+	if state.get("source_refuel_only",false):state["source_port_name"]=str(world.current_site().get("name","Космопорт"))
+	return state
 func _show_help()->void:
 	_open_menu("УПРАВЛЕНИЕ И СБОРКА")
 	_menu_text("Левый стик меняет направление носа. Правая шкала задаёт скорость. «Тормозить» отменяет автоматический полёт и плавно останавливает корабль. «Авто» ведёт к станции или площадке; после посадки команда «На орбиту» выполняет автоматический вылет. «Взлететь» оставляет управление вам после короткого подъёма. Кнопки подъёма и снижения помогают лететь над землёй. В доке кнопка «Службы» открывает обслуживание.")
 	_menu_text("Клавиатура: стрелки — поворот, W/S — скорость, Q/E — крен, R/F — подъём, пробел — тормоз, A — авто, L — поверхность/орбита, D — стыковка/взлёт, V — вид, Esc — меню.")
-	_menu_text("Сборка %s. Отчёт об ошибке и журналы можно сохранить ZIP-архивом через меню. Осмотрите корабль, планеты и станцию через «Графический полёт». Полёт и данные исходных миров возвращены частично. Новые полёты используют исходные расчёты орбит JJFFE и положения орбитальных портов. Форма станции и стыковочный коридор пока адаптированы. Радиусы, гравитация, карта маршрутов, три лётных профиля и учебная торговля пока используют адаптации. Полная кампания, исходная экономика и ИИ ещё не готовы. Проверка на настоящем телефоне нужна отдельно."%BuildInfo.VERSION)
+	_menu_text("Сборка %s. Через меню можно сохранить ZIP с отчётом об ошибке и журналами. Новый полёт использует исходные сектора, системы, рельеф, орбиты и модели космопортов; прежние сохранения сохраняют свою версию мира. Управление адаптировано для телефона, тяга «Кобры» ограничена проверенным исходным значением. Полный каталог кораблей, оборудование, экономика, кампания и ИИ ещё в разработке. Проверка на настоящем телефоне выполняется отдельно."%BuildInfo.VERSION)
 
 func _show_bug_report()->void:
 	if busy:return
@@ -597,25 +689,31 @@ func _confirm_new_game()->void:
 	_open_menu("НОВЫЙ ПОЛЁТ")
 	_menu_text("Текущий прогресс будет заменён новым полётом. При необходимости сначала сделайте резервную копию.")
 	_menu_action("Сохранить код резервной копии",_show_backup)
-	_menu_action("Начать новый полёт",func():_new_models();saving_enabled=true;_close_menu();_apply_system();_save_game();_announce("Начат новый полёт."))
+	_menu_action("Начать новый полёт",func():_new_models(World.FULL_LAYOUT);saving_enabled=true;_close_menu();_apply_system();_save_game();_announce("Начат новый полёт."))
 
 func _payload()->Dictionary:return {"schema":"starfrontier-rebuild-game-v1","flight":ship.snapshot(),"navigation":nav.snapshot(),"planetary":world.snapshot(),"surface":surface.snapshot()}
 func _decode_state(data:Dictionary)->Dictionary:
 	if data.get("schema")!="starfrontier-rebuild-game-v1":return {}
 	for key in ["flight","navigation","planetary","surface"]:
 		if not data.get(key) is Dictionary:return {}
-	var candidate_ship:=Flight.new();var candidate_nav:=NavigationData.new()
-	if not candidate_ship.restore(data.flight) or not candidate_nav.restore(data.navigation):return {}
+	var candidate_nav:=NavigationData.new()
+	if not candidate_nav.restore(data.navigation):return {}
 	var candidate_world:=World.new();candidate_world.configure(candidate_nav.current())
 	if not candidate_world.restore(data.planetary):return {}
+	var restored:=StationSession.restore_flight(candidate_world,candidate_nav,data.flight)
+	if restored.is_empty():return {}
+	var candidate_ship:RefCounted=restored.ship
 	var candidate_surface:=Surface.new()
+	candidate_surface.set_source_time(candidate_nav.elapsed_days)
 	if not candidate_surface.restore(data.surface,candidate_ship,candidate_world):return {}
 	if candidate_surface.active and (candidate_ship.docked or candidate_nav.remaining>0 or candidate_world.transfer_remaining>0):return {}
 	if candidate_nav.remaining>0 and candidate_world.transfer_remaining>0:return {}
 	if candidate_ship.docked:
 		if candidate_nav.remaining>0 or candidate_world.transfer_remaining>0:return {}
 		if not candidate_world.is_orbital_site() and not (candidate_world.site_id.is_empty() and candidate_world.focus_id==candidate_world.default_id and candidate_nav.has_station()):return {}
-		if candidate_ship.position.distance_to(candidate_ship.STATION)>candidate_ship.DOCK_RADIUS+0.01 or candidate_ship.velocity.length()>0.001 or absf(candidate_ship.target_speed)>0.001:return {}
+		if candidate_ship.has_source_station():
+			if not candidate_ship.source_dock_pose_valid(candidate_ship.position,candidate_ship.velocity,candidate_ship.attitude,candidate_ship.ship_id):return {}
+		elif candidate_ship.position.distance_to(candidate_ship.STATION)>candidate_ship.DOCK_RADIUS+0.01 or candidate_ship.velocity.length()>0.001 or absf(candidate_ship.target_speed)>0.001:return {}
 	return {"ship":candidate_ship,"nav":candidate_nav,"world":candidate_world,"surface":candidate_surface}
 func _commit_state(data:Dictionary)->void:
 	ship=data.ship;nav=data.nav;world=data.world;surface=data.surface;near.clear()
@@ -686,6 +784,8 @@ func _notification(what:int)->void:
 func _exit_tree()->void:
 	if diagnostics!=null:diagnostics.shutdown(true)
 	if worker!=null and worker.is_started():worker.wait_to_finish()
+	if hatch_worker!=null and hatch_worker.is_started():hatch_worker.wait_to_finish()
+	near.finish_preparation()
 
 func _run_smoke()->void:
 	await get_tree().process_frame

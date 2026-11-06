@@ -6,6 +6,7 @@ const TerrainMath=preload("res://scripts/source_terrain_math.gd")
 const FFPMath=preload("res://scripts/ffe_math.gd")
 const MASK:=0xffffffff
 static var resources:Dictionary={}
+static var _resource_mutex:=Mutex.new()
 var depth_control:=0
 var feature_schedule:Array=[]
 var vertex_count:=0
@@ -173,10 +174,14 @@ func _plane_fraction(numerator:int,denominator:int)->int:
 
 func _load_resources()->bool:
 	if not raw_tables.is_empty():return true
+	_resource_mutex.lock()
 	if resources.is_empty():
 		var text:=FileAccess.get_file_as_string("res://data/ffe_terrain_query.json")
-		if text.is_empty():return false
-		resources=JSON.parse_string(text)
+		var parsed:Variant=JSON.parse_string(text)
+		if not parsed is Dictionary or not parsed.get("tables") is Dictionary or not parsed.get("models") is Dictionary or not parsed.get("maps") is Dictionary:
+			_resource_mutex.unlock();return false
+		resources=parsed
+	_resource_mutex.unlock()
 	raw_tables=PackedByteArray();table_offsets.clear();table_symbols.clear();map_bytes.clear()
 	for number in range(7835,7895):
 		var key:=str(number)

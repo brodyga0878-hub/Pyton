@@ -7,6 +7,8 @@ var catalog := Catalog.new()
 const EconomyCatalog = preload("res://scripts/economy_catalog.gd")
 const SourceStation = preload("res://scripts/source_station_geometry.gd")
 const SOURCE_PILOT_PROFILE:="source-bay-phone-pilot-v1"
+const SourceControlProfile=preload("res://scripts/source_ship_control_profile.gd")
+var source_motion_profile:=false # Derived from World v4, never trusted from a save.
 var economy_catalog := EconomyCatalog.new()
 var goods := {"medicines":2,"food":0,"metals":0,"machines":0,"electronics":0,"luxury":0}
 var equipment: Array = []
@@ -158,6 +160,9 @@ func profile() -> Dictionary:
 	return catalog.get_ship(ship_id)
 
 func acceleration() -> float:
+	if source_motion_profile:
+		var native_bound:=SourceControlProfile.acceleration(ship_id)
+		if native_bound>0:return native_bound
 	return float(profile().get("acceleration",0.0))*(1.2 if "engine" in equipment else 1.0)
 
 func cargo_capacity() -> int:
@@ -397,7 +402,7 @@ func restore(data: Dictionary) -> bool:
 	# New reconstruction of the previously missing restore tail.
 	credits=int(data.credits)
 	delivered=bool(data.get("delivered",false))
-	autopilot=false;surface_mode=false;combat_active=false;station_available=true
+	autopilot=false;surface_mode=false;combat_active=false;station_available=true;source_motion_profile=false
 	shots=0;last_notice=""
 	_source_pilot_phase=""
 	return true

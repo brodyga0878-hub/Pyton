@@ -45,8 +45,10 @@ func collision_and_doors()->void:
 		ship=flight(model);ship.position=Ship.STATION+Vector3(100,0,700);ship.velocity=Vector3(0,0,-1000);ship.assisted=false
 		ship.step(1,Vector2.ZERO)
 		check(ship.hull<100 and ship.position.z>Ship.STATION.z and not ship.autopilot,"Continuous source wall collision prevents high-speed tunnelling")
-		ship=flight(model);ship.position=Ship.STATION+Vector3(0,10,0);ship.attitude=Quaternion(Vector3.FORWARD,PI/2)
-		check(not ship._source_shape_sweep(Vector3(0,10,0),Vector3(0,10,0),ship.attitude).is_empty(),"Rolled actual ship ellipsoid does not retain an incorrectly thin station-Y collider")
+		ship=flight(model)
+		var near_ceiling:=Vector3(0,Geometry.prepare(model).dock_bay.end.y-ship.source_collision_radii().x*0.5,0)
+		ship.position=Ship.STATION+near_ceiling;ship.attitude=Quaternion(Vector3.FORWARD,PI/2)
+		check(not ship._source_shape_sweep(near_ceiling,near_ceiling,ship.attitude).is_empty(),"Rolled actual ship ellipsoid intersects each source bay's own ceiling rather than retaining an incorrectly thin station-Y collider")
 		ship=flight(model);ship.position=Ship.STATION;ship.velocity=Vector3.ZERO
 		check(ship.can_dock() and ship.dock(),"Aligned actual interior dock pose is accepted")
 		var closed:=Geometry.prepare(model,0,65535)

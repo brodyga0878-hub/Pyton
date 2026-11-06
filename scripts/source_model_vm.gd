@@ -4,9 +4,13 @@ extends RefCounted
 const Vertices=preload("res://scripts/source_model_vertices.gd")
 const Ground=preload("res://scripts/ground_coordinates.gd")
 static var assets:Dictionary={}
+static var _assets_mutex:=Mutex.new()
 static var _underground_assets:Dictionary={}
 static var _underground_checked:=false
 static var _underground_mutex:=Mutex.new()
+static var _special_station_assets:Dictionary={}
+static var _special_station_checked:=false
+static var _special_station_mutex:=Mutex.new()
 var error:=""
 static func s16(value:int)->int:
 	var n:=value&65535
@@ -90,8 +94,16 @@ static func material_base(code:int,local_rgb4:Array)->Dictionary:
 		for k in range(3):rgb[k]=(int(rgb[k])+int(local_rgb4[k]))&255
 	return {"rgb4_base":rgb,"texture_index":texture,"textured":bool(code>>14),"unlit":bool(code&0x2000),"local_colour":bool(code&0x1000),"source_lighting_applied":false}
 static func model(index:int)->Dictionary:
-	if assets.is_empty():assets=JSON.parse_string(FileAccess.get_file_as_string("res://data/ffe_world_models.json")).models
-	if assets.has(str(index)):return assets[str(index)]
+	# Main scene preparation and the global-height worker can arrive together.
+	# Publish the base dictionary once and retain the selected record while
+	# holding the lock; replacing it during a concurrent lookup is unsafe.
+	_assets_mutex.lock()
+	if assets.is_empty():
+		var parsed:Variant=JSON.parse_string(FileAccess.get_file_as_string("res://data/ffe_world_models.json"))
+		if parsed is Dictionary and parsed.get("models") is Dictionary:assets=parsed.models
+	var base:Dictionary=assets.get(str(index),{})
+	_assets_mutex.unlock()
+	if not base.is_empty():return base
 	# The original model96 closure is an optional append-only resource. Existing
 	# open-city/station assets keep their exact records and lookup precedence.
 	if not _underground_checked:
@@ -103,4 +115,17 @@ static func model(index:int)->Dictionary:
 				if parsed is Dictionary and parsed.get("schema")==1 and parsed.get("source_sha256")=="d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72" and parsed.get("models") is Dictionary:_underground_assets=parsed.models
 			_underground_checked=true
 		_underground_mutex.unlock()
-	return _underground_assets.get(str(index),{})
+	var underground:Dictionary=_underground_assets.get(str(index),{})
+	if not underground.is_empty():return underground
+	# Publish the special F892 port69 closure under a lock, independently from
+	# existing asset dictionaries. Base and model96 records keep precedence.
+	_special_station_mutex.lock()
+	if not _special_station_checked:
+		var path:="res://data/ffe_special_station_models.json"
+		if FileAccess.file_exists(path):
+			var parsed:Variant=JSON.parse_string(FileAccess.get_file_as_string(path))
+			if parsed is Dictionary and parsed.get("schema")==1 and parsed.get("source_sha256")=="d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72" and parsed.get("models") is Dictionary:_special_station_assets=parsed.models
+		_special_station_checked=true
+	var special:Dictionary=_special_station_assets.get(str(index),{})
+	_special_station_mutex.unlock()
+	return special

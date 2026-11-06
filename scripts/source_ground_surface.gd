@@ -10,6 +10,7 @@ const SOURCE_VARIANT:="jjffe-7e54034-ground-surface"
 const OBJECT_BYTES:=338
 const MASK:=0xffffffff
 static var collision_resources:Dictionary={}
+static var _resource_mutex:=Mutex.new()
 var point_kernel:=Point.new()
 
 static func _s32(value:int)->int:return Ground.signed32(value)
@@ -19,17 +20,20 @@ static func _u32(value:Variant)->bool:
 	return (value is int or value is float) and is_finite(float(value)) and value>=0 and value<=MASK and float(value)==floorf(float(value))
 
 static func _load_collision_resources()->bool:
-	if not collision_resources.is_empty():return true
-	if not FileAccess.file_exists("res://data/ffe_ground_collision.json"):return false
-	var parsed:Variant=JSON.parse_string(FileAccess.get_file_as_string("res://data/ffe_ground_collision.json"))
-	if not parsed is Dictionary or parsed.get("schema")!=1 or parsed.get("source_sha256")!="d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72" or not parsed.get("models") is Dictionary:return false
-	collision_resources=parsed
-	return true
+	_resource_mutex.lock()
+	if collision_resources.is_empty():
+		var parsed:Variant=JSON.parse_string(FileAccess.get_file_as_string("res://data/ffe_ground_collision.json"))
+		if not parsed is Dictionary or parsed.get("schema")!=1 or parsed.get("source_sha256")!="d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72" or not parsed.get("models") is Dictionary:
+			_resource_mutex.unlock();return false
+		collision_resources=parsed
+	_resource_mutex.unlock();return true
 
 static func model_resources(model_index:int)->Dictionary:
 	if not _load_collision_resources():return {}
+	_resource_mutex.lock()
 	var model:Variant=collision_resources.models.get(str(model_index))
-	return model.duplicate(true) if model is Dictionary else {}
+	var result:Dictionary=model.duplicate(true) if model is Dictionary else {}
+	_resource_mutex.unlock();return result
 
 static func initialize_model(initial:PackedByteArray,model_index:int,tick_u32:Variant=0,day_u32:Variant=0)->Dictionary:
 	# Actual F1533's in-place branch for these descriptors, all of which have

@@ -545,7 +545,9 @@ func actual_main()->void:
 	for control in game.menu_rows.get_children():
 		if control is Button and control.text=="Начать новый полёт":control.pressed.emit();activated=true;break
 	game.saving_enabled=false
-	check(activated and game.world.layout_mode==World.PORT_LAYOUT and game.nav.current_id==Galaxy.SOL_ID,"Actual new-game menu starts a fresh native-family flight")
+	check(activated and game.world.layout_mode==World.FULL_LAYOUT and game.nav.is_native() and game.nav.current_id==Galaxy.SOL_ID,"Actual new-game menu starts the complete source-world family")
+	# Remaining controls below deliberately exercise historical adapter saves.
+	game._new_models();game._apply_system()
 	var old_world:=World.new();old_world.configure(game.nav.current());var old_payload:=json_copy(game._payload());old_payload.planetary=old_world.snapshot()
 	var old_loaded:Dictionary=game._decode_state(old_payload)
 	check(not old_loaded.is_empty(),"Actual complete decoder still accepts an old unmodified v1 world save")

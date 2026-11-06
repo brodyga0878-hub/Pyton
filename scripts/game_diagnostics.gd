@@ -112,17 +112,17 @@ func _safe_value(value:Variant,depth:int)->Variant:
 	if value is Dictionary:
 		var result:Dictionary={};var count:=0
 		for key in value:
-			if not key is String:continue
-			var lowered:String=key.to_lower()
+			if not (key is String or key is StringName):continue
+			var lowered:String=str(key).to_lower()
 			if lowered in OMIT_KEYS or lowered.ends_with("_token") or lowered.ends_with("_password"):continue
-			result[_clean(key,80)]=_safe_value(value[key],depth+1);count+=1
+			result[_clean(str(key),80)]=_safe_value(value[key],depth+1);count+=1
 			if count>=80:break
 		return result
 	if value is Array:
 		var result:Array=[]
 		for index in range(mini(value.size(),64)):result.append(_safe_value(value[index],depth+1))
 		return result
-	if value is String:return _clean(value,4000)
+	if value is String or value is StringName:return _clean(str(value),4000)
 	if value is float:return value if is_finite(value) else "[non-finite]"
 	if value is int or value is bool or value==null:return value
 	if value is Vector2:return _safe_value([value.x,value.y],depth+1)
@@ -133,13 +133,13 @@ func _json_safe(value:Variant,depth:=0)->bool:
 	if depth>24:return false
 	if value is Dictionary:
 		for key in value:
-			if not key is String or not _json_safe(value[key],depth+1):return false
+			if not (key is String or key is StringName) or not _json_safe(value[key],depth+1):return false
 		return true
 	if value is Array:
 		for item in value:
 			if not _json_safe(item,depth+1):return false
 		return true
-	return value==null or value is String or value is int or value is bool or (value is float and is_finite(value))
+	return value==null or value is String or value is StringName or value is int or value is bool or (value is float and is_finite(value))
 
 func _utf8_clean(bytes:PackedByteArray)->String:
 	# Replace invalid sequences before String decoding, which otherwise logs

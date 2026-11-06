@@ -1,5 +1,5 @@
 extends Node3D
-# Authored PBR finish on original station72/73/80 triangles. Model axes and
+# Authored PBR finish on original station69/72-through80 triangles. Model axes and
 # colours are preserved; no replacement torus/cube station is constructed.
 const Geometry=preload("res://scripts/source_station_geometry.gd")
 const SourceAppearance=preload("res://scripts/source_model_visual.gd")

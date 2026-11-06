@@ -76,6 +76,20 @@ func _render()->void:
 	add_child(summary);labels["summary"]=summary
 	var capacity:=_label("Груз: %d/%d т · Гипертопливо: %d/%d"%[int(_number(_state,"cargo_used")),int(_number(_state,"cargo_capacity")),int(_number(_state,"fuel")),int(_number(_state,"fuel_capacity"))])
 	add_child(capacity);labels["capacity"]=capacity
+	if _state.get("native_services_unavailable") is bool and _state.native_services_unavailable:
+		var unavailable:=_label(_text(_state,"context_error","Для заправки выберите космопорт и выполните стыковку."))
+		add_child(unavailable);labels["unavailable"]=unavailable;return
+	if _state.get("source_refuel_only") is bool and _state.source_refuel_only and _state.get("original_port",false)==true:
+		var role:=_label("%s · ЗАПРАВКА КОСМОПОРТА"%_text(_state,"source_port_name","Выбранный космопорт"),23)
+		role.add_theme_color_override("font_color",Color("efb45e"));add_child(role);labels["role"]=role;labels["port_name"]=role
+		if _state.get("docked",false)!=true or hull<=0:
+			var unavailable:=_label("Для заправки сначала выполните стыковку." if hull>0 else "Корабль потерян: обслуживание недоступно.")
+			add_child(unavailable);labels["unavailable"]=unavailable;return
+		_section("ГИПЕРТОПЛИВО")
+		var service_row:=HBoxContainer.new();add_child(service_row)
+		var refuel:Dictionary=_state.get("refuel",{}) if _state.get("refuel") is Dictionary else {}
+		_service(service_row,"refuel","Заправить гипердвигатель\n%d кр."%int(_number(refuel,"price")),refuel.get("can_refuel",false)==true,_text(refuel,"reason"))
+		return
 	if _state.get("original_port",false)==true:
 		var unavailable:=_label("Службы этого космопорта пока недоступны. Учебный рынок находится у тренировочного орбитального узла.")
 		add_child(unavailable);labels["unavailable"]=unavailable;return

@@ -2,6 +2,7 @@ extends RefCounted
 # Source body-frame port positions: F874 -> F1674 row 1 -> F879/F880.
 # Parent spin, orbital motion and the original terrain remain separate work.
 static var sine_quarter:Array=[]
+static var _sine_mutex:=Mutex.new()
 
 static func signed32(value:int)->int:
 	var low:=value&0xffffffff
@@ -24,6 +25,7 @@ static func from_record(phase:int,inclination:int)->Dictionary:
 	return fields(phase,inclination,"ffe_packed_record")
 
 static func sin_q31(angle:int)->int:
+	_sine_mutex.lock()
 	if sine_quarter.is_empty():
 		sine_quarter=JSON.parse_string(FileAccess.get_file_as_string("res://data/ffe_ground_coordinates.json")).sin_quarter_q31
 	var index:=angle&0x3fff
@@ -31,6 +33,7 @@ static func sin_q31(angle:int)->int:
 	# Original Sin32 mirrors at 16383, not the ideal quarter-turn endpoint.
 	if quadrant&1:index=0x3fff-index
 	var value:=int(sine_quarter[index])
+	_sine_mutex.unlock()
 	return -value if quadrant>=2 else value
 
 static func multiply_q31(first:int,second:int)->int:
