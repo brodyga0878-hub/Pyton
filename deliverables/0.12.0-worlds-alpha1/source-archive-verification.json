@@ -1,0 +1,24 @@
+{
+  "source_commit": "0233a8c012ebf71337afe1395073cd1400e90b9e",
+  "archive_bytes": 27886591,
+  "archive_sha256": "fa171356646d522cac311101e3af38b1919d0e2576eda02b2de880683d17e0cd",
+  "files": 1029,
+  "below_32MiB": true,
+  "zip_crc_verified": true,
+  "all_source_assets_tests_fixtures_and_recovered_history_included": true,
+  "excluded_roots": [
+    "deliverables",
+    "validation",
+    "build",
+    ".godot"
+  ],
+  "signing_keys_or_sdk_included": false,
+  "fresh_isolated_import_passed": true,
+  "isolated_native_startup_checks": 10,
+  "isolated_native_startup_failures": 0,
+  "portability_checks_added_to_canonical_total": false,
+  "canonical_current_checks": 931938,
+  "canonical_current_suites": 85,
+  "import_scope": "Fresh .godot cache created from the exact ZIP in an isolated directory; editor socket requires host execution",
+  "startup_scope": "Actual non-automated Worldv4 startup/save/restore using a private source_full_startup XDG directory; no player progress read/written"
+}

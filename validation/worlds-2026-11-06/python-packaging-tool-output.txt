@@ -1,0 +1,46 @@
+RETAINED TOOL-OUTPUT TRANSCRIPTION — NOT ORIGINAL STDOUT
+
+This file was written after the original execution, from tool output retained
+in this agent's conversation. It is not an original stdout/stderr capture,
+terminal recording, or a new test run. The tests were not rerun to create it.
+
+Original execution date: 2026-11-06 UTC.
+Original execution time of day: not retained; no timestamp is invented.
+Working directory: /workspace/Pyton
+Execution tool: functions.exec -> tools.exec_command
+Retained backend chunk_id: 4f2796
+No persistent process/session ID was returned for this completed command.
+
+Exact command string submitted to exec_command:
+python3 tests/test_android_full_packaging.py; python3 -m py_compile tools/verify_rebuilt_android.py; git diff --check
+
+Retained tool metadata:
+exit_code: 0
+wall_time_seconds: 0.075719799
+original_token_count: 30
+
+Retained tool output (transcribed verbatim):
+..................
+----------------------------------------------------------------------
+Ran 18 tests in 0.105s
+
+OK
+
+Exit-status scope: the tool reported exit_code 0 for the combined shell
+command above. Its three individual exit statuses were not captured
+separately. The unittest runner itself explicitly reported 18 tests and OK;
+py_compile and git diff --check produced no retained output.
+
+Coverage context: these were unit checks of the APK packaging verifier,
+including FULL startup/legacy retention, required compiled modules and exact
+JSON/shader checks, missing/tampered assets, and forbidden development files.
+Their archive input was explicitly a mock archive; this output is not evidence
+that an Android APK was built, signed, executed, or tested on a phone.
+
+Separate actual-APK verification was subsequently performed successfully and
+is recorded in android-verification.json and android-verification.log in this
+directory. Those files, rather than this transcription, contain the actual
+APK SHA-256, signature, ARM64/SDK/alignment and package-content results.
+
+Prepared by agent /root/surface_native_full at the release owner's request.
+Transcription creation time: 2026-11-06 14:31:36 UTC (clock tool reading).

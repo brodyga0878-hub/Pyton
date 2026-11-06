@@ -1,0 +1,190 @@
+{
+  "version": "0.12.0-worlds-alpha1",
+  "version_code": 34,
+  "created_utc": "2026-11-06T14:33:43.538637+00:00",
+  "source_commit": "0233a8c012ebf71337afe1395073cd1400e90b9e",
+  "source_archive_scope": "Exact git archive of the current rebuilt Godot project, all assets/data, native fixtures/tests/tools/docs, recovered-history and recovery evidence; excludes deliverables/validation/build/.godot, SDK and signing keys. Full previous project not found.",
+  "source_archive_files": 1029,
+  "source_archive_below_32MiB": true,
+  "source_archive_crc_verified": true,
+  "source_archive_fresh_import_passed": true,
+  "source_archive_isolated_native_startup_checks": 10,
+  "files": {
+    "README_RU.md": {
+      "bytes": 3687,
+      "sha256": "beede7099c7f5de0faa2c214c1936f44023b33b87d462e69ec3ec7f02a47e569"
+    },
+    "StarFrontier-0.12.0-worlds-arm64.apk": {
+      "bytes": 49623926,
+      "sha256": "b74c18b1a83263e2ed96720e839e6c4f99f15e3e454603e6fa87e387f292c5cc"
+    },
+    "StarFrontier-0.12.0-worlds-source.zip": {
+      "bytes": 27886591,
+      "sha256": "fa171356646d522cac311101e3af38b1919d0e2576eda02b2de880683d17e0cd"
+    },
+    "android-verification.json": {
+      "bytes": 79351,
+      "sha256": "e0de81915338094975b6486b2a9989b03c2ce467e9a1645a536ef5737c1ccb9a"
+    },
+    "python-packaging-tool-output.txt": {
+      "bytes": 2138,
+      "sha256": "a67a01b15f670ef70694ba4c6f6a81df96e3dc31469a37ef6b3927425653d4a1"
+    },
+    "render.log": {
+      "bytes": 444,
+      "sha256": "507b500cf60d0da54545fc20e8a0fa6a2efada1e20ea3648d596d07146574773"
+    },
+    "screenshots/01-original-orbital-station.png": {
+      "bytes": 235516,
+      "sha256": "fcd958bcb5d6200f79532564abc95d857e39fdf16d60403dcfff4101368e9acc"
+    },
+    "screenshots/02-original-ground-city.png": {
+      "bytes": 590527,
+      "sha256": "c4735e25f47bc3b807c2685126dfec12142e9d263d215803fc4b2f59cf67068e"
+    },
+    "screenshots/03-original-underground-hangar.png": {
+      "bytes": 484698,
+      "sha256": "77c619ec68292b87ce76050852e247789bc215d1a1d6853f0571fbf008180b75"
+    },
+    "screenshots/04-cobra-at-native-dock.png": {
+      "bytes": 1277471,
+      "sha256": "4a25a1293edab5882a98e33b581634d94b641c8e36979e8aea9808b36501c7fa"
+    },
+    "screenshots/capture-manifest.json": {
+      "bytes": 2350,
+      "sha256": "310f877831e35bc7cbdbcc49fb9e173360087ab4795cd54ae60b860a97b03567"
+    },
+    "screenshots/visual-review.json": {
+      "bytes": 1456,
+      "sha256": "fe531b54a6ea3cb7d349e373a56342db08d811be250fadbba64fcc1253710a77"
+    },
+    "source-archive-import.log": {
+      "bytes": 22976,
+      "sha256": "fde6e801768f87d876e85377e8f888fd98ab623ecf7b4f6873866159f6ed7f7d"
+    },
+    "source-archive-startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "source-archive-verification.json": {
+      "bytes": 993,
+      "sha256": "9128505e03944e65c45b0b3b7c41281f3b91adc1a78f1efdc4e2d706c69f7de3"
+    },
+    "source-surface-gles-tool-output.txt": {
+      "bytes": 2189,
+      "sha256": "4a97a355ac6aa76708c687c3dee8c0277d73f784ac2fb18de1ef967388e8d7e3"
+    },
+    "source_main_full.log": {
+      "bytes": 510,
+      "sha256": "e47e1fc4afc8edcc9058f87c2e030b49254e297d41a857ce12117fa43d453b7e"
+    },
+    "source_surface_streaming.log": {
+      "bytes": 1192,
+      "sha256": "dc9ef94a9e49e5c6e09653cfc8f23b1bd2cac55ce4f53a9bb5a2bef45cd86858"
+    },
+    "streaming-117-66km.log": {
+      "bytes": 678,
+      "sha256": "a4df09c4414e1191259ee5ce48f0fad7786160b125b106b9b612f862bd173506"
+    },
+    "streaming-earth-66km.log": {
+      "bytes": 669,
+      "sha256": "64c63604825906e97d768495f3ab86e7ffafb5b4d41d4941d6683f5d45a9b995"
+    },
+    "validation-final.json": {
+      "bytes": 90759,
+      "sha256": "7ab280e1dec0be8b46e2e0412fe8c1b75f6bea63ecf9174071a0d2493ad4f917"
+    }
+  },
+  "checks": 931938,
+  "passed_suites": 85,
+  "failures": 0,
+  "validation_status": "passed",
+  "validation_scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "validation_report": "validation-final.json",
+  "android_verification": "android-verification.json",
+  "source_archive_verification": "source-archive-verification.json",
+  "source_layout": "source_jjffe_systems_v4",
+  "legacy_v1_v2_v3_preserved": true,
+  "native_population_valid_headers": 4231,
+  "native_population_records": 50496,
+  "orbital_models": [
+    69,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80
+  ],
+  "underground_model": 96,
+  "source_field_models": [
+    117,
+    118,
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127,
+    128,
+    129,
+    130,
+    131,
+    132,
+    133
+  ],
+  "source_main_checks": 153,
+  "source_contact_checks": 32,
+  "source_streaming_checks": 2378,
+  "long_stress_66km_600m_s": {
+    "117": {
+      "checks": 31890,
+      "failures": 0,
+      "main_native_height_queries": 0
+    },
+    "earth": {
+      "checks": 31784,
+      "failures": 0,
+      "main_native_height_queries": 0
+    }
+  },
+  "separate_stress_and_portability_counts_added_to_canonical_total": false,
+  "python_packaging_unit_tests": 18,
+  "source_compiled_modules_verified": 59,
+  "source_exact_shaders_verified": 2,
+  "source_exact_json_verified": 21,
+  "runtime_material_maps": 51,
+  "fresh_desktop_gles_frames_visually_inspected": 4,
+  "screenshots_are_phone_captures": false,
+  "package": "org.starfrontier.rebuild",
+  "abi": "arm64-v8a",
+  "min_sdk": 24,
+  "target_sdk": 36,
+  "zip_and_elf_alignment_16k": true,
+  "debuggable": false,
+  "forbidden_permissions_absent": true,
+  "test_key_only": true,
+  "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+  "production_signing_key_configured": false,
+  "physical_device_tested": false,
+  "block10_complete": true,
+  "next_major_block": 9,
+  "block9_implementation_started": false,
+  "remaining_major_blocks": [
+    9,
+    11,
+    12,
+    13,
+    14
+  ],
+  "complete_original_physics": false,
+  "full_original_port_complete": false,
+  "reference_visual_quality_achieved": false,
+  "publication_ready": false
+}
