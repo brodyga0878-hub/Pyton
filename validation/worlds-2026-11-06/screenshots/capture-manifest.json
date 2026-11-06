@@ -1,0 +1,98 @@
+[
+	{
+		"actual_scene": "scenes/main.tscn",
+		"composited": false,
+		"file": "01-original-orbital-station.png",
+		"gameplay_progress_read": false,
+		"gameplay_progress_written": false,
+		"layout": "source_jjffe_systems_v4",
+		"phone_capture": false,
+		"quality": 2,
+		"ship_hull": 100.0,
+		"site_id": "site13",
+		"source_mesh": {
+			"cache_entries": 1,
+			"cache_limit": 4,
+			"error": "",
+			"focus_id": "earth",
+			"job_key": "",
+			"profile": "source-height-global-lod-v1",
+			"status": "ready"
+		},
+		"station_model": 80,
+		"system_id": 44341016,
+		"terrain_revision": ""
+	},
+	{
+		"actual_scene": "scenes/main.tscn",
+		"composited": false,
+		"file": "04-cobra-at-native-dock.png",
+		"gameplay_progress_read": false,
+		"gameplay_progress_written": false,
+		"layout": "source_jjffe_systems_v4",
+		"phone_capture": false,
+		"quality": 2,
+		"ship_hull": 100.0,
+		"site_id": "site13",
+		"source_mesh": {
+			"cache_entries": 1,
+			"cache_limit": 4,
+			"error": "",
+			"focus_id": "earth",
+			"job_key": "",
+			"profile": "source-height-global-lod-v1",
+			"status": "ready"
+		},
+		"station_model": 80,
+		"system_id": 44341016,
+		"terrain_revision": ""
+	},
+	{
+		"actual_scene": "scenes/main.tscn",
+		"composited": false,
+		"file": "02-original-ground-city.png",
+		"gameplay_progress_read": false,
+		"gameplay_progress_written": false,
+		"layout": "source_jjffe_systems_v4",
+		"phone_capture": false,
+		"quality": 2,
+		"ship_hull": 100.0,
+		"site_id": "site10",
+		"source_mesh": {
+			"cache_entries": 1,
+			"cache_limit": 4,
+			"error": "",
+			"focus_id": "earth",
+			"job_key": "",
+			"profile": "source-height-global-lod-v1",
+			"status": "ready"
+		},
+		"station_model": 84,
+		"system_id": 44341016,
+		"terrain_revision": "sphere-source-ground-v4"
+	},
+	{
+		"actual_scene": "scenes/main.tscn",
+		"composited": false,
+		"file": "03-original-underground-hangar.png",
+		"gameplay_progress_read": false,
+		"gameplay_progress_written": false,
+		"layout": "source_jjffe_systems_v4",
+		"phone_capture": false,
+		"quality": 2,
+		"ship_hull": 100.0,
+		"site_id": "site17",
+		"source_mesh": {
+			"cache_entries": 2,
+			"cache_limit": 4,
+			"error": "",
+			"focus_id": "moon",
+			"job_key": "",
+			"profile": "source-height-global-lod-v1",
+			"status": "ready"
+		},
+		"station_model": 96,
+		"system_id": 44341016,
+		"terrain_revision": "sphere-source-ground-v4"
+	}
+]

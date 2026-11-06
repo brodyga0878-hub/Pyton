@@ -224,7 +224,8 @@ func immutable_geometry_reuse(records:Dictionary)->void:
 	check(Session.configure_flight(ship,world,nav).active and world.geometry_reads==2 and ship._source_station.door_u16==1,"Door identity change fetches one new original geometry pack")
 
 func run()->void:
-	if not World.can_instantiate():check(false,"World dependency must compile before session integration controls run");quit(1);return
+	var world_script:Script=World
+	if not world_script.can_instantiate():check(false,"World dependency must compile before session integration controls run");quit(1);return
 	var records:=source_records()
 	legacy_isolation();selected_station(records);invalid_contexts(records);restore_order(records);real_full_world();real_generated_stations();immutable_geometry_reuse(records)
 	print("SOURCE STATION SESSION TESTS: ",checks," checks, ",failures," failures")

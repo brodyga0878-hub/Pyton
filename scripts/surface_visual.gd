@@ -283,7 +283,7 @@ func _source_publish(packet:Dictionary,worker_state:Dictionary,full:bool)->bool:
 		_source_core_material=_source_material.duplicate();_source_core_material.set_shader_parameter("source_clip_core",false)
 		_source_core.add_child(_source_mesh(packet.meshes[0],_source_core_material))
 	_source_core_state=state;_source_region=worker_state;_source_core_offset=packet.get("core_offset",Vector2.ZERO)
-	_source_owner.source_render_state=state
+	_source_owner.publish_source_render_state(state)
 	_source_publish_usec=Time.get_ticks_usec()-started
 	return true
 func _source_publish_far(packet:Dictionary,worker_state:Dictionary)->bool:

@@ -1,0 +1,4 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+{"initial_publication_ms":68.048,"main_native_queries":0,"maximum_configure_ms":26.814,"minimum_cap_margin_rad":0.00851067515788593,"minimum_clearance_m":99.9687504320219,"steps":15936,"stream_model":117,"stream_stats":{"core_offset":"(-1500.0, 0.0)","far_jobs_finished":10,"far_jobs_started":10,"has_geometry":true,"jobs_finished":128,"jobs_started":128,"last_core_duration_usec":582059,"last_core_evictions":1131,"last_core_queries":1131,"last_error":"","last_publication_usec":10491,"pending_core_jobs":0,"pending_far_jobs":0,"pending_jobs":0}}
+SOURCE SURFACE STREAMING TESTS: 31890 checks, 0 failures

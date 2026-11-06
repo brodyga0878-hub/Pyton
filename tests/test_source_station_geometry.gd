@@ -176,7 +176,8 @@ func invalid_inputs()->void:
 	check(not Geometry.approach_clear(data,Vector3(INF,1,1)),"Invalid collision size cannot advertise approach clearance")
 	for row in [[-1,0,0],[65536,0,0],[0,256,0],[0,0,-1],[0,0,4294967296]]:check(Geometry.advance_door(row[0],row[1],row[2]).is_empty(),"Invalid original door state rejected")
 func run()->void:
-	if not World.can_instantiate():check(false,"World dependency must compile before source station geometry integration runs");quit(1);return
+	var world_script:Script=World
+	if not world_script.can_instantiate():check(false,"World dependency must compile before source station geometry integration runs");quit(1);return
 	special_asset_publication();all_root_native_vertices();contact_controls();spin_controls();geometry_controls();await render_controls();invalid_inputs()
 	print("SOURCE STATION TESTS: %d checks, %d failures; original69/72-through80 geometry, native contact/spin, explicit modern CCD/mobile guard"%[checks,failures])
 	quit(1 if failures else 0)

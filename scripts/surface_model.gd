@@ -14,6 +14,9 @@ var source_render_worker_state:Dictionary={}
 var source_render_state:RefCounted
 var render_position:=Vector3.ZERO
 var render_velocity:=Vector3.ZERO
+var _source_render_ship:RefCounted
+var _source_render_clearance:=NAN
+var _render_frame_shift:=Vector3.ZERO
 var gravity_vector:=Vector3.DOWN
 var _source_system:RefCounted
 var _source_days:=0.0
@@ -115,6 +118,23 @@ func has_prepared_entry(system:RefCounted=null,ship:RefCounted=null)->bool:
 	return true if system==null or ship==null else _prepared_entry.get("context")==_entry_context(system,ship)
 func source_surface()->bool:return globe!=null and globe.revision==SourceTerrain.REVISION_NAME
 func source_city()->bool:return globe!=null and globe.revision in [SphereTerrain.CITY_REVISION,SourceTerrain.REVISION_NAME]
+func publish_source_render_state(state:RefCounted)->void:
+	# An exact source-field LOD can have different interpolated triangles after
+	# changing its regional grid. Keep the player's clearance through the
+	# atomic visible/collider handoff, including a saved parked ship.
+	if active and source_surface() and _source_render_ship!=null and state!=null:
+		var point:Vector3=_source_render_ship.position
+		var next:Dictionary=state.height_at(globe,point.x,point.z)
+		var previous:Dictionary=source_render_state.height_at(globe,point.x,point.z) if source_render_state!=null else {}
+		if not next.is_empty():
+			var old_height:=float(previous.height) if not previous.is_empty() else (point.y-clearance(_source_render_ship)-_source_render_clearance)
+			if is_finite(old_height):
+				var correction:=float(next.height)-old_height
+				_source_render_ship.position.y+=correction;render_position=_source_render_ship.position
+				_render_frame_shift+=Vector3.UP*correction
+	source_render_state=state
+func consume_render_frame_shift()->Vector3:
+	var result:=_render_frame_shift;_render_frame_shift=Vector3.ZERO;return result
 func set_source_time(days:float)->bool:
 	if not is_finite(days) or days<0 or days>1e9:return false
 	_source_days=days;return true
@@ -229,6 +249,8 @@ func enter(ship: RefCounted, system: RefCounted, spherical:=false, terrain_revis
 	globe=candidate_globe;frame_index=0;city_data=prepared.data;underground=prepared.get("underground")
 	source_render_packet=prepared.get("render_packet",{});source_render_worker_state=prepared.get("render_worker_state",{});source_render_state=null
 	_source_system=system if source_surface() else null
+	_source_render_ship=ship if source_surface() else null
+	_render_frame_shift=Vector3.ZERO
 	_prepared_entry={}
 	gravity=G*float(body.mass_solar)*SOLAR_MASS/pow(float(body.radius_km)*1000,2)
 	orbit_position=ship.position;orbit_attitude=ship.attitude
@@ -242,6 +264,7 @@ func enter(ship: RefCounted, system: RefCounted, spherical:=false, terrain_revis
 	if not _refresh_gravity(ship):active=false;ship.surface_mode=false;message="Не удалось определить исходную гравитацию.";return false
 	render_position=ship.position
 	render_velocity=ship.velocity
+	_source_render_clearance=altitude(ship) if source_surface() else NAN
 	message="Посадочная зона: %s. «Автопилот» — заход; «Стыковка» — мягкая посадка."%(site_name if not site_name.is_empty() else body.name)
 	return true
 
@@ -346,6 +369,7 @@ func step(dt: float, ship: RefCounted, steering: Vector2, roll: float, lift := 0
 	if globe and radial.length()>REBASE_DISTANCE:recenter(ship)
 	render_position=ship.position
 	render_velocity=ship.velocity
+	_source_render_clearance=altitude(ship) if source_surface() else NAN
 
 func touch_down(ship: RefCounted) -> bool:
 	if not active or landed or ship.hull<=0 or altitude(ship)>3 or ship.velocity.length()>6:return false
@@ -424,6 +448,8 @@ func leave(ship: RefCounted,system:RefCounted=null,days:=0.0) -> bool:
 		ship.position=orbit_position;ship.attitude=orbit_attitude
 	ship.velocity=Vector3.ZERO;ship.target_speed=0;ship.autopilot=false;ship.surface_mode=false
 	active=false;landing=false;taking_off=false;flight_phase="";ready_for_orbit=false
+	_source_render_ship=null;_source_render_clearance=NAN
+	_render_frame_shift=Vector3.ZERO
 	message="Возврат в орбитальную зону."
 	return true
 
@@ -434,6 +460,9 @@ func snapshot() -> Dictionary:
 		state.version=4;state.layout="globe_v1";state.terrain_revision=globe.revision
 		state.latitude=globe.latitude;state.longitude=globe.longitude
 		if underground!=null:state.underground=underground.snapshot()
+		if source_surface() and source_render_state!=null and _source_render_ship!=null and source_render_state.has_method("contact_patch"):
+			var patch:Dictionary=source_render_state.contact_patch(globe,_source_render_ship.position.x,_source_render_ship.position.z)
+			if not patch.is_empty():state.terrain_contact=patch
 	if active and extended_flight:state.version=6;state.flight_phase=flight_phase
 	if not active and not orbit_link.is_empty():state.version=5;state.orbit_link=orbit_link.duplicate(true)
 	return state
@@ -482,7 +511,7 @@ func restore(data: Dictionary, ship: RefCounted, system: RefCounted) -> bool:
 	elif data.landed:return false
 	orbit_link={}
 	extended_flight=false;flight_phase="";ready_for_orbit=false
-	globe=null;city_data={};underground=null;source_render_packet={};source_render_worker_state={};source_render_state=null;_source_system=null;frame_index=0
+	globe=null;city_data={};underground=null;source_render_packet={};source_render_worker_state={};source_render_state=null;_source_system=null;_source_render_ship=null;_source_render_clearance=NAN;frame_index=0
 	site_name=""
 	active=data.active;landed=data.landed;landing=false;body_id=str(data.get("body_id",""))
 	orbit_position=Vector3(data.orbit_position[0],data.orbit_position[1],data.orbit_position[2]);orbit_attitude=rotation.normalized()
@@ -646,6 +675,13 @@ func _restore_globe(data:Dictionary,ship:RefCounted,system:RefCounted,maximum_he
 		candidate.city_data=candidate.underground.data
 	elif candidate.underground!=null:return false
 	candidate.globe.latitude=float(data.latitude);candidate.globe.longitude=float(data.longitude)
+	if data.has("terrain_contact"):
+		if not candidate.source_surface() or not data.terrain_contact is Dictionary:return false
+		var contact_script:Variant=load("res://scripts/source_surface_contact_patch.gd")
+		if contact_script==null:return false
+		var contact:RefCounted=contact_script.new()
+		if not contact.configure(data.terrain_contact,candidate.globe):return false
+		candidate.source_render_state=contact
 	candidate.seed_value=system.system_id^system.focus_id.hash()
 	var site:Dictionary=system.current_site()
 	if not site.is_empty() and int(site.type_code)==35:
@@ -659,8 +695,10 @@ func _restore_globe(data:Dictionary,ship:RefCounted,system:RefCounted,maximum_he
 	orbit_link={}
 	extended_flight=false;flight_phase="";ready_for_orbit=false
 	globe=candidate.globe;seed_value=candidate.seed_value;site_name=candidate.site_name;city_data=candidate.city_data;underground=candidate.underground
-	source_render_packet={};source_render_worker_state={};source_render_state=null
+	source_render_packet={};source_render_worker_state={};source_render_state=candidate.source_render_state
 	_source_system=system if source_surface() else null
+	_source_render_ship=ship if source_surface() else null
+	_render_frame_shift=Vector3.ZERO
 	frame_index=0;active=true;landed=data.landed;landing=false;taking_off=false;body_id=system.focus_id
 	kind=str(system.by_id[body_id].kind)
 	gravity=candidate.gravity;gravity_vector=candidate.gravity_vector
@@ -668,6 +706,7 @@ func _restore_globe(data:Dictionary,ship:RefCounted,system:RefCounted,maximum_he
 	ship.surface_mode=true
 	render_position=ship.position
 	render_velocity=ship.velocity
+	_source_render_clearance=altitude(ship) if source_surface() else NAN
 	return true
 
 func enter_from_orbit(ship:RefCounted,system:RefCounted,days:float)->bool:

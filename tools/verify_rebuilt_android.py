@@ -22,7 +22,7 @@ FULL_SOURCE_MODULES=(
     'source_orbit','source_gravity','source_physics_bridge','source_ship_control_profile',
     'source_ground_surface','source_terrain_query','source_terrain_point','source_terrain_math',
     'source_surface_terrain','source_global_body_mesh','source_ground_pads',
-    'source_surface_render_packet','source_surface_render_state','surface_visual',
+    'source_surface_render_packet','source_surface_render_state','source_surface_contact_patch','surface_visual',
     'source_model_vm','source_model_vertices','source_model_mesh','source_polygon',
     'source_station_geometry','source_station_session','source_station_visual',
     'source_underground_port','source_underground_controller','source_enclosed_city_visual',
@@ -636,6 +636,7 @@ def verify_source_full_runtime(archive,project):
     for name in ['source_surface_render_packet.gd','source_surface_render_state.gd',*FULL_SOURCE_SHADERS]:
         assert 'res://scripts/'+name in text['surface_visual'],'Source terrain streaming helper is disconnected from SurfaceVisual '+name
     assert 'sphere-source-ground-v4' in text['source_surface_render_packet'] and 'source-surface-render-state-v1' in text['source_surface_render_state'],'Streaming publication must retain its explicit source terrain/frame contract'
+    assert 'source_surface_contact_patch.gd' in text['surface_model'] and 'source-surface-contact-triangle-v1' in text['source_surface_contact_patch'],'Saved source contact triangle validator is disconnected from Surface'
     assert 'source_motion_profile=full' in text['source_station_session'] and 'if source_motion_profile:' in source_function(text['flight_model'],'acceleration'),'Source ship controls must be selected by world version'
     assert 'SourceControlProfile.acceleration(ship_id)' in source_function(text['flight_model'],'acceleration'),'Source control profile is disconnected from Flight'
     cobra=next((row for row in tables['ffe_ship_registry']['ships'] if row['index']==38),None)

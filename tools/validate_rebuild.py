@@ -49,6 +49,7 @@ SUITES = [
     Suite('source_surface_streaming', 'tests/test_source_surface_streaming.gd', 'Actual Earth/117 worker mesh publication, coherent core collision and bounded high-speed geographic streaming.', timeout=600),
     Suite('source_render_packet', 'tests/test_source_surface_render_packet.gd', 'Worker-only source height mesh buffers, bounded far LOD and published core geometry.', timeout=600),
     Suite('source_render_state', 'tests/test_source_surface_render_state.gd', 'Exact vertical collision queries against the published source core after geographic rebasing.', timeout=300),
+    Suite('source_surface_contact_patch', 'tests/test_source_surface_contact_patch.gd', 'Saved nonvertex source contact independently verifies all three original triangle vertices before restoring the published physical height.', timeout=300),
     Suite('source_surface_cap', 'tests/test_source_surface_cap.gd', 'Actual source117 coarse globe overlap, opt-in near patch coverage and retained far horizon.', timeout=300),
     Suite('source_high_gravity', 'tests/test_source_high_gravity_surface.gd', 'Actual23m/s² port with source Cobra controls, manual takeoff, clock and ascent saves.', timeout=600),
     Suite('source_orbit_surface_guard', 'tests/test_source_orbit_surface_guard.gd', 'Actual Earth/117 terrain height guards preserve real20km departures without phantom sphere damage.', timeout=600),
@@ -74,7 +75,7 @@ SUITES = [
     Suite('source_ground_surface', 'tests/test_source_ground_surface.gd', 'Actual F879 placement and F574 ground collision against independent original instructions.', timeout=600),
     Suite('source_surface_terrain', 'tests/test_source_surface_terrain.gd', 'Shared native height adapter, all17natural models,21ports and explicit117caller correction.', timeout=600),
     Suite('source_physics_bridge', 'tests/test_source_physics_bridge.gd', 'Sampled F603 acceleration with explicit nominal-day SI unit policy.', timeout=300),
-    Suite('source_station_geometry', 'tests/test_source_station_geometry.gd', 'Actual72/73/80 geometry, source contact/door/spin and swept hull controls.', timeout=600),
+    Suite('source_station_geometry', 'tests/test_source_station_geometry.gd', 'Actual69 and72..80 geometry, source contact/door/spin, special Polaris and swept hull controls.', timeout=600),
     Suite('source_docking_flight', 'tests/test_source_docking_flight.gd', 'Physical source-station docking/launch and opt-in flightv5 restore.', timeout=300),
     Suite('source_underground', 'tests/test_source_underground_port.gd', 'Original96 enclosed hangar, hatch geometry, vertical path and source reservation controls.', timeout=600),
     Suite('native_navigation', 'tests/test_native_navigation.gd', 'Paged original-coordinate navigation with bounded cache and atomicv2 saves.', timeout=300),
@@ -292,8 +293,8 @@ def limitations() -> list[dict]:
         'status': 'unavailable' if not (PROJECT/'tests/fixtures/model_vertices_reference.json').is_file() else 'not_in_this_curated_run',
         'reason': 'The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage.' if (PROJECT/'tests/fixtures/model_vertices_reference.json').is_file() else 'Independent original leaf fixture is unavailable.',
     }]
-    items.append({'scope': 'Full application, Android installation and physical Samsung S23 Ultra', 'status': 'separate_validation',
-                  'reason': 'This runner covers current standalone suites and isolated native terrain controls only.'})
+    items.append({'scope': 'Android installation, on-device rendering and physical Samsung S23 Ultra', 'status': 'separate_validation',
+                  'reason': 'This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence.'})
     return items
 
 

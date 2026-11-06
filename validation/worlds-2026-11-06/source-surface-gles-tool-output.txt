@@ -1,0 +1,33 @@
+PROVENANCE
+This file transcribes successful tool output retained in the agent conversation.
+It was assembled on 2026-11-06 UTC. It is NOT an original redirected stdout log.
+No tests were rerun to create this file. The original successful runs occurred
+in this session on 2026-11-06 UTC; their exact wall-clock start times were not
+recorded. Godot file logging is disabled in project.godot lines33-34.
+Rendering backend: managed Xorg display :97, Godot4.6.3, GLES Compatibility,
+Mesa25.0.7 llvmpipe(LLVM19.1.7,256bits). These results do not establish phone FPS.
+
+SOURCE SURFACE CAP
+Working directory: /workspace/Pyton
+Permission mode: require_escalated (local Xorg socket connection)
+Command:
+DISPLAY=:97 XDG_DATA_HOME=/workspace/rebuild-test-state/data XDG_CACHE_HOME=/workspace/rebuild-test-state/cache XDG_CONFIG_HOME=/workspace/rebuild-test-state/config godot --rendering-method gl_compatibility --audio-driver Dummy --path . --script tests/test_source_surface_cap.gd -- --rebuild-capture
+Tool execution session:33392
+Final output chunk:b4ecec
+Exit code:0
+Retained final stdout:
+CAP GLES PIXELS before=(0.2353, 0.2157, 0.1882, 1.0) after=(0.902, 0.0039, 0.0, 1.0) measured_overshoot_m=10903.4269790874
+SOURCE SURFACE CAP TESTS: 88 checks, 0 failures; native117/Earth, global horizon, default-off legacy shader
+
+SOURCE SURFACE PACKET CLIP
+Working directory: /workspace/Pyton
+Permission mode: require_escalated (local Xorg socket connection)
+Command:
+DISPLAY=:97 XDG_DATA_HOME=/workspace/rebuild-test-state/data XDG_CACHE_HOME=/workspace/rebuild-test-state/cache XDG_CONFIG_HOME=/workspace/rebuild-test-state/config godot --rendering-method gl_compatibility --audio-driver Dummy --path . --script tests/test_source_surface_packet_clip.gd -- --rebuild-capture
+Tool execution session:76248
+Final output chunk:606e09
+Exit code:0
+Retained final stdout:
+NATIVE PACKET OVERDRAW point=(0.0, 1500.0) base_above_fine_m=17.7714205016382 role=ring base_rings=3
+PACKET CLIP GLES before=(0.2706, 0.302, 0.3333, 1.0) after=(0.498, 0.1608, 0.1725, 1.0) raised_m=17.7714205016382
+SOURCE SURFACE PACKET CLIP TESTS: 35 checks, 0 failures; real117nativeheights, coarse/fineframes, outsideedges, transitions

@@ -1,0 +1,37 @@
+{
+  "reviewed_utc": "2026-11-06T14:28:25.243272+00:00",
+  "reviewer": "Release agent visually inspected all four actual images with view_image; parent independently inspected ground/cobra/underground",
+  "renderer": "Godot4.6.3 Compatibility, Mesa llvmpipe on Xorg:97",
+  "actual_main_scene": true,
+  "resolution": [
+    1920,
+    1080
+  ],
+  "composited": false,
+  "phone_capture": false,
+  "reference_visual_quality_achieved": false,
+  "player_progress_accessed": false,
+  "findings": "All four images contain the real Russian mobile HUD and intended native scene; no empty/black capture or missing UI. City fog and current authored ship/native port appearance are visible; reference-quality graphics are not claimed.",
+  "files": {
+    "01-original-orbital-station.png": {
+      "bytes": 235516,
+      "sha256": "fcd958bcb5d6200f79532564abc95d857e39fdf16d60403dcfff4101368e9acc",
+      "source_model": 80
+    },
+    "04-cobra-at-native-dock.png": {
+      "bytes": 1277471,
+      "sha256": "4a25a1293edab5882a98e33b581634d94b641c8e36979e8aea9808b36501c7fa",
+      "source_model": 80
+    },
+    "02-original-ground-city.png": {
+      "bytes": 590527,
+      "sha256": "c4735e25f47bc3b807c2685126dfec12142e9d263d215803fc4b2f59cf67068e",
+      "source_model": 84
+    },
+    "03-original-underground-hangar.png": {
+      "bytes": 484698,
+      "sha256": "77c619ec68292b87ce76050852e247789bc215d1a1d6853f0571fbf008180b75",
+      "source_model": 96
+    }
+  }
+}

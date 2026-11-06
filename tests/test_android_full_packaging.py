@@ -87,9 +87,11 @@ class FullPackagingChecks(unittest.TestCase):
         self.assertFalse(result['complete_original_physics'])
 
     def test_missing_new_kernel_rejects(self):
-        del self.archive.entries['assets/scripts/source_station_session.gdc']
-        with self.assertRaisesRegex(AssertionError,'Missing full source runtime module source_station_session'):
-            verifier.verify_source_full_runtime(self.archive,PROJECT)
+        for name in ['source_station_session','source_surface_render_packet','source_surface_render_state','source_surface_contact_patch']:
+            with self.subTest(module=name):
+                archive=MockArchive();del archive.entries[f'assets/scripts/{name}.gdc']
+                with self.assertRaisesRegex(AssertionError,'Missing full source runtime module '+name):
+                    verifier.verify_source_full_runtime(archive,PROJECT)
 
     def test_invalid_new_compiled_header_rejects(self):
         self.archive.entries['assets/scripts/source_physics_bridge.gdc']=b'wrong-header'+b'x'*100

@@ -280,6 +280,7 @@ func _process(dt:float)->void:
 	_pump_underground_geometry()
 	var blocked:=_blocked()
 	if not busy:_sync_scene()
+	if surface.active:camera.position+=surface.consume_render_frame_shift()
 	player.position=ship.position;player.quaternion=ship.attitude;player.visible=ship.external_view
 	player.set_thrust(0.0 if ship.docked or surface.landed else clampf(maxf(absf(ship.target_speed),ship.velocity.length())/ship.MAX_SPEED,0.04,1.0))
 	player.set_landed(surface.landed)

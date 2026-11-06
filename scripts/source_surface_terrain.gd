@@ -217,11 +217,15 @@ func sample_render_cached(x:float,z:float)->PackedFloat64Array:
 	if _render_cache.has(key):result=_render_cache[key].duplicate()
 	else:
 		result=sample(x,z)
-		_render_cache[key]=result.duplicate();_render_order.append(key)
-		if _render_cache.size()>RENDER_CACHE_LIMIT:
-			_render_cache.erase(_render_order[_render_head]);_render_head+=1
-		if _render_head>RENDER_CACHE_LIMIT:
-			_render_order=_render_order.slice(_render_head);_render_head=0
+		var valid:=true
+		for component in result:
+			if not is_finite(component):valid=false;break
+		if valid:
+			_render_cache[key]=result.duplicate();_render_order.append(key)
+			if _render_cache.size()>RENDER_CACHE_LIMIT:
+				_render_cache.erase(_render_order[_render_head]);_render_head+=1
+			if _render_head>RENDER_CACHE_LIMIT:
+				_render_order=_render_order.slice(_render_head);_render_head=0
 	_render_mutex.unlock();return result
 
 func project(lat:float,lon:float)->Vector2:
@@ -318,7 +322,7 @@ static func from_worker_state(snapshot:Dictionary)->RefCounted:
 	if not result.install_patch(patch):return null
 	if snapshot.get("render_cache") is Dictionary and snapshot.render_cache.size()<=RENDER_CACHE_LIMIT and snapshot.get("render_record") is PackedByteArray:
 		if not snapshot.render_cache.is_empty():
-			if not is_finite(float(snapshot.get("render_latitude",INF))) or not is_finite(float(snapshot.get("render_longitude",INF))) or snapshot.render_record!=snapshot.source_record:return null
+			if not (snapshot.get("render_latitude") is int or snapshot.get("render_latitude") is float) or not (snapshot.get("render_longitude") is int or snapshot.get("render_longitude") is float) or not is_finite(float(snapshot.render_latitude)) or not is_finite(float(snapshot.render_longitude)) or snapshot.render_record!=snapshot.source_record:return null
 			for key:Variant in snapshot.render_cache:
 				var value:Variant=snapshot.render_cache[key]
 				if not key is PackedByteArray or key.size()!=16 or not value is PackedFloat64Array or value.size()!=5:return null

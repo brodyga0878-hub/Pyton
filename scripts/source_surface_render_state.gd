@@ -186,3 +186,13 @@ func height_at(globe:RefCounted,x:float,z:float)->Dictionary:
 	return {}
 
 func stats()->Dictionary:return {"queries":_queries,"last_cells":_last_cells,"last_triangles":_last_triangles,"maximum_cells":_maximum_cells,"cell_budget":core_cells*2+2,"configured_ok":configured_ok,"source_key":source_key}
+
+func contact_patch(globe:RefCounted,x:float,z:float)->Dictionary:
+	var hit:=height_at(globe,x,z)
+	if hit.is_empty():return {}
+	var cell:Vector2i=hit.cell;var which:=int(hit.triangle_index)&1;var a:=cell.y*(core_cells+1)+cell.x
+	var points:Array=[_vertices[a],_vertices[a+1],_vertices[a+core_cells+1]] if which==0 else [_vertices[a+1],_vertices[a+core_cells+2],_vertices[a+core_cells+1]]
+	# Runtime loading avoids a preload cycle: the tiny contact verifier reuses
+	# this module's pure frame arithmetic, never its full rendered packet.
+	var script:Script=load("res://scripts/source_surface_contact_patch.gd")
+	return script.seal_capture(_frame,core_width,core_cells,core_offset,cell,which,points,globe) if script!=null else {}

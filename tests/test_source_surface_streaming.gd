@@ -6,6 +6,12 @@ const Surface=preload("res://scripts/surface_model.gd")
 const Visual=preload("res://scripts/surface_visual.gd")
 var checks:=0
 var failures:=0
+class ShiftedState extends RefCounted:
+ var original:RefCounted
+ func height_at(globe:RefCounted,x:float,z:float)->Dictionary:
+  var result:Dictionary=original.height_at(globe,x,z).duplicate()
+  if not result.is_empty():result.height=float(result.height)+2.0
+  return result
 func check(value:bool,message:String)->void:
  checks+=1
  if not value:
@@ -81,4 +87,38 @@ func review(model:int)->void:
  check(minimum_cap_margin>=-0.00001,"Refreshed actual far context keeps the ship inside the verified celestial cutout")
  if "--stress-long" in OS.get_cmdline_user_args():check(int(view.source_stream_stats().far_jobs_finished)>1,"Continuous sixty-kilometre travel refreshes the far footprint repeatedly")
  print(JSON.stringify({"stream_model":model,"initial_publication_ms":initial_usec/1000.0,"maximum_configure_ms":max_call_usec/1000.0,"steps":steps,"stream_stats":view.source_stream_stats(),"minimum_clearance_m":min_clearance,"minimum_cap_margin_rad":minimum_cap_margin,"main_native_queries":surface.globe.cache_stats().source_samples-source_before.source_samples}))
+ # Synthetic2m handoff isolates the parking/control protocol; source height
+ # values are proved separately above and by the independent native tests.
+ ship.position.y=surface.height_at(ship.position.x,ship.position.z)+surface.clearance(ship)+0.5;ship.velocity=Vector3.ZERO
+ check(surface.touch_down(ship),"Ship parks before a pending geometry handoff")
+ var parked:Dictionary=JSON.parse_string(JSON.stringify(surface.snapshot()))
+ check(parked.get("terrain_contact") is Dictionary,"Parked source save includes only its verified contact triangle")
+ var ship_copy:=Flight.new();check(ship_copy.restore(JSON.parse_string(JSON.stringify(ship.snapshot()))),"Parked ship data restores independently")
+ ship_copy.source_motion_profile=true
+ var restored:=Surface.new();restored.set_source_time(0.0)
+ check(restored.restore(parked,ship_copy,world) and restored.landed,"Nonvertex parked source contact restores before any render packet")
+ if restored.active and parked.has("terrain_contact"):
+  check(absf(restored.altitude(ship_copy)-surface.altitude(ship))<0.1,"Saved triangle reproduces the actual published parked height")
+  var bad:=parked.duplicate(true);bad.terrain_contact.vertices[0][1]+=1.0
+  var before_restore:=restored.snapshot()
+  check(not restored.restore(bad,ship_copy,world) and restored.snapshot()==before_restore,"Tampered contact vertex rejects atomically")
+ surface.consume_render_frame_shift()
+ var old_state:RefCounted=surface.source_render_state;var changed:=ShiftedState.new();changed.original=old_state
+ var before_y:float=ship.position.y;var old_altitude:float=surface.altitude(ship);var old_hull:float=ship.hull;var old_docked:bool=ship.docked
+ var old_world:=var_to_bytes(world.snapshot());var old_velocity:Vector3=ship.velocity
+ surface.publish_source_render_state(changed)
+ check(absf(ship.position.y-before_y-2.0)<0.001 and absf(surface.altitude(ship)-old_altitude)<0.005,"Atomic LOD handoff keeps parked physical clearance")
+ check(surface.landed and not surface.taking_off and ship.hull==old_hull and ship.docked==old_docked and ship.velocity==old_velocity and var_to_bytes(world.snapshot())==old_world,"LOD correction preserves control/hull/time/sourceQ31 state")
+ check(surface.consume_render_frame_shift().distance_to(Vector3.UP*2.0)<0.001 and surface.consume_render_frame_shift()==Vector3.ZERO,"Camera receives exactly one matching frame shift")
+ check(surface.take_off(ship),"Parked ship can take off after geometry publication")
+ surface.step(0.05,ship,Vector2.ZERO,0.0,1.0)
+ check(not surface.landed and ship.velocity.y>0,"Phone lift remains usable after geometry publication")
+ if restored.active and parked.has("terrain_contact"):
+  var first:=ShiftedState.new();first.original=restored.source_render_state
+  var before_altitude:float=restored.altitude(ship_copy)
+  restored.publish_source_render_state(first)
+  check(absf(restored.altitude(ship_copy)-before_altitude)<0.1 and restored.landed,"First cold publication after restore keeps parked clearance")
+  check(restored.take_off(ship_copy),"Restored contact can take off after first cold publication")
+  restored.step(0.05,ship_copy,Vector2.ZERO,0.0,1.0)
+  check(not restored.landed and ship_copy.velocity.y>0,"Restored phone lift is not locked by a pending handoff")
  view.queue_free();await process_frame
