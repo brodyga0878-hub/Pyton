@@ -1,0 +1,49 @@
+{
+  "recorded_utc": "2026-11-06T14:38:34.191267+00:00",
+  "publication_status": "blocked_by_automatic_approval_review; no final release upload occurred",
+  "functional_status": "Block10 accepted; reached block9; block9 implementation not started",
+  "source_commit": "0233a8c012ebf71337afe1395073cd1400e90b9e",
+  "artifact_commit": "3eb5e6061dc99c11c6215f338faef5d2376588c1",
+  "files": {
+    "StarFrontier-0.12.0-worlds-arm64.apk": {
+      "bytes": 49623926,
+      "sha256": "b74c18b1a83263e2ed96720e839e6c4f99f15e3e454603e6fa87e387f292c5cc"
+    },
+    "StarFrontier-0.12.0-worlds-source.zip": {
+      "bytes": 27886591,
+      "sha256": "fa171356646d522cac311101e3af38b1919d0e2576eda02b2de880683d17e0cd"
+    }
+  },
+  "canonical_validation": {
+    "checks": 931938,
+    "passed_suites": 85,
+    "failures": 0
+  },
+  "source_archive": {
+    "zip_crc_verified": true,
+    "files": 1029,
+    "below_32MiB": true,
+    "fresh_isolated_import_passed": true,
+    "isolated_native_startup_checks": 10,
+    "isolated_native_startup_failures": 0
+  },
+  "target_repository": "https://github.com/brodyga0878-hub/Pyton.git",
+  "target_branch": "development/starfrontier-rebuild",
+  "last_verified_remote_commit": "19475aed2534f1c1e6b5bda9b58691e9a35fe09c",
+  "remote_verification_method": "Read-only git ls-remote origin refs/heads/development/starfrontier-rebuild returned the existing published checkpoint; parent separately confirmed the recovery branch.",
+  "automatic_review_reason_summary": "The root review recognized prior permission to save recovered sources to the recovery branch, but treated publishing rebuilt APK/source ZIP/screenshots/validation to the development branch as a wider payload and destination-branch scope requiring explicit user authorization.",
+  "subagent_review_reasons": [
+    "The push exports full source and binary artifacts; specific destination authorization was not established in the subagent review context.",
+    "Prior repository selection and approval were quoted only in assistant context, which the subagent reviewer did not accept as trusted user content."
+  ],
+  "no_further_upload_or_review_attempts_authorized_without_scope_resolution": true,
+  "required_next_authorization_scope": "Explicit user permission to publish the rebuilt APK, portable source ZIP, screenshots, validation reports and manifests to brodyga0878-hub/Pyton on development/starfrontier-rebuild.",
+  "prepared_read_only_https_verifier": "/workspace/recovery/verify_worlds_remote.py",
+  "read_only_https_verifier_executed": false,
+  "immutable_https_links_verified": false,
+  "download_links_available_for_this_release": false,
+  "artifact_files_or_manifest_modified_after_creation": false,
+  "physical_device_tested": false,
+  "production_signing_key_configured": false,
+  "full_original_ffe_complete": false
+}
