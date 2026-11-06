@@ -57,7 +57,7 @@ func identity_and_validation()->void:
 	check(globe.calls==calls,"Published height lookup makes no SourceTerrain/native sampling call")
 	for point in [Vector2(-1250.01,0),Vector2(2750.01,0),Vector2(0,-2500.01),Vector2(0,1500.01),Vector2(INF,0),Vector2(0,NAN)]:check(state.height_at(globe,point.x,point.y).is_empty(),"Outside/nonfinite core query falls back explicitly")
 	var reference:Dictionary=state.height_at(globe,750,-500)
-	for mutation in ["topology","coordinate","domain","revision","record","nan_frame","offset","cells"]:
+	for mutation in ["topology","coordinate","domain","revision","record","nan_frame","offset","cells","typed_domain","typed_role"]:
 		var bad:=packet.duplicate(true)
 		if mutation=="topology":bad.meshes[0].indices[0]=1
 		elif mutation=="coordinate":bad.meshes[0].vertices[0]=bad.meshes[0].vertices[0]+Vector3(1,0,0)
@@ -67,6 +67,8 @@ func identity_and_validation()->void:
 		elif mutation=="nan_frame":bad.frame.latitude=NAN
 		elif mutation=="offset":bad.core_offset=Vector2.ZERO
 		elif mutation=="cells":bad.core_cells=9
+		elif mutation=="typed_domain":bad.frame.record_domain=17
+		elif mutation=="typed_role":bad.meshes[0].role=17
 		check(not state.configure(bad) and state.configured_ok and state.height_at(globe,750,-500)==reference,"Bad replacement preserves live physical/render pair atomically: "+mutation)
 	packet.meshes[0].vertices[40]=Vector3(750,9999,-500)
 	check(state.height_at(globe,750,-500)==reference,"Caller mutation cannot alias state-owned core vertices")
@@ -98,6 +100,16 @@ func rebase_controls()->void:
 		check(not state.height_at(globe,x,z).is_empty(),"Production retained mesh core responds inside stable rebase neighbourhood")
 	var stats:=state.stats()
 	check(globe.calls==calls and stats.maximum_cells<=4 and stats.last_triangles<=8 and stats.cell_budget==130,"Normal512m rebase uses bounded few-cell DDA, never scans8192triangles or samples sourcefield")
+	# Non-power-of-two spacing becomes slightly nonuniform when actually stored
+	# as Float32 vertices; DDA must use those published boundaries too.
+	globe=Globe.new();packet=Packet.prepare(globe,{"core_width":4000.3,"core_cells":7,"far_along":4,"far_radial":1,"include_rings":false,"core_offset":Vector2(813.25,-112.75),"source_key":"rounded-published-grid"});state=State.new()
+	check(state.configure(packet),"Validated rounded seven-cell offset lattice configures")
+	globe.latitude+=600.0/globe.radius;var transform:=state.transform_to(globe)
+	for index in [1,5,9,17,25,32,46,54,62]:
+		var point:Vector3=transform*packet.meshes[0].vertices[index]
+		var actual:=state.height_at(globe,point.x,point.z);var expected:=brute(packet,transform,point.x,point.z)
+		check(actual.is_empty()==expected.is_empty(),"Rounded published grid-line hit has matching exact triangle coverage")
+		if not actual.is_empty():check(absf(float(actual.height)-float(expected.height))<0.001,"Rounded grid DDA follows actual Float32 vertex planes")
 
 func native117_control()->void:
 	var fixture:Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://tests/fixtures/source_ground_surface_native.json"));var record:=PackedByteArray()

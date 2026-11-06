@@ -44,6 +44,14 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_packet_clip', 'tests/test_source_surface_packet_clip.gd', 'Actual117 coarse/fine overlap and packet-shader clip contracts; rendered pixel controls are verified separately.', timeout=300),
+    Suite('source_full_startup', 'tests/test_source_full_startup.gd', 'Actual normal startup selects Worldv4/native navigation and restores a private native save; no player progress access.', timeout=300, user_args=('--source-startup-isolated',)),
+    Suite('source_surface_streaming', 'tests/test_source_surface_streaming.gd', 'Actual Earth/117 worker mesh publication, coherent core collision and bounded high-speed geographic streaming.', timeout=600),
+    Suite('source_render_packet', 'tests/test_source_surface_render_packet.gd', 'Worker-only source height mesh buffers, bounded far LOD and published core geometry.', timeout=600),
+    Suite('source_render_state', 'tests/test_source_surface_render_state.gd', 'Exact vertical collision queries against the published source core after geographic rebasing.', timeout=300),
+    Suite('source_surface_cap', 'tests/test_source_surface_cap.gd', 'Actual source117 coarse globe overlap, opt-in near patch coverage and retained far horizon.', timeout=300),
+    Suite('source_high_gravity', 'tests/test_source_high_gravity_surface.gd', 'Actual23m/s² port with source Cobra controls, manual takeoff, clock and ascent saves.', timeout=600),
+    Suite('source_orbit_surface_guard', 'tests/test_source_orbit_surface_guard.gd', 'Actual Earth/117 terrain height guards preserve real20km departures without phantom sphere damage.', timeout=600),
     Suite('source_generated_worlds', 'tests/test_source_generated_worlds.gd', 'Complete source Worldv4, native body/port frames and explicit original-source caller corrections.', timeout=600),
     Suite('source_galaxy_population', 'tests/test_source_galaxy_population.gd', 'All4231 valid native-header systems through actual runtime construction/catalogue with documented caller corrections.', timeout=600),
     Suite('source_surface_integration', 'tests/test_source_surface_integration.gd', 'Native source terrain/force frame, actual117 and ground-port entry, geography, ascent, load and return.', timeout=600),
@@ -370,6 +378,9 @@ def main():
                     'requested_suites': executed_names,
                     'executed_suites': [name for name in executed_names if results[name].get('command')]})
     coverage = limitations()
+    if all(any(row['name'] == name and row['status'] == 'passed' for row in ordered)
+           for name in ('source_model_mesh', 'source_model_vertices')):
+        coverage[0].update(status='passed', reason='Both unchanged preserved mesh controls and direct independently regenerated original vertex controls passed in this report.')
     report = {'schema': 1, 'scope': 'Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.',
               'started_utc': previous['started_utc'] if previous else started_utc,
               'updated_utc': dt.datetime.now(dt.timezone.utc).isoformat(),

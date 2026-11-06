@@ -27,14 +27,14 @@ func finish_preparation()->void:
 	if _preview_worker==null:return
 	var result:Variant=_preview_worker.wait_to_finish();_preview_worker=null
 	_preview_bundle=result if result is Dictionary else {}
-func _prepare_enclosed_preview(system:RefCounted,ship:RefCounted)->Dictionary:
+func _prepare_enclosed_preview(system:RefCounted,ship:RefCounted,days:float)->Dictionary:
 	var context:=Surface._entry_context(system,ship)
 	if _preview_worker!=null:
 		if _preview_worker.is_alive():return {}
 		finish_preparation()
 	if _preview_bundle.get("ok",false) and _preview_bundle.get("context")==context:return _preview_bundle
 	_preview_bundle={}
-	var snapshot:=Surface.create_entry_snapshot(system,ship)
+	var snapshot:=Surface.create_entry_snapshot(system,ship,days)
 	if snapshot.is_empty():return {}
 	_preview_worker=Thread.new()
 	if _preview_worker.start(Surface.prepare_entry.bind(snapshot))!=OK:_preview_worker=null
@@ -67,7 +67,7 @@ func update(surface:RefCounted,ship:RefCounted,system:RefCounted,days:float)->bo
 	if Link.is_source_layout(system):
 		var selected_site:Dictionary=system.get_site(anchor)
 		if int(selected_site.get("model_index",-1))==96 and anchor==str(system.site_id):
-			enclosed_bundle=_prepare_enclosed_preview(system,ship)
+			enclosed_bundle=_prepare_enclosed_preview(system,ship,days)
 			if enclosed_bundle.is_empty():clear();return false
 		var sampler_key:String=str(system.system_id)+":"+system.focus_id+":"+system.layout_mode+":"+system.source_digest+":"+anchor+":"+terrain_revision
 		if _source_sampler==null or _source_sampler_key!=sampler_key:
@@ -91,7 +91,9 @@ func update(surface:RefCounted,ship:RefCounted,system:RefCounted,days:float)->bo
 			var ll:Array=Link.coordinates(surface.orbit_link,ship,system,days)
 			if ll.is_empty():clear();return false
 			drawing.globe.latitude=ll[0];drawing.globe.longitude=ll[1]
-		if not enclosed_bundle.is_empty():drawing.city_data=enclosed_bundle.data;drawing.underground=enclosed_bundle.underground
+		if not enclosed_bundle.is_empty():
+			drawing.city_data=enclosed_bundle.data;drawing.underground=enclosed_bundle.underground
+			drawing.source_render_packet=enclosed_bundle.render_packet;drawing.source_render_worker_state=enclosed_bundle.render_worker_state
 		elif not drawing.bind_city(system.get_site(anchor)):clear();return false
 		drawing.active=true;drawing.extended_flight=true
 	frame=world_frame(drawing.globe,system,days)
@@ -104,6 +106,7 @@ func update(surface:RefCounted,ship:RefCounted,system:RefCounted,days:float)->bo
 		frame=world_frame(drawing.globe,system,days);local=_local_position(surface,ship,system,days)
 	space_blend=far_blend(geoid_height)
 	drawing.render_position=local
+	drawing.render_velocity=frame.basis.inverse()*ship.velocity
 	height=local.y-drawing.height_at(local.x,local.z)-drawing.clearance(ship)
 	active=true
 	return true

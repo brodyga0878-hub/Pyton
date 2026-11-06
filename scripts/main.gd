@@ -312,6 +312,8 @@ func _diagnostic_context()->Dictionary:
 	if world!=null and world.layout_mode==World.FULL_LAYOUT:
 		context.session["source_station"]=StationSession.diagnostics(ship,world,nav)
 		context.session["source_world_contract"]=world.full_system_state.duplicate(true)
+		context.session["source_surface_stream"]=ground_view.source_stream_stats() if ground_view!=null else {}
+		if surface!=null and surface.source_surface():context.session["source_terrain_cache"]=surface.globe.cache_stats()
 	return context
 func _base_diagnostic_context()->Dictionary:
 	return {"build":{"version":BuildInfo.VERSION,"code":BuildInfo.VERSION_CODE,"channel":BuildInfo.CHANNEL},"mode":"graphics_preview" if not graphics_return.is_empty() else ("surface" if surface!=null and surface.active else "space"),"flight":_flight_diagnostic_sample(),"last_flight_sample":last_flight_sample,"settings":settings.snapshot(),"session":{"saving_enabled":saving_enabled,"save_generation":saves.sequence,"elapsed_days":nav.elapsed_days if nav!=null else 0,"source_clock":SourceClock.from_elapsed_days(nav.elapsed_days) if nav!=null else {},"source_runtime":world.source_runtime_state.duplicate(true) if world!=null else {},"source_orbit":world.orbit_backend_state.duplicate(true) if world!=null else {},"source_ports":world.port_backend_state.duplicate(true) if world!=null else {},"source_physics":world.source_physics_state.duplicate(true) if world!=null else {},"world_layout":world.layout_mode if world!=null else "","preferred_world_layout":world.preferred_layout() if world!=null else "","source_port_position_au":world.site_position_au(world.site_id,nav.elapsed_days) if world!=null and nav!=null else [],"origin_au":world.origin_au(nav.elapsed_days) if world!=null and nav!=null else []},"display":{"fps":Engine.get_frames_per_second(),"viewport":[get_viewport().get_visible_rect().size.x,get_viewport().get_visible_rect().size.y]}}
@@ -368,8 +370,6 @@ func _sync_scene()->void:
 	ground_view.visible=draw!=null;ground_view.transform=near.frame if preview else Transform3D.IDENTITY
 	if not city_view.configure(draw,ground_view.transform,1.0-blend if layered else 1.0):push_error(city_view.last_error)
 	celestial.transform=to_scene;celestial.visible=not surface.active or high
-	celestial.set_source_ground_patch(draw.globe if layered and draw!=null else null)
-	celestial.set_surface_transition(layered,blend if layered else 1.0)
 	station.visible=_station_here() and not preview and world.layout_mode!=World.FULL_LAYOUT
 	_sync_source_station()
 	planet_fill.visible=not surface.active or high
@@ -389,6 +389,8 @@ func _sync_scene()->void:
 		presentation.update_height(environment.environment,draw,height,settings.quality,blend)
 		stars.visible=draw.kind!="earth" or (draw.extended_flight and height>15000)
 	else:camera.far=180000;camera.near=0.5;stars.visible=true
+	celestial.set_source_ground_patch(ground_view.source_ground_patch_context() if layered and draw!=null else null)
+	celestial.set_surface_transition(layered,blend if layered else 1.0)
 	if celestial.visible:celestial.update_view(nav.elapsed_days,camera.position)
 	if world.layout_mode==World.FULL_LAYOUT:
 		var light:Dictionary=celestial.source_light(world.focus_id,nav.elapsed_days)
@@ -786,6 +788,7 @@ func _exit_tree()->void:
 	if worker!=null and worker.is_started():worker.wait_to_finish()
 	if hatch_worker!=null and hatch_worker.is_started():hatch_worker.wait_to_finish()
 	near.finish_preparation()
+	if ground_view!=null:ground_view.finish_source_preparation()
 
 func _run_smoke()->void:
 	await get_tree().process_frame

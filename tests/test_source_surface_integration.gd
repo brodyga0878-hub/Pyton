@@ -151,6 +151,9 @@ func prepared_entry_controls()->void:
 	var previous_ship:=str(ship.ship_id);ship.ship_id="viper"
 	check(not surface.install_prepared_entry(bundle,world,ship),"Stale ship geometry rejects prepared entry")
 	ship.ship_id=previous_ship
+	var original_position:Vector3=ship.position;ship.position+=Vector3.RIGHT
+	check(not surface.install_prepared_entry(bundle,world,ship),"Entry preparation rejects a moved ship after worker capture")
+	ship.position=original_position
 	check(surface.install_prepared_entry(bundle,world,ship) and surface.has_prepared_entry(world,ship),"Matching immutable sourceentry bundle installs as one-use candidate")
 	check(surface.enter(ship,world,true) and surface.globe==bundle.globe and surface.underground==bundle.underground,"Entry consumes worker-prepared exact objects instead of synchronous recompilation")
 	check(not surface.has_prepared_entry(),"Prepared entry consumed once")

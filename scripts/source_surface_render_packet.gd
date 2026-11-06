@@ -14,7 +14,7 @@ static func _sha(bytes:PackedByteArray)->String:
 	return context.finish().hex_encode()
 
 static func _sample(globe:RefCounted,x:float,z:float,stats:Dictionary)->PackedFloat64Array:
-	var sampled:Variant=globe.sample(x,z)
+	var sampled:Variant=globe.sample_render_cached(x,z) if globe.has_method("sample_render_cached") else globe.sample(x,z)
 	stats.samples+=1
 	if not sampled is PackedFloat64Array or sampled.size()!=5:return PackedFloat64Array()
 	for component in sampled:

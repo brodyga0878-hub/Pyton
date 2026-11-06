@@ -85,10 +85,22 @@ func cache_controls(record:PackedByteArray)->void:
 	if clone!=null:
 		clone.clear_cache();check(terrain.cache_stats().entries>0 and clone.cache_stats().entries==0,"Worker source cache never shares live mutation")
 	state.radius=1.0;check(Terrain.from_worker_state(state)==null,"Worker snapshot rejects mismatched source reference")
+	var direct:=terrain.sample(10.0,20.0);var memo:=terrain.sample_render_cached(10.0,20.0)
+	check(direct==memo and terrain.sample_render_cached(10.0,20.0)==memo,"Render memo preserves every source sample component exactly")
+	terrain.sample_render_cached(10.00000001,20.0)
+	check(terrain._render_cache.size()==2,"Render memo keeps distinct double coordinate bits")
+	state=terrain.capture_worker_state()
+	var render_key:PackedByteArray=state.render_cache.keys()[0]
+	var corrupt_render:PackedFloat64Array=state.render_cache[render_key].duplicate();corrupt_render[0]=NAN;state.render_cache[render_key]=corrupt_render
+	check(Terrain.from_worker_state(state)==null,"Worker snapshot rejects nonfinite cached render data")
+	var prior_lat:=terrain.latitude;terrain.latitude+=0.001
+	terrain.sample_render_cached(10.0,20.0)
+	check(terrain._render_cache.size()==1 and terrain._render_latitude==terrain.latitude,"Changing regional frame invalidates render memo")
+	terrain.latitude=prior_lat
 	var edge_a:=terrain.elevation(0.2,-PI);var edge_b:=terrain.elevation(0.2,PI)
 	check(edge_a==edge_b,"Geographic grid seam wraps consistently")
 	check(is_nan(terrain.elevation(NAN,0.0)) and terrain.exact_source_sample(INF,0.0).is_empty(),"Invalid directions rejected")
-	terrain.clear_cache();check(terrain.cache_stats().entries==0,"Bounded cache clears publicly")
+	terrain.clear_cache();check(terrain.cache_stats().entries==0 and terrain._render_cache.is_empty(),"Both bounded field and render caches clear publicly")
 func corrected_117_controls()->void:
 	var fixture:Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://tests/fixtures/source_model117_surface_policy_native.json"))
 	check(fixture.case_count==312 and fixture.corrected_probe_case_count==156 and fixture.unguarded_boundary_rejection_count==24,"Independent native corrected117andboundary controls")

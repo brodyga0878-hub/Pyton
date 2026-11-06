@@ -4,7 +4,7 @@ extends RefCounted
 const Packet=preload("res://scripts/source_surface_render_packet.gd")
 const REVISION:="source-surface-render-state-v1"
 const RECORD_DOMAIN:="f878_runtime_bank_with_unconverted_type35_fields"
-const RAY_EPS:=0.00001
+const RAY_EPS:=0.001 # Float32 render-transform boundary tolerance, in metres.
 var configured_ok:=false
 var source_key:=""
 var core_width:=0.0
@@ -12,6 +12,8 @@ var core_cells:=0
 var core_offset:=Vector2.ZERO
 var _frame:Dictionary={}
 var _vertices:=PackedVector3Array()
+var _grid_x:=PackedFloat64Array()
+var _grid_z:=PackedFloat64Array()
 var _minimum:=PackedFloat64Array()
 var _maximum:=PackedFloat64Array()
 var _record:=PackedByteArray()
@@ -30,12 +32,16 @@ static func _sha(value:PackedByteArray)->String:
 	var hash:=HashingContext.new();hash.start(HashingContext.HASH_SHA256);hash.update(value);return hash.finish().hex_encode()
 
 func clear()->void:
-	configured_ok=false;source_key="";core_width=0;core_cells=0;core_offset=Vector2.ZERO;_frame={};_vertices.clear();_minimum.clear();_maximum.clear();_record.clear();_target_lat=INF;_target_lon=INF;_inverse.clear();_transform=Transform3D.IDENTITY;_queries=0;_last_cells=0;_last_triangles=0;_maximum_cells=0
+	configured_ok=false;source_key="";core_width=0;core_cells=0;core_offset=Vector2.ZERO;_frame={};_vertices.clear();_grid_x.clear();_grid_z.clear();_minimum.clear();_maximum.clear();_record.clear();_target_lat=INF;_target_lon=INF;_inverse.clear();_transform=Transform3D.IDENTITY;_queries=0;_last_cells=0;_last_triangles=0;_maximum_cells=0
 
 func configure(packet:Dictionary)->bool:
 	# Validate before assigning any live state. A failed replacement leaves the
 	# previous visual/collision pair usable until the caller publishes a new one.
-	if not packet.get("ok") is bool or not packet.get("revision") is String or not Packet.valid(packet):return false
+	if not packet.get("ok") is bool or not packet.get("revision") is String or not packet.get("frame") is Dictionary or not packet.get("meshes") is Array:return false
+	if not packet.frame.get("terrain_revision") is String or not packet.frame.get("record_domain") is String:return false
+	for row:Variant in packet.meshes:
+		if not row is Dictionary or not row.get("role") is String:return false
+	if not Packet.valid(packet):return false
 	var frame:Dictionary=packet.frame
 	if frame.get("terrain_revision")!=Packet.TERRAIN_REVISION or frame.get("record_domain")!=RECORD_DOMAIN or not packet.get("source_key","") is String:return false
 	if not _integer(packet.get("core_cells"),2,128) or not _number(packet.get("core_width")) or float(packet.core_width)<64 or float(packet.core_width)>65536:return false
@@ -57,13 +63,18 @@ func configure(packet:Dictionary)->bool:
 	var minimum:=PackedFloat64Array([INF,INF,INF]);var maximum:=PackedFloat64Array([-INF,-INF,-INF])
 	for point:Vector3 in core.vertices:
 		for axis in range(3):minimum[axis]=minf(minimum[axis],float(point[axis]));maximum[axis]=maxf(maximum[axis],float(point[axis]))
-	_frame=frame.duplicate(true);_frame.record_hash=str(frame.record_hash).to_lower();_vertices=core.vertices.duplicate();_minimum=minimum;_maximum=maximum
+	var grid_x:=PackedFloat64Array();var grid_z:=PackedFloat64Array()
+	for index in range(count+1):
+		grid_x.append(float(core.vertices[index].x));grid_z.append(float(core.vertices[index*(count+1)].z))
+		if index>0 and (grid_x[index]<=grid_x[index-1] or grid_z[index]<=grid_z[index-1]):return false
+	_frame=frame.duplicate(true);_frame.record_hash=str(frame.record_hash).to_lower();_vertices=core.vertices.duplicate();_grid_x=grid_x;_grid_z=grid_z;_minimum=minimum;_maximum=maximum
 	source_key=str(packet.get("source_key",""));core_cells=count;core_width=width;core_offset=offset;configured_ok=true
 	_record.clear();_target_lat=INF;_target_lon=INF;_inverse.clear();_queries=0;_last_cells=0;_last_triangles=0;_maximum_cells=0
 	return true
 
 func matches(globe:RefCounted)->bool:
-	if not configured_ok or globe==null or globe.get("revision")!=Packet.TERRAIN_REVISION or globe.get("configured_ok")!=true:return false
+	if not configured_ok or globe==null or not globe.get("revision") is String or not globe.get("configured_ok") is bool:return false
+	if globe.revision!=Packet.TERRAIN_REVISION or not globe.configured_ok:return false
 	if not _number(globe.get("radius")) or float(globe.radius)!=float(_frame.radius) or not _number(globe.get("latitude")) or not _number(globe.get("longitude")) or absf(float(globe.latitude))>PI*0.5 or absf(float(globe.longitude))>PI+0.000001:return false
 	var record:Variant=globe.get("source_record")
 	if not record is PackedByteArray or record.size()!=68:return false
@@ -108,7 +119,7 @@ func _clip(origin:PackedFloat64Array,direction:PackedFloat64Array)->PackedFloat6
 		if absf(direction[axis])<1e-15:
 			if origin[axis]<_minimum[axis]-RAY_EPS or origin[axis]>_maximum[axis]+RAY_EPS:return PackedFloat64Array()
 		else:
-			var first:=(_minimum[axis]-origin[axis])/direction[axis];var second:=(_maximum[axis]-origin[axis])/direction[axis]
+			var first:=(_minimum[axis]-RAY_EPS-origin[axis])/direction[axis];var second:=(_maximum[axis]+RAY_EPS-origin[axis])/direction[axis]
 			low=maxf(low,minf(first,second));high=minf(high,maxf(first,second))
 	if not is_finite(low) or not is_finite(high) or low>high+RAY_EPS:return PackedFloat64Array()
 	return PackedFloat64Array([low,high])
@@ -126,10 +137,22 @@ func _triangle(ix:int,iz:int,which:int,origin:PackedFloat64Array,direction:Packe
 	var x:=origin[0]+direction[0]*height;var z:=origin[2]+direction[2]*height
 	var corner:Vector3=_vertices[a];var end:Vector3=_vertices[a+core_cells+2]
 	var fx:=(x-float(corner.x))/(float(end.x)-corner.x);var fz:=(z-float(corner.z))/(float(end.z)-corner.z)
-	if fx<(-1e-7) or fz<(-1e-7) or fx>1.0000001 or fz>1.0000001 or (which==0 and fx+fz>1.0000001) or (which==1 and fx+fz<0.9999999):return {}
+	var tolerance:=RAY_EPS/minf(float(end.x)-corner.x,float(end.z)-corner.z)
+	if fx<(-tolerance) or fz<(-tolerance) or fx>1.0+tolerance or fz>1.0+tolerance or (which==0 and fx+fz>1.0+tolerance) or (which==1 and fx+fz<1.0-tolerance):return {}
 	var normal:=Vector3(_inverse[0]*nx+_inverse[3]*ny+_inverse[6]*nz,_inverse[1]*nx+_inverse[4]*ny+_inverse[7]*nz,_inverse[2]*nx+_inverse[5]*ny+_inverse[8]*nz).normalized()
 	if normal.y<0:normal=-normal
 	return {"height":height,"normal":normal,"triangle_index":(iz*core_cells+ix)*2+which,"cell":Vector2i(ix,iz),"revision":REVISION,"source_key":source_key}
+
+func _cell_at(grid:PackedFloat64Array,value:float,walk:float)->int:
+	# Float32 mesh coordinates need not have perfectly equal adjacent widths.
+	# Search their actual boundaries, never an idealized metadata-only lattice.
+	var low:=0;var high:=core_cells
+	while low+1<high:
+		var middle:=(low+high)/2
+		if value<grid[middle]:high=middle
+		else:low=middle
+	if walk<0 and absf(value-grid[low])<1e-9:low-=1
+	return clampi(low,0,core_cells-1)
 
 func height_at(globe:RefCounted,x:float,z:float)->Dictionary:
 	_queries+=1;_last_cells=0;_last_triangles=0
@@ -142,15 +165,11 @@ func height_at(globe:RefCounted,x:float,z:float)->Dictionary:
 	if clipped.is_empty():return {}
 	var low:=clipped[0];var high:=clipped[1];var span:=maxf(0.0,high-low)
 	var start_x:=origin[0]+direction[0]*high;var start_z:=origin[2]+direction[2]*high
-	var dx:=-direction[0];var dz:=-direction[2];var cell_x:=(_maximum[0]-_minimum[0])/core_cells;var cell_z:=(_maximum[2]-_minimum[2])/core_cells
-	var gx:=(start_x-_minimum[0])/cell_x;var gz:=(start_z-_minimum[2])/cell_z
-	var ix:=clampi(floori(gx),0,core_cells-1);var iz:=clampi(floori(gz),0,core_cells-1)
-	if dx<0 and absf(gx-roundf(gx))<1e-9:ix=clampi(ceili(gx)-1,0,core_cells-1)
-	if dz<0 and absf(gz-roundf(gz))<1e-9:iz=clampi(ceili(gz)-1,0,core_cells-1)
+	var dx:=-direction[0];var dz:=-direction[2]
+	var ix:=_cell_at(_grid_x,start_x,dx);var iz:=_cell_at(_grid_z,start_z,dz)
 	var step_x:=1 if dx>0 else -1;var step_z:=1 if dz>0 else -1
-	var next_x:=INF if absf(dx)<1e-15 else (_minimum[0]+float(ix+(1 if dx>0 else 0))*cell_x-start_x)/dx
-	var next_z:=INF if absf(dz)<1e-15 else (_minimum[2]+float(iz+(1 if dz>0 else 0))*cell_z-start_z)/dz
-	var delta_x:=INF if absf(dx)<1e-15 else cell_x/absf(dx);var delta_z:=INF if absf(dz)<1e-15 else cell_z/absf(dz)
+	var next_x:=INF if absf(dx)<1e-15 else (_grid_x[ix+(1 if dx>0 else 0)]-start_x)/dx
+	var next_z:=INF if absf(dz)<1e-15 else (_grid_z[iz+(1 if dz>0 else 0)]-start_z)/dz
 	for visit in range(core_cells*2+2):
 		_last_cells+=1;_maximum_cells=maxi(_maximum_cells,_last_cells)
 		var first:=_triangle(ix,iz,0,origin,direction,low,high);var second:=_triangle(ix,iz,1,origin,direction,low,high)
@@ -158,9 +177,12 @@ func height_at(globe:RefCounted,x:float,z:float)->Dictionary:
 			return second if first.is_empty() else (first if second.is_empty() or float(first.height)>=float(second.height) else second)
 		var next:=minf(next_x,next_z)
 		if not is_finite(next) or next>span+RAY_EPS:break
-		if next_x<=next_z+1e-10:ix+=step_x;next_x+=delta_x
-		if next_z<=next+1e-10:iz+=step_z;next_z+=delta_z
+		var cross_x:=next_x<=next+1e-10;var cross_z:=next_z<=next+1e-10
+		if cross_x:ix+=step_x
+		if cross_z:iz+=step_z
 		if ix<0 or iz<0 or ix>=core_cells or iz>=core_cells:break
+		if cross_x:next_x=(_grid_x[ix+(1 if dx>0 else 0)]-start_x)/dx
+		if cross_z:next_z=(_grid_z[iz+(1 if dz>0 else 0)]-start_z)/dz
 	return {}
 
 func stats()->Dictionary:return {"queries":_queries,"last_cells":_last_cells,"last_triangles":_last_triangles,"maximum_cells":_maximum_cells,"cell_budget":core_cells*2+2,"configured_ok":configured_ok,"source_key":source_key}

@@ -13,6 +13,7 @@ var source_render_packet:Dictionary={}
 var source_render_worker_state:Dictionary={}
 var source_render_state:RefCounted
 var render_position:=Vector3.ZERO
+var render_velocity:=Vector3.ZERO
 var gravity_vector:=Vector3.DOWN
 var _source_system:RefCounted
 var _source_days:=0.0
@@ -75,7 +76,7 @@ static func create_entry_snapshot(system:RefCounted,ship:RefCounted,days:=0.0)->
 		if str(site.get("parent",""))==str(system.focus_id) and int(site.get("type_code",-1))==35:sites.append(site.duplicate(true))
 	var span:=float(ship.profile().visual_span_m)
 	var body_point:Vector3=system.body_rotation_basis(str(system.focus_id),days).inverse()*(ship.position-system.local_meters(str(system.focus_id),days))
-	return {"revision":ENTRY_PREPARATION,"context":_entry_context(system,ship),"body_id":str(system.focus_id),"site_id":anchor,"site":selected if not anchor.is_empty() else {},"system_id":int(system.system_id),"by_id":{str(system.focus_id):body.duplicate(true)},"settlements":sites,"radii":Vector3(span*0.55,span*0.14+2.0,span*0.55),"bodyfixed_ship_point":body_point}
+	return {"revision":ENTRY_PREPARATION,"context":_entry_context(system,ship),"body_id":str(system.focus_id),"site_id":anchor,"site":selected if not anchor.is_empty() else {},"system_id":int(system.system_id),"by_id":{str(system.focus_id):body.duplicate(true)},"settlements":sites,"radii":Vector3(span*0.55,span*0.14+2.0,span*0.55),"bodyfixed_ship_point":body_point,"ship_position":Vector3(ship.position),"days":days}
 static func prepare_entry(snapshot:Dictionary)->Dictionary:
 	if snapshot.get("revision")!=ENTRY_PREPARATION or not snapshot.get("context") is String or not snapshot.get("by_id") is Dictionary or not snapshot.get("settlements") is Array or not snapshot.get("body_id") is String or not snapshot.get("site_id") is String or not snapshot.get("site") is Dictionary or not snapshot.get("radii") is Vector3:return {"ok":false,"error":"Invalid source surface preparation snapshot"}
 	var proxy:=EntrySystem.new();proxy.system_id=int(snapshot.get("system_id",0));proxy.by_id=snapshot.by_id.duplicate(true);proxy.settlements=snapshot.settlements.duplicate(true)
@@ -94,11 +95,12 @@ static func prepare_entry(snapshot:Dictionary)->Dictionary:
 	if not prepared.get("ok",false):return prepared
 	var kind:=str(proxy.by_id[str(snapshot.body_id)].get("kind","rock"))
 	if kind not in RenderPacket.KINDS:kind="rock"
-	var packet:=RenderPacket.prepare(terrain,{"kind":kind})
+	var packet:=RenderPacket.prepare(terrain,{"kind":kind,"core_width":8000.0 if terrain.source_model_index==117 else 4000.0,"core_cells":32 if terrain.source_model_index==117 else 64})
 	if not packet.get("ok",false):return packet
-	return {"ok":true,"revision":ENTRY_PREPARATION,"context":snapshot.context,"body_id":snapshot.body_id,"site_id":snapshot.site_id,"globe":terrain,"data":prepared.data,"underground":prepared.get("underground"),"render_packet":packet,"render_worker_state":terrain.capture_worker_state()}
+	return {"ok":true,"revision":ENTRY_PREPARATION,"context":snapshot.context,"body_id":snapshot.body_id,"site_id":snapshot.site_id,"globe":terrain,"data":prepared.data,"underground":prepared.get("underground"),"render_packet":packet,"render_worker_state":terrain.capture_worker_state(),"ship_position":snapshot.get("ship_position",Vector3.INF),"days":snapshot.get("days",0.0)}
 func install_prepared_entry(bundle:Dictionary,system:RefCounted,ship:RefCounted)->bool:
 	if active or not source_layout(system) or bundle.get("ok")!=true or bundle.get("revision")!=ENTRY_PREPARATION or bundle.get("context")!=_entry_context(system,ship) or bundle.get("body_id")!=str(system.focus_id) or not bundle.get("globe") is RefCounted or not bundle.get("data") is Dictionary:return false
+	if not bundle.get("ship_position") is Vector3 or not bundle.ship_position.is_finite() or bundle.ship_position!=ship.position:return false
 	var terrain:RefCounted=bundle.globe
 	if not bundle.get("render_packet") is Dictionary or not RenderPacket.valid(bundle.render_packet) or not bundle.get("render_worker_state") is Dictionary:return false
 	var site:Dictionary=system.current_site()
@@ -239,6 +241,7 @@ func enter(ship: RefCounted, system: RefCounted, spherical:=false, terrain_revis
 	if globe:recenter(ship)
 	if not _refresh_gravity(ship):active=false;ship.surface_mode=false;message="Не удалось определить исходную гравитацию.";return false
 	render_position=ship.position
+	render_velocity=ship.velocity
 	message="Посадочная зона: %s. «Автопилот» — заход; «Стыковка» — мягкая посадка."%(site_name if not site_name.is_empty() else body.name)
 	return true
 
@@ -342,6 +345,7 @@ func step(dt: float, ship: RefCounted, steering: Vector2, roll: float, lift := 0
 
 	if globe and radial.length()>REBASE_DISTANCE:recenter(ship)
 	render_position=ship.position
+	render_velocity=ship.velocity
 
 func touch_down(ship: RefCounted) -> bool:
 	if not active or landed or ship.hull<=0 or altitude(ship)>3 or ship.velocity.length()>6:return false
@@ -614,6 +618,7 @@ func recenter(ship:RefCounted)->void:
 	ship.attitude=(frame_rotation*ship.attitude).normalized()
 	rebase_to=ship.position
 	render_position=ship.position
+	render_velocity=ship.velocity
 func _restore_globe(data:Dictionary,ship:RefCounted,system:RefCounted,maximum_height:=4001.0)->bool:
 	if data.get("layout")!="globe_v1" or not OrbitLink.supports_terrain_revision(data.get("terrain_revision"),system):return false
 	if not data.get("active") is bool or not data.active or not data.get("landed") is bool or data.get("body_id")!=system.focus_id:return false
@@ -662,6 +667,7 @@ func _restore_globe(data:Dictionary,ship:RefCounted,system:RefCounted,maximum_he
 	orbit_position=Vector3(data.orbit_position[0],data.orbit_position[1],data.orbit_position[2]);orbit_attitude=rotation.normalized()
 	ship.surface_mode=true
 	render_position=ship.position
+	render_velocity=ship.velocity
 	return true
 
 func enter_from_orbit(ship:RefCounted,system:RefCounted,days:float)->bool:

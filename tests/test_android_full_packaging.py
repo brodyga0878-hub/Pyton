@@ -18,6 +18,8 @@ class MockArchive:
         self.entries={f'assets/scripts/{name}.gdc':b'GDSC'+b'unit-mock-not-an-exported-module'*4 for name in verifier.FULL_SOURCE_MODULES}
         for name in verifier.FULL_SOURCE_TABLES+('ships','world_names_ru'):
             self.entries[f'assets/data/{name}.json']=(PROJECT/'data'/f'{name}.json').read_bytes()
+        for name in verifier.FULL_SOURCE_SHADERS:
+            self.entries['assets/scripts/'+name]=(PROJECT/'scripts'/name).read_bytes()
     def namelist(self):return list(self.entries)
     def read(self,name):return self.entries[name]
 
@@ -63,6 +65,7 @@ class FullPackagingChecks(unittest.TestCase):
         result=verifier.verify_source_full_runtime(self.archive,PROJECT)
         self.assertEqual(result['compiled_module_count'],len(verifier.FULL_SOURCE_MODULES))
         self.assertEqual(result['raw_json_count'],len(verifier.FULL_SOURCE_TABLES)+2)
+        self.assertEqual(result['streaming_shader_count'],2)
         self.assertEqual(result['orbital_station_model_indices'],[69]+list(range(72,81)))
         self.assertEqual(result['natural_model_indices'],list(range(117,134)))
         self.assertFalse(result['compiled_source_correspondence_rebuilt_by_verifier'])
@@ -91,6 +94,16 @@ class FullPackagingChecks(unittest.TestCase):
     def test_invalid_new_compiled_header_rejects(self):
         self.archive.entries['assets/scripts/source_physics_bridge.gdc']=b'wrong-header'+b'x'*100
         with self.assertRaisesRegex(AssertionError,'Invalid compiled full source runtime module'):
+            verifier.verify_source_full_runtime(self.archive,PROJECT)
+
+    def test_missing_streaming_shader_rejects(self):
+        del self.archive.entries['assets/scripts/source_terrain_packet.gdshader']
+        with self.assertRaisesRegex(AssertionError,'Missing source streaming terrain shader'):
+            verifier.verify_source_full_runtime(self.archive,PROJECT)
+
+    def test_changed_streaming_shader_rejects(self):
+        self.archive.entries['assets/scripts/source_terrain_packet_transition.gdshader']+=b' '
+        with self.assertRaisesRegex(AssertionError,'streaming terrain shader differs'):
             verifier.verify_source_full_runtime(self.archive,PROJECT)
 
     def test_missing_special_source_resource_rejects(self):

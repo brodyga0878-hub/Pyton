@@ -5,11 +5,60 @@ const PadShader=preload("res://scripts/landing_pad.gdshader")
 const BuildingShader=preload("res://scripts/building.gdshader")
 const Materials=preload("res://scripts/material_library.gd")
 const WorldMaterials=preload("res://scripts/world_surface_library.gd")
+const SourceTerrain=preload("res://scripts/source_surface_terrain.gd")
+const SourcePacket=preload("res://scripts/source_surface_render_packet.gd")
+const SourceState=preload("res://scripts/source_surface_render_state.gd")
+const SourceTerrainShader=preload("res://scripts/source_terrain_packet.gdshader")
+const SourceTransitionShader=preload("res://scripts/source_terrain_packet_transition.gdshader")
+const SOURCE_STREAM_DISTANCE:=512.0
+const SOURCE_REGION_DISTANCE:=8000.0
+var _source_owner:RefCounted
+var _source_key:=""
+var _source_base:Node3D
+var _source_core:Node3D
+var _source_base_state:RefCounted
+var _source_core_state:RefCounted
+var _source_region:Dictionary={}
+var _source_core_offset:=Vector2.ZERO
+var _source_nodes:Array[MeshInstance3D]=[]
+var _source_worker:Thread
+var _source_far_worker:Thread
+var _source_job_key:=""
+var _source_packet:Dictionary={}
+var _source_material:ShaderMaterial
+var _source_core_material:ShaderMaterial
+var _source_context:RefCounted
+var _source_jobs_started:=0
+var _source_jobs_finished:=0
+var _source_publish_usec:=0
+var _source_far_started:=0
+var _source_far_finished:=0
+var _source_far_job_usec:=0
+var _source_far_duration:=1.0
+var _source_last_error:=""
+var _source_last_core_usec:=0
+var _source_last_core_queries:=0
+var _source_last_core_evictions:=0
+var _source_generation:=0
+class SourcePatchContext extends RefCounted:
+	var revision:=SourceTerrain.REVISION_NAME
+	var source_record:=PackedByteArray()
+	var source_policy:Dictionary={}
+	var latitude:=0.0
+	var longitude:=0.0
+	var radius:=0.0
+	var extent:=0.0
+	func maximum_patch_extent()->float:return extent
 var quality:=2
 var view_coverage:=1.0
 var world_material_kind:="rock"
 func set_quality(value:int)->void:
 	quality=clampi(value,0,2)
+	if _source_base!=null:
+		for node:MeshInstance3D in _source_nodes:
+			if is_instance_valid(node) and node.material_override is ShaderMaterial:
+				node.material_override.set_shader_parameter("detail_level",quality);_bind_ground_material(node.material_override)
+		return
 	for child in get_children():
 		if child is MeshInstance3D and child.material_override is ShaderMaterial:
 			if child.material_override.shader in [TerrainShader,TransitionShader,BuildingShader,PadShader]:
@@ -25,6 +74,10 @@ func _bind_ground_material(material:ShaderMaterial)->void:
 
 
 func configure(surface: RefCounted) -> void:
+	if surface.get("globe")!=null and str(surface.globe.get("revision"))==SourceTerrain.REVISION_NAME:
+		_configure_source(surface);return
+	if not _source_key.is_empty():
+		_source_key="";_source_owner=null;_source_base=null;_source_core=null;_source_base_state=null;_source_core_state=null;_source_context=null;_source_region={};_source_nodes.clear()
 	var current_site:String=str(surface.get("site_name")) if surface.get("site_name")!=null else ""
 	var cache_key:String=surface.terrain_key() if surface.has_method("terrain_key") else str(surface.seed_value)+":"+str(surface.kind)+":"+current_site
 	if get_meta("terrain_key","")==cache_key and get_child_count()>0:return
@@ -164,6 +217,11 @@ func _far_ring(surface:RefCounted,inner:float,outer:float,material:Material,base
 
 func set_view_coverage(value:float)->void:
 	view_coverage=clampf(value,0,1)
+	if _source_base!=null:
+		for node:MeshInstance3D in _source_nodes:
+			if is_instance_valid(node):_source_coverage(node.material_override)
+		_source_update_clip()
+		return
 	for child in get_children():
 		if child.get_meta("terrain_layer",false):
 			var target:Shader=TerrainShader if view_coverage>=1.0 else TransitionShader
@@ -176,3 +234,157 @@ func set_view_coverage(value:float)->void:
 				child.material_override.set_shader_parameter("view_coverage",view_coverage)
 				child.material_override.set_shader_parameter("coverage_invert",true)
 		else:child.visible=view_coverage>=0.5
+
+func _exit_tree()->void:finish_source_preparation()
+func finish_source_preparation()->void:
+	if _source_worker!=null:_source_worker.wait_to_finish();_source_worker=null
+	if _source_far_worker!=null:_source_far_worker.wait_to_finish();_source_far_worker=null
+func source_ground_patch_context()->RefCounted:return _source_context
+func source_stream_stats()->Dictionary:
+	return {"jobs_started":_source_jobs_started,"jobs_finished":_source_jobs_finished,"pending_jobs":(1 if _source_worker!=null else 0)+(1 if _source_far_worker!=null else 0),"pending_core_jobs":1 if _source_worker!=null else 0,"pending_far_jobs":1 if _source_far_worker!=null else 0,"far_jobs_started":_source_far_started,"far_jobs_finished":_source_far_finished,"last_publication_usec":_source_publish_usec,"last_core_duration_usec":_source_last_core_usec,"last_core_queries":_source_last_core_queries,"last_core_evictions":_source_last_core_evictions,"last_error":_source_last_error,"core_offset":_source_core_offset,"has_geometry":_source_base!=null}
+func _source_coverage(material:ShaderMaterial)->void:
+	var target:Shader=SourceTerrainShader if view_coverage>=1.0 else SourceTransitionShader
+	if material.shader!=target:
+		material.shader=target
+		material.set_shader_parameter("detail_level",quality);material.set_shader_parameter("spherical_coordinates",true)
+		material.set_shader_parameter("surface_kind",int(get_meta("material_kind",1)));_bind_ground_material(material)
+		material.set_shader_parameter("material_origin",_source_packet.get("material_origin",Vector3.ZERO))
+	material.set_shader_parameter("view_coverage",view_coverage);material.set_shader_parameter("coverage_invert",true)
+func _source_mesh(data:Dictionary,material:ShaderMaterial=null)->MeshInstance3D:
+	var arrays:=[];arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_VERTEX]=data.vertices;arrays[Mesh.ARRAY_NORMAL]=data.normals;arrays[Mesh.ARRAY_COLOR]=data.colors
+	arrays[Mesh.ARRAY_TEX_UV]=data.uv;arrays[Mesh.ARRAY_TEX_UV2]=data.uv2;arrays[Mesh.ARRAY_INDEX]=data.indices
+	var mesh:=ArrayMesh.new();mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,arrays)
+	var node:=MeshInstance3D.new();node.name=str(data.name);node.mesh=mesh;node.material_override=_source_material if material==null else material;node.set_meta("terrain_layer",true)
+	_source_nodes.append(node);return node
+func _source_publish(packet:Dictionary,worker_state:Dictionary,full:bool)->bool:
+	var started:=Time.get_ticks_usec()
+	var state:=SourceState.new()
+	if not state.configure(packet):return false
+	if full:
+		for child in get_children():remove_child(child);child.queue_free()
+		_source_nodes.clear();_source_core=null
+		_source_base=Node3D.new();_source_base.name="SourceBodyFixedTerrain";add_child(_source_base)
+		_source_packet=packet;_source_base_state=state
+		_source_far_duration=maxf(0.1,float(packet.get("duration_usec",1000000))/1000000.0)
+		_source_material=ShaderMaterial.new();_source_material.shader=SourceTerrainShader
+		_source_material.set_shader_parameter("detail_level",quality);_source_material.set_shader_parameter("spherical_coordinates",true)
+		_source_material.set_shader_parameter("surface_kind",int(get_meta("material_kind",1)));_source_material.set_shader_parameter("material_origin",packet.material_origin)
+		_bind_ground_material(_source_material);_source_coverage(_source_material)
+		for data:Dictionary in packet.meshes:_source_base.add_child(_source_mesh(data))
+		var context:=SourcePatchContext.new();context.source_record=worker_state.source_record.duplicate();context.source_policy=worker_state.source_policy.duplicate(true)
+		context.latitude=float(packet.frame.latitude);context.longitude=float(packet.frame.longitude);context.radius=float(packet.frame.radius);context.extent=float(packet.meshes[-1].outer)
+		_source_context=context
+	else:
+		if _source_core!=null:
+			for old in _source_core.get_children():_source_nodes.erase(old)
+			remove_child(_source_core);_source_core.queue_free()
+		_source_core=Node3D.new();_source_core.name="SourceStreamedCore";add_child(_source_core)
+		_source_core_material=_source_material.duplicate();_source_core_material.set_shader_parameter("source_clip_core",false)
+		_source_core.add_child(_source_mesh(packet.meshes[0],_source_core_material))
+	_source_core_state=state;_source_region=worker_state;_source_core_offset=packet.get("core_offset",Vector2.ZERO)
+	_source_owner.source_render_state=state
+	_source_publish_usec=Time.get_ticks_usec()-started
+	return true
+func _source_publish_far(packet:Dictionary,worker_state:Dictionary)->bool:
+	var started:=Time.get_ticks_usec()
+	var state:=SourceState.new()
+	if not state.configure(packet):return false
+	if _source_base!=null:
+		for old in _source_base.get_children():_source_nodes.erase(old)
+		remove_child(_source_base);_source_base.queue_free()
+	_source_base=Node3D.new();_source_base.name="SourceBodyFixedTerrain";add_child(_source_base)
+	_source_base_state=state;_source_packet=packet
+	_source_material=ShaderMaterial.new();_source_material.shader=SourceTerrainShader
+	_source_material.set_shader_parameter("detail_level",quality);_source_material.set_shader_parameter("spherical_coordinates",true)
+	_source_material.set_shader_parameter("surface_kind",int(get_meta("material_kind",1)));_source_material.set_shader_parameter("material_origin",packet.material_origin)
+	_bind_ground_material(_source_material);_source_coverage(_source_material)
+	for data:Dictionary in packet.meshes:_source_base.add_child(_source_mesh(data))
+	var context:=SourcePatchContext.new();context.source_record=worker_state.source_record.duplicate();context.source_policy=worker_state.source_policy.duplicate(true)
+	context.latitude=float(packet.frame.latitude);context.longitude=float(packet.frame.longitude);context.radius=float(packet.frame.radius);context.extent=float(packet.meshes[-1].outer)
+	_source_context=context;_source_update_clip();_source_publish_usec=Time.get_ticks_usec()-started
+	# A finished far job already contains an exact warm core in its predicted
+	# frame. Adopt it when it covers the live ship, avoiding a cold reanchor.
+	var local:Vector3=state.transform_to(_source_owner.globe).affine_inverse()*Vector3(_source_owner.render_position)
+	if maxf(absf(local.x-float(state.core_offset.x)),absf(local.z-float(state.core_offset.y)))<float(state.core_width)*0.5-SOURCE_STREAM_DISTANCE:
+		_source_generation+=1
+		_source_publish(packet,worker_state,false)
+	return true
+func _source_update_clip()->void:
+	if _source_material==null:return
+	var enabled:=_source_core!=null and _source_core_state!=null and _source_base_state!=null
+	_source_material.set_shader_parameter("source_clip_core",enabled)
+	if not enabled:return
+	var core_from_base:Transform3D=_source_core_state.transform_to(_source_owner.globe).affine_inverse()*_source_base_state.transform_to(_source_owner.globe)
+	_source_material.set_shader_parameter("source_core_from_packet_basis",core_from_base.basis)
+	_source_material.set_shader_parameter("source_core_from_packet_origin",core_from_base.origin)
+	_source_material.set_shader_parameter("source_core_center",_source_core_state.core_offset)
+	_source_material.set_shader_parameter("source_core_half_width",float(_source_core_state.core_width)*0.5)
+static func _prepare_source_job(snapshot:Dictionary,options:Dictionary,key:String,full:bool)->Dictionary:
+	var terrain:=SourceTerrain.from_worker_state(snapshot)
+	if terrain==null:return {"ok":false,"key":key}
+	var prepared_options:=options.duplicate()
+	if not prepared_options.has("core_width") and terrain.source_model_index==117:prepared_options.core_width=8000.0
+	if not prepared_options.has("core_cells") and terrain.source_model_index==117:prepared_options.core_cells=32
+	var packet:=SourcePacket.prepare(terrain,prepared_options)
+	return {"ok":packet.get("ok",false),"key":key,"packet":packet,"state":terrain.capture_worker_state(),"full":full,"generation":int(options.get("generation",0))}
+func _source_poll()->void:
+	if _source_worker!=null and not _source_worker.is_alive():
+		var result:Variant=_source_worker.wait_to_finish();_source_worker=null;_source_jobs_finished+=1
+		if result is Dictionary and result.get("key")==_source_key:
+			_source_last_error=str(result.get("packet",{}).get("error",""));_source_last_core_usec=int(result.get("packet",{}).get("duration_usec",0))
+			_source_last_core_queries=int(result.get("packet",{}).get("source_query_count",0))
+			_source_last_core_evictions=int(result.get("packet",{}).get("cache_stats_after",{}).get("evictions",0))-int(result.get("packet",{}).get("cache_stats_before",{}).get("evictions",0))
+			if result.get("ok",false) and int(result.get("generation",-1))==_source_generation and _source_owner!=null and _source_owner.globe!=null:_source_publish(result.packet,result.state,bool(result.full))
+	if _source_far_worker!=null and not _source_far_worker.is_alive():
+		var result:Variant=_source_far_worker.wait_to_finish();_source_far_worker=null;_source_far_finished+=1
+		if result is Dictionary and result.get("ok",false) and result.get("key")==_source_key and _source_owner!=null and _source_owner.globe!=null:
+			_source_far_duration=maxf(0.1,float(Time.get_ticks_usec()-_source_far_job_usec)/1000000.0)
+			_source_publish_far(result.packet,result.state)
+func _source_request(snapshot:Dictionary,options:Dictionary,full:bool)->void:
+	if _source_worker!=null:return
+	options=options.duplicate();options.generation=_source_generation
+	_source_worker=Thread.new();_source_job_key=_source_key;_source_jobs_started+=1
+	if _source_worker.start(_prepare_source_job.bind(snapshot,options,_source_key,full))!=OK:_source_worker=null
+func _source_request_far(surface:RefCounted)->void:
+	if _source_far_worker!=null or _source_context==null:return
+	var ll:Array=surface.globe.coordinates_at_height(surface.render_position.x,surface.render_position.z,surface.render_position.y)
+	var direction:=Vector3(cos(ll[0])*cos(ll[1]),sin(ll[0]),-cos(ll[0])*sin(ll[1]))
+	var bound:=maxf(float(_source_context.radius),float(_source_context.source_policy.get("original_outer_bound_raw",0))*16785.0/16777216.0)
+	var angle:=asin(clampf(float(_source_context.extent)*0.9/bound,0.0,1.0))
+	var delta:=pow(sin((float(ll[0])-float(_source_context.latitude))*0.5),2)+cos(float(ll[0]))*cos(float(_source_context.latitude))*pow(sin((float(ll[1])-float(_source_context.longitude))*0.5),2)
+	if 2.0*asin(sqrt(clampf(delta,0.0,1.0)))<angle*0.2:return
+	var future:Vector3=surface.render_position+Vector3(surface.render_velocity)*clampf(_source_far_duration,1.0,12.0)
+	var predicted:Array=surface.globe.coordinates_at_height(future.x,future.z,future.y)
+	var predicted_direction:=Vector3(cos(predicted[0])*cos(predicted[1]),sin(predicted[0]),-cos(predicted[0])*sin(predicted[1]))
+	var ahead:=acos(clampf(direction.dot(predicted_direction),-1.0,1.0))
+	if ahead>angle*0.8:predicted_direction=direction.slerp(predicted_direction,angle*0.8/ahead).normalized()
+	var snapshot:=_source_region.duplicate(false)
+	snapshot.latitude=atan2(float(predicted_direction.y),sqrt(float(predicted_direction.x)*predicted_direction.x+float(predicted_direction.z)*predicted_direction.z));snapshot.longitude=atan2(-float(predicted_direction.z),float(predicted_direction.x))
+	_source_far_worker=Thread.new();_source_far_started+=1;_source_far_job_usec=Time.get_ticks_usec()
+	if _source_far_worker.start(_prepare_source_job.bind(snapshot,{"kind":world_material_kind,"extended_flight":bool(surface.extended_flight)},_source_key,true))!=OK:_source_far_worker=null
+func _configure_source(surface:RefCounted)->void:
+	var key:=str(surface.get_instance_id())+":"+str(surface.globe.get_instance_id())
+	if key!=_source_key:
+		for child in get_children():remove_child(child);child.queue_free()
+		_source_nodes.clear();_source_base=null;_source_core=null;_source_base_state=null;_source_core_state=null;_source_context=null;_source_region={}
+		_source_key=key;_source_owner=surface
+		world_material_kind=WorldMaterials.canonical_kind(str(surface.kind));set_meta("material_kind",int({"earth":0,"rock":1,"desert":2,"ice":3}.get(surface.kind,1)));set_meta("material_spherical",true)
+		if not surface.source_render_packet.is_empty() and not surface.source_render_worker_state.is_empty():_source_publish(surface.source_render_packet,surface.source_render_worker_state,true)
+	_source_poll()
+	if _source_base==null:
+		_source_request(surface.globe.capture_worker_state(),{"kind":world_material_kind,"extended_flight":bool(surface.extended_flight)},true);return
+	if _source_base_state.matches(surface.globe):_source_base.transform=_source_base_state.transform_to(surface.globe)
+	if _source_core!=null and _source_core_state.matches(surface.globe):_source_core.transform=_source_core_state.transform_to(surface.globe)
+	_source_update_clip()
+	_source_request_far(surface)
+	if not _source_core_state.matches(surface.globe) or _source_worker!=null:return
+	var regional:Vector3=_source_core_state.transform_to(surface.globe).affine_inverse()*Vector3(surface.render_position)
+	var target:=Vector2(regional.x,regional.z)
+	if target.distance_to(_source_core_offset)<SOURCE_STREAM_DISTANCE:return
+	var snapshot:=_source_region.duplicate(false)
+	var cell:=float(_source_packet.core_width)/int(_source_packet.core_cells)
+	target=Vector2(roundf(target.x/cell)*cell,roundf(target.y/cell)*cell)
+	if target.length()>SOURCE_REGION_DISTANCE:
+		snapshot.latitude=float(surface.globe.latitude);snapshot.longitude=float(surface.globe.longitude);target=Vector2.ZERO
+	_source_request(snapshot,{"kind":world_material_kind,"include_rings":false,"core_offset":target,"core_cells":int(_source_packet.core_cells),"core_width":float(_source_packet.core_width)},false)

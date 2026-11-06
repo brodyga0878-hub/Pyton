@@ -10,7 +10,8 @@ const Pads=preload("res://scripts/source_ground_pads.gd")
 const Units=preload("res://scripts/source_units.gd")
 const Underground=preload("res://scripts/source_underground_port.gd")
 const CELL_METRES:=256.0
-const CACHE_LIMIT:=32768
+const CACHE_LIMIT:=131072
+const RENDER_CACHE_LIMIT:=16384
 const SOURCE_DETAIL:=1
 var source_record:=PackedByteArray()
 var source_model_index:=-1
@@ -22,6 +23,14 @@ var _probe:=PackedByteArray()
 var _parent:=PackedByteArray()
 var _cache:Dictionary={}
 var _cache_order:Array[String]=[]
+var _cache_head:=0
+var _render_cache:Dictionary={}
+var _render_order:Array=[]
+var _render_head:=0
+var _render_latitude:=INF
+var _render_longitude:=INF
+var _render_record:=PackedByteArray()
+var _render_mutex:=Mutex.new()
 var _cache_hits:=0
 var _source_samples:=0
 var _cache_evictions:=0
@@ -97,17 +106,17 @@ func configure(system:RefCounted,body_id:String,site_id:String,revision_value:St
 		if profile.is_empty():
 			configured_ok=false;configuration_error="Invalid source ground-port anchor: "+str(site.get("id",""));return
 		profiles[str(site.id)]=profile;locations[str(site.id)]=[profile.root_latitude,profile.root_longitude]
-	_mutex.lock()
+	_render_mutex.lock();_mutex.lock()
 	source_record=record.duplicate();source_model_index=int(metadata.model_index);radius=float(metadata.reference_radius_m)
 	_parent=candidate_parent;_probe=probe_init.object;source_policy=metadata.duplicate(true)
 	seed_value=int(system.system_id)^body_id.hash();selected_site_id=site_id;revision=REVISION_NAME
 	city_profiles=profiles;source_site_coordinates=locations;flat_sites=[]
 	_lat_cells=maxi(2,ceili(PI*radius/CELL_METRES));_lon_cells=maxi(4,ceili(TAU*radius/CELL_METRES))
-	_reset_cache_locked();configured_ok=true;configuration_error=""
+	_reset_cache_locked();_render_cache.clear();_render_order.clear();_render_head=0;configured_ok=true;configuration_error=""
 	var pad:=site_coordinates(site_id)
 	if profiles.has(site_id):pad=[profiles[site_id].pad_latitude,profiles[site_id].pad_longitude]
 	pad_latitude=pad[0];pad_longitude=pad[1];latitude=pad_latitude;longitude=pad_longitude
-	_mutex.unlock()
+	_mutex.unlock();_render_mutex.unlock()
 
 static func source_city_profile(site:Dictionary,parent_record:PackedByteArray,reference_radius_m:float)->Dictionary:
 	var port_record:=str(site.get("runtime_record_hex","")).hex_decode()
@@ -194,6 +203,27 @@ func sample(x:float,z:float)->PackedFloat64Array:
 	var actual_radius:=sqrt(x*x+z*z+pow(radius+height,2))
 	return PackedFloat64Array([height,actual_radius-radius,actual_radius*cos(ll[0])*cos(ll[1]),actual_radius*sin(ll[0]),actual_radius*cos(ll[0])*sin(ll[1])])
 
+func sample_render_cached(x:float,z:float)->PackedFloat64Array:
+	# Renderer-only memoization of exact double input bits. Moving regional
+	# grids reuse the identical vertices/ghost normals instead of ray-solving
+	# their whole overlap again. The source field and ordinary sample API stay
+	# unchanged, and a different geographic frame invalidates this cache.
+	_render_mutex.lock()
+	if latitude!=_render_latitude or longitude!=_render_longitude or source_record!=_render_record:
+		_render_cache.clear();_render_order.clear();_render_head=0
+		_render_latitude=latitude;_render_longitude=longitude;_render_record=source_record.duplicate()
+	var key:=PackedFloat64Array([x,z]).to_byte_array()
+	var result:PackedFloat64Array
+	if _render_cache.has(key):result=_render_cache[key].duplicate()
+	else:
+		result=sample(x,z)
+		_render_cache[key]=result.duplicate();_render_order.append(key)
+		if _render_cache.size()>RENDER_CACHE_LIMIT:
+			_render_cache.erase(_render_order[_render_head]);_render_head+=1
+		if _render_head>RENDER_CACHE_LIMIT:
+			_render_order=_render_order.slice(_render_head);_render_head=0
+	_render_mutex.unlock();return result
+
 func project(lat:float,lon:float)->Vector2:
 	var actual_radius:=radius+elevation(lat,lon)
 	var dl:=lon-longitude
@@ -252,10 +282,10 @@ func exact_source_sample(lat:float,lon:float)->Dictionary:
 	return result
 
 func _reset_cache_locked()->void:
-	_cache.clear();_cache_order.clear();_cache_hits=0;_source_samples=0;_cache_evictions=0;_generation+=1
+	_cache.clear();_cache_order.clear();_cache_head=0;_cache_hits=0;_source_samples=0;_cache_evictions=0;_generation+=1
 
 func clear_cache()->void:
-	_mutex.lock();_reset_cache_locked();_mutex.unlock()
+	_render_mutex.lock();_mutex.lock();_reset_cache_locked();_render_cache.clear();_render_order.clear();_render_head=0;_mutex.unlock();_render_mutex.unlock()
 
 func cache_stats()->Dictionary:
 	_mutex.lock()
@@ -264,11 +294,12 @@ func cache_stats()->Dictionary:
 
 func capture_worker_state()->Dictionary:
 	# Plain immutable value graph: no mutable kernel, mutex, World or nodes.
-	_mutex.lock()
+	_render_mutex.lock();_mutex.lock()
 	var result:={"revision":REVISION_NAME,"source_record":source_record.duplicate(),"source_policy":source_policy.duplicate(true),"parent":_parent.duplicate(),"probe":_probe.duplicate(),"cache":_cache.duplicate(),"lat_cells":_lat_cells,"lon_cells":_lon_cells,"configured_ok":configured_ok}
 	for field in ["radius","seed_value","latitude","longitude","pad_latitude","pad_longitude","selected_site_id"]:result[field]=get(field)
 	result.city_profiles=city_profiles.duplicate(true);result.source_site_coordinates=source_site_coordinates.duplicate(true)
-	_mutex.unlock();return result
+	result.render_cache=_render_cache.duplicate(true);result.render_latitude=_render_latitude;result.render_longitude=_render_longitude;result.render_record=_render_record.duplicate()
+	_mutex.unlock();_render_mutex.unlock();return result
 
 static func from_worker_state(snapshot:Dictionary)->RefCounted:
 	if snapshot.get("revision")!=REVISION_NAME or snapshot.get("configured_ok")!=true or not snapshot.get("source_record") is PackedByteArray or not supported_model(snapshot.source_record) or not snapshot.get("source_policy") is Dictionary or not snapshot.get("parent") is PackedByteArray or snapshot.parent.size()!=SourceKernel.OBJECT_BYTES or not snapshot.get("probe") is PackedByteArray or snapshot.probe.size()!=SourceKernel.OBJECT_BYTES or not snapshot.get("cache") is Dictionary or snapshot.cache.size()>CACHE_LIMIT:return null
@@ -285,6 +316,16 @@ static func from_worker_state(snapshot:Dictionary)->RefCounted:
 	if not result._kernel.point_kernel.kernel._load_resources():return null
 	var patch:={"revision":REVISION_NAME,"record_hex":result.source_record.hex_encode(),"cell_metres":CELL_METRES,"height_policy":SAMPLE_POLICY,"source_policy":result.source_policy.duplicate(true),"nodes":snapshot.cache.duplicate()}
 	if not result.install_patch(patch):return null
+	if snapshot.get("render_cache") is Dictionary and snapshot.render_cache.size()<=RENDER_CACHE_LIMIT and snapshot.get("render_record") is PackedByteArray:
+		if not snapshot.render_cache.is_empty():
+			if not is_finite(float(snapshot.get("render_latitude",INF))) or not is_finite(float(snapshot.get("render_longitude",INF))) or snapshot.render_record!=snapshot.source_record:return null
+			for key:Variant in snapshot.render_cache:
+				var value:Variant=snapshot.render_cache[key]
+				if not key is PackedByteArray or key.size()!=16 or not value is PackedFloat64Array or value.size()!=5:return null
+				for component in value:
+					if not is_finite(component):return null
+		result._render_cache=snapshot.render_cache.duplicate(true);result._render_order=snapshot.render_cache.keys()
+		result._render_latitude=float(snapshot.get("render_latitude",INF));result._render_longitude=float(snapshot.get("render_longitude",INF));result._render_record=snapshot.render_record.duplicate()
 	return result
 
 func _node_key(x:int,y:int)->String:
@@ -299,8 +340,10 @@ func _node_height_unlocked(x:int,y:int)->float:
 	if sampled.is_empty():return NAN
 	var value:=float(sampled.elevation_m)
 	_cache[key]=value;_cache_order.append(key)
-	if _cache_order.size()>CACHE_LIMIT:
-		_cache.erase(_cache_order.pop_front());_cache_evictions+=1
+	if _cache.size()>CACHE_LIMIT:
+		_cache.erase(_cache_order[_cache_head]);_cache_head+=1;_cache_evictions+=1
+	if _cache_head>CACHE_LIMIT:
+		_cache_order=_cache_order.slice(_cache_head);_cache_head=0
 	return value
 
 func _grid_height_unlocked(lat:float,lon:float)->float:
@@ -367,5 +410,5 @@ func _install_patch_locked(patch:Dictionary)->bool:
 		var x:=int(coordinates_key[0]);var y:=int(coordinates_key[1])
 		if x<0 or x>=_lon_cells or y<0 or y>_lat_cells or key!=_node_key(x,y):return false
 		prepared[key]=float(nodes[key]);order.append(key)
-	_cache=prepared;_cache_order=order;_generation+=1
+	_cache=prepared;_cache_order=order;_cache_head=0;_generation+=1
 	return true

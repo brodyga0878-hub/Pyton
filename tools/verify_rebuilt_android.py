@@ -22,6 +22,7 @@ FULL_SOURCE_MODULES=(
     'source_orbit','source_gravity','source_physics_bridge','source_ship_control_profile',
     'source_ground_surface','source_terrain_query','source_terrain_point','source_terrain_math',
     'source_surface_terrain','source_global_body_mesh','source_ground_pads',
+    'source_surface_render_packet','source_surface_render_state','surface_visual',
     'source_model_vm','source_model_vertices','source_model_mesh','source_polygon',
     'source_station_geometry','source_station_session','source_station_visual',
     'source_underground_port','source_underground_controller','source_enclosed_city_visual',
@@ -37,6 +38,7 @@ FULL_SOURCE_TABLES=(
     'ffe_special_station_models','ffe_stellar_factory','ffe_system_metadata',
     'ffe_system_names','ffe_terrain_query','ffe_underground_models','ffe_world_models','ffe_worlds',
 )
+FULL_SOURCE_SHADERS=('source_terrain_packet.gdshader','source_terrain_packet_transition.gdshader')
 DEVELOPMENT_ASSET_PREFIXES=(
     'assets/tests/','assets/tools/','assets/docs/','assets/recovered-history/',
     'assets/recovery/','assets/validation/','assets/deliverables/',
@@ -571,7 +573,7 @@ def verify_source_full_runtime(archive,project):
         assert not name.startswith(DEVELOPMENT_ASSET_PREFIXES),'Development material included in full runtime APK '+name
         assert not (name.startswith('assets/') and 'fixtures' in name.lower().split('/')),'Native development fixture included in APK '+name
         assert not (name.startswith('assets/') and name.lower().endswith(('.py','.asm','.exe','.o','.elf','.apk'))),'Host/development binary included in APK '+name
-    result={'scripts':{},'data':{},'source_executable_sha256':SOURCE_IMAGE_SHA256}
+    result={'scripts':{},'shaders':{},'data':{},'source_executable_sha256':SOURCE_IMAGE_SHA256}
     text={}
     for name in FULL_SOURCE_MODULES:
         raw=(project/'scripts'/f'{name}.gd').read_bytes();text[name]=raw.decode('utf-8')
@@ -580,6 +582,12 @@ def verify_source_full_runtime(archive,project):
         packed=archive.read(exported)
         assert len(packed)>64 and packed[:4]==b'GDSC','Invalid compiled full source runtime module '+name
         result['scripts'][name]={'runtime_path':exported,'runtime_bytes':len(packed),'runtime_sha256':hashlib.sha256(packed).hexdigest(),'local_source_sha256':hashlib.sha256(raw).hexdigest()}
+    for name in FULL_SOURCE_SHADERS:
+        raw=(project/'scripts'/name).read_bytes();exported='assets/scripts/'+name
+        assert exported in names,'Missing source streaming terrain shader '+name
+        assert len(raw)>64 and archive.read(exported)==raw,'Source streaming terrain shader differs from local source '+name
+        assert re.search(rb'^shader_type\s+spatial\s*;',raw,re.M),'Invalid source streaming spatial shader '+name
+        result['shaders'][name]={'runtime_path':exported,'runtime_bytes':len(raw),'runtime_sha256':hashlib.sha256(raw).hexdigest()}
     result['startup_contract']=verify_full_startup(text['main'],text['planetary_system'])
     assert set(path.stem for path in (project/'data').glob('ffe_*.json'))==set(FULL_SOURCE_TABLES),'Full packaging verifier list omits a source table or names a missing table'
     tables={}
@@ -625,6 +633,9 @@ def verify_source_full_runtime(archive,project):
     assert 'sphere-source-ground-v4' in text['source_surface_terrain'] and 'source_exterior_probe_125pct_axes_v1' in text['source_surface_terrain'],'Shared source terrain and explicit model117 caller policy are missing'
     assert 'continuous_q31_source_probe_grid_v1' in text['source_surface_terrain'],'Shared source render/collision sampling policy changed'
     assert 'source_surface_terrain.gd' in text['source_global_body_mesh'] and 'source-height-global-lod-v1' in text['source_global_body_mesh'],'Celestial global LOD is not bound to shared source surface heights'
+    for name in ['source_surface_render_packet.gd','source_surface_render_state.gd',*FULL_SOURCE_SHADERS]:
+        assert 'res://scripts/'+name in text['surface_visual'],'Source terrain streaming helper is disconnected from SurfaceVisual '+name
+    assert 'sphere-source-ground-v4' in text['source_surface_render_packet'] and 'source-surface-render-state-v1' in text['source_surface_render_state'],'Streaming publication must retain its explicit source terrain/frame contract'
     assert 'source_motion_profile=full' in text['source_station_session'] and 'if source_motion_profile:' in source_function(text['flight_model'],'acceleration'),'Source ship controls must be selected by world version'
     assert 'SourceControlProfile.acceleration(ship_id)' in source_function(text['flight_model'],'acceleration'),'Source control profile is disconnected from Flight'
     cobra=next((row for row in tables['ffe_ship_registry']['ships'] if row['index']==38),None)
@@ -635,7 +646,7 @@ def verify_source_full_runtime(archive,project):
     assert decode.index('candidate_world.restore(')<decode.index('StationSession.restore_flight(')<decode.index('candidate_surface.restore('),'Full save load order must remain World then Flight then Surface'
     tick=source_function(text['main'],'_tick')
     assert tick.index('StationSession.refresh(')<tick.index('ship.step(') and 'surface.set_source_time(nav.elapsed_days)' in tick,'Frame update must precede orbital Flight and source surface step'
-    result.update({'compiled_module_count':len(FULL_SOURCE_MODULES),'raw_json_count':len(result['data']),'natural_model_indices':ground['parent_models'],'orbital_station_model_indices':orbital_models,'source_control_specification_sha256':spec_sha,'world_layout':'source_jjffe_systems_v4','live_gravity':'sampled-f603-nominal-day-si-v1','gravity_parent_policy':'single_current_focus_parent_f603_v1','live_terrain':'sphere-source-ground-v4','station_session':'selected-source-station-session-v1','native_development_fixtures_packaged':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'original_per_frame_dynamics':False,'complete_original_physics':False,'physical_device_tested':False})
+    result.update({'compiled_module_count':len(FULL_SOURCE_MODULES),'streaming_shader_count':len(FULL_SOURCE_SHADERS),'raw_json_count':len(result['data']),'natural_model_indices':ground['parent_models'],'orbital_station_model_indices':orbital_models,'source_control_specification_sha256':spec_sha,'world_layout':'source_jjffe_systems_v4','live_gravity':'sampled-f603-nominal-day-si-v1','gravity_parent_policy':'single_current_focus_parent_f603_v1','live_terrain':'sphere-source-ground-v4','surface_streaming_packet':'source-surface-render-packet-v1','surface_streaming_state':'source-surface-render-state-v1','station_session':'selected-source-station-session-v1','native_development_fixtures_packaged':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'original_per_frame_dynamics':False,'complete_original_physics':False,'physical_device_tested':False})
     return result
 
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):

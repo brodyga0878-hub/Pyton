@@ -14,7 +14,7 @@ func ready_mesh()->bool:
 		await frame()
 	return false
 func save_frame(filename:String,eye:Vector3,target:Vector3)->bool:
-	game._sync_scene();game._refresh_hud();game.camera.position=eye;game.camera.look_at(game.to_global(target),Vector3.UP);game.camera.fov=62
+	game._process(0.0);game._sync_scene();game._refresh_hud();game.camera.position=eye;game.camera.look_at(game.to_global(target),Vector3.UP);game.camera.fov=62
 	game.notice_timer=0;game.notice.hide();game.player.visible=true
 	for index in range(4):await frame()
 	if root.get_texture().get_image().save_png(OUTPUT+"/"+filename)!=OK:return false
@@ -39,6 +39,7 @@ func run()->void:
 	var geometry:Dictionary=game.world.source_station_geometry(game.nav.elapsed_days)
 	var centre:Vector3=geometry.bounds.get_center();var span:float=geometry.bounds.size.length()
 	if not await save_frame("01-original-orbital-station.png",game.ship.STATION+basis*(centre+Vector3(0.8,0.35,0.9)*span),game.ship.STATION+basis*centre):await finish(1);return
+	if not await save_frame("04-cobra-at-native-dock.png",game.ship.position+basis*Vector3(55,32,95),game.ship.position+basis*Vector3(0,4,0)):await finish(1);return
 	game._new_models(World.FULL_LAYOUT);game.world.site_id="site10";game.world.focus_id="earth";game.world.selected_id="earth";game._apply_system()
 	await game._enter_surface()
 	if not game.surface.active or not await ready_mesh():push_error("Source city capture failed");await finish(1);return
