@@ -1,0 +1,92 @@
+[
+	{
+		"actual_scene": "scenes/main.tscn",
+		"composited": false,
+		"console_height": 240.0,
+		"file": "01-classic-console-external.png",
+		"gameplay_progress_read": false,
+		"gameplay_progress_written": false,
+		"layout": "source_jjffe_systems_v4",
+		"menu_visible": false,
+		"physical_phone_capture": false,
+		"simulation_paused": false,
+		"station_model": 80,
+		"view": "external",
+		"viewport": [
+			1440,
+			720
+		]
+	},
+	{
+		"actual_scene": "scenes/main.tscn",
+		"composited": false,
+		"console_height": 240.0,
+		"file": "02-classic-console-rear.png",
+		"gameplay_progress_read": false,
+		"gameplay_progress_written": false,
+		"layout": "source_jjffe_systems_v4",
+		"menu_visible": false,
+		"physical_phone_capture": false,
+		"simulation_paused": false,
+		"station_model": 80,
+		"view": "rear",
+		"viewport": [
+			1440,
+			720
+		]
+	},
+	{
+		"actual_scene": "scenes/main.tscn",
+		"composited": false,
+		"console_height": 240.0,
+		"file": "03-classic-console-pause.png",
+		"gameplay_progress_read": false,
+		"gameplay_progress_written": false,
+		"layout": "source_jjffe_systems_v4",
+		"menu_visible": false,
+		"physical_phone_capture": false,
+		"simulation_paused": true,
+		"station_model": 80,
+		"view": "rear",
+		"viewport": [
+			1440,
+			720
+		]
+	},
+	{
+		"actual_scene": "scenes/main.tscn",
+		"composited": false,
+		"console_height": 240.0,
+		"file": "04-real-cargo-and-equipment.png",
+		"gameplay_progress_read": false,
+		"gameplay_progress_written": false,
+		"layout": "source_jjffe_systems_v4",
+		"menu_visible": true,
+		"physical_phone_capture": false,
+		"simulation_paused": true,
+		"station_model": 80,
+		"view": "rear",
+		"viewport": [
+			1440,
+			720
+		]
+	},
+	{
+		"actual_scene": "scenes/main.tscn",
+		"composited": false,
+		"console_height": 240.0,
+		"file": "05-classic-console-wide-landscape.png",
+		"gameplay_progress_read": false,
+		"gameplay_progress_written": false,
+		"layout": "source_jjffe_systems_v4",
+		"menu_visible": false,
+		"physical_phone_capture": false,
+		"simulation_paused": false,
+		"station_model": 80,
+		"view": "external",
+		"viewport": [
+			2316,
+			1080
+		]
+	}
+]

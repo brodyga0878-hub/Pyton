@@ -1,0 +1,153 @@
+{
+	"bounds_raw": {
+		"maximum": [
+			151551,
+			131071,
+			278527
+		],
+		"minimum": [
+			-159744,
+			-139264,
+			-278528
+		]
+	},
+	"checks": 224,
+	"failures": 0,
+	"model_index": 112,
+	"native_vertex_points": 200,
+	"original_collider_executed": false,
+	"profile": "offline-source112-native-vertex-and-mesh-spike-v1",
+	"radial_mesh_intersections": [
+		{
+			"direction": [
+				1.0,
+				0.0,
+				0.0
+			],
+			"normal": [
+				0.905829608440399,
+				-0.329382508993149,
+				-0.26642045378685
+			],
+			"ok": true,
+			"radius_m": 102.446503951588,
+			"radius_raw": 102398.994652406,
+			"triangle_index": 41
+		},
+		{
+			"direction": [
+				-1.0,
+				0.0,
+				0.0
+			],
+			"normal": [
+				-0.782127618789673,
+				-0.502796351909637,
+				-0.368065357208252
+			],
+			"ok": true,
+			"radius_m": 69.664306640625,
+			"radius_raw": 69632.0,
+			"triangle_index": 24
+		},
+		{
+			"direction": [
+				0.0,
+				1.0,
+				0.0
+			],
+			"normal": [
+				0.0,
+				0.861931025981903,
+				-0.507025539875031
+			],
+			"ok": true,
+			"radius_m": 90.1528179038745,
+			"radius_raw": 90111.0097695544,
+			"triangle_index": 20
+		},
+		{
+			"direction": [
+				0.0,
+				-1.0,
+				0.0
+			],
+			"normal": [
+				0.0,
+				-0.904816389083862,
+				-0.425802052021027
+			],
+			"ok": true,
+			"radius_m": 57.37060546875,
+			"radius_raw": 57344.0,
+			"triangle_index": 26
+		},
+		{
+			"direction": [
+				0.0,
+				0.0,
+				-1.0
+			],
+			"normal": [
+				0.533626079559326,
+				0.315328001976013,
+				-0.784736633300781
+			],
+			"ok": true,
+			"radius_m": 278.657219286247,
+			"radius_raw": 278527.992727121,
+			"triangle_index": 54
+		},
+		{
+			"direction": [
+				0.0,
+				0.0,
+				1.0
+			],
+			"normal": [
+				0.432597070932388,
+				0.253593534231186,
+				0.86518794298172
+			],
+			"ok": true,
+			"radius_m": 278.656215936079,
+			"radius_raw": 278526.989842254,
+			"triangle_index": 0
+		},
+		{
+			"direction": [
+				0.577350258827209,
+				0.577350258827209,
+				0.577350258827209
+			],
+			"normal": [
+				0.857733845710754,
+				0.509283363819122,
+				0.0701642334461212
+			],
+			"ok": true,
+			"radius_m": 162.624226052078,
+			"radius_raw": 162548.809491125,
+			"triangle_index": 7
+		},
+		{
+			"direction": [
+				-0.577350258827209,
+				0.577350258827209,
+				-0.577350258827209
+			],
+			"normal": [
+				-0.959722220897675,
+				0.218131750822067,
+				-0.177064895629883
+			],
+			"ok": true,
+			"radius_m": 85.4679356075888,
+			"radius_raw": 85428.3000752224,
+			"triangle_index": 35
+		}
+	],
+	"runtime_landability_enabled": false,
+	"source_events": 3,
+	"triangle_count": 60
+}

@@ -1,0 +1,31 @@
+{
+  "recorded_utc": "2026-11-06T18:31:51.923644+00:00",
+  "scope": "Python packaging checker unit tests using an explicit mock archive and local source API/provenance reads; not an APK export, game execution or device test.",
+  "command": [
+    "python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_android_full_packaging.py",
+    "-v"
+  ],
+  "tests": 24,
+  "failures": 0,
+  "errors": 0,
+  "exit_code": 0,
+  "unittest_duration_seconds": 0.184,
+  "raw_stdout_file_saved": false,
+  "output_evidence": "Full original combined output is retained in tool call exec_command chunk658993; this JSON records observed results, not a raw log.",
+  "file_sha256_at_recording": {
+    "tests/test_android_full_packaging.py": "559d8e7a56ce11715c9bf96e0a055220d5fe494ae5328a6615ebd666ccfe7125",
+    "tools/verify_rebuilt_android.py": "f15db64ddc1bca38108a5870b3df1de702cccd107802b21264ca62bd52a71127",
+    "scripts/flight_console.gd": "01d1e2d08fad0dca5156977cbb33eb284597c52d5d59f9bb7847a0da66b4eca8",
+    "scripts/main.gd": "1bbbbea519e5580aaa6db106b3701fc324410c77ac42421be91de0c0bb52255b",
+    "scripts/flight_instruments.gd": "06681eb395b7cceaa16a5d705bb5e5ff948f9d60802cae10ecc2987661958329",
+    "scripts/source_mining_machine.gd": "cdbcef39b2ec2ec777fb68da483b53f8a8ec3a986dad6f2722a436a6f8f52ddb"
+  },
+  "physical_device_tested": false
+}
