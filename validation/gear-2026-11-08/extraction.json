@@ -1,0 +1,39 @@
+{
+  "time_utc": "2026-11-07T21:18:19.410979+00:00",
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_extract_landing_gear.py",
+    "-v"
+  ],
+  "test_count": 10,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "exit_code": 0,
+  "file_sha256": {
+    "tools/extract_landing_gear.py": "3336018767d9a570806aba65941c63c1cf3ce699f8805417dc77f0e46c7a41d7",
+    "data/ffe_landing_gear.json": "f06d7184046407dea3ee45fb3c6dedeb6bfaf21fe1a6136a388a87fa97ed1f00",
+    "tests/test_extract_landing_gear.py": "63aabdedfef87557083622ce064b34cf2f08c53beac8c311e80d045184bc9388",
+    "tests/fixtures/landing_gear_v42_sources.json": "df26c2952f08c837f074d4d9ccf44731e84a61e7f9258d84f34126ddc5ffb894"
+  },
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "primary_anchors": {
+    "count": 2,
+    "byte_count": 421,
+    "instruction_count": 104
+  },
+  "supporting_slices": {
+    "count": 2,
+    "byte_count": 53,
+    "instruction_count": 14
+  },
+  "historical_code42_baseline_files": 17,
+  "original_native_oracle_executed_by_this_run": false,
+  "physical_device_tested": false
+}

@@ -1,0 +1,15 @@
+test_actual_dos_offsets_and_reextraction_are_exact (test_extract_landing_gear.LandingGearExtraction.test_actual_dos_offsets_and_reextraction_are_exact) ... ok
+test_automatic_phase_boundary_and_manual_block_are_not_interchanged (test_extract_landing_gear.LandingGearExtraction.test_automatic_phase_boundary_and_manual_block_are_not_interchanged) ... ok
+test_console_and_sound_callbacks_do_not_claim_full_ui_execution (test_extract_landing_gear.LandingGearExtraction.test_console_and_sound_callbacks_do_not_claim_full_ui_execution) ... ok
+test_fixed_sixty_host_rate_is_adapter_not_source_scheduler (test_extract_landing_gear.LandingGearExtraction.test_fixed_sixty_host_rate_is_adapter_not_source_scheduler) ... ok
+test_high_speed_emits_one_warning_without_blocking_motion (test_extract_landing_gear.LandingGearExtraction.test_high_speed_emits_one_warning_without_blocking_motion) ... ok
+test_pinned_original_sources_and_three_immutable_resources (test_extract_landing_gear.LandingGearExtraction.test_pinned_original_sources_and_three_immutable_resources) ... ok
+test_request_bit_and_position_polarity_are_explicit (test_extract_landing_gear.LandingGearExtraction.test_request_bit_and_position_polarity_are_explicit) ... ok
+test_same_offset_e8_does_not_conflate_object_timer_and_flight_state (test_extract_landing_gear.LandingGearExtraction.test_same_offset_e8_does_not_conflate_object_timer_and_flight_state) ... ok
+test_supporting_caller_and_landing_predicates_are_bounded_slices (test_extract_landing_gear.LandingGearExtraction.test_supporting_caller_and_landing_predicates_are_bounded_slices) ... ok
+test_two_primary_anchors_keep_exact_bounds_bytes_and_scope (test_extract_landing_gear.LandingGearExtraction.test_two_primary_anchors_keep_exact_bounds_bytes_and_scope) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.044s
+
+OK

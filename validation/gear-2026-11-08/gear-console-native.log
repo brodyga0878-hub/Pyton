@@ -1,0 +1,4 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+GEAR CONSOLE NATIVE EVIDENCE: [{"phase":"actual_source_gear_touch_cycle","position_from_source":true,"source_fraction_after_retraction":0.620965896086061,"source_request_is_retract":true,"touch_width":720,"visual_landed":false},{"automatic_source_override_retained":true,"blocked_phase_touch_rejected":true,"paused_touch_blocked":true,"phase":"actual_quote_guards_and_caption","supported_widths":[720,1440,1920]}]
+GEAR CONSOLE NATIVE TESTS: 27 checks, 0 failures

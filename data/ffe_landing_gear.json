@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "profile": "dos-firstenc-f1008-f1056-landing-gear-anchors-v1",
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_data_sha256": "34219c91c5d019440ebf4fc707711a32c5080123ede05cf4d10a27d41f770850",
+  "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+  "immutable_resources": {
+    "ffe_hyperdrive_sha256": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+    "ffe_fuel_sha256": "4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f",
+    "ffe_atmosphere_sha256": "b65e25e187ac4abe7e24325a78de3fe70c140395711127ee0076f9905222bcce"
+  },
+  "source_newlines_normalized_for_fragment_hashes": true,
+  "procedures": {
+    "1008": {
+      "dos_file_offset": 202128,
+      "dos_virtual_address": 4458384,
+      "byte_count": 305,
+      "hex": "558bec53568b5d08be3c216400668b83e80000006685c074388b150c2c650081faffff000077210fb7c03bd0770f66a10c2c6500662983e8000000eb1466c783e80000000000eb0966c783e8000000000080bee800000002753e6681a6c6000000fdff80bbff0000001e7617f686e9000000027405e8a252000080a6e9000000fdeb15808ee900000002f686e9000000027405e884520000f686e90000000274260fb7939e000000a10c2c6500d1e83bd076096629839e000000eb7166c7839e0000000000eb6680bee800000002742c81bed8000000a08601007c20f686c600000002750f6aff68ce980000e8973c000083c40866838ec6000000020fb7839e0000008b150c2c6500d1ea03c23dffff0000760b66c7839e000000ffffeb0ea10c2c6500d1e86601839e0000005e5b5dc3",
+      "sha256": "6d0a8a82a36809b64f58568ad7ef7c29e2b767f8091e06d47536e04adab41e97",
+      "independently_normalized_instruction_count": 72,
+      "source_label": "FUNC_001008",
+      "source_line": 74681,
+      "pinned_jjffe_fragment_sha256": "94dffaeda908139a1f555af2fa28f15eaafbe7cafd9c0ee11e7bafab09639916",
+      "pinned_jjffe_instructions_match_dos": true,
+      "coverage": "complete procedure",
+      "instruction_proof_policy": "Instruction/operand comparison normalizes branch destination addresses only; external calls remain identified by DOS address"
+    },
+    "1056_4410": {
+      "dos_file_offset": 213146,
+      "dos_virtual_address": 4469402,
+      "byte_count": 116,
+      "hex": "8b86c800000080b8ff00000024745880b6e9000000026681a6c6000000fdfff686e900000002741a6a006a38e83da0fdff83c4086a006a46e831a0fdff83c408eb186a016a38e823a0fdff83c4086a016a46e817a0fdff83c408e8b32700006a0ce87acb0200596a14e872cb020059e966020000",
+      "sha256": "4262147506224b00e3d94d2febdfed3f690773655f90439d724e8f393ba61107",
+      "independently_normalized_instruction_count": 32,
+      "source_label": "FUNC_001056/JUMP_004410..JUMP_004413",
+      "source_line": 78582,
+      "pinned_jjffe_fragment_sha256": "5bdacc110cf49c7318bdfad9aaf4928ab787728b07a4851348a4b4d5235b743f",
+      "pinned_jjffe_instructions_match_dos": true,
+      "coverage": "gear toggle branch including its terminal jump to the F1056 epilogue; not the full input dispatcher",
+      "instruction_proof_policy": "Instruction/operand comparison normalizes branch destination addresses only; external calls remain identified by DOS address"
+    }
+  },
+  "supporting_slices": {
+    "1009_call_order": {
+      "dos_file_offset": 202524,
+      "dos_virtual_address": 4458780,
+      "byte_count": 26,
+      "hex": "53e86efeffff59530fbe0524226400d1f88b04c500ee4e00ffd0",
+      "sha256": "e8595087e9d8024083bd4a947051337dcedbb9bf0fbf0548c6015f4560713f9b",
+      "independently_normalized_instruction_count": 8,
+      "source_label": "FUNC_001009",
+      "source_line": 74772,
+      "scope": "Only PUSH/call F1008/POP then indirect active-state dispatch. Does not prove the whole F1009/frame scheduler."
+    },
+    "575_landing_predicate": {
+      "dos_file_offset": 100049,
+      "dos_virtual_address": 4356305,
+      "byte_count": 27,
+      "hex": "817df0580200007f296681bb9e000000ffff751e3d000000787c17",
+      "sha256": "99d87ce24619fcba14d99c78cd37b0a24a41fc2b334d591f0e7bc53383d08c7b",
+      "independently_normalized_instruction_count": 6,
+      "source_label": "FUNC_000575/JUMP_002412",
+      "source_line": 36572,
+      "scope": "Only six predicate instructions: aggregate speed<=0x258, gear word==0xFFFF, orientation dot>=0x78000000; not full collision response or manual docking."
+    }
+  },
+  "field_layout": {
+    "object": {
+      "gear_position_u16": 158,
+      "unrelated_timer_u16": 232,
+      "autopilot_phase_u8": 255
+    },
+    "game": {
+      "warning_flags_u16": 198,
+      "player_object_pointer_u32": 200,
+      "speed_s32": 216,
+      "flight_state_u8": 232,
+      "control_flags_u8": 233
+    },
+    "globals": {
+      "DATA_008804_game_virtual_address": 6562108,
+      "DATA_009155_master_ticks_u32_virtual_address": 6630412
+    }
+  },
+  "constants": {
+    "request_retract_game_e9_mask_u8": 2,
+    "warning_game_c6_mask_u16": 2,
+    "position_fully_retracted_u16": 0,
+    "position_fully_deployed_u16": 65535,
+    "motion_ticks_shift_right": 1,
+    "automatic_flight_state_u8": 2,
+    "auto_retract_phase_maximum_u8": 30,
+    "toggle_blocked_autopilot_phase_u8": 36,
+    "deployment_warning_speed_raw_s32": 100000,
+    "deployment_warning_message_u16": 39118,
+    "warning_selector_s32": -1,
+    "console_button_indices_u8": [
+      56,
+      70
+    ],
+    "console_retracted_request_image_u8": 0,
+    "console_deployed_request_image_u8": 1,
+    "toggle_success_sound_u8": 12,
+    "toggle_final_sound_u8": 20,
+    "supporting_landing_maximum_speed_aggregate_s32": 600,
+    "supporting_landing_minimum_orientation_dot_s32": 2013265920
+  },
+  "callbacks": {
+    "FUNC_001116": {
+      "dos_virtual_address": 4479660,
+      "scope": "Observed control/console refresh request, not the entire original UI engine"
+    },
+    "FUNC_001097": {
+      "dos_virtual_address": 4474136,
+      "arguments": [
+        "message_u16",
+        "selector_s32"
+      ],
+      "scope": "Observed warning presentation request"
+    },
+    "FUNC_000262": {
+      "dos_virtual_address": 4313864,
+      "arguments": [
+        "console_button_index",
+        "image_index"
+      ],
+      "scope": "Observed original console icon update request"
+    },
+    "FUNC_001906": {
+      "dos_virtual_address": 4652666,
+      "arguments": [
+        "sound_sample_index"
+      ],
+      "scope": "Observed sound callback, not original audio execution"
+    }
+  },
+  "canonical_contracts": {
+    "request_polarity": "game+E9 bit2 SET requests retraction to object+9E=0; CLEAR requests deployment to0xFFFF. A request is distinct from actual word position.",
+    "motion": "F1008 uses unsigned master_ticks>>1, saturating at the requested endpoint. Tick0/1 can leave position unchanged while other source effects still occur.",
+    "object_timer": "First independently decrement object+E8 u16 by supplied master ticks, saturating at0; ticks>65535 clear it. This is not the game+E8 flight state.",
+    "automatic_phase": "For game+E8==2, clear warning bit; object+FF<=0x1E sets retract and refreshes on every invocation; phase>0x1E clears retract and refreshes only if previously set.",
+    "speed_warning": "Deploy request outside automatic flight state warns once at signed raw speed>=100000 and latches warning bit2. It does not block gear motion.",
+    "manual_toggle": "Only object+FF==0x24 blocks this branch. Otherwise XOR request bit2, clear warning latch, set both console icons, refresh, play0x0C; every path plays0x14.",
+    "landing_position": "Original six-instruction F575 predicate requires exact gear position0xFFFF as one condition; a request alone is insufficient and this is not full collision parity.",
+    "source_order": "Verified F1009 slice calls F1008 before indirect active-state dispatch; the modern caller rate is a separate policy.",
+    "thermal_polarity": "Existing source_atmospheric_dynamics.gear_down bool represents raw game+E9 bit2 despite its historical name: pass retract_request_bit, not physical deployment. No previous JSON is rewritten."
+  },
+  "caller_policies": {
+    "canonical_original_player_call_rate_inferred": false,
+    "phone_invocation_rate_hz": 60,
+    "phone_rate_is_original": false,
+    "phone_rate_scope": "Explicit named fixed60 phone adapter with persisted phase/rational master ticks; not proof of original DOS60Hz.",
+    "initialization_scope": "Explicit context-derived phone snapshot adapter; no complete F998 starter gear state inferred.",
+    "automatic_phase_scope": "Phone landing/docking phase mapping must be named as an adapter; the original entire autopilot/state machine is not implied.",
+    "persistence_scope": "A separate versioned landing-gear sibling owns request bit, position, warning/timer and scheduling state; previous thermal/fuel/hyperdrive resources stay immutable.",
+    "callback_scope": "Icon/warning/refresh/sound callbacks are observed requests; full original GUI/audio/event dispatcher is outside extraction."
+  },
+  "source_variants": {
+    "covered_DOS_and_pinned_JJFFE_instructions_equal": true,
+    "covered_scope": [
+      "complete F1008",
+      "F1056 JUMP_004410..JUMP_004413 including exit jump"
+    ],
+    "whole_F1056_DOS_equivalence_proved": false,
+    "whole_F1056_scope": "Pinned JJFFE changes other keyboard input paths; no whole-dispatcher equivalence is asserted.",
+    "legacy_thermal_boolean_polarity_correction": "New metadata explicitly documents retract-bit polarity; old atmosphere JSON and old API spelling are immutable."
+  },
+  "scope": "Read-only byte/source provenance and caller policies. No original instructions executed by extractor, no new raw gear tables, no complete player scheduler/autopilot/F575/GUI/audio integration proof."
+}

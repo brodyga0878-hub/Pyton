@@ -21,6 +21,7 @@ signal equipment_requested
 signal control_requested
 signal surface_requested
 signal pause_requested
+signal gear_requested
 var buttons:Dictionary={}
 var scanner_buttons:Dictionary={}
 var labels:Dictionary={}
@@ -34,11 +35,13 @@ var _built:=false
 var _bank_width:=432.0
 var _scan_rect:=Rect2()
 var _actions_enabled:=true
+var _gear_present:=false
 
 class ActionIcon extends Control:
 	var symbol:=""
 	var active:=false
 	var alert:=false
+	var fraction:=0.0
 	func _ready()->void:mouse_filter=Control.MOUSE_FILTER_IGNORE
 	func _draw()->void:
 		var c:=Vector2(size.x*0.5,22.0)
@@ -87,6 +90,13 @@ class ActionIcon extends Control:
 				if active:draw_colored_polygon(PackedVector2Array([c+Vector2(-8,-12),c+Vector2(12,0),c+Vector2(-8,12)]),green)
 				else:
 					for x in [-9,3]:draw_rect(Rect2(c+Vector2(x,-11),Vector2(6,22)),ink)
+			"gear":
+				c.y=13
+				var down:=clampf(fraction,0,1);var gear_ink:=green if down>=1.0 else (gold if down>0 else ink)
+				draw_line(c+Vector2(-13,-7),c+Vector2(13,-7),ink,2,true)
+				for x in [-9.0,9.0]:
+					var foot:=c+Vector2(x,lerpf(-3,8,down))
+					draw_line(c+Vector2(x,-7),foot,gear_ink,2,true);draw_line(foot+Vector2(-4,0),foot+Vector2(4,0),gear_ink,2,true)
 
 func _ready()->void:
 	mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -147,6 +157,27 @@ func _action(key:String)->void:
 		"control":control_requested.emit()
 		"surface":surface_requested.emit()
 		"pause":pause_requested.emit()
+		"gear":
+			if _gear_present and _actions_enabled and buttons.has("gear") and not buttons.gear.disabled and buttons.gear.is_visible_in_tree():gear_requested.emit()
+
+func _configure_gear()->void:
+	var present:bool=_state.get("gear_available",false)==true
+	if present and not buttons.has("gear"):
+		var button:=_make_button("gear")
+		for role in ["normal","hover","pressed","disabled"]:
+			var style:StyleBoxFlat=button.get_theme_stylebox(role).duplicate();style.content_margin_top=26
+			button.add_theme_stylebox_override(role,style)
+	elif not present and buttons.has("gear"):
+		var button:Button=buttons.gear;button.release_pointer();buttons.erase("gear");remove_child(button);button.queue_free()
+	var changed:=_gear_present!=present;_gear_present=present
+	if changed:_layout()
+	if not present:return
+	var caption:="Шасси";var status:=""
+	if _state.get("gear_text") is String and not _state.gear_text.strip_edges().is_empty():caption=_state.gear_text.replace("\n"," ").replace("\r"," ").strip_edges()
+	if _state.get("gear_status") is String:status=_state.gear_status.replace("\n"," ").replace("\r"," ").strip_edges()
+	buttons.gear.text=caption+("\n"+status if not status.is_empty() else "")
+	buttons.gear.tooltip_text=status if not status.is_empty() else "Выпуск или уборка шасси"
+	var icon:ActionIcon=buttons.gear.get_node("Icon");icon.fraction=clampf(_number("gear_fraction"),0,1);icon.queue_redraw()
 
 func _zoom_scanner(direction:int)->void:
 	_scanner_zoom=clampf(_scanner_zoom*2.0 if direction>0 else _scanner_zoom/2.0,0.25,16.0)
@@ -169,6 +200,9 @@ func _update_action_availability()->void:
 	buttons.control.disabled=paused or not bool(_state.get("control_enabled",true))
 	buttons.surface.disabled=paused or not bool(_state.get("surface_enabled",true))
 	for key in ["auto","brake","dock"]:buttons[key].disabled=paused
+	if _gear_present:
+		buttons.gear.disabled=paused or _state.get("gear_enabled",false)!=true
+		if buttons.gear.disabled:buttons.gear.release_pointer()
 	scanner_buttons["out"].disabled=_scanner_zoom<=0.25
 	scanner_buttons["in"].disabled=_scanner_zoom>=16.0
 
@@ -204,6 +238,11 @@ func _layout()->void:
 	for key in ["out","in"]:
 		var button:Button=scanner_buttons[key]
 		button.position=Vector2(_scan_rect.position.x+3 if key=="out" else _scan_rect.end.x-67,172);button.size=Vector2(64,64)
+	if _gear_present:
+		var gear_width:=minf(180.0,_scan_rect.size.x-140.0)
+		buttons.gear.position=Vector2(_scan_rect.get_center().x-gear_width*0.5,172);buttons.gear.size=Vector2(gear_width,64)
+		buttons.gear.add_theme_font_size_override("font_size",11 if compact else 14)
+		_place("scanner_range",Vector2(_scan_rect.position.x+40,55),Vector2(_scan_rect.size.x-80,22),12 if compact else 15,HORIZONTAL_ALIGNMENT_CENTER)
 	queue_redraw()
 
 func _number(key:String,fallback:=0.0)->float:
@@ -216,12 +255,16 @@ func _distance(value:float)->String:
 
 func _update_scanner_labels()->void:
 	if not _built:return
-	labels.scanner_range.text="ШКАЛА\n"+_distance(_range/_scanner_zoom)
+	labels.scanner_range.text=("ШКАЛА " if _gear_present else "ШКАЛА\n")+_distance(_range/_scanner_zoom)
+	# Refit after replacing the previous two-line text; its old minimum size
+	# must not leave the one-line scale extending into scanner contact glyphs.
+	if _gear_present:labels.scanner_range.size.y=22
 	_update_action_availability()
 
 func configure_state(state:Dictionary)->void:
 	_state=state.duplicate(true)
 	if not _built:return
+	_configure_gear()
 	labels.speed.text="Факт: %.1f м/с"%maxf(0,_number("actual_speed_mps"))
 	labels.set_speed.text="Задано: %.1f м/с"%_number("target_speed_mps")
 	var surface_active:bool=bool(state.get("surface_active",false))
@@ -289,7 +332,7 @@ func _project_contact(point:Vector3,center:Vector2,radii:Vector2)->Dictionary:
 	var raw_top:=foot-Vector2(0,elevation)
 	# The instrument plot ends above the scale/buttons. A capped elevation is
 	# marked as such rather than drawing a contact into a different instrument.
-	var top:=Vector2(raw_top.x,clampf(raw_top.y,61.0,164.0))
+	var top:=Vector2(raw_top.x,clampf(raw_top.y,81.0 if _gear_present else 61.0,164.0))
 	return {"foot":foot,"top":top,"outside":point.length()>range_m,"clipped":not top.is_equal_approx(raw_top)}
 
 func _draw_contact(point:Vector3,color:Color,center:Vector2,radii:Vector2,selected:=false)->void:

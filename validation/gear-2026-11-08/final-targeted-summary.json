@@ -1,0 +1,223 @@
+{
+  "schema": "starfrontier-current-landing-gear-targeted-summary-v1",
+  "created_utc": "2026-11-07T21:30:29.614550+00:00",
+  "version": "0.18.0-landing-gear-alpha1",
+  "checks": 51431,
+  "passed_suites": 28,
+  "failures": 0,
+  "status": "passed",
+  "suites": [
+    {
+      "test": "tests/test_source_landing_gear.gd",
+      "checks": 42935,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/source-landing-gear-core.json"
+    },
+    {
+      "test": "tests/test_source_landing_gear_session.gd",
+      "checks": 413,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/landing-gear-session.json"
+    },
+    {
+      "test": "tests/test_source_gear_main.gd",
+      "checks": 112,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/source-gear-main.json"
+    },
+    {
+      "test": "tests/test_flight_console.gd",
+      "checks": 318,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/ui-visual-tests.json",
+      "log": "validation/gear-2026-11-08/flight-console-legacy.log"
+    },
+    {
+      "test": "tests/test_ship_graphics.gd",
+      "checks": 108,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/ui-visual-tests.json",
+      "log": "validation/gear-2026-11-08/ship-graphics-legacy.log"
+    },
+    {
+      "test": "tests/test_gear_flight_console.gd",
+      "checks": 137,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/ui-visual-tests.json",
+      "log": "validation/gear-2026-11-08/gear-flight-console.log"
+    },
+    {
+      "test": "tests/test_gear_ship_visual.gd",
+      "checks": 71,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/ui-visual-tests.json",
+      "log": "validation/gear-2026-11-08/gear-ship-visual.log"
+    },
+    {
+      "test": "tests/test_gear_console_native.gd",
+      "checks": 27,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/ui-visual-tests.json",
+      "log": "validation/gear-2026-11-08/gear-console-native.log"
+    },
+    {
+      "test": "tests/test_source_thermal_motion_bridge.gd",
+      "checks": 355,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/regressions.json",
+      "log": "/workspace/Pyton/validation/gear-2026-11-08/regression-logs/logs/source_thermal_motion_bridge.log"
+    },
+    {
+      "test": "tests/test_source_atmosphere_contact.gd",
+      "checks": 3904,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/regressions.json",
+      "log": "/workspace/Pyton/validation/gear-2026-11-08/regression-logs/logs/source_atmosphere_contact.log"
+    },
+    {
+      "test": "tests/test_source_thermal_main.gd",
+      "checks": 463,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/regressions.json",
+      "log": "/workspace/Pyton/validation/gear-2026-11-08/regression-logs/logs/source_thermal_main.log"
+    },
+    {
+      "test": "tests/test_source_fuel_main.gd",
+      "checks": 397,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/regressions.json",
+      "log": "/workspace/Pyton/validation/gear-2026-11-08/regression-logs/logs/source_fuel_main.log"
+    },
+    {
+      "test": "tests/test_source_hyperdrive_main.gd",
+      "checks": 70,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/regressions.json",
+      "log": "/workspace/Pyton/validation/gear-2026-11-08/regression-logs/logs/source_hyperdrive_main.log"
+    },
+    {
+      "test": "tests/test_navigation_main.gd",
+      "checks": 53,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/regressions.json",
+      "log": "/workspace/Pyton/validation/gear-2026-11-08/regression-logs/logs/navigation_main.log"
+    },
+    {
+      "test": "tests/test_source_motion_bridge.gd",
+      "checks": 81,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/regressions.json",
+      "log": "/workspace/Pyton/validation/gear-2026-11-08/regression-logs/logs/source_motion_bridge.log"
+    },
+    {
+      "test": "tests/test_source_motion_main_continuation.gd",
+      "checks": 28,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/regressions.json",
+      "log": "/workspace/Pyton/validation/gear-2026-11-08/regression-logs/logs/source_motion_main_continuation.log"
+    },
+    {
+      "test": "tests/test_classic_console_main.gd",
+      "checks": 42,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/regressions.json",
+      "log": "/workspace/Pyton/validation/gear-2026-11-08/regression-logs/logs/classic_console_main.log"
+    },
+    {
+      "test": "tests/test_flight_projection.gd",
+      "checks": 691,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/regressions.json",
+      "log": "/workspace/Pyton/validation/gear-2026-11-08/regression-logs/logs/flight_projection.log"
+    },
+    {
+      "test": "tests/test_source_console_pause.gd",
+      "checks": 131,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/regressions.json",
+      "log": "/workspace/Pyton/validation/gear-2026-11-08/regression-logs/logs/source_console_pause.log"
+    },
+    {
+      "test": "tests/test_source_full_startup.gd",
+      "checks": 10,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/regressions.json",
+      "log": "/workspace/Pyton/validation/gear-2026-11-08/regression-logs/logs/source_full_startup.log"
+    },
+    {
+      "test": "tests/test_source_underground_controller.gd",
+      "checks": 197,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/regressions.json",
+      "log": "/workspace/Pyton/validation/gear-2026-11-08/regression-logs/logs/source_underground_controller.log"
+    },
+    {
+      "test": "tests/test_source_main_full.gd",
+      "checks": 153,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/regressions.json",
+      "log": "/workspace/Pyton/validation/gear-2026-11-08/regression-logs/logs/source_main_full.log"
+    },
+    {
+      "test": "tests/test_source_docking_flight.gd",
+      "checks": 402,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/regressions.json",
+      "log": "/workspace/Pyton/validation/gear-2026-11-08/regression-logs/logs/source_docking_flight.log"
+    },
+    {
+      "test": "tests/test_graphics_integration.gd",
+      "checks": 44,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/regressions.json",
+      "log": "/workspace/Pyton/validation/gear-2026-11-08/regression-logs/logs/graphics_integration.log"
+    },
+    {
+      "test": "tests/test_graphics_scope.gd",
+      "checks": 87,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/regressions.json",
+      "log": "/workspace/Pyton/validation/gear-2026-11-08/regression-logs/logs/graphics_scope.log"
+    },
+    {
+      "test": "tests/test_offpad_takeoff.gd",
+      "checks": 109,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/regressions.json",
+      "log": "/workspace/Pyton/validation/gear-2026-11-08/regression-logs/logs/offpad_takeoff.log"
+    },
+    {
+      "test": "tests/test_surface_action_controls.gd",
+      "checks": 66,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/regressions.json",
+      "log": "/workspace/Pyton/validation/gear-2026-11-08/regression-logs/logs/surface_action_controls.log"
+    },
+    {
+      "test": "tests/test_report_export.gd",
+      "checks": 27,
+      "failures": 0,
+      "proof": "validation/gear-2026-11-08/regressions.json",
+      "log": "/workspace/Pyton/validation/gear-2026-11-08/regression-logs/logs/report_export.log"
+    }
+  ],
+  "proofs_sha256": {
+    "validation/gear-2026-11-08/source-landing-gear-core.json": "fcdd4c6ea22cf02cd4d6fd1998237f7aab36ef22f382f01dc659a979ce2a718a",
+    "validation/gear-2026-11-08/landing-gear-session.json": "30cd72b6d05e2a547741c015baf0d9631185d56e4ea3cb35fd2b5653eac1f753",
+    "validation/gear-2026-11-08/source-gear-main.json": "69de976a76c18d92c837aa716308396d870491275d19a0268505cabf5548b364",
+    "validation/gear-2026-11-08/ui-visual-tests.json": "6fb669d0fda3bf98a7fdc0788c3b5a78bfcaf056afe98c33cd16cdaf0ca8cc44",
+    "validation/gear-2026-11-08/regressions.json": "c766716d42d8d57a2dc3d0526e433e70781c9c1e86d1a78f6eecf95043923b1e"
+  },
+  "new_instruction_matched_DOS_native_cases": 2812,
+  "original_DOS_primary_instructions": 104,
+  "new_native_cases_included_in_core_checks": true,
+  "old_reference_records_are_new_native_executions": false,
+  "historical_totals_added": false,
+  "repeated_source_archive_checks_added": false,
+  "capture_checks_added": false,
+  "scope": "One current passing result per unique selected gear kernel/session/UI/visual/Main and regression group. Native controls included within kernel total. Failed fixture setup/intermediate runs, repeated portability/capture checks and historical release totals excluded. Bounded suite timestamps retained, not an atomic full-game run.",
+  "full_original_port_complete": false,
+  "full_original_physics": false,
+  "physical_device_tested": false,
+  "production_release_ready": false
+}

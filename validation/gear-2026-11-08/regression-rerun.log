@@ -1,0 +1,3 @@
+source_console_pause: passed; 131 checks, 0 failures
+source_main_full: passed; 153 checks, 0 failures
+Validation passed: 7310 current checks; 20 passed suites; 0 failed; 0 unavailable. Report: validation/gear-2026-11-08/regressions.json

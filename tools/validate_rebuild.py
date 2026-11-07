@@ -44,6 +44,12 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_landing_gear', 'tests/test_source_landing_gear.gd', 'Uploaded DOS F1008 and bounded F1056 undercarriage action versus2812 native cases; request polarity, physical word, callbacks, timer and warning latch. Not the full input dispatcher or collision response.', timeout=300),
+    Suite('source_landing_gear_session', 'tests/test_source_landing_gear_session.gd', 'Strict independent gear save, fixed60Hz source ticks, exact mid-travel continuation and explicit idempotent phone request adapter.', timeout=300),
+    Suite('gear_flight_console', 'tests/test_gear_flight_console.gd', 'Optional source gear control in the classic console, retained legacy positions, readable scanner and touch/pause boundaries.', timeout=300),
+    Suite('gear_ship_visual', 'tests/test_gear_ship_visual.gd', 'Authoritative source extension drives all three existing ship struts, separate from landed state and frozen render time.', timeout=300),
+    Suite('gear_console_native', 'tests/test_gear_console_native.gd', 'Actual source gear session supplies original request and physical extension to console touch and ship visual consumers.', timeout=300),
+    Suite('source_gear_main', 'tests/test_source_gear_main.gd', 'Actual Main gear commands, exact old/partial/invalid saves, original thermal flag polarity, terrain contact waiting and lift recovery under an explicit phone collision adapter.', timeout=600, user_args=('--rebuild-capture',)),
     Suite('source_thermal_motion_bridge', 'tests/test_source_thermal_motion_bridge.gd', 'Actual raw movement retains Q16 velocity fractions, position/clock and exact cold continuation when atmosphere changes only native integer velocity words.', timeout=300),
     Suite('source_atmospheric_dynamics', 'tests/test_source_atmospheric_dynamics.gd', 'Uploaded DOS F1014 heat/drag/wind, F953 raw shield/hull and callback requests, reserved F1016/F1017 and F1530 seeds versus1447 independently executed native cases and8 complete instruction proofs; excludes full event/equipment/destruction VM.', timeout=300),
     Suite('source_atmosphere_contact', 'tests/test_source_atmosphere_contact.gd', 'Actual World/Surface natural-contact and velocity-frame adapter, airless Mercury and F1033 unknown-height sentinel; reused native solid/gas fields plus239 new source speed controls with explicit mixed provenance.', timeout=300),

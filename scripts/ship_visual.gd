@@ -18,6 +18,7 @@ var _display_thrust:=0.25
 var _clock:=0.0
 var _landed:=false
 var _gear_amount:=0.0
+var _source_gear_driven:=false
 var landing_gear:MeshInstance3D
 var _exhausts:Array[MeshInstance3D]=[]
 var _halos:Array[MeshInstance3D]=[]
@@ -67,11 +68,22 @@ func set_thrust(value:float)->void:
 	_thrust=clampf(absf(value),0,1) if is_finite(value) else 0.0
 func set_landed(value:bool)->void:
 	_landed=value
+func set_gear_fraction(value:float)->void:
+	# The source state already advances the mechanism. Drawing it must not
+	# introduce another wall-clock animation or infer its position from landed.
+	if not is_finite(value):return
+	_source_gear_driven=true;_gear_amount=clampf(value,0,1);_apply_gear()
+func clear_gear_fraction_override()->void:
+	# A caller switching this same visual back to legacy/training explicitly
+	# restores the previous landed-driven smoothing, without a position jump.
+	_source_gear_driven=false
+func _apply_gear()->void:
+	if is_instance_valid(landing_gear):
+		landing_gear.visible=_gear_amount>0.01;landing_gear.scale.y=maxf(0.02,_gear_amount)
 func _process(dt:float)->void:
 	_clock+=dt;_display_thrust=move_toward(_display_thrust,_thrust,dt*3.0)
-	_gear_amount=move_toward(_gear_amount,1.0 if _landed else 0.0,dt*5.0)
-	if landing_gear!=null:
-		landing_gear.visible=_gear_amount>0.01;landing_gear.scale.y=maxf(0.02,_gear_amount)
+	if not _source_gear_driven:_gear_amount=move_toward(_gear_amount,1.0 if _landed else 0.0,dt*5.0)
+	_apply_gear()
 	for i in range(_exhausts.size()):
 		var jet:MeshInstance3D=_exhausts[i]
 		var length_scale:float=(0.28+_display_thrust*1.15)*(1+sin(_clock*32+i)*0.025)

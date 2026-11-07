@@ -42,6 +42,7 @@ const MotionBridge=preload("res://scripts/source_motion_bridge.gd")
 const FuelFlightBridge=preload("res://scripts/source_fuel_flight_bridge.gd")
 const FuelContact=preload("res://scripts/source_fuel_contact.gd")
 const AtmosphereContact=preload("res://scripts/source_atmosphere_contact.gd")
+const LandingGearSession=preload("res://scripts/source_landing_gear_session.gd")
 const Diagnostics=preload("res://scripts/game_diagnostics.gd")
 const ReportExport=preload("res://scripts/report_export.gd")
 const DockServices=preload("res://scripts/training_dock_services.gd")
@@ -53,6 +54,7 @@ var surface:RefCounted
 var near:=Near.new()
 var fuel_contact:=FuelContact.new()
 var atmosphere_contact:=AtmosphereContact.new()
+var landing_gear:RefCounted
 var _thermal_notice_level:=""
 var settings:=Settings.new()
 var saves:=SaveStore.new()
@@ -171,6 +173,56 @@ func _new_models(layout:String=World.PORT_LAYOUT)->void:
 	if layout==World.FULL_LAYOUT and not nav.configure_native():push_error("Original galaxy could not be initialized")
 	world=World.new();world.configure(nav.current(),layout);surface=Surface.new();near.clear()
 	StationSession.configure_flight(ship,world,nav)
+	landing_gear=LandingGearSession.new();landing_gear.configure(ship.docked or surface.landed)
+	_apply_landing_gear_state()
+
+func _gear_enabled()->bool:return world!=null and world.layout_mode==World.FULL_LAYOUT
+
+func _gear_context()->Dictionary:
+	# The complete source player-state dispatcher is not yet connected. Manual
+	# flight and the parked-surface phase are explicit phone context adapters.
+	var speed:=FuelContact.raw_speed(ship.velocity)
+	return {"flight_state_u8":0,"autopilot_phase_u8":0x24 if surface.landed or ship.docked else 0,"speed_s32":speed.get("speed_s32"),"paused":instruments.paused or not active or busy}
+
+func _gear_state()->Dictionary:
+	if not _gear_enabled() or landing_gear==null:return {}
+	return landing_gear.state(_gear_context())
+
+func _apply_landing_gear_state()->void:
+	var current:=_gear_state()
+	if surface!=null:surface.set_landing_gear_state(not current.is_empty(),bool(current.get("deployed",true)) and bool(current.get("requested_down",true)),str(current.get("status_text","")))
+	if player!=null:
+		if current.is_empty():player.clear_gear_fraction_override()
+		else:player.set_gear_fraction(float(current.get("extension_fraction",0.0)))
+
+func _request_landing_gear(down:bool)->Dictionary:
+	if not _gear_enabled() or landing_gear==null:return {"ok":false,"accepted":false,"message":"Управляемые шасси недоступны в этом полёте."}
+	var result:Dictionary=landing_gear.command_request(down,_gear_context())
+	_apply_landing_gear_state();return result
+
+func _toggle_landing_gear()->void:
+	if _paused_command() or busy or not active or ship.hull<=0 or not _gear_enabled() or landing_gear==null:return
+	_release_inputs()
+	var result:Dictionary=landing_gear.command_toggle(_gear_context())
+	_apply_landing_gear_state()
+	var feedback:=str(result.get("message","Команда шасси отклонена."))
+	if result.get("accepted",false) and saving_enabled and not _save_game():feedback+=" Изменения пока не удалось сохранить."
+	_record_event("landing_gear_command",{"accepted":result.get("accepted",false),"position_u16":_gear_state().get("position_u16",0),"requested_down":_gear_state().get("requested_down",false)})
+	_announce(feedback);_refresh_hud()
+
+func _step_landing_gear(seconds:float)->bool:
+	if not _gear_enabled():_apply_landing_gear_state();return true
+	if landing_gear==null:return false
+	# The existing phone surface pilot requests extension through the real
+	# toggle branch when needed; it does not fabricate native autopilot phases.
+	if surface.active and (surface.landing or surface.flight_phase=="descent"):
+		var requested:=_request_landing_gear(true)
+		if not requested.get("ok",false):return false
+	var result:Dictionary=landing_gear.advance_seconds(seconds,_gear_context())
+	if not result.get("ok",false):_announce("Не удалось обновить шасси. Сохраните отчёт об ошибке.");return false
+	_apply_landing_gear_state()
+	if not str(result.get("message","")).is_empty():_announce(str(result.message))
+	return true
 
 func _enable_source_hyperdrive()->bool:
 	if world.layout_mode!=World.FULL_LAYOUT:return false
@@ -238,6 +290,7 @@ func _build_ui()->void:
 	flight_console.auto_requested.connect(_toggle_auto);flight_console.brake_requested.connect(_brake);flight_console.dock_requested.connect(_dock_action)
 	flight_console.status_requested.connect(_show_status);flight_console.equipment_requested.connect(_show_equipment)
 	flight_console.control_requested.connect(_toggle_control_mode);flight_console.surface_requested.connect(_surface_action);flight_console.pause_requested.connect(_toggle_pause)
+	flight_console.gear_requested.connect(_toggle_landing_gear)
 	auto_button=flight_console.buttons.auto;dock_button=flight_console.buttons.dock
 	# Preserve the public action reference while using the actual lower-console
 	# button. A duplicate floating button would overlap the throttle caption.
@@ -367,6 +420,7 @@ func _tick(dt:float,steering:Vector2,roll:float,lift:=0.0)->void:
 	if steering.length()>0.04 or absf(roll)>0.05 or absf(lift)>0.1:
 		ship.autopilot=false
 		if surface.active:surface.landing=false
+	if not _step_landing_gear(dt):return
 	if nav.remaining>0:
 		# New source sessions keep charging time on the same celestial clock.
 		# Saves without the opt-in retain their published legacy timing.
@@ -419,7 +473,10 @@ func _step_source_fuel(seconds:float,commands:Array)->void:
 	# Loading and ordinary saves use strict bind instead, preserving exact HP.
 	if not nav.sync_thermal_ship(ship):_announce("Не удалось согласовать состояние корпуса. Сохраните отчёт об ошибке.");return
 	if ship.hull<=0:_source_ship_destroyed("Корабль потерян при столкновении.","physical_collision");return
-	var context:Dictionary=atmosphere_contact.sample(world,ship,surface,nav.elapsed_days)
+	# The historical thermal argument name gear_down carries the RAW E9 bit2:
+	# SET requests retraction, CLEAR requests deployment. Physical readiness
+	# comes separately from object+9E==FFFF and must not invert this input.
+	var context:Dictionary=atmosphere_contact.sample(world,ship,surface,nav.elapsed_days,bool(_gear_state().get("f1014_raw_gear_flag",false)))
 	if not context.get("ok",false):_announce("Не удалось определить состояние атмосферы. Сохраните отчёт об ошибке.");return
 	var raw_motion:bool=not surface.active and source_motion.is_active() and source_motion.synchronized(world,ship,nav.elapsed_days)
 	if raw_motion:
@@ -509,6 +566,7 @@ func _process(dt:float)->void:
 	player.position=ship.position;player.quaternion=ship.attitude;player.visible=ship.external_view
 	player.set_thrust(0.0 if ship.docked or surface.landed else clampf(maxf(absf(ship.target_speed),ship.velocity.length())/ship.MAX_SPEED,0.04,1.0))
 	player.set_landed(surface.landed)
+	_apply_landing_gear_state()
 	var pose:=instruments.camera_pose(ship.position,ship.attitude,ship.external_view,float(ship.profile().visual_span_m))
 	var desired:Vector3=pose.position;var attitude:Quaternion=pose.attitude
 	var current_view:=instruments.view_key(ship.external_view)
@@ -533,7 +591,7 @@ func _input_diagnostic_state()->Dictionary:
 	return {"stick":[stick.value.x,stick.value.y] if stick!=null else [],"stick_pointer":stick.pointer_id if stick!=null else -1,"throttle_pointer":lever.pointer_id if lever!=null else -1,"lift_up":lift_up,"lift_down":lift_down,"roll_left":roll_left_strength,"roll_right":roll_right_strength,"active":active,"busy":busy,"menu_open":menu!=null and menu.visible,"settings_open":settings_panel!=null and settings_panel.visible,"map_open":is_instance_valid(active_map),"map_kind":active_map_kind,"camera_view":instruments.view_key(ship.external_view) if ship!=null else "front","simulation_paused":instruments.paused,"time_rate":flight_time.effective_rate,"source_motion_enabled":source_motion_enabled,"source_motion_active":source_motion.is_active()}
 func _flight_diagnostic_sample()->Dictionary:
 	if ship==null or nav==null or world==null or surface==null:return {}
-	return {"ship_id":ship.ship_id,"position":[ship.position.x,ship.position.y,ship.position.z],"velocity":[ship.velocity.x,ship.velocity.y,ship.velocity.z],"target_speed":ship.target_speed,"hull":ship.hull,"docked":ship.docked,"autopilot":ship.autopilot,"system_id":nav.current_id,"focus_id":world.focus_id,"site_id":world.site_id,"jump_remaining":nav.remaining,"transfer_remaining":world.transfer_remaining,"surface":surface.active,"landed":surface.landed,"flight_phase":surface.flight_phase,"surface_motion":{"landing":surface.landing,"taking_off":surface.taking_off,"altitude_m":surface.altitude(ship) if surface.active else 0.0,"pad_distance_m":surface.pad_distance(ship) if surface.active else 0.0},"controls":_input_diagnostic_state(),"source_fuel":nav.fuel_state(ship)}
+	return {"ship_id":ship.ship_id,"position":[ship.position.x,ship.position.y,ship.position.z],"velocity":[ship.velocity.x,ship.velocity.y,ship.velocity.z],"target_speed":ship.target_speed,"hull":ship.hull,"docked":ship.docked,"autopilot":ship.autopilot,"system_id":nav.current_id,"focus_id":world.focus_id,"site_id":world.site_id,"jump_remaining":nav.remaining,"transfer_remaining":world.transfer_remaining,"surface":surface.active,"landed":surface.landed,"flight_phase":surface.flight_phase,"surface_motion":{"landing":surface.landing,"taking_off":surface.taking_off,"altitude_m":surface.altitude(ship) if surface.active else 0.0,"pad_distance_m":surface.pad_distance(ship) if surface.active else 0.0},"controls":_input_diagnostic_state(),"source_fuel":nav.fuel_state(ship),"landing_gear":_gear_state()}
 func _diagnostic_context()->Dictionary:
 	var context:=_base_diagnostic_context()
 	if world!=null and world.layout_mode==World.FULL_LAYOUT:
@@ -555,6 +613,7 @@ func _apply_system()->void:
 		if not context.ok:_announce("Не удалось подготовить исходную станцию. Сохраните отчёт об ошибке.")
 	else:ship.clear_source_station()
 	celestial.configure(world);celestial.set_quality(settings.quality);player.configure(ship.profile())
+	_apply_landing_gear_state()
 	player.set_quality(settings.quality);station.configure(settings.quality);city_view.set_quality(settings.quality)
 	if not graphics_return.is_empty():space_environment.configure(ship.STATION,settings.quality)
 	station.position=ship.STATION;camera.position=ship.position;camera.quaternion=ship.attitude;presentation_key="";_sync_scene();_update_flight_projection()
@@ -642,7 +701,7 @@ func _refresh_hud()->void:
 	var target:Vector3=navigation_target.position
 	if surface.active:target_label.text="%s · высота %.0f м\nДо площадки %.0f м"%[surface.site_name if not surface.site_name.is_empty() else world.by_id[world.focus_id].name,maxf(0,surface.altitude(ship)),surface.pad_distance(ship)]
 	else:target_label.text="%s · до цели %.0f м"%[navigation_target.label,ship.position.distance_to(target)]
-	flight_console.configure_state({
+	var console_state:={
 		"actual_speed_mps":ship.velocity.length(),"target_speed_mps":ship.target_speed,
 		"surface_active":surface.active,"altitude_m":surface.altitude(ship) if surface.active else 0.0,
 		"target_distance_m":ship.position.distance_to(target),"target_local":Basis(ship.attitude).inverse()*(target-ship.position),
@@ -653,7 +712,11 @@ func _refresh_hud()->void:
 		"view_label":instruments.view_label(ship.external_view),"simulation_paused":instruments.paused,
 		"control_enabled":_control_mode_available(),"surface_enabled":not instruments.paused and ship.hull>0,
 		"contextlabel":surface.site_name if surface.active and not surface.site_name.is_empty() else space_context,
-		"auto_text":auto_button.text,"dock_text":dock_button.text,"surface_text":surface_button.text})
+		"auto_text":auto_button.text,"dock_text":dock_button.text,"surface_text":surface_button.text}
+	var gear:=_gear_state()
+	if not gear.is_empty():
+		console_state.merge({"gear_available":true,"gear_enabled":ship.hull>0 and bool(gear.get("can_toggle",false)),"gear_text":str(gear.get("command_label","Шасси")),"gear_status":str(gear.get("status_text","")),"gear_fraction":float(gear.get("extension_fraction",0.0))})
+	flight_console.configure_state(console_state)
 	fps_label.visible=settings.show_fps;fps_label.text="%d FPS"%Engine.get_frames_per_second()
 	if time_controls!=null:time_controls.configure_state({"options":flight_time.rate_options(_time_context()),"requested_rate":flight_time.requested_rate,"applied_rate":flight_time.effective_rate,"paused":instruments.paused,"reason":flight_time.last_reason})
 	if docking_label!=null:
@@ -734,7 +797,9 @@ func _toggle_auto()->void:
 	if surface.active:
 		if surface.landed:_begin_departure_action()
 		elif surface.landing or not surface.flight_phase.is_empty():surface.landing=false;surface.cancel_vertical();_announce("Автоматический полёт отменён.")
-		else:surface.begin_landing(ship);_announce(surface.message)
+		else:
+			if _gear_enabled():_request_landing_gear(true)
+			surface.begin_landing(ship);_announce(surface.message)
 	elif ship.docked:_show_services()
 	elif not target_site_id.is_empty() and target_site_id!=world.site_id:_choose_site(target_site_id)
 	elif world.selected_id!=world.focus_id:_choose_body(world.selected_id)
@@ -767,7 +832,10 @@ func _dock_action()->void:
 	if _paused_command():return
 	if surface.active:
 		if surface.landed:_takeoff_action();return
-		if not surface.touch_down(ship):surface.begin_landing(ship)
+		if _gear_enabled():_request_landing_gear(true)
+		if not surface.touch_down(ship):
+			if not surface.landing:surface.begin_landing(ship)
+			else:surface.message="Посадочный заход продолжается. Дождитесь готовности шасси и касания."
 		_announce(surface.message)
 	elif ship.docked:
 		_release_inputs()
@@ -1329,6 +1397,9 @@ func _payload()->Dictionary:
 	if nav.is_source_hyperdrive() and not nav.sync_source_ship(ship):return {}
 	if not _apply_source_fuel_state():return {}
 	var result:={"schema":"starfrontier-rebuild-game-v1","flight":ship.snapshot(),"navigation":nav.snapshot(),"planetary":world.snapshot(),"surface":surface.snapshot()}
+	if _gear_enabled():
+		if landing_gear==null or not landing_gear.state().get("initialized",false):return {}
+		result.gear_session=landing_gear.snapshot()
 	if not target_site_id.is_empty():result.target_session={"version":1,"system_id":nav.current_id,"body_id":world.selected_id,"site_id":target_site_id}
 	if source_motion_enabled:
 		if source_motion.is_active() and not source_motion.synchronized(world,ship,nav.elapsed_days):source_motion.reset()
@@ -1353,6 +1424,14 @@ func _decode_state(data:Dictionary)->Dictionary:
 	candidate_surface.set_source_time(candidate_nav.elapsed_days)
 	if not candidate_surface.restore(data.surface,candidate_ship,candidate_world):return {}
 	if candidate_surface.active and (candidate_ship.docked or candidate_nav.remaining>0 or candidate_world.transfer_remaining>0):return {}
+	var candidate_gear:=LandingGearSession.new()
+	if data.has("gear_session"):
+		if candidate_world.layout_mode!=World.FULL_LAYOUT or not data.gear_session is Dictionary or not candidate_gear.restore(data.gear_session):return {}
+	else:
+		if not candidate_gear.configure(candidate_surface.landed or candidate_ship.docked):return {}
+	var restored_gear:Dictionary=candidate_gear.state()
+	if candidate_surface.landed and (not restored_gear.get("deployed",false) or not restored_gear.get("requested_down",false)):return {}
+	candidate_surface.set_landing_gear_state(candidate_world.layout_mode==World.FULL_LAYOUT,bool(restored_gear.get("deployed",true)) and bool(restored_gear.get("requested_down",true)),str(restored_gear.get("status_text","")))
 	if candidate_nav.remaining>0 and candidate_world.transfer_remaining>0:return {}
 	if candidate_ship.docked:
 		if candidate_nav.remaining>0 or candidate_world.transfer_remaining>0:return {}
@@ -1379,15 +1458,19 @@ func _decode_state(data:Dictionary)->Dictionary:
 			# carries their exact IEEE64 bits alongside the fractional ticks.
 			if candidate_motion.is_active():candidate_nav.elapsed_days=candidate_motion.elapsed_days()
 		elif not motion.state.is_empty():return {}
-	return {"ship":candidate_ship,"nav":candidate_nav,"world":candidate_world,"surface":candidate_surface,"target_site_id":candidate_target,"source_motion_enabled":candidate_motion_enabled,"source_motion":candidate_motion}
+	return {"ship":candidate_ship,"nav":candidate_nav,"world":candidate_world,"surface":candidate_surface,"target_site_id":candidate_target,"source_motion_enabled":candidate_motion_enabled,"source_motion":candidate_motion,"landing_gear":candidate_gear}
 func _commit_state(data:Dictionary)->void:
 	_close_map(false)
 	ship=data.ship;nav=data.nav;world=data.world;surface=data.surface;near.clear();instruments.reset();flight_time.reset();last_view=""
+	landing_gear=data.get("landing_gear")
+	if landing_gear==null:landing_gear=LandingGearSession.new();landing_gear.configure(surface.landed or ship.docked)
 	target_site_id=str(data.get("target_site_id",""));target_reference.clear()
 	source_motion_enabled=bool(data.get("source_motion_enabled",false));source_motion=data.get("source_motion",MotionBridge.new());last_motion_result.clear()
 	_apply_source_fuel_state()
+	_apply_landing_gear_state()
 func _save_game()->bool:
 	if not saving_enabled or busy:return false
+	if _gear_enabled() and (landing_gear==null or not landing_gear.state().get("initialized",false)):return false
 	if nav.is_source_hyperdrive() and not nav.sync_source_ship(ship):return false
 	if not _apply_source_fuel_state():return false
 	var ok:=saves.write(_payload())

@@ -6,7 +6,7 @@ const AtmosphereContact=preload("res://scripts/source_atmosphere_contact.gd")
 const Terrain=preload("res://scripts/source_surface_terrain.gd")
 const Surface=preload("res://scripts/surface_model.gd")
 const Physics=preload("res://scripts/source_physics_bridge.gd")
-const REPORT:="res://validation/thermal-2026-11-07/source-thermal-main.json"
+const REPORT:="res://validation/gear-2026-11-08/thermal-main-regression.json"
 var atmosphere_contact:=AtmosphereContact.new()
 
 func thermal()->Dictionary:return inventory().get("thermal_system",{}).duplicate(true)
@@ -159,7 +159,7 @@ func pause_touch_death_and_save()->void:
 	set_fuel_fixture({"jet_raw_u32":0x10000000});game._show_equipment();await frame();var button:Button=game.hyperdrive_services_view.buttons.manual_jet_refuel;var scroll:ScrollContainer=game.menu_rows.get_parent();scroll.ensure_control_visible(button);await frame()
 	var touch:=InputEventScreenTouch.new();touch.index=191;touch.position=button.get_global_rect().get_center();touch.pressed=true;var frozen:=state();root.push_input(touch,true);await frame();game._notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT);touch.pressed=false;root.push_input(touch,true);await frame()
 	check(state()==frozen,"Fuel touch held across focus loss cannot change inventory or thermal state")
-	game._notification(Node.NOTIFICATION_APPLICATION_FOCUS_IN);game._close_menu();fresh();stage_natural("earth",5000,10);set_fuel_fixture({"heat_s32":65530});game._start_jump(ALPHA)
+	game._notification(Node.NOTIFICATION_APPLICATION_FOCUS_IN);game._close_menu();fresh();stage_natural("earth",5000,10);set_fuel_fixture({"heat_s32":65534});game._start_jump(ALPHA)
 	check(game.nav.remaining>0,"Actual source hyperdrive enters its charge before the overheat fixture")
 	var hydrogen:int=inventory().hydrogen;var record:=RecordingStore.new();game.saves=record;game.saving_enabled=true;game._tick(1.0/60.0,Vector2.ZERO,0)
 	check(game.ship.hull==0 and thermal().destroyed and game.nav.remaining==0 and game.nav.pending_source_quote.is_empty(),"Actual thermal destruction cancels the pending source charge")

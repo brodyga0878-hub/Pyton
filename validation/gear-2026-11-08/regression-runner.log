@@ -1,0 +1,21 @@
+source_thermal_motion_bridge: passed; 355 checks, 0 failures
+source_atmosphere_contact: passed; 3904 checks, 0 failures
+source_hyperdrive_main: passed; 70 checks, 0 failures
+source_motion_bridge: passed; 81 checks, 0 failures
+source_motion_main_continuation: passed; 28 checks, 0 failures
+source_fuel_main: passed; 397 checks, 0 failures
+flight_projection: passed; 691 checks, 0 failures
+classic_console_main: passed; 42 checks, 0 failures
+navigation_main: passed; 53 checks, 0 failures
+source_full_startup: passed; 10 checks, 0 failures
+source_thermal_main: passed; 463 checks, 0 failures
+source_console_pause: failed; 47 checks, 5 failures; Process did not exit successfully; No positive passing check count; Engine error or leaked resource diagnostic
+graphics_integration: passed; 44 checks, 0 failures
+source_docking_flight: passed; 402 checks, 0 failures
+graphics_scope: passed; 87 checks, 0 failures
+surface_action_controls: passed; 66 checks, 0 failures
+offpad_takeoff: passed; 109 checks, 0 failures
+report_export: passed; 27 checks, 0 failures
+source_underground_controller: passed; 197 checks, 0 failures
+source_main_full: failed; 141 checks, 1 failures; Process did not exit successfully; No positive passing check count; Engine error or leaked resource diagnostic
+Validation failed: 7214 current checks; 18 passed suites; 2 failed; 0 unavailable. Report: validation/gear-2026-11-08/regressions.json

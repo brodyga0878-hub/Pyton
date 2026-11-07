@@ -86,10 +86,12 @@ static func _bodyfixed_orbit_point(world:RefCounted,body:Dictionary,ship:RefCoun
 		raw.append(roundi(converted))
 	return {"raw":raw,"basis_body_to_world":orientation.basis}
 
+# Historical argument/key gear_down is the raw E9 bit2 (SET=retract).
+# Physical extension belongs to the separately bound landing-gear session.
 static func _base_result(ship:RefCounted,gear_down:bool)->Dictionary:
 	var speed:=Gas.raw_speed(ship.velocity)
 	if not speed.get("ok",false):return {"ok":false,"reason":str(speed.get("reason","invalid_velocity"))}
-	return {"ok":true,"source_contract":CONTRACT,"policy":"native_natural_contact_with_explicit_current_phone_frame_v1","reason":"outside_natural_atmosphere","contact":{"flags_u8":0,"altitude_raw_s32":-1,"parent_model_u32":0},"altitude_s32":UNKNOWN_ALTITUDE_S32,"speed_s32":int(speed.speed_s32),"velocity_s32":Array(speed.raw_velocity_s32),"velocity_unit_mps":Physics.VELOCITY_UNIT_MPS,"velocity_basis":Basis.IDENTITY,"velocity_to_phone_basis":Basis.IDENTITY,"velocity_frame":"current_phone_world_local_frame","velocity_policy":"current_phone_si_to_source_words_no_automatic_f570_frame_selection","input_velocity_mps":ship.velocity,"body_id":"","body_flags_u8":0,"gear_down":gear_down,"gear_policy":"explicit_caller_input_default_retracted","apply_f1014":false,"within_altitude_gate":false,"full_original_caller_dispatch":false,"full_f569":false,"physical_device_tested":false}
+	return {"ok":true,"source_contract":CONTRACT,"policy":"native_natural_contact_with_explicit_current_phone_frame_v1","reason":"outside_natural_atmosphere","contact":{"flags_u8":0,"altitude_raw_s32":-1,"parent_model_u32":0},"altitude_s32":UNKNOWN_ALTITUDE_S32,"speed_s32":int(speed.speed_s32),"velocity_s32":Array(speed.raw_velocity_s32),"velocity_unit_mps":Physics.VELOCITY_UNIT_MPS,"velocity_basis":Basis.IDENTITY,"velocity_to_phone_basis":Basis.IDENTITY,"velocity_frame":"current_phone_world_local_frame","velocity_policy":"current_phone_si_to_source_words_no_automatic_f570_frame_selection","input_velocity_mps":ship.velocity,"body_id":"","body_flags_u8":0,"gear_down":gear_down,"gear_policy":"historical_raw_game_e9_bit2_default_clear_not_physical_down","apply_f1014":false,"within_altitude_gate":false,"full_original_caller_dispatch":false,"full_f569":false,"physical_device_tested":false}
 
 static func speed_from_raw_velocity(raw_velocity:Variant)->Dictionary:
 	if not (raw_velocity is Array or raw_velocity is PackedInt64Array) or raw_velocity.size()!=3:return {"ok":false,"reason":"invalid_raw_velocity"}

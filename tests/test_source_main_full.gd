@@ -179,6 +179,8 @@ func offpad_controls()->void:
 		game.ship.velocity=Vector3.ZERO;game.ship.attitude=Quaternion.IDENTITY
 		if not game.surface.overlaps_building(game.ship) and game.surface._departure_column_clear(game.ship):found=true;break
 	check(found,"Offpad landing fixture has a verified open source-triangle ascent column")
+	# Request the source mechanism before this normal offpad landing fixture.
+	game._request_landing_gear(true)
 	if not found:return
 	game.ship.assisted=false;game.ship.target_speed=0
 	for frame in range(80):

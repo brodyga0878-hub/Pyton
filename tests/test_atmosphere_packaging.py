@@ -23,6 +23,25 @@ class MockAtmosphereArchive:
 
 
 class AtmospherePackaging(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        directory=tempfile.TemporaryDirectory(prefix='landing-gear-packaging-v42-')
+        cls.addClassCleanup(directory.cleanup);cls.project=Path(directory.name)
+        for relative in cls.project_files():
+            target=cls.project/relative;target.parent.mkdir(parents=True,exist_ok=True)
+            target.write_bytes((PROJECT/relative).read_bytes())
+        path=PROJECT/'tests/fixtures/landing_gear_v42_sources.json'
+        if hashlib.sha256(path.read_bytes()).hexdigest()!='df26c2952f08c837f074d4d9ccf44731e84a61e7f9258d84f34126ddc5ffb894':
+            raise AssertionError('Historical code42 landing-gear baseline fixture changed')
+        baseline=json.loads(path.read_text());expected=verifier.ATMOSPHERE_AUDITED_SOURCE_SHA256
+        if baseline['source_commit']!='0ad404f25db0b54d42796457555c8e4dc7f2ad6d' or set(baseline['files'])!=set(expected):
+            raise AssertionError('Historical code42 source fixture domain changed')
+        for name,digest in expected.items():
+            entry=baseline['files'][name];raw=entry['source'].encode()
+            if entry['sha256']!=digest or hashlib.sha256(raw).hexdigest()!=digest:
+                raise AssertionError('Historical code42 source differs '+name)
+            (cls.project/name).write_bytes(raw)
+
     def setUp(self):self.archive=MockAtmosphereArchive()
 
     @staticmethod
@@ -41,7 +60,7 @@ class AtmospherePackaging(unittest.TestCase):
     def project_copy(self,directory):
         project=Path(directory)
         for relative in self.project_files():
-            path=project/relative;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes((PROJECT/relative).read_bytes())
+            path=project/relative;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes((self.project/relative).read_bytes())
         return project
 
     def mutate_resource(self,project,name,callback):
@@ -53,7 +72,7 @@ class AtmospherePackaging(unittest.TestCase):
         self.assertIn(old,function);path.write_text(raw.replace(function,function.replace(old,new,1),1))
 
     def test_frozen_scope_and_honest_evidence_boundaries(self):
-        result=verifier.verify_atmosphere_runtime(self.archive,PROJECT)
+        result=verifier.verify_atmosphere_runtime(self.archive,self.project)
         self.assertEqual(result['baseline_source_commit'],'450e862ac3c146994371d8fa427efbc65b9fc677')
         self.assertEqual((result['compiled_module_count'],result['integration_compiled_module_count'],result['raw_json_count']),(2,17,1))
         self.assertEqual((result['original_procedure_count'],result['original_procedure_bytes']),(8,920))
@@ -78,7 +97,7 @@ class AtmospherePackaging(unittest.TestCase):
             with self.subTest(name=name):
                 archive=MockAtmosphereArchive();del archive.entries[f'assets/scripts/{name}.gdc']
                 with self.assertRaisesRegex(AssertionError,'Missing (atmospheric|fuel|hyperdrive)'):
-                    verifier.verify_atmosphere_runtime(archive,PROJECT)
+                    verifier.verify_atmosphere_runtime(archive,self.project)
 
     def test_every_integration_module_header_and_length_is_checked(self):
         for relative in verifier.ATMOSPHERE_AUDITED_SOURCE_SHA256:
@@ -87,28 +106,28 @@ class AtmospherePackaging(unittest.TestCase):
                 with self.subTest(name=name,bytes=len(content)):
                     archive=MockAtmosphereArchive();archive.entries[f'assets/scripts/{name}.gdc']=content
                     with self.assertRaisesRegex(AssertionError,'Invalid compiled'):
-                        verifier.verify_atmosphere_runtime(archive,PROJECT)
+                        verifier.verify_atmosphere_runtime(archive,self.project)
 
     def test_all_retained_information_modules_remain_required(self):
         for name in verifier.SYSTEM_INFORMATION_MODULES:
             with self.subTest(name=name):
                 archive=MockAtmosphereArchive();del archive.entries[f'assets/scripts/{name}.gdc']
                 with self.assertRaisesRegex(AssertionError,'Missing system information runtime'):
-                    verifier.verify_atmosphere_runtime(archive,PROJECT)
+                    verifier.verify_atmosphere_runtime(archive,self.project)
 
     def test_missing_or_different_exported_atmosphere_resource_rejects(self):
         del self.archive.entries['assets/data/ffe_atmosphere.json']
         with self.assertRaisesRegex(AssertionError,'Missing atmosphere resource'):
-            verifier.verify_atmosphere_runtime(self.archive,PROJECT)
+            verifier.verify_atmosphere_runtime(self.archive,self.project)
         self.archive=MockAtmosphereArchive();self.archive.entries['assets/data/ffe_atmosphere.json']+=b' '
         with self.assertRaisesRegex(AssertionError,'Atmosphere resource differs from local source'):
-            verifier.verify_atmosphere_runtime(self.archive,PROJECT)
+            verifier.verify_atmosphere_runtime(self.archive,self.project)
 
     def test_retained_fuel_hyperdrive_information_payloads_stay_checked(self):
         for name in ('ffe_fuel','ffe_hyperdrive',*verifier.SYSTEM_INFORMATION_TABLES):
             with self.subTest(name=name):
                 archive=MockAtmosphereArchive();archive.entries[f'assets/data/{name}.json']+=b' '
-                with self.assertRaises(AssertionError):verifier.verify_atmosphere_runtime(archive,PROJECT)
+                with self.assertRaises(AssertionError):verifier.verify_atmosphere_runtime(archive,self.project)
 
     def test_wrong_executable_provenance_rejects_even_with_matching_export(self):
         with tempfile.TemporaryDirectory() as directory:

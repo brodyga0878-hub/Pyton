@@ -1,0 +1,71 @@
+{
+	"checks": 42935,
+	"domain_failures": {
+
+	},
+	"domains": {
+		"F1008": 1430,
+		"step_then_toggle": 465,
+		"toggle": 466,
+		"toggle_then_step": 451
+	},
+	"evidence": [
+		{
+			"bounded_toggle_instruction_count": 32.0,
+			"domain_failures": {
+
+			},
+			"full_procedure_instruction_count": 72.0,
+			"independent_literal_controls": 10,
+			"native_cases": 2812,
+			"operations": {
+				"F1008": 1430,
+				"step_then_toggle": 465,
+				"toggle": 466,
+				"toggle_then_step": 451
+			},
+			"raw_semantics": {
+				"frame_ticks": "DATA9155 u32 per original F1009→F1008 player physics invocation; not F152 whole-seconds cadence",
+				"game_e9_mask02_clear": "deploy requested; object9E tends to65535",
+				"game_e9_mask02_set": "retract requested; object9E tends to0",
+				"gamee8_state2": "autopilot overrides desired gear command based on unsigned objectFF<=0x1E",
+				"object9e_ffff": "fully deployed; required by F575 terminal docking predicate",
+				"object9e_zero": "fully retracted",
+				"objectff_24hex": "bounded toggle blocked; only sound0x14 still emitted"
+			},
+			"scope": [
+				"Full F1008 arithmetic/control flow, including timer, automatic command, warning latch and gear animation.",
+				"Only F1056 JUMP_004410..004413 and terminal branch; no complete keyboard, hot-area or pause/flight dispatcher claim.",
+				"F1116 console update, F262 button image, F1097 notification and F1906 sound are observed callbacks; full UI and sound engine excluded.",
+				"No forced flight-state transition exists in this exact toggle branch.",
+				"Source unit conversion, virtual scheduling, save persistence and phone UI are separate caller policies."
+			],
+			"warning_resource": {
+				"data_label": "DATA_005860",
+				"executable_offset": 805561.0,
+				"ff_code_u16": 39118.0,
+				"hex": "01025741524e494e473a200103556e646572636172726961676520646f776e2e0d202020284974206d61792062652064616d61676564206279206d6963726f6d6574656f72697465732900",
+				"plain_text": "WARNING: Undercarriage down.\n   (It may be damaged by micrometeorites)",
+				"sha256": "3bd5c30b6cb91dfa97d7e93cc471885f0ccc88ec50605c8c9cb8435429dd9644"
+			}
+		},
+		{
+			"case": "kernel_boundary_policy",
+			"full_F1056_dispatch_claim": false,
+			"gear_fractional_travel_accumulator_added": false,
+			"micrometeorite_damage_claim": false,
+			"physical_deployed_position": 65535,
+			"physical_retracted_position": 0,
+			"requested_down_bit_clear": true
+		}
+	],
+	"failures": 0,
+	"schema": 1,
+	"scope": "Uploaded DOS complete F1008 timer/automatic gear/warning/position transitions and bounded F1056 undercarriage toggle branch versus independently executed instruction-matched controls. GUI/sound are observed requests; full keyboard/flight dispatcher, game save/session, host cadence, physical renderer and micrometeorite damage remain separate.",
+	"sources": {
+		"core_sha256": "0a65184b0e02f6a578e9d4bc12124a87585241e25598020b351494059af05b6a",
+		"fixture_sha256": "3690144d57048c2be03fa5e70ffd193a57edef38e0602126c17b857834439a16",
+		"native_generator_sha256": "6c001b0c28719780372d7d4ab7ded13c31b79e4aff5b66bd828878eb0eb7c5c5",
+		"test_sha256": "956f4512aadc90874bfeaf5abe914b0f782b7a3412bba272e5923f800be8301c"
+	}
+}

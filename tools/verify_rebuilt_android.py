@@ -174,6 +174,17 @@ ATMOSPHERE_AUDITED_SOURCE_SHA256={'scripts/source_hyperdrive.gd': 'b79cd38051e44
 ATMOSPHERE_NATIVE_REFERENCE={'source_atmospheric_native': {'sha256': '04cff4bc5d43c7eabda2ed4361a0ee8c0221cc1c432c8ea2dd33daad0d3b9025', 'case_count': 1447}, 'source_atmosphere_speed_native': {'sha256': 'cbffa800bfbfa805f12480dbefe30888ed2f9d37cb8a3f07469fa0ae11dca57f', 'case_count': 239}}
 ATMOSPHERE_DOS_PROCEDURES={'34': {'dos_file_offset': 13048, 'byte_count': 31, 'sha256': 'fbafd34f244fc54703ebc14e55a04731088dfd1a8462e87d99f4020b4ee63187', 'independently_normalized_instruction_count': 12}, '35': {'dos_file_offset': 13080, 'byte_count': 15, 'sha256': '96974c654576f4f30e03da8d77af820eb9b6b2e0ce0c037ab98b817e3c7e5866', 'independently_normalized_instruction_count': 6}, '953': {'dos_file_offset': 191868, 'byte_count': 436, 'sha256': 'aa8ec30bafd1e80ed164f34e8b384a2ff9e46d8eaf9a17239ee9065d84874469', 'independently_normalized_instruction_count': 131}, '1014': {'dos_file_offset': 202896, 'byte_count': 321, 'sha256': 'dcdc0bc325086ddaff36264342e39a703e41543d7e0badd4f067c3a5ce595095', 'independently_normalized_instruction_count': 94}, '1016': {'dos_file_offset': 203244, 'byte_count': 27, 'sha256': 'd11d23496ba03a43ce954ab8e0906dcb2f53cecfd8b2425911e2ccfc517137c5', 'independently_normalized_instruction_count': 10}, '1017': {'dos_file_offset': 203272, 'byte_count': 10, 'sha256': '2d8a6cf3a78899319464c62419cb1f5f1b36331ff4359fc1b1081d1ccbbea30a', 'independently_normalized_instruction_count': 6}, '1521': {'dos_file_offset': 279160, 'byte_count': 17, 'sha256': 'f62a5f949cbf8da772c3cc32ae59b607e0f35cda6c3c4e1ddf848ba3b5a1b445', 'independently_normalized_instruction_count': 9}, '1530': {'dos_file_offset': 279740, 'byte_count': 63, 'sha256': '35fb8bff8c10fc5628238eb1cfe0078393caf7fa1a4cdb6a6d28374e6edf0535', 'independently_normalized_instruction_count': 18}}
 
+# Code43 adds a separate gear sibling; old code42 remains frozen above.
+LANDING_GEAR_BASELINE_SOURCE_COMMIT='0ad404f25db0b54d42796457555c8e4dc7f2ad6d'
+LANDING_GEAR_MODULES=('source_landing_gear','source_landing_gear_session')
+LANDING_GEAR_RESOURCE_SHA256='f06d7184046407dea3ee45fb3c6dedeb6bfaf21fe1a6136a388a87fa97ed1f00'
+LANDING_GEAR_UNCHANGED_SOURCE_SHA256={'scripts/source_hyperdrive.gd': 'b79cd38051e44d52fcd4f2beb173b2699096e7d9aea9a0288aba205e453a8874', 'scripts/navigation.gd': '2745b49c42b69a23679740f21bf31efdcab319d7eedff6de090aac854bd3f225', 'scripts/source_hyperdrive_session.gd': '0a0428071f8cfc188f80930474c804261626be6952d41a55b8399eb6b70c7bc8', 'scripts/hyperdrive_services_view.gd': '70d828f819faeb8c8e31d12e1101ef82ce5d306f9cf329b2902600f82b5fe3f7', 'scripts/galactic_map_model.gd': '597a5bd049e3dea2698bfbc255a0d57e7c98b70fabedfe09d56bb60ccd3a11a5', 'scripts/galactic_map_view.gd': '9a2a6fa97d9ab4f6ce572a5e10bb390d5036ccf6d30e3bc31e087a61440b7876', 'scripts/source_jet_fuel.gd': 'ef043cd3d7fe4ef06a08d1f6592bf97b5d1e6d81c5f2efe9ea067d514f207cc1', 'scripts/source_fuel_scoop.gd': 'de1e96fd3013de48557b340b9ca4e4d174c4d39aaebb8b2eee96250db53af296', 'scripts/source_fuel_contact.gd': '0f8d5defba15db89d02c5253c988a2a5680d7a16058296b91d262017d5a49903', 'scripts/source_fuel_flight_bridge.gd': '70921d3cb8b7d211f07f1211309f809dab1e0be9094ccf015e658558d6a04b52', 'scripts/flight_model.gd': '4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b', 'scripts/source_motion_bridge.gd': '4fd81d7226e1c63f5c280e6ade6692b829bc5568937429a8ecac397949a003a5', 'scripts/source_atmospheric_dynamics.gd': 'a9ccce9fa27a2354205f3b1c88a9108320f567742d44d84082635339bc9af4a9', 'scripts/flight_time_controller.gd': 'd171bb7354e57ae6349ac04775d6f640a932c0f061cba879bb044724f3d06d91'}
+LANDING_GEAR_AUDITED_SOURCE_SHA256={'scripts/source_hyperdrive.gd': 'b79cd38051e44d52fcd4f2beb173b2699096e7d9aea9a0288aba205e453a8874', 'scripts/navigation.gd': '2745b49c42b69a23679740f21bf31efdcab319d7eedff6de090aac854bd3f225', 'scripts/source_hyperdrive_session.gd': '0a0428071f8cfc188f80930474c804261626be6952d41a55b8399eb6b70c7bc8', 'scripts/hyperdrive_services_view.gd': '70d828f819faeb8c8e31d12e1101ef82ce5d306f9cf329b2902600f82b5fe3f7', 'scripts/galactic_map_model.gd': '597a5bd049e3dea2698bfbc255a0d57e7c98b70fabedfe09d56bb60ccd3a11a5', 'scripts/galactic_map_view.gd': '9a2a6fa97d9ab4f6ce572a5e10bb390d5036ccf6d30e3bc31e087a61440b7876', 'scripts/source_jet_fuel.gd': 'ef043cd3d7fe4ef06a08d1f6592bf97b5d1e6d81c5f2efe9ea067d514f207cc1', 'scripts/source_fuel_scoop.gd': 'de1e96fd3013de48557b340b9ca4e4d174c4d39aaebb8b2eee96250db53af296', 'scripts/source_fuel_contact.gd': '0f8d5defba15db89d02c5253c988a2a5680d7a16058296b91d262017d5a49903', 'scripts/source_fuel_flight_bridge.gd': '70921d3cb8b7d211f07f1211309f809dab1e0be9094ccf015e658558d6a04b52', 'scripts/flight_model.gd': '4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b', 'scripts/source_motion_bridge.gd': '4fd81d7226e1c63f5c280e6ade6692b829bc5568937429a8ecac397949a003a5', 'scripts/source_atmospheric_dynamics.gd': 'a9ccce9fa27a2354205f3b1c88a9108320f567742d44d84082635339bc9af4a9', 'scripts/flight_time_controller.gd': 'd171bb7354e57ae6349ac04775d6f640a932c0f061cba879bb044724f3d06d91', 'scripts/main.gd': 'f0b46207ef64b6c95b495ad01d47b11263d560774f7e49c1bca4ec5d0d942db6', 'scripts/surface_model.gd': '6b03d8625bdddd4f552aea4640010a62ab7f2f51c8b087d75d66d07f61f1ae8f', 'scripts/source_atmosphere_contact.gd': '046dcfbb3ad3f2c937f023aa5268e239b9c668e9a943ce6a51502ad7b35392be', 'scripts/flight_console.gd': '0a9fe99fd5e4f2cfb276e476a8a12c141cbb9b74a92cd246c4dcfa9cc4180c54', 'scripts/ship_visual.gd': '5c175408f1687ecb440296e62051884a79503a4903965d16bd8dbba66934dd88', 'scripts/source_landing_gear.gd': '0a65184b0e02f6a578e9d4bc12124a87585241e25598020b351494059af05b6a', 'scripts/source_landing_gear_session.gd': 'ba8b63cbf89f30441f0bdfe01ed51af3a7e0e4679451264826039dd7b65887a0'}
+LANDING_GEAR_UNCHANGED_SURFACE_FUNCTION_SHA256={'height_at': 'b4334a9bcd40d059ab4e69326963118334ca87d80cfee80f94424056591885e5', '_grounded_height': '728f9b6b466644452c0813868ba1fad567b4860a1960b99fe65ebbfcc6056132', 'clearance': '32ff5539b2bd849931ed72fc4855f42975dda12749996378d79abf01c4b378c8', 'take_off': '3e21f47dc06320aefe0c4dbf4b107d94c389246a48829fe7bf4219d73dfbecaa', 'restore': '7e16930659abbe68b434a2757fe1dc4e17698e6114dfc64df26db05665b70caa', 'snapshot': 'd7be5cf06115a101bc396e0c0c7a50a748937368498dd5b2acb1547906e41863', 'create_entry_snapshot': '3d669383e97c0d052b7767f9c8cd6f5a7f51b3b9780e96179838ce9dc87a8c16', 'prepare_entry': 'cbb9d056a9f04abb38e49b5a0aac3ece7cf63cda8d94376dce8a3ab47c7ebdb7', 'begin_ascent': 'c4f8f5270ba355b824a0e99ae6d8eaed9eae4105bf0146ab52372e42b20d034e'}
+LANDING_GEAR_DOS_ANCHORS={'1008': {'dos_file_offset': 202128, 'byte_count': 305, 'sha256': '6d0a8a82a36809b64f58568ad7ef7c29e2b767f8091e06d47536e04adab41e97', 'independently_normalized_instruction_count': 72}, '1056_4410': {'dos_file_offset': 213146, 'byte_count': 116, 'sha256': '4262147506224b00e3d94d2febdfed3f690773655f90439d724e8f393ba61107', 'independently_normalized_instruction_count': 32}}
+LANDING_GEAR_SUPPORTING_ANCHORS={'1009_call_order': {'dos_file_offset': 202524, 'byte_count': 26, 'sha256': 'e8595087e9d8024083bd4a947051337dcedbb9bf0fbf0548c6015f4560713f9b', 'independently_normalized_instruction_count': 8}, '575_landing_predicate': {'dos_file_offset': 100049, 'byte_count': 27, 'sha256': '99d87ce24619fcba14d99c78cd37b0a24a41fc2b334d591f0e7bc53383d08c7b', 'independently_normalized_instruction_count': 6}}
+LANDING_GEAR_NATIVE_REFERENCE_SHA256='3690144d57048c2be03fa5e70ffd193a57edef38e0602126c17b857834439a16'
+
 def preset_values(path):
     text=path.read_text()
     def quoted(key):
@@ -715,12 +726,12 @@ def verify_source_full_runtime(archive,project,version_code=34):
         assert re.search(rb'^shader_type\s+spatial\s*;',raw,re.M),'Invalid source streaming spatial shader '+name
         result['shaders'][name]={'runtime_path':exported,'runtime_bytes':len(raw),'runtime_sha256':hashlib.sha256(raw).hexdigest()}
     result['startup_contract']=verify_full_startup(text['main'],text['planetary_system'])
-    required_tables=FULL_SOURCE_TABLES+(NAVIGATION_TABLES if version_code>=36 else ())+(('ffe_fuel',) if version_code>=41 else ())+(('ffe_atmosphere',) if version_code>=42 else ())
+    required_tables=FULL_SOURCE_TABLES+(NAVIGATION_TABLES if version_code>=36 else ())+(('ffe_fuel',) if version_code>=41 else ())+(('ffe_atmosphere',) if version_code>=42 else ())+(('ffe_landing_gear',) if version_code>=43 else ())
     present_tables=set(path.stem for path in (project/'data').glob('ffe_*.json'))
     # Older contracts still inspect their exact base tables when tested from a
     # newer checkout. Only explicitly known later-version tables may coexist;
     # current v36 must include and verify its additional original map resource.
-    allowed_tables=FULL_SOURCE_TABLES+NAVIGATION_TABLES+('ffe_system_information','ffe_hyperdrive')+(('ffe_fuel',) if version_code>=41 else ())+(('ffe_atmosphere',) if version_code>=42 else ())
+    allowed_tables=FULL_SOURCE_TABLES+NAVIGATION_TABLES+('ffe_system_information','ffe_hyperdrive')+(('ffe_fuel',) if version_code>=41 else ())+(('ffe_atmosphere',) if version_code>=42 else ())+(('ffe_landing_gear',) if version_code>=43 else ())
     assert set(required_tables)<=present_tables<=set(allowed_tables),'Full packaging verifier list omits a source table or names a missing table'
     tables={}
     for name in required_tables+('ships','world_names_ru'):
@@ -1403,8 +1414,8 @@ def verify_fuel_runtime(archive,project):
 
 
 
-def verify_atmosphere_runtime(archive,project):
-    """Code42 package/source wiring evidence; does not execute/decompile GDSC."""
+def _verify_atmosphere_payload(archive,project):
+    """Retained code42 immutable data/modules/native metadata, no source upgrade."""
     retained=_verify_fuel_payload(archive,project)
     names=set(archive.namelist());modules={}
     for name in ATMOSPHERE_MODULES:
@@ -1448,6 +1459,31 @@ def verify_atmosphere_runtime(archive,project):
         spec=bytes.fromhex(row.get('spec_hex',''))
         assert len(spec)==24 and spec.hex()==retained['hyper']['data']['ship_specs'][str(index)]['spec_hex'] and hashlib.sha256(spec).hexdigest()==row.get('spec_sha256'),'Atmospheric hull differs from original specification '+id
     assert hashlib.sha256(raw).hexdigest()==ATMOSPHERE_RESOURCE_SHA256,'Atmosphere resource differs from frozen DOS extraction'
+    references={}
+    for name,expected in ATMOSPHERE_NATIVE_REFERENCE.items():
+        fixture_raw=(project/'tests/fixtures'/f'{name}.json').read_bytes();fixture=json.loads(fixture_raw)
+        assert hashlib.sha256(fixture_raw).hexdigest()==expected['sha256'],'Changed atmospheric native reference '+name
+        assert fixture.get('case_count')==len(fixture.get('cases',[]))==expected['case_count'],'Incomplete atmospheric native cases '+name
+        if name=='source_atmospheric_native':
+            assert fixture.get('schema_version')==1 and fixture.get('executable_sha256')==SOURCE_IMAGE_SHA256 and fixture.get('pinned_asm_sha256')==SOURCE_ASSEMBLY_SHA256 and fixture.get('source_commit')==SOURCE_ASSEMBLY_COMMIT,'Wrong atmospheric DOS native provenance'
+            checks=fixture.get('execution_checks',{})
+            assert checks.get('fresh_identical_processes')==3 and checks.get('reverse_case_order_identical') is True and checks.get('object_globals_output_canaries') is True and checks.get('unrelated_object_bytes_unchanged') is True and checks.get('expected_arithmetic_computed_by_python') is False,'Incomplete atmospheric native reproduction'
+            assert set(fixture.get('byte_instruction_proofs',{}))==set(ATMOSPHERE_DOS_PROCEDURES),'Incomplete atmospheric instruction proof'
+            for label,original in ATMOSPHERE_DOS_PROCEDURES.items():
+                proof=fixture['byte_instruction_proofs'][label]
+                assert (proof.get('executable_offset'),proof.get('byte_length'),proof.get('sha256'),proof.get('instruction_count'))==(original['dos_file_offset'],original['byte_count'],original['sha256'],original['independently_normalized_instruction_count']) and proof.get('all_instructions_equal_after_only_branch_destination_normalization') is True,'Atmospheric native instructions differ from DOS '+label
+            variant='uploaded-DOS-F1014-F953-F1530-with-observed-external-callbacks'
+        else:
+            assert fixture.get('schema')==1 and fixture.get('asm_sha256')==SOURCE_ASSEMBLY_SHA256 and fixture.get('source_contract')=='pinned-jjffe-f1099-f1475-f1466-speed-v1' and fixture.get('whole_DOS_binary_equivalence') is False,'Speed fixture must retain its pinned-JJFFE-only evidence scope'
+            assert fixture.get('fresh_process_runs')==3 and fixture.get('reverse_repeat_count')==expected['case_count'],'Incomplete speed native reproduction'
+            variant='pinned-JJFFE-speed-fragment-host-ABI-not-whole-DOS-equivalence'
+        references[name]={'sha256':expected['sha256'],'case_count':expected['case_count'],'source_variant':variant,'oracle_executed_by_apk_verifier':False}
+    return {'retained':retained,'modules':modules,'integration_modules':integration_modules,'raw':raw,'data':data,'references':references}
+
+def verify_atmosphere_runtime(archive,project):
+    """Code42 package/source wiring evidence; does not execute/decompile GDSC."""
+    payload=_verify_atmosphere_payload(archive,project)
+    retained,modules,integration_modules,raw,data,references=(payload[key]for key in ['retained','modules','integration_modules','raw','data','references'])
     protected={path:value for path,value in MAP_VISUAL_PROTECTED_SOURCE_SHA256.items()
                if path not in ('scripts/main.gd','scripts/system_map_view.gd','scripts/navigation.gd','scripts/galactic_map_model.gd',
                                'scripts/flight_model.gd','scripts/surface_model.gd','scripts/source_motion_bridge.gd','scripts/flight_time_controller.gd')}
@@ -1496,25 +1532,6 @@ def verify_atmosphere_runtime(archive,project):
     assert 'session.hyperdrive_snapshot()' in source_function(navigation,'_pending_for') and 'source_map_quote(' in source_function(source['galactic_map_model'],'jump_state'),'Atmospheric extension disconnected source hyperdrive quotes'
     for relative,expected in ATMOSPHERE_AUDITED_SOURCE_SHA256.items():
         assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==expected,'Atmosphere update differs from audited integration source '+relative
-    references={}
-    for name,expected in ATMOSPHERE_NATIVE_REFERENCE.items():
-        fixture_raw=(project/'tests/fixtures'/f'{name}.json').read_bytes();fixture=json.loads(fixture_raw)
-        assert hashlib.sha256(fixture_raw).hexdigest()==expected['sha256'],'Changed atmospheric native reference '+name
-        assert fixture.get('case_count')==len(fixture.get('cases',[]))==expected['case_count'],'Incomplete atmospheric native cases '+name
-        if name=='source_atmospheric_native':
-            assert fixture.get('schema_version')==1 and fixture.get('executable_sha256')==SOURCE_IMAGE_SHA256 and fixture.get('pinned_asm_sha256')==SOURCE_ASSEMBLY_SHA256 and fixture.get('source_commit')==SOURCE_ASSEMBLY_COMMIT,'Wrong atmospheric DOS native provenance'
-            checks=fixture.get('execution_checks',{})
-            assert checks.get('fresh_identical_processes')==3 and checks.get('reverse_case_order_identical') is True and checks.get('object_globals_output_canaries') is True and checks.get('unrelated_object_bytes_unchanged') is True and checks.get('expected_arithmetic_computed_by_python') is False,'Incomplete atmospheric native reproduction'
-            assert set(fixture.get('byte_instruction_proofs',{}))==set(ATMOSPHERE_DOS_PROCEDURES),'Incomplete atmospheric instruction proof'
-            for label,original in ATMOSPHERE_DOS_PROCEDURES.items():
-                proof=fixture['byte_instruction_proofs'][label]
-                assert (proof.get('executable_offset'),proof.get('byte_length'),proof.get('sha256'),proof.get('instruction_count'))==(original['dos_file_offset'],original['byte_count'],original['sha256'],original['independently_normalized_instruction_count']) and proof.get('all_instructions_equal_after_only_branch_destination_normalization') is True,'Atmospheric native instructions differ from DOS '+label
-            variant='uploaded-DOS-F1014-F953-F1530-with-observed-external-callbacks'
-        else:
-            assert fixture.get('schema')==1 and fixture.get('asm_sha256')==SOURCE_ASSEMBLY_SHA256 and fixture.get('source_contract')=='pinned-jjffe-f1099-f1475-f1466-speed-v1' and fixture.get('whole_DOS_binary_equivalence') is False,'Speed fixture must retain its pinned-JJFFE-only evidence scope'
-            assert fixture.get('fresh_process_runs')==3 and fixture.get('reverse_repeat_count')==expected['case_count'],'Incomplete speed native reproduction'
-            variant='pinned-JJFFE-speed-fragment-host-ABI-not-whole-DOS-equivalence'
-        references[name]={'sha256':expected['sha256'],'case_count':expected['case_count'],'source_variant':variant,'oracle_executed_by_apk_verifier':False}
     return {'baseline_source_commit':ATMOSPHERE_BASELINE_SOURCE_COMMIT,'compiled_modules':modules,'compiled_module_count':2,
         'raw_resource_sha256':hashlib.sha256(raw).hexdigest(),'raw_json_count':1,'original_procedure_count':8,
         'integration_compiled_modules':integration_modules,'integration_compiled_module_count':len(integration_modules),
@@ -1531,6 +1548,120 @@ def verify_atmosphere_runtime(archive,project):
         'full_original_global_event_rng_stream':False,'full_original_equipment_damage_dispatcher':False,
         'full_original_destruction_dispatcher':False,'full_F569_player_collision_integrated':False,
         'original_F908_arrival_pipeline':False,'original_outfitting_economy':False,'complete_original_time_scheduler':False,
+        'complete_original_physics':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
+
+
+def verify_landing_gear_runtime(archive,project):
+    """Code43 package/source wiring, separate from native/GPU/device evidence."""
+    atmosphere=_verify_atmosphere_payload(archive,project)
+    names=set(archive.namelist());modules={};integration_modules={}
+    for relative in LANDING_GEAR_AUDITED_SOURCE_SHA256:
+        name=Path(relative).stem;path='assets/scripts/'+name+'.gdc'
+        assert path in names,'Missing landing-gear integration runtime '+name
+        compiled=archive.read(path)
+        assert len(compiled)>64 and compiled[:4]==b'GDSC','Invalid compiled landing-gear integration runtime '+name
+        integration_modules[name]=hashlib.sha256(compiled).hexdigest()
+        if name in LANDING_GEAR_MODULES:modules[name]={'runtime_sha256':integration_modules[name],'local_source_sha256':hashlib.sha256((project/relative).read_bytes()).hexdigest()}
+    path='assets/data/ffe_landing_gear.json'
+    assert path in names,'Missing landing-gear resource'
+    raw=archive.read(path)
+    assert raw==(project/'data/ffe_landing_gear.json').read_bytes(),'Landing-gear resource differs from local source'
+    data=json.loads(raw)
+    assert data.get('schema')==1 and data.get('profile')=='dos-firstenc-f1008-f1056-landing-gear-anchors-v1','Wrong landing-gear extraction profile'
+    assert data.get('source_sha256')==SOURCE_IMAGE_SHA256 and data.get('source_assembly_sha256')==SOURCE_ASSEMBLY_SHA256 and data.get('source_commit')==SOURCE_ASSEMBLY_COMMIT,'Wrong landing-gear source provenance'
+    assert data.get('immutable_resources')=={'ffe_hyperdrive_sha256':HYPERDRIVE_RESOURCE_SHA256,'ffe_fuel_sha256':FUEL_RESOURCE_SHA256,'ffe_atmosphere_sha256':ATMOSPHERE_RESOURCE_SHA256},'Landing-gear extension changed retained resource digests'
+    for section,expected_rows in [('procedures',LANDING_GEAR_DOS_ANCHORS),('supporting_slices',LANDING_GEAR_SUPPORTING_ANCHORS)]:
+        assert set(data.get(section,{}))==set(expected_rows),'Incomplete landing-gear '+section
+        for label,expected in expected_rows.items():
+            row=data[section][label];original=bytes.fromhex(row.get('hex',''))
+            assert all(row.get(key)==value for key,value in expected.items()),'Changed landing-gear DOS anchor '+label
+            assert len(original)==expected['byte_count'] and hashlib.sha256(original).hexdigest()==expected['sha256'],'Changed landing-gear DOS bytes '+label
+    constants=data.get('constants',{})
+    assert tuple(constants.get(key)for key in ['request_retract_game_e9_mask_u8','position_fully_retracted_u16','position_fully_deployed_u16'])==(2,0,65535),'Landing-gear request/position polarity reversed'
+    assert tuple(constants.get(key)for key in ['automatic_flight_state_u8','auto_retract_phase_maximum_u8','toggle_blocked_autopilot_phase_u8'])==(2,30,36),'Landing-gear automatic/toggle phases conflated'
+    assert tuple(constants.get(key)for key in ['deployment_warning_speed_raw_s32','deployment_warning_message_u16','warning_selector_s32'])==(100000,0x98ce,-1),'Landing-gear original warning altered'
+    assert constants.get('console_button_indices_u8')==[0x38,0x46] and constants.get('toggle_success_sound_u8')==0x0c and constants.get('toggle_final_sound_u8')==0x14,'Landing-gear original callbacks altered'
+    fields=data.get('field_layout',{})
+    assert fields.get('object',{}).get('unrelated_timer_u16')==0xe8 and fields.get('game',{}).get('flight_state_u8')==0xe8 and fields['object'].get('gear_position_u16')==0x9e,'Landing-gear object timer/flight state/position fields conflated'
+    policy=data.get('caller_policies',{});variants=data.get('source_variants',{})
+    assert policy.get('phone_invocation_rate_hz')==60 and policy.get('phone_rate_is_original') is False and policy.get('canonical_original_player_call_rate_inferred') is False,'Gear phone cadence must remain an explicit adapter'
+    assert variants.get('covered_DOS_and_pinned_JJFFE_instructions_equal') is True and variants.get('whole_F1056_DOS_equivalence_proved') is False,'Gear branch must not claim full F1056 equivalence'
+    assert hashlib.sha256(raw).hexdigest()==LANDING_GEAR_RESOURCE_SHA256,'Landing-gear resource differs from frozen DOS extraction'
+    protected={path:value for path,value in MAP_VISUAL_PROTECTED_SOURCE_SHA256.items()
+               if path not in ('scripts/main.gd','scripts/system_map_view.gd','scripts/navigation.gd','scripts/galactic_map_model.gd',
+                               'scripts/flight_model.gd','scripts/surface_model.gd','scripts/source_motion_bridge.gd','scripts/flight_time_controller.gd')}
+    for relative,expected in {**protected,**HYPERDRIVE_INFORMATION_SOURCE_SHA256,**FUEL_CONTACT_DEPENDENCY_SHA256,**LANDING_GEAR_UNCHANGED_SOURCE_SHA256}.items():
+        assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==expected,'Landing-gear update changed protected source/data '+relative
+    assert hashlib.sha256((project/'scripts/celestial_renderer.gd').read_bytes()).hexdigest()==SYSTEM_INFORMATION_CELESTIAL_SHA256,'Landing-gear update changed Mercury stellar visibility'
+    assert hashlib.sha256((project/'scripts/system_map_view.gd').read_bytes()).hexdigest()==SYSTEM_INFORMATION_MAP_VIEW_SHA256['scripts/system_map_view.gd'],'Landing-gear update changed system-map travel/information'
+    source={Path(name).stem:(project/name).read_text()for name in LANDING_GEAR_AUDITED_SOURCE_SHA256}
+    main=source['main'];session=source['source_landing_gear_session'];surface=source['surface_model'];console=source['flight_console'];visual=source['ship_visual']
+    unchanged={name:value for name,value in FUEL_UNCHANGED_MAIN_FUNCTION_SHA256.items()if name not in ('_new_models','_time_context','_apply_system','_toggle_auto','_dock_action')}
+    for name,expected in unchanged.items():
+        assert hashlib.sha256(source_function(main,name).encode()).hexdigest()==expected,'Landing-gear update changed undeclared physical Main function '+name
+    for name,expected in LANDING_GEAR_UNCHANGED_SURFACE_FUNCTION_SHA256.items():
+        assert hashlib.sha256(source_function(surface,name).encode()).hexdigest()==expected,'Landing-gear update changed undeclared physical Surface function '+name
+    contact=source['source_atmosphere_contact']
+    contact=contact.replace('# Historical argument/key gear_down is the raw E9 bit2 (SET=retract).\n# Physical extension belongs to the separately bound landing-gear session.\n','',1).replace('historical_raw_game_e9_bit2_default_clear_not_physical_down','explicit_caller_input_default_retracted',1)
+    assert hashlib.sha256(contact.encode()).hexdigest()==ATMOSPHERE_AUDITED_SOURCE_SHA256['scripts/source_atmosphere_contact.gd'],'Gear contact description correction changed atmospheric geometry/math'
+    tick=source_function(main,'_tick');thermal=source_function(main,'_step_source_fuel')
+    assert '_step_landing_gear(dt)' in tick and tick.index('_step_landing_gear(dt)')<tick.index('_step_source_fuel(dt,fuel_commands)'),'Main must advance source gear before thermal fuel processing'
+    assert '_step_source_fuel(dt,fuel_commands)' in tick and tick.index('_step_source_fuel(dt,fuel_commands)')<tick.index('if save_after_fuel:_save_game()'),'Gear/fuel must advance before arrival autosave'
+    assert 'landing_gear=LandingGearSession.new()' in source_function(main,'_new_models') and 'landing_gear.configure(ship.docked or surface.landed)' in source_function(main,'_new_models'),'Fresh source games lack independent gear initialization'
+    assert 'World.FULL_LAYOUT' in source_function(main,'_gear_enabled'),'Legacy worlds must not silently acquire source gear behavior'
+    assert 'landing_gear.advance_seconds(seconds,_gear_context())' in source_function(main,'_step_landing_gear'),'Live gear animation lacks the source session consumer'
+    assert 'flight_console.gear_requested.connect(_toggle_landing_gear)' in source_function(main,'_build_ui') and 'landing_gear.command_toggle(_gear_context())' in source_function(main,'_toggle_landing_gear'),'Console gear command lacks a Main/source toggle consumer'
+    assert 'paused' in source_function(main,'_toggle_landing_gear') and 'context.get("paused",false)' in source_function(session,'command_toggle') and 'context.get("paused",false)' in source_function(session,'_advance_seconds'),'Paused gear input/animation must preserve state'
+    assert 'atmosphere_contact.sample(world,ship,surface,nav.elapsed_days,bool(_gear_state().get("f1014_raw_gear_flag",false)))' in thermal and '"gear_down":bool(context.gear_down)' in thermal,'F1014 must consume the raw retract request bit, not physical deployed state'
+    assert 'nav.advance_fuel_seconds(seconds,context,ship)' in thermal and 'source_motion.apply_velocity_words(after,ship)' in thermal and 'ship.velocity+=Basis(context.velocity_to_phone_basis)*delta' in thermal,'Gear extension disconnected retained thermal/fuel/raw/SI consumers'
+    assert 'candidate_nav.bind_thermal_ship(candidate_ship)' in source_function(main,'_decode_state') and 'nav.bind_thermal_ship(ship)' in source_function(main,'_apply_source_fuel_state'),'Gear restore must retain strict raw thermal HP binding'
+    persist=source_function(main,'_payload');decode=source_function(main,'_decode_state')
+    assert 'result.gear_session=landing_gear.snapshot()' in persist and 'candidate_gear.restore(data.gear_session)' in decode and 'candidate_gear.configure(candidate_surface.landed or candidate_ship.docked)' in decode,'Independent gear state lacks strict restore and explicit previous-save initialization'
+    assert 'candidate_surface.landed and (' in decode and 'restored_gear.get("deployed",false)' in decode and 'restored_gear.get("requested_down",false)' in decode and 'landing_gear=data.get("landing_gear")' in source_function(main,'_commit_state'),'Landed restore must validate and install physical gear position'
+    assert 'data.source_digest!=_digest()' in source_function(session,'_valid') and '_phase(data.phase_f64_hex)' in source_function(session,'_valid') and 'frame_tick_remainder_raw' in source_function(session,'_valid'),'Gear restore lacks resource/fraction/remainder validation'
+    assert 'const HZ:=60' in session and 'const TICK_DENOMINATOR:=86400*HZ' in session and 'Kernel.step(candidate._kernel_state(context),ticks)' in source_function(session,'_advance_seconds'),'Gear fixed-host rational ticks are disconnected'
+    assert 'Kernel.toggle(_kernel_state(context))' in source_function(session,'command_toggle'),'Gear command bypasses original bounded F1056 branch'
+    keys=re.search(r'^const KEYS:=([^\n]+)',session,re.M)
+    assert keys and all(token not in keys.group(1)for token in ['heat_s32','jet_raw_u32','hydrogen','hull_u16']),'Independent gear save must not duplicate fuel/heat/cargo/raw HP'
+    state=source_function(session,'state')
+    assert 'position==Kernel.DEPLOYED_POSITION' in state and '"f1014_raw_gear_flag":retract' in state and '"landing_ready":deployed' in state,'Gear telemetry conflates physical position and raw request'
+    apply=source_function(main,'_apply_landing_gear_state')
+    assert 'surface.set_landing_gear_state(' in apply and 'current.get("deployed",true)' in apply and 'player.set_gear_fraction(' in apply and 'player.clear_gear_fraction_override()' in apply,'Gear position lacks actual surface/visual/legacy consumers'
+    assert 'landing_gear_managed and not landing_gear_ready' in source_function(surface,'_gear_blocks_touchdown') and '_gear_blocks_touchdown()' in source_function(surface,'touch_down') and '_gear_blocks_touchdown()' in source_function(surface,'_clip_source_city'),'Actual touchdown paths ignore incomplete physical gear'
+    assert surface.count('_hold_for_landing_gear(ship)')>=3 and 'landed and not _gear_blocks_touchdown()' in surface,'Terrain/city/underground contact lost gear readiness gating'
+    assert 'landing_gear_managed' not in source_function(surface,'snapshot') and 'landing_gear_ready' not in source_function(surface,'snapshot'),'Derived surface gear readiness must not become a trusted duplicate save field'
+    assert 'gear_requested.emit()' in source_function(console,'_action') and '_configure_gear()' in source_function(console,'configure_state') and 'buttons.gear.disabled=paused' in source_function(console,'_update_action_availability'),'Actual console gear button/disabled-state consumers are missing'
+    assert '_source_gear_driven=true' in source_function(visual,'set_gear_fraction') and 'if not _source_gear_driven:' in source_function(visual,'_process'),'Visual gear must consume physical source fraction without a second animation clock'
+    for relative,expected in LANDING_GEAR_AUDITED_SOURCE_SHA256.items():
+        assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==expected,'Landing-gear update differs from audited integration source '+relative
+    fixture_raw=(project/'tests/fixtures/source_landing_gear_native.json').read_bytes();fixture=json.loads(fixture_raw)
+    assert hashlib.sha256(fixture_raw).hexdigest()==LANDING_GEAR_NATIVE_REFERENCE_SHA256,'Changed landing-gear native reference'
+    assert fixture.get('schema_version')==1 and fixture.get('executable_sha256')==SOURCE_IMAGE_SHA256 and fixture.get('pinned_asm_sha256')==SOURCE_ASSEMBLY_SHA256 and fixture.get('source_commit')==SOURCE_ASSEMBLY_COMMIT,'Wrong gear DOS native provenance'
+    assert fixture.get('case_count')==len(fixture.get('cases',[]))==2812,'Incomplete gear native cases'
+    checks=fixture.get('execution_checks',{})
+    assert checks.get('fresh_identical_processes')==3 and checks.get('reverse_case_order_identical') is True and checks.get('object_globals_output_canaries') is True and checks.get('unrelated_bytes_unchanged') is True and checks.get('expected_transitions_computed_by_python') is False,'Incomplete gear native reproduction'
+    for label,native_key in [('1008','F1008'),('1056_4410','F1056_JUMP_004410')]:
+        expected=LANDING_GEAR_DOS_ANCHORS[label];proof=fixture.get('byte_instruction_proofs',{}).get(native_key,{})
+        assert (proof.get('executable_offset'),proof.get('byte_length'),proof.get('sha256'),proof.get('instruction_count'))==(expected['dos_file_offset'],expected['byte_count'],expected['sha256'],expected['independently_normalized_instruction_count']) and proof.get('all_instructions_equal_after_branch_destination_normalization') is True,'Gear native instructions differ from DOS '+label
+    warning=fixture.get('warning_resource',{})
+    assert warning.get('ff_code_u16')==0x98ce and warning.get('sha256')=='3bd5c30b6cb91dfa97d7e93cc471885f0ccc88ec50605c8c9cb8435429dd9644' and hashlib.sha256(bytes.fromhex(warning.get('hex',''))).hexdigest()==warning['sha256'],'Gear warning lost its original text provenance'
+    return {'baseline_source_commit':LANDING_GEAR_BASELINE_SOURCE_COMMIT,'compiled_modules':modules,'compiled_module_count':2,
+        'integration_compiled_modules':integration_modules,'integration_compiled_module_count':len(integration_modules),
+        'raw_resource_sha256':hashlib.sha256(raw).hexdigest(),'raw_json_count':1,'original_primary_anchors':2,'original_primary_anchor_bytes':421,'original_primary_instruction_count':104,
+        'supporting_anchor_slices':2,'supporting_anchor_bytes':53,'supporting_instruction_count':14,
+        'audited_local_source_sha256':LANDING_GEAR_AUDITED_SOURCE_SHA256,'unchanged_code42_source_count':len(LANDING_GEAR_UNCHANGED_SOURCE_SHA256),
+        'protected_old_source_data_count':len(protected),'protected_contact_dependency_count':len(FUEL_CONTACT_DEPENDENCY_SHA256),
+        'unchanged_Main_function_count':len(unchanged),'unchanged_Surface_function_count':len(LANDING_GEAR_UNCHANGED_SURFACE_FUNCTION_SHA256),
+        'unchanged_atmosphere_resource_sha256':ATMOSPHERE_RESOURCE_SHA256,'retained_atmosphere_compiled_module_count':len(atmosphere['modules']),
+        'retained_atmosphere_native_references':atmosphere['references'],'unchanged_fuel_resource_sha256':FUEL_RESOURCE_SHA256,
+        'retained_fuel_compiled_module_count':len(atmosphere['retained']['modules']),'retained_fuel_native_references':atmosphere['retained']['references'],
+        'unchanged_hyperdrive_resource_sha256':HYPERDRIVE_RESOURCE_SHA256,'retained_hyperdrive_compiled_module_count':len(atmosphere['retained']['hyper']['modules']),
+        'unchanged_information_resources':atmosphere['retained']['information']['tables'],'unchanged_information_runtime_count':3,
+        'native_reference':{'sha256':LANDING_GEAR_NATIVE_REFERENCE_SHA256,'case_count':2812,'source_variant':'uploaded-DOS-complete-F1008-and-selected-F1056-gear-branch','oracle_executed_by_apk_verifier':False},
+        'separate_gear_sibling_persisted':True,'actual_console_visual_touchdown_thermal_consumers_checked':True,
+        'phone_invocation_rate_hz':60,'phone_rate_is_original':False,'whole_original_F1056_dispatcher':False,
+        'full_original_player_scheduler':False,'full_original_autopilot_phase_mapping':False,'full_F575_contact_response':False,
+        'full_original_GUI_audio_callbacks':False,'micrometeorite_damage_integrated_by_this_block':False,
         'complete_original_physics':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
 
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
@@ -1551,7 +1682,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={};hyperdrive_assets={};fuel_assets={};atmosphere_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={};hyperdrive_assets={};fuel_assets={};atmosphere_assets={};landing_gear_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -1637,11 +1768,17 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
                 fuel_assets=verify_fuel_runtime(archive,presets.parent)
                 hyperdrive_assets={'raw_resource_sha256':fuel_assets['unchanged_hyperdrive_resource_sha256'],'compiled_module_count':fuel_assets['retained_hyperdrive_compiled_module_count'],'retained_by_strict_fuel_gate':True,'source_f903_live_quote_consumers_checked':True}
                 system_information_assets={'resources':fuel_assets['unchanged_information_resources'],'unchanged_runtime_modules':3,'raw_original_and_ru_resources_checked':True}
-            if expected['version_code']>=42:
+            if expected['version_code']==42:
                 atmosphere_assets=verify_atmosphere_runtime(archive,presets.parent)
                 fuel_assets={'raw_resource_sha256':atmosphere_assets['unchanged_fuel_resource_sha256'],'compiled_module_count':atmosphere_assets['retained_fuel_compiled_module_count'],'retained_by_strict_atmosphere_gate':True,'native_references':atmosphere_assets['retained_fuel_native_references']}
                 hyperdrive_assets={'raw_resource_sha256':atmosphere_assets['unchanged_hyperdrive_resource_sha256'],'compiled_module_count':atmosphere_assets['retained_hyperdrive_compiled_module_count'],'retained_by_strict_atmosphere_gate':True,'source_f903_live_quote_consumers_checked':True}
                 system_information_assets={'resources':atmosphere_assets['unchanged_information_resources'],'unchanged_runtime_modules':3,'raw_original_and_ru_resources_checked':True}
+            if expected['version_code']>=43:
+                landing_gear_assets=verify_landing_gear_runtime(archive,presets.parent)
+                atmosphere_assets={'raw_resource_sha256':landing_gear_assets['unchanged_atmosphere_resource_sha256'],'compiled_module_count':landing_gear_assets['retained_atmosphere_compiled_module_count'],'retained_by_strict_landing_gear_gate':True,'native_references':landing_gear_assets['retained_atmosphere_native_references']}
+                fuel_assets={'raw_resource_sha256':landing_gear_assets['unchanged_fuel_resource_sha256'],'compiled_module_count':landing_gear_assets['retained_fuel_compiled_module_count'],'retained_by_strict_landing_gear_gate':True,'native_references':landing_gear_assets['retained_fuel_native_references']}
+                hyperdrive_assets={'raw_resource_sha256':landing_gear_assets['unchanged_hyperdrive_resource_sha256'],'compiled_module_count':landing_gear_assets['retained_hyperdrive_compiled_module_count'],'retained_by_strict_landing_gear_gate':True,'source_f903_live_quote_consumers_checked':True}
+                system_information_assets={'resources':landing_gear_assets['unchanged_information_resources'],'unchanged_runtime_modules':3,'raw_original_and_ru_resources_checked':True}
         for name in names:
             if not name.startswith('lib/') or not name.endswith('.so'):continue
             data=archive.read(name)
@@ -1659,7 +1796,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'hyperdrive_assets':hyperdrive_assets,'fuel_assets':fuel_assets,'atmosphere_assets':atmosphere_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'hyperdrive_assets':hyperdrive_assets,'fuel_assets':fuel_assets,'atmosphere_assets':atmosphere_assets,'landing_gear_assets':landing_gear_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

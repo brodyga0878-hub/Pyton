@@ -65,6 +65,9 @@ func prepare_pending_core()->Dictionary:
 	check(found,"Actual source-triangle fixture has an open offpad ascent column")
 	if not found:return {}
 	game.ship.assisted=false;game.ship.target_speed=0.0
+	# This fixture studies paused terrain publication after a normal landing.
+	# The actual source gear mechanism must now be requested before touchdown.
+	game._request_landing_gear(true)
 	for frame in range(80):
 		game._tick(0.05,Vector2.ZERO,0.0)
 		if game.surface.landed:break

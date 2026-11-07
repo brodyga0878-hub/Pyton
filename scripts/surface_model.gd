@@ -46,6 +46,11 @@ const LIMIT := 1750.0
 const GRID_WIDTH:=4000.0
 const GRID_CELLS:=96
 var taking_off:=false
+# Derived from Main's separately saved source gear session. Standalone legacy
+# surface callers retain their existing touchdown behavior until explicitly bound.
+var landing_gear_managed:=false
+var landing_gear_ready:=true
+var landing_gear_status:=""
 var active := false
 var landed := false
 var landing := false
@@ -57,6 +62,19 @@ var orbit_attitude := Quaternion.IDENTITY
 var message := ""
 var kind := "rock"
 var site_name:=""
+
+func set_landing_gear_state(managed:bool,ready:bool,status:String="")->void:
+	landing_gear_managed=managed;landing_gear_ready=ready;landing_gear_status=status
+
+func _gear_blocks_touchdown()->bool:return landing_gear_managed and not landing_gear_ready
+
+func _hold_for_landing_gear(ship:RefCounted)->void:
+	# Explicit phone contact adapter until the complete F575 hull response is
+	# connected. Preserve lift and lateral escape; this does not invent damage.
+	ship.position.y=maxf(ship.position.y,_grounded_height(ship,ship.position.x,ship.position.z)+0.05)
+	ship.velocity.y=maxf(0.0,ship.velocity.y)
+	landed=false
+	message="Для посадки дождитесь полного выпуска шасси. «Подъём» позволяет отойти от поверхности."
 
 static func preferred_terrain_revision(system:RefCounted)->String:return OrbitLink.preferred_terrain_revision(system)
 static func source_layout(system:RefCounted)->bool:return OrbitLink.is_source_layout(system)
@@ -304,7 +322,7 @@ func step(dt: float, ship: RefCounted, steering: Vector2, roll: float, lift := 0
 	ship.last_propulsive_delta_v=Vector3.ZERO
 	if not active or not is_finite(dt) or dt<=0 or ship.hull<=0:return
 	if not _refresh_gravity(ship):message="Не удалось обновить исходную гравитацию.";return
-	if underground!=null:underground.step_seconds(dt,globe,ship.position,collision_radii(ship),landed)
+	if underground!=null:underground.step_seconds(dt,globe,ship.position,collision_radii(ship),landed and not _gear_blocks_touchdown())
 	if landed:
 		if is_finite(lift) and lift>0.1:
 			# The visible phone lift control must also work from a healthy landing.
@@ -364,18 +382,25 @@ func step(dt: float, ship: RefCounted, steering: Vector2, roll: float, lift := 0
 	if ship.position.y>ceiling:
 		ship.position.y=ceiling;ship.velocity.y=minf(ship.velocity.y,0);ship.target_speed=0
 	if landing and altitude(ship)<=0.6 and ship.velocity.length()<=6 and (not globe or pad_distance(ship)<80):
-		ship.position.y=_grounded_height(ship,ship.position.x,ship.position.z)
-		ship.velocity=Vector3.ZERO;ship.target_speed=0;landing=false;landed=true
-		message="Посадка выполнена. «Взлететь» — подъём над поверхностью."
+		if _gear_blocks_touchdown():_hold_for_landing_gear(ship)
+		else:
+			ship.position.y=_grounded_height(ship,ship.position.x,ship.position.z)
+			ship.velocity=Vector3.ZERO;ship.target_speed=0;landing=false;landed=true
+			message="Посадка выполнена. «Взлететь» — подъём над поверхностью."
 	if altitude(ship)<=0 and not landed:
 		var impact: float=ship.velocity.length()
-		ship.position.y=_grounded_height(ship,ship.position.x,ship.position.z)
-		ship.velocity=Vector3.ZERO;ship.target_speed=0;landing=false
 		if impact>6:
 			ship.hull=maxf(0,ship.hull-(impact-6)*3)
+			if _gear_blocks_touchdown():ship.velocity=Vector3.ZERO
 			message="Жёсткое касание: %.0f м/с. Проверьте корпус."%impact
-		else:message="Посадка выполнена. «Взлететь» — подъём над поверхностью."
-		landed=true
+		if _gear_blocks_touchdown():
+			_hold_for_landing_gear(ship)
+			if impact>6:message="Жёсткое касание без готовых шасси: %.0f м/с. Проверьте корпус."%impact
+		else:
+			ship.position.y=_grounded_height(ship,ship.position.x,ship.position.z)
+			ship.velocity=Vector3.ZERO;ship.target_speed=0;landing=false
+			if impact<=6:message="Посадка выполнена. «Взлететь» — подъём над поверхностью."
+			landed=true
 
 	if globe and radial.length()>REBASE_DISTANCE:recenter(ship)
 	render_position=ship.position
@@ -384,6 +409,8 @@ func step(dt: float, ship: RefCounted, steering: Vector2, roll: float, lift := 0
 
 func touch_down(ship: RefCounted) -> bool:
 	if not active or landed or ship.hull<=0 or altitude(ship)>3 or ship.velocity.length()>6:return false
+	if _gear_blocks_touchdown():
+		message="Для мягкой посадки шасси должны быть полностью выпущены.";return false
 	ship.position.y=_grounded_height(ship,ship.position.x,ship.position.z)
 	ship.velocity=Vector3.ZERO;ship.target_speed=0;ship.attitude=Quaternion.IDENTITY
 	landed=true;landing=false
@@ -607,12 +634,17 @@ func _clip_source_city(previous:Vector3,ship:RefCounted)->void:
 	if floor_contact:
 		var impact:float=ship.velocity.length()
 		ship.position=Vector3(contact.position.x,_grounded_height(ship,contact.position.x,contact.position.z),contact.position.z)
-		ship.velocity=Vector3.ZERO;ship.target_speed=0;landing=false;taking_off=false;landed=true
-		flight_phase="";ready_for_orbit=false
 		if impact>6:
 			ship.hull=maxf(0,ship.hull-(impact-6)*3)
+			if _gear_blocks_touchdown():ship.velocity=Vector3.ZERO
 			message="Жёсткое касание: %.0f м/с. Проверьте корпус."%impact
-		else:message="Посадка выполнена. «Взлететь» — подъём над поверхностью."
+		if _gear_blocks_touchdown():
+			_hold_for_landing_gear(ship)
+			if impact>6:message="Жёсткое касание без готовых шасси: %.0f м/с. Проверьте корпус."%impact
+		else:
+			ship.velocity=Vector3.ZERO;ship.target_speed=0;landing=false;taking_off=false;landed=true
+			flight_phase="";ready_for_orbit=false
+			if impact<=6:message="Посадка выполнена. «Взлететь» — подъём над поверхностью."
 		return
 	ship.position=Vector3(contact.position)+Vector3(contact.normal)*0.05
 	var inward:float=ship.velocity.dot(contact.normal)
