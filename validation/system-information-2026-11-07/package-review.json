@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "completed_utc": "2026-11-07T15:12:08.664358+00:00",
+  "independent_reviewer": "rotating_dock_impl",
+  "scope": "Read-only source/package review; exact original/Russian provenance/resources, exported modules, historic37/38 fixtures and narrowly approved Main/map changes. Functional/native/GPU checks recorded separately.",
+  "findings_fixed": [
+    "Projection helper now pinned to exact verified606baseline; ship-position mutation rejected",
+    "Seven audited information Main helpers pinned; injected _tick rejected",
+    "Both audited new map view sources pinned; travel-to-star redirect rejected"
+  ],
+  "historical_37_38_contracts_preserved": true,
+  "old_606_fixture_bytes_verified": true,
+  "verifier_sha256": "ad4018c8f048ba66c88aff8f1fce97855da99d721c90843a08d7e73fb2640ba2",
+  "remaining_blockers": []
+}

@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "completed_utc": "2026-11-07T14:53:02.882796+00:00",
+  "resource": "data/ffe_system_information.json",
+  "resource_sha256": "77b37c26d7925e27f227c683c2c78a74f636fc28bf3b55f71f916ab6bcfc09c6",
+  "source_variant": "dos-firstenc-system-information-texts-v1",
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_data_sha256": "34219c91c5d019440ebf4fc707711a32c5080123ede05cf4d10a27d41f770850",
+  "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+  "source_strings": 358,
+  "ff_mappings": 349,
+  "original_pointer_tables": 3,
+  "long_descriptions": {
+    "count": 44,
+    "text_count": 25,
+    "blank_count": 19,
+    "blank_ff_codes": [
+      32768,
+      32769,
+      32770,
+      32771,
+      32772,
+      32773,
+      32774,
+      32775,
+      32777,
+      32779,
+      32785,
+      32791,
+      32799,
+      32800,
+      32802,
+      32808,
+      32809,
+      32810,
+      32811
+    ],
+    "executable_offset": 876496,
+    "cstring_bytes": 6333,
+    "cstring_sha256": "7a8eb24a707f5feabe1a99cc0cda5a96e934d33b6ba01e2dd6471bf64144b8c6",
+    "data7182_first_string_hex": "2000",
+    "constructor_name_tail_bytes": 1373,
+    "audit_correction": "Earlier26text/18blank counted all DATA7182 constructor-name tail as a description. Original F895/F1348 consumes only the first string, so25/19 is authoritative."
+  },
+  "dos_metadata": {
+    "bytes": 18268,
+    "record_rows": 338,
+    "negative_rows": 8,
+    "known_rows": 329,
+    "sentinel_rows": 1,
+    "exception_tail_bytes": 16,
+    "jjffe_added_rows": 10
+  },
+  "python_tests": {
+    "command": "python3 -m unittest discover -s tests -p 'test_extract_system_information.py' -v",
+    "cases": 11,
+    "failures": 0,
+    "skipped": 0,
+    "log": "validation/system-information-2026-11-07/extraction-tests.log",
+    "log_sha256": "2d8b604bfe8a34b6e0476806ef1858c91f3897d404e6bd9974254fcbd9d4cfbf"
+  },
+  "independent_byte_pointer_review": {
+    "checks": 2181,
+    "failures": 0,
+    "report": "validation/system-information-2026-11-07/independent-extraction.json",
+    "report_sha256": "8e8e45a4671964dffe72065d8d89fb10deb75fdc158631cc18abdc96b33a0234",
+    "extractor_imported": false
+  },
+  "changed_files_sha256": {
+    "tools/extract_system_information.py": "7e79f37f37443d452f4c939397597b0d20d66cbed64d897185f5a58725bcb2f2",
+    "data/ffe_system_information.json": "77b37c26d7925e27f227c683c2c78a74f636fc28bf3b55f71f916ab6bcfc09c6",
+    "tests/test_extract_system_information.py": "bd07272613d3b309710739c4784d9b887bd6caafafe748ef2e472b1663e6bbee"
+  },
+  "scope": "Source extraction and provenance only. No runtime/Main/version/build/orbit/world data changed. Native original text/page oracle is a separate core-owned tool and fixture."
+}

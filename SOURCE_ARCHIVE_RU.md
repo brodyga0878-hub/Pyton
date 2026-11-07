@@ -11,9 +11,20 @@ ZIP содержит текущий проект Godot, все рабочие и
 скрипты, сцены, тесты, инструменты сборки и генераторы текстур, документацию
 и исторически восстановленные исходные фрагменты.
 
-Текущая опубликованная сборка — **0.13.2-celestial-alpha1 / code 38**.
+Текущий кандидат — **0.14.0-system-info-alpha1 / code 39**.
+В исходники входят новые модели/экран сведений, исходный текстовый ресурс
+и русский словарь 358 строк, независимые fixtures и проверки извлечения,
+интерпретации и локализации. Длинные описания сохраняют 25 историй и 19
+исходных пробелов; оригинальные IDs, source hex и переменные сохранены.
+Настоящий ARM64 APK собран и технически проверен: 49 880 920 байт,
+SHA256 `0570051ebfd302d2c46db2992e63b9ae64888bb0678b1d3e814e4660aa7c2b25`.
+Точный исходный ZIP ещё готовится; его коммит, размер, SHA и новые
+HTTPS-ссылки будут записаны после упаковки и проверки скачиванием.
+[Состав блока и ограничения](docs/RELEASE_0_14_0_RU.md).
+
+Последняя опубликованная контрольная точка — **0.13.2-celestial-alpha1 / code 38**.
 [Исправление видимости и проекции](docs/RELEASE_0_13_2_RU.md).
-[Скачать APK 0.13.2](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/bd6db12f798ed45e503c198dc6092940faed4096/deliverables/0.13.2-celestial-alpha1/StarFrontier-0.13.2-celestial-arm64.apk) · [Исходники ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/bd6db12f798ed45e503c198dc6092940faed4096/deliverables/0.13.2-celestial-alpha1/StarFrontier-0.13.2-celestial-source.zip)
+[Скачать предыдущий APK 0.13.2](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/bd6db12f798ed45e503c198dc6092940faed4096/deliverables/0.13.2-celestial-alpha1/StarFrontier-0.13.2-celestial-arm64.apk) · [Предыдущие исходники 0.13.2 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/bd6db12f798ed45e503c198dc6092940faed4096/deliverables/0.13.2-celestial-alpha1/StarFrontier-0.13.2-celestial-source.zip)
 
 ZIP: **29 528 548 байт**, 1 296 записей/1 143 файла, меньше 32 МиБ.
 SHA256 `6fd180f08258a8d15e98df99277379b7cd984422a66442e56ee4e16507cb93c0`;

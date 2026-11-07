@@ -132,6 +132,17 @@ CELESTIAL_VISUAL_PROTECTED_RENDERER_FUNCTION_SHA256={
 }
 CELESTIAL_VISUAL_LEGACY_TRANSITION_SHA256='9a400b1d1e7e163f3ada764f441bbd70f313da04793293dc379c8fd26d864697'
 CELESTIAL_VISUAL_RUNTIME_MODULES=('main','celestial_renderer')
+SYSTEM_INFORMATION_BASELINE_SOURCE_COMMIT='606775527498662697ae9eedba152898adabfe40'
+SYSTEM_INFORMATION_MODULES=('source_information_text','source_system_information','system_information_view')
+SYSTEM_INFORMATION_TABLES=('ffe_system_information','system_information_ru')
+SYSTEM_INFORMATION_CELESTIAL_SHA256='c084f772a420a8b625488ce176e87532833c4677e26da2a669939a437c01448e'
+SYSTEM_INFORMATION_RESOURCE_SHA256={
+    'ffe_system_information':'77b37c26d7925e27f227c683c2c78a74f636fc28bf3b55f71f916ab6bcfc09c6',
+    'system_information_ru':'b78c2edcd1889b6aee01b45ef9b591705b159622fca918b803552a3e42057a7f',
+}
+SYSTEM_INFORMATION_MAIN_HELPER_SHA256={'_information_source_counts': '1e50a9c7f8bd846e12b720789ed95ebb57b24fff8d978ce71d480962a8520b8f', '_prepare_information_context': '1b2c529ccd3c7ab736851939114a56582ea24cfbade55446a0dbd5b6c37bad74', '_show_information': '4e0b3d599fd4ded671a997693c81f1533d88421fce685ec5781e0cbee64c2977', '_pump_information': 'a0ea44aca075882067ccdb66806cab1c34783502bbcdd566c826b79c4575f62c', '_finish_information_preparation': 'cefce6e006ad70a083501817b981caf7434c744edee365fc2324c55e1683d3a7', '_discard_information_parent': 'c11a5a15264b0e8d66c304bf3e234c4088b1755dbd4b47e6ea17e248aba09389', '_close_information': '5b06ec3d36bb706ad315797e6b40046be80964877f90f04c2beee0948fa7a868'}
+SYSTEM_INFORMATION_BASELINE_MAIN_FUNCTION_SHA256={'_safe_area': '6d5e38a60d624a39a9d2316f19d36d9a70d165ed774d98758770591a9572fd8f', '_update_flight_projection': '64f5a6530eeebe1e58488f0f54b106e15f889bf2e311f9384c48eb3ab1e1f9e3', '_build_ui': '3436befa9d94776e9569d8d712ecdef667a51c36b2fbd8de1baee9e921b44d6a', '_process': '630d45fb00b80dd356b3343e078fbf0e559edda05cc466856e167b60664a0707', '_exit_tree': 'd568fc0f044944e6755ae645ef01a926c118bfc82c7c98c3c5afe92e4cb1c242', '_show_status': 'ddee14eda7ad252602270d6eb4f0802b7528f07a6280bf55830e2fa9dc7bd1f2'}
+SYSTEM_INFORMATION_MAP_VIEW_SHA256={'scripts/system_map_view.gd': 'b1c03291928cb9dea19ca7a27e6055e192d2066e6fc46e3a21370100963eb103', 'scripts/galactic_map_view.gd': '2b725d1ecfda0f66e2d56872dd20c737dc73f904eee1a4fe490a2d93bbd9a33f'}
 DEVELOPMENT_ASSET_PREFIXES=(
     'assets/tests/','assets/tools/','assets/docs/','assets/recovered-history/',
     'assets/recovery/','assets/validation/','assets/deliverables/',
@@ -687,7 +698,7 @@ def verify_source_full_runtime(archive,project,version_code=34):
     # Older contracts still inspect their exact base tables when tested from a
     # newer checkout. Only explicitly known later-version tables may coexist;
     # current v36 must include and verify its additional original map resource.
-    assert set(required_tables)<=present_tables<=set(FULL_SOURCE_TABLES+NAVIGATION_TABLES),'Full packaging verifier list omits a source table or names a missing table'
+    assert set(required_tables)<=present_tables<=set(FULL_SOURCE_TABLES+NAVIGATION_TABLES+('ffe_system_information',)),'Full packaging verifier list omits a source table or names a missing table'
     tables={}
     for name in required_tables+('ships','world_names_ru'):
         raw=(project/'data'/f'{name}.json').read_bytes();exported=f'assets/data/{name}.json'
@@ -1013,6 +1024,125 @@ def verify_celestial_visibility_runtime(archive,project):
             'compiled_source_correspondence_rebuilt_by_verifier':False,'visibility_or_eclipse_proved_by_this_package_check':False,
             'physical_device_tested':False,'astronomically_calibrated_star_radii':False,'complete_original_renderer':False}
 
+def verify_system_information_runtime(archive,project):
+    """Require actual information consumers/data while preserving flight logic.
+
+    This verifies package/source inputs and narrowly allowed UI hooks; original
+    instruction controls, translation review, Main behavior and GPU are separate.
+    """
+    protected={path:value for path,value in MAP_VISUAL_PROTECTED_SOURCE_SHA256.items()
+               if path not in ('scripts/main.gd','scripts/system_map_view.gd')}
+    map_assets=_verify_map_visual_contract(archive,project,protected,SYSTEM_INFORMATION_BASELINE_SOURCE_COMMIT)
+    modules={}
+    for name in SYSTEM_INFORMATION_MODULES:
+        path='assets/scripts/'+name+'.gdc'
+        assert path in set(archive.namelist()),'Missing system information runtime '+name
+        packed=archive.read(path)
+        assert len(packed)>64 and packed[:4]==b'GDSC','Invalid compiled system information runtime '+name
+        modules[name]={'runtime_sha256':hashlib.sha256(packed).hexdigest(),
+                       'local_source_sha256':hashlib.sha256((project/'scripts'/f'{name}.gd').read_bytes()).hexdigest()}
+    tables={}
+    for name in SYSTEM_INFORMATION_TABLES:
+        path='assets/data/'+name+'.json'
+        assert path in set(archive.namelist()),'Missing system information resource '+name
+        raw=archive.read(path)
+        assert raw==(project/'data'/f'{name}.json').read_bytes(),'System information resource differs from source '+name
+        tables[name]={'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()}
+    source=json.loads(archive.read('assets/data/ffe_system_information.json'))
+    language=json.loads(archive.read('assets/data/system_information_ru.json'))
+    for data in [source,language]:
+        assert data.get('schema')==1 and data.get('source_sha256')==SOURCE_IMAGE_SHA256,'Wrong system information source provenance'
+        assert data.get('source_assembly_sha256')==SOURCE_ASSEMBLY_SHA256,'Wrong system information assembly provenance'
+    assert len(source.get('strings',{}))==358 and len(source.get('ff_code_to_label',{}))==349,'Incomplete original information text graph'
+    assert set(source['strings'])==set(language.get('strings',{})),'Russian information string coverage differs from original'
+    for key,entry in source['strings'].items():
+        raw=bytes.fromhex(entry['hex'])
+        assert raw and raw[-1]==0 and raw.find(b'\0')==len(raw)-1,'Information string crosses its original C boundary '+key
+        assert language['strings'][key].get('source_hex')==entry['hex'],'Russian template refers to different original bytes '+key
+        tokens=[];at=0
+        while at<len(raw)-1:
+            byte=raw[at]
+            if byte in (255,254):
+                assert at+2<len(raw)-1,'Truncated information FF/FE operand '+key
+                tokens.append('{%s%02X%02X}'%('FF' if byte==255 else 'FE',raw[at+1],raw[at+2]));at+=3
+            elif byte==253:
+                assert at+1<len(raw)-1,'Truncated information FD operand '+key
+                tokens.append('{FD%02X}'%raw[at+1]);at+=2
+            else:
+                if byte==13:tokens.append('\r')
+                elif byte<32:tokens.append('{CTRL%02X}'%byte)
+                at+=1
+        translated=language['strings'][key].get('text')
+        assert isinstance(translated,str) and '\0' not in translated,'Invalid Russian information template '+key
+        assert re.findall(r'\{(?:FF[0-9A-F]{4}|FD[0-9A-F]{2}|FE[0-9A-F]{4}|CTRL[0-9A-F]{2})\}|\r',translated)==tokens,'Russian information variable/layout tokens differ '+key
+        assert re.findall(r'%[si]',translated)==[item.decode() for item in re.findall(rb'%[si]',raw[:-1])],'Russian information formatting arguments differ '+key
+    long_strings=[bytes.fromhex(source['strings'][str(index)]['hex']) for index in range(7139,7183)]
+    blank=sum(not raw[:-1].strip() for raw in long_strings)
+    assert blank==19 and len(long_strings)-blank==25,'Incorrect first-NUL long-description boundary'
+    assert source.get('metadata_stride_bytes')==54 and source.get('negative_rows')==8,'Incorrect DOS information policy stride'
+    assert source.get('dos_record_rows')==338 and source.get('dos_sentinel_offset')==18198,'Incorrect DOS information policy domain'
+    assert len(bytes.fromhex(source['dos_metadata_hex']))==18268,'Incorrect DOS information policy bytes'
+    assert language.get('language')=='ru' and language.get('coverage',{}).get('complete_game_localization') is False,'Russian information scope is not explicit'
+    main=(project/'scripts/main.gd').read_text()
+    additions={
+        '_show_system':'\tview.information_requested.connect(func(id:String):\n\t\tif active_map==view:_show_information(world.system_id,id)\n\t)\n',
+        '_show_routes':'\tview.information_requested.connect(func(id:int):\n\t\tif active_map==view:_show_information(id)\n\t)\n',
+        '_close_map':'\tif active_map_kind=="information":\n\t\tif save_progress:_close_information();return\n\t\t_finish_information_preparation();_discard_information_parent()\n',
+    }
+    hashes={}
+    for name,expected in CELESTIAL_VISUAL_PROTECTED_MAIN_FUNCTION_SHA256.items():
+        text=source_function(main,name)
+        if name in additions:
+            assert text.count(additions[name])==1,'Information requires exactly one declared Main hook '+name
+            text=text.replace(additions[name],'',1)
+        if name=='_apply_system':
+            suffix=';_sync_scene();_update_flight_projection()'
+            assert text.count('_update_flight_projection()')==1 and re.search(re.escape(suffix)+r'\n\s*\Z',text),'Information must preserve the Mercury projection consumer'
+            text=text.replace(';_update_flight_projection()','',1)
+        actual=hashlib.sha256(text.encode()).hexdigest()
+        assert actual==expected,'Information update changed protected Main function '+name
+        hashes[name]=actual
+    for name,expected in SYSTEM_INFORMATION_MAIN_HELPER_SHA256.items():
+        assert hashlib.sha256(source_function(main,name).encode()).hexdigest()==expected,'Information update changed audited read-only Main helper '+name
+    allowed={
+        '_process':'\t_pump_information()\n',
+        '_exit_tree':'\t_finish_information_preparation()\n\tif is_instance_valid(information_parent) and information_parent.has_method("finish_preparation"):information_parent.finish_preparation()\n',
+        '_show_status':'\t_menu_action("Сведения о системе",func():_show_information())\n',
+    }
+    for name,expected in SYSTEM_INFORMATION_BASELINE_MAIN_FUNCTION_SHA256.items():
+        text=source_function(main,name)
+        if name in allowed:
+            assert text.count(allowed[name])==1,'Information requires exactly one declared presentation consumer '+name
+            text=text.replace(allowed[name],'',1)
+        assert hashlib.sha256(text.encode()).hexdigest()==expected,'Information update changed protected projection/lifecycle function '+name
+    celestial=hashlib.sha256((project/'scripts/celestial_renderer.gd').read_bytes()).hexdigest()
+    assert celestial==SYSTEM_INFORMATION_CELESTIAL_SHA256,'Information update changed the Mercury stellar-visibility fix'
+    for view in ['system_map_view','galactic_map_view']:
+        text=(project/'scripts'/f'{view}.gd').read_text()
+        assert 'signal information_requested(' in text and 'information_requested.emit(' in text,'Missing live information action '+view
+    for relative,expected in SYSTEM_INFORMATION_MAP_VIEW_SHA256.items():
+        assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==expected,'Information update changed audited map view '+relative
+    opening=source_function(main,'_show_information')
+    assert 'information_parent=active_map' in opening and 'duplicate(true)' in opening,'Information must retain parent UI and copy records'
+    assert '_save_game' not in opening and 'begin_jump' not in opening and 'begin_transfer' not in opening,'Information opening must remain read-only'
+    assert '_pump_information()' in source_function(main,'_process'),'Information worker is not consumed by Main'
+    assert '_finish_information_preparation()' in source_function(main,'_exit_tree'),'Information worker lacks cleanup'
+    assert '_close_information' in source_function(main,'_close_map'),'Information lacks parent-map return'
+    for name,expected in SYSTEM_INFORMATION_RESOURCE_SHA256.items():
+        assert tables[name]['sha256']==expected,'System information resource differs from reviewed original/translation '+name
+    return {'baseline_source_commit':SYSTEM_INFORMATION_BASELINE_SOURCE_COMMIT,
+            'compiled_modules':modules,'compiled_module_count':len(modules),'resources':tables,
+            'source_strings':358,'ff_lookups':349,'long_descriptions':44,'long_nonblank_descriptions':25,
+            'long_blank_descriptions':19,'dos_metadata_rows':338,'source_variant':'uploaded_DOS_information_policy',
+            'protected_main_functions':hashes,'protected_main_function_count':len(hashes),
+            'galactic_map_visual_assets':map_assets,'unchanged_celestial_renderer_sha256':celestial,
+            'additional_runtime_modules':3,'additional_shaders':0,'additional_textures':0,
+            'raw_original_and_ru_resources_checked':True,'read_only_Main_consumers_checked':True,
+            'original_instruction_oracle_executed_by_this_check':False,
+            'complete_original_information_pages':False,'complete_original_text_interpreter':False,
+            'complete_game_localization':False,'physical_device_tested':False}
+
+
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     expected=preset_values(presets)
     signature=run(build_tools/'apksigner','verify','--verbose','--print-certs',apk)
@@ -1031,7 +1161,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -1107,6 +1237,9 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             if expected['version_code']==38:
                 celestial_visibility_assets=verify_celestial_visibility_runtime(archive,presets.parent)
                 map_visual_assets=celestial_visibility_assets['galactic_map_visual_assets']
+            if expected['version_code']>=39:
+                system_information_assets=verify_system_information_runtime(archive,presets.parent)
+                map_visual_assets=system_information_assets['galactic_map_visual_assets']
         for name in names:
             if not name.startswith('lib/') or not name.endswith('.so'):continue
             data=archive.read(name)
@@ -1124,7 +1257,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

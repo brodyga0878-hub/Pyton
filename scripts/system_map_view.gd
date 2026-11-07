@@ -7,6 +7,7 @@ signal body_selected(id:String)
 signal site_selected(id:String)
 signal travel_requested(body_id:String,site_id:String)
 signal close_requested
+signal information_requested(selected_id:String)
 var model:=Model.new()
 var buttons:Dictionary={}
 var body_buttons:Dictionary={}
@@ -136,6 +137,7 @@ func _build()->void:
 	tree_scroll=ScrollContainer.new();tree_scroll.name="SystemMapHierarchy";add_child(tree_scroll)
 	tree_list=VBoxContainer.new();tree_list.size_flags_horizontal=Control.SIZE_EXPAND_FILL;tree_list.add_theme_constant_override("separation",3);tree_scroll.add_child(tree_list)
 	_button("close","Закрыть",func():release_pointers();close_requested.emit())
+	_button("information","Сведения",_request_information)
 	_button("fit","Вся система",func():model.reset_focus();fit_view())
 	_button("center","Центр цели",center_selection)
 	_button("names","Имена",func():show_labels=not show_labels;_redraw())
@@ -185,9 +187,10 @@ func _populate_hierarchy()->void:
 func _layout()->void:
 	if not _built:return
 	var width:=maxf(720,size.x);var height:=maxf(440,size.y);var sidebar:=250.0 if width>=1100 else 210.0
-	title.position=Vector2(12,8);title.size=Vector2(width-128,32)
-	feedback.position=Vector2(12,43);feedback.size=Vector2(width-140,24)
+	title.position=Vector2(12,8);title.size=Vector2(width-248,32)
+	feedback.position=Vector2(12,43);feedback.size=Vector2(width-260,24)
 	buttons.close.position=Vector2(width-112,4);buttons.close.size=Vector2(104,64)
+	buttons.information.position=Vector2(width-232,4);buttons.information.size=Vector2(112,64)
 	var toolbar:=["fit","center","names","orbits","ports","view","rotate_left","rotate_right"]
 	var x:=8.0;var toolbar_width:float=(width-16.0-7*3)/8.0
 	buttons.fit.text="Обзор" if width<1000 else "Вся система";buttons.center.text="Центр" if width<1000 else "Центр цели"
@@ -291,6 +294,7 @@ func _update_contents()->void:
 	if not _built:return
 	title.text="%s · КАРТА СИСТЕМЫ"%model.system_name
 	feedback.text=_feedback_text
+	buttons.information.disabled=not model.configured
 	if not model.configured:selected_label.text=model.last_error;buttons.travel.disabled=true;return
 	var row:=model.selected()
 	selected_label.text=str(row.get("name","Объект не выбран"))
@@ -308,6 +312,10 @@ func _update_contents()->void:
 	buttons.later.disabled=model.preview_offset_days>=Model.MAX_PREVIEW_DAYS or model.preview_days()>=Model.Clock.MAX_ELAPSED_DAYS
 	for id in body_buttons:body_buttons[id].add_theme_color_override("font_color",Color("ffce71") if id==model.selected_id else Color("d8e0d7"))
 	_redraw()
+
+func _request_information()->void:
+	if not input_allowed or not model.configured:return
+	release_pointers();information_requested.emit(model.selected_id)
 
 func _redraw()->void:
 	if plot!=null:plot.queue_redraw()

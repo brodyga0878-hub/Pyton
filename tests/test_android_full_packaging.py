@@ -36,6 +36,9 @@ class FullPackagingChecks(unittest.TestCase):
         self.archive=MockArchive()
         self.main=(PROJECT/'scripts/main.gd').read_text()
         self.world=(PROJECT/'scripts/planetary_system.gd').read_text()
+        historical=tempfile.TemporaryDirectory();self.addCleanup(historical.cleanup)
+        self.celestial_baseline=Path(historical.name)
+        self.celestial_visual_project(self.celestial_baseline)
 
     def test_actual_local_startup_and_legacy_contract(self):
         result=verifier.verify_full_startup(self.main,self.world)
@@ -343,6 +346,11 @@ class FullPackagingChecks(unittest.TestCase):
         for relative in (*verifier.MAP_VISUAL_PROTECTED_SOURCE_SHA256,'scripts/galactic_map_view.gd'):
             target=project/relative;target.parent.mkdir(parents=True,exist_ok=True)
             raw=(PROJECT/relative).read_text()
+            historical=json.loads((PROJECT/'tests/fixtures/celestial_visual_v38_sources.json').read_text())
+            if relative in historical['files']:
+                entry=historical['files'][relative]
+                self.assertEqual(hashlib.sha256(entry['source'].encode()).hexdigest(),entry['sha256'])
+                raw=entry['source']
             if historical_main and relative=='scripts/main.gd':
                 baseline=json.loads((PROJECT/'tests/fixtures/map_visual_v37_main_source.json').read_text())
                 self.assertEqual(hashlib.sha256(baseline['source'].encode()).hexdigest(),verifier.MAP_VISUAL_PROTECTED_SOURCE_SHA256[relative])
@@ -423,7 +431,7 @@ class FullPackagingChecks(unittest.TestCase):
         return project
 
     def test_celestial_visual_scope_keeps_gameplay_and_source_units_explicit(self):
-        result=verifier.verify_celestial_visibility_runtime(self.archive,PROJECT)
+        result=verifier.verify_celestial_visibility_runtime(self.archive,self.celestial_baseline)
         self.assertEqual(result['baseline_source_commit'],'c5d61229d579dc738aca6f5b45c570e5444fa836')
         self.assertEqual(result['presentation_runtime_module_count'],2)
         self.assertEqual(result['protected_source_data_count'],17)
@@ -439,7 +447,7 @@ class FullPackagingChecks(unittest.TestCase):
 
     def test_historical_v37_contract_does_not_accept_v38_Main_changes(self):
         with self.assertRaisesRegex(AssertionError,'Visual-only map update changed protected source/data scripts/main.gd'):
-            verifier.verify_map_visual_runtime(self.archive,PROJECT)
+            verifier.verify_map_visual_runtime(self.archive,self.celestial_baseline)
 
     def test_celestial_presentation_requires_both_compiled_consumers(self):
         for name in verifier.CELESTIAL_VISUAL_RUNTIME_MODULES:
@@ -449,7 +457,7 @@ class FullPackagingChecks(unittest.TestCase):
                     if mutation=='missing':del archive.entries[path]
                     else:archive.entries[path]=b'invalid'+b'x'*100
                     with self.assertRaisesRegex(AssertionError,'(?:Missing|Invalid compiled) celestial visibility runtime'):
-                        verifier.verify_celestial_visibility_runtime(archive,PROJECT)
+                        verifier.verify_celestial_visibility_runtime(archive,self.celestial_baseline)
 
     def test_celestial_update_cannot_change_simulation_save_or_transfer_functions(self):
         for name in ['_tick','_payload','_decode_state','_time_context','_source_motion_step','_choose_body','_choose_site','_apply_system']:

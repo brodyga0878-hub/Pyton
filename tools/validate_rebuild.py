@@ -44,6 +44,11 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_system_information', 'tests/test_source_system_information.gd', 'Original DOS information strings, policy, numeric and body pages versus1570 independently executed native cases plus actual World isolation.', timeout=300),
+    Suite('system_information_view', 'tests/test_system_information_view.gd', 'Information UI layout, touch scrolling, copied inputs, source counter forwarding and unavailable states with an explicitly labelled fixture provider.', timeout=300),
+    Suite('system_information_native_view', 'tests/test_system_information_native_view.gd', 'Actual original Sol/Alpha Centauri information through the real UI, exact counters, ground-port adapter and unknown knowledge guard.', timeout=300),
+    Suite('map_information_actions', 'tests/test_map_information_actions.gd', 'Actual map information buttons, responsive action geometry, input release and unchanged travel/selection behavior.', timeout=300),
+    Suite('system_information_main', 'tests/test_system_information_main.gd', 'Actual Main information modal, source-state isolation, retained parent map/menu, background/cancellation/exit and time-acceleration interruption policy.', timeout=300, user_args=('--rebuild-capture',)),
     Suite('navigation_main', 'tests/test_navigation_main.gd', 'Actual Main graphical map selection/confirmation, forecast isolation, raw save continuation, phone roll, clock scheduling and legacy opt-in boundaries.', timeout=600, user_args=('--rebuild-capture',)),
     Suite('galactic_map_model', 'tests/test_galactic_map_model.gd', 'Original F853 galaxy overview, source sectors/search/distance and independent native density controls.', timeout=300),
     Suite('galactic_map_view', 'tests/test_galactic_map_view.gd', 'Actual galaxy screen worker lifecycle, pan/zoom/search, touch and explicit jump confirmation.', timeout=300),

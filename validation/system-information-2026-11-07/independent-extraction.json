@@ -1,0 +1,18 @@
+{
+  "checks": 2181,
+  "failures": [],
+  "resource_sha256": "77b37c26d7925e27f227c683c2c78a74f636fc28bf3b55f71f916ab6bcfc09c6",
+  "expected_source": "independent build/read-only db parser + raw DOS pointer/text matching; extractor not imported",
+  "coverage": "all349 mapped strings,9 direct strings,3 complete DOS pointer tables, FFlookup,19blanks/7182tail/0x83;9 direct offsets independently anchored via4 complete unique source groups",
+  "extra_direct_offset_controls": {
+    "7097": 855382,
+    "7098": 855390,
+    "7099": 855397,
+    "7100": 855399,
+    "7101": 855402,
+    "7102": 855408,
+    "7103": 855410,
+    "7653": 957396,
+    "7654": 957401
+  }
+}

@@ -1,0 +1,1853 @@
+{
+  "schema": 1,
+  "language": "ru",
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_data_sha256": "34219c91c5d019440ebf4fc707711a32c5080123ede05cf4d10a27d41f770850",
+  "source_resource_path": "res://data/ffe_system_information.json",
+  "template_encoding": "Unicode text with exact uppercase {FFxxxx}, {FDxx}, {FExxxx}, {CTRLxx} source-control tokens; CR preserved",
+  "scope": "Original system-information resource graph only, including38original commodity labels (33market +5extra), source formats and unit labels; not complete localization of FFE, generated names, missions or newspapers.",
+  "long_text_boundary_correction": "DATA7182 is a space plus NUL; later constructor names within the same ASM block are outside its description C string.",
+  "coverage": {
+    "system_table_strings": 267,
+    "long_description_strings": 44,
+    "long_nonblank_descriptions": 25,
+    "long_original_blank_descriptions": 19,
+    "commodity_strings": 38,
+    "total_strings": 358,
+    "complete_game_localization": false,
+    "market_commodity_strings": 33,
+    "additional_original_commodity_strings": 5,
+    "summary_and_format_strings": 7,
+    "unit_strings": 2
+  },
+  "strings": {
+    "6216": {
+      "text": "Вода",
+      "source_hex": "576174657200",
+      "translation_policy": "russian_translation"
+    },
+    "6217": {
+      "text": "Жидкий кислород",
+      "source_hex": "4c6971756964204f787967656e00",
+      "translation_policy": "russian_translation"
+    },
+    "6218": {
+      "text": "Зерно",
+      "source_hex": "477261696e00",
+      "translation_policy": "russian_translation"
+    },
+    "6219": {
+      "text": "Фрукты и овощи",
+      "source_hex": "467275697420616e64205665672e00",
+      "translation_policy": "russian_translation"
+    },
+    "6220": {
+      "text": "Мясо животных",
+      "source_hex": "416e696d616c204d65617400",
+      "translation_policy": "russian_translation"
+    },
+    "6221": {
+      "text": "Синтетическое мясо",
+      "source_hex": "53796e746865746963204d65617400",
+      "translation_policy": "russian_translation"
+    },
+    "6222": {
+      "text": "Спиртные напитки",
+      "source_hex": "4c6971756f7200",
+      "translation_policy": "russian_translation"
+    },
+    "6223": {
+      "text": "Наркотики",
+      "source_hex": "4e6172636f7469637300",
+      "translation_policy": "russian_translation"
+    },
+    "6224": {
+      "text": "Медикаменты",
+      "source_hex": "4d65646963696e657300",
+      "translation_policy": "russian_translation"
+    },
+    "6225": {
+      "text": "Удобрения",
+      "source_hex": "46657274696c697a657200",
+      "translation_policy": "russian_translation"
+    },
+    "6226": {
+      "text": "Шкуры животных",
+      "source_hex": "416e696d616c20536b696e7300",
+      "translation_policy": "russian_translation"
+    },
+    "6227": {
+      "text": "Живые животные",
+      "source_hex": "4c69766520416e696d616c7300",
+      "translation_policy": "russian_translation"
+    },
+    "6228": {
+      "text": "Рабы",
+      "source_hex": "536c6176657300",
+      "translation_policy": "russian_translation"
+    },
+    "6229": {
+      "text": "Предметы роскоши",
+      "source_hex": "4c757875727920476f6f647300",
+      "translation_policy": "russian_translation"
+    },
+    "6230": {
+      "text": "Тяжёлые пластмассы",
+      "source_hex": "486561767920506c61737469637300",
+      "translation_policy": "russian_translation"
+    },
+    "6231": {
+      "text": "Металлические сплавы",
+      "source_hex": "4d6574616c20416c6c6f797300",
+      "translation_policy": "russian_translation"
+    },
+    "6232": {
+      "text": "Драгоценные металлы",
+      "source_hex": "50726563696f7573204d6574616c7300",
+      "translation_policy": "russian_translation"
+    },
+    "6233": {
+      "text": "Драгоценные камни",
+      "source_hex": "47656d2053746f6e657300",
+      "translation_policy": "russian_translation"
+    },
+    "6234": {
+      "text": "Минералы",
+      "source_hex": "4d696e6572616c7300",
+      "translation_policy": "russian_translation"
+    },
+    "6235": {
+      "text": "Водородное топливо",
+      "source_hex": "487964726f67656e204675656c00",
+      "translation_policy": "russian_translation"
+    },
+    "6236": {
+      "text": "Военное топливо",
+      "source_hex": "4d696c6974617279204675656c00",
+      "translation_policy": "russian_translation"
+    },
+    "6237": {
+      "text": "Стрелковое оружие",
+      "source_hex": "48616e6420576561706f6e7300",
+      "translation_policy": "russian_translation"
+    },
+    "6238": {
+      "text": "Боевое вооружение",
+      "source_hex": "426174746c6520576561706f6e7300",
+      "translation_policy": "russian_translation"
+    },
+    "6239": {
+      "text": "Нервно-паралитический газ",
+      "source_hex": "4e657276652047617300",
+      "translation_policy": "russian_translation"
+    },
+    "6240": {
+      "text": "Промышленные комплектующие",
+      "source_hex": "496e647573747269616c20506172747300",
+      "translation_policy": "russian_translation"
+    },
+    "6241": {
+      "text": "Компьютеры",
+      "source_hex": "436f6d70757465727300",
+      "translation_policy": "russian_translation"
+    },
+    "6242": {
+      "text": "Установки переработки воздуха",
+      "source_hex": "4169722050726f636573736f727300",
+      "translation_policy": "russian_translation"
+    },
+    "6243": {
+      "text": "Сельскохозяйственная техника",
+      "source_hex": "4661726d204d616368696e65727900",
+      "translation_policy": "russian_translation"
+    },
+    "6244": {
+      "text": "Роботы",
+      "source_hex": "526f626f747300",
+      "translation_policy": "russian_translation"
+    },
+    "6245": {
+      "text": "Радиоактивные материалы",
+      "source_hex": "526164696f6163746976657300",
+      "translation_policy": "russian_translation"
+    },
+    "6246": {
+      "text": "Мусор",
+      "source_hex": "5275626269736800",
+      "translation_policy": "russian_translation"
+    },
+    "6247": {
+      "text": "Инопланетные артефакты",
+      "source_hex": "416c69656e2041727465666163747300",
+      "translation_policy": "russian_translation"
+    },
+    "6248": {
+      "text": "Дипольные отражатели",
+      "source_hex": "436861666600",
+      "translation_policy": "russian_translation"
+    },
+    "6249": {
+      "text": "Карточка «Jjagged Bbanner»",
+      "source_hex": "4a6a6167676564204262616e6e6572204361726400",
+      "translation_policy": "proper_name_preserved"
+    },
+    "6250": {
+      "text": "Бортовой самописец",
+      "source_hex": "466c69676874205265636f7264657200",
+      "translation_policy": "russian_translation"
+    },
+    "6251": {
+      "text": "Вакцина от гипермикоида",
+      "source_hex": "48797065726d79636f69642056616363696e6500",
+      "translation_policy": "russian_translation"
+    },
+    "6252": {
+      "text": "Предмет задания 2",
+      "source_hex": "4d697373696f6e204974656d203200",
+      "translation_policy": "russian_translation"
+    },
+    "6253": {
+      "text": "Предмет задания 3",
+      "source_hex": "4d697373696f6e204974656d203300",
+      "translation_policy": "russian_translation"
+    },
+    "6830": {
+      "text": "Солнце",
+      "source_hex": "536f6c00",
+      "translation_policy": "canonical_name"
+    },
+    "6831": {
+      "text": "Альфа Центавра",
+      "source_hex": "416c7068612043656e746175726900",
+      "translation_policy": "canonical_name"
+    },
+    "6832": {
+      "text": "Вольф 359",
+      "source_hex": "576f6c662033353900",
+      "translation_policy": "canonical_name"
+    },
+    "6833": {
+      "text": "Лаланд 21185 ",
+      "source_hex": "4c616c616e64652032313138352000",
+      "translation_policy": "canonical_name"
+    },
+    "6834": {
+      "text": "UV Кита",
+      "source_hex": "5556204365746900",
+      "translation_policy": "canonical_name"
+    },
+    "6835": {
+      "text": "Росс 128",
+      "source_hex": "526f73732031323800",
+      "translation_policy": "canonical_name"
+    },
+    "6836": {
+      "text": "Тау Кита",
+      "source_hex": "546175204365746900",
+      "translation_policy": "canonical_name"
+    },
+    "6837": {
+      "text": "LET 118",
+      "source_hex": "4c45542031313800",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6838": {
+      "text": "Вольф 424",
+      "source_hex": "576f6c662034323400",
+      "translation_policy": "canonical_name"
+    },
+    "6839": {
+      "text": "CD-37^15492",
+      "source_hex": "43442d33375e313534393200",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6840": {
+      "text": "Лаланд 25372",
+      "source_hex": "4c616c616e646520323533373200",
+      "translation_policy": "canonical_name"
+    },
+    "6841": {
+      "text": "Сириус",
+      "source_hex": "53697269757300",
+      "translation_policy": "canonical_name"
+    },
+    "6842": {
+      "text": "Эпсилон Эридана",
+      "source_hex": "457073696c6f6e2045726964616e6900",
+      "translation_policy": "canonical_name"
+    },
+    "6843": {
+      "text": "Процион",
+      "source_hex": "50726f63796f6e00",
+      "translation_policy": "canonical_name"
+    },
+    "6844": {
+      "text": "BD+5^1668",
+      "source_hex": "42442b355e3136363800",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6845": {
+      "text": "BD+20^2465",
+      "source_hex": "42442b32305e3234363500",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6846": {
+      "text": "Грумбридж 1618",
+      "source_hex": "47726f6f6d627269646765203136313800",
+      "translation_policy": "canonical_name"
+    },
+    "6847": {
+      "text": "Лейтен 1159-16",
+      "source_hex": "4c757974656e20313135392d313600",
+      "translation_policy": "canonical_name"
+    },
+    "6848": {
+      "text": "WX Большой Медведицы",
+      "source_hex": "57582055727361204d616a6f72697300",
+      "translation_policy": "canonical_name"
+    },
+    "6849": {
+      "text": "+53^1320",
+      "source_hex": "2b35335e3133323000",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6850": {
+      "text": "Росс 248",
+      "source_hex": "526f73732032343800",
+      "translation_policy": "canonical_name"
+    },
+    "6851": {
+      "text": "Грумбридж 34",
+      "source_hex": "47726f6f6d62726964676520333400",
+      "translation_policy": "canonical_name"
+    },
+    "6852": {
+      "text": "Звезда ван Маанена",
+      "source_hex": "76616e204d61616e656e73205374617200",
+      "translation_policy": "canonical_name"
+    },
+    "6853": {
+      "text": "Гиклас 158-27",
+      "source_hex": "4769636c6173203135382d323700",
+      "translation_policy": "canonical_name"
+    },
+    "6854": {
+      "text": "61 Лебедя",
+      "source_hex": "3631204379676e6900",
+      "translation_policy": "canonical_name"
+    },
+    "6855": {
+      "text": "Струве 2398",
+      "source_hex": "537472757665203233393800",
+      "translation_policy": "canonical_name"
+    },
+    "6856": {
+      "text": "1^4774",
+      "source_hex": "315e3437373400",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6857": {
+      "text": "Звезда Барнарда",
+      "source_hex": "4261726e61726473205374617200",
+      "translation_policy": "canonical_name"
+    },
+    "6858": {
+      "text": "Росс 154",
+      "source_hex": "526f73732031353400",
+      "translation_policy": "canonical_name"
+    },
+    "6859": {
+      "text": "Лейтен 789-6",
+      "source_hex": "4c757974656e203738392d3600",
+      "translation_policy": "canonical_name"
+    },
+    "6860": {
+      "text": "Лакайль 9352",
+      "source_hex": "4c616361696c6c65203933353200",
+      "translation_policy": "canonical_name"
+    },
+    "6861": {
+      "text": "Лакайль 8760",
+      "source_hex": "4c616361696c6c65203837363000",
+      "translation_policy": "canonical_name"
+    },
+    "6862": {
+      "text": "Росс 780",
+      "source_hex": "526f73732037383000",
+      "translation_policy": "canonical_name"
+    },
+    "6863": {
+      "text": "Фомальгаут",
+      "source_hex": "466f6d616c6861757400",
+      "translation_policy": "canonical_name"
+    },
+    "6864": {
+      "text": "Эпсилон Индейца",
+      "source_hex": "457073696c6f6e20496e646900",
+      "translation_policy": "canonical_name"
+    },
+    "6865": {
+      "text": "BD 4523",
+      "source_hex": "4244203435323300",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6866": {
+      "text": "CD-46^11540",
+      "source_hex": "43442d34365e313135343000",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6867": {
+      "text": "CD-49^13515",
+      "source_hex": "43442d34395e313335313500",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6868": {
+      "text": "CD-44^11909",
+      "source_hex": "43442d34345e313139303900",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6869": {
+      "text": "-11^3759",
+      "source_hex": "2d31315e3337353900",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6870": {
+      "text": "Звезда Каптейна",
+      "source_hex": "4b61707465796e73205374617200",
+      "translation_policy": "canonical_name"
+    },
+    "6871": {
+      "text": "82 Эридана",
+      "source_hex": "38322045726964616e6900",
+      "translation_policy": "canonical_name"
+    },
+    "6872": {
+      "text": "Лейтен 674-15",
+      "source_hex": "4c757974656e203637342d313500",
+      "translation_policy": "canonical_name"
+    },
+    "6873": {
+      "text": "Росс 614",
+      "source_hex": "526f73732036313400",
+      "translation_policy": "canonical_name"
+    },
+    "6874": {
+      "text": "Омикрон Эридана",
+      "source_hex": "4f6d6963726f6e2045726964616e6900",
+      "translation_policy": "canonical_name"
+    },
+    "6875": {
+      "text": "YZ Малого Пса",
+      "source_hex": "595a2043616e6973204d696e6f72697300",
+      "translation_policy": "canonical_name"
+    },
+    "6876": {
+      "text": "-21^1377",
+      "source_hex": "2d32315e3133373700",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6877": {
+      "text": "HD 36395",
+      "source_hex": "484420333633393500",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6878": {
+      "text": "LP 658-2",
+      "source_hex": "4c50203635382d3200",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6879": {
+      "text": "Росс 986",
+      "source_hex": "526f73732039383600",
+      "translation_policy": "canonical_name"
+    },
+    "6880": {
+      "text": "Росс 47",
+      "source_hex": "526f737320343700",
+      "translation_policy": "canonical_name"
+    },
+    "6881": {
+      "text": "Вольф 294",
+      "source_hex": "576f6c662032393400",
+      "translation_policy": "canonical_name"
+    },
+    "6882": {
+      "text": "Штейн 2051",
+      "source_hex": "537465696e203230353100",
+      "translation_policy": "canonical_name"
+    },
+    "6883": {
+      "text": "AC+79^3888",
+      "source_hex": "41432b37395e3338383800",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6884": {
+      "text": "Эта Кассиопеи",
+      "source_hex": "4574612043617373696f7065696100",
+      "translation_policy": "canonical_name"
+    },
+    "6885": {
+      "text": "Крюгер 60",
+      "source_hex": "4b725b67657220363000",
+      "translation_policy": "canonical_name"
+    },
+    "6886": {
+      "text": "BD 946",
+      "source_hex": "42442039343600",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6887": {
+      "text": "BD+43^4305",
+      "source_hex": "42442b34335e3433303500",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6888": {
+      "text": "Сигма Дракона",
+      "source_hex": "5369676d6120447261636f6e697300",
+      "translation_policy": "canonical_name"
+    },
+    "6889": {
+      "text": "+19^5116",
+      "source_hex": "2b31395e3531313600",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6890": {
+      "text": "Альтаир",
+      "source_hex": "416c7461697200",
+      "translation_policy": "canonical_name"
+    },
+    "6891": {
+      "text": "FU 46",
+      "source_hex": "465520343600",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6892": {
+      "text": "70 Змееносца",
+      "source_hex": "3730204f7068697563686900",
+      "translation_policy": "canonical_name"
+    },
+    "6893": {
+      "text": "VB 10",
+      "source_hex": "564220313000",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6894": {
+      "text": "Арктур",
+      "source_hex": "417263747572757300",
+      "translation_policy": "canonical_name"
+    },
+    "6895": {
+      "text": "36 Змееносца",
+      "source_hex": "3336204f7068697563686900",
+      "translation_policy": "canonical_name"
+    },
+    "6896": {
+      "text": "HR 7703",
+      "source_hex": "4852203737303300",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6897": {
+      "text": "Лейтен 347-14",
+      "source_hex": "4c757974656e203334372d313400",
+      "translation_policy": "canonical_name"
+    },
+    "6898": {
+      "text": "Вольф 630",
+      "source_hex": "576f6c662036333000",
+      "translation_policy": "canonical_name"
+    },
+    "6899": {
+      "text": "Дельта Павлина",
+      "source_hex": "44656c7461205061766f6e697300",
+      "translation_policy": "canonical_name"
+    },
+    "6900": {
+      "text": "Лейтен 205-128",
+      "source_hex": "4c757974656e203230352d31323800",
+      "translation_policy": "canonical_name"
+    },
+    "6901": {
+      "text": "-40^9712",
+      "source_hex": "2d34305e3937313200",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6902": {
+      "text": "-45^13677",
+      "source_hex": "2d34355e313336373700",
+      "translation_policy": "catalogue_designation_preserved"
+    },
+    "6903": {
+      "text": "Лейтен 145-41",
+      "source_hex": "4c757974656e203134352d343100",
+      "translation_policy": "canonical_name"
+    },
+    "6904": {
+      "text": "Бета Южной Гидры",
+      "source_hex": "4265746120487964726900",
+      "translation_policy": "canonical_name"
+    },
+    "6905": {
+      "text": "Лейтен 97-12",
+      "source_hex": "4c757974656e2039372d313200",
+      "translation_policy": "canonical_name"
+    },
+    "6906": {
+      "text": "Вега",
+      "source_hex": "5665676100",
+      "translation_policy": "canonical_name"
+    },
+    "6907": {
+      "text": "Кастор",
+      "source_hex": "436173746f7200",
+      "translation_policy": "canonical_name"
+    },
+    "6908": {
+      "text": "Поллукс",
+      "source_hex": "506f6c6c757800",
+      "translation_policy": "canonical_name"
+    },
+    "6909": {
+      "text": "Регул",
+      "source_hex": "526567756c757300",
+      "translation_policy": "canonical_name"
+    },
+    "6910": {
+      "text": "Ахенар",
+      "source_hex": "416368656e617200",
+      "translation_policy": "canonical_name"
+    },
+    "6911": {
+      "text": "Капелла",
+      "source_hex": "436170656c6c6100",
+      "translation_policy": "canonical_name"
+    },
+    "6912": {
+      "text": "Альдебаран",
+      "source_hex": "416c6465626172616e00",
+      "translation_policy": "canonical_name"
+    },
+    "6913": {
+      "text": "Канопус",
+      "source_hex": "43616e6f70757300",
+      "translation_policy": "canonical_name"
+    },
+    "6914": {
+      "text": "Спика",
+      "source_hex": "537069636100",
+      "translation_policy": "canonical_name"
+    },
+    "6915": {
+      "text": "Хадар",
+      "source_hex": "486164617200",
+      "translation_policy": "canonical_name"
+    },
+    "6916": {
+      "text": "Антарес",
+      "source_hex": "416e746172657300",
+      "translation_policy": "canonical_name"
+    },
+    "6917": {
+      "text": "Бетельгейзе",
+      "source_hex": "426574656c676575736500",
+      "translation_policy": "canonical_name"
+    },
+    "6918": {
+      "text": "Ригель",
+      "source_hex": "526967656c00",
+      "translation_policy": "canonical_name"
+    },
+    "6919": {
+      "text": "Альциона",
+      "source_hex": "416c63796f6e6500",
+      "translation_policy": "canonical_name"
+    },
+    "6920": {
+      "text": "Атлас",
+      "source_hex": "41746c617300",
+      "translation_policy": "canonical_name"
+    },
+    "6921": {
+      "text": "Электра",
+      "source_hex": "456c656374726100",
+      "translation_policy": "canonical_name"
+    },
+    "6922": {
+      "text": "Майя",
+      "source_hex": "4d61696100",
+      "translation_policy": "canonical_name"
+    },
+    "6923": {
+      "text": "Меропа",
+      "source_hex": "4d65726f706500",
+      "translation_policy": "canonical_name"
+    },
+    "6924": {
+      "text": "Тайгета",
+      "source_hex": "5461796765746500",
+      "translation_policy": "canonical_name"
+    },
+    "6925": {
+      "text": "Плейона",
+      "source_hex": "506c65696f6e6500",
+      "translation_policy": "canonical_name"
+    },
+    "6926": {
+      "text": "Полярная",
+      "source_hex": "506f6c6172697300",
+      "translation_policy": "canonical_name"
+    },
+    "6927": {
+      "text": "Бета Лиры",
+      "source_hex": "42657461204c7972616500",
+      "translation_policy": "canonical_name"
+    },
+    "6928": {
+      "text": "Алькаид",
+      "source_hex": "416c6b61696400",
+      "translation_policy": "canonical_name"
+    },
+    "6929": {
+      "text": "Мицар",
+      "source_hex": "4d697a617200",
+      "translation_policy": "canonical_name"
+    },
+    "6930": {
+      "text": "Алькор",
+      "source_hex": "416c636f7200",
+      "translation_policy": "canonical_name"
+    },
+    "6931": {
+      "text": "Алиот",
+      "source_hex": "416c696f746800",
+      "translation_policy": "canonical_name"
+    },
+    "6932": {
+      "text": "Мегрец",
+      "source_hex": "4d656772657a00",
+      "translation_policy": "canonical_name"
+    },
+    "6933": {
+      "text": "Фекда",
+      "source_hex": "5068656b646100",
+      "translation_policy": "canonical_name"
+    },
+    "6934": {
+      "text": "Мерак",
+      "source_hex": "4d6572616b00",
+      "translation_policy": "canonical_name"
+    },
+    "6935": {
+      "text": "Дубхе",
+      "source_hex": "447562686500",
+      "translation_policy": "canonical_name"
+    },
+    "6936": {
+      "text": "Лейв",
+      "source_hex": "4c61766500",
+      "translation_policy": "canonical_name"
+    },
+    "6937": {
+      "text": "Дисо",
+      "source_hex": "4469736f00",
+      "translation_policy": "canonical_name"
+    },
+    "6938": {
+      "text": "Ридкват",
+      "source_hex": "526965647175617400",
+      "translation_policy": "canonical_name"
+    },
+    "6939": {
+      "text": "Листи",
+      "source_hex": "4c656573746900",
+      "translation_policy": "canonical_name"
+    },
+    "6940": {
+      "text": "Орерв",
+      "source_hex": "4f726572766500",
+      "translation_policy": "canonical_name"
+    },
+    "6941": {
+      "text": "Заонс",
+      "source_hex": "5a616f6e636500",
+      "translation_policy": "canonical_name"
+    },
+    "6942": {
+      "text": "Тионисла",
+      "source_hex": "54696f6e69736c6100",
+      "translation_policy": "canonical_name"
+    },
+    "6943": {
+      "text": "Реорте",
+      "source_hex": "52656f72746500",
+      "translation_policy": "canonical_name"
+    },
+    "6944": {
+      "text": "Усзаа",
+      "source_hex": "55737a616100",
+      "translation_policy": "canonical_name"
+    },
+    "6945": {
+      "text": "Оррере",
+      "source_hex": "4f727265726500",
+      "translation_policy": "canonical_name"
+    },
+    "6946": {
+      "text": "Кватор",
+      "source_hex": "517561746f7200",
+      "translation_policy": "canonical_name"
+    },
+    "6947": {
+      "text": "Двойная система",
+      "source_hex": "42696e6172792073797374656d00",
+      "translation_policy": "russian_translation"
+    },
+    "6948": {
+      "text": "Астероидное тело",
+      "source_hex": "41737465726f6964616c20626f647900",
+      "translation_policy": "russian_translation"
+    },
+    "6949": {
+      "text": "Небольшое безжизненное шарообразное каменное тело",
+      "source_hex": "536d616c6c2062617272656e20737068657265206f6620726f636b00",
+      "translation_policy": "russian_translation"
+    },
+    "6950": {
+      "text": "Безжизненный каменный планетоид",
+      "source_hex": "42617272656e20726f636b7920706c616e65746f696400",
+      "translation_policy": "russian_translation"
+    },
+    "6951": {
+      "text": "Каменная планета с разреженной атмосферой",
+      "source_hex": "526f636b7920706c616e657420776974682061207468696e2061746d6f73706865726500",
+      "translation_policy": "russian_translation"
+    },
+    "6952": {
+      "text": "Мир с высокой вулканической активностью",
+      "source_hex": "486967686c7920766f6c63616e696320776f726c6400",
+      "translation_policy": "russian_translation"
+    },
+    "6953": {
+      "text": "Мир с аммиачным круговоротом и агрессивной атмосферой",
+      "source_hex": "576f726c64207769746820616d6d6f6e696120776561746865722073797374656d20616e6420636f72726f736976652061746d6f73706865726500",
+      "translation_policy": "russian_translation"
+    },
+    "6954": {
+      "text": "Мир с метановым круговоротом и агрессивной атмосферой",
+      "source_hex": "576f726c642077697468206d657468616e6520776561746865722073797374656d20616e6420636f72726f736976652061746d6f73706865726500",
+      "translation_policy": "russian_translation"
+    },
+    "6955": {
+      "text": "Мир с водным круговоротом и агрессивной атмосферой",
+      "source_hex": "576f726c64207769746820776174657220776561746865722073797374656d20616e6420636f72726f736976652061746d6f73706865726500",
+      "translation_policy": "russian_translation"
+    },
+    "6956": {
+      "text": "Небольшой терраформированный мир с искусственным поддержанием условий",
+      "source_hex": "536d616c6c207375737461696e6564207465727261666f726d656420776f726c6400",
+      "translation_policy": "russian_translation"
+    },
+    "6957": {
+      "text": "Мир с местными формами жизни и кислородной атмосферой",
+      "source_hex": "576f726c64207769746820696e646967656e6f7573206c69666520616e64206f787967656e2061746d6f73706865726500",
+      "translation_policy": "russian_translation"
+    },
+    "6958": {
+      "text": "Терраформированный мир с завезёнными формами жизни",
+      "source_hex": "5465727261666f726d656420776f726c64207769746820696e74726f6475636564206c69666500",
+      "translation_policy": "russian_translation"
+    },
+    "6959": {
+      "text": "Каменный мир с плотной агрессивной атмосферой",
+      "source_hex": "526f636b7920776f726c642077697468206120746869636b20636f72726f736976652061746d6f73706865726500",
+      "translation_policy": "russian_translation"
+    },
+    "6960": {
+      "text": "Малый газовый гигант",
+      "source_hex": "536d616c6c20676173206769616e7400",
+      "translation_policy": "russian_translation"
+    },
+    "6961": {
+      "text": "Средний газовый гигант",
+      "source_hex": "4d656469756d20676173206769616e7400",
+      "translation_policy": "russian_translation"
+    },
+    "6962": {
+      "text": "Крупный газовый гигант",
+      "source_hex": "4c6172676520676173206769616e7400",
+      "translation_policy": "russian_translation"
+    },
+    "6963": {
+      "text": "Очень крупный газовый гигант",
+      "source_hex": "56657279206c6172676520676173206769616e7400",
+      "translation_policy": "russian_translation"
+    },
+    "6964": {
+      "text": "Коричневый карлик — субзвёздный объект",
+      "source_hex": "42726f776e206477617266207375627374656c6c6172206f626a65637400",
+      "translation_policy": "russian_translation"
+    },
+    "6965": {
+      "text": "Вспыхивающая звезда класса M",
+      "source_hex": "54797065274d27666c617265207374617200",
+      "translation_policy": "russian_translation"
+    },
+    "6966": {
+      "text": "Тусклая красная звезда класса M",
+      "source_hex": "4661696e742074797065274d27726564207374617200",
+      "translation_policy": "russian_translation"
+    },
+    "6967": {
+      "text": "Красная звезда класса M",
+      "source_hex": "54797065274d27726564207374617200",
+      "translation_policy": "russian_translation"
+    },
+    "6968": {
+      "text": "Оранжевая звезда класса K",
+      "source_hex": "54797065274b276f72616e6765207374617200",
+      "translation_policy": "russian_translation"
+    },
+    "6969": {
+      "text": "Жёлтая звезда класса G",
+      "source_hex": "5479706527472779656c6c6f77207374617200",
+      "translation_policy": "russian_translation"
+    },
+    "6970": {
+      "text": "Белая звезда класса F",
+      "source_hex": "547970652746277768697465207374617200",
+      "translation_policy": "russian_translation"
+    },
+    "6971": {
+      "text": "Горячая белая звезда класса A",
+      "source_hex": "54797065274127686f74207768697465207374617200",
+      "translation_policy": "russian_translation"
+    },
+    "6972": {
+      "text": "Белый карлик",
+      "source_hex": "5768697465206477617266207374617200",
+      "translation_policy": "russian_translation"
+    },
+    "6973": {
+      "text": "Красный гигант",
+      "source_hex": "526564206769616e74207374617200",
+      "translation_policy": "russian_translation"
+    },
+    "6974": {
+      "text": "Яркий гигант",
+      "source_hex": "427269676874206769616e74207374617200",
+      "translation_policy": "russian_translation"
+    },
+    "6975": {
+      "text": "Горячая голубая звезда класса B",
+      "source_hex": "54797065274227686f7420626c7565207374617200",
+      "translation_policy": "russian_translation"
+    },
+    "6976": {
+      "text": "Сверхгигант",
+      "source_hex": "53757065726769616e74207374617200",
+      "translation_policy": "russian_translation"
+    },
+    "6977": {
+      "text": "Голубой сверхгигант",
+      "source_hex": "426c75652073757065726769616e74207374617200",
+      "translation_policy": "russian_translation"
+    },
+    "6978": {
+      "text": "Контактная двойная звезда",
+      "source_hex": "436f6e746163742062696e617279207374617200",
+      "translation_policy": "russian_translation"
+    },
+    "6979": {
+      "text": "Орбитальный торговый пост",
+      "source_hex": "4f72626974616c2074726164696e6720706f737400",
+      "translation_policy": "russian_translation"
+    },
+    "6980": {
+      "text": "Орбитальная станция",
+      "source_hex": "4f72626974616c2073746174696f6e00",
+      "translation_policy": "russian_translation"
+    },
+    "6981": {
+      "text": "Орбитальный город",
+      "source_hex": "4f72626974616c206369747900",
+      "translation_policy": "russian_translation"
+    },
+    "6982": {
+      "text": "Двойная система. Главная звезда:",
+      "source_hex": "42696e6172792073797374656d2e205072696d6172793a00",
+      "translation_policy": "russian_translation"
+    },
+    "6983": {
+      "text": "Тройная система. Главная звезда:",
+      "source_hex": "5465726e6172792073797374656d2e205072696d6172793a00",
+      "translation_policy": "russian_translation"
+    },
+    "6984": {
+      "text": "Четверная система. Главная звезда:",
+      "source_hex": "5175617465726e6172792073797374656d2e205072696d6172793a00",
+      "translation_policy": "russian_translation"
+    },
+    "6985": {
+      "text": "Пятерная система. Главная звезда:",
+      "source_hex": "5175696e7475706c652073797374656d2e205072696d6172793a00",
+      "translation_policy": "russian_translation"
+    },
+    "6986": {
+      "text": "Шестерная система. Главная звезда:",
+      "source_hex": "5365787475706c652073797374656d2e205072696d6172793a00",
+      "translation_policy": "russian_translation"
+    },
+    "6987": {
+      "text": "Дист. {FF3007} св. лет",
+      "source_hex": "446973742e20ff3007206c6967687420796561727300",
+      "translation_policy": "russian_translation"
+    },
+    "6988": {
+      "text": "0{FD26}{FF3001} св. лет",
+      "source_hex": "30fd26ff3001206c6967687420796561727300",
+      "translation_policy": "russian_translation"
+    },
+    "6989": {
+      "text": "Стабильная система. Основных тел: {FF3001}.",
+      "source_hex": "537461626c652073797374656d207769746820ff3001206d616a6f7220626f646965732e00",
+      "translation_policy": "russian_translation"
+    },
+    "6990": {
+      "text": "Масса{FD29}{FF3008} масс Земли\rТемпература поверхности {FF3001}^C\rКрупные космопорты",
+      "source_hex": "4d617373fd29ff3008204561727468206d61737365730d537572666163652074656d706572617475726520ff30015e430d4d616a6f722053746172706f72747300",
+      "translation_policy": "russian_translation"
+    },
+    "6991": {
+      "text": "Орбитальный период\rРадиус орбиты{FD29}{FF300A} а.е.",
+      "source_hex": "4f72626974616c20706572696f640d4f72626974616c20726164697573fd29ff300a20412e552e00",
+      "translation_policy": "russian_translation"
+    },
+    "6992": {
+      "text": "Период совместного обращения\rРасстояние между телами{FD29}{FF300A} а.е.",
+      "source_hex": "436f2d6f72626974616c20706572696f640d53657061726174696f6efd29ff300a20412e552e00",
+      "translation_policy": "russian_translation"
+    },
+    "6993": {
+      "text": "{FF3002} ч",
+      "source_hex": "ff300220686f75727300",
+      "translation_policy": "russian_translation"
+    },
+    "6994": {
+      "text": "{FF3002} сут.",
+      "source_hex": "ff3002206461797300",
+      "translation_policy": "russian_translation"
+    },
+    "6995": {
+      "text": "{FF3005} лет",
+      "source_hex": "ff300520796561727300",
+      "translation_policy": "russian_translation"
+    },
+    "6996": {
+      "text": "Нет",
+      "source_hex": "4e6f6e6500",
+      "translation_policy": "russian_translation"
+    },
+    "6997": {
+      "text": "Главный рукав",
+      "source_hex": "4d616a6f722041726d00",
+      "translation_policy": "russian_translation"
+    },
+    "6998": {
+      "text": "Рукав Персея",
+      "source_hex": "506572736575732041726d00",
+      "translation_policy": "russian_translation"
+    },
+    "6999": {
+      "text": "Промежуточный рукав",
+      "source_hex": "496e7465726d6564696174652041726d00",
+      "translation_policy": "russian_translation"
+    },
+    "7000": {
+      "text": "Рукав Наугольника",
+      "source_hex": "4e6f726d612041726d00",
+      "translation_policy": "russian_translation"
+    },
+    "7001": {
+      "text": "Плеяды",
+      "source_hex": "506c65696164657300",
+      "translation_policy": "russian_translation"
+    },
+    "7002": {
+      "text": "Туманность Гантель",
+      "source_hex": "44756d62656c6c204e6562756c6100",
+      "translation_policy": "russian_translation"
+    },
+    "7003": {
+      "text": "Сектор: {FF3001},{FF3002}",
+      "source_hex": "536563746f723a20ff30012cff300200",
+      "translation_policy": "russian_translation"
+    },
+    "7004": {
+      "text": "Требуется топлива: {FF301F}",
+      "source_hex": "4675656c2052657175697265643a20ff301f00",
+      "translation_policy": "russian_translation"
+    },
+    "7005": {
+      "text": "Недостаточно топлива (нужно {FF301F})",
+      "source_hex": "496e73756666696369656e74204675656c2028ff301f2072657175697265642900",
+      "translation_policy": "russian_translation"
+    },
+    "7006": {
+      "text": "Вне дальности",
+      "source_hex": "4f7574206f662052616e676500",
+      "translation_policy": "russian_translation"
+    },
+    "7007": {
+      "text": "Галактическая карта",
+      "source_hex": "47616c6163746963204d617000",
+      "translation_policy": "russian_translation"
+    },
+    "7008": {
+      "text": "Неисследованная система. Сведения о звёздах получены удалёнными телескопами, но планетные данные отсутствуют.\r\r{CTRL01}{CTRL04}{FD2D}ВХОДИТЕ В СИСТЕМУ НА СВОЙ СТРАХ И РИСК!",
+      "source_hex": "556e6578706c6f7265642053797374656d2e205374617220696e666f726d6174696f6e20686173206265656e2067617468657265642062792072656d6f74652074656c6573636f70652c20627574206e6f20706c616e657461727920696e666f726d6174696f6e20697320617661696c61626c652e0d0d0104fd2d454e5445522053595354454d20415420594f5552204f574e205249534b2100",
+      "translation_policy": "russian_translation"
+    },
+    "7009": {
+      "text": "Основной импорт{FD20}Прочий импорт{FD40}Основной экспорт{FD60}Прочий экспорт{FD80}Запрещённые товары",
+      "source_hex": "4d616a6f7220496d706f727473fd204d696e6f7220496d706f727473fd404d616a6f72204578706f727473fd604d696e6f72204578706f727473fd80496c6c6567616c20476f6f647300",
+      "translation_policy": "russian_translation"
+    },
+    "7010": {
+      "text": "Форма правления:{FD41}{FF3018}\rЭкономика:{FD41}{FF3019}\rПринадлежность:{FD41}{FF301A}\rНаселение:{FD41}{FF301B}",
+      "source_hex": "476f7665726e6d656e7420547970653afd41ff30180d45636f6e6f6d7920547970653afd41ff30190d416c6c656769616e63653afd41ff301a0d506f70756c6174696f6e3afd41ff301b00",
+      "translation_policy": "russian_translation"
+    },
+    "7011": {
+      "text": "Код сектора системы:{FD41}{FF3001},{FF3002}\rНомер системы:{FD41}{FF3003}",
+      "source_hex": "53797374656d20536563746f7220436f64653afd41ff30012cff30020d53797374656d204e756d6265723afd41ff300300",
+      "translation_policy": "russian_translation"
+    },
+    "7012": {
+      "text": "Независимая система",
+      "source_hex": "496e646570656e64656e7400",
+      "translation_policy": "russian_translation"
+    },
+    "7013": {
+      "text": "Империя",
+      "source_hex": "496d70657269616c00",
+      "translation_policy": "russian_translation"
+    },
+    "7014": {
+      "text": "Федерация",
+      "source_hex": "46656465726174696f6e00",
+      "translation_policy": "russian_translation"
+    },
+    "7015": {
+      "text": "Альянс",
+      "source_hex": "416c6c69616e636500",
+      "translation_policy": "russian_translation"
+    },
+    "7016": {
+      "text": "Отсутствует",
+      "source_hex": "4e6f6e6500",
+      "translation_policy": "russian_translation"
+    },
+    "7017": {
+      "text": "Нестабильная — выживает лучше вооружённый",
+      "source_hex": "556e737461626c65202d20537572766976616c206f662074686520626573742061726d656400",
+      "translation_policy": "russian_translation"
+    },
+    "7018": {
+      "text": "Феодальная",
+      "source_hex": "46657564616c00",
+      "translation_policy": "russian_translation"
+    },
+    "7019": {
+      "text": "Корпоративная и капиталистическая",
+      "source_hex": "436f72706f7261746520616e64204361706974616c69737400",
+      "translation_policy": "russian_translation"
+    },
+    "7020": {
+      "text": "Корпоративная",
+      "source_hex": "436f72706f7261746500",
+      "translation_policy": "russian_translation"
+    },
+    "7021": {
+      "text": "Капиталистическая",
+      "source_hex": "4361706974616c69737400",
+      "translation_policy": "russian_translation"
+    },
+    "7022": {
+      "text": "Капиталистическая",
+      "source_hex": "4361706974616c69737400",
+      "translation_policy": "russian_translation"
+    },
+    "7023": {
+      "text": "Капиталистическая",
+      "source_hex": "4361706974616c69737400",
+      "translation_policy": "russian_translation"
+    },
+    "7024": {
+      "text": "Коммунистическая",
+      "source_hex": "436f6d6d756e69737400",
+      "translation_policy": "russian_translation"
+    },
+    "7025": {
+      "text": "Социалистическая",
+      "source_hex": "536f6369616c69737400",
+      "translation_policy": "russian_translation"
+    },
+    "7026": {
+      "text": "Капиталистическая",
+      "source_hex": "4361706974616c69737400",
+      "translation_policy": "russian_translation"
+    },
+    "7027": {
+      "text": "Строго капиталистическая — без социальных гарантий",
+      "source_hex": "5374726963746c79206361706974616c697374202d206e6f20736f6369616c207361666567756172647300",
+      "translation_policy": "russian_translation"
+    },
+    "7028": {
+      "text": "Строго капиталистическая",
+      "source_hex": "5374726963746c79206361706974616c69737400",
+      "translation_policy": "russian_translation"
+    },
+    "7029": {
+      "text": "Система в состоянии гражданской войны",
+      "source_hex": "53797374656d20696e207374617465206f6620436976696c2057617200",
+      "translation_policy": "russian_translation"
+    },
+    "7030": {
+      "text": "Спорная система между Империей и Федерацией",
+      "source_hex": "44697370757465642053797374656d206265747765656e20456d7069726520616e642046656465726174696f6e00",
+      "translation_policy": "russian_translation"
+    },
+    "7031": {
+      "text": "Капиталистическая",
+      "source_hex": "4361706974616c69737400",
+      "translation_policy": "russian_translation"
+    },
+    "7032": {
+      "text": "Отсутствует",
+      "source_hex": "4e6f6e6500",
+      "translation_policy": "russian_translation"
+    },
+    "7033": {
+      "text": "Отсутствует (анархия)",
+      "source_hex": "4e6f6e652028416e61726368792900",
+      "translation_policy": "russian_translation"
+    },
+    "7034": {
+      "text": "Силовая власть местных баронов",
+      "source_hex": "52756c6520627920666f726365206f66206c6f63616c204261726f6e7300",
+      "translation_policy": "russian_translation"
+    },
+    "7035": {
+      "text": "Порядок поддерживают местные корпорации",
+      "source_hex": "506f6c6963656420627920746865206c6f63616c20636f72706f726174696f6e7300",
+      "translation_policy": "russian_translation"
+    },
+    "7036": {
+      "text": "Корпоративное государство",
+      "source_hex": "436f72706f7261746520537461746500",
+      "translation_policy": "russian_translation"
+    },
+    "7037": {
+      "text": "Федеральная демократия",
+      "source_hex": "4665646572616c2044656d6f637261637900",
+      "translation_policy": "russian_translation"
+    },
+    "7038": {
+      "text": "Федеральное колониальное управление",
+      "source_hex": "4665646572616c20436f6c6f6e69616c2052756c6500",
+      "translation_policy": "russian_translation"
+    },
+    "7039": {
+      "text": "Диктатура",
+      "source_hex": "4469637461746f727368697000",
+      "translation_policy": "russian_translation"
+    },
+    "7040": {
+      "text": "Коммунизм",
+      "source_hex": "436f6d6d756e69737400",
+      "translation_policy": "russian_translation"
+    },
+    "7041": {
+      "text": "Религиозная диктатура",
+      "source_hex": "52656c6967696f7573204469637461746f727368697000",
+      "translation_policy": "russian_translation"
+    },
+    "7042": {
+      "text": "Независимая демократия",
+      "source_hex": "496e646570656e64656e742044656d6f637261637900",
+      "translation_policy": "russian_translation"
+    },
+    "7043": {
+      "text": "Имперское правление",
+      "source_hex": "496d70657269616c2052756c6500",
+      "translation_policy": "russian_translation"
+    },
+    "7044": {
+      "text": "Имперское колониальное управление",
+      "source_hex": "496d70657269616c20436f6c6f6e69616c2052756c6500",
+      "translation_policy": "russian_translation"
+    },
+    "7045": {
+      "text": "Нет устойчивой власти",
+      "source_hex": "4e6f20537461626c6520476f7665726e6d656e7400",
+      "translation_policy": "russian_translation"
+    },
+    "7046": {
+      "text": "Военное положение",
+      "source_hex": "4d61727469616c204c617700",
+      "translation_policy": "russian_translation"
+    },
+    "7047": {
+      "text": "Демократия Альянса",
+      "source_hex": "416c6c69616e63652044656d6f637261637900",
+      "translation_policy": "russian_translation"
+    },
+    "7048": {
+      "text": "Не зарегистрировано",
+      "source_hex": "4e6f6e65207265676973746572656400",
+      "translation_policy": "russian_translation"
+    },
+    "7049": {
+      "text": "Менее 1 000",
+      "source_hex": "4c657373207468616e20312c30303000",
+      "translation_policy": "russian_translation"
+    },
+    "7050": {
+      "text": "1 000–10 000",
+      "source_hex": "312c3030302d31302c30303000",
+      "translation_policy": "russian_translation"
+    },
+    "7051": {
+      "text": "10 000–100 000",
+      "source_hex": "31302c3030302d3130302c30303000",
+      "translation_policy": "russian_translation"
+    },
+    "7052": {
+      "text": "100 000–1 миллион",
+      "source_hex": "3130302c3030302d31204d696c6c696f6e00",
+      "translation_policy": "russian_translation"
+    },
+    "7053": {
+      "text": "1–10 миллионов",
+      "source_hex": "312d3130204d696c6c696f6e00",
+      "translation_policy": "russian_translation"
+    },
+    "7054": {
+      "text": "10–100 миллионов",
+      "source_hex": "31302d313030204d696c6c696f6e00",
+      "translation_policy": "russian_translation"
+    },
+    "7055": {
+      "text": "100 миллионов–1 миллиард",
+      "source_hex": "313030204d696c6c696f6e2d312042696c6c696f6e00",
+      "translation_policy": "russian_translation"
+    },
+    "7056": {
+      "text": "1–10 миллиардов",
+      "source_hex": "312d31302042696c6c696f6e00",
+      "translation_policy": "russian_translation"
+    },
+    "7057": {
+      "text": "Более 10 миллиардов",
+      "source_hex": "4d6f7265207468616e2031302042696c6c696f6e00",
+      "translation_policy": "russian_translation"
+    },
+    "7058": {
+      "text": "Неисследованная система. Других данных нет.",
+      "source_hex": "556e6578706c6f7265642073797374656d2e204e6f206d6f7265206461746120617661696c61626c652e00",
+      "translation_policy": "russian_translation"
+    },
+    "7059": {
+      "text": "Система исследована. Зарегистрированных поселений нет.",
+      "source_hex": "53797374656d206578706c6f7265642e204e6f207265676973746572656420736574746c656d656e74732e00",
+      "translation_policy": "russian_translation"
+    },
+    "7060": {
+      "text": "Приграничная система. Ведутся разведка месторождений и добыча.",
+      "source_hex": "46726f6e746965722073797374656d2e20536f6d652070726f7370656374696e6720616e64206d696e696e672e00",
+      "translation_policy": "russian_translation"
+    },
+    "7061": {
+      "text": "Небольшие горнодобывающие предприятия.",
+      "source_hex": "536f6d6520736d616c6c207363616c65206d696e696e67206f7065726174696f6e732e00",
+      "translation_policy": "russian_translation"
+    },
+    "7062": {
+      "text": "Добыча полезных ископаемых и частичная переработка руды.",
+      "source_hex": "4d696e696e6720616e6420736f6d65206f726520726566696e656d656e742e00",
+      "translation_policy": "russian_translation"
+    },
+    "7063": {
+      "text": "Добыча полезных ископаемых и тяжёлая промышленность.",
+      "source_hex": "4d696e696e6720616e64206865617679206d616e75666163747572696e6720696e6475737472792e00",
+      "translation_policy": "russian_translation"
+    },
+    "7064": {
+      "text": "Развитые горнодобывающая отрасль и промышленность.",
+      "source_hex": "457874656e73697665206d696e696e6720616e6420696e647573747269616c20646576656c6f706d656e742e00",
+      "translation_policy": "russian_translation"
+    },
+    "7065": {
+      "text": "Планет нет. Зарегистрированных поселений нет.",
+      "source_hex": "4e6f20506c616e6574732e204e6f207265676973746572656420736574746c656d656e74732e00",
+      "translation_policy": "russian_translation"
+    },
+    "7066": {
+      "text": "Производство редких элементов и реакторного топлива.",
+      "source_hex": "5261726520656c656d656e7420616e642072656163746f72206675656c2070726f64756374696f6e2e00",
+      "translation_policy": "russian_translation"
+    },
+    "7067": {
+      "text": "Приграничный мир с пригодной для жизни атмосферой. Небольшое сельское хозяйство и туризм.",
+      "source_hex": "46726f6e74696572206f7574646f6f7220776f726c642e20536f6d65206661726d696e6720616e6420746f757269736d2e00",
+      "translation_policy": "russian_translation"
+    },
+    "7068": {
+      "text": "Аграрный мир с пригодной для жизни атмосферой. Член Федерации.",
+      "source_hex": "4f7574646f6f72206167726963756c747572616c20776f726c642e2046656465726174696f6e206d656d6265722e00",
+      "translation_policy": "russian_translation"
+    },
+    "7069": {
+      "text": "Мир льда и воды с пригодной для жизни атмосферой. Туризм и рыболовство.",
+      "source_hex": "4f7574646f6f722069636520616e6420776174657220776f726c642e20546f757269736d20616e642066697368696e672e00",
+      "translation_policy": "russian_translation"
+    },
+    "7070": {
+      "text": "Мир джунглей с пригодной для жизни атмосферой. Туризм и сельское хозяйство.",
+      "source_hex": "4f7574646f6f72206a756e676c6520776f726c642e20546f757269736d20616e64206167726963756c747572652e00",
+      "translation_policy": "russian_translation"
+    },
+    "7071": {
+      "text": "Пустынный мир с пригодной для жизни атмосферой. Небольшое сельское хозяйство.",
+      "source_hex": "4f7574646f6f722064657365727420776f726c642e20536f6d65206167726963756c747572652e00",
+      "translation_policy": "russian_translation"
+    },
+    "7072": {
+      "text": "Замкнутый религиозный анклав. Требуется разрешение.",
+      "source_hex": "49736f6c6174696f6e6973742072656c6967696f757320656e636c6176652e205065726d69742072657175697265642e00",
+      "translation_policy": "russian_translation"
+    },
+    "7073": {
+      "text": "Строгий коммунистический режим. Требуется разрешение.",
+      "source_hex": "53747269637420636f6d6d756e69737420726567696d652e205065726d69742072657175697265642e00",
+      "translation_policy": "russian_translation"
+    },
+    "7074": {
+      "text": "Федеральная исправительная колония. Требуется разрешение.",
+      "source_hex": "4665646572616c20707269736f6e20636f6c6f6e792e205065726d69742072657175697265642e00",
+      "translation_policy": "russian_translation"
+    },
+    "7075": {
+      "text": "Система под запретом Федерации. Посещение незаконно.",
+      "source_hex": "53797374656d20756e646572204665646572616c20696e746572646963742e20496c6c6567616c20746f2076697369742e00",
+      "translation_policy": "russian_translation"
+    },
+    "7076": {
+      "text": "Научно-исследовательская станция.",
+      "source_hex": "536369656e74696669632072657365617263682073746174696f6e2e00",
+      "translation_policy": "russian_translation"
+    },
+    "7077": {
+      "text": "Терраформированный аграрный мир.",
+      "source_hex": "5465727261666f726d6564206167726963756c747572616c20776f726c642e00",
+      "translation_policy": "russian_translation"
+    },
+    "7078": {
+      "text": "Терраформированный мир-сад. Дорогой туризм.",
+      "source_hex": "5465727261666f726d65642067617264656e20776f726c642e20486967682d636f737420746f757269736d2e00",
+      "translation_policy": "russian_translation"
+    },
+    "7079": {
+      "text": "Терраформированный мир льда и воды. Туризм.",
+      "source_hex": "5465727261666f726d65642069636520616e6420776174657220776f726c642e20546f757269736d2e00",
+      "translation_policy": "russian_translation"
+    },
+    "7080": {
+      "text": "Два терраформированных аграрных мира. Туризм.",
+      "source_hex": "54776f207465727261666f726d6564206167726963756c747572616c20776f726c64732e20546f757269736d2e00",
+      "translation_policy": "russian_translation"
+    },
+    "7081": {
+      "text": "Густонаселённый мир с пригодной для жизни атмосферой. Член Федерации.",
+      "source_hex": "4869676820706f70756c6174696f6e206f7574646f6f7220776f726c642e2046656465726174696f6e206d656d6265722e00",
+      "translation_policy": "russian_translation"
+    },
+    "7082": {
+      "text": "Историческая столица Федерации. Управление и туризм.",
+      "source_hex": "486973746f726963204665646572616c206361706974616c2e2041646d696e697374726174696f6e20616e6420546f757269736d2e00",
+      "translation_policy": "russian_translation"
+    },
+    "7083": {
+      "text": "Столица Империи. Резиденция Императора.",
+      "source_hex": "496d70657269616c206361706974616c2e2053656174206f662074686520456d7065726f722e00",
+      "translation_policy": "russian_translation"
+    },
+    "7084": {
+      "text": "Густонаселённый мир с пригодной для жизни атмосферой под властью Империи.",
+      "source_hex": "4869676820706f70756c6174696f6e206f7574646f6f7220776f726c6420756e64657220496d70657269616c2072756c652e00",
+      "translation_policy": "russian_translation"
+    },
+    "7085": {
+      "text": "Имперская промышленная и горнодобывающая колония.",
+      "source_hex": "496d70657269616c20696e647573747269616c20616e64206d696e696e6720636f6c6f6e792e00",
+      "translation_policy": "russian_translation"
+    },
+    "7086": {
+      "text": "Имперский терраформированный мир.",
+      "source_hex": "496d70657269616c207465727261666f726d656420776f726c642e00",
+      "translation_policy": "russian_translation"
+    },
+    "7087": {
+      "text": "Система, представляющая особый научный интерес.",
+      "source_hex": "53797374656d206f66207370656369616c20736369656e746966696320696e7465726573742e00",
+      "translation_policy": "russian_translation"
+    },
+    "7088": {
+      "text": "Мир с пригодной для жизни атмосферой. Независимая диктатура.",
+      "source_hex": "4f7574646f6f7220776f726c642e20496e646570656e64656e74204469637461746f72736869702e00",
+      "translation_policy": "russian_translation"
+    },
+    "7089": {
+      "text": "Анархическая система. Минимальная полицейская защита.",
+      "source_hex": "416e6172636869632073797374656d2e204d696e696d616c20706f6c6963652070726f74656374696f6e2e00",
+      "translation_policy": "russian_translation"
+    },
+    "7090": {
+      "text": "Спорная система.",
+      "source_hex": "44697370757465642073797374656d2e00",
+      "translation_policy": "russian_translation"
+    },
+    "7091": {
+      "text": "Имперские миры с пригодной для жизни атмосферой и военно-космическая база.",
+      "source_hex": "496d70657269616c206f7574646f6f7220776f726c647320616e64206e6176616c20626173652e00",
+      "translation_policy": "russian_translation"
+    },
+    "7092": {
+      "text": "Федеральная военно-космическая база.",
+      "source_hex": "4665646572616c206e6176616c20626173652e00",
+      "translation_policy": "russian_translation"
+    },
+    "7093": {
+      "text": "Корпоративный ледяной мир.",
+      "source_hex": "436f72706f726174652069636520776f726c642e00",
+      "translation_policy": "russian_translation"
+    },
+    "7094": {
+      "text": "Промышленная и горнодобывающая система Альянса.",
+      "source_hex": "416c6c69616e636520496e647573747269616c20616e64204d696e696e672053797374656d2e00",
+      "translation_policy": "russian_translation"
+    },
+    "7095": {
+      "text": "Столица Альянса.",
+      "source_hex": "4361706974616c206f662074686520416c6c69616e63652e00",
+      "translation_policy": "russian_translation"
+    },
+    "7096": {
+      "text": "Густонаселённая система Альянса.",
+      "source_hex": "4869676820506f70756c6174696f6e20416c6c69616e63652053797374656d2e00",
+      "translation_policy": "russian_translation"
+    },
+    "7097": {
+      "text": "(%i,%i)",
+      "source_hex": "2825692c25692900",
+      "translation_policy": "format_only"
+    },
+    "7098": {
+      "text": "%s%s%s",
+      "source_hex": "25732573257300",
+      "translation_policy": "format_only"
+    },
+    "7099": {
+      "text": ",",
+      "source_hex": "2c00",
+      "translation_policy": "format_only"
+    },
+    "7100": {
+      "text": ": ",
+      "source_hex": "3a2000",
+      "translation_policy": "format_only"
+    },
+    "7101": {
+      "text": "%s %s",
+      "source_hex": "257320257300",
+      "translation_policy": "format_only"
+    },
+    "7102": {
+      "text": "\r",
+      "source_hex": "0d00",
+      "translation_policy": "format_only"
+    },
+    "7103": {
+      "text": ": ",
+      "source_hex": "3a2000",
+      "translation_policy": "format_only"
+    },
+    "7139": {
+      "text": " ",
+      "source_hex": "2000",
+      "translation_policy": "original_blank"
+    },
+    "7140": {
+      "text": " ",
+      "source_hex": "2000",
+      "translation_policy": "original_blank"
+    },
+    "7141": {
+      "text": " ",
+      "source_hex": "2000",
+      "translation_policy": "original_blank"
+    },
+    "7142": {
+      "text": " ",
+      "source_hex": "2000",
+      "translation_policy": "original_blank"
+    },
+    "7143": {
+      "text": " ",
+      "source_hex": "2000",
+      "translation_policy": "original_blank"
+    },
+    "7144": {
+      "text": " ",
+      "source_hex": "2000",
+      "translation_policy": "original_blank"
+    },
+    "7145": {
+      "text": " ",
+      "source_hex": "2000",
+      "translation_policy": "original_blank"
+    },
+    "7146": {
+      "text": " ",
+      "source_hex": "2000",
+      "translation_policy": "original_blank"
+    },
+    "7147": {
+      "text": "Известна как первая по-настоящему корпоративная система. С 2350 года, со времён первой межзвёздной войны, корпорация «Сириус» использует огромное количество дешёвой энергии, получаемой на Люцифере с помощью опоясывающих планету катушек, для синтеза заданных элементов, прежде всего военного топлива.\rНа эту систему не распространяются законы Федерации.",
+      "source_hex": "46616d6f757320617320746865206669727374207472756520636f72706f726174652073797374656d2e205468652053697269757320636f72706f726174696f6e20686173206265656e207573696e6720746865207661737420616d6f756e7473206f6620636865617020656e6572677920617661696c61626c65206f6e204c7563696665722066726f6d20636f696c7320777261707065642061726f756e642074686520706c616e657420666f722073796e746865736973206f6620637573746f6d20656c656d656e74732028706172746963756c61726c79206d696c6974617279206772616465206675656c292073696e6365203233353020616e642074686520666972737420696e7465727374656c6c6172207761722e0d546869732073797374656d206973206e6f74207375626a65637420746f204665646572616c206c61772e00",
+      "translation_policy": "russian_translation"
+    },
+    "7148": {
+      "text": " ",
+      "source_hex": "2000",
+      "translation_policy": "original_blank"
+    },
+    "7149": {
+      "text": "На Лэндфолле одно из самых интересных небес среди всех известных обитаемых планет: не менее шести звёзд здесь достаточно ярки, чтобы в разное время отбрасывать тени.\rЗдесь также лучше всего сохранилась местная живая природа: её виды успешно сосуществуют, нередко вытесняя завезённые формы жизни.",
+      "source_hex": "4c616e6466616c6c20686173206f6e65206f6620746865206d6f737420696e746572657374696e6720736b696573206f6620616c6c20746865206b6e6f776e20686162697461626c6520706c616e6574732c2077697468206e6f206c657373207468616e207369782073746172732062726967687420656e6f75676820746f206361737420736861646f777320617420736f6d652074696d652e0d497420616c736f206861732074686520626573742070726573657276656420696e646967656e6f75732077696c646c69666520776869636820636f6861626974732073756363657366756c6c792c206f6674656e20746f20746865206578636c7573696f6e206f6620696e74726f6475636564206c6966652e00",
+      "translation_policy": "russian_translation"
+    },
+    "7150": {
+      "text": " ",
+      "source_hex": "2000",
+      "translation_policy": "original_blank"
+    },
+    "7151": {
+      "text": "Очень высокая влажность и местные формы жизни делают этот мир интересным для посещения. Здесь выращивают множество экзотических продуктов питания. Пейзажи поразительно красивы, хотя местная фауна может быть немного опасна.",
+      "source_hex": "5665727920686967682068756d696469747920616e64206e6174697665206c696665206d616b65207468697320616e20696e746572657374696e6720706c61636520746f2076697369742e204d616e792065786f74696320666f6f6420737475666673206172652067726f776e20686572652e20546865207363656e65727920697320737472696b696e676c792062656175746966756c2c2074686f756768207468652077696c646c6966652063616e2062652061206c6974746c652064616e6765726f75732e00",
+      "translation_policy": "russian_translation"
+    },
+    "7152": {
+      "text": "Жизнь на этой засушливой планете едва поддерживается; местные формы жизни здесь очень выносливы.",
+      "source_hex": "4f6e6c79206a757374207375737461696e696e67206c6966652c2074686520696e646967656e6f757320666f726d73206f6e2074686973206172696420706c616e65742061726520766572792068617264792e00",
+      "translation_policy": "russian_translation"
+    },
+    "7153": {
+      "text": "В 2480 году Федерация передала эту систему религиозной секте Хранителей свободного духа. Её последователи считают, что жизнь должна быть предельно суровой, и живут под землёй на нескольких внутренних планетах системы. Федеральные законы запрещают входить в систему без разрешения Хранителей.",
+      "source_hex": "546869732073797374656d2077617320676976656e20746f2074686520477561726469616e73206f66207468652046726565205370697269742072656c6967696f75732073656374206279207468652046656465726174696f6e20696e20323438302e20546865792062656c6965766520696e206d6178696d756d20686172647368697020616e64206c69766520756e64657267726f756e64206f6e207365766572616c206f662074686520696e6e657220706c616e657473206f66207468652073797374656d2e20497420697320666f7262696464656e206279204665646572616c204c617720746f20656e746572207468652073797374656d20776974686f757420746865207065726d697373696f6e206f662074686520477561726469616e732e00",
+      "translation_policy": "russian_translation"
+    },
+    "7154": {
+      "text": "Известна как первая заселённая система вспыхивающей звезды: поселения появились здесь в 3017 году. Под всеми наземными жилищами устроены укрытия от вспышек; при сигнале тревоги следует спускаться туда. Первую планету, часто называемую «Ленин», терраформировала группа богатых идеалистов при условии строгого соблюдения коммунистических принципов. Они передали системе огромное состояние, и теперь она очень богата.",
+      "source_hex": "46616d6f75732061732074686520666972737420666c61726520737461722073797374656d20746f20626520736574746c65642c20696e20333031372e20416c6c20737572666163652068616269746174696f6e73206861766520666c617265207368656c746572732062656e65617468207468656d2c2077686963682073686f756c6420626520656e7465726564206f6e2068656172696e672074686520666c617265207761726e696e67732e2054686520666972737420706c616e65742c206f6674656e206b6e6f776e206173204c656e696e2c20776173207465727261666f726d656420627920612067726f7570206f66207269636820696465616c69737473206f6e20636f6e646974696f6e206974207761732072756e20746f2073747269637420636f6d6d756e697374207072696e6369706c65732e205468657920656e646f77656420616e20656e6f726d6f757320616d6f756e74206f66207765616c746820746f207468652073797374656d2c207768696368206973206e6f77207665727920726963682e00",
+      "translation_policy": "russian_translation"
+    },
+    "7155": {
+      "text": "Заключённые содержатся в подземных тюремных комплексах и занимаются ручной добычей полезных ископаемых. Посетителей допускают, но сначала необходимо получить разрешение на въезд.\rПо слухам, у колонии есть и более сомнительная сторона: одинокие посетители могут проникать туда без разрешения, если заплатят охране, которая закроет на это глаза. Впрочем, подобные слухи всегда отрицаются.",
+      "source_hex": "507269736f6e6572732061726520686f7573656420696e20756e64657267726f756e642063656c6c20636f6d706c657865732c20616e642073657420746f20646f206d616e75616c206d696e696e6720776f726b2e2056697369746f72732061726520616c6c6f7765642c2062757420616e20656e747279207065726d6974206d757374206669727374206265206f627461696e65642e0d205468657265206973207265707574656420746f20626520612073656564696572207369646520746f2074686520636f6c6f6e792077686572656279206c6f6e656c792076697369746f7273206d617920656e74657220776974686f75742061207065726d6974207768696c652074686520677561726473207475726e206120626c696e642065796520666f722061206665652c20627574207468697320697320616c776179732064656e6965642e00",
+      "translation_policy": "russian_translation"
+    },
+    "7156": {
+      "text": " ",
+      "source_hex": "2000",
+      "translation_policy": "original_blank"
+    },
+    "7157": {
+      "text": "Эдем стал первой планетой, на которой спектроскопическими методами обнаружили жидкую воду: это произошло в 2038 году и стало важным стимулом к освоению космоса. Однако Эдем оказался крайне негостеприимным, а дополнительную опасность представляло жёсткое излучение Проксимы. Сейчас на Эдеме есть небольшая научная станция, но в остальной системе почти ничего нет.",
+      "source_hex": "4564656e207761732074686520666972737420706c616e6574206f6e207768696368206c6971756964207761746572207761732064657465637465642c206279207370656374726f73636f706963206d6574686f647320696e20323033382c20616e6420736f207761732061206d616a6f722064726976696e6720666f72636520666f7220746865206578706c6f726174696f6e206f662073706163652e20486f77657665722c204564656e207475726e6564206f757420746f2062652065787472656d656c7920696e686f7370697461626c652077697468207468652061646465642064616e676572206f66206861726420726164696174696f6e2066726f6d2050726f78696d612e205468657265206973206e6f77206120736d616c6c2072657365617263682073746174696f6e206f6e204564656e2c20627574206c6974746c6520656c736520696e207468652072657374206f66207468652073797374656d2e00",
+      "translation_policy": "russian_translation"
+    },
+    "7158": {
+      "text": "Огромные площади отведены под выращивание специально выведенных зерновых культур, которые в громадных количествах экспортируются в соседние миры. Чтобы избежать загрязняющих выбросов, обрабатывающая промышленность запрещена.",
+      "source_hex": "5661737420617265617320617265207573656420666f722067726f77696e6720637573746f6d20677261696e2063726f707320696e20656e6f726d6f7573207175616e74697469657320776869636820617265207468656e206578706f7274656420746f2074686520737572726f756e64696e6720776f726c64732e4e6f206d616e75666163747572696e6720696e647573747279206973207065726d697474656420746f2061766f696420616e7920706f6c6c7574696e6720656d6d6973696f6e732e00",
+      "translation_policy": "russian_translation"
+    },
+    "7159": {
+      "text": "В 2958 году корпорация «Сиско» терраформировала внутреннюю планету, превратив её в прекрасный тематический парк. На систему не распространяются законы Федерации; здесь доступны самые разнообразные экзотические развлечения, в том числе исторические приключения с участием актёров.",
+      "source_hex": "54686520696e6e657220706c616e657420776173207465727261666f726d65642062792074686520436973636f20636f72706f726174696f6e20696e746f20612062656175746966756c207468656d65207061726b20696e20323935382e205468652073797374656d20646f6573206e6f7420636f6d6520756e646572204665646572616c206c61772c20616e64206120776964652072616e6765206f662065786f7469632064656c69676874732061726520617661696c61626c652c20696e636c7564696e6720686973746f72696320616476656e747572657320737461676564207573696e67206163746f72732e00",
+      "translation_policy": "russian_translation"
+    },
+    "7160": {
+      "text": "Планету Скотт терраформировали в 2329 году как сельскохозяйственную колонию, но поддерживать температуру не удалось, и после эпидемии в 2408 году её покинули. В 2641 году экваториальный пояс вновь заселили колонисты, которым нравилась суровая среда. Теперь он славится рыболовством и туризмом. Особенно популярен этот мир у промышленных рабочих из соседних систем, которые иначе проводят всю жизнь в закрытых помещениях.",
+      "source_hex": "54686520706c616e65742053636f747420776173207465727261666f726d656420696e203233323920617320616e206167726963756c747572616c20636f6c6f6e792c20627574207468652074656d706572617475726520636f756c64206e6f74206265207375737461696e656420616e6420776173206162616e646f6e656420696e2032343038206166746572206120646973656173652065706964656d69632e205468652065717561746f7269616c2062656c7420776173207265736574746c656420696e203236343120627920736574746c6572732077686f206c696b65642074686520686172736820656e7669726f6e6d656e742c206e6f772066616d6f757320666f722066697368696e6720616e6420746f757269736d2e20497420697320706172746963756c61726c7920706f70756c617220776974682074686520696e647573747269616c20776f726b6572732066726f6d206e65617262792073797374656d732077686f206f7468657277697365206c6976652074686569722077686f6c65206c6976657320696e646f6f72732e00",
+      "translation_policy": "russian_translation"
+    },
+    "7161": {
+      "text": "Здесь уже терраформированы две планеты. Обе планеты в основном заняты сельским хозяйством и скотоводством, вызывающим этические споры. Обрабатывающей промышленности почти нет, за исключением производства знаменитого бурбона.",
+      "source_hex": "54776f20706c616e65747320686572652068617665206e6f77206265656e207465727261666f726d65642c20616e6420626f746820617265206c617267656c7920676976656e206f76657220746f206167726963756c747572616c2070726f64756374696f6e20616e6420746f206574686963616c6c79207175657374696f6e61626c6520636174746c652072616e6368696e672e205468657265206973206c6974746c65206d616e75666163747572696e6720696e647573747279206f74686572207468616e207468652070726f64756374696f6e206f66207468652066616d6f757320626f7572626f6e2e00",
+      "translation_policy": "russian_translation"
+    },
+    "7162": {
+      "text": " ",
+      "source_hex": "2000",
+      "translation_policy": "original_blank"
+    },
+    "7163": {
+      "text": "Первая колония за пределами Солнечной системы; здесь же впервые обнаружили внеземную жизнь. К сожалению, последние её представители теперь сохранились лишь в зоопарковых вольерах для туристов, а завезённые формы жизни и сельскохозяйственные культуры покрывают большую часть суши и морей.",
+      "source_hex": "466972737420636f6c6f6e79206f7574736964652074686520536f6c2073797374656d2c20616e6420666972737420616c69656e206c6966652077617320646973636f766572656420686572652e20556e666f7274756e6174656c7920746865206c6173742072656d6e616e747320617265206e6f7720696e207a6f6f20656e636c6f737572657320666f7220746f7572697374732c20696e74726f6475636564206c69666520616e642063726f707320636f766572206d6f7374206f6620746865207375726661636520616e6420736561732e00",
+      "translation_policy": "russian_translation"
+    },
+    "7164": {
+      "text": "Когда в 2304 году на Арктур 3 прибыли люди, там только начинали зарождаться первые формы жизни. Теперь их сменила земная экосистема, приспособленная к красному свету. Местные жители в целом уверены, что их звезда навсегда останется красным гигантом.",
+      "source_hex": "4561726c79206c69666520686164206a757374207374617274656420746f20656d65726765206f6e2041726374757275732033207768656e207468652068756d616e20736574746c657273206172726976656420696e20323330342e205468697320686173206e6f77206265656e207265706c6163656420627920616e2045617274682065636f73797374656d2c206164617074656420746f206c69766520756e6465722074686520726564206c696768742e204c6f63616c73206172652067656e6572616c6c7920636f6e666964656e7420746865697220737461722077696c6c2072656d61696e206120726564206769616e7420666f72657665722e00",
+      "translation_policy": "russian_translation"
+    },
+    "7165": {
+      "text": "Историческая система, известная как колыбель человечества и политическая столица Федерации. Жить здесь очень дорого и престижно; система также популярна среди туристов. Большинство богатых людей хотя бы раз в жизни посещают Землю. На Марсе, терраформированном в 2286 году, расположены штаб-квартиры всех крупнейших корпораций; он служит главным административным центром.",
+      "source_hex": "486973746f7269632073797374656d2066616d6f757320617320626f746820746865206269727468706c616365206f662048756d616e69747920616e642061732074686520706f6c69746963616c206361706974616c206f66207468652046656465726174696f6e2e2041207665727920657870656e7369766520616e642070726573746967696f75732073797374656d20746f206c69766520696e2c20616e64206120706f70756c617220746f75726973742076656e75652e204d6f737420726963682068756d616e732077696c6c207669736974204561727468206f6e636520696e207468656972206c697665732e20416c6c20746865206d616a6f7220636f72706f726174696f6e73206861766520746865697220686561647175617274657273206f6e204d6172732c207465727261666f726d656420696e20323238362c20776869636820697320746865206d61696e2063656e74726520666f722061646d696e697374726174696f6e2e00",
+      "translation_policy": "russian_translation"
+    },
+    "7166": {
+      "text": "Имперская столица находится на Ахенаре 6d, который местные жители называют Капитолием. Планету 6c до сих пор называют Конверсией, хотя её терраформировали в 2696 году. Планету 6b терраформировали в 2850 году, чтобы разместить быстро растущее население. К любому, у кого нет своеобразного акцента граждан Империи, относятся отчуждённо, особенно если он прибыл из мира Федерации.",
+      "source_hex": "496d70657269616c206361706974616c206f6e20416368656e61722036642c206b6e6f776e2061732043617069746f6c20627920746865206c6f63616c732e203663206973207374696c6c206b6e6f776e20617320436f6e76657273696f6e2074686f75676820697420776173207465727261666f726d656420696e20323639362e20366220776173207465727261666f726d656420696e203238353020746f206163636f6d6f646174652074686520706f70756c6174696f6e206578706c6f73696f6e20776869636820666f6c6c6f7765642e20416e796f6e6520776974686f75742074686520717569726b7920616363656e74206f6620496d70657269616c20636974697a656e73206973207368756e6e65642c20657370656369616c6c792069662074686579206172652066726f6d20612046656465726174696f6e20776f726c642e00",
+      "translation_policy": "russian_translation"
+    },
+    "7167": {
+      "text": "Система в значительной мере опирается на рабство, поддерживающее роскошный образ жизни очень богатой элиты. Большинство её представителей живёт на огромных плантациях, распространённых по всем имперским мирам. В городах живут работники сферы услуг и индустрии более экзотических развлечений.",
+      "source_hex": "5468652073797374656d2072656c6965732068656176696c79206f6e20736c617665727920746f206d61696e7461696e20746865206c75787572696f7573206c696665207374796c65206f66207468652076657279207765616c74687920836c6974652e204d6f7374206c697665206f6e2074686520677265617420706c616e746174696f6e732c20636f6d6d6f6e207468726f7567686f75742074686520496d70657269616c20576f726c64732e205468652063697469657320686f7573652074686520776f726b65727320666f7220746865207365727669636520696e647573747269657320616e6420746865206d6f72652065786f74696320656e7465727461696e6d656e74732e00",
+      "translation_policy": "russian_translation"
+    },
+    "7168": {
+      "text": "Глубокие и высокомеханизированные имперские шахты славятся эффективной добычей руды. Рабский труд также играет важную роль в повседневном надзоре за машинами в тяжёлых условиях шахт.",
+      "source_hex": "546865206465657020616e6420686967686c79206d656368616e6973656420496d70657269616c206d696e6573206172652072656e6f776e656420666f7220746865697220656666696369656e6379206174206f72652065787472616374696f6e2e20536c617665727920697320616c736f20696d706f7274616e7420666f722074686520726f7574696e65207375706572766973696f6e206f6620746865206d616368696e65727920696e2074686520756e706c656173616e74206d696e696e6720656e7669726f6e6d656e742e00",
+      "translation_policy": "russian_translation"
+    },
+    "7169": {
+      "text": "Многие имперские миры, в том числе этот, были терраформированы во время последнего крупного расширения Империи в 2950–3150 годах. Здесь сохранилось множество прекрасных образцов архитектуры того периода.",
+      "source_hex": "4d616e7920496d70657269616c20776f726c64732077657265207465727261666f726d656420647572696e6720746865206c617374206d616a6f7220496d70657269616c20657870616e73696f6e20323935302d333135302c20696e636c7564696e6720746869732c20616e6420746865726520617265206e756d65726f75732066696e65206578616d706c6573206f6620617263686974656374757265206f662074686520706572696f642e00",
+      "translation_policy": "russian_translation"
+    },
+    "7170": {
+      "text": " ",
+      "source_hex": "2000",
+      "translation_policy": "original_blank"
+    },
+    "7171": {
+      "text": " ",
+      "source_hex": "2000",
+      "translation_policy": "original_blank"
+    },
+    "7172": {
+      "text": "Настоящих законов здесь нет, хотя в городах организованная преступность выполняет некоторые полицейские функции. Настоятельно рекомендуется по возможности избегать этой системы.",
+      "source_hex": "5468657265206973206e6f207265616c206c617720686572652c2074686f75676820696e2074686520636974696573206f7267616e69736564206372696d6520646f657320736f6d6520666f726d206f6620706f6c6963696e672e20497420697320686967686c79207265636f6d6d656e64656420746f2061766f696420746869732073797374656d20696620617420616c6c20706f737369626c652e00",
+      "translation_policy": "russian_translation"
+    },
+    "7173": {
+      "text": " ",
+      "source_hex": "2000",
+      "translation_policy": "original_blank"
+    },
+    "7174": {
+      "text": "Известная имперская военно-космическая база. Основные административные службы Имперского флота размещены на Топазе; по поверхности разбросано несколько учебных лагерей под открытым небом.",
+      "source_hex": "57656c6c206b6e6f776e20496d70657269616c204e6176616c20426173652e204d6f737420496d70657269616c206e6176616c2061646d696e697374726174696f6e20697320646f6e65206f6e20546f70617a2c20616e6420746865726520617265207365766572616c206f7574646f6f7220747261696e696e672063616d7073206163726f73732074686520737572666163652e00",
+      "translation_policy": "russian_translation"
+    },
+    "7175": {
+      "text": "Главную федеральную военно-космическую базу перенесли сюда из Анлава в 2983 году после терраформирования в 2970-х. Это превосходный учебный полигон для войск планетарного десанта.",
+      "source_hex": "546865206d61696e204665646572616c204e6176616c204261736520776173206d6f76656420686572652066726f6d20416e6c61766520696e203239383320666f6c6c6f77696e67207465727261666f726d696e6720696e207468652032393730732c20616e6420697320616e20657863656c6c656e7420747261696e696e672067726f756e6420666f7220706c616e65746172792061737361756c742074726f6f70732e00",
+      "translation_policy": "russian_translation"
+    },
+    "7176": {
+      "text": "Система прежде всего известна гигантскими верриксами. Стивенсон — родной мир этих выносливых вьючных животных, которые теперь встречаются по всему населённому людьми космосу, особенно в развивающихся мирах внешних окраин.",
+      "source_hex": "53797374656d206d6f73742066616d6f757320666f7220746865206769616e74205665727269782e2053746576656e736f6e2069732074686520686f6d6520776f726c64206f6620746865206861726479206265617374206f662062757264656e206e6f7720666f756e64207468726f7567686f75742068756d616e2073706163652c20657370656369616c6c79206f6e2074686520656d657267696e6720776f726c6473206f6620746865206f757465722072696d2e00",
+      "translation_policy": "russian_translation"
+    },
+    "7177": {
+      "text": "Промышленные миры Альянса хорошо известны тем, что условия труда здесь намного лучше, чем в других местах.",
+      "source_hex": "54686520496e647573747269616c6973656420776f726c6473206f662074686520416c6c69616e6365206172652077656c6c206b6e6f776e20666f7220746865206661722062657474657220636f6e646974696f6e7320617661696c61626c6520666f7220776f726b657273207468616e20656c736577686572652e00",
+      "translation_policy": "russian_translation"
+    },
+    "7178": {
+      "text": "Знаменитая столица Альянса независимых систем. В течение многих лет за эту систему сражались Федерация и Империя, пока в 3230 году в результате массового восстания против обеих групп захватчиков не был образован Альянс.\rТеперь Альянс объединяет множество миров, и Алиот стал важным политическим центром.",
+      "source_hex": "546865206e6f772066616d6f7573206361706974616c206f662074686520416c6c69616e6365206f6620496e646570656e64656e742053797374656d732e20546869732073797374656d2077617320746865207375626a656374206f66206d616e7920626174746c6573206265747765656e207468652046656465726174696f6e20616e642074686520456d70697265206f766572206d616e792079656172732c20756e74696c20696e20333233302074686520416c6c69616e63652077617320666f726d656420696e2061206d617373656420696e73757272656374696f6e20616761696e737420626f74682073657473206f6620696e7661646572732e0d54686520416c6c69616e636520686173206e6f7720737072656164206f766572206d616e7920776f726c64732c20616e6420736f20416c696f7468206973206e6f7720616e20696d706f7274616e7420706f6c69746963616c2063656e7472652e00",
+      "translation_policy": "russian_translation"
+    },
+    "7179": {
+      "text": " ",
+      "source_hex": "2000",
+      "translation_policy": "original_blank"
+    },
+    "7180": {
+      "text": " ",
+      "source_hex": "2000",
+      "translation_policy": "original_blank"
+    },
+    "7181": {
+      "text": " ",
+      "source_hex": "2000",
+      "translation_policy": "original_blank"
+    },
+    "7182": {
+      "text": " ",
+      "source_hex": "2000",
+      "translation_policy": "original_blank"
+    },
+    "7653": {
+      "text": " км{",
+      "source_hex": "206b6d7b00",
+      "translation_policy": "russian_translation"
+    },
+    "7654": {
+      "text": " км|",
+      "source_hex": "206b6d7c00",
+      "translation_policy": "russian_translation"
+    }
+  },
+  "ui": {
+    "general": "Сведения о системе",
+    "demography": "Население и устройство",
+    "trade": "Торговая сводка",
+    "body": "Сведения об объекте",
+    "major_imports": "Основной импорт",
+    "minor_imports": "Прочий импорт",
+    "major_exports": "Основной экспорт",
+    "minor_exports": "Прочий экспорт",
+    "illegal_goods": "Запрещённые товары",
+    "unsupported": "Исходный код текста пока не поддержан",
+    "unknown": "Нет исходных данных",
+    "unexplored": "Неисследованная система",
+    "government": "Форма правления",
+    "economy": "Экономика",
+    "allegiance": "Принадлежность",
+    "population": "Население",
+    "sector_code": "Код сектора",
+    "system_number": "Номер системы",
+    "description": "Описание",
+    "major_bodies": "Основные тела",
+    "major_starports": "Крупные космопорты",
+    "mass": "Масса",
+    "surface_temperature": "Температура поверхности",
+    "orbital_period": "Орбитальный период",
+    "orbital_radius": "Радиус орбиты",
+    "coorbital_period": "Период совместного обращения",
+    "separation": "Расстояние между телами",
+    "none": "Нет",
+    "distance": "Расстояние",
+    "source_record": "Исходная запись",
+    "close": "Закрыть",
+    "back": "Назад",
+    "parent": "Родитель",
+    "ground_port": "Наземный космопорт",
+    "no_entries": "Нет"
+  }
+}

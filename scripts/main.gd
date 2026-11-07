@@ -25,6 +25,7 @@ const TimeControls=preload("res://scripts/flight_time_controls.gd")
 const TimeController=preload("res://scripts/flight_time_controller.gd")
 const GalacticMap=preload("res://scripts/galactic_map_view.gd")
 const SystemMap=preload("res://scripts/system_map_view.gd")
+const SystemInformation=preload("res://scripts/system_information_view.gd")
 const ShipView=preload("res://scripts/ship_visual.gd")
 const StationView=preload("res://scripts/station_visual.gd")
 const SourceStationView=preload("res://scripts/source_station_visual.gd")
@@ -94,6 +95,11 @@ var time_controls:Control
 var flight_time:=TimeController.new()
 var active_map:Control
 var active_map_kind:=""
+var information_parent:Control
+var information_parent_kind:=""
+var information_return_menu:=false
+var information_worker:Thread
+var information_job_view:Control
 var docking_label:Label
 var target_site_id:=""
 var target_reference:Dictionary={}
@@ -400,6 +406,7 @@ func _update_flight_controls()->void:
 func _process(dt:float)->void:
 	_update_flight_controls()
 	if not active:return
+	_pump_information()
 	_pump_target_reference()
 	var blocked:=_blocked()
 	# Publishing completed geometry can move the physical contact frame. Keep
@@ -788,6 +795,7 @@ func _show_status()->void:
 	_menu_text("%s · %s"%[instruments.view_label(ship.external_view),"ПАУЗА" if instruments.paused else ("Стабилизация скорости" if ship.assisted else "Инерционный режим")])
 	_menu_action("Груз и оборудование",_show_equipment)
 	_menu_action("Объекты и космопорты",_show_system)
+	_menu_action("Сведения о системе",func():_show_information())
 	_menu_action("Маршруты",_show_routes)
 	if ship.docked:_menu_action("Службы космопорта",_show_services)
 
@@ -872,6 +880,9 @@ func _show_system()->void:
 	view.close_requested.connect(func():
 		if active_map==view:_close_map()
 	)
+	view.information_requested.connect(func(id:String):
+		if active_map==view:_show_information(world.system_id,id)
+	)
 	_install_map(view,"system")
 func _choose_body(id:String)->void:
 	if _paused_command():return
@@ -917,7 +928,83 @@ func _show_routes()->void:
 	view.close_requested.connect(func():
 		if active_map==view:_close_map()
 	)
+	view.information_requested.connect(func(id:int):
+		if active_map==view:_show_information(id)
+	)
 	_install_map(view,"galaxy")
+
+static func _information_source_counts(system:RefCounted)->Dictionary:
+	var value:Variant=system.source_runtime_state.get("body_count_byte")
+	return {"body_count_byte":int(value)} if value is int and value>=0 and value<=255 else {}
+
+static func _prepare_information_context(star:Dictionary)->Dictionary:
+	# Only this private World is constructed on the worker. The live navigation,
+	# source motion, clock, target, spin and save models never enter this job.
+	var context:={"system_id":int(star.id),"system_name":str(star.name),"known":int(star.get("source_parameters",{}).get("population_raw",0))!=0,"bodies":[],"settlements":[],"selected_body_id":"","source_counts":{}}
+	if not context.known:return context
+	var candidate:=World.new();candidate.configure(star,World.FULL_LAYOUT)
+	if candidate.layout_mode!=World.FULL_LAYOUT:return {"error":"Не удалось прочитать исходные сведения о телах этой системы."}
+	context.bodies=candidate.bodies.duplicate(true);context.settlements=candidate.settlements.duplicate(true)
+	context.body_generation_variant=candidate.layout_mode
+	context.source_counts=_information_source_counts(candidate)
+	return context
+
+func _show_information(system_id:int=-1,body_id:String="")->void:
+	if busy or active_map_kind=="information":return
+	_finish_information_preparation()
+	var requested:int=nav.current_id if system_id<0 else system_id
+	var star:Dictionary=nav.galaxy.get_system(requested)
+	if star.is_empty():_announce("Сведения об этой системе недоступны.");return
+	var view:=SystemInformation.new()
+	view.configure_loading(requested,str(star.name))
+	view.close_requested.connect(_close_information)
+	_release_inputs();flight_time.interrupt("Открыты сведения.");information_parent=active_map;information_parent_kind=active_map_kind
+	information_return_menu=menu.visible
+	if is_instance_valid(information_parent):
+		information_parent.set("input_allowed",false);information_parent.hide()
+	menu.hide();settings_panel.hide();active_map=view;active_map_kind="information"
+	ui.add_child(view);view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);view.move_to_front();_update_flight_controls()
+	if requested==world.system_id:
+		view.configure({"system_id":requested,"system_name":str(star.name),"known":int(star.get("source_parameters",{}).get("population_raw",0))!=0,"bodies":world.bodies.duplicate(true),"settlements":world.settlements.duplicate(true),"selected_body_id":body_id,"body_generation_variant":world.layout_mode,"source_counts":_information_source_counts(world)})
+	else:
+		information_job_view=view;information_worker=Thread.new()
+		if information_worker.start(_prepare_information_context.bind(star.duplicate(true)))!=OK:
+			information_worker=null;information_job_view=null;view.configure_error("Не удалось подготовить сведения о системе.")
+	_record_event("information_open",{"system_id":requested,"body_id":body_id})
+
+func _pump_information()->void:
+	if information_worker==null or information_worker.is_alive():return
+	var result:Variant=information_worker.wait_to_finish();information_worker=null
+	var view:Control=information_job_view;information_job_view=null
+	if not is_instance_valid(view) or active_map!=view or active_map_kind!="information":return
+	if not result is Dictionary or result.has("error"):
+		view.configure_error(str(result.get("error","Не удалось прочитать сведения.")) if result is Dictionary else "Не удалось прочитать сведения.")
+	else:view.configure(result)
+
+func _finish_information_preparation()->void:
+	if information_worker!=null:
+		if information_worker.is_started():information_worker.wait_to_finish()
+		information_worker=null
+	information_job_view=null
+
+func _discard_information_parent()->void:
+	if is_instance_valid(information_parent):
+		information_parent.set("input_allowed",false)
+		if information_parent.has_method("finish_preparation"):information_parent.finish_preparation()
+		information_parent.queue_free()
+	information_parent=null;information_parent_kind="";information_return_menu=false
+
+func _close_information()->void:
+	if active_map_kind!="information":return
+	_finish_information_preparation()
+	var closing:Control=active_map;active_map=null;active_map_kind=""
+	if is_instance_valid(closing):closing.input_allowed=false;closing.release_pointers();closing.hide();closing.queue_free()
+	if is_instance_valid(information_parent):
+		active_map=information_parent;active_map_kind=information_parent_kind
+		active_map.show();active_map.move_to_front()
+	elif information_return_menu:menu.show()
+	information_parent=null;information_parent_kind="";information_return_menu=false
+	_release_inputs();_update_flight_controls()
 
 func _install_map(view:Control,kind:String)->void:
 	_close_map(false);_release_inputs();flight_time.interrupt("Открыта карта.")
@@ -927,6 +1014,9 @@ func _install_map(view:Control,kind:String)->void:
 	_record_event("map_open",{"kind":kind})
 
 func _close_map(save_progress:=true)->void:
+	if active_map_kind=="information":
+		if save_progress:_close_information();return
+		_finish_information_preparation();_discard_information_parent()
 	if not is_instance_valid(active_map):active_map=null;active_map_kind="";return
 	var closing:=active_map;active_map=null;active_map_kind=""
 	closing.set("input_allowed",false)
@@ -1152,6 +1242,8 @@ func _notification(what:int)->void:
 		_save_game();get_tree().quit()
 func _exit_tree()->void:
 	if diagnostics!=null:diagnostics.shutdown(true)
+	_finish_information_preparation()
+	if is_instance_valid(information_parent) and information_parent.has_method("finish_preparation"):information_parent.finish_preparation()
 	if target_worker!=null and target_worker.is_started():target_worker.wait_to_finish()
 	if is_instance_valid(active_map) and active_map.has_method("finish_preparation"):active_map.finish_preparation()
 	if worker!=null and worker.is_started():worker.wait_to_finish()

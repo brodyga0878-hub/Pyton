@@ -8,6 +8,7 @@ const COMPACT_CARD_HEIGHT:=680.0
 signal system_selected(id:int)
 signal jump_requested(id:int)
 signal close_requested
+signal information_requested(system_id:int)
 var model:RefCounted
 var buttons:Dictionary={}
 var search_edit:LineEdit
@@ -138,6 +139,7 @@ func _build()->void:
 	_plot_canvas=PlotCanvas.new();_plot_canvas.controller=self;_plot_canvas.mouse_filter=Control.MOUSE_FILTER_IGNORE;_plot_canvas.clip_contents=true;add_child(_plot_canvas)
 	title=_label("ГАЛАКТИЧЕСКАЯ КАРТА",26);status=_label("Подготовка карты…",14);status.add_theme_color_override("font_color",Color("89a9bc"))
 	_button("close","Закрыть",func():release_pointers();close_requested.emit())
+	_button("information","Сведения",_request_information)
 	_button("mode","Галактика",_toggle_mode);_button("home","К кораблю",center_current)
 	_button("zoom_out","−",func():zoom(-1));_button("zoom_in","+",func():zoom(1))
 	_button("rotate_left","↶",func():_yaw-=PI/12;queue_redraw())
@@ -171,9 +173,10 @@ func _build()->void:
 func _layout()->void:
 	if title==null:return
 	var w:=size.x;var h:=size.y;var side:=252.0 if w<1100 else 304.0;var footer:=158.0
-	title.position=Vector2(22,14);title.size=Vector2(maxf(20,w-164),42)
+	title.position=Vector2(22,14);title.size=Vector2(maxf(20,w-286),42)
 	title.add_theme_font_size_override("font_size",23 if w<1000 else 26)
 	buttons.close.position=Vector2(w-130,8);buttons.close.size=Vector2(110,64)
+	buttons.information.position=Vector2(w-252,8);buttons.information.size=Vector2(110,64)
 	_plot=Rect2(20,174,maxf(140,w-side-56),maxf(96,h-footer-186))
 	search_edit.position=Vector2(20,78);search_edit.size=Vector2(maxf(80,_plot.size.x-104),64)
 	buttons.search.position=Vector2(_plot.end.x-88,78);buttons.search.size=Vector2(88,64)
@@ -287,6 +290,7 @@ func _publish_search()->void:
 func _update_buttons()->void:
 	if not _ready_ui:return
 	buttons.jump.disabled=model==null or loading() or not bool(model.jump_state().get("reachable",false))
+	buttons.information.disabled=model==null or loading()
 	buttons.mode.disabled=model!=null and not model.native;buttons.sector_go.disabled=model!=null and not model.native
 	sector_x.editable=model==null or model.native;sector_y.editable=model==null or model.native
 	for key in ["rotate_left","rotate_right","tilt"]:buttons[key].disabled=_overview
@@ -300,6 +304,10 @@ func select_system(id:int,recenter:=false)->bool:
 	return true
 func _confirm_jump()->void:
 	if model!=null and not loading() and bool(model.jump_state().get("reachable",false)):release_pointers();jump_requested.emit(int(model.selected_id))
+func _request_information()->void:
+	if not input_allowed or model==null or loading():return
+	release_pointers();information_requested.emit(int(model.selected_id))
+
 func center_current()->void:
 	if model==null:return
 	_center=model.sector_position(model.current);_request_now()
