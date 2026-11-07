@@ -1,12 +1,13 @@
 # Ответ на касание поверхности — 0.19.0
 
-Кандидат **0.19.0-surface-contact-alpha1 / Android code 44** подключает
+Опубликованная сборка **0.19.0-surface-contact-alpha1 / Android code 44** подключает
 ограниченное исходное продолжение F575 для игрока после обнаружения
 касания. Безопасная посадка и отскок используют исходные целые значения;
 запросы повреждений проходят через существующий F953 и его сохранённое
 состояние. Настоящий Main и строгая техническая проверка ARM64 APK
 завершены; финальные функциональные проверки и восемь настоящих кадров
-Main прошли без ошибок. Точный ZIP и HTTPS-публикация пока не подготовлены. Проверенные предыдущие
+Main прошли без ошибок. Точный ZIP проверен свежим импортом и запуском;
+неизменяемые HTTPS-ссылки проверены полным скачиванием. Проверенные предыдущие
 артефакты — в [0.18.0](RELEASE_0_18_0_RU.md).
 
 ## Что перенесено
@@ -156,9 +157,32 @@ target SDK 36, `debuggable=false`, прежний TEST-сертификат и Z
 SHA256 TEST-сертификата:
 `16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25`.
 
-Точный ZIP со свежим импортом и запуском, а также неизменяемые
-HTTPS-ссылки будут добавлены после фактического выполнения.
-Готовность этих артефактов пока не заявляется.
+## Исходники и проверенные ссылки
+
+Точный ZIP — **31 552 790 байт**, 1469 записей / **1316 файлов**, меньше
+32 МиБ. Исходный коммит `5a8b7aa86fe94ac7662e37a7af69944b1f853ac3`. SHA256:
+`ce00bb495943086f02a54fddd706755e8e8da92277ab66ae30dc74806d3fdf7a`.
+Свежий импорт и обычный изолированный запуск — **10/0**; настоящий
+контактный Main из точного ZIP — **220/0**. Все 1316 исходных файлов
+сохранили SHA; повторные проверки ZIP не прибавлены к 32 группам.
+[Свежий импорт и запуск](../validation/contact-source-portability-2026-11-08/verification.json),
+[настоящий контактный Main из ZIP](../validation/contact-source-portability-2026-11-08/contact-main-feature.json).
+
+[Скачать APK 0.19.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/StarFrontier-0.19.0-surface-contact-arm64.apk) · [Исходники 0.19.0 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/StarFrontier-0.19.0-surface-contact-source.zip)
+
+[Мягкая посадка](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/screenshots/01-native-soft-landing-classic-console.png) · [Отскок с убранным шасси](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/screenshots/02-native-gear-up-rebound-and-hull.png) · [Повторная посадка и взлёт](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/screenshots/07-recovered-source-landing-and-takeoff.png)
+
+Полным скачиванием проверены **12 файлов**: манифест, APK, source ZIP,
+протокол захвата и восемь PNG. HTTP 200, размеры, SHA, CRC обоих архивов,
+число записей и Git-комментарий source ZIP совпали. Вспомогательные
+журналы и отчёты упакованы и хешированы, но каждый из них отдельно не
+скачивался. Документы внутри ZIP сохраняют состояние исходного коммита
+до удалённой публикации.
+[Проверка скачивания](../validation/contact-publication-2026-11-08/verification.json).
+
+Артефакты закреплены коммитом `ced44e68a261c2268f6d941c1dd0be037953dde1`.
+Техническая публикация TEST-сборки не означает готовность магазинного
+релиза или проверку на физическом телефоне.
 
 ## Оставшаяся работа
 

@@ -11,7 +11,7 @@ ZIP содержит текущий проект Godot, все рабочие и
 скрипты, сцены, тесты, инструменты сборки и генераторы текстур, документацию
 и исторически восстановленные исходные фрагменты.
 
-Текущий кандидат — **0.19.0-surface-contact-alpha1 / code 44**.
+Текущая опубликованная сборка — **0.19.0-surface-contact-alpha1 / code 44**.
 Добавлены `source_surface_contact.gd`, отдельный мобильный мост,
 `data/ffe_surface_contact.json`, извлекатель и независимые DOS-контроли.
 Обработчик передаёт запросы урона существующему владельцу сырого
@@ -31,7 +31,24 @@ ZIP содержит текущий проект Godot, все рабочие и
 Настоящий ARM64 APK технически проверен: **50 113 019 байт**, SHA256
 `0b80d69711ce926314fb567add237f54bc4fad7dfdde983d13586527a525d92d`.
 Зафиксированы 417 runtime-файлов; 12 исходных отметок захвата совпали.
-Точный ZIP и новые HTTPS-ссылки пока не подготовлены.
+Точный ZIP — **31 552 790 байт**, 1469 записей / **1316 файлов**, меньше
+32 МиБ. Исходный коммит `5a8b7aa86fe94ac7662e37a7af69944b1f853ac3`. SHA256:
+`ce00bb495943086f02a54fddd706755e8e8da92277ab66ae30dc74806d3fdf7a`.
+Свежий импорт и обычный изолированный запуск — **10/0**; настоящий
+контактный Main из точного ZIP — **220/0**. Все 1316 исходных файлов
+сохранили SHA; повторные проверки ZIP не прибавлены к 32 группам.
+[Свежий импорт и запуск](validation/contact-source-portability-2026-11-08/verification.json),
+[настоящий контактный Main из ZIP](validation/contact-source-portability-2026-11-08/contact-main-feature.json).
+
+[Скачать APK 0.19.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/StarFrontier-0.19.0-surface-contact-arm64.apk) · [Исходники 0.19.0 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/StarFrontier-0.19.0-surface-contact-source.zip)
+
+Полным скачиванием проверены **12 файлов**: манифест, APK, source ZIP,
+протокол захвата и восемь PNG. HTTP 200, размеры, SHA, CRC обоих архивов,
+число записей и Git-комментарий source ZIP совпали. Вспомогательные
+журналы и отчёты упакованы и хешированы, но каждый из них отдельно не
+скачивался. Документы внутри ZIP сохраняют состояние исходного коммита
+до удалённой публикации.
+[Проверка скачивания](validation/contact-publication-2026-11-08/verification.json).
 [Состав и границы блока](docs/RELEASE_0_19_0_RU.md).
 
 Предыдущая опубликованная сборка — **0.18.0-landing-gear-alpha1 / code 43**.

@@ -1,0 +1,102 @@
+{
+  "started_utc": "2026-11-07T23:08:34.557243+00:00",
+  "version": "0.19.0-surface-contact-alpha1",
+  "artifact_commit": "ced44e68a261c2268f6d941c1dd0be037953dde1",
+  "source_commit": "5a8b7aa86fe94ac7662e37a7af69944b1f853ac3",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/manifest.json",
+      "http_status": 200,
+      "bytes": 29951,
+      "sha256": "e23f99dcec24092456b8be03f17d5a5b57a030ebb7b8a617edfb1e6961eb14ec"
+    },
+    {
+      "file": "StarFrontier-0.19.0-surface-contact-arm64.apk",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/StarFrontier-0.19.0-surface-contact-arm64.apk",
+      "http_status": 200,
+      "bytes": 50113019,
+      "sha256": "0b80d69711ce926314fb567add237f54bc4fad7dfdde983d13586527a525d92d",
+      "zip_crc_verified": true
+    },
+    {
+      "file": "StarFrontier-0.19.0-surface-contact-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/StarFrontier-0.19.0-surface-contact-source.zip",
+      "http_status": 200,
+      "bytes": 31552790,
+      "sha256": "ce00bb495943086f02a54fddd706755e8e8da92277ab66ae30dc74806d3fdf7a",
+      "zip_crc_verified": true,
+      "source_commit_in_zip_comment": "5a8b7aa86fe94ac7662e37a7af69944b1f853ac3"
+    },
+    {
+      "file": "screenshots/capture-manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/screenshots/capture-manifest.json",
+      "http_status": 200,
+      "bytes": 60349,
+      "sha256": "4dc3d52aa019ce194ba2a02e6cdeb60d3a8ffd9191926f0bdcefc7cb221facb0"
+    },
+    {
+      "file": "screenshots/01-native-soft-landing-classic-console.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/screenshots/01-native-soft-landing-classic-console.png",
+      "http_status": 200,
+      "bytes": 366740,
+      "sha256": "de2b8533610f16b979041c192b2b835c8a8c01e6dd54682ef574533b56e4254f"
+    },
+    {
+      "file": "screenshots/02-native-gear-up-rebound-and-hull.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/screenshots/02-native-gear-up-rebound-and-hull.png",
+      "http_status": 200,
+      "bytes": 226490,
+      "sha256": "cf6755329d7e6ce395ad0c3e6707567d45c8e0f02e9886321f417b75e019c8c9"
+    },
+    {
+      "file": "screenshots/03-native-inclined-contact-external.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/screenshots/03-native-inclined-contact-external.png",
+      "http_status": 200,
+      "bytes": 283160,
+      "sha256": "30a91b18438ba262f57f509efed34497a735c83a5750c734da7fb161cadf9dfd"
+    },
+    {
+      "file": "screenshots/04-native-hard-impact-external.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/screenshots/04-native-hard-impact-external.png",
+      "http_status": 200,
+      "bytes": 265155,
+      "sha256": "b6be1f38074931348d1418e4600d442a4d3762ea8d6567de7d3ac9e94de8a022"
+    },
+    {
+      "file": "screenshots/05-fractional-contact-hp-cold-restore.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/screenshots/05-fractional-contact-hp-cold-restore.png",
+      "http_status": 200,
+      "bytes": 210259,
+      "sha256": "33fa816effcad102470fd00c29de8d726a014c3c9abd001776860603038e6bd6"
+    },
+    {
+      "file": "screenshots/06-original-city-floor-single-impact.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/screenshots/06-original-city-floor-single-impact.png",
+      "http_status": 200,
+      "bytes": 206958,
+      "sha256": "9f55dbe15ba5ba46a1467869c976343bd7ed8a8bf98ee456d2baa4e0d70b91b0"
+    },
+    {
+      "file": "screenshots/07-recovered-source-landing-and-takeoff.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/screenshots/07-recovered-source-landing-and-takeoff.png",
+      "http_status": 200,
+      "bytes": 458871,
+      "sha256": "5b01e18caad8027c0861d1e954c6edf1f94304b0d9acd7e5e7f479f7a18ee7ef"
+    },
+    {
+      "file": "screenshots/08-source-contact-fatality-restored.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/screenshots/08-source-contact-fatality-restored.png",
+      "http_status": 200,
+      "bytes": 234066,
+      "sha256": "adc5a057d387282bc69696018c371b0fd4d13c1b0c1e9b612ee4af0c9f0bdd86"
+    }
+  ],
+  "status": "verified",
+  "scope": "Actual complete HTTPS downloads; immutable manifest bytes, payload SHA256/length, ZIP CRC, source archive Git comment and screenshot hashes. Not physical Android execution.",
+  "completed_utc": "2026-11-07T23:09:04.785120+00:00",
+  "all_manifest_payloads_downloaded": false,
+  "manifest_payload_count": 84,
+  "all_local_manifest_payload_hashes_verified": true,
+  "downloaded_file_scope": "Manifest, complete APK and source ZIP, capture manifest and8 PNG. Auxiliary logs/reports are locally hashed; not individually downloaded."
+}

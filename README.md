@@ -3,7 +3,7 @@
 Ветка `development/starfrontier-rebuild` содержит **новую запускаемую основу** нативного Android-проекта на Godot 4.6.3. Она собрана из частично восстановленных исторических модулей, повторно извлечённых исходных данных FFE и заново написанного недостающего кода. Полный прежний проект и APK версии 0.10.8 не найдены.
 
 
-Текущий кандидат — **0.19.0-surface-contact-alpha1 / code 44**:
+Текущая опубликованная сборка — **0.19.0-surface-contact-alpha1 / code 44**:
 [исходный ответ на касание поверхности и общий учёт повреждений](docs/RELEASE_0_19_0_RU.md).
 После обнаружения касания ограниченный исходный обработчик F575 решает,
 принять посадку или изменить скорость и запросить урон F953. Посадка
@@ -28,8 +28,28 @@
 0 ошибок**, desktop GLES/Mesa с явно подготовленными условиями контакта.
 Настоящий ARM64 APK технически проверен: **50 113 019 байт**, SHA256
 `0b80d69711ce926314fb567add237f54bc4fad7dfdde983d13586527a525d92d`.
-Точный ZIP и HTTPS-публикация пока не подготовлены. Ниже сохранены
-проверенные ссылки предыдущей 0.18.0.
+Точный ZIP — **31 552 790 байт**, 1469 записей / **1316 файлов**, меньше
+32 МиБ. Исходный коммит `5a8b7aa86fe94ac7662e37a7af69944b1f853ac3`. SHA256:
+`ce00bb495943086f02a54fddd706755e8e8da92277ab66ae30dc74806d3fdf7a`.
+Свежий импорт и обычный изолированный запуск — **10/0**; настоящий
+контактный Main из точного ZIP — **220/0**. Все 1316 исходных файлов
+сохранили SHA; повторные проверки ZIP не прибавлены к 32 группам.
+
+[Скачать APK 0.19.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/StarFrontier-0.19.0-surface-contact-arm64.apk) · [Исходники 0.19.0 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/StarFrontier-0.19.0-surface-contact-source.zip)
+
+[Мягкая посадка](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/screenshots/01-native-soft-landing-classic-console.png) · [Отскок с убранным шасси](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/screenshots/02-native-gear-up-rebound-and-hull.png) · [Повторная посадка и взлёт](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/ced44e68a261c2268f6d941c1dd0be037953dde1/deliverables/0.19.0-surface-contact-alpha1/screenshots/07-recovered-source-landing-and-takeoff.png)
+
+Полным скачиванием проверены **12 файлов**: манифест, APK, source ZIP,
+протокол захвата и восемь PNG. HTTP 200, размеры, SHA, CRC обоих архивов,
+число записей и Git-комментарий source ZIP совпали. Вспомогательные
+журналы и отчёты упакованы и хешированы, но каждый из них отдельно не
+скачивался. Документы внутри ZIP сохраняют состояние исходного коммита
+до удалённой публикации.
+[Проверка скачивания](validation/contact-publication-2026-11-08/verification.json).
+
+Следующий приоритет — исходные F569/F570/F576/F577: классификация
+и выбор кадров контакта, остальные взаимодействия объектов и ручной док.
+Ниже сохранена предыдущая 0.18.0.
 
 Предыдущая опубликованная сборка — **0.18.0-landing-gear-alpha1 / code 43**:
 [управляемое шасси, консоль и посадочный контакт](docs/RELEASE_0_18_0_RU.md).
