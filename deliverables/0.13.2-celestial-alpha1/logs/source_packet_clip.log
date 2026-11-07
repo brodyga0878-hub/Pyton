@@ -1,0 +1,5 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+NATIVE PACKET OVERDRAW point=(0.0, 1500.0) base_above_fine_m=17.7714205016382 role=ring base_rings=3
+Source packet GPU controls require real GLES display; CPU preparation only
+SOURCE SURFACE PACKET CLIP TESTS: 5 checks, 0 failures; real117nativeheights, coarse/fineframes, outsideedges, transitions

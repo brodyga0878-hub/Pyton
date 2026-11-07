@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "version": "0.13.2-celestial-alpha1",
+  "version_code": 38,
+  "timestamp_utc": "2026-11-07T14:00:52.917669+00:00",
+  "execution": "Python unittest.TextTestRunner on test_android_full_packaging.py, with output recorded directly to the adjacent log.",
+  "equivalent_cli_command": "python -m unittest discover -s tests -p test_android_full_packaging.py -v",
+  "test_count": 58,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "passed": true,
+  "duration_seconds": 0.632003,
+  "test_source_sha256": "d82e4ace8fc03db6e157db3a6115eb27f627ae7ce9a9bc739c8c8b0cbe1210c1",
+  "verifier_sha256": "7d5a106d074405399dc6199f8fa441681ac85d423757e641449de5ec34ccb445",
+  "historical_v37_main_fixture_sha256": "d723ac8b2d9e51ecebd9e45545828c65bea25dfd489f107fea33358eee6b4b2e",
+  "test_archive_is_mock": true,
+  "actual_apk_verified_by_this_run": false,
+  "physical_device_tested": false,
+  "evidence_log": "validation/mercury-visibility-2026-11-07/python-packaging-tests.log"
+}

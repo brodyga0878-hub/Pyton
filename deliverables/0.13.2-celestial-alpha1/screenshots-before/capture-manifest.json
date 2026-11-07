@@ -1,0 +1,384 @@
+{
+	"checks": 22,
+	"completed_utc": "2026-11-07T14:04:02",
+	"failures": [],
+	"frames": [
+		{
+			"actual_scene": "scenes/main.tscn",
+			"bodies": {
+				"mercury": {
+					"behind_camera": false,
+					"coverage": 1.0,
+					"draw_position": [
+						27780.96484375,
+						-16205.5634765625,
+						-57877.01171875
+					],
+					"local_meters": [
+						6648106.0,
+						-3878061.75,
+						-13850221.0
+					],
+					"screen_centre": [
+						949.313354492188,
+						493.766143798828
+					]
+				},
+				"star": {
+					"behind_camera": false,
+					"coverage": 1.0,
+					"draw_position": [
+						43322.09765625,
+						-5322.4814453125,
+						-71918.9921875
+					],
+					"local_meters": [
+						29835544576.0,
+						-3665545984.0,
+						-49529970688.0
+					],
+					"screen_centre": [
+						1007.77563476562,
+						395.355651855469
+					]
+				}
+			},
+			"camera_forward": [
+				0.0,
+				0.0,
+				-1.0
+			],
+			"composited": false,
+			"console_top": 480.0,
+			"elapsed_days": 0.306422375978051,
+			"file": "01-arrival-front.png",
+			"fixture": "Unchanged actual map -> Approach arrival from fresh FULL Sol at epoch0",
+			"near_blend": 0.0,
+			"near_preview": false,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"progress_read_or_written": false,
+			"ship_position": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"source_mesh": {
+				"cache_entries": 1,
+				"cache_limit": 4,
+				"error": "",
+				"focus_id": "mercury",
+				"job_key": "",
+				"profile": "source-height-global-lod-v1",
+				"status": "ready"
+			},
+			"viewport": [
+				1440,
+				720
+			]
+		},
+		{
+			"actual_scene": "scenes/main.tscn",
+			"bodies": {
+				"mercury": {
+					"behind_camera": false,
+					"coverage": 1.0,
+					"draw_position": [
+						27780.96484375,
+						-16205.5634765625,
+						-57877.01171875
+					],
+					"local_meters": [
+						6648106.0,
+						-3878061.75,
+						-13850221.0
+					],
+					"screen_centre": [
+						720.0,
+						360.0
+					]
+				},
+				"star": {
+					"behind_camera": false,
+					"coverage": 1.0,
+					"draw_position": [
+						43322.09765625,
+						-5322.4814453125,
+						-71918.9921875
+					],
+					"local_meters": [
+						29835544576.0,
+						-3665545984.0,
+						-49529970688.0
+					],
+					"screen_centre": [
+						766.032409667969,
+						271.254852294922
+					]
+				}
+			},
+			"camera_forward": [
+				0.419570177793503,
+				-0.244749248027802,
+				-0.874104499816895
+			],
+			"composited": false,
+			"console_top": 480.0,
+			"elapsed_days": 0.306422375978051,
+			"file": "02-arrival-target.png",
+			"fixture": "Same arrival position and time; only turn the ship toward Mercury",
+			"near_blend": 0.0,
+			"near_preview": false,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"progress_read_or_written": false,
+			"ship_position": [
+				0.0,
+				0.0,
+				0.0
+			],
+			"source_mesh": {
+				"cache_entries": 1,
+				"cache_limit": 4,
+				"error": "",
+				"focus_id": "mercury",
+				"job_key": "",
+				"profile": "source-height-global-lod-v1",
+				"status": "ready"
+			},
+			"viewport": [
+				1440,
+				720
+			]
+		},
+		{
+			"actual_scene": "scenes/main.tscn",
+			"bodies": {
+				"mercury": {
+					"behind_camera": false,
+					"coverage": 1.0,
+					"draw_position": [
+						-34098.0,
+						4186.0,
+						56604.0
+					],
+					"local_meters": [
+						6648106.0,
+						-3878061.75,
+						-13850221.0
+					],
+					"screen_centre": [
+						719.995849609375,
+						359.998474121094
+					]
+				},
+				"star": {
+					"behind_camera": true,
+					"coverage": 1.0,
+					"draw_position": [
+						43323.0,
+						-5318.0,
+						-71918.0
+					],
+					"local_meters": [
+						29835544576.0,
+						-3665545984.0,
+						-49529970688.0
+					],
+					"screen_centre": [
+						719.995422363281,
+						360.001342773438
+					]
+				}
+			},
+			"camera_forward": [
+				-0.514979124069214,
+				0.0632166936993599,
+				0.854868531227112
+			],
+			"composited": false,
+			"console_top": 480.0,
+			"elapsed_days": 0.306422375978051,
+			"file": "03-dayside-orbit.png",
+			"fixture": "Fixture observer at4 reference radii on the daylight side; looking at Mercury",
+			"near_blend": 0.0,
+			"near_preview": false,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"progress_read_or_written": false,
+			"ship_position": [
+				14807974.0,
+				-4879732.5,
+				-27395644.0
+			],
+			"source_mesh": {
+				"cache_entries": 1,
+				"cache_limit": 4,
+				"error": "",
+				"focus_id": "mercury",
+				"job_key": "",
+				"profile": "source-height-global-lod-v1",
+				"status": "ready"
+			},
+			"viewport": [
+				1440,
+				720
+			]
+		},
+		{
+			"actual_scene": "scenes/main.tscn",
+			"bodies": {
+				"mercury": {
+					"behind_camera": true,
+					"coverage": 1.0,
+					"draw_position": [
+						-34098.0,
+						4186.0,
+						56604.0
+					],
+					"local_meters": [
+						6648106.0,
+						-3878061.75,
+						-13850221.0
+					],
+					"screen_centre": [
+						719.995727539062,
+						360.001525878906
+					]
+				},
+				"star": {
+					"behind_camera": false,
+					"coverage": 1.0,
+					"draw_position": [
+						43323.0,
+						-5318.0,
+						-71918.0
+					],
+					"local_meters": [
+						29835544576.0,
+						-3665545984.0,
+						-49529970688.0
+					],
+					"screen_centre": [
+						719.995361328125,
+						359.998687744141
+					]
+				}
+			},
+			"camera_forward": [
+				0.514979302883148,
+				-0.0632166638970375,
+				-0.854868412017822
+			],
+			"composited": false,
+			"console_top": 480.0,
+			"elapsed_days": 0.306422375978051,
+			"file": "04-sun-orbit.png",
+			"fixture": "Same daylight observer position; looking toward the unocculted Sun",
+			"near_blend": 0.0,
+			"near_preview": false,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"progress_read_or_written": false,
+			"ship_position": [
+				14807974.0,
+				-4879732.5,
+				-27395644.0
+			],
+			"source_mesh": {
+				"cache_entries": 1,
+				"cache_limit": 4,
+				"error": "",
+				"focus_id": "mercury",
+				"job_key": "",
+				"profile": "source-height-global-lod-v1",
+				"status": "ready"
+			},
+			"viewport": [
+				1440,
+				720
+			]
+		},
+		{
+			"actual_scene": "scenes/main.tscn",
+			"bodies": {
+				"mercury": {
+					"behind_camera": true,
+					"coverage": 1.0,
+					"draw_position": [
+						-2028772.0,
+						249043.25,
+						3367771.0
+					],
+					"local_meters": [
+						6648106.0,
+						-3878061.75,
+						-13850221.0
+					],
+					"screen_centre": [
+						720.000061035156,
+						360.0
+					]
+				},
+				"star": {
+					"behind_camera": false,
+					"coverage": 0.0,
+					"draw_position": [
+						1544938.0,
+						-189650.0,
+						-2564604.0
+					],
+					"local_meters": [
+						29835544576.0,
+						-3665545984.0,
+						-49529970688.0
+					],
+					"screen_centre": [
+						720.000122070312,
+						360.0
+					]
+				}
+			},
+			"camera_forward": [
+				0.514979302883148,
+				-0.0632166638970375,
+				-0.854868412017822
+			],
+			"composited": false,
+			"console_top": 480.0,
+			"elapsed_days": 0.306422375978051,
+			"file": "05-sun-near-surface.png",
+			"fixture": "Fixture observer20km above actual source-height terrain at solar zenith; looking at Sun",
+			"near_blend": 0.0,
+			"near_preview": true,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"progress_read_or_written": false,
+			"ship_position": [
+				8676878.0,
+				-4127105.0,
+				-17217992.0
+			],
+			"source_mesh": {
+				"cache_entries": 1,
+				"cache_limit": 4,
+				"error": "",
+				"focus_id": "mercury",
+				"job_key": "",
+				"profile": "source-height-global-lod-v1",
+				"status": "ready"
+			},
+			"viewport": [
+				1440,
+				720
+			]
+		}
+	],
+	"source_sha256": {
+		"scripts/build_info.gd": "36946af9f2ec303ab09093b8cf6d4249d001f0599c73a001bc34216bcc2c01d7",
+		"scripts/celestial_renderer.gd": "9ec436816b707e2b96a27f5c20cc40f340af4bbb6c994311eac2f57ae2b1b20a",
+		"scripts/main.gd": "61dd63e92cc7b2bebdb86859ccc5a8e5653f5376fbf0616d168f4c1ab4652d30",
+		"scripts/planet.gdshader": "c076faf23a1ba06a61060f9066a73b221b89a7b4cd2c1adfc7781b9034a998ad"
+	},
+	"version": "0.13.1-map-alpha1"
+}

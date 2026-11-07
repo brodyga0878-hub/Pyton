@@ -1,0 +1,47 @@
+{
+	"reference_radius_m": 3961260.0,
+	"sampled_max_height_m": 25463.6034224876,
+	"sampled_max_radius_m": 3986723.60342249,
+	"sampled_min_height_m": -90842.2321224888,
+	"sampled_min_radius_m": 3870417.76787751,
+	"scope": "Actual source global CPU mesh, physical ray tests at epoch0 Mercury arrival; no GPU draw or runtime modifications.",
+	"source_profile": "source-height-global-lod-v1",
+	"sun_disc_ray_tests": [
+		{
+			"source_mercury_mesh_intersections": 2,
+			"sun_disc_offset": [
+				0.0,
+				0.0
+			]
+		},
+		{
+			"source_mercury_mesh_intersections": 2,
+			"sun_disc_offset": [
+				-1.0,
+				0.0
+			]
+		},
+		{
+			"source_mercury_mesh_intersections": 2,
+			"sun_disc_offset": [
+				1.0,
+				0.0
+			]
+		},
+		{
+			"source_mercury_mesh_intersections": 2,
+			"sun_disc_offset": [
+				0.0,
+				-1.0
+			]
+		},
+		{
+			"source_mercury_mesh_intersections": 2,
+			"sun_disc_offset": [
+				0.0,
+				1.0
+			]
+		}
+	],
+	"vertex_count": 2145
+}

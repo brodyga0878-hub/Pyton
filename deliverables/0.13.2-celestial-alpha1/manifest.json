@@ -1,0 +1,246 @@
+{
+  "version": "0.13.2-celestial-alpha1",
+  "version_code": 38,
+  "created_utc": "2026-11-07T14:12:59.264256+00:00",
+  "source_commit": "606775527498662697ae9eedba152898adabfe40",
+  "source_archive_scope": "Exact git archive -9 of current reconstruction; compact parity audit exception retained. Other validation/deliverables/build/.godot/SDK/signing key excluded. Not complete original FFE.",
+  "source_archive_files": 1296,
+  "source_archive_actual_file_count": 1143,
+  "source_archive_below_32MiB": true,
+  "source_archive_crc_verified": true,
+  "source_archive_fresh_import_passed": true,
+  "source_archive_isolated_native_startup_checks": 10,
+  "source_archive_isolated_native_startup_failures": 0,
+  "files": {
+    "README_RU.md": {
+      "bytes": 3999,
+      "sha256": "f327a59226a28a6d553bca79dc1a3df3106fb85f4d6b7a35268f9aa9bab4b26d"
+    },
+    "StarFrontier-0.13.2-celestial-arm64.apk": {
+      "bytes": 49765516,
+      "sha256": "c24b31c67dcf993dd44d837142e5bb69d8abfcec05722e5760b513f583529bdf"
+    },
+    "StarFrontier-0.13.2-celestial-source.zip": {
+      "bytes": 29528548,
+      "sha256": "6fd180f08258a8d15e98df99277379b7cd984422a66442e56ee4e16507cb93c0"
+    },
+    "android-export.log": {
+      "bytes": 6442,
+      "sha256": "46648e8edf67cf7c6ea6b91382b33929663df0b2944279fc669f5ef53a60efa3"
+    },
+    "android-verification.json": {
+      "bytes": 102201,
+      "sha256": "a0178543d0231a529b58127220bf2fcdacec0575eb7ea8ce0ef51cb9b8ba9277"
+    },
+    "capture-after.log": {
+      "bytes": 429,
+      "sha256": "725e213c8f3d8f59cd9c7e570eb8bd479095fe16be24301b5229616ebb2a2025"
+    },
+    "capture-before.log": {
+      "bytes": 429,
+      "sha256": "725e213c8f3d8f59cd9c7e570eb8bd479095fe16be24301b5229616ebb2a2025"
+    },
+    "flight-projection-observed.json": {
+      "bytes": 15691,
+      "sha256": "e6659e67517213e1ba63e9eb17514cbeee4989cbfe33abe4983a999b9b6de5e1"
+    },
+    "flight-projection-summary.json": {
+      "bytes": 1304,
+      "sha256": "1482b45c31e227510677b0a86beaeb550773aaef41dcb78836308ed98b0eeb11"
+    },
+    "gpu-comparison.json": {
+      "bytes": 2625,
+      "sha256": "cfa7a5285426839cf5d2bcb5e7e363651fdeeaf1204ab86368d2816684c28cba"
+    },
+    "logs/app_transitions.log": {
+      "bytes": 120,
+      "sha256": "0c190763c029bb01bb6bb16c947fe7d80537e36b271d22fc91c468771ba45cd4"
+    },
+    "logs/flight_projection.log": {
+      "bytes": 10280,
+      "sha256": "96fa2e725d75a7957c6bef6751b56e0eb8ae49366634d81325c61e6ea0d1d61e"
+    },
+    "logs/graphics_integration.log": {
+      "bytes": 123,
+      "sha256": "f6b6dc847918df771b6f2ac4b0b0f0537855cf6f5247269fadb9b1f4b8ea6d06"
+    },
+    "logs/graphics_scope.log": {
+      "bytes": 355,
+      "sha256": "b7ec54445dbb93814b7877b35fd9c0b18e5e17f8dcf4a62aa1fba3a09f2692bb"
+    },
+    "logs/navigation_main.log": {
+      "bytes": 118,
+      "sha256": "341f62f03e5ea9792cb9e4caaf3261f7e61c57b9664e49fe27d12453ab4c12b6"
+    },
+    "logs/source_console_pause.log": {
+      "bytes": 1713,
+      "sha256": "186271e8ac79a9016109344758aa6d75971a915ac0cd5ff0234864319ad62a7b"
+    },
+    "logs/source_full_startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "logs/source_main_full.log": {
+      "bytes": 510,
+      "sha256": "c7f0c506f8719a48ab1cc3589c2db12565829432d6e9e8ce945ef26b7795952a"
+    },
+    "logs/source_packet_clip.log": {
+      "bytes": 372,
+      "sha256": "cdd523b1a2744a0bb1ff0aeb46d98e9d42e7496dbf32200f6db472035a0fb4ec"
+    },
+    "logs/source_render_state.log": {
+      "bytes": 199,
+      "sha256": "bb2d47fc76d7d93358fbe92b3ad89dfc6d7bd631f1774e48a6f9f63bc9289980"
+    },
+    "mercury_mesh_diagnostic.json": {
+      "bytes": 930,
+      "sha256": "1c2bee2a9f71b51d856ea600227e8ba97609c08568ddf5816fd3f0bc71046b89"
+    },
+    "mercury_world_diagnostic.json": {
+      "bytes": 45001,
+      "sha256": "b442574ab92c17f5983ada0448dc30f6c68d35882077c818252042bb4d97e4a1"
+    },
+    "python-packaging-tests.json": {
+      "bytes": 982,
+      "sha256": "f5f1021fb899b27114770e9c20beacfaf78d53c841292e133c44f6fad49b9c1e"
+    },
+    "python-packaging-tests.log": {
+      "bytes": 9359,
+      "sha256": "1c870ffca382c7e9785eabfbd37d335ba75b1432b75de269bcd1449bbb206b18"
+    },
+    "review.json": {
+      "bytes": 1116,
+      "sha256": "6e44d1d4f202bf67ec5156fa9cc3d539154e840f31383f7f658aaaeb7fa78e33"
+    },
+    "runtime-freeze.json": {
+      "bytes": 41397,
+      "sha256": "28ec3205ec4a3ecbb07c80d2e797e99ea0d278ed938231ebf58d79a819e5cc78"
+    },
+    "screenshots/01-arrival-front.png": {
+      "bytes": 186713,
+      "sha256": "5af407155a71b580cf06f3910bb4e3d94278c6fad3ffd644a442387c76d213c0"
+    },
+    "screenshots/02-arrival-target.png": {
+      "bytes": 212056,
+      "sha256": "3bf152a3eb5f9043293bb58b1dad7f2ac221135a349bf82986ccb67308aefb1e"
+    },
+    "screenshots/03-dayside-orbit.png": {
+      "bytes": 288565,
+      "sha256": "81c655f96abf7f705395dac5dccf5db5ce2417ba893231645b36a06a1ae37227"
+    },
+    "screenshots/04-sun-orbit.png": {
+      "bytes": 221402,
+      "sha256": "926fcfcf1a53af0d57b870dc0086f9d734ce8de375a6a9918ffe77ce4d00075e"
+    },
+    "screenshots/05-sun-near-surface.png": {
+      "bytes": 222091,
+      "sha256": "f8f54aed9a8ab86d742e0c02f7805ddbab29c4cc0e618961284c3c71e3649c20"
+    },
+    "screenshots/capture-manifest.json": {
+      "bytes": 7986,
+      "sha256": "6e12f349c9f1cc732c9cf0fe68173ea5b96e773e70e34105868d76848d2325f6"
+    },
+    "screenshots-before/01-arrival-front.png": {
+      "bytes": 211712,
+      "sha256": "ab21e4316472fb9410720472bd48b36a7d27aa57a4e4382be7febd83c92b23d2"
+    },
+    "screenshots-before/02-arrival-target.png": {
+      "bytes": 220672,
+      "sha256": "67deec58d48aab25c488e62633bd625c37fdaa5cba46b8611ec08d41a03695e9"
+    },
+    "screenshots-before/03-dayside-orbit.png": {
+      "bytes": 258848,
+      "sha256": "4c149383a6f77e08a4130c4768fa3429b7790df8b982f4fa21c0ab644f248066"
+    },
+    "screenshots-before/04-sun-orbit.png": {
+      "bytes": 230109,
+      "sha256": "4d36fd56731c76333f575efbe9a4182f177a848cd23afdfebb19440003be5284"
+    },
+    "screenshots-before/05-sun-near-surface.png": {
+      "bytes": 229282,
+      "sha256": "858856811046da1f1b94da55aa2af404fe91c45c6c52722a0b64dcb8f3e1e32b"
+    },
+    "screenshots-before/capture-manifest.json": {
+      "bytes": 7959,
+      "sha256": "5407844889f99b72b02f33ed6dde45619e12cb5f9b0d0c03f9b659d2b47d5f02"
+    },
+    "source-archive-import.log": {
+      "bytes": 25086,
+      "sha256": "c3363dd645d01890457fb06d66ae26ff5e7212091a0e651197202efaaf38c8be"
+    },
+    "source-archive-restricted-attempt.json": {
+      "bytes": 4972,
+      "sha256": "e7791a4aeda46754299c0e0a3d324a77eee03908030c892068bea9beef79b2d4"
+    },
+    "source-archive-startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "source-archive-verification.json": {
+      "bytes": 5917,
+      "sha256": "1d12b81d7bb7d06ccf87d5f93dc3a8d46417ab5ccfc62ef6f8886608a53350da"
+    },
+    "source-renderer-before-fix.log": {
+      "bytes": 1231,
+      "sha256": "d8543d7d1617fa2490a3c24b2b4c3cb8505942a44205b11716a5968a301c77d2"
+    },
+    "source-renderer-result.json": {
+      "bytes": 1326,
+      "sha256": "f2247d850beafb8583b636180aada537021d14bf1dcd02f9b4afec13a7bbfef2"
+    },
+    "source-renderer.log": {
+      "bytes": 129,
+      "sha256": "653d936aedbb6dffa93820b126d5595b887670177e016e2466944bc2f1c16c8d"
+    },
+    "validation-final.json": {
+      "bytes": 13761,
+      "sha256": "09484aa9d621d3399568dc9306db03e20fa7313df3e1ba58c92619c645fa8adf"
+    }
+  },
+  "checks": 2508,
+  "passed_suites": 11,
+  "failures": 0,
+  "validation_status": "passed",
+  "validation_report": "validation-final.json",
+  "validation_scope": "Targeted Main camera/safe area/console, native body geometry/coverage, navigation/save/dock/launch, paused terrain publication, source contact/clip and graphics-return controls; previous totals excluded.",
+  "python_packaging_unit_tests": 58,
+  "capture_checks": 44,
+  "capture_checks_added_to_targeted_total": false,
+  "fresh_desktop_gles_frames_visually_inspected": 10,
+  "screenshots_are_phone_captures": false,
+  "renderer": "Godot4.6.3 Compatibility/OpenGL Mesa llvmpipe desktop software rendering",
+  "runtime_input_freeze_count": 376,
+  "additional_runtime_modules": 0,
+  "additional_shaders": 0,
+  "additional_textures": 0,
+  "runtime_material_maps": 51,
+  "source_exact_json_verified": 22,
+  "navigation_modules_verified": 11,
+  "protected_source_data_count": 17,
+  "protected_main_function_count": 28,
+  "protected_renderer_function_count": 16,
+  "unchanged_full_galactic_view_verified": true,
+  "legacy_celestial_transition_preserved": true,
+  "package": "org.starfrontier.rebuild",
+  "abi": "arm64-v8a",
+  "min_sdk": 24,
+  "target_sdk": 36,
+  "debuggable": false,
+  "zip_and_elf_alignment_16k": true,
+  "test_key_only": true,
+  "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+  "physical_device_tested": false,
+  "production_signing_key_configured": false,
+  "production_release_ready": false,
+  "full_original_port_complete": false,
+  "full_original_physics": false,
+  "full_original_system_information": false,
+  "full_russian_localization_complete": false,
+  "astronomically_calibrated_star_radii": false,
+  "quantitative_inverse_square_illumination_added": false,
+  "game_completion_percent": null,
+  "full_release_date": null,
+  "next_functional_priority": "Original F842/F843/F863/F895 information pages and required FF text interpretation",
+  "artifact_upload_authorized": true,
+  "publication_state_at_packaging": "Prepared for authorized GitHub backup; immutable HTTPS verification recorded separately after upload."
+}

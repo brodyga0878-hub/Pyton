@@ -1,0 +1,21 @@
+{
+  "test": "source_celestial_renderer",
+  "command": "godot --headless --path /workspace/Pyton --script res://tests/test_source_celestial_renderer.gd",
+  "exit_code": 0,
+  "checks": 172,
+  "failures": 0,
+  "completed_utc": "2026-11-07T13:55:28.778816+00:00",
+  "log": "validation/mercury-visibility-2026-11-07/source-renderer.log",
+  "log_sha256": "653d936aedbb6dffa93820b126d5595b887670177e016e2466944bc2f1c16c8d",
+  "sources_sha256": {
+    "scripts/celestial_renderer.gd": "c084f772a420a8b625488ce176e87532833c4677e26da2a669939a437c01448e",
+    "tests/test_source_celestial_renderer.gd": "17952f00149824459b33efab6a39d1d56b38f588ebfa942d445e0621bdb23485"
+  },
+  "before_fix": {
+    "checks": 172,
+    "failures": 3,
+    "log": "validation/mercury-visibility-2026-11-07/source-renderer-before-fix.log",
+    "failed_cases": "Actual luminous Sun coverage at Mercury surface-transition blends0,0.25,0.5; all other checks passed."
+  },
+  "scope": "Existing source-height renderer tests plus ready actualSol/Mercury mesh, luminous photosphere coverage across four blends, unchanged nonstellar coverage/source mesh/records/world state/native positions, and Mercury-triangle occlusion of solar centre plus four photosphere limb rays. Headless geometry/material test; final GPU depth rendering is validated separately by parent."
+}

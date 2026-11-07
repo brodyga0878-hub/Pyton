@@ -1,0 +1,20 @@
+{
+  "completed_utc": "2026-11-07T14:08:35.362122+00:00",
+  "independent_review": "PASS; no blocking issues found by approach_review",
+  "scope": [
+    "Actual console and safe-area optical centre agrees with reticle/cross",
+    "Independent perspective comparison preserves angular scale and physical camera/ship pose",
+    "No runtime project_ray_normal or project_position consumers; engine off-axis builtin limitation documented",
+    "FULL luminous exception matches kindstar/types17..30; legacy transition and depth testing unchanged",
+    "GPU10frames inspected by root, with true occultation retained and Sun restored near surface"
+  ],
+  "remaining_limits": [
+    "No physical Android safe-area/orientation run",
+    "No calibrated astronomical stellar radius/colour/flux change",
+    "Pixel threshold checks distinguish current photosphere, not astrophysical brightness"
+  ],
+  "reviewed_source_sha256": {
+    "scripts/main.gd": "7778e7264fe6dfd092cdc0e4ad9b9e27c7c19b51851c49df1842f64fb6052775",
+    "scripts/celestial_renderer.gd": "c084f772a420a8b625488ce176e87532833c4677e26da2a669939a437c01448e"
+  }
+}

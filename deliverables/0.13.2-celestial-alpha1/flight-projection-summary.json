@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-07T14:02:11.227984+00:00",
+  "scope": "Actual Main Mercury arrival and independent perspective comparison, safe-area/resize/view/FOV/KEEP-aspect projection with source state preserved.",
+  "status": "passed",
+  "suites": [
+    {
+      "name": "flight_projection",
+      "scope": "Actual Main Mercury arrival and independent perspective comparison, safe-area/resize/view/FOV/KEEP-aspect projection with source state preserved.",
+      "status": "passed",
+      "checks": 691,
+      "failures": 0,
+      "executed_utc": "2026-11-07T14:02:09.871526+00:00",
+      "suite_source": {
+        "path": "tests/test_flight_projection.gd",
+        "bytes": 12962,
+        "sha256": "a1e2569ae67b334851340782de2dab1c41ee8ceba3bb28b8ba66055d21f777d7"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_flight_projection.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.356,
+      "timed_out": false,
+      "output_bytes": 10280,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "validation/mercury-2026-11-07/logs/flight_projection.log",
+      "summary_lines": 1
+    }
+  ]
+}
