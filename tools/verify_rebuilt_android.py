@@ -48,6 +48,37 @@ NAVIGATION_MODULES=(
     'rotating_dock_dynamics','source_motion_pipeline','source_motion_bridge','source_frame_kinematics',
 )
 NAVIGATION_TABLES=('ffe_galactic_map',)
+MAP_VISUAL_PROFILE='navy-star-chart-v1'
+MAP_VISUAL_BASELINE_SOURCE_COMMIT='e4e8e7edccdb4422124f249365dfb8c99d135bb5'
+MAP_VISUAL_PROTECTED_SOURCE_SHA256={
+    'scripts/galactic_map_model.gd':'bb2f52814aae33d1d7fa000931e369f8c4d1cb0de1364939f9b363e496399b02',
+    'scripts/galaxy.gd':'6cb023e203a633deebe774bc0c87fb71021d44d679e130bae6ba5aa36b3c94f4',
+    'scripts/source_galaxy.gd':'5c258d5192e0797c76eab2e7a2653a3dd83954063d4fba58ed5bf0fa2f76d767',
+    'scripts/navigation.gd':'aee7aeffccd200290c435cabf708c0e4ec5dc852fbae30f85b2bedce1c2a6b80',
+    'scripts/system_map_model.gd':'ac7ae75188b9b8a47fefbd233d85dc90d4c64996e64d98dcc46705394f732e4a',
+    'scripts/system_map_view.gd':'0d438facab582699c852ee19107ea113c69fa56971978ca998930554c55f6a2d',
+    'scripts/main.gd':'61dd63e92cc7b2bebdb86859ccc5a8e5653f5376fbf0616d168f4c1ab4652d30',
+    'scripts/flight_model.gd':'8da5454be81142412ba8bcfb4df0154ae43d906a73fc1f04f5650ec1d57b3391',
+    'scripts/flight_time_controller.gd':'bebb04d4a40793bbaad2574044ab763ffe4609aaf9f8b615eeace704dd2ff728',
+    'scripts/source_motion_pipeline.gd':'478b18ed852da1549eb573e2b8d168e3b817deb684c31c50e085d30a6d98bb84',
+    'scripts/source_motion_bridge.gd':'7f5a805ca0a9675262ce511e28e4306df12b2b3cb5992dbb76d6e42f97f0bb9a',
+    'scripts/source_frame_kinematics.gd':'aac70ddc3237a9b97910020db6a2ac400659ab02457730e113de9c828b530689',
+    'scripts/rotating_dock_dynamics.gd':'68eb63c19831a2828fa62a1c10126de099d7d4905859f905c4b93e37124206a4',
+    'scripts/source_station_session.gd':'80807b1c4b0aefb42f6907ef7480e2792295017f681caa5608894290d8d85b8f',
+    'scripts/planetary_system.gd':'f243ebb2699bce714386e87ca32bfdb35709a2c9c45178cac9fa6cb8874abc62',
+    'scripts/surface_model.gd':'a8e2825fd2daae3a9e66783cd0c77dd87e12d249187281147984e652677e2ab5',
+    'data/ffe_galactic_map.json':'8fe5f5c5445a282422d5f9845b8d237a759c12c54538a3af8d8c260beb2b72b9',
+    'data/ships.json':'944974a355019507fefe53f79dffc19d24e838fe650d34a52fbc00c692b8571a',
+}
+MAP_VISUAL_PROTECTED_FUNCTION_SHA256={
+    '_prepare':'513d42bf46abe1015c5d5985a5995189b1f5a523019ddfd68619389edc664624',
+    '_confirm_jump':'daceaa30c79ebe789ac6cd2a4d0b34108b04bfb5f8c56293874cc0d858b727ec',
+    'select_system':'8c6d79b4187f0bfc0dd456056d602e3b5dbf46276b5dcd7b7c743c3dddfcda9a',
+    '_pan':'1b26c414e3f6962f5d3b4d278a40cdddcd7944461c705b52756238b8da04c465',
+    '_input':'bef7d1e275130c45c8b4e45484395a27dff25fd9f99b8054a74eea4337d9c32d',
+    '_search':'6e7af10f8ed67621683a20533c93989ac92232c6547f6ac10afcd729ee418fd7',
+    '_goto_sector':'cbb9c084c4456c285ef6b571516f50d80d78f3af18a778b9f95d893658e327d4',
+}
 DEVELOPMENT_ASSET_PREFIXES=(
     'assets/tests/','assets/tools/','assets/docs/','assets/recovered-history/',
     'assets/recovery/','assets/validation/','assets/deliverables/',
@@ -825,6 +856,40 @@ def verify_navigation_runtime(archive,project):
                    'original_hyperdrive_f903_complete':False,'complete_original_player_pipeline':False,'complete_original_physics':False})
     return result
 
+def verify_map_visual_runtime(archive,project):
+    """Check v37's presentation-only galactic map contract.
+
+    Protected input hashes come from the exact v36 source checkpoint, not from
+    the new view. They establish selected local source/data preservation;
+    compiled GDSC is checked and hashed, not decompiled or equated to source.
+    """
+    path='assets/scripts/galactic_map_view.gdc'
+    assert path in set(archive.namelist()),'Missing modern map visual runtime'
+    packed=archive.read(path)
+    assert len(packed)>64 and packed[:4]==b'GDSC','Invalid compiled modern map visual runtime'
+    raw=(project/'scripts/galactic_map_view.gd').read_bytes();text=raw.decode('utf-8')
+    assert re.search(r'^const\s+PRESENTATION_PROFILE\s*:=\s*"'+re.escape(MAP_VISUAL_PROFILE)+r'"\s*$',text,re.M),'Modern map presentation profile missing or changed'
+    assert re.search(r'set_meta\(\s*"presentation_profile"\s*,\s*PRESENTATION_PROFILE\s*\)',source_function(text,'_ready')),'Modern map presentation profile is not consumed by the view'
+    protected={}
+    for relative,expected in MAP_VISUAL_PROTECTED_SOURCE_SHA256.items():
+        actual=hashlib.sha256((project/relative).read_bytes()).hexdigest()
+        assert actual==expected,'Visual-only map update changed protected source/data '+relative
+        protected[relative]=actual
+    functions={}
+    for name,expected in MAP_VISUAL_PROTECTED_FUNCTION_SHA256.items():
+        actual=hashlib.sha256(source_function(text,name).encode()).hexdigest()
+        assert actual==expected,'Visual-only map update changed protected input/worker function '+name
+        functions[name]=actual
+    return {'presentation_profile':MAP_VISUAL_PROFILE,'runtime_path':path,'runtime_bytes':len(packed),
+            'runtime_sha256':hashlib.sha256(packed).hexdigest(),'local_source_sha256':hashlib.sha256(raw).hexdigest(),
+            'baseline_source_commit':MAP_VISUAL_BASELINE_SOURCE_COMMIT,
+            'protected_source_data_sha256':protected,'protected_view_function_sha256':functions,
+            'protected_source_data_count':len(protected),'protected_view_function_count':len(functions),
+            'additional_runtime_modules':0,'additional_shaders':0,'additional_textures':0,
+            'original_map_data_preserved':True,'display_color_transfer_is_presentation':True,
+            'complete_original_renderer':False,'compiled_source_correspondence_rebuilt_by_verifier':False,
+            'behavior_proved_by_this_package_check':False,'physical_device_tested':False}
+
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     expected=preset_values(presets)
     signature=run(build_tools/'apksigner','verify','--verbose','--print-certs',apk)
@@ -843,7 +908,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -914,6 +979,8 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
                 mining_kernel_assets=verify_mining_kernel_runtime(archive,presets.parent)
             if expected['version_code']>=36:
                 navigation_assets=verify_navigation_runtime(archive,presets.parent)
+            if expected['version_code']>=37:
+                map_visual_assets=verify_map_visual_runtime(archive,presets.parent)
         for name in names:
             if not name.startswith('lib/') or not name.endswith('.so'):continue
             data=archive.read(name)
@@ -931,7 +998,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

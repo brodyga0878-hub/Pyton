@@ -1,0 +1,319 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-07T10:16:42.486037+00:00",
+  "target": "Full original content and functional/mathematical behavior, modern graphics/Russian/Android touch as presentation changes; user DOS binary is reference and JJFFE fixes require explicit mapping.",
+  "full_game_parity_proven": false,
+  "all_source_instructions_semantically_reviewed": false,
+  "game_completion_percent": null,
+  "full_release_date": null,
+  "matrix_scope": "Concrete observed gaps from5 domain audits; broad complete static source/resource inventory does not imply all possible original states have been reviewed.",
+  "rows": [
+    {
+      "id": "G01",
+      "area": "Галактика",
+      "current": "Исходные секторы, координаты, имена, ограниченные поисковые окна",
+      "required_for_original_parity": "Все исходные инструменты, поиск, ограничения знания и страницы информации",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G02",
+      "area": "Системы и орбиты",
+      "current": "Исходная иерархия, положения, вращение тел/портов, проверенные генераторы",
+      "required_for_original_parity": "Полный исходный жизненный цикл объектов и связанных событий, проверка различий DOS/JJFFE",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G03",
+      "area": "Тексты систем",
+      "current": "267 строк, metadata и коды",
+      "required_for_original_parity": "Полный FF/bracket-интерпретатор, 44 длинных строки и исходные страницы",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G04",
+      "area": "Корабли",
+      "current": "57 записей справочника, три адаптированных профиля игрока",
+      "required_for_original_parity": "Весь требуемый исходный парк с правильными ролями, доступностью, массой, габаритами и управлением",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G05",
+      "area": "Оснащение",
+      "current": "Четыре позиции адаптера и учёт места",
+      "required_for_original_parity": "Исходный каталог, классы приводов, кабины, экипаж, повреждения и все ограничения",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G06",
+      "area": "Оружейные места",
+      "current": "Авторская видимая геометрия",
+      "required_for_original_parity": "Извлечение полей за пределами текущих 24 байт спецификации, исходные hardpoints/турели/направления",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G07",
+      "area": "Гипердвигатели",
+      "current": "Бак12, `ceil(ly/4)`, заряд3с и адаптированные сроки",
+      "required_for_original_parity": "F899–F903: масса, привод, тип топлива, точная дальность, сроки, военные отходы и отказы",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G08",
+      "area": "Реактивное топливо",
+      "current": "Тяга и отдельный адаптированный гипербак",
+      "required_for_original_parity": "F929: расход реактивного бака, автозаправщик, грузовое топливо и прекращение тяги",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G09",
+      "area": "Поступательное движение",
+      "current": "Исходное raw-ядро у Cobra с фиксированным естественным родителем",
+      "required_for_original_parity": "Все корпуса/режимы, полный контур исходного объекта и порядок вызовов",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G10",
+      "area": "Вращение и системы отсчёта",
+      "current": "Quaternion-ввод, отдельные F572/F573",
+      "required_for_original_parity": "Живые F585/F570/F595/F604–606, остатки углов, автоматический выбор/смена кадра и скорость родителя",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G11",
+      "area": "Гравитация",
+      "current": "Ограниченное F603 и SI fallback",
+      "required_for_original_parity": "Единый исходный покадровый цикл вместо сочетания отдельных контроллеров",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G12",
+      "area": "Внутрисистемный перелёт",
+      "current": "Адаптер с подготовкой и перестановкой корабля",
+      "required_for_original_parity": "Исходный непрерывный маршрут, торможение, движение цели и автопилот",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G13",
+      "area": "Время",
+      "current": "Календарь, безопасные ×1/×10/×100",
+      "required_for_original_parity": "Общий исходный таймер, ×1000/×10000, события мира и точное поведение при ускорении/переполнениях",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G14",
+      "area": "Док",
+      "current": "Исходная геометрия/дверь/вращение, физический подход и вылет",
+      "required_for_original_parity": "Полный протокол разрешения/очереди/штрафов и исходные контакт/автопилот/промежуточные состояния",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G15",
+      "area": "Посадка",
+      "current": "Исходный рельеф части моделей, города, ручной подъём",
+      "required_for_original_parity": "Исходный посадочный автомат/шасси, непрерывный переход с орбиты без собственных caps/reset",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G16",
+      "area": "Все твёрдые объекты",
+      "current": "Поддержка части natural-моделей117–133",
+      "required_for_original_parity": "Астероиды112–116 и другие допустимые формы, их контакт, состояние и сохранение",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G17",
+      "area": "Кометы",
+      "current": "Общий живой механизм не установлен",
+      "required_for_original_parity": "Сначала доказать исходные классы/условия; пользовательское расширение не выдавать за восстановленный факт",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G18",
+      "area": "Атмосфера",
+      "current": "Визуальный слой",
+      "required_for_original_parity": "Исходное сопротивление, температура, нагрев, защитное оборудование и повреждение",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G19",
+      "area": "Звёздная/газовая заправка",
+      "current": "В игровом пути отсутствует",
+      "required_for_original_parity": "F1033: условия fuel scoop, водород в трюме, задержки и тепловая связь",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G20",
+      "area": "Подбор груза",
+      "current": "Инвентарь-словарь",
+      "required_for_original_parity": "Физические контейнеры, контакт/сбор/удаление и исходное оборудование",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G21",
+      "area": "MB4",
+      "current": "Проверенное отдельное ядро записей",
+      "required_for_original_parity": "Развёртывание отделяемой установки, месторождение, недели добычи, возврат, груз и мировой save",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G22",
+      "area": "Горный лазер",
+      "current": "Живого цикла нет",
+      "required_for_original_parity": "Попадание, дробление/создание объектов, расход топлива/тепла и добыча",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G23",
+      "area": "Торговля",
+      "current": "Шесть учебных товаров с фиксированными ценами",
+      "required_for_original_parity": "Исходные33 рыночные записи, запасы порта, ежедневный пересчёт, фракции и законность",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G24",
+      "area": "Службы исходных портов",
+      "current": "Базовая заправка",
+      "required_for_original_parity": "Полный рынок, ремонт, обслуживание, верфь, BBS, найм и пассажирские действия",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G25",
+      "area": "Бой",
+      "current": "`fire()` увеличивает счётчик; полноценного боя нет",
+      "required_for_original_parity": "Лазеры/ракеты/мины, попадания, энергия, ECM, щиты, охлаждение и повреждения",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G26",
+      "area": "NPC/ИИ/трафик",
+      "current": "Справочные пулы",
+      "required_for_original_parity": "Создание/оснащение объектов, полёт, торговля, атака, уклонение, полиция и события",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G27",
+      "area": "Закон и ранги",
+      "current": "Полного механизма нет",
+      "required_for_original_parity": "Преступления, свидетели, штрафы, репутация, боевой и военные ранги, награды и допуски",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G28",
+      "area": "BBS и задания",
+      "current": "Одна учебная доставка",
+      "required_for_original_parity": "Исходные объявления, договоры, сроки, пассажиры, грузы, экипаж и последствия",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G29",
+      "area": "Сюжет/таргоиды/INRA",
+      "current": "Исходные тексты доступны для анализа",
+      "required_for_original_parity": "Сценарная VM, флаги/триггеры, встречи, развилки, персонажи и исходные развязки",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G30",
+      "area": "Газеты/журнал/диалоги",
+      "current": "Полного потребителя нет",
+      "required_for_original_parity": "Газетные источники, даты, сообщения, переменные текста и UI",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G31",
+      "area": "Сохранения",
+      "current": "Надёжный новый JSON, часть raw-остатков",
+      "required_for_original_parity": "Полное исходное состояние объектов/сценариев/AI/MB4 и отдельная совместимость с commander-файлами",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G32",
+      "area": "Интерфейс/сканеры",
+      "current": "12 команд новой консоли и новые карты",
+      "required_for_original_parity": "Все исходные страницы/функции/режимы сканеров, цели, горячие действия и доступность",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G33",
+      "area": "Геометрия и анимации",
+      "current": "Исходные станции/города и часть VM; три авторских корпуса",
+      "required_for_original_parity": "Весь требуемый исходный парк и модельные события, надписи, сопла, LOD, texture IDs/состояния",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G34",
+      "area": "Кабины/иконки/шрифты",
+      "current": "Современное представление",
+      "required_for_original_parity": "Поддержка всех исходных функций и видов; имеющиеся6CABIN/bitmap-таблицы не подключены целиком",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G35",
+      "area": "Звук и музыка",
+      "current": "В игровом цикле нет исходного воспроизведения",
+      "required_for_original_parity": "RAW-эффекты, HMP-музыка, события, громкости и состояния",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G36",
+      "area": "CD-видео/видеопортреты",
+      "current": "Нет воспроизведения и нет файлов в пользовательском архиве",
+      "required_for_original_parity": "Отдельно получить полный исходный комплект медиа и реализовать его потребитель",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G37",
+      "area": "Русификация",
+      "current": "Русский UI, часть имён",
+      "required_for_original_parity": "Полный текстовый корпус, параметры, кодировка/глифы, диалоги/газеты/миссии и контекстная проверка",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    },
+    {
+      "id": "G38",
+      "area": "Android-проверка",
+      "current": "Технически проверенный ARM64 APK, desktop-кадры",
+      "required_for_original_parity": "Физический S23 Ultra: касания, пауза/возврат, установка, отчёты, длительный полёт, память/FPS/нагрев",
+      "complete_original_subsystem_proven": false,
+      "review_type": "static_semantic_domain_review_with_documented_limits"
+    }
+  ],
+  "next_functional_priority": "Original system information, FF text interpreter and F842/F843/F863/F895 pages",
+  "runtime_changed_by_audit": false,
+  "provided_archive_missing_cd_fmv": true
+}

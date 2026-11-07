@@ -1,0 +1,249 @@
+{
+  "schema": 1,
+  "audit": "ships-economy-combat-static-parity",
+  "timestamp_utc": "2026-11-07T10:08:02.745748+00:00",
+  "working_head": "155bcd9777a1cb5266a1d1141b94aabcf7022541",
+  "scope": "Targeted source and live consumer inspection only; no APK, Godot gameplay, native oracle or hardware rerun. Not a claim of whole-assembly review.",
+  "upstream_ffe_asm_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "upstream_ffedat_asm_sha256": "34219c91c5d019440ebf4fc707711a32c5080123ede05cf4d10a27d41f770850",
+  "source_function_labels_checked": [
+    {
+      "function": "F236",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 18761,
+      "label": "FUNC_000236:"
+    },
+    {
+      "function": "F237",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 18924,
+      "label": "FUNC_000237:"
+    },
+    {
+      "function": "F619",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 42500,
+      "label": "FUNC_000619:"
+    },
+    {
+      "function": "F620",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 42571,
+      "label": "FUNC_000620:"
+    },
+    {
+      "function": "F622",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 42654,
+      "label": "FUNC_000622:"
+    },
+    {
+      "function": "F633",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 43279,
+      "label": "FUNC_000633:"
+    },
+    {
+      "function": "F634",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 43543,
+      "label": "FUNC_000634:"
+    },
+    {
+      "function": "F635",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 43576,
+      "label": "FUNC_000635:"
+    },
+    {
+      "function": "F724",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 47844,
+      "label": "FUNC_000724:"
+    },
+    {
+      "function": "F725",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 47870,
+      "label": "FUNC_000725:"
+    },
+    {
+      "function": "F753",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 49665,
+      "label": "FUNC_000753:"
+    },
+    {
+      "function": "F754",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 49779,
+      "label": "FUNC_000754:"
+    },
+    {
+      "function": "F774",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 50765,
+      "label": "FUNC_000774:"
+    },
+    {
+      "function": "F819",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 53872,
+      "label": "FUNC_000819:"
+    },
+    {
+      "function": "F902",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 67122,
+      "label": "FUNC_000902:"
+    },
+    {
+      "function": "F903",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 67190,
+      "label": "FUNC_000903:"
+    },
+    {
+      "function": "F929",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 69365,
+      "label": "FUNC_000929:"
+    },
+    {
+      "function": "F930",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 69454,
+      "label": "FUNC_000930:"
+    },
+    {
+      "function": "F931",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 69550,
+      "label": "FUNC_000931:"
+    },
+    {
+      "function": "F933",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 69855,
+      "label": "FUNC_000933:"
+    },
+    {
+      "function": "F934",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 69911,
+      "label": "FUNC_000934:"
+    },
+    {
+      "function": "F935",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 69987,
+      "label": "FUNC_000935:"
+    },
+    {
+      "function": "F938",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 70122,
+      "label": "FUNC_000938:"
+    },
+    {
+      "function": "F941",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 70399,
+      "label": "FUNC_000941:"
+    },
+    {
+      "function": "F942",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 70650,
+      "label": "FUNC_000942:"
+    },
+    {
+      "function": "F946",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 70932,
+      "label": "FUNC_000946:"
+    },
+    {
+      "function": "F947",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 70948,
+      "label": "FUNC_000947:"
+    },
+    {
+      "function": "F948",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 70976,
+      "label": "FUNC_000948:"
+    },
+    {
+      "function": "F952",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 71154,
+      "label": "FUNC_000952:"
+    },
+    {
+      "function": "F953",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 71190,
+      "label": "FUNC_000953:"
+    },
+    {
+      "function": "F1014",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 74965,
+      "label": "FUNC_001014:"
+    },
+    {
+      "function": "F1538",
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line": 91412,
+      "label": "FUNC_001538:"
+    }
+  ],
+  "source_registry_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "registry_records": 57,
+  "registry_index_range": [
+    15,
+    71
+  ],
+  "registry_spec_bytes": [
+    24
+  ],
+  "selection_pool_count": 19,
+  "adapted_playable_profile_count": 3,
+  "adapted_playable_ids": [
+    "cobra",
+    "eagle",
+    "shuttle"
+  ],
+  "adapted_good_count": 6,
+  "adapted_equipment_count": 4,
+  "runtime_gd_files_searched": 101,
+  "selected_nondefinition_callsites": {
+    "fire": [],
+    "shield_capacity": [],
+    "cooling_rate": [],
+    "install_equipment": [],
+    "remove_equipment": []
+  },
+  "examined_runtime_inputs_sha256": {
+    "scripts/ship_catalog.gd": "c3c077d107336a8ffe30165291f6e3bee785ee8a262b88ef48262ff38dad7a06",
+    "scripts/flight_model.gd": "8da5454be81142412ba8bcfb4df0154ae43d906a73fc1f04f5650ec1d57b3391",
+    "scripts/economy_catalog.gd": "bb91fcfaf70f8fe75afc6e06f0e104a9120e33ee0ddbf6c3c36c83fffadd670e",
+    "scripts/navigation.gd": "aee7aeffccd200290c435cabf708c0e4ec5dc852fbae30f85b2bedce1c2a6b80",
+    "scripts/main.gd": "61dd63e92cc7b2bebdb86859ccc5a8e5653f5376fbf0616d168f4c1ab4652d30",
+    "scripts/source_ship_control_profile.gd": "de2d0aed1943af69160f16b4b4892fea37afbc97c707a7b0870bba9b1805562e",
+    "scripts/source_motion_bridge.gd": "7f5a805ca0a9675262ce511e28e4306df12b2b3cb5992dbb76d6e42f97f0bb9a",
+    "scripts/training_dock_services.gd": "1613ae776e378c14e8130cd2bf1ec25812c2d167b681e298cdc757a3e0e17924",
+    "scripts/dock_services_view.gd": "79d1ca1f4d9f7e439c877bd71444de3da42159c6195697e992dadbcf9fb0a2a6",
+    "scripts/source_mining_machine.gd": "cdbcef39b2ec2ec777fb68da483b53f8a8ec3a986dad6f2722a436a6f8f52ddb",
+    "scripts/ship_visual.gd": "674f0be53f51205813b396591c110dd5e5e982fe35a78287db17d04c4d9e7bae",
+    "scripts/flight_reticle.gd": "d25918f69e2857a4ee8283d1d267a2a126f72dfc680197b73f0f0a6c85c5ac7a",
+    "data/ffe_ship_registry.json": "07ccae9d6674bef40a7a5d2311a216b083ebdf010d5d47b187f7520de3b5d61a",
+    "data/ships.json": "944974a355019507fefe53f79dffc19d24e838fe650d34a52fbc00c692b8571a",
+    "recovered-history/ground_harness/tools/extract_ship_registry.py": "11c717720ba0f0e0fe3bd4cc17e825d57f2e620e9e6c155870d65896a1dd5712"
+  },
+  "original_ship_equipment_economy_combat_parity_complete": false,
+  "physical_device_tested": false,
+  "document": "docs/PARITY_AUDIT_SHIPS_ECONOMY_COMBAT_RU.md"
+}

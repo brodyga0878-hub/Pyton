@@ -1,0 +1,330 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-07",
+  "document": "docs/PARITY_AUDIT_CAMPAIGN_CONTENT_RU.md",
+  "method": "static read-only source and resource inventory audit; no tests/builds/gameplay executed",
+  "overall_parity": "not_complete",
+  "coverage_limit": "Targeted campaign/BBS/journal/audio/save flows only; not all1615 source function definitions or all original content audited",
+  "source_hashes": [
+    {
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+      "line_count": 133134
+    },
+    {
+      "path": "/workspace/ffe-upstream/jjffe/ffedat.asm",
+      "sha256": "34219c91c5d019440ebf4fc707711a32c5080123ede05cf4d10a27d41f770850",
+      "line_count": 29067
+    },
+    {
+      "path": "/workspace/ffe-upstream/jjffe/sdl/sdlsound.cpp",
+      "sha256": "6b949af7460527972f9b081dcdb8730be4cfc26870bda1daf33c59f39279f2e8",
+      "line_count": 388
+    },
+    {
+      "path": "/workspace/ffe-upstream/jjffe/win32/w32sound.cpp",
+      "sha256": "1d35c9f1c13f14b0d9c7639b2ce78594975a1b8e326cee9dcf310cabf1582754",
+      "line_count": 779
+    },
+    {
+      "path": "/workspace/ffe-upstream/jjffe/srctools/cbbs.txt",
+      "sha256": "02d4137f5ed4fdf1efa1ffb24087b894b853137d41d470d504971b844b66b9b8",
+      "line_count": 1111
+    },
+    {
+      "path": "/workspace/ffe-upstream/jjffe/srctools/gmstruct.txt",
+      "sha256": "08b1fd2c3a437a423c08ddd3e2575c4ef41d9c97f349384710b5e1797da3c614",
+      "line_count": 343
+    },
+    {
+      "path": "/workspace/Pyton/scripts/main.gd",
+      "sha256": "61dd63e92cc7b2bebdb86859ccc5a8e5653f5376fbf0616d168f4c1ab4652d30",
+      "line_count": 1164
+    },
+    {
+      "path": "/workspace/Pyton/scripts/flight_model.gd",
+      "sha256": "8da5454be81142412ba8bcfb4df0154ae43d906a73fc1f04f5650ec1d57b3391",
+      "line_count": 540
+    },
+    {
+      "path": "/workspace/Pyton/scripts/save_store.gd",
+      "sha256": "8af7d350fcd3eaa1dc32f5aacf5e9afdf3424b181ef5964468f584412cd52634",
+      "line_count": 46
+    },
+    {
+      "path": "/workspace/Pyton/scripts/navigation.gd",
+      "sha256": "aee7aeffccd200290c435cabf708c0e4ec5dc852fbae30f85b2bedce1c2a6b80",
+      "line_count": 140
+    },
+    {
+      "path": "/workspace/Pyton/scripts/planetary_system.gd",
+      "sha256": "f243ebb2699bce714386e87ca32bfdb35709a2c9c45178cac9fa6cb8874abc62",
+      "line_count": 764
+    },
+    {
+      "path": "/workspace/Pyton/scripts/surface_model.gd",
+      "sha256": "a8e2825fd2daae3a9e66783cd0c77dd87e12d249187281147984e652677e2ab5",
+      "line_count": 836
+    },
+    {
+      "path": "/workspace/Pyton/scripts/training_dock_services.gd",
+      "sha256": "1613ae776e378c14e8130cd2bf1ec25812c2d167b681e298cdc757a3e0e17924",
+      "line_count": 215
+    },
+    {
+      "path": "/workspace/Pyton/scripts/dock_services_view.gd",
+      "sha256": "79d1ca1f4d9f7e439c877bd71444de3da42159c6195697e992dadbcf9fb0a2a6",
+      "line_count": 136
+    },
+    {
+      "path": "/workspace/Pyton/scripts/economy_catalog.gd",
+      "sha256": "bb91fcfaf70f8fe75afc6e06f0e104a9120e33ee0ddbf6c3c36c83fffadd670e",
+      "line_count": 31
+    },
+    {
+      "path": "/workspace/Pyton/scripts/source_model_mesh.gd",
+      "sha256": "6642ce62a1a8046c71a57fb08325304c8d12c3bc61b90921d458ef84ad21472e",
+      "line_count": 496
+    },
+    {
+      "path": "/workspace/Pyton/scripts/source_model_visual.gd",
+      "sha256": "d8f5c42cc10e0ad8f7f179d824bb8c0aa94e63833cf0bfd62f2594f29bc5c774",
+      "line_count": 139
+    }
+  ],
+  "resource_inventory": "validation/parity-audit-2026-11-07/resource-inventory.json",
+  "archive_sha256": "8495ca9a5c7714816c62255810bb88b878dab8f33b09090ef5e57a3ffafcd7fd",
+  "selected_archive_resources": [
+    {
+      "path": "FIRSTENC/IMAGE.DAT",
+      "type": "file",
+      "size_bytes": 2463,
+      "crc32": "6D47B10B",
+      "sha256": "1611863697d7bae3655d65c21251fe162faf56752d740dc675898bfa837e7d4d",
+      "extension": ".dat",
+      "ascii_runs_ge10_count": 56,
+      "category": "installation_file_manifest",
+      "runtime_status": "not_imported_installation_replaced",
+      "runtime_counterparts": []
+    },
+    {
+      "path": "FIRSTENC/MISSION.DAT",
+      "type": "file",
+      "size_bytes": 779951,
+      "crc32": "C133E35E",
+      "sha256": "3cf36755c7420f12281ca8a55f11dbc9787bacaeef49edc4584338f77dc94afc",
+      "extension": ".dat",
+      "ascii_runs_ge10_count": 0,
+      "category": "compressed_journal_mission_content",
+      "runtime_status": "not_imported_no_campaign_reader_runtime",
+      "runtime_counterparts": []
+    },
+    {
+      "path": "FIRSTENC/LANGRC.RES",
+      "type": "file",
+      "size_bytes": 6274,
+      "crc32": "F576BCDE",
+      "sha256": "6cc34bc19eaeafa5e7ac47f542572be505d7127b1715585c013e9a06f8cb53df",
+      "extension": ".res",
+      "ascii_runs_ge10_count": 244,
+      "category": "installer_language_resource",
+      "runtime_status": "not_game_localization_runtime",
+      "runtime_counterparts": []
+    }
+  ],
+  "observed_counts": {
+    "mission_string_table_references": 468,
+    "original_music_slot_count": 17,
+    "original_sound_slot_count": 40,
+    "campaign_global_saved_dwords": 71,
+    "campaign_saved_record_scan_count": 105,
+    "dynamic_saved_record_count": 150,
+    "dynamic_saved_record_bytes": 36
+  },
+  "count_caveat": "Counts are table/serialization sizes, not playable mission counts, total distinct original texts, simultaneous NPC counts or parity percentages",
+  "features": [
+    {
+      "id": "campaign_vm",
+      "original": "present",
+      "archive": "embedded original executable and external MISSION.DAT; full script coverage not decoded",
+      "runtime": "missing",
+      "source_refs": [
+        "ffe.asm:2240",
+        "ffe.asm:3507",
+        "ffe.asm:6654",
+        "ffedat.asm:612"
+      ],
+      "repo_refs": [
+        "scripts/main.gd:1001",
+        "scripts/flight_model.gd:433"
+      ],
+      "confidence": "observed table/handler and current save contracts; not all opcode semantics audited"
+    },
+    {
+      "id": "thargoid_story",
+      "original": "present",
+      "archive": "story resources identified; complete trigger graph not traced",
+      "runtime": "missing",
+      "source_refs": [
+        "ffedat.asm:1003",
+        "ffedat.asm:1033",
+        "ffedat.asm:1117",
+        "ffedat.asm:1129",
+        "ffedat.asm:1143",
+        "ffedat.asm:1169"
+      ],
+      "repo_refs": [
+        "data/ffe_ship_registry.json",
+        "scripts/flight_model.gd:372"
+      ],
+      "unknown": [
+        "home-system exact coordinates",
+        "all encounter and fleet spawn conditions",
+        "all branching outcomes in selected original version"
+      ]
+    },
+    {
+      "id": "bbs",
+      "original": "present",
+      "archive": "code and data available",
+      "runtime": "missing_original_bbs",
+      "source_refs": [
+        "ffe.asm:31582",
+        "ffe.asm:31640",
+        "ffe.asm:31672"
+      ],
+      "repo_refs": [
+        "scripts/main.gd:925",
+        "scripts/training_dock_services.gd:175"
+      ]
+    },
+    {
+      "id": "passengers_parcels_crew_military_reputation",
+      "original": "present",
+      "archive": "code and tables identified",
+      "runtime": "missing; inventory cargo containers do not implement these rules",
+      "source_refs": [
+        "ffe.asm:32437",
+        "ffe.asm:32492",
+        "ffe.asm:34229",
+        "ffe.asm:34603",
+        "ffedat.asm:5696",
+        "srctools/gmstruct.txt:212",
+        "srctools/gmstruct.txt:293"
+      ],
+      "repo_refs": [
+        "scripts/flight_model.gd:16",
+        "scripts/flight_model.gd:433",
+        "scripts/economy_catalog.gd:3"
+      ]
+    },
+    {
+      "id": "five_newspapers",
+      "original": "present",
+      "archive": "MISSION.DAT available, not fully decoded",
+      "runtime": "missing",
+      "source_refs": [
+        "ffedat.asm:1271",
+        "ffedat.asm:1824",
+        "ffedat.asm:2648",
+        "ffedat.asm:3028",
+        "ffe.asm:9991",
+        "ffe.asm:11448"
+      ],
+      "repo_refs": [
+        "data/ffe_system_names.json",
+        "data/ffe_planet_names.json"
+      ]
+    },
+    {
+      "id": "audio",
+      "original": "present; backend dependent implementation",
+      "archive": "17 MUSIC HMP and23 FX RAW plus one test each",
+      "runtime": "no playback consumer found; source model sound event retained only",
+      "source_refs": [
+        "sdl/sdlsound.cpp:16",
+        "sdl/sdlsound.cpp:62",
+        "sdl/sdlsound.cpp:178",
+        "sdl/sdlsound.cpp:377",
+        "win32/w32sound.cpp:328"
+      ],
+      "repo_refs": [
+        "scripts/source_model_mesh.gd:187",
+        "scripts/source_model_visual.gd:91"
+      ]
+    },
+    {
+      "id": "video_communications",
+      "original": "AVI/RIFF decoder and BBS video chain present",
+      "archive": "required AVI and character media not present in this RAR; retail set completeness unknown",
+      "runtime": "missing",
+      "source_refs": [
+        "ffe.asm:12772",
+        "ffe.asm:13675",
+        "ffe.asm:35853",
+        "ffe.asm:67944",
+        "ffedat.asm:8586"
+      ],
+      "repo_refs": [
+        "scripts/dock_services_view.gd:72"
+      ]
+    },
+    {
+      "id": "commander_save_compatibility",
+      "original": "binary compressed/scrambled state plus scripting and journal state",
+      "archive": "empty COMMANDR directory; existing saved commanders unavailable for fixture audit",
+      "runtime": "new JSON save format; no original commander import/export found",
+      "source_refs": [
+        "ffe.asm:6898",
+        "ffe.asm:6994",
+        "ffe.asm:7227",
+        "ffe.asm:15526",
+        "ffe.asm:15607",
+        "ffe.asm:15825",
+        "ffe.asm:15947"
+      ],
+      "repo_refs": [
+        "scripts/save_store.gd:2",
+        "scripts/main.gd:1001",
+        "scripts/main.gd:1010",
+        "scripts/main.gd:1069"
+      ]
+    },
+    {
+      "id": "global_world_persistence",
+      "original": "broader original state includes story rosters and object blocks",
+      "archive": "procedures available; full type schema and all event links not reconstructed",
+      "runtime": "partial reconstructed flight/world/surface/visited/station/spin/motion snapshots",
+      "source_refs": [
+        "ffe.asm:6922",
+        "ffe.asm:6935",
+        "ffe.asm:6963",
+        "ffe.asm:15537"
+      ],
+      "repo_refs": [
+        "scripts/navigation.gd:103",
+        "scripts/planetary_system.gd:502",
+        "scripts/planetary_system.gd:533",
+        "scripts/surface_model.gd:456",
+        "scripts/main.gd:1001"
+      ]
+    }
+  ],
+  "not_executed": [
+    "native campaign opcode oracle",
+    "all Thargoid branching playthroughs",
+    "full MISSION.DAT decode",
+    "original commander import/export verification",
+    "music/sound playback",
+    "AVI playback"
+  ],
+  "acceptance_document_section": "Что требуется для доказательства полного соответствия",
+  "unknowns": [
+    "full retail/CD resource set completeness",
+    "all original script opcode side effects",
+    "homeworld exact coordinates and encounter spawn graph",
+    "all newsletter articles and publication conditions",
+    "all original save blocks/pointers/dynamic links",
+    "other intelligent species outside reviewed source tables"
+  ]
+}

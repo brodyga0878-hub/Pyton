@@ -84,7 +84,7 @@ class FullPackagingChecks(unittest.TestCase):
         self.assertFalse(result['physical_device_tested'])
 
     def test_retained_orbit_native_provenance_still_runs_for_v34(self):
-        for code in [34,35,36]:
+        for code in [34,35,36,37]:
             with self.subTest(version_code=code):
                 result=verifier.verify_source_orbit_runtime(self.archive,PROJECT,code)
                 self.assertEqual(result['new_game_requested_layout'],'source_jjffe_systems_v4')
@@ -93,7 +93,7 @@ class FullPackagingChecks(unittest.TestCase):
                 self.assertEqual(result['retained_local_physics_adapter'],'analytic_si_rebuild_v1')
 
     def test_retained_v3_raw_physics_checks_are_not_relaxed(self):
-        for code in [34,35,36]:
+        for code in [34,35,36,37]:
             with self.subTest(version_code=code):
                 result=verifier.verify_source_physics_ports_runtime(self.archive,PROJECT,code)
                 self.assertEqual(result['reported_layout_scope'],'retained-v3-layout')
@@ -335,5 +335,72 @@ class FullPackagingChecks(unittest.TestCase):
             path=project/'tests/fixtures/source_motion_native.json';fixture=json.loads(path.read_text());fixture['source_assembly_sha256']='0'*64;path.write_text(json.dumps(fixture))
             with self.assertRaisesRegex(AssertionError,'Wrong navigation native reference provenance'):
                 verifier.verify_navigation_runtime(self.archive,project)
+
+    def map_visual_project(self,directory,replacements=None):
+        project=Path(directory)
+        for relative in (*verifier.MAP_VISUAL_PROTECTED_SOURCE_SHA256,'scripts/galactic_map_view.gd'):
+            target=project/relative;target.parent.mkdir(parents=True,exist_ok=True)
+            raw=(PROJECT/relative).read_text()
+            for old,new in (replacements or {}).get(relative,[]):
+                self.assertIn(old,raw,'Mutation must affect the intended protected input')
+                raw=raw.replace(old,new)
+            target.write_text(raw)
+        return project
+
+    def test_modern_map_visual_scope_is_explicitly_presentation_only(self):
+        result=verifier.verify_map_visual_runtime(self.archive,PROJECT)
+        self.assertEqual(result['presentation_profile'],'navy-star-chart-v1')
+        self.assertEqual(result['baseline_source_commit'],'e4e8e7edccdb4422124f249365dfb8c99d135bb5')
+        self.assertEqual(result['protected_source_data_count'],18)
+        self.assertEqual(result['protected_view_function_count'],7)
+        self.assertEqual(result['additional_runtime_modules'],0)
+        self.assertEqual(result['additional_shaders'],0)
+        self.assertEqual(result['additional_textures'],0)
+        self.assertTrue(result['original_map_data_preserved'])
+        self.assertTrue(result['display_color_transfer_is_presentation'])
+        self.assertFalse(result['complete_original_renderer'])
+        self.assertFalse(result['compiled_source_correspondence_rebuilt_by_verifier'])
+        self.assertFalse(result['behavior_proved_by_this_package_check'])
+        self.assertFalse(result['physical_device_tested'])
+
+    def test_modern_map_missing_or_invalid_compiled_view_rejects(self):
+        path='assets/scripts/galactic_map_view.gdc'
+        for mutation in ['missing','invalid_header']:
+            with self.subTest(mutation=mutation):
+                archive=MockArchive()
+                if mutation=='missing':del archive.entries[path]
+                else:archive.entries[path]=b'not-GDSC'+b'x'*100
+                with self.assertRaisesRegex(AssertionError,'(?:Missing|Invalid compiled) modern map visual runtime'):
+                    verifier.verify_map_visual_runtime(archive,PROJECT)
+
+    def test_modern_map_requires_presentation_profile(self):
+        with tempfile.TemporaryDirectory() as directory:
+            project=self.map_visual_project(directory,{'scripts/galactic_map_view.gd':[('PRESENTATION_PROFILE','UNDECLARED_PRESENTATION_PROFILE')]})
+            with self.assertRaisesRegex(AssertionError,'Modern map presentation profile missing'):
+                verifier.verify_map_visual_runtime(self.archive,project)
+
+    def test_modern_map_requires_actual_presentation_consumer(self):
+        with tempfile.TemporaryDirectory() as directory:
+            project=self.map_visual_project(directory,{'scripts/galactic_map_view.gd':[('"presentation_profile"','"unconnected_presentation_profile"')]})
+            with self.assertRaisesRegex(AssertionError,'Modern map presentation profile is not consumed'):
+                verifier.verify_map_visual_runtime(self.archive,project)
+
+    def test_visual_map_update_cannot_change_protected_gameplay_or_data(self):
+        for relative in ['scripts/main.gd','scripts/galactic_map_model.gd','scripts/system_map_view.gd','scripts/source_motion_bridge.gd','data/ffe_galactic_map.json']:
+            with self.subTest(relative=relative),tempfile.TemporaryDirectory() as directory:
+                project=self.map_visual_project(directory)
+                path=project/relative;path.write_bytes(path.read_bytes()+b'\n')
+                with self.assertRaisesRegex(AssertionError,'Visual-only map update changed protected source/data'):
+                    verifier.verify_map_visual_runtime(self.archive,project)
+
+    def test_visual_map_update_retains_worker_explicit_jump_and_input_deduplication(self):
+        changes=[('candidate.load_sector_window(center)','candidate.load_sector_window(Vector2.ZERO)'),
+                 ('jump_requested.emit(int(model.selected_id))','system_selected.emit(int(model.selected_id))'),
+                 ('event.device==-1','event.device==999')]
+        for old,new in changes:
+            with self.subTest(mutation=old),tempfile.TemporaryDirectory() as directory:
+                project=self.map_visual_project(directory,{'scripts/galactic_map_view.gd':[(old,new)]})
+                with self.assertRaisesRegex(AssertionError,'Visual-only map update changed protected input/worker function'):
+                    verifier.verify_map_visual_runtime(self.archive,project)
 
 if __name__=='__main__':unittest.main()

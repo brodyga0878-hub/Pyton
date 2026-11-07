@@ -1,0 +1,6092 @@
+{
+  "schema": 1,
+  "audit": "physics-flight-surface-time-scoop-mining-parity",
+  "created_utc": "2026-11-07T10:09:56.807689+00:00",
+  "repo_head": "155bcd9777a1cb5266a1d1141b94aabcf7022541",
+  "reference_target": "User-supplied DOS executable; pinned JJFFE is a code helper with known patches, not automatically behavior-equivalent.",
+  "pinned_jjffe_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+  "assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "data_assembly_sha256": "34219c91c5d019440ebf4fc707711a32c5080123ede05cf4d10a27d41f770850",
+  "historical_extractor_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "method": "Static source/consumer inspection and read-only metadata of existing independent fixtures. No newly executed oracle, test, APK, binary-wide semantic equivalence, or physical-device claim. Function call index is not a completeness or understanding score.",
+  "findings": [
+    {
+      "id": "P01",
+      "original_mechanism": "Полный цикл игрока: F1007 `:74532`, F1019 `:75178`, F1021 `:75373`, F1041 `:76874`, F1043 `:77000`",
+      "current_consumer": "`main.gd:306`, `flight_model.gd:256`",
+      "status_and_gap": "**Частично.** Нет общего исходного автомата игрока, объектного банка, событий и всех исходных порядков вызовов"
+    },
+    {
+      "id": "P02",
+      "original_mechanism": "Угловые команды/остатки: F584 `:38960`, F585 `:39023`, F609 `:41698`, F611",
+      "current_consumer": "`main.gd:353`, `flight_model.gd:286`, `source_motion_bridge.gd:53`",
+      "status_and_gap": "**Адаптировано.** Quaternion-поворот по скорости из профиля; F585 не исполняется в игре"
+    },
+    {
+      "id": "P03",
+      "original_mechanism": "Шесть осей тяги, set-speed и kick: F598–F602 `:40308`, F607 `:41576`",
+      "current_consumer": "`source_motion_pipeline.gd:115`, `source_motion_bridge.gd:137`",
+      "status_and_gap": "**Исходное ядро в узкой игре.** Не все корабли/режимы/оборудование; телефонный throttle — отдельное отображение ввода"
+    },
+    {
+      "id": "P04",
+      "original_mechanism": "Исходные raw position / velocity / fractions: F603 `:41012`, F1511 `:90203`, F1512 `:90407`",
+      "current_consumer": "`source_gravity.gd`, `source_motion_pipeline.gd:115`",
+      "status_and_gap": "Ядра есть; полная цепь игрока и исходный таймер не замкнуты. Остальной Flight хранит SI Vector3/Quaternion"
+    },
+    {
+      "id": "P05",
+      "original_mechanism": "Выбор родителя и переходы FOR: F570 `:35983`, F590 `:39512`, F604 `:41205`, F605 `:41263`, F606 `:41390`",
+      "current_consumer": "`World.focus_id`, явный transfer, `source_motion_bridge.gd:116`",
+      "status_and_gap": "**Нет полного живого переноса.** Родитель задаётся контекстом, автоматический исходный выбор FOR не исполняется"
+    },
+    {
+      "id": "P06",
+      "original_mechanism": "Преобразование вращающегося кадра F572 `:36217`, F573 `:36277`",
+      "current_consumer": "`source_frame_kinematics.gd:24`",
+      "status_and_gap": "**Отдельное исходное ядро.** Не подключено к Main; не заменяет translation, выбор FOR и относительную скорость родителя"
+    },
+    {
+      "id": "P07",
+      "original_mechanism": "Скорость движущегося родителя: F595 `:39770`, F604/F605, F866 `:60570`",
+      "current_consumer": "`planetary_system.gd:166`, `:607`, `source_motion_bridge.gd:85`",
+      "status_and_gap": "Орбиты движутся; полного исходного преобразования скорости при смене/движении origin нет"
+    },
+    {
+      "id": "P08",
+      "original_mechanism": "Гравитация F603 и родитель объекта",
+      "current_consumer": "`planetary_system.gd:622`, `source_physics_bridge.gd:31`",
+      "status_and_gap": "Raw ядро есть. SI fallback получает силу из отдельного образца F603 при 49710 ticks; это не тождество исходному покадровому интегратору"
+    },
+    {
+      "id": "P09",
+      "original_mechanism": "Исходный маршрут/торможение/автопилот F589/F610…, F597 `:39933`, F1019/F1020",
+      "current_consumer": "`flight_model.gd:194`, `surface_model.gd:326`, `:400`, `:819`",
+      "status_and_gap": "**Адаптировано.** Подход по waypoint/sqrt/slerp; исходный общий автопилот, состояния/оборудование и обход объектов не перенесены полностью"
+    },
+    {
+      "id": "P10",
+      "original_mechanism": "Внутрисистемный перелёт как реальное движение",
+      "current_consumer": "`planetary_system.gd:439`, `:475`",
+      "status_and_gap": "**Адаптированный transfer.** 3 секунды подготовки, затем добавление суток и смена позиции/скорости; не полный баллистический маршрут"
+    },
+    {
+      "id": "P11",
+      "original_mechanism": "Гипердальность/расход/срок/ошибки: F899–F903 `:67040`, F908–F910 `:67494`",
+      "current_consumer": "`navigation.gd:6`, `:42`, `:63`, `:73`",
+      "status_and_gap": "Бак12, `ceil(distance/4)`, заряд3с, `max(0.02,distance*0.1)` суток; исходная формула привода/массы/топлива не подключена"
+    },
+    {
+      "id": "P12",
+      "original_mechanism": "Полный контакт/классификатор: F569 `:35957` → F570 → F575 `:36373`; F574 `:36334`, F582 `:38524`, F583 `:38803`",
+      "current_consumer": "`source_ground_surface.gd:210`, `source_station_geometry.gd`, `surface_model.gd:565`",
+      "status_and_gap": "Исходные специальные kernels и геометрия есть, **общая collision VM и реакция игрока не перенесены целиком**"
+    },
+    {
+      "id": "P13",
+      "original_mechanism": "Шасси и исходные условия посадки: F1008 `:74681`, F575 `:36572`",
+      "current_consumer": "`surface_model.gd:355`, `:374`, `ship_visual.gd`",
+      "status_and_gap": "Нет исходного управляемого физического состояния шасси и полного посадочного автомата; критерий6м/с/altitude — адаптер"
+    },
+    {
+      "id": "P14",
+      "original_mechanism": "Непрерывная орбита → поверхность → орбита",
+      "current_consumer": "`surface_model.gd:200`, `:221`, `:426`, `:777`; `surface_orbit_link.gd`",
+      "status_and_gap": "Географическая связь работает частично. Есть speed/g/height caps, быстрый вход и обнуление скорости; исходное непрерывное движение не достигнуто"
+    },
+    {
+      "id": "P15",
+      "original_mechanism": "Посадка на все действительно твёрдые исходные модели",
+      "current_consumer": "`source_world_catalogue.gd:58`, `source_surface_terrain.gd:44`",
+      "status_and_gap": "Live natural terrain только117–133 с дополнительным type filter. 112–116 и все прочие твёрдые формы не покрыты общей посадкой"
+    },
+    {
+      "id": "P16",
+      "original_mechanism": "Астероиды и отдельные объекты: F1036 `:76393`, F765 `:50303`",
+      "current_consumer": "offline112 spike; `space_environment.gd`",
+      "status_and_gap": "Исходные112 vertices/bytes исследованы отдельно. Нет полного live asteroid object lifecycle/collision/landing/mining. Декоративное поле не является им"
+    },
+    {
+      "id": "P17",
+      "original_mechanism": "Кометные ядра",
+      "current_consumer": "Отдельный доказанный source class/живой механический объект в проверенном пути не найден",
+      "status_and_gap": "**Не установлено для оригинала; нет реализации требования проекта.** Нельзя объявить все кометы реализованными или придумать их ради метки «клон»"
+    },
+    {
+      "id": "P18",
+      "original_mechanism": "Атмосферный флаг/высота/drag/нагрев: F569/F575, F1014 `:74965`, F1007 `:74532`",
+      "current_consumer": "`surface_model.gd`, визуальный `atmosphere.gdshader`",
+      "status_and_gap": "**Нет исходного живого температурно-аэродинамического цикла.** Shader не нагревает корпус и не создаёт исходное сопротивление"
+    },
+    {
+      "id": "P19",
+      "original_mechanism": "Реактивный бак и автозаправщик: F929 `:69365`",
+      "current_consumer": "`navigation.fuel`, raw Motion template",
+      "status_and_gap": "**Нет живой реализации.** Не расходуется отдельный `PhysObj+0x11e`, не выключается тяга от его исчерпания"
+    },
+    {
+      "id": "P20",
+      "original_mechanism": "Fuel scoop у газового гиганта/звезды: F1033 `:76144`",
+      "current_consumer": "В Main отсутствует соответствующий consumer",
+      "status_and_gap": "**Не подключён.** Нет атмосферной проверки, тонны Hydrogen в cargo, исходной задержки и тепловой ветви"
+    },
+    {
+      "id": "P21",
+      "original_mechanism": "Сбор физических грузов/трактор: F714 `:47194`, F1034 `:76284`",
+      "current_consumer": "`flight_model.gd.goods` — словарь инвентаря",
+      "status_and_gap": "**Нет полного живого цикла.** Нет исходного потока грузовых объектов/контакта/удаления/ракеты-подвески"
+    },
+    {
+      "id": "P22",
+      "original_mechanism": "Реальная стрельба/горный лазер: F930 `:69454`, F931 `:69550`, F926",
+      "current_consumer": "`flight_model.gd:380`",
+      "status_and_gap": "`fire()` только увеличивает shots. Нет исходного mining-laser попадания, fragment spawning, heat/fuel consumption"
+    },
+    {
+      "id": "P23",
+      "original_mechanism": "MB4 развёртывание/обратная загрузка: F246 `:19387`, F247 `:19670`, F253 `:19957`, F1122 `:82644`",
+      "current_consumer": "`source_mining_machine.gd:24`, `:63`",
+      "status_and_gap": "**Отдельный узкий kernel.** У игрока нет физического отделяемого аппарата, команды и полного возврата в трюм"
+    },
+    {
+      "id": "P24",
+      "original_mechanism": "Недельный MB4 и мир/сохранение: F243 `:19204`, смена дня `:68546`",
+      "current_consumer": "`source_mining_machine.gd:50`, `main.gd::_payload`",
+      "status_and_gap": "Kernel считает предоставленные события; общий недельный scheduler и array52-byte machines в игровом save не интегрированы"
+    },
+    {
+      "id": "P25",
+      "original_mechanism": "Добыча/проспекция и специальная111",
+      "current_consumer": "F246 `:19489`, F247, `ffedat.asm:8500`",
+      "status_and_gap": "Оценка исходного месторождения, специальные модели/кампания/вакцина не перенесены живым MB4. Не любое место обязано давать руду"
+    },
+    {
+      "id": "P26",
+      "original_mechanism": "Тепло оружия/щиты/ремонт/износ: F934 `:69911`, F938 `:70122`, F939 `:70291`, F953",
+      "current_consumer": "`flight_model.gd:500`, `:503`",
+      "status_and_gap": "Учебные capacity/cooling значения и hull; полного исходного цикла оборудования и повреждений нет"
+    },
+    {
+      "id": "P27",
+      "original_mechanism": "Обычные часы и ×1/10/100/1000/10000: F208 `:17066`, F217 `:18038`, F220 `:18230`, F1418 `:85652`",
+      "current_consumer": "`flight_time_controller.gd:9`, `:46`, `:103`, `main.gd:327`",
+      "status_and_gap": "Безопасный номинальный SI scheduler, не исходный планировщик. ×1000/10000 отключены; доступны максимум×100 и только при собственных safety caps"
+    },
+    {
+      "id": "P28",
+      "original_mechanism": "Полный исходный календарь событий/гиперрежим/overflow",
+      "current_consumer": "`source_clock.gd:15`, `:42`; source-control helper",
+      "status_and_gap": "Calendar decoder перенесён, но live master clock — float elapsed_days; original raw counter/event loop, Timer50Hz и гиперускорение полностью не перенесены"
+    },
+    {
+      "id": "P29",
+      "original_mechanism": "Док и вращение станции: F866, F865; исходный терминальный контакт F575",
+      "current_consumer": "`source_station_session.gd:39`, `:78`; `rotating_dock_dynamics.gd:21`; `flight_model.gd:151`",
+      "status_and_gap": "Source Q31 pose/door есть, ручной крен и относительная скорость есть; CCD/автопилот/impact response — собственные адаптеры, не весь исходный док"
+    },
+    {
+      "id": "P30",
+      "original_mechanism": "Исходные разрешения/очередь/штрафы/выход из дока: F1023–F1032, F1088–F1092",
+      "current_consumer": "`main.gd`, `world.station_launch_pending`, `SourceUndergroundController`",
+      "status_and_gap": "Рабочее ожидание двери и вылет не доказывают перенос всего исходного протокола и всех промежуточных состояний"
+    },
+    {
+      "id": "P31",
+      "original_mechanism": "Все физические состояния в save",
+      "current_consumer": "`flight_model.gd:385`, `main.gd::_payload`, source motion snapshot",
+      "status_and_gap": "Новая raw338+fraction сессия сохраняется; исходный полный мир объектов, fuel/heat/angular/MB4/AI/FOR states в игре отсутствует"
+    }
+  ],
+  "source_functions": [
+    {
+      "id": "F207",
+      "label": "FUNC_000207_SysMenuUpdateAccel",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 17049,
+      "line_end": 17065,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F208",
+      "label": "FUNC_000208_SysMenuProcessAccel",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 17066,
+      "line_end": 17204,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 17078,
+          "callee": "FUNC_001414_GuiGetLastAction",
+          "instruction": "call near [DATA_007672]    ; FUNC_001414_GuiGetLastAction"
+        },
+        {
+          "line": 17093,
+          "callee": "FUNC_001415_GuiSetLastAction",
+          "instruction": "call near [DATA_007673]    ; FUNC_001415_GuiSetLastAction"
+        },
+        {
+          "line": 17144,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 17154,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 17164,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 17174,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 17184,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 17189,
+          "callee": "FUNC_001415_GuiSetLastAction",
+          "instruction": "call near [DATA_007673]    ; FUNC_001415_GuiSetLastAction"
+        }
+      ]
+    },
+    {
+      "id": "F217",
+      "label": "FUNC_000217_SysMenuPlayTime",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 18038,
+      "line_end": 18078,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 18061,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        }
+      ]
+    },
+    {
+      "id": "F220",
+      "label": "FUNC_000220_SysMenuStopTime",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 18230,
+      "line_end": 18254,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 18241,
+          "callee": "FUNC_000207_SysMenuUpdateAccel",
+          "instruction": "call FUNC_000207_SysMenuUpdateAccel"
+        },
+        {
+          "line": 18245,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        }
+      ]
+    },
+    {
+      "id": "F242",
+      "label": "FUNC_000242",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 19191,
+      "line_end": 19203,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F243",
+      "label": "FUNC_000243",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 19204,
+      "line_end": 19314,
+      "research_level": "reviewed_body_in_scope",
+      "call_sites": [
+        {
+          "line": 19254,
+          "callee": "FUNC_000928",
+          "instruction": "call near [DATA_007219]    ; FUNC_000928"
+        },
+        {
+          "line": 19282,
+          "callee": "FUNC_000244",
+          "instruction": "call FUNC_000244"
+        },
+        {
+          "line": 19297,
+          "callee": "FUNC_000568",
+          "instruction": "call near [DATA_006140]    ; FUNC_000568"
+        }
+      ]
+    },
+    {
+      "id": "F244",
+      "label": "FUNC_000244",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 19315,
+      "line_end": 19351,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 19331,
+          "callee": "FUNC_001531",
+          "instruction": "call near [DATA_007753]    ; FUNC_001531"
+        },
+        {
+          "line": 19337,
+          "callee": "FUNC_000245",
+          "instruction": "call FUNC_000245"
+        }
+      ]
+    },
+    {
+      "id": "F245",
+      "label": "FUNC_000245",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 19352,
+      "line_end": 19386,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F246",
+      "label": "FUNC_000246",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 19387,
+      "line_end": 19669,
+      "research_level": "reviewed_body_in_scope",
+      "call_sites": [
+        {
+          "line": 19396,
+          "callee": "FUNC_000251",
+          "instruction": "call FUNC_000251"
+        },
+        {
+          "line": 19420,
+          "callee": "FUNC_000928",
+          "instruction": "call near [DATA_007219]    ; FUNC_000928"
+        },
+        {
+          "line": 19451,
+          "callee": "FUNC_001514",
+          "instruction": "call near [DATA_007746]    ; FUNC_001514"
+        },
+        {
+          "line": 19466,
+          "callee": "FUNC_000568",
+          "instruction": "call near [DATA_006140]    ; FUNC_000568"
+        },
+        {
+          "line": 19496,
+          "callee": "FUNC_001532",
+          "instruction": "call near [DATA_007754]    ; FUNC_001532"
+        },
+        {
+          "line": 19541,
+          "callee": "FUNC_001530",
+          "instruction": "call near [DATA_007752]    ; FUNC_001530"
+        },
+        {
+          "line": 19566,
+          "callee": "FUNC_000869",
+          "instruction": "call FUNC_000869"
+        },
+        {
+          "line": 19601,
+          "callee": "FUNC_000922",
+          "instruction": "call near [DATA_007217]    ; FUNC_000922"
+        },
+        {
+          "line": 19631,
+          "callee": "FUNC_000349",
+          "instruction": "call FUNC_000349"
+        },
+        {
+          "line": 19642,
+          "callee": "FUNC_000349",
+          "instruction": "call FUNC_000349"
+        },
+        {
+          "line": 19653,
+          "callee": null,
+          "instruction": "call _strncpyfill"
+        },
+        {
+          "line": 19658,
+          "callee": "FUNC_000237",
+          "instruction": "call FUNC_000237"
+        }
+      ]
+    },
+    {
+      "id": "F247",
+      "label": "FUNC_000247",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 19670,
+      "line_end": 19813,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 19681,
+          "callee": "FUNC_001532",
+          "instruction": "call near [DATA_007754]    ; FUNC_001532"
+        },
+        {
+          "line": 19693,
+          "callee": "FUNC_000252",
+          "instruction": "call FUNC_000252"
+        },
+        {
+          "line": 19745,
+          "callee": "FUNC_000349",
+          "instruction": "call FUNC_000349"
+        },
+        {
+          "line": 19777,
+          "callee": "FUNC_000349",
+          "instruction": "call FUNC_000349"
+        },
+        {
+          "line": 19781,
+          "callee": "FUNC_000148",
+          "instruction": "call FUNC_000148"
+        },
+        {
+          "line": 19795,
+          "callee": "FUNC_000349",
+          "instruction": "call FUNC_000349"
+        },
+        {
+          "line": 19803,
+          "callee": "FUNC_000349",
+          "instruction": "call FUNC_000349"
+        }
+      ]
+    },
+    {
+      "id": "F248",
+      "label": "FUNC_000248",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 19814,
+      "line_end": 19840,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F249",
+      "label": "FUNC_000249",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 19841,
+      "line_end": 19881,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 19848,
+          "callee": "FUNC_000251",
+          "instruction": "call FUNC_000251"
+        }
+      ]
+    },
+    {
+      "id": "F250",
+      "label": "FUNC_000250",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 19882,
+      "line_end": 19896,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 19888,
+          "callee": "FUNC_000249",
+          "instruction": "call FUNC_000249"
+        }
+      ]
+    },
+    {
+      "id": "F251",
+      "label": "FUNC_000251",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 19897,
+      "line_end": 19925,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F252",
+      "label": "FUNC_000252",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 19926,
+      "line_end": 19956,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F253",
+      "label": "FUNC_000253",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 19957,
+      "line_end": 20059,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 19994,
+          "callee": "FUNC_000148",
+          "instruction": "call FUNC_000148"
+        },
+        {
+          "line": 20013,
+          "callee": "FUNC_000252",
+          "instruction": "call FUNC_000252"
+        },
+        {
+          "line": 20036,
+          "callee": "FUNC_000349",
+          "instruction": "call FUNC_000349"
+        },
+        {
+          "line": 20040,
+          "callee": "FUNC_000925",
+          "instruction": "call near [DATA_007218]    ; FUNC_000925"
+        },
+        {
+          "line": 20044,
+          "callee": "FUNC_000148",
+          "instruction": "call FUNC_000148"
+        }
+      ]
+    },
+    {
+      "id": "F254",
+      "label": "FUNC_000254",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 20060,
+      "line_end": 20073,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 20067,
+          "callee": "FUNC_000253",
+          "instruction": "call FUNC_000253"
+        }
+      ]
+    },
+    {
+      "id": "F255",
+      "label": "FUNC_000255",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 20074,
+      "line_end": 20125,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 20087,
+          "callee": "FUNC_000252",
+          "instruction": "call FUNC_000252"
+        },
+        {
+          "line": 20111,
+          "callee": "FUNC_000148",
+          "instruction": "call FUNC_000148"
+        }
+      ]
+    },
+    {
+      "id": "F256",
+      "label": "FUNC_000256",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 20126,
+      "line_end": 20143,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 20135,
+          "callee": "FUNC_000255",
+          "instruction": "call FUNC_000255"
+        }
+      ]
+    },
+    {
+      "id": "F568",
+      "label": "FUNC_000568",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 35931,
+      "line_end": 35956,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 35950,
+          "callee": "FUNC_000570",
+          "instruction": "call FUNC_000570"
+        }
+      ]
+    },
+    {
+      "id": "F569",
+      "label": "FUNC_000569",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 35957,
+      "line_end": 35982,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 35976,
+          "callee": "FUNC_000570",
+          "instruction": "call FUNC_000570"
+        }
+      ]
+    },
+    {
+      "id": "F570",
+      "label": "FUNC_000570",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 35983,
+      "line_end": 36183,
+      "research_level": "reviewed_body_in_scope",
+      "call_sites": [
+        {
+          "line": 36006,
+          "callee": "FUNC_001532",
+          "instruction": "call near [DATA_007754]    ; FUNC_001532"
+        },
+        {
+          "line": 36020,
+          "callee": "FUNC_000575",
+          "instruction": "call FUNC_000575"
+        },
+        {
+          "line": 36047,
+          "callee": "FUNC_000572",
+          "instruction": "call FUNC_000572"
+        },
+        {
+          "line": 36056,
+          "callee": "FUNC_000573",
+          "instruction": "call FUNC_000573"
+        },
+        {
+          "line": 36082,
+          "callee": "FUNC_001532",
+          "instruction": "call near [DATA_007754]    ; FUNC_001532"
+        },
+        {
+          "line": 36104,
+          "callee": "FUNC_001677",
+          "instruction": "call near [DATA_007802]    ; FUNC_001677"
+        },
+        {
+          "line": 36109,
+          "callee": "FUNC_001677",
+          "instruction": "call near [DATA_007802]    ; FUNC_001677"
+        },
+        {
+          "line": 36115,
+          "callee": "FUNC_001662_Vec64Sub",
+          "instruction": "call FUNC_001662_Vec64Sub"
+        },
+        {
+          "line": 36131,
+          "callee": "FUNC_001662_Vec64Sub",
+          "instruction": "call FUNC_001662_Vec64Sub"
+        },
+        {
+          "line": 36138,
+          "callee": "FUNC_000575",
+          "instruction": "call FUNC_000575"
+        }
+      ]
+    },
+    {
+      "id": "F571",
+      "label": "FUNC_000571",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 36184,
+      "line_end": 36216,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F572",
+      "label": "FUNC_000572",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 36217,
+      "line_end": 36276,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 36230,
+          "callee": "FUNC_001658_Vec64Truncate",
+          "instruction": "call FUNC_001658_Vec64Truncate"
+        },
+        {
+          "line": 36244,
+          "callee": "FUNC_001670_VecMatTMul",
+          "instruction": "call FUNC_001670_VecMatTMul"
+        },
+        {
+          "line": 36251,
+          "callee": "FUNC_001517",
+          "instruction": "call near [DATA_007749]    ; FUNC_001517"
+        },
+        {
+          "line": 36256,
+          "callee": "FUNC_001673_MatMatTMul",
+          "instruction": "call FUNC_001673_MatMatTMul"
+        },
+        {
+          "line": 36266,
+          "callee": "FUNC_001670_VecMatTMul",
+          "instruction": "call FUNC_001670_VecMatTMul"
+        }
+      ]
+    },
+    {
+      "id": "F573",
+      "label": "FUNC_000573",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 36277,
+      "line_end": 36333,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 36290,
+          "callee": "FUNC_001658_Vec64Truncate",
+          "instruction": "call FUNC_001658_Vec64Truncate"
+        },
+        {
+          "line": 36304,
+          "callee": "FUNC_001669_VecMatMul",
+          "instruction": "call FUNC_001669_VecMatMul"
+        },
+        {
+          "line": 36311,
+          "callee": "FUNC_001517",
+          "instruction": "call near [DATA_007749]    ; FUNC_001517"
+        },
+        {
+          "line": 36316,
+          "callee": "FUNC_001672_MatMatMul",
+          "instruction": "call FUNC_001672_MatMatMul"
+        },
+        {
+          "line": 36323,
+          "callee": "FUNC_001669_VecMatMul",
+          "instruction": "call FUNC_001669_VecMatMul"
+        }
+      ]
+    },
+    {
+      "id": "F574",
+      "label": "FUNC_000574",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 36334,
+      "line_end": 36372,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 36353,
+          "callee": "FUNC_000575",
+          "instruction": "call FUNC_000575"
+        }
+      ]
+    },
+    {
+      "id": "F575",
+      "label": "FUNC_000575",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 36373,
+      "line_end": 37051,
+      "research_level": "selected_branches_reviewed",
+      "call_sites": [
+        {
+          "line": 36393,
+          "callee": "FUNC_001664_Vec64Abs",
+          "instruction": "call FUNC_001664_Vec64Abs"
+        },
+        {
+          "line": 36401,
+          "callee": "FUNC_001333_Int64Add64",
+          "instruction": "call FUNC_001333_Int64Add64"
+        },
+        {
+          "line": 36409,
+          "callee": "FUNC_001333_Int64Add64",
+          "instruction": "call FUNC_001333_Int64Add64"
+        },
+        {
+          "line": 36414,
+          "callee": "FUNC_001341_Int64ArithShift",
+          "instruction": "call FUNC_001341_Int64ArithShift"
+        },
+        {
+          "line": 36422,
+          "callee": "FUNC_001335_Int64Sub64",
+          "instruction": "call FUNC_001335_Int64Sub64"
+        },
+        {
+          "line": 36432,
+          "callee": "FUNC_001335_Int64Sub64",
+          "instruction": "call FUNC_001335_Int64Sub64"
+        },
+        {
+          "line": 36446,
+          "callee": "FUNC_000576",
+          "instruction": "call FUNC_000576"
+        },
+        {
+          "line": 36454,
+          "callee": "FUNC_000578",
+          "instruction": "call FUNC_000578"
+        },
+        {
+          "line": 36473,
+          "callee": "FUNC_000577",
+          "instruction": "call FUNC_000577"
+        },
+        {
+          "line": 36482,
+          "callee": "FUNC_000578",
+          "instruction": "call FUNC_000578"
+        },
+        {
+          "line": 36497,
+          "callee": null,
+          "instruction": "call _abs"
+        },
+        {
+          "line": 36502,
+          "callee": null,
+          "instruction": "call _abs"
+        },
+        {
+          "line": 36507,
+          "callee": null,
+          "instruction": "call _abs"
+        },
+        {
+          "line": 36522,
+          "callee": "FUNC_001658_Vec64Truncate",
+          "instruction": "call FUNC_001658_Vec64Truncate"
+        },
+        {
+          "line": 36533,
+          "callee": "FUNC_001503",
+          "instruction": "call FUNC_001503"
+        },
+        {
+          "line": 36547,
+          "callee": "FUNC_001519",
+          "instruction": "call FUNC_001519"
+        },
+        {
+          "line": 36554,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 36561,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 36568,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 36588,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 36593,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 36604,
+          "callee": "FUNC_001335_Int64Sub64",
+          "instruction": "call FUNC_001335_Int64Sub64"
+        },
+        {
+          "line": 36610,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 36617,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 36624,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 36651,
+          "callee": "FUNC_001333_Int64Add64",
+          "instruction": "call FUNC_001333_Int64Add64"
+        },
+        {
+          "line": 36659,
+          "callee": "FUNC_001333_Int64Add64",
+          "instruction": "call FUNC_001333_Int64Add64"
+        },
+        {
+          "line": 36667,
+          "callee": "FUNC_001333_Int64Add64",
+          "instruction": "call FUNC_001333_Int64Add64"
+        },
+        {
+          "line": 36709,
+          "callee": "FUNC_001504",
+          "instruction": "call FUNC_001504"
+        },
+        {
+          "line": 36763,
+          "callee": "FUNC_000571",
+          "instruction": "call FUNC_000571"
+        },
+        {
+          "line": 36766,
+          "callee": "FUNC_001520",
+          "instruction": "call near [DATA_007719]    ; FUNC_001520"
+        },
+        {
+          "line": 36769,
+          "callee": "FUNC_000571",
+          "instruction": "call FUNC_000571"
+        },
+        {
+          "line": 36775,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 36782,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 36789,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 36796,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 36802,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 36808,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 36869,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 36876,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 36883,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 36894,
+          "callee": null,
+          "instruction": "call _abs"
+        },
+        {
+          "line": 36899,
+          "callee": null,
+          "instruction": "call _abs"
+        },
+        {
+          "line": 36904,
+          "callee": null,
+          "instruction": "call _abs"
+        },
+        {
+          "line": 36910,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 36933,
+          "callee": "FUNC_000953",
+          "instruction": "call FUNC_000953"
+        },
+        {
+          "line": 36951,
+          "callee": "FUNC_001503",
+          "instruction": "call FUNC_001503"
+        },
+        {
+          "line": 36966,
+          "callee": "FUNC_001520",
+          "instruction": "call near [DATA_007719]    ; FUNC_001520"
+        },
+        {
+          "line": 36985,
+          "callee": "FUNC_000571",
+          "instruction": "call FUNC_000571"
+        },
+        {
+          "line": 36988,
+          "callee": "FUNC_001520",
+          "instruction": "call near [DATA_007719]    ; FUNC_001520"
+        },
+        {
+          "line": 36991,
+          "callee": "FUNC_000571",
+          "instruction": "call FUNC_000571"
+        },
+        {
+          "line": 37004,
+          "callee": "FUNC_000953",
+          "instruction": "call FUNC_000953"
+        },
+        {
+          "line": 37015,
+          "callee": "FUNC_000571",
+          "instruction": "call FUNC_000571"
+        },
+        {
+          "line": 37018,
+          "callee": "FUNC_001520",
+          "instruction": "call near [DATA_007719]    ; FUNC_001520"
+        },
+        {
+          "line": 37021,
+          "callee": "FUNC_000571",
+          "instruction": "call FUNC_000571"
+        }
+      ]
+    },
+    {
+      "id": "F576",
+      "label": "FUNC_000576",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 37052,
+      "line_end": 37229,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 37064,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 37088,
+          "callee": "FUNC_000579",
+          "instruction": "call FUNC_000579"
+        },
+        {
+          "line": 37198,
+          "callee": "FUNC_001334_Int64Add32",
+          "instruction": "call FUNC_001334_Int64Add32"
+        },
+        {
+          "line": 37207,
+          "callee": "FUNC_001334_Int64Add32",
+          "instruction": "call FUNC_001334_Int64Add32"
+        },
+        {
+          "line": 37216,
+          "callee": "FUNC_001334_Int64Add32",
+          "instruction": "call FUNC_001334_Int64Add32"
+        }
+      ]
+    },
+    {
+      "id": "F577",
+      "label": "FUNC_000577",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 37230,
+      "line_end": 37374,
+      "research_level": "selected_branches_reviewed",
+      "call_sites": [
+        {
+          "line": 37250,
+          "callee": "FUNC_001656_FindMSB",
+          "instruction": "call FUNC_001656_FindMSB"
+        },
+        {
+          "line": 37261,
+          "callee": "FUNC_001656_FindMSB",
+          "instruction": "call FUNC_001656_FindMSB"
+        },
+        {
+          "line": 37291,
+          "callee": "FUNC_001660_Vec64Shift",
+          "instruction": "call FUNC_001660_Vec64Shift"
+        },
+        {
+          "line": 37300,
+          "callee": "FUNC_001333_Int64Add64",
+          "instruction": "call FUNC_001333_Int64Add64"
+        },
+        {
+          "line": 37307,
+          "callee": "FUNC_001341_Int64ArithShift",
+          "instruction": "call FUNC_001341_Int64ArithShift"
+        },
+        {
+          "line": 37314,
+          "callee": "FUNC_001522",
+          "instruction": "call near [DATA_007737]    ; FUNC_001522"
+        },
+        {
+          "line": 37319,
+          "callee": "FUNC_001522",
+          "instruction": "call near [DATA_007737]    ; FUNC_001522"
+        },
+        {
+          "line": 37326,
+          "callee": "FUNC_001522",
+          "instruction": "call near [DATA_007737]    ; FUNC_001522"
+        },
+        {
+          "line": 37333,
+          "callee": "FUNC_001522",
+          "instruction": "call near [DATA_007737]    ; FUNC_001522"
+        },
+        {
+          "line": 37344,
+          "callee": "FUNC_001502",
+          "instruction": "call near [DATA_007738]    ; FUNC_001502"
+        },
+        {
+          "line": 37357,
+          "callee": "FUNC_001341_Int64ArithShift",
+          "instruction": "call FUNC_001341_Int64ArithShift"
+        }
+      ]
+    },
+    {
+      "id": "F578",
+      "label": "FUNC_000578",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 37375,
+      "line_end": 37655,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 37406,
+          "callee": null,
+          "instruction": "call _abs"
+        },
+        {
+          "line": 37411,
+          "callee": null,
+          "instruction": "call _abs"
+        },
+        {
+          "line": 37416,
+          "callee": null,
+          "instruction": "call _abs"
+        },
+        {
+          "line": 37426,
+          "callee": "FUNC_000953",
+          "instruction": "call FUNC_000953"
+        },
+        {
+          "line": 37442,
+          "callee": "FUNC_001538",
+          "instruction": "call FUNC_001538"
+        },
+        {
+          "line": 37446,
+          "callee": "FUNC_001538",
+          "instruction": "call FUNC_001538"
+        },
+        {
+          "line": 37479,
+          "callee": "FUNC_001662_Vec64Sub",
+          "instruction": "call FUNC_001662_Vec64Sub"
+        },
+        {
+          "line": 37488,
+          "callee": "FUNC_001658_Vec64Truncate",
+          "instruction": "call FUNC_001658_Vec64Truncate"
+        },
+        {
+          "line": 37500,
+          "callee": "FUNC_001519",
+          "instruction": "call FUNC_001519"
+        },
+        {
+          "line": 37509,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 37516,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 37525,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 37541,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 37546,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 37551,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 37557,
+          "callee": "FUNC_001538",
+          "instruction": "call FUNC_001538"
+        },
+        {
+          "line": 37571,
+          "callee": "FUNC_000953",
+          "instruction": "call FUNC_000953"
+        },
+        {
+          "line": 37578,
+          "callee": "FUNC_000953",
+          "instruction": "call FUNC_000953"
+        },
+        {
+          "line": 37617,
+          "callee": "FUNC_000953",
+          "instruction": ";\t\tcall FUNC_000953"
+        },
+        {
+          "line": 37626,
+          "callee": "FUNC_000953",
+          "instruction": ";\t\tcall FUNC_000953"
+        },
+        {
+          "line": 37637,
+          "callee": "FUNC_000953",
+          "instruction": ";\t\tcall FUNC_000953"
+        },
+        {
+          "line": 37646,
+          "callee": "FUNC_000953",
+          "instruction": ";\t\tcall FUNC_000953"
+        }
+      ]
+    },
+    {
+      "id": "F579",
+      "label": "FUNC_000579",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 37656,
+      "line_end": 37752,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 37668,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 37680,
+          "callee": "FUNC_001658_Vec64Truncate",
+          "instruction": "call FUNC_001658_Vec64Truncate"
+        },
+        {
+          "line": 37729,
+          "callee": "FUNC_001670_VecMatTMul",
+          "instruction": "call FUNC_001670_VecMatTMul"
+        },
+        {
+          "line": 37741,
+          "callee": "FUNC_000582",
+          "instruction": "call FUNC_000582"
+        }
+      ]
+    },
+    {
+      "id": "F580",
+      "label": "FUNC_000580",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 37753,
+      "line_end": 37938,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 37763,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 37928,
+          "callee": "FUNC_000582",
+          "instruction": "call FUNC_000582"
+        }
+      ]
+    },
+    {
+      "id": "F581",
+      "label": "FUNC_000581",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 37939,
+      "line_end": 38523,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 38160,
+          "callee": "FUNC_001466",
+          "instruction": "call FUNC_001466"
+        },
+        {
+          "line": 38175,
+          "callee": "FUNC_001341_Int64ArithShift",
+          "instruction": "call FUNC_001341_Int64ArithShift"
+        },
+        {
+          "line": 38188,
+          "callee": "FUNC_001822",
+          "instruction": "call FUNC_001822"
+        },
+        {
+          "line": 38203,
+          "callee": "FUNC_001341_Int64ArithShift",
+          "instruction": "call FUNC_001341_Int64ArithShift"
+        },
+        {
+          "line": 38216,
+          "callee": "FUNC_001822",
+          "instruction": "call FUNC_001822"
+        },
+        {
+          "line": 38230,
+          "callee": "FUNC_001466",
+          "instruction": "call FUNC_001466"
+        },
+        {
+          "line": 38239,
+          "callee": "FUNC_001523",
+          "instruction": "call FUNC_001523"
+        },
+        {
+          "line": 38252,
+          "callee": "FUNC_001523",
+          "instruction": "call FUNC_001523"
+        },
+        {
+          "line": 38265,
+          "callee": "FUNC_001523",
+          "instruction": "call FUNC_001523"
+        },
+        {
+          "line": 38278,
+          "callee": "FUNC_001523",
+          "instruction": "call FUNC_001523"
+        },
+        {
+          "line": 38329,
+          "callee": "FUNC_001466",
+          "instruction": "call FUNC_001466"
+        },
+        {
+          "line": 38338,
+          "callee": "FUNC_001523",
+          "instruction": "call FUNC_001523"
+        },
+        {
+          "line": 38351,
+          "callee": "FUNC_001523",
+          "instruction": "call FUNC_001523"
+        },
+        {
+          "line": 38364,
+          "callee": "FUNC_001523",
+          "instruction": "call FUNC_001523"
+        },
+        {
+          "line": 38377,
+          "callee": "FUNC_001523",
+          "instruction": "call FUNC_001523"
+        },
+        {
+          "line": 38387,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 38393,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 38400,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 38406,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 38427,
+          "callee": "FUNC_001669_VecMatMul",
+          "instruction": "call FUNC_001669_VecMatMul"
+        },
+        {
+          "line": 38435,
+          "callee": "FUNC_001669_VecMatMul",
+          "instruction": "call FUNC_001669_VecMatMul"
+        },
+        {
+          "line": 38443,
+          "callee": "FUNC_001669_VecMatMul",
+          "instruction": "call FUNC_001669_VecMatMul"
+        },
+        {
+          "line": 38469,
+          "callee": "FUNC_001876",
+          "instruction": "call FUNC_001876"
+        },
+        {
+          "line": 38497,
+          "callee": "FUNC_001341_Int64ArithShift",
+          "instruction": "call FUNC_001341_Int64ArithShift"
+        }
+      ]
+    },
+    {
+      "id": "F582",
+      "label": "FUNC_000582",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 38524,
+      "line_end": 38802,
+      "research_level": "reviewed_body_in_scope",
+      "call_sites": [
+        {
+          "line": 38576,
+          "callee": "FUNC_001822",
+          "instruction": "call FUNC_001822"
+        },
+        {
+          "line": 38632,
+          "callee": "FUNC_000581",
+          "instruction": "call FUNC_000581"
+        },
+        {
+          "line": 38657,
+          "callee": "FUNC_000583",
+          "instruction": "call FUNC_000583"
+        },
+        {
+          "line": 38693,
+          "callee": "FUNC_000583",
+          "instruction": "call FUNC_000583"
+        },
+        {
+          "line": 38727,
+          "callee": "FUNC_000580",
+          "instruction": "call FUNC_000580"
+        },
+        {
+          "line": 38772,
+          "callee": "FUNC_000583",
+          "instruction": "call FUNC_000583"
+        }
+      ]
+    },
+    {
+      "id": "F583",
+      "label": "FUNC_000583",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 38803,
+      "line_end": 38959,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 38905,
+          "callee": null,
+          "instruction": "call _abs"
+        },
+        {
+          "line": 38910,
+          "callee": null,
+          "instruction": "call _abs"
+        },
+        {
+          "line": 38915,
+          "callee": null,
+          "instruction": "call _abs"
+        },
+        {
+          "line": 38919,
+          "callee": "FUNC_001656_FindMSB",
+          "instruction": "call FUNC_001656_FindMSB"
+        }
+      ]
+    },
+    {
+      "id": "F584",
+      "label": "FUNC_000584",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 38960,
+      "line_end": 39022,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F585",
+      "label": "FUNC_000585",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 39023,
+      "line_end": 39245,
+      "research_level": "reviewed_body_in_scope",
+      "call_sites": [
+        {
+          "line": 39079,
+          "callee": "FUNC_000584",
+          "instruction": "call FUNC_000584"
+        },
+        {
+          "line": 39091,
+          "callee": "FUNC_000611",
+          "instruction": "call FUNC_000611"
+        },
+        {
+          "line": 39105,
+          "callee": "FUNC_000584",
+          "instruction": "call FUNC_000584"
+        },
+        {
+          "line": 39117,
+          "callee": "FUNC_000611",
+          "instruction": "call FUNC_000611"
+        },
+        {
+          "line": 39133,
+          "callee": "FUNC_000584",
+          "instruction": "call FUNC_000584"
+        },
+        {
+          "line": 39144,
+          "callee": "FUNC_000611",
+          "instruction": "call FUNC_000611"
+        },
+        {
+          "line": 39158,
+          "callee": "FUNC_000584",
+          "instruction": "call FUNC_000584"
+        },
+        {
+          "line": 39169,
+          "callee": "FUNC_000611",
+          "instruction": "call FUNC_000611"
+        },
+        {
+          "line": 39185,
+          "callee": "FUNC_000584",
+          "instruction": "call FUNC_000584"
+        },
+        {
+          "line": 39196,
+          "callee": "FUNC_000611",
+          "instruction": "call FUNC_000611"
+        },
+        {
+          "line": 39216,
+          "callee": "FUNC_000584",
+          "instruction": "call FUNC_000584"
+        },
+        {
+          "line": 39227,
+          "callee": "FUNC_000611",
+          "instruction": "call FUNC_000611"
+        }
+      ]
+    },
+    {
+      "id": "F586",
+      "label": "FUNC_000586",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 39246,
+      "line_end": 39262,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F587",
+      "label": "FUNC_000587",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 39263,
+      "line_end": 39339,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F588",
+      "label": "FUNC_000588",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 39340,
+      "line_end": 39412,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F589",
+      "label": "FUNC_000589",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 39413,
+      "line_end": 39511,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F590",
+      "label": "FUNC_000590",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 39512,
+      "line_end": 39553,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 39524,
+          "callee": "FUNC_001677",
+          "instruction": "call near [DATA_007802]    ; FUNC_001677"
+        },
+        {
+          "line": 39531,
+          "callee": "FUNC_001678",
+          "instruction": "call near [DATA_007803]    ; FUNC_001678"
+        },
+        {
+          "line": 39536,
+          "callee": "FUNC_001658_Vec64Truncate",
+          "instruction": "call FUNC_001658_Vec64Truncate"
+        }
+      ]
+    },
+    {
+      "id": "F591",
+      "label": "FUNC_000591",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 39554,
+      "line_end": 39578,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 39564,
+          "callee": "FUNC_001677",
+          "instruction": "call near [DATA_007802]    ; FUNC_001677"
+        },
+        {
+          "line": 39570,
+          "callee": "FUNC_001678",
+          "instruction": "call near [DATA_007803]    ; FUNC_001678"
+        }
+      ]
+    },
+    {
+      "id": "F592",
+      "label": "FUNC_000592",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 39579,
+      "line_end": 39654,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 39593,
+          "callee": "FUNC_001677",
+          "instruction": "call near [DATA_007802]    ; FUNC_001677"
+        },
+        {
+          "line": 39599,
+          "callee": "FUNC_000593",
+          "instruction": "call FUNC_000593"
+        },
+        {
+          "line": 39608,
+          "callee": "FUNC_001658_Vec64Truncate",
+          "instruction": "call FUNC_001658_Vec64Truncate"
+        },
+        {
+          "line": 39623,
+          "callee": "FUNC_001532",
+          "instruction": "call near [DATA_007754]    ; FUNC_001532"
+        },
+        {
+          "line": 39628,
+          "callee": "FUNC_001670_VecMatTMul",
+          "instruction": "call FUNC_001670_VecMatTMul"
+        },
+        {
+          "line": 39635,
+          "callee": "FUNC_001658_Vec64Truncate",
+          "instruction": "call FUNC_001658_Vec64Truncate"
+        }
+      ]
+    },
+    {
+      "id": "F593",
+      "label": "FUNC_000593",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 39655,
+      "line_end": 39719,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 39668,
+          "callee": "FUNC_001678",
+          "instruction": "call near [DATA_007803]    ; FUNC_001678"
+        }
+      ]
+    },
+    {
+      "id": "F594",
+      "label": "FUNC_000594",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 39720,
+      "line_end": 39769,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 39742,
+          "callee": "FUNC_000595",
+          "instruction": "call FUNC_000595"
+        }
+      ]
+    },
+    {
+      "id": "F595",
+      "label": "FUNC_000595",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 39770,
+      "line_end": 39868,
+      "research_level": "reviewed_body_in_scope",
+      "call_sites": [
+        {
+          "line": 39803,
+          "callee": "FUNC_001533",
+          "instruction": "call near [DATA_007755]    ; FUNC_001533"
+        },
+        {
+          "line": 39831,
+          "callee": "FUNC_000866",
+          "instruction": "call FUNC_000866"
+        }
+      ]
+    },
+    {
+      "id": "F596",
+      "label": "FUNC_000596",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 39869,
+      "line_end": 39932,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 39883,
+          "callee": "FUNC_000594",
+          "instruction": "call FUNC_000594"
+        },
+        {
+          "line": 39886,
+          "callee": "FUNC_000612",
+          "instruction": "call FUNC_000612"
+        },
+        {
+          "line": 39897,
+          "callee": "FUNC_000592",
+          "instruction": "call FUNC_000592"
+        },
+        {
+          "line": 39922,
+          "callee": "FUNC_000597",
+          "instruction": "call FUNC_000597"
+        }
+      ]
+    },
+    {
+      "id": "F597",
+      "label": "FUNC_000597",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 39933,
+      "line_end": 40307,
+      "research_level": "selected_branches_reviewed",
+      "call_sites": [
+        {
+          "line": 39990,
+          "callee": "FUNC_000592",
+          "instruction": "call FUNC_000592"
+        },
+        {
+          "line": 39995,
+          "callee": "FUNC_001466",
+          "instruction": "call FUNC_001466"
+        },
+        {
+          "line": 39998,
+          "callee": "FUNC_001489",
+          "instruction": "call FUNC_001489"
+        },
+        {
+          "line": 40011,
+          "callee": "FUNC_000594",
+          "instruction": "call FUNC_000594"
+        },
+        {
+          "line": 40016,
+          "callee": "FUNC_001466",
+          "instruction": "call FUNC_001466"
+        },
+        {
+          "line": 40019,
+          "callee": "FUNC_001489",
+          "instruction": "call FUNC_001489"
+        },
+        {
+          "line": 40023,
+          "callee": "FUNC_001482",
+          "instruction": "call FUNC_001482"
+        },
+        {
+          "line": 40033,
+          "callee": "FUNC_001489",
+          "instruction": "call FUNC_001489"
+        },
+        {
+          "line": 40038,
+          "callee": "FUNC_001482",
+          "instruction": "call FUNC_001482"
+        },
+        {
+          "line": 40049,
+          "callee": "FUNC_000606",
+          "instruction": "call FUNC_000606"
+        },
+        {
+          "line": 40075,
+          "callee": "FUNC_000594",
+          "instruction": "call FUNC_000594"
+        },
+        {
+          "line": 40086,
+          "callee": "FUNC_001677",
+          "instruction": "call near [DATA_007802]    ; FUNC_001677"
+        },
+        {
+          "line": 40093,
+          "callee": "FUNC_000593",
+          "instruction": "call FUNC_000593"
+        },
+        {
+          "line": 40101,
+          "callee": "FUNC_001333_Int64Add64",
+          "instruction": "call FUNC_001333_Int64Add64"
+        },
+        {
+          "line": 40109,
+          "callee": "FUNC_001333_Int64Add64",
+          "instruction": "call FUNC_001333_Int64Add64"
+        },
+        {
+          "line": 40117,
+          "callee": "FUNC_001333_Int64Add64",
+          "instruction": "call FUNC_001333_Int64Add64"
+        },
+        {
+          "line": 40166,
+          "callee": "FUNC_001465",
+          "instruction": "call near [DATA_007724]    ; FUNC_001465"
+        },
+        {
+          "line": 40170,
+          "callee": "FUNC_001467",
+          "instruction": "call near [DATA_007723]    ; FUNC_001467"
+        },
+        {
+          "line": 40263,
+          "callee": "FUNC_001670_VecMatTMul",
+          "instruction": "call FUNC_001670_VecMatTMul"
+        }
+      ]
+    },
+    {
+      "id": "F598",
+      "label": "FUNC_000598",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 40308,
+      "line_end": 40372,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F599",
+      "label": "FUNC_000599",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 40373,
+      "line_end": 40443,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F600",
+      "label": "FUNC_000600",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 40444,
+      "line_end": 40562,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 40462,
+          "callee": "FUNC_001523",
+          "instruction": "call FUNC_001523"
+        },
+        {
+          "line": 40473,
+          "callee": "FUNC_001523",
+          "instruction": "call FUNC_001523"
+        },
+        {
+          "line": 40484,
+          "callee": "FUNC_001523",
+          "instruction": "call FUNC_001523"
+        },
+        {
+          "line": 40495,
+          "callee": "FUNC_001523",
+          "instruction": "call FUNC_001523"
+        },
+        {
+          "line": 40506,
+          "callee": "FUNC_001523",
+          "instruction": "call FUNC_001523"
+        },
+        {
+          "line": 40517,
+          "callee": "FUNC_001523",
+          "instruction": "call FUNC_001523"
+        },
+        {
+          "line": 40525,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 40533,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 40541,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        }
+      ]
+    },
+    {
+      "id": "F601",
+      "label": "FUNC_000601",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 40563,
+      "line_end": 40865,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F602",
+      "label": "FUNC_000602",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 40866,
+      "line_end": 41011,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F603",
+      "label": "FUNC_000603",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 41012,
+      "line_end": 41204,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 41029,
+          "callee": "FUNC_001532",
+          "instruction": "call near [DATA_007754]    ; FUNC_001532"
+        },
+        {
+          "line": 41045,
+          "callee": "FUNC_001658_Vec64Truncate",
+          "instruction": "call FUNC_001658_Vec64Truncate"
+        },
+        {
+          "line": 41062,
+          "callee": "FUNC_001466",
+          "instruction": "call FUNC_001466"
+        },
+        {
+          "line": 41069,
+          "callee": "FUNC_001496",
+          "instruction": "call near [DATA_007722]    ; FUNC_001496"
+        },
+        {
+          "line": 41078,
+          "callee": "FUNC_001482",
+          "instruction": "call FUNC_001482"
+        },
+        {
+          "line": 41090,
+          "callee": "FUNC_001496",
+          "instruction": "call near [DATA_007722]    ; FUNC_001496"
+        },
+        {
+          "line": 41095,
+          "callee": "FUNC_001483",
+          "instruction": "call near [DATA_007731]    ; FUNC_001483"
+        }
+      ]
+    },
+    {
+      "id": "F604",
+      "label": "FUNC_000604",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 41205,
+      "line_end": 41262,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 41222,
+          "callee": "FUNC_001333_Int64Add64",
+          "instruction": "call FUNC_001333_Int64Add64"
+        },
+        {
+          "line": 41230,
+          "callee": "FUNC_001333_Int64Add64",
+          "instruction": "call FUNC_001333_Int64Add64"
+        },
+        {
+          "line": 41238,
+          "callee": "FUNC_001333_Int64Add64",
+          "instruction": "call FUNC_001333_Int64Add64"
+        },
+        {
+          "line": 41243,
+          "callee": "FUNC_000595",
+          "instruction": "call FUNC_000595"
+        },
+        {
+          "line": 41253,
+          "callee": "FUNC_000148",
+          "instruction": "call FUNC_000148"
+        }
+      ]
+    },
+    {
+      "id": "F605",
+      "label": "FUNC_000605",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 41263,
+      "line_end": 41389,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 41278,
+          "callee": "FUNC_001532",
+          "instruction": "call near [DATA_007754]    ; FUNC_001532"
+        },
+        {
+          "line": 41287,
+          "callee": "FUNC_001335_Int64Sub64",
+          "instruction": "call FUNC_001335_Int64Sub64"
+        },
+        {
+          "line": 41295,
+          "callee": "FUNC_001335_Int64Sub64",
+          "instruction": "call FUNC_001335_Int64Sub64"
+        },
+        {
+          "line": 41303,
+          "callee": "FUNC_001335_Int64Sub64",
+          "instruction": "call FUNC_001335_Int64Sub64"
+        },
+        {
+          "line": 41308,
+          "callee": "FUNC_000595",
+          "instruction": "call FUNC_000595"
+        },
+        {
+          "line": 41318,
+          "callee": "FUNC_000148",
+          "instruction": "call FUNC_000148"
+        },
+        {
+          "line": 41359,
+          "callee": "FUNC_000590",
+          "instruction": "call FUNC_000590"
+        }
+      ]
+    },
+    {
+      "id": "F606",
+      "label": "FUNC_000606",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 41390,
+      "line_end": 41575,
+      "research_level": "reviewed_body_in_scope",
+      "call_sites": [
+        {
+          "line": 41415,
+          "callee": "FUNC_001532",
+          "instruction": "call near [DATA_007754]    ; FUNC_001532"
+        },
+        {
+          "line": 41424,
+          "callee": "FUNC_000590",
+          "instruction": "call FUNC_000590"
+        },
+        {
+          "line": 41439,
+          "callee": "FUNC_001532",
+          "instruction": "call near [DATA_007754]    ; FUNC_001532"
+        },
+        {
+          "line": 41448,
+          "callee": "FUNC_000590",
+          "instruction": "call FUNC_000590"
+        },
+        {
+          "line": 41458,
+          "callee": "FUNC_000604",
+          "instruction": "call FUNC_000604"
+        },
+        {
+          "line": 41486,
+          "callee": "FUNC_000605",
+          "instruction": "call FUNC_000605"
+        },
+        {
+          "line": 41493,
+          "callee": "FUNC_001532",
+          "instruction": "call near [DATA_007754]    ; FUNC_001532"
+        },
+        {
+          "line": 41505,
+          "callee": "FUNC_000590",
+          "instruction": "call FUNC_000590"
+        },
+        {
+          "line": 41528,
+          "callee": "FUNC_000590",
+          "instruction": "call FUNC_000590"
+        },
+        {
+          "line": 41542,
+          "callee": "FUNC_001532",
+          "instruction": "call near [DATA_007754]    ; FUNC_001532"
+        },
+        {
+          "line": 41547,
+          "callee": "FUNC_000604",
+          "instruction": "call FUNC_000604"
+        },
+        {
+          "line": 41564,
+          "callee": "FUNC_000605",
+          "instruction": "call FUNC_000605"
+        }
+      ]
+    },
+    {
+      "id": "F607",
+      "label": "FUNC_000607",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 41576,
+      "line_end": 41672,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 41599,
+          "callee": "FUNC_001516",
+          "instruction": "call near [DATA_007748]    ; FUNC_001516"
+        },
+        {
+          "line": 41607,
+          "callee": "FUNC_001516",
+          "instruction": "call near [DATA_007748]    ; FUNC_001516"
+        },
+        {
+          "line": 41615,
+          "callee": "FUNC_001516",
+          "instruction": "call near [DATA_007748]    ; FUNC_001516"
+        },
+        {
+          "line": 41625,
+          "callee": "FUNC_001516",
+          "instruction": "call near [DATA_007748]    ; FUNC_001516"
+        },
+        {
+          "line": 41632,
+          "callee": "FUNC_001516",
+          "instruction": "call near [DATA_007748]    ; FUNC_001516"
+        },
+        {
+          "line": 41639,
+          "callee": "FUNC_001516",
+          "instruction": "call near [DATA_007748]    ; FUNC_001516"
+        },
+        {
+          "line": 41659,
+          "callee": "FUNC_001670_VecMatTMul",
+          "instruction": "call FUNC_001670_VecMatTMul"
+        }
+      ]
+    },
+    {
+      "id": "F608",
+      "label": "FUNC_000608",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 41673,
+      "line_end": 41697,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 41682,
+          "callee": "FUNC_001475",
+          "instruction": "call FUNC_001475"
+        },
+        {
+          "line": 41690,
+          "callee": "FUNC_001670_VecMatTMul",
+          "instruction": "call FUNC_001670_VecMatTMul"
+        }
+      ]
+    },
+    {
+      "id": "F609",
+      "label": "FUNC_000609",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 41698,
+      "line_end": 41721,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F610",
+      "label": "FUNC_000610",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 41722,
+      "line_end": 42065,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 41735,
+          "callee": "FUNC_000594",
+          "instruction": "call FUNC_000594"
+        },
+        {
+          "line": 41739,
+          "callee": "FUNC_000612",
+          "instruction": "call FUNC_000612"
+        },
+        {
+          "line": 41751,
+          "callee": "FUNC_000592",
+          "instruction": "call FUNC_000592"
+        },
+        {
+          "line": 41757,
+          "callee": "FUNC_001518",
+          "instruction": "call FUNC_001518"
+        },
+        {
+          "line": 41776,
+          "callee": "FUNC_001341_Int64ArithShift",
+          "instruction": "call FUNC_001341_Int64ArithShift"
+        },
+        {
+          "line": 41783,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 41791,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 41799,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 41834,
+          "callee": "FUNC_000597",
+          "instruction": "call FUNC_000597"
+        },
+        {
+          "line": 41876,
+          "callee": "FUNC_001341_Int64ArithShift",
+          "instruction": "call FUNC_001341_Int64ArithShift"
+        },
+        {
+          "line": 41880,
+          "callee": "FUNC_001465",
+          "instruction": "call near [DATA_007724]    ; FUNC_001465"
+        },
+        {
+          "line": 41894,
+          "callee": "FUNC_001341_Int64ArithShift",
+          "instruction": "call FUNC_001341_Int64ArithShift"
+        },
+        {
+          "line": 41937,
+          "callee": "FUNC_000802",
+          "instruction": "call near [DATA_006791]    ; FUNC_000802"
+        },
+        {
+          "line": 41966,
+          "callee": "FUNC_000597",
+          "instruction": "call FUNC_000597"
+        },
+        {
+          "line": 41978,
+          "callee": "FUNC_001465",
+          "instruction": "call near [DATA_007724]    ; FUNC_001465"
+        },
+        {
+          "line": 41988,
+          "callee": "FUNC_001495",
+          "instruction": "call near [DATA_007734]    ; FUNC_001495"
+        },
+        {
+          "line": 41996,
+          "callee": "FUNC_001335_Int64Sub64",
+          "instruction": "call FUNC_001335_Int64Sub64"
+        },
+        {
+          "line": 42055,
+          "callee": "FUNC_000597",
+          "instruction": "call FUNC_000597"
+        }
+      ]
+    },
+    {
+      "id": "F611",
+      "label": "FUNC_000611",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 42066,
+      "line_end": 42207,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 42194,
+          "callee": "FUNC_001520",
+          "instruction": "call near [DATA_007719]    ; FUNC_001520"
+        }
+      ]
+    },
+    {
+      "id": "F714",
+      "label": "FUNC_000714",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 47194,
+      "line_end": 47367,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 47228,
+          "callee": "FUNC_001662_Vec64Sub",
+          "instruction": "call FUNC_001662_Vec64Sub"
+        },
+        {
+          "line": 47233,
+          "callee": "FUNC_001658_Vec64Truncate",
+          "instruction": "call FUNC_001658_Vec64Truncate"
+        },
+        {
+          "line": 47247,
+          "callee": "FUNC_001519",
+          "instruction": "call FUNC_001519"
+        },
+        {
+          "line": 47252,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 47258,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 47264,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 47284,
+          "callee": "FUNC_000569",
+          "instruction": "call near [DATA_006141]    ; FUNC_000569"
+        },
+        {
+          "line": 47292,
+          "callee": "FUNC_000940",
+          "instruction": "call FUNC_000940"
+        },
+        {
+          "line": 47312,
+          "callee": "FUNC_000349",
+          "instruction": "call FUNC_000349"
+        },
+        {
+          "line": 47315,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 47323,
+          "callee": "FUNC_000148",
+          "instruction": "call FUNC_000148"
+        },
+        {
+          "line": 47326,
+          "callee": "FUNC_000940",
+          "instruction": "call FUNC_000940"
+        },
+        {
+          "line": 47332,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 47352,
+          "callee": "FUNC_000940",
+          "instruction": "call FUNC_000940"
+        }
+      ]
+    },
+    {
+      "id": "F765",
+      "label": "FUNC_000765",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 50303,
+      "line_end": 50319,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 50312,
+          "callee": "FUNC_000925",
+          "instruction": "call near [DATA_007218]    ; FUNC_000925"
+        }
+      ]
+    },
+    {
+      "id": "F865",
+      "label": "FUNC_000865",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 60529,
+      "line_end": 60569,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F866",
+      "label": "FUNC_000866",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 60570,
+      "line_end": 60702,
+      "research_level": "selected_branches_reviewed",
+      "call_sites": [
+        {
+          "line": 60591,
+          "callee": "FUNC_000865",
+          "instruction": "call FUNC_000865"
+        },
+        {
+          "line": 60609,
+          "callee": "FUNC_001510",
+          "instruction": "call near [DATA_007743]    ; FUNC_001510"
+        },
+        {
+          "line": 60621,
+          "callee": "FUNC_001333_Int64Add64",
+          "instruction": "call FUNC_001333_Int64Add64"
+        },
+        {
+          "line": 60635,
+          "callee": "FUNC_001508",
+          "instruction": "call near [DATA_007742]    ; FUNC_001508"
+        },
+        {
+          "line": 60646,
+          "callee": "FUNC_001507",
+          "instruction": "call near [DATA_007741]    ; FUNC_001507"
+        },
+        {
+          "line": 60652,
+          "callee": "FUNC_000865",
+          "instruction": "call FUNC_000865"
+        },
+        {
+          "line": 60681,
+          "callee": "FUNC_001675_MatBuildYZT",
+          "instruction": "call FUNC_001675_MatBuildYZT"
+        },
+        {
+          "line": 60690,
+          "callee": "FUNC_001675_MatBuildYZT",
+          "instruction": "call FUNC_001675_MatBuildYZT"
+        }
+      ]
+    },
+    {
+      "id": "F879",
+      "label": "FUNC_000879",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 64353,
+      "line_end": 64595,
+      "research_level": "selected_branches_reviewed",
+      "call_sites": [
+        {
+          "line": 64367,
+          "callee": "FUNC_001532",
+          "instruction": "call near [DATA_007754]    ; FUNC_001532"
+        },
+        {
+          "line": 64373,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 64381,
+          "callee": "FUNC_001674_MatBuildOdd",
+          "instruction": "call FUNC_001674_MatBuildOdd"
+        },
+        {
+          "line": 64402,
+          "callee": "FUNC_001338_Int64Mul32",
+          "instruction": "call FUNC_001338_Int64Mul32"
+        },
+        {
+          "line": 64409,
+          "callee": "FUNC_001338_Int64Mul32",
+          "instruction": "call FUNC_001338_Int64Mul32"
+        },
+        {
+          "line": 64416,
+          "callee": "FUNC_001338_Int64Mul32",
+          "instruction": "call FUNC_001338_Int64Mul32"
+        },
+        {
+          "line": 64426,
+          "callee": "FUNC_001341_Int64ArithShift",
+          "instruction": "call FUNC_001341_Int64ArithShift"
+        },
+        {
+          "line": 64432,
+          "callee": "FUNC_001341_Int64ArithShift",
+          "instruction": "call FUNC_001341_Int64ArithShift"
+        },
+        {
+          "line": 64438,
+          "callee": "FUNC_001341_Int64ArithShift",
+          "instruction": "call FUNC_001341_Int64ArithShift"
+        },
+        {
+          "line": 64448,
+          "callee": "FUNC_000574",
+          "instruction": "call FUNC_000574"
+        },
+        {
+          "line": 64486,
+          "callee": "FUNC_001338_Int64Mul32",
+          "instruction": "call FUNC_001338_Int64Mul32"
+        },
+        {
+          "line": 64493,
+          "callee": "FUNC_001338_Int64Mul32",
+          "instruction": "call FUNC_001338_Int64Mul32"
+        },
+        {
+          "line": 64500,
+          "callee": "FUNC_001338_Int64Mul32",
+          "instruction": "call FUNC_001338_Int64Mul32"
+        },
+        {
+          "line": 64506,
+          "callee": "FUNC_001341_Int64ArithShift",
+          "instruction": "call FUNC_001341_Int64ArithShift"
+        },
+        {
+          "line": 64512,
+          "callee": "FUNC_001341_Int64ArithShift",
+          "instruction": "call FUNC_001341_Int64ArithShift"
+        },
+        {
+          "line": 64518,
+          "callee": "FUNC_001341_Int64ArithShift",
+          "instruction": "call FUNC_001341_Int64ArithShift"
+        },
+        {
+          "line": 64528,
+          "callee": "FUNC_000574",
+          "instruction": "call FUNC_000574"
+        },
+        {
+          "line": 64549,
+          "callee": "FUNC_001338_Int64Mul32",
+          "instruction": "call FUNC_001338_Int64Mul32"
+        },
+        {
+          "line": 64556,
+          "callee": "FUNC_001338_Int64Mul32",
+          "instruction": "call FUNC_001338_Int64Mul32"
+        },
+        {
+          "line": 64563,
+          "callee": "FUNC_001338_Int64Mul32",
+          "instruction": "call FUNC_001338_Int64Mul32"
+        },
+        {
+          "line": 64569,
+          "callee": "FUNC_001341_Int64ArithShift",
+          "instruction": "call FUNC_001341_Int64ArithShift"
+        },
+        {
+          "line": 64574,
+          "callee": "FUNC_001341_Int64ArithShift",
+          "instruction": "call FUNC_001341_Int64ArithShift"
+        },
+        {
+          "line": 64579,
+          "callee": "FUNC_001341_Int64ArithShift",
+          "instruction": "call FUNC_001341_Int64ArithShift"
+        }
+      ]
+    },
+    {
+      "id": "F880",
+      "label": "FUNC_000880",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 64596,
+      "line_end": 64888,
+      "research_level": "selected_branches_reviewed",
+      "call_sites": [
+        {
+          "line": 64629,
+          "callee": "FUNC_000927",
+          "instruction": "call near [DATA_007198]    ; FUNC_000927"
+        },
+        {
+          "line": 64651,
+          "callee": "FUNC_001482",
+          "instruction": "call FUNC_001482"
+        },
+        {
+          "line": 64654,
+          "callee": "FUNC_001496",
+          "instruction": "call near [DATA_007722]    ; FUNC_001496"
+        },
+        {
+          "line": 64772,
+          "callee": "FUNC_000879",
+          "instruction": "call FUNC_000879"
+        },
+        {
+          "line": 64792,
+          "callee": "FUNC_001496",
+          "instruction": "call near [DATA_007722]    ; FUNC_001496"
+        },
+        {
+          "line": 64797,
+          "callee": "FUNC_001483",
+          "instruction": "call near [DATA_007731]    ; FUNC_001483"
+        },
+        {
+          "line": 64803,
+          "callee": "FUNC_001494",
+          "instruction": "call near [DATA_007733]    ; FUNC_001494"
+        },
+        {
+          "line": 64820,
+          "callee": "FUNC_001510",
+          "instruction": "call near [DATA_007743]    ; FUNC_001510"
+        },
+        {
+          "line": 64834,
+          "callee": "FUNC_001507",
+          "instruction": "call near [DATA_007741]    ; FUNC_001507"
+        },
+        {
+          "line": 64845,
+          "callee": "FUNC_001675_MatBuildYZT",
+          "instruction": "call FUNC_001675_MatBuildYZT"
+        }
+      ]
+    },
+    {
+      "id": "F899",
+      "label": "FUNC_000899",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 67040,
+      "line_end": 67065,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 67059,
+          "callee": "FUNC_000903",
+          "instruction": "call FUNC_000903"
+        }
+      ]
+    },
+    {
+      "id": "F900",
+      "label": "FUNC_000900",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 67066,
+      "line_end": 67095,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 67088,
+          "callee": "FUNC_000903",
+          "instruction": "call FUNC_000903"
+        }
+      ]
+    },
+    {
+      "id": "F901",
+      "label": "FUNC_000901",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 67096,
+      "line_end": 67121,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 67115,
+          "callee": "FUNC_000903",
+          "instruction": "call FUNC_000903"
+        }
+      ]
+    },
+    {
+      "id": "F902",
+      "label": "FUNC_000902",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 67122,
+      "line_end": 67189,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 67133,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        }
+      ]
+    },
+    {
+      "id": "F903",
+      "label": "FUNC_000903",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 67190,
+      "line_end": 67386,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 67203,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 67262,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 67356,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        }
+      ]
+    },
+    {
+      "id": "F904",
+      "label": "FUNC_000904",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 67387,
+      "line_end": 67407,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 67394,
+          "callee": "FUNC_000855",
+          "instruction": "call FUNC_000855"
+        },
+        {
+          "line": 67398,
+          "callee": "FUNC_000905",
+          "instruction": "call FUNC_000905"
+        }
+      ]
+    },
+    {
+      "id": "F905",
+      "label": "FUNC_000905",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 67408,
+      "line_end": 67440,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 67416,
+          "callee": "FUNC_000906",
+          "instruction": "call FUNC_000906"
+        },
+        {
+          "line": 67420,
+          "callee": "FUNC_000878",
+          "instruction": "call FUNC_000878"
+        },
+        {
+          "line": 67425,
+          "callee": "FUNC_000907",
+          "instruction": "call FUNC_000907"
+        },
+        {
+          "line": 67433,
+          "callee": "FUNC_000880",
+          "instruction": "call FUNC_000880"
+        }
+      ]
+    },
+    {
+      "id": "F906",
+      "label": "FUNC_000906",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 67441,
+      "line_end": 67459,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F907",
+      "label": "FUNC_000907",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 67460,
+      "line_end": 67493,
+      "research_level": "selected_branches_reviewed",
+      "call_sites": []
+    },
+    {
+      "id": "F908",
+      "label": "FUNC_000908",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 67494,
+      "line_end": 67602,
+      "research_level": "selected_branches_reviewed",
+      "call_sites": [
+        {
+          "line": 67513,
+          "callee": "FUNC_000034",
+          "instruction": "call FUNC_000034"
+        },
+        {
+          "line": 67516,
+          "callee": "FUNC_000035",
+          "instruction": "call FUNC_000035"
+        },
+        {
+          "line": 67522,
+          "callee": "FUNC_000034",
+          "instruction": "call FUNC_000034"
+        },
+        {
+          "line": 67542,
+          "callee": "FUNC_000901",
+          "instruction": "call FUNC_000901"
+        },
+        {
+          "line": 67580,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 67583,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 67588,
+          "callee": "FUNC_000909",
+          "instruction": "call FUNC_000909"
+        }
+      ]
+    },
+    {
+      "id": "F909",
+      "label": "FUNC_000909",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 67603,
+      "line_end": 67750,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 67616,
+          "callee": "FUNC_000148",
+          "instruction": "call FUNC_000148"
+        },
+        {
+          "line": 67622,
+          "callee": "FUNC_000988",
+          "instruction": "call FUNC_000988"
+        },
+        {
+          "line": 67637,
+          "callee": "FUNC_000922",
+          "instruction": "call near [DATA_007217]    ; FUNC_000922"
+        },
+        {
+          "line": 67646,
+          "callee": "FUNC_000912",
+          "instruction": "call FUNC_000912"
+        },
+        {
+          "line": 67658,
+          "callee": "FUNC_001530",
+          "instruction": "call near [DATA_007752]    ; FUNC_001530"
+        },
+        {
+          "line": 67666,
+          "callee": "FUNC_000910",
+          "instruction": "call FUNC_000910"
+        },
+        {
+          "line": 67677,
+          "callee": "FUNC_000910",
+          "instruction": "call FUNC_000910"
+        },
+        {
+          "line": 67682,
+          "callee": "FUNC_000148",
+          "instruction": "call FUNC_000148"
+        },
+        {
+          "line": 67688,
+          "callee": "FUNC_000860",
+          "instruction": "call FUNC_000860"
+        },
+        {
+          "line": 67692,
+          "callee": "FUNC_000905",
+          "instruction": "call FUNC_000905"
+        },
+        {
+          "line": 67723,
+          "callee": "FUNC_000606",
+          "instruction": "call near [DATA_006154]    ; FUNC_000606"
+        },
+        {
+          "line": 67729,
+          "callee": "FUNC_000606",
+          "instruction": "call near [DATA_006154]    ; FUNC_000606"
+        },
+        {
+          "line": 67734,
+          "callee": "FUNC_000148",
+          "instruction": "call FUNC_000148"
+        },
+        {
+          "line": 67741,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        }
+      ]
+    },
+    {
+      "id": "F910",
+      "label": "FUNC_000910",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 67751,
+      "line_end": 67879,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 67764,
+          "callee": "FUNC_001530",
+          "instruction": "call near [DATA_007752]    ; FUNC_001530"
+        },
+        {
+          "line": 67771,
+          "callee": "FUNC_000148",
+          "instruction": "call FUNC_000148"
+        },
+        {
+          "line": 67796,
+          "callee": "FUNC_000911",
+          "instruction": "call FUNC_000911"
+        },
+        {
+          "line": 67804,
+          "callee": "FUNC_000349",
+          "instruction": "call FUNC_000349"
+        },
+        {
+          "line": 67810,
+          "callee": "FUNC_000860",
+          "instruction": "call FUNC_000860"
+        },
+        {
+          "line": 67814,
+          "callee": "FUNC_000905",
+          "instruction": "call FUNC_000905"
+        },
+        {
+          "line": 67818,
+          "callee": "FUNC_000148",
+          "instruction": "call FUNC_000148"
+        },
+        {
+          "line": 67837,
+          "callee": "FUNC_000912",
+          "instruction": "call FUNC_000912"
+        },
+        {
+          "line": 67845,
+          "callee": "FUNC_000349",
+          "instruction": "call FUNC_000349"
+        },
+        {
+          "line": 67851,
+          "callee": "FUNC_000925",
+          "instruction": "call near [DATA_007218]    ; FUNC_000925"
+        },
+        {
+          "line": 67857,
+          "callee": "FUNC_000911",
+          "instruction": "call FUNC_000911"
+        },
+        {
+          "line": 67865,
+          "callee": "FUNC_000349",
+          "instruction": "call FUNC_000349"
+        }
+      ]
+    },
+    {
+      "id": "F925",
+      "label": "FUNC_000925",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 69085,
+      "line_end": 69098,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 69092,
+          "callee": "FUNC_000924",
+          "instruction": "call FUNC_000924"
+        }
+      ]
+    },
+    {
+      "id": "F926",
+      "label": "FUNC_000926",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 69099,
+      "line_end": 69169,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 69116,
+          "callee": "FUNC_000927",
+          "instruction": "call near [DATA_007198]    ; FUNC_000927"
+        },
+        {
+          "line": 69132,
+          "callee": "FUNC_001344_StringExpandFFCode",
+          "instruction": "call near [DATA_007639]    ; FUNC_001344_StringExpandFFCode"
+        },
+        {
+          "line": 69138,
+          "callee": "FUNC_001530",
+          "instruction": "call near [DATA_007752]    ; FUNC_001530"
+        },
+        {
+          "line": 69142,
+          "callee": "FUNC_001530",
+          "instruction": "call near [DATA_007752]    ; FUNC_001530"
+        },
+        {
+          "line": 69158,
+          "callee": "FUNC_001514",
+          "instruction": "call near [DATA_007746]    ; FUNC_001514"
+        }
+      ]
+    },
+    {
+      "id": "F927",
+      "label": "FUNC_000927",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 69170,
+      "line_end": 69258,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 69245,
+          "callee": "FUNC_001533",
+          "instruction": "call near [DATA_007755]    ; FUNC_001533"
+        }
+      ]
+    },
+    {
+      "id": "F928",
+      "label": "FUNC_000928",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 69259,
+      "line_end": 69364,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 69293,
+          "callee": "FUNC_001533",
+          "instruction": "call near [DATA_007755]    ; FUNC_001533"
+        },
+        {
+          "line": 69335,
+          "callee": "FUNC_001533",
+          "instruction": "call near [DATA_007755]    ; FUNC_001533"
+        }
+      ]
+    },
+    {
+      "id": "F929",
+      "label": "FUNC_000929",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 69365,
+      "line_end": 69453,
+      "research_level": "reviewed_body_in_scope",
+      "call_sites": [
+        {
+          "line": 69428,
+          "callee": "FUNC_000349",
+          "instruction": "call FUNC_000349"
+        }
+      ]
+    },
+    {
+      "id": "F930",
+      "label": "FUNC_000930",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 69454,
+      "line_end": 69549,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 69472,
+          "callee": "FUNC_001907_SoundPlaySampleLogVol",
+          "instruction": "call FUNC_001907_SoundPlaySampleLogVol"
+        },
+        {
+          "line": 69495,
+          "callee": "FUNC_000929",
+          "instruction": "call FUNC_000929"
+        },
+        {
+          "line": 69504,
+          "callee": "FUNC_000929",
+          "instruction": "call FUNC_000929"
+        },
+        {
+          "line": 69512,
+          "callee": "FUNC_001907_SoundPlaySampleLogVol",
+          "instruction": "call FUNC_001907_SoundPlaySampleLogVol"
+        },
+        {
+          "line": 69538,
+          "callee": "FUNC_000929",
+          "instruction": "call FUNC_000929"
+        }
+      ]
+    },
+    {
+      "id": "F931",
+      "label": "FUNC_000931",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 69550,
+      "line_end": 69824,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 69580,
+          "callee": "FUNC_000034",
+          "instruction": "call FUNC_000034"
+        },
+        {
+          "line": 69583,
+          "callee": "FUNC_000035",
+          "instruction": "call FUNC_000035"
+        },
+        {
+          "line": 69589,
+          "callee": "FUNC_000034",
+          "instruction": "call FUNC_000034"
+        },
+        {
+          "line": 69601,
+          "callee": "FUNC_000237",
+          "instruction": "call FUNC_000237"
+        },
+        {
+          "line": 69627,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 69633,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 69652,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 69658,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 69677,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 69683,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 69691,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 69697,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 69747,
+          "callee": "FUNC_000802",
+          "instruction": "call near [DATA_006791]    ; FUNC_000802"
+        },
+        {
+          "line": 69766,
+          "callee": "FUNC_000922",
+          "instruction": "call near [DATA_007217]    ; FUNC_000922"
+        },
+        {
+          "line": 69778,
+          "callee": "FUNC_000926",
+          "instruction": "call FUNC_000926"
+        },
+        {
+          "line": 69797,
+          "callee": "FUNC_000930",
+          "instruction": "call FUNC_000930"
+        },
+        {
+          "line": 69802,
+          "callee": "FUNC_000953",
+          "instruction": "call FUNC_000953"
+        },
+        {
+          "line": 69808,
+          "callee": "FUNC_000939",
+          "instruction": "call FUNC_000939"
+        },
+        {
+          "line": 69813,
+          "callee": "FUNC_000930",
+          "instruction": "call FUNC_000930"
+        }
+      ]
+    },
+    {
+      "id": "F932",
+      "label": "FUNC_000932",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 69825,
+      "line_end": 69854,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F933",
+      "label": "FUNC_000933",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 69855,
+      "line_end": 69910,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 69874,
+          "callee": "FUNC_000922",
+          "instruction": "call near [DATA_007217]    ; FUNC_000922"
+        }
+      ]
+    },
+    {
+      "id": "F934",
+      "label": "FUNC_000934",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 69911,
+      "line_end": 69986,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 69933,
+          "callee": "FUNC_001530",
+          "instruction": "call near [DATA_007752]    ; FUNC_001530"
+        },
+        {
+          "line": 69938,
+          "callee": "FUNC_000933",
+          "instruction": "call FUNC_000933"
+        },
+        {
+          "line": 69948,
+          "callee": "FUNC_000349",
+          "instruction": "call FUNC_000349"
+        },
+        {
+          "line": 69952,
+          "callee": "FUNC_001530",
+          "instruction": "call near [DATA_007752]    ; FUNC_001530"
+        },
+        {
+          "line": 69975,
+          "callee": "FUNC_000349",
+          "instruction": "call FUNC_000349"
+        }
+      ]
+    },
+    {
+      "id": "F935",
+      "label": "FUNC_000935",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 69987,
+      "line_end": 70022,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 70001,
+          "callee": "FUNC_001907_SoundPlaySampleLogVol",
+          "instruction": "call FUNC_001907_SoundPlaySampleLogVol"
+        },
+        {
+          "line": 70015,
+          "callee": "FUNC_001907_SoundPlaySampleLogVol",
+          "instruction": "call FUNC_001907_SoundPlaySampleLogVol"
+        }
+      ]
+    },
+    {
+      "id": "F936",
+      "label": "FUNC_000936",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 70023,
+      "line_end": 70061,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 70042,
+          "callee": "FUNC_000590",
+          "instruction": "call near [DATA_006148]    ; FUNC_000590"
+        },
+        {
+          "line": 70051,
+          "callee": "FUNC_000953",
+          "instruction": "call FUNC_000953"
+        }
+      ]
+    },
+    {
+      "id": "F937",
+      "label": "FUNC_000937",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 70062,
+      "line_end": 70121,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 70086,
+          "callee": "FUNC_001907_SoundPlaySampleLogVol",
+          "instruction": "call FUNC_001907_SoundPlaySampleLogVol"
+        },
+        {
+          "line": 70105,
+          "callee": "FUNC_000936",
+          "instruction": "call FUNC_000936"
+        }
+      ]
+    },
+    {
+      "id": "F938",
+      "label": "FUNC_000938",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 70122,
+      "line_end": 70290,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 70163,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 70173,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 70187,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 70242,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 70281,
+          "callee": "FUNC_000929",
+          "instruction": "call FUNC_000929"
+        }
+      ]
+    },
+    {
+      "id": "F939",
+      "label": "FUNC_000939",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 70291,
+      "line_end": 70380,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 70304,
+          "callee": "FUNC_001530",
+          "instruction": "call near [DATA_007752]    ; FUNC_001530"
+        },
+        {
+          "line": 70316,
+          "callee": "FUNC_000928",
+          "instruction": "call near [DATA_007219]    ; FUNC_000928"
+        },
+        {
+          "line": 70331,
+          "callee": "FUNC_001530",
+          "instruction": "call near [DATA_007752]    ; FUNC_001530"
+        },
+        {
+          "line": 70333,
+          "callee": "FUNC_001530",
+          "instruction": "call near [DATA_007752]    ; FUNC_001530"
+        },
+        {
+          "line": 70343,
+          "callee": "FUNC_001675_MatBuildYZT",
+          "instruction": "call FUNC_001675_MatBuildYZT"
+        },
+        {
+          "line": 70358,
+          "callee": "FUNC_001532",
+          "instruction": "call near [DATA_007754]    ; FUNC_001532"
+        }
+      ]
+    },
+    {
+      "id": "F953",
+      "label": "FUNC_000953",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 71190,
+      "line_end": 71339,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 71208,
+          "callee": "FUNC_000034",
+          "instruction": "call FUNC_000034"
+        },
+        {
+          "line": 71213,
+          "callee": "FUNC_000034",
+          "instruction": "call FUNC_000034"
+        },
+        {
+          "line": 71217,
+          "callee": "FUNC_000034",
+          "instruction": "call FUNC_000034"
+        },
+        {
+          "line": 71220,
+          "callee": "FUNC_000035",
+          "instruction": "call FUNC_000035"
+        },
+        {
+          "line": 71239,
+          "callee": "FUNC_000144",
+          "instruction": "call FUNC_000144"
+        },
+        {
+          "line": 71259,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 71271,
+          "callee": "FUNC_001907_SoundPlaySampleLogVol",
+          "instruction": "call FUNC_001907_SoundPlaySampleLogVol"
+        },
+        {
+          "line": 71285,
+          "callee": "FUNC_000942",
+          "instruction": "call FUNC_000942"
+        },
+        {
+          "line": 71294,
+          "callee": "FUNC_001907_SoundPlaySampleLogVol",
+          "instruction": "call FUNC_001907_SoundPlaySampleLogVol"
+        },
+        {
+          "line": 71300,
+          "callee": "FUNC_001530",
+          "instruction": "call near [DATA_007752]    ; FUNC_001530"
+        },
+        {
+          "line": 71310,
+          "callee": "FUNC_000952",
+          "instruction": "call FUNC_000952"
+        },
+        {
+          "line": 71318,
+          "callee": "FUNC_000148",
+          "instruction": "call FUNC_000148"
+        },
+        {
+          "line": 71327,
+          "callee": "FUNC_001907_SoundPlaySampleLogVol",
+          "instruction": "call FUNC_001907_SoundPlaySampleLogVol"
+        }
+      ]
+    },
+    {
+      "id": "F1007",
+      "label": "FUNC_001007",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 74532,
+      "line_end": 74680,
+      "research_level": "reviewed_body_in_scope",
+      "call_sites": [
+        {
+          "line": 74574,
+          "callee": "FUNC_000934",
+          "instruction": "call FUNC_000934"
+        },
+        {
+          "line": 74581,
+          "callee": "FUNC_000938",
+          "instruction": "call FUNC_000938"
+        },
+        {
+          "line": 74590,
+          "callee": "FUNC_001532",
+          "instruction": "call near [DATA_007754]    ; FUNC_001532"
+        },
+        {
+          "line": 74596,
+          "callee": "FUNC_000144",
+          "instruction": "call FUNC_000144"
+        },
+        {
+          "line": 74607,
+          "callee": "FUNC_000589",
+          "instruction": "call near [DATA_006147]    ; FUNC_000589"
+        },
+        {
+          "line": 74625,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 74631,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 74635,
+          "callee": "FUNC_000995",
+          "instruction": "call FUNC_000995"
+        },
+        {
+          "line": 74636,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 74641,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 74646,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 74662,
+          "callee": "FUNC_001097",
+          "instruction": "call FUNC_001097"
+        },
+        {
+          "line": 74666,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 74670,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        }
+      ]
+    },
+    {
+      "id": "F1008",
+      "label": "FUNC_001008",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 74681,
+      "line_end": 74771,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 74715,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 74723,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 74747,
+          "callee": "FUNC_001097",
+          "instruction": "call FUNC_001097"
+        }
+      ]
+    },
+    {
+      "id": "F1009",
+      "label": "FUNC_001009",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 74772,
+      "line_end": 74815,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 74800,
+          "callee": "FUNC_001008",
+          "instruction": "call FUNC_001008"
+        },
+        {
+          "line": 74806,
+          "callee": null,
+          "instruction": "call eax"
+        }
+      ]
+    },
+    {
+      "id": "F1010",
+      "label": "FUNC_001010",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 74816,
+      "line_end": 74841,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 74827,
+          "callee": "FUNC_001062",
+          "instruction": "call FUNC_001062"
+        },
+        {
+          "line": 74831,
+          "callee": "FUNC_001064",
+          "instruction": "call FUNC_001064"
+        },
+        {
+          "line": 74836,
+          "callee": null,
+          "instruction": "call eax"
+        }
+      ]
+    },
+    {
+      "id": "F1011",
+      "label": "FUNC_001011",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 74842,
+      "line_end": 74874,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 74851,
+          "callee": "FUNC_001039",
+          "instruction": "call FUNC_001039"
+        },
+        {
+          "line": 74857,
+          "callee": "FUNC_001014",
+          "instruction": "call FUNC_001014"
+        },
+        {
+          "line": 74866,
+          "callee": "FUNC_000939",
+          "instruction": "call FUNC_000939"
+        }
+      ]
+    },
+    {
+      "id": "F1012",
+      "label": "FUNC_001012",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 74875,
+      "line_end": 74911,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 74884,
+          "callee": "FUNC_001039",
+          "instruction": "call FUNC_001039"
+        },
+        {
+          "line": 74889,
+          "callee": "FUNC_001014",
+          "instruction": "call FUNC_001014"
+        },
+        {
+          "line": 74894,
+          "callee": "FUNC_001015",
+          "instruction": "call FUNC_001015"
+        },
+        {
+          "line": 74903,
+          "callee": "FUNC_000939",
+          "instruction": "call FUNC_000939"
+        }
+      ]
+    },
+    {
+      "id": "F1013",
+      "label": "FUNC_001013",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 74912,
+      "line_end": 74964,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 74920,
+          "callee": "FUNC_001037",
+          "instruction": "call FUNC_001037"
+        },
+        {
+          "line": 74928,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 74932,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 74936,
+          "callee": "FUNC_001041",
+          "instruction": "call FUNC_001041"
+        },
+        {
+          "line": 74941,
+          "callee": "FUNC_000602",
+          "instruction": "call near [DATA_006152]    ; FUNC_000602"
+        },
+        {
+          "line": 74944,
+          "callee": "FUNC_001046",
+          "instruction": "call FUNC_001046"
+        },
+        {
+          "line": 74955,
+          "callee": "FUNC_001033",
+          "instruction": "call FUNC_001033"
+        }
+      ]
+    },
+    {
+      "id": "F1014",
+      "label": "FUNC_001014",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 74965,
+      "line_end": 75115,
+      "research_level": "reviewed_body_in_scope",
+      "call_sites": [
+        {
+          "line": 75013,
+          "callee": "FUNC_000953",
+          "instruction": "call FUNC_000953"
+        },
+        {
+          "line": 75024,
+          "callee": "FUNC_001097",
+          "instruction": "call FUNC_001097"
+        },
+        {
+          "line": 75035,
+          "callee": "FUNC_000953",
+          "instruction": ";\t\tcall FUNC_000953"
+        },
+        {
+          "line": 75048,
+          "callee": "FUNC_001532",
+          "instruction": "call near [DATA_007754]    ; FUNC_001532"
+        },
+        {
+          "line": 75054,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 75060,
+          "callee": "FUNC_001017",
+          "instruction": "call FUNC_001017"
+        },
+        {
+          "line": 75090,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 75096,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 75102,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 75106,
+          "callee": "FUNC_001016",
+          "instruction": "call FUNC_001016"
+        }
+      ]
+    },
+    {
+      "id": "F1015",
+      "label": "FUNC_001015",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 75116,
+      "line_end": 75129,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 75123,
+          "callee": "FUNC_001016",
+          "instruction": "call FUNC_001016"
+        }
+      ]
+    },
+    {
+      "id": "F1016",
+      "label": "FUNC_001016",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 75130,
+      "line_end": 75145,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 75138,
+          "callee": "FUNC_001017",
+          "instruction": "call FUNC_001017"
+        }
+      ]
+    },
+    {
+      "id": "F1017",
+      "label": "FUNC_001017",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 75146,
+      "line_end": 75156,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F1018",
+      "label": "FUNC_001018",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 75157,
+      "line_end": 75177,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 75164,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 75166,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 75171,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        }
+      ]
+    },
+    {
+      "id": "F1019",
+      "label": "FUNC_001019",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 75178,
+      "line_end": 75322,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 75191,
+          "callee": "FUNC_001018",
+          "instruction": "call FUNC_001018"
+        },
+        {
+          "line": 75195,
+          "callee": "FUNC_001039",
+          "instruction": "call FUNC_001039"
+        },
+        {
+          "line": 75206,
+          "callee": "FUNC_001033",
+          "instruction": "call FUNC_001033"
+        },
+        {
+          "line": 75215,
+          "callee": "FUNC_001014",
+          "instruction": "call FUNC_001014"
+        },
+        {
+          "line": 75220,
+          "callee": "FUNC_001035",
+          "instruction": "call FUNC_001035"
+        },
+        {
+          "line": 75235,
+          "callee": "FUNC_001042",
+          "instruction": "call FUNC_001042"
+        },
+        {
+          "line": 75241,
+          "callee": "FUNC_000652",
+          "instruction": "call FUNC_000652"
+        },
+        {
+          "line": 75247,
+          "callee": "FUNC_000995",
+          "instruction": "call FUNC_000995"
+        },
+        {
+          "line": 75248,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 75253,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 75262,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 75266,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 75271,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 75276,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 75283,
+          "callee": "FUNC_001014",
+          "instruction": "call FUNC_001014"
+        },
+        {
+          "line": 75288,
+          "callee": "FUNC_001035",
+          "instruction": "call FUNC_001035"
+        },
+        {
+          "line": 75292,
+          "callee": "FUNC_001046",
+          "instruction": "call FUNC_001046"
+        },
+        {
+          "line": 75299,
+          "callee": "FUNC_000603",
+          "instruction": "call near [DATA_006153]    ; FUNC_000603"
+        },
+        {
+          "line": 75304,
+          "callee": "FUNC_000601",
+          "instruction": "call near [DATA_006142]    ; FUNC_000601"
+        },
+        {
+          "line": 75311,
+          "callee": "FUNC_000585",
+          "instruction": "call near [DATA_006143]    ; FUNC_000585"
+        }
+      ]
+    },
+    {
+      "id": "F1020",
+      "label": "FUNC_001020",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 75323,
+      "line_end": 75372,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 75344,
+          "callee": "FUNC_001032",
+          "instruction": "call FUNC_001032"
+        },
+        {
+          "line": 75355,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 75357,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 75359,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 75364,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        }
+      ]
+    },
+    {
+      "id": "F1021",
+      "label": "FUNC_001021",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 75373,
+      "line_end": 75553,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 75383,
+          "callee": "FUNC_001037",
+          "instruction": "call FUNC_001037"
+        },
+        {
+          "line": 75386,
+          "callee": "FUNC_001041",
+          "instruction": "call FUNC_001041"
+        },
+        {
+          "line": 75393,
+          "callee": "FUNC_000602",
+          "instruction": "call near [DATA_006152]    ; FUNC_000602"
+        },
+        {
+          "line": 75400,
+          "callee": "FUNC_000601",
+          "instruction": "call near [DATA_006142]    ; FUNC_000601"
+        },
+        {
+          "line": 75409,
+          "callee": "FUNC_001018",
+          "instruction": "call FUNC_001018"
+        },
+        {
+          "line": 75411,
+          "callee": "FUNC_001120",
+          "instruction": "call FUNC_001120"
+        },
+        {
+          "line": 75426,
+          "callee": "FUNC_000726",
+          "instruction": "call FUNC_000726"
+        },
+        {
+          "line": 75437,
+          "callee": "FUNC_000726",
+          "instruction": "call FUNC_000726"
+        },
+        {
+          "line": 75446,
+          "callee": "FUNC_001117",
+          "instruction": "call FUNC_001117"
+        },
+        {
+          "line": 75447,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 75451,
+          "callee": "FUNC_001046",
+          "instruction": "call FUNC_001046"
+        },
+        {
+          "line": 75462,
+          "callee": "FUNC_001033",
+          "instruction": "call FUNC_001033"
+        },
+        {
+          "line": 75471,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 75475,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 75485,
+          "callee": "FUNC_000657",
+          "instruction": "call FUNC_000657"
+        },
+        {
+          "line": 75493,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 75499,
+          "callee": "FUNC_001022",
+          "instruction": "call FUNC_001022"
+        },
+        {
+          "line": 75510,
+          "callee": "FUNC_001042",
+          "instruction": "call FUNC_001042"
+        },
+        {
+          "line": 75517,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 75522,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 75530,
+          "callee": "FUNC_001014",
+          "instruction": "call FUNC_001014"
+        },
+        {
+          "line": 75542,
+          "callee": "FUNC_001035",
+          "instruction": "call FUNC_001035"
+        }
+      ]
+    },
+    {
+      "id": "F1022",
+      "label": "FUNC_001022",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 75554,
+      "line_end": 75588,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 75575,
+          "callee": "FUNC_000349",
+          "instruction": "call FUNC_000349"
+        },
+        {
+          "line": 75580,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        }
+      ]
+    },
+    {
+      "id": "F1023",
+      "label": "FUNC_001023",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 75589,
+      "line_end": 75674,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 75608,
+          "callee": "FUNC_000263_ConsoleShowButton",
+          "instruction": "call FUNC_000263_ConsoleShowButton"
+        },
+        {
+          "line": 75613,
+          "callee": "FUNC_000264_ConsoleHideButton",
+          "instruction": "call FUNC_000264_ConsoleHideButton"
+        },
+        {
+          "line": 75621,
+          "callee": "FUNC_000263_ConsoleShowButton",
+          "instruction": "call FUNC_000263_ConsoleShowButton"
+        },
+        {
+          "line": 75626,
+          "callee": "FUNC_000264_ConsoleHideButton",
+          "instruction": "call FUNC_000264_ConsoleHideButton"
+        },
+        {
+          "line": 75634,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 75656,
+          "callee": "FUNC_000349",
+          "instruction": "call FUNC_000349"
+        },
+        {
+          "line": 75665,
+          "callee": "FUNC_000237",
+          "instruction": "call FUNC_000237"
+        }
+      ]
+    },
+    {
+      "id": "F1024",
+      "label": "FUNC_001024",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 75675,
+      "line_end": 75810,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 75685,
+          "callee": "FUNC_001037",
+          "instruction": "call FUNC_001037"
+        },
+        {
+          "line": 75688,
+          "callee": "FUNC_001041",
+          "instruction": "call FUNC_001041"
+        },
+        {
+          "line": 75693,
+          "callee": "FUNC_000601",
+          "instruction": "call near [DATA_006142]    ; FUNC_000601"
+        },
+        {
+          "line": 75696,
+          "callee": "FUNC_001046",
+          "instruction": "call FUNC_001046"
+        },
+        {
+          "line": 75707,
+          "callee": "FUNC_001033",
+          "instruction": "call FUNC_001033"
+        },
+        {
+          "line": 75723,
+          "callee": "FUNC_001022",
+          "instruction": "call FUNC_001022"
+        },
+        {
+          "line": 75739,
+          "callee": "FUNC_001042",
+          "instruction": "call FUNC_001042"
+        },
+        {
+          "line": 75745,
+          "callee": "FUNC_000652",
+          "instruction": "call FUNC_000652"
+        },
+        {
+          "line": 75751,
+          "callee": "FUNC_000995",
+          "instruction": "call FUNC_000995"
+        },
+        {
+          "line": 75752,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 75757,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 75766,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 75770,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 75775,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 75780,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 75788,
+          "callee": "FUNC_000589",
+          "instruction": "call near [DATA_006147]    ; FUNC_000589"
+        },
+        {
+          "line": 75799,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        }
+      ]
+    },
+    {
+      "id": "F1025",
+      "label": "FUNC_001025",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 75811,
+      "line_end": 75981,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 75826,
+          "callee": "FUNC_000939",
+          "instruction": "call FUNC_000939"
+        },
+        {
+          "line": 75839,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 75848,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 75855,
+          "callee": "FUNC_000589",
+          "instruction": "call near [DATA_006147]    ; FUNC_000589"
+        },
+        {
+          "line": 75862,
+          "callee": "FUNC_000591",
+          "instruction": "call near [DATA_006149]    ; FUNC_000591"
+        },
+        {
+          "line": 75871,
+          "callee": "FUNC_001334_Int64Add32",
+          "instruction": "call FUNC_001334_Int64Add32"
+        },
+        {
+          "line": 75903,
+          "callee": "FUNC_000585",
+          "instruction": "call near [DATA_006143]    ; FUNC_000585"
+        },
+        {
+          "line": 75906,
+          "callee": "FUNC_001046",
+          "instruction": "call FUNC_001046"
+        },
+        {
+          "line": 75927,
+          "callee": "FUNC_000568",
+          "instruction": "call near [DATA_006140]    ; FUNC_000568"
+        },
+        {
+          "line": 75943,
+          "callee": "FUNC_000653",
+          "instruction": "call FUNC_000653"
+        },
+        {
+          "line": 75946,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 75950,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 75959,
+          "callee": "FUNC_000653",
+          "instruction": "call FUNC_000653"
+        },
+        {
+          "line": 75962,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 75966,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        }
+      ]
+    },
+    {
+      "id": "F1026",
+      "label": "FUNC_001026",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 75982,
+      "line_end": 75997,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 75989,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        }
+      ]
+    },
+    {
+      "id": "F1027",
+      "label": "FUNC_001027",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 75998,
+      "line_end": 76013,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 76006,
+          "callee": "FUNC_001026",
+          "instruction": "call FUNC_001026"
+        }
+      ]
+    },
+    {
+      "id": "F1028",
+      "label": "FUNC_001028",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 76014,
+      "line_end": 76023,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F1029",
+      "label": "FUNC_001029",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 76024,
+      "line_end": 76045,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 76032,
+          "callee": "FUNC_001030",
+          "instruction": "call FUNC_001030"
+        },
+        {
+          "line": 76037,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        }
+      ]
+    },
+    {
+      "id": "F1030",
+      "label": "FUNC_001030",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 76046,
+      "line_end": 76054,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F1031",
+      "label": "FUNC_001031",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 76055,
+      "line_end": 76124,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 76072,
+          "callee": "FUNC_001033",
+          "instruction": "call FUNC_001033"
+        },
+        {
+          "line": 76076,
+          "callee": "FUNC_001037",
+          "instruction": "call FUNC_001037"
+        },
+        {
+          "line": 76079,
+          "callee": "FUNC_001041",
+          "instruction": "call FUNC_001041"
+        },
+        {
+          "line": 76084,
+          "callee": "FUNC_000601",
+          "instruction": "call near [DATA_006142]    ; FUNC_000601"
+        },
+        {
+          "line": 76087,
+          "callee": "FUNC_001046",
+          "instruction": "call FUNC_001046"
+        },
+        {
+          "line": 76094,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 76096,
+          "callee": "FUNC_001032",
+          "instruction": "call FUNC_001032"
+        },
+        {
+          "line": 76102,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 76114,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        }
+      ]
+    },
+    {
+      "id": "F1032",
+      "label": "FUNC_001032",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 76125,
+      "line_end": 76143,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 76136,
+          "callee": "FUNC_000651",
+          "instruction": "call FUNC_000651"
+        }
+      ]
+    },
+    {
+      "id": "F1033",
+      "label": "FUNC_001033",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 76144,
+      "line_end": 76283,
+      "research_level": "reviewed_body_in_scope",
+      "call_sites": [
+        {
+          "line": 76167,
+          "callee": "FUNC_000569",
+          "instruction": "call near [DATA_006141]    ; FUNC_000569"
+        },
+        {
+          "line": 76187,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 76196,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 76203,
+          "callee": "FUNC_001034",
+          "instruction": "call FUNC_001034"
+        },
+        {
+          "line": 76238,
+          "callee": "FUNC_000349",
+          "instruction": "call FUNC_000349"
+        },
+        {
+          "line": 76242,
+          "callee": "FUNC_000148",
+          "instruction": "call FUNC_000148"
+        },
+        {
+          "line": 76245,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 76270,
+          "callee": "FUNC_000953",
+          "instruction": "call FUNC_000953"
+        }
+      ]
+    },
+    {
+      "id": "F1034",
+      "label": "FUNC_001034",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 76284,
+      "line_end": 76305,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F1035",
+      "label": "FUNC_001035",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 76306,
+      "line_end": 76392,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 76317,
+          "callee": "FUNC_001015",
+          "instruction": "call FUNC_001015"
+        },
+        {
+          "line": 76322,
+          "callee": "FUNC_001036",
+          "instruction": "call FUNC_001036"
+        },
+        {
+          "line": 76328,
+          "callee": "FUNC_001530",
+          "instruction": "call near [DATA_007752]    ; FUNC_001530"
+        },
+        {
+          "line": 76341,
+          "callee": "FUNC_000928",
+          "instruction": "call near [DATA_007219]    ; FUNC_000928"
+        },
+        {
+          "line": 76351,
+          "callee": "FUNC_001530",
+          "instruction": "call near [DATA_007752]    ; FUNC_001530"
+        },
+        {
+          "line": 76360,
+          "callee": "FUNC_001675_MatBuildYZT",
+          "instruction": "call FUNC_001675_MatBuildYZT"
+        },
+        {
+          "line": 76362,
+          "callee": "FUNC_001530",
+          "instruction": "call near [DATA_007752]    ; FUNC_001530"
+        },
+        {
+          "line": 76376,
+          "callee": "FUNC_001517",
+          "instruction": "call near [DATA_007749]    ; FUNC_001517"
+        },
+        {
+          "line": 76382,
+          "callee": "FUNC_001661_Vec64Add",
+          "instruction": "call FUNC_001661_Vec64Add"
+        }
+      ]
+    },
+    {
+      "id": "F1036",
+      "label": "FUNC_001036",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 76393,
+      "line_end": 76519,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 76400,
+          "callee": "FUNC_001530",
+          "instruction": "call near [DATA_007752]    ; FUNC_001530"
+        },
+        {
+          "line": 76411,
+          "callee": "FUNC_001530",
+          "instruction": "call near [DATA_007752]    ; FUNC_001530"
+        },
+        {
+          "line": 76422,
+          "callee": "FUNC_000927",
+          "instruction": "call near [DATA_007198]    ; FUNC_000927"
+        },
+        {
+          "line": 76434,
+          "callee": "FUNC_001530",
+          "instruction": "call near [DATA_007752]    ; FUNC_001530"
+        },
+        {
+          "line": 76437,
+          "callee": "FUNC_001530",
+          "instruction": "call near [DATA_007752]    ; FUNC_001530"
+        },
+        {
+          "line": 76440,
+          "callee": "FUNC_001530",
+          "instruction": "call near [DATA_007752]    ; FUNC_001530"
+        },
+        {
+          "line": 76443,
+          "callee": "FUNC_001530",
+          "instruction": "call near [DATA_007752]    ; FUNC_001530"
+        },
+        {
+          "line": 76504,
+          "callee": "FUNC_001661_Vec64Add",
+          "instruction": "call FUNC_001661_Vec64Add"
+        }
+      ]
+    },
+    {
+      "id": "F1037",
+      "label": "FUNC_001037",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 76520,
+      "line_end": 76673,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 76540,
+          "callee": "FUNC_001038",
+          "instruction": "call FUNC_001038"
+        },
+        {
+          "line": 76546,
+          "callee": "FUNC_001121",
+          "instruction": "call FUNC_001121"
+        },
+        {
+          "line": 76576,
+          "callee": "FUNC_001121",
+          "instruction": "call FUNC_001121"
+        },
+        {
+          "line": 76592,
+          "callee": "FUNC_001038",
+          "instruction": "call FUNC_001038"
+        }
+      ]
+    },
+    {
+      "id": "F1038",
+      "label": "FUNC_001038",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 76674,
+      "line_end": 76813,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 76686,
+          "callee": "FUNC_001445_GuiGetXYAccum",
+          "instruction": "call near [DATA_007682]    ; FUNC_001445_GuiGetXYAccum"
+        },
+        {
+          "line": 76720,
+          "callee": null,
+          "instruction": "call FUNC_CalcKeyInput"
+        },
+        {
+          "line": 76724,
+          "callee": null,
+          "instruction": "call FUNC_CalcKeyInput"
+        },
+        {
+          "line": 76729,
+          "callee": null,
+          "instruction": "call FUNC_CalcKeyInput"
+        },
+        {
+          "line": 76733,
+          "callee": null,
+          "instruction": "call FUNC_CalcKeyInput"
+        },
+        {
+          "line": 76738,
+          "callee": null,
+          "instruction": "call FUNC_CalcKeyInput"
+        },
+        {
+          "line": 76742,
+          "callee": null,
+          "instruction": "call FUNC_CalcKeyInput"
+        },
+        {
+          "line": 76756,
+          "callee": null,
+          "instruction": "call FUNC_CheckInputWrap"
+        },
+        {
+          "line": 76765,
+          "callee": null,
+          "instruction": "call FUNC_CheckInputWrap"
+        },
+        {
+          "line": 76777,
+          "callee": null,
+          "instruction": "call FUNC_CheckInputWrap"
+        }
+      ]
+    },
+    {
+      "id": "F1039",
+      "label": "FUNC_001039",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 76814,
+      "line_end": 76833,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 76826,
+          "callee": "FUNC_001038",
+          "instruction": "call FUNC_001038"
+        }
+      ]
+    },
+    {
+      "id": "F1040",
+      "label": "FUNC_001040",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 76834,
+      "line_end": 76873,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 76838,
+          "callee": "FUNC_001445_GuiGetXYAccum",
+          "instruction": "call near [DATA_007682]    ; FUNC_001445_GuiGetXYAccum"
+        },
+        {
+          "line": 76866,
+          "callee": "FUNC_000931",
+          "instruction": "call FUNC_000931"
+        }
+      ]
+    },
+    {
+      "id": "F1041",
+      "label": "FUNC_001041",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 76874,
+      "line_end": 76967,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 76887,
+          "callee": "FUNC_000585",
+          "instruction": "call near [DATA_006143]    ; FUNC_000585"
+        },
+        {
+          "line": 76895,
+          "callee": "FUNC_000585",
+          "instruction": "call near [DATA_006143]    ; FUNC_000585"
+        },
+        {
+          "line": 76902,
+          "callee": "FUNC_000603",
+          "instruction": "call near [DATA_006153]    ; FUNC_000603"
+        },
+        {
+          "line": 76907,
+          "callee": "FUNC_000609",
+          "instruction": "call near [DATA_006157]    ; FUNC_000609"
+        },
+        {
+          "line": 76919,
+          "callee": "FUNC_000606",
+          "instruction": "call near [DATA_006154]    ; FUNC_000606"
+        },
+        {
+          "line": 76935,
+          "callee": "FUNC_000599",
+          "instruction": "call near [DATA_006151]    ; FUNC_000599"
+        },
+        {
+          "line": 76942,
+          "callee": "FUNC_001043",
+          "instruction": "call FUNC_001043"
+        },
+        {
+          "line": 76951,
+          "callee": "FUNC_000607",
+          "instruction": "call near [DATA_006155]    ; FUNC_000607"
+        },
+        {
+          "line": 76958,
+          "callee": "FUNC_000599",
+          "instruction": "call near [DATA_006151]    ; FUNC_000599"
+        }
+      ]
+    },
+    {
+      "id": "F1042",
+      "label": "FUNC_001042",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 76968,
+      "line_end": 76999,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 76992,
+          "callee": "FUNC_001910_SoundModifyStationNoise",
+          "instruction": "call FUNC_001910_SoundModifyStationNoise"
+        }
+      ]
+    },
+    {
+      "id": "F1043",
+      "label": "FUNC_001043",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 77000,
+      "line_end": 77163,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 77029,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 77036,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 77043,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 77051,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 77058,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 77065,
+          "callee": "FUNC_001521",
+          "instruction": "call FUNC_001521"
+        },
+        {
+          "line": 77145,
+          "callee": "FUNC_001910_SoundModifyStationNoise",
+          "instruction": "call FUNC_001910_SoundModifyStationNoise"
+        },
+        {
+          "line": 77153,
+          "callee": "FUNC_000599",
+          "instruction": "call near [DATA_006151]    ; FUNC_000599"
+        }
+      ]
+    },
+    {
+      "id": "F1056",
+      "label": "FUNC_001056",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 78017,
+      "line_end": 78788,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 78043,
+          "callee": null,
+          "instruction": "call FUNC_CalcKeyInputNoPause"
+        },
+        {
+          "line": 78050,
+          "callee": null,
+          "instruction": "call FUNC_CalcKeyInputNoPause"
+        },
+        {
+          "line": 78068,
+          "callee": null,
+          "instruction": "call FUNC_CalcKeyInputNoPause"
+        },
+        {
+          "line": 78075,
+          "callee": null,
+          "instruction": "call FUNC_CalcKeyInputNoPause"
+        },
+        {
+          "line": 78097,
+          "callee": null,
+          "instruction": "call FUNC_CalcKeyInputNoPause"
+        },
+        {
+          "line": 78101,
+          "callee": null,
+          "instruction": "call FUNC_CalcKeyInputNoPause"
+        },
+        {
+          "line": 78120,
+          "callee": null,
+          "instruction": "call FUNC_CalcKeyInputNoPause"
+        },
+        {
+          "line": 78124,
+          "callee": null,
+          "instruction": "call FUNC_CalcKeyInputNoPause"
+        },
+        {
+          "line": 78137,
+          "callee": "FUNC_001538",
+          "instruction": "call near [DATA_007756]    ; FUNC_001538"
+        },
+        {
+          "line": 78163,
+          "callee": "FUNC_001040",
+          "instruction": "call FUNC_001040"
+        },
+        {
+          "line": 78166,
+          "callee": "FUNC_001414_GuiGetLastAction",
+          "instruction": "call near [DATA_007672]    ; FUNC_001414_GuiGetLastAction"
+        },
+        {
+          "line": 78235,
+          "callee": "FUNC_001096",
+          "instruction": "call FUNC_001096"
+        },
+        {
+          "line": 78237,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 78244,
+          "callee": "FUNC_000935",
+          "instruction": "call FUNC_000935"
+        },
+        {
+          "line": 78247,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 78254,
+          "callee": "FUNC_001098",
+          "instruction": "call FUNC_001098"
+        },
+        {
+          "line": 78257,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 78264,
+          "callee": "FUNC_000937",
+          "instruction": "call FUNC_000937"
+        },
+        {
+          "line": 78266,
+          "callee": "FUNC_001119",
+          "instruction": "call FUNC_001119"
+        },
+        {
+          "line": 78268,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 78275,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 78282,
+          "callee": "FUNC_001122",
+          "instruction": "call FUNC_001122"
+        },
+        {
+          "line": 78285,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 78300,
+          "callee": "FUNC_000291",
+          "instruction": "call FUNC_000291"
+        },
+        {
+          "line": 78313,
+          "callee": "FUNC_000990",
+          "instruction": "call FUNC_000990"
+        },
+        {
+          "line": 78317,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 78325,
+          "callee": "FUNC_001415_GuiSetLastAction",
+          "instruction": "call near [DATA_007673]    ; FUNC_001415_GuiSetLastAction"
+        },
+        {
+          "line": 78376,
+          "callee": "FUNC_001020",
+          "instruction": "call FUNC_001020"
+        },
+        {
+          "line": 78384,
+          "callee": "FUNC_001020",
+          "instruction": "call FUNC_001020"
+        },
+        {
+          "line": 78388,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 78393,
+          "callee": "FUNC_001443_GuiRemoveHotArea",
+          "instruction": "call near [DATA_007680]    ; FUNC_001443_GuiRemoveHotArea"
+        },
+        {
+          "line": 78453,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 78459,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 78463,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 78469,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 78476,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 78491,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 78497,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 78509,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 78525,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 78531,
+          "callee": "FUNC_001098",
+          "instruction": "call FUNC_001098"
+        },
+        {
+          "line": 78534,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 78550,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 78556,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 78561,
+          "callee": "FUNC_001443_GuiRemoveHotArea",
+          "instruction": "call near [DATA_007680]    ; FUNC_001443_GuiRemoveHotArea"
+        },
+        {
+          "line": 78577,
+          "callee": "FUNC_001120",
+          "instruction": "call FUNC_001120"
+        },
+        {
+          "line": 78580,
+          "callee": "FUNC_001117",
+          "instruction": "call FUNC_001117"
+        },
+        {
+          "line": 78592,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 78596,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 78602,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 78606,
+          "callee": "FUNC_000262_ConsoleSetButtonImage",
+          "instruction": "call FUNC_000262_ConsoleSetButtonImage"
+        },
+        {
+          "line": 78609,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 78611,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 78615,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 78621,
+          "callee": "FUNC_001060",
+          "instruction": "call FUNC_001060"
+        },
+        {
+          "line": 78624,
+          "callee": "FUNC_001058",
+          "instruction": "call FUNC_001058"
+        },
+        {
+          "line": 78631,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 78634,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 78654,
+          "callee": "FUNC_000349",
+          "instruction": "call FUNC_000349"
+        },
+        {
+          "line": 78663,
+          "callee": "FUNC_000237",
+          "instruction": "call FUNC_000237"
+        },
+        {
+          "line": 78671,
+          "callee": "FUNC_000237",
+          "instruction": "call FUNC_000237"
+        },
+        {
+          "line": 78676,
+          "callee": "FUNC_001119",
+          "instruction": "call FUNC_001119"
+        },
+        {
+          "line": 78683,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 78685,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 78687,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 78692,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 78705,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 78707,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 78709,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 78714,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 78723,
+          "callee": "FUNC_001020",
+          "instruction": "call FUNC_001020"
+        },
+        {
+          "line": 78726,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 78728,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 78732,
+          "callee": "FUNC_001020",
+          "instruction": "call FUNC_001020"
+        },
+        {
+          "line": 78735,
+          "callee": "FUNC_001018",
+          "instruction": "call FUNC_001018"
+        },
+        {
+          "line": 78747,
+          "callee": "FUNC_001120",
+          "instruction": "call FUNC_001120"
+        },
+        {
+          "line": 78759,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 78770,
+          "callee": "FUNC_001020",
+          "instruction": "call FUNC_001020"
+        },
+        {
+          "line": 78773,
+          "callee": "FUNC_001018",
+          "instruction": "call FUNC_001018"
+        },
+        {
+          "line": 78777,
+          "callee": "FUNC_001415_GuiSetLastAction",
+          "instruction": "call near [DATA_007673]    ; FUNC_001415_GuiSetLastAction"
+        }
+      ]
+    },
+    {
+      "id": "F1088",
+      "label": "FUNC_001088",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 79830,
+      "line_end": 79987,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 79844,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 79847,
+          "callee": "FUNC_001906_SoundPlaySample",
+          "instruction": "call FUNC_001906_SoundPlaySample"
+        },
+        {
+          "line": 79859,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 79880,
+          "callee": "FUNC_001042",
+          "instruction": "call FUNC_001042"
+        },
+        {
+          "line": 79884,
+          "callee": "FUNC_001093",
+          "instruction": "call FUNC_001093"
+        },
+        {
+          "line": 79901,
+          "callee": "FUNC_001445_GuiGetXYAccum",
+          "instruction": "call near [DATA_007682]    ; FUNC_001445_GuiGetXYAccum"
+        },
+        {
+          "line": 79909,
+          "callee": "FUNC_001086",
+          "instruction": "call FUNC_001086"
+        },
+        {
+          "line": 79918,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 79929,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 79943,
+          "callee": "FUNC_001520",
+          "instruction": "call near [DATA_007719]    ; FUNC_001520"
+        },
+        {
+          "line": 79947,
+          "callee": "FUNC_001042",
+          "instruction": "call FUNC_001042"
+        },
+        {
+          "line": 79949,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 79952,
+          "callee": "FUNC_001445_GuiGetXYAccum",
+          "instruction": "call near [DATA_007682]    ; FUNC_001445_GuiGetXYAccum"
+        },
+        {
+          "line": 79960,
+          "callee": "FUNC_001086",
+          "instruction": "call FUNC_001086"
+        },
+        {
+          "line": 79969,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 79977,
+          "callee": "FUNC_001086",
+          "instruction": "call FUNC_001086"
+        }
+      ]
+    },
+    {
+      "id": "F1089",
+      "label": "FUNC_001089",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 79988,
+      "line_end": 80017,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 79999,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 80004,
+          "callee": "FUNC_001056",
+          "instruction": "call FUNC_001056"
+        },
+        {
+          "line": 80010,
+          "callee": "FUNC_001054",
+          "instruction": "call FUNC_001054"
+        }
+      ]
+    },
+    {
+      "id": "F1090",
+      "label": "FUNC_001090",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 80018,
+      "line_end": 80047,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 80029,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 80034,
+          "callee": "FUNC_001056",
+          "instruction": "call FUNC_001056"
+        },
+        {
+          "line": 80040,
+          "callee": "FUNC_001054",
+          "instruction": "call FUNC_001054"
+        }
+      ]
+    },
+    {
+      "id": "F1091",
+      "label": "FUNC_001091",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 80048,
+      "line_end": 80078,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 80054,
+          "callee": "FUNC_000148",
+          "instruction": "call FUNC_000148"
+        },
+        {
+          "line": 80056,
+          "callee": "FUNC_001903_SoundStopSong",
+          "instruction": "call FUNC_001903_SoundStopSong"
+        },
+        {
+          "line": 80067,
+          "callee": "FUNC_001116",
+          "instruction": "call FUNC_001116"
+        },
+        {
+          "line": 80068,
+          "callee": "FUNC_001092",
+          "instruction": "call FUNC_001092"
+        },
+        {
+          "line": 80072,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        }
+      ]
+    },
+    {
+      "id": "F1092",
+      "label": "FUNC_001092",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 80079,
+      "line_end": 80136,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 80089,
+          "callee": "FUNC_001908_SoundPlaySampleLinVol",
+          "instruction": "call FUNC_001908_SoundPlaySampleLinVol"
+        },
+        {
+          "line": 80098,
+          "callee": "FUNC_000048",
+          "instruction": "call FUNC_000048"
+        },
+        {
+          "line": 80102,
+          "callee": "FUNC_001055",
+          "instruction": "call FUNC_001055"
+        },
+        {
+          "line": 80119,
+          "callee": "FUNC_001071",
+          "instruction": "call FUNC_001071"
+        },
+        {
+          "line": 80128,
+          "callee": "FUNC_001071",
+          "instruction": "call FUNC_001071"
+        }
+      ]
+    },
+    {
+      "id": "F1122",
+      "label": "FUNC_001122",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 82644,
+      "line_end": 82675,
+      "research_level": "reviewed_body_in_scope",
+      "call_sites": [
+        {
+          "line": 82652,
+          "callee": "FUNC_001123",
+          "instruction": "call FUNC_001123"
+        },
+        {
+          "line": 82662,
+          "callee": "FUNC_001124",
+          "instruction": "call FUNC_001124"
+        },
+        {
+          "line": 82669,
+          "callee": "FUNC_001125",
+          "instruction": "call FUNC_001125"
+        }
+      ]
+    },
+    {
+      "id": "F1123",
+      "label": "FUNC_001123",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 82676,
+      "line_end": 82685,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 82680,
+          "callee": "FUNC_000247",
+          "instruction": "call FUNC_000247"
+        }
+      ]
+    },
+    {
+      "id": "F1124",
+      "label": "FUNC_001124",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 82686,
+      "line_end": 82695,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 82690,
+          "callee": "FUNC_000246",
+          "instruction": "call FUNC_000246"
+        }
+      ]
+    },
+    {
+      "id": "F1357",
+      "label": "FUNC_001357_StringConvertDateNum",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 84165,
+      "line_end": 84265,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": []
+    },
+    {
+      "id": "F1363",
+      "label": "FUNC_001363_StringConvertTime",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 84393,
+      "line_end": 84446,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 84432,
+          "callee": null,
+          "instruction": "call _sprintf"
+        },
+        {
+          "line": 84435,
+          "callee": null,
+          "instruction": "call _strlen"
+        }
+      ]
+    },
+    {
+      "id": "F1418",
+      "label": "FUNC_001418_TimerAdvance",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 85652,
+      "line_end": 85707,
+      "research_level": "reviewed_body_in_scope",
+      "call_sites": [
+        {
+          "line": 85659,
+          "callee": null,
+          "instruction": "call _TimerFrameUpdate"
+        },
+        {
+          "line": 85662,
+          "callee": null,
+          "instruction": "call _TimerGetTimeStamp"
+        },
+        {
+          "line": 85668,
+          "callee": null,
+          "instruction": "call _TimerSleep"
+        },
+        {
+          "line": 85676,
+          "callee": null,
+          "instruction": "call Timer50Hz"
+        }
+      ]
+    },
+    {
+      "id": "F1511",
+      "label": "FUNC_001511",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 90203,
+      "line_end": 90406,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 90236,
+          "callee": "FUNC_001656_FindMSB",
+          "instruction": "call FUNC_001656_FindMSB"
+        },
+        {
+          "line": 90248,
+          "callee": "FUNC_001656_FindMSB",
+          "instruction": "call FUNC_001656_FindMSB"
+        },
+        {
+          "line": 90270,
+          "callee": "FUNC_001338_Int64Mul32",
+          "instruction": "call FUNC_001338_Int64Mul32"
+        },
+        {
+          "line": 90284,
+          "callee": "FUNC_001338_Int64Mul32",
+          "instruction": "call FUNC_001338_Int64Mul32"
+        },
+        {
+          "line": 90298,
+          "callee": "FUNC_001338_Int64Mul32",
+          "instruction": "call FUNC_001338_Int64Mul32"
+        },
+        {
+          "line": 90396,
+          "callee": "FUNC_001661_Vec64Add",
+          "instruction": "call FUNC_001661_Vec64Add"
+        }
+      ]
+    },
+    {
+      "id": "F1512",
+      "label": "FUNC_001512",
+      "file": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "line_start": 90407,
+      "line_end": 90424,
+      "research_level": "indexed_dependency_not_full_review",
+      "call_sites": [
+        {
+          "line": 90418,
+          "callee": "FUNC_001511",
+          "instruction": "call FUNC_001511"
+        }
+      ]
+    }
+  ],
+  "file_evidence": {
+    "scripts/main.gd": {
+      "bytes": 84788,
+      "sha256": "61dd63e92cc7b2bebdb86859ccc5a8e5653f5376fbf0616d168f4c1ab4652d30"
+    },
+    "scripts/flight_model.gd": {
+      "bytes": 31872,
+      "sha256": "8da5454be81142412ba8bcfb4df0154ae43d906a73fc1f04f5650ec1d57b3391"
+    },
+    "scripts/ship_catalog.gd": {
+      "bytes": 3405,
+      "sha256": "c3c077d107336a8ffe30165291f6e3bee785ee8a262b88ef48262ff38dad7a06"
+    },
+    "data/ships.json": {
+      "bytes": 1787,
+      "sha256": "944974a355019507fefe53f79dffc19d24e838fe650d34a52fbc00c692b8571a"
+    },
+    "scripts/planetary_system.gd": {
+      "bytes": 53879,
+      "sha256": "f243ebb2699bce714386e87ca32bfdb35709a2c9c45178cac9fa6cb8874abc62"
+    },
+    "scripts/surface_model.gd": {
+      "bytes": 55309,
+      "sha256": "a8e2825fd2daae3a9e66783cd0c77dd87e12d249187281147984e652677e2ab5"
+    },
+    "scripts/surface_orbit_link.gd": {
+      "bytes": 8166,
+      "sha256": "c1cffc1ea9ba6efc4ea88e3adcf0e6e84ec2a42ff830df6f3d8e23097ca1767c"
+    },
+    "scripts/source_motion_pipeline.gd": {
+      "bytes": 9131,
+      "sha256": "478b18ed852da1549eb573e2b8d168e3b817deb684c31c50e085d30a6d98bb84"
+    },
+    "scripts/source_motion_bridge.gd": {
+      "bytes": 15703,
+      "sha256": "7f5a805ca0a9675262ce511e28e4306df12b2b3cb5992dbb76d6e42f97f0bb9a"
+    },
+    "scripts/source_frame_kinematics.gd": {
+      "bytes": 2793,
+      "sha256": "aac70ddc3237a9b97910020db6a2ac400659ab02457730e113de9c828b530689"
+    },
+    "scripts/source_gravity.gd": {
+      "bytes": 9429,
+      "sha256": "058db4e5cbebd07e7420274ca07b24ccaec620f46c440081d1d6855326dc3872"
+    },
+    "scripts/source_physics_bridge.gd": {
+      "bytes": 4886,
+      "sha256": "c7b8550217fbce3925da741afeb3c7d58c841d91ab247c4994ecc1c45ac72262"
+    },
+    "scripts/source_world_catalogue.gd": {
+      "bytes": 12856,
+      "sha256": "4b07a6f9f7fac455371a6ba378c70533df00a2080efbe608a824a5f3ddc4fbe0"
+    },
+    "scripts/source_surface_terrain.gd": {
+      "bytes": 25841,
+      "sha256": "5c2939f5dae7adfa08e7591980612d6e53fd6fcdcf321850d00d388982024a17"
+    },
+    "scripts/source_ground_surface.gd": {
+      "bytes": 23706,
+      "sha256": "e9db09fbd9c9e8a70bfba771b79627bbba6313d86b3efe781fba7b93a29e7ee7"
+    },
+    "scripts/source_orbit_surface_guard.gd": {
+      "bytes": 4563,
+      "sha256": "deda7d90316172e9c8254235d07f630b286a5bc047d54d41a6e0357408c2c7c8"
+    },
+    "scripts/body_rotation.gd": {
+      "bytes": 2917,
+      "sha256": "b5d4e63331728681d1f34c73fe83cdd57120e29b352e09090da4ff147b22ed34"
+    },
+    "scripts/source_clock.gd": {
+      "bytes": 2583,
+      "sha256": "b2d206a9e2e6db21635fe37d6f61ba75d2fb9f56d92f8851a77c9b11fc4dbe09"
+    },
+    "scripts/flight_time_controller.gd": {
+      "bytes": 14484,
+      "sha256": "bebb04d4a40793bbaad2574044ab763ffe4609aaf9f8b615eeace704dd2ff728"
+    },
+    "scripts/source_mining_machine.gd": {
+      "bytes": 4558,
+      "sha256": "cdbcef39b2ec2ec777fb68da483b53f8a8ec3a986dad6f2722a436a6f8f52ddb"
+    },
+    "scripts/source_station_geometry.gd": {
+      "bytes": 11895,
+      "sha256": "5785d288a3a0582dc4f06db53fad4b6d52446d3d476adc894fa9b7624cf69b94"
+    },
+    "scripts/source_station_session.gd": {
+      "bytes": 8327,
+      "sha256": "80807b1c4b0aefb42f6907ef7480e2792295017f681caa5608894290d8d85b8f"
+    },
+    "scripts/rotating_dock_dynamics.gd": {
+      "bytes": 6804,
+      "sha256": "68eb63c19831a2828fa62a1c10126de099d7d4905859f905c4b93e37124206a4"
+    },
+    "scripts/navigation.gd": {
+      "bytes": 8595,
+      "sha256": "aee7aeffccd200290c435cabf708c0e4ec5dc852fbae30f85b2bedce1c2a6b80"
+    },
+    "scripts/flight_instruments.gd": {
+      "bytes": 1509,
+      "sha256": "06681eb395b7cceaa16a5d705bb5e5ff948f9d60802cae10ecc2987661958329"
+    },
+    "scripts/training_dock_services.gd": {
+      "bytes": 15383,
+      "sha256": "1613ae776e378c14e8130cd2bf1ec25812c2d167b681e298cdc757a3e0e17924"
+    },
+    "tests/fixtures/source_motion_native.json": {
+      "bytes": 3029644,
+      "sha256": "087eeb8f70ffcd70a489f3d37bbd96e468bca2c01cffca8a7646f4e680c53625"
+    },
+    "tests/fixtures/source_frame_native.json": {
+      "bytes": 1188168,
+      "sha256": "42320b712c4f4410cda409cf45f55c3cd07e433eb2aa12823ea8e95e425e5f5a"
+    },
+    "tests/fixtures/source_gravity_native.json": {
+      "bytes": 5111783,
+      "sha256": "8d12101d57b6792c465d84103c6d84cbf85a5d664b4287a9fc25da0dcd841405"
+    },
+    "tests/fixtures/source_time_controls_native.json": {
+      "bytes": 1448379,
+      "sha256": "f5d812f399f24490580f1907cbf4e9c78b71c39949203c57e2228128abea571b"
+    },
+    "tests/fixtures/source_mining_weekly_native.json": {
+      "bytes": 374417,
+      "sha256": "3d3cd01a636a925e2b97580e58f3448bac851b23d1b62d1fcd4d3bf74b785092"
+    },
+    "tests/fixtures/source_mining_load_native.json": {
+      "bytes": 646828,
+      "sha256": "f844c87d1d3eeb19c7a2855f599ddff6f5b41f9ae2c160232eebb4f7f71c8368"
+    },
+    "tests/fixtures/source_asteroid_mesh_spike.json": {
+      "bytes": 40074,
+      "sha256": "186de87b349b251a4d7658f3abe31fa7a627e58e6865d5166a4a21d4706b9bb1"
+    }
+  },
+  "existing_fixture_scopes": {
+    "source_motion_native": {
+      "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+      "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+      "case_count": 1236,
+      "fresh_process_runs": 3,
+      "scope": "Original F598/F599/F600 controls, F607 set-speed, complete F601/F602 velocity and fixed-frame F603→thrust→kick→F1512 compositions. No full F585/F606/atmosphere/collision/fuel/player event pipeline."
+    },
+    "source_frame_native": {
+      "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+      "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+      "case_count": 720,
+      "fresh_process_runs": 3,
+      "scope": "Whole F572/F573 rotation primitives and composed native roundtrips; no automatic FOR selection, parent-origin translation or angular surface-velocity adjustment"
+    },
+    "source_gravity_native": {
+      "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+      "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+      "scope": "Complete pinned F603 velocity/fraction update with actual F1532 parent lookup, F880 coefficient slice, complete F1511 and F1512 position integration. No complete world physics/frame selection, surface radius, source timer or SI bridge claim.",
+      "case_count": 1179,
+      "mass_case_count": 194,
+      "integration_case_count": 304,
+      "fresh_process_runs": 3
+    },
+    "source_time_controls_native": {
+      "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+      "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+      "scope": "Actual F207/F208/F217/F220 and F1418 instructions in host ELF; GUI callbacks only record parameters, source Timer50Hz is held ahead of supplied timestamp and traps if entered. This is not full original frame/physics scheduling or Android x86 runtime.",
+      "case_count": 1736,
+      "fresh_process_runs": 3
+    },
+    "source_mining_weekly_native": {
+      "scope": "Actual F243 event0x10 weekly branch only; one52-byte MB4 record, valid hopper0..10 and all256 reserve bytes. Dead recreation callbacks trap. Host ABI adaptation only, not Android implementation, full deployment, weekly scheduler execution or original EXE binary execution.",
+      "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+      "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+      "case_count": 2816,
+      "fresh_process_runs": 3
+    },
+    "source_mining_load_native": {
+      "scope": "Actual normal model110 F247 and actual F252 lookup; tested hopper0..10, prospect0..8, nonnegative free cargo including29/30tonnes. Lookup returns a prepared original-size body, message/UI callbacks are explicit host adapters. Record/cargo mutation and retrieval request are original instructions. Does not execute deployment F246, retrieval F253, docking or Android gameplay.",
+      "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+      "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+      "case_count": 990,
+      "fresh_process_runs": 3
+    },
+    "source_asteroid_mesh_spike": {
+      "scope": "Exact model112 program/descriptor/vertices/plane-volume bytes plus actual original F1470/F1478 unprojected native vertex outputs. No F574/F582/F583 native collider execution, live landing, mobile renderer, mining or comet implementation claim.",
+      "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+      "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+      "runtime_enabled": false
+    }
+  },
+  "known_relevant_fix_comments": [
+    {
+      "line": 37273,
+      "comment": "; FIX: Collision radius"
+    },
+    {
+      "line": 37431,
+      "comment": "; FIX: Missile retardation"
+    },
+    {
+      "line": 39834,
+      "comment": "; FIX: Linear FOR switch velocity"
+    },
+    {
+      "line": 39975,
+      "comment": "; FIX: Autopilot acceleration fudge"
+    },
+    {
+      "line": 60628,
+      "comment": "; FIX: Orbital drift bug"
+    },
+    {
+      "line": 63820,
+      "comment": "; FIX: for binary light bug"
+    },
+    {
+      "line": 64452,
+      "comment": "; FIX: Starports below ground"
+    },
+    {
+      "line": 64666,
+      "comment": "; FIX: Binary over-adjustment"
+    },
+    {
+      "line": 64685,
+      "comment": "; FIX: Binary child under-adjustment"
+    },
+    {
+      "line": 67486,
+      "comment": "; FIX: Asteroids run out (refixed)"
+    },
+    {
+      "line": 67551,
+      "comment": "; FIX: Player hyperspace time-travel"
+    },
+    {
+      "line": 68531,
+      "comment": "; FIX: Groundhog day bug"
+    },
+    {
+      "line": 74976,
+      "comment": "; FIX: Atmospheric heat dependency on frame rate, not time"
+    },
+    {
+      "line": 80058,
+      "comment": "; FIX: Docking => laser invulnerability"
+    }
+  ],
+  "unresolved": [
+    "Complete mapping between pinned JJFFE patched bodies and user DOS executable instructions.",
+    "Full F570/F575/F582/F606 and player/global event-loop branch coverage on original object banks.",
+    "Any distinct original comet class or physical nebula drag law.",
+    "Full live original atmospheric/thermal/fuel/scoop/MB4 path and every ship/equipment combination.",
+    "Exact whole-game reference traces and save continuation for all listed acceptance cases."
+  ],
+  "audit_document": {
+    "path": "docs/PARITY_AUDIT_PHYSICS_RU.md",
+    "sha256": "97629901b1dce886a27508a5323ede7d15fdee11182fdaf2bd76a3d5424f5ca1",
+    "bytes": 53028
+  },
+  "independent_review": {
+    "scope": "Read-only document/evidence review for material source-vs-live overclaims, units, DOS/JJFFE target and references.",
+    "result": "No material overclaims found; corrected the motion bridge step reference from134 to137.",
+    "runtime_or_tests_changed": false
+  }
+}

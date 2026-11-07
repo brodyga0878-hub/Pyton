@@ -1,0 +1,1845 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-07",
+  "scope": "read-only resource presence, hashes and code references; not a full instruction or game-parity proof",
+  "archive": {
+    "path": "/workspace/recovery/Frontier_First_Encounters.rar",
+    "size_bytes": 2032543,
+    "sha256": "8495ca9a5c7714816c62255810bb88b878dab8f33b09090ef5e57a3ffafcd7fd",
+    "format": "RAR1.5 solid",
+    "file_count": 68,
+    "directory_count": 4,
+    "uncompressed_file_bytes": 9951738,
+    "by_extension": {
+      ".386": {
+        "count": 3,
+        "bytes": 461231
+      },
+      ".bmp": {
+        "count": 6,
+        "bytes": 309828
+      },
+      ".bnk": {
+        "count": 2,
+        "bytes": 10808
+      },
+      ".cfg": {
+        "count": 1,
+        "bytes": 1542
+      },
+      ".dat": {
+        "count": 2,
+        "bytes": 782414
+      },
+      ".exe": {
+        "count": 6,
+        "bytes": 2902945
+      },
+      ".hmp": {
+        "count": 18,
+        "bytes": 420645
+      },
+      ".ini": {
+        "count": 2,
+        "bytes": 13178
+      },
+      ".ovl": {
+        "count": 1,
+        "bytes": 58344
+      },
+      ".raw": {
+        "count": 24,
+        "bytes": 790221
+      },
+      ".res": {
+        "count": 1,
+        "bytes": 6274
+      },
+      ".swp": {
+        "count": 1,
+        "bytes": 4194304
+      },
+      ".txt": {
+        "count": 1,
+        "bytes": 4
+      }
+    },
+    "entries": [
+      {
+        "path": "FIRSTENC/COMMANDR",
+        "type": "directory",
+        "runtime_status": "not_a_resource_file"
+      },
+      {
+        "path": "FIRSTENC/FX",
+        "type": "directory",
+        "runtime_status": "not_a_resource_file"
+      },
+      {
+        "path": "FIRSTENC/HMIDET.386",
+        "type": "file",
+        "size_bytes": 81990,
+        "crc32": "637C56A8",
+        "sha256": "8d800cd95214f1cd6e98e14bc1ed9608f2da9e50d60614caa4628821ee4e44a1",
+        "extension": ".386",
+        "category": "dos_installation_driver_or_environment",
+        "runtime_status": "not_android_gameplay_resource",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/HMIDRV.386",
+        "type": "file",
+        "size_bytes": 261425,
+        "crc32": "F6D116A3",
+        "sha256": "f95ac0259cc1f0512f51ed9fcf97478c628bbaff58bbc2cba5873a352bad2209",
+        "extension": ".386",
+        "category": "dos_installation_driver_or_environment",
+        "runtime_status": "not_android_gameplay_resource",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/HMIMDRV.386",
+        "type": "file",
+        "size_bytes": 117816,
+        "crc32": "B7D651E1",
+        "sha256": "db8434931aa18ac6f25004bd5fa9cec8ba2d98c13f4dd1da4d3080efa9eba5ee",
+        "extension": ".386",
+        "category": "dos_installation_driver_or_environment",
+        "runtime_status": "not_android_gameplay_resource",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/CABIN0.BMP",
+        "type": "file",
+        "size_bytes": 51638,
+        "crc32": "3B1A9101",
+        "sha256": "99bfe4ca6159427a28d9e24ebb70061ea9eb69c93b262d27cd15d0b11c5f3c0a",
+        "extension": ".bmp",
+        "image": {
+          "width": 320,
+          "height": 158,
+          "mode": "P",
+          "format": "BMP"
+        },
+        "category": "original_cabin_bitmap",
+        "runtime_status": "not_imported_modern_presentation_replacement",
+        "runtime_counterparts": [
+          "scripts/flight_console.gd",
+          "scripts/ship_visual.gd"
+        ]
+      },
+      {
+        "path": "FIRSTENC/CABIN1.BMP",
+        "type": "file",
+        "size_bytes": 51638,
+        "crc32": "6EBDBE8B",
+        "sha256": "dfdc9ad2efe49001c8d9e63218f2c32791540296359309fe8ef5673ad6c9be58",
+        "extension": ".bmp",
+        "image": {
+          "width": 320,
+          "height": 158,
+          "mode": "P",
+          "format": "BMP"
+        },
+        "category": "original_cabin_bitmap",
+        "runtime_status": "not_imported_modern_presentation_replacement",
+        "runtime_counterparts": [
+          "scripts/flight_console.gd",
+          "scripts/ship_visual.gd"
+        ]
+      },
+      {
+        "path": "FIRSTENC/CABIN2.BMP",
+        "type": "file",
+        "size_bytes": 51638,
+        "crc32": "3FA11E37",
+        "sha256": "64e82260b7e118b480e164bcf3c7926b47449d618a3da8d6fb362cc881055ad0",
+        "extension": ".bmp",
+        "image": {
+          "width": 320,
+          "height": 158,
+          "mode": "P",
+          "format": "BMP"
+        },
+        "category": "original_cabin_bitmap",
+        "runtime_status": "not_imported_modern_presentation_replacement",
+        "runtime_counterparts": [
+          "scripts/flight_console.gd",
+          "scripts/ship_visual.gd"
+        ]
+      },
+      {
+        "path": "FIRSTENC/CABIN3.BMP",
+        "type": "file",
+        "size_bytes": 51638,
+        "crc32": "62231388",
+        "sha256": "2acda06a83958ae501ae5e931987deb79feccdff4a54b99bb8dec919e9263d19",
+        "extension": ".bmp",
+        "image": {
+          "width": 320,
+          "height": 158,
+          "mode": "P",
+          "format": "BMP"
+        },
+        "category": "original_cabin_bitmap",
+        "runtime_status": "not_imported_modern_presentation_replacement",
+        "runtime_counterparts": [
+          "scripts/flight_console.gd",
+          "scripts/ship_visual.gd"
+        ]
+      },
+      {
+        "path": "FIRSTENC/CABIN4.BMP",
+        "type": "file",
+        "size_bytes": 51638,
+        "crc32": "DB423281",
+        "sha256": "b8a9a1515dee8d83e1e95c5b87ce31c408d503a6ae0dd65403392bade59066bb",
+        "extension": ".bmp",
+        "image": {
+          "width": 320,
+          "height": 158,
+          "mode": "P",
+          "format": "BMP"
+        },
+        "category": "original_cabin_bitmap",
+        "runtime_status": "not_imported_modern_presentation_replacement",
+        "runtime_counterparts": [
+          "scripts/flight_console.gd",
+          "scripts/ship_visual.gd"
+        ]
+      },
+      {
+        "path": "FIRSTENC/CABIN5.BMP",
+        "type": "file",
+        "size_bytes": 51638,
+        "crc32": "99C7CFE3",
+        "sha256": "421ef56f28c4bed69a658c74464a29a4cf16d50cadf0ceb5c2cdc1c1d57e06ae",
+        "extension": ".bmp",
+        "image": {
+          "width": 320,
+          "height": 158,
+          "mode": "P",
+          "format": "BMP"
+        },
+        "category": "original_cabin_bitmap",
+        "runtime_status": "not_imported_modern_presentation_replacement",
+        "runtime_counterparts": [
+          "scripts/flight_console.gd",
+          "scripts/ship_visual.gd"
+        ]
+      },
+      {
+        "path": "FIRSTENC/DRUM.BNK",
+        "type": "file",
+        "size_bytes": 5404,
+        "crc32": "6C29DF77",
+        "sha256": "809994c0e42679e4fc4a1e03a835795be2f09e3a0eba6fc56e957b746e060b9c",
+        "extension": ".bnk",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MELODIC.BNK",
+        "type": "file",
+        "size_bytes": 5404,
+        "crc32": "C1776D26",
+        "sha256": "153b37b7516e2b1cc3008d7958ebb2c9f360353a74cbcf45a7a7d3ea9440236e",
+        "extension": ".bnk",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/BLD_INFO.CFG",
+        "type": "file",
+        "size_bytes": 1542,
+        "crc32": "A04E3CD8",
+        "sha256": "32200c4255d5c6274071fe4c49dcd7b864b984e102eed06315fe9987b8ff6574",
+        "extension": ".cfg",
+        "ascii_runs_ge10_count": 62,
+        "category": "dos_installation_driver_or_environment",
+        "runtime_status": "not_android_gameplay_resource",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/IMAGE.DAT",
+        "type": "file",
+        "size_bytes": 2463,
+        "crc32": "6D47B10B",
+        "sha256": "1611863697d7bae3655d65c21251fe162faf56752d740dc675898bfa837e7d4d",
+        "extension": ".dat",
+        "ascii_runs_ge10_count": 56,
+        "category": "installation_file_manifest",
+        "runtime_status": "not_imported_installation_replaced",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MISSION.DAT",
+        "type": "file",
+        "size_bytes": 779951,
+        "crc32": "C133E35E",
+        "sha256": "3cf36755c7420f12281ca8a55f11dbc9787bacaeef49edc4584338f77dc94afc",
+        "extension": ".dat",
+        "ascii_runs_ge10_count": 0,
+        "category": "compressed_journal_mission_content",
+        "runtime_status": "not_imported_no_campaign_reader_runtime",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/32RTM.EXE",
+        "type": "file",
+        "size_bytes": 152108,
+        "crc32": "82B4D638",
+        "sha256": "28c6394e1e8295d4fce54c30d16890e173f625ccedbbbbbab9e27cdd7e390a56",
+        "extension": ".exe",
+        "category": "dos_installation_driver_or_environment",
+        "runtime_status": "not_android_gameplay_resource",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/DOS4GW.EXE",
+        "type": "file",
+        "size_bytes": 254556,
+        "crc32": "95D35B4D",
+        "sha256": "580f164bd05b438262267a7e03984529b56e3096ee158d5d2b0e6f159520d4c3",
+        "extension": ".exe",
+        "category": "dos_installation_driver_or_environment",
+        "runtime_status": "not_android_gameplay_resource",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FIRSTENC.EXE",
+        "type": "file",
+        "size_bytes": 2097152,
+        "crc32": "3FE342B9",
+        "sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+        "extension": ".exe",
+        "category": "compiled_original_program_and_embedded_data",
+        "runtime_status": "extraction_source_only_not_android_runtime",
+        "runtime_counterparts": [
+          "data/ffe_*.json",
+          "scripts/source_*.gd"
+        ]
+      },
+      {
+        "path": "FIRSTENC/INSTALL.EXE",
+        "type": "file",
+        "size_bytes": 161656,
+        "crc32": "BA0D48FA",
+        "sha256": "dc6a0a8de21dd5b4050a6f18bbc51241e75e3ab39c0fdbc89d4a1dd927ca325a",
+        "extension": ".exe",
+        "category": "dos_installation_driver_or_environment",
+        "runtime_status": "not_android_gameplay_resource",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/LOADPATS.EXE",
+        "type": "file",
+        "size_bytes": 49194,
+        "crc32": "066C5E51",
+        "sha256": "bb9a4f0f3beb2c2294175d3bbecbcff3846fb72d880b7956245d79ff3172b899",
+        "extension": ".exe",
+        "category": "dos_installation_driver_or_environment",
+        "runtime_status": "not_android_gameplay_resource",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/SETUP.EXE",
+        "type": "file",
+        "size_bytes": 188279,
+        "crc32": "4619D072",
+        "sha256": "0296420b885ed67a051826f9002250a75243d27bc28a16887f86eec62b16b29c",
+        "extension": ".exe",
+        "category": "dos_installation_driver_or_environment",
+        "runtime_status": "not_android_gameplay_resource",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MUSIC/BABAYAGA.HMP",
+        "type": "file",
+        "size_bytes": 13141,
+        "crc32": "21360E38",
+        "sha256": "39c29e6359f79d6b0a1f6b0fd1fe037310c703e2c61a58b8979b04f9662c1c48",
+        "extension": ".hmp",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MUSIC/BAREM.HMP",
+        "type": "file",
+        "size_bytes": 37033,
+        "crc32": "31774637",
+        "sha256": "76dc0d654f22543da1bb3e52a3ff1544e27a57ee457e8d07d17d5f506f66696e",
+        "extension": ".hmp",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MUSIC/BLUEDAN.HMP",
+        "type": "file",
+        "size_bytes": 12723,
+        "crc32": "05BEABF2",
+        "sha256": "cd5ee6f4be03dfbe33187ba28df8e0dcaf055289fb1314ad270dba99952fe65d",
+        "extension": ".hmp",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MUSIC/GGOFKIEV.HMP",
+        "type": "file",
+        "size_bytes": 5745,
+        "crc32": "ACCC0D08",
+        "sha256": "b26815a53151089562e9dbc2e051a8f2f9a711654678db9c6c1a18da8cf9c566",
+        "extension": ".hmp",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MUSIC/HALLKING.HMP",
+        "type": "file",
+        "size_bytes": 21136,
+        "crc32": "D73D1F09",
+        "sha256": "5a925591124364b16319bce45527b9f48ce6c69fa9d2d96f2b0eaf197ca2a236",
+        "extension": ".hmp",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MUSIC/INTRO.HMP",
+        "type": "file",
+        "size_bytes": 30084,
+        "crc32": "2D611472",
+        "sha256": "1bc2fc2f987bbd57d0f6deda467e2987822000e50bbae624883726ed1c6e81ba",
+        "extension": ".hmp",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MUSIC/JUPALT.HMP",
+        "type": "file",
+        "size_bytes": 29383,
+        "crc32": "C5EE56EC",
+        "sha256": "005fa7d19724dbaf590a1c4d700cdbbc2bc006594e0ac9b851af3833c616e3e5",
+        "extension": ".hmp",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MUSIC/QQATMOSP.HMP",
+        "type": "file",
+        "size_bytes": 27464,
+        "crc32": "E4140144",
+        "sha256": "519faad9b60d8537d094766bb24168de653dc35b71b3178364d024147743d8ae",
+        "extension": ".hmp",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MUSIC/QQDRAMA.HMP",
+        "type": "file",
+        "size_bytes": 33442,
+        "crc32": "9A45E710",
+        "sha256": "2b3dd95769a07d19ad43bd7b3da9cb8792a6285d21693966864b1ad82d447c1c",
+        "extension": ".hmp",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MUSIC/QQESCAPE.HMP",
+        "type": "file",
+        "size_bytes": 21552,
+        "crc32": "5AEFDB33",
+        "sha256": "ae3a293340aae884a33ca0bdd49db578020e2fd290a49f65f056e84916ae9fee",
+        "extension": ".hmp",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MUSIC/QQFRONT.HMP",
+        "type": "file",
+        "size_bytes": 16880,
+        "crc32": "5B8929EB",
+        "sha256": "28ded21f7f6d3ecbfa7af2515e9ddc1060838cd2e67baef4b8bbad9622b822f9",
+        "extension": ".hmp",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MUSIC/QQFRONT2.HMP",
+        "type": "file",
+        "size_bytes": 9104,
+        "crc32": "494B91AF",
+        "sha256": "0b126ed4bb33165ce5af66bda2a3ac020a20e2cf3047a47cc22027da6e3caf74",
+        "extension": ".hmp",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MUSIC/QQPARADI.HMP",
+        "type": "file",
+        "size_bytes": 18684,
+        "crc32": "4C6AE5C6",
+        "sha256": "175d475ee369eb98543b4071236ced2f24e37cefcabb974827f48ca746e0dadc",
+        "extension": ".hmp",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MUSIC/QQROCK.HMP",
+        "type": "file",
+        "size_bytes": 47046,
+        "crc32": "76B016BC",
+        "sha256": "780b2c6ab14d7252ae04b96453d1140e7c861cc1be2dbb4601ad046510fd2fba",
+        "extension": ".hmp",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MUSIC/QQSUSPEN.HMP",
+        "type": "file",
+        "size_bytes": 22469,
+        "crc32": "08CD5FBD",
+        "sha256": "de9057139f7cd6eeb045ed777bb554f698e414a1fd35b3cb44a16c86a40718b2",
+        "extension": ".hmp",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MUSIC/QQTRAVEL.HMP",
+        "type": "file",
+        "size_bytes": 30353,
+        "crc32": "89F43E73",
+        "sha256": "a8e50b92bec2e4ef1997b8b53eacb32656607ef7959dbbcca342f25f4aa5fa9b",
+        "extension": ".hmp",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/TEST.HMP",
+        "type": "file",
+        "size_bytes": 18643,
+        "crc32": "FC9E07A2",
+        "sha256": "f812a7578d6fb431976b66addbf4cfed2d4b9cb92f0581f5910e2034d8a227a3",
+        "extension": ".hmp",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MUSIC/VALKRIES.HMP",
+        "type": "file",
+        "size_bytes": 25763,
+        "crc32": "B5677131",
+        "sha256": "636e302b7bcdedb8ef87f4da7102a30cc6e8f7a6b52ad541f16bb8e3de215177",
+        "extension": ".hmp",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MUSIC",
+        "type": "directory",
+        "runtime_status": "not_a_resource_file"
+      },
+      {
+        "path": "FIRSTENC/PATCHES.INI",
+        "type": "file",
+        "size_bytes": 9825,
+        "crc32": "FF05CBF8",
+        "sha256": "2283f9e22d004032a0a896fa21253749e1539f23aeaed69a2c281b10268aa90c",
+        "extension": ".ini",
+        "category": "dos_installation_driver_or_environment",
+        "runtime_status": "not_android_gameplay_resource",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/SETUP.INI",
+        "type": "file",
+        "size_bytes": 3353,
+        "crc32": "30653A3F",
+        "sha256": "caf4add9e4e96798f57810480832cdb4d71ad153f69a4a0f5bc154043fb5fe62",
+        "extension": ".ini",
+        "category": "dos_installation_driver_or_environment",
+        "runtime_status": "not_android_gameplay_resource",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/DPMI32VM.OVL",
+        "type": "file",
+        "size_bytes": 58344,
+        "crc32": "3F40D5D6",
+        "sha256": "c65e6051c508bcaccee0f96d43abc01ea96e48cd9fb244a438461ce1d67ca6b3",
+        "extension": ".ovl",
+        "category": "dos_installation_driver_or_environment",
+        "runtime_status": "not_android_gameplay_resource",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/AIROPEN.RAW",
+        "type": "file",
+        "size_bytes": 129614,
+        "crc32": "226DD864",
+        "sha256": "ca1bd7ba29db3eb7094e7d38e0566c2d4d9ddf01f2569f8c6b581e66daacbfc4",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/BIP.RAW",
+        "type": "file",
+        "size_bytes": 16842,
+        "crc32": "0FE7EC01",
+        "sha256": "faa716acdad6330700ef4a1f02966299fdba985d1eacbc3a70eba17a87b652f3",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/BONG.RAW",
+        "type": "file",
+        "size_bytes": 23612,
+        "crc32": "C3A08978",
+        "sha256": "3bbd2ec4bcfbbfea02991982493aff4d5cd0534e5906d846afff8920690ba6e5",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/BOOM.RAW",
+        "type": "file",
+        "size_bytes": 93468,
+        "crc32": "747B5E02",
+        "sha256": "6dccbcc39b596a460c72de358e5a4750e863a85be971531ac1a5f53055adc038",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/CAMERA.RAW",
+        "type": "file",
+        "size_bytes": 11544,
+        "crc32": "80A00B5F",
+        "sha256": "2938bb2e836b24c5418f25be68df0d064da91f5fb705c2fb4c0e61d36d06fe8d",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/CHIME.RAW",
+        "type": "file",
+        "size_bytes": 39276,
+        "crc32": "F35372CE",
+        "sha256": "660ac4b16eabb6af6590db4693cd05c6e5196d900a9e22e14071cf8bad14671f",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/CLUNKIT.RAW",
+        "type": "file",
+        "size_bytes": 3470,
+        "crc32": "A66BB4CC",
+        "sha256": "d0e94f44e6c4377196b03f298072dfa93388259ac03b205a3732df5628c0b316",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/DAMAGE.RAW",
+        "type": "file",
+        "size_bytes": 47834,
+        "crc32": "4CCF7D54",
+        "sha256": "d9c6fe0e3b187d9f04c20573e885fe740ec5960c5c2dabf060780eb6c60f4a8d",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/ECM.RAW",
+        "type": "file",
+        "size_bytes": 28472,
+        "crc32": "69A45D9F",
+        "sha256": "4a32fda59c5ac13f61c60bbd4d81d99a8db16d99ddd7f4c2b0a62480ff78c7c5",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/HYPE.RAW",
+        "type": "file",
+        "size_bytes": 94140,
+        "crc32": "830BC75C",
+        "sha256": "331f7240521cf0e2a99e797940ac57d218a751bc5fcb5500fc42737570c5cf5c",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/LASER1.RAW",
+        "type": "file",
+        "size_bytes": 8354,
+        "crc32": "0B9D38C0",
+        "sha256": "d59fe11c2a40c6f38568e9cb27c1e60c288eff11fbad87b23472ad80b8554471",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/LASER2.RAW",
+        "type": "file",
+        "size_bytes": 14606,
+        "crc32": "611E5104",
+        "sha256": "52ef0af4c20e0cce5e402fdbbab8c08454c950097ab128cf075bbdf05bae5e57",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/LASER3.RAW",
+        "type": "file",
+        "size_bytes": 9198,
+        "crc32": "D10CC8E6",
+        "sha256": "99031a616a7bf5c62c9c7a08b5925437db77b7d57d04522db9163d9eb4ba3a61",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/LASER4.RAW",
+        "type": "file",
+        "size_bytes": 9198,
+        "crc32": "183A1B57",
+        "sha256": "76dbaff801bbc8d8f6c8611831a0d6d705170673307268d2e479c0a244742593",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/LAUNCH.RAW",
+        "type": "file",
+        "size_bytes": 51102,
+        "crc32": "D7479152",
+        "sha256": "a6d710ed90375c2d02f612b3159e8a52f9d3aea4a345a75a9ccdb0fc77f6fac6",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/MISSEXPL.RAW",
+        "type": "file",
+        "size_bytes": 49432,
+        "crc32": "479A5BDF",
+        "sha256": "9d63c23caf45668f8fc4558252319408273a10ebb753be88a07b9d01c70189f3",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/NECM.RAW",
+        "type": "file",
+        "size_bytes": 16632,
+        "crc32": "48647A85",
+        "sha256": "a84a08137d3d61e2a0b6838ac65a16c3d719a1fcf2e6e562aefb5d18cfccd632",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/NOWT.RAW",
+        "type": "file",
+        "size_bytes": 0,
+        "crc32": "00000000",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/ROAR.RAW",
+        "type": "file",
+        "size_bytes": 1488,
+        "crc32": "68C9F4A9",
+        "sha256": "3f4d66a3b984ddf9ba09e7be0c68d1ef1a6503b748bc30ddf34079b1556d7b3f",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/SHIPEXP.RAW",
+        "type": "file",
+        "size_bytes": 27880,
+        "crc32": "28AED88B",
+        "sha256": "574a5b946358c8208b1c5372b302b5215bc5afdff72151113fe6891a50ea99fc",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/SIREN.RAW",
+        "type": "file",
+        "size_bytes": 19232,
+        "crc32": "3F570EEF",
+        "sha256": "76a7f87eacdfbb15890f18809a824e06adb1541e6c45c14bb725d556b28ce54d",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/STATION.RAW",
+        "type": "file",
+        "size_bytes": 16362,
+        "crc32": "46482553",
+        "sha256": "47cd3363df3c368374a13b286e0d88522b0b58c566f13ddc4b84ef8ed37126ff",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/TEST.RAW",
+        "type": "file",
+        "size_bytes": 22313,
+        "crc32": "03034739",
+        "sha256": "179f643745c8512e94a6e016f5b45917f501143869ade9409ef0a93e53115597",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/FX/WIND.RAW",
+        "type": "file",
+        "size_bytes": 56152,
+        "crc32": "19778794",
+        "sha256": "026e4c717931a691397feb9b07135eedffb32c341ba28c3291339fabbc90f029",
+        "extension": ".raw",
+        "category": "original_audio_or_instrument_bank",
+        "runtime_status": "not_imported_no_runtime_audio_playback",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/LANGRC.RES",
+        "type": "file",
+        "size_bytes": 6274,
+        "crc32": "F576BCDE",
+        "sha256": "6cc34bc19eaeafa5e7ac47f542572be505d7127b1715585c013e9a06f8cb53df",
+        "extension": ".res",
+        "ascii_runs_ge10_count": 244,
+        "category": "installer_language_resource",
+        "runtime_status": "not_game_localization_runtime",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/EDPMI.SWP",
+        "type": "file",
+        "size_bytes": 4194304,
+        "crc32": "1147406A",
+        "sha256": "bb9f8df61474d25e71fa00722318cd387396ca1736605e1248821cc0de3d3af8",
+        "extension": ".swp",
+        "category": "dos_installation_driver_or_environment",
+        "runtime_status": "not_android_gameplay_resource",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC/MEMORY.TXT",
+        "type": "file",
+        "size_bytes": 4,
+        "crc32": "8BC21544",
+        "sha256": "dba5166ad9db9ba648c1032ebbd34dcd0d085b50023b839ef5c68ca1db93a563",
+        "extension": ".txt",
+        "category": "dos_installation_driver_or_environment",
+        "runtime_status": "not_android_gameplay_resource",
+        "runtime_counterparts": []
+      },
+      {
+        "path": "FIRSTENC",
+        "type": "directory",
+        "runtime_status": "not_a_resource_file"
+      }
+    ]
+  },
+  "source_reference_files": [
+    {
+      "path": "/workspace/ffe-upstream/jjffe/ffe.asm",
+      "size_bytes": 2537976,
+      "sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+      "line_count": 133134
+    },
+    {
+      "path": "/workspace/ffe-upstream/jjffe/ffedat.asm",
+      "size_bytes": 1082788,
+      "sha256": "34219c91c5d019440ebf4fc707711a32c5080123ede05cf4d10a27d41f770850",
+      "line_count": 29067
+    },
+    {
+      "path": "/workspace/ffe-upstream/jjffe/ffebmp.asm",
+      "size_bytes": 7615155,
+      "sha256": "6f9732f6f881f038a9780460e287437d4d0b6b4b6df739d8a24e19a80e687a33",
+      "line_count": 175430
+    },
+    {
+      "path": "/workspace/ffe-upstream/jjffe/sdl/sdlsound.cpp",
+      "size_bytes": 8420,
+      "sha256": "6b949af7460527972f9b081dcdb8730be4cfc26870bda1daf33c59f39279f2e8",
+      "line_count": 388
+    },
+    {
+      "path": "/workspace/ffe-upstream/jjffe/hmp.cpp",
+      "size_bytes": 5015,
+      "sha256": "6fca23be8462a8e0d29a56ef9ec9f9851e03fc171f7c3b58404d12877e4c2151",
+      "line_count": 272
+    },
+    {
+      "path": "/workspace/ffe-upstream/jjffe/srctools/expbmp.cpp",
+      "size_bytes": 7520,
+      "sha256": "196423455509b043d94d9f18f27c63b71d2f97088802989ce9abe9218e3d31d8",
+      "line_count": 264
+    },
+    {
+      "path": "/workspace/ffe-upstream/jjffe/srctools/bmpconv.cpp",
+      "size_bytes": 2023,
+      "sha256": "fb8b3093dec84bdcc95da4c32c59140110860a22db8f4dc1936513ea4fe92246",
+      "line_count": 73
+    },
+    {
+      "path": "/workspace/ffe-upstream/jjffe/srctools/convdata.cpp",
+      "size_bytes": 5384,
+      "sha256": "8e058a53155f48454e0673a345290a27c1c2648190c643239d85591c663a5191",
+      "line_count": 230
+    }
+  ],
+  "project_resource_files": [
+    {
+      "path": "assets/city_surfaces/LICENSE.txt",
+      "size_bytes": 131,
+      "sha256": "e47ad2b7e67a6e6997f4b7a93b92685ab0dc7432c011cc73d773412d3fd598c8"
+    },
+    {
+      "path": "assets/city_surfaces/albedo.png",
+      "size_bytes": 596091,
+      "sha256": "46080062e17bd0fb65a95b427b4f3a5641bc9135e5cf818dde3071baac2cb822",
+      "image": {
+        "width": 2048,
+        "height": 2048,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/city_surfaces/manifest.json",
+      "size_bytes": 1940,
+      "sha256": "3cf93fe506d5abb12c870347da5140109d97732514e8c0a48f35df1b57ab1b44"
+    },
+    {
+      "path": "assets/city_surfaces/normal.png",
+      "size_bytes": 566466,
+      "sha256": "5abde4a87d7a2270e3e8e3944ef8b74b90e1e1cf88c2463dfa53b911c37f76b0",
+      "image": {
+        "width": 2048,
+        "height": 2048,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/city_surfaces/orm.png",
+      "size_bytes": 461972,
+      "sha256": "817c575883d3e380f5a4b491fdbe14907bcf5c3af16de7d5f89a10a6a94ef962",
+      "image": {
+        "width": 2048,
+        "height": 2048,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/LICENSE.txt",
+      "size_bytes": 648,
+      "sha256": "f48d1977afa6e5f4cc9dd0984f34cecd933b3aa19153d8db20caa7c77cad7be0"
+    },
+    {
+      "path": "assets/materials/asphalt/albedo.png",
+      "size_bytes": 172558,
+      "sha256": "c34a433a70152dce90512e5e7e0744f78d8b5042877bad2684a352b36695e374",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/asphalt/normal.png",
+      "size_bytes": 381640,
+      "sha256": "87f838c51f7e26421fffbf794e9b7d772700b24c46939af868064e0b759692a4",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/asphalt/orm.png",
+      "size_bytes": 170158,
+      "sha256": "5d163c654cba6dbd0632b32b2a3d0539885c7e411d972614d964ce9f89eb24eb",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/brushed_metal/albedo.png",
+      "size_bytes": 45843,
+      "sha256": "52069a8050fc8077c10fcdd5b6625c83f4893b92287fffa56b4265644d52250e",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/brushed_metal/normal.png",
+      "size_bytes": 116242,
+      "sha256": "e80164b02cb995b733ae07bcd246d4432c181ac898acca4c408fd73296d321e5",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/brushed_metal/orm.png",
+      "size_bytes": 54562,
+      "sha256": "ae51b49d38a122d38aac40e36a2644808b4b4027bc17177404d96d44a691265f",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/concrete/albedo.png",
+      "size_bytes": 210357,
+      "sha256": "873493e82b46536b4ca31c665e531afb731c46069a8f02962d9f2009eaf025af",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/concrete/normal.png",
+      "size_bytes": 517188,
+      "sha256": "45262cc50fe01cdeedbb90a9583625bd0db32e04a128a3eadbb7ad9c4554d1e8",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/concrete/orm.png",
+      "size_bytes": 275167,
+      "sha256": "9aacf5c445f30124e647b055f803b8d78f65a2e5cd774fecf8278efefaf2c0d2",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/glass/albedo.png",
+      "size_bytes": 10328,
+      "sha256": "19f46ccc170ac5cdaae1b2470e36350268abe09f967e301151029ea3a7daaa2a",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/glass/normal.png",
+      "size_bytes": 77476,
+      "sha256": "74f2525fcad42d873f6bda5afb6c2b327d227129f17a8c2a910a167280d49109",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/glass/orm.png",
+      "size_bytes": 22797,
+      "sha256": "1a073513e54240596600437ac743a2bd6e0003d961864f2685dcdfa3c025ad9f",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/ice/albedo.png",
+      "size_bytes": 180585,
+      "sha256": "7473ccaa9e1f3f69487e1580eb296c24d4f312ebb243a8286f16aee58fb08620",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/ice/normal.png",
+      "size_bytes": 178588,
+      "sha256": "a6c96d12f8d4e4ffd501bef30f69af8dbd287a27e1405a344409b39092da6bcb",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/ice/orm.png",
+      "size_bytes": 83161,
+      "sha256": "ccae7a8980bf1902d8656be541631f491a0de98377646751a94a3bae0d3c151e",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/manifest.json",
+      "size_bytes": 6459,
+      "sha256": "0e0351e2dd270739312a2342232bf1675efa9d84db1750dd3b92460ffe9f2ce6"
+    },
+    {
+      "path": "assets/materials/painted_alloy/albedo.png",
+      "size_bytes": 89741,
+      "sha256": "16f54465872aa464b0571f4d94f11080c9e6c6a3775ad2fb925ec70a746f0da1",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/painted_alloy/normal.png",
+      "size_bytes": 301653,
+      "sha256": "6b001916c2790823c829482691631c0c5fb1016a0ff989430fe56065bb22f05a",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/painted_alloy/orm.png",
+      "size_bytes": 159635,
+      "sha256": "66e91f1a16024894b27eb65f206fb316bff13c2f4bd289fabbcbf66317fc1c46",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/rock/albedo.png",
+      "size_bytes": 129653,
+      "sha256": "f07a50247fc0499ecd138eb0ef6c3b8413a9f8ca9c0aadd22294ede23b26bc2c",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/rock/normal.png",
+      "size_bytes": 321995,
+      "sha256": "bb30d76c591be70dcde3bfc084f7a4e52c956c1a57e143686bf0c8382529bb4a",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/rock/orm.png",
+      "size_bytes": 150275,
+      "sha256": "944e48f1e68119befe0bf9c5dc5e5b81f496db68d003d736afeaad6fd3d776aa",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/rubber/albedo.png",
+      "size_bytes": 138086,
+      "sha256": "1ef38a321e51170b890e09a4c9c77e8240b0fc6d9a6a7ee00ff5fc2587232b21",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/rubber/normal.png",
+      "size_bytes": 310546,
+      "sha256": "a5bbc92c4fc529fb0ef65dba823ae06fff0e1cc965f750ed8a91194e9511f5ac",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/rubber/orm.png",
+      "size_bytes": 206518,
+      "sha256": "8fd3ec3f55aa2a27afe8b3ea5b1f7492c77eff222723aeb0af28feb18519a10b",
+      "image": {
+        "width": 512,
+        "height": 512,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/materials/texture_contact_sheet.jpg",
+      "size_bytes": 254111,
+      "sha256": "000dea929d1f039ca99f5fd206e5c92277e1f2c57643f40596760aee3630c34b",
+      "image": {
+        "width": 768,
+        "height": 2240,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/surface_details/ships/LICENSE.txt",
+      "size_bytes": 197,
+      "sha256": "47b7c14f171e5aaf76b493ba61c3d86bfa466f88df10d090b4aa5ad5b56ebae7"
+    },
+    {
+      "path": "assets/surface_details/ships/cobra/albedo.png",
+      "size_bytes": 677521,
+      "sha256": "fe18b7cdd30efe229b90bebbfaea4badf4378be3ca2323957b0f331dea0eb264",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/surface_details/ships/cobra/normal.png",
+      "size_bytes": 164206,
+      "sha256": "d87c0ac3ef5f520b4589e9360ec45a449b4f1338e84e270ec0f5a90bdb7358ce",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/surface_details/ships/cobra/orm.png",
+      "size_bytes": 113047,
+      "sha256": "3ee033cdf2380d146eeadef4f0604a1f7dcd362daa8893f2c5b260c8bf47dcd1",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/surface_details/ships/eagle/albedo.png",
+      "size_bytes": 681548,
+      "sha256": "cdceadb95bebc72c8af8acd6983658667c0189560f0b2c1da5b487cb7201d905",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/surface_details/ships/eagle/normal.png",
+      "size_bytes": 167629,
+      "sha256": "3336ff074edf33eeab2905ab7dfd315ea5c6580ff7b517a4d323f24b301b9eb1",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/surface_details/ships/eagle/orm.png",
+      "size_bytes": 114662,
+      "sha256": "5ab0c4bb4a7d642e175bc528909f3e4381e6e7da854fb14685d67283c161684f",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/surface_details/ships/manifest.json",
+      "size_bytes": 2614,
+      "sha256": "635c355901ba9311e5d244a1624ffd4f3dd5e1c2de7424ed54430e4caacb4280"
+    },
+    {
+      "path": "assets/surface_details/ships/shuttle/albedo.png",
+      "size_bytes": 677766,
+      "sha256": "8864fbfeae5f82846c6c3df010a29114de9d875116b8a7877616ba31e8e96012",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/surface_details/ships/shuttle/normal.png",
+      "size_bytes": 162012,
+      "sha256": "fdf49877ab7f0127974616a860e28f2b61233471eccc0bc87cb1d3a3614318c9",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/surface_details/ships/shuttle/orm.png",
+      "size_bytes": 112524,
+      "sha256": "044f932dccfb565f2e35a6aadd5ef9609b90b40d0a2198fc524a62ac9148e927",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/surface_details/station/LICENSE.txt",
+      "size_bytes": 146,
+      "sha256": "54cfe62059b7cab0451269d5250cdba0f28090053a025339779cd90b16181740"
+    },
+    {
+      "path": "assets/surface_details/station/albedo.png",
+      "size_bytes": 199350,
+      "sha256": "7eff9d51005d10e7fe582dc4430e85bf288640308504fe7603622b8542ef2c9d",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/surface_details/station/manifest.json",
+      "size_bytes": 894,
+      "sha256": "7d1c95dec02dd51987b0111b2a65f420090441529ab5f88a020810145fc867e8"
+    },
+    {
+      "path": "assets/surface_details/station/normal.png",
+      "size_bytes": 342644,
+      "sha256": "3a85b42255686ddcbfc697e3c00e17bd70550025d76c0160cb8c5cbf70a42d6b",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/surface_details/station/orm.png",
+      "size_bytes": 297853,
+      "sha256": "4e7b41f13f26c8731061e7b3deb228e91a999640fe34bd88bd760d9df3f386e4",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/world_surfaces/LICENSE.txt",
+      "size_bytes": 115,
+      "sha256": "7737a93a631d5cb3d26fed39fcbd847bda836dba0af3bc37651b7626c1d47019"
+    },
+    {
+      "path": "assets/world_surfaces/desert/albedo.png",
+      "size_bytes": 877732,
+      "sha256": "01a3e4f236acabe01192596373d858844477314d6b297b454a3f8ef8052100ac",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/world_surfaces/desert/normal.png",
+      "size_bytes": 1112536,
+      "sha256": "2fadba22305a4e52a94f08bb38d87adf27251efdee9898a2377083f51adc6edc",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/world_surfaces/desert/orm.png",
+      "size_bytes": 330112,
+      "sha256": "d23403ae60c8931cba7d68aef5d8ac2da6d15ac0d3bd2cb9ef34262d0c748da3",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/world_surfaces/earth/albedo.png",
+      "size_bytes": 849016,
+      "sha256": "44d51d80cdafd253b92c019bccca1e0e31f3ef3663ff36903eb9ec5792a7f258",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/world_surfaces/earth/normal.png",
+      "size_bytes": 1056950,
+      "sha256": "cda378b31bd962e81ed2f84ce25a098a0cf82c95561cc3d144409eb970785740",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/world_surfaces/earth/orm.png",
+      "size_bytes": 645434,
+      "sha256": "060a42ebc2aa8e010033c39065ac8e5d2af11060024032c8cbbdbe98fdb82914",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/world_surfaces/ice/albedo.png",
+      "size_bytes": 704756,
+      "sha256": "14d20f61d7a1e9e03c23ef4bee7742fedb83268e73d92182ca28aa75ad6a998f",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/world_surfaces/ice/normal.png",
+      "size_bytes": 683878,
+      "sha256": "5271e4439828ffea08eb332341087090c37a9c77d15994cac99cca4b9a2c0239",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/world_surfaces/ice/orm.png",
+      "size_bytes": 450911,
+      "sha256": "45e744827c6b0ca553270a285743c3607ed8ba8558caf105b992773967ff3cd9",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/world_surfaces/manifest.json",
+      "size_bytes": 3577,
+      "sha256": "390391393381752105f824321a1ea5186cab2683bc103bf6761d9bfb35a5b1e6"
+    },
+    {
+      "path": "assets/world_surfaces/rock/albedo.png",
+      "size_bytes": 820947,
+      "sha256": "ab87abd92bc7e160de97723a1cddfc29ab9f5bbb7cdc5d0ba74cdb3fde24987f",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/world_surfaces/rock/normal.png",
+      "size_bytes": 957497,
+      "sha256": "5cbee4649d5e3f63687f5d2ea6f750687340602b6e4a116e9877984c255776a3",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "assets/world_surfaces/rock/orm.png",
+      "size_bytes": 507514,
+      "sha256": "e94b71f50aa1ff02a155e466a61b63ebb8e538df30493399a0b32ad9afb73546",
+      "image": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGB"
+      }
+    },
+    {
+      "path": "data/README_RU.md",
+      "size_bytes": 10412,
+      "sha256": "96229d3310334a2d91d0e26be1c9d65bbe548a97cdfa6e29eb56f68dfd1b6786"
+    },
+    {
+      "path": "data/ffe_data_provenance.json",
+      "size_bytes": 3081,
+      "sha256": "1af3f832fa4505f70150ba4452cb8885c743a237389328738253f22b92df280e"
+    },
+    {
+      "path": "data/ffe_galactic_map.json",
+      "size_bytes": 8240,
+      "sha256": "8fe5f5c5445a282422d5f9845b8d237a759c12c54538a3af8d8c260beb2b72b9"
+    },
+    {
+      "path": "data/ffe_galaxy.json",
+      "size_bytes": 38814,
+      "sha256": "bfe18506451502bd5eb336845c9e7a890af06e0953f9a5247a66a8b3258e4d57"
+    },
+    {
+      "path": "data/ffe_ground_collision.json",
+      "size_bytes": 48871,
+      "sha256": "2dbf44a94422907b1bb29b34df1d795cef819cecf267b1591f3d82ea6326d018"
+    },
+    {
+      "path": "data/ffe_ground_coordinates.json",
+      "size_bytes": 175461,
+      "sha256": "e94e9ec86761aa1d775498a2959af201f3c6497506da481c9d49ca7f27766abf"
+    },
+    {
+      "path": "data/ffe_ground_pads.json",
+      "size_bytes": 4157,
+      "sha256": "4d582c012349360d7fbee5bd0cf8285b904c491161d5553d5c7bc705ee2ef4ba"
+    },
+    {
+      "path": "data/ffe_handcrafted_records.json",
+      "size_bytes": 35246,
+      "sha256": "f0aff6be8bc15580d698f2fa3fe6b886474d107a2dc09394c07c84cf6f3489da"
+    },
+    {
+      "path": "data/ffe_math.json",
+      "size_bytes": 12555,
+      "sha256": "4166407ada817e8abfbd6e501ad12bac1a75977ee4d0c66fe727adb3aea8cce5"
+    },
+    {
+      "path": "data/ffe_planet_names.json",
+      "size_bytes": 19220,
+      "sha256": "717746d559f2079766bf68555ba8dbb73482bfe6b2a44c74b5bf4456d302d5d6"
+    },
+    {
+      "path": "data/ffe_runtime_model_descriptors.json",
+      "size_bytes": 107751,
+      "sha256": "cf9c673c2bba22f0c865e77e3a7ceed5497053cdb444b80f31d7439176446818"
+    },
+    {
+      "path": "data/ffe_settlement_rules.json",
+      "size_bytes": 1849,
+      "sha256": "88f909b5af25406b839e6da6b76651aa0f24ea94117274da28aec2f9a39173ab"
+    },
+    {
+      "path": "data/ffe_ship_registry.json",
+      "size_bytes": 35853,
+      "sha256": "07ccae9d6674bef40a7a5d2311a216b083ebdf010d5d47b187f7520de3b5d61a"
+    },
+    {
+      "path": "data/ffe_special_station_models.json",
+      "size_bytes": 9885,
+      "sha256": "5f327250cf0a807d4c2bb92f2c9665e5a9e0c69093e49540e40332b46584f526"
+    },
+    {
+      "path": "data/ffe_stellar_factory.json",
+      "size_bytes": 1217,
+      "sha256": "0f8899757618392aeb5a40ec8a559e21625bc5701e0dcc545bd88942971a77cb"
+    },
+    {
+      "path": "data/ffe_system_metadata.json",
+      "size_bytes": 77454,
+      "sha256": "9c742c68bcd678b05687b1af9072150a709c903b23723eeffda8220587a63588"
+    },
+    {
+      "path": "data/ffe_system_names.json",
+      "size_bytes": 16275,
+      "sha256": "2130927864a995816a446dfea55723ebed3adb1fd89d362c4fa08ad0f22e9443"
+    },
+    {
+      "path": "data/ffe_terrain_query.json",
+      "size_bytes": 125364,
+      "sha256": "8d764c2cd2a682ddfa8e0b8978b8f12616333ef361d0ed820dcb5b03b3f1977a"
+    },
+    {
+      "path": "data/ffe_underground_models.json",
+      "size_bytes": 149771,
+      "sha256": "0209b968cd970b5b40b6857fba49ae39e9c4c844da7bd831418803f7c685a37e"
+    },
+    {
+      "path": "data/ffe_world_models.json",
+      "size_bytes": 643746,
+      "sha256": "01d42a271f2da53f09d46277bd88a8b29a341818269f9ec89cc3d74286c89ece"
+    },
+    {
+      "path": "data/ffe_worlds.json",
+      "size_bytes": 62587,
+      "sha256": "71b4a250d100d689edceb575a26f9c837013759387f4f653d8dd04ed8843dbc8"
+    },
+    {
+      "path": "data/ships.json",
+      "size_bytes": 1787,
+      "sha256": "944974a355019507fefe53f79dffc19d24e838fe650d34a52fbc00c692b8571a"
+    },
+    {
+      "path": "data/world_names_ru.json",
+      "size_bytes": 4861,
+      "sha256": "cf3c02277698c0744e4012cc04edd4e480c3a2b247a7d3ced434a1e02e7d0b51"
+    }
+  ],
+  "archive_ascii_samples": {
+    "FIRSTENC/BLD_INFO.CFG": [
+      "\\QBDLFS!DPOGJH^",
+      "\\CVJME!EJS^",
+      "t;]fmjuf4]gmpqqz",
+      "\\UPUBM!CZUFT^",
+      "\\EFGBVMU!JOTUBMM!EJS^",
+      "D;]GJSTUFOD",
+      "\\IE!SFRVJSFE^",
+      "\\IE!CVGGFS^",
+      "\\QSPEVDU!UJUMF^",
+      "GJSTU!FODPVOUFST",
+      "\\UBSHFU!GMPQQZ^",
+      "\\SFTUSJDU!B0C^"
+    ],
+    "FIRSTENC/IMAGE.DAT": [
+      "DPMI32VM.OVL",
+      "MISSION.DAT",
+      "CABIN0.BMP",
+      "CABIN1.BMP",
+      "CABIN2.BMP",
+      "CABIN3.BMP",
+      "CABIN4.BMP",
+      "CABIN5.BMP",
+      "HMIDRV.386",
+      "HMIMDRV.386",
+      "HMIDET.386",
+      "LOADPATS.EXE"
+    ],
+    "FIRSTENC/MISSION.DAT": [],
+    "FIRSTENC/LANGRC.RES": [
+      "\\MBOHVBHF!GJMF^",
+      "VTF!DVSTPS!UP!TFMFDU",
+      "JOTUBMM!HBNF",
+      "TFMFDU!TPVOE!GY!DBSE",
+      "TFMFDU!NVTJD!DBSE",
+      "DPOUSPM!PQUJPOT",
+      "Vtf!Dvstps!Lfzt!Up!Npwf!Vq!boe!Epxo!!;!!Qsftt!Sfuvso!Up!FYJU",
+      "+++++++++FOE!PG!GJMF+++++++++++",
+      "TBWF!TFUUJOH!CFGPF!FYJU",
+      "JOTUBMMBUJPO",
+      "QSFTT!(FTD(!UP!BCPSU",
+      "EFTUJOBUJPO!EJSFDUPSZ!GPS"
+    ]
+  },
+  "runtime_static_audit": {
+    "audio_api_occurrences": 0,
+    "audio_files_in_project_assets": 0,
+    "external_font_or_translation_files_in_assets_data": 0,
+    "original_archive_media_files_copied_into_assets": 0,
+    "scope": "static names/files only, not a runtime trace or full liveness analysis"
+  },
+  "model_resource_coverage": {
+    "base_world_models": 150,
+    "base_roots": [
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90
+    ],
+    "underground_closure_models": 36,
+    "underground_new_indices": [
+      96,
+      162,
+      237,
+      267,
+      301
+    ],
+    "special_station_closure_models": 2,
+    "special_new_indices": [
+      69,
+      225
+    ],
+    "unique_model_program_records": 157,
+    "extraction_status_counts": {
+      "decoded": 157
+    },
+    "bounded_vertex_kinds": [
+      0,
+      1,
+      5,
+      7,
+      11,
+      19
+    ],
+    "independent_native_vertex_fixture_scope": {
+      "models": [
+        302,
+        312,
+        366,
+        392,
+        393,
+        394,
+        395,
+        396,
+        269
+      ],
+      "snapshots": 12,
+      "cases": 108,
+      "points": 1392,
+      "provenance": "docs/SOURCE_MODEL_VERTICES_NATIVE_RU.md"
+    },
+    "runtime_descriptor_slots": 149,
+    "original_ship_registry_descriptors": 57,
+    "playable_authored_hulls": 3,
+    "claim_limit": "decoded record counts are not full renderer, original ship mesh or instruction coverage"
+  },
+  "translation_coverage": {
+    "authored_world_name_dictionary_entries": 133,
+    "native_system_display_translation_entries": 9,
+    "registry_ship_display_name_ru_entries": 57,
+    "source_planet_name_table_strings": 510,
+    "source_system_name_table_strings": 267,
+    "unknown_extended_source_glyph_display": "U+FFFD replacement; raw bytes preserved",
+    "whole_game_translation_complete": false,
+    "mission_news_dialogue_translation_corpus_present": false,
+    "claim_limit": "dictionary sizes use distinct domains, cannot be divided into an overall translation percentage"
+  },
+  "embedded_graphics_tables": {
+    "source_file": "/workspace/ffe-upstream/jjffe/ffebmp.asm",
+    "DATA_008240": {
+      "line": 50509,
+      "direct_dd_entries": 96,
+      "meaning": "direct bitmap pointer entries; count not all original UI states"
+    },
+    "DATA_008241": {
+      "line": 50606,
+      "direct_dd_entries": 251,
+      "meaning": "additional bitmap pointer entries; not claimed251 icons or full font glyph coverage"
+    },
+    "font_width_code_reference": "/workspace/ffe-upstream/jjffe/ffe.asm:94066 F1597 / DATA7751",
+    "font_draw_code_reference": "/workspace/ffe-upstream/jjffe/ffe.asm:94090 F1598",
+    "runtime_original_bitmap_or_font_table_renderer": false
+  },
+  "findings": [
+    {
+      "id": "RES-01",
+      "status": "partial_source_geometry_with_modern_renderer",
+      "evidence": [
+        "scripts/source_model_vertices.gd:4",
+        "scripts/source_model_mesh.gd:154",
+        "scripts/source_model_mesh.gd:187",
+        "scripts/source_model_mesh.gd:254",
+        "scripts/source_model_visual.gd:47"
+      ]
+    },
+    {
+      "id": "RES-02",
+      "status": "original_ship_catalogue_geometry_not_ported",
+      "evidence": [
+        "scripts/ship_visual.gd:2",
+        "data/ships.json",
+        "data/ffe_ship_registry.json"
+      ]
+    },
+    {
+      "id": "RES-03",
+      "status": "sampled_source_global_height_modern_lod_not_original_adaptive_renderer",
+      "evidence": [
+        "scripts/source_global_body_mesh.gd:2",
+        "scripts/source_global_body_mesh.gd:80",
+        "scripts/source_surface_render_packet.gd:48"
+      ]
+    },
+    {
+      "id": "RES-04",
+      "status": "original_audio_cabin_fonts_icons_video_not_equivalent_runtime",
+      "evidence": [
+        "scripts/source_model_visual.gd:91",
+        "scripts/flight_console.gd:7",
+        "project.godot:20"
+      ]
+    },
+    {
+      "id": "RES-05",
+      "status": "russian_ui_and_partial_name_tables_not_full_localization",
+      "evidence": [
+        "scripts/source_system_definition.gd:83",
+        "scripts/source_world_catalogue.gd:43",
+        "data/world_names_ru.json"
+      ]
+    }
+  ],
+  "cross_references": {
+    "campaign_audit": "docs/PARITY_AUDIT_CAMPAIGN_CONTENT_RU.md",
+    "resource_graphics_audit": "docs/PARITY_AUDIT_RESOURCES_GRAPHICS_RU.md",
+    "original_full_function_catalog": "validation/parity-audit-2026-11-07/original-function-catalog.json"
+  },
+  "limits": [
+    "All68 archive files were decompressed to bytes and hashed; text/media/model semantics were not exhaustively decoded.",
+    "Original DOS executables were not executed. No APK build, benchmark or gameplay test was run by this inventory.",
+    "157 decoded unique model-program records and passing kernel controls are not whole-game or whole-renderer parity.",
+    "Archive has no AVI/movie or external portrait directory, but source code includes video hooks; missing archive media is not proof original game lacked it."
+  ]
+}
