@@ -1,0 +1,108 @@
+{
+  "started_utc": "2026-11-07T17:36:11.729778+00:00",
+  "version": "0.15.0-hyperdrive-alpha1",
+  "artifact_commit": "2f33742937677df01e65d5e79f3cf1f6a01d2097",
+  "source_commit": "48d4b05161e8bcce1716e94d7f4845e0793f4714",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/2f33742937677df01e65d5e79f3cf1f6a01d2097/deliverables/0.15.0-hyperdrive-alpha1/manifest.json",
+      "http_status": 200,
+      "bytes": 10954,
+      "sha256": "73b9ddac2be1e541e96a383d4204ed27de274dc34117b01c45a832ba1bc34892"
+    },
+    {
+      "file": "StarFrontier-0.15.0-hyperdrive-arm64.apk",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/2f33742937677df01e65d5e79f3cf1f6a01d2097/deliverables/0.15.0-hyperdrive-alpha1/StarFrontier-0.15.0-hyperdrive-arm64.apk",
+      "http_status": 200,
+      "bytes": 49934782,
+      "sha256": "eed44e84639ae62f5c3afdf1bee8d666f83d1ca1b6e7144dcaf4fd8b2490246a",
+      "zip_crc_verified": true
+    },
+    {
+      "file": "StarFrontier-0.15.0-hyperdrive-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/2f33742937677df01e65d5e79f3cf1f6a01d2097/deliverables/0.15.0-hyperdrive-alpha1/StarFrontier-0.15.0-hyperdrive-source.zip",
+      "http_status": 200,
+      "bytes": 30094130,
+      "sha256": "9e03cfd4832a307754e019c37b631831178a72a5f5eb58fe82f9d7c0dc9887f7",
+      "zip_crc_verified": true,
+      "source_commit_in_zip_comment": "48d4b05161e8bcce1716e94d7f4845e0793f4714"
+    },
+    {
+      "file": "screenshots/capture-manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/2f33742937677df01e65d5e79f3cf1f6a01d2097/deliverables/0.15.0-hyperdrive-alpha1/screenshots/capture-manifest.json",
+      "http_status": 200,
+      "bytes": 64364,
+      "sha256": "6bafaaabc50490c97391fb3701cb007ee1cbed7a76b6f9c5bd05e60f7c192bf4"
+    },
+    {
+      "file": "screenshots/01-source-equipment-sol.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/2f33742937677df01e65d5e79f3cf1f6a01d2097/deliverables/0.15.0-hyperdrive-alpha1/screenshots/01-source-equipment-sol.png",
+      "http_status": 200,
+      "bytes": 113543,
+      "sha256": "ba322a2e3841c9f9822db55716f3ea5e46b079f87bb831f2cbbe6ad8eae62c02"
+    },
+    {
+      "file": "screenshots/02-source-equipment-narrow.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/2f33742937677df01e65d5e79f3cf1f6a01d2097/deliverables/0.15.0-hyperdrive-alpha1/screenshots/02-source-equipment-narrow.png",
+      "http_status": 200,
+      "bytes": 103333,
+      "sha256": "069f7afb58852e1608c36be45edf54c869ddaf4348deb86c6bde2bd69c4f3af7"
+    },
+    {
+      "file": "screenshots/03-military-equipment-sol.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/2f33742937677df01e65d5e79f3cf1f6a01d2097/deliverables/0.15.0-hyperdrive-alpha1/screenshots/03-military-equipment-sol.png",
+      "http_status": 200,
+      "bytes": 113553,
+      "sha256": "ef6fa1632e7f2d6c7731d79407c9940b624f5bb1f725f026a3b90b7ec88fb733"
+    },
+    {
+      "file": "screenshots/04-alpha-source-route.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/2f33742937677df01e65d5e79f3cf1f6a01d2097/deliverables/0.15.0-hyperdrive-alpha1/screenshots/04-alpha-source-route.png",
+      "http_status": 200,
+      "bytes": 193431,
+      "sha256": "bbb020845aec4d66c46d79f9a149713c64e4c94784772210cc39eb649023b43b"
+    },
+    {
+      "file": "screenshots/05-source-charge-classic-console.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/2f33742937677df01e65d5e79f3cf1f6a01d2097/deliverables/0.15.0-hyperdrive-alpha1/screenshots/05-source-charge-classic-console.png",
+      "http_status": 200,
+      "bytes": 221619,
+      "sha256": "0adcec6a8c4d85bdc30e76a9ed3167c7f086909921c651d36347f32fe8820051"
+    },
+    {
+      "file": "screenshots/06-military-waste-after-arrival.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/2f33742937677df01e65d5e79f3cf1f6a01d2097/deliverables/0.15.0-hyperdrive-alpha1/screenshots/06-military-waste-after-arrival.png",
+      "http_status": 200,
+      "bytes": 111580,
+      "sha256": "81e0a81b5466d10de6a4b95199cff59aac705bd2c166fd19bde2c36a7cb3c8dd"
+    },
+    {
+      "file": "screenshots/07-legacy-migration-review.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/2f33742937677df01e65d5e79f3cf1f6a01d2097/deliverables/0.15.0-hyperdrive-alpha1/screenshots/07-legacy-migration-review.png",
+      "http_status": 200,
+      "bytes": 108067,
+      "sha256": "976afa8bd58254725f0b5847c01c7db292d93f17abb0efd1cb077d07f61f63e0"
+    },
+    {
+      "file": "screenshots/08-return-classic-flight.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/2f33742937677df01e65d5e79f3cf1f6a01d2097/deliverables/0.15.0-hyperdrive-alpha1/screenshots/08-return-classic-flight.png",
+      "http_status": 200,
+      "bytes": 217802,
+      "sha256": "ab6b763c2a7e08c0e46956bd63bddf5150cda6c553ec5812787e457c838f21dd"
+    }
+  ],
+  "status": "verified",
+  "scope": "Actual complete HTTPS downloads; immutable manifest bytes, payload SHA256/length, ZIP CRC, source archive Git comment and screenshot hashes. Not physical Android execution.",
+  "completed_utc": "2026-11-07T17:36:37.877648+00:00",
+  "immutable_urls": true,
+  "verified_payload_count": 12,
+  "all_manifest_payloads_downloaded": false,
+  "payload_scope": "Manifest, full APK, full source ZIP, capture manifest and all8 PNG; auxiliary evidence logs/reports were packaged and hashed but were not each independently downloaded.",
+  "artifact_branch": "development/starfrontier-rebuild",
+  "source_archive_fresh_import_report": "validation/hyperdrive-source-portability-2026-11-07/verification.json",
+  "source_archive_feature_report": "validation/hyperdrive-source-portability-2026-11-07/hyperdrive-main-feature.json",
+  "physical_device_tested": false,
+  "full_original_port_complete": false,
+  "production_release_ready": false
+}
