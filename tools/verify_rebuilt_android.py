@@ -143,6 +143,13 @@ SYSTEM_INFORMATION_RESOURCE_SHA256={
 SYSTEM_INFORMATION_MAIN_HELPER_SHA256={'_information_source_counts': '1e50a9c7f8bd846e12b720789ed95ebb57b24fff8d978ce71d480962a8520b8f', '_prepare_information_context': '1b2c529ccd3c7ab736851939114a56582ea24cfbade55446a0dbd5b6c37bad74', '_show_information': '4e0b3d599fd4ded671a997693c81f1533d88421fce685ec5781e0cbee64c2977', '_pump_information': 'a0ea44aca075882067ccdb66806cab1c34783502bbcdd566c826b79c4575f62c', '_finish_information_preparation': 'cefce6e006ad70a083501817b981caf7434c744edee365fc2324c55e1683d3a7', '_discard_information_parent': 'c11a5a15264b0e8d66c304bf3e234c4088b1755dbd4b47e6ea17e248aba09389', '_close_information': '5b06ec3d36bb706ad315797e6b40046be80964877f90f04c2beee0948fa7a868'}
 SYSTEM_INFORMATION_BASELINE_MAIN_FUNCTION_SHA256={'_safe_area': '6d5e38a60d624a39a9d2316f19d36d9a70d165ed774d98758770591a9572fd8f', '_update_flight_projection': '64f5a6530eeebe1e58488f0f54b106e15f889bf2e311f9384c48eb3ab1e1f9e3', '_build_ui': '3436befa9d94776e9569d8d712ecdef667a51c36b2fbd8de1baee9e921b44d6a', '_process': '630d45fb00b80dd356b3343e078fbf0e559edda05cc466856e167b60664a0707', '_exit_tree': 'd568fc0f044944e6755ae645ef01a926c118bfc82c7c98c3c5afe92e4cb1c242', '_show_status': 'ddee14eda7ad252602270d6eb4f0802b7528f07a6280bf55830e2fa9dc7bd1f2'}
 SYSTEM_INFORMATION_MAP_VIEW_SHA256={'scripts/system_map_view.gd': 'b1c03291928cb9dea19ca7a27e6055e192d2066e6fc46e3a21370100963eb103', 'scripts/galactic_map_view.gd': '2b725d1ecfda0f66e2d56872dd20c737dc73f904eee1a4fe490a2d93bbd9a33f'}
+HYPERDRIVE_BASELINE_SOURCE_COMMIT='860951235548fc58c859d7337b9a6909fd78ca62'
+HYPERDRIVE_MODULES=('source_hyperdrive', 'source_hyperdrive_session', 'hyperdrive_services_view')
+HYPERDRIVE_RESOURCE_SHA256='17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47'
+HYPERDRIVE_NATIVE_SHA256='5f5034fb0b2b2b73d1b82b73217b7ee0a4483b483f8f9921e1f640d2dbb91eae'
+HYPERDRIVE_AUDITED_SOURCE_SHA256={'scripts/source_hyperdrive.gd': 'b79cd38051e44d52fcd4f2beb173b2699096e7d9aea9a0288aba205e453a8874', 'scripts/navigation.gd': '3bc3d50e1c008b0f9f37f587e804729450ced47baf19330a27550d6343dccc1c', 'scripts/source_hyperdrive_session.gd': '0a505bd31bbffc703c9c06144b2f58167aa1da525de8ed013de5af4b58d2e59a', 'scripts/hyperdrive_services_view.gd': '755fad2ba1d52366a64954621f3406c4483bff299ead44a0d7151f502acac468', 'scripts/main.gd': '25dad04995505b2c119cc45470ff531c657dd80eb6963408a427bae641823049', 'scripts/galactic_map_model.gd': '597a5bd049e3dea2698bfbc255a0d57e7c98b70fabedfe09d56bb60ccd3a11a5', 'scripts/galactic_map_view.gd': '9a2a6fa97d9ab4f6ce572a5e10bb390d5036ccf6d30e3bc31e087a61440b7876'}
+HYPERDRIVE_INFORMATION_SOURCE_SHA256={'scripts/source_information_text.gd': '3d3e3af3b32fe77c28f00eb269e0b286ec16763e0c79730f51767a9c62409648', 'scripts/source_system_information.gd': '503be92125c8f4dd461a97bf891fbe27a48a8a0da57630aa0c9db11dada3647c', 'scripts/system_information_view.gd': 'f2dfa6ae205713ee52b5d39d7cb755ca902cb9583f3353496a772767f2814708'}
+HYPERDRIVE_PHYSICAL_MAIN_FUNCTION_SHA256={'_new_models': '84ee3ddf0488623c93a925f9e80c76d28f4b7369245264dc686c0a99b364d5d9', '_time_context': 'fe9c64abab18fcfef20cc38e32749e8f484cbe2f54cdf7c6dfd06ed316b3f23a', '_advance_controls': '040b53157b656043a248f22bcac26a8e33ddb056338cdc26f4fcc1ef58e54b7d', '_tick': 'd75bff3c9ad15639e0a9c10b14c3241d10e0dc3029c31b39ca46ce8ca5db148f', '_source_motion_step': 'c476095f2e40347e7e45b1680dcb74c9adcd85931d8914a4959460a9410631cd', '_apply_system': '47920c0adf4566e249ff2a7107ea85ae46923de53f94d788ad61307063acddc0', '_set_speed': '70f2369529290729e7cce96f51b7e6925614f0694cacebd0056523608ea34ec9', '_brake': '65dcd9782fee7cf46f030449926b6b637261f77e29024b3b765638878dfb58c1', '_toggle_auto': 'c66d6117ba49db06dcff00c94c59e04cb7c18bbd3ea91442eafe54f9e086616d', '_takeoff_action': '9d9648da5d8568bd962c3cde905bbd3865daa99f2fab14ba4ef1608b77ba310b', '_dock_action': 'bb95a86e818161c86714e17c200c16fef97354b5d62c555997b15799dc9e1865', '_surface_action': 'a19f55eb2bd983bdb3845cd7db9164b4bd18807877bae4c69e7096ef5ab3c5f3', '_enter_surface': '832d1576ee6c4f123d36a84c48bb0d0c882ef9bedffbaec506eb6647ff4716cf', '_finish_ascent': '596a7336a3b0f5d95fc223a8e721572db7f35065ebaf23ead1fbf1fdd729d742', '_choose_body': 'c3dab65a5e88c31f842188d34607279731672271b8d300b5c37a7c6929fdb18b', '_choose_site': '5dd971636babc4a708158c8438ad0b426794763328a26634c40c8757b05eab39', '_safe_area': '6d5e38a60d624a39a9d2316f19d36d9a70d165ed774d98758770591a9572fd8f', '_update_flight_projection': '64f5a6530eeebe1e58488f0f54b106e15f889bf2e311f9384c48eb3ab1e1f9e3', '_commit_state': 'f9f2d2a08f0290ddc57c1027820ad364c618b6272c3716bd124373e4a4b9cde1'}
 DEVELOPMENT_ASSET_PREFIXES=(
     'assets/tests/','assets/tools/','assets/docs/','assets/recovered-history/',
     'assets/recovery/','assets/validation/','assets/deliverables/',
@@ -698,7 +705,7 @@ def verify_source_full_runtime(archive,project,version_code=34):
     # Older contracts still inspect their exact base tables when tested from a
     # newer checkout. Only explicitly known later-version tables may coexist;
     # current v36 must include and verify its additional original map resource.
-    assert set(required_tables)<=present_tables<=set(FULL_SOURCE_TABLES+NAVIGATION_TABLES+('ffe_system_information',)),'Full packaging verifier list omits a source table or names a missing table'
+    assert set(required_tables)<=present_tables<=set(FULL_SOURCE_TABLES+NAVIGATION_TABLES+('ffe_system_information','ffe_hyperdrive')),'Full packaging verifier list omits a source table or names a missing table'
     tables={}
     for name in required_tables+('ships','world_names_ru'):
         raw=(project/'data'/f'{name}.json').read_bytes();exported=f'assets/data/{name}.json'
@@ -1024,15 +1031,8 @@ def verify_celestial_visibility_runtime(archive,project):
             'compiled_source_correspondence_rebuilt_by_verifier':False,'visibility_or_eclipse_proved_by_this_package_check':False,
             'physical_device_tested':False,'astronomically_calibrated_star_radii':False,'complete_original_renderer':False}
 
-def verify_system_information_runtime(archive,project):
-    """Require actual information consumers/data while preserving flight logic.
-
-    This verifies package/source inputs and narrowly allowed UI hooks; original
-    instruction controls, translation review, Main behavior and GPU are separate.
-    """
-    protected={path:value for path,value in MAP_VISUAL_PROTECTED_SOURCE_SHA256.items()
-               if path not in ('scripts/main.gd','scripts/system_map_view.gd')}
-    map_assets=_verify_map_visual_contract(archive,project,protected,SYSTEM_INFORMATION_BASELINE_SOURCE_COMMIT)
+def _verify_system_information_payload(archive,project):
+    """Unchanged code39 source/RU/compiled controls, reused by later modules."""
     modules={}
     for name in SYSTEM_INFORMATION_MODULES:
         path='assets/scripts/'+name+'.gdc'
@@ -1083,6 +1083,21 @@ def verify_system_information_runtime(archive,project):
     assert source.get('dos_record_rows')==338 and source.get('dos_sentinel_offset')==18198,'Incorrect DOS information policy domain'
     assert len(bytes.fromhex(source['dos_metadata_hex']))==18268,'Incorrect DOS information policy bytes'
     assert language.get('language')=='ru' and language.get('coverage',{}).get('complete_game_localization') is False,'Russian information scope is not explicit'
+    for name,expected in SYSTEM_INFORMATION_RESOURCE_SHA256.items():
+        assert tables[name]['sha256']==expected,'System information resource differs from reviewed original/translation '+name
+    return {'modules':modules,'tables':tables}
+
+def verify_system_information_runtime(archive,project):
+    """Require actual information consumers/data while preserving flight logic.
+
+    This verifies package/source inputs and narrowly allowed UI hooks; original
+    instruction controls, translation review, Main behavior and GPU are separate.
+    """
+    protected={path:value for path,value in MAP_VISUAL_PROTECTED_SOURCE_SHA256.items()
+               if path not in ('scripts/main.gd','scripts/system_map_view.gd')}
+    map_assets=_verify_map_visual_contract(archive,project,protected,SYSTEM_INFORMATION_BASELINE_SOURCE_COMMIT)
+    information=_verify_system_information_payload(archive,project)
+    modules,tables=information['modules'],information['tables']
     main=(project/'scripts/main.gd').read_text()
     additions={
         '_show_system':'\tview.information_requested.connect(func(id:String):\n\t\tif active_map==view:_show_information(world.system_id,id)\n\t)\n',
@@ -1143,6 +1158,107 @@ def verify_system_information_runtime(archive,project):
             'complete_game_localization':False,'physical_device_tested':False}
 
 
+def verify_hyperdrive_runtime(archive,project):
+    """Code40 package inputs and audited consumers, without executing GDSC.
+
+    Exact source pins follow the reviewed integration checkpoint. Native kernel,
+    live Main and UI behavior are tested separately; package evidence does not
+    imply F908/arrival, original economy, or complete original physics parity.
+    """
+    names=set(archive.namelist());modules={}
+    for name in HYPERDRIVE_MODULES:
+        path='assets/scripts/'+name+'.gdc'
+        assert path in names,'Missing hyperdrive runtime module '+name
+        packed=archive.read(path)
+        assert len(packed)>64 and packed[:4]==b'GDSC','Invalid compiled hyperdrive runtime '+name
+        modules[name]={'runtime_sha256':hashlib.sha256(packed).hexdigest(),
+                       'local_source_sha256':hashlib.sha256((project/'scripts'/f'{name}.gd').read_bytes()).hexdigest()}
+    path='assets/data/ffe_hyperdrive.json'
+    assert path in names,'Missing hyperdrive resource'
+    raw=archive.read(path)
+    assert raw==(project/'data/ffe_hyperdrive.json').read_bytes(),'Hyperdrive resource differs from source'
+    data=json.loads(raw)
+    assert data.get('schema')==1 and data.get('source_sha256')==SOURCE_IMAGE_SHA256,'Wrong hyperdrive source provenance'
+    assert data.get('source',{}).get('ffe_asm_sha256')==SOURCE_ASSEMBLY_SHA256 and data.get('source',{}).get('jjffe_commit')==SOURCE_ASSEMBLY_COMMIT,'Wrong hyperdrive assembly provenance'
+    drive_raw=bytes.fromhex(data.get('drive_table_hex',''))
+    assert data.get('drive_count')==15 and data.get('drive_stride_bytes')==16 and len(drive_raw)==240,'Incorrect original hyperdrive table domain'
+    assert hashlib.sha256(drive_raw).hexdigest()=='82659f368ab7b4298735b16b4f76276207a19d1b529526c4452c2c78569fe654','Changed original hyperdrive table bytes'
+    assert sorted(map(int,data.get('ship_specs',{})))==list(range(15,72)),'Incomplete original hyperdrive ship specifications'
+    for key,spec in data['ship_specs'].items():
+        packed=bytes.fromhex(spec['spec_hex'])
+        assert len(packed)==24 and hashlib.sha256(packed).hexdigest()==spec['spec_sha256'],'Changed original hyperdrive ship spec '+key
+        assert struct.unpack_from('<hh',packed,6)==(spec['hull_mass_tonnes_s16'],spec['internal_capacity_tonnes_s16']),'Incorrect signed original hyperdrive ship spec '+key
+    for ship,expected in {'cobra':(38,3,4,6,True),'eagle':(24,2,1,6,False),'shuttle':(15,1,0,0,False)}.items():
+        profile=data.get('new_session_profiles',{}).get(ship,{})
+        assert tuple(profile.get(key) for key in ['source_model_index','source_drive_index','hydrogen','fixed_equipment_space_t','original_starter'])==expected,'Changed audited new-session hyperdrive profile '+ship
+        assert profile.get('military')==profile.get('waste')==0,'Incorrect initial hyperdrive cargo '+ship
+    assert hashlib.sha256(raw).hexdigest()==HYPERDRIVE_RESOURCE_SHA256,'Hyperdrive resource differs from reviewed DOS extraction'
+    # Preserve all code39 original/RU boundaries and variable controls. The
+    # three information scripts are frozen as well, rather than skipped.
+    information=_verify_system_information_payload(archive,project)
+    for relative,expected in HYPERDRIVE_INFORMATION_SOURCE_SHA256.items():
+        assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==expected,'Hyperdrive update changed information runtime '+relative
+    protected={path:value for path,value in MAP_VISUAL_PROTECTED_SOURCE_SHA256.items()
+               if path not in ('scripts/main.gd','scripts/system_map_view.gd','scripts/navigation.gd','scripts/galactic_map_model.gd')}
+    for relative,expected in protected.items():
+        assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==expected,'Hyperdrive update changed protected flight/source data '+relative
+    celestial=hashlib.sha256((project/'scripts/celestial_renderer.gd').read_bytes()).hexdigest()
+    assert celestial==SYSTEM_INFORMATION_CELESTIAL_SHA256,'Hyperdrive update changed the Mercury stellar-visibility fix'
+    assert hashlib.sha256((project/'scripts/system_map_view.gd').read_bytes()).hexdigest()==SYSTEM_INFORMATION_MAP_VIEW_SHA256['scripts/system_map_view.gd'],'Hyperdrive update changed system-map information/travel view'
+    main=(project/'scripts/main.gd').read_text()
+    for name,expected in HYPERDRIVE_PHYSICAL_MAIN_FUNCTION_SHA256.items():
+        assert hashlib.sha256(source_function(main,name).encode()).hexdigest()==expected,'Hyperdrive update changed protected physical Main function '+name
+    source={name:(project/'scripts'/f'{name}.gd').read_text() for name in (*HYPERDRIVE_MODULES,'navigation','galactic_map_model','galactic_map_view')}
+    ready=source_function(main,'_ready');enable=source_function(main,'_enable_source_hyperdrive')
+    assert re.search(r'if not automated:\s*\n\s*_enable_source_hyperdrive\(\)\s*\n\s*_load_game\(\)',ready),'Fresh normal startup must configure source hyperdrive before optional save restore'
+    assert 'world.layout_mode!=World.FULL_LAYOUT' in enable and 'nav.configure_source(ship.ship_id,nav.current_id)' in enable and 'nav.sync_source_ship(ship)' in enable,'Missing explicit FULL source-hyperdrive startup gate'
+    assert '_enable_source_hyperdrive()' in source_function(main,'_confirm_new_game'),'New Game omits source hyperdrive'
+    routes=source_function(main,'_show_routes')
+    assert 'nav.map_profile(ship)' in routes and 'map_state.source_hyperdrive_profile=' in routes,'Galactic map lost its source hyperdrive profile'
+    assert 'SourceNavigation.source_map_quote(' in source_function(source['galactic_map_model'],'jump_state'),'Galactic map lost source fuel/duration quote consumer'
+    assert 'model.jump_state()' in source_function(source['galactic_map_view'],'_confirm_jump'),'Map jump must use the displayed quote availability'
+    assert 'nav.begin_jump(ship)' in source_function(main,'_start_jump'),'Main lost Navigation jump consumer'
+    navigation=source['navigation']
+    assert '"starfrontier-rebuild-navigation-v3"' in source_function(navigation,'snapshot') and '_hyperdrive.snapshot()' in source_function(navigation,'snapshot'),'Source inventory lacks versioned Navigation snapshot'
+    assert '_restore_source(data)' in source_function(navigation,'restore') and 'starfrontier-rebuild-navigation-v1' in source_function(navigation,'restore') and 'starfrontier-rebuild-navigation-v2' in source_function(navigation,'restore'),'Source restore must retain explicit legacy branches'
+    assert 'session.restore(data.source_hyperdrive)' in source_function(navigation,'_restore_source') and '_same_pending(expected,data.pending_source_quote)' in source_function(navigation,'_restore_source'),'Source restore lacks validated inventory/pending quote'
+    assert 'pending_source_quote={}' in source_function(navigation,'cancel_jump') and '.commit(' not in source_function(navigation,'cancel_jump'),'Jump cancel must clear pending quote without fuel consumption'
+    step=source_function(navigation,'_step_source')
+    assert 'candidate.commit(' in step and 'duration_raw_u32)/65536.0' in step and '_same_pending(' in step,'Jump completion lost source quote/atomic fuel/duration consumer'
+    assert 'candidate_nav.validate_source_ship(candidate_ship)' in source_function(main,'_decode_state'),'Save restore lost Flight/inventory validation'
+    assert 'nav.sync_source_ship(ship)' in source_function(main,'_payload'),'Save snapshot lost Flight/cargo bridge'
+    assert 'hyperdrive_services_view.command.connect(_hyperdrive_service_command)' in source_function(main,'_embed_hyperdrive_services') and 'nav.service(action,id,quantity,ship)' in source_function(main,'_hyperdrive_service_command'),'Workshop UI lacks live Navigation command consumer'
+    assert 'command.emit(action,id,quantity)' in source_function(source['hyperdrive_services_view'],'_action') and '_editable()' in source_function(source['hyperdrive_services_view'],'_action'),'Workshop commands lack actual copied-state/docked UI gate'
+    session=source['source_hyperdrive_session']
+    assert 'Kernel.quote(' in source_function(session,'quote') and 'drive_mass(drive_index)' in source_function(session,'occupied'),'Session lost original quote/installed-mass capacity consumer'
+    assert 'source_digest' in source_function(session,'restore') and 'candidate.valid()' in source_function(session,'restore'),'Inventory save lacks validated resource-bound atomic restore'
+    for relative,expected in HYPERDRIVE_AUDITED_SOURCE_SHA256.items():
+        assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==expected,'Hyperdrive update differs from audited integration source '+relative
+    fixture_path=project/'tests/fixtures/source_hyperdrive_native.json'
+    fixture_raw=fixture_path.read_bytes();fixture=json.loads(fixture_raw)
+    assert hashlib.sha256(fixture_raw).hexdigest()==HYPERDRIVE_NATIVE_SHA256,'Changed independent hyperdrive native reference'
+    assert fixture.get('source_sha256')==SOURCE_IMAGE_SHA256 and fixture.get('source_assembly_sha256')==SOURCE_ASSEMBLY_SHA256 and fixture.get('source_commit')==SOURCE_ASSEMBLY_COMMIT,'Wrong hyperdrive native provenance'
+    assert fixture.get('drive_table_hex')==data['drive_table_hex'] and fixture.get('drive_count')==15,'Hyperdrive native table differs from runtime'
+    for key,spec in data['ship_specs'].items():
+        assert fixture.get('ship_specs',{}).get(key,{}).get('spec_hex')==spec['spec_hex'],'Hyperdrive native spec differs from runtime '+key
+    assert fixture.get('case_count')==len(fixture.get('cases',[]))==5453 and fixture.get('unsafe_case_count')==len(fixture.get('unsafe_cases',[]))==11,'Incomplete independent hyperdrive cases'
+    assert fixture.get('fresh_process_runs')==3 and fixture.get('reverse_repeat_count')==5453 and all(fixture.get(key) is True for key in ['canaries_unchanged','nonfuel_object_bytes_unchanged','specifications_unchanged']),'Incomplete independent hyperdrive reproduction/boundaries'
+    return {'baseline_source_commit':HYPERDRIVE_BASELINE_SOURCE_COMMIT,'compiled_modules':modules,'compiled_module_count':3,
+            'raw_resource_sha256':hashlib.sha256(raw).hexdigest(),'raw_json_count':1,'drive_count':15,'ship_specification_count':57,
+            'new_session_profile_models':{'cobra':38,'eagle':24,'shuttle':15},'original_starting_loadout_subset':['cobra'],
+            'explicit_fitting_adapters':['eagle','shuttle'],'protected_flight_source_data_count':len(protected),
+            'protected_physical_Main_functions':len(HYPERDRIVE_PHYSICAL_MAIN_FUNCTION_SHA256),
+            'unchanged_information_runtime_count':3,'unchanged_information_resource_count':2,'system_information_resources':information['tables'],
+            'audited_local_source_sha256':HYPERDRIVE_AUDITED_SOURCE_SHA256,
+            'source_f903_live_quote_consumers_checked':True,'source_f833_distance_consumer_checked':True,
+            'legacy_v1_v2_saved_navigation_retained':True,'source_v3_inventory_and_pending_restore_checked':True,
+            'native_reference':{'sha256':HYPERDRIVE_NATIVE_SHA256,'case_count':5453,'unsafe_case_count':11,'fresh_process_runs':3,'oracle_executed_by_apk_verifier':False},
+            'pricing_policy':'basic-source-workshop-pricing-adapter-v1','original_outfitting_economy':False,
+            'original_f908_arrival_pipeline':False,'original_misjump_pipeline':False,'jetfuel_or_star_scoop_integrated_by_this_block':False,
+            'all57_ships_playable':False,'complete_original_hyperdrive_gameplay':False,'complete_original_physics':False,
+            'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
+
+
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     expected=preset_values(presets)
     signature=run(build_tools/'apksigner','verify','--verbose','--print-certs',apk)
@@ -1161,7 +1277,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={};hyperdrive_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -1237,9 +1353,12 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             if expected['version_code']==38:
                 celestial_visibility_assets=verify_celestial_visibility_runtime(archive,presets.parent)
                 map_visual_assets=celestial_visibility_assets['galactic_map_visual_assets']
-            if expected['version_code']>=39:
+            if expected['version_code']==39:
                 system_information_assets=verify_system_information_runtime(archive,presets.parent)
                 map_visual_assets=system_information_assets['galactic_map_visual_assets']
+            if expected['version_code']>=40:
+                hyperdrive_assets=verify_hyperdrive_runtime(archive,presets.parent)
+                system_information_assets={'resources':hyperdrive_assets['system_information_resources'],'unchanged_runtime_modules':3,'raw_original_and_ru_resources_checked':True}
         for name in names:
             if not name.startswith('lib/') or not name.endswith('.so'):continue
             data=archive.read(name)
@@ -1257,7 +1376,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'hyperdrive_assets':hyperdrive_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

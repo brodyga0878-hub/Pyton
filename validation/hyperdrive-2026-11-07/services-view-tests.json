@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "completed_utc": "2026-11-07T17:27:15.410922+00:00",
+  "checks": 538,
+  "failures": 0,
+  "results": [
+    {
+      "log": "services-view-fixture.log",
+      "checks": 484,
+      "failures": 0,
+      "sha256": "ad588172bf909e0b19aaa7bc6ba9b0879c652536f8692e66cc9c6e9fefac3c39"
+    },
+    {
+      "log": "services-view-native.log",
+      "checks": 54,
+      "failures": 0,
+      "sha256": "c00971c0b384aebcc35858e3b66728ce8d7c0eb7b7ca1b23887eb40ed36bfb23"
+    }
+  ],
+  "sources": {
+    "scripts/hyperdrive_services_view.gd": "755fad2ba1d52366a64954621f3406c4483bff299ead44a0d7151f502acac468",
+    "tests/test_hyperdrive_services_view.gd": "f37d97a1e7c3b388f8828ea7d9e39be45695746190316b7f4a4f850378809508",
+    "tests/test_hyperdrive_services_native_view.gd": "a93fa91ce9bf19d6448c0fbb91b8555e6d344890b264fd57840c6a82f3af69e4",
+    "scripts/navigation.gd": "3bc3d50e1c008b0f9f37f587e804729450ced47baf19330a27550d6343dccc1c",
+    "scripts/source_hyperdrive_session.gd": "0a505bd31bbffc703c9c06144b2f58167aa1da525de8ed013de5af4b58d2e59a",
+    "scripts/source_hyperdrive.gd": "b79cd38051e44d52fcd4f2beb173b2699096e7d9aea9a0288aba205e453a8874",
+    "scripts/flight_model.gd": "8da5454be81142412ba8bcfb4df0154ae43d906a73fc1f04f5650ec1d57b3391",
+    "data/ffe_hyperdrive.json": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47"
+  },
+  "native_view_evidence": [
+    {
+      "capacity_t": 80,
+      "drive_index": 3,
+      "flight_cargo_t": 6,
+      "occupied_t": 45,
+      "phase": "initial_actual_source",
+      "pricing_profile": "basic-source-workshop-pricing-adapter-v1"
+    },
+    {
+      "drive_index": 11,
+      "free_t": 1,
+      "fuel_handover_credit_change": 0,
+      "hydrogen": 4,
+      "military": 47,
+      "occupied_t": 79,
+      "phase": "fitted_and_fuelled"
+    },
+    {
+      "duration_days": 2.53741455078125,
+      "duration_raw_u32": 166292,
+      "final_free_t": 3,
+      "military_consumed": 2,
+      "ordinary_inventory_unchanged": true,
+      "phase": "military_jump_and_waste",
+      "required_fuel": 2,
+      "waste_handed_over": 2
+    },
+    {
+      "elapsed_days": 17.25,
+      "hydrogen_after_service": 13,
+      "old_fuel_units": 12,
+      "ordinary_inventory_unchanged": true,
+      "phase": "immediate_post_migration",
+      "service_available_without_extra_refresh": true
+    }
+  ],
+  "scope": "Actual source Navigation/session quotes through embedded phone equipment UI and touch commands; read-only display, adapter prices/refund, source capacity including existing Flight manifest, H2/military/waste, full-fuel handover, real quoted military jump and immediate post-migration services. The independent original hyperdrive arithmetic oracle is validated separately.",
+  "pricing_profile": "basic-source-workshop-pricing-adapter-v1",
+  "full_original_market_implemented": false,
+  "headless": true,
+  "gpu_capture": false,
+  "physical_device_tested": false,
+  "physical_dock_contact_tested": false,
+  "dock_context": "Isolated business-service fixture with explicit dock/port flags; Main physical contact integration is separate.",
+  "embedded_widths_tested": [
+    320,
+    440,
+    720,
+    960,
+    1440
+  ]
+}

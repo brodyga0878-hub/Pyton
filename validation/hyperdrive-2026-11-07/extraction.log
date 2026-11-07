@@ -1,0 +1,12 @@
+test_all_data_and_instruction_bytes_are_at_the_stated_dos_offsets (test_extract_hyperdrive.HyperdriveExtraction.test_all_data_and_instruction_bytes_are_at_the_stated_dos_offsets) ... ok
+test_exact_fifteen_drive_domain_and_table_digest (test_extract_hyperdrive.HyperdriveExtraction.test_exact_fifteen_drive_domain_and_table_digest) ... ok
+test_fifty_seven_specs_include_distinct_eagles (test_extract_hyperdrive.HyperdriveExtraction.test_fifty_seven_specs_include_distinct_eagles) ... ok
+test_installation_mass_does_not_use_f902_capacity_threshold (test_extract_hyperdrive.HyperdriveExtraction.test_installation_mass_does_not_use_f902_capacity_threshold) ... ok
+test_original_dos_equipment_variant_is_explicit (test_extract_hyperdrive.HyperdriveExtraction.test_original_dos_equipment_variant_is_explicit) ... ok
+test_reextraction_is_reproducible_and_rejects_wrong_original (test_extract_hyperdrive.HyperdriveExtraction.test_reextraction_is_reproducible_and_rejects_wrong_original) ... ok
+test_starting_fuel_is_cargo_and_adapters_are_not_original_starters (test_extract_hyperdrive.HyperdriveExtraction.test_starting_fuel_is_cargo_and_adapters_are_not_original_starters) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.671s
+
+OK

@@ -1,0 +1,252 @@
+{
+  "schema": 1,
+  "completed_utc": "2026-11-07T17:33:07.417517+00:00",
+  "status": "passed",
+  "checks": 70630,
+  "failures": 0,
+  "groups": 16,
+  "suites": [
+    {
+      "name": "source_hyperdrive",
+      "test": "tests/test_source_hyperdrive.gd",
+      "checks": 66147,
+      "failures": 0,
+      "status": "passed",
+      "proof": "validation/hyperdrive-2026-11-07/source-hyperdrive-core.json",
+      "proof_sha256": "06ff8197d2fb19de87f795bad120172349d4229a66f9681b9af88bd3373e7817",
+      "log": "validation/hyperdrive-2026-11-07/source-hyperdrive-core.log",
+      "log_sha256": "13797d69a097148e5a04d9cd5d9f53702a0784dc5d0e38d154ff339798e6f85e"
+    },
+    {
+      "name": "source_hyperdrive_navigation",
+      "test": "tests/test_source_hyperdrive_navigation.gd",
+      "checks": 143,
+      "failures": 0,
+      "status": "passed",
+      "proof": "validation/hyperdrive-2026-11-07/navigation-integration.json",
+      "proof_sha256": "34977a427a7960d18d048131546a15ce3a43f79db323ea3e02fee7b9117c84f9",
+      "log": "validation/hyperdrive-2026-11-07/source-hyperdrive-navigation.log",
+      "log_sha256": "9e49696cf7496e1a106a4c0b5a371fd9c2d87cf91c3ceb5d13a20b1769104eb9"
+    },
+    {
+      "name": "native_navigation",
+      "test": "tests/test_native_navigation.gd",
+      "checks": 219,
+      "failures": 0,
+      "status": "passed",
+      "proof": "validation/hyperdrive-2026-11-07/navigation-integration.json",
+      "proof_sha256": "34977a427a7960d18d048131546a15ce3a43f79db323ea3e02fee7b9117c84f9",
+      "log": "validation/hyperdrive-2026-11-07/legacy-native-navigation.log",
+      "log_sha256": "875e664e3e0605e0a71b2fabc284598e30216783875c466de66f2fc2dd78f140"
+    },
+    {
+      "name": "hyperdrive_services_view",
+      "test": "tests/test_hyperdrive_services_view.gd",
+      "checks": 484,
+      "failures": 0,
+      "status": "passed",
+      "proof": "validation/hyperdrive-2026-11-07/services-view-fixture.json",
+      "proof_sha256": "7a8caf9b7ad3675db0d1ce50557c4a6e30408a863ca618b4889a89a12417a019",
+      "log": "validation/hyperdrive-2026-11-07/services-view-fixture.log",
+      "log_sha256": "ad588172bf909e0b19aaa7bc6ba9b0879c652536f8692e66cc9c6e9fefac3c39"
+    },
+    {
+      "name": "hyperdrive_services_native_view",
+      "test": "tests/test_hyperdrive_services_native_view.gd",
+      "checks": 54,
+      "failures": 0,
+      "status": "passed",
+      "proof": "validation/hyperdrive-2026-11-07/services-view-tests.json",
+      "proof_sha256": "fc80e942dd2947740e1c70a8477f3515e04d0118e6e16dbcd1b13be25b6a34fa",
+      "log": "validation/hyperdrive-2026-11-07/services-view-native.log",
+      "log_sha256": "c00971c0b384aebcc35858e3b66728ce8d7c0eb7b7ca1b23887eb40ed36bfb23"
+    },
+    {
+      "name": "source_hyperdrive_main",
+      "test": "tests/test_source_hyperdrive_main.gd",
+      "checks": 70,
+      "failures": 0,
+      "status": "passed",
+      "proof": "validation/hyperdrive-2026-11-07/source-hyperdrive-main.json",
+      "proof_sha256": "9d649b12b5c6dbbc29f6fdc03eef6ea462e77a2320613e49dd16e6607e995bcc",
+      "log": "validation/hyperdrive-2026-11-07/source-hyperdrive-main.log",
+      "log_sha256": "714642268b5d030046e011e56f234bb451f4042b5a194b32c21d1e1878eecbd8"
+    },
+    {
+      "name": "source_hyperdrive_map",
+      "test": "tests/test_source_hyperdrive_map.gd",
+      "checks": 31,
+      "failures": 0,
+      "status": "passed",
+      "proof": "validation/hyperdrive-2026-11-07/source-map.log",
+      "proof_sha256": "22fb8b1faa27d97af5a58149fa4cf80c3589d8c4f6e7cbd4f4d9cc68640f82fe",
+      "log": "validation/hyperdrive-2026-11-07/source-map.log",
+      "log_sha256": "22fb8b1faa27d97af5a58149fa4cf80c3589d8c4f6e7cbd4f4d9cc68640f82fe"
+    },
+    {
+      "name": "navigation_main",
+      "test": "tests/test_navigation_main.gd",
+      "checks": 53,
+      "failures": 0,
+      "status": "passed",
+      "proof": "validation/hyperdrive-2026-11-07/regression-summary.json",
+      "proof_sha256": "66bb5bc0abaa6020a6838041c34b9c545aa68126d0fb67c3b6cf5c875087cf09",
+      "log": "/workspace/Pyton/validation/hyperdrive-2026-11-07/regression-logs/logs/navigation_main.log",
+      "log_sha256": "341f62f03e5ea9792cb9e4caaf3261f7e61c57b9664e49fe27d12453ab4c12b6"
+    },
+    {
+      "name": "galactic_map_view",
+      "test": "tests/test_galactic_map_view.gd",
+      "checks": 2908,
+      "failures": 0,
+      "status": "passed",
+      "proof": "validation/hyperdrive-2026-11-07/regression-summary.json",
+      "proof_sha256": "66bb5bc0abaa6020a6838041c34b9c545aa68126d0fb67c3b6cf5c875087cf09",
+      "log": "/workspace/Pyton/validation/hyperdrive-2026-11-07/regression-logs/logs/galactic_map_view.log",
+      "log_sha256": "d5cc0ed4b00963fd1c0a8de424b0e8772065969d25340166795f1d379a0baaa3"
+    },
+    {
+      "name": "classic_console_main",
+      "test": "tests/test_classic_console_main.gd",
+      "checks": 42,
+      "failures": 0,
+      "status": "passed",
+      "proof": "validation/hyperdrive-2026-11-07/regression-summary.json",
+      "proof_sha256": "66bb5bc0abaa6020a6838041c34b9c545aa68126d0fb67c3b6cf5c875087cf09",
+      "log": "/workspace/Pyton/validation/hyperdrive-2026-11-07/regression-logs/logs/classic_console_main.log",
+      "log_sha256": "fd1b59ff7ab0184ebb05c966c93c20e81d6f74731c727c273818a1dadac0b0b3"
+    },
+    {
+      "name": "source_console_pause",
+      "test": "tests/test_source_console_pause.gd",
+      "checks": 131,
+      "failures": 0,
+      "status": "passed",
+      "proof": "validation/hyperdrive-2026-11-07/regression-summary.json",
+      "proof_sha256": "66bb5bc0abaa6020a6838041c34b9c545aa68126d0fb67c3b6cf5c875087cf09",
+      "log": "/workspace/Pyton/validation/hyperdrive-2026-11-07/regression-logs/logs/source_console_pause.log",
+      "log_sha256": "1632b869ffb60aefc0e86d11ea26a7c794be7e22dc736d4aca659f32f29341f9"
+    },
+    {
+      "name": "source_full_startup",
+      "test": "tests/test_source_full_startup.gd",
+      "checks": 10,
+      "failures": 0,
+      "status": "passed",
+      "proof": "validation/hyperdrive-2026-11-07/regression-summary.json",
+      "proof_sha256": "66bb5bc0abaa6020a6838041c34b9c545aa68126d0fb67c3b6cf5c875087cf09",
+      "log": "/workspace/Pyton/validation/hyperdrive-2026-11-07/regression-logs/logs/source_full_startup.log",
+      "log_sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    {
+      "name": "source_main_full",
+      "test": "tests/test_source_main_full.gd",
+      "checks": 153,
+      "failures": 0,
+      "status": "passed",
+      "proof": "validation/hyperdrive-2026-11-07/regression-summary.json",
+      "proof_sha256": "66bb5bc0abaa6020a6838041c34b9c545aa68126d0fb67c3b6cf5c875087cf09",
+      "log": "/workspace/Pyton/validation/hyperdrive-2026-11-07/regression-logs/logs/source_main_full.log",
+      "log_sha256": "ec531259006eba083849a668835dbfe82d927858f46cfce6e03752a286a76d9a"
+    },
+    {
+      "name": "app_transitions",
+      "test": "tests/test_rebuilt_app_transitions.gd",
+      "checks": 54,
+      "failures": 0,
+      "status": "passed",
+      "proof": "validation/hyperdrive-2026-11-07/regression-summary.json",
+      "proof_sha256": "66bb5bc0abaa6020a6838041c34b9c545aa68126d0fb67c3b6cf5c875087cf09",
+      "log": "/workspace/Pyton/validation/hyperdrive-2026-11-07/regression-logs/logs/app_transitions.log",
+      "log_sha256": "0c190763c029bb01bb6bb16c947fe7d80537e36b271d22fc91c468771ba45cd4"
+    },
+    {
+      "name": "graphics_integration",
+      "test": "tests/test_graphics_integration.gd",
+      "checks": 44,
+      "failures": 0,
+      "status": "passed",
+      "proof": "validation/hyperdrive-2026-11-07/regression-summary.json",
+      "proof_sha256": "66bb5bc0abaa6020a6838041c34b9c545aa68126d0fb67c3b6cf5c875087cf09",
+      "log": "/workspace/Pyton/validation/hyperdrive-2026-11-07/regression-logs/logs/graphics_integration.log",
+      "log_sha256": "f6b6dc847918df771b6f2ac4b0b0f0537855cf6f5247269fadb9b1f4b8ea6d06"
+    },
+    {
+      "name": "graphics_scope",
+      "test": "tests/test_graphics_scope.gd",
+      "checks": 87,
+      "failures": 0,
+      "status": "passed",
+      "proof": "validation/hyperdrive-2026-11-07/regression-summary.json",
+      "proof_sha256": "66bb5bc0abaa6020a6838041c34b9c545aa68126d0fb67c3b6cf5c875087cf09",
+      "log": "/workspace/Pyton/validation/hyperdrive-2026-11-07/regression-logs/logs/graphics_scope.log",
+      "log_sha256": "b7ec54445dbb93814b7877b35fd9c0b18e5e17f8dcf4a62aa1fba3a09f2692bb"
+    }
+  ],
+  "aggregation_policy": "One retained passing result per unique test script: seven focused suites (including legacy native navigation) plus nine curated regressions. Existing combined proof files are referenced, never added again as extra groups. Two stale Core/Main proof records were replaced by one fresh final-source run each to resolve observed resource/session SHA mismatches; each suite is counted once.",
+  "focused_checks": 67148,
+  "focused_groups": 7,
+  "curated_checks": 3482,
+  "curated_groups": 9,
+  "separate_evidence": {
+    "desktop_gpu": {
+      "checks": 120,
+      "failures": 0,
+      "frames": 8,
+      "proof": "validation/hyperdrive-2026-11-07/screenshots/capture-manifest.json",
+      "proof_sha256": "6bafaaabc50490c97391fb3701cb007ee1cbed7a76b6f9c5bd05e60f7c192bf4",
+      "physical_phone_tested": false,
+      "performance_benchmark": false
+    },
+    "python_tests": {
+      "tests": 100,
+      "failures": 0,
+      "parts": [
+        {
+          "tests": 93,
+          "proof": "validation/hyperdrive-2026-11-07/packaging.json",
+          "proof_sha256": "43e69637ff930a6f0be687058fd21dc7d5d679a3a54910ca2eda1dd2fca53b49"
+        },
+        {
+          "tests": 7,
+          "proof": "validation/hyperdrive-2026-11-07/extraction.json",
+          "proof_sha256": "9c25c39a27f0c4ab4677f79b367acab0e85abd0c26128665bd82bd2e3dc3aa95"
+        }
+      ]
+    },
+    "independent_extraction_review": {
+      "checks": 1198,
+      "failures": 0,
+      "proof": "validation/hyperdrive-2026-11-07/independent-extraction.json",
+      "proof_sha256": "3326b04eb3ae4a51a0b2423ef18a8a65e5d54211a835dcbcbc22c8e34977f832"
+    }
+  },
+  "runner": {
+    "path": "tools/validate_rebuild.py",
+    "sha256": "c98e88c791fb30c170cabfb368c48e1814aceccd0f077ab097e50d3454c58bba",
+    "new_hyperdrive_suites": 6,
+    "source_hyperdrive_main_user_args": [
+      "--rebuild-capture"
+    ],
+    "syntax_and_unique_registration_verified": true
+  },
+  "limitations": [
+    "These counts are scoped regression checks, not a percentage of complete FFE parity.",
+    "Desktop GPU, Python packaging/extraction and independent extraction reviews are excluded from the70630 logic/UI integration count.",
+    "Original market supply/pricing, complete hyperspace entry/arrival, misjumps/interceptions/failures and physical-phone performance are not proved by this summary."
+  ],
+  "final_source_replacements": {
+    "suites": [
+      "source_hyperdrive",
+      "source_hyperdrive_main"
+    ],
+    "reason": "Observed initial Core resource and Main session SHA differed from final immutable data/runtime. Fresh runs replaced existing records; no proof stamps were patched and no counts were added.",
+    "verified_current_source_sha256": {
+      "scripts/source_hyperdrive.gd": "b79cd38051e44d52fcd4f2beb173b2699096e7d9aea9a0288aba205e453a8874",
+      "data/ffe_hyperdrive.json": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+      "scripts/main.gd": "25dad04995505b2c119cc45470ff531c657dd80eb6963408a427bae641823049",
+      "scripts/navigation.gd": "3bc3d50e1c008b0f9f37f587e804729450ced47baf19330a27550d6343dccc1c",
+      "scripts/source_hyperdrive_session.gd": "0a505bd31bbffc703c9c06144b2f58167aa1da525de8ed013de5af4b58d2e59a"
+    }
+  }
+}

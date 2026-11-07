@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "scope": "source-hyperdrive-navigation-v3-explicit-session-integration",
+  "status": "passed",
+  "suites": [
+    {
+      "test": "tests/test_source_hyperdrive_navigation.gd",
+      "checks": 143,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/hyperdrive-2026-11-07/source-hyperdrive-navigation.log"
+    },
+    {
+      "test": "tests/test_native_navigation.gd",
+      "checks": 219,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/hyperdrive-2026-11-07/legacy-native-navigation.log"
+    }
+  ],
+  "checks": 362,
+  "failures": 0,
+  "groups": 2,
+  "sha256": {
+    "scripts/navigation.gd": "3bc3d50e1c008b0f9f37f587e804729450ced47baf19330a27550d6343dccc1c",
+    "scripts/source_hyperdrive_session.gd": "0a505bd31bbffc703c9c06144b2f58167aa1da525de8ed013de5af4b58d2e59a",
+    "scripts/source_hyperdrive.gd": "b79cd38051e44d52fcd4f2beb173b2699096e7d9aea9a0288aba205e453a8874",
+    "data/ffe_hyperdrive.json": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+    "tests/test_source_hyperdrive_navigation.gd": "904e1876160b3284748c62dd03f3185de641471d8cf664cc1c8f355e30051709",
+    "tests/test_native_navigation.gd": "5fe983525880c0366ad48adc28fde6cce2506aa03016b4fa98a18ebf498a3a04"
+  },
+  "limits": [
+    "Source F833/F903 arithmetic is independently validated by the core owner; this report checks integration and does not duplicate native oracle totals.",
+    "Three-second charge and basic workshop prices/free fuel handover are explicit adapters.",
+    "Selected-port availability is an explicit derived dock fixture in this suite; no full original market or phone claim.",
+    "Legacy native navigation is a separate 219-check control group and must not be counted twice in release consolidation."
+  ]
+}

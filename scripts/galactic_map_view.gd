@@ -270,6 +270,7 @@ func _publish_labels()->void:
 	distance_value.text="%.2f"%float(state.distance_ly)
 	_publish_card_facts()
 	selection_state.text="●  Переход доступен" if bool(state.reachable) else str(state.reason)
+	if bool(state.reachable) and state.has("duration_days"):selection_state.text+=" · %.2f сут."%float(state.duration_days)
 	selection_state.add_theme_color_override("font_color",Color("79d9b0") if bool(state.reachable) else Color("c7a977"))
 	status.text=("%d систем · сетка 8 св. лет"%model.rows.size() if not _overview else "Плотность по исходным данным FFE · коснитесь области для просмотра секторов") if model.native else "%d систем · сохранённая схема перелётов"%model.rows.size()
 	_update_buttons()

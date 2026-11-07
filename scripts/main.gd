@@ -26,6 +26,7 @@ const TimeController=preload("res://scripts/flight_time_controller.gd")
 const GalacticMap=preload("res://scripts/galactic_map_view.gd")
 const SystemMap=preload("res://scripts/system_map_view.gd")
 const SystemInformation=preload("res://scripts/system_information_view.gd")
+const HyperdriveServices=preload("res://scripts/hyperdrive_services_view.gd")
 const ShipView=preload("res://scripts/ship_visual.gd")
 const StationView=preload("res://scripts/station_visual.gd")
 const SourceStationView=preload("res://scripts/source_station_visual.gd")
@@ -112,6 +113,7 @@ var last_motion_result:Dictionary={}
 var instruments:=FlightInstruments.new()
 var last_view:=""
 var dock_services_view:Control
+var hyperdrive_services_view:Control
 var action_buttons:Array=[]
 var flight_widgets:Array=[]
 var busy:=false
@@ -146,7 +148,9 @@ func _ready()->void:
 	if not automated:diagnostics.initialize(BuildInfo.VERSION)
 	report_export=ReportExport.new();add_child(report_export);report_export.completed.connect(_report_export_completed)
 	settings.load_file();_new_models(World.PORT_LAYOUT if automated else World.FULL_LAYOUT);_build_world();_build_ui();_apply_settings()
-	if not automated:_load_game()
+	if not automated:
+		_enable_source_hyperdrive()
+		_load_game()
 	_apply_system();_refresh_hud()
 	if notice_timer<=0:_announce("Стик — поворот. Справа — скорость. «Авто» помогает подойти к станции.")
 	get_viewport().size_changed.connect(_safe_area)
@@ -161,6 +165,12 @@ func _new_models(layout:String=World.PORT_LAYOUT)->void:
 	if layout==World.FULL_LAYOUT and not nav.configure_native():push_error("Original galaxy could not be initialized")
 	world=World.new();world.configure(nav.current(),layout);surface=Surface.new();near.clear()
 	StationSession.configure_flight(ship,world,nav)
+
+func _enable_source_hyperdrive()->bool:
+	if world.layout_mode!=World.FULL_LAYOUT:return false
+	if not nav.configure_source(ship.ship_id,nav.current_id) or not nav.sync_source_ship(ship):
+		saving_enabled=false;_announce("Не удалось подготовить исходный гипердвигатель. Сохраните отчёт об ошибке.");return false
+	return true
 
 func _build_world()->void:
 	environment=WorldEnvironment.new();environment.environment=Environment.new()
@@ -278,6 +288,7 @@ func _release_inputs()->void:
 	if time_controls!=null:time_controls.release_pointers()
 	if is_instance_valid(active_map) and active_map.has_method("release_pointers"):active_map.release_pointers()
 	if is_instance_valid(dock_services_view):dock_services_view.release_pointers()
+	if is_instance_valid(hyperdrive_services_view):hyperdrive_services_view.release_pointers()
 	lift_up=false;lift_down=false;roll_left=false;roll_right=false;roll_left_strength=0;roll_right_strength=0
 func _blocked()->bool:return busy or not active or menu.visible or settings_panel.visible or is_instance_valid(active_map)
 func _physics_process(dt:float)->void:
@@ -399,6 +410,7 @@ func _update_flight_controls()->void:
 	flight_console.set_actions_enabled(not blocked)
 	if time_controls!=null:time_controls.set_actions_enabled(not blocked)
 	if is_instance_valid(active_map):active_map.set("input_allowed",active and not busy)
+	if is_instance_valid(hyperdrive_services_view):hyperdrive_services_view.input_allowed=active and not busy
 	for button in action_buttons:
 		if is_instance_valid(button):button.input_allowed=active and not busy
 	if is_instance_valid(dock_services_view):
@@ -555,7 +567,7 @@ func _refresh_hud()->void:
 		"actual_speed_mps":ship.velocity.length(),"target_speed_mps":ship.target_speed,
 		"surface_active":surface.active,"altitude_m":surface.altitude(ship) if surface.active else 0.0,
 		"target_distance_m":ship.position.distance_to(target),"target_local":Basis(ship.attitude).inverse()*(target-ship.position),
-		"hull_percent":ship.hull,"fuel":nav.fuel,"fuel_capacity":nav.FUEL_CAPACITY,
+		"hull_percent":ship.hull,"fuel":nav.fuel,"fuel_capacity":nav.fuel_capacity(),
 		"cargo_t":ship.total_cargo(),"cargo_capacity_t":ship.cargo_capacity(),"totalcredits":ship.credits,"elapsed_days":nav.elapsed_days,
 		"assisted":ship.assisted,"autopilot":ship.autopilot,"landing":surface.landing,"taking_off":surface.taking_off,
 		"landed":surface.landed,"docked":ship.docked,"flight_phase":surface.flight_phase,"external_view":ship.external_view,
@@ -791,7 +803,7 @@ func _show_status()->void:
 	_open_menu("БОРТОВОЙ КОМПЬЮТЕР")
 	_menu_text("%s · система %s"%[ship.profile().name,nav.current().name])
 	var context:String=surface.site_name if surface.active and not surface.site_name.is_empty() else str(world.by_id[world.focus_id].name)
-	_menu_text("Объект: %s\nКорпус: %.0f%%\nСкорость: %.1f м/с · задано %.1f м/с\nТопливо гиперпереходов: %d/%d\nГруз: %d/%d т\nСчёт: %d кр."%[context,ship.hull,ship.velocity.length(),ship.target_speed,nav.fuel,nav.FUEL_CAPACITY,ship.total_cargo(),ship.cargo_capacity(),ship.credits])
+	_menu_text("Объект: %s\nКорпус: %.0f%%\nСкорость: %.1f м/с · задано %.1f м/с\nТопливо гиперпереходов: %d/%d\nГруз: %d/%d т\nСчёт: %d кр."%[context,ship.hull,ship.velocity.length(),ship.target_speed,nav.fuel,nav.fuel_capacity(),ship.total_cargo(),ship.cargo_capacity(),ship.credits])
 	_menu_text("%s · %s"%[instruments.view_label(ship.external_view),"ПАУЗА" if instruments.paused else ("Стабилизация скорости" if ship.assisted else "Инерционный режим")])
 	_menu_action("Груз и оборудование",_show_equipment)
 	_menu_action("Объекты и космопорты",_show_system)
@@ -801,6 +813,11 @@ func _show_status()->void:
 
 func _show_equipment()->void:
 	_open_menu("ГРУЗ И ОБОРУДОВАНИЕ")
+	if nav.is_source_hyperdrive():
+		_embed_hyperdrive_services()
+		_menu_action("Бортовой компьютер",_show_status);_fit_hyperdrive_menu();return
+	if nav.is_native() and world.layout_mode==World.FULL_LAYOUT:
+		_menu_action("Исходный гипердвигатель · перейти",_show_hyperdrive_migration)
 	_menu_text("Грузовой отсек: %d/%d т · оборудование занимает %d т"%[ship.total_cargo(),ship.cargo_capacity(),ship.equipment_space()])
 	for id in ship.goods:
 		if int(ship.goods[id])>0:_menu_text("%s: %d т"%[str(ship.economy_catalog.good(str(id)).get("name_ru",id)),int(ship.goods[id])])
@@ -916,7 +933,10 @@ func _show_routes()->void:
 	elif ship.combat_active:reason="Сначала выйдите из боя."
 	elif nav.remaining>0 or world.transfer_remaining>0:reason="Сначала завершите или отмените текущий переход."
 	elif ship.velocity.length()>20:reason="Затормозите до 20 м/с."
-	if not view.configure_state({"native":nav.is_native(),"current_id":nav.current_id,"selected_id":nav.selected_id,"jump_range_ly":ship.jump_range(),"fuel":nav.fuel,"fuel_capacity":nav.FUEL_CAPACITY,"jump_blocked_reason":reason}):view.free();_announce("Не удалось подготовить карту галактики.");return
+	var map_state:={"native":nav.is_native(),"current_id":nav.current_id,"selected_id":nav.selected_id,"jump_range_ly":ship.jump_range(),"fuel":nav.fuel,"fuel_capacity":nav.fuel_capacity(),"jump_blocked_reason":reason}
+	if nav.is_source_hyperdrive():
+		map_state.source_hyperdrive_profile=nav.map_profile(ship);map_state.jump_range_ly=nav.source_range_ly(ship)
+	if not view.configure_state(map_state):view.free();_announce("Не удалось подготовить карту галактики.");return
 	view.system_selected.connect(func(id:int):
 		if active_map==view:nav.select(id)
 	)
@@ -1040,12 +1060,99 @@ func _start_jump(id:int)->void:
 func _show_services(save_progress:bool=true)->void:
 	menu_feedback.text=""
 	_open_menu("СЛУЖБЫ СТАНЦИИ",save_progress)
+	if nav.is_source_hyperdrive():_embed_hyperdrive_services();_fit_hyperdrive_menu();return
 	dock_services_view=DockServicesView.new()
 	dock_services_view.configure_state(_dock_services_state())
 	dock_services_view.command.connect(_service_command)
 	menu_rows.add_child(dock_services_view)
+
+func _embed_hyperdrive_services()->void:
+	hyperdrive_services_view=HyperdriveServices.new()
+	hyperdrive_services_view.configure_state(nav.service_state(ship))
+	hyperdrive_services_view.command.connect(_hyperdrive_service_command)
+	menu_rows.add_child(hyperdrive_services_view)
+
+func _fit_hyperdrive_menu()->void:
+	# Existing menus retain their historical widths. This embedded workshop
+	# uses the actual available phone width, including narrow logical windows.
+	menu_title.clip_text=true
+	for row:Node in menu_rows.get_children():
+		if row is Control:row.custom_minimum_size.x=minf(row.custom_minimum_size.x,300.0)
+	var header:Node=menu_title.get_parent()
+	for child:Node in header.get_children():
+		if child is Button:child.custom_minimum_size.x=112
+
+func _hyperdrive_service_command(action:String,id:String,quantity:int)->void:
+	if busy:return
+	_release_inputs()
+	var accepted:bool=nav.service(action,id,quantity,ship)
+	var result:={"ok":accepted,"message":nav.message}
+	_record_event("hyperdrive_service",{"action":action,"id":id,"quantity":quantity,"accepted":result.get("ok",false)})
+	var feedback:=str(result.get("message","Операция недоступна."))
+	if result.get("ok",false) and saving_enabled and not _save_game():feedback+=" Изменения пока не удалось сохранить."
+	if is_instance_valid(hyperdrive_services_view):hyperdrive_services_view.configure_state(nav.service_state(ship))
+	_refresh_hud();_announce(feedback)
+
+func _hyperdrive_backup_folder()->String:return saves.directory.path_join("hyperdrive-backups")
+
+func _backup_before_source_hyperdrive()->String:
+	var payload:=_payload()
+	if payload.is_empty() or _decode_state(payload).is_empty():return ""
+	var code:String=saves.encode(payload,saves.sequence)
+	if saves.decode(code).is_empty():return ""
+	var folder:=_hyperdrive_backup_folder()
+	if DirAccess.make_dir_recursive_absolute(folder)!=OK:return ""
+	var name:="before-source-%s-%012d.txt"%[Time.get_datetime_string_from_system().replace(":","-"),Time.get_ticks_msec()]
+	var path:=folder.path_join(name);var file:=FileAccess.open(path,FileAccess.WRITE)
+	if file==null:return ""
+	file.store_string(code);file.flush();file.close()
+	return path if FileAccess.get_file_as_string(path)==code else ""
+
+func _latest_hyperdrive_backup()->String:
+	var directory:=DirAccess.open(_hyperdrive_backup_folder())
+	if directory==null:return ""
+	var files:Array[String]=[]
+	for name:String in directory.get_files():
+		if name.begins_with("before-source-") and name.ends_with(".txt"):files.append(name)
+	files.sort()
+	return _hyperdrive_backup_folder().path_join(files[-1]) if not files.is_empty() else ""
+
+func _show_previous_hyperdrive_backup()->void:
+	var path:=_latest_hyperdrive_backup()
+	if path.is_empty():_announce("Резервная копия до перехода не найдена.");return
+	_show_backup();backup_edit.text=FileAccess.get_file_as_string(path);menu_title.text="СОХРАНЕНИЕ ДО ПЕРЕХОДА"
+
+func _apply_hyperdrive_migration()->void:
+	var quote:Dictionary=nav.migration_quote(ship)
+	if not quote.get("ok",false):_announce(str(quote.get("message","Переход недоступен.")));return
+	var backup:=_backup_before_source_hyperdrive()
+	if backup.is_empty():_announce("Не удалось сохранить прежний полёт. Переход отменён.");return
+	var result:Dictionary=nav.migrate_source(ship)
+	if result.get("ok",false):
+		if saving_enabled and not _save_game():result.message=str(result.get("message",""))+" Изменения пока не удалось сохранить."
+		_show_equipment()
+	_record_event("hyperdrive_migration",{"accepted":result.get("ok",false),"backup_created":true})
+	_announce(str(result.get("message","Переход недоступен.")))
+
+func _show_hyperdrive_migration()->void:
+	_open_menu("ИСХОДНЫЙ ГИПЕРДВИГАТЕЛЬ")
+	var quote:Dictionary=nav.migration_quote(ship)
+	_menu_text("Прежний полёт сохранит систему, время, корабль и груз. Двигатель получит исходную базовую комплектацию; каждая прежняя единица топлива станет тонной водорода. Дальность и сроки переходов будут рассчитываться по правилам оригинала.")
+	_menu_text(str(quote.get("message","")))
+	_menu_action("Сохранить код резервной копии",_show_backup)
+	if quote.get("ok",false):_menu_action("Применить исходный гипердвигатель",_apply_hyperdrive_migration)
+	_fit_hyperdrive_menu()
 func _service_command(action:String,id:String="")->void:
 	if busy:return
+	if nav.is_source_hyperdrive():
+		if action=="refuel":
+			var state:Dictionary=nav.service_state(ship)
+			for row:Dictionary in state.get("fuels",[]):
+				if str(row.id)==str(state.get("fuel_kind","")):
+					_hyperdrive_service_command("refuel",str(row.id),int(row.get("fill_quantity",0)));return
+			_announce("Заправка недоступна.")
+		else:_announce("Обслуживание доступно на экране гипердвигателя.")
+		return
 	if surface.active or not _station_here() or not ship.docked:
 		_announce("Для обслуживания сначала выполните стыковку с доступной станцией.")
 		return
@@ -1111,10 +1218,15 @@ func _confirm_new_game()->void:
 	_open_menu("НОВЫЙ ПОЛЁТ")
 	_menu_text("Текущий прогресс будет заменён новым полётом. При необходимости сначала сделайте резервную копию.")
 	_menu_action("Сохранить код резервной копии",_show_backup)
-	_menu_action("Начать новый полёт",func():_new_models(World.FULL_LAYOUT);saving_enabled=true;_close_menu();_apply_system();_save_game();_announce("Начат новый полёт."))
+	_menu_action("Начать новый полёт",func():
+		_new_models(World.FULL_LAYOUT)
+		if not _enable_source_hyperdrive():return
+		saving_enabled=true;_close_menu();_apply_system();_save_game();_announce("Начат новый полёт.")
+	)
 
 func _payload()->Dictionary:
 	_validate_navigation_target()
+	if nav.is_source_hyperdrive() and not nav.sync_source_ship(ship):return {}
 	var result:={"schema":"starfrontier-rebuild-game-v1","flight":ship.snapshot(),"navigation":nav.snapshot(),"planetary":world.snapshot(),"surface":surface.snapshot()}
 	if not target_site_id.is_empty():result.target_session={"version":1,"system_id":nav.current_id,"body_id":world.selected_id,"site_id":target_site_id}
 	if source_motion_enabled:
@@ -1133,6 +1245,7 @@ func _decode_state(data:Dictionary)->Dictionary:
 	var restored:=StationSession.restore_flight(candidate_world,candidate_nav,data.flight)
 	if restored.is_empty():return {}
 	var candidate_ship:RefCounted=restored.ship
+	if not candidate_nav.validate_source_ship(candidate_ship):return {}
 	var candidate_surface:=Surface.new()
 	candidate_surface.set_source_time(candidate_nav.elapsed_days)
 	if not candidate_surface.restore(data.surface,candidate_ship,candidate_world):return {}
@@ -1171,6 +1284,7 @@ func _commit_state(data:Dictionary)->void:
 	source_motion_enabled=bool(data.get("source_motion_enabled",false));source_motion=data.get("source_motion",MotionBridge.new());last_motion_result.clear()
 func _save_game()->bool:
 	if not saving_enabled or busy:return false
+	if nav.is_source_hyperdrive() and not nav.sync_source_ship(ship):return false
 	var ok:=saves.write(_payload())
 	_record_event("save_result",{"ok":ok,"generation":saves.sequence})
 	if not ok:_announce(saves.last_error)
@@ -1189,6 +1303,7 @@ func _show_backup()->void:
 	_menu_action("Копировать код",func():DisplayServer.clipboard_set(backup_edit.text);_announce("Код резервной копии скопирован."))
 	_menu_action("Вставить из буфера",func():backup_edit.text=DisplayServer.clipboard_get())
 	_menu_action("Восстановить из кода",_import_backup)
+	if not _latest_hyperdrive_backup().is_empty():_menu_action("Сохранение до перехода на исходный двигатель",_show_previous_hyperdrive_backup)
 func _import_backup()->void:
 	if busy:return
 	if not graphics_return.is_empty():_announce("Сначала вернитесь к основному полёту через меню.");return

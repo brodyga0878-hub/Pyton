@@ -4,6 +4,7 @@ const GalaxyData=preload("res://scripts/galaxy.gd")
 const Kernel=preload("res://scripts/source_galaxy.gd")
 const Metadata=preload("res://scripts/source_system_metadata.gd")
 const Names=preload("res://scripts/source_planet_names.gd")
+const SourceNavigation=preload("res://scripts/navigation.gd")
 const MAP_DATA_PATH:="res://data/ffe_galactic_map.json"
 const SECTOR_LY:=8.0
 const DISPLAY_ORIGIN:=Vector2i(0x1718,0x1524)
@@ -27,6 +28,7 @@ var search_results:Array=[]
 var last_error:=""
 var _kernel:=Kernel.new()
 var _map_data:Dictionary={}
+var source_hyperdrive_profile:Dictionary={}
 
 static func prepare_shared_resources()->bool:
 	# These preserved text helpers have static read-only caches. Warm them on
@@ -50,6 +52,12 @@ func configure_state(state:Dictionary)->bool:
 		if not _number(state.get(key,0),0,2147483647,true):return false
 	if int(state.get("fuel",0))>int(state.get("fuel_capacity",0)):return false
 	if not state.get("jump_blocked_reason","") is String:return false
+	var source_profile:Dictionary={}
+	if state.has("source_hyperdrive_profile"):
+		if not bool(state.get("native",true)):return false
+		if not state.source_hyperdrive_profile is Dictionary or not SourceNavigation.validate_map_profile(state.source_hyperdrive_profile):return false
+		if int(state.source_hyperdrive_profile.current_id)!=int(state.get("current_id",GalaxyData.SOL_ID)):return false
+		source_profile=state.source_hyperdrive_profile.duplicate(true)
 	var candidate:=GalaxyData.new()
 	if bool(state.get("native",true)) and not candidate.configure_native():return false
 	var origin:Dictionary=candidate.get_system(int(state.get("current_id",GalaxyData.SOL_ID)))
@@ -58,6 +66,7 @@ func configure_state(state:Dictionary)->bool:
 	galaxy=candidate;native=bool(state.get("native",true));current_id=int(origin.id);selected_id=int(target.id)
 	current=origin;selected=target;jump_range_ly=float(state.get("jump_range_ly",0));fuel=int(state.get("fuel",0));fuel_capacity=int(state.get("fuel_capacity",0))
 	jump_blocked_reason=str(state.get("jump_blocked_reason",""));center_sector=sector_position(target);rows=[];search_results=[];last_error=""
+	source_hyperdrive_profile=source_profile
 	return true
 
 func sector_position(row:Dictionary)->Vector2:
@@ -87,6 +96,7 @@ func select(id:int)->bool:
 	selected_id=id;selected=candidate;return true
 
 func distance_ly(row:Dictionary)->float:
+	if not source_hyperdrive_profile.is_empty():return float(SourceNavigation.source_map_quote(source_hyperdrive_profile,current,row).get("distance_ly",INF))
 	var a:Array=current.get("position_ly",[]);var b:Array=row.get("position_ly",[])
 	if a.size()!=3 or b.size()!=3:return INF
 	var total:=0.0
@@ -94,6 +104,10 @@ func distance_ly(row:Dictionary)->float:
 	return sqrt(total)
 
 func jump_state(row:Dictionary={})->Dictionary:
+	if not source_hyperdrive_profile.is_empty():
+		var result:Dictionary=SourceNavigation.source_map_quote(source_hyperdrive_profile,current,selected if row.is_empty() else row)
+		if not jump_blocked_reason.is_empty() and result.get("reachable",false):result.reachable=false;result.reason=jump_blocked_reason
+		return result
 	var target:Dictionary=selected if row.is_empty() else row
 	var distance:=distance_ly(target);var required:=ceili(distance/4.0) if is_finite(distance) and distance>0 else 0
 	var reason:=jump_blocked_reason

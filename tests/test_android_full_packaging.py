@@ -12,10 +12,36 @@ import json
 import shutil
 import tempfile
 import unittest
+import atexit
 
 PROJECT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('android_verifier',PROJECT/'tools/verify_rebuilt_android.py')
 verifier=importlib.util.module_from_spec(spec);spec.loader.exec_module(verifier)
+
+# These are historical v34..39 controls. Later live Main/Nav/map consumers
+# must not silently redefine what the old verifier accepted. Preserve the
+# exact audited v39 source overlay while sharing unchanged project inputs.
+_LIVE_PROJECT=PROJECT
+_HISTORICAL_DIRECTORY=tempfile.TemporaryDirectory(prefix='packaging-v39-')
+atexit.register(_HISTORICAL_DIRECTORY.cleanup)
+PROJECT=Path(_HISTORICAL_DIRECTORY.name)
+for _directory in ('scripts','data','tests'):
+    (PROJECT/_directory).mkdir()
+    for _path in (_LIVE_PROJECT/_directory).iterdir():
+        (PROJECT/_directory/_path.name).symlink_to(_path,target_is_directory=_path.is_dir())
+_baseline=json.loads((_LIVE_PROJECT/'tests/fixtures/hyperdrive_v39_sources.json').read_text())
+assert _baseline['source_commit']=='860951235548fc58c859d7337b9a6909fd78ca62'
+_baseline_sha256={
+    'scripts/main.gd':'c83a666e1de2c6ce23b29247ad3c8fab007a0f325ecf2288523bfc8abad3a9de',
+    'scripts/navigation.gd':verifier.MAP_VISUAL_PROTECTED_SOURCE_SHA256['scripts/navigation.gd'],
+    'scripts/galactic_map_model.gd':verifier.MAP_VISUAL_PROTECTED_SOURCE_SHA256['scripts/galactic_map_model.gd'],
+    'scripts/galactic_map_view.gd':verifier.SYSTEM_INFORMATION_MAP_VIEW_SHA256['scripts/galactic_map_view.gd'],
+}
+assert set(_baseline['files'])==set(_baseline_sha256)
+for _relative,_entry in _baseline['files'].items():
+    assert hashlib.sha256(_entry['source'].encode()).hexdigest()==_entry['sha256']==_baseline_sha256[_relative]
+    _target=PROJECT/_relative
+    _target.unlink();_target.write_text(_entry['source'])
 
 class MockArchive:
     def __init__(self):

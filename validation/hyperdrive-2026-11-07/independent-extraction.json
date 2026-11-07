@@ -1,0 +1,36 @@
+{
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_extract_hyperdrive.py",
+    "-v"
+  ],
+  "time_utc": "2026-11-07T17:15:55.641303+00:00",
+  "exit_code": 0,
+  "tests": 7,
+  "failures": 0,
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "drive_records": 15,
+  "drive_record_bytes": 240,
+  "ship_specs": 57,
+  "dos_instruction_anchors": 10,
+  "dos_equipment_records": 66,
+  "drive_equipment_records": 13,
+  "dos_jjffe_differences": 4,
+  "independent_native_arithmetic_executed_by_this_test": false,
+  "physical_device_tested": false,
+  "file_sha256": {
+    "tools/extract_hyperdrive.py": "45328ee784374402ba5d486e103e286287f7bf3b4ec01d782e7f6884bac49840",
+    "data/ffe_hyperdrive.json": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+    "tests/test_extract_hyperdrive.py": "149841daf2768e856a38afcd95eab74c82ac8733dfc18ff4b72b9c72b49972c3"
+  },
+  "independent_review_checks": 1198,
+  "independent_review_failures": 0,
+  "reviewer": "/root/rotating_dock_impl/rotating_contact_review",
+  "review_scope": "Independent PE DOS address mapper, 57 descriptor+spec pointers/names,6tables,15drives,66equipment/13engines,4variantbytes,10codeanchors,adapters,cargo19/20/29; no native arithmetic rerun"
+}

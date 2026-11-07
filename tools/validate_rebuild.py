@@ -44,6 +44,12 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_hyperdrive', 'tests/test_source_hyperdrive.gd', 'Original F833/F899..F903/F1521 arithmetic versus5453 native safe controls plus11 original fault domains; immutable raw evaluator and source-spec quotes.', timeout=300),
+    Suite('source_hyperdrive_navigation', 'tests/test_source_hyperdrive_navigation.gd', 'Explicit v3 source inventory/capacity, quoted pending jumps and exact-once consumption/time, strict restore and atomic dock workshop services; legacy adapters remain separate.', timeout=300),
+    Suite('hyperdrive_services_view', 'tests/test_hyperdrive_services_view.gd', 'Embedded phone equipment UI, copied service quotes, responsive actions, pointer release and fixture command routing; fixture prices do not prove original markets.', timeout=300),
+    Suite('hyperdrive_services_native_view', 'tests/test_hyperdrive_services_native_view.gd', 'Actual source Navigation/session through equipment touch actions, capacity/fuel handover, military jump/waste and immediate post-migration service; dock flags are business fixtures.', timeout=300),
+    Suite('source_hyperdrive_map', 'tests/test_source_hyperdrive_map.gd', 'Actual source route/model/background worker preserve the same F833 distance, F903 fuel and Q16 duration as live Navigation, without editing the session.', timeout=300),
+    Suite('source_hyperdrive_main', 'tests/test_source_hyperdrive_main.gd', 'Actual Main route/charge/cancel/save continuation, military fuel/waste, stale service inputs, explicit legacy migration with durable private backup and atomic invalid-v3 rejection.', timeout=300, user_args=('--rebuild-capture',)),
     Suite('source_system_information', 'tests/test_source_system_information.gd', 'Original DOS information strings, policy, numeric and body pages versus1570 independently executed native cases plus actual World isolation.', timeout=300),
     Suite('system_information_view', 'tests/test_system_information_view.gd', 'Information UI layout, touch scrolling, copied inputs, source counter forwarding and unavailable states with an explicitly labelled fixture provider.', timeout=300),
     Suite('system_information_native_view', 'tests/test_system_information_native_view.gd', 'Actual original Sol/Alpha Centauri information through the real UI, exact counters, ground-port adapter and unknown knowledge guard.', timeout=300),

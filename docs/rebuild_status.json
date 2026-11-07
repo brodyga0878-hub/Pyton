@@ -1,6 +1,6 @@
 {
   "audit_date_moscow": "2026-11-07",
-  "snapshot_scope": "Current0.14.0 final native/UI/Main/GPU/APK, fresh exact-source ZIP startup/information-feature and immutable HTTPS publication facts. Older published artifacts preserved; physical-device and full-release work remain.",
+  "snapshot_scope": "Current0.15.0 final70630checks/16groups,100Python,8visually inspected actualGPUframes/120checks and actualARM64code40APK technical verification. Exact source ZIP and immutable HTTPS pending; earlier published artifacts preserved.",
   "recovery_commit": "2f91ec7500e2da0f86abd95f9d2c0917072fe48e",
   "recovered_history_files": 301,
   "identified_original_paths": 105,
@@ -29,8 +29,8 @@
   },
   "current_reconstruction": {
     "implementation_kind": "New integration and newly written missing modules around preserved historical source; not discovery of the complete former source tree",
-    "application_version": "0.14.0-system-info-alpha1",
-    "application_integration_status": "Actual original system/general, demographic, trade and body information pages connected in Main from both maps and onboard computer. Final15unique-group functional/native/Main tests, eight actual GPU frames and ARM64 APK technical verification passed. Original DOS information policy remains separate from live JJFFE generation; full original game/global text/font/markets incomplete.",
+    "application_version": "0.15.0-hyperdrive-alpha1",
+    "application_integration_status": "Fresh normal FULL sessions use original F833 distance and F899-F903 hyperdrive/fuel/duration arithmetic, explicit source capacity/inventory, dock workshop and reviewed v2 migration with mandatory independent backup. Oldv1/v2 adapters preserved. Full source hyperjump lifecycle and original market remain incomplete.",
     "native_android_runtime": "Godot ARM64; no DOS or x86 emulator in the game",
     "modules_present": [
       "Main scene and Russian mobile controls with independently tracked pointers",
@@ -45,7 +45,8 @@
       "Graphical galactic and system map models/views using original sector/orbit/overview data with new touch projection",
       "Bounded1/10/100 time controller and analog phone roll",
       "Sampled rotating-station contact and scoped optional raw Cobra linear motion; F572/F573 remain standalone primitives",
-      "Original DOS system-information policy and358-source-string FF interpreter/localization resource; live modern Russian general/demographic/trade/body pages with Main read-only provider and retained map return."
+      "Original DOS system-information policy and358-source-string FF interpreter/localization resource; live modern Russian general/demographic/trade/body pages with Main read-only provider and retained map return.",
+      "Original F833/F899-F903 hyperdrive core, explicit Navigationv3 source inventory/capacity bridge and dock hyperdrive/fuel/waste UI; oldv1/v2 remain unchanged until reviewed migration with mandatory independent backup."
     ],
     "original_data_regeneration": {
       "provenance_file": "data/ffe_data_provenance.json",
@@ -69,45 +70,41 @@
       }
     },
     "whole_application_smoke_passed": true,
-    "whole_application_smoke_scope": "Current information core/native references, fixture and actual-provider UI, both actual maps and Main lifecycle/navigation/dock/save/surface modal/graphics-return controls. One result per suite; timestamps/source hashes retained across bounded batches. Historical release totals, independent byte-review, Python units, source-ZIP repeat startup and GPU checks excluded. Not physical-phone execution.",
-    "whole_application_smoke_log": "validation/system-information-2026-11-07/validation-final.json",
+    "whole_application_smoke_scope": "One result per16unique GDS suite: original hyperdrive/native core, Navigationv3, legacy native control, workshop fixtures/actual source consumer, Main saved charge/migration, source map and prior regression. Python, independent byte review, GPU and historical release totals excluded.",
+    "whole_application_smoke_log": "validation/hyperdrive-2026-11-07/final-targeted-summary.json",
     "desktop_gles_render_passed": true,
-    "desktop_gles_render_scope": "Eight actual Main frames after the final typography fix, all root visually inspected,1440x720/2316x1080/960x540; desktop GLES/Mesa llvmpipe, no compositing, physical phone execution or FPS benchmark.",
-    "desktop_gles_render_log": "validation/system-information-2026-11-07/screenshots/capture-manifest.json",
+    "desktop_gles_render_scope": "Eight actual software-rendered Main frames; fixture-staged equipment, source route, pending charge, military waste and migration conditions. All8root visually inspected. No phone/FPS/full-market claim.",
+    "desktop_gles_render_log": "validation/hyperdrive-2026-11-07/screenshots/capture-manifest.json",
     "android_apk_built": true,
     "android_apk_technically_verified": true,
-    "android_artifact_status": "Actual0.14.0/code39 ARM64 TEST APK and exact source ZIP published; full immutable HTTPS downloads verified. Fresh ZIP import/startup10/0 and actual information Main44/0; all1172source files unchanged. Physical phone/store release pending.",
-    "final_android_candidate_hash": "0570051ebfd302d2c46db2992e63b9ae64888bb0678b1d3e814e4660aa7c2b25",
+    "android_artifact_status": "Actual0.15.0/code40 ARM64 TEST APK built and technically verified:49934782bytes,16KiBZIP/ELF alignment. Exact source ZIP and new immutable HTTPS pending; previous0.14.0 published files remain available separately.",
+    "final_android_candidate_hash": "eed44e84639ae62f5c3afdf1bee8d666f83d1ca1b6e7144dcaf4fd8b2490246a",
     "final_android_candidate": {
-      "version": "0.14.0-system-info-alpha1",
-      "version_code": 39,
+      "version": "0.15.0-hyperdrive-alpha1",
+      "version_code": 40,
       "package": "org.starfrontier.rebuild",
-      "file": "deliverables/0.14.0-system-info-alpha1/StarFrontier-0.14.0-system-info-arm64.apk",
-      "file_scope": "Published exact technically verified TEST APK with full immutable download verification",
-      "bytes": 49880920,
-      "sha256": "0570051ebfd302d2c46db2992e63b9ae64888bb0678b1d3e814e4660aa7c2b25",
+      "file": "deliverables/0.15.0-hyperdrive-alpha1/StarFrontier-0.15.0-hyperdrive-arm64.apk",
+      "file_scope": "Actual built and technically verified TEST APK; exact source ZIP and HTTPS pending",
+      "bytes": 49934782,
+      "sha256": "eed44e84639ae62f5c3afdf1bee8d666f83d1ca1b6e7144dcaf4fd8b2490246a",
       "abi": "arm64-v8a",
       "min_sdk": 24,
       "target_sdk": 36,
-      "debuggable": false,
       "built": true,
       "technically_verified": true,
-      "verification_report": "validation/system-information-2026-11-07/android-verification.json",
-      "test_signature_verified": true,
-      "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
-      "zip_and_elf_alignment_16k": true,
-      "new_information_compiled_modules_verified": 3,
-      "new_information_JSON_resources_verified": 2,
-      "publication_status": "uploaded_and_immutable_downloads_verified",
+      "verification_report": "validation/hyperdrive-2026-11-07/android-verification.json",
+      "publication_status": "not_yet_published",
       "physical_device_tested": false,
       "production_signing_key_configured": false,
       "full_original_port_complete": false,
       "publication_ready": false,
-      "source_commit": "860951235548fc58c859d7337b9a6909fd78ca62",
-      "artifact_commit": "4a2df6d8ad7739e9a622cf5a3c4e34c1d110a015",
-      "apk_url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4a2df6d8ad7739e9a622cf5a3c4e34c1d110a015/deliverables/0.14.0-system-info-alpha1/StarFrontier-0.14.0-system-info-arm64.apk",
-      "source_zip_url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4a2df6d8ad7739e9a622cf5a3c4e34c1d110a015/deliverables/0.14.0-system-info-alpha1/StarFrontier-0.14.0-system-info-source.zip",
-      "publication_verification_report": "validation/system-information-publication-2026-11-07/verification.json"
+      "debuggable": false,
+      "test_signature_verified": true,
+      "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+      "zip_and_elf_alignment_16k": true,
+      "new_hyperdrive_compiled_modules_verified": 3,
+      "raw_hyperdrive_resource_verified": true,
+      "raw_hyperdrive_resource_sha256": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47"
     },
     "physical_device_tested": false,
     "new_russian_name_labels": 133,
@@ -121,14 +118,15 @@
       "Full original per-frame integrator not claimed: selected source F603 focused-parent force uses an explicit nominal-day SI bridge; original normalization quirks remain documented.",
       "Mobile source terrain uses explicit bounded LOD (117:8km/32cells; others4km/64cells), worker queues and published-triangle collision; this is not an exact replay of every original renderer frame.",
       "Five original defective system headers use named caller policies; original/effective inputs remain saved. Audit4231valid native headers is broad coverage, not every possible galaxy system.",
-      "Three adapted flight profiles, existing tank/range/fuel policy and authored hulls do not complete57original ships/equipment/engines (block9).",
-      "Only basic selected-source-port refuel is integrated; original economy/factions/AI/combat/campaign remain pending.",
+      "Three fitted source profiles and F903 do not complete57original ships/full equipment. Cobra F998 is source starter; Eagle24 fitting is explicit model23 adaptation, Shuttle15 is bare stock and cannot fit prototype starter cargo2.",
+      "Selected-source-port workshop uses explicitly flat adapter prices and free fuel handover; original stocks, economic modifiers, full market/factions/AI/combat/campaign remain pending.",
       "Full previous project/APK0.10.8 not found; original COMMANDR progress import, full Russian text/editorial review and reference visual quality remain unverified or unfinished.",
       "Physical Samsung S23 Ultra installation/update/touch/background/SAF/FPS/heat untested; test signing only, production release not ready.",
       "Godot4.6.3 project_ray_normal omits frustum_offset; no current runtime consumers. Future3Dscreen picking must use an independently validated inverse-projection ray. Stellar radius/colour/quantitative flux remain uncalibrated by0.13.2.",
-      "0.14.0 source information pages use modern semantic layout and supported FF branches. Original F863 observer-distance composition, complete global FF/bracket graph/font-pixel rendering and full original markets remain incomplete. Type35 ground ports use explicitly labelled parent-summary adapter(action-1)."
+      "0.14.0 source information pages use modern semantic layout and supported FF branches. Original F863 observer-distance composition, complete global FF/bracket graph/font-pixel rendering and full original markets remain incomplete. Type35 ground ports use explicitly labelled parent-summary adapter(action-1).",
+      "0.15.0 preserves3-second charge and20m/s activation safety as adapters. FullF908 transitions/misjumps, F929 jet fuel/star scoop, full fleet/equipment and original market lifecycle are incomplete; source F903 arithmetic itself is independently validated."
     ],
-    "application_version_planned": "0.14.0-system-info-alpha1",
+    "application_version_planned": "0.15.0-hyperdrive-alpha1",
     "graphics_update": {
       "version": "0.11.1-graphics-alpha1",
       "checks": 1408,
@@ -456,12 +454,12 @@
       "missing_independent_leaf_fixture": "tests/fixtures/model_vertices_reference.json"
     },
     "latest_targeted_validation": {
-      "checks": 30393,
-      "passed_suites": 15,
+      "checks": 70630,
+      "passed_suites": 16,
       "failures": 0,
       "status": "passed",
-      "report": "validation/system-information-2026-11-07/validation-final.json",
-      "scope": "Current information core/native references, fixture and actual-provider UI, both actual maps and Main lifecycle/navigation/dock/save/surface modal/graphics-return controls. One result per suite; timestamps/source hashes retained across bounded batches. Historical release totals, independent byte-review, Python units, source-ZIP repeat startup and GPU checks excluded. Not physical-phone execution.",
+      "report": "validation/hyperdrive-2026-11-07/final-targeted-summary.json",
+      "scope": "One result per16unique GDS suite: original hyperdrive/native core, Navigationv3, legacy native control, workshop fixtures/actual source consumer, Main saved charge/migration, source map and prior regression. Python, independent byte review, GPU and historical release totals excluded.",
       "engine_error_or_leak_diagnostics": false
     },
     "source_ports_physics_update": {
@@ -595,100 +593,11 @@
     "current_module_validation": {
       "status": "passed",
       "engine": "4.6.3.stable.official.7d41c59c4",
-      "report": "validation/system-information-2026-11-07/validation-final.json",
-      "scope": "Current information core/native references, fixture and actual-provider UI, both actual maps and Main lifecycle/navigation/dock/save/surface modal/graphics-return controls. One result per suite; timestamps/source hashes retained across bounded batches. Historical release totals, independent byte-review, Python units, source-ZIP repeat startup and GPU checks excluded. Not physical-phone execution.",
-      "suites": {
-        "system_information_main": {
-          "checks": 44,
-          "failures": 0,
-          "test": "tests/test_system_information_main.gd",
-          "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/system_information_main.log"
-        },
-        "navigation_main": {
-          "checks": 53,
-          "failures": 0,
-          "test": "tests/test_navigation_main.gd",
-          "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/navigation_main.log"
-        },
-        "classic_console_main": {
-          "checks": 42,
-          "failures": 0,
-          "test": "tests/test_classic_console_main.gd",
-          "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/classic_console_main.log"
-        },
-        "source_console_pause": {
-          "checks": 131,
-          "failures": 0,
-          "test": "tests/test_source_console_pause.gd",
-          "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/source_console_pause.log"
-        },
-        "source_full_startup": {
-          "checks": 10,
-          "failures": 0,
-          "test": "tests/test_source_full_startup.gd",
-          "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/source_full_startup.log"
-        },
-        "source_main_full": {
-          "checks": 153,
-          "failures": 0,
-          "test": "tests/test_source_main_full.gd",
-          "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/source_main_full.log"
-        },
-        "app_transitions": {
-          "checks": 54,
-          "failures": 0,
-          "test": "tests/test_rebuilt_app_transitions.gd",
-          "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/app_transitions.log"
-        },
-        "graphics_integration": {
-          "checks": 44,
-          "failures": 0,
-          "test": "tests/test_graphics_integration.gd",
-          "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/graphics_integration.log"
-        },
-        "graphics_scope": {
-          "checks": 87,
-          "failures": 0,
-          "test": "tests/test_graphics_scope.gd",
-          "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/graphics_scope.log"
-        },
-        "system_information_view": {
-          "checks": 132,
-          "failures": 0,
-          "test": null,
-          "log": "validation/system-information-2026-11-07/ui-provider-fixture.log"
-        },
-        "map_information_actions": {
-          "checks": 127,
-          "failures": 0,
-          "test": null,
-          "log": "validation/system-information-2026-11-07/map-information-actions.log"
-        },
-        "system_information_native_view": {
-          "checks": 57,
-          "failures": 0,
-          "test": null,
-          "log": "validation/system-information-2026-11-07/native-information-view.log"
-        },
-        "system_map": {
-          "checks": 2117,
-          "failures": 0,
-          "test": null,
-          "log": "validation/system-information-2026-11-07/system-map-information-regression.log"
-        },
-        "galactic_map_view": {
-          "checks": 2908,
-          "failures": 0,
-          "test": null,
-          "log": "validation/system-information-2026-11-07/galaxy-map-information-regression.log"
-        },
-        "source_system_information": {
-          "checks": 24434,
-          "failures": 0,
-          "test": null,
-          "log": "validation/system-information-2026-11-07/source-information-core.log"
-        }
-      }
+      "report": "validation/hyperdrive-2026-11-07/final-targeted-summary.json",
+      "scope": "One result per16unique GDS suite: original hyperdrive/native core, Navigationv3, legacy native control, workshop fixtures/actual source consumer, Main saved charge/migration, source map and prior regression. Python, independent byte review, GPU and historical release totals excluded.",
+      "checks": 70630,
+      "groups": 16,
+      "failures": 0
     },
     "initial_curated_validation_snapshot": {
       "checks": 212493,
@@ -708,16 +617,16 @@
       "snapshot_version": "0.11.0-rebuild-alpha1"
     },
     "curated_validation": {
-      "checks": 30393,
-      "passed_suites": 15,
+      "checks": 70630,
+      "passed_suites": 16,
       "failures": 0,
       "status": "passed",
-      "report": "validation/system-information-2026-11-07/validation-final.json",
-      "scope": "Current information core/native references, fixture and actual-provider UI, both actual maps and Main lifecycle/navigation/dock/save/surface modal/graphics-return controls. One result per suite; timestamps/source hashes retained across bounded batches. Historical release totals, independent byte-review, Python units, source-ZIP repeat startup and GPU checks excluded. Not physical-phone execution.",
+      "report": "validation/hyperdrive-2026-11-07/final-targeted-summary.json",
+      "scope": "One result per16unique GDS suite: original hyperdrive/native core, Navigationv3, legacy native control, workshop fixtures/actual source consumer, Main saved charge/migration, source map and prior regression. Python, independent byte review, GPU and historical release totals excluded.",
       "engine_error_or_leak_diagnostics": false
     },
-    "desktop_gles_capture_manifest": "validation/system-information-2026-11-07/screenshots/capture-manifest.json",
-    "original_port_services_scope": "Basic refuel in the actual selected source orbital port; full original economy/market/equipment services remain pending.",
+    "desktop_gles_capture_manifest": "validation/hyperdrive-2026-11-07/screenshots/capture-manifest.json",
+    "original_port_services_scope": "Navigationv3 selected-source-port dock workshop supports source drive fitting/removal, separate H2/military refuel/free handover and paid waste disposal. Explicit flat basic-source-workshop-pricing-adapter-v1; legacy sessions retain prior basic refuel. Full original stock/market/equipment lifecycle incomplete.",
     "source_full_worlds_update": {
       "version": "0.12.0-worlds-alpha1",
       "documentation": "docs/RELEASE_0_12_0_RU.md",
@@ -1444,8 +1353,8 @@
         "scope": "Final15 UI/Main groups plus2 unchanged same-session native-reference groups; unique suites only, report timestamps retained; historical931938 excluded; not a complete rerun of all source kernels."
       }
     },
-    "whole_application_smoke_status": "passed_final0.14.0_fifteen_unique_targeted_groups",
-    "desktop_gles_render_status": "passed_final_eight_actual_Main_frames_visually_inspected",
+    "whole_application_smoke_status": "passed_final0.15.0_sixteen_unique_targeted_groups",
+    "desktop_gles_render_status": "passed_eight_actual_frames_all_root_visually_inspected",
     "galactic_map_update": {
       "version": "0.13.1-map-alpha1",
       "status": "modern_presentation_functional_APK_and_actual_GLES_checks_passed",
@@ -1523,10 +1432,10 @@
       "complete_angular_rigid_body_integrator": false,
       "final_Main_validation_pending": false
     },
-    "release_phase": "published_alpha_with_native_UI_Main_GPU_APK_fresh_source_portability_and_immutable_HTTPS_checks; full_game_and_physical_device_pending",
-    "desktop_gles_visual_review": "root_visually_inspected_all8_final_frames",
+    "release_phase": "runtime_final70630checks_16groups_eight_actual_GPU_frames_and_ARM64_APK_technical_verification_passed; exact_source_archive_and_publication_pending",
+    "desktop_gles_visual_review": "validation/hyperdrive-2026-11-07/screenshots/visual-review.json",
     "desktop_gles_capture_frame_count": 8,
-    "desktop_gles_capture_checks": 163,
+    "desktop_gles_capture_checks": 120,
     "baseline_0_13_0": {
       "application_version": "0.13.0-navigation-alpha1",
       "application_integration_status": "Main connects graphical galactic/system maps, bounded time1/10/100, analog roll, sampled rotating dock contact and optional raw motion for new FULL Cobra sessions around fixed natural focus. Final integration validation pending; original renderer/F903/full player physics and whole block9 are not complete.",
@@ -2464,6 +2373,378 @@
       "immutable_https_downloads_verified": true,
       "publication_report": "validation/system-information-publication-2026-11-07/verification.json",
       "next_functional_priority": "Original F899-F903 hyperdrive, fuel and equipment rules within block9; other text/renderer branches remain documented."
+    },
+    "baseline_0_14_0": {
+      "application_version": "0.14.0-system-info-alpha1",
+      "application_integration_status": "Actual original system/general, demographic, trade and body information pages connected in Main from both maps and onboard computer. Final15unique-group functional/native/Main tests, eight actual GPU frames and ARM64 APK technical verification passed. Original DOS information policy remains separate from live JJFFE generation; full original game/global text/font/markets incomplete.",
+      "whole_application_smoke_passed": true,
+      "whole_application_smoke_scope": "Current information core/native references, fixture and actual-provider UI, both actual maps and Main lifecycle/navigation/dock/save/surface modal/graphics-return controls. One result per suite; timestamps/source hashes retained across bounded batches. Historical release totals, independent byte-review, Python units, source-ZIP repeat startup and GPU checks excluded. Not physical-phone execution.",
+      "whole_application_smoke_log": "validation/system-information-2026-11-07/validation-final.json",
+      "whole_application_smoke_status": "passed_final0.14.0_fifteen_unique_targeted_groups",
+      "desktop_gles_render_passed": true,
+      "desktop_gles_render_scope": "Eight actual Main frames after the final typography fix, all root visually inspected,1440x720/2316x1080/960x540; desktop GLES/Mesa llvmpipe, no compositing, physical phone execution or FPS benchmark.",
+      "desktop_gles_render_log": "validation/system-information-2026-11-07/screenshots/capture-manifest.json",
+      "desktop_gles_render_status": "passed_final_eight_actual_Main_frames_visually_inspected",
+      "desktop_gles_capture_manifest": "validation/system-information-2026-11-07/screenshots/capture-manifest.json",
+      "desktop_gles_visual_review": "root_visually_inspected_all8_final_frames",
+      "desktop_gles_capture_frame_count": 8,
+      "desktop_gles_capture_checks": 163,
+      "android_apk_built": true,
+      "android_apk_technically_verified": true,
+      "android_artifact_status": "Actual0.14.0/code39 ARM64 TEST APK and exact source ZIP published; full immutable HTTPS downloads verified. Fresh ZIP import/startup10/0 and actual information Main44/0; all1172source files unchanged. Physical phone/store release pending.",
+      "final_android_candidate_hash": "0570051ebfd302d2c46db2992e63b9ae64888bb0678b1d3e814e4660aa7c2b25",
+      "final_android_candidate": {
+        "version": "0.14.0-system-info-alpha1",
+        "version_code": 39,
+        "package": "org.starfrontier.rebuild",
+        "file": "deliverables/0.14.0-system-info-alpha1/StarFrontier-0.14.0-system-info-arm64.apk",
+        "file_scope": "Published exact technically verified TEST APK with full immutable download verification",
+        "bytes": 49880920,
+        "sha256": "0570051ebfd302d2c46db2992e63b9ae64888bb0678b1d3e814e4660aa7c2b25",
+        "abi": "arm64-v8a",
+        "min_sdk": 24,
+        "target_sdk": 36,
+        "debuggable": false,
+        "built": true,
+        "technically_verified": true,
+        "verification_report": "validation/system-information-2026-11-07/android-verification.json",
+        "test_signature_verified": true,
+        "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+        "zip_and_elf_alignment_16k": true,
+        "new_information_compiled_modules_verified": 3,
+        "new_information_JSON_resources_verified": 2,
+        "publication_status": "uploaded_and_immutable_downloads_verified",
+        "physical_device_tested": false,
+        "production_signing_key_configured": false,
+        "full_original_port_complete": false,
+        "publication_ready": false,
+        "source_commit": "860951235548fc58c859d7337b9a6909fd78ca62",
+        "artifact_commit": "4a2df6d8ad7739e9a622cf5a3c4e34c1d110a015",
+        "apk_url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4a2df6d8ad7739e9a622cf5a3c4e34c1d110a015/deliverables/0.14.0-system-info-alpha1/StarFrontier-0.14.0-system-info-arm64.apk",
+        "source_zip_url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4a2df6d8ad7739e9a622cf5a3c4e34c1d110a015/deliverables/0.14.0-system-info-alpha1/StarFrontier-0.14.0-system-info-source.zip",
+        "publication_verification_report": "validation/system-information-publication-2026-11-07/verification.json"
+      },
+      "latest_targeted_validation": {
+        "checks": 30393,
+        "passed_suites": 15,
+        "failures": 0,
+        "status": "passed",
+        "report": "validation/system-information-2026-11-07/validation-final.json",
+        "scope": "Current information core/native references, fixture and actual-provider UI, both actual maps and Main lifecycle/navigation/dock/save/surface modal/graphics-return controls. One result per suite; timestamps/source hashes retained across bounded batches. Historical release totals, independent byte-review, Python units, source-ZIP repeat startup and GPU checks excluded. Not physical-phone execution.",
+        "engine_error_or_leak_diagnostics": false
+      },
+      "current_module_validation": {
+        "status": "passed",
+        "engine": "4.6.3.stable.official.7d41c59c4",
+        "report": "validation/system-information-2026-11-07/validation-final.json",
+        "scope": "Current information core/native references, fixture and actual-provider UI, both actual maps and Main lifecycle/navigation/dock/save/surface modal/graphics-return controls. One result per suite; timestamps/source hashes retained across bounded batches. Historical release totals, independent byte-review, Python units, source-ZIP repeat startup and GPU checks excluded. Not physical-phone execution.",
+        "suites": {
+          "system_information_main": {
+            "checks": 44,
+            "failures": 0,
+            "test": "tests/test_system_information_main.gd",
+            "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/system_information_main.log"
+          },
+          "navigation_main": {
+            "checks": 53,
+            "failures": 0,
+            "test": "tests/test_navigation_main.gd",
+            "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/navigation_main.log"
+          },
+          "classic_console_main": {
+            "checks": 42,
+            "failures": 0,
+            "test": "tests/test_classic_console_main.gd",
+            "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/classic_console_main.log"
+          },
+          "source_console_pause": {
+            "checks": 131,
+            "failures": 0,
+            "test": "tests/test_source_console_pause.gd",
+            "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/source_console_pause.log"
+          },
+          "source_full_startup": {
+            "checks": 10,
+            "failures": 0,
+            "test": "tests/test_source_full_startup.gd",
+            "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/source_full_startup.log"
+          },
+          "source_main_full": {
+            "checks": 153,
+            "failures": 0,
+            "test": "tests/test_source_main_full.gd",
+            "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/source_main_full.log"
+          },
+          "app_transitions": {
+            "checks": 54,
+            "failures": 0,
+            "test": "tests/test_rebuilt_app_transitions.gd",
+            "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/app_transitions.log"
+          },
+          "graphics_integration": {
+            "checks": 44,
+            "failures": 0,
+            "test": "tests/test_graphics_integration.gd",
+            "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/graphics_integration.log"
+          },
+          "graphics_scope": {
+            "checks": 87,
+            "failures": 0,
+            "test": "tests/test_graphics_scope.gd",
+            "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/graphics_scope.log"
+          },
+          "system_information_view": {
+            "checks": 132,
+            "failures": 0,
+            "test": null,
+            "log": "validation/system-information-2026-11-07/ui-provider-fixture.log"
+          },
+          "map_information_actions": {
+            "checks": 127,
+            "failures": 0,
+            "test": null,
+            "log": "validation/system-information-2026-11-07/map-information-actions.log"
+          },
+          "system_information_native_view": {
+            "checks": 57,
+            "failures": 0,
+            "test": null,
+            "log": "validation/system-information-2026-11-07/native-information-view.log"
+          },
+          "system_map": {
+            "checks": 2117,
+            "failures": 0,
+            "test": null,
+            "log": "validation/system-information-2026-11-07/system-map-information-regression.log"
+          },
+          "galactic_map_view": {
+            "checks": 2908,
+            "failures": 0,
+            "test": null,
+            "log": "validation/system-information-2026-11-07/galaxy-map-information-regression.log"
+          },
+          "source_system_information": {
+            "checks": 24434,
+            "failures": 0,
+            "test": null,
+            "log": "validation/system-information-2026-11-07/source-information-core.log"
+          }
+        }
+      },
+      "curated_validation": {
+        "checks": 30393,
+        "passed_suites": 15,
+        "failures": 0,
+        "status": "passed",
+        "report": "validation/system-information-2026-11-07/validation-final.json",
+        "scope": "Current information core/native references, fixture and actual-provider UI, both actual maps and Main lifecycle/navigation/dock/save/surface modal/graphics-return controls. One result per suite; timestamps/source hashes retained across bounded batches. Historical release totals, independent byte-review, Python units, source-ZIP repeat startup and GPU checks excluded. Not physical-phone execution.",
+        "engine_error_or_leak_diagnostics": false
+      },
+      "release_phase": "published_alpha_with_native_UI_Main_GPU_APK_fresh_source_portability_and_immutable_HTTPS_checks; full_game_and_physical_device_pending",
+      "system_information_update": {
+        "version": "0.14.0-system-info-alpha1",
+        "document": "docs/RELEASE_0_14_0_RU.md",
+        "status": "final_native_UI_Main_GPU_and_APK_checks_passed_source_archive_preparation",
+        "modules": [
+          "scripts/source_information_text.gd",
+          "scripts/source_system_information.gd",
+          "scripts/system_information_view.gd"
+        ],
+        "resource": "data/ffe_system_information.json",
+        "resource_sha256": "77b37c26d7925e27f227c683c2c78a74f636fc28bf3b55f71f916ab6bcfc09c6",
+        "russian_resource": "data/system_information_ru.json",
+        "russian_resource_sha256": "b78c2edcd1889b6aee01b45ef9b591705b159622fca918b803552a3e42057a7f",
+        "information_policy": "dos-original-info-only",
+        "live_world_metadata_policy": "jjffe-policy-table-with10-added-rows_preserved",
+        "source_strings": 358,
+        "system_table_strings": 267,
+        "long_description_positions": 44,
+        "nonblank_long_descriptions": 25,
+        "original_blank_long_descriptions": 19,
+        "commodity_labels": 38,
+        "original_market_group_labels": 33,
+        "format_strings": 7,
+        "unit_strings": 2,
+        "extraction_report": "validation/system-information-2026-11-07/extraction.json",
+        "independent_extraction_checks": 2181,
+        "extractor_python_tests": 11,
+        "russian_validation_report": "validation/system-information-2026-11-07/russian-localization.json",
+        "russian_python_tests": 7,
+        "russian_python_failures": 0,
+        "russian_scope_is_entire_game": false,
+        "ui_consumer_report": "validation/system-information-2026-11-07/ui-consumer-tests.json",
+        "native_core_report": "validation/system-information-2026-11-07/source-information-core.json",
+        "final_native_and_integration_totals_pending": false,
+        "pages": [
+          "general",
+          "demography",
+          "trade",
+          "body"
+        ],
+        "entry_points": [
+          "galactic_map",
+          "system_map",
+          "onboard_computer"
+        ],
+        "readonly_preserves": [
+          "world",
+          "ship",
+          "raw_motion",
+          "navigation_clock",
+          "targets",
+          "saves",
+          "map_instance",
+          "map_pan",
+          "map_forecast"
+        ],
+        "modal_time_acceleration_interrupted_to1": true,
+        "time_controller_entire_state_unchanged": false,
+        "general_count_source": "source_runtime_state.body_count_byte, including original station counting rules",
+        "ground_port_type35_policy": "parent-summary adapter with source_action_id=-1; no original individual F843 action claimed",
+        "full_original_F863_distance_composition": false,
+        "complete_global_FF_bracket_interpreter": false,
+        "original_font_pixel_renderer_complete": false,
+        "full33_original_commodity_market_complete": false,
+        "full_original_port_complete": false,
+        "physical_device_tested": false,
+        "final_functional_report": "validation/system-information-2026-11-07/validation-final.json",
+        "final_functional_checks": 30393,
+        "final_unique_groups": 15,
+        "final_functional_failures": 0,
+        "native_core_checks": 24434,
+        "UI_consumer_checks": 5341,
+        "Main_regression_checks": 618,
+        "native_original_cases_within_core_count": 1570,
+        "native_original_cases_added_again_to_total": false,
+        "packaging_python_tests": 72,
+        "distinct_python_unit_functions": 90,
+        "actual_GPU_frames": 8,
+        "actual_GPU_capture_checks": 163,
+        "actual_GPU_capture_failures": 0,
+        "all_final_GPU_frames_root_visually_inspected": true,
+        "actual_GPU_manifest": "validation/system-information-2026-11-07/screenshots/capture-manifest.json",
+        "actual_APK_verification_report": "validation/system-information-2026-11-07/android-verification.json",
+        "final_typography_policy": "UI-only tab spacing, degrees-Celsius glyph and readable F843 port-list commas; raw/backend/358RUtemplates preserved",
+        "source_commit": "860951235548fc58c859d7337b9a6909fd78ca62",
+        "artifact_commit": "4a2df6d8ad7739e9a622cf5a3c4e34c1d110a015",
+        "source_archive_fresh_import_passed": true,
+        "source_archive_startup_checks": 10,
+        "source_archive_information_Main_checks": 44,
+        "source_archive_information_Main_failures": 0,
+        "source_archive_actual_files_unchanged": 1172,
+        "immutable_https_downloads_verified": true,
+        "publication_report": "validation/system-information-publication-2026-11-07/verification.json",
+        "next_functional_priority": "Original F899-F903 hyperdrive, fuel and equipment rules within block9; other text/renderer branches remain documented."
+      }
+    },
+    "hyperdrive_update": {
+      "version": "0.15.0-hyperdrive-alpha1",
+      "version_code": 40,
+      "release_document": "docs/RELEASE_0_15_0_RU.md",
+      "source_contract": "dos-firstenc-f899-f903-hyperdrive-v1",
+      "raw_resource": "data/ffe_hyperdrive.json",
+      "raw_sha256": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+      "core": "scripts/source_hyperdrive.gd",
+      "source_session": "scripts/source_hyperdrive_session.gd",
+      "services_view": "scripts/hyperdrive_services_view.gd",
+      "navigation_schema": "starfrontier-rebuild-navigation-v3",
+      "new_normal_FULL_sessions_opt_in": true,
+      "legacy_v1_v2_automatic_migration": false,
+      "source_distance_F833_Q16": true,
+      "source_range_fuel_duration_F903": true,
+      "source_mass_policy": "unchanged source signed spec+6, cargo/fuel/equipment not added to divisor",
+      "capacity_policy": "source spec+8 minus source drive/fixed gear/fuels/waste plus explicit existing Flight cargo and equipment-space bridge",
+      "fuel_commit": "exactly once on arrival; cancel consumes zero",
+      "military_commit": "military fuel replaced by equal radioactive waste; carried cargo conserved",
+      "pending_save_quote_recomputed_and_inventory_hash_verified": true,
+      "Cobra_source_profile": {
+        "model_index": 38,
+        "drive_index": 3,
+        "hydrogen": 4,
+        "fixed_equipment_space_t": 6,
+        "source_hull_mass_t": 100,
+        "source_capacity_t": 80,
+        "original_F998_starter": true
+      },
+      "Eagle_policy": "model24 MkII with explicit fitting adapter borrowed from model23 F998",
+      "Shuttle_policy": "model15 bare built-in drive; capacity4 occupied by drive4, no hyperjump; prototype starter cargo2 cannot fit and is never silently discarded",
+      "Cobra_Alpha_Centauri": {
+        "required_fuel_t": 2,
+        "duration_raw_u32": 166292,
+        "duration_days": 2.53741455078125
+      },
+      "pricing_profile": "basic-source-workshop-pricing-adapter-v1",
+      "price_adapter": {
+        "hydrogen_per_t": 10,
+        "military_per_t": 10,
+        "install_per_drive_mass_t": 100,
+        "remove_refund_per_drive_mass_t": 50,
+        "waste_disposal_per_t": 10,
+        "fuel_handover_price": 0,
+        "fuel_handover_refund": 0
+      },
+      "original_base_prices_extracted": true,
+      "original_full_market_implemented": false,
+      "charge_seconds_adapter": 3,
+      "speed_guard_mps_adapter": 20,
+      "migration": {
+        "explicit_v2_only": true,
+        "source_selected_port_dock_required": true,
+        "old_fuel_units_to_hydrogen_tonnes": "one-to-one",
+        "mandatory_independent_old_save_backup": true,
+        "backup_accessible_in_backup_menu": true,
+        "backup_failure_blocks_migration": true,
+        "preserves": [
+          "current_id",
+          "selected_id",
+          "elapsed_days",
+          "visited",
+          "Flight goods",
+          "credits"
+        ],
+        "rejects": [
+          "pending_charge",
+          "prototype_equipment",
+          "capacity_overflow"
+        ]
+      },
+      "core_checks": 66147,
+      "native_safe_cases_within_core": 5453,
+      "native_SIGFPE_domains_within_core": 11,
+      "native_cases_added_again_to_total": false,
+      "navigation_focused_checks": 143,
+      "legacy_native_navigation_control_checks": 219,
+      "navigation_report": "validation/hyperdrive-2026-11-07/navigation-integration.json",
+      "distinct_python_unit_functions": 100,
+      "packaging_python_tests": 93,
+      "extraction_python_tests": 7,
+      "independent_extraction_conditions": 1198,
+      "physical_device_tested": false,
+      "complete_F908": false,
+      "complete_F929_jet_fuel_and_star_scoop": false,
+      "full_original_fleet_and_equipment": false,
+      "full_original_port_complete": false,
+      "final_functional_checks": 70630,
+      "final_unique_groups": 16,
+      "final_functional_failures": 0,
+      "final_functional_report": "validation/hyperdrive-2026-11-07/final-targeted-summary.json",
+      "fixture_UI_checks": 484,
+      "actual_source_UI_checks": 54,
+      "UI_report": "validation/hyperdrive-2026-11-07/services-view-tests.json",
+      "actual_Main_checks": 70,
+      "source_map_checks": 31,
+      "legacy_regression_checks": 3482,
+      "actual_GPU_frames": 8,
+      "actual_GPU_capture_checks": 120,
+      "actual_GPU_capture_failures": 0,
+      "all_GPU_frames_root_visually_inspected": true,
+      "GPU_scope": "Actual software-rendered Main with fixture-staged service/migration conditions, no phone/FPS/full-market claim",
+      "actual_GPU_manifest": "validation/hyperdrive-2026-11-07/screenshots/capture-manifest.json",
+      "actual_APK_built": true,
+      "actual_APK_technically_verified": true,
+      "actual_APK_verification_report": "validation/hyperdrive-2026-11-07/android-verification.json",
+      "actual_APK_bytes": 49934782,
+      "actual_APK_sha256": "eed44e84639ae62f5c3afdf1bee8d666f83d1ca1b6e7144dcaf4fd8b2490246a"
     }
   },
   "target_device": "Samsung S23 Ultra 12/512",
@@ -2489,14 +2770,14 @@
     "13": "Full Russian localization",
     "14": "Device testing and release"
   },
-  "current_prerequisite": "Create and verify exact0.14.0 source archive and immutable publication, then continue source gameplay equivalence and remaining F863/global text/font/market gaps against the audit.",
+  "current_prerequisite": "Create and verify exact0.15.0 source ZIP and immutable publication from frozen verified runtime/APK; then continue original hyperjump/equipment/market lifecycle against the parity audit.",
   "historical_statistics_are_current_validation": false,
   "full_release_date": null,
   "detailed_audit": "docs/RECOVERY_AND_ROADMAP_RU.md",
-  "last_updated_moscow": "2026-11-07T18:20:15.614273+03:00",
+  "last_updated_moscow": "2026-11-07T20:28:38.909371+03:00",
   "block10_status": "accepted_with_documented_mobile_units_and_force_policies",
-  "block9_status": "in_progress_modern_map_presentation_and_partial_navigation_not_original_gameplay_equivalence",
-  "publication_status": "Current0.14.0 sources, APK, exact ZIP and8actualframes published;12immutable full HTTPS downloads verified. Older0.12.x/0.13.x artifacts remain unchanged. Physical phone and full release remain pending.",
+  "block9_status": "in_progress_source_F833_F903_and_explicit_equipment_fuel_sessions_connected; full_fleet_equipment_and_jump_lifecycle_incomplete",
+  "publication_status": "Current0.15.0 candidate not yet published. Previous0.14.0 exact sources/APK/ZIP/screenshots remain immutable and HTTPS-verified; upload authorization persists.",
   "artifact_publication": {
     "status": "uploaded_and_immutable_downloads_verified",
     "authorized_by_user": true,
@@ -2526,6 +2807,41 @@
     "all_manifest_payloads_downloaded": false
   },
   "current_candidate_publication": {
+    "version": "0.15.0-hyperdrive-alpha1",
+    "status": "actual_APK_verified_exact_source_archive_and_publication_pending",
+    "repository": "brodyga0878-hub/Pyton",
+    "branch": "development/starfrontier-rebuild",
+    "persistent_progress_upload_authorization": true,
+    "uploaded": false,
+    "immutable_https_downloads_verified": false,
+    "source_commit": null,
+    "artifact_commit": null,
+    "source_zip_sha256": null,
+    "apk_sha256": "eed44e84639ae62f5c3afdf1bee8d666f83d1ca1b6e7144dcaf4fd8b2490246a",
+    "source_zip_below_32MiB_required": true,
+    "apk_bytes": 49934782,
+    "source_zip_bytes": null,
+    "source_zip_below_32MiB": null,
+    "source_archive_fresh_import_passed": false,
+    "apk_url": null,
+    "source_zip_url": null,
+    "verification_report": null,
+    "publication_is_store_release": false,
+    "local_apk_verification_report": "validation/hyperdrive-2026-11-07/android-verification.json"
+  },
+  "remaining_major_blocks_interpretation": "Five historical workstream labels9/11/12/13/14; not a measured completion fraction, finite microtask count or release-date promise.",
+  "parity_target": {
+    "requested_by_user": "100percent clone of selected original FFE behavior and content",
+    "status": "not_achieved_partial_reconstruction",
+    "audit": "docs/PARITY_AUDIT_RU.md",
+    "system_info_audit": "docs/PARITY_AUDIT_SYSTEM_INFO_RU.md",
+    "next_priority": "Complete verified0.15.0 F833/F903 integration delivery, then source jump/equipment lifecycle and remaining full-market/text/font/gameplay parity; no full-game completion claim.",
+    "source_original_descriptions_portable": true,
+    "technical_impossibility_claimed": false,
+    "percentage_complete": null,
+    "full_release_date": null
+  },
+  "previous_candidate_publication": {
     "version": "0.14.0-system-info-alpha1",
     "status": "uploaded_and_immutable_downloads_verified",
     "repository": "brodyga0878-hub/Pyton",
@@ -2555,17 +2871,5 @@
     "verified_file_count": 12,
     "verified_utc": "2026-11-07T15:18:55.955678+00:00",
     "publication_is_store_release": false
-  },
-  "remaining_major_blocks_interpretation": "Five historical workstream labels9/11/12/13/14; not a measured completion fraction, finite microtask count or release-date promise.",
-  "parity_target": {
-    "requested_by_user": "100percent clone of selected original FFE behavior and content",
-    "status": "not_achieved_partial_reconstruction",
-    "audit": "docs/PARITY_AUDIT_RU.md",
-    "system_info_audit": "docs/PARITY_AUDIT_SYSTEM_INFO_RU.md",
-    "next_priority": "Complete source information-page acceptance and package0.14.0, then original gameplay equivalence and remaining global text/font/F863 gaps.",
-    "source_original_descriptions_portable": true,
-    "technical_impossibility_claimed": false,
-    "percentage_complete": null,
-    "full_release_date": null
   }
 }
