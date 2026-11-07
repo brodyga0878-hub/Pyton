@@ -1,0 +1,258 @@
+{
+  "schema": 1,
+  "scope": "Targeted visual-map, actual navigation/Main, modal surface publication, classic console, save/touch, transition and native-startup controls. One result per suite; previous release counts excluded. Per-suite timestamps retained; not an atomic full-game or physical-device run.",
+  "started_utc": "2026-11-07T10:05:56.613392+00:00",
+  "updated_utc": "2026-11-07T10:06:10.640659+00:00",
+  "duration_seconds": 14.027,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-07T10:05:56.613392+00:00",
+      "duration_seconds": 14.027,
+      "requested_suites": [
+        "navigation_main",
+        "classic_console_main",
+        "source_console_pause",
+        "source_full_startup",
+        "save_touch",
+        "app_transitions"
+      ],
+      "executed_suites": [
+        "navigation_main",
+        "classic_console_main",
+        "source_console_pause",
+        "source_full_startup",
+        "save_touch",
+        "app_transitions"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 3,
+  "status": "passed",
+  "passed_suites": 7,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 3257,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "navigation_main",
+      "scope": "Actual Main graphical map selection/confirmation, forecast isolation, raw save continuation, phone roll, clock scheduling and legacy opt-in boundaries.",
+      "status": "passed",
+      "checks": 53,
+      "failures": 0,
+      "executed_utc": "2026-11-07T10:05:56.615289+00:00",
+      "suite_source": {
+        "path": "tests/test_navigation_main.gd",
+        "bytes": 12697,
+        "sha256": "134ccfc0534ce835429cdd2c0cdbae7272c96d073ae011df03d19ee159661d73"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_navigation_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 10.118,
+      "timed_out": false,
+      "output_bytes": 118,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/modern-map-2026-11-07/logs/navigation_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "classic_console_main",
+      "scope": "Actual Main console hooks, principal cameras, session pause, independent fingers, offpad takeoff and pending-jump/save boundaries.",
+      "status": "passed",
+      "checks": 42,
+      "failures": 0,
+      "executed_utc": "2026-11-07T10:05:56.615453+00:00",
+      "suite_source": {
+        "path": "tests/test_classic_console_main.gd",
+        "bytes": 10629,
+        "sha256": "a9d2f15c1ecd3911828f96671fa52636a60fcadbfbf57230fc4cb8b12c027fcf"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_classic_console_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.547,
+      "timed_out": false,
+      "output_bytes": 123,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/modern-map-2026-11-07/logs/classic_console_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_console_pause",
+      "scope": "Actual Worldv4 pending terrain worker publication is deferred during console pause and resumes without losing physical contact.",
+      "status": "passed",
+      "checks": 131,
+      "failures": 0,
+      "executed_utc": "2026-11-07T10:05:56.615883+00:00",
+      "suite_source": {
+        "path": "tests/test_source_console_pause.gd",
+        "bytes": 15261,
+        "sha256": "5af16b7609c35bab07fa0f01c0dd1722d36e06b346154ce71868011ce47ca0a0"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_console_pause.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 14.023,
+      "timed_out": false,
+      "output_bytes": 1713,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/modern-map-2026-11-07/logs/source_console_pause.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_full_startup",
+      "scope": "Actual normal startup selects Worldv4/native navigation and restores a private native save; no player progress access.",
+      "status": "passed",
+      "checks": 10,
+      "failures": 0,
+      "executed_utc": "2026-11-07T10:05:58.164114+00:00",
+      "suite_source": {
+        "path": "tests/test_source_full_startup.gd",
+        "bytes": 2501,
+        "sha256": "ffaa0a4a6736da6409315e74753c15896e73d55e01348b42314652126f9b9c06"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_full_startup.gd",
+        "--",
+        "--source-startup-isolated"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.186,
+      "timed_out": false,
+      "output_bytes": 122,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/modern-map-2026-11-07/logs/source_full_startup.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "save_touch",
+      "scope": "Current complete save-store decoding, atomic writes/fallback and multi-finger phone input/release behavior; separate from app/device smoke.",
+      "status": "passed",
+      "checks": 71,
+      "failures": 0,
+      "executed_utc": "2026-11-07T10:05:59.350258+00:00",
+      "suite_source": {
+        "path": "tests/test_rebuilt_save_touch.gd",
+        "bytes": 16715,
+        "sha256": "c2755cdb318c5f75c8c1a348d14ed8bc4e2014a9e1bcf9807264a5a3196786f0"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_save_touch.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.152,
+      "timed_out": false,
+      "output_bytes": 121,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/modern-map-2026-11-07/logs/save_touch.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "app_transitions",
+      "scope": "Actual Main transition locks, pending-save resume and asynchronous New Moscow entry; capture mode disables user progress loading/writing.",
+      "status": "passed",
+      "checks": 54,
+      "failures": 0,
+      "executed_utc": "2026-11-07T10:06:00.502766+00:00",
+      "suite_source": {
+        "path": "tests/test_rebuilt_app_transitions.gd",
+        "bytes": 11061,
+        "sha256": "f81dad10e23e7169ba5e5046567b335720be7e93cfe95f7445e897f25cc436a5"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_app_transitions.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 3.968,
+      "timed_out": false,
+      "output_bytes": 120,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/modern-map-2026-11-07/logs/app_transitions.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "galactic_map_view",
+      "scope": "Existing source navigation/input/search/jump/focus/dense-marker regressions plus display-only raw transfer, clean typography, actual Alpha/Polaris search, true fuel/cost/reason visibility and coordinate-editor/compact breakpoint layout; headless, not a phone benchmark.",
+      "status": "passed",
+      "checks": 2896,
+      "failures": 0,
+      "executed_utc": "2026-11-07T10:04:21.403809+00:00",
+      "timestamp_kind": "completion_observed",
+      "suite_source": {
+        "path": "tests/test_galactic_map_view.gd",
+        "bytes": 16229,
+        "sha256": "4375a87deea0f07fd4df158c2e0676ab41a0c3a42b02390db632a4849eaadd8d"
+      },
+      "command": "godot --headless --path /workspace/Pyton --script res://tests/test_galactic_map_view.gd",
+      "exit_code": 0,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/modern-map-2026-11-07/galactic-map-view.log",
+      "observed_metadata": "validation/modern-map-2026-11-07/galactic-map-view-result.json"
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ],
+  "supplemental_reports": [
+    "galactic-map-view-result.json"
+  ]
+}

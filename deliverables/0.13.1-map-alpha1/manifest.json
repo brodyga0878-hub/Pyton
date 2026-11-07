@@ -1,0 +1,198 @@
+{
+  "version": "0.13.1-map-alpha1",
+  "version_code": 37,
+  "created_moscow": "2026-11-07T13:24:12.312478+03:00",
+  "source_commit": "c5d61229d579dc738aca6f5b45c570e5444fa836",
+  "source_archive_scope": "Exact git archive -9 of current tracked project, including6parity audit docs and validation/parity-audit-2026-11-07 exception; excludes other validation/deliverables/build/.godot/SDK/signing key. This is current reconstruction, not complete original retail FFE.",
+  "source_archive_files": 1290,
+  "source_archive_below_32MiB": true,
+  "source_archive_crc_verified": true,
+  "source_archive_fresh_import_passed": true,
+  "source_archive_isolated_native_startup_checks": 10,
+  "source_archive_isolated_native_startup_failures": 0,
+  "files": {
+    "FFE-parity-audit-2026-11-07.zip": {
+      "bytes": 699079,
+      "sha256": "d2aeb61fa260021973d1697c912d67544d9882a587df9601345cca20ab892d30"
+    },
+    "README_RU.md": {
+      "bytes": 3659,
+      "sha256": "c993b788530cb3c89d9fcb72a4f929509fdd591fab6d0b3b6473259d36a865c3"
+    },
+    "StarFrontier-0.13.1-map-arm64.apk": {
+      "bytes": 49765516,
+      "sha256": "7021ac20a6180edc73a6bc9110a07888560531d1d8f18689cfd9304e91f18c4f"
+    },
+    "StarFrontier-0.13.1-map-source.zip": {
+      "bytes": 29465942,
+      "sha256": "7588c52474ef115764d07b146e78decc195b32277c7ab7095b351f81a3e4ed3f"
+    },
+    "android-export.log": {
+      "bytes": 6326,
+      "sha256": "c2191737d4aa5ccbaa49f6123628db068de882f051ec5829579026111f075afb"
+    },
+    "android-verification.json": {
+      "bytes": 92889,
+      "sha256": "14ac2b1db83c9be9efdf2b5231577b944542e0accd3a5cbaa27fd1ce004a2c92"
+    },
+    "galactic-map-view-result.json": {
+      "bytes": 918,
+      "sha256": "a2f5e21ab0d79f512c705683a67a3cdc724672a799a28a0898d1a0dc15c94363"
+    },
+    "logs/app_transitions.log": {
+      "bytes": 120,
+      "sha256": "0c190763c029bb01bb6bb16c947fe7d80537e36b271d22fc91c468771ba45cd4"
+    },
+    "logs/classic_console_main.log": {
+      "bytes": 123,
+      "sha256": "fd1b59ff7ab0184ebb05c966c93c20e81d6f74731c727c273818a1dadac0b0b3"
+    },
+    "logs/galactic_map_view.log": {
+      "bytes": 122,
+      "sha256": "c89c949c12c2f4eb7babb68deef35d84d987db437fc7f9ea29e4366b4c17096b"
+    },
+    "logs/navigation_main.log": {
+      "bytes": 118,
+      "sha256": "341f62f03e5ea9792cb9e4caaf3261f7e61c57b9664e49fe27d12453ab4c12b6"
+    },
+    "logs/save_touch.log": {
+      "bytes": 121,
+      "sha256": "4e005c6452779d4e0da1f581ec5c6c9adb329e96988074e1b55de70b58bb2c07"
+    },
+    "logs/source_console_pause.log": {
+      "bytes": 1713,
+      "sha256": "c7649a9f4b320a66a845f798dc0806c8c3b3c096c4f77ee491fd841b7071429d"
+    },
+    "logs/source_full_startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "python-packaging-tests.json": {
+      "bytes": 710,
+      "sha256": "37e054271f387491c132b5c0d33a8a20742217b9ea99b0b758e9ff56a49310b8"
+    },
+    "python-packaging-tests.log": {
+      "bytes": 7431,
+      "sha256": "413992b5ab479c49320590c490ca4e6258a08fbda1ce08d9897ace272506235f"
+    },
+    "runtime-freeze.json": {
+      "bytes": 41302,
+      "sha256": "beabfdfdbe63603ed0baf2da09de93ca76516d7f380190f31b70ecc2b60a3f87"
+    },
+    "screenshots/1440x720-01-sector.png": {
+      "bytes": 190878,
+      "sha256": "ed0458b583d871d32775515eb11f2509f20c8ccabe4c374042fc110e6ed999b2"
+    },
+    "screenshots/1440x720-02-galaxy.png": {
+      "bytes": 175198,
+      "sha256": "fabf0853c4355e5cdea9677381e36e2895d5c4483b705ac9d68c6bbcc43d8824"
+    },
+    "screenshots/1440x720-03-search-route.png": {
+      "bytes": 171243,
+      "sha256": "54d73e1e1ddef689b0ea0eff1417cf32f04b91facd036bc3e7b530f817829442"
+    },
+    "screenshots/1440x720-04-unreachable-route.png": {
+      "bytes": 209893,
+      "sha256": "a7d5f8afbd013adfaf26874e1265624b1cfcc4c65cc1d48f8f4796171487b08c"
+    },
+    "screenshots/2316x1080-01-sector.png": {
+      "bytes": 404207,
+      "sha256": "0aea9e43aae026b11d2dc97887c85f3801717bf90388f4af4b4f8dfbd582b813"
+    },
+    "screenshots/2316x1080-02-galaxy.png": {
+      "bytes": 341782,
+      "sha256": "3d0f1fa34e94f328d772a86173cd5f424ba45d9d19fa3a8a7bf4d57d6e3f34e4"
+    },
+    "screenshots/960x540-01-sector.png": {
+      "bytes": 153204,
+      "sha256": "29fd9bd1b42114768c0d4e1a289cbd447cf75e385d3f91430db4ca964b2219c2"
+    },
+    "screenshots/960x540-02-galaxy.png": {
+      "bytes": 136116,
+      "sha256": "e44adb04846256dd5977b2245f7c767ace46db6174db72fe25a1e6ebf788fae2"
+    },
+    "screenshots/SHA256SUMS.txt": {
+      "bytes": 729,
+      "sha256": "ca185e60d43b6eb9228b0f7065d0b4b403548a0994a5bb95b8efd4b2580ba5db"
+    },
+    "screenshots/capture-manifest.json": {
+      "bytes": 4344,
+      "sha256": "98d7723da914951a8b8be4b403f51d4c79ec774a63553d865d5cde0b4f93aaa9"
+    },
+    "screenshots/render.log": {
+      "bytes": 431,
+      "sha256": "fae243fa0ef62d3a9639b00e683425b30657752ee4db7a02ba4319545ef84d21"
+    },
+    "screenshots/visual-review.json": {
+      "bytes": 1917,
+      "sha256": "5729135364d7fc9e9c24a574bc16978f4c6d22c8b04d34feabf551280d156631"
+    },
+    "source-archive-import.log": {
+      "bytes": 24970,
+      "sha256": "8ee5f159da09c324a4823924f42eccf6b5f665d8903b6ecc6e5c594899d9bc83"
+    },
+    "source-archive-startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "source-archive-verification.json": {
+      "bytes": 5531,
+      "sha256": "cec12a166334def8ea12ccc60abc931117b90d91ad70b371d35d664bd1f79391"
+    },
+    "validation-final.json": {
+      "bytes": 9224,
+      "sha256": "837f6b716b734014e5ab354edc21ca092b685798471fc0d316cb7931ebbd4474"
+    }
+  },
+  "checks": 3257,
+  "passed_suites": 7,
+  "failures": 0,
+  "validation_status": "passed",
+  "validation_report": "validation-final.json",
+  "validation_scope": "Targeted visual-map, actual navigation/Main, modal surface publication, classic console, save/touch, transition and native-startup controls. One result per suite; previous release counts excluded. Per-suite timestamps retained; not an atomic full-game or physical-device run.",
+  "python_packaging_unit_tests": 47,
+  "capture_checks": 1506,
+  "capture_checks_added_to_targeted_total": false,
+  "fresh_desktop_gles_frames_visually_inspected": 8,
+  "screenshots_are_phone_captures": false,
+  "renderer": "Godot4.6.3 Compatibility/OpenGL Mesa llvmpipe desktop software rendering",
+  "galactic_map_presentation_profile": "navy-star-chart-v1",
+  "protected_0_13_0_source_data_inputs": 18,
+  "protected_view_function_count": 7,
+  "additional_runtime_modules": 0,
+  "additional_shaders": 0,
+  "additional_textures": 0,
+  "navigation_modules_verified": 11,
+  "source_exact_json_verified": 22,
+  "runtime_material_maps": 51,
+  "package": "org.starfrontier.rebuild",
+  "abi": "arm64-v8a",
+  "min_sdk": 24,
+  "target_sdk": 36,
+  "debuggable": false,
+  "forbidden_permissions_absent": true,
+  "zip_and_elf_alignment_16k": true,
+  "test_key_only": true,
+  "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+  "physical_device_tested": false,
+  "production_signing_key_configured": false,
+  "production_release_ready": false,
+  "full_original_port_complete": false,
+  "full_original_physics": false,
+  "full_original_system_information": false,
+  "full_russian_localization_complete": false,
+  "parity_audit_semantic_docs": 6,
+  "parity_audit_gap_areas": 38,
+  "labelled_jjffe_procedure_inventory": 1615,
+  "labelled_asm_data_inventory": 8649,
+  "upstream_source_file_inventory": 50,
+  "user_archive_files": 68,
+  "source_inventory_is_semantic_completion_proof": false,
+  "all_original_code_branches_reviewed": false,
+  "provided_archive_missing_cd_fmv": true,
+  "game_completion_percent": null,
+  "full_release_date": null,
+  "next_functional_priority": "Original F842/F843/F863/F895 information pages and full required FF text interpretation",
+  "artifact_upload_authorized": true,
+  "publication_state_at_packaging": "Prepared for authorized GitHub backup; immutable HTTPS verification is recorded separately after upload."
+}

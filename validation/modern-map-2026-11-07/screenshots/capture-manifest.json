@@ -1,0 +1,184 @@
+{
+	"checks": 1506,
+	"completed_utc": "2026-11-07T10:05:15",
+	"failures": [],
+	"frames": [
+		{
+			"actual_scene": "scenes/main.tscn",
+			"composited": false,
+			"elapsed_days": 0.0,
+			"file": "1440x720-01-sector.png",
+			"logical_viewport": [
+				1440.0,
+				720.0
+			],
+			"overview": false,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"progress_read_or_written": false,
+			"selected_id": 111449880,
+			"selected_name": "Альфа Центавра",
+			"star_count": 42,
+			"viewport": [
+				1440,
+				720
+			]
+		},
+		{
+			"actual_scene": "scenes/main.tscn",
+			"composited": false,
+			"elapsed_days": 0.0,
+			"file": "1440x720-02-galaxy.png",
+			"logical_viewport": [
+				1440.0,
+				720.0
+			],
+			"overview": true,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"progress_read_or_written": false,
+			"selected_id": 111449880,
+			"selected_name": "Альфа Центавра",
+			"star_count": 42,
+			"viewport": [
+				1440,
+				720
+			]
+		},
+		{
+			"actual_scene": "scenes/main.tscn",
+			"composited": false,
+			"elapsed_days": 0.0,
+			"file": "2316x1080-01-sector.png",
+			"logical_viewport": [
+				1544.0,
+				720.0
+			],
+			"overview": false,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"progress_read_or_written": false,
+			"selected_id": 111449880,
+			"selected_name": "Альфа Центавра",
+			"star_count": 42,
+			"viewport": [
+				2316,
+				1080
+			]
+		},
+		{
+			"actual_scene": "scenes/main.tscn",
+			"composited": false,
+			"elapsed_days": 0.0,
+			"file": "2316x1080-02-galaxy.png",
+			"logical_viewport": [
+				1544.0,
+				720.0
+			],
+			"overview": true,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"progress_read_or_written": false,
+			"selected_id": 111449880,
+			"selected_name": "Альфа Центавра",
+			"star_count": 42,
+			"viewport": [
+				2316,
+				1080
+			]
+		},
+		{
+			"actual_scene": "scenes/main.tscn",
+			"composited": false,
+			"elapsed_days": 0.0,
+			"file": "960x540-01-sector.png",
+			"logical_viewport": [
+				1440.0,
+				810.0
+			],
+			"overview": false,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"progress_read_or_written": false,
+			"selected_id": 111449880,
+			"selected_name": "Альфа Центавра",
+			"star_count": 42,
+			"viewport": [
+				960,
+				540
+			]
+		},
+		{
+			"actual_scene": "scenes/main.tscn",
+			"composited": false,
+			"elapsed_days": 0.0,
+			"file": "960x540-02-galaxy.png",
+			"logical_viewport": [
+				1440.0,
+				810.0
+			],
+			"overview": true,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"progress_read_or_written": false,
+			"selected_id": 111449880,
+			"selected_name": "Альфа Центавра",
+			"star_count": 42,
+			"viewport": [
+				960,
+				540
+			]
+		},
+		{
+			"actual_scene": "scenes/main.tscn",
+			"composited": false,
+			"elapsed_days": 0.0,
+			"file": "1440x720-03-search-route.png",
+			"logical_viewport": [
+				1440.0,
+				720.0
+			],
+			"overview": false,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"progress_read_or_written": false,
+			"selected_id": 111449880,
+			"selected_name": "Альфа Центавра",
+			"star_count": 42,
+			"viewport": [
+				1440,
+				720
+			]
+		},
+		{
+			"actual_scene": "scenes/main.tscn",
+			"composited": false,
+			"elapsed_days": 0.0,
+			"file": "1440x720-04-unreachable-route.png",
+			"logical_viewport": [
+				1440.0,
+				720.0
+			],
+			"overview": false,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"progress_read_or_written": false,
+			"selected_id": 44963608,
+			"selected_name": "Polaris",
+			"star_count": 78,
+			"viewport": [
+				1440,
+				720
+			]
+		}
+	],
+	"source_sha256": {
+		"scripts/build_info.gd": "36946af9f2ec303ab09093b8cf6d4249d001f0599c73a001bc34216bcc2c01d7",
+		"scripts/galactic_map_model.gd": "bb2f52814aae33d1d7fa000931e369f8c4d1cb0de1364939f9b363e496399b02",
+		"scripts/galactic_map_view.gd": "3b0d0fc97429ae3e37bf041ecaa0b67c6625bc0fbeda4a2a78fbe0ce04266137",
+		"scripts/main.gd": "61dd63e92cc7b2bebdb86859ccc5a8e5653f5376fbf0616d168f4c1ab4652d30",
+		"tools/capture_modern_galactic_map.gd": "5641e003e4eb71b24e29d49e63ea44243a6bf438c4ef3df60b16a2adb99f35b2"
+	},
+	"started_utc": "2026-11-07T10:05:06",
+	"version": "0.13.1-map-alpha1"
+}

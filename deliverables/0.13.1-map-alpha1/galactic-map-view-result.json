@@ -1,0 +1,15 @@
+{
+  "test": "galactic_map_view",
+  "command": "godot --headless --path /workspace/Pyton --script res://tests/test_galactic_map_view.gd",
+  "exit_code": 0,
+  "checks": 2896,
+  "failures": 0,
+  "completed_utc": "2026-11-07T10:04:21.403809+00:00",
+  "log": "validation/modern-map-2026-11-07/galactic-map-view.log",
+  "log_sha256": "c89c949c12c2f4eb7babb68deef35d84d987db437fc7f9ea29e4366b4c17096b",
+  "sources_sha256": {
+    "scripts/galactic_map_view.gd": "3b0d0fc97429ae3e37bf041ecaa0b67c6625bc0fbeda4a2a78fbe0ce04266137",
+    "tests/test_galactic_map_view.gd": "4375a87deea0f07fd4df158c2e0676ab41a0c3a42b02390db632a4849eaadd8d"
+  },
+  "scope": "Existing source navigation/input/search/jump/focus/dense-marker regressions plus display-only raw transfer, clean typography, actual Alpha/Polaris search, true fuel/cost/reason visibility and coordinate-editor/compact breakpoint layout; headless, not a phone benchmark."
+}

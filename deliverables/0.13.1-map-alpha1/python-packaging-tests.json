@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "version": "0.13.1-map-alpha1",
+  "version_code": 37,
+  "timestamp_utc": "2026-11-07T09:56:33.518427+00:00",
+  "command": "python -m unittest discover -s tests -p test_android_full_packaging.py -v",
+  "test_count": 47,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "passed": true,
+  "duration_seconds": 0.443063,
+  "test_source_sha256": "1b1551bc91f570bf320ea15c04444c60aab05a8f46c949defe3a4a178ee438a0",
+  "verifier_sha256": "7ea77e0c0bb0bcff80c86fc573f0892181e5008ad07bf2b077e3cf8dd4f24b9d",
+  "test_archive_is_mock": true,
+  "actual_apk_verified_by_this_run": false,
+  "physical_device_tested": false,
+  "evidence_log": "validation/modern-map-2026-11-07/python-packaging-tests.log"
+}

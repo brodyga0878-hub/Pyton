@@ -1,0 +1,50 @@
+{
+  "reviewed_utc": "2026-11-07T10:14:10.417975+00:00",
+  "method": "Each of the8 final actual Main PNGs was opened with view_image and visually inspected by the root agent.",
+  "renderer": "Godot4.6.3 Compatibility/OpenGL Mesa llvmpipe desktop software rendering",
+  "physical_phone_capture": false,
+  "phone_performance_tested": false,
+  "composited": false,
+  "checks": 1506,
+  "failures": 0,
+  "findings": [
+    "Navy panels, actual source star halos, selected route, source-density display recolour and clear typography visible.",
+    "Fuel/range/cost/availability remain readable while search results are open.",
+    "DistantPolaris target visibly explains disabled jump.",
+    "Coordinate inputs/action buttons remain separate, and no viewport clipping found in the final frames."
+  ],
+  "frames": [
+    {
+      "file": "1440x720-01-sector.png",
+      "sha256": "ed0458b583d871d32775515eb11f2509f20c8ccabe4c374042fc110e6ed999b2"
+    },
+    {
+      "file": "1440x720-02-galaxy.png",
+      "sha256": "fabf0853c4355e5cdea9677381e36e2895d5c4483b705ac9d68c6bbcc43d8824"
+    },
+    {
+      "file": "2316x1080-01-sector.png",
+      "sha256": "0aea9e43aae026b11d2dc97887c85f3801717bf90388f4af4b4f8dfbd582b813"
+    },
+    {
+      "file": "2316x1080-02-galaxy.png",
+      "sha256": "3d0f1fa34e94f328d772a86173cd5f424ba45d9d19fa3a8a7bf4d57d6e3f34e4"
+    },
+    {
+      "file": "960x540-01-sector.png",
+      "sha256": "29fd9bd1b42114768c0d4e1a289cbd447cf75e385d3f91430db4ca964b2219c2"
+    },
+    {
+      "file": "960x540-02-galaxy.png",
+      "sha256": "e44adb04846256dd5977b2245f7c767ace46db6174db72fe25a1e6ebf788fae2"
+    },
+    {
+      "file": "1440x720-03-search-route.png",
+      "sha256": "54d73e1e1ddef689b0ea0eff1417cf32f04b91facd036bc3e7b530f817829442"
+    },
+    {
+      "file": "1440x720-04-unreachable-route.png",
+      "sha256": "a7d5f8afbd013adfaf26874e1265624b1cfcc4c65cc1d48f8f4796171487b08c"
+    }
+  ]
+}
