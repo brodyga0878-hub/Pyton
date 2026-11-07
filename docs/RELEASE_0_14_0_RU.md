@@ -7,8 +7,8 @@ Main. Их можно открыть из галактической карты,
 доступны по-русски. Оформление и сенсорные элементы современные.
 
 Runtime зафиксирован после финальных проверок; настоящий ARM64 APK
-собран и технически проверен. Точный source ZIP и новые неизменяемые
-HTTPS-ссылки ещё готовятся. [0.13.2](RELEASE_0_13_2_RU.md) сохраняется
+собран и технически проверен. Точный source ZIP и APK опубликованы,
+неизменяемые HTTPS-ссылки проверены полным скачиванием. [0.13.2](RELEASE_0_13_2_RU.md) сохраняется
 как предыдущая опубликованная контрольная точка.
 
 ## Страницы и исходные данные
@@ -114,8 +114,23 @@ Main**, **163 условия захвата, 0 ошибок**. Все кадры
 `0570051ebfd302d2c46db2992e63b9ae64888bb0678b1d3e814e4660aa7c2b25`.
 SHA256 TEST-сертификата:
 `16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25`.
-Точный исходный коммит, source ZIP и новая проверка HTTPS-скачиваний
-будут записаны после упаковки и публикации. Их готовность пока не заявлена.
+Исходный коммит `860951235548fc58c859d7337b9a6909fd78ca62`. ZIP — 29 818 080 байт,
+1 325 записей/1 172 файла, меньше 32 МиБ, CRC исправен. SHA256:
+`a58a357e7b7db7f8fe3b18d6f1071b19c78fea9ef28aba9a1fdeccc48aed0070`.
+Свежий импорт и обычный изолированный запуск точного ZIP — 10/0;
+новые страницы через Main из распакованного ZIP — 44/0. Все исходные файлы
+сохранили SHA; повторные проверки ZIP не прибавлены к итогам 15 групп.
+
+[Скачать APK 0.14.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4a2df6d8ad7739e9a622cf5a3c4e34c1d110a015/deliverables/0.14.0-system-info-alpha1/StarFrontier-0.14.0-system-info-arm64.apk) · [Исходники ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4a2df6d8ad7739e9a622cf5a3c4e34c1d110a015/deliverables/0.14.0-system-info-alpha1/StarFrontier-0.14.0-system-info-source.zip)
+
+[Описание Солнца](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4a2df6d8ad7739e9a622cf5a3c4e34c1d110a015/deliverables/0.14.0-system-info-alpha1/screenshots/01-sol-general.png) · [Карточка Меркурия](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4a2df6d8ad7739e9a622cf5a3c4e34c1d110a015/deliverables/0.14.0-system-info-alpha1/screenshots/04-mercury-source-card.png) · [Альфа Центавра](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4a2df6d8ad7739e9a622cf5a3c4e34c1d110a015/deliverables/0.14.0-system-info-alpha1/screenshots/06-alpha-centauri-general-wide.png)
+
+Публикация подтверждена полным скачиванием двенадцати файлов: манифест,
+APK, ZIP, протокол захвата и восемь PNG. HTTP 200, размеры, SHA и CRC
+совпали; Git-комментарий ZIP совпал с исходным коммитом.
+[Отчёт HTTPS](../validation/system-information-publication-2026-11-07/verification.json).
+Артефакты сохранены в коммите `4a2df6d8ad7739e9a622cf5a3c4e34c1d110a015`.
+Документы внутри ZIP отражают состояние до удалённой публикации.
 
 ## Границы соответствия
 
