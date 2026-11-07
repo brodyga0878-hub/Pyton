@@ -1,0 +1,45 @@
+{
+  "time_utc": "2026-11-07T22:31:03.633443+00:00",
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_extract_surface_contact.py",
+    "-v"
+  ],
+  "test_count": 12,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "exit_code": 0,
+  "file_sha256": {
+    "tools/extract_surface_contact.py": "03697a123ba63d7a3e1561acdfa88db8ed1b9b069a50868629cfa743a3a6776a",
+    "data/ffe_surface_contact.json": "960931e58ac1fe73428956b87f8567e29ea554c84793e33e1e86852f060050e6",
+    "tests/test_extract_surface_contact.py": "8f5abcd56598c21cb70652d15b42ce397777d5886e65d7dcc07d5382b105bf49",
+    "tests/fixtures/contact_v43_sources.json": "ea881cdd1864445f3dc28cf8cb50773e4f5d428364aae3497f691067b26c6b36"
+  },
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "runtime_primary_anchor": {
+    "byte_count": 1657,
+    "instruction_count": 518
+  },
+  "full_F575_static_anchor_only": {
+    "byte_count": 2005,
+    "instruction_count": 635
+  },
+  "F578_excluded_variant_anchor": {
+    "byte_count": 416,
+    "instruction_count": 114
+  },
+  "instruction_proof_records": 21,
+  "instruction_proof_bytes_including_primary": 3402,
+  "instruction_proof_instructions_including_primary": 1259,
+  "exact_current_ship_models": 3,
+  "historical_code43_baseline_files": 21,
+  "original_native_oracle_executed_by_this_run": false,
+  "physical_device_tested": false
+}

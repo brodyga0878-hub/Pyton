@@ -1,0 +1,57 @@
+{
+  "time_utc": "2026-11-07T23:00:58.865836+00:00",
+  "reviewer": "/root/fuel_scoop_core",
+  "read_only": true,
+  "material_blockers": 0,
+  "verifier_sha256": "f71babd21e9c77cd78e70bf0f7ace098f40b0c51cfb7429152d12424a08669ae",
+  "audited_runtime_source_count": 23,
+  "unchanged_code43_source_count": 17,
+  "protected_map_world_source_data_count": 10,
+  "shared_contact_dependency_count": 16,
+  "published_provider_dependency_count": 17,
+  "unchanged_information_runtime_count": 3,
+  "unchanged_Main_function_count": 9,
+  "exact_approved_pending_Main_normalizations": 2,
+  "protected_Main_function_count": 11,
+  "unchanged_Surface_function_count": 9,
+  "unchanged_saved_state_function_count": 13,
+  "portable_code43_fixture_sha256": "ea881cdd1864445f3dc28cf8cb50773e4f5d428364aae3497f691067b26c6b36",
+  "new_mock_test_methods_reviewed": 35,
+  "new_native_reference_cases": 858,
+  "runtime_primary_DOS_instruction_count": 518,
+  "metadata_proof_record_count": 21,
+  "metadata_proof_instruction_count_including_primary": 1259,
+  "findings": "No concrete preservation/disclosure gap. Shared old43 payload still retains original data/native/compiled checks; new23 source pins and17 providers/state functions protect actual consumers. Two exact pending-contact normalizations are counted once and hashed. Pose validates before shared F953 then commits, preimpact commands/deferred interval/save-block/common-city paths checked. NewJSON explicitly provenance-only; real149descriptor/hyper consumers are pinned. No GDSC/source equivalence, full original engine or device proof implied.",
+  "files_changed": false,
+  "tests_executed": false,
+  "native_oracle_executed": false,
+  "Godot_executed": false,
+  "APK_built": false,
+  "previous_review_verifier_sha256": "19e5212f4afb1df5fb5171faabdf58bca9b09164fcc45615c9fc3b2d938d4f0d",
+  "current_verifier_sha256": "f71babd21e9c77cd78e70bf0f7ace098f40b0c51cfb7429152d12424a08669ae",
+  "subsequent_final_revision": {
+    "previous_Main_sha256": "749b4e8bad4279c83e90c0042680eb96b294fb51e1dac45b3add708a76d1a112",
+    "superseded_intermediate_Main_sha256": "ee2826b2f7e97674b1d5112a93e9494ab43ca626d9fa58c160b9b14c2ce79cbe",
+    "current_Main_sha256": "ad3cde5417c04c042f729cd3a391d7a996f048990e26c8cf7cf66d2b8637d09f",
+    "scope": "Final held-menu recovery fix: pending path disables pointer buttons except Menu, repeated identical contact failure preserves held input, pending contact blocks graphics preview. Only Main runtime pin changed. Existing35-case suite expands the unresolved-contact rejection method with3 UI recovery subcontrols; no distinct methods added.",
+    "intermediate_EE_proof": "validation/contact-2026-11-08/packaging-ee2826.json",
+    "intermediate_EE_log": "validation/contact-2026-11-08/packaging-code44-menu-ee2826.log"
+  },
+  "final_delta_independent_review_pending": false,
+  "subsequent_review_note": "Final delta acknowledged independently: current verifier SHA recomputed; Main pin/actual Main AD3 and all23source pins match. Menu-exclusion loop, first-reason-only input release and pending graphics-demo guard inspected. EE remains explicitly superseded. No additional test/build/native/Godot runs by reviewer.",
+  "review_runs": [
+    {
+      "scope": "Original broad code44 source/metadata/consumer guard review",
+      "verifier_sha256": "19e5212f4afb1df5fb5171faabdf58bca9b09164fcc45615c9fc3b2d938d4f0d",
+      "main_sha256": "749b4e8bad4279c83e90c0042680eb96b294fb51e1dac45b3add708a76d1a112",
+      "read_only": true
+    },
+    {
+      "scope": "Final AD3 Main-pin/recovery-subcontrols delta; all23currentpins independently recomputed, retained old payload/scope guards rechecked",
+      "verifier_sha256": "f71babd21e9c77cd78e70bf0f7ace098f40b0c51cfb7429152d12424a08669ae",
+      "main_sha256": "ad3cde5417c04c042f729cd3a391d7a996f048990e26c8cf7cf66d2b8637d09f",
+      "read_only": true,
+      "new_negative_subcontrols_reviewed": 3
+    }
+  ]
+}

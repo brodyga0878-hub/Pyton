@@ -1,0 +1,21 @@
+{
+  "time_utc": "2026-11-07T22:31:03.633443+00:00",
+  "reviewer": "/root/fuel_scoop_core",
+  "read_only": true,
+  "raw_resource_sha256": "960931e58ac1fe73428956b87f8567e29ea554c84793e33e1e86852f060050e6",
+  "material_errors": 0,
+  "anchor_count": 3,
+  "instruction_proof_records": 21,
+  "ship_descriptor_spec_records": 3,
+  "F577_DOS_evidence": {
+    "file_offset": 102066,
+    "hex": "038638010000",
+    "meaning": "ADD eax,[esi+0x138] in original short-shift sphere branch; pinned JJFFE source changes it to+0x140. Classifier remains excluded."
+  },
+  "scope": "Independent actual EXE byte/proof/native metadata and3descriptor/spec/scale checks; verified bounded-vs-full entry, kind1 radial normal vs phone triangle provider, caller classification/frame/scheduler/HP owner limits and excluded F577/F578 source variants. Final9609digest rechecked.",
+  "files_changed": false,
+  "tests_executed": false,
+  "native_oracle_executed": false,
+  "Godot_executed": false,
+  "APK_built": false
+}

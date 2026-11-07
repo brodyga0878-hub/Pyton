@@ -1,0 +1,16 @@
+{
+  "time_utc": "2026-11-07T22:31:03.633443+00:00",
+  "historical_test_count": 179,
+  "exit_code": 0,
+  "observed_summary": "Ran179 tests in20.912s; OK",
+  "baseline_fixture_sha256": "ea881cdd1864445f3dc28cf8cb50773e4f5d428364aae3497f691067b26c6b36",
+  "baseline_commit": "faa22eaee504b324b096d64c059d9daf670eca9c",
+  "baseline_files": 21,
+  "scope": "Portable strict old43 tests now overlay exact baseline before per-test mutations. Immutable gear payload/data/native controls factored for upcoming strict44 source integration, without replacing old43 source/function guards.",
+  "independent_review": {
+    "reviewer": "/root/fuel_scoop_core",
+    "read_only": true,
+    "finding": "All21fixture sources compared to actual git commit byte-for-byte; temporary copies isolate mutations, no preservation gap.",
+    "tests_executed_by_reviewer": false
+  }
+}

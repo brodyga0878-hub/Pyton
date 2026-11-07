@@ -1,0 +1,113 @@
+{
+  "schema": "starfrontier-source-archive-portability-v1",
+  "started_utc": "2026-11-07T23:04:35.771279+00:00",
+  "archive_path": "/workspace/Pyton/deliverables/0.19.0-surface-contact-alpha1/StarFrontier-0.19.0-surface-contact-source.zip",
+  "archive_sha256": "ce00bb495943086f02a54fddd706755e8e8da92277ab66ae30dc74806d3fdf7a",
+  "expected_archive_sha256": "ce00bb495943086f02a54fddd706755e8e8da92277ab66ae30dc74806d3fdf7a",
+  "archive_bytes": 31552790,
+  "source_commit": "5a8b7aa86fe94ac7662e37a7af69944b1f853ac3",
+  "workspace": "/workspace/recovery/contact-source-portability",
+  "source_project_path": "/workspace/recovery/contact-source-portability/source/StarFrontier-0.19.0-surface-contact-source",
+  "fresh_extraction": true,
+  "private_xdg": true,
+  "apk_built": false,
+  "host_sdk_copied": false,
+  "commands": [
+    {
+      "name": "source-archive-import",
+      "started_utc": "2026-11-07T23:04:36.472175+00:00",
+      "finished_utc": "2026-11-07T23:04:44.197420+00:00",
+      "duration_seconds": 7.725248,
+      "command": [
+        "godot",
+        "--headless",
+        "--audio-driver",
+        "Dummy",
+        "--editor",
+        "--quit",
+        "--path",
+        "/workspace/recovery/contact-source-portability/source/StarFrontier-0.19.0-surface-contact-source"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "log_path": "validation/contact-source-portability-2026-11-08/source-archive-import.log",
+      "log_sha256": "297b841cf99a1074c38b176a189a74ec6d2c09f05529da82fb72646d81add6ab",
+      "log_bytes": 28450,
+      "error_markers": []
+    },
+    {
+      "name": "source-archive-startup",
+      "started_utc": "2026-11-07T23:04:44.197684+00:00",
+      "finished_utc": "2026-11-07T23:04:45.358207+00:00",
+      "duration_seconds": 1.160538,
+      "command": [
+        "godot",
+        "--headless",
+        "--audio-driver",
+        "Dummy",
+        "--path",
+        "/workspace/recovery/contact-source-portability/source/StarFrontier-0.19.0-surface-contact-source",
+        "--script",
+        "res://tests/test_source_full_startup.gd",
+        "--",
+        "--source-startup-isolated"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "log_path": "validation/contact-source-portability-2026-11-08/source-archive-startup.log",
+      "log_sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36",
+      "log_bytes": 122,
+      "error_markers": []
+    }
+  ],
+  "ok": true,
+  "execution_policy": "require_escalated",
+  "archive_commit_comment": "5a8b7aa86fe94ac7662e37a7af69944b1f853ac3",
+  "nested_historical_godot_projects": [
+    "StarFrontier-0.19.0-surface-contact-source/recovered-history/release_audit/project.godot"
+  ],
+  "static_audit_packaging": {
+    "scope": "Presence, file hashes, counts and explicit limitations only; not semantic review or full-game equivalence.",
+    "required_files_sha256": {
+      "docs/PARITY_AUDIT_RU.md": "79dca562bc160fc9cf8e867ab8199722dc36976e79c8fd552bbd6db8f2cae16c",
+      "docs/PARITY_AUDIT_SYSTEM_INFO_RU.md": "7be8973da4622f790283d6fee96d49dcc08c9184cf36e1a918ffb22e92e7bb63",
+      "docs/PARITY_AUDIT_PHYSICS_RU.md": "0d528552f348e722c1b66e72b6444c2f63cb27c62929071525303608978abc11",
+      "docs/PARITY_AUDIT_SHIPS_ECONOMY_COMBAT_RU.md": "c8f3c27c111509ca1f0c83d4f80d7b373047140c00abe0652cfa7c0e9de2c6f7",
+      "docs/PARITY_AUDIT_CAMPAIGN_CONTENT_RU.md": "6a75d064f19fb9cd19c856188ea7cca5608db0a675ac79c3a8add42c36b3e721",
+      "docs/PARITY_AUDIT_RESOURCES_GRAPHICS_RU.md": "ba969cc581317cc38a87b845f7db0c64bc5a70048d060fe58e456e7e55225209",
+      "tools/audit_original_parity.py": "61dfcacf8f1887812ea268fc58d884a581fdc46b77453b0b062ee35ed05dc77f",
+      "validation/parity-audit-2026-11-07/original-function-catalog.json": "4fff7e078f690cf3dcf64a85247d544ce6e5257e8346823a6a870675ca7ed630",
+      "validation/parity-audit-2026-11-07/original-function-catalog.csv": "cad2ab202709cc7e33ab3fc164dab22cd4e62314a7a7f06063730c5ea77765e7",
+      "validation/parity-audit-2026-11-07/original-data-block-catalog.json": "adc5764f71eb9f31cdbed05a2388f8c3bab81f0db8e58b15966091f2d4498161",
+      "validation/parity-audit-2026-11-07/resource-inventory.json": "5a4dd3492358eb145bb3abf6907d88a89358622cfc1473ece58b9c9abdbc234e"
+    },
+    "function_definitions": 1615,
+    "upstream_source_inventory_entries": 50,
+    "data_declarations": 8649,
+    "mentions_are_not_full_port_counts": true,
+    "jjffe_dos_equivalence_claim": false,
+    "full_game_incompleteness_statement_present": true
+  },
+  "archive_file_count": 1316,
+  "archive_crc_ok": true,
+  "archive_source_inventory_sha256": "61eb3b3ad32ac16057032c98930af0a3f53d3f66c097a210a0ea5743d37e44de",
+  "import_cache_before": false,
+  "project_godot_sha256": "634ec52da910101dce6e96fb230c1e06d7d50445b4a352e4f045ea29111e958a",
+  "startup_test_sha256": "ffaa0a4a6736da6409315e74753c15896e73d55e01348b42314652126f9b9c06",
+  "main_source_sha256": "ad3cde5417c04c042f729cd3a391d7a996f048990e26c8cf7cf66d2b8637d09f",
+  "private_environment_overrides": {
+    "XDG_DATA_HOME": "/workspace/recovery/contact-source-portability/source_full_startup/data",
+    "XDG_CONFIG_HOME": "/workspace/recovery/contact-source-portability/source_full_startup/config",
+    "XDG_CACHE_HOME": "/workspace/recovery/contact-source-portability/source_full_startup/cache"
+  },
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "startup_checks": 10,
+  "startup_failures": 0,
+  "import_cache_after": true,
+  "extracted_archive_files_unchanged": true,
+  "modified_archive_files": [],
+  "finished_utc": "2026-11-07T23:04:45.455421+00:00",
+  "source_archive_matches_frozen_runtime": true,
+  "source_archive_matches_frozen_runtime_file_count": 417,
+  "frozen_runtime_manifest_sha256": "1d53540c85539fea29fcde8d67f8198104ebeef5b741b04aa14686af9983e4a2"
+}

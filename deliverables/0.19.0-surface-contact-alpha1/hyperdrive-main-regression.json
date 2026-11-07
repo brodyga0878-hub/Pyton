@@ -1,0 +1,41 @@
+{
+	"checks": 70,
+	"evidence": [
+		{
+			"case": "source_map_cancel",
+			"distance_raw": 435,
+			"duration_raw_u32": 166292,
+			"required_fuel": 2
+		},
+		{
+			"actual_elapsed_days": 2.53745043041088,
+			"arrival_ticks_after_restore": 19,
+			"case": "pending_save_arrival",
+			"expected_elapsed_days": 2.53744927300347,
+			"hydrogen_after": 2,
+			"remaining_at_save": 1.9
+		},
+		{
+			"case": "military_fixture_not_trade",
+			"fixture_drive_index": 11,
+			"fuel_before": 4,
+			"military_after": 2,
+			"waste_after": 2
+		},
+		{
+			"backup_navigation_version": 2,
+			"backup_private_path": "user://hyperdrive-main-464048/hyperdrive-backups/before-source-2026-11-07T22-50-26-000000003050.txt",
+			"case": "legacy_explicit_migration",
+			"old_backup_survives_both_v3_slots": true
+		}
+	],
+	"failures": 0,
+	"schema": 1,
+	"scope": "Actual Main source jump, map quote, pending whole-game continuation, military fixture, explicit legacy migration/durable private backup and invalid-v3 atomicity; no physical-phone or FPS proof.",
+	"sources": {
+		"main_sha256": "749b4e8bad4279c83e90c0042680eb96b294fb51e1dac45b3add708a76d1a112",
+		"navigation_sha256": "5f689fce7b1f899c4a39e95add22dd59a8b9ba2909ccfec2d7bf18a74698f3c6",
+		"session_sha256": "931427fe16367c8a7d32fdfbb554e14ef64987a477fa8e275a75122aa1505c14",
+		"test_sha256": "1562e96545e7d30e9aaff5004cb940b844a89024b984c99109bc9b2f2c9b82b8"
+	}
+}

@@ -1,0 +1,32 @@
+{
+  "schema": "starfrontier-source-archive-contact-feature-v1",
+  "started_utc": "2026-11-07T23:05:38.639917+00:00",
+  "finished_utc": "2026-11-07T23:07:09.542737+00:00",
+  "duration_seconds": 90.90283,
+  "source_commit": "5a8b7aa86fe94ac7662e37a7af69944b1f853ac3",
+  "archive_sha256": "ce00bb495943086f02a54fddd706755e8e8da92277ab66ae30dc74806d3fdf7a",
+  "command": [
+    "godot",
+    "--headless",
+    "--audio-driver",
+    "Dummy",
+    "--path",
+    "/workspace/recovery/contact-source-portability/source/StarFrontier-0.19.0-surface-contact-source",
+    "--script",
+    "res://tests/test_source_contact_main.gd",
+    "--",
+    "--rebuild-capture"
+  ],
+  "exit_code": 0,
+  "checks": 220,
+  "failures": 0,
+  "error_markers": [],
+  "source_actual_files": 1316,
+  "all_source_files_unchanged": true,
+  "modified_files": [],
+  "private_xdg": true,
+  "execution_policy": "require_escalated",
+  "log_sha256": "e011d6a2a034a26f4bd292606b9838fc462cf79c1bc76bf4ac343f42cc82a8b3",
+  "scope": "Exact source ZIP, fresh isolated actual Main source-contact/landing/rebound/shared-HP/cold/deferred-fuel/save/recovery test. Repeated portability checks excluded from current distinct total. No Android device execution.",
+  "ok": true
+}
