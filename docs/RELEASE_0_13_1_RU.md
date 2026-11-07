@@ -2,8 +2,8 @@
 
 Кандидат **0.13.1-map-alpha1 / Android code 37** меняет только визуальное
 представление галактической карты. Runtime зафиксирован; настоящий ARM64
-APK собран и технически проверен. Подготовка точного source ZIP и новых
-неизменяемых HTTPS-ссылок ещё выполняется владельцем публикации.
+APK собран и технически проверен. Точный source ZIP и неизменяемые HTTPS-ссылки опубликованы и проверены
+повторным скачиванием.
 Материалы 0.13.0 остаются неизменными.
 
 Цель дальнейшей работы — **100% соответствие выбранному оригиналу FFE**.
@@ -95,3 +95,14 @@ S23 Ultra ещё не проверен; desktop-кадры не измеряют
 Подпись кандидата остаётся TEST; полный выпуск игры и магазинная
 готовность не заявлены. Старый план содержит блоки 9, 11, 12, 13 и 14;
 их количество не является сроком или процентом готовности 100% клона.
+
+## Получить сборку и аудит
+
+[APK](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/StarFrontier-0.13.1-map-arm64.apk) · [Исходники ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/StarFrontier-0.13.1-map-source.zip) · [Аудит ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/FFE-parity-audit-2026-11-07.zip).
+
+Коммит исходников `c5d61229d579dc738aca6f5b45c570e5444fa836`, артефактов `fe920fceab88e02a0bfffdd9c7f185fd1df49368`.
+Свежий импорт и обычный изолированный запуск source ZIP — 10/0;
+29 465 942 байт, меньше 32 МиБ. Все три опубликованных архива, манифест,
+capture manifest и 8 PNG скачаны заново, SHA/размеры/CRC совпали.
+[Доказательство](../validation/modern-map-publication-2026-11-07/verification.json).
+Полная FFE, оригинальные страницы описаний и проверка S23 Ultra ещё не завершены.

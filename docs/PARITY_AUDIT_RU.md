@@ -187,3 +187,6 @@ FOR/поверхность/док/добыча; экономика/службы;
 Полная готовность требует закрытия всей матрицы, получения отсутствующих
 оригинальных медиа для соответствующего издания и проверки устройства.
 Обоснованной даты и процента полного релиза сейчас нет.
+
+Комплект отчётов и машинных реестров: [скачать ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/FFE-parity-audit-2026-11-07.zip).
+Исходники текущей реконструкции: [скачать ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/StarFrontier-0.13.1-map-source.zip).

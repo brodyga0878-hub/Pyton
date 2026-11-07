@@ -1,0 +1,110 @@
+{
+  "started_utc": "2026-11-07T10:25:15.324377+00:00",
+  "version": "0.13.1-map-alpha1",
+  "artifact_commit": "fe920fceab88e02a0bfffdd9c7f185fd1df49368",
+  "source_commit": "c5d61229d579dc738aca6f5b45c570e5444fa836",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/manifest.json",
+      "http_status": 200,
+      "bytes": 8114,
+      "sha256": "1e5c9bfbb9cec7e5dc1a175080ebcf3b3a79557d8fef98fb1feb776eccb1ad0f"
+    },
+    {
+      "file": "StarFrontier-0.13.1-map-arm64.apk",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/StarFrontier-0.13.1-map-arm64.apk",
+      "http_status": 200,
+      "bytes": 49765516,
+      "sha256": "7021ac20a6180edc73a6bc9110a07888560531d1d8f18689cfd9304e91f18c4f",
+      "zip_crc_verified": true
+    },
+    {
+      "file": "StarFrontier-0.13.1-map-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/StarFrontier-0.13.1-map-source.zip",
+      "http_status": 200,
+      "bytes": 29465942,
+      "sha256": "7588c52474ef115764d07b146e78decc195b32277c7ab7095b351f81a3e4ed3f",
+      "zip_crc_verified": true,
+      "source_commit_in_zip_comment": "c5d61229d579dc738aca6f5b45c570e5444fa836"
+    },
+    {
+      "file": "screenshots/capture-manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/screenshots/capture-manifest.json",
+      "http_status": 200,
+      "bytes": 4344,
+      "sha256": "98d7723da914951a8b8be4b403f51d4c79ec774a63553d865d5cde0b4f93aaa9"
+    },
+    {
+      "file": "screenshots/1440x720-01-sector.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/screenshots/1440x720-01-sector.png",
+      "http_status": 200,
+      "bytes": 190878,
+      "sha256": "ed0458b583d871d32775515eb11f2509f20c8ccabe4c374042fc110e6ed999b2"
+    },
+    {
+      "file": "screenshots/1440x720-02-galaxy.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/screenshots/1440x720-02-galaxy.png",
+      "http_status": 200,
+      "bytes": 175198,
+      "sha256": "fabf0853c4355e5cdea9677381e36e2895d5c4483b705ac9d68c6bbcc43d8824"
+    },
+    {
+      "file": "screenshots/1440x720-03-search-route.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/screenshots/1440x720-03-search-route.png",
+      "http_status": 200,
+      "bytes": 171243,
+      "sha256": "54d73e1e1ddef689b0ea0eff1417cf32f04b91facd036bc3e7b530f817829442"
+    },
+    {
+      "file": "screenshots/1440x720-04-unreachable-route.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/screenshots/1440x720-04-unreachable-route.png",
+      "http_status": 200,
+      "bytes": 209893,
+      "sha256": "a7d5f8afbd013adfaf26874e1265624b1cfcc4c65cc1d48f8f4796171487b08c"
+    },
+    {
+      "file": "screenshots/2316x1080-01-sector.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/screenshots/2316x1080-01-sector.png",
+      "http_status": 200,
+      "bytes": 404207,
+      "sha256": "0aea9e43aae026b11d2dc97887c85f3801717bf90388f4af4b4f8dfbd582b813"
+    },
+    {
+      "file": "screenshots/2316x1080-02-galaxy.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/screenshots/2316x1080-02-galaxy.png",
+      "http_status": 200,
+      "bytes": 341782,
+      "sha256": "3d0f1fa34e94f328d772a86173cd5f424ba45d9d19fa3a8a7bf4d57d6e3f34e4"
+    },
+    {
+      "file": "screenshots/960x540-01-sector.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/screenshots/960x540-01-sector.png",
+      "http_status": 200,
+      "bytes": 153204,
+      "sha256": "29fd9bd1b42114768c0d4e1a289cbd447cf75e385d3f91430db4ca964b2219c2"
+    },
+    {
+      "file": "screenshots/960x540-02-galaxy.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/screenshots/960x540-02-galaxy.png",
+      "http_status": 200,
+      "bytes": 136116,
+      "sha256": "e44adb04846256dd5977b2245f7c767ace46db6174db72fe25a1e6ebf788fae2"
+    },
+    {
+      "file": "FFE-parity-audit-2026-11-07.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/FFE-parity-audit-2026-11-07.zip",
+      "http_status": 200,
+      "bytes": 699079,
+      "sha256": "d2aeb61fa260021973d1697c912d67544d9882a587df9601345cca20ab892d30",
+      "zip_crc_verified": true,
+      "source_commit_in_zip_comment": "c5d61229d579dc738aca6f5b45c570e5444fa836",
+      "semantic_audit_documents": 6,
+      "gap_matrix_rows": 38
+    }
+  ],
+  "status": "verified",
+  "scope": "Actual complete HTTPS downloads; immutable manifest bytes, payload SHA256/length, ZIP CRC, source archive Git comment and screenshot hashes. Not physical Android execution.",
+  "completed_utc": "2026-11-07T10:26:42.581001+00:00",
+  "audit_archive_verified": true
+}
