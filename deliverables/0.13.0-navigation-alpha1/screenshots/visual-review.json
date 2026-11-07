@@ -1,0 +1,44 @@
+{
+  "version": "0.13.0-navigation-alpha1",
+  "reviewed_utc": "2026-11-07T08:22:09.547010+00:00",
+  "inspection_tool": "view_image",
+  "actual_scene": "scenes/main.tscn",
+  "viewports": [
+    [
+      1440,
+      720
+    ],
+    [
+      2316,
+      1080
+    ]
+  ],
+  "reviewed_image_count": 10,
+  "renderer": "Godot 4.6.3, OpenGL 4.5 Compatibility, Mesa 25.0.7 llvmpipe (LLVM 19.1.7, 256 bits)",
+  "hardware_gpu_benchmark": false,
+  "physical_phone_capture": false,
+  "composited": false,
+  "checks": 2191,
+  "failures": [],
+  "source_sha256_verified_after_capture": true,
+  "observations": [
+    "All ten final PNGs inspected individually through view_image.",
+    "Source-sector names no longer overlap each other in the shown native Sol neighbourhood; current and selected names remain visible.",
+    "System overview separates Earth and Sun names; Earth/Moon close view shows source surface and orbital port names.",
+    "Time controls, roll controls, measured station spin/docking telemetry and classic flight console are visible and readable in both viewport sizes.",
+    "Map and time-button rectangles stay in the viewport and do not overlap according to capture assertions.",
+    "Viewing maps does not advance the live clock or move the live ship; gameplay persistence is disabled in capture mode."
+  ],
+  "sha256": {
+    "1440x720-01-flight-time-roll.png": "84d2be34df1ef6c104bdc8d85a5876d9b58754284ae1df45b3656292cbcb1d39",
+    "1440x720-02-galaxy-sector.png": "f9a277080fdd49e823eab3bba7ce0fd1456f8f4285084381a099a033f856ccda",
+    "1440x720-03-galaxy-overview.png": "4549c0a727262bacd1eb85e5d10d85f5e47fddb4e1e3fd779561020d73f482ec",
+    "1440x720-04-system-overview.png": "d2eed6c9baa5b8a444c03a95ef971fc5d738b33f9a6c85fa37074a8a2258c80e",
+    "1440x720-05-system-earth-moon.png": "c66161526160706fe65fede55a9fb671f430cdd889088e14d6d0c758e2b83862",
+    "2316x1080-01-flight-time-roll.png": "a18b81f6455ecb8ece3bdacaa5653273fd3982042a76507cead18645255533c6",
+    "2316x1080-02-galaxy-sector.png": "f94f38f6cd760cb62459242f7948801f153d950cd20e4c90277058671268fb6a",
+    "2316x1080-03-galaxy-overview.png": "ddc78fda4b3fe614cc3e29112efee1980913f5c91a95533e6ae2a0a62e3c2376",
+    "2316x1080-04-system-overview.png": "01005f9ad23def99054fbfccdb13d3e3a34433f29a3cbb6ccf349a9c49ded2c5",
+    "2316x1080-05-system-earth-moon.png": "a47c058935caa14bd41e14b0c63cf2fc03ba1e63b2ddbbe295ac6b70e0682303"
+  }
+}

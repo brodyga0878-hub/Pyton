@@ -1,0 +1,20 @@
+{
+  "status": "passed",
+  "test_count": 41,
+  "failures": 0,
+  "errors": 0,
+  "duration_seconds": 0.351,
+  "recorded_moscow": "2026-11-07T11:18:11.378336+03:00",
+  "command": "python -m unittest tests.test_android_full_packaging",
+  "scope": "Explicit mocked archive and local-source contract checks; not actual APK signature/ARM64/export or physical-device validation. Main integration was still under development; actual frozen APK verification will be separate.",
+  "output_provenance": "Observed tool-output record; original raw stdout was not redirected to a file. This is not presented as an original engine log.",
+  "observed_output": "Ran 41 tests in 0.351s\nOK",
+  "verifier_sha256": "73d7d15103332a459e622135be70d1c93861b423793f5751bbe983182511bba4",
+  "test_source_sha256": "3b0905f0f0d1884eac12b41212f30b18f3d761b5c8298f36cebc630658b3cea2",
+  "navigation_modules_expected": 11,
+  "new_source_map_json_expected": 1,
+  "old_v34_v35_controls_retained": true,
+  "original_oracle_executed": false,
+  "physical_device_tested": false,
+  "new_exact_clock_restore_guard_tested": true
+}

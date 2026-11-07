@@ -1,0 +1,15 @@
+{
+  "test": "galactic_map_view",
+  "command": "godot --headless --path /workspace/Pyton --script res://tests/test_galactic_map_view.gd",
+  "exit_code": 0,
+  "checks": 3144,
+  "failures": 0,
+  "completed_utc": "2026-11-07T08:14:24.774143+00:00",
+  "log": "validation/navigation-2026-11-07/galaxy-view-labels.log",
+  "log_sha256": "e398dbf3d692cd633ee6b8b7f16c3be372008de46122c0a0e0897e8482d0e855",
+  "sources_sha256": {
+    "scripts/galactic_map_view.gd": "0c9f770f363410c9e5799db68914e3733c308af9c594366ce5b054014da5b7e0",
+    "tests/test_galactic_map_view.gd": "175f9511e631bbf0d0e062ad78c7b895042167c832fdc97094c203b10787ea67"
+  },
+  "scope": "Actual map-view tests, including real source marker and rendered label-rectangle layout regressions; headless test, not a physical phone benchmark."
+}

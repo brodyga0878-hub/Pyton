@@ -1,0 +1,68 @@
+{
+  "schema": "starfrontier-source-archive-portability-v1",
+  "started_utc": "2026-11-07T08:25:49.471834+00:00",
+  "archive_path": "/workspace/Pyton/deliverables/0.13.0-navigation-alpha1/StarFrontier-0.13.0-navigation-source.zip",
+  "archive_sha256": "24d5a592c920ce6785430577fef89126d11658ed5e168ae2dbe3cb8e88c9f57f",
+  "expected_archive_sha256": "24d5a592c920ce6785430577fef89126d11658ed5e168ae2dbe3cb8e88c9f57f",
+  "archive_bytes": 28766521,
+  "source_commit": "e4e8e7edccdb4422124f249365dfb8c99d135bb5",
+  "workspace": "/workspace/recovery/navigation-source-portability",
+  "source_project_path": "/workspace/recovery/navigation-source-portability/source/StarFrontier-0.13.0-navigation-source",
+  "fresh_extraction": true,
+  "private_xdg": true,
+  "apk_built": false,
+  "host_sdk_copied": false,
+  "commands": [
+    {
+      "name": "source-archive-import",
+      "started_utc": "2026-11-07T08:25:50.009129+00:00",
+      "finished_utc": "2026-11-07T08:25:56.631320+00:00",
+      "duration_seconds": 6.622196,
+      "command": [
+        "godot",
+        "--headless",
+        "--audio-driver",
+        "Dummy",
+        "--editor",
+        "--quit",
+        "--path",
+        "/workspace/recovery/navigation-source-portability/source/StarFrontier-0.13.0-navigation-source"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "log_path": "/workspace/Pyton/validation/navigation-2026-11-07/source-archive-import-restricted.log",
+      "log_sha256": "7d7ab4c8f0efbf8e6a949a147f7ea4995eceb1d4d07f3fb32ee0558188a8ad8e",
+      "log_bytes": 25102,
+      "error_markers": [
+        "ERROR: Condition \"_sock == -1\" is true. Returning: FAILED",
+        "ERROR: Condition \"err != OK\" is true. Returning: ERR_CANT_CREATE",
+        "ERROR: Condition \"_sock == -1\" is true. Returning: FAILED",
+        "ERROR: Condition \"err != OK\" is true. Returning: ERR_CANT_CREATE"
+      ]
+    }
+  ],
+  "ok": false,
+  "archive_commit_comment": "e4e8e7edccdb4422124f249365dfb8c99d135bb5",
+  "nested_historical_godot_projects": [
+    "StarFrontier-0.13.0-navigation-source/recovered-history/release_audit/project.godot"
+  ],
+  "archive_file_count": 1118,
+  "archive_crc_ok": true,
+  "archive_source_inventory_sha256": "d9c52b04f0bb2dd7312ba194557ada488da9b54bdfd0ef71965b4d739f3fe8e8",
+  "import_cache_before": false,
+  "project_godot_sha256": "634ec52da910101dce6e96fb230c1e06d7d50445b4a352e4f045ea29111e958a",
+  "startup_test_sha256": "ffaa0a4a6736da6409315e74753c15896e73d55e01348b42314652126f9b9c06",
+  "main_source_sha256": "61dd63e92cc7b2bebdb86859ccc5a8e5653f5376fbf0616d168f4c1ab4652d30",
+  "private_environment_overrides": {
+    "XDG_DATA_HOME": "/workspace/recovery/navigation-source-portability/source_full_startup/data",
+    "XDG_CONFIG_HOME": "/workspace/recovery/navigation-source-portability/source_full_startup/config",
+    "XDG_CACHE_HOME": "/workspace/recovery/navigation-source-portability/source_full_startup/cache"
+  },
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "import_cache_after": true,
+  "extracted_archive_files_unchanged": true,
+  "modified_archive_files": [],
+  "finished_utc": "2026-11-07T08:25:56.700222+00:00",
+  "execution_policy": "restricted",
+  "preserved_extraction_after_attempt": "/workspace/recovery/navigation-source-portability/source-restricted-import"
+}

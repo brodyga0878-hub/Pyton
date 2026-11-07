@@ -1,0 +1,317 @@
+{
+  "version": "0.13.0-navigation-alpha1",
+  "version_code": 36,
+  "created_moscow": "2026-11-07T11:27:35.907203+03:00",
+  "source_commit": "e4e8e7edccdb4422124f249365dfb8c99d135bb5",
+  "source_archive_scope": "Exact git archive -9 of all tracked project roots except deliverables/validation; includes runtime resources, tests/native fixtures/tools/docs/recovered-history/recovery. Excludes SDK/cache/signing keys/build outputs. Complete former project not found.",
+  "source_archive_files": 1269,
+  "source_archive_below_32MiB": true,
+  "source_archive_crc_verified": true,
+  "source_archive_fresh_import_passed": true,
+  "source_archive_isolated_native_startup_checks": 10,
+  "source_archive_isolated_native_startup_failures": 0,
+  "files": {
+    "README_RU.md": {
+      "bytes": 5041,
+      "sha256": "b935d2a68ace5a26282c82ad07d312a960bcdfff14eec6560aa386c99a42d6db"
+    },
+    "StarFrontier-0.13.0-navigation-arm64.apk": {
+      "bytes": 49757324,
+      "sha256": "b7f9e4c999fa75dc9f271a1b05514f9adde8c1af066910f8cee234168d990153"
+    },
+    "StarFrontier-0.13.0-navigation-source.zip": {
+      "bytes": 28766521,
+      "sha256": "24d5a592c920ce6785430577fef89126d11658ed5e168ae2dbe3cb8e88c9f57f"
+    },
+    "android-export.log": {
+      "bytes": 6210,
+      "sha256": "247dac47506869c5747d7d7a39ade350eeb77dee658ca2bc4a583b291a4604df"
+    },
+    "android-verification.json": {
+      "bytes": 89424,
+      "sha256": "052dbe1a098164bfa031447954ca0be8e66e415985794424cbe1bbeebd8c9e36"
+    },
+    "galaxy-view-labels-result.json": {
+      "bytes": 797,
+      "sha256": "b8b876ff89789bad1aeaf2483d82b1fb24a6682d3775d6dd473b7f8d5b02a58b"
+    },
+    "logs/app_transitions.log": {
+      "bytes": 120,
+      "sha256": "0c190763c029bb01bb6bb16c947fe7d80537e36b271d22fc91c468771ba45cd4"
+    },
+    "logs/block10_legacy.log": {
+      "bytes": 225,
+      "sha256": "ff897320664f7a4c248fd40679425b678863a9767dbf83ec724573dbdae2eae5"
+    },
+    "logs/bug_report_ui.log": {
+      "bytes": 116,
+      "sha256": "53986c8b036d06d79273fcf3e6b9f828751b9f9d8e3f6d11d9fecc5aeb4261cd"
+    },
+    "logs/classic_console_main.log": {
+      "bytes": 123,
+      "sha256": "fd1b59ff7ab0184ebb05c966c93c20e81d6f74731c727c273818a1dadac0b0b3"
+    },
+    "logs/departure_cycle.log": {
+      "bytes": 119,
+      "sha256": "503244e882c3ddaf35e1c7ece031b5ea621697508edc448a8d67c3741ad9729e"
+    },
+    "logs/diagnostics.log": {
+      "bytes": 164,
+      "sha256": "4a1a56e7a8b1ce527097eb423ec35342c22533a03298354ca5c172c3186032e4"
+    },
+    "logs/dock_service_actions.log": {
+      "bytes": 123,
+      "sha256": "e60587c8e9832253ed353bdfdd5869d492985f75243b47dc9d5e15aa991f30c1"
+    },
+    "logs/flight_console.log": {
+      "bytes": 118,
+      "sha256": "2833eda9720b8b638431c30397f32b73f56a9a735e477d50d1c74cdc7c5ece70"
+    },
+    "logs/flight_time_controller.log": {
+      "bytes": 128,
+      "sha256": "b53b43e65f62372860d06f939b76e493c80c702a3858896a93ee7acb915d7f76"
+    },
+    "logs/galactic_map_model.log": {
+      "bytes": 123,
+      "sha256": "eecef0ea4e4cae5ccfbeb156027976e2b77419e9fb12b6e6907408a471c98285"
+    },
+    "logs/galactic_map_view.log": {
+      "bytes": 122,
+      "sha256": "e398dbf3d692cd633ee6b8b7f16c3be372008de46122c0a0e0897e8482d0e855"
+    },
+    "logs/graphics_integration.log": {
+      "bytes": 123,
+      "sha256": "f6b6dc847918df771b6f2ac4b0b0f0537855cf6f5247269fadb9b1f4b8ea6d06"
+    },
+    "logs/graphics_scope.log": {
+      "bytes": 355,
+      "sha256": "b7ec54445dbb93814b7877b35fd9c0b18e5e17f8dcf4a62aa1fba3a09f2692bb"
+    },
+    "logs/native_navigation.log": {
+      "bytes": 121,
+      "sha256": "875e664e3e0605e0a71b2fabc284598e30216783875c466de66f2fc2dd78f140"
+    },
+    "logs/navigation_main.log": {
+      "bytes": 118,
+      "sha256": "341f62f03e5ea9792cb9e4caaf3261f7e61c57b9664e49fe27d12453ab4c12b6"
+    },
+    "logs/offpad_takeoff.log": {
+      "bytes": 118,
+      "sha256": "c48c9e6771737eaa3fd8bc350d0d769e9db501bed072ff6f936404a4e59951e0"
+    },
+    "logs/report_export.log": {
+      "bytes": 116,
+      "sha256": "6812fd589ef650008dacfb1d68e9ef1ccc3cf096f4197090ba20d44f039441fb"
+    },
+    "logs/rotating_dock_dynamics.log": {
+      "bytes": 126,
+      "sha256": "e5a535e82d5079a24b0a57c4f13f27374ff5203e5d80c59646c9b03c26cddea8"
+    },
+    "logs/save_touch.log": {
+      "bytes": 121,
+      "sha256": "4e005c6452779d4e0da1f581ec5c6c9adb329e96988074e1b55de70b58bb2c07"
+    },
+    "logs/source_console_pause.log": {
+      "bytes": 1713,
+      "sha256": "e9e5aad4687ae1787d77aeb5f163922cc925625584db422ea976ef2062eace04"
+    },
+    "logs/source_docking_flight.log": {
+      "bytes": 125,
+      "sha256": "9e7d3fcfbabb498d60a2a57cfb98e809d575c23d253807b9e78773011813fad8"
+    },
+    "logs/source_frame_kinematics.log": {
+      "bytes": 201,
+      "sha256": "54ed2931c93bd845bba0e9b1808231003787853b50c1cceec96cd8772f557b8e"
+    },
+    "logs/source_full_startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "logs/source_main_full.log": {
+      "bytes": 510,
+      "sha256": "4bacef67c64da3aacdfaf42c78f2214619d9d463e53a9c5f046f61042feffaa7"
+    },
+    "logs/source_motion_bridge.log": {
+      "bytes": 193,
+      "sha256": "d99dd7cfe1112eb96fd484294fdf123d4de622d24d45a719fe26ea5f0727b6ce"
+    },
+    "logs/source_motion_main_continuation.log": {
+      "bytes": 134,
+      "sha256": "ab033c9f87f6330cebe4b90aaefd83515c127b83a397d21d532ca38c4f152491"
+    },
+    "logs/source_motion_pipeline.log": {
+      "bytes": 127,
+      "sha256": "1507e5e91ec95e962203d7856c090b7dc70d1f9e9d7b0a8a5aa96e92ecb44666"
+    },
+    "logs/source_station_session.log": {
+      "bytes": 126,
+      "sha256": "6cb3b0ffdbe921621fb1617c9486cab4a962f3588e353f9f621910dc42db65f0"
+    },
+    "logs/surface_action_controls.log": {
+      "bytes": 126,
+      "sha256": "6c3e792791191a8b2d1acaf25f798e1476fb9c282f93c7304b97ebe4606b3d20"
+    },
+    "logs/system_map.log": {
+      "bytes": 7320,
+      "sha256": "f8d2e4677850eeedf26cf070162b2ba9086c7e2db6828a642855de7d35299cd9"
+    },
+    "logs/touch_actions.log": {
+      "bytes": 122,
+      "sha256": "0ac80d88cf2eb7f4966b4339da9f3a9e2a203ffaf18f4d9b9a82972cc9787a86"
+    },
+    "python-packaging-tests.json": {
+      "bytes": 1089,
+      "sha256": "313a4c0964c1d0f427c9c78d385e888338b89bedb59f7752ca75ec5b5671e468"
+    },
+    "runtime-freeze.json": {
+      "bytes": 41404,
+      "sha256": "9f0bbdc00f797209d4f817c91740dfb5a9fce05e17b39a252f7a6a7e401e629d"
+    },
+    "screenshots/1440x720-01-flight-time-roll.png": {
+      "bytes": 493659,
+      "sha256": "84d2be34df1ef6c104bdc8d85a5876d9b58754284ae1df45b3656292cbcb1d39"
+    },
+    "screenshots/1440x720-02-galaxy-sector.png": {
+      "bytes": 171368,
+      "sha256": "f9a277080fdd49e823eab3bba7ce0fd1456f8f4285084381a099a033f856ccda"
+    },
+    "screenshots/1440x720-03-galaxy-overview.png": {
+      "bytes": 129400,
+      "sha256": "4549c0a727262bacd1eb85e5d10d85f5e47fddb4e1e3fd779561020d73f482ec"
+    },
+    "screenshots/1440x720-04-system-overview.png": {
+      "bytes": 110878,
+      "sha256": "d2eed6c9baa5b8a444c03a95ef971fc5d738b33f9a6c85fa37074a8a2258c80e"
+    },
+    "screenshots/1440x720-05-system-earth-moon.png": {
+      "bytes": 91480,
+      "sha256": "c66161526160706fe65fede55a9fb671f430cdd889088e14d6d0c758e2b83862"
+    },
+    "screenshots/2316x1080-01-flight-time-roll.png": {
+      "bytes": 1145571,
+      "sha256": "a18b81f6455ecb8ece3bdacaa5653273fd3982042a76507cead18645255533c6"
+    },
+    "screenshots/2316x1080-02-galaxy-sector.png": {
+      "bytes": 355342,
+      "sha256": "f94f38f6cd760cb62459242f7948801f153d950cd20e4c90277058671268fb6a"
+    },
+    "screenshots/2316x1080-03-galaxy-overview.png": {
+      "bytes": 253079,
+      "sha256": "ddc78fda4b3fe614cc3e29112efee1980913f5c91a95533e6ae2a0a62e3c2376"
+    },
+    "screenshots/2316x1080-04-system-overview.png": {
+      "bytes": 221733,
+      "sha256": "01005f9ad23def99054fbfccdb13d3e3a34433f29a3cbb6ccf349a9c49ded2c5"
+    },
+    "screenshots/2316x1080-05-system-earth-moon.png": {
+      "bytes": 187184,
+      "sha256": "a47c058935caa14bd41e14b0c63cf2fc03ba1e63b2ddbbe295ac6b70e0682303"
+    },
+    "screenshots/README.md": {
+      "bytes": 2282,
+      "sha256": "5caf1160907cadcc60b0d16e78ddb48270f178a7429464f3f34e12eba0ea3ee3"
+    },
+    "screenshots/SHA256SUMS.txt": {
+      "bytes": 987,
+      "sha256": "1121839bd3c7df52badd27067d4039301f3370e19e34e65b6a5483e1d6ae9157"
+    },
+    "screenshots/capture-manifest.json": {
+      "bytes": 6995,
+      "sha256": "cc761582543e2b6508980619528217c2a1a84b1a305be1c959fab2d9e2956de1"
+    },
+    "screenshots/render.log": {
+      "bytes": 475,
+      "sha256": "fac342714e7ef52be5492d9b150e291b08d91c1ae45b832c0434e9f8444f5235"
+    },
+    "screenshots/visual-review.json": {
+      "bytes": 2407,
+      "sha256": "fd88c1fab197612c1652ff07244b5b8c9380ab6d706fe664a5a62ae06637c981"
+    },
+    "source-archive-import.log": {
+      "bytes": 24658,
+      "sha256": "eca7ee8bc440cdb208187d34911d931da3f882603f7c6e20729c34d9121b2817"
+    },
+    "source-archive-startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "source-archive-verification.json": {
+      "bytes": 3985,
+      "sha256": "6fae82ce79dea57340a101aecd626382b00e17e431b0d4a70168d02d97a1761e"
+    },
+    "source-console-pause-summary.json": {
+      "bytes": 2592,
+      "sha256": "5b8ec0bf7787c367c9af5c009a4f118faff5b62eb0e0213f6b82d349eb5aa6e3"
+    },
+    "system-map-labels-observed.json": {
+      "bytes": 12259,
+      "sha256": "fc4da00905b272a0f848aa9b32483daed9d6efdd57f6cd37e845ee34b822d420"
+    },
+    "validation-final.json": {
+      "bytes": 36243,
+      "sha256": "3d75b008db5ccf882ce94a37d01c59f37552cdac80d88759d4705c220bfcf105"
+    }
+  },
+  "checks": 60032,
+  "passed_suites": 31,
+  "failures": 0,
+  "validation_status": "passed",
+  "validation_report": "validation-final.json",
+  "validation_scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot. Final changed/fixed suites replace previous entries;31 unique groups, prior releases excluded.",
+  "python_packaging_unit_tests": 41,
+  "portability_checks_added_to_targeted_total": false,
+  "capture_checks": 2191,
+  "capture_checks_added_to_targeted_total": false,
+  "fresh_desktop_gles_frames_visually_inspected": 10,
+  "screenshots_are_phone_captures": false,
+  "renderer": "Godot4.6.3 Compatibility/OpenGL Mesa llvmpipe desktop software rendering",
+  "source_world_core_modules_verified": 59,
+  "classic_console_modules_verified": 4,
+  "main_shared_between_module_groups": true,
+  "navigation_modules_verified": 11,
+  "source_exact_json_verified": 22,
+  "runtime_material_maps": 51,
+  "package": "org.starfrontier.rebuild",
+  "abi": "arm64-v8a",
+  "min_sdk": 24,
+  "target_sdk": 36,
+  "debuggable": false,
+  "forbidden_permissions_absent": true,
+  "zip_and_elf_alignment_16k": true,
+  "test_key_only": true,
+  "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+  "galactic_and_system_graphical_maps_connected": true,
+  "time_rates": [
+    1,
+    10,
+    100
+  ],
+  "disabled_time_rates": [
+    1000,
+    10000
+  ],
+  "analog_phone_roll_connected": true,
+  "rotating_station_contact_connected": true,
+  "source_motion_live_scope": "Opt-in new Full Cobra, fixed natural parent; legacy saves without motion_session retain SI adapter. Full automatic FOR/player pipeline incomplete.",
+  "full_original_map_renderer": false,
+  "original_f903_complete": false,
+  "complete_original_physics": false,
+  "full_original_port_complete": false,
+  "physical_device_tested": false,
+  "production_signing_key_configured": false,
+  "production_release_ready": false,
+  "current_major_block": 9,
+  "block9_complete": false,
+  "remaining_major_blocks": [
+    9,
+    11,
+    12,
+    13,
+    14
+  ],
+  "mb4_integrated_gameplay": false,
+  "star_fuel_scoop_integrated": false,
+  "all_solid_body_landing_implemented": false,
+  "artifact_upload_authorized": true,
+  "publication_state_at_packaging": "Prepared for authorized GitHub backup; immutable HTTPS download verification recorded separately after upload."
+}

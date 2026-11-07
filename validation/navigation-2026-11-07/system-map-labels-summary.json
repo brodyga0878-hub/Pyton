@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-07T08:20:14.305663+00:00",
+  "updated_utc": "2026-11-07T08:20:16.304826+00:00",
+  "duration_seconds": 1.999,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-07T08:20:14.305663+00:00",
+      "duration_seconds": 1.999,
+      "requested_suites": [
+        "system_map"
+      ],
+      "executed_suites": [
+        "system_map"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 1,
+  "status": "passed",
+  "passed_suites": 1,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 2109,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "system_map",
+      "scope": "Original system hierarchy, sampled source orbits, isolated time forecast, moving ports and graphical map controls.",
+      "status": "passed",
+      "checks": 2109,
+      "failures": 0,
+      "executed_utc": "2026-11-07T08:20:14.307363+00:00",
+      "suite_source": {
+        "path": "tests/test_system_map.gd",
+        "bytes": 19859,
+        "sha256": "4d7f03449a330e790da1b62018b65cfcc5646fc11bda6164b7fa3668f05ac762"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_system_map.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.997,
+      "timed_out": false,
+      "output_bytes": 7320,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/navigation-2026-11-07/system-map-labels/logs/system_map.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ]
+}

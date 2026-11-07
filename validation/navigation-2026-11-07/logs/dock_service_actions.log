@@ -1,0 +1,10 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+ERROR: Switching menu pages detaches the previous services view and cancels its action ownership
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_dock_service_actions.gd:18)
+       [1] lifecycle_and_gating (res://tests/test_dock_service_actions.gd:135)
+       [2] reveal (res://tests/test_dock_service_actions.gd:41)
+       [3] settle (res://tests/test_dock_service_actions.gd:23)
+DOCK SERVICE ACTIONS TESTS: 63 checks, 1 failures

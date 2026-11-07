@@ -1,0 +1,239 @@
+{
+	"checks": 2191,
+	"failures": [],
+	"frames": [
+		{
+			"actual_scene": "scenes/main.tscn",
+			"composited": false,
+			"docking_telemetry_text": "Крен к проёму: -12.2° · вращение 2.09°/с\nОтносительная скорость 0.0 м/с",
+			"elapsed_days": 0.00000115740740740741,
+			"file": "1440x720-01-flight-time-roll.png",
+			"gameplay_progress_read": false,
+			"gameplay_progress_written": false,
+			"layout": "source_jjffe_systems_v4",
+			"map_kind": "",
+			"menu_visible": false,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"station_model": 80,
+			"time_text": "Ход времени ×1",
+			"view": "front",
+			"viewport": [
+				1440,
+				720
+			]
+		},
+		{
+			"actual_scene": "scenes/main.tscn",
+			"composited": false,
+			"elapsed_days": 0.00000115740740740741,
+			"file": "1440x720-02-galaxy-sector.png",
+			"gameplay_progress_read": false,
+			"gameplay_progress_written": false,
+			"layout": "source_jjffe_systems_v4",
+			"map_kind": "galaxy",
+			"menu_visible": false,
+			"overview": false,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"rendered_sector_labels": 30,
+			"selected_id": 111449880,
+			"source_system_count": 42,
+			"title": "СЕКТОРНАЯ КАРТА · (0, 0)",
+			"view": "front",
+			"viewport": [
+				1440,
+				720
+			]
+		},
+		{
+			"actual_scene": "scenes/main.tscn",
+			"composited": false,
+			"elapsed_days": 0.00000115740740740741,
+			"file": "1440x720-03-galaxy-overview.png",
+			"gameplay_progress_read": false,
+			"gameplay_progress_written": false,
+			"layout": "source_jjffe_systems_v4",
+			"map_kind": "galaxy",
+			"menu_visible": false,
+			"overview": true,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"selected_id": 111449880,
+			"source_system_count": 42,
+			"title": "ОБЗОР ГАЛАКТИКИ",
+			"view": "front",
+			"viewport": [
+				1440,
+				720
+			]
+		},
+		{
+			"actual_scene": "scenes/main.tscn",
+			"composited": false,
+			"elapsed_days": 0.00000115740740740741,
+			"file": "1440x720-04-system-overview.png",
+			"gameplay_progress_read": false,
+			"gameplay_progress_written": false,
+			"layout": "source_jjffe_systems_v4",
+			"map_kind": "system",
+			"menu_visible": false,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"preview_offset_days": 0.0,
+			"rendered_system_labels": 16,
+			"selected_id": "earth",
+			"source_body_and_port_count": 53,
+			"title": "Солнце · КАРТА СИСТЕМЫ",
+			"view": "front",
+			"viewport": [
+				1440,
+				720
+			]
+		},
+		{
+			"actual_scene": "scenes/main.tscn",
+			"composited": false,
+			"elapsed_days": 0.00000115740740740741,
+			"file": "1440x720-05-system-earth-moon.png",
+			"gameplay_progress_read": false,
+			"gameplay_progress_written": false,
+			"layout": "source_jjffe_systems_v4",
+			"map_kind": "system",
+			"menu_visible": false,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"preview_offset_days": 0.0,
+			"rendered_system_labels": 10,
+			"selected_id": "earth",
+			"source_body_and_port_count": 53,
+			"title": "Солнце · КАРТА СИСТЕМЫ",
+			"view": "front",
+			"viewport": [
+				1440,
+				720
+			]
+		},
+		{
+			"actual_scene": "scenes/main.tscn",
+			"composited": false,
+			"docking_telemetry_text": "Крен к проёму: -12.2° · вращение 2.09°/с\nОтносительная скорость 0.0 м/с",
+			"elapsed_days": 0.00000115740740740741,
+			"file": "2316x1080-01-flight-time-roll.png",
+			"gameplay_progress_read": false,
+			"gameplay_progress_written": false,
+			"layout": "source_jjffe_systems_v4",
+			"map_kind": "",
+			"menu_visible": false,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"station_model": 80,
+			"time_text": "Ход времени ×1",
+			"view": "front",
+			"viewport": [
+				2316,
+				1080
+			]
+		},
+		{
+			"actual_scene": "scenes/main.tscn",
+			"composited": false,
+			"elapsed_days": 0.00000115740740740741,
+			"file": "2316x1080-02-galaxy-sector.png",
+			"gameplay_progress_read": false,
+			"gameplay_progress_written": false,
+			"layout": "source_jjffe_systems_v4",
+			"map_kind": "galaxy",
+			"menu_visible": false,
+			"overview": false,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"rendered_sector_labels": 30,
+			"selected_id": 111449880,
+			"source_system_count": 42,
+			"title": "СЕКТОРНАЯ КАРТА · (0, 0)",
+			"view": "front",
+			"viewport": [
+				2316,
+				1080
+			]
+		},
+		{
+			"actual_scene": "scenes/main.tscn",
+			"composited": false,
+			"elapsed_days": 0.00000115740740740741,
+			"file": "2316x1080-03-galaxy-overview.png",
+			"gameplay_progress_read": false,
+			"gameplay_progress_written": false,
+			"layout": "source_jjffe_systems_v4",
+			"map_kind": "galaxy",
+			"menu_visible": false,
+			"overview": true,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"selected_id": 111449880,
+			"source_system_count": 42,
+			"title": "ОБЗОР ГАЛАКТИКИ",
+			"view": "front",
+			"viewport": [
+				2316,
+				1080
+			]
+		},
+		{
+			"actual_scene": "scenes/main.tscn",
+			"composited": false,
+			"elapsed_days": 0.00000115740740740741,
+			"file": "2316x1080-04-system-overview.png",
+			"gameplay_progress_read": false,
+			"gameplay_progress_written": false,
+			"layout": "source_jjffe_systems_v4",
+			"map_kind": "system",
+			"menu_visible": false,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"preview_offset_days": 0.0,
+			"rendered_system_labels": 16,
+			"selected_id": "earth",
+			"source_body_and_port_count": 53,
+			"title": "Солнце · КАРТА СИСТЕМЫ",
+			"view": "front",
+			"viewport": [
+				2316,
+				1080
+			]
+		},
+		{
+			"actual_scene": "scenes/main.tscn",
+			"composited": false,
+			"elapsed_days": 0.00000115740740740741,
+			"file": "2316x1080-05-system-earth-moon.png",
+			"gameplay_progress_read": false,
+			"gameplay_progress_written": false,
+			"layout": "source_jjffe_systems_v4",
+			"map_kind": "system",
+			"menu_visible": false,
+			"performance_benchmark": false,
+			"physical_phone_capture": false,
+			"preview_offset_days": 0.0,
+			"rendered_system_labels": 10,
+			"selected_id": "earth",
+			"source_body_and_port_count": 53,
+			"title": "Солнце · КАРТА СИСТЕМЫ",
+			"view": "front",
+			"viewport": [
+				2316,
+				1080
+			]
+		}
+	],
+	"source_sha256": {
+		"scripts/build_info.gd": "d21962339a0163101af9d8b5875b584b925b5daa37ec0fe617be0ca3c273a1af",
+		"scripts/galactic_map_view.gd": "0c9f770f363410c9e5799db68914e3733c308af9c594366ce5b054014da5b7e0",
+		"scripts/main.gd": "61dd63e92cc7b2bebdb86859ccc5a8e5653f5376fbf0616d168f4c1ab4652d30",
+		"scripts/system_map_view.gd": "0d438facab582699c852ee19107ea113c69fa56971978ca998930554c55f6a2d",
+		"tools/capture_navigation_block.gd": "434ec977abdaa4bb66bd51919cc24d424d6437d4f5b74b48b4b0c5f522d07191"
+	},
+	"started_utc": "2026-11-07T08:20:52",
+	"version": "0.13.0-navigation-alpha1"
+}

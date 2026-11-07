@@ -1,0 +1,31 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+SCRIPT ERROR: Invalid call. Nonexistent function 'elapsed_days' in base 'RefCounted (source_motion_bridge.gd)'.
+          at: _decode_state (res://scripts/main.gd:1045)
+          GDScript backtrace (most recent call first):
+              [0] _decode_state (res://scripts/main.gd:1045)
+              [1] maps (res://tests/test_navigation_main.gd:57)
+              [2] tap (res://tests/test_navigation_main.gd:25)
+              [3] touch (res://tests/test_navigation_main.gd:22)
+ERROR: Arrival after source charge remains strictly restorable
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_navigation_main.gd:14)
+       [1] maps (res://tests/test_navigation_main.gd:57)
+       [2] tap (res://tests/test_navigation_main.gd:25)
+       [3] touch (res://tests/test_navigation_main.gd:22)
+SCRIPT ERROR: Invalid call. Nonexistent function 'elapsed_days' in base 'RefCounted (source_motion_bridge.gd)'.
+          at: _decode_state (res://scripts/main.gd:1045)
+          GDScript backtrace (most recent call first):
+              [0] _decode_state (res://scripts/main.gd:1045)
+              [1] source_continuation (res://tests/test_navigation_main.gd:98)
+              [2] run (res://tests/test_navigation_main.gd:160)
+              [3] maps (res://tests/test_navigation_main.gd:90)
+ERROR: JSON Main restore retains every raw and IEEE64 fractional word exactly
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/test_navigation_main.gd:14)
+       [1] source_continuation (res://tests/test_navigation_main.gd:99)
+       [2] run (res://tests/test_navigation_main.gd:160)
+       [3] maps (res://tests/test_navigation_main.gd:90)
+NAVIGATION MAIN TESTS: 41 checks, 2 failures

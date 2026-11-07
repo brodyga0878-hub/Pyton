@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-07T08:12:47.055350+00:00",
+  "updated_utc": "2026-11-07T08:13:05.046430+00:00",
+  "duration_seconds": 17.991,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-07T08:12:47.055350+00:00",
+      "duration_seconds": 17.991,
+      "requested_suites": [
+        "source_console_pause"
+      ],
+      "executed_suites": [
+        "source_console_pause"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 1,
+  "status": "passed",
+  "passed_suites": 1,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 131,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "source_console_pause",
+      "scope": "Actual Worldv4 pending terrain worker publication is deferred during console pause and resumes without losing physical contact.",
+      "status": "passed",
+      "checks": 131,
+      "failures": 0,
+      "executed_utc": "2026-11-07T08:12:47.057256+00:00",
+      "suite_source": {
+        "path": "tests/test_source_console_pause.gd",
+        "bytes": 15261,
+        "sha256": "5af16b7609c35bab07fa0f01c0dd1722d36e06b346154ce71868011ce47ca0a0"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_console_pause.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 17.988,
+      "timed_out": false,
+      "output_bytes": 1713,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/navigation-2026-11-07/logs/source_console_pause.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ]
+}

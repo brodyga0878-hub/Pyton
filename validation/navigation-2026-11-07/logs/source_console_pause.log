@@ -1,0 +1,8 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+SOURCE CONSOLE PAUSE EVIDENCE: {"core_after":"(625.0, 187.5)","core_before":"(0.0, 812.5)","jobs_finished_after":2,"jobs_finished_before":1,"mock_geometry":false,"source_days":3.7700462962963,"source_model":129,"worker_real":true}
+SOURCE CONSOLE MODAL EVIDENCE: {"core_after":"(625.0, 187.5)","core_before":"(0.0, 812.5)","jobs_finished_after":4,"jobs_finished_before":3,"mock_geometry":false,"modal":"system","parked_altitude_after":0.00543273220420737,"parked_altitude_before":0.00543273220420737,"source_days":3.7700462962963,"source_model":129,"worker_real":true}
+SOURCE CONSOLE MODAL EVIDENCE: {"core_after":"(625.0, 187.5)","core_before":"(0.0, 812.5)","jobs_finished_after":6,"jobs_finished_before":5,"mock_geometry":false,"modal":"galaxy","parked_altitude_after":0.00543273220420737,"parked_altitude_before":0.00543273220420737,"source_days":3.7700462962963,"source_model":129,"worker_real":true}
+SOURCE CONSOLE MODAL EVIDENCE: {"core_after":"(625.0, 187.5)","core_before":"(0.0, 812.5)","jobs_finished_after":8,"jobs_finished_before":7,"mock_geometry":false,"modal":"menu","parked_altitude_after":0.00543273220420737,"parked_altitude_before":0.00543273220420737,"source_days":3.7700462962963,"source_model":129,"worker_real":true}
+SOURCE CONSOLE MODAL EVIDENCE: {"core_after":"(625.0, 187.5)","core_before":"(0.0, 812.5)","jobs_finished_after":10,"jobs_finished_before":9,"mock_geometry":false,"modal":"settings","parked_altitude_after":0.00543273220420737,"parked_altitude_before":0.00543273220420737,"source_days":3.7700462962963,"source_model":129,"worker_real":true}
+SOURCE CONSOLE PAUSE TESTS: 131 checks, 0 failures; 17.101s

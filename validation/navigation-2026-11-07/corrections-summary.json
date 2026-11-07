@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-07T08:15:06.404251+00:00",
+  "updated_utc": "2026-11-07T08:15:17.388652+00:00",
+  "duration_seconds": 10.984,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-07T08:15:06.404251+00:00",
+      "duration_seconds": 10.984,
+      "requested_suites": [
+        "navigation_main",
+        "source_motion_bridge",
+        "source_motion_main_continuation",
+        "dock_service_actions"
+      ],
+      "executed_suites": [
+        "navigation_main",
+        "source_motion_bridge",
+        "source_motion_main_continuation",
+        "dock_service_actions"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 2,
+  "status": "passed",
+  "passed_suites": 4,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 225,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "navigation_main",
+      "scope": "Actual Main graphical map selection/confirmation, forecast isolation, raw save continuation, phone roll, clock scheduling and legacy opt-in boundaries.",
+      "status": "passed",
+      "checks": 53,
+      "failures": 0,
+      "executed_utc": "2026-11-07T08:15:06.406797+00:00",
+      "suite_source": {
+        "path": "tests/test_navigation_main.gd",
+        "bytes": 12697,
+        "sha256": "134ccfc0534ce835429cdd2c0cdbae7272c96d073ae011df03d19ee159661d73"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_navigation_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 10.96,
+      "timed_out": false,
+      "output_bytes": 118,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/navigation-2026-11-07/corrections/logs/navigation_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_motion_bridge",
+      "scope": "Fixed natural-parent Cobra raw motion SI boundary, precise fractional continuation and strict restore; excludes automatic frame selection.",
+      "status": "passed",
+      "checks": 81,
+      "failures": 0,
+      "executed_utc": "2026-11-07T08:15:06.408486+00:00",
+      "suite_source": {
+        "path": "tests/test_source_motion_bridge.gd",
+        "bytes": 9931,
+        "sha256": "3db067941e7cfac7f9f9e8022a97cbef57955fad78ec9cf9ed34e4218e2d1678"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_motion_bridge.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.636,
+      "timed_out": false,
+      "output_bytes": 193,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/navigation-2026-11-07/corrections/logs/source_motion_bridge.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_motion_main_continuation",
+      "scope": "Actual Main three rotated savepoints retain exact next raw body, Q16 fraction, IEEE64 clock, ship pose and velocity.",
+      "status": "passed",
+      "checks": 28,
+      "failures": 0,
+      "executed_utc": "2026-11-07T08:15:07.045484+00:00",
+      "suite_source": {
+        "path": "tests/test_source_motion_main_continuation.gd",
+        "bytes": 3417,
+        "sha256": "98f30d43361747a56627170e76dbdaf1f3f7bbdefe53027ac2920899b2e5e728"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_motion_main_continuation.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.458,
+      "timed_out": false,
+      "output_bytes": 134,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/navigation-2026-11-07/corrections/logs/source_motion_main_continuation.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "dock_service_actions",
+      "scope": "Real Main service commands, current-context revalidation, touch/scroll lifecycle and game-state preservation.",
+      "status": "passed",
+      "checks": 63,
+      "failures": 0,
+      "executed_utc": "2026-11-07T08:15:08.503926+00:00",
+      "suite_source": {
+        "path": "tests/test_dock_service_actions.gd",
+        "bytes": 11298,
+        "sha256": "933f030cb852c277d832e4f69c47e7560a7fc1460d4812681f352b349cf7f817"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_dock_service_actions.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.931,
+      "timed_out": false,
+      "output_bytes": 123,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/navigation-2026-11-07/corrections/logs/dock_service_actions.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ]
+}
