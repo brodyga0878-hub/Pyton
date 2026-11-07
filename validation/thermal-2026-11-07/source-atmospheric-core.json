@@ -1,0 +1,58 @@
+{
+	"checks": 36294,
+	"domain_failures": {
+
+	},
+	"domains": {
+		"F1014": 692,
+		"F1014_damage": 9,
+		"F1016": 4,
+		"F1017": 4,
+		"F1530": 75,
+		"F953": 663
+	},
+	"evidence": [
+		{
+			"byte_instruction_proof_count": 8,
+			"domain_failures": {
+
+			},
+			"independent_native_literal_controls": 8,
+			"known_jjffe_differences": [
+				"JJFFE F1014 heat uses dt product and4096 cap with shifted22/19, DOS uses speed SAR11/5 minus gear-up adjustment per call",
+				"JJFFE comments out incremental F953 damage and adds heat bit0x8000 notification, absent in DOS",
+				"JJFFE signed drag cap0xFFFF differs from DOS unsigned0xFFFFF"
+			],
+			"native_cases": 1447,
+			"operations": {
+				"F1014": 692,
+				"F1014_damage": 9,
+				"F1016": 4,
+				"F1017": 4,
+				"F1530": 75,
+				"F953": 663
+			},
+			"scope": [
+				"F1014 original per-invocation heat; unsigned drag cap0xFFFFF; original wind branch",
+				"F953 shield/hull/equipment decision arithmetic; original F34/F35 variable bus and original F1530 RNG",
+				"F144/F148/sound/object lookup/F942/F952 are explicitly observed adapters, not full event/equipment/destruction implementations",
+				"F1014 operation observes F953 requests only; F1014_damage executes F953 core with those external adapters",
+				"F1530 uses fixture-local source seeds; no claim to reproduce the unported global AI/event RNG stream"
+			]
+		},
+		{
+			"caller_fixed_frequency_policy_proved_here": false,
+			"case": "source_frame_dependence",
+			"original_heat_cadence": "per F1014 invocation",
+			"zero_tick_heat_increment": 256
+		}
+	],
+	"failures": 0,
+	"schema": 1,
+	"scope": "Uploaded DOS F1014 heat/drag/wind, complete reserved F1016/F1017, F953 raw shield/hull and explicit external callback boundaries, F1530 pure seed transitions. No original destruction/equipment/module VM, shared global AI stream, phone cadence, SI flight integration or Android device proof.",
+	"sources": {
+		"core_sha256": "a9ccce9fa27a2354205f3b1c88a9108320f567742d44d84082635339bc9af4a9",
+		"fixture_sha256": "04cff4bc5d43c7eabda2ed4361a0ee8c0221cc1c432c8ea2dd33daad0d3b9025",
+		"test_sha256": "b4d5449197ab09e489a575d314df304dd7db720d33ae96dc23e06500388dd975"
+	}
+}

@@ -19,7 +19,7 @@ const MIN_BODY_CLEARANCE_10_M:=10000.0
 const MIN_BODY_CLEARANCE_100_M:=100000.0
 const MIN_STATION_DISTANCE_10_M:=20000.0
 const MIN_STATION_DISTANCE_100_M:=200000.0
-const BOOLEAN_KEYS:=["active","menu_open","busy","paused","source_world","manual_input","autopilot","landing","taking_off","docked","surface_active","combat_active","station_available"]
+const BOOLEAN_KEYS:=["active","menu_open","busy","paused","source_world","manual_input","autopilot","landing","taking_off","docked","surface_active","combat_active","station_available","atmospheric_hazard"]
 const NONNEGATIVE_KEYS:=["speed_mps","gravity_mps2","jump_remaining","transfer_remaining"]
 var requested_rate:=1
 var effective_rate:=1
@@ -48,6 +48,8 @@ static func safety_limit(context:Dictionary)->Dictionary:
 	if not bool(context.get("active",true)):return {"rate":0,"reason":"Приложение неактивно.","code":"inactive"}
 	for key in ["paused","menu_open","busy"]:
 		if bool(context.get(key,false)):return {"rate":0,"reason":"Симуляция приостановлена.","code":key}
+	if bool(context.get("atmospheric_hazard",false)):
+		return {"rate":1,"reason":"В атмосфере или при опасном нагреве доступно обычное время.","code":"atmospheric_hazard"}
 	for key in ["manual_input","autopilot","landing","taking_off","docked","surface_active","combat_active"]:
 		if bool(context.get(key,false)):return {"rate":1,"reason":"Управление, сближение или контакт требуют обычного времени.","code":key}
 	for key in ["jump_remaining","transfer_remaining"]:

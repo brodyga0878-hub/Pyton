@@ -1,0 +1,14 @@
+{
+  "reviewer": "/root/time_dynamics_impl/information_text_review/atmospheric_damage_reference",
+  "read_only": true,
+  "time_utc": "2026-11-07T20:29:46.735899+00:00",
+  "raw_resource_sha256": "b65e25e187ac4abe7e24325a78de3fe70c140395711127ee0076f9905222bcce",
+  "procedures": 8,
+  "original_instruction_bytes": 920,
+  "objdump_instruction_count": 286,
+  "profile_specifications_and_descriptor_pointers": 3,
+  "material_errors": 0,
+  "scope": "Independent DOS byte/descriptor/equipment/source-variant/caller-policy review; reviewed8test methods but executed no tests/native/runtime.60Hzadapter,existingheat1EC,localRNG,identityfilter and callback scope explicit.",
+  "native_oracle_executed": false,
+  "files_changed": false
+}

@@ -1,0 +1,26 @@
+{
+  "time_utc": "2026-11-07T20:49:11.704071+00:00",
+  "reviewer": "/root/time_dynamics_impl/information_text_review/atmospheric_damage_reference",
+  "read_only": true,
+  "material_blockers": 0,
+  "verifier_sha256": "03587c09deed3224ea0b80612afe5652839c94b2b393f02d55f936739b38d865",
+  "audited_runtime_sources": 17,
+  "required_integration_compiled_modules": 17,
+  "retained_information_compiled_modules": 3,
+  "protected_old_source_data": 10,
+  "shared_contact_dependencies": 16,
+  "unchanged_Main_functions": 14,
+  "original_DOS_anchors": 8,
+  "original_DOS_anchor_bytes": 920,
+  "new_mock_test_methods_reviewed": 27,
+  "native_fixture_domains": {
+    "DOS_atmospheric": 1447,
+    "pinned_JJFFE_speed_not_whole_DOS": 239
+  },
+  "findings": "No concrete preservation/disclosure blocker. Exactsource pins, retained Info/Hyper/Fuel payloads and all3 Fuel native pins preserved; old41 fixture exact16sources. Newdata allowed only>=42; >=42 strict dispatch retained. Mutation tests operate after copying inputs; mock/GDSC/native/device evidence boundaries explicit.",
+  "files_changed": false,
+  "tests_executed": false,
+  "native_oracle_executed": false,
+  "Godot_executed": false,
+  "APK_built": false
+}

@@ -1,0 +1,1958 @@
+{
+  "package": "org.starfrontier.rebuild",
+  "version": "0.17.0-atmosphere-alpha1",
+  "version_code": 42,
+  "apk": "starfrontier-rebuild-arm64-alpha.apk",
+  "bytes": 50038396,
+  "sha256": "8df3ed0fa1d790437bd536c16c7997ee18b263c39f462a6bad2716939e6fad63",
+  "abi": "arm64-v8a",
+  "min_sdk": 24,
+  "target_sdk": 36,
+  "signature_verified": true,
+  "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+  "test_key_only": true,
+  "zipalign_16k": true,
+  "elf_load_alignment": {
+    "lib/arm64-v8a/libc++_shared.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/arm64-v8a/libgodot_android.so": [
+      16384,
+      16384,
+      16384
+    ]
+  },
+  "forbidden_permissions_absent": true,
+  "debuggable": false,
+  "native_data_checked": true,
+  "native_data_assets": [
+    "ffe_ground_coordinates",
+    "ffe_ground_pads",
+    "ffe_ship_registry",
+    "ffe_world_models",
+    "ffe_worlds"
+  ],
+  "graphics_runtime_assets_sha256": {
+    "ship_visual.gdc": "eb7b6504f1db74a8aa0a88e4cc7b007166c1fd92af332874140e4526234d00b7",
+    "ship_hull.gdshader": "9e0820d3704a50d7f1769ee142ac56146e8c9cbf4b3d943f2fee32c8bb0e8994",
+    "ship_exhaust.gdshader": "7c99ef81f2cb6f371871d0affe1f07e5d80d47474ceee8a750d8a1a28c76b5ae",
+    "ship_halo.gdshader": "f1dfa4528e2ab40319e97e4c81226ed96c67452ced72326d675a4b4979783a3c",
+    "station_visual.gdc": "680495189eef4e188ef5dc6cc775046d263d027aadf40fb8f762dc9f506577bb",
+    "station_solar.gdshader": "6e9aa211d0a4d56646ca192c2f9fe424158a10f393381acd0e527342ef4be9ba",
+    "space_environment.gdc": "c29e7325a2c26d7eb64bc58a850caf976d890e0fe3aed46e6dd90e156cd2fdcf",
+    "asteroid_surface.gdshader": "4c7e9d95fb217d0189a01482b59714d7c98affec7c9a8e5a5056798b097b7df4",
+    "space_sky.gdshader": "f91797913b04ff61dc8897c27b477845607248e87f36363869c30fc39f5117bd",
+    "flight_theme.gdc": "0f18d0f4af096321e52e697e8d2bc0df6307246f653edcf4e462ed1aaaa4f488",
+    "flight_reticle.gdc": "2cfdbbb3309b07ec2a5496aa4fea2daaeee9abbf1a22e7404930b83ee95826cc"
+  },
+  "diagnostics_runtime_assets_sha256": {
+    "build_info.gdc": "e1fa6a3a476b8abdda4c165a3e57de853f2c39fd5e50b101f59c097b74d8cce2",
+    "game_diagnostics.gdc": "10f06c30507690b31f707e6c23eb13f02c48e74011c52e8b6a7d48f7529f68a3",
+    "diagnostics_logger.gdc": "f0e61955122e3fdf38a72261a51022a1fd12604ac6afca8ea57eaecce67515d9",
+    "report_export.gdc": "646bb7027e996505810ccac7902ec3e0414af9e3f0f34e71f6d22640f52afa59"
+  },
+  "material_assets": {
+    "runtime_sha256": "6c67d54a3054fd9d44ae01e1b3a7c89dfc4aa1c5ddd28304dd53ca18f4a4a359",
+    "maps": {
+      "painted_alloy/albedo": {
+        "source_png_sha256": "16f54465872aa464b0571f4d94f11080c9e6c6a3775ad2fb925ec70a746f0da1",
+        "runtime_resource": ".godot/imported/albedo.png-0c6e255ffe14735c6155b3301910d33f.ctex",
+        "runtime_bytes": 94162,
+        "runtime_sha256": "ec714c95909fc6dcc3cab63a8b9f6d744bfeb6c5df61e44a4f7a6e1e56a45870",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "painted_alloy/normal": {
+        "source_png_sha256": "6b001916c2790823c829482691631c0c5fb1016a0ff989430fe56065bb22f05a",
+        "runtime_resource": ".godot/imported/normal.png-756cef30cee9fd00c098a9af75bdd483.ctex",
+        "runtime_bytes": 376184,
+        "runtime_sha256": "4ca5eb550932c29f258f97d6f5dccc5cd06da4f15ce8d0201859d28346e3382f",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "painted_alloy/orm": {
+        "source_png_sha256": "66e91f1a16024894b27eb65f206fb316bff13c2f4bd289fabbcbf66317fc1c46",
+        "runtime_resource": ".godot/imported/orm.png-f3ebce7bd30d71f10a039eda6c5604df.ctex",
+        "runtime_bytes": 210098,
+        "runtime_sha256": "cdc34e772b571ebd49bf7894c755802f973db688cc42747b975ab5149d6d47ee",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "brushed_metal/albedo": {
+        "source_png_sha256": "52069a8050fc8077c10fcdd5b6625c83f4893b92287fffa56b4265644d52250e",
+        "runtime_resource": ".godot/imported/albedo.png-046b870a4a74553e0dbba33f47a5c027.ctex",
+        "runtime_bytes": 53384,
+        "runtime_sha256": "0d124f12cc80b5b1b95db4ba3a3f2badb82c02edc9b0fa0100bdba22e8e6bf62",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "brushed_metal/normal": {
+        "source_png_sha256": "e80164b02cb995b733ae07bcd246d4432c181ac898acca4c408fd73296d321e5",
+        "runtime_resource": ".godot/imported/normal.png-27bd409c304f7a14769176bc7abeafef.ctex",
+        "runtime_bytes": 156442,
+        "runtime_sha256": "e447d16aa01d129159fabfaa8e761e70221e8fbabc4bf51a6369e16d3799ba23",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "brushed_metal/orm": {
+        "source_png_sha256": "ae51b49d38a122d38aac40e36a2644808b4b4027bc17177404d96d44a691265f",
+        "runtime_resource": ".godot/imported/orm.png-b403516d4e30015973885251d600c69d.ctex",
+        "runtime_bytes": 73786,
+        "runtime_sha256": "da3c319b04fc23327d1844e3de0869030f67b88889077bb622c62f3e9dd776f5",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "concrete/albedo": {
+        "source_png_sha256": "873493e82b46536b4ca31c665e531afb731c46069a8f02962d9f2009eaf025af",
+        "runtime_resource": ".godot/imported/albedo.png-9f253d0a8dbae2b36aa8a36174b7dde4.ctex",
+        "runtime_bytes": 202830,
+        "runtime_sha256": "50ed2aca528b39bdf86b928b8f7ef78991e8aff5f6d4913ace06f992d78c6b6c",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "concrete/normal": {
+        "source_png_sha256": "45262cc50fe01cdeedbb90a9583625bd0db32e04a128a3eadbb7ad9c4554d1e8",
+        "runtime_resource": ".godot/imported/normal.png-537363d05f9224540b679bd4ae7c0abc.ctex",
+        "runtime_bytes": 667434,
+        "runtime_sha256": "92be1b1aa03147a8ee761920d0a869a78461b6ec5ca62cc2746625d1e47b1a5a",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "concrete/orm": {
+        "source_png_sha256": "9aacf5c445f30124e647b055f803b8d78f65a2e5cd774fecf8278efefaf2c0d2",
+        "runtime_resource": ".godot/imported/orm.png-d5a1d0fa4afc8055414b94f8f45432d9.ctex",
+        "runtime_bytes": 311640,
+        "runtime_sha256": "2cade2bbc8f39604e5e79bbee98932ae57af1ba9d69342c75ba94fbf695b9980",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "asphalt/albedo": {
+        "source_png_sha256": "c34a433a70152dce90512e5e7e0744f78d8b5042877bad2684a352b36695e374",
+        "runtime_resource": ".godot/imported/albedo.png-dca2209625d3985987fdc75ccab63bfc.ctex",
+        "runtime_bytes": 177784,
+        "runtime_sha256": "66d1c93df29cd458360b8559673a96bd56a21dba7f493aa0c938d6d4dc256443",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "asphalt/normal": {
+        "source_png_sha256": "87f838c51f7e26421fffbf794e9b7d772700b24c46939af868064e0b759692a4",
+        "runtime_resource": ".godot/imported/normal.png-1035f2cd74ecd046577f3b682fad0b90.ctex",
+        "runtime_bytes": 476068,
+        "runtime_sha256": "6e017f2c4f7343f4b77ee7b25f8aa6ca28184499eafb70c6f1295edff53c335e",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "asphalt/orm": {
+        "source_png_sha256": "5d163c654cba6dbd0632b32b2a3d0539885c7e411d972614d964ce9f89eb24eb",
+        "runtime_resource": ".godot/imported/orm.png-c11f50d9c6f5e38eedb23e3a42f3d0bf.ctex",
+        "runtime_bytes": 190516,
+        "runtime_sha256": "e9ac98ff1d35be60e30f866fa6d2f8526206ea083bbe4d16baa64ad3b6ace9bc",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "rock/albedo": {
+        "source_png_sha256": "f07a50247fc0499ecd138eb0ef6c3b8413a9f8ca9c0aadd22294ede23b26bc2c",
+        "runtime_resource": ".godot/imported/albedo.png-3ca92f8771892b8cdcd74e5b66ad69bc.ctex",
+        "runtime_bytes": 130334,
+        "runtime_sha256": "cc6039b7e6a0d9ca481eb42f7858eab9a52b4bf0c77ee3cd36c408e03eaee235",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "rock/normal": {
+        "source_png_sha256": "bb30d76c591be70dcde3bfc084f7a4e52c956c1a57e143686bf0c8382529bb4a",
+        "runtime_resource": ".godot/imported/normal.png-047a2b95bcf62403f7b2a333c4d34dd0.ctex",
+        "runtime_bytes": 396984,
+        "runtime_sha256": "fe66924fbb2b25d3dd93971da419f26ed751408633183f47638eac39fe2fade5",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "rock/orm": {
+        "source_png_sha256": "944e48f1e68119befe0bf9c5dc5e5b81f496db68d003d736afeaad6fd3d776aa",
+        "runtime_resource": ".godot/imported/orm.png-402c7d01a3ff334c295d8787222d1094.ctex",
+        "runtime_bytes": 180230,
+        "runtime_sha256": "9feb0439f0752149e1d56c4fa2355bfeee10a478abff1fc03f0261091e7b66b0",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "ice/albedo": {
+        "source_png_sha256": "7473ccaa9e1f3f69487e1580eb296c24d4f312ebb243a8286f16aee58fb08620",
+        "runtime_resource": ".godot/imported/albedo.png-066b987db03faca136d9737e74e6d77d.ctex",
+        "runtime_bytes": 217502,
+        "runtime_sha256": "89ed06ddfb6e053cc5796bcdaa6a0c3cd454723dbdecbf04d30320312a311190",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "ice/normal": {
+        "source_png_sha256": "a6c96d12f8d4e4ffd501bef30f69af8dbd287a27e1405a344409b39092da6bcb",
+        "runtime_resource": ".godot/imported/normal.png-26d4df54ee4880295d1345075819908c.ctex",
+        "runtime_bytes": 222964,
+        "runtime_sha256": "25ab09e8700c0d1e7dc3bdf87d664c5fa2897f5cc5691e5754faf9f216381abb",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "ice/orm": {
+        "source_png_sha256": "ccae7a8980bf1902d8656be541631f491a0de98377646751a94a3bae0d3c151e",
+        "runtime_resource": ".godot/imported/orm.png-63817564e96c31e36fec853a8cb3aee3.ctex",
+        "runtime_bytes": 104576,
+        "runtime_sha256": "63f9160e27d0e44a77a6eaebf3b2c2a7c6b2128b1333e60ed229ae4d28829cc0",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "rubber/albedo": {
+        "source_png_sha256": "1ef38a321e51170b890e09a4c9c77e8240b0fc6d9a6a7ee00ff5fc2587232b21",
+        "runtime_resource": ".godot/imported/albedo.png-95d1c6bbfe0e811793f31f175a37389a.ctex",
+        "runtime_bytes": 125068,
+        "runtime_sha256": "3e4b436c8bf5a6af1946da3efadf3f0d7fa509452295b8ee97384f8d1a848d01",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "rubber/normal": {
+        "source_png_sha256": "a5bbc92c4fc529fb0ef65dba823ae06fff0e1cc965f750ed8a91194e9511f5ac",
+        "runtime_resource": ".godot/imported/normal.png-5225058e54915a3240e140479a5b6498.ctex",
+        "runtime_bytes": 346710,
+        "runtime_sha256": "821c901cbccc757a594e2eefa6f0ded3318c6a777d5ba4ebf746da03cb54165d",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "rubber/orm": {
+        "source_png_sha256": "8fd3ec3f55aa2a27afe8b3ea5b1f7492c77eff222723aeb0af28feb18519a10b",
+        "runtime_resource": ".godot/imported/orm.png-77de7af176305fc5267a5ae45a3e0a15.ctex",
+        "runtime_bytes": 241394,
+        "runtime_sha256": "21dd2e81768a488480f95d761ece3aa996c24f5d460fc064a26a792d359dfc8c",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "glass/albedo": {
+        "source_png_sha256": "19f46ccc170ac5cdaae1b2470e36350268abe09f967e301151029ea3a7daaa2a",
+        "runtime_resource": ".godot/imported/albedo.png-156c20cfd941c98349ed49970f60099d.ctex",
+        "runtime_bytes": 11246,
+        "runtime_sha256": "d7d9e2baf6432598e578ea64dc300ca95de52139e8e91e37a5c1680a5d499ac0",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "glass/normal": {
+        "source_png_sha256": "74f2525fcad42d873f6bda5afb6c2b327d227129f17a8c2a910a167280d49109",
+        "runtime_resource": ".godot/imported/normal.png-b6a22047a93ed03ffb8ed5a9c9ea88fd.ctex",
+        "runtime_bytes": 70924,
+        "runtime_sha256": "264fc3c1b3868d5ed977aac2382fe9377cde03625e3e89f7cc14d92e1b586d02",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      },
+      "glass/orm": {
+        "source_png_sha256": "1a073513e54240596600437ac743a2bd6e0003d961864f2685dcdfa3c025ad9f",
+        "runtime_resource": ".godot/imported/orm.png-6951e4af45508790951bb46e26ecec72.ctex",
+        "runtime_bytes": 31608,
+        "runtime_sha256": "f8c100847abf9f06997475f9a139253a0f47c297b20942f9b8ce4e48f8c71ec9",
+        "width": 512,
+        "height": 512,
+        "mipmap_import_enabled": true
+      }
+    },
+    "map_count": 24
+  },
+  "surface_detail_assets": {
+    "runtime_sha256": "0ac723bea4a58ecd7abd94afc0d578b6bf8d5783e34f616499aa4f5026b2df71",
+    "manifests": {
+      "ships": {
+        "source_sha256": "635c355901ba9311e5d244a1624ffd4f3dd5e1c2de7424ed54430e4caacb4280",
+        "runtime_path": "assets/assets/surface_details/ships/manifest.json"
+      },
+      "station": {
+        "source_sha256": "7d1c95dec02dd51987b0111b2a65f420090441529ab5f88a020810145fc867e8",
+        "runtime_path": "assets/assets/surface_details/station/manifest.json"
+      }
+    },
+    "maps": {
+      "ships/cobra/albedo": {
+        "source_png_sha256": "fe18b7cdd30efe229b90bebbfaea4badf4378be3ca2323957b0f331dea0eb264",
+        "source_png_bytes": 677521,
+        "runtime_resource": ".godot/imported/albedo.png-60d8231fc414ff591d121d328932636c.ctex",
+        "runtime_bytes": 648670,
+        "runtime_sha256": "9467a86b508454e7b1ac4dbd79cca1216447c22f7e5ae9bac84e5728b8d46979",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ships/cobra/normal": {
+        "source_png_sha256": "d87c0ac3ef5f520b4589e9360ec45a449b4f1338e84e270ec0f5a90bdb7358ce",
+        "source_png_bytes": 164206,
+        "runtime_resource": ".godot/imported/normal.png-6b235c4a99000b8cbe8351d91a8af65f.ctex",
+        "runtime_bytes": 211398,
+        "runtime_sha256": "23c35cd3b60441687bacb016e56932bcfeb8c4215a23f365db480a178d8b391c",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ships/cobra/orm": {
+        "source_png_sha256": "3ee033cdf2380d146eeadef4f0604a1f7dcd362daa8893f2c5b260c8bf47dcd1",
+        "source_png_bytes": 113047,
+        "runtime_resource": ".godot/imported/orm.png-f1dd54478a77cf135f2b41e65c36dd48.ctex",
+        "runtime_bytes": 143256,
+        "runtime_sha256": "ceb21f5b98d58d317cc38fa6570a8b5d086a8a1909e76637a539777b17b623ac",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ships/eagle/albedo": {
+        "source_png_sha256": "cdceadb95bebc72c8af8acd6983658667c0189560f0b2c1da5b487cb7201d905",
+        "source_png_bytes": 681548,
+        "runtime_resource": ".godot/imported/albedo.png-058663806f4e9de324d705549f7c8587.ctex",
+        "runtime_bytes": 649500,
+        "runtime_sha256": "cbbc5439d66499d9a247249e67a04e42feada59cbedb17862ca4dc3631359c02",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ships/eagle/normal": {
+        "source_png_sha256": "3336ff074edf33eeab2905ab7dfd315ea5c6580ff7b517a4d323f24b301b9eb1",
+        "source_png_bytes": 167629,
+        "runtime_resource": ".godot/imported/normal.png-8e3b1e5fad3717ca838a5b820378c425.ctex",
+        "runtime_bytes": 214300,
+        "runtime_sha256": "2f4117e4f8c6c94371cfd2157fcdf796ca37a3a32766e29e7e30183b0fbe8c1b",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ships/eagle/orm": {
+        "source_png_sha256": "5ab0c4bb4a7d642e175bc528909f3e4381e6e7da854fb14685d67283c161684f",
+        "source_png_bytes": 114662,
+        "runtime_resource": ".godot/imported/orm.png-abcd2fe01e39e3943d6bb59b87c1eeae.ctex",
+        "runtime_bytes": 143502,
+        "runtime_sha256": "92a18877a6a7b44cb1395c5b20f7bdfc4a690b1ec214ef3e0e00f8dbc88d844c",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ships/shuttle/albedo": {
+        "source_png_sha256": "8864fbfeae5f82846c6c3df010a29114de9d875116b8a7877616ba31e8e96012",
+        "source_png_bytes": 677766,
+        "runtime_resource": ".godot/imported/albedo.png-5edcde93808289e9b41fd24a2123f3d4.ctex",
+        "runtime_bytes": 645922,
+        "runtime_sha256": "706a55f555419b37050f4d78f038c5d26339b464efa7ac2665215aaebc4312c8",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ships/shuttle/normal": {
+        "source_png_sha256": "fdf49877ab7f0127974616a860e28f2b61233471eccc0bc87cb1d3a3614318c9",
+        "source_png_bytes": 162012,
+        "runtime_resource": ".godot/imported/normal.png-172552d16e1f10b9d7b183dcf0af1926.ctex",
+        "runtime_bytes": 210054,
+        "runtime_sha256": "62ab4534dbae0c83322bc7ecc47ff687c6672405ba466e0dda124e6f13fcc27c",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ships/shuttle/orm": {
+        "source_png_sha256": "044f932dccfb565f2e35a6aadd5ef9609b90b40d0a2198fc524a62ac9148e927",
+        "source_png_bytes": 112524,
+        "runtime_resource": ".godot/imported/orm.png-f1b1940052795ff31966398b60a14bbf.ctex",
+        "runtime_bytes": 140734,
+        "runtime_sha256": "eb4b727803057f6fc7fec9509649a92096011ee79698a99838ede9c9ddeb884b",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "station/albedo": {
+        "source_png_sha256": "7eff9d51005d10e7fe582dc4430e85bf288640308504fe7603622b8542ef2c9d",
+        "source_png_bytes": 199350,
+        "runtime_resource": ".godot/imported/albedo.png-a43f167ac0f2585f27982713ce9987ed.ctex",
+        "runtime_bytes": 272596,
+        "runtime_sha256": "57843fa24a1623d0b14df08469fd9272ad66f11e8917b402bc55bbd2cef22fc0",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "station/normal": {
+        "source_png_sha256": "3a85b42255686ddcbfc697e3c00e17bd70550025d76c0160cb8c5cbf70a42d6b",
+        "source_png_bytes": 342644,
+        "runtime_resource": ".godot/imported/normal.png-1b0108e6246ce049665dca773e9096da.ctex",
+        "runtime_bytes": 574382,
+        "runtime_sha256": "d52f7dc7eddb24e0e76679606cae0ce2bbf22640cd03ec08decd304357f1b7af",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "station/orm": {
+        "source_png_sha256": "4e7b41f13f26c8731061e7b3deb228e91a999640fe34bd88bd760d9df3f386e4",
+        "source_png_bytes": 297853,
+        "runtime_resource": ".godot/imported/orm.png-a1863a1a423bc2a626971de5b266e43b.ctex",
+        "runtime_bytes": 425740,
+        "runtime_sha256": "013379458e1a41b16a846ba2e8d1d5f162caab1b5fa7f6111ec1803e174d2fbd",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      }
+    },
+    "map_count": 12
+  },
+  "city_surface_assets": {
+    "manifest_sha256": "3cf93fe506d5abb12c870347da5140109d97732514e8c0a48f35df1b57ab1b44",
+    "runtime_manifest": "assets/assets/city_surfaces/manifest.json",
+    "runtime_assets_sha256": {
+      "city_surface_library.gdc": "7b4b961a9c5f9caf5a389066a2ee32a273246920120bbc0d7bb8d3898000078d",
+      "city_material_roles.gdc": "113d82f3afa672c8655838d2e1287bab56ba80bb3bef0786a857a00939fce8f6",
+      "source_model_visual.gdc": "0ab03df14972c75157e92a05659d96b9d914bebc630df859f13d7fd59fe133ba",
+      "source_city_view.gdc": "4fa13146f857ee6145520475dab4b125411001918d0ccc003c30bd5415e4b037",
+      "source_model.gdshader": "50d24307abf77a4c2128a13ed76d4495ec73be30b15bb776cf4849ea92f95039"
+    },
+    "maps": {
+      "albedo": {
+        "source_png_sha256": "46080062e17bd0fb65a95b427b4f3a5641bc9135e5cf818dde3071baac2cb822",
+        "source_png_bytes": 596091,
+        "runtime_resource": ".godot/imported/albedo.png-c7afb95875b1c2de8dd198eab07dfc24.ctex",
+        "runtime_bytes": 720800,
+        "runtime_sha256": "83b06a4071f061aa47c541738f1631fbc0d390406c423624379cccebc53f24b6",
+        "width": 2048,
+        "height": 2048,
+        "mipmap_import_enabled": true
+      },
+      "normal": {
+        "source_png_sha256": "5abde4a87d7a2270e3e8e3944ef8b74b90e1e1cf88c2463dfa53b911c37f76b0",
+        "source_png_bytes": 566466,
+        "runtime_resource": ".godot/imported/normal.png-7233c6da70c4df72894206dccce9db8e.ctex",
+        "runtime_bytes": 685422,
+        "runtime_sha256": "77f85e198aaba4ecc023f7bffd5c7c74da8b6e27b5feeaa0e4b2c582f1d4fc19",
+        "width": 2048,
+        "height": 2048,
+        "mipmap_import_enabled": true
+      },
+      "orm": {
+        "source_png_sha256": "817c575883d3e380f5a4b491fdbe14907bcf5c3af16de7d5f89a10a6a94ef962",
+        "source_png_bytes": 461972,
+        "runtime_resource": ".godot/imported/orm.png-5092a5207753478775b50ca82902076d.ctex",
+        "runtime_bytes": 630004,
+        "runtime_sha256": "d89e5a6f2a5da1146f7f6e9592d47d83d192d6a7f24629b2e9d10e9cf04fd250",
+        "width": 2048,
+        "height": 2048,
+        "mipmap_import_enabled": true
+      }
+    },
+    "map_count": 3
+  },
+  "world_surface_assets": {
+    "manifest_sha256": "390391393381752105f824321a1ea5186cab2683bc103bf6761d9bfb35a5b1e6",
+    "runtime_manifest": "assets/assets/world_surfaces/manifest.json",
+    "runtime_assets_sha256": {
+      "world_surface_library.gdc": "886ddcb6e7a6c38df087556104c011a345ce45e66cb06cf06693d5501434d9c9",
+      "surface_visual.gdc": "5728f012af5917944154e7df346c21de9013de247525631df98ba78453e08d15",
+      "celestial_renderer.gdc": "2736ff45bc47015fa5e7084de78200adc5fede3e2b5d56b6e7b65734695d657f",
+      "terrain.gdshader": "cc4940dab7625f4af4a70181dcfcf5fa6c9e42fc71dc2d0c7f8615a98c4f4443",
+      "terrain_transition.gdshader": "3e110c62eafb224342b863bc71a1b9cb9f5584b196d9e5584f7812c620952cc6",
+      "planet.gdshader": "c076faf23a1ba06a61060f9066a73b221b89a7b4cd2c1adfc7781b9034a998ad"
+    },
+    "maps": {
+      "earth/albedo": {
+        "source_png_sha256": "44d51d80cdafd253b92c019bccca1e0e31f3ef3663ff36903eb9ec5792a7f258",
+        "source_png_bytes": 849016,
+        "runtime_resource": ".godot/imported/albedo.png-f61eec341a48cff94587e17556b8bd7b.ctex",
+        "runtime_bytes": 1014212,
+        "runtime_sha256": "d6fb7584c2176a36c39da8c1801e0332166d130bb0f255e54be9a3bb96a98042",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "earth/normal": {
+        "source_png_sha256": "cda378b31bd962e81ed2f84ce25a098a0cf82c95561cc3d144409eb970785740",
+        "source_png_bytes": 1056950,
+        "runtime_resource": ".godot/imported/normal.png-56bf8ad99c9d9378b4fa14a58309aaf6.ctex",
+        "runtime_bytes": 1417724,
+        "runtime_sha256": "56d886ddb9f6c0fc09f9fb098cc456857b6d48b0ca7d3d032a655064bb30d33c",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "earth/orm": {
+        "source_png_sha256": "060a42ebc2aa8e010033c39065ac8e5d2af11060024032c8cbbdbe98fdb82914",
+        "source_png_bytes": 645434,
+        "runtime_resource": ".godot/imported/orm.png-5ae400a84a7c3d9736821661e895b702.ctex",
+        "runtime_bytes": 801642,
+        "runtime_sha256": "46bbcc9845f32c9276e83da538783e8d4533d4f9d46bc2d7dd95ff1a5e85dacf",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "rock/albedo": {
+        "source_png_sha256": "ab87abd92bc7e160de97723a1cddfc29ab9f5bbb7cdc5d0ba74cdb3fde24987f",
+        "source_png_bytes": 820947,
+        "runtime_resource": ".godot/imported/albedo.png-21ed65075b57b555b4d87f85083468b7.ctex",
+        "runtime_bytes": 911246,
+        "runtime_sha256": "32bbe76d4fe1c0fdeb5344a371db1d0d82db9044de4c93ca591c9568fd96f939",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "rock/normal": {
+        "source_png_sha256": "5cbee4649d5e3f63687f5d2ea6f750687340602b6e4a116e9877984c255776a3",
+        "source_png_bytes": 957497,
+        "runtime_resource": ".godot/imported/normal.png-7fa20f84f2cdfe3af0fac9811b50f31b.ctex",
+        "runtime_bytes": 1314402,
+        "runtime_sha256": "82a9d455c61ba4eb4f42a6aa1674d7a43dc4551947cd48d16b4b6e264e7a557c",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "rock/orm": {
+        "source_png_sha256": "e94b71f50aa1ff02a155e466a61b63ebb8e538df30493399a0b32ad9afb73546",
+        "source_png_bytes": 507514,
+        "runtime_resource": ".godot/imported/orm.png-4a290131e338117f1c3b1598b53a0ae2.ctex",
+        "runtime_bytes": 657874,
+        "runtime_sha256": "d642a30f943c58ad9cf7f3daed976d3835c7cf8264a1677ff588cbfacc857e51",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "desert/albedo": {
+        "source_png_sha256": "01a3e4f236acabe01192596373d858844477314d6b297b454a3f8ef8052100ac",
+        "source_png_bytes": 877732,
+        "runtime_resource": ".godot/imported/albedo.png-278cc5263b331d654604f3bafb4caa94.ctex",
+        "runtime_bytes": 910250,
+        "runtime_sha256": "9aa4a414a709d7a2eadf66b94b13a1a730d269bbc6e15d46989d359f9257d8a6",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "desert/normal": {
+        "source_png_sha256": "2fadba22305a4e52a94f08bb38d87adf27251efdee9898a2377083f51adc6edc",
+        "source_png_bytes": 1112536,
+        "runtime_resource": ".godot/imported/normal.png-f9ea63be202d3cbd53babe2237089e6a.ctex",
+        "runtime_bytes": 1356458,
+        "runtime_sha256": "588da0f33510d6dac550f2dc58130f57d3ff73d9870c9f72a31fc78a9112f7a1",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "desert/orm": {
+        "source_png_sha256": "d23403ae60c8931cba7d68aef5d8ac2da6d15ac0d3bd2cb9ef34262d0c748da3",
+        "source_png_bytes": 330112,
+        "runtime_resource": ".godot/imported/orm.png-8ef4e7e07295f820d234db6c2b5356e9.ctex",
+        "runtime_bytes": 406118,
+        "runtime_sha256": "4f38036bc8d5b424aa32af69f7d437cee3d1e7235bfceb4c2aa8b1ab934639c0",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ice/albedo": {
+        "source_png_sha256": "14d20f61d7a1e9e03c23ef4bee7742fedb83268e73d92182ca28aa75ad6a998f",
+        "source_png_bytes": 704756,
+        "runtime_resource": ".godot/imported/albedo.png-701b1c37fa5500049b7acc9b7ed6fd08.ctex",
+        "runtime_bytes": 862024,
+        "runtime_sha256": "eb1dbb883a55687d64b52937342a062517ae9e5443be2530f3e5b08be646b3d6",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ice/normal": {
+        "source_png_sha256": "5271e4439828ffea08eb332341087090c37a9c77d15994cac99cca4b9a2c0239",
+        "source_png_bytes": 683878,
+        "runtime_resource": ".godot/imported/normal.png-c5d89d89fed119aaf72056a3bdc3503f.ctex",
+        "runtime_bytes": 838002,
+        "runtime_sha256": "72c69fb1be649bd9536601ed62cd51c4059d81b445bab3b7a49fb7db99f6e97d",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      },
+      "ice/orm": {
+        "source_png_sha256": "45e744827c6b0ca553270a285743c3607ed8ba8558caf105b992773967ff3cd9",
+        "source_png_bytes": 450911,
+        "runtime_resource": ".godot/imported/orm.png-41de001e407d27f33dd8a4359870afb8.ctex",
+        "runtime_bytes": 570516,
+        "runtime_sha256": "05dd854d0f2e6a1a2a97985c0a1d8aa830ff9d9290fbd597fe3c8a7f6d6ebfd9",
+        "width": 1024,
+        "height": 1024,
+        "mipmap_import_enabled": true
+      }
+    },
+    "map_count": 12
+  },
+  "source_world_runtime_assets": {
+    "scripts_sha256": {
+      "source_body_factory.gdc": "a44e78018ecdebf5dfc2546dd670c4bf4d1ac2fc06b08a7bf6ad8708212a1415",
+      "handcrafted_runtime_builder.gdc": "9d4d0fb1f97361d1dab8464a71ca8f913cafe6ae87f0c02d1aa8efd584f97b26",
+      "source_clock.gdc": "d34a98baee27cd92109b5e8d437faf1e0f271f255822436bd1b0de245a7fecfd",
+      "stellar_body_factory.gdc": "0a03e07d11e6bd19b679b74920e301b7f17ea7b184502475b66d141d31472117",
+      "planetary_classifier.gdc": "1e1ecb82536866795b01f0bbfd00fc5989ab0dd78e60f16447f3119cbc7f2efe",
+      "body_initializer.gdc": "c0535098808c02329cfb6fdbca7416d54a3d8ab87d9b744cab0d7b6b4d0d1316",
+      "ffe_math.gdc": "71b775716d8058d7ef54c29cc7a99a4b2ae75e6f8342482b6c859ff1a0aee986",
+      "planetary_system.gdc": "01d53597cc246d6faa122cd543d710d7d4eb04d089b6de3ae8371e38aab42dcd",
+      "flight_console.gdc": "9a6e23bbac62dc4f394b657870325d688a1b4b09f1216c7e88f18b43b607d859",
+      "main.gdc": "df3328c3537f23287542023b084849642bc4b56f7c53dfc68c6c514766a8950b"
+    },
+    "data": {
+      "ffe_handcrafted_records": {
+        "runtime_path": "assets/data/ffe_handcrafted_records.json",
+        "bytes": 35246,
+        "source_json_sha256": "f0aff6be8bc15580d698f2fa3fe6b886474d107a2dc09394c07c84cf6f3489da",
+        "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72"
+      },
+      "ffe_stellar_factory": {
+        "runtime_path": "assets/data/ffe_stellar_factory.json",
+        "bytes": 1217,
+        "source_json_sha256": "0f8899757618392aeb5a40ec8a559e21625bc5701e0dcc545bd88942971a77cb",
+        "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72"
+      },
+      "ffe_math": {
+        "runtime_path": "assets/data/ffe_math.json",
+        "bytes": 12555,
+        "source_json_sha256": "4166407ada817e8abfbd6e501ad12bac1a75977ee4d0c66fe727adb3aea8cce5",
+        "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72"
+      }
+    },
+    "clock_constants": {
+      "EPOCH_DAY_U32": 1187063,
+      "EPOCH_TICK_U32": 2147483648,
+      "TICKS_PER_DAY": 4294967296,
+      "TICKS_PER_DISPLAY_SECOND": 49710
+    }
+  },
+  "source_orbit_runtime_assets": {
+    "scripts": {
+      "source_orbit": {
+        "runtime_path": "assets/scripts/source_orbit.gdc",
+        "runtime_bytes": 6815,
+        "runtime_sha256": "c6577c798aec4951bcae5f5a633b48aa5a123b8b101af3366c6c774734b88800",
+        "local_source_sha256": "7091ed3bbb88e79434ce21d53b3c98bf7f01391ee8a20a736c5e7c56eef55579"
+      },
+      "planetary_system": {
+        "runtime_path": "assets/scripts/planetary_system.gdc",
+        "runtime_bytes": 34324,
+        "runtime_sha256": "01d53597cc246d6faa122cd543d710d7d4eb04d089b6de3ae8371e38aab42dcd",
+        "local_source_sha256": "f243ebb2699bce714386e87ca32bfdb35709a2c9c45178cac9fa6cb8874abc62"
+      },
+      "main": {
+        "runtime_path": "assets/scripts/main.gdc",
+        "runtime_bytes": 66271,
+        "runtime_sha256": "df3328c3537f23287542023b084849642bc4b56f7c53dfc68c6c514766a8950b",
+        "local_source_sha256": "62e77b1f2d64fcdd5e1604876f883965cae635df3906b895226549cab41b4f2b"
+      },
+      "source_clock": {
+        "runtime_path": "assets/scripts/source_clock.gdc",
+        "runtime_bytes": 2017,
+        "runtime_sha256": "d34a98baee27cd92109b5e8d437faf1e0f271f255822436bd1b0de245a7fecfd",
+        "local_source_sha256": "b2d206a9e2e6db21635fe37d6f61ba75d2fb9f56d92f8851a77c9b11fc4dbe09"
+      },
+      "source_units": {
+        "runtime_path": "assets/scripts/source_units.gdc",
+        "runtime_bytes": 508,
+        "runtime_sha256": "152c3fff5db4dd70b1e9ab9d785c755bd862b7d9702ddff60eb14b9f999fdbe5",
+        "local_source_sha256": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24"
+      },
+      "ground_coordinates": {
+        "runtime_path": "assets/scripts/ground_coordinates.gdc",
+        "runtime_bytes": 2043,
+        "runtime_sha256": "0fc702896119b7f1857dafb79ca7b611ea77d7b1db73dde97c8bc39230bc4646",
+        "local_source_sha256": "54dedcc157dea6c84c4f8ad6ff0859159d81719cafbbaa23c626cd94e1cdf7b6"
+      },
+      "ffe_math": {
+        "runtime_path": "assets/scripts/ffe_math.gdc",
+        "runtime_bytes": 3707,
+        "runtime_sha256": "71b775716d8058d7ef54c29cc7a99a4b2ae75e6f8342482b6c859ff1a0aee986",
+        "local_source_sha256": "d3cb103361e4039fd2b0942d84af042d69c9e19b8a856c7d830b82827827f228"
+      },
+      "handcrafted_runtime_builder": {
+        "runtime_path": "assets/scripts/handcrafted_runtime_builder.gdc",
+        "runtime_bytes": 2502,
+        "runtime_sha256": "9d4d0fb1f97361d1dab8464a71ca8f913cafe6ae87f0c02d1aa8efd584f97b26",
+        "local_source_sha256": "783d29e8968be93a3d4818c30291f34cd17905f2363948c39feca795dab4b994"
+      }
+    },
+    "data": {
+      "ffe_worlds": {
+        "runtime_path": "assets/data/ffe_worlds.json",
+        "bytes": 62587,
+        "source_json_sha256": "71b4a250d100d689edceb575a26f9c837013759387f4f653d8dd04ed8843dbc8",
+        "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72"
+      },
+      "ffe_handcrafted_records": {
+        "runtime_path": "assets/data/ffe_handcrafted_records.json",
+        "bytes": 35246,
+        "source_json_sha256": "f0aff6be8bc15580d698f2fa3fe6b886474d107a2dc09394c07c84cf6f3489da",
+        "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72"
+      },
+      "ffe_ground_coordinates": {
+        "runtime_path": "assets/data/ffe_ground_coordinates.json",
+        "bytes": 175461,
+        "source_json_sha256": "e94e9ec86761aa1d775498a2959af201f3c6497506da481c9d49ca7f27766abf",
+        "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72"
+      },
+      "ffe_math": {
+        "runtime_path": "assets/data/ffe_math.json",
+        "bytes": 12555,
+        "source_json_sha256": "4166407ada817e8abfbd6e501ad12bac1a75977ee4d0c66fe727adb3aea8cce5",
+        "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72"
+      },
+      "world_names_ru": {
+        "runtime_path": "assets/data/world_names_ru.json",
+        "bytes": 4861,
+        "source_json_sha256": "cf3c02277698c0744e4012cc04edd4e480c3a2b247a7d3ced434a1e02e7d0b51"
+      }
+    },
+    "startup_contract": {
+      "normal_startup_layout": "source_jjffe_systems_v4",
+      "user_new_game_layout": "source_jjffe_systems_v4",
+      "automated_and_helper_layout": "handcrafted_jjffe_ports_v3",
+      "legacy_saved_layouts_retained": [
+        "handcrafted_analytic_rebuild_v1",
+        "handcrafted_jjffe_orbits_v2",
+        "handcrafted_jjffe_ports_v3",
+        "reconstructed_solar_v1",
+        "source_unavailable_rebuild_v1"
+      ]
+    },
+    "source_variant": "jjffe-7e54034-q31-orbit",
+    "native_contract": "jjffe-f880-3250-anchor-f866-orbit-xyz-v1",
+    "layouts": {
+      "NATIVE_LAYOUT": "handcrafted_jjffe_orbits_v2",
+      "SOURCE_LAYOUT": "handcrafted_analytic_rebuild_v1",
+      "SOLAR_LAYOUT": "reconstructed_solar_v1",
+      "EMPTY_LAYOUT": "source_unavailable_rebuild_v1",
+      "PORT_LAYOUT": "handcrafted_jjffe_ports_v3",
+      "FULL_LAYOUT": "source_jjffe_systems_v4"
+    },
+    "new_game_requested_layout": "source_jjffe_systems_v4",
+    "epoch_anchor": {
+      "tick_u32": 2147483648,
+      "day_u32": 1187063,
+      "source_clock_constants_agree": true,
+      "world_calls_evaluate_from_epoch": true
+    },
+    "retained_local_physics_adapter": "analytic_si_rebuild_v1",
+    "metres_per_raw": 0.0010004639625549316,
+    "active_scope": "Fixed-epoch native F880 initialization followed by ordinary F866 orbital updates, source clock and parent translations; retained analytic SI radius/mass/gravity/spin and legacy saved layouts.",
+    "complete_original_physics": false,
+    "compiled_source_correspondence_rebuilt_by_verifier": false,
+    "native_fixture": {
+      "local_path": "tests/fixtures/source_orbit_native.json",
+      "bytes": 7140949,
+      "sha256": "9ccb21258ad4ec5796de75bb357d63f4f7711312ca61f06200d89480f42fc0a9",
+      "provenance_checked": true,
+      "oracle_executed_by_apk_verifier": false,
+      "revision": "source-orbit-native-jjffe-q31-v1",
+      "source_variant": "jjffe-7e54034-q31-orbit",
+      "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+      "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+      "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+      "scope": "Pinned JJFFE F1507/F1508 Q31 position/interpolation, original F1506 radial and F1509/F1510 phase algorithms, the exact F880 rate/init slice, direct F1661 vector addition, and the ordinary pinned F866 orbital update slice. Position variant differs from uploaded DOS and is explicitly identified; no full F866 body policy, F880 allocation, F1677 hierarchy traversal, radius, gravity or SI claim.",
+      "source_procedure_hashes": {
+        "1333": "edef2f6e8e34a857f9e18e8dbebd4127fd89b78898d741a1c27c584a5867a10e",
+        "1338": "f8b728e9d8925572494ea8f215ab277d01aec974065a068fee4927bb6b3c9fcf",
+        "1341": "a51126c7423da785463e6cf7bfedccbfdb2bb14404423348093872999c07bbcc",
+        "1483": "b545046fd04ddfa9f4622cb2611b666d6c906b604407cac528803deadf48a365",
+        "1494": "7a06b90126d6f0ba51ea6f7fe0d8e2bdee7ebc4708e3dd171549b979b6f4e618",
+        "1496": "a379201f49886226373d086d2a5e383c0964cc9c00cd98b1101ac0c62eb37b9a",
+        "1506": "520ee4da8deafbc259fa987365108c28cf2f07751e3b6ad3508f55a0ef689df6",
+        "1507": "295d606480dfef51c853d50e0becf65b6cae00d0eb025f84ff0385868843810d",
+        "1508": "21fcef3c0e0d4cf0e16412ff1c8724dc0db0cbaa7a0aace1fa73f554a5c4d0db",
+        "1509": "1d4d4c994b8dfbb110bdfe42cc9a9665c630684f1326ee14a12bbae6cf9e209e",
+        "1510": "ff6aaf5c0f44f1c052d3fe292b281d68582f25f158018951bfc02c30208f4ed5",
+        "1521": "510fbc68cf8f12dbc208438c129012665e06909a0644b1112f8ec7009ceb207c",
+        "1661": "5d2a96ae2809d4a38bd70a4562944818f8576324862939da048ba0cf24e2dd05",
+        "1914": "21a48da39e035a618aa37b4fd15be416d5715700fa2fe4d12d58bbc0c911285a"
+      },
+      "pinned_procedure_hashes": {
+        "1333": "21169ed7f6ae5c55f135027b5d3fe379217ad43964826e1dfe139473d48d8deb",
+        "1338": "55008a114ed0ac90e39f23c70e51a1752dd994ddb0aa1ec4079931c6ba51ced7",
+        "1341": "e407fe8be68c2d9f3b6125c61911699896df3ffe206b909d806db78de63913fb",
+        "1483": "23954368ffea4508164e842849b8215bfb5185298dfc29ff776aa11ae7b8195f",
+        "1494": "d0a22095373aecab4d0dd2e9da98872a7186355d8413a5f31dbb627d9c1ca389",
+        "1496": "eb35e7ad980bbb205869e6b875d6ce10a30bceaeaec1cb857fa36debe1dbc442",
+        "1506": "e1dc7d2e9ae5dca11f76a6568f81ba640d6299d03d8407e34e0bd31602442a4a",
+        "1507": "9c4c67770162c18d43949430cb9ca93d8f0e71540e03dded29a167ba340f8420",
+        "1508": "2f773bcba7e98d70fae13381e99b3a17909d9eef590cdf773a8f80f894f1813d",
+        "1509": "aa39991a00f40174b167c984694d0a0aa21f7e91a32511579d288fb38ab26dfd",
+        "1510": "ec324d84cfbda37fa21ac7ffa119d036bb12e69426ee9b3571a595a673b2c26d",
+        "1521": "ba18bd552b16196d550b9a49e7b86be8fdc49bac0bdee173c0ae9132ad2f3e88",
+        "1661": "363054928605da0f3b97b42499d3f11e48ecbf646c931d4e9dd790dd8cec5941",
+        "1914": "2fec2b6bb618c1a2708966ad2ae676b977d6ce6b4aaf6d33cb6f83d2c586c5e3"
+      },
+      "dos_f880_rate_and_initialization_slice": {
+        "executable_offset": 175665,
+        "byte_length": 167,
+        "entry_signature": "66c745fc605466c745feeeff8b431450",
+        "executable_block_sha256": "ff3f2d00bf9a1dbb0a1fd196a4fcd48c029f7b0fc242c317267fe05300fa2513",
+        "pinned_executed_slice_sha256": "b5d31bf7583b811c527661638058a9437ff90076983eb7ab42300bc6bffcf63e",
+        "phase_call_word_order": "source F880 passes day as low and tick as high; source F866 delta uses ordinary tick-low/day-high order",
+        "pinned_full_f880_sha256": "eadefb99d4f924dae99771fb9a0a6d9ca7e689a955d2d3068bb1717b5469856d",
+        "host_entry_sha256": "a3089db37da6666131dda1bb83ad2599fe5171d9ddbb3d6fb421ec63d1b59445"
+      },
+      "pinned_f866_ordinary_orbital_slice": {
+        "pinned_executed_orbital_slice_sha256": "6cecfd7a495b6e685d980d85922cac04e887f7166233a4facaa6fbda71ecac69",
+        "pinned_full_f866_sha256": "9633119d2d4918b4d76aa0ad0bfa5e4b6c711f56fdb2142e7eb3c2754c8ba166",
+        "host_entry_sha256": "5ad14166def0a349c506acc1cfcd0f9cdea84cd06712963f93d0b97f2031b648",
+        "scope": "Ordinary orbital branch including phase add and pinned JJFFE recompute/interpolate dispatch; excludes selection by ship flags, shields and surface rotation",
+        "position_dispatch": "Pinned JJFFE jump recomputes F1507 whenever phase high word changes; F1508 interpolation arm remains present but unreachable in this pinned source"
+      },
+      "packed_record_fixture": "tests/fixtures/handcrafted_runtime_native.json",
+      "packed_record_fixture_sha256": "e09016da974e0e9e188bff12d463784bb2c1f2b23588bbe64632e137f8e486cd",
+      "case_count": 1760,
+      "vector_add_case_count": 50,
+      "epoch_update_case_count": 560,
+      "fresh_process_runs": 3,
+      "vector_add_fresh_process_runs": 3,
+      "epoch_update_fresh_process_runs": 3,
+      "epoch_update_reverse_repeat_count": 1120,
+      "epoch_single_step_matches_stepped": true,
+      "ordinary_epoch_tick_u32": 2147483648,
+      "ordinary_epoch_day_u32": 1187063,
+      "native_ordered_output_sha256": "9b0534ccd9be139ed4e99daa312fc9087838dfe190b06010707185470433d9ba",
+      "native_vector_add_output_sha256": "2b9ee4729fe0f6de0274a4808fbdedc921c60c5dfa9c84e6a9e877b9cf123bd4",
+      "native_epoch_update_output_sha256": "cdec4e7e0b8d21e3fc490ef3816b5b7989c6202b9781821c01eefbcc982ee16b",
+      "adapted_assembly_sha256": "a504419c20547728faee4831dd5d44b950eaed8b5fc3b61633a79aff9019458d",
+      "sine_sha256": "108cff65b3eb4788b94455d87b308a98c102d05f1b399871762c4e797a192265"
+    }
+  },
+  "source_physics_ports_runtime_assets": {
+    "scripts": {
+      "source_gravity": {
+        "runtime_path": "assets/scripts/source_gravity.gdc",
+        "runtime_bytes": 7082,
+        "runtime_sha256": "ae0b6779163dc0d494a817e88ac451e4540c14e92627aacb2d61dd123731b837",
+        "local_source_sha256": "058db4e5cbebd07e7420274ca07b24ccaec620f46c440081d1d6855326dc3872"
+      },
+      "source_orbit": {
+        "runtime_path": "assets/scripts/source_orbit.gdc",
+        "runtime_bytes": 6815,
+        "runtime_sha256": "c6577c798aec4951bcae5f5a633b48aa5a123b8b101af3366c6c774734b88800",
+        "local_source_sha256": "7091ed3bbb88e79434ce21d53b3c98bf7f01391ee8a20a736c5e7c56eef55579"
+      },
+      "planetary_system": {
+        "runtime_path": "assets/scripts/planetary_system.gdc",
+        "runtime_bytes": 34324,
+        "runtime_sha256": "01d53597cc246d6faa122cd543d710d7d4eb04d089b6de3ae8371e38aab42dcd",
+        "local_source_sha256": "f243ebb2699bce714386e87ca32bfdb35709a2c9c45178cac9fa6cb8874abc62"
+      },
+      "flight_model": {
+        "runtime_path": "assets/scripts/flight_model.gdc",
+        "runtime_bytes": 22603,
+        "runtime_sha256": "d95562153bb52ec0f4ded5add73ec1edfff39ab49a15d6956b42aa03c257fc67",
+        "local_source_sha256": "4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b"
+      },
+      "surface_model": {
+        "runtime_path": "assets/scripts/surface_model.gdc",
+        "runtime_bytes": 34279,
+        "runtime_sha256": "c2a366c073b5e4075eefc6f5881c2821603e3508434768fabbe31f5caf2517c0",
+        "local_source_sha256": "28fcc37fb4adc1291129fdd90fb685828992e5657eaeb891eff986c9d5f3d894"
+      },
+      "surface_orbit_link": {
+        "runtime_path": "assets/scripts/surface_orbit_link.gdc",
+        "runtime_bytes": 5804,
+        "runtime_sha256": "2c6e9773195d1ab8a86887dc49b74da20e24a24b1a7babae7d303b147c206189",
+        "local_source_sha256": "c1cffc1ea9ba6efc4ea88e3adcf0e6e84ec2a42ff830df6f3d8e23097ca1767c"
+      },
+      "main": {
+        "runtime_path": "assets/scripts/main.gdc",
+        "runtime_bytes": 66271,
+        "runtime_sha256": "df3328c3537f23287542023b084849642bc4b56f7c53dfc68c6c514766a8950b",
+        "local_source_sha256": "62e77b1f2d64fcdd5e1604876f883965cae635df3906b895226549cab41b4f2b"
+      },
+      "source_units": {
+        "runtime_path": "assets/scripts/source_units.gdc",
+        "runtime_bytes": 508,
+        "runtime_sha256": "152c3fff5db4dd70b1e9ab9d785c755bd862b7d9702ddff60eb14b9f999fdbe5",
+        "local_source_sha256": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24"
+      },
+      "source_clock": {
+        "runtime_path": "assets/scripts/source_clock.gdc",
+        "runtime_bytes": 2017,
+        "runtime_sha256": "d34a98baee27cd92109b5e8d437faf1e0f271f255822436bd1b0de245a7fecfd",
+        "local_source_sha256": "b2d206a9e2e6db21635fe37d6f61ba75d2fb9f56d92f8851a77c9b11fc4dbe09"
+      }
+    },
+    "startup_contract": {
+      "normal_startup_layout": "source_jjffe_systems_v4",
+      "user_new_game_layout": "source_jjffe_systems_v4",
+      "automated_and_helper_layout": "handcrafted_jjffe_ports_v3",
+      "legacy_saved_layouts_retained": [
+        "handcrafted_analytic_rebuild_v1",
+        "handcrafted_jjffe_orbits_v2",
+        "handcrafted_jjffe_ports_v3",
+        "reconstructed_solar_v1",
+        "source_unavailable_rebuild_v1"
+      ]
+    },
+    "source_variant": "jjffe-7e54034-gravity",
+    "port_layout": "handcrafted_jjffe_ports_v3",
+    "port_contract": "source-orbital-centres-station-following-v1",
+    "reported_layout_scope": "retained-v3-layout",
+    "dock_local_m": [
+      0.0,
+      0.0,
+      -2500.0
+    ],
+    "flight_dock_target_equal": true,
+    "source_epoch": {
+      "tick_u32": 2147483648,
+      "day_u32": 1187063
+    },
+    "active_scope": "Native orbital station centres in a non-rotating station-following frame; prepared F880 a4 fields and separately available raw F603/F1511/F1512 primitives.",
+    "live_gravity": "analytic_si_rebuild_v1",
+    "live_surface_radius": "analytic_si_rebuild_v1",
+    "source_time_accumulator_integrated": false,
+    "original_station_spin_integrated": false,
+    "original_dock_geometry_services_integrated": false,
+    "complete_original_physics": false,
+    "complete_original_docking": false,
+    "compiled_source_correspondence_rebuilt_by_verifier": false,
+    "native_fixture": {
+      "local_path": "tests/fixtures/source_gravity_native.json",
+      "bytes": 5111783,
+      "sha256": "8d12101d57b6792c465d84103c6d84cbf85a5d664b4287a9fc25da0dcd841405",
+      "provenance_checked": true,
+      "oracle_executed_by_apk_verifier": false,
+      "revision": "source-gravity-native-v1",
+      "source_variant": "jjffe-7e54034-gravity",
+      "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+      "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+      "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+      "scope": "Complete pinned F603 velocity/fraction update with actual F1532 parent lookup, F880 coefficient slice, complete F1511 and F1512 position integration. No complete world physics/frame selection, surface radius, source timer or SI bridge claim.",
+      "object_bytes": 338,
+      "object_bank_stride_bytes": 338,
+      "object_bank_header_bytes": 116,
+      "object_state_offsets": {
+        "position_signed64_xyz": 62,
+        "parent_index_u8": 86,
+        "velocity_signed32_xyz": 140,
+        "gravity_coefficient_packed": 164,
+        "velocity_fraction_u16_xyz": 236
+      },
+      "source_procedure_hashes": {
+        "603": "c8aa2ac35ed86ceb43a2d2b436eed2ee71e4ffa062cd115c097368653ef39d12",
+        "1333": "edef2f6e8e34a857f9e18e8dbebd4127fd89b78898d741a1c27c584a5867a10e",
+        "1338": "f8b728e9d8925572494ea8f215ab277d01aec974065a068fee4927bb6b3c9fcf",
+        "1466": "97a9205664d5f6ba66e2529cc4a47e09cfc53d4bf4ca802dece502aae882620c",
+        "1482": "6421f8fb33965b668e63add19057ff0ef27b2dc3a335bbf00e7710acb048d003",
+        "1483": "b545046fd04ddfa9f4622cb2611b666d6c906b604407cac528803deadf48a365",
+        "1496": "a379201f49886226373d086d2a5e383c0964cc9c00cd98b1101ac0c62eb37b9a",
+        "1502": "70024a92af33fcefb9139cf78ed9502cdb495d46b57023ea9fb4844f8685cbbb",
+        "1511": "6acf61268a2c59c791d0880f2beb6259e3d28743570501bbb0d2b4478a7573c5",
+        "1512": "4c501e809d530106733c54993d8924b60f5c49e0d775a749f30ec04b6e101844",
+        "1521": "510fbc68cf8f12dbc208438c129012665e06909a0644b1112f8ec7009ceb207c",
+        "1532": "efe7e306e908387d5e874bea14c78b4820e3a03b04f5814ea9a5101eda096d9d",
+        "1656": "493cc90ac90424f2bd426848876a9030837cca7930e09415c09cdf44dab1447e",
+        "1657": "39a68d41c24af6f183fa611215d875fa0138c38b81f392e6ec9bebd346c14db8",
+        "1658": "015c3cad4cf12ec28570fd53934ba78498f180411e24a11727be76fa863ea374",
+        "1660": "09a271eb193715732f14a27149382b6fd195b63f086be47be62176e1a9227cf6",
+        "1661": "5d2a96ae2809d4a38bd70a4562944818f8576324862939da048ba0cf24e2dd05"
+      },
+      "pinned_procedure_hashes": {
+        "603": "82184ab39ade4ac7a7b44a6dd9641769932115c124335ddbc37808b9f68b7b6a",
+        "1333": "21169ed7f6ae5c55f135027b5d3fe379217ad43964826e1dfe139473d48d8deb",
+        "1338": "55008a114ed0ac90e39f23c70e51a1752dd994ddb0aa1ec4079931c6ba51ced7",
+        "1466": "bf5fbee4fb8ad13cfc8fcbe236fc7d9e96abc3053b828adaf03974c78d99969c",
+        "1482": "8704a5d9f09a447245b73e8cc7f6fba62682b253eed73a1bc3ab00d185c35149",
+        "1483": "23954368ffea4508164e842849b8215bfb5185298dfc29ff776aa11ae7b8195f",
+        "1496": "eb35e7ad980bbb205869e6b875d6ce10a30bceaeaec1cb857fa36debe1dbc442",
+        "1502": "a36dbc4361d5c08d90acc5d61757b8f70f91fdf2c00652207dd20c5fb3112f8d",
+        "1511": "37c44c97e5032c946867094a0cdcd72e217ae0b9f03403feabe21be0e4032f38",
+        "1512": "18312c997239e82860ccb50c5f1abb91b9b584a3f4493bb5b53d7c5b6226fe85",
+        "1521": "ba18bd552b16196d550b9a49e7b86be8fdc49bac0bdee173c0ae9132ad2f3e88",
+        "1532": "d71a0a9a315f9665fa60e93265f9170c3a091c570b256fef3a10b2854a96a61e",
+        "1656": "8028d5932e8dc76e275d087a0d2bcdf71933ce37f2c46eb10f9eaffab6b482ea",
+        "1657": "80105830a24374a7e4eaed0b018a3ded7ea1d3608a1f0115863f4f9ab856a68b",
+        "1658": "5e2174efa19883a50b7414c465d83517734b026f7c6a4e236b9b895395c423a2",
+        "1660": "b1abc0348a8f4d6501015f06c045c4c7d0cb3927d7bc2d87feeade7e0d6540eb",
+        "1661": "363054928605da0f3b97b42499d3f11e48ecbf646c931d4e9dd790dd8cec5941"
+      },
+      "F880_coefficient_slice": {
+        "pinned_full_f880_sha256": "eadefb99d4f924dae99771fb9a0a6d9ca7e689a955d2d3068bb1717b5469856d",
+        "pinned_executed_slice_sha256": "1d1f61b8fe1be771c7910eec8cbc4ab14ee4f0959500f1a2d37b1d8536dd458e",
+        "host_entry_sha256": "fe73d57dd0142c772b59a9f256e4d6a00e7689c3b79dd1217f66b9d3bab3519a",
+        "scope": "Exact F880 packed coefficient initialization only; excludes allocation and da frame-selection adjustments"
+      },
+      "case_count": 1179,
+      "mass_case_count": 194,
+      "integration_case_count": 304,
+      "fresh_process_runs": 3,
+      "reverse_repeat_count": 1179,
+      "mass_reverse_repeat_count": 194,
+      "integration_reverse_repeat_count": 304,
+      "native_gravity_output_sha256": "fbb95a443f6ee37afd7bc0e93d2244a157731c4c394c8be5944606cf51d0ed65",
+      "native_mass_output_sha256": "09d435830396a47e320323842f835cb54c0e4342d80e2d5dad01136eb2963727",
+      "native_integration_output_sha256": "16143637739aac1a1eb10fd0c8a85bd8caa5e7492c1311cfa41fbe940f882875",
+      "adapted_assembly_sha256": "83853860e17b6e25c811bb73493346417fa166e03c9527d893eb485aacb1f724",
+      "input_fixtures_sha256": {
+        "tests/fixtures/handcrafted_runtime_native.json": "e09016da974e0e9e188bff12d463784bb2c1f2b23588bbe64632e137f8e486cd",
+        "tests/fixtures/source_orbit_native.json": "9ccb21258ad4ec5796de75bb357d63f4f7711312ca61f06200d89480f42fc0a9"
+      }
+    }
+  },
+  "source_full_runtime_assets": {
+    "scripts": {
+      "source_galaxy": {
+        "runtime_path": "assets/scripts/source_galaxy.gdc",
+        "runtime_bytes": 5514,
+        "runtime_sha256": "703845d185cdda614836dc6f70ffc6063d6aff9a39cc484003cf1905d67731fc",
+        "local_source_sha256": "5c258d5192e0797c76eab2e7a2653a3dd83954063d4fba58ed5bf0fa2f76d767"
+      },
+      "source_system_definition": {
+        "runtime_path": "assets/scripts/source_system_definition.gdc",
+        "runtime_bytes": 4954,
+        "runtime_sha256": "8260fbdb7e8948e75eb70bb0c421b09f56a00ef40c617f418592519970e0c86e",
+        "local_source_sha256": "cd18f93e6dac389ec8a8b63ff57538145e6568e679c334be29d2eea6ab87351a"
+      },
+      "source_system_metadata": {
+        "runtime_path": "assets/scripts/source_system_metadata.gdc",
+        "runtime_bytes": 3069,
+        "runtime_sha256": "ef946b87704d4f20db2a5a200148f2e3c6e270bf10993e8588ba7d32fc68ed2e",
+        "local_source_sha256": "b88716c16e6fa65cd6816232ad8ae46d3f148740ff03cc6570ba85df919ba5f4"
+      },
+      "source_system_builder": {
+        "runtime_path": "assets/scripts/source_system_builder.gdc",
+        "runtime_bytes": 10052,
+        "runtime_sha256": "06159212a952c34e8cbf87231a4fa19b492ec639cfcd639d478f8ca99af67758",
+        "local_source_sha256": "6edb1907655abe3f5ef4018d0eac6d90a41e01f19fcf8de71d6dddc452ebddf6"
+      },
+      "source_body_classifier_full": {
+        "runtime_path": "assets/scripts/source_body_classifier_full.gdc",
+        "runtime_bytes": 6341,
+        "runtime_sha256": "9368949928437319a3968a35169e125c367d269f2f13b6e488b884f2042114d0",
+        "local_source_sha256": "9422b1d908b7a72899c0edceab10eb751a2cd950894d9bc3c753f6fa633a9c4a"
+      },
+      "source_planet_names": {
+        "runtime_path": "assets/scripts/source_planet_names.gdc",
+        "runtime_bytes": 7169,
+        "runtime_sha256": "0ded81b8351b7cc087ee08eb545be106e6449cc2920f02969c52bd86e654305b",
+        "local_source_sha256": "976e7f40161d4cf8f394183aa78c17106066161f15cdfe08e8eb1db38bd5a05a"
+      },
+      "source_settlement_builder": {
+        "runtime_path": "assets/scripts/source_settlement_builder.gdc",
+        "runtime_bytes": 5833,
+        "runtime_sha256": "92a9888b6486004fc73a4266057cf474fa301ac29cbff0169fb0e36e3c5d76a1",
+        "local_source_sha256": "5196cc32c69768e713cfd7426c845f05f864759e833e62edeeab1a022e40d714"
+      },
+      "source_world_catalogue": {
+        "runtime_path": "assets/scripts/source_world_catalogue.gdc",
+        "runtime_bytes": 9656,
+        "runtime_sha256": "bd05a1879e44597a8073574333aa2da7522f91cbf50599a7f406a651e2502e62",
+        "local_source_sha256": "4b07a6f9f7fac455371a6ba378c70533df00a2080efbe608a824a5f3ddc4fbe0"
+      },
+      "source_body_factory": {
+        "runtime_path": "assets/scripts/source_body_factory.gdc",
+        "runtime_bytes": 10203,
+        "runtime_sha256": "a44e78018ecdebf5dfc2546dd670c4bf4d1ac2fc06b08a7bf6ad8708212a1415",
+        "local_source_sha256": "3a0ef33118bae74e198c0ea41f9b2064c1131eabed29a9f0625730a9c3515066"
+      },
+      "handcrafted_runtime_builder": {
+        "runtime_path": "assets/scripts/handcrafted_runtime_builder.gdc",
+        "runtime_bytes": 2502,
+        "runtime_sha256": "9d4d0fb1f97361d1dab8464a71ca8f913cafe6ae87f0c02d1aa8efd584f97b26",
+        "local_source_sha256": "783d29e8968be93a3d4818c30291f34cd17905f2363948c39feca795dab4b994"
+      },
+      "stellar_body_factory": {
+        "runtime_path": "assets/scripts/stellar_body_factory.gdc",
+        "runtime_bytes": 4357,
+        "runtime_sha256": "0a03e07d11e6bd19b679b74920e301b7f17ea7b184502475b66d141d31472117",
+        "local_source_sha256": "cb96e2a6b480f559a49dcbe4ead8a59c5a0b23c0fb6e95a2596a049121d4e144"
+      },
+      "planetary_classifier": {
+        "runtime_path": "assets/scripts/planetary_classifier.gdc",
+        "runtime_bytes": 2682,
+        "runtime_sha256": "1e1ecb82536866795b01f0bbfd00fc5989ab0dd78e60f16447f3119cbc7f2efe",
+        "local_source_sha256": "d8d419c2a15077766cb1393348c433e8b4e92efca48f6e723f2de938f590736c"
+      },
+      "body_initializer": {
+        "runtime_path": "assets/scripts/body_initializer.gdc",
+        "runtime_bytes": 2243,
+        "runtime_sha256": "c0535098808c02329cfb6fdbca7416d54a3d8ab87d9b744cab0d7b6b4d0d1316",
+        "local_source_sha256": "24fe4896190f8c2f1d4174b57f9966b7f16e6918f63cf5eb96a0ece538f8a5a8"
+      },
+      "body_rotation": {
+        "runtime_path": "assets/scripts/body_rotation.gdc",
+        "runtime_bytes": 2207,
+        "runtime_sha256": "42ed9a125283c19593a03a44a47fd9a710c5d4c59858300163188f45bf795003",
+        "local_source_sha256": "b5d4e63331728681d1f34c73fe83cdd57120e29b352e09090da4ff147b22ed34"
+      },
+      "ffe_math": {
+        "runtime_path": "assets/scripts/ffe_math.gdc",
+        "runtime_bytes": 3707,
+        "runtime_sha256": "71b775716d8058d7ef54c29cc7a99a4b2ae75e6f8342482b6c859ff1a0aee986",
+        "local_source_sha256": "d3cb103361e4039fd2b0942d84af042d69c9e19b8a856c7d830b82827827f228"
+      },
+      "source_clock": {
+        "runtime_path": "assets/scripts/source_clock.gdc",
+        "runtime_bytes": 2017,
+        "runtime_sha256": "d34a98baee27cd92109b5e8d437faf1e0f271f255822436bd1b0de245a7fecfd",
+        "local_source_sha256": "b2d206a9e2e6db21635fe37d6f61ba75d2fb9f56d92f8851a77c9b11fc4dbe09"
+      },
+      "source_units": {
+        "runtime_path": "assets/scripts/source_units.gdc",
+        "runtime_bytes": 508,
+        "runtime_sha256": "152c3fff5db4dd70b1e9ab9d785c755bd862b7d9702ddff60eb14b9f999fdbe5",
+        "local_source_sha256": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24"
+      },
+      "ground_coordinates": {
+        "runtime_path": "assets/scripts/ground_coordinates.gdc",
+        "runtime_bytes": 2043,
+        "runtime_sha256": "0fc702896119b7f1857dafb79ca7b611ea77d7b1db73dde97c8bc39230bc4646",
+        "local_source_sha256": "54dedcc157dea6c84c4f8ad6ff0859159d81719cafbbaa23c626cd94e1cdf7b6"
+      },
+      "source_orbit": {
+        "runtime_path": "assets/scripts/source_orbit.gdc",
+        "runtime_bytes": 6815,
+        "runtime_sha256": "c6577c798aec4951bcae5f5a633b48aa5a123b8b101af3366c6c774734b88800",
+        "local_source_sha256": "7091ed3bbb88e79434ce21d53b3c98bf7f01391ee8a20a736c5e7c56eef55579"
+      },
+      "source_gravity": {
+        "runtime_path": "assets/scripts/source_gravity.gdc",
+        "runtime_bytes": 7082,
+        "runtime_sha256": "ae0b6779163dc0d494a817e88ac451e4540c14e92627aacb2d61dd123731b837",
+        "local_source_sha256": "058db4e5cbebd07e7420274ca07b24ccaec620f46c440081d1d6855326dc3872"
+      },
+      "source_physics_bridge": {
+        "runtime_path": "assets/scripts/source_physics_bridge.gdc",
+        "runtime_bytes": 3236,
+        "runtime_sha256": "f01604c9fec8086fe0fc06703b80d5832fa84fc3e57d6e3325746cee8cac12b2",
+        "local_source_sha256": "c7b8550217fbce3925da741afeb3c7d58c841d91ab247c4994ecc1c45ac72262"
+      },
+      "source_ship_control_profile": {
+        "runtime_path": "assets/scripts/source_ship_control_profile.gdc",
+        "runtime_bytes": 3120,
+        "runtime_sha256": "0b721914bb738e7f493612dd9c4396f4b207873b9fb0f41d620b2418e0bea719",
+        "local_source_sha256": "de2d0aed1943af69160f16b4b4892fea37afbc97c707a7b0870bba9b1805562e"
+      },
+      "source_ground_surface": {
+        "runtime_path": "assets/scripts/source_ground_surface.gdc",
+        "runtime_bytes": 14920,
+        "runtime_sha256": "c439367bd7ed3fb73e612de668bd2384518e34dc7b09e18fc4550ceaab5990b5",
+        "local_source_sha256": "e9db09fbd9c9e8a70bfba771b79627bbba6313d86b3efe781fba7b93a29e7ee7"
+      },
+      "source_terrain_query": {
+        "runtime_path": "assets/scripts/source_terrain_query.gdc",
+        "runtime_bytes": 14588,
+        "runtime_sha256": "252a9ef749c5df0bdc2ad1a4f8275fd7a249ca1c2c5e3f82067f90d9eb6eb137",
+        "local_source_sha256": "fc9bf87c182113fffa10bbad9aab150eb99ed95b089dcaac20806e5505b15731"
+      },
+      "source_terrain_point": {
+        "runtime_path": "assets/scripts/source_terrain_point.gdc",
+        "runtime_bytes": 5537,
+        "runtime_sha256": "e28296495bd58af5bb058ad4e5963adab4751d5ec7208c5246c044c9b99fa802",
+        "local_source_sha256": "caebe9f918763d6781a4885ae05e9d27aec84e584b9b45bb02cc71dc75000037"
+      },
+      "source_terrain_math": {
+        "runtime_path": "assets/scripts/source_terrain_math.gdc",
+        "runtime_bytes": 884,
+        "runtime_sha256": "9ddb073662d6dbdfc0a96247cffe6c81f60072ca049c382cd043d19fa282ced5",
+        "local_source_sha256": "de4b98dfae36b680b3d378750624b0b8d84fb520e4883d78800f1cb4572e4eff"
+      },
+      "source_surface_terrain": {
+        "runtime_path": "assets/scripts/source_surface_terrain.gdc",
+        "runtime_bytes": 17852,
+        "runtime_sha256": "18f05ad7a4e2dfa62adac5287cdec3e7625b2de9d7b67fd453aa30cefbe71fdb",
+        "local_source_sha256": "5c2939f5dae7adfa08e7591980612d6e53fd6fcdcf321850d00d388982024a17"
+      },
+      "source_global_body_mesh": {
+        "runtime_path": "assets/scripts/source_global_body_mesh.gdc",
+        "runtime_bytes": 4722,
+        "runtime_sha256": "f506ab7b12b3e7588af5c7bae403613e7413876c34712760cc231e743d2c2246",
+        "local_source_sha256": "c0101d6e2b442e5dd0e469f0c8d07272f038e9a6bb1e4016ddec1815949974d6"
+      },
+      "source_ground_pads": {
+        "runtime_path": "assets/scripts/source_ground_pads.gdc",
+        "runtime_bytes": 2932,
+        "runtime_sha256": "8fbca8d2f5240e01f4b0d29d47d5993a30e8a105b275b8aed6613c5d282449e9",
+        "local_source_sha256": "2de5cec29b7e69be5d3f4f6652386bd7a5ff80ac84ce1367feb07fcf5fc24cbb"
+      },
+      "source_surface_render_packet": {
+        "runtime_path": "assets/scripts/source_surface_render_packet.gdc",
+        "runtime_bytes": 9425,
+        "runtime_sha256": "b8b2176dfc13fb1043597df5bc3c78e9ae212adfe712dc4e98012a3fd660da6a",
+        "local_source_sha256": "1371064fbbd00010567c2a7ae8552254540a22f3e382bba4cfd16f68fa99273e"
+      },
+      "source_surface_render_state": {
+        "runtime_path": "assets/scripts/source_surface_render_state.gdc",
+        "runtime_bytes": 9228,
+        "runtime_sha256": "015d6df12108548cf8cefa97450f25ab374e8cd2def95fe066e94d4b8a70eb2f",
+        "local_source_sha256": "91eca62418b0f3bf48d10cf1af9286688e9cd8b0ab6a214c77df9070396465f4"
+      },
+      "source_surface_contact_patch": {
+        "runtime_path": "assets/scripts/source_surface_contact_patch.gdc",
+        "runtime_bytes": 8630,
+        "runtime_sha256": "5a5036c8f3b92c06ed463219fa30867a1bf22db9822c1d66e99fa8dc9ff41415",
+        "local_source_sha256": "a0c2dfe0442cdb33498ccd9e92cf5bb0c3b23f0fef06de71358bcfe668e15d0a"
+      },
+      "surface_visual": {
+        "runtime_path": "assets/scripts/surface_visual.gdc",
+        "runtime_bytes": 18328,
+        "runtime_sha256": "5728f012af5917944154e7df346c21de9013de247525631df98ba78453e08d15",
+        "local_source_sha256": "b94c8f3eac101e7fc95ad4633236c9db877f6d5e39b7cd1fe414f577bc45227e"
+      },
+      "source_model_vm": {
+        "runtime_path": "assets/scripts/source_model_vm.gdc",
+        "runtime_bytes": 5725,
+        "runtime_sha256": "612e8738f5c242699882446e7e8bcb922bbe4929d4d23a13e5478d96677e96a3",
+        "local_source_sha256": "2ee0a4743bb497de34310e0fef9823d3558e13d36fd38e8d235788bb74b3f3f2"
+      },
+      "source_model_vertices": {
+        "runtime_path": "assets/scripts/source_model_vertices.gdc",
+        "runtime_bytes": 4605,
+        "runtime_sha256": "d0527fd7c44da38eaa1e2c5fe5b18f4e4c3da4cc1edfc9dbcf5b7f9520c70370",
+        "local_source_sha256": "bfd236cbee940167f882a85a461911aad672fd7c292b6f58619e87cf6ecc7e33"
+      },
+      "source_model_mesh": {
+        "runtime_path": "assets/scripts/source_model_mesh.gdc",
+        "runtime_bytes": 22965,
+        "runtime_sha256": "ff6f680d45cfac071f58c6f814b0e0c2b60c50803d1cc34a8e2bb730864ecfcd",
+        "local_source_sha256": "6642ce62a1a8046c71a57fb08325304c8d12c3bc61b90921d458ef84ad21472e"
+      },
+      "source_polygon": {
+        "runtime_path": "assets/scripts/source_polygon.gdc",
+        "runtime_bytes": 4008,
+        "runtime_sha256": "b46abeaca8088e1304966a1632d0ba3501c119d745b70a4ac5aa70ba48328d3d",
+        "local_source_sha256": "9e83a719b5a13a22fcba53417cb3c4006d310804eda3e69aba543a9551c07a43"
+      },
+      "source_station_geometry": {
+        "runtime_path": "assets/scripts/source_station_geometry.gdc",
+        "runtime_bytes": 8114,
+        "runtime_sha256": "79b74a4b48b6951426046e72d4a5ad46d973f1ce1f91d4926090d403a8d4105e",
+        "local_source_sha256": "5785d288a3a0582dc4f06db53fad4b6d52446d3d476adc894fa9b7624cf69b94"
+      },
+      "source_station_session": {
+        "runtime_path": "assets/scripts/source_station_session.gdc",
+        "runtime_bytes": 5452,
+        "runtime_sha256": "3b781c06864da80ac304c04632e893bad540c68e6a2ca817dd91eb951415efb8",
+        "local_source_sha256": "80807b1c4b0aefb42f6907ef7480e2792295017f681caa5608894290d8d85b8f"
+      },
+      "source_station_visual": {
+        "runtime_path": "assets/scripts/source_station_visual.gdc",
+        "runtime_bytes": 5035,
+        "runtime_sha256": "e40570eac352fa9ea10445e27705fc5eb5e725116b7577553ce83c1b78384af5",
+        "local_source_sha256": "771f0f19744f037ebdca4df6acc1572c10a0cdbb482764245edda4fc364230f1"
+      },
+      "source_underground_port": {
+        "runtime_path": "assets/scripts/source_underground_port.gdc",
+        "runtime_bytes": 11965,
+        "runtime_sha256": "2a5c325b6cad867a03c8bc366596879f582536b78d2f4596e2c76387c0025d2d",
+        "local_source_sha256": "a23791197ec0cebf635367f68b4a26483f374d96c7ad4c037afef51386ebc596"
+      },
+      "source_underground_controller": {
+        "runtime_path": "assets/scripts/source_underground_controller.gdc",
+        "runtime_bytes": 10576,
+        "runtime_sha256": "9070ef7f4acad7a3b40e7b28ebe89a349167986d459b2218f879c19fc67a61f5",
+        "local_source_sha256": "08128b223be3d28db23523fe1080c6aa29c69f07f62bcba9bd71e29188dfb1b8"
+      },
+      "source_enclosed_city_visual": {
+        "runtime_path": "assets/scripts/source_enclosed_city_visual.gdc",
+        "runtime_bytes": 1512,
+        "runtime_sha256": "681eb9e103a9681bc39b4ea49a30b2878c8db5e37eb57cfd2685d997454d0a56",
+        "local_source_sha256": "4cbcacf2bf3cadca09788741403fbb355cc1b98d2a8e9d898c38b6f6709dbd32"
+      },
+      "source_city_profile": {
+        "runtime_path": "assets/scripts/source_city_profile.gdc",
+        "runtime_bytes": 3239,
+        "runtime_sha256": "09626ad9b5cc414b57c7c239a601621fd6588f3283ae5d4805fb9b9a6178f108",
+        "local_source_sha256": "b5015f8252aa611cc9a2c93158495a3d12d6bad66affbd5635d501cbaa96d8b4"
+      },
+      "source_city_runtime": {
+        "runtime_path": "assets/scripts/source_city_runtime.gdc",
+        "runtime_bytes": 7594,
+        "runtime_sha256": "d7578537c6b19f663bf8136d67d9f9d4557b34d76195d310d13fbfbc837cd319",
+        "local_source_sha256": "a0a5bcbfc37adda1d46ff968c88eac752ccddbe268556520dbf2c83c7b1f12ba"
+      },
+      "source_city_view": {
+        "runtime_path": "assets/scripts/source_city_view.gdc",
+        "runtime_bytes": 3656,
+        "runtime_sha256": "4fa13146f857ee6145520475dab4b125411001918d0ccc003c30bd5415e4b037",
+        "local_source_sha256": "f12eba244a6d70e3492c22dc3625f85473b1df8426d566ed12519ff8594ea8ac"
+      },
+      "source_model_visual": {
+        "runtime_path": "assets/scripts/source_model_visual.gdc",
+        "runtime_bytes": 6486,
+        "runtime_sha256": "0ab03df14972c75157e92a05659d96b9d914bebc630df859f13d7fd59fe133ba",
+        "local_source_sha256": "d8f5c42cc10e0ad8f7f179d824bb8c0aa94e63833cf0bfd62f2594f29bc5c774"
+      },
+      "galaxy": {
+        "runtime_path": "assets/scripts/galaxy.gdc",
+        "runtime_bytes": 6416,
+        "runtime_sha256": "ff7b772d4655504e5ad84037106bdbc0453e8da2e946c450a33caa8b763bd8e0",
+        "local_source_sha256": "6cb023e203a633deebe774bc0c87fb71021d44d679e130bae6ba5aa36b3c94f4"
+      },
+      "navigation": {
+        "runtime_path": "assets/scripts/navigation.gdc",
+        "runtime_bytes": 20807,
+        "runtime_sha256": "557bd754d3b3a4b0edbe893fa248a65132511f995e7ea4c932ce8adbc4f19e78",
+        "local_source_sha256": "2745b49c42b69a23679740f21bf31efdcab319d7eedff6de090aac854bd3f225"
+      },
+      "planetary_system": {
+        "runtime_path": "assets/scripts/planetary_system.gdc",
+        "runtime_bytes": 34324,
+        "runtime_sha256": "01d53597cc246d6faa122cd543d710d7d4eb04d089b6de3ae8371e38aab42dcd",
+        "local_source_sha256": "f243ebb2699bce714386e87ca32bfdb35709a2c9c45178cac9fa6cb8874abc62"
+      },
+      "flight_model": {
+        "runtime_path": "assets/scripts/flight_model.gdc",
+        "runtime_bytes": 22603,
+        "runtime_sha256": "d95562153bb52ec0f4ded5add73ec1edfff39ab49a15d6956b42aa03c257fc67",
+        "local_source_sha256": "4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b"
+      },
+      "surface_model": {
+        "runtime_path": "assets/scripts/surface_model.gdc",
+        "runtime_bytes": 34279,
+        "runtime_sha256": "c2a366c073b5e4075eefc6f5881c2821603e3508434768fabbe31f5caf2517c0",
+        "local_source_sha256": "28fcc37fb4adc1291129fdd90fb685828992e5657eaeb891eff986c9d5f3d894"
+      },
+      "spherical_terrain": {
+        "runtime_path": "assets/scripts/spherical_terrain.gdc",
+        "runtime_bytes": 4991,
+        "runtime_sha256": "0c5382ec94087d6fce5bbe09dedca8450ceb6c5a8a94458a066022b2780a8823",
+        "local_source_sha256": "6da1c61aac47df2f8921ab459a962c9853bd5d327c86264d7fc28c46b8d7986e"
+      },
+      "celestial_renderer": {
+        "runtime_path": "assets/scripts/celestial_renderer.gdc",
+        "runtime_bytes": 12475,
+        "runtime_sha256": "2736ff45bc47015fa5e7084de78200adc5fede3e2b5d56b6e7b65734695d657f",
+        "local_source_sha256": "c084f772a420a8b625488ce176e87532833c4677e26da2a669939a437c01448e"
+      },
+      "near_surface_view": {
+        "runtime_path": "assets/scripts/near_surface_view.gdc",
+        "runtime_bytes": 6575,
+        "runtime_sha256": "4cfeeaad902e24cf9f7b34c4cb5149c3679307a5389858ac38432d5d61cb5afa",
+        "local_source_sha256": "122c7352f773d6d208ea4f46adb0a0fa7152ff806508ed553510d02bdbe3b53f"
+      },
+      "surface_orbit_link": {
+        "runtime_path": "assets/scripts/surface_orbit_link.gdc",
+        "runtime_bytes": 5804,
+        "runtime_sha256": "2c6e9773195d1ab8a86887dc49b74da20e24a24b1a7babae7d303b147c206189",
+        "local_source_sha256": "c1cffc1ea9ba6efc4ea88e3adcf0e6e84ec2a42ff830df6f3d8e23097ca1767c"
+      },
+      "segment_triangle": {
+        "runtime_path": "assets/scripts/segment_triangle.gdc",
+        "runtime_bytes": 5422,
+        "runtime_sha256": "2a9349986fa5851a8b9611b13a99fdde81cc29167f5a454e897185301593879d",
+        "local_source_sha256": "c1f000e1481ba9654ab9cf27db7b30e6eaeef46a35d533a01dffb2d86bece346"
+      },
+      "segment_box": {
+        "runtime_path": "assets/scripts/segment_box.gdc",
+        "runtime_bytes": 1087,
+        "runtime_sha256": "6d4556baef1b50ebbef0a59cd37c40ba40bba0e3718a0c307bf4434d54a74dce",
+        "local_source_sha256": "c859146608a6e8208620078a12742c07e1fdafa04761ec5abcffa2cfd0501fad"
+      },
+      "main": {
+        "runtime_path": "assets/scripts/main.gdc",
+        "runtime_bytes": 66271,
+        "runtime_sha256": "df3328c3537f23287542023b084849642bc4b56f7c53dfc68c6c514766a8950b",
+        "local_source_sha256": "62e77b1f2d64fcdd5e1604876f883965cae635df3906b895226549cab41b4f2b"
+      }
+    },
+    "shaders": {
+      "source_terrain_packet.gdshader": {
+        "runtime_path": "assets/scripts/source_terrain_packet.gdshader",
+        "runtime_bytes": 7955,
+        "runtime_sha256": "ad2f9f707a716028f747dede680be9e77b7512d3088ac2246f257543d0eadb1f"
+      },
+      "source_terrain_packet_transition.gdshader": {
+        "runtime_path": "assets/scripts/source_terrain_packet_transition.gdshader",
+        "runtime_bytes": 7713,
+        "runtime_sha256": "c75659fc8e1fd36ae59526438f55a8a47b30ad3887ce6240001645b3751d9208"
+      }
+    },
+    "data": {
+      "ffe_data_provenance": {
+        "runtime_path": "assets/data/ffe_data_provenance.json",
+        "bytes": 3081,
+        "source_json_sha256": "1af3f832fa4505f70150ba4452cb8885c743a237389328738253f22b92df280e"
+      },
+      "ffe_galaxy": {
+        "runtime_path": "assets/data/ffe_galaxy.json",
+        "bytes": 38814,
+        "source_json_sha256": "bfe18506451502bd5eb336845c9e7a890af06e0953f9a5247a66a8b3258e4d57"
+      },
+      "ffe_ground_collision": {
+        "runtime_path": "assets/data/ffe_ground_collision.json",
+        "bytes": 48871,
+        "source_json_sha256": "2dbf44a94422907b1bb29b34df1d795cef819cecf267b1591f3d82ea6326d018"
+      },
+      "ffe_ground_coordinates": {
+        "runtime_path": "assets/data/ffe_ground_coordinates.json",
+        "bytes": 175461,
+        "source_json_sha256": "e94e9ec86761aa1d775498a2959af201f3c6497506da481c9d49ca7f27766abf"
+      },
+      "ffe_ground_pads": {
+        "runtime_path": "assets/data/ffe_ground_pads.json",
+        "bytes": 4157,
+        "source_json_sha256": "4d582c012349360d7fbee5bd0cf8285b904c491161d5553d5c7bc705ee2ef4ba"
+      },
+      "ffe_handcrafted_records": {
+        "runtime_path": "assets/data/ffe_handcrafted_records.json",
+        "bytes": 35246,
+        "source_json_sha256": "f0aff6be8bc15580d698f2fa3fe6b886474d107a2dc09394c07c84cf6f3489da"
+      },
+      "ffe_math": {
+        "runtime_path": "assets/data/ffe_math.json",
+        "bytes": 12555,
+        "source_json_sha256": "4166407ada817e8abfbd6e501ad12bac1a75977ee4d0c66fe727adb3aea8cce5"
+      },
+      "ffe_planet_names": {
+        "runtime_path": "assets/data/ffe_planet_names.json",
+        "bytes": 19220,
+        "source_json_sha256": "717746d559f2079766bf68555ba8dbb73482bfe6b2a44c74b5bf4456d302d5d6"
+      },
+      "ffe_runtime_model_descriptors": {
+        "runtime_path": "assets/data/ffe_runtime_model_descriptors.json",
+        "bytes": 107751,
+        "source_json_sha256": "cf9c673c2bba22f0c865e77e3a7ceed5497053cdb444b80f31d7439176446818"
+      },
+      "ffe_settlement_rules": {
+        "runtime_path": "assets/data/ffe_settlement_rules.json",
+        "bytes": 1849,
+        "source_json_sha256": "88f909b5af25406b839e6da6b76651aa0f24ea94117274da28aec2f9a39173ab"
+      },
+      "ffe_ship_registry": {
+        "runtime_path": "assets/data/ffe_ship_registry.json",
+        "bytes": 35853,
+        "source_json_sha256": "07ccae9d6674bef40a7a5d2311a216b083ebdf010d5d47b187f7520de3b5d61a"
+      },
+      "ffe_special_station_models": {
+        "runtime_path": "assets/data/ffe_special_station_models.json",
+        "bytes": 9885,
+        "source_json_sha256": "5f327250cf0a807d4c2bb92f2c9665e5a9e0c69093e49540e40332b46584f526"
+      },
+      "ffe_stellar_factory": {
+        "runtime_path": "assets/data/ffe_stellar_factory.json",
+        "bytes": 1217,
+        "source_json_sha256": "0f8899757618392aeb5a40ec8a559e21625bc5701e0dcc545bd88942971a77cb"
+      },
+      "ffe_system_metadata": {
+        "runtime_path": "assets/data/ffe_system_metadata.json",
+        "bytes": 77454,
+        "source_json_sha256": "9c742c68bcd678b05687b1af9072150a709c903b23723eeffda8220587a63588"
+      },
+      "ffe_system_names": {
+        "runtime_path": "assets/data/ffe_system_names.json",
+        "bytes": 16275,
+        "source_json_sha256": "2130927864a995816a446dfea55723ebed3adb1fd89d362c4fa08ad0f22e9443"
+      },
+      "ffe_terrain_query": {
+        "runtime_path": "assets/data/ffe_terrain_query.json",
+        "bytes": 125364,
+        "source_json_sha256": "8d764c2cd2a682ddfa8e0b8978b8f12616333ef361d0ed820dcb5b03b3f1977a"
+      },
+      "ffe_underground_models": {
+        "runtime_path": "assets/data/ffe_underground_models.json",
+        "bytes": 149771,
+        "source_json_sha256": "0209b968cd970b5b40b6857fba49ae39e9c4c844da7bd831418803f7c685a37e"
+      },
+      "ffe_world_models": {
+        "runtime_path": "assets/data/ffe_world_models.json",
+        "bytes": 643746,
+        "source_json_sha256": "01d42a271f2da53f09d46277bd88a8b29a341818269f9ec89cc3d74286c89ece"
+      },
+      "ffe_worlds": {
+        "runtime_path": "assets/data/ffe_worlds.json",
+        "bytes": 62587,
+        "source_json_sha256": "71b4a250d100d689edceb575a26f9c837013759387f4f653d8dd04ed8843dbc8"
+      },
+      "ffe_galactic_map": {
+        "runtime_path": "assets/data/ffe_galactic_map.json",
+        "bytes": 8240,
+        "source_json_sha256": "8fe5f5c5445a282422d5f9845b8d237a759c12c54538a3af8d8c260beb2b72b9"
+      },
+      "ffe_fuel": {
+        "runtime_path": "assets/data/ffe_fuel.json",
+        "bytes": 49330,
+        "source_json_sha256": "4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f"
+      },
+      "ffe_atmosphere": {
+        "runtime_path": "assets/data/ffe_atmosphere.json",
+        "bytes": 15437,
+        "source_json_sha256": "b65e25e187ac4abe7e24325a78de3fe70c140395711127ee0076f9905222bcce"
+      },
+      "ships": {
+        "runtime_path": "assets/data/ships.json",
+        "bytes": 1787,
+        "source_json_sha256": "944974a355019507fefe53f79dffc19d24e838fe650d34a52fbc00c692b8571a"
+      },
+      "world_names_ru": {
+        "runtime_path": "assets/data/world_names_ru.json",
+        "bytes": 4861,
+        "source_json_sha256": "cf3c02277698c0744e4012cc04edd4e480c3a2b247a7d3ced434a1e02e7d0b51"
+      }
+    },
+    "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+    "startup_contract": {
+      "normal_startup_layout": "source_jjffe_systems_v4",
+      "user_new_game_layout": "source_jjffe_systems_v4",
+      "automated_and_helper_layout": "handcrafted_jjffe_ports_v3",
+      "legacy_saved_layouts_retained": [
+        "handcrafted_analytic_rebuild_v1",
+        "handcrafted_jjffe_orbits_v2",
+        "handcrafted_jjffe_ports_v3",
+        "reconstructed_solar_v1",
+        "source_unavailable_rebuild_v1"
+      ]
+    },
+    "compiled_module_count": 59,
+    "streaming_shader_count": 2,
+    "raw_json_count": 24,
+    "natural_model_indices": [
+      117,
+      118,
+      119,
+      120,
+      121,
+      122,
+      123,
+      124,
+      125,
+      126,
+      127,
+      128,
+      129,
+      130,
+      131,
+      132,
+      133
+    ],
+    "orbital_station_model_indices": [
+      69,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80
+    ],
+    "source_control_specification_sha256": "b0f77d55db624b023accc8542f6b990d95515ab3e4c23bdd4e1d6e30c4cf2656",
+    "world_layout": "source_jjffe_systems_v4",
+    "live_gravity": "source-fixed-parent-raw-f603-with-sampled-si-fallback-v1",
+    "gravity_parent_policy": "single_current_focus_parent_f603_v1",
+    "live_terrain": "sphere-source-ground-v4",
+    "surface_streaming_packet": "source-surface-render-packet-v1",
+    "surface_streaming_state": "source-surface-render-state-v1",
+    "station_session": "selected-source-station-session-v1",
+    "native_development_fixtures_packaged": false,
+    "compiled_source_correspondence_rebuilt_by_verifier": false,
+    "original_per_frame_dynamics": false,
+    "complete_original_physics": false,
+    "physical_device_tested": false,
+    "retained_sampled_force_bridge": "sampled-f603-nominal-day-si-v1",
+    "raw_source_motion_scope": "Optional new-FULL-session Cobra motion around one fixed natural focus; ports, surfaces, vertical assist and other profiles retain the existing path."
+  },
+  "classic_console_runtime_assets": {
+    "scripts": {
+      "flight_console": {
+        "runtime_path": "assets/scripts/flight_console.gdc",
+        "runtime_bytes": 17346,
+        "runtime_sha256": "9a6e23bbac62dc4f394b657870325d688a1b4b09f1216c7e88f18b43b607d859",
+        "local_source_sha256": "01d1e2d08fad0dca5156977cbb33eb284597c52d5d59f9bb7847a0da66b4eca8"
+      },
+      "touch_action_button": {
+        "runtime_path": "assets/scripts/touch_action_button.gdc",
+        "runtime_bytes": 3183,
+        "runtime_sha256": "2bd3f52c25ed488f252f9ac0ef0937146706baaf3351701fa5427ff674cd509a",
+        "local_source_sha256": "8aaf97622f0b5ba3d96b52e2aacb3a51b99c15dd48934fa2bb532bab033e696b"
+      },
+      "flight_instruments": {
+        "runtime_path": "assets/scripts/flight_instruments.gdc",
+        "runtime_bytes": 1315,
+        "runtime_sha256": "096e5083667c3ab374790271948b26158fd7cadf4bc269dab7d881026b277aa3",
+        "local_source_sha256": "06681eb395b7cceaa16a5d705bb5e5ff948f9d60802cae10ecc2987661958329"
+      },
+      "main": {
+        "runtime_path": "assets/scripts/main.gdc",
+        "runtime_bytes": 66271,
+        "runtime_sha256": "df3328c3537f23287542023b084849642bc4b56f7c53dfc68c6c514766a8950b",
+        "local_source_sha256": "62e77b1f2d64fcdd5e1604876f883965cae635df3906b895226549cab41b4f2b"
+      }
+    },
+    "compiled_source_correspondence_rebuilt_by_verifier": false,
+    "console_height_logical_px": 240,
+    "live_command_count": 12,
+    "live_commands": [
+      "system",
+      "routes",
+      "auto",
+      "brake",
+      "dock",
+      "view",
+      "menu",
+      "status",
+      "equipment",
+      "control",
+      "surface",
+      "pause"
+    ],
+    "compiled_module_count": 4,
+    "complete_original_interface": false,
+    "original_per_frame_dynamics": false,
+    "physical_device_tested": false
+  },
+  "source_mining_kernel_assets": {
+    "runtime_path": "assets/scripts/source_mining_machine.gdc",
+    "runtime_bytes": 3140,
+    "runtime_sha256": "8c253b3921428430a856614acfa4f57550a3dcf58dcf4adbeea5f7156fa54b81",
+    "local_source_sha256": "cdbcef39b2ec2ec777fb68da483b53f8a8ec3a986dad6f2722a436a6f8f52ddb",
+    "native_fixture_provenance_checked": true,
+    "native_weekly_case_count": 2816,
+    "native_load_case_count": 990,
+    "oracle_executed_by_apk_verifier": false,
+    "integrated_gameplay": false,
+    "physical_deployment_implemented": false,
+    "weekly_world_scheduler_integrated": false,
+    "star_fuel_scoop_integrated": false,
+    "physical_device_tested": false
+  },
+  "navigation_runtime_assets": {
+    "scripts": {
+      "galactic_map_model": {
+        "runtime_path": "assets/scripts/galactic_map_model.gdc",
+        "runtime_bytes": 9624,
+        "runtime_sha256": "58630cadaccc4255314d79d45d410903bb4a91cdb559112b379874d59e389ca4",
+        "local_source_sha256": "597a5bd049e3dea2698bfbc255a0d57e7c98b70fabedfe09d56bb60ccd3a11a5"
+      },
+      "galactic_map_view": {
+        "runtime_path": "assets/scripts/galactic_map_view.gdc",
+        "runtime_bytes": 28234,
+        "runtime_sha256": "35a157b7e34030f2835f623f9182218361e78647694439bc2d9a8fa409389c78",
+        "local_source_sha256": "9a2a6fa97d9ab4f6ce572a5e10bb390d5036ccf6d30e3bc31e087a61440b7876"
+      },
+      "system_map_model": {
+        "runtime_path": "assets/scripts/system_map_model.gdc",
+        "runtime_bytes": 9593,
+        "runtime_sha256": "42b3b8230be9258e15dbe7809509f714bc21fdf1ae06ad3ed43e479c772b2850",
+        "local_source_sha256": "ac7ae75188b9b8a47fefbd233d85dc90d4c64996e64d98dcc46705394f732e4a"
+      },
+      "system_map_view": {
+        "runtime_path": "assets/scripts/system_map_view.gdc",
+        "runtime_bytes": 18713,
+        "runtime_sha256": "695091c8db165d45caa157c77522fd783f03d2b04ff227cfa5c7cd037a913d05",
+        "local_source_sha256": "b1c03291928cb9dea19ca7a27e6055e192d2066e6fc46e3a21370100963eb103"
+      },
+      "flight_time_controller": {
+        "runtime_path": "assets/scripts/flight_time_controller.gdc",
+        "runtime_bytes": 9523,
+        "runtime_sha256": "4895bb9e9c8bc276c0f9b44155ee8c30facc612eef526f5453b8cb75b18c2e81",
+        "local_source_sha256": "d171bb7354e57ae6349ac04775d6f640a932c0f061cba879bb044724f3d06d91"
+      },
+      "flight_time_controls": {
+        "runtime_path": "assets/scripts/flight_time_controls.gdc",
+        "runtime_bytes": 2919,
+        "runtime_sha256": "cf5b08bdbbab5079275147a861bf0cf732c8a99a3abacc675e6c20107a13ec61",
+        "local_source_sha256": "679fb022d1836570c36a386a8f5686870ae188c7700d31b732e8df92e1bc18a8"
+      },
+      "roll_control": {
+        "runtime_path": "assets/scripts/roll_control.gdc",
+        "runtime_bytes": 1220,
+        "runtime_sha256": "d14d4ca07d7eeb7119eedc14304c1761d5e049bc3934d72ee1097ae1aa13ab7d",
+        "local_source_sha256": "da23458845373f4dfda98f9e8c1cb9878b392ce713c40cff1ae7d95665b9e810"
+      },
+      "rotating_dock_dynamics": {
+        "runtime_path": "assets/scripts/rotating_dock_dynamics.gdc",
+        "runtime_bytes": 4592,
+        "runtime_sha256": "1bf8079fb40a097ceb3239c392fcec4c980dd43eef925baae176bb2dc37e479b",
+        "local_source_sha256": "68eb63c19831a2828fa62a1c10126de099d7d4905859f905c4b93e37124206a4"
+      },
+      "source_motion_pipeline": {
+        "runtime_path": "assets/scripts/source_motion_pipeline.gdc",
+        "runtime_bytes": 7104,
+        "runtime_sha256": "e616f966a9b153d5e98dbeeafe507af0c4274802559d57e796c6b4436b2226d2",
+        "local_source_sha256": "478b18ed852da1549eb573e2b8d168e3b817deb684c31c50e085d30a6d98bb84"
+      },
+      "source_motion_bridge": {
+        "runtime_path": "assets/scripts/source_motion_bridge.gdc",
+        "runtime_bytes": 11727,
+        "runtime_sha256": "4bf636fd9d9048be9a59a843eb505a9fbf4070bfa2a3da33493ced3de03dce49",
+        "local_source_sha256": "4fd81d7226e1c63f5c280e6ade6692b829bc5568937429a8ecac397949a003a5"
+      },
+      "source_frame_kinematics": {
+        "runtime_path": "assets/scripts/source_frame_kinematics.gdc",
+        "runtime_bytes": 2221,
+        "runtime_sha256": "72e7defa425d50ec608c0fa9c8fcd5fddab1da6918009f7cbb70943da56706f4",
+        "local_source_sha256": "aac70ddc3237a9b97910020db6a2ac400659ab02457730e113de9c828b530689"
+      }
+    },
+    "data": {
+      "ffe_galactic_map": {
+        "runtime_path": "assets/data/ffe_galactic_map.json",
+        "bytes": 8240,
+        "source_json_sha256": "8fe5f5c5445a282422d5f9845b8d237a759c12c54538a3af8d8c260beb2b72b9",
+        "source_landmark_count": 14
+      }
+    },
+    "native_reference_metadata": {
+      "source_motion_native": {
+        "local_path": "tests/fixtures/source_motion_native.json",
+        "sha256": "087eeb8f70ffcd70a489f3d37bbd96e468bca2c01cffca8a7646f4e680c53625",
+        "case_count": 1236,
+        "fresh_process_runs": 3,
+        "provenance_checked": true,
+        "oracle_executed_by_apk_verifier": false
+      },
+      "source_frame_native": {
+        "local_path": "tests/fixtures/source_frame_native.json",
+        "sha256": "42320b712c4f4410cda409cf45f55c3cd07e433eb2aa12823ea8e95e425e5f5a",
+        "case_count": 720,
+        "fresh_process_runs": 3,
+        "provenance_checked": true,
+        "oracle_executed_by_apk_verifier": false
+      },
+      "source_time_controls_native": {
+        "local_path": "tests/fixtures/source_time_controls_native.json",
+        "sha256": "f5d812f399f24490580f1907cbf4e9c78b71c39949203c57e2228128abea571b",
+        "case_count": 1736,
+        "fresh_process_runs": 3,
+        "provenance_checked": true,
+        "oracle_executed_by_apk_verifier": false
+      },
+      "source_galactic_map_native": {
+        "local_path": "tests/fixtures/source_galactic_map_native.json",
+        "sha256": "0a15ce8ee486da83adbd9c52d9ecc8a57505378e9ff8a68f6ea116d1b24f480a",
+        "case_count": 4536,
+        "fresh_process_runs": 3,
+        "provenance_checked": true,
+        "oracle_executed_by_apk_verifier": false
+      }
+    },
+    "compiled_source_correspondence_rebuilt_by_verifier": false,
+    "oracle_executed_by_apk_verifier": false,
+    "physical_device_tested": false,
+    "compiled_module_count": 11,
+    "raw_json_count": 1,
+    "galactic_map_connected": true,
+    "system_map_connected": true,
+    "original_map_overview_data_verified": true,
+    "galactic_map_renderer_policy": "modern-touch-projection-with-original-density-palette-landmarks-and-sector-data",
+    "complete_original_map_renderer": false,
+    "complete_original_map_instruments": false,
+    "galactic_search_scope": "bounded local window plus original named-system catalogue, not exhaustive global name enumeration",
+    "implemented_time_rates": [
+      1,
+      10,
+      100
+    ],
+    "disabled_time_rates": [
+      1000,
+      10000
+    ],
+    "maximum_substeps": 32,
+    "maximum_substep_seconds": 0.1,
+    "original_time_scheduler_complete": false,
+    "analog_phone_roll_connected": true,
+    "rotating_station_contact": "sampled-pose-modern-conservative-sweep-with-omega-cross-radius",
+    "complete_original_f582_collision": false,
+    "raw_source_motion_connected": true,
+    "raw_source_motion_scope": "Optional new FULL sessions; Cobra around a fixed natural focus; ports/surfaces/vertical assist and other profiles use existing fallback.",
+    "old_saves_without_motion_session_use_previous_path": true,
+    "active_raw_session_restores_validated_ieee64_clock": true,
+    "source_frame_primitives_standalone": true,
+    "automatic_source_for_parent_selection": false,
+    "original_hyperdrive_f903_complete": false,
+    "complete_original_player_pipeline": false,
+    "complete_original_physics": false
+  },
+  "galactic_map_visual_assets": {},
+  "celestial_visibility_assets": {},
+  "system_information_assets": {
+    "resources": {
+      "ffe_system_information": {
+        "bytes": 333479,
+        "sha256": "77b37c26d7925e27f227c683c2c78a74f636fc28bf3b55f71f916ab6bcfc09c6"
+      },
+      "system_information_ru": {
+        "bytes": 92129,
+        "sha256": "b78c2edcd1889b6aee01b45ef9b591705b159622fca918b803552a3e42057a7f"
+      }
+    },
+    "unchanged_runtime_modules": 3,
+    "raw_original_and_ru_resources_checked": true
+  },
+  "hyperdrive_assets": {
+    "raw_resource_sha256": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+    "compiled_module_count": 3,
+    "retained_by_strict_atmosphere_gate": true,
+    "source_f903_live_quote_consumers_checked": true
+  },
+  "fuel_assets": {
+    "raw_resource_sha256": "4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f",
+    "compiled_module_count": 4,
+    "retained_by_strict_atmosphere_gate": true,
+    "native_references": {
+      "source_jet_fuel_native": {
+        "sha256": "ba1fa8be78c6c142fa037f0fb499e2aa2f2782077ad0b8f1da6a1dffa30051c8",
+        "case_count": 3182,
+        "fresh_process_runs": 3,
+        "oracle_executed_by_apk_verifier": false
+      },
+      "source_fuel_scoop_native": {
+        "sha256": "40d2a6528bc7607a442311aeea69c2fcc7ac9859ccfe4cc64a88ddf123f6b15f",
+        "case_count": 729,
+        "fresh_process_runs": 3,
+        "oracle_executed_by_apk_verifier": false
+      },
+      "source_fuel_contact_native": {
+        "sha256": "a68264130ed7a13b17a689b58e23e2f0d6921d4c33b9bfb4d20219709d7cf3d6",
+        "case_count": 330,
+        "fresh_process_runs": 3,
+        "oracle_executed_by_apk_verifier": false
+      }
+    }
+  },
+  "atmosphere_assets": {
+    "baseline_source_commit": "450e862ac3c146994371d8fa427efbc65b9fc677",
+    "compiled_modules": {
+      "source_atmospheric_dynamics": {
+        "runtime_sha256": "35e5685f89a563d78c7344fa5c74a867ecda2bff97623b96d870cbe436ac528b",
+        "local_source_sha256": "a9ccce9fa27a2354205f3b1c88a9108320f567742d44d84082635339bc9af4a9"
+      },
+      "source_atmosphere_contact": {
+        "runtime_sha256": "a05800f080bdd613aeed1c8528657d3732c815db335d0166088483f8bd0ea382",
+        "local_source_sha256": "5b048597421267adf2604617be09079dbd3d256c26572506e57ce3de7c3a87a9"
+      }
+    },
+    "compiled_module_count": 2,
+    "raw_resource_sha256": "b65e25e187ac4abe7e24325a78de3fe70c140395711127ee0076f9905222bcce",
+    "raw_json_count": 1,
+    "original_procedure_count": 8,
+    "integration_compiled_modules": {
+      "source_hyperdrive": "42bf04e80b34c51e4ff88ab60b54662425f2be15ed4e69866201ce94df720316",
+      "navigation": "557bd754d3b3a4b0edbe893fa248a65132511f995e7ea4c932ce8adbc4f19e78",
+      "source_hyperdrive_session": "d139254c12507283000d9996650681c65277c7d43bf703bba3a73c62fea33c9a",
+      "hyperdrive_services_view": "e710628ffbecfe589f197c0b32e4d962b02b8b11df82032a86b984668aa5afb4",
+      "main": "df3328c3537f23287542023b084849642bc4b56f7c53dfc68c6c514766a8950b",
+      "galactic_map_model": "58630cadaccc4255314d79d45d410903bb4a91cdb559112b379874d59e389ca4",
+      "galactic_map_view": "35a157b7e34030f2835f623f9182218361e78647694439bc2d9a8fa409389c78",
+      "source_jet_fuel": "537bebf01f5253b1526af9f0e400f6c8e6993649e9d55f11c19bde4cea0cd7ef",
+      "source_fuel_scoop": "3116221c1ad60863ab8c5a1f26778bfd872ab373cfb07b1ce88bab1e8f4eac2e",
+      "source_fuel_contact": "07761e1f57ebf1533acac082f0811d117d65c808fbb554ede2ebe39537691519",
+      "source_fuel_flight_bridge": "13a3b55e37b9bda9811db3cc2911df70dfd2ae916b4aba1495717d7f6b167e62",
+      "flight_model": "d95562153bb52ec0f4ded5add73ec1edfff39ab49a15d6956b42aa03c257fc67",
+      "surface_model": "c2a366c073b5e4075eefc6f5881c2821603e3508434768fabbe31f5caf2517c0",
+      "source_motion_bridge": "4bf636fd9d9048be9a59a843eb505a9fbf4070bfa2a3da33493ced3de03dce49",
+      "source_atmospheric_dynamics": "35e5685f89a563d78c7344fa5c74a867ecda2bff97623b96d870cbe436ac528b",
+      "source_atmosphere_contact": "a05800f080bdd613aeed1c8528657d3732c815db335d0166088483f8bd0ea382",
+      "flight_time_controller": "4895bb9e9c8bc276c0f9b44155ee8c30facc612eef526f5453b8cb75b18c2e81"
+    },
+    "integration_compiled_module_count": 17,
+    "original_procedure_bytes": 920,
+    "audited_local_source_sha256": {
+      "scripts/source_hyperdrive.gd": "b79cd38051e44d52fcd4f2beb173b2699096e7d9aea9a0288aba205e453a8874",
+      "scripts/navigation.gd": "2745b49c42b69a23679740f21bf31efdcab319d7eedff6de090aac854bd3f225",
+      "scripts/source_hyperdrive_session.gd": "0a0428071f8cfc188f80930474c804261626be6952d41a55b8399eb6b70c7bc8",
+      "scripts/hyperdrive_services_view.gd": "70d828f819faeb8c8e31d12e1101ef82ce5d306f9cf329b2902600f82b5fe3f7",
+      "scripts/main.gd": "62e77b1f2d64fcdd5e1604876f883965cae635df3906b895226549cab41b4f2b",
+      "scripts/galactic_map_model.gd": "597a5bd049e3dea2698bfbc255a0d57e7c98b70fabedfe09d56bb60ccd3a11a5",
+      "scripts/galactic_map_view.gd": "9a2a6fa97d9ab4f6ce572a5e10bb390d5036ccf6d30e3bc31e087a61440b7876",
+      "scripts/source_jet_fuel.gd": "ef043cd3d7fe4ef06a08d1f6592bf97b5d1e6d81c5f2efe9ea067d514f207cc1",
+      "scripts/source_fuel_scoop.gd": "de1e96fd3013de48557b340b9ca4e4d174c4d39aaebb8b2eee96250db53af296",
+      "scripts/source_fuel_contact.gd": "0f8d5defba15db89d02c5253c988a2a5680d7a16058296b91d262017d5a49903",
+      "scripts/source_fuel_flight_bridge.gd": "70921d3cb8b7d211f07f1211309f809dab1e0be9094ccf015e658558d6a04b52",
+      "scripts/flight_model.gd": "4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b",
+      "scripts/surface_model.gd": "28fcc37fb4adc1291129fdd90fb685828992e5657eaeb891eff986c9d5f3d894",
+      "scripts/source_motion_bridge.gd": "4fd81d7226e1c63f5c280e6ade6692b829bc5568937429a8ecac397949a003a5",
+      "scripts/source_atmospheric_dynamics.gd": "a9ccce9fa27a2354205f3b1c88a9108320f567742d44d84082635339bc9af4a9",
+      "scripts/source_atmosphere_contact.gd": "5b048597421267adf2604617be09079dbd3d256c26572506e57ce3de7c3a87a9",
+      "scripts/flight_time_controller.gd": "d171bb7354e57ae6349ac04775d6f640a932c0f061cba879bb044724f3d06d91"
+    },
+    "protected_old_source_data_count": 10,
+    "protected_contact_dependency_count": 16,
+    "unchanged_Main_function_count": 14,
+    "retained_fuel_compiled_module_count": 4,
+    "unchanged_fuel_resource_sha256": "4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f",
+    "retained_fuel_native_references": {
+      "source_jet_fuel_native": {
+        "sha256": "ba1fa8be78c6c142fa037f0fb499e2aa2f2782077ad0b8f1da6a1dffa30051c8",
+        "case_count": 3182,
+        "fresh_process_runs": 3,
+        "oracle_executed_by_apk_verifier": false
+      },
+      "source_fuel_scoop_native": {
+        "sha256": "40d2a6528bc7607a442311aeea69c2fcc7ac9859ccfe4cc64a88ddf123f6b15f",
+        "case_count": 729,
+        "fresh_process_runs": 3,
+        "oracle_executed_by_apk_verifier": false
+      },
+      "source_fuel_contact_native": {
+        "sha256": "a68264130ed7a13b17a689b58e23e2f0d6921d4c33b9bfb4d20219709d7cf3d6",
+        "case_count": 330,
+        "fresh_process_runs": 3,
+        "oracle_executed_by_apk_verifier": false
+      }
+    },
+    "unchanged_hyperdrive_resource_sha256": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+    "retained_hyperdrive_compiled_module_count": 3,
+    "unchanged_information_resources": {
+      "ffe_system_information": {
+        "bytes": 333479,
+        "sha256": "77b37c26d7925e27f227c683c2c78a74f636fc28bf3b55f71f916ab6bcfc09c6"
+      },
+      "system_information_ru": {
+        "bytes": 92129,
+        "sha256": "b78c2edcd1889b6aee01b45ef9b591705b159622fca918b803552a3e42057a7f"
+      }
+    },
+    "unchanged_information_runtime_count": 3,
+    "native_references": {
+      "source_atmospheric_native": {
+        "sha256": "04cff4bc5d43c7eabda2ed4361a0ee8c0221cc1c432c8ea2dd33daad0d3b9025",
+        "case_count": 1447,
+        "source_variant": "uploaded-DOS-F1014-F953-F1530-with-observed-external-callbacks",
+        "oracle_executed_by_apk_verifier": false
+      },
+      "source_atmosphere_speed_native": {
+        "sha256": "cbffa800bfbfa805f12480dbefe30888ed2f9d37cb8a3f07469fa0ae11dca57f",
+        "case_count": 239,
+        "source_variant": "pinned-JJFFE-speed-fragment-host-ABI-not-whole-DOS-equivalence",
+        "oracle_executed_by_apk_verifier": false
+      }
+    },
+    "canonical_atmosphere_variant": "uploaded-DOS-F1014-per-invocation-gear-shield-heat-unsigned-drag-cap-0xFFFFF",
+    "shared_single_heat_state": true,
+    "raw_HP_and_local_thermal_RNG_persisted": true,
+    "actual_contact_and_drag_consumers_checked": true,
+    "phone_invocation_rate_hz": 60,
+    "phone_rate_is_original": false,
+    "full_original_reference_frame_pipeline": false,
+    "full_original_global_event_rng_stream": false,
+    "full_original_equipment_damage_dispatcher": false,
+    "full_original_destruction_dispatcher": false,
+    "full_F569_player_collision_integrated": false,
+    "original_F908_arrival_pipeline": false,
+    "original_outfitting_economy": false,
+    "complete_original_time_scheduler": false,
+    "complete_original_physics": false,
+    "compiled_source_correspondence_rebuilt_by_verifier": false,
+    "physical_device_tested": false
+  },
+  "runtime_material_map_count": 51,
+  "flight_ui_runtime_assets_sha256": {
+    "flight_console.gdc": "9a6e23bbac62dc4f394b657870325d688a1b4b09f1216c7e88f18b43b607d859",
+    "touch_action_button.gdc": "2bd3f52c25ed488f252f9ac0ef0937146706baaf3351701fa5427ff674cd509a",
+    "main.gdc": "df3328c3537f23287542023b084849642bc4b56f7c53dfc68c6c514766a8950b",
+    "surface_model.gdc": "c2a366c073b5e4075eefc6f5881c2821603e3508434768fabbe31f5caf2517c0",
+    "dock_services_view.gdc": "b9c0f6c5d015b1c6170db333d4f511616376614cab7c94b9bee2e38529467123",
+    "training_dock_services.gdc": "f4635e2cf6043effeb08c499d41dddfc3f78ac1ce42d5935956389f0be4c77d3",
+    "navigation.gdc": "557bd754d3b3a4b0edbe893fa248a65132511f995e7ea4c932ce8adbc4f19e78"
+  },
+  "toolchain_smoke_only": false,
+  "physical_device_tested": false,
+  "full_original_port_complete": false,
+  "production_signing_key_configured": false,
+  "publication_ready": false
+}

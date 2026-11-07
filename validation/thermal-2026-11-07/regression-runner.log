@@ -1,0 +1,14 @@
+source_fuel_flight: passed; 29 checks, 0 failures
+source_motion_main_continuation: passed; 28 checks, 0 failures
+classic_console_main: passed; 42 checks, 0 failures
+source_hyperdrive_main: passed; 70 checks, 0 failures
+flight_projection: passed; 691 checks, 0 failures
+source_full_startup: passed; 10 checks, 0 failures
+navigation_main: passed; 53 checks, 0 failures
+source_docking_flight: passed; 402 checks, 0 failures
+graphics_scope: passed; 87 checks, 0 failures
+graphics_integration: passed; 44 checks, 0 failures
+offpad_takeoff: passed; 109 checks, 0 failures
+source_console_pause: passed; 131 checks, 0 failures
+source_main_full: passed; 153 checks, 0 failures
+Validation passed: 38856 current checks; 15 passed suites; 0 failed; 0 unavailable. Report: validation/thermal-2026-11-07/regressions.json

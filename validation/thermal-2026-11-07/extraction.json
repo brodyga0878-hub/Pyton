@@ -1,0 +1,27 @@
+{
+  "time_utc": "2026-11-07T20:29:46.735766+00:00",
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_extract_atmosphere.py",
+    "-v"
+  ],
+  "test_count": 8,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "exit_code": 0,
+  "file_sha256": {
+    "tools/extract_atmosphere.py": "35d36598dc8dbca2004f2f1fab76f2a2b21b3c4a718fb0d812f089cf999c5d1e",
+    "data/ffe_atmosphere.json": "b65e25e187ac4abe7e24325a78de3fe70c140395711127ee0076f9905222bcce",
+    "tests/test_extract_atmosphere.py": "1b2df50c35c1cfd430fe76a50ae74bbcafa118efc8b35a1774d0d3b0a635af32"
+  },
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "original_native_oracle_executed_by_this_run": false,
+  "physical_device_tested": false
+}

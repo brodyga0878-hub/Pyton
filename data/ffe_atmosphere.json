@@ -1,0 +1,307 @@
+{
+  "schema": 1,
+  "profile": "dos-firstenc-atmosphere-damage-anchors-v1",
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_data_sha256": "34219c91c5d019440ebf4fc707711a32c5080123ede05cf4d10a27d41f770850",
+  "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+  "immutable_resources": {
+    "ffe_hyperdrive_sha256": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+    "ffe_fuel_sha256": "4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f"
+  },
+  "procedures": {
+    "34": {
+      "source_label": "FUNC_000034",
+      "source_line": 3507,
+      "pinned_jjffe_procedure_sha256": "be931b3b77ca968d90f42f9f4e3312c8d7f3e4041a1adbd64a1a772766a86b6c",
+      "dos_file_offset": 13048,
+      "dos_virtual_address": 4269304,
+      "byte_count": 31,
+      "hex": "558bec8b45088b550c89148508be6000506a006a02e8321b000083c40c5dc3",
+      "sha256": "fbafd34f244fc54703ebc14e55a04731088dfd1a8462e87d99f4020b4ee63187",
+      "independently_normalized_instruction_count": 12,
+      "pinned_jjffe_instructions_match_dos": true,
+      "instruction_proof_policy": "Only branch destination addresses normalized; F1014 canonical reconstruction comes directly from DOS, not modified JJFFE"
+    },
+    "35": {
+      "source_label": "FUNC_000035",
+      "source_line": 3524,
+      "pinned_jjffe_procedure_sha256": "923625eaa6913d8adfc6dac621219d282b93fc381dc632c013208f26138e024d",
+      "dos_file_offset": 13080,
+      "dos_virtual_address": 4269336,
+      "byte_count": 15,
+      "hex": "558bec8b45088b048508be60005dc3",
+      "sha256": "96974c654576f4f30e03da8d77af820eb9b6b2e0ce0c037ab98b817e3c7e5866",
+      "independently_normalized_instruction_count": 6,
+      "pinned_jjffe_instructions_match_dos": true,
+      "instruction_proof_policy": "Only branch destination addresses normalized; F1014 canonical reconstruction comes directly from DOS, not modified JJFFE"
+    },
+    "953": {
+      "source_label": "FUNC_000953",
+      "source_line": 71190,
+      "pinned_jjffe_procedure_sha256": "242a08a8ed3ca9cf73d107b65635f68b069f70eac50c6e1cb32546f18c0f7010",
+      "dos_file_offset": 191868,
+      "dos_virtual_address": 4448124,
+      "byte_count": 436,
+      "hex": "558bec83c4f05356578b7d0c8b5d0885ff7d05bfffffff7f33c08a8386000000506a0de85445fdff83c4088b4510506a0ee84645fdff83c408576a0ce83b45fdff83c4086a0ce85145fdff598bf833f6c745f0950a6300eb2f8b45f0f600047422c745f401000000895df88a83860000008845fc8d45f4506a0b56e80cb3fdff83c40c468345f0083b358c0a63007cc980bb8700000003743d80bb870000000b0f85f000000033c08a83860000008b1554185000f60402100f85d80000008b838200000050ff154818500059837838000f84c00000000fb783e00000003bf87f226629bbe00000000fbe8388000000506a1ce80920030083c408808b5101000001eb770fb783e00000002bf866c783e000000000000fb783e40000003bf87c0f8b45105053e876f9ffff83c408eb7e6629bbe4000000c6834e0100000a0fbe8388000000506a1de8b41f030083c4080fb7b3e4000000c1fe023bfe7d14ff15381850008bc88bc7c1e00f99f7fe3bc8730953e83dfeffff59eb3380bb18010000ff750c6a006a17e824b3fdff83c408b801000000eb170fbe8388000000506a1de85b1f030083c408b8010000005f5e5b8be55dc3",
+      "sha256": "aa8ec30bafd1e80ed164f34e8b384a2ff9e46d8eaf9a17239ee9065d84874469",
+      "independently_normalized_instruction_count": 131,
+      "pinned_jjffe_instructions_match_dos": true,
+      "instruction_proof_policy": "Only branch destination addresses normalized; F1014 canonical reconstruction comes directly from DOS, not modified JJFFE"
+    },
+    "1014": {
+      "source_label": "FUNC_001014",
+      "source_line": 74965,
+      "pinned_jjffe_procedure_sha256": "cc9c723791fd5fa54b5a8f50ece3aee606c1227ff395539406e7a51f226a8ef0",
+      "dos_file_offset": 202896,
+      "dos_virtual_address": 4459152,
+      "byte_count": 321,
+      "hex": "558bec53568b5d08be3c21640081bedc000000002d31010f8f20010000f683cb000000407407b80b000000eb05b805000000f686e9000000020f94c283e2012bc28bc88b86d8000000d3f88b96ec01000003d081faffff00007e0f6a006aff53e887d4ffff83c40ceb1b0186ec0100008bd0c1fa0885d27e0c6a005253e86ad4ffff83c40c80be623f000000743580be5c3f000000742ca1487964005033c08a435650ff154018500083c4086681b8e000000016017d0c804e74406a0ee828f302005981bed8000000b80b00007d0953e8a300000059eb65813d0c2c6500ffff0f007607beffff0f00eb068b350c2c6500c1e60b568b838c00000050e8e728010083c40829838c000000568b839000000050e8d128010083c408298390000000568b839400000050e8bb28010083c40829839400000053e820000000595e5b5dc3",
+      "sha256": "dcdc0bc325086ddaff36264342e39a703e41543d7e0badd4f067c3a5ce595095",
+      "independently_normalized_instruction_count": 94,
+      "pinned_jjffe_instructions_match_dos": false,
+      "instruction_proof_policy": "Only branch destination addresses normalized; F1014 canonical reconstruction comes directly from DOS, not modified JJFFE"
+    },
+    "1016": {
+      "source_label": "FUNC_001016",
+      "source_line": 75130,
+      "pinned_jjffe_procedure_sha256": "4b27173e6fec6a7768453ac847010361c8c06db31cbf363c92e62411fb69435e",
+      "dos_file_offset": 203244,
+      "dos_virtual_address": 4459500,
+      "byte_count": 27,
+      "hex": "558bec813d18226400002d31017f0a8b450850e804000000595dc3",
+      "sha256": "d11d23496ba03a43ce954ab8e0906dcb2f53cecfd8b2425911e2ccfc517137c5",
+      "independently_normalized_instruction_count": 10,
+      "pinned_jjffe_instructions_match_dos": true,
+      "instruction_proof_policy": "Only branch destination addresses normalized; F1014 canonical reconstruction comes directly from DOS, not modified JJFFE"
+    },
+    "1017": {
+      "source_label": "FUNC_001017",
+      "source_line": 75146,
+      "pinned_jjffe_procedure_sha256": "6c905a24ebf37c7fd9820a93bcbb162e5e5581756c8c0ddf7269599aea655418",
+      "dos_file_offset": 203272,
+      "dos_virtual_address": 4459528,
+      "byte_count": 10,
+      "hex": "558bec83c4e08be55dc3",
+      "sha256": "2d8a6cf3a78899319464c62419cb1f5f1b36331ff4359fc1b1081d1ccbbea30a",
+      "independently_normalized_instruction_count": 6,
+      "pinned_jjffe_instructions_match_dos": true,
+      "instruction_proof_policy": "Only branch destination addresses normalized; F1014 canonical reconstruction comes directly from DOS, not modified JJFFE"
+    },
+    "1521": {
+      "source_label": "FUNC_001521",
+      "source_line": 90809,
+      "pinned_jjffe_procedure_sha256": "aa9b35711bd646e06cd86862d31199c0a3a5842da1bdd7a29ec40f59159ecf60",
+      "dos_file_offset": 279160,
+      "dos_virtual_address": 4535416,
+      "byte_count": 17,
+      "hex": "558bec8b4508f76d0cd1e0d1d28bc25dc3",
+      "sha256": "f62a5f949cbf8da772c3cc32ae59b607e0f35cda6c3c4e1ddf848ba3b5a1b445",
+      "independently_normalized_instruction_count": 9,
+      "pinned_jjffe_instructions_match_dos": true,
+      "instruction_proof_policy": "Only branch destination addresses normalized; F1014 canonical reconstruction comes directly from DOS, not modified JJFFE"
+    },
+    "1530": {
+      "source_label": "FUNC_001530",
+      "source_line": 90913,
+      "pinned_jjffe_procedure_sha256": "4f799fcd072bfe573bbbdda92678b294e229a1598f4c2d671974267be1fbbf55",
+      "dos_file_offset": 279740,
+      "dos_virtual_address": 4535996,
+      "byte_count": 63,
+      "hex": "8b1560216400a164216400357f5634128bc8c1e119c1e8070bc88bc10105602164008bc2c1e00dc1ea130bc28bd0891564216400a16021640025ffff0000c3",
+      "sha256": "35fb8bff8c10fc5628238eb1cfe0078393caf7fa1a4cdb6a6d28374e6edf0535",
+      "independently_normalized_instruction_count": 18,
+      "pinned_jjffe_instructions_match_dos": true,
+      "instruction_proof_policy": "Only branch destination addresses normalized; F1014 canonical reconstruction comes directly from DOS, not modified JJFFE"
+    }
+  },
+  "ship_profiles": {
+    "cobra": {
+      "source_model_index": 38,
+      "spec_hex": "942a19f10201640050007c009600234001000400030c0200",
+      "spec_sha256": "b0f77d55db624b023accc8542f6b990d95515ab3e4c23bdd4e1d6e30c4cf2656",
+      "hull_mass_tonnes_s16": 100,
+      "maximum_hull_raw_u16": 400,
+      "initial_equipment_bits_u32": 262144,
+      "original_starter": true,
+      "scope": "Source hull specification and explicit existing starter adapter, not a reconstructed full original inventory or shared world object bank"
+    },
+    "eagle": {
+      "source_model_index": 24,
+      "spec_hex": "9c3b7cf701001c00160029003700154001000200020b0001",
+      "spec_sha256": "b6c0ea6cb7c68a28273fbe121ac0d6b9fb6f92ed509d6f6cf387606f1902886b",
+      "hull_mass_tonnes_s16": 28,
+      "maximum_hull_raw_u16": 112,
+      "initial_equipment_bits_u32": 1076101120,
+      "original_starter": false,
+      "scope": "Source hull specification and explicit existing starter adapter, not a reconstructed full original inventory or shared world object bank"
+    },
+    "shuttle": {
+      "source_model_index": 15,
+      "spec_hex": "a50a9df90000080004000e0028000b400100000001800001",
+      "spec_sha256": "152669632b18334ded65adb09cfbf1d6235945a231bdfdf12653e7e0e6256b36",
+      "hull_mass_tonnes_s16": 8,
+      "maximum_hull_raw_u16": 32,
+      "initial_equipment_bits_u32": 0,
+      "original_starter": false,
+      "scope": "Source hull specification and explicit existing starter adapter, not a reconstructed full original inventory or shared world object bank"
+    }
+  },
+  "equipment": {
+    "atmospheric_shielding": {
+      "equipment_index": 15,
+      "name_ff_code": 39044,
+      "source_label": 5786,
+      "source_line": 8401,
+      "dos_file_offset": 803589,
+      "hex": "41746d6f7370686572696320536869656c64696e6700",
+      "name_en": "Atmospheric Shielding",
+      "record_hex": "140000000a000000010000000300000000800e3a0000",
+      "record_sha256": "b0c653b62c48a921f488528112351ee0e35cf71a16e33a969af4d313ecdcfae1",
+      "record_file_offset": 792510,
+      "purchase_price_raw_u32": 20,
+      "sale_price_raw_u32": 10,
+      "mass_tonnes_u32": 1,
+      "flags_u32": 3,
+      "type_u8": 0,
+      "source_selector_u8": 14,
+      "availability_bytes_hex": "3a0000",
+      "equipment_mask_u32": 1073741824,
+      "storage": "PhysObj+0xc8 equipmentDWORD",
+      "single_install": true,
+      "required_spec_word_offset": null,
+      "required_spec_mask_u16": 0,
+      "required_equipment_mask_u32": 0
+    },
+    "shield_generator": {
+      "equipment_index": 27,
+      "name_ff_code": 39056,
+      "source_label": 5798,
+      "source_line": 8425,
+      "dos_file_offset": 803807,
+      "hex": "536869656c642047656e657261746f7200",
+      "name_en": "Shield Generator",
+      "record_hex": "fa000000c800000004000000030000000480009c0100",
+      "record_sha256": "283c5b7bf1ca17c5b7d119274eacf208628136aca3ff5abb779108ee1aad91cd",
+      "record_file_offset": 792774,
+      "purchase_price_raw_u32": 250,
+      "sale_price_raw_u32": 200,
+      "mass_tonnes_u32": 4,
+      "flags_u32": 3,
+      "type_u8": 4,
+      "source_selector_u8": 0,
+      "availability_bytes_hex": "9c0100",
+      "equipment_mask_u32": 0,
+      "storage": "PhysObj+0xe2 shield-capacity WORD",
+      "single_install": false,
+      "required_spec_word_offset": null,
+      "required_spec_mask_u16": 0,
+      "required_equipment_mask_u32": 0,
+      "shield_capacity_increment_raw": 64
+    }
+  },
+  "field_layout": {
+    "object": {
+      "model_index_u32": 130,
+      "object_index_u8": 134,
+      "kind_u8": 135,
+      "volume_s8": 136,
+      "velocity_s32_xyz": [
+        140,
+        144,
+        148
+      ],
+      "equipment_u32": 200,
+      "shielding_byte": 203,
+      "shield_current_u16": 224,
+      "shield_maximum_u16": 226,
+      "hull_u16": 228,
+      "player_selector_u8": 280,
+      "damage_timer_u8": 334,
+      "damage_flags_u8": 337
+    },
+    "game": {
+      "wind_flags_u8": 116,
+      "speed_s32": 216,
+      "altitude_s32": 220,
+      "gear_flags_u8": 233,
+      "heat_s32": 492,
+      "wind_enabled_u8": 16226,
+      "wind_armed_u8": 16220
+    }
+  },
+  "constants": {
+    "altitude_limit_raw_s32": 20000000,
+    "minimum_drag_speed_raw_s32": 3000,
+    "drag_max_master_ticks_u32": 1048575,
+    "drag_shift": 11,
+    "shielded_heat_shift": 11,
+    "unshielded_heat_shift": 5,
+    "gear_up_shift_reduction": 1,
+    "gear_down_game_e9_mask_u8": 2,
+    "shielding_object_cb_mask_u8": 64,
+    "shielding_equipment_mask_u32": 1073741824,
+    "fatal_heat_signed_limit": 65535,
+    "incremental_damage_shift": 8,
+    "hull_raw_per_mass_tonne": 4,
+    "damage_flash_timer_raw_u8": 10,
+    "shield_hit_flag_mask_u8": 1,
+    "damage_register": 12,
+    "object_register": 13,
+    "attacker_register": 14,
+    "wind_parent_shield_threshold_s16": 278,
+    "wind_flag_mask_u8": 64,
+    "rng_xor_u32": 305419903,
+    "rng_first_rotate_left": 25,
+    "rng_second_rotate_left": 13,
+    "rng_output_mask_u32": 65535
+  },
+  "canonical_contracts": {
+    "heat": "F1014 increments existing game+1EC once per invocation; no step multiplication and no second temperature state",
+    "fatal_heat": "Signed32 wrapped candidate>65535 calls F953(-1,0) without storing candidate; other invocation effects continue",
+    "incremental_damage": "Stored nonfatal heat increment SAR8>0 calls F953(amount,0)",
+    "drag": "Unsigned min(master_ticks,0xFFFFF)<<11; velocity -= F1521(velocity,factor), preserving32-bit wrap",
+    "altitude": "F1033 HUD-normalized game+DC; unknown raw-1 is converted to0x7FFFFFFF before F1014",
+    "near_surface": "Complete F1016 only conditionally calls F1017; complete DOS F1017 has no gameplay state effect",
+    "damage": "F953 consumes shield word then hull word; F952 equipment damage and F942 destruction remain distinct callbacks",
+    "rng": "F1530 pure transition of two caller-supplied u32 seeds; source shared global sequence is not inferred"
+  },
+  "caller_policies": {
+    "canonical_original_player_call_rate_inferred": false,
+    "phone_invocation_rate_hz": 60,
+    "phone_rate_is_original": false,
+    "phone_rate_scope": "Explicit fixed-step reconstruction adapter; not proof that original DOS runs F1014 at60Hz",
+    "existing_heat_state": "fuel_system.heat_s32 corresponds to game+0x1EC; preserve it across mode/restore transitions",
+    "thermal_rng_scope": "Caller-owned local deterministic thermal stream; not original AI/event shared RNG",
+    "event_filter_scope": "Default identity treatment of F34/F35 damage registers does not implement the full source event/module dispatcher",
+    "HP_scope": "Raw F953 shield/hull words and explicit Flight percentage bridge; no invented original HP rate"
+  },
+  "source_variants": {
+    "F1014_DOS": {
+      "heat_per_invocation": true,
+      "heat_shifts": [
+        5,
+        11
+      ],
+      "uses_gear_adjustment": true,
+      "incremental_F953_damage": true,
+      "drag_cap_u32": 1048575,
+      "heat_step_multiplication": false
+    },
+    "F1014_pinned_JJFFE": {
+      "heat_per_invocation": false,
+      "heat_shifts": [
+        19,
+        22
+      ],
+      "uses_gear_adjustment": false,
+      "heat_step_multiplication": true,
+      "heat_increment_cap": 4096,
+      "incremental_F953_damage": false,
+      "heat_bit8000_notification": true,
+      "drag_cap_signed_s32": 65535
+    },
+    "unchanged_helpers": "F34/F35/F953/F1016/F1017/F1521/F1530 independently match uploaded DOS instructions after branch-target normalization only"
+  },
+  "scope": "Source bytes/provenance and explicit caller policies only. Extraction executes no original instructions, proves no complete F569/collision/atmosphere/event/RNG integration, and does not modify previous resources."
+}

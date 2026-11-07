@@ -166,6 +166,14 @@ DEVELOPMENT_ASSET_PREFIXES=(
 def run(*command):
     return subprocess.check_output([str(v) for v in command],text=True,stderr=subprocess.STDOUT)
 
+# Code42 is a distinct integration scope; prior code41 remains frozen above.
+ATMOSPHERE_BASELINE_SOURCE_COMMIT='450e862ac3c146994371d8fa427efbc65b9fc677'
+ATMOSPHERE_MODULES=('source_atmospheric_dynamics','source_atmosphere_contact')
+ATMOSPHERE_RESOURCE_SHA256='b65e25e187ac4abe7e24325a78de3fe70c140395711127ee0076f9905222bcce'
+ATMOSPHERE_AUDITED_SOURCE_SHA256={'scripts/source_hyperdrive.gd': 'b79cd38051e44d52fcd4f2beb173b2699096e7d9aea9a0288aba205e453a8874', 'scripts/navigation.gd': '2745b49c42b69a23679740f21bf31efdcab319d7eedff6de090aac854bd3f225', 'scripts/source_hyperdrive_session.gd': '0a0428071f8cfc188f80930474c804261626be6952d41a55b8399eb6b70c7bc8', 'scripts/hyperdrive_services_view.gd': '70d828f819faeb8c8e31d12e1101ef82ce5d306f9cf329b2902600f82b5fe3f7', 'scripts/main.gd': '62e77b1f2d64fcdd5e1604876f883965cae635df3906b895226549cab41b4f2b', 'scripts/galactic_map_model.gd': '597a5bd049e3dea2698bfbc255a0d57e7c98b70fabedfe09d56bb60ccd3a11a5', 'scripts/galactic_map_view.gd': '9a2a6fa97d9ab4f6ce572a5e10bb390d5036ccf6d30e3bc31e087a61440b7876', 'scripts/source_jet_fuel.gd': 'ef043cd3d7fe4ef06a08d1f6592bf97b5d1e6d81c5f2efe9ea067d514f207cc1', 'scripts/source_fuel_scoop.gd': 'de1e96fd3013de48557b340b9ca4e4d174c4d39aaebb8b2eee96250db53af296', 'scripts/source_fuel_contact.gd': '0f8d5defba15db89d02c5253c988a2a5680d7a16058296b91d262017d5a49903', 'scripts/source_fuel_flight_bridge.gd': '70921d3cb8b7d211f07f1211309f809dab1e0be9094ccf015e658558d6a04b52', 'scripts/flight_model.gd': '4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b', 'scripts/surface_model.gd': '28fcc37fb4adc1291129fdd90fb685828992e5657eaeb891eff986c9d5f3d894', 'scripts/source_motion_bridge.gd': '4fd81d7226e1c63f5c280e6ade6692b829bc5568937429a8ecac397949a003a5', 'scripts/source_atmospheric_dynamics.gd': 'a9ccce9fa27a2354205f3b1c88a9108320f567742d44d84082635339bc9af4a9', 'scripts/source_atmosphere_contact.gd': '5b048597421267adf2604617be09079dbd3d256c26572506e57ce3de7c3a87a9', 'scripts/flight_time_controller.gd': 'd171bb7354e57ae6349ac04775d6f640a932c0f061cba879bb044724f3d06d91'}
+ATMOSPHERE_NATIVE_REFERENCE={'source_atmospheric_native': {'sha256': '04cff4bc5d43c7eabda2ed4361a0ee8c0221cc1c432c8ea2dd33daad0d3b9025', 'case_count': 1447}, 'source_atmosphere_speed_native': {'sha256': 'cbffa800bfbfa805f12480dbefe30888ed2f9d37cb8a3f07469fa0ae11dca57f', 'case_count': 239}}
+ATMOSPHERE_DOS_PROCEDURES={'34': {'dos_file_offset': 13048, 'byte_count': 31, 'sha256': 'fbafd34f244fc54703ebc14e55a04731088dfd1a8462e87d99f4020b4ee63187', 'independently_normalized_instruction_count': 12}, '35': {'dos_file_offset': 13080, 'byte_count': 15, 'sha256': '96974c654576f4f30e03da8d77af820eb9b6b2e0ce0c037ab98b817e3c7e5866', 'independently_normalized_instruction_count': 6}, '953': {'dos_file_offset': 191868, 'byte_count': 436, 'sha256': 'aa8ec30bafd1e80ed164f34e8b384a2ff9e46d8eaf9a17239ee9065d84874469', 'independently_normalized_instruction_count': 131}, '1014': {'dos_file_offset': 202896, 'byte_count': 321, 'sha256': 'dcdc0bc325086ddaff36264342e39a703e41543d7e0badd4f067c3a5ce595095', 'independently_normalized_instruction_count': 94}, '1016': {'dos_file_offset': 203244, 'byte_count': 27, 'sha256': 'd11d23496ba03a43ce954ab8e0906dcb2f53cecfd8b2425911e2ccfc517137c5', 'independently_normalized_instruction_count': 10}, '1017': {'dos_file_offset': 203272, 'byte_count': 10, 'sha256': '2d8a6cf3a78899319464c62419cb1f5f1b36331ff4359fc1b1081d1ccbbea30a', 'independently_normalized_instruction_count': 6}, '1521': {'dos_file_offset': 279160, 'byte_count': 17, 'sha256': 'f62a5f949cbf8da772c3cc32ae59b607e0f35cda6c3c4e1ddf848ba3b5a1b445', 'independently_normalized_instruction_count': 9}, '1530': {'dos_file_offset': 279740, 'byte_count': 63, 'sha256': '35fb8bff8c10fc5628238eb1cfe0078393caf7fa1a4cdb6a6d28374e6edf0535', 'independently_normalized_instruction_count': 18}}
+
 def preset_values(path):
     text=path.read_text()
     def quoted(key):
@@ -707,12 +715,12 @@ def verify_source_full_runtime(archive,project,version_code=34):
         assert re.search(rb'^shader_type\s+spatial\s*;',raw,re.M),'Invalid source streaming spatial shader '+name
         result['shaders'][name]={'runtime_path':exported,'runtime_bytes':len(raw),'runtime_sha256':hashlib.sha256(raw).hexdigest()}
     result['startup_contract']=verify_full_startup(text['main'],text['planetary_system'])
-    required_tables=FULL_SOURCE_TABLES+(NAVIGATION_TABLES if version_code>=36 else ())+(('ffe_fuel',) if version_code>=41 else ())
+    required_tables=FULL_SOURCE_TABLES+(NAVIGATION_TABLES if version_code>=36 else ())+(('ffe_fuel',) if version_code>=41 else ())+(('ffe_atmosphere',) if version_code>=42 else ())
     present_tables=set(path.stem for path in (project/'data').glob('ffe_*.json'))
     # Older contracts still inspect their exact base tables when tested from a
     # newer checkout. Only explicitly known later-version tables may coexist;
     # current v36 must include and verify its additional original map resource.
-    allowed_tables=FULL_SOURCE_TABLES+NAVIGATION_TABLES+('ffe_system_information','ffe_hyperdrive')+(('ffe_fuel',) if version_code>=41 else ())
+    allowed_tables=FULL_SOURCE_TABLES+NAVIGATION_TABLES+('ffe_system_information','ffe_hyperdrive')+(('ffe_fuel',) if version_code>=41 else ())+(('ffe_atmosphere',) if version_code>=42 else ())
     assert set(required_tables)<=present_tables<=set(allowed_tables),'Full packaging verifier list omits a source table or names a missing table'
     tables={}
     for name in required_tables+('ships','world_names_ru'):
@@ -1273,8 +1281,8 @@ def verify_hyperdrive_runtime(archive,project):
             'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
 
 
-def verify_fuel_runtime(archive,project):
-    """Code41 fuel input/consumer gate, separate from instruction/GPU tests."""
+def _verify_fuel_payload(archive,project):
+    """Retained code41 original data/module/native metadata controls."""
     hyper=_verify_hyperdrive_payload(archive,project)
     information=_verify_system_information_payload(archive,project)
     names=set(archive.namelist());modules={}
@@ -1311,6 +1319,31 @@ def verify_fuel_runtime(archive,project):
         assert tuple(item.get(k)for k in ['equipment_index','mass_tonnes_u32','equipment_mask_u32'])==expected,'Changed original fuel equipment '+key
     assert data['equipment']['scoop'].get('required_spec_word_offset')==4 and data['equipment']['scoop'].get('required_spec_mask_u16')==256,'Fuel scoop lost its original hull eligibility'
     assert hashlib.sha256(raw).hexdigest()==FUEL_RESOURCE_SHA256,'Fuel resource differs from frozen DOS extraction'
+    references={}
+    for name,expected in FUEL_NATIVE_REFERENCE.items():
+        fixture_raw=(project/'tests/fixtures'/f'{name}.json').read_bytes();fixture=json.loads(fixture_raw)
+        assert hashlib.sha256(fixture_raw).hexdigest()==expected['sha256'],'Changed fuel native reference '+name
+        assert fixture.get('schema')==1 and fixture.get('source_assembly_sha256',fixture.get('asm_sha256'))==SOURCE_ASSEMBLY_SHA256,'Wrong fuel native assembly provenance '+name
+        assert fixture.get('case_count')==len(fixture.get('cases',[]))==expected['case_count'] and fixture.get('fresh_process_runs')==3 and fixture.get('canaries_unchanged') is True,'Incomplete fuel native reproduction '+name
+        references[name]={'sha256':expected['sha256'],'case_count':expected['case_count'],'fresh_process_runs':3,'oracle_executed_by_apk_verifier':False}
+        if name=='source_jet_fuel_native':
+            assert fixture.get('source_sha256')==SOURCE_IMAGE_SHA256 and fixture.get('source_variant')=='dos-firstenc-f929-f938-f289-v1','Wrong canonical DOS jet native provenance'
+            for label in ['5111','6266']:assert fixture['tables'][label]['hex']==data['tables_hex'][label],'Jet native table differs from runtime '+label
+            for label in ['289','929','938']:
+                proof=fixture['dos_instruction_proof'][label];original=data['dos_code_blocks'][label]
+                assert proof['sha256']==original['sha256'] and proof['executable_offset']==original['dos_file_offset'] and proof['byte_length']==original['byte_count'] and proof['all_instructions_equal_after_only_branch_destination_normalization'] is True,'Jet native instructions differ from uploaded DOS '+label
+            counterfactual=fixture.get('jjffe_counterfactual',{})
+            assert counterfactual.get('not_canonical_dos') is True and counterfactual.get('difference_count',0)>0,'Missing explicit DOS/JJFFE jet divergence proof'
+        elif name=='source_fuel_scoop_native':
+            assert fixture.get('source_contract')=='jjffe-f1033-after-f569-fuel-scoop-v1' and fixture.get('reverse_order_unchanged') is True,'Wrong scoop native contract/reproduction'
+        else:
+            assert fixture.get('source_sha256')==SOURCE_IMAGE_SHA256 and fixture.get('models')==list(range(134,149)) and fixture.get('reverse_repeat_count')==expected['case_count'] and fixture.get('parent_bank_unchanged') is True,'Incomplete original gas/star contact reference'
+    return {'hyper':hyper,'information':information,'modules':modules,'raw':raw,'data':data,'references':references}
+
+def verify_fuel_runtime(archive,project):
+    """Code41 fuel input/consumer gate, separate from instruction/GPU tests."""
+    payload=_verify_fuel_payload(archive,project)
+    hyper,information,modules,raw,data,references=(payload[key]for key in ['hyper','information','modules','raw','data','references'])
     protected={path:value for path,value in MAP_VISUAL_PROTECTED_SOURCE_SHA256.items()
                if path not in ('scripts/main.gd','scripts/system_map_view.gd','scripts/navigation.gd','scripts/galactic_map_model.gd',
                                'scripts/flight_model.gd','scripts/surface_model.gd','scripts/source_motion_bridge.gd')}
@@ -1353,25 +1386,6 @@ def verify_fuel_runtime(archive,project):
     assert 'legacy_pending' in source_function(navigation,'_restore_source') and 'fuel_extension_upgraded' in source_function(navigation,'_restore_source'),'Previous v3 pending/fuel initialization path is missing'
     for relative,expected in FUEL_AUDITED_SOURCE_SHA256.items():
         assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==expected,'Fuel update differs from audited integration source '+relative
-    references={}
-    for name,expected in FUEL_NATIVE_REFERENCE.items():
-        fixture_raw=(project/'tests/fixtures'/f'{name}.json').read_bytes();fixture=json.loads(fixture_raw)
-        assert hashlib.sha256(fixture_raw).hexdigest()==expected['sha256'],'Changed fuel native reference '+name
-        assert fixture.get('schema')==1 and fixture.get('source_assembly_sha256',fixture.get('asm_sha256'))==SOURCE_ASSEMBLY_SHA256,'Wrong fuel native assembly provenance '+name
-        assert fixture.get('case_count')==len(fixture.get('cases',[]))==expected['case_count'] and fixture.get('fresh_process_runs')==3 and fixture.get('canaries_unchanged') is True,'Incomplete fuel native reproduction '+name
-        references[name]={'sha256':expected['sha256'],'case_count':expected['case_count'],'fresh_process_runs':3,'oracle_executed_by_apk_verifier':False}
-        if name=='source_jet_fuel_native':
-            assert fixture.get('source_sha256')==SOURCE_IMAGE_SHA256 and fixture.get('source_variant')=='dos-firstenc-f929-f938-f289-v1','Wrong canonical DOS jet native provenance'
-            for label in ['5111','6266']:assert fixture['tables'][label]['hex']==data['tables_hex'][label],'Jet native table differs from runtime '+label
-            for label in ['289','929','938']:
-                proof=fixture['dos_instruction_proof'][label];original=data['dos_code_blocks'][label]
-                assert proof['sha256']==original['sha256'] and proof['executable_offset']==original['dos_file_offset'] and proof['byte_length']==original['byte_count'] and proof['all_instructions_equal_after_only_branch_destination_normalization'] is True,'Jet native instructions differ from uploaded DOS '+label
-            counterfactual=fixture.get('jjffe_counterfactual',{})
-            assert counterfactual.get('not_canonical_dos') is True and counterfactual.get('difference_count',0)>0,'Missing explicit DOS/JJFFE jet divergence proof'
-        elif name=='source_fuel_scoop_native':
-            assert fixture.get('source_contract')=='jjffe-f1033-after-f569-fuel-scoop-v1' and fixture.get('reverse_order_unchanged') is True,'Wrong scoop native contract/reproduction'
-        else:
-            assert fixture.get('source_sha256')==SOURCE_IMAGE_SHA256 and fixture.get('models')==list(range(134,149)) and fixture.get('reverse_repeat_count')==expected['case_count'] and fixture.get('parent_bank_unchanged') is True,'Incomplete original gas/star contact reference'
     return {'baseline_source_commit':FUEL_BASELINE_SOURCE_COMMIT,'compiled_modules':modules,'compiled_module_count':4,
         'raw_resource_sha256':hashlib.sha256(raw).hexdigest(),'raw_json_count':1,'contact_model_count':15,'fuel_equipment_records':len(data['equipment']),
         'audited_local_source_sha256':FUEL_AUDITED_SOURCE_SHA256,'protected_old_source_data_count':len(protected),
@@ -1387,6 +1401,137 @@ def verify_fuel_runtime(archive,project):
         'original_F908_arrival_pipeline':False,'original_outfitting_economy':False,'complete_original_time_scheduler':False,
         'complete_original_physics':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
 
+
+
+def verify_atmosphere_runtime(archive,project):
+    """Code42 package/source wiring evidence; does not execute/decompile GDSC."""
+    retained=_verify_fuel_payload(archive,project)
+    names=set(archive.namelist());modules={}
+    for name in ATMOSPHERE_MODULES:
+        path='assets/scripts/'+name+'.gdc'
+        assert path in names,'Missing atmospheric runtime module '+name
+        compiled=archive.read(path)
+        assert len(compiled)>64 and compiled[:4]==b'GDSC','Invalid compiled atmospheric runtime '+name
+        modules[name]={'runtime_sha256':hashlib.sha256(compiled).hexdigest(),
+                      'local_source_sha256':hashlib.sha256((project/'scripts'/f'{name}.gd').read_bytes()).hexdigest()}
+    integration_modules={}
+    for relative in ATMOSPHERE_AUDITED_SOURCE_SHA256:
+        name=Path(relative).stem;path='assets/scripts/'+name+'.gdc'
+        assert path in names,'Missing atmospheric integration runtime '+name
+        compiled=archive.read(path)
+        assert len(compiled)>64 and compiled[:4]==b'GDSC','Invalid compiled atmospheric integration runtime '+name
+        integration_modules[name]=hashlib.sha256(compiled).hexdigest()
+    path='assets/data/ffe_atmosphere.json'
+    assert path in names,'Missing atmosphere resource'
+    raw=archive.read(path)
+    assert raw==(project/'data/ffe_atmosphere.json').read_bytes(),'Atmosphere resource differs from local source'
+    data=json.loads(raw)
+    assert data.get('schema')==1 and data.get('profile')=='dos-firstenc-atmosphere-damage-anchors-v1','Wrong atmosphere extraction profile'
+    assert data.get('source_sha256')==SOURCE_IMAGE_SHA256 and data.get('source_assembly_sha256')==SOURCE_ASSEMBLY_SHA256 and data.get('source_commit')==SOURCE_ASSEMBLY_COMMIT,'Wrong atmosphere source provenance'
+    assert data.get('immutable_resources')=={'ffe_hyperdrive_sha256':HYPERDRIVE_RESOURCE_SHA256,'ffe_fuel_sha256':FUEL_RESOURCE_SHA256},'Atmosphere extension changed retained resource digests'
+    assert set(data.get('procedures',{}))==set(ATMOSPHERE_DOS_PROCEDURES),'Incomplete atmosphere DOS anchors'
+    for label,expected in ATMOSPHERE_DOS_PROCEDURES.items():
+        row=data['procedures'][label];original=bytes.fromhex(row.get('hex',''))
+        assert all(row.get(key)==value for key,value in expected.items()),'Changed atmosphere DOS anchor '+label
+        assert len(original)==expected['byte_count'] and hashlib.sha256(original).hexdigest()==expected['sha256'],'Changed atmosphere DOS bytes '+label
+        assert row.get('pinned_jjffe_instructions_match_dos')==(label!='1014'),'Lost explicit atmospheric DOS/JJFFE distinction '+label
+    variants=data.get('source_variants',{});dos=variants.get('F1014_DOS',{});jjffe=variants.get('F1014_pinned_JJFFE',{})
+    assert dos.get('heat_per_invocation') is True and dos.get('heat_shifts')==[5,11] and dos.get('uses_gear_adjustment') is True and dos.get('incremental_F953_damage') is True and dos.get('heat_step_multiplication') is False and dos.get('drag_cap_u32')==0xfffff,'Atmosphere lost canonical DOS heat/drag policy'
+    assert jjffe.get('heat_shifts')==[19,22] and jjffe.get('heat_step_multiplication') is True and jjffe.get('drag_cap_signed_s32')==0xffff,'Atmosphere lost explicit JJFFE counterfactual'
+    policies=data.get('caller_policies',{})
+    assert policies.get('phone_invocation_rate_hz')==60 and policies.get('phone_rate_is_original') is False and policies.get('canonical_original_player_call_rate_inferred') is False,'Phone thermal cadence must remain an explicit adapter'
+    assert 'fuel_system.heat_s32' in policies.get('existing_heat_state','') and data.get('field_layout',{}).get('game',{}).get('heat_s32')==0x1ec,'Atmosphere must share the original single heat state'
+    assert data.get('constants',{}).get('drag_max_master_ticks_u32')==0xfffff and data['constants'].get('hull_raw_per_mass_tonne')==4,'Wrong atmospheric unsigned drag cap or raw HP scale'
+    for id,index,mass,hull in [('cobra',38,100,400),('eagle',24,28,112),('shuttle',15,8,32)]:
+        row=data.get('ship_profiles',{}).get(id,{})
+        assert (row.get('source_model_index'),row.get('hull_mass_tonnes_s16'),row.get('maximum_hull_raw_u16'))==(index,mass,hull),'Changed source atmospheric hull profile '+id
+        spec=bytes.fromhex(row.get('spec_hex',''))
+        assert len(spec)==24 and spec.hex()==retained['hyper']['data']['ship_specs'][str(index)]['spec_hex'] and hashlib.sha256(spec).hexdigest()==row.get('spec_sha256'),'Atmospheric hull differs from original specification '+id
+    assert hashlib.sha256(raw).hexdigest()==ATMOSPHERE_RESOURCE_SHA256,'Atmosphere resource differs from frozen DOS extraction'
+    protected={path:value for path,value in MAP_VISUAL_PROTECTED_SOURCE_SHA256.items()
+               if path not in ('scripts/main.gd','scripts/system_map_view.gd','scripts/navigation.gd','scripts/galactic_map_model.gd',
+                               'scripts/flight_model.gd','scripts/surface_model.gd','scripts/source_motion_bridge.gd','scripts/flight_time_controller.gd')}
+    for relative,expected in {**protected,**HYPERDRIVE_INFORMATION_SOURCE_SHA256,**FUEL_CONTACT_DEPENDENCY_SHA256}.items():
+        assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==expected,'Atmosphere update changed protected source/data '+relative
+    assert hashlib.sha256((project/'scripts/celestial_renderer.gd').read_bytes()).hexdigest()==SYSTEM_INFORMATION_CELESTIAL_SHA256,'Atmosphere update changed Mercury stellar visibility'
+    assert hashlib.sha256((project/'scripts/system_map_view.gd').read_bytes()).hexdigest()==SYSTEM_INFORMATION_MAP_VIEW_SHA256['scripts/system_map_view.gd'],'Atmosphere update changed system-map travel/information'
+    main=(project/'scripts/main.gd').read_text()
+    unchanged={name:value for name,value in FUEL_UNCHANGED_MAIN_FUNCTION_SHA256.items()if name not in ('_new_models','_time_context')}
+    for name,expected in unchanged.items():
+        assert hashlib.sha256(source_function(main,name).encode()).hexdigest()==expected,'Atmosphere update changed undeclared physical Main function '+name
+    source={name:(project/'scripts'/f'{name}.gd').read_text() for name in (*ATMOSPHERE_MODULES,*FUEL_MODULES,*HYPERDRIVE_MODULES,'navigation','source_motion_bridge','flight_time_controller','galactic_map_model')}
+    session=source['source_hyperdrive_session'];navigation=source['navigation'];bridge=source['source_motion_bridge'];contact=source['source_atmosphere_contact'];core=source['source_atmospheric_dynamics']
+    tick=source_function(main,'_tick');step=source_function(main,'_step_source_fuel')
+    assert '_step_source_fuel(dt,fuel_commands)' in tick and tick.index('_step_source_fuel(dt,fuel_commands)')<tick.index('if save_after_fuel:_save_game()'),'Atmospheric/fuel state must advance before arrival autosave'
+    assert 'AtmosphereContact.new()' in main and 'atmosphere_contact.sample(world,ship,surface,nav.elapsed_days)' in step and 'context["thermal"]=' in step and 'nav.advance_fuel_seconds(seconds,context,ship)' in step,'Live thermal step lost actual contact/combined session consumers'
+    assert 'source_motion.apply_velocity_words(after,ship)' in step and 'ship.velocity+=Basis(context.velocity_to_phone_basis)*delta' in step,'Atmospheric drag has no raw/SI velocity consumer'
+    assert '_source_ship_destroyed(' in step and 'destruction_requested' in step and 'ship.hull=0' in source_function(main,'_source_ship_destroyed'),'Atmospheric destruction has no Main consumer'
+    assert 'nav.bind_thermal_ship(ship)' in source_function(main,'_apply_source_fuel_state') and 'candidate_nav.bind_thermal_ship(candidate_ship)' in source_function(main,'_decode_state'),'Restored thermal HP must bind strictly without repair'
+    assert 'source_motion.velocity_words()' in step and 'AtmosphereContact.raw_speed_words(context.velocity_s32)' in step,'Active raw motion speed must consume source velocity words'
+    assert 'source_fuel_contact.gd' in contact and 'source_ground_surface.gd' in contact and 'source_terrain_point.gd' in contact and '_natural.height_raw(' in source_function(contact,'query_raw') and 'query_raw(' in source_function(contact,'sample'),'Atmosphere contact lost original solid/gas geometry consumers'
+    assert 'altitude_s32' in source_function(contact,'sample') and '0x7fffffff' in source_function(session,'_thermal_context'),'Unknown source altitude must not become below-ground heat'
+    thermal=source_function(session,'_thermal_step_inplace');context=source_function(session,'_thermal_context')
+    assert '"heat_s32":int(fuel_system.heat_s32)' in context and 'fuel_system.heat_s32=int(atmosphere.state.heat_s32)' in thermal and 'Thermal.atmosphere(' in thermal,'Thermal integration disconnected the single source heat state'
+    match=re.search(r'^const THERMAL_KEYS:=([^\n]+)',session,re.M)
+    assert match and 'heat_s32' not in match.group(1),'Thermal save must not introduce a duplicate heat state'
+    assert 'Thermal.damage(' in source_function(session,'_apply_damage_call') and '_apply_damage_call(callback)' in thermal,'Atmospheric F953 requests are not consumed by raw HP arithmetic'
+    fixed=source_function(session,'_fixed_thermal_seconds')
+    assert 'const THERMAL_HZ:=60' in session and 'dt*THERMAL_HZ+_fraction(thermal_system.phase_f64_hex)' in fixed and 'candidate.advance_fuel_ticks(ticks,fuel_context)' in fixed and 'candidate._thermal_step_inplace(thermal_context)' in fixed,'Combined fuel/thermal fixed-host schedule is disconnected'
+    assert '_fixed_thermal_seconds(dt,context,true)' in source_function(session,'advance_fuel_seconds'),'Ordinary source fuel step bypasses thermal schedule'
+    valid=source_function(session,'_valid_thermal')
+    assert 'thermal_system.source_digest!=_thermal_digest()' in valid and '_fraction(thermal_system.phase_f64_hex)' in valid and '_fraction(thermal_system.tick_fraction_anchor_f64_hex)' in valid,'Thermal restore lacks resource/fraction validation'
+    assert 'rng_seed_a_u32' in valid and 'rng_seed_b_u32' in valid and 'thermal_system.hull_u16' in valid and 'full_hull_raw()*anchor/100.0' in valid,'Thermal restore lacks raw HP/RNG validation'
+    assert 'candidate._valid_thermal()' in source_function(session,'restore') and 'result.thermal_system=thermal_system.duplicate(true)' in source_function(session,'snapshot'),'Thermal state lacks validated round-trip persistence'
+    assert 'not thermal_system.is_empty():return thermal_hull_matches(percent)' in source_function(session,'bind_thermal_hull'),'Ordinary restore binding may silently repair raw HP'
+    assert 'ship.hull=candidate.thermal_hull_percent()' in source_function(navigation,'_commit_fuel_result'),'F953 raw hull changes are not consumed by Flight'
+    assert 'thermal_system.rng_seed_a_u32=int(result.rng_state.seed_a_u32)' in source_function(session,'_apply_damage_call'),'Thermal RNG continuation is not persisted'
+    velocity=source_function(bridge,'apply_velocity_words')
+    assert velocity.count('body.encode_s32(')==1 and 'body.encode_s32(0x8c+axis*4,int(words[axis]))' in velocity and 'encode_u16' not in velocity and 'encode_s64' not in velocity,'Atmospheric raw drag must preserve Q16 velocity fractions and position'
+    hazard=source_function(main,'_time_context');limit=source_function(source['flight_time_controller'],'safety_limit')
+    assert 'result.atmospheric_hazard=' in hazard and 'nav.thermal_state(ship)' in hazard and 'atmospheric_hazard' in limit and '"rate":1' in limit,'Atmospheric time acceleration safety is disconnected'
+    assert 'nav.thermal_state(ship)' in step and '_announce(fuel_notice.strip_edges())' in step and '_render_thermal()' in source_function(source['hyperdrive_services_view'],'_render'),'Thermal state has no actual flight-notice/workshop consumers'
+    # Retain original source fuel/hyperdrive wiring as well as the new thermal branch.
+    assert 'Jet.fuel_step(' in source_function(session,'_step_fuel') and 'Scoop.evaluate(' in source_function(session,'_step_fuel'),'Atmospheric extension disconnected retained jet/scoop kernels'
+    assert 'candidate.fuel_system.jet_raw_u32=0' in source_function(session,'service'),'Drive removal lost its F410 empty-tank side effect'
+    assert 'session.hyperdrive_snapshot()' in source_function(navigation,'_pending_for') and 'source_map_quote(' in source_function(source['galactic_map_model'],'jump_state'),'Atmospheric extension disconnected source hyperdrive quotes'
+    for relative,expected in ATMOSPHERE_AUDITED_SOURCE_SHA256.items():
+        assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==expected,'Atmosphere update differs from audited integration source '+relative
+    references={}
+    for name,expected in ATMOSPHERE_NATIVE_REFERENCE.items():
+        fixture_raw=(project/'tests/fixtures'/f'{name}.json').read_bytes();fixture=json.loads(fixture_raw)
+        assert hashlib.sha256(fixture_raw).hexdigest()==expected['sha256'],'Changed atmospheric native reference '+name
+        assert fixture.get('case_count')==len(fixture.get('cases',[]))==expected['case_count'],'Incomplete atmospheric native cases '+name
+        if name=='source_atmospheric_native':
+            assert fixture.get('schema_version')==1 and fixture.get('executable_sha256')==SOURCE_IMAGE_SHA256 and fixture.get('pinned_asm_sha256')==SOURCE_ASSEMBLY_SHA256 and fixture.get('source_commit')==SOURCE_ASSEMBLY_COMMIT,'Wrong atmospheric DOS native provenance'
+            checks=fixture.get('execution_checks',{})
+            assert checks.get('fresh_identical_processes')==3 and checks.get('reverse_case_order_identical') is True and checks.get('object_globals_output_canaries') is True and checks.get('unrelated_object_bytes_unchanged') is True and checks.get('expected_arithmetic_computed_by_python') is False,'Incomplete atmospheric native reproduction'
+            assert set(fixture.get('byte_instruction_proofs',{}))==set(ATMOSPHERE_DOS_PROCEDURES),'Incomplete atmospheric instruction proof'
+            for label,original in ATMOSPHERE_DOS_PROCEDURES.items():
+                proof=fixture['byte_instruction_proofs'][label]
+                assert (proof.get('executable_offset'),proof.get('byte_length'),proof.get('sha256'),proof.get('instruction_count'))==(original['dos_file_offset'],original['byte_count'],original['sha256'],original['independently_normalized_instruction_count']) and proof.get('all_instructions_equal_after_only_branch_destination_normalization') is True,'Atmospheric native instructions differ from DOS '+label
+            variant='uploaded-DOS-F1014-F953-F1530-with-observed-external-callbacks'
+        else:
+            assert fixture.get('schema')==1 and fixture.get('asm_sha256')==SOURCE_ASSEMBLY_SHA256 and fixture.get('source_contract')=='pinned-jjffe-f1099-f1475-f1466-speed-v1' and fixture.get('whole_DOS_binary_equivalence') is False,'Speed fixture must retain its pinned-JJFFE-only evidence scope'
+            assert fixture.get('fresh_process_runs')==3 and fixture.get('reverse_repeat_count')==expected['case_count'],'Incomplete speed native reproduction'
+            variant='pinned-JJFFE-speed-fragment-host-ABI-not-whole-DOS-equivalence'
+        references[name]={'sha256':expected['sha256'],'case_count':expected['case_count'],'source_variant':variant,'oracle_executed_by_apk_verifier':False}
+    return {'baseline_source_commit':ATMOSPHERE_BASELINE_SOURCE_COMMIT,'compiled_modules':modules,'compiled_module_count':2,
+        'raw_resource_sha256':hashlib.sha256(raw).hexdigest(),'raw_json_count':1,'original_procedure_count':8,
+        'integration_compiled_modules':integration_modules,'integration_compiled_module_count':len(integration_modules),
+        'original_procedure_bytes':sum(row['byte_count']for row in ATMOSPHERE_DOS_PROCEDURES.values()),
+        'audited_local_source_sha256':ATMOSPHERE_AUDITED_SOURCE_SHA256,'protected_old_source_data_count':len(protected),
+        'protected_contact_dependency_count':len(FUEL_CONTACT_DEPENDENCY_SHA256),'unchanged_Main_function_count':len(unchanged),
+        'retained_fuel_compiled_module_count':len(retained['modules']),'unchanged_fuel_resource_sha256':FUEL_RESOURCE_SHA256,
+        'retained_fuel_native_references':retained['references'],'unchanged_hyperdrive_resource_sha256':HYPERDRIVE_RESOURCE_SHA256,
+        'retained_hyperdrive_compiled_module_count':len(retained['hyper']['modules']),
+        'unchanged_information_resources':retained['information']['tables'],'unchanged_information_runtime_count':3,
+        'native_references':references,'canonical_atmosphere_variant':'uploaded-DOS-F1014-per-invocation-gear-shield-heat-unsigned-drag-cap-0xFFFFF',
+        'shared_single_heat_state':True,'raw_HP_and_local_thermal_RNG_persisted':True,'actual_contact_and_drag_consumers_checked':True,
+        'phone_invocation_rate_hz':60,'phone_rate_is_original':False,'full_original_reference_frame_pipeline':False,
+        'full_original_global_event_rng_stream':False,'full_original_equipment_damage_dispatcher':False,
+        'full_original_destruction_dispatcher':False,'full_F569_player_collision_integrated':False,
+        'original_F908_arrival_pipeline':False,'original_outfitting_economy':False,'complete_original_time_scheduler':False,
+        'complete_original_physics':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
 
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     expected=preset_values(presets)
@@ -1406,7 +1551,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={};hyperdrive_assets={};fuel_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={};hyperdrive_assets={};fuel_assets={};atmosphere_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -1488,10 +1633,15 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             if expected['version_code']==40:
                 hyperdrive_assets=verify_hyperdrive_runtime(archive,presets.parent)
                 system_information_assets={'resources':hyperdrive_assets['system_information_resources'],'unchanged_runtime_modules':3,'raw_original_and_ru_resources_checked':True}
-            if expected['version_code']>=41:
+            if expected['version_code']==41:
                 fuel_assets=verify_fuel_runtime(archive,presets.parent)
                 hyperdrive_assets={'raw_resource_sha256':fuel_assets['unchanged_hyperdrive_resource_sha256'],'compiled_module_count':fuel_assets['retained_hyperdrive_compiled_module_count'],'retained_by_strict_fuel_gate':True,'source_f903_live_quote_consumers_checked':True}
                 system_information_assets={'resources':fuel_assets['unchanged_information_resources'],'unchanged_runtime_modules':3,'raw_original_and_ru_resources_checked':True}
+            if expected['version_code']>=42:
+                atmosphere_assets=verify_atmosphere_runtime(archive,presets.parent)
+                fuel_assets={'raw_resource_sha256':atmosphere_assets['unchanged_fuel_resource_sha256'],'compiled_module_count':atmosphere_assets['retained_fuel_compiled_module_count'],'retained_by_strict_atmosphere_gate':True,'native_references':atmosphere_assets['retained_fuel_native_references']}
+                hyperdrive_assets={'raw_resource_sha256':atmosphere_assets['unchanged_hyperdrive_resource_sha256'],'compiled_module_count':atmosphere_assets['retained_hyperdrive_compiled_module_count'],'retained_by_strict_atmosphere_gate':True,'source_f903_live_quote_consumers_checked':True}
+                system_information_assets={'resources':atmosphere_assets['unchanged_information_resources'],'unchanged_runtime_modules':3,'raw_original_and_ru_resources_checked':True}
         for name in names:
             if not name.startswith('lib/') or not name.endswith('.so'):continue
             data=archive.read(name)
@@ -1509,7 +1659,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'hyperdrive_assets':hyperdrive_assets,'fuel_assets':fuel_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'hyperdrive_assets':hyperdrive_assets,'fuel_assets':fuel_assets,'atmosphere_assets':atmosphere_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

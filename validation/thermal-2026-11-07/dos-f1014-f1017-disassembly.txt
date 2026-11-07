@@ -1,0 +1,134 @@
+
+/workspace/ffe-original/FIRSTENC.EXE:     file format binary
+
+
+Disassembly of section .data:
+
+00031890 <.data+0x31890>:
+   31890:	push   ebp
+   31891:	mov    ebp,esp
+   31893:	push   ebx
+   31894:	push   esi
+   31895:	mov    ebx,DWORD PTR [ebp+0x8]
+   31898:	mov    esi,0x64213c
+   3189d:	cmp    DWORD PTR [esi+0xdc],0x1312d00
+   318a7:	jg     0x319cd
+   318ad:	test   BYTE PTR [ebx+0xcb],0x40
+   318b4:	je     0x318bd
+   318b6:	mov    eax,0xb
+   318bb:	jmp    0x318c2
+   318bd:	mov    eax,0x5
+   318c2:	test   BYTE PTR [esi+0xe9],0x2
+   318c9:	sete   dl
+   318cc:	and    edx,0x1
+   318cf:	sub    eax,edx
+   318d1:	mov    ecx,eax
+   318d3:	mov    eax,DWORD PTR [esi+0xd8]
+   318d9:	sar    eax,cl
+   318db:	mov    edx,DWORD PTR [esi+0x1ec]
+   318e1:	add    edx,eax
+   318e3:	cmp    edx,0xffff
+   318e9:	jle    0x318fa
+   318eb:	push   0x0
+   318ed:	push   0xffffffff
+   318ef:	push   ebx
+   318f0:	call   0x2ed7c
+   318f5:	add    esp,0xc
+   318f8:	jmp    0x31915
+   318fa:	add    DWORD PTR [esi+0x1ec],eax
+   31900:	mov    edx,eax
+   31902:	sar    edx,0x8
+   31905:	test   edx,edx
+   31907:	jle    0x31915
+   31909:	push   0x0
+   3190b:	push   edx
+   3190c:	push   ebx
+   3190d:	call   0x2ed7c
+   31912:	add    esp,0xc
+   31915:	cmp    BYTE PTR [esi+0x3f62],0x0
+   3191c:	je     0x31953
+   3191e:	cmp    BYTE PTR [esi+0x3f5c],0x0
+   31925:	je     0x31953
+   31927:	mov    eax,ds:0x647948
+   3192c:	push   eax
+   3192d:	xor    eax,eax
+   3192f:	mov    al,BYTE PTR [ebx+0x56]
+   31932:	push   eax
+   31933:	call   DWORD PTR ds:0x501840
+   31939:	add    esp,0x8
+   3193c:	cmp    WORD PTR [eax+0xe0],0x116
+   31945:	jge    0x31953
+   31947:	or     BYTE PTR [esi+0x74],0x40
+   3194b:	push   0xe
+   3194d:	call   0x60c7a
+   31952:	pop    ecx
+   31953:	cmp    DWORD PTR [esi+0xd8],0xbb8
+   3195d:	jge    0x31968
+   3195f:	push   ebx
+   31960:	call   0x31a08
+   31965:	pop    ecx
+   31966:	jmp    0x319cd
+   31968:	cmp    DWORD PTR ds:0x652c0c,0xfffff
+   31972:	jbe    0x3197b
+   31974:	mov    esi,0xfffff
+   31979:	jmp    0x31981
+   3197b:	mov    esi,DWORD PTR ds:0x652c0c
+   31981:	shl    esi,0xb
+   31984:	push   esi
+   31985:	mov    eax,DWORD PTR [ebx+0x8c]
+   3198b:	push   eax
+   3198c:	call   0x44278
+   31991:	add    esp,0x8
+   31994:	sub    DWORD PTR [ebx+0x8c],eax
+   3199a:	push   esi
+   3199b:	mov    eax,DWORD PTR [ebx+0x90]
+   319a1:	push   eax
+   319a2:	call   0x44278
+   319a7:	add    esp,0x8
+   319aa:	sub    DWORD PTR [ebx+0x90],eax
+   319b0:	push   esi
+   319b1:	mov    eax,DWORD PTR [ebx+0x94]
+   319b7:	push   eax
+   319b8:	call   0x44278
+   319bd:	add    esp,0x8
+   319c0:	sub    DWORD PTR [ebx+0x94],eax
+   319c6:	push   ebx
+   319c7:	call   0x319ec
+   319cc:	pop    ecx
+   319cd:	pop    esi
+   319ce:	pop    ebx
+   319cf:	pop    ebp
+   319d0:	ret
+   319d1:	nop
+   319d2:	nop
+   319d3:	nop
+   319d4:	push   ebp
+   319d5:	mov    ebp,esp
+   319d7:	and    BYTE PTR ds:0x6421b0,0xbf
+   319de:	mov    eax,DWORD PTR [ebp+0x8]
+   319e1:	push   eax
+   319e2:	call   0x319ec
+   319e7:	pop    ecx
+   319e8:	pop    ebp
+   319e9:	ret
+   319ea:	nop
+   319eb:	nop
+   319ec:	push   ebp
+   319ed:	mov    ebp,esp
+   319ef:	cmp    DWORD PTR ds:0x642218,0x1312d00
+   319f9:	jg     0x31a05
+   319fb:	mov    eax,DWORD PTR [ebp+0x8]
+   319fe:	push   eax
+   319ff:	call   0x31a08
+   31a04:	pop    ecx
+   31a05:	pop    ebp
+   31a06:	ret
+   31a07:	nop
+   31a08:	push   ebp
+   31a09:	mov    ebp,esp
+   31a0b:	add    esp,0xffffffe0
+   31a0e:	mov    esp,ebp
+   31a10:	pop    ebp
+   31a11:	ret
+   31a12:	nop
+   31a13:	nop

@@ -80,6 +80,23 @@ func is_active()->bool:return _active
 # Valid only for an active session. After strict restore this exact saved
 # nominal-day value may replace a rounded decimal Navigation JSON candidate.
 func elapsed_days()->float:return _days if _active else NAN
+func velocity_words()->Array:
+	if not _active:return []
+	var body:=_motion.raw_body();var result:Array=[]
+	for axis in range(3):result.append(int(body.decode_s32(0x8c+axis*4)))
+	return result
+func apply_velocity_words(words:Array,ship:RefCounted)->bool:
+	# F1014 changes the integer velocity words only. Keep source position,
+	# Q16 velocity residues, orientation and clock remainder authoritative.
+	if not _active or words.size()!=3 or ship==null:return false
+	for word:Variant in words:
+		if not word is int or word<(-0x80000000) or word>0x7fffffff:return false
+	var body:=_motion.raw_body()
+	if _velocity(body).distance_to(ship.velocity)>_velocity_error(_velocity(body),ship.velocity):return false
+	for axis in range(3):body.encode_s32(0x8c+axis*4,int(words[axis]))
+	var velocity:=_velocity(body)
+	if not velocity.is_finite() or not _motion.configure(body,str(_motion.snapshot().parent_hex).hex_decode()):return false
+	ship.velocity=velocity;return true
 func synchronize_thrust_limits(ship:RefCounted)->bool:
 	if not _active:return true
 	var limits:Variant=ship.source_thrust_limits_u16

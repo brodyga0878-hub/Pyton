@@ -41,6 +41,7 @@ const SourceUnits=preload("res://scripts/source_units.gd")
 const MotionBridge=preload("res://scripts/source_motion_bridge.gd")
 const FuelFlightBridge=preload("res://scripts/source_fuel_flight_bridge.gd")
 const FuelContact=preload("res://scripts/source_fuel_contact.gd")
+const AtmosphereContact=preload("res://scripts/source_atmosphere_contact.gd")
 const Diagnostics=preload("res://scripts/game_diagnostics.gd")
 const ReportExport=preload("res://scripts/report_export.gd")
 const DockServices=preload("res://scripts/training_dock_services.gd")
@@ -51,6 +52,8 @@ var world:RefCounted
 var surface:RefCounted
 var near:=Near.new()
 var fuel_contact:=FuelContact.new()
+var atmosphere_contact:=AtmosphereContact.new()
+var _thermal_notice_level:=""
 var settings:=Settings.new()
 var saves:=SaveStore.new()
 var presentation:=Presentation.new()
@@ -162,7 +165,7 @@ func _ready()->void:
 
 func _new_models(layout:String=World.PORT_LAYOUT)->void:
 	_close_map(false)
-	instruments.reset();flight_time.reset();last_view="";target_site_id="";target_reference.clear()
+	instruments.reset();flight_time.reset();last_view="";target_site_id="";target_reference.clear();_thermal_notice_level=""
 	source_motion=MotionBridge.new();source_motion_enabled=layout==World.FULL_LAYOUT;last_motion_result.clear()
 	ship=Flight.new();nav=NavigationData.new()
 	if layout==World.FULL_LAYOUT and not nav.configure_native():push_error("Original galaxy could not be initialized")
@@ -176,6 +179,7 @@ func _enable_source_hyperdrive()->bool:
 	return _apply_source_fuel_state()
 
 func _apply_source_fuel_state()->bool:
+	if not nav.bind_thermal_ship(ship):return false
 	if not nav.apply_fuel_availability(ship):return false
 	return source_motion.synchronize_thrust_limits(ship)
 
@@ -326,6 +330,9 @@ func _advance_controls(dt:float)->void:
 
 func _time_context(manual:=false)->Dictionary:
 	var result:={"active":active and ship.hull>0,"menu_open":menu.visible or settings_panel.visible or is_instance_valid(active_map),"busy":busy,"paused":instruments.paused,"source_world":world.layout_mode==World.FULL_LAYOUT,"manual_input":manual,"autopilot":ship.autopilot,"landing":surface.landing,"taking_off":surface.taking_off,"docked":ship.docked,"surface_active":surface.active,"combat_active":ship.combat_active,"jump_remaining":nav.remaining,"transfer_remaining":world.transfer_remaining,"speed_mps":ship.velocity.length(),"station_available":ship.station_available}
+	if nav.is_source_hyperdrive():
+		var thermal:Dictionary=nav.thermal_state(ship)
+		result.atmospheric_hazard=bool(thermal.get("atmosphere_active",false)) or float(thermal.get("heat_percent",0.0))>=75.0
 	var clearance:=INF
 	for body:Dictionary in world.bodies:
 		if str(body.kind)=="barycenter":continue
@@ -408,27 +415,57 @@ func _tick(dt:float,steering:Vector2,roll:float,lift:=0.0)->void:
 func _step_source_fuel(seconds:float,commands:Array)->void:
 	if not nav.is_source_hyperdrive():return
 	if commands.size()!=3:_announce("Не удалось рассчитать расход реактивного топлива.");return
-	var context:Dictionary=fuel_contact.sample(world,ship,nav.elapsed_days) if not surface.active else {"ok":true,"contact":{"flags_u8":0,"altitude_raw_s32":-1,"parent_model_u32":0},"speed_s32":0}
-	if not context.get("ok",false):
-		context={"contact":{"flags_u8":0,"altitude_raw_s32":-1,"parent_model_u32":0},"speed_s32":0}
-	if int(context.contact.get("flags_u8",0))&0x80:
+	# Only a live physical collision/repair may reanchor the raw-HP adapter.
+	# Loading and ordinary saves use strict bind instead, preserving exact HP.
+	if not nav.sync_thermal_ship(ship):_announce("Не удалось согласовать состояние корпуса. Сохраните отчёт об ошибке.");return
+	if ship.hull<=0:_source_ship_destroyed("Корабль потерян при столкновении.","physical_collision");return
+	var context:Dictionary=atmosphere_contact.sample(world,ship,surface,nav.elapsed_days)
+	if not context.get("ok",false):_announce("Не удалось определить состояние атмосферы. Сохраните отчёт об ошибке.");return
+	var raw_motion:bool=not surface.active and source_motion.is_active() and source_motion.synchronized(world,ship,nav.elapsed_days)
+	if raw_motion:
+		context.velocity_s32=source_motion.velocity_words()
+		var exact_speed:=AtmosphereContact.raw_speed_words(context.velocity_s32)
+		if not exact_speed.get("ok",false):return
+		context.speed_s32=int(exact_speed.speed_s32)
+	if int(context.contact.get("flags_u8",0))&0x80 and int(context.contact.get("parent_model_u32",0))>=134 and int(context.contact.get("parent_model_u32",0))<=148:
 		# The read-only source field is probed at the phone ship's centre. This
 		# fatal contact guard is an explicit adapter, not F575's hull response.
-		ship.hull=0;ship.autopilot=false;source_motion.reset()
-		_announce("Корабль потерян: столкновение с недоступной поверхностью звезды или газового гиганта.")
-		_record_event("source_fuel_body_contact",{"body_id":str(context.get("body_id","")),"flags":int(context.contact.flags_u8),"response_policy":"phone-point-solid-contact-fatality-v1"});_save_game();return
+		_source_ship_destroyed("Корабль потерян: столкновение с недоступной поверхностью звезды или газового гиганта.","source_fuel_body_contact",{"body_id":str(context.get("body_id","")),"flags":int(context.contact.flags_u8),"response_policy":"phone-point-solid-contact-fatality-v1"});return
 	context["commands_s16"]=commands
+	context["thermal"]={"apply_f1014":bool(context.apply_f1014),"altitude_s32":int(context.altitude_s32),"speed_s32":int(context.speed_s32),"velocity_s32":context.velocity_s32.duplicate(),"shielding":bool(nav.fuel_state(ship).get("atmospheric_shielding_installed",false)),"gear_down":bool(context.gear_down),"wind_enabled":false,"wind_armed":false,"parent_shield_s16":0,"wind_flags_u8":0}
 	var result:Dictionary=nav.advance_fuel_seconds(seconds,context,ship)
 	if not result.get("ok",false):_announce("Топливная система отклонила состояние. Сохраните отчёт об ошибке.");return
+	var thermal_result:Dictionary=result.get("thermal",{})
+	if thermal_result.get("velocity_changed",false):
+		var before:Array=thermal_result.velocity_before_s32;var after:Array=thermal_result.velocity_after_s32
+		if not raw_motion or not source_motion.apply_velocity_words(after,ship):
+			# The ordinary and surface controllers retain their SI residual.
+			# Only the source integer-word DELTA crosses this explicit frame boundary.
+			if source_motion.is_active():source_motion.reset()
+			var delta:=Vector3(int(after[0])-int(before[0]),int(after[1])-int(before[1]),int(after[2])-int(before[2]))*float(context.velocity_unit_mps)
+			ship.velocity+=Basis(context.velocity_to_phone_basis)*delta
 	if not _apply_source_fuel_state():_announce("Не удалось согласовать тягу после заправки.");return
 	if result.get("destruction_requested",false):
-		ship.hull=0;ship.autopilot=false;_announce("Корабль потерян: критический перегрев.");_record_event("fuel_overheat",{"heat":nav.fuel_state(ship).get("heat_s32",0)});_save_game();return
+		_source_ship_destroyed("Корабль потерян: перегрев и разрушение корпуса.","thermal_destruction",{"heat":nav.fuel_state(ship).get("heat_s32",0)});return
 	var fuel_notice:=""
 	if 0x9907 in result.get("jet_events",[]):fuel_notice="Реактивный бак пуст. Прямая и подъёмная тяга недоступны; заправьте бак из груза через «Оснащение»."
 	if int(result.get("scooped_tonnes",0))>0:
 		fuel_notice="Топливозаборник собрал водород: +%d т в трюм."%int(result.scooped_tonnes);_record_event("fuel_scooped",{"tonnes":int(result.scooped_tonnes),"body_id":str(context.get("body_id",""))})
 	if result.get("hyperjump_cancelled",false):fuel_notice+=" Заряд гипердвигателя отменён: запас грузового топлива изменился."
+	var thermal_state:Dictionary=nav.thermal_state(ship);var severity:=str(thermal_state.get("thermal_severity","unknown"))
+	if severity!=_thermal_notice_level:
+		if severity in ["warning","danger","critical"]:fuel_notice=str(thermal_state.get("thermal_status",""))+" "+str(thermal_state.get("escape_guidance",""))
+		_thermal_notice_level=severity
+	if float(thermal_result.get("hull_percent_after",ship.hull))<float(thermal_result.get("hull_percent_before",ship.hull)):
+		_record_event("atmospheric_hull_damage",{"hull":ship.hull,"heat":nav.fuel_state(ship).get("heat_s32",0),"body_id":str(context.get("body_id","")),"equipment_effect_requested":thermal_result.get("equipment_damage_requested",false)})
 	if not fuel_notice.is_empty():_announce(fuel_notice.strip_edges())
+
+func _source_ship_destroyed(reason:String,event:String,details:Dictionary={})->void:
+	ship.hull=0;ship.autopilot=false
+	if nav.remaining>0:nav.cancel_jump()
+	if world.transfer_remaining>0:world.cancel_transfer()
+	source_motion.reset();nav.sync_thermal_ship(ship)
+	_record_event(event,details);_announce(reason);_save_game()
 
 func _source_motion_step(dt:float,steering:Vector2,roll:float,lift:float)->bool:
 	if not source_motion_enabled or not settings.orbital_gravity or not MotionBridge.eligible(world,ship,surface.active) or dt>MotionBridge.MAX_STEP_SECONDS or absf(lift)>0.000001:
@@ -1310,6 +1347,7 @@ func _decode_state(data:Dictionary)->Dictionary:
 	if restored.is_empty():return {}
 	var candidate_ship:RefCounted=restored.ship
 	if not candidate_nav.validate_source_ship(candidate_ship):return {}
+	if not candidate_nav.bind_thermal_ship(candidate_ship):return {}
 	candidate_nav.apply_fuel_availability(candidate_ship)
 	var candidate_surface:=Surface.new()
 	candidate_surface.set_source_time(candidate_nav.elapsed_days)

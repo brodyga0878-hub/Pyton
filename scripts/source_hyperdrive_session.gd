@@ -5,6 +5,8 @@ const Kernel=preload("res://scripts/source_hyperdrive.gd")
 const Jet=preload("res://scripts/source_jet_fuel.gd")
 const Scoop=preload("res://scripts/source_fuel_scoop.gd")
 const Motion=preload("res://scripts/source_motion_pipeline.gd")
+const Thermal=preload("res://scripts/source_atmospheric_dynamics.gd")
+const ThermalContact=preload("res://scripts/source_atmosphere_contact.gd")
 const SCHEMA:="starfrontier-source-hyperdrive-session-v1"
 const FUEL_PROFILE:="source-f903-hydrogen-military-v1"
 const PRICING:="basic-source-workshop-pricing-adapter-v1"
@@ -14,12 +16,20 @@ const HOST_FUEL_POLICY:="nominal-day-si-player-f152-49710-cadence-v1"
 const PLAYER_UPDATE_TICKS:=49710
 const FUEL_KEYS:=["schema","version","source_digest","initialization_policy","jet_raw_u32","disabled_axes_mask_u8","refueller_installed","refueller_enabled","scoop_installed","atmospheric_shielding_installed","status_u16","cooldown_u32","heat_s32","ticks_fraction_f64_hex","jet_update_remainder_raw","last_scoop_reason","thermal_destruction_requested"]
 const SCOOP_REASONS:=["not_evaluated","outside_atmosphere","ineligible_parent_model","too_high","too_slow","cooldown","scooped","cargo_full","no_scoop"]
+const THERMAL_SCHEMA:="starfrontier-source-thermal-session-v1"
+const THERMAL_DATA_PATH:="res://data/ffe_atmosphere.json"
+const THERMAL_HOST_POLICY:="nominal-day-si-fixed60-combined-source-thermal-v1"
+const THERMAL_HZ:=60
+const THERMAL_TICK_DENOMINATOR:=86400*THERMAL_HZ
+const MAX_THERMAL_STEPS:=256
+const THERMAL_KEYS:=["schema","version","source_contract","source_sha256","source_digest","host_policy","initialization_policy","phase_f64_hex","frame_tick_remainder_raw","tick_fraction_anchor_f64_hex","full_hull_u16","hull_anchor_raw_u16","hull_anchor_percent_f64_hex","hull_u16","shield_max_u16","shield_u16","damage_timer_u8","damage_flags_u8","rng_seed_a_u32","rng_seed_b_u32","destroyed","last_atmosphere_active","last_drag_active","last_hull_damage_u16","last_shield_damage_u16","equipment_damage_requested","wind_flags_u8"]
 static var _resource:Dictionary={}
 static var _resource_mutex:=Mutex.new()
 static var _resource_digest:=""
 static var _fuel_resource:Dictionary={}
 static var _fuel_resource_mutex:=Mutex.new()
 static var _fuel_resource_digest:=""
+static var _thermal_resource_digest:=""
 var ship_id:=""
 var model_index:=-1
 var drive_index:=0
@@ -31,6 +41,9 @@ var adapted_cargo_t:=0
 var adapted_equipment_space_t:=0
 var fuel_system:Dictionary={}
 var fuel_extension_upgraded:=false # Transient notification; never a saved privilege.
+var thermal_system:Dictionary={}
+var thermal_extension_upgraded:=false
+var _thermal_initialization_policy:="source-new-profile-hull-anchor-v1"
 
 static func _number(value:Variant,low:int,high:int)->bool:
 	return (value is int or value is float) and is_finite(float(value)) and float(value)==floorf(float(value)) and value>=low and value<=high
@@ -55,6 +68,11 @@ static func _fuel_digest()->String:
 	if _fuel_resource_digest.is_empty():_fuel_resource_digest=FileAccess.get_sha256(Jet.DATA_PATH)
 	var result:=_fuel_resource_digest
 	_fuel_resource_mutex.unlock();return result
+static func _thermal_digest()->String:
+	_fuel_resource_mutex.lock()
+	if _thermal_resource_digest.is_empty():_thermal_resource_digest=FileAccess.get_sha256(THERMAL_DATA_PATH)
+	var result:=_thermal_resource_digest
+	_fuel_resource_mutex.unlock();return result
 static func _float_hex(value:float)->String:
 	var bytes:=PackedByteArray();bytes.resize(8);bytes.encode_double(0,value);return bytes.hex_encode()
 static func _fraction(value:Variant)->float:
@@ -63,6 +81,12 @@ static func _fraction(value:Variant)->float:
 		if not character in "0123456789abcdef":return -1.0
 	var number:float=value.hex_decode().decode_double(0)
 	return number if is_finite(number) and number>=0 and number<1 else -1.0
+static func _finite_hex(value:Variant)->float:
+	if not value is String or value.length()!=16:return NAN
+	for character:String in value:
+		if not character in "0123456789abcdef":return NAN
+	var number:float=value.hex_decode().decode_double(0)
+	return number if is_finite(number) else NAN
 static func _fuel_data()->Dictionary:
 	_fuel_resource_mutex.lock()
 	if _fuel_resource.is_empty() and FileAccess.file_exists(Jet.DATA_PATH):
@@ -152,7 +176,204 @@ func valid()->bool:
 	if drive_index<0 or drive_index>12 or (drive_index==1 and int(definition.get("source_drive_index",-1))!=1):return false
 	for value in [hydrogen,military,radioactives,fixed_equipment_space_t,adapted_cargo_t,adapted_equipment_space_t]:
 		if value<0 or value>MAX_QUANTITY:return false
-	return hull_mass()>0 and capacity()>=0 and drive_mass(drive_index)>=0 and occupied()<=capacity() and _valid_fuel()
+	return hull_mass()>0 and capacity()>=0 and drive_mass(drive_index)>=0 and occupied()<=capacity() and _valid_fuel() and (thermal_system.is_empty() or _valid_thermal())
+func full_hull_raw()->int:return hull_mass()*4
+func _valid_thermal()->bool:
+	if thermal_system.size()!=THERMAL_KEYS.size():return false
+	for key in THERMAL_KEYS:
+		if not thermal_system.has(key):return false
+	if thermal_system.schema!=THERMAL_SCHEMA or thermal_system.version!=1 or thermal_system.source_contract!=Thermal.CONTRACT or thermal_system.source_sha256!=Thermal.SOURCE_SHA or thermal_system.source_digest!=_thermal_digest() or thermal_system.host_policy!=THERMAL_HOST_POLICY:return false
+	if not thermal_system.initialization_policy in ["source-new-profile-hull-anchor-v1","previous-v3-hull-anchor-v1","explicit-v2-migration-hull-anchor-v1"]:return false
+	if _fraction(thermal_system.phase_f64_hex)<0 or _fraction(thermal_system.tick_fraction_anchor_f64_hex)<0:return false
+	if not _number(thermal_system.frame_tick_remainder_raw,0,THERMAL_TICK_DENOMINATOR-1):return false
+	for key in ["full_hull_u16","hull_anchor_raw_u16","hull_u16","shield_max_u16","shield_u16","last_hull_damage_u16","last_shield_damage_u16"]:
+		if not _number(thermal_system[key],0,65535):return false
+	for key in ["damage_timer_u8","damage_flags_u8","wind_flags_u8"]:
+		if not _number(thermal_system[key],0,255):return false
+	for key in ["rng_seed_a_u32","rng_seed_b_u32"]:
+		if not _number(thermal_system[key],0,0xffffffff):return false
+	for key in ["destroyed","last_atmosphere_active","last_drag_active","equipment_damage_requested"]:
+		if not thermal_system[key] is bool:return false
+	var anchor:=_finite_hex(thermal_system.hull_anchor_percent_f64_hex)
+	if not is_finite(anchor) or anchor<0 or anchor>100:return false
+	if int(thermal_system.full_hull_u16)!=full_hull_raw() or int(thermal_system.hull_anchor_raw_u16)!=ceili(full_hull_raw()*anchor/100.0):return false
+	return int(thermal_system.hull_u16)<=int(thermal_system.hull_anchor_raw_u16) and int(thermal_system.shield_u16)<=int(thermal_system.shield_max_u16)
+func thermal_hull_percent()->float:
+	if thermal_system.is_empty() or not _valid_thermal():return NAN
+	if thermal_system.destroyed or int(thermal_system.hull_u16)==0:return 0.0
+	var anchor:=_finite_hex(thermal_system.hull_anchor_percent_f64_hex)
+	return clampf(anchor-float(int(thermal_system.hull_anchor_raw_u16)-int(thermal_system.hull_u16))*100.0/full_hull_raw(),0,100)
+func thermal_hull_matches(percent:Variant)->bool:
+	if thermal_system.is_empty():return true # Explicit binding owns initialization.
+	if not (percent is int or percent is float) or not is_finite(float(percent)) or float(percent)<0 or float(percent)>100:return false
+	var expected:=thermal_hull_percent()
+	# Flight's legacy JSON decimal may round; the authoritative anchor is F64.
+	return is_finite(expected) and absf(float(percent)-expected)<=maxf(1e-12,absf(expected)*1e-12)
+func bind_thermal_hull(percent:float)->bool:
+	if not is_finite(percent) or percent<0 or percent>100 or full_hull_raw()<=0 or full_hull_raw()>65535:return false
+	if not thermal_system.is_empty():return thermal_hull_matches(percent)
+	var raw:=ceili(full_hull_raw()*percent/100.0);var policy:=_thermal_initialization_policy
+	if fuel_system.initialization_policy=="explicit-v2-migration-profile-v1":policy="explicit-v2-migration-hull-anchor-v1"
+	thermal_system={"schema":THERMAL_SCHEMA,"version":1,"source_contract":Thermal.CONTRACT,"source_sha256":Thermal.SOURCE_SHA,"source_digest":_thermal_digest(),"host_policy":THERMAL_HOST_POLICY,"initialization_policy":policy,"phase_f64_hex":_float_hex(0),"frame_tick_remainder_raw":0,"tick_fraction_anchor_f64_hex":str(fuel_system.ticks_fraction_f64_hex),"full_hull_u16":full_hull_raw(),"hull_anchor_raw_u16":raw,"hull_anchor_percent_f64_hex":_float_hex(percent),"hull_u16":raw,"shield_max_u16":0,"shield_u16":0,"damage_timer_u8":0,"damage_flags_u8":0,"rng_seed_a_u32":1,"rng_seed_b_u32":1,"destroyed":percent==0,"last_atmosphere_active":false,"last_drag_active":false,"last_hull_damage_u16":0,"last_shield_damage_u16":0,"equipment_damage_requested":false,"wind_flags_u8":0}
+	return _valid_thermal()
+func sync_thermal_hull(percent:float)->bool:
+	if not is_finite(percent) or percent<0 or percent>100:return false
+	if thermal_system.is_empty():return bind_thermal_hull(percent)
+	if not _valid_thermal():return false
+	if percent==thermal_hull_percent():return true
+	var raw:=ceili(full_hull_raw()*percent/100.0)
+	thermal_system.hull_anchor_percent_f64_hex=_float_hex(percent);thermal_system.hull_anchor_raw_u16=raw;thermal_system.hull_u16=raw;thermal_system.destroyed=percent==0
+	thermal_system.last_hull_damage_u16=0;thermal_system.last_shield_damage_u16=0
+	return _valid_thermal()
+func _thermal_context(context:Dictionary,velocity:Array=[])->Dictionary:
+	var actual:Variant=context.get("velocity_s32") if velocity.is_empty() else velocity
+	if actual is Array:actual=actual.duplicate(true)
+	var altitude:Variant=context.get("altitude_s32")
+	if _number(altitude,-2147483648,2147483647) and int(altitude)==-1:altitude=0x7fffffff
+	return {"altitude_s32":altitude,"speed_s32":context.get("speed_s32"),"heat_s32":int(fuel_system.heat_s32),"velocity_s32":actual,"shielding":bool(fuel_system.atmospheric_shielding_installed),"gear_down":context.get("gear_down",false),"wind_enabled":context.get("wind_enabled",false),"wind_armed":context.get("wind_armed",false),"parent_shield_s16":context.get("parent_shield_s16",0),"wind_flags_u8":context.get("wind_flags_u8",int(thermal_system.get("wind_flags_u8",0)))}
+func _damage_state()->Dictionary:
+	return {"object_index_u8":1,"kind_u8":3,"volume_s8":0,"player_selector_u8":255,"shield_u16":int(thermal_system.shield_u16),"hull_u16":int(thermal_system.hull_u16),"damage_timer_u8":int(thermal_system.damage_timer_u8),"damage_flags_u8":int(thermal_system.damage_flags_u8)}
+func _apply_damage_call(call:Dictionary)->Dictionary:
+	var rng:={"seed_a_u32":int(thermal_system.rng_seed_a_u32),"seed_b_u32":int(thermal_system.rng_seed_b_u32)}
+	var result:=Thermal.damage(_damage_state(),call.get("amount_s32"),call.get("attacker_u32",0),{"rng_state":rng})
+	if not result.get("ok",false):return result
+	for key in ["shield_u16","hull_u16","damage_timer_u8","damage_flags_u8"]:thermal_system[key]=int(result.state[key])
+	if result.rng_consumed:
+		thermal_system.rng_seed_a_u32=int(result.rng_state.seed_a_u32);thermal_system.rng_seed_b_u32=int(result.rng_state.seed_b_u32)
+	thermal_system.destroyed=bool(thermal_system.destroyed) or bool(result.destruction_requested)
+	thermal_system.equipment_damage_requested=bool(thermal_system.equipment_damage_requested) or bool(result.equipment_damage_requested)
+	return result
+func _thermal_step_inplace(context:Dictionary)->Dictionary:
+	var rejected:={"ok":false,"reason":"invalid_thermal_context"}
+	if not valid() or thermal_system.is_empty() or not _number(context.get("step_ticks_u32"),0,0xffffffff):return rejected
+	if context.has("apply_f1014") and not context.apply_f1014 is bool:return rejected
+	var state:=_thermal_context(context)
+	if not Thermal.valid_atmosphere(state):return rejected
+	for axis in range(3):state.velocity_s32[axis]=int(state.velocity_s32[axis])
+	var before_velocity:Array=state.velocity_s32.duplicate();var before_hull:=thermal_hull_percent()
+	var raw_hull:int=thermal_system.hull_u16;var raw_shield:int=thermal_system.shield_u16
+	var result:={"ok":true,"reason":"outside_atmosphere","velocity_before_s32":before_velocity,"velocity_after_s32":before_velocity.duplicate(),"velocity_changed":false,"hull_percent_before":before_hull,"hull_percent_after":before_hull,"damage_calls":[],"callbacks":[],"destruction_requested":bool(thermal_system.destroyed),"equipment_damage_requested":false,"heat_increment_s32":0,"drag_factor_s32":0,"executed_steps":1,"phase_f64_hex":str(thermal_system.phase_f64_hex),"host_policy":THERMAL_HOST_POLICY,"source_contract":Thermal.CONTRACT}
+	thermal_system.last_atmosphere_active=false;thermal_system.last_drag_active=false
+	thermal_system.last_hull_damage_u16=0;thermal_system.last_shield_damage_u16=0
+	if context.get("apply_f1014",true):
+		var atmosphere:=Thermal.atmosphere(state,int(context.step_ticks_u32))
+		if not atmosphere.get("ok",false):return rejected
+		fuel_system.heat_s32=int(atmosphere.state.heat_s32);thermal_system.wind_flags_u8=int(atmosphere.state.wind_flags_u8)
+		thermal_system.last_atmosphere_active=atmosphere.reason=="atmosphere"
+		result.reason=str(atmosphere.reason);result.damage_calls=atmosphere.damage_calls.duplicate(true)
+		result.heat_increment_s32=int(atmosphere.heat_increment_s32);result.drag_factor_s32=int(atmosphere.drag_factor_s32)
+		result.velocity_after_s32=atmosphere.state.velocity_s32.duplicate();result.velocity_changed=result.velocity_after_s32!=before_velocity
+		thermal_system.last_drag_active=result.velocity_changed
+		for callback:Dictionary in atmosphere.callbacks:
+			result.callbacks.append(callback.duplicate(true))
+			if callback.get("function")=="F953":
+				var damage:=_apply_damage_call(callback)
+				if not damage.get("ok",false):return rejected
+				result.callbacks.append_array(damage.callbacks.duplicate(true))
+				result.equipment_damage_requested=bool(result.equipment_damage_requested) or bool(damage.equipment_damage_requested)
+	thermal_system.last_hull_damage_u16=maxi(0,raw_hull-int(thermal_system.hull_u16));thermal_system.last_shield_damage_u16=maxi(0,raw_shield-int(thermal_system.shield_u16))
+	result.hull_percent_after=thermal_hull_percent();result.destruction_requested=bool(thermal_system.destroyed)
+	return result if valid() else rejected
+func thermal_step(context:Dictionary)->Dictionary:
+	var candidate:=duplicate_session()
+	if candidate==null:return {"ok":false,"reason":"invalid_thermal_session"}
+	var result:Dictionary=candidate._thermal_step_inplace(context)
+	if result.get("ok",false):_copy(candidate)
+	return result
+func _fixed_thermal_seconds(dt:float,context:Dictionary,include_fuel:bool,allow_fastpath:=true)->Dictionary:
+	var rejected:={"ok":false,"reason":"invalid_thermal_context"}
+	if not valid() or thermal_system.is_empty() or not is_finite(dt) or dt<0:return rejected
+	var supplied:Variant=context.get("thermal") if include_fuel else context
+	if not supplied is Dictionary or not Thermal.valid_atmosphere(_thermal_context(supplied)):return rejected
+	if supplied.has("apply_f1014") and not supplied.apply_f1014 is bool:return rejected
+	if include_fuel and not _valid_fuel_context(context):return rejected
+	var accumulated:=dt*THERMAL_HZ+_fraction(thermal_system.phase_f64_hex)
+	if not is_finite(accumulated) or accumulated<0 or accumulated>=MAX_THERMAL_STEPS+1:return {"ok":false,"reason":"thermal_step_budget"}
+	var count:=floori(accumulated);var candidate:=duplicate_session()
+	var velocity:Array=[]
+	for value:Variant in supplied.velocity_s32:velocity.append(int(value))
+	var result:={"ok":true,"reason":"combined_fixed_thermal" if include_fuel else "standalone_fixed_thermal","jet_events":[],"jet_callbacks":[],"scoop_events":{},"scooped_tonnes":0,"destruction_requested":false,"fuel_destruction_requested":false,"thermal_destruction_requested":false,"propulsion_available":propulsion_available(),"host_policy":THERMAL_HOST_POLICY}
+	var detail:={"ok":true,"velocity_before_s32":velocity.duplicate(),"velocity_after_s32":velocity.duplicate(),"velocity_changed":false,"hull_percent_before":thermal_hull_percent(),"hull_percent_after":thermal_hull_percent(),"callbacks":[],"damage_calls":[],"equipment_damage_requested":false,"destruction_requested":false,"executed_steps":0,"phase_f64_hex":str(thermal_system.phase_f64_hex),"host_policy":THERMAL_HOST_POLICY}
+	# A caller may deliberately use the legacy API between fixed-host calls.
+	# Reanchor its new scheduling metadata without changing any legacy fuel bit.
+	var anchor:=_fraction(candidate.thermal_system.tick_fraction_anchor_f64_hex)
+	var remainder:=int(candidate.thermal_system.frame_tick_remainder_raw)
+	var expected:=anchor+float(remainder)/THERMAL_TICK_DENOMINATOR
+	if count>0 and include_fuel and _float_hex(expected-floorf(expected))!=candidate.fuel_system.ticks_fraction_f64_hex:
+		candidate.thermal_system.tick_fraction_anchor_f64_hex=str(candidate.fuel_system.ticks_fraction_f64_hex)
+		candidate.thermal_system.frame_tick_remainder_raw=0;anchor=_fraction(candidate.fuel_system.ticks_fraction_f64_hex)
+	# In a cold vacuum coast all source state transitions below are identities:
+	# positive tank/zero commands, zero heat/timer, no F1033 atmosphere/goods.
+	# Aggregate their clock exactly, while still executing one actual source
+	# update for HUD flags and the final observable no-effect callback record.
+	var vacuum_fast:bool=allow_fastpath and include_fuel and count>0 and not supplied.get("apply_f1014",true) and context.has("contact") and (int(context.contact.flags_u8)&1)==0 and int(candidate.fuel_system.heat_s32)==0 and int(candidate.fuel_system.cooldown_u32)==0 and int(candidate.fuel_system.jet_raw_u32)>0 and not candidate.fuel_system.thermal_destruction_requested and not candidate.thermal_system.destroyed
+	if vacuum_fast:
+		for command:Variant in context.commands_s16:
+			if int(command)!=0:vacuum_fast=false
+	if vacuum_fast:
+		var old_remainder:=int(candidate.thermal_system.frame_tick_remainder_raw)
+		var total:=old_remainder+count*0x100000000
+		var ticks:int=total/THERMAL_TICK_DENOMINATOR;var next_remainder:=total%THERMAL_TICK_DENOMINATOR
+		var previous_fraction:=anchor+float(old_remainder)/THERMAL_TICK_DENOMINATOR;var next_fraction:=anchor+float(next_remainder)/THERMAL_TICK_DENOMINATOR
+		ticks+=floori(next_fraction)-floori(previous_fraction)
+		var fuel_context:=context.duplicate(true);fuel_context.erase("thermal")
+		var sample:=ThermalContact.raw_speed_words(velocity)
+		if not sample.get("ok",false):return rejected
+		fuel_context.speed_s32=int(sample.speed_s32)
+		var fuel_result:Dictionary=candidate.advance_fuel_ticks(ticks,fuel_context)
+		if not fuel_result.get("ok",false):return fuel_result
+		candidate.fuel_system.ticks_fraction_f64_hex=_float_hex(next_fraction-floorf(next_fraction))
+		candidate.thermal_system.frame_tick_remainder_raw=next_remainder;candidate.thermal_system.phase_f64_hex=_float_hex(accumulated-float(count))
+		candidate.thermal_system.last_atmosphere_active=false;candidate.thermal_system.last_drag_active=false;candidate.thermal_system.last_hull_damage_u16=0;candidate.thermal_system.last_shield_damage_u16=0
+		result.jet_events=fuel_result.get("jet_events",[]).duplicate(true);result.jet_callbacks=fuel_result.get("jet_callbacks",[]).duplicate(true);result.scoop_events=fuel_result.get("scoop_events",{}).duplicate(true)
+		detail.executed_steps=count;detail.phase_f64_hex=str(candidate.thermal_system.phase_f64_hex);result.thermal=detail
+		if not candidate.valid():return rejected
+		_copy(candidate);return result
+	for _index in range(count):
+		var old_remainder:=int(candidate.thermal_system.frame_tick_remainder_raw)
+		var total:=old_remainder+0x100000000
+		var ticks:int=total/THERMAL_TICK_DENOMINATOR;var next_remainder:=total%THERMAL_TICK_DENOMINATOR
+		var previous_fraction:=anchor+float(old_remainder)/THERMAL_TICK_DENOMINATOR
+		var next_fraction:=anchor+float(next_remainder)/THERMAL_TICK_DENOMINATOR
+		ticks+=floori(next_fraction)-floori(previous_fraction)
+		candidate.thermal_system.frame_tick_remainder_raw=next_remainder
+		var sample:=ThermalContact.raw_speed_words(velocity)
+		if not sample.get("ok",false):return rejected
+		if include_fuel:
+			var fuel_context:=context.duplicate(true);fuel_context.erase("thermal");fuel_context.speed_s32=int(sample.speed_s32)
+			var fuel_result:Dictionary=candidate.advance_fuel_ticks(ticks,fuel_context)
+			if not fuel_result.get("ok",false):return fuel_result
+			candidate.fuel_system.ticks_fraction_f64_hex=_float_hex(next_fraction-floorf(next_fraction))
+			result.jet_events.append_array(fuel_result.get("jet_events",[]));result.jet_callbacks.append_array(fuel_result.get("jet_callbacks",[]))
+			result.scooped_tonnes+=int(fuel_result.get("scooped_tonnes",0));result.scoop_events=fuel_result.get("scoop_events",{}).duplicate(true)
+			result.fuel_destruction_requested=bool(result.fuel_destruction_requested) or bool(fuel_result.get("destruction_requested",false))
+		var thermal_context:Dictionary=supplied.duplicate(true);thermal_context.velocity_s32=velocity.duplicate();thermal_context.speed_s32=int(sample.speed_s32);thermal_context.step_ticks_u32=ticks
+		var thermal_result:Dictionary=candidate._thermal_step_inplace(thermal_context)
+		if not thermal_result.get("ok",false):return thermal_result
+		velocity=thermal_result.velocity_after_s32.duplicate()
+		detail.callbacks.append_array(thermal_result.callbacks);detail.damage_calls.append_array(thermal_result.damage_calls)
+		detail.equipment_damage_requested=bool(detail.equipment_damage_requested) or bool(thermal_result.equipment_damage_requested);detail.executed_steps+=1
+		result.thermal_destruction_requested=bool(result.thermal_destruction_requested) or bool(thermal_result.destruction_requested)
+		if result.fuel_destruction_requested:candidate.thermal_system.destroyed=true
+		if candidate.thermal_system.destroyed:break
+	candidate.thermal_system.phase_f64_hex=_float_hex(accumulated-float(count))
+	detail.phase_f64_hex=str(candidate.thermal_system.phase_f64_hex);detail.velocity_after_s32=velocity;detail.velocity_changed=velocity!=detail.velocity_before_s32
+	detail.hull_percent_after=candidate.thermal_hull_percent();detail.destruction_requested=bool(candidate.thermal_system.destroyed)
+	result.destruction_requested=bool(result.fuel_destruction_requested) or bool(result.thermal_destruction_requested);result.thermal=detail;result.propulsion_available=candidate.propulsion_available()
+	if not candidate.valid():return rejected
+	_copy(candidate);return result
+func advance_thermal_seconds(dt:float,context:Dictionary)->Dictionary:return _fixed_thermal_seconds(dt,context,false)
+func thermal_state()->Dictionary:
+	var heat:=int(fuel_system.get("heat_s32",0));var percentage:=float(heat)*100.0/65535.0
+	if thermal_system.is_empty():return {"initialized":false,"atmosphere_active":false,"heat_percent":percentage,"thermal_severity":"unknown","thermal_status":"Тепловая модель ожидает привязки корпуса.","atmospheric_status":"Нет подтверждённого состояния атмосферы.","drag_status":"Нет данных о сопротивлении.","damage_status":"Нет исходных данных о повреждениях.","escape_guidance":"","shielding":bool(fuel_system.get("atmospheric_shielding_installed",false)),"shield_available":false,"shield_percent":0.0,"hull_percent":0.0,"upgrade_notice":""}
+	var destroyed:bool=thermal_system.destroyed;var hull_damage:=int(thermal_system.last_hull_damage_u16);var shield_damage:=int(thermal_system.last_shield_damage_u16)
+	var severity:="critical" if destroyed else ("danger" if percentage>=75 or hull_damage>0 else ("warning" if percentage>=50 or shield_damage>0 else "normal"))
+	var statuses:={"normal":"Температурный режим в норме.","warning":"Нагрев повышен.","danger":"Опасный нагрев или повреждение корпуса.","critical":"Корабль потерян из-за повреждений."}
+	var damage_status:="Корпус: %.2f%%."%thermal_hull_percent()
+	if destroyed:damage_status="Корпус разрушен."
+	elif hull_damage>0:damage_status="Урон корпусу от атмосферы: %.2f%%."%(float(hull_damage)*100.0/full_hull_raw())
+	elif shield_damage>0:damage_status="Атмосферный урон поглощён щитом."
+	return {"initialized":true,"atmosphere_active":bool(thermal_system.last_atmosphere_active),"heat_percent":percentage,"thermal_severity":severity,"thermal_status":str(statuses[severity]),"atmospheric_status":"Корабль находится в атмосфере." if thermal_system.last_atmosphere_active else "Атмосферное воздействие не обнаружено.","drag_status":"Действует атмосферное торможение." if thermal_system.last_drag_active else "Атмосферное торможение не действует.","damage_status":damage_status,"escape_guidance":("Уменьшите скорость и выходите из плотных слоёв атмосферы." if thermal_system.last_atmosphere_active else "Удаляйтесь от источника нагрева и дайте корпусу остыть.") if severity in ["warning","danger"] else "","shielding":bool(fuel_system.atmospheric_shielding_installed),"shield_available":int(thermal_system.shield_max_u16)>0,"shield_percent":float(thermal_system.shield_u16)*100.0/int(thermal_system.shield_max_u16) if int(thermal_system.shield_max_u16)>0 else 0.0,"hull_percent":thermal_hull_percent(),"upgrade_notice":"Тепловая модель добавлена к сохранению без изменения корпуса и топлива." if thermal_extension_upgraded else "","host_policy":THERMAL_HOST_POLICY,"source_contract":Thermal.CONTRACT,"phase_f64_hex":str(thermal_system.phase_f64_hex)}
 static func ship_bridge(ship:RefCounted)->Dictionary:
 	if ship==null or not ship.has_method("total_cargo") or not ship.has_method("equipment_space"):return {}
 	var cargo:Variant=ship.total_cargo();var equipment:Variant=ship.equipment_space()
@@ -177,10 +398,13 @@ func range_quote()->Dictionary:return quote(1)
 func hyperdrive_snapshot()->Dictionary:
 	return {"schema":SCHEMA,"version":1,"source_digest":_digest(),"ship_id":ship_id,"model_index":model_index,"drive_index":drive_index,"hydrogen":hydrogen,"military":military,"radioactives":radioactives,"fixed_equipment_space_t":fixed_equipment_space_t,"adapted_cargo_t":adapted_cargo_t,"adapted_equipment_space_t":adapted_equipment_space_t}
 func snapshot()->Dictionary:
-	var result:=hyperdrive_snapshot();result.fuel_system=fuel_system.duplicate(true);return result
+	var result:=hyperdrive_snapshot();result.fuel_system=fuel_system.duplicate(true)
+	if not thermal_system.is_empty():result.thermal_system=thermal_system.duplicate(true)
+	return result
 func restore(data:Dictionary)->bool:
 	var keys:=["schema","version","source_digest","ship_id","model_index","drive_index","hydrogen","military","radioactives","fixed_equipment_space_t","adapted_cargo_t","adapted_equipment_space_t"]
 	if data.has("fuel_system"):keys.append("fuel_system")
+	if data.has("thermal_system"):keys.append("thermal_system")
 	if data.size()!=keys.size():return false
 	for key in keys:
 		if not data.has(key):return false
@@ -196,17 +420,26 @@ func restore(data:Dictionary)->bool:
 		candidate.fuel_system=data.fuel_system.duplicate(true)
 	elif not candidate._initialize_fuel("previous-v3-profile-initialization-v1"):return false
 	candidate.fuel_extension_upgraded=not data.has("fuel_system")
+	if data.has("thermal_system"):
+		if not data.thermal_system is Dictionary or not data.has("fuel_system"):return false
+		candidate.thermal_system=data.thermal_system.duplicate(true)
+		if not candidate._valid_thermal():return false
+	else:
+		candidate._thermal_initialization_policy="previous-v3-hull-anchor-v1";candidate.thermal_extension_upgraded=true
 	if not candidate.valid():return false
 	for key in ["version","jet_raw_u32","disabled_axes_mask_u8","status_u16","cooldown_u32","heat_s32","jet_update_remainder_raw"]:candidate.fuel_system[key]=int(candidate.fuel_system[key])
+	for key in ["version","frame_tick_remainder_raw","full_hull_u16","hull_anchor_raw_u16","hull_u16","shield_max_u16","shield_u16","damage_timer_u8","damage_flags_u8","rng_seed_a_u32","rng_seed_b_u32","last_hull_damage_u16","last_shield_damage_u16","wind_flags_u8"]:
+		if not candidate.thermal_system.is_empty():candidate.thermal_system[key]=int(candidate.thermal_system[key])
 	_copy(candidate);return true
 func _copy(other:RefCounted)->void:
 	ship_id=other.ship_id;model_index=other.model_index;drive_index=other.drive_index;hydrogen=other.hydrogen;military=other.military;radioactives=other.radioactives
 	fixed_equipment_space_t=other.fixed_equipment_space_t;adapted_cargo_t=other.adapted_cargo_t;adapted_equipment_space_t=other.adapted_equipment_space_t
 	fuel_system=other.fuel_system.duplicate(true);fuel_extension_upgraded=other.fuel_extension_upgraded
+	thermal_system=other.thermal_system.duplicate(true);thermal_extension_upgraded=other.thermal_extension_upgraded;_thermal_initialization_policy=other._thermal_initialization_policy
 func duplicate_session()->RefCounted:
 	var candidate:RefCounted=get_script().new()
 	if not candidate.restore(snapshot()):return null
-	candidate.fuel_extension_upgraded=fuel_extension_upgraded;return candidate
+	candidate.fuel_extension_upgraded=fuel_extension_upgraded;candidate.thermal_extension_upgraded=thermal_extension_upgraded;candidate._thermal_initialization_policy=_thermal_initialization_policy;return candidate
 func commit(distance_raw:int,expected:Dictionary)->Dictionary:
 	var current:=quote(distance_raw)
 	if not current.get("ok",false) or not current.get("can_jump",false):return {"ok":false,"reason":"quote_unavailable"}
@@ -313,7 +546,7 @@ func advance_fuel_ticks(ticks:int,context:Dictionary)->Dictionary:
 	if not result.get("ok",false):return result
 	candidate.fuel_system.jet_update_remainder_raw=total%PLAYER_UPDATE_TICKS;_copy(candidate)
 	result.host_policy=HOST_FUEL_POLICY;return result
-func advance_fuel_seconds(dt:float,context:Dictionary)->Dictionary:
+func _legacy_advance_fuel_seconds(dt:float,context:Dictionary)->Dictionary:
 	if not valid() or not _valid_fuel_context(context) or not is_finite(dt) or dt<0:return {"ok":false,"reason":"invalid_fuel_seconds"}
 	var accumulated:=dt*Motion.NOMINAL_TICKS_PER_SECOND+_fraction(fuel_system.ticks_fraction_f64_hex)
 	if not is_finite(accumulated) or accumulated<0 or accumulated>0x7fffffff:return {"ok":false,"reason":"source_tick_range"}
@@ -324,13 +557,15 @@ func advance_fuel_seconds(dt:float,context:Dictionary)->Dictionary:
 	else:result={"ok":true,"reason":"fraction_only","step_s32":0,"jet_events":[],"jet_callbacks":[],"scoop_events":{},"scooped_tonnes":0,"destruction_requested":bool(fuel_system.thermal_destruction_requested),"propulsion_available":propulsion_available()}
 	candidate.fuel_system.ticks_fraction_f64_hex=_float_hex(accumulated-float(step));_copy(candidate)
 	result.host_policy=HOST_FUEL_POLICY;return result
+func advance_fuel_seconds(dt:float,context:Dictionary)->Dictionary:
+	return _fixed_thermal_seconds(dt,context,true) if context.has("thermal") else _legacy_advance_fuel_seconds(dt,context)
 func fuel_state()->Dictionary:
 	if not valid():return {"source_mode":true,"reason":"Недопустимое состояние топливной системы."}
 	var capacity_raw:=Jet.jet_capacity_raw(drive_index);var raw:=int(fuel_system.jet_raw_u32)
 	var manual:=Jet.manual_refuel(_jet_state(),capacity_raw) if capacity_raw>=0 else {"ok":false,"accepted":false,"reason":"invalid_capacity"}
 	var labels:={"not_evaluated":"Ожидание подходящих условий.","outside_atmosphere":"Для забора нужна атмосфера звезды или газового гиганта.","ineligible_parent_model":"Этот объект не подходит для забора топлива.","too_high":"Слишком большая высота для забора топлива.","too_slow":"Недостаточная скорость для забора топлива.","cooldown":"Подготовка следующего забора.","scooped":"Водород поступает в трюм.","cargo_full":"Трюм заполнен.","no_scoop":"Топливозаборник не установлен."}
 	var upgraded:="Реактивная топливная система добавлена к сохранению0.15.0 по начальному профилю корабля; прежний груз и гипертопливо сохранены." if fuel_extension_upgraded else ""
-	return {"source_mode":true,"jet_raw_u32":raw,"jet_capacity_raw_u32":maxi(0,capacity_raw),"jet_tonnes":float(raw)/Jet.RAW_PER_TONNE,"jet_capacity_tonnes":float(maxi(0,capacity_raw))/Jet.RAW_PER_TONNE,"jet_percent":float(raw)*100.0/capacity_raw if capacity_raw>0 else (100.0 if raw>0 else 0.0),"jet_above_nominal":raw>capacity_raw,"propulsion_available":propulsion_available(),"forward_propulsion_available":int(thrust_limits_u16()[4])!=0,"thrust_disabled_axes_mask_u8":int(fuel_system.disabled_axes_mask_u8),"thrust_limits_u16":thrust_limits_u16(),"refueller_installed":bool(fuel_system.refueller_installed),"refueller_enabled":bool(fuel_system.refueller_enabled),"can_toggle_refueller":bool(fuel_system.refueller_installed),"toggle_reason":"" if fuel_system.refueller_installed else "Автозаправщик не установлен.","can_manual_refuel":bool(manual.get("ok",false)) and bool(manual.get("accepted",false)),"manual_refuel_reason":_manual_reason(str(manual.get("reason",""))),"scoop_installed":bool(fuel_system.scoop_installed),"atmospheric_shielding_installed":bool(fuel_system.atmospheric_shielding_installed),"starter_shielding_credit_t":starter_shielding_credit(),"heat_s32":int(fuel_system.heat_s32),"heat_label":"Критический перегрев корпуса." if fuel_system.thermal_destruction_requested else "Нагрев корпуса: %d (шкала игры)."%int(fuel_system.heat_s32),"cooldown_u32":int(fuel_system.cooldown_u32),"cooldown_seconds":float(fuel_system.cooldown_u32)/Motion.NOMINAL_TICKS_PER_SECOND,"scoop_status":str(labels.get(str(fuel_system.last_scoop_reason),labels.not_evaluated)) if fuel_system.scoop_installed else labels.no_scoop,"upgrade_notice":upgraded,"initialization_policy":str(fuel_system.initialization_policy),"host_policy":HOST_FUEL_POLICY}
+	return {"source_mode":true,"jet_raw_u32":raw,"jet_capacity_raw_u32":maxi(0,capacity_raw),"jet_tonnes":float(raw)/Jet.RAW_PER_TONNE,"jet_capacity_tonnes":float(maxi(0,capacity_raw))/Jet.RAW_PER_TONNE,"jet_percent":float(raw)*100.0/capacity_raw if capacity_raw>0 else (100.0 if raw>0 else 0.0),"jet_above_nominal":raw>capacity_raw,"propulsion_available":propulsion_available(),"forward_propulsion_available":int(thrust_limits_u16()[4])!=0,"thrust_disabled_axes_mask_u8":int(fuel_system.disabled_axes_mask_u8),"thrust_limits_u16":thrust_limits_u16(),"refueller_installed":bool(fuel_system.refueller_installed),"refueller_enabled":bool(fuel_system.refueller_enabled),"can_toggle_refueller":bool(fuel_system.refueller_installed),"toggle_reason":"" if fuel_system.refueller_installed else "Автозаправщик не установлен.","can_manual_refuel":bool(manual.get("ok",false)) and bool(manual.get("accepted",false)),"manual_refuel_reason":_manual_reason(str(manual.get("reason",""))),"scoop_installed":bool(fuel_system.scoop_installed),"atmospheric_shielding_installed":bool(fuel_system.atmospheric_shielding_installed),"starter_shielding_credit_t":starter_shielding_credit(),"heat_s32":int(fuel_system.heat_s32),"heat_label":"Критический перегрев корпуса." if fuel_system.thermal_destruction_requested else "Нагрев корпуса: %d (шкала игры)."%int(fuel_system.heat_s32),"cooldown_u32":int(fuel_system.cooldown_u32),"cooldown_seconds":float(fuel_system.cooldown_u32)/Motion.NOMINAL_TICKS_PER_SECOND,"scoop_status":str(labels.get(str(fuel_system.last_scoop_reason),labels.not_evaluated)) if fuel_system.scoop_installed else labels.no_scoop,"upgrade_notice":upgraded,"initialization_policy":str(fuel_system.initialization_policy),"host_policy":HOST_FUEL_POLICY,"thermal":thermal_state()}
 func service_state(credits:int,available:bool,reason:String="")->Dictionary:
 	var ranges:=range_quote();var current_range:=float(ranges.get("current_range_raw",0))/100.0
 	var state:={"schema":"source-hyperdrive-services-v1","source_mode":true,"ship_id":ship_id,"source_model_index":model_index,"profile_name":"Корабельное оборудование и гипертопливо","pricing_profile":PRICING,"drive_class":drive_index,"drive_index":drive_index,"drive_name":drive_name(drive_index),"drive_class_label":drive_name(drive_index),"class_label":drive_name(drive_index),"range_ly":maxf(0,current_range),"maximum_range_ly":maxf(0,float(ranges.get("max_range_raw",0))/100.0),"fuel_kind":fuel_kind(),"hydrogen":hydrogen,"military":military,"radioactives":radioactives,"source_capacity_t":capacity(),"occupied_t":occupied(),"free_t":free_space(),"flight_cargo_t":adapted_cargo_t,"flight_equipment_space_t":adapted_equipment_space_t,"credits":credits,"docked":available,"service_available":available,"reason":reason,"drives":[],"fuels":[],"remove_price":maxi(0,drive_mass(drive_index))*50,"can_remove":available and drive_index>=2,"remove_reason":reason,"can_unload_waste":available and radioactives>0 and credits>=radioactives*10,"unload_quantity":radioactives,"waste_price":radioactives*10,"waste_reason":reason}

@@ -70,6 +70,12 @@ class InformationPackaging(unittest.TestCase):
             if hashlib.sha256(raw).hexdigest()!=entry['sha256'] or entry['sha256']!=verifier.MAP_VISUAL_PROTECTED_SOURCE_SHA256[name]:
                 raise AssertionError('Historical physics baseline differs: '+name)
             (cls.project/name).write_bytes(raw)
+        thermal=json.loads((PROJECT/'tests/fixtures/thermal_v41_sources.json').read_text())
+        for name in ['scripts/planetary_system.gd','scripts/flight_time_controller.gd']:
+            entry=thermal['files'][name];raw=entry['source'].encode()
+            if hashlib.sha256(raw).hexdigest()!=entry['sha256'] or entry['sha256']!=verifier.MAP_VISUAL_PROTECTED_SOURCE_SHA256[name]:
+                raise AssertionError('Historical World/time source differs')
+            (cls.project/name).write_bytes(raw)
 
     def setUp(self):self.archive=MockInformationArchive(self.project)
 

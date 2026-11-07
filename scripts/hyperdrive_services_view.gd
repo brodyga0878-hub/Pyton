@@ -85,6 +85,35 @@ func _price(row:Dictionary,key:String,caption:="")->String:
 func _reason(parent:Control,key:String,text:String)->void:
 	if not text.is_empty():_label(parent,key,text,17,true)
 
+func _thermal_state()->Dictionary:
+	var fuel:Variant=_state.get("fuel_system")
+	if not fuel is Dictionary or fuel.get("source_mode",false)!=true:return {}
+	var thermal:Variant=fuel.get("thermal")
+	return thermal if thermal is Dictionary and thermal.get("initialized",false)==true else {}
+
+func _render_thermal()->void:
+	var thermal:=_thermal_state()
+	if thermal.is_empty():return
+	_section("НАГРЕВ И АТМОСФЕРА")
+	var card:=_card()
+	var heat:=_number(thermal,"heat_percent")
+	var heat_label:=_label(card,"thermal_heat","Нагрев корпуса: "+(_amount(heat,1)+"%" if is_finite(heat) else "—"),23)
+	var palette:={"normal":Color("8cdbd1"),"warning":Color("f3d48a"),"danger":Color("ffa16c"),"critical":Color("ff827d"),"unknown":Color("8eafbd")}
+	var color:Color=palette.get(_text(thermal,"thermal_severity","unknown"),palette.unknown)
+	heat_label.add_theme_color_override("font_color",color)
+	var status:=_text(thermal,"thermal_status")
+	if not status.is_empty():_label(card,"thermal_status",status,20).add_theme_color_override("font_color",color)
+	_label(card,"thermal_hull","Корпус: "+_amount(_number(thermal,"hull_percent"))+"%",20)
+	var available:Variant=thermal.get("shield_available")
+	var shield:="—"
+	if available is bool:shield=(_amount(_number(thermal,"shield_percent"))+"%") if available else "не установлен"
+	_label(card,"thermal_shield","Энергетический щит: "+shield,18,true)
+	var shielding:Variant=thermal.get("shielding")
+	_label(card,"thermal_shielding","Атмосферная защита: "+(("установлена" if shielding else "не установлена") if shielding is bool else "—"),18,true)
+	for key:String in ["atmospheric_status","drag_status","damage_status","escape_guidance","upgrade_notice"]:
+		var target:String={"atmospheric_status":"thermal_atmosphere","drag_status":"thermal_drag","damage_status":"thermal_damage","escape_guidance":"thermal_guidance","upgrade_notice":"thermal_upgrade"}[key]
+		_reason(card,target,_text(thermal,key))
+	_reason(card,"thermal_source_heat",_text(_state.fuel_system,"heat_label"))
 
 func _render_fuel_system()->void:
 	var value:Variant=_state.get("fuel_system")
@@ -116,7 +145,8 @@ func _render_fuel_system()->void:
 		if fuel.get("can_toggle_refueller",false)!=true:_reason(refueller,"refueller_reason",_text(fuel,"toggle_reason"))
 	var scoop:=_card();var fitted:Variant=fuel.get("scoop_installed")
 	_label(scoop,"scoop","Топливозаборник: "+("установлен" if fitted else "не установлен") if fitted is bool else "Топливозаборник: —",21)
-	_reason(scoop,"scoop_status",_text(fuel,"scoop_status"));_reason(scoop,"scoop_heat",_text(fuel,"heat_label"))
+	_reason(scoop,"scoop_status",_text(fuel,"scoop_status"))
+	if _thermal_state().is_empty():_reason(scoop,"scoop_heat",_text(fuel,"heat_label"))
 	var seconds:=_number(fuel,"cooldown_seconds")
 	if is_finite(seconds):_label(scoop,"scoop_cooldown","До следующего сбора: "+_amount(seconds,2)+" с",18,true)
 	if fuel.get("atmospheric_shielding_installed") is bool:_label(scoop,"scoop_shielding","Атмосферная защита: "+("установлена" if fuel.atmospheric_shielding_installed else "не установлена"),18,true)
@@ -166,6 +196,7 @@ func _render()->void:
 	else:
 		_action(current,"remove_drive","Снять гипердвигатель"+_price(_state,"remove_price","Возврат "),"remove_drive","",1,_state.get("can_remove",false)==true,_text(_state,"remove_reason"))
 		if _state.get("can_remove",false)!=true:_reason(current,"remove_reason",_text(_state,"remove_reason"))
+	_render_thermal()
 	_render_fuel_system()
 	_render_fuel_equipment()
 	_section("ТОПЛИВО И ОТХОДЫ")

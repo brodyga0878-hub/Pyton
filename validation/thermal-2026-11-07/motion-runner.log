@@ -1,0 +1,2 @@
+source_thermal_motion_bridge: passed; 355 checks, 0 failures
+Validation passed: 355 current checks; 1 passed suites; 0 failed; 0 unavailable. Report: validation/thermal-2026-11-07/motion-bridge.json

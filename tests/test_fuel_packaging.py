@@ -1,5 +1,6 @@
 """Strict code41 package negative controls with an explicit mock, not an APK."""
 import importlib.util
+import hashlib
 import json
 from pathlib import Path
 import tempfile
@@ -21,10 +22,32 @@ class MockFuelArchive:
 
 
 class FuelPackaging(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        directory=tempfile.TemporaryDirectory(prefix='fuel-packaging-v41-')
+        cls.addClassCleanup(directory.cleanup);cls.project=Path(directory.name)
+        for relative in cls.project_files():
+            target=cls.project/relative;target.parent.mkdir(parents=True,exist_ok=True)
+            target.write_bytes((PROJECT/relative).read_bytes())
+        path=PROJECT/'tests/fixtures/thermal_v41_sources.json'
+        if hashlib.sha256(path.read_bytes()).hexdigest()!='4fd5e42c88d9a11c911ac01ca04f41dc5fe1a42624fa99c7774cb145e7382790':
+            raise AssertionError('Historical code41 thermal baseline fixture changed')
+        baseline=json.loads(path.read_text())
+        expected={**verifier.FUEL_AUDITED_SOURCE_SHA256,
+                  **{name:verifier.MAP_VISUAL_PROTECTED_SOURCE_SHA256[name] for name in
+                     ['scripts/planetary_system.gd','scripts/flight_time_controller.gd']}}
+        if baseline['source_commit']!='450e862ac3c146994371d8fa427efbc65b9fc677' or set(baseline['files'])!=set(expected):
+            raise AssertionError('Historical code41 source fixture domain changed')
+        for name,digest in expected.items():
+            entry=baseline['files'][name];raw=entry['source'].encode()
+            if entry['sha256']!=digest or hashlib.sha256(raw).hexdigest()!=digest:
+                raise AssertionError('Historical code41 source differs '+name)
+            (cls.project/name).write_bytes(raw)
+
     def setUp(self):self.archive=MockFuelArchive()
 
-    def project_copy(self,directory):
-        project=Path(directory)
+    @staticmethod
+    def project_files():
         files=set(verifier.MAP_VISUAL_PROTECTED_SOURCE_SHA256)
         files.update(verifier.FUEL_AUDITED_SOURCE_SHA256)
         files.update(verifier.FUEL_CONTACT_DEPENDENCY_SHA256)
@@ -33,9 +56,13 @@ class FuelPackaging(unittest.TestCase):
                       'data/ffe_fuel.json','data/ffe_hyperdrive.json','tests/fixtures/source_hyperdrive_native.json'])
         files.update(f'data/{name}.json' for name in verifier.SYSTEM_INFORMATION_TABLES)
         files.update(f'tests/fixtures/{name}.json'for name in verifier.FUEL_NATIVE_REFERENCE)
-        for relative in files:
+        return files
+
+    def project_copy(self,directory):
+        project=Path(directory)
+        for relative in self.project_files():
             target=project/relative;target.parent.mkdir(parents=True,exist_ok=True)
-            target.write_bytes((PROJECT/relative).read_bytes())
+            target.write_bytes((self.project/relative).read_bytes())
         return project
 
     def mutate_resource(self,project,name,callback):
@@ -48,8 +75,8 @@ class FuelPackaging(unittest.TestCase):
         self.assertIn(old,function);changed=function.replace(old,new,1)
         path.write_text(raw.replace(function,changed,1))
 
-    def test_actual_frozen_code41_scope_and_declared_limits(self):
-        result=verifier.verify_fuel_runtime(self.archive,PROJECT)
+    def test_historical_frozen_code41_scope_and_declared_limits(self):
+        result=verifier.verify_fuel_runtime(self.archive,self.project)
         self.assertEqual(result['baseline_source_commit'],'c3872931413d5641c3b437aa2669ed444e5f8075')
         self.assertEqual((result['compiled_module_count'],result['contact_model_count'],result['raw_json_count']),(4,15,1))
         self.assertEqual(result['protected_old_source_data_count'],11)
@@ -71,29 +98,29 @@ class FuelPackaging(unittest.TestCase):
             with self.subTest(name=name):
                 archive=MockFuelArchive();del archive.entries[f'assets/scripts/{name}.gdc']
                 with self.assertRaisesRegex(AssertionError,'Missing fuel runtime module'):
-                    verifier.verify_fuel_runtime(archive,PROJECT)
+                    verifier.verify_fuel_runtime(archive,self.project)
 
     def test_each_new_compiled_module_header_is_checked(self):
         for name in verifier.FUEL_MODULES:
             with self.subTest(name=name):
                 archive=MockFuelArchive();archive.entries[f'assets/scripts/{name}.gdc']=b'BAD!'+b'x'*100
                 with self.assertRaisesRegex(AssertionError,'Invalid compiled fuel runtime'):
-                    verifier.verify_fuel_runtime(archive,PROJECT)
+                    verifier.verify_fuel_runtime(archive,self.project)
 
     def test_old_hyperdrive_and_information_modules_are_still_required(self):
         for name in (*verifier.HYPERDRIVE_MODULES,*verifier.SYSTEM_INFORMATION_MODULES):
             with self.subTest(name=name):
                 archive=MockFuelArchive();del archive.entries[f'assets/scripts/{name}.gdc']
                 with self.assertRaisesRegex(AssertionError,'Missing (hyperdrive|system information) runtime'):
-                    verifier.verify_fuel_runtime(archive,PROJECT)
+                    verifier.verify_fuel_runtime(archive,self.project)
 
     def test_missing_or_different_exported_fuel_resource_is_rejected(self):
         del self.archive.entries['assets/data/ffe_fuel.json']
         with self.assertRaisesRegex(AssertionError,'Missing fuel resource'):
-            verifier.verify_fuel_runtime(self.archive,PROJECT)
+            verifier.verify_fuel_runtime(self.archive,self.project)
         self.archive=MockFuelArchive();self.archive.entries['assets/data/ffe_fuel.json']+=b' '
         with self.assertRaisesRegex(AssertionError,'Fuel resource differs from local source'):
-            verifier.verify_fuel_runtime(self.archive,PROJECT)
+            verifier.verify_fuel_runtime(self.archive,self.project)
 
     def test_wrong_original_provenance_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:

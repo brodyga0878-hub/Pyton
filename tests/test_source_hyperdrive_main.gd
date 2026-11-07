@@ -30,7 +30,7 @@ func inventory()->Dictionary:
 	# This suite compares the hyperdrive inventory. The independently advancing
 	# jet/thermal clock has its own complete pause/continuation tests.
 	var result:Dictionary=game.nav.snapshot().get("source_hyperdrive",{}).duplicate(true)
-	result.erase("fuel_system");return result
+	result.erase("fuel_system");result.erase("thermal_system");return result
 func tap(button:Button,pointer:=111)->void:
 	var event:=InputEventScreenTouch.new();event.index=pointer;event.position=button.get_global_rect().get_center();event.pressed=true
 	root.push_input(event,true);await frame();event.pressed=false;root.push_input(event,true);await frame()
@@ -177,6 +177,6 @@ func run()->void:
 	game.set_process(false);game.set_physics_process(false);await frame();check(game.automated and not game.saving_enabled,"Actual Main test never loads ordinary player progress")
 	await source_map_and_cancel();await pending_save_and_arrival();await military_fixture();await services_focus_and_save_failure();invalid_v3_atomic();await legacy_migration_and_backup()
 	game.queue_free();await frame()
-	var path:="res://validation/fuel-2026-11-07/hyperdrive-main-regression.json";DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(path.get_base_dir()));var file:=FileAccess.open(path,FileAccess.WRITE)
+	var path:="res://validation/thermal-2026-11-07/hyperdrive-main-regression.json";DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(path.get_base_dir()));var file:=FileAccess.open(path,FileAccess.WRITE)
 	file.store_string(JSON.stringify({"schema":1,"checks":checks,"failures":failures,"evidence":evidence,"scope":"Actual Main source jump, map quote, pending whole-game continuation, military fixture, explicit legacy migration/durable private backup and invalid-v3 atomicity; no physical-phone or FPS proof.","sources":{"main_sha256":FileAccess.get_sha256("res://scripts/main.gd"),"navigation_sha256":FileAccess.get_sha256("res://scripts/navigation.gd"),"session_sha256":FileAccess.get_sha256("res://scripts/source_hyperdrive_session.gd"),"test_sha256":FileAccess.get_sha256("res://tests/test_source_hyperdrive_main.gd")}},"\t"))
 	print("Source hyperdrive Main: %d checks, %d failures"%[checks,failures]);quit(1 if failures else 0)

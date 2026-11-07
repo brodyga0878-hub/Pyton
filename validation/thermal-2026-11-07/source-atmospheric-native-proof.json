@@ -1,0 +1,318 @@
+{
+  "schema_version": 1,
+  "reference": "uploaded DOS FIRSTENC.EXE",
+  "executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "pinned_asm_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+  "byte_instruction_proofs": {
+    "34": {
+      "executable_offset": 13048,
+      "virtual_address": 4269304,
+      "byte_length": 31,
+      "sha256": "fbafd34f244fc54703ebc14e55a04731088dfd1a8462e87d99f4020b4ee63187",
+      "instruction_count": 12,
+      "normalized_instruction_sha256": "7aa07ecfc81a7e74d485c5cd3641816c28a7dbdfb8003f03bd49059c69337065",
+      "all_instructions_equal_after_only_branch_destination_normalization": true,
+      "source": "pinned ASM, independently matched to DOS"
+    },
+    "35": {
+      "executable_offset": 13080,
+      "virtual_address": 4269336,
+      "byte_length": 15,
+      "sha256": "96974c654576f4f30e03da8d77af820eb9b6b2e0ce0c037ab98b817e3c7e5866",
+      "instruction_count": 6,
+      "normalized_instruction_sha256": "3694ed47ad63a9ae640345cdbdb9c2b9ccf5ee7b88629138933294f8b074b7cc",
+      "all_instructions_equal_after_only_branch_destination_normalization": true,
+      "source": "pinned ASM, independently matched to DOS"
+    },
+    "953": {
+      "executable_offset": 191868,
+      "virtual_address": 4448124,
+      "byte_length": 436,
+      "sha256": "aa8ec30bafd1e80ed164f34e8b384a2ff9e46d8eaf9a17239ee9065d84874469",
+      "instruction_count": 131,
+      "normalized_instruction_sha256": "a218d09765da3d067ef9a3d9dbab65bc616f4813c0265661c20711b3a7026b9d",
+      "all_instructions_equal_after_only_branch_destination_normalization": true,
+      "source": "pinned ASM, independently matched to DOS"
+    },
+    "1016": {
+      "executable_offset": 203244,
+      "virtual_address": 4459500,
+      "byte_length": 27,
+      "sha256": "d11d23496ba03a43ce954ab8e0906dcb2f53cecfd8b2425911e2ccfc517137c5",
+      "instruction_count": 10,
+      "normalized_instruction_sha256": "f4cc1ac5803765a0f2e98408a249e787b77ee6ef84a4499a071314d44190c1f5",
+      "all_instructions_equal_after_only_branch_destination_normalization": true,
+      "source": "pinned ASM, independently matched to DOS"
+    },
+    "1017": {
+      "executable_offset": 203272,
+      "virtual_address": 4459528,
+      "byte_length": 10,
+      "sha256": "2d8a6cf3a78899319464c62419cb1f5f1b36331ff4359fc1b1081d1ccbbea30a",
+      "instruction_count": 6,
+      "normalized_instruction_sha256": "d34b2ffd7d4e76bacba2adaad7d9bd0adb55b915da569ff8168ea82fba1e5bc8",
+      "all_instructions_equal_after_only_branch_destination_normalization": true,
+      "source": "pinned ASM, independently matched to DOS"
+    },
+    "1521": {
+      "executable_offset": 279160,
+      "virtual_address": 4535416,
+      "byte_length": 17,
+      "sha256": "f62a5f949cbf8da772c3cc32ae59b607e0f35cda6c3c4e1ddf848ba3b5a1b445",
+      "instruction_count": 9,
+      "normalized_instruction_sha256": "41d13ec389df5b306dbeb350873dd5272b12f7a1d61a674cb369cb6e1398f31c",
+      "all_instructions_equal_after_only_branch_destination_normalization": true,
+      "source": "pinned ASM, independently matched to DOS"
+    },
+    "1530": {
+      "executable_offset": 279740,
+      "virtual_address": 4535996,
+      "byte_length": 63,
+      "sha256": "35fb8bff8c10fc5628238eb1cfe0078393caf7fa1a4cdb6a6d28374e6edf0535",
+      "instruction_count": 18,
+      "normalized_instruction_sha256": "2780e30402318725b54618094aa0334b57497b3b9d877cf06cf0cf48ce996580",
+      "all_instructions_equal_after_only_branch_destination_normalization": true,
+      "source": "pinned ASM, independently matched to DOS"
+    },
+    "1014": {
+      "executable_offset": 202896,
+      "virtual_address": 4459152,
+      "byte_length": 321,
+      "sha256": "dcdc0bc325086ddaff36264342e39a703e41543d7e0badd4f067c3a5ce595095",
+      "instruction_count": 94,
+      "normalized_instruction_sha256": "635ed699db90cc11a889d96b72bdf0738c044316dec9a43b14a792078fc6c78e",
+      "all_instructions_equal_after_only_branch_destination_normalization": true,
+      "source": "direct uploaded DOS disassembly"
+    }
+  },
+  "case_count": 1447,
+  "callback_raw_schema": [
+    "function_number",
+    "arg1_u32",
+    "arg2_u32",
+    "arg3_u32",
+    "arg4_u32",
+    "reserved_zero"
+  ],
+  "callback_arguments": {
+    "34": [
+      "register",
+      "value_u32"
+    ],
+    "35": [
+      "register",
+      "return_u32"
+    ],
+    "144": [
+      "module_index",
+      "event",
+      "code",
+      "object_index_u8"
+    ],
+    "148": [
+      "action",
+      "value"
+    ],
+    "942": [
+      "attacker_u32"
+    ],
+    "952": [],
+    "953": [
+      "amount_s32_bits",
+      "attacker_u32"
+    ],
+    "1016": [],
+    "1017": [],
+    "1530": [
+      "return_u32"
+    ],
+    "1532": [],
+    "1538": [],
+    "1906": [
+      "sample"
+    ],
+    "1907": [
+      "sample",
+      "volume_s8_sign_extended_u32"
+    ]
+  },
+  "execution_checks": {
+    "fresh_identical_processes": 3,
+    "reverse_case_order_identical": true,
+    "object_globals_output_canaries": true,
+    "unrelated_object_bytes_unchanged": true,
+    "expected_arithmetic_computed_by_python": false
+  },
+  "scope": [
+    "F1014 original per-invocation heat; unsigned drag cap0xFFFFF; original wind branch",
+    "F953 shield/hull/equipment decision arithmetic; original F34/F35 variable bus and original F1530 RNG",
+    "F144/F148/sound/object lookup/F942/F952 are explicitly observed adapters, not full event/equipment/destruction implementations",
+    "F1014 operation observes F953 requests only; F1014_damage executes F953 core with those external adapters",
+    "F1530 uses fixture-local source seeds; no claim to reproduce the unported global AI/event RNG stream"
+  ],
+  "known_jjffe_differences": [
+    "JJFFE F1014 heat uses dt product and4096 cap with shifted22/19, DOS uses speed SAR11/5 minus gear-up adjustment per call",
+    "JJFFE comments out incremental F953 damage and adds heat bit0x8000 notification, absent in DOS",
+    "JJFFE signed drag cap0xFFFF differs from DOS unsigned0xFFFFF"
+  ],
+  "invalid_domains_not_executed": [
+    {
+      "domain": "malformed object or missing parent pointer",
+      "policy": "API rejects; source raw pointers require valid object banks"
+    },
+    {
+      "domain": "module count beyond host input16",
+      "policy": "fixture adapter bound only; original source uses DATA8621 count; not a source gameplay restriction"
+    }
+  ],
+  "independent_literal_controls": [
+    {
+      "name": "3000-speed-heat-shield-0-gear-0",
+      "case_id": "dos-atmospheric-0092",
+      "observed": 187,
+      "literal_expected": 187,
+      "passed": true
+    },
+    {
+      "name": "3000-speed-heat-shield-0-gear-1",
+      "case_id": "dos-atmospheric-0093",
+      "observed": 93,
+      "literal_expected": 93,
+      "passed": true
+    },
+    {
+      "name": "3000-speed-heat-shield-1-gear-0",
+      "case_id": "dos-atmospheric-0094",
+      "observed": 2,
+      "literal_expected": 2,
+      "passed": true
+    },
+    {
+      "name": "3000-speed-heat-shield-1-gear-1",
+      "case_id": "dos-atmospheric-0095",
+      "observed": 1,
+      "literal_expected": 1,
+      "passed": true
+    },
+    {
+      "name": "fatal-candidate-does-not-write-heat",
+      "case_id": "dos-atmospheric-0374",
+      "observed": [
+        65535,
+        [
+          {
+            "amount_s32": -1,
+            "attacker_u32": 0
+          }
+        ],
+        1017
+      ],
+      "literal_expected": [
+        65535,
+        [
+          {
+            "amount_s32": -1,
+            "attacker_u32": 0
+          }
+        ],
+        1017
+      ],
+      "passed": true
+    },
+    {
+      "name": "wind-parent-277-sets-only-bit40",
+      "case_id": "dos-atmospheric-0548",
+      "observed": [
+        64,
+        [
+          [
+            1532,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1906,
+            14,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      ],
+      "literal_expected": [
+        64,
+        [
+          [
+            1532,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1906,
+            14,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "name": "exact-shield-boundary-preserves-hull",
+      "case_id": "dos-atmospheric-0684",
+      "observed": [
+        0,
+        1000,
+        161,
+        1
+      ],
+      "literal_expected": [
+        0,
+        1000,
+        161,
+        1
+      ],
+      "passed": true
+    },
+    {
+      "name": "zero-seeds-first-source-random",
+      "case_id": "dos-atmospheric-1116",
+      "observed": [
+        26796,
+        {
+          "seed_a_u32": 4263798956,
+          "seed_b_u32": 0
+        }
+      ],
+      "literal_expected": [
+        26796,
+        {
+          "seed_a_u32": 4263798956,
+          "seed_b_u32": 0
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "fixture_sha256": "04cff4bc5d43c7eabda2ed4361a0ee8c0221cc1c432c8ea2dd33daad0d3b9025",
+  "tool_sha256": "9252d56228ba6c8b50aba384377fa91f87256591040a32110e88bd5554f04f78",
+  "generated_native_assembly_sha256": "86806c5d41416dcca3e6c5bbf38d0816354b08fc7bf87bb2a99fe661ae523f57",
+  "counts_by_operation": {
+    "F1014": 692,
+    "F953": 663,
+    "F1014_damage": 9,
+    "F1016": 4,
+    "F1017": 4,
+    "F1530": 75
+  }
+}

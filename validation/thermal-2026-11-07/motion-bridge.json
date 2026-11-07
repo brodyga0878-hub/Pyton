@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-07T20:24:39.202316+00:00",
+  "updated_utc": "2026-11-07T20:24:39.719910+00:00",
+  "duration_seconds": 0.518,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-07T20:24:39.202316+00:00",
+      "duration_seconds": 0.518,
+      "requested_suites": [
+        "source_thermal_motion_bridge"
+      ],
+      "executed_suites": [
+        "source_thermal_motion_bridge"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 3,
+  "status": "passed",
+  "passed_suites": 1,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 355,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "source_thermal_motion_bridge",
+      "scope": "Actual raw movement retains Q16 velocity fractions, position/clock and exact cold continuation when atmosphere changes only native integer velocity words.",
+      "status": "passed",
+      "checks": 355,
+      "failures": 0,
+      "executed_utc": "2026-11-07T20:24:39.203824+00:00",
+      "suite_source": {
+        "path": "tests/test_source_thermal_motion_bridge.gd",
+        "bytes": 4725,
+        "sha256": "8379d9111be049328f9cef39a267d4e10a897aa669955d2bbfd85542a6c6feed"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_thermal_motion_bridge.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.515,
+      "timed_out": false,
+      "output_bytes": 132,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/motion-logs/logs/source_thermal_motion_bridge.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ]
+}
