@@ -1,0 +1,112 @@
+{
+  "started_utc": "2026-11-07T08:28:30.559657+00:00",
+  "version": "0.13.0-navigation-alpha1",
+  "artifact_commit": "518438c23c0ff4a800d1749034a811f47b54a0ce",
+  "source_commit": "e4e8e7edccdb4422124f249365dfb8c99d135bb5",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/518438c23c0ff4a800d1749034a811f47b54a0ce/deliverables/0.13.0-navigation-alpha1/manifest.json",
+      "http_status": 200,
+      "bytes": 12280,
+      "sha256": "d676c1a63f16179e98361d54bdd74211407a2d2d3d49b01a0bb77ece2b64db71"
+    },
+    {
+      "file": "StarFrontier-0.13.0-navigation-arm64.apk",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/518438c23c0ff4a800d1749034a811f47b54a0ce/deliverables/0.13.0-navigation-alpha1/StarFrontier-0.13.0-navigation-arm64.apk",
+      "http_status": 200,
+      "bytes": 49757324,
+      "sha256": "b7f9e4c999fa75dc9f271a1b05514f9adde8c1af066910f8cee234168d990153",
+      "zip_crc_verified": true
+    },
+    {
+      "file": "StarFrontier-0.13.0-navigation-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/518438c23c0ff4a800d1749034a811f47b54a0ce/deliverables/0.13.0-navigation-alpha1/StarFrontier-0.13.0-navigation-source.zip",
+      "http_status": 200,
+      "bytes": 28766521,
+      "sha256": "24d5a592c920ce6785430577fef89126d11658ed5e168ae2dbe3cb8e88c9f57f",
+      "zip_crc_verified": true,
+      "source_commit_in_zip_comment": "e4e8e7edccdb4422124f249365dfb8c99d135bb5"
+    },
+    {
+      "file": "screenshots/capture-manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/518438c23c0ff4a800d1749034a811f47b54a0ce/deliverables/0.13.0-navigation-alpha1/screenshots/capture-manifest.json",
+      "http_status": 200,
+      "bytes": 6995,
+      "sha256": "cc761582543e2b6508980619528217c2a1a84b1a305be1c959fab2d9e2956de1"
+    },
+    {
+      "file": "screenshots/1440x720-01-flight-time-roll.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/518438c23c0ff4a800d1749034a811f47b54a0ce/deliverables/0.13.0-navigation-alpha1/screenshots/1440x720-01-flight-time-roll.png",
+      "http_status": 200,
+      "bytes": 493659,
+      "sha256": "84d2be34df1ef6c104bdc8d85a5876d9b58754284ae1df45b3656292cbcb1d39"
+    },
+    {
+      "file": "screenshots/1440x720-02-galaxy-sector.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/518438c23c0ff4a800d1749034a811f47b54a0ce/deliverables/0.13.0-navigation-alpha1/screenshots/1440x720-02-galaxy-sector.png",
+      "http_status": 200,
+      "bytes": 171368,
+      "sha256": "f9a277080fdd49e823eab3bba7ce0fd1456f8f4285084381a099a033f856ccda"
+    },
+    {
+      "file": "screenshots/1440x720-03-galaxy-overview.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/518438c23c0ff4a800d1749034a811f47b54a0ce/deliverables/0.13.0-navigation-alpha1/screenshots/1440x720-03-galaxy-overview.png",
+      "http_status": 200,
+      "bytes": 129400,
+      "sha256": "4549c0a727262bacd1eb85e5d10d85f5e47fddb4e1e3fd779561020d73f482ec"
+    },
+    {
+      "file": "screenshots/1440x720-04-system-overview.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/518438c23c0ff4a800d1749034a811f47b54a0ce/deliverables/0.13.0-navigation-alpha1/screenshots/1440x720-04-system-overview.png",
+      "http_status": 200,
+      "bytes": 110878,
+      "sha256": "d2eed6c9baa5b8a444c03a95ef971fc5d738b33f9a6c85fa37074a8a2258c80e"
+    },
+    {
+      "file": "screenshots/1440x720-05-system-earth-moon.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/518438c23c0ff4a800d1749034a811f47b54a0ce/deliverables/0.13.0-navigation-alpha1/screenshots/1440x720-05-system-earth-moon.png",
+      "http_status": 200,
+      "bytes": 91480,
+      "sha256": "c66161526160706fe65fede55a9fb671f430cdd889088e14d6d0c758e2b83862"
+    },
+    {
+      "file": "screenshots/2316x1080-01-flight-time-roll.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/518438c23c0ff4a800d1749034a811f47b54a0ce/deliverables/0.13.0-navigation-alpha1/screenshots/2316x1080-01-flight-time-roll.png",
+      "http_status": 200,
+      "bytes": 1145571,
+      "sha256": "a18b81f6455ecb8ece3bdacaa5653273fd3982042a76507cead18645255533c6"
+    },
+    {
+      "file": "screenshots/2316x1080-02-galaxy-sector.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/518438c23c0ff4a800d1749034a811f47b54a0ce/deliverables/0.13.0-navigation-alpha1/screenshots/2316x1080-02-galaxy-sector.png",
+      "http_status": 200,
+      "bytes": 355342,
+      "sha256": "f94f38f6cd760cb62459242f7948801f153d950cd20e4c90277058671268fb6a"
+    },
+    {
+      "file": "screenshots/2316x1080-03-galaxy-overview.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/518438c23c0ff4a800d1749034a811f47b54a0ce/deliverables/0.13.0-navigation-alpha1/screenshots/2316x1080-03-galaxy-overview.png",
+      "http_status": 200,
+      "bytes": 253079,
+      "sha256": "ddc78fda4b3fe614cc3e29112efee1980913f5c91a95533e6ae2a0a62e3c2376"
+    },
+    {
+      "file": "screenshots/2316x1080-04-system-overview.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/518438c23c0ff4a800d1749034a811f47b54a0ce/deliverables/0.13.0-navigation-alpha1/screenshots/2316x1080-04-system-overview.png",
+      "http_status": 200,
+      "bytes": 221733,
+      "sha256": "01005f9ad23def99054fbfccdb13d3e3a34433f29a3cbb6ccf349a9c49ded2c5"
+    },
+    {
+      "file": "screenshots/2316x1080-05-system-earth-moon.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/518438c23c0ff4a800d1749034a811f47b54a0ce/deliverables/0.13.0-navigation-alpha1/screenshots/2316x1080-05-system-earth-moon.png",
+      "http_status": 200,
+      "bytes": 187184,
+      "sha256": "a47c058935caa14bd41e14b0c63cf2fc03ba1e63b2ddbbe295ac6b70e0682303"
+    }
+  ],
+  "status": "verified",
+  "scope": "Actual complete HTTPS downloads; immutable manifest bytes, payload SHA256/length, ZIP CRC, source archive Git comment and screenshot hashes. Not physical Android execution.",
+  "completed_utc": "2026-11-07T08:28:59.064567+00:00"
+}
