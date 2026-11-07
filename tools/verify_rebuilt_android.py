@@ -79,6 +79,59 @@ MAP_VISUAL_PROTECTED_FUNCTION_SHA256={
     '_search':'6e7af10f8ed67621683a20533c93989ac92232c6547f6ac10afcd729ee418fd7',
     '_goto_sector':'cbb9c084c4456c285ef6b571516f50d80d78f3af18a778b9f95d893658e327d4',
 }
+# v38 permits only the explicit Main projection and FULL star-coverage fixes.
+CELESTIAL_VISUAL_BASELINE_SOURCE_COMMIT='c5d61229d579dc738aca6f5b45c570e5444fa836'
+CELESTIAL_VISUAL_GALACTIC_VIEW_SHA256='3b0d0fc97429ae3e37bf041ecaa0b67c6625bc0fbeda4a2a78fbe0ce04266137'
+CELESTIAL_VISUAL_PROTECTED_MAIN_FUNCTION_SHA256={
+    '_new_models':'84ee3ddf0488623c93a925f9e80c76d28f4b7369245264dc686c0a99b364d5d9',
+    '_time_context':'fe9c64abab18fcfef20cc38e32749e8f484cbe2f54cdf7c6dfd06ed316b3f23a',
+    '_advance_controls':'040b53157b656043a248f22bcac26a8e33ddb056338cdc26f4fcc1ef58e54b7d',
+    '_tick':'d75bff3c9ad15639e0a9c10b14c3241d10e0dc3029c31b39ca46ce8ca5db148f',
+    '_source_motion_step':'c476095f2e40347e7e45b1680dcb74c9adcd85931d8914a4959460a9410631cd',
+    '_apply_system':'ba5483228b2c6182a77cea0a6c60095e7c533f1dda83e3a837c53139834c3fdb',
+    '_set_speed':'70f2369529290729e7cce96f51b7e6925614f0694cacebd0056523608ea34ec9',
+    '_brake':'65dcd9782fee7cf46f030449926b6b637261f77e29024b3b765638878dfb58c1',
+    '_toggle_auto':'c66d6117ba49db06dcff00c94c59e04cb7c18bbd3ea91442eafe54f9e086616d',
+    '_takeoff_action':'9d9648da5d8568bd962c3cde905bbd3865daa99f2fab14ba4ef1608b77ba310b',
+    '_dock_action':'bb95a86e818161c86714e17c200c16fef97354b5d62c555997b15799dc9e1865',
+    '_surface_action':'a19f55eb2bd983bdb3845cd7db9164b4bd18807877bae4c69e7096ef5ab3c5f3',
+    '_enter_surface':'832d1576ee6c4f123d36a84c48bb0d0c882ef9bedffbaec506eb6647ff4716cf',
+    '_finish_ascent':'596a7336a3b0f5d95fc223a8e721572db7f35065ebaf23ead1fbf1fdd729d742',
+    '_cycle_view':'6e67437213491fd93075a37b9cc87b0dffe6409d2cffe810754c6b9dbbe516ad',
+    '_show_system':'18a541bfc14a32692b1dfd0cfe662e687c399e106525bd3dae00f923990234c9',
+    '_choose_body':'c3dab65a5e88c31f842188d34607279731672271b8d300b5c37a7c6929fdb18b',
+    '_choose_site':'5dd971636babc4a708158c8438ad0b426794763328a26634c40c8757b05eab39',
+    '_show_routes':'9adaa3907d6d826d80c39368430558b37e04490d22fefc64da4fe1a0bf61359f',
+    '_install_map':'9b03be6d3d7a12352218d827adacbeeef0450e44f727dafba01c01c1a8a80608',
+    '_close_map':'e4ce4c508c25955794749a6b86587bdbcaba275289eafed266781e485bb4aae8',
+    '_start_jump':'e86f67215d31be57a5daa5f6e68774d7a65ecf245f7e5e3589a9daa5830db8f9',
+    '_confirm_new_game':'26d20395cda493fa057b8f850c16903e90b91c2be8fb4e24612b2790278197cc',
+    '_payload':'3dea677d678c8ba4859e4046060a4bd429ceff43b65ac1f1896cec705beec3f2',
+    '_decode_state':'a4e3a90b798c8dc82b7886dfe823e724ce1eb3e9addd8b25c83881b61062facd',
+    '_commit_state':'f9f2d2a08f0290ddc57c1027820ad364c618b6272c3716bd124373e4a4b9cde1',
+    '_save_game':'dd756e0363e7368927145ccf6c45505e4f74ed472d5f6c815729a343eac6a649',
+    '_load_game':'df251a26d6b7d236fd349a99ef61a7e3f9174dda3f50f6a3ffd7fc2fb66db8ab',
+}
+CELESTIAL_VISUAL_PROTECTED_RENDERER_FUNCTION_SHA256={
+    '_full_context':'584b482a5cc29aaaae51fc9514afd8020ab11a6495f2164622fdc2f3a3a77028',
+    '_exit_tree':'cd0257352c17bb107192713a0b986ee4e0502f9befab0e0bb6743e2401f1830d',
+    '_process':'89a90ebb4ecbe58f17a0a311cf5ab63c836fa91b72437a8ba09ac0e58499941c',
+    '_start_source_job':'423300d697e2d0d53fc5a6a7a596a9c2dae6df0eae460a1c5ab39f6df3db35f8',
+    '_request_source_focus':'8593aea50eaa65f2af005be26d81eb11fe1810c28e6747f94114254fdf8260f4',
+    '_install_source_mesh':'76854b8e821569cc039b3150a4fc7771995c4735a552702ee19184ac3d138ace',
+    'source_mesh_state':'35635ae9f87c0ac584420dd0cbdcb4f4dd5c661a8d9ae5a1c449d626cab41a5f',
+    'source_light':'5e933b0625767d801983a1d51792d33a5b9505fca09b8b4ec81c5b6fd6ed71aa',
+    'source_cap_state':'ccbe85c137c870a895b379f9ae71409cadb0914815d1cbdb58f7cb343bc83126',
+    'set_source_ground_patch':'4d2db181f729685a264b7440d0ba207229e445ae82ea365bb03a2ef6d058813b',
+    '_source_cap':'728e0f1ecb94fa9352684e0b47927ad00557082705bc43b9aafa47d0e9c2fb1f',
+    'set_quality':'81d329a0373e5ba177abf2ab7149141fc20d3baf3dbf393a5281fb73c773adff',
+    '_bind_body_material':'591c6b4f8106981ee4ecfe0c173a1fd9bf101a1df42b1901ea8bc35dce237ffa',
+    'configure':'e5ac7ff9943c1c375528c44957c40190e790507896ed9c9222ac923f52123dea',
+    'update_view':'de2acb54093ccfa7d3e1d44f68d3eb1033a4129ce6e92b43d214fd412b800206',
+    'suppress_focus_surface':'f75e533078f78f997d20e1d893e350df51505e438d96f157dd705c61fba3f105',
+}
+CELESTIAL_VISUAL_LEGACY_TRANSITION_SHA256='9a400b1d1e7e163f3ada764f441bbd70f313da04793293dc379c8fd26d864697'
+CELESTIAL_VISUAL_RUNTIME_MODULES=('main','celestial_renderer')
 DEVELOPMENT_ASSET_PREFIXES=(
     'assets/tests/','assets/tools/','assets/docs/','assets/recovered-history/',
     'assets/recovery/','assets/validation/','assets/deliverables/',
@@ -856,8 +909,8 @@ def verify_navigation_runtime(archive,project):
                    'original_hyperdrive_f903_complete':False,'complete_original_player_pipeline':False,'complete_original_physics':False})
     return result
 
-def verify_map_visual_runtime(archive,project):
-    """Check v37's presentation-only galactic map contract.
+def _verify_map_visual_contract(archive,project,protected_source_sha256,baseline_source_commit):
+    """Check map presentation inputs explicitly selected by the version wrapper.
 
     Protected input hashes come from the exact v36 source checkpoint, not from
     the new view. They establish selected local source/data preservation;
@@ -871,7 +924,7 @@ def verify_map_visual_runtime(archive,project):
     assert re.search(r'^const\s+PRESENTATION_PROFILE\s*:=\s*"'+re.escape(MAP_VISUAL_PROFILE)+r'"\s*$',text,re.M),'Modern map presentation profile missing or changed'
     assert re.search(r'set_meta\(\s*"presentation_profile"\s*,\s*PRESENTATION_PROFILE\s*\)',source_function(text,'_ready')),'Modern map presentation profile is not consumed by the view'
     protected={}
-    for relative,expected in MAP_VISUAL_PROTECTED_SOURCE_SHA256.items():
+    for relative,expected in protected_source_sha256.items():
         actual=hashlib.sha256((project/relative).read_bytes()).hexdigest()
         assert actual==expected,'Visual-only map update changed protected source/data '+relative
         protected[relative]=actual
@@ -882,13 +935,83 @@ def verify_map_visual_runtime(archive,project):
         functions[name]=actual
     return {'presentation_profile':MAP_VISUAL_PROFILE,'runtime_path':path,'runtime_bytes':len(packed),
             'runtime_sha256':hashlib.sha256(packed).hexdigest(),'local_source_sha256':hashlib.sha256(raw).hexdigest(),
-            'baseline_source_commit':MAP_VISUAL_BASELINE_SOURCE_COMMIT,
+            'baseline_source_commit':baseline_source_commit,
             'protected_source_data_sha256':protected,'protected_view_function_sha256':functions,
             'protected_source_data_count':len(protected),'protected_view_function_count':len(functions),
             'additional_runtime_modules':0,'additional_shaders':0,'additional_textures':0,
             'original_map_data_preserved':True,'display_color_transfer_is_presentation':True,
             'complete_original_renderer':False,'compiled_source_correspondence_rebuilt_by_verifier':False,
             'behavior_proved_by_this_package_check':False,'physical_device_tested':False}
+
+def verify_map_visual_runtime(archive,project):
+    # Historical v37 contract stays strict, including the complete previous Main.
+    return _verify_map_visual_contract(archive,project,MAP_VISUAL_PROTECTED_SOURCE_SHA256,MAP_VISUAL_BASELINE_SOURCE_COMMIT)
+
+def verify_celestial_visibility_runtime(archive,project):
+    """v38 allows Main projection and FULL star coverage, with protected inputs.
+
+    These checks pin selected source functions and require actual consumers;
+    exported GDSC is hashed, never claimed equivalent to local source.
+    Functional visibility and eclipse tests are separate acceptance evidence.
+    """
+    protected={path:value for path,value in MAP_VISUAL_PROTECTED_SOURCE_SHA256.items() if path!='scripts/main.gd'}
+    map_assets=_verify_map_visual_contract(archive,project,protected,CELESTIAL_VISUAL_BASELINE_SOURCE_COMMIT)
+    view_hash=hashlib.sha256((project/'scripts/galactic_map_view.gd').read_bytes()).hexdigest()
+    assert view_hash==CELESTIAL_VISUAL_GALACTIC_VIEW_SHA256,'Celestial presentation fix changed the galactic map view'
+    runtime={}
+    for name in CELESTIAL_VISUAL_RUNTIME_MODULES:
+        path='assets/scripts/'+name+'.gdc'
+        assert path in set(archive.namelist()),'Missing celestial visibility runtime '+name
+        packed=archive.read(path)
+        assert len(packed)>64 and packed[:4]==b'GDSC','Invalid compiled celestial visibility runtime '+name
+        runtime[name]={'path':path,'bytes':len(packed),'sha256':hashlib.sha256(packed).hexdigest(),
+                       'local_source_sha256':hashlib.sha256((project/'scripts'/str(name+'.gd')).read_bytes()).hexdigest()}
+    main=(project/'scripts/main.gd').read_text();renderer=(project/'scripts/celestial_renderer.gd').read_text()
+    main_functions={}
+    for name,expected in CELESTIAL_VISUAL_PROTECTED_MAIN_FUNCTION_SHA256.items():
+        text=source_function(main,name)
+        # This one existing initialization method gains only a presentation call.
+        if name=='_apply_system':
+            suffix=';_sync_scene();_update_flight_projection()'
+            assert text.count('_update_flight_projection()')==1 and re.search(re.escape(suffix)+r'\n\s*\Z',text),'System initialization may only append one projection call after scene synchronization'
+            text=text.replace(';_update_flight_projection()','',1)
+        actual=hashlib.sha256(text.encode()).hexdigest()
+        assert actual==expected,'Celestial presentation fix changed protected Main function '+name
+        main_functions[name]=actual
+    renderer_functions={}
+    for name,expected in CELESTIAL_VISUAL_PROTECTED_RENDERER_FUNCTION_SHA256.items():
+        actual=hashlib.sha256(source_function(renderer,name).encode()).hexdigest()
+        assert actual==expected,'Celestial presentation fix changed protected renderer function '+name
+        renderer_functions[name]=actual
+    transition=source_function(renderer,'set_surface_transition')
+    assert '\tif last_high_focus' in transition,'Legacy celestial transition missing'
+    legacy_hash=hashlib.sha256(transition.split('\tif last_high_focus',1)[1].encode()).hexdigest()
+    assert legacy_hash==CELESTIAL_VISUAL_LEGACY_TRANSITION_SHA256,'Celestial presentation fix changed the legacy transition'
+    full_transition=transition.split('\tif last_high_focus',1)[0]
+    assert 'str(body.get("kind",""))=="star" and type_code>=17 and type_code<=30' in full_transition,'FULL celestial transition lacks actual luminous-star classification'
+    assert '1.0 if not enabled or id==context.focus_id or luminous else surface_space_blend' in full_transition,'Luminous star coverage is not connected to the FULL transition'
+    assert 'set_shader_parameter("view_coverage",coverage)' in full_transition,'FULL star coverage is not consumed by the mesh material'
+    projection=source_function(main,'_update_flight_projection')
+    for token in ['flight_console.get_global_rect()','flight_view_rect.get_center()','camera.set_frustum(',
+                  'camera.near','camera.far','camera.fov','camera.keep_aspect','_flight_projection_signature']:
+        assert token in projection,'Flight projection lacks real console/camera consumer '+token
+    assert not re.search(r'\b(?:ship|world|nav|surface|source_motion)\s*[.\[]',projection),'Flight projection must not access simulation state'
+    assert not re.search(r'camera\.(?:position|quaternion|rotation|basis|transform)\b',projection),'Flight projection must preserve physical camera pose'
+    for name in ['_safe_area','_apply_system','_process']:
+        assert '_update_flight_projection()' in source_function(main,name),'Flight projection is not connected to '+name
+    ui=source_function(main,'_build_ui')
+    assert 'Vector4(0,0,0,-FlightConsole.HEIGHT)' in ui and '-20-console_height*0.5' in ui,'Flight reticle and cross must use the unobscured flight area'
+    return {'baseline_source_commit':CELESTIAL_VISUAL_BASELINE_SOURCE_COMMIT,
+            'presentation_runtime_modules':runtime,'presentation_runtime_module_count':len(runtime),
+            'galactic_map_visual_assets':map_assets,'unchanged_galactic_map_view_sha256':view_hash,
+            'protected_source_data_count':len(protected),'protected_main_function_sha256':main_functions,
+            'protected_main_function_count':len(main_functions),'main_apply_system_normalization':'Exactly one appended ;_update_flight_projection() immediately after the final _sync_scene() is excluded from the prior function hash.',
+            'protected_renderer_function_sha256':renderer_functions,'protected_renderer_function_count':len(renderer_functions),
+            'legacy_transition_sha256':legacy_hash,'actual_console_camera_projection_consumers':True,
+            'full_star_coverage_material_consumer_checked':True,
+            'physical_camera_pose_unchanged_by_projection':True,'additional_runtime_modules':0,'additional_shaders':0,'additional_textures':0,
+            'compiled_source_correspondence_rebuilt_by_verifier':False,'visibility_or_eclipse_proved_by_this_package_check':False,
+            'physical_device_tested':False,'astronomically_calibrated_star_radii':False,'complete_original_renderer':False}
 
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     expected=preset_values(presets)
@@ -908,7 +1031,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -979,8 +1102,11 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
                 mining_kernel_assets=verify_mining_kernel_runtime(archive,presets.parent)
             if expected['version_code']>=36:
                 navigation_assets=verify_navigation_runtime(archive,presets.parent)
-            if expected['version_code']>=37:
+            if expected['version_code']==37:
                 map_visual_assets=verify_map_visual_runtime(archive,presets.parent)
+            if expected['version_code']==38:
+                celestial_visibility_assets=verify_celestial_visibility_runtime(archive,presets.parent)
+                map_visual_assets=celestial_visibility_assets['galactic_map_visual_assets']
         for name in names:
             if not name.startswith('lib/') or not name.endswith('.so'):continue
             data=archive.read(name)
@@ -998,7 +1124,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

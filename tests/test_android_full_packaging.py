@@ -6,6 +6,7 @@ packaging checker's rejection paths only.
 """
 from __future__ import annotations
 import importlib.util
+import hashlib
 from pathlib import Path
 import json
 import shutil
@@ -21,6 +22,7 @@ class MockArchive:
         self.entries={f'assets/scripts/{name}.gdc':b'GDSC'+b'unit-mock-not-an-exported-module'*4 for name in verifier.FULL_SOURCE_MODULES}
         self.entries.update({f'assets/scripts/{name}.gdc':b'GDSC'+b'unit-mock-not-an-exported-module'*4 for name in verifier.CLASSIC_CONSOLE_MODULES})
         self.entries.update({f'assets/scripts/{name}.gdc':b'GDSC'+b'unit-mock-not-an-exported-module'*4 for name in verifier.NAVIGATION_MODULES})
+        self.entries.update({f'assets/scripts/{name}.gdc':b'GDSC'+b'unit-mock-not-an-exported-module'*4 for name in verifier.CELESTIAL_VISUAL_RUNTIME_MODULES})
         self.entries[f'assets/scripts/{verifier.SOURCE_MINING_KERNEL_MODULE}.gdc']=b'GDSC'+b'unit-mock-not-an-exported-module'*4
         for name in verifier.FULL_SOURCE_TABLES+verifier.NAVIGATION_TABLES+('ships','world_names_ru'):
             self.entries[f'assets/data/{name}.json']=(PROJECT/'data'/f'{name}.json').read_bytes()
@@ -84,7 +86,7 @@ class FullPackagingChecks(unittest.TestCase):
         self.assertFalse(result['physical_device_tested'])
 
     def test_retained_orbit_native_provenance_still_runs_for_v34(self):
-        for code in [34,35,36,37]:
+        for code in [34,35,36,37,38]:
             with self.subTest(version_code=code):
                 result=verifier.verify_source_orbit_runtime(self.archive,PROJECT,code)
                 self.assertEqual(result['new_game_requested_layout'],'source_jjffe_systems_v4')
@@ -93,7 +95,7 @@ class FullPackagingChecks(unittest.TestCase):
                 self.assertEqual(result['retained_local_physics_adapter'],'analytic_si_rebuild_v1')
 
     def test_retained_v3_raw_physics_checks_are_not_relaxed(self):
-        for code in [34,35,36,37]:
+        for code in [34,35,36,37,38]:
             with self.subTest(version_code=code):
                 result=verifier.verify_source_physics_ports_runtime(self.archive,PROJECT,code)
                 self.assertEqual(result['reported_layout_scope'],'retained-v3-layout')
@@ -336,11 +338,16 @@ class FullPackagingChecks(unittest.TestCase):
             with self.assertRaisesRegex(AssertionError,'Wrong navigation native reference provenance'):
                 verifier.verify_navigation_runtime(self.archive,project)
 
-    def map_visual_project(self,directory,replacements=None):
+    def map_visual_project(self,directory,replacements=None,historical_main=True):
         project=Path(directory)
         for relative in (*verifier.MAP_VISUAL_PROTECTED_SOURCE_SHA256,'scripts/galactic_map_view.gd'):
             target=project/relative;target.parent.mkdir(parents=True,exist_ok=True)
             raw=(PROJECT/relative).read_text()
+            if historical_main and relative=='scripts/main.gd':
+                baseline=json.loads((PROJECT/'tests/fixtures/map_visual_v37_main_source.json').read_text())
+                self.assertEqual(hashlib.sha256(baseline['source'].encode()).hexdigest(),verifier.MAP_VISUAL_PROTECTED_SOURCE_SHA256[relative])
+                self.assertEqual(baseline['source_commit'],verifier.CELESTIAL_VISUAL_BASELINE_SOURCE_COMMIT)
+                raw=baseline['source']
             for old,new in (replacements or {}).get(relative,[]):
                 self.assertIn(old,raw,'Mutation must affect the intended protected input')
                 raw=raw.replace(old,new)
@@ -348,7 +355,9 @@ class FullPackagingChecks(unittest.TestCase):
         return project
 
     def test_modern_map_visual_scope_is_explicitly_presentation_only(self):
-        result=verifier.verify_map_visual_runtime(self.archive,PROJECT)
+        with tempfile.TemporaryDirectory() as directory:
+            project=self.map_visual_project(directory)
+            result=verifier.verify_map_visual_runtime(self.archive,project)
         self.assertEqual(result['presentation_profile'],'navy-star-chart-v1')
         self.assertEqual(result['baseline_source_commit'],'e4e8e7edccdb4422124f249365dfb8c99d135bb5')
         self.assertEqual(result['protected_source_data_count'],18)
@@ -402,5 +411,110 @@ class FullPackagingChecks(unittest.TestCase):
                 project=self.map_visual_project(directory,{'scripts/galactic_map_view.gd':[(old,new)]})
                 with self.assertRaisesRegex(AssertionError,'Visual-only map update changed protected input/worker function'):
                     verifier.verify_map_visual_runtime(self.archive,project)
+
+    def celestial_visual_project(self,directory,replacements=None):
+        project=self.map_visual_project(directory,replacements,historical_main=False)
+        path=project/'scripts/celestial_renderer.gd'
+        raw=(PROJECT/'scripts/celestial_renderer.gd').read_text()
+        for old,new in (replacements or {}).get('scripts/celestial_renderer.gd',[]):
+            self.assertIn(old,raw,'Mutation must affect the intended celestial source')
+            raw=raw.replace(old,new)
+        path.write_text(raw)
+        return project
+
+    def test_celestial_visual_scope_keeps_gameplay_and_source_units_explicit(self):
+        result=verifier.verify_celestial_visibility_runtime(self.archive,PROJECT)
+        self.assertEqual(result['baseline_source_commit'],'c5d61229d579dc738aca6f5b45c570e5444fa836')
+        self.assertEqual(result['presentation_runtime_module_count'],2)
+        self.assertEqual(result['protected_source_data_count'],17)
+        self.assertEqual(result['protected_main_function_count'],28)
+        self.assertEqual(result['protected_renderer_function_count'],16)
+        self.assertTrue(result['actual_console_camera_projection_consumers'])
+        self.assertTrue(result['full_star_coverage_material_consumer_checked'])
+        self.assertEqual(result['additional_runtime_modules'],0)
+        self.assertFalse(result['compiled_source_correspondence_rebuilt_by_verifier'])
+        self.assertFalse(result['visibility_or_eclipse_proved_by_this_package_check'])
+        self.assertFalse(result['astronomically_calibrated_star_radii'])
+        self.assertFalse(result['physical_device_tested'])
+
+    def test_historical_v37_contract_does_not_accept_v38_Main_changes(self):
+        with self.assertRaisesRegex(AssertionError,'Visual-only map update changed protected source/data scripts/main.gd'):
+            verifier.verify_map_visual_runtime(self.archive,PROJECT)
+
+    def test_celestial_presentation_requires_both_compiled_consumers(self):
+        for name in verifier.CELESTIAL_VISUAL_RUNTIME_MODULES:
+            for mutation in ['missing','invalid']:
+                with self.subTest(module=name,mutation=mutation):
+                    archive=MockArchive();path='assets/scripts/'+name+'.gdc'
+                    if mutation=='missing':del archive.entries[path]
+                    else:archive.entries[path]=b'invalid'+b'x'*100
+                    with self.assertRaisesRegex(AssertionError,'(?:Missing|Invalid compiled) celestial visibility runtime'):
+                        verifier.verify_celestial_visibility_runtime(archive,PROJECT)
+
+    def test_celestial_update_cannot_change_simulation_save_or_transfer_functions(self):
+        for name in ['_tick','_payload','_decode_state','_time_context','_source_motion_step','_choose_body','_choose_site','_apply_system']:
+            with self.subTest(function=name),tempfile.TemporaryDirectory() as directory:
+                original=verifier.source_function(self.main,name)
+                project=self.celestial_visual_project(directory,{'scripts/main.gd':[(original,original+'# Unapproved gameplay change\n')]})
+                error='System initialization may only append one projection call' if name=='_apply_system' else 'Celestial presentation fix changed protected Main function '+name
+                with self.assertRaisesRegex(AssertionError,error):
+                    verifier.verify_celestial_visibility_runtime(self.archive,project)
+
+    def test_celestial_update_cannot_change_original_lighting_or_geometry(self):
+        original=(PROJECT/'scripts/celestial_renderer.gd').read_text()
+        for name in ['source_light','update_view','configure','_source_cap']:
+            with self.subTest(function=name),tempfile.TemporaryDirectory() as directory:
+                function=verifier.source_function(original,name)
+                project=self.celestial_visual_project(directory,{'scripts/celestial_renderer.gd':[(function,function+'# Unapproved lighting or geometry change\n')]})
+                with self.assertRaisesRegex(AssertionError,'Celestial presentation fix changed protected renderer function '+name):
+                    verifier.verify_celestial_visibility_runtime(self.archive,project)
+
+    def test_celestial_update_cannot_duplicate_system_projection_call(self):
+        with tempfile.TemporaryDirectory() as directory:
+            function=verifier.source_function(self.main,'_apply_system')
+            wrong=function.replace(';_update_flight_projection()',';_update_flight_projection();_update_flight_projection()')
+            project=self.celestial_visual_project(directory,{'scripts/main.gd':[(function,wrong)]})
+            with self.assertRaisesRegex(AssertionError,'System initialization may only append one projection call'):
+                verifier.verify_celestial_visibility_runtime(self.archive,project)
+
+    def test_celestial_update_cannot_change_legacy_crossfade(self):
+        with tempfile.TemporaryDirectory() as directory:
+            old='var is_focus:bool=id==context.focus_id'
+            project=self.celestial_visual_project(directory,{'scripts/celestial_renderer.gd':[(old,'var is_focus:bool=true')]})
+            with self.assertRaisesRegex(AssertionError,'Celestial presentation fix changed the legacy transition'):
+                verifier.verify_celestial_visibility_runtime(self.archive,project)
+
+    def test_celestial_update_keeps_real_projection_consumers(self):
+        changes=[('_safe_area','\t_update_flight_projection()','\tpass'),
+                 ('_update_flight_projection','camera.set_frustum(','camera.unconsumed_frustum(')]
+        for name,old,new in changes:
+            with self.subTest(function=name),tempfile.TemporaryDirectory() as directory:
+                function=verifier.source_function(self.main,name)
+                self.assertIn(old,function)
+                project=self.celestial_visual_project(directory,{'scripts/main.gd':[(function,function.replace(old,new))]})
+                with self.assertRaisesRegex(AssertionError,'Flight projection (?:lacks|is not connected)'):
+                    verifier.verify_celestial_visibility_runtime(self.archive,project)
+
+    def test_projection_cannot_access_simulation_state_or_move_camera_pose(self):
+        for extra in ['\tnav.elapsed_days=1\n','\tcamera.position=Vector3.ZERO\n']:
+            with self.subTest(statement=extra),tempfile.TemporaryDirectory() as directory:
+                function=verifier.source_function(self.main,'_update_flight_projection')
+                project=self.celestial_visual_project(directory,{'scripts/main.gd':[(function,function+extra)]})
+                with self.assertRaisesRegex(AssertionError,'Flight projection must (?:not access simulation state|preserve physical camera pose)'):
+                    verifier.verify_celestial_visibility_runtime(self.archive,project)
+
+    def test_stars_cannot_be_disconnected_from_FULL_coverage_fix(self):
+        with tempfile.TemporaryDirectory() as directory:
+            old='id==context.focus_id or luminous else surface_space_blend'
+            project=self.celestial_visual_project(directory,{'scripts/celestial_renderer.gd':[(old,'id==context.focus_id else surface_space_blend')]})
+            with self.assertRaisesRegex(AssertionError,'Luminous star coverage is not connected'):
+                verifier.verify_celestial_visibility_runtime(self.archive,project)
+
+    def test_celestial_update_keeps_complete_previous_galactic_view(self):
+        with tempfile.TemporaryDirectory() as directory:
+            project=self.celestial_visual_project(directory)
+            path=project/'scripts/galactic_map_view.gd';path.write_bytes(path.read_bytes()+b'\n')
+            with self.assertRaisesRegex(AssertionError,'Celestial presentation fix changed the galactic map view'):
+                verifier.verify_celestial_visibility_runtime(self.archive,project)
 
 if __name__=='__main__':unittest.main()

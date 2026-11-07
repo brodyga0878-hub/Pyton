@@ -1,0 +1,379 @@
+{
+  "schema": 1,
+  "scope": "One current result per relevant suite; actual Main off-axis camera/console, source renderer, navigation/save/dock/launch, paused terrain publication, near packet clipping/render contact and graphics-return controls. Historical release totals excluded. Per-suite source stamps retained; no physical-phone execution.",
+  "started_utc": "2026-11-07T14:02:32.189158+00:00",
+  "updated_utc": "2026-11-07T14:03:15.481262+00:00",
+  "duration_seconds": 43.292,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-07T14:02:32.189158+00:00",
+      "duration_seconds": 43.292,
+      "requested_suites": [
+        "navigation_main",
+        "source_console_pause",
+        "source_packet_clip",
+        "source_full_startup",
+        "source_render_state",
+        "source_main_full",
+        "app_transitions",
+        "graphics_integration",
+        "graphics_scope"
+      ],
+      "executed_suites": [
+        "navigation_main",
+        "source_console_pause",
+        "source_packet_clip",
+        "source_full_startup",
+        "source_render_state",
+        "source_main_full",
+        "app_transitions",
+        "graphics_integration",
+        "graphics_scope"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 3,
+  "status": "passed",
+  "passed_suites": 11,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 2508,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "navigation_main",
+      "scope": "Actual Main graphical map selection/confirmation, forecast isolation, raw save continuation, phone roll, clock scheduling and legacy opt-in boundaries.",
+      "status": "passed",
+      "checks": 53,
+      "failures": 0,
+      "executed_utc": "2026-11-07T14:02:32.190740+00:00",
+      "suite_source": {
+        "path": "tests/test_navigation_main.gd",
+        "bytes": 12697,
+        "sha256": "134ccfc0534ce835429cdd2c0cdbae7272c96d073ae011df03d19ee159661d73"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_navigation_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 10.126,
+      "timed_out": false,
+      "output_bytes": 118,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/mercury-visibility-2026-11-07/regression-logs/logs/navigation_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_console_pause",
+      "scope": "Actual Worldv4 pending terrain worker publication is deferred during console pause and resumes without losing physical contact.",
+      "status": "passed",
+      "checks": 131,
+      "failures": 0,
+      "executed_utc": "2026-11-07T14:02:32.190890+00:00",
+      "suite_source": {
+        "path": "tests/test_source_console_pause.gd",
+        "bytes": 15261,
+        "sha256": "5af16b7609c35bab07fa0f01c0dd1722d36e06b346154ce71868011ce47ca0a0"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_console_pause.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 13.756,
+      "timed_out": false,
+      "output_bytes": 1713,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/mercury-visibility-2026-11-07/regression-logs/logs/source_console_pause.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_packet_clip",
+      "scope": "Actual117 coarse/fine overlap and packet-shader clip contracts; rendered pixel controls are verified separately.",
+      "status": "passed",
+      "checks": 5,
+      "failures": 0,
+      "executed_utc": "2026-11-07T14:02:32.191328+00:00",
+      "suite_source": {
+        "path": "tests/test_source_surface_packet_clip.gd",
+        "bytes": 12539,
+        "sha256": "c37dd43c0fddd2ca09be1bcc1d7bb22cf6ce310bde1ac488c68d451d40f5d399"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_surface_packet_clip.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 4.528,
+      "timed_out": false,
+      "output_bytes": 372,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/mercury-visibility-2026-11-07/regression-logs/logs/source_packet_clip.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_full_startup",
+      "scope": "Actual normal startup selects Worldv4/native navigation and restores a private native save; no player progress access.",
+      "status": "passed",
+      "checks": 10,
+      "failures": 0,
+      "executed_utc": "2026-11-07T14:02:36.720556+00:00",
+      "suite_source": {
+        "path": "tests/test_source_full_startup.gd",
+        "bytes": 2501,
+        "sha256": "ffaa0a4a6736da6409315e74753c15896e73d55e01348b42314652126f9b9c06"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_full_startup.gd",
+        "--",
+        "--source-startup-isolated"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.075,
+      "timed_out": false,
+      "output_bytes": 122,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/mercury-visibility-2026-11-07/regression-logs/logs/source_full_startup.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_render_state",
+      "scope": "Exact vertical collision queries against the published source core after geographic rebasing.",
+      "status": "passed",
+      "checks": 1108,
+      "failures": 0,
+      "executed_utc": "2026-11-07T14:02:37.796428+00:00",
+      "suite_source": {
+        "path": "tests/test_source_surface_render_state.gd",
+        "bytes": 10465,
+        "sha256": "1ad88b38ed2aa73013920e62cb6a9d624f6748d87616f72325be223bb80c8dfb"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_surface_render_state.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.612,
+      "timed_out": false,
+      "output_bytes": 199,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/mercury-visibility-2026-11-07/regression-logs/logs/source_render_state.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_main_full",
+      "scope": "Actual Main native jump/cancel/save, physical station dock/refuel/launch, offpad takeoff and enclosed96 touch/save/launch.",
+      "status": "passed",
+      "checks": 153,
+      "failures": 0,
+      "executed_utc": "2026-11-07T14:02:38.409307+00:00",
+      "suite_source": {
+        "path": "tests/test_source_main_full.gd",
+        "bytes": 23076,
+        "sha256": "2825439a6ec22fb04a9b56fa7f4d711c4ed374ca81587f858be34801ceb4f7e1"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_main_full.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 37.07,
+      "timed_out": false,
+      "output_bytes": 510,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/mercury-visibility-2026-11-07/regression-logs/logs/source_main_full.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "app_transitions",
+      "scope": "Actual Main transition locks, pending-save resume and asynchronous New Moscow entry; capture mode disables user progress loading/writing.",
+      "status": "passed",
+      "checks": 54,
+      "failures": 0,
+      "executed_utc": "2026-11-07T14:02:42.317410+00:00",
+      "suite_source": {
+        "path": "tests/test_rebuilt_app_transitions.gd",
+        "bytes": 11061,
+        "sha256": "f81dad10e23e7169ba5e5046567b335720be7e93cfe95f7445e897f25cc436a5"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_app_transitions.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 3.801,
+      "timed_out": false,
+      "output_bytes": 120,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/mercury-visibility-2026-11-07/regression-logs/logs/app_transitions.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "graphics_integration",
+      "scope": "Actual Main graphics-flight entry/return, isolated original progress/save bytes, save-failure guard, controls/quality and native city return; private test save directory.",
+      "status": "passed",
+      "checks": 44,
+      "failures": 0,
+      "executed_utc": "2026-11-07T14:02:45.947615+00:00",
+      "suite_source": {
+        "path": "tests/test_graphics_integration.gd",
+        "bytes": 9877,
+        "sha256": "07803e334be7ce9c9feea54a6ca2a942971f99b206c213f3aed53c28c31cb34c"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_graphics_integration.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 5.642,
+      "timed_out": false,
+      "output_bytes": 123,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/mercury-visibility-2026-11-07/regression-logs/logs/graphics_integration.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "graphics_scope",
+      "scope": "Actual Main normal flight excludes decorative asteroid scenery, preserves flight/navigation/surface data and restores optional graphics preview.",
+      "status": "passed",
+      "checks": 87,
+      "failures": 0,
+      "executed_utc": "2026-11-07T14:02:46.119390+00:00",
+      "suite_source": {
+        "path": "tests/test_graphics_scope.gd",
+        "bytes": 8672,
+        "sha256": "222ad1fc4b32ecb896c751945e2d50ca9b5432f63780a3cd6821e3dda91558b8"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_graphics_scope.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.642,
+      "timed_out": false,
+      "output_bytes": 355,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/mercury-visibility-2026-11-07/regression-logs/logs/graphics_scope.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "flight_projection",
+      "scope": "Actual Main Mercury arrival and independent perspective comparison, safe-area/resize/view/FOV/KEEP-aspect projection with source state preserved.",
+      "status": "passed",
+      "checks": 691,
+      "failures": 0,
+      "executed_utc": "2026-11-07T14:02:09.871526+00:00",
+      "suite_source": {
+        "path": "tests/test_flight_projection.gd",
+        "bytes": 12962,
+        "sha256": "a1e2569ae67b334851340782de2dab1c41ee8ceba3bb28b8ba66055d21f777d7"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_flight_projection.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.356,
+      "timed_out": false,
+      "output_bytes": 10280,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "validation/mercury-2026-11-07/logs/flight_projection.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_celestial_renderer",
+      "status": "passed",
+      "checks": 172,
+      "failures": 0,
+      "executed_utc": "2026-11-07T13:55:28.778816+00:00",
+      "command": "godot --headless --path /workspace/Pyton --script res://tests/test_source_celestial_renderer.gd",
+      "log": "validation/mercury-visibility-2026-11-07/source-renderer.log",
+      "source_sha256": {
+        "scripts/celestial_renderer.gd": "c084f772a420a8b625488ce176e87532833c4677e26da2a669939a437c01448e",
+        "tests/test_source_celestial_renderer.gd": "17952f00149824459b33efab6a39d1d56b38f588ebfa942d445e0621bdb23485"
+      },
+      "scope": "Existing source-height renderer tests plus ready actualSol/Mercury mesh, luminous photosphere coverage across four blends, unchanged nonstellar coverage/source mesh/records/world state/native positions, and Mercury-triangle occlusion of solar centre plus four photosphere limb rays. Headless geometry/material test; final GPU depth rendering is validated separately by parent."
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ],
+  "completed_utc": "2026-11-07T14:07:18.795522+00:00"
+}

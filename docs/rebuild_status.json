@@ -1,6 +1,6 @@
 {
   "audit_date_moscow": "2026-11-07",
-  "snapshot_scope": "Current0.13.1 presentation candidate facts plus preserved historical reconstruction baselines; source and remote publication pending.",
+  "snapshot_scope": "Current0.13.2 celestial visibility candidate facts plus preserved historical0.13.1/0.13.0 baselines; exact source archive and new remote publication pending.",
   "recovery_commit": "2f91ec7500e2da0f86abd95f9d2c0917072fe48e",
   "recovered_history_files": 301,
   "identified_original_paths": 105,
@@ -29,8 +29,8 @@
   },
   "current_reconstruction": {
     "implementation_kind": "New integration and newly written missing modules around preserved historical source; not discovery of the complete former source tree",
-    "application_version": "0.13.1-map-alpha1",
-    "application_integration_status": "Presentation-only galactic map update over the verified0.13.0 checkpoint. Original model/data and seven input/worker/selection functions preserved; source system-info pages and full FF text runtime remain unimplemented. Full100percent original FFE equivalence is the target, not achieved by this partial reconstruction.",
+    "application_version": "0.13.2-celestial-alpha1",
+    "application_integration_status": "Two presentation fixes: Main frustum/reticle follows the unobscured flight area above the console, FULL luminous stars retain coverage during near terrain transitions. Source coordinates, camera/ship physical pose, simulation time, physics, saves and genuine planet occlusion preserved. Original FFE equivalence remains incomplete.",
     "native_android_runtime": "Godot ARM64; no DOS or x86 emulator in the game",
     "modules_present": [
       "Main scene and Russian mobile controls with independently tracked pointers",
@@ -68,28 +68,28 @@
       }
     },
     "whole_application_smoke_passed": true,
-    "whole_application_smoke_scope": "Seven targeted groups: galactic view2896 plus actual navigation/Main, classic console, save/touch, transitions, native FULL startup and source pause361; previous release totals excluded.",
-    "whole_application_smoke_log": "validation/modern-map-2026-11-07/validation-final.json",
+    "whole_application_smoke_scope": "One current result per relevant suite; actual Main off-axis camera/console, source renderer, navigation/save/dock/launch, paused terrain publication, near packet clipping/render contact and graphics-return controls. Historical release totals excluded. Per-suite source stamps retained; no physical-phone execution.",
+    "whole_application_smoke_log": "validation/mercury-visibility-2026-11-07/regression-logs/logs/navigation_main.log",
     "desktop_gles_render_passed": true,
-    "desktop_gles_render_scope": "Eight actual Main frames, all visually inspected by root, desktop Compatibility/OpenGL Mesa llvmpipe,1440x720/2316x1080/960x540. No compositing, player progress access, phone capture or performance benchmark.",
-    "desktop_gles_render_log": "validation/modern-map-2026-11-07/screenshots/capture-manifest.json",
+    "desktop_gles_render_scope": "Actual unchanged0.13.1 archive and working0.13.2 Main; same external harness, no compositing; source epoch, observer position/attitude and body positions match per fixture. Pixel colour threshold distinguishes current photosphere from background, and does not prove quantitative astrophysical lighting.",
+    "desktop_gles_render_log": "validation/mercury-visibility-2026-11-07/gpu-comparison.json",
     "android_apk_built": true,
     "android_apk_technically_verified": true,
-    "android_artifact_status": "Actual0.13.1/code37 ARM64 TEST APK, exact portable source ZIP and complete audit ZIP published to authorized GitHub branch; all3archives,manifest,capture manifest and8screenshots downloaded/hash checked; CRC/source commit matched. Full FFE, source information pages and physical device test remain incomplete.",
-    "final_android_candidate_hash": "7021ac20a6180edc73a6bc9110a07888560531d1d8f18689cfd9304e91f18c4f",
+    "android_artifact_status": "Actual0.13.2/code38 ARM64 TEST APK technically verified from frozen runtime. Exact source ZIP and new immutable HTTPS publication pending; prior0.13.1 links remain explicitly historical. Persistent upload authorization exists; physical device and store release remain pending.",
+    "final_android_candidate_hash": "c24b31c67dcf993dd44d837142e5bb69d8abfcec05722e5760b513f583529bdf",
     "final_android_candidate": {
       "bytes": 49765516,
       "package": "org.starfrontier.rebuild",
-      "version": "0.13.1-map-alpha1",
-      "version_code": 37,
+      "version": "0.13.2-celestial-alpha1",
+      "version_code": 38,
       "abi": "arm64-v8a",
       "min_sdk": 24,
       "target_sdk": 36,
       "debuggable": false,
       "toolchain_smoke_only": false,
       "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
-      "file": "deliverables/0.13.1-map-alpha1/StarFrontier-0.13.1-map-arm64.apk",
-      "file_scope": "Immutable published checkpoint",
+      "file": "build/starfrontier-rebuild-arm64-alpha.apk",
+      "file_scope": "Actual local verified candidate; exact source/archive and immutable publication pending",
       "test_signature_verified": true,
       "production_signing_key_configured": false,
       "zip_and_elf_alignment_16k": true,
@@ -105,13 +105,21 @@
       "complete_original_physics": false,
       "original_f903_complete": false,
       "physical_device_tested": false,
-      "verification_report": "validation/modern-map-2026-11-07/android-verification.json",
-      "publication_status": "published_and_immutable_https_downloads_verified",
-      "presentation_profile": "navy-star-chart-v1",
-      "protected_source_data_count": 18,
+      "verification_report": "validation/mercury-visibility-2026-11-07/android-verification.json",
+      "publication_status": "local_APK_verified_source_archive_and_remote_publication_pending",
+      "protected_source_data_count": 17,
       "protected_view_function_count": 7,
       "complete_original_system_information": false,
-      "complete_original_text_interpreter": false
+      "complete_original_text_interpreter": false,
+      "galactic_map_presentation_profile": "navy-star-chart-v1_unchanged",
+      "presentation_fix_scope": [
+        "Main unobscured flight-window frustum/reticle",
+        "FULL luminous-star transition coverage"
+      ],
+      "protected_main_function_count": 28,
+      "protected_renderer_function_count": 16,
+      "unchanged_full_galactic_view_verified": true,
+      "legacy_celestial_transition_preserved": true
     },
     "physical_device_tested": false,
     "new_russian_name_labels": 133,
@@ -129,9 +137,10 @@
       "Only basic selected-source-port refuel is integrated; original economy/factions/AI/combat/campaign remain pending.",
       "Full previous project/APK0.10.8 not found; original COMMANDR progress import, full Russian text/editorial review and reference visual quality remain unverified or unfinished.",
       "Physical Samsung S23 Ultra installation/update/touch/background/SAF/FPS/heat untested; test signing only, production release not ready.",
-      "Original system-info/body pages, complete FF text interpreter and Russian text corpus are not implemented. Existing267short strings and original44long descriptions are source inputs, not completed UI. Full100percent clone target requires the explicit parity acceptance audit."
+      "Original system-info/body pages, complete FF text interpreter and Russian text corpus are not implemented. Existing267short strings and original44long descriptions are source inputs, not completed UI. Full100percent clone target requires the explicit parity acceptance audit.",
+      "Godot4.6.3 project_ray_normal omits frustum_offset; no current runtime consumers. Future3Dscreen picking must use an independently validated inverse-projection ray. Stellar radius/colour/quantitative flux remain uncalibrated by0.13.2."
     ],
-    "application_version_planned": "0.13.1-map-alpha1",
+    "application_version_planned": "0.13.2-celestial-alpha1",
     "graphics_update": {
       "version": "0.11.1-graphics-alpha1",
       "checks": 1408,
@@ -459,12 +468,12 @@
       "missing_independent_leaf_fixture": "tests/fixtures/model_vertices_reference.json"
     },
     "latest_targeted_validation": {
-      "checks": 3257,
-      "passed_suites": 7,
+      "checks": 2508,
+      "passed_suites": 11,
       "failures": 0,
       "status": "passed",
-      "report": "validation/modern-map-2026-11-07/validation-final.json",
-      "scope": "Targeted visual-map, actual navigation/Main, modal surface publication, classic console, save/touch, transition and native-startup controls. One result per suite; previous release counts excluded. Per-suite timestamps retained; not an atomic full-game or physical-device run.",
+      "report": "validation/mercury-visibility-2026-11-07/validation-final.json",
+      "scope": "One current result per relevant suite; actual Main off-axis camera/console, source renderer, navigation/save/dock/launch, paused terrain publication, near packet clipping/render contact and graphics-return controls. Historical release totals excluded. Per-suite source stamps retained; no physical-phone execution.",
       "engine_error_or_leak_diagnostics": false
     },
     "source_ports_physics_update": {
@@ -597,51 +606,75 @@
     },
     "current_module_validation": {
       "engine": "4.6.3.stable.official.7d41c59c4",
-      "scope": "Targeted visual-map, actual navigation/Main, modal surface publication, classic console, save/touch, transition and native-startup controls. One result per suite; previous release counts excluded. Per-suite timestamps retained; not an atomic full-game or physical-device run.",
-      "report": "validation/modern-map-2026-11-07/validation-final.json",
+      "scope": "One current result per relevant suite; actual Main off-axis camera/console, source renderer, navigation/save/dock/launch, paused terrain publication, near packet clipping/render contact and graphics-return controls. Historical release totals excluded. Per-suite source stamps retained; no physical-phone execution.",
+      "report": "validation/mercury-visibility-2026-11-07/validation-final.json",
       "status": "passed",
       "suites": {
         "navigation_main": {
           "checks": 53,
           "failures": 0,
           "test": "tests/test_navigation_main.gd",
-          "log": "/workspace/Pyton/validation/modern-map-2026-11-07/logs/navigation_main.log"
-        },
-        "classic_console_main": {
-          "checks": 42,
-          "failures": 0,
-          "test": "tests/test_classic_console_main.gd",
-          "log": "/workspace/Pyton/validation/modern-map-2026-11-07/logs/classic_console_main.log"
+          "log": "/workspace/Pyton/validation/mercury-visibility-2026-11-07/regression-logs/logs/navigation_main.log"
         },
         "source_console_pause": {
           "checks": 131,
           "failures": 0,
           "test": "tests/test_source_console_pause.gd",
-          "log": "/workspace/Pyton/validation/modern-map-2026-11-07/logs/source_console_pause.log"
+          "log": "/workspace/Pyton/validation/mercury-visibility-2026-11-07/regression-logs/logs/source_console_pause.log"
+        },
+        "source_packet_clip": {
+          "checks": 5,
+          "failures": 0,
+          "test": "tests/test_source_surface_packet_clip.gd",
+          "log": "/workspace/Pyton/validation/mercury-visibility-2026-11-07/regression-logs/logs/source_packet_clip.log"
         },
         "source_full_startup": {
           "checks": 10,
           "failures": 0,
           "test": "tests/test_source_full_startup.gd",
-          "log": "/workspace/Pyton/validation/modern-map-2026-11-07/logs/source_full_startup.log"
+          "log": "/workspace/Pyton/validation/mercury-visibility-2026-11-07/regression-logs/logs/source_full_startup.log"
         },
-        "save_touch": {
-          "checks": 71,
+        "source_render_state": {
+          "checks": 1108,
           "failures": 0,
-          "test": "tests/test_rebuilt_save_touch.gd",
-          "log": "/workspace/Pyton/validation/modern-map-2026-11-07/logs/save_touch.log"
+          "test": "tests/test_source_surface_render_state.gd",
+          "log": "/workspace/Pyton/validation/mercury-visibility-2026-11-07/regression-logs/logs/source_render_state.log"
+        },
+        "source_main_full": {
+          "checks": 153,
+          "failures": 0,
+          "test": "tests/test_source_main_full.gd",
+          "log": "/workspace/Pyton/validation/mercury-visibility-2026-11-07/regression-logs/logs/source_main_full.log"
         },
         "app_transitions": {
           "checks": 54,
           "failures": 0,
           "test": "tests/test_rebuilt_app_transitions.gd",
-          "log": "/workspace/Pyton/validation/modern-map-2026-11-07/logs/app_transitions.log"
+          "log": "/workspace/Pyton/validation/mercury-visibility-2026-11-07/regression-logs/logs/app_transitions.log"
         },
-        "galactic_map_view": {
-          "checks": 2896,
+        "graphics_integration": {
+          "checks": 44,
           "failures": 0,
-          "test": "tests/test_galactic_map_view.gd",
-          "log": "/workspace/Pyton/validation/modern-map-2026-11-07/galactic-map-view.log"
+          "test": "tests/test_graphics_integration.gd",
+          "log": "/workspace/Pyton/validation/mercury-visibility-2026-11-07/regression-logs/logs/graphics_integration.log"
+        },
+        "graphics_scope": {
+          "checks": 87,
+          "failures": 0,
+          "test": "tests/test_graphics_scope.gd",
+          "log": "/workspace/Pyton/validation/mercury-visibility-2026-11-07/regression-logs/logs/graphics_scope.log"
+        },
+        "flight_projection": {
+          "checks": 691,
+          "failures": 0,
+          "test": "tests/test_flight_projection.gd",
+          "log": "validation/mercury-2026-11-07/logs/flight_projection.log"
+        },
+        "source_celestial_renderer": {
+          "checks": 172,
+          "failures": 0,
+          "test": "tests/test_source_celestial_renderer.gd",
+          "log": "validation/mercury-visibility-2026-11-07/source-renderer.log"
         }
       }
     },
@@ -663,15 +696,15 @@
       "snapshot_version": "0.11.0-rebuild-alpha1"
     },
     "curated_validation": {
-      "checks": 3257,
-      "passed_suites": 7,
+      "checks": 2508,
+      "passed_suites": 11,
       "failures": 0,
       "status": "passed",
-      "report": "validation/modern-map-2026-11-07/validation-final.json",
-      "scope": "Targeted visual-map, actual navigation/Main, modal surface publication, classic console, save/touch, transition and native-startup controls. One result per suite; previous release counts excluded. Per-suite timestamps retained; not an atomic full-game or physical-device run.",
+      "report": "validation/mercury-visibility-2026-11-07/validation-final.json",
+      "scope": "One current result per relevant suite; actual Main off-axis camera/console, source renderer, navigation/save/dock/launch, paused terrain publication, near packet clipping/render contact and graphics-return controls. Historical release totals excluded. Per-suite source stamps retained; no physical-phone execution.",
       "engine_error_or_leak_diagnostics": false
     },
-    "desktop_gles_capture_manifest": "validation/modern-map-2026-11-07/screenshots/capture-manifest.json",
+    "desktop_gles_capture_manifest": "validation/mercury-visibility-2026-11-07/screenshots/capture-manifest.json",
     "original_port_services_scope": "Basic refuel in the actual selected source orbital port; full original economy/market/equipment services remain pending.",
     "source_full_worlds_update": {
       "version": "0.12.0-worlds-alpha1",
@@ -1399,8 +1432,8 @@
         "scope": "Final15 UI/Main groups plus2 unchanged same-session native-reference groups; unique suites only, report timestamps retained; historical931938 excluded; not a complete rerun of all source kernels."
       }
     },
-    "whole_application_smoke_status": "passed_final0.13.1_seven_targeted_groups",
-    "desktop_gles_render_status": "passed_final_eight_actual_Main_frames_visually_inspected",
+    "whole_application_smoke_status": "passed_final0.13.2_eleven_targeted_groups",
+    "desktop_gles_render_status": "passed_five_actual_before_and_five_after_frames_all_root_visually_inspected",
     "galactic_map_update": {
       "version": "0.13.1-map-alpha1",
       "status": "modern_presentation_functional_APK_and_actual_GLES_checks_passed",
@@ -1476,10 +1509,10 @@
       "complete_angular_rigid_body_integrator": false,
       "final_Main_validation_pending": false
     },
-    "release_phase": "runtime_frozen_functional_GLES_and_actual_APK_verified_exact_source_archive_preparation",
-    "desktop_gles_visual_review": "validation/modern-map-2026-11-07/screenshots/visual-review.json",
-    "desktop_gles_capture_frame_count": 8,
-    "desktop_gles_capture_checks": 1506,
+    "release_phase": "runtime_frozen_functional_GPU_comparison_and_actual_APK_verified_exact_source_archive_preparation",
+    "desktop_gles_visual_review": "validation/mercury-visibility-2026-11-07/gpu-comparison.json",
+    "desktop_gles_capture_frame_count": 5,
+    "desktop_gles_capture_checks": 22,
     "baseline_0_13_0": {
       "application_version": "0.13.0-navigation-alpha1",
       "application_integration_status": "Main connects graphical galactic/system maps, bounded time1/10/100, analog roll, sampled rotating dock contact and optional raw motion for new FULL Cobra sessions around fixed natural focus. Final integration validation pending; original renderer/F903/full player physics and whole block9 are not complete.",
@@ -1803,6 +1836,260 @@
       "all_capture_frames_visually_inspected": true,
       "physical_device_tested": false,
       "complete_original_clone": false
+    },
+    "baseline_0_13_1": {
+      "application_version": "0.13.1-map-alpha1",
+      "application_integration_status": "Presentation-only galactic map update over the verified0.13.0 checkpoint. Original model/data and seven input/worker/selection functions preserved; source system-info pages and full FF text runtime remain unimplemented. Full100percent original FFE equivalence is the target, not achieved by this partial reconstruction.",
+      "whole_application_smoke_passed": true,
+      "whole_application_smoke_scope": "Seven targeted groups: galactic view2896 plus actual navigation/Main, classic console, save/touch, transitions, native FULL startup and source pause361; previous release totals excluded.",
+      "whole_application_smoke_log": "validation/modern-map-2026-11-07/validation-final.json",
+      "whole_application_smoke_status": "passed_final0.13.1_seven_targeted_groups",
+      "desktop_gles_render_passed": true,
+      "desktop_gles_render_scope": "Eight actual Main frames, all visually inspected by root, desktop Compatibility/OpenGL Mesa llvmpipe,1440x720/2316x1080/960x540. No compositing, player progress access, phone capture or performance benchmark.",
+      "desktop_gles_render_log": "validation/modern-map-2026-11-07/screenshots/capture-manifest.json",
+      "desktop_gles_render_status": "passed_final_eight_actual_Main_frames_visually_inspected",
+      "desktop_gles_capture_manifest": "validation/modern-map-2026-11-07/screenshots/capture-manifest.json",
+      "desktop_gles_visual_review": "validation/modern-map-2026-11-07/screenshots/visual-review.json",
+      "desktop_gles_capture_frame_count": 8,
+      "desktop_gles_capture_checks": 1506,
+      "android_apk_built": true,
+      "android_apk_technically_verified": true,
+      "android_artifact_status": "Actual0.13.1/code37 ARM64 TEST APK, exact portable source ZIP and complete audit ZIP published to authorized GitHub branch; all3archives,manifest,capture manifest and8screenshots downloaded/hash checked; CRC/source commit matched. Full FFE, source information pages and physical device test remain incomplete.",
+      "final_android_candidate_hash": "7021ac20a6180edc73a6bc9110a07888560531d1d8f18689cfd9304e91f18c4f",
+      "final_android_candidate": {
+        "bytes": 49765516,
+        "package": "org.starfrontier.rebuild",
+        "version": "0.13.1-map-alpha1",
+        "version_code": 37,
+        "abi": "arm64-v8a",
+        "min_sdk": 24,
+        "target_sdk": 36,
+        "debuggable": false,
+        "toolchain_smoke_only": false,
+        "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+        "file": "deliverables/0.13.1-map-alpha1/StarFrontier-0.13.1-map-arm64.apk",
+        "file_scope": "Immutable published checkpoint",
+        "test_signature_verified": true,
+        "production_signing_key_configured": false,
+        "zip_and_elf_alignment_16k": true,
+        "native_data_assets_verified": true,
+        "material_map_count_verified": 51,
+        "source_compiled_modules_verified": 59,
+        "source_exact_shaders_verified": 2,
+        "source_exact_json_verified": 22,
+        "classic_console_modules_verified": 4,
+        "navigation_modules_verified": 11,
+        "source_mining_kernel_standalone": true,
+        "complete_original_map_renderer": false,
+        "complete_original_physics": false,
+        "original_f903_complete": false,
+        "physical_device_tested": false,
+        "verification_report": "validation/modern-map-2026-11-07/android-verification.json",
+        "publication_status": "published_and_immutable_https_downloads_verified",
+        "presentation_profile": "navy-star-chart-v1",
+        "protected_source_data_count": 18,
+        "protected_view_function_count": 7,
+        "complete_original_system_information": false,
+        "complete_original_text_interpreter": false
+      },
+      "latest_targeted_validation": {
+        "checks": 3257,
+        "passed_suites": 7,
+        "failures": 0,
+        "status": "passed",
+        "report": "validation/modern-map-2026-11-07/validation-final.json",
+        "scope": "Targeted visual-map, actual navigation/Main, modal surface publication, classic console, save/touch, transition and native-startup controls. One result per suite; previous release counts excluded. Per-suite timestamps retained; not an atomic full-game or physical-device run.",
+        "engine_error_or_leak_diagnostics": false
+      },
+      "current_module_validation": {
+        "engine": "4.6.3.stable.official.7d41c59c4",
+        "scope": "Targeted visual-map, actual navigation/Main, modal surface publication, classic console, save/touch, transition and native-startup controls. One result per suite; previous release counts excluded. Per-suite timestamps retained; not an atomic full-game or physical-device run.",
+        "report": "validation/modern-map-2026-11-07/validation-final.json",
+        "status": "passed",
+        "suites": {
+          "navigation_main": {
+            "checks": 53,
+            "failures": 0,
+            "test": "tests/test_navigation_main.gd",
+            "log": "/workspace/Pyton/validation/modern-map-2026-11-07/logs/navigation_main.log"
+          },
+          "classic_console_main": {
+            "checks": 42,
+            "failures": 0,
+            "test": "tests/test_classic_console_main.gd",
+            "log": "/workspace/Pyton/validation/modern-map-2026-11-07/logs/classic_console_main.log"
+          },
+          "source_console_pause": {
+            "checks": 131,
+            "failures": 0,
+            "test": "tests/test_source_console_pause.gd",
+            "log": "/workspace/Pyton/validation/modern-map-2026-11-07/logs/source_console_pause.log"
+          },
+          "source_full_startup": {
+            "checks": 10,
+            "failures": 0,
+            "test": "tests/test_source_full_startup.gd",
+            "log": "/workspace/Pyton/validation/modern-map-2026-11-07/logs/source_full_startup.log"
+          },
+          "save_touch": {
+            "checks": 71,
+            "failures": 0,
+            "test": "tests/test_rebuilt_save_touch.gd",
+            "log": "/workspace/Pyton/validation/modern-map-2026-11-07/logs/save_touch.log"
+          },
+          "app_transitions": {
+            "checks": 54,
+            "failures": 0,
+            "test": "tests/test_rebuilt_app_transitions.gd",
+            "log": "/workspace/Pyton/validation/modern-map-2026-11-07/logs/app_transitions.log"
+          },
+          "galactic_map_view": {
+            "checks": 2896,
+            "failures": 0,
+            "test": "tests/test_galactic_map_view.gd",
+            "log": "/workspace/Pyton/validation/modern-map-2026-11-07/galactic-map-view.log"
+          }
+        }
+      },
+      "curated_validation": {
+        "checks": 3257,
+        "passed_suites": 7,
+        "failures": 0,
+        "status": "passed",
+        "report": "validation/modern-map-2026-11-07/validation-final.json",
+        "scope": "Targeted visual-map, actual navigation/Main, modal surface publication, classic console, save/touch, transition and native-startup controls. One result per suite; previous release counts excluded. Per-suite timestamps retained; not an atomic full-game or physical-device run.",
+        "engine_error_or_leak_diagnostics": false
+      },
+      "galactic_map_update": {
+        "version": "0.13.1-map-alpha1",
+        "status": "modern_presentation_functional_APK_and_actual_GLES_checks_passed",
+        "document": "docs/GALACTIC_MAP_STATUS_RU.md",
+        "graphical_galactic_map_connected": true,
+        "graphical_system_map_connected": true,
+        "source_sector_coordinates_used": true,
+        "source_overview_density_palette_landmarks_used": true,
+        "renderer_policy": "modern_navy_star_chart_presentation_and_RGBA_display_transfer_with_original_source_data",
+        "local_sector_window": "3x3 movable window, not fixed to current ship",
+        "search_scope": "local procedural window plus original named-system catalogue and named exceptions",
+        "full_global_procedural_name_index": false,
+        "complete_original_renderer": false,
+        "complete_original_instruments": false,
+        "original_f903_hyperdrive_complete": false,
+        "physical_device_tested": false,
+        "system_map_checks": 2109,
+        "galactic_map_GUI_checks": 2896,
+        "presentation_profile": "navy-star-chart-v1",
+        "protected_baseline_source_commit": "e4e8e7edccdb4422124f249365dfb8c99d135bb5",
+        "protected_source_data_count": 18,
+        "protected_view_function_count": 7,
+        "system_map_validation_version": "0.13.0-navigation-alpha1_unchanged_historical2109checks",
+        "system_info_original_pages_complete": false,
+        "source_FF_text_interpreter_complete": false,
+        "source_system_info_audit": "docs/PARITY_AUDIT_SYSTEM_INFO_RU.md"
+      },
+      "galactic_map_visual_update": {
+        "version": "0.13.1-map-alpha1",
+        "scope": "galactic_map_view presentation only; no new runtime helper modules, shaders or textures",
+        "document": "docs/RELEASE_0_13_1_RU.md",
+        "runtime_frozen": true,
+        "runtime_sha256": "3b0d0fc97429ae3e37bf041ecaa0b67c6625bc0fbeda4a2a78fbe0ce04266137",
+        "functional_report": "validation/modern-map-2026-11-07/validation-final.json",
+        "python_packaging_report": "validation/modern-map-2026-11-07/python-packaging-tests.json",
+        "python_packaging_tests": 47,
+        "python_packaging_failures": 0,
+        "python_archive_is_mock": true,
+        "actual_apk_verification_report": "validation/modern-map-2026-11-07/android-verification.json",
+        "capture_frame_count": 8,
+        "capture_checks": 1506,
+        "capture_failures": 0,
+        "all_capture_frames_visually_inspected": true,
+        "physical_device_tested": false,
+        "complete_original_clone": false
+      },
+      "publication": {
+        "version": "0.13.1-map-alpha1",
+        "status": "published_and_immutable_https_downloads_verified",
+        "repository": "brodyga0878-hub/Pyton",
+        "branch": "development/starfrontier-rebuild",
+        "persistent_progress_upload_authorization": true,
+        "uploaded": true,
+        "immutable_https_downloads_verified": true,
+        "source_commit": "c5d61229d579dc738aca6f5b45c570e5444fa836",
+        "artifact_commit": "fe920fceab88e02a0bfffdd9c7f185fd1df49368",
+        "source_zip_sha256": "7588c52474ef115764d07b146e78decc195b32277c7ab7095b351f81a3e4ed3f",
+        "apk_sha256": "7021ac20a6180edc73a6bc9110a07888560531d1d8f18689cfd9304e91f18c4f",
+        "source_zip_below_32MiB_required": true,
+        "apk_bytes": 49765516,
+        "source_zip_bytes": 29465942,
+        "source_zip_below_32MiB": true,
+        "source_archive_fresh_import_passed": true,
+        "source_archive_startup_checks": 10,
+        "source_archive_startup_failures": 0,
+        "apk_url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/StarFrontier-0.13.1-map-arm64.apk",
+        "source_zip_url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/StarFrontier-0.13.1-map-source.zip",
+        "verification_report": "validation/modern-map-publication-2026-11-07/verification.json",
+        "local_apk_verification_report": "validation/modern-map-2026-11-07/android-verification.json",
+        "parity_audit_zip_url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/FFE-parity-audit-2026-11-07.zip"
+      }
+    },
+    "desktop_gles_comparison_frame_count": 10,
+    "desktop_gles_comparison_checks": 44,
+    "celestial_visibility_update": {
+      "version": "0.13.2-celestial-alpha1",
+      "document": "docs/RELEASE_0_13_2_RU.md",
+      "runtime_freeze_report": "validation/mercury-visibility-2026-11-07/runtime-freeze.json",
+      "runtime_inputs": 376,
+      "runtime_input_mismatches": 0,
+      "changed_runtime_files": [
+        "scripts/main.gd",
+        "scripts/celestial_renderer.gd"
+      ],
+      "additional_runtime_modules": 0,
+      "additional_shaders": 0,
+      "additional_textures": 0,
+      "functional_checks": 2508,
+      "unique_groups": 11,
+      "failures": 0,
+      "projection_checks": 691,
+      "source_renderer_checks": 172,
+      "python_packaging_checks": 58,
+      "python_packaging_failures": 0,
+      "python_packaging_archive_is_mock": true,
+      "python_packaging_report": "validation/mercury-visibility-2026-11-07/python-packaging-tests.json",
+      "actual_apk_report": "validation/mercury-visibility-2026-11-07/android-verification.json",
+      "actual_GPU_comparison_report": "validation/mercury-visibility-2026-11-07/gpu-comparison.json",
+      "actual_frames_before": 5,
+      "actual_frames_after": 5,
+      "capture_checks_combined": 44,
+      "capture_failures": 0,
+      "all10frames_visually_inspected": true,
+      "comparison_source_epoch_observer_attitude_and_body_positions_match_per_fixture": true,
+      "near_sun_photosphere_pixels_before_after": [
+        0,
+        175
+      ],
+      "eclipsed_sun_photosphere_pixels_before_after": [
+        0,
+        0
+      ],
+      "orbital_sun_photosphere_pixels_before_after": [
+        176,
+        176
+      ],
+      "mercury_centre_y_arrival_before_after": [
+        493.766143798828,
+        373.766143798828
+      ],
+      "pixel_counts_are_photometric_measurement": false,
+      "physical_device_tested": false,
+      "quantitative_stellar_flux_calibrated": false,
+      "astronomically_calibrated_star_radius_or_colour": false,
+      "project_ray_normal_limitation": {
+        "engine": "Godot4.6.3",
+        "limitation": "Built-in symmetric perspective ray helper ignores frustum_offset; future screen-ray consumers require actual inverse projection or separately validated correction.",
+        "current_runtime_consumers": 0,
+        "actual_render_projection_and_inverse_matrix_tested": true
+      }
     }
   },
   "target_device": "Samsung S23 Ultra 12/512",
@@ -1828,14 +2115,14 @@
     "13": "Full Russian localization",
     "14": "Device testing and release"
   },
-  "current_prerequisite": "Finish exact0.13.1 source archive/publication verification. Next implementation priority: original system/body information, FF text interpreter and original pages, then full source gameplay equivalence against the parity audit. Historical5block labels are not a release deadline or completeness estimate.",
+  "current_prerequisite": "Finish exact0.13.2 source archive/publication verification, then continue original system/body information, FF text interpreter and original pages before further source gameplay equivalence work. Historical5block labels are not a deadline or completion estimate.",
   "historical_statistics_are_current_validation": false,
   "full_release_date": null,
   "detailed_audit": "docs/RECOVERY_AND_ROADMAP_RU.md",
-  "last_updated_moscow": "2026-11-07T13:27:47.285162+03:00",
+  "last_updated_moscow": "2026-11-07T17:09:57.803100+03:00",
   "block10_status": "accepted_with_documented_mobile_units_and_force_policies",
   "block9_status": "in_progress_modern_map_presentation_and_partial_navigation_not_original_gameplay_equivalence",
-  "publication_status": "Historical0.12.0/0.12.1/0.13.0 immutable artifacts remain published and download-verified. Current0.13.1 runtime/functionality/GLES/APK checks passed; exact source ZIP and new remote publication pending. Persistent progress-backup authorization exists.",
+  "publication_status": "Historical0.12.0/0.12.1/0.13.0/0.13.1 immutable files remain published and download-verified. Current0.13.2 functional/GPU/APK checks passed; exact source ZIP and new HTTPS verification pending. Persistent upload authorization exists.",
   "artifact_publication": {
     "status": "uploaded_and_immutable_downloads_verified",
     "authorized_by_user": true,
@@ -1865,29 +2152,28 @@
     "all_manifest_payloads_downloaded": false
   },
   "current_candidate_publication": {
-    "version": "0.13.1-map-alpha1",
-    "status": "published_and_immutable_https_downloads_verified",
+    "version": "0.13.2-celestial-alpha1",
+    "status": "local_APK_verified_exact_source_archive_and_remote_publication_pending",
     "repository": "brodyga0878-hub/Pyton",
     "branch": "development/starfrontier-rebuild",
     "persistent_progress_upload_authorization": true,
-    "uploaded": true,
-    "immutable_https_downloads_verified": true,
-    "source_commit": "c5d61229d579dc738aca6f5b45c570e5444fa836",
-    "artifact_commit": "fe920fceab88e02a0bfffdd9c7f185fd1df49368",
-    "source_zip_sha256": "7588c52474ef115764d07b146e78decc195b32277c7ab7095b351f81a3e4ed3f",
-    "apk_sha256": "7021ac20a6180edc73a6bc9110a07888560531d1d8f18689cfd9304e91f18c4f",
+    "uploaded": false,
+    "immutable_https_downloads_verified": false,
+    "source_commit": null,
+    "artifact_commit": null,
+    "source_zip_sha256": null,
+    "apk_sha256": "c24b31c67dcf993dd44d837142e5bb69d8abfcec05722e5760b513f583529bdf",
     "source_zip_below_32MiB_required": true,
     "apk_bytes": 49765516,
-    "source_zip_bytes": 29465942,
-    "source_zip_below_32MiB": true,
-    "source_archive_fresh_import_passed": true,
-    "source_archive_startup_checks": 10,
-    "source_archive_startup_failures": 0,
-    "apk_url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/StarFrontier-0.13.1-map-arm64.apk",
-    "source_zip_url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/StarFrontier-0.13.1-map-source.zip",
-    "verification_report": "validation/modern-map-publication-2026-11-07/verification.json",
-    "local_apk_verification_report": "validation/modern-map-2026-11-07/android-verification.json",
-    "parity_audit_zip_url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/FFE-parity-audit-2026-11-07.zip"
+    "source_zip_bytes": null,
+    "source_zip_below_32MiB": null,
+    "source_archive_fresh_import_passed": false,
+    "source_archive_startup_checks": null,
+    "source_archive_startup_failures": null,
+    "apk_url": null,
+    "source_zip_url": null,
+    "verification_report": null,
+    "local_apk_verification_report": "validation/mercury-visibility-2026-11-07/android-verification.json"
   },
   "remaining_major_blocks_interpretation": "Five historical workstream labels9/11/12/13/14; not a measured completion fraction, finite microtask count or release-date promise.",
   "parity_target": {

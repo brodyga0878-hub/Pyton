@@ -1,0 +1,95 @@
+{
+  "status": "passed",
+  "completed_utc": "2026-11-07T14:06:20.428240+00:00",
+  "before_version": "0.13.1-map-alpha1",
+  "after_version": "0.13.2-celestial-alpha1",
+  "actual_frames": 10,
+  "capture_checks": 44,
+  "capture_failures": 0,
+  "all_frames_root_visually_inspected": true,
+  "renderer": "Godot4.6.3 OpenGL Compatibility / Mesa llvmpipe on Linux virtual display",
+  "physical_android_execution": false,
+  "scope": "Actual unchanged0.13.1 archive and working0.13.2 Main; same external harness, no compositing; source epoch, observer position/attitude and body positions match per fixture. Pixel colour threshold distinguishes current photosphere from background, and does not prove quantitative astrophysical lighting.",
+  "rows": [
+    {
+      "file": "01-arrival-front.png",
+      "sun_photosphere_yellow_pixels_before_after": [
+        0,
+        0
+      ],
+      "source_epoch_observer_attitude_and_body_positions_identical": true,
+      "sun_coverage_before_after": [
+        1.0,
+        1.0
+      ],
+      "mercury_centre_y_before_after": [
+        493.766143798828,
+        373.766143798828
+      ]
+    },
+    {
+      "file": "02-arrival-target.png",
+      "sun_photosphere_yellow_pixels_before_after": [
+        0,
+        0
+      ],
+      "source_epoch_observer_attitude_and_body_positions_identical": true,
+      "sun_coverage_before_after": [
+        1.0,
+        1.0
+      ],
+      "mercury_centre_y_before_after": [
+        360.0,
+        240.000030517578
+      ]
+    },
+    {
+      "file": "03-dayside-orbit.png",
+      "sun_photosphere_yellow_pixels_before_after": [
+        0,
+        0
+      ],
+      "source_epoch_observer_attitude_and_body_positions_identical": true,
+      "sun_coverage_before_after": [
+        1.0,
+        1.0
+      ],
+      "mercury_centre_y_before_after": [
+        359.998474121094,
+        239.998489379883
+      ]
+    },
+    {
+      "file": "04-sun-orbit.png",
+      "sun_photosphere_yellow_pixels_before_after": [
+        176,
+        176
+      ],
+      "source_epoch_observer_attitude_and_body_positions_identical": true,
+      "sun_coverage_before_after": [
+        1.0,
+        1.0
+      ],
+      "mercury_centre_y_before_after": [
+        360.001525878906,
+        240.001541137695
+      ]
+    },
+    {
+      "file": "05-sun-near-surface.png",
+      "sun_photosphere_yellow_pixels_before_after": [
+        0,
+        175
+      ],
+      "source_epoch_observer_attitude_and_body_positions_identical": true,
+      "sun_coverage_before_after": [
+        0.0,
+        1.0
+      ],
+      "mercury_centre_y_before_after": [
+        360.0,
+        240.0
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1293 @@
+{
+  "cases": [
+    {
+      "after": {
+        "bodies": [
+          {
+            "a_au": 0.0,
+            "angular_radius_deg": 1.41490471363141,
+            "camera_forward_angle_deg": 31.2536673072237,
+            "camera_horizontal_deg": 31.0636479654806,
+            "camera_vertical_deg": -3.62733627015172,
+            "id": "star",
+            "kind": "star",
+            "landable": false,
+            "local_meters": [
+              29835544576.0,
+              -3665545984.0,
+              -49529970688.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 1.0,
+            "model_index": 141,
+            "name": "Солнце",
+            "observer_distance_m": 57938014208.0,
+            "parent": "",
+            "period_days": 0.0,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "position_raw": [
+              0,
+              0,
+              0
+            ],
+            "radius_km": 1430619.12,
+            "radius_policy": "descriptor_bound_render_reference_no_native_landable_domain",
+            "runtime_record_hex": "5e5f5b0078563412000016008d0000001200000000000000000000000000000000000000b917536f6c000000000000000000000000000000000000000000020000000000",
+            "source_a4_packed": 3104798,
+            "source_outer_bound_m": 1430619120.0,
+            "source_reference_radius_m": 0.0
+          },
+          {
+            "a_au": 0.387205840624308,
+            "angular_radius_deg": 14.4775121859299,
+            "camera_forward_angle_deg": 29.0608299980518,
+            "camera_horizontal_deg": 25.6410055553317,
+            "camera_vertical_deg": -14.167015864571,
+            "id": "mercury",
+            "kind": "rock",
+            "landable": true,
+            "local_meters": [
+              6648106.0,
+              -3878061.75,
+              -13850221.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 1.65000422401081e-07,
+            "model_index": 120,
+            "name": "Меркурий",
+            "observer_distance_m": 15845040.0,
+            "parent": "star",
+            "period_days": 87.9407407407407,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              -0.199393855762115,
+              0.0244767379745765,
+              0.330994818142801
+            ],
+            "position_raw": [
+              -29815063179787,
+              3659969793742,
+              49493157035307
+            ],
+            "radius_km": 3961.26,
+            "radius_policy": "original_static_equal_axis_reference_not_terrain_height_v1",
+            "runtime_record_hex": "00424500312bc9cb01000300780051692e005515f83918000000000000000000ce00fa046f024d6572637572790000000000000000000000000000000000000000000000",
+            "source_a4_packed": 1655430,
+            "source_outer_bound_m": 4401866.25,
+            "source_reference_radius_m": 3961260.0
+          },
+          {
+            "a_au": 1.00043614323984,
+            "angular_radius_deg": 0.00310673046206671,
+            "camera_forward_angle_deg": 67.2300728605756,
+            "camera_horizontal_deg": -67.2205075109831,
+            "camera_vertical_deg": -1.61558265084436,
+            "id": "earth",
+            "kind": "earth",
+            "landable": true,
+            "local_meters": [
+              -119825367040.0,
+              -3665545984.0,
+              -50319486976.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 2.9900076544196e-06,
+            "model_index": 129,
+            "name": "Земля",
+            "observer_distance_m": 130013872128.0,
+            "parent": "star",
+            "period_days": 365.274074074074,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              -1.00042141656669,
+              0.0,
+              -0.00527760249846407
+            ],
+            "position_raw": [
+              -149591508862407,
+              0,
+              -789151959212
+            ],
+            "radius_km": 7049.7,
+            "radius_policy": "original_static_equal_axis_reference_not_terrain_height_v1",
+            "runtime_record_hex": "c04a49003412bc0a01000a008100074430000040191e1b000000000000000000110000002701456172746800000000000000000000000000000000000000010000000000",
+            "source_a4_packed": 1919830,
+            "source_outer_bound_m": 7813417.5,
+            "source_reference_radius_m": 7049700.0
+          }
+        ],
+        "elapsed_days": 0.306422375978051,
+        "focus": "mercury",
+        "forward": [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "origin_au": [
+          -0.199438295604384,
+          0.0245026612169525,
+          0.331087401150159
+        ],
+        "origin_raw": [
+          -29821708202745,
+          3663846057051,
+          49507000833303
+        ],
+        "ship_attitude": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "ship_position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "site": ""
+      },
+      "angle_between_sun_mercury_from_ship_deg": 11.819434891711,
+      "before": {
+        "bodies": [
+          {
+            "a_au": 0.0,
+            "angular_radius_deg": 0.547651330077481,
+            "camera_forward_angle_deg": 89.9908367509056,
+            "camera_horizontal_deg": 89.9908367506998,
+            "camera_vertical_deg": -0.0026419556433272,
+            "id": "star",
+            "kind": "star",
+            "landable": false,
+            "local_meters": [
+              149674950656.0,
+              -6901635.5,
+              -23937346.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 1.0,
+            "model_index": 141,
+            "name": "Солнце",
+            "observer_distance_m": 149674950656.0,
+            "parent": "",
+            "period_days": 0.0,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "position_raw": [
+              0,
+              0,
+              0
+            ],
+            "radius_km": 1430619.12,
+            "radius_policy": "descriptor_bound_render_reference_no_native_landable_domain",
+            "runtime_record_hex": "5e5f5b0078563412000016008d0000001200000000000000000000000000000000000000b917536f6c000000000000000000000000000000000000000000020000000000",
+            "source_a4_packed": 3104798,
+            "source_outer_bound_m": 1430619120.0,
+            "source_reference_radius_m": 0.0
+          },
+          {
+            "a_au": 0.387205840624308,
+            "angular_radius_deg": 0.00173309630782861,
+            "camera_forward_angle_deg": 112.510747523233,
+            "camera_horizontal_deg": 112.519338839057,
+            "camera_vertical_deg": 1.54102056814977,
+            "id": "mercury",
+            "kind": "rock",
+            "landable": true,
+            "local_meters": [
+              120929091584.0,
+              3521816576.0,
+              50138296320.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 1.65000422401081e-07,
+            "model_index": 120,
+            "name": "Меркурий",
+            "observer_distance_m": 130958376960.0,
+            "parent": "star",
+            "period_days": 87.9407407407407,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              -0.192154159832856,
+              0.0235880238996557,
+              0.335313809491632
+            ],
+            "position_raw": [
+              -28732522342667,
+              3527081715565,
+              50138969311950
+            ],
+            "radius_km": 3961.26,
+            "radius_policy": "original_static_equal_axis_reference_not_terrain_height_v1",
+            "runtime_record_hex": "00424500312bc9cb01000300780051692e005515f83918000000000000000000ce00fa046f024d6572637572790000000000000000000000000000000000000000000000",
+            "source_a4_packed": 1655430,
+            "source_outer_bound_m": 4401866.25,
+            "source_reference_radius_m": 3961260.0
+          },
+          {
+            "a_au": 1.00043614323984,
+            "angular_radius_deg": 14.4775132351737,
+            "camera_forward_angle_deg": 29.060822967316,
+            "camera_horizontal_deg": 25.6410057487365,
+            "camera_vertical_deg": -14.1670164165283,
+            "id": "earth",
+            "kind": "earth",
+            "landable": true,
+            "local_meters": [
+              11831375.0,
+              -6901635.5,
+              -24648698.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 2.9900076544196e-06,
+            "model_index": 129,
+            "name": "Земля",
+            "observer_distance_m": 28198798.0,
+            "parent": "star",
+            "period_days": 365.274074074074,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              -1.00043612888702,
+              0.0,
+              -4.75509144683098e-06
+            ],
+            "position_raw": [
+              -149593708773525,
+              0,
+              -711021668
+            ],
+            "radius_km": 7049.7,
+            "radius_policy": "original_static_equal_axis_reference_not_terrain_height_v1",
+            "runtime_record_hex": "c04a49003412bc0a01000a008100074430000040191e1b000000000000000000110000002701456172746800000000000000000000000000000000000000010000000000",
+            "source_a4_packed": 1919830,
+            "source_outer_bound_m": 7813417.5,
+            "source_reference_radius_m": 7049700.0
+          }
+        ],
+        "elapsed_days": 0.0,
+        "focus": "earth",
+        "forward": [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "origin_au": [
+          -1.00051521674191,
+          4.61345838893764e-05,
+          0.00016001127758035
+        ],
+        "origin_raw": [
+          -149605534661756,
+          6898434885,
+          23926245563
+        ],
+        "ship_attitude": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "ship_position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "site": ""
+      },
+      "charge_substeps": 30,
+      "message": "Прибытие к объекту: Меркурий.",
+      "source_days_added": 0.306422375978051,
+      "sun_mercury_separation_au": 0.387188070103995,
+      "transfer_accepted": true,
+      "transfer_completed": true,
+      "mercury_phase_angle_deg": 168.1773545241766,
+      "ideal_visible_illuminated_fraction": 0.010606756163003106,
+      "sun_fully_occulted_by_reference_sphere": true
+    },
+    {
+      "after": {
+        "bodies": [
+          {
+            "a_au": 0.0,
+            "angular_radius_deg": 1.41493662991464,
+            "camera_forward_angle_deg": 46.4933914322257,
+            "camera_horizontal_deg": 46.2791516031029,
+            "camera_vertical_deg": -5.07288066810062,
+            "id": "star",
+            "kind": "star",
+            "landable": false,
+            "local_meters": [
+              41707757568.0,
+              -5122928128.0,
+              -39885844480.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 1.0,
+            "model_index": 141,
+            "name": "Солнце",
+            "observer_distance_m": 57936707584.0,
+            "parent": "",
+            "period_days": 0.0,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "position_raw": [
+              0,
+              0,
+              0
+            ],
+            "radius_km": 1430619.12,
+            "radius_policy": "descriptor_bound_render_reference_no_native_landable_domain",
+            "runtime_record_hex": "5e5f5b0078563412000016008d0000001200000000000000000000000000000000000000b917536f6c000000000000000000000000000000000000000000020000000000",
+            "source_a4_packed": 3104798,
+            "source_outer_bound_m": 1430619120.0,
+            "source_reference_radius_m": 0.0
+          },
+          {
+            "a_au": 0.387205840624308,
+            "angular_radius_deg": 14.4775121859299,
+            "camera_forward_angle_deg": 29.0608299980518,
+            "camera_horizontal_deg": 25.6410055553317,
+            "camera_vertical_deg": -14.167015864571,
+            "id": "mercury",
+            "kind": "rock",
+            "landable": true,
+            "local_meters": [
+              6648106.0,
+              -3878061.75,
+              -13850221.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 1.65000422401081e-07,
+            "model_index": 120,
+            "name": "Меркурий",
+            "observer_distance_m": 15845040.0,
+            "parent": "star",
+            "period_days": 87.9407407407407,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              -0.27875468814848,
+              0.0342187348730077,
+              0.266527809391118
+            ],
+            "position_raw": [
+              -41681769014609,
+              5116675929013,
+              39853502234527
+            ],
+            "radius_km": 3961.26,
+            "radius_policy": "original_static_equal_axis_reference_not_terrain_height_v1",
+            "runtime_record_hex": "00424500312bc9cb01000300780051692e005515f83918000000000000000000ce00fa046f024d6572637572790000000000000000000000000000000000000000000000",
+            "source_a4_packed": 1655430,
+            "source_outer_bound_m": 4401866.25,
+            "source_reference_radius_m": 3961260.0
+          },
+          {
+            "a_au": 1.00043614323984,
+            "angular_radius_deg": 0.00339820466120407,
+            "camera_forward_angle_deg": 64.9897647884176,
+            "camera_horizontal_deg": -64.9649020809518,
+            "camera_vertical_deg": -2.47019764802988,
+            "id": "earth",
+            "kind": "earth",
+            "landable": true,
+            "local_meters": [
+              -107594866688.0,
+              -5122928128.0,
+              -50252574720.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 2.9900076544196e-06,
+            "model_index": 129,
+            "name": "Земля",
+            "observer_distance_m": 118862192640.0,
+            "parent": "star",
+            "period_days": 365.274074074074,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              -0.998026408379827,
+              0.0,
+              -0.0692973166340045
+            ],
+            "position_raw": [
+              -149233386892527,
+              0,
+              -10361923469184
+            ],
+            "radius_km": 7049.7,
+            "radius_policy": "original_static_equal_axis_reference_not_terrain_height_v1",
+            "runtime_record_hex": "c04a49003412bc0a01000a008100074430000040191e1b000000000000000000110000002701456172746800000000000000000000000000000000000000010000000000",
+            "source_a4_packed": 1919830,
+            "source_outer_bound_m": 7813417.5,
+            "source_reference_radius_m": 7049700.0
+          }
+        ],
+        "elapsed_days": 4.03002498183001,
+        "focus": "mercury",
+        "forward": [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "origin_au": [
+          -0.278799127990749,
+          0.0342446581153836,
+          0.266620392398476
+        ],
+        "origin_raw": [
+          -41688414037567,
+          5120552192322,
+          39867346032523
+        ],
+        "ship_attitude": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "ship_position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "site": ""
+      },
+      "angle_between_sun_mercury_from_ship_deg": 22.2636043638508,
+      "before": {
+        "bodies": [
+          {
+            "a_au": 0.0,
+            "angular_radius_deg": 0.547660682415684,
+            "camera_forward_angle_deg": 93.6862419824507,
+            "camera_horizontal_deg": 93.6862420561135,
+            "camera_vertical_deg": -0.0026420007601807,
+            "id": "star",
+            "kind": "star",
+            "landable": false,
+            "local_meters": [
+              149362737152.0,
+              -6901635.5,
+              9622840320.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 1.0,
+            "model_index": 141,
+            "name": "Солнце",
+            "observer_distance_m": 149672394752.0,
+            "parent": "",
+            "period_days": 0.0,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "position_raw": [
+              0,
+              0,
+              0
+            ],
+            "radius_km": 1430619.12,
+            "radius_policy": "descriptor_bound_render_reference_no_native_landable_domain",
+            "runtime_record_hex": "5e5f5b0078563412000016008d0000001200000000000000000000000000000000000000b917536f6c000000000000000000000000000000000000000000020000000000",
+            "source_a4_packed": 3104798,
+            "source_outer_bound_m": 1430619120.0,
+            "source_reference_radius_m": 0.0
+          },
+          {
+            "a_au": 0.387205840624308,
+            "angular_radius_deg": 0.00189650979943514,
+            "camera_forward_angle_deg": 114.868470396723,
+            "camera_horizontal_deg": 114.891812842734,
+            "camera_vertical_deg": 2.40119392932338,
+            "id": "mercury",
+            "kind": "rock",
+            "landable": true,
+            "local_meters": [
+              108461735936.0,
+              5013931008.0,
+              50327425024.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 1.65000422401081e-07,
+            "model_index": 120,
+            "name": "Меркурий",
+            "observer_distance_m": 119674298368.0,
+            "parent": "star",
+            "period_days": 87.9407407407407,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              -0.273406331480494,
+              0.0335621935145382,
+              0.272093327712935
+            ],
+            "position_raw": [
+              -40882037290908,
+              5018504287725,
+              40685705813514
+            ],
+            "radius_km": 3961.26,
+            "radius_policy": "original_static_equal_axis_reference_not_terrain_height_v1",
+            "runtime_record_hex": "00424500312bc9cb01000300780051692e005515f83918000000000000000000ce00fa046f024d6572637572790000000000000000000000000000000000000000000000",
+            "source_a4_packed": 1655430,
+            "source_outer_bound_m": 4401866.25,
+            "source_reference_radius_m": 3961260.0
+          },
+          {
+            "a_au": 1.00043614323984,
+            "angular_radius_deg": 14.4775132351737,
+            "camera_forward_angle_deg": 29.060822967316,
+            "camera_horizontal_deg": 25.6410057487365,
+            "camera_vertical_deg": -14.1670164165283,
+            "id": "earth",
+            "kind": "earth",
+            "landable": true,
+            "local_meters": [
+              11831375.0,
+              -6901635.5,
+              -24648698.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 2.9900076544196e-06,
+            "model_index": 129,
+            "name": "Земля",
+            "observer_distance_m": 28198798.0,
+            "parent": "star",
+            "period_days": 365.274074074074,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              -0.998349188468104,
+              0.0,
+              -0.0644894830308848
+            ],
+            "position_raw": [
+              -149281651713368,
+              0,
+              -9643015345927
+            ],
+            "radius_km": 7049.7,
+            "radius_policy": "original_static_equal_axis_reference_not_terrain_height_v1",
+            "runtime_record_hex": "c04a49003412bc0a01000a008100074430000040191e1b000000000000000000110000002701456172746800000000000000000000000000000000000000010000000000",
+            "source_a4_packed": 1919830,
+            "source_outer_bound_m": 7813417.5,
+            "source_reference_radius_m": 7049700.0
+          }
+        ],
+        "elapsed_days": 3.75,
+        "focus": "earth",
+        "forward": [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "origin_au": [
+          -0.99842827632299,
+          4.61345838893764e-05,
+          -0.0643247166618576
+        ],
+        "origin_raw": [
+          -149293477601599,
+          6898434885,
+          -9618378078696
+        ],
+        "ship_attitude": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "ship_position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "site": ""
+      },
+      "charge_substeps": 30,
+      "message": "Прибытие к объекту: Меркурий.",
+      "source_days_added": 0.280024981830008,
+      "sun_mercury_separation_au": 0.387184948776146,
+      "transfer_accepted": true,
+      "transfer_completed": true,
+      "mercury_phase_angle_deg": 157.73045986915199,
+      "ideal_visible_illuminated_fraction": 0.03729434199211734,
+      "sun_fully_occulted_by_reference_sphere": false
+    },
+    {
+      "after": {
+        "bodies": [
+          {
+            "a_au": 0.0,
+            "angular_radius_deg": 1.41528920553883,
+            "camera_forward_angle_deg": 117.347897430309,
+            "camera_horizontal_deg": 117.52328383364,
+            "camera_vertical_deg": -6.21591310274288,
+            "id": "star",
+            "kind": "star",
+            "landable": false,
+            "local_meters": [
+              51064823808.0,
+              -6271561216.0,
+              26609045504.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 1.0,
+            "model_index": 141,
+            "name": "Солнце",
+            "observer_distance_m": 57922277376.0,
+            "parent": "",
+            "period_days": 0.0,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "position_raw": [
+              0,
+              0,
+              0
+            ],
+            "radius_km": 1430619.12,
+            "radius_policy": "descriptor_bound_render_reference_no_native_landable_domain",
+            "runtime_record_hex": "5e5f5b0078563412000016008d0000001200000000000000000000000000000000000000b917536f6c000000000000000000000000000000000000000000020000000000",
+            "source_a4_packed": 3104798,
+            "source_outer_bound_m": 1430619120.0,
+            "source_reference_radius_m": 0.0
+          },
+          {
+            "a_au": 0.387205840624308,
+            "angular_radius_deg": 14.4775121859299,
+            "camera_forward_angle_deg": 29.0608299980518,
+            "camera_horizontal_deg": 25.6410055553317,
+            "camera_vertical_deg": -14.167015864571,
+            "id": "mercury",
+            "kind": "rock",
+            "landable": true,
+            "local_meters": [
+              6648106.0,
+              -3878061.75,
+              -13850221.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 1.65000422401081e-07,
+            "model_index": 120,
+            "name": "Меркурий",
+            "observer_distance_m": 15845040.0,
+            "parent": "star",
+            "period_days": 87.9407407407407,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              -0.341302811213648,
+              0.0418968753610384,
+              -0.17796305941167
+            ],
+            "position_raw": [
+              -51034495726459,
+              6264776721181,
+              -26610548453195
+            ],
+            "radius_km": 3961.26,
+            "radius_policy": "original_static_equal_axis_reference_not_terrain_height_v1",
+            "runtime_record_hex": "00424500312bc9cb01000300780051692e005515f83918000000000000000000ce00fa046f024d6572637572790000000000000000000000000000000000000000000000",
+            "source_a4_packed": 1655430,
+            "source_outer_bound_m": 4401866.25,
+            "source_reference_radius_m": 3961260.0
+          },
+          {
+            "a_au": 1.00043614323984,
+            "angular_radius_deg": 0.00434852465865463,
+            "camera_forward_angle_deg": 73.0330434637751,
+            "camera_horizontal_deg": -72.9930565673798,
+            "camera_vertical_deg": -3.87148417692169,
+            "id": "earth",
+            "kind": "earth",
+            "landable": true,
+            "local_meters": [
+              -88621555712.0,
+              -6271561216.0,
+              -27106072576.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 2.9900076544196e-06,
+            "model_index": 129,
+            "name": "Земля",
+            "observer_distance_m": 92886228992.0,
+            "parent": "star",
+            "period_days": 365.274074074074,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              -0.933745763641903,
+              0.0,
+              -0.359063383705136
+            ],
+            "position_raw": [
+              -139621598822261,
+              0,
+              -53690207402824
+            ],
+            "radius_km": 7049.7,
+            "radius_policy": "original_static_equal_axis_reference_not_terrain_height_v1",
+            "runtime_record_hex": "c04a49003412bc0a01000a008100074430000040191e1b000000000000000000110000002701456172746800000000000000000000000000000000000000010000000000",
+            "source_a4_packed": 1919830,
+            "source_outer_bound_m": 7813417.5,
+            "source_reference_radius_m": 7049700.0
+          }
+        ],
+        "elapsed_days": 21.342100721481,
+        "focus": "mercury",
+        "forward": [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "origin_au": [
+          -0.341347251055918,
+          0.0419227986034143,
+          -0.177870476404312
+        ],
+        "origin_raw": [
+          -51041140749417,
+          6268652984490,
+          -26596704655199
+        ],
+        "ship_attitude": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "ship_position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "site": ""
+      },
+      "angle_between_sun_mercury_from_ship_deg": 90.2956199219455,
+      "before": {
+        "bodies": [
+          {
+            "a_au": 0.0,
+            "angular_radius_deg": 0.547703791231847,
+            "camera_forward_angle_deg": 110.809393694889,
+            "camera_horizontal_deg": 110.809392465485,
+            "camera_vertical_deg": -0.00264220857557578,
+            "id": "star",
+            "kind": "star",
+            "landable": false,
+            "local_meters": [
+              139897880576.0,
+              -6901635.5,
+              53168463872.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 1.0,
+            "model_index": 141,
+            "name": "Солнце",
+            "observer_distance_m": 149660614656.0,
+            "parent": "",
+            "period_days": 0.0,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "position_raw": [
+              0,
+              0,
+              0
+            ],
+            "radius_km": 1430619.12,
+            "radius_policy": "descriptor_bound_render_reference_no_native_landable_domain",
+            "runtime_record_hex": "5e5f5b0078563412000016008d0000001200000000000000000000000000000000000000b917536f6c000000000000000000000000000000000000000000020000000000",
+            "source_a4_packed": 3104798,
+            "source_outer_bound_m": 1430619120.0,
+            "source_reference_radius_m": 0.0
+          },
+          {
+            "a_au": 0.387205840624308,
+            "angular_radius_deg": 0.00244619077342902,
+            "camera_forward_angle_deg": 107.141936057593,
+            "camera_horizontal_deg": 107.182957703379,
+            "camera_vertical_deg": 3.89982967685894,
+            "id": "mercury",
+            "kind": "rock",
+            "landable": true,
+            "local_meters": [
+              88435933184.0,
+              6310347264.0,
+              27346671616.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 1.65000422401081e-07,
+            "model_index": 120,
+            "name": "Меркурий",
+            "observer_distance_m": 92782411776.0,
+            "parent": "star",
+            "period_days": 87.9407407407407,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              -0.344001881494715,
+              0.0422282017162415,
+              -0.172608025187554
+            ],
+            "position_raw": [
+              -51438083643695,
+              6314319452454,
+              -25809818244575
+            ],
+            "radius_km": 3961.26,
+            "radius_policy": "original_static_equal_axis_reference_not_terrain_height_v1",
+            "runtime_record_hex": "00424500312bc9cb01000300780051692e005515f83918000000000000000000ce00fa046f024d6572637572790000000000000000000000000000000000000000000000",
+            "source_a4_packed": 1655430,
+            "source_outer_bound_m": 4401866.25,
+            "source_reference_radius_m": 3961260.0
+          },
+          {
+            "a_au": 1.00043614323984,
+            "angular_radius_deg": 14.4775132351737,
+            "camera_forward_angle_deg": 29.060822967316,
+            "camera_horizontal_deg": 25.6410057487365,
+            "camera_vertical_deg": -14.1670164165283,
+            "id": "earth",
+            "kind": "earth",
+            "landable": true,
+            "local_meters": [
+              11831375.0,
+              -6901635.5,
+              -24648698.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 2.9900076544196e-06,
+            "model_index": 129,
+            "name": "Земля",
+            "observer_distance_m": 28198798.0,
+            "parent": "star",
+            "period_days": 365.274074074074,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              -0.93508051820283,
+              0.0,
+              -0.355574000121599
+            ],
+            "position_raw": [
+              -139821182663054,
+              0,
+              -53168445126830
+            ],
+            "radius_km": 7049.7,
+            "radius_policy": "original_static_equal_axis_reference_not_terrain_height_v1",
+            "runtime_record_hex": "c04a49003412bc0a01000a008100074430000040191e1b000000000000000000110000002701456172746800000000000000000000000000000000000000010000000000",
+            "source_a4_packed": 1919830,
+            "source_outer_bound_m": 7813417.5,
+            "source_reference_radius_m": 7049700.0
+          }
+        ],
+        "elapsed_days": 21.125,
+        "focus": "earth",
+        "forward": [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "origin_au": [
+          -0.935159606057716,
+          4.61345838893764e-05,
+          -0.355409233752572
+        ],
+        "origin_raw": [
+          -139833008551285,
+          6898434885,
+          -53143807859599
+        ],
+        "ship_attitude": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "ship_position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "site": ""
+      },
+      "charge_substeps": 30,
+      "message": "Прибытие к объекту: Меркурий.",
+      "source_days_added": 0.217100721481,
+      "sun_mercury_separation_au": 0.387187057041448,
+      "transfer_accepted": true,
+      "transfer_completed": true,
+      "mercury_phase_angle_deg": 89.68870720897255,
+      "ideal_visible_illuminated_fraction": 0.5027165287059316,
+      "sun_fully_occulted_by_reference_sphere": false
+    },
+    {
+      "after": {
+        "bodies": [
+          {
+            "a_au": 0.0,
+            "angular_radius_deg": 1.41504879855819,
+            "camera_forward_angle_deg": 86.0080785877418,
+            "camera_horizontal_deg": 85.9781859996488,
+            "camera_vertical_deg": -6.9843151042429,
+            "id": "star",
+            "kind": "star",
+            "landable": false,
+            "local_meters": [
+              57360625664.0,
+              -7044407808.0,
+              -4032991744.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 1.0,
+            "model_index": 141,
+            "name": "Солнце",
+            "observer_distance_m": 57932115968.0,
+            "parent": "",
+            "period_days": 0.0,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "position_raw": [
+              0,
+              0,
+              0
+            ],
+            "radius_km": 1430619.12,
+            "radius_policy": "descriptor_bound_render_reference_no_native_landable_domain",
+            "runtime_record_hex": "5e5f5b0078563412000016008d0000001200000000000000000000000000000000000000b917536f6c000000000000000000000000000000000000000000020000000000",
+            "source_a4_packed": 3104798,
+            "source_outer_bound_m": 1430619120.0,
+            "source_reference_radius_m": 0.0
+          },
+          {
+            "a_au": 0.387205840624308,
+            "angular_radius_deg": 14.4775121859299,
+            "camera_forward_angle_deg": 29.0608299980518,
+            "camera_horizontal_deg": 25.6410055553317,
+            "camera_vertical_deg": -14.167015864571,
+            "id": "mercury",
+            "kind": "rock",
+            "landable": true,
+            "local_meters": [
+              6648106.0,
+              -3878061.75,
+              -13850221.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 1.65000422401081e-07,
+            "model_index": 120,
+            "name": "Меркурий",
+            "observer_distance_m": 15845040.0,
+            "parent": "star",
+            "period_days": 87.9407407407407,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              -0.383387669001926,
+              0.047063032789047,
+              0.0268663008543947
+            ],
+            "position_raw": [
+              -57327381177086,
+              7037264466724,
+              4017277535054
+            ],
+            "radius_km": 3961.26,
+            "radius_policy": "original_static_equal_axis_reference_not_terrain_height_v1",
+            "runtime_record_hex": "00424500312bc9cb01000300780051692e005515f83918000000000000000000ce00fa046f024d6572637572790000000000000000000000000000000000000000000000",
+            "source_a4_packed": 1655430,
+            "source_outer_bound_m": 4401866.25,
+            "source_reference_radius_m": 3961260.0
+          },
+          {
+            "a_au": 1.00043614323984,
+            "angular_radius_deg": 0.00435827081938475,
+            "camera_forward_angle_deg": 87.2295157208634,
+            "camera_horizontal_deg": -87.2214716059227,
+            "camera_vertical_deg": -4.35920316812359,
+            "id": "earth",
+            "kind": "earth",
+            "landable": true,
+            "local_meters": [
+              -92301770752.0,
+              -7044407808.0,
+              -4479637504.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 2.9900076544196e-06,
+            "model_index": 129,
+            "name": "Земля",
+            "observer_distance_m": 92678512640.0,
+            "parent": "star",
+            "period_days": 365.274074074074,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              -1.00043133102375,
+              0.0,
+              -0.0029856421425023
+            ],
+            "position_raw": [
+              -149592991356251,
+              0,
+              -446438576408
+            ],
+            "radius_km": 7049.7,
+            "radius_policy": "original_static_equal_axis_reference_not_terrain_height_v1",
+            "runtime_record_hex": "c04a49003412bc0a01000a008100074430000040191e1b000000000000000000110000002701456172746800000000000000000000000000000000000000010000000000",
+            "source_a4_packed": 1919830,
+            "source_outer_bound_m": 7813417.5,
+            "source_reference_radius_m": 7049700.0
+          }
+        ],
+        "elapsed_days": 365.467079718955,
+        "focus": "mercury",
+        "forward": [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "origin_au": [
+          -0.383432108844195,
+          0.0470889560314229,
+          0.0269588838617528
+        ],
+        "origin_raw": [
+          -57334026200044,
+          7041140730033,
+          4031121333050
+        ],
+        "ship_attitude": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "ship_position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "site": ""
+      },
+      "angle_between_sun_mercury_from_ship_deg": 59.5993496031283,
+      "before": {
+        "bodies": [
+          {
+            "a_au": 0.0,
+            "angular_radius_deg": 0.547651449977231,
+            "camera_forward_angle_deg": 89.9503081664234,
+            "camera_horizontal_deg": 89.9503081690298,
+            "camera_vertical_deg": -0.00264195612948814,
+            "id": "star",
+            "kind": "star",
+            "landable": false,
+            "local_meters": [
+              149674868736.0,
+              -6901635.5,
+              -129810960.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 1.0,
+            "model_index": 141,
+            "name": "Солнце",
+            "observer_distance_m": 149674917888.0,
+            "parent": "",
+            "period_days": 0.0,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "position_raw": [
+              0,
+              0,
+              0
+            ],
+            "radius_km": 1430619.12,
+            "radius_policy": "descriptor_bound_render_reference_no_native_landable_domain",
+            "runtime_record_hex": "5e5f5b0078563412000016008d0000001200000000000000000000000000000000000000b917536f6c000000000000000000000000000000000000000000020000000000",
+            "source_a4_packed": 3104798,
+            "source_outer_bound_m": 1430619120.0,
+            "source_reference_radius_m": 0.0
+          },
+          {
+            "a_au": 0.387205840624308,
+            "angular_radius_deg": 0.00244625664926584,
+            "camera_forward_angle_deg": 92.9562703575631,
+            "camera_horizontal_deg": 92.9647894303525,
+            "camera_vertical_deg": 4.34251948318541,
+            "id": "mercury",
+            "kind": "rock",
+            "landable": true,
+            "local_meters": [
+              92389728256.0,
+              7025176064.0,
+              4785009152.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 1.65000422401081e-07,
+            "model_index": 120,
+            "name": "Меркурий",
+            "observer_distance_m": 92779913216.0,
+            "parent": "star",
+            "period_days": 87.9407407407407,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              -0.382927435689751,
+              0.0470065364346188,
+              0.0328535429749327
+            ],
+            "position_raw": [
+              -57258563182532,
+              7028816651869,
+              4912540839002
+            ],
+            "radius_km": 3961.26,
+            "radius_policy": "original_static_equal_axis_reference_not_terrain_height_v1",
+            "runtime_record_hex": "00424500312bc9cb01000300780051692e005515f83918000000000000000000ce00fa046f024d6572637572790000000000000000000000000000000000000000000000",
+            "source_a4_packed": 1655430,
+            "source_outer_bound_m": 4401866.25,
+            "source_reference_radius_m": 3961260.0
+          },
+          {
+            "a_au": 1.00043614323984,
+            "angular_radius_deg": 14.4775132351737,
+            "camera_forward_angle_deg": 29.060822967316,
+            "camera_horizontal_deg": 25.6410057487365,
+            "camera_vertical_deg": -14.1670164165283,
+            "id": "earth",
+            "kind": "earth",
+            "landable": true,
+            "local_meters": [
+              11831375.0,
+              -6901635.5,
+              -24648698.0
+            ],
+            "local_vs_au_roundtrip_error_m": 0.0,
+            "mass_solar": 2.9900076544196e-06,
+            "model_index": 129,
+            "name": "Земля",
+            "observer_distance_m": 28198798.0,
+            "parent": "star",
+            "period_days": 365.274074074074,
+            "physical_adapter": "original_runtime_units_with_explicit_display_adapters_v1",
+            "position_au": [
+              -1.00043556006706,
+              0.0,
+              0.000702966303470106
+            ],
+            "position_raw": [
+              -149593623718732,
+              0,
+              105113493448
+            ],
+            "radius_km": 7049.7,
+            "radius_policy": "original_static_equal_axis_reference_not_terrain_height_v1",
+            "runtime_record_hex": "c04a49003412bc0a01000a008100074430000040191e1b000000000000000000110000002701456172746800000000000000000000000000000000000000010000000000",
+            "source_a4_packed": 1919830,
+            "source_outer_bound_m": 7813417.5,
+            "source_reference_radius_m": 7049700.0
+          }
+        ],
+        "elapsed_days": 365.25,
+        "focus": "earth",
+        "forward": [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "origin_au": [
+          -1.00051464792195,
+          4.61345838893764e-05,
+          0.000867732672497287
+        ],
+        "origin_raw": [
+          -149605449606963,
+          6898434885,
+          129750760679
+        ],
+        "ship_attitude": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "ship_position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "site": ""
+      },
+      "charge_substeps": 30,
+      "message": "Прибытие к объекту: Меркурий.",
+      "source_days_added": 0.217079718955119,
+      "sun_mercury_separation_au": 0.38719869357071,
+      "transfer_accepted": true,
+      "transfer_completed": true,
+      "mercury_phase_angle_deg": 120.38713508897,
+      "ideal_visible_illuminated_fraction": 0.24707995659392368,
+      "sun_fully_occulted_by_reference_sphere": false
+    }
+  ],
+  "scope": "Read-only actual World/Nav/Flight source-Sol transfer diagnostic, no Main rendering or player saves; no runtime edits."
+}

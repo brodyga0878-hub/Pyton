@@ -50,6 +50,9 @@ var settings:=Settings.new()
 var saves:=SaveStore.new()
 var presentation:=Presentation.new()
 var camera:Camera3D
+var flight_view_rect:=Rect2()
+var _flight_projection_signature:Array=[]
+var flight_cross:Label
 var environment:WorldEnvironment
 var sunlight:DirectionalLight3D
 var planet_fill:DirectionalLight3D
@@ -191,7 +194,7 @@ func _anchored(node:Control,preset:int,offsets:Vector4)->void:
 
 func _build_ui()->void:
 	var layer:=CanvasLayer.new();add_child(layer);ui=Control.new();ui.theme=FlightTheme.build();ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);ui.mouse_filter=Control.MOUSE_FILTER_IGNORE;layer.add_child(ui)
-	flight_reticle=FlightReticle.new();_anchored(flight_reticle,Control.PRESET_FULL_RECT,Vector4.ZERO);flight_widgets.append(flight_reticle)
+	flight_reticle=FlightReticle.new();_anchored(flight_reticle,Control.PRESET_FULL_RECT,Vector4(0,0,0,-FlightConsole.HEIGHT));flight_widgets.append(flight_reticle)
 	hud=_label("",20);_anchored(hud,Control.PRESET_TOP_WIDE,Vector4(18,8,-260,38));hud.mouse_filter=Control.MOUSE_FILTER_IGNORE;flight_widgets.append(hud)
 	var console_height:float=FlightConsole.HEIGHT
 	stick=Stick.new();_anchored(stick,Control.PRESET_BOTTOM_LEFT,Vector4(20,-250-console_height,250,-80-console_height));flight_widgets.append(stick)
@@ -212,7 +215,7 @@ func _build_ui()->void:
 	# Preserve the public action reference while using the actual lower-console
 	# button. A duplicate floating button would overlap the throttle caption.
 	surface_button=flight_console.buttons.surface
-	var cross:=_label("·",27);cross.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(cross,Control.PRESET_CENTER,Vector4(-15,-20,15,20));cross.mouse_filter=Control.MOUSE_FILTER_IGNORE;flight_widgets.append(cross)
+	flight_cross=_label("·",27);flight_cross.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(flight_cross,Control.PRESET_CENTER,Vector4(-15,-20-console_height*0.5,15,20-console_height*0.5));flight_cross.mouse_filter=Control.MOUSE_FILTER_IGNORE;flight_widgets.append(flight_cross)
 	target_label=_label("",18);target_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(target_label,Control.PRESET_CENTER_TOP,Vector4(-330,40,330,94));target_label.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	flight_widgets.append(target_label)
 	docking_label=_label("",16);docking_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(docking_label,Control.PRESET_CENTER_BOTTOM,Vector4(-360,-70-console_height,360,-8-console_height));docking_label.mouse_filter=Control.MOUSE_FILTER_IGNORE;flight_widgets.append(docking_label)
@@ -237,6 +240,27 @@ func _safe_area()->void:
 		if window.x>0 and window.y>0:
 			padding=Vector4(maxi(0,safe.position.x)*logical.x/window.x,maxi(0,safe.position.y)*logical.y/window.y,maxi(0,window.x-safe.end.x)*logical.x/window.x,maxi(0,window.y-safe.end.y)*logical.y/window.y)
 	ui.offset_left=padding.x;ui.offset_top=padding.y;ui.offset_right=-padding.z;ui.offset_bottom=-padding.w
+	_update_flight_projection()
+
+func _update_flight_projection()->void:
+	if camera==null or ui==null or flight_console==null:return
+	var viewport_rect:=get_viewport().get_visible_rect()
+	if viewport_rect.size.x<=0 or viewport_rect.size.y<=0:return
+	var safe_rect:=ui.get_global_rect()
+	var console_top:float=flight_console.get_global_rect().position.y
+	flight_view_rect=Rect2(safe_rect.position,Vector2(safe_rect.size.x,maxf(1,console_top-safe_rect.position.y)))
+	var signature:=[viewport_rect,flight_view_rect,camera.fov,camera.near,camera.far,camera.keep_aspect]
+	if signature==_flight_projection_signature:return
+	_flight_projection_signature=signature
+	# Keep the same angular scale and physical camera pose. Move only the
+	# optical centre to the usable flight window above the opaque console.
+	# Frustum size is its vertical span at the near plane, even for KEEP_WIDTH.
+	var aspect:float=viewport_rect.size.x/viewport_rect.size.y
+	var half_height:float=camera.near*tan(deg_to_rad(camera.fov)*0.5)
+	if camera.keep_aspect==Camera3D.KEEP_WIDTH:half_height/=aspect
+	var centre:Vector2=flight_view_rect.get_center()-viewport_rect.position
+	var offset:=Vector2(half_height*aspect*(1.0-2.0*centre.x/viewport_rect.size.x),half_height*(2.0*centre.y/viewport_rect.size.y-1.0))
+	camera.set_frustum(half_height*2.0,offset,camera.near,camera.far)
 
 func _release_inputs()->void:
 	if stick:stick.release_pointer()
@@ -393,6 +417,7 @@ func _process(dt:float)->void:
 	if last_view!=current_view:camera.position=desired;camera.quaternion=attitude;last_view=current_view
 	last_external=ship.external_view
 	camera.position=camera.position.lerp(desired,minf(1,dt*30));camera.quaternion=camera.quaternion.slerp(attitude,minf(1,dt*25))
+	_update_flight_projection()
 	notice_timer=maxf(0,notice_timer-dt);notice.visible=notice_timer>0 and not menu.visible and not settings_panel.visible and not is_instance_valid(active_map)
 	menu_feedback.visible=notice_timer>0 and not menu_feedback.text.is_empty()
 	hud_timer+=dt
@@ -434,7 +459,7 @@ func _apply_system()->void:
 	celestial.configure(world);celestial.set_quality(settings.quality);player.configure(ship.profile())
 	player.set_quality(settings.quality);station.configure(settings.quality);city_view.set_quality(settings.quality)
 	if not graphics_return.is_empty():space_environment.configure(ship.STATION,settings.quality)
-	station.position=ship.STATION;camera.position=ship.position;camera.quaternion=ship.attitude;presentation_key="";_sync_scene()
+	station.position=ship.STATION;camera.position=ship.position;camera.quaternion=ship.attitude;presentation_key="";_sync_scene();_update_flight_projection()
 
 func _sync_source_station()->void:
 	var visible_source:bool=_station_here() and world.layout_mode==World.FULL_LAYOUT and not near.active

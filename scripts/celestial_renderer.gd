@@ -266,7 +266,12 @@ func set_surface_transition(enabled:bool,blend:float)->void:
 		_request_source_focus();focus_surface_preview=enabled;surface_space_blend=clampf(blend,0,1)
 		for id in visuals:
 			var entry:Dictionary=visuals[id];entry.anchor.visible=true
-			var coverage:float=1.0 if not enabled or id==context.focus_id else surface_space_blend
+			var body:Dictionary=context.by_id.get(str(id),{})
+			var type_code:=int(body.get("type_code",body.get("original_type",-1)))
+			# The terrain crossfade must not erase an actual luminous photosphere.
+			# Ordinary depth testing still lets the planet occult a star naturally.
+			var luminous:bool=str(body.get("kind",""))=="star" and type_code>=17 and type_code<=30
+			var coverage:float=1.0 if not enabled or id==context.focus_id or luminous else surface_space_blend
 			entry.mesh.material_override.set_shader_parameter("view_coverage",coverage);entry.mesh.material_override.set_shader_parameter("coverage_invert",false)
 			if entry.has("air"):entry.air.material_override.set_shader_parameter("view_coverage",surface_space_blend if enabled else 1.0);entry.air.material_override.set_shader_parameter("coverage_invert",false)
 			if entry.has("rings"):entry.rings.material_override.set_shader_parameter("view_coverage",coverage);entry.rings.material_override.set_shader_parameter("coverage_invert",false)

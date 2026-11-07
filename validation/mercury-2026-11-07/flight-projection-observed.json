@@ -1,0 +1,532 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-07T14:03:00.184879+00:00",
+  "scope": "Actual private Main source-Sol Mercury arrival. Godot perspective camera is independent reference for optical scale; inverse actual camera projection verifies optical ray. Desktop headless math/UI geometry only, not a GPU or physical Android result.",
+  "checks": 691,
+  "failures": 0,
+  "source_inputs": {
+    "tests/test_flight_projection.gd": {
+      "sha256": "a1e2569ae67b334851340782de2dab1c41ee8ceba3bb28b8ba66055d21f777d7",
+      "bytes": 12962
+    },
+    "scripts/main.gd": {
+      "sha256": "7778e7264fe6dfd092cdc0e4ad9b9e27c7c19b51851c49df1842f64fb6052775",
+      "bytes": 86370
+    },
+    "scripts/flight_instruments.gd": {
+      "sha256": "06681eb395b7cceaa16a5d705bb5e5ff948f9d60802cae10ecc2987661958329",
+      "bytes": 1509
+    },
+    "scripts/flight_console.gd": {
+      "sha256": "01d1e2d08fad0dca5156977cbb33eb284597c52d5d59f9bb7847a0da66b4eca8",
+      "bytes": 22434
+    },
+    "scripts/flight_reticle.gd": {
+      "sha256": "d25918f69e2857a4ee8283d1d267a2a126f72dfc680197b73f0f0a6c85c5ac7a",
+      "bytes": 945
+    },
+    "scripts/planetary_system.gd": {
+      "sha256": "f243ebb2699bce714386e87ca32bfdb35709a2c9c45178cac9fa6cb8874abc62",
+      "bytes": 53879
+    },
+    "scripts/source_motion_bridge.gd": {
+      "sha256": "7f5a805ca0a9675262ce511e28e4306df12b2b3cb5992dbb76d6e42f97f0bb9a",
+      "bytes": 15703
+    },
+    "scripts/flight_time_controller.gd": {
+      "sha256": "bebb04d4a40793bbaad2574044ab763ffe4609aaf9f8b615eeace704dd2ff728",
+      "bytes": 14484
+    }
+  },
+  "log_sha256": "96fa2e725d75a7957c6bef6751b56e0eb8ae49366634d81325c61e6ea0d1d61e",
+  "evidence": [
+    {
+      "case": "Mercury arrival 1440x720",
+      "cross_centre": "(720.0, 240.0)",
+      "far": 180000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1440.0, 480.0)]",
+      "fov": 74.0,
+      "godot_builtin_ray_forward_dot": 0.969871580600739,
+      "keep_aspect": 1,
+      "near": 0.5,
+      "optical_centre": "(720.0, 240.0)",
+      "reticle_centre": "(720.0, 240.0)",
+      "viewport": [
+        1440.0,
+        720.0
+      ]
+    },
+    {
+      "case": "actual_mercury_regression",
+      "console_top": 480.0,
+      "elapsed_days": 0.306423533385459,
+      "fixed_screen": [
+        949.313354492188,
+        373.766143798828
+      ],
+      "mercury_angular_radius_deg": 14.4775121859299,
+      "old_screen": [
+        949.313354492188,
+        493.766143798828
+      ],
+      "sun_angular_radius_deg": 1.41490471363141,
+      "sun_mercury_separation_deg": 11.819437453032
+    },
+    {
+      "case": "viewport(1440, 720) aspect1 FOV74",
+      "cross_centre": "(720.0, 240.0)",
+      "far": 180000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1440.0, 480.0)]",
+      "fov": 74.0,
+      "godot_builtin_ray_forward_dot": 0.969871580600739,
+      "keep_aspect": 1,
+      "near": 0.5,
+      "optical_centre": "(720.0, 240.0)",
+      "reticle_centre": "(720.0, 240.0)",
+      "viewport": [
+        1440.0,
+        720.0
+      ]
+    },
+    {
+      "case": "viewport(1440, 720) aspect1 FOV52",
+      "cross_centre": "(720.0, 240.0)",
+      "far": 6000000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1440.0, 480.0)]",
+      "fov": 52.0,
+      "godot_builtin_ray_forward_dot": 0.987040579319,
+      "keep_aspect": 1,
+      "near": 2.0,
+      "optical_centre": "(720.0, 240.0)",
+      "reticle_centre": "(720.0, 240.0)",
+      "viewport": [
+        1440.0,
+        720.0
+      ]
+    },
+    {
+      "case": "viewport(1440, 720) aspect1 FOV96",
+      "cross_centre": "(720.0, 240.0)",
+      "far": 10000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1440.0, 480.0)]",
+      "fov": 96.0,
+      "godot_builtin_ray_forward_dot": 0.937799513339996,
+      "keep_aspect": 1,
+      "near": 0.0500000007450581,
+      "optical_centre": "(720.0, 240.0)",
+      "reticle_centre": "(720.0, 240.0)",
+      "viewport": [
+        1440.0,
+        720.0
+      ]
+    },
+    {
+      "case": "viewport(1440, 720) aspect0 FOV74",
+      "cross_centre": "(720.0, 240.0)",
+      "far": 180000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1440.0, 480.0)]",
+      "fov": 74.0,
+      "godot_builtin_ray_forward_dot": 0.992205381393433,
+      "keep_aspect": 0,
+      "near": 0.5,
+      "optical_centre": "(720.0, 240.0)",
+      "reticle_centre": "(720.0, 240.0)",
+      "viewport": [
+        1440.0,
+        720.0
+      ]
+    },
+    {
+      "case": "viewport(1440, 720) aspect0 FOV52",
+      "cross_centre": "(720.0, 240.0)",
+      "far": 6000000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1440.0, 480.0)]",
+      "fov": 52.0,
+      "godot_builtin_ray_forward_dot": 0.996712386608124,
+      "keep_aspect": 0,
+      "near": 2.0,
+      "optical_centre": "(720.0, 240.0)",
+      "reticle_centre": "(720.0, 240.0)",
+      "viewport": [
+        1440.0,
+        720.0
+      ]
+    },
+    {
+      "case": "viewport(1440, 720) aspect0 FOV96",
+      "cross_centre": "(720.0, 240.0)",
+      "far": 10000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1440.0, 480.0)]",
+      "fov": 96.0,
+      "godot_builtin_ray_forward_dot": 0.983296632766724,
+      "keep_aspect": 0,
+      "near": 0.0500000007450581,
+      "optical_centre": "(720.0, 240.0)",
+      "reticle_centre": "(720.0, 240.0)",
+      "viewport": [
+        1440.0,
+        720.0
+      ]
+    },
+    {
+      "case": "asymmetric safe-area (1440, 720)",
+      "cross_centre": "(732.0, 245.0)",
+      "far": 10000.0,
+      "flight_rect": "[P: (36.0, 18.0), S: (1392.0, 454.0)]",
+      "fov": 96.0,
+      "godot_builtin_ray_forward_dot": 0.984464824199677,
+      "keep_aspect": 0,
+      "near": 0.0500000007450581,
+      "optical_centre": "(732.0, 245.0)",
+      "reticle_centre": "(732.0, 245.0)",
+      "viewport": [
+        1440.0,
+        720.0
+      ]
+    },
+    {
+      "case": "actual safe-area hook (1440, 720)",
+      "cross_centre": "(720.0, 240.0)",
+      "far": 10000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1440.0, 480.0)]",
+      "fov": 96.0,
+      "godot_builtin_ray_forward_dot": 0.983296632766724,
+      "keep_aspect": 0,
+      "near": 0.0500000007450581,
+      "optical_centre": "(720.0, 240.0)",
+      "reticle_centre": "(720.0, 240.0)",
+      "viewport": [
+        1440.0,
+        720.0
+      ]
+    },
+    {
+      "case": "viewport(2316, 1080) aspect1 FOV74",
+      "cross_centre": "(772.0, 240.0)",
+      "far": 180000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1544.0, 480.0)]",
+      "fov": 74.0,
+      "godot_builtin_ray_forward_dot": 0.969871580600739,
+      "keep_aspect": 1,
+      "near": 0.5,
+      "optical_centre": "(772.0, 240.0)",
+      "reticle_centre": "(772.0, 240.0)",
+      "viewport": [
+        1544.0,
+        720.0
+      ]
+    },
+    {
+      "case": "viewport(2316, 1080) aspect1 FOV52",
+      "cross_centre": "(772.0, 240.0)",
+      "far": 6000000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1544.0, 480.0)]",
+      "fov": 52.0,
+      "godot_builtin_ray_forward_dot": 0.987040579319,
+      "keep_aspect": 1,
+      "near": 2.0,
+      "optical_centre": "(772.0, 240.0)",
+      "reticle_centre": "(772.0, 240.0)",
+      "viewport": [
+        1544.0,
+        720.0
+      ]
+    },
+    {
+      "case": "viewport(2316, 1080) aspect1 FOV96",
+      "cross_centre": "(772.0, 240.0)",
+      "far": 10000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1544.0, 480.0)]",
+      "fov": 96.0,
+      "godot_builtin_ray_forward_dot": 0.937799513339996,
+      "keep_aspect": 1,
+      "near": 0.0500000007450581,
+      "optical_centre": "(772.0, 240.0)",
+      "reticle_centre": "(772.0, 240.0)",
+      "viewport": [
+        1544.0,
+        720.0
+      ]
+    },
+    {
+      "case": "viewport(2316, 1080) aspect0 FOV74",
+      "cross_centre": "(772.0, 240.0)",
+      "far": 180000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1544.0, 480.0)]",
+      "fov": 74.0,
+      "godot_builtin_ray_forward_dot": 0.993209779262543,
+      "keep_aspect": 0,
+      "near": 0.5,
+      "optical_centre": "(772.0, 240.0)",
+      "reticle_centre": "(772.0, 240.0)",
+      "viewport": [
+        1544.0,
+        720.0
+      ]
+    },
+    {
+      "case": "viewport(2316, 1080) aspect0 FOV52",
+      "cross_centre": "(772.0, 240.0)",
+      "far": 6000000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1544.0, 480.0)]",
+      "fov": 52.0,
+      "godot_builtin_ray_forward_dot": 0.997138500213623,
+      "keep_aspect": 0,
+      "near": 2.0,
+      "optical_centre": "(772.0, 240.0)",
+      "reticle_centre": "(772.0, 240.0)",
+      "viewport": [
+        1544.0,
+        720.0
+      ]
+    },
+    {
+      "case": "viewport(2316, 1080) aspect0 FOV96",
+      "cross_centre": "(772.0, 240.0)",
+      "far": 10000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1544.0, 480.0)]",
+      "fov": 96.0,
+      "godot_builtin_ray_forward_dot": 0.985423743724823,
+      "keep_aspect": 0,
+      "near": 0.0500000007450581,
+      "optical_centre": "(772.0, 240.0)",
+      "reticle_centre": "(772.0, 240.0)",
+      "viewport": [
+        1544.0,
+        720.0
+      ]
+    },
+    {
+      "case": "asymmetric safe-area (2316, 1080)",
+      "cross_centre": "(784.0, 245.0)",
+      "far": 10000.0,
+      "flight_rect": "[P: (36.0, 18.0), S: (1496.0, 454.0)]",
+      "fov": 96.0,
+      "godot_builtin_ray_forward_dot": 0.986446261405945,
+      "keep_aspect": 0,
+      "near": 0.0500000007450581,
+      "optical_centre": "(784.0, 245.0)",
+      "reticle_centre": "(784.0, 245.0)",
+      "viewport": [
+        1544.0,
+        720.0
+      ]
+    },
+    {
+      "case": "actual safe-area hook (2316, 1080)",
+      "cross_centre": "(772.0, 240.0)",
+      "far": 10000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1544.0, 480.0)]",
+      "fov": 96.0,
+      "godot_builtin_ray_forward_dot": 0.985423743724823,
+      "keep_aspect": 0,
+      "near": 0.0500000007450581,
+      "optical_centre": "(772.0, 240.0)",
+      "reticle_centre": "(772.0, 240.0)",
+      "viewport": [
+        1544.0,
+        720.0
+      ]
+    },
+    {
+      "case": "viewport(960, 540) aspect1 FOV74",
+      "cross_centre": "(720.0, 285.0)",
+      "far": 180000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1440.0, 570.0)]",
+      "fov": 74.0,
+      "godot_builtin_ray_forward_dot": 0.975968956947327,
+      "keep_aspect": 1,
+      "near": 0.5,
+      "optical_centre": "(720.0, 285.0)",
+      "reticle_centre": "(720.0, 285.0)",
+      "viewport": [
+        1440.0,
+        810.0
+      ]
+    },
+    {
+      "case": "viewport(960, 540) aspect1 FOV52",
+      "cross_centre": "(720.0, 285.0)",
+      "far": 6000000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1440.0, 570.0)]",
+      "fov": 52.0,
+      "godot_builtin_ray_forward_dot": 0.989718735218048,
+      "keep_aspect": 1,
+      "near": 2.0,
+      "optical_centre": "(720.0, 285.0)",
+      "reticle_centre": "(720.0, 285.0)",
+      "viewport": [
+        1440.0,
+        810.0
+      ]
+    },
+    {
+      "case": "viewport(960, 540) aspect1 FOV96",
+      "cross_centre": "(720.0, 285.0)",
+      "far": 10000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1440.0, 570.0)]",
+      "fov": 96.0,
+      "godot_builtin_ray_forward_dot": 0.949891090393066,
+      "keep_aspect": 1,
+      "near": 0.0500000007450581,
+      "optical_centre": "(720.0, 285.0)",
+      "reticle_centre": "(720.0, 285.0)",
+      "viewport": [
+        1440.0,
+        810.0
+      ]
+    },
+    {
+      "case": "viewport(960, 540) aspect0 FOV74",
+      "cross_centre": "(720.0, 285.0)",
+      "far": 180000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1440.0, 570.0)]",
+      "fov": 74.0,
+      "godot_builtin_ray_forward_dot": 0.992205381393433,
+      "keep_aspect": 0,
+      "near": 0.5,
+      "optical_centre": "(720.0, 285.0)",
+      "reticle_centre": "(720.0, 285.0)",
+      "viewport": [
+        1440.0,
+        810.0
+      ]
+    },
+    {
+      "case": "viewport(960, 540) aspect0 FOV52",
+      "cross_centre": "(720.0, 285.0)",
+      "far": 6000000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1440.0, 570.0)]",
+      "fov": 52.0,
+      "godot_builtin_ray_forward_dot": 0.996712386608124,
+      "keep_aspect": 0,
+      "near": 2.0,
+      "optical_centre": "(720.0, 285.0)",
+      "reticle_centre": "(720.0, 285.0)",
+      "viewport": [
+        1440.0,
+        810.0
+      ]
+    },
+    {
+      "case": "viewport(960, 540) aspect0 FOV96",
+      "cross_centre": "(720.0, 285.0)",
+      "far": 10000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1440.0, 570.0)]",
+      "fov": 96.0,
+      "godot_builtin_ray_forward_dot": 0.983296632766724,
+      "keep_aspect": 0,
+      "near": 0.0500000007450581,
+      "optical_centre": "(720.0, 285.0)",
+      "reticle_centre": "(720.0, 285.0)",
+      "viewport": [
+        1440.0,
+        810.0
+      ]
+    },
+    {
+      "case": "asymmetric safe-area (960, 540)",
+      "cross_centre": "(732.0, 290.0)",
+      "far": 10000.0,
+      "flight_rect": "[P: (36.0, 18.0), S: (1392.0, 544.0)]",
+      "fov": 96.0,
+      "godot_builtin_ray_forward_dot": 0.984464824199677,
+      "keep_aspect": 0,
+      "near": 0.0500000007450581,
+      "optical_centre": "(732.0, 290.0)",
+      "reticle_centre": "(732.0, 290.0)",
+      "viewport": [
+        1440.0,
+        810.0
+      ]
+    },
+    {
+      "case": "actual safe-area hook (960, 540)",
+      "cross_centre": "(720.0, 285.0)",
+      "far": 10000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1440.0, 570.0)]",
+      "fov": 96.0,
+      "godot_builtin_ray_forward_dot": 0.983296632766724,
+      "keep_aspect": 0,
+      "near": 0.0500000007450581,
+      "optical_centre": "(720.0, 285.0)",
+      "reticle_centre": "(720.0, 285.0)",
+      "viewport": [
+        1440.0,
+        810.0
+      ]
+    },
+    {
+      "case": "principal view front",
+      "cross_centre": "(720.0, 240.0)",
+      "far": 180000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1440.0, 480.0)]",
+      "fov": 74.0,
+      "godot_builtin_ray_forward_dot": 0.969871580600739,
+      "keep_aspect": 1,
+      "near": 0.5,
+      "optical_centre": "(720.0, 240.0)",
+      "reticle_centre": "(720.0, 240.0)",
+      "viewport": [
+        1440.0,
+        720.0
+      ]
+    },
+    {
+      "case": "principal view rear",
+      "cross_centre": "(720.0, 240.0)",
+      "far": 180000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1440.0, 480.0)]",
+      "fov": 74.0,
+      "godot_builtin_ray_forward_dot": 0.969871580600739,
+      "keep_aspect": 1,
+      "near": 0.5,
+      "optical_centre": "(720.0, 240.0)",
+      "reticle_centre": "(720.0, 240.0)",
+      "viewport": [
+        1440.0,
+        720.0
+      ]
+    },
+    {
+      "case": "principal view external",
+      "cross_centre": "(720.0, 240.0)",
+      "far": 180000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1440.0, 480.0)]",
+      "fov": 74.0,
+      "godot_builtin_ray_forward_dot": 0.969871640205383,
+      "keep_aspect": 1,
+      "near": 0.5,
+      "optical_centre": "(720.0, 240.0)",
+      "reticle_centre": "(720.0, 240.0)",
+      "viewport": [
+        1440.0,
+        720.0
+      ]
+    },
+    {
+      "case": "restored legacy source save",
+      "cross_centre": "(720.0, 240.0)",
+      "far": 180000.0,
+      "flight_rect": "[P: (0.0, 0.0), S: (1440.0, 480.0)]",
+      "fov": 74.0,
+      "godot_builtin_ray_forward_dot": 0.969871640205383,
+      "keep_aspect": 1,
+      "near": 0.5,
+      "optical_centre": "(720.0, 240.0)",
+      "reticle_centre": "(720.0, 240.0)",
+      "viewport": [
+        1440.0,
+        720.0
+      ]
+    }
+  ],
+  "godot_builtin_ray_limitation": {
+    "engine": "Godot4.6.3",
+    "observed": "Camera3D.project_ray_normal ignores off-axis FRUSTUM offset; unproject_position and inverse actual projection agree with the shifted optical centre.",
+    "current_runtime_consumers": [],
+    "affects_current_flight_input": false
+  },
+  "physical_world_orbit_attitude_time_modified_by_projection": false,
+  "player_progress_writes": 0
+}

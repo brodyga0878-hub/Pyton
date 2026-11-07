@@ -3,18 +3,34 @@
 Ветка `development/starfrontier-rebuild` содержит **новую запускаемую основу** нативного Android-проекта на Godot 4.6.3. Она собрана из частично восстановленных исторических модулей, повторно извлечённых исходных данных FFE и заново написанного недостающего кода. Полный прежний проект и APK версии 0.10.8 не найдены.
 
 
-Текущая сборка — **0.13.1-map-alpha1 / code 37**:
+Текущий кандидат — **0.13.2-celestial-alpha1 / code 38**:
+[видимость светил и область полёта](docs/RELEASE_0_13_2_RU.md).
+Меркурий после «Подойти» теперь выходит из-под нижней консоли;
+звёзды сохраняют видимость при переходе к ближнему рельефу.
+Координаты, ориентация корабля, время и настоящее перекрытие Солнца
+планетой сохранены. Пройдено **2 508 проверок в 11 группах**, отдельно
+**58 Python-проверок упаковщика**, ошибок нет. Осмотрены десять
+настоящих кадров до/после из пяти одинаковых условий каждой версии;
+[сравнение](validation/mercury-visibility-2026-11-07/gpu-comparison.json).
+
+Настоящий ARM64 APK технически проверен: **49 765 516 байт**, SHA256
+`c24b31c67dcf993dd44d837142e5bb69d8abfcec05722e5760b513f583529bdf`.
+Точный source ZIP и новые HTTPS-ссылки ещё готовятся; следующие ссылки
+ведут на явно обозначенную предыдущую версию. Астрономический масштаб,
+цвет и количественная освещённость Солнца этим исправлением не калибруются.
+
+Последняя опубликованная версия — **0.13.1-map-alpha1 / code 37**:
 [современное оформление галактической карты](docs/RELEASE_0_13_1_RU.md).
 Исходные данные и механика карты сохранены; обновлены цвета, подписи,
 панели и читаемость сенсорных элементов. Настоящий ARM64 APK собран и
 технически проверен: 49 765 516 байт, SHA256
 `7021ac20a6180edc73a6bc9110a07888560531d1d8f18689cfd9304e91f18c4f`.
-Текущая целевая регрессия — **3 257 проверок в семи группах, 0 ошибок**;
+Её отдельная целевая регрессия — **3 257 проверок в семи группах, 0 ошибок**;
 отдельно — 47 Python-проверок упаковщика и восемь настоящих desktop-кадров
 с 1 506 условиями проверки захвата. Точный source ZIP, APK и отдельный ZIP аудита опубликованы и проверены
 полным повторным скачиванием; CRC, SHA и размеры совпали.
 
-[Скачать APK 0.13.1](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/StarFrontier-0.13.1-map-arm64.apk) · [Исходники ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/StarFrontier-0.13.1-map-source.zip)
+[Скачать предыдущий APK 0.13.1](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/StarFrontier-0.13.1-map-arm64.apk) · [Предыдущие исходники 0.13.1 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/StarFrontier-0.13.1-map-source.zip)
 · [Скачать полный комплект аудита](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/FFE-parity-audit-2026-11-07.zip)
 · [Восемь настоящих кадров](https://github.com/brodyga0878-hub/Pyton/tree/fe920fceab88e02a0bfffdd9c7f185fd1df49368/deliverables/0.13.1-map-alpha1/screenshots).
 

@@ -95,7 +95,51 @@ func async_render_and_cache(actual:Dictionary)->void:
 	check(renderer.visuals.moon.anchor.scale.is_equal_approx(Vector3.ONE*float(world.by_id.moon.radius_km)*1000.0),"FULL transition uses actual source reference radius without authored350m shrink")
 	renderer.queue_free();await process_frame
 
+func mercury_occults_solar_disc(renderer:Node3D,observer:Vector3)->bool:
+	# Query the actual ready Mercury triangles, rather than replacing occultation
+	# with a source-reference sphere or changing depth behaviour to reveal a star.
+	var mesh:MeshInstance3D=renderer.visuals.mercury.mesh
+	var arrays:Array=mesh.mesh.surface_get_arrays(0)
+	var vertices:PackedVector3Array=arrays[Mesh.ARRAY_VERTEX];var indices:PackedInt32Array=arrays[Mesh.ARRAY_INDEX]
+	var sun:Node3D=renderer.visuals.star.anchor;var direction:Vector3=(sun.global_position-observer).normalized()
+	var across:=direction.cross(Vector3.UP).normalized();var upward:=across.cross(direction).normalized()
+	var inverse:=mesh.global_transform.affine_inverse();var origin:Vector3=inverse*observer
+	for offset:Vector2 in [Vector2.ZERO,Vector2(0.9,0),Vector2(-0.9,0),Vector2(0,0.9),Vector2(0,-0.9)]:
+		var target:Vector3=sun.global_position+(across*offset.x+upward*offset.y)*sun.scale.x
+		var ray:Vector3=(inverse.basis*(target-observer).normalized()).normalized();var nearest:=INF
+		for at in range(0,indices.size(),3):
+			var hit:Variant=Geometry3D.ray_intersects_triangle(origin,ray,vertices[indices[at]],vertices[indices[at+1]],vertices[indices[at+2]])
+			if hit is Vector3:nearest=minf(nearest,observer.distance_to(mesh.global_transform*Vector3(hit)))
+		if not is_finite(nearest) or nearest>observer.distance_to(target)-sun.scale.x:return false
+	return true
+
+func mercury_luminous_transition()->void:
+	var galaxy:=GalaxyData.new();var world:=World.new();world.configure(galaxy.get_system(GalaxyData.SOL_ID),World.FULL_LAYOUT)
+	world.focus_id="mercury";world.selected_id="mercury";world.site_id=""
+	var renderer:=Renderer.new();root.add_child(renderer);renderer.configure(world)
+	var deadline:=Time.get_ticks_msec()+30000
+	while renderer.source_mesh_state().status in ["pending","building"] and Time.get_ticks_msec()<deadline:await process_frame
+	check(renderer.source_mesh_state().status=="ready" and renderer.visuals.mercury.source_height_active,"Actual native Mercury installs its ready source-height mesh for the transition regression")
+	if renderer.source_mesh_state().status!="ready":renderer.queue_free();await process_frame;return
+	var centre:Vector3=world.local_meters("mercury",0.0)
+	var observer:=centre-centre.normalized()*(float(world.by_id.mercury.radius_km)*1000.0+50000.0)
+	renderer.update_view(0.0,observer)
+	var source_before:=digest([world.bodies,world.settlements,world.snapshot()])
+	var mesh_before:=digest(renderer.visuals.mercury.mesh.mesh.surface_get_arrays(0))
+	var positions_before:={}
+	for id in ["star","mercury","venus"]:positions_before[id]=world.position_au(id,0.0)
+	for blend in [0.0,0.25,0.5,1.0]:
+		renderer.set_surface_transition(true,blend);renderer.update_view(0.0,observer)
+		check(renderer.visuals.star.mesh.material_override.get_shader_parameter("view_coverage")==1.0,"Actual luminous Sun photosphere is never removed by the Mercury surface crossfade at blend "+str(blend))
+		check(renderer.visuals.mercury.mesh.material_override.get_shader_parameter("view_coverage")==1.0,"Actual focus Mercury retains its existing opaque-globe coverage")
+		check(renderer.visuals.venus.mesh.material_override.get_shader_parameter("view_coverage")==blend,"Nonstellar remote-body coverage keeps its established transition behaviour")
+		check(digest(renderer.visuals.mercury.mesh.mesh.surface_get_arrays(0))==mesh_before,"Stellar coverage does not alter ready source Mercury triangles")
+	check(mercury_occults_solar_disc(renderer,observer),"Actual Mercury source triangles still occult the solar centre and four photosphere limb rays in the initial eclipse")
+	check(digest([world.bodies,world.settlements,world.snapshot()])==source_before,"Stellar surface-transition fix does not edit native source records, clock, spin or saved world state")
+	for id in positions_before:check(world.position_au(id,0.0)==positions_before[id],"Stellar transition keeps exact native positions for "+str(id))
+	renderer.queue_free();await process_frame
+
 func run()->void:
-	var actual:=actual_source_mesh();await luminous_sources();await async_render_and_cache(actual)
+	var actual:=actual_source_mesh();await luminous_sources();await async_render_and_cache(actual);await mercury_luminous_transition()
 	print("SOURCE CELESTIAL RENDERER TESTS: ",checks," checks, ",failures," failures")
 	quit(1 if failures else 0)
