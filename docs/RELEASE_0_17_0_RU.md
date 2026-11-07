@@ -3,8 +3,9 @@
 Кандидат **0.17.0-atmosphere-alpha1 / Android code 42** подключает
 DOS-арифметику нагрева и сопротивления атмосферы, а также исходный
 сырой учёт повреждений щита и корпуса. Функциональные проверки,
-настоящие кадры Main и строгая техническая проверка ARM64 APK завершены.
-Точный ZIP и новые HTTPS-ссылки ещё готовятся. Предыдущая опубликованная сборка — [0.16.0](RELEASE_0_16_0_RU.md).
+настоящие кадры Main, строгая техническая проверка ARM64 APK и свежий
+запуск точного ZIP завершены. APK, исходники и кадры опубликованы по
+проверенным HTTPS-ссылкам. Предыдущая опубликованная сборка — [0.16.0](RELEASE_0_16_0_RU.md).
 
 ## Исходные процедуры и мобильный вызов
 
@@ -177,8 +178,28 @@ target SDK 36, `debuggable=false`, прежний TEST-сертификат и Z
 `8df3ed0fa1d790437bd536c16c7997ee18b263c39f462a6bad2716939e6fad63`.
 SHA256 TEST-сертификата:
 `16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25`.
-Точный ZIP со свежим импортом/запуском и подтверждение HTTPS-публикации
-будут добавлены по фактическим результатам.
+Точный ZIP — **30 817 760 байт**, 1421 запись / **1268 файлов**, меньше
+32 МиБ. Исходный коммит `714624bba30d6359921cced42be2c1adb8d4c5bd`. SHA256:
+`bf87804585f3ba90a8be2459dd8c368e8c02f97797808d68b16386bece296d29`.
+Свежий импорт и обычный изолированный запуск — **10/0**; фактический
+тепловой сценарий Main из точного ZIP — **463/0**. Все 1268 исходных
+файлов сохранили SHA; повторные проверки ZIP не прибавлены к 30 группам.
+
+[Скачать APK 0.17.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fd96b61d7f27d57a22c11269a4222d0de31f7054/deliverables/0.17.0-atmosphere-alpha1/StarFrontier-0.17.0-atmosphere-arm64.apk) · [Исходники 0.17.0 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fd96b61d7f27d57a22c11269a4222d0de31f7054/deliverables/0.17.0-atmosphere-alpha1/StarFrontier-0.17.0-atmosphere-source.zip)
+
+[Нагрев и повреждения](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fd96b61d7f27d57a22c11269a4222d0de31f7054/deliverables/0.17.0-atmosphere-alpha1/screenshots/02-unshielded-thermal-and-hull.png) · [Атмосферная защита](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fd96b61d7f27d57a22c11269a4222d0de31f7054/deliverables/0.17.0-atmosphere-alpha1/screenshots/04-fitted-atmospheric-shielding.png) · [Корпус старого сохранения](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fd96b61d7f27d57a22c11269a4222d0de31f7054/deliverables/0.17.0-atmosphere-alpha1/screenshots/08-legacy-partial-hull-anchor.png)
+
+Полным скачиванием проверены **12 файлов**: манифест, APK, source ZIP,
+протокол захвата и восемь PNG. HTTP 200, размеры, SHA, CRC обоих архивов,
+число записей и Git-комментарий source ZIP совпали. Вспомогательные
+журналы и отчёты упакованы и хешированы, но каждый из них отдельно не
+скачивался. Документы внутри ZIP сохраняют состояние исходного коммита
+до удалённой публикации.
+[Свежий импорт и запуск](../validation/atmosphere-source-portability-2026-11-07/verification.json),
+[тепловой сценарий Main из ZIP](../validation/atmosphere-source-portability-2026-11-07/thermal-main-feature.json),
+[проверка HTTPS](../validation/atmosphere-publication-2026-11-07/verification.json).
+Артефакты сохранены в коммите `fd96b61d7f27d57a22c11269a4222d0de31f7054`.
+Предыдущие опубликованные артефакты 0.16.0 сохранены без изменений.
 
 Следующий ограниченный функциональный приоритет — управляемое шасси
 F1056/F1008: отдельные запрос и физическое положение, их сохранение,

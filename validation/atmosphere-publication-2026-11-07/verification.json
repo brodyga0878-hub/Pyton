@@ -1,0 +1,101 @@
+{
+  "started_utc": "2026-11-07T20:52:49.670100+00:00",
+  "version": "0.17.0-atmosphere-alpha1",
+  "artifact_commit": "fd96b61d7f27d57a22c11269a4222d0de31f7054",
+  "source_commit": "714624bba30d6359921cced42be2c1adb8d4c5bd",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fd96b61d7f27d57a22c11269a4222d0de31f7054/deliverables/0.17.0-atmosphere-alpha1/manifest.json",
+      "http_status": 200,
+      "bytes": 15393,
+      "sha256": "8803a561f437f513513cde661b602048d0ff59cd09642239c1e0c4c814303d91"
+    },
+    {
+      "file": "StarFrontier-0.17.0-atmosphere-arm64.apk",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fd96b61d7f27d57a22c11269a4222d0de31f7054/deliverables/0.17.0-atmosphere-alpha1/StarFrontier-0.17.0-atmosphere-arm64.apk",
+      "http_status": 200,
+      "bytes": 50038396,
+      "sha256": "8df3ed0fa1d790437bd536c16c7997ee18b263c39f462a6bad2716939e6fad63",
+      "zip_crc_verified": true
+    },
+    {
+      "file": "StarFrontier-0.17.0-atmosphere-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fd96b61d7f27d57a22c11269a4222d0de31f7054/deliverables/0.17.0-atmosphere-alpha1/StarFrontier-0.17.0-atmosphere-source.zip",
+      "http_status": 200,
+      "bytes": 30817760,
+      "sha256": "bf87804585f3ba90a8be2459dd8c368e8c02f97797808d68b16386bece296d29",
+      "zip_crc_verified": true,
+      "source_commit_in_zip_comment": "714624bba30d6359921cced42be2c1adb8d4c5bd"
+    },
+    {
+      "file": "screenshots/capture-manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fd96b61d7f27d57a22c11269a4222d0de31f7054/deliverables/0.17.0-atmosphere-alpha1/screenshots/capture-manifest.json",
+      "http_status": 200,
+      "bytes": 54636,
+      "sha256": "d26f1083194d4d0c46eb05d4503b8afea285303591fba02baf12212b9d0beb65"
+    },
+    {
+      "file": "screenshots/01-source-earth-unshielded-flight.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fd96b61d7f27d57a22c11269a4222d0de31f7054/deliverables/0.17.0-atmosphere-alpha1/screenshots/01-source-earth-unshielded-flight.png",
+      "http_status": 200,
+      "bytes": 467673,
+      "sha256": "7b8459a3b27e1c0cb160d741bd844ca7237404323f366ce8326444a6414d009f"
+    },
+    {
+      "file": "screenshots/02-unshielded-thermal-and-hull.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fd96b61d7f27d57a22c11269a4222d0de31f7054/deliverables/0.17.0-atmosphere-alpha1/screenshots/02-unshielded-thermal-and-hull.png",
+      "http_status": 200,
+      "bytes": 253663,
+      "sha256": "caaed1b4ed9cc0ef8f4a5be9e70b931e165686a843cbf6a5966b5fed1b1b1c82"
+    },
+    {
+      "file": "screenshots/03-unshielded-thermal-narrow.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fd96b61d7f27d57a22c11269a4222d0de31f7054/deliverables/0.17.0-atmosphere-alpha1/screenshots/03-unshielded-thermal-narrow.png",
+      "http_status": 200,
+      "bytes": 181197,
+      "sha256": "dfc1a0e21b96c01fee0d185cc80d898ce568756b8ad86dacfa492f713bad6666"
+    },
+    {
+      "file": "screenshots/04-fitted-atmospheric-shielding.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fd96b61d7f27d57a22c11269a4222d0de31f7054/deliverables/0.17.0-atmosphere-alpha1/screenshots/04-fitted-atmospheric-shielding.png",
+      "http_status": 200,
+      "bytes": 222312,
+      "sha256": "6f6ac2634b22d443070210eafe522455ac84eba755071ffed6d7a80eab4c0e91"
+    },
+    {
+      "file": "screenshots/05-airless-mercury-thermal-status.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fd96b61d7f27d57a22c11269a4222d0de31f7054/deliverables/0.17.0-atmosphere-alpha1/screenshots/05-airless-mercury-thermal-status.png",
+      "http_status": 200,
+      "bytes": 103028,
+      "sha256": "5910e5dc9a5eb9e021661573c0188e2da446983e25c98cb44070c152f0e6938c"
+    },
+    {
+      "file": "screenshots/06-sun-unknown-height-gate.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fd96b61d7f27d57a22c11269a4222d0de31f7054/deliverables/0.17.0-atmosphere-alpha1/screenshots/06-sun-unknown-height-gate.png",
+      "http_status": 200,
+      "bytes": 124257,
+      "sha256": "a1eb65a65257bc985aa134e22637ca680ad28d7c0527fa1940ddac55c97ffd50"
+    },
+    {
+      "file": "screenshots/07-source-earth-surface-thermal-flight.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fd96b61d7f27d57a22c11269a4222d0de31f7054/deliverables/0.17.0-atmosphere-alpha1/screenshots/07-source-earth-surface-thermal-flight.png",
+      "http_status": 200,
+      "bytes": 381033,
+      "sha256": "4e294cfaa96049b46d193fc8f9a3495c7784b78d09de81514884912f42fb4567"
+    },
+    {
+      "file": "screenshots/08-legacy-partial-hull-anchor.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/fd96b61d7f27d57a22c11269a4222d0de31f7054/deliverables/0.17.0-atmosphere-alpha1/screenshots/08-legacy-partial-hull-anchor.png",
+      "http_status": 200,
+      "bytes": 139044,
+      "sha256": "e898e8825c7dfd161937c127e7d9f8f68e65843c213a00d7d03f0d4113f9a858"
+    }
+  ],
+  "status": "verified",
+  "scope": "Actual complete HTTPS downloads; immutable manifest bytes, payload SHA256/length, ZIP CRC, source archive Git comment and screenshot hashes. Not physical Android execution.",
+  "completed_utc": "2026-11-07T20:53:19.268771+00:00",
+  "all_manifest_payloads_downloaded": false,
+  "verified_download_count": 12,
+  "auxiliary_logs_and_reports_verified_by_local_manifest_only": true
+}
