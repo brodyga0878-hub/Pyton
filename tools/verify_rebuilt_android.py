@@ -42,6 +42,12 @@ FULL_SOURCE_SHADERS=('source_terrain_packet.gdshader','source_terrain_packet_tra
 CLASSIC_CONSOLE_ACTIONS=('system','routes','auto','brake','dock','view','menu','status','equipment','control','surface','pause')
 CLASSIC_CONSOLE_MODULES=('flight_console','touch_action_button','flight_instruments','main')
 SOURCE_MINING_KERNEL_MODULE='source_mining_machine'
+NAVIGATION_MODULES=(
+    'galactic_map_model','galactic_map_view','system_map_model','system_map_view',
+    'flight_time_controller','flight_time_controls','roll_control',
+    'rotating_dock_dynamics','source_motion_pipeline','source_motion_bridge','source_frame_kinematics',
+)
+NAVIGATION_TABLES=('ffe_galactic_map',)
 DEVELOPMENT_ASSET_PREFIXES=(
     'assets/tests/','assets/tools/','assets/docs/','assets/recovered-history/',
     'assets/recovery/','assets/validation/','assets/deliverables/',
@@ -62,7 +68,7 @@ def preset_values(path):
     return {'package':quoted('package/unique_name'),'version':quoted('version/name'),'version_code':int(found[1])}
 
 def source_function(text,name):
-    found=re.search(r'^(?:static\s+)?func\s+'+re.escape(name)+r'\([^\n]*\)[^\n]*:\s*\n',text,re.M)
+    found=re.search(r'^(?:static\s+)?func\s+'+re.escape(name)+r'\([^\n]*\)[^\n]*:',text,re.M)
     assert found,'Missing source function '+name
     following=re.search(r'^(?:static\s+)?func\s+',text[found.end():],re.M)
     return text[found.start():found.end()+following.start() if following else len(text)]
@@ -564,7 +570,7 @@ def verify_source_physics_ports_runtime(archive,project,version_code=33):
                                      **{key:fixture[key] for key in ['revision','source_variant','source_sha256','source_assembly_sha256','source_commit','scope','object_bytes','object_bank_stride_bytes','object_bank_header_bytes','object_state_offsets','source_procedure_hashes','pinned_procedure_hashes','F880_coefficient_slice','case_count','mass_case_count','integration_case_count','fresh_process_runs','reverse_repeat_count','mass_reverse_repeat_count','integration_reverse_repeat_count','native_gravity_output_sha256','native_mass_output_sha256','native_integration_output_sha256','adapted_assembly_sha256','input_fixtures_sha256']}}})
     return result
 
-def verify_source_full_runtime(archive,project):
+def verify_source_full_runtime(archive,project,version_code=34):
     """Check v34 runtime/data packaging and declared caller policies.
 
     Compiled bytes are checked as GDSC and hashed; they are not decompiled or
@@ -592,9 +598,14 @@ def verify_source_full_runtime(archive,project):
         assert re.search(rb'^shader_type\s+spatial\s*;',raw,re.M),'Invalid source streaming spatial shader '+name
         result['shaders'][name]={'runtime_path':exported,'runtime_bytes':len(raw),'runtime_sha256':hashlib.sha256(raw).hexdigest()}
     result['startup_contract']=verify_full_startup(text['main'],text['planetary_system'])
-    assert set(path.stem for path in (project/'data').glob('ffe_*.json'))==set(FULL_SOURCE_TABLES),'Full packaging verifier list omits a source table or names a missing table'
+    required_tables=FULL_SOURCE_TABLES+(NAVIGATION_TABLES if version_code>=36 else ())
+    present_tables=set(path.stem for path in (project/'data').glob('ffe_*.json'))
+    # Older contracts still inspect their exact base tables when tested from a
+    # newer checkout. Only explicitly known later-version tables may coexist;
+    # current v36 must include and verify its additional original map resource.
+    assert set(required_tables)<=present_tables<=set(FULL_SOURCE_TABLES+NAVIGATION_TABLES),'Full packaging verifier list omits a source table or names a missing table'
     tables={}
-    for name in FULL_SOURCE_TABLES+('ships','world_names_ru'):
+    for name in required_tables+('ships','world_names_ru'):
         raw=(project/'data'/f'{name}.json').read_bytes();exported=f'assets/data/{name}.json'
         assert exported in names and archive.read(exported)==raw,'Full runtime JSON differs from local source '+name
         metadata=json.loads(raw);assert isinstance(metadata,dict),'Invalid full runtime JSON '+name
@@ -651,6 +662,10 @@ def verify_source_full_runtime(archive,project):
     tick=source_function(text['main'],'_tick')
     assert tick.index('StationSession.refresh(')<tick.index('ship.step(') and 'surface.set_source_time(nav.elapsed_days)' in tick,'Frame update must precede orbital Flight and source surface step'
     result.update({'compiled_module_count':len(FULL_SOURCE_MODULES),'streaming_shader_count':len(FULL_SOURCE_SHADERS),'raw_json_count':len(result['data']),'natural_model_indices':ground['parent_models'],'orbital_station_model_indices':orbital_models,'source_control_specification_sha256':spec_sha,'world_layout':'source_jjffe_systems_v4','live_gravity':'sampled-f603-nominal-day-si-v1','gravity_parent_policy':'single_current_focus_parent_f603_v1','live_terrain':'sphere-source-ground-v4','surface_streaming_packet':'source-surface-render-packet-v1','surface_streaming_state':'source-surface-render-state-v1','station_session':'selected-source-station-session-v1','native_development_fixtures_packaged':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'original_per_frame_dynamics':False,'complete_original_physics':False,'physical_device_tested':False})
+    if version_code>=36:
+        result.update({'live_gravity':'source-fixed-parent-raw-f603-with-sampled-si-fallback-v1',
+                       'retained_sampled_force_bridge':'sampled-f603-nominal-day-si-v1',
+                       'raw_source_motion_scope':'Optional new-FULL-session Cobra motion around one fixed natural focus; ports, surfaces, vertical assist and other profiles retain the existing path.'})
     return result
 
 def verify_classic_console_runtime(archive,project):
@@ -705,6 +720,111 @@ def verify_mining_kernel_runtime(archive,project):
     assert mapping and [int(value) for value in mapping[1].split(',') if value.strip()]==loading['commodity_map'],'Standalone MB4 commodity map differs from original native fixture'
     return {'runtime_path':exported,'runtime_bytes':len(packed),'runtime_sha256':hashlib.sha256(packed).hexdigest(),'local_source_sha256':hashlib.sha256(raw).hexdigest(),'native_fixture_provenance_checked':True,'native_weekly_case_count':weekly['case_count'],'native_load_case_count':loading['case_count'],'oracle_executed_by_apk_verifier':False,'integrated_gameplay':False,'physical_deployment_implemented':False,'weekly_world_scheduler_integrated':False,'star_fuel_scoop_integrated':False,'physical_device_tested':False}
 
+def verify_navigation_runtime(archive,project):
+    """Check v36 navigation/time/motion packaging and real Main consumers.
+
+    Hashes and local API checks do not decompile GDSC or rerun native oracles.
+    Native/reference, UI and Main behavior are established by separate suites.
+    """
+    names=set(archive.namelist());text={}
+    result={'scripts':{},'data':{},'native_reference_metadata':{},
+            'compiled_source_correspondence_rebuilt_by_verifier':False,
+            'oracle_executed_by_apk_verifier':False,'physical_device_tested':False}
+    for name in NAVIGATION_MODULES:
+        raw=(project/'scripts'/f'{name}.gd').read_bytes();text[name]=raw.decode('utf-8')
+        exported=f'assets/scripts/{name}.gdc'
+        assert exported in names,'Missing navigation runtime module '+name
+        packed=archive.read(exported)
+        assert len(packed)>64 and packed[:4]==b'GDSC','Invalid compiled navigation runtime module '+name
+        result['scripts'][name]={'runtime_path':exported,'runtime_bytes':len(packed),
+                                 'runtime_sha256':hashlib.sha256(packed).hexdigest(),
+                                 'local_source_sha256':hashlib.sha256(raw).hexdigest()}
+    raw=(project/'data/ffe_galactic_map.json').read_bytes();exported='assets/data/ffe_galactic_map.json'
+    assert exported in names and archive.read(exported)==raw,'Navigation map JSON differs from local source'
+    data=json.loads(raw)
+    assert data.get('schema')==1 and data.get('source_sha256')==SOURCE_IMAGE_SHA256,'Wrong navigation map executable provenance'
+    assert data.get('source_assembly_sha256')==SOURCE_ASSEMBLY_SHA256 and data.get('source_commit')==SOURCE_ASSEMBLY_COMMIT,'Wrong navigation map assembly provenance'
+    assert data.get('display_sector_offset_raw')==[5912,5412] and data.get('source_overview_pixels')==[320,158],'Changed original map coordinates or overview dimensions'
+    indices=data.get('overview_palette_indices');palette=data.get('overview_palette_rgb6')
+    assert isinstance(indices,list) and len(indices)==64 and all(type(i) is int and 0<=i<16 for i in indices),'Invalid original map density palette'
+    assert isinstance(palette,list) and len(palette)==16 and all(isinstance(row,list) and len(row)==3 and all(type(c) is int and 0<=c<64 for c in row) for row in palette),'Invalid original map RGB6 palette'
+    assert data.get('overview_density_ignores_handcrafted_count_override') is True,'Overview must retain its distinct F853 caller mode'
+    blocks={(b['first_label'],b['bytes']):b['sha256'] for b in data.get('source_blocks',[]) if b.get('matches_source_bytes') is True}
+    assert blocks=={(6821,256):'6078def153120d68cdd56738615176d192afa1ac27ccdc7dae30c8d9e132ddd6',
+                    (7769,384):'79fc5dd2e848ba8c8edad4955f3a863153a95a215a492b0e9a8b4e3ff5fbdab2',
+                    (6812,240):'ad0feb1b7b071299819d6ed08dd95eea22ad865e60b74d471b42b74906512297'},'Original map source blocks changed'
+    result['data']['ffe_galactic_map']={'runtime_path':exported,'bytes':len(raw),'source_json_sha256':hashlib.sha256(raw).hexdigest(),'source_landmark_count':len(data.get('landmarks',[]))}
+    for name in ['main','flight_model','source_station_session']:
+        text[name]=(project/'scripts'/f'{name}.gd').read_text()
+    main=text['main']
+    for alias,module in [('GalacticMap','galactic_map_view'),('SystemMap','system_map_view'),('TimeController','flight_time_controller'),('TimeControls','flight_time_controls'),('RollControl','roll_control'),('MotionBridge','source_motion_bridge')]:
+        assert re.search(r'const\s+'+alias+r'\s*=\s*preload\("res://scripts/'+module+r'\.gd"\)',main),'Navigation Main preload missing '+module
+    for view,model in [('galactic_map_view','galactic_map_model'),('system_map_view','system_map_model')]:
+        assert 'res://scripts/'+model+'.gd' in text[view],'Navigation view lost its data model '+view
+    galactic=source_function(main,'_show_routes');system=source_function(main,'_show_system')
+    assert 'GalacticMap.new()' in galactic and 'view.configure_state(' in galactic and 'view.system_selected.connect(' in galactic and 'view.jump_requested.connect(' in galactic and '_start_jump(id)' in galactic,'Graphical galactic map is not connected to Main navigation'
+    assert 'SystemMap.new()' in system and 'view.configure(' in system and 'world.snapshot()' in system and 'view.body_selected.connect(' in system and 'view.site_selected.connect(' in system and 'view.travel_requested.connect(' in system and '_choose_body(body_id)' in system and '_choose_site(site_id)' in system,'Graphical system map is not connected to Main selections/travel'
+    assert 'is_instance_valid(active_map)' in source_function(main,'_blocked'),'Map must block flight input'
+    assert '_release_inputs()' in source_function(main,'_install_map') and 'flight_time.interrupt(' in source_function(main,'_install_map'),'Map opening must release flight input and interrupt accelerated time'
+    advance=source_function(main,'_advance_controls')
+    for marker in ['flight_time.plan_frame(','flight_time.can_continue(','flight_time.finish_frame(','_tick(step,']:
+        assert marker in advance,'Bounded time controller is not connected to Main '+marker
+    assert re.search(r'^const\s+MAX_IMPLEMENTED_RATE\s*:=\s*100\s*$',text['flight_time_controller'],re.M),'Unsupported time rates must remain disabled'
+    assert re.search(r'^const\s+MAX_SUBSTEPS\s*:=\s*32\s*$',text['flight_time_controller'],re.M) and re.search(r'^const\s+MAX_STEP_SECONDS\s*:=\s*0\.1\s*$',text['flight_time_controller'],re.M),'Bounded time substep policy changed'
+    assert 'time_controls.rate_requested.connect(_request_time_rate)' in main and 'flight_time.rate_options(' in source_function(main,'_request_time_rate'),'Time buttons are not connected to the real scheduler'
+    assert main.count('RollControl.new()')>=2 and 'roll1.axis_changed.connect(' in main and 'roll2.axis_changed.connect(' in main and 'roll_right_strength-roll_left_strength' in advance,'Analog phone roll is not connected to Main flight input'
+    assert 'res://scripts/rotating_dock_dynamics.gd' in text['flight_model'] and 'RotatingDock.sweep(' in text['flight_model'] and 'RotatingDock.surface_velocity(' in text['flight_model'],'Rotating station contact is not consumed by Flight'
+    assert 'ship.configure_source_station(geometry,basis,step_seconds)' in text['source_station_session'],'Station coordinator must supply the sampled rotation interval'
+    tick=source_function(main,'_tick');motion_step=source_function(main,'_source_motion_step')
+    assert '_source_motion_step(dt,steering,roll,lift)' in tick and 'ship.step(' in tick,'Main lost the scoped raw-motion branch or compatible fallback'
+    assert re.search(r'if\s+not\s+source_motion_enabled\b',motion_step),'Source motion must respect the saved session enable gate'
+    assert re.search(r'source_motion_enabled\s*=\s*layout\s*==\s*World\.FULL_LAYOUT',source_function(main,'_new_models')),'Only new FULL sessions may select the raw-motion path by default'
+    assert 'MotionBridge.eligible(' in motion_step and 'source_motion.step(' in motion_step and 'settings.orbital_gravity' in motion_step,'Source motion bridge is not connected with its explicit guards'
+    eligibility=source_function(text['source_motion_bridge'],'eligible')
+    for marker in ['"cobra"','surface_active','"station_available"','"site_id"','"star"','"barycenter"']:
+        assert marker in eligibility,'Source motion bridge lost an explicit scope guard '+marker
+    assert 'res://scripts/source_motion_pipeline.gd' in text['source_motion_bridge'],'Source motion bridge lost its raw kernel'
+    sequence=source_function(text['source_motion_pipeline'],'manual_step')
+    for marker in ['Gravity.update(','desired_acceleration(','set_thrust(','velocity_step(','Gravity.integrate(']:
+        assert marker in sequence,'Raw source motion composition lost '+marker
+    payload=source_function(main,'_payload');decode=source_function(main,'_decode_state')
+    assert 'if source_motion_enabled:' in payload and 'result.motion_session=' in payload,'Optional raw-motion session is not saved'
+    assert 'candidate_motion_enabled:=false' in decode and 'if data.has("motion_session"):' in decode and 'candidate_motion.restore(' in decode,'Old saves must keep the previous path unless an explicit raw-motion session is present'
+    assert 'candidate_motion.is_active()' in decode and 'candidate_nav.elapsed_days=candidate_motion.elapsed_days()' in decode,'Validated active raw motion must restore its exact saved clock'
+    assert re.search(r'func\s+elapsed_days\(\)\s*->\s*float\s*:',text['source_motion_bridge']),'Source motion bridge is missing its validated exact-clock API'
+    fixtures=[('source_motion_native','source_motion_pipeline','profile','body_and_bank_canaries_unchanged','reverse_case_count'),
+              ('source_frame_native','source_frame_kinematics','profile','canaries_and_matrix_unchanged','reverse_case_count'),
+              ('source_time_controls_native','flight_time_controller',None,'guards_unchanged','reverse_repeat_cases'),
+              ('source_galactic_map_native','galactic_map_model',None,'canaries_unchanged','reverse_repeat_count')]
+    for name,module,profile_key,guard,reverse in fixtures:
+        path=project/'tests/fixtures'/f'{name}.json';fixture_raw=path.read_bytes();fixture=json.loads(fixture_raw)
+        assert fixture.get('source_assembly_sha256')==SOURCE_ASSEMBLY_SHA256 and fixture.get('source_commit')==SOURCE_ASSEMBLY_COMMIT,'Wrong navigation native reference provenance '+name
+        if 'source_executable_sha256' in fixture:assert fixture['source_executable_sha256']==SOURCE_IMAGE_SHA256,'Wrong source image in navigation reference '+name
+        if 'source_sha256' in fixture:assert fixture['source_sha256']==SOURCE_IMAGE_SHA256,'Wrong source image in navigation reference '+name
+        assert type(fixture.get('case_count')) is int and fixture['case_count']>0 and len(fixture.get('cases',[]))==fixture['case_count'] and fixture.get(guard) is True and fixture.get(reverse)==fixture['case_count'],'Incomplete navigation native reference '+name
+        fresh=fixture.get('fresh_process_runs_per_scale') if name=='source_galactic_map_native' else fixture.get('fresh_process_runs')
+        assert fresh==3,'Navigation native reference requires three fresh processes '+name
+        if profile_key:
+            profile=re.search(r'^const\s+PROFILE\s*:=\s*"([^"]+)"\s*$',text[module],re.M)
+            assert profile and fixture[profile_key]==profile[1],'Navigation native profile differs from runtime '+module
+        if name=='source_galactic_map_native':assert fixture.get('runtime_resource_sha256')==hashlib.sha256(raw).hexdigest(),'Map resource differs from native-used bytes'
+        result['native_reference_metadata'][name]={'local_path':str(path.relative_to(project)),'sha256':hashlib.sha256(fixture_raw).hexdigest(),'case_count':fixture['case_count'],'fresh_process_runs':fresh,'provenance_checked':True,'oracle_executed_by_apk_verifier':False}
+    result.update({'compiled_module_count':len(NAVIGATION_MODULES),'raw_json_count':1,
+                   'galactic_map_connected':True,'system_map_connected':True,'original_map_overview_data_verified':True,
+                   'galactic_map_renderer_policy':'modern-touch-projection-with-original-density-palette-landmarks-and-sector-data',
+                   'complete_original_map_renderer':False,'complete_original_map_instruments':False,
+                   'galactic_search_scope':'bounded local window plus original named-system catalogue, not exhaustive global name enumeration',
+                   'implemented_time_rates':[1,10,100],'disabled_time_rates':[1000,10000],'maximum_substeps':32,'maximum_substep_seconds':0.1,
+                   'original_time_scheduler_complete':False,'analog_phone_roll_connected':True,
+                   'rotating_station_contact':'sampled-pose-modern-conservative-sweep-with-omega-cross-radius',
+                   'complete_original_f582_collision':False,'raw_source_motion_connected':True,
+                   'raw_source_motion_scope':'Optional new FULL sessions; Cobra around a fixed natural focus; ports/surfaces/vertical assist and other profiles use existing fallback.',
+                   'old_saves_without_motion_session_use_previous_path':True,
+                   'active_raw_session_restores_validated_ieee64_clock':True,
+                   'source_frame_primitives_standalone':True,'automatic_source_for_parent_selection':False,
+                   'original_hyperdrive_f903_complete':False,'complete_original_player_pipeline':False,'complete_original_physics':False})
+    return result
+
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     expected=preset_values(presets)
     signature=run(build_tools/'apksigner','verify','--verbose','--print-certs',apk)
@@ -723,7 +843,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -788,10 +908,12 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             if expected['version_code']>=33:
                 source_physics_ports_assets=verify_source_physics_ports_runtime(archive,presets.parent,expected['version_code'])
             if expected['version_code']>=34:
-                source_full_assets=verify_source_full_runtime(archive,presets.parent)
+                source_full_assets=verify_source_full_runtime(archive,presets.parent,expected['version_code'])
             if expected['version_code']>=35:
                 classic_console_assets=verify_classic_console_runtime(archive,presets.parent)
                 mining_kernel_assets=verify_mining_kernel_runtime(archive,presets.parent)
+            if expected['version_code']>=36:
+                navigation_assets=verify_navigation_runtime(archive,presets.parent)
         for name in names:
             if not name.startswith('lib/') or not name.endswith('.so'):continue
             data=archive.read(name)
@@ -809,7 +931,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

@@ -16,10 +16,15 @@ const SettingsPanel=preload("res://scripts/settings_panel.gd")
 const SaveStore=preload("res://scripts/save_store.gd")
 const Stick=preload("res://scripts/touch_stick.gd")
 const Hold=preload("res://scripts/hold_button.gd")
+const RollControl=preload("res://scripts/roll_control.gd")
 const Lever=preload("res://scripts/speed_lever.gd")
 const ActionButton=preload("res://scripts/touch_action_button.gd")
 const FlightConsole=preload("res://scripts/flight_console.gd")
 const FlightInstruments=preload("res://scripts/flight_instruments.gd")
+const TimeControls=preload("res://scripts/flight_time_controls.gd")
+const TimeController=preload("res://scripts/flight_time_controller.gd")
+const GalacticMap=preload("res://scripts/galactic_map_view.gd")
+const SystemMap=preload("res://scripts/system_map_view.gd")
 const ShipView=preload("res://scripts/ship_visual.gd")
 const StationView=preload("res://scripts/station_visual.gd")
 const SourceStationView=preload("res://scripts/source_station_visual.gd")
@@ -30,6 +35,8 @@ const FlightTheme=preload("res://scripts/flight_theme.gd")
 const FlightReticle=preload("res://scripts/flight_reticle.gd")
 const BuildInfo=preload("res://scripts/build_info.gd")
 const SourceClock=preload("res://scripts/source_clock.gd")
+const SourceUnits=preload("res://scripts/source_units.gd")
+const MotionBridge=preload("res://scripts/source_motion_bridge.gd")
 const Diagnostics=preload("res://scripts/game_diagnostics.gd")
 const ReportExport=preload("res://scripts/report_export.gd")
 const DockServices=preload("res://scripts/training_dock_services.gd")
@@ -68,6 +75,8 @@ var lift_up:=false
 var lift_down:=false
 var roll_left:=false
 var roll_right:=false
+var roll_left_strength:=0.0
+var roll_right_strength:=0.0
 var menu:PanelContainer
 var menu_rows:VBoxContainer
 var menu_title:Label
@@ -78,6 +87,19 @@ var auto_button:Button
 var dock_button:Button
 var surface_button:Button
 var flight_console:Control
+var time_controls:Control
+var flight_time:=TimeController.new()
+var active_map:Control
+var active_map_kind:=""
+var docking_label:Label
+var target_site_id:=""
+var target_reference:Dictionary={}
+var target_worker:Thread
+var target_job_key:=""
+var target_job_world:RefCounted
+var source_motion:=MotionBridge.new()
+var source_motion_enabled:=false
+var last_motion_result:Dictionary={}
 var instruments:=FlightInstruments.new()
 var last_view:=""
 var dock_services_view:Control
@@ -123,7 +145,9 @@ func _ready()->void:
 	if "--rebuild-smoke" in OS.get_cmdline_user_args():call_deferred("_run_smoke")
 
 func _new_models(layout:String=World.PORT_LAYOUT)->void:
-	instruments.reset();last_view=""
+	_close_map(false)
+	instruments.reset();flight_time.reset();last_view="";target_site_id="";target_reference.clear()
+	source_motion=MotionBridge.new();source_motion_enabled=layout==World.FULL_LAYOUT;last_motion_result.clear()
 	ship=Flight.new();nav=NavigationData.new()
 	if layout==World.FULL_LAYOUT and not nav.configure_native():push_error("Original galaxy could not be initialized")
 	world=World.new();world.configure(nav.current(),layout);surface=Surface.new();near.clear()
@@ -170,11 +194,14 @@ func _build_ui()->void:
 	flight_reticle=FlightReticle.new();_anchored(flight_reticle,Control.PRESET_FULL_RECT,Vector4.ZERO);flight_widgets.append(flight_reticle)
 	hud=_label("",20);_anchored(hud,Control.PRESET_TOP_WIDE,Vector4(18,8,-260,38));hud.mouse_filter=Control.MOUSE_FILTER_IGNORE;flight_widgets.append(hud)
 	var console_height:float=FlightConsole.HEIGHT
-	stick=Stick.new();_anchored(stick,Control.PRESET_BOTTOM_LEFT,Vector4(20,-250-console_height,250,-20-console_height));flight_widgets.append(stick)
+	stick=Stick.new();_anchored(stick,Control.PRESET_BOTTOM_LEFT,Vector4(20,-250-console_height,250,-80-console_height));flight_widgets.append(stick)
 	lever=Lever.new();_anchored(lever,Control.PRESET_BOTTOM_RIGHT,Vector4(-115,-315-console_height,-25,-20-console_height));lever.target_changed.connect(_set_speed);flight_widgets.append(lever)
 	var caption:=_label("СКОРОСТЬ",16);caption.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(caption,Control.PRESET_BOTTOM_RIGHT,Vector4(-125,-350-console_height,-15,-318-console_height));flight_widgets.append(caption)
 	var lift1:=Hold.new();lift1.text="ПОДЪЁМ";_anchored(lift1,Control.PRESET_BOTTOM_RIGHT,Vector4(-275,-230-console_height,-135,-145-console_height));lift1.state_changed.connect(func(value:bool):lift_up=value);holds.append(lift1);flight_widgets.append(lift1)
 	var lift2:=Hold.new();lift2.text="СНИЖЕНИЕ";_anchored(lift2,Control.PRESET_BOTTOM_RIGHT,Vector4(-275,-125-console_height,-135,-40-console_height));lift2.state_changed.connect(func(value:bool):lift_down=value);holds.append(lift2);flight_widgets.append(lift2)
+	var roll1:=RollControl.new();roll1.direction=-1.0;_anchored(roll1,Control.PRESET_BOTTOM_LEFT,Vector4(20,-74-console_height,126,-10-console_height));roll1.axis_changed.connect(func(value:float):roll_left_strength=value;roll_left=value>0);holds.append(roll1);flight_widgets.append(roll1)
+	var roll2:=RollControl.new();roll2.direction=1.0;_anchored(roll2,Control.PRESET_BOTTOM_LEFT,Vector4(144,-74-console_height,250,-10-console_height));roll2.axis_changed.connect(func(value:float):roll_right_strength=value;roll_right=value>0);holds.append(roll2);flight_widgets.append(roll2)
+	time_controls=TimeControls.new();_anchored(time_controls,Control.PRESET_TOP_LEFT,Vector4(20,104,356,194));time_controls.rate_requested.connect(_request_time_rate);flight_widgets.append(time_controls)
 	flight_console=FlightConsole.new();_anchored(flight_console,Control.PRESET_BOTTOM_WIDE,Vector4(0,-console_height,0,0));flight_widgets.append(flight_console)
 	flight_console.system_requested.connect(_show_system);flight_console.routes_requested.connect(_show_routes);flight_console.menu_requested.connect(_show_menu)
 	flight_console.view_requested.connect(_cycle_view)
@@ -188,6 +215,7 @@ func _build_ui()->void:
 	var cross:=_label("·",27);cross.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(cross,Control.PRESET_CENTER,Vector4(-15,-20,15,20));cross.mouse_filter=Control.MOUSE_FILTER_IGNORE;flight_widgets.append(cross)
 	target_label=_label("",18);target_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(target_label,Control.PRESET_CENTER_TOP,Vector4(-330,40,330,94));target_label.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	flight_widgets.append(target_label)
+	docking_label=_label("",16);docking_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(docking_label,Control.PRESET_CENTER_BOTTOM,Vector4(-360,-70-console_height,360,-8-console_height));docking_label.mouse_filter=Control.MOUSE_FILTER_IGNORE;flight_widgets.append(docking_label)
 	notice=_label("",21);notice.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;notice.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;_anchored(notice,Control.PRESET_CENTER_BOTTOM,Vector4(-430,-190-console_height,430,-115-console_height));notice.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	fps_label=_label("",16);_anchored(fps_label,Control.PRESET_BOTTOM_LEFT,Vector4(25,-280-console_height,230,-250-console_height))
 	menu=PanelContainer.new();_anchored(menu,Control.PRESET_FULL_RECT,Vector4(140,40,-140,-40))
@@ -217,19 +245,63 @@ func _release_inputs()->void:
 	for button in action_buttons:
 		if is_instance_valid(button):button.release_pointer()
 	if flight_console!=null:flight_console.release_pointers()
+	if time_controls!=null:time_controls.release_pointers()
+	if is_instance_valid(active_map) and active_map.has_method("release_pointers"):active_map.release_pointers()
 	if is_instance_valid(dock_services_view):dock_services_view.release_pointers()
-	lift_up=false;lift_down=false;roll_left=false;roll_right=false
-func _blocked()->bool:return busy or not active or menu.visible or settings_panel.visible
+	lift_up=false;lift_down=false;roll_left=false;roll_right=false;roll_left_strength=0;roll_right_strength=0
+func _blocked()->bool:return busy or not active or menu.visible or settings_panel.visible or is_instance_valid(active_map)
 func _physics_process(dt:float)->void:
-	if automated or _blocked() or instruments.paused:return
+	if automated:return
+	_advance_controls(dt)
+
+func _advance_controls(dt:float)->void:
+	if _blocked() or instruments.paused:
+		flight_time.interrupt("Полёт приостановлен.");return
 	var steering:Vector2=stick.value
 	steering.x+=float(Input.is_physical_key_pressed(KEY_RIGHT))-float(Input.is_physical_key_pressed(KEY_LEFT))
 	steering.y+=float(Input.is_physical_key_pressed(KEY_DOWN))-float(Input.is_physical_key_pressed(KEY_UP))
-	var roll:=float(roll_right)-float(roll_left)+float(Input.is_physical_key_pressed(KEY_E))-float(Input.is_physical_key_pressed(KEY_Q))
+	var roll:float=(roll_right_strength-roll_left_strength)*0.35+float(Input.is_physical_key_pressed(KEY_E))-float(Input.is_physical_key_pressed(KEY_Q))
 	var lift:=float(lift_up)-float(lift_down)+float(Input.is_physical_key_pressed(KEY_R))-float(Input.is_physical_key_pressed(KEY_F))
 	if Input.is_physical_key_pressed(KEY_W):_set_speed(ship.target_speed+150*dt)
 	if Input.is_physical_key_pressed(KEY_S):_set_speed(ship.target_speed-150*dt)
-	_tick(minf(dt,0.1),settings.steer(steering.limit_length()),roll,lift)
+	var manual:bool=stick.pointer_id!=-1 or lever.pointer_id!=-1 or absf(roll)>0.0001 or absf(lift)>0.0001 or steering.length()>0.001 or Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_S)
+	var plan:Dictionary=flight_time.plan_frame(dt,_time_context(manual))
+	if not plan.get("ok",false):return
+	var executed:=0;var interrupted:=false
+	var frame_identity:=[ship,world,nav.current_id,world.focus_id,world.site_id,surface.active]
+	for step:float in plan.steps:
+		if not flight_time.can_continue(int(plan.effective_rate),_time_context(manual)):interrupted=true;break
+		_tick(step,settings.steer(steering.limit_length()),roll,lift);executed+=1
+		if frame_identity!=[ship,world,nav.current_id,world.focus_id,world.site_id,surface.active]:interrupted=true;break
+		if not flight_time.can_continue(int(plan.effective_rate),_time_context(manual)):interrupted=true;break
+	flight_time.finish_frame(int(plan.token),executed,interrupted)
+
+func _time_context(manual:=false)->Dictionary:
+	var result:={"active":active and ship.hull>0,"menu_open":menu.visible or settings_panel.visible or is_instance_valid(active_map),"busy":busy,"paused":instruments.paused,"source_world":world.layout_mode==World.FULL_LAYOUT,"manual_input":manual,"autopilot":ship.autopilot,"landing":surface.landing,"taking_off":surface.taking_off,"docked":ship.docked,"surface_active":surface.active,"combat_active":ship.combat_active,"jump_remaining":nav.remaining,"transfer_remaining":world.transfer_remaining,"speed_mps":ship.velocity.length(),"station_available":ship.station_available}
+	var clearance:=INF
+	for body:Dictionary in world.bodies:
+		if str(body.kind)=="barycenter":continue
+		var centre:Vector3=world.local_meters(str(body.id),nav.elapsed_days)
+		var envelope:=maxf(float(body.get("source_outer_bound_m",0.0)),float(body.get("radius_km",0.0))*1000.0)
+		var distance:float=ship.position.distance_to(centre)
+		if centre.is_finite() and is_finite(distance) and is_finite(envelope):clearance=minf(clearance,distance-envelope)
+	if is_finite(clearance):result.body_clearance_m=clearance
+	var gravity:Vector3=world.gravity_at(ship.position,nav.elapsed_days) if settings.orbital_gravity else Vector3.ZERO
+	if gravity.is_finite():result.gravity_mps2=gravity.length()
+	if ship.station_available:
+		var bound:=0.0
+		if ship.has_source_station():
+			var bounds:Variant=ship._source_station.get("bounds")
+			if bounds is AABB:bound=bounds.get_center().length()+bounds.size.length()*0.5
+		result.station_distance_m=ship.position.distance_to(ship.STATION)-bound
+	return result
+
+func _request_time_rate(rate:int)->void:
+	var context:=_time_context()
+	for option:Dictionary in flight_time.rate_options(context):
+		if int(option.rate)!=rate:continue
+		if not option.enabled:_announce(str(option.reason));return
+		_release_inputs();flight_time.interrupt();flight_time.request_rate(rate);_refresh_hud();return
 
 func _tick(dt:float,steering:Vector2,roll:float,lift:=0.0)->void:
 	if instruments.paused or ship.hull<=0:return
@@ -237,9 +309,13 @@ func _tick(dt:float,steering:Vector2,roll:float,lift:=0.0)->void:
 		ship.autopilot=false
 		if surface.active:surface.landing=false
 	if nav.remaining>0:
+		# New source sessions keep charging time on the same celestial clock.
+		# Saves without the opt-in retain their published legacy timing.
+		if source_motion_enabled:nav.elapsed_days+=dt/86400.0
 		if nav.step(dt,ship):
 			world.configure(nav.current(),world.preferred_layout());surface=Surface.new();near.clear();_apply_system();_announce(nav.message);_save_game()
 	elif world.transfer_remaining>0:
+		if source_motion_enabled:nav.elapsed_days+=dt/86400.0
 		if world.step_transfer(dt,ship,nav):
 			# An explicit transfer starts a new local flight. A geographic link
 			# from the previous departure belongs to its previous origin/focus.
@@ -265,11 +341,24 @@ func _tick(dt:float,steering:Vector2,roll:float,lift:=0.0)->void:
 				if not context.ok:ship.brake();_announce("Не удалось подготовить станцию. Сохраните отчёт об ошибке.");return
 				if ship.docked and world.station_launch_ready():
 					ship.launch();world.finish_station_launch(not ship.docked)
-			ship.step(dt,steering,roll,world.gravity_at(ship.position,nav.elapsed_days) if settings.orbital_gravity else Vector3.ZERO,lift)
-			if world.protect_surface(ship,nav.elapsed_days):_announce(world.message)
+			if not _source_motion_step(dt,steering,roll,lift):ship.step(dt,steering,roll,world.gravity_at(ship.position,nav.elapsed_days) if settings.orbital_gravity else Vector3.ZERO,lift)
+			if world.protect_surface(ship,nav.elapsed_days):source_motion.reset();_announce(world.message)
 	if not ship.last_notice.is_empty():_announce(ship.last_notice);ship.last_notice=""
 	save_timer+=dt
 	if save_timer>20:save_timer=0;_save_game()
+
+func _source_motion_step(dt:float,steering:Vector2,roll:float,lift:float)->bool:
+	if not source_motion_enabled or not settings.orbital_gravity or not MotionBridge.eligible(world,ship,surface.active) or dt>MotionBridge.MAX_STEP_SECONDS or absf(lift)>0.000001:
+		source_motion.reset();return false
+	var previous:Quaternion=ship.attitude
+	var turn:float=ship.profile().turn_rate
+	var local_rotation:=Quaternion(Vector3.UP,-steering.x*dt*turn)*Quaternion(Vector3.RIGHT,-steering.y*dt*turn)*Quaternion(Vector3.FORWARD,roll*dt*turn/1.2)
+	ship.attitude=(previous*local_rotation).normalized()
+	last_motion_result=source_motion.step(dt,ship,world,nav.elapsed_days,lift)
+	if last_motion_result.get("ok",false) and last_motion_result.get("handled",false):return true
+	ship.attitude=previous
+	if not last_motion_result.get("ok",false):source_motion.reset()
+	return false
 
 func _update_flight_controls()->void:
 	var blocked:=_blocked()
@@ -278,6 +367,8 @@ func _update_flight_controls()->void:
 	lever.input_allowed=stick.input_allowed
 	for hold in holds:hold.input_allowed=stick.input_allowed
 	flight_console.set_actions_enabled(not blocked)
+	if time_controls!=null:time_controls.set_actions_enabled(not blocked)
+	if is_instance_valid(active_map):active_map.set("input_allowed",active and not busy)
 	for button in action_buttons:
 		if is_instance_valid(button):button.input_allowed=active and not busy
 	if is_instance_valid(dock_services_view):
@@ -285,10 +376,11 @@ func _update_flight_controls()->void:
 func _process(dt:float)->void:
 	_update_flight_controls()
 	if not active:return
+	_pump_target_reference()
 	var blocked:=_blocked()
-	# Completed source geometry can move the physical contact frame. Defer its
-	# publication during explicit pause, just like simulation and hatch updates.
-	if not instruments.paused:
+	# Publishing completed geometry can move the physical contact frame. Keep
+	# that publication frozen with simulation while a modal screen is open.
+	if not instruments.paused and not blocked:
 		_pump_underground_geometry()
 		if not busy:_sync_scene()
 		if surface.active:camera.position+=surface.consume_render_frame_shift()
@@ -301,7 +393,7 @@ func _process(dt:float)->void:
 	if last_view!=current_view:camera.position=desired;camera.quaternion=attitude;last_view=current_view
 	last_external=ship.external_view
 	camera.position=camera.position.lerp(desired,minf(1,dt*30));camera.quaternion=camera.quaternion.slerp(attitude,minf(1,dt*25))
-	notice_timer=maxf(0,notice_timer-dt);notice.visible=notice_timer>0 and not menu.visible and not settings_panel.visible
+	notice_timer=maxf(0,notice_timer-dt);notice.visible=notice_timer>0 and not menu.visible and not settings_panel.visible and not is_instance_valid(active_map)
 	menu_feedback.visible=notice_timer>0 and not menu_feedback.text.is_empty()
 	hud_timer+=dt
 	if hud_timer>0.15:hud_timer=0;_refresh_hud()
@@ -315,7 +407,7 @@ func _process(dt:float)->void:
 func _record_event(event:String,details:Dictionary={})->void:
 	if diagnostics!=null and not automated:diagnostics.record(event,details)
 func _input_diagnostic_state()->Dictionary:
-	return {"stick":[stick.value.x,stick.value.y] if stick!=null else [],"stick_pointer":stick.pointer_id if stick!=null else -1,"throttle_pointer":lever.pointer_id if lever!=null else -1,"lift_up":lift_up,"lift_down":lift_down,"active":active,"busy":busy,"menu_open":menu!=null and menu.visible,"settings_open":settings_panel!=null and settings_panel.visible,"camera_view":instruments.view_key(ship.external_view) if ship!=null else "front","simulation_paused":instruments.paused}
+	return {"stick":[stick.value.x,stick.value.y] if stick!=null else [],"stick_pointer":stick.pointer_id if stick!=null else -1,"throttle_pointer":lever.pointer_id if lever!=null else -1,"lift_up":lift_up,"lift_down":lift_down,"roll_left":roll_left_strength,"roll_right":roll_right_strength,"active":active,"busy":busy,"menu_open":menu!=null and menu.visible,"settings_open":settings_panel!=null and settings_panel.visible,"map_open":is_instance_valid(active_map),"map_kind":active_map_kind,"camera_view":instruments.view_key(ship.external_view) if ship!=null else "front","simulation_paused":instruments.paused,"time_rate":flight_time.effective_rate,"source_motion_enabled":source_motion_enabled,"source_motion_active":source_motion.is_active()}
 func _flight_diagnostic_sample()->Dictionary:
 	if ship==null or nav==null or world==null or surface==null:return {}
 	return {"ship_id":ship.ship_id,"position":[ship.position.x,ship.position.y,ship.position.z],"velocity":[ship.velocity.x,ship.velocity.y,ship.velocity.z],"target_speed":ship.target_speed,"hull":ship.hull,"docked":ship.docked,"autopilot":ship.autopilot,"system_id":nav.current_id,"focus_id":world.focus_id,"site_id":world.site_id,"jump_remaining":nav.remaining,"transfer_remaining":world.transfer_remaining,"surface":surface.active,"landed":surface.landed,"flight_phase":surface.flight_phase,"surface_motion":{"landing":surface.landing,"taking_off":surface.taking_off,"altitude_m":surface.altitude(ship) if surface.active else 0.0,"pad_distance_m":surface.pad_distance(ship) if surface.active else 0.0},"controls":_input_diagnostic_state()}
@@ -332,6 +424,8 @@ func _base_diagnostic_context()->Dictionary:
 
 func _station_here()->bool:return not surface.active and (world.is_orbital_site() or (world.site_id.is_empty() and world.focus_id==world.default_id and nav.has_station()))
 func _apply_system()->void:
+	_validate_navigation_target()
+	if source_motion.is_active() and (not MotionBridge.eligible(world,ship,surface.active) or not source_motion.synchronized(world,ship,nav.elapsed_days)):source_motion.reset()
 	ship.original_port=not world.current_site().is_empty();ship.station_available=_station_here()
 	if world.layout_mode==World.FULL_LAYOUT:
 		var context:=StationSession.configure_flight(ship,world,nav)
@@ -421,9 +515,10 @@ func _refresh_hud()->void:
 	auto_button.text="Службы" if ship.docked else ("На орбиту" if surface.active and surface.landed and surface.globe!=null else ("Отмена" if ship.autopilot or surface.landing or not surface.flight_phase.is_empty() else "Авто"))
 	dock_button.text="Взлететь" if surface.landed else ("Вылететь" if ship.docked else "Посадка" if surface.active else "Стыковка")
 	surface_button.text="Взлететь" if surface.active and surface.landed else ("На орбиту" if surface.active else "К поверхности")
+	var navigation_target:=_navigation_target()
+	var target:Vector3=navigation_target.position
 	if surface.active:target_label.text="%s · высота %.0f м\nДо площадки %.0f м"%[surface.site_name if not surface.site_name.is_empty() else world.by_id[world.focus_id].name,maxf(0,surface.altitude(ship)),surface.pad_distance(ship)]
-	else:target_label.text="%s · до станции %.0f м"%[space_context,ship.position.distance_to(ship.STATION)] if _station_here() else space_context
-	var target:Vector3=surface.pad_position() if surface.active else (ship.STATION if _station_here() else world.local_meters(world.focus_id,nav.elapsed_days))
+	else:target_label.text="%s · до цели %.0f м"%[navigation_target.label,ship.position.distance_to(target)]
 	flight_console.configure_state({
 		"actual_speed_mps":ship.velocity.length(),"target_speed_mps":ship.target_speed,
 		"surface_active":surface.active,"altitude_m":surface.altitude(ship) if surface.active else 0.0,
@@ -437,6 +532,61 @@ func _refresh_hud()->void:
 		"contextlabel":surface.site_name if surface.active and not surface.site_name.is_empty() else space_context,
 		"auto_text":auto_button.text,"dock_text":dock_button.text,"surface_text":surface_button.text})
 	fps_label.visible=settings.show_fps;fps_label.text="%d FPS"%Engine.get_frames_per_second()
+	if time_controls!=null:time_controls.configure_state({"options":flight_time.rate_options(_time_context()),"requested_rate":flight_time.requested_rate,"applied_rate":flight_time.effective_rate,"paused":instruments.paused,"reason":flight_time.last_reason})
+	if docking_label!=null:
+		docking_label.text=""
+		if ship.has_source_station() and not ship.docked and ship.has_method("source_docking_telemetry"):
+			var docking:Dictionary=ship.source_docking_telemetry()
+			if docking.get("sample_valid",false):
+				var spin:Vector3=docking.get("station_angular_velocity_world_rad_s",Vector3.ZERO)
+				docking_label.text="Крен к проёму: %+.1f° · вращение %.2f°/с\nОтносительная скорость %.1f м/с"%[rad_to_deg(float(docking.get("roll_error_rad",0))),rad_to_deg(spin.length()),Vector3(docking.get("relative_linear_velocity_mps",Vector3.ZERO)).length()]
+
+func _navigation_target()->Dictionary:
+	if surface.active:return {"position":surface.pad_position(),"label":surface.site_name}
+	if not target_site_id.is_empty():
+		var site:Dictionary=world.get_site(target_site_id)
+		if not site.is_empty() and str(site.parent)==world.selected_id:
+			if int(site.type_code) in [32,33,34]:return {"position":world.site_local_meters(target_site_id,nav.elapsed_days),"label":str(site.name)}
+			_request_target_reference()
+			if target_reference.get("site_id")==target_site_id and target_reference.get("system_id")==nav.current_id:
+				return {"position":world.local_meters(str(site.parent),nav.elapsed_days)+world.body_rotation_basis(str(site.parent),nav.elapsed_days)*Vector3(target_reference.body_fixed_m),"label":str(site.name)}
+	var id:String=world.selected_id if world.by_id.has(world.selected_id) else world.focus_id
+	if id==world.focus_id and _station_here():return {"position":ship.STATION,"label":str(world.current_site().get("name",world.by_id[id].name))}
+	return {"position":world.local_meters(id,nav.elapsed_days),"label":str(world.by_id[id].name)}
+
+func _validate_navigation_target()->void:
+	if target_site_id.is_empty():return
+	var site:Dictionary=world.get_site(target_site_id)
+	if site.is_empty() or str(site.parent)!=world.selected_id:
+		target_site_id="";target_reference.clear()
+
+func _request_target_reference()->void:
+	if target_worker!=null or target_site_id.is_empty() or world.layout_mode!=World.FULL_LAYOUT:return
+	if target_reference.get("site_id")==target_site_id and target_reference.get("system_id")==nav.current_id:return
+	var site:Dictionary=world.get_site(target_site_id)
+	if site.is_empty() or int(site.type_code)!=35 or not world.by_id.has(str(site.parent)):return
+	var body:Dictionary=world.by_id[str(site.parent)]
+	var record:=str(body.get("runtime_record_hex","")).hex_decode()
+	if record.size()!=68:return
+	var radius:=float(body.radius_km)*1000.0;var copied_site:=site.duplicate(true)
+	var system_id:int=nav.current_id;var requested_site:=target_site_id
+	if target_job_world==world and target_job_key==str(system_id)+":"+requested_site:return
+	target_job_key=str(system_id)+":"+requested_site
+	target_job_world=world
+	target_worker=Thread.new()
+	target_worker.start(func():
+		var profile:Dictionary=SourceTerrain.source_city_profile(copied_site,record,radius)
+		var raw:Variant=profile.get("source_root_raw")
+		if not raw is PackedInt64Array or raw.size()!=3:return {}
+		return {"system_id":system_id,"site_id":requested_site,"body_fixed_m":Vector3(SourceUnits.metres(float(raw[0])),SourceUnits.metres(float(raw[1])),SourceUnits.metres(float(raw[2])))}
+	)
+
+func _pump_target_reference()->void:
+	if target_worker==null or target_worker.is_alive():return
+	var result:Variant=target_worker.wait_to_finish();target_worker=null
+	if target_job_world!=world:return
+	if not result is Dictionary or result.get("site_id")!=target_site_id or result.get("system_id")!=nav.current_id:return
+	if result.get("body_fixed_m") is Vector3 and result.body_fixed_m.is_finite():target_reference=result
 
 func _announce(text:String)->void:
 	_record_event("notice",{"text":text})
@@ -463,6 +613,8 @@ func _toggle_auto()->void:
 		elif surface.landing or not surface.flight_phase.is_empty():surface.landing=false;surface.cancel_vertical();_announce("Автоматический полёт отменён.")
 		else:surface.begin_landing(ship);_announce(surface.message)
 	elif ship.docked:_show_services()
+	elif not target_site_id.is_empty() and target_site_id!=world.site_id:_choose_site(target_site_id)
+	elif world.selected_id!=world.focus_id:_choose_body(world.selected_id)
 	elif not _station_here():_announce("Автоподход доступен у станции. Выберите объект в системе.")
 	else:
 		ship.autopilot=not ship.autopilot
@@ -555,19 +707,23 @@ func _finish_ascent()->void:
 	_apply_system();_announce("Выход на орбиту. Положение над планетой сохранено.");_save_game()
 
 func _open_menu(title:String,save_progress:bool=true)->void:
+	_close_map(false);flight_time.interrupt("Открыто меню.")
 	_record_event("menu_open",{"title":title,"controls_before_release":_input_diagnostic_state()})
 	_release_inputs()
 	if save_progress:_save_game()
 	menu_title.text=title
-	for child in menu_rows.get_children():menu_rows.remove_child(child);child.queue_free()
-	dock_services_view=null
+	_clear_menu_rows()
 	menu.show()
 	_update_flight_controls()
+
+func _clear_menu_rows()->void:
+	for child in menu_rows.get_children():menu_rows.remove_child(child);child.queue_free()
+	dock_services_view=null
 func _menu_text(text:String)->void:
 	var label:=_label(text,21);label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;label.custom_minimum_size.x=900;menu_rows.add_child(label)
 func _menu_action(text:String,callback:Callable)->void:
 	menu_rows.add_child(_button(text,callback,900))
-func _close_menu()->void:menu.hide();backup_edit=null;_release_inputs();_update_flight_controls()
+func _close_menu()->void:_close_map(false);menu.hide();backup_edit=null;_release_inputs();_update_flight_controls()
 
 func _cycle_view()->void:
 	if _blocked():return
@@ -577,6 +733,7 @@ func _cycle_view()->void:
 func _toggle_pause()->void:
 	if busy or not active:return
 	instruments.paused=not instruments.paused;_release_inputs();_update_flight_controls();_refresh_hud()
+	flight_time.interrupt("Пауза." if instruments.paused else "Обычное время.")
 	_record_event("simulation_pause",{"paused":instruments.paused})
 	_announce("Полёт приостановлен. Кнопка «Продолжить» возвращает управление." if instruments.paused else "Полёт продолжен.")
 
@@ -654,24 +811,43 @@ func _begin_graphics_demo()->void:
 	if busy or not graphics_return.is_empty():return
 	if saving_enabled and not _save_game():return
 	_release_inputs()
-	graphics_return={"ship":ship,"nav":nav,"world":world,"surface":surface,"saving_enabled":saving_enabled}
+	graphics_return={"ship":ship,"nav":nav,"world":world,"surface":surface,"saving_enabled":saving_enabled,"source_motion":source_motion,"source_motion_enabled":source_motion_enabled,"target_site_id":target_site_id,"target_reference":target_reference.duplicate(true),"paused":instruments.paused}
 	saving_enabled=false;_new_models();ship.external_view=true;nav.elapsed_days=225.0;ship.target_speed=0;ship.attitude=Quaternion(Vector3.UP,-0.38)
 	_close_menu();_apply_system();_refresh_hud();_announce("Осмотрите обновлённый корабль и станцию. Вернуться к основному полёту можно через меню.")
 func _end_graphics_demo()->void:
 	if busy or graphics_return.is_empty():return
 	_release_inputs();ship=graphics_return.ship;nav=graphics_return.nav;world=graphics_return.world;surface=graphics_return.surface;saving_enabled=graphics_return.saving_enabled
+	source_motion=graphics_return.source_motion;source_motion_enabled=bool(graphics_return.source_motion_enabled);target_site_id=str(graphics_return.target_site_id);target_reference=graphics_return.target_reference.duplicate(true)
+	instruments.paused=bool(graphics_return.paused);flight_time.reset()
 	graphics_return={};near.clear();_close_menu();_apply_system();_refresh_hud();_announce("Основной полёт продолжен.")
 func _show_system()->void:
-	_open_menu("%s · ОБЪЕКТЫ И КОСМОПОРТЫ"%nav.current().name)
-	_menu_text("Для автоперелёта остановитесь. После вылета отойдите от станции минимум на 400 м.")
-	for body in world.bodies:
-		if body.kind in ["star","barycenter"]:continue
-		var id:String=str(body.id)
-		_menu_action("%s · подойти к объекту"%body.name,func():_choose_body(id))
-		for site in world.settlements:
-			if str(site.parent)!=id:continue
-			var site_id:String=str(site.id)
-			_menu_action("    %s · %s"%[site.name,"наземный порт" if int(site.type_code)==35 else "орбитальный порт"],func():_choose_site(site_id))
+	if busy:return
+	var view:=SystemMap.new()
+	var state:={"star":nav.current(),"world":world.snapshot(),"elapsed_days":nav.elapsed_days,"system_name":nav.current().name}
+	if not surface.active:
+		var origin:Array=world.origin_au(nav.elapsed_days)
+		state.ship_position_au=[float(origin[0])+ship.position.x/world.AU_METERS,float(origin[1])+ship.position.y/world.AU_METERS,float(origin[2])+ship.position.z/world.AU_METERS]
+	if not view.configure(state):view.free();_announce("Не удалось подготовить карту системы.");return
+	view.body_selected.connect(func(id:String):
+		if active_map!=view:return
+		if world.select(id):target_site_id="";target_reference.clear();_refresh_hud()
+	)
+	view.site_selected.connect(func(id:String):
+		if active_map!=view:return
+		if world.select_site(id):
+			target_site_id=id;target_reference=view.model.ground_target_reference(id)
+			_request_target_reference();_refresh_hud()
+	)
+	view.travel_requested.connect(func(body_id:String,site_id:String):
+		if active_map!=view:return
+		if site_id.is_empty():_choose_body(body_id)
+		else:_choose_site(site_id)
+		if is_instance_valid(active_map) and active_map==view:view.set_feedback(world.message if not instruments.paused else "Сначала продолжите полёт.")
+	)
+	view.close_requested.connect(func():
+		if active_map==view:_close_map()
+	)
+	_install_map(view,"system")
 func _choose_body(id:String)->void:
 	if _paused_command():return
 	if busy:return
@@ -694,11 +870,47 @@ func _choose_site(id:String)->void:
 	if world.begin_site_transfer(id,ship,nav):_close_menu()
 	_announce(world.message)
 func _show_routes()->void:
-	_open_menu("МАРШРУТЫ ВОССТАНОВЛЕННЫХ СИСТЕМ")
-	_menu_text("Показаны исходные системы текущего и соседних секторов. Расстояния рассчитаны по исходным координатам; запас топлива и оборудование пока используют упрощённые правила." if nav.is_native() else "Здесь доступны 11 восстановленных систем прежнего режима полёта.")
-	for star in nav.galaxy.all():
-		var id:int=int(star.id);var distance:float=nav.galaxy.distance(nav.current_id,id)
-		_menu_action("%s · %.1f св. лет"%[star.name,distance],func():_start_jump(id))
+	if busy:return
+	var view:=GalacticMap.new()
+	var reason:=""
+	if instruments.paused:reason="Сначала продолжите полёт."
+	elif ship.hull<=0:reason="Корабль потерян."
+	elif ship.docked:reason="Сначала вылетите со станции."
+	elif surface.active:reason="Сначала вернитесь на орбиту."
+	elif ship.combat_active:reason="Сначала выйдите из боя."
+	elif nav.remaining>0 or world.transfer_remaining>0:reason="Сначала завершите или отмените текущий переход."
+	elif ship.velocity.length()>20:reason="Затормозите до 20 м/с."
+	if not view.configure_state({"native":nav.is_native(),"current_id":nav.current_id,"selected_id":nav.selected_id,"jump_range_ly":ship.jump_range(),"fuel":nav.fuel,"fuel_capacity":nav.FUEL_CAPACITY,"jump_blocked_reason":reason}):view.free();_announce("Не удалось подготовить карту галактики.");return
+	view.system_selected.connect(func(id:int):
+		if active_map==view:nav.select(id)
+	)
+	view.jump_requested.connect(func(id:int):
+		if active_map!=view:return
+		_start_jump(id)
+		if is_instance_valid(active_map) and active_map==view:view.set_feedback(nav.message if not instruments.paused else "Сначала продолжите полёт.")
+	)
+	view.close_requested.connect(func():
+		if active_map==view:_close_map()
+	)
+	_install_map(view,"galaxy")
+
+func _install_map(view:Control,kind:String)->void:
+	_close_map(false);_release_inputs();flight_time.interrupt("Открыта карта.")
+	_clear_menu_rows()
+	_save_game();menu.hide();settings_panel.hide();active_map=view;active_map_kind=kind
+	ui.add_child(view);view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);view.move_to_front();_update_flight_controls()
+	_record_event("map_open",{"kind":kind})
+
+func _close_map(save_progress:=true)->void:
+	if not is_instance_valid(active_map):active_map=null;active_map_kind="";return
+	var closing:=active_map;active_map=null;active_map_kind=""
+	closing.set("input_allowed",false)
+	if closing.has_method("release_pointers"):closing.release_pointers()
+	closing.hide()
+	if closing.has_method("finish_preparation"):closing.finish_preparation()
+	closing.queue_free();_release_inputs()
+	if save_progress:_save_game()
+	_update_flight_controls()
 func _start_jump(id:int)->void:
 	if _paused_command():return
 	if busy:return
@@ -786,7 +998,15 @@ func _confirm_new_game()->void:
 	_menu_action("Сохранить код резервной копии",_show_backup)
 	_menu_action("Начать новый полёт",func():_new_models(World.FULL_LAYOUT);saving_enabled=true;_close_menu();_apply_system();_save_game();_announce("Начат новый полёт."))
 
-func _payload()->Dictionary:return {"schema":"starfrontier-rebuild-game-v1","flight":ship.snapshot(),"navigation":nav.snapshot(),"planetary":world.snapshot(),"surface":surface.snapshot()}
+func _payload()->Dictionary:
+	_validate_navigation_target()
+	var result:={"schema":"starfrontier-rebuild-game-v1","flight":ship.snapshot(),"navigation":nav.snapshot(),"planetary":world.snapshot(),"surface":surface.snapshot()}
+	if not target_site_id.is_empty():result.target_session={"version":1,"system_id":nav.current_id,"body_id":world.selected_id,"site_id":target_site_id}
+	if source_motion_enabled:
+		if source_motion.is_active() and not source_motion.synchronized(world,ship,nav.elapsed_days):source_motion.reset()
+		var snapshot:Dictionary=source_motion.snapshot() if MotionBridge.eligible(world,ship,surface.active) else {}
+		result.motion_session={"version":1,"profile":MotionBridge.CONTRACT,"enabled":true,"state":snapshot}
+	return result
 func _decode_state(data:Dictionary)->Dictionary:
 	if data.get("schema")!="starfrontier-rebuild-game-v1":return {}
 	for key in ["flight","navigation","planetary","surface"]:
@@ -809,9 +1029,31 @@ func _decode_state(data:Dictionary)->Dictionary:
 		if candidate_ship.has_source_station():
 			if not candidate_ship.source_dock_pose_valid(candidate_ship.position,candidate_ship.velocity,candidate_ship.attitude,candidate_ship.ship_id):return {}
 		elif candidate_ship.position.distance_to(candidate_ship.STATION)>candidate_ship.DOCK_RADIUS+0.01 or candidate_ship.velocity.length()>0.001 or absf(candidate_ship.target_speed)>0.001:return {}
-	return {"ship":candidate_ship,"nav":candidate_nav,"world":candidate_world,"surface":candidate_surface}
+	var candidate_target:=""
+	if data.has("target_session"):
+		var target:Variant=data.target_session
+		if not target is Dictionary or target.size()!=4 or not NavigationData._number(target.get("version"),1,1,true) or not NavigationData._number(target.get("system_id"),0,4294967295.0,true) or target.get("system_id")!=candidate_nav.current_id or not target.get("body_id") is String or target.body_id!=candidate_world.selected_id or not target.get("site_id") is String:return {}
+		var selected_site:Dictionary=candidate_world.get_site(str(target.site_id))
+		if selected_site.is_empty() or str(selected_site.parent)!=candidate_world.selected_id:return {}
+		candidate_target=str(target.site_id)
+	var candidate_motion:=MotionBridge.new();var candidate_motion_enabled:=false
+	if data.has("motion_session"):
+		var motion:Variant=data.motion_session
+		if not motion is Dictionary or motion.size()!=4 or not NavigationData._number(motion.get("version"),1,1,true) or motion.get("profile")!=MotionBridge.CONTRACT or not motion.get("enabled") is bool or not motion.get("state") is Dictionary:return {}
+		candidate_motion_enabled=motion.enabled
+		if candidate_motion_enabled:
+			if candidate_world.layout_mode!=World.FULL_LAYOUT:return {}
+			if not motion.state.is_empty() and (candidate_surface.active or not candidate_motion.restore(motion.state,candidate_world,candidate_ship,candidate_nav.elapsed_days)):return {}
+			# Ordinary JSON rounds decimal days. The validated opt-in session
+			# carries their exact IEEE64 bits alongside the fractional ticks.
+			if candidate_motion.is_active():candidate_nav.elapsed_days=candidate_motion.elapsed_days()
+		elif not motion.state.is_empty():return {}
+	return {"ship":candidate_ship,"nav":candidate_nav,"world":candidate_world,"surface":candidate_surface,"target_site_id":candidate_target,"source_motion_enabled":candidate_motion_enabled,"source_motion":candidate_motion}
 func _commit_state(data:Dictionary)->void:
-	ship=data.ship;nav=data.nav;world=data.world;surface=data.surface;near.clear();instruments.reset();last_view=""
+	_close_map(false)
+	ship=data.ship;nav=data.nav;world=data.world;surface=data.surface;near.clear();instruments.reset();flight_time.reset();last_view=""
+	target_site_id=str(data.get("target_site_id",""));target_reference.clear()
+	source_motion_enabled=bool(data.get("source_motion_enabled",false));source_motion=data.get("source_motion",MotionBridge.new());last_motion_result.clear()
 func _save_game()->bool:
 	if not saving_enabled or busy:return false
 	var ok:=saves.write(_payload())
@@ -850,6 +1092,7 @@ func _unhandled_key_input(event:InputEvent)->void:
 	if not event is InputEventKey or not event.pressed or event.echo:return
 	if event.physical_keycode==KEY_ESCAPE:
 		if settings_panel.visible:_close_settings()
+		elif is_instance_valid(active_map):_close_map()
 		elif menu.visible:_close_menu()
 		else:_show_menu()
 		return
@@ -867,19 +1110,25 @@ func _notification(what:int)->void:
 	if what==NOTIFICATION_APPLICATION_PAUSED or what==NOTIFICATION_APPLICATION_FOCUS_OUT:
 		if diagnostics!=null and not automated:diagnostics.lifecycle("paused" if what==NOTIFICATION_APPLICATION_PAUSED else "focus_out")
 		active=false;_release_inputs()
+		flight_time.interrupt("Приложение неактивно.")
+		if ui!=null:_update_flight_controls()
 		if ship!=null and (report_export==null or not report_export.is_busy()):_save_game()
 	elif what==NOTIFICATION_APPLICATION_RESUMED or what==NOTIFICATION_APPLICATION_FOCUS_IN:
 		active=true
+		if ui!=null:_update_flight_controls()
 		if diagnostics!=null and not automated:diagnostics.lifecycle("resumed" if what==NOTIFICATION_APPLICATION_RESUMED else "focus_in")
 	elif what==NOTIFICATION_WM_GO_BACK_REQUEST:
 		if menu!=null:
 			if settings_panel.visible:_close_settings()
+			elif is_instance_valid(active_map):_close_map()
 			elif menu.visible:_close_menu()
 			else:_show_menu()
 	elif what==NOTIFICATION_WM_CLOSE_REQUEST:
 		_save_game();get_tree().quit()
 func _exit_tree()->void:
 	if diagnostics!=null:diagnostics.shutdown(true)
+	if target_worker!=null and target_worker.is_started():target_worker.wait_to_finish()
+	if is_instance_valid(active_map) and active_map.has_method("finish_preparation"):active_map.finish_preparation()
 	if worker!=null and worker.is_started():worker.wait_to_finish()
 	if hatch_worker!=null and hatch_worker.is_started():hatch_worker.wait_to_finish()
 	near.finish_preparation()

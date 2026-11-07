@@ -7,6 +7,8 @@ packaging checker's rejection paths only.
 from __future__ import annotations
 import importlib.util
 from pathlib import Path
+import json
+import shutil
 import tempfile
 import unittest
 
@@ -18,8 +20,9 @@ class MockArchive:
     def __init__(self):
         self.entries={f'assets/scripts/{name}.gdc':b'GDSC'+b'unit-mock-not-an-exported-module'*4 for name in verifier.FULL_SOURCE_MODULES}
         self.entries.update({f'assets/scripts/{name}.gdc':b'GDSC'+b'unit-mock-not-an-exported-module'*4 for name in verifier.CLASSIC_CONSOLE_MODULES})
+        self.entries.update({f'assets/scripts/{name}.gdc':b'GDSC'+b'unit-mock-not-an-exported-module'*4 for name in verifier.NAVIGATION_MODULES})
         self.entries[f'assets/scripts/{verifier.SOURCE_MINING_KERNEL_MODULE}.gdc']=b'GDSC'+b'unit-mock-not-an-exported-module'*4
-        for name in verifier.FULL_SOURCE_TABLES+('ships','world_names_ru'):
+        for name in verifier.FULL_SOURCE_TABLES+verifier.NAVIGATION_TABLES+('ships','world_names_ru'):
             self.entries[f'assets/data/{name}.json']=(PROJECT/'data'/f'{name}.json').read_bytes()
         for name in verifier.FULL_SOURCE_SHADERS:
             self.entries['assets/scripts/'+name]=(PROJECT/'scripts'/name).read_bytes()
@@ -37,6 +40,11 @@ class FullPackagingChecks(unittest.TestCase):
         self.assertEqual(result['normal_startup_layout'],'source_jjffe_systems_v4')
         self.assertEqual(result['automated_and_helper_layout'],'handcrafted_jjffe_ports_v3')
         self.assertEqual(len(result['legacy_saved_layouts_retained']),5)
+
+    def test_source_function_extracts_inline_and_multiline_without_next_function(self):
+        example='func one()->bool:return true\nfunc two()->void:\n\tpass\nfunc three()->void:pass\n'
+        self.assertEqual(verifier.source_function(example,'one'),'func one()->bool:return true\n')
+        self.assertEqual(verifier.source_function(example,'two'),'func two()->void:\n\tpass\n')
 
     def test_normal_startup_cannot_remain_legacy(self):
         wrong=self.main.replace('World.PORT_LAYOUT if automated else World.FULL_LAYOUT','World.PORT_LAYOUT if automated else World.PORT_LAYOUT')
@@ -76,7 +84,7 @@ class FullPackagingChecks(unittest.TestCase):
         self.assertFalse(result['physical_device_tested'])
 
     def test_retained_orbit_native_provenance_still_runs_for_v34(self):
-        for code in [34,35]:
+        for code in [34,35,36]:
             with self.subTest(version_code=code):
                 result=verifier.verify_source_orbit_runtime(self.archive,PROJECT,code)
                 self.assertEqual(result['new_game_requested_layout'],'source_jjffe_systems_v4')
@@ -85,7 +93,7 @@ class FullPackagingChecks(unittest.TestCase):
                 self.assertEqual(result['retained_local_physics_adapter'],'analytic_si_rebuild_v1')
 
     def test_retained_v3_raw_physics_checks_are_not_relaxed(self):
-        for code in [34,35]:
+        for code in [34,35,36]:
             with self.subTest(version_code=code):
                 result=verifier.verify_source_physics_ports_runtime(self.archive,PROJECT,code)
                 self.assertEqual(result['reported_layout_scope'],'retained-v3-layout')
@@ -186,5 +194,146 @@ class FullPackagingChecks(unittest.TestCase):
         del self.archive.entries[f'assets/scripts/{verifier.SOURCE_MINING_KERNEL_MODULE}.gdc']
         with self.assertRaisesRegex(AssertionError,'Missing standalone MB4 record kernel'):
             verifier.verify_mining_kernel_runtime(self.archive,PROJECT)
+
+    def navigation_project(self,directory,replacements=None):
+        """Only local verifier inputs are copied; the archive stays an explicit mock."""
+        project=Path(directory)
+        for name in (*verifier.NAVIGATION_MODULES,'main','flight_model','source_station_session'):
+            target=project/'scripts'/f'{name}.gd';target.parent.mkdir(parents=True,exist_ok=True)
+            raw=(PROJECT/'scripts'/f'{name}.gd').read_text()
+            for old,new in (replacements or {}).get(name,[]):
+                self.assertIn(old,raw,'Mutation must affect the intended real contract')
+                raw=raw.replace(old,new)
+            target.write_text(raw)
+        target=project/'data/ffe_galactic_map.json';target.parent.mkdir(parents=True,exist_ok=True)
+        shutil.copy2(PROJECT/'data/ffe_galactic_map.json',target)
+        for name in ['source_motion_native','source_frame_native','source_time_controls_native','source_galactic_map_native']:
+            target=project/'tests/fixtures'/f'{name}.json';target.parent.mkdir(parents=True,exist_ok=True)
+            shutil.copy2(PROJECT/'tests/fixtures'/f'{name}.json',target)
+        return project
+
+    def test_navigation_summary_declares_actual_scope_and_limits(self):
+        result=verifier.verify_navigation_runtime(self.archive,PROJECT)
+        self.assertEqual(result['compiled_module_count'],11)
+        self.assertEqual(result['raw_json_count'],1)
+        self.assertTrue(result['galactic_map_connected'])
+        self.assertTrue(result['system_map_connected'])
+        self.assertTrue(result['analog_phone_roll_connected'])
+        self.assertTrue(result['raw_source_motion_connected'])
+        self.assertTrue(result['old_saves_without_motion_session_use_previous_path'])
+        self.assertTrue(result['active_raw_session_restores_validated_ieee64_clock'])
+        self.assertEqual(result['implemented_time_rates'],[1,10,100])
+        self.assertEqual(result['disabled_time_rates'],[1000,10000])
+        self.assertEqual(result['maximum_substeps'],32)
+        self.assertEqual(result['maximum_substep_seconds'],0.1)
+        for flag in ['complete_original_map_renderer','complete_original_map_instruments','original_time_scheduler_complete','complete_original_f582_collision','automatic_source_for_parent_selection','original_hyperdrive_f903_complete','complete_original_player_pipeline','complete_original_physics','physical_device_tested','compiled_source_correspondence_rebuilt_by_verifier','oracle_executed_by_apk_verifier']:
+            self.assertFalse(result[flag],flag)
+        expected={'source_motion_native':1236,'source_frame_native':720,'source_time_controls_native':1736,'source_galactic_map_native':4536}
+        self.assertEqual({k:v['case_count'] for k,v in result['native_reference_metadata'].items()},expected)
+
+    def test_v36_source_tables_are_required_without_changing_old_contract(self):
+        previous=verifier.verify_source_full_runtime(self.archive,PROJECT,35)
+        current=verifier.verify_source_full_runtime(self.archive,PROJECT,36)
+        self.assertEqual(previous['raw_json_count'],21)
+        self.assertNotIn('ffe_galactic_map',previous['data'])
+        self.assertEqual(current['raw_json_count'],22)
+        self.assertIn('ffe_galactic_map',current['data'])
+        self.assertEqual(previous['live_gravity'],'sampled-f603-nominal-day-si-v1')
+        self.assertEqual(current['live_gravity'],'source-fixed-parent-raw-f603-with-sampled-si-fallback-v1')
+        self.assertFalse(current['original_per_frame_dynamics'])
+        del self.archive.entries['assets/data/ffe_galactic_map.json']
+        with self.assertRaisesRegex(AssertionError,'Full runtime JSON differs.*ffe_galactic_map'):
+            verifier.verify_source_full_runtime(self.archive,PROJECT,36)
+
+    def test_missing_each_navigation_runtime_module_rejects(self):
+        for name in verifier.NAVIGATION_MODULES:
+            with self.subTest(module=name):
+                archive=MockArchive();del archive.entries[f'assets/scripts/{name}.gdc']
+                with self.assertRaisesRegex(AssertionError,'Missing navigation runtime module '+name):
+                    verifier.verify_navigation_runtime(archive,PROJECT)
+
+    def test_invalid_navigation_compiled_header_rejects(self):
+        for name in ['galactic_map_view','source_motion_bridge','source_frame_kinematics']:
+            with self.subTest(module=name):
+                archive=MockArchive();archive.entries[f'assets/scripts/{name}.gdc']=b'not-GDSC'+b'x'*100
+                with self.assertRaisesRegex(AssertionError,'Invalid compiled navigation runtime module '+name):
+                    verifier.verify_navigation_runtime(archive,PROJECT)
+
+    def test_navigation_map_json_missing_or_changed_rejects(self):
+        path='assets/data/ffe_galactic_map.json'
+        for mutation in ['missing','changed']:
+            with self.subTest(mutation=mutation):
+                archive=MockArchive()
+                if mutation=='missing':del archive.entries[path]
+                else:archive.entries[path]+=b'\n'
+                with self.assertRaisesRegex(AssertionError,'Navigation map JSON differs'):
+                    verifier.verify_navigation_runtime(archive,PROJECT)
+
+    def test_galactic_map_without_jump_consumer_rejects(self):
+        with tempfile.TemporaryDirectory() as directory:
+            project=self.navigation_project(directory,{'main':[('view.jump_requested.connect','view.unconnected_jump_requested.connect')]})
+            with self.assertRaisesRegex(AssertionError,'Graphical galactic map is not connected'):
+                verifier.verify_navigation_runtime(self.archive,project)
+
+    def test_system_map_without_travel_consumer_rejects(self):
+        with tempfile.TemporaryDirectory() as directory:
+            project=self.navigation_project(directory,{'main':[('view.travel_requested.connect','view.unconnected_travel_requested.connect')]})
+            with self.assertRaisesRegex(AssertionError,'Graphical system map is not connected'):
+                verifier.verify_navigation_runtime(self.archive,project)
+
+    def test_time_scheduler_without_step_acknowledgement_rejects(self):
+        with tempfile.TemporaryDirectory() as directory:
+            project=self.navigation_project(directory,{'main':[('flight_time.finish_frame(','flight_time.skip_acknowledgement(')]})
+            with self.assertRaisesRegex(AssertionError,'Bounded time controller is not connected'):
+                verifier.verify_navigation_runtime(self.archive,project)
+
+    def test_unproven_high_time_rates_reject(self):
+        with tempfile.TemporaryDirectory() as directory:
+            project=self.navigation_project(directory,{'flight_time_controller':[('MAX_IMPLEMENTED_RATE:=100','MAX_IMPLEMENTED_RATE:=10000')]})
+            with self.assertRaisesRegex(AssertionError,'Unsupported time rates must remain disabled'):
+                verifier.verify_navigation_runtime(self.archive,project)
+
+    def test_source_motion_scope_cannot_silently_include_ports(self):
+        with tempfile.TemporaryDirectory() as directory:
+            project=self.navigation_project(directory,{'source_motion_bridge':[('"station_available"','"ignored_station_available"')]})
+            with self.assertRaisesRegex(AssertionError,'Source motion bridge lost an explicit scope guard'):
+                verifier.verify_navigation_runtime(self.archive,project)
+
+    def test_old_saves_cannot_silently_enable_raw_motion(self):
+        with tempfile.TemporaryDirectory() as directory:
+            project=self.navigation_project(directory,{'main':[('candidate_motion_enabled:=false','candidate_motion_enabled:=true')]})
+            with self.assertRaisesRegex(AssertionError,'Old saves must keep the previous path'):
+                verifier.verify_navigation_runtime(self.archive,project)
+
+    def test_active_motion_cannot_restore_only_rounded_json_clock(self):
+        with tempfile.TemporaryDirectory() as directory:
+            project=self.navigation_project(directory,{'main':[('candidate_nav.elapsed_days=candidate_motion.elapsed_days()','candidate_nav.elapsed_days=candidate_nav.elapsed_days')]})
+            with self.assertRaisesRegex(AssertionError,'Validated active raw motion must restore its exact saved clock'):
+                verifier.verify_navigation_runtime(self.archive,project)
+
+    def test_source_motion_kernel_without_main_consumer_rejects(self):
+        with tempfile.TemporaryDirectory() as directory:
+            project=self.navigation_project(directory,{'main':[('source_motion.step(','source_motion.unconsumed_step(')]})
+            with self.assertRaisesRegex(AssertionError,'Source motion bridge is not connected'):
+                verifier.verify_navigation_runtime(self.archive,project)
+
+    def test_source_motion_requires_saved_session_enable_gate(self):
+        with tempfile.TemporaryDirectory() as directory:
+            project=self.navigation_project(directory,{'main':[('not source_motion_enabled or ','')]})
+            with self.assertRaisesRegex(AssertionError,'Source motion must respect the saved session enable gate'):
+                verifier.verify_navigation_runtime(self.archive,project)
+
+    def test_legacy_new_game_cannot_enable_raw_motion_by_default(self):
+        with tempfile.TemporaryDirectory() as directory:
+            project=self.navigation_project(directory,{'main':[('source_motion_enabled=layout==World.FULL_LAYOUT','source_motion_enabled=true')]})
+            with self.assertRaisesRegex(AssertionError,'Only new FULL sessions'):
+                verifier.verify_navigation_runtime(self.archive,project)
+
+    def test_wrong_motion_native_provenance_rejects(self):
+        with tempfile.TemporaryDirectory() as directory:
+            project=self.navigation_project(directory)
+            path=project/'tests/fixtures/source_motion_native.json';fixture=json.loads(path.read_text());fixture['source_assembly_sha256']='0'*64;path.write_text(json.dumps(fixture))
+            with self.assertRaisesRegex(AssertionError,'Wrong navigation native reference provenance'):
+                verifier.verify_navigation_runtime(self.archive,project)
 
 if __name__=='__main__':unittest.main()

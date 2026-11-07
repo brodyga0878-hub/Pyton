@@ -36,7 +36,7 @@ static func _clear(ship:RefCounted,nav:RefCounted,full:bool)->void:
 static func _result(ok:bool,active:bool,handled:bool,status:String)->Dictionary:
 	return {"ok":ok,"active":active,"handled":handled,"status":status,"contract":CONTRACT}
 
-static func configure_flight(ship:RefCounted,world:RefCounted,nav:RefCounted)->Dictionary:
+static func configure_flight(ship:RefCounted,world:RefCounted,nav:RefCounted,step_seconds:=0.0)->Dictionary:
 	var full:bool=world!=null and world.get("layout_mode")==FULL_LAYOUT
 	if ship==null or world==null or nav==null or not ship.has_method("clear_source_station") or not ship.has_method("configure_source_station") or not nav.has_method("set_source_port_available"):
 		_clear(ship,nav,full);return _result(false,false,full,"invalid_models")
@@ -67,7 +67,7 @@ static func configure_flight(ship:RefCounted,world:RefCounted,nav:RefCounted)->D
 	var basis:Variant=world.source_station_basis(float(nav.elapsed_days))
 	if not geometry is Dictionary or not basis is Basis or geometry.is_empty() or not _whole(geometry.get("model_index"),65535) or not _whole(geometry.get("source_seed"),0xffffffff):
 		_clear(ship,nav,true);return _result(false,false,true,"invalid_source_geometry")
-	if int(geometry.model_index)!=int(raw.decode_u16(12)) or int(geometry.source_seed)!=int(raw.decode_u32(4)) or not ship.configure_source_station(geometry,basis):
+	if int(geometry.model_index)!=int(raw.decode_u16(12)) or int(geometry.source_seed)!=int(raw.decode_u32(4)) or not ship.configure_source_station(geometry,basis,step_seconds):
 		_clear(ship,nav,true);return _result(false,false,true,"invalid_source_geometry")
 	ship.station_available=true;nav.set_source_port_available(true)
 	var result:=_result(true,true,true,"configured")
@@ -82,7 +82,7 @@ static func refresh(ship:RefCounted,world:RefCounted,nav:RefCounted,dt:Variant)-
 		_clear(ship,nav,true);return _result(false,false,true,"invalid_step")
 	if not world.advance_station(float(dt),float(nav.elapsed_days)):
 		_clear(ship,nav,true);return _result(false,false,true,"station_step_failed")
-	return configure_flight(ship,world,nav)
+	return configure_flight(ship,world,nav,float(dt))
 
 static func restore_flight(world:RefCounted,nav:RefCounted,data:Dictionary)->Dictionary:
 	# The supplied World and Navigation are already restored isolated candidates.

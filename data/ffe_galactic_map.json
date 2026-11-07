@@ -1,0 +1,635 @@
+{
+  "schema": 1,
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_data_sha256": "34219c91c5d019440ebf4fc707711a32c5080123ede05cf4d10a27d41f770850",
+  "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+  "scope": "Exact original overview density-to-palette indices, low grayscale palette and F846 landmark records; no full graphical-renderer claim.",
+  "source_blocks": [
+    {
+      "first_label": 6821,
+      "exclusive_end_label": 6822,
+      "executable_offset": 849020,
+      "bytes": 256,
+      "sha256": "6078def153120d68cdd56738615176d192afa1ac27ccdc7dae30c8d9e132ddd6",
+      "matches_source_bytes": true
+    },
+    {
+      "first_label": 7769,
+      "exclusive_end_label": 7770,
+      "executable_offset": 963984,
+      "bytes": 384,
+      "sha256": "79fc5dd2e848ba8c8edad4955f3a863153a95a215a492b0e9a8b4e3ff5fbdab2",
+      "matches_source_bytes": true
+    },
+    {
+      "first_label": 6812,
+      "exclusive_end_label": 6816,
+      "executable_offset": 848544,
+      "bytes": 240,
+      "sha256": "ad0feb1b7b071299819d6ed08dd95eea22ad865e60b74d471b42b74906512297",
+      "matches_source_bytes": true
+    }
+  ],
+  "display_sector_offset_raw": [
+    5912,
+    5412
+  ],
+  "source_overview_pixels": [
+    320,
+    158
+  ],
+  "overview_scale_min": 1,
+  "overview_scale_max": 255,
+  "overview_density_ignores_handcrafted_count_override": true,
+  "overview_density_scaling": "F853 scale1..15 uses factor65535-(((16-scale)*random_multiplier)>>5); scale16..255 returns the bilinear field directly. Both paths skip handmade sector count overrides.",
+  "overview_palette_indices": [
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    3,
+    3,
+    3,
+    3,
+    4,
+    4,
+    4,
+    4,
+    5,
+    5,
+    5,
+    5,
+    6,
+    6,
+    6,
+    6,
+    7,
+    7,
+    7,
+    7,
+    8,
+    8,
+    8,
+    9,
+    9,
+    9,
+    10,
+    10,
+    10,
+    11,
+    11,
+    11,
+    12,
+    12,
+    12,
+    13,
+    13,
+    13,
+    13,
+    14,
+    14,
+    14,
+    14,
+    14,
+    15,
+    15,
+    15,
+    15,
+    15,
+    15,
+    15,
+    15
+  ],
+  "overview_palette_rgb6": [
+    [
+      0,
+      0,
+      0
+    ],
+    [
+      4,
+      4,
+      4
+    ],
+    [
+      8,
+      8,
+      8
+    ],
+    [
+      12,
+      12,
+      12
+    ],
+    [
+      16,
+      16,
+      16
+    ],
+    [
+      20,
+      20,
+      20
+    ],
+    [
+      24,
+      24,
+      24
+    ],
+    [
+      28,
+      28,
+      28
+    ],
+    [
+      32,
+      32,
+      32
+    ],
+    [
+      36,
+      36,
+      36
+    ],
+    [
+      40,
+      40,
+      40
+    ],
+    [
+      44,
+      44,
+      44
+    ],
+    [
+      48,
+      48,
+      48
+    ],
+    [
+      52,
+      52,
+      52
+    ],
+    [
+      56,
+      56,
+      56
+    ],
+    [
+      60,
+      60,
+      60
+    ]
+  ],
+  "overview_rgb_policy": "sdl_component_shift_left2",
+  "density_palette_indices": [
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    3,
+    3,
+    3,
+    3,
+    4,
+    4,
+    4,
+    4,
+    5,
+    5,
+    5,
+    5,
+    6,
+    6,
+    6,
+    6,
+    7,
+    7,
+    7,
+    7,
+    8,
+    8,
+    8,
+    9,
+    9,
+    9,
+    10,
+    10,
+    10,
+    11,
+    11,
+    11,
+    12,
+    12,
+    12,
+    13,
+    13,
+    13,
+    13,
+    14,
+    14,
+    14,
+    14,
+    14,
+    15,
+    15,
+    15,
+    15,
+    15,
+    15,
+    15,
+    15
+  ],
+  "low_palette_rgb6": [
+    [
+      0,
+      0,
+      0
+    ],
+    [
+      4,
+      4,
+      4
+    ],
+    [
+      8,
+      8,
+      8
+    ],
+    [
+      12,
+      12,
+      12
+    ],
+    [
+      16,
+      16,
+      16
+    ],
+    [
+      20,
+      20,
+      20
+    ],
+    [
+      24,
+      24,
+      24
+    ],
+    [
+      28,
+      28,
+      28
+    ],
+    [
+      32,
+      32,
+      32
+    ],
+    [
+      36,
+      36,
+      36
+    ],
+    [
+      40,
+      40,
+      40
+    ],
+    [
+      44,
+      44,
+      44
+    ],
+    [
+      48,
+      48,
+      48
+    ],
+    [
+      52,
+      52,
+      52
+    ],
+    [
+      56,
+      56,
+      56
+    ],
+    [
+      60,
+      60,
+      60
+    ]
+  ],
+  "low_palette_rgb8_nominal_sdl_shift2": [
+    [
+      0,
+      0,
+      0
+    ],
+    [
+      16,
+      16,
+      16
+    ],
+    [
+      32,
+      32,
+      32
+    ],
+    [
+      48,
+      48,
+      48
+    ],
+    [
+      64,
+      64,
+      64
+    ],
+    [
+      80,
+      80,
+      80
+    ],
+    [
+      96,
+      96,
+      96
+    ],
+    [
+      112,
+      112,
+      112
+    ],
+    [
+      128,
+      128,
+      128
+    ],
+    [
+      144,
+      144,
+      144
+    ],
+    [
+      160,
+      160,
+      160
+    ],
+    [
+      176,
+      176,
+      176
+    ],
+    [
+      192,
+      192,
+      192
+    ],
+    [
+      208,
+      208,
+      208
+    ],
+    [
+      224,
+      224,
+      224
+    ],
+    [
+      240,
+      240,
+      240
+    ]
+  ],
+  "low_palette_rgb8_screenshot_bit_replication": [
+    [
+      0,
+      0,
+      0
+    ],
+    [
+      16,
+      16,
+      16
+    ],
+    [
+      32,
+      32,
+      32
+    ],
+    [
+      48,
+      48,
+      48
+    ],
+    [
+      65,
+      65,
+      65
+    ],
+    [
+      81,
+      81,
+      81
+    ],
+    [
+      97,
+      97,
+      97
+    ],
+    [
+      113,
+      113,
+      113
+    ],
+    [
+      130,
+      130,
+      130
+    ],
+    [
+      146,
+      146,
+      146
+    ],
+    [
+      162,
+      162,
+      162
+    ],
+    [
+      178,
+      178,
+      178
+    ],
+    [
+      195,
+      195,
+      195
+    ],
+    [
+      211,
+      211,
+      211
+    ],
+    [
+      227,
+      227,
+      227
+    ],
+    [
+      243,
+      243,
+      243
+    ]
+  ],
+  "palette_policy": "Nominal SDL VideoSetPalValue with identity gamma uses RGB6<<2. Screenshot F1448 uses bit replication. Gamma/display calibration is not inferred.",
+  "landmarks": [
+    {
+      "visible_above_scale": 40,
+      "sector_raw": [
+        3328,
+        7168
+      ],
+      "ffcode": 33960,
+      "name_en": "Major Arm",
+      "name_ru": "Главный рукав"
+    },
+    {
+      "visible_above_scale": 40,
+      "sector_raw": [
+        6656,
+        4096
+      ],
+      "ffcode": 33961,
+      "name_en": "Perseus Arm",
+      "name_ru": "Рукав Персея"
+    },
+    {
+      "visible_above_scale": 40,
+      "sector_raw": [
+        -512,
+        3328
+      ],
+      "ffcode": 33962,
+      "name_en": "Intermediate Arm",
+      "name_ru": "Промежуточный рукав"
+    },
+    {
+      "visible_above_scale": 40,
+      "sector_raw": [
+        4096,
+        1280
+      ],
+      "ffcode": 33963,
+      "name_en": "Norma Arm",
+      "name_ru": "Рукав Наугольника"
+    },
+    {
+      "visible_above_scale": 16,
+      "sector_raw": [
+        5912,
+        5412
+      ],
+      "ffcode": 33793
+    },
+    {
+      "visible_above_scale": 7,
+      "sector_raw": [
+        5912,
+        5488
+      ],
+      "ffcode": 33889
+    },
+    {
+      "visible_above_scale": 6,
+      "sector_raw": [
+        6004,
+        5418
+      ],
+      "ffcode": 33881
+    },
+    {
+      "visible_above_scale": 4,
+      "sector_raw": [
+        5766,
+        5497
+      ],
+      "ffcode": 33890
+    },
+    {
+      "visible_above_scale": 4,
+      "sector_raw": [
+        5944,
+        5444
+      ],
+      "ffcode": 33964,
+      "name_en": "Pleiades",
+      "name_ru": "Плеяды"
+    },
+    {
+      "visible_above_scale": 3,
+      "sector_raw": [
+        5873,
+        5378
+      ],
+      "ffcode": 33879
+    },
+    {
+      "visible_above_scale": 1,
+      "sector_raw": [
+        5840,
+        5450
+      ],
+      "ffcode": 33965,
+      "name_en": "Dumbell Nebula",
+      "name_ru": "Туманность Гантель"
+    },
+    {
+      "visible_above_scale": 1,
+      "sector_raw": [
+        5906,
+        5372
+      ],
+      "ffcode": 33878
+    },
+    {
+      "visible_above_scale": 1,
+      "sector_raw": [
+        5971,
+        5426
+      ],
+      "ffcode": 33880
+    },
+    {
+      "visible_above_scale": 1,
+      "sector_raw": [
+        5908,
+        5395
+      ],
+      "ffcode": 33877
+    }
+  ],
+  "landmark_name_policy": "Only six literal arm/nebula names decoded; other FF codes must use the original system/name provider, not guessed labels."
+}

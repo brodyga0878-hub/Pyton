@@ -44,6 +44,16 @@ class Suite:
 
 
 SUITES = [
+    Suite('navigation_main', 'tests/test_navigation_main.gd', 'Actual Main graphical map selection/confirmation, forecast isolation, raw save continuation, phone roll, clock scheduling and legacy opt-in boundaries.', timeout=600, user_args=('--rebuild-capture',)),
+    Suite('galactic_map_model', 'tests/test_galactic_map_model.gd', 'Original F853 galaxy overview, source sectors/search/distance and independent native density controls.', timeout=300),
+    Suite('galactic_map_view', 'tests/test_galactic_map_view.gd', 'Actual galaxy screen worker lifecycle, pan/zoom/search, touch and explicit jump confirmation.', timeout=300),
+    Suite('system_map', 'tests/test_system_map.gd', 'Original system hierarchy, sampled source orbits, isolated time forecast, moving ports and graphical map controls.', timeout=600),
+    Suite('flight_time_controller', 'tests/test_flight_time_controller.gd', 'Original timer control native references plus bounded nominal-SI scheduler, safety and exact executed-step acknowledgement.', timeout=300),
+    Suite('rotating_dock_dynamics', 'tests/test_rotating_dock_dynamics.gd', 'Actual station rotation, relative contact velocity, conservative angular CCD, source docking and legacy restore.', timeout=300),
+    Suite('source_motion_pipeline', 'tests/test_source_motion_pipeline.gd', 'Original F598..F603/F607/F1512 persistent raw body and Q16 fraction transitions against independent native cases.', timeout=300),
+    Suite('source_motion_bridge', 'tests/test_source_motion_bridge.gd', 'Fixed natural-parent Cobra raw motion SI boundary, precise fractional continuation and strict restore; excludes automatic frame selection.', timeout=300),
+    Suite('source_motion_main_continuation', 'tests/test_source_motion_main_continuation.gd', 'Actual Main three rotated savepoints retain exact next raw body, Q16 fraction, IEEE64 clock, ship pose and velocity.', timeout=300, user_args=('--rebuild-capture',)),
+    Suite('source_frame_kinematics', 'tests/test_source_frame_kinematics.gd', 'Standalone original F572/F573 integer rotating-frame primitives versus720 native cases; not automatic F570/F606 frame selection.', timeout=300),
     Suite('classic_console_main', 'tests/test_classic_console_main.gd', 'Actual Main console hooks, principal cameras, session pause, independent fingers, offpad takeoff and pending-jump/save boundaries.', timeout=300, user_args=('--rebuild-capture',)),
     Suite('source_console_pause', 'tests/test_source_console_pause.gd', 'Actual Worldv4 pending terrain worker publication is deferred during console pause and resumes without losing physical contact.', timeout=600, user_args=('--rebuild-capture',)),
     Suite('source_mining_machine', 'tests/test_source_mining_machine.gd', 'Standalone original MB4 weekly/loading transitions versus independently executed native controls; deployment and gameplay inventory integration remain future work.', timeout=300),

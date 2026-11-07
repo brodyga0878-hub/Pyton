@@ -6,6 +6,7 @@ const Catalog = preload("res://scripts/ship_catalog.gd")
 var catalog := Catalog.new()
 const EconomyCatalog = preload("res://scripts/economy_catalog.gd")
 const SourceStation = preload("res://scripts/source_station_geometry.gd")
+const RotatingDock=preload("res://scripts/rotating_dock_dynamics.gd")
 const SOURCE_PILOT_PROFILE:="source-bay-phone-pilot-v1"
 const SourceControlProfile=preload("res://scripts/source_ship_control_profile.gd")
 var source_motion_profile:=false # Derived from World v4, never trusted from a save.
@@ -46,21 +47,47 @@ var _source_basis:=Basis.IDENTITY
 var _source_pilot_phase:=""
 var _source_clear_key:=""
 var _source_clear:=false
+var _source_previous_basis:=Basis.IDENTITY
+var _source_step_seconds:=0.0
+var _source_motion_pending:=false
+var _source_angular_velocity:=Vector3.ZERO
+var _source_ship_angular_velocity:=Vector3.ZERO
+var _source_rate_sample_valid:=false
+var _source_last_collision:Dictionary={}
 
 func has_source_station()->bool:return not _source_station.is_empty()
 
-func configure_source_station(geometry:Dictionary,basis:Basis)->bool:
+func configure_source_station(geometry:Dictionary,basis:Basis,step_seconds:=0.0)->bool:
+	if not is_finite(step_seconds) or step_seconds<0:return false
 	if not geometry.get("ok") is bool or not geometry.get("revision") is String:return false
 	if not SourceStation._valid_geometry(geometry) or int(geometry.get("model_index",-1)) not in SourceStation.MODELS or not basis.is_finite():return false
 	if not SourceStation._u32(geometry.get("source_seed")) or not SourceStation._u16(geometry.get("door_u16")) or not geometry.get("descriptor_sha256") is String or str(geometry.descriptor_sha256).length()!=64 or not geometry.get("cache_key") is String or not geometry.get("approach_waypoint") is Vector3 or not geometry.approach_waypoint.is_finite() or geometry.triangles.is_empty() or not geometry.bounds.position.is_finite() or not geometry.bounds.size.is_finite():return false
 	if absf(basis.determinant()-1.0)>0.001 or absf(basis.x.length_squared()-1.0)>0.001 or absf(basis.y.length_squared()-1.0)>0.001 or absf(basis.z.length_squared()-1.0)>0.001 or absf(basis.x.dot(basis.y))>0.001 or absf(basis.x.dot(basis.z))>0.001 or absf(basis.y.dot(basis.z))>0.001:return false
-	if not has_source_station() or int(_source_station.model_index)!=int(geometry.model_index) or int(_source_station.source_seed)!=int(geometry.source_seed):_source_pilot_phase=""
+	var same_identity:bool=has_source_station() and int(_source_station.model_index)==int(geometry.model_index) and int(_source_station.source_seed)==int(geometry.source_seed) and str(_source_station.descriptor_sha256)==str(geometry.descriptor_sha256)
+	if not same_identity:_source_pilot_phase=""
+	_source_previous_basis=_source_basis if same_identity and step_seconds>0 else basis
+	_source_step_seconds=step_seconds if same_identity else 0.0
+	_source_rate_sample_valid=_source_step_seconds>0
+	_source_motion_pending=_source_rate_sample_valid
+	var motion:=RotatingDock.sample(_source_previous_basis,basis,_source_step_seconds)
+	_source_angular_velocity=motion.get("angular_velocity_world_rad_s",Vector3.ZERO)
+	if not same_identity:_source_ship_angular_velocity=Vector3.ZERO;_source_last_collision={}
 	_source_station=geometry;_source_basis=basis
-	if docked:position=STATION;velocity=Vector3.ZERO;attitude=basis.get_rotation_quaternion().normalized()
+	if docked:position=STATION;velocity=Vector3.ZERO;attitude=basis.get_rotation_quaternion().normalized();_source_ship_angular_velocity=_source_angular_velocity
 	return true
 
 func clear_source_station()->void:
 	_source_station={};_source_basis=Basis.IDENTITY;_source_pilot_phase="";_source_clear_key=""
+	_source_previous_basis=Basis.IDENTITY;_source_step_seconds=0;_source_motion_pending=false;_source_angular_velocity=Vector3.ZERO;_source_ship_angular_velocity=Vector3.ZERO;_source_rate_sample_valid=false;_source_last_collision={}
+
+func source_docking_telemetry()->Dictionary:
+	if not has_source_station():return {}
+	var result:=RotatingDock.telemetry(_source_basis,_source_angular_velocity,position,velocity,attitude,_source_ship_angular_velocity,STATION,_source_rate_sample_valid)
+	result["last_collision"]=_source_last_collision.duplicate(true)
+	return result
+
+func _source_relative_velocity(point:Vector3,linear_velocity:Vector3)->Vector3:
+	return _source_basis.transposed()*(linear_velocity-RotatingDock.surface_velocity(_source_angular_velocity,point,STATION))
 
 func _source_approach_clear()->bool:
 	var key:="%s:%s"%[str(_source_station.get("cache_key","")),ship_id]
@@ -77,25 +104,33 @@ func source_collision_radii(id:String="")->Vector3:
 
 func _source_local(point:Vector3)->Vector3:return _source_basis.transposed()*(point-STATION)
 
-func _source_shape_sweep(start:Vector3,finish:Vector3,rotation:Quaternion,id:String="")->Dictionary:
-	var radii:=source_collision_radii(id)
+func _source_shape_sweep(start:Vector3,finish:Vector3,rotation:Quaternion,id:String="",basis_override:Variant=null,radii_scale:=1.0)->Dictionary:
+	if not is_finite(radii_scale) or radii_scale<1:return {}
+	var radii:=source_collision_radii(id)*radii_scale
 	if radii==Vector3.ZERO:return {}
 	var broad:=AABB(start.min(finish),start.max(finish)-start.min(finish)).grow(maxf(radii.x,maxf(radii.y,radii.z)))
 	if not broad.intersects(_source_station.bounds):return {}
-	var local_basis:=_source_basis.transposed()*Basis(rotation.normalized())
+	var station_basis:Basis=basis_override if basis_override is Basis else _source_basis
+	var local_basis:=station_basis.transposed()*Basis(rotation.normalized())
 	# Horizontal radii are equal. Yaw does not change this ellipsoid, whereas
 	# roll/pitch need the actual oriented triangle transform, not a thin fixed Y.
-	if absf(local_basis.y.dot(Vector3.UP))>0.999999:return SourceStation.sweep(_source_station,start,finish,radii)
-	var inverse:=local_basis.transposed();var transformed:=_source_station.duplicate();var triangles:Array=[];var boxes:Array=[];var bounds:=AABB();var first:=true
-	for triangle:Array in _source_station.triangles:
+	if absf(local_basis.y.x)<=0.00000001 and absf(local_basis.y.z)<=0.00000001 and absf(absf(local_basis.y.y)-1.0)<=0.0000001:return SourceStation.sweep(_source_station,start,finish,radii)
+	var inverse:=local_basis.transposed();var transformed:=_source_station.duplicate();var triangles:Array=[];var boxes:Array=[];var bounds:=AABB();var first:=true;var original_indices:Array[int]=[]
+	# Rotation does not make the hull exceed its maximum-radius capsule. Reject
+	# remote source faces before transforming vertices; the outer waypoint can
+	# otherwise rebuild thousands of irrelevant triangles at each pose sample.
+	for index in range(_source_station.triangles.size()):
+		if not broad.intersects(_source_station.triangle_bounds[index].grow(0.003)):continue
+		var triangle:Array=_source_station.triangles[index]
 		var vertices:Array[Vector3]=[]
 		for point:Vector3 in triangle:vertices.append(inverse*point)
 		var box:=AABB(vertices[0],Vector3.ZERO)
 		for point:Vector3 in vertices:box=box.expand(point)
-		triangles.append(vertices);boxes.append(box);bounds=box if first else bounds.merge(box);first=false
+		triangles.append(vertices);boxes.append(box);original_indices.append(index);bounds=box if first else bounds.merge(box);first=false
+	if triangles.is_empty():return {}
 	transformed.triangles=triangles;transformed.triangle_bounds=boxes;transformed.bounds=bounds
 	var hit:=SourceStation.sweep(transformed,inverse*start,inverse*finish,radii)
-	if not hit.is_empty():hit.position=local_basis*hit.position;hit.normal=local_basis*hit.normal
+	if not hit.is_empty():hit.position=local_basis*hit.position;hit.normal=local_basis*hit.normal;hit.triangle_index=original_indices[int(hit.triangle_index)]
 	return hit
 
 func source_dock_pose_valid(candidate_position:Vector3,candidate_velocity:Vector3,candidate_attitude:Quaternion,candidate_id:String="")->bool:
@@ -108,9 +143,19 @@ func source_dock_pose_valid(candidate_position:Vector3,candidate_velocity:Vector
 	# interior pose against the open bay contract and the ACTUAL current solids.
 	var open_geometry:=_source_station if int(_source_station.door_u16)==0 else SourceStation.prepare(int(_source_station.model_index),int(_source_station.source_seed),0)
 	var point:=_source_local(candidate_position)
-	return SourceStation.mobile_dock_ready(open_geometry,point,_source_basis.transposed()*candidate_velocity,-local_basis.z,local_basis.y,fitted) and _source_shape_sweep(point,point,candidate_attitude,candidate_id).is_empty()
+	return SourceStation.mobile_dock_ready(open_geometry,point,_source_relative_velocity(candidate_position,candidate_velocity),-local_basis.z,local_basis.y,fitted) and _source_shape_sweep(point,point,candidate_attitude,candidate_id).is_empty()
 
-func _source_collide(previous:Vector3)->void:
+func _source_rotating_sweep_local(start:Vector3,finish:Vector3,rotation:Quaternion,basis:Basis,scale:float)->Dictionary:
+	return _source_shape_sweep(start,finish,rotation,"",basis,scale)
+
+func _source_collide(previous:Vector3,previous_attitude:Quaternion)->void:
+	if _source_motion_pending:
+		var station_angle:=RotatingDock.angular_displacement(_source_previous_basis.get_rotation_quaternion(),_source_basis.get_rotation_quaternion()).length()
+		var ship_angle:=RotatingDock.angular_displacement(previous_attitude,attitude).length()
+		if station_angle+ship_angle>0.00000001:
+			var rotating_hit:=RotatingDock.sweep(_source_rotating_sweep_local,previous,position,previous_attitude,attitude,_source_previous_basis,_source_basis,STATION,source_collision_radii())
+			if not rotating_hit.is_empty():_source_rotating_contact(rotating_hit)
+			return
 	var hit:=_source_shape_sweep(_source_local(previous),_source_local(position),attitude)
 	if hit.is_empty():return
 	var normal:Vector3=(_source_basis*hit.normal).normalized();var speed:=velocity.length()
@@ -120,6 +165,31 @@ func _source_collide(previous:Vector3)->void:
 	if speed>DOCK_SPEED:hull=maxf(0.0,hull-speed*0.15)
 	target_speed=0.0;autopilot=false;_source_pilot_phase=""
 	last_notice="Столкновение с корпусом станции. Выровняйте корабль по проёму."
+
+func _source_rotating_contact(hit:Dictionary)->void:
+	var normal:Vector3=(_source_basis*hit.normal).normalized()
+	# A contact point belongs to the source solid. Carry its separated centre
+	# through the remainder of this sampled rigid rotation instead of leaving
+	# it behind a wall that continued moving after the time of impact.
+	position=STATION+_source_basis*hit.position+normal*0.02
+	for iteration in range(6):
+		var point:=_source_local(position)
+		var overlap:=_source_shape_sweep(point,point,attitude)
+		if overlap.is_empty():break
+		normal=(_source_basis*overlap.normal).normalized();position=STATION+_source_basis*overlap.position+normal*0.02
+	# Linear contact velocity is evaluated at the hull support point, not its
+	# centre. A rotating wall can strike an otherwise stationary ship.
+	var support:=RotatingDock.support_offset(source_collision_radii(),attitude,-normal)
+	var contact_point:=position+support
+	var wall_velocity:=RotatingDock.surface_velocity(_source_angular_velocity,contact_point,STATION)
+	var relative:=velocity+_source_ship_angular_velocity.cross(support)-wall_velocity
+	var inward:=relative.dot(normal)
+	if inward<0:velocity-=normal*inward*1.2
+	var impact_speed:=maxf(0,-inward)
+	if impact_speed>DOCK_SPEED:hull=maxf(0,hull-impact_speed*0.15)
+	target_speed=0;autopilot=false;_source_pilot_phase=""
+	_source_last_collision={"profile":RotatingDock.PROFILE,"time":float(hit.time),"segments":int(hit.segments),"center_error_bound_m":float(hit.center_error_bound_m),"shape_error_bound_m":float(hit.shape_error_bound_m),"ellipsoid_scale":float(hit.ellipsoid_scale),"relative_normal_speed_mps":impact_speed,"station_surface_velocity_mps":wall_velocity,"contact_point_m":contact_point,"relative_contact_velocity_mps":relative}
+	last_notice="Контакт с вращающимся корпусом станции. Выровняйте курс и крен."
 
 func _source_autopilot_step(dt:float,gravity:Vector3)->bool:
 	if can_dock():dock();return true
@@ -189,6 +259,7 @@ func step(dt: float, steering: Vector2, roll: float = 0.0, gravity := Vector3.ZE
 	if not position.is_finite() or not velocity.is_finite() or not attitude.is_finite() or attitude.length_squared()<0.0001 or not is_finite(target_speed) or not is_finite(hull) or profile().is_empty():return
 	if docked or hull<=0:
 		return
+	var previous_attitude:=attitude
 	steering=steering.limit_length();roll=clampf(roll,-1,1)
 	target_speed=clampf(target_speed,-100.0,MAX_SPEED)
 	if not station_available or surface_mode or combat_active: autopilot = false
@@ -223,7 +294,9 @@ func step(dt: float, steering: Vector2, roll: float = 0.0, gravity := Vector3.ZE
 	var previous:=position
 	position += velocity * dt
 	if has_source_station():
-		if station_available and not surface_mode:_source_collide(previous)
+		_source_ship_angular_velocity=RotatingDock.angular_displacement(previous_attitude,attitude)/dt
+		if station_available and not surface_mode:_source_collide(previous,previous_attitude)
+		_source_motion_pending=false
 		return
 	var movement:=position-previous
 	var fraction:=clampf((STATION-previous).dot(movement)/movement.length_squared(),0,1) if movement.length_squared()>0.001 else 0.0
@@ -253,7 +326,7 @@ func dock() -> bool:
 	autopilot = false
 	velocity = Vector3.ZERO
 	target_speed = 0.0
-	if has_source_station():position=STATION;attitude=_source_basis.get_rotation_quaternion().normalized();_source_pilot_phase=""
+	if has_source_station():position=STATION;attitude=_source_basis.get_rotation_quaternion().normalized();_source_pilot_phase="";_source_ship_angular_velocity=_source_angular_velocity;_source_motion_pending=false
 	return true
 
 # New reconstruction of the missing launch/training-market section.
@@ -264,6 +337,7 @@ func launch() -> void:
 		position=STATION
 		attitude=Basis.looking_at(_source_basis.z,_source_basis.y).get_rotation_quaternion().normalized()
 		velocity=_source_basis.z*DOCK_SPEED;target_speed=DOCK_SPEED;docked=false;autopilot=false;assisted=true;_source_pilot_phase=""
+		_source_motion_pending=false;_source_ship_angular_velocity=Vector3.ZERO
 		last_notice="Вылет выполнен через открытый проём. Корабль отходит от станции."
 		return
 	var away:Vector3=(position-STATION).normalized()
@@ -405,6 +479,7 @@ func restore(data: Dictionary) -> bool:
 	autopilot=false;surface_mode=false;combat_active=false;station_available=true;source_motion_profile=false
 	shots=0;last_notice=""
 	_source_pilot_phase=""
+	_source_motion_pending=false;_source_step_seconds=0;_source_rate_sample_valid=false;_source_angular_velocity=Vector3.ZERO;_source_ship_angular_velocity=Vector3.ZERO;_source_previous_basis=_source_basis;_source_last_collision={}
 	return true
 
 
