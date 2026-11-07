@@ -3,7 +3,7 @@
 Ветка `development/starfrontier-rebuild` содержит **новую запускаемую основу** нативного Android-проекта на Godot 4.6.3. Она собрана из частично восстановленных исторических модулей, повторно извлечённых исходных данных FFE и заново написанного недостающего кода. Полный прежний проект и APK версии 0.10.8 не найдены.
 
 
-Текущий кандидат — **0.16.0-fuel-alpha1 / code 41**:
+Текущая опубликованная сборка — **0.16.0-fuel-alpha1 / code 41**:
 [реактивное топливо, автозаправщик и топливозаборник](docs/RELEASE_0_16_0_RU.md).
 Реактивный бак отделён от грузового водорода и военного топлива. Расход
 учитывает исходные команды тяги и секундный шаг F152/F938; ручная
@@ -27,8 +27,27 @@
 условия. Это не проверка телефона или измерение FPS.
 Настоящий ARM64 APK собран и технически проверен: **49 996 985 байт**,
 SHA256 `c7b12d9f869008bd5bce9bf3615b2d2d5f72fa7ffc0d799bda537111d5d4950d`.
-Точный source ZIP, его свежий запуск и новые HTTPS-ссылки ещё готовятся.
-Ниже сохранена предыдущая публикация 0.15.0.
+Точный ZIP — **30 481 191 байт**, 1391 запись / **1238 файлов**, меньше
+32 МиБ. Исходный коммит `217c1cbf1503cd44dbc386b66cbfff4a315be6f3`. SHA256:
+`759b0ec67d958d2eaef6607b83a717e3c50387bb7c138f205f61c2e52297398c`.
+Свежий импорт и обычный изолированный запуск — **10/0**; фактический Main
+с новой топливной системой из точного ZIP — **397/0**. Все 1238 исходных
+файлов сохранили SHA; повторные проверки ZIP не прибавлены к 26 группам.
+
+[Скачать APK 0.16.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/StarFrontier-0.16.0-fuel-arm64.apk) · [Исходники 0.16.0 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/StarFrontier-0.16.0-fuel-source.zip)
+
+[Ручная заправка](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/screenshots/05-manual-refill-restored-limits.png) · [Сбор водорода у Солнца](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/screenshots/06-source-sun-hydrogen-collection.png) · [Классическая консоль](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/screenshots/08-return-classic-flight.png)
+
+Полным скачиванием проверены **12 файлов**: манифест, APK, source ZIP,
+протокол захвата и восемь PNG. HTTP 200, размеры, SHA, CRC обоих архивов
+и Git-комментарий source ZIP совпали. Вспомогательные журналы упакованы
+и хешированы, но каждый из них отдельно не скачивался. Документы внутри
+ZIP сохраняют состояние исходного коммита до удалённой публикации.
+[Проверка скачивания](validation/fuel-publication-2026-11-07/verification.json).
+
+Нативные эталоны имеют смешанное происхождение: 3182 контроля Jet
+сопоставлены с инструкциями DOS, а 729 Scoop и 330 Contact исполняют
+закреплённый JJFFE ASM. [Уточнение подписей опубликованного счётчика](validation/fuel-publication-2026-11-07/native-reference-provenance.json).
 
 Предыдущая опубликованная сборка — **0.15.0-hyperdrive-alpha1 / code 40**:
 [исходный гипердвигатель и оборудование](docs/RELEASE_0_15_0_RU.md).

@@ -4,8 +4,12 @@
 реактивный бак, ручную и автоматическую заправку из трюма, а также сбор
 водорода у подходящих звёзд и газовых гигантов. Классическая нижняя
 полётная консоль сохранена. Функциональные проверки, настоящие кадры
-Main и техническая проверка ARM64 APK завершены. Точный ZIP и новые
-HTTPS-ссылки ещё готовятся.
+Main, техническая проверка ARM64 APK и свежий запуск точного ZIP
+завершены. APK, исходники и кадры опубликованы по проверенным HTTPS-ссылкам.
+Нативные эталоны имеют смешанное происхождение: 3182 контроля Jet
+сопоставлены с инструкциями DOS, а 729 Scoop и 330 Contact исполняют
+закреплённый JJFFE ASM. [Уточнение подписей опубликованного счётчика](../validation/fuel-publication-2026-11-07/native-reference-provenance.json).
+
 Предыдущая опубликованная сборка — [0.15.0](RELEASE_0_15_0_RU.md).
 
 ## Бак, грузовое топливо и тяга
@@ -181,8 +185,27 @@ raw-motion, прежний сценарий гипердвигателя и об
 `c7b12d9f869008bd5bce9bf3615b2d2d5f72fa7ffc0d799bda537111d5d4950d`.
 SHA256 TEST-сертификата:
 `16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25`.
-Точный ZIP со свежим импортом/запуском и подтверждение HTTPS-публикации
-будут добавлены по фактическим результатам.
+Точный ZIP — **30 481 191 байт**, 1391 запись / **1238 файлов**, меньше
+32 МиБ. Исходный коммит `217c1cbf1503cd44dbc386b66cbfff4a315be6f3`. SHA256:
+`759b0ec67d958d2eaef6607b83a717e3c50387bb7c138f205f61c2e52297398c`.
+Свежий импорт и обычный изолированный запуск — **10/0**; фактический Main
+с новой топливной системой из точного ZIP — **397/0**. Все 1238 исходных
+файлов сохранили SHA; повторные проверки ZIP не прибавлены к 26 группам.
+
+[Скачать APK 0.16.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/StarFrontier-0.16.0-fuel-arm64.apk) · [Исходники 0.16.0 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/StarFrontier-0.16.0-fuel-source.zip)
+
+[Ручная заправка](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/screenshots/05-manual-refill-restored-limits.png) · [Сбор водорода у Солнца](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/screenshots/06-source-sun-hydrogen-collection.png) · [Классическая консоль](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/screenshots/08-return-classic-flight.png)
+
+Полным скачиванием проверены **12 файлов**: манифест, APK, source ZIP,
+протокол захвата и восемь PNG. HTTP 200, размеры, SHA, CRC обоих архивов
+и Git-комментарий source ZIP совпали. Вспомогательные журналы упакованы
+и хешированы, но каждый из них отдельно не скачивался. Документы внутри
+ZIP сохраняют состояние исходного коммита до удалённой публикации.
+[Свежий импорт и запуск](../validation/fuel-source-portability-2026-11-07/verification.json),
+[топливный сценарий Main из ZIP](../validation/fuel-source-portability-2026-11-07/fuel-main-feature.json),
+[проверка HTTPS](../validation/fuel-publication-2026-11-07/verification.json).
+Артефакты сохранены в коммите `e14007cba706c19e22de14c03dd59487884689f7`.
+Предыдущие опубликованные артефакты 0.15.0 сохранены без изменений.
 
 ## Оставшиеся границы
 

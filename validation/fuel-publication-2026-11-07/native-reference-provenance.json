@@ -1,0 +1,19 @@
+{
+  "schema": "starfrontier-native-reference-count-clarification-v1",
+  "created_utc": "2026-11-07T18:38:44.225771+00:00",
+  "version": "0.16.0-fuel-alpha1",
+  "artifact_commit": "e14007cba706c19e22de14c03dd59487884689f7",
+  "scope": "Clarifies a count label in the immutable packaged summary/manifest and README. No runtime, arithmetic, test result, source ZIP, APK or screenshot changes.",
+  "native_reference_case_count": 4241,
+  "DOS_instruction_matched_jet_cases": 3182,
+  "pinned_JJFFE_assembly_cases": {
+    "fuel_scoop": 729,
+    "gas_star_contact": 330
+  },
+  "contact_descriptors_from_uploaded_DOS": true,
+  "entire_contact_or_scoop_procedure_bank_byte_identity_with_DOS_proven": false,
+  "packaged_field_native_DOS_case_count_means": "Aggregate native reference cases of mixed provenance, not4241 byte-matched-DOS instruction cases.",
+  "test_conditions_and_unique_group_totals_unchanged": true,
+  "immutable_artifacts_unchanged": true,
+  "source_commit": "217c1cbf1503cd44dbc386b66cbfff4a315be6f3"
+}

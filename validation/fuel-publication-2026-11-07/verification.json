@@ -1,0 +1,108 @@
+{
+  "started_utc": "2026-11-07T18:33:20.336569+00:00",
+  "version": "0.16.0-fuel-alpha1",
+  "artifact_commit": "e14007cba706c19e22de14c03dd59487884689f7",
+  "source_commit": "217c1cbf1503cd44dbc386b66cbfff4a315be6f3",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/manifest.json",
+      "http_status": 200,
+      "bytes": 13580,
+      "sha256": "d9c6416ef1373a805095b701fcc9d4a689cd47b347daa3047bac2b70c13db7d9"
+    },
+    {
+      "file": "StarFrontier-0.16.0-fuel-arm64.apk",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/StarFrontier-0.16.0-fuel-arm64.apk",
+      "http_status": 200,
+      "bytes": 49996985,
+      "sha256": "c7b12d9f869008bd5bce9bf3615b2d2d5f72fa7ffc0d799bda537111d5d4950d",
+      "zip_crc_verified": true
+    },
+    {
+      "file": "StarFrontier-0.16.0-fuel-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/StarFrontier-0.16.0-fuel-source.zip",
+      "http_status": 200,
+      "bytes": 30481191,
+      "sha256": "759b0ec67d958d2eaef6607b83a717e3c50387bb7c138f205f61c2e52297398c",
+      "zip_crc_verified": true,
+      "source_commit_in_zip_comment": "217c1cbf1503cd44dbc386b66cbfff4a315be6f3"
+    },
+    {
+      "file": "screenshots/capture-manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/screenshots/capture-manifest.json",
+      "http_status": 200,
+      "bytes": 68546,
+      "sha256": "124e400306a363d019368757865fe1f9df6a64d2935596120082c49701445001"
+    },
+    {
+      "file": "screenshots/01-default-source-reaction-tank.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/screenshots/01-default-source-reaction-tank.png",
+      "http_status": 200,
+      "bytes": 107163,
+      "sha256": "d456d782eb832274f12d0fc0f73ca8b18b2d6515488761b7303295108078e668"
+    },
+    {
+      "file": "screenshots/02-reaction-tank-narrow.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/screenshots/02-reaction-tank-narrow.png",
+      "http_status": 200,
+      "bytes": 100814,
+      "sha256": "c2577edf72fe8a8f938f00a5ab040fd791c0077e733da699da6be565f43a845d"
+    },
+    {
+      "file": "screenshots/03-fitted-refueller-in-flight.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/screenshots/03-fitted-refueller-in-flight.png",
+      "http_status": 200,
+      "bytes": 121461,
+      "sha256": "8253375816ccc684931bb324d22f5e59851a4f6fd520f2879bad68866b14c4ad"
+    },
+    {
+      "file": "screenshots/04-empty-tank-manual-refuel.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/screenshots/04-empty-tank-manual-refuel.png",
+      "http_status": 200,
+      "bytes": 139594,
+      "sha256": "7a1cdbf2663434c584629f8d2761b3694d2cc51abe1686836f13b81d78f70f07"
+    },
+    {
+      "file": "screenshots/05-manual-refill-restored-limits.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/screenshots/05-manual-refill-restored-limits.png",
+      "http_status": 200,
+      "bytes": 125355,
+      "sha256": "7c70dab826fd8dddef4f9be386db17c6fe0b3d0276dc840b3d03150ce25638f8"
+    },
+    {
+      "file": "screenshots/06-source-sun-hydrogen-collection.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/screenshots/06-source-sun-hydrogen-collection.png",
+      "http_status": 200,
+      "bytes": 118437,
+      "sha256": "7b8a79df0ba094223a715f64d42022100a94dda18570e500d941804d76679c91"
+    },
+    {
+      "file": "screenshots/07-legacy-source-fuel-upgrade-narrow.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/screenshots/07-legacy-source-fuel-upgrade-narrow.png",
+      "http_status": 200,
+      "bytes": 107578,
+      "sha256": "3f0083bd0b9713fa8cbe32a6e3c8bde586a12a52e576c1099cb7b9210fac1a70"
+    },
+    {
+      "file": "screenshots/08-return-classic-flight.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/e14007cba706c19e22de14c03dd59487884689f7/deliverables/0.16.0-fuel-alpha1/screenshots/08-return-classic-flight.png",
+      "http_status": 200,
+      "bytes": 209896,
+      "sha256": "6f6d02f4d72ff6dec364cae9252d106ecd6fba0f16f786739d0258a16f4497e0"
+    }
+  ],
+  "status": "verified",
+  "scope": "Actual complete HTTPS downloads; immutable manifest bytes, payload SHA256/length, ZIP CRC, source archive Git comment and screenshot hashes. Not physical Android execution.",
+  "completed_utc": "2026-11-07T18:33:48.637972+00:00",
+  "immutable_urls": true,
+  "verified_payload_count": 12,
+  "all_manifest_payloads_downloaded": false,
+  "payload_scope": "Manifest, full APK, full source ZIP, capture manifest and all8 PNG. Auxiliary evidence logs/reports were packaged and hashed but were not individually downloaded.",
+  "artifact_branch": "development/starfrontier-rebuild",
+  "source_archive_fresh_import_report": "validation/fuel-source-portability-2026-11-07/verification.json",
+  "source_archive_feature_report": "validation/fuel-source-portability-2026-11-07/fuel-main-feature.json",
+  "physical_device_tested": false,
+  "full_original_port_complete": false,
+  "production_release_ready": false
+}
