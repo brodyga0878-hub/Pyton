@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "version": "0.14.0-system-info-alpha1",
+  "version_code": 39,
+  "completed_utc": "2026-11-07T15:08:19.807715+00:00",
+  "command": "python3 -m unittest discover -s tests -p *packaging.py -v",
+  "test_count": 72,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "passed": true,
+  "explicit_mock_archives_not_real_APK": true,
+  "actual_APK_verified_by_this_run": false,
+  "physical_device_tested": false,
+  "scope": "Historical strict35\u201338 contracts and new39 original/Russian resource and compiled-consumer guards; explicit negative controls for physics/save writes, information-triggered tick, corrupted projection and redirected map travel.",
+  "source_sha256": {
+    "tools/verify_rebuilt_android.py": "ad4018c8f048ba66c88aff8f1fce97855da99d721c90843a08d7e73fb2640ba2",
+    "tests/test_android_full_packaging.py": "2b99099108123b299cd1c0f613dad0f42eeb61cf2b590b2fc5de940e2fa52afb",
+    "tests/test_system_information_packaging.py": "310f91f3b0bd4ae434002546512a74426c1372dd64ee9851411c42d1ba576c63",
+    "tests/fixtures/celestial_visual_v38_sources.json": "6295c4fc2b910fa293ce4705764784311c8e8c58c3ae288c43201724d0be720a"
+  },
+  "log": "validation/system-information-2026-11-07/python-packaging-tests.log",
+  "log_sha256": "60456c32e697737cc76f526cca6b6720dda358695ea63d676ba3f0c90fff184b"
+}

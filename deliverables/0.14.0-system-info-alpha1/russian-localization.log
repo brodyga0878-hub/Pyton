@@ -1,0 +1,12 @@
+test_all_categories_commodities_and_types_have_russian_text (system_l10n_validation.SystemInformationLocalization.test_all_categories_commodities_and_types_have_russian_text) ... ok
+test_all_source_variables_layout_codes_and_line_breaks_are_preserved (system_l10n_validation.SystemInformationLocalization.test_all_source_variables_layout_codes_and_line_breaks_are_preserved) ... ok
+test_demographic_and_body_templates_keep_exact_source_operand_ids (system_l10n_validation.SystemInformationLocalization.test_demographic_and_body_templates_keep_exact_source_operand_ids) ... ok
+test_every_original_resource_string_has_exactly_one_translation (system_l10n_validation.SystemInformationLocalization.test_every_original_resource_string_has_exactly_one_translation) ... ok
+test_long_description_c_string_boundaries_preserve_nineteen_blanks (system_l10n_validation.SystemInformationLocalization.test_long_description_c_string_boundaries_preserve_nineteen_blanks) ... ok
+test_narrative_years_and_planet_designators_remain_source_values (system_l10n_validation.SystemInformationLocalization.test_narrative_years_and_planet_designators_remain_source_values) ... ok
+test_runtime_information_ui_consumers_have_russian_labels (system_l10n_validation.SystemInformationLocalization.test_runtime_information_ui_consumers_have_russian_labels) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.005s
+
+OK

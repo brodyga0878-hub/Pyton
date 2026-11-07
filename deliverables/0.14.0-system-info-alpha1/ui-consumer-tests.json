@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "completed_utc": "2026-11-07T15:08:33.610485+00:00",
+  "checks": 5341,
+  "failures": 0,
+  "results": [
+    {
+      "log": "ui-provider-fixture.log",
+      "checks": 132,
+      "failures": 0,
+      "sha256": "8e0f2055a0445c13e799125cb07e6a8ea400e9629f4869798163e6a074ca9688"
+    },
+    {
+      "log": "map-information-actions.log",
+      "checks": 127,
+      "failures": 0,
+      "sha256": "9ee24e0ae92ebc908b0de3ddcea215c0321f5ce9b9af7364cc4a29513b3b3c60"
+    },
+    {
+      "log": "native-information-view.log",
+      "checks": 57,
+      "failures": 0,
+      "sha256": "8016f13ed2a8b715a278dc1b05bf2238d5189d32f32d52d411f24401e1ce7756"
+    },
+    {
+      "log": "system-map-information-regression.log",
+      "checks": 2117,
+      "failures": 0,
+      "sha256": "caf1932e00e46647fdb0c3ae227a95fb7e8e5add0595a6e1e3b2dbd3be4ebeae"
+    },
+    {
+      "log": "galaxy-map-information-regression.log",
+      "checks": 2908,
+      "failures": 0,
+      "sha256": "d5cc0ed4b00963fd1c0a8de424b0e8772065969d25340166795f1d379a0baaa3"
+    }
+  ],
+  "sources": {
+    "scripts/system_information_view.gd": "f2dfa6ae205713ee52b5d39d7cb755ca902cb9583f3353496a772767f2814708",
+    "scripts/system_map_view.gd": "b1c03291928cb9dea19ca7a27e6055e192d2066e6fc46e3a21370100963eb103",
+    "scripts/galactic_map_view.gd": "2b725d1ecfda0f66e2d56872dd20c737dc73f904eee1a4fe490a2d93bbd9a33f",
+    "scripts/source_system_information.gd": "503be92125c8f4dd461a97bf891fbe27a48a8a0da57630aa0c9db11dada3647c",
+    "scripts/source_information_text.gd": "3d3e3af3b32fe77c28f00eb269e0b286ec16763e0c79730f51767a9c62409648",
+    "scripts/planetary_system.gd": "f243ebb2699bce714386e87ca32bfdb35709a2c9c45178cac9fa6cb8874abc62",
+    "scripts/source_system_definition.gd": "cd18f93e6dac389ec8a8b63ff57538145e6568e679c334be29d2eea6ab87351a",
+    "data/ffe_system_information.json": "77b37c26d7925e27f227c683c2c78a74f636fc28bf3b55f71f916ab6bcfc09c6",
+    "data/system_information_ru.json": "b78c2edcd1889b6aee01b45ef9b591705b159622fca918b803552a3e42057a7f",
+    "tests/test_system_information_view.gd": "f992728b63b449bb8f50c3debb2506310fe3b9bbed199c152d4356ef2e03b644",
+    "tests/test_map_information_actions.gd": "37a8a661f78a47758c17c98243ed92e29f3296d41d7044d0a19fb5dc1cd4500d",
+    "tests/test_system_information_native_view.gd": "cbe0e5ec91f1b2687d34831735ea4fcf8c415a137d64e360c67506dbdc8a4a5b",
+    "tests/test_system_map.gd": "4d7f03449a330e790da1b62018b65cfcc5646fc11bda6164b7fa3668f05ac762",
+    "tests/test_galactic_map_view.gd": "4375a87deea0f07fd4df158c2e0676ab41a0c3a42b02390db632a4849eaadd8d"
+  },
+  "native_view_evidence": [
+    {
+      "body_count_byte": 43,
+      "natural_body_rows": 35,
+      "original_world_unchanged": true,
+      "port_rows": 18,
+      "source_counter_forwarded": true,
+      "source_provenance": {
+        "F863_distance": "not_requested_no_observer_in_API",
+        "bodies_policy": "caller_supplied_original_runtime_records_not_regenerated_by_information_module",
+        "body_count_available": true,
+        "effective_known": true,
+        "live_world_metadata_variant": "jjffe-7e54034-policy-table-with10-added-rows",
+        "metadata_variant": "dos-original-info-only",
+        "policy_index": 0,
+        "population_raw": 253,
+        "presentation": "semantic_text_not_original_pixel_positions",
+        "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+        "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+        "source_variant": "dos-firstenc-system-information-pages-v1",
+        "system_id": 44341016
+      },
+      "system_id": 44341016
+    },
+    {
+      "body_count_byte": 11,
+      "natural_body_rows": 10,
+      "original_world_unchanged": true,
+      "port_rows": 1,
+      "source_counter_forwarded": true,
+      "source_provenance": {
+        "F863_distance": "not_requested_no_observer_in_API",
+        "bodies_policy": "caller_supplied_original_runtime_records_not_regenerated_by_information_module",
+        "body_count_available": true,
+        "effective_known": true,
+        "live_world_metadata_variant": "jjffe-7e54034-policy-table-with10-added-rows",
+        "metadata_variant": "dos-original-info-only",
+        "policy_index": 1,
+        "population_raw": 69,
+        "presentation": "semantic_text_not_original_pixel_positions",
+        "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+        "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+        "source_variant": "dos-firstenc-system-information-pages-v1",
+        "system_id": 111449880
+      },
+      "system_id": 111449880
+    }
+  ],
+  "ui_fixture_provider_tests": 132,
+  "actual_native_view_consumer_tests": 57,
+  "headless": true,
+  "gpu_capture": false,
+  "physical_device_tested": false,
+  "scope": "Read-only phone information UI, native source-provider consumer, exact original header count, original unknown policy and unchanged existing map behaviour; not full game localization or original screen pixel-layout parity.",
+  "display_typography": {
+    "tabs": "two spaces in the displayed document only",
+    "celsius_marker": "^C becomes a modern degree symbol in displayed text only",
+    "comma_spacing": "F843 mass/temperature source port-list call only; digit-to-digit commas preserved",
+    "provider_text_raw_bytes_and_data_unchanged": true
+  }
+}

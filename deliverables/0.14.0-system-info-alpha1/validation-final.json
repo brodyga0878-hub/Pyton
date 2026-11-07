@@ -1,0 +1,518 @@
+{
+  "schema": 1,
+  "scope": "Current information core/native references, fixture and actual-provider UI, both actual maps and Main lifecycle/navigation/dock/save/surface modal/graphics-return controls. One result per suite; timestamps/source hashes retained across bounded batches. Historical release totals, independent byte-review, Python units, source-ZIP repeat startup and GPU checks excluded. Not physical-phone execution.",
+  "started_utc": "2026-11-07T15:00:32.312116+00:00",
+  "updated_utc": "2026-11-07T15:01:14.177725+00:00",
+  "duration_seconds": 41.866,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-07T15:00:32.312116+00:00",
+      "duration_seconds": 41.866,
+      "requested_suites": [
+        "system_information_main",
+        "navigation_main",
+        "classic_console_main",
+        "source_console_pause",
+        "source_full_startup",
+        "source_main_full",
+        "app_transitions",
+        "graphics_integration",
+        "graphics_scope"
+      ],
+      "executed_suites": [
+        "system_information_main",
+        "navigation_main",
+        "classic_console_main",
+        "source_console_pause",
+        "source_full_startup",
+        "source_main_full",
+        "app_transitions",
+        "graphics_integration",
+        "graphics_scope"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 3,
+  "status": "passed",
+  "passed_suites": 15,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 30393,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "system_information_main",
+      "scope": "Actual Main information modal, source-state isolation, retained parent map/menu, background/cancellation/exit and time-acceleration interruption policy.",
+      "status": "passed",
+      "checks": 44,
+      "failures": 0,
+      "executed_utc": "2026-11-07T15:00:32.313643+00:00",
+      "suite_source": {
+        "path": "tests/test_system_information_main.gd",
+        "bytes": 9069,
+        "sha256": "0c7c4c0ead1be685b77963491679c8ed697a4ba0b5d3f10d21aa31190dda2fd7"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_system_information_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.752,
+      "timed_out": false,
+      "output_bytes": 126,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/system_information_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "navigation_main",
+      "scope": "Actual Main graphical map selection/confirmation, forecast isolation, raw save continuation, phone roll, clock scheduling and legacy opt-in boundaries.",
+      "status": "passed",
+      "checks": 53,
+      "failures": 0,
+      "executed_utc": "2026-11-07T15:00:32.314048+00:00",
+      "suite_source": {
+        "path": "tests/test_navigation_main.gd",
+        "bytes": 12697,
+        "sha256": "134ccfc0534ce835429cdd2c0cdbae7272c96d073ae011df03d19ee159661d73"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_navigation_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 8.888,
+      "timed_out": false,
+      "output_bytes": 118,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/navigation_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "classic_console_main",
+      "scope": "Actual Main console hooks, principal cameras, session pause, independent fingers, offpad takeoff and pending-jump/save boundaries.",
+      "status": "passed",
+      "checks": 42,
+      "failures": 0,
+      "executed_utc": "2026-11-07T15:00:32.314433+00:00",
+      "suite_source": {
+        "path": "tests/test_classic_console_main.gd",
+        "bytes": 10629,
+        "sha256": "a9d2f15c1ecd3911828f96671fa52636a60fcadbfbf57230fc4cb8b12c027fcf"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_classic_console_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.538,
+      "timed_out": false,
+      "output_bytes": 123,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/classic_console_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_console_pause",
+      "scope": "Actual Worldv4 pending terrain worker publication is deferred during console pause and resumes without losing physical contact.",
+      "status": "passed",
+      "checks": 131,
+      "failures": 0,
+      "executed_utc": "2026-11-07T15:00:33.853182+00:00",
+      "suite_source": {
+        "path": "tests/test_source_console_pause.gd",
+        "bytes": 15261,
+        "sha256": "5af16b7609c35bab07fa0f01c0dd1722d36e06b346154ce71868011ce47ca0a0"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_console_pause.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 13.957,
+      "timed_out": false,
+      "output_bytes": 1713,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/source_console_pause.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_full_startup",
+      "scope": "Actual normal startup selects Worldv4/native navigation and restores a private native save; no player progress access.",
+      "status": "passed",
+      "checks": 10,
+      "failures": 0,
+      "executed_utc": "2026-11-07T15:00:35.065951+00:00",
+      "suite_source": {
+        "path": "tests/test_source_full_startup.gd",
+        "bytes": 2501,
+        "sha256": "ffaa0a4a6736da6409315e74753c15896e73d55e01348b42314652126f9b9c06"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_full_startup.gd",
+        "--",
+        "--source-startup-isolated"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.336,
+      "timed_out": false,
+      "output_bytes": 122,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/source_full_startup.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_main_full",
+      "scope": "Actual Main native jump/cancel/save, physical station dock/refuel/launch, offpad takeoff and enclosed96 touch/save/launch.",
+      "status": "passed",
+      "checks": 153,
+      "failures": 0,
+      "executed_utc": "2026-11-07T15:00:36.402429+00:00",
+      "suite_source": {
+        "path": "tests/test_source_main_full.gd",
+        "bytes": 23076,
+        "sha256": "2825439a6ec22fb04a9b56fa7f4d711c4ed374ca81587f858be34801ceb4f7e1"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_main_full.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 37.774,
+      "timed_out": false,
+      "output_bytes": 510,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/source_main_full.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "app_transitions",
+      "scope": "Actual Main transition locks, pending-save resume and asynchronous New Moscow entry; capture mode disables user progress loading/writing.",
+      "status": "passed",
+      "checks": 54,
+      "failures": 0,
+      "executed_utc": "2026-11-07T15:00:41.202772+00:00",
+      "suite_source": {
+        "path": "tests/test_rebuilt_app_transitions.gd",
+        "bytes": 11061,
+        "sha256": "f81dad10e23e7169ba5e5046567b335720be7e93cfe95f7445e897f25cc436a5"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_app_transitions.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 3.871,
+      "timed_out": false,
+      "output_bytes": 120,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/app_transitions.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "graphics_integration",
+      "scope": "Actual Main graphics-flight entry/return, isolated original progress/save bytes, save-failure guard, controls/quality and native city return; private test save directory.",
+      "status": "passed",
+      "checks": 44,
+      "failures": 0,
+      "executed_utc": "2026-11-07T15:00:45.074421+00:00",
+      "suite_source": {
+        "path": "tests/test_graphics_integration.gd",
+        "bytes": 9877,
+        "sha256": "07803e334be7ce9c9feea54a6ca2a942971f99b206c213f3aed53c28c31cb34c"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_graphics_integration.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 5.742,
+      "timed_out": false,
+      "output_bytes": 123,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/graphics_integration.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "graphics_scope",
+      "scope": "Actual Main normal flight excludes decorative asteroid scenery, preserves flight/navigation/surface data and restores optional graphics preview.",
+      "status": "passed",
+      "checks": 87,
+      "failures": 0,
+      "executed_utc": "2026-11-07T15:00:47.811072+00:00",
+      "suite_source": {
+        "path": "tests/test_graphics_scope.gd",
+        "bytes": 8672,
+        "sha256": "222ad1fc4b32ecb896c751945e2d50ca9b5432f63780a3cd6821e3dda91558b8"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_graphics_scope.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.734,
+      "timed_out": false,
+      "output_bytes": 355,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/system-information-2026-11-07/regression-logs/logs/graphics_scope.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "system_information_view",
+      "status": "passed",
+      "checks": 132,
+      "failures": 0,
+      "log": "validation/system-information-2026-11-07/ui-provider-fixture.log",
+      "log_sha256": "8e0f2055a0445c13e799125cb07e6a8ea400e9629f4869798163e6a074ca9688",
+      "source_inputs": {
+        "scripts/system_information_view.gd": "f2dfa6ae205713ee52b5d39d7cb755ca902cb9583f3353496a772767f2814708",
+        "scripts/system_map_view.gd": "b1c03291928cb9dea19ca7a27e6055e192d2066e6fc46e3a21370100963eb103",
+        "scripts/galactic_map_view.gd": "2b725d1ecfda0f66e2d56872dd20c737dc73f904eee1a4fe490a2d93bbd9a33f",
+        "scripts/source_system_information.gd": "503be92125c8f4dd461a97bf891fbe27a48a8a0da57630aa0c9db11dada3647c",
+        "scripts/source_information_text.gd": "3d3e3af3b32fe77c28f00eb269e0b286ec16763e0c79730f51767a9c62409648",
+        "scripts/planetary_system.gd": "f243ebb2699bce714386e87ca32bfdb35709a2c9c45178cac9fa6cb8874abc62",
+        "scripts/source_system_definition.gd": "cd18f93e6dac389ec8a8b63ff57538145e6568e679c334be29d2eea6ab87351a",
+        "data/ffe_system_information.json": "77b37c26d7925e27f227c683c2c78a74f636fc28bf3b55f71f916ab6bcfc09c6",
+        "data/system_information_ru.json": "b78c2edcd1889b6aee01b45ef9b591705b159622fca918b803552a3e42057a7f",
+        "tests/test_system_information_view.gd": "f992728b63b449bb8f50c3debb2506310fe3b9bbed199c152d4356ef2e03b644",
+        "tests/test_map_information_actions.gd": "37a8a661f78a47758c17c98243ed92e29f3296d41d7044d0a19fb5dc1cd4500d",
+        "tests/test_system_information_native_view.gd": "cbe0e5ec91f1b2687d34831735ea4fcf8c415a137d64e360c67506dbdc8a4a5b",
+        "tests/test_system_map.gd": "4d7f03449a330e790da1b62018b65cfcc5646fc11bda6164b7fa3668f05ac762",
+        "tests/test_galactic_map_view.gd": "4375a87deea0f07fd4df158c2e0676ab41a0c3a42b02390db632a4849eaadd8d"
+      },
+      "executed_utc": "2026-11-07T15:08:33.610485+00:00",
+      "scope": "Read-only phone information UI, native source-provider consumer, exact original header count, original unknown policy and unchanged existing map behaviour; not full game localization or original screen pixel-layout parity."
+    },
+    {
+      "name": "map_information_actions",
+      "status": "passed",
+      "checks": 127,
+      "failures": 0,
+      "log": "validation/system-information-2026-11-07/map-information-actions.log",
+      "log_sha256": "9ee24e0ae92ebc908b0de3ddcea215c0321f5ce9b9af7364cc4a29513b3b3c60",
+      "source_inputs": {
+        "scripts/system_information_view.gd": "f2dfa6ae205713ee52b5d39d7cb755ca902cb9583f3353496a772767f2814708",
+        "scripts/system_map_view.gd": "b1c03291928cb9dea19ca7a27e6055e192d2066e6fc46e3a21370100963eb103",
+        "scripts/galactic_map_view.gd": "2b725d1ecfda0f66e2d56872dd20c737dc73f904eee1a4fe490a2d93bbd9a33f",
+        "scripts/source_system_information.gd": "503be92125c8f4dd461a97bf891fbe27a48a8a0da57630aa0c9db11dada3647c",
+        "scripts/source_information_text.gd": "3d3e3af3b32fe77c28f00eb269e0b286ec16763e0c79730f51767a9c62409648",
+        "scripts/planetary_system.gd": "f243ebb2699bce714386e87ca32bfdb35709a2c9c45178cac9fa6cb8874abc62",
+        "scripts/source_system_definition.gd": "cd18f93e6dac389ec8a8b63ff57538145e6568e679c334be29d2eea6ab87351a",
+        "data/ffe_system_information.json": "77b37c26d7925e27f227c683c2c78a74f636fc28bf3b55f71f916ab6bcfc09c6",
+        "data/system_information_ru.json": "b78c2edcd1889b6aee01b45ef9b591705b159622fca918b803552a3e42057a7f",
+        "tests/test_system_information_view.gd": "f992728b63b449bb8f50c3debb2506310fe3b9bbed199c152d4356ef2e03b644",
+        "tests/test_map_information_actions.gd": "37a8a661f78a47758c17c98243ed92e29f3296d41d7044d0a19fb5dc1cd4500d",
+        "tests/test_system_information_native_view.gd": "cbe0e5ec91f1b2687d34831735ea4fcf8c415a137d64e360c67506dbdc8a4a5b",
+        "tests/test_system_map.gd": "4d7f03449a330e790da1b62018b65cfcc5646fc11bda6164b7fa3668f05ac762",
+        "tests/test_galactic_map_view.gd": "4375a87deea0f07fd4df158c2e0676ab41a0c3a42b02390db632a4849eaadd8d"
+      },
+      "executed_utc": "2026-11-07T15:08:33.610485+00:00",
+      "scope": "Read-only phone information UI, native source-provider consumer, exact original header count, original unknown policy and unchanged existing map behaviour; not full game localization or original screen pixel-layout parity."
+    },
+    {
+      "name": "system_information_native_view",
+      "status": "passed",
+      "checks": 57,
+      "failures": 0,
+      "log": "validation/system-information-2026-11-07/native-information-view.log",
+      "log_sha256": "8016f13ed2a8b715a278dc1b05bf2238d5189d32f32d52d411f24401e1ce7756",
+      "source_inputs": {
+        "scripts/system_information_view.gd": "f2dfa6ae205713ee52b5d39d7cb755ca902cb9583f3353496a772767f2814708",
+        "scripts/system_map_view.gd": "b1c03291928cb9dea19ca7a27e6055e192d2066e6fc46e3a21370100963eb103",
+        "scripts/galactic_map_view.gd": "2b725d1ecfda0f66e2d56872dd20c737dc73f904eee1a4fe490a2d93bbd9a33f",
+        "scripts/source_system_information.gd": "503be92125c8f4dd461a97bf891fbe27a48a8a0da57630aa0c9db11dada3647c",
+        "scripts/source_information_text.gd": "3d3e3af3b32fe77c28f00eb269e0b286ec16763e0c79730f51767a9c62409648",
+        "scripts/planetary_system.gd": "f243ebb2699bce714386e87ca32bfdb35709a2c9c45178cac9fa6cb8874abc62",
+        "scripts/source_system_definition.gd": "cd18f93e6dac389ec8a8b63ff57538145e6568e679c334be29d2eea6ab87351a",
+        "data/ffe_system_information.json": "77b37c26d7925e27f227c683c2c78a74f636fc28bf3b55f71f916ab6bcfc09c6",
+        "data/system_information_ru.json": "b78c2edcd1889b6aee01b45ef9b591705b159622fca918b803552a3e42057a7f",
+        "tests/test_system_information_view.gd": "f992728b63b449bb8f50c3debb2506310fe3b9bbed199c152d4356ef2e03b644",
+        "tests/test_map_information_actions.gd": "37a8a661f78a47758c17c98243ed92e29f3296d41d7044d0a19fb5dc1cd4500d",
+        "tests/test_system_information_native_view.gd": "cbe0e5ec91f1b2687d34831735ea4fcf8c415a137d64e360c67506dbdc8a4a5b",
+        "tests/test_system_map.gd": "4d7f03449a330e790da1b62018b65cfcc5646fc11bda6164b7fa3668f05ac762",
+        "tests/test_galactic_map_view.gd": "4375a87deea0f07fd4df158c2e0676ab41a0c3a42b02390db632a4849eaadd8d"
+      },
+      "executed_utc": "2026-11-07T15:08:33.610485+00:00",
+      "scope": "Read-only phone information UI, native source-provider consumer, exact original header count, original unknown policy and unchanged existing map behaviour; not full game localization or original screen pixel-layout parity."
+    },
+    {
+      "name": "system_map",
+      "status": "passed",
+      "checks": 2117,
+      "failures": 0,
+      "log": "validation/system-information-2026-11-07/system-map-information-regression.log",
+      "log_sha256": "caf1932e00e46647fdb0c3ae227a95fb7e8e5add0595a6e1e3b2dbd3be4ebeae",
+      "source_inputs": {
+        "scripts/system_information_view.gd": "f2dfa6ae205713ee52b5d39d7cb755ca902cb9583f3353496a772767f2814708",
+        "scripts/system_map_view.gd": "b1c03291928cb9dea19ca7a27e6055e192d2066e6fc46e3a21370100963eb103",
+        "scripts/galactic_map_view.gd": "2b725d1ecfda0f66e2d56872dd20c737dc73f904eee1a4fe490a2d93bbd9a33f",
+        "scripts/source_system_information.gd": "503be92125c8f4dd461a97bf891fbe27a48a8a0da57630aa0c9db11dada3647c",
+        "scripts/source_information_text.gd": "3d3e3af3b32fe77c28f00eb269e0b286ec16763e0c79730f51767a9c62409648",
+        "scripts/planetary_system.gd": "f243ebb2699bce714386e87ca32bfdb35709a2c9c45178cac9fa6cb8874abc62",
+        "scripts/source_system_definition.gd": "cd18f93e6dac389ec8a8b63ff57538145e6568e679c334be29d2eea6ab87351a",
+        "data/ffe_system_information.json": "77b37c26d7925e27f227c683c2c78a74f636fc28bf3b55f71f916ab6bcfc09c6",
+        "data/system_information_ru.json": "b78c2edcd1889b6aee01b45ef9b591705b159622fca918b803552a3e42057a7f",
+        "tests/test_system_information_view.gd": "f992728b63b449bb8f50c3debb2506310fe3b9bbed199c152d4356ef2e03b644",
+        "tests/test_map_information_actions.gd": "37a8a661f78a47758c17c98243ed92e29f3296d41d7044d0a19fb5dc1cd4500d",
+        "tests/test_system_information_native_view.gd": "cbe0e5ec91f1b2687d34831735ea4fcf8c415a137d64e360c67506dbdc8a4a5b",
+        "tests/test_system_map.gd": "4d7f03449a330e790da1b62018b65cfcc5646fc11bda6164b7fa3668f05ac762",
+        "tests/test_galactic_map_view.gd": "4375a87deea0f07fd4df158c2e0676ab41a0c3a42b02390db632a4849eaadd8d"
+      },
+      "executed_utc": "2026-11-07T15:08:33.610485+00:00",
+      "scope": "Read-only phone information UI, native source-provider consumer, exact original header count, original unknown policy and unchanged existing map behaviour; not full game localization or original screen pixel-layout parity."
+    },
+    {
+      "name": "galactic_map_view",
+      "status": "passed",
+      "checks": 2908,
+      "failures": 0,
+      "log": "validation/system-information-2026-11-07/galaxy-map-information-regression.log",
+      "log_sha256": "d5cc0ed4b00963fd1c0a8de424b0e8772065969d25340166795f1d379a0baaa3",
+      "source_inputs": {
+        "scripts/system_information_view.gd": "f2dfa6ae205713ee52b5d39d7cb755ca902cb9583f3353496a772767f2814708",
+        "scripts/system_map_view.gd": "b1c03291928cb9dea19ca7a27e6055e192d2066e6fc46e3a21370100963eb103",
+        "scripts/galactic_map_view.gd": "2b725d1ecfda0f66e2d56872dd20c737dc73f904eee1a4fe490a2d93bbd9a33f",
+        "scripts/source_system_information.gd": "503be92125c8f4dd461a97bf891fbe27a48a8a0da57630aa0c9db11dada3647c",
+        "scripts/source_information_text.gd": "3d3e3af3b32fe77c28f00eb269e0b286ec16763e0c79730f51767a9c62409648",
+        "scripts/planetary_system.gd": "f243ebb2699bce714386e87ca32bfdb35709a2c9c45178cac9fa6cb8874abc62",
+        "scripts/source_system_definition.gd": "cd18f93e6dac389ec8a8b63ff57538145e6568e679c334be29d2eea6ab87351a",
+        "data/ffe_system_information.json": "77b37c26d7925e27f227c683c2c78a74f636fc28bf3b55f71f916ab6bcfc09c6",
+        "data/system_information_ru.json": "b78c2edcd1889b6aee01b45ef9b591705b159622fca918b803552a3e42057a7f",
+        "tests/test_system_information_view.gd": "f992728b63b449bb8f50c3debb2506310fe3b9bbed199c152d4356ef2e03b644",
+        "tests/test_map_information_actions.gd": "37a8a661f78a47758c17c98243ed92e29f3296d41d7044d0a19fb5dc1cd4500d",
+        "tests/test_system_information_native_view.gd": "cbe0e5ec91f1b2687d34831735ea4fcf8c415a137d64e360c67506dbdc8a4a5b",
+        "tests/test_system_map.gd": "4d7f03449a330e790da1b62018b65cfcc5646fc11bda6164b7fa3668f05ac762",
+        "tests/test_galactic_map_view.gd": "4375a87deea0f07fd4df158c2e0676ab41a0c3a42b02390db632a4849eaadd8d"
+      },
+      "executed_utc": "2026-11-07T15:08:33.610485+00:00",
+      "scope": "Read-only phone information UI, native source-provider consumer, exact original header count, original unknown policy and unchanged existing map behaviour; not full game localization or original screen pixel-layout parity."
+    },
+    {
+      "name": "source_system_information",
+      "status": "passed",
+      "checks": 24434,
+      "failures": 0,
+      "log": "validation/system-information-2026-11-07/source-information-core.log",
+      "source_inputs": {
+        "fixture_sha256": "8588f170bb558189af44011b6eb771885138e8c4b3f41334f6ca2c2dfeaa9c60",
+        "pages_sha256": "503be92125c8f4dd461a97bf891fbe27a48a8a0da57630aa0c9db11dada3647c",
+        "raw_resource_sha256": "77b37c26d7925e27f227c683c2c78a74f636fc28bf3b55f71f916ab6bcfc09c6",
+        "russian_resource_sha256": "b78c2edcd1889b6aee01b45ef9b591705b159622fca918b803552a3e42057a7f",
+        "test_sha256": "1b83f8da4598574bfe355e4ba3f125acb2986171b782ce9fa0385ab9a1e4b9fc",
+        "text_sha256": "3d3e3af3b32fe77c28f00eb269e0b286ec16763e0c79730f51767a9c62409648"
+      },
+      "scope": "Native original information text, DOS policy, F843 demographics/trade/body branches and read-only actual World boundary; not complete original renderer or full F76 game-state interpreter.",
+      "evidence": [
+        {
+          "domain_failures": {},
+          "domains": {
+            "body_page": 6,
+            "bracket_outer_pass": 3,
+            "coorbital_boundary": 4,
+            "demographic_page": 337,
+            "direct_fraction": 27,
+            "ground_port_list": 3,
+            "inserted_strings": 2,
+            "long_description": 44,
+            "numeric": 221,
+            "policy_copy": 337,
+            "raw_ff_fe_fd": 8,
+            "recursive_3018_301c": 24,
+            "source_bracket_name": 1,
+            "source_generated_body_page": 64,
+            "source_page_text": 150,
+            "trade_page": 337,
+            "unknown_policy_page": 2
+          },
+          "native_cases": 1570.0,
+          "native_output_sha256": "753a417dc76d88a7fc3e89a23319c35a811e335a867cff08fe4b4232546f7b4f"
+        },
+        {
+          "dos_known_rows": 329,
+          "pages": 3,
+          "system_id": 44341016,
+          "world_bodies": 35,
+          "world_settlements": 18,
+          "world_unchanged": true
+        }
+      ]
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ],
+  "completed_utc": "2026-11-07T15:10:10.545384+00:00"
+}

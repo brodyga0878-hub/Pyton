@@ -1,0 +1,270 @@
+{
+  "version": "0.14.0-system-info-alpha1",
+  "version_code": 39,
+  "created_moscow": "2026-11-07T18:17:33.781534+03:00",
+  "source_commit": "860951235548fc58c859d7337b9a6909fd78ca62",
+  "source_archive_scope": "Exact git archive -9 of current reconstruction with static parity audit exception; other validation/deliverables/build/.godot/SDK/key excluded. Source docs record pre-publication state.",
+  "source_archive_files": 1325,
+  "source_archive_actual_file_count": 1172,
+  "source_archive_below_32MiB": true,
+  "source_archive_crc_verified": true,
+  "source_archive_fresh_import_passed": true,
+  "source_archive_isolated_native_startup_checks": 10,
+  "source_archive_isolated_native_startup_failures": 0,
+  "source_archive_information_Main_checks": 44,
+  "source_archive_information_Main_failures": 0,
+  "source_archive_actual_files_unchanged": 1172,
+  "files": {
+    "README_RU.md": {
+      "bytes": 4280,
+      "sha256": "c784be5746bad8dadb99bd311ad54c5b942cb0d13874ca9ea2e36a8c9130d3c1"
+    },
+    "StarFrontier-0.14.0-system-info-arm64.apk": {
+      "bytes": 49880920,
+      "sha256": "0570051ebfd302d2c46db2992e63b9ae64888bb0678b1d3e814e4660aa7c2b25"
+    },
+    "StarFrontier-0.14.0-system-info-source.zip": {
+      "bytes": 29818080,
+      "sha256": "a58a357e7b7db7f8fe3b18d6f1071b19c78fea9ef28aba9a1fdeccc48aed0070"
+    },
+    "android-export.log": {
+      "bytes": 6676,
+      "sha256": "e426020d4740061654c0d7ff27d472ffb7a02694d1ca9824fac3c5c302a5ae9f"
+    },
+    "android-verification.json": {
+      "bytes": 100707,
+      "sha256": "8ed5d73ce034ddd1695b109b13b695a975a72e05d30f48ae9026f1977ac797c8"
+    },
+    "capture.log": {
+      "bytes": 429,
+      "sha256": "8fcb56eeb653913e1f522604f91229e9b111f5ad902d0fc79364af78d4287cb5"
+    },
+    "description-boundary-correction.json": {
+      "bytes": 1043,
+      "sha256": "0afdc63d113883bfeb70bdec9124e673f7159c579caf53068ec06633a1fd27c7"
+    },
+    "extraction-tests.log": {
+      "bytes": 2131,
+      "sha256": "2d8b604bfe8a34b6e0476806ef1858c91f3897d404e6bd9974254fcbd9d4cfbf"
+    },
+    "extraction.json": {
+      "bytes": 2861,
+      "sha256": "6449a6985462bea0a64ff57d98564bca66856724ad4b6812f0279f51f1341454"
+    },
+    "independent-extraction.json": {
+      "bytes": 660,
+      "sha256": "8e8e45a4671964dffe72065d8d89fb10deb75fdc158631cc18abdc96b33a0234"
+    },
+    "logs/app_transitions.log": {
+      "bytes": 120,
+      "sha256": "0c190763c029bb01bb6bb16c947fe7d80537e36b271d22fc91c468771ba45cd4"
+    },
+    "logs/classic_console_main.log": {
+      "bytes": 123,
+      "sha256": "fd1b59ff7ab0184ebb05c966c93c20e81d6f74731c727c273818a1dadac0b0b3"
+    },
+    "logs/galaxy-map-information-regression.log": {
+      "bytes": 122,
+      "sha256": "d5cc0ed4b00963fd1c0a8de424b0e8772065969d25340166795f1d379a0baaa3"
+    },
+    "logs/graphics_integration.log": {
+      "bytes": 123,
+      "sha256": "f6b6dc847918df771b6f2ac4b0b0f0537855cf6f5247269fadb9b1f4b8ea6d06"
+    },
+    "logs/graphics_scope.log": {
+      "bytes": 355,
+      "sha256": "b7ec54445dbb93814b7877b35fd9c0b18e5e17f8dcf4a62aa1fba3a09f2692bb"
+    },
+    "logs/map-information-actions.log": {
+      "bytes": 126,
+      "sha256": "9ee24e0ae92ebc908b0de3ddcea215c0321f5ce9b9af7364cc4a29513b3b3c60"
+    },
+    "logs/native-information-view.log": {
+      "bytes": 1780,
+      "sha256": "8016f13ed2a8b715a278dc1b05bf2238d5189d32f32d52d411f24401e1ce7756"
+    },
+    "logs/navigation_main.log": {
+      "bytes": 118,
+      "sha256": "341f62f03e5ea9792cb9e4caaf3261f7e61c57b9664e49fe27d12453ab4c12b6"
+    },
+    "logs/source_console_pause.log": {
+      "bytes": 1713,
+      "sha256": "f5466f43df178b7c00fb3842b7157344f4c2af28d65b5bf641e4ef4978876af3"
+    },
+    "logs/source_full_startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "logs/source_main_full.log": {
+      "bytes": 510,
+      "sha256": "01e9bca54d4b14c8b8182bb54c2e1fcae0b3fc3f7d30c6617f9c618899e5065f"
+    },
+    "logs/system-map-information-regression.log": {
+      "bytes": 7320,
+      "sha256": "caf1932e00e46647fdb0c3ae227a95fb7e8e5add0595a6e1e3b2dbd3be4ebeae"
+    },
+    "logs/system_information_main.log": {
+      "bytes": 126,
+      "sha256": "1663f9acc6a6aca6f0ec3949615d542bec66dfffb1bccfe56505f8493d19797c"
+    },
+    "logs/ui-provider-fixture.log": {
+      "bytes": 127,
+      "sha256": "8e0f2055a0445c13e799125cb07e6a8ea400e9629f4869798163e6a074ca9688"
+    },
+    "package-review.json": {
+      "bytes": 842,
+      "sha256": "40414533bc956a87305974222e4fb684dbafe5c337707d499c073bbc71895a77"
+    },
+    "python-packaging-tests.json": {
+      "bytes": 1319,
+      "sha256": "68ec7c917ec6e589bd57e91f38c2f4b37270c6ec5243521ac4a254abede9869d"
+    },
+    "python-packaging-tests.log": {
+      "bytes": 11717,
+      "sha256": "60456c32e697737cc76f526cca6b6720dda358695ea63d676ba3f0c90fff184b"
+    },
+    "runtime-freeze.json": {
+      "bytes": 42286,
+      "sha256": "2d9bab15d82cee645c1de66f3e6e8af8ddac8580ec1398175a443e5e49c69772"
+    },
+    "russian-localization.json": {
+      "bytes": 1444,
+      "sha256": "bf499321f087ab297507b861c9cf4c29456e0caf72da3a8292454b8eb190c0cc"
+    },
+    "russian-localization.log": {
+      "bytes": 1430,
+      "sha256": "16e2111426e2eae116b22c37c6568a9dd8c3ff97a3f1509a2d38fd9f21db240e"
+    },
+    "screenshots/01-sol-general.png": {
+      "bytes": 105121,
+      "sha256": "fcf874877fe1259162bdf2d4ccb1d3544c835bc0681fd37546031bed3cc33830"
+    },
+    "screenshots/02-sol-demography.png": {
+      "bytes": 70894,
+      "sha256": "4997bc8fbb2ab509d571d936c0b7800003bf17fcd831c22f8b220bc6a3646c9b"
+    },
+    "screenshots/03-sol-trade.png": {
+      "bytes": 77187,
+      "sha256": "83ce7865e4f0512dc5b778f93f3fa6da6c978bcf8d6bf0d1ca98d517df6fabda"
+    },
+    "screenshots/04-mercury-source-card.png": {
+      "bytes": 76207,
+      "sha256": "785f63b236d3a56d17656a60ba091b40050b41001ef4eedccf28db022f456882"
+    },
+    "screenshots/05-earth-source-card-wide.png": {
+      "bytes": 209619,
+      "sha256": "a86df71491ac874d9651ec835b063610ebc7f6210781ec8e16e28f02e455c33e"
+    },
+    "screenshots/06-alpha-centauri-general-wide.png": {
+      "bytes": 319095,
+      "sha256": "07ab65dc5cf7243e75e435706c826f8d5d0230bb52f64d0c0bf8c7ea9d4a5f7a"
+    },
+    "screenshots/07-unknown-system-compact.png": {
+      "bytes": 61287,
+      "sha256": "007f850538a434564ac262cad8bb6567b52c83981994eca3a6bc8bc165a40f85"
+    },
+    "screenshots/08-return-classic-flight.png": {
+      "bytes": 209393,
+      "sha256": "a481976c026ec9949c816a528083dbdcf84137a55e34203e6b64fe3d79e76742"
+    },
+    "screenshots/capture-manifest.json": {
+      "bytes": 14144,
+      "sha256": "4846d733c65851adffd31ed51576c326d0d2935672bb89f20de270a0473e7323"
+    },
+    "screenshots/visual-review.json": {
+      "bytes": 2833,
+      "sha256": "08c330d79d428ee9b300f027ebedf53055335ef527fad55f3f356c6512bf9444"
+    },
+    "source-archive-import.log": {
+      "bytes": 25608,
+      "sha256": "eebad343ef8e3a3c96739943ff46944e4e58f9a0cbf30ae2740d5cd6b902913e"
+    },
+    "source-archive-startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "source-archive-verification.json": {
+      "bytes": 5689,
+      "sha256": "f648b00ef4e1e8826b59b07a28ac84bf89f729f4e47e2f58241f668af6e55aec"
+    },
+    "source-information-core.json": {
+      "bytes": 1620,
+      "sha256": "8ba5e1804f71117050b3760d079a823a110b8e87520701e20b745e163eee1b90"
+    },
+    "source-information-core.log": {
+      "bytes": 125,
+      "sha256": "e0c3102a6f23e670fdf84d52bdf62e238abc7c2d31fa5def69b327e18a5e52a7"
+    },
+    "source-information-feature.json": {
+      "bytes": 805,
+      "sha256": "8ee93e207d68ee073edec1d709aebb190331403816bbf4819db80ac06bded4fb"
+    },
+    "source-information-feature.log": {
+      "bytes": 126,
+      "sha256": "1663f9acc6a6aca6f0ec3949615d542bec66dfffb1bccfe56505f8493d19797c"
+    },
+    "ui-consumer-tests.json": {
+      "bytes": 5375,
+      "sha256": "17f620d66f39d8d9e26c4f07e7263160e13be43167639971d6bef4c360e75806"
+    },
+    "validation-final.json": {
+      "bytes": 25043,
+      "sha256": "b77e3b80ccb0f8eb90fc50bf6b453593d3ea347e08fc099319dfa32f1399c66f"
+    }
+  },
+  "checks": 30393,
+  "passed_suites": 15,
+  "failures": 0,
+  "validation_status": "passed",
+  "validation_report": "validation-final.json",
+  "validation_scope": "One current result per information core/native, UI/maps and Main navigation/save/dock/launch/modal/graphics-return suite. Historical totals and repeated source-ZIP checks excluded; source stamps preserved across bounded batches.",
+  "native_original_information_case_count": 1570,
+  "native_case_count_included_in_core_checks": true,
+  "python_packaging_tests": 72,
+  "python_extraction_tests": 11,
+  "python_localization_tests": 7,
+  "python_distinct_tests": 90,
+  "independent_original_byte_pointer_checks": 2181,
+  "capture_checks": 163,
+  "capture_checks_added_to_targeted_total": false,
+  "fresh_desktop_gles_frames_visually_inspected": 8,
+  "screenshots_are_phone_captures": false,
+  "renderer": "Godot4.6.3 Compatibility/OpenGL Mesa llvmpipe Linux virtual display",
+  "frozen_runtime_inputs": 384,
+  "original_information_strings": 358,
+  "original_FF_mappings": 349,
+  "original_long_description_records": 44,
+  "nonblank_long_descriptions": 25,
+  "original_blank_long_descriptions": 19,
+  "information_policy_metadata_variant": "uploaded_DOS",
+  "information_DOS_metadata_rows": 338,
+  "live_world_metadata_variant": "pinned_JJFFE_with10_additional_rows",
+  "additional_runtime_modules": 3,
+  "additional_shaders": 0,
+  "additional_textures": 0,
+  "additional_source_and_Russian_JSON": 2,
+  "runtime_material_maps": 51,
+  "package": "org.starfrontier.rebuild",
+  "abi": "arm64-v8a",
+  "min_sdk": 24,
+  "target_sdk": 36,
+  "debuggable": false,
+  "zip_and_elf_alignment_16k": true,
+  "test_key_only": true,
+  "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+  "physical_device_tested": false,
+  "production_signing_key_configured": false,
+  "production_release_ready": false,
+  "full_original_port_complete": false,
+  "full_original_physics": false,
+  "full_original_system_information": false,
+  "full_original_text_interpreter": false,
+  "full_russian_localization_complete": false,
+  "original_33commodity_market_gameplay_added": false,
+  "source_F863_observer_distance_added": false,
+  "game_completion_percent": null,
+  "full_release_date": null,
+  "next_functional_priority": "Original F899-F903 hyperdrive/fuel/equipment rules within block9; remaining information renderer/text branches stay documented.",
+  "artifact_upload_authorized": true,
+  "publication_state_at_packaging": "Prepared for authorized GitHub backup; immutable full HTTPS download verification recorded separately after upload."
+}

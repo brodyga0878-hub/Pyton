@@ -1,0 +1,42 @@
+{
+  "status": "passed",
+  "completed_utc": "2026-11-07T15:12:08.646585+00:00",
+  "actual_scene": "scenes/main.tscn",
+  "actual_frames": 8,
+  "root_visually_inspected_all_frames": true,
+  "renderer": "Godot4.6.3 Compatibility/OpenGL Mesa llvmpipe Linux virtual display",
+  "physical_device_tested": false,
+  "composited": false,
+  "performance_benchmark": false,
+  "observations": [
+    "Sol source short/long description and original43majorbody count are readable",
+    "Demography separates fields and preserves original values and sector0,0",
+    "Trade list scrolls; no claim of integrated33commodity gameplay market",
+    "Mercury and Earth cards retain original numeric values and display readable spacing and Celsius degree glyph",
+    "Source Earth major port list has word-wrap opportunities after commas",
+    "Alpha Centauri description retains original2038andProxima/Eden narrative",
+    "Unknown original system shows no stale planet/port rows",
+    "Closing information returns to unchanged classic lower flight console"
+  ],
+  "source_sha256": {
+    "data/ffe_system_information.json": "77b37c26d7925e27f227c683c2c78a74f636fc28bf3b55f71f916ab6bcfc09c6",
+    "data/system_information_ru.json": "b78c2edcd1889b6aee01b45ef9b591705b159622fca918b803552a3e42057a7f",
+    "scripts/build_info.gd": "5696b861c40e1828bc386f10a9c85a6d2f7a6eb040f977a07705ff56a64cf555",
+    "scripts/galactic_map_view.gd": "2b725d1ecfda0f66e2d56872dd20c737dc73f904eee1a4fe490a2d93bbd9a33f",
+    "scripts/main.gd": "c83a666e1de2c6ce23b29247ad3c8fab007a0f325ecf2288523bfc8abad3a9de",
+    "scripts/source_information_text.gd": "3d3e3af3b32fe77c28f00eb269e0b286ec16763e0c79730f51767a9c62409648",
+    "scripts/source_system_information.gd": "503be92125c8f4dd461a97bf891fbe27a48a8a0da57630aa0c9db11dada3647c",
+    "scripts/system_information_view.gd": "f2dfa6ae205713ee52b5d39d7cb755ca902cb9583f3353496a772767f2814708",
+    "scripts/system_map_view.gd": "b1c03291928cb9dea19ca7a27e6055e192d2066e6fc46e3a21370100963eb103"
+  },
+  "frames": {
+    "01-sol-general.png": "fcf874877fe1259162bdf2d4ccb1d3544c835bc0681fd37546031bed3cc33830",
+    "02-sol-demography.png": "4997bc8fbb2ab509d571d936c0b7800003bf17fcd831c22f8b220bc6a3646c9b",
+    "03-sol-trade.png": "83ce7865e4f0512dc5b778f93f3fa6da6c978bcf8d6bf0d1ca98d517df6fabda",
+    "04-mercury-source-card.png": "785f63b236d3a56d17656a60ba091b40050b41001ef4eedccf28db022f456882",
+    "05-earth-source-card-wide.png": "a86df71491ac874d9651ec835b063610ebc7f6210781ec8e16e28f02e455c33e",
+    "06-alpha-centauri-general-wide.png": "07ab65dc5cf7243e75e435706c826f8d5d0230bb52f64d0c0bf8c7ea9d4a5f7a",
+    "07-unknown-system-compact.png": "007f850538a434564ac262cad8bb6567b52c83981994eca3a6bc8bc165a40f85",
+    "08-return-classic-flight.png": "a481976c026ec9949c816a528083dbdcf84137a55e34203e6b64fe3d79e76742"
+  }
+}

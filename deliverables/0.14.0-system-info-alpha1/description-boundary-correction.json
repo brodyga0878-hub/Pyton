@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "correction_date_utc": "2026-11-07T14:46:38.558975+00:00",
+  "corrects": "validation/parity-audit-2026-11-07/system-info.json long_text classification and prose in the dated parity audits",
+  "historical_record_preserved": true,
+  "cause": "Prior audit counted the entire DATA7182 ASM block instead of the description C string ending at its first NUL. Remaining bytes contain constructor names.",
+  "label7182_first_C_string_hex": "2000",
+  "old_nonblank_count": 26,
+  "correct_nonblank_count": 25,
+  "old_blank_count": 18,
+  "correct_blank_count": 19,
+  "pointer_count": 44,
+  "labels_first": 7139,
+  "labels_last": 7182,
+  "correct_description_payload_bytes": 6333,
+  "correct_description_payload_sha256": "7a8eb24a707f5feabe1a99cc0cda5a96e934d33b6ba01e2dd6471bf64144b8c6",
+  "original_executable_offset": 876496,
+  "original_executable_bytes_match": true,
+  "old_ASM_region_bytes": 7706,
+  "excluded_constructor_names_tail_bytes": 1373,
+  "raw_resource": "data/ffe_system_information.json",
+  "whole_game_ready": false
+}

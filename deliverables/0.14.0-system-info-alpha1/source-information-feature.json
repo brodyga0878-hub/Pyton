@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "completed_utc": "2026-11-07T15:16:39.844041+00:00",
+  "scope": "Actual information modal/navigation/worker/exit test executed from exact freshly extracted source ZIP in private XDG folders. Repeat artifact-portability run excluded from current targeted totals.",
+  "archive_sha256": "a58a357e7b7db7f8fe3b18d6f1071b19c78fea9ef28aba9a1fdeccc48aed0070",
+  "source_commit": "860951235548fc58c859d7337b9a6909fd78ca62",
+  "checks": 44,
+  "failures": 0,
+  "source_files_unchanged": 1172,
+  "changed_source_files": [],
+  "player_progress_read_or_written": false,
+  "physical_device_tested": false,
+  "log": "validation/system-information-source-portability-2026-11-07/source-information-feature.log",
+  "log_sha256": "1663f9acc6a6aca6f0ec3949615d542bec66dfffb1bccfe56505f8493d19797c"
+}

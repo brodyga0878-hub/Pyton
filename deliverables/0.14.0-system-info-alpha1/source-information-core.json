@@ -1,0 +1,50 @@
+{
+	"checks": 24434,
+	"evidence": [
+		{
+			"domain_failures": {
+
+			},
+			"domains": {
+				"body_page": 6,
+				"bracket_outer_pass": 3,
+				"coorbital_boundary": 4,
+				"demographic_page": 337,
+				"direct_fraction": 27,
+				"ground_port_list": 3,
+				"inserted_strings": 2,
+				"long_description": 44,
+				"numeric": 221,
+				"policy_copy": 337,
+				"raw_ff_fe_fd": 8,
+				"recursive_3018_301c": 24,
+				"source_bracket_name": 1,
+				"source_generated_body_page": 64,
+				"source_page_text": 150,
+				"trade_page": 337,
+				"unknown_policy_page": 2
+			},
+			"native_cases": 1570.0,
+			"native_output_sha256": "753a417dc76d88a7fc3e89a23319c35a811e335a867cff08fe4b4232546f7b4f"
+		},
+		{
+			"dos_known_rows": 329,
+			"pages": 3,
+			"system_id": 44341016,
+			"world_bodies": 35,
+			"world_settlements": 18,
+			"world_unchanged": true
+		}
+	],
+	"failures": 0,
+	"schema": 1,
+	"scope": "Native original information text, DOS policy, F843 demographics/trade/body branches and read-only actual World boundary; not complete original renderer or full F76 game-state interpreter.",
+	"sources": {
+		"fixture_sha256": "8588f170bb558189af44011b6eb771885138e8c4b3f41334f6ca2c2dfeaa9c60",
+		"pages_sha256": "503be92125c8f4dd461a97bf891fbe27a48a8a0da57630aa0c9db11dada3647c",
+		"raw_resource_sha256": "77b37c26d7925e27f227c683c2c78a74f636fc28bf3b55f71f916ab6bcfc09c6",
+		"russian_resource_sha256": "b78c2edcd1889b6aee01b45ef9b591705b159622fca918b803552a3e42057a7f",
+		"test_sha256": "1b83f8da4598574bfe355e4ba3f125acb2986171b782ce9fa0385ab9a1e4b9fc",
+		"text_sha256": "3d3e3af3b32fe77c28f00eb269e0b286ec16763e0c79730f51767a9c62409648"
+	}
+}
