@@ -1,0 +1,109 @@
+{
+  "started_utc": "2026-11-07T07:15:21.559482+00:00",
+  "repository": "brodyga0878-hub/Pyton",
+  "scope": "Actual independent complete HTTPS downloads from immutable Git commit URLs; downloaded manifests also match local immutable manifests. Four full APK/source ZIP payloads have SHA256/length/ZIP CRC controls; both source ZIP comments identify exact source commits. The current console screenshot and capture manifest are downloaded and hash-checked as well.",
+  "network_operation": "read_only_https_get",
+  "upload_performed_by_this_tool": false,
+  "complete_manifest_payloads_downloaded": false,
+  "physical_device_tested": false,
+  "complete_original_ffe_claimed": false,
+  "packages": {
+    "0.12.0-worlds-alpha1": {
+      "artifact_commit": "3eb5e6061dc99c11c6215f338faef5d2376588c1",
+      "source_commit": "0233a8c012ebf71337afe1395073cd1400e90b9e",
+      "manifest": {
+        "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/3eb5e6061dc99c11c6215f338faef5d2376588c1/deliverables/0.12.0-worlds-alpha1/manifest.json",
+        "http_status": 200,
+        "bytes": 6240,
+        "sha256": "8a47d16911c3bb6cf3b42c0d8ca37f9b437052a61699cd26f44a311b2ae11092",
+        "content_type": "text/plain; charset=utf-8",
+        "downloaded_to": "/workspace/recovery/published-downloads-2026-11-07/0.12.0-worlds-alpha1/manifest.json",
+        "matches_local_immutable_payload": true
+      },
+      "files": {
+        "StarFrontier-0.12.0-worlds-source.zip": {
+          "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/3eb5e6061dc99c11c6215f338faef5d2376588c1/deliverables/0.12.0-worlds-alpha1/StarFrontier-0.12.0-worlds-source.zip",
+          "http_status": 200,
+          "bytes": 27886591,
+          "sha256": "fa171356646d522cac311101e3af38b1919d0e2576eda02b2de880683d17e0cd",
+          "content_type": "application/zip",
+          "downloaded_to": "/workspace/recovery/published-downloads-2026-11-07/0.12.0-worlds-alpha1/StarFrontier-0.12.0-worlds-source.zip",
+          "matches_local_immutable_payload": true,
+          "zip_crc_verified": true,
+          "source_commit_in_zip_comment": "0233a8c012ebf71337afe1395073cd1400e90b9e",
+          "source_file_count": 1029
+        },
+        "StarFrontier-0.12.0-worlds-arm64.apk": {
+          "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/3eb5e6061dc99c11c6215f338faef5d2376588c1/deliverables/0.12.0-worlds-alpha1/StarFrontier-0.12.0-worlds-arm64.apk",
+          "http_status": 200,
+          "bytes": 49623926,
+          "sha256": "b74c18b1a83263e2ed96720e839e6c4f99f15e3e454603e6fa87e387f292c5cc",
+          "content_type": "application/octet-stream",
+          "downloaded_to": "/workspace/recovery/published-downloads-2026-11-07/0.12.0-worlds-alpha1/StarFrontier-0.12.0-worlds-arm64.apk",
+          "matches_local_immutable_payload": true,
+          "zip_crc_verified": true
+        }
+      }
+    },
+    "0.12.1-console-alpha1": {
+      "artifact_commit": "09b48fc9829e40bef133b4a996c110b7ca4881cf",
+      "source_commit": "932d641055f4fb587d4dd278ad986804b63dd754",
+      "manifest": {
+        "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/09b48fc9829e40bef133b4a996c110b7ca4881cf/deliverables/0.12.1-console-alpha1/manifest.json",
+        "http_status": 200,
+        "bytes": 8376,
+        "sha256": "f910e094a3219f630524b0a435249ba0208bf2f1d04daf2af0943d1762714e60",
+        "content_type": "text/plain; charset=utf-8",
+        "downloaded_to": "/workspace/recovery/published-downloads-2026-11-07/0.12.1-console-alpha1/manifest.json",
+        "matches_local_immutable_payload": true
+      },
+      "files": {
+        "StarFrontier-0.12.1-console-source.zip": {
+          "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/09b48fc9829e40bef133b4a996c110b7ca4881cf/deliverables/0.12.1-console-alpha1/StarFrontier-0.12.1-console-source.zip",
+          "http_status": 200,
+          "bytes": 28010224,
+          "sha256": "a0b9f45d3b910dae075dfd7ab0d87b2d1dbd1a55d2866936dc498ac064e28b25",
+          "content_type": "application/zip",
+          "downloaded_to": "/workspace/recovery/published-downloads-2026-11-07/0.12.1-console-alpha1/StarFrontier-0.12.1-console-source.zip",
+          "matches_local_immutable_payload": true,
+          "zip_crc_verified": true,
+          "source_commit_in_zip_comment": "932d641055f4fb587d4dd278ad986804b63dd754",
+          "source_file_count": 1055
+        },
+        "screenshots/05-classic-console-wide-landscape.png": {
+          "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/09b48fc9829e40bef133b4a996c110b7ca4881cf/deliverables/0.12.1-console-alpha1/screenshots/05-classic-console-wide-landscape.png",
+          "http_status": 200,
+          "bytes": 1076392,
+          "sha256": "ffa115b6013cacdce24e901a5c21ff63d330978b91c576b1ff8ba5acd160cc70",
+          "content_type": "image/png",
+          "downloaded_to": "/workspace/recovery/published-downloads-2026-11-07/0.12.1-console-alpha1/screenshots/05-classic-console-wide-landscape.png",
+          "matches_local_immutable_payload": true
+        },
+        "screenshots/capture-manifest.json": {
+          "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/09b48fc9829e40bef133b4a996c110b7ca4881cf/deliverables/0.12.1-console-alpha1/screenshots/capture-manifest.json",
+          "http_status": 200,
+          "bytes": 2102,
+          "sha256": "84a80915319ac2209fdcb91c92efba98aa766140379da1da370430015ff81e60",
+          "content_type": "text/plain; charset=utf-8",
+          "downloaded_to": "/workspace/recovery/published-downloads-2026-11-07/0.12.1-console-alpha1/screenshots/capture-manifest.json",
+          "matches_local_immutable_payload": true
+        },
+        "StarFrontier-0.12.1-console-arm64.apk": {
+          "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/09b48fc9829e40bef133b4a996c110b7ca4881cf/deliverables/0.12.1-console-alpha1/StarFrontier-0.12.1-console-arm64.apk",
+          "http_status": 200,
+          "bytes": 49640658,
+          "sha256": "e80448ff28edfcf39f5d2eae3e0666087dd4bc0587f7fbd5d66cc2dba7b55dbd",
+          "content_type": "application/octet-stream",
+          "downloaded_to": "/workspace/recovery/published-downloads-2026-11-07/0.12.1-console-alpha1/StarFrontier-0.12.1-console-arm64.apk",
+          "matches_local_immutable_payload": true,
+          "zip_crc_verified": true
+        }
+      }
+    }
+  },
+  "errors": [],
+  "status": "passed",
+  "verified_utc": "2026-11-07T07:15:49.496606+00:00",
+  "verified_moscow": "2026-11-07T10:15:49.496780+03:00",
+  "verified_file_count": 8
+}

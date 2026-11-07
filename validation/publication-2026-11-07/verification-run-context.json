@@ -1,0 +1,10 @@
+{
+  "recorded_moscow": "2026-11-07T10:16:26.445518+03:00",
+  "operation": "Read-only downloads; no upload/push or GitHub settings changes by verifier agent",
+  "initial_default_sandbox_attempt": "URLError Errno1 Operation not permitted before downloading; failed diagnostic retained outside repository",
+  "initial_diagnostic": "/workspace/recovery/published-downloads-2026-11-07-sandbox-rejection.json",
+  "final_execution": "Same command approved with require_escalated; inherited HTTPS proxy and CA preserved; exit0",
+  "network_payloads_verified": 8,
+  "full_archive_crc_verified": 4,
+  "proof": "remote-download-verification.json"
+}

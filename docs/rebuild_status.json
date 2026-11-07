@@ -72,7 +72,7 @@
     "desktop_gles_render_log": "validation/console-2026-11-06/render.log",
     "android_apk_built": true,
     "android_apk_technically_verified": true,
-    "android_artifact_status": "Actual0.12.1/code35 ARM64 TEST candidate built from frozen runtime and technically verified:59 core source modules,4 console modules(Main shared),standalone MB4 record kernel,12 live command connections,2 exact shaders,21 exactJSON,51 materialmaps,minSDK24/target36,16KiB ZIP/ELF,nondebuggable,no extra permissions; local only,physical phone pending.",
+    "android_artifact_status": "Actual0.12.1/code35 ARM64 TEST candidate built from frozen runtime and technically verified:59 core source modules,4 console modules(Main shared),standalone MB4 record kernel,12 live command connections,2 exact shaders,21 exactJSON,51 materialmaps,minSDK24/target36,16KiB ZIP/ELF,nondebuggable,no extra permissions; uploaded to the authorized GitHub branch; immutable HTTPS APK/source ZIP downloads verified; physical phone test pending.",
     "final_android_candidate_hash": "e80448ff28edfcf39f5d2eae3e0666087dd4bc0587f7fbd5d66cc2dba7b55dbd",
     "final_android_candidate": {
       "bytes": 49640658,
@@ -100,7 +100,13 @@
       "mb4_integrated_gameplay": false,
       "star_fuel_scoop_integrated": false,
       "verification_report": "validation/console-2026-11-06/android-verification.json",
-      "publication_status": "local_only; prior automatic approval blocked remote artifact publication; no new upload authorization"
+      "publication_status": "uploaded_and_immutable_apk_source_zip_downloads_verified",
+      "immutable_download_urls": {
+        "apk": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/09b48fc9829e40bef133b4a996c110b7ca4881cf/deliverables/0.12.1-console-alpha1/StarFrontier-0.12.1-console-arm64.apk",
+        "source_zip": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/09b48fc9829e40bef133b4a996c110b7ca4881cf/deliverables/0.12.1-console-alpha1/StarFrontier-0.12.1-console-source.zip",
+        "screenshots": "https://github.com/brodyga0878-hub/Pyton/tree/09b48fc9829e40bef133b4a996c110b7ca4881cf/deliverables/0.12.1-console-alpha1/screenshots"
+      },
+      "download_verification_report": "validation/publication-2026-11-07/remote-download-verification.json"
     },
     "physical_device_tested": false,
     "new_russian_name_labels": 133,
@@ -1298,8 +1304,36 @@
   "historical_statistics_are_current_validation": false,
   "full_release_date": null,
   "detailed_audit": "docs/RECOVERY_AND_ROADMAP_RU.md",
-  "last_updated_moscow": "2026-11-06",
+  "last_updated_moscow": "2026-11-07",
   "block10_status": "accepted_with_documented_mobile_units_and_force_policies",
   "block9_status": "implementation_started_classic_console_and_verified_mb4_kernel_not_complete",
-  "publication_status": "Blocked by automatic approval review: broader APK/source ZIP/screenshots/reports in development branch await explicit scope authorization; no final0.12.0/0.12.1 upload or verified HTTPS downloads"
+  "publication_status": "Both0.12.0/0.12.1 source/resources/APKs/ZIPs/screenshots/reports uploaded to the user-authorized GitHub development branch; actual immutable HTTPS downloads verified for all4 APK/source ZIP payloads and selected supporting files",
+  "artifact_publication": {
+    "status": "uploaded_and_immutable_downloads_verified",
+    "authorized_by_user": true,
+    "authorization_date_moscow": "2026-11-07",
+    "authorization_scope": "Complete sources/resources/source ZIPs/Android APKs/screenshots/reports/manifests for BOTH0.12.0 and0.12.1 and supporting commits",
+    "repository": "brodyga0878-hub/Pyton",
+    "branch": "development/starfrontier-rebuild",
+    "uploaded_head": "951de097947478987c89147ba86b2c164cd06df6",
+    "source_commits": {
+      "0.12.0": "0233a8c012ebf71337afe1395073cd1400e90b9e",
+      "0.12.1": "932d641055f4fb587d4dd278ad986804b63dd754"
+    },
+    "artifact_commits": {
+      "0.12.0": "3eb5e6061dc99c11c6215f338faef5d2376588c1",
+      "0.12.1": "09b48fc9829e40bef133b4a996c110b7ca4881cf"
+    },
+    "historical_blocked_records_preserved": true,
+    "immutable_https_downloads_verified": true,
+    "publication_is_store_release": false,
+    "verified_moscow": "2026-11-07T10:15:49.496780+03:00",
+    "verification_report": "validation/publication-2026-11-07/remote-download-verification.json",
+    "verification_report_sha256": "5edb93e8a773f50e16d0de1793fa9ec72bc82f85055b14ff6568de4ded9226e8",
+    "verified_download_file_count": 8,
+    "apk_and_source_zip_payloads_downloaded": 4,
+    "all_four_zip_crc_verified": true,
+    "both_source_archive_commit_comments_verified": true,
+    "all_manifest_payloads_downloaded": false
+  }
 }

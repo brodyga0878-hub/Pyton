@@ -1,0 +1,55 @@
+{
+  "recorded_at_moscow": "2026-11-07T10:17:28.050402+03:00",
+  "publication_status": "published_and_verified_by_complete_https_downloads",
+  "repository": "brodyga0878-hub/Pyton",
+  "branch": "development/starfrontier-rebuild",
+  "user_authorization": {
+    "source": "Explicit user reply to the immediately preceding question naming both versions, source/resources/ZIP/APK/screenshots/reports and this repository/branch",
+    "text": "И да я разрешаю что ты просил сними блокировку загрущки",
+    "scope": "Full project materials and supporting commits for both0.12.0 and0.12.1 to this repository/development branch"
+  },
+  "initial_publication": {
+    "success": true,
+    "non_force_push": true,
+    "previous_remote_commit": "19475aed2534f1c1e6b5bda9b58691e9a35fe09c",
+    "published_commit": "951de097947478987c89147ba86b2c164cd06df6"
+  },
+  "previous_gate_records_retained_unchanged": [
+    "validation/worlds-2026-11-06/publication-blocked.json",
+    "validation/console-2026-11-06/publication-blocked.json"
+  ],
+  "remote_verification_report": "validation/publication-2026-11-07/remote-download-verification.json",
+  "remote_verification": {
+    "complete_downloaded_files": 8,
+    "all_http_status_200": true,
+    "all_sha256_and_byte_sizes_match": true,
+    "four_apk_and_source_zip_crc_passed": true,
+    "source_zip_commit_comments_verified": true,
+    "complete_all_manifest_payload_download_claimed": false
+  },
+  "packages": {
+    "0.12.0-worlds-alpha1": {
+      "artifact_commit": "3eb5e6061dc99c11c6215f338faef5d2376588c1",
+      "source_commit": "0233a8c012ebf71337afe1395073cd1400e90b9e",
+      "verified_download_urls": {
+        "StarFrontier-0.12.0-worlds-source.zip": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/3eb5e6061dc99c11c6215f338faef5d2376588c1/deliverables/0.12.0-worlds-alpha1/StarFrontier-0.12.0-worlds-source.zip",
+        "StarFrontier-0.12.0-worlds-arm64.apk": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/3eb5e6061dc99c11c6215f338faef5d2376588c1/deliverables/0.12.0-worlds-alpha1/StarFrontier-0.12.0-worlds-arm64.apk"
+      }
+    },
+    "0.12.1-console-alpha1": {
+      "artifact_commit": "09b48fc9829e40bef133b4a996c110b7ca4881cf",
+      "source_commit": "932d641055f4fb587d4dd278ad986804b63dd754",
+      "verified_download_urls": {
+        "StarFrontier-0.12.1-console-source.zip": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/09b48fc9829e40bef133b4a996c110b7ca4881cf/deliverables/0.12.1-console-alpha1/StarFrontier-0.12.1-console-source.zip",
+        "screenshots/05-classic-console-wide-landscape.png": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/09b48fc9829e40bef133b4a996c110b7ca4881cf/deliverables/0.12.1-console-alpha1/screenshots/05-classic-console-wide-landscape.png",
+        "screenshots/capture-manifest.json": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/09b48fc9829e40bef133b4a996c110b7ca4881cf/deliverables/0.12.1-console-alpha1/screenshots/capture-manifest.json",
+        "StarFrontier-0.12.1-console-arm64.apk": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/09b48fc9829e40bef133b4a996c110b7ca4881cf/deliverables/0.12.1-console-alpha1/StarFrontier-0.12.1-console-arm64.apk"
+      }
+    }
+  },
+  "release_payloads_modified": false,
+  "physical_device_tested": false,
+  "full_original_ffe_complete": false,
+  "full_original_galactic_map_complete": false,
+  "galactic_map_audit": "docs/GALACTIC_MAP_STATUS_RU.md"
+}
