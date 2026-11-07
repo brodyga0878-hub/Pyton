@@ -22,6 +22,7 @@ const THERMAL_HOST_POLICY:="nominal-day-si-fixed60-combined-source-thermal-v1"
 const THERMAL_HZ:=60
 const THERMAL_TICK_DENOMINATOR:=86400*THERMAL_HZ
 const MAX_THERMAL_STEPS:=256
+const MAX_CONTACT_DAMAGE_CALLS:=64
 const THERMAL_KEYS:=["schema","version","source_contract","source_sha256","source_digest","host_policy","initialization_policy","phase_f64_hex","frame_tick_remainder_raw","tick_fraction_anchor_f64_hex","full_hull_u16","hull_anchor_raw_u16","hull_anchor_percent_f64_hex","hull_u16","shield_max_u16","shield_u16","damage_timer_u8","damage_flags_u8","rng_seed_a_u32","rng_seed_b_u32","destroyed","last_atmosphere_active","last_drag_active","last_hull_damage_u16","last_shield_damage_u16","equipment_damage_requested","wind_flags_u8"]
 static var _resource:Dictionary={}
 static var _resource_mutex:=Mutex.new()
@@ -243,6 +244,37 @@ func _apply_damage_call(call:Dictionary)->Dictionary:
 	thermal_system.destroyed=bool(thermal_system.destroyed) or bool(result.destruction_requested)
 	thermal_system.equipment_damage_requested=bool(thermal_system.equipment_damage_requested) or bool(result.equipment_damage_requested)
 	return result
+func apply_contact_damage(calls:Array)->Dictionary:
+	var rejected:={"ok":false,"reason":"invalid_contact_damage","callbacks":[],"destruction_requested":false,"equipment_damage_requested":false}
+	if not valid() or thermal_system.is_empty() or calls.size()>MAX_CONTACT_DAMAGE_CALLS:return rejected
+	var normalized:Array=[]
+	for value:Variant in calls:
+		if not value is Dictionary or value.size()!=2 or not value.has("amount_s32") or not value.has("attacker_u32"):return rejected
+		if not _number(value.amount_s32,-2147483648,2147483647) or not _number(value.attacker_u32,0,0xffffffff):return rejected
+		normalized.append({"amount_s32":int(value.amount_s32),"attacker_u32":int(value.attacker_u32)})
+	var before_hull:=thermal_hull_percent();var raw_hull:=int(thermal_system.hull_u16);var raw_shield:=int(thermal_system.shield_u16)
+	var rng_before:={"seed_a_u32":int(thermal_system.rng_seed_a_u32),"seed_b_u32":int(thermal_system.rng_seed_b_u32)}
+	var result:={"ok":true,"reason":"contact_damage_applied" if not calls.is_empty() else "empty_contact_damage","changed":false,"hull_percent_before":before_hull,"hull_percent_after":before_hull,"raw_hull_before":raw_hull,"raw_hull_after":raw_hull,"raw_shield_before":raw_shield,"raw_shield_after":raw_shield,"hull_percent_loss":0.0,"hull_damage_u16":0,"shield_damage_u16":0,"damage_calls":normalized,"applied_calls":0,"results":[],"callbacks":[],"destruction_requested":false,"destroyed":bool(thermal_system.destroyed),"equipment_damage_requested":false,"rng_consumed":false,"rng_state_before":rng_before,"rng_state_after":rng_before.duplicate(),"source_contract":Thermal.DAMAGE_CONTRACT,"event_filter_policy":"identity-event-filter-adapter","rng_policy":"existing-local-F1530-stream"}
+	if calls.is_empty():return result
+	if thermal_system.destroyed:return rejected
+	var candidate:=duplicate_session()
+	if candidate==null:return rejected
+	for call:Dictionary in normalized:
+		var damage:Dictionary=candidate._apply_damage_call(call)
+		if not damage.get("ok",false):return rejected
+		result.results.append(damage.duplicate(true));result.callbacks.append_array(damage.callbacks.duplicate(true));result.applied_calls+=1
+		result.rng_consumed=bool(result.rng_consumed) or bool(damage.rng_consumed)
+		result.equipment_damage_requested=bool(result.equipment_damage_requested) or bool(damage.equipment_damage_requested)
+		result.destruction_requested=bool(result.destruction_requested) or bool(damage.destruction_requested)
+		if damage.destruction_requested:break
+	if not candidate.valid():return rejected
+	result.hull_percent_after=candidate.thermal_hull_percent();result.raw_hull_after=int(candidate.thermal_system.hull_u16);result.raw_shield_after=int(candidate.thermal_system.shield_u16)
+	result.hull_percent_loss=maxf(0,before_hull-float(result.hull_percent_after));result.hull_damage_u16=maxi(0,raw_hull-int(result.raw_hull_after));result.shield_damage_u16=maxi(0,raw_shield-int(result.raw_shield_after))
+	result.rng_state_after={"seed_a_u32":int(candidate.thermal_system.rng_seed_a_u32),"seed_b_u32":int(candidate.thermal_system.rng_seed_b_u32)}
+	result.destroyed=bool(candidate.thermal_system.destroyed);result.changed=candidate.thermal_system!=thermal_system
+	# F953 changes its shared raw state only. In particular, do not replace
+	# atmospheric status/history with this separate contact-damage result.
+	_copy(candidate);return result
 func _thermal_step_inplace(context:Dictionary)->Dictionary:
 	var rejected:={"ok":false,"reason":"invalid_thermal_context"}
 	if not valid() or thermal_system.is_empty() or not _number(context.get("step_ticks_u32"),0,0xffffffff):return rejected

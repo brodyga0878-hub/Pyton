@@ -1,7 +1,7 @@
 extends "res://tests/test_source_thermal_main.gd"
 # Actual Main commands, source terrain and whole-game decoder. Placements and
 # old-save shapes below are labelled fixtures, never claims of manual flight.
-const GEAR_REPORT:="res://validation/gear-2026-11-08/source-gear-main.json"
+const GEAR_REPORT:="res://validation/contact-2026-11-08/gear-main-regression.json"
 var gear_evidence:Array=[]
 
 func gear()->Dictionary:return game._gear_state().duplicate(true)
@@ -40,7 +40,8 @@ func old_save_default_and_atomic()->void:
 	await launch();game._toggle_landing_gear()
 	check(not gear().requested_down,"Leaving the actual dock makes manual gear retraction available again")
 	if await stage_gear_surface(1.0):
-		complete_gear(true);check(game.surface.touch_down(game.ship),"Actual source floor accepts the fully deployed fixture")
+		complete_gear(true);game.ship.position.y=game.surface.height_at(0,0)+game.surface.clearance(game.ship)-0.001
+		check(game.surface.touch_down(game.ship) and game._apply_pending_source_contact() and game.surface.landed,"Actual source floor accepts and commits the fully deployed native contact fixture")
 		var landed:Dictionary=copied(payload());landed.erase("gear_session")
 		check(load_fixture(landed,"Prior landed source save without managed gear"),"Actual Main upgrades an old landed gear state")
 		check(int(gear().position_u16)==65535 and gear().requested_down and game.surface.landed,"Old landed source save remains parked with fully deployed gear")
@@ -123,13 +124,14 @@ func actual_thermal_request_bit()->void:
 
 func ground_hold_lift_and_autoland()->void:
 	if not await stage_gear_surface(-0.01):return
-	complete_gear(false);game.ship.velocity=Vector3(0,-0.5,0);var hull:float=game.ship.hull
+	complete_gear(false);game.ship.velocity=Vector3(0,-0.5,0)
 	game._tick(1.0/60.0,Vector2.ZERO,0)
-	check(not game.surface.landed and game.surface.altitude(game.ship)>0 and game.ship.hull==hull,"Gear-up soft floor contact remains an explicit airborne clearance hold without invented hull damage")
+	check(not game.surface.landed and absf(game.surface.altitude(game.ship))<=game.surface.CONTACT_QUANTIZATION_METRES and game.ship.hull==75,"Gear-up contact now consumes the original100raw damage and rebound rather than the previous artificial clearance hold")
+	var hull:float=game.ship.hull
 	check(not game.surface.touch_down(game.ship),"Manual soft-landing shortcut rejects retracted gear")
 	var hold_height:float=game.surface.altitude(game.ship)
 	for index in range(12):game._tick(1.0/60.0,Vector2.ZERO,0,1)
-	check(not game.surface.landed and game.surface.altitude(game.ship)>hold_height and game.ship.velocity.y>0,"Actual phone lift escapes the gear-up ground hold without a parked-state lockout")
+	check(not game.surface.landed and game.surface.altitude(game.ship)>hold_height and game.ship.velocity.y>0 and game.ship.hull==hull,"Actual phone lift escapes the damaging source rebound without a parked-state lockout or repeated loss")
 	game.ship.position=Vector3(0,game.surface.height_at(0,0)+game.surface.clearance(game.ship)+0.5,0)
 	game.ship.velocity=Vector3.ZERO;game.ship.target_speed=0;game.surface.landed=false;game.surface.landing=false
 	game._toggle_auto();check(game.surface.landing,"Actual classic automatic command starts a gear-managed surface landing")
@@ -146,15 +148,15 @@ func ground_hold_lift_and_autoland()->void:
 	check(game._takeoff_action(),"Actual takeoff command remains available after the gear-managed landing")
 	for index in range(12):game._tick(1.0/60.0,Vector2.ZERO,0,1)
 	check(not game.surface.landed and game.ship.velocity.y>0 and game.ship.hull==hull,"Recovered landing still leaves the actual source floor through the phone lift path")
-	gear_evidence.append({"case":"actual_source_floor_gear_hold_and_recovery","initial_hold_agl_m":hold_height,"final_agl_m":game.surface.altitude(game.ship),"hull_percent":game.ship.hull,"response_policy":"phone-ground-gear-clearance-v1","full_original_F575_collision_claim":false})
+	gear_evidence.append({"case":"actual_source_floor_gear_native_rebound_and_recovery","initial_native_agl_m":hold_height,"final_agl_m":game.surface.altitude(game.ship),"hull_percent":game.ship.hull,"response_policy":"dos-firstenc-f575-postclassification-player-contact-v1","geometry_provider_is_phone_adapter":true,"full_original_F575_collision_claim":false})
 
 func retract_request_before_first_frame()->void:
-	if not await stage_gear_surface(1.0):return
+	if not await stage_gear_surface(0.0):return
 	complete_gear(true);command_gear(false)
 	check(int(gear().position_u16)==65535 and not gear().requested_down,"Immediate retraction fixture retains the deployed physical endpoint until its first source update")
 	check(not game.surface.touch_down(game.ship) and not game.surface.landed,"Additional phone landing-readiness guard blocks a new soft landing once retraction has been requested")
 	command_gear(true)
-	check(game.surface.touch_down(game.ship),"Restoring the deployment request permits contact at the still-complete physical endpoint")
+	check(game.surface.touch_down(game.ship) and game._apply_pending_source_contact() and game.surface.landed,"Restoring the deployment request permits and commits contact at the still-complete physical endpoint")
 	gear_evidence.append({"case":"request_guard_before_first_source_frame","physical_word_u16":65535,"policy":"phone landing requires full physical extension plus deployment request; additional host policy, not the whole original F575 response"})
 
 func run()->void:
@@ -165,7 +167,7 @@ func run()->void:
 	check(game.automated and not game.saving_enabled,"Gear regression never reads or writes ordinary player progress")
 	await old_save_default_and_atomic();partial_cold_continuation();await pointer_pause_and_background();raw_thermal_bit_and_visual();actual_thermal_request_bit();await retract_request_before_first_frame();await ground_hold_lift_and_autoland()
 	var sources:Dictionary={}
-	for path:String in ["scripts/main.gd","scripts/surface_model.gd","scripts/flight_console.gd","scripts/ship_visual.gd","scripts/source_landing_gear.gd","scripts/source_landing_gear_session.gd","tests/test_source_gear_main.gd"]:sources[path]=FileAccess.get_sha256("res://"+path)
+	for path:String in ["scripts/main.gd","scripts/surface_model.gd","scripts/flight_console.gd","scripts/ship_visual.gd","scripts/source_landing_gear.gd","scripts/source_landing_gear_session.gd","scripts/source_surface_contact.gd","scripts/source_surface_contact_bridge.gd","tests/test_source_gear_main.gd"]:sources[path]=FileAccess.get_sha256("res://"+path)
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(GEAR_REPORT.get_base_dir()))
-	var file:=FileAccess.open(GEAR_REPORT,FileAccess.WRITE);file.store_string(JSON.stringify({"schema":1,"checks":checks,"failures":failures,"evidence":gear_evidence,"sources":sources,"scope":"Actual Main managed-gear commands, classic-console touch/pause/focus, source-ground clearance adapter, visual source-fraction binding and whole-game old/partial/invalid save states. Explicit observer placement; no manual landing, physical Android, full original collision response or performance benchmark claim."},"\t"));file.close()
+	var file:=FileAccess.open(GEAR_REPORT,FileAccess.WRITE);file.store_string(JSON.stringify({"schema":1,"checks":checks,"failures":failures,"evidence":gear_evidence,"sources":sources,"scope":"Retained managed-gear regression on current0.19 Main: classic-console touch/pause/focus, original bounded F575 rebound and existing F953 HP, automatic recovery, source-fraction visuals and old/partial/invalid saves. Original0.18 evidence is unchanged; current reports write only under contact. Explicit observer placement; no manual landing, physical Android, complete original collision classifier or performance benchmark claim."},"\t"));file.close()
 	game.queue_free();await frame();print("Source gear Main: %d checks, %d failures"%[checks,failures]);quit(1 if failures else 0)

@@ -23,6 +23,25 @@ class MockLandingGearArchive:
 
 
 class LandingGearPackaging(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        directory=tempfile.TemporaryDirectory(prefix='contact-packaging-v43-')
+        cls.addClassCleanup(directory.cleanup);cls.project=Path(directory.name)
+        for relative in cls.project_files():
+            target=cls.project/relative;target.parent.mkdir(parents=True,exist_ok=True)
+            target.write_bytes((PROJECT/relative).read_bytes())
+        path=PROJECT/'tests/fixtures/contact_v43_sources.json'
+        if hashlib.sha256(path.read_bytes()).hexdigest()!='ea881cdd1864445f3dc28cf8cb50773e4f5d428364aae3497f691067b26c6b36':
+            raise AssertionError('Historical code43 contact baseline fixture changed')
+        baseline=json.loads(path.read_text());expected=verifier.LANDING_GEAR_AUDITED_SOURCE_SHA256
+        if baseline['source_commit']!='faa22eaee504b324b096d64c059d9daf670eca9c' or set(baseline['files'])!=set(expected):
+            raise AssertionError('Historical code43 source fixture domain changed')
+        for name,digest in expected.items():
+            entry=baseline['files'][name];raw=entry['source'].encode()
+            if entry['sha256']!=digest or hashlib.sha256(raw).hexdigest()!=digest:
+                raise AssertionError('Historical code43 source differs '+name)
+            (cls.project/name).write_bytes(raw)
+
     def setUp(self):self.archive=MockLandingGearArchive()
 
     @staticmethod
@@ -41,7 +60,7 @@ class LandingGearPackaging(unittest.TestCase):
     def project_copy(self,directory):
         project=Path(directory)
         for relative in self.project_files():
-            path=project/relative;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes((PROJECT/relative).read_bytes())
+            path=project/relative;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes((self.project/relative).read_bytes())
         return project
 
     def mutate_resource(self,project,callback):
@@ -53,7 +72,7 @@ class LandingGearPackaging(unittest.TestCase):
         self.assertIn(old,function);path.write_text(raw.replace(function,function.replace(old,new,1),1))
 
     def test_frozen_scope_retains_old_data_and_honest_partial_boundaries(self):
-        result=verifier.verify_landing_gear_runtime(self.archive,PROJECT)
+        result=verifier.verify_landing_gear_runtime(self.archive,self.project)
         self.assertEqual(result['baseline_source_commit'],'0ad404f25db0b54d42796457555c8e4dc7f2ad6d')
         self.assertEqual((result['compiled_module_count'],result['integration_compiled_module_count'],result['raw_json_count']),(2,21,1))
         self.assertEqual((result['original_primary_anchors'],result['original_primary_anchor_bytes'],result['original_primary_instruction_count']),(2,421,104))
@@ -76,7 +95,7 @@ class LandingGearPackaging(unittest.TestCase):
             with self.subTest(name=name):
                 archive=MockLandingGearArchive();del archive.entries[f'assets/scripts/{name}.gdc']
                 with self.assertRaisesRegex(AssertionError,'Missing (atmospheric|landing-gear|fuel|hyperdrive)'):
-                    verifier.verify_landing_gear_runtime(archive,PROJECT)
+                    verifier.verify_landing_gear_runtime(archive,self.project)
 
     def test_each_integration_module_header_and_length_is_checked(self):
         for relative in verifier.LANDING_GEAR_AUDITED_SOURCE_SHA256:
@@ -85,28 +104,28 @@ class LandingGearPackaging(unittest.TestCase):
                 with self.subTest(name=name,bytes=len(content)):
                     archive=MockLandingGearArchive();archive.entries[f'assets/scripts/{name}.gdc']=content
                     with self.assertRaisesRegex(AssertionError,'Invalid compiled'):
-                        verifier.verify_landing_gear_runtime(archive,PROJECT)
+                        verifier.verify_landing_gear_runtime(archive,self.project)
 
     def test_retained_information_modules_still_required(self):
         for name in verifier.SYSTEM_INFORMATION_MODULES:
             with self.subTest(name=name):
                 archive=MockLandingGearArchive();del archive.entries[f'assets/scripts/{name}.gdc']
                 with self.assertRaisesRegex(AssertionError,'Missing system information runtime'):
-                    verifier.verify_landing_gear_runtime(archive,PROJECT)
+                    verifier.verify_landing_gear_runtime(archive,self.project)
 
     def test_missing_or_different_exported_gear_resource_rejects(self):
         del self.archive.entries['assets/data/ffe_landing_gear.json']
         with self.assertRaisesRegex(AssertionError,'Missing landing-gear resource'):
-            verifier.verify_landing_gear_runtime(self.archive,PROJECT)
+            verifier.verify_landing_gear_runtime(self.archive,self.project)
         self.archive=MockLandingGearArchive();self.archive.entries['assets/data/ffe_landing_gear.json']+=b' '
         with self.assertRaisesRegex(AssertionError,'Landing-gear resource differs from local source'):
-            verifier.verify_landing_gear_runtime(self.archive,PROJECT)
+            verifier.verify_landing_gear_runtime(self.archive,self.project)
 
     def test_old_fuel_atmosphere_hyperdrive_and_information_payloads_stay_checked(self):
         for name in ('ffe_atmosphere','ffe_fuel','ffe_hyperdrive',*verifier.SYSTEM_INFORMATION_TABLES):
             with self.subTest(name=name):
                 archive=MockLandingGearArchive();archive.entries[f'assets/data/{name}.json']+=b' '
-                with self.assertRaises(AssertionError):verifier.verify_landing_gear_runtime(archive,PROJECT)
+                with self.assertRaises(AssertionError):verifier.verify_landing_gear_runtime(archive,self.project)
 
     def test_matching_export_cannot_use_wrong_original_provenance(self):
         with tempfile.TemporaryDirectory() as directory:

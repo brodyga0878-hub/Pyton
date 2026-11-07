@@ -2,7 +2,7 @@ extends "res://tests/test_source_gear_main.gd"
 # Eight real Main framebuffers. Inspection-camera and observer placements are
 # explicit fixtures; source words, classic console and meshes stay production.
 const GearBuildInfo=preload("res://scripts/build_info.gd")
-const GEAR_OUTPUT:="res://validation/gear-2026-11-08/screenshots"
+const GEAR_OUTPUT:="res://validation/contact-2026-11-08/gear-screenshots"
 var gear_captures:Array=[]
 var gear_capture_errors:Array=[]
 var gear_input_hashes:Dictionary={}
@@ -47,7 +47,7 @@ func finish_gear_capture()->void:
 	for path:String in gear_input_hashes:check(FileAccess.get_sha256("res://"+path)==gear_input_hashes[path],"Gear capture leaves its input unchanged: "+path)
 	check(gear_captures.size()==8,"Eight meaningful actual Main gear frames are retained")
 	var file:=FileAccess.open(GEAR_OUTPUT.path_join("capture-manifest.json"),FileAccess.WRITE)
-	file.store_string(JSON.stringify({"schema":1,"version":GearBuildInfo.VERSION,"completed_utc":Time.get_datetime_string_from_system(true),"source_sha256":gear_input_hashes,"checks":checks,"failures":gear_capture_errors,"frames":gear_captures,"scope":"Actual desktop Main/retained classic console and real ship meshes driven by production source gear state. Source-Earth observer placements and three lower-side inspection camera poses are explicit fixtures. Physical gear motion, clearance hold and recovery use Main's production methods; no compositing, physical Android, manual landing, full original F575 collision or performance benchmark proof."},"\t"));file.close()
+	file.store_string(JSON.stringify({"schema":1,"version":GearBuildInfo.VERSION,"completed_utc":Time.get_datetime_string_from_system(true),"source_sha256":gear_input_hashes,"checks":checks,"failures":gear_capture_errors,"frames":gear_captures,"scope":"Retained gear capture tool adapted to current0.19 Main/console and real ship meshes. Original0.18 images/manifests are unchanged; optional reruns write only to the new contact folder. Earth observer placements and three lower-side inspection camera poses are explicit fixtures. Gear motion, bounded original rebound/damage and automatic recovery use production methods; no compositing, physical Android, manual landing, complete original F575 collision classifier or performance benchmark proof."},"\t"));file.close()
 	game.queue_free();await process_frame
 	print("SOURCE GEAR CAPTURE: %d frames, %d checks, %d failures"%[gear_captures.size(),checks,failures]);quit(1 if failures else 0)
 
@@ -81,15 +81,15 @@ func run()->void:
 	await photograph_gear("06-actual-external-struts-deployed.png")
 	if not await stage_gear_surface(-0.01):await finish_gear_capture();return
 	inspection_camera=false;complete_gear(false);game.ship.velocity=Vector3(0,-0.5,0);game.ship.external_view=false;game.last_view="";game._tick(1.0/60.0,Vector2.ZERO,0)
-	check(not game.surface.landed and game.surface.altitude(game.ship)>0,"Production gear-up soft contact retains a recoverable airborne ground-clearance hold")
-	gear_fixture_label="Explicit low-speed source-ground contact fixture with retracted gear. The named phone clearance adapter prevents a false soft landing without invented raw collision damage; lift remains available."
-	await photograph_gear("07-gear-up-source-ground-hold.png")
+	check(not game.surface.landed and absf(game.surface.altitude(game.ship))<=game.surface.CONTACT_QUANTIZATION_METRES and game.ship.hull==75,"Current production gear-up contact applies original raw damage and a recoverable rebound at the native millimetre plane")
+	gear_fixture_label="Explicit low-speed source-ground contact with retracted gear under current0.19. Original bounded F575 requests100raw damage and rebounds; existing F953 leaves75percent hull. Lift remains available; original0.18 screenshots are unchanged."
+	await photograph_gear("07-gear-up-source-ground-rebound.png")
 	game._toggle_auto()
 	for index in range(300):
 		game._tick(1.0/60.0,Vector2.ZERO,0)
 		if game.surface.landed:break
-	check(game.surface.landed and int(gear().position_u16)==65535 and game.ship.hull==100,"Production automatic recovery completes only after physical gear deployment")
+	check(game.surface.landed and int(gear().position_u16)==65535 and game.ship.hull==75,"Production automatic recovery completes after physical gear deployment without restoring prior contact HP")
 	game.ship.external_view=true;game.last_view="";game._process(0)
-	gear_fixture_label="Production Main automatic landing after the explicit gear-up contact fixture: request extension, wait for the physical endpoint, then complete source-ground soft landing. Existing takeoff controls remain available."
+	gear_fixture_label="Current production automatic landing after the explicit original gear-up rebound: request extension, wait for its physical endpoint, then complete a healthy source contact at the existing75percent HP. Existing takeoff controls remain available."
 	await photograph_gear("08-full-gear-recovered-source-landing.png")
 	await finish_gear_capture()

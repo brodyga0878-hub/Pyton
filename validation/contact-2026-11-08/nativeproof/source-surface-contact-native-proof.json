@@ -1,0 +1,580 @@
+{
+  "schema_version": 1,
+  "reference": "uploaded DOS FIRSTENC.EXE",
+  "executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "pinned_asm_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+  "case_count": 858,
+  "byte_instruction_proofs": {
+    "571": {
+      "executable_offset": 99040,
+      "virtual_address": 4355296,
+      "byte_length": 75,
+      "sha256": "d6f72bd663b601a5c0292f2b3e52cd5025762d68c77f4fccaf3fb7334abfdda6",
+      "instruction_count": 28,
+      "normalized_instruction_sha256": "fa98f823de213559f28b67adb4c52a055a02e81e91f3834f49b52c6f0ae86761",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1333": {
+      "executable_offset": 259606,
+      "virtual_address": 4515862,
+      "byte_length": 25,
+      "sha256": "8946c4ccd895806bb39d3d393c582970d2e34c8ba60c06257447eb10186e5468",
+      "instruction_count": 11,
+      "normalized_instruction_sha256": "d404596ee05a43e6f48c9e0e3738ec8f555a7f3093ca751c86a988fd4a17721f",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1335": {
+      "executable_offset": 259656,
+      "virtual_address": 4515912,
+      "byte_length": 25,
+      "sha256": "630251ee2b7c42186d7b3e5a7dad2245d537527943aa08e08cfe6879016c0514",
+      "instruction_count": 11,
+      "normalized_instruction_sha256": "b9e6d7e710d5ec7c76685289fe22ba6cd78860994046859e09839c50c506c91c",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1503": {
+      "executable_offset": 276874,
+      "virtual_address": 4533130,
+      "byte_length": 60,
+      "sha256": "d0afd5b854572fc1f0c76c0e0baf449afecd09a825f1962dd0d1183c8612e36d",
+      "instruction_count": 26,
+      "normalized_instruction_sha256": "307da135d766cc2fe6db9c2b3a78a67557921604e6d673085815a494e542a23a",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1504": {
+      "executable_offset": 276934,
+      "virtual_address": 4533190,
+      "byte_length": 105,
+      "sha256": "3086b86ae6eed52dcb62404ed6eecc861949b851139ae9cd621ba08e88414e09",
+      "instruction_count": 45,
+      "normalized_instruction_sha256": "35e028cacd4a45ca0cf58aae7b1314451e91904d24b810bd650d09e521645450",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1501": {
+      "executable_offset": 276671,
+      "virtual_address": 4532927,
+      "byte_length": 64,
+      "sha256": "422940485e22b08f5173b3b64ada177be0a09e4ba2dc8599b8b36ecdee8cff04",
+      "instruction_count": 31,
+      "normalized_instruction_sha256": "248cfbe789335ff48b5beffbbae45a5b1a12021461674fa254c4023fb865889b",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1502": {
+      "executable_offset": 276735,
+      "virtual_address": 4532991,
+      "byte_length": 139,
+      "sha256": "06d92dfc59b6eca45c8c8c4d203e1deb6a270101894bdea28ca83b692dc60d19",
+      "instruction_count": 61,
+      "normalized_instruction_sha256": "c5023ccf9909d9370799f5bbbb7d17b5daaf2db9050c49ef71ca246620516b3e",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1519": {
+      "executable_offset": 278938,
+      "virtual_address": 4535194,
+      "byte_length": 136,
+      "sha256": "4cf67a734da229a0a8cb12b509f70668250b4b0f3836a19146b53b0272e78ea3",
+      "instruction_count": 59,
+      "normalized_instruction_sha256": "9369229fe448116d4b12ecec5376daac76a7d0bae226162a3d7df03c02cf9996",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1466": {
+      "executable_offset": 269559,
+      "virtual_address": 4525815,
+      "byte_length": 272,
+      "sha256": "d8afc05d10b13f7872438dd3a1e13e11ccc15dd0b55881fa120ef8781055cf10",
+      "instruction_count": 103,
+      "normalized_instruction_sha256": "f1b7d70b6d1216f006b0da3c7b5570857cb159b27d020d3a48969e3ea470eab3",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1520": {
+      "executable_offset": 279074,
+      "virtual_address": 4535330,
+      "byte_length": 86,
+      "sha256": "97176815c1009869daef82477468f18dd21c7dccac64b5a3714d84295f281976",
+      "instruction_count": 37,
+      "normalized_instruction_sha256": "fc2ec756cb992daf57a2342232c0b6abfc57094cc543450478e2c84f2306afd5",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1521": {
+      "executable_offset": 279160,
+      "virtual_address": 4535416,
+      "byte_length": 17,
+      "sha256": "f62a5f949cbf8da772c3cc32ae59b607e0f35cda6c3c4e1ddf848ba3b5a1b445",
+      "instruction_count": 9,
+      "normalized_instruction_sha256": "41d13ec389df5b306dbeb350873dd5272b12f7a1d61a674cb369cb6e1398f31c",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1522": {
+      "executable_offset": 279177,
+      "virtual_address": 4535433,
+      "byte_length": 12,
+      "sha256": "e6001a066c6ed54cff7bf995d82867c4b0809fa6752fdfb96247378823c29291",
+      "instruction_count": 7,
+      "normalized_instruction_sha256": "0db7d02ec4a9097b59586917c6cfbf316b7b2c90a45ca38f2e5ec3f70278f243",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1523": {
+      "executable_offset": 279189,
+      "virtual_address": 4535445,
+      "byte_length": 33,
+      "sha256": "e393035168c327e2d7c04e94b55828696681e5f6eabbab45e27c103d00f712af",
+      "instruction_count": 16,
+      "normalized_instruction_sha256": "e69f744bbca564eb592b29b6ec8993e63c04f907b208de2955f074d1046f87e4",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1538": {
+      "executable_offset": 281168,
+      "virtual_address": 4537424,
+      "byte_length": 15,
+      "sha256": "7f8a8207c382290494a4d7fabdc00b15b17b0c51b7e9185cd4a3ae9f4cfb1226",
+      "instruction_count": 6,
+      "normalized_instruction_sha256": "0479e1d3839e11ec5ad483579aef67c8e1d81d99ba702d609e064c3fb94116ee",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1552": {
+      "executable_offset": 282920,
+      "virtual_address": 4539176,
+      "byte_length": 157,
+      "sha256": "7977b9c88ca60678c48bd16343b74af7de283391e7ac94a49c27aa269eb4ee2d",
+      "instruction_count": 69,
+      "normalized_instruction_sha256": "cd64227f183024769371ba3f12cb0661a50450597477b3ca846b591d6f79cd24",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1656": {
+      "executable_offset": 305076,
+      "virtual_address": 4561332,
+      "byte_length": 74,
+      "sha256": "8bdce1d3d508b9cbf7d5fcbbf261407789d7bbf8fd917a4225db88c6d5aa2949",
+      "instruction_count": 29,
+      "normalized_instruction_sha256": "fb3430703e53a390c573480dc2a76a799a82e386edd80d2d0e4df2494995dbb6",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1658": {
+      "executable_offset": 305360,
+      "virtual_address": 4561616,
+      "byte_length": 44,
+      "sha256": "6bdbafa74820fd4a83d1e5dfdb85032acacc6fd0e1636b481ac3f18af1ad065f",
+      "instruction_count": 23,
+      "normalized_instruction_sha256": "ee101255a4019a0c7d7e4e372bdc426e50b6f1ab72d614b370e79a41bc813f3a",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1657": {
+      "executable_offset": 305152,
+      "virtual_address": 4561408,
+      "byte_length": 207,
+      "sha256": "86d7da85e49ea3ddca538301d8ff1595065c0fb8e2a52ad7dd1b35b68bcbd6ff",
+      "instruction_count": 84,
+      "normalized_instruction_sha256": "8248127cd6d66196b4d905d201be1a2d2ba017ed215faa149d317cfafe4e45f2",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1660": {
+      "executable_offset": 305752,
+      "virtual_address": 4562008,
+      "byte_length": 177,
+      "sha256": "e23941156e2eb6f1c53020a82a29d6537e6be0b7a6af446323409fb93e3be0cc",
+      "instruction_count": 74,
+      "normalized_instruction_sha256": "dd0955a8519f7df2d6693ec66963ecfa03ef327cc77da6935c6bfb5623544ebf",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "575_postclassification": {
+      "executable_offset": 99829,
+      "virtual_address": 4356085,
+      "byte_length": 1657,
+      "sha256": "56d9e671bd0b831b6364ab1927351594d33b02967342ce401261388e65807785",
+      "instruction_count": 518,
+      "normalized_instruction_sha256": "c788e4abe83fd421ee15f968f7251b27f1b61e04a43e791bf0fae9c612036ef9",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "outgoing_edge": "JUMP_002432 is the original epilogue; host wrapper captures results then restores registers and returns."
+    },
+    "abs": {
+      "executable_offset": 421944,
+      "virtual_address": 4678200,
+      "byte_length": 22,
+      "sha256": "46c8a9d0c4e7b862f57c083615031c907a391a2166724a009057ab580d4c0795",
+      "instruction_count": 12,
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "source": "Exact uploaded DOS Watcom abs bytes; clone independently reassembled, INT_MIN stays negative."
+    }
+  },
+  "models": {
+    "15": {
+      "model_index": 15,
+      "descriptor_file_offset": 560842,
+      "descriptor_hex": "caf04900fef14900200000005ef249001600000006000000000000004b000000110000000606060008000000004b0000001e0000f0f149009af249000000000000000000",
+      "descriptor_sha256": "b359ca04d2ac30582914c20e14e17402362b4a35a39bc283daedcd7a4aeeb2df",
+      "spec_file_offset": 560794,
+      "spec_hex": "a50a9df90000080004000e0028000b400100000001800001",
+      "spec_sha256": "152669632b18334ded65adb09cfbf1d6235945a231bdfdf12653e7e0e6256b36",
+      "actual_source_spec_pointer_u32": 4846234
+    },
+    "24": {
+      "model_index": 24,
+      "descriptor_file_offset": 565992,
+      "descriptor_hex": "a0064a00b2064a0002000000000000000200000008000000000000007d00000013000000060606000a000000a028000050140000aa064a00b8064a000000000000000000",
+      "descriptor_sha256": "a0319edb595a3c88e91fefa67c1b11b81bb8bde7d8953d277710cc18fcb7d7e3",
+      "spec_file_offset": 565944,
+      "spec_hex": "9c3b7cf701001c00160029003700154001000200020b0001",
+      "spec_sha256": "b6c0ea6cb7c68a28273fbe121ac0d6b9fb6f92ed509d6f6cf387606f1902886b",
+      "actual_source_spec_pointer_u32": 4851384
+    },
+    "38": {
+      "model_index": 38,
+      "descriptor_file_offset": 580140,
+      "descriptor_hex": "343a4a00b83c4a005c000000cc3d4a001200000009000000000000006d00000017000000060606000b00000050460000c01200009e3c4a00fc3d4a000000000000000000",
+      "descriptor_sha256": "f96a200b4ccf4f12252ef1fb0240c7b4a8d637481e7ac4608dd4c7a7fb052217",
+      "spec_file_offset": 580092,
+      "spec_hex": "942a19f10201640050007c009600234001000400030c0200",
+      "spec_sha256": "b0f77d55db624b023accc8542f6b990d95515ab3e4c23bdd4e1d6e30c4cf2656",
+      "actual_source_spec_pointer_u32": 4865532
+    },
+    "81": {
+      "model_index": 81,
+      "descriptor_file_offset": 624586,
+      "descriptor_hex": "10eb4a0070eb4a001e000000000000000200000011000000000000004c0000001500000088080800110000004b4c00000000000066eb4a00000000000000000000000000",
+      "descriptor_sha256": "3cef2248b7610a735311509c5216730567358a7904d2fa1b3a6b29cc0704e0f2",
+      "spec_file_offset": null,
+      "spec_hex": "000000000000000000000000000000000000000000000000",
+      "spec_sha256": "9d908ecfb6b256def8b49a7c504e6c889c4b0e41fe6ce3e01863dd7b61a20aa0",
+      "actual_source_spec_pointer_u32": 0
+    },
+    "96": {
+      "model_index": 96,
+      "descriptor_file_offset": 628754,
+      "descriptor_hex": "5cfb4a00d0fb4a00160000000000000002000000120000000000000066000000150000008808080013000000ff66000000000000c6fb4a00000000000000000000000000",
+      "descriptor_sha256": "4ca90e4d2299918305bda2c013c0aa3d083d224def9b3e12c3276e0750e0fbea",
+      "spec_file_offset": null,
+      "spec_hex": "000000000000000000000000000000000000000000000000",
+      "spec_sha256": "9d908ecfb6b256def8b49a7c504e6c889c4b0e41fe6ce3e01863dd7b61a20aa0",
+      "actual_source_spec_pointer_u32": 0
+    },
+    "117": {
+      "model_index": 117,
+      "descriptor_file_offset": 637274,
+      "descriptor_hex": "201d4b00421d4b00080000000000000002000000160000000100000047000000250000000505050016000000391a0000b0100000321d4b00000000000000000000000000",
+      "descriptor_sha256": "412fbce642e0b1d60c15989409e2eba29ecdb2eb74b17785876513db6b1c6d34",
+      "spec_file_offset": null,
+      "spec_hex": "000000000000000000000000000000000000000000000000",
+      "spec_sha256": "9d908ecfb6b256def8b49a7c504e6c889c4b0e41fe6ce3e01863dd7b61a20aa0",
+      "actual_source_spec_pointer_u32": 0
+    },
+    "118": {
+      "model_index": 118,
+      "descriptor_file_offset": 637912,
+      "descriptor_hex": "9e1d4b00c01f4b000800000000000000020000001600000003000000490000002600000006060600180000006e490000ba2e0000b01e4b00000000000000000000000000",
+      "descriptor_sha256": "81879ce8c0d40cf5b2dbd4062ff54e880ff1d87d97bf91103fe9226a0642f18b",
+      "spec_file_offset": null,
+      "spec_hex": "000000000000000000000000000000000000000000000000",
+      "spec_sha256": "9d908ecfb6b256def8b49a7c504e6c889c4b0e41fe6ce3e01863dd7b61a20aa0",
+      "actual_source_spec_pointer_u32": 0
+    },
+    "121": {
+      "model_index": 121,
+      "descriptor_file_offset": 639826,
+      "descriptor_hex": "18254b003a274b00080000000000000002000000160000000400000051000000270000000606060019000000f4510000273400002a264b00000000000000000000000000",
+      "descriptor_sha256": "88c6fa0e7d2db72856534eafd86d0da73e9ab6909827e7cc4e2a2ea13c53917c",
+      "spec_file_offset": null,
+      "spec_hex": "000000000000000000000000000000000000000000000000",
+      "spec_sha256": "9d908ecfb6b256def8b49a7c504e6c889c4b0e41fe6ce3e01863dd7b61a20aa0",
+      "actual_source_spec_pointer_u32": 0
+    },
+    "130": {
+      "model_index": 130,
+      "descriptor_file_offset": 644544,
+      "descriptor_hex": "86374b00a8394b0008000000000000000200000016000000040000006a0000002800000008080600190000008b6a0000cc43000098384b00000000000000000000000000",
+      "descriptor_sha256": "0474704e168c377835e9de13bc971c4923008cbd76d0d3f5455a5a691b253462",
+      "spec_file_offset": null,
+      "spec_hex": "000000000000000000000000000000000000000000000000",
+      "spec_sha256": "9d908ecfb6b256def8b49a7c504e6c889c4b0e41fe6ce3e01863dd7b61a20aa0",
+      "actual_source_spec_pointer_u32": 0
+    },
+    "134": {
+      "model_index": 134,
+      "descriptor_file_offset": 646616,
+      "descriptor_hex": "7e414b00c0414b00080000000000000002000000160000000a000000740000002d000000080604001f0000009f0f0000f1090000b0414b00000000000000000000000000",
+      "descriptor_sha256": "32bf799cabafe3df2aa8bf2c51c35f4ba8082707c5764dedf93f48c2f7f8f680",
+      "spec_file_offset": null,
+      "spec_hex": "000000000000000000000000000000000000000000000000",
+      "spec_sha256": "9d908ecfb6b256def8b49a7c504e6c889c4b0e41fe6ce3e01863dd7b61a20aa0",
+      "actual_source_spec_pointer_u32": 0
+    },
+    "140": {
+      "model_index": 140,
+      "descriptor_file_offset": 647468,
+      "descriptor_hex": "f2444b0014454b00080000000000000002000000160000000c0000004000000040000000af0b06002100000007400000be28000004454b00000000000000000000000000",
+      "descriptor_sha256": "c41726f5907c147ad88a4d276dca065c2fbaaebed0feb24b4c56aa5f37133f85",
+      "spec_file_offset": null,
+      "spec_hex": "000000000000000000000000000000000000000000000000",
+      "spec_sha256": "9d908ecfb6b256def8b49a7c504e6c889c4b0e41fe6ce3e01863dd7b61a20aa0",
+      "actual_source_spec_pointer_u32": 0
+    }
+  },
+  "source_external_aliases": {
+    "DATA_008696": 6504136,
+    "DATA_008698": 6504138,
+    "DATA_008699": 6504139,
+    "DATA_008700": 6504140,
+    "DATA_008702": 6504144,
+    "DATA_008705": 6504156,
+    "DATA_008706": 6504160,
+    "DATA_008707": 6504164,
+    "DATA_008857": 6562300,
+    "_abs": 4678200,
+    "FUNC_000953": 4448124,
+    "JUMP_002432": 4357742,
+    "FUNC_000571": 4355296,
+    "FUNC_001333": 4515862,
+    "FUNC_001335": 4515912,
+    "FUNC_001503": 4533130,
+    "FUNC_001504": 4533190,
+    "FUNC_001519": 4535194,
+    "FUNC_001520": 4535330,
+    "FUNC_001521": 4535416,
+    "FUNC_001658": 4561616,
+    "FUNC_001538": 4537424,
+    "DATA_007756": 5249096,
+    "DATA_007719": 5247748,
+    "FUNC_001466": 4525815,
+    "FUNC_001656": 4561332,
+    "DATA_007738": 5247872,
+    "FUNC_001502": 4532991,
+    "FUNC_001501": 4532927,
+    "DATA_007737": 5247868,
+    "FUNC_001522": 4535433,
+    "FUNC_001523": 4535445,
+    "FUNC_001552": 4539176,
+    "DATA_004681": 5049596,
+    "FUNC_001657": 4561408,
+    "FUNC_001660": 4562008
+  },
+  "callback_raw_schema": [
+    "function_number",
+    "amount_s32_bits",
+    "attacker_u32",
+    "reserved_zero"
+  ],
+  "execution_checks": {
+    "fresh_identical_processes": 3,
+    "reverse_case_order_identical": true,
+    "object_parent_relative_descriptor_spec_output_canaries": true,
+    "unrelated_body_bytes_unchanged": true,
+    "parent_and_descriptors_and_specs_unchanged": true,
+    "expected_transitions_computed_by_python": false
+  },
+  "scope": [
+    "Complete original bounded F575 JUMP002410..JUMP002431 then epilogue; original prior classification is supplied, not executed.",
+    "Canonical player body86==DATA8857 only; NPC branch is not part of generated canonical cases.",
+    "Source F953 calls are recorded without applying HP, equipment destruction, RNG or callbacks; caller owns those separately.",
+    "F577 distance-squared/raw context can be supplied independently for synthetic operand controls; no geometric hit proof follows from them.",
+    "Raw64 fields also have exact little-endian hex; JSON decimal numbers are human previews and must not be used as lossy64-bit machine inputs.",
+    "No F569/F576/F577/F578 scanner/geometry or reference-frame transition is executed; no complete F575 or original collision-engine claim."
+  ],
+  "invalid_domains_not_executed": [
+    "Non-player object identity: this kernel scope requires body86==player index0..255.",
+    "Malformed raw338 objects, raw68 descriptors or raw24 specification; missing descriptor/model table entry."
+  ],
+  "independent_literal_controls": [
+    {
+      "name": "fully-deployed-clean-contact",
+      "case_id": "dos-surface-contact-0010",
+      "literal_expected": [
+        true,
+        67,
+        0,
+        [],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "observed": [
+        true,
+        67,
+        0,
+        [],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "name": "gear-not-ready-zero-speed-quarter-hull-request",
+      "case_id": "dos-surface-contact-0001",
+      "literal_expected": [
+        false,
+        131,
+        [
+          {
+            "amount_s32": 100,
+            "attacker_u32": 0
+          }
+        ]
+      ],
+      "observed": [
+        false,
+        131,
+        [
+          {
+            "amount_s32": 100,
+            "attacker_u32": 0
+          }
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "name": "disabled-response-no-invented-damage",
+      "case_id": "dos-surface-contact-0000",
+      "literal_expected": [
+        false,
+        3,
+        []
+      ],
+      "observed": [
+        false,
+        3,
+        []
+      ],
+      "passed": true
+    },
+    {
+      "name": "speed600-equality-lands",
+      "case_id": "dos-surface-contact-0022",
+      "literal_expected": [
+        600,
+        true,
+        [],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "observed": [
+        600,
+        true,
+        [],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "name": "speed601-tangent-damping-and-mass-floor",
+      "case_id": "dos-surface-contact-0034",
+      "literal_expected": [
+        601,
+        false,
+        [
+          {
+            "amount_s32": 100,
+            "attacker_u32": 0
+          }
+        ],
+        [
+          400,
+          0,
+          0
+        ]
+      ],
+      "observed": [
+        601,
+        false,
+        [
+          {
+            "amount_s32": 100,
+            "attacker_u32": 0
+          }
+        ],
+        [
+          400,
+          0,
+          0
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "name": "incoming-normal-bounce-and-source-damage",
+      "case_id": "dos-surface-contact-0085",
+      "literal_expected": [
+        [
+          {
+            "amount_s32": 111,
+            "attacker_u32": 0
+          }
+        ],
+        [
+          0,
+          100,
+          0
+        ]
+      ],
+      "observed": [
+        [
+          {
+            "amount_s32": 111,
+            "attacker_u32": 0
+          }
+        ],
+        [
+          0,
+          100,
+          0
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "name": "watcom-int-min-abs-wrap-kept",
+      "case_id": "dos-surface-contact-0130",
+      "literal_expected": [
+        -2147483648,
+        true,
+        []
+      ],
+      "observed": [
+        -2147483648,
+        true,
+        []
+      ],
+      "passed": true
+    },
+    {
+      "name": "old40-flag-is-not-new-acceptance",
+      "case_id": "dos-surface-contact-0537",
+      "literal_expected": [
+        false,
+        67
+      ],
+      "observed": [
+        false,
+        67
+      ],
+      "passed": true
+    },
+    {
+      "name": "existing-collider-parent-identity-preserved",
+      "case_id": "dos-surface-contact-0570",
+      "literal_expected": [
+        255,
+        true
+      ],
+      "observed": [
+        255,
+        true
+      ],
+      "passed": true
+    }
+  ],
+  "fixture_sha256": "a4c23ec94860641f18bb3632189346f3a264834904532bd24bed0e980e3ebeef",
+  "tool_sha256": "6cb4314fbe1004eafd9476e80e9743f94c684b4a8359101d41fa6a77a572a6f9",
+  "native_assembly_sha256": "4f4c257ad990ba0d641b259419650c589c4fd03c15e5cae714e1a10c2f13ce44"
+}

@@ -1,0 +1,258 @@
+{
+  "schema": "starfrontier-current-surface-contact-targeted-summary-v1",
+  "created_utc": "2026-11-07T23:00:46.583519+00:00",
+  "version": "0.19.0-surface-contact-alpha1",
+  "checks": 22137,
+  "passed_suites": 32,
+  "failures": 0,
+  "status": "passed",
+  "suites": [
+    {
+      "test": "tests/test_source_atmosphere_contact.gd",
+      "checks": 3904,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regression-report-paths.json",
+      "test_source_sha256": "5b395843d023a3f82fe70055746ed5975bdb7ea4faa0f790296fba01d9e1cb31"
+    },
+    {
+      "test": "tests/test_source_thermal_session.gd",
+      "checks": 118,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "4b50093f84e82b3277291db5ba64c497641a62cf8ee57f3109868fae59e7b0c2"
+    },
+    {
+      "test": "tests/test_source_thermal_main.gd",
+      "checks": 463,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regression-report-paths.json",
+      "test_source_sha256": "e4585aab39cf839eef18e07604366b0333156485e666d4e1445fe683fc805319"
+    },
+    {
+      "test": "tests/test_source_fuel_session.gd",
+      "checks": 109,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "a8f37d7873be6eed0689307a0b301ccd44d48164dba20b582957fb1b1d295d7c"
+    },
+    {
+      "test": "tests/test_source_fuel_main.gd",
+      "checks": 397,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regression-report-paths.json",
+      "test_source_sha256": "ffb4bb3d920c5d758c370a4ce5a305cebf37ff3087176f3f8d91e453864591f5"
+    },
+    {
+      "test": "tests/test_source_fuel_flight.gd",
+      "checks": 29,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "2580eb9f6c3999103e78d8d533305509eb602991d0630c47c8c98c7cee310f37"
+    },
+    {
+      "test": "tests/test_source_hyperdrive_main.gd",
+      "checks": 70,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regression-report-paths.json",
+      "test_source_sha256": "1562e96545e7d30e9aaff5004cb940b844a89024b984c99109bc9b2f2c9b82b8"
+    },
+    {
+      "test": "tests/test_navigation_main.gd",
+      "checks": 53,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "134ccfc0534ce835429cdd2c0cdbae7272c96d073ae011df03d19ee159661d73"
+    },
+    {
+      "test": "tests/test_rotating_dock_dynamics.gd",
+      "checks": 201,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "c04a07d13b6c6d8853228cec8a5274324dbc6de5c52ee078ca91d9448a1a86f1"
+    },
+    {
+      "test": "tests/test_source_motion_main_continuation.gd",
+      "checks": 28,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "98f30d43361747a56627170e76dbdaf1f3f7bbdefe53027ac2920899b2e5e728"
+    },
+    {
+      "test": "tests/test_classic_console_main.gd",
+      "checks": 42,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "a9d2f15c1ecd3911828f96671fa52636a60fcadbfbf57230fc4cb8b12c027fcf"
+    },
+    {
+      "test": "tests/test_flight_projection.gd",
+      "checks": 691,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "a1e2569ae67b334851340782de2dab1c41ee8ceba3bb28b8ba66055d21f777d7"
+    },
+    {
+      "test": "tests/test_source_console_pause.gd",
+      "checks": 131,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "a1b35c822a69b79f9327a97885f6e95826b3fb84fba877f0593c85c767c3f9b4"
+    },
+    {
+      "test": "tests/test_source_full_startup.gd",
+      "checks": 10,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "ffaa0a4a6736da6409315e74753c15896e73d55e01348b42314652126f9b9c06"
+    },
+    {
+      "test": "tests/test_source_surface_streaming.gd",
+      "checks": 2362,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "16c60c0429ea264d1b60fb03177c0fd52ad612c4e903c5749582744a4c635473"
+    },
+    {
+      "test": "tests/test_source_surface_render_state.gd",
+      "checks": 1108,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "1ad88b38ed2aa73013920e62cb6a9d624f6748d87616f72325be223bb80c8dfb"
+    },
+    {
+      "test": "tests/test_source_surface_contact_patch.gd",
+      "checks": 32,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "3468d237cf3a4528c76cb14a6b5a7f0d0c5bb737f8607f1b95f58e811d22ae19"
+    },
+    {
+      "test": "tests/test_source_underground_controller.gd",
+      "checks": 197,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "9e55fac81c31acf49199a61e38b036fd951bbcac902eec29ebbddc2a1fb3d767"
+    },
+    {
+      "test": "tests/test_source_main_full.gd",
+      "checks": 153,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "6a17efe8fd09d5e26e3704d80081d712427c30f8808fdb2171dae43899e7465d"
+    },
+    {
+      "test": "tests/test_source_docking_flight.gd",
+      "checks": 402,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "01dfc4d243969917ad7354df996ecafc5da5c031fc2f00f7fe2a52c769fcd27c"
+    },
+    {
+      "test": "tests/test_rebuilt_save_touch.gd",
+      "checks": 71,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "c2755cdb318c5f75c8c1a348d14ed8bc4e2014a9e1bcf9807264a5a3196786f0"
+    },
+    {
+      "test": "tests/test_graphics_integration.gd",
+      "checks": 44,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "07803e334be7ce9c9feea54a6ca2a942971f99b206c213f3aed53c28c31cb34c"
+    },
+    {
+      "test": "tests/test_graphics_scope.gd",
+      "checks": 87,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "222ad1fc4b32ecb896c751945e2d50ca9b5432f63780a3cd6821e3dda91558b8"
+    },
+    {
+      "test": "tests/test_offpad_takeoff.gd",
+      "checks": 109,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "20f95381e09b9467225e6038f4d33fa4b5f0c9f279f4f9e738e9c0d668011c27"
+    },
+    {
+      "test": "tests/test_surface_action_controls.gd",
+      "checks": 66,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "9408e25188442cd113ff5b8070c06a88e506c6104d102b43ad346e0cb1c35260"
+    },
+    {
+      "test": "tests/test_report_export.gd",
+      "checks": 27,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "c7ccee21fb27c906336abebc9897acf6eb5b7479a30d934e69d0c3b8a55a7e80"
+    },
+    {
+      "test": "tests/test_bug_report_ui.gd",
+      "checks": 99,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/regressions.json",
+      "test_source_sha256": "01600083741179de09a29a8f11807974eee4857fab1c2734eeaa328267770079"
+    },
+    {
+      "test": "tests/test_source_surface_contact.gd",
+      "checks": 10498,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/source-surface-contact-core.json",
+      "test_source_sha256": "10f1af8de3f1d03f988593b6dbf1f89a31138b5134004d6af64c6b979f3362c5"
+    },
+    {
+      "test": "tests/test_source_surface_contact_bridge.gd",
+      "checks": 234,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/source-surface-contact-bridge.json",
+      "test_source_sha256": "73c917d322a6f938698c3680bb4fbe33615cefcfc4603f0a8cb467a51da9f84a"
+    },
+    {
+      "test": "tests/test_source_contact_damage.gd",
+      "checks": 70,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/shared-contact-damage.json",
+      "test_source_sha256": "0b8e7f86e05267cc8d1f8546c9393438f49e2ce38aceaaf6464d4701b4c52d39"
+    },
+    {
+      "test": "tests/test_source_contact_main.gd",
+      "checks": 220,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/source-contact-main.json",
+      "test_source_sha256": "8206fb7eb9589fa03cfda6e8850e4553aae07a10817f56ef77490d1ff5e96d80"
+    },
+    {
+      "test": "tests/test_source_gear_main.gd",
+      "checks": 112,
+      "failures": 0,
+      "proof": "validation/contact-2026-11-08/gear-main-regression.json",
+      "test_source_sha256": "cef0f4ba8eae4d76e5014ae28532ac6e51f39c79ed07b0e91a81761cc85a1d5f"
+    }
+  ],
+  "proofs_sha256": {
+    "validation/contact-2026-11-08/regressions.json": "27e973c074a050c846c705f304ef5e63d1cd81bb90d31c9044a43965091e74eb",
+    "validation/contact-2026-11-08/regression-report-paths.json": "712535484b666ac5f730f550e539b8f33477a4d003f5d2a5d41eb96b14f475b9",
+    "validation/contact-2026-11-08/source-surface-contact-core.json": "0d4e52030d4b18298ca7a5b7d947a065d55fe38e44897d7ddb5aa55a14e3dca8",
+    "validation/contact-2026-11-08/source-surface-contact-bridge.json": "3ed28c665abe188e9a8c7eaade9a8719035b4db5ecc02b32ee16c23ae9abf17d",
+    "validation/contact-2026-11-08/shared-contact-damage.json": "c424a129e5f959a485a9cdd89899f89d564baa1c6864228cd315d63124012c27",
+    "validation/contact-2026-11-08/source-contact-main.json": "46c95a3c0254eb7c0ba99f76bdf65d640d4d6d8611de6633085749576494af8d",
+    "validation/contact-2026-11-08/gear-main-regression.json": "725417169a8c9c593847ac64aa3fb8130e3ec7b666b45c12f71bd2e564cc8679"
+  },
+  "new_instruction_matched_DOS_native_cases": 858,
+  "original_DOS_bounded_primary_instructions": 518,
+  "original_DOS_proved_scope_count": 21,
+  "original_DOS_proved_scope_instructions": 1259,
+  "new_native_cases_included_in_core_checks": true,
+  "historical_totals_added": false,
+  "repeated_report_path_checks_added": false,
+  "repeated_source_archive_checks_added": false,
+  "capture_checks_added": false,
+  "scope": "One current passing result per unique selected contact kernel/bridge/shared-HP/Main/gear and regression group. Four report-output destinations moved from historical0.18 to current0.19 and rerun; their final results replace earlier same-group rows. Native controls included within kernel total. Failed/intermediate runs, repeated portability/capture and historical totals excluded; bounded suite times retained, not an atomic full-game run.",
+  "full_original_port_complete": false,
+  "full_original_physics": false,
+  "physical_device_tested": false,
+  "production_release_ready": false
+}

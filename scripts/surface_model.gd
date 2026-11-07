@@ -41,6 +41,8 @@ var rebase_from:=Vector3.ZERO
 var rebase_to:=Vector3.ZERO
 const SegmentBox=preload("res://scripts/segment_box.gd")
 const G := 6.67430e-11
+const SourceUnits=preload("res://scripts/source_units.gd")
+const CONTACT_QUANTIZATION_METRES:=2.0*SourceUnits.METRES_PER_RAW
 const SOLAR_MASS := 1.98847e30
 const LIMIT := 1750.0
 const GRID_WIDTH:=4000.0
@@ -51,6 +53,8 @@ var taking_off:=false
 var landing_gear_managed:=false
 var landing_gear_ready:=true
 var landing_gear_status:=""
+var source_contact_enabled:=false
+var _pending_source_contact:Dictionary={}
 var active := false
 var landed := false
 var landing := false
@@ -67,6 +71,47 @@ func set_landing_gear_state(managed:bool,ready:bool,status:String="")->void:
 	landing_gear_managed=managed;landing_gear_ready=ready;landing_gear_status=status
 
 func _gear_blocks_touchdown()->bool:return landing_gear_managed and not landing_gear_ready
+
+func set_source_contact_enabled(enabled:bool)->void:
+	source_contact_enabled=enabled
+	if not enabled:_pending_source_contact.clear()
+
+func uses_source_contact()->bool:return source_contact_enabled and source_surface()
+
+func pending_source_contact()->Dictionary:return _pending_source_contact.duplicate(true)
+
+func _queue_source_contact(ship:RefCounted,kind:String,hit:Dictionary={})->bool:
+	if not uses_source_contact() or not _pending_source_contact.is_empty():return false
+	_pending_source_contact={"kind":kind,"candidate_position":Vector3(hit.get("position",ship.position)),"provider_hit":hit.duplicate(true),"frame_index":frame_index,"body_id":body_id}
+	message="Обрабатывается касание поверхности."
+	return true
+
+func _source_contact_needed(ship:RefCounted)->bool:
+	var height:=altitude(ship)
+	if height>CONTACT_QUANTIZATION_METRES or ship.velocity.y>0:return false
+	# The phone pilot brakes in place while the actual mechanism extends.
+	# This is powered guidance, not a fictitious safe collision or a cooldown.
+	if landing and _gear_blocks_touchdown() and absf(ship.velocity.y)<0.000001 and height>=-CONTACT_QUANTIZATION_METRES:return false
+	return true
+
+func finish_source_contact(ship:RefCounted,resolution:Dictionary,parked:bool,hpdetail:Dictionary)->void:
+	# Main validates the complete candidate and commits the shared raw HP
+	# before this non-failing pose application. No damage is computed here.
+	ship.position=Vector3(resolution.position);ship.velocity=Vector3(resolution.velocity);ship.attitude=Quaternion(resolution.attitude)
+	landed=parked and ship.hull>0
+	ship.target_speed=0;ship.autopilot=false
+	landing=false;taking_off=false;flight_phase="";ready_for_orbit=false
+	if landed:
+		ship.velocity=Vector3.ZERO
+		message="Мягкая посадка выполнена. «Взлететь» — подъём над поверхностью."
+	elif hpdetail.get("destruction_requested",false):message="Корабль потерян при ударе о поверхность."
+	elif float(hpdetail.get("hull_percent_loss",0.0))>0:
+		message="Удар о поверхность: отскок. Корпус %.2f%%. Для отхода используйте «Подъём»."%ship.hull
+	else:message="Касание поверхности обработано. Для посадки выпустите шасси и выровняйте корабль."
+	_pending_source_contact.clear()
+	if globe and Vector2(ship.position.x,ship.position.z).length()>REBASE_DISTANCE:recenter(ship)
+	render_position=ship.position;render_velocity=ship.velocity
+	_source_render_clearance=altitude(ship)
 
 func _hold_for_landing_gear(ship:RefCounted)->void:
 	# Explicit phone contact adapter until the complete F575 hull response is
@@ -321,6 +366,7 @@ func begin_landing(ship: RefCounted) -> bool:
 func step(dt: float, ship: RefCounted, steering: Vector2, roll: float, lift := 0.0) -> void:
 	ship.last_propulsive_delta_v=Vector3.ZERO
 	if not active or not is_finite(dt) or dt<=0 or ship.hull<=0:return
+	if not _pending_source_contact.is_empty():return
 	if not _refresh_gravity(ship):message="Не удалось обновить исходную гравитацию.";return
 	if underground!=null:underground.step_seconds(dt,globe,ship.position,collision_radii(ship),landed and not _gear_blocks_touchdown())
 	if landed:
@@ -356,6 +402,9 @@ func step(dt: float, ship: RefCounted, steering: Vector2, roll: float, lift := 0
 		var desired:=horizontal.normalized()*minf(60,sqrt(horizontal.length()*reserve))
 		var cruise:float=maxf(350.0,float(city_data.cruise_height_m)) if not city_data.is_empty() else 200.0
 		desired.y=-minf(25,sqrt(maxf(0,height-0.3)*reserve)) if horizontal.length()<40 else clampf((height_at(ship.position.x,ship.position.z)+cruise+clearance(ship)-ship.position.y)*0.1,-20,20)
+		if uses_source_contact():
+			if _gear_blocks_touchdown():desired=Vector3.ZERO
+			elif horizontal.length()<40:desired.y=-minf(25,sqrt(maxf(0,height+CONTACT_QUANTIZATION_METRES)*reserve))
 		var climb_threshold:float=cruise-20.0 if not city_data.is_empty() else 100.0
 		if globe and horizontal.length()>40 and altitude(ship)<climb_threshold:
 			# Climb above the actual city roofs before crossing the district.
@@ -370,6 +419,7 @@ func step(dt: float, ship: RefCounted, steering: Vector2, roll: float, lift := 0
 	var correction:Vector3=ship.last_propulsive_delta_v-requested_delta
 	ship.velocity+=correction;ship.position+=correction*dt
 	_clip_buildings(previous,ship)
+	if not _pending_source_contact.is_empty():return
 	if ship.hull<=0:return
 	var radial:=Vector2(ship.position.x,ship.position.z)
 	if not globe and radial.length()>LIMIT:
@@ -381,13 +431,16 @@ func step(dt: float, ship: RefCounted, steering: Vector2, roll: float, lift := 0
 	var ceiling:=height_at(ship.position.x,ship.position.z)+clearance(ship)+(MAX_FLIGHT_HEIGHT if extended_flight else 4000.0) if globe else 4000.0
 	if ship.position.y>ceiling:
 		ship.position.y=ceiling;ship.velocity.y=minf(ship.velocity.y,0);ship.target_speed=0
-	if landing and altitude(ship)<=0.6 and ship.velocity.length()<=6 and (not globe or pad_distance(ship)<80):
+	if uses_source_contact() and _source_contact_needed(ship):
+		_queue_source_contact(ship,"terrain")
+		return
+	if not uses_source_contact() and landing and altitude(ship)<=0.6 and ship.velocity.length()<=6 and (not globe or pad_distance(ship)<80):
 		if _gear_blocks_touchdown():_hold_for_landing_gear(ship)
 		else:
 			ship.position.y=_grounded_height(ship,ship.position.x,ship.position.z)
 			ship.velocity=Vector3.ZERO;ship.target_speed=0;landing=false;landed=true
 			message="Посадка выполнена. «Взлететь» — подъём над поверхностью."
-	if altitude(ship)<=0 and not landed:
+	if not uses_source_contact() and altitude(ship)<=0 and not landed:
 		var impact: float=ship.velocity.length()
 		if impact>6:
 			ship.hull=maxf(0,ship.hull-(impact-6)*3)
@@ -408,6 +461,10 @@ func step(dt: float, ship: RefCounted, steering: Vector2, roll: float, lift := 0
 	_source_render_clearance=altitude(ship) if source_surface() else NAN
 
 func touch_down(ship: RefCounted) -> bool:
+	if uses_source_contact():
+		if not active or landed or ship.hull<=0 or not _source_contact_needed(ship):return false
+		if _gear_blocks_touchdown():message="Для посадки дождитесь полного выпуска шасси.";return false
+		return _queue_source_contact(ship,"manual")
 	if not active or landed or ship.hull<=0 or altitude(ship)>3 or ship.velocity.length()>6:return false
 	if _gear_blocks_touchdown():
 		message="Для мягкой посадки шасси должны быть полностью выпущены.";return false
@@ -632,6 +689,12 @@ func _clip_source_city(previous:Vector3,ship:RefCounted)->void:
 	var ground:=height_at(contact.position.x,contact.position.z)
 	var floor_contact:bool=contact.normal.dot(Vector3.UP)>0.9 and absf(float(contact.position.y)-radii.y-ground)<=0.25
 	if floor_contact:
+		if uses_source_contact():
+			if ship.velocity.dot(Vector3(contact.normal))>0:return
+			if landing and _gear_blocks_touchdown() and ship.velocity.length()<0.000001:return
+			var hit:Dictionary=contact.duplicate(true);hit.height=ground
+			_queue_source_contact(ship,"city_floor",hit)
+			return
 		var impact:float=ship.velocity.length()
 		ship.position=Vector3(contact.position.x,_grounded_height(ship,contact.position.x,contact.position.z),contact.position.z)
 		if impact>6:

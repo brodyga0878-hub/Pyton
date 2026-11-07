@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-07T22:23:24.954910+00:00",
+  "status": "passed",
+  "scope": "Atomic shared raw F953 HP/shield/local-RNG contact consumer; no new stored HP or clock, not full original F575/F942/F952 lifecycle",
+  "checks": 70,
+  "groups": 1,
+  "failures": 0,
+  "test": "tests/test_source_contact_damage.gd",
+  "log": "validation/contact-2026-11-08/shared-contact-damage.log",
+  "sha256": {
+    "scripts/source_hyperdrive_session.gd": "931427fe16367c8a7d32fdfbb554e14ef64987a477fa8e275a75122aa1505c14",
+    "scripts/navigation.gd": "5f689fce7b1f899c4a39e95add22dd59a8b9ba2909ccfec2d7bf18a74698f3c6",
+    "tests/test_source_contact_damage.gd": "0b8e7f86e05267cc8d1f8546c9393438f49e2ce38aceaaf6464d4701b4c52d39",
+    "scripts/source_atmospheric_dynamics.gd": "a9ccce9fa27a2354205f3b1c88a9108320f567742d44d84082635339bc9af4a9",
+    "data/ffe_hyperdrive.json": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+    "data/ffe_fuel.json": "4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f",
+    "data/ffe_atmosphere.json": "b65e25e187ac4abe7e24325a78de3fe70c140395711127ee0076f9905222bcce",
+    "data/ffe_landing_gear.json": "f06d7184046407dea3ee45fb3c6dedeb6bfaf21fe1a6136a388a87fa97ed1f00"
+  },
+  "contracts": {
+    "damage_call_keys": [
+      "amount_s32",
+      "attacker_u32"
+    ],
+    "maximum_consumer_calls": 64,
+    "covered_original_player_F575_response_maximum_calls": 1,
+    "validates_entire_array_before_mutation": true,
+    "empty_list_is_no_effect_without_HP_projection": true,
+    "existing_shared_thermal_keys": 27,
+    "existing_fuel_keys": 17,
+    "existing_exact_fractional_HP_anchor_preserved": true,
+    "existing_local_F1530_stream_reused": true,
+    "fatal_source_hull_word_preserved_and_destroyed_projects_HP0": true,
+    "source_charge_cancelled_on_fatal_without_hyperfuel_debit": true,
+    "all_fuel_quantities_and_heat_cadence_fields_unchanged": true,
+    "no_thermal_clock_cooling_or_atmosphere_call": true,
+    "last_atmosphere_drag_and_atmospheric_loss_history_preserved": true,
+    "contact_loss_and_callbacks_returned_separately": true,
+    "prior_non_source_collision_requires_explicit_sync": true,
+    "no_silent_legacy_hyperdrive_migration": true
+  },
+  "coverage": [
+    "Legacy fractional37.625 and minimum rawdamage1; exact anchored delta and local RNG draw",
+    "Shield absorption versus actual hull loss and zero-call versus empty-list source callback distinction",
+    "Cold save continuation of rawHP/RNG without replaying old contact",
+    "Fatal normalizednegative damage, rawhull1 equality, ordered composition stopping after fatal",
+    "Invalid tail after valid call, extra/missing/wrong-domain fields, callback/RNG/HP atomic rejection",
+    "Source hyperjump pending canceled atomically with no fuel or jump-time consumption",
+    "Actual preceding atmospheric history remains distinct from new contact result",
+    "Explicit live collision reanchor, strict mismatched cargo bridge rejection"
+  ],
+  "review": "Independent read-only review by the existing F953/core owner found no material issue; no extra native oracle execution included",
+  "limits": [
+    "This consumer uses the existing explicit player context, identity event filter and local F1530 policy.",
+    "F942/F952/module/sound callbacks are returned as observations; complete object/equipment/audio VM effects remain outside this block.",
+    "Main owns FULL-layout gating, physical contact classification, prior external-collision sync and world-transfer cancellation.",
+    "The fixed64-call consumer bound is an adapter; covered F575 player responses contain at most one call.",
+    "Old direct tests were not rerun solely for this additive consumer; root owns relevant consolidated regressions.",
+    "Headless model checks do not measure physical Android, GPU or full original gameplay."
+  ]
+}

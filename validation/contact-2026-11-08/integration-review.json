@@ -1,0 +1,231 @@
+{
+  "schema": 1,
+  "review": "source-surface-contact-main-surface-integration-closeout",
+  "created_utc": "2026-11-07T22:58:09.616709+00:00",
+  "reviewer": "/root/time_dynamics_impl/time_controller_review",
+  "result": "no_material_blockers_found_in_reviewed_final_sources",
+  "scope": "Read-only review of Main/Surface contact integration, shared HP, pose ordering, source-only and legacy boundaries, deferred fuel/time, pending-state immutability, save/backup/reload, diagnostics and multi-frame Menu touch ownership. The only file written by this closeout is this report.",
+  "source_files": {
+    "scripts/main.gd": {
+      "sha256": "ad3cde5417c04c042f729cd3a391d7a996f048990e26c8cf7cf66d2b8637d09f",
+      "bytes": 121004,
+      "line_count": 1685
+    },
+    "scripts/surface_model.gd": {
+      "sha256": "449155f904b72e6c97e430b90b78d1859c6d6a27017f297620552e5094eb32ff",
+      "bytes": 62033,
+      "line_count": 944
+    },
+    "scripts/source_surface_contact_bridge.gd": {
+      "sha256": "f83bbecc35c60bfaf79cf2314d067f997b966258665a41a93f082534ba7dfdd9",
+      "bytes": 24364,
+      "line_count": 251
+    },
+    "scripts/source_surface_contact.gd": {
+      "sha256": "fcfb6077f0bcabf7b6ffce98c3a3dbb23251a850175be4ef241b299fdf8d117d",
+      "bytes": 10874,
+      "line_count": 147
+    },
+    "scripts/navigation.gd": {
+      "sha256": "5f689fce7b1f899c4a39e95add22dd59a8b9ba2909ccfec2d7bf18a74698f3c6",
+      "bytes": 36407,
+      "line_count": 444
+    },
+    "scripts/source_fuel_flight_bridge.gd": {
+      "sha256": "70921d3cb8b7d211f07f1211309f809dab1e0be9094ccf015e658558d6a04b52",
+      "bytes": 1981,
+      "line_count": 34
+    },
+    "scripts/flight_console.gd": {
+      "sha256": "0a9fe99fd5e4f2cfb276e476a8a12c141cbb9b74a92cd246c4dcfa9cc4180c54",
+      "bytes": 25148,
+      "line_count": 385
+    },
+    "scripts/touch_action_button.gd": {
+      "sha256": "8aaf97622f0b5ba3d96b52e2aacb3a51b99c15dd48934fa2bb532bab033e696b",
+      "bytes": 4154,
+      "line_count": 101
+    },
+    "scripts/diagnostics_logger.gd": {
+      "sha256": "a0a2a4a993613f3f864d669f862229db29293793a6084636bee1d4eabbf7a052",
+      "bytes": 2093,
+      "line_count": 45
+    },
+    "scripts/game_diagnostics.gd": {
+      "sha256": "ec43f79d0971680225f0555ac9d7f6e60f41806257bae7e9c1bff8a4f73c0fc3",
+      "bytes": 16340,
+      "line_count": 290
+    }
+  },
+  "checks": [
+    {
+      "id": "bounded_source_scope",
+      "status": "reviewed_no_blocker",
+      "references": [
+        "scripts/main.gd:195",
+        "scripts/surface_model.gd:75",
+        "scripts/surface_model.gd:434",
+        "scripts/surface_model.gd:691"
+      ],
+      "finding": "Source contact is enabled only in the full source layout with source hyperdrive and source terrain. Terrain/manual and explicit city-floor proxy consume the bounded core; nonfloor wall and legacy contact paths remain separate."
+    },
+    {
+      "id": "pose_hp_once",
+      "status": "reviewed_no_blocker",
+      "references": [
+        "scripts/main.gd:215",
+        "scripts/main.gd:225",
+        "scripts/main.gd:230",
+        "scripts/surface_model.gd:97",
+        "scripts/navigation.gd:388"
+      ],
+      "finding": "Resolved pose is checked before shared raw HP requests; Surface.finish_source_contact commits the pose and consumes the queue without a second SI percent impact penalty. A fatal result clears deferred work before destruction/save."
+    },
+    {
+      "id": "preimpact_nozzle_basis",
+      "status": "resolved",
+      "references": [
+        "scripts/main.gd:505",
+        "scripts/main.gd:508",
+        "scripts/main.gd:510",
+        "scripts/source_fuel_flight_bridge.gd:27"
+      ],
+      "previous_issue": "Inferring nozzle commands after native contact/rebase projected the powered impulse through a different attitude and could change clamped force words and fuel debit.",
+      "resolution": "Commands are captured immediately after Surface.step and before applying native contact."
+    },
+    {
+      "id": "deferred_original_interval",
+      "status": "resolved",
+      "references": [
+        "scripts/main.gd:470",
+        "scripts/main.gd:472",
+        "scripts/main.gd:474",
+        "scripts/main.gd:509",
+        "scripts/main.gd:536"
+      ],
+      "previous_issue": "A failed original contact frame could retain its clock/impulse but lose its fuel/surface/camera/save continuation on retry.",
+      "resolution": "The original seconds, force words, frame and landed state are retained; a successful retry clears and finishes that stored interval exactly once without applying retry dt."
+    },
+    {
+      "id": "retry_clock_scheduler_boundary",
+      "status": "resolved",
+      "references": [
+        "scripts/main.gd:408",
+        "scripts/main.gd:412",
+        "scripts/main.gd:464"
+      ],
+      "previous_issue": "Retry after failed contact advanced gear/time and could be counted as a new scheduler step.",
+      "resolution": "Pending work is handled before W/S polling and plan_frame; direct _tick callers also resolve pending before advancing gear, clock or fuel."
+    },
+    {
+      "id": "immutable_pending_context",
+      "status": "resolved",
+      "references": [
+        "scripts/main.gd:218",
+        "scripts/main.gd:618",
+        "scripts/main.gd:643",
+        "scripts/main.gd:864",
+        "scripts/main.gd:1015",
+        "scripts/main.gd:1316",
+        "scripts/main.gd:1342"
+      ],
+      "previous_issue": "Brake/gear/throttle/fuel commands and LOD publication could change live operands or terrain between a failed contact and retry.",
+      "resolution": "Body/frame identity is checked; physical controls and runtime fuel/service commands are blocked while pending; geometry publication is frozen. Restore/new-game remain explicit recovery replacements."
+    },
+    {
+      "id": "pending_save_backup_recovery",
+      "status": "resolved",
+      "references": [
+        "scripts/main.gd:1082",
+        "scripts/main.gd:1486",
+        "scripts/main.gd:1556",
+        "scripts/main.gd:1565",
+        "scripts/main.gd:1580"
+      ],
+      "previous_issue": "Pending state must not overwrite the last valid save or produce an apparently valid backup envelope containing an empty game payload; a reload instruction needs a reachable action.",
+      "resolution": "Pending payload/save writes are rejected; backup stays blank and allows importing an existing code; recovery menu exposes a strict last-save reload; commit/new-game clear contact error and deferred state."
+    },
+    {
+      "id": "rank_deficient_native_output",
+      "status": "resolved_explicit_phone_adapter",
+      "references": [
+        "scripts/source_surface_contact_bridge.gd:173",
+        "scripts/source_surface_contact_bridge.gd:177",
+        "scripts/source_surface_contact_bridge.gd:249",
+        "tests/fixtures/source_surface_contact_native.json case dos-surface-contact-0013"
+      ],
+      "previous_issue": "A legitimate native rank-one result was rejected together with its position, velocity and F953 requests.",
+      "resolution": "Keep the previous phone Quaternion only when the native output is finite and rank deficient, while preserving exact kernel raw output and all other effects. Reflected nondegenerate outputs remain rejected; facts identify the projection policy and raw basis.",
+      "existing_native_fixture_observation": {
+        "case": "dos-surface-contact-0013",
+        "initial_matrix_determinant": 1,
+        "expected_matrix_determinant": 0,
+        "expected_matrix_q31": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2130705920,
+          0,
+          0
+        ],
+        "expected_F953_amount_s32": 100,
+        "method": "Read an existing independently generated native fixture; no fixture regeneration or core execution in this review."
+      }
+    },
+    {
+      "id": "diagnostic_retention",
+      "status": "resolved",
+      "references": [
+        "scripts/main.gd:206",
+        "scripts/main.gd:675",
+        "scripts/diagnostics_logger.gd:4"
+      ],
+      "previous_issue": "Repeated retry notices could evict the original error and candidate from the bounded256-line logger.",
+      "resolution": "Error notice and event are emitted on reason change only; current error, pending candidate and deferred interval are included in diagnostic samples."
+    },
+    {
+      "id": "recovery_menu_multiframe_touch",
+      "status": "resolved_static_review",
+      "references": [
+        "scripts/main.gd:206",
+        "scripts/main.gd:615",
+        "scripts/main.gd:622",
+        "scripts/flight_console.gd:192",
+        "scripts/touch_action_button.gd:4",
+        "scripts/touch_action_button.gd:54"
+      ],
+      "previous_issue": "Disable-all then reenable-menu released Menu pointer ownership every display frame; unconditional release_inputs on retries also canceled a held recovery touch.",
+      "resolution": "During pending state Menu is never set input_allowed=false by the per-frame bulk update, while other pointer buttons remain blocked. release_inputs runs only when entering a new error reason. Menu action itself emits independently of the physical actions_enabled gate.",
+      "dynamic_validation": "Not executed by this reviewer; the actual press->process/retry frames->release regression is owned by the Main test agent."
+    },
+    {
+      "id": "graphics_preview_pending_escape",
+      "status": "resolved",
+      "references": [
+        "scripts/main.gd:1099"
+      ],
+      "finding": "Graphics preview is explicitly rejected while pending, including when ordinary saving is disabled, preventing temporary model replacement from discarding an unresolved contact."
+    }
+  ],
+  "unresolved_material_findings": [],
+  "limits_and_known_adapters": [
+    "This is static review, not execution or proof of whole-game DOS parity.",
+    "The geometry/contact event bridge and city-floor radial proxy are explicit phone adapters; the full F569/F570/F576/F577/F578 classification/frame/collision pipeline remains outside this integration.",
+    "Nonfloor city/building wall response and legacy flight/surface contact continue to use their documented existing rules.",
+    "The rank-deficient native orientation uses an explicitly reported phone-Quaternion projection fallback; the raw source matrix is retained rather than repaired.",
+    "No Android device, APK, GPU capture, tests or native oracle were executed by this reviewer. Release validation and the actual multi-frame Menu touch regression belong to other agents."
+  ],
+  "execution_by_reviewer": {
+    "runtime_tests": false,
+    "native_oracle": false,
+    "builds": false,
+    "APK_or_device": false,
+    "GPU_capture": false,
+    "runtime_edits": false,
+    "read_existing_native_fixture": true
+  },
+  "external_test_results": "Not restated as reviewer results; use the separately hashed validation reports from the responsible agents."
+}

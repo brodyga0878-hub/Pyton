@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-07T22:50:22.569833+00:00",
+  "updated_utc": "2026-11-07T22:50:44.861194+00:00",
+  "duration_seconds": 22.291,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-07T22:50:22.569833+00:00",
+      "duration_seconds": 22.291,
+      "requested_suites": [
+        "source_atmosphere_contact",
+        "source_thermal_main",
+        "source_fuel_main",
+        "source_hyperdrive_main"
+      ],
+      "executed_suites": [
+        "source_atmosphere_contact",
+        "source_thermal_main",
+        "source_fuel_main",
+        "source_hyperdrive_main"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 3,
+  "status": "passed",
+  "passed_suites": 4,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 4834,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "source_atmosphere_contact",
+      "scope": "Actual World/Surface natural-contact and velocity-frame adapter, airless Mercury and F1033 unknown-height sentinel; reused native solid/gas fields plus239 new source speed controls with explicit mixed provenance.",
+      "status": "passed",
+      "checks": 3904,
+      "failures": 0,
+      "executed_utc": "2026-11-07T22:50:22.571502+00:00",
+      "suite_source": {
+        "path": "tests/test_source_atmosphere_contact.gd",
+        "bytes": 12639,
+        "sha256": "5b395843d023a3f82fe70055746ed5975bdb7ea4faa0f790296fba01d9e1cb31"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_atmosphere_contact.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.169,
+      "timed_out": false,
+      "output_bytes": 124,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/contact-2026-11-08/regression-report-paths/logs/source_atmosphere_contact.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_thermal_main",
+      "scope": "Actual Main Earth/surface heat and drag, exact legacy HP anchors, raw motion continuation, fixed thermal-hook partition, natural boundary fixtures, pause/input/death/save ordering and atomic invalid-thermal restore.",
+      "status": "passed",
+      "checks": 463,
+      "failures": 0,
+      "executed_utc": "2026-11-07T22:50:22.571754+00:00",
+      "suite_source": {
+        "path": "tests/test_source_thermal_main.gd",
+        "bytes": 21585,
+        "sha256": "e4585aab39cf839eef18e07604366b0333156485e666d4e1445fe683fc805319"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_thermal_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 22.288,
+      "timed_out": false,
+      "output_bytes": 117,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/contact-2026-11-08/regression-report-paths/logs/source_thermal_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_fuel_main",
+      "scope": "Actual Main fuel cadence, source movement/save continuation, automatic star/gas scooping, UI recovery, old v40 saves, pause and stale-input boundaries.",
+      "status": "passed",
+      "checks": 397,
+      "failures": 0,
+      "executed_utc": "2026-11-07T22:50:22.572448+00:00",
+      "suite_source": {
+        "path": "tests/test_source_fuel_main.gd",
+        "bytes": 16377,
+        "sha256": "ffb4bb3d920c5d758c370a4ce5a305cebf37ff3087176f3f8d91e453864591f5"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_fuel_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 5.825,
+      "timed_out": false,
+      "output_bytes": 114,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/contact-2026-11-08/regression-report-paths/logs/source_fuel_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_hyperdrive_main",
+      "scope": "Actual Main route/charge/cancel/save continuation, military fuel/waste, stale service inputs, explicit legacy migration with durable private backup and atomic invalid-v3 rejection.",
+      "status": "passed",
+      "checks": 70,
+      "failures": 0,
+      "executed_utc": "2026-11-07T22:50:23.741534+00:00",
+      "suite_source": {
+        "path": "tests/test_source_hyperdrive_main.gd",
+        "bytes": 18405,
+        "sha256": "1562e96545e7d30e9aaff5004cb940b844a89024b984c99109bc9b2f2c9b82b8"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_hyperdrive_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 3.353,
+      "timed_out": false,
+      "output_bytes": 119,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/contact-2026-11-08/regression-report-paths/logs/source_hyperdrive_main.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ]
+}

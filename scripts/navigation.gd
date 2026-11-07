@@ -385,6 +385,15 @@ func advance_thermal_seconds(dt:float,context:Dictionary,ship:RefCounted)->Dicti
 	var candidate:RefCounted=_fuel_candidate(ship)
 	if candidate==null:return {"ok":false,"reason":"invalid_thermal_session"}
 	return _commit_fuel_result(candidate,candidate.advance_thermal_seconds(dt,context),ship)
+func apply_contact_damage(calls:Array,ship:RefCounted)->Dictionary:
+	if not is_source_hyperdrive() or ship==null or not validate_source_ship(ship) or _hyperdrive.thermal_system.is_empty():return {"ok":false,"reason":"invalid_contact_damage_session","callbacks":[],"destruction_requested":false}
+	var candidate:RefCounted=_hyperdrive.duplicate_session()
+	if candidate==null:return {"ok":false,"reason":"invalid_contact_damage_session","callbacks":[],"destruction_requested":false}
+	var detail:Dictionary=candidate.apply_contact_damage(calls)
+	if not detail.get("ok",false):return detail
+	var result:={"ok":true,"contact_damage":detail,"callbacks":detail.callbacks.duplicate(true),"destruction_requested":bool(detail.destruction_requested),"contact_destruction_requested":bool(detail.destruction_requested),"equipment_damage_requested":bool(detail.equipment_damage_requested),"hyperjump_cancelled":false}
+	if calls.is_empty():return result # No HP projection, clock tick or binding.
+	return _commit_fuel_result(candidate,result,ship)
 func _service_reason(ship:RefCounted)->String:
 	if not is_source_hyperdrive():return "Этот сеанс сохраняет прежнюю топливную модель."
 	if remaining>0:return "Сначала отмените заряд гипердвигателя."

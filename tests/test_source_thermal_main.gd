@@ -6,7 +6,7 @@ const AtmosphereContact=preload("res://scripts/source_atmosphere_contact.gd")
 const Terrain=preload("res://scripts/source_surface_terrain.gd")
 const Surface=preload("res://scripts/surface_model.gd")
 const Physics=preload("res://scripts/source_physics_bridge.gd")
-const REPORT:="res://validation/gear-2026-11-08/thermal-main-regression.json"
+const REPORT:="res://validation/contact-2026-11-08/thermal-main-regression.json"
 var atmosphere_contact:=AtmosphereContact.new()
 
 func thermal()->Dictionary:return inventory().get("thermal_system",{}).duplicate(true)

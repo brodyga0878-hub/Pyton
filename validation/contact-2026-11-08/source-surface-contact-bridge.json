@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "Read-only phone surface provider/frame and bounded original F575 player-contact bridge. Existing published or saved source triangles, exact fallback diagonal, explicit authored-clearance/source-origin and Quaternion projection adapters.",
+  "groups": 1,
+  "checks": 234,
+  "failures": 0,
+  "suites": [
+    {
+      "test": "tests/test_source_surface_contact_bridge.gd",
+      "checks": 234,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/contact-2026-11-08/source-surface-contact-bridge.log"
+    }
+  ],
+  "sha256": {
+    "scripts/source_surface_contact_bridge.gd": "f83bbecc35c60bfaf79cf2314d067f997b966258665a41a93f082534ba7dfdd9",
+    "tests/test_source_surface_contact_bridge.gd": "73c917d322a6f938698c3680bb4fbe33615cefcfc4603f0a8cb467a51da9f84a",
+    "scripts/source_surface_contact.gd": "fcfb6077f0bcabf7b6ffce98c3a3dbb23251a850175be4ef241b299fdf8d117d",
+    "scripts/source_ground_surface.gd": "e9db09fbd9c9e8a70bfba771b79627bbba6313d86b3efe781fba7b93a29e7ee7",
+    "scripts/source_surface_render_state.gd": "91eca62418b0f3bf48d10cf1af9286688e9cd8b0ab6a214c77df9070396465f4",
+    "scripts/source_surface_contact_patch.gd": "a0c2dfe0442cdb33498ccd9e92cf5bb0c3b23f0fef06de71358bcfe668e15d0a",
+    "scripts/source_surface_render_packet.gd": "1371064fbbd00010567c2a7ae8552254540a22f3e382bba4cfd16f68fa99273e",
+    "scripts/source_surface_terrain.gd": "5c2939f5dae7adfa08e7591980612d6e53fd6fcdcf321850d00d388982024a17",
+    "scripts/source_physics_bridge.gd": "c7b8550217fbce3925da741afeb3c7d58c841d91ab247c4994ecc1c45ac72262",
+    "scripts/source_units.gd": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24",
+    "data/ffe_runtime_model_descriptors.json": "cf9c673c2bba22f0c865e77e3a7ceed5497053cdb444b80f31d7439176446818",
+    "data/ffe_hyperdrive.json": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+    "tests/fixtures/source_surface_contact_native.json": "a4c23ec94860641f18bb3632189346f3a264834904532bd24bed0e980e3ebeef",
+    "tests/fixtures/source_ground_surface_native.json": "d0e49fa2a65489bd81c59f686ba69149e401622ea199d581e2a6d3b8857aeba1"
+  },
+  "contracts": {
+    "sample_signature": "sample(surface,ship)",
+    "resolve_signature": "resolve(surface,ship,physical_gear_u16:int,event:Dictionary={})",
+    "event_fields": [
+      "candidate_position",
+      "provider_hit",
+      "kind"
+    ],
+    "published_render_triangle_first": true,
+    "verified_saved_triangle_supported": true,
+    "fallback_matches_Surface_height_at_cell_and_diagonal": true,
+    "fallback_queries_first_triangle": 3,
+    "fallback_queries_second_triangle": 4,
+    "separate_gradient_sampling": false,
+    "all_contact_vectors_frame": "same globe.basis_at(latitude,longitude) bodyfixed tangent basis",
+    "velocity_unit_mps": "16785/172800",
+    "position_unit_m": "16785/16777216",
+    "SI_mapping": "native raw after-before delta added to captured authored pose/velocity",
+    "source_origin_policy": "authored-clearance-to-f1533-inner-radius-v1",
+    "previous_altitude_policy": "native_inner_raw + round(phone_AGL_m / position_unit_m)",
+    "input_matrix_policy": "proper local yaw(pi), scalar-double unit axes, exact source F1520",
+    "native_kind1_normal": "F1503 radial normal from actual bodyfixed source-relative position",
+    "mesh_normal_is_native_kind1_normal": false,
+    "city_floor_policy": "explicit floor height plus documented kind1 radial proxy; not original F577",
+    "rank_deficient_native_matrix_phone_policy": "preserve prior valid phone Quaternion while retaining exact raw native body, other deltas and F953 requests",
+    "native_alignment_clamped": false,
+    "kernel_orientation_repaired": false,
+    "source_damage_executed_by_bridge": false,
+    "clock_or_Hz_or_hold_added": false,
+    "Navigation_or_HP_dependency": false,
+    "mutates_Flight_Surface_or_event": false,
+    "facts_JSON_safe": true,
+    "physical_phone_tested": false,
+    "GPU_rendered": false
+  },
+  "evidence": [
+    {
+      "agl_m": 100879.8625,
+      "case": "original_source120_verified_saved_triangle",
+      "height": -100764.7425,
+      "native_mesh_classifier_claim": false,
+      "provider": "verified-saved-contact-triangle",
+      "verified_original_vertices": 3
+    },
+    {
+      "HP_applied_by_bridge": false,
+      "authored_source_origin_offset_m": 1.72445404052734,
+      "case": "actual_f575_live_boundary",
+      "gear_up_damage_requested": 100,
+      "landing_accepted": true,
+      "mesh_normal_substituted_for_radial": false,
+      "penetration_before_m": -0.0249993133544937,
+      "physical_gear_u16": 65535,
+      "position_delta_raw": [
+        21,
+        7,
+        -11
+      ],
+      "source_inner_radius_raw": 9600
+    },
+    {
+      "case": "phone_q31_unit_boundary",
+      "input_normalization": "exact source F1520 after scalar-double unit axes and proper local yaw(pi)",
+      "kernel_alignment_clamped": false,
+      "near_up_cases": 70,
+      "tilted_attitude_forced_up": false
+    },
+    {
+      "case": "native_rank_one_phone_projection",
+      "kernel_orientation_repaired": false,
+      "live_damage_amount": 100,
+      "native_damage_amount": 100,
+      "native_fixture": "dos-surface-contact-0013",
+      "native_raw_body_unchanged": true,
+      "orientation_policy": "native-rank-deficient-preserve-phone-quaternion-v1",
+      "phone_quaternion_retained": true
+    }
+  ],
+  "independent_review": {
+    "reviewer": "/root/time_dynamics_impl/time_controller_review",
+    "read_only": true,
+    "tests_run_by_reviewer": false,
+    "findings": "No remaining concrete blockers. Existing independent native0013 and related cases prove genuine rank-one F575 output; explicit phone Quaternion fallback preserves raw output, damage and other deltas. Bounds/frame/cache review found no other blockers.",
+    "original_native_case": "dos-surface-contact-0013",
+    "native_raw_body_kept_exact": true
+  },
+  "limits": [
+    "The original native differential10498/0 and858cases belong to the separate core report and are not added to this bridge count.",
+    "Provider classification, authored ship clearance/source-body origin and source object indices player1/parent2 are explicit phone adapters, not full F569/F570/F576/F577/F578 execution.",
+    "City floor contact requires an explicit floor height and is a named radial proxy; a CCD ship-centre position is rejected as a substitute for floor height.",
+    "F575 rank-one raw orientation remains exact; retaining a valid phone Quaternion is an explicit projection fallback, not a source-kernel correction.",
+    "Root owns atomic HP/RNG/callback application, once-contact orchestration, live pose commit and save/pending behavior; those require separate Main tests.",
+    "Only the new bridge and its focused test were edited by this task; existing Surface/Flight/Navigation/HP modules were not changed.",
+    "Headless controls do not certify Android rendering or Samsung performance."
+  ]
+}

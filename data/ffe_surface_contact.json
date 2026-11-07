@@ -1,0 +1,418 @@
+{
+  "schema": 1,
+  "profile": "dos-firstenc-f575-postclassification-anchors-v1",
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_data_sha256": "34219c91c5d019440ebf4fc707711a32c5080123ede05cf4d10a27d41f770850",
+  "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+  "immutable_resources": {
+    "ffe_hyperdrive_sha256": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+    "ffe_fuel_sha256": "4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f",
+    "ffe_atmosphere_sha256": "b65e25e187ac4abe7e24325a78de3fe70c140395711127ee0076f9905222bcce",
+    "ffe_landing_gear_sha256": "f06d7184046407dea3ee45fb3c6dedeb6bfaf21fe1a6136a388a87fa97ed1f00",
+    "ffe_runtime_model_descriptors_sha256": "cf9c673c2bba22f0c865e77e3a7ceed5497053cdb444b80f31d7439176446818"
+  },
+  "procedures": {
+    "575_postclassification": {
+      "dos_file_offset": 99829,
+      "dos_virtual_address": 4356085,
+      "byte_count": 1657,
+      "hex": "800dc83e6300028b838c00000050e830ea0400598bf08b839000000050e821ea04005903f08b839400000050e812ea04005903f08975f0803de43e6300017542578d75c88d7db0b906000000f3a55f6a1c8d45b050e88122030083c4088b45b08945808b45b88945848b45c089458868ffffff7f8d458050e818b3020083c408eb228b45c88945808b45d08945848b45d88945888d4580508d458050e804bb020083c4088b4580508b430c50e8d2bb020083c4088bf08b4584508b431050e8c0bb020083c40803f08b4588508b431450e8aebb020083c40803f08bc6817df0580200007f296681bb9e000000ffff751e3d000000787c17800dc83e6300408025c83e63007fc605cb3e630000eb0aa0cc3e6300a2cb3e63008b838200000050ff1548185000598945e88b878200000050ff1548185000598bd0803de43e6300010f85fe000000ff35e03e6300ff35dc3e6300ffb344010000ffb3400100008d45e050e8ec6e020083c4148b45e0508b458050e80cbb020083c408898568ffffff8b45e0508b458450e8f6ba020083c408898570ffffff8b45e0508b458850e8e0ba020083c408898578ffffff83c8ff83bd68ffffff007c014089856cffffff83c8ff83bd70ffffff007c0140898574ffffff83c8ff83bd78ffffff007c014089857cffffffffb56cffffffffb568ffffffff7342ff733e8d433e50e8216e020083c414ffb574ffffffffb570ffffffff734aff73468d434650e8036e020083c414ffb57cffffffffb578ffffffff7352ff734e8d434e50e8e56d020083c414e9ab0000008b422cc1e0108b72140372188b55e88b52148b4de8035118528bd6592bd18b4de88b4930c1e110894dec85d274058bcad37dec0345ec85c07d05d1e8ff45f48b55c88955988b55d089559c8b55d88955a08b55f452508d459850e82eb1020083c40c83ee37f7de46b8200000002bc68bc88b5598d3e289533e8bc88b559cd3e28953468bc88b45a0d3e089434e8bce8b4598d3f88943428bce8b459cd3f889434a8bce8b45a0d3f8894352803dcb3e6300000f8409030000800dc83e63008033c08a83860000003b05fc2164000f8577020000578bf38dbd2cffffffb909000000f3a55f8b458089430c8b45848943108b458889431453e8abf9ffff5953ff15041350005953e89cf9ffff598b4580508b838c00000050e823b9020083c4088bf08b4584508b839000000050e80eb9020083c40803f08b4588508b839400000050e8f9b8020083c40803f0568b458050e8eab8020083c408894598568b458450e8dab8020083c40889459c568b458850e8cab8020083c4088945a08b838c00000003c0b90300000099f7f98bc88b459803c08d0480be0c00000099f7fe2bc8898b8c0000008b839000000003c0b90300000099f7f98bc88b459c03c08d0480be0c00000099f7fe2bc8898b900000008b839400000003c0b90300000099f7f98bc88b45a003c08d0480be0c00000099f7fe2bc8898b940000008b838c0000008945988b839000000089459c8b83940000008945a08b838c000000508b8544ffffff50e818b8020083c4088bf08b8390000000508b8548ffffff50e800b8020083c40803f08b8394000000508b854cffffff50e8e8b7020083c40803f085f67d09f75d98f75d9cf75da08b838c00000050e88ae50400598bf08b839000000050e87be504005903f08b839400000050e86ce504005903f02975f08b838200000050ff1548185000598b40380fbf4806c1e1028bc1f76df0be0807000099f7fe8bd185d2790383c203c1fa023bc27d028bc26a005053e86a62010083c40c837d98007527837d9c007521837da000751b8b8544ffffff8945988b8548ffffff89459c8b854cffffff8945a068ffffff7f8d459850e83aae020083c408578db52cffffff8bfbb909000000f3a55f8b45988943188b459c89431c8b45a089432053ff150413500059e9b700000083bb820000000d0f86aa0000008a83870000003c0b74083c0e0f85980000008b458089430c8b45848943108b458889431453e826f7ffff5953ff15041350005953e817f7ffff5933c089838c00000033c089839000000033c0898394000000803dcc3e630000744f6a006aff53e88761010083c40ceb408b458089430c8b45848943108b458889431453e8cef6ffff5953ff15041350005953e8bff6ffff5933c089838c00000033c089839000000033c08983940000008b87400100003b87380100007407800dc83e630001803dca3e63000075118a8786000000a2ca3e6300893dd03e6300a0c83e6300",
+      "sha256": "56d9e671bd0b831b6364ab1927351594d33b02967342ce401261388e65807785",
+      "disassembled_instruction_count": 518,
+      "source_label": "FUNC_000575/JUMP_002410..before JUMP_002432",
+      "runtime_entry": true,
+      "scope": "Bounded post-classification continuation only; original epilogue is captured by the host wrapper, original geometry/classifier entry is not executed."
+    },
+    "575_full_static_only": {
+      "dos_file_offset": 99488,
+      "dos_virtual_address": 4355744,
+      "byte_count": 2005,
+      "hex": "558bec81c42cffffff5356578b7d108b5d0c8b750856578d7dc8b906000000f3a55f5e5656e85227030083c408ff760cff7608ff7604ff368d45f850e83571020083c414ff7614ff7610ff75fcff75f88d45f850e81d71020083c4146aff8d45f850e85172020083c408ffb33c010000ffb338010000ff75fcff75f88d45f850e82371020083c414837dfc007c2bffb73c010000ffb738010000ff75fcff75f88d45f850e8ff70020083c414837dfc007c0733c0e915070000c605e43e63000080bf4c010000007d398d45c8505753e80407000083c40c85c0751d803de43e63000075715753e82d0a000083c408a0c83e6300e9d6060000a0c83e6300e9cc060000568d45c8ba05000000ff34904a79fa57538d45f450e89008000083c42885c075288a87860000003a435674145753e8e309000083c408a0c83e6300e98c060000c605e43e630002eb0aa0c83e6300e979060000800dc83e6300028b838c00000050e830ea0400598bf08b839000000050e821ea04005903f08b839400000050e812ea04005903f08975f0803de43e6300017542578d75c88d7db0b906000000f3a55f6a1c8d45b050e88122030083c4088b45b08945808b45b88945848b45c089458868ffffff7f8d458050e818b3020083c408eb228b45c88945808b45d08945848b45d88945888d4580508d458050e804bb020083c4088b4580508b430c50e8d2bb020083c4088bf08b4584508b431050e8c0bb020083c40803f08b4588508b431450e8aebb020083c40803f08bc6817df0580200007f296681bb9e000000ffff751e3d000000787c17800dc83e6300408025c83e63007fc605cb3e630000eb0aa0cc3e6300a2cb3e63008b838200000050ff1548185000598945e88b878200000050ff1548185000598bd0803de43e6300010f85fe000000ff35e03e6300ff35dc3e6300ffb344010000ffb3400100008d45e050e8ec6e020083c4148b45e0508b458050e80cbb020083c408898568ffffff8b45e0508b458450e8f6ba020083c408898570ffffff8b45e0508b458850e8e0ba020083c408898578ffffff83c8ff83bd68ffffff007c014089856cffffff83c8ff83bd70ffffff007c0140898574ffffff83c8ff83bd78ffffff007c014089857cffffffffb56cffffffffb568ffffffff7342ff733e8d433e50e8216e020083c414ffb574ffffffffb570ffffffff734aff73468d434650e8036e020083c414ffb57cffffffffb578ffffffff7352ff734e8d434e50e8e56d020083c414e9ab0000008b422cc1e0108b72140372188b55e88b52148b4de8035118528bd6592bd18b4de88b4930c1e110894dec85d274058bcad37dec0345ec85c07d05d1e8ff45f48b55c88955988b55d089559c8b55d88955a08b55f452508d459850e82eb1020083c40c83ee37f7de46b8200000002bc68bc88b5598d3e289533e8bc88b559cd3e28953468bc88b45a0d3e089434e8bce8b4598d3f88943428bce8b459cd3f889434a8bce8b45a0d3f8894352803dcb3e6300000f8409030000800dc83e63008033c08a83860000003b05fc2164000f8577020000578bf38dbd2cffffffb909000000f3a55f8b458089430c8b45848943108b458889431453e8abf9ffff5953ff15041350005953e89cf9ffff598b4580508b838c00000050e823b9020083c4088bf08b4584508b839000000050e80eb9020083c40803f08b4588508b839400000050e8f9b8020083c40803f0568b458050e8eab8020083c408894598568b458450e8dab8020083c40889459c568b458850e8cab8020083c4088945a08b838c00000003c0b90300000099f7f98bc88b459803c08d0480be0c00000099f7fe2bc8898b8c0000008b839000000003c0b90300000099f7f98bc88b459c03c08d0480be0c00000099f7fe2bc8898b900000008b839400000003c0b90300000099f7f98bc88b45a003c08d0480be0c00000099f7fe2bc8898b940000008b838c0000008945988b839000000089459c8b83940000008945a08b838c000000508b8544ffffff50e818b8020083c4088bf08b8390000000508b8548ffffff50e800b8020083c40803f08b8394000000508b854cffffff50e8e8b7020083c40803f085f67d09f75d98f75d9cf75da08b838c00000050e88ae50400598bf08b839000000050e87be504005903f08b839400000050e86ce504005903f02975f08b838200000050ff1548185000598b40380fbf4806c1e1028bc1f76df0be0807000099f7fe8bd185d2790383c203c1fa023bc27d028bc26a005053e86a62010083c40c837d98007527837d9c007521837da000751b8b8544ffffff8945988b8548ffffff89459c8b854cffffff8945a068ffffff7f8d459850e83aae020083c408578db52cffffff8bfbb909000000f3a55f8b45988943188b459c89431c8b45a089432053ff150413500059e9b700000083bb820000000d0f86aa0000008a83870000003c0b74083c0e0f85980000008b458089430c8b45848943108b458889431453e826f7ffff5953ff15041350005953e817f7ffff5933c089838c00000033c089839000000033c0898394000000803dcc3e630000744f6a006aff53e88761010083c40ceb408b458089430c8b45848943108b458889431453e8cef6ffff5953ff15041350005953e8bff6ffff5933c089838c00000033c089839000000033c08983940000008b87400100003b87380100007407800dc83e630001803dca3e63000075118a8786000000a2ca3e6300893dd03e6300a0c83e63005f5e5b8be55dc3",
+      "sha256": "33e2895597b23f2e12a3fc6f8c09a08c73042eb26f3529a2b1d911d12b77b015",
+      "disassembled_instruction_count": 635,
+      "source_label": "FUNC_000575",
+      "runtime_entry": false,
+      "scope": "Whole original DOS byte/disassembly anchor for provenance; not whole-function native execution or gameplay integration."
+    },
+    "578_excluded_variant": {
+      "dos_file_offset": 102328,
+      "dos_virtual_address": 4358584,
+      "byte_count": 416,
+      "hex": "558bec53568b750c8b5d08800dc83e6300808a43563a8686000000740d80be87000000010f85830000008b838c000000c1f802f7d889838c0000008b8390000000c1f802f7d88983900000008b8394000000c1f802f7d88983940000008b838c00000050e817e00400598bf08b839000000050e808e004005903f08b839400000050e8f9df04005903f08bc683c00a83bb820000000d0f86000100006a005053e81f5d010083c40ce9ef0000008b838c00000003868c000000d1f889868c00000089838c0000008b8390000000038690000000d1f88986900000008983900000008b8394000000038694000000d1f8898694000000898394000000803dcc3e6300000f849400000083bb820000000d0f868700000083be820000000d767e668b86e4000000663b83e4000000773633d28a9386000000520fb7c003c05056e8815c010083c40c33c08a8686000000500fb786e400000003c05053e8655c010083c40ceb3833c08a8386000000500fb783e400000003c05056e8475c010083c40c33c08a8686000000500fb783e400000003c05053e82b5c010083c40c5e5b5dc3",
+      "sha256": "c5234844446da9de83bff6aa3ebe81bb64ec510a02d8b4a4b6503461c1c91f83",
+      "disassembled_instruction_count": 114,
+      "source_label": "FUNC_000578",
+      "runtime_entry": false,
+      "scope": "Explicitly excluded pair/solid response; pinned JJFFE rewrites this DOS procedure."
+    }
+  },
+  "helper_proof_complete": true,
+  "instruction_proofs": {
+    "571": {
+      "executable_offset": 99040,
+      "virtual_address": 4355296,
+      "byte_length": 75,
+      "sha256": "d6f72bd663b601a5c0292f2b3e52cd5025762d68c77f4fccaf3fb7334abfdda6",
+      "instruction_count": 28,
+      "normalized_instruction_sha256": "fa98f823de213559f28b67adb4c52a055a02e81e91f3834f49b52c6f0ae86761",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "hex": "558bec83c4f48b45088b50188955f48b501c8955f88b50208955fc8b500c8950188b501089501c8b50148950208b55f489500c8b55f88950108b55fc895014f718f75804f758088be55dc3"
+    },
+    "1333": {
+      "executable_offset": 259606,
+      "virtual_address": 4515862,
+      "byte_length": 25,
+      "sha256": "8946c4ccd895806bb39d3d393c582970d2e34c8ba60c06257447eb10186e5468",
+      "instruction_count": 11,
+      "normalized_instruction_sha256": "d404596ee05a43e6f48c9e0e3738ec8f555a7f3093ca751c86a988fd4a17721f",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "hex": "558bec8b55088b450c03451489028b45101345188942045dc3"
+    },
+    "1335": {
+      "executable_offset": 259656,
+      "virtual_address": 4515912,
+      "byte_length": 25,
+      "sha256": "630251ee2b7c42186d7b3e5a7dad2245d537527943aa08e08cfe6879016c0514",
+      "instruction_count": 11,
+      "normalized_instruction_sha256": "b9e6d7e710d5ec7c76685289fe22ba6cd78860994046859e09839c50c506c91c",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "hex": "558bec8b55088b450c2b451489028b45101b45188942045dc3"
+    },
+    "1503": {
+      "executable_offset": 276874,
+      "virtual_address": 4533130,
+      "byte_length": 60,
+      "sha256": "d0afd5b854572fc1f0c76c0e0baf449afecd09a825f1962dd0d1183c8612e36d",
+      "instruction_count": 26,
+      "normalized_instruction_sha256": "307da135d766cc2fe6db9c2b3a78a67557921604e6d673085815a494e542a23a",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "hex": "558bec53568b5d08ff33ff157c135000598bf0ff7304ff157c1350005903f0ff7308ff157c1350005903f056ff750c53e80700000083c40c5e5b5dc3"
+    },
+    "1504": {
+      "executable_offset": 276934,
+      "virtual_address": 4533190,
+      "byte_length": 105,
+      "sha256": "3086b86ae6eed52dcb62404ed6eecc861949b851139ae9cd621ba08e88414e09",
+      "instruction_count": 45,
+      "normalized_instruction_sha256": "35e028cacd4a45ca0cf58aae7b1314451e91904d24b810bd650d09e521645450",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "hex": "558bec5356578b75108b7d0c8b5d0803f656ff1580135000598bf05756ff33e8d5feffff83c40850e88508000083c40889035756ff7304e8bdfeffff83c40850e86d08000083c4088943045756ff7308e8a4feffff83c40850e85408000083c4088943085f5e5b5dc3"
+    },
+    "1501": {
+      "executable_offset": 276671,
+      "virtual_address": 4532927,
+      "byte_length": 64,
+      "sha256": "422940485e22b08f5173b3b64ada177be0a09e4ba2dc8599b8b36ecdee8cff04",
+      "instruction_count": 31,
+      "normalized_instruction_sha256": "248cfbe789335ff48b5beffbbae45a5b1a12021461674fa254c4023fb865889b",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "hex": "558bec538b4d0c8b5d08b80100000085db7d068bd3f7daeb028bd303d203c03bca77032bd14085c07ff125ffffff7f85db7d068bd0f7daeb028bd08bc25b5dc3"
+    },
+    "1502": {
+      "executable_offset": 276735,
+      "virtual_address": 4532991,
+      "byte_length": 139,
+      "sha256": "06d92dfc59b6eca45c8c8c4d203e1deb6a270101894bdea28ca83b692dc60d19",
+      "instruction_count": 61,
+      "normalized_instruction_sha256": "c5023ccf9909d9370799f5bbbb7d17b5daaf2db9050c49ef71ca246620516b3e",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "hex": "558bec51535633c0ba000000803b5508760940c1ea023b550877f733d28955fc33d283f80f7f328d48ff8b5dfcd3eb03da8bc803c9be00000080d3ee03de8bcb3b4d08770e8bd18bc8bb00000080d3eb015dfc4083f80f7ece83f81f7f258d48ff8b5dfcd3eb8bcb03ca3b4d08770e8bd18bc8bb00000080d3eb015dfc4083f81f7edb8b45fc5e5b595dc3"
+    },
+    "1519": {
+      "executable_offset": 278938,
+      "virtual_address": 4535194,
+      "byte_length": 136,
+      "sha256": "4cf67a734da229a0a8cb12b509f70668250b4b0f3836a19146b53b0272e78ea3",
+      "instruction_count": 59,
+      "normalized_instruction_sha256": "9369229fe448116d4b12ecec5376daac76a7d0bae226162a3d7df03c02cf9996",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "hex": "558bec5356578b7d0c57e84edbffff598bd84353e80166000059be1f0000002bf08bced3e3d1eb53680000803fe8c900000083c408d1e88bd88bc34850ff37e89a00000083c4088d4e01d3e08b550889028bc34850ff7704e88100000083c4088d4e01d3e08b55088942044b53ff7708e86900000083c4088d4e01d3e08b55088942085f5e5b5dc3"
+    },
+    "1466": {
+      "executable_offset": 269559,
+      "virtual_address": 4525815,
+      "byte_length": 272,
+      "sha256": "d8afc05d10b13f7872438dd3a1e13e11ccc15dd0b55881fa120ef8781055cf10",
+      "instruction_count": 103,
+      "normalized_instruction_sha256": "f1b7d70b6d1216f006b0da3c7b5570857cb159b27d020d3a48969e3ea470eab3",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "hex": "558bec83c4e85356578b5d088d75f4ff33e82b530200598906ff7304e82053020059894604ff7308e814530200598946088b068945e88b46048945ec8b46088945f08b060b46040b460850e86d8a000059bb1e0000002bd88bcbd3268bcbd366048bcbd3660885db7e46ff36ff36e80e25000083c4088bf8c1ff02ff7604ff7604e8fb24000083c408c1f80203f8ff7608ff7608e8e824000083c408c1f80203f857ff1580135000598d4bffd3e8eb41ff36ff36e8c824000083c4088bd8c1fb02ff7604ff7604e8b524000083c408c1f80203d8ff7608ff7608e8a224000083c408c1f80203d853ff15801350005903c03b45e873038b45e83b45ec73038b45ec3b45f073038b45f05f5e5b8be55dc3"
+    },
+    "1520": {
+      "executable_offset": 279074,
+      "virtual_address": 4535330,
+      "byte_length": 86,
+      "sha256": "97176815c1009869daef82477468f18dd21c7dccac64b5a3714d84295f281976",
+      "instruction_count": 37,
+      "normalized_instruction_sha256": "fc2ec756cb992daf57a2342232c0b6abfc57094cc543450478e2c84f2306afd5",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "hex": "558bec538b5d085353e86affffff83c4088d4318508d431850e85affffff83c408538d4318508d430c50e8d70e000083c40c8d430c508d430c50e839ffffff83c4088d4318508d430c5053e8b60e000083c40c5b5dc3"
+    },
+    "1521": {
+      "executable_offset": 279160,
+      "virtual_address": 4535416,
+      "byte_length": 17,
+      "sha256": "f62a5f949cbf8da772c3cc32ae59b607e0f35cda6c3c4e1ddf848ba3b5a1b445",
+      "instruction_count": 9,
+      "normalized_instruction_sha256": "41d13ec389df5b306dbeb350873dd5272b12f7a1d61a674cb369cb6e1398f31c",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "hex": "558bec8b4508f76d0cd1e0d1d28bc25dc3"
+    },
+    "1522": {
+      "executable_offset": 279177,
+      "virtual_address": 4535433,
+      "byte_length": 12,
+      "sha256": "e6001a066c6ed54cff7bf995d82867c4b0809fa6752fdfb96247378823c29291",
+      "instruction_count": 7,
+      "normalized_instruction_sha256": "0db7d02ec4a9097b59586917c6cfbf316b7b2c90a45ca38f2e5ec3f70278f243",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "hex": "558bec8b4508f7e88bc25dc3"
+    },
+    "1523": {
+      "executable_offset": 279189,
+      "virtual_address": 4535445,
+      "byte_length": 33,
+      "sha256": "e393035168c327e2d7c04e94b55828696681e5f6eabbab45e27c103d00f712af",
+      "instruction_count": 16,
+      "normalized_instruction_sha256": "e69f744bbca564eb592b29b6ec8993e63c04f907b208de2955f074d1046f87e4",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "hex": "558bec8b4508d1e83b450c720583c8ff5dc38b55088bc2d1eac1e01ff7750c5dc3"
+    },
+    "1538": {
+      "executable_offset": 281168,
+      "virtual_address": 4537424,
+      "byte_length": 15,
+      "sha256": "7f8a8207c382290494a4d7fabdc00b15b17b0c51b7e9185cd4a3ae9f4cfb1226",
+      "instruction_count": 6,
+      "normalized_instruction_sha256": "0479e1d3839e11ec5ad483579aef67c8e1d81d99ba702d609e064c3fb94116ee",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "hex": "558bec8b45088b0485fc0c4d005dc3"
+    },
+    "1552": {
+      "executable_offset": 282920,
+      "virtual_address": 4539176,
+      "byte_length": 157,
+      "sha256": "7977b9c88ca60678c48bd16343b74af7de283391e7ac94a49c27aa269eb4ee2d",
+      "instruction_count": 69,
+      "normalized_instruction_sha256": "cd64227f183024769371ba3f12cb0661a50450597477b3ca846b591d6f79cd24",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "hex": "558bec83c4f05356578b55108b450c8b5d088b308b78048b40088945fc8b028945f88b42048945f48b42088945f08b45f05057e818f1ffff83c408508b45f4508b45fc50e807f1ffff83c4085a2bd089138b45f8508b45fc50e8f2f0ffff83c408508b45f05056e8e4f0ffff83c4085a2bd08953048b45f45056e8d1f0ffff83c408508b45f85057e8c3f0ffff83c4085a2bd08953085f5e5b8be55dc3"
+    },
+    "1656": {
+      "executable_offset": 305076,
+      "virtual_address": 4561332,
+      "byte_length": 74,
+      "sha256": "8bdce1d3d508b9cbf7d5fcbbf261407789d7bbf8fd917a4225db88c6d5aa2949",
+      "instruction_count": 29,
+      "normalized_instruction_sha256": "fb3430703e53a390c573480dc2a76a799a82e386edd80d2d0e4df2494995dbb6",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "hex": "558bec8b45083d00000100720ac1e810ba10000000eb0233d23d000100007206c1e80883c20883f8107206c1e80483c20483f8047206c1e80283c20283f80272058d42015dc38bc25dc3"
+    },
+    "1658": {
+      "executable_offset": 305360,
+      "virtual_address": 4561616,
+      "byte_length": 44,
+      "sha256": "6bdbafa74820fd4a83d1e5dfdb85032acacc6fd0e1636b481ac3f18af1ad065f",
+      "instruction_count": 23,
+      "normalized_instruction_sha256": "ee101255a4019a0c7d7e4e372bdc426e50b6f1ab72d614b370e79a41bc813f3a",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "hex": "558bec53568b750856e822ffffff598bd82b5d0c85db7f0433c0eb0c5356e86501000083c4088bc35e5b5dc3"
+    },
+    "1657": {
+      "executable_offset": 305152,
+      "virtual_address": 4561408,
+      "byte_length": 207,
+      "sha256": "86d7da85e49ea3ddca538301d8ff1595065c0fb8e2a52ad7dd1b35b68bcbd6ff",
+      "instruction_count": 84,
+      "normalized_instruction_sha256": "8248127cd6d66196b4d905d201be1a2d2ba017ed215faa149d317cfafe4e45f2",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "hex": "558bec568b45088b500485d274034275148b480c85c9740341750a8b701485f6743e46743b837804007d078b5004f7daeb038b500483780c007d078b480cf7d9eb038b480c0bd1837814007d078b4814f7d9eb038b48140bd1b820000000eb34837804007d068b10f7daeb028b1083780c007d078b4808f7d9eb038b48080bd1837814007d078b4810f7d9eb038b48100bd133c081faffff00007606c1ea1083c01081faff0000007606c1ea0883c00883fa0f7606c1ea0483c00483fa037606c1ea0283c00283fa017601405e5dc3"
+    },
+    "1660": {
+      "executable_offset": 305752,
+      "virtual_address": 4562008,
+      "byte_length": 177,
+      "sha256": "e23941156e2eb6f1c53020a82a29d6537e6be0b7a6af446323409fb93e3be0cc",
+      "instruction_count": 74,
+      "normalized_instruction_sha256": "dd0955a8519f7df2d6693ec66963ecfa03ef327cc77da6935c6bfb5623544ebf",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "hex": "558bec5356578b550c8b450885d20f849800000083fa207d4fbb200000002bda8bcb8b7004d3e68bca8b38d3ef0bf789308bcad378048bcb8b700cd3e68bca8b7808d3ef0bf78970088bcad3780c8bcb8b5814d3e38bca8b7010d3ee0bde8958108bcad37814eb4483fa207e228d5ae08bcb8b7004d3fe89308bcb8b700cd3fe8970088bcb8b5014d3fa895010eb118b500489108b500c8950088b5014895010c178041fc1780c1fc178141f5f5e5b5dc3"
+    },
+    "575_postclassification": {
+      "executable_offset": 99829,
+      "virtual_address": 4356085,
+      "byte_length": 1657,
+      "sha256": "56d9e671bd0b831b6364ab1927351594d33b02967342ce401261388e65807785",
+      "instruction_count": 518,
+      "normalized_instruction_sha256": "c788e4abe83fd421ee15f968f7251b27f1b61e04a43e791bf0fae9c612036ef9",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "outgoing_edge": "JUMP_002432 is the original epilogue; host wrapper captures results then restores registers and returns.",
+      "hex": "800dc83e6300028b838c00000050e830ea0400598bf08b839000000050e821ea04005903f08b839400000050e812ea04005903f08975f0803de43e6300017542578d75c88d7db0b906000000f3a55f6a1c8d45b050e88122030083c4088b45b08945808b45b88945848b45c089458868ffffff7f8d458050e818b3020083c408eb228b45c88945808b45d08945848b45d88945888d4580508d458050e804bb020083c4088b4580508b430c50e8d2bb020083c4088bf08b4584508b431050e8c0bb020083c40803f08b4588508b431450e8aebb020083c40803f08bc6817df0580200007f296681bb9e000000ffff751e3d000000787c17800dc83e6300408025c83e63007fc605cb3e630000eb0aa0cc3e6300a2cb3e63008b838200000050ff1548185000598945e88b878200000050ff1548185000598bd0803de43e6300010f85fe000000ff35e03e6300ff35dc3e6300ffb344010000ffb3400100008d45e050e8ec6e020083c4148b45e0508b458050e80cbb020083c408898568ffffff8b45e0508b458450e8f6ba020083c408898570ffffff8b45e0508b458850e8e0ba020083c408898578ffffff83c8ff83bd68ffffff007c014089856cffffff83c8ff83bd70ffffff007c0140898574ffffff83c8ff83bd78ffffff007c014089857cffffffffb56cffffffffb568ffffffff7342ff733e8d433e50e8216e020083c414ffb574ffffffffb570ffffffff734aff73468d434650e8036e020083c414ffb57cffffffffb578ffffffff7352ff734e8d434e50e8e56d020083c414e9ab0000008b422cc1e0108b72140372188b55e88b52148b4de8035118528bd6592bd18b4de88b4930c1e110894dec85d274058bcad37dec0345ec85c07d05d1e8ff45f48b55c88955988b55d089559c8b55d88955a08b55f452508d459850e82eb1020083c40c83ee37f7de46b8200000002bc68bc88b5598d3e289533e8bc88b559cd3e28953468bc88b45a0d3e089434e8bce8b4598d3f88943428bce8b459cd3f889434a8bce8b45a0d3f8894352803dcb3e6300000f8409030000800dc83e63008033c08a83860000003b05fc2164000f8577020000578bf38dbd2cffffffb909000000f3a55f8b458089430c8b45848943108b458889431453e8abf9ffff5953ff15041350005953e89cf9ffff598b4580508b838c00000050e823b9020083c4088bf08b4584508b839000000050e80eb9020083c40803f08b4588508b839400000050e8f9b8020083c40803f0568b458050e8eab8020083c408894598568b458450e8dab8020083c40889459c568b458850e8cab8020083c4088945a08b838c00000003c0b90300000099f7f98bc88b459803c08d0480be0c00000099f7fe2bc8898b8c0000008b839000000003c0b90300000099f7f98bc88b459c03c08d0480be0c00000099f7fe2bc8898b900000008b839400000003c0b90300000099f7f98bc88b45a003c08d0480be0c00000099f7fe2bc8898b940000008b838c0000008945988b839000000089459c8b83940000008945a08b838c000000508b8544ffffff50e818b8020083c4088bf08b8390000000508b8548ffffff50e800b8020083c40803f08b8394000000508b854cffffff50e8e8b7020083c40803f085f67d09f75d98f75d9cf75da08b838c00000050e88ae50400598bf08b839000000050e87be504005903f08b839400000050e86ce504005903f02975f08b838200000050ff1548185000598b40380fbf4806c1e1028bc1f76df0be0807000099f7fe8bd185d2790383c203c1fa023bc27d028bc26a005053e86a62010083c40c837d98007527837d9c007521837da000751b8b8544ffffff8945988b8548ffffff89459c8b854cffffff8945a068ffffff7f8d459850e83aae020083c408578db52cffffff8bfbb909000000f3a55f8b45988943188b459c89431c8b45a089432053ff150413500059e9b700000083bb820000000d0f86aa0000008a83870000003c0b74083c0e0f85980000008b458089430c8b45848943108b458889431453e826f7ffff5953ff15041350005953e817f7ffff5933c089838c00000033c089839000000033c0898394000000803dcc3e630000744f6a006aff53e88761010083c40ceb408b458089430c8b45848943108b458889431453e8cef6ffff5953ff15041350005953e8bff6ffff5933c089838c00000033c089839000000033c08983940000008b87400100003b87380100007407800dc83e630001803dca3e63000075118a8786000000a2ca3e6300893dd03e6300a0c83e6300"
+    },
+    "abs": {
+      "executable_offset": 421944,
+      "virtual_address": 4678200,
+      "byte_length": 22,
+      "sha256": "46c8a9d0c4e7b862f57c083615031c907a391a2166724a009057ab580d4c0795",
+      "instruction_count": 12,
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "source": "Exact uploaded DOS Watcom abs bytes; clone independently reassembled, INT_MIN stays negative.",
+      "hex": "558bec8b450885c07d068bd0f7daeb028bd08bc25dc3"
+    }
+  },
+  "helper_source_procedure_sha256": {
+    "571": "a6a3b9c321b3554b8a4d6992e2f2da3c8a6b001ab61edfc17a2b1d2ebaf4a0a4",
+    "1333": "21169ed7f6ae5c55f135027b5d3fe379217ad43964826e1dfe139473d48d8deb",
+    "1335": "44ad47a712e41ef6ae947ddcd0b47011d5ff1e639f14553a6f6d58f20773e020",
+    "1466": "bf5fbee4fb8ad13cfc8fcbe236fc7d9e96abc3053b828adaf03974c78d99969c",
+    "1501": "541cbf721f52320115cc47619a5bd7befd519794aac98b421d2d32e3c679e778",
+    "1502": "a36dbc4361d5c08d90acc5d61757b8f70f91fdf2c00652207dd20c5fb3112f8d",
+    "1503": "360a5dbddb4da13c5c5b733926d883ab3cdad533b60c9639dc279878f0dc21c6",
+    "1504": "d16a93f8713fec0312d976a4c97b2c515daf751d7053ad7a4e5bcaa39b4d83f6",
+    "1519": "1dcfe66d82fc103e68f83c09115c3da8722a26e5d410fa5c429dfe996cd845e5",
+    "1520": "abe21e37baa4a3bbb381e07c7ebdc33acac52e0f14c5698b33ef518fb67d7c27",
+    "1521": "ba18bd552b16196d550b9a49e7b86be8fdc49bac0bdee173c0ae9132ad2f3e88",
+    "1522": "aca6425d312d9aa76c5c7618004a8545d6be62b2f197c9213ca66c2bbfba39ca",
+    "1523": "6c2580ea234e73e0a6a6c6eef7f3bd51d1cc5ddbcd2fb8e2036928c2da056543",
+    "1538": "2a4442f595de4e858ce77f5ebba773ee9bda99ee7ea50eefd5d8c4369c27306c",
+    "1552": "da7f4b88a2563d166902a00a747bde661a6f029b722de54ce013604a0e80bfc4",
+    "1656": "8028d5932e8dc76e275d087a0d2bcdf71933ce37f2c46eb10f9eaffab6b482ea",
+    "1657": "80105830a24374a7e4eaed0b018a3ded7ea1d3608a1f0115863f4f9ab856a68b",
+    "1658": "5e2174efa19883a50b7414c465d83517734b026f7c6a4e236b9b895395c423a2",
+    "1660": "b1abc0348a8f4d6501015f06c045c4c7d0cb3927d7bc2d87feeade7e0d6540eb"
+  },
+  "source_newlines_normalized_for_fragment_hashes": true,
+  "ship_models": {
+    "15": {
+      "model_index": 15,
+      "descriptor_hex": "caf04900fef14900200000005ef249001600000006000000000000004b000000110000000606060008000000004b0000001e0000f0f149009af249000000000000000000",
+      "descriptor_file_offset": 560842,
+      "descriptor_sha256": "b359ca04d2ac30582914c20e14e17402362b4a35a39bc283daedcd7a4aeeb2df",
+      "spec_hex": "a50a9df90000080004000e0028000b400100000001800001",
+      "spec_file_offset": 560794,
+      "spec_sha256": "152669632b18334ded65adb09cfbf1d6235945a231bdfdf12653e7e0e6256b36",
+      "original_spec_pointer_u32": 4846234,
+      "model_scale_raw": -2,
+      "outer_radius_s16": 19200,
+      "inner_radius_s16": 7680,
+      "source_refs": "Existing immutable149-descriptor table and57-specification table; these are the3 current adapted ships, not57 playable ships."
+    },
+    "24": {
+      "model_index": 24,
+      "descriptor_hex": "a0064a00b2064a0002000000000000000200000008000000000000007d00000013000000060606000a000000a028000050140000aa064a00b8064a000000000000000000",
+      "descriptor_file_offset": 565992,
+      "descriptor_sha256": "a0319edb595a3c88e91fefa67c1b11b81bb8bde7d8953d277710cc18fcb7d7e3",
+      "spec_hex": "9c3b7cf701001c00160029003700154001000200020b0001",
+      "spec_file_offset": 565944,
+      "spec_sha256": "b6c0ea6cb7c68a28273fbe121ac0d6b9fb6f92ed509d6f6cf387606f1902886b",
+      "original_spec_pointer_u32": 4851384,
+      "model_scale_raw": 0,
+      "outer_radius_s16": 10400,
+      "inner_radius_s16": 5200,
+      "source_refs": "Existing immutable149-descriptor table and57-specification table; these are the3 current adapted ships, not57 playable ships."
+    },
+    "38": {
+      "model_index": 38,
+      "descriptor_hex": "343a4a00b83c4a005c000000cc3d4a001200000009000000000000006d00000017000000060606000b00000050460000c01200009e3c4a00fc3d4a000000000000000000",
+      "descriptor_file_offset": 580140,
+      "descriptor_sha256": "f96a200b4ccf4f12252ef1fb0240c7b4a8d637481e7ac4608dd4c7a7fb052217",
+      "spec_hex": "942a19f10201640050007c009600234001000400030c0200",
+      "spec_file_offset": 580092,
+      "spec_sha256": "b0f77d55db624b023accc8542f6b990d95515ab3e4c23bdd4e1d6e30c4cf2656",
+      "original_spec_pointer_u32": 4865532,
+      "model_scale_raw": 1,
+      "outer_radius_s16": 18000,
+      "inner_radius_s16": 4800,
+      "source_refs": "Existing immutable149-descriptor table and57-specification table; these are the3 current adapted ships, not57 playable ships."
+    }
+  },
+  "global_field_policy": "field_layout.globals values name original DATA label numbers, not object/game byte offsets.",
+  "field_layout": {
+    "object": {
+      "orientation_q31_dword_offsets": [
+        0,
+        4,
+        8,
+        12,
+        16,
+        20,
+        24,
+        28,
+        32
+      ],
+      "parent_index_u8": 86,
+      "position_s64_xyz": [
+        62,
+        70,
+        78
+      ],
+      "model_index_u32": 130,
+      "object_index_u8": 134,
+      "kind_u8": 135,
+      "velocity_s32_xyz": [
+        140,
+        144,
+        148
+      ],
+      "gear_position_u16": 158,
+      "outer_bound_s64": 312,
+      "inner_bound_s64": 320
+    },
+    "globals": {
+      "collision_flags_u8": 8696,
+      "collider_index_u8": 8698,
+      "collision_active_u8": 8699,
+      "collision_enabled_u8": 8700,
+      "collider_pointer": 8702,
+      "previous_altitude_low_u32": 8705,
+      "previous_altitude_high_s32": 8706,
+      "collision_kind_u8": 8707,
+      "player_index_u32": 8857
+    }
+  },
+  "constants": {
+    "landing_speed_l1_limit_raw_s32": 600,
+    "landing_gear_required_u16": 65535,
+    "landing_orientation_dot_minimum_q31_s32": 2013265920,
+    "contact_flag_u8": 2,
+    "landing_flag_u8": 64,
+    "unsafe_contact_flag_u8": 128,
+    "natural_contact_kind_u8": 1,
+    "source_object_record_bytes": 338,
+    "ship_descriptor_bytes": 68,
+    "ship_specification_bytes": 24,
+    "hull_raw_per_mass_tonne": 4,
+    "impact_damage_divisor_s32": 1800
+  },
+  "canonical_contracts": {
+    "classification": "Caller supplies classification/contact globals and valid raw context; runtime entry begins after original F575 classification.",
+    "natural_normal": "Kind1 continuation computes the radial source normal from parent-relative raw position; a published triangle gradient is not substituted as original source math.",
+    "landing": "Original Q31/L1/fully-deployed-word predicate; physicalgear position is distinct from the request flag.",
+    "response": "Exact bounded position/basis/velocity continuation returns F953 amount/attacker requests. Original F953 arithmetic is reused through the existing saved HP/RNG owner.",
+    "bounds": "Ship outer/inner bounds derive from original descriptor mantissa and F1533→F1495 exponent: scale14+scale18−8; no visual mesh radius is inferred.",
+    "scope": "Post-classification arithmetic is distinct from full F569/F570/F574/F575/F576/F577/F578 and the complete object-bank/frame/event pipelines."
+  },
+  "caller_policies": {
+    "source_classifier_integrated": false,
+    "source_frame_pipeline_integrated": false,
+    "published_geometry_scope": "Phone CCD/height provider uses published terrain/city triangles; its event classification is an explicit adapter to the bounded original continuation.",
+    "source_frame_scope": "Position, orientation and velocity must enter one consistent source frame; L1 speed is basis-sensitive. No implicit complete F570 frame selection.",
+    "response_schedule_scope": "Phone contact event scheduling/repeated-hit suppression is caller policy, not an inferred original timer frequency.",
+    "HP_RNG_scope": "Reuse existing persisted F953 raw HP/shield/local RNG owner; no second HP or contact RNG state.",
+    "callback_scope": "F953 requests are consumed by existing DOS damage arithmetic; F942 destruction/F952 equipment/full event dispatcher remain explicit external scope.",
+    "whole_original_physics": false
+  },
+  "source_variants": {
+    "canonical_entry": "Uploaded DOS bounded F575 JUMP_002410 continuation; pinned-source helper equivalence recorded separately when proof_complete.",
+    "full_F575_anchor_is_runtime_entry": false,
+    "F577_included_in_runtime": false,
+    "F578_included_in_runtime": false,
+    "F577_DOS_other_radius_object_offset": 312,
+    "F577_pinned_JJFFE_other_radius_object_offset": 320,
+    "F577_scope": "Pinned JJFFE explicitly changes the other-object sphere radius; full original sphere classifier is excluded from this runtime.",
+    "F578_DOS": "Pair velocity uses signed wrapped means and original raw hull-word damage order.",
+    "F578_pinned_JJFFE": "Explicit Missile retardation rewrite uses descriptor masses, collision direction and a different impulse/damage formula; excluded from this runtime."
+  },
+  "scope": "Read-only metadata/bytes/provenance. Extractor executes no original instructions. Prototype until helper_proof_complete=true; no full classifier/world/frame/collision/destruction/equipment parity claim."
+}

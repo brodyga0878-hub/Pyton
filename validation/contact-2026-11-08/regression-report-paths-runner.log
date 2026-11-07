@@ -1,0 +1,5 @@
+source_atmosphere_contact: passed; 3904 checks, 0 failures
+source_hyperdrive_main: passed; 70 checks, 0 failures
+source_fuel_main: passed; 397 checks, 0 failures
+source_thermal_main: passed; 463 checks, 0 failures
+Validation passed: 4834 current checks; 4 passed suites; 0 failed; 0 unavailable. Report: validation/contact-2026-11-08/regression-report-paths.json
