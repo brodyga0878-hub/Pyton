@@ -1,0 +1,247 @@
+{
+  "schema_version": 1,
+  "reference": "uploaded DOS FIRSTENC.EXE",
+  "executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "pinned_asm_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+  "case_count": 2812,
+  "byte_instruction_proofs": {
+    "F1008": {
+      "executable_offset": 202128,
+      "virtual_address": 4458384,
+      "byte_length": 305,
+      "sha256": "6d0a8a82a36809b64f58568ad7ef7c29e2b767f8091e06d47536e04adab41e97",
+      "instruction_count": 72,
+      "normalized_instruction_sha256": "7b9072caf66dc8606cd745315a8f9cf8041f77626fbdfac7f4672bcf445ad67a",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "outgoing_branch": "None"
+    },
+    "F1056_JUMP_004410": {
+      "executable_offset": 213146,
+      "virtual_address": 4469402,
+      "byte_length": 116,
+      "sha256": "4262147506224b00e3d94d2febdfed3f690773655f90439d724e8f393ba61107",
+      "instruction_count": 32,
+      "normalized_instruction_sha256": "4909ec5205ccac31a0f52f7c43d9bfd071245a17cf74d450465cde73c53d55c9",
+      "all_instructions_equal_after_branch_destination_normalization": true,
+      "outgoing_branch": "Only terminal JMP_004431 exits; normalized to slice_exit for instruction comparison, host returns instead of executing remaining VM."
+    }
+  },
+  "known_dos_jjffe_differences": [],
+  "warning_resource": {
+    "ff_code_u16": 39118,
+    "data_label": "DATA_005860",
+    "executable_offset": 805561,
+    "hex": "01025741524e494e473a200103556e646572636172726961676520646f776e2e0d202020284974206d61792062652064616d61676564206279206d6963726f6d6574656f72697465732900",
+    "sha256": "3bd5c30b6cb91dfa97d7e93cc471885f0ccc88ec50605c8c9cb8435429dd9644",
+    "plain_text": "WARNING: Undercarriage down.\n   (It may be damaged by micrometeorites)"
+  },
+  "callback_raw_schema": [
+    "function_number",
+    "arg1_u32",
+    "arg2_u32",
+    "reserved_zero"
+  ],
+  "callback_arguments": {
+    "262": [
+      "button_id",
+      "image_id"
+    ],
+    "1097": [
+      "message_code_u32",
+      "selector_s32_bits"
+    ],
+    "1116": [],
+    "1906": [
+      "sample"
+    ]
+  },
+  "raw_semantics": {
+    "game_e9_mask02_set": "retract requested; object9E tends to0",
+    "game_e9_mask02_clear": "deploy requested; object9E tends to65535",
+    "object9e_zero": "fully retracted",
+    "object9e_ffff": "fully deployed; required by F575 terminal docking predicate",
+    "objectff_24hex": "bounded toggle blocked; only sound0x14 still emitted",
+    "gamee8_state2": "autopilot overrides desired gear command based on unsigned objectFF<=0x1E",
+    "frame_ticks": "DATA9155 u32 per original F1009\u2192F1008 player physics invocation; not F152 whole-seconds cadence"
+  },
+  "execution_checks": {
+    "fresh_identical_processes": 3,
+    "reverse_case_order_identical": true,
+    "object_globals_output_canaries": true,
+    "unrelated_bytes_unchanged": true,
+    "expected_transitions_computed_by_python": false
+  },
+  "scope": [
+    "Full F1008 arithmetic/control flow, including timer, automatic command, warning latch and gear animation.",
+    "Only F1056 JUMP_004410..004413 and terminal branch; no complete keyboard, hot-area or pause/flight dispatcher claim.",
+    "F1116 console update, F262 button image, F1097 notification and F1906 sound are observed callbacks; full UI and sound engine excluded.",
+    "No forced flight-state transition exists in this exact toggle branch.",
+    "Source unit conversion, virtual scheduling, save persistence and phone UI are separate caller policies."
+  ],
+  "invalid_domains_not_executed": [
+    "Malformed object pointers are rejected by public adapter; source raw instructions assume valid338-byte object and DATA8804 context."
+  ],
+  "independent_literal_controls": [
+    {
+      "name": "literal_deploy_one",
+      "case_id": "dos-landing-gear-02802",
+      "literal_state_subset": {
+        "position_u16": 1
+      },
+      "literal_callbacks_raw_u32": [],
+      "passed": true
+    },
+    {
+      "name": "literal_retract_complete",
+      "case_id": "dos-landing-gear-02803",
+      "literal_state_subset": {
+        "position_u16": 0
+      },
+      "literal_callbacks_raw_u32": [],
+      "passed": true
+    },
+    {
+      "name": "literal_timer_equality",
+      "case_id": "dos-landing-gear-02804",
+      "literal_state_subset": {
+        "object_timer_u16": 0
+      },
+      "literal_callbacks_raw_u32": [],
+      "passed": true
+    },
+    {
+      "name": "literal_odd_tick_truncation",
+      "case_id": "dos-landing-gear-02805",
+      "literal_state_subset": {
+        "position_u16": 0
+      },
+      "literal_callbacks_raw_u32": [],
+      "passed": true
+    },
+    {
+      "name": "literal_auto_low_phase",
+      "case_id": "dos-landing-gear-02806",
+      "literal_state_subset": {
+        "control_flags_u8": 2
+      },
+      "literal_callbacks_raw_u32": [
+        [
+          1116,
+          0,
+          0,
+          0
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "name": "literal_auto_high_phase",
+      "case_id": "dos-landing-gear-02807",
+      "literal_state_subset": {
+        "control_flags_u8": 0
+      },
+      "literal_callbacks_raw_u32": [
+        [
+          1116,
+          0,
+          0,
+          0
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "name": "literal_warning_exact_speed",
+      "case_id": "dos-landing-gear-02808",
+      "literal_state_subset": {
+        "warning_flags_u16": 2
+      },
+      "literal_callbacks_raw_u32": [
+        [
+          1097,
+          39118,
+          4294967295,
+          0
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "name": "literal_warning_below_speed",
+      "case_id": "dos-landing-gear-02809",
+      "literal_state_subset": {
+        "warning_flags_u16": 0
+      },
+      "literal_callbacks_raw_u32": [],
+      "passed": true
+    },
+    {
+      "name": "literal_toggle_blocked",
+      "case_id": "dos-landing-gear-02810",
+      "literal_state_subset": {
+        "control_flags_u8": 0,
+        "warning_flags_u16": 65535
+      },
+      "literal_callbacks_raw_u32": [
+        [
+          1906,
+          20,
+          0,
+          0
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "name": "literal_toggle_request",
+      "case_id": "dos-landing-gear-02811",
+      "literal_state_subset": {
+        "control_flags_u8": 2,
+        "warning_flags_u16": 65533
+      },
+      "literal_callbacks_raw_u32": [
+        [
+          262,
+          56,
+          0,
+          0
+        ],
+        [
+          262,
+          70,
+          0,
+          0
+        ],
+        [
+          1116,
+          0,
+          0,
+          0
+        ],
+        [
+          1906,
+          12,
+          0,
+          0
+        ],
+        [
+          1906,
+          20,
+          0,
+          0
+        ]
+      ],
+      "passed": true
+    }
+  ],
+  "fixture_sha256": "3690144d57048c2be03fa5e70ffd193a57edef38e0602126c17b857834439a16",
+  "tool_sha256": "6c001b0c28719780372d7d4ab7ded13c31b79e4aff5b66bd828878eb0eb7c5c5",
+  "native_assembly_sha256": "6ab5ded588155d99ab92ae21f447a8e0cd468443ee478ea01981a38abeab254f",
+  "counts_by_operation": {
+    "F1008": 1430,
+    "toggle": 466,
+    "toggle_then_step": 451,
+    "step_then_toggle": 465
+  }
+}

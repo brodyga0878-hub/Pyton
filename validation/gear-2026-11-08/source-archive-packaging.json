@@ -1,0 +1,33 @@
+{
+  "created_utc": "2026-11-07T21:35:16.768154+00:00",
+  "source_commit": "5c7be752af6cf3167452bb16a970b7a6f30d7cd9",
+  "archive_path": "/workspace/Pyton/deliverables/0.18.0-landing-gear-alpha1/StarFrontier-0.18.0-landing-gear-source.zip",
+  "archive_bytes": 31185873,
+  "archive_sha256": "89324041e68c1dfce09c7f9b5d5c20c7080396c8bfb3261a2e0c1148776d2b93",
+  "archive_entries": 1447,
+  "archive_actual_files": 1294,
+  "archive_crc_ok": true,
+  "archive_below_32MiB": true,
+  "apk_bytes": 50071605,
+  "apk_sha256": "20f340f1d1c9e8917849d56246123a1f9519b89d730e3568f3ef5f95b671a735",
+  "archive_roots": [
+    ".gitignore",
+    "README.md",
+    "SOURCE_ARCHIVE_RU.md",
+    "assets",
+    "data",
+    "docs",
+    "export_presets.cfg",
+    "icon.svg",
+    "icon.svg.import",
+    "project.godot",
+    "recovered-history",
+    "recovery",
+    "scenes",
+    "scripts",
+    "tests",
+    "tools",
+    "validation/parity-audit-2026-11-07"
+  ],
+  "source_docs_prepublication": true
+}

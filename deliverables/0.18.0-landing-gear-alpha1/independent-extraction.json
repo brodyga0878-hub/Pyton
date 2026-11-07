@@ -1,0 +1,15 @@
+{
+  "time_utc": "2026-11-07T21:20:02.545368+00:00",
+  "reviewer": "/root/time_dynamics_impl/information_text_review",
+  "read_only": true,
+  "raw_resource_sha256": "f06d7184046407dea3ee45fb3c6dedeb6bfaf21fe1a6136a388a87fa97ed1f00",
+  "material_errors": 0,
+  "primary_anchor_bytes": 421,
+  "primary_instruction_count": 104,
+  "supporting_slice_bytes": 53,
+  "supporting_instruction_count": 14,
+  "scope": "Independently compared actual DOS bytes/VA/objdump instructions for both native anchors and bounded F1009/F575 slices; verified polarity, independent E8 fields, autopilot boundaries, warning latch, observed callbacks and explicit scheduler/full-F1056 limits.",
+  "files_changed": false,
+  "native_oracle_executed": false,
+  "final_metadata_note": "Reviewer re-read final resource and original F1097: argument2 is copied into event record+0x18 before F349; duration semantics unproved, renamed warning_selector_s32 / selector_s32. No instruction/numeric/source/caller changes."
+}

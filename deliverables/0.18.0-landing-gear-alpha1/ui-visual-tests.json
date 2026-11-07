@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "Optional classic-console gear command and authored3-strut visual consume authoritative independent source-gear session; legacy console/visual controls retained",
+  "groups": 5,
+  "checks": 661,
+  "failures": 0,
+  "suites": [
+    {
+      "test": "tests/test_flight_console.gd",
+      "checks": 318,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/gear-2026-11-08/flight-console-legacy.log"
+    },
+    {
+      "test": "tests/test_ship_graphics.gd",
+      "checks": 108,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/gear-2026-11-08/ship-graphics-legacy.log"
+    },
+    {
+      "test": "tests/test_gear_flight_console.gd",
+      "checks": 137,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/gear-2026-11-08/gear-flight-console.log"
+    },
+    {
+      "test": "tests/test_gear_ship_visual.gd",
+      "checks": 71,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/gear-2026-11-08/gear-ship-visual.log"
+    },
+    {
+      "test": "tests/test_gear_console_native.gd",
+      "checks": 27,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/gear-2026-11-08/gear-console-native.log"
+    }
+  ],
+  "sha256": {
+    "scripts/flight_console.gd": "0a9fe99fd5e4f2cfb276e476a8a12c141cbb9b74a92cd246c4dcfa9cc4180c54",
+    "scripts/ship_visual.gd": "5c175408f1687ecb440296e62051884a79503a4903965d16bd8dbba66934dd88",
+    "scripts/source_landing_gear.gd": "0a65184b0e02f6a578e9d4bc12124a87585241e25598020b351494059af05b6a",
+    "scripts/source_landing_gear_session.gd": "ba8b63cbf89f30441f0bdfe01ed51af3a7e0e4679451264826039dd7b65887a0",
+    "data/ffe_landing_gear.json": "f06d7184046407dea3ee45fb3c6dedeb6bfaf21fe1a6136a388a87fa97ed1f00",
+    "tests/test_flight_console.gd": "3127c6c5a720b23260626765e9dcd4ce2f92c1e40d6e856c5b503a5492498abd",
+    "tests/test_ship_graphics.gd": "bf574a0b3fc1837964bcfb11903164e4c09335ab61f35ef2cc671d80a54e1db6",
+    "tests/test_gear_flight_console.gd": "91b501cc8282c2a500c187fecd8d86c4744a32e58e975493bea09508225292b4",
+    "tests/test_gear_ship_visual.gd": "c0903b7c46f511f134fcf8cfe8ed2463e48382fdf77f4b2842373bec30ad5726",
+    "tests/test_gear_console_native.gd": "a49e31a86a7749e8225826101b6fb9fda10b856be16abe0d78ac27df5daa89bb"
+  },
+  "contracts": {
+    "legacy_classic_actions": 12,
+    "optional_classic_actions": 13,
+    "existing_classic_and_zoom_control_positions_unchanged": true,
+    "console_height_px": 240,
+    "minimum_gear_touch_width_px": 132,
+    "minimum_gear_touch_height_px": 64,
+    "gear_button_top_y": 172,
+    "gear_scanner_scale_y": [
+      55,
+      77
+    ],
+    "gear_contact_top_clip_y": [
+      81,
+      164
+    ],
+    "supported_widths": [
+      720,
+      1440,
+      1920
+    ],
+    "signal": "gear_requested()",
+    "state_fields": [
+      "gear_available",
+      "gear_enabled",
+      "gear_text",
+      "gear_status",
+      "gear_fraction"
+    ],
+    "visual_setter": "set_gear_fraction(float)",
+    "visual_legacy_reset": "clear_gear_fraction_override()",
+    "visual_fraction_has_extra_wall_clock_animation": false,
+    "landed_determines_source_gear_position": false,
+    "visual_profiles": [
+      "cobra",
+      "eagle",
+      "shuttle"
+    ],
+    "visual_fraction_cases": [
+      0,
+      0.25,
+      0.5,
+      0.75,
+      1
+    ],
+    "old_landed_smoothing_retained_until_override": true,
+    "immutable_hull_and_gear_meshes_preserved": true,
+    "gear_controls_save_or_advance_model_on_render": false,
+    "GPU_rendered": false,
+    "physical_phone_tested": false
+  },
+  "actual_session_evidence": [
+    {
+      "phase": "actual_source_gear_touch_cycle",
+      "position_from_source": true,
+      "source_fraction_after_retraction": 0.620965896086061,
+      "source_request_is_retract": true,
+      "touch_width": 720,
+      "visual_landed": false
+    },
+    {
+      "automatic_source_override_retained": true,
+      "blocked_phase_touch_rejected": true,
+      "paused_touch_blocked": true,
+      "phase": "actual_quote_guards_and_caption",
+      "supported_widths": [
+        720,
+        1440,
+        1920
+      ]
+    }
+  ],
+  "limits": [
+    "Actual GearSession→console→touch→model→visual is isolated by an explicit presentation bridge; Main flight-context/save integration has separate tests.",
+    "Source F1008 arithmetic/native oracle execution belongs to the independent core report, not these UI counts.",
+    "Gear remains the existing authored procedural3-strut artwork; original57 collision models and articulated hydraulic rigging are not claimed.",
+    "Headless layout/touch/font/transform checks do not certify desktop GPU output or Samsung rendering/performance.",
+    "Retained318console and108graphics tests may appear in root regressions and must be counted only once."
+  ]
+}

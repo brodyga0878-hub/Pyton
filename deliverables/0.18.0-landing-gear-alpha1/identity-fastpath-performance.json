@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "scope": "Desktop headless stable manual retracted gear session; no phone/GPU/FPS claim",
+  "before_identity_fastpath": [
+    {
+      "rate": 1,
+      "calls": 2000,
+      "total_usec": 128791,
+      "mean_usec": 64.3955
+    },
+    {
+      "rate": 100,
+      "calls": 200,
+      "total_usec": 168631,
+      "mean_usec": 843.155
+    }
+  ],
+  "after_identity_fastpath": [
+    {
+      "rate": 1,
+      "calls": 2000,
+      "total_usec": 115903,
+      "mean_usec": 57.9515
+    },
+    {
+      "rate": 100,
+      "calls": 200,
+      "total_usec": 11962,
+      "mean_usec": 59.81
+    }
+  ],
+  "source_session_sha256": "ba8b63cbf89f30441f0bdfe01ed51af3a7e0e4679451264826039dd7b65887a0",
+  "reference_equivalence_report": "validation/gear-2026-11-08/landing-gear-session.json",
+  "benchmark": "validation/gear-2026-11-08/performance-benchmark.gd"
+}

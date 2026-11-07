@@ -1,0 +1,32 @@
+{
+  "schema": "starfrontier-source-archive-gear-feature-v1",
+  "started_utc": "2026-11-07T21:36:30.950862+00:00",
+  "finished_utc": "2026-11-07T21:36:59.887254+00:00",
+  "duration_seconds": 28.936403,
+  "source_commit": "5c7be752af6cf3167452bb16a970b7a6f30d7cd9",
+  "archive_sha256": "89324041e68c1dfce09c7f9b5d5c20c7080396c8bfb3261a2e0c1148776d2b93",
+  "command": [
+    "godot",
+    "--headless",
+    "--audio-driver",
+    "Dummy",
+    "--path",
+    "/workspace/recovery/gear-source-portability/source/StarFrontier-0.18.0-landing-gear-source",
+    "--script",
+    "res://tests/test_source_gear_main.gd",
+    "--",
+    "--rebuild-capture"
+  ],
+  "exit_code": 0,
+  "checks": 112,
+  "failures": 0,
+  "error_markers": [],
+  "source_actual_files": 1294,
+  "all_source_files_unchanged": true,
+  "modified_files": [],
+  "private_xdg": true,
+  "execution_policy": "require_escalated",
+  "log_sha256": "63caa373b770d451b3d8aa9b7deec6df6c6bae60a4359aba7d61e3c87668d96f",
+  "scope": "Exact source ZIP, fresh isolated actual Main gear/console/physical-extension/thermal-flag/landing/lift/save test. Repeated portability checks excluded from current distinct total. No Android device execution.",
+  "ok": true
+}

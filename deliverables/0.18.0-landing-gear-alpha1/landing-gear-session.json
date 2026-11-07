@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-07T21:24:53.410903+00:00",
+  "status": "passed",
+  "scope": "Independent whole-game landing-gear session; source F1056 selected action and F1008 fixed60 caller integration, not full F575 collision/autopilot/game",
+  "checks": 413,
+  "groups": 1,
+  "failures": 0,
+  "test": "tests/test_source_landing_gear_session.gd",
+  "log": "validation/gear-2026-11-08/source-landing-gear-session.log",
+  "sha256": {
+    "scripts/source_landing_gear_session.gd": "ba8b63cbf89f30441f0bdfe01ed51af3a7e0e4679451264826039dd7b65887a0",
+    "tests/test_source_landing_gear_session.gd": "8466680a68f5136a7fd312c4e4a857cc54ae8c47156859d842b0178932e9c154",
+    "scripts/source_landing_gear.gd": "0a65184b0e02f6a578e9d4bc12124a87585241e25598020b351494059af05b6a",
+    "data/ffe_landing_gear.json": "f06d7184046407dea3ee45fb3c6dedeb6bfaf21fe1a6136a388a87fa97ed1f00",
+    "scripts/navigation.gd": "2745b49c42b69a23679740f21bf31efdcab319d7eedff6de090aac854bd3f225",
+    "scripts/source_hyperdrive_session.gd": "0a0428071f8cfc188f80930474c804261626be6952d41a55b8399eb6b70c7bc8",
+    "data/ffe_hyperdrive.json": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+    "data/ffe_fuel.json": "4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f",
+    "data/ffe_atmosphere.json": "b65e25e187ac4abe7e24325a78de3fe70c140395711127ee0076f9905222bcce"
+  },
+  "contracts": {
+    "snapshot_keys": 12,
+    "source_control_flags_all_u8_preserved": true,
+    "warning_flags_all_u16_preserved": true,
+    "raw_E9_bit2_set_means": "retract requested; physical9E moves toward0",
+    "raw_E9_bit2_clear_means": "deploy requested; physical9E moves toward65535",
+    "f1014_raw_gear_flag": "raw retract request, intentionally opposite requested_down",
+    "neutral_object_E8_timer_is_not_gear_delay": true,
+    "source_selected_toggle_does_not_cancel_autopilot": true,
+    "command_request": "Explicit idempotent phone adapter; source toggle only if target changes",
+    "host_hz": 60,
+    "maximum_virtual_steps": 256,
+    "host_tick_policy": "Integer rational2^32/(86400*60), carried remainder plus exact IEEE64 simulation phase",
+    "source_warning_signed_raw_threshold": 100000,
+    "source_warning_does_not_block_motion_or_apply_damage": true,
+    "cold_restore_mid_animation_full_snapshot_and_callbacks_equal": true,
+    "FPS_30_60_120_full_snapshot_equal": true,
+    "zero_elapsed_and_paused_host_no_catchup": true,
+    "present_empty_or_unknown_fields_reject_atomically": true,
+    "identity_fastpath_forced_reference_full_snapshot_and_result_equal": "Both endpoints,30/60/120FPS,warp1/100,carried phase/remainder,unrelated rawflags; guards timer/midtravel/newwarning/nativeauto",
+    "Root_old_missing_defaults": "Main-owned: DOWN if Surface.landed or Ship.docked, otherwiseUP; not silently inferred inside this model"
+  },
+  "limits": [
+    "Actual DOS arithmetic and2812native cases belong to the separate kernel proof and are not added again here.",
+    "Main/Surface save migration, landed coherence and automatic deployment are parent-owned integration policies.",
+    "No original autopilot phases are guessed from phone autopilot; mode2 here is an explicit independent native-context test.",
+    "GUI/sound callbacks are returned as observations, not a complete original GUI/audio VM.",
+    "The physical65535 endpoint is one F575 criterion; complete original landing/impact logic is not implemented by this session.",
+    "Desktop timing is not physical Android or GPU/FPS testing."
+  ]
+}

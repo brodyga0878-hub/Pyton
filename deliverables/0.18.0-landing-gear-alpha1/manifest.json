@@ -1,0 +1,358 @@
+{
+  "version": "0.18.0-landing-gear-alpha1",
+  "version_code": 43,
+  "created_utc": "2026-11-07T21:37:40.898182+00:00",
+  "source_commit": "5c7be752af6cf3167452bb16a970b7a6f30d7cd9",
+  "source_archive_scope": "Exact git archive reconstruction plus scoped static parity audit; SDK, keys, caches, other validation and deliverables excluded; internal docs reflect pre-publication state.",
+  "source_archive_files": 1447,
+  "source_archive_actual_file_count": 1294,
+  "source_archive_below_32MiB": true,
+  "source_archive_crc_verified": true,
+  "source_archive_fresh_import_passed": true,
+  "source_archive_isolated_native_startup_checks": 10,
+  "source_archive_isolated_native_startup_failures": 0,
+  "source_archive_gear_Main_checks": 112,
+  "source_archive_gear_Main_failures": 0,
+  "source_archive_actual_files_unchanged": 1294,
+  "checks": 51431,
+  "passed_suites": 28,
+  "failures": 0,
+  "validation_status": "passed",
+  "validation_report": "final-targeted-summary.json",
+  "validation_scope": "One current passing result per unique selected gear kernel/session/UI/visual/Main and regression group. Native controls included within kernel total. Failed fixture setup/intermediate runs, repeated portability/capture checks and historical release totals excluded. Bounded suite timestamps retained, not an atomic full-game run.",
+  "new_instruction_matched_DOS_native_cases": 2812,
+  "original_DOS_primary_instructions": 104,
+  "native_cases_included_in_core_checks": true,
+  "historical_native_totals_added": false,
+  "python_packaging_tests": 179,
+  "python_extraction_tests": 10,
+  "python_distinct_tests": 189,
+  "capture_checks": 196,
+  "capture_checks_added_to_targeted_total": false,
+  "fresh_desktop_gles_frames_visually_inspected": 8,
+  "screenshots_are_phone_captures": false,
+  "inspection_camera_is_fixture_not_gameplay_feature": true,
+  "renderer": "Godot4.6.3 Compatibility/OpenGL Mesa llvmpipe Linux virtual display",
+  "frozen_runtime_inputs": 412,
+  "additional_runtime_modules": 2,
+  "additional_shaders": 0,
+  "additional_textures": 0,
+  "additional_source_JSON": 1,
+  "runtime_material_maps": 51,
+  "original_DOS_F1008_kernel": true,
+  "original_DOS_F1056_selected_gear_branch": true,
+  "complete_original_F1056_input_dispatcher": false,
+  "complete_original_F575_player_collision": false,
+  "native_GUI_and_audio_callbacks_executed": false,
+  "micrometeorite_gear_damage_implemented": false,
+  "gear_request_bit_set_means": "retract",
+  "gear_fully_deployed_position_raw": 65535,
+  "thermal_historical_gear_down_field_is_raw_E9_bit": true,
+  "gear_host_caller_is_original": false,
+  "gear_host_invocation_rate_hz": 60,
+  "gear_ground_hold_adapter": "phone-ground-gear-clearance-v1",
+  "gear_ground_clearance_m": 0.05,
+  "automatic_deploy_request_is_phone_adapter": true,
+  "partial_gear_state_saved_exactly": true,
+  "package": "org.starfrontier.rebuild",
+  "abi": "arm64-v8a",
+  "min_sdk": 24,
+  "target_sdk": 36,
+  "debuggable": false,
+  "zip_and_elf_alignment_16k": true,
+  "test_key_only": true,
+  "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+  "physical_device_tested": false,
+  "production_signing_key_configured": false,
+  "production_release_ready": false,
+  "full_original_port_complete": false,
+  "full_original_physics": false,
+  "full_russian_localization_complete": false,
+  "game_completion_percent": null,
+  "full_release_date": null,
+  "next_functional_priority": "Complete original surface contact and landing-damage consumers to replace the explicitly adapted gear ground hold.",
+  "artifact_upload_authorized": true,
+  "publication_state_at_packaging": "Prepared for authorized GitHub backup; immutable full HTTPS download verification follows separately.",
+  "files": {
+    "README_RU.md": {
+      "bytes": 4405,
+      "sha256": "3979a7ec545a589b94d754a09172dfb9c38adce3eba4e626ca27a2419434d334"
+    },
+    "StarFrontier-0.18.0-landing-gear-arm64.apk": {
+      "bytes": 50071605,
+      "sha256": "20f340f1d1c9e8917849d56246123a1f9519b89d730e3568f3ef5f95b671a735"
+    },
+    "StarFrontier-0.18.0-landing-gear-source.zip": {
+      "bytes": 31185873,
+      "sha256": "89324041e68c1dfce09c7f9b5d5c20c7080396c8bfb3261a2e0c1148776d2b93"
+    },
+    "android-export.log": {
+      "bytes": 7255,
+      "sha256": "fa0ff0116ef73c474d6f82e8bb2cbdf27bbb9dab9e04566b59a149ff2b8b055f"
+    },
+    "android-verification.json": {
+      "bytes": 101462,
+      "sha256": "501a954d32aba55778b2d5509efe5f15cdf7ed371cac7c9853d654c9484e8b4b"
+    },
+    "atmosphere-contact-regression.json": {
+      "bytes": 2847,
+      "sha256": "facc799255980a1537acd035d8ae70137be184e01f41a019036b2e87bb096b0b"
+    },
+    "extraction.json": {
+      "bytes": 1166,
+      "sha256": "58ddc35e92b4e60030fda37405f90c1bd57ea0f2599a9e903b368c812853267c"
+    },
+    "extraction.log": {
+      "bytes": 1875,
+      "sha256": "c48048a27b868cd7aa70f9f7bee06268e108afcc7c4fdd1c11cbfb834ab5b96d"
+    },
+    "final-targeted-summary.json": {
+      "bytes": 8918,
+      "sha256": "8167029a8add2c50ee2f1a13ee89ed80e937c4038e930063e01e8375493d35bf"
+    },
+    "flight-console-legacy.log": {
+      "bytes": 118,
+      "sha256": "2833eda9720b8b638431c30397f32b73f56a9a735e477d50d1c74cdc7c5ece70"
+    },
+    "fuel-main-regression.json": {
+      "bytes": 2056,
+      "sha256": "8c47fa623ffeb1757cbc4183f25b3b620edf906efa9de5647bba8b5f7bbed99b"
+    },
+    "gear-console-native.log": {
+      "bytes": 536,
+      "sha256": "cc1320c799b98e4d098c29bde9920e7fca9f00c2eca39078f943facac1669614"
+    },
+    "gear-flight-console.log": {
+      "bytes": 123,
+      "sha256": "2b2aa65b5f24a86e72d6211b2730bdbc2bc4a10746706dfa5dfa48db360a81d7"
+    },
+    "gear-main-feature.json": {
+      "bytes": 1200,
+      "sha256": "93b33823f9cff67b41ee1ac88961dcd76c5ac71051d1dbc220f142b0c59c4677"
+    },
+    "gear-main-feature.log": {
+      "bytes": 114,
+      "sha256": "63caa373b770d451b3d8aa9b7deec6df6c6bae60a4359aba7d61e3c87668d96f"
+    },
+    "gear-ship-visual.log": {
+      "bytes": 119,
+      "sha256": "4f7a831fb61a0f3ad5496830a9a88c3c5bc5bf2e93e2b7bca0470878c6eee00c"
+    },
+    "hyperdrive-main-regression.json": {
+      "bytes": 1383,
+      "sha256": "770fd6350c70e38785944c596d65b07285c15fe7b3324780905352c22adbfb7a"
+    },
+    "identity-fastpath-performance.json": {
+      "bytes": 859,
+      "sha256": "f94e064a5c793b6962b62bdeef04c6029d84e463a4b39c31f0211d29d281b844"
+    },
+    "independent-extraction.json": {
+      "bytes": 984,
+      "sha256": "1e221be10b6c011417334419ec46ae79668153d77ae4c66c86bb6edb2baae7a6"
+    },
+    "independent-packaging.json": {
+      "bytes": 1431,
+      "sha256": "783726f6dc15c3bcc8bfe4b63f0e9e436c1303d62e34c676ac78fb5422dff6a0"
+    },
+    "landing-gear-session.json": {
+      "bytes": 3531,
+      "sha256": "30cd72b6d05e2a547741c015baf0d9631185d56e4ea3cb35fd2b5653eac1f753"
+    },
+    "nativeproof/dos-landing-gear-disassembly.txt": {
+      "bytes": 3348,
+      "sha256": "52764b8226b8b5666719673a4ec2827ea6ca5f5334f494f2dfa7fbf78e97c6c0"
+    },
+    "nativeproof/source-landing-gear-native-proof.json": {
+      "bytes": 7319,
+      "sha256": "8fe609a1aafa52c86a84240134fe729beba7c3bf013269abfe7ef79fa3940be9"
+    },
+    "packaging.json": {
+      "bytes": 4455,
+      "sha256": "46febc65e059915857fe295e0402bef1bbf4153f84b26df0dab8b74d479265dd"
+    },
+    "packaging.log": {
+      "bytes": 100,
+      "sha256": "128a9fd155f854dff199edc2b0f6620521734e42d8dbb7d79b6ec74ddace0575"
+    },
+    "performance-benchmark.gd": {
+      "bytes": 836,
+      "sha256": "c1e45b822f3c12cdb0f161d4405ad447a8e9926b8a50669b362ff891e296685e"
+    },
+    "regression-logs/logs/classic_console_main.log": {
+      "bytes": 123,
+      "sha256": "fd1b59ff7ab0184ebb05c966c93c20e81d6f74731c727c273818a1dadac0b0b3"
+    },
+    "regression-logs/logs/flight_projection.log": {
+      "bytes": 10047,
+      "sha256": "e5975c1d32e6a08a7f636589baf1c72d9a8b86a2bf780a15847ccca504fc6d35"
+    },
+    "regression-logs/logs/graphics_integration.log": {
+      "bytes": 123,
+      "sha256": "f6b6dc847918df771b6f2ac4b0b0f0537855cf6f5247269fadb9b1f4b8ea6d06"
+    },
+    "regression-logs/logs/graphics_scope.log": {
+      "bytes": 355,
+      "sha256": "b7ec54445dbb93814b7877b35fd9c0b18e5e17f8dcf4a62aa1fba3a09f2692bb"
+    },
+    "regression-logs/logs/navigation_main.log": {
+      "bytes": 118,
+      "sha256": "341f62f03e5ea9792cb9e4caaf3261f7e61c57b9664e49fe27d12453ab4c12b6"
+    },
+    "regression-logs/logs/offpad_takeoff.log": {
+      "bytes": 118,
+      "sha256": "c48c9e6771737eaa3fd8bc350d0d769e9db501bed072ff6f936404a4e59951e0"
+    },
+    "regression-logs/logs/report_export.log": {
+      "bytes": 116,
+      "sha256": "6812fd589ef650008dacfb1d68e9ef1ccc3cf096f4197090ba20d44f039441fb"
+    },
+    "regression-logs/logs/source_atmosphere_contact.log": {
+      "bytes": 124,
+      "sha256": "a1dc44e4bfc5b2f9162b6e01ee7d8a5325856242b6137d95b08672ec588bfa40"
+    },
+    "regression-logs/logs/source_console_pause.log": {
+      "bytes": 1718,
+      "sha256": "3ec4bd82113ff5be2ae8584c58ce7a715668df23bd4d21fb9b544b97d1b674b6"
+    },
+    "regression-logs/logs/source_docking_flight.log": {
+      "bytes": 125,
+      "sha256": "9e7d3fcfbabb498d60a2a57cfb98e809d575c23d253807b9e78773011813fad8"
+    },
+    "regression-logs/logs/source_fuel_main.log": {
+      "bytes": 114,
+      "sha256": "56d10dd266bc7c99655e694d8239d01f71dc6be6d1387f40552f21c080b59b8e"
+    },
+    "regression-logs/logs/source_full_startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "regression-logs/logs/source_hyperdrive_main.log": {
+      "bytes": 119,
+      "sha256": "714642268b5d030046e011e56f234bb451f4042b5a194b32c21d1e1878eecbd8"
+    },
+    "regression-logs/logs/source_main_full.log": {
+      "bytes": 510,
+      "sha256": "86f23737370e1d65b8dcf69e3f126f51b00c291767361fba5858927f374140a5"
+    },
+    "regression-logs/logs/source_motion_bridge.log": {
+      "bytes": 193,
+      "sha256": "d99dd7cfe1112eb96fd484294fdf123d4de622d24d45a719fe26ea5f0727b6ce"
+    },
+    "regression-logs/logs/source_motion_main_continuation.log": {
+      "bytes": 134,
+      "sha256": "ab033c9f87f6330cebe4b90aaefd83515c127b83a397d21d532ca38c4f152491"
+    },
+    "regression-logs/logs/source_thermal_main.log": {
+      "bytes": 117,
+      "sha256": "778c6760648b68cfb044879f19bd0c3e3d255300008d57f8d2aa6c364285c486"
+    },
+    "regression-logs/logs/source_thermal_motion_bridge.log": {
+      "bytes": 132,
+      "sha256": "b6113e99b7a13b79da9e137009775b3a97ff7bd711ffc65c45c8a38628dcc6ad"
+    },
+    "regression-logs/logs/source_underground_controller.log": {
+      "bytes": 127,
+      "sha256": "1cebbc1d5fca139e9cb6bb212a99de4412781e9a4a16dd73fb89ec9639dd67e8"
+    },
+    "regression-logs/logs/surface_action_controls.log": {
+      "bytes": 126,
+      "sha256": "6c3e792791191a8b2d1acaf25f798e1476fb9c282f93c7304b97ebe4606b3d20"
+    },
+    "regressions.json": {
+      "bytes": 24162,
+      "sha256": "c766716d42d8d57a2dc3d0526e433e70781c9c1e86d1a78f6eecf95043923b1e"
+    },
+    "runtime-freeze.json": {
+      "bytes": 45789,
+      "sha256": "20723127035313fe37ad0b6c7fe2138d4eadfa516c856c53be9a45d5a9a9dc66"
+    },
+    "screenshots/01-classic-console-gear-retracted.png": {
+      "bytes": 356325,
+      "sha256": "064c88ab9de5e6df88512383cf02545e240a301ff8ab6a8ee932413d0856bf7b"
+    },
+    "screenshots/02-classic-console-gear-deploying.png": {
+      "bytes": 356960,
+      "sha256": "4a03ebef69f26787fe11edca354ca2b69b56400f10d8fea2ac8ca0a77977e2cf"
+    },
+    "screenshots/03-classic-console-gear-deployed-narrow.png": {
+      "bytes": 215612,
+      "sha256": "500329cb1bc4c42c409b657f379a6b0002e3f1204fa761ada832c33b0ad87e00"
+    },
+    "screenshots/04-actual-external-struts-retracted.png": {
+      "bytes": 404347,
+      "sha256": "717e38ad6eac731ac87257dcf8e09ddbc774b8fce8b1c0f28bf3fa32a042e931"
+    },
+    "screenshots/05-actual-external-struts-deploying.png": {
+      "bytes": 405837,
+      "sha256": "2a3d5b198bef582f6c92f7afd9d23a60ea2ea4916c5c4662fac21da8f29ff0c0"
+    },
+    "screenshots/06-actual-external-struts-deployed.png": {
+      "bytes": 405786,
+      "sha256": "043e3c82ce47d8e4fd9f546025fa302b20427601f17674e09970df61f040bf0a"
+    },
+    "screenshots/07-gear-up-source-ground-hold.png": {
+      "bytes": 372674,
+      "sha256": "1826858f11a27b4156a56630eb5d48b138483174714166a0847175c360674d9c"
+    },
+    "screenshots/08-full-gear-recovered-source-landing.png": {
+      "bytes": 350258,
+      "sha256": "5846080d920c5364369ae155e591d743dddf09088351257050dd20538b2f935f"
+    },
+    "screenshots/capture-manifest.json": {
+      "bytes": 22409,
+      "sha256": "94274d6eabf36ab008617cffda79127e036ecbad9f0d608479f57451c99a0e5d"
+    },
+    "ship-graphics-legacy.log": {
+      "bytes": 266,
+      "sha256": "2c5afe8e1c028cb0f6a9004f5f6e55eb80cab10d849f38d8a3d59f4b052f1c5f"
+    },
+    "source-archive-import.log": {
+      "bytes": 28044,
+      "sha256": "3dd46187e155136303598b9d80fc39f8df36b980d3bb756df8427ace8d501cac"
+    },
+    "source-archive-packaging.json": {
+      "bytes": 971,
+      "sha256": "34bc7eb6713012f42d39f339503bae7abdacca12f688cd9b695474d5efdd70a0"
+    },
+    "source-archive-startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "source-archive-verification.json": {
+      "bytes": 5534,
+      "sha256": "ac41fc050b5810c3ff3ba4037d6208ae8478c48f3e5fe47375c7b367426ae41a"
+    },
+    "source-gear-capture.log": {
+      "bytes": 422,
+      "sha256": "e9c0e28b1d7a0aabdcbb5432b0c47c42e3b49f7e1bb1b084d36ff82466469cc9"
+    },
+    "source-gear-main.json": {
+      "bytes": 5582,
+      "sha256": "69de976a76c18d92c837aa716308396d870491275d19a0268505cabf5548b364"
+    },
+    "source-gear-main.log": {
+      "bytes": 114,
+      "sha256": "63caa373b770d451b3d8aa9b7deec6df6c6bae60a4359aba7d61e3c87668d96f"
+    },
+    "source-landing-gear-core.json": {
+      "bytes": 3173,
+      "sha256": "fcdd4c6ea22cf02cd4d6fd1998237f7aab36ef22f382f01dc659a979ce2a718a"
+    },
+    "source-landing-gear-core.log": {
+      "bytes": 119,
+      "sha256": "4173ec986d7e5f7f7262dce3d72ff15291e0d79471e3bbeaf4cc22758d3db7c1"
+    },
+    "source-landing-gear-session.log": {
+      "bytes": 125,
+      "sha256": "0ac291ec10878ab06cdb81a9563f0edc1953b4ed091535251af097bcb4e220c1"
+    },
+    "thermal-main-regression.json": {
+      "bytes": 3781,
+      "sha256": "fc9480b7831b81fc774a72dd0cea0eefb8da0c777f4f6fcfed50052148d926bd"
+    },
+    "ui-visual-tests.json": {
+      "bytes": 4819,
+      "sha256": "6fb669d0fda3bf98a7fdc0788c3b5a78bfcaf056afe98c33cd16cdaf0ca8cc44"
+    }
+  }
+}

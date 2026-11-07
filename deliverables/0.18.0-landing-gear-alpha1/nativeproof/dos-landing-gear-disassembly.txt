@@ -1,0 +1,122 @@
+F1008
+
+/workspace/ffe-original/FIRSTENC.EXE:     file format pei-i386
+
+
+Disassembly of section CODE:
+
+00440790 <CODE+0x30790>:
+  440790:	push   ebp
+  440791:	mov    ebp,esp
+  440793:	push   ebx
+  440794:	push   esi
+  440795:	mov    ebx,DWORD PTR [ebp+0x8]
+  440798:	mov    esi,0x64213c
+  44079d:	mov    ax,WORD PTR [ebx+0xe8]
+  4407a4:	test   ax,ax
+  4407a7:	je     0x4407e1
+  4407a9:	mov    edx,DWORD PTR ds:0x652c0c
+  4407af:	cmp    edx,0xffff
+  4407b5:	ja     0x4407d8
+  4407b7:	movzx  eax,ax
+  4407ba:	cmp    edx,eax
+  4407bc:	ja     0x4407cd
+  4407be:	mov    ax,ds:0x652c0c
+  4407c4:	sub    WORD PTR [ebx+0xe8],ax
+  4407cb:	jmp    0x4407e1
+  4407cd:	mov    WORD PTR [ebx+0xe8],0x0
+  4407d6:	jmp    0x4407e1
+  4407d8:	mov    WORD PTR [ebx+0xe8],0x0
+  4407e1:	cmp    BYTE PTR [esi+0xe8],0x2
+  4407e8:	jne    0x440828
+  4407ea:	and    WORD PTR [esi+0xc6],0xfffd
+  4407f3:	cmp    BYTE PTR [ebx+0xff],0x1e
+  4407fa:	jbe    0x440813
+  4407fc:	test   BYTE PTR [esi+0xe9],0x2
+  440803:	je     0x44080a
+  440805:	call   0x445aac
+  44080a:	and    BYTE PTR [esi+0xe9],0xfd
+  440811:	jmp    0x440828
+  440813:	or     BYTE PTR [esi+0xe9],0x2
+  44081a:	test   BYTE PTR [esi+0xe9],0x2
+  440821:	je     0x440828
+  440823:	call   0x445aac
+  440828:	test   BYTE PTR [esi+0xe9],0x2
+  44082f:	je     0x440857
+  440831:	movzx  edx,WORD PTR [ebx+0x9e]
+  440838:	mov    eax,ds:0x652c0c
+  44083d:	shr    eax,1
+  44083f:	cmp    edx,eax
+  440841:	jbe    0x44084c
+  440843:	sub    WORD PTR [ebx+0x9e],ax
+  44084a:	jmp    0x4408bd
+  44084c:	mov    WORD PTR [ebx+0x9e],0x0
+  440855:	jmp    0x4408bd
+  440857:	cmp    BYTE PTR [esi+0xe8],0x2
+  44085e:	je     0x44088c
+  440860:	cmp    DWORD PTR [esi+0xd8],0x186a0
+  44086a:	jl     0x44088c
+  44086c:	test   BYTE PTR [esi+0xc6],0x2
+  440873:	jne    0x440884
+  440875:	push   0xffffffff
+  440877:	push   0x98ce
+  44087c:	call   0x444518
+  440881:	add    esp,0x8
+  440884:	or     WORD PTR [esi+0xc6],0x2
+  44088c:	movzx  eax,WORD PTR [ebx+0x9e]
+  440893:	mov    edx,DWORD PTR ds:0x652c0c
+  440899:	shr    edx,1
+  44089b:	add    eax,edx
+  44089d:	cmp    eax,0xffff
+  4408a2:	jbe    0x4408af
+  4408a4:	mov    WORD PTR [ebx+0x9e],0xffff
+  4408ad:	jmp    0x4408bd
+  4408af:	mov    eax,ds:0x652c0c
+  4408b4:	shr    eax,1
+  4408b6:	add    WORD PTR [ebx+0x9e],ax
+  4408bd:	pop    esi
+  4408be:	pop    ebx
+  4408bf:	pop    ebp
+  4408c0:	ret
+
+
+F1056_JUMP_004410
+
+/workspace/ffe-original/FIRSTENC.EXE:     file format pei-i386
+
+
+Disassembly of section CODE:
+
+0044329a <CODE+0x3329a>:
+  44329a:	mov    eax,DWORD PTR [esi+0xc8]
+  4432a0:	cmp    BYTE PTR [eax+0xff],0x24
+  4432a7:	je     0x443301
+  4432a9:	xor    BYTE PTR [esi+0xe9],0x2
+  4432b0:	and    WORD PTR [esi+0xc6],0xfffd
+  4432b9:	test   BYTE PTR [esi+0xe9],0x2
+  4432c0:	je     0x4432dc
+  4432c2:	push   0x0
+  4432c4:	push   0x38
+  4432c6:	call   0x41d308
+  4432cb:	add    esp,0x8
+  4432ce:	push   0x0
+  4432d0:	push   0x46
+  4432d2:	call   0x41d308
+  4432d7:	add    esp,0x8
+  4432da:	jmp    0x4432f4
+  4432dc:	push   0x1
+  4432de:	push   0x38
+  4432e0:	call   0x41d308
+  4432e5:	add    esp,0x8
+  4432e8:	push   0x1
+  4432ea:	push   0x46
+  4432ec:	call   0x41d308
+  4432f1:	add    esp,0x8
+  4432f4:	call   0x445aac
+  4432f9:	push   0xc
+  4432fb:	call   0x46fe7a
+  443300:	pop    ecx
+  443301:	push   0x14
+  443303:	call   0x46fe7a
+  443308:	pop    ecx
+  443309:	jmp    0x443574
