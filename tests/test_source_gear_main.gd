@@ -1,7 +1,7 @@
 extends "res://tests/test_source_thermal_main.gd"
 # Actual Main commands, source terrain and whole-game decoder. Placements and
 # old-save shapes below are labelled fixtures, never claims of manual flight.
-const GEAR_REPORT:="res://validation/contact-2026-11-08/gear-main-regression.json"
+const GEAR_REPORT:="res://build/current-test-reports/gear-main-regression.json"
 var gear_evidence:Array=[]
 
 func gear()->Dictionary:return game._gear_state().duplicate(true)

@@ -44,6 +44,10 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_spherical_contact', 'tests/test_source_spherical_contact.gd', 'Complete uploaded DOS F577 sphere helper and exact DOS/JJFFE radius distinction versus independently executed native controls; no object-bank traversal or collision response.', timeout=300),
+    Suite('source_spherical_pipeline', 'tests/test_source_spherical_contact_pipeline.gd', 'Bounded raw F575 simple-parent player route: original coarse gate, F577, unchanged terminal response and explicit atomic guards for unsupported F576/F578.', timeout=300),
+    Suite('source_spherical_probe', 'tests/test_source_spherical_contact_probe.gd', 'Read-only real-world sphere envelopes and original model collision-stream eligibility in source coordinates; not a terrain hit, live collision response or complete frame pipeline.', timeout=300),
+    Suite('source_spherical_main', 'tests/test_source_spherical_main.gd', 'Actual Main diagnostics and report archive carry the read-only source sphere probe without changing HP, fuel, clocks, source frames or existing terrain landing.', timeout=600, user_args=('--rebuild-capture',)),
     Suite('source_surface_contact', 'tests/test_source_surface_contact.gd', 'Uploaded DOS F575 bounded player continuation after contact classification and21 proved helper scopes versus858 new native cases; not the complete collision provider or F578 pair response.', timeout=300),
     Suite('source_surface_contact_bridge', 'tests/test_source_surface_contact_bridge.gd', 'Actual source terrain/provider, scalar64 frame and Q31 contact bridge; origin alignment and degenerate native-basis phone projection are explicit adapters.', timeout=300),
     Suite('source_contact_damage', 'tests/test_source_contact_damage.gd', 'Exact-once bounded source contact F953 requests through the existing raw HP/RNG owner, strict atomic requests and no atmospheric-history pollution.', timeout=300),

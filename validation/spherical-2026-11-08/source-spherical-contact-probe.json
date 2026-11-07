@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "Read-only F577 sphere-envelope diagnostic on actual source World/ship operands; does not dispatch F575 or replace the0.19 terrain/city kind1 provider or response.",
+  "groups": 1,
+  "checks": 227,
+  "failures": 0,
+  "suites": [
+    {
+      "test": "tests/test_source_spherical_contact_probe.gd",
+      "checks": 227,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/spherical-2026-11-08/source-spherical-contact-probe.log"
+    }
+  ],
+  "sha256": {
+    "scripts/source_spherical_contact_probe.gd": "dc320da753e778e6ebd69c01ea60a15c37df6cceceaf0fe93289c0fe95846883",
+    "tests/test_source_spherical_contact_probe.gd": "c7730db12e2940964b89152f80308aebfddcbd8cc7dc0a2930421b5ba48921a4",
+    "scripts/source_spherical_contact.gd": "d5b484d6e5c6c6802c896fbb12df9cf13a6a7a79c8b9292dae9b31df3b772a77",
+    "data/ffe_spherical_contact.json": "e0fe32fe24ec2a0bb036aca3ee2afd1cb890bee1a976ffe58ffbee68ce42a07f",
+    "scripts/source_surface_contact_bridge.gd": "f83bbecc35c60bfaf79cf2314d067f997b966258665a41a93f082534ba7dfdd9",
+    "scripts/source_fuel_contact.gd": "0f8d5defba15db89d02c5253c988a2a5680d7a16058296b91d262017d5a49903",
+    "scripts/planetary_system.gd": "f243ebb2699bce714386e87ca32bfdb35709a2c9c45178cac9fa6cb8874abc62",
+    "scripts/source_clock.gd": "b2d206a9e2e6db21635fe37d6f61ba75d2fb9f56d92f8851a77c9b11fc4dbe09",
+    "scripts/source_orbit.gd": "7091ed3bbb88e79434ce21d53b3c98bf7f01391ee8a20a736c5e7c56eef55579",
+    "scripts/body_rotation.gd": "b5d4e63331728681d1f34c73fe83cdd57120e29b352e09090da4ff147b22ed34",
+    "scripts/source_surface_contact_patch.gd": "a0c2dfe0442cdb33498ccd9e92cf5bb0c3b23f0fef06de71358bcfe668e15d0a",
+    "scripts/source_surface_terrain.gd": "5c2939f5dae7adfa08e7591980612d6e53fd6fcdcf321850d00d388982024a17",
+    "data/ffe_runtime_model_descriptors.json": "cf9c673c2bba22f0c865e77e3a7ceed5497053cdb444b80f31d7439176446818",
+    "data/ffe_hyperdrive.json": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+    "tests/fixtures/source_spherical_contact_native.json": "37a9c51bf5d1b9dbb74343e3863d7672cca009985bfd89a557f22993fb9059c4"
+  },
+  "contracts": {
+    "public_API": "static sample(world,ship,surface,days)->JSON-safe Dictionary",
+    "envelope_only": true,
+    "response_applied": false,
+    "full_F569": false,
+    "source_object_bank_present": false,
+    "original_F575_dispatch_executed": false,
+    "original_nonzero_initialized_simple_models": 18,
+    "descriptor_collision_prefix_rows": 149,
+    "model_zero_actual_initialization": "unknown/null; F1533 skips it",
+    "natural117_to148_dispatch_eligible": false,
+    "origin_policy": "phone-authored-centre-no-ground-offset-v1",
+    "ordinary_space_ephemeris": "isolated scratch World reusing source records and cloned caches, not system regeneration",
+    "body_rotation": "isolated copy via existing FuelContact._basis_readonly",
+    "all_position_arithmetic": "scalar-double parent-origin subtraction and bodyfixed rotation before bounded raw64 conversion",
+    "exact_raw64_primary_encoding": "little-endian hex",
+    "surface_height_AGL_clearance_queries_by_probe": 0,
+    "terrain_height_kind_or_physics_changed": false,
+    "live_World_snapshot_cache_counter_or_spin_mutated": false,
+    "HP_RNG_fuel_clock_Navigation_or_landed_mutated": false,
+    "native_inside_return_s32": 0,
+    "native_outside_or_equality_return_s32": -1,
+    "raw_flag2_means_landing_hit": false,
+    "altitude_semantics": "source-reconstructed-centre-distance-not-AGL",
+    "inside_altitude_write": false,
+    "initial_altitude_policy": "isolated-zero-no-object-bank-history",
+    "whole_new_metadata_SHA_pinned_by_runtime": true,
+    "old0_19_bridge_byte_exact_preserved": true,
+    "physical_phone_tested": false,
+    "GPU_rendered": false
+  },
+  "evidence": [
+    {
+      "altitude_written": false,
+      "body_id": "earth",
+      "case": "actual_source_space_envelope",
+      "inside_sphere": true,
+      "observer_radius_factor": 0.5,
+      "original_sphere_dispatch_eligible": false,
+      "parent_model": 129,
+      "return_s32": 0,
+      "world_and_game_unchanged": true
+    },
+    {
+      "altitude_written": true,
+      "body_id": "earth",
+      "case": "actual_source_space_envelope",
+      "inside_sphere": false,
+      "observer_radius_factor": 1.5,
+      "original_sphere_dispatch_eligible": false,
+      "parent_model": 129,
+      "return_s32": -1,
+      "world_and_game_unchanged": true
+    },
+    {
+      "altitude_written": false,
+      "body_id": "mercury",
+      "case": "actual_source_space_envelope",
+      "inside_sphere": true,
+      "observer_radius_factor": 0.5,
+      "original_sphere_dispatch_eligible": false,
+      "parent_model": 120,
+      "return_s32": 0,
+      "world_and_game_unchanged": true
+    },
+    {
+      "altitude_written": true,
+      "body_id": "mercury",
+      "case": "actual_source_space_envelope",
+      "inside_sphere": false,
+      "observer_radius_factor": 1.5,
+      "original_sphere_dispatch_eligible": false,
+      "parent_model": 120,
+      "return_s32": -1,
+      "world_and_game_unchanged": true
+    },
+    {
+      "case": "actual_saved_patch_unchanged",
+      "old_kind1_raw_output_unchanged": true,
+      "original_sphere_dispatch_eligible": false,
+      "parent_model": 129,
+      "probe_clearance_calls": 0,
+      "probe_height_calls": 0,
+      "verified_vertices": 3
+    }
+  ],
+  "independent_review": {
+    "reviewer": "/root/time_dynamics_impl/time_controller_review",
+    "read_only": true,
+    "tests_run_by_reviewer": false,
+    "blockers": 0,
+    "findings": "Confirmed isolated space ephemeris/spin, no live cache-writing methods, no surface height/AGL/clearance calls, whole-resource SHA and149 original routing validation with model0 null initialization. Return polarity/centre-distance semantics and primitive JSON/hex output are explicit; no HP/fuel/Navigation/landing mutation found."
+  },
+  "limits": [
+    "Observer placements at0.5/1.5 descriptor outer radius are explicit diagnostic fixtures, not physical approaches through source terrain.",
+    "The raw F577 native oracle and separately bounded coupled F575 controls belong to independent reports and are not added to these227checks.",
+    "Natural117..148 source routing remains F576; executing a sphere-envelope diagnostic does not make it original terrain classification.",
+    "Model-prefix data describe initial F1533 eligibility only; no live original object bank or F569/F570/F576/F578 pipeline is present.",
+    "Unchanged kind1 bridge is independently checked on a real restored source contact patch; no0.19 proof or runtime file was edited.",
+    "Main logging/capture/report-menu integration is owned and validated separately.",
+    "No new original machine execution, desktop GPU proof or physical Samsung performance test is claimed."
+  ]
+}

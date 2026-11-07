@@ -24,6 +24,25 @@ class MockSurfaceContactArchive:
 
 
 class SurfaceContactPackaging(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        directory=tempfile.TemporaryDirectory(prefix='spherical-packaging-v44-')
+        cls.addClassCleanup(directory.cleanup);cls.project=Path(directory.name)
+        for relative in cls.project_files():
+            target=cls.project/relative;target.parent.mkdir(parents=True,exist_ok=True)
+            target.write_bytes((PROJECT/relative).read_bytes())
+        path=PROJECT/'tests/fixtures/spherical_v44_sources.json'
+        if hashlib.sha256(path.read_bytes()).hexdigest()!='8b6eebc4d6ea1faf37f86f3fdb0389da8fd1a238925044370232bca86e923d57':
+            raise AssertionError('Historical code44 spherical baseline fixture changed')
+        baseline=json.loads(path.read_text());expected=verifier.SURFACE_CONTACT_AUDITED_SOURCE_SHA256
+        if baseline['source_commit']!='86a4a5e2a44c73d610d8a35f7fda7e393343991e' or set(baseline['files'])!=set(expected):
+            raise AssertionError('Historical code44 source fixture domain changed')
+        for name,digest in expected.items():
+            entry=baseline['files'][name];raw=entry['source'].encode()
+            if entry['sha256']!=digest or hashlib.sha256(raw).hexdigest()!=digest:
+                raise AssertionError('Historical code44 source differs '+name)
+            (cls.project/name).write_bytes(raw)
+
     def setUp(self):self.archive=MockSurfaceContactArchive()
 
     @staticmethod
@@ -41,7 +60,7 @@ class SurfaceContactPackaging(unittest.TestCase):
     def project_copy(self,directory):
         project=Path(directory)
         for relative in self.project_files():
-            path=project/relative;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes((PROJECT/relative).read_bytes())
+            path=project/relative;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes((self.project/relative).read_bytes())
         return project
 
     def mutate_resource(self,project,callback):
@@ -53,7 +72,7 @@ class SurfaceContactPackaging(unittest.TestCase):
         self.assertIn(old,function);path.write_text(raw.replace(function,function.replace(old,new,1),1))
 
     def test_frozen_scope_and_retained_evidence_boundaries(self):
-        result=verifier.verify_surface_contact_runtime(self.archive,PROJECT)
+        result=verifier.verify_surface_contact_runtime(self.archive,self.project)
         self.assertEqual(result['baseline_source_commit'],'faa22eaee504b324b096d64c059d9daf670eca9c')
         self.assertEqual((result['compiled_module_count'],result['integration_compiled_module_count'],result['raw_json_count']),(2,23,1))
         self.assertEqual((result['runtime_primary_anchor_bytes'],result['runtime_primary_instruction_count']),(1657,518))
@@ -75,7 +94,7 @@ class SurfaceContactPackaging(unittest.TestCase):
             with self.subTest(name=name):
                 archive=MockSurfaceContactArchive();del archive.entries[f'assets/scripts/{name}.gdc']
                 with self.assertRaisesRegex(AssertionError,'Missing (atmospheric|landing-gear|surface-contact|fuel|hyperdrive)'):
-                    verifier.verify_surface_contact_runtime(archive,PROJECT)
+                    verifier.verify_surface_contact_runtime(archive,self.project)
 
     def test_each_new_module_header_and_length_is_checked(self):
         for name in verifier.SURFACE_CONTACT_MODULES:
@@ -83,7 +102,7 @@ class SurfaceContactPackaging(unittest.TestCase):
                 with self.subTest(name=name,bytes=len(content)):
                     archive=MockSurfaceContactArchive();archive.entries[f'assets/scripts/{name}.gdc']=content
                     with self.assertRaisesRegex(AssertionError,'Invalid compiled surface-contact'):
-                        verifier.verify_surface_contact_runtime(archive,PROJECT)
+                        verifier.verify_surface_contact_runtime(archive,self.project)
 
     def test_each_published_geometry_provider_is_required(self):
         for relative in verifier.SURFACE_CONTACT_PROVIDER_DEPENDENCY_SHA256:
@@ -92,26 +111,26 @@ class SurfaceContactPackaging(unittest.TestCase):
             with self.subTest(name=name):
                 archive=MockSurfaceContactArchive();del archive.entries[f'assets/scripts/{name}.gdc']
                 with self.assertRaisesRegex(AssertionError,'Missing published contact provider'):
-                    verifier.verify_surface_contact_runtime(archive,PROJECT)
+                    verifier.verify_surface_contact_runtime(archive,self.project)
 
     def test_missing_or_different_exported_provenance_json_rejects(self):
         del self.archive.entries['assets/data/ffe_surface_contact.json']
         with self.assertRaisesRegex(AssertionError,'Missing surface-contact provenance resource'):
-            verifier.verify_surface_contact_runtime(self.archive,PROJECT)
+            verifier.verify_surface_contact_runtime(self.archive,self.project)
         self.archive=MockSurfaceContactArchive();self.archive.entries['assets/data/ffe_surface_contact.json']+=b' '
         with self.assertRaisesRegex(AssertionError,'Surface-contact resource differs from local source'):
-            verifier.verify_surface_contact_runtime(self.archive,PROJECT)
+            verifier.verify_surface_contact_runtime(self.archive,self.project)
 
     def test_all_retained_resources_remain_checked(self):
         for name in ('ffe_landing_gear','ffe_atmosphere','ffe_fuel','ffe_hyperdrive',*verifier.SYSTEM_INFORMATION_TABLES):
             with self.subTest(name=name):
                 archive=MockSurfaceContactArchive();archive.entries[f'assets/data/{name}.json']+=b' '
-                with self.assertRaises(AssertionError):verifier.verify_surface_contact_runtime(archive,PROJECT)
+                with self.assertRaises(AssertionError):verifier.verify_surface_contact_runtime(archive,self.project)
 
     def test_original_runtime_descriptor_table_cannot_be_substituted(self):
         self.archive.entries['assets/data/ffe_runtime_model_descriptors.json']+=b' '
         with self.assertRaisesRegex(AssertionError,'Contact runtime descriptors differ'):
-            verifier.verify_surface_contact_runtime(self.archive,PROJECT)
+            verifier.verify_surface_contact_runtime(self.archive,self.project)
 
     def test_wrong_executable_provenance_cannot_pass_matching_export(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -1,0 +1,215 @@
+{
+  "schema": "starfrontier-current-spherical-contact-targeted-summary-v1",
+  "created_utc": "2026-11-07T23:53:43.836511+00:00",
+  "version": "0.20.0-spherical-contact-alpha1",
+  "checks": 23593,
+  "passed_suites": 26,
+  "failures": 0,
+  "status": "passed",
+  "suites": [
+    {
+      "test": "tests/test_source_contact_main.gd",
+      "checks": 220,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "4fe5094f251decdf18453c41386af507c980f658c623fb8507076310c07bbfbd"
+    },
+    {
+      "test": "tests/test_source_gear_main.gd",
+      "checks": 112,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "1cbbb9ac45692058d24dfdc5cda0bc532fe5633a282fd5493a8fb72aeadecfa3"
+    },
+    {
+      "test": "tests/test_source_thermal_main.gd",
+      "checks": 463,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "cc413076aeff8c13d2cbd0d1ebbce8ad1acd185b3dadef73385aa7704aaf0f6b"
+    },
+    {
+      "test": "tests/test_source_fuel_main.gd",
+      "checks": 397,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "31ddac2cab1eaeea39ddd8e222bf25a2b61429ae40ba25e2b8dfddee2ab1d70e"
+    },
+    {
+      "test": "tests/test_source_hyperdrive_main.gd",
+      "checks": 70,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "84f688bd98c73d50be2e3998f0780ff0ba44fa249aa10bd315840b6c6ec0f465"
+    },
+    {
+      "test": "tests/test_navigation_main.gd",
+      "checks": 53,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "134ccfc0534ce835429cdd2c0cdbae7272c96d073ae011df03d19ee159661d73"
+    },
+    {
+      "test": "tests/test_rotating_dock_dynamics.gd",
+      "checks": 201,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "c04a07d13b6c6d8853228cec8a5274324dbc6de5c52ee078ca91d9448a1a86f1"
+    },
+    {
+      "test": "tests/test_source_motion_main_continuation.gd",
+      "checks": 28,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "98f30d43361747a56627170e76dbdaf1f3f7bbdefe53027ac2920899b2e5e728"
+    },
+    {
+      "test": "tests/test_classic_console_main.gd",
+      "checks": 42,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "a9d2f15c1ecd3911828f96671fa52636a60fcadbfbf57230fc4cb8b12c027fcf"
+    },
+    {
+      "test": "tests/test_flight_projection.gd",
+      "checks": 691,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "a1e2569ae67b334851340782de2dab1c41ee8ceba3bb28b8ba66055d21f777d7"
+    },
+    {
+      "test": "tests/test_source_console_pause.gd",
+      "checks": 131,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "a1b35c822a69b79f9327a97885f6e95826b3fb84fba877f0593c85c767c3f9b4"
+    },
+    {
+      "test": "tests/test_source_full_startup.gd",
+      "checks": 10,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "ffaa0a4a6736da6409315e74753c15896e73d55e01348b42314652126f9b9c06"
+    },
+    {
+      "test": "tests/test_source_main_full.gd",
+      "checks": 153,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "6a17efe8fd09d5e26e3704d80081d712427c30f8808fdb2171dae43899e7465d"
+    },
+    {
+      "test": "tests/test_source_docking_flight.gd",
+      "checks": 402,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "01dfc4d243969917ad7354df996ecafc5da5c031fc2f00f7fe2a52c769fcd27c"
+    },
+    {
+      "test": "tests/test_rebuilt_save_touch.gd",
+      "checks": 71,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "c2755cdb318c5f75c8c1a348d14ed8bc4e2014a9e1bcf9807264a5a3196786f0"
+    },
+    {
+      "test": "tests/test_graphics_integration.gd",
+      "checks": 44,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "07803e334be7ce9c9feea54a6ca2a942971f99b206c213f3aed53c28c31cb34c"
+    },
+    {
+      "test": "tests/test_graphics_scope.gd",
+      "checks": 87,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "222ad1fc4b32ecb896c751945e2d50ca9b5432f63780a3cd6821e3dda91558b8"
+    },
+    {
+      "test": "tests/test_offpad_takeoff.gd",
+      "checks": 109,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "20f95381e09b9467225e6038f4d33fa4b5f0c9f279f4f9e738e9c0d668011c27"
+    },
+    {
+      "test": "tests/test_surface_action_controls.gd",
+      "checks": 66,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "9408e25188442cd113ff5b8070c06a88e506c6104d102b43ad346e0cb1c35260"
+    },
+    {
+      "test": "tests/test_game_diagnostics.gd",
+      "checks": 71,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "8633e58548a1c9467e2dcbbc87274cb55e47d0628ef45f000655d1a46a94cc2d"
+    },
+    {
+      "test": "tests/test_report_export.gd",
+      "checks": 27,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "c7ccee21fb27c906336abebc9897acf6eb5b7479a30d934e69d0c3b8a55a7e80"
+    },
+    {
+      "test": "tests/test_bug_report_ui.gd",
+      "checks": 99,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/regressions.json",
+      "test_source_sha256": "01600083741179de09a29a8f11807974eee4857fab1c2734eeaa328267770079"
+    },
+    {
+      "test": "tests/test_source_spherical_contact.gd",
+      "checks": 17224,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/source-spherical-contact-core.json",
+      "test_source_sha256": "28c1d387f210e161ba7c8fd9cd7294a22ba84cf6832eac97c853e12fd3683526"
+    },
+    {
+      "test": "tests/test_source_spherical_contact_pipeline.gd",
+      "checks": 2400,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/source-spherical-pipeline.json",
+      "test_source_sha256": "6d209a77edbabf55f7af302ba6ceeab069b1eea5a541754ef8d52de8a73aa271"
+    },
+    {
+      "test": "tests/test_source_spherical_contact_probe.gd",
+      "checks": 227,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/source-spherical-contact-probe.json",
+      "test_source_sha256": "c7730db12e2940964b89152f80308aebfddcbd8cc7dc0a2930421b5ba48921a4"
+    },
+    {
+      "test": "tests/test_source_spherical_main.gd",
+      "checks": 195,
+      "failures": 0,
+      "proof": "validation/spherical-2026-11-08/source-spherical-main.json",
+      "test_source_sha256": "43dcd2f435a3949dc4c0b7a35f38524d81fe9752b70c6f19a88e3c22e02eb067"
+    }
+  ],
+  "proofs_sha256": {
+    "validation/spherical-2026-11-08/regressions.json": "94c36bd28fe1e9e55427cb1fe175bf5072b93980e88e35954b8d76566ace2b8d",
+    "validation/spherical-2026-11-08/source-spherical-contact-core.json": "c71dfa78e2418d70ea9bfaf43be388e95f3cbb9dfb67999a46e3bd8350ba48e3",
+    "validation/spherical-2026-11-08/source-spherical-pipeline.json": "6fcd64514cf6aa8a0df32cd2e6f173df2cc15f64959d4e3c1803e554b053892f",
+    "validation/spherical-2026-11-08/source-spherical-contact-probe.json": "b07a023942e680efce313fce31da858a1d81c6578c3a97032aef24b99685cc2a",
+    "validation/spherical-2026-11-08/source-spherical-main.json": "4ef3ad2fe80586c76da077787c5631cc11676934b01cf6145c3336a8202b0699"
+  },
+  "new_canonical_F577_native_cases": 1141,
+  "new_supported_coupled_native_cases": 207,
+  "new_supported_DOS_native_cases_total": 1348,
+  "additional_native_interception_host_rollback_guards": 6,
+  "separate_JJFFE_counterfactual_cases": 1,
+  "all_native_controls_included_within_functional_checks": true,
+  "historical_totals_added": false,
+  "repeated_source_archive_checks_added": false,
+  "capture_checks_added": false,
+  "scope": "One current passing result per unique selected F577/composed raw route/readonly probe/Main and22 preserved regression groups.207 supported coupled source paths are separate from six intercepted native paths with explicit host rollback; no F576/F578 behavior claimed. Failed/intermediate runs, native cases already within suites, repeated portability/captures and prior release totals excluded. Bounded suite timestamps retained; not an atomic full-game run.",
+  "physical_gameplay_collision_response_changed": false,
+  "full_original_port_complete": false,
+  "full_original_physics": false,
+  "physical_device_tested": false,
+  "production_release_ready": false
+}

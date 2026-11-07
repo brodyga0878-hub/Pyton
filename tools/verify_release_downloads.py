@@ -15,6 +15,8 @@ def main():
     parser.add_argument('release', type=Path)
     parser.add_argument('artifact_commit')
     parser.add_argument('output', type=Path)
+    parser.add_argument('--include-file', action='append', default=[],
+                        help='Also download this exact payload path from the immutable manifest; may be repeated.')
     args = parser.parse_args()
     if not re.fullmatch(r'[0-9a-f]{40}', args.artifact_commit):
         parser.error('A full immutable Git commit is required')
@@ -27,6 +29,7 @@ def main():
     report = {'started_utc': dt.datetime.now(dt.timezone.utc).isoformat(),
               'version': manifest['version'], 'artifact_commit': args.artifact_commit,
               'source_commit': manifest['source_commit'], 'files': [], 'status': 'running',
+              'requested_extra_files': args.include_file,
               'scope': 'Actual complete HTTPS downloads; immutable manifest bytes, payload SHA256/length, ZIP CRC, source archive Git comment and screenshot hashes. Not physical Android execution.'}
     def download(name, expected):
         path = PurePosixPath(name)
@@ -68,6 +71,11 @@ def main():
         names += [name for name in manifest['files'] if name.endswith('capture-manifest.json')]
         frames = [name for name in manifest['files'] if name.endswith('.png')]
         names += frames
+        for name in args.include_file:
+            if name not in manifest['files']:
+                raise ValueError('Extra file is absent from the immutable manifest: '+name)
+            if name not in names:
+                names.append(name)
         for name in names:
             download(name, manifest['files'][name])
         report['status'] = 'verified'

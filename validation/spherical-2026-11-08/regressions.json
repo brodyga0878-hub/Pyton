@@ -1,0 +1,754 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-07T23:41:50.005076+00:00",
+  "updated_utc": "2026-11-07T23:43:35.607294+00:00",
+  "duration_seconds": 105.602,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-07T23:41:50.005076+00:00",
+      "duration_seconds": 105.602,
+      "requested_suites": [
+        "source_contact_main",
+        "source_gear_main",
+        "source_thermal_main",
+        "source_fuel_main",
+        "source_hyperdrive_main",
+        "navigation_main",
+        "rotating_dock_dynamics",
+        "source_motion_main_continuation",
+        "classic_console_main",
+        "flight_projection",
+        "source_console_pause",
+        "source_full_startup",
+        "source_main_full",
+        "source_docking_flight",
+        "save_touch",
+        "graphics_integration",
+        "graphics_scope",
+        "offpad_takeoff",
+        "surface_action_controls",
+        "diagnostics",
+        "report_export",
+        "bug_report_ui"
+      ],
+      "executed_suites": [
+        "source_contact_main",
+        "source_gear_main",
+        "source_thermal_main",
+        "source_fuel_main",
+        "source_hyperdrive_main",
+        "navigation_main",
+        "rotating_dock_dynamics",
+        "source_motion_main_continuation",
+        "classic_console_main",
+        "flight_projection",
+        "source_console_pause",
+        "source_full_startup",
+        "source_main_full",
+        "source_docking_flight",
+        "save_touch",
+        "graphics_integration",
+        "graphics_scope",
+        "offpad_takeoff",
+        "surface_action_controls",
+        "diagnostics",
+        "report_export",
+        "bug_report_ui"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 3,
+  "status": "passed",
+  "passed_suites": 22,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 3547,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "source_contact_main",
+      "scope": "Actual Main source-surface landing, rebound, shared damage, fractional HP cold restore, pending-save boundary, fatal cleanup and phone lift recovery.",
+      "status": "passed",
+      "checks": 220,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:41:50.006646+00:00",
+      "suite_source": {
+        "path": "tests/test_source_contact_main.gd",
+        "bytes": 31115,
+        "sha256": "4fe5094f251decdf18453c41386af507c980f658c623fb8507076310c07bbfbd"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_contact_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 105.598,
+      "timed_out": false,
+      "output_bytes": 117,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/source_contact_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_gear_main",
+      "scope": "Actual Main gear commands, exact old/partial/invalid saves, original thermal flag polarity, source-contact damage and lift recovery; legacy Surface retains its prior phone collision adapter.",
+      "status": "passed",
+      "checks": 112,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:41:50.006861+00:00",
+      "suite_source": {
+        "path": "tests/test_source_gear_main.gd",
+        "bytes": 16582,
+        "sha256": "1cbbb9ac45692058d24dfdc5cda0bc532fe5633a282fd5493a8fb72aeadecfa3"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_gear_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 44.043,
+      "timed_out": false,
+      "output_bytes": 114,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/source_gear_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_thermal_main",
+      "scope": "Actual Main Earth/surface heat and drag, exact legacy HP anchors, raw motion continuation, fixed thermal-hook partition, natural boundary fixtures, pause/input/death/save ordering and atomic invalid-thermal restore.",
+      "status": "passed",
+      "checks": 463,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:41:50.007004+00:00",
+      "suite_source": {
+        "path": "tests/test_source_thermal_main.gd",
+        "bytes": 21582,
+        "sha256": "cc413076aeff8c13d2cbd0d1ebbce8ad1acd185b3dadef73385aa7704aaf0f6b"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_thermal_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 42.195,
+      "timed_out": false,
+      "output_bytes": 117,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/source_thermal_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_fuel_main",
+      "scope": "Actual Main fuel cadence, source movement/save continuation, automatic star/gas scooping, UI recovery, old v40 saves, pause and stale-input boundaries.",
+      "status": "passed",
+      "checks": 397,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:42:32.203694+00:00",
+      "suite_source": {
+        "path": "tests/test_source_fuel_main.gd",
+        "bytes": 16374,
+        "sha256": "31ddac2cab1eaeea39ddd8e222bf25a2b61429ae40ba25e2b8dfddee2ab1d70e"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_fuel_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 6.599,
+      "timed_out": false,
+      "output_bytes": 114,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/source_fuel_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_hyperdrive_main",
+      "scope": "Actual Main route/charge/cancel/save continuation, military fuel/waste, stale service inputs, explicit legacy migration with durable private backup and atomic invalid-v3 rejection.",
+      "status": "passed",
+      "checks": 70,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:42:34.050976+00:00",
+      "suite_source": {
+        "path": "tests/test_source_hyperdrive_main.gd",
+        "bytes": 18402,
+        "sha256": "84f688bd98c73d50be2e3998f0780ff0ba44fa249aa10bd315840b6c6ec0f465"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_hyperdrive_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 3.437,
+      "timed_out": false,
+      "output_bytes": 119,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/source_hyperdrive_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "navigation_main",
+      "scope": "Actual Main graphical map selection/confirmation, forecast isolation, raw save continuation, phone roll, clock scheduling and legacy opt-in boundaries.",
+      "status": "passed",
+      "checks": 53,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:42:37.488821+00:00",
+      "suite_source": {
+        "path": "tests/test_navigation_main.gd",
+        "bytes": 12697,
+        "sha256": "134ccfc0534ce835429cdd2c0cdbae7272c96d073ae011df03d19ee159661d73"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_navigation_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 11.01,
+      "timed_out": false,
+      "output_bytes": 118,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/navigation_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "rotating_dock_dynamics",
+      "scope": "Actual station rotation, relative contact velocity, conservative angular CCD, source docking and legacy restore.",
+      "status": "passed",
+      "checks": 201,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:42:38.802753+00:00",
+      "suite_source": {
+        "path": "tests/test_rotating_dock_dynamics.gd",
+        "bytes": 15203,
+        "sha256": "c04a07d13b6c6d8853228cec8a5274324dbc6de5c52ee078ca91d9448a1a86f1"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rotating_dock_dynamics.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.632,
+      "timed_out": false,
+      "output_bytes": 126,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/rotating_dock_dynamics.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_motion_main_continuation",
+      "scope": "Actual Main three rotated savepoints retain exact next raw body, Q16 fraction, IEEE64 clock, ship pose and velocity.",
+      "status": "passed",
+      "checks": 28,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:42:40.435313+00:00",
+      "suite_source": {
+        "path": "tests/test_source_motion_main_continuation.gd",
+        "bytes": 3417,
+        "sha256": "98f30d43361747a56627170e76dbdaf1f3f7bbdefe53027ac2920899b2e5e728"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_motion_main_continuation.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.536,
+      "timed_out": false,
+      "output_bytes": 134,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/source_motion_main_continuation.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "classic_console_main",
+      "scope": "Actual Main console hooks, principal cameras, session pause, independent fingers, offpad takeoff and pending-jump/save boundaries.",
+      "status": "passed",
+      "checks": 42,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:42:41.971833+00:00",
+      "suite_source": {
+        "path": "tests/test_classic_console_main.gd",
+        "bytes": 10629,
+        "sha256": "a9d2f15c1ecd3911828f96671fa52636a60fcadbfbf57230fc4cb8b12c027fcf"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_classic_console_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.838,
+      "timed_out": false,
+      "output_bytes": 123,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/classic_console_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "flight_projection",
+      "scope": "Actual Main Mercury arrival, independent perspective angular scale, off-axis flight-window centre, safe-area/resize/FOV/principal views and preserved source/legacy state.",
+      "status": "passed",
+      "checks": 691,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:42:43.810922+00:00",
+      "suite_source": {
+        "path": "tests/test_flight_projection.gd",
+        "bytes": 12962,
+        "sha256": "a1e2569ae67b334851340782de2dab1c41ee8ceba3bb28b8ba66055d21f777d7"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_flight_projection.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.64,
+      "timed_out": false,
+      "output_bytes": 10047,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/flight_projection.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_console_pause",
+      "scope": "Actual Worldv4 pending terrain worker publication is deferred during console pause and resumes without losing physical contact.",
+      "status": "passed",
+      "checks": 131,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:42:45.451875+00:00",
+      "suite_source": {
+        "path": "tests/test_source_console_pause.gd",
+        "bytes": 15446,
+        "sha256": "a1b35c822a69b79f9327a97885f6e95826b3fb84fba877f0593c85c767c3f9b4"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_console_pause.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 15.467,
+      "timed_out": false,
+      "output_bytes": 1718,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/source_console_pause.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_full_startup",
+      "scope": "Actual normal startup selects Worldv4/native navigation and restores a private native save; no player progress access.",
+      "status": "passed",
+      "checks": 10,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:42:48.499436+00:00",
+      "suite_source": {
+        "path": "tests/test_source_full_startup.gd",
+        "bytes": 2501,
+        "sha256": "ffaa0a4a6736da6409315e74753c15896e73d55e01348b42314652126f9b9c06"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_full_startup.gd",
+        "--",
+        "--source-startup-isolated"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.559,
+      "timed_out": false,
+      "output_bytes": 122,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/source_full_startup.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_main_full",
+      "scope": "Actual Main native jump/cancel/save, physical station dock/refuel/launch, offpad takeoff and enclosed96 touch/save/launch.",
+      "status": "passed",
+      "checks": 153,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:42:50.059236+00:00",
+      "suite_source": {
+        "path": "tests/test_source_main_full.gd",
+        "bytes": 23185,
+        "sha256": "6a17efe8fd09d5e26e3704d80081d712427c30f8808fdb2171dae43899e7465d"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_main_full.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 40.998,
+      "timed_out": false,
+      "output_bytes": 510,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/source_main_full.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_docking_flight",
+      "scope": "Physical source-station docking/launch and opt-in flightv5 restore.",
+      "status": "passed",
+      "checks": 402,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:43:00.919895+00:00",
+      "suite_source": {
+        "path": "tests/test_source_docking_flight.gd",
+        "bytes": 10307,
+        "sha256": "01dfc4d243969917ad7354df996ecafc5da5c031fc2f00f7fe2a52c769fcd27c"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_docking_flight.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 10.235,
+      "timed_out": false,
+      "output_bytes": 125,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/source_docking_flight.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "save_touch",
+      "scope": "Current complete save-store decoding, atomic writes/fallback and multi-finger phone input/release behavior; separate from app/device smoke.",
+      "status": "passed",
+      "checks": 71,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:43:11.155643+00:00",
+      "suite_source": {
+        "path": "tests/test_rebuilt_save_touch.gd",
+        "bytes": 16715,
+        "sha256": "c2755cdb318c5f75c8c1a348d14ed8bc4e2014a9e1bcf9807264a5a3196786f0"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_save_touch.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.184,
+      "timed_out": false,
+      "output_bytes": 121,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/save_touch.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "graphics_integration",
+      "scope": "Actual Main graphics-flight entry/return, isolated original progress/save bytes, save-failure guard, controls/quality and native city return; private test save directory.",
+      "status": "passed",
+      "checks": 44,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:43:12.339799+00:00",
+      "suite_source": {
+        "path": "tests/test_graphics_integration.gd",
+        "bytes": 9877,
+        "sha256": "07803e334be7ce9c9feea54a6ca2a942971f99b206c213f3aed53c28c31cb34c"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_graphics_integration.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 6.713,
+      "timed_out": false,
+      "output_bytes": 123,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/graphics_integration.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "graphics_scope",
+      "scope": "Actual Main normal flight excludes decorative asteroid scenery, preserves flight/navigation/surface data and restores optional graphics preview.",
+      "status": "passed",
+      "checks": 87,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:43:19.053280+00:00",
+      "suite_source": {
+        "path": "tests/test_graphics_scope.gd",
+        "bytes": 8672,
+        "sha256": "222ad1fc4b32ecb896c751945e2d50ca9b5432f63780a3cd6821e3dda91558b8"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_graphics_scope.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.942,
+      "timed_out": false,
+      "output_bytes": 355,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/graphics_scope.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "offpad_takeoff",
+      "scope": "Healthy manual off-pad landings, positive lift departure, restore, slopes, surviving impacts and destroyed-hull rejection.",
+      "status": "passed",
+      "checks": 109,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:43:20.996290+00:00",
+      "suite_source": {
+        "path": "tests/test_offpad_takeoff.gd",
+        "bytes": 6215,
+        "sha256": "20f95381e09b9467225e6038f4d33fa4b5f0c9f279f4f9e738e9c0d668011c27"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_offpad_takeoff.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 3.573,
+      "timed_out": false,
+      "output_bytes": 118,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/offpad_takeoff.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "surface_action_controls",
+      "scope": "Actual phone surface actions, stale held inputs, independent second-finger takeoff, focus/report lifecycle and explicit destroyed-hull feedback.",
+      "status": "passed",
+      "checks": 66,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:43:24.569611+00:00",
+      "suite_source": {
+        "path": "tests/test_surface_action_controls.gd",
+        "bytes": 9432,
+        "sha256": "9408e25188442cd113ff5b8070c06a88e506c6104d102b43ad346e0cb1c35260"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_surface_action_controls.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.01,
+      "timed_out": false,
+      "output_bytes": 126,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/surface_action_controls.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "diagnostics",
+      "scope": "Bounded persistent diagnostics, real isolated engine/script errors, archive CRC/hash/retention, session markers and explicit save opt-in.",
+      "status": "passed",
+      "checks": 71,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:43:26.580654+00:00",
+      "suite_source": {
+        "path": "tests/test_game_diagnostics.gd",
+        "bytes": 12723,
+        "sha256": "8633e58548a1c9467e2dcbbc87274cb55e47d0628ef45f000655d1a46a94cc2d"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_game_diagnostics.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.131,
+      "timed_out": false,
+      "output_bytes": 164,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/diagnostics.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "report_export",
+      "scope": "Checked multiblock ZIP export, errors/cancel/retry, source preservation; Android SAF separately source-verified, physical device untested.",
+      "status": "passed",
+      "checks": 27,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:43:28.711892+00:00",
+      "suite_source": {
+        "path": "tests/test_report_export.gd",
+        "bytes": 4905,
+        "sha256": "c7ccee21fb27c906336abebc9897acf6eb5b7479a30d934e69d0c3b8a55a7e80"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_report_export.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.237,
+      "timed_out": false,
+      "output_bytes": 116,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/report_export.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "bug_report_ui",
+      "scope": "Actual Main report buttons, report description/context/save opt-in, verified export callback, direct retry and original progress isolation.",
+      "status": "passed",
+      "checks": 99,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:43:28.949286+00:00",
+      "suite_source": {
+        "path": "tests/test_bug_report_ui.gd",
+        "bytes": 14873,
+        "sha256": "01600083741179de09a29a8f11807974eee4857fab1c2734eeaa328267770079"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_bug_report_ui.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.916,
+      "timed_out": false,
+      "output_bytes": 116,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/regressions/logs/bug_report_ui.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ]
+}

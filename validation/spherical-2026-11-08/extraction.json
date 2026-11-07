@@ -1,0 +1,40 @@
+{
+  "time_utc": "2026-11-07T23:39:11.373103+00:00",
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_extract_spherical_contact.py",
+    "-v"
+  ],
+  "test_count": 12,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "exit_code": 0,
+  "file_sha256": {
+    "tools/extract_spherical_contact.py": "85e4d16b04d16510bba979a0124ea837a430e7ad68228cc5ed45511702378833",
+    "data/ffe_spherical_contact.json": "e0fe32fe24ec2a0bb036aca3ee2afd1cb890bee1a976ffe58ffbee68ce42a07f",
+    "tests/test_extract_spherical_contact.py": "7dc60649874500e4799a87994f3817fba5b09ef313d8d6d8407cc74d8cec6c48",
+    "tests/fixtures/spherical_v44_sources.json": "8b6eebc4d6ea1faf37f86f3fdb0389da8fd1a238925044370232bca86e923d57"
+  },
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "F577_original_bytes": 363,
+  "F577_original_instructions": 128,
+  "all_instruction_proof_records": 7,
+  "all_instruction_proof_bytes": 917,
+  "all_instruction_proof_instructions": 367,
+  "model_routing_count": 149,
+  "zero_stream_descriptor_count": 19,
+  "initialized_simple_model_count": 18,
+  "initialization_skipped_models": [
+    0
+  ],
+  "historical_code44_baseline_source_count": 23,
+  "original_native_oracle_executed_by_this_run": false,
+  "physical_device_tested": false
+}

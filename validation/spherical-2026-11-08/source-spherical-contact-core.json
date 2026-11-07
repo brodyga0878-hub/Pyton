@@ -1,0 +1,308 @@
+{
+	"checks": 17224,
+	"domain_failures": {
+
+	},
+	"domains": {
+		"actual_source_model_bounds_inputs": 168,
+		"both_scaling_branches_signed64": 102,
+		"dos_vs_jjffe_radius_canary": 1,
+		"globals_preservation_and_overwrite": 126,
+		"independent_abs_pointer_raw_operand": 30,
+		"literal_int32_min_square": 1,
+		"literal_left_highword_preservation": 1,
+		"literal_positive_branch_ignores_inner_radius": 1,
+		"literal_positive_branch_outer_radius": 1,
+		"positive_shift_radius64_wrap": 48,
+		"radius_distance_equality_unsigned": 138,
+		"repeat_same_raw_context": 12,
+		"seeded_full_raw64": 512
+	},
+	"evidence": [
+		{
+			"byte_instruction_proofs": {
+				"1333": {
+					"all_instructions_equal_after_branch_destination_normalization": true,
+					"byte_length": 25.0,
+					"executable_offset": 259606.0,
+					"instruction_count": 11.0,
+					"normalized_instruction_sha256": "d404596ee05a43e6f48c9e0e3738ec8f555a7f3093ca751c86a988fd4a17721f",
+					"sha256": "8946c4ccd895806bb39d3d393c582970d2e34c8ba60c06257447eb10186e5468",
+					"virtual_address": 4515862.0
+				},
+				"1341": {
+					"all_instructions_equal_after_branch_destination_normalization": true,
+					"byte_length": 127.0,
+					"executable_offset": 259928.0,
+					"instruction_count": 57.0,
+					"normalized_instruction_sha256": "91f886eebe2baa0ba96dd39d1780e2873e9118a671b5d410235768a1f066a92f",
+					"sha256": "ce1f10cd3645a7e74e65b774758ad6160e67cc67d19b0ad4cbfa77dbcc454ef3",
+					"virtual_address": 4516184.0
+				},
+				"1502": {
+					"all_instructions_equal_after_branch_destination_normalization": true,
+					"byte_length": 139.0,
+					"executable_offset": 276735.0,
+					"instruction_count": 61.0,
+					"normalized_instruction_sha256": "c5023ccf9909d9370799f5bbbb7d17b5daaf2db9050c49ef71ca246620516b3e",
+					"sha256": "06d92dfc59b6eca45c8c8c4d203e1deb6a270101894bdea28ca83b692dc60d19",
+					"virtual_address": 4532991.0
+				},
+				"1522": {
+					"all_instructions_equal_after_branch_destination_normalization": true,
+					"byte_length": 12.0,
+					"executable_offset": 279177.0,
+					"instruction_count": 7.0,
+					"normalized_instruction_sha256": "0db7d02ec4a9097b59586917c6cfbf316b7b2c90a45ca38f2e5ec3f70278f243",
+					"sha256": "e6001a066c6ed54cff7bf995d82867c4b0809fa6752fdfb96247378823c29291",
+					"virtual_address": 4535433.0
+				},
+				"1656": {
+					"all_instructions_equal_after_branch_destination_normalization": true,
+					"byte_length": 74.0,
+					"executable_offset": 305076.0,
+					"instruction_count": 29.0,
+					"normalized_instruction_sha256": "fb3430703e53a390c573480dc2a76a799a82e386edd80d2d0e4df2494995dbb6",
+					"sha256": "8bdce1d3d508b9cbf7d5fcbbf261407789d7bbf8fd917a4225db88c6d5aa2949",
+					"virtual_address": 4561332.0
+				},
+				"1660": {
+					"all_instructions_equal_after_branch_destination_normalization": true,
+					"byte_length": 177.0,
+					"executable_offset": 305752.0,
+					"instruction_count": 74.0,
+					"normalized_instruction_sha256": "dd0955a8519f7df2d6693ec66963ecfa03ef327cc77da6935c6bfb5623544ebf",
+					"sha256": "e23941156e2eb6f1c53020a82a29d6537e6be0b7a6af446323409fb93e3be0cc",
+					"virtual_address": 4562008.0
+				},
+				"577": {
+					"all_instructions_equal_after_branch_destination_normalization": true,
+					"byte_length": 363.0,
+					"executable_offset": 101964.0,
+					"instruction_count": 128.0,
+					"normalized_instruction_sha256": "8ff97fb96362ca8ebec6af45a9b84178e8b3027451e6073ce3414fef54200e88",
+					"sha256": "f2bb5974c51d801bf5c219f697cf16716250a296f744e54fed61a6c26131e790",
+					"virtual_address": 4358220.0
+				}
+			},
+			"domain_failures": {
+
+			},
+			"domains": {
+				"actual_source_model_bounds_inputs": 168,
+				"both_scaling_branches_signed64": 102,
+				"dos_vs_jjffe_radius_canary": 1,
+				"globals_preservation_and_overwrite": 126,
+				"independent_abs_pointer_raw_operand": 30,
+				"literal_int32_min_square": 1,
+				"literal_left_highword_preservation": 1,
+				"literal_positive_branch_ignores_inner_radius": 1,
+				"literal_positive_branch_outer_radius": 1,
+				"positive_shift_radius64_wrap": 48,
+				"radius_distance_equality_unsigned": 138,
+				"repeat_same_raw_context": 12,
+				"seeded_full_raw64": 512
+			},
+			"exact64_policy": "Decode little-endian hex; decimal64 JSON previews never supply machine inputs.",
+			"execution_checks": {
+				"all_input_buffers_unchanged": true,
+				"expected_transitions_computed_by_python": false,
+				"fresh_identical_processes": 3.0,
+				"object_parent_relative_absolute_output_canaries": true,
+				"reverse_case_order_identical": true
+			},
+			"known_jjffe_variant": {
+				"all_other_instructions_equal": true,
+				"canonical_applied_edit": "Restore documented ADD parent+138 from uploaded DOS; never silently adopt JJFFE+140.",
+				"difference_count": 1.0,
+				"differences": [
+					{
+						"dos": "add eax,dwordptr[esi+0x138]",
+						"instruction": 38.0,
+						"pinned_jjffe": "add eax,dwordptr[esi+0x140]"
+					}
+				]
+			},
+			"literal_controls": [
+				{
+					"case_id": "dos-spherical-contact-0000",
+					"literal_expected": [
+						0.0,
+						-23.0,
+						922746880.0,
+						{
+							"altitude_s64_hex": "15cd5b0700000000",
+							"collision_flags_u8": 0.0
+						}
+					],
+					"name": "DOS-parent-outer110-inside60",
+					"observed": [
+						0.0,
+						-23.0,
+						922746880.0,
+						{
+							"altitude_s64_hex": "15cd5b0700000000",
+							"collision_flags_u8": 0.0
+						}
+					],
+					"passed": true
+				},
+				{
+					"case_id": "jjffe-counterfactual-radius-only",
+					"literal_expected": [
+						-1.0,
+						251658240.0
+					],
+					"name": "JJFFE-parent-inner30-outside60",
+					"observed": [
+						-1.0,
+						251658240.0
+					],
+					"passed": true
+				},
+				{
+					"case_id": "dos-spherical-contact-0046",
+					"literal_expected": [
+						-1.0,
+						2.0
+					],
+					"name": "radius-equality-is-outside",
+					"observed": [
+						-1.0,
+						2.0
+					],
+					"passed": true
+				},
+				{
+					"case_id": "dos-spherical-contact-0289",
+					"literal_expected": "000080ffffffffff000080ffffffffff000080ffffffffff",
+					"name": "left-shift-keeps-highwords",
+					"observed": "000080ffffffffff000080ffffffffff000080ffffffffff",
+					"passed": true
+				},
+				{
+					"case_id": "dos-spherical-contact-0625",
+					"literal_expected": [
+						1073741824.0,
+						"000000800000000000000000000000000000000000000000"
+					],
+					"name": "signed-INT32-MIN-square-highword",
+					"observed": [
+						1073741824.0,
+						"000000800000000000000000000000000000000000000000"
+					],
+					"passed": true
+				},
+				{
+					"case_id": "dos-spherical-contact-0626",
+					"literal_expected": "000080000100000000000000000000000000000000000000",
+					"name": "left-shift-does-not-propagate-lowword-carry",
+					"observed": "000080000100000000000000000000000000000000000000",
+					"passed": true
+				},
+				{
+					"case_id": "dos-spherical-contact-0627",
+					"literal_expected": [
+						11.0,
+						1073741824.0,
+						0.0
+					],
+					"name": "literal_positive_branch_outer_radius",
+					"observed": [
+						11.0,
+						1073741824.0,
+						0.0
+					],
+					"passed": true
+				},
+				{
+					"case_id": "dos-spherical-contact-0628",
+					"literal_expected": [
+						11.0,
+						1073741824.0,
+						0.0
+					],
+					"name": "literal_positive_branch_ignores_inner_radius",
+					"observed": [
+						11.0,
+						1073741824.0,
+						0.0
+					],
+					"passed": true
+				}
+			],
+			"native_cases": 1141,
+			"returns": {
+				"-1": 749,
+				"0": 392
+			},
+			"scope": [
+				"Complete actual-DOS F577 plus all six required integer helpers.",
+				"Object bounds and separate relative/absolute vectors are explicit raw inputs. Caller-consistent cases handcraft the F1664 two-complement absolute invariant; this tool does not execute F1664.",
+				"Actual source descriptor bounds are fixture input construction only; no whole F1533 initialization or complete model collision-engine claim.",
+				"No F569/F575/F576/F578 scanner/contact response, damage, frame selection or SI bridge executes.",
+				"Return0 is inside sphere; return−1 is outside/equality. F577 does not publish collisionkind/previousheight.",
+				"ExactLEhex carries64-bit inputs/outputs; JSON decimal previews must not be used as lossy machine inputs."
+			],
+			"separate_jjffe_counterfactual_cases": 1,
+			"shifts": {
+				"-1": 11,
+				"-12": 1,
+				"-13": 7,
+				"-14": 30,
+				"-15": 15,
+				"-16": 21,
+				"-17": 9,
+				"-2": 18,
+				"-22": 66,
+				"-23": 94,
+				"-26": 10,
+				"-27": 2,
+				"-28": 18,
+				"-29": 8,
+				"-4": 3,
+				"-5": 21,
+				"-6": 18,
+				"0": 20,
+				"1": 20,
+				"11": 8,
+				"14": 30,
+				"16": 3,
+				"2": 38,
+				"3": 77,
+				"31": 1,
+				"32": 17,
+				"33": 156,
+				"34": 392,
+				"4": 6,
+				"6": 18,
+				"7": 3
+			}
+		},
+		{
+			"automatic_kind_assignment": false,
+			"automatic_previous_altitude_assignment": false,
+			"bodies_mutated": false,
+			"case": "pure_raw_api_guards",
+			"collider_bank_or_F578_claim": false,
+			"signed64_hex_inputs": true
+		}
+	],
+	"failures": 0,
+	"schema": 1,
+	"scope": "Complete uploaded DOS F577 helper versus independently executed original instructions. Original DOS parent outer-radius operand retained, including its difference from JJFFE. No collider banks, F575 caller decision/response, F578, terrain classification or HP mutation.",
+	"sources": {
+		"core_sha256": "d5b484d6e5c6c6802c896fbb12df9cf13a6a7a79c8b9292dae9b31df3b772a77",
+		"fixture_sha256": "37a9c51bf5d1b9dbb74343e3863d7672cca009985bfd89a557f22993fb9059c4",
+		"native_generator_sha256": "dab2371b8b9aa2346dac1fd8ad48a0690d9580cd8f3970062c0d2ce68ac7ca3b",
+		"reused_helpers": {
+			"ground_coordinates": "54dedcc157dea6c84c4f8ad6ff0859159d81719cafbbaa23c626cd94e1cdf7b6",
+			"source_gravity": "058db4e5cbebd07e7420274ca07b24ccaec620f46c440081d1d6855326dc3872",
+			"source_ground_surface": "e9db09fbd9c9e8a70bfba771b79627bbba6313d86b3efe781fba7b93a29e7ee7",
+			"source_orbit": "7091ed3bbb88e79434ce21d53b3c98bf7f01391ee8a20a736c5e7c56eef55579",
+			"source_surface_contact": "fcfb6077f0bcabf7b6ffce98c3a3dbb23251a850175be4ef241b299fdf8d117d",
+			"source_terrain_point": "caebe9f918763d6781a4885ae05e9d27aec84e584b9b45bb02cc71dc75000037"
+		},
+		"test_sha256": "28c1d387f210e161ba7c8fd9cd7294a22ba84cf6832eac97c853e12fd3683526"
+	}
+}

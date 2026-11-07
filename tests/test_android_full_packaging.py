@@ -28,7 +28,7 @@ PROJECT=Path(_HISTORICAL_DIRECTORY.name)
 for _directory in ('scripts','data','tests'):
     (PROJECT/_directory).mkdir()
     for _path in (_LIVE_PROJECT/_directory).iterdir():
-        if _directory=='data' and _path.name in ('ffe_fuel.json','ffe_atmosphere.json','ffe_landing_gear.json','ffe_surface_contact.json'):continue
+        if _directory=='data' and _path.name in ('ffe_fuel.json','ffe_atmosphere.json','ffe_landing_gear.json','ffe_surface_contact.json','ffe_spherical_contact.json'):continue
         (PROJECT/_directory/_path.name).symlink_to(_path,target_is_directory=_path.is_dir())
 _baseline=json.loads((_LIVE_PROJECT/'tests/fixtures/hyperdrive_v39_sources.json').read_text())
 assert _baseline['source_commit']=='860951235548fc58c859d7337b9a6909fd78ca62'
@@ -329,6 +329,16 @@ class FullPackagingChecks(unittest.TestCase):
                 (project/'data'/f'{name}.json').write_bytes((_LIVE_PROJECT/'data'/f'{name}.json').read_bytes())
             with self.assertRaisesRegex(AssertionError,'verifier list omits a source table or names a missing table'):
                 verifier.verify_source_full_runtime(self.archive,project,43)
+
+    def test_new_spherical_contact_table_is_not_whitelisted_for_code44(self):
+        with tempfile.TemporaryDirectory() as directory:
+            project=Path(directory);(project/'scripts').symlink_to(PROJECT/'scripts',target_is_directory=True)
+            (project/'data').mkdir()
+            for path in (PROJECT/'data').iterdir():(project/'data'/path.name).symlink_to(path)
+            for name in ('ffe_fuel','ffe_atmosphere','ffe_landing_gear','ffe_surface_contact','ffe_spherical_contact'):
+                (project/'data'/f'{name}.json').write_bytes((_LIVE_PROJECT/'data'/f'{name}.json').read_bytes())
+            with self.assertRaisesRegex(AssertionError,'verifier list omits a source table or names a missing table'):
+                verifier.verify_source_full_runtime(self.archive,project,44)
 
     def test_missing_each_navigation_runtime_module_rejects(self):
         for name in verifier.NAVIGATION_MODULES:

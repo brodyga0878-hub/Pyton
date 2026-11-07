@@ -3,7 +3,7 @@ extends "res://tests/test_source_gear_main.gd"
 # independent native oracle; positions and old-save HP anchors here are fixtures.
 const ContactFrame=preload("res://scripts/source_surface_contact_bridge.gd")
 const CityContacts=preload("res://scripts/source_city_runtime.gd")
-const CONTACT_REPORT:="res://validation/contact-2026-11-08/source-contact-main.json"
+const CONTACT_REPORT:="res://build/current-test-reports/source-contact-main.json"
 var contact_evidence:Array=[]
 class ObservedSurface extends "res://scripts/surface_model.gd":
 	const ObservedFuel=preload("res://scripts/source_fuel_flight_bridge.gd")

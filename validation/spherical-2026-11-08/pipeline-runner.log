@@ -1,0 +1,2 @@
+source_spherical_pipeline: passed; 2400 checks, 0 failures
+Validation passed: 2400 current checks; 1 passed suites; 0 failed; 0 unavailable. Report: validation/spherical-2026-11-08/pipeline-run.json
