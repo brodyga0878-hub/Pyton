@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "scope": "Source F1014/F953 session integration, explicit HP binding and combined fixed60 host with source fuel cadence; legacy controls kept separate",
+  "status": "passed",
+  "suites": [
+    {
+      "test": "tests/test_source_thermal_session.gd",
+      "checks": 118,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/thermal-2026-11-07/source-thermal-session.log"
+    },
+    {
+      "test": "tests/test_source_fuel_session.gd",
+      "checks": 109,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/thermal-2026-11-07/source-fuel-session.log"
+    },
+    {
+      "test": "tests/test_source_hyperdrive_navigation.gd",
+      "checks": 143,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/thermal-2026-11-07/source-hyperdrive-navigation.log"
+    },
+    {
+      "test": "tests/test_native_navigation.gd",
+      "checks": 219,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/thermal-2026-11-07/legacy-native-navigation.log"
+    }
+  ],
+  "checks": 589,
+  "groups": 4,
+  "failures": 0,
+  "sha256": {
+    "scripts/navigation.gd": "2745b49c42b69a23679740f21bf31efdcab319d7eedff6de090aac854bd3f225",
+    "scripts/source_hyperdrive_session.gd": "0a0428071f8cfc188f80930474c804261626be6952d41a55b8399eb6b70c7bc8",
+    "scripts/source_atmospheric_dynamics.gd": "a9ccce9fa27a2354205f3b1c88a9108320f567742d44d84082635339bc9af4a9",
+    "scripts/source_atmosphere_contact.gd": "5b048597421267adf2604617be09079dbd3d256c26572506e57ce3de7c3a87a9",
+    "data/ffe_atmosphere.json": "b65e25e187ac4abe7e24325a78de3fe70c140395711127ee0076f9905222bcce",
+    "data/ffe_fuel.json": "4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f",
+    "data/ffe_hyperdrive.json": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+    "tests/test_source_thermal_session.gd": "4b50093f84e82b3277291db5ba64c497641a62cf8ee57f3109868fae59e7b0c2",
+    "tests/test_source_fuel_session.gd": "a8f37d7873be6eed0689307a0b301ccd44d48164dba20b582957fb1b1d295d7c",
+    "tests/test_source_hyperdrive_navigation.gd": "904e1876160b3284748c62dd03f3185de641471d8cf664cc1c8f355e30051709",
+    "tests/test_native_navigation.gd": "5fe983525880c0366ad48adc28fde6cce2506aa03016b4fa98a18ebf498a3a04"
+  },
+  "contracts": {
+    "legacy_fuel_system_keys": 17,
+    "thermal_sibling_keys": 27,
+    "missing_thermal_initialization_requires_actual_restored_ship": true,
+    "present_empty_thermal_rejected": true,
+    "bind_preserves_old_fuel17_bytes": true,
+    "bind_preserves_old_partial_HP": true,
+    "hull_anchor_policy": "ceil(spec_mass*4*percent/100), exactIEEE64percent anchor, only rawdamage delta projected; F942request persists destroyed flag while native hull word preserved",
+    "HP_JSON_coherence_tolerance": "max(1e-12,abs(expected)*1e-12), then restore exact expected bits; larger mismatch rejects",
+    "live_external_damage_requires_explicit_sync": true,
+    "thermal_host_hz": 60,
+    "maximum_steps_per_call": 256,
+    "fixed_step_order": [
+      "F152 whole49710 cadence/F938jet/F1007cooling",
+      "F1033 cargo/heat/cooldown",
+      "F1014 heat/drag/F953 damage"
+    ],
+    "master_tick_policy": "integer rational2^32/(86400*60) with carried remainder and immutable old fuel-fraction F64anchor",
+    "legacy_API_without_thermal_retains_0_16_trajectory": true,
+    "FPS_30_60_120_full_state_and_velocity_equal": true,
+    "cold_combined_continuation_bit_exact": true,
+    "fastpath_forced_slow_full_state_events_equal_at_FPS_30_60_120_and_warp100": true,
+    "fastpath_guards_tested": [
+      "heat",
+      "cooldown",
+      "empty tank with automatic feeder",
+      "nonzero commands",
+      "F1033 atmosphere",
+      "F1014 enabled",
+      "source destruction latch"
+    ],
+    "pending_death_cancelled_without_hyperfuel_debit": true,
+    "RNG_policy": "Named local F1530 seeds1/1; event filter identity adapter; F942/F952/module/audio callbacks observed, not complete VM effects",
+    "thermal_severity_thresholds": "50/75percent are presentation only; source damage and fatality remain kernel outputs"
+  },
+  "limits": [
+    "Headless session checks do not measure a physical phone, GPU or full original gameplay.",
+    "Native DOS arithmetic cases belong to the independent core proof and are not counted again here.",
+    "Fixed60 frequency, caller unit/frame bridge, local RNG, identity event filter and bounded loop are explicit modern caller policies.",
+    "Root owns geometry/body choice, raw-to-phone velocity delta application, complete Main lifecycle and fatal world-transfer handling.",
+    "109/143/219 historical control suites must be deduplicated in release consolidation."
+  ]
+}

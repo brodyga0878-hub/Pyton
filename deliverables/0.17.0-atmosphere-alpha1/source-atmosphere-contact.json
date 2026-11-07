@@ -1,0 +1,73 @@
+{
+	"checks": 3904,
+	"evidence": [
+		{
+			"models": [
+				129,
+				120,
+				125,
+				126,
+				127,
+				122,
+				117,
+				118,
+				119,
+				121,
+				123,
+				124,
+				128,
+				130,
+				131,
+				132,
+				133
+			],
+			"new_original_machine_execution_by_this_test": false,
+			"reused_reference_cases": 377,
+			"reused_reference_fixture": "tests/fixtures/source_ground_surface_native.json",
+			"scope": "New context wrapper checked against already independently generated native fixture, not newly executing the original code."
+		},
+		{
+			"new_original_machine_execution_by_this_test": false,
+			"reused_reference_cases": 330,
+			"reused_reference_fixture": "tests/fixtures/source_fuel_contact_native.json"
+		},
+		{
+			"native_speed_output_sha256": "da90d5bf5e9d299ec82c8a001f82428fbf2b2d56bb161da45fabe6247314d3e8",
+			"native_speed_variant": "pinned_JJFFE_original_source_instructions_host_ABI",
+			"new_native_speed_cases": 239.0
+		},
+		{
+			"airless_mercury_contact": {
+				"altitude_raw_s32": 1012368,
+				"flags_u8": 2,
+				"parent_model_u32": 120
+			},
+			"gear_policy": "Explicit caller input, default retracted; no implicit surface-mode native gear assertion.",
+			"live_earth_orbit_contact": {
+				"altitude_raw_s32": 1635104,
+				"flags_u8": 3,
+				"parent_model_u32": 129
+			},
+			"live_earth_surface_contact": {
+				"altitude_raw_s32": 1635904,
+				"flags_u8": 3,
+				"parent_model_u32": 129
+			},
+			"reference_frame": "Orbit: current phone world-local words; surface: bodyfixed words with an inverse tangent basis for applying only the drag delta. Automatic original rotating-frame selection remains outside this wrapper.",
+			"star_unknown_altitude_normalized": 2147483647
+		}
+	],
+	"failures": 0,
+	"physical_device_tested": false,
+	"schema": 1,
+	"scope": "New read-only natural atmosphere context wrapper, actual World/Surface frame projection, original raw-speed extraction and F1033 HUD-altitude sentinel. Solid/gas native field fixtures are reused reference records; only239 raw-speed controls are newly independently executed. Pinned JJFFE/source-data provenance is mixed and does not establish whole-DOS equivalence or full F569/caller dispatch.",
+	"sources": {
+		"core_sha256": "5b048597421267adf2604617be09079dbd3d256c26572506e57ce3de7c3a87a9",
+		"fuel_resource_sha256": "4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f",
+		"gas_reference_sha256": "a68264130ed7a13b17a689b58e23e2f0d6921d4c33b9bfb4d20219709d7cf3d6",
+		"ground_resource_sha256": "2dbf44a94422907b1bb29b34df1d795cef819cecf267b1591f3d82ea6326d018",
+		"solid_reference_sha256": "d0e49fa2a65489bd81c59f686ba69149e401622ea199d581e2a6d3b8857aeba1",
+		"speed_fixture_sha256": "cbffa800bfbfa805f12480dbefe30888ed2f9d37cb8a3f07469fa0ae11dca57f",
+		"test_sha256": "778bf7581de5d952ec77dc4de5a16adbd519f7b16f7eade4997da6ffdd31fcfc"
+	}
+}

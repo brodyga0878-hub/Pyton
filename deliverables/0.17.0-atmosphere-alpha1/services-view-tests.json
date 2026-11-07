@@ -1,0 +1,234 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "Embedded read-only thermal/atmosphere phone UI; source-model percentages, status, damage and escape guidance; separate atmospheric equipment and defensive shield; retained fuel/equipment controls",
+  "groups": 6,
+  "checks": 1024,
+  "failures": 0,
+  "suites": [
+    {
+      "test": "tests/test_hyperdrive_services_view.gd",
+      "checks": 484,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/thermal-2026-11-07/hyperdrive-services-view.log",
+      "validation_phase": "unchanged fixture UI; no Navigation dependency"
+    },
+    {
+      "test": "tests/test_hyperdrive_services_native_view.gd",
+      "checks": 54,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/thermal-2026-11-07/hyperdrive-services-native-view.log",
+      "validation_phase": "final frozen Navigation/session rerun"
+    },
+    {
+      "test": "tests/test_fuel_services_view.gd",
+      "checks": 229,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/thermal-2026-11-07/fuel-services-view.log",
+      "validation_phase": "unchanged fixture UI; no Navigation dependency"
+    },
+    {
+      "test": "tests/test_fuel_services_native_view.gd",
+      "checks": 91,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/thermal-2026-11-07/fuel-services-native-view.log",
+      "validation_phase": "final frozen Navigation/session rerun"
+    },
+    {
+      "test": "tests/test_thermal_services_view.gd",
+      "checks": 111,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/thermal-2026-11-07/thermal-services-view.log",
+      "validation_phase": "new fixture UI; frozen view unchanged"
+    },
+    {
+      "test": "tests/test_thermal_services_native_view.gd",
+      "checks": 55,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/thermal-2026-11-07/thermal-services-native-view.log",
+      "validation_phase": "new actual Navigation consumer; final frozen runtime rerun"
+    }
+  ],
+  "sha256": {
+    "scripts/hyperdrive_services_view.gd": "70d828f819faeb8c8e31d12e1101ef82ce5d306f9cf329b2902600f82b5fe3f7",
+    "scripts/navigation.gd": "2745b49c42b69a23679740f21bf31efdcab319d7eedff6de090aac854bd3f225",
+    "scripts/source_hyperdrive_session.gd": "0a0428071f8cfc188f80930474c804261626be6952d41a55b8399eb6b70c7bc8",
+    "scripts/source_atmospheric_dynamics.gd": "a9ccce9fa27a2354205f3b1c88a9108320f567742d44d84082635339bc9af4a9",
+    "scripts/source_jet_fuel.gd": "ef043cd3d7fe4ef06a08d1f6592bf97b5d1e6d81c5f2efe9ea067d514f207cc1",
+    "scripts/source_fuel_scoop.gd": "de1e96fd3013de48557b340b9ca4e4d174c4d39aaebb8b2eee96250db53af296",
+    "scripts/flight_model.gd": "4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b",
+    "data/ffe_hyperdrive.json": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+    "data/ffe_fuel.json": "4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f",
+    "data/ffe_atmosphere.json": "b65e25e187ac4abe7e24325a78de3fe70c140395711127ee0076f9905222bcce",
+    "tests/test_hyperdrive_services_view.gd": "f37d97a1e7c3b388f8828ea7d9e39be45695746190316b7f4a4f850378809508",
+    "tests/test_hyperdrive_services_native_view.gd": "540135c5ce883e9fc32639d532deb1a34d7c43d7107e27917274459f3c151fab",
+    "tests/test_fuel_services_view.gd": "e57030e212964e0f50fa40a1c941351aa4d50f135933731429bd754307a4cb53",
+    "tests/test_fuel_services_native_view.gd": "41aa118a5a43b96dd9915b0d81eb6c367e4950dfd9c870ffb1daa7e3e228ecec",
+    "tests/test_thermal_services_view.gd": "0dede5f0d60355513fdd665d44af2939ed34a6096383b5cda52daf30c4a3717f",
+    "tests/test_thermal_services_native_view.gd": "f538d1a0843420085d276f635cdf415dc2798df51cf90335d7133b1908e729e3"
+  },
+  "contracts": {
+    "thermal_state_path": "nav.service_state(ship).fuel_system.thermal",
+    "explicit_bind_owned_by_model": true,
+    "UI_initializes_thermal_model": false,
+    "UI_mutates_model": false,
+    "UI_calculates_source_units_or_damage": false,
+    "UI_computes_warning_thresholds": false,
+    "atmospheric_shielding_equals_defensive_shield": false,
+    "initialized_false_preserves_previous_layout": true,
+    "thermal_adds_runtime_actions": false,
+    "existing_runtime_actions": [
+      "manual_jet_refuel",
+      "set_refueller_enabled"
+    ],
+    "fixture_widths": [
+      320,
+      440,
+      720,
+      960,
+      1440
+    ],
+    "thermal_fixture_widths": [
+      320,
+      440,
+      720,
+      1440
+    ],
+    "actual_consumer_widths": [
+      320,
+      440,
+      720
+    ],
+    "actual_atmospheric_fitting_touch_at_320px": true,
+    "GPU_rendered": false,
+    "physical_phone_tested": false
+  },
+  "evidence": {
+    "tests/test_hyperdrive_services_native_view.gd": [
+      {
+        "capacity_t": 80,
+        "drive_index": 3,
+        "flight_cargo_t": 6,
+        "occupied_t": 45,
+        "phase": "initial_actual_source",
+        "pricing_profile": "basic-source-workshop-pricing-adapter-v1"
+      },
+      {
+        "drive_index": 11,
+        "free_t": 1,
+        "fuel_handover_credit_change": 0,
+        "hydrogen": 4,
+        "military": 47,
+        "occupied_t": 79,
+        "phase": "fitted_and_fuelled"
+      },
+      {
+        "duration_days": 2.53741455078125,
+        "duration_raw_u32": 166292,
+        "final_free_t": 3,
+        "military_consumed": 2,
+        "ordinary_inventory_unchanged": true,
+        "phase": "military_jump_and_waste",
+        "required_fuel": 2,
+        "waste_handed_over": 2
+      },
+      {
+        "elapsed_days": 17.25,
+        "hydrogen_after_service": 13,
+        "old_fuel_units": 12,
+        "ordinary_inventory_unchanged": true,
+        "phase": "immediate_post_migration",
+        "service_available_without_extra_refresh": true
+      }
+    ],
+    "tests/test_fuel_services_native_view.gd": [
+      {
+        "all_six_limits_restored": true,
+        "any_thrust_while_empty": true,
+        "forward_while_empty": false,
+        "hydrogen_after": 3,
+        "phase": "actual_depletion_manual",
+        "tank_tonnes_after": 1.0
+      },
+      {
+        "cooldown_seconds_from_model": 2.99998372793198,
+        "heat_text_from_model": "Нагрев корпуса: 1000 (шкала игры).",
+        "pending_charge_actions_blocked": true,
+        "phase": "actual_fuel_hardware",
+        "refuel_runtime_off_on": true,
+        "source_added_mass_t": 8
+      },
+      {
+        "hydrogen_unchanged": true,
+        "military_consumed": 1,
+        "occupied_t_unchanged": true,
+        "phase": "actual_military_manual",
+        "radioactives_added": 1
+      },
+      {
+        "occupied_after_reinstall": 19,
+        "occupied_t_with_default_shield": 19,
+        "phase": "actual_eagle_phone",
+        "scoop_mounting_rejected": true,
+        "widths": [
+          320,
+          440,
+          720
+        ]
+      }
+    ],
+    "tests/test_thermal_services_native_view.gd": [
+      {
+        "after_phone_hull_percent": 37.125,
+        "after_source_hull_u16": 149,
+        "full_source_hull_u16": 400,
+        "heat_s32": 512,
+        "initial_phone_hull_percent": 37.625,
+        "phase": "actual_unshielded_partial_hull",
+        "severity": "danger",
+        "source_drag_returned": true
+      },
+      {
+        "actual_UI_widths": [
+          320,
+          440,
+          720
+        ],
+        "atmospheric_shielding": true,
+        "drag_returned": true,
+        "energy_shield_available": false,
+        "fitting_touch_width": 320,
+        "phase": "actual_atmospheric_protection",
+        "phone_hull_percent": 37.625,
+        "source_heat_s32": 8
+      },
+      {
+        "critical_source_status": "Корабль потерян из-за повреждений.",
+        "destroyed_hull_percent": 0.0,
+        "outside_atmosphere_guidance": true,
+        "phase": "explicit_warning_and_critical_boundaries",
+        "sampled_world_claim": false
+      }
+    ]
+  },
+  "independent_readonly_review": {
+    "agent": "/root/approach_review/thermal_ui_review",
+    "blockers_found": 0,
+    "tests_run_by_reviewer": false
+  },
+  "limits": [
+    "Raw F1014/F953 arithmetic is invoked through actual Navigation using explicit source-context fixtures; sampled-world/Main physics and desktop GPU frames have separate reports.",
+    "Default Cobra hull400 and partial phone hull37.625percent are model inputs, not values derived by UI.",
+    "Dock availability is an isolated service fixture; installation/refund prices use the explicit workshop adapter.",
+    "Read-only thermal card preserves the existing copied heat_label; backend policy/clock/debug fields are not exposed.",
+    "Joint vertical visibility of heat/warning/damage/guidance belongs to desktop GPU capture; headless tests check column bounds and reachable actions.",
+    "The six UI suites may appear in root consolidated regressions and must be counted only once.",
+    "Headless checks do not certify physical Android rendering or Samsung performance."
+  ]
+}

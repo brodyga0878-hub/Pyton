@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-07T20:40:14.957555+00:00",
+  "updated_utc": "2026-11-07T20:40:48.709005+00:00",
+  "duration_seconds": 33.751,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-07T20:40:14.957555+00:00",
+      "duration_seconds": 33.751,
+      "requested_suites": [
+        "source_thermal_main",
+        "source_fuel_main"
+      ],
+      "executed_suites": [
+        "source_thermal_main",
+        "source_fuel_main"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 2,
+  "status": "passed",
+  "passed_suites": 2,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 860,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "source_thermal_main",
+      "scope": "Actual Main Earth/surface heat and drag, exact legacy HP anchors, raw motion continuation, fixed thermal-hook partition, natural boundary fixtures, pause/input/death/save ordering and atomic invalid-thermal restore.",
+      "status": "passed",
+      "checks": 463,
+      "failures": 0,
+      "executed_utc": "2026-11-07T20:40:14.986653+00:00",
+      "suite_source": {
+        "path": "tests/test_source_thermal_main.gd",
+        "bytes": 21581,
+        "sha256": "64d21d323ae40e906b7e909b1cf8146eae78ffaa7944e78f30fb7b2740f02d02"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_thermal_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 33.72,
+      "timed_out": false,
+      "output_bytes": 117,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/final-main-runner/logs/source_thermal_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_fuel_main",
+      "scope": "Actual Main fuel cadence, source movement/save continuation, automatic star/gas scooping, UI recovery, old v40 saves, pause and stale-input boundaries.",
+      "status": "passed",
+      "checks": 397,
+      "failures": 0,
+      "executed_utc": "2026-11-07T20:40:14.988268+00:00",
+      "suite_source": {
+        "path": "tests/test_source_fuel_main.gd",
+        "bytes": 16377,
+        "sha256": "e3bd3bdecd9650b88e5905407712ccef369a10805fa4e95ab075cdff5680d1b0"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_fuel_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 11.341,
+      "timed_out": false,
+      "output_bytes": 114,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/final-main-runner/logs/source_fuel_main.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ]
+}

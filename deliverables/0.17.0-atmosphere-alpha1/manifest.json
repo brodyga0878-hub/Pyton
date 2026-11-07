@@ -1,0 +1,379 @@
+{
+  "version": "0.17.0-atmosphere-alpha1",
+  "version_code": 42,
+  "created_utc": "2026-11-07T20:51:57.340613+00:00",
+  "source_commit": "714624bba30d6359921cced42be2c1adb8d4c5bd",
+  "source_archive_scope": "Exact git archive reconstruction plus scoped static parity audit; SDK, keys, caches, other validation and deliverables excluded; internal docs reflect pre-publication state.",
+  "source_archive_files": 1421,
+  "source_archive_actual_file_count": 1268,
+  "source_archive_below_32MiB": true,
+  "source_archive_crc_verified": true,
+  "source_archive_fresh_import_passed": true,
+  "source_archive_isolated_native_startup_checks": 10,
+  "source_archive_isolated_native_startup_failures": 0,
+  "source_archive_thermal_Main_checks": 463,
+  "source_archive_thermal_Main_failures": 0,
+  "source_archive_actual_files_unchanged": 1268,
+  "checks": 81882,
+  "passed_suites": 30,
+  "failures": 0,
+  "validation_status": "passed",
+  "validation_report": "final-targeted-summary.json",
+  "validation_scope": "One current passing result per unique selected kernel/contact/session/UI/Main/clock/motion/flight/save/surface/graphics suite. Native controls are included in core totals. Failed intermediate runs, repeated portability/capture checks and historical release totals are excluded; bounded per-suite timestamps retained, not an atomic full-game run.",
+  "new_instruction_matched_DOS_native_cases": 1447,
+  "new_pinned_JJFFE_speed_native_cases": 239,
+  "reused_solid_geometry_fixture_records": 377,
+  "reused_pinned_JJFFE_gas_geometry_fixture_records": 330,
+  "reused_geometry_records_are_new_native_executions": false,
+  "native_cases_included_in_core_checks": true,
+  "python_packaging_tests": 145,
+  "python_extraction_tests": 8,
+  "python_distinct_tests": 153,
+  "capture_checks": 144,
+  "capture_checks_added_to_targeted_total": false,
+  "fresh_desktop_gles_frames_visually_inspected": 8,
+  "screenshots_are_phone_captures": false,
+  "renderer": "Godot4.6.3 Compatibility/OpenGL Mesa llvmpipe Linux virtual display",
+  "frozen_runtime_inputs": 407,
+  "additional_runtime_modules": 2,
+  "additional_shaders": 0,
+  "additional_textures": 0,
+  "additional_source_JSON": 1,
+  "runtime_material_maps": 51,
+  "original_DOS_F1014_kernel": true,
+  "original_DOS_F953_kernel": true,
+  "original_DOS_F1530_kernel": true,
+  "original_DOS_global_call_loop": false,
+  "thermal_host_caller": "fixed60Hz-combined-fuel-cooling-scoop-atmosphere-v1",
+  "full_F942_F952_event_equipment_pipeline": false,
+  "full_original_frame_selection_F569_F570": false,
+  "full_original_shield_generator_fitting": false,
+  "workshop_pricing_adapter": "basic-source-workshop-pricing-adapter-v1",
+  "phone_force_and_SI_frames_are_adapters": true,
+  "point_contact_fatality_is_adapter": true,
+  "package": "org.starfrontier.rebuild",
+  "abi": "arm64-v8a",
+  "min_sdk": 24,
+  "target_sdk": 36,
+  "debuggable": false,
+  "zip_and_elf_alignment_16k": true,
+  "test_key_only": true,
+  "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+  "physical_device_tested": false,
+  "production_signing_key_configured": false,
+  "production_release_ready": false,
+  "full_original_port_complete": false,
+  "full_original_physics": false,
+  "full_russian_localization_complete": false,
+  "game_completion_percent": null,
+  "full_release_date": null,
+  "next_functional_priority": "Managed landing gear F1056/F1008: persisted request/position, classic-console action and F1014/visual consumers; complete F575, shields and event VM remain separate.",
+  "artifact_upload_authorized": true,
+  "publication_state_at_packaging": "Prepared for authorized GitHub backup; immutable full HTTPS download verification follows separately.",
+  "files": {
+    "README_RU.md": {
+      "bytes": 4687,
+      "sha256": "6ad57ca3946a086d05ac235ae88e459ac4107cc12e7905866bc94c970c15c74b"
+    },
+    "StarFrontier-0.17.0-atmosphere-arm64.apk": {
+      "bytes": 50038396,
+      "sha256": "8df3ed0fa1d790437bd536c16c7997ee18b263c39f462a6bad2716939e6fad63"
+    },
+    "StarFrontier-0.17.0-atmosphere-source.zip": {
+      "bytes": 30817760,
+      "sha256": "bf87804585f3ba90a8be2459dd8c368e8c02f97797808d68b16386bece296d29"
+    },
+    "android-export.log": {
+      "bytes": 7265,
+      "sha256": "66459bc8297295a7539ed6c8aa453b73da0abbbb2b722611ac2e0eb5efdd4b42"
+    },
+    "android-verification.json": {
+      "bytes": 99131,
+      "sha256": "395d92da32d6001b4529286824ebd66d52fe6232cc6d6d9187718281471bb3e5"
+    },
+    "dos-atmospheric-disassembly.txt": {
+      "bytes": 9082,
+      "sha256": "bbeb45270d2d37dfe4fd081186c83de7e96d2cc50c47334bb250f56f69e42b10"
+    },
+    "dos-f1014-f1017-disassembly.txt": {
+      "bytes": 3508,
+      "sha256": "837c3d48cf91ce6afa325d92d1cdcd9a2ce07b1e21d0c9f2db8c3ec8e0ce86d8"
+    },
+    "extraction.json": {
+      "bytes": 803,
+      "sha256": "530c5db4238970162bbe7cbec32ed7cfa5a930222ee295edf0bb523bc0f0efcd"
+    },
+    "extraction.log": {
+      "bytes": 1494,
+      "sha256": "2e9a8da451a589e9e29306bc2161de3a0c82eb1d6829ed37d82a2adcca130a03"
+    },
+    "final-main-runner/logs/source_fuel_main.log": {
+      "bytes": 114,
+      "sha256": "56d10dd266bc7c99655e694d8239d01f71dc6be6d1387f40552f21c080b59b8e"
+    },
+    "final-main-runner/logs/source_thermal_main.log": {
+      "bytes": 117,
+      "sha256": "778c6760648b68cfb044879f19bd0c3e3d255300008d57f8d2aa6c364285c486"
+    },
+    "final-main-summary.json": {
+      "bytes": 3812,
+      "sha256": "43cd0d8c5eea4566a0e66825472a56dc1c70c603fa1d122777698cdd1ebeea1e"
+    },
+    "final-targeted-summary.json": {
+      "bytes": 10164,
+      "sha256": "c4e87d8f045784306fa21176359b4e9120e417114962aa456ed236872927b1af"
+    },
+    "fuel-main-regression.json": {
+      "bytes": 2056,
+      "sha256": "dc2c6e1a9738f3860775685e5a9fb28b6a3a4377359bec26c70e8687f95eb02a"
+    },
+    "fuel-main-regression.log": {
+      "bytes": 114,
+      "sha256": "56d10dd266bc7c99655e694d8239d01f71dc6be6d1387f40552f21c080b59b8e"
+    },
+    "fuel-services-native-view.log": {
+      "bytes": 872,
+      "sha256": "e8ce78331f9a31656f802ee2a00ebca392526918a2224cb0f299831b9e19ded0"
+    },
+    "fuel-services-view.log": {
+      "bytes": 122,
+      "sha256": "6ae011fc01d019b97390c8bd51d0d72fb12ea0d7f06c4605165b88e334dfc714"
+    },
+    "hyperdrive-main-regression.json": {
+      "bytes": 1383,
+      "sha256": "8f802293071b9a5fb610058f61a88939065a89956228e8c944e01d1fb169ac2f"
+    },
+    "hyperdrive-services-native-view.log": {
+      "bytes": 855,
+      "sha256": "c00971c0b384aebcc35858e3b66728ce8d7c0eb7b7ca1b23887eb40ed36bfb23"
+    },
+    "hyperdrive-services-view.log": {
+      "bytes": 128,
+      "sha256": "ad588172bf909e0b19aaa7bc6ba9b0879c652536f8692e66cc9c6e9fefac3c39"
+    },
+    "independent-extraction.json": {
+      "bytes": 727,
+      "sha256": "7ff887d8f1166cbacdd7f9e7534c81fd3d34bc559ca247de0cbe607187ea8b97"
+    },
+    "independent-packaging.json": {
+      "bytes": 1203,
+      "sha256": "65601fffcfe787a9c7242172f4da718c145dc0fce4e8912ac520a4a7528d6a5f"
+    },
+    "legacy-native-navigation.log": {
+      "bytes": 121,
+      "sha256": "875e664e3e0605e0a71b2fabc284598e30216783875c466de66f2fc2dd78f140"
+    },
+    "motion-bridge.json": {
+      "bytes": 2628,
+      "sha256": "fccbfe70270066ee2afe1fd94679ae45ba38e91dec827e5162153e05dc0a9ab8"
+    },
+    "motion-logs/logs/source_thermal_motion_bridge.log": {
+      "bytes": 132,
+      "sha256": "b6113e99b7a13b79da9e137009775b3a97ff7bd711ffc65c45c8a38628dcc6ad"
+    },
+    "motion-runner.log": {
+      "bytes": 199,
+      "sha256": "01b512c7a9885172d436a2266f482dd0eb13c42ed1901d61fbb1d928033f7525"
+    },
+    "packaging.json": {
+      "bytes": 4110,
+      "sha256": "2bcb6629b573a8c0cda94abace4b0bf0fbc40f742da03bfecb740b51f7a7d57d"
+    },
+    "packaging.log": {
+      "bytes": 100,
+      "sha256": "441117da98a07213374e569a1c34af99b8dfb0e3342f4494f548ae60b48c9a31"
+    },
+    "regression-logs/logs/classic_console_main.log": {
+      "bytes": 123,
+      "sha256": "fd1b59ff7ab0184ebb05c966c93c20e81d6f74731c727c273818a1dadac0b0b3"
+    },
+    "regression-logs/logs/flight_projection.log": {
+      "bytes": 10047,
+      "sha256": "e5975c1d32e6a08a7f636589baf1c72d9a8b86a2bf780a15847ccca504fc6d35"
+    },
+    "regression-logs/logs/flight_time_controller.log": {
+      "bytes": 128,
+      "sha256": "b53b43e65f62372860d06f939b76e493c80c702a3858896a93ee7acb915d7f76"
+    },
+    "regression-logs/logs/graphics_integration.log": {
+      "bytes": 123,
+      "sha256": "f6b6dc847918df771b6f2ac4b0b0f0537855cf6f5247269fadb9b1f4b8ea6d06"
+    },
+    "regression-logs/logs/graphics_scope.log": {
+      "bytes": 355,
+      "sha256": "b7ec54445dbb93814b7877b35fd9c0b18e5e17f8dcf4a62aa1fba3a09f2692bb"
+    },
+    "regression-logs/logs/navigation_main.log": {
+      "bytes": 118,
+      "sha256": "341f62f03e5ea9792cb9e4caaf3261f7e61c57b9664e49fe27d12453ab4c12b6"
+    },
+    "regression-logs/logs/offpad_takeoff.log": {
+      "bytes": 118,
+      "sha256": "c48c9e6771737eaa3fd8bc350d0d769e9db501bed072ff6f936404a4e59951e0"
+    },
+    "regression-logs/logs/source_console_pause.log": {
+      "bytes": 1713,
+      "sha256": "b08cd34e7c4571cbba66e334f72f4859a8f769f617440df34b18cc07f1f0e498"
+    },
+    "regression-logs/logs/source_docking_flight.log": {
+      "bytes": 125,
+      "sha256": "9e7d3fcfbabb498d60a2a57cfb98e809d575c23d253807b9e78773011813fad8"
+    },
+    "regression-logs/logs/source_fuel_flight.log": {
+      "bytes": 121,
+      "sha256": "23d1c9dbd45f2f877f299f4055a4b470b2a5b50f4bf6fb375957cefae0b9696d"
+    },
+    "regression-logs/logs/source_full_startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "regression-logs/logs/source_hyperdrive_main.log": {
+      "bytes": 119,
+      "sha256": "714642268b5d030046e011e56f234bb451f4042b5a194b32c21d1e1878eecbd8"
+    },
+    "regression-logs/logs/source_main_full.log": {
+      "bytes": 510,
+      "sha256": "c995752d0c43c8a8ff204d09ebe92a0c8348bd0f49e329645272e0d3ca610fc0"
+    },
+    "regression-logs/logs/source_motion_bridge.log": {
+      "bytes": 193,
+      "sha256": "d99dd7cfe1112eb96fd484294fdf123d4de622d24d45a719fe26ea5f0727b6ce"
+    },
+    "regression-logs/logs/source_motion_main_continuation.log": {
+      "bytes": 134,
+      "sha256": "ab033c9f87f6330cebe4b90aaefd83515c127b83a397d21d532ca38c4f152491"
+    },
+    "regressions.json": {
+      "bytes": 18752,
+      "sha256": "dde2b154fbdaefda802e5c68c7e8cf0d3599fb1e7e65bd25bf0c7e6e55a04955"
+    },
+    "runtime-freeze.json": {
+      "bytes": 45226,
+      "sha256": "4a72be6d7173bb439fcd56764440f54059089078ea76b3fe6fb07f124ddd416c"
+    },
+    "screenshots/01-source-earth-unshielded-flight.png": {
+      "bytes": 467673,
+      "sha256": "7b8459a3b27e1c0cb160d741bd844ca7237404323f366ce8326444a6414d009f"
+    },
+    "screenshots/02-unshielded-thermal-and-hull.png": {
+      "bytes": 253663,
+      "sha256": "caaed1b4ed9cc0ef8f4a5be9e70b931e165686a843cbf6a5966b5fed1b1b1c82"
+    },
+    "screenshots/03-unshielded-thermal-narrow.png": {
+      "bytes": 181197,
+      "sha256": "dfc1a0e21b96c01fee0d185cc80d898ce568756b8ad86dacfa492f713bad6666"
+    },
+    "screenshots/04-fitted-atmospheric-shielding.png": {
+      "bytes": 222312,
+      "sha256": "6f6ac2634b22d443070210eafe522455ac84eba755071ffed6d7a80eab4c0e91"
+    },
+    "screenshots/05-airless-mercury-thermal-status.png": {
+      "bytes": 103028,
+      "sha256": "5910e5dc9a5eb9e021661573c0188e2da446983e25c98cb44070c152f0e6938c"
+    },
+    "screenshots/06-sun-unknown-height-gate.png": {
+      "bytes": 124257,
+      "sha256": "a1eb65a65257bc985aa134e22637ca680ad28d7c0527fa1940ddac55c97ffd50"
+    },
+    "screenshots/07-source-earth-surface-thermal-flight.png": {
+      "bytes": 381033,
+      "sha256": "4e294cfaa96049b46d193fc8f9a3495c7784b78d09de81514884912f42fb4567"
+    },
+    "screenshots/08-legacy-partial-hull-anchor.png": {
+      "bytes": 139044,
+      "sha256": "e898e8825c7dfd161937c127e7d9f8f68e65843c213a00d7d03f0d4113f9a858"
+    },
+    "screenshots/capture-manifest.json": {
+      "bytes": 54636,
+      "sha256": "d26f1083194d4d0c46eb05d4503b8afea285303591fba02baf12212b9d0beb65"
+    },
+    "services-view-tests.json": {
+      "bytes": 8947,
+      "sha256": "d7bfe944410d65a1be0496af456ddcb2a0f823f196a3c9bec051b3540e9aaf1e"
+    },
+    "source-archive-import.log": {
+      "bytes": 27522,
+      "sha256": "304f1d498046e0ca4ed97a17cad70995770f3df93ebb63271b9a904585199f44"
+    },
+    "source-archive-packaging.json": {
+      "bytes": 967,
+      "sha256": "8a03133c51577b547167f9df7b9d5f3184b9ceaa46ace74f81c37c5d4f34a576"
+    },
+    "source-archive-startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "source-archive-verification.json": {
+      "bytes": 5577,
+      "sha256": "011ee649c3397d011c21ade5aa6652250ac27769395aa9ef11e660825f1d4cd0"
+    },
+    "source-atmosphere-contact.json": {
+      "bytes": 2825,
+      "sha256": "34394e18b8096d26f7b30215db9945072b616c22d54a07bed3b72f2473c9d534"
+    },
+    "source-atmosphere-contact.log": {
+      "bytes": 124,
+      "sha256": "a1dc44e4bfc5b2f9162b6e01ee7d8a5325856242b6137d95b08672ec588bfa40"
+    },
+    "source-atmospheric-core.json": {
+      "bytes": 2160,
+      "sha256": "533613d845788789747c414eea7ebacb3a52e72a40797f65e1176d76bbac0cc9"
+    },
+    "source-atmospheric-core.log": {
+      "bytes": 127,
+      "sha256": "16e2c1c1f6f498b4662e9b5d2258f45f8b04de6595d6dc01e3fcc574f8c1988d"
+    },
+    "source-atmospheric-native-proof.json": {
+      "bytes": 9482,
+      "sha256": "f0a4cce9bbd204ede5c33b1bc69007749e67752a072bd95f1a88055b12eff7ba"
+    },
+    "source-fuel-session.log": {
+      "bytes": 117,
+      "sha256": "72c99396446c57a1432734b4b9198ec23a410617f269aefe80f5b0f1d9648abf"
+    },
+    "source-hyperdrive-navigation.log": {
+      "bytes": 126,
+      "sha256": "9e49696cf7496e1a106a4c0b5a371fd9c2d87cf91c3ceb5d13a20b1769104eb9"
+    },
+    "source-thermal-capture.log": {
+      "bytes": 425,
+      "sha256": "411285dbdc2cf94c3eadb9fd4d9ad65b37bf6fa65b95251da9db63467b8b7281"
+    },
+    "source-thermal-main.json": {
+      "bytes": 3783,
+      "sha256": "663e5c76ed635c0e42cb489c6dfde159734d18a67a41107ee3dea885c9a09428"
+    },
+    "source-thermal-main.log": {
+      "bytes": 117,
+      "sha256": "778c6760648b68cfb044879f19bd0c3e3d255300008d57f8d2aa6c364285c486"
+    },
+    "source-thermal-session.log": {
+      "bytes": 120,
+      "sha256": "435ff1e39aec1fe18f8ea6cac2ed5a60afca9b9e17889a6ff65b6640eb1afbaa"
+    },
+    "thermal-main-feature.json": {
+      "bytes": 1195,
+      "sha256": "c3dc475f4314013baf7c7a3d71e92fd9ed08d2d4ff8fc84a6b4de9adb9718e7e"
+    },
+    "thermal-main-feature.log": {
+      "bytes": 117,
+      "sha256": "778c6760648b68cfb044879f19bd0c3e3d255300008d57f8d2aa6c364285c486"
+    },
+    "thermal-services-native-view.log": {
+      "bytes": 870,
+      "sha256": "cf12a35871f1e70ef88f55002c2c7eb88fee7dfd7da8f96395b60a5595f6894b"
+    },
+    "thermal-services-view.log": {
+      "bytes": 125,
+      "sha256": "c6d004a7b822c58cd5da97d99ee81ca4429ba5ba67bd827e54c2c651adfd44ae"
+    },
+    "thermal-session-integration.json": {
+      "bytes": 4680,
+      "sha256": "0b18430a325dc4c0900433347ae5ca53b883b625a00d8a68491efa2ee8a0ab2e"
+    },
+    "vacuum-fastpath-performance.json": {
+      "bytes": 725,
+      "sha256": "87f7e3eaeffcac0cd101963a369ddeeae10409b1b34dd187c2492bbb1f52af24"
+    }
+  }
+}

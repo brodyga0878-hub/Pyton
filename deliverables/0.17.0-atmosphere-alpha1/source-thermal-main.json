@@ -1,0 +1,99 @@
+{
+	"checks": 463,
+	"evidence": [
+		{
+			"case": "actual_earth_heat_and_drag",
+			"fixture": "source Earth native sampled ground +5000m, tangent900m/s, gravity disabled to isolate atmosphere",
+			"manual_approach_claim": false,
+			"shielded": {
+				"cooldown_u32": 0,
+				"heat_s32": 247,
+				"hull_percent": 100.0,
+				"hull_u16": 400,
+				"jet_raw_u32": 1073741824,
+				"jet_update_remainder_raw": 24855,
+				"rng_seed_a_u32": 1,
+				"rng_seed_b_u32": 1,
+				"shield_u16": 0,
+				"velocity_words": []
+			},
+			"unshielded": {
+				"cooldown_u32": 0,
+				"heat_s32": 17145,
+				"hull_percent": 85.0,
+				"hull_u16": 340,
+				"jet_raw_u32": 1073741824,
+				"jet_update_remainder_raw": 24855,
+				"rng_seed_a_u32": 3212563656,
+				"rng_seed_b_u32": 1538266718,
+				"shield_u16": 0,
+				"velocity_words": []
+			}
+		},
+		{
+			"caller_fps": [
+				30,
+				60,
+				120
+			],
+			"case": "fixed_contact_main_hook_caller_partition",
+			"duration_seconds": 0.5,
+			"facts": {
+				"cooldown_u32": 0,
+				"heat_s32": 17145,
+				"hull_percent": 85.0,
+				"hull_u16": 340,
+				"jet_raw_u32": 1073741824,
+				"jet_update_remainder_raw": 24855,
+				"rng_seed_a_u32": 3212563656,
+				"rng_seed_b_u32": 1538266718,
+				"shield_u16": 0,
+				"velocity_words": [
+					-6999,
+					0,
+					-5709
+				]
+			},
+			"scope": "Main post-physics thermal hook with actual native contact and anchored source velocity; physical integration held fixed deliberately, no whole-flight FPS or device benchmark claim."
+		},
+		{
+			"Sun_F1033_heat_may_still_apply": true,
+			"Sun_normalized_altitude": 2147483647,
+			"Sun_raw_altitude": -1,
+			"case": "natural_contact_boundaries",
+			"mercury": {
+				"altitude_raw_s32": 5010424,
+				"flags_u8": 2,
+				"parent_model_u32": 120
+			}
+		},
+		{
+			"case": "actual_main_surface",
+			"contact": {
+				"altitude_raw_s32": 1643424,
+				"flags_u8": 3,
+				"parent_model_u32": 129
+			},
+			"manual_descent_claim": false,
+			"surface_revision": "sphere-source-ground-v4",
+			"velocity_frame": "bodyfixed_from_current_source_surface_tangent"
+		}
+	],
+	"failures": 0,
+	"schema": 1,
+	"scope": "Actual Main Earth flight/surface heat, raw drag and HP integration; exact legacy percentage anchors, source-body continuation, fixed thermal-hook caller partition, natural airless/unknown-height boundaries, modal/background/input and post-environment save ordering. Explicit terrain/charge/raw boundary fixtures; no physical Android, manual atmospheric approach, complete F942/F952/event VM or whole-flight FPS equivalence proof.",
+	"sources": {
+		"data/ffe_atmosphere.json": "b65e25e187ac4abe7e24325a78de3fe70c140395711127ee0076f9905222bcce",
+		"scripts/flight_model.gd": "4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b",
+		"scripts/hyperdrive_services_view.gd": "70d828f819faeb8c8e31d12e1101ef82ce5d306f9cf329b2902600f82b5fe3f7",
+		"scripts/main.gd": "62e77b1f2d64fcdd5e1604876f883965cae635df3906b895226549cab41b4f2b",
+		"scripts/navigation.gd": "2745b49c42b69a23679740f21bf31efdcab319d7eedff6de090aac854bd3f225",
+		"scripts/source_atmosphere_contact.gd": "5b048597421267adf2604617be09079dbd3d256c26572506e57ce3de7c3a87a9",
+		"scripts/source_atmospheric_dynamics.gd": "a9ccce9fa27a2354205f3b1c88a9108320f567742d44d84082635339bc9af4a9",
+		"scripts/source_hyperdrive_session.gd": "0a0428071f8cfc188f80930474c804261626be6952d41a55b8399eb6b70c7bc8",
+		"scripts/source_motion_bridge.gd": "4fd81d7226e1c63f5c280e6ade6692b829bc5568937429a8ecac397949a003a5",
+		"tests/test_source_fuel_main.gd": "e3bd3bdecd9650b88e5905407712ccef369a10805fa4e95ab075cdff5680d1b0",
+		"tests/test_source_hyperdrive_main.gd": "34273bcb13a183e4ed228112dd9ed51e14ac2fce062c1772d99bb0113e9f4226",
+		"tests/test_source_thermal_main.gd": "64d21d323ae40e906b7e909b1cf8146eae78ffaa7944e78f30fb7b2740f02d02"
+	}
+}

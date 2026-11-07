@@ -1,0 +1,364 @@
+F34
+
+/workspace/ffe-original/FIRSTENC.EXE:     file format pei-i386
+
+
+Disassembly of section CODE:
+
+004124f8 <CODE+0x24f8>:
+  4124f8:	push   ebp
+  4124f9:	mov    ebp,esp
+  4124fb:	mov    eax,DWORD PTR [ebp+0x8]
+  4124fe:	mov    edx,DWORD PTR [ebp+0xc]
+  412501:	mov    DWORD PTR [eax*4+0x60be08],edx
+  412508:	push   eax
+  412509:	push   0x0
+  41250b:	push   0x2
+  41250d:	call   0x414044
+  412512:	add    esp,0xc
+  412515:	pop    ebp
+  412516:	ret
+
+
+F35
+
+/workspace/ffe-original/FIRSTENC.EXE:     file format pei-i386
+
+
+Disassembly of section CODE:
+
+00412518 <CODE+0x2518>:
+  412518:	push   ebp
+  412519:	mov    ebp,esp
+  41251b:	mov    eax,DWORD PTR [ebp+0x8]
+  41251e:	mov    eax,DWORD PTR [eax*4+0x60be08]
+  412525:	pop    ebp
+  412526:	ret
+
+
+F953
+
+/workspace/ffe-original/FIRSTENC.EXE:     file format pei-i386
+
+
+Disassembly of section CODE:
+
+0043df7c <CODE+0x2df7c>:
+  43df7c:	push   ebp
+  43df7d:	mov    ebp,esp
+  43df7f:	add    esp,0xfffffff0
+  43df82:	push   ebx
+  43df83:	push   esi
+  43df84:	push   edi
+  43df85:	mov    edi,DWORD PTR [ebp+0xc]
+  43df88:	mov    ebx,DWORD PTR [ebp+0x8]
+  43df8b:	test   edi,edi
+  43df8d:	jge    0x43df94
+  43df8f:	mov    edi,0x7fffffff
+  43df94:	xor    eax,eax
+  43df96:	mov    al,BYTE PTR [ebx+0x86]
+  43df9c:	push   eax
+  43df9d:	push   0xd
+  43df9f:	call   0x4124f8
+  43dfa4:	add    esp,0x8
+  43dfa7:	mov    eax,DWORD PTR [ebp+0x10]
+  43dfaa:	push   eax
+  43dfab:	push   0xe
+  43dfad:	call   0x4124f8
+  43dfb2:	add    esp,0x8
+  43dfb5:	push   edi
+  43dfb6:	push   0xc
+  43dfb8:	call   0x4124f8
+  43dfbd:	add    esp,0x8
+  43dfc0:	push   0xc
+  43dfc2:	call   0x412518
+  43dfc7:	pop    ecx
+  43dfc8:	mov    edi,eax
+  43dfca:	xor    esi,esi
+  43dfcc:	mov    DWORD PTR [ebp-0x10],0x630a95
+  43dfd3:	jmp    0x43e004
+  43dfd5:	mov    eax,DWORD PTR [ebp-0x10]
+  43dfd8:	test   BYTE PTR [eax],0x4
+  43dfdb:	je     0x43dfff
+  43dfdd:	mov    DWORD PTR [ebp-0xc],0x1
+  43dfe4:	mov    DWORD PTR [ebp-0x8],ebx
+  43dfe7:	mov    al,BYTE PTR [ebx+0x86]
+  43dfed:	mov    BYTE PTR [ebp-0x4],al
+  43dff0:	lea    eax,[ebp-0xc]
+  43dff3:	push   eax
+  43dff4:	push   0xb
+  43dff6:	push   esi
+  43dff7:	call   0x419308
+  43dffc:	add    esp,0xc
+  43dfff:	inc    esi
+  43e000:	add    DWORD PTR [ebp-0x10],0x8
+  43e004:	cmp    esi,DWORD PTR ds:0x630a8c
+  43e00a:	jl     0x43dfd5
+  43e00c:	cmp    BYTE PTR [ebx+0x87],0x3
+  43e013:	je     0x43e052
+  43e015:	cmp    BYTE PTR [ebx+0x87],0xb
+  43e01c:	jne    0x43e112
+  43e022:	xor    eax,eax
+  43e024:	mov    al,BYTE PTR [ebx+0x86]
+  43e02a:	mov    edx,DWORD PTR ds:0x501854
+  43e030:	test   BYTE PTR [edx+eax*1],0x10
+  43e034:	jne    0x43e112
+  43e03a:	mov    eax,DWORD PTR [ebx+0x82]
+  43e040:	push   eax
+  43e041:	call   DWORD PTR ds:0x501848
+  43e047:	pop    ecx
+  43e048:	cmp    DWORD PTR [eax+0x38],0x0
+  43e04c:	je     0x43e112
+  43e052:	movzx  eax,WORD PTR [ebx+0xe0]
+  43e059:	cmp    edi,eax
+  43e05b:	jg     0x43e07f
+  43e05d:	sub    WORD PTR [ebx+0xe0],di
+  43e064:	movsx  eax,BYTE PTR [ebx+0x88]
+  43e06b:	push   eax
+  43e06c:	push   0x1c
+  43e06e:	call   0x47007c
+  43e073:	add    esp,0x8
+  43e076:	or     BYTE PTR [ebx+0x151],0x1
+  43e07d:	jmp    0x43e0f6
+  43e07f:	movzx  eax,WORD PTR [ebx+0xe0]
+  43e086:	sub    edi,eax
+  43e088:	mov    WORD PTR [ebx+0xe0],0x0
+  43e091:	movzx  eax,WORD PTR [ebx+0xe4]
+  43e098:	cmp    edi,eax
+  43e09a:	jl     0x43e0ab
+  43e09c:	mov    eax,DWORD PTR [ebp+0x10]
+  43e09f:	push   eax
+  43e0a0:	push   ebx
+  43e0a1:	call   0x43da1c
+  43e0a6:	add    esp,0x8
+  43e0a9:	jmp    0x43e129
+  43e0ab:	sub    WORD PTR [ebx+0xe4],di
+  43e0b2:	mov    BYTE PTR [ebx+0x14e],0xa
+  43e0b9:	movsx  eax,BYTE PTR [ebx+0x88]
+  43e0c0:	push   eax
+  43e0c1:	push   0x1d
+  43e0c3:	call   0x47007c
+  43e0c8:	add    esp,0x8
+  43e0cb:	movzx  esi,WORD PTR [ebx+0xe4]
+  43e0d2:	sar    esi,0x2
+  43e0d5:	cmp    edi,esi
+  43e0d7:	jge    0x43e0ed
+  43e0d9:	call   DWORD PTR ds:0x501838
+  43e0df:	mov    ecx,eax
+  43e0e1:	mov    eax,edi
+  43e0e3:	shl    eax,0xf
+  43e0e6:	cdq
+  43e0e7:	idiv   esi
+  43e0e9:	cmp    ecx,eax
+  43e0eb:	jae    0x43e0f6
+  43e0ed:	push   ebx
+  43e0ee:	call   0x43df30
+  43e0f3:	pop    ecx
+  43e0f4:	jmp    0x43e129
+  43e0f6:	cmp    BYTE PTR [ebx+0x118],0xff
+  43e0fd:	jne    0x43e10b
+  43e0ff:	push   0x0
+  43e101:	push   0x17
+  43e103:	call   0x41942c
+  43e108:	add    esp,0x8
+  43e10b:	mov    eax,0x1
+  43e110:	jmp    0x43e129
+  43e112:	movsx  eax,BYTE PTR [ebx+0x88]
+  43e119:	push   eax
+  43e11a:	push   0x1d
+  43e11c:	call   0x47007c
+  43e121:	add    esp,0x8
+  43e124:	mov    eax,0x1
+  43e129:	pop    edi
+  43e12a:	pop    esi
+  43e12b:	pop    ebx
+  43e12c:	mov    esp,ebp
+  43e12e:	pop    ebp
+  43e12f:	ret
+
+
+F1014
+
+/workspace/ffe-original/FIRSTENC.EXE:     file format pei-i386
+
+
+Disassembly of section CODE:
+
+00440a90 <CODE+0x30a90>:
+  440a90:	push   ebp
+  440a91:	mov    ebp,esp
+  440a93:	push   ebx
+  440a94:	push   esi
+  440a95:	mov    ebx,DWORD PTR [ebp+0x8]
+  440a98:	mov    esi,0x64213c
+  440a9d:	cmp    DWORD PTR [esi+0xdc],0x1312d00
+  440aa7:	jg     0x440bcd
+  440aad:	test   BYTE PTR [ebx+0xcb],0x40
+  440ab4:	je     0x440abd
+  440ab6:	mov    eax,0xb
+  440abb:	jmp    0x440ac2
+  440abd:	mov    eax,0x5
+  440ac2:	test   BYTE PTR [esi+0xe9],0x2
+  440ac9:	sete   dl
+  440acc:	and    edx,0x1
+  440acf:	sub    eax,edx
+  440ad1:	mov    ecx,eax
+  440ad3:	mov    eax,DWORD PTR [esi+0xd8]
+  440ad9:	sar    eax,cl
+  440adb:	mov    edx,DWORD PTR [esi+0x1ec]
+  440ae1:	add    edx,eax
+  440ae3:	cmp    edx,0xffff
+  440ae9:	jle    0x440afa
+  440aeb:	push   0x0
+  440aed:	push   0xffffffff
+  440aef:	push   ebx
+  440af0:	call   0x43df7c
+  440af5:	add    esp,0xc
+  440af8:	jmp    0x440b15
+  440afa:	add    DWORD PTR [esi+0x1ec],eax
+  440b00:	mov    edx,eax
+  440b02:	sar    edx,0x8
+  440b05:	test   edx,edx
+  440b07:	jle    0x440b15
+  440b09:	push   0x0
+  440b0b:	push   edx
+  440b0c:	push   ebx
+  440b0d:	call   0x43df7c
+  440b12:	add    esp,0xc
+  440b15:	cmp    BYTE PTR [esi+0x3f62],0x0
+  440b1c:	je     0x440b53
+  440b1e:	cmp    BYTE PTR [esi+0x3f5c],0x0
+  440b25:	je     0x440b53
+  440b27:	mov    eax,ds:0x647948
+  440b2c:	push   eax
+  440b2d:	xor    eax,eax
+  440b2f:	mov    al,BYTE PTR [ebx+0x56]
+  440b32:	push   eax
+  440b33:	call   DWORD PTR ds:0x501840
+  440b39:	add    esp,0x8
+  440b3c:	cmp    WORD PTR [eax+0xe0],0x116
+  440b45:	jge    0x440b53
+  440b47:	or     BYTE PTR [esi+0x74],0x40
+  440b4b:	push   0xe
+  440b4d:	call   0x46fe7a
+  440b52:	pop    ecx
+  440b53:	cmp    DWORD PTR [esi+0xd8],0xbb8
+  440b5d:	jge    0x440b68
+  440b5f:	push   ebx
+  440b60:	call   0x440c08
+  440b65:	pop    ecx
+  440b66:	jmp    0x440bcd
+  440b68:	cmp    DWORD PTR ds:0x652c0c,0xfffff
+  440b72:	jbe    0x440b7b
+  440b74:	mov    esi,0xfffff
+  440b79:	jmp    0x440b81
+  440b7b:	mov    esi,DWORD PTR ds:0x652c0c
+  440b81:	shl    esi,0xb
+  440b84:	push   esi
+  440b85:	mov    eax,DWORD PTR [ebx+0x8c]
+  440b8b:	push   eax
+  440b8c:	call   0x453478
+  440b91:	add    esp,0x8
+  440b94:	sub    DWORD PTR [ebx+0x8c],eax
+  440b9a:	push   esi
+  440b9b:	mov    eax,DWORD PTR [ebx+0x90]
+  440ba1:	push   eax
+  440ba2:	call   0x453478
+  440ba7:	add    esp,0x8
+  440baa:	sub    DWORD PTR [ebx+0x90],eax
+  440bb0:	push   esi
+  440bb1:	mov    eax,DWORD PTR [ebx+0x94]
+  440bb7:	push   eax
+  440bb8:	call   0x453478
+  440bbd:	add    esp,0x8
+  440bc0:	sub    DWORD PTR [ebx+0x94],eax
+  440bc6:	push   ebx
+  440bc7:	call   0x440bec
+  440bcc:	pop    ecx
+  440bcd:	pop    esi
+  440bce:	pop    ebx
+  440bcf:	pop    ebp
+  440bd0:	ret
+
+
+F1016
+
+/workspace/ffe-original/FIRSTENC.EXE:     file format pei-i386
+
+
+Disassembly of section CODE:
+
+00440bec <CODE+0x30bec>:
+  440bec:	push   ebp
+  440bed:	mov    ebp,esp
+  440bef:	cmp    DWORD PTR ds:0x642218,0x1312d00
+  440bf9:	jg     0x440c05
+  440bfb:	mov    eax,DWORD PTR [ebp+0x8]
+  440bfe:	push   eax
+  440bff:	call   0x440c08
+  440c04:	pop    ecx
+  440c05:	pop    ebp
+  440c06:	ret
+
+
+F1017
+
+/workspace/ffe-original/FIRSTENC.EXE:     file format pei-i386
+
+
+Disassembly of section CODE:
+
+00440c08 <CODE+0x30c08>:
+  440c08:	push   ebp
+  440c09:	mov    ebp,esp
+  440c0b:	add    esp,0xffffffe0
+  440c0e:	mov    esp,ebp
+  440c10:	pop    ebp
+  440c11:	ret
+
+
+F1521
+
+/workspace/ffe-original/FIRSTENC.EXE:     file format pei-i386
+
+
+Disassembly of section CODE:
+
+00453478 <CODE+0x43478>:
+  453478:	push   ebp
+  453479:	mov    ebp,esp
+  45347b:	mov    eax,DWORD PTR [ebp+0x8]
+  45347e:	imul   DWORD PTR [ebp+0xc]
+  453481:	shl    eax,1
+  453483:	rcl    edx,1
+  453485:	mov    eax,edx
+  453487:	pop    ebp
+  453488:	ret
+
+
+F1530
+
+/workspace/ffe-original/FIRSTENC.EXE:     file format pei-i386
+
+
+Disassembly of section CODE:
+
+004536bc <CODE+0x436bc>:
+  4536bc:	mov    edx,DWORD PTR ds:0x642160
+  4536c2:	mov    eax,ds:0x642164
+  4536c7:	xor    eax,0x1234567f
+  4536cc:	mov    ecx,eax
+  4536ce:	shl    ecx,0x19
+  4536d1:	shr    eax,0x7
+  4536d4:	or     ecx,eax
+  4536d6:	mov    eax,ecx
+  4536d8:	add    DWORD PTR ds:0x642160,eax
+  4536de:	mov    eax,edx
+  4536e0:	shl    eax,0xd
+  4536e3:	shr    edx,0x13
+  4536e6:	or     eax,edx
+  4536e8:	mov    edx,eax
+  4536ea:	mov    DWORD PTR ds:0x642164,edx
+  4536f0:	mov    eax,ds:0x642160
+  4536f5:	and    eax,0xffff
+  4536fa:	ret

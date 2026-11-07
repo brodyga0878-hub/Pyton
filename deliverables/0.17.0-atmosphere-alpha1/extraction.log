@@ -1,0 +1,13 @@
+test_damage_and_rng_metadata_keep_original_field_units (test_extract_atmosphere.AtmosphereExtraction.test_damage_and_rng_metadata_keep_original_field_units) ... ok
+test_dos_heat_gear_damage_and_drag_do_not_silently_use_jjffe_fixes (test_extract_atmosphere.AtmosphereExtraction.test_dos_heat_gear_damage_and_drag_do_not_silently_use_jjffe_fixes) ... ok
+test_eight_original_procedure_bounds_and_digests (test_extract_atmosphere.AtmosphereExtraction.test_eight_original_procedure_bounds_and_digests) ... ok
+test_every_published_instruction_byte_is_at_the_real_dos_offset (test_extract_atmosphere.AtmosphereExtraction.test_every_published_instruction_byte_is_at_the_real_dos_offset) ... ok
+test_hull_profiles_keep_raw_specs_and_shielding_baseline (test_extract_atmosphere.AtmosphereExtraction.test_hull_profiles_keep_raw_specs_and_shielding_baseline) ... ok
+test_reextraction_is_reproducible_and_old_resource_changes_reject (test_extract_atmosphere.AtmosphereExtraction.test_reextraction_is_reproducible_and_old_resource_changes_reject) ... ok
+test_single_existing_heat_state_and_explicit_non_original_phone_rate (test_extract_atmosphere.AtmosphereExtraction.test_single_existing_heat_state_and_explicit_non_original_phone_rate) ... ok
+test_source_and_previous_resource_provenance_are_exact (test_extract_atmosphere.AtmosphereExtraction.test_source_and_previous_resource_provenance_are_exact) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.048s
+
+OK

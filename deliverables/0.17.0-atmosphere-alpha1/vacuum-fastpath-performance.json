@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "scope": "Desktop headless Session combinedfixed60 vacuum warp100 reference versus guarded fastpath; not phone/GPU/FPS",
+  "outer_calls_each": 50,
+  "virtual_steps_each": 5000,
+  "forced_slow": {
+    "total_usec": 3667179,
+    "mean_outer_usec": 73343.58
+  },
+  "guarded_fastpath": {
+    "total_usec": 49111,
+    "mean_outer_usec": 982.22
+  },
+  "full_normal_coast_baseline": {
+    "iterations": 2000,
+    "total_usec": 2752057,
+    "mean_usec": 1376.0285,
+    "scope": "Navigation combinedfixed60 before fastpath"
+  },
+  "source_session_sha256": "0a0428071f8cfc188f80930474c804261626be6952d41a55b8399eb6b70c7bc8",
+  "correctness_report": "validation/thermal-2026-11-07/thermal-session-integration.json"
+}

@@ -1,0 +1,4 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+THERMAL SERVICES NATIVE VIEW EVIDENCE: [{"after_phone_hull_percent":37.125,"after_source_hull_u16":149,"full_source_hull_u16":400,"heat_s32":512,"initial_phone_hull_percent":37.625,"phase":"actual_unshielded_partial_hull","severity":"danger","source_drag_returned":true},{"actual_UI_widths":[320,440,720],"atmospheric_shielding":true,"drag_returned":true,"energy_shield_available":false,"fitting_touch_width":320,"phase":"actual_atmospheric_protection","phone_hull_percent":37.625,"source_heat_s32":8},{"critical_source_status":"Корабль потерян из-за повреждений.","destroyed_hull_percent":0.0,"outside_atmosphere_guidance":true,"phase":"explicit_warning_and_critical_boundaries","sampled_world_claim":false}]
+THERMAL SERVICES NATIVE VIEW TESTS: 55 checks, 0 failures

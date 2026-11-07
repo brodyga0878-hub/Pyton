@@ -1,0 +1,242 @@
+{
+  "schema": "starfrontier-current-atmosphere-targeted-summary-v1",
+  "created_utc": "2026-11-07T20:42:02.677015+00:00",
+  "version": "0.17.0-atmosphere-alpha1",
+  "checks": 81882,
+  "passed_suites": 30,
+  "failures": 0,
+  "status": "passed",
+  "suites": [
+    {
+      "test": "tests/test_source_atmospheric_dynamics.gd",
+      "checks": 36294,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/source-atmospheric-core.json"
+    },
+    {
+      "test": "tests/test_source_atmosphere_contact.gd",
+      "checks": 3904,
+      "failures": 0,
+      "proof": "validation/atmosphere-2026-11-07/source-atmosphere-contact.json"
+    },
+    {
+      "test": "tests/test_source_thermal_motion_bridge.gd",
+      "checks": 355,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/motion-bridge.json",
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/motion-logs/logs/source_thermal_motion_bridge.log"
+    },
+    {
+      "test": "tests/test_source_thermal_session.gd",
+      "checks": 118,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/thermal-session-integration.json",
+      "log": "validation/thermal-2026-11-07/source-thermal-session.log"
+    },
+    {
+      "test": "tests/test_source_fuel_session.gd",
+      "checks": 109,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/thermal-session-integration.json",
+      "log": "validation/thermal-2026-11-07/source-fuel-session.log"
+    },
+    {
+      "test": "tests/test_source_hyperdrive_navigation.gd",
+      "checks": 143,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/thermal-session-integration.json",
+      "log": "validation/thermal-2026-11-07/source-hyperdrive-navigation.log"
+    },
+    {
+      "test": "tests/test_native_navigation.gd",
+      "checks": 219,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/thermal-session-integration.json",
+      "log": "validation/thermal-2026-11-07/legacy-native-navigation.log"
+    },
+    {
+      "test": "tests/test_hyperdrive_services_view.gd",
+      "checks": 484,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/services-view-tests.json",
+      "log": "validation/thermal-2026-11-07/hyperdrive-services-view.log"
+    },
+    {
+      "test": "tests/test_hyperdrive_services_native_view.gd",
+      "checks": 54,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/services-view-tests.json",
+      "log": "validation/thermal-2026-11-07/hyperdrive-services-native-view.log"
+    },
+    {
+      "test": "tests/test_fuel_services_view.gd",
+      "checks": 229,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/services-view-tests.json",
+      "log": "validation/thermal-2026-11-07/fuel-services-view.log"
+    },
+    {
+      "test": "tests/test_fuel_services_native_view.gd",
+      "checks": 91,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/services-view-tests.json",
+      "log": "validation/thermal-2026-11-07/fuel-services-native-view.log"
+    },
+    {
+      "test": "tests/test_thermal_services_view.gd",
+      "checks": 111,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/services-view-tests.json",
+      "log": "validation/thermal-2026-11-07/thermal-services-view.log"
+    },
+    {
+      "test": "tests/test_thermal_services_native_view.gd",
+      "checks": 55,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/services-view-tests.json",
+      "log": "validation/thermal-2026-11-07/thermal-services-native-view.log"
+    },
+    {
+      "test": "tests/test_source_thermal_main.gd",
+      "checks": 463,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/final-main-summary.json",
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/final-main-runner/logs/source_thermal_main.log"
+    },
+    {
+      "test": "tests/test_source_fuel_main.gd",
+      "checks": 397,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/final-main-summary.json",
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/final-main-runner/logs/source_fuel_main.log"
+    },
+    {
+      "test": "tests/test_source_fuel_flight.gd",
+      "checks": 29,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/regressions.json",
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/regression-logs/logs/source_fuel_flight.log"
+    },
+    {
+      "test": "tests/test_source_hyperdrive_main.gd",
+      "checks": 70,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/regressions.json",
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/regression-logs/logs/source_hyperdrive_main.log"
+    },
+    {
+      "test": "tests/test_navigation_main.gd",
+      "checks": 53,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/regressions.json",
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/regression-logs/logs/navigation_main.log"
+    },
+    {
+      "test": "tests/test_flight_time_controller.gd",
+      "checks": 36926,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/regressions.json",
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/regression-logs/logs/flight_time_controller.log"
+    },
+    {
+      "test": "tests/test_source_motion_bridge.gd",
+      "checks": 81,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/regressions.json",
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/regression-logs/logs/source_motion_bridge.log"
+    },
+    {
+      "test": "tests/test_source_motion_main_continuation.gd",
+      "checks": 28,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/regressions.json",
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/regression-logs/logs/source_motion_main_continuation.log"
+    },
+    {
+      "test": "tests/test_classic_console_main.gd",
+      "checks": 42,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/regressions.json",
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/regression-logs/logs/classic_console_main.log"
+    },
+    {
+      "test": "tests/test_flight_projection.gd",
+      "checks": 691,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/regressions.json",
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/regression-logs/logs/flight_projection.log"
+    },
+    {
+      "test": "tests/test_source_console_pause.gd",
+      "checks": 131,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/regressions.json",
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/regression-logs/logs/source_console_pause.log"
+    },
+    {
+      "test": "tests/test_source_full_startup.gd",
+      "checks": 10,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/regressions.json",
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/regression-logs/logs/source_full_startup.log"
+    },
+    {
+      "test": "tests/test_source_main_full.gd",
+      "checks": 153,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/regressions.json",
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/regression-logs/logs/source_main_full.log"
+    },
+    {
+      "test": "tests/test_source_docking_flight.gd",
+      "checks": 402,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/regressions.json",
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/regression-logs/logs/source_docking_flight.log"
+    },
+    {
+      "test": "tests/test_graphics_integration.gd",
+      "checks": 44,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/regressions.json",
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/regression-logs/logs/graphics_integration.log"
+    },
+    {
+      "test": "tests/test_graphics_scope.gd",
+      "checks": 87,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/regressions.json",
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/regression-logs/logs/graphics_scope.log"
+    },
+    {
+      "test": "tests/test_offpad_takeoff.gd",
+      "checks": 109,
+      "failures": 0,
+      "proof": "validation/thermal-2026-11-07/regressions.json",
+      "log": "/workspace/Pyton/validation/thermal-2026-11-07/regression-logs/logs/offpad_takeoff.log"
+    }
+  ],
+  "proofs_sha256": {
+    "validation/thermal-2026-11-07/source-atmospheric-core.json": "533613d845788789747c414eea7ebacb3a52e72a40797f65e1176d76bbac0cc9",
+    "validation/atmosphere-2026-11-07/source-atmosphere-contact.json": "34394e18b8096d26f7b30215db9945072b616c22d54a07bed3b72f2473c9d534",
+    "validation/thermal-2026-11-07/motion-bridge.json": "fccbfe70270066ee2afe1fd94679ae45ba38e91dec827e5162153e05dc0a9ab8",
+    "validation/thermal-2026-11-07/thermal-session-integration.json": "0b18430a325dc4c0900433347ae5ca53b883b625a00d8a68491efa2ee8a0ab2e",
+    "validation/thermal-2026-11-07/services-view-tests.json": "d7bfe944410d65a1be0496af456ddcb2a0f823f196a3c9bec051b3540e9aaf1e",
+    "validation/thermal-2026-11-07/final-main-summary.json": "43cd0d8c5eea4566a0e66825472a56dc1c70c603fa1d122777698cdd1ebeea1e",
+    "validation/thermal-2026-11-07/regressions.json": "dde2b154fbdaefda802e5c68c7e8cf0d3599fb1e7e65bd25bf0c7e6e55a04955"
+  },
+  "new_instruction_matched_DOS_native_cases": 1447,
+  "new_pinned_JJFFE_speed_native_cases": 239,
+  "reused_solid_geometry_fixture_records": 377,
+  "reused_pinned_JJFFE_gas_geometry_fixture_records": 330,
+  "reused_geometry_records_are_new_native_executions": false,
+  "native_cases_included_in_core_checks": true,
+  "historical_totals_added": false,
+  "repeated_source_archive_checks_added": false,
+  "capture_checks_added": false,
+  "scope": "One current passing result per unique selected kernel/contact/session/UI/Main/clock/motion/flight/save/surface/graphics suite. Native controls are included in core totals. Failed intermediate runs, repeated portability/capture checks and historical release totals are excluded; bounded per-suite timestamps retained, not an atomic full-game run.",
+  "full_original_port_complete": false,
+  "full_original_physics": false,
+  "physical_device_tested": false,
+  "production_release_ready": false
+}

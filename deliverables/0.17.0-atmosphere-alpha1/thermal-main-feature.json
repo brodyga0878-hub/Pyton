@@ -1,0 +1,32 @@
+{
+  "schema": "starfrontier-source-archive-thermal-feature-v1",
+  "started_utc": "2026-11-07T20:50:50.502329+00:00",
+  "finished_utc": "2026-11-07T20:51:09.931204+00:00",
+  "duration_seconds": 19.428888,
+  "source_commit": "714624bba30d6359921cced42be2c1adb8d4c5bd",
+  "archive_sha256": "bf87804585f3ba90a8be2459dd8c368e8c02f97797808d68b16386bece296d29",
+  "command": [
+    "godot",
+    "--headless",
+    "--audio-driver",
+    "Dummy",
+    "--path",
+    "/workspace/recovery/atmosphere-source-portability/source/StarFrontier-0.17.0-atmosphere-source",
+    "--script",
+    "res://tests/test_source_thermal_main.gd",
+    "--",
+    "--rebuild-capture"
+  ],
+  "exit_code": 0,
+  "checks": 463,
+  "failures": 0,
+  "error_markers": [],
+  "source_actual_files": 1268,
+  "all_source_files_unchanged": true,
+  "modified_files": [],
+  "private_xdg": true,
+  "execution_policy": "require_escalated",
+  "log_sha256": "778c6760648b68cfb044879f19bd0c3e3d255300008d57f8d2aa6c364285c486",
+  "scope": "Exact source ZIP, fresh isolated actual Main thermal/damage/raw-motion/migration/backup/save test. Repeated portability checks excluded from current distinct total. No Android device execution.",
+  "ok": true
+}

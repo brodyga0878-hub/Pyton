@@ -1,0 +1,33 @@
+{
+  "created_utc": "2026-11-07T20:49:42.679403+00:00",
+  "source_commit": "714624bba30d6359921cced42be2c1adb8d4c5bd",
+  "archive_path": "/workspace/Pyton/deliverables/0.17.0-atmosphere-alpha1/StarFrontier-0.17.0-atmosphere-source.zip",
+  "archive_bytes": 30817760,
+  "archive_sha256": "bf87804585f3ba90a8be2459dd8c368e8c02f97797808d68b16386bece296d29",
+  "archive_entries": 1421,
+  "archive_actual_files": 1268,
+  "archive_crc_ok": true,
+  "archive_below_32MiB": true,
+  "apk_bytes": 50038396,
+  "apk_sha256": "8df3ed0fa1d790437bd536c16c7997ee18b263c39f462a6bad2716939e6fad63",
+  "archive_roots": [
+    ".gitignore",
+    "README.md",
+    "SOURCE_ARCHIVE_RU.md",
+    "assets",
+    "data",
+    "docs",
+    "export_presets.cfg",
+    "icon.svg",
+    "icon.svg.import",
+    "project.godot",
+    "recovered-history",
+    "recovery",
+    "scenes",
+    "scripts",
+    "tests",
+    "tools",
+    "validation/parity-audit-2026-11-07"
+  ],
+  "source_docs_prepublication": true
+}
