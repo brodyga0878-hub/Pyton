@@ -1,0 +1,273 @@
+{
+  "version": "0.15.0-hyperdrive-alpha1",
+  "version_code": 40,
+  "created_utc": "2026-11-07T17:35:37.985031+00:00",
+  "source_commit": "48d4b05161e8bcce1716e94d7f4845e0793f4714",
+  "source_archive_scope": "Exact git archive -9 of reconstruction plus scoped static parity audit; other validation/build/deliverables/SDK/keys/caches excluded. Docs reflect pre-publication source state.",
+  "source_archive_files": 1353,
+  "source_archive_actual_file_count": 1200,
+  "source_archive_below_32MiB": true,
+  "source_archive_crc_verified": true,
+  "source_archive_fresh_import_passed": true,
+  "source_archive_isolated_native_startup_checks": 10,
+  "source_archive_isolated_native_startup_failures": 0,
+  "source_archive_hyperdrive_Main_checks": 70,
+  "source_archive_hyperdrive_Main_failures": 0,
+  "source_archive_actual_files_unchanged": 1200,
+  "checks": 70630,
+  "passed_suites": 16,
+  "failures": 0,
+  "validation_status": "passed",
+  "validation_report": "final-targeted-summary.json",
+  "validation_scope": "One current result per core, integration, UI/Main/map and9 curated regression groups. Independent native cases included in core; repeated ZIP checks and historical totals excluded. Bounded proof timestamps and runtime stamps retained.",
+  "native_original_hyperdrive_safe_case_count": 5453,
+  "native_original_hyperdrive_fault_domains": 11,
+  "native_cases_included_in_core_checks": true,
+  "python_packaging_tests": 93,
+  "python_extraction_tests": 7,
+  "python_distinct_tests": 100,
+  "independent_original_byte_checks": 1198,
+  "capture_checks": 120,
+  "capture_checks_added_to_targeted_total": false,
+  "fresh_desktop_gles_frames_visually_inspected": 8,
+  "screenshots_are_phone_captures": false,
+  "renderer": "Godot4.6.3 Compatibility/OpenGL Mesa llvmpipe Linux virtual display",
+  "frozen_runtime_inputs": 393,
+  "additional_runtime_modules": 3,
+  "additional_shaders": 0,
+  "additional_textures": 0,
+  "additional_source_JSON": 1,
+  "runtime_material_maps": 51,
+  "source_drive_records": 15,
+  "source_ship_specifications": 57,
+  "all57_ships_playable": false,
+  "source_f833_distance_live": true,
+  "source_f899_f903_quote_live": true,
+  "legacy_v1_v2_rules_preserved": true,
+  "v2_source_migration_requires_independent_backup": true,
+  "source_f908_full_pipeline": false,
+  "jetfuel_or_star_scoop_added_by_this_block": false,
+  "original_workshop_market": false,
+  "workshop_pricing_adapter": "basic-source-workshop-pricing-adapter-v1",
+  "package": "org.starfrontier.rebuild",
+  "abi": "arm64-v8a",
+  "min_sdk": 24,
+  "target_sdk": 36,
+  "debuggable": false,
+  "zip_and_elf_alignment_16k": true,
+  "test_key_only": true,
+  "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+  "physical_device_tested": false,
+  "production_signing_key_configured": false,
+  "production_release_ready": false,
+  "full_original_port_complete": false,
+  "full_original_physics": false,
+  "full_russian_localization_complete": false,
+  "game_completion_percent": null,
+  "full_release_date": null,
+  "next_functional_priority": "Original jet-fuel, scooping/refuelling and remaining flight/equipment rules within block9.",
+  "artifact_upload_authorized": true,
+  "publication_state_at_packaging": "Prepared for authorized GitHub backup; full immutable HTTPS downloads verified separately after upload.",
+  "files": {
+    "README_RU.md": {
+      "bytes": 3837,
+      "sha256": "0417d6783b497b95871dd97f97e989c73da7ab1f1dfa2fe1aa8c3c09b8faab26"
+    },
+    "StarFrontier-0.15.0-hyperdrive-arm64.apk": {
+      "bytes": 49934782,
+      "sha256": "eed44e84639ae62f5c3afdf1bee8d666f83d1ca1b6e7144dcaf4fd8b2490246a"
+    },
+    "StarFrontier-0.15.0-hyperdrive-source.zip": {
+      "bytes": 30094130,
+      "sha256": "9e03cfd4832a307754e019c37b631831178a72a5f5eb58fe82f9d7c0dc9887f7"
+    },
+    "android-export.log": {
+      "bytes": 6975,
+      "sha256": "1c68d70768c7b9f63bb3989fd68d6fd733c7cdb13ef233c403cc7c0f4cb40b4b"
+    },
+    "android-verification.json": {
+      "bytes": 93505,
+      "sha256": "28c9bd11741fda86ea71735bf7a86d7c1495877a294931fe72d9c8f895d8c3ef"
+    },
+    "capture.log": {
+      "bytes": 428,
+      "sha256": "35393fae14cac46772ca56ae15665638ce2bad74fc8111d2ff0546d0736351cf"
+    },
+    "extraction.json": {
+      "bytes": 974,
+      "sha256": "9c25c39a27f0c4ab4677f79b367acab0e85abd0c26128665bd82bd2e3dc3aa95"
+    },
+    "extraction.log": {
+      "bytes": 1272,
+      "sha256": "2aa602d3a50701b199eb594d3f5c105641896b9961f603a37a4ef68df13f3f14"
+    },
+    "final-targeted-summary.json": {
+      "bytes": 11698,
+      "sha256": "9fd9db0d436753fe78877f9fab130077c5ff1fe7eede675bd4b98b5a38aa58be"
+    },
+    "hyperdrive-main-feature.json": {
+      "bytes": 1194,
+      "sha256": "4d5c4ee0c9f1ae75419c6dbc1cd4727d8394d82b975c0afc593c5bbd2d2a9485"
+    },
+    "hyperdrive-main-feature.log": {
+      "bytes": 119,
+      "sha256": "714642268b5d030046e011e56f234bb451f4042b5a194b32c21d1e1878eecbd8"
+    },
+    "independent-extraction.json": {
+      "bytes": 1321,
+      "sha256": "3326b04eb3ae4a51a0b2423ef18a8a65e5d54211a835dcbcbc22c8e34977f832"
+    },
+    "legacy-native-navigation.log": {
+      "bytes": 121,
+      "sha256": "875e664e3e0605e0a71b2fabc284598e30216783875c466de66f2fc2dd78f140"
+    },
+    "navigation-integration.json": {
+      "bytes": 1780,
+      "sha256": "34977a427a7960d18d048131546a15ce3a43f79db323ea3e02fee7b9117c84f9"
+    },
+    "packaging-independent-review.json": {
+      "bytes": 703,
+      "sha256": "51f4aa4e72a1f6549a06449477b4dc0ccb443b14d96087ef0fd35137071aa48e"
+    },
+    "packaging-observed.log": {
+      "bytes": 127,
+      "sha256": "d9e3bbb4da6535ec82292505f239ef6a1b4370cf5b28907b8c4554418489b824"
+    },
+    "packaging.json": {
+      "bytes": 2453,
+      "sha256": "43e69637ff930a6f0be687058fd21dc7d5d679a3a54910ca2eda1dd2fca53b49"
+    },
+    "regression-logs/logs/app_transitions.log": {
+      "bytes": 120,
+      "sha256": "0c190763c029bb01bb6bb16c947fe7d80537e36b271d22fc91c468771ba45cd4"
+    },
+    "regression-logs/logs/classic_console_main.log": {
+      "bytes": 123,
+      "sha256": "fd1b59ff7ab0184ebb05c966c93c20e81d6f74731c727c273818a1dadac0b0b3"
+    },
+    "regression-logs/logs/galactic_map_view.log": {
+      "bytes": 122,
+      "sha256": "d5cc0ed4b00963fd1c0a8de424b0e8772065969d25340166795f1d379a0baaa3"
+    },
+    "regression-logs/logs/graphics_integration.log": {
+      "bytes": 123,
+      "sha256": "f6b6dc847918df771b6f2ac4b0b0f0537855cf6f5247269fadb9b1f4b8ea6d06"
+    },
+    "regression-logs/logs/graphics_scope.log": {
+      "bytes": 355,
+      "sha256": "b7ec54445dbb93814b7877b35fd9c0b18e5e17f8dcf4a62aa1fba3a09f2692bb"
+    },
+    "regression-logs/logs/navigation_main.log": {
+      "bytes": 118,
+      "sha256": "341f62f03e5ea9792cb9e4caaf3261f7e61c57b9664e49fe27d12453ab4c12b6"
+    },
+    "regression-logs/logs/source_console_pause.log": {
+      "bytes": 1713,
+      "sha256": "1632b869ffb60aefc0e86d11ea26a7c794be7e22dc736d4aca659f32f29341f9"
+    },
+    "regression-logs/logs/source_full_startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "regression-logs/logs/source_main_full.log": {
+      "bytes": 510,
+      "sha256": "ec531259006eba083849a668835dbfe82d927858f46cfce6e03752a286a76d9a"
+    },
+    "regression-summary.json": {
+      "bytes": 11488,
+      "sha256": "66bb5bc0abaa6020a6838041c34b9c545aa68126d0fb67c3b6cf5c875087cf09"
+    },
+    "runtime-freeze.json": {
+      "bytes": 43584,
+      "sha256": "d5b4c5c9e4977fe63b8c7ab0cb4fb3f89a55e9f13d8f3d75d27aeadcf15710dd"
+    },
+    "screenshots/01-source-equipment-sol.png": {
+      "bytes": 113543,
+      "sha256": "ba322a2e3841c9f9822db55716f3ea5e46b079f87bb831f2cbbe6ad8eae62c02"
+    },
+    "screenshots/02-source-equipment-narrow.png": {
+      "bytes": 103333,
+      "sha256": "069f7afb58852e1608c36be45edf54c869ddaf4348deb86c6bde2bd69c4f3af7"
+    },
+    "screenshots/03-military-equipment-sol.png": {
+      "bytes": 113553,
+      "sha256": "ef6fa1632e7f2d6c7731d79407c9940b624f5bb1f725f026a3b90b7ec88fb733"
+    },
+    "screenshots/04-alpha-source-route.png": {
+      "bytes": 193431,
+      "sha256": "bbb020845aec4d66c46d79f9a149713c64e4c94784772210cc39eb649023b43b"
+    },
+    "screenshots/05-source-charge-classic-console.png": {
+      "bytes": 221619,
+      "sha256": "0adcec6a8c4d85bdc30e76a9ed3167c7f086909921c651d36347f32fe8820051"
+    },
+    "screenshots/06-military-waste-after-arrival.png": {
+      "bytes": 111580,
+      "sha256": "81e0a81b5466d10de6a4b95199cff59aac705bd2c166fd19bde2c36a7cb3c8dd"
+    },
+    "screenshots/07-legacy-migration-review.png": {
+      "bytes": 108067,
+      "sha256": "976afa8bd58254725f0b5847c01c7db292d93f17abb0efd1cb077d07f61f63e0"
+    },
+    "screenshots/08-return-classic-flight.png": {
+      "bytes": 217802,
+      "sha256": "ab6b763c2a7e08c0e46956bd63bddf5150cda6c553ec5812787e457c838f21dd"
+    },
+    "screenshots/capture-manifest.json": {
+      "bytes": 64364,
+      "sha256": "6bafaaabc50490c97391fb3701cb007ee1cbed7a76b6f9c5bd05e60f7c192bf4"
+    },
+    "services-view-fixture.json": {
+      "bytes": 1263,
+      "sha256": "7a8caf9b7ad3675db0d1ce50557c4a6e30408a863ca618b4889a89a12417a019"
+    },
+    "services-view-fixture.log": {
+      "bytes": 128,
+      "sha256": "ad588172bf909e0b19aaa7bc6ba9b0879c652536f8692e66cc9c6e9fefac3c39"
+    },
+    "services-view-native.log": {
+      "bytes": 855,
+      "sha256": "c00971c0b384aebcc35858e3b66728ce8d7c0eb7b7ca1b23887eb40ed36bfb23"
+    },
+    "services-view-tests.json": {
+      "bytes": 3174,
+      "sha256": "fc80e942dd2947740e1c70a8477f3515e04d0118e6e16dbcd1b13be25b6a34fa"
+    },
+    "source-archive-import.log": {
+      "bytes": 26188,
+      "sha256": "f4319240897013c458482eb000990ed26571db3beee60ee58c1464955835219b"
+    },
+    "source-archive-startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "source-archive-verification.json": {
+      "bytes": 5610,
+      "sha256": "455137fdf2203831b0a3a23ecbb56f48506e071e7a8f24a0ea0ade8d1e3fc5d6"
+    },
+    "source-hyperdrive-core.json": {
+      "bytes": 1299,
+      "sha256": "06ff8197d2fb19de87f795bad120172349d4229a66f9681b9af88bd3373e7817"
+    },
+    "source-hyperdrive-core.log": {
+      "bytes": 117,
+      "sha256": "13797d69a097148e5a04d9cd5d9f53702a0784dc5d0e38d154ff339798e6f85e"
+    },
+    "source-hyperdrive-main.json": {
+      "bytes": 1383,
+      "sha256": "9d649b12b5c6dbbc29f6fdc03eef6ea462e77a2320613e49dd16e6607e995bcc"
+    },
+    "source-hyperdrive-main.log": {
+      "bytes": 119,
+      "sha256": "714642268b5d030046e011e56f234bb451f4042b5a194b32c21d1e1878eecbd8"
+    },
+    "source-hyperdrive-navigation.log": {
+      "bytes": 126,
+      "sha256": "9e49696cf7496e1a106a4c0b5a371fd9c2d87cf91c3ceb5d13a20b1769104eb9"
+    },
+    "source-map.log": {
+      "bytes": 124,
+      "sha256": "22fb8b1faa27d97af5a58149fa4cf80c3589d8c4f6e7cbd4f4d9cc68640f82fe"
+    }
+  }
+}

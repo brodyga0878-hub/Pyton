@@ -1,0 +1,42 @@
+{
+	"checks": 66147,
+	"evidence": [
+		{
+			"canaries_unchanged": true,
+			"domain_failures": {
+
+			},
+			"fresh_process_runs": 3.0,
+			"native_cases": 5453.0,
+			"native_fault_cases": 11,
+			"native_output_sha256": "55be192cd9f67d0ac81108c2c4b0496da663e9b2675a04e3a3c234a9f087e551",
+			"operations": {
+				"F1521": 589,
+				"F833": 280,
+				"F833_F903": 72,
+				"F899": 96,
+				"F900": 96,
+				"F901": 96,
+				"F902": 282,
+				"F903": 3942
+			}
+		},
+		{
+			"drive_index": 2,
+			"mass_tonnes": 100,
+			"max_range_raw": 300,
+			"model_index": 38,
+			"source_table_sha256": "82659f368ab7b4298735b16b4f76276207a19d1b529526c4452c2c78569fe654",
+			"time_raw_u32": 458745
+		}
+	],
+	"failures": 0,
+	"schema": 1,
+	"scope": "Original F899..F903/F1521 and F833 distance arithmetic, immutable raw evaluator and safe source-spec quote. Does not implement complete hyperspace entry/arrival, misjumps, interception, drive failures or service prices.",
+	"sources": {
+		"core_sha256": "b79cd38051e44d52fcd4f2beb173b2699096e7d9aea9a0288aba205e453a8874",
+		"fixture_sha256": "5f5034fb0b2b2b73d1b82b73217b7ee0a4483b483f8f9921e1f640d2dbb91eae",
+		"resource_sha256": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+		"test_sha256": "9d97f9bd8f18ea0690b89dbb168744f1ac271c7259357be0a9bf4c761ea190fc"
+	}
+}

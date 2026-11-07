@@ -1,0 +1,110 @@
+{
+  "schema": "starfrontier-source-archive-portability-v1",
+  "started_utc": "2026-11-07T17:34:29.016023+00:00",
+  "archive_path": "/workspace/Pyton/deliverables/0.15.0-hyperdrive-alpha1/StarFrontier-0.15.0-hyperdrive-source.zip",
+  "archive_sha256": "9e03cfd4832a307754e019c37b631831178a72a5f5eb58fe82f9d7c0dc9887f7",
+  "expected_archive_sha256": "9e03cfd4832a307754e019c37b631831178a72a5f5eb58fe82f9d7c0dc9887f7",
+  "archive_bytes": 30094130,
+  "source_commit": "48d4b05161e8bcce1716e94d7f4845e0793f4714",
+  "workspace": "/workspace/recovery/hyperdrive-source-portability",
+  "source_project_path": "/workspace/recovery/hyperdrive-source-portability/source/StarFrontier-0.15.0-hyperdrive-source",
+  "fresh_extraction": true,
+  "private_xdg": true,
+  "apk_built": false,
+  "host_sdk_copied": false,
+  "commands": [
+    {
+      "name": "source-archive-import",
+      "started_utc": "2026-11-07T17:34:29.633671+00:00",
+      "finished_utc": "2026-11-07T17:34:36.278478+00:00",
+      "duration_seconds": 6.64481,
+      "command": [
+        "godot",
+        "--headless",
+        "--audio-driver",
+        "Dummy",
+        "--editor",
+        "--quit",
+        "--path",
+        "/workspace/recovery/hyperdrive-source-portability/source/StarFrontier-0.15.0-hyperdrive-source"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "log_path": "/workspace/Pyton/validation/hyperdrive-source-portability-2026-11-07/source-archive-import.log",
+      "log_sha256": "f4319240897013c458482eb000990ed26571db3beee60ee58c1464955835219b",
+      "log_bytes": 26188,
+      "error_markers": []
+    },
+    {
+      "name": "source-archive-startup",
+      "started_utc": "2026-11-07T17:34:36.278814+00:00",
+      "finished_utc": "2026-11-07T17:34:37.348726+00:00",
+      "duration_seconds": 1.069934,
+      "command": [
+        "godot",
+        "--headless",
+        "--audio-driver",
+        "Dummy",
+        "--path",
+        "/workspace/recovery/hyperdrive-source-portability/source/StarFrontier-0.15.0-hyperdrive-source",
+        "--script",
+        "res://tests/test_source_full_startup.gd",
+        "--",
+        "--source-startup-isolated"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "log_path": "/workspace/Pyton/validation/hyperdrive-source-portability-2026-11-07/source-archive-startup.log",
+      "log_sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36",
+      "log_bytes": 122,
+      "error_markers": []
+    }
+  ],
+  "ok": true,
+  "execution_policy": "require_escalated",
+  "archive_commit_comment": "48d4b05161e8bcce1716e94d7f4845e0793f4714",
+  "nested_historical_godot_projects": [
+    "StarFrontier-0.15.0-hyperdrive-source/recovered-history/release_audit/project.godot"
+  ],
+  "static_audit_packaging": {
+    "scope": "Presence, file hashes, counts and explicit limitations only; not semantic review or full-game equivalence.",
+    "required_files_sha256": {
+      "docs/PARITY_AUDIT_RU.md": "e932929909dd685a5443f899e4e5150f21981ee7011340dc429e18648b9541b6",
+      "docs/PARITY_AUDIT_SYSTEM_INFO_RU.md": "54a7761ccaad6ca67f1b98eb94b45a19049d478f54a9b107eaf29bf96e758c65",
+      "docs/PARITY_AUDIT_PHYSICS_RU.md": "360490ae23ba7243e2d56cb0dbb1258f9a6bfdef0dd2131b72fc6cc5e672753b",
+      "docs/PARITY_AUDIT_SHIPS_ECONOMY_COMBAT_RU.md": "6e37b336cffe9e0d80bb2c537a79ca733777f7fc89ba44fa9185d568333edfe9",
+      "docs/PARITY_AUDIT_CAMPAIGN_CONTENT_RU.md": "6a75d064f19fb9cd19c856188ea7cca5608db0a675ac79c3a8add42c36b3e721",
+      "docs/PARITY_AUDIT_RESOURCES_GRAPHICS_RU.md": "ba969cc581317cc38a87b845f7db0c64bc5a70048d060fe58e456e7e55225209",
+      "tools/audit_original_parity.py": "61dfcacf8f1887812ea268fc58d884a581fdc46b77453b0b062ee35ed05dc77f",
+      "validation/parity-audit-2026-11-07/original-function-catalog.json": "4fff7e078f690cf3dcf64a85247d544ce6e5257e8346823a6a870675ca7ed630",
+      "validation/parity-audit-2026-11-07/original-function-catalog.csv": "cad2ab202709cc7e33ab3fc164dab22cd4e62314a7a7f06063730c5ea77765e7",
+      "validation/parity-audit-2026-11-07/original-data-block-catalog.json": "adc5764f71eb9f31cdbed05a2388f8c3bab81f0db8e58b15966091f2d4498161",
+      "validation/parity-audit-2026-11-07/resource-inventory.json": "5a4dd3492358eb145bb3abf6907d88a89358622cfc1473ece58b9c9abdbc234e"
+    },
+    "function_definitions": 1615,
+    "upstream_source_inventory_entries": 50,
+    "data_declarations": 8649,
+    "mentions_are_not_full_port_counts": true,
+    "jjffe_dos_equivalence_claim": false,
+    "full_game_incompleteness_statement_present": true
+  },
+  "archive_file_count": 1200,
+  "archive_crc_ok": true,
+  "archive_source_inventory_sha256": "fb318da0a1a7832ff63e6ece0fdd5c9ee3c687b29cadfd3103688457b8fb6807",
+  "import_cache_before": false,
+  "project_godot_sha256": "634ec52da910101dce6e96fb230c1e06d7d50445b4a352e4f045ea29111e958a",
+  "startup_test_sha256": "ffaa0a4a6736da6409315e74753c15896e73d55e01348b42314652126f9b9c06",
+  "main_source_sha256": "25dad04995505b2c119cc45470ff531c657dd80eb6963408a427bae641823049",
+  "private_environment_overrides": {
+    "XDG_DATA_HOME": "/workspace/recovery/hyperdrive-source-portability/source_full_startup/data",
+    "XDG_CONFIG_HOME": "/workspace/recovery/hyperdrive-source-portability/source_full_startup/config",
+    "XDG_CACHE_HOME": "/workspace/recovery/hyperdrive-source-portability/source_full_startup/cache"
+  },
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "startup_checks": 10,
+  "startup_failures": 0,
+  "import_cache_after": true,
+  "extracted_archive_files_unchanged": true,
+  "modified_archive_files": [],
+  "finished_utc": "2026-11-07T17:34:37.445763+00:00"
+}

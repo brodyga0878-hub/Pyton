@@ -1,0 +1,48 @@
+{
+  "time_utc": "2026-11-07T17:25:11.018184+00:00",
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_*packaging.py",
+    "-q"
+  ],
+  "exit_code": 0,
+  "observed_summary": "Ran93 tests in1.697s; OK",
+  "test_count": 93,
+  "failures": 0,
+  "groups": {
+    "test_android_full_packaging": 58,
+    "test_system_information_packaging": 16,
+    "test_hyperdrive_packaging": 19
+  },
+  "archive_kind": "explicit in-memory unit mock, not an APK",
+  "old_contracts": "v37/v38 strict original controls; v39 exact8609512 source overlay",
+  "audited_source_sha256": {
+    "scripts/source_hyperdrive.gd": "b79cd38051e44d52fcd4f2beb173b2699096e7d9aea9a0288aba205e453a8874",
+    "scripts/navigation.gd": "3bc3d50e1c008b0f9f37f587e804729450ced47baf19330a27550d6343dccc1c",
+    "scripts/source_hyperdrive_session.gd": "0a505bd31bbffc703c9c06144b2f58167aa1da525de8ed013de5af4b58d2e59a",
+    "scripts/hyperdrive_services_view.gd": "755fad2ba1d52366a64954621f3406c4483bff299ead44a0d7151f502acac468",
+    "scripts/main.gd": "25dad04995505b2c119cc45470ff531c657dd80eb6963408a427bae641823049",
+    "scripts/galactic_map_model.gd": "597a5bd049e3dea2698bfbc255a0d57e7c98b70fabedfe09d56bb60ccd3a11a5",
+    "scripts/galactic_map_view.gd": "9a2a6fa97d9ab4f6ce572a5e10bb390d5036ccf6d30e3bc31e087a61440b7876"
+  },
+  "new_source_resource_sha256": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+  "file_sha256": {
+    "tools/verify_rebuilt_android.py": "efb5ae72bb714b698cb742572190478d0da00f71f9198fb966a7eec2a31dbc32",
+    "tests/test_android_full_packaging.py": "5afdc2fae8a3a18fff12e492c5da73dc3dec21312b79bd0c1672750f9fb61520",
+    "tests/test_system_information_packaging.py": "a5d98647c9f4e748a142932414eed53da65f9d6896265ba3b3b68d700ac40327",
+    "tests/test_hyperdrive_packaging.py": "47fade662702d49c3e4992ae23c861b55b494c0cfe75b0a0980091fa17f7f742",
+    "tests/fixtures/hyperdrive_v39_sources.json": "a34bc6165aad5a9626f129fe7d903bf448fdd6058c5b98aa537c0344fcbcd755",
+    "tests/fixtures/source_hyperdrive_native.json": "5f5034fb0b2b2b73d1b82b73217b7ee0a4483b483f8f9921e1f640d2dbb91eae",
+    "data/ffe_hyperdrive.json": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47"
+  },
+  "physical_device_tested": false,
+  "actual_signed_apk_verified_by_this_run": false,
+  "native_oracle_executed_by_this_run": false,
+  "compiled_source_correspondence_rebuilt_by_this_run": false
+}

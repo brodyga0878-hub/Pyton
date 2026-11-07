@@ -1,0 +1,32 @@
+{
+  "schema": "starfrontier-source-archive-hyperdrive-feature-v1",
+  "started_utc": "2026-11-07T17:35:21.344444+00:00",
+  "finished_utc": "2026-11-07T17:35:23.822705+00:00",
+  "duration_seconds": 2.478273,
+  "source_commit": "48d4b05161e8bcce1716e94d7f4845e0793f4714",
+  "archive_sha256": "9e03cfd4832a307754e019c37b631831178a72a5f5eb58fe82f9d7c0dc9887f7",
+  "command": [
+    "godot",
+    "--headless",
+    "--audio-driver",
+    "Dummy",
+    "--path",
+    "/workspace/recovery/hyperdrive-source-portability/source/StarFrontier-0.15.0-hyperdrive-source",
+    "--script",
+    "res://tests/test_source_hyperdrive_main.gd",
+    "--",
+    "--rebuild-capture"
+  ],
+  "exit_code": 0,
+  "checks": 70,
+  "failures": 0,
+  "error_markers": [],
+  "source_actual_files": 1200,
+  "all_source_files_unchanged": true,
+  "modified_files": [],
+  "private_xdg": true,
+  "execution_policy": "require_escalated",
+  "log_sha256": "714642268b5d030046e011e56f234bb451f4042b5a194b32c21d1e1878eecbd8",
+  "scope": "Exact frozen downloaded-source candidate, fresh isolated native Main hyperdrive/migration/backup integration; repeated checks excluded from70630 current total. No Android device execution.",
+  "ok": true
+}

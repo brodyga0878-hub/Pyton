@@ -1,0 +1,13 @@
+{
+  "reviewer": "/root/rotating_dock_impl/rotating_contact_review",
+  "time_utc": "2026-11-07T17:25:11.028050+00:00",
+  "read_only": true,
+  "checks": 30,
+  "failures": 0,
+  "source_pins_policy": "Review ran before final runtime freeze; four known changing pins were normalized only in RAM, no source or verifier edits. Final93-suite above uses real frozen pins.",
+  "scope": "Baseline; missing/corrupt6GDSC;missing3JSON;7integration+3info+SystemMap localsource mutants; coordinated local/APK mutation each3JSON;retained navigation11module gate",
+  "old37_38_wrappers_unchanged": true,
+  "old39_checks_preserved": true,
+  "compiled_source_correspondence_proved": false,
+  "actual_apk_verified": false
+}

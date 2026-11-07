@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "completed_utc": "2026-11-07T17:27:15.410922+00:00",
+  "checks": 484,
+  "failures": 0,
+  "sources": {
+    "scripts/hyperdrive_services_view.gd": "755fad2ba1d52366a64954621f3406c4483bff299ead44a0d7151f502acac468",
+    "tests/test_hyperdrive_services_view.gd": "f37d97a1e7c3b388f8828ea7d9e39be45695746190316b7f4a4f850378809508"
+  },
+  "scope": "Explicitly labelled fixture equipment/fuel quote display and exact touch command routing. Fixture prices are not claimed as original FFE market prices. Actual source consumer proof is in services-view-tests.json.",
+  "pricing_profile": "basic-source-workshop-pricing-adapter-v1",
+  "full_original_market_implemented": false,
+  "headless": true,
+  "gpu_capture": false,
+  "physical_device_tested": false,
+  "physical_dock_contact_tested": false,
+  "dock_context": "Isolated business-service fixture with explicit dock/port flags; Main physical contact integration is separate.",
+  "embedded_widths_tested": [
+    320,
+    440,
+    720,
+    960,
+    1440
+  ],
+  "native_backend_consumer_tested": false,
+  "results": [
+    {
+      "log": "services-view-fixture.log",
+      "checks": 484,
+      "failures": 0,
+      "sha256": "ad588172bf909e0b19aaa7bc6ba9b0879c652536f8692e66cc9c6e9fefac3c39"
+    }
+  ]
+}
