@@ -62,6 +62,14 @@ class InformationPackaging(unittest.TestCase):
             if entry['sha256']!=expected or hashlib.sha256(raw).hexdigest()!=expected:
                 raise AssertionError('Historical information packaging source differs: '+name)
             (cls.project/name).write_bytes(raw)
+        fuel_baseline=json.loads((PROJECT/'tests/fixtures/fuel_v40_sources.json').read_text())
+        if fuel_baseline['source_commit']!='c3872931413d5641c3b437aa2669ed444e5f8075':
+            raise AssertionError('Historical fuel baseline source commit changed')
+        for name in ['scripts/flight_model.gd','scripts/surface_model.gd','scripts/source_motion_bridge.gd']:
+            entry=fuel_baseline['files'][name];raw=entry['source'].encode()
+            if hashlib.sha256(raw).hexdigest()!=entry['sha256'] or entry['sha256']!=verifier.MAP_VISUAL_PROTECTED_SOURCE_SHA256[name]:
+                raise AssertionError('Historical physics baseline differs: '+name)
+            (cls.project/name).write_bytes(raw)
 
     def setUp(self):self.archive=MockInformationArchive(self.project)
 

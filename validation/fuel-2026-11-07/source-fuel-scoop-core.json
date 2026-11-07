@@ -1,0 +1,23 @@
+{
+	"checks": 10229,
+	"domains": {
+		"altitude_hud": 66,
+		"cargo": 24,
+		"cooldown_step_heat": 234,
+		"flag_model": 88,
+		"outside_spoilage": 12,
+		"random": 240,
+		"speed_equipment": 35,
+		"thermal": 30
+	},
+	"failures": 0,
+	"native_cases": 729,
+	"physical_device_tested": false,
+	"schema": 1,
+	"scope": "Original F1033/F1034 raw branch, cargo, timer, thermal and side-effect call parity after explicitly stubbed F569 result. Does not prove physical geometry, SI units, countdown scheduling, atmospheric heat/cooling, callback damage or Android device execution.",
+	"sources": {
+		"core_sha256": "de1e96fd3013de48557b340b9ca4e4d174c4d39aaebb8b2eee96250db53af296",
+		"fixture_sha256": "40d2a6528bc7607a442311aeea69c2fcc7ac9859ccfe4cc64a88ddf123f6b15f",
+		"test_sha256": "4e1566a74752da07b915317cfce4eb6ed76764c1a9e830609a625ebabb31a95a"
+	}
+}

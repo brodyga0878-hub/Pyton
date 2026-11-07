@@ -1,0 +1,32 @@
+{
+	"checks": 58890,
+	"evidence": [
+		{
+			"domain_failures": {
+
+			},
+			"jjffe_counterfactual_cases": 128.0,
+			"jjffe_counterfactual_differences": 84.0,
+			"native_cases": 3182.0,
+			"operations": {
+				"F289": 426,
+				"F929": 776,
+				"F938": 1660,
+				"cadence": 113,
+				"cooling": 192,
+				"initial_profile": 15
+			},
+			"scope": "F929 and F289 projected raw fuel/global/six-word results; F938 fuel tail only, excluding maintenance side effects. Supplementary F1007 cooling head and F152 cadence are bounded instruction slices, not complete event handlers.",
+			"source_policy": "uploaded-dos-f929-three-positive-limits-no-automatic-restore"
+		}
+	],
+	"failures": 0,
+	"schema": 1,
+	"scope": "Uploaded DOS F929, F938 jet consumption tail, F289 cargo-to-jet refuelling, bounded F1007 cooling head and F152 display-second cadence arithmetic. Excludes other shield/hull/laser maintenance, complete event/player thermal handlers, live integration and scoop/contact heat production.",
+	"sources": {
+		"core_sha256": "ef043cd3d7fe4ef06a08d1f6592bf97b5d1e6d81c5f2efe9ea067d514f207cc1",
+		"fixture_sha256": "ba1fa8be78c6c142fa037f0fb499e2aa2f2782077ad0b8f1da6a1dffa30051c8",
+		"resource_sha256": "4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f",
+		"test_sha256": "8d208f46d3a545016055a3b9a394547a673aa8cce91700a8452acfd5c71abe17"
+	}
+}

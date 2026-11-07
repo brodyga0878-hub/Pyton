@@ -4,6 +4,7 @@ No signatures, GPU, native instruction execution or GDSC-to-source equivalence
 is claimed here. Those are separate release checks.
 """
 import importlib.util
+import hashlib
 import json
 from pathlib import Path
 import tempfile
@@ -12,6 +13,9 @@ import unittest
 PROJECT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('hyperdrive_android_verifier',PROJECT/'tools/verify_rebuilt_android.py')
 verifier=importlib.util.module_from_spec(spec);spec.loader.exec_module(verifier)
+HISTORICAL_SOURCE_SHA256={**verifier.HYPERDRIVE_AUDITED_SOURCE_SHA256,
+                         **{name:verifier.MAP_VISUAL_PROTECTED_SOURCE_SHA256[name] for name in
+                            ['scripts/flight_model.gd','scripts/surface_model.gd','scripts/source_motion_bridge.gd']}}
 
 
 class MockHyperdriveArchive:
@@ -25,18 +29,39 @@ class MockHyperdriveArchive:
 
 
 class HyperdrivePackaging(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        directory=tempfile.TemporaryDirectory(prefix='hyperdrive-packaging-v40-')
+        cls.addClassCleanup(directory.cleanup)
+        cls.project=Path(directory.name)
+        for relative in cls.project_files():
+            path=cls.project/relative;path.parent.mkdir(parents=True,exist_ok=True)
+            path.write_bytes((PROJECT/relative).read_bytes())
+        baseline=json.loads((PROJECT/'tests/fixtures/fuel_v40_sources.json').read_text())
+        if baseline['source_commit']!='c3872931413d5641c3b437aa2669ed444e5f8075' or set(baseline['files'])!=set(HISTORICAL_SOURCE_SHA256):
+            raise AssertionError('Historical code40 source fixture changed')
+        for name,expected in HISTORICAL_SOURCE_SHA256.items():
+            entry=baseline['files'][name];raw=entry['source'].encode()
+            if entry['sha256']!=expected or hashlib.sha256(raw).hexdigest()!=expected:
+                raise AssertionError('Historical code40 source differs: '+name)
+            (cls.project/name).write_bytes(raw)
+
     def setUp(self):self.archive=MockHyperdriveArchive()
 
-    def project_copy(self,directory):
-        project=Path(directory)
+    @staticmethod
+    def project_files():
         files=set(verifier.MAP_VISUAL_PROTECTED_SOURCE_SHA256)
         files.update(verifier.HYPERDRIVE_AUDITED_SOURCE_SHA256)
         files.update(verifier.HYPERDRIVE_INFORMATION_SOURCE_SHA256)
         files.update(['scripts/celestial_renderer.gd','data/ffe_hyperdrive.json','tests/fixtures/source_hyperdrive_native.json'])
         files.update(f'data/{name}.json' for name in verifier.SYSTEM_INFORMATION_TABLES)
-        for relative in files:
+        return files
+
+    def project_copy(self,directory):
+        project=Path(directory)
+        for relative in self.project_files():
             path=project/relative;path.parent.mkdir(parents=True,exist_ok=True)
-            path.write_bytes((PROJECT/relative).read_bytes())
+            path.write_bytes((self.project/relative).read_bytes())
         return project
 
     def mutate_resource(self,project,name,callback):
@@ -49,8 +74,8 @@ class HyperdrivePackaging(unittest.TestCase):
         self.assertIn(old,function);changed=function.replace(old,new,1)
         path.write_text(raw.replace(function,changed,1))
 
-    def test_live_code40_scope_is_explicit_and_bounded(self):
-        result=verifier.verify_hyperdrive_runtime(self.archive,PROJECT)
+    def test_historical_code40_scope_is_explicit_and_bounded(self):
+        result=verifier.verify_hyperdrive_runtime(self.archive,self.project)
         self.assertEqual(result['baseline_source_commit'],'860951235548fc58c859d7337b9a6909fd78ca62')
         self.assertEqual((result['compiled_module_count'],result['drive_count'],result['ship_specification_count']),(3,15,57))
         self.assertEqual(result['protected_flight_source_data_count'],14)
@@ -65,25 +90,31 @@ class HyperdrivePackaging(unittest.TestCase):
             self.assertFalse(result[key],key)
         self.assertFalse(result['native_reference']['oracle_executed_by_apk_verifier'])
 
+    def test_historical_code40_fixture_is_exactly_pinned(self):
+        path=PROJECT/'tests/fixtures/fuel_v40_sources.json'
+        self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(),'323e3446b726ad211f0e02cec76a88e826e9ef2fa3bdacbd547ca180cd46ec44')
+        for name,expected in HISTORICAL_SOURCE_SHA256.items():
+            self.assertEqual(hashlib.sha256((self.project/name).read_bytes()).hexdigest(),expected)
+
     def test_each_new_compiled_module_is_required(self):
         for name in verifier.HYPERDRIVE_MODULES:
             with self.subTest(name=name):
                 archive=MockHyperdriveArchive();del archive.entries[f'assets/scripts/{name}.gdc']
                 with self.assertRaisesRegex(AssertionError,'Missing hyperdrive runtime module'):
-                    verifier.verify_hyperdrive_runtime(archive,PROJECT)
+                    verifier.verify_hyperdrive_runtime(archive,self.project)
 
     def test_invalid_compiled_core_is_rejected(self):
         self.archive.entries['assets/scripts/source_hyperdrive.gdc']=b'BAD!'+b'x'*100
         with self.assertRaisesRegex(AssertionError,'Invalid compiled hyperdrive runtime'):
-            verifier.verify_hyperdrive_runtime(self.archive,PROJECT)
+            verifier.verify_hyperdrive_runtime(self.archive,self.project)
 
     def test_missing_or_wrong_exported_resource_is_rejected(self):
         del self.archive.entries['assets/data/ffe_hyperdrive.json']
         with self.assertRaisesRegex(AssertionError,'Missing hyperdrive resource'):
-            verifier.verify_hyperdrive_runtime(self.archive,PROJECT)
+            verifier.verify_hyperdrive_runtime(self.archive,self.project)
         self.archive=MockHyperdriveArchive();self.archive.entries['assets/data/ffe_hyperdrive.json']+=b' '
         with self.assertRaisesRegex(AssertionError,'Hyperdrive resource differs from source'):
-            verifier.verify_hyperdrive_runtime(self.archive,PROJECT)
+            verifier.verify_hyperdrive_runtime(self.archive,self.project)
 
     def test_wrong_original_provenance_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -112,7 +143,7 @@ class HyperdrivePackaging(unittest.TestCase):
             with self.subTest(name=name):
                 archive=MockHyperdriveArchive();del archive.entries[f'assets/data/{name}.json']
                 with self.assertRaisesRegex(AssertionError,'Missing system information resource'):
-                    verifier.verify_hyperdrive_runtime(archive,PROJECT)
+                    verifier.verify_hyperdrive_runtime(archive,self.project)
 
     def test_information_control_tokens_are_still_checked(self):
         with tempfile.TemporaryDirectory() as directory:

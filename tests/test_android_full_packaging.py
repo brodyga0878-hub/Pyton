@@ -28,6 +28,7 @@ PROJECT=Path(_HISTORICAL_DIRECTORY.name)
 for _directory in ('scripts','data','tests'):
     (PROJECT/_directory).mkdir()
     for _path in (_LIVE_PROJECT/_directory).iterdir():
+        if _directory=='data' and _path.name=='ffe_fuel.json':continue
         (PROJECT/_directory/_path.name).symlink_to(_path,target_is_directory=_path.is_dir())
 _baseline=json.loads((_LIVE_PROJECT/'tests/fixtures/hyperdrive_v39_sources.json').read_text())
 assert _baseline['source_commit']=='860951235548fc58c859d7337b9a6909fd78ca62'
@@ -40,6 +41,13 @@ _baseline_sha256={
 assert set(_baseline['files'])==set(_baseline_sha256)
 for _relative,_entry in _baseline['files'].items():
     assert hashlib.sha256(_entry['source'].encode()).hexdigest()==_entry['sha256']==_baseline_sha256[_relative]
+    _target=PROJECT/_relative
+    _target.unlink();_target.write_text(_entry['source'])
+_fuel_baseline=json.loads((_LIVE_PROJECT/'tests/fixtures/fuel_v40_sources.json').read_text())
+assert _fuel_baseline['source_commit']=='c3872931413d5641c3b437aa2669ed444e5f8075'
+for _relative in ['scripts/flight_model.gd','scripts/surface_model.gd','scripts/source_motion_bridge.gd']:
+    _entry=_fuel_baseline['files'][_relative]
+    assert hashlib.sha256(_entry['source'].encode()).hexdigest()==_entry['sha256']==verifier.MAP_VISUAL_PROTECTED_SOURCE_SHA256[_relative]
     _target=PROJECT/_relative
     _target.unlink();_target.write_text(_entry['source'])
 
@@ -275,6 +283,15 @@ class FullPackagingChecks(unittest.TestCase):
         del self.archive.entries['assets/data/ffe_galactic_map.json']
         with self.assertRaisesRegex(AssertionError,'Full runtime JSON differs.*ffe_galactic_map'):
             verifier.verify_source_full_runtime(self.archive,PROJECT,36)
+
+    def test_new_fuel_table_is_not_whitelisted_for_historical_versions(self):
+        with tempfile.TemporaryDirectory() as directory:
+            project=Path(directory);(project/'scripts').symlink_to(PROJECT/'scripts',target_is_directory=True)
+            (project/'data').mkdir()
+            for path in (PROJECT/'data').iterdir():(project/'data'/path.name).symlink_to(path)
+            (project/'data/ffe_fuel.json').write_bytes((_LIVE_PROJECT/'data/ffe_fuel.json').read_bytes())
+            with self.assertRaisesRegex(AssertionError,'verifier list omits a source table or names a missing table'):
+                verifier.verify_source_full_runtime(self.archive,project,40)
 
     def test_missing_each_navigation_runtime_module_rejects(self):
         for name in verifier.NAVIGATION_MODULES:

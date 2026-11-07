@@ -1,0 +1,52 @@
+{
+	"checks": 397,
+	"evidence": [
+		{
+			"case": "actual_force_cadence",
+			"first_second_debit": 2128,
+			"frame_count": 60,
+			"source_force_words": [
+				0,
+				0,
+				10900
+			]
+		},
+		{
+			"case": "actual_gas_contact",
+			"contact": {
+				"altitude_raw_s32": -1,
+				"flags_u8": 3,
+				"parent_model_u32": 134
+			},
+			"fixture_position": "Jupiter centre +0.95 native outer bound, tangent900m/s",
+			"hydrogen_delta": 1,
+			"reason_after": "scooped"
+		},
+		{
+			"case": "actual_Sun_contact",
+			"contact": {
+				"altitude_raw_s32": -1,
+				"flags_u8": 3,
+				"parent_model_u32": 141
+			},
+			"fixture_position": "source Sun centre +0.95 native outer bound, tangent900m/s",
+			"geometry_branch": "terrain_query",
+			"manual_approach_or_market_supply_claim": false,
+			"speed_raw": 9265
+		}
+	],
+	"failures": 0,
+	"schema": 1,
+	"scope": "Actual Main source force/cadence, dynamic DOS nozzle availability/manual touch, raw continuation, source-Sun geometry scoop boundary fixtures, oldv40/pending compatibility, pause/background and private save boundaries; no physical phone, manual stellar approach or original-market proof.",
+	"sources": {
+		"data/ffe_fuel.json": "4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f",
+		"scripts/flight_model.gd": "4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b",
+		"scripts/hyperdrive_services_view.gd": "b0bcc31c52f8d46f94b29585ce2993535d45ef045a39617e8c90d15a2967cc97",
+		"scripts/main.gd": "a09c5fe5b38011aaa455c78bc85902d27723f32cb4c82a5522882d7821068abf",
+		"scripts/navigation.gd": "26e25aabedbf93831bd2f875b663a075053b0e479a67376b014a3aae79525a03",
+		"scripts/source_fuel_flight_bridge.gd": "70921d3cb8b7d211f07f1211309f809dab1e0be9094ccf015e658558d6a04b52",
+		"scripts/source_hyperdrive_session.gd": "6604df5a7573e1abdc3aae5b22e10c38c1d0cfcef4a38dbb03e54459bbe9aaf4",
+		"scripts/source_motion_bridge.gd": "f6ce8bd052ed586b560fb7935cbf4a039e264ab67a53e7afb32f14889c62c402",
+		"tests/test_source_fuel_main.gd": "cb3ade854e87f9d37aa4cb8b24587e68a9f20d7236775a55902e9834357c741e"
+	}
+}

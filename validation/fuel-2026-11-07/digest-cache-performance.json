@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "scope": "Headless desktop Navigation.advance_fuel_seconds coast2000frames; no GPU/phone/FPS claim",
+  "iterations_each": 2000,
+  "before_digest_cache": {
+    "total_usec": 6032789,
+    "mean_usec": 3016.3945
+  },
+  "after_digest_cache": {
+    "total_usec": 1059826,
+    "mean_usec": 529.913
+  },
+  "measured_change": "Private mutex-protected one-time immutable res:// resource digest caches; actual expected SHA comparisons retained. F410 branch-only change was made after this benchmark.",
+  "source_hyperdrive_digest_unchanged": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+  "source_fuel_digest_unchanged": "4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f"
+}

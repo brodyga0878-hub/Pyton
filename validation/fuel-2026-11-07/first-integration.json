@@ -1,0 +1,178 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-07T18:06:10.057515+00:00",
+  "updated_utc": "2026-11-07T18:07:10.757838+00:00",
+  "duration_seconds": 6.143,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-07T18:06:10.057515+00:00",
+      "duration_seconds": 3.12,
+      "requested_suites": [
+        "source_fuel_flight",
+        "source_hyperdrive_main",
+        "source_motion_bridge",
+        "source_full_startup"
+      ],
+      "executed_suites": [
+        "source_fuel_flight",
+        "source_hyperdrive_main",
+        "source_motion_bridge",
+        "source_full_startup"
+      ]
+    },
+    {
+      "started_utc": "2026-11-07T18:07:07.734971+00:00",
+      "duration_seconds": 3.023,
+      "requested_suites": [
+        "source_hyperdrive_main"
+      ],
+      "executed_suites": [
+        "source_hyperdrive_main"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 3,
+  "status": "passed",
+  "passed_suites": 4,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 190,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "source_fuel_flight",
+      "scope": "Actual Flight and Surface selective uploaded-DOS nozzle gating, ballistic inertia/gravity and explicit phone powered-impulse fuel adapter; independent source fuel/session tests are separate.",
+      "status": "passed",
+      "checks": 29,
+      "failures": 0,
+      "executed_utc": "2026-11-07T18:06:10.059078+00:00",
+      "suite_source": {
+        "path": "tests/test_source_fuel_flight.gd",
+        "bytes": 4860,
+        "sha256": "2580eb9f6c3999103e78d8d533305509eb602991d0630c47c8c98c7cee310f37"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_fuel_flight.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.421,
+      "timed_out": false,
+      "output_bytes": 121,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/fuel-2026-11-07/first-integration-logs/logs/source_fuel_flight.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_hyperdrive_main",
+      "scope": "Actual Main route/charge/cancel/save continuation, military fuel/waste, stale service inputs, explicit legacy migration with durable private backup and atomic invalid-v3 rejection.",
+      "status": "passed",
+      "checks": 70,
+      "failures": 0,
+      "executed_utc": "2026-11-07T18:07:07.736565+00:00",
+      "suite_source": {
+        "path": "tests/test_source_hyperdrive_main.gd",
+        "bytes": 18371,
+        "sha256": "699a44aeed0a6cf92400ad8e2ccd3ffd518a69fd47e1a54a894f005b6b2baade"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_hyperdrive_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 3.02,
+      "timed_out": false,
+      "output_bytes": 119,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/fuel-2026-11-07/first-integration-logs/logs/source_hyperdrive_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_motion_bridge",
+      "scope": "Fixed natural-parent Cobra raw motion SI boundary, precise fractional continuation and strict restore; excludes automatic frame selection.",
+      "status": "passed",
+      "checks": 81,
+      "failures": 0,
+      "executed_utc": "2026-11-07T18:06:10.059615+00:00",
+      "suite_source": {
+        "path": "tests/test_source_motion_bridge.gd",
+        "bytes": 9931,
+        "sha256": "3db067941e7cfac7f9f9e8022a97cbef57955fad78ec9cf9ed34e4218e2d1678"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_motion_bridge.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.605,
+      "timed_out": false,
+      "output_bytes": 193,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/fuel-2026-11-07/first-integration-logs/logs/source_motion_bridge.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_full_startup",
+      "scope": "Actual normal startup selects Worldv4/native navigation and restores a private native save; no player progress access.",
+      "status": "passed",
+      "checks": 10,
+      "failures": 0,
+      "executed_utc": "2026-11-07T18:06:10.480532+00:00",
+      "suite_source": {
+        "path": "tests/test_source_full_startup.gd",
+        "bytes": 2501,
+        "sha256": "ffaa0a4a6736da6409315e74753c15896e73d55e01348b42314652126f9b9c06"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_full_startup.gd",
+        "--",
+        "--source-startup-isolated"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.165,
+      "timed_out": false,
+      "output_bytes": 122,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/fuel-2026-11-07/first-integration-logs/logs/source_full_startup.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ]
+}

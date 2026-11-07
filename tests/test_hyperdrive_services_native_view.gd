@@ -85,7 +85,7 @@ func fuel_and_fitting()->void:
 func military_jump_and_waste()->void:
 	ship.docked=false;ship.velocity=Vector3.ZERO;ship.station_available=false;nav.set_source_port_available(false)
 	await refresh();var before:=models();var before_manifest:=manifest()
-	check(view.buttons.is_empty() and not view.labels.readonly.text.is_empty(),"Actual in-flight source inventory is readable but exposes zero service actions")
+	check(not view.buttons.has("refuel:military") and not view.buttons.has("remove_drive") and not view.labels.readonly.text.is_empty(),"Actual in-flight source inventory is readable without exposing dock service actions")
 	check(not nav.service("refuel","military",1,ship) and models()==before,"Controller also rejects in-flight service atomically")
 	check(nav.select(ALPHA),"Actual source Alpha Centauri can be selected")
 	var quote:Dictionary=nav.quote_for(ALPHA,ship)
@@ -98,7 +98,7 @@ func military_jump_and_waste()->void:
 	check(after.hydrogen==inventory.hydrogen and after.occupied_t==inventory.occupied_t and manifest()==before_manifest,"Military fuel-to-waste conversion preserves total occupancy and ordinary Flight cargo")
 	check(nav.current_id==ALPHA and absf(nav.elapsed_days-days-float(quote.duration_days))<1e-10,"Source destination and duration follow the actual quote")
 	await refresh()
-	check(view.labels.radioactives.text.contains(str(after.radioactives)+" т") and view.buttons.is_empty(),"Post-jump source waste is visible in the read-only flight inventory")
+	check(view.labels.radioactives.text.contains(str(after.radioactives)+" т") and not view.buttons.has("unload_waste"),"Post-jump source waste is visible without exposing the dock-only handover action")
 	ship.docked=true;ship.station_available=true;nav.set_source_port_available(true);await refresh()
 	inventory=state();var credits:int=ship.credits;var quantity:int=inventory.unload_quantity
 	check(quantity==inventory.radioactives and inventory.can_unload_waste,"Actual port offers a waste handover quote for the source inventory")

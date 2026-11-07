@@ -58,12 +58,12 @@ static func _orientation(attitude:Quaternion)->PackedInt64Array:
 	for axis:Vector3 in axes:
 		for component in [axis.x,axis.y,axis.z]:values.append(clampi(roundi(float(component)*2147483647.0),-2147483647,2147483647))
 	return values
-static func _template()->PackedByteArray:
+static func _template(thrust_limits:Array=[])->PackedByteArray:
 	var profile:=Profile.describe("cobra")
 	if profile.is_empty():return PackedByteArray()
 	var body:=PackedByteArray();body.resize(Motion.OBJECT_BYTES);body.fill(0)
 	body[0x56]=1;body.encode_u16(0x82,38);body.encode_u16(0xe4,int(profile.source_mass_tonnes)*4)
-	for i in range(6):body.encode_u16(0xbc+i*2,int(profile.source_axis_thrust_s16[i])&65535)
+	for i in range(6):body.encode_u16(0xbc+i*2,int(thrust_limits[i]) if thrust_limits.size()==6 else (int(profile.source_axis_thrust_s16[i])&65535))
 	return body
 static func _raw_position(body:PackedByteArray)->PackedInt64Array:
 	return PackedInt64Array([body.decode_s64(0x3e),body.decode_s64(0x46),body.decode_s64(0x4e)])
@@ -80,13 +80,22 @@ func is_active()->bool:return _active
 # Valid only for an active session. After strict restore this exact saved
 # nominal-day value may replace a rounded decimal Navigation JSON candidate.
 func elapsed_days()->float:return _days if _active else NAN
+func synchronize_thrust_limits(ship:RefCounted)->bool:
+	if not _active:return true
+	var limits:Variant=ship.source_thrust_limits_u16
+	if not limits is Array or limits.size()!=6:return limits is Array and limits.is_empty()
+	for value:Variant in limits:
+		if not value is int or value<0 or value>65535:return false
+	var body:=_motion.raw_body()
+	for index in range(6):body.encode_u16(0xbc+index*2,int(limits[index]))
+	return _motion.configure(body,str(_motion.snapshot().parent_hex).hex_decode())
 func reset()->void:
 	_motion=Motion.new();_active=false;_anchor_local=[];_anchor_raw=PackedInt64Array();_parent_local=[];_ticks_fraction=0
 func configure(world:RefCounted,ship:RefCounted,days:Variant)->bool:
 	if not eligible(world,ship) or not _finite(days) or float(days)<0 or not ship.position.is_finite() or not ship.velocity.is_finite() or not ship.attitude.is_finite() or ship.attitude.length_squared()<0.0001:return false
 	var center:Vector3=world.local_meters(str(world.focus_id),float(days))
 	if not center.is_finite() or ship.position.length()>MAX_LOCAL_METRES or ship.velocity.length()>100000000.0:return false
-	var body:=_template();var record:=_record(world);var parent:=_parent_body(record)
+	var body:=_template(ship.source_thrust_limits_u16);var record:=_record(world);var parent:=_parent_body(record)
 	if body.is_empty() or parent.is_empty():return false
 	for axis in range(3):
 		# Subtract in double precision at the conversion boundary, not through
@@ -145,6 +154,8 @@ func step(dt:Variant,ship:RefCounted,world:RefCounted,days:Variant,lift:Variant=
 	elif not _matches(world,ship,float(days)):
 		reset();return {"ok":true,"handled":false,"reason":"external_state_change_requires_reanchor"}
 	var body:=_motion.raw_body();_write_orientation(body,ship.attitude)
+	var profile:=Profile.describe("cobra")
+	for index in range(6):body.encode_u16(0xbc+index*2,int(ship.source_thrust_limits_u16[index]) if ship.source_thrust_limits_u16.size()==6 else (int(profile.source_axis_thrust_s16[index])&65535))
 	var saved_state:=_motion.snapshot()
 	if not _motion.configure(body,str(saved_state.parent_hex).hex_decode()):return {"ok":false,"handled":false,"reason":"orientation_update_failed"}
 	var accumulated:=float(dt)*Motion.NOMINAL_TICKS_PER_SECOND+_ticks_fraction
@@ -165,7 +176,9 @@ func step(dt:Variant,ship:RefCounted,world:RefCounted,days:Variant,lift:Variant=
 	if not position.is_finite() or not velocity.is_finite() or position.length()>MAX_LOCAL_METRES:
 		_motion.restore(saved_state);return {"ok":false,"handled":false,"reason":"source_state_out_of_display_range"}
 	ship.position=position;ship.velocity=velocity;_ticks_fraction=remainder;_days=float(days)
-	return {"ok":true,"handled":true,"reason":"source_fixed_parent_step","profile":CONTRACT,"ticks":ticks,"ticks_fraction":_ticks_fraction,"source_order":result.source_order,"original_complete_player_pipeline":false}
+	var commands:Array=[]
+	for index in range(3):commands.append(int(result.body.decode_s16(0xb6+index*2)))
+	return {"ok":true,"handled":true,"reason":"source_fixed_parent_step","profile":CONTRACT,"ticks":ticks,"ticks_fraction":_ticks_fraction,"commands_s16":commands,"source_order":result.source_order,"original_complete_player_pipeline":false}
 
 func snapshot()->Dictionary:
 	if not _active:return {}
@@ -184,7 +197,7 @@ func restore(data:Variant,world:RefCounted,ship:RefCounted,days:Variant)->bool:
 	if not is_finite(tick_fraction) or tick_fraction<0 or tick_fraction>=1 or not is_finite(saved_days) or saved_days<0 or absf(saved_days-float(days))>maxf(1.0e-9,absf(float(days))*0.000000000000002):return false
 	var motion:=Motion.new()
 	if not motion.restore(data.motion):return false
-	var body:=motion.raw_body();var template:=_template();var mutable:=PackedByteArray();mutable.resize(Motion.OBJECT_BYTES);mutable.fill(0)
+	var body:=motion.raw_body();var template:=_template(ship.source_thrust_limits_u16);var mutable:=PackedByteArray();mutable.resize(Motion.OBJECT_BYTES);mutable.fill(0)
 	for span in [[0,36],[0x3e,24],[0x8c,12],[0xb6,6],[0xec,6],[0xf2,12]]:
 		for index in range(int(span[0]),int(span[0])+int(span[1])):mutable[index]=1
 	for index in range(Motion.OBJECT_BYTES):

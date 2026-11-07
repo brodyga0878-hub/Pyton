@@ -39,6 +39,8 @@ const BuildInfo=preload("res://scripts/build_info.gd")
 const SourceClock=preload("res://scripts/source_clock.gd")
 const SourceUnits=preload("res://scripts/source_units.gd")
 const MotionBridge=preload("res://scripts/source_motion_bridge.gd")
+const FuelFlightBridge=preload("res://scripts/source_fuel_flight_bridge.gd")
+const FuelContact=preload("res://scripts/source_fuel_contact.gd")
 const Diagnostics=preload("res://scripts/game_diagnostics.gd")
 const ReportExport=preload("res://scripts/report_export.gd")
 const DockServices=preload("res://scripts/training_dock_services.gd")
@@ -48,6 +50,7 @@ var nav:RefCounted
 var world:RefCounted
 var surface:RefCounted
 var near:=Near.new()
+var fuel_contact:=FuelContact.new()
 var settings:=Settings.new()
 var saves:=SaveStore.new()
 var presentation:=Presentation.new()
@@ -170,7 +173,11 @@ func _enable_source_hyperdrive()->bool:
 	if world.layout_mode!=World.FULL_LAYOUT:return false
 	if not nav.configure_source(ship.ship_id,nav.current_id) or not nav.sync_source_ship(ship):
 		saving_enabled=false;_announce("Не удалось подготовить исходный гипердвигатель. Сохраните отчёт об ошибке.");return false
-	return true
+	return _apply_source_fuel_state()
+
+func _apply_source_fuel_state()->bool:
+	if not nav.apply_fuel_availability(ship):return false
+	return source_motion.synchronize_thrust_limits(ship)
 
 func _build_world()->void:
 	environment=WorldEnvironment.new();environment.environment=Environment.new()
@@ -346,6 +353,10 @@ func _request_time_rate(rate:int)->void:
 
 func _tick(dt:float,steering:Vector2,roll:float,lift:=0.0)->void:
 	if instruments.paused or ship.hull<=0:return
+	if not _apply_source_fuel_state():_announce("Не удалось согласовать реактивный бак. Сохраните отчёт об ошибке.");return
+	ship.last_propulsive_delta_v=Vector3.ZERO
+	var fuel_commands:Array=[0,0,0]
+	var save_after_fuel:=false
 	if steering.length()>0.04 or absf(roll)>0.05 or absf(lift)>0.1:
 		ship.autopilot=false
 		if surface.active:surface.landing=false
@@ -354,7 +365,7 @@ func _tick(dt:float,steering:Vector2,roll:float,lift:=0.0)->void:
 		# Saves without the opt-in retain their published legacy timing.
 		if source_motion_enabled:nav.elapsed_days+=dt/86400.0
 		if nav.step(dt,ship):
-			world.configure(nav.current(),world.preferred_layout());surface=Surface.new();near.clear();_apply_system();_announce(nav.message);_save_game()
+			world.configure(nav.current(),world.preferred_layout());surface=Surface.new();near.clear();_apply_system();_announce(nav.message);save_after_fuel=true
 	elif world.transfer_remaining>0:
 		if source_motion_enabled:nav.elapsed_days+=dt/86400.0
 		if world.step_transfer(dt,ship,nav):
@@ -363,18 +374,19 @@ func _tick(dt:float,steering:Vector2,roll:float,lift:=0.0)->void:
 			surface=Surface.new();near.clear()
 			_apply_system();_announce(world.message)
 			if not world.current_site().is_empty() and int(world.current_site().type_code)==35:_enter_surface()
-			else:_save_game()
+			else:save_after_fuel=true
 	else:
 		nav.elapsed_days+=dt/86400.0
 		if surface.active:
 			var frame:int=surface.frame_index;var was_landed:bool=surface.landed
 			surface.set_source_time(nav.elapsed_days)
 			surface.step(dt,ship,steering,roll,lift)
+			fuel_commands=FuelFlightBridge.commands(ship,dt)
 			if frame!=surface.frame_index:
 				camera.position=surface.rebase_to+surface.frame_rotation*(camera.position-surface.rebase_from)
 				camera.quaternion=(surface.frame_rotation*camera.quaternion).normalized()
-			if surface.ready_for_orbit:_finish_ascent()
-			if surface.landed and not was_landed:_save_game()
+			if surface.ready_for_orbit:_finish_ascent(false);save_after_fuel=true
+			if surface.landed and not was_landed:save_after_fuel=true
 			if not surface.message.is_empty():_announce(surface.message);surface.message=""
 		else:
 			if world.layout_mode==World.FULL_LAYOUT:
@@ -382,11 +394,41 @@ func _tick(dt:float,steering:Vector2,roll:float,lift:=0.0)->void:
 				if not context.ok:ship.brake();_announce("Не удалось подготовить станцию. Сохраните отчёт об ошибке.");return
 				if ship.docked and world.station_launch_ready():
 					ship.launch();world.finish_station_launch(not ship.docked)
-			if not _source_motion_step(dt,steering,roll,lift):ship.step(dt,steering,roll,world.gravity_at(ship.position,nav.elapsed_days) if settings.orbital_gravity else Vector3.ZERO,lift)
+			if _source_motion_step(dt,steering,roll,lift):fuel_commands=last_motion_result.get("commands_s16",[0,0,0])
+			else:
+				ship.step(dt,steering,roll,world.gravity_at(ship.position,nav.elapsed_days) if settings.orbital_gravity else Vector3.ZERO,lift)
+				fuel_commands=FuelFlightBridge.commands(ship,dt)
 			if world.protect_surface(ship,nav.elapsed_days):source_motion.reset();_announce(world.message)
+	_step_source_fuel(dt,fuel_commands)
+	if save_after_fuel:_save_game()
 	if not ship.last_notice.is_empty():_announce(ship.last_notice);ship.last_notice=""
 	save_timer+=dt
 	if save_timer>20:save_timer=0;_save_game()
+
+func _step_source_fuel(seconds:float,commands:Array)->void:
+	if not nav.is_source_hyperdrive():return
+	if commands.size()!=3:_announce("Не удалось рассчитать расход реактивного топлива.");return
+	var context:Dictionary=fuel_contact.sample(world,ship,nav.elapsed_days) if not surface.active else {"ok":true,"contact":{"flags_u8":0,"altitude_raw_s32":-1,"parent_model_u32":0},"speed_s32":0}
+	if not context.get("ok",false):
+		context={"contact":{"flags_u8":0,"altitude_raw_s32":-1,"parent_model_u32":0},"speed_s32":0}
+	if int(context.contact.get("flags_u8",0))&0x80:
+		# The read-only source field is probed at the phone ship's centre. This
+		# fatal contact guard is an explicit adapter, not F575's hull response.
+		ship.hull=0;ship.autopilot=false;source_motion.reset()
+		_announce("Корабль потерян: столкновение с недоступной поверхностью звезды или газового гиганта.")
+		_record_event("source_fuel_body_contact",{"body_id":str(context.get("body_id","")),"flags":int(context.contact.flags_u8),"response_policy":"phone-point-solid-contact-fatality-v1"});_save_game();return
+	context["commands_s16"]=commands
+	var result:Dictionary=nav.advance_fuel_seconds(seconds,context,ship)
+	if not result.get("ok",false):_announce("Топливная система отклонила состояние. Сохраните отчёт об ошибке.");return
+	if not _apply_source_fuel_state():_announce("Не удалось согласовать тягу после заправки.");return
+	if result.get("destruction_requested",false):
+		ship.hull=0;ship.autopilot=false;_announce("Корабль потерян: критический перегрев.");_record_event("fuel_overheat",{"heat":nav.fuel_state(ship).get("heat_s32",0)});_save_game();return
+	var fuel_notice:=""
+	if 0x9907 in result.get("jet_events",[]):fuel_notice="Реактивный бак пуст. Прямая и подъёмная тяга недоступны; заправьте бак из груза через «Оснащение»."
+	if int(result.get("scooped_tonnes",0))>0:
+		fuel_notice="Топливозаборник собрал водород: +%d т в трюм."%int(result.scooped_tonnes);_record_event("fuel_scooped",{"tonnes":int(result.scooped_tonnes),"body_id":str(context.get("body_id",""))})
+	if result.get("hyperjump_cancelled",false):fuel_notice+=" Заряд гипердвигателя отменён: запас грузового топлива изменился."
+	if not fuel_notice.is_empty():_announce(fuel_notice.strip_edges())
 
 func _source_motion_step(dt:float,steering:Vector2,roll:float,lift:float)->bool:
 	if not source_motion_enabled or not settings.orbital_gravity or not MotionBridge.eligible(world,ship,surface.active) or dt>MotionBridge.MAX_STEP_SECONDS or absf(lift)>0.000001:
@@ -454,7 +496,7 @@ func _input_diagnostic_state()->Dictionary:
 	return {"stick":[stick.value.x,stick.value.y] if stick!=null else [],"stick_pointer":stick.pointer_id if stick!=null else -1,"throttle_pointer":lever.pointer_id if lever!=null else -1,"lift_up":lift_up,"lift_down":lift_down,"roll_left":roll_left_strength,"roll_right":roll_right_strength,"active":active,"busy":busy,"menu_open":menu!=null and menu.visible,"settings_open":settings_panel!=null and settings_panel.visible,"map_open":is_instance_valid(active_map),"map_kind":active_map_kind,"camera_view":instruments.view_key(ship.external_view) if ship!=null else "front","simulation_paused":instruments.paused,"time_rate":flight_time.effective_rate,"source_motion_enabled":source_motion_enabled,"source_motion_active":source_motion.is_active()}
 func _flight_diagnostic_sample()->Dictionary:
 	if ship==null or nav==null or world==null or surface==null:return {}
-	return {"ship_id":ship.ship_id,"position":[ship.position.x,ship.position.y,ship.position.z],"velocity":[ship.velocity.x,ship.velocity.y,ship.velocity.z],"target_speed":ship.target_speed,"hull":ship.hull,"docked":ship.docked,"autopilot":ship.autopilot,"system_id":nav.current_id,"focus_id":world.focus_id,"site_id":world.site_id,"jump_remaining":nav.remaining,"transfer_remaining":world.transfer_remaining,"surface":surface.active,"landed":surface.landed,"flight_phase":surface.flight_phase,"surface_motion":{"landing":surface.landing,"taking_off":surface.taking_off,"altitude_m":surface.altitude(ship) if surface.active else 0.0,"pad_distance_m":surface.pad_distance(ship) if surface.active else 0.0},"controls":_input_diagnostic_state()}
+	return {"ship_id":ship.ship_id,"position":[ship.position.x,ship.position.y,ship.position.z],"velocity":[ship.velocity.x,ship.velocity.y,ship.velocity.z],"target_speed":ship.target_speed,"hull":ship.hull,"docked":ship.docked,"autopilot":ship.autopilot,"system_id":nav.current_id,"focus_id":world.focus_id,"site_id":world.site_id,"jump_remaining":nav.remaining,"transfer_remaining":world.transfer_remaining,"surface":surface.active,"landed":surface.landed,"flight_phase":surface.flight_phase,"surface_motion":{"landing":surface.landing,"taking_off":surface.taking_off,"altitude_m":surface.altitude(ship) if surface.active else 0.0,"pad_distance_m":surface.pad_distance(ship) if surface.active else 0.0},"controls":_input_diagnostic_state(),"source_fuel":nav.fuel_state(ship)}
 func _diagnostic_context()->Dictionary:
 	var context:=_base_diagnostic_context()
 	if world!=null and world.layout_mode==World.FULL_LAYOUT:
@@ -746,9 +788,10 @@ func _enter_surface()->void:
 		if not surface.entry_error(ship,world).is_empty():_announce(surface.entry_error(ship,world));return
 	if near.enter_descent(surface,ship,world,nav.elapsed_days):_apply_system();_announce(surface.message);_save_game()
 	else:_announce(surface.message)
-func _finish_ascent()->void:
+func _finish_ascent(save_progress:=true)->void:
 	if not surface.leave(ship,world,nav.elapsed_days):_announce(surface.message);return
-	_apply_system();_announce("Выход на орбиту. Положение над планетой сохранено.");_save_game()
+	_apply_system();_announce("Выход на орбиту. Положение над планетой сохранено.")
+	if save_progress:_save_game()
 
 func _open_menu(title:String,save_progress:bool=true)->void:
 	_close_map(false);flight_time.interrupt("Открыто меню.")
@@ -805,6 +848,10 @@ func _show_status()->void:
 	var context:String=surface.site_name if surface.active and not surface.site_name.is_empty() else str(world.by_id[world.focus_id].name)
 	_menu_text("Объект: %s\nКорпус: %.0f%%\nСкорость: %.1f м/с · задано %.1f м/с\nТопливо гиперпереходов: %d/%d\nГруз: %d/%d т\nСчёт: %d кр."%[context,ship.hull,ship.velocity.length(),ship.target_speed,nav.fuel,nav.fuel_capacity(),ship.total_cargo(),ship.cargo_capacity(),ship.credits])
 	_menu_text("%s · %s"%[instruments.view_label(ship.external_view),"ПАУЗА" if instruments.paused else ("Стабилизация скорости" if ship.assisted else "Инерционный режим")])
+	if nav.is_source_hyperdrive():
+		var fuel_status:Dictionary=nav.fuel_state(ship)
+		var manifest:Dictionary=nav.service_state(ship)
+		_menu_text("Реактивный бак: %.1f%% · %.2f т\nВодород: %d т · военное топливо: %d т · отходы: %d т\n%s"%[float(fuel_status.get("jet_percent",0)),float(fuel_status.get("jet_tonnes",0)),int(manifest.get("hydrogen",0)),int(manifest.get("military",0)),int(manifest.get("radioactives",0)),str(fuel_status.get("heat_label",""))])
 	_menu_action("Груз и оборудование",_show_equipment)
 	_menu_action("Объекты и космопорты",_show_system)
 	_menu_action("Сведения о системе",func():_show_information())
@@ -1070,7 +1117,23 @@ func _embed_hyperdrive_services()->void:
 	hyperdrive_services_view=HyperdriveServices.new()
 	hyperdrive_services_view.configure_state(nav.service_state(ship))
 	hyperdrive_services_view.command.connect(_hyperdrive_service_command)
+	hyperdrive_services_view.runtime_command.connect(_fuel_runtime_command)
 	menu_rows.add_child(hyperdrive_services_view)
+
+func _fuel_runtime_command(action:String,enabled:bool)->void:
+	if busy or not active or not menu.visible or not is_instance_valid(hyperdrive_services_view):return
+	_release_inputs()
+	var accepted:=false
+	if action=="manual_jet_refuel":accepted=nav.manual_jet_refuel(ship)
+	elif action=="set_refueller_enabled":accepted=nav.set_refueller_enabled(enabled,ship)
+	else:return
+	var feedback:=str(nav.message)
+	if accepted:
+		if not _apply_source_fuel_state():feedback+=" Не удалось согласовать тягу."
+		elif not _save_game() and saving_enabled:feedback+=" "+str(saves.last_error)
+	_record_event("fuel_command",{"action":action,"enabled":enabled,"accepted":accepted})
+	if is_instance_valid(hyperdrive_services_view):hyperdrive_services_view.configure_state(nav.service_state(ship))
+	menu_feedback.text=feedback;_announce(feedback);_refresh_hud()
 
 func _fit_hyperdrive_menu()->void:
 	# Existing menus retain their historical widths. This embedded workshop
@@ -1227,6 +1290,7 @@ func _confirm_new_game()->void:
 func _payload()->Dictionary:
 	_validate_navigation_target()
 	if nav.is_source_hyperdrive() and not nav.sync_source_ship(ship):return {}
+	if not _apply_source_fuel_state():return {}
 	var result:={"schema":"starfrontier-rebuild-game-v1","flight":ship.snapshot(),"navigation":nav.snapshot(),"planetary":world.snapshot(),"surface":surface.snapshot()}
 	if not target_site_id.is_empty():result.target_session={"version":1,"system_id":nav.current_id,"body_id":world.selected_id,"site_id":target_site_id}
 	if source_motion_enabled:
@@ -1246,6 +1310,7 @@ func _decode_state(data:Dictionary)->Dictionary:
 	if restored.is_empty():return {}
 	var candidate_ship:RefCounted=restored.ship
 	if not candidate_nav.validate_source_ship(candidate_ship):return {}
+	candidate_nav.apply_fuel_availability(candidate_ship)
 	var candidate_surface:=Surface.new()
 	candidate_surface.set_source_time(candidate_nav.elapsed_days)
 	if not candidate_surface.restore(data.surface,candidate_ship,candidate_world):return {}
@@ -1282,9 +1347,11 @@ func _commit_state(data:Dictionary)->void:
 	ship=data.ship;nav=data.nav;world=data.world;surface=data.surface;near.clear();instruments.reset();flight_time.reset();last_view=""
 	target_site_id=str(data.get("target_site_id",""));target_reference.clear()
 	source_motion_enabled=bool(data.get("source_motion_enabled",false));source_motion=data.get("source_motion",MotionBridge.new());last_motion_result.clear()
+	_apply_source_fuel_state()
 func _save_game()->bool:
 	if not saving_enabled or busy:return false
 	if nav.is_source_hyperdrive() and not nav.sync_source_ship(ship):return false
+	if not _apply_source_fuel_state():return false
 	var ok:=saves.write(_payload())
 	_record_event("save_result",{"ok":ok,"generation":saves.sequence})
 	if not ok:_announce(saves.last_error)

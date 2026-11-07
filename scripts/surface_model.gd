@@ -301,6 +301,7 @@ func begin_landing(ship: RefCounted) -> bool:
 	return true
 
 func step(dt: float, ship: RefCounted, steering: Vector2, roll: float, lift := 0.0) -> void:
+	ship.last_propulsive_delta_v=Vector3.ZERO
 	if not active or not is_finite(dt) or dt<=0 or ship.hull<=0:return
 	if not _refresh_gravity(ship):message="Не удалось обновить исходную гравитацию.";return
 	if underground!=null:underground.step_seconds(dt,globe,ship.position,collision_radii(ship),landed)
@@ -313,9 +314,15 @@ func step(dt: float, ship: RefCounted, steering: Vector2, roll: float, lift := 0
 			ship.velocity=Vector3.ZERO;ship.target_speed=0
 			return
 	var previous:Vector3=ship.position
+	var previous_velocity:Vector3=ship.velocity
 	if not flight_phase.is_empty() and (steering.length()>0.05 or absf(roll)>0.05 or absf(lift)>0.1):cancel_vertical()
 	if absf(lift)>0.1:landing=false;taking_off=false
-	if underground!=null and ((landing and str(underground.state.intent)=="dock") or str(underground.state.intent)=="launch"):
+	if not ship.propulsion_available:
+		# Empty source thrust limits leave the ship ballistic. Automated descent
+		# must not retain its historical minimum 0.1 m/s² powered correction.
+		landing=false;taking_off=false;flight_phase="";ready_for_orbit=false;ship.autopilot=false
+		ship.step(dt,steering,roll,gravity_vector,lift)
+	elif underground!=null and ((landing and str(underground.state.intent)=="dock") or str(underground.state.intent)=="launch"):
 		_step_underground_navigation(dt,ship)
 	elif not flight_phase.is_empty():
 		_step_vertical(dt,ship)
@@ -340,6 +347,10 @@ func step(dt: float, ship: RefCounted, steering: Vector2, roll: float, lift := 0
 		ship.position+=ship.velocity*dt
 	else:
 		ship.step(dt,steering,roll,gravity_vector,lift)
+	var requested_delta:Vector3=ship.velocity-previous_velocity-gravity_vector*dt
+	ship.last_propulsive_delta_v=ship.filter_propulsive_delta(requested_delta)
+	var correction:Vector3=ship.last_propulsive_delta_v-requested_delta
+	ship.velocity+=correction;ship.position+=correction*dt
 	_clip_buildings(previous,ship)
 	if ship.hull<=0:return
 	var radial:=Vector2(ship.position.x,ship.position.z)
@@ -383,6 +394,8 @@ func take_off(ship: RefCounted) -> bool:
 	if not active:message="Взлёт доступен после посадки на поверхность.";return false
 	if ship.hull<=0:message="Взлёт невозможен: корпус корабля разрушен (0%).";return false
 	if not landed:message="Корабль уже находится над поверхностью.";return false
+	if ship.source_thrust_limits_u16.size()==6 and int(ship.source_thrust_limits_u16[2])==0:
+		message="Подъёмная тяга недоступна. Заправьте реактивный бак из груза через «Оснащение».";return false
 	if underground!=null and str(underground.state.phase)=="docked":
 		if not underground.request("launch"):return false
 		landed=false;landing=false;taking_off=false;flight_phase="";ready_for_orbit=false;ship.autopilot=false
@@ -740,7 +753,7 @@ func begin_departure(ship:RefCounted)->bool:
 		message="Автовылет недоступен в текущем состоянии корабля.";return false
 	if not ship.position.is_finite() or not ship.velocity.is_finite() or not ship.attitude.is_finite() or ship.attitude.length_squared()<0.0001 or not is_finite(ship.target_speed) or ship.velocity.length()>20:
 		message="Для автовылета остановитесь до 20 м/с.";return false
-	var thrust:float=ship.acceleration()
+	var thrust:float=ship.available_acceleration(Vector3.UP)
 	if not is_finite(gravity) or gravity<0 or not is_finite(thrust) or thrust<=0 or gravity>thrust*0.8:
 		message="Недостаточно тяги для безопасного автовылета при этой гравитации.";return false
 	var height:float=altitude(ship)

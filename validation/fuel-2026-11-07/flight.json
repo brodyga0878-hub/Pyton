@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-07T17:59:06.484798+00:00",
+  "updated_utc": "2026-11-07T17:59:06.907055+00:00",
+  "duration_seconds": 0.422,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-07T17:59:06.484798+00:00",
+      "duration_seconds": 0.422,
+      "requested_suites": [
+        "source_fuel_flight"
+      ],
+      "executed_suites": [
+        "source_fuel_flight"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 3,
+  "status": "passed",
+  "passed_suites": 1,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 29,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "source_fuel_flight",
+      "scope": "Actual Flight and Surface selective uploaded-DOS nozzle gating, ballistic inertia/gravity and explicit phone powered-impulse fuel adapter; independent source fuel/session tests are separate.",
+      "status": "passed",
+      "checks": 29,
+      "failures": 0,
+      "executed_utc": "2026-11-07T17:59:06.486618+00:00",
+      "suite_source": {
+        "path": "tests/test_source_fuel_flight.gd",
+        "bytes": 4860,
+        "sha256": "2580eb9f6c3999103e78d8d533305509eb602991d0630c47c8c98c7cee310f37"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_fuel_flight.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.419,
+      "timed_out": false,
+      "output_bytes": 121,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/fuel-2026-11-07/flight-logs/logs/source_fuel_flight.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ]
+}

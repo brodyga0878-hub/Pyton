@@ -150,6 +150,13 @@ HYPERDRIVE_NATIVE_SHA256='5f5034fb0b2b2b73d1b82b73217b7ee0a4483b483f8f9921e1f640
 HYPERDRIVE_AUDITED_SOURCE_SHA256={'scripts/source_hyperdrive.gd': 'b79cd38051e44d52fcd4f2beb173b2699096e7d9aea9a0288aba205e453a8874', 'scripts/navigation.gd': '3bc3d50e1c008b0f9f37f587e804729450ced47baf19330a27550d6343dccc1c', 'scripts/source_hyperdrive_session.gd': '0a505bd31bbffc703c9c06144b2f58167aa1da525de8ed013de5af4b58d2e59a', 'scripts/hyperdrive_services_view.gd': '755fad2ba1d52366a64954621f3406c4483bff299ead44a0d7151f502acac468', 'scripts/main.gd': '25dad04995505b2c119cc45470ff531c657dd80eb6963408a427bae641823049', 'scripts/galactic_map_model.gd': '597a5bd049e3dea2698bfbc255a0d57e7c98b70fabedfe09d56bb60ccd3a11a5', 'scripts/galactic_map_view.gd': '9a2a6fa97d9ab4f6ce572a5e10bb390d5036ccf6d30e3bc31e087a61440b7876'}
 HYPERDRIVE_INFORMATION_SOURCE_SHA256={'scripts/source_information_text.gd': '3d3e3af3b32fe77c28f00eb269e0b286ec16763e0c79730f51767a9c62409648', 'scripts/source_system_information.gd': '503be92125c8f4dd461a97bf891fbe27a48a8a0da57630aa0c9db11dada3647c', 'scripts/system_information_view.gd': 'f2dfa6ae205713ee52b5d39d7cb755ca902cb9583f3353496a772767f2814708'}
 HYPERDRIVE_PHYSICAL_MAIN_FUNCTION_SHA256={'_new_models': '84ee3ddf0488623c93a925f9e80c76d28f4b7369245264dc686c0a99b364d5d9', '_time_context': 'fe9c64abab18fcfef20cc38e32749e8f484cbe2f54cdf7c6dfd06ed316b3f23a', '_advance_controls': '040b53157b656043a248f22bcac26a8e33ddb056338cdc26f4fcc1ef58e54b7d', '_tick': 'd75bff3c9ad15639e0a9c10b14c3241d10e0dc3029c31b39ca46ce8ca5db148f', '_source_motion_step': 'c476095f2e40347e7e45b1680dcb74c9adcd85931d8914a4959460a9410631cd', '_apply_system': '47920c0adf4566e249ff2a7107ea85ae46923de53f94d788ad61307063acddc0', '_set_speed': '70f2369529290729e7cce96f51b7e6925614f0694cacebd0056523608ea34ec9', '_brake': '65dcd9782fee7cf46f030449926b6b637261f77e29024b3b765638878dfb58c1', '_toggle_auto': 'c66d6117ba49db06dcff00c94c59e04cb7c18bbd3ea91442eafe54f9e086616d', '_takeoff_action': '9d9648da5d8568bd962c3cde905bbd3865daa99f2fab14ba4ef1608b77ba310b', '_dock_action': 'bb95a86e818161c86714e17c200c16fef97354b5d62c555997b15799dc9e1865', '_surface_action': 'a19f55eb2bd983bdb3845cd7db9164b4bd18807877bae4c69e7096ef5ab3c5f3', '_enter_surface': '832d1576ee6c4f123d36a84c48bb0d0c882ef9bedffbaec506eb6647ff4716cf', '_finish_ascent': '596a7336a3b0f5d95fc223a8e721572db7f35065ebaf23ead1fbf1fdd729d742', '_choose_body': 'c3dab65a5e88c31f842188d34607279731672271b8d300b5c37a7c6929fdb18b', '_choose_site': '5dd971636babc4a708158c8438ad0b426794763328a26634c40c8757b05eab39', '_safe_area': '6d5e38a60d624a39a9d2316f19d36d9a70d165ed774d98758770591a9572fd8f', '_update_flight_projection': '64f5a6530eeebe1e58488f0f54b106e15f889bf2e311f9384c48eb3ab1e1f9e3', '_commit_state': 'f9f2d2a08f0290ddc57c1027820ad364c618b6272c3716bd124373e4a4b9cde1'}
+FUEL_BASELINE_SOURCE_COMMIT='c3872931413d5641c3b437aa2669ed444e5f8075'
+FUEL_MODULES=('source_jet_fuel', 'source_fuel_scoop', 'source_fuel_contact', 'source_fuel_flight_bridge')
+FUEL_RESOURCE_SHA256='4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f'
+FUEL_AUDITED_SOURCE_SHA256={'scripts/source_hyperdrive.gd': 'b79cd38051e44d52fcd4f2beb173b2699096e7d9aea9a0288aba205e453a8874', 'scripts/navigation.gd': '26e25aabedbf93831bd2f875b663a075053b0e479a67376b014a3aae79525a03', 'scripts/source_hyperdrive_session.gd': '6604df5a7573e1abdc3aae5b22e10c38c1d0cfcef4a38dbb03e54459bbe9aaf4', 'scripts/hyperdrive_services_view.gd': 'b0bcc31c52f8d46f94b29585ce2993535d45ef045a39617e8c90d15a2967cc97', 'scripts/main.gd': 'a09c5fe5b38011aaa455c78bc85902d27723f32cb4c82a5522882d7821068abf', 'scripts/galactic_map_model.gd': '597a5bd049e3dea2698bfbc255a0d57e7c98b70fabedfe09d56bb60ccd3a11a5', 'scripts/galactic_map_view.gd': '9a2a6fa97d9ab4f6ce572a5e10bb390d5036ccf6d30e3bc31e087a61440b7876', 'scripts/source_jet_fuel.gd': 'ef043cd3d7fe4ef06a08d1f6592bf97b5d1e6d81c5f2efe9ea067d514f207cc1', 'scripts/source_fuel_scoop.gd': 'de1e96fd3013de48557b340b9ca4e4d174c4d39aaebb8b2eee96250db53af296', 'scripts/source_fuel_contact.gd': '0f8d5defba15db89d02c5253c988a2a5680d7a16058296b91d262017d5a49903', 'scripts/source_fuel_flight_bridge.gd': '70921d3cb8b7d211f07f1211309f809dab1e0be9094ccf015e658558d6a04b52', 'scripts/flight_model.gd': '4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b', 'scripts/surface_model.gd': '28fcc37fb4adc1291129fdd90fb685828992e5657eaeb891eff986c9d5f3d894', 'scripts/source_motion_bridge.gd': 'f6ce8bd052ed586b560fb7935cbf4a039e264ab67a53e7afb32f14889c62c402'}
+FUEL_CONTACT_DEPENDENCY_SHA256={'scripts/source_terrain_point.gd': 'caebe9f918763d6781a4885ae05e9d27aec84e584b9b45bb02cc71dc75000037', 'scripts/source_terrain_query.gd': 'fc9bf87c182113fffa10bbad9aab150eb99ed95b089dcaac20806e5505b15731', 'scripts/source_ground_surface.gd': 'e9db09fbd9c9e8a70bfba771b79627bbba6313d86b3efe781fba7b93a29e7ee7', 'scripts/ground_coordinates.gd': '54dedcc157dea6c84c4f8ad6ff0859159d81719cafbbaa23c626cd94e1cdf7b6', 'scripts/source_units.gd': '42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24', 'scripts/source_gravity.gd': '058db4e5cbebd07e7420274ca07b24ccaec620f46c440081d1d6855326dc3872', 'scripts/body_rotation.gd': 'b5d4e63331728681d1f34c73fe83cdd57120e29b352e09090da4ff147b22ed34', 'scripts/source_clock.gd': 'b2d206a9e2e6db21635fe37d6f61ba75d2fb9f56d92f8851a77c9b11fc4dbe09', 'scripts/source_terrain_math.gd': 'de4b98dfae36b680b3d378750624b0b8d84fb520e4883d78800f1cb4572e4eff', 'scripts/ffe_math.gd': 'd3cb103361e4039fd2b0942d84af042d69c9e19b8a856c7d830b82827827f228', 'scripts/source_physics_bridge.gd': 'c7b8550217fbce3925da741afeb3c7d58c841d91ab247c4994ecc1c45ac72262', 'scripts/source_ship_control_profile.gd': 'de2d0aed1943af69160f16b4b4892fea37afbc97c707a7b0870bba9b1805562e', 'data/ffe_ground_collision.json': '2dbf44a94422907b1bb29b34df1d795cef819cecf267b1591f3d82ea6326d018', 'data/ffe_terrain_query.json': '8d764c2cd2a682ddfa8e0b8978b8f12616333ef361d0ed820dcb5b03b3f1977a', 'data/ffe_math.json': '4166407ada817e8abfbd6e501ad12bac1a75977ee4d0c66fe727adb3aea8cce5', 'data/ffe_ship_registry.json': '07ccae9d6674bef40a7a5d2311a216b083ebdf010d5d47b187f7520de3b5d61a'}
+FUEL_UNCHANGED_MAIN_FUNCTION_SHA256={'_new_models': '84ee3ddf0488623c93a925f9e80c76d28f4b7369245264dc686c0a99b364d5d9', '_time_context': 'fe9c64abab18fcfef20cc38e32749e8f484cbe2f54cdf7c6dfd06ed316b3f23a', '_advance_controls': '040b53157b656043a248f22bcac26a8e33ddb056338cdc26f4fcc1ef58e54b7d', '_source_motion_step': 'c476095f2e40347e7e45b1680dcb74c9adcd85931d8914a4959460a9410631cd', '_apply_system': '47920c0adf4566e249ff2a7107ea85ae46923de53f94d788ad61307063acddc0', '_set_speed': '70f2369529290729e7cce96f51b7e6925614f0694cacebd0056523608ea34ec9', '_brake': '65dcd9782fee7cf46f030449926b6b637261f77e29024b3b765638878dfb58c1', '_toggle_auto': 'c66d6117ba49db06dcff00c94c59e04cb7c18bbd3ea91442eafe54f9e086616d', '_takeoff_action': '9d9648da5d8568bd962c3cde905bbd3865daa99f2fab14ba4ef1608b77ba310b', '_dock_action': 'bb95a86e818161c86714e17c200c16fef97354b5d62c555997b15799dc9e1865', '_surface_action': 'a19f55eb2bd983bdb3845cd7db9164b4bd18807877bae4c69e7096ef5ab3c5f3', '_enter_surface': '832d1576ee6c4f123d36a84c48bb0d0c882ef9bedffbaec506eb6647ff4716cf', '_choose_body': 'c3dab65a5e88c31f842188d34607279731672271b8d300b5c37a7c6929fdb18b', '_choose_site': '5dd971636babc4a708158c8438ad0b426794763328a26634c40c8757b05eab39', '_safe_area': '6d5e38a60d624a39a9d2316f19d36d9a70d165ed774d98758770591a9572fd8f', '_update_flight_projection': '64f5a6530eeebe1e58488f0f54b106e15f889bf2e311f9384c48eb3ab1e1f9e3'}
+FUEL_NATIVE_REFERENCE={'source_jet_fuel_native': {'sha256': 'ba1fa8be78c6c142fa037f0fb499e2aa2f2782077ad0b8f1da6a1dffa30051c8', 'case_count': 3182}, 'source_fuel_scoop_native': {'sha256': '40d2a6528bc7607a442311aeea69c2fcc7ac9859ccfe4cc64a88ddf123f6b15f', 'case_count': 729}, 'source_fuel_contact_native': {'sha256': 'a68264130ed7a13b17a689b58e23e2f0d6921d4c33b9bfb4d20219709d7cf3d6', 'case_count': 330}}
 DEVELOPMENT_ASSET_PREFIXES=(
     'assets/tests/','assets/tools/','assets/docs/','assets/recovered-history/',
     'assets/recovery/','assets/validation/','assets/deliverables/',
@@ -700,12 +707,13 @@ def verify_source_full_runtime(archive,project,version_code=34):
         assert re.search(rb'^shader_type\s+spatial\s*;',raw,re.M),'Invalid source streaming spatial shader '+name
         result['shaders'][name]={'runtime_path':exported,'runtime_bytes':len(raw),'runtime_sha256':hashlib.sha256(raw).hexdigest()}
     result['startup_contract']=verify_full_startup(text['main'],text['planetary_system'])
-    required_tables=FULL_SOURCE_TABLES+(NAVIGATION_TABLES if version_code>=36 else ())
+    required_tables=FULL_SOURCE_TABLES+(NAVIGATION_TABLES if version_code>=36 else ())+(('ffe_fuel',) if version_code>=41 else ())
     present_tables=set(path.stem for path in (project/'data').glob('ffe_*.json'))
     # Older contracts still inspect their exact base tables when tested from a
     # newer checkout. Only explicitly known later-version tables may coexist;
     # current v36 must include and verify its additional original map resource.
-    assert set(required_tables)<=present_tables<=set(FULL_SOURCE_TABLES+NAVIGATION_TABLES+('ffe_system_information','ffe_hyperdrive')),'Full packaging verifier list omits a source table or names a missing table'
+    allowed_tables=FULL_SOURCE_TABLES+NAVIGATION_TABLES+('ffe_system_information','ffe_hyperdrive')+(('ffe_fuel',) if version_code>=41 else ())
+    assert set(required_tables)<=present_tables<=set(allowed_tables),'Full packaging verifier list omits a source table or names a missing table'
     tables={}
     for name in required_tables+('ships','world_names_ru'):
         raw=(project/'data'/f'{name}.json').read_bytes();exported=f'assets/data/{name}.json'
@@ -1158,13 +1166,8 @@ def verify_system_information_runtime(archive,project):
             'complete_game_localization':False,'physical_device_tested':False}
 
 
-def verify_hyperdrive_runtime(archive,project):
-    """Code40 package inputs and audited consumers, without executing GDSC.
-
-    Exact source pins follow the reviewed integration checkpoint. Native kernel,
-    live Main and UI behavior are tested separately; package evidence does not
-    imply F908/arrival, original economy, or complete original physics parity.
-    """
+def _verify_hyperdrive_payload(archive,project):
+    """Retained code40 byte/native metadata controls shared with later fuel."""
     names=set(archive.namelist());modules={}
     for name in HYPERDRIVE_MODULES:
         path='assets/scripts/'+name+'.gdc'
@@ -1193,6 +1196,26 @@ def verify_hyperdrive_runtime(archive,project):
         assert tuple(profile.get(key) for key in ['source_model_index','source_drive_index','hydrogen','fixed_equipment_space_t','original_starter'])==expected,'Changed audited new-session hyperdrive profile '+ship
         assert profile.get('military')==profile.get('waste')==0,'Incorrect initial hyperdrive cargo '+ship
     assert hashlib.sha256(raw).hexdigest()==HYPERDRIVE_RESOURCE_SHA256,'Hyperdrive resource differs from reviewed DOS extraction'
+    fixture_path=project/'tests/fixtures/source_hyperdrive_native.json'
+    fixture_raw=fixture_path.read_bytes();fixture=json.loads(fixture_raw)
+    assert hashlib.sha256(fixture_raw).hexdigest()==HYPERDRIVE_NATIVE_SHA256,'Changed independent hyperdrive native reference'
+    assert fixture.get('source_sha256')==SOURCE_IMAGE_SHA256 and fixture.get('source_assembly_sha256')==SOURCE_ASSEMBLY_SHA256 and fixture.get('source_commit')==SOURCE_ASSEMBLY_COMMIT,'Wrong hyperdrive native provenance'
+    assert fixture.get('drive_table_hex')==data['drive_table_hex'] and fixture.get('drive_count')==15,'Hyperdrive native table differs from runtime'
+    for key,spec in data['ship_specs'].items():
+        assert fixture.get('ship_specs',{}).get(key,{}).get('spec_hex')==spec['spec_hex'],'Hyperdrive native spec differs from runtime '+key
+    assert fixture.get('case_count')==len(fixture.get('cases',[]))==5453 and fixture.get('unsafe_case_count')==len(fixture.get('unsafe_cases',[]))==11,'Incomplete independent hyperdrive cases'
+    assert fixture.get('fresh_process_runs')==3 and fixture.get('reverse_repeat_count')==5453 and all(fixture.get(key) is True for key in ['canaries_unchanged','nonfuel_object_bytes_unchanged','specifications_unchanged']),'Incomplete independent hyperdrive reproduction/boundaries'
+    return {'modules':modules,'raw':raw,'data':data,'fixture':fixture}
+
+def verify_hyperdrive_runtime(archive,project):
+    """Code40 package inputs and audited consumers, without executing GDSC.
+
+    Exact source pins follow the reviewed integration checkpoint. Native kernel,
+    live Main and UI behavior are tested separately; package evidence does not
+    imply F908/arrival, original economy, or complete original physics parity.
+    """
+    payload=_verify_hyperdrive_payload(archive,project)
+    modules,raw,data=payload['modules'],payload['raw'],payload['data']
     # Preserve all code39 original/RU boundaries and variable controls. The
     # three information scripts are frozen as well, rather than skipped.
     information=_verify_system_information_payload(archive,project)
@@ -1234,15 +1257,6 @@ def verify_hyperdrive_runtime(archive,project):
     assert 'source_digest' in source_function(session,'restore') and 'candidate.valid()' in source_function(session,'restore'),'Inventory save lacks validated resource-bound atomic restore'
     for relative,expected in HYPERDRIVE_AUDITED_SOURCE_SHA256.items():
         assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==expected,'Hyperdrive update differs from audited integration source '+relative
-    fixture_path=project/'tests/fixtures/source_hyperdrive_native.json'
-    fixture_raw=fixture_path.read_bytes();fixture=json.loads(fixture_raw)
-    assert hashlib.sha256(fixture_raw).hexdigest()==HYPERDRIVE_NATIVE_SHA256,'Changed independent hyperdrive native reference'
-    assert fixture.get('source_sha256')==SOURCE_IMAGE_SHA256 and fixture.get('source_assembly_sha256')==SOURCE_ASSEMBLY_SHA256 and fixture.get('source_commit')==SOURCE_ASSEMBLY_COMMIT,'Wrong hyperdrive native provenance'
-    assert fixture.get('drive_table_hex')==data['drive_table_hex'] and fixture.get('drive_count')==15,'Hyperdrive native table differs from runtime'
-    for key,spec in data['ship_specs'].items():
-        assert fixture.get('ship_specs',{}).get(key,{}).get('spec_hex')==spec['spec_hex'],'Hyperdrive native spec differs from runtime '+key
-    assert fixture.get('case_count')==len(fixture.get('cases',[]))==5453 and fixture.get('unsafe_case_count')==len(fixture.get('unsafe_cases',[]))==11,'Incomplete independent hyperdrive cases'
-    assert fixture.get('fresh_process_runs')==3 and fixture.get('reverse_repeat_count')==5453 and all(fixture.get(key) is True for key in ['canaries_unchanged','nonfuel_object_bytes_unchanged','specifications_unchanged']),'Incomplete independent hyperdrive reproduction/boundaries'
     return {'baseline_source_commit':HYPERDRIVE_BASELINE_SOURCE_COMMIT,'compiled_modules':modules,'compiled_module_count':3,
             'raw_resource_sha256':hashlib.sha256(raw).hexdigest(),'raw_json_count':1,'drive_count':15,'ship_specification_count':57,
             'new_session_profile_models':{'cobra':38,'eagle':24,'shuttle':15},'original_starting_loadout_subset':['cobra'],
@@ -1257,6 +1271,121 @@ def verify_hyperdrive_runtime(archive,project):
             'original_f908_arrival_pipeline':False,'original_misjump_pipeline':False,'jetfuel_or_star_scoop_integrated_by_this_block':False,
             'all57_ships_playable':False,'complete_original_hyperdrive_gameplay':False,'complete_original_physics':False,
             'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
+
+
+def verify_fuel_runtime(archive,project):
+    """Code41 fuel input/consumer gate, separate from instruction/GPU tests."""
+    hyper=_verify_hyperdrive_payload(archive,project)
+    information=_verify_system_information_payload(archive,project)
+    names=set(archive.namelist());modules={}
+    for name in FUEL_MODULES:
+        path='assets/scripts/'+name+'.gdc'
+        assert path in names,'Missing fuel runtime module '+name
+        raw=archive.read(path)
+        assert len(raw)>64 and raw[:4]==b'GDSC','Invalid compiled fuel runtime '+name
+        modules[name]={'runtime_sha256':hashlib.sha256(raw).hexdigest(),
+                       'local_source_sha256':hashlib.sha256((project/'scripts'/f'{name}.gd').read_bytes()).hexdigest()}
+    path='assets/data/ffe_fuel.json'
+    assert path in names,'Missing fuel resource'
+    raw=archive.read(path)
+    assert raw==(project/'data/ffe_fuel.json').read_bytes(),'Fuel resource differs from local source'
+    data=json.loads(raw)
+    assert data.get('schema')==1 and data.get('source_sha256')==SOURCE_IMAGE_SHA256,'Wrong fuel executable provenance'
+    assert data.get('source_assembly_sha256')==SOURCE_ASSEMBLY_SHA256 and data.get('source_commit')==SOURCE_ASSEMBLY_COMMIT,'Wrong fuel assembly provenance'
+    assert data.get('immutable_hyperdrive_resource_sha256')==HYPERDRIVE_RESOURCE_SHA256,'Fuel update changed immutable hyperdrive digest'
+    for label,expected in {'5111':'094f80502f208b354b4e91d1dff6777d0d893d47c05c31fba8177d3e5b214a57','6266':'6fd21579d4bf35590dee289b2a1cbe12f1bc4e0d10a9ee71d56efea80cac21cb'}.items():
+        table=bytes.fromhex(data.get('tables_hex',{}).get(label,''))
+        assert len(table)==60 and hashlib.sha256(table).hexdigest()==expected,'Changed original fuel table '+label
+    variant=data.get('source_variants',{}).get('F929',{})
+    assert variant.get('DOS_automatic_restore') is False and variant.get('DOS_exhaustion_cleared_offsets')==[188,192,196],'Fuel policy lost the canonical DOS three-axis variant'
+    assert sorted(map(int,data.get('models',{})))==list(range(134,149)),'Incomplete original gas/star contact models'
+    for key,row in data['models'].items():
+        descriptor=bytes.fromhex(row['descriptor_hex']);vertices=bytes.fromhex(row['vertices_hex']);payload=bytes.fromhex(row['collision_payload_hex'])
+        assert len(descriptor)==68 and len(vertices)==24 and len(payload)==8,'Incorrect original contact component bounds '+key
+        for field in ['descriptor','vertices','collision_payload']:
+            assert hashlib.sha256(bytes.fromhex(row[field+'_hex'])).hexdigest()==row[field+'_sha256'],'Changed original fuel contact component '+key+'/'+field
+        assert row['mesh_zoom']==sum(struct.unpack_from('<II',descriptor,20)),'Changed original fuel contact scale '+key
+        assert struct.unpack_from('<H',payload,4)[0]=={134:3,135:6,136:5}.get(int(key),9),'Changed original stellar terrain style '+key
+    for key,expected in {'refueller':(14,1,2),'scoop':(29,6,0x100000),'atmospheric_shielding':(15,1,0x40000000)}.items():
+        item=data.get('equipment',{}).get(key,{})
+        assert tuple(item.get(k)for k in ['equipment_index','mass_tonnes_u32','equipment_mask_u32'])==expected,'Changed original fuel equipment '+key
+    assert data['equipment']['scoop'].get('required_spec_word_offset')==4 and data['equipment']['scoop'].get('required_spec_mask_u16')==256,'Fuel scoop lost its original hull eligibility'
+    assert hashlib.sha256(raw).hexdigest()==FUEL_RESOURCE_SHA256,'Fuel resource differs from frozen DOS extraction'
+    protected={path:value for path,value in MAP_VISUAL_PROTECTED_SOURCE_SHA256.items()
+               if path not in ('scripts/main.gd','scripts/system_map_view.gd','scripts/navigation.gd','scripts/galactic_map_model.gd',
+                               'scripts/flight_model.gd','scripts/surface_model.gd','scripts/source_motion_bridge.gd')}
+    for relative,expected in {**protected,**HYPERDRIVE_INFORMATION_SOURCE_SHA256,**FUEL_CONTACT_DEPENDENCY_SHA256}.items():
+        assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==expected,'Fuel update changed protected source/data '+relative
+    assert hashlib.sha256((project/'scripts/celestial_renderer.gd').read_bytes()).hexdigest()==SYSTEM_INFORMATION_CELESTIAL_SHA256,'Fuel update changed Mercury stellar visibility'
+    assert hashlib.sha256((project/'scripts/system_map_view.gd').read_bytes()).hexdigest()==SYSTEM_INFORMATION_MAP_VIEW_SHA256['scripts/system_map_view.gd'],'Fuel update changed system-map travel/information'
+    main=(project/'scripts/main.gd').read_text()
+    for name,expected in FUEL_UNCHANGED_MAIN_FUNCTION_SHA256.items():
+        assert hashlib.sha256(source_function(main,name).encode()).hexdigest()==expected,'Fuel update changed undeclared physical Main function '+name
+    source={name:(project/'scripts'/f'{name}.gd').read_text() for name in (*FUEL_MODULES,*HYPERDRIVE_MODULES,'navigation','flight_model','surface_model','source_motion_bridge','galactic_map_model')}
+    jet=source['source_jet_fuel'];session=source['source_hyperdrive_session'];navigation=source['navigation']
+    assert 'uploaded-dos-f929-three-positive-limits-no-automatic-restore' in jet,'Live jet kernel uses the wrong F929 variant'
+    assert 'tables_hex' in source_function(jet,'_load') and '5111' in source_function(jet,'jet_capacity_raw'),'Manual refill lost its original tank-capacity consumer'
+    assert 'state.thrust_u16=state.cached_thrust_u16.duplicate()' in source_function(jet,'manual_refuel'),'Manual refill lost its original thrust-limit restoration'
+    tick=source_function(main,'_tick')
+    assert '_apply_source_fuel_state()' in tick and '_step_source_fuel(dt,fuel_commands)' in tick,'Main fuel debit is not consumed by the live physics step'
+    debit=source_function(main,'_step_source_fuel')
+    assert 'fuel_contact.sample(world,ship,nav.elapsed_days)' in debit and 'FuelContact.new()' in main and 'nav.advance_fuel_seconds(seconds,context,ship)' in debit,'Live fuel step lost original contact/session consumers'
+    assert 'destruction_requested' in debit and 'ship.hull=0' in debit,'Stellar thermal destruction is not consumed by Main'
+    runtime_command=source_function(main,'_fuel_runtime_command')
+    assert 'nav.manual_jet_refuel(ship)' in runtime_command and 'nav.set_refueller_enabled(enabled,ship)' in runtime_command,'Manual refill/refueller controls lack Main consumers'
+    assert 'runtime_command.connect(_fuel_runtime_command)' in source_function(main,'_embed_hyperdrive_services'),'Fuel UI commands are not connected to Main'
+    assert 'runtime_command.emit(' in source['hyperdrive_services_view'],'Fuel workshop lost its actual runtime signal'
+    assert 'apply_fuel_availability' in source_function(main,'_decode_state') and '_apply_source_fuel_state()' in source_function(main,'_commit_state'),'Restored fuel flags must derive Flight propulsion state'
+    assert 'nav.apply_fuel_availability(ship)' in source_function(main,'_apply_source_fuel_state'),'Source fuel state is not consumed by Flight'
+    assert 'propulsion_available' in source_function(source['flight_model'],'acceleration') and 'source_thrust_limits_u16' in source['source_motion_bridge'],'Fuel exhaustion lost its phone/raw propulsion consumers'
+    assert 'propulsion_available' in source['surface_model'],'Surface propulsion must respect empty jet fuel'
+    assert '"propulsion_available"' not in source_function(source['flight_model'],'snapshot'),'Derived propulsion flags must not become trusted Flight save fields'
+    assert 'fuel_system' in source_function(session,'snapshot') and '_valid_fuel()' in source_function(session,'valid'),'Fuel inventory lacks validated snapshot state'
+    assert '_fuel_digest()' in source_function(session,'_valid_fuel') and '_fraction(' in source_function(session,'_valid_fuel'),'Fuel restore lacks resource/clock-fraction validation'
+    assert 'Jet.manual_refuel(' in source_function(session,'manual_jet_refuel') and 'Jet.jet_capacity_raw(' in source_function(session,'manual_jet_refuel'),'Manual refill lost original F289/capacity calculation'
+    fuel_step=source_function(session,'_step_fuel')
+    assert 'Jet.fuel_step(' in fuel_step and 'Scoop.evaluate(' in fuel_step,'Session lost its jet debit or scoop source kernel'
+    assert 'PLAYER_UPDATE_TICKS' in source_function(session,'advance_fuel_ticks') and 'ticks_fraction_f64_hex' in source_function(session,'advance_fuel_seconds'),'Jet maintenance lost its explicit calendar-second/fraction schedule'
+    assert 'starter_shielding_credit()' in source_function(session,'occupied'),'Eagle baseline shielding cannot be double-counted as new equipment'
+    assert 'candidate.fuel_system.jet_raw_u32=0' in source_function(session,'service'),'Drive removal lost its F410 jet-empty side effect'
+    assert 'source_map_quote(' in source_function(source['galactic_map_model'],'jump_state'),'Map lost the retained source hyperdrive quote'
+    assert 'session.hyperdrive_snapshot()' in source_function(navigation,'_pending_for'),'Pending hyperdrive quote must exclude unrelated jet clock ticks'
+    assert 'legacy_pending' in source_function(navigation,'_restore_source') and 'fuel_extension_upgraded' in source_function(navigation,'_restore_source'),'Previous v3 pending/fuel initialization path is missing'
+    for relative,expected in FUEL_AUDITED_SOURCE_SHA256.items():
+        assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==expected,'Fuel update differs from audited integration source '+relative
+    references={}
+    for name,expected in FUEL_NATIVE_REFERENCE.items():
+        fixture_raw=(project/'tests/fixtures'/f'{name}.json').read_bytes();fixture=json.loads(fixture_raw)
+        assert hashlib.sha256(fixture_raw).hexdigest()==expected['sha256'],'Changed fuel native reference '+name
+        assert fixture.get('schema')==1 and fixture.get('source_assembly_sha256',fixture.get('asm_sha256'))==SOURCE_ASSEMBLY_SHA256,'Wrong fuel native assembly provenance '+name
+        assert fixture.get('case_count')==len(fixture.get('cases',[]))==expected['case_count'] and fixture.get('fresh_process_runs')==3 and fixture.get('canaries_unchanged') is True,'Incomplete fuel native reproduction '+name
+        references[name]={'sha256':expected['sha256'],'case_count':expected['case_count'],'fresh_process_runs':3,'oracle_executed_by_apk_verifier':False}
+        if name=='source_jet_fuel_native':
+            assert fixture.get('source_sha256')==SOURCE_IMAGE_SHA256 and fixture.get('source_variant')=='dos-firstenc-f929-f938-f289-v1','Wrong canonical DOS jet native provenance'
+            for label in ['5111','6266']:assert fixture['tables'][label]['hex']==data['tables_hex'][label],'Jet native table differs from runtime '+label
+            for label in ['289','929','938']:
+                proof=fixture['dos_instruction_proof'][label];original=data['dos_code_blocks'][label]
+                assert proof['sha256']==original['sha256'] and proof['executable_offset']==original['dos_file_offset'] and proof['byte_length']==original['byte_count'] and proof['all_instructions_equal_after_only_branch_destination_normalization'] is True,'Jet native instructions differ from uploaded DOS '+label
+            counterfactual=fixture.get('jjffe_counterfactual',{})
+            assert counterfactual.get('not_canonical_dos') is True and counterfactual.get('difference_count',0)>0,'Missing explicit DOS/JJFFE jet divergence proof'
+        elif name=='source_fuel_scoop_native':
+            assert fixture.get('source_contract')=='jjffe-f1033-after-f569-fuel-scoop-v1' and fixture.get('reverse_order_unchanged') is True,'Wrong scoop native contract/reproduction'
+        else:
+            assert fixture.get('source_sha256')==SOURCE_IMAGE_SHA256 and fixture.get('models')==list(range(134,149)) and fixture.get('reverse_repeat_count')==expected['case_count'] and fixture.get('parent_bank_unchanged') is True,'Incomplete original gas/star contact reference'
+    return {'baseline_source_commit':FUEL_BASELINE_SOURCE_COMMIT,'compiled_modules':modules,'compiled_module_count':4,
+        'raw_resource_sha256':hashlib.sha256(raw).hexdigest(),'raw_json_count':1,'contact_model_count':15,'fuel_equipment_records':len(data['equipment']),
+        'audited_local_source_sha256':FUEL_AUDITED_SOURCE_SHA256,'protected_old_source_data_count':len(protected),
+        'protected_contact_dependency_count':len(FUEL_CONTACT_DEPENDENCY_SHA256),'unchanged_Main_function_count':len(FUEL_UNCHANGED_MAIN_FUNCTION_SHA256),
+        'unchanged_hyperdrive_resource_sha256':HYPERDRIVE_RESOURCE_SHA256,'retained_hyperdrive_compiled_module_count':len(hyper['modules']),
+        'unchanged_information_resources':information['tables'],'unchanged_information_runtime_count':3,
+        'native_references':references,'canonical_jet_variant':'uploaded-DOS-three-positive-limits-no-automatic-restore',
+        'manual_refill':'F289 cargo-to-jet, not direct station tank filling','source_scoop_kernel':'F1033 after supplied contact',
+        'gas_star_contact':'F574/F581/F1876 with exact source models and read-only model84 probe; current SI/world frame adapter',
+        'cadence_policy':'nominal-day SI clock, F152 integer49710 calendar-second updates, explicit caller cooldown decrement',
+        'phone_powered_impulse_to_f938_commands_is_adapter':True,'full_F938_shield_damage_loop_integrated':False,
+        'full_F569_player_collision_integrated':False,'full_F1014_atmospheric_heat_integrated':False,
+        'original_F908_arrival_pipeline':False,'original_outfitting_economy':False,'complete_original_time_scheduler':False,
+        'complete_original_physics':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
 
 
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
@@ -1277,7 +1406,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={};hyperdrive_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={};hyperdrive_assets={};fuel_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -1356,9 +1485,13 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             if expected['version_code']==39:
                 system_information_assets=verify_system_information_runtime(archive,presets.parent)
                 map_visual_assets=system_information_assets['galactic_map_visual_assets']
-            if expected['version_code']>=40:
+            if expected['version_code']==40:
                 hyperdrive_assets=verify_hyperdrive_runtime(archive,presets.parent)
                 system_information_assets={'resources':hyperdrive_assets['system_information_resources'],'unchanged_runtime_modules':3,'raw_original_and_ru_resources_checked':True}
+            if expected['version_code']>=41:
+                fuel_assets=verify_fuel_runtime(archive,presets.parent)
+                hyperdrive_assets={'raw_resource_sha256':fuel_assets['unchanged_hyperdrive_resource_sha256'],'compiled_module_count':fuel_assets['retained_hyperdrive_compiled_module_count'],'retained_by_strict_fuel_gate':True,'source_f903_live_quote_consumers_checked':True}
+                system_information_assets={'resources':fuel_assets['unchanged_information_resources'],'unchanged_runtime_modules':3,'raw_original_and_ru_resources_checked':True}
         for name in names:
             if not name.startswith('lib/') or not name.endswith('.so'):continue
             data=archive.read(name)
@@ -1376,7 +1509,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'hyperdrive_assets':hyperdrive_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'hyperdrive_assets':hyperdrive_assets,'fuel_assets':fuel_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

@@ -23,6 +23,7 @@ var message:=""
 var _source_port_available:=false # Derived selected-port context, never saved.
 var _hyperdrive:RefCounted
 var pending_source_quote:Dictionary={}
+var fuel_extension_upgraded:=false
 
 func is_native()->bool:return galaxy.is_native()
 func is_source_hyperdrive()->bool:return _hyperdrive!=null
@@ -32,7 +33,7 @@ func configure_native(start_id:int=GalaxyData.SOL_ID)->bool:
 	if not candidate.configure_native() or not candidate.set_focus(start_id):return false
 	galaxy=candidate;current_id=start_id;selected_id=start_id;elapsed_days=0.0;fuel=FUEL_CAPACITY;remaining=0.0
 	visited=[start_id];pending_id=-1;pending_fuel=0;station_override="";message="";_source_port_available=false
-	_hyperdrive=null;pending_source_quote={}
+	_hyperdrive=null;pending_source_quote={};fuel_extension_upgraded=false
 	return true
 
 func set_source_port_available(available:bool)->void:
@@ -157,7 +158,7 @@ func restore(data:Dictionary)->bool:
 	current_id=int(data.current_id);selected_id=int(data.selected_id);elapsed_days=float(data.elapsed_days);fuel=int(data.fuel)
 	remaining=float(data.remaining);pending_id=int(data.pending_id);pending_fuel=int(data.pending_fuel);visited=data.visited.duplicate()
 	station_override="";message="";_source_port_available=false
-	_hyperdrive=null;pending_source_quote={}
+	_hyperdrive=null;pending_source_quote={};fuel_extension_upgraded=false
 	return true
 
 func configure_source(ship_id:String="cobra",start_id:int=GalaxyData.SOL_ID)->bool:
@@ -165,7 +166,7 @@ func configure_source(ship_id:String="cobra",start_id:int=GalaxyData.SOL_ID)->bo
 	if not session.configure(ship_id) or not candidate.configure_native() or not candidate.set_focus(start_id):return false
 	galaxy=candidate;current_id=start_id;selected_id=start_id;elapsed_days=0.0;remaining=0.0;visited=[start_id]
 	pending_id=-1;pending_fuel=0;pending_source_quote={};station_override="";message="";_source_port_available=false
-	_hyperdrive=session;fuel=session.fuel();return true
+	_hyperdrive=session;fuel=session.fuel();fuel_extension_upgraded=false;return true
 func fuel_capacity()->int:return _hyperdrive.fuel_capacity() if is_source_hyperdrive() else FUEL_CAPACITY
 func source_range_ly(ship:RefCounted=null)->float:
 	if not is_source_hyperdrive():return 0.0
@@ -230,10 +231,12 @@ func _source_jump_error(ship:RefCounted)->String:
 	if not quote.get("ok",false) or not quote.get("can_jump",false):return _quote_reason(str(quote.get("reason","")))
 	if ship.velocity.length()>20:return "Затормозите до 20 м/с."
 	return ""
-static func _pending_for(session:RefCounted,origin_id:int,destination_id:int,distance_raw:int)->Dictionary:
+static func _pending_for(session:RefCounted,origin_id:int,destination_id:int,distance_raw:int,legacy:=false)->Dictionary:
 	var quote:Dictionary=session.quote(distance_raw)
 	if not quote.get("ok",false) or not quote.get("can_jump",false):return {}
-	return {"schema":"source-hyperdrive-pending-v1","origin_id":origin_id,"destination_id":destination_id,"distance_raw":distance_raw,"required_fuel":int(quote.required_fuel),"duration_raw_u32":int(quote.duration_raw_u32),"max_range_raw":int(quote.max_range_raw),"current_range_raw":int(quote.current_range_raw),"session_before_sha256":JSON.stringify(session.snapshot()).sha256_text()}
+	var result:={"schema":"source-hyperdrive-pending-v1" if legacy else "source-hyperdrive-pending-v2","origin_id":origin_id,"destination_id":destination_id,"distance_raw":distance_raw,"required_fuel":int(quote.required_fuel),"duration_raw_u32":int(quote.duration_raw_u32),"max_range_raw":int(quote.max_range_raw),"current_range_raw":int(quote.current_range_raw),"session_before_sha256":JSON.stringify(session.hyperdrive_snapshot()).sha256_text()}
+	if not legacy:result.fuel_hardware_before_sha256=JSON.stringify({"refueller_installed":bool(session.fuel_system.refueller_installed),"scoop_installed":bool(session.fuel_system.scoop_installed),"atmospheric_shielding_installed":bool(session.fuel_system.atmospheric_shielding_installed)}).sha256_text()
+	return result
 static func _same_pending(first:Dictionary,second:Dictionary)->bool:
 	if first.size()!=second.size():return false
 	for key in first:
@@ -279,28 +282,87 @@ func _restore_source(data:Dictionary)->bool:
 		if not _number(id,0,4294967295,true) or not candidate.is_valid_id(int(id)) or seen.has(int(id)):return false
 		seen[int(id)]=true
 	if not seen.has(int(data.current_id)):return false
+	var restored_pending:Dictionary={}
 	if float(data.remaining)>0:
 		if int(data.pending_id)!=int(data.selected_id) or int(data.pending_id)==int(data.current_id) or not candidate.is_valid_id(int(data.pending_id)):return false
 		var metric:=_raw_distance(candidate.get_system(int(data.current_id)),candidate.get_system(int(data.pending_id)))
 		if not metric.get("ok",false):return false
-		var expected:=_pending_for(session,int(data.current_id),int(data.pending_id),int(metric.distance_raw))
+		var legacy_pending:bool=not data.source_hyperdrive.has("fuel_system")
+		var expected:=_pending_for(session,int(data.current_id),int(data.pending_id),int(metric.distance_raw),legacy_pending)
 		if expected.is_empty() or int(data.pending_fuel)!=int(expected.required_fuel) or not _same_pending(expected,data.pending_source_quote):return false
+		restored_pending=_pending_for(session,int(data.current_id),int(data.pending_id),int(metric.distance_raw))
 	elif int(data.pending_id)!=-1 or int(data.pending_fuel)!=0 or not data.pending_source_quote.is_empty():return false
 	if not candidate.set_focus(int(data.current_id)):return false
 	galaxy=candidate;_hyperdrive=session;current_id=int(data.current_id);selected_id=int(data.selected_id);elapsed_days=float(data.elapsed_days);fuel=int(data.fuel)
-	remaining=float(data.remaining);pending_id=int(data.pending_id);pending_fuel=int(data.pending_fuel);visited=data.visited.duplicate();pending_source_quote=data.pending_source_quote.duplicate(true)
+	remaining=float(data.remaining);pending_id=int(data.pending_id);pending_fuel=int(data.pending_fuel);visited=data.visited.duplicate();pending_source_quote=restored_pending
+	fuel_extension_upgraded=session.fuel_extension_upgraded
 	station_override="";message="";_source_port_available=false;return true
+func _fuel_action_reason(ship:RefCounted)->String:
+	if not is_source_hyperdrive():return "Этот сеанс сохраняет прежнюю топливную модель."
+	if remaining>0:return "Сначала отмените заряд гипердвигателя."
+	if ship==null or not is_finite(ship.hull) or ship.hull<=0:return "Корабль недоступен для заправки."
+	return ""
+func fuel_state(ship:RefCounted=null)->Dictionary:
+	if not is_source_hyperdrive():return {"source_mode":false,"reason":"Этот сеанс сохраняет прежнюю топливную модель.","can_manual_refuel":false,"can_toggle_refueller":false,"upgrade_notice":""}
+	var candidate:RefCounted=_hyperdrive if ship==null else _hyperdrive.with_ship(ship)
+	if candidate==null:return {"source_mode":true,"reason":"Груз или оборудование не помещаются в исходный корабль.","can_manual_refuel":false,"can_toggle_refueller":false,"upgrade_notice":""}
+	var result:Dictionary=candidate.fuel_state();var reason:="" if ship==null else _fuel_action_reason(ship)
+	if not reason.is_empty():
+		result.can_manual_refuel=false;result.manual_refuel_reason=reason;result.can_toggle_refueller=false;result.toggle_reason=reason
+	return result
+func apply_fuel_availability(ship:RefCounted)->bool:
+	if ship==null:return false
+	if not is_source_hyperdrive():ship.propulsion_available=true;ship.source_thrust_limits_u16=[];return true
+	if not validate_source_ship(ship):return false
+	ship.source_thrust_limits_u16=_hyperdrive.thrust_limits_u16();ship.propulsion_available=_hyperdrive.propulsion_available();return true
+func set_refueller_enabled(enabled:bool,ship:RefCounted)->bool:
+	message=_fuel_action_reason(ship)
+	if not message.is_empty():return false
+	var candidate:RefCounted=_hyperdrive.with_ship(ship)
+	if candidate==null or not candidate.set_refueller_enabled(enabled):message="Автозаправщик не установлен или недоступен.";return false
+	_hyperdrive=candidate;fuel=candidate.fuel();message="Автозаправщик включён." if enabled else "Автозаправщик выключен.";return true
+func manual_jet_refuel(ship:RefCounted)->bool:
+	message=_fuel_action_reason(ship)
+	if not message.is_empty():return false
+	var candidate:RefCounted=_hyperdrive.with_ship(ship)
+	if candidate==null:message="Груз или оборудование не помещаются в исходный корабль.";return false
+	var result:Dictionary=candidate.manual_jet_refuel();message=str(result.get("message","Ручная заправка недоступна."))
+	if not result.get("ok",false) or not result.get("accepted",false):return false
+	_hyperdrive=candidate;fuel=candidate.fuel();apply_fuel_availability(ship);return true
+func _commit_fuel_result(candidate:RefCounted,result:Dictionary,ship:RefCounted)->Dictionary:
+	if not result.get("ok",false):return result
+	var cancelled:=false
+	if remaining>0 and candidate.hyperdrive_snapshot()!=_hyperdrive.hyperdrive_snapshot():cancel_jump();cancelled=true
+	_hyperdrive=candidate;fuel=candidate.fuel();apply_fuel_availability(ship)
+	result.hyperjump_cancelled=cancelled;return result
+func _fuel_candidate(ship:RefCounted)->RefCounted:
+	if not is_source_hyperdrive() or ship==null or not is_finite(ship.hull) or ship.hull<=0:return null
+	if remaining>0 and not validate_source_ship(ship):return null
+	return _hyperdrive.with_ship(ship)
+func fuel_step(context:Dictionary,ship:RefCounted)->Dictionary:
+	var candidate:RefCounted=_fuel_candidate(ship)
+	if candidate==null:return {"ok":false,"reason":"invalid_fuel_session"}
+	return _commit_fuel_result(candidate,candidate.fuel_step(context),ship)
+func advance_fuel_ticks(ticks:int,context:Dictionary,ship:RefCounted)->Dictionary:
+	var candidate:RefCounted=_fuel_candidate(ship)
+	if candidate==null:return {"ok":false,"reason":"invalid_fuel_session"}
+	return _commit_fuel_result(candidate,candidate.advance_fuel_ticks(ticks,context),ship)
+func advance_fuel_seconds(dt:float,context:Dictionary,ship:RefCounted)->Dictionary:
+	var candidate:RefCounted=_fuel_candidate(ship)
+	if candidate==null:return {"ok":false,"reason":"invalid_fuel_session"}
+	return _commit_fuel_result(candidate,candidate.advance_fuel_seconds(dt,context),ship)
 func _service_reason(ship:RefCounted)->String:
 	if not is_source_hyperdrive():return "Этот сеанс сохраняет прежнюю топливную модель."
 	if remaining>0:return "Сначала отмените заряд гипердвигателя."
 	if not ship.docked or not _source_port_available or not ship.station_available or ship.surface_mode or ship.combat_active or not is_finite(ship.hull) or ship.hull<=0:return "Для обслуживания выполните стыковку с выбранным космопортом."
 	return ""
 func service_state(ship:RefCounted)->Dictionary:
-	if not is_source_hyperdrive():return {"schema":"source-hyperdrive-services-v1","source_mode":false,"docked":ship.docked,"service_available":false,"reason":_service_reason(ship),"drives":[],"fuels":[]}
+	if not is_source_hyperdrive():return {"schema":"source-hyperdrive-services-v1","source_mode":false,"docked":ship.docked,"service_available":false,"reason":_service_reason(ship),"drives":[],"fuels":[],"fuel_system":fuel_state(ship),"fuel_equipment":[]}
 	var candidate:RefCounted=_hyperdrive.with_ship(ship);var reason:=_service_reason(ship)
 	if candidate==null:return {"schema":"source-hyperdrive-services-v1","source_mode":true,"docked":ship.docked,"service_available":false,"reason":"Груз или оборудование не помещаются в исходный корабль.","drives":[],"fuels":[]}
 	var result:Dictionary=candidate.service_state(int(ship.credits),reason.is_empty(),reason);result.docked=ship.docked
 	result.profile_name=str(ship.profile().get("name",ship.ship_id))
+	result.fuel_system=fuel_state(ship)
 	return result
 func service(action:String,id:String,quantity:int,ship:RefCounted)->bool:
 	message=_service_reason(ship)
@@ -313,7 +375,7 @@ func service(action:String,id:String,quantity:int,ship:RefCounted)->bool:
 	var result:Dictionary=candidate.service(action,id,quantity,int(ship.credits))
 	message=str(result.message)
 	if not result.ok:return false
-	_hyperdrive=candidate;fuel=candidate.fuel();ship.credits=int(result.credits);return true
+	_hyperdrive=candidate;fuel=candidate.fuel();ship.credits=int(result.credits);apply_fuel_availability(ship);return true
 func migration_quote(ship:RefCounted)->Dictionary:
 	var reason:=""
 	if is_source_hyperdrive() or not is_native():reason="Переход доступен только для прежнего нативного сеанса."
@@ -324,6 +386,7 @@ func migration_quote(ship:RefCounted)->Dictionary:
 	if reason.is_empty() and not candidate.configure_source(str(ship.ship_id),current_id):reason="Исходный профиль этого корабля недоступен."
 	if reason.is_empty():
 		candidate._hyperdrive.hydrogen=fuel;candidate._hyperdrive.military=0;candidate._hyperdrive.radioactives=0
+		candidate._hyperdrive.fuel_system.initialization_policy="explicit-v2-migration-profile-v1"
 		if not candidate.sync_source_ship(ship):reason="Груз и переведённое топливо не помещаются в исходный корабль."
 	if not reason.is_empty():return {"ok":false,"message":reason,"reason":reason}
 	candidate.selected_id=selected_id;candidate.elapsed_days=elapsed_days;candidate.visited=visited.duplicate()

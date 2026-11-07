@@ -1,0 +1,29 @@
+{
+  "time_utc": "2026-11-07T18:00:42.280253+00:00",
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_*packaging.py",
+    "-v"
+  ],
+  "test_count": 94,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "exit_code": 0,
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "file_sha256": {
+    "tools/verify_rebuilt_android.py": "782c556e157bb1be2471a5d218a53731fe92e977f86dc534fccfb547f8e3b899",
+    "tests/test_hyperdrive_packaging.py": "b554986cb058c722e6b956430fbf9ce6e1dae00754bc5f93a5d28034c8caa1e0",
+    "tests/test_android_full_packaging.py": "8b22841907d50c764303751a234a7ac77fb5d2529bcdeada1bc4431ecb815bee",
+    "tests/test_system_information_packaging.py": "328a11ce88109d162488bf61b80cedc2c85d92b3c709d54b10225230f207a533",
+    "tests/fixtures/fuel_v40_sources.json": "323e3446b726ad211f0e02cec76a88e826e9ef2fa3bdacbd547ca180cd46ec44"
+  },
+  "original_native_oracle_executed_by_this_run": false,
+  "physical_device_tested": false
+}

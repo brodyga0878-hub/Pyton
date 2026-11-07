@@ -10,6 +10,9 @@ const RotatingDock=preload("res://scripts/rotating_dock_dynamics.gd")
 const SOURCE_PILOT_PROFILE:="source-bay-phone-pilot-v1"
 const SourceControlProfile=preload("res://scripts/source_ship_control_profile.gd")
 var source_motion_profile:=false # Derived from World v4, never trusted from a save.
+var propulsion_available:=true # Derived from the separate source fuel session; never saved here.
+var source_thrust_limits_u16:Array=[] # Exact six source words; [] preserves old flight contracts.
+var last_propulsive_delta_v:=Vector3.ZERO # Phone-controller telemetry, before collision impulses.
 var economy_catalog := EconomyCatalog.new()
 var goods := {"medicines":2,"food":0,"metals":0,"machines":0,"electronics":0,"luxury":0}
 var equipment: Array = []
@@ -230,10 +233,31 @@ func profile() -> Dictionary:
 	return catalog.get_ship(ship_id)
 
 func acceleration() -> float:
+	if not propulsion_available:return 0.0
 	if source_motion_profile:
 		var native_bound:=SourceControlProfile.acceleration(ship_id)
 		if native_bound>0:return native_bound
 	return float(profile().get("acceleration",0.0))*(1.2 if "engine" in equipment else 1.0)
+
+func forward_propulsion_available()->bool:
+	return propulsion_available and (source_thrust_limits_u16.size()!=6 or int(source_thrust_limits_u16[4])!=0)
+
+func available_acceleration(direction:Vector3)->float:
+	if not direction.is_finite() or direction.length_squared()<0.00000001:return 0.0
+	var unit:=direction.normalized()
+	return acceleration()*maxf(0.0,filter_propulsive_delta(unit).dot(unit))
+
+func filter_propulsive_delta(delta:Vector3)->Vector3:
+	if not propulsion_available:return Vector3.ZERO
+	if source_thrust_limits_u16.size()!=6 or not 0 in source_thrust_limits_u16:return delta
+	# Preserve the uploaded DOS F929 quirk: exhaustion clears only the positive
+	# left/up/forward limits. The three negative limits remain usable until F289.
+	var basis:=Basis(attitude.normalized());var local:=basis.transposed()*delta
+	var native:=Vector3(-local.x,local.y,-local.z)
+	for axis in range(3):
+		var index:=axis*2+(0 if native[axis]>=0 else 1)
+		if int(source_thrust_limits_u16[index])==0:native[axis]=0.0
+	return basis*Vector3(-native.x,native.y,-native.z)
 
 func cargo_capacity() -> int:
 	return maxi(0,int(profile().get("cargo_capacity",0))-equipment_space())
@@ -254,12 +278,14 @@ func forward() -> Vector3:
 	return -(Basis(attitude).z)
 
 func step(dt: float, steering: Vector2, roll: float = 0.0, gravity := Vector3.ZERO, lift := 0.0) -> void:
+	last_propulsive_delta_v=Vector3.ZERO
 	# New boundary guard: a bad frame/input cannot poison the saved flight state.
 	if dt<=0 or not is_finite(dt) or not steering.is_finite() or not is_finite(roll) or not gravity.is_finite() or not is_finite(lift):return
 	if not position.is_finite() or not velocity.is_finite() or not attitude.is_finite() or attitude.length_squared()<0.0001 or not is_finite(target_speed) or not is_finite(hull) or profile().is_empty():return
 	if docked or hull<=0:
 		return
 	var previous_attitude:=attitude
+	var previous_velocity:=velocity
 	steering=steering.limit_length();roll=clampf(roll,-1,1)
 	target_speed=clampf(target_speed,-100.0,MAX_SPEED)
 	if not station_available or surface_mode or combat_active: autopilot = false
@@ -291,6 +317,9 @@ func step(dt: float, steering: Vector2, roll: float = 0.0, gravity := Vector3.ZE
 		else:
 			# Inertial mode: the slider sets axial thrust, not a hidden velocity clamp.
 			velocity += (forward() * (target_speed / MAX_SPEED) * acceleration()+gravity+Vector3.UP*clampf(lift,-1,1)*acceleration()*0.5) * dt
+	var requested_delta:=velocity-previous_velocity-gravity*dt
+	last_propulsive_delta_v=filter_propulsive_delta(requested_delta)
+	velocity+=last_propulsive_delta_v-requested_delta
 	var previous:=position
 	position += velocity * dt
 	if has_source_station():
@@ -332,6 +361,7 @@ func dock() -> bool:
 # New reconstruction of the missing launch/training-market section.
 func launch() -> void:
 	if not docked or hull<=0:return
+	if not forward_propulsion_available():last_notice="Прямая тяга недоступна. Заправьте реактивный бак из груза.";return
 	if has_source_station():
 		if not _source_approach_clear():last_notice="Вылет ожидает открытия стыковочного проёма.";return
 		position=STATION
@@ -476,7 +506,7 @@ func restore(data: Dictionary) -> bool:
 	# New reconstruction of the previously missing restore tail.
 	credits=int(data.credits)
 	delivered=bool(data.get("delivered",false))
-	autopilot=false;surface_mode=false;combat_active=false;station_available=true;source_motion_profile=false
+	autopilot=false;surface_mode=false;combat_active=false;station_available=true;source_motion_profile=false;propulsion_available=true;source_thrust_limits_u16=[];last_propulsive_delta_v=Vector3.ZERO
 	shots=0;last_notice=""
 	_source_pilot_phase=""
 	_source_motion_pending=false;_source_step_seconds=0;_source_rate_sample_valid=false;_source_angular_velocity=Vector3.ZERO;_source_ship_angular_velocity=Vector3.ZERO;_source_previous_basis=_source_basis;_source_last_collision={}

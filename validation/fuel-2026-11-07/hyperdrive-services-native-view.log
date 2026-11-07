@@ -1,0 +1,4 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+HYPERDRIVE NATIVE VIEW EVIDENCE: [{"capacity_t":80,"drive_index":3,"flight_cargo_t":6,"occupied_t":45,"phase":"initial_actual_source","pricing_profile":"basic-source-workshop-pricing-adapter-v1"},{"drive_index":11,"free_t":1,"fuel_handover_credit_change":0,"hydrogen":4,"military":47,"occupied_t":79,"phase":"fitted_and_fuelled"},{"duration_days":2.53741455078125,"duration_raw_u32":166292,"final_free_t":3,"military_consumed":2,"ordinary_inventory_unchanged":true,"phase":"military_jump_and_waste","required_fuel":2,"waste_handed_over":2},{"elapsed_days":17.25,"hydrogen_after_service":13,"old_fuel_units":12,"ordinary_inventory_unchanged":true,"phase":"immediate_post_migration","service_available_without_extra_refresh":true}]
+HYPERDRIVE NATIVE VIEW TESTS: 54 checks, 0 failures

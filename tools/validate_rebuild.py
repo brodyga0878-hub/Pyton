@@ -44,6 +44,14 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_jet_fuel', 'tests/test_source_jet_fuel.gd', 'Uploaded DOS F929/F938 tail/F289, bounded F1007 cooling/F152 cadence versus independent native instructions; explicit JJFFE counterfactual differences.', timeout=300),
+    Suite('source_fuel_scoop', 'tests/test_source_fuel_scoop.gd', 'Exact F1033/F1034 raw atmosphere/equipment/cargo/cooldown/stellar heat branches versus729 native cases; geometry is controlled independently.', timeout=300),
+    Suite('source_fuel_contact', 'tests/test_source_fuel_contact.gd', 'Read-only source gas/star F574/F581/F1876 natural field and current-world SI/frame adapter versus330 independently executed native contacts.', timeout=300),
+    Suite('source_fuel_session', 'tests/test_source_fuel_session.gd', 'Separate persisted jet tank, DOS selective nozzles, cargo refuelling, original cadence, hardware mass/mounting, legacy v3 upgrades and atomic pending quote rules.', timeout=300),
+    Suite('fuel_services_view', 'tests/test_fuel_services_view.gd', 'Embedded fuel UI layout and explicit runtime commands distinct from dock workshop transactions.', timeout=300),
+    Suite('fuel_services_native_view', 'tests/test_fuel_services_native_view.gd', 'Actual Navigation fuel and equipment operations through phone touch controls, directional depletion recovery and old source-profile hardware.', timeout=300),
+    Suite('source_fuel_main', 'tests/test_source_fuel_main.gd', 'Actual Main fuel cadence, source movement/save continuation, automatic star/gas scooping, UI recovery, old v40 saves, pause and stale-input boundaries.', timeout=600, user_args=('--rebuild-capture',)),
+    Suite('source_fuel_flight', 'tests/test_source_fuel_flight.gd', 'Actual Flight and Surface selective uploaded-DOS nozzle gating, ballistic inertia/gravity and explicit phone powered-impulse fuel adapter; independent source fuel/session tests are separate.', timeout=300),
     Suite('source_hyperdrive', 'tests/test_source_hyperdrive.gd', 'Original F833/F899..F903/F1521 arithmetic versus5453 native safe controls plus11 original fault domains; immutable raw evaluator and source-spec quotes.', timeout=300),
     Suite('source_hyperdrive_navigation', 'tests/test_source_hyperdrive_navigation.gd', 'Explicit v3 source inventory/capacity, quoted pending jumps and exact-once consumption/time, strict restore and atomic dock workshop services; legacy adapters remain separate.', timeout=300),
     Suite('hyperdrive_services_view', 'tests/test_hyperdrive_services_view.gd', 'Embedded phone equipment UI, copied service quotes, responsive actions, pointer release and fixture command routing; fixture prices do not prove original markets.', timeout=300),
