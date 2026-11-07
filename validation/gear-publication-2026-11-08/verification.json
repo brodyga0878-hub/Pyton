@@ -1,0 +1,101 @@
+{
+  "started_utc": "2026-11-07T21:38:25.253395+00:00",
+  "version": "0.18.0-landing-gear-alpha1",
+  "artifact_commit": "38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477",
+  "source_commit": "5c7be752af6cf3167452bb16a970b7a6f30d7cd9",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/manifest.json",
+      "http_status": 200,
+      "bytes": 14613,
+      "sha256": "3f6bafaca64b543905df4b2d2a7ddea596db05cf36053250899056713d89564b"
+    },
+    {
+      "file": "StarFrontier-0.18.0-landing-gear-arm64.apk",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/StarFrontier-0.18.0-landing-gear-arm64.apk",
+      "http_status": 200,
+      "bytes": 50071605,
+      "sha256": "20f340f1d1c9e8917849d56246123a1f9519b89d730e3568f3ef5f95b671a735",
+      "zip_crc_verified": true
+    },
+    {
+      "file": "StarFrontier-0.18.0-landing-gear-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/StarFrontier-0.18.0-landing-gear-source.zip",
+      "http_status": 200,
+      "bytes": 31185873,
+      "sha256": "89324041e68c1dfce09c7f9b5d5c20c7080396c8bfb3261a2e0c1148776d2b93",
+      "zip_crc_verified": true,
+      "source_commit_in_zip_comment": "5c7be752af6cf3167452bb16a970b7a6f30d7cd9"
+    },
+    {
+      "file": "screenshots/capture-manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/screenshots/capture-manifest.json",
+      "http_status": 200,
+      "bytes": 22409,
+      "sha256": "94274d6eabf36ab008617cffda79127e036ecbad9f0d608479f57451c99a0e5d"
+    },
+    {
+      "file": "screenshots/01-classic-console-gear-retracted.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/screenshots/01-classic-console-gear-retracted.png",
+      "http_status": 200,
+      "bytes": 356325,
+      "sha256": "064c88ab9de5e6df88512383cf02545e240a301ff8ab6a8ee932413d0856bf7b"
+    },
+    {
+      "file": "screenshots/02-classic-console-gear-deploying.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/screenshots/02-classic-console-gear-deploying.png",
+      "http_status": 200,
+      "bytes": 356960,
+      "sha256": "4a03ebef69f26787fe11edca354ca2b69b56400f10d8fea2ac8ca0a77977e2cf"
+    },
+    {
+      "file": "screenshots/03-classic-console-gear-deployed-narrow.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/screenshots/03-classic-console-gear-deployed-narrow.png",
+      "http_status": 200,
+      "bytes": 215612,
+      "sha256": "500329cb1bc4c42c409b657f379a6b0002e3f1204fa761ada832c33b0ad87e00"
+    },
+    {
+      "file": "screenshots/04-actual-external-struts-retracted.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/screenshots/04-actual-external-struts-retracted.png",
+      "http_status": 200,
+      "bytes": 404347,
+      "sha256": "717e38ad6eac731ac87257dcf8e09ddbc774b8fce8b1c0f28bf3fa32a042e931"
+    },
+    {
+      "file": "screenshots/05-actual-external-struts-deploying.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/screenshots/05-actual-external-struts-deploying.png",
+      "http_status": 200,
+      "bytes": 405837,
+      "sha256": "2a3d5b198bef582f6c92f7afd9d23a60ea2ea4916c5c4662fac21da8f29ff0c0"
+    },
+    {
+      "file": "screenshots/06-actual-external-struts-deployed.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/screenshots/06-actual-external-struts-deployed.png",
+      "http_status": 200,
+      "bytes": 405786,
+      "sha256": "043e3c82ce47d8e4fd9f546025fa302b20427601f17674e09970df61f040bf0a"
+    },
+    {
+      "file": "screenshots/07-gear-up-source-ground-hold.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/screenshots/07-gear-up-source-ground-hold.png",
+      "http_status": 200,
+      "bytes": 372674,
+      "sha256": "1826858f11a27b4156a56630eb5d48b138483174714166a0847175c360674d9c"
+    },
+    {
+      "file": "screenshots/08-full-gear-recovered-source-landing.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/screenshots/08-full-gear-recovered-source-landing.png",
+      "http_status": 200,
+      "bytes": 350258,
+      "sha256": "5846080d920c5364369ae155e591d743dddf09088351257050dd20538b2f935f"
+    }
+  ],
+  "status": "verified",
+  "scope": "Actual complete HTTPS downloads; immutable manifest bytes, payload SHA256/length, ZIP CRC, source archive Git comment and screenshot hashes. Not physical Android execution.",
+  "completed_utc": "2026-11-07T21:38:53.013565+00:00",
+  "all_manifest_payloads_downloaded": false,
+  "verified_download_count": 12,
+  "auxiliary_logs_and_reports_verified_by_local_manifest_only": true
+}

@@ -1,11 +1,12 @@
 # Управляемое шасси и посадочный контакт — 0.18.0
 
-Кандидат **0.18.0-landing-gear-alpha1 / Android code 43** подключает
+Опубликованная сборка **0.18.0-landing-gear-alpha1 / Android code 43** подключает
 управление шасси к сохранению, классической нижней консоли, изображению
 корабля, атмосферному входу F1014 и посадочным условиям. Функциональные
 проверки, настоящие кадры Main и строгая техническая проверка ARM64 APK
-завершены. Точный ZIP и новые HTTPS-ссылки ещё готовятся. Предыдущая
-опубликованная сборка — [0.17.0](RELEASE_0_17_0_RU.md).
+завершены. Точный ZIP прошёл свежий импорт и запуск; неизменяемые
+HTTPS-ссылки проверены полным скачиванием. Предыдущая опубликованная
+сборка — [0.17.0](RELEASE_0_17_0_RU.md).
 
 ## Запрос и физическое положение
 
@@ -160,8 +161,33 @@ target SDK 36, `debuggable=false`, прежний TEST-сертификат и Z
 `20f340f1d1c9e8917849d56246123a1f9519b89d730e3568f3ef5f95b671a735`.
 SHA256 TEST-сертификата:
 `16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25`.
-Точный ZIP со свежим импортом/запуском и HTTPS-публикация будут добавлены
-по фактическим результатам.
+
+## Исходники и проверенные ссылки
+
+Точный ZIP — **31 185 873 байта**, 1447 записей / **1294 файла**, меньше
+32 МиБ. Исходный коммит `5c7be752af6cf3167452bb16a970b7a6f30d7cd9`. SHA256:
+`89324041e68c1dfce09c7f9b5d5c20c7080396c8bfb3261a2e0c1148776d2b93`.
+Свежий импорт и обычный изолированный запуск — **10/0**; фактический
+сценарий Main с шасси из точного ZIP — **112/0**. Все 1294 исходных
+файла сохранили SHA; повторные проверки ZIP не прибавлены к 28 группам.
+[Свежий импорт и запуск](../validation/gear-source-portability-2026-11-08/verification.json),
+[фактический Main из ZIP](../validation/gear-source-portability-2026-11-08/gear-main-feature.json).
+
+[Скачать APK 0.18.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/StarFrontier-0.18.0-landing-gear-arm64.apk) · [Исходники 0.18.0 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/StarFrontier-0.18.0-landing-gear-source.zip)
+
+[Кнопка классической консоли](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/screenshots/03-classic-console-gear-deployed-narrow.png) · [Фактические выпущенные стойки](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/screenshots/06-actual-external-struts-deployed.png) · [Посадка после выпуска](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/screenshots/08-full-gear-recovered-source-landing.png)
+
+Полным скачиванием проверены **12 файлов**: манифест, APK, source ZIP,
+протокол захвата и восемь PNG. HTTP 200, размеры, SHA, CRC обоих архивов,
+число записей и Git-комментарий source ZIP совпали. Вспомогательные
+журналы и отчёты упакованы и хешированы, но каждый из них отдельно не
+скачивался. Документы внутри ZIP сохраняют состояние исходного коммита
+до удалённой публикации.
+[Проверка скачивания](../validation/gear-publication-2026-11-08/verification.json).
+
+Артефакты закреплены коммитом `38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477`.
+Техническая публикация TEST-сборки не означает готовность магазинного
+релиза или проверку на физическом телефоне.
 
 ## Оставшиеся границы
 

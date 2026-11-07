@@ -3,7 +3,7 @@
 Ветка `development/starfrontier-rebuild` содержит **новую запускаемую основу** нативного Android-проекта на Godot 4.6.3. Она собрана из частично восстановленных исторических модулей, повторно извлечённых исходных данных FFE и заново написанного недостающего кода. Полный прежний проект и APK версии 0.10.8 не найдены.
 
 
-Текущий кандидат — **0.18.0-landing-gear-alpha1 / code 43**:
+Текущая опубликованная сборка — **0.18.0-landing-gear-alpha1 / code 43**:
 [управляемое шасси, консоль и посадочный контакт](docs/RELEASE_0_18_0_RU.md).
 Исходные F1008 и выбранная ветвь F1056 управляют раздельными запросом
 и физическим положением шасси. Добавлены сохраняемая сессия механизма,
@@ -23,9 +23,28 @@
 с подготовленными позициями и камерой осмотра стоек.
 Настоящий ARM64 APK технически проверен: **50 071 605 байт**, SHA256
 `20f340f1d1c9e8917849d56246123a1f9519b89d730e3568f3ef5f95b671a735`.
-Точный ZIP и HTTPS ещё готовятся. Следующий приоритет — исходный
-потребитель поверхностного контакта и посадочных повреждений F575,
-чтобы заменить нынешнее мобильное правило ожидания. Ниже сохранена 0.17.0.
+Точный ZIP — **31 185 873 байта**, 1447 записей / **1294 файла**, меньше
+32 МиБ. Исходный коммит `5c7be752af6cf3167452bb16a970b7a6f30d7cd9`. SHA256:
+`89324041e68c1dfce09c7f9b5d5c20c7080396c8bfb3261a2e0c1148776d2b93`.
+Свежий импорт и обычный изолированный запуск — **10/0**; фактический
+сценарий Main с шасси из точного ZIP — **112/0**. Все 1294 исходных
+файла сохранили SHA; повторные проверки ZIP не прибавлены к 28 группам.
+
+[Скачать APK 0.18.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/StarFrontier-0.18.0-landing-gear-arm64.apk) · [Исходники 0.18.0 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/StarFrontier-0.18.0-landing-gear-source.zip)
+
+[Кнопка классической консоли](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/screenshots/03-classic-console-gear-deployed-narrow.png) · [Фактические выпущенные стойки](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/screenshots/06-actual-external-struts-deployed.png) · [Посадка после выпуска](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/38a6e59fef50b7d4f5e8c5a19e6a02a17a6c2477/deliverables/0.18.0-landing-gear-alpha1/screenshots/08-full-gear-recovered-source-landing.png)
+
+Полным скачиванием проверены **12 файлов**: манифест, APK, source ZIP,
+протокол захвата и восемь PNG. HTTP 200, размеры, SHA, CRC обоих архивов,
+число записей и Git-комментарий source ZIP совпали. Вспомогательные
+журналы и отчёты упакованы и хешированы, но каждый из них отдельно не
+скачивался. Документы внутри ZIP сохраняют состояние исходного коммита
+до удалённой публикации.
+[Проверка скачивания](validation/gear-publication-2026-11-08/verification.json).
+
+Следующий приоритет — исходный потребитель поверхностного контакта
+и посадочных повреждений F575, чтобы заменить нынешнее мобильное
+правило ожидания. Ниже сохранена 0.17.0.
 
 Предыдущая опубликованная сборка — **0.17.0-atmosphere-alpha1 / code 42**:
 [атмосферный нагрев, сопротивление и повреждения](docs/RELEASE_0_17_0_RU.md).
