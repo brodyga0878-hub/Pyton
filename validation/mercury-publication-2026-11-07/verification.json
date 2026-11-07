@@ -1,0 +1,121 @@
+{
+  "started_utc": "2026-11-07T14:13:49.572092+00:00",
+  "version": "0.13.2-celestial-alpha1",
+  "artifact_commit": "bd6db12f798ed45e503c198dc6092940faed4096",
+  "source_commit": "606775527498662697ae9eedba152898adabfe40",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/bd6db12f798ed45e503c198dc6092940faed4096/deliverables/0.13.2-celestial-alpha1/manifest.json",
+      "http_status": 200,
+      "bytes": 9751,
+      "sha256": "9a00254db1ce0a5664d1fda965093e6680406e4e032b93778a74185b86d7979b"
+    },
+    {
+      "file": "StarFrontier-0.13.2-celestial-arm64.apk",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/bd6db12f798ed45e503c198dc6092940faed4096/deliverables/0.13.2-celestial-alpha1/StarFrontier-0.13.2-celestial-arm64.apk",
+      "http_status": 200,
+      "bytes": 49765516,
+      "sha256": "c24b31c67dcf993dd44d837142e5bb69d8abfcec05722e5760b513f583529bdf",
+      "zip_crc_verified": true
+    },
+    {
+      "file": "StarFrontier-0.13.2-celestial-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/bd6db12f798ed45e503c198dc6092940faed4096/deliverables/0.13.2-celestial-alpha1/StarFrontier-0.13.2-celestial-source.zip",
+      "http_status": 200,
+      "bytes": 29528548,
+      "sha256": "6fd180f08258a8d15e98df99277379b7cd984422a66442e56ee4e16507cb93c0",
+      "zip_crc_verified": true,
+      "source_commit_in_zip_comment": "606775527498662697ae9eedba152898adabfe40"
+    },
+    {
+      "file": "screenshots/capture-manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/bd6db12f798ed45e503c198dc6092940faed4096/deliverables/0.13.2-celestial-alpha1/screenshots/capture-manifest.json",
+      "http_status": 200,
+      "bytes": 7986,
+      "sha256": "6e12f349c9f1cc732c9cf0fe68173ea5b96e773e70e34105868d76848d2325f6"
+    },
+    {
+      "file": "screenshots-before/capture-manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/bd6db12f798ed45e503c198dc6092940faed4096/deliverables/0.13.2-celestial-alpha1/screenshots-before/capture-manifest.json",
+      "http_status": 200,
+      "bytes": 7959,
+      "sha256": "5407844889f99b72b02f33ed6dde45619e12cb5f9b0d0c03f9b659d2b47d5f02"
+    },
+    {
+      "file": "screenshots/01-arrival-front.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/bd6db12f798ed45e503c198dc6092940faed4096/deliverables/0.13.2-celestial-alpha1/screenshots/01-arrival-front.png",
+      "http_status": 200,
+      "bytes": 186713,
+      "sha256": "5af407155a71b580cf06f3910bb4e3d94278c6fad3ffd644a442387c76d213c0"
+    },
+    {
+      "file": "screenshots/02-arrival-target.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/bd6db12f798ed45e503c198dc6092940faed4096/deliverables/0.13.2-celestial-alpha1/screenshots/02-arrival-target.png",
+      "http_status": 200,
+      "bytes": 212056,
+      "sha256": "3bf152a3eb5f9043293bb58b1dad7f2ac221135a349bf82986ccb67308aefb1e"
+    },
+    {
+      "file": "screenshots/03-dayside-orbit.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/bd6db12f798ed45e503c198dc6092940faed4096/deliverables/0.13.2-celestial-alpha1/screenshots/03-dayside-orbit.png",
+      "http_status": 200,
+      "bytes": 288565,
+      "sha256": "81c655f96abf7f705395dac5dccf5db5ce2417ba893231645b36a06a1ae37227"
+    },
+    {
+      "file": "screenshots/04-sun-orbit.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/bd6db12f798ed45e503c198dc6092940faed4096/deliverables/0.13.2-celestial-alpha1/screenshots/04-sun-orbit.png",
+      "http_status": 200,
+      "bytes": 221402,
+      "sha256": "926fcfcf1a53af0d57b870dc0086f9d734ce8de375a6a9918ffe77ce4d00075e"
+    },
+    {
+      "file": "screenshots/05-sun-near-surface.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/bd6db12f798ed45e503c198dc6092940faed4096/deliverables/0.13.2-celestial-alpha1/screenshots/05-sun-near-surface.png",
+      "http_status": 200,
+      "bytes": 222091,
+      "sha256": "f8f54aed9a8ab86d742e0c02f7805ddbab29c4cc0e618961284c3c71e3649c20"
+    },
+    {
+      "file": "screenshots-before/01-arrival-front.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/bd6db12f798ed45e503c198dc6092940faed4096/deliverables/0.13.2-celestial-alpha1/screenshots-before/01-arrival-front.png",
+      "http_status": 200,
+      "bytes": 211712,
+      "sha256": "ab21e4316472fb9410720472bd48b36a7d27aa57a4e4382be7febd83c92b23d2"
+    },
+    {
+      "file": "screenshots-before/02-arrival-target.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/bd6db12f798ed45e503c198dc6092940faed4096/deliverables/0.13.2-celestial-alpha1/screenshots-before/02-arrival-target.png",
+      "http_status": 200,
+      "bytes": 220672,
+      "sha256": "67deec58d48aab25c488e62633bd625c37fdaa5cba46b8611ec08d41a03695e9"
+    },
+    {
+      "file": "screenshots-before/03-dayside-orbit.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/bd6db12f798ed45e503c198dc6092940faed4096/deliverables/0.13.2-celestial-alpha1/screenshots-before/03-dayside-orbit.png",
+      "http_status": 200,
+      "bytes": 258848,
+      "sha256": "4c149383a6f77e08a4130c4768fa3429b7790df8b982f4fa21c0ab644f248066"
+    },
+    {
+      "file": "screenshots-before/04-sun-orbit.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/bd6db12f798ed45e503c198dc6092940faed4096/deliverables/0.13.2-celestial-alpha1/screenshots-before/04-sun-orbit.png",
+      "http_status": 200,
+      "bytes": 230109,
+      "sha256": "4d36fd56731c76333f575efbe9a4182f177a848cd23afdfebb19440003be5284"
+    },
+    {
+      "file": "screenshots-before/05-sun-near-surface.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/bd6db12f798ed45e503c198dc6092940faed4096/deliverables/0.13.2-celestial-alpha1/screenshots-before/05-sun-near-surface.png",
+      "http_status": 200,
+      "bytes": 229282,
+      "sha256": "858856811046da1f1b94da55aa2af404fe91c45c6c52722a0b64dcb8f3e1e32b"
+    }
+  ],
+  "status": "verified",
+  "scope": "Actual complete HTTPS downloads; immutable manifest bytes, payload SHA256/length, ZIP CRC, source archive Git comment and screenshot hashes. Not physical Android execution.",
+  "completed_utc": "2026-11-07T14:14:20.255274+00:00",
+  "all_manifest_payloads_downloaded": false,
+  "verified_payload_scope": "Manifest, actual APK, exact source ZIP, both capture manifests and all10PNG; auxiliary logs/reports listed in manifest were not individually downloaded."
+}
