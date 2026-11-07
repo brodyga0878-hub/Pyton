@@ -1,0 +1,336 @@
+{
+  "version": "0.16.0-fuel-alpha1",
+  "version_code": 41,
+  "created_utc": "2026-11-07T18:31:20.569117+00:00",
+  "source_commit": "217c1cbf1503cd44dbc386b66cbfff4a315be6f3",
+  "source_archive_scope": "Exact git archive -9 reconstruction plus scoped static parity audit; other validation, deliverables, build, SDK, keys and caches excluded. Source docs reflect pre-publication state.",
+  "source_archive_files": 1391,
+  "source_archive_actual_file_count": 1238,
+  "source_archive_below_32MiB": true,
+  "source_archive_crc_verified": true,
+  "source_archive_fresh_import_passed": true,
+  "source_archive_isolated_native_startup_checks": 10,
+  "source_archive_isolated_native_startup_failures": 0,
+  "source_archive_fuel_Main_checks": 397,
+  "source_archive_fuel_Main_failures": 0,
+  "source_archive_actual_files_unchanged": 1238,
+  "checks": 74687,
+  "passed_suites": 26,
+  "failures": 0,
+  "validation_status": "passed",
+  "validation_report": "final-targeted-summary.json",
+  "validation_scope": "One current passing result per26 unique core/session/UI/Main/flight/save/map/surface/graphics groups. Bounded batch timestamps and source stamps retained, not an atomic global full-game run. Independent native controls are included within three kernel totals. Earlier failed/intermediate/repeated results are excluded.",
+  "native_DOS_case_count": 4241,
+  "native_DOS_cases_included_in_core_checks": true,
+  "JJFFE_counterfactual_cases": 128,
+  "JJFFE_observable_differences": 84,
+  "python_packaging_tests": 117,
+  "python_extraction_tests": 9,
+  "python_distinct_tests": 126,
+  "capture_checks": 124,
+  "capture_checks_added_to_targeted_total": false,
+  "fresh_desktop_gles_frames_visually_inspected": 8,
+  "screenshots_are_phone_captures": false,
+  "renderer": "Godot4.6.3 Compatibility/OpenGL Mesa llvmpipe Linux virtual display",
+  "frozen_runtime_inputs": 402,
+  "capture_frozen_source_stamps": 15,
+  "additional_runtime_modules": 4,
+  "additional_shaders": 0,
+  "additional_textures": 0,
+  "additional_source_JSON": 1,
+  "runtime_material_maps": 51,
+  "source_contact_models": 15,
+  "source_fuel_equipment_records": 11,
+  "jet_policy": "uploaded-DOS-three-positive-limits-no-automatic-restore",
+  "manual_refill": "F289 cargo-to-jet; successful refill restores six limits",
+  "F938_player_cadence_raw_ticks_per_quantum": 49710,
+  "original_F1014_full_thermal_model": false,
+  "original_F569_F575_full_player_collision": false,
+  "original_F908_full_pipeline": false,
+  "original_workshop_market": false,
+  "workshop_pricing_adapter": "basic-source-workshop-pricing-adapter-v1",
+  "scoop_countdown_is_host_adapter": true,
+  "phone_force_and_SI_frames_are_adapters": true,
+  "point_contact_fatality_is_adapter": true,
+  "package": "org.starfrontier.rebuild",
+  "abi": "arm64-v8a",
+  "min_sdk": 24,
+  "target_sdk": 36,
+  "debuggable": false,
+  "zip_and_elf_alignment_16k": true,
+  "test_key_only": true,
+  "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+  "physical_device_tested": false,
+  "production_signing_key_configured": false,
+  "production_release_ready": false,
+  "full_original_port_complete": false,
+  "full_original_physics": false,
+  "full_russian_localization_complete": false,
+  "game_completion_percent": null,
+  "full_release_date": null,
+  "next_functional_priority": "Complete original thermal/atmospheric drag/damage and remaining equipment/flight consumers within block9.",
+  "artifact_upload_authorized": true,
+  "publication_state_at_packaging": "Prepared for authorized GitHub backup; full immutable HTTPS download verification follows separately.",
+  "files": {
+    "README_RU.md": {
+      "bytes": 4772,
+      "sha256": "a31ae07a1c97316653ce02f895ec4ea1a0aee183260786342b057ba8bd63a718"
+    },
+    "StarFrontier-0.16.0-fuel-arm64.apk": {
+      "bytes": 49996985,
+      "sha256": "c7b12d9f869008bd5bce9bf3615b2d2d5f72fa7ffc0d799bda537111d5d4950d"
+    },
+    "StarFrontier-0.16.0-fuel-source.zip": {
+      "bytes": 30481191,
+      "sha256": "759b0ec67d958d2eaef6607b83a717e3c50387bb7c138f205f61c2e52297398c"
+    },
+    "android-export.log": {
+      "bytes": 7393,
+      "sha256": "aa40e879f21e696264c11a6535ae6f23092ead14d711fbaa643851c74917cb85"
+    },
+    "android-verification.json": {
+      "bytes": 95617,
+      "sha256": "0c97c2c4dbef88dec411b1b185f9a1b968feebdd3a12cb4300f3c2f68793453d"
+    },
+    "capture.log": {
+      "bytes": 422,
+      "sha256": "97f37940161b9ef2c4d505edad5f288eeb45fa458ac24a2826c4a42775cbf5b7"
+    },
+    "digest-cache-performance.json": {
+      "bytes": 722,
+      "sha256": "b3ac7ee23b908f0164e936b0beedf94abd6d2819d92555b4de4414259f1df58e"
+    },
+    "drive-services-dos-disassembly.log": {
+      "bytes": 3958,
+      "sha256": "fc669383427ba024503fee58a3b80ce21b197da6fdb900ca28831afcf42de546"
+    },
+    "drive-services-dos-proof.json": {
+      "bytes": 2717,
+      "sha256": "2d3b151debcf8167291e4841f19943218efb0cab6588b8dcf385c2d464937938"
+    },
+    "extraction-final-observed.log": {
+      "bytes": 127,
+      "sha256": "588428340438a79f78d2e85eb500f70e1b87465408d01f410b29f31838d07050"
+    },
+    "extraction.json": {
+      "bytes": 972,
+      "sha256": "01db5b03c5fcee4a0b01d67b03dfac8fa1f99c6d609567918bccf10975281292"
+    },
+    "extraction.log": {
+      "bytes": 1424,
+      "sha256": "ccc11d1a46381429c0e08f018c07bf76d52f3f6ba2448baaaf2f0dbc0b8883fe"
+    },
+    "final-targeted-summary.json": {
+      "bytes": 8563,
+      "sha256": "44e48021d58466b343435532ac164c6bf09ceef8486e7cf6bec79d7debeb993c"
+    },
+    "fuel-main-feature.json": {
+      "bytes": 1153,
+      "sha256": "56f8a30912f074a974a75ec2e0a6d6ecb003491cc498e72017a457227ff1a762"
+    },
+    "fuel-main-feature.log": {
+      "bytes": 114,
+      "sha256": "56d10dd266bc7c99655e694d8239d01f71dc6be6d1387f40552f21c080b59b8e"
+    },
+    "fuel-services-native-view.log": {
+      "bytes": 872,
+      "sha256": "e8ce78331f9a31656f802ee2a00ebca392526918a2224cb0f299831b9e19ded0"
+    },
+    "fuel-services-view.log": {
+      "bytes": 122,
+      "sha256": "6ae011fc01d019b97390c8bd51d0d72fb12ea0d7f06c4605165b88e334dfc714"
+    },
+    "fuel-session-integration.json": {
+      "bytes": 3935,
+      "sha256": "21eb16cc99f809bebce3fdad114d62cdacc104224f486af609cd5928e00265c7"
+    },
+    "hyperdrive-main-regression.json": {
+      "bytes": 1383,
+      "sha256": "943ca1bacd69f21381e72eb1bc9fad1f01e20683bb127966746e449c4a6ad3aa"
+    },
+    "hyperdrive-services-native-view.log": {
+      "bytes": 855,
+      "sha256": "c00971c0b384aebcc35858e3b66728ce8d7c0eb7b7ca1b23887eb40ed36bfb23"
+    },
+    "hyperdrive-services-view.log": {
+      "bytes": 128,
+      "sha256": "ad588172bf909e0b19aaa7bc6ba9b0879c652536f8692e66cc9c6e9fefac3c39"
+    },
+    "legacy-native-navigation.log": {
+      "bytes": 121,
+      "sha256": "875e664e3e0605e0a71b2fabc284598e30216783875c466de66f2fc2dd78f140"
+    },
+    "packaging-independent-review.json": {
+      "bytes": 552,
+      "sha256": "7a190c9b38f49abe1a335bb178622cd8b2904c93f294d8afdbc5f8d5997e0b0b"
+    },
+    "packaging-observed.log": {
+      "bytes": 127,
+      "sha256": "86072fe6d82d5ef14e464fddea6d76b11e60d90bd16323f798ddbbd0b47947da"
+    },
+    "packaging.json": {
+      "bytes": 3735,
+      "sha256": "a7e6db3553081c9dceb79618ed20a408b05d8e61eb2ce9db3c10be26af3922f5"
+    },
+    "regression-logs/logs/app_transitions.log": {
+      "bytes": 120,
+      "sha256": "0c190763c029bb01bb6bb16c947fe7d80537e36b271d22fc91c468771ba45cd4"
+    },
+    "regression-logs/logs/classic_console_main.log": {
+      "bytes": 123,
+      "sha256": "fd1b59ff7ab0184ebb05c966c93c20e81d6f74731c727c273818a1dadac0b0b3"
+    },
+    "regression-logs/logs/flight_projection.log": {
+      "bytes": 10047,
+      "sha256": "e5975c1d32e6a08a7f636589baf1c72d9a8b86a2bf780a15847ccca504fc6d35"
+    },
+    "regression-logs/logs/graphics_integration.log": {
+      "bytes": 123,
+      "sha256": "f6b6dc847918df771b6f2ac4b0b0f0537855cf6f5247269fadb9b1f4b8ea6d06"
+    },
+    "regression-logs/logs/graphics_scope.log": {
+      "bytes": 355,
+      "sha256": "b7ec54445dbb93814b7877b35fd9c0b18e5e17f8dcf4a62aa1fba3a09f2692bb"
+    },
+    "regression-logs/logs/navigation_main.log": {
+      "bytes": 118,
+      "sha256": "341f62f03e5ea9792cb9e4caaf3261f7e61c57b9664e49fe27d12453ab4c12b6"
+    },
+    "regression-logs/logs/offpad_takeoff.log": {
+      "bytes": 118,
+      "sha256": "c48c9e6771737eaa3fd8bc350d0d769e9db501bed072ff6f936404a4e59951e0"
+    },
+    "regression-logs/logs/source_console_pause.log": {
+      "bytes": 1713,
+      "sha256": "e012e840be4e87ede2b69cd30332fbfd6a452efcb7e6775690d2a3e159fa5b77"
+    },
+    "regression-logs/logs/source_docking_flight.log": {
+      "bytes": 125,
+      "sha256": "9e7d3fcfbabb498d60a2a57cfb98e809d575c23d253807b9e78773011813fad8"
+    },
+    "regression-logs/logs/source_fuel_flight.log": {
+      "bytes": 121,
+      "sha256": "23d1c9dbd45f2f877f299f4055a4b470b2a5b50f4bf6fb375957cefae0b9696d"
+    },
+    "regression-logs/logs/source_full_startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "regression-logs/logs/source_hyperdrive_main.log": {
+      "bytes": 119,
+      "sha256": "714642268b5d030046e011e56f234bb451f4042b5a194b32c21d1e1878eecbd8"
+    },
+    "regression-logs/logs/source_main_full.log": {
+      "bytes": 510,
+      "sha256": "44d84cebcf25f5aa4e863b252b093d4475ff3cdbb15049fa72abe997f25188b3"
+    },
+    "regression-logs/logs/source_motion_bridge.log": {
+      "bytes": 193,
+      "sha256": "d99dd7cfe1112eb96fd484294fdf123d4de622d24d45a719fe26ea5f0727b6ce"
+    },
+    "regression-logs/logs/source_underground_controller.log": {
+      "bytes": 127,
+      "sha256": "1cebbc1d5fca139e9cb6bb212a99de4412781e9a4a16dd73fb89ec9639dd67e8"
+    },
+    "regression-summary.json": {
+      "bytes": 18077,
+      "sha256": "113172e8868b22c17a7f66bd01ffaa42ca6110a6fc6415ce493dbf5b3fdf943a"
+    },
+    "runtime-freeze.json": {
+      "bytes": 44653,
+      "sha256": "8b07e36c0316d1fea736f17843e123773dcad958e7b8ca650fa69995163d9565"
+    },
+    "screenshots/01-default-source-reaction-tank.png": {
+      "bytes": 107163,
+      "sha256": "d456d782eb832274f12d0fc0f73ca8b18b2d6515488761b7303295108078e668"
+    },
+    "screenshots/02-reaction-tank-narrow.png": {
+      "bytes": 100814,
+      "sha256": "c2577edf72fe8a8f938f00a5ab040fd791c0077e733da699da6be565f43a845d"
+    },
+    "screenshots/03-fitted-refueller-in-flight.png": {
+      "bytes": 121461,
+      "sha256": "8253375816ccc684931bb324d22f5e59851a4f6fd520f2879bad68866b14c4ad"
+    },
+    "screenshots/04-empty-tank-manual-refuel.png": {
+      "bytes": 139594,
+      "sha256": "7a1cdbf2663434c584629f8d2761b3694d2cc51abe1686836f13b81d78f70f07"
+    },
+    "screenshots/05-manual-refill-restored-limits.png": {
+      "bytes": 125355,
+      "sha256": "7c70dab826fd8dddef4f9be386db17c6fe0b3d0276dc840b3d03150ce25638f8"
+    },
+    "screenshots/06-source-sun-hydrogen-collection.png": {
+      "bytes": 118437,
+      "sha256": "7b8a79df0ba094223a715f64d42022100a94dda18570e500d941804d76679c91"
+    },
+    "screenshots/07-legacy-source-fuel-upgrade-narrow.png": {
+      "bytes": 107578,
+      "sha256": "3f0083bd0b9713fa8cbe32a6e3c8bde586a12a52e576c1099cb7b9210fac1a70"
+    },
+    "screenshots/08-return-classic-flight.png": {
+      "bytes": 209896,
+      "sha256": "6f6d02f4d72ff6dec364cae9252d106ecd6fba0f16f786739d0258a16f4497e0"
+    },
+    "screenshots/capture-manifest.json": {
+      "bytes": 68546,
+      "sha256": "124e400306a363d019368757865fe1f9df6a64d2935596120082c49701445001"
+    },
+    "services-view-tests.json": {
+      "bytes": 6031,
+      "sha256": "f8a00549fd6960d40b374fea41edaddf19edac7afcd20a843181f566677e96ad"
+    },
+    "source-archive-import.log": {
+      "bytes": 26942,
+      "sha256": "755d509ab087765c4416df2dee916953e928e0fdeeb32e9fd075e8782c695563"
+    },
+    "source-archive-startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "source-archive-verification.json": {
+      "bytes": 5521,
+      "sha256": "63a1226c4417f7b7fab27a01f850bb20bc5860921bd655f4f9fd2faddcc9c4f7"
+    },
+    "source-fuel-contact-core.json": {
+      "bytes": 1590,
+      "sha256": "48069929a9cb6e81d9f427763abf6c430a6595a1d93ea7755251d5a47786c752"
+    },
+    "source-fuel-contact-core.log": {
+      "bytes": 118,
+      "sha256": "0597fbd7919b9fc8a8d8e6eb4cf44dd5cffa128150b82e2ac61f97a517ebaa2c"
+    },
+    "source-fuel-main.json": {
+      "bytes": 2056,
+      "sha256": "71ba2eae00b38ff24deebaaeeadff770396ceb9e1b1c474b6125263124cc01f9"
+    },
+    "source-fuel-main.log": {
+      "bytes": 114,
+      "sha256": "56d10dd266bc7c99655e694d8239d01f71dc6be6d1387f40552f21c080b59b8e"
+    },
+    "source-fuel-scoop-core.json": {
+      "bytes": 840,
+      "sha256": "1d392bffa09c87e8d184e529c886152046ae2dda2e708638c5286a1c39dd4a96"
+    },
+    "source-fuel-scoop-core.log": {
+      "bytes": 117,
+      "sha256": "2bb4419704770bbb43e85dfbec8fa50e4b27d8515d08a8b58c3c7c6517fcfe05"
+    },
+    "source-fuel-session.log": {
+      "bytes": 117,
+      "sha256": "72c99396446c57a1432734b4b9198ec23a410617f269aefe80f5b0f1d9648abf"
+    },
+    "source-hyperdrive-navigation.log": {
+      "bytes": 126,
+      "sha256": "9e49696cf7496e1a106a4c0b5a371fd9c2d87cf91c3ceb5d13a20b1769104eb9"
+    },
+    "source-jet-fuel-core.json": {
+      "bytes": 1349,
+      "sha256": "586d28374b686a4f69b4b45d00d296cd53882b8f84a0bef9efc2342b4090ab1a"
+    },
+    "source-jet-fuel-core.log": {
+      "bytes": 115,
+      "sha256": "e63d522ab7b6f127c431ade771672bf9dc9f1e2661fc5eaddd8f2dcf38b7e6e4"
+    }
+  }
+}

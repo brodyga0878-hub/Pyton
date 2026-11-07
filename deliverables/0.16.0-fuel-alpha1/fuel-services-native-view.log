@@ -1,0 +1,4 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+FUEL SERVICES NATIVE VIEW EVIDENCE: [{"all_six_limits_restored":true,"any_thrust_while_empty":true,"forward_while_empty":false,"hydrogen_after":3,"phase":"actual_depletion_manual","tank_tonnes_after":1.0},{"cooldown_seconds_from_model":2.99998372793198,"heat_text_from_model":"Нагрев корпуса: 1000 (шкала игры).","pending_charge_actions_blocked":true,"phase":"actual_fuel_hardware","refuel_runtime_off_on":true,"source_added_mass_t":8},{"hydrogen_unchanged":true,"military_consumed":1,"occupied_t_unchanged":true,"phase":"actual_military_manual","radioactives_added":1},{"occupied_after_reinstall":19,"occupied_t_with_default_shield":19,"phase":"actual_eagle_phone","scoop_mounting_rejected":true,"widths":[320,440,720]}]
+FUEL SERVICES NATIVE VIEW TESTS: 91 checks, 0 failures

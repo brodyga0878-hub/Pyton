@@ -1,0 +1,12 @@
+{
+  "reviewer": "/root/approach_review",
+  "time_utc": "2026-11-07T18:27:08.482338+00:00",
+  "read_only": true,
+  "ad_hoc_in_memory_negative_controls": 38,
+  "rejected_controls": 38,
+  "blockers": 0,
+  "scope": "10new/retained modules missing/badheader/64Btruncation30controls;4resourcesmissing/byte-difference8controls. All10baselinefixture texts independently compared with gitc387293. No files changed, no Godot/APK/native oracle executed.",
+  "included_in_117_test_count": false,
+  "native_oracle_executed": false,
+  "actual_apk_verified": false
+}

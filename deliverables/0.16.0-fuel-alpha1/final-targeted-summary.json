@@ -1,0 +1,209 @@
+{
+  "schema": "starfrontier-current-fuel-targeted-summary-v1",
+  "created_utc": "2026-11-07T18:22:44.214326+00:00",
+  "version": "0.16.0-fuel-alpha1",
+  "checks": 74687,
+  "passed_suites": 26,
+  "failures": 0,
+  "status": "passed",
+  "suites": [
+    {
+      "test": "tests/test_source_jet_fuel.gd",
+      "checks": 58890,
+      "failures": 0,
+      "proof": "validation/jet-fuel-2026-11-07/source-jet-fuel-core.json"
+    },
+    {
+      "test": "tests/test_source_fuel_scoop.gd",
+      "checks": 10229,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/source-fuel-scoop-core.json"
+    },
+    {
+      "test": "tests/test_source_fuel_contact.gd",
+      "checks": 1689,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/source-fuel-contact-core.json"
+    },
+    {
+      "test": "tests/test_source_fuel_main.gd",
+      "checks": 397,
+      "failures": 0,
+      "proof": "validation/jet-fuel-2026-11-07/source-fuel-main.json"
+    },
+    {
+      "test": "tests/test_source_fuel_session.gd",
+      "checks": 109,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/fuel-session-integration.json",
+      "log": "validation/fuel-2026-11-07/source-fuel-session.log"
+    },
+    {
+      "test": "tests/test_source_hyperdrive_navigation.gd",
+      "checks": 143,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/fuel-session-integration.json",
+      "log": "validation/fuel-2026-11-07/source-hyperdrive-navigation.log"
+    },
+    {
+      "test": "tests/test_native_navigation.gd",
+      "checks": 219,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/fuel-session-integration.json",
+      "log": "validation/fuel-2026-11-07/legacy-native-navigation.log"
+    },
+    {
+      "test": "tests/test_hyperdrive_services_view.gd",
+      "checks": 484,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/services-view-tests.json",
+      "log": "validation/fuel-2026-11-07/hyperdrive-services-view.log"
+    },
+    {
+      "test": "tests/test_hyperdrive_services_native_view.gd",
+      "checks": 54,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/services-view-tests.json",
+      "log": "validation/fuel-2026-11-07/hyperdrive-services-native-view.log"
+    },
+    {
+      "test": "tests/test_fuel_services_view.gd",
+      "checks": 229,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/services-view-tests.json",
+      "log": "validation/fuel-2026-11-07/fuel-services-view.log"
+    },
+    {
+      "test": "tests/test_fuel_services_native_view.gd",
+      "checks": 91,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/services-view-tests.json",
+      "log": "validation/fuel-2026-11-07/fuel-services-native-view.log"
+    },
+    {
+      "test": "tests/test_source_fuel_flight.gd",
+      "checks": 29,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/regression-summary.json",
+      "log": "/workspace/Pyton/validation/fuel-2026-11-07/regression-logs/logs/source_fuel_flight.log"
+    },
+    {
+      "test": "tests/test_source_hyperdrive_main.gd",
+      "checks": 70,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/regression-summary.json",
+      "log": "/workspace/Pyton/validation/fuel-2026-11-07/regression-logs/logs/source_hyperdrive_main.log"
+    },
+    {
+      "test": "tests/test_navigation_main.gd",
+      "checks": 53,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/regression-summary.json",
+      "log": "/workspace/Pyton/validation/fuel-2026-11-07/regression-logs/logs/navigation_main.log"
+    },
+    {
+      "test": "tests/test_source_motion_bridge.gd",
+      "checks": 81,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/regression-summary.json",
+      "log": "/workspace/Pyton/validation/fuel-2026-11-07/regression-logs/logs/source_motion_bridge.log"
+    },
+    {
+      "test": "tests/test_classic_console_main.gd",
+      "checks": 42,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/regression-summary.json",
+      "log": "/workspace/Pyton/validation/fuel-2026-11-07/regression-logs/logs/classic_console_main.log"
+    },
+    {
+      "test": "tests/test_flight_projection.gd",
+      "checks": 691,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/regression-summary.json",
+      "log": "/workspace/Pyton/validation/fuel-2026-11-07/regression-logs/logs/flight_projection.log"
+    },
+    {
+      "test": "tests/test_source_console_pause.gd",
+      "checks": 131,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/regression-summary.json",
+      "log": "/workspace/Pyton/validation/fuel-2026-11-07/regression-logs/logs/source_console_pause.log"
+    },
+    {
+      "test": "tests/test_source_full_startup.gd",
+      "checks": 10,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/regression-summary.json",
+      "log": "/workspace/Pyton/validation/fuel-2026-11-07/regression-logs/logs/source_full_startup.log"
+    },
+    {
+      "test": "tests/test_source_underground_controller.gd",
+      "checks": 197,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/regression-summary.json",
+      "log": "/workspace/Pyton/validation/fuel-2026-11-07/regression-logs/logs/source_underground_controller.log"
+    },
+    {
+      "test": "tests/test_source_main_full.gd",
+      "checks": 153,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/regression-summary.json",
+      "log": "/workspace/Pyton/validation/fuel-2026-11-07/regression-logs/logs/source_main_full.log"
+    },
+    {
+      "test": "tests/test_source_docking_flight.gd",
+      "checks": 402,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/regression-summary.json",
+      "log": "/workspace/Pyton/validation/fuel-2026-11-07/regression-logs/logs/source_docking_flight.log"
+    },
+    {
+      "test": "tests/test_rebuilt_app_transitions.gd",
+      "checks": 54,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/regression-summary.json",
+      "log": "/workspace/Pyton/validation/fuel-2026-11-07/regression-logs/logs/app_transitions.log"
+    },
+    {
+      "test": "tests/test_graphics_integration.gd",
+      "checks": 44,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/regression-summary.json",
+      "log": "/workspace/Pyton/validation/fuel-2026-11-07/regression-logs/logs/graphics_integration.log"
+    },
+    {
+      "test": "tests/test_graphics_scope.gd",
+      "checks": 87,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/regression-summary.json",
+      "log": "/workspace/Pyton/validation/fuel-2026-11-07/regression-logs/logs/graphics_scope.log"
+    },
+    {
+      "test": "tests/test_offpad_takeoff.gd",
+      "checks": 109,
+      "failures": 0,
+      "proof": "validation/fuel-2026-11-07/regression-summary.json",
+      "log": "/workspace/Pyton/validation/fuel-2026-11-07/regression-logs/logs/offpad_takeoff.log"
+    }
+  ],
+  "proofs_sha256": {
+    "validation/jet-fuel-2026-11-07/source-jet-fuel-core.json": "586d28374b686a4f69b4b45d00d296cd53882b8f84a0bef9efc2342b4090ab1a",
+    "validation/fuel-2026-11-07/source-fuel-scoop-core.json": "1d392bffa09c87e8d184e529c886152046ae2dda2e708638c5286a1c39dd4a96",
+    "validation/fuel-2026-11-07/source-fuel-contact-core.json": "48069929a9cb6e81d9f427763abf6c430a6595a1d93ea7755251d5a47786c752",
+    "validation/jet-fuel-2026-11-07/source-fuel-main.json": "71ba2eae00b38ff24deebaaeeadff770396ceb9e1b1c474b6125263124cc01f9",
+    "validation/fuel-2026-11-07/fuel-session-integration.json": "21eb16cc99f809bebce3fdad114d62cdacc104224f486af609cd5928e00265c7",
+    "validation/fuel-2026-11-07/services-view-tests.json": "f8a00549fd6960d40b374fea41edaddf19edac7afcd20a843181f566677e96ad",
+    "validation/fuel-2026-11-07/regression-summary.json": "113172e8868b22c17a7f66bd01ffaa42ca6110a6fc6415ce493dbf5b3fdf943a"
+  },
+  "native_DOS_case_count": 4241,
+  "native_DOS_cases_included_in_core_checks": true,
+  "JJFFE_counterfactual_cases": 128,
+  "JJFFE_observable_differences": 84,
+  "historical_totals_added": false,
+  "repeated_source_archive_checks_added": false,
+  "scope": "One current passing result per26 unique core/session/UI/Main/flight/save/map/surface/graphics groups. Bounded batch timestamps and source stamps retained, not an atomic global full-game run. Independent native controls are included within three kernel totals. Earlier failed/intermediate/repeated results are excluded.",
+  "full_original_port_complete": false,
+  "full_original_physics": false,
+  "physical_device_tested": false,
+  "production_release_ready": false
+}

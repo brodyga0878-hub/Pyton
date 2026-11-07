@@ -1,0 +1,13 @@
+test_all_fifteen_models_keep_raw_geometry_and_separate_bounds (test_extract_fuel.FuelExtraction.test_all_fifteen_models_keep_raw_geometry_and_separate_bounds) ... ok
+test_dos_f929_variant_cannot_be_called_jjffe_six_axis_restore (test_extract_fuel.FuelExtraction.test_dos_f929_variant_cannot_be_called_jjffe_six_axis_restore) ... ok
+test_every_published_table_code_anchor_and_geometry_byte_is_original (test_extract_fuel.FuelExtraction.test_every_published_table_code_anchor_and_geometry_byte_is_original) ... ok
+test_immutable_hyperdrive_resource_and_source_provenance (test_extract_fuel.FuelExtraction.test_immutable_hyperdrive_resource_and_source_provenance) ... ok
+test_manual_capacity_and_npc_initial_tables_are_distinct (test_extract_fuel.FuelExtraction.test_manual_capacity_and_npc_initial_tables_are_distinct) ... ok
+test_original_starters_are_explicitly_separate_from_bare_shuttle (test_extract_fuel.FuelExtraction.test_original_starters_are_explicitly_separate_from_bare_shuttle) ... ok
+test_reextraction_is_exact_and_wrong_old_hyperdrive_is_rejected (test_extract_fuel.FuelExtraction.test_reextraction_is_exact_and_wrong_old_hyperdrive_is_rejected) ... ok
+test_source_equipment_mass_mask_and_scoop_hull_requirement (test_extract_fuel.FuelExtraction.test_source_equipment_mass_mask_and_scoop_hull_requirement) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.689s
+
+OK

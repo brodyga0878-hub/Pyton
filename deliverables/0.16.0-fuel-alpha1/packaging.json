@@ -1,0 +1,72 @@
+{
+  "time_utc": "2026-11-07T18:27:08.481293+00:00",
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_*packaging.py",
+    "-q"
+  ],
+  "evidence_kind": "Observed completed tool run, not an APK or native oracle",
+  "observed_summary": "Ran117 tests in3.994s; OK",
+  "exit_code": 0,
+  "test_count": 117,
+  "failures": 0,
+  "errors": 0,
+  "groups": {
+    "test_android_full_packaging": 59,
+    "test_system_information_packaging": 16,
+    "test_hyperdrive_packaging": 20,
+    "test_fuel_packaging": 22
+  },
+  "audited_runtime_source_sha256": {
+    "scripts/source_hyperdrive.gd": "b79cd38051e44d52fcd4f2beb173b2699096e7d9aea9a0288aba205e453a8874",
+    "scripts/navigation.gd": "26e25aabedbf93831bd2f875b663a075053b0e479a67376b014a3aae79525a03",
+    "scripts/source_hyperdrive_session.gd": "6604df5a7573e1abdc3aae5b22e10c38c1d0cfcef4a38dbb03e54459bbe9aaf4",
+    "scripts/hyperdrive_services_view.gd": "b0bcc31c52f8d46f94b29585ce2993535d45ef045a39617e8c90d15a2967cc97",
+    "scripts/main.gd": "a09c5fe5b38011aaa455c78bc85902d27723f32cb4c82a5522882d7821068abf",
+    "scripts/galactic_map_model.gd": "597a5bd049e3dea2698bfbc255a0d57e7c98b70fabedfe09d56bb60ccd3a11a5",
+    "scripts/galactic_map_view.gd": "9a2a6fa97d9ab4f6ce572a5e10bb390d5036ccf6d30e3bc31e087a61440b7876",
+    "scripts/source_jet_fuel.gd": "ef043cd3d7fe4ef06a08d1f6592bf97b5d1e6d81c5f2efe9ea067d514f207cc1",
+    "scripts/source_fuel_scoop.gd": "de1e96fd3013de48557b340b9ca4e4d174c4d39aaebb8b2eee96250db53af296",
+    "scripts/source_fuel_contact.gd": "0f8d5defba15db89d02c5253c988a2a5680d7a16058296b91d262017d5a49903",
+    "scripts/source_fuel_flight_bridge.gd": "70921d3cb8b7d211f07f1211309f809dab1e0be9094ccf015e658558d6a04b52",
+    "scripts/flight_model.gd": "4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b",
+    "scripts/surface_model.gd": "28fcc37fb4adc1291129fdd90fb685828992e5657eaeb891eff986c9d5f3d894",
+    "scripts/source_motion_bridge.gd": "f6ce8bd052ed586b560fb7935cbf4a039e264ab67a53e7afb32f14889c62c402"
+  },
+  "fuel_resource_sha256": "4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f",
+  "immutable_hyperdrive_resource_sha256": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+  "native_reference_inputs": {
+    "source_jet_fuel_native": {
+      "sha256": "ba1fa8be78c6c142fa037f0fb499e2aa2f2782077ad0b8f1da6a1dffa30051c8",
+      "case_count": 3182
+    },
+    "source_fuel_scoop_native": {
+      "sha256": "40d2a6528bc7607a442311aeea69c2fcc7ac9859ccfe4cc64a88ddf123f6b15f",
+      "case_count": 729
+    },
+    "source_fuel_contact_native": {
+      "sha256": "a68264130ed7a13b17a689b58e23e2f0d6921d4c33b9bfb4d20219709d7cf3d6",
+      "case_count": 330
+    }
+  },
+  "strict_legacy_v37_v38_v39_v40_retained": true,
+  "fuel_table_allowed_only_from_code": 41,
+  "file_sha256": {
+    "tools/verify_rebuilt_android.py": "77bf3ce3d21115dc475a3f0d7e9d0be43d0a55c59e705808be1e113831b321f4",
+    "tests/test_android_full_packaging.py": "b6bfc20a40ed222664016ee27494537cdd1c9b54ebb4935765fcd0ca24c4ffb6",
+    "tests/test_system_information_packaging.py": "328a11ce88109d162488bf61b80cedc2c85d92b3c709d54b10225230f207a533",
+    "tests/test_hyperdrive_packaging.py": "b554986cb058c722e6b956430fbf9ce6e1dae00754bc5f93a5d28034c8caa1e0",
+    "tests/test_fuel_packaging.py": "a9e70a11f2f8d962ef8269d86b6a313aa32024f4acf145dc0f0e152232d79e3e",
+    "tests/fixtures/fuel_v40_sources.json": "323e3446b726ad211f0e02cec76a88e826e9ef2fa3bdacbd547ca180cd46ec44"
+  },
+  "original_native_oracle_executed_by_this_run": false,
+  "actual_signed_apk_verified_by_this_run": false,
+  "physical_device_tested": false,
+  "compiled_source_correspondence_rebuilt_by_this_run": false
+}

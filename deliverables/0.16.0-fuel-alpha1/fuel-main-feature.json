@@ -1,0 +1,32 @@
+{
+  "schema": "starfrontier-source-archive-fuel-feature-v1",
+  "started_utc": "2026-11-07T18:30:15.388085+00:00",
+  "finished_utc": "2026-11-07T18:30:20.399656+00:00",
+  "duration_seconds": 5.011582,
+  "source_commit": "217c1cbf1503cd44dbc386b66cbfff4a315be6f3",
+  "archive_sha256": "759b0ec67d958d2eaef6607b83a717e3c50387bb7c138f205f61c2e52297398c",
+  "command": [
+    "godot",
+    "--headless",
+    "--audio-driver",
+    "Dummy",
+    "--path",
+    "/workspace/recovery/fuel-source-portability/source/StarFrontier-0.16.0-fuel-source",
+    "--script",
+    "res://tests/test_source_fuel_main.gd",
+    "--",
+    "--rebuild-capture"
+  ],
+  "exit_code": 0,
+  "checks": 397,
+  "failures": 0,
+  "error_markers": [],
+  "source_actual_files": 1238,
+  "all_source_files_unchanged": true,
+  "modified_files": [],
+  "private_xdg": true,
+  "execution_policy": "require_escalated",
+  "log_sha256": "56d10dd266bc7c99655e694d8239d01f71dc6be6d1387f40552f21c080b59b8e",
+  "scope": "Exact source ZIP, fresh isolated actual Main fuel/cadence/scoop/migration/backup/save test. Repeated checks excluded from74687 current total. No Android device execution.",
+  "ok": true
+}

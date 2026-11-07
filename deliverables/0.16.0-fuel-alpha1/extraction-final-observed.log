@@ -1,0 +1,4 @@
+Observed tool result for python3 -m unittest discover -s tests -p test_extract_fuel.py -q
+Ran 9 tests in 0.672s
+OK
+Exit code:0

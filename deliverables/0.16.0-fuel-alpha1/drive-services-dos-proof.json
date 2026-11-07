@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+  "functions": {
+    "408": {
+      "dos_file_offset": 82104,
+      "dos_virtual_address": 4338360,
+      "byte_count": 77,
+      "hex": "558bec8b450880b8d0000000007407b8010000005dc38b550c8a52128890d0000000c70534236400f40100008b154021640089153c2364003b0504226400750966812502226400feff33c05dc3",
+      "sha256": "0ae40f6158fe61eff656016ab3c3a8e7fbd3befe9fe5f9b1c6505a4b9118e62c",
+      "jjffe_procedure_sha256": "4e7d72d5c73d0554914f18ec2482017eafa25597fccff4bc45729f97ddb7b752",
+      "statically_reviewed_effects": {
+        "object_write_offsets": [
+          208
+        ],
+        "jet_write": false,
+        "thrust_limit_writes": false,
+        "initial_fuel_granted": false
+      }
+    },
+    "410": {
+      "dos_file_offset": 82248,
+      "dos_virtual_address": 4338504,
+      "byte_count": 77,
+      "hex": "558bec538b5d088b838200000050ff1548185000598b403866837814007c260fbe83d00000008b550c0fb652123bc27514c683d00000000033c089831e01000033c05b5dc3b8010000005b5dc3",
+      "sha256": "6cd8fcdd7e66f59e522e837d6b56f6aad6d1d3fb3434141605e5e65ac6afa9af",
+      "jjffe_procedure_sha256": "f34e1aa010f546b43890c63ce27ce8f3e895c390deb376ecd993e90c60358ad9",
+      "statically_reviewed_effects": {
+        "object_write_offsets": [
+          208,
+          286
+        ],
+        "jet_write": true,
+        "jet_value_on_success": 0,
+        "thrust_limit_writes": false,
+        "requires_removable_spec_drive": true,
+        "requires_matching_equipment_drive": true
+      }
+    }
+  },
+  "clear_drive_and_jet_anchor": {
+    "dos_file_offset": 82297,
+    "hex": "c683d00000000033c089831e010000"
+  },
+  "proof_kind": "Pinned original full function bytes and read-only DOS/ASM disassembly review; no instruction oracle executed",
+  "full_jjffe_machine_code_equality_claimed": false,
+  "native_oracle_executed": false,
+  "frozen_fuel_resource_unchanged_sha256": "4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f",
+  "scope": "F410 success clears removable drive and jet tank, without modifying six thrust-limit fields; F408 installs the selected drive but does not grant jet fuel. Prices and full outfitting transactions are separate.",
+  "time_utc": "2026-11-07T18:14:22.943468+00:00",
+  "generator_sha256": "5572325c03a599ccb98c0d662a4ee2b0d14e2775bde2c084df58b317d59134cb",
+  "disassembly_command": [
+    "objdump",
+    "-d",
+    "--start-address=0x4232b8",
+    "--stop-address=0x423398",
+    "/workspace/ffe-original/FIRSTENC.EXE"
+  ]
+}

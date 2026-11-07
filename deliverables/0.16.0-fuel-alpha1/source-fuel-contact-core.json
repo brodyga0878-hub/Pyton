@@ -1,0 +1,54 @@
+{
+	"checks": 1689,
+	"evidence": [
+		{
+			"branches": {
+				"broad_phase_rejected": 15,
+				"inside_inner_bound": 30,
+				"outside_outer_bound": 15,
+				"terrain_query": 270
+			},
+			"models": [
+				134,
+				135,
+				136,
+				137,
+				138,
+				139,
+				140,
+				141,
+				142,
+				143,
+				144,
+				145,
+				146,
+				147,
+				148
+			],
+			"native_cases": 330.0,
+			"source_fixture_sha256": "a68264130ed7a13b17a689b58e23e2f0d6921d4c33b9bfb4d20219709d7cf3d6"
+		},
+		{
+			"actual_near_source_speed": 9265,
+			"live_sol_model": 141,
+			"native_units_bridged_by_current_controller_adapter": true,
+			"near_branch": "terrain_query",
+			"near_contact": {
+				"altitude_raw_s32": -1,
+				"flags_u8": 3,
+				"parent_model_u32": 141
+			},
+			"si_policy": "source-natural-field-with-current-phone-frame-si-adapter-v1"
+		}
+	],
+	"failures": 0,
+	"physical_device_tested": false,
+	"schema": 1,
+	"scope": "Actual F1533/F574/F575/F576/F579/F582/F581/F1876 native gas/star reference geometry; isolated readonly natural branch. Current World body orientation/local position and phone SI speed are explicit adapters, not full F569 object scanning or automatic frame selection. No collision response, thermal damage or physical Android execution.",
+	"sources": {
+		"core_sha256": "0f8d5defba15db89d02c5253c988a2a5680d7a16058296b91d262017d5a49903",
+		"fixture_sha256": "a68264130ed7a13b17a689b58e23e2f0d6921d4c33b9bfb4d20219709d7cf3d6",
+		"resource_sha256": "4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f",
+		"test_sha256": "0a59d726ad7252b40802c91e8a04fe7f4b13549f29a3532c2bf5654c7aec16c7"
+	}
+}

@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "scope": "Versioned source jetfuel/inventory session, DOS directional limits, exact F152 whole-second cadence and F1033 rawframe scoop integration; legacy navigation controls separate",
+  "status": "passed",
+  "suites": [
+    {
+      "test": "tests/test_source_fuel_session.gd",
+      "checks": 109,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/fuel-2026-11-07/source-fuel-session.log"
+    },
+    {
+      "test": "tests/test_source_hyperdrive_navigation.gd",
+      "checks": 143,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/fuel-2026-11-07/source-hyperdrive-navigation.log"
+    },
+    {
+      "test": "tests/test_native_navigation.gd",
+      "checks": 219,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/fuel-2026-11-07/legacy-native-navigation.log"
+    }
+  ],
+  "checks": 471,
+  "failures": 0,
+  "groups": 3,
+  "sha256": {
+    "scripts/navigation.gd": "26e25aabedbf93831bd2f875b663a075053b0e479a67376b014a3aae79525a03",
+    "scripts/source_hyperdrive_session.gd": "6604df5a7573e1abdc3aae5b22e10c38c1d0cfcef4a38dbb03e54459bbe9aaf4",
+    "scripts/source_jet_fuel.gd": "ef043cd3d7fe4ef06a08d1f6592bf97b5d1e6d81c5f2efe9ea067d514f207cc1",
+    "scripts/source_fuel_scoop.gd": "de1e96fd3013de48557b340b9ca4e4d174c4d39aaebb8b2eee96250db53af296",
+    "data/ffe_hyperdrive.json": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+    "data/ffe_fuel.json": "4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f",
+    "tests/test_source_fuel_session.gd": "a8f37d7873be6eed0689307a0b301ccd44d48164dba20b582957fb1b1d295d7c",
+    "tests/test_source_hyperdrive_navigation.gd": "904e1876160b3284748c62dd03f3185de641471d8cf664cc1c8f355e30051709",
+    "tests/test_native_navigation.gd": "5fe983525880c0366ad48adc28fde6cce2506aa03016b4fa98a18ebf498a3a04"
+  },
+  "contracts": {
+    "source_session_original_12_keys_accepted": true,
+    "optional_strict_nested_fuel_keys": 17,
+    "source_v40_pending_old12_hash_verified_before_upgrade": true,
+    "upgraded_pending_schema": "source-hyperdrive-pending-v2",
+    "pending_dynamic_jet_heat_clock_excluded": true,
+    "pending_hyperfuel_and_hardware_locked": true,
+    "jet_tick_remainder_range": [
+      0,
+      49709
+    ],
+    "host_fraction_exact_IEEE64_hex": true,
+    "F938_player_whole_quantum_ticks": 49710,
+    "F1033_step_is_raw_frame_ticks": true,
+    "zero_whole_quantum_skips_F929": true,
+    "DOS_empty_disabled_axes_mask": 21,
+    "ordinary_and_automatic_refill_restore_disabled_caps": false,
+    "F289_manual_restores_all_six_caps": true,
+    "F410_removal_clears_jet_not_limits": true,
+    "F408_install_grants_jet": false,
+    "Eagle_starter_atmospheric_shielding_credit_t": 1,
+    "legacy_v1_v2_jet_session_automatic_upgrade": false
+  },
+  "limits": [
+    "Raw arithmetic/native cases belong to independent core reports, not added again here.",
+    "Selected port availability is an explicit derived fixture in workshop unit cases; no physical dock/full-market claim.",
+    "Host nominal-day SI clock and scoop countdown are named caller policies; original F15249710 cadence and F1007 cooling are used.",
+    "Only F1033 stellar heat plus F1007 cooling implemented here; full F1014 thermal/damage pipeline remains out of scope.",
+    "Prices use the existing basic-source-workshop adapter; source hardware mass/mounting and fuel arithmetic are independent of prices.",
+    "143and219control groups may also appear in root consolidated regressions and must be counted only once.",
+    "Headless checks and desktop microbenchmark do not measure Samsung performance."
+  ],
+  "independent_drive_service_DOS_instruction_proof": "validation/fuel-2026-11-07/drive-services-dos-proof.json",
+  "drive_service_proof_scope": "Static DOS bytes/ASM/disassembly, not an additional native execution oracle. F40877bytes has no11Ewrite; F41077bytes clearsD0and11E without thrust writes."
+}

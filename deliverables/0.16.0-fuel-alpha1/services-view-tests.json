@@ -1,0 +1,172 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "scope": "Embedded phone equipment UI: separate jet tank/cargo, runtime refueller/manual fuel actions and dock fuel hardware; actual Navigation consumer plus explicit display fixtures",
+  "groups": 4,
+  "checks": 858,
+  "failures": 0,
+  "suites": [
+    {
+      "test": "tests/test_hyperdrive_services_view.gd",
+      "checks": 484,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/fuel-2026-11-07/hyperdrive-services-view.log"
+    },
+    {
+      "test": "tests/test_hyperdrive_services_native_view.gd",
+      "checks": 54,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/fuel-2026-11-07/hyperdrive-services-native-view.log"
+    },
+    {
+      "test": "tests/test_fuel_services_view.gd",
+      "checks": 229,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/fuel-2026-11-07/fuel-services-view.log"
+    },
+    {
+      "test": "tests/test_fuel_services_native_view.gd",
+      "checks": 91,
+      "failures": 0,
+      "exit_code": 0,
+      "log": "validation/fuel-2026-11-07/fuel-services-native-view.log"
+    }
+  ],
+  "sha256": {
+    "scripts/hyperdrive_services_view.gd": "b0bcc31c52f8d46f94b29585ce2993535d45ef045a39617e8c90d15a2967cc97",
+    "scripts/navigation.gd": "26e25aabedbf93831bd2f875b663a075053b0e479a67376b014a3aae79525a03",
+    "scripts/source_hyperdrive_session.gd": "6604df5a7573e1abdc3aae5b22e10c38c1d0cfcef4a38dbb03e54459bbe9aaf4",
+    "scripts/source_jet_fuel.gd": "ef043cd3d7fe4ef06a08d1f6592bf97b5d1e6d81c5f2efe9ea067d514f207cc1",
+    "scripts/source_fuel_scoop.gd": "de1e96fd3013de48557b340b9ca4e4d174c4d39aaebb8b2eee96250db53af296",
+    "scripts/flight_model.gd": "4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b",
+    "data/ffe_hyperdrive.json": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+    "data/ffe_fuel.json": "4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f",
+    "tests/test_hyperdrive_services_view.gd": "f37d97a1e7c3b388f8828ea7d9e39be45695746190316b7f4a4f850378809508",
+    "tests/test_hyperdrive_services_native_view.gd": "540135c5ce883e9fc32639d532deb1a34d7c43d7107e27917274459f3c151fab",
+    "tests/test_fuel_services_view.gd": "e57030e212964e0f50fa40a1c941351aa4d50f135933731429bd754307a4cb53",
+    "tests/test_fuel_services_native_view.gd": "41aa118a5a43b96dd9915b0d81eb6c367e4950dfd9c870ffb1daa7e3e228ecec"
+  },
+  "contracts": {
+    "runtime_signal": "runtime_command(action:String,enabled:bool)",
+    "runtime_actions": [
+      "manual_jet_refuel",
+      "set_refueller_enabled"
+    ],
+    "dock_fuel_equipment_actions": [
+      "install_fuel_equipment",
+      "remove_fuel_equipment"
+    ],
+    "equipment_ids": [
+      "refueller",
+      "scoop",
+      "atmospheric_shielding"
+    ],
+    "DOS_empty_any_thrust": true,
+    "DOS_empty_forward_thrust": false,
+    "manual_refuel_restores_all_six_limits": true,
+    "military_manual_refuel_produces_waste": true,
+    "runtime_actions_guarded_during_charge": true,
+    "fixture_widths": [
+      320,
+      440,
+      720,
+      960,
+      1440
+    ],
+    "actual_consumer_widths": [
+      320,
+      440,
+      720
+    ],
+    "actual_touch_at_320px": true,
+    "GPU_rendered": false,
+    "physical_phone_tested": false,
+    "UI_performs_raw_unit_conversion": false,
+    "render_mutates_model": false
+  },
+  "evidence": {
+    "tests/test_hyperdrive_services_native_view.gd": [
+      {
+        "capacity_t": 80,
+        "drive_index": 3,
+        "flight_cargo_t": 6,
+        "occupied_t": 45,
+        "phase": "initial_actual_source",
+        "pricing_profile": "basic-source-workshop-pricing-adapter-v1"
+      },
+      {
+        "drive_index": 11,
+        "free_t": 1,
+        "fuel_handover_credit_change": 0,
+        "hydrogen": 4,
+        "military": 47,
+        "occupied_t": 79,
+        "phase": "fitted_and_fuelled"
+      },
+      {
+        "duration_days": 2.53741455078125,
+        "duration_raw_u32": 166292,
+        "final_free_t": 3,
+        "military_consumed": 2,
+        "ordinary_inventory_unchanged": true,
+        "phase": "military_jump_and_waste",
+        "required_fuel": 2,
+        "waste_handed_over": 2
+      },
+      {
+        "elapsed_days": 17.25,
+        "hydrogen_after_service": 13,
+        "old_fuel_units": 12,
+        "ordinary_inventory_unchanged": true,
+        "phase": "immediate_post_migration",
+        "service_available_without_extra_refresh": true
+      }
+    ],
+    "tests/test_fuel_services_native_view.gd": [
+      {
+        "all_six_limits_restored": true,
+        "any_thrust_while_empty": true,
+        "forward_while_empty": false,
+        "hydrogen_after": 3,
+        "phase": "actual_depletion_manual",
+        "tank_tonnes_after": 1.0
+      },
+      {
+        "cooldown_seconds_from_model": 2.99998372793198,
+        "heat_text_from_model": "Нагрев корпуса: 1000 (шкала игры).",
+        "pending_charge_actions_blocked": true,
+        "phase": "actual_fuel_hardware",
+        "refuel_runtime_off_on": true,
+        "source_added_mass_t": 8
+      },
+      {
+        "hydrogen_unchanged": true,
+        "military_consumed": 1,
+        "occupied_t_unchanged": true,
+        "phase": "actual_military_manual",
+        "radioactives_added": 1
+      },
+      {
+        "occupied_after_reinstall": 19,
+        "occupied_t_with_default_shield": 19,
+        "phase": "actual_eagle_phone",
+        "scoop_mounting_rejected": true,
+        "widths": [
+          320,
+          440,
+          720
+        ]
+      }
+    ]
+  },
+  "limits": [
+    "Dock availability is an isolated service flag fixture, not a physical docking or full-market claim.",
+    "Prices are model-supplied basic-source-workshop adapter quotes.",
+    "Native parity, thermal geometry, actual Main routing and desktop GPU screenshots belong to their independent reports.",
+    "These four UI suites may also appear in root consolidated regressions and must be counted only once.",
+    "Headless touch/layout checks do not measure Samsung performance."
+  ]
+}
