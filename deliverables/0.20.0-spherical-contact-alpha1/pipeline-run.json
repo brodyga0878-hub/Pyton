@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-07T23:39:00.793783+00:00",
+  "updated_utc": "2026-11-07T23:39:01.033623+00:00",
+  "duration_seconds": 0.24,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-07T23:39:00.793783+00:00",
+      "duration_seconds": 0.24,
+      "requested_suites": [
+        "source_spherical_pipeline"
+      ],
+      "executed_suites": [
+        "source_spherical_pipeline"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 1,
+  "status": "passed",
+  "passed_suites": 1,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 2400,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "source_spherical_pipeline",
+      "scope": "Bounded raw F575 simple-parent player route: original coarse gate, F577, unchanged terminal response and explicit atomic guards for unsupported F576/F578.",
+      "status": "passed",
+      "checks": 2400,
+      "failures": 0,
+      "executed_utc": "2026-11-07T23:39:00.795620+00:00",
+      "suite_source": {
+        "path": "tests/test_source_spherical_contact_pipeline.gd",
+        "bytes": 10751,
+        "sha256": "6d209a77edbabf55f7af302ba6ceeab069b1eea5a541754ef8d52de8a73aa271"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_spherical_contact_pipeline.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.237,
+      "timed_out": false,
+      "output_bytes": 124,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/spherical-2026-11-08/pipeline-run/logs/source_spherical_pipeline.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ]
+}

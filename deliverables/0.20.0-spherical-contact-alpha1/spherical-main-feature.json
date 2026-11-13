@@ -1,0 +1,32 @@
+{
+  "schema": "starfrontier-source-archive-spherical-feature-v1",
+  "started_utc": "2026-11-07T23:59:08.755422+00:00",
+  "finished_utc": "2026-11-07T23:59:36.267328+00:00",
+  "duration_seconds": 27.511916,
+  "source_commit": "47903dae5b1688bac688a2568424ce3779489549",
+  "archive_sha256": "343bcfab4802dd2666825f382b89164838e30f20ccdfab42db1816d43398a3a3",
+  "command": [
+    "godot",
+    "--headless",
+    "--audio-driver",
+    "Dummy",
+    "--path",
+    "/workspace/recovery/spherical-source-portability/source/StarFrontier-0.20.0-spherical-contact-source",
+    "--script",
+    "res://tests/test_source_spherical_main.gd",
+    "--",
+    "--rebuild-capture"
+  ],
+  "exit_code": 0,
+  "checks": 195,
+  "failures": 0,
+  "error_markers": [],
+  "source_actual_files": 1341,
+  "all_source_files_unchanged": true,
+  "modified_files": [],
+  "private_xdg": true,
+  "execution_policy": "require_escalated",
+  "log_sha256": "94ad0ea55abd7e0435ef0b5ab34e37b2015545dad6ae8c264a5826d379633c68",
+  "scope": "Exact source ZIP, fresh isolated actual Main readonly spherical envelope/log/report/cold/cache and preserved terrain test. Repeated portability checks excluded from current distinct total. No Android device execution.",
+  "ok": true
+}

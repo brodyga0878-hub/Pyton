@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "timestamp_utc": "2026-11-07T23:52:53.662981+00:00",
+  "reviewer": "/root/fuel_scoop_core",
+  "read_only": true,
+  "material_blockers": 0,
+  "verifier_sha256": "ae29437bcfd75296ab085de009b2608dd60afccbe4b9235d1431d6f691d8a9e1",
+  "tests_sha256": "5454ba62d5dd64dfdb6fa713d790f22b7c1721dc61c791001dab2589750e0999",
+  "historical_fixture_sha256": "8b6eebc4d6ea1faf37f86f3fdb0389da8fd1a238925044370232bca86e923d57",
+  "scope": [
+    "Retained44 helper AST equals historical HEAD after removing only declared optional normalized-Main adapter.",
+    "Public strict44 wrapper retains default semantics.",
+    "Portable fixture contains23 exact source/digest entries; per-mutation clones follow overlay.",
+    "Exact-count probe additions normalize entire Main to historical AD3; actual26 source pins separately frozen.",
+    "Old858 bounded-response native fixture and retained gear/atmosphere/fuel/hyperdrive/information data and controls retained.",
+    "Routing149: model0 initialized flags/eligibility null,18eligible,130hierarchical; allnatural117..148 requireF576.",
+    "Pure1141 reference remains distinct from coupled213=207supported+6hostguards; no full pair/terrain/scanner/world-bank claim.",
+    "Virtual retained Main and actual45 Main hashes/disclosure are explicit."
+  ],
+  "files_changed_by_reviewer": false,
+  "tests_executed_by_reviewer": false,
+  "native_executed_by_reviewer": false,
+  "Godot_executed_by_reviewer": false,
+  "APK_built_by_reviewer": false
+}

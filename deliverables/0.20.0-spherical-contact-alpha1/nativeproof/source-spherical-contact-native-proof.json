@@ -1,0 +1,371 @@
+{
+  "schema_version": 1,
+  "reference": "uploaded DOS FIRSTENC.EXE",
+  "executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "pinned_asm_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+  "case_count": 1141,
+  "byte_instruction_proofs": {
+    "577": {
+      "executable_offset": 101964,
+      "virtual_address": 4358220,
+      "byte_length": 363,
+      "sha256": "f2bb5974c51d801bf5c219f697cf16716250a296f744e54fed61a6c26131e790",
+      "instruction_count": 128,
+      "normalized_instruction_sha256": "8ff97fb96362ca8ebec6af45a9b84178e8b3027451e6073ce3414fef54200e88",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1333": {
+      "executable_offset": 259606,
+      "virtual_address": 4515862,
+      "byte_length": 25,
+      "sha256": "8946c4ccd895806bb39d3d393c582970d2e34c8ba60c06257447eb10186e5468",
+      "instruction_count": 11,
+      "normalized_instruction_sha256": "d404596ee05a43e6f48c9e0e3738ec8f555a7f3093ca751c86a988fd4a17721f",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1341": {
+      "executable_offset": 259928,
+      "virtual_address": 4516184,
+      "byte_length": 127,
+      "sha256": "ce1f10cd3645a7e74e65b774758ad6160e67cc67d19b0ad4cbfa77dbcc454ef3",
+      "instruction_count": 57,
+      "normalized_instruction_sha256": "91f886eebe2baa0ba96dd39d1780e2873e9118a671b5d410235768a1f066a92f",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1502": {
+      "executable_offset": 276735,
+      "virtual_address": 4532991,
+      "byte_length": 139,
+      "sha256": "06d92dfc59b6eca45c8c8c4d203e1deb6a270101894bdea28ca83b692dc60d19",
+      "instruction_count": 61,
+      "normalized_instruction_sha256": "c5023ccf9909d9370799f5bbbb7d17b5daaf2db9050c49ef71ca246620516b3e",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1522": {
+      "executable_offset": 279177,
+      "virtual_address": 4535433,
+      "byte_length": 12,
+      "sha256": "e6001a066c6ed54cff7bf995d82867c4b0809fa6752fdfb96247378823c29291",
+      "instruction_count": 7,
+      "normalized_instruction_sha256": "0db7d02ec4a9097b59586917c6cfbf316b7b2c90a45ca38f2e5ec3f70278f243",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1656": {
+      "executable_offset": 305076,
+      "virtual_address": 4561332,
+      "byte_length": 74,
+      "sha256": "8bdce1d3d508b9cbf7d5fcbbf261407789d7bbf8fd917a4225db88c6d5aa2949",
+      "instruction_count": 29,
+      "normalized_instruction_sha256": "fb3430703e53a390c573480dc2a76a799a82e386edd80d2d0e4df2494995dbb6",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    },
+    "1660": {
+      "executable_offset": 305752,
+      "virtual_address": 4562008,
+      "byte_length": 177,
+      "sha256": "e23941156e2eb6f1c53020a82a29d6537e6be0b7a6af446323409fb93e3be0cc",
+      "instruction_count": 74,
+      "normalized_instruction_sha256": "dd0955a8519f7df2d6693ec66963ecfa03ef327cc77da6935c6bfb5623544ebf",
+      "all_instructions_equal_after_branch_destination_normalization": true
+    }
+  },
+  "known_jjffe_variant": {
+    "difference_count": 1,
+    "differences": [
+      {
+        "instruction": 38,
+        "dos": "add eax,dwordptr[esi+0x138]",
+        "pinned_jjffe": "add eax,dwordptr[esi+0x140]"
+      }
+    ],
+    "all_other_instructions_equal": true,
+    "canonical_applied_edit": "Restore documented ADD parent+138 from uploaded DOS; never silently adopt JJFFE+140."
+  },
+  "jjffe_counterfactual_case": {
+    "operation": "F577",
+    "input_domain": "dos_vs_jjffe_radius_canary",
+    "absolute_input_policy": "caller-consistent-F1664-absolute-invariant",
+    "body_hex": "07325d88b3de09345f8ab5e00b36618cb7e20d38638eb9e40f3a6590bbe6113c6792bde8133e6994bfea15406b96c1ec17426d98c3ee19446f9ac5f01b46719cc7f21d48739ec9f41f4a75a0cbf6214c77a2cdf8234e79a4cffa25507ba6d1fc27527da8d3fe29547faad5002b5681acd7022d5883aed9042f5a85b0db06315c87b22600000089b4df0a35608bb6e10c37628db8e30e39648fbae5103b6691bce7123d6893bee9143f6a95c0eb16416c97c2ed18436e99c4ef1a45709bc6f11c47729dc8f31e49749fcaf5204b76a1ccf7224d78a3cef9244f7aa5d0fb26517ca7d2fd28537ea9d4ff2a5580abd6012c5782add8032e5984afda05305b86b1dc07325d88b3de09345f8ab5e00b36618cb7e20d38638eb9e40f3a6590bbe6113c6792bde8133e6994bfea15406b96c1ec17426d98c3ee194432000000000000000a000000000000001f4a75a0cbf6214c77a2",
+    "parent_hex": "0b4681bcf7326da8e31e5994cf0a4580bbf6316ca7e21d5893ce09447fbaf5306ba6e11c5792cd08437eb9f42f6aa5e01b5691cc07427db8f32e69a4df1a5590cb06417cb7f22d68a3de19548fca05407bb6f12c67a2dd18538ec9043f7ab5f02b66a1dc17528dc8033e79b4ef2a65a0db16518cc7023d78b3ee29649fda15508bc675000000ed28639ed9144f8ac5003b76b1ec27629dd8134e89c4ff3a75b0eb26619cd7124d88c3fe3974afea25609bd6114c87c2fd3873aee9245f9ad5104b86c1fc3772ade8235e99d40f4a85c0fb3671ace7225d98d30e4984bffa3570abe6215c97d20d4883bef9346faae5205b96d10c4782bdf8336ea9e41f5a95d00b4681bcf7326da8e31e5994cf0a4580bbf6316ca7e21d5893ce09447fbaf5306ba6e11c5792cd08437eb9f42f6aa5e01b5691cc07427db864000000000000001400000000000000a3de19548fca05407bb6",
+    "context": {
+      "relative_position_s64": [
+        60,
+        0,
+        0
+      ],
+      "relative_position_s64_hex": "3c0000000000000000000000000000000000000000000000",
+      "absolute_position_s64": [
+        60,
+        0,
+        0
+      ],
+      "absolute_position_s64_hex": "3c0000000000000000000000000000000000000000000000",
+      "globals": {
+        "collision_flags_u8": 0,
+        "altitude_s64": 123456789,
+        "altitude_s64_hex": "15cd5b0700000000"
+      }
+    },
+    "repeat_count": 1,
+    "id": "jjffe-counterfactual-radius-only",
+    "expected": {
+      "return_s32": -1,
+      "inside_sphere": false,
+      "distance_squared_s32": 58982400,
+      "globals": {
+        "collision_flags_u8": 3,
+        "altitude_s64_hex": "3c00000000000000"
+      },
+      "body_hex": "07325d88b3de09345f8ab5e00b36618cb7e20d38638eb9e40f3a6590bbe6113c6792bde8133e6994bfea15406b96c1ec17426d98c3ee19446f9ac5f01b46719cc7f21d48739ec9f41f4a75a0cbf6214c77a2cdf8234e79a4cffa25507ba6d1fc27527da8d3fe29547faad5002b5681acd7022d5883aed9042f5a85b0db06315c87b22600000089b4df0a35608bb6e10c37628db8e30e39648fbae5103b6691bce7123d6893bee9143f6a95c0eb16416c97c2ed18436e99c4ef1a45709bc6f11c47729dc8f31e49749fcaf5204b76a1ccf7224d78a3cef9244f7aa5d0fb26517ca7d2fd28537ea9d4ff2a5580abd6012c5782add8032e5984afda05305b86b1dc07325d88b3de09345f8ab5e00b36618cb7e20d38638eb9e40f3a6590bbe6113c6792bde8133e6994bfea15406b96c1ec17426d98c3ee194432000000000000000a000000000000001f4a75a0cbf6214c77a2",
+      "parent_hex": "0b4681bcf7326da8e31e5994cf0a4580bbf6316ca7e21d5893ce09447fbaf5306ba6e11c5792cd08437eb9f42f6aa5e01b5691cc07427db8f32e69a4df1a5590cb06417cb7f22d68a3de19548fca05407bb6f12c67a2dd18538ec9043f7ab5f02b66a1dc17528dc8033e79b4ef2a65a0db16518cc7023d78b3ee29649fda15508bc675000000ed28639ed9144f8ac5003b76b1ec27629dd8134e89c4ff3a75b0eb26619cd7124d88c3fe3974afea25609bd6114c87c2fd3873aee9245f9ad5104b86c1fc3772ade8235e99d40f4a85c0fb3671ace7225d98d30e4984bffa3570abe6215c97d20d4883bef9346faae5205b96d10c4782bdf8336ea9e41f5a95d00b4681bcf7326da8e31e5994cf0a4580bbf6316ca7e21d5893ce09447fbaf5306ba6e11c5792cd08437eb9f42f6aa5e01b5691cc07427db864000000000000001400000000000000a3de19548fca05407bb6",
+      "relative_position_s64_hex": "3c0000000000000000000000000000000000000000000000",
+      "absolute_position_s64_hex": "3c0000000000000000000000000000000000000000000000",
+      "shift_s32": -23,
+      "radius_s32": 251658240,
+      "radius_squared_s32": 14745600,
+      "scaled_position_s64_hex": "0000001e0000000000000000000000000000000000000000",
+      "repeat_count": 1
+    }
+  },
+  "independent_literal_controls": [
+    {
+      "name": "DOS-parent-outer110-inside60",
+      "case_id": "dos-spherical-contact-0000",
+      "literal_expected": [
+        0,
+        -23,
+        922746880,
+        {
+          "collision_flags_u8": 0,
+          "altitude_s64_hex": "15cd5b0700000000"
+        }
+      ],
+      "observed": [
+        0,
+        -23,
+        922746880,
+        {
+          "collision_flags_u8": 0,
+          "altitude_s64_hex": "15cd5b0700000000"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "JJFFE-parent-inner30-outside60",
+      "case_id": "jjffe-counterfactual-radius-only",
+      "literal_expected": [
+        -1,
+        251658240
+      ],
+      "observed": [
+        -1,
+        251658240
+      ],
+      "passed": true
+    },
+    {
+      "name": "radius-equality-is-outside",
+      "case_id": "dos-spherical-contact-0046",
+      "literal_expected": [
+        -1,
+        2
+      ],
+      "observed": [
+        -1,
+        2
+      ],
+      "passed": true
+    },
+    {
+      "name": "left-shift-keeps-highwords",
+      "case_id": "dos-spherical-contact-0289",
+      "literal_expected": "000080ffffffffff000080ffffffffff000080ffffffffff",
+      "observed": "000080ffffffffff000080ffffffffff000080ffffffffff",
+      "passed": true
+    },
+    {
+      "name": "signed-INT32-MIN-square-highword",
+      "case_id": "dos-spherical-contact-0625",
+      "literal_expected": [
+        1073741824,
+        "000000800000000000000000000000000000000000000000"
+      ],
+      "observed": [
+        1073741824,
+        "000000800000000000000000000000000000000000000000"
+      ],
+      "passed": true
+    },
+    {
+      "name": "left-shift-does-not-propagate-lowword-carry",
+      "case_id": "dos-spherical-contact-0626",
+      "literal_expected": "000080000100000000000000000000000000000000000000",
+      "observed": "000080000100000000000000000000000000000000000000",
+      "passed": true
+    },
+    {
+      "name": "literal_positive_branch_outer_radius",
+      "case_id": "dos-spherical-contact-0627",
+      "literal_expected": [
+        11,
+        1073741824,
+        0
+      ],
+      "observed": [
+        11,
+        1073741824,
+        0
+      ],
+      "passed": true
+    },
+    {
+      "name": "literal_positive_branch_ignores_inner_radius",
+      "case_id": "dos-spherical-contact-0628",
+      "literal_expected": [
+        11,
+        1073741824,
+        0
+      ],
+      "observed": [
+        11,
+        1073741824,
+        0
+      ],
+      "passed": true
+    }
+  ],
+  "models": {
+    "15": {
+      "descriptor_file_offset": 560842,
+      "descriptor_hex": "caf04900fef14900200000005ef249001600000006000000000000004b000000110000000606060008000000004b0000001e0000f0f149009af249000000000000000000",
+      "descriptor_sha256": "b359ca04d2ac30582914c20e14e17402362b4a35a39bc283daedcd7a4aeeb2df",
+      "bounds_input_derivation": "Source F1533 radius16/exponent input formula only; full initialization not executed by this classifier oracle.",
+      "scale_exponent": -2,
+      "outer_bound_s64_hex": "c012000000000000",
+      "inner_bound_s64_hex": "8007000000000000"
+    },
+    "24": {
+      "descriptor_file_offset": 565992,
+      "descriptor_hex": "a0064a00b2064a0002000000000000000200000008000000000000007d00000013000000060606000a000000a028000050140000aa064a00b8064a000000000000000000",
+      "descriptor_sha256": "a0319edb595a3c88e91fefa67c1b11b81bb8bde7d8953d277710cc18fcb7d7e3",
+      "bounds_input_derivation": "Source F1533 radius16/exponent input formula only; full initialization not executed by this classifier oracle.",
+      "scale_exponent": 0,
+      "outer_bound_s64_hex": "a028000000000000",
+      "inner_bound_s64_hex": "5014000000000000"
+    },
+    "38": {
+      "descriptor_file_offset": 580140,
+      "descriptor_hex": "343a4a00b83c4a005c000000cc3d4a001200000009000000000000006d00000017000000060606000b00000050460000c01200009e3c4a00fc3d4a000000000000000000",
+      "descriptor_sha256": "f96a200b4ccf4f12252ef1fb0240c7b4a8d637481e7ac4608dd4c7a7fb052217",
+      "bounds_input_derivation": "Source F1533 radius16/exponent input formula only; full initialization not executed by this classifier oracle.",
+      "scale_exponent": 1,
+      "outer_bound_s64_hex": "a08c000000000000",
+      "inner_bound_s64_hex": "8025000000000000"
+    },
+    "81": {
+      "descriptor_file_offset": 624586,
+      "descriptor_hex": "10eb4a0070eb4a001e000000000000000200000011000000000000004c0000001500000088080800110000004b4c00000000000066eb4a00000000000000000000000000",
+      "descriptor_sha256": "3cef2248b7610a735311509c5216730567358a7904d2fa1b3a6b29cc0704e0f2",
+      "bounds_input_derivation": "Source F1533 radius16/exponent input formula only; full initialization not executed by this classifier oracle.",
+      "scale_exponent": 9,
+      "outer_bound_s64_hex": "0096980000000000",
+      "inner_bound_s64_hex": "0000000000000000"
+    },
+    "96": {
+      "descriptor_file_offset": 628754,
+      "descriptor_hex": "5cfb4a00d0fb4a00160000000000000002000000120000000000000066000000150000008808080013000000ff66000000000000c6fb4a00000000000000000000000000",
+      "descriptor_sha256": "4ca90e4d2299918305bda2c013c0aa3d083d224def9b3e12c3276e0750e0fbea",
+      "bounds_input_derivation": "Source F1533 radius16/exponent input formula only; full initialization not executed by this classifier oracle.",
+      "scale_exponent": 10,
+      "outer_bound_s64_hex": "00fc9b0100000000",
+      "inner_bound_s64_hex": "0000000000000000"
+    },
+    "117": {
+      "descriptor_file_offset": 637274,
+      "descriptor_hex": "201d4b00421d4b00080000000000000002000000160000000100000047000000250000000505050016000000391a0000b0100000321d4b00000000000000000000000000",
+      "descriptor_sha256": "412fbce642e0b1d60c15989409e2eba29ecdb2eb74b17785876513db6b1c6d34",
+      "bounds_input_derivation": "Source F1533 radius16/exponent input formula only; full initialization not executed by this classifier oracle.",
+      "scale_exponent": 15,
+      "outer_bound_s64_hex": "00801c0d00000000",
+      "inner_bound_s64_hex": "0000580800000000"
+    },
+    "118": {
+      "descriptor_file_offset": 637912,
+      "descriptor_hex": "9e1d4b00c01f4b000800000000000000020000001600000003000000490000002600000006060600180000006e490000ba2e0000b01e4b00000000000000000000000000",
+      "descriptor_sha256": "81879ce8c0d40cf5b2dbd4062ff54e880ff1d87d97bf91103fe9226a0642f18b",
+      "bounds_input_derivation": "Source F1533 radius16/exponent input formula only; full initialization not executed by this classifier oracle.",
+      "scale_exponent": 17,
+      "outer_bound_s64_hex": "0000dc9200000000",
+      "inner_bound_s64_hex": "0000745d00000000"
+    },
+    "134": {
+      "descriptor_file_offset": 646616,
+      "descriptor_hex": "7e414b00c0414b00080000000000000002000000160000000a000000740000002d000000080604001f0000009f0f0000f1090000b0414b00000000000000000000000000",
+      "descriptor_sha256": "32bf799cabafe3df2aa8bf2c51c35f4ba8082707c5764dedf93f48c2f7f8f680",
+      "bounds_input_derivation": "Source F1533 radius16/exponent input formula only; full initialization not executed by this classifier oracle.",
+      "scale_exponent": 24,
+      "outer_bound_s64_hex": "0000009f0f000000",
+      "inner_bound_s64_hex": "000000f109000000"
+    }
+  },
+  "observed_shift_s32_values": [
+    -29,
+    -28,
+    -27,
+    -26,
+    -23,
+    -22,
+    -17,
+    -16,
+    -15,
+    -14,
+    -13,
+    -12,
+    -6,
+    -5,
+    -4,
+    -2,
+    -1,
+    0,
+    1,
+    2,
+    3,
+    4,
+    6,
+    7,
+    11,
+    14,
+    16,
+    31,
+    32,
+    33,
+    34
+  ],
+  "execution_checks": {
+    "fresh_identical_processes": 3,
+    "reverse_case_order_identical": true,
+    "object_parent_relative_absolute_output_canaries": true,
+    "all_input_buffers_unchanged": true,
+    "expected_transitions_computed_by_python": false
+  },
+  "host_abi_adaptation": {
+    "by_value_relative_six_dwords": "Copied from expanded host argument slots into a private contiguous24B stack shadow. All original F577 relative accesses and F1660 pointer use that same shadow. Source arithmetic unchanged.",
+    "observers": "MOV-only output captures retain all original registers/flags; no synthetic square/root callback."
+  },
+  "scope": [
+    "Complete actual-DOS F577 plus all six required integer helpers.",
+    "Object bounds and separate relative/absolute vectors are explicit raw inputs. Caller-consistent cases handcraft the F1664 two-complement absolute invariant; this tool does not execute F1664.",
+    "Actual source descriptor bounds are fixture input construction only; no whole F1533 initialization or complete model collision-engine claim.",
+    "No F569/F575/F576/F578 scanner/contact response, damage, frame selection or SI bridge executes.",
+    "Return0 is inside sphere; return\u22121 is outside/equality. F577 does not publish collisionkind/previousheight.",
+    "ExactLEhex carries64-bit inputs/outputs; JSON decimal previews must not be used as lossy machine inputs."
+  ],
+  "invalid_domains_not_executed": [
+    "Malformed raw338 objects or missing3\u00d7s64 vectors; invalid initialflags/altitude field domains."
+  ],
+  "fixture_sha256": "37a9c51bf5d1b9dbb74343e3863d7672cca009985bfd89a557f22993fb9059c4",
+  "tool_sha256": "dab2371b8b9aa2346dac1fd8ad48a0690d9580cd8f3970062c0d2ce68ac7ca3b",
+  "native_assembly_sha256": "163adb166f14e0a0bb8ce67d23bae40ff9353c470bd5f4cbc3b40639812d7350"
+}

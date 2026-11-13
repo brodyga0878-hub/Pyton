@@ -1,0 +1,675 @@
+{
+  "version": "0.20.0-spherical-contact-alpha1",
+  "version_code": 45,
+  "created_utc": "2026-11-13T11:30:44.131996+00:00",
+  "source_commit": "47903dae5b1688bac688a2568424ce3779489549",
+  "source_archive_scope": "Exact git archive reconstruction plus scoped static parity audit; SDK, keys, caches, other validation and deliverables excluded; internal docs reflect pre-publication state.",
+  "source_archive_files": 1494,
+  "source_archive_actual_file_count": 1341,
+  "source_archive_below_32MiB": true,
+  "source_archive_crc_verified": true,
+  "source_archive_fresh_import_passed": true,
+  "source_archive_isolated_native_startup_checks": 10,
+  "source_archive_isolated_native_startup_failures": 0,
+  "source_archive_spherical_Main_checks": 195,
+  "source_archive_spherical_Main_failures": 0,
+  "source_archive_actual_files_unchanged": 1341,
+  "checks": 23593,
+  "passed_suites": 26,
+  "failures": 0,
+  "validation_status": "passed",
+  "validation_report": "final-targeted-summary.json",
+  "validation_scope": "One current passing result per unique selected F577/composed raw route/readonly probe/Main and22 preserved regression groups.207 supported coupled source paths are separate from six intercepted native paths with explicit host rollback; no F576/F578 behavior claimed. Failed/intermediate runs, native cases already within suites, repeated portability/captures and prior release totals excluded. Bounded suite timestamps retained; not an atomic full-game run.",
+  "core_checks": 17224,
+  "pipeline_checks": 2400,
+  "probe_checks": 227,
+  "actual_Main_checks": 195,
+  "new_supported_DOS_native_cases": 1348,
+  "F577_canonical_native_cases": 1141,
+  "pipeline_supported_native_cases": 207,
+  "pipeline_native_interception_HOST_rollback_controls_separate": 6,
+  "JJFFE_counterfactual_controls_separate": 1,
+  "F577_instruction_matched_scopes": 7,
+  "F577_proven_bytes": 917,
+  "F577_proven_instructions": 367,
+  "F577_primary_bytes": 363,
+  "F577_primary_instructions": 128,
+  "pipeline_instruction_matched_scopes": 25,
+  "pipeline_proven_bytes": 4359,
+  "pipeline_proven_instructions": 1608,
+  "pipeline_full_F575_byte_anchor_bytes": 2005,
+  "pipeline_full_F575_byte_anchor_instructions": 635,
+  "full_F575_byte_anchor_implies_whole_behavior": false,
+  "native_cases_already_in_test_checks": true,
+  "historical_native_totals_added": false,
+  "python_packaging_tests": 248,
+  "python_extraction_tests": 12,
+  "python_distinct_tests": 260,
+  "capture_checks": 128,
+  "capture_checks_added_to_targeted_total": false,
+  "fresh_desktop_gles_frames_visually_inspected": 8,
+  "screenshots_are_phone_captures": false,
+  "capture_scope": "Actual desktop Main views and real diagnostic-report ZIP containing read-only DOS F577 envelope facts. Existing source terrain, F575/F953 landing/takeoff, map and docking views are retained production behavior, not newly implemented F577 collisions. Explicit observer placements; no compositing, physical Android, manual approach, complete original classifier/object bank or performance benchmark proof.",
+  "capture_setup_is_fixture": true,
+  "renderer": "Godot4.6.3 Compatibility/OpenGL Mesa llvmpipe Linux virtual display",
+  "frozen_runtime_inputs": 424,
+  "capture_source_stamps": 11,
+  "capture_source_stamps_match": true,
+  "additional_runtime_modules": 3,
+  "additional_source_JSON": 1,
+  "runtime_material_maps": 51,
+  "spherical_contact_assets": {
+    "baseline_source_commit": "86a4a5e2a44c73d610d8a35f7fda7e393343991e",
+    "compiled_modules": {
+      "source_spherical_contact": "c2e24ef2782680c854ae33118589b7b6dba30ef2b432ff71b3ab573ab1b7d75a",
+      "source_spherical_contact_pipeline": "d911870846f67362aa2719438d9f11324cb5fd036f3e44cc01be3692f5f20635",
+      "source_spherical_contact_probe": "db2e5e8ac3e899d8f2192d93cb170911dacb61eb9c6ec149bbc74b9a9ca27305"
+    },
+    "compiled_module_count": 3,
+    "integration_compiled_modules": {
+      "source_hyperdrive": "42bf04e80b34c51e4ff88ab60b54662425f2be15ed4e69866201ce94df720316",
+      "hyperdrive_services_view": "e710628ffbecfe589f197c0b32e4d962b02b8b11df82032a86b984668aa5afb4",
+      "galactic_map_model": "58630cadaccc4255314d79d45d410903bb4a91cdb559112b379874d59e389ca4",
+      "galactic_map_view": "35a157b7e34030f2835f623f9182218361e78647694439bc2d9a8fa409389c78",
+      "source_jet_fuel": "537bebf01f5253b1526af9f0e400f6c8e6993649e9d55f11c19bde4cea0cd7ef",
+      "source_fuel_scoop": "3116221c1ad60863ab8c5a1f26778bfd872ab373cfb07b1ce88bab1e8f4eac2e",
+      "source_fuel_contact": "07761e1f57ebf1533acac082f0811d117d65c808fbb554ede2ebe39537691519",
+      "source_fuel_flight_bridge": "13a3b55e37b9bda9811db3cc2911df70dfd2ae916b4aba1495717d7f6b167e62",
+      "flight_model": "d95562153bb52ec0f4ded5add73ec1edfff39ab49a15d6956b42aa03c257fc67",
+      "source_motion_bridge": "4bf636fd9d9048be9a59a843eb505a9fbf4070bfa2a3da33493ced3de03dce49",
+      "source_atmospheric_dynamics": "35e5685f89a563d78c7344fa5c74a867ecda2bff97623b96d870cbe436ac528b",
+      "flight_time_controller": "4895bb9e9c8bc276c0f9b44155ee8c30facc612eef526f5453b8cb75b18c2e81",
+      "source_atmosphere_contact": "c3c944ff17ec677c1ba0242f4def704df3338a709619d95b2acd1ebeff9f13bb",
+      "flight_console": "a0c042b50fd983731a7d61edd8ed88fe709a8ebfe86cc462acaa2dff83c87d03",
+      "ship_visual": "38eaa1bc44b82f1776035e7f1a0fb062eb40a58a80420ff4506ca0ac33ffc22e",
+      "source_landing_gear": "9f3a38498ac4346515e0f16b4427ca88703014714ebcad52b78c8c6a47780f1d",
+      "source_landing_gear_session": "4f0f01a640f92f821bca6189dbdbce1f43305b97e8df03a33e98061c1e83a848",
+      "main": "b2eabcb767ec526e723dadc158b27498e70c4cd3cc5ce1a3fc3cbbade66d2e75",
+      "navigation": "f5e507e22bed9c0363d3951acd908419f2d9ad8ca69e3126bd804849d6f21e1b",
+      "source_hyperdrive_session": "160fb307d289ed2ae29478937288b90f419d386fd86fc07fbeea2469d57d7906",
+      "surface_model": "9cdb109f71f6ee85e55d789e57e2a17ba06a1225f27d353d6d327a234a6a1d03",
+      "source_surface_contact": "40ee1c244bf43d233a8968a1cf8846a4e9d5e3cebc1ececf2a468e9a7c66ce07",
+      "source_surface_contact_bridge": "385c64c4d58040097b1693baec49052a9d9454821b31f0ecaeef6a2f7159b746",
+      "source_spherical_contact": "c2e24ef2782680c854ae33118589b7b6dba30ef2b432ff71b3ab573ab1b7d75a",
+      "source_spherical_contact_pipeline": "d911870846f67362aa2719438d9f11324cb5fd036f3e44cc01be3692f5f20635",
+      "source_spherical_contact_probe": "db2e5e8ac3e899d8f2192d93cb170911dacb61eb9c6ec149bbc74b9a9ca27305"
+    },
+    "integration_compiled_module_count": 26,
+    "audited_local_source_sha256": {
+      "scripts/source_hyperdrive.gd": "b79cd38051e44d52fcd4f2beb173b2699096e7d9aea9a0288aba205e453a8874",
+      "scripts/hyperdrive_services_view.gd": "70d828f819faeb8c8e31d12e1101ef82ce5d306f9cf329b2902600f82b5fe3f7",
+      "scripts/galactic_map_model.gd": "597a5bd049e3dea2698bfbc255a0d57e7c98b70fabedfe09d56bb60ccd3a11a5",
+      "scripts/galactic_map_view.gd": "9a2a6fa97d9ab4f6ce572a5e10bb390d5036ccf6d30e3bc31e087a61440b7876",
+      "scripts/source_jet_fuel.gd": "ef043cd3d7fe4ef06a08d1f6592bf97b5d1e6d81c5f2efe9ea067d514f207cc1",
+      "scripts/source_fuel_scoop.gd": "de1e96fd3013de48557b340b9ca4e4d174c4d39aaebb8b2eee96250db53af296",
+      "scripts/source_fuel_contact.gd": "0f8d5defba15db89d02c5253c988a2a5680d7a16058296b91d262017d5a49903",
+      "scripts/source_fuel_flight_bridge.gd": "70921d3cb8b7d211f07f1211309f809dab1e0be9094ccf015e658558d6a04b52",
+      "scripts/flight_model.gd": "4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b",
+      "scripts/source_motion_bridge.gd": "4fd81d7226e1c63f5c280e6ade6692b829bc5568937429a8ecac397949a003a5",
+      "scripts/source_atmospheric_dynamics.gd": "a9ccce9fa27a2354205f3b1c88a9108320f567742d44d84082635339bc9af4a9",
+      "scripts/flight_time_controller.gd": "d171bb7354e57ae6349ac04775d6f640a932c0f061cba879bb044724f3d06d91",
+      "scripts/source_atmosphere_contact.gd": "046dcfbb3ad3f2c937f023aa5268e239b9c668e9a943ce6a51502ad7b35392be",
+      "scripts/flight_console.gd": "0a9fe99fd5e4f2cfb276e476a8a12c141cbb9b74a92cd246c4dcfa9cc4180c54",
+      "scripts/ship_visual.gd": "5c175408f1687ecb440296e62051884a79503a4903965d16bd8dbba66934dd88",
+      "scripts/source_landing_gear.gd": "0a65184b0e02f6a578e9d4bc12124a87585241e25598020b351494059af05b6a",
+      "scripts/source_landing_gear_session.gd": "ba8b63cbf89f30441f0bdfe01ed51af3a7e0e4679451264826039dd7b65887a0",
+      "scripts/main.gd": "4d219628aac3fda5f217da57f26f6c65d5144950899c5aa031a8f736b35722aa",
+      "scripts/navigation.gd": "5f689fce7b1f899c4a39e95add22dd59a8b9ba2909ccfec2d7bf18a74698f3c6",
+      "scripts/source_hyperdrive_session.gd": "931427fe16367c8a7d32fdfbb554e14ef64987a477fa8e275a75122aa1505c14",
+      "scripts/surface_model.gd": "449155f904b72e6c97e430b90b78d1859c6d6a27017f297620552e5094eb32ff",
+      "scripts/source_surface_contact.gd": "fcfb6077f0bcabf7b6ffce98c3a3dbb23251a850175be4ef241b299fdf8d117d",
+      "scripts/source_surface_contact_bridge.gd": "f83bbecc35c60bfaf79cf2314d067f997b966258665a41a93f082534ba7dfdd9",
+      "scripts/source_spherical_contact.gd": "d5b484d6e5c6c6802c896fbb12df9cf13a6a7a79c8b9292dae9b31df3b772a77",
+      "scripts/source_spherical_contact_pipeline.gd": "60361ad6f22a13fc31d8b03f28e924391a4b7d9510b9618a8993da7b8249186b",
+      "scripts/source_spherical_contact_probe.gd": "dc320da753e778e6ebd69c01ea60a15c37df6cceceaf0fe93289c0fe95846883"
+    },
+    "raw_resource_sha256": "e0fe32fe24ec2a0bb036aca3ee2afd1cb890bee1a976ffe58ffbee68ce42a07f",
+    "raw_json_count": 1,
+    "new_json_is_runtime_routing_resource": true,
+    "new_json_runtime_lookup_required": true,
+    "descriptor_model_count": 149,
+    "descriptor_zero_stream_count": 19,
+    "initial_simple_sphere_count": 18,
+    "initialization_skipped_model_count": 1,
+    "initial_hierarchical_count": 130,
+    "primary_anchor_bytes": 363,
+    "primary_instruction_count": 128,
+    "instruction_proof_record_count": 7,
+    "instruction_proof_bytes": 917,
+    "instruction_proof_instructions": 367,
+    "native_references": {
+      "source_spherical_contact_native": {
+        "sha256": "37a9c51bf5d1b9dbb74343e3863d7672cca009985bfd89a557f22993fb9059c4",
+        "case_count": 1141,
+        "supported_case_count": 1141,
+        "host_guard_case_count": 0,
+        "oracle_executed_by_apk_verifier": false
+      },
+      "source_spherical_contact_pipeline_native": {
+        "sha256": "4334c5f9583d50938ba8cbd8a57cc1a977c0f84a2f6a28482c284699fa3dc0ac",
+        "case_count": 213,
+        "supported_case_count": 207,
+        "host_guard_case_count": 6,
+        "oracle_executed_by_apk_verifier": false
+      }
+    },
+    "unchanged_code44_source_count": 22,
+    "whole_Main_normalization_sha256": "ad3cde5417c04c042f729cd3a391d7a996f048990e26c8cf7cf66d2b8637d09f",
+    "Main_normalization_policy": "Exactly one probe preload and diagnostic sample rewrite removed; all other bytes equal code44 AD3. Retained strict44 report audits this virtual normalized Main; actual45 Main is separately pinned.",
+    "actual_Main_sha256": "4d219628aac3fda5f217da57f26f6c65d5144950899c5aa031a8f736b35722aa",
+    "retained_surface_contact_assets": {
+      "baseline_source_commit": "faa22eaee504b324b096d64c059d9daf670eca9c",
+      "compiled_modules": {
+        "source_surface_contact": {
+          "runtime_sha256": "40ee1c244bf43d233a8968a1cf8846a4e9d5e3cebc1ececf2a468e9a7c66ce07",
+          "local_source_sha256": "fcfb6077f0bcabf7b6ffce98c3a3dbb23251a850175be4ef241b299fdf8d117d"
+        },
+        "source_surface_contact_bridge": {
+          "runtime_sha256": "385c64c4d58040097b1693baec49052a9d9454821b31f0ecaeef6a2f7159b746",
+          "local_source_sha256": "f83bbecc35c60bfaf79cf2314d067f997b966258665a41a93f082534ba7dfdd9"
+        }
+      },
+      "compiled_module_count": 2,
+      "integration_compiled_modules": {
+        "source_hyperdrive": "42bf04e80b34c51e4ff88ab60b54662425f2be15ed4e69866201ce94df720316",
+        "hyperdrive_services_view": "e710628ffbecfe589f197c0b32e4d962b02b8b11df82032a86b984668aa5afb4",
+        "galactic_map_model": "58630cadaccc4255314d79d45d410903bb4a91cdb559112b379874d59e389ca4",
+        "galactic_map_view": "35a157b7e34030f2835f623f9182218361e78647694439bc2d9a8fa409389c78",
+        "source_jet_fuel": "537bebf01f5253b1526af9f0e400f6c8e6993649e9d55f11c19bde4cea0cd7ef",
+        "source_fuel_scoop": "3116221c1ad60863ab8c5a1f26778bfd872ab373cfb07b1ce88bab1e8f4eac2e",
+        "source_fuel_contact": "07761e1f57ebf1533acac082f0811d117d65c808fbb554ede2ebe39537691519",
+        "source_fuel_flight_bridge": "13a3b55e37b9bda9811db3cc2911df70dfd2ae916b4aba1495717d7f6b167e62",
+        "flight_model": "d95562153bb52ec0f4ded5add73ec1edfff39ab49a15d6956b42aa03c257fc67",
+        "source_motion_bridge": "4bf636fd9d9048be9a59a843eb505a9fbf4070bfa2a3da33493ced3de03dce49",
+        "source_atmospheric_dynamics": "35e5685f89a563d78c7344fa5c74a867ecda2bff97623b96d870cbe436ac528b",
+        "flight_time_controller": "4895bb9e9c8bc276c0f9b44155ee8c30facc612eef526f5453b8cb75b18c2e81",
+        "source_atmosphere_contact": "c3c944ff17ec677c1ba0242f4def704df3338a709619d95b2acd1ebeff9f13bb",
+        "flight_console": "a0c042b50fd983731a7d61edd8ed88fe709a8ebfe86cc462acaa2dff83c87d03",
+        "ship_visual": "38eaa1bc44b82f1776035e7f1a0fb062eb40a58a80420ff4506ca0ac33ffc22e",
+        "source_landing_gear": "9f3a38498ac4346515e0f16b4427ca88703014714ebcad52b78c8c6a47780f1d",
+        "source_landing_gear_session": "4f0f01a640f92f821bca6189dbdbce1f43305b97e8df03a33e98061c1e83a848",
+        "main": "b2eabcb767ec526e723dadc158b27498e70c4cd3cc5ce1a3fc3cbbade66d2e75",
+        "navigation": "f5e507e22bed9c0363d3951acd908419f2d9ad8ca69e3126bd804849d6f21e1b",
+        "source_hyperdrive_session": "160fb307d289ed2ae29478937288b90f419d386fd86fc07fbeea2469d57d7906",
+        "surface_model": "9cdb109f71f6ee85e55d789e57e2a17ba06a1225f27d353d6d327a234a6a1d03",
+        "source_surface_contact": "40ee1c244bf43d233a8968a1cf8846a4e9d5e3cebc1ececf2a468e9a7c66ce07",
+        "source_surface_contact_bridge": "385c64c4d58040097b1693baec49052a9d9454821b31f0ecaeef6a2f7159b746"
+      },
+      "integration_compiled_module_count": 23,
+      "raw_resource_sha256": "960931e58ac1fe73428956b87f8567e29ea554c84793e33e1e86852f060050e6",
+      "raw_json_count": 1,
+      "new_json_is_provenance_only": true,
+      "new_json_runtime_lookup_required": false,
+      "runtime_primary_anchor_bytes": 1657,
+      "runtime_primary_instruction_count": 518,
+      "full_F575_static_anchor_bytes": 2005,
+      "full_F575_static_instruction_count": 635,
+      "instruction_proof_record_count": 21,
+      "instruction_proof_bytes_including_primary": 3402,
+      "instruction_proof_instructions_including_primary": 1259,
+      "exact_current_ship_models": 3,
+      "audited_local_source_sha256": {
+        "scripts/source_hyperdrive.gd": "b79cd38051e44d52fcd4f2beb173b2699096e7d9aea9a0288aba205e453a8874",
+        "scripts/hyperdrive_services_view.gd": "70d828f819faeb8c8e31d12e1101ef82ce5d306f9cf329b2902600f82b5fe3f7",
+        "scripts/galactic_map_model.gd": "597a5bd049e3dea2698bfbc255a0d57e7c98b70fabedfe09d56bb60ccd3a11a5",
+        "scripts/galactic_map_view.gd": "9a2a6fa97d9ab4f6ce572a5e10bb390d5036ccf6d30e3bc31e087a61440b7876",
+        "scripts/source_jet_fuel.gd": "ef043cd3d7fe4ef06a08d1f6592bf97b5d1e6d81c5f2efe9ea067d514f207cc1",
+        "scripts/source_fuel_scoop.gd": "de1e96fd3013de48557b340b9ca4e4d174c4d39aaebb8b2eee96250db53af296",
+        "scripts/source_fuel_contact.gd": "0f8d5defba15db89d02c5253c988a2a5680d7a16058296b91d262017d5a49903",
+        "scripts/source_fuel_flight_bridge.gd": "70921d3cb8b7d211f07f1211309f809dab1e0be9094ccf015e658558d6a04b52",
+        "scripts/flight_model.gd": "4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b",
+        "scripts/source_motion_bridge.gd": "4fd81d7226e1c63f5c280e6ade6692b829bc5568937429a8ecac397949a003a5",
+        "scripts/source_atmospheric_dynamics.gd": "a9ccce9fa27a2354205f3b1c88a9108320f567742d44d84082635339bc9af4a9",
+        "scripts/flight_time_controller.gd": "d171bb7354e57ae6349ac04775d6f640a932c0f061cba879bb044724f3d06d91",
+        "scripts/source_atmosphere_contact.gd": "046dcfbb3ad3f2c937f023aa5268e239b9c668e9a943ce6a51502ad7b35392be",
+        "scripts/flight_console.gd": "0a9fe99fd5e4f2cfb276e476a8a12c141cbb9b74a92cd246c4dcfa9cc4180c54",
+        "scripts/ship_visual.gd": "5c175408f1687ecb440296e62051884a79503a4903965d16bd8dbba66934dd88",
+        "scripts/source_landing_gear.gd": "0a65184b0e02f6a578e9d4bc12124a87585241e25598020b351494059af05b6a",
+        "scripts/source_landing_gear_session.gd": "ba8b63cbf89f30441f0bdfe01ed51af3a7e0e4679451264826039dd7b65887a0",
+        "scripts/main.gd": "ad3cde5417c04c042f729cd3a391d7a996f048990e26c8cf7cf66d2b8637d09f",
+        "scripts/navigation.gd": "5f689fce7b1f899c4a39e95add22dd59a8b9ba2909ccfec2d7bf18a74698f3c6",
+        "scripts/source_hyperdrive_session.gd": "931427fe16367c8a7d32fdfbb554e14ef64987a477fa8e275a75122aa1505c14",
+        "scripts/surface_model.gd": "449155f904b72e6c97e430b90b78d1859c6d6a27017f297620552e5094eb32ff",
+        "scripts/source_surface_contact.gd": "fcfb6077f0bcabf7b6ffce98c3a3dbb23251a850175be4ef241b299fdf8d117d",
+        "scripts/source_surface_contact_bridge.gd": "f83bbecc35c60bfaf79cf2314d067f997b966258665a41a93f082534ba7dfdd9"
+      },
+      "unchanged_code43_source_count": 17,
+      "protected_old_source_data_count": 10,
+      "protected_contact_dependency_count": 16,
+      "published_provider_dependency_count": 17,
+      "published_provider_compiled_modules": {
+        "source_surface_render_state": "015d6df12108548cf8cefa97450f25ab374e8cd2def95fe066e94d4b8a70eb2f",
+        "source_surface_render_packet": "b8b2176dfc13fb1043597df5bc3c78e9ae212adfe712dc4e98012a3fd660da6a",
+        "source_surface_contact_patch": "5a5036c8f3b92c06ed463219fa30867a1bf22db9822c1d66e99fa8dc9ff41415",
+        "source_surface_terrain": "18f05ad7a4e2dfa62adac5287cdec3e7625b2de9d7b67fd453aa30cefbe71fdb",
+        "source_city_runtime": "d7578537c6b19f663bf8136d67d9f9d4557b34d76195d310d13fbfbc837cd319",
+        "source_underground_controller": "9070ef7f4acad7a3b40e7b28ebe89a349167986d459b2218f879c19fc67a61f5",
+        "source_underground_port": "2a5c325b6cad867a03c8bc366596879f582536b78d2f4596e2c76387c0025d2d",
+        "source_model_mesh": "ff6f680d45cfac071f58c6f814b0e0c2b60c50803d1cc34a8e2bb730864ecfcd",
+        "source_city_profile": "09626ad9b5cc414b57c7c239a601621fd6588f3283ae5d4805fb9b9a6178f108",
+        "segment_triangle": "2a9349986fa5851a8b9611b13a99fdde81cc29167f5a454e897185301593879d",
+        "source_ground_pads": "8fbca8d2f5240e01f4b0d29d47d5993a30e8a105b275b8aed6613c5d282449e9",
+        "source_model_vm": "612e8738f5c242699882446e7e8bcb922bbe4929d4d23a13e5478d96677e96a3",
+        "source_model_vertices": "d0527fd7c44da38eaa1e2c5fe5b18f4e4c3da4cc1edfc9dbcf5b7f9520c70370",
+        "source_polygon": "b46abeaca8088e1304966a1632d0ba3501c119d745b70a4ac5aa70ba48328d3d",
+        "source_station_geometry": "79b74a4b48b6951426046e72d4a5ad46d973f1ce1f91d4926090d403a8d4105e"
+      },
+      "unchanged_Main_function_count": 9,
+      "normalized_Main_function_count": 2,
+      "protected_Main_function_count": 11,
+      "unchanged_Surface_function_count": 9,
+      "unchanged_saved_state_function_count": 13,
+      "unchanged_landing_gear_resource_sha256": "f06d7184046407dea3ee45fb3c6dedeb6bfaf21fe1a6136a388a87fa97ed1f00",
+      "retained_landing_gear_compiled_module_count": 2,
+      "unchanged_atmosphere_resource_sha256": "b65e25e187ac4abe7e24325a78de3fe70c140395711127ee0076f9905222bcce",
+      "retained_atmosphere_compiled_module_count": 2,
+      "retained_atmosphere_native_references": {
+        "source_atmospheric_native": {
+          "sha256": "04cff4bc5d43c7eabda2ed4361a0ee8c0221cc1c432c8ea2dd33daad0d3b9025",
+          "case_count": 1447,
+          "source_variant": "uploaded-DOS-F1014-F953-F1530-with-observed-external-callbacks",
+          "oracle_executed_by_apk_verifier": false
+        },
+        "source_atmosphere_speed_native": {
+          "sha256": "cbffa800bfbfa805f12480dbefe30888ed2f9d37cb8a3f07469fa0ae11dca57f",
+          "case_count": 239,
+          "source_variant": "pinned-JJFFE-speed-fragment-host-ABI-not-whole-DOS-equivalence",
+          "oracle_executed_by_apk_verifier": false
+        }
+      },
+      "unchanged_fuel_resource_sha256": "4d35dfd7047e7c3878ab92e25dcd9fde67697d7a93d46e53e57d0e1c7b71f14f",
+      "retained_fuel_compiled_module_count": 4,
+      "retained_fuel_native_references": {
+        "source_jet_fuel_native": {
+          "sha256": "ba1fa8be78c6c142fa037f0fb499e2aa2f2782077ad0b8f1da6a1dffa30051c8",
+          "case_count": 3182,
+          "fresh_process_runs": 3,
+          "oracle_executed_by_apk_verifier": false
+        },
+        "source_fuel_scoop_native": {
+          "sha256": "40d2a6528bc7607a442311aeea69c2fcc7ac9859ccfe4cc64a88ddf123f6b15f",
+          "case_count": 729,
+          "fresh_process_runs": 3,
+          "oracle_executed_by_apk_verifier": false
+        },
+        "source_fuel_contact_native": {
+          "sha256": "a68264130ed7a13b17a689b58e23e2f0d6921d4c33b9bfb4d20219709d7cf3d6",
+          "case_count": 330,
+          "fresh_process_runs": 3,
+          "oracle_executed_by_apk_verifier": false
+        }
+      },
+      "unchanged_hyperdrive_resource_sha256": "17fe376bf480aa34fe8278193c558a8a30d198fa06354caf3c9692de34b1cf47",
+      "retained_hyperdrive_compiled_module_count": 3,
+      "unchanged_information_resources": {
+        "ffe_system_information": {
+          "bytes": 333479,
+          "sha256": "77b37c26d7925e27f227c683c2c78a74f636fc28bf3b55f71f916ab6bcfc09c6"
+        },
+        "system_information_ru": {
+          "bytes": 92129,
+          "sha256": "b78c2edcd1889b6aee01b45ef9b591705b159622fca918b803552a3e42057a7f"
+        }
+      },
+      "unchanged_information_runtime_count": 3,
+      "native_reference": {
+        "sha256": "a4c23ec94860641f18bb3632189346f3a264834904532bd24bed0e980e3ebeef",
+        "case_count": 858,
+        "source_variant": "uploaded-DOS-bounded-F575-postclassification-player-continuation",
+        "oracle_executed_by_apk_verifier": false
+      },
+      "shared_F953_HP_RNG_consumer_checked": true,
+      "actual_contact_pose_and_save_consumers_checked": true,
+      "authored_clearance_to_native_origin_is_adapter": true,
+      "whole_F575_runtime": false,
+      "full_F569_F570_F576_F577_F578_classifier": false,
+      "full_original_reference_frame_pipeline": false,
+      "full_original_destruction_equipment_dispatcher": false,
+      "complete_original_physics": false,
+      "compiled_source_correspondence_rebuilt_by_verifier": false,
+      "physical_device_tested": false
+    },
+    "actual_Main_probe_readonly": true,
+    "physical_response_changed_by_probe": false,
+    "complete_original_F575": false,
+    "F576_F578_engine_integrated": false,
+    "full_original_world_object_bank": false,
+    "complete_original_physics": false,
+    "compiled_source_correspondence_rebuilt_by_verifier": false,
+    "physical_device_tested": false
+  },
+  "whole_DOS_F577": true,
+  "bounded_raw_F575_simple_selected_parent_player_pipeline": true,
+  "complete_original_F575_behavior": false,
+  "F569_F570_live_object_bank_frame_dispatch_ported": false,
+  "F576_F578_response_executed": false,
+  "unsupported_F576_F578_atomic_host_rollback": true,
+  "pipeline_F953_HP_RNG_applied": false,
+  "model_collision_routing_rows": 149,
+  "zero_stream_descriptors_including_model0": 19,
+  "initialized_simple_models": 18,
+  "model0_initial_flags_and_eligibility_are_null": true,
+  "all_natural_models117_through148_require_F576": true,
+  "Main_spherical_consumer_is_readonly_diagnostics_only": true,
+  "live_probe_envelope_only": true,
+  "live_probe_response_applied": false,
+  "live_probe_source_object_bank_present": false,
+  "probe_authored_centre_has_no_AGL_ground_offset": true,
+  "probe_queries_terrain": false,
+  "probe_changes_HP_time_fuel_World_cache_spin": false,
+  "new_live_physical_collision_route": false,
+  "existing_terrain_HP_graphics_controls_unchanged": true,
+  "F577_return0_is_inside_candidate": true,
+  "F577_return_minus1_includes_outside_equality": true,
+  "F577_outside_flags2_is_not_landing_hit": true,
+  "F577_DATA8703_8704_is_centre_distance_not_AGL": true,
+  "F577_inside_writes_kind_previous_height_HP": false,
+  "DOS_nonpositive_radius_operands": "body inner140 + parent outer138",
+  "JJFFE_counterfactual_parent_radius_operand": "inner140; not canonical DOS",
+  "DOS_positive_radius_operands": "two outer64 radii",
+  "package": "org.starfrontier.rebuild",
+  "abi": "arm64-v8a",
+  "min_sdk": 24,
+  "target_sdk": 36,
+  "debuggable": false,
+  "zip_and_elf_alignment_16k": true,
+  "test_key_only": true,
+  "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+  "physical_device_tested": false,
+  "production_signing_key_configured": false,
+  "production_release_ready": false,
+  "full_original_port_complete": false,
+  "full_original_physics": false,
+  "full_russian_localization_complete": false,
+  "game_completion_percent": null,
+  "full_release_date": null,
+  "next_functional_priority": "F569/F570/F576, object-bank/frame dispatch, F578 and manual docking per existing plan.",
+  "artifact_upload_authorized": true,
+  "publication_state_at_packaging": "Prepared for authorized GitHub backup; immutable full HTTPS download verification follows separately.",
+  "actual_collector_report_ZIP": "sample-diagnostic-report.zip",
+  "actual_collector_report_ZIP_CRC_verified": true,
+  "actual_collector_report_included_save": false,
+  "actual_collector_report_has_readonly_spherical_probe": true,
+  "planned_HTTPS_verification_download_count": 13,
+  "planned_HTTPS_additional_include_file": "sample-diagnostic-report.zip",
+  "immutable_HTTPS_verified_at_packaging": false,
+  "other_auxiliary_payloads_verified_by_local_manifest_only": true,
+  "files": {
+    "README_RU.md": {
+      "bytes": 5995,
+      "sha256": "4d042cfbf5be0a36482361f2ab104beed541584930cd0e0e52dc437fcfd662d3"
+    },
+    "StarFrontier-0.20.0-spherical-contact-arm64.apk": {
+      "bytes": 50150546,
+      "sha256": "db2c38100cb1d7c9a779e18a271f43fab664d30e29217e0dc433f6e20a8de7b7"
+    },
+    "StarFrontier-0.20.0-spherical-contact-source.zip": {
+      "bytes": 32024118,
+      "sha256": "343bcfab4802dd2666825f382b89164838e30f20ccdfab42db1816d43398a3a3"
+    },
+    "android-export.log": {
+      "bytes": 6966,
+      "sha256": "44bece191a9b688cecdc19b426aeaf768a94275922a3c1792eedb8eb21323588"
+    },
+    "android-verification.json": {
+      "bytes": 124268,
+      "sha256": "90d90beca9c0cf6ff9f7ada34013e42251b6a952c36a1949fa102879902370af"
+    },
+    "capture.log": {
+      "bytes": 427,
+      "sha256": "56c2ad25fa43d4583142685526ead65808c915bda3175f75f9ff272c48775fac"
+    },
+    "extraction.json": {
+      "bytes": 1342,
+      "sha256": "f9bea5712fb4c428b70d7c666f4abb8e6f9e8084359217d56e88b08f8484fece"
+    },
+    "extraction.log": {
+      "bytes": 2505,
+      "sha256": "c7a3932f0e3271abef5079434eadb497a6810c6fafdffb3735a0361a76053368"
+    },
+    "final-targeted-summary.json": {
+      "bytes": 9119,
+      "sha256": "db52310d80fe93e047576b0ec7d13b35db1dd897812318f2a24f2f5076dd0182"
+    },
+    "fuel-main-regression.json": {
+      "bytes": 2056,
+      "sha256": "b58014b7b6d515857d32e74304193950deeec60a899ea300a6324f89eb56f309"
+    },
+    "gear-main-regression.json": {
+      "bytes": 6006,
+      "sha256": "d7fd548bc9388ca7c60228cd399cff1aad9252de420fb4bc9af5a7e59d5f2f4f"
+    },
+    "hyperdrive-main-regression.json": {
+      "bytes": 1383,
+      "sha256": "10c644d92fa49a343f22f617d52b9fef6329c7b83b9e9af13b7b45d4f2af08b0"
+    },
+    "independent-extraction.json": {
+      "bytes": 1057,
+      "sha256": "48d3875cfbf16d472b71371039754c85702c07da2104bc43f9b72c0cac742cc1"
+    },
+    "independent-packaging.json": {
+      "bytes": 1492,
+      "sha256": "a1fb6e8ad65d6036e0225c9db0da773c0fd068ec15cfdbc5c90a37dc49fdda5e"
+    },
+    "nativeproof/dos-source-spherical-contact-disassembly.txt": {
+      "bytes": 9682,
+      "sha256": "8a5537118edd3a7d12dc9694a14ee0b761bbea21f92b07e30dc9a755d6226b2d"
+    },
+    "nativeproof/source-spherical-contact-native-proof.json": {
+      "bytes": 17166,
+      "sha256": "43012f638bfa1308bb0b87396254c04cca6d3114ac627472c3af0ea1702a82f3"
+    },
+    "nativeproof/source-spherical-contact-pipeline-native-proof.json": {
+      "bytes": 30288,
+      "sha256": "d756ae22c1683b6b874dbb5f2e8cfe970da700a43f864d22e29a2fba036a6aa0"
+    },
+    "packaging.json": {
+      "bytes": 2224,
+      "sha256": "fea674c6c120b6ac0ca3f0766b7ccf75deb3ae52f1154c6adbb371a7023ee052"
+    },
+    "packaging.log": {
+      "bytes": 42163,
+      "sha256": "5c0005968167e5485845c4d5b678c2b0e436161e68cb62d999d9419afefc8aca"
+    },
+    "pipeline-run/logs/source_spherical_pipeline.log": {
+      "bytes": 124,
+      "sha256": "3f8409f7a8275649b25b766efe797b877a41e6f8ae6cf18bacbbf078f0def2c7"
+    },
+    "pipeline-run.json": {
+      "bytes": 2630,
+      "sha256": "f70993bfe2fd88e797e3509ed50a0bc1be7a8a3fd0468f9485d25cca1ab428fd"
+    },
+    "regressions/logs/bug_report_ui.log": {
+      "bytes": 116,
+      "sha256": "53986c8b036d06d79273fcf3e6b9f828751b9f9d8e3f6d11d9fecc5aeb4261cd"
+    },
+    "regressions/logs/classic_console_main.log": {
+      "bytes": 123,
+      "sha256": "fd1b59ff7ab0184ebb05c966c93c20e81d6f74731c727c273818a1dadac0b0b3"
+    },
+    "regressions/logs/diagnostics.log": {
+      "bytes": 164,
+      "sha256": "4a1a56e7a8b1ce527097eb423ec35342c22533a03298354ca5c172c3186032e4"
+    },
+    "regressions/logs/flight_projection.log": {
+      "bytes": 10047,
+      "sha256": "e5975c1d32e6a08a7f636589baf1c72d9a8b86a2bf780a15847ccca504fc6d35"
+    },
+    "regressions/logs/graphics_integration.log": {
+      "bytes": 123,
+      "sha256": "f6b6dc847918df771b6f2ac4b0b0f0537855cf6f5247269fadb9b1f4b8ea6d06"
+    },
+    "regressions/logs/graphics_scope.log": {
+      "bytes": 355,
+      "sha256": "b7ec54445dbb93814b7877b35fd9c0b18e5e17f8dcf4a62aa1fba3a09f2692bb"
+    },
+    "regressions/logs/navigation_main.log": {
+      "bytes": 118,
+      "sha256": "341f62f03e5ea9792cb9e4caaf3261f7e61c57b9664e49fe27d12453ab4c12b6"
+    },
+    "regressions/logs/offpad_takeoff.log": {
+      "bytes": 118,
+      "sha256": "c48c9e6771737eaa3fd8bc350d0d769e9db501bed072ff6f936404a4e59951e0"
+    },
+    "regressions/logs/report_export.log": {
+      "bytes": 116,
+      "sha256": "6812fd589ef650008dacfb1d68e9ef1ccc3cf096f4197090ba20d44f039441fb"
+    },
+    "regressions/logs/rotating_dock_dynamics.log": {
+      "bytes": 126,
+      "sha256": "e5a535e82d5079a24b0a57c4f13f27374ff5203e5d80c59646c9b03c26cddea8"
+    },
+    "regressions/logs/save_touch.log": {
+      "bytes": 121,
+      "sha256": "4e005c6452779d4e0da1f581ec5c6c9adb329e96988074e1b55de70b58bb2c07"
+    },
+    "regressions/logs/source_console_pause.log": {
+      "bytes": 1718,
+      "sha256": "167f434208a0a1f6ad72a1cb38a63852794313c20e8522bd22c1c128a0b24adc"
+    },
+    "regressions/logs/source_contact_main.log": {
+      "bytes": 117,
+      "sha256": "e011d6a2a034a26f4bd292606b9838fc462cf79c1bc76bf4ac343f42cc82a8b3"
+    },
+    "regressions/logs/source_docking_flight.log": {
+      "bytes": 125,
+      "sha256": "9e7d3fcfbabb498d60a2a57cfb98e809d575c23d253807b9e78773011813fad8"
+    },
+    "regressions/logs/source_fuel_main.log": {
+      "bytes": 114,
+      "sha256": "56d10dd266bc7c99655e694d8239d01f71dc6be6d1387f40552f21c080b59b8e"
+    },
+    "regressions/logs/source_full_startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "regressions/logs/source_gear_main.log": {
+      "bytes": 114,
+      "sha256": "63caa373b770d451b3d8aa9b7deec6df6c6bae60a4359aba7d61e3c87668d96f"
+    },
+    "regressions/logs/source_hyperdrive_main.log": {
+      "bytes": 119,
+      "sha256": "714642268b5d030046e011e56f234bb451f4042b5a194b32c21d1e1878eecbd8"
+    },
+    "regressions/logs/source_main_full.log": {
+      "bytes": 510,
+      "sha256": "930ce9a9a64b7c43874519d4062612d610a2e6c562dd607fbd87c64f131d1fa4"
+    },
+    "regressions/logs/source_motion_main_continuation.log": {
+      "bytes": 134,
+      "sha256": "ab033c9f87f6330cebe4b90aaefd83515c127b83a397d21d532ca38c4f152491"
+    },
+    "regressions/logs/source_thermal_main.log": {
+      "bytes": 117,
+      "sha256": "778c6760648b68cfb044879f19bd0c3e3d255300008d57f8d2aa6c364285c486"
+    },
+    "regressions/logs/surface_action_controls.log": {
+      "bytes": 126,
+      "sha256": "6c3e792791191a8b2d1acaf25f798e1476fb9c282f93c7304b97ebe4606b3d20"
+    },
+    "regressions.json": {
+      "bytes": 25933,
+      "sha256": "94c36bd28fe1e9e55427cb1fe175bf5072b93980e88e35954b8d76566ace2b8d"
+    },
+    "runtime-freeze.json": {
+      "bytes": 47401,
+      "sha256": "a851532eed94c7518175cdff1d5f967af535bdf9deb9109a7821319b2a8c142b"
+    },
+    "sample-diagnostic-report.zip": {
+      "bytes": 8203,
+      "sha256": "a235425c52883a8f72be7e961c258d8666c82b5a6f3a5d34ee571b19464d7233"
+    },
+    "screenshots/01-existing-earth-flight-readonly-probe.png": {
+      "bytes": 331747,
+      "sha256": "1d9b609e7b0ec02ba986a4144bd3802b7b99902825bfe6ffc03ad7b93301957f"
+    },
+    "screenshots/02-existing-system-map-readonly-probe.png": {
+      "bytes": 75791,
+      "sha256": "c44dee8f218ef2242605c596e5061ada58367decc07207aece8ae8d564d96356"
+    },
+    "screenshots/03-existing-mercury-flight-readonly-probe.png": {
+      "bytes": 376760,
+      "sha256": "26eb25132e8ed92afee60995e9829dbc984211ca2bc43ffdf1a5f405cd19d9e4"
+    },
+    "screenshots/04-existing-source-surface-observer.png": {
+      "bytes": 342421,
+      "sha256": "bdfeea0fa934b80597ff5a20bf6016563e1453c94591f900db923009e1b95898"
+    },
+    "screenshots/05-unchanged-healthy-source-landing.png": {
+      "bytes": 365407,
+      "sha256": "1f5fb51ccd98ea9a66bcf0c94f6f6bba76531a9ddfca208ef4a717ec384594ee"
+    },
+    "screenshots/06-unchanged-source-takeoff.png": {
+      "bytes": 459834,
+      "sha256": "b02770f78dd7ea42383dab7f43ac61040ce05bb5b0068dd8c71f1916ee821796"
+    },
+    "screenshots/07-existing-docked-onboard-status.png": {
+      "bytes": 123508,
+      "sha256": "ab3152fa63dda291b7a497a80e00f9b503799d7304242980f61be2cbf3fe0cc9"
+    },
+    "screenshots/08-actual-diagnostic-zip-ready.png": {
+      "bytes": 88818,
+      "sha256": "10271ac670d18f2c977a9642ab0d9d75fd62ee2af22e0411f99f1807cd6a1d5f"
+    },
+    "screenshots/capture-manifest.json": {
+      "bytes": 36596,
+      "sha256": "91bef0b0e7da6ac0947ea5e980d021991a04ce93cc708fae42e9bd686201ff0f"
+    },
+    "source-archive-import.log": {
+      "bytes": 28914,
+      "sha256": "12f8660361d64e66a189e5a38c83864747cc619c6778280141ea157b53bf5306"
+    },
+    "source-archive-startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "source-archive-verification.json": {
+      "bytes": 5895,
+      "sha256": "3a64442a533c96a840594e67a3af72013f67c72a1e7519b77b01b708cae27385"
+    },
+    "source-contact-main.json": {
+      "bytes": 50287,
+      "sha256": "f214e2274ea82f6642b9238bc4cfae0843119e542bd3856b1ede430830ee68a9"
+    },
+    "source-spherical-contact-core.json": {
+      "bytes": 10193,
+      "sha256": "c71dfa78e2418d70ea9bfaf43be388e95f3cbb9dfb67999a46e3bd8350ba48e3"
+    },
+    "source-spherical-contact-core.log": {
+      "bytes": 124,
+      "sha256": "fb9e2d2224fc0c0daa5111421aae03d663f014f93f5f8eab9ffa08284440c2ab"
+    },
+    "source-spherical-contact-probe.json": {
+      "bytes": 6859,
+      "sha256": "b07a023942e680efce313fce31da858a1d81c6578c3a97032aef24b99685cc2a"
+    },
+    "source-spherical-contact-probe.log": {
+      "bytes": 1327,
+      "sha256": "ee915e81db47eb6a903f76c93ee3ce4a52291229cef73e0bce2b56ca494c690f"
+    },
+    "source-spherical-main.json": {
+      "bytes": 23245,
+      "sha256": "4ef3ad2fe80586c76da077787c5631cc11676934b01cf6145c3336a8202b0699"
+    },
+    "source-spherical-main.log": {
+      "bytes": 119,
+      "sha256": "94ad0ea55abd7e0435ef0b5ab34e37b2015545dad6ae8c264a5826d379633c68"
+    },
+    "source-spherical-pipeline.json": {
+      "bytes": 13444,
+      "sha256": "6fcd64514cf6aa8a0df32cd2e6f173df2cc15f64959d4e3c1803e554b053892f"
+    },
+    "spherical-main-feature.json": {
+      "bytes": 1229,
+      "sha256": "81dbd0e5370508e01d96326464996a26ca9e0ff9c17a1d1d0cb07a8f774bd908"
+    },
+    "spherical-main-feature.log": {
+      "bytes": 119,
+      "sha256": "94ad0ea55abd7e0435ef0b5ab34e37b2015545dad6ae8c264a5826d379633c68"
+    },
+    "thermal-main-regression.json": {
+      "bytes": 3781,
+      "sha256": "3726ee07a3d7d1e1ea691e2ed5cd5e9dd50a26acbfc4f9224671f3cc237dc54c"
+    }
+  }
+}

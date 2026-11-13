@@ -1,0 +1,19 @@
+{
+  "time_utc": "2026-11-07T23:39:11.373103+00:00",
+  "reviewer": "/root/fuel_scoop_core",
+  "read_only": true,
+  "raw_resource_sha256": "e0fe32fe24ec2a0bb036aca3ee2afd1cb890bee1a976ffe58ffbee68ce42a07f",
+  "material_errors": 0,
+  "instruction_proof_records": 7,
+  "model_routing_records": 149,
+  "initialized_simple_models": 18,
+  "zero_stream_descriptors": 19,
+  "model_zero_policy": "Descriptor-derived flag0, actual initialized flags and eligibility unknown/null becauseF1533 skips descriptor initialization for model0.",
+  "scope": "Independent EXE slices/SHA for fullF577+helpers,149descriptor/prefix bytes/flags, DOS+138 vsJJFFE+140 operand, unsigned return semantics and read-only natural-hierarchy/HP/clock limits.",
+  "release_dependency": "Separate raw coupled F575/F577 native fixture must be verified by the final package gate before publication; it is not embedded into this immutable routing resource.",
+  "files_changed": false,
+  "tests_executed": false,
+  "native_oracle_executed": false,
+  "Godot_executed": false,
+  "APK_built": false
+}
