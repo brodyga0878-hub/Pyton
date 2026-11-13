@@ -203,11 +203,28 @@ SPHERICAL_CONTACT_MODULES=('source_spherical_contact','source_spherical_contact_
 SPHERICAL_CONTACT_RESOURCE_SHA256='e0fe32fe24ec2a0bb036aca3ee2afd1cb890bee1a976ffe58ffbee68ce42a07f'
 SPHERICAL_CONTACT_NATIVE_REFERENCE_SHA256='37a9c51bf5d1b9dbb74343e3863d7672cca009985bfd89a557f22993fb9059c4'
 SPHERICAL_CONTACT_PIPELINE_REFERENCE_SHA256='4334c5f9583d50938ba8cbd8a57cc1a977c0f84a2f6a28482c284699fa3dc0ac'
+NATURAL_CONTACT_BASELINE_SOURCE_COMMIT='e3b9369230085ef7c15ab974d8e8de84eda1a991'
+NATURAL_CONTACT_MODULES=('source_natural_contact','source_natural_contact_pipeline','source_natural_contact_probe')
+NATURAL_CONTACT_RESOURCE_SHA256='0074a49df9f22879a4eefbef6dda183cbb517243792dd8d086cb782c2da5603e'
+NATURAL_CONTACT_GROUND_RESOURCE_SHA256='2dbf44a94422907b1bb29b34df1d795cef819cecf267b1591f3d82ea6326d018'
 SPHERICAL_CONTACT_AUDITED_SOURCE_SHA256={**SURFACE_CONTACT_AUDITED_SOURCE_SHA256,
     'scripts/main.gd':'4d219628aac3fda5f217da57f26f6c65d5144950899c5aa031a8f736b35722aa',
     'scripts/source_spherical_contact.gd':'d5b484d6e5c6c6802c896fbb12df9cf13a6a7a79c8b9292dae9b31df3b772a77',
     'scripts/source_spherical_contact_pipeline.gd':'60361ad6f22a13fc31d8b03f28e924391a4b7d9510b9618a8993da7b8249186b',
     'scripts/source_spherical_contact_probe.gd':'dc320da753e778e6ebd69c01ea60a15c37df6cceceaf0fe93289c0fe95846883'}
+NATURAL_CONTACT_AUDITED_SOURCE_SHA256={**SPHERICAL_CONTACT_AUDITED_SOURCE_SHA256,
+    'scripts/main.gd':'91e21ef682be19fe07ce4ac970829bb01f767b6e9eab551d8f248706f0f43a82',
+    'scripts/source_natural_contact.gd':'e6cb189d34dc4d434b10f9fc2ef43bf8b96433845c01673f79b4d9592446658f',
+    'scripts/source_natural_contact_pipeline.gd':'8d981b53f301dd375f22faae89a439673a3f94a98278cbb2161075a85ae125be',
+    'scripts/source_natural_contact_probe.gd':'ee163acac97707333e5b8234987dd82a071791b36a92c3c518ad32fc1ee6977c'}
+NATURAL_CONTACT_NATIVE_REFERENCE_SHA256='d4ce0cf3ebfe0fd3bb1f263d047fa3a17ffc5201b8040389fdbddcc21a50e166'
+NATURAL_CONTACT_NATIVE_CASE_COUNT=993
+NATURAL_CONTACT_PRIMARY_PROOFS={
+    '576':(101496,466,'2b8ae8b0a52f16b8fb101879618218e83dd9852ccecb97090c7cb3f611439227',159),
+    '579':(102744,215,'f535e8001ef4989a30b2189a20157425ce67970d55959a6b06bae7a64902c218',87),
+    '581':(103404,1542,'a5559afa26a9783d6df67b558cd84d69e35158844c1a00cc81a75bcb0be766f0',533),
+    '582':(104948,653,'a216b90c8dcac7e7601fcf57ea6c2afbc2d9a02111a051d1da4da1293901b4b4',243),
+}
 SPHERICAL_CONTACT_INSTRUCTION_PROOFS={'577': {'executable_offset': 101964, 'byte_length': 363, 'sha256': 'f2bb5974c51d801bf5c219f697cf16716250a296f744e54fed61a6c26131e790', 'instruction_count': 128}, '1333': {'executable_offset': 259606, 'byte_length': 25, 'sha256': '8946c4ccd895806bb39d3d393c582970d2e34c8ba60c06257447eb10186e5468', 'instruction_count': 11}, '1341': {'executable_offset': 259928, 'byte_length': 127, 'sha256': 'ce1f10cd3645a7e74e65b774758ad6160e67cc67d19b0ad4cbfa77dbcc454ef3', 'instruction_count': 57}, '1502': {'executable_offset': 276735, 'byte_length': 139, 'sha256': '06d92dfc59b6eca45c8c8c4d203e1deb6a270101894bdea28ca83b692dc60d19', 'instruction_count': 61}, '1522': {'executable_offset': 279177, 'byte_length': 12, 'sha256': 'e6001a066c6ed54cff7bf995d82867c4b0809fa6752fdfb96247378823c29291', 'instruction_count': 7}, '1656': {'executable_offset': 305076, 'byte_length': 74, 'sha256': '8bdce1d3d508b9cbf7d5fcbbf261407789d7bbf8fd917a4225db88c6d5aa2949', 'instruction_count': 29}, '1660': {'executable_offset': 305752, 'byte_length': 177, 'sha256': 'e23941156e2eb6f1c53020a82a29d6537e6be0b7a6af446323409fb93e3be0cc', 'instruction_count': 74}}
 SPHERICAL_CONTACT_PIPELINE_INSTRUCTION_PROOFS={'571': {'executable_offset': 99040, 'byte_length': 75, 'sha256': 'd6f72bd663b601a5c0292f2b3e52cd5025762d68c77f4fccaf3fb7334abfdda6', 'instruction_count': 28}, '1333': {'executable_offset': 259606, 'byte_length': 25, 'sha256': '8946c4ccd895806bb39d3d393c582970d2e34c8ba60c06257447eb10186e5468', 'instruction_count': 11}, '1335': {'executable_offset': 259656, 'byte_length': 25, 'sha256': '630251ee2b7c42186d7b3e5a7dad2245d537527943aa08e08cfe6879016c0514', 'instruction_count': 11}, '1503': {'executable_offset': 276874, 'byte_length': 60, 'sha256': 'd0afd5b854572fc1f0c76c0e0baf449afecd09a825f1962dd0d1183c8612e36d', 'instruction_count': 26}, '1504': {'executable_offset': 276934, 'byte_length': 105, 'sha256': '3086b86ae6eed52dcb62404ed6eecc861949b851139ae9cd621ba08e88414e09', 'instruction_count': 45}, '1501': {'executable_offset': 276671, 'byte_length': 64, 'sha256': '422940485e22b08f5173b3b64ada177be0a09e4ba2dc8599b8b36ecdee8cff04', 'instruction_count': 31}, '1502': {'executable_offset': 276735, 'byte_length': 139, 'sha256': '06d92dfc59b6eca45c8c8c4d203e1deb6a270101894bdea28ca83b692dc60d19', 'instruction_count': 61}, '1519': {'executable_offset': 278938, 'byte_length': 136, 'sha256': '4cf67a734da229a0a8cb12b509f70668250b4b0f3836a19146b53b0272e78ea3', 'instruction_count': 59}, '1466': {'executable_offset': 269559, 'byte_length': 272, 'sha256': 'd8afc05d10b13f7872438dd3a1e13e11ccc15dd0b55881fa120ef8781055cf10', 'instruction_count': 103}, '1520': {'executable_offset': 279074, 'byte_length': 86, 'sha256': '97176815c1009869daef82477468f18dd21c7dccac64b5a3714d84295f281976', 'instruction_count': 37}, '1521': {'executable_offset': 279160, 'byte_length': 17, 'sha256': 'f62a5f949cbf8da772c3cc32ae59b607e0f35cda6c3c4e1ddf848ba3b5a1b445', 'instruction_count': 9}, '1522': {'executable_offset': 279177, 'byte_length': 12, 'sha256': 'e6001a066c6ed54cff7bf995d82867c4b0809fa6752fdfb96247378823c29291', 'instruction_count': 7}, '1523': {'executable_offset': 279189, 'byte_length': 33, 'sha256': 'e393035168c327e2d7c04e94b55828696681e5f6eabbab45e27c103d00f712af', 'instruction_count': 16}, '1538': {'executable_offset': 281168, 'byte_length': 15, 'sha256': '7f8a8207c382290494a4d7fabdc00b15b17b0c51b7e9185cd4a3ae9f4cfb1226', 'instruction_count': 6}, '1552': {'executable_offset': 282920, 'byte_length': 157, 'sha256': '7977b9c88ca60678c48bd16343b74af7de283391e7ac94a49c27aa269eb4ee2d', 'instruction_count': 69}, '1656': {'executable_offset': 305076, 'byte_length': 74, 'sha256': '8bdce1d3d508b9cbf7d5fcbbf261407789d7bbf8fd917a4225db88c6d5aa2949', 'instruction_count': 29}, '1658': {'executable_offset': 305360, 'byte_length': 44, 'sha256': '6bdbafa74820fd4a83d1e5dfdb85032acacc6fd0e1636b481ac3f18af1ad065f', 'instruction_count': 23}, '1657': {'executable_offset': 305152, 'byte_length': 207, 'sha256': '86d7da85e49ea3ddca538301d8ff1595065c0fb8e2a52ad7dd1b35b68bcbd6ff', 'instruction_count': 84}, '1660': {'executable_offset': 305752, 'byte_length': 177, 'sha256': 'e23941156e2eb6f1c53020a82a29d6537e6be0b7a6af446323409fb93e3be0cc', 'instruction_count': 74}, 'abs': {'executable_offset': 421944, 'byte_length': 22, 'sha256': '46c8a9d0c4e7b862f57c083615031c907a391a2166724a009057ab580d4c0795', 'instruction_count': 12}, '1332': {'executable_offset': 259552, 'byte_length': 54, 'sha256': '0e214c91774522f45b3c50a19f59f2807fb95454fc24eead2749bdc795ccc03c', 'instruction_count': 20}, '1341': {'executable_offset': 259928, 'byte_length': 127, 'sha256': 'ce1f10cd3645a7e74e65b774758ad6160e67cc67d19b0ad4cbfa77dbcc454ef3', 'instruction_count': 57}, '1664': {'executable_offset': 306204, 'byte_length': 65, 'sha256': '701108e268a44d562f19fe0c65162217e901584fb775656302d5c4c27c9b9e08', 'instruction_count': 27}, '575': {'executable_offset': 99488, 'byte_length': 2005, 'sha256': '33e2895597b23f2e12a3fc6f8c09a08c73042eb26f3529a2b1d911d12b77b015', 'instruction_count': 635}, '577': {'executable_offset': 101964, 'byte_length': 363, 'sha256': 'f2bb5974c51d801bf5c219f697cf16716250a296f744e54fed61a6c26131e790', 'instruction_count': 128}}
 
@@ -752,12 +769,12 @@ def verify_source_full_runtime(archive,project,version_code=34):
         assert re.search(rb'^shader_type\s+spatial\s*;',raw,re.M),'Invalid source streaming spatial shader '+name
         result['shaders'][name]={'runtime_path':exported,'runtime_bytes':len(raw),'runtime_sha256':hashlib.sha256(raw).hexdigest()}
     result['startup_contract']=verify_full_startup(text['main'],text['planetary_system'])
-    required_tables=FULL_SOURCE_TABLES+(NAVIGATION_TABLES if version_code>=36 else ())+(('ffe_fuel',) if version_code>=41 else ())+(('ffe_atmosphere',) if version_code>=42 else ())+(('ffe_landing_gear',) if version_code>=43 else ())+(('ffe_surface_contact',) if version_code>=44 else ())+(('ffe_spherical_contact',) if version_code>=45 else ())
+    required_tables=FULL_SOURCE_TABLES+(NAVIGATION_TABLES if version_code>=36 else ())+(('ffe_fuel',) if version_code>=41 else ())+(('ffe_atmosphere',) if version_code>=42 else ())+(('ffe_landing_gear',) if version_code>=43 else ())+(('ffe_surface_contact',) if version_code>=44 else ())+(('ffe_spherical_contact',) if version_code>=45 else ())+(('ffe_natural_contact',) if version_code>=46 else ())
     present_tables=set(path.stem for path in (project/'data').glob('ffe_*.json'))
     # Older contracts still inspect their exact base tables when tested from a
     # newer checkout. Only explicitly known later-version tables may coexist;
     # current v36 must include and verify its additional original map resource.
-    allowed_tables=FULL_SOURCE_TABLES+NAVIGATION_TABLES+('ffe_system_information','ffe_hyperdrive')+(('ffe_fuel',) if version_code>=41 else ())+(('ffe_atmosphere',) if version_code>=42 else ())+(('ffe_landing_gear',) if version_code>=43 else ())+(('ffe_surface_contact',) if version_code>=44 else ())+(('ffe_spherical_contact',) if version_code>=45 else ())
+    allowed_tables=FULL_SOURCE_TABLES+NAVIGATION_TABLES+('ffe_system_information','ffe_hyperdrive')+(('ffe_fuel',) if version_code>=41 else ())+(('ffe_atmosphere',) if version_code>=42 else ())+(('ffe_landing_gear',) if version_code>=43 else ())+(('ffe_surface_contact',) if version_code>=44 else ())+(('ffe_spherical_contact',) if version_code>=45 else ())+(('ffe_natural_contact',) if version_code>=46 else ())
     assert set(required_tables)<=present_tables<=set(allowed_tables),'Full packaging verifier list omits a source table or names a missing table'
     tables={}
     for name in required_tables+('ships','world_names_ru'):
@@ -1857,6 +1874,12 @@ def _normalize_spherical_main(main):
 
 def verify_spherical_contact_runtime(archive,project):
     """Code45 source/asset controls; no oracle execution, GDSC decompilation or device claim."""
+    return _verify_spherical_contact_runtime(archive,project)
+
+
+def _verify_spherical_contact_runtime(archive,project,normalized_main=None):
+    # Private retained audit view. The public code45 entry still checks the
+    # actual Main exactly; code46 first proves its complete Main normalization.
     names=set(archive.namelist());compiled={}
     for relative,expected in SPHERICAL_CONTACT_AUDITED_SOURCE_SHA256.items():
         name=Path(relative).stem;path='assets/scripts/'+name+'.gdc'
@@ -1864,10 +1887,11 @@ def verify_spherical_contact_runtime(archive,project):
         content=archive.read(path)
         assert len(content)>64 and content[:4]==b'GDSC','Invalid compiled spherical-contact integration runtime '+name
         compiled[name]=hashlib.sha256(content).hexdigest()
-    main=(project/'scripts/main.gd').read_text()
+    main=normalized_main if normalized_main is not None else (project/'scripts/main.gd').read_text()
     normalized=_normalize_spherical_main(main)
     for relative,expected in SPHERICAL_CONTACT_AUDITED_SOURCE_SHA256.items():
-        assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==expected,'Spherical contact differs from audited integration source '+relative
+        raw=main.encode() if relative=='scripts/main.gd' else (project/relative).read_bytes()
+        assert hashlib.sha256(raw).hexdigest()==expected,'Spherical contact differs from audited integration source '+relative
     # This retained report describes the virtual AD3 Main audit view only.
     # The actual Main and its exact normalization are separately pinned above.
     retained=_verify_surface_contact_runtime(archive,project,normalized)
@@ -1916,6 +1940,7 @@ def verify_spherical_contact_runtime(archive,project):
     assert all(rows[str(i)]['initial_sphere_path_eligible'] is False for i in range(117,149)),'Natural collision streams require F576 and cannot become F577 terrain'
     assert hashlib.sha256(raw).hexdigest()==SPHERICAL_CONTACT_RESOURCE_SHA256,'Spherical routing resource differs from frozen DOS extraction'
     source={Path(relative).stem:(project/relative).read_text()for relative in SPHERICAL_CONTACT_AUDITED_SOURCE_SHA256}
+    source['main']=main
     probe=source['source_spherical_contact_probe'];pipeline=source['source_spherical_contact_pipeline'];core=source['source_spherical_contact']
     assert 'res://data/ffe_spherical_contact.json' in probe and 'FileAccess.get_sha256(DATA_PATH)!=DATA_SHA' in source_function(probe,'_load_routing') and SPHERICAL_CONTACT_RESOURCE_SHA256 in probe and 'model_collision_routing' in source_function(probe,'_load_routing'),'Read-only probe lacks immutable routing resource consumer'
     assert 'Sphere.classify(player,parent,context)' in source_function(probe,'sample') and '"response_applied":false' in source_function(probe,'_base') and '"envelope_only":true' in source_function(probe,'_base'),'Probe must remain envelope-only without response'
@@ -1947,6 +1972,125 @@ def verify_spherical_contact_runtime(archive,project):
         'unchanged_code44_source_count':22,'whole_Main_normalization_sha256':SURFACE_CONTACT_AUDITED_SOURCE_SHA256['scripts/main.gd'],'Main_normalization_policy':'Exactly one probe preload and diagnostic sample rewrite removed; all other bytes equal code44 AD3. Retained strict44 report audits this virtual normalized Main; actual45 Main is separately pinned.','actual_Main_sha256':SPHERICAL_CONTACT_AUDITED_SOURCE_SHA256['scripts/main.gd'],'retained_surface_contact_assets':retained,
         'actual_Main_probe_readonly':True,'physical_response_changed_by_probe':False,'complete_original_F575':False,'F576_F578_engine_integrated':False,'full_original_world_object_bank':False,'complete_original_physics':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
 
+def _normalize_natural_main(main):
+    preload='const NaturalContactProbe=preload("res://scripts/source_natural_contact_probe.gd")\n'
+    diagnostic='\tsample["source_natural_probe"]=NaturalContactProbe.sample(world,ship,surface,nav.elapsed_days) if nav.is_source_hyperdrive() else {"ok":true,"reason":"legacy_navigation","diagnostic_only":true,"response_applied":false}\n'
+    assert main.count(preload)==1 and main.count(diagnostic)==1,'Missing exact natural diagnostic-only Main additions'
+    assert diagnostic in source_function(main,'_flight_diagnostic_sample'),'Natural probe must only run in diagnostic sampling'
+    normalized=main.replace(preload,'',1).replace(diagnostic,'',1)
+    assert hashlib.sha256(normalized.encode()).hexdigest()==SPHERICAL_CONTACT_AUDITED_SOURCE_SHA256['scripts/main.gd'],'Natural update changed physical/save/Main outside exact diagnostic normalization'
+    return normalized
+
+
+def _verify_natural_contact_resource(archive,project):
+    names=set(archive.namelist());path='assets/data/ffe_natural_contact.json'
+    assert path in names,'Missing natural-contact metadata resource'
+    raw=archive.read(path)
+    assert raw==(project/'data/ffe_natural_contact.json').read_bytes(),'Natural-contact resource differs from local source'
+    data=json.loads(raw)
+    assert data.get('schema')==1 and data.get('profile')=='dos-firstenc-natural-contact-v1','Wrong natural-contact extraction profile'
+    assert data.get('source_sha256')==SOURCE_IMAGE_SHA256 and data.get('source_assembly_sha256')==SOURCE_ASSEMBLY_SHA256 and data.get('source_commit')==SOURCE_ASSEMBLY_COMMIT and data.get('source_data_sha256')=='34219c91c5d019440ebf4fc707711a32c5080123ede05cf4d10a27d41f770850','Wrong natural-contact source provenance'
+    immutable={'ffe_runtime_model_descriptors':SURFACE_CONTACT_RUNTIME_DESCRIPTOR_SHA256,'ffe_hyperdrive':HYPERDRIVE_RESOURCE_SHA256,'ffe_fuel':FUEL_RESOURCE_SHA256,'ffe_ground_collision':NATURAL_CONTACT_GROUND_RESOURCE_SHA256}
+    assert data.get('immutable_resources')=={name+'_sha256':digest for name,digest in immutable.items()},'Natural extension changed retained resource digests'
+    previous={}
+    for name,digest in immutable.items():
+        local=(project/'data'/f'{name}.json').read_bytes();exported='assets/data/'+name+'.json'
+        assert exported in names and archive.read(exported)==local and hashlib.sha256(local).hexdigest()==digest,'Natural retained resource changed '+name
+        previous[name]=json.loads(local)
+    descriptors=previous['ffe_runtime_model_descriptors']['models'];specs=previous['ffe_hyperdrive']['ship_specs']
+    ships=data.get('ship_models',{})
+    assert set(ships)=={'15','24','38'},'Incomplete three-ship natural player domain'
+    expected_children={'24':(0x8a2a8,'0000',[]),'38':(0x8d894,'00007805903379059033',[(13200,1401),(13200,1400)]),'15':(0x88dea,'0000840c803e',[(16000,3204)])}
+    expected_radii={'24':(0,10400,5200),'38':(1,36000,9600),'15':(-2,4800,1920)}
+    for key,row in ships.items():
+        descriptor=bytes.fromhex(row.get('descriptor_hex',''));old=descriptors[key];spec=specs[key]
+        assert len(descriptor)==68 and descriptor.hex()==old['descriptor_hex'] and row.get('descriptor_sha256')==old['descriptor_sha256'] and row.get('descriptor_file_offset')==old['descriptor_executable_offset'],'Natural ship descriptor mismatch '+key
+        physical=bytes.fromhex(row.get('physical_spec_hex',''))
+        assert len(physical)==24 and physical.hex()==spec['spec_hex'] and row.get('physical_spec_sha256')==spec['spec_sha256'] and hashlib.sha256(physical).hexdigest()==spec['spec_sha256'] and row.get('physical_spec_pointer_u32')==struct.unpack_from('<I',descriptor,0x38)[0] and row.get('physical_spec_file_offset')==spec['spec_file_offset'],'Natural ship physical specification mismatch '+key
+        radius=row.get('f1533_radii',{})
+        assert (radius.get('exponent_s32'),radius.get('outer_s64'),radius.get('inner_s64'))==expected_radii[key],'Natural ship positive F1533 radii mismatch '+key
+        prefix=bytes.fromhex(row.get('collision_prefix_hex',''));pointer=struct.unpack_from('<I',descriptor,0x34)[0]
+        assert row.get('collision_pointer_u32')==pointer and row.get('collision_file_offset')==pointer-0x416400 and len(prefix)==8 and hashlib.sha256(prefix).hexdigest()==row.get('collision_prefix_sha256'),'Natural ship original collision pointer/prefix mismatch '+key
+        children=row.get('preceding_children',{});child_raw=bytes.fromhex(children.get('hex',''));at,expected_hex,pairs=expected_children[key]
+        assert child_raw.hex()==expected_hex and children.get('file_offset')==at and children.get('byte_length')==len(child_raw) and at+len(child_raw)==row['collision_file_offset'] and children.get('terminator_file_offset')==at and children.get('terminator_s16')==0 and child_raw[:2]==b'\0\0' and hashlib.sha256(child_raw).hexdigest()==children.get('sha256'),'Natural player backwards child bytes mismatch '+key
+        records=children.get('records',[])
+        assert len(records)==len(pairs),'Natural player actual child count mismatch '+key
+        for index,(offset,encoded) in enumerate(pairs):
+            entry=records[index];word_at=len(child_raw)-2-index*4
+            assert (struct.unpack_from('<h',child_raw,word_at)[0],struct.unpack_from('<h',child_raw,word_at-2)[0])==(offset,encoded),'Natural player child traversal mismatch '+key
+            expected={'radius_s16':offset,'displacement_s16':offset,'axis_radius_encoded_s16':encoded,'axis_index':(encoded&6)//2,'axis_negative':bool(encoded&1),'radius_word_u16':encoded&0xfff8,'displacement_file_offset':at+word_at,'axis_radius_file_offset':at+word_at-2}
+            assert entry==expected,'Natural player child axis/radius/offset mismatch '+key
+    parents=data.get('natural_parent_programs',{})
+    assert set(parents)=={str(i)for i in range(117,149)},'Incomplete32-natural parent resource domain'
+    for key,row in parents.items():
+        ground=int(key)<=133;name='ffe_ground_collision' if ground else 'ffe_fuel';original=previous[name]['models'][key]
+        stream=bytes.fromhex(original['collision_bytes_hex' if ground else 'collision_stream_hex']);vertices=bytes.fromhex(original['vertices_hex']);descriptor=bytes.fromhex(descriptors[key]['descriptor_hex'])
+        program=row.get('program',{});col=int(original['collision_offset' if ground else 'collision_stream_offset'],16)
+        assert row.get('resource')==name and row.get('model_path')=='models.'+key and row.get('descriptor_sha256')==original['descriptor_sha256'] and row.get('vertices_sha256')==original['vertices_sha256'] and row.get('descriptor_file_offset')==descriptors[key]['descriptor_executable_offset'] and row.get('vertices_file_offset')==int(original['vertices_offset'],16),'Natural retained parent descriptor/vertices index mismatch '+key
+        assert len(vertices)==24 and hashlib.sha256(vertices).hexdigest()==row['vertices_sha256'] and row.get('descriptor_zoom_s32')==struct.unpack_from('<I',descriptor,0x14)[0]+struct.unpack_from('<I',descriptor,0x18)[0] and row.get('non_spherical_source_model') is (key=='117'),'Natural source vertex/zoom/nonspherical provenance mismatch '+key
+        assert stream[:3] in (bytes.fromhex('1082ff'),bytes.fromhex('1083ff')) and stream[-5:]==bytes.fromhex('5080000000') and program.get('byte_length')==len(stream) and program.get('sha256')==hashlib.sha256(stream).hexdigest() and program.get('collision_file_offset')==col,'Natural retained complete terrain program mismatch '+key
+        end=9;features=[]
+        while end+2<=len(stream) and struct.unpack_from('<H',stream,end)[0]:features.append(col+end);end+=16
+        assert end+7==len(stream) and program.get('feature_count')==len(features) and program.get('feature_offsets')==features and program.get('feature_terminator_file_offset')==col+end and program.get('tail_file_offset')==col+end+2 and program.get('tail_hex')=='5080000000','Natural feature list/terminator/tail provenance mismatch '+key
+        assert (program.get('opcode_u8'),program.get('primitive_flags_u8'),program.get('primitive_selector_u8'))==tuple(stream[:3]) and program.get('terrain_payload_file_offset')==col+3 and program.get('terrain_payload_byte_length')==end-1 and program.get('terrain_style_raw')==stream[7],'Natural opcode/payload provenance mismatch '+key
+    assert data.get('field_layout',{}).get('object_bytes')==338 and data.get('field_layout',{}).get('descriptor_bytes')==68 and data.get('field_layout',{}).get('physical_spec_bytes')==24,'Natural original object/descriptor/spec sizes changed'
+    assert hashlib.sha256(raw).hexdigest()==NATURAL_CONTACT_RESOURCE_SHA256,'Natural metadata differs from frozen DOS extraction'
+    return data
+
+
+def verify_natural_contact_runtime(archive,project):
+    """Code46 data/source/asset controls, separate from native/Godot/device tests."""
+    names=set(archive.namelist());compiled={}
+    for relative in NATURAL_CONTACT_AUDITED_SOURCE_SHA256:
+        name=Path(relative).stem;path='assets/scripts/'+name+'.gdc'
+        assert path in names,'Missing natural-contact integration runtime '+name
+        raw=archive.read(path)
+        assert len(raw)>64 and raw[:4]==b'GDSC','Invalid compiled natural-contact integration runtime '+name
+        compiled[name]=hashlib.sha256(raw).hexdigest()
+    main=(project/'scripts/main.gd').read_text();normalized=_normalize_natural_main(main)
+    for relative,digest in NATURAL_CONTACT_AUDITED_SOURCE_SHA256.items():
+        assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==digest,'Natural contact differs from audited integration source '+relative
+    retained=_verify_spherical_contact_runtime(archive,project,normalized)
+    data=_verify_natural_contact_resource(archive,project)
+    core=(project/'scripts/source_natural_contact.gd').read_text();pipeline=(project/'scripts/source_natural_contact_pipeline.gd').read_text();probe=(project/'scripts/source_natural_contact_probe.gd').read_text()
+    assert NATURAL_CONTACT_RESOURCE_SHA256 in core and 'FileAccess.get_sha256(DATA_PATH)!=DATA_SHA' in source_function(core,'ship_model') and 'preceding_children' in source_function(core,'ship_model'),'Natural core lacks immutable original child metadata consumer'
+    assert 'Ground.model_resources(index)' in source_function(core,'parent_model') and 'Fuel.model(index)' in source_function(core,'parent_model'),'Natural core must reuse retained32-natural source resources'
+    assert 'Natural.new().classify_natural_player(' in source_function(probe,'sample') and 'FileAccess.get_sha256(DATA_PATH)!=DATA_SHA' in source_function(probe,'sample') and NATURAL_CONTACT_RESOURCE_SHA256 in probe,'Natural read-only probe lacks immutable source classifier consumer'
+    base=source_function(probe,'_base')
+    assert all(token in base for token in ('"diagnostic_only":true','"response_applied":false','"source_object_bank_present":false','"live_collision_classifier_changed":false','"original_F575_dispatch_executed":false','"terrain_provider_queried":false','"mesh_source_height_alignment_proved":false')),'Natural phone probe must remain diagnostic-only without mesh-alignment/live-physics claims'
+    assert 'source_natural_contact_pipeline' not in probe and 'Response.resolve_player(body,parent,' in source_function(pipeline,'_dispatch_classification') and '_classifier.classify_natural_player(' in source_function(pipeline,'resolve_natural_player'),'Standalone natural F575 composition must stay separate from phone diagnostics'
+    fixture_raw=(project/'tests/fixtures/source_natural_contact_native.json').read_bytes();fixture=json.loads(fixture_raw)
+    assert hashlib.sha256(fixture_raw).hexdigest()==NATURAL_CONTACT_NATIVE_REFERENCE_SHA256,'Changed natural native reference'
+    assert fixture.get('schema')==1 and fixture.get('source_sha256')==SOURCE_IMAGE_SHA256 and fixture.get('source_assembly_sha256')==SOURCE_ASSEMBLY_SHA256 and fixture.get('source_commit')==SOURCE_ASSEMBLY_COMMIT and fixture.get('source_data_assembly_sha256')==data['source_data_sha256'],'Wrong natural native source provenance'
+    cases=fixture.get('cases',[])
+    assert fixture.get('case_count')==len(cases)==NATURAL_CONTACT_NATIVE_CASE_COUNT,'Wrong natural native case count'
+    assert fixture.get('fresh_process_runs')==3 and fixture.get('reverse_repeat_count')==len(cases) and fixture.get('output_canaries_unchanged') is True and fixture.get('caller_buffers_unchanged') is True and fixture.get('native_expected_arithmetic_in_python') is False,'Incomplete independent natural native execution checks'
+    assert fixture.get('dos_jjffe_behavior_differences')==[],'Unreviewed natural DOS/JJFFE behavior difference'
+    proofs=fixture.get('byte_instruction_proofs',{})
+    assert set(NATURAL_CONTACT_PRIMARY_PROOFS)<=set(proofs),'Incomplete natural primary instruction proof domain'
+    for key,expected in NATURAL_CONTACT_PRIMARY_PROOFS.items():
+        row=proofs[key]
+        assert (row.get('executable_offset'),row.get('byte_length'),row.get('sha256'),row.get('instruction_count'))==expected and row.get('all_instructions_equal') is True,'Changed natural primary instruction proof '+key
+    for key,row in proofs.items():
+        assert row.get('all_instructions_equal') is True and row.get('virtual_address')==row.get('executable_offset',-1)+0x40f200 and row.get('byte_length',0)>0 and row.get('instruction_count',0)>0,'Incomplete natural static helper proof '+key
+    assert {int(row['parent_model'])for row in cases}==set(range(117,149)) and {int(row['player_model'])for row in cases}=={15,24,38},'Incomplete natural native parent/player domain'
+    resources=fixture.get('original_model_resources',{})
+    assert set(resources)=={str(n)for n in [15,24,38,*range(117,149)]},'Incomplete natural native original resource domain'
+    for key,row in data['ship_models'].items():
+        original=resources[key]
+        assert original.get('descriptor_hex')==row['descriptor_hex'] and original.get('preceding_children_hex')==row['preceding_children']['hex'] and original.get('physical_spec_hex','')[:48]==row['physical_spec_hex'],'Native natural player resource differs from frozen metadata '+key
+    traps=fixture.get('host_trap_codes',{})
+    assert 'FUNC_000580' in traps.values() and 'FUNC_000583' in traps.values(),'Natural general/nested/plane VM must remain explicit native traps'
+    interceptions=fixture.get('unsupported_vm_interceptions',[])
+    assert fixture.get('unsupported_vm_interception_count')==len(interceptions)==2 and {row.get('intercepted_original_callee')for row in interceptions}=={'FUNC_000580','FUNC_000583'},'Natural native unsupported VM interceptions must remain separate from supported cases'
+    assert all(row.get('separate_from_supported_natural_cases') is True and row.get('completed_output_records')==0 and row.get('expected_native_exit_status') in (100,101)for row in interceptions),'Unreviewed natural native VM abort interception'
+    reference={'sha256':NATURAL_CONTACT_NATIVE_REFERENCE_SHA256,'case_count':len(cases),'supported_case_count':len(cases),'separate_unsupported_VM_abort_interception_count':2,'static_instruction_proof_count':len(proofs),'static_instruction_proof_bytes':sum(row['byte_length']for row in proofs.values()),'static_instruction_proof_instructions':sum(row['instruction_count']for row in proofs.values()),'executed_primary_procedures':['576','579','581','582'],'general_nested_and_plane_VM_executed':False,'oracle_executed_by_apk_verifier':False}
+    return {'baseline_source_commit':NATURAL_CONTACT_BASELINE_SOURCE_COMMIT,'compiled_modules':{name:compiled[name]for name in NATURAL_CONTACT_MODULES},'compiled_module_count':3,'integration_compiled_modules':compiled,'integration_compiled_module_count':len(compiled),'audited_local_source_sha256':NATURAL_CONTACT_AUDITED_SOURCE_SHA256,
+        'raw_resource_sha256':NATURAL_CONTACT_RESOURCE_SHA256,'raw_json_count':1,'new_json_runtime_lookup_required':True,'ship_model_count':3,'natural_parent_model_count':32,'source_player_child_counts':{key:len(row['preceding_children']['records'])for key,row in data['ship_models'].items()},'unchanged_code45_source_count':25,
+        'whole_Main_normalization_sha256':SPHERICAL_CONTACT_AUDITED_SOURCE_SHA256['scripts/main.gd'],'actual_Main_sha256':NATURAL_CONTACT_AUDITED_SOURCE_SHA256['scripts/main.gd'],'Main_normalization_policy':'Exactly one new probe preload and diagnostic line removed; every remaining byte equals code45. Retained strict45 report audits that virtual Main, while actual46 Main is separately pinned.','retained_spherical_contact_assets':retained,'native_reference':reference,
+        'actual_Main_probe_readonly':True,'physical_response_changed_by_probe':False,'source_field_is_phone_AGL':False,'mesh_source_height_alignment_proved':False,'independent_native_natural_F575_pipeline_executed':False,'full_F569_F570_engine':False,'general_F580_F583_VM':False,'full_original_world_object_bank':False,'complete_original_physics':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
+
+
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     expected=preset_values(presets)
     signature=run(build_tools/'apksigner','verify','--verbose','--print-certs',apk)
@@ -1965,7 +2109,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={};hyperdrive_assets={};fuel_assets={};atmosphere_assets={};landing_gear_assets={};surface_contact_assets={};spherical_contact_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={};hyperdrive_assets={};fuel_assets={};atmosphere_assets={};landing_gear_assets={};surface_contact_assets={};spherical_contact_assets={};natural_contact_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -2064,8 +2208,12 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
                 system_information_assets={'resources':landing_gear_assets['unchanged_information_resources'],'unchanged_runtime_modules':3,'raw_original_and_ru_resources_checked':True}
             if expected['version_code']==44:
                 surface_contact_assets=verify_surface_contact_runtime(archive,presets.parent)
-            if expected['version_code']>=45:
+            if expected['version_code']==45:
                 spherical_contact_assets=verify_spherical_contact_runtime(archive,presets.parent)
+                surface_contact_assets=spherical_contact_assets['retained_surface_contact_assets']
+            if expected['version_code']>=46:
+                natural_contact_assets=verify_natural_contact_runtime(archive,presets.parent)
+                spherical_contact_assets=natural_contact_assets['retained_spherical_contact_assets']
                 surface_contact_assets=spherical_contact_assets['retained_surface_contact_assets']
             if expected['version_code']>=44:
                 landing_gear_assets={'raw_resource_sha256':surface_contact_assets['unchanged_landing_gear_resource_sha256'],'compiled_module_count':surface_contact_assets['retained_landing_gear_compiled_module_count'],'retained_by_strict_surface_contact_gate':True}
@@ -2090,7 +2238,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'hyperdrive_assets':hyperdrive_assets,'fuel_assets':fuel_assets,'atmosphere_assets':atmosphere_assets,'landing_gear_assets':landing_gear_assets,'surface_contact_assets':surface_contact_assets,'spherical_contact_assets':spherical_contact_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'hyperdrive_assets':hyperdrive_assets,'fuel_assets':fuel_assets,'atmosphere_assets':atmosphere_assets,'landing_gear_assets':landing_gear_assets,'surface_contact_assets':surface_contact_assets,'spherical_contact_assets':spherical_contact_assets,'natural_contact_assets':natural_contact_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

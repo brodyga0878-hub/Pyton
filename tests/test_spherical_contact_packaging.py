@@ -19,6 +19,23 @@ class MockSphericalArchive(retained.MockSurfaceContactArchive):
 
 
 class SphericalContactPackaging(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        directory=tempfile.TemporaryDirectory(prefix='natural-packaging-v45-')
+        cls.addClassCleanup(directory.cleanup);cls.project=Path(directory.name)
+        for relative in cls.project_files():
+            target=cls.project/relative;target.parent.mkdir(parents=True,exist_ok=True)
+            target.write_bytes((PROJECT/relative).read_bytes())
+        path=PROJECT/'tests/fixtures/natural_v45_sources.json'
+        if hashlib.sha256(path.read_bytes()).hexdigest()!='f9511cf774d7a54826a77a71d0ac5a88ae68369e0ed63d6eb8f2717b9a66a60d':
+            raise AssertionError('Historical code45 natural baseline fixture changed')
+        baseline=json.loads(path.read_text());expected=verifier.SPHERICAL_CONTACT_AUDITED_SOURCE_SHA256
+        if baseline['source_commit']!='e3b9369230085ef7c15ab974d8e8de84eda1a991' or set(baseline['files'])!=set(expected):
+            raise AssertionError('Historical code45 source fixture domain changed')
+        for name,digest in expected.items():
+            raw=baseline['files'][name].encode()
+            if hashlib.sha256(raw).hexdigest()!=digest:raise AssertionError('Historical code45 source differs '+name)
+            (cls.project/name).write_bytes(raw)
     def setUp(self):self.archive=MockSphericalArchive()
 
     @staticmethod
@@ -32,7 +49,7 @@ class SphericalContactPackaging(unittest.TestCase):
     def project_copy(self,directory):
         project=Path(directory)
         for relative in self.project_files():
-            path=project/relative;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes((PROJECT/relative).read_bytes())
+            path=project/relative;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes((self.project/relative).read_bytes())
         return project
 
     def mutate_resource(self,project,callback):
@@ -44,7 +61,7 @@ class SphericalContactPackaging(unittest.TestCase):
         self.assertIn(old,function);path.write_text(raw.replace(function,function.replace(old,new,1),1))
 
     def test_frozen_runtime_scope_and_distinct_native_domains(self):
-        result=verifier.verify_spherical_contact_runtime(self.archive,PROJECT)
+        result=verifier.verify_spherical_contact_runtime(self.archive,self.project)
         self.assertEqual(result['baseline_source_commit'],'86a4a5e2a44c73d610d8a35f7fda7e393343991e')
         self.assertEqual((result['compiled_module_count'],result['integration_compiled_module_count'],result['raw_json_count']),(3,26,1))
         self.assertEqual((result['primary_anchor_bytes'],result['primary_instruction_count']),(363,128))
@@ -68,7 +85,7 @@ class SphericalContactPackaging(unittest.TestCase):
             with self.subTest(relative=relative):
                 archive=MockSphericalArchive();del archive.entries['assets/scripts/'+Path(relative).stem+'.gdc']
                 with self.assertRaisesRegex(AssertionError,'Missing spherical-contact integration runtime'):
-                    verifier.verify_spherical_contact_runtime(archive,PROJECT)
+                    verifier.verify_spherical_contact_runtime(archive,self.project)
 
     def test_each_new_compiled_header_and64byte_truncation_rejects(self):
         for name in verifier.SPHERICAL_CONTACT_MODULES:
@@ -76,35 +93,35 @@ class SphericalContactPackaging(unittest.TestCase):
                 with self.subTest(name=name,bytes=len(content)):
                     archive=MockSphericalArchive();archive.entries['assets/scripts/'+name+'.gdc']=content
                     with self.assertRaisesRegex(AssertionError,'Invalid compiled spherical-contact integration runtime'):
-                        verifier.verify_spherical_contact_runtime(archive,PROJECT)
+                        verifier.verify_spherical_contact_runtime(archive,self.project)
 
     def test_retained_information_compiled_modules_required(self):
         for name in verifier.SYSTEM_INFORMATION_MODULES:
             with self.subTest(name=name):
                 archive=MockSphericalArchive();del archive.entries['assets/scripts/'+name+'.gdc']
                 with self.assertRaisesRegex(AssertionError,'Missing system information runtime'):
-                    verifier.verify_spherical_contact_runtime(archive,PROJECT)
+                    verifier.verify_spherical_contact_runtime(archive,self.project)
 
     def test_published_physical_provider_compiled_module_remains_required(self):
         del self.archive.entries['assets/scripts/source_surface_render_state.gdc']
         with self.assertRaisesRegex(AssertionError,'Missing published contact provider'):
-            verifier.verify_spherical_contact_runtime(self.archive,PROJECT)
+            verifier.verify_spherical_contact_runtime(self.archive,self.project)
 
     def test_missing_new_routing_resource_rejects(self):
         del self.archive.entries['assets/data/ffe_spherical_contact.json']
         with self.assertRaisesRegex(AssertionError,'Missing spherical-contact routing resource'):
-            verifier.verify_spherical_contact_runtime(self.archive,PROJECT)
+            verifier.verify_spherical_contact_runtime(self.archive,self.project)
 
     def test_export_cannot_differ_from_local_routing_resource(self):
         self.archive.entries['assets/data/ffe_spherical_contact.json']+=b' '
         with self.assertRaisesRegex(AssertionError,'Spherical-contact resource differs from local source'):
-            verifier.verify_spherical_contact_runtime(self.archive,PROJECT)
+            verifier.verify_spherical_contact_runtime(self.archive,self.project)
 
     def test_all_six_old_raw_resources_and_information_resources_stay_checked(self):
         for name in ('ffe_surface_contact','ffe_runtime_model_descriptors','ffe_landing_gear','ffe_atmosphere','ffe_fuel','ffe_hyperdrive',*verifier.SYSTEM_INFORMATION_TABLES):
             with self.subTest(name=name):
                 archive=MockSphericalArchive();archive.entries[f'assets/data/{name}.json']+=b' '
-                with self.assertRaises(AssertionError):verifier.verify_spherical_contact_runtime(archive,PROJECT)
+                with self.assertRaises(AssertionError):verifier.verify_spherical_contact_runtime(archive,self.project)
 
     def test_wrong_original_executable_provenance_rejects_matching_export(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -255,7 +272,7 @@ class SphericalContactPackaging(unittest.TestCase):
 
     def test_old44_public_gate_remains_strict_against_actual45_main(self):
         with self.assertRaisesRegex(AssertionError,'Contact differs from audited integration source scripts/main.gd'):
-            verifier.verify_surface_contact_runtime(self.archive,PROJECT)
+            verifier.verify_surface_contact_runtime(self.archive,self.project)
 
 
 if __name__=='__main__':unittest.main()

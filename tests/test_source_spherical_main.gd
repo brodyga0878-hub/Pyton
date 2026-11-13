@@ -3,7 +3,7 @@ extends "res://tests/test_source_contact_main.gd"
 # classification, a landing verdict, or a new source-object collision bank.
 const SphereProbe=preload("res://scripts/source_spherical_contact_probe.gd")
 const SphereBuild=preload("res://scripts/build_info.gd")
-const SPHERE_REPORT:="res://validation/spherical-2026-11-08/source-spherical-main.json"
+const SPHERE_REPORT:="res://build/current-test-reports/source-spherical-main.json"
 const SPHERE_KEY:="source_spherical_probe"
 var spherical_evidence:Array=[]
 var spherical_private:="user://spherical-main-"+str(OS.get_process_id())

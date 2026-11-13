@@ -1,0 +1,142 @@
+00428e84: push ebp
+00428e85: mov ebp,esp
+00428e87: add esp,0xffffffd8
+00428e8a: push ebx
+00428e8b: push esi
+00428e8c: push edi
+00428e8d: mov edx,DWORD PTR [ebp+0x10]
+00428e90: mov eax,DWORD PTR [ebp+0xc]
+00428e93: mov ecx,eax
+00428e95: sar ecx,1
+00428e97: lea ecx,[ecx+ecx*2]
+00428e9a: mov ebx,DWORD PTR [edx+0xc]
+00428e9d: mov esi,DWORD PTR [ebx+ecx*2-0x6]
+00428ea1: mov DWORD PTR [ebp-0x8],esi
+00428ea4: mov si,WORD PTR [ebx+ecx*2-0x2]
+00428ea9: mov WORD PTR [ebp-0x4],si
+00428ead: mov bl,BYTE PTR [ebp-0x8]
+00428eb0: xor ecx,ecx
+00428eb2: mov cl,bl
+00428eb4: sar ecx,1
+00428eb6: lea ecx,[ecx+ecx*2]
+00428eb9: mov esi,DWORD PTR [edx+0x10]
+00428ebc: mov edi,DWORD PTR [esi+ecx*2]
+00428ebf: mov DWORD PTR [ebp-0x10],edi
+00428ec2: mov di,WORD PTR [esi+ecx*2+0x4]
+00428ec7: mov WORD PTR [ebp-0xc],di
+00428ecb: test al,0x1
+00428ecd: je 0x428efd
+00428ecf: movsx eax,BYTE PTR [ebp-0x6]
+00428ed3: neg eax
+00428ed5: shl eax,0x8
+00428ed8: mov DWORD PTR [ebp-0x1c],eax
+00428edb: movsx eax,BYTE PTR [ebp-0x5]
+00428edf: shl eax,0x8
+00428ee2: mov DWORD PTR [ebp-0x18],eax
+00428ee5: movsx eax,BYTE PTR [ebp-0x4]
+00428ee9: shl eax,0x8
+00428eec: mov DWORD PTR [ebp-0x14],eax
+00428eef: xor eax,eax
+00428ef1: mov al,BYTE PTR [ebp-0x8]
+00428ef4: test al,0x1
+00428ef6: jne 0x428f23
+00428ef8: neg BYTE PTR [ebp-0xe]
+00428efb: jmp 0x428f23
+00428efd: movsx eax,BYTE PTR [ebp-0x6]
+00428f01: shl eax,0x8
+00428f04: mov DWORD PTR [ebp-0x1c],eax
+00428f07: movsx eax,BYTE PTR [ebp-0x5]
+00428f0b: shl eax,0x8
+00428f0e: mov DWORD PTR [ebp-0x18],eax
+00428f11: movsx eax,BYTE PTR [ebp-0x4]
+00428f15: shl eax,0x8
+00428f18: mov DWORD PTR [ebp-0x14],eax
+00428f1b: test bl,0x1
+00428f1e: je 0x428f23
+00428f20: neg BYTE PTR [ebp-0xe]
+00428f23: mov eax,DWORD PTR [edx+0x14]
+00428f26: sub eax,DWORD PTR [edx+0x18]
+00428f29: test eax,eax
+00428f2b: jge 0x428f52
+00428f2d: neg eax
+00428f2f: mov ecx,eax
+00428f31: movsx ebx,BYTE PTR [ebp-0xe]
+00428f35: sar ebx,cl
+00428f37: mov DWORD PTR [ebp-0x28],ebx
+00428f3a: mov ecx,eax
+00428f3c: movsx ebx,BYTE PTR [ebp-0xd]
+00428f40: sar ebx,cl
+00428f42: mov DWORD PTR [ebp-0x24],ebx
+00428f45: mov ecx,eax
+00428f47: movsx eax,BYTE PTR [ebp-0xc]
+00428f4b: sar eax,cl
+00428f4d: mov DWORD PTR [ebp-0x20],eax
+00428f50: jmp 0x428f73
+00428f52: mov ecx,eax
+00428f54: movsx ebx,BYTE PTR [ebp-0xe]
+00428f58: shl ebx,cl
+00428f5a: mov DWORD PTR [ebp-0x28],ebx
+00428f5d: mov ecx,eax
+00428f5f: movsx ebx,BYTE PTR [ebp-0xd]
+00428f63: shl ebx,cl
+00428f65: mov DWORD PTR [ebp-0x24],ebx
+00428f68: mov ecx,eax
+00428f6a: movsx eax,BYTE PTR [ebp-0xc]
+00428f6e: shl eax,cl
+00428f70: mov DWORD PTR [ebp-0x20],eax
+00428f73: mov eax,DWORD PTR [edx]
+00428f75: sub DWORD PTR [ebp-0x28],eax
+00428f78: mov eax,DWORD PTR [edx+0x4]
+00428f7b: sub DWORD PTR [ebp-0x24],eax
+00428f7e: mov eax,DWORD PTR [edx+0x8]
+00428f81: sub DWORD PTR [ebp-0x20],eax
+00428f84: mov eax,DWORD PTR [ebp-0x28]
+00428f87: push eax
+00428f88: call 0x476238
+00428f8d: pop ecx
+00428f8e: mov ebx,eax
+00428f90: mov eax,DWORD PTR [ebp-0x24]
+00428f93: push eax
+00428f94: call 0x476238
+00428f99: pop ecx
+00428f9a: or ebx,eax
+00428f9c: mov eax,DWORD PTR [ebp-0x20]
+00428f9f: push eax
+00428fa0: call 0x476238
+00428fa5: pop ecx
+00428fa6: or ebx,eax
+00428fa8: push ebx
+00428fa9: call 0x4599b4
+00428fae: pop ecx
+00428faf: add eax,0xfffffff3
+00428fb2: test eax,eax
+00428fb4: jge 0x428fb8
+00428fb6: xor eax,eax
+00428fb8: mov ecx,eax
+00428fba: mov edx,DWORD PTR [ebp-0x28]
+00428fbd: sar edx,cl
+00428fbf: imul edx,DWORD PTR [ebp-0x1c]
+00428fc3: mov ecx,eax
+00428fc5: mov ebx,DWORD PTR [ebp-0x24]
+00428fc8: sar ebx,cl
+00428fca: imul ebx,DWORD PTR [ebp-0x18]
+00428fce: add edx,ebx
+00428fd0: mov ecx,eax
+00428fd2: mov ebx,DWORD PTR [ebp-0x20]
+00428fd5: sar ebx,cl
+00428fd7: imul ebx,DWORD PTR [ebp-0x14]
+00428fdb: add edx,ebx
+00428fdd: neg edx
+00428fdf: add edx,edx
+00428fe1: mov ecx,eax
+00428fe3: mov eax,DWORD PTR [ebp+0x8]
+00428fe6: sar eax,cl
+00428fe8: cmp edx,eax
+00428fea: setge al
+00428fed: and eax,0x1
+00428ff0: pop edi
+00428ff1: pop esi
+00428ff2: pop ebx
+00428ff3: mov esp,ebp
+00428ff5: pop ebp
+00428ff6: ret 

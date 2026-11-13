@@ -1,0 +1,20 @@
+00462878: push ebp
+00462879: mov ebp,esp
+0046287b: mov eax,DWORD PTR [ebp+0x8]
+0046287e: cmp eax,0xffff8002
+00462883: jne 0x46288c
+00462885: mov eax,0x8
+0046288a: pop ebp
+0046288b: ret 
+0046288c: cmp eax,0xa0
+00462891: jne 0x46289a
+00462893: mov eax,0x2
+00462898: pop ebp
+00462899: ret 
+0046289a: mov edx,0x1
+0046289f: cmp eax,0xa0
+004628a4: jl 0x4628a9
+004628a6: add edx,0x3
+004628a9: mov eax,edx
+004628ab: pop ebp
+004628ac: ret 

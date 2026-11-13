@@ -1,0 +1,5 @@
+00462cfc: push ebp
+00462cfd: mov ebp,esp
+00462cff: mov eax,DWORD PTR [ebp+0x8]
+00462d02: pop ebp
+00462d03: ret 

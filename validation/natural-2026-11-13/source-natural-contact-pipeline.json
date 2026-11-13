@@ -1,0 +1,50 @@
+{
+	"checks": 26592,
+	"combined_native_chain_executed": false,
+	"counts": {
+		"early_returns": 489,
+		"early_returns_with_flag2": 489,
+		"inner_hits_preserving_previous_high": 89,
+		"native_cases": 993,
+		"responses": 504
+	},
+	"evidence": [
+		{
+			"caller_reset_executed": false,
+			"case": "raw_caller_boundary",
+			"full_globals_required": true,
+			"high_previous_words_preserved": true,
+			"private_return_buffers": true,
+			"synthetic_unsupported_dispatch_controls": [
+				0,
+				2,
+				255
+			]
+		},
+		{
+			"HP_RNG_fuel_clock_executed": false,
+			"case": "native_classifier_composition",
+			"classifier_expected": "independently executed original native F576 fixture",
+			"combined_native_chain_executed": false,
+			"continuation_expected": "direct composition with separately native-proved source_surface_contact",
+			"counts": {
+				"early_returns": 489,
+				"early_returns_with_flag2": 489,
+				"inner_hits_preserving_previous_high": 89,
+				"native_cases": 993,
+				"responses": 504
+			},
+			"full_F575_broad_phase_executed": false
+		}
+	],
+	"failures": 0,
+	"schema": 1,
+	"scope": "Explicit raw natural-player F576 classification and supported F575 kind1 continuation only; no F574 reset, F575 broad phase, F569/F570, F578, world bank, phone pose, executed HP/RNG, fuel or clock.",
+	"sources": {
+		"classifier_sha256": "e6cb189d34dc4d434b10f9fc2ef43bf8b96433845c01673f79b4d9592446658f",
+		"native_fixture_sha256": "d4ce0cf3ebfe0fd3bb1f263d047fa3a17ffc5201b8040389fdbddcc21a50e166",
+		"pipeline_sha256": "8d981b53f301dd375f22faae89a439673a3f94a98278cbb2161075a85ae125be",
+		"response_sha256": "fcfb6077f0bcabf7b6ffce98c3a3dbb23251a850175be4ef241b299fdf8d117d",
+		"test_sha256": "fd0853757b6c9b0daa45ad6a89c48138eb2eb8a840f5282f80de9daca5196d7f"
+	}
+}

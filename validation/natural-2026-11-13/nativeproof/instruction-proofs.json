@@ -1,0 +1,999 @@
+{
+  "byte_instruction_proofs": {
+    "576": {
+      "virtual_address": 4357752,
+      "executable_offset": 101496,
+      "byte_length": 466,
+      "sha256": "2b8ae8b0a52f16b8fb101879618218e83dd9852ccecb97090c7cb3f611439227",
+      "instruction_count": 159,
+      "normalized_instruction_sha256": "4a9e41766bd5b0a51b9981f6c6b1c7c2a1050bd686803f4b8edb97664f1c7752",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "579": {
+      "virtual_address": 4359000,
+      "executable_offset": 102744,
+      "byte_length": 215,
+      "sha256": "f535e8001ef4989a30b2189a20157425ce67970d55959a6b06bae7a64902c218",
+      "instruction_count": 87,
+      "normalized_instruction_sha256": "357a7db6dcbb6be55d08348c1a58e8d0eef5b2c6476a6048de42cf7abc25574b",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "582": {
+      "virtual_address": 4361204,
+      "executable_offset": 104948,
+      "byte_length": 653,
+      "sha256": "a216b90c8dcac7e7601fcf57ea6c2afbc2d9a02111a051d1da4da1293901b4b4",
+      "instruction_count": 243,
+      "normalized_instruction_sha256": "bef9036b99437584da413f06bcb892c393cf57f5ea9e216e17ebbeb95baab927",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "581": {
+      "virtual_address": 4359660,
+      "executable_offset": 103404,
+      "byte_length": 1542,
+      "sha256": "a5559afa26a9783d6df67b558cd84d69e35158844c1a00cc81a75bcb0be766f0",
+      "instruction_count": 533,
+      "normalized_instruction_sha256": "24424cb46737c21eec97dee74fca254cda8ce759d7574994097114aab6506eb0",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "583": {
+      "virtual_address": 4361860,
+      "executable_offset": 105604,
+      "byte_length": 371,
+      "sha256": "90080e9df4b70a57b9697873caca5a334018801dc338946fb26406ea8096bfbe",
+      "instruction_count": 142,
+      "normalized_instruction_sha256": "1c3f33676f52090d8e1fbbb8066b43e3e62729f61d09da8baa9bd13c9d0b534d",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1334": {
+      "virtual_address": 4515887,
+      "executable_offset": 259631,
+      "byte_length": 25,
+      "sha256": "84354768135502d9299208c8bd43b3b99aa18363d2bdfb0fe11690cd0fb5d7bb",
+      "instruction_count": 13,
+      "normalized_instruction_sha256": "7833d55bfec9b4d4cd6ac0fe4ae49def2871850a01e46037fc728458119098b1",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1341": {
+      "virtual_address": 4516184,
+      "executable_offset": 259928,
+      "byte_length": 127,
+      "sha256": "ce1f10cd3645a7e74e65b774758ad6160e67cc67d19b0ad4cbfa77dbcc454ef3",
+      "instruction_count": 57,
+      "normalized_instruction_sha256": "91f886eebe2baa0ba96dd39d1780e2873e9118a671b5d410235768a1f066a92f",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1466": {
+      "virtual_address": 4525815,
+      "executable_offset": 269559,
+      "byte_length": 272,
+      "sha256": "d8afc05d10b13f7872438dd3a1e13e11ccc15dd0b55881fa120ef8781055cf10",
+      "instruction_count": 103,
+      "normalized_instruction_sha256": "91e17551087df2c80867fd3f6aab44d34c4cd200142c2d6f779a57af80b10d79",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1502": {
+      "virtual_address": 4532991,
+      "executable_offset": 276735,
+      "byte_length": 139,
+      "sha256": "06d92dfc59b6eca45c8c8c4d203e1deb6a270101894bdea28ca83b692dc60d19",
+      "instruction_count": 61,
+      "normalized_instruction_sha256": "c5023ccf9909d9370799f5bbbb7d17b5daaf2db9050c49ef71ca246620516b3e",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1521": {
+      "virtual_address": 4535416,
+      "executable_offset": 279160,
+      "byte_length": 17,
+      "sha256": "f62a5f949cbf8da772c3cc32ae59b607e0f35cda6c3c4e1ddf848ba3b5a1b445",
+      "instruction_count": 9,
+      "normalized_instruction_sha256": "41d13ec389df5b306dbeb350873dd5272b12f7a1d61a674cb369cb6e1398f31c",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1523": {
+      "virtual_address": 4535445,
+      "executable_offset": 279189,
+      "byte_length": 33,
+      "sha256": "e393035168c327e2d7c04e94b55828696681e5f6eabbab45e27c103d00f712af",
+      "instruction_count": 16,
+      "normalized_instruction_sha256": "e69f744bbca564eb592b29b6ec8993e63c04f907b208de2955f074d1046f87e4",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1538": {
+      "virtual_address": 4537424,
+      "executable_offset": 281168,
+      "byte_length": 15,
+      "sha256": "7f8a8207c382290494a4d7fabdc00b15b17b0c51b7e9185cd4a3ae9f4cfb1226",
+      "instruction_count": 6,
+      "normalized_instruction_sha256": "0479e1d3839e11ec5ad483579aef67c8e1d81d99ba702d609e064c3fb94116ee",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1656": {
+      "virtual_address": 4561332,
+      "executable_offset": 305076,
+      "byte_length": 74,
+      "sha256": "8bdce1d3d508b9cbf7d5fcbbf261407789d7bbf8fd917a4225db88c6d5aa2949",
+      "instruction_count": 29,
+      "normalized_instruction_sha256": "fb3430703e53a390c573480dc2a76a799a82e386edd80d2d0e4df2494995dbb6",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1658": {
+      "virtual_address": 4561616,
+      "executable_offset": 305360,
+      "byte_length": 44,
+      "sha256": "6bdbafa74820fd4a83d1e5dfdb85032acacc6fd0e1636b481ac3f18af1ad065f",
+      "instruction_count": 23,
+      "normalized_instruction_sha256": "ee101255a4019a0c7d7e4e372bdc426e50b6f1ab72d614b370e79a41bc813f3a",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1657": {
+      "virtual_address": 4561408,
+      "executable_offset": 305152,
+      "byte_length": 207,
+      "sha256": "86d7da85e49ea3ddca538301d8ff1595065c0fb8e2a52ad7dd1b35b68bcbd6ff",
+      "instruction_count": 84,
+      "normalized_instruction_sha256": "8248127cd6d66196b4d905d201be1a2d2ba017ed215faa149d317cfafe4e45f2",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1660": {
+      "virtual_address": 4562008,
+      "executable_offset": 305752,
+      "byte_length": 177,
+      "sha256": "e23941156e2eb6f1c53020a82a29d6537e6be0b7a6af446323409fb93e3be0cc",
+      "instruction_count": 74,
+      "normalized_instruction_sha256": "dd0955a8519f7df2d6693ec66963ecfa03ef327cc77da6935c6bfb5623544ebf",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1669": {
+      "virtual_address": 4564080,
+      "executable_offset": 307824,
+      "byte_length": 209,
+      "sha256": "b4659d0676704a64b15ccc105df8f0a11490e32fa8a36cda946412534b252976",
+      "instruction_count": 95,
+      "normalized_instruction_sha256": "2f348f4b8ef423a8ddf1dd508d82cf58910fff38bc8ffcde6ca28be9657dd814",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1670": {
+      "virtual_address": 4564528,
+      "executable_offset": 308272,
+      "byte_length": 209,
+      "sha256": "037f1fa90d8883d19276a9d53cbd943b53979443ee898a93e01ccdd45be455d2",
+      "instruction_count": 95,
+      "normalized_instruction_sha256": "fde73a6041c04dccecfed8c698bb446f1c738faf2e5e08011e561f750c15caf2",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1822": {
+      "virtual_address": 4596168,
+      "executable_offset": 339912,
+      "byte_length": 28,
+      "sha256": "637d6414dabf0868de9891239dda19e30da4689d46b2565db2856722b1e95e3e",
+      "instruction_count": 13,
+      "normalized_instruction_sha256": "253edd6e3d730e5ba4da3a8504daf42563834304422120da0ca30a3005bf89d7",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1836": {
+      "virtual_address": 4599036,
+      "executable_offset": 342780,
+      "byte_length": 8,
+      "sha256": "d5a2b635b0bbb254914f2641e4508361a0c95686c0422dcebeb3abbcca7f1d2b",
+      "instruction_count": 5,
+      "normalized_instruction_sha256": "2ba2039980a293c399005ccca5f9303982cc3596c3b51732216f2df0fd1c91a4",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1841": {
+      "virtual_address": 4601672,
+      "executable_offset": 345416,
+      "byte_length": 340,
+      "sha256": "3b9e7f59cdaf0363695810c843a17e2445ef84b8521d5e8c1d3b40c326840ece",
+      "instruction_count": 114,
+      "normalized_instruction_sha256": "99ca1ad404c69ee5eb9f5649b0d70829bdaf549e923a467c94320081fc3ee2e1",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1843": {
+      "virtual_address": 4602404,
+      "executable_offset": 346148,
+      "byte_length": 76,
+      "sha256": "40e1fd699af9c4990828b8721bb0f9248f9d24be677b63d71fbf09347192f3f3",
+      "instruction_count": 31,
+      "normalized_instruction_sha256": "0d6428772a4bb5801adcabe5ca90518f96248534e246c5a858aa7af2b89318c0",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1849": {
+      "virtual_address": 4603068,
+      "executable_offset": 346812,
+      "byte_length": 628,
+      "sha256": "276fe6d31d5deaec6b254fc1195aabb59991511f75fd23855eab34d6b21ff420",
+      "instruction_count": 214,
+      "normalized_instruction_sha256": "1873d48695505551a6ef785a07f95c03cd25936fce00adc27abe889ab2fb1a88",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1818": {
+      "virtual_address": 4595952,
+      "executable_offset": 339696,
+      "byte_length": 56,
+      "sha256": "5ec9bc129221b1a6edde44ce7b5cd37dddb5821b057427a3e69ca778871676bb",
+      "instruction_count": 15,
+      "normalized_instruction_sha256": "05c6eec9e3906394b5ab837a6052b7f006102bce85ba4110bcca26a222d79c3e",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1820": {
+      "virtual_address": 4596036,
+      "executable_offset": 339780,
+      "byte_length": 68,
+      "sha256": "2d26f9b5460c98a33957835cc2d3c1e40e731cf6a1460cf866a9ed61068cda30",
+      "instruction_count": 22,
+      "normalized_instruction_sha256": "02641e3fa558840e48469f40a97d1b5cd38a66a70b43ef83d5e4bc056d9b2412",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1829": {
+      "virtual_address": 4597488,
+      "executable_offset": 341232,
+      "byte_length": 58,
+      "sha256": "3c28747fffc971475fed991772456730c10cc29eaffd2ebdaad35d0de0e28fab",
+      "instruction_count": 24,
+      "normalized_instruction_sha256": "8ea8d184da80790d30e6cc459602eb83c1516ad6fb66ed2952ea4592967c9121",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1850": {
+      "virtual_address": 4603696,
+      "executable_offset": 347440,
+      "byte_length": 600,
+      "sha256": "5052f06279be96ae2022a2a5486dbab74023d7fdfc3e606e30d977eca1605e13",
+      "instruction_count": 207,
+      "normalized_instruction_sha256": "5bef88b6c6c7887a164809f61c71db239cbcff52180d34708d58c6b7dc1b5f45",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1846": {
+      "virtual_address": 4602744,
+      "executable_offset": 346488,
+      "byte_length": 68,
+      "sha256": "c5508b2c8a1d335b395f60e691b607a9a066cbec3ace57cc71415afb17967513",
+      "instruction_count": 34,
+      "normalized_instruction_sha256": "b6d11264227e279b9e58fe51ff0fc92d8ef884d72e06eec8c512a1974cb8a52a",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1824": {
+      "virtual_address": 4596664,
+      "executable_offset": 340408,
+      "byte_length": 34,
+      "sha256": "0c337718428409948e1d903751adce3a8bfa0cfe8a82fbd73afbca860e6b8551",
+      "instruction_count": 16,
+      "normalized_instruction_sha256": "49d2f0960d2c7c6d8654c9a4057482c38f1bd8d81847bbbae708fb8f3ab4980d",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1851": {
+      "virtual_address": 4604296,
+      "executable_offset": 348040,
+      "byte_length": 616,
+      "sha256": "44b0995b004ddcfa4b5e4667f479c73138bd86d25c8c91c30ea780da49a493b7",
+      "instruction_count": 218,
+      "normalized_instruction_sha256": "f64030257f7b2e4221db641fa739f25b10fbe6cb279749c5c8213d4b493cec54",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1852": {
+      "virtual_address": 4604912,
+      "executable_offset": 348656,
+      "byte_length": 612,
+      "sha256": "44fe32c272593e2efdab5d229f81f95c996c45502a57de192e68e50acdd2cf4d",
+      "instruction_count": 212,
+      "normalized_instruction_sha256": "b35d20076b2352cd378b943d8a4565cc6bad1a8acc46ab4fcebad47d6d76091f",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1853": {
+      "virtual_address": 4605524,
+      "executable_offset": 349268,
+      "byte_length": 684,
+      "sha256": "8ce25a936bcbab54e704c49a5aa086ba1fddd3f7063095731727409a3d2fb7d6",
+      "instruction_count": 242,
+      "normalized_instruction_sha256": "c871d9f0f0cac600ad8407d8133c588d3dec9d34bc449dd841ac86c1305739c3",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1854": {
+      "virtual_address": 4606208,
+      "executable_offset": 349952,
+      "byte_length": 697,
+      "sha256": "8629552128027b2c56373d002f7b35e87cadab16977225701e3cad1389624708",
+      "instruction_count": 235,
+      "normalized_instruction_sha256": "11da25cd5bc9061648867c4da6ae7e5c7acaad41c28e212c9338334d4500a3a0",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1855": {
+      "virtual_address": 4606908,
+      "executable_offset": 350652,
+      "byte_length": 700,
+      "sha256": "0dfea14dfd8d08537127fb30f2d21946f5ae73dac7821343e2400cb844a08482",
+      "instruction_count": 241,
+      "normalized_instruction_sha256": "dfc36234dee57b6f32235ada91875f3f096791df708e570b6755e87354cb9c49",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1856": {
+      "virtual_address": 4607608,
+      "executable_offset": 351352,
+      "byte_length": 712,
+      "sha256": "6d259f21c4787b1acaf3948a4dfc3a41e79bf13edaef80e45dda38f8958ad307",
+      "instruction_count": 240,
+      "normalized_instruction_sha256": "626f3fd542b68555daa4b05bd4dde8f616e00993b0f5b4eb048b55e0ee815228",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1857": {
+      "virtual_address": 4608320,
+      "executable_offset": 352064,
+      "byte_length": 772,
+      "sha256": "3455773190a937331f70089912025355d8aa561cc91f8fdba72d83ceb1bbbf56",
+      "instruction_count": 269,
+      "normalized_instruction_sha256": "c72b2362ad48f32072741c95638f1362523bc232e6d8c704611c5d5e316d39b4",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1858": {
+      "virtual_address": 4609092,
+      "executable_offset": 352836,
+      "byte_length": 1032,
+      "sha256": "0edab738de50f6b3a42540a4e84f2caded05738c5acdf54cdb20969ff01faf56",
+      "instruction_count": 348,
+      "normalized_instruction_sha256": "adbc6eb9916cdd026f177033b05d5f18a85a47f12fb12114d75f3ead4a4f93c2",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1859": {
+      "virtual_address": 4610124,
+      "executable_offset": 353868,
+      "byte_length": 1052,
+      "sha256": "58e557f139083db05785e7ff16eac824f9b0efaf4aa3754c12e51fa2703a233f",
+      "instruction_count": 358,
+      "normalized_instruction_sha256": "ce3ca2a4968473ac35599a33d3b23b3e191539de3a0324eccf09a841c07e70a7",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1860": {
+      "virtual_address": 4611176,
+      "executable_offset": 354920,
+      "byte_length": 1048,
+      "sha256": "984a38615bf84b1c13f26ace79b8ddf3ecfe88f50ef0faa8c9c702868bae13ad",
+      "instruction_count": 354,
+      "normalized_instruction_sha256": "eae7360b2d1dbf453c3798432bd226079f7714027428ef1bbc9ca57197eb6e3b",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1861": {
+      "virtual_address": 4612224,
+      "executable_offset": 355968,
+      "byte_length": 1060,
+      "sha256": "2846a426323757fc810b4add53ee9ce6bdd2c7c5e6a8c1f9f190a27fd58ecc16",
+      "instruction_count": 363,
+      "normalized_instruction_sha256": "5702051732e69f2695eb908c4141bd6635a7838af7de1add663368dc2ea16360",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1862": {
+      "virtual_address": 4613284,
+      "executable_offset": 357028,
+      "byte_length": 1132,
+      "sha256": "92ab90dece33662f5a0d8d334113751b0c8c8c1960ef2a43c94b21e0c530d2d4",
+      "instruction_count": 379,
+      "normalized_instruction_sha256": "f5986e0e2251aff71f0fa3320321b0135e668fe872db46a397072f26b68f8f7e",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1863": {
+      "virtual_address": 4614416,
+      "executable_offset": 358160,
+      "byte_length": 1148,
+      "sha256": "40a4cc6d377e8d61a0e25a6f7d0b0fb8f7e87866f4e9b5eb3437b2315acba89f",
+      "instruction_count": 385,
+      "normalized_instruction_sha256": "e859a6367c7c7928deb59cd1c2da7bbf8bb5a5f4b292a17f728f9f4f508067cc",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1864": {
+      "virtual_address": 4615564,
+      "executable_offset": 359308,
+      "byte_length": 1148,
+      "sha256": "52aaad1123aff38e6165c64b1876551c48e237b018c8d517b6ce4374f03ca97a",
+      "instruction_count": 385,
+      "normalized_instruction_sha256": "5f9fb9a900be4cb1cc625e85a0e5d7975b4895281094d725543f6e47ed6379da",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1865": {
+      "virtual_address": 4616712,
+      "executable_offset": 360456,
+      "byte_length": 1152,
+      "sha256": "018c647352e26164e3ef1a28bc4147dade86683d2d3b1df0bbd7806b72b93191",
+      "instruction_count": 390,
+      "normalized_instruction_sha256": "fd9d7bf52b9020698003be99d4abc9b2beb2eae81819a4f2a3db9e279953ebee",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1866": {
+      "virtual_address": 4617864,
+      "executable_offset": 361608,
+      "byte_length": 568,
+      "sha256": "e61476b6512586ec6e6445a0646bde457bf7f1420ad39f55fe8f5c85eb13a438",
+      "instruction_count": 197,
+      "normalized_instruction_sha256": "9d45c61745e3c86011f1353c2dc2cf11b0e17e76055e550a3e9cd05ed1e47f20",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1867": {
+      "virtual_address": 4618432,
+      "executable_offset": 362176,
+      "byte_length": 656,
+      "sha256": "b74ed251fa1f001644e665e5e2d3ea77a780b9f8859c82a8d63e4a83ca2881f3",
+      "instruction_count": 224,
+      "normalized_instruction_sha256": "626d75ad18a47bb57da1c7ad6c6c1bfe01f1d0a750474ab220d1f4c37f7759a0",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1876": {
+      "virtual_address": 4641540,
+      "executable_offset": 385284,
+      "byte_length": 4685,
+      "sha256": "4ad69979094059443e8d4b86b772132b5a751ec019a0662960b7edcf45c0146d",
+      "instruction_count": 1483,
+      "normalized_instruction_sha256": "83fcd3d0bae73084f5cda2cfaa9a0fd3d3c0193744509463f610a5b39aab6985",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1467": {
+      "virtual_address": 4526087,
+      "executable_offset": 269831,
+      "byte_length": 178,
+      "sha256": "62a649ee92e93438b97682783ed8a2ce3317e91b7f54e87b7df8e7bfe30849d5",
+      "instruction_count": 56,
+      "normalized_instruction_sha256": "80ed384930ddfe032e8b2b6f88253af4e5a70906f818b56c8158fbb00655a8ba",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1816": {
+      "virtual_address": 4595816,
+      "executable_offset": 339560,
+      "byte_length": 125,
+      "sha256": "ce9c5db17f5b1327e50b2e3dc948fc645480ef8feb7327bebd1d9265cecc82ea",
+      "instruction_count": 44,
+      "normalized_instruction_sha256": "1ae9f2da0832318b3977b5bd40a9628c79ac22a39d1a9975edd5af7837f8d78d",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1817": {
+      "virtual_address": 4595944,
+      "executable_offset": 339688,
+      "byte_length": 8,
+      "sha256": "bbe58e84cf71d2abb2ccb76d707bd4051050b0818550cc1c9caa58cb2d3a67e9",
+      "instruction_count": 3,
+      "normalized_instruction_sha256": "0223cd8c1de3172a34089bcaff61c40bee91336ecc612585271b96d3eb473c1b",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1823": {
+      "virtual_address": 4596196,
+      "executable_offset": 339940,
+      "byte_length": 465,
+      "sha256": "683a53b98992d10131ec22f9ff551ed27685ff9dc8efae951155bb7c9dee7174",
+      "instruction_count": 161,
+      "normalized_instruction_sha256": "a09a9b15b2d117a54cc22dcea04f033aeb2ea93343f9063311d77ca351fa9bfd",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1825": {
+      "virtual_address": 4596700,
+      "executable_offset": 340444,
+      "byte_length": 64,
+      "sha256": "0eb2c25e94e73783c3423ab56d9caae20e6cbcbeea704c833ac06e37a553c471",
+      "instruction_count": 28,
+      "normalized_instruction_sha256": "c893e9468aaa14edcc67f3ea83b003d77bb5cf64d838f5820a576d209c7edb05",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1833": {
+      "virtual_address": 4597988,
+      "executable_offset": 341732,
+      "byte_length": 142,
+      "sha256": "93f96ea02e616582f6510f8d4d22906e4a50440de770362b07e6b8f10da29bf5",
+      "instruction_count": 37,
+      "normalized_instruction_sha256": "0ffd40a504ee3cf289b0ad6dd60649df7e0d81c63379dba30304e582802738a6",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1831": {
+      "virtual_address": 4597880,
+      "executable_offset": 341624,
+      "byte_length": 53,
+      "sha256": "0a4d00a086db864e8c67141690f773012d200d313b8d787ac415680a122e2ec1",
+      "instruction_count": 20,
+      "normalized_instruction_sha256": "9b019b7ed00e0b0068bafbdc4a8fac87357a1fcfe0c14d783dd8a2c3ed551629",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1832": {
+      "virtual_address": 4597936,
+      "executable_offset": 341680,
+      "byte_length": 49,
+      "sha256": "4ee5860101a50e4dfa493cac02aa687ac2a2aa31d1ae698ee3f9d7557a93b72f",
+      "instruction_count": 20,
+      "normalized_instruction_sha256": "4ef7353c398ffa7e67c5d1557e3cab0349ff6e402e1089e977e413771a58076b",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1834": {
+      "virtual_address": 4598132,
+      "executable_offset": 341876,
+      "byte_length": 574,
+      "sha256": "fb4b299fbeefd8fe81d7e32aa47e9b9bbba67791a6d9ae2bed1ca7a389ba0fe5",
+      "instruction_count": 184,
+      "normalized_instruction_sha256": "23eca1fbd9cdd9ba9b938acb51cbfc7c0a531f2a89ddcc9f717e3f7af42e2543",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1848": {
+      "virtual_address": 4602996,
+      "executable_offset": 346740,
+      "byte_length": 72,
+      "sha256": "6d3ab49e40780d5af7eca133c7d6b437e0ac8ac3ffb578c08ffb875456b6c2bd",
+      "instruction_count": 26,
+      "normalized_instruction_sha256": "49d7bcb33faf5b807682fc32ddaa43064e1758c1e20549106a11953279b4b274",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1875": {
+      "virtual_address": 4641452,
+      "executable_offset": 385196,
+      "byte_length": 88,
+      "sha256": "de0c4ee83c32d6fb6d31c67a7a62b32260c53644b0fbe2630ac27ee6899f940d",
+      "instruction_count": 38,
+      "normalized_instruction_sha256": "a31dce193f9d374769e07968e507c93d842fb9b92109425cf3e76b76d7dddc53",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1335": {
+      "virtual_address": 4515912,
+      "executable_offset": 259656,
+      "byte_length": 25,
+      "sha256": "630251ee2b7c42186d7b3e5a7dad2245d537527943aa08e08cfe6879016c0514",
+      "instruction_count": 11,
+      "normalized_instruction_sha256": "b9e6d7e710d5ec7c76685289fe22ba6cd78860994046859e09839c50c506c91c",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1339": {
+      "virtual_address": 4516035,
+      "executable_offset": 259779,
+      "byte_length": 21,
+      "sha256": "fce7716dfb0388ee8b01544281db7c93bc16e12a86ea5a7076542ebc68722749",
+      "instruction_count": 11,
+      "normalized_instruction_sha256": "799261dde624340d7a1467a2e7a76fe5ff6b9600cd72f92eed7c46db42111c52",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1465": {
+      "virtual_address": 4525776,
+      "executable_offset": 269520,
+      "byte_length": 39,
+      "sha256": "3a8c9b7a57b57d0f7687c057da177eaa66e73ec50f008f31dffdc2be6d8f360d",
+      "instruction_count": 18,
+      "normalized_instruction_sha256": "c50c85bab64aeddea52fe015949729981696fecaa3e6a8c8fe52d74dc14b9124",
+      "all_instructions_equal": true,
+      "entry_anchor": "neighbor1466 Pos delta, then full instruction comparison"
+    },
+    "1495": {
+      "virtual_address": 4532682,
+      "executable_offset": 276426,
+      "byte_length": 65,
+      "sha256": "49b5514af718406bd1bc97944faf13f3e4a848c2c7cec6383dd224f5ecab2aee",
+      "instruction_count": 27,
+      "normalized_instruction_sha256": "90ae64d99b6bcb06ab3987f7176237e3dc02ac06d23ee95a83f2885880a188c8",
+      "all_instructions_equal": true,
+      "entry_anchor": "neighbor1502 Pos delta, then full instruction comparison"
+    },
+    "1533": {
+      "virtual_address": 4536120,
+      "executable_offset": 279864,
+      "byte_length": 463,
+      "sha256": "42c149b5d536adba046c659f932bd2cca5921f7e299951c674d7ac35ce71d5ce",
+      "instruction_count": 124,
+      "normalized_instruction_sha256": "681de4c9b20b9510f24d9a16522a9884ffcb03e1cf775d843522e4b9014132bf",
+      "all_instructions_equal": true,
+      "entry_anchor": "neighbor1523 Pos delta, then full instruction comparison"
+    },
+    "1819": {
+      "virtual_address": 4596008,
+      "executable_offset": 339752,
+      "byte_length": 27,
+      "sha256": "8d419f204f54bf4dc2ba401ea2cfdd63c25fdfb795d9cd8482ed5c47bb636ddd",
+      "instruction_count": 9,
+      "normalized_instruction_sha256": "25853256b8f0a86c30a1829f4b0a20b5a0c3f8302490771d32724029a1d32933",
+      "all_instructions_equal": true,
+      "entry_anchor": "neighbor1820 Pos delta, then full instruction comparison"
+    },
+    "1821": {
+      "virtual_address": 4596104,
+      "executable_offset": 339848,
+      "byte_length": 64,
+      "sha256": "411f4672f07316325cee6f702753c205603cac4cba9eb41226998150f6e62d13",
+      "instruction_count": 26,
+      "normalized_instruction_sha256": "356a23011424fb6e59188981ef981314f14ef54513ecfb6fab2e62ab4f407aa8",
+      "all_instructions_equal": true,
+      "entry_anchor": "neighbor1822 Pos delta, then full instruction comparison"
+    },
+    "1826": {
+      "virtual_address": 4596764,
+      "executable_offset": 340508,
+      "byte_length": 124,
+      "sha256": "7befd2bc887bbea27360d81c83ead335fbae0533e5f9ae96e4890d552facf330",
+      "instruction_count": 55,
+      "normalized_instruction_sha256": "bf21428b3b6b463b47bfb6f4d9ac550a22c6aba9cbdc0ab39c43961ff7c40ceb",
+      "all_instructions_equal": true,
+      "entry_anchor": "neighbor1825 Pos delta, then full instruction comparison"
+    },
+    "1827": {
+      "virtual_address": 4596888,
+      "executable_offset": 340632,
+      "byte_length": 264,
+      "sha256": "ffbb02310d9028c2e8a2748e25402f0ad4e3073723f282f77a9031948eee161b",
+      "instruction_count": 110,
+      "normalized_instruction_sha256": "e503a8932fd6c0bc9519775d87f9c5574d60398189f55f91b45387b43f73ef47",
+      "all_instructions_equal": true,
+      "entry_anchor": "neighbor1826 Pos delta, then full instruction comparison"
+    }
+  },
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "dos_jjffe_behavior_differences": [],
+  "callback_pointer_words": [
+    {
+      "file_offset": 974652,
+      "symbol": "DATA_007638",
+      "address": 5225836
+    },
+    {
+      "file_offset": 974660,
+      "symbol": "DATA_007637",
+      "address": 5209452
+    },
+    {
+      "file_offset": 974664,
+      "symbol": "DATA_007638",
+      "address": 5225836
+    },
+    {
+      "file_offset": 974676,
+      "symbol": "DATA_007638",
+      "address": 5225836
+    },
+    {
+      "file_offset": 974684,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 974688,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 974732,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 974736,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 974780,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 974784,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 974828,
+      "symbol": "FUNC_001842",
+      "address": 4602012
+    },
+    {
+      "file_offset": 974832,
+      "symbol": "FUNC_001843",
+      "address": 4602404
+    },
+    {
+      "file_offset": 974876,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 974880,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 974924,
+      "symbol": "FUNC_001842",
+      "address": 4602012
+    },
+    {
+      "file_offset": 974928,
+      "symbol": "FUNC_001843",
+      "address": 4602404
+    },
+    {
+      "file_offset": 974972,
+      "symbol": "FUNC_001842",
+      "address": 4602012
+    },
+    {
+      "file_offset": 974976,
+      "symbol": "FUNC_001843",
+      "address": 4602404
+    },
+    {
+      "file_offset": 975020,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 975024,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 975068,
+      "symbol": "FUNC_001844",
+      "address": 4602480
+    },
+    {
+      "file_offset": 975072,
+      "symbol": "FUNC_001836",
+      "address": 4599036
+    },
+    {
+      "file_offset": 975116,
+      "symbol": "FUNC_001845",
+      "address": 4602660
+    },
+    {
+      "file_offset": 975120,
+      "symbol": "FUNC_001836",
+      "address": 4599036
+    },
+    {
+      "file_offset": 975164,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 975168,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 975212,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 975216,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 975260,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 975264,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 975308,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 975312,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 975356,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975360,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975364,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975368,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975372,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975376,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975380,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975384,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975388,
+      "symbol": "FUNC_001850",
+      "address": 4603696
+    },
+    {
+      "file_offset": 975392,
+      "symbol": "FUNC_001851",
+      "address": 4604296
+    },
+    {
+      "file_offset": 975396,
+      "symbol": "FUNC_001852",
+      "address": 4604912
+    },
+    {
+      "file_offset": 975400,
+      "symbol": "FUNC_001853",
+      "address": 4605524
+    },
+    {
+      "file_offset": 975404,
+      "symbol": "FUNC_001854",
+      "address": 4606208
+    },
+    {
+      "file_offset": 975408,
+      "symbol": "FUNC_001855",
+      "address": 4606908
+    },
+    {
+      "file_offset": 975412,
+      "symbol": "FUNC_001856",
+      "address": 4607608
+    },
+    {
+      "file_offset": 975416,
+      "symbol": "FUNC_001857",
+      "address": 4608320
+    },
+    {
+      "file_offset": 975420,
+      "symbol": "FUNC_001858",
+      "address": 4609092
+    },
+    {
+      "file_offset": 975424,
+      "symbol": "FUNC_001859",
+      "address": 4610124
+    },
+    {
+      "file_offset": 975428,
+      "symbol": "FUNC_001860",
+      "address": 4611176
+    },
+    {
+      "file_offset": 975432,
+      "symbol": "FUNC_001861",
+      "address": 4612224
+    },
+    {
+      "file_offset": 975436,
+      "symbol": "FUNC_001862",
+      "address": 4613284
+    },
+    {
+      "file_offset": 975440,
+      "symbol": "FUNC_001863",
+      "address": 4614416
+    },
+    {
+      "file_offset": 975444,
+      "symbol": "FUNC_001864",
+      "address": 4615564
+    },
+    {
+      "file_offset": 975448,
+      "symbol": "FUNC_001865",
+      "address": 4616712
+    },
+    {
+      "file_offset": 975452,
+      "symbol": "FUNC_001866",
+      "address": 4617864
+    },
+    {
+      "file_offset": 975456,
+      "symbol": "FUNC_001866",
+      "address": 4617864
+    },
+    {
+      "file_offset": 975460,
+      "symbol": "FUNC_001866",
+      "address": 4617864
+    },
+    {
+      "file_offset": 975464,
+      "symbol": "FUNC_001866",
+      "address": 4617864
+    },
+    {
+      "file_offset": 975468,
+      "symbol": "FUNC_001867",
+      "address": 4618432
+    },
+    {
+      "file_offset": 975472,
+      "symbol": "FUNC_001867",
+      "address": 4618432
+    },
+    {
+      "file_offset": 975476,
+      "symbol": "FUNC_001867",
+      "address": 4618432
+    },
+    {
+      "file_offset": 975480,
+      "symbol": "FUNC_001867",
+      "address": 4618432
+    }
+  ]
+}

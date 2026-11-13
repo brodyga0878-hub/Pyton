@@ -3,7 +3,7 @@ extends SceneTree
 # classifier formula is used to construct an expected transition in this test.
 const Core=preload("res://scripts/source_spherical_contact.gd")
 const FIXTURE:="res://tests/fixtures/source_spherical_contact_native.json"
-const REPORT:="res://validation/spherical-2026-11-08/source-spherical-contact-core.json"
+const REPORT:="res://build/current-test-reports/source-spherical-contact-core.json"
 var checks:=0
 var failures:=0
 var domains:Dictionary={}

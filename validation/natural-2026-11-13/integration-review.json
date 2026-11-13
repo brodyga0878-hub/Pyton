@@ -1,0 +1,270 @@
+{
+  "schema": 1,
+  "reviewed_at_utc": "2026-11-13T12:01:29.626463+00:00",
+  "status": "bounded_review_passed_with_live_alignment_and_device_limits_open",
+  "scope": "Independent code/source review of the read-only authored-centre natural probe, raw classifier/pipeline composition and diagnostic collection; limited executed desktop checks are identified separately. No new live contact response, original bank/dispatcher parity, native combined F576-to-F575 execution or Android performance proof.",
+  "source_sha256": {
+    "scripts/main.gd": "91e21ef682be19fe07ce4ac970829bb01f767b6e9eab551d8f248706f0f43a82",
+    "scripts/source_natural_contact_probe.gd": "ee163acac97707333e5b8234987dd82a071791b36a92c3c518ad32fc1ee6977c",
+    "scripts/source_natural_contact.gd": "e6cb189d34dc4d434b10f9fc2ef43bf8b96433845c01673f79b4d9592446658f",
+    "scripts/source_natural_contact_pipeline.gd": "8d981b53f301dd375f22faae89a439673a3f94a98278cbb2161075a85ae125be",
+    "scripts/source_surface_contact.gd": "fcfb6077f0bcabf7b6ffce98c3a3dbb23251a850175be4ef241b299fdf8d117d",
+    "scripts/source_surface_contact_bridge.gd": "f83bbecc35c60bfaf79cf2314d067f997b966258665a41a93f082534ba7dfdd9",
+    "scripts/source_spherical_contact_probe.gd": "dc320da753e778e6ebd69c01ea60a15c37df6cceceaf0fe93289c0fe95846883",
+    "scripts/source_fuel_contact.gd": "0f8d5defba15db89d02c5253c988a2a5680d7a16058296b91d262017d5a49903",
+    "scripts/source_surface_render_state.gd": "91eca62418b0f3bf48d10cf1af9286688e9cd8b0ab6a214c77df9070396465f4",
+    "scripts/source_surface_terrain.gd": "5c2939f5dae7adfa08e7591980612d6e53fd6fcdcf321850d00d388982024a17",
+    "scripts/source_ground_surface.gd": "e9db09fbd9c9e8a70bfba771b79627bbba6313d86b3efe781fba7b93a29e7ee7",
+    "scripts/game_diagnostics.gd": "ec43f79d0971680225f0555ac9d7f6e60f41806257bae7e9c1bff8a4f73c0fc3",
+    "tests/test_source_natural_contact_pipeline.gd": "fd0853757b6c9b0daa45ad6a89c48138eb2eb8a840f5282f80de9daca5196d7f",
+    "tests/test_source_natural_contact_main.gd": "ae1c26760dd86e39231725f50568b26260f32329913fd9b4a8a2d68288821d34",
+    "tests/test_source_natural_contact_probe.gd": "fa9e3f57960532e36d9b9b0b8a4996e0d4bfd6aa5282b18c165878eb50712343",
+    "tests/test_source_contact_main.gd": "4fe5094f251decdf18453c41386af507c980f658c623fb8507076310c07bbfbd",
+    "tests/test_source_gear_main.gd": "1cbbb9ac45692058d24dfdc5cda0bc532fe5633a282fd5493a8fb72aeadecfa3",
+    "tests/test_source_thermal_main.gd": "cc413076aeff8c13d2cbd0d1ebbce8ad1acd185b3dadef73385aa7704aaf0f6b",
+    "tests/test_source_fuel_main.gd": "31ddac2cab1eaeea39ddd8e222bf25a2b61429ae40ba25e2b8dfddee2ab1d70e",
+    "tests/test_source_hyperdrive_main.gd": "84f688bd98c73d50be2e3998f0780ff0ba44fa249aa10bd315840b6c6ec0f465",
+    "data/ffe_natural_contact.json": "0074a49df9f22879a4eefbef6dda183cbb517243792dd8d086cb782c2da5603e",
+    "data/ffe_spherical_contact.json": "e0fe32fe24ec2a0bb036aca3ee2afd1cb890bee1a976ffe58ffbee68ce42a07f",
+    "data/ffe_ground_collision.json": "2dbf44a94422907b1bb29b34df1d795cef819cecf267b1591f3d82ea6326d018",
+    "tests/fixtures/source_natural_contact_native.json": "d4ce0cf3ebfe0fd3bb1f263d047fa3a17ffc5201b8040389fdbddcc21a50e166",
+    "scripts/body_rotation.gd": "b5d4e63331728681d1f34c73fe83cdd57120e29b352e09090da4ff147b22ed34",
+    "scripts/source_station_geometry.gd": "5785d288a3a0582dc4f06db53fad4b6d52446d3d476adc894fa9b7624cf69b94",
+    "scripts/source_clock.gd": "b2d206a9e2e6db21635fe37d6f61ba75d2fb9f56d92f8851a77c9b11fc4dbe09",
+    "tools/rebuild_source_natural_contact_native.py": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889"
+  },
+  "original_sources": {
+    "firstenc_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+    "ffe_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+    "procedures": {
+      "F575": {
+        "normalized_fragment_sha256": "ad2a7ac22884f99734fcb094a5df30192ac71d6aa74bccd267f6466771d62f4c",
+        "fragment_policy": "LF-normalized procedure label through before next FUNC label"
+      },
+      "F576": {
+        "normalized_fragment_sha256": "5d4daa1676f398523e54e7c913d54e61451e2b637c74e6b6f434307ce509f369",
+        "fragment_policy": "LF-normalized procedure label through before next FUNC label"
+      },
+      "F579": {
+        "normalized_fragment_sha256": "ef005e60122c0f32f94c6919d191e53603849c830079bef25c0dae8f6830d7f6",
+        "fragment_policy": "LF-normalized procedure label through before next FUNC label"
+      },
+      "F581": {
+        "normalized_fragment_sha256": "31118462454be4303dd7df4980297500c9d6130b5935d514b7a4b7f4656ad8a9",
+        "fragment_policy": "LF-normalized procedure label through before next FUNC label"
+      },
+      "F582": {
+        "normalized_fragment_sha256": "447135fdfad91cff851d61b72957f1a4f620226f26cc525dd3d36dfcf3b4b2db",
+        "fragment_policy": "LF-normalized procedure label through before next FUNC label"
+      },
+      "F1519": {
+        "normalized_fragment_sha256": "1dcfe66d82fc103e68f83c09115c3da8722a26e5d410fa5c429dfe996cd845e5",
+        "fragment_policy": "LF-normalized procedure label through before next FUNC label"
+      },
+      "F1520": {
+        "normalized_fragment_sha256": "abe21e37baa4a3bbb381e07c7ebdc33acac52e0f14c5698b33ef518fb67d7c27",
+        "fragment_policy": "LF-normalized procedure label through before next FUNC label"
+      }
+    }
+  },
+  "review_findings": [
+    {
+      "id": "frame_and_Q31",
+      "status": "reviewed_and_limited_desktop_checked",
+      "finding": "Envelope relative positions are already bodyfixed. Surface orientation uses the matching actual tangent basis; orbital orientation builds the inverse copied source-rotation basis with correct row-to-column conversion. Shared contact helper applies proper local yaw(pi), scalar-double axis conversion and source F1520. F1519 literal0x3f800000 intentionally produces non-unit raw matrix norms; retained raw determinant about0.969 is source behavior, not a unit-matrix claim.",
+      "executed_direction_cases": 27,
+      "evidence_functions": [
+        "source_natural_contact_probe._orientation",
+        "source_spherical_contact_probe._space_point",
+        "source_surface_contact_bridge.contact_orientation_q31",
+        "source_ground_surface._normalize_vector",
+        "source_ground_surface._orthonormalize",
+        "original F1519/F1520"
+      ],
+      "phone_rotation_boundary": "The shared source rotation adapter exports StationGeometry.orientation_basis, which orthonormalizes the copied Q31 rotation into a phone Basis. This is a declared phone-frame adapter, not a claim of exact raw F570 frame selection."
+    },
+    {
+      "id": "object_fields",
+      "status": "code_and_metadata_reviewed",
+      "finding": "Probe uses player1,parent2 and player56=2/player57=1, so F579 legitimately skips parent transpose. Player and parent initial14c flags and descriptor radii are read from source metadata; parent+a0 receives the original record UID at offset4. The source parent matrix is explicit identity in this isolated bodyfixed frame; this does not establish a real F570 object-bank frame selection."
+    },
+    {
+      "id": "raw_coords_and_mesh_scope",
+      "status": "reviewed",
+      "finding": "Probe deliberately uses the current authored phone centre with no clearance/AGL/origin correction. Its own code does not call Surface height/clearance/published mesh/saved contact patch providers. Returned altitude describes original F581, not phone AGL. Model117 rendering caller corrections do not replace original parent bounds."
+    },
+    {
+      "id": "state_and_effects",
+      "status": "code_review_and_limited_desktop_checked",
+      "finding": "Classifier uses private object/vector copies and isolated query state; probe exposes compact primitive facts rather than body buffers or damage/landing commands. Ephemeris and body-spin advancement use scratch/copies. Main adds the probe only to existing diagnostics. Timed probe, Main diagnostic samples and report creation preserve the protected gameplay model/HP/RNG/fuel/time snapshots; report creation intentionally writes private diagnostic ZIPs and changes its UI/report state."
+    },
+    {
+      "id": "pipeline_dispatch",
+      "status": "reviewed_and_separately_tested",
+      "finding": "Pipeline requires all raw caller globals including low/high previous words; no F574 reset is supplied. F576 nonzero returns succeed without F575 response or damage. Return0+kind0 rejects unsupported F578 atomically; return0+kind1 composes the separately proved continuation using original unshifted relative vector and exact native previous altitude. Unsupported-kind guards are explicit synthetic tests, not native observations of those branches. No phone interpretation is introduced."
+    },
+    {
+      "id": "query_scheduling",
+      "status": "limited_desktop_observed_device_limit_open",
+      "finding": "Main samples synchronously on the existing two-second diagnostic logger path and again when collecting fresh report context. Compact output limits log size but does not make F1876 asynchronous. Limited prepared-world Cobra observations are recorded below; they do not bound all models, terrain styles, workloads, devices or frame-time spikes."
+    },
+    {
+      "id": "height_alignment",
+      "status": "open_for_next_block",
+      "finding": "The existing model120 Point/F581 observation disagrees with the renderer/provider height. That observation is a Godot source-kernel numerical probe, not an executed combined native response proof. This block retains the old provider-based live contact bridge. Native/read-only kind1 results do not authorize a live mesh contact or landing."
+    }
+  ],
+  "executed_desktop_review": {
+    "checks": 75,
+    "duration_scope": "one managed desktop headless Godot process; limited repeated observations only; not S23/Android timing, frame-rate, complete workload or thermal proof",
+    "failures": 0,
+    "orientation": {
+      "cases": 27,
+      "immutable": true,
+      "max_axis_direction_distance": 1.97686247815909e-07,
+      "max_axis_distance": 0.015564227476716,
+      "min_determinant": 0.969114243984222
+    },
+    "report_collection": [
+      {
+        "microseconds_including_awaited_process_frame": 13110,
+        "ok": true,
+        "report_bytes": 6312
+      },
+      {
+        "microseconds_including_awaited_process_frame": 10560,
+        "ok": true,
+        "report_bytes": 6411
+      },
+      {
+        "microseconds_including_awaited_process_frame": 10771,
+        "ok": true,
+        "report_bytes": 6431
+      }
+    ],
+    "report_model_state_unchanged": true,
+    "timings": [
+      {
+        "actual_Main_flight_sample_microseconds": [
+          6837,
+          6037,
+          5964
+        ],
+        "case": "actual_earth_orbital_5000m",
+        "direct_probe_microseconds": [
+          11895,
+          5018,
+          5470,
+          5177,
+          5073
+        ],
+        "direct_query_calls": [
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "first_sample_policy": "first call for this observer; shared resource caches may already be warm",
+        "unchanged_model_state": true
+      },
+      {
+        "actual_Main_flight_sample_microseconds": [
+          5139,
+          4764,
+          4852
+        ],
+        "case": "actual_earth_active_source_surface",
+        "direct_probe_microseconds": [
+          4158,
+          4115,
+          4278,
+          4014,
+          4068
+        ],
+        "direct_query_calls": [
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "first_sample_policy": "first call for this observer; shared resource caches may already be warm",
+        "unchanged_model_state": true
+      },
+      {
+        "actual_Main_flight_sample_microseconds": [
+          6298,
+          6325,
+          6299
+        ],
+        "case": "actual_mercury_orbital_5000m",
+        "direct_probe_microseconds": [
+          5373,
+          5162,
+          5084,
+          5130,
+          5030
+        ],
+        "direct_query_calls": [
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "first_sample_policy": "first call for this observer; shared resource caches may already be warm",
+        "unchanged_model_state": true
+      },
+      {
+        "actual_Main_flight_sample_microseconds": [
+          4502,
+          4528,
+          4436
+        ],
+        "case": "actual_mercury_active_source_surface",
+        "direct_probe_microseconds": [
+          4389,
+          3816,
+          3531,
+          3701,
+          3825
+        ],
+        "direct_query_calls": [
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "first_sample_policy": "first call for this observer; shared resource caches may already be warm",
+        "unchanged_model_state": true
+      }
+    ]
+  },
+  "execution_harness": {
+    "path_at_execution": "/tmp/starfrontier_natural_integration_review.gd",
+    "sha256": "df57c9c802748e288fb21d39adcdd7e5f7cd828fbb1c09b2b7a2080622264ca0",
+    "source": "extends \"res://tests/test_source_natural_contact_main.gd\"\nconst ReviewFuel=preload(\"res://scripts/source_fuel_contact.gd\")\nvar review_timings:Array=[]\nvar review_orientation:={\"cases\":0,\"max_axis_distance\":0.0,\"max_axis_direction_distance\":0.0,\"min_determinant\":1.0,\"immutable\":true}\nfunc measure_case(label:String)->void:\n var before:=live_natural_state();var samples:Array=[];var calls:Array=[]\n for index in range(5):\n  var started:=Time.get_ticks_usec();var value:=NaturalProbe.sample(game.world,game.ship,game.surface,game.nav.elapsed_days);var elapsed:=Time.get_ticks_usec()-started\n  check(value.get(\"ok\",false),\"Review direct query succeeds \"+label);samples.append(elapsed);calls.append(value.get(\"terrain_query_calls\",-1))\n check(live_natural_state()==before,\"Review timed direct query is immutable \"+label)\n var main_samples:Array=[]\n for index in range(3):\n  var started:=Time.get_ticks_usec();game._flight_diagnostic_sample();main_samples.append(Time.get_ticks_usec()-started)\n check(live_natural_state()==before,\"Review timed Main sample is immutable \"+label)\n review_timings.append({\"case\":label,\"direct_probe_microseconds\":samples,\"direct_query_calls\":calls,\"actual_Main_flight_sample_microseconds\":main_samples,\"first_sample_policy\":\"first call for this observer; shared resource caches may already be warm\",\"unchanged_model_state\":live_natural_state()==before})\nfunc orientation_cases()->void:\n var original_attitude:Quaternion=game.ship.attitude\n var before:=live_natural_state()\n for body_id:String in [\"earth\",\"mercury\",\"star\"]:\n  var body:Dictionary=game.world.by_id[body_id]\n  for days:float in [0.0,0.25,17.25]:\n   var rotation:=ReviewFuel._basis_readonly(game.world,body,days)\n   for euler:Vector3 in [Vector3.ZERO,Vector3(0.23,-0.91,0.61),Vector3(-1.3,2.1,0.7)]:\n    game.ship.attitude=Quaternion.from_euler(euler)\n    var matrix:=NaturalProbe._orientation(game.world,game.ship,null,body,days)\n    var actual:=Basis(Vector3(matrix[0],matrix[1],matrix[2])/2147483648.0,Vector3(matrix[3],matrix[4],matrix[5])/2147483648.0,Vector3(matrix[6],matrix[7],matrix[8])/2147483648.0)\n    var local:Basis=rotation.basis.inverse()*Basis(game.ship.attitude)\n    var distance:=maxf(actual.x.distance_to(-local.x),maxf(actual.y.distance_to(local.y),actual.z.distance_to(-local.z)))\n    var direction_distance:=maxf(actual.x.normalized().distance_to(-local.x.normalized()),maxf(actual.y.normalized().distance_to(local.y.normalized()),actual.z.normalized().distance_to(-local.z.normalized())))\n    review_orientation.cases+=1;review_orientation.max_axis_distance=maxf(review_orientation.max_axis_distance,distance);review_orientation.max_axis_direction_distance=maxf(review_orientation.max_axis_direction_distance,direction_distance);review_orientation.min_determinant=minf(review_orientation.min_determinant,actual.determinant())\n    check(direction_distance<0.00001 and actual.determinant()>0.9,\"Review source Q31 matrix follows the same inverse rotating body frame and proper local yaw(pi)\")\n game.ship.attitude=original_attitude\n review_orientation.immutable=live_natural_state()==before\n check(review_orientation.immutable,\"Review rotation advance remains isolated from live spin and ephemeris\")\nfunc run()->void:\n if not \"--rebuild-capture\" in OS.get_cmdline_user_args():quit(1);return\n root.size=Vector2i(1440,720);game=load(\"res://scenes/main.tscn\").instantiate();game.settings=MemorySettings.new();root.add_child(game);game.set_process(false);game.set_physics_process(false);await frame();initialize_probe_diagnostics()\n for body_id:String in [\"earth\",\"mercury\"]:\n  fresh();game.settings.orbital_gravity=false;stage_natural(body_id,5000,0)\n  measure_case(\"actual_\"+body_id+\"_orbital_5000m\")\n  if body_id==\"earth\":orientation_cases()\n  await game._enter_surface();check(game.surface.active,\"Review actual source surface entry\")\n  if game.surface.active:measure_case(\"actual_\"+body_id+\"_active_source_surface\")\n fresh();game.settings.orbital_gravity=false;stage_natural(\"mercury\",5000,0)\n var before:=live_natural_state();var reports:Array=[]\n game.report_draft=\"Private desktop duration review\";game.report_include_save=false\n for index in range(3):\n  var started:=Time.get_ticks_usec();await game._create_bug_report(false);reports.append({\"microseconds_including_awaited_process_frame\":Time.get_ticks_usec()-started,\"ok\":game.current_report.get(\"ok\",false),\"report_bytes\":game.current_report.get(\"report_bytes\",0)})\n  check(game.current_report.get(\"ok\",false),\"Review actual report collector succeeds\")\n check(live_natural_state()==before,\"Review actual report collection preserves model/HP/RNG/fuel/time state\")\n var report:={\"checks\":checks,\"failures\":failures,\"timings\":review_timings,\"orientation\":review_orientation,\"report_collection\":reports,\"report_model_state_unchanged\":live_natural_state()==before,\"duration_scope\":\"one managed desktop headless Godot process; limited repeated observations only; not S23/Android timing, frame-rate, complete workload or thermal proof\"}\n var file:=FileAccess.open(\"/tmp/starfrontier-natural-integration-review-execution.json\",FileAccess.WRITE);file.store_string(JSON.stringify(report,\"  \"));file.close()\n print(\"INTEGRATION REVIEW: \",JSON.stringify(report));game.queue_free();await frame();quit(1 if failures else 0)\n",
+    "invocation": "XDG_DATA_HOME=/tmp/starfrontier-natural-integration-review godot --headless --path /workspace/Pyton --script /tmp/starfrontier_natural_integration_review.gd -- --rebuild-capture",
+    "ordinary_progress_saving_enabled": false,
+    "render_device": "headless managed desktop",
+    "harness_adjustment_note": "Initial private review assertion incorrectly required exact unit matrix norm after source F1520, and did not restore its original fixture attitude; corrected private harness compares normalized axis directions, preserves source raw norm and restores the original attitude. The clean rerun has zero failures."
+  },
+  "native_fixture_observed": {
+    "case_count": 993,
+    "fixture_sha256": "d4ce0cf3ebfe0fd3bb1f263d047fa3a17ffc5201b8040389fdbddcc21a50e166",
+    "generator_sha256": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889",
+    "review_reran_native_executor": false,
+    "combined_native_chain_executed": false,
+    "native_agent_declared_final": true
+  },
+  "limits": [
+    "No physical Samsung S23 Ultra/Android execution or timing.",
+    "Prepared world/resource caches are outside timing; first natural-probe invocation is not whole-application cold start.",
+    "Report wall durations include the existing awaited process frame.",
+    "No comprehensive performance benchmark, FPS or thermal claim.",
+    "Full F569/F570 source object bank, F578 and general collision VM remain unsupported.",
+    "Read-only probe does not resolve renderer/source contact-height disagreement."
+  ]
+}

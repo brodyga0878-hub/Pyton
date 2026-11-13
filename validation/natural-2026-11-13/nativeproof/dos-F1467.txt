@@ -1,0 +1,56 @@
+00451007: push ebp
+00451008: mov ebp,esp
+0045100a: mov eax,DWORD PTR [ebp+0x8]
+0045100d: cmp eax,0x4000000
+00451012: jae 0x45107f
+00451014: cmp eax,0x400000
+00451019: jb 0x45102b
+0045101b: shr eax,0xf
+0045101e: movzx eax,WORD PTR [eax*2+0x516590]
+00451026: sar eax,0x3
+00451029: pop ebp
+0045102a: ret 
+0045102b: cmp eax,0x40000
+00451030: jb 0x451042
+00451032: shr eax,0xb
+00451035: movzx eax,WORD PTR [eax*2+0x516590]
+0045103d: sar eax,0x5
+00451040: pop ebp
+00451041: ret 
+00451042: cmp eax,0x4000
+00451047: jb 0x451059
+00451049: shr eax,0x7
+0045104c: movzx eax,WORD PTR [eax*2+0x516590]
+00451054: sar eax,0x7
+00451057: pop ebp
+00451058: ret 
+00451059: cmp eax,0x400
+0045105e: jb 0x451070
+00451060: shr eax,0x3
+00451063: movzx eax,WORD PTR [eax*2+0x516590]
+0045106b: sar eax,0x9
+0045106e: pop ebp
+0045106f: ret 
+00451070: add eax,eax
+00451072: movzx eax,WORD PTR [eax*2+0x516590]
+0045107a: sar eax,0xb
+0045107d: pop ebp
+0045107e: ret 
+0045107f: cmp eax,0x40000000
+00451084: jb 0x451093
+00451086: shr eax,0x15
+00451089: movzx eax,WORD PTR [eax*2+0x516590]
+00451091: pop ebp
+00451092: ret 
+00451093: cmp eax,0x10000000
+00451098: jb 0x4510a9
+0045109a: shr eax,0x13
+0045109d: movzx eax,WORD PTR [eax*2+0x516590]
+004510a5: sar eax,1
+004510a7: pop ebp
+004510a8: ret 
+004510a9: shr eax,0x11
+004510ac: movzx eax,WORD PTR [eax*2+0x516590]
+004510b4: sar eax,0x2
+004510b7: pop ebp
+004510b8: ret 

@@ -1,0 +1,74 @@
+00459c58: push ebp
+00459c59: mov ebp,esp
+00459c5b: push ebx
+00459c5c: push esi
+00459c5d: push edi
+00459c5e: mov edx,DWORD PTR [ebp+0xc]
+00459c61: mov eax,DWORD PTR [ebp+0x8]
+00459c64: test edx,edx
+00459c66: je 0x459d04
+00459c6c: cmp edx,0x20
+00459c6f: jge 0x459cc0
+00459c71: mov ebx,0x20
+00459c76: sub ebx,edx
+00459c78: mov ecx,ebx
+00459c7a: mov esi,DWORD PTR [eax+0x4]
+00459c7d: shl esi,cl
+00459c7f: mov ecx,edx
+00459c81: mov edi,DWORD PTR [eax]
+00459c83: shr edi,cl
+00459c85: or esi,edi
+00459c87: mov DWORD PTR [eax],esi
+00459c89: mov ecx,edx
+00459c8b: sar DWORD PTR [eax+0x4],cl
+00459c8e: mov ecx,ebx
+00459c90: mov esi,DWORD PTR [eax+0xc]
+00459c93: shl esi,cl
+00459c95: mov ecx,edx
+00459c97: mov edi,DWORD PTR [eax+0x8]
+00459c9a: shr edi,cl
+00459c9c: or esi,edi
+00459c9e: mov DWORD PTR [eax+0x8],esi
+00459ca1: mov ecx,edx
+00459ca3: sar DWORD PTR [eax+0xc],cl
+00459ca6: mov ecx,ebx
+00459ca8: mov ebx,DWORD PTR [eax+0x14]
+00459cab: shl ebx,cl
+00459cad: mov ecx,edx
+00459caf: mov esi,DWORD PTR [eax+0x10]
+00459cb2: shr esi,cl
+00459cb4: or ebx,esi
+00459cb6: mov DWORD PTR [eax+0x10],ebx
+00459cb9: mov ecx,edx
+00459cbb: sar DWORD PTR [eax+0x14],cl
+00459cbe: jmp 0x459d04
+00459cc0: cmp edx,0x20
+00459cc3: jle 0x459ce7
+00459cc5: lea ebx,[edx-0x20]
+00459cc8: mov ecx,ebx
+00459cca: mov esi,DWORD PTR [eax+0x4]
+00459ccd: sar esi,cl
+00459ccf: mov DWORD PTR [eax],esi
+00459cd1: mov ecx,ebx
+00459cd3: mov esi,DWORD PTR [eax+0xc]
+00459cd6: sar esi,cl
+00459cd8: mov DWORD PTR [eax+0x8],esi
+00459cdb: mov ecx,ebx
+00459cdd: mov edx,DWORD PTR [eax+0x14]
+00459ce0: sar edx,cl
+00459ce2: mov DWORD PTR [eax+0x10],edx
+00459ce5: jmp 0x459cf8
+00459ce7: mov edx,DWORD PTR [eax+0x4]
+00459cea: mov DWORD PTR [eax],edx
+00459cec: mov edx,DWORD PTR [eax+0xc]
+00459cef: mov DWORD PTR [eax+0x8],edx
+00459cf2: mov edx,DWORD PTR [eax+0x14]
+00459cf5: mov DWORD PTR [eax+0x10],edx
+00459cf8: sar DWORD PTR [eax+0x4],0x1f
+00459cfc: sar DWORD PTR [eax+0xc],0x1f
+00459d00: sar DWORD PTR [eax+0x14],0x1f
+00459d04: pop edi
+00459d05: pop esi
+00459d06: pop ebx
+00459d07: pop ebp
+00459d08: ret 

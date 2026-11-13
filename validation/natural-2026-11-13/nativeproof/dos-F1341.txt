@@ -1,0 +1,57 @@
+0044e958: push ebp
+0044e959: mov ebp,esp
+0044e95b: push ebx
+0044e95c: push esi
+0044e95d: mov eax,DWORD PTR [ebp+0xc]
+0044e960: mov edx,DWORD PTR [ebp+0x8]
+0044e963: test eax,eax
+0044e965: je 0x44e9d3
+0044e967: test eax,eax
+0044e969: jge 0x44e99f
+0044e96b: neg eax
+0044e96d: cmp eax,0x20
+0044e970: jge 0x44e98f
+0044e972: mov ecx,eax
+0044e974: mov ebx,DWORD PTR [edx]
+0044e976: shr ebx,cl
+0044e978: mov ecx,0x20
+0044e97d: sub ecx,eax
+0044e97f: mov esi,DWORD PTR [edx+0x4]
+0044e982: shl esi,cl
+0044e984: or ebx,esi
+0044e986: mov DWORD PTR [edx],ebx
+0044e988: mov ecx,eax
+0044e98a: sar DWORD PTR [edx+0x4],cl
+0044e98d: jmp 0x44e9d3
+0044e98f: lea ecx,[eax-0x20]
+0044e992: mov eax,DWORD PTR [edx+0x4]
+0044e995: sar eax,cl
+0044e997: mov DWORD PTR [edx],eax
+0044e999: sar DWORD PTR [edx+0x4],0x1f
+0044e99d: jmp 0x44e9d3
+0044e99f: test eax,eax
+0044e9a1: jle 0x44e9d3
+0044e9a3: cmp eax,0x20
+0044e9a6: jge 0x44e9c5
+0044e9a8: mov ecx,eax
+0044e9aa: mov ebx,DWORD PTR [edx+0x4]
+0044e9ad: shl ebx,cl
+0044e9af: mov ecx,0x20
+0044e9b4: sub ecx,eax
+0044e9b6: mov esi,DWORD PTR [edx]
+0044e9b8: shr esi,cl
+0044e9ba: or ebx,esi
+0044e9bc: mov DWORD PTR [edx+0x4],ebx
+0044e9bf: mov ecx,eax
+0044e9c1: shl DWORD PTR [edx],cl
+0044e9c3: jmp 0x44e9d3
+0044e9c5: lea ecx,[eax-0x20]
+0044e9c8: mov eax,DWORD PTR [edx]
+0044e9ca: shl eax,cl
+0044e9cc: mov DWORD PTR [edx+0x4],eax
+0044e9cf: xor eax,eax
+0044e9d1: mov DWORD PTR [edx],eax
+0044e9d3: pop esi
+0044e9d4: pop ebx
+0044e9d5: pop ebp
+0044e9d6: ret 

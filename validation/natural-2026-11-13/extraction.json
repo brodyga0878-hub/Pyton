@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "profile": "natural-contact-extraction-v1",
+  "success": true,
+  "test_count": 17,
+  "tests": [
+    {
+      "name": "test_extract_natural_contact.NaturalContactExtraction.test_actual_positive_ship_radii_use_signed_descriptor_bounds_and_f1495_scale",
+      "status": "passed"
+    },
+    {
+      "name": "test_extract_natural_contact.NaturalContactExtraction.test_all32_natural_programs_reference_immutable_complete_source_bytes",
+      "status": "passed"
+    },
+    {
+      "name": "test_extract_natural_contact.NaturalContactExtraction.test_axis6_is_explicitly_unsupported_instead_of_inventing_a_matrix_row",
+      "status": "passed"
+    },
+    {
+      "name": "test_extract_natural_contact.NaturalContactExtraction.test_changed_executable_assembly_or_data_cannot_enter_resource",
+      "status": "passed"
+    },
+    {
+      "name": "test_extract_natural_contact.NaturalContactExtraction.test_child_axes_signs_and_displacements_are_separate_from_child_radius",
+      "status": "passed"
+    },
+    {
+      "name": "test_extract_natural_contact.NaturalContactExtraction.test_code45_portable_baseline_contains_all26_exact_audited_sources",
+      "status": "passed"
+    },
+    {
+      "name": "test_extract_natural_contact.NaturalContactExtraction.test_decoder_preserves_negative_signed_displacement_and_encoded_word",
+      "status": "passed"
+    },
+    {
+      "name": "test_extract_natural_contact.NaturalContactExtraction.test_decoder_rejects_truncated_missing_terminator_and_oversized_child_lists",
+      "status": "passed"
+    },
+    {
+      "name": "test_extract_natural_contact.NaturalContactExtraction.test_every_new_ship_byte_and_parent_index_matches_actual_mapped_dos_pointer",
+      "status": "passed"
+    },
+    {
+      "name": "test_extract_natural_contact.NaturalContactExtraction.test_four_previous_resources_remain_byte_exact",
+      "status": "passed"
+    },
+    {
+      "name": "test_extract_natural_contact.NaturalContactExtraction.test_model117_retains_nonspherical_provenance_without_a_generic_caller_claim",
+      "status": "passed"
+    },
+    {
+      "name": "test_extract_natural_contact.NaturalContactExtraction.test_mutated_descriptor_spec_and_unreviewed_child_bytes_reject",
+      "status": "passed"
+    },
+    {
+      "name": "test_extract_natural_contact.NaturalContactExtraction.test_natural_decoder_rejects_opcode_tail_and_feature_truncation",
+      "status": "passed"
+    },
+    {
+      "name": "test_extract_natural_contact.NaturalContactExtraction.test_natural_program_decoder_retains_feature_records_and_actual_return_tail",
+      "status": "passed"
+    },
+    {
+      "name": "test_extract_natural_contact.NaturalContactExtraction.test_preceding_child_bytes_include_real_terminator_and_traversal_order",
+      "status": "passed"
+    },
+    {
+      "name": "test_extract_natural_contact.NaturalContactExtraction.test_reextraction_is_byte_exact_and_any_changed_previous_resource_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_extract_natural_contact.NaturalContactExtraction.test_three_ship_descriptors_and_specs_match_existing_149model_and_hyperdrive_tables",
+      "status": "passed"
+    }
+  ],
+  "failures": [],
+  "errors": [],
+  "skipped": [],
+  "source_sha256": {
+    "tools/verify_rebuilt_android.py": "2fc1bd4172cf978afc8b6a662e8a0562d7c9de6970efd867a3b076ccd84fcd6c",
+    "tools/extract_natural_contact.py": "0c7d562cbeaac2dbbdec71bfcfb572b00869df1d49e5c05d84342eff28d8b3a7",
+    "data/ffe_natural_contact.json": "0074a49df9f22879a4eefbef6dda183cbb517243792dd8d086cb782c2da5603e",
+    "tests/test_natural_contact_packaging.py": "21ced896bcc43288f66308aac3e9c2918364c24d4451e9b36d90662374a2dcf8",
+    "tests/test_extract_natural_contact.py": "4b0febfc4df5261812031f75e8d6687140ce8b1c2ec94944e1041c0795a9d88c",
+    "tests/test_android_full_packaging.py": "d6093db1a586b62ad3f415806181151c24b1b66a314e7a40e6b22469608c35f4",
+    "tests/test_spherical_contact_packaging.py": "de86108eef80960edcd88ae4cbea11c3f09cd0e169d927a8bec4ca449fbf495c",
+    "tests/fixtures/natural_v45_sources.json": "f9511cf774d7a54826a77a71d0ac5a88ae68369e0ed63d6eb8f2717b9a66a60d",
+    "tests/fixtures/source_natural_contact_native.json": "d4ce0cf3ebfe0fd3bb1f263d047fa3a17ffc5201b8040389fdbddcc21a50e166"
+  },
+  "claims": {
+    "mock_GDSC_packaging_only": false,
+    "native_oracle_executed_by_this_runner": false,
+    "Godot_or_Android_executed_by_this_runner": false,
+    "physical_device_tested": false
+  }
+}

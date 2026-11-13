@@ -1,0 +1,161 @@
+{
+	"checks": 112,
+	"evidence": [
+		{
+			"airborne_default_u16": 0,
+			"case": "old_missing_extension_and_present_malformed",
+			"landed_or_docked_default_u16": 65535,
+			"malformed_variants": 6
+		},
+		{
+			"case": "partial_cold_continuation",
+			"continued": {
+				"can_toggle": true,
+				"command_label": "Убрать шасси",
+				"control_flags_u8": 0,
+				"deployed": false,
+				"extension_fraction": 0.18951705195697,
+				"extension_percent": 18.951705195697,
+				"f1014_raw_gear_flag": false,
+				"frame_tick_remainder_raw": 698880,
+				"host_policy": "nominal-day-si-fixed60-source-landing-gear-v1",
+				"initialized": true,
+				"landing_ready": false,
+				"moving": true,
+				"object_timer_u16": 0,
+				"phase_f64_hex": "d478e9263108dc3f",
+				"position_u16": 12420,
+				"requested_down": true,
+				"retract_requested": false,
+				"retracted": false,
+				"source_contract": "dos-firstenc-f1008-f1056-gear-branch-v1",
+				"status_text": "Выпуск 19%",
+				"toggle_reason": "",
+				"warning_latched": false,
+				"warning_text": ""
+			},
+			"partial": {
+				"can_toggle": true,
+				"command_label": "Убрать шасси",
+				"control_flags_u8": 0,
+				"deployed": false,
+				"extension_fraction": 0.0505378805218585,
+				"extension_percent": 5.05378805218585,
+				"f1014_raw_gear_flag": false,
+				"frame_tick_remainder_raw": 186368,
+				"host_policy": "nominal-day-si-fixed60-source-landing-gear-v1",
+				"initialized": true,
+				"landing_ready": false,
+				"moving": true,
+				"object_timer_u16": 0,
+				"phase_f64_hex": "6abc74931804ee3f",
+				"position_u16": 3312,
+				"requested_down": true,
+				"retract_requested": false,
+				"retracted": false,
+				"source_contract": "dos-firstenc-f1008-f1056-gear-branch-v1",
+				"status_text": "Выпуск 5%",
+				"toggle_reason": "",
+				"warning_latched": false,
+				"warning_text": ""
+			},
+			"partial_save": {
+				"control_flags_u8": 0,
+				"frame_tick_remainder_raw": 186368,
+				"host_policy": "nominal-day-si-fixed60-source-landing-gear-v1",
+				"object_timer_u16": 0,
+				"phase_f64_hex": "6abc74931804ee3f",
+				"position_u16": 3312,
+				"schema": "starfrontier-source-landing-gear-session-v1",
+				"source_contract": "dos-firstenc-f1008-f1056-gear-branch-v1",
+				"source_digest": "f06d7184046407dea3ee45fb3c6dedeb6bfaf21fe1a6136a388a87fa97ed1f00",
+				"source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+				"version": 1,
+				"warning_flags_u16": 0
+			}
+		},
+		{
+			"case": "actual_classic_console_pointer_pause_focus",
+			"stale_pointer_replayed": false
+		},
+		{
+			"case": "thermal_raw_bit_not_deployed_flag",
+			"partial": {
+				"can_toggle": true,
+				"command_label": "Убрать шасси",
+				"control_flags_u8": 0,
+				"deployed": false,
+				"extension_fraction": 0.379034103913939,
+				"extension_percent": 37.9034103913939,
+				"f1014_raw_gear_flag": false,
+				"frame_tick_remainder_raw": 1397760,
+				"host_policy": "nominal-day-si-fixed60-source-landing-gear-v1",
+				"initialized": true,
+				"landing_ready": false,
+				"moving": true,
+				"object_timer_u16": 0,
+				"phase_f64_hex": "0000000000000000",
+				"position_u16": 24840,
+				"requested_down": true,
+				"retract_requested": false,
+				"retracted": false,
+				"source_contract": "dos-firstenc-f1008-f1056-gear-branch-v1",
+				"status_text": "Выпуск 38%",
+				"toggle_reason": "",
+				"warning_latched": false,
+				"warning_text": ""
+			},
+			"visual_fraction": 0.379034103913939
+		},
+		{
+			"actual_source_Earth_contact": true,
+			"case": "actual_Main_F1014_requested_raw_bit",
+			"outcomes": [
+				{
+					"actual_heat_s32": 289,
+					"expected_heat_s32": 289,
+					"physical_position_u16": 0,
+					"raw_gear_flag": true,
+					"requested_down": false,
+					"source_speed_s32": 9264
+				},
+				{
+					"actual_heat_s32": 579,
+					"expected_heat_s32": 579,
+					"physical_position_u16": 0,
+					"raw_gear_flag": false,
+					"requested_down": true,
+					"source_speed_s32": 9264
+				}
+			]
+		},
+		{
+			"case": "request_guard_before_first_source_frame",
+			"physical_word_u16": 65535,
+			"policy": "phone landing requires full physical extension plus deployment request; additional host policy, not the whole original F575 response"
+		},
+		{
+			"case": "actual_source_floor_gear_native_rebound_and_recovery",
+			"final_agl_m": 1.93580101537111,
+			"full_original_F575_collision_claim": false,
+			"geometry_provider_is_phone_adapter": true,
+			"hull_percent": 75.0,
+			"initial_native_agl_m": 0.0000368125448577672,
+			"response_policy": "dos-firstenc-f575-postclassification-player-contact-v1"
+		}
+	],
+	"failures": 0,
+	"schema": 1,
+	"scope": "Retained managed-gear regression on current0.19 Main: classic-console touch/pause/focus, original bounded F575 rebound and existing F953 HP, automatic recovery, source-fraction visuals and old/partial/invalid saves. Original0.18 evidence is unchanged; current reports write only under contact. Explicit observer placement; no manual landing, physical Android, complete original collision classifier or performance benchmark claim.",
+	"sources": {
+		"scripts/flight_console.gd": "0a9fe99fd5e4f2cfb276e476a8a12c141cbb9b74a92cd246c4dcfa9cc4180c54",
+		"scripts/main.gd": "91e21ef682be19fe07ce4ac970829bb01f767b6e9eab551d8f248706f0f43a82",
+		"scripts/ship_visual.gd": "5c175408f1687ecb440296e62051884a79503a4903965d16bd8dbba66934dd88",
+		"scripts/source_landing_gear.gd": "0a65184b0e02f6a578e9d4bc12124a87585241e25598020b351494059af05b6a",
+		"scripts/source_landing_gear_session.gd": "ba8b63cbf89f30441f0bdfe01ed51af3a7e0e4679451264826039dd7b65887a0",
+		"scripts/source_surface_contact.gd": "fcfb6077f0bcabf7b6ffce98c3a3dbb23251a850175be4ef241b299fdf8d117d",
+		"scripts/source_surface_contact_bridge.gd": "f83bbecc35c60bfaf79cf2314d067f997b966258665a41a93f082534ba7dfdd9",
+		"scripts/surface_model.gd": "449155f904b72e6c97e430b90b78d1859c6d6a27017f297620552e5094eb32ff",
+		"tests/test_source_gear_main.gd": "1cbbb9ac45692058d24dfdc5cda0bc532fe5633a282fd5493a8fb72aeadecfa3"
+	}
+}

@@ -4,7 +4,7 @@ extends "res://tests/test_source_spherical_contact.gd"
 # unsupported F576/F578 branches are never supplied a fabricated response.
 const Pipeline=preload("res://scripts/source_spherical_contact_pipeline.gd")
 const CHAIN_FIXTURE:="res://tests/fixtures/source_spherical_contact_pipeline_native.json"
-const CHAIN_REPORT:="res://validation/spherical-2026-11-08/source-spherical-pipeline.json"
+const CHAIN_REPORT:="res://build/current-test-reports/source-spherical-pipeline.json"
 var chain_domains:Dictionary={}
 var chain_branches:Dictionary={}
 var chain_evidence:Array=[]

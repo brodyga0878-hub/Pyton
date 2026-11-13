@@ -1,0 +1,358 @@
+0046584c: push ebp
+0046584d: mov ebp,esp
+0046584f: add esp,0xffffffec
+00465852: push ebx
+00465853: push esi
+00465854: push edi
+00465855: mov ebx,DWORD PTR [ebp+0x8]
+00465858: mov eax,DWORD PTR [ebx+0x8]
+0046585b: test eax,eax
+0046585d: je 0x4658c3
+0046585f: mov DWORD PTR [ebp-0x4],eax
+00465862: xor esi,esi
+00465864: mov eax,DWORD PTR [ebp-0x4]
+00465867: lea ecx,[eax+0x34]
+0046586a: mov eax,DWORD PTR [ebp+0x10]
+0046586d: lea edx,[eax+0x34]
+00465870: mov eax,DWORD PTR [ebp+0xc]
+00465873: add eax,0x34
+00465876: mov ebx,DWORD PTR [ebp+0x18]
+00465879: lea ebx,[ebx*8+0x69e51c]
+00465880: mov DWORD PTR [ebp-0x10],ebx
+00465883: mov ebx,DWORD PTR [ebp-0x10]
+00465886: cmp DWORD PTR [ebx],0x0
+00465889: je 0x4658a8
+0046588b: movsx ebx,WORD PTR [eax]
+0046588e: movsx edi,WORD PTR [edx]
+00465891: add ebx,edi
+00465893: sar ebx,1
+00465895: mov WORD PTR [ecx],bx
+00465898: movsx ebx,WORD PTR [eax+0x2]
+0046589c: movsx edi,WORD PTR [edx+0x2]
+004658a0: add ebx,edi
+004658a2: sar ebx,1
+004658a4: mov WORD PTR [ecx+0x2],bx
+004658a8: inc esi
+004658a9: add ecx,0x4
+004658ac: add edx,0x4
+004658af: add eax,0x4
+004658b2: add DWORD PTR [ebp-0x10],0x100
+004658b9: cmp esi,0x2
+004658bc: jl 0x465883
+004658be: jmp 0x465c5f
+004658c3: call 0x4620f0
+004658c8: mov DWORD PTR [ebx+0x8],eax
+004658cb: mov DWORD PTR [ebp-0x4],eax
+004658ce: mov eax,DWORD PTR [ebx]
+004658d0: cmp eax,DWORD PTR [ebp+0xc]
+004658d3: jne 0x4658f1
+004658d5: call 0x462144
+004658da: mov DWORD PTR [ebx+0x4],eax
+004658dd: mov edx,DWORD PTR [ebp+0xc]
+004658e0: mov DWORD PTR [eax],edx
+004658e2: call 0x462144
+004658e7: mov DWORD PTR [ebx+0xc],eax
+004658ea: mov edx,DWORD PTR [ebp+0x10]
+004658ed: mov DWORD PTR [eax],edx
+004658ef: jmp 0x46590b
+004658f1: call 0x462144
+004658f6: mov DWORD PTR [ebx+0x4],eax
+004658f9: mov edx,DWORD PTR [ebp+0x10]
+004658fc: mov DWORD PTR [eax],edx
+004658fe: call 0x462144
+00465903: mov DWORD PTR [ebx+0xc],eax
+00465906: mov edx,DWORD PTR [ebp+0xc]
+00465909: mov DWORD PTR [eax],edx
+0046590b: xor esi,esi
+0046590d: mov eax,DWORD PTR [ebp-0x4]
+00465910: lea edx,[eax+0x34]
+00465913: mov eax,DWORD PTR [ebp+0x10]
+00465916: add eax,0x34
+00465919: mov ecx,DWORD PTR [ebp+0xc]
+0046591c: add ecx,0x34
+0046591f: mov ebx,DWORD PTR [ebp+0x18]
+00465922: lea ebx,[ebx*8+0x69e51c]
+00465929: mov DWORD PTR [ebp-0x14],ebx
+0046592c: mov ebx,DWORD PTR [ebp-0x14]
+0046592f: cmp DWORD PTR [ebx],0x0
+00465932: je 0x465951
+00465934: movsx ebx,WORD PTR [ecx]
+00465937: movsx edi,WORD PTR [eax]
+0046593a: add ebx,edi
+0046593c: sar ebx,1
+0046593e: mov WORD PTR [edx],bx
+00465941: movsx ebx,WORD PTR [ecx+0x2]
+00465945: movsx edi,WORD PTR [eax+0x2]
+00465949: add ebx,edi
+0046594b: sar ebx,1
+0046594d: mov WORD PTR [edx+0x2],bx
+00465951: inc esi
+00465952: add edx,0x4
+00465955: add eax,0x4
+00465958: add ecx,0x4
+0046595b: add DWORD PTR [ebp-0x14],0x100
+00465962: cmp esi,0x2
+00465965: jl 0x46592c
+00465967: mov eax,DWORD PTR [ebp+0xc]
+0046596a: mov edx,DWORD PTR [ebp-0x4]
+0046596d: mov ecx,DWORD PTR [eax+0x28]
+00465970: mov DWORD PTR [edx+0x28],ecx
+00465973: mov ecx,DWORD PTR [eax+0x2c]
+00465976: mov DWORD PTR [edx+0x2c],ecx
+00465979: mov ecx,DWORD PTR [eax+0x30]
+0046597c: mov DWORD PTR [edx+0x30],ecx
+0046597f: xor eax,eax
+00465981: mov DWORD PTR [ebp-0x8],eax
+00465984: mov eax,DWORD PTR [ebp+0xc]
+00465987: mov eax,DWORD PTR [eax+0x3c]
+0046598a: dec eax
+0046598b: mov edx,DWORD PTR [ebp+0x10]
+0046598e: mov edx,DWORD PTR [edx+0x3c]
+00465991: dec edx
+00465992: xor eax,edx
+00465994: jge 0x46599c
+00465996: mov eax,DWORD PTR [ebp+0x18]
+00465999: dec eax
+0046599a: jmp 0x46599f
+0046599c: mov eax,DWORD PTR [ebp+0x18]
+0046599f: mov edx,DWORD PTR [ebp+0xc]
+004659a2: cmp eax,DWORD PTR [edx+0x44]
+004659a5: jle 0x465b33
+004659ab: mov edx,DWORD PTR [ebp+0x10]
+004659ae: cmp eax,DWORD PTR [edx+0x44]
+004659b1: jle 0x465b33
+004659b7: mov eax,DWORD PTR [ebp+0xc]
+004659ba: mov eax,DWORD PTR [eax+0x3c]
+004659bd: mov edx,DWORD PTR [ebp+0x10]
+004659c0: add eax,DWORD PTR [edx+0x3c]
+004659c3: sar eax,1
+004659c5: mov edx,DWORD PTR [ebp-0x4]
+004659c8: mov DWORD PTR [edx+0x3c],eax
+004659cb: mov eax,DWORD PTR [ebp+0xc]
+004659ce: mov eax,DWORD PTR [eax+0x4]
+004659d1: mov edx,DWORD PTR [ebp+0x10]
+004659d4: add eax,DWORD PTR [edx+0x4]
+004659d7: sar eax,1
+004659d9: mov edx,DWORD PTR [ebp-0x4]
+004659dc: mov DWORD PTR [edx+0x4],eax
+004659df: mov eax,DWORD PTR [ebp+0xc]
+004659e2: mov eax,DWORD PTR [eax+0x8]
+004659e5: mov edx,DWORD PTR [ebp+0x10]
+004659e8: add eax,DWORD PTR [edx+0x8]
+004659eb: sar eax,1
+004659ed: mov edx,DWORD PTR [ebp-0x4]
+004659f0: mov DWORD PTR [edx+0x8],eax
+004659f3: mov eax,DWORD PTR [ebp+0xc]
+004659f6: mov eax,DWORD PTR [eax+0xc]
+004659f9: mov edx,DWORD PTR [ebp+0x10]
+004659fc: add eax,DWORD PTR [edx+0xc]
+004659ff: sar eax,1
+00465a01: mov edx,DWORD PTR [ebp-0x4]
+00465a04: mov DWORD PTR [edx+0xc],eax
+00465a07: mov eax,DWORD PTR [ebp+0xc]
+00465a0a: cmp DWORD PTR [eax+0xc],0x40
+00465a0e: jl 0x465a19
+00465a10: mov eax,DWORD PTR [ebp+0x10]
+00465a13: cmp DWORD PTR [eax+0xc],0x40
+00465a17: jge 0x465a29
+00465a19: mov eax,DWORD PTR [ebp-0x4]
+00465a1c: push eax
+00465a1d: call DWORD PTR ds:0x6c48e0
+00465a23: pop ecx
+00465a24: jmp 0x465c55
+00465a29: mov eax,DWORD PTR [ebp+0xc]
+00465a2c: movsx eax,WORD PTR [eax]
+00465a2f: mov edx,DWORD PTR [ebp+0x10]
+00465a32: movsx edx,WORD PTR [edx]
+00465a35: add eax,edx
+00465a37: sar eax,1
+00465a39: mov edx,DWORD PTR [ebp-0x4]
+00465a3c: mov WORD PTR [edx],ax
+00465a3f: mov eax,DWORD PTR [ebp+0xc]
+00465a42: movsx eax,WORD PTR [eax+0x2]
+00465a46: mov edx,DWORD PTR [ebp+0x10]
+00465a49: movsx edx,WORD PTR [edx+0x2]
+00465a4d: add eax,edx
+00465a4f: sar eax,1
+00465a51: mov edx,DWORD PTR [ebp-0x4]
+00465a54: mov WORD PTR [edx+0x2],ax
+00465a58: mov eax,DWORD PTR [ebp+0x14]
+00465a5b: cmp DWORD PTR [eax+0xc],0x40
+00465a5f: jle 0x465b03
+00465a65: mov eax,DWORD PTR [ebp+0xc]
+00465a68: mov ax,WORD PTR [eax+0x2]
+00465a6c: mov edx,DWORD PTR [ebp+0x10]
+00465a6f: cmp ax,WORD PTR [edx+0x2]
+00465a73: setg al
+00465a76: and eax,0x1
+00465a79: mov edx,DWORD PTR [ebp+0xc]
+00465a7c: mov dx,WORD PTR [edx]
+00465a7f: mov ecx,DWORD PTR [ebp+0x10]
+00465a82: cmp dx,WORD PTR [ecx]
+00465a85: setg dl
+00465a88: and edx,0x1
+00465a8b: mov ecx,DWORD PTR [ebp+0x14]
+00465a8e: movsx ecx,WORD PTR [ecx]
+00465a91: mov ebx,DWORD PTR [ebp+0xc]
+00465a94: movsx ebx,WORD PTR [ebx]
+00465a97: sub ecx,ebx
+00465a99: mov ebx,DWORD PTR [ebp+0x10]
+00465a9c: movsx ebx,WORD PTR [ebx+0x2]
+00465aa0: mov esi,DWORD PTR [ebp+0xc]
+00465aa3: movsx esi,WORD PTR [esi+0x2]
+00465aa7: sub ebx,esi
+00465aa9: imul ecx,ebx
+00465aac: mov ebx,DWORD PTR [ebp+0x10]
+00465aaf: movsx ebx,WORD PTR [ebx]
+00465ab2: mov esi,DWORD PTR [ebp+0xc]
+00465ab5: movsx esi,WORD PTR [esi]
+00465ab8: sub ebx,esi
+00465aba: mov esi,DWORD PTR [ebp+0x14]
+00465abd: movsx esi,WORD PTR [esi+0x2]
+00465ac1: mov edi,DWORD PTR [ebp+0xc]
+00465ac4: movsx edi,WORD PTR [edi+0x2]
+00465ac8: sub esi,edi
+00465aca: imul ebx,esi
+00465acd: cmp ecx,ebx
+00465acf: setg cl
+00465ad2: and ecx,0x1
+00465ad5: mov ebx,eax
+00465ad7: shl ebx,0x4
+00465ada: add ebx,0x505a10
+00465ae0: lea ebx,[ebx+edx*8]
+00465ae3: mov bx,WORD PTR [ebx+ecx*4]
+00465ae7: mov esi,DWORD PTR [ebp-0x4]
+00465aea: add WORD PTR [esi],bx
+00465aed: shl eax,0x4
+00465af0: add eax,0x505a12
+00465af5: lea eax,[eax+edx*8]
+00465af8: mov ax,WORD PTR [eax+ecx*4]
+00465afc: mov edx,DWORD PTR [ebp-0x4]
+00465aff: add WORD PTR [edx+0x2],ax
+00465b03: mov eax,DWORD PTR [ebp-0x4]
+00465b06: movsx eax,WORD PTR [eax]
+00465b09: push eax
+00465b0a: call DWORD PTR ds:0x6c48d8
+00465b10: pop ecx
+00465b11: mov edx,DWORD PTR [ebp-0x4]
+00465b14: mov WORD PTR [edx+0x24],ax
+00465b18: mov eax,DWORD PTR [ebp-0x4]
+00465b1b: movsx eax,WORD PTR [eax+0x2]
+00465b1f: push eax
+00465b20: call DWORD PTR ds:0x6c48dc
+00465b26: pop ecx
+00465b27: mov edx,DWORD PTR [ebp-0x4]
+00465b2a: mov WORD PTR [edx+0x26],ax
+00465b2e: jmp 0x465c55
+00465b33: mov eax,DWORD PTR [ebp+0x18]
+00465b36: push eax
+00465b37: mov eax,DWORD PTR [ebp+0x10]
+00465b3a: mov edi,DWORD PTR [eax+0x3c]
+00465b3d: push edi
+00465b3e: mov eax,DWORD PTR [ebp+0xc]
+00465b41: mov esi,DWORD PTR [eax+0x3c]
+00465b44: push esi
+00465b45: call 0x463b78
+00465b4a: add esp,0xc
+00465b4d: add esi,edi
+00465b4f: sar esi,1
+00465b51: add eax,esi
+00465b53: mov edx,DWORD PTR [ebp-0x4]
+00465b56: mov DWORD PTR [edx+0x3c],eax
+00465b59: xor esi,esi
+00465b5b: mov eax,DWORD PTR [ebp-0x4]
+00465b5e: add eax,0x34
+00465b61: mov edx,DWORD PTR [ebp+0x18]
+00465b64: lea edx,[edx*8+0x69e51c]
+00465b6b: cmp DWORD PTR [edx],0x0
+00465b6e: je 0x465bc0
+00465b70: movsx ecx,WORD PTR [eax]
+00465b73: cmp ecx,0x80
+00465b79: jae 0x465bc0
+00465b7b: movsx ecx,WORD PTR [eax+0x2]
+00465b7f: cmp ecx,0x80
+00465b85: jae 0x465bc0
+00465b87: mov ecx,DWORD PTR [ebp-0x4]
+00465b8a: sar DWORD PTR [ecx+0x3c],0x7
+00465b8e: movsx ecx,WORD PTR [eax]
+00465b91: movsx ebx,WORD PTR [eax+0x2]
+00465b95: shl ebx,0x7
+00465b98: add ecx,ebx
+00465b9a: cmp DWORD PTR [edx+0x4],0x0
+00465b9e: je 0x465bb1
+00465ba0: mov ebx,DWORD PTR [edx+0x4]
+00465ba3: movzx ebx,BYTE PTR [ebx+ecx*1]
+00465ba7: mov edi,DWORD PTR [ebp-0x4]
+00465baa: imul ebx,DWORD PTR [edi+0x3c]
+00465bae: mov DWORD PTR [edi+0x3c],ebx
+00465bb1: mov ebx,DWORD PTR [edx]
+00465bb3: movsx ecx,BYTE PTR [ebx+ecx*1]
+00465bb7: shl ecx,0x15
+00465bba: mov ebx,DWORD PTR [ebp-0x4]
+00465bbd: add DWORD PTR [ebx+0x3c],ecx
+00465bc0: inc esi
+00465bc1: add eax,0x4
+00465bc4: add edx,0x100
+00465bca: cmp esi,0x2
+00465bcd: jl 0x465b6b
+00465bcf: mov eax,DWORD PTR [ebp-0x8]
+00465bd2: push eax
+00465bd3: mov eax,DWORD PTR [ebp-0x4]
+00465bd6: mov eax,DWORD PTR [eax+0x28]
+00465bd9: push eax
+00465bda: call 0x453478
+00465bdf: add esp,0x8
+00465be2: mov edx,DWORD PTR [ebp+0xc]
+00465be5: mov edx,DWORD PTR [edx+0x4]
+00465be8: mov ecx,DWORD PTR [ebp+0x10]
+00465beb: add edx,DWORD PTR [ecx+0x4]
+00465bee: sar edx,1
+00465bf0: add eax,edx
+00465bf2: mov edx,DWORD PTR [ebp-0x4]
+00465bf5: mov DWORD PTR [edx+0x4],eax
+00465bf8: mov eax,DWORD PTR [ebp-0x8]
+00465bfb: push eax
+00465bfc: mov eax,DWORD PTR [ebp-0x4]
+00465bff: mov eax,DWORD PTR [eax+0x2c]
+00465c02: push eax
+00465c03: call 0x453478
+00465c08: add esp,0x8
+00465c0b: mov edx,DWORD PTR [ebp+0xc]
+00465c0e: mov edx,DWORD PTR [edx+0x8]
+00465c11: mov ecx,DWORD PTR [ebp+0x10]
+00465c14: add edx,DWORD PTR [ecx+0x8]
+00465c17: sar edx,1
+00465c19: add eax,edx
+00465c1b: mov edx,DWORD PTR [ebp-0x4]
+00465c1e: mov DWORD PTR [edx+0x8],eax
+00465c21: mov eax,DWORD PTR [ebp-0x8]
+00465c24: push eax
+00465c25: mov eax,DWORD PTR [ebp-0x4]
+00465c28: mov eax,DWORD PTR [eax+0x30]
+00465c2b: push eax
+00465c2c: call 0x453478
+00465c31: add esp,0x8
+00465c34: mov edx,DWORD PTR [ebp+0xc]
+00465c37: mov edx,DWORD PTR [edx+0xc]
+00465c3a: mov ecx,DWORD PTR [ebp+0x10]
+00465c3d: add edx,DWORD PTR [ecx+0xc]
+00465c40: sar edx,1
+00465c42: add eax,edx
+00465c44: mov edx,DWORD PTR [ebp-0x4]
+00465c47: mov DWORD PTR [edx+0xc],eax
+00465c4a: mov eax,DWORD PTR [ebp-0x4]
+00465c4d: push eax
+00465c4e: call DWORD PTR ds:0x6c48e0
+00465c54: pop ecx
+00465c55: mov eax,DWORD PTR [ebp-0x4]
+00465c58: push eax
+00465c59: call 0x4626f0
+00465c5e: pop ecx
+00465c5f: pop edi
+00465c60: pop esi
+00465c61: pop ebx
+00465c62: mov esp,ebp
+00465c64: pop ebp
+00465c65: ret 
+00465c66: nop 
+00465c67: nop 

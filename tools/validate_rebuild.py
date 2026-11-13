@@ -44,6 +44,10 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_natural_contact', 'tests/test_source_natural_contact.gd', 'Positive-radius original F576, F579 and bounded natural F582/F581/F1876 against independently executed DOS cases; actual Eagle, Cobra and Shuttle child streams.', timeout=600),
+    Suite('source_natural_pipeline', 'tests/test_source_natural_contact_pipeline.gd', 'Standalone composition of the native-proved natural classifier and previously native-proved F575 continuation using explicit globals; not an independently executed end-to-end F575 oracle or live source bank.', timeout=600),
+    Suite('source_natural_probe', 'tests/test_source_natural_contact_probe.gd', 'Read-only actual-world F576 classification at the authored phone ship centre, original parent UID and actual child offsets; source field is not phone AGL or a new live contact response.', timeout=300),
+    Suite('source_natural_main', 'tests/test_source_natural_contact_main.gd', 'Actual Main read-only natural classifier facts in periodic logs and the diagnostic ZIP, with preserved HP, fuel, time, cold saves, menu and existing source landing.', timeout=600, user_args=('--rebuild-capture',)),
     Suite('source_spherical_contact', 'tests/test_source_spherical_contact.gd', 'Complete uploaded DOS F577 sphere helper and exact DOS/JJFFE radius distinction versus independently executed native controls; no object-bank traversal or collision response.', timeout=300),
     Suite('source_spherical_pipeline', 'tests/test_source_spherical_contact_pipeline.gd', 'Bounded raw F575 simple-parent player route: original coarse gate, F577, unchanged terminal response and explicit atomic guards for unsupported F576/F578.', timeout=300),
     Suite('source_spherical_probe', 'tests/test_source_spherical_contact_probe.gd', 'Read-only real-world sphere envelopes and original model collision-stream eligibility in source coordinates; not a terrain hit, live collision response or complete frame pipeline.', timeout=300),

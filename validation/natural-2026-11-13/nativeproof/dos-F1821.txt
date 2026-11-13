@@ -1,0 +1,26 @@
+00462188: push ebp
+00462189: mov ebp,esp
+0046218b: push ebx
+0046218c: mov ebx,DWORD PTR [ebp+0x8]
+0046218f: mov eax,DWORD PTR [ebx+0x4]
+00462192: test eax,eax
+00462194: je 0x46219d
+00462196: push eax
+00462197: call 0x462188
+0046219c: pop ecx
+0046219d: mov eax,DWORD PTR [ebx+0x8]
+004621a0: test eax,eax
+004621a2: je 0x4621ab
+004621a4: push eax
+004621a5: call 0x462128
+004621aa: pop ecx
+004621ab: dec DWORD PTR ds:0x6b8d4c
+004621b1: mov eax,ds:0x6b8d48
+004621b6: mov DWORD PTR [ebx],eax
+004621b8: mov DWORD PTR ds:0x6b8d48,ebx
+004621be: mov ebx,DWORD PTR [ebx+0xc]
+004621c1: test ebx,ebx
+004621c3: jne 0x46218f
+004621c5: pop ebx
+004621c6: pop ebp
+004621c7: ret 

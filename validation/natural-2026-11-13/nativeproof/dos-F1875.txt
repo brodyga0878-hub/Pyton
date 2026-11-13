@@ -1,0 +1,38 @@
+0046d2ac: push ebp
+0046d2ad: mov ebp,esp
+0046d2af: add esp,0xffffffe8
+0046d2b2: push ebx
+0046d2b3: push esi
+0046d2b4: mov esi,DWORD PTR [ebp+0xc]
+0046d2b7: mov ebx,DWORD PTR [ebp+0x8]
+0046d2ba: mov eax,DWORD PTR [esi+0x4]
+0046d2bd: push eax
+0046d2be: mov eax,DWORD PTR [ebx]
+0046d2c0: push eax
+0046d2c1: lea eax,[ebp-0x8]
+0046d2c4: push eax
+0046d2c5: call 0x44e8c3
+0046d2ca: add esp,0xc
+0046d2cd: mov eax,DWORD PTR [esi]
+0046d2cf: push eax
+0046d2d0: mov eax,DWORD PTR [ebx+0x4]
+0046d2d3: push eax
+0046d2d4: lea eax,[ebp-0x10]
+0046d2d7: push eax
+0046d2d8: call 0x44e8c3
+0046d2dd: add esp,0xc
+0046d2e0: push DWORD PTR [ebp-0xc]
+0046d2e3: push DWORD PTR [ebp-0x10]
+0046d2e6: push DWORD PTR [ebp-0x4]
+0046d2e9: push DWORD PTR [ebp-0x8]
+0046d2ec: lea eax,[ebp-0x18]
+0046d2ef: push eax
+0046d2f0: call 0x44e848
+0046d2f5: add esp,0x14
+0046d2f8: mov eax,DWORD PTR [ebp-0x14]
+0046d2fb: sar eax,0x1f
+0046d2fe: pop esi
+0046d2ff: pop ebx
+0046d300: mov esp,ebp
+0046d302: pop ebp
+0046d303: ret 

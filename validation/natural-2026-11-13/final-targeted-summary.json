@@ -1,0 +1,227 @@
+{
+  "schema": "starfrontier-current-natural-contact-targeted-summary-v1",
+  "created_utc": "2026-11-13T12:05:05.233294+00:00",
+  "version": "0.21.0-natural-contact-alpha1",
+  "checks": 47045,
+  "passed_suites": 28,
+  "failures": 0,
+  "status": "passed",
+  "suites": [
+    {
+      "test": "tests/test_source_spherical_contact_probe.gd",
+      "checks": 227,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "c7730db12e2940964b89152f80308aebfddcbd8cc7dc0a2930421b5ba48921a4"
+    },
+    {
+      "test": "tests/test_source_spherical_main.gd",
+      "checks": 195,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "31e6261d8f518cec93153501c53f4251ddf67d21149a0a5d519ffd0d7fccf12b"
+    },
+    {
+      "test": "tests/test_source_contact_main.gd",
+      "checks": 220,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "4fe5094f251decdf18453c41386af507c980f658c623fb8507076310c07bbfbd"
+    },
+    {
+      "test": "tests/test_source_gear_main.gd",
+      "checks": 112,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "1cbbb9ac45692058d24dfdc5cda0bc532fe5633a282fd5493a8fb72aeadecfa3"
+    },
+    {
+      "test": "tests/test_source_thermal_main.gd",
+      "checks": 463,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "cc413076aeff8c13d2cbd0d1ebbce8ad1acd185b3dadef73385aa7704aaf0f6b"
+    },
+    {
+      "test": "tests/test_source_fuel_main.gd",
+      "checks": 397,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "31ddac2cab1eaeea39ddd8e222bf25a2b61429ae40ba25e2b8dfddee2ab1d70e"
+    },
+    {
+      "test": "tests/test_source_hyperdrive_main.gd",
+      "checks": 70,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "84f688bd98c73d50be2e3998f0780ff0ba44fa249aa10bd315840b6c6ec0f465"
+    },
+    {
+      "test": "tests/test_navigation_main.gd",
+      "checks": 53,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "134ccfc0534ce835429cdd2c0cdbae7272c96d073ae011df03d19ee159661d73"
+    },
+    {
+      "test": "tests/test_rotating_dock_dynamics.gd",
+      "checks": 201,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "c04a07d13b6c6d8853228cec8a5274324dbc6de5c52ee078ca91d9448a1a86f1"
+    },
+    {
+      "test": "tests/test_source_motion_main_continuation.gd",
+      "checks": 28,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "98f30d43361747a56627170e76dbdaf1f3f7bbdefe53027ac2920899b2e5e728"
+    },
+    {
+      "test": "tests/test_classic_console_main.gd",
+      "checks": 42,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "a9d2f15c1ecd3911828f96671fa52636a60fcadbfbf57230fc4cb8b12c027fcf"
+    },
+    {
+      "test": "tests/test_flight_projection.gd",
+      "checks": 691,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "a1e2569ae67b334851340782de2dab1c41ee8ceba3bb28b8ba66055d21f777d7"
+    },
+    {
+      "test": "tests/test_source_console_pause.gd",
+      "checks": 131,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "a1b35c822a69b79f9327a97885f6e95826b3fb84fba877f0593c85c767c3f9b4"
+    },
+    {
+      "test": "tests/test_source_full_startup.gd",
+      "checks": 10,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "ffaa0a4a6736da6409315e74753c15896e73d55e01348b42314652126f9b9c06"
+    },
+    {
+      "test": "tests/test_source_main_full.gd",
+      "checks": 153,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "6a17efe8fd09d5e26e3704d80081d712427c30f8808fdb2171dae43899e7465d"
+    },
+    {
+      "test": "tests/test_source_docking_flight.gd",
+      "checks": 402,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "01dfc4d243969917ad7354df996ecafc5da5c031fc2f00f7fe2a52c769fcd27c"
+    },
+    {
+      "test": "tests/test_rebuilt_save_touch.gd",
+      "checks": 71,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "c2755cdb318c5f75c8c1a348d14ed8bc4e2014a9e1bcf9807264a5a3196786f0"
+    },
+    {
+      "test": "tests/test_graphics_integration.gd",
+      "checks": 44,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "07803e334be7ce9c9feea54a6ca2a942971f99b206c213f3aed53c28c31cb34c"
+    },
+    {
+      "test": "tests/test_graphics_scope.gd",
+      "checks": 87,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "222ad1fc4b32ecb896c751945e2d50ca9b5432f63780a3cd6821e3dda91558b8"
+    },
+    {
+      "test": "tests/test_offpad_takeoff.gd",
+      "checks": 109,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "20f95381e09b9467225e6038f4d33fa4b5f0c9f279f4f9e738e9c0d668011c27"
+    },
+    {
+      "test": "tests/test_surface_action_controls.gd",
+      "checks": 66,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "9408e25188442cd113ff5b8070c06a88e506c6104d102b43ad346e0cb1c35260"
+    },
+    {
+      "test": "tests/test_game_diagnostics.gd",
+      "checks": 71,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "8633e58548a1c9467e2dcbbc87274cb55e47d0628ef45f000655d1a46a94cc2d"
+    },
+    {
+      "test": "tests/test_report_export.gd",
+      "checks": 27,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "c7ccee21fb27c906336abebc9897acf6eb5b7479a30d934e69d0c3b8a55a7e80"
+    },
+    {
+      "test": "tests/test_bug_report_ui.gd",
+      "checks": 99,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/regressions.json",
+      "test_source_sha256": "01600083741179de09a29a8f11807974eee4857fab1c2734eeaa328267770079"
+    },
+    {
+      "test": "tests/test_source_natural_contact.gd",
+      "checks": 16185,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/source-natural-contact-core.json",
+      "test_source_sha256": "39a6f0a77ff1ec8e50a003e021366cd55cc98e1c0f64e54c70133df95fcb2ba6"
+    },
+    {
+      "test": "tests/test_source_natural_contact_pipeline.gd",
+      "checks": 26592,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/source-natural-contact-pipeline.json",
+      "test_source_sha256": "fd0853757b6c9b0daa45ad6a89c48138eb2eb8a840f5282f80de9daca5196d7f"
+    },
+    {
+      "test": "tests/test_source_natural_contact_probe.gd",
+      "checks": 136,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/source-natural-contact-probe.json",
+      "test_source_sha256": "fa9e3f57960532e36d9b9b0b8a4996e0d4bfd6aa5282b18c165878eb50712343"
+    },
+    {
+      "test": "tests/test_source_natural_contact_main.gd",
+      "checks": 163,
+      "failures": 0,
+      "proof": "validation/natural-2026-11-13/source-natural-main.json",
+      "test_source_sha256": "ae1c26760dd86e39231725f50568b26260f32329913fd9b4a8a2d68288821d34"
+    }
+  ],
+  "proofs_sha256": {
+    "validation/natural-2026-11-13/regressions.json": "1d9ae6460a5677a022299c691cc51031b3e13bc3473c49d643f9d776d4e107a5",
+    "validation/natural-2026-11-13/source-natural-contact-core.json": "c6e5a9c30f4cac80b5797859fd78031bf1513303c592880539c63715645e47b1",
+    "validation/natural-2026-11-13/source-natural-contact-pipeline.json": "b20f1051accf3cd24eef33f4ae41ad9a858f72b706bbd23c8efab349ee881554",
+    "validation/natural-2026-11-13/source-natural-contact-probe.json": "04b82c4453218bb2c441f2591cc6089487a2a7bf3973d5c6e40ee1473342e4f0",
+    "validation/natural-2026-11-13/source-natural-main.json": "4b345354039149270450a916d66c0fc7cedeac92aaa7eb2059dfd6e4c66bd200"
+  },
+  "new_supported_DOS_native_cases": 993,
+  "additional_actual_general_VM_abort_interceptions_separate": 2,
+  "combined_native_F576_F575_chain_executed": false,
+  "native_controls_included_within_functional_checks": true,
+  "historical_totals_added": false,
+  "repeated_source_archive_checks_added": false,
+  "capture_or_review_harness_checks_added": false,
+  "scope": "One current passing result per unique selected natural classifier/composition/readonly probe/Main and24 preserved regression groups.993 independently executed original F576 controls are reused within the suites, not added again; two actual general-VM abort interceptions remain separate. Pipeline composition uses the independently proved classifier and previously proved F575 continuation; no new single end-to-end native F576-to-F575 execution claimed. Failed/intermediate runs, separate75-check desktop review harness,129 capture checks, repeated portability checks and prior release totals excluded. Bounded suite timestamps retained; not an atomic full-game run.",
+  "physical_gameplay_collision_response_changed": false,
+  "full_original_port_complete": false,
+  "full_original_physics": false,
+  "physical_device_tested": false,
+  "production_release_ready": false
+}

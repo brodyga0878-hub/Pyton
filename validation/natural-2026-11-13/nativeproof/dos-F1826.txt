@@ -1,0 +1,55 @@
+0046241c: push ebp
+0046241d: mov ebp,esp
+0046241f: push ebx
+00462420: push esi
+00462421: mov ebx,DWORD PTR [ebp+0xc]
+00462424: mov esi,DWORD PTR [ebp+0x8]
+00462427: cmp DWORD PTR [ebx],0x0
+0046242a: jge 0x462432
+0046242c: mov eax,DWORD PTR [ebx]
+0046242e: neg eax
+00462430: jmp 0x462434
+00462432: mov eax,DWORD PTR [ebx]
+00462434: cmp DWORD PTR [ebx+0x4],0x0
+00462438: jge 0x462441
+0046243a: mov edx,DWORD PTR [ebx+0x4]
+0046243d: neg edx
+0046243f: jmp 0x462444
+00462441: mov edx,DWORD PTR [ebx+0x4]
+00462444: or eax,edx
+00462446: cmp DWORD PTR [ebx+0x8],0x0
+0046244a: jge 0x462453
+0046244c: mov edx,DWORD PTR [ebx+0x8]
+0046244f: neg edx
+00462451: jmp 0x462456
+00462453: mov edx,DWORD PTR [ebx+0x8]
+00462456: or eax,edx
+00462458: push eax
+00462459: call 0x4599b4
+0046245e: pop ecx
+0046245f: add eax,0xfffffff3
+00462462: test eax,eax
+00462464: jl 0x462484
+00462466: mov ecx,eax
+00462468: mov edx,DWORD PTR [ebx]
+0046246a: sar edx,cl
+0046246c: mov DWORD PTR [esi],edx
+0046246e: mov ecx,eax
+00462470: mov edx,DWORD PTR [ebx+0x4]
+00462473: sar edx,cl
+00462475: mov DWORD PTR [esi+0x4],edx
+00462478: mov ecx,eax
+0046247a: mov eax,DWORD PTR [ebx+0x8]
+0046247d: sar eax,cl
+0046247f: mov DWORD PTR [esi+0x8],eax
+00462482: jmp 0x462494
+00462484: mov eax,DWORD PTR [ebx]
+00462486: mov DWORD PTR [esi],eax
+00462488: mov eax,DWORD PTR [ebx+0x4]
+0046248b: mov DWORD PTR [esi+0x4],eax
+0046248e: mov eax,DWORD PTR [ebx+0x8]
+00462491: mov DWORD PTR [esi+0x8],eax
+00462494: pop esi
+00462495: pop ebx
+00462496: pop ebp
+00462497: ret 
