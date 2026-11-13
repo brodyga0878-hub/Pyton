@@ -12,8 +12,8 @@ ZIP содержит текущий проект Godot, все рабочие и
 и исторически восстановленные исходные фрагменты.
 
 <!-- NATURAL_CURRENT_BEGIN -->
-Подготавливаемая версия исходников — **0.21.0-natural-contact-alpha1 /
-code 46**. Добавляются `source_natural_contact.gd`,
+Текущая опубликованная версия исходников — **0.21.0-natural-contact-alpha1 /
+code 46**. Добавлены `source_natural_contact.gd`,
 `source_natural_contact_pipeline.gd`, `source_natural_contact_probe.gd`,
 `data/ffe_natural_contact.json`, извлекатель, независимые DOS-контроли
 и проверки ядра/композиции/настоящего Main.
@@ -47,10 +47,32 @@ integration review **75/0** и восемь осмотренных desktop-ка�
 Добавлены три модуля, их три UID и один JSON. Прежние графика,
 полётные/посадочные ядра и общий учёт HP сохранены.
 
-Этот текст — PREPUB-состояние точного source-коммита; результаты свежего
-импорта, неизменности извлечённых файлов и запуска Main из ZIP,
-а также SHA/размеры ZIP и проверенные HTTPS-ссылки добавляются после
-создания артефактов. [Состав блока](docs/RELEASE_0_21_0_RU.md).
+Точный ZIP — **32 397 333 байта**, **1521 запись / 1368 файлов**, меньше
+32 МиБ. Исходный коммит `abae633776275a88bf0706893a030e7497ae6ef0`.
+SHA256:
+`13d0309677062e8e2b8e6e10c5fc48b7bd7e75984adf6925de93df02a4fd6fa1`.
+Свежий импорт и изолированный обычный запуск — **10/0**, настоящий
+Main из точного ZIP — **163/0**. Все 1368 файлов сохранили SHA;
+ZIP совпал со всеми 431 замороженными runtime-входами. Повторы
+из ZIP не прибавлены к функциональному итогу.
+[Свежий импорт/запуск](validation/natural-source-portability-2026-11-13/verification.json),
+[Main из ZIP](validation/natural-source-portability-2026-11-13/natural-main-feature.json).
+
+[Скачать APK 0.21.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/StarFrontier-0.21.0-natural-contact-arm64.apk) · [Исходники 0.21.0 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/StarFrontier-0.21.0-natural-contact-source.zip)
+
+[Настоящий диагностический ZIP без сохранения](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/sample-diagnostic-report.zip)
+
+Полным HTTPS-скачиванием проверены **13 файлов**: манифест, APK,
+source ZIP, протокол захвата, восемь PNG и настоящий диагностический ZIP.
+HTTP 200, размеры, SHA, CRC трёх архивов, число записей и исходный
+Git-комментарий ZIP совпали. Локально проверены все **108 payload-записей**
+манифеста; остальные **96 вспомогательных файлов отдельно через HTTP
+не скачивались**. Документы внутри ZIP сохраняют PREPUB-состояние
+исходного коммита; эта страница в ветке дополнена после публикации.
+[Проверка скачивания](validation/natural-publication-2026-11-13/verification.json).
+Публикация завершена **13 ноября 2026 года**, artifact-коммит
+`81ced88e551a7c64aaab1212892c50040fcff4f8`.
+[Состав блока](docs/RELEASE_0_21_0_RU.md).
 Физический телефон и производственная подпись не проверены/не настроены.
 <!-- NATURAL_CURRENT_END -->
 

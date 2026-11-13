@@ -1,0 +1,121 @@
+{
+  "started_utc": "2026-11-13T12:12:31.973224+00:00",
+  "version": "0.21.0-natural-contact-alpha1",
+  "artifact_commit": "81ced88e551a7c64aaab1212892c50040fcff4f8",
+  "source_commit": "abae633776275a88bf0706893a030e7497ae6ef0",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/manifest.json",
+      "http_status": 200,
+      "bytes": 48999,
+      "sha256": "ae90ddf3ede419b5ed0e73f12a56455a6be06bffe7708f8bea5fdaef2d2b0cb1"
+    },
+    {
+      "file": "StarFrontier-0.21.0-natural-contact-arm64.apk",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/StarFrontier-0.21.0-natural-contact-arm64.apk",
+      "http_status": 200,
+      "bytes": 50183963,
+      "sha256": "49f15c7435cf5db66a18e8d79385337be97b4876da911e642d626e1d4a826984",
+      "zip_crc_verified": true
+    },
+    {
+      "file": "StarFrontier-0.21.0-natural-contact-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/StarFrontier-0.21.0-natural-contact-source.zip",
+      "http_status": 200,
+      "bytes": 32397333,
+      "sha256": "13d0309677062e8e2b8e6e10c5fc48b7bd7e75984adf6925de93df02a4fd6fa1",
+      "zip_crc_verified": true,
+      "source_commit_in_zip_comment": "abae633776275a88bf0706893a030e7497ae6ef0"
+    },
+    {
+      "file": "screenshots/capture-manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/screenshots/capture-manifest.json",
+      "http_status": 200,
+      "bytes": 41881,
+      "sha256": "375f53cffb280f878700b36f5ec1b94df7e565e80d2c36c5b3e3577724f59e24"
+    },
+    {
+      "file": "screenshots/01-existing-earth-flight-readonly-probe.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/screenshots/01-existing-earth-flight-readonly-probe.png",
+      "http_status": 200,
+      "bytes": 331747,
+      "sha256": "1d9b609e7b0ec02ba986a4144bd3802b7b99902825bfe6ffc03ad7b93301957f"
+    },
+    {
+      "file": "screenshots/02-existing-system-map-readonly-probe.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/screenshots/02-existing-system-map-readonly-probe.png",
+      "http_status": 200,
+      "bytes": 75791,
+      "sha256": "c44dee8f218ef2242605c596e5061ada58367decc07207aece8ae8d564d96356"
+    },
+    {
+      "file": "screenshots/03-existing-mercury-flight-readonly-probe.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/screenshots/03-existing-mercury-flight-readonly-probe.png",
+      "http_status": 200,
+      "bytes": 376760,
+      "sha256": "26eb25132e8ed92afee60995e9829dbc984211ca2bc43ffdf1a5f405cd19d9e4"
+    },
+    {
+      "file": "screenshots/04-existing-source-surface-observer.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/screenshots/04-existing-source-surface-observer.png",
+      "http_status": 200,
+      "bytes": 342421,
+      "sha256": "bdfeea0fa934b80597ff5a20bf6016563e1453c94591f900db923009e1b95898"
+    },
+    {
+      "file": "screenshots/05-unchanged-healthy-source-landing.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/screenshots/05-unchanged-healthy-source-landing.png",
+      "http_status": 200,
+      "bytes": 365407,
+      "sha256": "1f5fb51ccd98ea9a66bcf0c94f6f6bba76531a9ddfca208ef4a717ec384594ee"
+    },
+    {
+      "file": "screenshots/06-unchanged-source-takeoff.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/screenshots/06-unchanged-source-takeoff.png",
+      "http_status": 200,
+      "bytes": 459834,
+      "sha256": "b02770f78dd7ea42383dab7f43ac61040ce05bb5b0068dd8c71f1916ee821796"
+    },
+    {
+      "file": "screenshots/07-existing-docked-onboard-status.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/screenshots/07-existing-docked-onboard-status.png",
+      "http_status": 200,
+      "bytes": 123508,
+      "sha256": "ab3152fa63dda291b7a497a80e00f9b503799d7304242980f61be2cbf3fe0cc9"
+    },
+    {
+      "file": "screenshots/08-actual-diagnostic-zip-ready.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/screenshots/08-actual-diagnostic-zip-ready.png",
+      "http_status": 200,
+      "bytes": 89205,
+      "sha256": "f2da8034fec051f1ba7571138592c9a011af076172a9e2ab2027ff29405584b5"
+    },
+    {
+      "file": "sample-diagnostic-report.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/sample-diagnostic-report.zip",
+      "http_status": 200,
+      "bytes": 9362,
+      "sha256": "1689ef02b7ef22282be05a92194f11ada9c6f7b2cdabf7c1e19d4f4a8f719feb",
+      "zip_crc_verified": true
+    }
+  ],
+  "status": "verified",
+  "requested_extra_files": [
+    "sample-diagnostic-report.zip"
+  ],
+  "scope": "Actual complete HTTPS downloads; immutable manifest bytes, payload SHA256/length, ZIP CRC, source archive Git comment and screenshot hashes. Not physical Android execution.",
+  "completed_utc": "2026-11-13T12:13:00.257037+00:00",
+  "download_count": 13,
+  "full_HTTPS_downloads_verified": true,
+  "local_manifest_payload_count": 108,
+  "all_local_manifest_payload_hashes_verified": true,
+  "manifest_sha256": "ae90ddf3ede419b5ed0e73f12a56455a6be06bffe7708f8bea5fdaef2d2b0cb1",
+  "all_manifest_payloads_downloaded": false,
+  "other_auxiliary_payloads_verified_locally_only": true,
+  "downloaded_manifest_payload_count": 12,
+  "local_payload_verification_utc": "2026-11-13T12:13:19.965873+00:00",
+  "physical_device_tested": false,
+  "full_original_port_complete": false,
+  "production_release_ready": false
+}

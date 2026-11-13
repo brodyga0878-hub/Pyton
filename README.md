@@ -4,7 +4,7 @@
 
 
 <!-- NATURAL_CURRENT_BEGIN -->
-Подготавливается **0.21.0-natural-contact-alpha1 / code 46**:
+Текущая опубликованная TEST-сборка — **0.21.0-natural-contact-alpha1 / code 46**:
 [природный контакт F576 и диагностика](docs/RELEASE_0_21_0_RU.md).
 Добавлены исходная классификация положительного объёма трёх кораблей,
 настоящие смещённые объёмы Cobra/Shuttle и отдельная композиция с ответом
@@ -35,8 +35,28 @@ desktop-кадров Main: **129 условий захвата / 0 ошибок*
 неизменным, изменены Main с диагностикой, BuildInfo и preset,
 добавлены три модуля с UID и один ресурс.
 
-Это PREPUB-состояние исходников. Точный ZIP, свежий импорт/запуск
-и HTTPS-ссылки добавляются после создания и проверки артефактов.
+Точный ZIP — **32 397 333 байта**, 1521 запись / **1368 файлов**, меньше
+32 МиБ. Исходный коммит `abae633776275a88bf0706893a030e7497ae6ef0`.
+SHA256: `13d0309677062e8e2b8e6e10c5fc48b7bd7e75984adf6925de93df02a4fd6fa1`.
+Свежий импорт и изолированный обычный запуск — **10/0**, настоящий
+Main из точного ZIP — **163/0**. Все 1368 исходных файлов сохранили SHA;
+ZIP совпал со всеми 431 замороженными runtime-входами. Повторы
+переносимости не прибавлены к 28 функциональным группам.
+
+[Скачать APK 0.21.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/StarFrontier-0.21.0-natural-contact-arm64.apk) · [Исходники 0.21.0 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/StarFrontier-0.21.0-natural-contact-source.zip)
+
+[Меркурий: контрольный вид](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/screenshots/03-existing-mercury-flight-readonly-probe.png) · [Существующий взлёт](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/screenshots/06-unchanged-source-takeoff.png) · [Настоящий диагностический ZIP без сохранения](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/sample-diagnostic-report.zip)
+
+Полным HTTPS-скачиванием проверены **13 файлов**: манифест, APK,
+source ZIP, протокол захвата, восемь PNG и настоящий диагностический ZIP.
+HTTP 200, размеры, SHA, CRC трёх архивов и исходный Git-комментарий
+ZIP совпали. Все **108 payload-записей** манифеста проверены локально;
+остальные **96 вспомогательных файлов отдельно через HTTP не скачивались**.
+[Проверка скачивания](validation/natural-publication-2026-11-13/verification.json).
+Публикация завершена **13 ноября 2026 года**, артефакты закреплены
+коммитом `81ced88e551a7c64aaab1212892c50040fcff4f8`. Документы внутри
+source ZIP сохраняют PREPUB-состояние исходного коммита.
+
 Samsung S23 Ultra на физическом Android 17 ещё не испытан;
 производственный ключ и полный магазинный релиз не готовы.
 <!-- NATURAL_CURRENT_END -->

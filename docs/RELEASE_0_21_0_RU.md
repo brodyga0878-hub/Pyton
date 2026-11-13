@@ -1,11 +1,11 @@
 # Природный контакт и диагностика — 0.21.0
 
-**0.21.0-natural-contact-alpha1 / Android code 46** — следующий блок
+Опубликована TEST-сборка **0.21.0-natural-contact-alpha1 / Android code 46**
 после [проверенной публикации 0.20](RELEASE_0_20_0_RU.md).
 Финальные функциональные проверки, восемь настоящих кадров Main
-и строгая техническая проверка APK завершены. Это PREPUB-состояние:
-точный source ZIP, свежий импорт/запуск и удалённые HTTPS-ссылки
-проверяются после фиксации исходного коммита.
+и строгая техническая проверка APK завершены. Точный source ZIP
+проверен свежим импортом и настоящим Main; неизменяемые HTTPS-ссылки
+проверены полным скачиванием.
 
 ## Что входит в изменение
 
@@ -126,10 +126,35 @@ SHA256 сертификата:
 и сохранность прежних обязательных компонентов.
 [APK](../validation/natural-2026-11-13/android-verification.json).
 
-Размер/SHA source ZIP, исходный/artifact коммиты и HTTPS-ссылки добавляются
-после свежего импорта, настоящего Main из этого ZIP и полного скачивания
-опубликованных файлов. Документ в source ZIP сохранит PREPUB-состояние
-исходного коммита.
+Точный ZIP — **32 397 333 байта**, **1521 запись / 1368 файлов**, меньше
+32 МиБ. Исходный коммит `abae633776275a88bf0706893a030e7497ae6ef0`.
+SHA256:
+`13d0309677062e8e2b8e6e10c5fc48b7bd7e75984adf6925de93df02a4fd6fa1`.
+Свежий импорт и изолированный обычный запуск — **10/0**, настоящий
+Main из точного ZIP — **163/0**. Все 1368 исходных файлов сохранили SHA,
+ZIP совпал со всеми **431 замороженными runtime-входами**. Повторы
+переносимости не прибавлены к 28 функциональным группам.
+[Импорт/запуск](../validation/natural-source-portability-2026-11-13/verification.json),
+[Main из ZIP](../validation/natural-source-portability-2026-11-13/natural-main-feature.json).
+
+[Скачать APK 0.21.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/StarFrontier-0.21.0-natural-contact-arm64.apk) · [Исходники 0.21.0 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/StarFrontier-0.21.0-natural-contact-source.zip)
+
+[Меркурий: контрольный вид](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/screenshots/03-existing-mercury-flight-readonly-probe.png) · [Существующий взлёт](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/screenshots/06-unchanged-source-takeoff.png) · [Страница отчёта](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/screenshots/08-actual-diagnostic-zip-ready.png)
+
+[Настоящий диагностический ZIP без сохранения](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/81ced88e551a7c64aaab1212892c50040fcff4f8/deliverables/0.21.0-natural-contact-alpha1/sample-diagnostic-report.zip)
+
+Полным HTTPS-скачиванием проверены **13 файлов**: манифест, APK,
+source ZIP, протокол захвата, восемь PNG и настоящий диагностический ZIP
+через `--include-file sample-diagnostic-report.zip`. HTTP 200, размеры,
+SHA, CRC трёх архивов, число записей и исходный Git-комментарий ZIP
+совпали. Все **108 payload-записей** манифеста проверены локально;
+остальные **96 вспомогательных файлов отдельно через HTTP не скачивались**.
+[Проверка скачивания](../validation/natural-publication-2026-11-13/verification.json).
+
+Публикация завершена **13 ноября 2026 года**; артефакты закреплены
+коммитом `81ced88e551a7c64aaab1212892c50040fcff4f8`.
+Документы внутри source ZIP сохраняют PREPUB-состояние исходного
+коммита; эта версия страницы дополнена после проверки публикации.
 
 Техническая проверка APK не заменяет испытание устройства.
 Физический **Samsung S23 Ultra 12/512** пока
