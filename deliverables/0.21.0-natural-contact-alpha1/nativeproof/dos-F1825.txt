@@ -1,0 +1,28 @@
+004623dc: push ebp
+004623dd: mov ebp,esp
+004623df: mov eax,DWORD PTR [ebp+0x8]
+004623e2: cmp DWORD PTR [eax],0x0
+004623e5: jge 0x4623ed
+004623e7: mov edx,DWORD PTR [eax]
+004623e9: neg edx
+004623eb: jmp 0x4623ef
+004623ed: mov edx,DWORD PTR [eax]
+004623ef: cmp DWORD PTR [eax+0x4],0x0
+004623f3: jge 0x4623fc
+004623f5: mov ecx,DWORD PTR [eax+0x4]
+004623f8: neg ecx
+004623fa: jmp 0x4623ff
+004623fc: mov ecx,DWORD PTR [eax+0x4]
+004623ff: or edx,ecx
+00462401: cmp DWORD PTR [eax+0x8],0x0
+00462405: jge 0x46240e
+00462407: mov ecx,DWORD PTR [eax+0x8]
+0046240a: neg ecx
+0046240c: jmp 0x462411
+0046240e: mov ecx,DWORD PTR [eax+0x8]
+00462411: or edx,ecx
+00462413: push edx
+00462414: call 0x4599b4
+00462419: pop ecx
+0046241a: pop ebp
+0046241b: ret 

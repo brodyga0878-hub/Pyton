@@ -1,0 +1,37 @@
+004628e4: push ebp
+004628e5: mov ebp,esp
+004628e7: push ebx
+004628e8: push esi
+004628e9: mov esi,DWORD PTR [ebp+0x8]
+004628ec: mov ebx,DWORD PTR [ebp+0x10]
+004628ef: shl ebx,0x4
+004628f2: lea ebx,[ebx+ebx*2]
+004628f5: add ebx,0x50435c
+004628fb: cmp DWORD PTR [ebp+0x14],0x0
+004628ff: je 0x462921
+00462901: mov DWORD PTR ds:0x6c48d8,0x462878
+0046290b: mov DWORD PTR ds:0x6c48dc,0x4628b0
+00462915: mov DWORD PTR ds:0x6c48e0,0x463c74
+0046291f: jmp 0x46293f
+00462921: mov DWORD PTR ds:0x6c48d8,0x45d6dc
+0046292b: mov DWORD PTR ds:0x6c48dc,0x45d710
+00462935: mov DWORD PTR ds:0x6c48e0,0x463bbc
+0046293f: test esi,esi
+00462941: je 0x46294b
+00462943: mov ecx,DWORD PTR [esi+0x130]
+00462949: jmp 0x46294d
+0046294b: xor ecx,ecx
+0046294d: mov eax,0x1dcd6500
+00462952: sar eax,cl
+00462954: mov ds:0x69e728,eax
+00462959: mov eax,DWORD PTR [ebx]
+0046295b: mov ds:0x69e73c,eax
+00462960: push ebx
+00462961: call DWORD PTR [ebx+0x4]
+00462964: pop ecx
+00462965: mov DWORD PTR ds:0x69e71c,esi
+0046296b: mov eax,DWORD PTR [ebx+0x8]
+0046296e: pop esi
+0046296f: pop ebx
+00462970: pop ebp
+00462971: ret 

@@ -1,0 +1,31 @@
+00463a24: push ebp
+00463a25: mov ebp,esp
+00463a27: push ebx
+00463a28: push esi
+00463a29: push edi
+00463a2a: xor ecx,ecx
+00463a2c: mov edx,0x505650
+00463a31: mov eax,0x5056d0
+00463a36: mov ebx,DWORD PTR [ebp+0x8]
+00463a39: mov esi,DWORD PTR [eax]
+00463a3b: mov ebx,DWORD PTR [ebx+esi*4+0xc]
+00463a3f: imul ebx,DWORD PTR [eax+0x4]
+00463a43: mov esi,DWORD PTR [ebp+0x8]
+00463a46: mov edi,DWORD PTR [eax+0x8]
+00463a49: mov esi,DWORD PTR [esi+edi*4+0xc]
+00463a4d: imul esi,DWORD PTR [eax+0xc]
+00463a51: add ebx,esi
+00463a53: sar ebx,0x4
+00463a56: and ebx,0xf0f0f
+00463a5c: mov DWORD PTR [edx],ebx
+00463a5e: inc ecx
+00463a5f: add edx,0x4
+00463a62: add eax,0x10
+00463a65: cmp ecx,0x20
+00463a68: jl 0x463a36
+00463a6a: pop edi
+00463a6b: pop esi
+00463a6c: pop ebx
+00463a6d: pop ebp
+00463a6e: ret 
+00463a6f: nop 

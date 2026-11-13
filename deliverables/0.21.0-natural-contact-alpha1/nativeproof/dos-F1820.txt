@@ -1,0 +1,22 @@
+00462144: push ebx
+00462145: mov eax,ds:0x6b8d48
+0046214a: mov ebx,eax
+0046214c: mov eax,DWORD PTR [eax]
+0046214e: mov ds:0x6b8d48,eax
+00462153: inc DWORD PTR ds:0x6b8d4c
+00462159: cmp DWORD PTR ds:0x6b8d4c,0xbb8
+00462163: jl 0x462174
+00462165: push 0x2
+00462167: push 0x69e740
+0046216c: call 0x477f56
+00462171: add esp,0x8
+00462174: xor eax,eax
+00462176: mov DWORD PTR [ebx+0x4],eax
+00462179: xor eax,eax
+0046217b: mov DWORD PTR [ebx+0xc],eax
+0046217e: xor eax,eax
+00462180: mov DWORD PTR [ebx+0x8],eax
+00462183: mov eax,ebx
+00462185: pop ebx
+00462186: ret 
+00462187: nop 

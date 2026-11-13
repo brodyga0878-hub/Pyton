@@ -1,0 +1,6 @@
+00453c50: push ebp
+00453c51: mov ebp,esp
+00453c53: mov eax,DWORD PTR [ebp+0x8]
+00453c56: mov eax,DWORD PTR [eax*4+0x4d0cfc]
+00453c5d: pop ebp
+00453c5e: ret 

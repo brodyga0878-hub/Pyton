@@ -1,0 +1,1140 @@
+{
+  "schema": 1,
+  "profile": "natural-contact-packaging-v1",
+  "success": true,
+  "test_count": 278,
+  "tests": [
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_active_motion_cannot_restore_only_rounded_json_clock",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_actual_local_startup_and_legacy_contract",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_celestial_presentation_requires_both_compiled_consumers",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_celestial_update_cannot_change_legacy_crossfade",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_celestial_update_cannot_change_original_lighting_or_geometry",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_celestial_update_cannot_change_simulation_save_or_transfer_functions",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_celestial_update_cannot_duplicate_system_projection_call",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_celestial_update_keeps_complete_previous_galactic_view",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_celestial_update_keeps_real_projection_consumers",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_celestial_visual_scope_keeps_gameplay_and_source_units_explicit",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_changed_raw_source_table_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_changed_streaming_shader_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_classic_console_command_without_main_consumer_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_classic_console_packaging_is_explicitly_bounded",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_full_packaging_summary_is_explicitly_bounded",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_full_startup_requires_native_navigation",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_galactic_map_without_jump_consumer_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_historical_v37_contract_does_not_accept_v38_Main_changes",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_host_binary_never_enters_apk",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_invalid_classic_console_compiled_header_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_invalid_navigation_compiled_header_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_invalid_new_compiled_header_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_legacy_helper_cannot_silently_upgrade",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_legacy_new_game_cannot_enable_raw_motion_by_default",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_legacy_saved_schema_cannot_disappear",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_missing_classic_console_compiled_module_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_missing_each_navigation_runtime_module_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_missing_new_kernel_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_missing_special_source_resource_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_missing_streaming_shader_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_modern_map_missing_or_invalid_compiled_view_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_modern_map_requires_actual_presentation_consumer",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_modern_map_requires_presentation_profile",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_modern_map_visual_scope_is_explicitly_presentation_only",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_native_fixtures_never_enter_apk",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_navigation_map_json_missing_or_changed_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_navigation_summary_declares_actual_scope_and_limits",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_new_atmosphere_table_is_not_whitelisted_for_code41",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_new_fuel_table_is_not_whitelisted_for_historical_versions",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_new_game_cannot_use_preview_layout",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_new_landing_gear_table_is_not_whitelisted_for_code42",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_new_natural_contact_table_is_not_whitelisted_for_code45",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_new_spherical_contact_table_is_not_whitelisted_for_code44",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_new_surface_contact_table_is_not_whitelisted_for_code43",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_normal_startup_cannot_remain_legacy",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_old_saves_cannot_silently_enable_raw_motion",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_projection_cannot_access_simulation_state_or_move_camera_pose",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_retained_orbit_native_provenance_still_runs_for_v34",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_retained_v3_raw_physics_checks_are_not_relaxed",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_source_function_extracts_inline_and_multiline_without_next_function",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_source_motion_kernel_without_main_consumer_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_source_motion_requires_saved_session_enable_gate",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_source_motion_scope_cannot_silently_include_ports",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_standalone_mining_kernel_missing_module_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_standalone_mining_kernel_packaging_does_not_claim_gameplay",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_stars_cannot_be_disconnected_from_FULL_coverage_fix",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_system_map_without_travel_consumer_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_time_scheduler_without_step_acknowledgement_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_tools_never_enter_apk",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_unproven_high_time_rates_reject",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_v36_source_tables_are_required_without_changing_old_contract",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_visual_map_update_cannot_change_protected_gameplay_or_data",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_visual_map_update_retains_worker_explicit_jump_and_input_deduplication",
+      "status": "passed"
+    },
+    {
+      "name": "test_android_full_packaging.FullPackagingChecks.test_wrong_motion_native_provenance_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_actual_source_hull_hp_cannot_be_substituted",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_all_retained_information_modules_remain_required",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_arrival_save_cannot_run_before_thermal_debit",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_atmospheric_time_acceleration_safety_cannot_be_disconnected",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_dos_heat_cannot_be_replaced_with_step_scaled_jjffe_formula",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_each_new_native_reference_is_frozen_without_reexecuting_oracle",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_each_original_procedure_anchor_is_pinned",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_every_compiled_integration_module_is_required",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_every_integration_module_header_and_length_is_checked",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_frozen_scope_and_honest_evidence_boundaries",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_fuel_heat_cannot_be_duplicated_in_thermal_save",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_live_actual_contact_cannot_be_replaced_by_sphere_guess",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_missing_or_different_exported_atmosphere_resource_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_modified_jjffe_heat_cannot_be_marked_original_dos",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_one_heat_state_cannot_be_relocated_in_metadata",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_original_dos_bytes_cannot_use_a_self_reported_hash",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_original_orbit_selection_remains_exact",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_raw_and_surface_drag_cannot_be_disconnected",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_raw_drag_cannot_reset_velocity_fractions",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_retained_fuel_hyperdrive_information_payloads_stay_checked",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_retained_fuel_native_references_still_reject_mutation",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_saved_hp_anchor_and_rng_validation_cannot_be_skipped",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_saved_thermal_phase_and_digest_validation_cannot_be_skipped",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_shared_solver_cannot_change_behind_new_contact_module",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_sixty_hz_cannot_be_claimed_as_original_player_scheduler",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_strict_restore_must_bind_raw_hp_without_live_repair",
+      "status": "passed"
+    },
+    {
+      "name": "test_atmosphere_packaging.AtmospherePackaging.test_wrong_executable_provenance_rejects_even_with_matching_export",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_actual_contact_query_cannot_be_replaced_by_a_sphere_guess",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_changed_stellar_geometry_cannot_use_self_reported_metadata",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_each_native_reference_is_pinned_without_reexecuting_oracle",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_each_new_compiled_module_header_is_checked",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_each_new_compiled_module_is_required",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_fuel_scoop_cannot_skip_original_hull_eligibility",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_historical_frozen_code41_scope_and_declared_limits",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_information_variable_tokens_remain_checked",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_jjffe_six_axis_restoration_cannot_be_called_canonical_dos",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_kernel_cannot_silently_restore_six_limits_on_ordinary_debit",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_live_fuel_tick_cannot_be_disconnected",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_missing_or_different_exported_fuel_resource_is_rejected",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_missing_original_stellar_model_is_rejected",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_old_hyperdrive_and_information_modules_are_still_required",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_old_hyperdrive_digest_cannot_be_changed_for_fuel_extension",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_original_main_orbit_selection_must_not_change",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_restored_jet_state_must_derive_flight_limits",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_saved_fraction_validation_cannot_be_removed",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_shared_contact_solver_cannot_mutate_behind_pinned_caller",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_source_drive_removal_cannot_keep_jet_fuel",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_wrong_original_provenance_is_rejected",
+      "status": "passed"
+    },
+    {
+      "name": "test_fuel_packaging.FuelPackaging.test_wrong_original_tank_capacity_cannot_pass_with_matching_export",
+      "status": "passed"
+    },
+    {
+      "name": "test_hyperdrive_packaging.HyperdrivePackaging.test_cancel_cannot_consume_reserved_fuel",
+      "status": "passed"
+    },
+    {
+      "name": "test_hyperdrive_packaging.HyperdrivePackaging.test_changed_native_reference_is_rejected_without_rerunning_it",
+      "status": "passed"
+    },
+    {
+      "name": "test_hyperdrive_packaging.HyperdrivePackaging.test_changed_new_session_fuel_or_eagle_claim_is_rejected",
+      "status": "passed"
+    },
+    {
+      "name": "test_hyperdrive_packaging.HyperdrivePackaging.test_changed_original_drive_bytes_are_rejected",
+      "status": "passed"
+    },
+    {
+      "name": "test_hyperdrive_packaging.HyperdrivePackaging.test_core_fuel_mutation_cannot_pass_audited_source_pin",
+      "status": "passed"
+    },
+    {
+      "name": "test_hyperdrive_packaging.HyperdrivePackaging.test_each_new_compiled_module_is_required",
+      "status": "passed"
+    },
+    {
+      "name": "test_hyperdrive_packaging.HyperdrivePackaging.test_historical_code40_fixture_is_exactly_pinned",
+      "status": "passed"
+    },
+    {
+      "name": "test_hyperdrive_packaging.HyperdrivePackaging.test_historical_code40_scope_is_explicit_and_bounded",
+      "status": "passed"
+    },
+    {
+      "name": "test_hyperdrive_packaging.HyperdrivePackaging.test_information_control_tokens_are_still_checked",
+      "status": "passed"
+    },
+    {
+      "name": "test_hyperdrive_packaging.HyperdrivePackaging.test_information_runtime_cannot_be_mutated",
+      "status": "passed"
+    },
+    {
+      "name": "test_hyperdrive_packaging.HyperdrivePackaging.test_invalid_compiled_core_is_rejected",
+      "status": "passed"
+    },
+    {
+      "name": "test_hyperdrive_packaging.HyperdrivePackaging.test_map_quote_cannot_revert_to_old_fuel_formula",
+      "status": "passed"
+    },
+    {
+      "name": "test_hyperdrive_packaging.HyperdrivePackaging.test_missing_or_wrong_exported_resource_is_rejected",
+      "status": "passed"
+    },
+    {
+      "name": "test_hyperdrive_packaging.HyperdrivePackaging.test_new_game_must_enable_source_hyperdrive",
+      "status": "passed"
+    },
+    {
+      "name": "test_hyperdrive_packaging.HyperdrivePackaging.test_original_physical_sources_and_mercury_fix_remain_frozen",
+      "status": "passed"
+    },
+    {
+      "name": "test_hyperdrive_packaging.HyperdrivePackaging.test_pending_completion_must_use_source_duration",
+      "status": "passed"
+    },
+    {
+      "name": "test_hyperdrive_packaging.HyperdrivePackaging.test_reviewed_information_resources_remain_required",
+      "status": "passed"
+    },
+    {
+      "name": "test_hyperdrive_packaging.HyperdrivePackaging.test_save_tamper_validation_cannot_be_skipped",
+      "status": "passed"
+    },
+    {
+      "name": "test_hyperdrive_packaging.HyperdrivePackaging.test_ui_tick_injection_cannot_move_ship",
+      "status": "passed"
+    },
+    {
+      "name": "test_hyperdrive_packaging.HyperdrivePackaging.test_wrong_original_provenance_is_rejected",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_auto_phase_thirty_and_blocked_phase_thirty_six_are_distinct",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_command_cannot_bypass_original_bounded_toggle_branch",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_console_gear_signal_cannot_be_disconnected",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_contact_comment_correction_cannot_conceal_geometry_math_change",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_each_integration_module_header_and_length_is_checked",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_each_integration_module_is_required",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_every_retained_atmospheric_native_reference_still_rejects_mutation",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_frozen_scope_retains_old_data_and_honest_partial_boundaries",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_gear_fraction_restore_validation_cannot_be_skipped",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_gear_resource_digest_restore_validation_cannot_be_skipped",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_gear_save_cannot_duplicate_thermal_state",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_hyperdrive_state_cannot_be_mutated_behind_independent_sibling",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_landed_restore_cannot_skip_physical_gear_validation",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_live_animation_cannot_disconnect_from_main_tick",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_matching_export_cannot_use_wrong_original_provenance",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_missing_or_different_exported_gear_resource_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_native_reference_is_frozen_without_reexecuting_oracle",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_object_timer_and_game_flight_state_cannot_be_conflated",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_old_fuel_atmosphere_hyperdrive_and_information_payloads_stay_checked",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_original_ascent_takeoff_function_remains_exact",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_original_instruction_bytes_cannot_use_self_reported_hash",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_original_signed_warning_threshold_cannot_be_replaced",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_physical_surface_readiness_cannot_be_replaced_with_true",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_polarity_cannot_be_flipped_to_requested_down_equals_set_bit",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_retained_information_modules_still_required",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_selected_original_toggle_must_not_instantly_teleport_physical_gear",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_sixty_hz_and_selected_branch_cannot_claim_full_original_dispatcher",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_soft_touchdown_cannot_ignore_incomplete_physical_gear",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_source_visual_must_not_add_a_second_wall_clock_animation",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_strict_restore_cannot_replace_saved_gear_with_fresh_defaults",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_thermal_consumer_must_use_raw_retract_bit_not_deployed_boolean",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_underground_contact_cannot_lose_gear_readiness",
+      "status": "passed"
+    },
+    {
+      "name": "test_landing_gear_packaging.LandingGearPackaging.test_world_orbits_cannot_change_behind_gear_block",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_all32_natural_parent_indices_required",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_all_old25_nonmain_sources_remain_unchanged",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_all_old_raw_resources_remain_checked",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_all_three_original_ship_models_are_required",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_child_displacement_axis_sign_and_radius_cannot_be_reinterpreted",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_child_pointer_uses_actual_va_to_file_mapping",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_child_record_count_cannot_drop_shuttle_offset",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_cobra_real_children_cannot_be_replaced_by_fake_zero_terminator",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_each_new_module_rejects_wrong_header_or64byte_truncation",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_each_of29_compiled_modules_required",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_every_new_local_runtime_source_is_frozen",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_export_must_match_local_metadata_bytes",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_frozen_runtime_scope_preserves_exact_code45_and_real_three_ship_lists",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_main_physical_tick_and_save_cannot_change",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_missing_new_metadata_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_model117_must_retain_nonspherical_source_flag",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_natural_diagnostic_preload_cannot_be_removed_or_duplicated",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_natural_terrain_stream_digest_cannot_be_self_reported",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_new_native_reference_bytes_cannot_change",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_old44_public_gate_remains_strict_against_actual46_main",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_old45_public_gate_remains_strict_against_actual46_main",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_original_source_provenance_cannot_be_replaced",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_player_inner_radius_must_remain_actual_positive_f1533_value",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_previous_resource_digest_contract_cannot_change",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_retained_native_domains_stay_pinned",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_ship_descriptor_cannot_be_fabricated",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_ship_physical_spec_cannot_be_replaced",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_source_feature_terminator_and_opcode_provenance_stay_exact",
+      "status": "passed"
+    },
+    {
+      "name": "test_natural_contact_packaging.NaturalContactPackaging.test_unreviewed_metadata_addition_rejects_frozen_hash",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_19_descriptor_streams_cannot_be_claimed19_initialized_objects",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_all149_routing_models_required",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_all_six_old_raw_resources_and_information_resources_stay_checked",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_collision_prefix_first_byte_checked_independently",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_coupled207_supported_and6_host_guards_cannot_be_conflated",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_diagnostic_probe_cannot_claim_physical_response_or_whole_world",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_each_new_compiled_header_and64byte_truncation_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_each_of26_compiled_integration_modules_required",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_export_cannot_differ_from_local_routing_resource",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_frozen_runtime_scope_and_distinct_native_domains",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_helper_cannot_claim_writing_collision_kind_hp_or_clock",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_incomplete_helper_proof_domain_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_jjffe_parent_inner_operand_cannot_replace_uploaded_dos_outer",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_main_diagnostic_probe_consumer_cannot_be_removed_or_duplicated",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_main_probe_cannot_run_as_a_physical_tick_mutation",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_missing_new_routing_resource_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_model_zero_descriptor_is_not_an_initialized_object",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_natural_models_cannot_be_reclassified_as_simple_spheres",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_old44_public_gate_remains_strict_against_actual45_main",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_old858_response_native_controls_still_pinned",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_old_fuel_atmosphere_gear_and_hyper_native_controls_retained",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_old_resource_digest_contract_cannot_change",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_old_surface_bridge_nav_and_shared_hp_owner_remain_immutable",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_pending_contact_menu_and_save_recovery_cannot_change",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_published_physical_provider_compiled_module_remains_required",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_pure1141_native_reference_cannot_be_changed",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_retained_information_compiled_modules_required",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_routing_descriptor_pointer_cannot_be_fabricated",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_self_reported_hash_cannot_replace_original_instruction_anchor",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_source_core_pipeline_and_probe_all_require_exact_reviewed_bytes",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_unreviewed_routing_resource_metadata_change_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_spherical_contact_packaging.SphericalContactPackaging.test_wrong_original_executable_provenance_rejects_matching_export",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_actual_bounded_native_fixture_cannot_be_replaced_with_self_reported_case_count",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_all_retained_resources_remain_checked",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_arrival_save_must_follow_thermal_fuel_debit",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_bounded_entry_cannot_claim_whole_f575_or_excluded_pair_response",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_bridge_cannot_replace_bounded_kernel_with_a_phone_impact_formula",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_candidate_pose_must_validate_before_hp_mutation",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_contact_event_must_be_cleared_after_exactly_one_pose_application",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_contact_f953_calls_must_use_existing_saved_hp_rng",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_each_integration_module_is_required",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_each_new_module_header_and_length_is_checked",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_each_published_geometry_provider_is_required",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_failed_contact_retry_must_complete_its_saved_interval_commands",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_frozen_scope_and_retained_evidence_boundaries",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_incomplete_or_prototype_helper_domain_cannot_be_released",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_instruction_proof_bytes_cannot_use_a_self_reported_hash",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_jjffe_sphere_fix_and_pair_rewrite_cannot_be_claimed_live",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_main_contact_resolution_must_consume_physical_gear_word",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_missing_or_different_exported_provenance_json_rejects",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_native_planet_height_must_not_be_rounded_to_float32_before_mapping",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_old_provider_source_cannot_change_behind_pinned_bridge",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_original_landing_speed_gear_alignment_thresholds_are_pinned",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_original_runtime_descriptor_table_cannot_be_substituted",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_original_ship_descriptor_and_specification_cannot_use_visual_fallback",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_pending_contact_speed_guard_cannot_hide_other_physical_changes",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_phone_provider_cannot_claim_original_classification_and_frames",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_pose_commit_must_not_apply_a_second_percent_penalty",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_preimpact_nozzle_capture_cannot_follow_native_pose_rotation",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_published_city_floor_cannot_bypass_the_common_response",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_retained_native_fuel_atmosphere_gear_controls_remain_required",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_saved_thermal_fraction_and_inventory_validation_stay_exact",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_shared_original_math_cannot_change_behind_new_kernel",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_source_damage_requests_cannot_be_replaced_with_empty_list",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_unresolved_contact_cannot_be_saved_before_pose_and_hp_finish",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_world_motion_must_not_change_behind_contact_block",
+      "status": "passed"
+    },
+    {
+      "name": "test_surface_contact_packaging.SurfaceContactPackaging.test_wrong_executable_provenance_cannot_pass_matching_export",
+      "status": "passed"
+    },
+    {
+      "name": "test_system_information_packaging.InformationPackaging.test_constructor_tail_cannot_become_a_long_description",
+      "status": "passed"
+    },
+    {
+      "name": "test_system_information_packaging.InformationPackaging.test_current_information_scope_and_original_boundaries",
+      "status": "passed"
+    },
+    {
+      "name": "test_system_information_packaging.InformationPackaging.test_each_information_runtime_module_is_required",
+      "status": "passed"
+    },
+    {
+      "name": "test_system_information_packaging.InformationPackaging.test_each_raw_and_translated_resource_is_required",
+      "status": "passed"
+    },
+    {
+      "name": "test_system_information_packaging.InformationPackaging.test_historical_navigation_and_map_logic_cannot_drift",
+      "status": "passed"
+    },
+    {
+      "name": "test_system_information_packaging.InformationPackaging.test_historical_v38_fixture_is_exactly_pinned",
+      "status": "passed"
+    },
+    {
+      "name": "test_system_information_packaging.InformationPackaging.test_historical_v39_fixture_is_exactly_pinned",
+      "status": "passed"
+    },
+    {
+      "name": "test_system_information_packaging.InformationPackaging.test_information_cannot_change_simulation_or_save_functions",
+      "status": "passed"
+    },
+    {
+      "name": "test_system_information_packaging.InformationPackaging.test_information_cannot_undo_mercury_stellar_fix",
+      "status": "passed"
+    },
+    {
+      "name": "test_system_information_packaging.InformationPackaging.test_information_helper_cannot_advance_simulation",
+      "status": "passed"
+    },
+    {
+      "name": "test_system_information_packaging.InformationPackaging.test_invalid_compiled_information_is_rejected",
+      "status": "passed"
+    },
+    {
+      "name": "test_system_information_packaging.InformationPackaging.test_projection_cannot_write_ship_position",
+      "status": "passed"
+    },
+    {
+      "name": "test_system_information_packaging.InformationPackaging.test_runtime_resource_must_equal_source",
+      "status": "passed"
+    },
+    {
+      "name": "test_system_information_packaging.InformationPackaging.test_source_provenance_must_be_original",
+      "status": "passed"
+    },
+    {
+      "name": "test_system_information_packaging.InformationPackaging.test_system_map_cannot_redirect_travel",
+      "status": "passed"
+    },
+    {
+      "name": "test_system_information_packaging.InformationPackaging.test_translation_cannot_lose_source_variable_codes",
+      "status": "passed"
+    }
+  ],
+  "failures": [],
+  "errors": [],
+  "skipped": [],
+  "source_sha256": {
+    "tools/verify_rebuilt_android.py": "2fc1bd4172cf978afc8b6a662e8a0562d7c9de6970efd867a3b076ccd84fcd6c",
+    "tools/extract_natural_contact.py": "0c7d562cbeaac2dbbdec71bfcfb572b00869df1d49e5c05d84342eff28d8b3a7",
+    "data/ffe_natural_contact.json": "0074a49df9f22879a4eefbef6dda183cbb517243792dd8d086cb782c2da5603e",
+    "tests/test_natural_contact_packaging.py": "21ced896bcc43288f66308aac3e9c2918364c24d4451e9b36d90662374a2dcf8",
+    "tests/test_extract_natural_contact.py": "4b0febfc4df5261812031f75e8d6687140ce8b1c2ec94944e1041c0795a9d88c",
+    "tests/test_android_full_packaging.py": "d6093db1a586b62ad3f415806181151c24b1b66a314e7a40e6b22469608c35f4",
+    "tests/test_spherical_contact_packaging.py": "de86108eef80960edcd88ae4cbea11c3f09cd0e169d927a8bec4ca449fbf495c",
+    "tests/fixtures/natural_v45_sources.json": "f9511cf774d7a54826a77a71d0ac5a88ae68369e0ed63d6eb8f2717b9a66a60d",
+    "tests/fixtures/source_natural_contact_native.json": "d4ce0cf3ebfe0fd3bb1f263d047fa3a17ffc5201b8040389fdbddcc21a50e166"
+  },
+  "claims": {
+    "mock_GDSC_packaging_only": true,
+    "native_oracle_executed_by_this_runner": false,
+    "Godot_or_Android_executed_by_this_runner": false,
+    "physical_device_tested": false
+  }
+}

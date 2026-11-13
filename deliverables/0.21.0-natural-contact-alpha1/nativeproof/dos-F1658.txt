@@ -1,0 +1,23 @@
+00459ad0: push ebp
+00459ad1: mov ebp,esp
+00459ad3: push ebx
+00459ad4: push esi
+00459ad5: mov esi,DWORD PTR [ebp+0x8]
+00459ad8: push esi
+00459ad9: call 0x459a00
+00459ade: pop ecx
+00459adf: mov ebx,eax
+00459ae1: sub ebx,DWORD PTR [ebp+0xc]
+00459ae4: test ebx,ebx
+00459ae6: jg 0x459aec
+00459ae8: xor eax,eax
+00459aea: jmp 0x459af8
+00459aec: push ebx
+00459aed: push esi
+00459aee: call 0x459c58
+00459af3: add esp,0x8
+00459af6: mov eax,ebx
+00459af8: pop esi
+00459af9: pop ebx
+00459afa: pop ebp
+00459afb: ret 

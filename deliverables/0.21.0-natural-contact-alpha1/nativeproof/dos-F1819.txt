@@ -1,0 +1,9 @@
+00462128: push ebp
+00462129: mov ebp,esp
+0046212b: mov eax,DWORD PTR [ebp+0x8]
+0046212e: dec DWORD PTR ds:0x69e764
+00462134: mov edx,DWORD PTR ds:0x69e760
+0046213a: mov DWORD PTR [eax],edx
+0046213c: mov ds:0x69e760,eax
+00462141: pop ebp
+00462142: ret 

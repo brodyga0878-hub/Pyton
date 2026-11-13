@@ -1,0 +1,34 @@
+00463b78: push ebp
+00463b79: mov ebp,esp
+00463b7b: push ebx
+00463b7c: push esi
+00463b7d: push edi
+00463b7e: mov edi,DWORD PTR [ebp+0xc]
+00463b81: mov esi,DWORD PTR [ebp+0x8]
+00463b84: cmp DWORD PTR [ebp+0x10],0x1
+00463b88: jg 0x463b98
+00463b8a: xor esi,edi
+00463b8c: push esi
+00463b8d: call 0x4623b8
+00463b92: pop ecx
+00463b93: sar eax,0x4
+00463b96: jmp 0x463bb7
+00463b98: mov ebx,esi
+00463b9a: sub ebx,edi
+00463b9c: test ebx,ebx
+00463b9e: jge 0x463ba2
+00463ba0: neg ebx
+00463ba2: push ebx
+00463ba3: xor esi,edi
+00463ba5: push esi
+00463ba6: call 0x4623b8
+00463bab: pop ecx
+00463bac: push eax
+00463bad: call 0x453478
+00463bb2: add esp,0x8
+00463bb5: sar eax,1
+00463bb7: pop edi
+00463bb8: pop esi
+00463bb9: pop ebx
+00463bba: pop ebp
+00463bbb: ret 

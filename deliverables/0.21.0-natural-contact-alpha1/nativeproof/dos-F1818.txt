@@ -1,0 +1,15 @@
+004620f0: push ebx
+004620f1: mov ebx,DWORD PTR ds:0x69e760
+004620f7: inc DWORD PTR ds:0x69e764
+004620fd: cmp DWORD PTR ds:0x69e764,0x5dc
+00462107: jl 0x462118
+00462109: push 0x1
+0046210b: push 0x69e740
+00462110: call 0x477f56
+00462115: add esp,0x8
+00462118: mov eax,ds:0x69e760
+0046211d: mov eax,DWORD PTR [eax]
+0046211f: mov ds:0x69e760,eax
+00462124: mov eax,ebx
+00462126: pop ebx
+00462127: ret 

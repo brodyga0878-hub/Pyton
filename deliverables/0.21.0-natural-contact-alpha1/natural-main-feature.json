@@ -1,0 +1,32 @@
+{
+  "schema": "starfrontier-source-archive-natural-feature-v1",
+  "started_utc": "2026-11-13T12:10:57.620553+00:00",
+  "finished_utc": "2026-11-13T12:11:16.305567+00:00",
+  "duration_seconds": 18.685025,
+  "source_commit": "abae633776275a88bf0706893a030e7497ae6ef0",
+  "archive_sha256": "13d0309677062e8e2b8e6e10c5fc48b7bd7e75984adf6925de93df02a4fd6fa1",
+  "command": [
+    "godot",
+    "--headless",
+    "--audio-driver",
+    "Dummy",
+    "--path",
+    "/workspace/recovery/natural-source-portability/source/StarFrontier-0.21.0-natural-contact-source",
+    "--script",
+    "res://tests/test_source_natural_contact_main.gd",
+    "--",
+    "--rebuild-capture"
+  ],
+  "exit_code": 0,
+  "checks": 163,
+  "failures": 0,
+  "error_markers": [],
+  "source_actual_files": 1368,
+  "all_source_files_unchanged": true,
+  "modified_files": [],
+  "private_xdg": true,
+  "execution_policy": "require_escalated",
+  "log_sha256": "47acd65fc5708b42714a74d246151996b082f0ca0116e47b45a360ae4fb8876d",
+  "scope": "Exact source ZIP, fresh isolated actual Main readonly natural F576/log/report/cold/cache and preserved terrain test. Repeated portability checks excluded from current distinct total. No Android device execution.",
+  "ok": true
+}

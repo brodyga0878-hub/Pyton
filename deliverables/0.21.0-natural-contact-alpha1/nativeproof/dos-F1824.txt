@@ -1,0 +1,16 @@
+004623b8: push ebp
+004623b9: mov ebp,esp
+004623bb: mov eax,DWORD PTR [ebp+0x8]
+004623be: mov edx,eax
+004623c0: shr edx,0x1b
+004623c3: mov ecx,eax
+004623c5: shl ecx,0x5
+004623c8: or edx,ecx
+004623ca: add edx,eax
+004623cc: mov ecx,edx
+004623ce: shr ecx,0x10
+004623d1: shl edx,0x10
+004623d4: or ecx,edx
+004623d6: add eax,ecx
+004623d8: pop ebp
+004623d9: ret 

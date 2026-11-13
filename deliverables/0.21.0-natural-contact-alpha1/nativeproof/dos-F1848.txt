@@ -1,0 +1,26 @@
+00463c74: push ebp
+00463c75: mov ebp,esp
+00463c77: mov eax,DWORD PTR [ebp+0x8]
+00463c7a: cmp DWORD PTR [eax+0x4],0x0
+00463c7e: jne 0x463c88
+00463c80: mov WORD PTR [eax+0x24],0x2
+00463c86: jmp 0x463c99
+00463c88: mov dx,0x1
+00463c8c: cmp DWORD PTR [eax+0x4],0x0
+00463c90: jl 0x463c95
+00463c92: add edx,0x3
+00463c95: mov WORD PTR [eax+0x24],dx
+00463c99: cmp DWORD PTR [eax+0x8],0x0
+00463c9d: jne 0x463ca7
+00463c9f: mov WORD PTR [eax+0x26],0x2
+00463ca5: pop ebp
+00463ca6: ret 
+00463ca7: mov dx,0x1
+00463cab: cmp DWORD PTR [eax+0x8],0x0
+00463caf: jl 0x463cb4
+00463cb1: add edx,0x3
+00463cb4: mov WORD PTR [eax+0x26],dx
+00463cb8: pop ebp
+00463cb9: ret 
+00463cba: nop 
+00463cbb: nop 

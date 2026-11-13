@@ -1,0 +1,16 @@
+00453495: push ebp
+00453496: mov ebp,esp
+00453498: mov eax,DWORD PTR [ebp+0x8]
+0045349b: shr eax,1
+0045349d: cmp eax,DWORD PTR [ebp+0xc]
+004534a0: jb 0x4534a7
+004534a2: or eax,0xffffffff
+004534a5: pop ebp
+004534a6: ret 
+004534a7: mov edx,DWORD PTR [ebp+0x8]
+004534aa: mov eax,edx
+004534ac: shr edx,1
+004534ae: shl eax,0x1f
+004534b1: div DWORD PTR [ebp+0xc]
+004534b4: pop ebp
+004534b5: ret 

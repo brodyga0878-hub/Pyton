@@ -1,0 +1,61 @@
+00452aff: push ebp
+00452b00: mov ebp,esp
+00452b02: push ecx
+00452b03: push ebx
+00452b04: push esi
+00452b05: xor eax,eax
+00452b07: mov edx,0x80000000
+00452b0c: cmp edx,DWORD PTR [ebp+0x8]
+00452b0f: jbe 0x452b1a
+00452b11: inc eax
+00452b12: shr edx,0x2
+00452b15: cmp edx,DWORD PTR [ebp+0x8]
+00452b18: ja 0x452b11
+00452b1a: xor edx,edx
+00452b1c: mov DWORD PTR [ebp-0x4],edx
+00452b1f: xor edx,edx
+00452b21: cmp eax,0xf
+00452b24: jg 0x452b58
+00452b26: lea ecx,[eax-0x1]
+00452b29: mov ebx,DWORD PTR [ebp-0x4]
+00452b2c: shr ebx,cl
+00452b2e: add ebx,edx
+00452b30: mov ecx,eax
+00452b32: add ecx,ecx
+00452b34: mov esi,0x80000000
+00452b39: shr esi,cl
+00452b3b: add ebx,esi
+00452b3d: mov ecx,ebx
+00452b3f: cmp ecx,DWORD PTR [ebp+0x8]
+00452b42: ja 0x452b52
+00452b44: mov edx,ecx
+00452b46: mov ecx,eax
+00452b48: mov ebx,0x80000000
+00452b4d: shr ebx,cl
+00452b4f: add DWORD PTR [ebp-0x4],ebx
+00452b52: inc eax
+00452b53: cmp eax,0xf
+00452b56: jle 0x452b26
+00452b58: cmp eax,0x1f
+00452b5b: jg 0x452b82
+00452b5d: lea ecx,[eax-0x1]
+00452b60: mov ebx,DWORD PTR [ebp-0x4]
+00452b63: shr ebx,cl
+00452b65: mov ecx,ebx
+00452b67: add ecx,edx
+00452b69: cmp ecx,DWORD PTR [ebp+0x8]
+00452b6c: ja 0x452b7c
+00452b6e: mov edx,ecx
+00452b70: mov ecx,eax
+00452b72: mov ebx,0x80000000
+00452b77: shr ebx,cl
+00452b79: add DWORD PTR [ebp-0x4],ebx
+00452b7c: inc eax
+00452b7d: cmp eax,0x1f
+00452b80: jle 0x452b5d
+00452b82: mov eax,DWORD PTR [ebp-0x4]
+00452b85: pop esi
+00452b86: pop ebx
+00452b87: pop ecx
+00452b88: pop ebp
+00452b89: ret 

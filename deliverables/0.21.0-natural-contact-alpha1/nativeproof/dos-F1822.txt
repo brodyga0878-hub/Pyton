@@ -1,0 +1,13 @@
+004621c8: push ebp
+004621c9: mov ebp,esp
+004621cb: mov eax,DWORD PTR [ebp+0x8]
+004621ce: movsx edx,WORD PTR [eax]
+004621d1: test edx,edx
+004621d3: je 0x4621df
+004621d5: add eax,0x10
+004621d8: movsx edx,WORD PTR [eax]
+004621db: test edx,edx
+004621dd: jne 0x4621d5
+004621df: add eax,0x2
+004621e2: pop ebp
+004621e3: ret 

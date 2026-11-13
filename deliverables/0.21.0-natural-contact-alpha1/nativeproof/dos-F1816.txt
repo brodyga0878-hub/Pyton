@@ -1,0 +1,44 @@
+00462068: push ebx
+00462069: push esi
+0046206a: push edi
+0046206b: mov ecx,0x69e768
+00462070: mov ebx,0x6b8d50
+00462075: cmp DWORD PTR ds:0x69e760,0x0
+0046207c: jne 0x4620e1
+0046207e: mov DWORD PTR ds:0x69e760,ecx
+00462084: xor eax,eax
+00462086: mov edx,ecx
+00462088: mov esi,eax
+0046208a: shl esi,0x3
+0046208d: lea esi,[esi+esi*8]
+00462090: lea edi,[ecx+0x48]
+00462093: add esi,edi
+00462095: mov DWORD PTR [edx],esi
+00462097: inc eax
+00462098: add edx,0x48
+0046209b: cmp eax,0x5db
+004620a0: jl 0x462088
+004620a2: xor eax,eax
+004620a4: mov DWORD PTR [ecx+0x1a598],eax
+004620aa: mov DWORD PTR ds:0x6b8d48,ebx
+004620b0: xor eax,eax
+004620b2: mov edx,ebx
+004620b4: mov ecx,eax
+004620b6: shl ecx,0x4
+004620b9: lea esi,[ebx+0x10]
+004620bc: add ecx,esi
+004620be: mov DWORD PTR [edx],ecx
+004620c0: inc eax
+004620c1: add edx,0x10
+004620c4: cmp eax,0xbb7
+004620c9: jl 0x4620b4
+004620cb: xor eax,eax
+004620cd: mov DWORD PTR [ebx+0xbb70],eax
+004620d3: xor eax,eax
+004620d5: mov ds:0x69e764,eax
+004620da: xor eax,eax
+004620dc: mov ds:0x6b8d4c,eax
+004620e1: pop edi
+004620e2: pop esi
+004620e3: pop ebx
+004620e4: ret 

@@ -1,0 +1,243 @@
+00428bf4: push ebp
+00428bf5: mov ebp,esp
+00428bf7: add esp,0xfffffff8
+00428bfa: push ebx
+00428bfb: push esi
+00428bfc: push edi
+00428bfd: mov esi,DWORD PTR [ebp+0x10]
+00428c00: mov bl,BYTE PTR [esi]
+00428c02: inc esi
+00428c03: test bl,bl
+00428c05: je 0x428e72
+00428c0b: xor eax,eax
+00428c0d: mov al,BYTE PTR [esi]
+00428c0f: mov DWORD PTR [ebp-0x4],eax
+00428c12: inc esi
+00428c13: test bl,0x20
+00428c16: je 0x428cba
+00428c1c: mov al,BYTE PTR [esi]
+00428c1e: inc esi
+00428c1f: and eax,0xff
+00428c24: mov edx,DWORD PTR [ebp+0x14]
+00428c27: movzx edx,WORD PTR [edx+eax*2+0x9c]
+00428c2f: mov al,BYTE PTR [esi]
+00428c31: inc esi
+00428c32: movsx ecx,al
+00428c35: and ecx,0x1f
+00428c38: shr edx,cl
+00428c3a: movsx eax,al
+00428c3d: sar eax,0x7
+00428c40: xor edx,eax
+00428c42: test dl,0x1
+00428c45: je 0x428cba
+00428c47: and ebx,0xc0
+00428c4d: sub ebx,0x1
+00428c50: jb 0x428c66
+00428c52: sub ebx,0x3f
+00428c55: je 0x428c98
+00428c57: sub ebx,0x40
+00428c5a: je 0x428ca5
+00428c5c: sub ebx,0x40
+00428c5f: je 0x428cad
+00428c61: jmp 0x428e67
+00428c66: movzx edi,BYTE PTR [esi]
+00428c69: inc esi
+00428c6a: cmp edi,0xff
+00428c70: jne 0x428c83
+00428c72: add esi,0x6
+00428c75: push esi
+00428c76: call 0x4621c8
+00428c7b: pop ecx
+00428c7c: mov esi,eax
+00428c7e: jmp 0x428e67
+00428c83: test edi,edi
+00428c85: je 0x428e67
+00428c8b: movzx edi,BYTE PTR [esi]
+00428c8e: inc esi
+00428c8f: test edi,edi
+00428c91: jne 0x428c8b
+00428c93: jmp 0x428e67
+00428c98: movzx edi,BYTE PTR [esi]
+00428c9b: inc esi
+00428c9c: test edi,edi
+00428c9e: jne 0x428c98
+00428ca0: jmp 0x428e67
+00428ca5: add esi,0x4
+00428ca8: jmp 0x428e67
+00428cad: movzx edi,BYTE PTR [esi]
+00428cb0: inc esi
+00428cb1: test edi,edi
+00428cb3: jne 0x428cad
+00428cb5: jmp 0x428e67
+00428cba: mov eax,ebx
+00428cbc: and eax,0xc0
+00428cc1: sub eax,0x1
+00428cc4: jb 0x428ce6
+00428cc6: sub eax,0x3f
+00428cc9: je 0x428d7b
+00428ccf: sub eax,0x40
+00428cd2: je 0x428dbc
+00428cd8: sub eax,0x40
+00428cdb: je 0x428e2b
+00428ce1: jmp 0x428e67
+00428ce6: movzx edi,BYTE PTR [esi]
+00428ce9: inc esi
+00428cea: cmp edi,0xff
+00428cf0: jne 0x428d38
+00428cf2: mov eax,DWORD PTR [ebp+0xc]
+00428cf5: push eax
+00428cf6: mov eax,DWORD PTR [ebp+0x18]
+00428cf9: push eax
+00428cfa: mov eax,DWORD PTR [ebp+0x14]
+00428cfd: push eax
+00428cfe: push esi
+00428cff: lea eax,[ebp-0x8]
+00428d02: push eax
+00428d03: call 0x4285ec
+00428d08: add esp,0x14
+00428d0b: mov esi,eax
+00428d0d: cmp DWORD PTR [ebp-0x8],0x0
+00428d11: jne 0x428d28
+00428d13: mov al,BYTE PTR [ebp-0x4]
+00428d16: or BYTE PTR ds:0x633ec9,al
+00428d1c: mov eax,DWORD PTR [ebp+0x8]
+00428d1f: mov BYTE PTR [eax],bl
+00428d21: xor eax,eax
+00428d23: jmp 0x428e7a
+00428d28: mov al,BYTE PTR [ebp-0x4]
+00428d2b: and al,0x7f
+00428d2d: or BYTE PTR ds:0x633ec9,al
+00428d33: jmp 0x428e67
+00428d38: test edi,edi
+00428d3a: je 0x428e67
+00428d40: mov eax,DWORD PTR [ebp+0xc]
+00428d43: push eax
+00428d44: push edi
+00428d45: mov eax,DWORD PTR [ebp+0x18]
+00428d48: push eax
+00428d49: call 0x428e84
+00428d4e: add esp,0xc
+00428d51: test eax,eax
+00428d53: je 0x428d6d
+00428d55: mov al,BYTE PTR [ebp-0x4]
+00428d58: and al,0x7f
+00428d5a: or BYTE PTR ds:0x633ec9,al
+00428d60: mov eax,DWORD PTR [ebp+0x8]
+00428d63: mov BYTE PTR [eax],bl
+00428d65: or eax,0xffffffff
+00428d68: jmp 0x428e7a
+00428d6d: inc esi
+00428d6e: movzx edi,BYTE PTR [esi-0x1]
+00428d72: test edi,edi
+00428d74: jne 0x428d40
+00428d76: jmp 0x428e67
+00428d7b: movzx edi,BYTE PTR [esi]
+00428d7e: inc esi
+00428d7f: test edi,edi
+00428d81: jne 0x428d9b
+00428d83: mov al,BYTE PTR [ebp-0x4]
+00428d86: and al,0x7f
+00428d88: or BYTE PTR ds:0x633ec9,al
+00428d8e: mov eax,DWORD PTR [ebp+0x8]
+00428d91: mov BYTE PTR [eax],bl
+00428d93: or eax,0xffffffff
+00428d96: jmp 0x428e7a
+00428d9b: mov eax,DWORD PTR [ebp+0xc]
+00428d9e: push eax
+00428d9f: push edi
+00428da0: mov eax,DWORD PTR [ebp+0x18]
+00428da3: push eax
+00428da4: call 0x428e84
+00428da9: add esp,0xc
+00428dac: test eax,eax
+00428dae: jne 0x428d7b
+00428db0: mov al,BYTE PTR [esi]
+00428db2: inc esi
+00428db3: test al,al
+00428db5: jne 0x428db0
+00428db7: jmp 0x428e67
+00428dbc: movzx edi,BYTE PTR [esi]
+00428dbf: shl edi,0x8
+00428dc2: inc esi
+00428dc3: xor eax,eax
+00428dc5: mov al,BYTE PTR [esi]
+00428dc7: or edi,eax
+00428dc9: inc esi
+00428dca: mov dl,BYTE PTR [esi]
+00428dcc: inc esi
+00428dcd: mov al,BYTE PTR [esi]
+00428dcf: inc esi
+00428dd0: mov ecx,DWORD PTR [ebp+0x14]
+00428dd3: push ecx
+00428dd4: mov ecx,DWORD PTR [ebp+0x18]
+00428dd7: push ecx
+00428dd8: push edx
+00428dd9: push eax
+00428dda: push edi
+00428ddb: mov eax,DWORD PTR [ebp+0xc]
+00428dde: push eax
+00428ddf: mov eax,DWORD PTR [ebp+0x8]
+00428de2: push eax
+00428de3: call 0x428430
+00428de8: add esp,0x1c
+00428deb: mov edx,DWORD PTR [ebp+0x8]
+00428dee: mov dl,BYTE PTR [edx]
+00428df0: or BYTE PTR ds:0x633ecd,dl
+00428df6: test eax,eax
+00428df8: jge 0x428e0f
+00428dfa: mov al,BYTE PTR [ebp-0x4]
+00428dfd: and al,0x7f
+00428dff: or BYTE PTR ds:0x633ec9,al
+00428e05: mov eax,DWORD PTR [ebp+0x8]
+00428e08: mov BYTE PTR [eax],bl
+00428e0a: or eax,0xffffffff
+00428e0d: jmp 0x428e7a
+00428e0f: test eax,eax
+00428e11: jg 0x428e67
+00428e13: mov al,BYTE PTR [ebp-0x4]
+00428e16: or BYTE PTR ds:0x633ec9,al
+00428e1c: test BYTE PTR [ebp-0x4],0x80
+00428e20: je 0x428e67
+00428e22: mov eax,DWORD PTR [ebp+0x8]
+00428e25: mov BYTE PTR [eax],bl
+00428e27: xor eax,eax
+00428e29: jmp 0x428e7a
+00428e2b: movzx edi,BYTE PTR [esi]
+00428e2e: inc esi
+00428e2f: test edi,edi
+00428e31: jne 0x428e4b
+00428e33: mov al,BYTE PTR [ebp-0x4]
+00428e36: or BYTE PTR ds:0x633ec9,al
+00428e3c: test BYTE PTR [ebp-0x4],0x80
+00428e40: je 0x428e4b
+00428e42: mov eax,DWORD PTR [ebp+0x8]
+00428e45: mov BYTE PTR [eax],bl
+00428e47: xor eax,eax
+00428e49: jmp 0x428e7a
+00428e4b: mov eax,DWORD PTR [ebp+0xc]
+00428e4e: push eax
+00428e4f: push edi
+00428e50: mov eax,DWORD PTR [ebp+0x18]
+00428e53: push eax
+00428e54: call 0x428e84
+00428e59: add esp,0xc
+00428e5c: test eax,eax
+00428e5e: je 0x428e2b
+00428e60: mov bl,BYTE PTR [esi]
+00428e62: inc esi
+00428e63: test bl,bl
+00428e65: jne 0x428e60
+00428e67: mov bl,BYTE PTR [esi]
+00428e69: inc esi
+00428e6a: test bl,bl
+00428e6c: jne 0x428c0b
+00428e72: mov eax,DWORD PTR [ebp+0x8]
+00428e75: mov BYTE PTR [eax],0x0
+00428e78: mov al,0x1
+00428e7a: pop edi
+00428e7b: pop esi
+00428e7c: pop ebx
+00428e7d: pop ecx
+00428e7e: pop ecx
+00428e7f: pop ebp
+00428e80: ret 

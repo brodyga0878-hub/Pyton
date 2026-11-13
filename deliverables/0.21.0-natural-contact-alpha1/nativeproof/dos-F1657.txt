@@ -1,0 +1,84 @@
+00459a00: push ebp
+00459a01: mov ebp,esp
+00459a03: push esi
+00459a04: mov eax,DWORD PTR [ebp+0x8]
+00459a07: mov edx,DWORD PTR [eax+0x4]
+00459a0a: test edx,edx
+00459a0c: je 0x459a11
+00459a0e: inc edx
+00459a0f: jne 0x459a25
+00459a11: mov ecx,DWORD PTR [eax+0xc]
+00459a14: test ecx,ecx
+00459a16: je 0x459a1b
+00459a18: inc ecx
+00459a19: jne 0x459a25
+00459a1b: mov esi,DWORD PTR [eax+0x14]
+00459a1e: test esi,esi
+00459a20: je 0x459a60
+00459a22: inc esi
+00459a23: je 0x459a60
+00459a25: cmp DWORD PTR [eax+0x4],0x0
+00459a29: jge 0x459a32
+00459a2b: mov edx,DWORD PTR [eax+0x4]
+00459a2e: neg edx
+00459a30: jmp 0x459a35
+00459a32: mov edx,DWORD PTR [eax+0x4]
+00459a35: cmp DWORD PTR [eax+0xc],0x0
+00459a39: jge 0x459a42
+00459a3b: mov ecx,DWORD PTR [eax+0xc]
+00459a3e: neg ecx
+00459a40: jmp 0x459a45
+00459a42: mov ecx,DWORD PTR [eax+0xc]
+00459a45: or edx,ecx
+00459a47: cmp DWORD PTR [eax+0x14],0x0
+00459a4b: jge 0x459a54
+00459a4d: mov ecx,DWORD PTR [eax+0x14]
+00459a50: neg ecx
+00459a52: jmp 0x459a57
+00459a54: mov ecx,DWORD PTR [eax+0x14]
+00459a57: or edx,ecx
+00459a59: mov eax,0x20
+00459a5e: jmp 0x459a94
+00459a60: cmp DWORD PTR [eax+0x4],0x0
+00459a64: jge 0x459a6c
+00459a66: mov edx,DWORD PTR [eax]
+00459a68: neg edx
+00459a6a: jmp 0x459a6e
+00459a6c: mov edx,DWORD PTR [eax]
+00459a6e: cmp DWORD PTR [eax+0xc],0x0
+00459a72: jge 0x459a7b
+00459a74: mov ecx,DWORD PTR [eax+0x8]
+00459a77: neg ecx
+00459a79: jmp 0x459a7e
+00459a7b: mov ecx,DWORD PTR [eax+0x8]
+00459a7e: or edx,ecx
+00459a80: cmp DWORD PTR [eax+0x14],0x0
+00459a84: jge 0x459a8d
+00459a86: mov ecx,DWORD PTR [eax+0x10]
+00459a89: neg ecx
+00459a8b: jmp 0x459a90
+00459a8d: mov ecx,DWORD PTR [eax+0x10]
+00459a90: or edx,ecx
+00459a92: xor eax,eax
+00459a94: cmp edx,0xffff
+00459a9a: jbe 0x459aa2
+00459a9c: shr edx,0x10
+00459a9f: add eax,0x10
+00459aa2: cmp edx,0xff
+00459aa8: jbe 0x459ab0
+00459aaa: shr edx,0x8
+00459aad: add eax,0x8
+00459ab0: cmp edx,0xf
+00459ab3: jbe 0x459abb
+00459ab5: shr edx,0x4
+00459ab8: add eax,0x4
+00459abb: cmp edx,0x3
+00459abe: jbe 0x459ac6
+00459ac0: shr edx,0x2
+00459ac3: add eax,0x2
+00459ac6: cmp edx,0x1
+00459ac9: jbe 0x459acc
+00459acb: inc eax
+00459acc: pop esi
+00459acd: pop ebp
+00459ace: ret 

@@ -1,0 +1,24 @@
+004626f0: push ebp
+004626f1: mov ebp,esp
+004626f3: push ebx
+004626f4: push esi
+004626f5: push edi
+004626f6: mov ebx,DWORD PTR [ebp+0x8]
+004626f9: mov esi,DWORD PTR [ebx+0xc]
+004626fc: cmp esi,0x400
+00462702: jge 0x462709
+00462704: mov esi,0x400
+00462709: push esi
+0046270a: call 0x4599b4
+0046270f: pop ecx
+00462710: mov edi,DWORD PTR ds:0x69e738
+00462716: sub edi,eax
+00462718: mov DWORD PTR [ebx+0x44],edi
+0046271b: dec edi
+0046271c: jge 0x462725
+0046271e: mov DWORD PTR [ebx+0x44],0x1
+00462725: pop edi
+00462726: pop esi
+00462727: pop ebx
+00462728: pop ebp
+00462729: ret 

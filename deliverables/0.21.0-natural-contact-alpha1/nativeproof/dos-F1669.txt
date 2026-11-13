@@ -1,0 +1,95 @@
+0045a470: push ebp
+0045a471: mov ebp,esp
+0045a473: add esp,0xfffffff8
+0045a476: push ebx
+0045a477: push esi
+0045a478: push edi
+0045a479: mov esi,DWORD PTR [ebp+0x10]
+0045a47c: mov ebx,DWORD PTR [ebp+0xc]
+0045a47f: mov edi,DWORD PTR [ebp+0x8]
+0045a482: mov eax,DWORD PTR [esi]
+0045a484: push eax
+0045a485: mov eax,DWORD PTR [ebx]
+0045a487: push eax
+0045a488: call 0x453478
+0045a48d: add esp,0x8
+0045a490: push eax
+0045a491: mov eax,DWORD PTR [esi+0xc]
+0045a494: push eax
+0045a495: mov eax,DWORD PTR [ebx+0x4]
+0045a498: push eax
+0045a499: call 0x453478
+0045a49e: add esp,0x8
+0045a4a1: pop edx
+0045a4a2: add edx,eax
+0045a4a4: push edx
+0045a4a5: mov eax,DWORD PTR [esi+0x18]
+0045a4a8: push eax
+0045a4a9: mov eax,DWORD PTR [ebx+0x8]
+0045a4ac: push eax
+0045a4ad: call 0x453478
+0045a4b2: add esp,0x8
+0045a4b5: pop edx
+0045a4b6: add edx,eax
+0045a4b8: mov DWORD PTR [ebp-0x4],edx
+0045a4bb: mov eax,DWORD PTR [esi+0x4]
+0045a4be: push eax
+0045a4bf: mov eax,DWORD PTR [ebx]
+0045a4c1: push eax
+0045a4c2: call 0x453478
+0045a4c7: add esp,0x8
+0045a4ca: push eax
+0045a4cb: mov eax,DWORD PTR [esi+0x10]
+0045a4ce: push eax
+0045a4cf: mov eax,DWORD PTR [ebx+0x4]
+0045a4d2: push eax
+0045a4d3: call 0x453478
+0045a4d8: add esp,0x8
+0045a4db: pop edx
+0045a4dc: add edx,eax
+0045a4de: push edx
+0045a4df: mov eax,DWORD PTR [esi+0x1c]
+0045a4e2: push eax
+0045a4e3: mov eax,DWORD PTR [ebx+0x8]
+0045a4e6: push eax
+0045a4e7: call 0x453478
+0045a4ec: add esp,0x8
+0045a4ef: pop edx
+0045a4f0: add edx,eax
+0045a4f2: mov DWORD PTR [ebp-0x8],edx
+0045a4f5: mov eax,DWORD PTR [esi+0x8]
+0045a4f8: push eax
+0045a4f9: mov eax,DWORD PTR [ebx]
+0045a4fb: push eax
+0045a4fc: call 0x453478
+0045a501: add esp,0x8
+0045a504: push eax
+0045a505: mov eax,DWORD PTR [esi+0x14]
+0045a508: push eax
+0045a509: mov eax,DWORD PTR [ebx+0x4]
+0045a50c: push eax
+0045a50d: call 0x453478
+0045a512: add esp,0x8
+0045a515: pop edx
+0045a516: add edx,eax
+0045a518: push edx
+0045a519: mov eax,DWORD PTR [esi+0x20]
+0045a51c: push eax
+0045a51d: mov eax,DWORD PTR [ebx+0x8]
+0045a520: push eax
+0045a521: call 0x453478
+0045a526: add esp,0x8
+0045a529: pop edx
+0045a52a: add edx,eax
+0045a52c: mov DWORD PTR [edi+0x8],edx
+0045a52f: mov eax,DWORD PTR [ebp-0x4]
+0045a532: mov DWORD PTR [edi],eax
+0045a534: mov eax,DWORD PTR [ebp-0x8]
+0045a537: mov DWORD PTR [edi+0x4],eax
+0045a53a: pop edi
+0045a53b: pop esi
+0045a53c: pop ebx
+0045a53d: pop ecx
+0045a53e: pop ecx
+0045a53f: pop ebp
+0045a540: ret 

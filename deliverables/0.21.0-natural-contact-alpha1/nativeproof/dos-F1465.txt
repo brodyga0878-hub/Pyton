@@ -1,0 +1,18 @@
+00450ed0: push ebp
+00450ed1: mov ebp,esp
+00450ed3: push ebx
+00450ed4: mov ebx,DWORD PTR [ebp+0x8]
+00450ed7: mov eax,DWORD PTR [ebx]
+00450ed9: imul DWORD PTR [ebx]
+00450edb: mov edx,DWORD PTR [ebx+0x4]
+00450ede: imul edx,DWORD PTR [ebx+0x4]
+00450ee2: add eax,edx
+00450ee4: mov edx,DWORD PTR [ebx+0x8]
+00450ee7: imul edx,DWORD PTR [ebx+0x8]
+00450eeb: add eax,edx
+00450eed: push eax
+00450eee: call 0x451007
+00450ef3: pop ecx
+00450ef4: pop ebx
+00450ef5: pop ebp
+00450ef6: ret 

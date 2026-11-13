@@ -1,0 +1,197 @@
+00467688: push ebp
+00467689: mov ebp,esp
+0046768b: add esp,0xfffffff8
+0046768e: push ebx
+0046768f: push esi
+00467690: push edi
+00467691: mov esi,DWORD PTR [ebp+0xc]
+00467694: mov edi,DWORD PTR [ebp+0x8]
+00467697: mov eax,DWORD PTR [edi+0x8]
+0046769a: test eax,eax
+0046769c: jne 0x4678b8
+004676a2: call 0x4620f0
+004676a7: mov DWORD PTR [edi+0x8],eax
+004676aa: mov ebx,eax
+004676ac: cmp esi,DWORD PTR [edi]
+004676ae: jne 0x4676c9
+004676b0: call 0x462144
+004676b5: mov DWORD PTR [edi+0x4],eax
+004676b8: mov DWORD PTR [eax],esi
+004676ba: call 0x462144
+004676bf: mov DWORD PTR [edi+0xc],eax
+004676c2: mov edx,DWORD PTR [ebp+0x10]
+004676c5: mov DWORD PTR [eax],edx
+004676c7: jmp 0x4676e0
+004676c9: call 0x462144
+004676ce: mov DWORD PTR [edi+0x4],eax
+004676d1: mov edx,DWORD PTR [ebp+0x10]
+004676d4: mov DWORD PTR [eax],edx
+004676d6: call 0x462144
+004676db: mov DWORD PTR [edi+0xc],eax
+004676de: mov DWORD PTR [eax],esi
+004676e0: mov eax,DWORD PTR [esi+0x28]
+004676e3: mov DWORD PTR [ebx+0x28],eax
+004676e6: mov eax,DWORD PTR [esi+0x2c]
+004676e9: mov DWORD PTR [ebx+0x2c],eax
+004676ec: mov eax,DWORD PTR [esi+0x30]
+004676ef: mov DWORD PTR [ebx+0x30],eax
+004676f2: xor edi,edi
+004676f4: mov eax,DWORD PTR [ebp+0x18]
+004676f7: cmp eax,DWORD PTR [esi+0x44]
+004676fa: jle 0x467844
+00467700: mov eax,DWORD PTR [ebp+0x18]
+00467703: mov edx,DWORD PTR [ebp+0x10]
+00467706: cmp eax,DWORD PTR [edx+0x44]
+00467709: jle 0x467844
+0046770f: mov eax,DWORD PTR [esi+0x3c]
+00467712: mov edx,DWORD PTR [ebp+0x10]
+00467715: add eax,DWORD PTR [edx+0x3c]
+00467718: sar eax,1
+0046771a: mov DWORD PTR [ebx+0x3c],eax
+0046771d: mov eax,DWORD PTR [esi+0x4]
+00467720: mov edx,DWORD PTR [ebp+0x10]
+00467723: add eax,DWORD PTR [edx+0x4]
+00467726: sar eax,1
+00467728: mov DWORD PTR [ebx+0x4],eax
+0046772b: mov eax,DWORD PTR [esi+0x8]
+0046772e: mov edx,DWORD PTR [ebp+0x10]
+00467731: add eax,DWORD PTR [edx+0x8]
+00467734: sar eax,1
+00467736: mov DWORD PTR [ebx+0x8],eax
+00467739: mov eax,DWORD PTR [esi+0xc]
+0046773c: mov edx,DWORD PTR [ebp+0x10]
+0046773f: add eax,DWORD PTR [edx+0xc]
+00467742: sar eax,1
+00467744: mov DWORD PTR [ebx+0xc],eax
+00467747: cmp DWORD PTR [esi+0xc],0x40
+0046774b: jl 0x467756
+0046774d: mov eax,DWORD PTR [ebp+0x10]
+00467750: cmp DWORD PTR [eax+0xc],0x40
+00467754: jge 0x467763
+00467756: push ebx
+00467757: call DWORD PTR ds:0x6c48e0
+0046775d: pop ecx
+0046775e: jmp 0x4678b1
+00467763: movsx eax,WORD PTR [esi]
+00467766: mov edx,DWORD PTR [ebp+0x10]
+00467769: movsx edx,WORD PTR [edx]
+0046776c: add eax,edx
+0046776e: sar eax,1
+00467770: mov WORD PTR [ebx],ax
+00467773: movsx eax,WORD PTR [esi+0x2]
+00467777: mov edx,DWORD PTR [ebp+0x10]
+0046777a: movsx edx,WORD PTR [edx+0x2]
+0046777e: add eax,edx
+00467780: sar eax,1
+00467782: mov WORD PTR [ebx+0x2],ax
+00467786: mov eax,DWORD PTR [ebp+0x14]
+00467789: cmp DWORD PTR [eax+0xc],0x40
+0046778d: jle 0x467823
+00467793: mov ax,WORD PTR [esi+0x2]
+00467797: mov edx,DWORD PTR [ebp+0x10]
+0046779a: cmp ax,WORD PTR [edx+0x2]
+0046779e: setg al
+004677a1: and eax,0x1
+004677a4: mov DWORD PTR [ebp-0x4],eax
+004677a7: mov ax,WORD PTR [esi]
+004677aa: mov edx,DWORD PTR [ebp+0x10]
+004677ad: cmp ax,WORD PTR [edx]
+004677b0: setg al
+004677b3: and eax,0x1
+004677b6: mov DWORD PTR [ebp-0x8],eax
+004677b9: mov eax,DWORD PTR [ebp+0x14]
+004677bc: movsx eax,WORD PTR [eax]
+004677bf: movsx edx,WORD PTR [esi]
+004677c2: sub eax,edx
+004677c4: mov edx,DWORD PTR [ebp+0x10]
+004677c7: movsx edx,WORD PTR [edx+0x2]
+004677cb: movsx ecx,WORD PTR [esi+0x2]
+004677cf: sub edx,ecx
+004677d1: imul edx
+004677d3: mov edx,DWORD PTR [ebp+0x10]
+004677d6: movsx edx,WORD PTR [edx]
+004677d9: movsx ecx,WORD PTR [esi]
+004677dc: sub edx,ecx
+004677de: mov ecx,DWORD PTR [ebp+0x14]
+004677e1: movsx ecx,WORD PTR [ecx+0x2]
+004677e5: movsx esi,WORD PTR [esi+0x2]
+004677e9: sub ecx,esi
+004677eb: imul edx,ecx
+004677ee: cmp eax,edx
+004677f0: setg al
+004677f3: and eax,0x1
+004677f6: mov edx,DWORD PTR [ebp-0x4]
+004677f9: shl edx,0x4
+004677fc: lea ecx,[edx+0x505af0]
+00467802: mov esi,DWORD PTR [ebp-0x8]
+00467805: lea ecx,[ecx+esi*8]
+00467808: mov cx,WORD PTR [ecx+eax*4]
+0046780c: add WORD PTR [ebx],cx
+0046780f: add edx,0x505af2
+00467815: mov ecx,DWORD PTR [ebp-0x8]
+00467818: lea edx,[edx+ecx*8]
+0046781b: mov ax,WORD PTR [edx+eax*4]
+0046781f: add WORD PTR [ebx+0x2],ax
+00467823: movsx eax,WORD PTR [ebx]
+00467826: push eax
+00467827: call DWORD PTR ds:0x6c48d8
+0046782d: pop ecx
+0046782e: mov WORD PTR [ebx+0x24],ax
+00467832: movsx eax,WORD PTR [ebx+0x2]
+00467836: push eax
+00467837: call DWORD PTR ds:0x6c48dc
+0046783d: pop ecx
+0046783e: mov WORD PTR [ebx+0x26],ax
+00467842: jmp 0x4678b1
+00467844: mov eax,DWORD PTR [esi+0x3c]
+00467847: mov edx,DWORD PTR [ebp+0x10]
+0046784a: add eax,DWORD PTR [edx+0x3c]
+0046784d: sar eax,1
+0046784f: mov DWORD PTR [ebx+0x3c],eax
+00467852: push edi
+00467853: mov eax,DWORD PTR [ebx+0x28]
+00467856: push eax
+00467857: call 0x453478
+0046785c: add esp,0x8
+0046785f: mov edx,DWORD PTR [esi+0x4]
+00467862: mov ecx,DWORD PTR [ebp+0x10]
+00467865: add edx,DWORD PTR [ecx+0x4]
+00467868: sar edx,1
+0046786a: add eax,edx
+0046786c: mov DWORD PTR [ebx+0x4],eax
+0046786f: push edi
+00467870: mov eax,DWORD PTR [ebx+0x2c]
+00467873: push eax
+00467874: call 0x453478
+00467879: add esp,0x8
+0046787c: mov edx,DWORD PTR [esi+0x8]
+0046787f: mov ecx,DWORD PTR [ebp+0x10]
+00467882: add edx,DWORD PTR [ecx+0x8]
+00467885: sar edx,1
+00467887: add eax,edx
+00467889: mov DWORD PTR [ebx+0x8],eax
+0046788c: push edi
+0046788d: mov eax,DWORD PTR [ebx+0x30]
+00467890: push eax
+00467891: call 0x453478
+00467896: add esp,0x8
+00467899: mov edx,DWORD PTR [esi+0xc]
+0046789c: mov ecx,DWORD PTR [ebp+0x10]
+0046789f: add edx,DWORD PTR [ecx+0xc]
+004678a2: sar edx,1
+004678a4: add eax,edx
+004678a6: mov DWORD PTR [ebx+0xc],eax
+004678a9: push ebx
+004678aa: call DWORD PTR ds:0x6c48e0
+004678b0: pop ecx
+004678b1: push ebx
+004678b2: call 0x4626f0
+004678b7: pop ecx
+004678b8: pop edi
+004678b9: pop esi
+004678ba: pop ebx
+004678bb: pop ecx
+004678bc: pop ecx
+004678bd: pop ebp
+004678be: ret 
+004678bf: nop 
