@@ -1,0 +1,3231 @@
+{
+  "scope": "Read-only alignment investigation. Canonical full F576 with actual Eagle24 and source-model120 parent from frozen993fixture; separately full originalF581/F1876 at explicit input vector_scales3..12 using nativeF1660 truncation and original descriptor context. No expected height formula in Python; forced scales beyond canonical3 are experiments, not changes toF579. OriginalF581/F1876 source bytes already proved by frozenfixture. SourceSurfaceTerrain continuous two-pass samples are adapter inputs, not asserted exact originalF879 matrix constructor outputs.",
+  "source_fixture_sha256": "d4ce0cf3ebfe0fd3bb1f263d047fa3a17ffc5201b8040389fdbddcc21a50e166",
+  "native_original_classifier_sha256": "6eb7716f0e16222886edbe7e0859bb55c0c9fe2084e66458dcf29da18f1470af",
+  "native_forced_scale_assembly_sha256": "8b13896776a0e4f90597c52071ecb389b0bb2684185ed4a2f3d09e3a9b5e570c",
+  "canonical_output_sha256": "354babeb3c0c28dc67191f12fe85710ce022150d9bd9cbcbdc13489cbf58423a",
+  "forced_scale_output_sha256": "320e8ef0be8a2213652ca6cdab713112e7b2f9cd1abdc26ac6644f505a025f39",
+  "fresh_native_runs": 3,
+  "canonical_reverse_repeat_count": 35,
+  "canonical_case_count": 35,
+  "forced_scale_case_count": 150,
+  "canonical_cases": [
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "graphics_level": 0,
+      "f576_return_s32": -1,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+          "relative_after_hex": "d216daf0ffffffff19ca4ae5ffffffffbff6790b00000000",
+          "f579_return_s32": -1,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "546816360",
+      "recorded_intersection_raw": 68352045,
+      "collision_kind_u8": 255
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "graphics_level": 1,
+      "f576_return_s32": -1,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+          "relative_after_hex": "d216daf0ffffffff19ca4ae5ffffffffbff6790b00000000",
+          "f579_return_s32": -1,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "541005576",
+      "recorded_intersection_raw": 67625697,
+      "collision_kind_u8": 255
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "graphics_level": 2,
+      "f576_return_s32": -1,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+          "relative_after_hex": "d216daf0ffffffff19ca4ae5ffffffffbff6790b00000000",
+          "f579_return_s32": -1,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "540728032",
+      "recorded_intersection_raw": 67591004,
+      "collision_kind_u8": 255
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "graphics_level": 3,
+      "f576_return_s32": -1,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+          "relative_after_hex": "d216daf0ffffffff19ca4ae5ffffffffbff6790b00000000",
+          "f579_return_s32": -1,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "540785968",
+      "recorded_intersection_raw": 67598246,
+      "collision_kind_u8": 255
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "graphics_level": 4,
+      "f576_return_s32": -1,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+          "relative_after_hex": "d216daf0ffffffff19ca4ae5ffffffffbff6790b00000000",
+          "f579_return_s32": -1,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "540845568",
+      "recorded_intersection_raw": 67605696,
+      "collision_kind_u8": 255
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "graphics_level": 5,
+      "f576_return_s32": -1,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+          "relative_after_hex": "d216daf0ffffffff19ca4ae5ffffffffbff6790b00000000",
+          "f579_return_s32": -1,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "540680296",
+      "recorded_intersection_raw": 67585037,
+      "collision_kind_u8": 255
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "graphics_level": 6,
+      "f576_return_s32": -1,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+          "relative_after_hex": "d216daf0ffffffff19ca4ae5ffffffffbff6790b00000000",
+          "f579_return_s32": -1,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "540714792",
+      "recorded_intersection_raw": 67589349,
+      "collision_kind_u8": 255
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "graphics_level": 0,
+      "f576_return_s32": -1,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+          "relative_after_hex": "41577bf2fffffffff7732ae8ffffffff01d93d0a00000000",
+          "f579_return_s32": -1,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "67391848",
+      "recorded_intersection_raw": 8423981,
+      "collision_kind_u8": 255
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "graphics_level": 1,
+      "f576_return_s32": -1,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+          "relative_after_hex": "41577bf2fffffffff7732ae8ffffffff01d93d0a00000000",
+          "f579_return_s32": -1,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "67475960",
+      "recorded_intersection_raw": 8434495,
+      "collision_kind_u8": 255
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "graphics_level": 2,
+      "f576_return_s32": -1,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+          "relative_after_hex": "41577bf2fffffffff7732ae8ffffffff01d93d0a00000000",
+          "f579_return_s32": -1,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "67308616",
+      "recorded_intersection_raw": 8413577,
+      "collision_kind_u8": 255
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "graphics_level": 3,
+      "f576_return_s32": -1,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+          "relative_after_hex": "41577bf2fffffffff7732ae8ffffffff01d93d0a00000000",
+          "f579_return_s32": -1,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "67336240",
+      "recorded_intersection_raw": 8417030,
+      "collision_kind_u8": 255
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "graphics_level": 4,
+      "f576_return_s32": -1,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+          "relative_after_hex": "41577bf2fffffffff7732ae8ffffffff01d93d0a00000000",
+          "f579_return_s32": -1,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "67356520",
+      "recorded_intersection_raw": 8419565,
+      "collision_kind_u8": 255
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "graphics_level": 5,
+      "f576_return_s32": -1,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+          "relative_after_hex": "41577bf2fffffffff7732ae8ffffffff01d93d0a00000000",
+          "f579_return_s32": -1,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "67356520",
+      "recorded_intersection_raw": 8419565,
+      "collision_kind_u8": 255
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "graphics_level": 6,
+      "f576_return_s32": -1,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+          "relative_after_hex": "41577bf2fffffffff7732ae8ffffffff01d93d0a00000000",
+          "f579_return_s32": -1,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "67356520",
+      "recorded_intersection_raw": 8419565,
+      "collision_kind_u8": 255
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "graphics_level": 0,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+          "relative_after_hex": "f4d0b6f2ffffffffa85093e8ffffffffc8c9100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-123592",
+      "recorded_intersection_raw": -15449,
+      "collision_kind_u8": 1
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "graphics_level": 1,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+          "relative_after_hex": "f4d0b6f2ffffffffa85093e8ffffffffc8c9100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-123592",
+      "recorded_intersection_raw": -15449,
+      "collision_kind_u8": 1
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "graphics_level": 2,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+          "relative_after_hex": "f4d0b6f2ffffffffa85093e8ffffffffc8c9100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-123592",
+      "recorded_intersection_raw": -15449,
+      "collision_kind_u8": 1
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "graphics_level": 3,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+          "relative_after_hex": "f4d0b6f2ffffffffa85093e8ffffffffc8c9100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-123592",
+      "recorded_intersection_raw": -15449,
+      "collision_kind_u8": 1
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "graphics_level": 4,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+          "relative_after_hex": "f4d0b6f2ffffffffa85093e8ffffffffc8c9100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-123592",
+      "recorded_intersection_raw": -15449,
+      "collision_kind_u8": 1
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "graphics_level": 5,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+          "relative_after_hex": "f4d0b6f2ffffffffa85093e8ffffffffc8c9100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-123592",
+      "recorded_intersection_raw": -15449,
+      "collision_kind_u8": 1
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "graphics_level": 6,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+          "relative_after_hex": "f4d0b6f2ffffffffa85093e8ffffffffc8c9100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-123592",
+      "recorded_intersection_raw": -15449,
+      "collision_kind_u8": 1
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "graphics_level": 0,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+          "relative_after_hex": "4dd1b6f2ffffffff5c5193e8ffffffff7bc9100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-125288",
+      "recorded_intersection_raw": -15661,
+      "collision_kind_u8": 1
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "graphics_level": 1,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+          "relative_after_hex": "4dd1b6f2ffffffff5c5193e8ffffffff7bc9100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-125288",
+      "recorded_intersection_raw": -15661,
+      "collision_kind_u8": 1
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "graphics_level": 2,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+          "relative_after_hex": "4dd1b6f2ffffffff5c5193e8ffffffff7bc9100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-125288",
+      "recorded_intersection_raw": -15661,
+      "collision_kind_u8": 1
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "graphics_level": 3,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+          "relative_after_hex": "4dd1b6f2ffffffff5c5193e8ffffffff7bc9100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-125288",
+      "recorded_intersection_raw": -15661,
+      "collision_kind_u8": 1
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "graphics_level": 4,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+          "relative_after_hex": "4dd1b6f2ffffffff5c5193e8ffffffff7bc9100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-125288",
+      "recorded_intersection_raw": -15661,
+      "collision_kind_u8": 1
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "graphics_level": 5,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+          "relative_after_hex": "4dd1b6f2ffffffff5c5193e8ffffffff7bc9100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-125288",
+      "recorded_intersection_raw": -15661,
+      "collision_kind_u8": 1
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "graphics_level": 6,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+          "relative_after_hex": "4dd1b6f2ffffffff5c5193e8ffffffff7bc9100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-125288",
+      "recorded_intersection_raw": -15661,
+      "collision_kind_u8": 1
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "graphics_level": 0,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+          "relative_after_hex": "23cfb6f2ffffffff8b4d93e8ffffffff1fcb100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-115720",
+      "recorded_intersection_raw": -14465,
+      "collision_kind_u8": 1
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "graphics_level": 1,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+          "relative_after_hex": "23cfb6f2ffffffff8b4d93e8ffffffff1fcb100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-115720",
+      "recorded_intersection_raw": -14465,
+      "collision_kind_u8": 1
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "graphics_level": 2,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+          "relative_after_hex": "23cfb6f2ffffffff8b4d93e8ffffffff1fcb100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-115720",
+      "recorded_intersection_raw": -14465,
+      "collision_kind_u8": 1
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "graphics_level": 3,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+          "relative_after_hex": "23cfb6f2ffffffff8b4d93e8ffffffff1fcb100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-115720",
+      "recorded_intersection_raw": -14465,
+      "collision_kind_u8": 1
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "graphics_level": 4,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+          "relative_after_hex": "23cfb6f2ffffffff8b4d93e8ffffffff1fcb100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-115720",
+      "recorded_intersection_raw": -14465,
+      "collision_kind_u8": 1
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "graphics_level": 5,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+          "relative_after_hex": "23cfb6f2ffffffff8b4d93e8ffffffff1fcb100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-115720",
+      "recorded_intersection_raw": -14465,
+      "collision_kind_u8": 1
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "graphics_level": 6,
+      "f576_return_s32": 0,
+      "query_calls": 1,
+      "volume_trace": [
+        {
+          "threshold_s32": 5200,
+          "relative_before_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+          "relative_after_hex": "23cfb6f2ffffffff8b4d93e8ffffffff1fcb100a00000000",
+          "f579_return_s32": 0,
+          "terrain_query_calls": 1
+        }
+      ],
+      "previous_altitude_s64": "-115720",
+      "recorded_intersection_raw": -14465,
+      "collision_kind_u8": 1
+    }
+  ],
+  "explicit_scale_cases": [
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 3,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "546816360",
+      "previous_altitude_s64": "546816360",
+      "recorded_intersection_raw": 68352045,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -254142766,
+        -448083431,
+        192542399
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 3,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "541005576",
+      "previous_altitude_s64": "541005576",
+      "recorded_intersection_raw": 67625697,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -254142766,
+        -448083431,
+        192542399
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 3,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "540845568",
+      "previous_altitude_s64": "540845568",
+      "recorded_intersection_raw": 67605696,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -254142766,
+        -448083431,
+        192542399
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 4,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "546816352",
+      "previous_altitude_s64": "546816352",
+      "recorded_intersection_raw": 34176022,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -127071383,
+        -224041716,
+        96271199
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 4,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "541005552",
+      "previous_altitude_s64": "541005552",
+      "recorded_intersection_raw": 33812847,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -127071383,
+        -224041716,
+        96271199
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 4,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "540845536",
+      "previous_altitude_s64": "540845536",
+      "recorded_intersection_raw": 33802846,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -127071383,
+        -224041716,
+        96271199
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 5,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "546816256",
+      "previous_altitude_s64": "546816256",
+      "recorded_intersection_raw": 17088008,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -63535692,
+        -112020858,
+        48135599
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 5,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "541005440",
+      "previous_altitude_s64": "541005440",
+      "recorded_intersection_raw": 16906420,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -63535692,
+        -112020858,
+        48135599
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 5,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "540845408",
+      "previous_altitude_s64": "540845408",
+      "recorded_intersection_raw": 16901419,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -63535692,
+        -112020858,
+        48135599
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 6,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "546816064",
+      "previous_altitude_s64": "546816064",
+      "recorded_intersection_raw": 8544001,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -31767846,
+        -56010429,
+        24067799
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 6,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "541005248",
+      "previous_altitude_s64": "541005248",
+      "recorded_intersection_raw": 8453207,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -31767846,
+        -56010429,
+        24067799
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 6,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "540845184",
+      "previous_altitude_s64": "540845184",
+      "recorded_intersection_raw": 8450706,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -31767846,
+        -56010429,
+        24067799
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 7,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "546815744",
+      "previous_altitude_s64": "546815744",
+      "recorded_intersection_raw": 4271998,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -15883923,
+        -28005215,
+        12033899
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 7,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "541004800",
+      "previous_altitude_s64": "541004800",
+      "recorded_intersection_raw": 4226600,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -15883923,
+        -28005215,
+        12033899
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 7,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "540844800",
+      "previous_altitude_s64": "540844800",
+      "recorded_intersection_raw": 4225350,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -15883923,
+        -28005215,
+        12033899
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 8,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "546815232",
+      "previous_altitude_s64": "546815232",
+      "recorded_intersection_raw": 2135997,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -7941962,
+        -14002608,
+        6016949
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 8,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "541004288",
+      "previous_altitude_s64": "541004288",
+      "recorded_intersection_raw": 2113298,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -7941962,
+        -14002608,
+        6016949
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 8,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "540844288",
+      "previous_altitude_s64": "540844288",
+      "recorded_intersection_raw": 2112673,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -7941962,
+        -14002608,
+        6016949
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 9,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "546813952",
+      "previous_altitude_s64": "546813952",
+      "recorded_intersection_raw": 1067996,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -3970981,
+        -7001304,
+        3008474
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 9,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "541002752",
+      "previous_altitude_s64": "541002752",
+      "recorded_intersection_raw": 1056646,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -3970981,
+        -7001304,
+        3008474
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 9,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "540842496",
+      "previous_altitude_s64": "540842496",
+      "recorded_intersection_raw": 1056333,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -3970981,
+        -7001304,
+        3008474
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 10,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "546812928",
+      "previous_altitude_s64": "546812928",
+      "recorded_intersection_raw": 533997,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -1985491,
+        -3500652,
+        1504237
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 10,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "541000704",
+      "previous_altitude_s64": "541000704",
+      "recorded_intersection_raw": 528321,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -1985491,
+        -3500652,
+        1504237
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 10,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "540838912",
+      "previous_altitude_s64": "540838912",
+      "recorded_intersection_raw": 528163,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -1985491,
+        -3500652,
+        1504237
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 11,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "546805760",
+      "previous_altitude_s64": "546805760",
+      "recorded_intersection_raw": 266995,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -992746,
+        -1750326,
+        752118
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 11,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "540991488",
+      "previous_altitude_s64": "540991488",
+      "recorded_intersection_raw": 264156,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -992746,
+        -1750326,
+        752118
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 11,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "540856320",
+      "previous_altitude_s64": "540856320",
+      "recorded_intersection_raw": 264090,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -992746,
+        -1750326,
+        752118
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 12,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "546799616",
+      "previous_altitude_s64": "546799616",
+      "recorded_intersection_raw": 133496,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -496373,
+        -875163,
+        376059
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 12,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "540954624",
+      "previous_altitude_s64": "540954624",
+      "recorded_intersection_raw": 132069,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -496373,
+        -875163,
+        376059
+      ]
+    },
+    {
+      "name": "source_first_probe",
+      "point_hex": "97b6d086ffffffffcd50562afffffffff9b5cf5b00000000",
+      "vector_scale": 12,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "540848128",
+      "previous_altitude_s64": "540848128",
+      "recorded_intersection_raw": 132043,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -496373,
+        -875163,
+        376059
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 3,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67391848",
+      "previous_altitude_s64": "67391848",
+      "recorded_intersection_raw": 8423981,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -226797759,
+        -399870985,
+        171825409
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 3,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67475960",
+      "previous_altitude_s64": "67475960",
+      "recorded_intersection_raw": 8434495,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -226797759,
+        -399870985,
+        171825409
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 3,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67356520",
+      "previous_altitude_s64": "67356520",
+      "recorded_intersection_raw": 8419565,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -226797759,
+        -399870985,
+        171825409
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 4,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67391792",
+      "previous_altitude_s64": "67391792",
+      "recorded_intersection_raw": 4211987,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -113398880,
+        -199935493,
+        85912704
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 4,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67475920",
+      "previous_altitude_s64": "67475920",
+      "recorded_intersection_raw": 4217245,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -113398880,
+        -199935493,
+        85912704
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 4,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67356416",
+      "previous_altitude_s64": "67356416",
+      "recorded_intersection_raw": 4209776,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -113398880,
+        -199935493,
+        85912704
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 5,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67391680",
+      "previous_altitude_s64": "67391680",
+      "recorded_intersection_raw": 2105990,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -56699440,
+        -99967747,
+        42956352
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 5,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67475808",
+      "previous_altitude_s64": "67475808",
+      "recorded_intersection_raw": 2108619,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -56699440,
+        -99967747,
+        42956352
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 5,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67351200",
+      "previous_altitude_s64": "67351200",
+      "recorded_intersection_raw": 2104725,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -56699440,
+        -99967747,
+        42956352
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 6,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67391552",
+      "previous_altitude_s64": "67391552",
+      "recorded_intersection_raw": 1052993,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -28349720,
+        -49983874,
+        21478176
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 6,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67475712",
+      "previous_altitude_s64": "67475712",
+      "recorded_intersection_raw": 1054308,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -28349720,
+        -49983874,
+        21478176
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 6,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67351040",
+      "previous_altitude_s64": "67351040",
+      "recorded_intersection_raw": 1052360,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -28349720,
+        -49983874,
+        21478176
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 7,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67391104",
+      "previous_altitude_s64": "67391104",
+      "recorded_intersection_raw": 526493,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -14174860,
+        -24991937,
+        10739088
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 7,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67475328",
+      "previous_altitude_s64": "67475328",
+      "recorded_intersection_raw": 527151,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -14174860,
+        -24991937,
+        10739088
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 7,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67350656",
+      "previous_altitude_s64": "67350656",
+      "recorded_intersection_raw": 526177,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -14174860,
+        -24991937,
+        10739088
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 8,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67390464",
+      "previous_altitude_s64": "67390464",
+      "recorded_intersection_raw": 263244,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -7087430,
+        -12495969,
+        5369544
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 8,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67474944",
+      "previous_altitude_s64": "67474944",
+      "recorded_intersection_raw": 263574,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -7087430,
+        -12495969,
+        5369544
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 8,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67350016",
+      "previous_altitude_s64": "67350016",
+      "recorded_intersection_raw": 263086,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -7087430,
+        -12495969,
+        5369544
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 9,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67381760",
+      "previous_altitude_s64": "67381760",
+      "recorded_intersection_raw": 131605,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -3543715,
+        -6247985,
+        2684772
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 9,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67475968",
+      "previous_altitude_s64": "67475968",
+      "recorded_intersection_raw": 131789,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -3543715,
+        -6247985,
+        2684772
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 9,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67347456",
+      "previous_altitude_s64": "67347456",
+      "recorded_intersection_raw": 131538,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -3543715,
+        -6247985,
+        2684772
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 10,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67378176",
+      "previous_altitude_s64": "67378176",
+      "recorded_intersection_raw": 65799,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -1771858,
+        -3123993,
+        1342386
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 10,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67469312",
+      "previous_altitude_s64": "67469312",
+      "recorded_intersection_raw": 65888,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -1771858,
+        -3123993,
+        1342386
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 10,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67343360",
+      "previous_altitude_s64": "67343360",
+      "recorded_intersection_raw": 65765,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -1771858,
+        -3123993,
+        1342386
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 11,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67381248",
+      "previous_altitude_s64": "67381248",
+      "recorded_intersection_raw": 32901,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -885929,
+        -1561997,
+        671193
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 11,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67465216",
+      "previous_altitude_s64": "67465216",
+      "recorded_intersection_raw": 32942,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -885929,
+        -1561997,
+        671193
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 11,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67338240",
+      "previous_altitude_s64": "67338240",
+      "recorded_intersection_raw": 32880,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -885929,
+        -1561997,
+        671193
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 12,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67358720",
+      "previous_altitude_s64": "67358720",
+      "recorded_intersection_raw": 16445,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -442965,
+        -780999,
+        335596
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 12,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67448832",
+      "previous_altitude_s64": "67448832",
+      "recorded_intersection_raw": 16467,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -442965,
+        -780999,
+        335596
+      ]
+    },
+    {
+      "name": "source_intermediate_probe",
+      "point_hex": "08bada93ffffffffb89f5341ffffffff0ac8ee5100000000",
+      "vector_scale": 12,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": -1,
+      "altitude_s64": "67321856",
+      "previous_altitude_s64": "67321856",
+      "recorded_intersection_raw": 16436,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -442965,
+        -780999,
+        335596
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 3,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-123592",
+      "recorded_intersection_raw": -15449,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -222899980,
+        -392998744,
+        168872392
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 3,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-123592",
+      "recorded_intersection_raw": -15449,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -222899980,
+        -392998744,
+        168872392
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 3,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-123592",
+      "recorded_intersection_raw": -15449,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -222899980,
+        -392998744,
+        168872392
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 4,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-123648",
+      "recorded_intersection_raw": -7728,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -111449990,
+        -196499372,
+        84436196
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 4,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-123648",
+      "recorded_intersection_raw": -7728,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -111449990,
+        -196499372,
+        84436196
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 4,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-123648",
+      "recorded_intersection_raw": -7728,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -111449990,
+        -196499372,
+        84436196
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 5,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-123968",
+      "recorded_intersection_raw": -3874,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -55724995,
+        -98249686,
+        42218098
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 5,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-123968",
+      "recorded_intersection_raw": -3874,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -55724995,
+        -98249686,
+        42218098
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 5,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-123968",
+      "recorded_intersection_raw": -3874,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -55724995,
+        -98249686,
+        42218098
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 6,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-123968",
+      "recorded_intersection_raw": -1937,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -27862498,
+        -49124843,
+        21109049
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 6,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-123968",
+      "recorded_intersection_raw": -1937,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -27862498,
+        -49124843,
+        21109049
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 6,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-123968",
+      "recorded_intersection_raw": -1937,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -27862498,
+        -49124843,
+        21109049
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 7,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-124544",
+      "recorded_intersection_raw": -973,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -13931249,
+        -24562422,
+        10554524
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 7,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-124544",
+      "recorded_intersection_raw": -973,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -13931249,
+        -24562422,
+        10554524
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 7,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-124544",
+      "recorded_intersection_raw": -973,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -13931249,
+        -24562422,
+        10554524
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 8,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-125696",
+      "recorded_intersection_raw": -491,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -6965625,
+        -12281211,
+        5277262
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 8,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-125696",
+      "recorded_intersection_raw": -491,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -6965625,
+        -12281211,
+        5277262
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 8,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-125696",
+      "recorded_intersection_raw": -491,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -6965625,
+        -12281211,
+        5277262
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 9,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-126976",
+      "recorded_intersection_raw": -248,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -3482813,
+        -6140606,
+        2638631
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 9,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-126976",
+      "recorded_intersection_raw": -248,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -3482813,
+        -6140606,
+        2638631
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 9,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-126976",
+      "recorded_intersection_raw": -248,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -3482813,
+        -6140606,
+        2638631
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 10,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-132096",
+      "recorded_intersection_raw": -129,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -1741407,
+        -3070303,
+        1319315
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 10,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-132096",
+      "recorded_intersection_raw": -129,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -1741407,
+        -3070303,
+        1319315
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 10,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-132096",
+      "recorded_intersection_raw": -129,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -1741407,
+        -3070303,
+        1319315
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 11,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-141312",
+      "recorded_intersection_raw": -69,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -870704,
+        -1535152,
+        659657
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 11,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-141312",
+      "recorded_intersection_raw": -69,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -870704,
+        -1535152,
+        659657
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 11,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-141312",
+      "recorded_intersection_raw": -69,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -870704,
+        -1535152,
+        659657
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 12,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-155648",
+      "recorded_intersection_raw": -38,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -435352,
+        -767576,
+        329828
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 12,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-155648",
+      "recorded_intersection_raw": -38,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -435352,
+        -767576,
+        329828
+      ]
+    },
+    {
+      "name": "source_two_pass_final",
+      "point_hex": "a787b695ffffffff47859a44ffffffff434e865000000000",
+      "vector_scale": 12,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-155648",
+      "recorded_intersection_raw": -38,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -435352,
+        -767576,
+        329828
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 3,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-125288",
+      "recorded_intersection_raw": -15661,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -222899891,
+        -392998564,
+        168872315
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 3,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-125288",
+      "recorded_intersection_raw": -15661,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -222899891,
+        -392998564,
+        168872315
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 3,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-125288",
+      "recorded_intersection_raw": -15661,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -222899891,
+        -392998564,
+        168872315
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 4,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-125376",
+      "recorded_intersection_raw": -7836,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -111449946,
+        -196499282,
+        84436157
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 4,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-125376",
+      "recorded_intersection_raw": -7836,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -111449946,
+        -196499282,
+        84436157
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 4,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-125376",
+      "recorded_intersection_raw": -7836,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -111449946,
+        -196499282,
+        84436157
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 5,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-125440",
+      "recorded_intersection_raw": -3920,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -55724973,
+        -98249641,
+        42218078
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 5,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-125440",
+      "recorded_intersection_raw": -3920,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -55724973,
+        -98249641,
+        42218078
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 5,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-125440",
+      "recorded_intersection_raw": -3920,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -55724973,
+        -98249641,
+        42218078
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 6,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-125760",
+      "recorded_intersection_raw": -1965,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -27862487,
+        -49124821,
+        21109039
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 6,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-125760",
+      "recorded_intersection_raw": -1965,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -27862487,
+        -49124821,
+        21109039
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 6,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-125760",
+      "recorded_intersection_raw": -1965,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -27862487,
+        -49124821,
+        21109039
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 7,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-126080",
+      "recorded_intersection_raw": -985,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -13931244,
+        -24562411,
+        10554519
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 7,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-126080",
+      "recorded_intersection_raw": -985,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -13931244,
+        -24562411,
+        10554519
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 7,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-126080",
+      "recorded_intersection_raw": -985,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -13931244,
+        -24562411,
+        10554519
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 8,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-127232",
+      "recorded_intersection_raw": -497,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -6965622,
+        -12281206,
+        5277259
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 8,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-127232",
+      "recorded_intersection_raw": -497,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -6965622,
+        -12281206,
+        5277259
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 8,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-127232",
+      "recorded_intersection_raw": -497,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -6965622,
+        -12281206,
+        5277259
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 9,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-129536",
+      "recorded_intersection_raw": -253,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -3482811,
+        -6140603,
+        2638629
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 9,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-129536",
+      "recorded_intersection_raw": -253,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -3482811,
+        -6140603,
+        2638629
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 9,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-129536",
+      "recorded_intersection_raw": -253,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -3482811,
+        -6140603,
+        2638629
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 10,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-133120",
+      "recorded_intersection_raw": -130,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -1741406,
+        -3070302,
+        1319314
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 10,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-133120",
+      "recorded_intersection_raw": -130,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -1741406,
+        -3070302,
+        1319314
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 10,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-133120",
+      "recorded_intersection_raw": -130,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -1741406,
+        -3070302,
+        1319314
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 11,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-141312",
+      "recorded_intersection_raw": -69,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -870703,
+        -1535151,
+        659657
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 11,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-141312",
+      "recorded_intersection_raw": -69,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -870703,
+        -1535151,
+        659657
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 11,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-141312",
+      "recorded_intersection_raw": -69,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -870703,
+        -1535151,
+        659657
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 12,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-155648",
+      "recorded_intersection_raw": -38,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -435352,
+        -767576,
+        329828
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 12,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-155648",
+      "recorded_intersection_raw": -38,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -435352,
+        -767576,
+        329828
+      ]
+    },
+    {
+      "name": "visual_grid_height",
+      "point_hex": "6b8ab695ffffffffe68a9a44ffffffffdd4b865000000000",
+      "vector_scale": 12,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-155648",
+      "recorded_intersection_raw": -38,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -435352,
+        -767576,
+        329828
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 3,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-115720",
+      "recorded_intersection_raw": -14465,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -222900445,
+        -392999541,
+        168872735
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 3,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-115720",
+      "recorded_intersection_raw": -14465,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -222900445,
+        -392999541,
+        168872735
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 3,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-115720",
+      "recorded_intersection_raw": -14465,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -222900445,
+        -392999541,
+        168872735
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 4,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-115760",
+      "recorded_intersection_raw": -7235,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -111450223,
+        -196499771,
+        84436367
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 4,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-115760",
+      "recorded_intersection_raw": -7235,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -111450223,
+        -196499771,
+        84436367
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 4,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-115760",
+      "recorded_intersection_raw": -7235,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -111450223,
+        -196499771,
+        84436367
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 5,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-115904",
+      "recorded_intersection_raw": -3622,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -55725112,
+        -98249886,
+        42218183
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 5,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-115904",
+      "recorded_intersection_raw": -3622,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -55725112,
+        -98249886,
+        42218183
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 5,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-115904",
+      "recorded_intersection_raw": -3622,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -55725112,
+        -98249886,
+        42218183
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 6,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-116096",
+      "recorded_intersection_raw": -1814,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -27862556,
+        -49124943,
+        21109091
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 6,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-116096",
+      "recorded_intersection_raw": -1814,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -27862556,
+        -49124943,
+        21109091
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 6,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-116096",
+      "recorded_intersection_raw": -1814,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -27862556,
+        -49124943,
+        21109091
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 7,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-116864",
+      "recorded_intersection_raw": -913,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -13931278,
+        -24562472,
+        10554545
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 7,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-116864",
+      "recorded_intersection_raw": -913,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -13931278,
+        -24562472,
+        10554545
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 7,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-116864",
+      "recorded_intersection_raw": -913,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -13931278,
+        -24562472,
+        10554545
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 8,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-117760",
+      "recorded_intersection_raw": -460,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -6965639,
+        -12281236,
+        5277272
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 8,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-117760",
+      "recorded_intersection_raw": -460,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -6965639,
+        -12281236,
+        5277272
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 8,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-117760",
+      "recorded_intersection_raw": -460,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -6965639,
+        -12281236,
+        5277272
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 9,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-119296",
+      "recorded_intersection_raw": -233,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -3482820,
+        -6140618,
+        2638636
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 9,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-119296",
+      "recorded_intersection_raw": -233,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -3482820,
+        -6140618,
+        2638636
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 9,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-119296",
+      "recorded_intersection_raw": -233,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -3482820,
+        -6140618,
+        2638636
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 10,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-122880",
+      "recorded_intersection_raw": -120,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -1741410,
+        -3070309,
+        1319318
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 10,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-122880",
+      "recorded_intersection_raw": -120,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -1741410,
+        -3070309,
+        1319318
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 10,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-122880",
+      "recorded_intersection_raw": -120,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -1741410,
+        -3070309,
+        1319318
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 11,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-131072",
+      "recorded_intersection_raw": -64,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -870705,
+        -1535155,
+        659659
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 11,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-131072",
+      "recorded_intersection_raw": -64,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -870705,
+        -1535155,
+        659659
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 11,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-131072",
+      "recorded_intersection_raw": -64,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -870705,
+        -1535155,
+        659659
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 12,
+      "graphics_level": 0,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-147456",
+      "recorded_intersection_raw": -36,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -435353,
+        -767578,
+        329829
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 12,
+      "graphics_level": 1,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-147456",
+      "recorded_intersection_raw": -36,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -435353,
+        -767578,
+        329829
+      ]
+    },
+    {
+      "name": "visual_grid_height_plus9_6m",
+      "point_hex": "1879b695ffffffff5a6c9a44fffffffffd58865000000000",
+      "vector_scale": 12,
+      "graphics_level": 4,
+      "query_calls": 1,
+      "f581_return_s32": 0,
+      "altitude_s64": "0",
+      "previous_altitude_s64": "-147456",
+      "recorded_intersection_raw": -36,
+      "pending_query_flag": 0,
+      "shifted_point_raw": [
+        -435353,
+        -767578,
+        329829
+      ]
+    }
+  ]
+}

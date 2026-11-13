@@ -1,0 +1,121 @@
+{
+  "schema": "starfrontier-source-archive-portability-v1",
+  "started_utc": "2026-11-13T14:15:08.920645+00:00",
+  "archive_path": "/workspace/Pyton/deliverables/0.22.0-contact-alignment-alpha1/StarFrontier-0.22.0-contact-alignment-source.zip",
+  "archive_sha256": "f8cf2ff60f9fe9ae7a58e0956aedef90aaefedc6dfcb6774e988ad5e1af5c984",
+  "expected_archive_sha256": "f8cf2ff60f9fe9ae7a58e0956aedef90aaefedc6dfcb6774e988ad5e1af5c984",
+  "archive_bytes": 32904922,
+  "source_commit": "a61d64c348a88986206a5a0804cae8a01e7c93ca",
+  "workspace": "/workspace/recovery/alignment-source-portability",
+  "source_project_path": "/workspace/recovery/alignment-source-portability/source/StarFrontier-0.22.0-contact-alignment-source",
+  "fresh_extraction": true,
+  "private_xdg": true,
+  "apk_built": false,
+  "host_sdk_copied": false,
+  "commands": [
+    {
+      "name": "source-archive-import",
+      "started_utc": "2026-11-13T14:15:10.220490+00:00",
+      "finished_utc": "2026-11-13T14:15:18.705083+00:00",
+      "duration_seconds": 8.484599,
+      "command": [
+        "godot",
+        "--headless",
+        "--audio-driver",
+        "Dummy",
+        "--editor",
+        "--quit",
+        "--path",
+        "/workspace/recovery/alignment-source-portability/source/StarFrontier-0.22.0-contact-alignment-source"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "log_path": "/workspace/Pyton/validation/alignment-source-portability-2026-11-13/source-archive-import.log",
+      "log_sha256": "55d8401196ebcaa2d6f90fab620c85bfea564c8cd08f4de131c1396acdf3f0bc",
+      "log_bytes": 30132,
+      "error_markers": []
+    },
+    {
+      "name": "source-archive-startup",
+      "started_utc": "2026-11-13T14:15:18.705409+00:00",
+      "finished_utc": "2026-11-13T14:15:19.964364+00:00",
+      "duration_seconds": 1.259072,
+      "command": [
+        "godot",
+        "--headless",
+        "--audio-driver",
+        "Dummy",
+        "--path",
+        "/workspace/recovery/alignment-source-portability/source/StarFrontier-0.22.0-contact-alignment-source",
+        "--script",
+        "res://tests/test_source_full_startup.gd",
+        "--",
+        "--source-startup-isolated"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "log_path": "/workspace/Pyton/validation/alignment-source-portability-2026-11-13/source-archive-startup.log",
+      "log_sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36",
+      "log_bytes": 122,
+      "error_markers": []
+    }
+  ],
+  "ok": true,
+  "execution_policy": "require_escalated",
+  "archive_commit_comment": "a61d64c348a88986206a5a0804cae8a01e7c93ca",
+  "nested_historical_godot_projects": [
+    "StarFrontier-0.22.0-contact-alignment-source/recovered-history/release_audit/project.godot"
+  ],
+  "static_audit_packaging": {
+    "scope": "Presence, file hashes, counts and explicit limitations only; not semantic review or full-game equivalence.",
+    "required_files_sha256": {
+      "docs/PARITY_AUDIT_RU.md": "79dca562bc160fc9cf8e867ab8199722dc36976e79c8fd552bbd6db8f2cae16c",
+      "docs/PARITY_AUDIT_SYSTEM_INFO_RU.md": "7be8973da4622f790283d6fee96d49dcc08c9184cf36e1a918ffb22e92e7bb63",
+      "docs/PARITY_AUDIT_PHYSICS_RU.md": "0d528552f348e722c1b66e72b6444c2f63cb27c62929071525303608978abc11",
+      "docs/PARITY_AUDIT_SHIPS_ECONOMY_COMBAT_RU.md": "c8f3c27c111509ca1f0c83d4f80d7b373047140c00abe0652cfa7c0e9de2c6f7",
+      "docs/PARITY_AUDIT_CAMPAIGN_CONTENT_RU.md": "6a75d064f19fb9cd19c856188ea7cca5608db0a675ac79c3a8add42c36b3e721",
+      "docs/PARITY_AUDIT_RESOURCES_GRAPHICS_RU.md": "ba969cc581317cc38a87b845f7db0c64bc5a70048d060fe58e456e7e55225209",
+      "tools/audit_original_parity.py": "61dfcacf8f1887812ea268fc58d884a581fdc46b77453b0b062ee35ed05dc77f",
+      "validation/parity-audit-2026-11-07/original-function-catalog.json": "4fff7e078f690cf3dcf64a85247d544ce6e5257e8346823a6a870675ca7ed630",
+      "validation/parity-audit-2026-11-07/original-function-catalog.csv": "cad2ab202709cc7e33ab3fc164dab22cd4e62314a7a7f06063730c5ea77765e7",
+      "validation/parity-audit-2026-11-07/original-data-block-catalog.json": "adc5764f71eb9f31cdbed05a2388f8c3bab81f0db8e58b15966091f2d4498161",
+      "validation/parity-audit-2026-11-07/resource-inventory.json": "5a4dd3492358eb145bb3abf6907d88a89358622cfc1473ece58b9c9abdbc234e"
+    },
+    "function_definitions": 1615,
+    "upstream_source_inventory_entries": 50,
+    "data_declarations": 8649,
+    "mentions_are_not_full_port_counts": true,
+    "jjffe_dos_equivalence_claim": false,
+    "full_game_incompleteness_statement_present": true
+  },
+  "archive_file_count": 1411,
+  "archive_crc_ok": true,
+  "archive_source_inventory_sha256": "20f5b12bbd3f3d5f878fd09696e2352ff7f91d8ef7eea2d9b0b650f19a729d73",
+  "import_cache_before": false,
+  "project_godot_sha256": "634ec52da910101dce6e96fb230c1e06d7d50445b4a352e4f045ea29111e958a",
+  "startup_test_sha256": "ffaa0a4a6736da6409315e74753c15896e73d55e01348b42314652126f9b9c06",
+  "main_source_sha256": "7713e18fc3b98603a4e772e9079a5b048b087ad0d6bdeb914f583730f8d7f457",
+  "private_environment_overrides": {
+    "XDG_DATA_HOME": "/workspace/recovery/alignment-source-portability/source_full_startup/data",
+    "XDG_CONFIG_HOME": "/workspace/recovery/alignment-source-portability/source_full_startup/config",
+    "XDG_CACHE_HOME": "/workspace/recovery/alignment-source-portability/source_full_startup/cache"
+  },
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "startup_checks": 10,
+  "startup_failures": 0,
+  "import_cache_after": true,
+  "extracted_archive_files_unchanged": true,
+  "modified_archive_files": [],
+  "finished_utc": "2026-11-13T14:15:20.084597+00:00",
+  "frozen_runtime_source_binding": {
+    "checked_utc": "2026-11-13T14:19:59.629200+00:00",
+    "runtime_freeze_sha256": "df193cf168c3bbf4a241d476006d1692b22bc5dfe04edf294b7825f58680be26",
+    "input_count": 439,
+    "all_archived_runtime_inputs_match": true,
+    "mismatches": []
+  },
+  "files_unchanged_after_actual_Main_feature_run": true,
+  "actual_Main_feature_report_sha256": "c6954c6256c103f1999062c4d0872816b96ba74c12e315104a073cff2e1e7aa5",
+  "files_unchanged_after_included_native_reproduction": true,
+  "native_reproduction_report_sha256": "b646be3f769f6475bfa0b706b0e568d447336f50b7f9e6b2036558c7cd2a9188"
+}

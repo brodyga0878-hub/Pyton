@@ -1,0 +1,164 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-13T13:36:05.710745+00:00",
+  "updated_utc": "2026-11-13T13:36:14.324870+00:00",
+  "duration_seconds": 8.614,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-13T13:36:05.710745+00:00",
+      "duration_seconds": 8.614,
+      "requested_suites": [
+        "source_render_packet",
+        "source_render_state",
+        "source_surface_contact_patch",
+        "source_celestial_renderer"
+      ],
+      "executed_suites": [
+        "source_render_packet",
+        "source_render_state",
+        "source_surface_contact_patch",
+        "source_celestial_renderer"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 2,
+  "status": "passed",
+  "passed_suites": 4,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 5534,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "source_render_packet",
+      "scope": "Worker-only source height mesh buffers, bounded far LOD and published core geometry.",
+      "status": "passed",
+      "checks": 4222,
+      "failures": 0,
+      "executed_utc": "2026-11-13T13:36:05.712284+00:00",
+      "suite_source": {
+        "path": "tests/test_source_surface_render_packet.gd",
+        "bytes": 9805,
+        "sha256": "cb377ecb681f4062539228942df49e59bf4f6d80ab03790c0b93ce21b66b1118"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_surface_render_packet.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.94,
+      "timed_out": false,
+      "output_bytes": 133,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/alignment-render-v4-regressions/logs/source_render_packet.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_render_state",
+      "scope": "Exact vertical collision queries against the published source core after geographic rebasing.",
+      "status": "passed",
+      "checks": 1108,
+      "failures": 0,
+      "executed_utc": "2026-11-13T13:36:05.712598+00:00",
+      "suite_source": {
+        "path": "tests/test_source_surface_render_state.gd",
+        "bytes": 10465,
+        "sha256": "1ad88b38ed2aa73013920e62cb6a9d624f6748d87616f72325be223bb80c8dfb"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_surface_render_state.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.796,
+      "timed_out": false,
+      "output_bytes": 199,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/alignment-render-v4-regressions/logs/source_render_state.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_surface_contact_patch",
+      "scope": "Saved nonvertex source contact independently verifies all three original triangle vertices before restoring the published physical height.",
+      "status": "passed",
+      "checks": 32,
+      "failures": 0,
+      "executed_utc": "2026-11-13T13:36:06.509193+00:00",
+      "suite_source": {
+        "path": "tests/test_source_surface_contact_patch.gd",
+        "bytes": 7717,
+        "sha256": "3468d237cf3a4528c76cb14a6b5a7f0d0c5bb737f8607f1b95f58e811d22ae19"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_surface_contact_patch.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 3.026,
+      "timed_out": false,
+      "output_bytes": 337,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/alignment-render-v4-regressions/logs/source_surface_contact_patch.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_celestial_renderer",
+      "scope": "Native body pose/light, source-height global LOD, bounded asynchronous publication and local overlap.",
+      "status": "passed",
+      "checks": 172,
+      "failures": 0,
+      "executed_utc": "2026-11-13T13:36:07.652767+00:00",
+      "suite_source": {
+        "path": "tests/test_source_celestial_renderer.gd",
+        "bytes": 13162,
+        "sha256": "17952f00149824459b33efab6a39d1d56b38f588ebfa942d445e0621bdb23485"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_celestial_renderer.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 6.671,
+      "timed_out": false,
+      "output_bytes": 129,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/alignment-render-v4-regressions/logs/source_celestial_renderer.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ]
+}

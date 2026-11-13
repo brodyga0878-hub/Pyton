@@ -1,0 +1,32 @@
+{
+  "schema": "starfrontier-source-archive-natural-feature-v1",
+  "started_utc": "2026-11-13T14:16:39.372822+00:00",
+  "finished_utc": "2026-11-13T14:17:08.943070+00:00",
+  "duration_seconds": 29.570258,
+  "source_commit": "a61d64c348a88986206a5a0804cae8a01e7c93ca",
+  "archive_sha256": "f8cf2ff60f9fe9ae7a58e0956aedef90aaefedc6dfcb6774e988ad5e1af5c984",
+  "command": [
+    "godot",
+    "--headless",
+    "--audio-driver",
+    "Dummy",
+    "--path",
+    "/workspace/recovery/alignment-source-portability/source/StarFrontier-0.22.0-contact-alignment-source",
+    "--script",
+    "res://tests/test_source_contact_alignment_main.gd",
+    "--",
+    "--rebuild-capture"
+  ],
+  "exit_code": 0,
+  "checks": 82,
+  "failures": 0,
+  "error_markers": [],
+  "source_actual_files": 1411,
+  "all_source_files_unchanged": true,
+  "modified_files": [],
+  "private_xdg": true,
+  "execution_policy": "require_escalated",
+  "log_sha256": "b482d7e9d7470216b52a3aff4968dddd98322ccbf8aaf5056b4784b8361c3d2c",
+  "scope": "Exact source ZIP, fresh isolated actual Main readonly natural F576/log/report/cold/cache and preserved terrain test. Repeated portability checks excluded from current distinct total. No Android device execution.",
+  "ok": true
+}

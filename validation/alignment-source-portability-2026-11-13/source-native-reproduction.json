@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "started_utc": "2026-11-13T14:18:43.147558+00:00",
+  "completed_utc": "2026-11-13T14:18:44.170734+00:00",
+  "exit_code": 0,
+  "fixture_sha256": "6cb84a1f6dff615a504c9cac7935f339291831b62a658971110a03c1cb7b6db6",
+  "expected_fixture_sha256": "6cb84a1f6dff615a504c9cac7935f339291831b62a658971110a03c1cb7b6db6",
+  "fixture_reproduced_byte_exact": true,
+  "all_archived_files_unchanged": true,
+  "modified_archived_files": [],
+  "log_sha256": "0d3f96790a1fb8301deb4d10f55af28db8d452c8f2a5d3221ff80206271a96c8",
+  "independent_new_native_cases_added_to_totals": false,
+  "scope": "Re-execution of the included original native459 witness generator from the exact fresh source archive, using included predecessor native assembly/resources. This is reproducibility/packaging evidence, not459 additional distinct functional controls or Android execution.",
+  "ok": true,
+  "source_commit": "a61d64c348a88986206a5a0804cae8a01e7c93ca",
+  "archive_sha256": "f8cf2ff60f9fe9ae7a58e0956aedef90aaefedc6dfcb6774e988ad5e1af5c984",
+  "archived_source_file_count": 1411,
+  "native_generator_relative_path": "validation/alignment-2026-11-13/native-root-proof/rebuild_source_contact_field_native.py"
+}

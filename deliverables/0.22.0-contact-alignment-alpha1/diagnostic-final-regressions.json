@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-13T14:00:53.673825+00:00",
+  "updated_utc": "2026-11-13T14:01:21.022282+00:00",
+  "duration_seconds": 27.348,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-13T14:00:53.673825+00:00",
+      "duration_seconds": 27.348,
+      "requested_suites": [
+        "source_natural_main",
+        "source_spherical_main"
+      ],
+      "executed_suites": [
+        "source_natural_main",
+        "source_spherical_main"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 2,
+  "status": "passed",
+  "passed_suites": 2,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 358,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "source_natural_main",
+      "scope": "Actual Main read-only natural classifier facts in periodic logs and the diagnostic ZIP, with preserved HP, fuel, time, cold saves, menu and existing source landing.",
+      "status": "passed",
+      "checks": 163,
+      "failures": 0,
+      "executed_utc": "2026-11-13T14:00:53.675853+00:00",
+      "suite_source": {
+        "path": "tests/test_source_natural_contact_main.gd",
+        "bytes": 17209,
+        "sha256": "7dac6164b749ae29206fc873c7d65399660a00c8e055f5562d2fc041a3441e2d"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_natural_contact_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 27.345,
+      "timed_out": false,
+      "output_bytes": 117,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/alignment-diagnostic-final/logs/source_natural_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_spherical_main",
+      "scope": "Actual Main diagnostics and report archive carry the read-only source sphere probe without changing HP, fuel, clocks, source frames or existing terrain landing.",
+      "status": "passed",
+      "checks": 195,
+      "failures": 0,
+      "executed_utc": "2026-11-13T14:00:53.676148+00:00",
+      "suite_source": {
+        "path": "tests/test_source_spherical_main.gd",
+        "bytes": 17781,
+        "sha256": "31e6261d8f518cec93153501c53f4251ddf67d21149a0a5d519ffd0d7fccf12b"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_spherical_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 26.318,
+      "timed_out": false,
+      "output_bytes": 119,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/alignment-diagnostic-final/logs/source_spherical_main.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ]
+}
