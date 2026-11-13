@@ -1,6 +1,7 @@
 extends RefCounted
 const Sphere=preload("res://scripts/spherical_terrain.gd")
 const SourceTerrain=preload("res://scripts/source_surface_terrain.gd")
+const ContactTerrain=preload("res://scripts/source_contact_surface_terrain.gd")
 const SOURCE_LAYOUT:="source_jjffe_systems_v4"
 const SOURCE_REVISION:="orbit-link-source-v3"
 const ALTITUDE:=20000.0
@@ -17,7 +18,7 @@ static func rotation_basis(system:RefCounted,body_id:String,days:float)->Basis:
 static func preferred_terrain_revision(system:RefCounted)->String:
 	return SourceTerrain.REVISION_NAME if is_source_layout(system) else Sphere.CURRENT_REVISION
 static func supports_terrain_revision(value:Variant,system:RefCounted)->bool:
-	return Sphere.supports_revision(value) or (is_source_layout(system) and value==SourceTerrain.REVISION_NAME)
+	return Sphere.supports_revision(value) or (is_source_layout(system) and value in [SourceTerrain.REVISION_NAME,ContactTerrain.CONTACT_REVISION])
 static func _raw_saved_basis(value:Variant)->Basis:
 	if not value is Array or value.size()!=9:return Basis(Vector3.ZERO,Vector3.ZERO,Vector3.ZERO)
 	for component in value:
@@ -36,7 +37,7 @@ static func make(surface:RefCounted,ship:RefCounted,system:RefCounted,days:float
 	var body:Dictionary=system.by_id[system.focus_id]
 	var rotation:=rotation_basis(system,system.focus_id,days)
 	var radial:Vector3=rotation*direction(ll[0],ll[1])
-	var source:bool=surface.globe.revision==SourceTerrain.REVISION_NAME
+	var source:bool=surface.globe.revision in [SourceTerrain.REVISION_NAME,ContactTerrain.CONTACT_REVISION]
 	var elevation:float=surface.globe.elevation(ll[0],ll[1]) if source else 0.0
 	var position:Vector3=system.local_meters(system.focus_id,days)+radial*(surface.globe.radius+elevation+ALTITUDE)
 	var link:Dictionary={"revision":REVISION,"layout":system.layout_mode,"source_digest":system.source_digest,"system_id":system.system_id,"body_id":system.focus_id,"site_id":system.site_id,"latitude":ll[0],"longitude":ll[1],"days":days,"position":[position.x,position.y,position.z]}
@@ -76,9 +77,10 @@ static func valid(link:Variant,system:RefCounted)->bool:
 	if not link is Dictionary or link.get("revision") not in [REVISION,LEGACY_REVISION,SOURCE_REVISION]:return false
 	if not matches(link,system):return false
 	if not supports_terrain_revision(link.get("terrain_revision",Sphere.REVISION),system):return false
-	if (link.revision==SOURCE_REVISION)!=(terrain_revision(link)==SourceTerrain.REVISION_NAME):return false
+	if (link.revision==SOURCE_REVISION)!=(terrain_revision(link) in [SourceTerrain.REVISION_NAME,ContactTerrain.CONTACT_REVISION]):return false
 	if link.revision==LEGACY_REVISION and terrain_revision(link)!=Sphere.REVISION:return false
 	if not link.get("site_id") is String:return false
+	if terrain_revision(link)==ContactTerrain.CONTACT_REVISION and not link.site_id.is_empty():return false
 	if not link.site_id.is_empty():
 		var site:Dictionary=system.get_site(link.site_id)
 		if site.is_empty() or site.parent!=system.focus_id or int(site.type_code)!=35:return false
@@ -95,7 +97,8 @@ static func valid(link:Variant,system:RefCounted)->bool:
 	var rotation:Basis
 	if link.revision==SOURCE_REVISION:
 		if not is_source_layout(system) or not _valid_saved_basis(link.get("departure_matrix_q31")) or not (link.get("surface_elevation_m") is float or link.get("surface_elevation_m") is int) or not is_finite(float(link.surface_elevation_m)):return false
-		var terrain:=SourceTerrain.new();terrain.configure(system,system.focus_id,str(link.site_id))
+		var terrain:RefCounted=ContactTerrain.new() if terrain_revision(link)==ContactTerrain.CONTACT_REVISION else SourceTerrain.new()
+		terrain.configure(system,system.focus_id,str(link.site_id))
 		if not terrain.configured_ok:return false
 		elevation=terrain.elevation(float(link.latitude),float(link.longitude))
 		if absf(elevation-float(link.surface_elevation_m))>0.002:return false

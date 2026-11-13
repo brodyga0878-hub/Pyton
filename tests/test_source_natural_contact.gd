@@ -4,7 +4,7 @@ extends SceneTree
 const Core=preload("res://scripts/source_natural_contact.gd")
 const Ground=preload("res://scripts/source_ground_surface.gd")
 const FIXTURE:="res://tests/fixtures/source_natural_contact_native.json"
-const REPORT:="res://validation/natural-2026-11-13/source-natural-contact-core.json"
+const REPORT:="res://build/current-test-reports/source-natural-contact-core.json"
 var checks:=0
 var failures:=0
 var domains:Dictionary={}

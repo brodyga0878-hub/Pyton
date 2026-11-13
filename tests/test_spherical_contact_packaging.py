@@ -36,6 +36,12 @@ class SphericalContactPackaging(unittest.TestCase):
             raw=baseline['files'][name].encode()
             if hashlib.sha256(raw).hexdigest()!=digest:raise AssertionError('Historical code45 source differs '+name)
             (cls.project/name).write_bytes(raw)
+
+        # Future renderer opt-ins must not redefine these historical contracts.
+        alignment=verifier._load_contact_alignment_baseline(PROJECT)
+        for relative in verifier.CONTACT_ALIGNMENT_PROVIDER_SOURCE_SHA256:
+            target=cls.project/relative
+            if target.exists():target.write_text(alignment['files'][relative]['source'])
     def setUp(self):self.archive=MockSphericalArchive()
 
     @staticmethod

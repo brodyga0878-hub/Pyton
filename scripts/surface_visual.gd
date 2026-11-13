@@ -74,7 +74,7 @@ func _bind_ground_material(material:ShaderMaterial)->void:
 
 
 func configure(surface: RefCounted) -> void:
-	if surface.get("globe")!=null and str(surface.globe.get("revision"))==SourceTerrain.REVISION_NAME:
+	if surface.get("globe")!=null and SourcePacket.supports_terrain_revision(surface.globe.get("revision")):
 		_configure_source(surface);return
 	if not _source_key.is_empty():
 		_source_key="";_source_owner=null;_source_base=null;_source_core=null;_source_base_state=null;_source_core_state=null;_source_context=null;_source_region={};_source_nodes.clear()
@@ -272,7 +272,7 @@ func _source_publish(packet:Dictionary,worker_state:Dictionary,full:bool)->bool:
 		_source_material.set_shader_parameter("surface_kind",int(get_meta("material_kind",1)));_source_material.set_shader_parameter("material_origin",packet.material_origin)
 		_bind_ground_material(_source_material);_source_coverage(_source_material)
 		for data:Dictionary in packet.meshes:_source_base.add_child(_source_mesh(data))
-		var context:=SourcePatchContext.new();context.source_record=worker_state.source_record.duplicate();context.source_policy=worker_state.source_policy.duplicate(true)
+		var context:=SourcePatchContext.new();context.revision=str(packet.frame.terrain_revision);context.source_record=worker_state.source_record.duplicate();context.source_policy=worker_state.source_policy.duplicate(true)
 		context.latitude=float(packet.frame.latitude);context.longitude=float(packet.frame.longitude);context.radius=float(packet.frame.radius);context.extent=float(packet.meshes[-1].outer)
 		_source_context=context
 	else:
@@ -300,7 +300,7 @@ func _source_publish_far(packet:Dictionary,worker_state:Dictionary)->bool:
 	_source_material.set_shader_parameter("surface_kind",int(get_meta("material_kind",1)));_source_material.set_shader_parameter("material_origin",packet.material_origin)
 	_bind_ground_material(_source_material);_source_coverage(_source_material)
 	for data:Dictionary in packet.meshes:_source_base.add_child(_source_mesh(data))
-	var context:=SourcePatchContext.new();context.source_record=worker_state.source_record.duplicate();context.source_policy=worker_state.source_policy.duplicate(true)
+	var context:=SourcePatchContext.new();context.revision=str(packet.frame.terrain_revision);context.source_record=worker_state.source_record.duplicate();context.source_policy=worker_state.source_policy.duplicate(true)
 	context.latitude=float(packet.frame.latitude);context.longitude=float(packet.frame.longitude);context.radius=float(packet.frame.radius);context.extent=float(packet.meshes[-1].outer)
 	_source_context=context;_source_update_clip();_source_publish_usec=Time.get_ticks_usec()-started
 	# A finished far job already contains an exact warm core in its predicted
@@ -321,7 +321,12 @@ func _source_update_clip()->void:
 	_source_material.set_shader_parameter("source_core_center",_source_core_state.core_offset)
 	_source_material.set_shader_parameter("source_core_half_width",float(_source_core_state.core_width)*0.5)
 static func _prepare_source_job(snapshot:Dictionary,options:Dictionary,key:String,full:bool)->Dictionary:
-	var terrain:=SourceTerrain.from_worker_state(snapshot)
+	var terrain:RefCounted
+	if snapshot.get("revision")==SourcePacket.CONTACT_TERRAIN_REVISION:
+		var script:Script=load("res://scripts/source_contact_surface_terrain.gd")
+		if script==null:return {"ok":false,"key":key}
+		terrain=script.from_worker_state(snapshot)
+	else:terrain=SourceTerrain.from_worker_state(snapshot)
 	if terrain==null:return {"ok":false,"key":key}
 	var prepared_options:=options.duplicate()
 	if not prepared_options.has("core_width") and terrain.source_model_index==117:prepared_options.core_width=8000.0
@@ -365,6 +370,7 @@ func _source_request_far(surface:RefCounted)->void:
 	if _source_far_worker.start(_prepare_source_job.bind(snapshot,{"kind":world_material_kind,"extended_flight":bool(surface.extended_flight)},_source_key,true))!=OK:_source_far_worker=null
 func _configure_source(surface:RefCounted)->void:
 	var key:=str(surface.get_instance_id())+":"+str(surface.globe.get_instance_id())
+	if surface.globe.get("revision")==SourcePacket.CONTACT_TERRAIN_REVISION:key+=":"+SourcePacket.CONTACT_TERRAIN_REVISION
 	if key!=_source_key:
 		for child in get_children():remove_child(child);child.queue_free()
 		_source_nodes.clear();_source_base=null;_source_core=null;_source_base_state=null;_source_core_state=null;_source_context=null;_source_region={}

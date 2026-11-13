@@ -10,7 +10,7 @@ const Navigation=preload("res://scripts/navigation.gd")
 const Terrain=preload("res://scripts/source_surface_terrain.gd")
 const Frame=preload("res://scripts/source_surface_render_state.gd")
 const Patch=preload("res://scripts/source_surface_contact_patch.gd")
-const REPORT:="res://validation/natural-2026-11-13/source-natural-contact-probe.json"
+const REPORT:="res://build/current-test-reports/source-natural-contact-probe.json"
 class ObservedSurface extends "res://scripts/surface_model.gd":
 	var height_calls:=0
 	var clearance_calls:=0

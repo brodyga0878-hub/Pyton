@@ -1,0 +1,149 @@
+{
+	"checks": 140,
+	"evidence": [
+		{
+			"case": "actual_stock_v5_visible_point",
+			"guard": {
+				"certified": true,
+				"contract": "source-v5-visible-local-point-exact-f581-guard-v1",
+				"frame_f64_hex": "000000000000000000000000000000000000000062e7404100000000000000000000000000000000",
+				"graphics_level": 1.0,
+				"latitude": 0.0,
+				"local_x": 0.0,
+				"local_z": 0.0,
+				"longitude": 0.0,
+				"provider_sha256": "c62c39c16a4854b556e264dcfd831a0593bf655f554978c80eced1b33dccf566",
+				"provider_triangle_index": 6.0,
+				"query_result_s32": 0.0,
+				"radius_m": 2215620.0,
+				"reason": "exact_visible_source_zero",
+				"record_sha256": "7231c678e46e0d200b385439c98ff6b4a9169436721a5a073bd7b10a2dabe4cb",
+				"scope": "local-visible-point-only-not-whole-triangle",
+				"source_residual_s64_hex": "0000000000000000",
+				"terrain_revision": "sphere-source-contact-v5",
+				"vector_scale_s32": 3.0,
+				"visible_height_f64_hex": "00000040c169c6c0",
+				"visible_height_m": -11475.509765625,
+				"visible_point_s64_hex": "94fa50830000000000000000000000000000000000000000"
+			},
+			"whole_triangle_certification": false
+		},
+		{
+			"case": "explicit_exact_local_point_fixture",
+			"guard": {
+				"certified": true,
+				"contract": "source-v5-visible-local-point-exact-f581-guard-v1",
+				"frame_f64_hex": "000000000000000000000000000000000000000062e7404100000000000000000000000000000000",
+				"graphics_level": 1.0,
+				"latitude": 0.0,
+				"local_x": 0.0,
+				"local_z": 0.0,
+				"longitude": 0.0,
+				"provider_sha256": "da68fd5928353d2fb4ed0173be55716288d6012ba24e0dc4265f52e1968b00b1",
+				"provider_triangle_index": 6.0,
+				"query_result_s32": 0.0,
+				"radius_m": 2215620.0,
+				"reason": "exact_visible_source_zero",
+				"record_sha256": "7231c678e46e0d200b385439c98ff6b4a9169436721a5a073bd7b10a2dabe4cb",
+				"scope": "local-visible-point-only-not-whole-triangle",
+				"source_residual_s64_hex": "0000000000000000",
+				"terrain_revision": "sphere-source-contact-v5",
+				"vector_scale_s32": 3.0,
+				"visible_height_f64_hex": "00000040c169c6c0",
+				"visible_height_m": -11475.509765625,
+				"visible_point_s64_hex": "94fa50830000000000000000000000000000000000000000"
+			},
+			"search_unique_float32_heights": 1,
+			"stock_v5_triangle_claim": false
+		},
+		{
+			"case": "explicit_caller_and_domain",
+			"complete_history_required": true,
+			"enabled_byte": 255,
+			"full_F570_executed": false,
+			"old_runtime_changed": false
+		},
+		{
+			"HP_applied": false,
+			"case": "actual_candidate_eagle",
+			"flow_executed_in_Main": false,
+			"hit_previous_hex": "10feffffffffffff",
+			"nohit_flags_u8": 2,
+			"source_origin_offset_m": -0.437587394714356,
+			"unsafe_F953_calls": [
+				{
+					"amount_s32": 28,
+					"attacker_u32": 0
+				}
+			]
+		},
+		{
+			"HP_applied": false,
+			"case": "actual_candidate_cobra",
+			"flow_executed_in_Main": false,
+			"hit_previous_hex": "10feffffffffffff",
+			"nohit_flags_u8": 2,
+			"source_origin_offset_m": 1.72445404052734,
+			"unsafe_F953_calls": [
+				{
+					"amount_s32": 100,
+					"attacker_u32": 0
+				}
+			]
+		},
+		{
+			"HP_applied": false,
+			"case": "actual_candidate_shuttle",
+			"flow_executed_in_Main": false,
+			"hit_previous_hex": "10feffffffffffff",
+			"nohit_flags_u8": 2,
+			"source_origin_offset_m": -3.43910919189453,
+			"unsafe_F953_calls": [
+				{
+					"amount_s32": 8,
+					"attacker_u32": 0
+				}
+			]
+		},
+		{
+			"case": "actual_child_first_exclusion",
+			"facts": {
+				"blocked_reason": "unsupported_child_geometry_certificate",
+				"caller_policy": "isolated-f569-enabled-f570-primary-parent-prefix-v1",
+				"clock_advanced": false,
+				"damage_applied": false,
+				"f576_return_s32": 0,
+				"full_F569": false,
+				"full_F570": false,
+				"native_collision_kind": 1,
+				"native_contact_observed": true,
+				"selected_child_index": 2,
+				"source_contract": "source-f576-f575-v5-surface-candidate-bridge-v1",
+				"source_object_bank_present": false
+			},
+			"observer_roll_radians": 0.25,
+			"response_applied": false,
+			"source_centre_height_fixture_m": 3.0
+		},
+		{
+			"case": "physical_visible_guard",
+			"inner_fast_history_assumed": false,
+			"native_hit_forced": false,
+			"truthy_flag_is_not_certificate": true,
+			"whole_triangle_certified": false
+		}
+	],
+	"failures": 0,
+	"schema": 1,
+	"scope": "Pure v5/source candidate bridge with exact local visible-point gate, source caller prefix and real F576-to-bounded-F575 composition. Explicit observer/flat-provider fixtures do not certify stock v5 triangles, Main live landing, Android, a complete object bank or full F570.",
+	"sources": {
+		"scripts/source_contact_surface_terrain.gd": "50faef7f781117f1e3b8d6fe4c96146d3af3dc0074bf42283a882c9093c9abac",
+		"scripts/source_natural_contact.gd": "e6cb189d34dc4d434b10f9fc2ef43bf8b96433845c01673f79b4d9592446658f",
+		"scripts/source_natural_contact_pipeline.gd": "8d981b53f301dd375f22faae89a439673a3f94a98278cbb2161075a85ae125be",
+		"scripts/source_natural_surface_bridge.gd": "a67cb675c93f052bd00a2268e0629ae729c6c975f0419d105f6c60b90c2d7686",
+		"scripts/source_surface_contact_bridge.gd": "f83bbecc35c60bfaf79cf2314d067f997b966258665a41a93f082534ba7dfdd9",
+		"scripts/source_surface_render_state.gd": "0f71658a283e2e6afa6eeea4e496b447565469242cfa7222e12618caa9b58b4a",
+		"scripts/source_terrain_contact_field.gd": "e6de88193bd96912587f0b653b96e058357a4d157017c8f82ce86f7be42e9bf3",
+		"tests/test_source_natural_surface_bridge.gd": "f8a2dc5c414ac9c2c8713a347612d842b8bf5af269122113ec217ab88f403d57"
+	}
+}

@@ -30,6 +30,11 @@ for _directory in ('scripts','data','tests'):
     for _path in (_LIVE_PROJECT/_directory).iterdir():
         if _directory=='data' and _path.name in ('ffe_fuel.json','ffe_atmosphere.json','ffe_landing_gear.json','ffe_surface_contact.json','ffe_spherical_contact.json','ffe_natural_contact.json'):continue
         (PROJECT/_directory/_path.name).symlink_to(_path,target_is_directory=_path.is_dir())
+_alignment=verifier._load_contact_alignment_baseline(_LIVE_PROJECT)
+for _relative in verifier.CONTACT_ALIGNMENT_PROVIDER_SOURCE_SHA256:
+    _target=PROJECT/_relative
+    if _target.exists():
+        _target.unlink();_target.write_text(_alignment['files'][_relative]['source'])
 _baseline=json.loads((_LIVE_PROJECT/'tests/fixtures/hyperdrive_v39_sources.json').read_text())
 assert _baseline['source_commit']=='860951235548fc58c859d7337b9a6909fd78ca62'
 _baseline_sha256={

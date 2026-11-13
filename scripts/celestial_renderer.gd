@@ -20,6 +20,8 @@ var _source_cancel:SourceGlobalMesh.Cancellation
 var _source_job_key:=""
 var _source_wanted:Dictionary={}
 var _source_focus:=""
+var _source_terrain_revision:=SourceGlobalMesh.Terrain.REVISION_NAME
+var _source_focus_revision:=""
 var _source_status:="inactive"
 var _source_error:=""
 var _source_ground_patch:Dictionary={}
@@ -52,13 +54,13 @@ func _start_source_job()->void:
 func _request_source_focus()->void:
 	if not _full_context():return
 	var focus:=str(context.focus_id)
-	if focus==_source_focus:return
-	_source_focus=focus
+	if focus==_source_focus and _source_focus_revision==_source_terrain_revision:return
+	_source_focus=focus;_source_focus_revision=_source_terrain_revision
 	if _source_cancel!=null:_source_cancel.cancel()
 	for id in visuals:
 		var entry:Dictionary=visuals[id]
 		if entry.get("source_height_active",false):entry.mesh.mesh=entry.base_sphere;entry.source_height_active=false
-	var snapshot:=SourceGlobalMesh.snapshot(context,focus)
+	var snapshot:=SourceGlobalMesh.snapshot(context,focus,_source_terrain_revision)
 	if snapshot.is_empty():_source_wanted={};_source_status="unsupported";return
 	var key:=SourceGlobalMesh.key(snapshot);_source_wanted={"key":key,"snapshot":snapshot};_source_status="pending";_source_error=""
 	if _source_cache.has(key):
@@ -75,6 +77,15 @@ func _install_source_mesh(result:Dictionary)->void:
 
 func source_mesh_state()->Dictionary:
 	return {"status":_source_status,"error":_source_error,"focus_id":_source_focus,"job_key":_source_job_key,"cache_entries":_source_cache.size(),"cache_limit":SOURCE_CACHE_LIMIT,"profile":SourceGlobalMesh.REVISION}
+
+func set_source_terrain_revision(value:String)->bool:
+	# New geometry requires an explicit caller choice. Ordinary v4 sessions and
+	# their bounded cache keys keep the previous default without migration.
+	if not SourceGlobalMesh.supports_terrain_revision(value):return false
+	if value==_source_terrain_revision:return true
+	_source_terrain_revision=value;_source_focus_revision=""
+	if _full_context():_request_source_focus()
+	return true
 
 func source_light(body_id:String,days:float)->Dictionary:
 	if not _full_context() or not context.by_id.has(body_id):return {}
@@ -102,7 +113,7 @@ func source_cap_state(body_id:String)->Dictionary:
 
 func set_source_ground_patch(globe:RefCounted)->void:
 	_source_ground_patch={}
-	if not _full_context() or globe==null or globe.get("revision")!=SourceGlobalMesh.Terrain.REVISION_NAME or not globe.has_method("maximum_patch_extent"):return
+	if not _full_context() or globe==null or not SourceGlobalMesh.supports_terrain_revision(globe.get("revision")) or not globe.has_method("maximum_patch_extent"):return
 	var record:Variant=globe.get("source_record");var policy:Variant=globe.get("source_policy")
 	if not record is PackedByteArray or record.size()!=68 or not policy is Dictionary:return
 	var radius:=float(globe.radius);var latitude:=float(globe.latitude);var longitude:=float(globe.longitude)
@@ -148,7 +159,7 @@ func _bind_body_material(material:ShaderMaterial,kind:String)->void:
 func configure(system: RefCounted) -> void:
 	last_high_focus=""
 	if _source_cancel!=null:_source_cancel.cancel()
-	_source_wanted={};_source_focus="";_source_status="inactive";_source_error=""
+	_source_wanted={};_source_focus="";_source_focus_revision="";_source_status="inactive";_source_error=""
 	context = system
 	for child in get_children():
 		remove_child(child)

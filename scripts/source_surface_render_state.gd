@@ -43,7 +43,7 @@ func configure(packet:Dictionary)->bool:
 		if not row is Dictionary or not row.get("role") is String:return false
 	if not Packet.valid(packet):return false
 	var frame:Dictionary=packet.frame
-	if frame.get("terrain_revision")!=Packet.TERRAIN_REVISION or frame.get("record_domain")!=RECORD_DOMAIN or not packet.get("source_key","") is String:return false
+	if not Packet.supports_terrain_revision(frame.get("terrain_revision")) or frame.get("record_domain")!=RECORD_DOMAIN or not packet.get("source_key","") is String:return false
 	if not _integer(packet.get("core_cells"),2,128) or not _number(packet.get("core_width")) or float(packet.core_width)<64 or float(packet.core_width)>65536:return false
 	var offset:Variant=packet.get("core_offset",Vector2.ZERO)
 	if not offset is Vector2 or not offset.is_finite():return false
@@ -74,7 +74,7 @@ func configure(packet:Dictionary)->bool:
 
 func matches(globe:RefCounted)->bool:
 	if not configured_ok or globe==null or not globe.get("revision") is String or not globe.get("configured_ok") is bool:return false
-	if globe.revision!=Packet.TERRAIN_REVISION or not globe.configured_ok:return false
+	if globe.revision!=_frame.get("terrain_revision") or not Packet.supports_terrain_revision(globe.revision) or not globe.configured_ok:return false
 	if not _number(globe.get("radius")) or float(globe.radius)!=float(_frame.radius) or not _number(globe.get("latitude")) or not _number(globe.get("longitude")) or absf(float(globe.latitude))>PI*0.5 or absf(float(globe.longitude))>PI+0.000001:return false
 	var record:Variant=globe.get("source_record")
 	if not record is PackedByteArray or record.size()!=68:return false

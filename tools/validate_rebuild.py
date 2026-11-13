@@ -44,6 +44,13 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_contact_alignment', 'tests/test_source_contact_alignment.gd', 'Measured source placement, grid, phone frame and saved-triangle discrepancies on17landable models/three anchors/three players; characterization is not live response.', timeout=600),
+    Suite('source_contact_field', 'tests/test_source_terrain_contact_field.gd', 'Certified signed F581 zeros or adjacent outward sign boundaries versus153 independent native geometry witnesses and306 actual player classifications.', timeout=600),
+    Suite('source_contact_surface_terrain', 'tests/test_source_contact_surface_terrain.gd', 'Distinct opt-in v5 signed-field node sampler, strict private worker/cache restore and retained reviewed JJFFE city anchors; interpolation is not certified.', timeout=300),
+    Suite('source_contact_surface_render', 'tests/test_source_contact_surface_render.gd', 'Explicit v5 renderer revision compatibility, worker packet, saved-triangle validation and immutable v4 golden checksum/cache key.', timeout=300),
+    Suite('source_natural_surface_bridge', 'tests/test_source_natural_surface_bridge.gd', 'Pure bounded candidate bridge with exact local-point admission, real source globals/positive radius and atomic unsupported geometry; no default live physics switch.', timeout=300),
+    Suite('source_contact_alignment_probe', 'tests/test_source_contact_alignment_probe.gd', 'Read-only source/visible height comparison using isolated source and provider copies with snapshot bindings; no landing authority.', timeout=300),
+    Suite('source_contact_alignment_main', 'tests/test_source_contact_alignment_main.gd', 'Actual comparison menu/report, retained gear after graphics preview, old save isolation and explicit v5 compatibility without default physics changes.', timeout=600, user_args=('--rebuild-capture',)),
     Suite('source_natural_contact', 'tests/test_source_natural_contact.gd', 'Positive-radius original F576, F579 and bounded natural F582/F581/F1876 against independently executed DOS cases; actual Eagle, Cobra and Shuttle child streams.', timeout=600),
     Suite('source_natural_pipeline', 'tests/test_source_natural_contact_pipeline.gd', 'Standalone composition of the native-proved natural classifier and previously native-proved F575 continuation using explicit globals; not an independently executed end-to-end F575 oracle or live source bank.', timeout=600),
     Suite('source_natural_probe', 'tests/test_source_natural_contact_probe.gd', 'Read-only actual-world F576 classification at the authored phone ship centre, original parent UID and actual child offsets; source field is not phone AGL or a new live contact response.', timeout=300),

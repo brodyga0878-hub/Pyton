@@ -4,6 +4,8 @@ extends RefCounted
 const Frame=preload("res://scripts/source_surface_render_state.gd")
 const Terrain=preload("res://scripts/source_surface_terrain.gd")
 const REVISION:="source-surface-contact-triangle-v1"
+const CONTACT_TERRAIN_REVISION:="sphere-source-contact-v5"
+const CONTACT_HEIGHT_POLICY:="signed-f581-contact-root-grid-v1"
 var configured_ok:=false
 var source_key:=""
 var core_width:=0.0
@@ -18,6 +20,18 @@ var _target_lat:=INF
 var _target_lon:=INF
 var _transform:=Transform3D.IDENTITY
 var _inverse:=PackedFloat64Array()
+
+static func _terrain_policy(terrain_revision:Variant)->String:
+	if terrain_revision==Terrain.REVISION_NAME:return Terrain.SAMPLE_POLICY
+	if terrain_revision==CONTACT_TERRAIN_REVISION:return CONTACT_HEIGHT_POLICY
+	return ""
+
+static func _clone_terrain(globe:RefCounted)->RefCounted:
+	if globe.revision==Terrain.REVISION_NAME:return Terrain.from_worker_state(globe.capture_worker_state())
+	if globe.revision==CONTACT_TERRAIN_REVISION:
+		var script:Script=load("res://scripts/source_contact_surface_terrain.gd")
+		return script.from_worker_state(globe.capture_worker_state()) if script!=null else null
+	return null
 
 static func _profile(model:int,width:float,cells:int)->String:
 	if width==4000.0 and cells==64:return "source-mobile-core-4000-64-v1"
@@ -40,11 +54,13 @@ static func _canonical(value:Dictionary)->Dictionary:
 	if not _plain(value) or not value.get("revision") is String or not value.get("terrain_policy") is String:return {}
 	for key in value:
 		if key not in ["revision","terrain_policy","profile","model_index","frame","grid","vertices","checksum"]:return {}
-	if value.get("revision")!=REVISION or value.get("terrain_policy")!=Terrain.SAMPLE_POLICY or not value.get("profile") is String or not Frame._integer(value.get("model_index"),117,133) or not value.get("frame") is Dictionary or not value.get("grid") is Dictionary:return {}
+	if value.get("revision")!=REVISION or not value.get("profile") is String or not Frame._integer(value.get("model_index"),117,133) or not value.get("frame") is Dictionary or not value.get("grid") is Dictionary:return {}
 	var f:Dictionary=value.frame;var g:Dictionary=value.grid
+	var policy:=_terrain_policy(f.get("terrain_revision"))
+	if policy.is_empty() or value.terrain_policy!=policy:return {}
 	for key in ["latitude","longitude","radius"]:
 		if not Frame._number(f.get(key)):return {}
-	if f.size()!=6 or not f.get("terrain_revision") is String or not f.get("record_domain") is String or absf(float(f.latitude))>PI*0.5 or absf(float(f.longitude))>PI+0.000001 or float(f.radius)<=0 or f.get("terrain_revision")!=Terrain.REVISION_NAME or f.get("record_domain")!=Frame.RECORD_DOMAIN or not f.get("record_hash") is String or f.record_hash.length()!=64 or not f.record_hash.is_valid_hex_number(false):return {}
+	if f.size()!=6 or not f.get("terrain_revision") is String or not f.get("record_domain") is String or absf(float(f.latitude))>PI*0.5 or absf(float(f.longitude))>PI+0.000001 or float(f.radius)<=0 or f.get("record_domain")!=Frame.RECORD_DOMAIN or not f.get("record_hash") is String or f.record_hash.length()!=64 or not f.record_hash.is_valid_hex_number(false):return {}
 	if g.size()!=5 or not Frame._number(g.get("width")) or not Frame._integer(g.get("cells"),2,128) or not g.get("offset") is Array or g.offset.size()!=2 or not g.get("cell") is Array or g.cell.size()!=2 or not Frame._integer(g.get("triangle"),0,1):return {}
 	for number in g.offset:
 		if not Frame._number(number):return {}
@@ -68,7 +84,7 @@ static func _canonical(value:Dictionary)->Dictionary:
 		var stored:=Vector3(float(point[0]),float(point[1]),float(point[2]))
 		if not stored.is_finite() or float(point[0])!=float(expected.x) or float(point[2])!=float(expected.z) or float(point[1])!=float(stored.y):return {}
 		vertices.append([float(stored.x),float(stored.y),float(stored.z)])
-	return {"revision":REVISION,"profile":profile,"model_index":model,"terrain_policy":Terrain.SAMPLE_POLICY,"frame":{"latitude":float(f.latitude),"longitude":float(f.longitude),"radius":float(f.radius),"record_hash":str(f.record_hash).to_lower(),"terrain_revision":Terrain.REVISION_NAME,"record_domain":Frame.RECORD_DOMAIN},"grid":{"width":width,"cells":cells,"offset":[float(g.offset[0]),float(g.offset[1])],"cell":[ix,iz],"triangle":which},"vertices":vertices}
+	return {"revision":REVISION,"profile":profile,"model_index":model,"terrain_policy":policy,"frame":{"latitude":float(f.latitude),"longitude":float(f.longitude),"radius":float(f.radius),"record_hash":str(f.record_hash).to_lower(),"terrain_revision":str(f.terrain_revision),"record_domain":Frame.RECORD_DOMAIN},"grid":{"width":width,"cells":cells,"offset":[float(g.offset[0]),float(g.offset[1])],"cell":[ix,iz],"triangle":which},"vertices":vertices}
 
 static func checksum_for(value:Dictionary)->String:
 	# Corruption detection, not authentication. Source-height reconstruction is
@@ -86,7 +102,9 @@ static func seal_capture(frame:Dictionary,width:float,cells:int,offset:Vector2,c
 	for point:Variant in points:
 		if not point is Vector3 or not point.is_finite():return {}
 		vertices.append([float(point.x),float(point.y),float(point.z)])
-	var raw:={"revision":REVISION,"profile":profile,"model_index":model,"terrain_policy":Terrain.SAMPLE_POLICY,"frame":frame.duplicate(true),"grid":{"width":width,"cells":cells,"offset":[float(offset.x),float(offset.y)],"cell":[cell.x,cell.y],"triangle":which},"vertices":vertices}
+	var policy:=_terrain_policy(globe.get("revision"))
+	if policy.is_empty() or frame.get("terrain_revision")!=globe.revision:return {}
+	var raw:={"revision":REVISION,"profile":profile,"model_index":model,"terrain_policy":policy,"frame":frame.duplicate(true),"grid":{"width":width,"cells":cells,"offset":[float(offset.x),float(offset.y)],"cell":[cell.x,cell.y],"triangle":which},"vertices":vertices}
 	# Normalize the exact numeric spelling that the ordinary game JSON writer
 	# preserves before sealing. No Vector/PackedArray is allowed in this result.
 	var canonical:=_canonical(JSON.parse_string(JSON.stringify(raw)))
@@ -105,12 +123,12 @@ func clear()->void:
 
 func configure(value:Dictionary,globe:RefCounted)->bool:
 	var patch:=_canonical(value)
-	if patch.is_empty() or not value.get("checksum") is String or value.checksum!=checksum_for(patch) or globe==null or globe.get("revision")!=Terrain.REVISION_NAME or globe.get("configured_ok")!=true or not globe.get("source_record") is PackedByteArray or globe.source_record.size()!=68:return false
+	if patch.is_empty() or not value.get("checksum") is String or value.checksum!=checksum_for(patch) or globe==null or globe.get("revision")!=patch.frame.terrain_revision or globe.get("configured_ok")!=true or not globe.get("source_record") is PackedByteArray or globe.source_record.size()!=68:return false
 	if patch.frame.record_hash!=Frame._sha(globe.source_record) or int(patch.model_index)!=int(globe.source_record.decode_u16(12)) or not Frame._number(globe.get("radius")) or float(patch.frame.radius)!=float(globe.radius) or not globe.has_method("capture_worker_state"):return false
 	# The caller globe has already been reconstructed from validated World/body
 	# data. Its isolated clone preserves all verified native city grading, while
 	# the saved OLD packet anchor is used only for these three vertex probes.
-	var sampler:RefCounted=Terrain.from_worker_state(globe.capture_worker_state())
+	var sampler:RefCounted=_clone_terrain(globe)
 	if sampler==null:return false
 	sampler.latitude=float(patch.frame.latitude);sampler.longitude=float(patch.frame.longitude)
 	var points:Array[Vector3]=[]
@@ -131,7 +149,7 @@ static func reconstruct(patch:Dictionary,globe:RefCounted)->RefCounted:
 	return state if state.configure(patch,globe) else null
 
 func matches(globe:RefCounted)->bool:
-	return configured_ok and globe!=null and globe.get("revision")==Terrain.REVISION_NAME and globe.get("configured_ok")==true and globe.get("source_record") is PackedByteArray and globe.source_record==_record and Frame._number(globe.get("radius")) and float(globe.radius)==float(_frame.radius) and Frame._number(globe.get("latitude")) and Frame._number(globe.get("longitude")) and absf(float(globe.latitude))<=PI*0.5 and absf(float(globe.longitude))<=PI+0.000001
+	return configured_ok and globe!=null and globe.get("revision")==_frame.get("terrain_revision") and not _terrain_policy(globe.get("revision")).is_empty() and globe.get("configured_ok")==true and globe.get("source_record") is PackedByteArray and globe.source_record==_record and Frame._number(globe.get("radius")) and float(globe.radius)==float(_frame.radius) and Frame._number(globe.get("latitude")) and Frame._number(globe.get("longitude")) and absf(float(globe.latitude))<=PI*0.5 and absf(float(globe.longitude))<=PI+0.000001
 
 func transform_to(globe:RefCounted)->Transform3D:
 	if not matches(globe):return Transform3D(Basis.IDENTITY,Vector3(INF,INF,INF))

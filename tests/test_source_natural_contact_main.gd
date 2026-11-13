@@ -3,7 +3,7 @@ extends "res://tests/test_source_contact_main.gd"
 # classification, a landing verdict, or a new source-object collision bank.
 const NaturalProbe=preload("res://scripts/source_natural_contact_probe.gd")
 const NaturalBuild=preload("res://scripts/build_info.gd")
-const NATURAL_REPORT:="res://validation/natural-2026-11-13/source-natural-main.json"
+const NATURAL_REPORT:="res://build/current-test-reports/source-natural-main.json"
 const NATURAL_KEY:="source_natural_probe"
 var natural_evidence:Array=[]
 var natural_private:="user://natural-main-"+str(OS.get_process_id())

@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "revision": "source-contact-field-native-v1",
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+  "scope": "Independent original archived fullF576/F579/boundednaturalF582/F581/F1876 checks at17landablemodels\u00d73anchors. Geometry cases use actualpositiveEagle24 and canonicalF579scale; only excluded model117axis anchors explicitly expand coarsebounds to evaluate the signedgeometryfield. Canonical classifier cases always retain actualoriginal parentbounds and actualpositiveEagle24/Cobra38/Shuttle15 radii/children. No F575response/gameplay/livev5triangle/device claim.",
+  "seed_provenance": "Immutable oldGround sampler follows pinnedJJFFE F879 SAR3; uploadedDOS F879 hasSAR4. New signedfieldpoints are certified independently by unchangedDOSF581/F1876; aplacementseed is not an asserted exact originalsurfacezero.",
+  "raw_units_policy": "All coordinate/altitude comparisons are original signedinteger rawunits. SI display conversion remains SourceUnits.METRES_PER_RAW, not rounded0.001. Three actual positive shipinnerbounds are5200/9600/1920raw, with original childstreams.",
+  "source_units_metres_per_raw_rational": {
+    "numerator": 16785,
+    "denominator": 16777216
+  },
+  "actual_player_inner_bounds_raw": {
+    "24": 5200,
+    "38": 9600,
+    "15": 1920
+  },
+  "source_units_module_sha256": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24",
+  "source_canonical_fixture_sha256": "d4ce0cf3ebfe0fd3bb1f263d047fa3a17ffc5201b8040389fdbddcc21a50e166",
+  "source_instruction_proofs_sha256": "7ff8e664b723c9b0afbfac0b15b60cb85dda3a633af2cb3195f28aae548f94aa",
+  "source_archived_assembly_sha256": "2af22487e26d1415ee5463baac49bba528694b0f3e2b1eb311a72fcf8538a40b",
+  "source_archived_excluded_assembly_sha256": "72b13be75e38cc971e7de75e05c9c08151184cd6924e36a990d17e73e3218f29",
+  "source_candidate_inputs_sha256": "6a381cf2e4442b59f9426b941eac97ad3afa6d495dff01568e5ad456f95463e3",
+  "generator_sha256": "696e7038e8995fc7d63d699cf0bb15e7ee16e576659158f926a4344338c805a0",
+  "observed_geometry_assembly_sha256": "429bebcd8824e653dde672ebd1eeff31c44c786c531c0c064675f5f89f896250",
+  "native_geometry_ordered_output_sha256": "f3c50a7049c32a11ebc19a3c4c7ba980f1101a3ab14899a5afc825a8fb97d5f8",
+  "native_classifier_ordered_output_sha256": "6dd44921c5134283af1e8ed37a6ac76653db1cd57b846f74cee13c960621bc55",
+  "anchor_count": 51,
+  "model_count": 17,
+  "player_models": [
+    24,
+    38,
+    15
+  ],
+  "geometry_case_count": 153,
+  "classifier_case_count": 306,
+  "case_count": 459,
+  "native_witness_selection_query_count": 316,
+  "fresh_process_runs_per_bank": 3,
+  "geometry_reverse_repeat_count": 153,
+  "classifier_reverse_repeat_count": 306,
+  "original_body_parent_buffers_and_canaries_unchanged": true,
+  "python_expected_query_arithmetic": false,
+  "geometry_exclusion_anchor_ids": [
+    "model117_axis_x",
+    "model117_axis_z"
+  ],
+  "geometry_context_policy": "Only model117coarse-gateexcluded anchors use explicitpositiveouter/zeroinner context to execute originalterrainbranch; these modified radii never enter canonical classifiercases."
+}

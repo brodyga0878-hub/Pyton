@@ -1,0 +1,1771 @@
+{
+	"checks": 220,
+	"evidence": [
+		{
+			"case": "actual_source_accepted_above_old_phone_speed",
+			"contact": {
+				"alignment_q31": 2130706463,
+				"damage_calls": [],
+				"l1_speed_s32": 175,
+				"landing_accepted": true,
+				"normal_q31": [
+					-884389334,
+					-1629497122,
+					1083642392
+				],
+				"return_flags_u8": 67,
+				"source_contract": "dos-firstenc-f575-postclassification-player-contact-v1"
+			},
+			"hull_percent": 100.0,
+			"manual_landing_claim": false
+		},
+		{
+			"case": "actual_source_unsafe_gear_retracted",
+			"expected_raw_minimum_damage": 100,
+			"facts": {
+				"agl_m": 0.314336576496425,
+				"attitude": "(-0.670729, 0.166442, -0.158297, 0.705238)",
+				"gear": {
+					"can_toggle": true,
+					"command_label": "Выпустить шасси",
+					"control_flags_u8": 2,
+					"deployed": false,
+					"extension_fraction": 0.0,
+					"extension_percent": 0.0,
+					"f1014_raw_gear_flag": true,
+					"frame_tick_remainder_raw": 4379648,
+					"host_policy": "nominal-day-si-fixed60-source-landing-gear-v1",
+					"initialized": true,
+					"landing_ready": false,
+					"moving": false,
+					"object_timer_u16": 0,
+					"phase_f64_hex": "c01e85eb51b8ae3f",
+					"position_u16": 0,
+					"requested_down": false,
+					"retract_requested": true,
+					"retracted": true,
+					"source_contract": "dos-firstenc-f1008-f1056-gear-branch-v1",
+					"status_text": "Убраны",
+					"toggle_reason": "",
+					"warning_latched": false,
+					"warning_text": ""
+				},
+				"hull_percent": 75.0,
+				"last": {
+					"body_id": "earth",
+					"body_model_index": 129,
+					"facts": {
+						"agl_m": -0.0117849328042947,
+						"altitude_policy": "sampled-phone-agl-plus-native-inner-radius-v1",
+						"city_floor_is_explicit_radial_proxy": false,
+						"clock_advanced": false,
+						"damage_applied": false,
+						"full_f569_classifier": false,
+						"full_f575": false,
+						"height_m": -56900.1143088172,
+						"input_matrix_policy": "proper-local-yaw-pi-double-unit-q31-source-f1520-v1",
+						"kernel_contract": "dos-firstenc-f575-postclassification-player-contact-v1",
+						"kind": "terrain",
+						"mesh_normal_is_native_contact_normal": false,
+						"model_index": 38,
+						"native_collision_kind": 1,
+						"native_orientation_determinant": 0.969075977802277,
+						"native_radial_normal_q31": [
+							-884389334,
+							-1629497132,
+							1083642382
+						],
+						"orientation_projection_policy": "native-rotation-delta-to-phone-quaternion-v1",
+						"parent_model_index": 129,
+						"phone_clearance_m": 7.88,
+						"physical_gear_u16": 0,
+						"position_delta_raw": [
+							-5,
+							-10,
+							6
+						],
+						"previous_altitude_s64": 9588,
+						"provider": "published-source-render-triangle",
+						"provider_normal": [
+							-0.155943363904953,
+							0.987764775753021,
+							0.00154338078573346
+						],
+						"source_body_origin_policy": "authored-clearance-to-f1533-inner-radius-v1",
+						"source_body_origin_up_offset_m": 1.72445404052734,
+						"source_contract": "source-surface-contact-phone-frame-v1",
+						"source_inner_radius_raw": 9600,
+						"source_mass_s16": 100,
+						"source_object_indices_policy": "isolated-player1-parent2-postclassification-v1",
+						"velocity_delta_q16": [
+							-131072,
+							-262144,
+							262144
+						]
+					},
+					"hpdetail": {
+						"applied_calls": 1,
+						"callbacks": [
+							{
+								"function": "F34",
+								"register": 13,
+								"value_u32": 1
+							},
+							{
+								"function": "F34",
+								"register": 14,
+								"value_u32": 0
+							},
+							{
+								"function": "F34",
+								"register": 12,
+								"value_u32": 100
+							},
+							{
+								"function": "F35",
+								"register": 12,
+								"return_s32": 100
+							},
+							{
+								"function": "F1907",
+								"sample": 29,
+								"volume_s8": 0
+							},
+							{
+								"function": "F952"
+							}
+						],
+						"changed": true,
+						"damage_calls": [
+							{
+								"amount_s32": 100,
+								"attacker_u32": 0
+							}
+						],
+						"destroyed": false,
+						"destruction_requested": false,
+						"equipment_damage_requested": true,
+						"event_filter_policy": "identity-event-filter-adapter",
+						"hull_damage_u16": 100,
+						"hull_percent_after": 75.0,
+						"hull_percent_before": 100.0,
+						"hull_percent_loss": 25.0,
+						"ok": true,
+						"raw_hull_after": 300,
+						"raw_hull_before": 400,
+						"raw_shield_after": 0,
+						"raw_shield_before": 0,
+						"reason": "contact_damage_applied",
+						"results": [
+							{
+								"callback_policy": "F942/F952/module effects requested, not executed",
+								"callbacks": [
+									{
+										"function": "F34",
+										"register": 13,
+										"value_u32": 1
+									},
+									{
+										"function": "F34",
+										"register": 14,
+										"value_u32": 0
+									},
+									{
+										"function": "F34",
+										"register": 12,
+										"value_u32": 100
+									},
+									{
+										"function": "F35",
+										"register": 12,
+										"return_s32": 100
+									},
+									{
+										"function": "F1907",
+										"sample": 29,
+										"volume_s8": 0
+									},
+									{
+										"function": "F952"
+									}
+								],
+								"changed": true,
+								"destruction_requested": false,
+								"equipment_damage_requested": true,
+								"event_filter_policy": "identity-event-filter-adapter",
+								"filtered_damage_s32": 100,
+								"normalized_damage_s32": 100,
+								"ok": true,
+								"reason": "equipment_request",
+								"return_s32": 0,
+								"rng_consumed": false,
+								"rng_state": {
+									"seed_a_u32": 1,
+									"seed_b_u32": 1
+								},
+								"source_contract": "dos-firstenc-f953-shield-hull-callbacks-v1",
+								"source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+								"state": {
+									"damage_flags_u8": 0,
+									"damage_timer_u8": 10,
+									"hull_u16": 300,
+									"kind_u8": 3,
+									"object_index_u8": 1,
+									"player_selector_u8": 255,
+									"shield_u16": 0,
+									"volume_s8": 0
+								}
+							}
+						],
+						"rng_consumed": false,
+						"rng_policy": "existing-local-F1530-stream",
+						"rng_state_after": {
+							"seed_a_u32": 1,
+							"seed_b_u32": 1
+						},
+						"rng_state_before": {
+							"seed_a_u32": 1,
+							"seed_b_u32": 1
+						},
+						"shield_damage_u16": 0,
+						"source_contract": "dos-firstenc-f953-shield-hull-callbacks-v1"
+					},
+					"parked": false,
+					"provider": "published-source-render-triangle",
+					"resolution": {
+						"alignment_q31": 2130706465,
+						"damage_calls": [
+							{
+								"amount_s32": 100,
+								"attacker_u32": 0
+							}
+						],
+						"l1_speed_s32": 8,
+						"landing_accepted": false,
+						"normal_q31": [
+							-884389334,
+							-1629497132,
+							1083642382
+						],
+						"return_flags_u8": 131,
+						"source_contract": "dos-firstenc-f575-postclassification-player-contact-v1"
+					},
+					"ship_model_index": 38
+				},
+				"position_m": "(0.012606, -56891.92, -0.008551)",
+				"raw_hull_u16": 300,
+				"raw_shield_u16": 0,
+				"surface_landed": false,
+				"velocity_mps": "(0.09513, 4.191045, -0.068536)"
+			},
+			"immediate": {
+				"agl_m": -0.0000526314059978716,
+				"attitude": "(-0.670729, 0.166442, -0.158297, 0.705238)",
+				"gear": {
+					"can_toggle": true,
+					"command_label": "Выпустить шасси",
+					"control_flags_u8": 2,
+					"deployed": false,
+					"extension_fraction": 0.0,
+					"extension_percent": 0.0,
+					"f1014_raw_gear_flag": true,
+					"frame_tick_remainder_raw": 4193280,
+					"host_policy": "nominal-day-si-fixed60-source-landing-gear-v1",
+					"initialized": true,
+					"landing_ready": false,
+					"moving": false,
+					"object_timer_u16": 0,
+					"phase_f64_hex": "b81e85eb51b8ae3f",
+					"position_u16": 0,
+					"requested_down": false,
+					"retract_requested": true,
+					"retracted": true,
+					"source_contract": "dos-firstenc-f1008-f1056-gear-branch-v1",
+					"status_text": "Убраны",
+					"toggle_reason": "",
+					"warning_latched": false,
+					"warning_text": ""
+				},
+				"hull_percent": 75.0,
+				"last": {
+					"body_id": "earth",
+					"body_model_index": 129,
+					"facts": {
+						"agl_m": -0.0117849328042947,
+						"altitude_policy": "sampled-phone-agl-plus-native-inner-radius-v1",
+						"city_floor_is_explicit_radial_proxy": false,
+						"clock_advanced": false,
+						"damage_applied": false,
+						"full_f569_classifier": false,
+						"full_f575": false,
+						"height_m": -56900.1143088172,
+						"input_matrix_policy": "proper-local-yaw-pi-double-unit-q31-source-f1520-v1",
+						"kernel_contract": "dos-firstenc-f575-postclassification-player-contact-v1",
+						"kind": "terrain",
+						"mesh_normal_is_native_contact_normal": false,
+						"model_index": 38,
+						"native_collision_kind": 1,
+						"native_orientation_determinant": 0.969075977802277,
+						"native_radial_normal_q31": [
+							-884389334,
+							-1629497132,
+							1083642382
+						],
+						"orientation_projection_policy": "native-rotation-delta-to-phone-quaternion-v1",
+						"parent_model_index": 129,
+						"phone_clearance_m": 7.88,
+						"physical_gear_u16": 0,
+						"position_delta_raw": [
+							-5,
+							-10,
+							6
+						],
+						"previous_altitude_s64": 9588,
+						"provider": "published-source-render-triangle",
+						"provider_normal": [
+							-0.155943363904953,
+							0.987764775753021,
+							0.00154338078573346
+						],
+						"source_body_origin_policy": "authored-clearance-to-f1533-inner-radius-v1",
+						"source_body_origin_up_offset_m": 1.72445404052734,
+						"source_contract": "source-surface-contact-phone-frame-v1",
+						"source_inner_radius_raw": 9600,
+						"source_mass_s16": 100,
+						"source_object_indices_policy": "isolated-player1-parent2-postclassification-v1",
+						"velocity_delta_q16": [
+							-131072,
+							-262144,
+							262144
+						]
+					},
+					"hpdetail": {
+						"applied_calls": 1,
+						"callbacks": [
+							{
+								"function": "F34",
+								"register": 13,
+								"value_u32": 1
+							},
+							{
+								"function": "F34",
+								"register": 14,
+								"value_u32": 0
+							},
+							{
+								"function": "F34",
+								"register": 12,
+								"value_u32": 100
+							},
+							{
+								"function": "F35",
+								"register": 12,
+								"return_s32": 100
+							},
+							{
+								"function": "F1907",
+								"sample": 29,
+								"volume_s8": 0
+							},
+							{
+								"function": "F952"
+							}
+						],
+						"changed": true,
+						"damage_calls": [
+							{
+								"amount_s32": 100,
+								"attacker_u32": 0
+							}
+						],
+						"destroyed": false,
+						"destruction_requested": false,
+						"equipment_damage_requested": true,
+						"event_filter_policy": "identity-event-filter-adapter",
+						"hull_damage_u16": 100,
+						"hull_percent_after": 75.0,
+						"hull_percent_before": 100.0,
+						"hull_percent_loss": 25.0,
+						"ok": true,
+						"raw_hull_after": 300,
+						"raw_hull_before": 400,
+						"raw_shield_after": 0,
+						"raw_shield_before": 0,
+						"reason": "contact_damage_applied",
+						"results": [
+							{
+								"callback_policy": "F942/F952/module effects requested, not executed",
+								"callbacks": [
+									{
+										"function": "F34",
+										"register": 13,
+										"value_u32": 1
+									},
+									{
+										"function": "F34",
+										"register": 14,
+										"value_u32": 0
+									},
+									{
+										"function": "F34",
+										"register": 12,
+										"value_u32": 100
+									},
+									{
+										"function": "F35",
+										"register": 12,
+										"return_s32": 100
+									},
+									{
+										"function": "F1907",
+										"sample": 29,
+										"volume_s8": 0
+									},
+									{
+										"function": "F952"
+									}
+								],
+								"changed": true,
+								"destruction_requested": false,
+								"equipment_damage_requested": true,
+								"event_filter_policy": "identity-event-filter-adapter",
+								"filtered_damage_s32": 100,
+								"normalized_damage_s32": 100,
+								"ok": true,
+								"reason": "equipment_request",
+								"return_s32": 0,
+								"rng_consumed": false,
+								"rng_state": {
+									"seed_a_u32": 1,
+									"seed_b_u32": 1
+								},
+								"source_contract": "dos-firstenc-f953-shield-hull-callbacks-v1",
+								"source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+								"state": {
+									"damage_flags_u8": 0,
+									"damage_timer_u8": 10,
+									"hull_u16": 300,
+									"kind_u8": 3,
+									"object_index_u8": 1,
+									"player_selector_u8": 255,
+									"shield_u16": 0,
+									"volume_s8": 0
+								}
+							}
+						],
+						"rng_consumed": false,
+						"rng_policy": "existing-local-F1530-stream",
+						"rng_state_after": {
+							"seed_a_u32": 1,
+							"seed_b_u32": 1
+						},
+						"rng_state_before": {
+							"seed_a_u32": 1,
+							"seed_b_u32": 1
+						},
+						"shield_damage_u16": 0,
+						"source_contract": "dos-firstenc-f953-shield-hull-callbacks-v1"
+					},
+					"parked": false,
+					"provider": "published-source-render-triangle",
+					"resolution": {
+						"alignment_q31": 2130706465,
+						"damage_calls": [
+							{
+								"amount_s32": 100,
+								"attacker_u32": 0
+							}
+						],
+						"l1_speed_s32": 8,
+						"landing_accepted": false,
+						"normal_q31": [
+							-884389334,
+							-1629497132,
+							1083642382
+						],
+						"return_flags_u8": 131,
+						"source_contract": "dos-firstenc-f575-postclassification-player-contact-v1"
+					},
+					"ship_model_index": 38
+				},
+				"position_m": "(-0.00008, -56892.23, 0.000588)",
+				"raw_hull_u16": 300,
+				"raw_shield_u16": 0,
+				"surface_landed": false,
+				"velocity_mps": "(0.095159, 0.066698, -0.068547)"
+			},
+			"recovered_hull_percent": 75.0,
+			"removed_phone_hold_claim": false,
+			"second_contact_placement_fixture": true
+		},
+		{
+			"case": "actual_source_unsafe_bad_inclination",
+			"expected_raw_minimum_damage": 100,
+			"facts": {
+				"agl_m": 0.314336576496425,
+				"attitude": "(-0.67898, 0.128711, -0.197449, 0.695294)",
+				"gear": {
+					"can_toggle": true,
+					"command_label": "Убрать шасси",
+					"control_flags_u8": 0,
+					"deployed": true,
+					"extension_fraction": 1.0,
+					"extension_percent": 100.0,
+					"f1014_raw_gear_flag": false,
+					"frame_tick_remainder_raw": 4379648,
+					"host_policy": "nominal-day-si-fixed60-source-landing-gear-v1",
+					"initialized": true,
+					"landing_ready": true,
+					"moving": false,
+					"object_timer_u16": 0,
+					"phase_f64_hex": "c01e85eb51b8ae3f",
+					"position_u16": 65535,
+					"requested_down": true,
+					"retract_requested": false,
+					"retracted": false,
+					"source_contract": "dos-firstenc-f1008-f1056-gear-branch-v1",
+					"status_text": "Выпущены",
+					"toggle_reason": "",
+					"warning_latched": false,
+					"warning_text": ""
+				},
+				"hull_percent": 75.0,
+				"last": {
+					"body_id": "earth",
+					"body_model_index": 129,
+					"facts": {
+						"agl_m": -0.0117849328042947,
+						"altitude_policy": "sampled-phone-agl-plus-native-inner-radius-v1",
+						"city_floor_is_explicit_radial_proxy": false,
+						"clock_advanced": false,
+						"damage_applied": false,
+						"full_f569_classifier": false,
+						"full_f575": false,
+						"height_m": -56900.1143088172,
+						"input_matrix_policy": "proper-local-yaw-pi-double-unit-q31-source-f1520-v1",
+						"kernel_contract": "dos-firstenc-f575-postclassification-player-contact-v1",
+						"kind": "terrain",
+						"mesh_normal_is_native_contact_normal": false,
+						"model_index": 38,
+						"native_collision_kind": 1,
+						"native_orientation_determinant": 0.969075918197632,
+						"native_radial_normal_q31": [
+							-884389334,
+							-1629497132,
+							1083642382
+						],
+						"orientation_projection_policy": "native-rotation-delta-to-phone-quaternion-v1",
+						"parent_model_index": 129,
+						"phone_clearance_m": 7.88,
+						"physical_gear_u16": 65535,
+						"position_delta_raw": [
+							-5,
+							-10,
+							6
+						],
+						"previous_altitude_s64": 9588,
+						"provider": "published-source-render-triangle",
+						"provider_normal": [
+							-0.155943363904953,
+							0.987764775753021,
+							0.00154338078573346
+						],
+						"source_body_origin_policy": "authored-clearance-to-f1533-inner-radius-v1",
+						"source_body_origin_up_offset_m": 1.72445404052734,
+						"source_contract": "source-surface-contact-phone-frame-v1",
+						"source_inner_radius_raw": 9600,
+						"source_mass_s16": 100,
+						"source_object_indices_policy": "isolated-player1-parent2-postclassification-v1",
+						"velocity_delta_q16": [
+							-131072,
+							-262144,
+							262144
+						]
+					},
+					"hpdetail": {
+						"applied_calls": 1,
+						"callbacks": [
+							{
+								"function": "F34",
+								"register": 13,
+								"value_u32": 1
+							},
+							{
+								"function": "F34",
+								"register": 14,
+								"value_u32": 0
+							},
+							{
+								"function": "F34",
+								"register": 12,
+								"value_u32": 100
+							},
+							{
+								"function": "F35",
+								"register": 12,
+								"return_s32": 100
+							},
+							{
+								"function": "F1907",
+								"sample": 29,
+								"volume_s8": 0
+							},
+							{
+								"function": "F952"
+							}
+						],
+						"changed": true,
+						"damage_calls": [
+							{
+								"amount_s32": 100,
+								"attacker_u32": 0
+							}
+						],
+						"destroyed": false,
+						"destruction_requested": false,
+						"equipment_damage_requested": true,
+						"event_filter_policy": "identity-event-filter-adapter",
+						"hull_damage_u16": 100,
+						"hull_percent_after": 75.0,
+						"hull_percent_before": 100.0,
+						"hull_percent_loss": 25.0,
+						"ok": true,
+						"raw_hull_after": 300,
+						"raw_hull_before": 400,
+						"raw_shield_after": 0,
+						"raw_shield_before": 0,
+						"reason": "contact_damage_applied",
+						"results": [
+							{
+								"callback_policy": "F942/F952/module effects requested, not executed",
+								"callbacks": [
+									{
+										"function": "F34",
+										"register": 13,
+										"value_u32": 1
+									},
+									{
+										"function": "F34",
+										"register": 14,
+										"value_u32": 0
+									},
+									{
+										"function": "F34",
+										"register": 12,
+										"value_u32": 100
+									},
+									{
+										"function": "F35",
+										"register": 12,
+										"return_s32": 100
+									},
+									{
+										"function": "F1907",
+										"sample": 29,
+										"volume_s8": 0
+									},
+									{
+										"function": "F952"
+									}
+								],
+								"changed": true,
+								"destruction_requested": false,
+								"equipment_damage_requested": true,
+								"event_filter_policy": "identity-event-filter-adapter",
+								"filtered_damage_s32": 100,
+								"normalized_damage_s32": 100,
+								"ok": true,
+								"reason": "equipment_request",
+								"return_s32": 0,
+								"rng_consumed": false,
+								"rng_state": {
+									"seed_a_u32": 1,
+									"seed_b_u32": 1
+								},
+								"source_contract": "dos-firstenc-f953-shield-hull-callbacks-v1",
+								"source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+								"state": {
+									"damage_flags_u8": 0,
+									"damage_timer_u8": 10,
+									"hull_u16": 300,
+									"kind_u8": 3,
+									"object_index_u8": 1,
+									"player_selector_u8": 255,
+									"shield_u16": 0,
+									"volume_s8": 0
+								}
+							}
+						],
+						"rng_consumed": false,
+						"rng_policy": "existing-local-F1530-stream",
+						"rng_state_after": {
+							"seed_a_u32": 1,
+							"seed_b_u32": 1
+						},
+						"rng_state_before": {
+							"seed_a_u32": 1,
+							"seed_b_u32": 1
+						},
+						"shield_damage_u16": 0,
+						"source_contract": "dos-firstenc-f953-shield-hull-callbacks-v1"
+					},
+					"parked": false,
+					"provider": "published-source-render-triangle",
+					"resolution": {
+						"alignment_q31": -2,
+						"damage_calls": [
+							{
+								"amount_s32": 100,
+								"attacker_u32": 0
+							}
+						],
+						"l1_speed_s32": 8,
+						"landing_accepted": false,
+						"normal_q31": [
+							-884389334,
+							-1629497132,
+							1083642382
+						],
+						"return_flags_u8": 131,
+						"source_contract": "dos-firstenc-f575-postclassification-player-contact-v1"
+					},
+					"ship_model_index": 38
+				},
+				"position_m": "(0.012606, -56891.92, -0.008551)",
+				"raw_hull_u16": 300,
+				"raw_shield_u16": 0,
+				"surface_landed": false,
+				"velocity_mps": "(0.09513, 4.191045, -0.068536)"
+			},
+			"immediate": {
+				"agl_m": -0.0000526314059978716,
+				"attitude": "(-0.67898, 0.128711, -0.197449, 0.695294)",
+				"gear": {
+					"can_toggle": true,
+					"command_label": "Убрать шасси",
+					"control_flags_u8": 0,
+					"deployed": true,
+					"extension_fraction": 1.0,
+					"extension_percent": 100.0,
+					"f1014_raw_gear_flag": false,
+					"frame_tick_remainder_raw": 4193280,
+					"host_policy": "nominal-day-si-fixed60-source-landing-gear-v1",
+					"initialized": true,
+					"landing_ready": true,
+					"moving": false,
+					"object_timer_u16": 0,
+					"phase_f64_hex": "b81e85eb51b8ae3f",
+					"position_u16": 65535,
+					"requested_down": true,
+					"retract_requested": false,
+					"retracted": false,
+					"source_contract": "dos-firstenc-f1008-f1056-gear-branch-v1",
+					"status_text": "Выпущены",
+					"toggle_reason": "",
+					"warning_latched": false,
+					"warning_text": ""
+				},
+				"hull_percent": 75.0,
+				"last": {
+					"body_id": "earth",
+					"body_model_index": 129,
+					"facts": {
+						"agl_m": -0.0117849328042947,
+						"altitude_policy": "sampled-phone-agl-plus-native-inner-radius-v1",
+						"city_floor_is_explicit_radial_proxy": false,
+						"clock_advanced": false,
+						"damage_applied": false,
+						"full_f569_classifier": false,
+						"full_f575": false,
+						"height_m": -56900.1143088172,
+						"input_matrix_policy": "proper-local-yaw-pi-double-unit-q31-source-f1520-v1",
+						"kernel_contract": "dos-firstenc-f575-postclassification-player-contact-v1",
+						"kind": "terrain",
+						"mesh_normal_is_native_contact_normal": false,
+						"model_index": 38,
+						"native_collision_kind": 1,
+						"native_orientation_determinant": 0.969075918197632,
+						"native_radial_normal_q31": [
+							-884389334,
+							-1629497132,
+							1083642382
+						],
+						"orientation_projection_policy": "native-rotation-delta-to-phone-quaternion-v1",
+						"parent_model_index": 129,
+						"phone_clearance_m": 7.88,
+						"physical_gear_u16": 65535,
+						"position_delta_raw": [
+							-5,
+							-10,
+							6
+						],
+						"previous_altitude_s64": 9588,
+						"provider": "published-source-render-triangle",
+						"provider_normal": [
+							-0.155943363904953,
+							0.987764775753021,
+							0.00154338078573346
+						],
+						"source_body_origin_policy": "authored-clearance-to-f1533-inner-radius-v1",
+						"source_body_origin_up_offset_m": 1.72445404052734,
+						"source_contract": "source-surface-contact-phone-frame-v1",
+						"source_inner_radius_raw": 9600,
+						"source_mass_s16": 100,
+						"source_object_indices_policy": "isolated-player1-parent2-postclassification-v1",
+						"velocity_delta_q16": [
+							-131072,
+							-262144,
+							262144
+						]
+					},
+					"hpdetail": {
+						"applied_calls": 1,
+						"callbacks": [
+							{
+								"function": "F34",
+								"register": 13,
+								"value_u32": 1
+							},
+							{
+								"function": "F34",
+								"register": 14,
+								"value_u32": 0
+							},
+							{
+								"function": "F34",
+								"register": 12,
+								"value_u32": 100
+							},
+							{
+								"function": "F35",
+								"register": 12,
+								"return_s32": 100
+							},
+							{
+								"function": "F1907",
+								"sample": 29,
+								"volume_s8": 0
+							},
+							{
+								"function": "F952"
+							}
+						],
+						"changed": true,
+						"damage_calls": [
+							{
+								"amount_s32": 100,
+								"attacker_u32": 0
+							}
+						],
+						"destroyed": false,
+						"destruction_requested": false,
+						"equipment_damage_requested": true,
+						"event_filter_policy": "identity-event-filter-adapter",
+						"hull_damage_u16": 100,
+						"hull_percent_after": 75.0,
+						"hull_percent_before": 100.0,
+						"hull_percent_loss": 25.0,
+						"ok": true,
+						"raw_hull_after": 300,
+						"raw_hull_before": 400,
+						"raw_shield_after": 0,
+						"raw_shield_before": 0,
+						"reason": "contact_damage_applied",
+						"results": [
+							{
+								"callback_policy": "F942/F952/module effects requested, not executed",
+								"callbacks": [
+									{
+										"function": "F34",
+										"register": 13,
+										"value_u32": 1
+									},
+									{
+										"function": "F34",
+										"register": 14,
+										"value_u32": 0
+									},
+									{
+										"function": "F34",
+										"register": 12,
+										"value_u32": 100
+									},
+									{
+										"function": "F35",
+										"register": 12,
+										"return_s32": 100
+									},
+									{
+										"function": "F1907",
+										"sample": 29,
+										"volume_s8": 0
+									},
+									{
+										"function": "F952"
+									}
+								],
+								"changed": true,
+								"destruction_requested": false,
+								"equipment_damage_requested": true,
+								"event_filter_policy": "identity-event-filter-adapter",
+								"filtered_damage_s32": 100,
+								"normalized_damage_s32": 100,
+								"ok": true,
+								"reason": "equipment_request",
+								"return_s32": 0,
+								"rng_consumed": false,
+								"rng_state": {
+									"seed_a_u32": 1,
+									"seed_b_u32": 1
+								},
+								"source_contract": "dos-firstenc-f953-shield-hull-callbacks-v1",
+								"source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+								"state": {
+									"damage_flags_u8": 0,
+									"damage_timer_u8": 10,
+									"hull_u16": 300,
+									"kind_u8": 3,
+									"object_index_u8": 1,
+									"player_selector_u8": 255,
+									"shield_u16": 0,
+									"volume_s8": 0
+								}
+							}
+						],
+						"rng_consumed": false,
+						"rng_policy": "existing-local-F1530-stream",
+						"rng_state_after": {
+							"seed_a_u32": 1,
+							"seed_b_u32": 1
+						},
+						"rng_state_before": {
+							"seed_a_u32": 1,
+							"seed_b_u32": 1
+						},
+						"shield_damage_u16": 0,
+						"source_contract": "dos-firstenc-f953-shield-hull-callbacks-v1"
+					},
+					"parked": false,
+					"provider": "published-source-render-triangle",
+					"resolution": {
+						"alignment_q31": -2,
+						"damage_calls": [
+							{
+								"amount_s32": 100,
+								"attacker_u32": 0
+							}
+						],
+						"l1_speed_s32": 8,
+						"landing_accepted": false,
+						"normal_q31": [
+							-884389334,
+							-1629497132,
+							1083642382
+						],
+						"return_flags_u8": 131,
+						"source_contract": "dos-firstenc-f575-postclassification-player-contact-v1"
+					},
+					"ship_model_index": 38
+				},
+				"position_m": "(-0.00008, -56892.23, 0.000588)",
+				"raw_hull_u16": 300,
+				"raw_shield_u16": 0,
+				"surface_landed": false,
+				"velocity_mps": "(0.095159, 0.066698, -0.068547)"
+			},
+			"recovered_hull_percent": 75.0,
+			"removed_phone_hold_claim": false,
+			"second_contact_placement_fixture": false
+		},
+		{
+			"case": "actual_source_hard_speed",
+			"facts": {
+				"agl_m": 0.0000901528302339472,
+				"attitude": "(-0.706309, 0.000627, -0.000626, 0.707903)",
+				"gear": {
+					"can_toggle": true,
+					"command_label": "Убрать шасси",
+					"control_flags_u8": 0,
+					"deployed": true,
+					"extension_fraction": 1.0,
+					"extension_percent": 100.0,
+					"f1014_raw_gear_flag": false,
+					"frame_tick_remainder_raw": 4193280,
+					"host_policy": "nominal-day-si-fixed60-source-landing-gear-v1",
+					"initialized": true,
+					"landing_ready": true,
+					"moving": false,
+					"object_timer_u16": 0,
+					"phase_f64_hex": "b81e85eb51b8ae3f",
+					"position_u16": 65535,
+					"requested_down": true,
+					"retract_requested": false,
+					"retracted": false,
+					"source_contract": "dos-firstenc-f1008-f1056-gear-branch-v1",
+					"status_text": "Выпущены",
+					"toggle_reason": "",
+					"warning_latched": false,
+					"warning_text": ""
+				},
+				"hull_percent": 36.25,
+				"last": {
+					"body_id": "earth",
+					"body_model_index": 129,
+					"facts": {
+						"agl_m": -0.0899099328042947,
+						"altitude_policy": "sampled-phone-agl-plus-native-inner-radius-v1",
+						"city_floor_is_explicit_radial_proxy": false,
+						"clock_advanced": false,
+						"damage_applied": false,
+						"full_f569_classifier": false,
+						"full_f575": false,
+						"height_m": -56900.1143088172,
+						"input_matrix_policy": "proper-local-yaw-pi-double-unit-q31-source-f1520-v1",
+						"kernel_contract": "dos-firstenc-f575-postclassification-player-contact-v1",
+						"kind": "terrain",
+						"mesh_normal_is_native_contact_normal": false,
+						"model_index": 38,
+						"native_collision_kind": 1,
+						"native_orientation_determinant": 0.969113945960999,
+						"native_radial_normal_q31": [
+							-884389325,
+							-1629497112,
+							1083642372
+						],
+						"orientation_projection_policy": "native-rotation-delta-to-phone-quaternion-v1",
+						"parent_model_index": 129,
+						"phone_clearance_m": 7.88,
+						"physical_gear_u16": 65535,
+						"position_delta_raw": [
+							-38,
+							-69,
+							45
+						],
+						"previous_altitude_s64": 9510,
+						"provider": "published-source-render-triangle",
+						"provider_normal": [
+							-0.155943363904953,
+							0.987764775753021,
+							0.00154338078573346
+						],
+						"source_body_origin_policy": "authored-clearance-to-f1533-inner-radius-v1",
+						"source_body_origin_up_offset_m": 1.72445404052734,
+						"source_contract": "source-surface-contact-phone-frame-v1",
+						"source_inner_radius_raw": 9600,
+						"source_mass_s16": 100,
+						"source_object_indices_policy": "isolated-player1-parent2-postclassification-v1",
+						"velocity_delta_q16": [
+							-25886720,
+							-47710208,
+							31784960
+						]
+					},
+					"hpdetail": {
+						"applied_calls": 1,
+						"callbacks": [
+							{
+								"function": "F34",
+								"register": 13,
+								"value_u32": 1
+							},
+							{
+								"function": "F34",
+								"register": 14,
+								"value_u32": 0
+							},
+							{
+								"function": "F34",
+								"register": 12,
+								"value_u32": 255
+							},
+							{
+								"function": "F35",
+								"register": 12,
+								"return_s32": 255
+							},
+							{
+								"function": "F1907",
+								"sample": 29,
+								"volume_s8": 0
+							},
+							{
+								"function": "F952"
+							}
+						],
+						"changed": true,
+						"damage_calls": [
+							{
+								"amount_s32": 255,
+								"attacker_u32": 0
+							}
+						],
+						"destroyed": false,
+						"destruction_requested": false,
+						"equipment_damage_requested": true,
+						"event_filter_policy": "identity-event-filter-adapter",
+						"hull_damage_u16": 255,
+						"hull_percent_after": 36.25,
+						"hull_percent_before": 100.0,
+						"hull_percent_loss": 63.75,
+						"ok": true,
+						"raw_hull_after": 145,
+						"raw_hull_before": 400,
+						"raw_shield_after": 0,
+						"raw_shield_before": 0,
+						"reason": "contact_damage_applied",
+						"results": [
+							{
+								"callback_policy": "F942/F952/module effects requested, not executed",
+								"callbacks": [
+									{
+										"function": "F34",
+										"register": 13,
+										"value_u32": 1
+									},
+									{
+										"function": "F34",
+										"register": 14,
+										"value_u32": 0
+									},
+									{
+										"function": "F34",
+										"register": 12,
+										"value_u32": 255
+									},
+									{
+										"function": "F35",
+										"register": 12,
+										"return_s32": 255
+									},
+									{
+										"function": "F1907",
+										"sample": 29,
+										"volume_s8": 0
+									},
+									{
+										"function": "F952"
+									}
+								],
+								"changed": true,
+								"destruction_requested": false,
+								"equipment_damage_requested": true,
+								"event_filter_policy": "identity-event-filter-adapter",
+								"filtered_damage_s32": 255,
+								"normalized_damage_s32": 255,
+								"ok": true,
+								"reason": "equipment_request",
+								"return_s32": 0,
+								"rng_consumed": false,
+								"rng_state": {
+									"seed_a_u32": 1,
+									"seed_b_u32": 1
+								},
+								"source_contract": "dos-firstenc-f953-shield-hull-callbacks-v1",
+								"source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+								"state": {
+									"damage_flags_u8": 0,
+									"damage_timer_u8": 10,
+									"hull_u16": 145,
+									"kind_u8": 3,
+									"object_index_u8": 1,
+									"player_selector_u8": 255,
+									"shield_u16": 0,
+									"volume_s8": 0
+								}
+							}
+						],
+						"rng_consumed": false,
+						"rng_policy": "existing-local-F1530-stream",
+						"rng_state_after": {
+							"seed_a_u32": 1,
+							"seed_b_u32": 1
+						},
+						"rng_state_before": {
+							"seed_a_u32": 1,
+							"seed_b_u32": 1
+						},
+						"shield_damage_u16": 0,
+						"source_contract": "dos-firstenc-f953-shield-hull-callbacks-v1"
+					},
+					"parked": false,
+					"provider": "published-source-render-triangle",
+					"resolution": {
+						"alignment_q31": 2130706441,
+						"damage_calls": [
+							{
+								"amount_s32": 255,
+								"attacker_u32": 0
+							}
+						],
+						"l1_speed_s32": 1379,
+						"landing_accepted": false,
+						"normal_q31": [
+							-884389325,
+							-1629497112,
+							1083642372
+						],
+						"return_flags_u8": 131,
+						"source_contract": "dos-firstenc-f575-postclassification-player-contact-v1"
+					},
+					"ship_model_index": 38
+				},
+				"position_m": "(-0.000988, -56892.23, 0.000257)",
+				"raw_hull_u16": 145,
+				"raw_shield_u16": 0,
+				"surface_landed": false,
+				"velocity_mps": "(0.061812, 13.22725, -0.044302)"
+			}
+		},
+		{
+			"anchor_percent_f64_hex": "0000000000d04240",
+			"case": "actual_source_fractional_rebound_cold_restore",
+			"hull_percent": 12.625,
+			"raw_hull_u16": 51
+		},
+		{
+			"case": "actual_city84_floor_no_duplicate_terrain_hit",
+			"facts": {
+				"agl_m": -0.00109345160206509,
+				"attitude": "(-0.694213, -0.090524, 0.088695, 0.708524)",
+				"gear": {
+					"can_toggle": true,
+					"command_label": "Выпустить шасси",
+					"control_flags_u8": 2,
+					"deployed": false,
+					"extension_fraction": 0.0,
+					"extension_percent": 0.0,
+					"f1014_raw_gear_flag": true,
+					"frame_tick_remainder_raw": 3202560,
+					"host_policy": "nominal-day-si-fixed60-source-landing-gear-v1",
+					"initialized": true,
+					"landing_ready": false,
+					"moving": false,
+					"object_timer_u16": 0,
+					"phase_f64_hex": "b81e85eb51b8ae3f",
+					"position_u16": 0,
+					"requested_down": false,
+					"retract_requested": true,
+					"retracted": true,
+					"source_contract": "dos-firstenc-f1008-f1056-gear-branch-v1",
+					"status_text": "Убраны",
+					"toggle_reason": "",
+					"warning_latched": false,
+					"warning_text": ""
+				},
+				"hull_percent": 75.0,
+				"last": {
+					"body_id": "earth",
+					"body_model_index": 129,
+					"facts": {
+						"agl_m": 0.00169675380049661,
+						"altitude_policy": "sampled-phone-agl-plus-native-inner-radius-v1",
+						"city_floor_is_explicit_radial_proxy": true,
+						"clock_advanced": false,
+						"damage_applied": false,
+						"full_f569_classifier": false,
+						"full_f575": false,
+						"height_m": -29850.7313061288,
+						"input_matrix_policy": "proper-local-yaw-pi-double-unit-q31-source-f1520-v1",
+						"kernel_contract": "dos-firstenc-f575-postclassification-player-contact-v1",
+						"kind": "city_floor",
+						"mesh_normal_is_native_contact_normal": false,
+						"model_index": 38,
+						"native_collision_kind": 1,
+						"native_orientation_determinant": 0.969086527824402,
+						"native_radial_normal_q31": [
+							-529551235,
+							1030934109,
+							-1807881622
+						],
+						"orientation_projection_policy": "native-rotation-delta-to-phone-quaternion-v1",
+						"parent_model_index": 129,
+						"phone_clearance_m": 7.88,
+						"physical_gear_u16": 0,
+						"position_delta_raw": [
+							0,
+							-1,
+							1
+						],
+						"previous_altitude_s64": 9602,
+						"provider": "explicit-city_floor-plane-provider",
+						"provider_normal": [
+							-0.0000792725259088911,
+							1.0,
+							0.0000456714151368942
+						],
+						"source_body_origin_policy": "authored-clearance-to-f1533-inner-radius-v1",
+						"source_body_origin_up_offset_m": 1.72445404052734,
+						"source_contract": "source-surface-contact-phone-frame-v1",
+						"source_inner_radius_raw": 9600,
+						"source_mass_s16": 100,
+						"source_object_indices_policy": "isolated-player1-parent2-postclassification-v1",
+						"velocity_delta_q16": [
+							-65536,
+							262144,
+							-393216
+						]
+					},
+					"hpdetail": {
+						"applied_calls": 1,
+						"callbacks": [
+							{
+								"function": "F34",
+								"register": 13,
+								"value_u32": 1
+							},
+							{
+								"function": "F34",
+								"register": 14,
+								"value_u32": 0
+							},
+							{
+								"function": "F34",
+								"register": 12,
+								"value_u32": 100
+							},
+							{
+								"function": "F35",
+								"register": 12,
+								"return_s32": 100
+							},
+							{
+								"function": "F1907",
+								"sample": 29,
+								"volume_s8": 0
+							},
+							{
+								"function": "F952"
+							}
+						],
+						"changed": true,
+						"damage_calls": [
+							{
+								"amount_s32": 100,
+								"attacker_u32": 0
+							}
+						],
+						"destroyed": false,
+						"destruction_requested": false,
+						"equipment_damage_requested": true,
+						"event_filter_policy": "identity-event-filter-adapter",
+						"hull_damage_u16": 100,
+						"hull_percent_after": 75.0,
+						"hull_percent_before": 100.0,
+						"hull_percent_loss": 25.0,
+						"ok": true,
+						"raw_hull_after": 300,
+						"raw_hull_before": 400,
+						"raw_shield_after": 0,
+						"raw_shield_before": 0,
+						"reason": "contact_damage_applied",
+						"results": [
+							{
+								"callback_policy": "F942/F952/module effects requested, not executed",
+								"callbacks": [
+									{
+										"function": "F34",
+										"register": 13,
+										"value_u32": 1
+									},
+									{
+										"function": "F34",
+										"register": 14,
+										"value_u32": 0
+									},
+									{
+										"function": "F34",
+										"register": 12,
+										"value_u32": 100
+									},
+									{
+										"function": "F35",
+										"register": 12,
+										"return_s32": 100
+									},
+									{
+										"function": "F1907",
+										"sample": 29,
+										"volume_s8": 0
+									},
+									{
+										"function": "F952"
+									}
+								],
+								"changed": true,
+								"destruction_requested": false,
+								"equipment_damage_requested": true,
+								"event_filter_policy": "identity-event-filter-adapter",
+								"filtered_damage_s32": 100,
+								"normalized_damage_s32": 100,
+								"ok": true,
+								"reason": "equipment_request",
+								"return_s32": 0,
+								"rng_consumed": false,
+								"rng_state": {
+									"seed_a_u32": 1,
+									"seed_b_u32": 1
+								},
+								"source_contract": "dos-firstenc-f953-shield-hull-callbacks-v1",
+								"source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+								"state": {
+									"damage_flags_u8": 0,
+									"damage_timer_u8": 10,
+									"hull_u16": 300,
+									"kind_u8": 3,
+									"object_index_u8": 1,
+									"player_selector_u8": 255,
+									"shield_u16": 0,
+									"volume_s8": 0
+								}
+							}
+						],
+						"rng_consumed": false,
+						"rng_policy": "existing-local-F1530-stream",
+						"rng_state_after": {
+							"seed_a_u32": 1,
+							"seed_b_u32": 1
+						},
+						"rng_state_before": {
+							"seed_a_u32": 1,
+							"seed_b_u32": 1
+						},
+						"shield_damage_u16": 0,
+						"source_contract": "dos-firstenc-f953-shield-hull-callbacks-v1"
+					},
+					"parked": false,
+					"provider": "explicit-city_floor-plane-provider",
+					"resolution": {
+						"alignment_q31": 2130706309,
+						"damage_calls": [
+							{
+								"amount_s32": 100,
+								"attacker_u32": 0
+							}
+						],
+						"l1_speed_s32": 8,
+						"landing_accepted": false,
+						"normal_q31": [
+							-529551235,
+							1030934109,
+							-1807881622
+						],
+						"return_flags_u8": 131,
+						"source_contract": "dos-firstenc-f575-postclassification-player-contact-v1"
+					},
+					"ship_model_index": 38
+				},
+				"position_m": "(0.0, -29842.81, 0.0)",
+				"raw_hull_u16": 300,
+				"raw_shield_u16": 0,
+				"surface_landed": false,
+				"velocity_mps": "(-0.070611, 0.192803, -0.059283)"
+			},
+			"site_id": "site6",
+			"triangle_index": 99
+		},
+		{
+			"case": "actual_pending_contact_atomic_save_boundary",
+			"source_HP_unchanged_on_blocked_save": true,
+			"unresolved_contact_saved": false
+		},
+		{
+			"case": "failed_stale_contact_retry_boundary",
+			"fixture": "Explicit private candidate kind/body/frame corruptions; real provider geometry and source terminal response retained",
+			"invalid_backup_created": false,
+			"retry_dt_applied": false
+		},
+		{
+			"actual_raw_debit": 745,
+			"case": "powered_native_contact_deferred_interval",
+			"expected_raw_debit": 745,
+			"ignored_retry_dt_seconds": 0.5,
+			"instrumentation": "Actual Surface.super.step with command recording and a one-shot malformed classification kind; no physics or geometry replacement",
+			"original_dt_seconds": 0.0166666666666667,
+			"source_commands_after": [
+				-95,
+				-3721,
+				837
+			],
+			"source_commands_before": [
+				0,
+				0,
+				3815
+			]
+		},
+		{
+			"case": "actual_Main_native_rank_one_projection",
+			"facts": {
+				"agl_m": -0.000989084243775196,
+				"attitude": "(0, 0, 0, 1)",
+				"gear": {
+					"can_toggle": true,
+					"command_label": "Выпустить шасси",
+					"control_flags_u8": 2,
+					"deployed": false,
+					"extension_fraction": 0.0,
+					"extension_percent": 0.0,
+					"f1014_raw_gear_flag": true,
+					"frame_tick_remainder_raw": 4193280,
+					"host_policy": "nominal-day-si-fixed60-source-landing-gear-v1",
+					"initialized": true,
+					"landing_ready": false,
+					"moving": false,
+					"object_timer_u16": 0,
+					"phase_f64_hex": "0000000000000000",
+					"position_u16": 0,
+					"requested_down": false,
+					"retract_requested": true,
+					"retracted": true,
+					"source_contract": "dos-firstenc-f1008-f1056-gear-branch-v1",
+					"status_text": "Убраны",
+					"toggle_reason": "",
+					"warning_latched": false,
+					"warning_text": ""
+				},
+				"hull_percent": 75.0,
+				"last": {
+					"body_id": "earth",
+					"body_model_index": 129,
+					"facts": {
+						"agl_m": -0.0250002193450936,
+						"altitude_policy": "sampled-phone-agl-plus-native-inner-radius-v1",
+						"city_floor_is_explicit_radial_proxy": false,
+						"clock_advanced": false,
+						"damage_applied": false,
+						"full_f569_classifier": false,
+						"full_f575": false,
+						"height_m": -0.0200092792510986,
+						"input_matrix_policy": "proper-local-yaw-pi-double-unit-q31-source-f1520-v1",
+						"kernel_contract": "dos-firstenc-f575-postclassification-player-contact-v1",
+						"kind": "terrain",
+						"mesh_normal_is_native_contact_normal": false,
+						"model_index": 38,
+						"native_collision_kind": 1,
+						"native_orientation_determinant": 0.0,
+						"native_orientation_q31_after": [
+							0,
+							0,
+							0,
+							0,
+							0,
+							0,
+							0,
+							0,
+							2130704384
+						],
+						"native_radial_normal_q31": [
+							0,
+							2147483637,
+							0
+						],
+						"orientation_projection_policy": "native-rank-deficient-preserve-phone-quaternion-v1",
+						"parent_model_index": 129,
+						"phone_clearance_m": 7.88,
+						"physical_gear_u16": 0,
+						"position_delta_raw": [
+							0,
+							24,
+							0
+						],
+						"previous_altitude_s64": 9575,
+						"provider": "surface-height-grid-exact-triangle-v1",
+						"provider_normal": [
+							0.00610137358307838,
+							0.999830961227417,
+							0.0173469018191099
+						],
+						"source_body_origin_policy": "authored-clearance-to-f1533-inner-radius-v1",
+						"source_body_origin_up_offset_m": 1.72445404052734,
+						"source_contract": "source-surface-contact-phone-frame-v1",
+						"source_inner_radius_raw": 9600,
+						"source_mass_s16": 100,
+						"source_object_indices_policy": "isolated-player1-parent2-postclassification-v1",
+						"velocity_delta_q16": [
+							0,
+							0,
+							-2228224
+						]
+					},
+					"hpdetail": {
+						"applied_calls": 1,
+						"callbacks": [
+							{
+								"function": "F34",
+								"register": 13,
+								"value_u32": 1
+							},
+							{
+								"function": "F34",
+								"register": 14,
+								"value_u32": 0
+							},
+							{
+								"function": "F34",
+								"register": 12,
+								"value_u32": 100
+							},
+							{
+								"function": "F35",
+								"register": 12,
+								"return_s32": 100
+							},
+							{
+								"function": "F1907",
+								"sample": 29,
+								"volume_s8": 0
+							},
+							{
+								"function": "F952"
+							}
+						],
+						"changed": true,
+						"damage_calls": [
+							{
+								"amount_s32": 100,
+								"attacker_u32": 0
+							}
+						],
+						"destroyed": false,
+						"destruction_requested": false,
+						"equipment_damage_requested": true,
+						"event_filter_policy": "identity-event-filter-adapter",
+						"hull_damage_u16": 100,
+						"hull_percent_after": 75.0,
+						"hull_percent_before": 100.0,
+						"hull_percent_loss": 25.0,
+						"ok": true,
+						"raw_hull_after": 300,
+						"raw_hull_before": 400,
+						"raw_shield_after": 0,
+						"raw_shield_before": 0,
+						"reason": "contact_damage_applied",
+						"results": [
+							{
+								"callback_policy": "F942/F952/module effects requested, not executed",
+								"callbacks": [
+									{
+										"function": "F34",
+										"register": 13,
+										"value_u32": 1
+									},
+									{
+										"function": "F34",
+										"register": 14,
+										"value_u32": 0
+									},
+									{
+										"function": "F34",
+										"register": 12,
+										"value_u32": 100
+									},
+									{
+										"function": "F35",
+										"register": 12,
+										"return_s32": 100
+									},
+									{
+										"function": "F1907",
+										"sample": 29,
+										"volume_s8": 0
+									},
+									{
+										"function": "F952"
+									}
+								],
+								"changed": true,
+								"destruction_requested": false,
+								"equipment_damage_requested": true,
+								"event_filter_policy": "identity-event-filter-adapter",
+								"filtered_damage_s32": 100,
+								"normalized_damage_s32": 100,
+								"ok": true,
+								"reason": "equipment_request",
+								"return_s32": 0,
+								"rng_consumed": false,
+								"rng_state": {
+									"seed_a_u32": 1,
+									"seed_b_u32": 1
+								},
+								"source_contract": "dos-firstenc-f953-shield-hull-callbacks-v1",
+								"source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+								"state": {
+									"damage_flags_u8": 0,
+									"damage_timer_u8": 10,
+									"hull_u16": 300,
+									"kind_u8": 3,
+									"object_index_u8": 1,
+									"player_selector_u8": 255,
+									"shield_u16": 0,
+									"volume_s8": 0
+								}
+							}
+						],
+						"rng_consumed": false,
+						"rng_policy": "existing-local-F1530-stream",
+						"rng_state_after": {
+							"seed_a_u32": 1,
+							"seed_b_u32": 1
+						},
+						"rng_state_before": {
+							"seed_a_u32": 1,
+							"seed_b_u32": 1
+						},
+						"shield_damage_u16": 0,
+						"source_contract": "dos-firstenc-f953-shield-hull-callbacks-v1"
+					},
+					"parked": false,
+					"provider": "surface-height-grid-exact-triangle-v1",
+					"resolution": {
+						"alignment_q31": 2130706409,
+						"damage_calls": [
+							{
+								"amount_s32": 100,
+								"attacker_u32": 0
+							}
+						],
+						"l1_speed_s32": 100,
+						"landing_accepted": false,
+						"normal_q31": [
+							0,
+							2147483637,
+							0
+						],
+						"return_flags_u8": 131,
+						"source_contract": "dos-firstenc-f575-postclassification-player-contact-v1"
+					},
+					"ship_model_index": 38
+				},
+				"position_m": "(0.0, 7.859002, -0.0)",
+				"raw_hull_u16": 300,
+				"raw_shield_u16": 0,
+				"surface_landed": false,
+				"velocity_mps": "(-6.410938, 0.0, 0.0)"
+			},
+			"fixture": "Explicit real source terrain north-pole frame and tangential post-classification queue; no complete classifier/manual travel claim"
+		},
+		{
+			"case": "actual_contact_pause_and_stale_pointer",
+			"stale_command_replayed": false
+		},
+		{
+			"case": "actual_source_contact_fatality",
+			"hull_percent": 0.0,
+			"hydrogen": 4,
+			"pending_surface_jump_fabricated": false,
+			"reaction_tank_raw": 1073741824
+		}
+	],
+	"failures": 0,
+	"schema": 1,
+	"scope": "Actual Main bounded original F575/F953 integration around an explicit source-surface published-geometry event adapter. Gear/alignment/raw-speed boundaries, native mass-based damage, fractional HP/RNG/cold continuation, one-hit consumption, city-floor duplicate prevention, pause/focus and post-contact death save. Explicit observer/legacy-HP fixtures; no fabricated surface jump, manual landing, physical Android, complete classifier or performance claim.",
+	"sources": {
+		"data/ffe_surface_contact.json": "960931e58ac1fe73428956b87f8567e29ea554c84793e33e1e86852f060050e6",
+		"scripts/main.gd": "c74553452e5a2afe8bbbff6999051c486218e6807bfe16857edd1422d2d71662",
+		"scripts/navigation.gd": "5f689fce7b1f899c4a39e95add22dd59a8b9ba2909ccfec2d7bf18a74698f3c6",
+		"scripts/source_hyperdrive_session.gd": "931427fe16367c8a7d32fdfbb554e14ef64987a477fa8e275a75122aa1505c14",
+		"scripts/source_surface_contact.gd": "fcfb6077f0bcabf7b6ffce98c3a3dbb23251a850175be4ef241b299fdf8d117d",
+		"scripts/source_surface_contact_bridge.gd": "f83bbecc35c60bfaf79cf2314d067f997b966258665a41a93f082534ba7dfdd9",
+		"scripts/surface_model.gd": "d96a20c9be21f4113975cd522e360963cb0b29a1ac75e27ed43b8b8d95edb445",
+		"tests/test_source_contact_main.gd": "4fe5094f251decdf18453c41386af507c980f658c623fb8507076310c07bbfbd"
+	}
+}

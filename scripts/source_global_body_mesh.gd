@@ -3,6 +3,8 @@ extends RefCounted
 # Scene nodes / mesh resources are created only by the renderer on its thread.
 const Terrain=preload("res://scripts/source_surface_terrain.gd")
 const REVISION:="source-height-global-lod-v1"
+const CONTACT_TERRAIN_REVISION:="sphere-source-contact-v5"
+const CONTACT_HEIGHT_POLICY:="signed-f581-contact-root-grid-v1"
 const SAMPLE_COLUMNS:=24
 const SAMPLE_ROWS:=12
 const RENDER_COLUMNS:=64
@@ -18,16 +20,25 @@ class Cancellation extends RefCounted:
 	func cancelled()->bool:_mutex.lock();var value:=_cancelled;_mutex.unlock();return value
 
 static func key(snapshot:Dictionary)->String:
-	return JSON.stringify([REVISION,Terrain.REVISION_NAME,Terrain.SAMPLE_POLICY,snapshot.get("system_id"),snapshot.get("body",{}),snapshot.get("settlements",[])]).sha256_text()
+	var terrain_revision:=str(snapshot.get("terrain_revision",Terrain.REVISION_NAME))
+	var policy:=CONTACT_HEIGHT_POLICY if terrain_revision==CONTACT_TERRAIN_REVISION else Terrain.SAMPLE_POLICY
+	return JSON.stringify([REVISION,terrain_revision,policy,snapshot.get("system_id"),snapshot.get("body",{}),snapshot.get("settlements",[])]).sha256_text()
 
-static func snapshot(system:RefCounted,body_id:String)->Dictionary:
+static func supports_terrain_revision(value:Variant)->bool:
+	return value==Terrain.REVISION_NAME or value==CONTACT_TERRAIN_REVISION
+
+static func snapshot(system:RefCounted,body_id:String,terrain_revision:String=Terrain.REVISION_NAME)->Dictionary:
+	if not supports_terrain_revision(terrain_revision):return {}
 	if system==null or not system.get("by_id") is Dictionary or not system.by_id.has(body_id):return {}
 	var body:Dictionary=system.by_id[body_id]
 	if not body.get("landable",false) or not Terrain.supported_model(str(body.get("runtime_record_hex","")).hex_decode()):return {}
 	var sites:Array=[]
 	for site:Dictionary in system.settlements:
 		if str(site.get("parent",""))==body_id and int(site.get("type_code",-1))==35:sites.append(site.duplicate(true))
-	return {"system_id":int(system.system_id),"body":body.duplicate(true),"settlements":sites}
+	var result:={"system_id":int(system.system_id),"body":body.duplicate(true),"settlements":sites}
+	# Preserve the old immutable snapshot and its key unless v5 is explicit.
+	if terrain_revision!=Terrain.REVISION_NAME:result["terrain_revision"]=terrain_revision
+	return result
 
 static func _height(nodes:PackedFloat64Array,x:float,y:float)->float:
 	x=clampf(x,0,SAMPLE_COLUMNS);y=clampf(y,0,SAMPLE_ROWS)
@@ -40,8 +51,15 @@ static func build(input:Dictionary,cancellation:Cancellation=null)->Dictionary:
 	var body:Dictionary=input.get("body",{})
 	if body.is_empty() or not input.get("settlements") is Array or not input.get("system_id") is int:return {"ok":false,"error":"Invalid immutable source body snapshot"}
 	if not body.get("id") is String or not body.get("landable",false):return {"ok":false,"error":"Body is outside original landable domain"}
+	var terrain_revision:Variant=input.get("terrain_revision",Terrain.REVISION_NAME)
+	if not terrain_revision is String or not supports_terrain_revision(terrain_revision):return {"ok":false,"error":"Unsupported source terrain revision"}
 	var system:=InputWorld.new();system.system_id=int(input.system_id);system.by_id={str(body.id):body.duplicate(true)};system.settlements=input.settlements.duplicate(true)
-	var terrain:=Terrain.new();terrain.configure(system,str(body.id),"",Terrain.REVISION_NAME)
+	var terrain:RefCounted=Terrain.new()
+	if terrain_revision==CONTACT_TERRAIN_REVISION:
+		var script:Script=load("res://scripts/source_contact_surface_terrain.gd")
+		if script==null:return {"ok":false,"error":"Contact-field terrain implementation is unavailable"}
+		terrain=script.new()
+	terrain.configure(system,str(body.id),"",str(terrain_revision))
 	if not terrain.configured_ok:return {"ok":false,"error":terrain.configuration_error}
 	var radius:=float(terrain.radius);var nodes:=PackedFloat64Array();nodes.resize((SAMPLE_COLUMNS+1)*(SAMPLE_ROWS+1))
 	for y in range(SAMPLE_ROWS+1):
@@ -51,7 +69,7 @@ static func build(input:Dictionary,cancellation:Cancellation=null)->Dictionary:
 			if x==SAMPLE_COLUMNS:nodes[at]=nodes[y*(SAMPLE_COLUMNS+1)];continue
 			if (y==0 or y==SAMPLE_ROWS) and x>0:nodes[at]=nodes[y*(SAMPLE_COLUMNS+1)];continue
 			var lat:=-PI*0.5+PI*float(y)/SAMPLE_ROWS;var lon:=-PI+TAU*float(x)/SAMPLE_COLUMNS
-			var height:=terrain.elevation(lat,lon)
+			var height:float=terrain.elevation(lat,lon)
 			if not is_finite(height) or radius+height<=0:return {"ok":false,"error":"Original source height did not produce a finite exterior surface"}
 			nodes[at]=height
 	var vertices:=PackedVector3Array();var normals:=PackedVector3Array();var uv:=PackedVector2Array();var indices:=PackedInt32Array()
@@ -77,4 +95,4 @@ static func build(input:Dictionary,cancellation:Cancellation=null)->Dictionary:
 			var a:=y*(RENDER_COLUMNS+1)+x;var b:=a+1;var c:=a+RENDER_COLUMNS+1;var d:=c+1
 			indices.append_array(PackedInt32Array([a,c,b,b,c,d])) # Godot clockwise exterior winding.
 	var arrays:Array=[];arrays.resize(Mesh.ARRAY_MAX);arrays[Mesh.ARRAY_VERTEX]=vertices;arrays[Mesh.ARRAY_NORMAL]=normals;arrays[Mesh.ARRAY_TEX_UV]=uv;arrays[Mesh.ARRAY_INDEX]=indices
-	return {"ok":true,"revision":REVISION,"key":key(input),"body_id":str(body.id),"record_hex":terrain.source_record.hex_encode(),"height_policy":Terrain.SAMPLE_POLICY,"source_policy":terrain.source_policy.duplicate(true),"radius_m":radius,"sample_columns":SAMPLE_COLUMNS,"sample_rows":SAMPLE_ROWS,"sample_nodes":nodes,"render_columns":RENDER_COLUMNS,"render_rows":RENDER_ROWS,"arrays":arrays,"source_stats":terrain.cache_stats(),"sampled_global_lod":true,"original_adaptive_renderer":false}
+	return {"ok":true,"revision":REVISION,"key":key(input),"body_id":str(body.id),"record_hex":terrain.source_record.hex_encode(),"height_policy":str(terrain.source_policy.height_policy),"source_policy":terrain.source_policy.duplicate(true),"radius_m":radius,"sample_columns":SAMPLE_COLUMNS,"sample_rows":SAMPLE_ROWS,"sample_nodes":nodes,"render_columns":RENDER_COLUMNS,"render_rows":RENDER_ROWS,"arrays":arrays,"source_stats":terrain.cache_stats(),"sampled_global_lod":true,"original_adaptive_renderer":false}

@@ -1,0 +1,42 @@
+{
+	"checks": 40,
+	"evidence": [
+		{
+			"case": "immutable_v4_compatibility",
+			"global_key": "d9b811fa801e29bbe96ea7742fdca368181a5d6a174a978cc102e068ee33ed14",
+			"old_source_commit": "abae633776275a88bf0706893a030e7497ae6ef0",
+			"patch_checksum": "6110d64354fc6e79f258e75c6d08a3fb376bb7fdc2ca3adb44b13ce0ff4638cf"
+		},
+		{
+			"case": "actual_source_v5_saved_triangle",
+			"full_global_v5_mesh_build_executed": false,
+			"height_policy": "signed-f581-contact-root-grid-v1",
+			"interpolated_triangle_is_native_arbitrary_point_zero": false,
+			"patch_checksum": "38593da44607d11ae4b67598270a72a47c973dbe0a8f7eb4e4911656f951cca9",
+			"vertices_verified": 3
+		},
+		{
+			"GPU_executed": false,
+			"arbitrary_point_native_equivalence_claim": false,
+			"case": "actual_source_v5_worker_packet",
+			"sample_count": 26,
+			"source_query_count": 9,
+			"terrain_revision": "sphere-source-contact-v5",
+			"vertices": 9
+		}
+	],
+	"failures": 0,
+	"schema": 1,
+	"scope": "Preserved immutable0.21 v4 checksum/cache default plus explicit v5 policy routing, actual source-backed three-vertex saved patch and bounded isolated worker packet. No arbitrary-point source-vs-triangle contact equivalence, complete globalv5 mesh, GPU, physicalAndroid or liveF576 landing claim.",
+	"sources": {
+		"scripts/celestial_renderer.gd": "8930c20b150de0019f55ca8aa2c4dd84ba9bde03d164fd7cd5bc8572505de492",
+		"scripts/source_contact_surface_terrain.gd": "50faef7f781117f1e3b8d6fe4c96146d3af3dc0074bf42283a882c9093c9abac",
+		"scripts/source_global_body_mesh.gd": "dc7bdced64514126be8c92d4907fef4e92d245a073881832c64093ff37ae6721",
+		"scripts/source_surface_contact_patch.gd": "7a34e21fab9db0d379f4866d3193cb0f32723e714ca4bebfd03cabec36a40744",
+		"scripts/source_surface_render_packet.gd": "e04552b706b8c4b89f53280e9e96afa73ede777e8719cf0b4c6587479b1b84f5",
+		"scripts/source_surface_render_state.gd": "0f71658a283e2e6afa6eeea4e496b447565469242cfa7222e12618caa9b58b4a",
+		"scripts/source_terrain_contact_field.gd": "e6de88193bd96912587f0b653b96e058357a4d157017c8f82ce86f7be42e9bf3",
+		"scripts/surface_visual.gd": "f5bdaf925ac522fdf08edd4141ecbd5bc46418e978a3792b253866935bde4432",
+		"tests/test_source_contact_surface_render.gd": "34098086bb055ea91688e2253936511efa7a00e118797233d3296e3fe5c5cd3c"
+	}
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "source-contact-height-characterization-summary-v1",
+  "matrix_sha256": "bde6b0f7543a29a9512b07ffe066d2fb064aeb6e70a7a75e62d0197c0b521311",
+  "checks": 7401,
+  "failures": 0,
+  "classifications": 2403,
+  "model_anchor_metrics": 51,
+  "verified_saved_triangles": 57,
+  "source_raw_to_metres": 0.0010004639625549316,
+  "source_units_sha256": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24",
+  "branches": {
+    "inside_inner": 81,
+    "terrain_query": 2322
+  },
+  "F879_zero_offset_Eagle_queried_cases": 50,
+  "F879_zero_offset_Eagle_nonzero_residual_cases": 50,
+  "F879_zero_offset_Eagle_min_signed_residual_m": -2822.32484579086,
+  "F879_zero_offset_Eagle_max_signed_residual_m": 603.375813961029,
+  "max_abs_bilinear_minus_F879_m": 40.1892416623887,
+  "max_phone_basis_minus_scalar64_m": 0.21150054260291,
+  "max_abs_saved_triangle_minus_bilinear_field_m": 13.3180357459933,
+  "scope": "Baseline observations for current source v4 height adapter, not expected bugs that a later implementation must preserve. No live response and no new native oracle execution."
+}

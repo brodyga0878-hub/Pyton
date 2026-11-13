@@ -1,0 +1,226 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-13T13:51:35.304605+00:00",
+  "updated_utc": "2026-11-13T13:51:41.157714+00:00",
+  "duration_seconds": 5.853,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-13T13:51:35.304605+00:00",
+      "duration_seconds": 5.853,
+      "requested_suites": [
+        "source_contact_alignment",
+        "source_contact_field",
+        "source_contact_surface_terrain",
+        "source_contact_surface_render",
+        "source_natural_surface_bridge",
+        "source_contact_alignment_probe"
+      ],
+      "executed_suites": [
+        "source_contact_alignment",
+        "source_contact_field",
+        "source_contact_surface_terrain",
+        "source_contact_surface_render",
+        "source_natural_surface_bridge",
+        "source_contact_alignment_probe"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 3,
+  "status": "passed",
+  "passed_suites": 6,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 11601,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "source_contact_alignment",
+      "scope": "Measured source placement, grid, phone frame and saved-triangle discrepancies on17landable models/three anchors/three players; characterization is not live response.",
+      "status": "passed",
+      "checks": 7401,
+      "failures": 0,
+      "executed_utc": "2026-11-13T13:51:35.307398+00:00",
+      "suite_source": {
+        "path": "tests/test_source_contact_alignment.gd",
+        "bytes": 3687,
+        "sha256": "42fa986eb99ef8bdf60962877632a1e6d1ddd47d1cb18df593ec70dd966970e1"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_contact_alignment.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 5.849,
+      "timed_out": false,
+      "output_bytes": 145,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/alignment-new-kernels/logs/source_contact_alignment.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_contact_field",
+      "scope": "Certified signed F581 zeros or adjacent outward sign boundaries versus153 independent native geometry witnesses and306 actual player classifications.",
+      "status": "passed",
+      "checks": 3802,
+      "failures": 0,
+      "executed_utc": "2026-11-13T13:51:35.307840+00:00",
+      "suite_source": {
+        "path": "tests/test_source_terrain_contact_field.gd",
+        "bytes": 13934,
+        "sha256": "a4b093da4276daf860a2ddd32a2eca8f8580b048f55288b78674f0e293f65b6c"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_terrain_contact_field.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.76,
+      "timed_out": false,
+      "output_bytes": 127,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/alignment-new-kernels/logs/source_contact_field.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_contact_surface_terrain",
+      "scope": "Distinct opt-in v5 signed-field node sampler, strict private worker/cache restore and retained reviewed JJFFE city anchors; interpolation is not certified.",
+      "status": "passed",
+      "checks": 51,
+      "failures": 0,
+      "executed_utc": "2026-11-13T13:51:35.308043+00:00",
+      "suite_source": {
+        "path": "tests/test_source_contact_surface_terrain.gd",
+        "bytes": 13089,
+        "sha256": "77649f0883339ddebb1260e4abc024a692d03ea76a30e87f853952b3d76b6dac"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_contact_surface_terrain.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.621,
+      "timed_out": false,
+      "output_bytes": 127,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/alignment-new-kernels/logs/source_contact_surface_terrain.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_contact_surface_render",
+      "scope": "Explicit v5 renderer revision compatibility, worker packet, saved-triangle validation and immutable v4 golden checksum/cache key.",
+      "status": "passed",
+      "checks": 40,
+      "failures": 0,
+      "executed_utc": "2026-11-13T13:51:35.929889+00:00",
+      "suite_source": {
+        "path": "tests/test_source_contact_surface_render.gd",
+        "bytes": 11696,
+        "sha256": "34098086bb055ea91688e2253936511efa7a00e118797233d3296e3fe5c5cd3c"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_contact_surface_render.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.124,
+      "timed_out": false,
+      "output_bytes": 132,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/alignment-new-kernels/logs/source_contact_surface_render.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_natural_surface_bridge",
+      "scope": "Pure bounded candidate bridge with exact local-point admission, real source globals/positive radius and atomic unsupported geometry; no default live physics switch.",
+      "status": "passed",
+      "checks": 140,
+      "failures": 0,
+      "executed_utc": "2026-11-13T13:51:37.054049+00:00",
+      "suite_source": {
+        "path": "tests/test_source_natural_surface_bridge.gd",
+        "bytes": 17783,
+        "sha256": "f8a2dc5c414ac9c2c8713a347612d842b8bf5af269122113ec217ab88f403d57"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_natural_surface_bridge.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.888,
+      "timed_out": false,
+      "output_bytes": 120,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/alignment-new-kernels/logs/source_natural_surface_bridge.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_contact_alignment_probe",
+      "scope": "Read-only source/visible height comparison using isolated source and provider copies with snapshot bindings; no landing authority.",
+      "status": "passed",
+      "checks": 167,
+      "failures": 0,
+      "executed_utc": "2026-11-13T13:51:37.068463+00:00",
+      "suite_source": {
+        "path": "tests/test_source_contact_alignment_probe.gd",
+        "bytes": 14721,
+        "sha256": "9cbdd905e0d2a37dc30e54545323581990f98689d1bb79295dd74f2bbe032cd6"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_contact_alignment_probe.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.442,
+      "timed_out": false,
+      "output_bytes": 128,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/build/alignment-new-kernels/logs/source_contact_alignment_probe.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ]
+}

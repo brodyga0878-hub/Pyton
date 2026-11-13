@@ -1,0 +1,50 @@
+{
+	"checks": 51,
+	"evidence": [
+		{
+			"case": "actual_model120_certified_root",
+			"elevation_m": -100639.117134427,
+			"original_seed_is_unchanged": true,
+			"position_raw_hex": "81a8b595ffffffffd8fb9844ffffffff52f7865000000000",
+			"query_count": 6,
+			"residual_raw_s64": 0,
+			"source_bounds": {
+				"branch": "terrain_query",
+				"distance_s32": 482353816,
+				"inner_bound_raw_s64": 2799960064,
+				"inner_s32": 349995008,
+				"outer_bound_raw_s64": 4399824896,
+				"outer_s32": 549978112,
+				"policy": "unchanged original descriptor gates; geometry-only root never overrides F581 bounds or positive-player classification",
+				"terrain_query_eligible": true,
+				"threshold_raw_s32": 0,
+				"vector_scale_s32": 3
+			},
+			"status": "exact_zero"
+		},
+		{
+			"arbitrary_grid_point_certified": false,
+			"case": "root_node_grid_interpolation",
+			"exact_root_elevation_m": -100639.117134427,
+			"grid_elevation_m": -100639.152226929,
+			"grid_minus_exact_m": -0.0350925019010901
+		},
+		{
+			"case": "unchanged_original_city_anchor",
+			"native_natural_collision_claim": false,
+			"parent_model": 129,
+			"port_model": 84,
+			"source_root_raw_hex": "a622e598ffffffff2effb8c8000000002011e19ffeffffff"
+		}
+	],
+	"failures": 0,
+	"schema": 1,
+	"scope": "Distinct v5 certified-node surface integration using actual source model120, private worker/cache validation and unchanged original city anchors. Grid/triangle interpolation is explicitly not a certified F581 root. No Main default enablement, live collision response, object-bank/frame selection, GPU rendering or physical Android execution.",
+	"sources": {
+		"scripts/source_contact_surface_terrain.gd": "50faef7f781117f1e3b8d6fe4c96146d3af3dc0074bf42283a882c9093c9abac",
+		"scripts/source_surface_terrain.gd": "5c2939f5dae7adfa08e7591980612d6e53fd6fcdcf321850d00d388982024a17",
+		"scripts/source_terrain_contact_field.gd": "e6de88193bd96912587f0b653b96e058357a4d157017c8f82ce86f7be42e9bf3",
+		"scripts/source_units.gd": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24",
+		"tests/test_source_contact_surface_terrain.gd": "77649f0883339ddebb1260e4abc024a692d03ea76a30e87f853952b3d76b6dac"
+	}
+}

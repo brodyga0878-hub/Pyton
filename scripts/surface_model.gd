@@ -6,6 +6,7 @@ const CityRuntime=preload("res://scripts/source_city_runtime.gd")
 var city_data:Dictionary={}
 const SphereTerrain=preload("res://scripts/spherical_terrain.gd")
 const SourceTerrain=preload("res://scripts/source_surface_terrain.gd")
+const ContactTerrain=preload("res://scripts/source_contact_surface_terrain.gd")
 const Underground=preload("res://scripts/source_underground_controller.gd")
 const RenderPacket=preload("res://scripts/source_surface_render_packet.gd")
 var underground:RefCounted
@@ -179,9 +180,15 @@ func install_prepared_entry(bundle:Dictionary,system:RefCounted,ship:RefCounted)
 func has_prepared_entry(system:RefCounted=null,ship:RefCounted=null)->bool:
 	if _prepared_entry.is_empty():return false
 	return true if system==null or ship==null else _prepared_entry.get("context")==_entry_context(system,ship)
-func source_surface()->bool:return globe!=null and globe.revision==SourceTerrain.REVISION_NAME
-func source_city()->bool:return globe!=null and globe.revision in [SphereTerrain.CITY_REVISION,SourceTerrain.REVISION_NAME]
+func source_surface()->bool:return globe!=null and RenderPacket.supports_terrain_revision(globe.revision)
+func source_city()->bool:return globe!=null and globe.revision in [SphereTerrain.CITY_REVISION,SourceTerrain.REVISION_NAME,ContactTerrain.CONTACT_REVISION]
 func publish_source_render_state(state:RefCounted)->void:
+	# A signed-field preview keeps its physical observer fixed while LOD is
+	# published. This does not certify the interpolated mesh for native landing.
+	if globe!=null and globe.revision==ContactTerrain.CONTACT_REVISION:
+		if state!=null and (not state.has_method("matches") or not state.matches(globe)):return
+		source_render_state=state
+		return
 	# An exact source-field LOD can have different interpolated triangles after
 	# changing its regional grid. Keep the player's clearance through the
 	# atomic visible/collider handoff, including a saved parked ship.
@@ -203,9 +210,12 @@ func set_source_time(days:float)->bool:
 	_source_days=days;return true
 static func make_globe(system:RefCounted,target_body:String,site:String,terrain_revision:String)->RefCounted:
 	if not OrbitLink.supports_terrain_revision(terrain_revision,system):return null
-	var candidate:RefCounted=SourceTerrain.new() if terrain_revision==SourceTerrain.REVISION_NAME else SphereTerrain.new()
+	# The new revision is currently a free-surface preview. Its unchanged city
+	# anchors do not constitute a new port/hatch navigation implementation.
+	if terrain_revision==ContactTerrain.CONTACT_REVISION and not site.is_empty():return null
+	var candidate:RefCounted=ContactTerrain.new() if terrain_revision==ContactTerrain.CONTACT_REVISION else (SourceTerrain.new() if terrain_revision==SourceTerrain.REVISION_NAME else SphereTerrain.new())
 	candidate.configure(system,target_body,site,terrain_revision)
-	if terrain_revision==SourceTerrain.REVISION_NAME and not candidate.configured_ok:return null
+	if RenderPacket.supports_terrain_revision(terrain_revision) and not candidate.configured_ok:return null
 	return candidate
 func _source_gravity_at(system:RefCounted,terrain:RefCounted,x:float,z:float,geoid:float)->Dictionary:
 	var up_sq:=pow(float(terrain.radius)+geoid,2)-x*x-z*z

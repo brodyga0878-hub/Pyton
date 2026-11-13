@@ -225,6 +225,17 @@ NATURAL_CONTACT_PRIMARY_PROOFS={
     '581':(103404,1542,'a5559afa26a9783d6df67b558cd84d69e35158844c1a00cc81a75bcb0be766f0',533),
     '582':(104948,653,'a216b90c8dcac7e7601fcf57ea6c2afbc2d9a02111a051d1da4da1293901b4b4',243),
 }
+CONTACT_ALIGNMENT_BASELINE_SOURCE_COMMIT='2637168f2371937758504a54b9e17c11d279c82e'
+CONTACT_ALIGNMENT_BASELINE_FIXTURE_SHA256='36c864a535d12398d5fa9427fbdafcf24f0638c94a3d1ea8cb5328368c848b16'
+CONTACT_ALIGNMENT_MODULES=('source_terrain_contact_field','source_contact_surface_terrain','source_natural_surface_bridge','source_contact_alignment_probe')
+CONTACT_ALIGNMENT_PROVIDER_SOURCE_SHA256={'scripts/source_surface_render_packet.gd': '1371064fbbd00010567c2a7ae8552254540a22f3e382bba4cfd16f68fa99273e', 'scripts/source_surface_render_state.gd': '91eca62418b0f3bf48d10cf1af9286688e9cd8b0ab6a214c77df9070396465f4', 'scripts/source_surface_contact_patch.gd': 'a0c2dfe0442cdb33498ccd9e92cf5bb0c3b23f0fef06de71358bcfe668e15d0a', 'scripts/source_global_body_mesh.gd': 'c0101d6e2b442e5dd0e469f0c8d07272f038e9a6bb1e4016ddec1815949974d6', 'scripts/surface_visual.gd': 'b94c8f3eac101e7fc95ad4633236c9db877f6d5e39b7cd1fe414f577bc45227e', 'scripts/celestial_renderer.gd': 'c084f772a420a8b625488ce176e87532833c4677e26da2a669939a437c01448e'}
+CONTACT_ALIGNMENT_AUDITED_SOURCE_SHA256={'scripts/source_hyperdrive.gd': 'b79cd38051e44d52fcd4f2beb173b2699096e7d9aea9a0288aba205e453a8874', 'scripts/hyperdrive_services_view.gd': '70d828f819faeb8c8e31d12e1101ef82ce5d306f9cf329b2902600f82b5fe3f7', 'scripts/galactic_map_model.gd': '597a5bd049e3dea2698bfbc255a0d57e7c98b70fabedfe09d56bb60ccd3a11a5', 'scripts/galactic_map_view.gd': '9a2a6fa97d9ab4f6ce572a5e10bb390d5036ccf6d30e3bc31e087a61440b7876', 'scripts/source_jet_fuel.gd': 'ef043cd3d7fe4ef06a08d1f6592bf97b5d1e6d81c5f2efe9ea067d514f207cc1', 'scripts/source_fuel_scoop.gd': 'de1e96fd3013de48557b340b9ca4e4d174c4d39aaebb8b2eee96250db53af296', 'scripts/source_fuel_contact.gd': '0f8d5defba15db89d02c5253c988a2a5680d7a16058296b91d262017d5a49903', 'scripts/source_fuel_flight_bridge.gd': '70921d3cb8b7d211f07f1211309f809dab1e0be9094ccf015e658558d6a04b52', 'scripts/flight_model.gd': '4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b', 'scripts/source_motion_bridge.gd': '4fd81d7226e1c63f5c280e6ade6692b829bc5568937429a8ecac397949a003a5', 'scripts/source_atmospheric_dynamics.gd': 'a9ccce9fa27a2354205f3b1c88a9108320f567742d44d84082635339bc9af4a9', 'scripts/flight_time_controller.gd': 'd171bb7354e57ae6349ac04775d6f640a932c0f061cba879bb044724f3d06d91', 'scripts/source_atmosphere_contact.gd': '046dcfbb3ad3f2c937f023aa5268e239b9c668e9a943ce6a51502ad7b35392be', 'scripts/flight_console.gd': '0a9fe99fd5e4f2cfb276e476a8a12c141cbb9b74a92cd246c4dcfa9cc4180c54', 'scripts/ship_visual.gd': '5c175408f1687ecb440296e62051884a79503a4903965d16bd8dbba66934dd88', 'scripts/source_landing_gear.gd': '0a65184b0e02f6a578e9d4bc12124a87585241e25598020b351494059af05b6a', 'scripts/source_landing_gear_session.gd': 'ba8b63cbf89f30441f0bdfe01ed51af3a7e0e4679451264826039dd7b65887a0', 'scripts/main.gd': '7713e18fc3b98603a4e772e9079a5b048b087ad0d6bdeb914f583730f8d7f457', 'scripts/navigation.gd': '5f689fce7b1f899c4a39e95add22dd59a8b9ba2909ccfec2d7bf18a74698f3c6', 'scripts/source_hyperdrive_session.gd': '931427fe16367c8a7d32fdfbb554e14ef64987a477fa8e275a75122aa1505c14', 'scripts/surface_model.gd': 'd96a20c9be21f4113975cd522e360963cb0b29a1ac75e27ed43b8b8d95edb445', 'scripts/source_surface_contact.gd': 'fcfb6077f0bcabf7b6ffce98c3a3dbb23251a850175be4ef241b299fdf8d117d', 'scripts/source_surface_contact_bridge.gd': 'f83bbecc35c60bfaf79cf2314d067f997b966258665a41a93f082534ba7dfdd9', 'scripts/source_spherical_contact.gd': 'd5b484d6e5c6c6802c896fbb12df9cf13a6a7a79c8b9292dae9b31df3b772a77', 'scripts/source_spherical_contact_pipeline.gd': '60361ad6f22a13fc31d8b03f28e924391a4b7d9510b9618a8993da7b8249186b', 'scripts/source_spherical_contact_probe.gd': 'dc320da753e778e6ebd69c01ea60a15c37df6cceceaf0fe93289c0fe95846883', 'scripts/source_natural_contact.gd': 'e6cb189d34dc4d434b10f9fc2ef43bf8b96433845c01673f79b4d9592446658f', 'scripts/source_natural_contact_pipeline.gd': '8d981b53f301dd375f22faae89a439673a3f94a98278cbb2161075a85ae125be', 'scripts/source_natural_contact_probe.gd': 'ee163acac97707333e5b8234987dd82a071791b36a92c3c518ad32fc1ee6977c', 'scripts/source_surface_render_packet.gd': 'e04552b706b8c4b89f53280e9e96afa73ede777e8719cf0b4c6587479b1b84f5', 'scripts/source_surface_render_state.gd': '0f71658a283e2e6afa6eeea4e496b447565469242cfa7222e12618caa9b58b4a', 'scripts/source_surface_contact_patch.gd': '7a34e21fab9db0d379f4866d3193cb0f32723e714ca4bebfd03cabec36a40744', 'scripts/source_global_body_mesh.gd': 'dc7bdced64514126be8c92d4907fef4e92d245a073881832c64093ff37ae6721', 'scripts/surface_visual.gd': 'f5bdaf925ac522fdf08edd4141ecbd5bc46418e978a3792b253866935bde4432', 'scripts/celestial_renderer.gd': '8930c20b150de0019f55ca8aa2c4dd84ba9bde03d164fd7cd5bc8572505de492', 'scripts/surface_orbit_link.gd': '52d8bbfd7de127dea1c9a46394877f8e06ae988db4d035b262c9319d28b4a40a', 'scripts/source_terrain_contact_field.gd': 'e6de88193bd96912587f0b653b96e058357a4d157017c8f82ce86f7be42e9bf3', 'scripts/source_contact_alignment_probe.gd': '7347ff488e5525aded65f36c17235f433c53942a5ac93a10b3c5cf1143c98dd8', 'scripts/source_contact_surface_terrain.gd': '50faef7f781117f1e3b8d6fe4c96146d3af3dc0074bf42283a882c9093c9abac', 'scripts/source_natural_surface_bridge.gd': 'a67cb675c93f052bd00a2268e0629ae729c6c975f0419d105f6c60b90c2d7686'}
+CONTACT_ALIGNMENT_FIELD_REFERENCE_SHA256='6cb84a1f6dff615a504c9cac7935f339291831b62a658971110a03c1cb7b6db6'
+CONTACT_ALIGNMENT_RENDER_TEST_SHA256='34098086bb055ea91688e2253936511efa7a00e118797233d3296e3fe5c5cd3c'
+CONTACT_ALIGNMENT_V4_PATCH_CHECKSUM='6110d64354fc6e79f258e75c6d08a3fb376bb7fdc2ca3adb44b13ce0ff4638cf'
+CONTACT_ALIGNMENT_V4_GLOBAL_KEY='d9b811fa801e29bbe96ea7742fdca368181a5d6a174a978cc102e068ee33ed14'
+CONTACT_ALIGNMENT_PROTECTED_KERNEL_DATA_SHA256={**FUEL_CONTACT_DEPENDENCY_SHA256,
+    'scripts/source_surface_terrain.gd':SURFACE_CONTACT_PROVIDER_DEPENDENCY_SHA256['scripts/source_surface_terrain.gd'],'scripts/game_diagnostics.gd':'ec43f79d0971680225f0555ac9d7f6e60f41806257bae7e9c1bff8a4f73c0fc3'}
 SPHERICAL_CONTACT_INSTRUCTION_PROOFS={'577': {'executable_offset': 101964, 'byte_length': 363, 'sha256': 'f2bb5974c51d801bf5c219f697cf16716250a296f744e54fed61a6c26131e790', 'instruction_count': 128}, '1333': {'executable_offset': 259606, 'byte_length': 25, 'sha256': '8946c4ccd895806bb39d3d393c582970d2e34c8ba60c06257447eb10186e5468', 'instruction_count': 11}, '1341': {'executable_offset': 259928, 'byte_length': 127, 'sha256': 'ce1f10cd3645a7e74e65b774758ad6160e67cc67d19b0ad4cbfa77dbcc454ef3', 'instruction_count': 57}, '1502': {'executable_offset': 276735, 'byte_length': 139, 'sha256': '06d92dfc59b6eca45c8c8c4d203e1deb6a270101894bdea28ca83b692dc60d19', 'instruction_count': 61}, '1522': {'executable_offset': 279177, 'byte_length': 12, 'sha256': 'e6001a066c6ed54cff7bf995d82867c4b0809fa6752fdfb96247378823c29291', 'instruction_count': 7}, '1656': {'executable_offset': 305076, 'byte_length': 74, 'sha256': '8bdce1d3d508b9cbf7d5fcbbf261407789d7bbf8fd917a4225db88c6d5aa2949', 'instruction_count': 29}, '1660': {'executable_offset': 305752, 'byte_length': 177, 'sha256': 'e23941156e2eb6f1c53020a82a29d6537e6be0b7a6af446323409fb93e3be0cc', 'instruction_count': 74}}
 SPHERICAL_CONTACT_PIPELINE_INSTRUCTION_PROOFS={'571': {'executable_offset': 99040, 'byte_length': 75, 'sha256': 'd6f72bd663b601a5c0292f2b3e52cd5025762d68c77f4fccaf3fb7334abfdda6', 'instruction_count': 28}, '1333': {'executable_offset': 259606, 'byte_length': 25, 'sha256': '8946c4ccd895806bb39d3d393c582970d2e34c8ba60c06257447eb10186e5468', 'instruction_count': 11}, '1335': {'executable_offset': 259656, 'byte_length': 25, 'sha256': '630251ee2b7c42186d7b3e5a7dad2245d537527943aa08e08cfe6879016c0514', 'instruction_count': 11}, '1503': {'executable_offset': 276874, 'byte_length': 60, 'sha256': 'd0afd5b854572fc1f0c76c0e0baf449afecd09a825f1962dd0d1183c8612e36d', 'instruction_count': 26}, '1504': {'executable_offset': 276934, 'byte_length': 105, 'sha256': '3086b86ae6eed52dcb62404ed6eecc861949b851139ae9cd621ba08e88414e09', 'instruction_count': 45}, '1501': {'executable_offset': 276671, 'byte_length': 64, 'sha256': '422940485e22b08f5173b3b64ada177be0a09e4ba2dc8599b8b36ecdee8cff04', 'instruction_count': 31}, '1502': {'executable_offset': 276735, 'byte_length': 139, 'sha256': '06d92dfc59b6eca45c8c8c4d203e1deb6a270101894bdea28ca83b692dc60d19', 'instruction_count': 61}, '1519': {'executable_offset': 278938, 'byte_length': 136, 'sha256': '4cf67a734da229a0a8cb12b509f70668250b4b0f3836a19146b53b0272e78ea3', 'instruction_count': 59}, '1466': {'executable_offset': 269559, 'byte_length': 272, 'sha256': 'd8afc05d10b13f7872438dd3a1e13e11ccc15dd0b55881fa120ef8781055cf10', 'instruction_count': 103}, '1520': {'executable_offset': 279074, 'byte_length': 86, 'sha256': '97176815c1009869daef82477468f18dd21c7dccac64b5a3714d84295f281976', 'instruction_count': 37}, '1521': {'executable_offset': 279160, 'byte_length': 17, 'sha256': 'f62a5f949cbf8da772c3cc32ae59b607e0f35cda6c3c4e1ddf848ba3b5a1b445', 'instruction_count': 9}, '1522': {'executable_offset': 279177, 'byte_length': 12, 'sha256': 'e6001a066c6ed54cff7bf995d82867c4b0809fa6752fdfb96247378823c29291', 'instruction_count': 7}, '1523': {'executable_offset': 279189, 'byte_length': 33, 'sha256': 'e393035168c327e2d7c04e94b55828696681e5f6eabbab45e27c103d00f712af', 'instruction_count': 16}, '1538': {'executable_offset': 281168, 'byte_length': 15, 'sha256': '7f8a8207c382290494a4d7fabdc00b15b17b0c51b7e9185cd4a3ae9f4cfb1226', 'instruction_count': 6}, '1552': {'executable_offset': 282920, 'byte_length': 157, 'sha256': '7977b9c88ca60678c48bd16343b74af7de283391e7ac94a49c27aa269eb4ee2d', 'instruction_count': 69}, '1656': {'executable_offset': 305076, 'byte_length': 74, 'sha256': '8bdce1d3d508b9cbf7d5fcbbf261407789d7bbf8fd917a4225db88c6d5aa2949', 'instruction_count': 29}, '1658': {'executable_offset': 305360, 'byte_length': 44, 'sha256': '6bdbafa74820fd4a83d1e5dfdb85032acacc6fd0e1636b481ac3f18af1ad065f', 'instruction_count': 23}, '1657': {'executable_offset': 305152, 'byte_length': 207, 'sha256': '86d7da85e49ea3ddca538301d8ff1595065c0fb8e2a52ad7dd1b35b68bcbd6ff', 'instruction_count': 84}, '1660': {'executable_offset': 305752, 'byte_length': 177, 'sha256': 'e23941156e2eb6f1c53020a82a29d6537e6be0b7a6af446323409fb93e3be0cc', 'instruction_count': 74}, 'abs': {'executable_offset': 421944, 'byte_length': 22, 'sha256': '46c8a9d0c4e7b862f57c083615031c907a391a2166724a009057ab580d4c0795', 'instruction_count': 12}, '1332': {'executable_offset': 259552, 'byte_length': 54, 'sha256': '0e214c91774522f45b3c50a19f59f2807fb95454fc24eead2749bdc795ccc03c', 'instruction_count': 20}, '1341': {'executable_offset': 259928, 'byte_length': 127, 'sha256': 'ce1f10cd3645a7e74e65b774758ad6160e67cc67d19b0ad4cbfa77dbcc454ef3', 'instruction_count': 57}, '1664': {'executable_offset': 306204, 'byte_length': 65, 'sha256': '701108e268a44d562f19fe0c65162217e901584fb775656302d5c4c27c9b9e08', 'instruction_count': 27}, '575': {'executable_offset': 99488, 'byte_length': 2005, 'sha256': '33e2895597b23f2e12a3fc6f8c09a08c73042eb26f3529a2b1d911d12b77b015', 'instruction_count': 635}, '577': {'executable_offset': 101964, 'byte_length': 363, 'sha256': 'f2bb5974c51d801bf5c219f697cf16716250a296f744e54fed61a6c26131e790', 'instruction_count': 128}}
 
@@ -1972,6 +1983,103 @@ def _verify_spherical_contact_runtime(archive,project,normalized_main=None):
         'unchanged_code44_source_count':22,'whole_Main_normalization_sha256':SURFACE_CONTACT_AUDITED_SOURCE_SHA256['scripts/main.gd'],'Main_normalization_policy':'Exactly one probe preload and diagnostic sample rewrite removed; all other bytes equal code44 AD3. Retained strict44 report audits this virtual normalized Main; actual45 Main is separately pinned.','actual_Main_sha256':SPHERICAL_CONTACT_AUDITED_SOURCE_SHA256['scripts/main.gd'],'retained_surface_contact_assets':retained,
         'actual_Main_probe_readonly':True,'physical_response_changed_by_probe':False,'complete_original_F575':False,'F576_F578_engine_integrated':False,'full_original_world_object_bank':False,'complete_original_physics':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
 
+def _load_contact_alignment_baseline(project):
+    """Read immutable host source history, never replace exported assets."""
+    raw=(project/'tests/fixtures/alignment_v46_sources.json').read_bytes()
+    assert hashlib.sha256(raw).hexdigest()==CONTACT_ALIGNMENT_BASELINE_FIXTURE_SHA256,'Changed portable code46 alignment source baseline'
+    data=json.loads(raw)
+    expected={**NATURAL_CONTACT_AUDITED_SOURCE_SHA256,**CONTACT_ALIGNMENT_PROVIDER_SOURCE_SHA256,
+              'scripts/surface_orbit_link.gd':'c1cffc1ea9ba6efc4ea88e3adcf0e6e84ec2a42ff830df6f3d8e23097ca1767c'}
+    assert data.get('schema')==1 and data.get('source_commit')==CONTACT_ALIGNMENT_BASELINE_SOURCE_COMMIT and data.get('audited_runtime_source_sha256')==NATURAL_CONTACT_AUDITED_SOURCE_SHA256 and data.get('provider_source_sha256')==CONTACT_ALIGNMENT_PROVIDER_SOURCE_SHA256 and set(data.get('files',{}))==set(expected),'Wrong portable code46 alignment baseline domain'
+    for path,digest in expected.items():
+        entry=data['files'][path]
+        assert entry.get('sha256')==digest and hashlib.sha256(entry.get('source','').encode()).hexdigest()==digest,'Changed portable code46 alignment source '+path
+    return data
+
+
+class _AlignmentSourceAuditPath:
+    """A read-only host source-history view; archive entries are never wrapped."""
+    def __init__(self,project,overrides,relative=Path('.')):
+        self.project=project;self.overrides=overrides;self.relative=relative
+    def __truediv__(self,relative):
+        return _AlignmentSourceAuditPath(self.project,self.overrides,self.relative/relative)
+    def read_bytes(self):
+        key=self.relative.as_posix()
+        return self.overrides[key].encode() if key in self.overrides else (self.project/self.relative).read_bytes()
+    def read_text(self,encoding='utf-8'):
+        return self.read_bytes().decode(encoding)
+
+
+def _verify_contact_field_native_reference(project):
+    raw=(project/'tests/fixtures/source_contact_field_native.json').read_bytes();data=json.loads(raw)
+    assert hashlib.sha256(raw).hexdigest()==CONTACT_ALIGNMENT_FIELD_REFERENCE_SHA256,'Changed independent signed-field native reference'
+    assert data.get('schema')==1 and data.get('revision')=='source-contact-field-native-v1' and data.get('source_sha256')==SOURCE_IMAGE_SHA256 and data.get('source_assembly_sha256')==SOURCE_ASSEMBLY_SHA256 and data.get('source_commit')==SOURCE_ASSEMBLY_COMMIT,'Wrong signed-field native provenance'
+    assert data.get('source_canonical_fixture_sha256')==NATURAL_CONTACT_NATIVE_REFERENCE_SHA256 and data.get('source_units_module_sha256')==FUEL_CONTACT_DEPENDENCY_SHA256['scripts/source_units.gd'],'Signed-field native proof must retain canonical F576 and exact source units'
+    anchors=data.get('anchors',[]);geometry=data.get('geometry_cases',[]);classifier=data.get('classifier_cases',[])
+    assert data.get('anchor_count')==len(anchors)==51 and data.get('model_count')==17 and {row['model_index']for row in anchors}==set(range(117,134)),'Incomplete signed-field17-model51-anchor domain'
+    assert data.get('geometry_case_count')==len(geometry)==153 and data.get('classifier_case_count')==len(classifier)==306 and data.get('case_count')==459 and data.get('player_models')==[24,38,15],'Signed-field geometry/classifier cases cannot be conflated'
+    assert data.get('fresh_process_runs_per_bank')==3 and data.get('geometry_reverse_repeat_count')==153 and data.get('classifier_reverse_repeat_count')==306 and data.get('original_body_parent_buffers_and_canaries_unchanged') is True and data.get('python_expected_query_arithmetic') is False,'Incomplete independent signed-field native execution checks'
+    excluded=['model117_axis_x','model117_axis_z']
+    assert data.get('geometry_exclusion_anchor_ids')==excluded,'Model117 geometry-only coarse-bound exclusions changed'
+    assert sum(row['certified_status']=='exact_zero'for row in anchors)==39 and sum(row['certified_status']=='adjacent_sign_boundary'for row in anchors)==12,'Signed-field zero/adjacent-boundary domains changed'
+    assert {row['role']for row in geometry}=={'final','inside','outside'} and {row['role']for row in classifier}=={'final','native_inner_clearance'},'Incomplete signed-field native witness roles'
+    altered=[]
+    for row in geometry:
+        if row['geometry_parent_object_hex']!=row['original_parent_object_hex']:altered.append(row['anchor_id'])
+    assert len(altered)==6 and set(altered)==set(excluded),'Expanded model117 bounds may occur only in six geometry-only witnesses'
+    descriptors=json.loads((project/'data/ffe_runtime_model_descriptors.json').read_bytes())['models']
+    ships=json.loads((project/'data/ffe_natural_contact.json').read_bytes())['ship_models']
+    assert {row['player_model']for row in classifier}=={15,24,38},'Signed-field classifier must use all three actual positive-radius player shapes'
+    for row in classifier:
+        parent=bytes.fromhex(row['parent_object_hex']);player=bytes.fromhex(row['player_object_hex']);descriptor=bytes.fromhex(descriptors[str(row['parent_model'])]['descriptor_hex']);ship=ships[str(row['player_model'])]
+        assert len(parent)==338 and len(player)==338,'Signed-field native raw objects must preserve338-byte layout'
+        exponent=sum(struct.unpack_from('<II',descriptor,0x14))-8
+        bounds=[struct.unpack_from('<h',descriptor,at)[0]for at in (0x2c,0x30)]
+        bounds=[value<<exponent if exponent>=0 else value>>(-exponent)for value in bounds]
+        assert [struct.unpack_from('<q',parent,at)[0]for at in (0x138,0x140)]==bounds,'Canonical signed-field F576 classifier may not inherit expanded geometry bounds'
+        assert struct.unpack_from('<q',player,0x138)[0]==ship['f1533_radii']['outer_s64'] and struct.unpack_from('<q',player,0x140)[0]==ship['f1533_radii']['inner_s64']>0,'Signed-field classifier may not use a zero-radius proxy'
+    return {'sha256':CONTACT_ALIGNMENT_FIELD_REFERENCE_SHA256,'case_count':459,'geometry_case_count':153,'canonical_positive_player_classifier_case_count':306,'anchor_count':51,'model_count':17,'exact_zero_count':39,'adjacent_integer_boundary_count':12,'geometry_only_coarse_bound_exclusions':excluded,'canonical_F576_bounds_expanded':False,'oracle_executed_by_apk_verifier':False,'root_algorithm_is_original_FFE':False,'global_root_uniqueness_proved':False,'interpolated_triangle_certification_proved':False}
+
+
+def _verify_contact_alignment_v4_evidence(project):
+    path='validation/alignment-2026-11-13/source-contact-surface-render.json'
+    raw=(project/path).read_bytes();data=json.loads(raw)
+    assert data.get('schema')==1 and data.get('failures')==0 and data.get('checks',0)>=40,'Missing successful current v4/v5 renderer regression evidence'
+    expected=set(CONTACT_ALIGNMENT_PROVIDER_SOURCE_SHA256)|{'scripts/source_terrain_contact_field.gd','scripts/source_contact_surface_terrain.gd','tests/test_source_contact_surface_render.gd'}
+    assert set(data.get('sources',{}))==expected,'Incomplete renderer regression source bindings'
+    assert data['sources']['tests/test_source_contact_surface_render.gd']==CONTACT_ALIGNMENT_RENDER_TEST_SHA256,'Changed renderer regression test source contract'
+    for relative,digest in data['sources'].items():
+        assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==digest,'Stale renderer regression evidence source '+relative
+    rows={row.get('case'):row for row in data.get('evidence',[])}
+    old=rows.get('immutable_v4_compatibility',{})
+    assert old.get('old_source_commit')=='abae633776275a88bf0706893a030e7497ae6ef0' and old.get('patch_checksum')==CONTACT_ALIGNMENT_V4_PATCH_CHECKSUM and old.get('global_key')==CONTACT_ALIGNMENT_V4_GLOBAL_KEY,'Current renderer changed independently measured old v4 checksum/cache defaults'
+    patch=rows.get('actual_source_v5_saved_triangle',{});worker=rows.get('actual_source_v5_worker_packet',{})
+    assert patch.get('interpolated_triangle_is_native_arbitrary_point_zero') is False and patch.get('full_global_v5_mesh_build_executed') is False and worker.get('arbitrary_point_native_equivalence_claim') is False and worker.get('GPU_executed') is False,'Renderer evidence cannot claim arbitrary-point/native/global/GPU equivalence'
+    assert worker.get('terrain_revision')=='sphere-source-contact-v5' and worker.get('vertices',0)>0 and worker.get('source_query_count',0)>0,'Missing actual bounded v5 source-root worker packet evidence'
+    return {'report':path,'report_sha256':hashlib.sha256(raw).hexdigest(),'checks':data['checks'],'failures':0,'source_hashes_match_actual_checkout':True,'v4_patch_checksum':CONTACT_ALIGNMENT_V4_PATCH_CHECKSUM,'v4_global_cache_key':CONTACT_ALIGNMENT_V4_GLOBAL_KEY,'v4_reference_source_commit':'abae633776275a88bf0706893a030e7497ae6ef0','renderer_tests_reexecuted_by_apk_verifier':False,'arbitrary_point_triangle_native_equivalence_proved':False}
+
+
+def _verify_contact_alignment_preserved_functions(project,baseline):
+    # The Main physical loop, save payload and source contact application do
+    # not gain a new response path. The compatibility layer and preview bugfix
+    # are independently pinned as actual code47 files, outside this subset.
+    protected={
+        'scripts/main.gd':['_tick','_source_contact_enabled','_source_contact_failed','_apply_pending_source_contact','_payload','_decode_state'],
+        'scripts/surface_orbit_link.gd':['preferred_terrain_revision'],
+        'scripts/source_surface_contact_patch.gd':['checksum_for'],
+        'scripts/surface_visual.gd':['_bind_ground_material'],
+        'scripts/celestial_renderer.gd':['source_light','_bind_body_material'],
+    }
+    checked={}
+    for relative,functions in protected.items():
+        current=(project/relative).read_text();previous=baseline['files'][relative]['source']
+        for function in functions:
+            old=source_function(previous,function);new=source_function(current,function)
+            assert new==old,'Contact alignment changed protected physical/default/material function '+relative+'/'+function
+            checked[relative+'/'+function]=hashlib.sha256(new.encode()).hexdigest()
+    return checked
+
+
 def _normalize_natural_main(main):
     preload='const NaturalContactProbe=preload("res://scripts/source_natural_contact_probe.gd")\n'
     diagnostic='\tsample["source_natural_probe"]=NaturalContactProbe.sample(world,ship,surface,nav.elapsed_days) if nav.is_source_hyperdrive() else {"ok":true,"reason":"legacy_navigation","diagnostic_only":true,"response_applied":false}\n'
@@ -2091,6 +2199,55 @@ def verify_natural_contact_runtime(archive,project):
         'actual_Main_probe_readonly':True,'physical_response_changed_by_probe':False,'source_field_is_phone_AGL':False,'mesh_source_height_alignment_proved':False,'independent_native_natural_F575_pipeline_executed':False,'full_F569_F570_engine':False,'general_F580_F583_VM':False,'full_original_world_object_bank':False,'complete_original_physics':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
 
 
+def verify_contact_alignment_runtime(archive,project):
+    """Code47 actual assets/pins plus explicitly separated historical source audit."""
+    names=set(archive.namelist());compiled={}
+    for relative in CONTACT_ALIGNMENT_AUDITED_SOURCE_SHA256:
+        name=Path(relative).stem;path='assets/scripts/'+name+'.gdc'
+        assert path in names,'Missing contact-alignment integration runtime '+name
+        raw=archive.read(path)
+        assert len(raw)>64 and raw[:4]==b'GDSC','Invalid compiled contact-alignment integration runtime '+name
+        compiled[name]=hashlib.sha256(raw).hexdigest()
+    for relative,digest in CONTACT_ALIGNMENT_AUDITED_SOURCE_SHA256.items():
+        assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==digest,'Contact alignment differs from audited integration source '+relative
+    kernels={}
+    for relative,digest in CONTACT_ALIGNMENT_PROTECTED_KERNEL_DATA_SHA256.items():
+        raw=(project/relative).read_bytes()
+        assert hashlib.sha256(raw).hexdigest()==digest,'Contact alignment changed protected original kernel/data '+relative
+        if relative.startswith('data/'):
+            assert 'assets/'+relative in names and archive.read('assets/'+relative)==raw,'Contact alignment exported protected data differs '+relative
+        else:
+            path='assets/scripts/'+Path(relative).stem+'.gdc'
+            assert path in names,'Missing contact-alignment original kernel runtime '+relative
+            exported=archive.read(path)
+            assert len(exported)>64 and exported[:4]==b'GDSC','Invalid compiled contact-alignment original kernel '+relative
+            kernels[Path(relative).stem]=hashlib.sha256(exported).hexdigest()
+    baseline=_load_contact_alignment_baseline(project)
+    preserved=_verify_contact_alignment_preserved_functions(project,baseline)
+    native=_verify_contact_field_native_reference(project)
+    renderer=_verify_contact_alignment_v4_evidence(project)
+    source={name:(project/'scripts'/f'{name}.gd').read_text()for name in (*CONTACT_ALIGNMENT_MODULES,'main','surface_model','surface_orbit_link','celestial_renderer')}
+    main=source['main'];probe=source['source_contact_alignment_probe'];bridge=source['source_natural_surface_bridge'];terrain=source['source_contact_surface_terrain']
+    assert 'ContactAlignmentProbe.sample(surface,ship)' in source_function(main,'_show_surface_alignment') and 'source_alignment_last' in source_function(main,'_flight_diagnostic_sample'),'Explicit surface comparison menu/report consumer is disconnected'
+    assert 'source_natural_surface_bridge.gd' not in main and 'source_alignment_last' not in source_function(main,'_payload'),'Surface comparison must not add Main natural response or game-save state'
+    assert '"diagnostic_only":true' in source_function(probe,'_base') and '"response_applied":false' in source_function(probe,'_base') and '"interpolated_points_certified":false' in source_function(probe,'_base') and '"explicit_user_command_only":true' in source_function(probe,'_base'),'Surface comparison must stay explicit and read-only without interpolation certification'
+    assert 'guard==measured' in source_function(bridge,'eligibility') and '"whole_triangle_certified":false' in source_function(bridge,'eligibility') and '"live_response_enabled":false' in source_function(bridge,'eligibility'),'Natural surface candidate requires a freshly recomputed local guard, not a whole-triangle/live grant'
+    geometry=source_function(bridge,'_geometry')
+    assert 'if residual==0:' in geometry and 'boundary.position_raw==raw' in geometry and 'boundary.source_bounds.terrain_query_eligible==true' in geometry,'Visible point must equal an exact source zero or exact admitted integer boundary, not a tolerance'
+    assert '"sampled_nodes_certified_against_signed_F581"' in terrain and '"interpolated_points_certified_against_F581"' in terrain and 'BaseTerrain.SAMPLE_POLICY' in terrain,'Signed-field terrain must preserve v4 seed provenance and separate nodes from interpolation'
+    assert '_source_terrain_revision:=SourceGlobalMesh.Terrain.REVISION_NAME' in source['celestial_renderer'],'Ordinary celestial geometry must keep its v4 default'
+    # Existing gates remain strict against actual47. This view restores only
+    # nine permitted host source-history entries; it passes the SAME archive
+    # object and never substitutes, synthesizes or rewrites compiled assets.
+    changed=[*CONTACT_ALIGNMENT_PROVIDER_SOURCE_SHA256,'scripts/main.gd','scripts/surface_model.gd','scripts/surface_orbit_link.gd']
+    overrides={relative:baseline['files'][relative]['source']for relative in changed}
+    retained=verify_natural_contact_runtime(archive,_AlignmentSourceAuditPath(project,overrides))
+    audit={'source_override_count':len(overrides),'source_override_paths':changed,'compiled_assets_substituted':False,'audit_is_actual_unchanged_code46_runtime':False,'description':'Host code46 source-history/data checks only, after separate actual47 source pins and current v4 checksum/default regressions. All compiled hashes below are read from the actual code47 archive; no old compiled assets are substituted.','assets':retained}
+    return {'baseline_source_commit':CONTACT_ALIGNMENT_BASELINE_SOURCE_COMMIT,'baseline_fixture_sha256':CONTACT_ALIGNMENT_BASELINE_FIXTURE_SHA256,'baseline_fixture_source_count':36,'compiled_modules':{name:compiled[name]for name in CONTACT_ALIGNMENT_MODULES},'compiled_module_count':4,'integration_compiled_modules':compiled,'integration_compiled_module_count':len(compiled),'audited_local_source_sha256':CONTACT_ALIGNMENT_AUDITED_SOURCE_SHA256,'protected_original_kernel_compiled_modules':kernels,
+        'raw_json_count':0,'new_runtime_JSON_added':False,'unchanged_code46_runtime_source_count':27,'actual_runtime_is_unchanged_code46':False,'preserved_physical_default_material_functions':preserved,'preserved_physical_default_material_function_count':len(preserved),'native_field_reference':native,'v4_renderer_regression':renderer,'retained_code46_source_audit':audit,
+        'v4_is_default_physical_terrain':True,'v5_geometry_is_explicit_opt_in':True,'Main_new_natural_response_branch':False,'new_alignment_data_persisted_in_game_save':False,'geometry_guard_is_local_point_only':True,'whole_interpolated_triangle_certified':False,'independent_native_F575_coupled_pipeline_executed':False,'full_original_world_bank':False,'complete_original_physics':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
+
+
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     expected=preset_values(presets)
     signature=run(build_tools/'apksigner','verify','--verbose','--print-certs',apk)
@@ -2109,7 +2266,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={};hyperdrive_assets={};fuel_assets={};atmosphere_assets={};landing_gear_assets={};surface_contact_assets={};spherical_contact_assets={};natural_contact_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={};hyperdrive_assets={};fuel_assets={};atmosphere_assets={};landing_gear_assets={};surface_contact_assets={};spherical_contact_assets={};natural_contact_assets={};contact_alignment_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -2211,10 +2368,15 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             if expected['version_code']==45:
                 spherical_contact_assets=verify_spherical_contact_runtime(archive,presets.parent)
                 surface_contact_assets=spherical_contact_assets['retained_surface_contact_assets']
-            if expected['version_code']>=46:
+            if expected['version_code']==46:
                 natural_contact_assets=verify_natural_contact_runtime(archive,presets.parent)
                 spherical_contact_assets=natural_contact_assets['retained_spherical_contact_assets']
                 surface_contact_assets=spherical_contact_assets['retained_surface_contact_assets']
+            if expected['version_code']>=47:
+                contact_alignment_assets=verify_contact_alignment_runtime(archive,presets.parent)
+                natural_contact_assets={**contact_alignment_assets['retained_code46_source_audit']['assets'],'host_source_history_audit_only':True,'actual_runtime_is_unchanged_code46':False}
+                spherical_contact_assets={**natural_contact_assets['retained_spherical_contact_assets'],'host_source_history_audit_only':True}
+                surface_contact_assets={**spherical_contact_assets['retained_surface_contact_assets'],'host_source_history_audit_only':True}
             if expected['version_code']>=44:
                 landing_gear_assets={'raw_resource_sha256':surface_contact_assets['unchanged_landing_gear_resource_sha256'],'compiled_module_count':surface_contact_assets['retained_landing_gear_compiled_module_count'],'retained_by_strict_surface_contact_gate':True}
                 atmosphere_assets={'raw_resource_sha256':surface_contact_assets['unchanged_atmosphere_resource_sha256'],'compiled_module_count':surface_contact_assets['retained_atmosphere_compiled_module_count'],'retained_by_strict_surface_contact_gate':True,'native_references':surface_contact_assets['retained_atmosphere_native_references']}
@@ -2238,7 +2400,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'hyperdrive_assets':hyperdrive_assets,'fuel_assets':fuel_assets,'atmosphere_assets':atmosphere_assets,'landing_gear_assets':landing_gear_assets,'surface_contact_assets':surface_contact_assets,'spherical_contact_assets':spherical_contact_assets,'natural_contact_assets':natural_contact_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'hyperdrive_assets':hyperdrive_assets,'fuel_assets':fuel_assets,'atmosphere_assets':atmosphere_assets,'landing_gear_assets':landing_gear_assets,'surface_contact_assets':surface_contact_assets,'spherical_contact_assets':spherical_contact_assets,'natural_contact_assets':natural_contact_assets,'contact_alignment_assets':contact_alignment_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

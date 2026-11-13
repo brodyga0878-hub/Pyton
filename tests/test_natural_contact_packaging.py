@@ -21,6 +21,17 @@ class MockNaturalArchive(retained.MockSphericalArchive):
 
 
 class NaturalContactPackaging(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        directory=tempfile.TemporaryDirectory(prefix='alignment-packaging-v46-')
+        cls.addClassCleanup(directory.cleanup);cls.project=Path(directory.name)
+        for relative in cls.project_files():
+            target=cls.project/relative;target.parent.mkdir(parents=True,exist_ok=True)
+            target.write_bytes((PROJECT/relative).read_bytes())
+        baseline=verifier._load_contact_alignment_baseline(PROJECT)
+        for relative,entry in baseline['files'].items():
+            target=cls.project/relative;target.parent.mkdir(parents=True,exist_ok=True)
+            target.write_text(entry['source'])
     def setUp(self):
         self.archive = MockNaturalArchive()
 
@@ -28,6 +39,8 @@ class NaturalContactPackaging(unittest.TestCase):
     def project_files():
         files = retained.SphericalContactPackaging.project_files()
         files.update('scripts/' + name + '.gd' for name in verifier.NATURAL_CONTACT_MODULES)
+        files.update(verifier.CONTACT_ALIGNMENT_PROVIDER_SOURCE_SHA256)
+        files.add('scripts/surface_orbit_link.gd')
         files.update(['data/ffe_natural_contact.json', 'data/ffe_ground_collision.json',
                       'tests/fixtures/source_natural_contact_native.json'])
         return files
@@ -37,7 +50,7 @@ class NaturalContactPackaging(unittest.TestCase):
         for relative in self.project_files():
             target = project / relative
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_bytes((PROJECT / relative).read_bytes())
+            target.write_bytes((self.project / relative).read_bytes())
         return project
 
     def mutate_resource(self, project, callback):
@@ -49,7 +62,7 @@ class NaturalContactPackaging(unittest.TestCase):
         self.archive.entries['assets/data/ffe_natural_contact.json'] = raw
 
     def test_frozen_runtime_scope_preserves_exact_code45_and_real_three_ship_lists(self):
-        result = verifier.verify_natural_contact_runtime(self.archive, PROJECT)
+        result = verifier.verify_natural_contact_runtime(self.archive, self.project)
         self.assertEqual(result['baseline_source_commit'], 'e3b9369230085ef7c15ab974d8e8de84eda1a991')
         self.assertEqual((result['compiled_module_count'], result['integration_compiled_module_count']), (3, 29))
         self.assertEqual(result['unchanged_code45_source_count'], 25)
@@ -75,7 +88,7 @@ class NaturalContactPackaging(unittest.TestCase):
                 archive = MockNaturalArchive()
                 del archive.entries['assets/scripts/' + Path(relative).stem + '.gdc']
                 with self.assertRaisesRegex(AssertionError, 'Missing natural-contact integration runtime'):
-                    verifier.verify_natural_contact_runtime(archive, PROJECT)
+                    verifier.verify_natural_contact_runtime(archive, self.project)
 
     def test_each_new_module_rejects_wrong_header_or64byte_truncation(self):
         for name in verifier.NATURAL_CONTACT_MODULES:
@@ -84,17 +97,17 @@ class NaturalContactPackaging(unittest.TestCase):
                     archive = MockNaturalArchive()
                     archive.entries['assets/scripts/' + name + '.gdc'] = value
                     with self.assertRaisesRegex(AssertionError, 'Invalid compiled natural-contact integration runtime'):
-                        verifier.verify_natural_contact_runtime(archive, PROJECT)
+                        verifier.verify_natural_contact_runtime(archive, self.project)
 
     def test_missing_new_metadata_rejects(self):
         del self.archive.entries['assets/data/ffe_natural_contact.json']
         with self.assertRaisesRegex(AssertionError, 'Missing natural-contact metadata resource'):
-            verifier.verify_natural_contact_runtime(self.archive, PROJECT)
+            verifier.verify_natural_contact_runtime(self.archive, self.project)
 
     def test_export_must_match_local_metadata_bytes(self):
         self.archive.entries['assets/data/ffe_natural_contact.json'] += b' '
         with self.assertRaisesRegex(AssertionError, 'Natural-contact resource differs from local source'):
-            verifier.verify_natural_contact_runtime(self.archive, PROJECT)
+            verifier.verify_natural_contact_runtime(self.archive, self.project)
 
     def test_original_source_provenance_cannot_be_replaced(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -118,7 +131,7 @@ class NaturalContactPackaging(unittest.TestCase):
                 archive = MockNaturalArchive()
                 archive.entries['assets/data/' + name + '.json'] += b' '
                 with self.assertRaises(AssertionError):
-                    verifier.verify_natural_contact_runtime(archive, PROJECT)
+                    verifier.verify_natural_contact_runtime(archive, self.project)
 
     def test_all_three_original_ship_models_are_required(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -275,11 +288,11 @@ class NaturalContactPackaging(unittest.TestCase):
 
     def test_old45_public_gate_remains_strict_against_actual46_main(self):
         with self.assertRaisesRegex(AssertionError, 'Missing exact spherical diagnostic-only Main additions|Spherical update changed physical/save/Main'):
-            verifier.verify_spherical_contact_runtime(self.archive, PROJECT)
+            verifier.verify_spherical_contact_runtime(self.archive, self.project)
 
     def test_old44_public_gate_remains_strict_against_actual46_main(self):
         with self.assertRaisesRegex(AssertionError, 'Contact differs from audited integration source scripts/main.gd'):
-            verifier.verify_surface_contact_runtime(self.archive, PROJECT)
+            verifier.verify_surface_contact_runtime(self.archive, self.project)
 
 
 if __name__ == '__main__':

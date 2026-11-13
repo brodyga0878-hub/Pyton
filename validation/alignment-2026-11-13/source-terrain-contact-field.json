@@ -1,0 +1,50 @@
+{
+	"anchor_count": 51,
+	"checks": 3802,
+	"failures": 0,
+	"field_source_sha256": "e6de88193bd96912587f0b653b96e058357a4d157017c8f82ce86f7be42e9bf3",
+	"fixture_sha256": "6cb84a1f6dff615a504c9cac7935f339291831b62a658971110a03c1cb7b6db6",
+	"height_policy": "source_f581_signed_ray_boundary_v1",
+	"models": {
+		"117": 3,
+		"118": 3,
+		"119": 3,
+		"120": 3,
+		"121": 3,
+		"122": 3,
+		"123": 3,
+		"124": 3,
+		"125": 3,
+		"126": 3,
+		"127": 3,
+		"128": 3,
+		"129": 3,
+		"130": 3,
+		"131": 3,
+		"132": 3,
+		"133": 3
+	},
+	"native_case_count": 459,
+	"query_counts": {
+		"12": 1,
+		"13": 2,
+		"14": 2,
+		"16": 1,
+		"2": 13,
+		"3": 11,
+		"4": 8,
+		"5": 4,
+		"6": 2,
+		"8": 4,
+		"9": 3
+	},
+	"schema": 1,
+	"scope": "New signed F581 geometry caller only. Old JJFFE SAR3 two-query seed and all old kernels unchanged. Exact zeros or adjacent outward sign boundaries; no fabricated zero, no global uniqueness claim, original117 gate exclusions explicit. Per-node certificates do not certify interpolated meshes or imply live F575/HP/clock integration.",
+	"source_contract": "source-f581-certified-radial-contact-field-v1",
+	"statuses": {
+		"adjacent_sign_boundary": 12,
+		"exact_zero": 39
+	},
+	"test": "source_terrain_contact_field",
+	"test_source_sha256": "a4b093da4276daf860a2ddd32a2eca8f8580b048f55288b78674f0e293f65b6c"
+}

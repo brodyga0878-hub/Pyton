@@ -3,8 +3,12 @@ extends RefCounted
 # SourceSurfaceTerrain instance; all SceneTree/GPU publication stays outside.
 const REVISION:="source-surface-render-packet-v1"
 const TERRAIN_REVISION:="sphere-source-ground-v4"
+const CONTACT_TERRAIN_REVISION:="sphere-source-contact-v5"
 const KINDS:=["earth","ice","desert","rock"]
 const MAX_VERTICES:=100000
+
+static func supports_terrain_revision(value:Variant)->bool:
+	return value==TERRAIN_REVISION or value==CONTACT_TERRAIN_REVISION
 
 static func _integer(value:Variant,minimum:int,maximum:int)->bool:
 	return (value is int or value is float) and is_finite(float(value)) and float(value)==floorf(float(value)) and int(value)>=minimum and int(value)<=maximum
@@ -95,7 +99,7 @@ static func _ring(globe:RefCounted,inner:float,outer:float,along:int,radial:int,
 
 static func prepare(globe:RefCounted,options:Dictionary={})->Dictionary:
 	var started:=Time.get_ticks_usec()
-	if globe==null or globe.get("revision")!=TERRAIN_REVISION or globe.get("configured_ok")!=true or not globe.get("source_record") is PackedByteArray or globe.source_record.size()!=68:return {"ok":false,"error":"A configured worker-owned source terrain is required"}
+	if globe==null or not supports_terrain_revision(globe.get("revision")) or globe.get("configured_ok")!=true or not globe.get("source_record") is PackedByteArray or globe.source_record.size()!=68:return {"ok":false,"error":"A configured worker-owned source terrain is required"}
 	var count_value:Variant=options.get("core_cells",64);var along_value:Variant=options.get("far_along",16);var radial_value:Variant=options.get("far_radial",2)
 	var width_value:Variant=options.get("core_width",4000.0)
 	if not _integer(count_value,2,128) or not _integer(along_value,4,64) or not _integer(radial_value,1,8) or not (width_value is int or width_value is float) or not is_finite(float(width_value)) or float(width_value)<64.0 or float(width_value)>65536.0:return {"ok":false,"error":"Invalid source render grid dimensions"}
@@ -130,7 +134,7 @@ static func prepare(globe:RefCounted,options:Dictionary={})->Dictionary:
 	var origin:=_sample(globe,offset.x,offset.y,stats)
 	if origin.is_empty():return {"ok":false,"error":"Source material origin query was not finite"}
 	var after:Dictionary=globe.cache_stats()
-	var result:={"ok":true,"revision":REVISION,"frame":{"latitude":latitude,"longitude":longitude,"radius":radius,"record_hash":_sha(globe.source_record),"terrain_revision":TERRAIN_REVISION,"record_domain":"f878_runtime_bank_with_unconverted_type35_fields"},"source_key":str(options.get("source_key","")),"meshes":meshes,"material_origin":Vector3(floor(origin[2]/1024.0)*1024.0,floor(origin[3]/1024.0)*1024.0,floor(origin[4]/1024.0)*1024.0),"kind":kind,"extended_flight":extended,"core_cells":count,"core_width":width,"core_offset":offset,"include_rings":include_rings,"far_along":along,"far_radial":radial,"sample_count":int(stats.samples),"source_query_count":int(after.get("source_samples",0))-int(before.get("source_samples",0)),"cache_stats_before":before,"cache_stats_after":after,"duration_usec":Time.get_ticks_usec()-started}
+	var result:={"ok":true,"revision":REVISION,"frame":{"latitude":latitude,"longitude":longitude,"radius":radius,"record_hash":_sha(globe.source_record),"terrain_revision":str(globe.revision),"record_domain":"f878_runtime_bank_with_unconverted_type35_fields"},"source_key":str(options.get("source_key","")),"meshes":meshes,"material_origin":Vector3(floor(origin[2]/1024.0)*1024.0,floor(origin[3]/1024.0)*1024.0,floor(origin[4]/1024.0)*1024.0),"kind":kind,"extended_flight":extended,"core_cells":count,"core_width":width,"core_offset":offset,"include_rings":include_rings,"far_along":along,"far_radial":radial,"sample_count":int(stats.samples),"source_query_count":int(after.get("source_samples",0))-int(before.get("source_samples",0)),"cache_stats_before":before,"cache_stats_after":after,"duration_usec":Time.get_ticks_usec()-started}
 	return result if valid(result) else {"ok":false,"error":"Prepared source geometry failed finite/bounds validation"}
 
 static func valid(packet:Dictionary)->bool:
@@ -140,7 +144,7 @@ static func valid(packet:Dictionary)->bool:
 	var frame:Dictionary=packet.frame
 	for key in ["latitude","longitude","radius"]:
 		if not (frame.get(key) is int or frame.get(key) is float) or not is_finite(float(frame[key])):return false
-	if absf(float(frame.latitude))>PI*0.5 or absf(float(frame.longitude))>PI+0.000001 or float(frame.radius)<=0.0 or not frame.get("record_hash") is String or frame.record_hash.length()!=64 or not frame.record_hash.is_valid_hex_number(false) or frame.get("terrain_revision")!=TERRAIN_REVISION or frame.get("record_domain")!="f878_runtime_bank_with_unconverted_type35_fields":return false
+	if absf(float(frame.latitude))>PI*0.5 or absf(float(frame.longitude))>PI+0.000001 or float(frame.radius)<=0.0 or not frame.get("record_hash") is String or frame.record_hash.length()!=64 or not frame.record_hash.is_valid_hex_number(false) or not supports_terrain_revision(frame.get("terrain_revision")) or frame.get("record_domain")!="f878_runtime_bank_with_unconverted_type35_fields":return false
 	var total:=0
 	for mesh_index in range(packet.meshes.size()):
 		var mesh:Variant=packet.meshes[mesh_index]
