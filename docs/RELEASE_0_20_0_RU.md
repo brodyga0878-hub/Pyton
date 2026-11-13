@@ -1,12 +1,13 @@
 # Сферическая проверка и диагностика контакта — 0.20.0
 
-Кандидат **0.20.0-spherical-contact-alpha1 / Android code 45** переносит
+Опубликованная сборка **0.20.0-spherical-contact-alpha1 / Android code 45** переносит
 целую DOS F577 и проверяет ограниченную чистую композицию с исходным
 заголовком F575 и прежним ответом игрока. В Main подключается только
 чтение `source_spherical_probe` для журналов и отчётов. Новая физическая
 ветка столкновений этим выпуском не вводится. Финальные функциональные
 проверки, настоящие кадры Main и строгая техническая проверка APK
-завершены; точный ZIP исходников и HTTPS пока не подготовлены.
+завершены. Точный ZIP проверен свежим импортом и настоящим Main;
+неизменяемые HTTPS-ссылки проверены полным скачиванием.
 Предыдущие проверенные артефакты — в [0.19.0](RELEASE_0_19_0_RU.md).
 
 ## Полная F577 и смысл результата
@@ -153,12 +154,40 @@ SHA256 TEST-сертификата:
 CRC архива проверен. Это отдельное доказательство экспорта отчёта,
 а не новая сумма функциональных условий.
 
-Точный ZIP исходников со свежим импортом и запуском пока не подготовлен.
-После публикации планируется полное скачивание **13 файлов**: манифеста,
-APK, source ZIP, capture-manifest, восьми PNG и настоящего диагностического
-ZIP через `--include-file sample-diagnostic-report.zip`. Проверка HTTPS
-ещё не выполнена; остальные вспомогательные отчёты не объявляются
-отдельно скачанными.
+## Исходники и проверенные ссылки
+
+Точный ZIP — **32 024 118 байт**, 1494 записи / **1341 файл**, меньше
+32 МиБ. Исходный коммит `47903dae5b1688bac688a2568424ce3779489549`. SHA256:
+`343bcfab4802dd2666825f382b89164838e30f20ccdfab42db1816d43398a3a3`.
+Свежий импорт и обычный изолированный запуск — **10/0**; настоящий
+Main с новой диагностикой из точного ZIP — **195/0**. Все 1341 исходный
+файл сохранили SHA; ZIP также совпал со всеми 424 замороженными
+runtime-входами. Повторы переносимости не прибавлены к 26 группам.
+[Свежий импорт и запуск](../validation/spherical-source-portability-2026-11-08/verification.json),
+[настоящий Main из ZIP](../validation/spherical-source-portability-2026-11-08/spherical-main-feature.json).
+
+[Скачать APK 0.20.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/StarFrontier-0.20.0-spherical-contact-arm64.apk) · [Исходники 0.20.0 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/StarFrontier-0.20.0-spherical-contact-source.zip)
+
+[Меркурий: контрольный вид](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/screenshots/03-existing-mercury-flight-readonly-probe.png) · [Прежний взлёт](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/screenshots/06-unchanged-source-takeoff.png) · [Страница отчёта](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/screenshots/08-actual-diagnostic-zip-ready.png)
+
+[Настоящий пример диагностического ZIP без сохранения](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/sample-diagnostic-report.zip)
+
+Полным скачиванием проверены **13 файлов**: манифест, APK, source ZIP,
+протокол захвата, восемь PNG и настоящий диагностический ZIP через
+`--include-file sample-diagnostic-report.zip`. HTTP 200, размеры, SHA,
+CRC трёх архивов, число записей и Git-комментарий source ZIP совпали.
+Остальные вспомогательные журналы и отчёты проверены по локальному
+манифесту; каждый из них отдельно не скачивался. Документы внутри ZIP
+сохраняют PREPUB-состояние исходного коммита.
+[Проверка скачивания](../validation/spherical-publication-2026-11-13/verification.json).
+
+Публикация завершена **13 ноября 2026 года**. Протоколы разработки и
+переносимости относятся к исходным запускам 8 ноября по московскому
+времени; они не выдаются за повторный прогон всех условий в день публикации.
+
+Артефакты закреплены коммитом `6e23511f96bfb8173f0390b21ebe5c19b79fb8cb`.
+Техническая публикация TEST-сборки не означает магазинный релиз или
+проверку на физическом телефоне.
 
 ## Оставшаяся работа
 

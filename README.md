@@ -3,7 +3,7 @@
 Ветка `development/starfrontier-rebuild` содержит **новую запускаемую основу** нативного Android-проекта на Godot 4.6.3. Она собрана из частично восстановленных исторических модулей, повторно извлечённых исходных данных FFE и заново написанного недостающего кода. Полный прежний проект и APK версии 0.10.8 не найдены.
 
 
-Текущий кандидат — **0.20.0-spherical-contact-alpha1 / code 45**:
+Текущая опубликованная сборка — **0.20.0-spherical-contact-alpha1 / code 45**:
 [исходная сферическая проверка и диагностический просмотр](docs/RELEASE_0_20_0_RU.md).
 Полностью перенесена DOS F577 и отдельно проверена ограниченная цепочка
 F575 → F577 → прежний ответ F575 для игрока и простого выбранного родителя.
@@ -26,7 +26,35 @@ F575 → F577 → прежний ответ F575 для игрока и прос
 0 ошибок**, desktop GLES/Mesa с подготовленными позициями наблюдателя.
 Настоящий ARM64 APK технически проверен: **50 150 546 байт**, SHA256
 `db2c38100cb1d7c9a779e18a271f43fab664d30e29217e0dc433f6e20a8de7b7`.
-Точный ZIP и HTTPS-публикация пока не подготовлены. Ниже сохранена
+Точный ZIP — **32 024 118 байт**, 1494 записи / **1341 файл**, меньше
+32 МиБ. Исходный коммит `47903dae5b1688bac688a2568424ce3779489549`. SHA256:
+`343bcfab4802dd2666825f382b89164838e30f20ccdfab42db1816d43398a3a3`.
+Свежий импорт и обычный изолированный запуск — **10/0**; настоящий
+Main с новой диагностикой из точного ZIP — **195/0**. Все 1341 исходный
+файл сохранили SHA; ZIP также совпал со всеми 424 замороженными
+runtime-входами. Повторы переносимости не прибавлены к 26 группам.
+
+[Скачать APK 0.20.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/StarFrontier-0.20.0-spherical-contact-arm64.apk) · [Исходники 0.20.0 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/StarFrontier-0.20.0-spherical-contact-source.zip)
+
+[Меркурий: контрольный вид](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/screenshots/03-existing-mercury-flight-readonly-probe.png) · [Прежний взлёт](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/screenshots/06-unchanged-source-takeoff.png) · [Страница отчёта](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/screenshots/08-actual-diagnostic-zip-ready.png)
+
+[Настоящий пример диагностического ZIP без сохранения](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/sample-diagnostic-report.zip)
+
+Полным скачиванием проверены **13 файлов**: манифест, APK, source ZIP,
+протокол захвата, восемь PNG и настоящий диагностический ZIP через
+`--include-file sample-diagnostic-report.zip`. HTTP 200, размеры, SHA,
+CRC трёх архивов, число записей и Git-комментарий source ZIP совпали.
+Остальные вспомогательные журналы и отчёты проверены по локальному
+манифесту; каждый из них отдельно не скачивался. Документы внутри ZIP
+сохраняют PREPUB-состояние исходного коммита.
+[Проверка скачивания](validation/spherical-publication-2026-11-13/verification.json).
+
+Публикация завершена **13 ноября 2026 года**. Протоколы разработки и
+переносимости относятся к исходным запускам 8 ноября по московскому
+времени; они не выдаются за повторный прогон всех условий в день публикации.
+
+Следующий приоритет — иерархическая ветвь F576, F569/F570 и банки/кадры
+объектов, оставшийся ответ F578 и ручная стыковка. Ниже сохранена
 проверенная публикация 0.19.0.
 
 Предыдущая опубликованная сборка — **0.19.0-surface-contact-alpha1 / code 44**:

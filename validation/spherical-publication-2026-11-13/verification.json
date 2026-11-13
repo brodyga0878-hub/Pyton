@@ -1,0 +1,113 @@
+{
+  "started_utc": "2026-11-13T11:33:02.255055+00:00",
+  "version": "0.20.0-spherical-contact-alpha1",
+  "artifact_commit": "6e23511f96bfb8173f0390b21ebe5c19b79fb8cb",
+  "source_commit": "47903dae5b1688bac688a2568424ce3779489549",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/manifest.json",
+      "http_status": 200,
+      "bytes": 36630,
+      "sha256": "0255f4d7018865e7a7fa94cc5b22c274f1518e18c2037ee0e8c9a6fe62713101"
+    },
+    {
+      "file": "StarFrontier-0.20.0-spherical-contact-arm64.apk",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/StarFrontier-0.20.0-spherical-contact-arm64.apk",
+      "http_status": 200,
+      "bytes": 50150546,
+      "sha256": "db2c38100cb1d7c9a779e18a271f43fab664d30e29217e0dc433f6e20a8de7b7",
+      "zip_crc_verified": true
+    },
+    {
+      "file": "StarFrontier-0.20.0-spherical-contact-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/StarFrontier-0.20.0-spherical-contact-source.zip",
+      "http_status": 200,
+      "bytes": 32024118,
+      "sha256": "343bcfab4802dd2666825f382b89164838e30f20ccdfab42db1816d43398a3a3",
+      "zip_crc_verified": true,
+      "source_commit_in_zip_comment": "47903dae5b1688bac688a2568424ce3779489549"
+    },
+    {
+      "file": "screenshots/capture-manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/screenshots/capture-manifest.json",
+      "http_status": 200,
+      "bytes": 36596,
+      "sha256": "91bef0b0e7da6ac0947ea5e980d021991a04ce93cc708fae42e9bd686201ff0f"
+    },
+    {
+      "file": "screenshots/01-existing-earth-flight-readonly-probe.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/screenshots/01-existing-earth-flight-readonly-probe.png",
+      "http_status": 200,
+      "bytes": 331747,
+      "sha256": "1d9b609e7b0ec02ba986a4144bd3802b7b99902825bfe6ffc03ad7b93301957f"
+    },
+    {
+      "file": "screenshots/02-existing-system-map-readonly-probe.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/screenshots/02-existing-system-map-readonly-probe.png",
+      "http_status": 200,
+      "bytes": 75791,
+      "sha256": "c44dee8f218ef2242605c596e5061ada58367decc07207aece8ae8d564d96356"
+    },
+    {
+      "file": "screenshots/03-existing-mercury-flight-readonly-probe.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/screenshots/03-existing-mercury-flight-readonly-probe.png",
+      "http_status": 200,
+      "bytes": 376760,
+      "sha256": "26eb25132e8ed92afee60995e9829dbc984211ca2bc43ffdf1a5f405cd19d9e4"
+    },
+    {
+      "file": "screenshots/04-existing-source-surface-observer.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/screenshots/04-existing-source-surface-observer.png",
+      "http_status": 200,
+      "bytes": 342421,
+      "sha256": "bdfeea0fa934b80597ff5a20bf6016563e1453c94591f900db923009e1b95898"
+    },
+    {
+      "file": "screenshots/05-unchanged-healthy-source-landing.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/screenshots/05-unchanged-healthy-source-landing.png",
+      "http_status": 200,
+      "bytes": 365407,
+      "sha256": "1f5fb51ccd98ea9a66bcf0c94f6f6bba76531a9ddfca208ef4a717ec384594ee"
+    },
+    {
+      "file": "screenshots/06-unchanged-source-takeoff.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/screenshots/06-unchanged-source-takeoff.png",
+      "http_status": 200,
+      "bytes": 459834,
+      "sha256": "b02770f78dd7ea42383dab7f43ac61040ce05bb5b0068dd8c71f1916ee821796"
+    },
+    {
+      "file": "screenshots/07-existing-docked-onboard-status.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/screenshots/07-existing-docked-onboard-status.png",
+      "http_status": 200,
+      "bytes": 123508,
+      "sha256": "ab3152fa63dda291b7a497a80e00f9b503799d7304242980f61be2cbf3fe0cc9"
+    },
+    {
+      "file": "screenshots/08-actual-diagnostic-zip-ready.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/screenshots/08-actual-diagnostic-zip-ready.png",
+      "http_status": 200,
+      "bytes": 88818,
+      "sha256": "10271ac670d18f2c977a9642ab0d9d75fd62ee2af22e0411f99f1807cd6a1d5f"
+    },
+    {
+      "file": "sample-diagnostic-report.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/sample-diagnostic-report.zip",
+      "http_status": 200,
+      "bytes": 8203,
+      "sha256": "a235425c52883a8f72be7e961c258d8666c82b5a6f3a5d34ee571b19464d7233",
+      "zip_crc_verified": true
+    }
+  ],
+  "status": "verified",
+  "requested_extra_files": [
+    "sample-diagnostic-report.zip"
+  ],
+  "scope": "Actual complete HTTPS downloads; immutable manifest bytes, payload SHA256/length, ZIP CRC, source archive Git comment and screenshot hashes. Not physical Android execution.",
+  "completed_utc": "2026-11-13T11:33:35.567799+00:00",
+  "all_manifest_payloads_downloaded": false,
+  "manifest_payload_count": 69,
+  "all_local_manifest_payload_hashes_verified": true,
+  "downloaded_file_scope": "Manifest, complete APK and source ZIP, capture manifest,8 PNG and actual no-save diagnostic-report ZIP. Auxiliary logs/reports are locally hashed, not individually downloaded."
+}

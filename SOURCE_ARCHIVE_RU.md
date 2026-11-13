@@ -11,7 +11,7 @@ ZIP содержит текущий проект Godot, все рабочие и
 скрипты, сцены, тесты, инструменты сборки и генераторы текстур, документацию
 и исторически восстановленные исходные фрагменты.
 
-Текущий кандидат — **0.20.0-spherical-contact-alpha1 / code 45**.
+Текущая опубликованная сборка — **0.20.0-spherical-contact-alpha1 / code 45**.
 Добавлены `source_spherical_contact.gd`, чистая ограниченная композиция
 `source_spherical_contact_pipeline.gd`, диагностическая проба и
 `data/ffe_spherical_contact.json`. Ресурс содержит байтовые доказательства
@@ -39,8 +39,34 @@ desktop GLES/Mesa с подготовленными позициями набл�
 Зафиксированы 424 runtime-файла; 11 исходных отметок захвата совпали.
 Из 417 прежних runtime-входов 414 сохранены побайтно; изменены только
 Main с диагностикой, BuildInfo и preset версии. Настоящий ZIP-отчёт
-содержит новую пробу и исключает сохранение игрока. Точный ZIP исходников
-и HTTPS пока не подготовлены.
+содержит новую пробу и исключает сохранение игрока.
+
+Точный ZIP — **32 024 118 байт**, 1494 записи / **1341 файл**, меньше
+32 МиБ. Исходный коммит `47903dae5b1688bac688a2568424ce3779489549`. SHA256:
+`343bcfab4802dd2666825f382b89164838e30f20ccdfab42db1816d43398a3a3`.
+Свежий импорт и обычный изолированный запуск — **10/0**; настоящий
+Main с новой диагностикой из точного ZIP — **195/0**. Все 1341 исходный
+файл сохранили SHA; ZIP также совпал со всеми 424 замороженными
+runtime-входами. Повторы переносимости не прибавлены к 26 группам.
+[Свежий импорт и запуск](validation/spherical-source-portability-2026-11-08/verification.json),
+[настоящий Main из ZIP](validation/spherical-source-portability-2026-11-08/spherical-main-feature.json).
+
+[Скачать APK 0.20.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/StarFrontier-0.20.0-spherical-contact-arm64.apk) · [Исходники 0.20.0 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/StarFrontier-0.20.0-spherical-contact-source.zip)
+
+[Настоящий пример диагностического ZIP без сохранения](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/6e23511f96bfb8173f0390b21ebe5c19b79fb8cb/deliverables/0.20.0-spherical-contact-alpha1/sample-diagnostic-report.zip)
+
+Полным скачиванием проверены **13 файлов**: манифест, APK, source ZIP,
+протокол захвата, восемь PNG и настоящий диагностический ZIP через
+`--include-file sample-diagnostic-report.zip`. HTTP 200, размеры, SHA,
+CRC трёх архивов, число записей и Git-комментарий source ZIP совпали.
+Остальные вспомогательные журналы и отчёты проверены по локальному
+манифесту; каждый из них отдельно не скачивался. Документы внутри ZIP
+сохраняют PREPUB-состояние исходного коммита.
+[Проверка скачивания](validation/spherical-publication-2026-11-13/verification.json).
+
+Публикация завершена **13 ноября 2026 года**. Протоколы разработки и
+переносимости относятся к исходным запускам 8 ноября по московскому
+времени; они не выдаются за повторный прогон всех условий в день публикации.
 [Состав и границы блока](docs/RELEASE_0_20_0_RU.md).
 
 Предыдущая опубликованная сборка — **0.19.0-surface-contact-alpha1 / code 44**.
