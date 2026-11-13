@@ -4,7 +4,7 @@
 
 
 <!-- ALIGNMENT_CURRENT_BEGIN -->
-Готовится **0.22.0-contact-alignment-alpha1 / code 47**:
+Текущая опубликованная TEST-сборка — **0.22.0-contact-alignment-alpha1 / code 47**:
 [поле контакта и проверка поверхности](docs/RELEASE_0_22_0_RU.md).
 Продолжены три связанных участка: измерение расхождений, ограниченный
 signed-root field F581 и чистый мост с проверкой текущей видимой точки.
@@ -42,8 +42,29 @@ desktop-кадров Main — **103 условия захвата / 0 ошибо
 Настоящий ARM64 TEST APK47 технически проверен: **50 229 793 байта**,
 SHA256 `edb36a59ab8117b9f42b01723a1de9adc184e7d41595300bb6347d249ea5c845`,
 min SDK 24 / target SDK 36, ZIP/ELF-выравнивание 16 КиБ.
-PREPUB: точный source ZIP, его fresh import/Main и HTTPS-ссылки
-дополняются после фактических проверок этих артефактов.
+Точный ZIP — **32 904 922 байта**, **1569 записей / 1411 файлов**,
+меньше 32 МиБ. Исходный коммит `a61d64c348a88986206a5a0804cae8a01e7c93ca`.
+SHA256: `f8cf2ff60f9fe9ae7a58e0956aedef90aaefedc6dfcb6774e988ad5e1af5c984`.
+Свежий импорт/обычный изолированный запуск — **10/0**, настоящий Main
+из ZIP — **82/0**. Включённый native-генератор воспроизвёл набор
+459 случаев побайтно. После всех трёх проверок **1411 файлов неизменны**,
+а все **439 runtime-входов** совпадают с freeze. Повторы переносимости
+не прибавлены к 39 функциональным группам.
+
+[Скачать APK 0.22.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/StarFrontier-0.22.0-contact-alignment-arm64.apk) · [Исходники 0.22.0 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/StarFrontier-0.22.0-contact-alignment-source.zip)
+
+[Проверка высоты v4](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/screenshots/02-actual-v4-height-comparison.png) · [Явный просмотр v5](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/screenshots/06-explicit-v5-bounded-surface-preview.png) · [Настоящий диагностический ZIP без сохранения](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/sample-diagnostic-report.zip)
+
+Полным HTTPS-скачиванием проверены **13 файлов**: манифест, APK,
+source ZIP, протокол захвата, восемь PNG и диагностический ZIP.
+HTTP 200, размеры, SHA, CRC трёх архивов и Git-комментарий ZIP совпали.
+Локально проверены все **55 payload-записей** манифеста; остальные
+**43 вспомогательных файла отдельно через HTTP не скачивались**.
+[Проверка публикации](validation/alignment-publication-2026-11-13/verification.json).
+Публикация завершена **13 ноября 2026 года**; artifact-коммит
+`9d9ad1983c7bd96bcb267e5d0655b3672e37969f`. Документы внутри source ZIP
+сохраняют PREPUB-состояние исходного коммита.
+
 S23 Ultra / Android 17 не испытан; полнота клона и магазинный релиз
 не заявляются.
 <!-- ALIGNMENT_CURRENT_END -->

@@ -12,8 +12,8 @@ ZIP содержит текущий проект Godot, все рабочие и
 и исторически восстановленные исходные фрагменты.
 
 <!-- ALIGNMENT_CURRENT_BEGIN -->
-Подготавливаемая версия исходников — **0.22.0-contact-alignment-alpha1 /
-code 47**. В неё добавляются signed-root field
+Текущая опубликованная версия исходников — **0.22.0-contact-alignment-alpha1 /
+code 47**. В неё добавлены signed-root field
 `source_terrain_contact_field.gd`, явная поверхность
 `source_contact_surface_terrain.gd`, чистый
 `source_natural_surface_bridge.gd` и read-only
@@ -50,7 +50,7 @@ APK47 проверен: **50 229 793 байта**, SHA256
 `edb36a59ab8117b9f42b01723a1de9adc184e7d41595300bb6347d249ea5c845`,
 ARM64 TEST, min SDK 24 / target SDK 36, ZIP/ELF-выравнивание 16 КиБ.
 
-План source ZIP 0.22 дополнительно допускает только воспроизводимые
+Точный source ZIP 0.22 дополнительно включает воспроизводимые
 исходные native-контроли: каталоги
 `validation/alignment-2026-11-13/native-root-proof/` и
 `validation/alignment-2026-11-13/native-altitude-proof/`, а из
@@ -60,10 +60,35 @@ ARM64 TEST, min SDK 24 / target SDK 36, ZIP/ELF-выравнивание 16 Ки
 assembly/proof. Полные матрицы, GPU-кадры и журналы не включаются этим
 исключением. Прежние три источника не переписываются.
 
-PREPUB: точный ZIP, fresh import/Main из него и HTTP-публикация ещё
-проверяются. Размер/SHA и удалённые ссылки ZIP новой версии пока
-не заявляются; фактический предел **меньше 32 МиБ** проверяется перед
-публикацией. [Состав 0.22](docs/RELEASE_0_22_0_RU.md).
+Точный ZIP — **32 904 922 байта**, **1569 записей / 1411 файлов**,
+меньше 32 МиБ. Исходный коммит `a61d64c348a88986206a5a0804cae8a01e7c93ca`.
+SHA256:
+`f8cf2ff60f9fe9ae7a58e0956aedef90aaefedc6dfcb6774e988ad5e1af5c984`.
+Свежий импорт/обычный изолированный запуск — **10/0**, настоящий Main
+из ZIP — **82/0**. Включённый native-генератор повторил 459 случаев
+и воспроизвёл fixture побайтно, SHA256
+`6cb84a1f6dff615a504c9cac7935f339291831b62a658971110a03c1cb7b6db6`.
+Все 1411 исходных файлов после трёх проверок сохранили SHA;
+все 439 runtime-входов совпали с freeze. Эти повторы не прибавлены
+к функциональным группам и новым native-cases.
+[Импорт/запуск](validation/alignment-source-portability-2026-11-13/verification.json),
+[Main из ZIP](validation/alignment-source-portability-2026-11-13/alignment-main-feature.json),
+[воспроизводимость native](validation/alignment-source-portability-2026-11-13/source-native-reproduction.json).
+
+[Скачать APK 0.22.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/StarFrontier-0.22.0-contact-alignment-arm64.apk) · [Исходники 0.22.0 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/StarFrontier-0.22.0-contact-alignment-source.zip)
+
+[Настоящий диагностический ZIP без сохранения](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/sample-diagnostic-report.zip)
+
+Полным HTTPS-скачиванием проверены **13 файлов**: манифест, APK,
+source ZIP, протокол захвата, восемь PNG и диагностический ZIP.
+HTTP 200, размеры, SHA, CRC трёх архивов, число записей и Git-комментарий
+ZIP совпали. Все **55 payload-записей** проверены локально; остальные
+**43 вспомогательных файла отдельно через HTTP не скачивались**.
+[Публикация](validation/alignment-publication-2026-11-13/verification.json).
+Публикация завершена **13 ноября 2026 года**, artifact-коммит
+`9d9ad1983c7bd96bcb267e5d0655b3672e37969f`. Документы внутри ZIP
+сохраняют PREPUB-состояние исходного коммита.
+[Состав 0.22](docs/RELEASE_0_22_0_RU.md).
 <!-- ALIGNMENT_CURRENT_END -->
 
 <!-- NATURAL_CURRENT_BEGIN -->

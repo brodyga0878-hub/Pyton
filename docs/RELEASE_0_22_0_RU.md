@@ -1,13 +1,14 @@
 # Поле контакта и проверка поверхности — 0.22.0
 
-Готовится TEST-кандидат **0.22.0-contact-alignment-alpha1 / Android
+Опубликована TEST-сборка **0.22.0-contact-alignment-alpha1 / Android
 code 47** после [публикации 0.21](RELEASE_0_21_0_RU.md).
 Три последовательных участка продолжают её геометрический анализ:
 измерение существующих высот, новый signed-root field и ограниченный
 чистый мост с проверкой текущей точки. Функциональные проверки,
-настоящие кадры Main и строгая проверка APK47 завершены. Это
-PREPUB-состояние: точный source ZIP и HTTPS-публикация проверяются
-после фиксации исходного коммита.
+настоящие кадры Main и строгая проверка APK47 завершены. Точный
+source ZIP прошёл свежий импорт, настоящий Main и воспроизведение
+включённого native-набора; неизменяемые HTTPS-ссылки проверены полным
+скачиванием.
 
 ## Измеренное расхождение
 
@@ -113,11 +114,44 @@ TEST-подпись, min SDK 24 / target SDK 36, ZIP/ELF-выравнивани�
 `edb36a59ab8117b9f42b01723a1de9adc184e7d41595300bb6347d249ea5c845`.
 [APK](../validation/alignment-2026-11-13/android-verification.json).
 
-PREPUB: размер/SHA ZIP, исходный и artifact коммиты, fresh import/actual
-Main из точного ZIP и неизменяемые HTTPS-ссылки добавляются по фактическим
-протоколам после создания артефактов. В архив планируются узкие исключения
-с воспроизводимыми native proof sources; фактический размер ниже 32 МиБ
-проверяется перед публикацией и пока не заявляется.
+Точный ZIP — **32 904 922 байта**, **1569 записей / 1411 файлов**,
+меньше 32 МиБ. Исходный коммит `a61d64c348a88986206a5a0804cae8a01e7c93ca`.
+SHA256:
+`f8cf2ff60f9fe9ae7a58e0956aedef90aaefedc6dfcb6774e988ad5e1af5c984`.
+Свежий импорт/обычный изолированный запуск — **10/0**, настоящий Main
+из точного ZIP — **82/0**. Включённый native-генератор воспроизвёл
+fixture 459 случаев побайтно, SHA256
+`6cb84a1f6dff615a504c9cac7935f339291831b62a658971110a03c1cb7b6db6`.
+После всех трёх проверок **1411 исходных файлов сохранили SHA**;
+ZIP совпал со всеми **439 замороженными runtime-входами**. Повторы
+переносимости и native-воспроизведение не прибавлены к 39 группам
+либо числу новых независимых контролей.
+[Импорт/запуск](../validation/alignment-source-portability-2026-11-13/verification.json),
+[Main из ZIP](../validation/alignment-source-portability-2026-11-13/alignment-main-feature.json),
+[native из ZIP](../validation/alignment-source-portability-2026-11-13/source-native-reproduction.json).
+
+В ZIP фактически включены два новых каталога native-proof sources
+и три неизменённых предшествующих assembly/proof-файла. Полные матрицы,
+GPU-кадры и журналы этим исключением не включаются.
+[Точный состав](../SOURCE_ARCHIVE_RU.md).
+
+[Скачать APK 0.22.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/StarFrontier-0.22.0-contact-alignment-arm64.apk) · [Исходники 0.22.0 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/StarFrontier-0.22.0-contact-alignment-source.zip)
+
+[Проверка высоты v4](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/screenshots/02-actual-v4-height-comparison.png) · [Явный просмотр v5](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/screenshots/06-explicit-v5-bounded-surface-preview.png) · [Страница отчёта](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/screenshots/08-actual-comparison-diagnostic-zip-ready.png)
+
+[Настоящий диагностический ZIP без сохранения](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/sample-diagnostic-report.zip)
+
+Полным HTTPS-скачиванием проверены **13 файлов**: манифест, APK,
+source ZIP, протокол захвата, восемь PNG и диагностический ZIP через
+`--include-file sample-diagnostic-report.zip`. HTTP 200, размеры, SHA,
+CRC трёх архивов, число записей и Git-комментарий source ZIP совпали.
+Все **55 payload-записей** манифеста проверены локально; остальные
+**43 вспомогательных файла отдельно через HTTP не скачивались**.
+[Проверка публикации](../validation/alignment-publication-2026-11-13/verification.json).
+Публикация завершена **13 ноября 2026 года**, artifact-коммит
+`9d9ad1983c7bd96bcb267e5d0655b3672e37969f`. Документы внутри source ZIP
+сохраняют PREPUB-состояние исходного коммита; эта страница дополнена
+после проверки публикации.
 
 Производственный ключ владельца не настроен. **Физический Samsung
 S23 Ultra 12/512 / Android 17 / One UI 9 ещё не проверен**.

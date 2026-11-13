@@ -1,0 +1,121 @@
+{
+  "started_utc": "2026-11-13T14:21:12.436473+00:00",
+  "version": "0.22.0-contact-alignment-alpha1",
+  "artifact_commit": "9d9ad1983c7bd96bcb267e5d0655b3672e37969f",
+  "source_commit": "a61d64c348a88986206a5a0804cae8a01e7c93ca",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/manifest.json",
+      "http_status": 200,
+      "bytes": 57017,
+      "sha256": "0a00ae5f86b4ad65f756eb96ed2059faba3033e994e01671e9615a9c5285718e"
+    },
+    {
+      "file": "StarFrontier-0.22.0-contact-alignment-arm64.apk",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/StarFrontier-0.22.0-contact-alignment-arm64.apk",
+      "http_status": 200,
+      "bytes": 50229793,
+      "sha256": "edb36a59ab8117b9f42b01723a1de9adc184e7d41595300bb6347d249ea5c845",
+      "zip_crc_verified": true
+    },
+    {
+      "file": "StarFrontier-0.22.0-contact-alignment-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/StarFrontier-0.22.0-contact-alignment-source.zip",
+      "http_status": 200,
+      "bytes": 32904922,
+      "sha256": "f8cf2ff60f9fe9ae7a58e0956aedef90aaefedc6dfcb6774e988ad5e1af5c984",
+      "zip_crc_verified": true,
+      "source_commit_in_zip_comment": "a61d64c348a88986206a5a0804cae8a01e7c93ca"
+    },
+    {
+      "file": "screenshots/capture-manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/screenshots/capture-manifest.json",
+      "http_status": 200,
+      "bytes": 55976,
+      "sha256": "cb2a06819dedb397c6ba33f73daa5dbd8f11a44bc70b867a242241a0df8b6358"
+    },
+    {
+      "file": "screenshots/01-existing-v4-source-surface.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/screenshots/01-existing-v4-source-surface.png",
+      "http_status": 200,
+      "bytes": 342421,
+      "sha256": "bdfeea0fa934b80597ff5a20bf6016563e1453c94591f900db923009e1b95898"
+    },
+    {
+      "file": "screenshots/02-actual-v4-height-comparison.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/screenshots/02-actual-v4-height-comparison.png",
+      "http_status": 200,
+      "bytes": 154154,
+      "sha256": "fd30950cc53db4462d9439c89cd3395d4037bd11c69330d356d3a18f6ed17b1b"
+    },
+    {
+      "file": "screenshots/03-paused-commander-surface-action.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/screenshots/03-paused-commander-surface-action.png",
+      "http_status": 200,
+      "bytes": 149505,
+      "sha256": "f9d4085540419879d8c81d6a1fc8360e1a32d14bfd1b6878b9ac8932b8aa6133"
+    },
+    {
+      "file": "screenshots/04-existing-graphics-preview.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/screenshots/04-existing-graphics-preview.png",
+      "http_status": 200,
+      "bytes": 332902,
+      "sha256": "ce28816979da4ac90204932d5c678885c83818ecc16a67ac6d4ce11dc6f5d1ad"
+    },
+    {
+      "file": "screenshots/05-returned-original-surface-and-gear.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/screenshots/05-returned-original-surface-and-gear.png",
+      "http_status": 200,
+      "bytes": 343522,
+      "sha256": "d3f4d162343ed615e51adc6bd0fedbd8f3d2168de478bbbf963ffd77ce5d15f6"
+    },
+    {
+      "file": "screenshots/06-explicit-v5-bounded-surface-preview.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/screenshots/06-explicit-v5-bounded-surface-preview.png",
+      "http_status": 200,
+      "bytes": 351351,
+      "sha256": "bd343b72a02d2b9eea9e81434095a40d043f77ab0a2a8c17dd198f61426b486c"
+    },
+    {
+      "file": "screenshots/07-actual-v5-height-comparison.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/screenshots/07-actual-v5-height-comparison.png",
+      "http_status": 200,
+      "bytes": 154637,
+      "sha256": "d099e37c5cc0adf6995149453973da744f73993cdf8bccac5954b548ec675155"
+    },
+    {
+      "file": "screenshots/08-actual-comparison-diagnostic-zip-ready.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/screenshots/08-actual-comparison-diagnostic-zip-ready.png",
+      "http_status": 200,
+      "bytes": 169351,
+      "sha256": "b56661a83b84267a9b9fce3d3d221f5553eab1d938197a406378788b4b3aac85"
+    },
+    {
+      "file": "sample-diagnostic-report.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/9d9ad1983c7bd96bcb267e5d0655b3672e37969f/deliverables/0.22.0-contact-alignment-alpha1/sample-diagnostic-report.zip",
+      "http_status": 200,
+      "bytes": 11624,
+      "sha256": "3863ed0a6bad675b747a3e8a6490dca7ec6dbf4b9dfb8c6db2021f919fd7b1e6",
+      "zip_crc_verified": true
+    }
+  ],
+  "status": "verified",
+  "requested_extra_files": [
+    "sample-diagnostic-report.zip"
+  ],
+  "scope": "Actual complete HTTPS downloads; immutable manifest bytes, payload SHA256/length, ZIP CRC, source archive Git comment and screenshot hashes. Not physical Android execution.",
+  "completed_utc": "2026-11-13T14:21:39.952552+00:00",
+  "download_count": 13,
+  "full_HTTPS_downloads_verified": true,
+  "local_manifest_payload_count": 55,
+  "all_local_manifest_payload_hashes_verified": true,
+  "manifest_sha256": "0a00ae5f86b4ad65f756eb96ed2059faba3033e994e01671e9615a9c5285718e",
+  "all_manifest_payloads_downloaded": false,
+  "other_auxiliary_payloads_verified_locally_only": true,
+  "downloaded_manifest_payload_count": 12,
+  "local_payload_verification_utc": "2026-11-13T14:22:21.696918+00:00",
+  "physical_device_tested": false,
+  "full_original_port_complete": false,
+  "production_release_ready": false
+}
