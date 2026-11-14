@@ -44,6 +44,11 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_contact_query_frame', 'tests/test_source_terrain_query_frame.gd', 'Original F581 U/O/D/C/A and actual quantized observer origin versus native frame/caller witnesses; no linear inverse or full parent conversion claim.', timeout=600),
+    Suite('source_native_contact_geometry', 'tests/test_source_native_contact_geometry.gd', 'Fresh native leaf/intersection identity, explicit parent chart and outward Q31/IEEE projection bounds; no float-height equivalence or live terrain switch.', timeout=600),
+    Suite('source_contact_geometry_probe', 'tests/test_source_contact_geometry_probe.gd', 'Actual ordered actor snapshot, strict frame/leaf projection packets, native pole rejection and complete JSON transport with preserved live state.', timeout=600),
+    Suite('native_contact_geometry_view', 'tests/test_native_contact_geometry_view.gd', 'Independent copied-packet World3D preview, fit/rotation/pinch, responsive controls and unavailable-state lifecycle; UI fixtures do not prove native math.', timeout=300),
+    Suite('source_contact_geometry_main', 'tests/test_source_contact_geometry_main.gd', 'Actual Russian geometry action, native packets in isolated viewer, source/phone state and old save preservation, complete ZIP and three compact observation references.', timeout=600, user_args=('--rebuild-capture',)),
     Suite('source_terrain_query_trace', 'tests/test_source_terrain_query_trace.gd', 'Observational original winning-triangle trace; unchanged integer query/classifier results and immutable input buffers against original native fixtures.', timeout=600),
     Suite('source_natural_footprint', 'tests/test_source_natural_footprint_probe.gd', 'Ordered original full-ship volumes, scalar64 published-geometry observations, isolated history and bounded readonly response preview; no live geometry identity claim.', timeout=600),
     Suite('source_natural_footprint_main', 'tests/test_source_natural_footprint_main.gd', 'Actual Russian full-ship check, paused/state/cache isolation, ephemeral save/preview lifetime and complete diagnostic ZIP with bounded log references.', timeout=600, user_args=('--rebuild-capture',)),

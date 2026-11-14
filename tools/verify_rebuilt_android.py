@@ -2363,6 +2363,152 @@ def verify_contact_footprint_runtime(archive,project):
     return {'baseline_source_commit':CONTACT_FOOTPRINT_BASELINE_SOURCE_COMMIT,'baseline_fixture_sha256':CONTACT_FOOTPRINT_BASELINE_FIXTURE_SHA256,'baseline_fixture_source_count':40,'compiled_modules':{name:compiled[name]for name in CONTACT_FOOTPRINT_MODULES},'compiled_module_count':2,'integration_compiled_modules':compiled,'integration_compiled_module_count':len(compiled),'audited_local_source_sha256':CONTACT_FOOTPRINT_AUDITED_SOURCE_SHA256,'preserved_Main_function_count':len(preserved),'preserved_Main_functions':preserved,'native_footprint_reference':native,'retained_code47_source_audit':audit,'unchanged_code47_runtime_source_count':39,'actual_runtime_is_unchanged_code47':False,'new_runtime_JSON_added':False,'explicit_user_command_only':True,'live_response_enabled':False,'fullmesh_geometry_certified':False,'default_physical_terrain_is_v4':True,'complete_original_physics':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
 
 
+
+# Code49 reuses immutable portable code47 history and just three exact code48
+# runtime source deltas. It never depends on Git or substitutes APK assets.
+CONTACT_FRAME_BASELINE_SOURCE_COMMIT='4dc8e42f864aad3515d2d9a4f1959d41645fffa2'
+CONTACT_FRAME_BASELINE_FIXTURE_SHA256='3c748bb7c1f0947f9d578156aeea41ccfe40975c6beb3a9fda3199daa94d9e65'
+CONTACT_FRAME_BASELINE_METADATA_SHA256={'scripts/build_info.gd':'b3b7ae469ea5e6d28eda570edafed9cb0bea7a1f607cb46adecc83cd782792e4','export_presets.cfg':'deb8895bd07ae2ceff8d994b1a16dcfe2a95dae50803d44aedbf4d41c0a8e3b3'}
+CONTACT_FRAME_NATIVE_REFERENCE_SHA256='8c0b9a7077fa305b6c27c3864fa63f7bb364fe654c9b2e8ec100e1577ff73bdb'
+CONTACT_FRAME_CALLER_PROOF_SHA256='ea6914aa30f8117a4608a6fd47c81f53cbb62dc926e064b04dbb3c6ad317b966'
+CONTACT_FRAME_MODULES=('source_terrain_query_frame','source_native_contact_geometry','source_contact_geometry_probe','native_contact_geometry_view')
+CONTACT_FRAME_AUDITED_SOURCE_SHA256={**CONTACT_FOOTPRINT_AUDITED_SOURCE_SHA256,
+    'scripts/main.gd':'7f85c68e8a8abd3321466160191a34955ef6155ce6f457bcf77900710f3ac3fd',
+    'scripts/source_terrain_query_frame.gd':'2b4be296798bf11755dc3b895a7e57fff013baad980bc1239369ddc59299b74e',
+    'scripts/source_native_contact_geometry.gd':'466eb3a88f1d1426321717d7ad24f73c6f697006473311646d9e79c101f6d0c7',
+    'scripts/source_contact_geometry_probe.gd':'e5eb15267a66781e99ef35235b10e5c116401a977907e9743d399ff1e8c6160a',
+    'scripts/native_contact_geometry_view.gd':'ba0d27f1de641bca1da779f2933c822d05791b34c7b5f94e7ce104a2d603816e'}
+CONTACT_FRAME_MAIN_ALLOWED_CHANGED_FUNCTIONS={
+    '_new_models','_commit_state','_show_menu','_flight_diagnostic_sample',
+    '_flight_log_sample','_begin_graphics_demo','_end_graphics_demo'}
+
+
+def _load_contact_frame_baseline(project):
+    """Expand a pinned portable delta, without any repository/history access."""
+    raw=(project/'tests/fixtures/contact_frame_v48_sources.json').read_bytes()
+    assert hashlib.sha256(raw).hexdigest()==CONTACT_FRAME_BASELINE_FIXTURE_SHA256,'Changed portable code48 contact-frame source delta'
+    data=json.loads(raw)
+    assert data.get('schema')==1 and data.get('revision')=='portable-code48-source-delta-v1' and data.get('source_commit')==CONTACT_FRAME_BASELINE_SOURCE_COMMIT and data.get('version_code')==48 and data.get('version')=='0.23.0-footprint-alpha1','Wrong portable code48 contact-frame baseline identity'
+    assert data.get('base_fixture')=={'path':'tests/fixtures/footprint_v47_sources.json','sha256':CONTACT_FOOTPRINT_BASELINE_FIXTURE_SHA256,'runtime_source_count':40,'evidence_source_count':1},'Wrong portable code48 contact-frame base link'
+    base=_load_contact_footprint_baseline(project)
+    overrides=data.get('source_overrides',{})
+    assert set(overrides)=={'scripts/main.gd','scripts/source_terrain_query_trace.gd','scripts/source_natural_footprint_probe.gd'},'Wrong portable code48 contact-frame runtime delta domain'
+    files={relative:dict(row)for relative,row in base['files'].items()}
+    for relative,row in overrides.items():
+        expected=CONTACT_FOOTPRINT_AUDITED_SOURCE_SHA256[relative]
+        assert row.get('sha256')==expected and hashlib.sha256(row.get('source','').encode()).hexdigest()==expected,'Changed portable code48 source delta '+relative
+        files[relative]=dict(row)
+    assert data.get('audited_runtime_source_sha256')==CONTACT_FOOTPRINT_AUDITED_SOURCE_SHA256 and data.get('expanded_runtime_source_count')==len(files)==42 and {relative:row['sha256']for relative,row in files.items()}==CONTACT_FOOTPRINT_AUDITED_SOURCE_SHA256,'Wrong expanded portable code48 source domain'
+    metadata=data.get('metadata_source_files',{})
+    assert set(metadata)==set(CONTACT_FRAME_BASELINE_METADATA_SHA256),'Wrong portable code48 metadata domain'
+    for relative,row in metadata.items():
+        digest=CONTACT_FRAME_BASELINE_METADATA_SHA256[relative]
+        assert row.get('sha256')==digest and hashlib.sha256(row.get('source','').encode()).hexdigest()==digest,'Changed portable code48 metadata '+relative
+    return {**data,'files':files,'evidence_source_files':base['evidence_source_files']}
+
+
+def _verify_contact_frame_preserved_functions(project,baseline):
+    old=baseline['files']['scripts/main.gd']['source'];current=(project/'scripts/main.gd').read_text()
+    names=re.findall(r'^(?:static\s+)?func\s+([A-Za-z0-9_]+)\(',old,re.M);preserved={}
+    for name in names:
+        if name in CONTACT_FRAME_MAIN_ALLOWED_CHANGED_FUNCTIONS:continue
+        previous=source_function(old,name).rstrip('\n');actual=source_function(current,name).rstrip('\n')
+        assert actual==previous,'Contact frame changed protected Main function '+name
+        preserved[name]=hashlib.sha256(actual.encode()).hexdigest()
+    assert all(name in preserved for name in ('_sync_scene','_tick','_payload','_decode_state','_apply_pending_source_contact','_source_contact_enabled')),'Contact-frame preserved-function domain lost physical, render or save functions'
+    return preserved
+
+
+
+def _verify_contact_frame_native_reference(project):
+    raw=(project/'tests/fixtures/source_contact_frame_native.json').read_bytes();data=json.loads(raw)
+    assert hashlib.sha256(raw).hexdigest()==CONTACT_FRAME_NATIVE_REFERENCE_SHA256,'Changed independent contact-frame native reference'
+    assert data.get('schema')==1 and data.get('revision')=='original-native-contact-frame-and-caller-v1' and data.get('source_sha256')==SOURCE_IMAGE_SHA256 and data.get('source_assembly_sha256')==SOURCE_ASSEMBLY_SHA256 and data.get('source_commit')==SOURCE_ASSEMBLY_COMMIT,'Wrong contact-frame native source provenance'
+    frames=data.get('frame_cases',[]);callers=data.get('caller_cases',[])
+    assert data.get('frame_case_count')==len(frames)==230 and data.get('caller_case_count')==len(callers)==12 and data.get('case_count')==242 and data.get('solid_model_count')==17,'Wrong contact-frame native case domains'
+    assert {row['parent_model']for row in frames}==set(range(117,134))|{146} and {row['player_model']for row in frames}=={15,24,38},'Contact-frame native witnesses must retain17solid models, separate146control and3actual player shapes'
+    assert data.get('fresh_process_runs_per_bank')==3 and data.get('frame_reverse_repeat_count')==230 and data.get('caller_reverse_repeat_count')==12 and data.get('python_expected_frame_or_subtraction_arithmetic') is False,'Incomplete original contact-frame execution checks'
+    provenance=data.get('original_provenance_sha256',{})
+    assert provenance.get('tests/fixtures/source_natural_contact_native.json')==NATURAL_CONTACT_NATIVE_REFERENCE_SHA256 and provenance.get('tests/fixtures/source_contact_field_native.json')==CONTACT_ALIGNMENT_FIELD_REFERENCE_SHA256 and provenance.get('tests/fixtures/source_footprint_native.json')==CONTACT_FOOTPRINT_NATIVE_REFERENCE_SHA256,'Contact-frame native reference changed its retained original proof dependencies'
+    observed=0;query_frames=0;nonodd_controls=0
+    for row in frames:
+        assert len(bytes.fromhex(row['player_object_hex']))==338 and len(bytes.fromhex(row['parent_object_hex']))==338 and len(bytes.fromhex(row['relative_before_hex']))==24,'Contact-frame raw input sizes changed'
+        for frame in row['expected']['frames']:
+            observed+=int(bool(frame.get('f581_observed')))
+            if not frame.get('query_frame_observed'):continue
+            query_frames+=1
+            assert all(len(frame.get(key,[]))==3 for key in ('source_origin_raw','center_difference_raw','working_difference_raw','observer_model_local_raw','C_raw','native_U_times_D_raw','native_U_transpose_C_raw','native_negative_D_raw','native_U_times_negative_D_raw','native_observer_forward_q_raw','native_center_minus_rotated_difference_raw')) and len(frame.get('U_q31',[]))==9 and len(frame.get('A_raw',[]))==9,'Incomplete captured original contact frame'
+            if frame['native_observer_forward_q_raw']!=frame['native_center_minus_rotated_difference_raw']:nonodd_controls+=1
+    assert nonodd_controls>0,'Native contact-frame fixture lost signed-Q31 nonodd observer-origin controls'
+    assert observed>230 and query_frames>230,'Contact-frame witness lost actual child/frame observations'
+    intercepted=0
+    for row in callers:
+        expected=row['expected'];entries=expected['entries']
+        assert expected['intercepted_f575_entry_count']==len(entries) and len(entries)<=2,'Bounded caller entry capture count changed'
+        for entry in entries:
+            assert len(bytes.fromhex(entry['relative_entry_hex']))==24,'F575 entry must retain actual signed64 vector words'
+        intercepted+=len(entries)
+    proof_raw=(project/'validation/contact-frame-2026-11-14/native-proof/caller-instruction-proofs.json').read_bytes()
+    assert hashlib.sha256(proof_raw).hexdigest()==CONTACT_FRAME_CALLER_PROOF_SHA256 and provenance.get('validation/contact-frame-2026-11-14/native-proof/caller-instruction-proofs.json')==CONTACT_FRAME_CALLER_PROOF_SHA256,'Changed original bounded F570 caller instruction proof'
+    proof=json.loads(proof_raw);procedures=proof.get('byte_instruction_proofs',{})
+    assert proof.get('source_sha256')==SOURCE_IMAGE_SHA256 and proof.get('source_assembly_sha256')==SOURCE_ASSEMBLY_SHA256 and set(procedures)=={'569','570','574','575','1532','1662','1335','1333','1531','1661','1677'} and proof.get('adapted_native_procedure_numbers')==[569,570,1335,1532,1662],'Wrong original caller static/adapted procedure domain'
+    assert all(row.get('all_instructions_equal') is True for row in procedures.values()) and sum(row['instruction_count']for row in procedures.values())==1076 and sum(row['byte_length']for row in procedures.values())==3263,'Incomplete original caller static instruction equivalence'
+    executed={str(number):procedures[str(number)]for number in proof['adapted_native_procedure_numbers']}
+    assert sum(row['instruction_count']for row in executed.values())==255 and sum(row['byte_length']for row in executed.values())==758,'Original bounded native caller instruction subset changed'
+    return {'sha256':CONTACT_FRAME_NATIVE_REFERENCE_SHA256,'case_count':242,'frame_case_count':230,'caller_case_count':12,'solid_model_count':17,'separate_natural_control_models':[146],'source_player_models':[15,24,38],'f581_observation_count':observed,'query_frame_observation_count':query_frames,'native_negative_D_transform_observed':True,'native_observer_query_origin_observed':True,'q31_nonodd_origin_difference_case_count':nonodd_controls,'f575_entry_observation_count':intercepted,'caller_instruction_proof_sha256':CONTACT_FRAME_CALLER_PROOF_SHA256,'caller_instruction_procedure_count':11,'caller_instruction_count':1076,'caller_instruction_bytes':3263,'caller_native_adapted_procedure_count':5,'caller_native_adapted_instruction_count':255,'caller_native_adapted_instruction_bytes':758,'caller_static_only_procedure_count':6,'fresh_process_runs_per_bank':3,'native_frame_and_entry_vectors_observed':True,'extra_native_matrix_calls_are_diagnostic_only':True,'source_F575_response_executed':False,'world_frame_conversion_executed':False,'complete_F570_world_scan_proved':False,'oracle_executed_by_apk_verifier':False,'floating_render_mesh_identity_proved':False}
+
+
+
+def _verify_contact_frame_readonly_scope(project):
+    main=(project/'scripts/main.gd').read_text();action=source_function(main,'_show_contact_geometry')
+    assert main.count('ContactGeometryProbe.sample(')==1 and 'ContactGeometryProbe.sample(' in action and 'isolated-diagnostic-initial-state' in action and '_record_event("source_contact_geometry"' in action,'Contact-frame observer must remain an explicit isolated user command'
+    assert 'ContactGeometryView.new()' in action and 'preview.configure(source_geometry_last)' in action,'Original leaf view is disconnected from the measured snapshot'
+    assert 'source_geometry_last.duplicate(true)' in source_function(main,'_flight_diagnostic_sample') and 'contact_geometry_sha256' in source_function(main,'_flight_log_sample'),'Contact-frame observer must retain the complete report and compact log binding'
+    assert all('source_geometry_last' not in source_function(main,name) for name in ('_sync_scene','_tick','_payload','_apply_pending_source_contact')),'Contact-frame observer must not enter gameplay geometry, physics, save or response'
+    probe=(project/'scripts/source_contact_geometry_probe.gd').read_text();base=source_function(probe,'_base');sample=source_function(probe,'sample')
+    assert all(token in base for token in ('"diagnostic_only":true','"response_applied":false','"live_response_enabled":false','"whole_mesh_certified":false','"ordinary_surface_replaced":false','"source_object_bank_present":false','"full_F569":false','"full_F570":false','"original_F575_dispatch_executed":false')),'Contact-frame observer changed its read-only scope'
+    assert 'classifier.classify_natural_player(operands.body,operands.parent,operands.relative,' in sample and 'ContactFrame.build(int(prepared.model),iteration.observer_model_local_raw,int(iteration.vector_scale_s32))' in sample and 'Geometry.build(source_frame,traces[query_index],phone)' in sample,'Contact geometry must use actual ordered source observers and observed leaf queries'
+    assert 'Footprint.sample(' not in probe and 'Pipeline' not in probe,'Contact geometry must not add candidate response execution'
+    frame=(project/'scripts/source_terrain_query_frame.gd').read_text();build=source_function(frame,'build')
+    assert 'Point.new().frame_raw(' in build and 'immutable.query_matrix_raw!=query_matrix' in build and 'immutable.query_center_raw!=center' in build and 'native_antiparallel_axis_frame' in build,'Source frame must preserve the immutable original frame and axis-degeneracy guard'
+    assert '_transform_witness(observer_delta,matrix)' in build and 'result["source_qorigin_delta_raw"]=actual_origin' in build and 'result["center_minus_rotated_difference_raw"]=origin_delta' in build,'Actual query origin must preserve signed-Q31 floors and distinguish C+T(-D) from C-T(D)'
+    assert '"linear_inverse_is_certificate":false' in frame and '"parent_frame_conversion_performed":false' in build,'A linear source-frame preview must not become an exact inverse or world-frame proof'
+    geometry=(project/'scripts/source_native_contact_geometry.gd').read_text();build=source_function(geometry,'build');verify=source_function(geometry,'verify')
+    assert 'tracer.query_raw(' in build and '_leaf_matches(trace_row.winning_triangle,leaf)' in build and 'original._intersection(vertices)' in build,'Leaf geometry must regenerate actual source query and replay immutable integer intersection'
+    assert 'packet!=result.packet' in verify and 'build(source_frame,trace_row,phone_frame)' in verify,'Leaf certificate must reject stale or changed complete packets'
+    phone=source_function(geometry,'_phone')
+    assert 'isolated-matching-bodyfixed-parent-q31' in phone and 'int(frame.source_body_parent_index_u8)!=int(frame.source_parent_index_u8)' in phone and 'source_parent_matrix_q31_hex' in phone,'Leaf projection must preserve its explicit matching-parent bodyfixed frame scope'
+    assert 'f579_sar_preimage_enclosure_f64_hex' in build and 'render_vs_f579_sar_preimage_error_f64_hex' in build and 'f579_sar_interval_semantics' in build and 'zero F579 SAR low bits' in build,'Scaled Q31 representative and complete F579 SAR-bin enclosures must remain distinct'
+    assert all(token in build for token in ('"raw_leaf_identity_verified":true','"original_integer_intersection_replayed":true','"render_projection_verified":true','"float32_rounding_cells_verified":true','"native_forward_derived_intervals_verified":true','"source_geometry_identity_verified":false','"float_collision_height_equivalence":false','"whole_mesh_certified":false','"live_response_enabled":false')),'Leaf projection certificate changed its explicit exactness/scope bounds'
+    view=(project/'scripts/native_contact_geometry_view.gd').read_text()
+    assert 'viewport.world_3d=World3D.new()' in source_function(view,'_ensure_built') and 'Camera3D.new()' in source_function(view,'_ensure_built'),'Inspection view must own an independent world/camera'
+    assert 'certificate.packet_sha256)!=JSON.stringify(packet,"",true).sha256_text()' in source_function(view,'_packet_points') and '_snapshot=snapshot.duplicate(true)' in source_function(view,'configure'),'Inspection view must consume the bound packet and keep an isolated snapshot'
+    assert '"readonly_preview":true' in source_function(view,'view_state') and '"flight_camera_or_geometry_changed":false' in source_function(view,'view_state'),'Inspection gestures must not claim gameplay changes'
+    return {'explicit_isolated_observer':True,'retained_original_query_intersection':True,'leaf_identity_and_declared_projection_only':True,'whole_mesh_certified':False,'linear_inverse_is_exact_certificate':False,'ordinary_surface_replaced':False,'live_response_enabled':False,'isolated_inspection_world_and_camera':True,'matching_bodyfixed_parent_frame_only':True,'scaled_Q31_and_full_F579_SAR_enclosures_distinct':True}
+
+
+def verify_contact_frame_runtime(archive,project):
+    """Code49 actual source/asset pins and explicitly labelled code48 history."""
+    names=set(archive.namelist());compiled={}
+    for relative,digest in CONTACT_FRAME_AUDITED_SOURCE_SHA256.items():
+        name=Path(relative).stem;path='assets/scripts/'+name+'.gdc'
+        assert path in names,'Missing contact-frame integration runtime '+name
+        raw=archive.read(path)
+        assert len(raw)>64 and raw[:4]==b'GDSC','Invalid compiled contact-frame integration runtime '+name
+        assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==digest,'Contact frame differs from audited integration source '+relative
+        compiled[name]=hashlib.sha256(raw).hexdigest()
+    scope=_verify_contact_frame_readonly_scope(project)
+    native=_verify_contact_frame_native_reference(project)
+    baseline=_load_contact_frame_baseline(project)
+    preserved=_verify_contact_frame_preserved_functions(project,baseline)
+    # The retained strict gate sees only the archived Main source. It reads
+    # precisely the SAME actual code49 compiled entries and all actual data.
+    overrides={'scripts/main.gd':baseline['files']['scripts/main.gd']['source']}
+    retained=verify_contact_footprint_runtime(archive,_AlignmentSourceAuditPath(project,overrides))
+    audit={'source_override_count':1,'source_override_paths':['scripts/main.gd'],'compiled_assets_substituted':False,'audit_is_actual_unchanged_code48_runtime':False,'description':'Host code48 source-history/data checks only. Actual49 pins and protected physical/render/save functions are checked separately. All compiled hashes below come from the same actual code49 archive.','assets':retained}
+    return {'baseline_source_commit':CONTACT_FRAME_BASELINE_SOURCE_COMMIT,'baseline_fixture_sha256':CONTACT_FRAME_BASELINE_FIXTURE_SHA256,'baseline_runtime_source_count':42,'baseline_stored_runtime_source_delta_count':3,'baseline_metadata_source_count':2,'baseline_requires_Git':False,'compiled_modules':{name:compiled[name]for name in CONTACT_FRAME_MODULES},'compiled_module_count':4,'integration_compiled_modules':compiled,'integration_compiled_module_count':len(compiled),'audited_local_source_sha256':CONTACT_FRAME_AUDITED_SOURCE_SHA256,'preserved_Main_function_count':len(preserved),'preserved_Main_functions':preserved,'native_frame_reference':native,'readonly_scope':scope,'retained_code48_source_audit':audit,'unchanged_code48_runtime_source_count':41,'actual_runtime_is_unchanged_code48':False,'new_runtime_JSON_added':False,'live_response_enabled':False,'whole_mesh_certified':False,'default_physical_terrain_is_v4':True,'complete_original_physics':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
+
+
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     expected=preset_values(presets)
     signature=run(build_tools/'apksigner','verify','--verbose','--print-certs',apk)
@@ -2381,7 +2527,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={};hyperdrive_assets={};fuel_assets={};atmosphere_assets={};landing_gear_assets={};surface_contact_assets={};spherical_contact_assets={};natural_contact_assets={};contact_alignment_assets={};contact_footprint_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={};hyperdrive_assets={};fuel_assets={};atmosphere_assets={};landing_gear_assets={};surface_contact_assets={};spherical_contact_assets={};natural_contact_assets={};contact_alignment_assets={};contact_footprint_assets={};contact_frame_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -2492,8 +2638,15 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
                 natural_contact_assets={**contact_alignment_assets['retained_code46_source_audit']['assets'],'host_source_history_audit_only':True,'actual_runtime_is_unchanged_code46':False}
                 spherical_contact_assets={**natural_contact_assets['retained_spherical_contact_assets'],'host_source_history_audit_only':True}
                 surface_contact_assets={**spherical_contact_assets['retained_surface_contact_assets'],'host_source_history_audit_only':True}
-            if expected['version_code']>=48:
+            if expected['version_code']==48:
                 contact_footprint_assets=verify_contact_footprint_runtime(archive,presets.parent)
+                contact_alignment_assets={**contact_footprint_assets['retained_code47_source_audit']['assets'],'host_source_history_audit_only':True,'actual_runtime_is_unchanged_code47':False}
+                natural_contact_assets={**contact_alignment_assets['retained_code46_source_audit']['assets'],'host_source_history_audit_only':True,'actual_runtime_is_unchanged_code46':False}
+                spherical_contact_assets={**natural_contact_assets['retained_spherical_contact_assets'],'host_source_history_audit_only':True}
+                surface_contact_assets={**spherical_contact_assets['retained_surface_contact_assets'],'host_source_history_audit_only':True}
+            if expected['version_code']>=49:
+                contact_frame_assets=verify_contact_frame_runtime(archive,presets.parent)
+                contact_footprint_assets={**contact_frame_assets['retained_code48_source_audit']['assets'],'host_source_history_audit_only':True,'actual_runtime_is_unchanged_code48':False}
                 contact_alignment_assets={**contact_footprint_assets['retained_code47_source_audit']['assets'],'host_source_history_audit_only':True,'actual_runtime_is_unchanged_code47':False}
                 natural_contact_assets={**contact_alignment_assets['retained_code46_source_audit']['assets'],'host_source_history_audit_only':True,'actual_runtime_is_unchanged_code46':False}
                 spherical_contact_assets={**natural_contact_assets['retained_spherical_contact_assets'],'host_source_history_audit_only':True}
@@ -2521,7 +2674,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'hyperdrive_assets':hyperdrive_assets,'fuel_assets':fuel_assets,'atmosphere_assets':atmosphere_assets,'landing_gear_assets':landing_gear_assets,'surface_contact_assets':surface_contact_assets,'spherical_contact_assets':spherical_contact_assets,'natural_contact_assets':natural_contact_assets,'contact_alignment_assets':contact_alignment_assets,'contact_footprint_assets':contact_footprint_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'hyperdrive_assets':hyperdrive_assets,'fuel_assets':fuel_assets,'atmosphere_assets':atmosphere_assets,'landing_gear_assets':landing_gear_assets,'surface_contact_assets':surface_contact_assets,'spherical_contact_assets':spherical_contact_assets,'natural_contact_assets':natural_contact_assets,'contact_alignment_assets':contact_alignment_assets,'contact_footprint_assets':contact_footprint_assets,'contact_frame_assets':contact_frame_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

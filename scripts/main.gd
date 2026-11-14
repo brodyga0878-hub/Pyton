@@ -48,6 +48,8 @@ const SphericalContactProbe=preload("res://scripts/source_spherical_contact_prob
 const NaturalContactProbe=preload("res://scripts/source_natural_contact_probe.gd")
 const ContactAlignmentProbe=preload("res://scripts/source_contact_alignment_probe.gd")
 const FootprintProbe=preload("res://scripts/source_natural_footprint_probe.gd")
+const ContactGeometryProbe=preload("res://scripts/source_contact_geometry_probe.gd")
+const ContactGeometryView=preload("res://scripts/native_contact_geometry_view.gd")
 const Diagnostics=preload("res://scripts/game_diagnostics.gd")
 const ReportExport=preload("res://scripts/report_export.gd")
 const DockServices=preload("res://scripts/training_dock_services.gd")
@@ -157,6 +159,7 @@ var diagnostic_timer:=0.0
 var last_flight_sample:Dictionary={}
 var source_alignment_last:Dictionary={}
 var source_footprint_last:Dictionary={}
+var source_geometry_last:Dictionary={}
 
 func _ready()->void:
 	get_tree().auto_accept_quit=false
@@ -180,6 +183,7 @@ func _new_models(layout:String=World.PORT_LAYOUT)->void:
 	instruments.reset();flight_time.reset();last_view="";target_site_id="";target_reference.clear();_thermal_notice_level="";source_contact_last.clear();source_contact_error="";_source_contact_interval.clear()
 	source_alignment_last.clear()
 	source_footprint_last.clear()
+	source_geometry_last.clear()
 	source_motion=MotionBridge.new();source_motion_enabled=layout==World.FULL_LAYOUT;last_motion_result.clear()
 	ship=Flight.new();nav=NavigationData.new()
 	if layout==World.FULL_LAYOUT and not nav.configure_native():push_error("Original galaxy could not be initialized")
@@ -704,6 +708,17 @@ func _flight_log_sample(sample:Dictionary)->Dictionary:
 			for key:String in ["context_binding_sha256","delta_m","observed_elapsed_days"]:
 				if measurement.has(key):reference[key]=measurement[key]
 			result["last_surface_alignment"]=reference
+	var geometry:Variant=sample.get("last_contact_geometry",{})
+	result.erase("last_contact_geometry")
+	if geometry is Dictionary and not geometry.is_empty():
+		# One shallow reference table keeps all three full observations in the
+		# report without overflowing the unchanged periodic logger line cap.
+		var references:Dictionary={"contact_geometry_sha256":JSON.stringify(geometry).sha256_text()}
+		for key:String in ["last_surface_alignment","last_surface_footprint"]:
+			var observation:Variant=sample.get(key,{})
+			if observation is Dictionary and not observation.is_empty():references[key+"_sha256"]=JSON.stringify(observation).sha256_text()
+			result.erase(key)
+		result["diagnostic_observation_refs"]=references
 	return result
 func _input_diagnostic_state()->Dictionary:
 	return {"stick":[stick.value.x,stick.value.y] if stick!=null else [],"stick_pointer":stick.pointer_id if stick!=null else -1,"throttle_pointer":lever.pointer_id if lever!=null else -1,"lift_up":lift_up,"lift_down":lift_down,"roll_left":roll_left_strength,"roll_right":roll_right_strength,"active":active,"busy":busy,"menu_open":menu!=null and menu.visible,"settings_open":settings_panel!=null and settings_panel.visible,"map_open":is_instance_valid(active_map),"map_kind":active_map_kind,"camera_view":instruments.view_key(ship.external_view) if ship!=null else "front","simulation_paused":instruments.paused,"time_rate":flight_time.effective_rate,"source_motion_enabled":source_motion_enabled,"source_motion_active":source_motion.is_active()}
@@ -714,6 +729,7 @@ func _flight_diagnostic_sample()->Dictionary:
 	sample["source_natural_probe"]=NaturalContactProbe.sample(world,ship,surface,nav.elapsed_days) if nav.is_source_hyperdrive() else {"ok":true,"reason":"legacy_navigation","diagnostic_only":true,"response_applied":false}
 	sample["last_surface_alignment"]=source_alignment_last.duplicate(true)
 	sample["last_surface_footprint"]=source_footprint_last.duplicate(true)
+	sample["last_contact_geometry"]=source_geometry_last.duplicate(true)
 	return sample
 
 func _diagnostic_context()->Dictionary:
@@ -1128,6 +1144,7 @@ func _show_menu()->void:
 	_menu_action("Графический полёт · осмотреть обновление",_begin_graphics_demo)
 	if surface.active and surface.source_surface():_menu_action("Проверить высоту поверхности",_show_surface_alignment)
 	if surface.active and surface.source_surface():_menu_action("Проверить контакт всего корабля",_show_surface_footprint)
+	if surface.active and surface.source_surface():_menu_action("Исходная геометрия контакта",_show_contact_geometry)
 	_menu_action("Космопорты и объекты системы",_show_system)
 	_menu_action("Маршруты между системами",_show_routes)
 	if surface.active and surface.globe!=null:_menu_action("Автовылет на орбиту",_begin_departure_action)
@@ -1179,12 +1196,31 @@ func _show_surface_footprint()->void:
 	_menu_action("Отчёт об ошибке / логи",_show_bug_report)
 	_menu_action("Вернуться в меню",_show_menu)
 
+func _source_geometry_summary(value:Dictionary)->Dictionary:
+	var result:Dictionary={"report_sha256":JSON.stringify(value).sha256_text(),"complete_observation_in_report":true}
+	for key:String in ["ok","reason","diagnostic_only","response_applied","live_response_enabled","whole_mesh_certified","context_binding_sha256","visited_volume_count","terrain_query_count","geometry_packet_count","blocked_frame_count","selected_child_index","observed_elapsed_days"]:
+		if value.has(key):result[key]=value[key]
+	return result
+func _show_contact_geometry()->void:
+	if busy or surface==null or not surface.active or not surface.source_surface():return
+	_release_inputs();_open_menu("ИСХОДНАЯ ГЕОМЕТРИЯ КОНТАКТА",false)
+	source_geometry_last=ContactGeometryProbe.sample(surface,ship,int(_gear_state().get("position_u16",0)),{"initial_globals":NaturalContactProbe.Natural._globals({}),"history_policy":"isolated-diagnostic-initial-state"})
+	source_geometry_last["observed_elapsed_days"]=nav.elapsed_days
+	_record_event("source_contact_geometry",_source_geometry_summary(source_geometry_last))
+	if source_geometry_last.get("ok",false) and int(source_geometry_last.get("geometry_packet_count",0))>0:
+		_menu_text("Исходных фрагментов рельефа: %d. Просмотр не меняет поверхность или полёт."%int(source_geometry_last.geometry_packet_count))
+		var preview:=ContactGeometryView.new();menu_rows.add_child(preview);preview.custom_minimum_size.y=clampf(get_viewport().get_visible_rect().size.y*0.65,350.0,520.0)
+		if not preview.configure(source_geometry_last):preview.queue_free();_menu_text("Не удалось показать фрагменты. Подробности сохранены для отчёта.")
+	else:_menu_text("Для этого положения исходная геометрия просмотра недоступна. Причина сохранена для отчёта об ошибке.")
+	_menu_action("Отчёт об ошибке / логи",_show_bug_report)
+	_menu_action("Вернуться в меню",_show_menu)
+
 func _begin_graphics_demo()->void:
 	if not surface.pending_source_contact().is_empty():_paused_command();return
 	if busy or not graphics_return.is_empty():return
 	if saving_enabled and not _save_game():return
 	_release_inputs()
-	graphics_return={"ship":ship,"nav":nav,"world":world,"surface":surface,"saving_enabled":saving_enabled,"source_motion":source_motion,"source_motion_enabled":source_motion_enabled,"target_site_id":target_site_id,"target_reference":target_reference.duplicate(true),"paused":instruments.paused,"landing_gear":landing_gear,"source_alignment_last":source_alignment_last.duplicate(true),"source_footprint_last":source_footprint_last.duplicate(true)}
+	graphics_return={"ship":ship,"nav":nav,"world":world,"surface":surface,"saving_enabled":saving_enabled,"source_motion":source_motion,"source_motion_enabled":source_motion_enabled,"target_site_id":target_site_id,"target_reference":target_reference.duplicate(true),"paused":instruments.paused,"landing_gear":landing_gear,"source_alignment_last":source_alignment_last.duplicate(true),"source_footprint_last":source_footprint_last.duplicate(true),"source_geometry_last":source_geometry_last.duplicate(true)}
 	saving_enabled=false;_new_models();ship.external_view=true;nav.elapsed_days=225.0;ship.target_speed=0;ship.attitude=Quaternion(Vector3.UP,-0.38)
 	_close_menu();_apply_system();_refresh_hud();_announce("Осмотрите обновлённый корабль и станцию. Вернуться к основному полёту можно через меню.")
 func _end_graphics_demo()->void:
@@ -1193,6 +1229,7 @@ func _end_graphics_demo()->void:
 	source_motion=graphics_return.source_motion;source_motion_enabled=bool(graphics_return.source_motion_enabled);target_site_id=str(graphics_return.target_site_id);target_reference=graphics_return.target_reference.duplicate(true)
 	landing_gear=graphics_return.landing_gear;source_alignment_last=graphics_return.source_alignment_last.duplicate(true)
 	source_footprint_last=graphics_return.source_footprint_last.duplicate(true)
+	source_geometry_last=graphics_return.source_geometry_last.duplicate(true)
 	instruments.paused=bool(graphics_return.paused);flight_time.reset()
 	graphics_return={};near.clear();_close_menu();_apply_system();_refresh_hud();_announce("Основной полёт продолжен.")
 func _show_system()->void:
@@ -1641,6 +1678,7 @@ func _commit_state(data:Dictionary)->void:
 	ship=data.ship;nav=data.nav;world=data.world;surface=data.surface;near.clear();instruments.reset();flight_time.reset();last_view=""
 	source_contact_last.clear();source_contact_error="";_source_contact_interval.clear();source_alignment_last.clear()
 	source_footprint_last.clear()
+	source_geometry_last.clear()
 	landing_gear=data.get("landing_gear")
 	if landing_gear==null:landing_gear=LandingGearSession.new();landing_gear.configure(surface.landed or ship.docked)
 	target_site_id=str(data.get("target_site_id",""));target_reference.clear()

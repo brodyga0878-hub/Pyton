@@ -1,0 +1,12 @@
+0045371c: push ebp
+0045371d: mov ebp,esp
+0045371f: mov eax,DWORD PTR [ebp+0x8]
+00453722: mov edx,eax
+00453724: lea eax,[edx+eax*4]
+00453727: lea eax,[edx+eax*4]
+0045372a: lea eax,[edx+eax*8]
+0045372d: add eax,eax
+0045372f: add eax,DWORD PTR [ebp+0xc]
+00453732: add eax,0x74
+00453735: pop ebp
+00453736: ret 

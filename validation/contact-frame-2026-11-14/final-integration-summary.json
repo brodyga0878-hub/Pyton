@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-14T21:27:56.447186+00:00",
+  "updated_utc": "2026-11-14T21:28:16.175766+00:00",
+  "duration_seconds": 19.728,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-14T21:27:56.447186+00:00",
+      "duration_seconds": 19.728,
+      "requested_suites": [
+        "source_contact_geometry_probe",
+        "source_contact_geometry_main"
+      ],
+      "executed_suites": [
+        "source_contact_geometry_probe",
+        "source_contact_geometry_main"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 2,
+  "status": "passed",
+  "passed_suites": 2,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 1089,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "source_contact_geometry_probe",
+      "scope": "Actual ordered actor snapshot, strict frame/leaf projection packets, native pole rejection and complete JSON transport with preserved live state.",
+      "status": "passed",
+      "checks": 1026,
+      "failures": 0,
+      "executed_utc": "2026-11-14T21:27:56.448855+00:00",
+      "suite_source": {
+        "path": "tests/test_source_contact_geometry_probe.gd",
+        "bytes": 8975,
+        "sha256": "b86c9943c31aac2898249b92f93a0ef3eb3e3c1026e3f836a91ced219ee2f0c2"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_contact_geometry_probe.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.639,
+      "timed_out": false,
+      "output_bytes": 128,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/contact-frame-2026-11-14/final-integration/logs/source_contact_geometry_probe.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_contact_geometry_main",
+      "scope": "Actual Russian geometry action, native packets in isolated viewer, source/phone state and old save preservation, complete ZIP and three compact observation references.",
+      "status": "passed",
+      "checks": 63,
+      "failures": 0,
+      "executed_utc": "2026-11-14T21:27:56.449218+00:00",
+      "suite_source": {
+        "path": "tests/test_source_contact_geometry_main.gd",
+        "bytes": 12953,
+        "sha256": "e67ba8f56913410372ffba95fff6bb2f85419657760b2445056f768228eaaadb"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_contact_geometry_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 19.725,
+      "timed_out": false,
+      "output_bytes": 125,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/contact-frame-2026-11-14/final-integration/logs/source_contact_geometry_main.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ]
+}

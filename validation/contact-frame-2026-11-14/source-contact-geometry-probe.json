@@ -1,0 +1,534 @@
+{
+	"checks": 1026,
+	"counts": {
+		"blocked_pole_frames": 1,
+		"native_actors": 56,
+		"native_leaf_packets": 93,
+		"visited_volumes": 93
+	},
+	"evidence": [
+		{
+			"binding": "694766ab93a88659b13ada953a7ac0dc4abd6a2aa4b4abd08b61e653919e4901",
+			"case": "118_eagle_upright_-0.5",
+			"packets": 1.0,
+			"selected_child_index": 0.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "e1c5ffbf3a72a42d24339eac07bfc1b811bad302adb0e74dd51315dc3761e301",
+			"case": "118_eagle_upright_3.0",
+			"packets": 1.0,
+			"selected_child_index": -1.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "0ecc378546b9eb71220442b34dc34da586d05ebdde339819cff59d5a9b38f255",
+			"case": "118_eagle_upright_80.0",
+			"packets": 1.0,
+			"selected_child_index": -1.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "fdc19f8e281ce231bb85c87f7ff65405a8476696ee41cb66cce83651c1825af6",
+			"case": "118_eagle_roll_plus_-0.5",
+			"packets": 1.0,
+			"selected_child_index": 0.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "8a5da3bf37f4ba4f94d0fb0b0371e02c6c8435b5026dd2b56ffae9307a1cbe43",
+			"case": "118_eagle_roll_plus_3.0",
+			"packets": 1.0,
+			"selected_child_index": -1.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "96e5e943831aecf1928727f89016133ae060f3a6081b2cf8b991ae0ba425cf68",
+			"case": "118_eagle_roll_plus_80.0",
+			"packets": 1.0,
+			"selected_child_index": -1.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "832e0fb383277b7c26b912c8dd4193c18bda4bb8da42ca46293d756c38f43b7c",
+			"case": "118_eagle_roll_minus_-0.5",
+			"packets": 1.0,
+			"selected_child_index": 0.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "81ad30274196dac9f2fff916491389bb04fe0f4bf2763f7dc64d544e74b5037a",
+			"case": "118_eagle_roll_minus_3.0",
+			"packets": 1.0,
+			"selected_child_index": -1.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "00f9a9adc510f4d5bcfd9e77ba615cd48c5436b8f452838f20b8ee5b92b7e0a2",
+			"case": "118_eagle_roll_minus_80.0",
+			"packets": 1.0,
+			"selected_child_index": -1.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "0d5aafe16ce5e79d153f9ec7c8160bfa48bd435cb776cd4c577361e0114e168d",
+			"case": "118_eagle_pitch_plus_-0.5",
+			"packets": 1.0,
+			"selected_child_index": 0.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "562a5ab1cc4c73be6e5705fca78d13d14f3e74becbb6eb6b39217937e74a2ba6",
+			"case": "118_eagle_pitch_plus_3.0",
+			"packets": 1.0,
+			"selected_child_index": -1.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "397bc6f6a7781e1990c83fac315de1c2c89e21be2c859e72887d6cab7df89753",
+			"case": "118_eagle_pitch_plus_80.0",
+			"packets": 1.0,
+			"selected_child_index": -1.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "77896a53c94c97ac2cdcfe9bb4f11574123b9ef861be48dad456fcc45138301c",
+			"case": "118_eagle_pitch_minus_-0.5",
+			"packets": 1.0,
+			"selected_child_index": 0.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "0c8d98a0ca03077f3451bd106b9d277f3e993ec53967cd032c1cfb2bd820a058",
+			"case": "118_eagle_pitch_minus_3.0",
+			"packets": 1.0,
+			"selected_child_index": -1.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "8db0f6a051c30b53a97872117a06f32d7617b0d62c565d5a2dc3bf7993c754f2",
+			"case": "118_eagle_pitch_minus_80.0",
+			"packets": 1.0,
+			"selected_child_index": -1.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "d24c1e0ee1f8fa63aad4dc4dafea43a3a0b4c68f11a445dee7caf31c2ba82269",
+			"case": "118_eagle_compound_-0.5",
+			"packets": 1.0,
+			"selected_child_index": 0.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "fe74c5e343ca98a5af6f0b347ce9ff7da85f5135eb60fb2c55e869bbee4e2d7d",
+			"case": "118_eagle_compound_3.0",
+			"packets": 1.0,
+			"selected_child_index": -1.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "4d5fd5fbda7021f0442407ac3f11929f64a24cd180337daa456f3f0d9797daf2",
+			"case": "118_eagle_compound_80.0",
+			"packets": 1.0,
+			"selected_child_index": -1.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "f597ed972661c531ff752693518560dc2a5d6c1c057299b7c86f95aafa909f10",
+			"case": "118_cobra_upright_-0.5",
+			"packets": 1.0,
+			"selected_child_index": 0.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "d2c774372003918ef3aa69757f7d78fe4974ee17ce50dee8658e6b5412f03225",
+			"case": "118_cobra_upright_3.0",
+			"packets": 3.0,
+			"selected_child_index": 2.0,
+			"visited": 3.0
+		},
+		{
+			"binding": "c6d1b5d356d3f37c04421dfff249fdf4924dd825556743a54faaa749c147d994",
+			"case": "118_cobra_upright_80.0",
+			"packets": 3.0,
+			"selected_child_index": -1.0,
+			"visited": 3.0
+		},
+		{
+			"binding": "26c10ba9f369a0fc71df91ff37d6e29016289db68c1b9ed2815cf89df24d5735",
+			"case": "118_cobra_roll_plus_-0.5",
+			"packets": 1.0,
+			"selected_child_index": 0.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "e0ccb69a9fe76915ece63be305c2f4aabcb29fab25262158ae8d2a5e11894590",
+			"case": "118_cobra_roll_plus_3.0",
+			"packets": 3.0,
+			"selected_child_index": 2.0,
+			"visited": 3.0
+		},
+		{
+			"binding": "3a62e728f19f1c127a4ed7c35d31f33779964ed513c7685c8ff4ca0b6c6afbdc",
+			"case": "118_cobra_roll_plus_80.0",
+			"packets": 3.0,
+			"selected_child_index": -1.0,
+			"visited": 3.0
+		},
+		{
+			"binding": "fa57723f3142da6bbc92c8173d5edfa5fb768c63d1f0cae1d69710079bbba114",
+			"case": "118_cobra_roll_minus_-0.5",
+			"packets": 1.0,
+			"selected_child_index": 0.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "9df4c5dd577f5f67ccb385ed18e62ff9358558d1bd0b0535ff7dd05babfc1662",
+			"case": "118_cobra_roll_minus_3.0",
+			"packets": 2.0,
+			"selected_child_index": 1.0,
+			"visited": 2.0
+		},
+		{
+			"binding": "48975544d8af4d4ff50541f20b8a55a506e652923e95d348ec26f604bf5f03a9",
+			"case": "118_cobra_roll_minus_80.0",
+			"packets": 3.0,
+			"selected_child_index": -1.0,
+			"visited": 3.0
+		},
+		{
+			"binding": "dea950d8401cf597b889088e022481366c7f260b56da1757571d1b56f0b7bc81",
+			"case": "118_cobra_pitch_plus_-0.5",
+			"packets": 1.0,
+			"selected_child_index": 0.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "b49c30413530fd374de55272ec7511d6fd1936b4cc34b6be152c7766bdfb376f",
+			"case": "118_cobra_pitch_plus_3.0",
+			"packets": 3.0,
+			"selected_child_index": 2.0,
+			"visited": 3.0
+		},
+		{
+			"binding": "865f77db9768e26c72b9020ba1d1346203c40abd01d2c9e4b923d2e7fcbdaf8f",
+			"case": "118_cobra_pitch_plus_80.0",
+			"packets": 3.0,
+			"selected_child_index": -1.0,
+			"visited": 3.0
+		},
+		{
+			"binding": "9ff4ad98fad8e4dedd6aeac7ef7ddaa337238f54bed7c97623a143dc9c5f3b53",
+			"case": "118_cobra_pitch_minus_-0.5",
+			"packets": 1.0,
+			"selected_child_index": 0.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "e9322157a0c8883e4483c69a1f60a068f2dc4ce0f791833461849345811ec61b",
+			"case": "118_cobra_pitch_minus_3.0",
+			"packets": 3.0,
+			"selected_child_index": 2.0,
+			"visited": 3.0
+		},
+		{
+			"binding": "58df2c97c50f296e9a835e3286a1ce705ddbde6fc94e5ae214691ceaa5d3148d",
+			"case": "118_cobra_pitch_minus_80.0",
+			"packets": 3.0,
+			"selected_child_index": -1.0,
+			"visited": 3.0
+		},
+		{
+			"binding": "d1a20baec2a119657a4527e5ca4b811842dbe446ee1d2e464615f4e7d8999baf",
+			"case": "118_cobra_compound_-0.5",
+			"packets": 1.0,
+			"selected_child_index": 0.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "7cf096c8a4c0ff599fc0cbdfe22c8886591bdcea1f7a45960ba3e82b9b1f75cb",
+			"case": "118_cobra_compound_3.0",
+			"packets": 3.0,
+			"selected_child_index": 2.0,
+			"visited": 3.0
+		},
+		{
+			"binding": "c847c7f9351e4e420cadb6df4e48e2620aca85ac953260530ef55d1642a2df74",
+			"case": "118_cobra_compound_80.0",
+			"packets": 3.0,
+			"selected_child_index": -1.0,
+			"visited": 3.0
+		},
+		{
+			"binding": "34044916acf0eb296981370ff6e5ade149b006e760f5d6b863f844dd6d162ef5",
+			"case": "118_shuttle_upright_-0.5",
+			"packets": 1.0,
+			"selected_child_index": 0.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "d12b50f283616bb38f5097828fab1a1977bc49af4b611fb7863740c21b674455",
+			"case": "118_shuttle_upright_3.0",
+			"packets": 2.0,
+			"selected_child_index": -1.0,
+			"visited": 2.0
+		},
+		{
+			"binding": "f93fcdfcdff3dcbab5f325ab0089dc71d3feb1238fb5d4a9a0b91f20350a6b17",
+			"case": "118_shuttle_upright_80.0",
+			"packets": 2.0,
+			"selected_child_index": -1.0,
+			"visited": 2.0
+		},
+		{
+			"binding": "bbf04f34003f5465c44c01aa3a60776ac343442ab333173f7b32510c8b80fcb5",
+			"case": "118_shuttle_roll_plus_-0.5",
+			"packets": 1.0,
+			"selected_child_index": 0.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "70a329d5a764ff37e07eccf31f9d7743a27c750f1c68dbfe35abbd7472937020",
+			"case": "118_shuttle_roll_plus_3.0",
+			"packets": 2.0,
+			"selected_child_index": -1.0,
+			"visited": 2.0
+		},
+		{
+			"binding": "2b07bac2450dbb06743ed1166f7b3efa3672e0fb10a8eb1a68d2ef8f87ab4946",
+			"case": "118_shuttle_roll_plus_80.0",
+			"packets": 2.0,
+			"selected_child_index": -1.0,
+			"visited": 2.0
+		},
+		{
+			"binding": "3077d2f95883b4f0f3f291d5bee9ead7252144388ed50dce79747b768f193df8",
+			"case": "118_shuttle_roll_minus_-0.5",
+			"packets": 1.0,
+			"selected_child_index": 0.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "1b2101dcbce9aac1fd6840eb57a9d3fbc251611e6ee70993ae447a23ed308d68",
+			"case": "118_shuttle_roll_minus_3.0",
+			"packets": 2.0,
+			"selected_child_index": -1.0,
+			"visited": 2.0
+		},
+		{
+			"binding": "9841e66c35624226553dded4a962c43c37be2d0a481fa819d8836b926e6999c5",
+			"case": "118_shuttle_roll_minus_80.0",
+			"packets": 2.0,
+			"selected_child_index": -1.0,
+			"visited": 2.0
+		},
+		{
+			"binding": "139a7b032e8081ddb1543ed8ebd790c4f599bc1b4f464404bbbf254d68fcdb4e",
+			"case": "118_shuttle_pitch_plus_-0.5",
+			"packets": 1.0,
+			"selected_child_index": 0.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "25d877ebdf589aefbcdd8898207f022aa9e0ad4b593e60ecbac723620bc79694",
+			"case": "118_shuttle_pitch_plus_3.0",
+			"packets": 2.0,
+			"selected_child_index": -1.0,
+			"visited": 2.0
+		},
+		{
+			"binding": "0bc2636ead844184ec5cf44840dd2a724d0faa897fd0da1d49c1ff73a709e0f8",
+			"case": "118_shuttle_pitch_plus_80.0",
+			"packets": 2.0,
+			"selected_child_index": -1.0,
+			"visited": 2.0
+		},
+		{
+			"binding": "b01855a5b0fe6390d69e41b466d5043ff37c7454c8bc007baf8217483f6db286",
+			"case": "118_shuttle_pitch_plus_0.5",
+			"packets": 2.0,
+			"selected_child_index": -1.0,
+			"visited": 2.0
+		},
+		{
+			"binding": "c78828706a03739897cf5bb184502a0f5ebbf279e34e84928112ece645a1d3b3",
+			"case": "118_shuttle_pitch_minus_-0.5",
+			"packets": 1.0,
+			"selected_child_index": 0.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "82bf5d36cbb34931712471c98c398c5ea2949a812be64aea54f4d3cbd5c04cd1",
+			"case": "118_shuttle_pitch_minus_3.0",
+			"packets": 2.0,
+			"selected_child_index": -1.0,
+			"visited": 2.0
+		},
+		{
+			"binding": "41c5bacd99d1973dc4c15f7b4dd02f49507e1d9b3ceb2d32499274088aeb0f44",
+			"case": "118_shuttle_pitch_minus_80.0",
+			"packets": 2.0,
+			"selected_child_index": -1.0,
+			"visited": 2.0
+		},
+		{
+			"binding": "f96bab7e219402fb51d5413b3e2f6ae5f685ab6232cb061137be33d0b6f4c925",
+			"case": "118_shuttle_pitch_minus_0.5",
+			"packets": 2.0,
+			"selected_child_index": 1.0,
+			"visited": 2.0
+		},
+		{
+			"binding": "d574794e4ef81f9f1cf00dddf88edfc659f21057df2789a1fb30e2c60090cdb6",
+			"case": "118_shuttle_compound_-0.5",
+			"packets": 1.0,
+			"selected_child_index": 0.0,
+			"visited": 1.0
+		},
+		{
+			"binding": "ed79f5fe43a301bd7ad57e4da29cd208f20d5b53fb1bf851b0b4757b41956075",
+			"case": "118_shuttle_compound_3.0",
+			"packets": 2.0,
+			"selected_child_index": -1.0,
+			"visited": 2.0
+		},
+		{
+			"binding": "0cccd033eba051b40bbf28bdb1c8fc16938ff4b37caef47bf91bf8bd516138f1",
+			"case": "118_shuttle_compound_80.0",
+			"packets": 2.0,
+			"selected_child_index": -1.0,
+			"visited": 2.0
+		},
+		{
+			"case": "actual_positive_z_source_degeneracy",
+			"global_sign_flip_applied": false,
+			"observation": {
+				"blocked_frame_count": 1.0,
+				"collision_kind_u8": 1.0,
+				"context_binding_sha256": "d6d8ec9b8d1ebac3e25aa040340d75c633a088c8d1cc7b555563e2b8e237fa76",
+				"diagnostic_only": true,
+				"f576_return_s32": 0.0,
+				"final_altitude_s64_hex": "0000000000000000",
+				"final_previous_s64_hex": "5c2efff4ffffffff",
+				"full_F569": false,
+				"full_F570": false,
+				"geometry_certificate_build_count": 0.0,
+				"geometry_packet_count": 0.0,
+				"live_response_enabled": false,
+				"ok": true,
+				"ordinary_surface_replaced": false,
+				"original_F575_dispatch_executed": false,
+				"query_context": {
+					"body_id": "body",
+					"body_model_index": 38.0,
+					"body_object_hex": "1000fe8100000000000000000000000000000000f4ffff7e00000000fcffff7e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000060028780000000002010000000000000000000000000000000000000000000000000000000000000000000000000000000000002600000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000900100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a08c000000000000802500000000000000000000800000000000",
+					"body_origin_offset_m": 1.72445404052734,
+					"body_origin_policy": "authored-clearance-to-native-inner-radius-v1",
+					"graphics_level": 1.0,
+					"history_is_running_source_bank": false,
+					"history_policy": "isolated-diagnostic-initial-state",
+					"initial_globals": {
+						"altitude_high_s32": 0.0,
+						"altitude_low_u32": 4294967295.0,
+						"collider_index_u8": 0.0,
+						"collider_parent_selected": false,
+						"collision_active_u8": 0.0,
+						"collision_enabled_u8": 0.0,
+						"collision_flags_u8": 0.0,
+						"collision_kind_u8": 0.0,
+						"pending_query_flag": 0.0,
+						"previous_altitude_high_s32": 0.0,
+						"previous_altitude_low_u32": 0.0,
+						"primitive_flags_u8": 0.0,
+						"recorded_intersection_raw": 0.0,
+						"volume_flags_u8": 0.0
+					},
+					"original_parent_bounds_preserved": true,
+					"original_relative_s64_hex": "000000000000000000000000000000000600287800000000",
+					"parent_model_index": 118.0,
+					"parent_object_hex": "ffffff7f000000000000000000000000ffffff7f000000000000000000000000ffffff7f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000760000000200ff000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000dc92000000000000745d0000000000000000800000000000",
+					"parent_uid_u32": 1.0,
+					"phone_basis_f64_hex": "000000000000f03f00000000000000000000004026a691bc0000004026a6913c0000000000000000000000000000f03f0000000000000000000000000000f0bf0000000000000000",
+					"phone_geographic_frame_f64_hex": "0000000000000000182d4454fb21f9bf0000000062e74041",
+					"physical_gear_u16": 0.0,
+					"source_record_sha256": "7231c678e46e0d200b385439c98ff6b4a9169436721a5a073bd7b10a2dabe4cb",
+					"terrain_revision": "sphere-source-contact-v5"
+				},
+				"reason": "original_frame_and_leaf_observed",
+				"response_applied": false,
+				"selected_child_index": 0.0,
+				"source_contract": "source-contact-frame-and-native-leaf-readonly-probe-v1",
+				"source_object_bank_present": false,
+				"source_query_count_matches": true,
+				"terrain_query_count": 1.0,
+				"terrain_query_count_scope": "original_F576_walk_only",
+				"total_volume_count": 3.0,
+				"visited_volume_count": 1.0,
+				"volumes": [
+					{
+						"certificate": {
+
+						},
+						"child_index": 0.0,
+						"frame": {
+							"T_D_s32_hex": "0000000000000000fffff5e1",
+							"actual_observer_equals_query_origin": false,
+							"antiparallel_axis_degeneracy": true,
+							"center_before_rotation_raw_s32_hex": "0000000000000000fffff5e1",
+							"center_minus_rotated_difference_raw_s32_hex": "00000000000000000200143c",
+							"frame_matches_immutable_point": true,
+							"linear_model_to_query_rows_f64_hex": "0000c0ffffffef3f0000000000000000000000000000000000000000000000000000c0ffffffef3f0000000000000000000000000000000000000000000000000000c0ffffffef3f",
+							"linear_query_to_model_rows_f64_hex": "000020000000f03f000000000000000000000000000000000000000000000000000020000000f03f000000000000000000000000000000000000000000000000000020000000f03f",
+							"mapping_admissible": false,
+							"model_index": 118.0,
+							"model_vertices_raw_s32_hex": "000000000000000000000000000000000000000000000021000000000000002100000000000000210000000000000000",
+							"observer_model_local_raw_s32_hex": "000000000000000001000a1e",
+							"ok": false,
+							"origin_model_raw_s32_hex": "000000000000000000000000",
+							"q31_floor_nonoddness_raw_s32_hex": "0000000000000000ffffffff",
+							"query_center_raw_s32_hex": "000000000000000001000a1e",
+							"query_matrix_raw_s32_hex": "0000000000000000ffffff2000000000ffffff2000000000ffffff200000000000000000",
+							"query_origin_unwrapped_offset_m": 4033645.31650186,
+							"reason": "native_antiparallel_axis_frame",
+							"rotation_q31_raw_s32_hex": "ffffff7f000000000000000000000000ffffff7f000000000000000000000000ffffff7f",
+							"source_qorigin_delta_nonwrapping": true,
+							"source_qorigin_delta_raw_s32_hex": "00000000000000000100143c",
+							"source_qorigin_delta_unwrapped_s64_hex": "000000000000000000000000000000000100143c00000000",
+							"source_quantum_raw_s64_hex": "0400000000000000",
+							"vector_scale_s32": 2.0,
+							"working_difference_raw_s32_hex": "0000000000000000fffff5e1",
+							"xy_rotation_taken": false,
+							"yz_rotation_taken": false
+						},
+						"geometry_ok": false,
+						"geometry_reason": "native_antiparallel_axis_frame",
+						"packet": {
+
+						},
+						"relative_before_s64_hex": "000000000000000000000000000000000600287800000000",
+						"selected_contact_volume": true,
+						"source_branch": "terrain_query",
+						"threshold_before_s32": 9600.0,
+						"threshold_scaled_s32": 2400.0,
+						"vector_scale_s32": 2.0
+					}
+				],
+				"whole_mesh_certified": false
+			}
+		}
+	],
+	"failures": 0,
+	"schema": 1,
+	"scope": "One actual original classification per copied snapshot; all56 modern native actor controls, exact ordered origins and first-hit/history, native frame/leaf projection certificates, real collector transport, original antiparallel pole rejection and atomic scope guards. Certificates describe native leaf derivation and original arithmetic, not ordinary flight mesh identity, live response, full source caller or physical Android.",
+	"sources": {
+		"scripts/game_diagnostics.gd": "ec43f79d0971680225f0555ac9d7f6e60f41806257bae7e9c1bff8a4f73c0fc3",
+		"scripts/source_contact_geometry_probe.gd": "e5eb15267a66781e99ef35235b10e5c116401a977907e9743d399ff1e8c6160a",
+		"scripts/source_native_contact_geometry.gd": "466eb3a88f1d1426321717d7ad24f73c6f697006473311646d9e79c101f6d0c7",
+		"scripts/source_natural_contact.gd": "e6cb189d34dc4d434b10f9fc2ef43bf8b96433845c01673f79b4d9592446658f",
+		"scripts/source_natural_footprint_probe.gd": "193018b8318c4d2593e99faeb71bb56691021b1e6d78e6cfbe076512490a1dc0",
+		"scripts/source_terrain_point.gd": "caebe9f918763d6781a4885ae05e9d27aec84e584b9b45bb02cc71dc75000037",
+		"scripts/source_terrain_query_frame.gd": "2b4be296798bf11755dc3b895a7e57fff013baad980bc1239369ddc59299b74e",
+		"scripts/source_terrain_query_trace.gd": "59871e3faa956a3bd580e30b50d5f3117e9e4a1968f48c17d615ab80e630e1b2",
+		"tests/test_source_contact_geometry_probe.gd": "b86c9943c31aac2898249b92f93a0ef3eb3e3c1026e3f836a91ced219ee2f0c2"
+	}
+}

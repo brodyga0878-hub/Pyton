@@ -19,24 +19,36 @@ class MockFootprintArchive(retained.MockAlignmentArchive):
 
 
 class ContactFootprintPackaging(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        directory=tempfile.TemporaryDirectory(prefix='contact-frame-packaging-v48-')
+        cls.addClassCleanup(directory.cleanup);cls.project=Path(directory.name)
+        for relative in cls.project_files():
+            target=cls.project/relative;target.parent.mkdir(parents=True,exist_ok=True)
+            target.write_bytes((PROJECT/relative).read_bytes())
+        baseline=verifier._load_contact_frame_baseline(PROJECT)
+        for relative,entry in {**baseline['files'],**baseline['metadata_source_files']}.items():
+            target=cls.project/relative;target.parent.mkdir(parents=True,exist_ok=True)
+            target.write_text(entry['source'])
+
     def setUp(self):self.archive=MockFootprintArchive()
 
     @staticmethod
     def project_files():
         files=retained.ContactAlignmentPackaging.project_files()
         files.update(verifier.CONTACT_FOOTPRINT_AUDITED_SOURCE_SHA256)
-        files.update(['tests/fixtures/footprint_v47_sources.json','tests/fixtures/source_footprint_native.json','scripts/build_info.gd','export_presets.cfg'])
+        files.update(['tests/fixtures/footprint_v47_sources.json','tests/fixtures/contact_frame_v48_sources.json','tests/fixtures/source_footprint_native.json','scripts/build_info.gd','export_presets.cfg'])
         return files
 
     def project_copy(self,directory):
         project=Path(directory)
         for relative in self.project_files():
             target=project/relative;target.parent.mkdir(parents=True,exist_ok=True)
-            target.write_bytes((PROJECT/relative).read_bytes())
+            target.write_bytes((self.project/relative).read_bytes())
         return project
 
     def test_actual48_scope_keeps_default_physics_and_all_actual_archive_hashes(self):
-        result=verifier.verify_contact_footprint_runtime(self.archive,PROJECT)
+        result=verifier.verify_contact_footprint_runtime(self.archive,self.project)
         self.assertEqual(result['baseline_source_commit'],'39397785dde976ca46e59e0c3fa240703898057c')
         self.assertEqual((result['compiled_module_count'],result['integration_compiled_module_count']),(2,42))
         self.assertEqual(result['baseline_fixture_source_count'],40)
@@ -69,7 +81,7 @@ class ContactFootprintPackaging(unittest.TestCase):
             with self.subTest(relative=relative):
                 archive=MockFootprintArchive();del archive.entries['assets/scripts/'+Path(relative).stem+'.gdc']
                 with self.assertRaisesRegex(AssertionError,'Missing contact-footprint integration runtime'):
-                    verifier.verify_contact_footprint_runtime(archive,PROJECT)
+                    verifier.verify_contact_footprint_runtime(archive,self.project)
 
     def test_new_compiled_headers_and_truncation_reject(self):
         for name in verifier.CONTACT_FOOTPRINT_MODULES:
@@ -77,12 +89,12 @@ class ContactFootprintPackaging(unittest.TestCase):
                 with self.subTest(name=name,size=len(raw)):
                     archive=MockFootprintArchive();archive.entries['assets/scripts/'+name+'.gdc']=raw
                     with self.assertRaisesRegex(AssertionError,'Invalid compiled contact-footprint integration runtime'):
-                        verifier.verify_contact_footprint_runtime(archive,PROJECT)
+                        verifier.verify_contact_footprint_runtime(archive,self.project)
 
     def test_same_actual_compiled_main_used_by_nested_history_audits(self):
         path='assets/scripts/main.gdc';raw=b'GDSC'+b'only-the-actual48-main-exported'*7
         self.archive.entries[path]=raw
-        result=verifier.verify_contact_footprint_runtime(self.archive,PROJECT)
+        result=verifier.verify_contact_footprint_runtime(self.archive,self.project)
         digest=hashlib.sha256(raw).hexdigest()
         self.assertEqual(result['integration_compiled_modules']['main'],digest)
         old47=result['retained_code47_source_audit']['assets']
@@ -93,10 +105,10 @@ class ContactFootprintPackaging(unittest.TestCase):
 
     def test_old47_public_gate_remains_strict_against_actual48(self):
         with self.assertRaisesRegex(AssertionError,'Contact alignment differs from audited integration source'):
-            verifier.verify_contact_alignment_runtime(self.archive,PROJECT)
+            verifier.verify_contact_alignment_runtime(self.archive,self.project)
 
     def test_baseline_is_exact_portable40source_code47_history(self):
-        baseline=verifier._load_contact_footprint_baseline(PROJECT)
+        baseline=verifier._load_contact_footprint_baseline(self.project)
         self.assertEqual(baseline['version_code'],47)
         self.assertEqual(baseline['audited_runtime_source_sha256'],verifier.CONTACT_ALIGNMENT_AUDITED_SOURCE_SHA256)
         self.assertEqual(len(baseline['files']),40)
@@ -120,7 +132,7 @@ class ContactFootprintPackaging(unittest.TestCase):
                     verifier.verify_contact_footprint_runtime(self.archive,project)
 
     def test_actual_physics_and_save_functions_compared_to47_before_source_history_audit(self):
-        baseline=verifier._load_contact_footprint_baseline(PROJECT)
+        baseline=verifier._load_contact_footprint_baseline(self.project)
         for name in ('_tick','_payload','_decode_state','_source_contact_enabled','_apply_pending_source_contact'):
             with self.subTest(name=name),tempfile.TemporaryDirectory() as directory:
                 project=self.project_copy(directory);path=project/'scripts/main.gd';raw=path.read_text()
@@ -150,8 +162,8 @@ class ContactFootprintPackaging(unittest.TestCase):
         for name in ('ffe_natural_contact','ffe_spherical_contact','ffe_ground_collision','ffe_surface_contact','ffe_terrain_query'):
             with self.subTest(name=name):
                 archive=MockFootprintArchive();path='assets/data/'+name+'.json'
-                archive.entries[path]=(PROJECT/'data'/f'{name}.json').read_bytes()+b' '
-                with self.assertRaises(AssertionError):verifier.verify_contact_footprint_runtime(archive,PROJECT)
+                archive.entries[path]=(self.project/'data'/f'{name}.json').read_bytes()+b' '
+                with self.assertRaises(AssertionError):verifier.verify_contact_footprint_runtime(archive,self.project)
 
     def test_new_native_footprint_reference_cannot_change(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -161,7 +173,7 @@ class ContactFootprintPackaging(unittest.TestCase):
                 verifier.verify_contact_footprint_runtime(self.archive,project)
 
     def test_runtime_and_android_metadata_are48_with_consistent_name(self):
-        info=(PROJECT/'scripts/build_info.gd').read_text();preset=verifier.preset_values(PROJECT/'export_presets.cfg')
+        info=(self.project/'scripts/build_info.gd').read_text();preset=verifier.preset_values(self.project/'export_presets.cfg')
         self.assertIn('const VERSION_CODE:=48',info)
         self.assertIn('const VERSION:="0.23.0-footprint-alpha1"',info)
         self.assertEqual((preset['version_code'],preset['version']),(48,'0.23.0-footprint-alpha1'))

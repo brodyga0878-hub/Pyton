@@ -1,0 +1,200 @@
+{
+  "schema": "starfrontier-contact-frame-unique-targeted-summary-v1",
+  "version": "0.24.0-contact-frame-alpha1",
+  "created_utc": "2026-11-14T21:32:07.828524+00:00",
+  "status": "passed",
+  "checks": 50326,
+  "failures": 0,
+  "passed_suites": 23,
+  "suites": [
+    {
+      "test": "tests/test_source_terrain_query_trace.gd",
+      "checks": 13071,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/regression-summary.json",
+      "test_source_sha256": "748db5d213ce7cb3dbd3ba94f094efa6d6dba12c53f896dfa3d1b18d1ba4f5b4"
+    },
+    {
+      "test": "tests/test_source_natural_footprint_probe.gd",
+      "checks": 1652,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/regression-summary.json",
+      "test_source_sha256": "41d14fef1941aa5409ef71c97ba1b0c5e5eb0aa7054dc15d264c748219735da2"
+    },
+    {
+      "test": "tests/test_source_natural_footprint_main.gd",
+      "checks": 54,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/regression-summary.json",
+      "test_source_sha256": "da6ea2d42b8847cdd31c602aa149155ff9d96beb211d59e0ae668a1e55dbcc4a"
+    },
+    {
+      "test": "tests/test_source_contact_alignment_main.gd",
+      "checks": 82,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/regression-summary.json",
+      "test_source_sha256": "d5d49b47922cb7a1544d0cfe5d8d72313323da2cac746949c75f83fd95f3e0a8"
+    },
+    {
+      "test": "tests/test_source_natural_contact_main.gd",
+      "checks": 163,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/regression-summary.json",
+      "test_source_sha256": "7dac6164b749ae29206fc873c7d65399660a00c8e055f5562d2fc041a3441e2d"
+    },
+    {
+      "test": "tests/test_source_spherical_main.gd",
+      "checks": 195,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/regression-summary.json",
+      "test_source_sha256": "31e6261d8f518cec93153501c53f4251ddf67d21149a0a5d519ffd0d7fccf12b"
+    },
+    {
+      "test": "tests/test_source_contact_main.gd",
+      "checks": 220,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/regression-summary.json",
+      "test_source_sha256": "4fe5094f251decdf18453c41386af507c980f658c623fb8507076310c07bbfbd"
+    },
+    {
+      "test": "tests/test_source_gear_main.gd",
+      "checks": 112,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/regression-summary.json",
+      "test_source_sha256": "1cbbb9ac45692058d24dfdc5cda0bc532fe5633a282fd5493a8fb72aeadecfa3"
+    },
+    {
+      "test": "tests/test_source_thermal_main.gd",
+      "checks": 463,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/regression-summary.json",
+      "test_source_sha256": "cc413076aeff8c13d2cbd0d1ebbce8ad1acd185b3dadef73385aa7704aaf0f6b"
+    },
+    {
+      "test": "tests/test_source_fuel_main.gd",
+      "checks": 397,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/regression-summary.json",
+      "test_source_sha256": "31ddac2cab1eaeea39ddd8e222bf25a2b61429ae40ba25e2b8dfddee2ab1d70e"
+    },
+    {
+      "test": "tests/test_source_hyperdrive_main.gd",
+      "checks": 70,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/regression-summary.json",
+      "test_source_sha256": "84f688bd98c73d50be2e3998f0780ff0ba44fa249aa10bd315840b6c6ec0f465"
+    },
+    {
+      "test": "tests/test_classic_console_main.gd",
+      "checks": 42,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/regression-summary.json",
+      "test_source_sha256": "a9d2f15c1ecd3911828f96671fa52636a60fcadbfbf57230fc4cb8b12c027fcf"
+    },
+    {
+      "test": "tests/test_flight_projection.gd",
+      "checks": 691,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/regression-summary.json",
+      "test_source_sha256": "a1e2569ae67b334851340782de2dab1c41ee8ceba3bb28b8ba66055d21f777d7"
+    },
+    {
+      "test": "tests/test_rebuilt_app_transitions.gd",
+      "checks": 54,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/regression-summary.json",
+      "test_source_sha256": "f81dad10e23e7169ba5e5046567b335720be7e93cfe95f7445e897f25cc436a5"
+    },
+    {
+      "test": "tests/test_graphics_integration.gd",
+      "checks": 44,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/regression-summary.json",
+      "test_source_sha256": "07803e334be7ce9c9feea54a6ca2a942971f99b206c213f3aed53c28c31cb34c"
+    },
+    {
+      "test": "tests/test_game_diagnostics.gd",
+      "checks": 71,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/regression-summary.json",
+      "test_source_sha256": "8633e58548a1c9467e2dcbbc87274cb55e47d0628ef45f000655d1a46a94cc2d"
+    },
+    {
+      "test": "tests/test_report_export.gd",
+      "checks": 27,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/regression-summary.json",
+      "test_source_sha256": "c7ccee21fb27c906336abebc9897acf6eb5b7479a30d934e69d0c3b8a55a7e80"
+    },
+    {
+      "test": "tests/test_bug_report_ui.gd",
+      "checks": 99,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/regression-summary.json",
+      "test_source_sha256": "01600083741179de09a29a8f11807974eee4857fab1c2734eeaa328267770079"
+    },
+    {
+      "test": "tests/test_source_contact_geometry_probe.gd",
+      "checks": 1026,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/final-integration-summary.json",
+      "test_source_sha256": "b86c9943c31aac2898249b92f93a0ef3eb3e3c1026e3f836a91ced219ee2f0c2"
+    },
+    {
+      "test": "tests/test_source_contact_geometry_main.gd",
+      "checks": 63,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/final-integration-summary.json",
+      "test_source_sha256": "e67ba8f56913410372ffba95fff6bb2f85419657760b2445056f768228eaaadb"
+    },
+    {
+      "test": "tests/test_source_terrain_query_frame.gd",
+      "checks": 25000,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/source-terrain-query-frame.json",
+      "test_source_sha256": "63d81fb4d0eb990ab09e4183d93741df6f00cf8acbf506a9107cf70726d9c41b"
+    },
+    {
+      "test": "tests/test_source_native_contact_geometry.gd",
+      "checks": 6583,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/source-native-contact-geometry.json",
+      "test_source_sha256": "a9181493307a1b388f36c8efcd23fe488dc2c88fee4ca95c7c1767c124637653"
+    },
+    {
+      "test": "tests/test_native_contact_geometry_view.gd",
+      "checks": 147,
+      "failures": 0,
+      "proof": "validation/contact-frame-2026-11-14/native-contact-geometry-view.json",
+      "test_source_sha256": "7005e044899b8cbf3764e3916cb448478f279508274f56e17aeb272557dabfc1"
+    }
+  ],
+  "proofs_sha256": {
+    "validation/contact-frame-2026-11-14/regression-summary.json": "a1beb082101d96891328284afa02c77061189b9e6a9d09597da411a472975564",
+    "validation/contact-frame-2026-11-14/final-integration-summary.json": "7f324499e4db8b8ff713f29298cd55301e3f94e2115f2fe7eab09fb40f513e5a",
+    "validation/contact-frame-2026-11-14/source-terrain-query-frame.json": "90615acaf1873272a10a118fef9a0a3738a0fca8529977a65ccb6d54af113304",
+    "validation/contact-frame-2026-11-14/source-native-contact-geometry.json": "c6f0a7a14d0f7cf04039b099bca25254150e679d30eb6f0592008b0b6f301ed9",
+    "validation/contact-frame-2026-11-14/native-contact-geometry-view.json": "39844640e062053982209c9e2db26e1de09501b155bd6fa44f4f84c918aecea8"
+  },
+  "new_native_control_cases": 242,
+  "new_native_frame_cases": 230,
+  "new_native_intercepted_caller_cases": 12,
+  "native_f581_observations": 237,
+  "native_query_frames": 236,
+  "native_leaf_packets_checked": 187,
+  "native_reproduction_validator_checks_separate": 400,
+  "capture_checks_separate": 73,
+  "capture_frames": 4,
+  "native_controls_already_in_functional_counts": true,
+  "historical_totals_added": false,
+  "failed_development_runs_added": false,
+  "repeated_portability_and_capture_checks_added": false,
+  "earlier_view_layout_checks_added": false,
+  "default_v4_terrain_retained": true,
+  "live_response_enabled": false,
+  "source_geometry_identity_verified": false,
+  "physical_device_tested": false,
+  "production_release_ready": false,
+  "full_original_port_complete": false,
+  "scope": "One current passing result per23 distinct selected suites:18 preserved app/footprint/trace groups, original query frame, native leaf projection packet, isolated inspection UI, actual snapshot producer and actual Main/report.242 new native cases are contained in those assertions and not added again. Native validator,328 packaging tests, GPU capture and fresh archive repeats remain separate. Earlier small-view and failed development runs are excluded. A frame/leaf projection certificate does not certify the ordinary whole mesh, full collision bank or physical phone."
+}

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "checks": 400,
+  "failures": 0,
+  "errors": [],
+  "frame_case_count": 230,
+  "caller_case_count": 12,
+  "unchanged_0_23_footprint_cases": 158,
+  "fresh_runs_per_bank": 3,
+  "reverse_repeats": true,
+  "static_instruction_procedure_count": 11,
+  "adapted_native_caller_procedure_numbers": [
+    569,
+    570,
+    1335,
+    1532,
+    1662
+  ],
+  "fixture_sha256": "8c0b9a7077fa305b6c27c3864fa63f7bb364fe654c9b2e8ec100e1577ff73bdb",
+  "generator_sha256": "f065075c673e3e179a509eefd6e21f549d690fcceb1a6030c545c54b81ffe96e",
+  "validator_sha256": "8c6ceaf395a2330155e24b6be89775913ab109e89387122406eca9f5b3f88e67",
+  "scope": "Actual observed frame/caller records rerun and unchanged158originalfootprintrecords. F575entryisobserverinterceptiononly; no fullF575pipeline/worldconversion/GPU/liveexecution claim."
+}

@@ -1,0 +1,21 @@
+00427270: push ebp
+00427271: mov ebp,esp
+00427273: mov BYTE PTR ds:0x633ecc,0xff
+0042727a: mov eax,DWORD PTR [ebp+0x20]
+0042727d: push eax
+0042727e: mov eax,DWORD PTR [ebp+0x1c]
+00427281: push eax
+00427282: mov eax,DWORD PTR [ebp+0x18]
+00427285: push eax
+00427286: mov eax,DWORD PTR [ebp+0x14]
+00427289: push eax
+0042728a: mov eax,DWORD PTR [ebp+0x10]
+0042728d: push eax
+0042728e: mov eax,DWORD PTR [ebp+0xc]
+00427291: push eax
+00427292: mov eax,DWORD PTR [ebp+0x8]
+00427295: push eax
+00427296: call 0x4272a0
+0042729b: add esp,0x1c
+0042729e: pop ebp
+0042729f: ret 

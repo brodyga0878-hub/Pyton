@@ -4,7 +4,7 @@ extends "res://tests/test_source_natural_surface_bridge.gd"
 # response is evaluated only as a preview; no Main physical commit is tested.
 const Footprint=preload("res://scripts/source_natural_footprint_probe.gd")
 const Diagnostics=preload("res://scripts/game_diagnostics.gd")
-const FOOTPRINT_REPORT:="res://validation/footprint-2026-11-14/source-natural-footprint-probe.json"
+const FOOTPRINT_REPORT:="res://build/current-test-reports/source-natural-footprint-probe.json"
 const NATIVE_FIXTURE:="res://tests/fixtures/source_footprint_native.json"
 var footprint_counts:={"native_modern_actors":0,"visited_volumes":0,"native_query_leaves":0,"selected_children":0,"history_control_volumes":0,"capped_history_controls":0}
 var footprint_evidence:Array=[]
