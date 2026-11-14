@@ -11,6 +11,7 @@ const NativeFuel=preload("res://scripts/source_fuel_flight_bridge.gd")
 const NativeTrace=preload("res://scripts/source_terrain_query_trace.gd")
 const NativeGravityFrame=preload("res://scripts/source_fuel_contact.gd")
 const NativePhysics=preload("res://scripts/source_physics_bridge.gd")
+const NativeFlight=preload("res://scripts/flight_model.gd")
 const NATIVE_SCHEMA:="starfrontier-native-surface-trial-v1"
 const NATIVE_POLICY:="bounded-native-manual-landing-host-adapter-v1"
 const MOTION_POLICY:="phone-delta-over-persistent-source-position-and-q16-velocity-v1"
@@ -358,6 +359,16 @@ func restore(data:Dictionary,ship:RefCounted,world:RefCounted)->bool:
 			if not coarse.get("ok",false) or int(coarse.get("f576_return_s32",0))==0 or int(coarse.get("terrain_query_calls",-1))!=0:return false
 	elif data.provider.kind=="render_only_signed_root":
 		if session.generation()!=0 or int(provider_binding.generation)!=0 or decoded.value.get("record")!=terrain.source_record:return false
+		# Generation zero has a known construction, rather than a previous
+		# integrator delta. Rebuild exactly that initial body so an unrelated
+		# valid raw session cannot ride an unchanged root/phone witness.
+		if pose!=anchor or pose.velocity!=Vector3.ZERO or pose.attitude!=Quaternion.IDENTITY:return false
+		var entry_surface:RefCounted=get_script().new();entry_surface.active=true;entry_surface.globe=terrain;entry_surface.body_id=str(data.body_id)
+		var entry_ship:=NativeFlight.new();entry_ship.ship_id=str(ship.ship_id);entry_ship.position=pose.position;entry_ship.velocity=pose.velocity;entry_ship.attitude=pose.attitude
+		var entry_frame:=NativeFootprint._prepare(entry_surface,entry_ship,{})
+		if not entry_frame.get("ok",false):return false
+		var entry_operands:=NativeFootprint._operands(entry_frame,0)
+		if entry_operands.is_empty() or entry_operands.body!=session.raw_body() or entry_operands.parent!=session.raw_parent():return false
 	else:
 		var source_snapshot:Dictionary=data.session
 		if session.generation()<1 or int(provider_binding.generation)+1!=session.generation() or provider_binding.request_token!=source_snapshot.last_token or provider_binding.request_sha256!=source_snapshot.last_token:return false

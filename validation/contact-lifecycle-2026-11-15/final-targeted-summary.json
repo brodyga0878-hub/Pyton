@@ -1,0 +1,479 @@
+{
+  "schema": "starfrontier-native-landing-unique-targeted-summary-v1",
+  "version": "0.25.0-native-landing-alpha1",
+  "created_utc": "2026-11-14T22:44:33.641164+00:00",
+  "status": "passed",
+  "checks": 44468,
+  "failures": 0,
+  "passed_suites": 26,
+  "old_suites": 18,
+  "new_suites": 8,
+  "suites": [
+    {
+      "name": "source_natural_park",
+      "test": "tests/test_source_natural_park.gd",
+      "checks": 621,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/final-clean-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/final-clean/logs/source_natural_park.log",
+      "executed_utc": "2026-11-14T22:43:21.267477+00:00",
+      "test_source_sha256": "181164fa415b05bad2174f963e4ecd136ec093b1cddfe82cbd8a79ccc5dbd4a6"
+    },
+    {
+      "name": "source_natural_contact_session",
+      "test": "tests/test_source_natural_contact_session.gd",
+      "checks": 2142,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/final-clean-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/final-clean/logs/source_natural_contact_session.log",
+      "executed_utc": "2026-11-14T22:43:21.268006+00:00",
+      "test_source_sha256": "2c91cd3c4d531784a19bf2a20cbfa54283b31416bf6f6bccd2bf2219e93aed83"
+    },
+    {
+      "name": "source_native_surface_provider",
+      "test": "tests/test_source_native_surface_provider.gd",
+      "checks": 1098,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/final-clean-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/final-clean/logs/source_native_surface_provider.log",
+      "executed_utc": "2026-11-14T22:43:21.268222+00:00",
+      "test_source_sha256": "9a9e5a0fb5d397e48c08730258723852349ea563cdccca6e1bcedbc505941aa0"
+    },
+    {
+      "name": "source_native_surface_visual",
+      "test": "tests/test_source_native_surface_visual.gd",
+      "checks": 115,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/final-clean-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/final-clean/logs/source_native_surface_visual.log",
+      "executed_utc": "2026-11-14T22:43:21.981712+00:00",
+      "test_source_sha256": "bdb6fc863ea3543488ba1c7e2269b17abd29c0e578e5fcb1c6ab8984c4635b7c"
+    },
+    {
+      "name": "native_surface_model",
+      "test": "tests/test_native_surface_model.gd",
+      "checks": 455,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/final-clean-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/final-clean/logs/native_surface_model.log",
+      "executed_utc": "2026-11-14T22:43:23.248218+00:00",
+      "test_source_sha256": "33a02808653fca7cafd0f5a3859504564721c285ff806e8e501ffe533efe120e"
+    },
+    {
+      "name": "native_landing_trial",
+      "test": "tests/test_native_landing_trial.gd",
+      "checks": 65,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/final-clean-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/final-clean/logs/native_landing_trial.log",
+      "executed_utc": "2026-11-14T22:43:23.448882+00:00",
+      "test_source_sha256": "c251e76c0dbf0496b1881129b8ec0f2ac70d1c72f91828ab3efdb969bf6a30e2"
+    },
+    {
+      "name": "native_landing_trial_integration",
+      "test": "tests/test_native_landing_trial_integration.gd",
+      "checks": 146,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/final-clean-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/final-clean/logs/native_landing_trial_integration.log",
+      "executed_utc": "2026-11-14T22:43:23.584301+00:00",
+      "test_source_sha256": "363550ee5f953c0bad59cfc9c76c469250f4050c6359a3ee7ba8740c3cc0780d"
+    },
+    {
+      "name": "native_landing_trial_main",
+      "test": "tests/test_native_landing_trial_main.gd",
+      "checks": 48,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/final-clean-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/final-clean/logs/native_landing_trial_main.log",
+      "executed_utc": "2026-11-14T22:43:24.168178+00:00",
+      "test_source_sha256": "5ebd2ee0f8e04a336b884a8595d210e64d9225dfd9ffd4ae36bd18cf93c96643"
+    },
+    {
+      "name": "app_transitions",
+      "test": "tests/test_rebuilt_app_transitions.gd",
+      "checks": 54,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/regression/logs/app_transitions.log",
+      "executed_utc": "2026-11-14T22:32:04.159922+00:00",
+      "test_source_sha256": "f81dad10e23e7169ba5e5046567b335720be7e93cfe95f7445e897f25cc436a5"
+    },
+    {
+      "name": "classic_console_main",
+      "test": "tests/test_classic_console_main.gd",
+      "checks": 42,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/regression/logs/classic_console_main.log",
+      "executed_utc": "2026-11-14T22:31:59.479733+00:00",
+      "test_source_sha256": "a9d2f15c1ecd3911828f96671fa52636a60fcadbfbf57230fc4cb8b12c027fcf"
+    },
+    {
+      "name": "flight",
+      "test": "tests/test_rebuilt_flight.gd",
+      "checks": 94,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/regression/logs/flight.log",
+      "executed_utc": "2026-11-14T22:32:03.682662+00:00",
+      "test_source_sha256": "4866c51adf55cf9f4ad31f0fdb17ddc10c26a76e0052a2357d64e085e5ef4e57"
+    },
+    {
+      "name": "flight_projection",
+      "test": "tests/test_flight_projection.gd",
+      "checks": 691,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/regression/logs/flight_projection.log",
+      "executed_utc": "2026-11-14T22:32:01.488615+00:00",
+      "test_source_sha256": "a1e2569ae67b334851340782de2dab1c41ee8ceba3bb28b8ba66055d21f777d7"
+    },
+    {
+      "name": "flight_time_controller",
+      "test": "tests/test_flight_time_controller.gd",
+      "checks": 36926,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/regression/logs/flight_time_controller.log",
+      "executed_utc": "2026-11-14T22:31:57.262101+00:00",
+      "test_source_sha256": "9bd88095910c6ccc1ecd759842d5b383c10ea8c294d915d93f38151aae2d5849"
+    },
+    {
+      "name": "navigation_main",
+      "test": "tests/test_navigation_main.gd",
+      "checks": 53,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/regression/logs/navigation_main.log",
+      "executed_utc": "2026-11-14T22:31:54.142464+00:00",
+      "test_source_sha256": "134ccfc0534ce835429cdd2c0cdbae7272c96d073ae011df03d19ee159661d73"
+    },
+    {
+      "name": "save_touch",
+      "test": "tests/test_rebuilt_save_touch.gd",
+      "checks": 71,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/regression/logs/save_touch.log",
+      "executed_utc": "2026-11-14T22:32:03.917730+00:00",
+      "test_source_sha256": "c2755cdb318c5f75c8c1a348d14ed8bc4e2014a9e1bcf9807264a5a3196786f0"
+    },
+    {
+      "name": "source_contact_alignment_main",
+      "test": "tests/test_source_contact_alignment_main.gd",
+      "checks": 82,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/regression/logs/source_contact_alignment_main.log",
+      "executed_utc": "2026-11-14T22:30:12.056133+00:00",
+      "test_source_sha256": "d5d49b47922cb7a1544d0cfe5d8d72313323da2cac746949c75f83fd95f3e0a8"
+    },
+    {
+      "name": "source_contact_geometry_main",
+      "test": "tests/test_source_contact_geometry_main.gd",
+      "checks": 63,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/regression/logs/source_contact_geometry_main.log",
+      "executed_utc": "2026-11-14T22:30:12.055854+00:00",
+      "test_source_sha256": "e67ba8f56913410372ffba95fff6bb2f85419657760b2445056f768228eaaadb"
+    },
+    {
+      "name": "source_contact_main",
+      "test": "tests/test_source_contact_main.gd",
+      "checks": 220,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/regression/logs/source_contact_main.log",
+      "executed_utc": "2026-11-14T22:31:06.528224+00:00",
+      "test_source_sha256": "4fe5094f251decdf18453c41386af507c980f658c623fb8507076310c07bbfbd"
+    },
+    {
+      "name": "source_fuel_main",
+      "test": "tests/test_source_fuel_main.gd",
+      "checks": 397,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/regression/logs/source_fuel_main.log",
+      "executed_utc": "2026-11-14T22:31:47.075385+00:00",
+      "test_source_sha256": "31ddac2cab1eaeea39ddd8e222bf25a2b61429ae40ba25e2b8dfddee2ab1d70e"
+    },
+    {
+      "name": "source_gear_main",
+      "test": "tests/test_source_gear_main.gd",
+      "checks": 112,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/regression/logs/source_gear_main.log",
+      "executed_utc": "2026-11-14T22:31:18.565171+00:00",
+      "test_source_sha256": "1cbbb9ac45692058d24dfdc5cda0bc532fe5633a282fd5493a8fb72aeadecfa3"
+    },
+    {
+      "name": "source_hyperdrive_main",
+      "test": "tests/test_source_hyperdrive_main.gd",
+      "checks": 70,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/regression/logs/source_hyperdrive_main.log",
+      "executed_utc": "2026-11-14T22:31:53.769101+00:00",
+      "test_source_sha256": "84f688bd98c73d50be2e3998f0780ff0ba44fa249aa10bd315840b6c6ec0f465"
+    },
+    {
+      "name": "source_motion_main_continuation",
+      "test": "tests/test_source_motion_main_continuation.gd",
+      "checks": 28,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/regression/logs/source_motion_main_continuation.log",
+      "executed_utc": "2026-11-14T22:31:57.499587+00:00",
+      "test_source_sha256": "98f30d43361747a56627170e76dbdaf1f3f7bbdefe53027ac2920899b2e5e728"
+    },
+    {
+      "name": "source_natural_footprint_main",
+      "test": "tests/test_source_natural_footprint_main.gd",
+      "checks": 54,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/regression/logs/source_natural_footprint_main.log",
+      "executed_utc": "2026-11-14T22:30:12.056025+00:00",
+      "test_source_sha256": "da6ea2d42b8847cdd31c602aa149155ff9d96beb211d59e0ae668a1e55dbcc4a"
+    },
+    {
+      "name": "source_natural_main",
+      "test": "tests/test_source_natural_contact_main.gd",
+      "checks": 163,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/regression/logs/source_natural_main.log",
+      "executed_utc": "2026-11-14T22:30:41.617365+00:00",
+      "test_source_sha256": "7dac6164b749ae29206fc873c7d65399660a00c8e055f5562d2fc041a3441e2d"
+    },
+    {
+      "name": "source_spherical_main",
+      "test": "tests/test_source_spherical_main.gd",
+      "checks": 195,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/regression/logs/source_spherical_main.log",
+      "executed_utc": "2026-11-14T22:30:45.989007+00:00",
+      "test_source_sha256": "31e6261d8f518cec93153501c53f4251ddf67d21149a0a5d519ffd0d7fccf12b"
+    },
+    {
+      "name": "source_thermal_main",
+      "test": "tests/test_source_thermal_main.gd",
+      "checks": 463,
+      "failures": 0,
+      "proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "log": "validation/contact-lifecycle-2026-11-15/regression/logs/source_thermal_main.log",
+      "executed_utc": "2026-11-14T22:31:19.125529+00:00",
+      "test_source_sha256": "cc413076aeff8c13d2cbd0d1ebbce8ad1acd185b3dadef73385aa7704aaf0f6b"
+    }
+  ],
+  "proofs_sha256": {
+    "tests/fixtures/source_contact_lifecycle_native.json": "0db723a520144a55fa3846d80a3e1cad58b42c18d2f904500688a05ebfbf1f8b",
+    "validation/contact-lifecycle-2026-11-15/final-clean-summary.json": "e0d0dcd885e5db5227f5725b4325ebf2643eb0241630e676edaca691727b316a",
+    "validation/contact-lifecycle-2026-11-15/final-clean/logs/native_landing_trial.log": "02b4c39d04c218abbf6574df1189193746e91fc4e167b8ec9f7c0eef633679d6",
+    "validation/contact-lifecycle-2026-11-15/final-clean/logs/native_landing_trial_integration.log": "53a73d013b7fef748badb339218638b16f1ae07f3cf37878131fc13031a505ca",
+    "validation/contact-lifecycle-2026-11-15/final-clean/logs/native_landing_trial_main.log": "7c638bcf50ba530b4f1c2c37c0f312bd1b403849d9feba80f37e709a18d14458",
+    "validation/contact-lifecycle-2026-11-15/final-clean/logs/native_surface_model.log": "a7046f567d74a8772ad0768c2d1afe8b92a11a8abb0cb436dddc611268290f36",
+    "validation/contact-lifecycle-2026-11-15/final-clean/logs/source_native_surface_provider.log": "220bba7bb6691c6a96ac8747ce6690c76ab3975473a4111fb02ca1d4953ee57d",
+    "validation/contact-lifecycle-2026-11-15/final-clean/logs/source_native_surface_visual.log": "5115ec0a9370e060a4cc7e7bfacb19c690f3ffac19ba1da176f4411243e50028",
+    "validation/contact-lifecycle-2026-11-15/final-clean/logs/source_natural_contact_session.log": "b45217d5cda4ac4c597f2f897b7afeb6be8a31f9ca5d80cb89f9f087cf0e5fc9",
+    "validation/contact-lifecycle-2026-11-15/final-clean/logs/source_natural_park.log": "51bd936111c1e26610a6a701173cdd0ce7d9ba955050c89d69011332570087ad",
+    "validation/contact-lifecycle-2026-11-15/native-landing-trial-integration.json": "5b2663c4acc275544d6cdf13267cf78cdf545880b1825fe9a768c09dff0b5e9f",
+    "validation/contact-lifecycle-2026-11-15/native-landing-trial-main.json": "59941256d1b786a6ecff313012b45d7babb2529d987a46b7a89d53c51924434f",
+    "validation/contact-lifecycle-2026-11-15/native-landing-trial.json": "f2ba3691d5464723737ffaf69a572c1834eaaf6ac2df698ab99edac8c0f18505",
+    "validation/contact-lifecycle-2026-11-15/native-proof/validation.json": "939ec337ef5538018bd4622a17735857c4aa0d769f7ce3fc431e388ac2d7c61f",
+    "validation/contact-lifecycle-2026-11-15/native-surface-model.json": "dca193bfebe1e60be9f2ec7c03a5afd980c2fa2f63619c7866e552ae85d5d5e0",
+    "validation/contact-lifecycle-2026-11-15/regression-summary.json": "97167883077a4190175f20c7db3a72366265161b382b120c44c93cd2df248716",
+    "validation/contact-lifecycle-2026-11-15/regression/logs/app_transitions.log": "0c190763c029bb01bb6bb16c947fe7d80537e36b271d22fc91c468771ba45cd4",
+    "validation/contact-lifecycle-2026-11-15/regression/logs/classic_console_main.log": "fd1b59ff7ab0184ebb05c966c93c20e81d6f74731c727c273818a1dadac0b0b3",
+    "validation/contact-lifecycle-2026-11-15/regression/logs/flight.log": "0b640c163b8abe26515d2c2b75908a7572a90a86002aada4d1e7b7576d44aa6b",
+    "validation/contact-lifecycle-2026-11-15/regression/logs/flight_projection.log": "e5975c1d32e6a08a7f636589baf1c72d9a8b86a2bf780a15847ccca504fc6d35",
+    "validation/contact-lifecycle-2026-11-15/regression/logs/flight_time_controller.log": "b53b43e65f62372860d06f939b76e493c80c702a3858896a93ee7acb915d7f76",
+    "validation/contact-lifecycle-2026-11-15/regression/logs/navigation_main.log": "341f62f03e5ea9792cb9e4caaf3261f7e61c57b9664e49fe27d12453ab4c12b6",
+    "validation/contact-lifecycle-2026-11-15/regression/logs/save_touch.log": "4e005c6452779d4e0da1f581ec5c6c9adb329e96988074e1b55de70b58bb2c07",
+    "validation/contact-lifecycle-2026-11-15/regression/logs/source_contact_alignment_main.log": "b482d7e9d7470216b52a3aff4968dddd98322ccbf8aaf5056b4784b8361c3d2c",
+    "validation/contact-lifecycle-2026-11-15/regression/logs/source_contact_geometry_main.log": "51dce3e104d3c227cab6356ddb8f102c0a38aa0674a73e272e07fc1ac3eb0c83",
+    "validation/contact-lifecycle-2026-11-15/regression/logs/source_contact_main.log": "e011d6a2a034a26f4bd292606b9838fc462cf79c1bc76bf4ac343f42cc82a8b3",
+    "validation/contact-lifecycle-2026-11-15/regression/logs/source_fuel_main.log": "56d10dd266bc7c99655e694d8239d01f71dc6be6d1387f40552f21c080b59b8e",
+    "validation/contact-lifecycle-2026-11-15/regression/logs/source_gear_main.log": "63caa373b770d451b3d8aa9b7deec6df6c6bae60a4359aba7d61e3c87668d96f",
+    "validation/contact-lifecycle-2026-11-15/regression/logs/source_hyperdrive_main.log": "714642268b5d030046e011e56f234bb451f4042b5a194b32c21d1e1878eecbd8",
+    "validation/contact-lifecycle-2026-11-15/regression/logs/source_motion_main_continuation.log": "ab033c9f87f6330cebe4b90aaefd83515c127b83a397d21d532ca38c4f152491",
+    "validation/contact-lifecycle-2026-11-15/regression/logs/source_natural_footprint_main.log": "525996577b273cfb8d314aeacb841e3aa706d8dbc8c827860dc2b56095326b1f",
+    "validation/contact-lifecycle-2026-11-15/regression/logs/source_natural_main.log": "47acd65fc5708b42714a74d246151996b082f0ca0116e47b45a360ae4fb8876d",
+    "validation/contact-lifecycle-2026-11-15/regression/logs/source_spherical_main.log": "94ad0ea55abd7e0435ef0b5ab34e37b2015545dad6ae8c264a5826d379633c68",
+    "validation/contact-lifecycle-2026-11-15/regression/logs/source_thermal_main.log": "778c6760648b68cfb044879f19bd0c3e3d255300008d57f8d2aa6c364285c486",
+    "validation/contact-lifecycle-2026-11-15/source-native-surface-provider.json": "2b95b4ac6557de01328e720862a05ef9393c88bad9ac828ea787e080805954d3",
+    "validation/contact-lifecycle-2026-11-15/source-native-surface-visual.json": "66e27153d446fcb2389451a81fb7647c3dfc9abe3e977db924e085e216b5b6f7",
+    "validation/contact-lifecycle-2026-11-15/source-natural-contact-session.json": "eb29d34d71ddf10ea6b91041d93d1f0e340c6d9dce2fd7730161c9c3d9f65f59",
+    "validation/contact-lifecycle-2026-11-15/source-natural-park.json": "e68f8190c946dc69a12eb339c35b9762519feb9313dbd929265a6f8535c208ae"
+  },
+  "selected_report_source_pins": {
+    "source_natural_park": {
+      "scripts/source_natural_park.gd": "06c44e67f338d8e1011ace70ea6bc89cbe1fa905348c6efedffeb2686abfab14",
+      "tests/fixtures/source_contact_lifecycle_native.json": "0db723a520144a55fa3846d80a3e1cad58b42c18d2f904500688a05ebfbf1f8b",
+      "tests/test_source_natural_park.gd": "181164fa415b05bad2174f963e4ecd136ec093b1cddfe82cbd8a79ccc5dbd4a6"
+    },
+    "source_natural_contact_session": {
+      "scripts/source_hyperdrive_session.gd": "c44596500a9dcd5645d9d9fce2b9a98d01cdf2abd07606046e4b6231edb8612c",
+      "scripts/source_natural_contact.gd": "e6cb189d34dc4d434b10f9fc2ef43bf8b96433845c01673f79b4d9592446658f",
+      "scripts/source_natural_contact_pipeline.gd": "8d981b53f301dd375f22faae89a439673a3f94a98278cbb2161075a85ae125be",
+      "scripts/source_natural_contact_session.gd": "5e3472a7bbe8998a30f11340a563564d43307dd1b3c482eb838126c880a728d6",
+      "scripts/source_natural_park.gd": "06c44e67f338d8e1011ace70ea6bc89cbe1fa905348c6efedffeb2686abfab14",
+      "scripts/source_surface_contact.gd": "fcfb6077f0bcabf7b6ffce98c3a3dbb23251a850175be4ef241b299fdf8d117d",
+      "scripts/source_terrain_query_trace.gd": "59871e3faa956a3bd580e30b50d5f3117e9e4a1968f48c17d615ab80e630e1b2",
+      "tests/fixtures/source_contact_lifecycle_native.json": "0db723a520144a55fa3846d80a3e1cad58b42c18d2f904500688a05ebfbf1f8b",
+      "tests/fixtures/source_footprint_native.json": "7fa98e4dd0b63ec9c0a608b9a11ec032aae2d55861c018212aeb50080d8bf726",
+      "tests/test_source_natural_contact_session.gd": "2c91cd3c4d531784a19bf2a20cbfa54283b31416bf6f6bccd2bf2219e93aed83"
+    },
+    "source_native_surface_provider": {
+      "scripts/source_native_contact_geometry.gd": "466eb3a88f1d1426321717d7ad24f73c6f697006473311646d9e79c101f6d0c7",
+      "scripts/source_native_surface_provider.gd": "c1558516a8414783de8b3c74d97e75fa9dfd52feeaa81517d974af10e28fcc5e",
+      "scripts/source_natural_contact.gd": "e6cb189d34dc4d434b10f9fc2ef43bf8b96433845c01673f79b4d9592446658f",
+      "scripts/source_terrain_query_frame.gd": "2b4be296798bf11755dc3b895a7e57fff013baad980bc1239369ddc59299b74e",
+      "tests/fixtures/source_footprint_native.json": "7fa98e4dd0b63ec9c0a608b9a11ec032aae2d55861c018212aeb50080d8bf726",
+      "tests/fixtures/source_native_provider_orientation.json": "5bb3eaf1f52d2ac7794e40bd41ebfb87250a7e9eceb799252281b790f04ed707",
+      "tests/test_source_native_surface_provider.gd": "9a9e5a0fb5d397e48c08730258723852349ea563cdccca6e1bcedbc505941aa0"
+    },
+    "source_native_surface_visual": {
+      "scripts/source_native_surface_provider.gd": "c1558516a8414783de8b3c74d97e75fa9dfd52feeaa81517d974af10e28fcc5e",
+      "scripts/source_native_surface_visual.gd": "980cae126b582328acf18de058964504249acc440c7616a66dc2b3c7b3760853",
+      "scripts/world_surface_library.gd": "45824d82d0269a92a027ddcf5967321a8f784f000eabadb583e67a79a85a5aa2",
+      "tests/test_source_native_surface_visual.gd": "bdb6fc863ea3543488ba1c7e2269b17abd29c0e578e5fcb1c6ab8984c4635b7c"
+    },
+    "native_surface_model": {},
+    "native_landing_trial": {},
+    "native_landing_trial_integration": {},
+    "native_landing_trial_main": {
+      "scripts/main.gd": "618ae48020cef6e0d1669f392fa0ed20483a9ab27d522be6446a18474bed891d",
+      "scripts/native_landing_trial.gd": "9e99d0c664a9fd2cab79424ee8c05359d0fa30bd2de34ea88a7286915285bda1",
+      "scripts/native_surface_model.gd": "9d63da249b3beadb53d88d97564b55a91b381a51b4f89c7b2f4b6a9ed794081e",
+      "scripts/source_native_surface_provider.gd": "c1558516a8414783de8b3c74d97e75fa9dfd52feeaa81517d974af10e28fcc5e",
+      "scripts/source_natural_contact_session.gd": "5e3472a7bbe8998a30f11340a563564d43307dd1b3c482eb838126c880a728d6",
+      "tests/test_native_landing_trial_main.gd": "5ebd2ee0f8e04a336b884a8595d210e64d9225dfd9ffd4ae36bd18cf93c96643"
+    }
+  },
+  "standalone_reports_without_internal_runtime_pins": [
+    "native_surface_model",
+    "native_landing_trial",
+    "native_landing_trial_integration"
+  ],
+  "all_suite_source_fingerprints_verified": true,
+  "declared_report_source_pins_verified": true,
+  "replacement_proofs": [
+    {
+      "proof": "validation/contact-lifecycle-2026-11-15/final-clean-summary.json",
+      "updated_utc": "2026-11-14T22:43:49.340880+00:00"
+    }
+  ],
+  "superseded_suite_results_not_added": [
+    {
+      "name": "source_natural_park",
+      "superseded_proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "replacement_proof": "validation/contact-lifecycle-2026-11-15/final-clean-summary.json",
+      "superseded_status": "passed",
+      "superseded_reason": "",
+      "superseded_test_source_sha256": "181164fa415b05bad2174f963e4ecd136ec093b1cddfe82cbd8a79ccc5dbd4a6",
+      "superseded_checks_not_added": 621,
+      "current_checks": 621
+    },
+    {
+      "name": "source_natural_contact_session",
+      "superseded_proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "replacement_proof": "validation/contact-lifecycle-2026-11-15/final-clean-summary.json",
+      "superseded_status": "passed",
+      "superseded_reason": "",
+      "superseded_test_source_sha256": "c4f119d86345b3fa5d9e359f6c7d7f6efb0b568a046ae5937a8fbc43287fcefa",
+      "superseded_checks_not_added": 2141,
+      "current_checks": 2142
+    },
+    {
+      "name": "source_native_surface_provider",
+      "superseded_proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "replacement_proof": "validation/contact-lifecycle-2026-11-15/final-clean-summary.json",
+      "superseded_status": "passed",
+      "superseded_reason": "",
+      "superseded_test_source_sha256": "74ff1ce478ddea9c3f3bd73e7d2894b7430d7d2c1079446a66e1813fc37add1d",
+      "superseded_checks_not_added": 1091,
+      "current_checks": 1098
+    },
+    {
+      "name": "source_native_surface_visual",
+      "superseded_proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "replacement_proof": "validation/contact-lifecycle-2026-11-15/final-clean-summary.json",
+      "superseded_status": "passed",
+      "superseded_reason": "",
+      "superseded_test_source_sha256": "bdb6fc863ea3543488ba1c7e2269b17abd29c0e578e5fcb1c6ab8984c4635b7c",
+      "superseded_checks_not_added": 115,
+      "current_checks": 115
+    },
+    {
+      "name": "native_surface_model",
+      "superseded_proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "replacement_proof": "validation/contact-lifecycle-2026-11-15/final-clean-summary.json",
+      "superseded_status": "failed",
+      "superseded_reason": "Expected exactly one current checks/failures summary, got 0",
+      "superseded_test_source_sha256": "48dd0bad6089b872ae06007bec72b6f5c724adca0473190fc511ac58b2062745",
+      "superseded_checks_not_added": 0,
+      "current_checks": 455
+    },
+    {
+      "name": "native_landing_trial",
+      "superseded_proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "replacement_proof": "validation/contact-lifecycle-2026-11-15/final-clean-summary.json",
+      "superseded_status": "passed",
+      "superseded_reason": "",
+      "superseded_test_source_sha256": "c251e76c0dbf0496b1881129b8ec0f2ac70d1c72f91828ab3efdb969bf6a30e2",
+      "superseded_checks_not_added": 65,
+      "current_checks": 65
+    },
+    {
+      "name": "native_landing_trial_integration",
+      "superseded_proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "replacement_proof": "validation/contact-lifecycle-2026-11-15/final-clean-summary.json",
+      "superseded_status": "passed",
+      "superseded_reason": "",
+      "superseded_test_source_sha256": "363550ee5f953c0bad59cfc9c76c469250f4050c6359a3ee7ba8740c3cc0780d",
+      "superseded_checks_not_added": 146,
+      "current_checks": 146
+    },
+    {
+      "name": "native_landing_trial_main",
+      "superseded_proof": "validation/contact-lifecycle-2026-11-15/regression-summary.json",
+      "replacement_proof": "validation/contact-lifecycle-2026-11-15/final-clean-summary.json",
+      "superseded_status": "passed",
+      "superseded_reason": "",
+      "superseded_test_source_sha256": "5ebd2ee0f8e04a336b884a8595d210e64d9225dfd9ffd4ae36bd18cf93c96643",
+      "superseded_checks_not_added": 48,
+      "current_checks": 48
+    }
+  ],
+  "superseded_failed_development_rows_not_added": [
+    "native_surface_model"
+  ],
+  "new_native_control_cases": 402,
+  "new_native_actor_cases": 247,
+  "native_corrected_requery_cases": 76,
+  "native_parked_cold_tick_cases": 76,
+  "native_launch_entry_prefix_cases": 3,
+  "native_fixture_sha256": "0db723a520144a55fa3846d80a3e1cad58b42c18d2f904500688a05ebfbf1f8b",
+  "native_reproduction_validator_checks_separate": 6208,
+  "native_classification_and_park_controls_consumed_within_functional_suites": 399,
+  "native_launch_entry_prefix_controls_separate": 3,
+  "native_control_case_counts_added": false,
+  "native_validator_checks_added": false,
+  "historical_totals_added": false,
+  "failed_development_runs_added": false,
+  "capture_checks_added": false,
+  "python_checks_added": false,
+  "fresh_process_repeats_added": false,
+  "portability_repeats_added": false,
+  "default_v4_terrain_retained": true,
+  "native_manual_mode_explicit_opt_in": true,
+  "full_original_port_complete": false,
+  "physical_device_tested": false,
+  "production_release_ready": false,
+  "scope": "One current passing result per unique18preserved+8new selected suites. Later source-bound supplemental runs replace prior matching tests instead of adding totals. Every declared standalone source pin and all runner test fingerprints match current files; reports without internal runtime pins are identified separately. Native402 controls, separate6208-validator work, GPU capture, Python packaging and repeated fresh/portability execution are not added. Bounded supplemental execution timestamps retained; not an atomic full-repository run. Native manual landing is explicit opt-in; no universal mesh equivalence, complete source object bank/launch scheduler or physical Android-device proof."
+}

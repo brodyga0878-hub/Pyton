@@ -11,6 +11,40 @@ ZIP содержит текущий проект Godot, все рабочие и
 скрипты, сцены, тесты, инструменты сборки и генераторы текстур, документацию
 и исторически восстановленные исходные фрагменты.
 
+<!-- NATIVE_LANDING_CURRENT_BEGIN -->
+Подготавливается **0.25.0-native-landing-alpha1 / code 50**. Источники
+нового блока — `source_natural_contact_session.gd`,
+`source_natural_park.gd`, `source_native_surface_provider.gd`,
+`source_native_surface_visual.gd`, `native_surface_model.gd`
+и `native_landing_trial.gd`, их тесты и компактные независимые native-
+доказательства. Публикация точного ZIP, SHA, коммиты и свежая проверка
+архива 0.25 пока не завершены; предыдущая опубликованная 0.24 доступна ниже.
+
+Новый переносимый baseline `tests/fixtures/native_landing_v49_sources.json`
+содержит только пять точных runtime-дельт и два файла метаданных 0.24.
+Он раскрывается через закреплённые baseline 48 и 47 в 46 прежних runtime-
+исходников. Для исторической проверки не нужны старый checkout, Git
+или подмена compiled-байтов APK. SHA нового baseline:
+`15b53e7150cc67624b73dc92dfe4c06100541b22f66e979246bd7f5cd8089b71`.
+
+Чтобы сохранить скачиваемый исходный ZIP меньше 32 МиБ, в новый архив
+**не дублируются только два старых ZIP внутри `recovery/`**:
+`StarFrontier_recovered_sources_2026-11-04_checkpoint1.zip` и
+`StarFrontier_recovered_sources_2026-11-04_expanded.zip`.
+Их MANIFEST/SHA-файлы остаются в новом архиве. Сами исторические ZIP
+остаются в GitHub и в
+[полном исходном архиве 0.24](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/0d45eb7b27e16e73761c14dd262d8ec413819470/deliverables/0.24.0-contact-frame-alpha1/StarFrontier-0.24.0-contact-frame-source.zip).
+Файлы репозитория не удаляются. **Все `recovered-history/`, текущие assets,
+данные, тесты и зависимости native-генераторов сохраняются**, включая
+`recovered-history/ground_harness/` и другие реально используемые проекты.
+Исключение касается вложенных резервных ZIP, а не рабочих исходников.
+
+В коде отдельно отмечены ограниченная область буквальных leaf-провайдеров,
+ручной режим и host-адаптеры. Автопосадка, полный object bank/VM и полный
+клон всех исходных механик этим блоком не объявляются готовыми.
+[Подробный контракт](docs/SOURCE_NATIVE_LANDING_RU.md).
+<!-- NATIVE_LANDING_CURRENT_END -->
+
 <!-- CONTACT_FRAME_CURRENT_BEGIN -->
 Текущая опубликованная версия исходников — **0.24.0-contact-frame-alpha1 /
 code 49**. Добавлены `source_terrain_query_frame.gd`,

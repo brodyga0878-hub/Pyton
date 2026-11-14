@@ -139,6 +139,7 @@ func park_and_history()->void:
 	var bad:=saved.duplicate(true);bad.park_witness.contact.body_after_hex="00".repeat(338);check(not restored.restore(bad),"A changed raw parked result cannot pass pure original transition replay")
 	bad=saved.duplicate(true);bad.park_witness.contact.binding=[];check(not restored.restore(bad),"Malformed nested parked binding rejects as data without a runtime exception")
 	bad=saved.duplicate(true);var changed_root:=str(bad.game_root_hex).hex_decode();changed_root[0xe8]=0x2c;bad.game_root_hex=changed_root.hex_encode();check(not restored.restore(bad),"Unsupported control-state bytes cannot poison an isolated source park root on cold restore")
+	bad=saved.duplicate(true);bad.last_commit_receipt.commands_sha256="0".repeat(64);check(not restored.restore(bad),"Cold parked receipt binds the actual replayed F575 command list, not merely a well-formed hash string")
 	var surviving:=restored.snapshot()
 	for path:Array in [["park_witness","contact","request","sequence"],["park_witness","contact","request","interval_receipt"],["park_witness","contact","generation"],["park_witness","park_context","parent_pointer_u32"],["park_witness","park_context","parent_index_u8"],["park_witness","callbacks"],["last_commit_receipt","generation"],["globals","previous_altitude_high_s32"],["binding","system_id"]]:
 		bad=saved.duplicate(true);var cursor:Dictionary=bad

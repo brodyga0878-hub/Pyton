@@ -40,6 +40,8 @@ func orientation_controls()->void:
 		check(actual.get("ok",false) and int(actual.get("sign",9))==int(row.expected_sign),"Exact orientation matches independent Fraction oracle "+str(counts.orientation_cases))
 	check(counts.orientation_cases==int(data.case_count),"All independent exact rational controls consumed")
 	check(not Provider._orient(0,0,1,0,0,NAN).ok and not Provider._orient(0,0,1,0,0,pow(2,-300)).ok,"Nonfinite and underflow predicate domains reject explicitly")
+	for invalid:String in ["-000000000000001","+000000000000001","g000000000000000"]:
+		check(not Provider._decode({"t":"i64","v":invalid},{"nodes":0}).ok and Provider._vector(invalid+"0".repeat(32)).is_empty(),"Malformed signed/nonhex codecs reject before hex_decode can emit an engine error")
 	var literal:=PackedFloat64Array([0,2,0,4,6,0,0,10,4])
 	for point:Vector2 in [Vector2(0,0),Vector2(4,0),Vector2(0,4),Vector2(2,0),Vector2(0,2),Vector2(1,1)]:
 		var hit:=Provider._coverage(literal,point.x,point.y)
@@ -101,6 +103,10 @@ func guard_and_root_controls()->void:
 	var post:=Provider.stage_from_classification(body,parent,relative,c,rows,phone,binding,"post_response_render_only")
 	check(post.ok and post.provider.render_payload().render_only_witness and post.provider.render_payload().render_phase=="post_response_render_only" and Provider.from_snapshot(post.provider.snapshot())!=null,"Fresh postresponse rendering is distinctly sealed and never renamed as accepted collision authority")
 	var snapshot:Dictionary=e.provider.snapshot();snapshot.witness_sha256="0".repeat(64);check(Provider.from_snapshot(snapshot)==null,"Stale source seal rejected")
+	var invalid_binding:=binding.duplicate(true);invalid_binding.request_sha256="-"+"0".repeat(63);check(not Provider.stage_from_classification(body,parent,relative,c,rows,phone,invalid_binding).ok,"A signed numeric hexadecimal string is not a request SHA256")
+	for prefix:String in ["-","+","g"]:
+		var corrupt:Dictionary=e.provider.snapshot();corrupt.source_witness.v.body.v=prefix+"0".repeat(675);corrupt.witness_sha256=Provider._sha({"witness":corrupt.source_witness});corrupt.erase("snapshot_sha256");corrupt.snapshot_sha256=Provider._sha(corrupt)
+		check(Provider.from_snapshot(corrupt)==null,"Resealed signed/nonhex byte witness rejects before invoking hex_decode")
 	snapshot=e.provider.snapshot();var decoded:=Provider._decode(snapshot.source_witness,{"nodes":0});decoded.value.body="wrong type";snapshot.source_witness=Provider._encode(decoded.value);snapshot.witness_sha256=Provider._sha({"witness":snapshot.source_witness});snapshot.erase("snapshot_sha256");snapshot.snapshot_sha256=Provider._sha(snapshot)
 	check(Provider.from_snapshot(snapshot)==null,"Corrupt resealed typed witness rejected without raw-call type errors")
 	for key:String in ["iterations","terrain_query_calls","f576_return_s32"]:

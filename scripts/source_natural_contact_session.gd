@@ -200,7 +200,7 @@ func apply_host_velocity_word_delta(delta:PackedInt64Array,policy:String=THERMAL
 	if changed:
 		_body=candidate;_last_transition={};_last_accepted=false
 	return true
-static func _replay_witness(witness:Dictionary,body:PackedByteArray,parent:PackedByteArray,history:Dictionary,source_binding:Dictionary)->bool:
+static func _replay_witness(witness:Dictionary,body:PackedByteArray,parent:PackedByteArray,history:Dictionary,source_binding:Dictionary,commands_sha256:String)->bool:
 	if not _keys(witness,["body_before_hex","parent_hex","original_relative_s64_hex","globals_before","request","binding","generation","caller_globals","body_after_hex","globals_after"]) or not _plain(witness):return false
 	for key:String in ["binding","globals_before","globals_after","caller_globals","request"]:
 		if not witness[key] is Dictionary:return false
@@ -209,7 +209,7 @@ static func _replay_witness(witness:Dictionary,body:PackedByteArray,parent:Packe
 	if prior.is_empty() or _history(witness.globals_after)!=history or caller_globals(prior)!=_history(witness.caller_globals) or not _operands_valid(before,parent,relative) or not _same_identity(before,body):return false
 	if not Natural._whole(witness.request.get("sequence"),1,0xffffffff) or not _request_valid(witness.request,int(witness.request.sequence)) or not Natural._whole(witness.generation,0,0xffffffff):return false
 	var result:=_raw_transition(before,parent,relative,caller_globals(prior))
-	return result.get("ok",false) and bool(result.landing_accepted) and bool(result.response_applied) and result.damage_calls.is_empty() and result.body_after==body and result.globals_after==history
+	return result.get("ok",false) and bool(result.landing_accepted) and bool(result.response_applied) and result.damage_calls.is_empty() and result.body_after==body and result.globals_after==history and _hash({"damage_calls":result.damage_calls,"callbacks":result.callbacks})==commands_sha256
 func mark_parked(policy:String=PARK_POLICY)->bool:
 	# Only privately committed source output can enter park. Runtime does not
 	# classify a second time; cold restoration verifies the witness by replay.
@@ -252,7 +252,7 @@ func restore(saved:Dictionary)->bool:
 		var witness:Dictionary=park.contact
 		if not _hex(witness.get("body_after_hex"),338):return false
 		var before_park:=str(witness.body_after_hex).hex_decode()
-		if not _replay_witness(witness,before_park,parent,history,saved.binding) or park.park_context.get("collision_flags_u8")!=history.collision_flags_u8 or park.park_context.get("reference_policy")!="isolated-parent-reference-word-v1" or park.park_context.get("source_flags_8860_u8")!=0 or park.park_context.get("control_8918_s32")!=0 or not _isolated_root_valid(str(park.game_root_before_hex).hex_decode(),parent):return false
+		if not _replay_witness(witness,before_park,parent,history,saved.binding,str(receipt.commands_sha256)) or park.park_context.get("collision_flags_u8")!=history.collision_flags_u8 or park.park_context.get("reference_policy")!="isolated-parent-reference-word-v1" or park.park_context.get("source_flags_8860_u8")!=0 or park.park_context.get("control_8918_s32")!=0 or not _isolated_root_valid(str(park.game_root_before_hex).hex_decode(),parent):return false
 		var reset:=Park.accept(before_park,parent,str(park.game_root_before_hex).hex_decode(),park.park_context)
 		if not reset.ok or reset.body_after!=body or park.body_after_park_hex!=body.hex_encode() or reset.game_root_after.hex_encode()!=saved.game_root_hex or park.game_root_after_hex!=saved.game_root_hex or _json({"callbacks":reset.callbacks})!=_json({"callbacks":park.callbacks}):return false
 		if int(witness.generation)+1!=int(saved.generation) or int(witness.request.sequence)!=int(saved.last_sequence):return false

@@ -44,6 +44,14 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_natural_park', 'tests/test_source_natural_park.gd', 'Actual source F1021/F1042 park and cold F1030 RET native witnesses.', timeout=600),
+    Suite('source_natural_contact_session', 'tests/test_source_natural_contact_session.gd', 'Persistent source globals, actual classifier trace, broadphase/nohit, source park, private receipts and cold replay.', timeout=600),
+    Suite('source_native_surface_provider', 'tests/test_source_native_surface_provider.gd', 'Literal source leaf packet provider, exact closed triangle coverage and uppermost rendering surface; separate integer collision law.', timeout=600),
+    Suite('source_native_surface_visual', 'tests/test_source_native_surface_visual.gd', 'All genuine bound source leaves rendered as their exact literal Float32 triangle packets.', timeout=600),
+    Suite('native_surface_model', 'tests/test_native_surface_model.gd', 'Explicit native manual surface, persistent raw movement, source park, strict cold anchors and powered takeoff.', timeout=600),
+    Suite('native_landing_trial', 'tests/test_native_landing_trial.gd', 'Atomic HP/fuel/RNG/gear/time ownership and rollback for source manual landing.', timeout=600),
+    Suite('native_landing_trial_integration', 'tests/test_native_landing_trial_integration.gd', 'Real source Earth gravity descent, gear damage, cold parked takeoff and empty propellant.', timeout=600),
+    Suite('native_landing_trial_main', 'tests/test_native_landing_trial_main.gd', 'Actual Main native mode, isolated save, true descent/cold takeoff/return, whole frame clock and real report ZIP.', timeout=600, user_args=('--rebuild-capture',)),
     Suite('source_contact_query_frame', 'tests/test_source_terrain_query_frame.gd', 'Original F581 U/O/D/C/A and actual quantized observer origin versus native frame/caller witnesses; no linear inverse or full parent conversion claim.', timeout=600),
     Suite('source_native_contact_geometry', 'tests/test_source_native_contact_geometry.gd', 'Fresh native leaf/intersection identity, explicit parent chart and outward Q31/IEEE projection bounds; no float-height equivalence or live terrain switch.', timeout=600),
     Suite('source_contact_geometry_probe', 'tests/test_source_contact_geometry_probe.gd', 'Actual ordered actor snapshot, strict frame/leaf projection packets, native pole rejection and complete JSON transport with preserved live state.', timeout=600),

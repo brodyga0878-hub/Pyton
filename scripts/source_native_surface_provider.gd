@@ -27,6 +27,12 @@ var _root:Dictionary={}
 
 static func _failure(reason:String)->Dictionary:return {"ok":false,"reason":reason,"provider":null,"source_contract":CONTRACT,"ordinary_terrain_fallback":false}
 static func _sha(value:Dictionary)->String:return JSON.stringify(value,"",true).sha256_text()
+static func _hex_digits(value:String)->bool:
+	# Godot's numeric parser accepts a leading sign; byte codecs must not.
+	for index in range(value.length()):
+		var code:=value.unicode_at(index)
+		if not ((code>=48 and code<=57) or (code>=97 and code<=102)):return false
+	return true
 static func _hex64(value:int)->String:
 	var bytes:=PackedByteArray();bytes.resize(8);bytes.encode_s64(0,value);return bytes.hex_encode()
 static func _float_hex(value:float)->String:
@@ -72,7 +78,7 @@ static func _decode(value:Variant,budget:Dictionary,depth:int=0)->Dictionary:
 			if not child.get("ok",false):return child
 			result.append(child.value)
 		return {"ok":true,"value":result}
-	if not data is String or data.length()>MAX_SNAPSHOT_BYTES or data.length()%2!=0 or (not data.is_empty() and not data.is_valid_hex_number(false)):return {"ok":false}
+	if not data is String or data.length()>MAX_SNAPSHOT_BYTES or data.length()%2!=0 or not _hex_digits(data):return {"ok":false}
 	var bytes:=str(data).hex_decode()
 	if tag=="bytes":return {"ok":true,"value":bytes}
 	if tag=="i64" or tag=="f64":
@@ -90,8 +96,9 @@ static func _decode(value:Variant,budget:Dictionary,depth:int=0)->Dictionary:
 			result.append(number)
 	return {"ok":true,"value":result}
 static func _valid_binding(value:Dictionary)->bool:
-	return value.size()==3 and Native._whole(value.get("generation"),0,0x7fffffff) and value.get("request_token") is String and not str(value.request_token).is_empty() and str(value.request_token).length()<=256 and value.get("request_sha256") is String and str(value.request_sha256).length()==64 and str(value.request_sha256).is_valid_hex_number(false)
+	return value.size()==3 and Native._whole(value.get("generation"),0,0x7fffffff) and value.get("request_token") is String and not str(value.request_token).is_empty() and str(value.request_token).length()<=256 and value.get("request_sha256") is String and str(value.request_sha256).length()==64 and _hex_digits(str(value.request_sha256))
 static func _vector(hex:String)->PackedInt64Array:
+	if hex.length()!=48 or not _hex_digits(hex):return PackedInt64Array()
 	var bytes:=hex.hex_decode()
 	return PackedInt64Array([bytes.decode_s64(0),bytes.decode_s64(8),bytes.decode_s64(16)]) if bytes.size()==24 else PackedInt64Array()
 static func _point_local(raw:PackedInt64Array,phone:Dictionary)->PackedFloat64Array:

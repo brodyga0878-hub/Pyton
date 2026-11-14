@@ -313,7 +313,7 @@ func _build_world()->void:
 	camera=Camera3D.new();camera.fov=74;camera.near=0.5;camera.far=180000;add_child(camera);camera.make_current()
 	celestial=Celestial.new();add_child(celestial)
 	ground_view=SurfaceView.new();add_child(ground_view);ground_view.hide()
-	native_ground_view=NativeSurfaceView.new();add_child(native_ground_view);native_ground_view.hide()
+	native_ground_view=NativeSurfaceView.new();add_child(native_ground_view);native_ground_view.set_witnesses_visible(false);native_ground_view.hide()
 	city_view=CityView.new();add_child(city_view);city_view.hide()
 	player=ShipView.new();add_child(player);player.set_quality(settings.quality);player.configure(ship.profile())
 	station=StationView.new();add_child(station);station.configure(settings.quality)

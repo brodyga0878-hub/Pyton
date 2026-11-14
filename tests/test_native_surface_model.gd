@@ -91,6 +91,14 @@ func cold_restore()->void:
 	check(not NativeSurface.new().restore(bad,restored_ship,world),"Changed exact pose cannot hide behind unchanged legacy flight anchor")
 	bad=snapshot.duplicate(true);bad.extra=true
 	check(not NativeSurface.new().restore(bad,restored_ship,world),"Unknown native surface schema fields reject")
+	if surface.native_session.generation()==0:
+		for control:String in ["position","orientation"]:
+			bad=snapshot.duplicate(true);var raw:PackedByteArray=str(bad.session.body_hex).hex_decode()
+			if control=="position":raw.encode_s64(0x3e,raw.decode_s64(0x3e)+32)
+			else:raw.encode_s32(0,raw.decode_s32(0)+7)
+			bad.session.body_hex=raw.hex_encode()
+			check(Session.new().restore(bad.session),"Unrelated generation-zero "+control+" body is structurally valid as an isolated raw session")
+			reject_cold(bad,"Signed-root generation zero rejects a raw "+control+" body that differs from the actual exact phone-entry construction")
 	# Each substituted provider below is a valid independently rebuilt source
 	# witness with a valid outer surface seal. These exercise cross-object
 	# coupling, rather than only corrupting an integrity digest.
@@ -170,7 +178,7 @@ func bounded_guards()->void:
 func run()->void:
 	check(fixture(),"Actual original Earth data create a separate native landing trial: "+surface.native_last_reason)
 	if surface.active:
-		initial_and_nohit();cold_restore();bounded_guards();flown_park_and_release()
+		cold_restore();initial_and_nohit();cold_restore();bounded_guards();flown_park_and_release()
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://build/current-test-reports"))
 	var file:=FileAccess.open(REPORT,FileAccess.WRITE)
 	file.store_string(JSON.stringify({"schema":1,"checks":checks,"failures":failures,"evidence":evidence,"scope":"Actual source Earth, real original F576/F575 session and literal Float32 geometry provider; no physical Android/device or full original object bank claim."},"\t"));file.close()
