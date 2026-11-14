@@ -1,0 +1,90 @@
+{
+  "started_utc": "2026-11-14T22:51:32.279639+00:00",
+  "version": "0.25.0-native-landing-alpha1",
+  "artifact_commit": "cd75c3df01bc8a72b4899307798ef454944706d0",
+  "source_commit": "efef2cadaec58448b32c50a8d585a3c1d4902cc6",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/cd75c3df01bc8a72b4899307798ef454944706d0/deliverables/0.25.0-native-landing-alpha1/manifest.json",
+      "http_status": 200,
+      "bytes": 163866,
+      "sha256": "2a51732796cec3eb5ad02642e6ab2dfbe98090301c5ae68c1a10f9586c7b35cd"
+    },
+    {
+      "file": "StarFrontier-0.25.0-native-landing-arm64.apk",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/cd75c3df01bc8a72b4899307798ef454944706d0/deliverables/0.25.0-native-landing-alpha1/StarFrontier-0.25.0-native-landing-arm64.apk",
+      "http_status": 200,
+      "bytes": 50395885,
+      "sha256": "b265550658fc2fc3008d3cf2f4c87a805ff25522b8dc55086db93f5688685a1f",
+      "zip_crc_verified": true
+    },
+    {
+      "file": "StarFrontier-0.25.0-native-landing-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/cd75c3df01bc8a72b4899307798ef454944706d0/deliverables/0.25.0-native-landing-alpha1/StarFrontier-0.25.0-native-landing-source.zip",
+      "http_status": 200,
+      "bytes": 33223581,
+      "sha256": "c46bc666447d5e98350944fdf32b8a30bfacecd453ad937beacbd65a558fdeb4",
+      "zip_crc_verified": true,
+      "source_commit_in_zip_comment": "efef2cadaec58448b32c50a8d585a3c1d4902cc6"
+    },
+    {
+      "file": "screenshots/capture-manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/cd75c3df01bc8a72b4899307798ef454944706d0/deliverables/0.25.0-native-landing-alpha1/screenshots/capture-manifest.json",
+      "http_status": 200,
+      "bytes": 72476,
+      "sha256": "dbb65e1135a85efef2195f6e4909444271a6b05e4f121a2fe23412a32bf52fac"
+    },
+    {
+      "file": "screenshots/01-native-entry-1440x720.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/cd75c3df01bc8a72b4899307798ef454944706d0/deliverables/0.25.0-native-landing-alpha1/screenshots/01-native-entry-1440x720.png",
+      "http_status": 200,
+      "bytes": 659675,
+      "sha256": "58d71cc5765d44323ef16052a7c14bfa251c1bae0d85207000856ddf6a08d2f4"
+    },
+    {
+      "file": "screenshots/02-native-manual-landing-1440x720.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/cd75c3df01bc8a72b4899307798ef454944706d0/deliverables/0.25.0-native-landing-alpha1/screenshots/02-native-manual-landing-1440x720.png",
+      "http_status": 200,
+      "bytes": 474924,
+      "sha256": "4075647312f0deb0d83fb6f6883539a8fe2661f7f698be0900ff9cfe082371d6"
+    },
+    {
+      "file": "screenshots/03-native-powered-takeoff-960x432.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/cd75c3df01bc8a72b4899307798ef454944706d0/deliverables/0.25.0-native-landing-alpha1/screenshots/03-native-powered-takeoff-960x432.png",
+      "http_status": 200,
+      "bytes": 220483,
+      "sha256": "03042d8d1a61b7168785f77dff547955b80f6fef0f60ba1515467526ed99a479"
+    },
+    {
+      "file": "screenshots/04-native-include-save-report-960x432.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/cd75c3df01bc8a72b4899307798ef454944706d0/deliverables/0.25.0-native-landing-alpha1/screenshots/04-native-include-save-report-960x432.png",
+      "http_status": 200,
+      "bytes": 126941,
+      "sha256": "b389ce2459b6af1accbae320dc42f50a61727abb11b9821ccdcfd76672763393"
+    },
+    {
+      "file": "sample-native-landing-include-save-report.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/cd75c3df01bc8a72b4899307798ef454944706d0/deliverables/0.25.0-native-landing-alpha1/sample-native-landing-include-save-report.zip",
+      "http_status": 200,
+      "bytes": 11797,
+      "sha256": "84fd74517d33bbc7b7666b8ac0df4a9b29cb79af97e13819258ffd0c1a3f3594",
+      "zip_crc_verified": true
+    }
+  ],
+  "status": "verified",
+  "requested_extra_files": [
+    "sample-native-landing-include-save-report.zip"
+  ],
+  "scope": "Actual complete HTTPS downloads; immutable manifest bytes, payload SHA256/length, ZIP CRC, source archive Git comment and screenshot hashes. Not physical Android execution.",
+  "completed_utc": "2026-11-14T22:52:08.461247+00:00",
+  "all_manifest_payloads_downloaded": false,
+  "local_manifest_payload_count": 83,
+  "all_local_manifest_payload_hashes_verified": true,
+  "auxiliary_payloads_not_individually_downloaded": 75,
+  "local_manifest_sha256": "2a51732796cec3eb5ad02642e6ab2dfbe98090301c5ae68c1a10f9586c7b35cd",
+  "release_verifier_sha256": "797290c09c2fd255ac637ff23f44b57e94845e0cda87c7a3b8118342a392cd7f",
+  "physical_device_tested": false,
+  "production_release_ready": false,
+  "full_original_port_complete": false
+}

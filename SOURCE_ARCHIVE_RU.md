@@ -12,13 +12,17 @@ ZIP содержит текущий проект Godot, все рабочие и
 и исторически восстановленные исходные фрагменты.
 
 <!-- NATIVE_LANDING_CURRENT_BEGIN -->
-Подготавливается **0.25.0-native-landing-alpha1 / code 50**. Источники
+Опубликован **0.25.0-native-landing-alpha1 / code 50**. Источники
 нового блока — `source_natural_contact_session.gd`,
 `source_natural_park.gd`, `source_native_surface_provider.gd`,
 `source_native_surface_visual.gd`, `native_surface_model.gd`
 и `native_landing_trial.gd`, их тесты и компактные независимые native-
-доказательства. Публикация точного ZIP, SHA, коммиты и свежая проверка
-архива 0.25 пока не завершены; предыдущая опубликованная 0.24 доступна ниже.
+доказательства. [Точный ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/cd75c3df01bc8a72b4899307798ef454944706d0/deliverables/0.25.0-native-landing-alpha1/StarFrontier-0.25.0-native-landing-source.zip) из `efef2cadaec58448b32c50a8d585a3c1d4902cc6`:
+33 223 581 байт, 1579 файлов, 1748 ZIP-записей; SHA256
+`c46bc666447d5e98350944fdf32b8a30bfacecd453ad937beacbd65a558fdeb4`.
+Свежие импорт/запуск, 48 проверок Main и 402 native-сценария воспроизведены;
+все файлы архива остались побайтно прежними. Полное HTTPS-скачивание проверено.
+[Доказательства переносимости](validation/native-landing-source-portability-2026-11-15/verification.json).
 
 Новый переносимый baseline `tests/fixtures/native_landing_v49_sources.json`
 содержит только пять точных runtime-дельт и два файла метаданных 0.24.
@@ -46,7 +50,7 @@ ZIP содержит текущий проект Godot, все рабочие и
 <!-- NATIVE_LANDING_CURRENT_END -->
 
 <!-- CONTACT_FRAME_CURRENT_BEGIN -->
-Текущая опубликованная версия исходников — **0.24.0-contact-frame-alpha1 /
+Предыдущая опубликованная версия исходников — **0.24.0-contact-frame-alpha1 /
 code 49**. Добавлены `source_terrain_query_frame.gd`,
 `source_native_contact_geometry.gd`, `source_contact_geometry_probe.gd`
 и `native_contact_geometry_view.gd` с UID. Исходные кадры и integer-leaf
