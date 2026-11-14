@@ -1,0 +1,30 @@
+{
+  "schema": "starfrontier-source-archive-contact-frame-feature-v1",
+  "source_commit": "99167cc4f335936567d1185a69040420448dedc8",
+  "archive_sha256": "e43c4d469aa69e34dca8545f55a531abbac0d906ecc78f7ff5fa0b60abd3e307",
+  "command": [
+    "godot",
+    "--headless",
+    "--audio-driver",
+    "Dummy",
+    "--path",
+    "/workspace/recovery/contact-frame-source-portability/source/StarFrontier-0.24.0-contact-frame-source",
+    "--script",
+    "res://tests/test_source_contact_geometry_main.gd",
+    "--",
+    "--rebuild-capture"
+  ],
+  "exit_code": 0,
+  "checks": 63,
+  "failures": 0,
+  "error_markers": [],
+  "source_actual_files": 1482,
+  "all_source_files_unchanged": true,
+  "modified_files": [],
+  "private_xdg": true,
+  "duration_seconds": 17.180616,
+  "log_sha256": "51dce3e104d3c227cab6356ddb8f102c0a38aa0674a73e272e07fc1ac3eb0c83",
+  "physical_device_tested": false,
+  "ok": true,
+  "scope": "Exact fresh source archive actual Main touch/contact/report/cold/preview/log checks. Separate repeated portability proof, excluded from distinct functional count."
+}

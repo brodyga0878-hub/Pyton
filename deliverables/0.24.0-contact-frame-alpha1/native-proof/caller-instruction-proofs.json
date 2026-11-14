@@ -1,0 +1,138 @@
+{
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "scope": "Full DOSF569/F570/F1532/F1662/F1335 plus static-onlyF574/F575/F1333/F1531/F1661/F1677 instructioncomparison. NativeexecutioninterceptsF575 atentry andexcludesframeconversion/worldrecursivebranches.",
+  "byte_instruction_proofs": {
+    "570": {
+      "virtual_address": 4354720,
+      "executable_offset": 98464,
+      "byte_length": 576,
+      "sha256": "52339450db7510dc4b0ac969707f9245a0da1d3fb9bad52c65bcb9f150da9cca",
+      "instruction_count": 178,
+      "normalized_instruction_sha256": "5b1369f4ebfa96dc30bcbac45d8b1b9224cce0851154096a2207f13835b3374f",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "575": {
+      "virtual_address": 4355744,
+      "executable_offset": 99488,
+      "byte_length": 2005,
+      "sha256": "33e2895597b23f2e12a3fc6f8c09a08c73042eb26f3529a2b1d911d12b77b015",
+      "instruction_count": 635,
+      "normalized_instruction_sha256": "3fd76411f5d8a7f6eeae38fdcd364b15c226b7d4c1ab338b89582501565205b5",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1333": {
+      "virtual_address": 4515862,
+      "executable_offset": 259606,
+      "byte_length": 25,
+      "sha256": "8946c4ccd895806bb39d3d393c582970d2e34c8ba60c06257447eb10186e5468",
+      "instruction_count": 11,
+      "normalized_instruction_sha256": "d404596ee05a43e6f48c9e0e3738ec8f555a7f3093ca751c86a988fd4a17721f",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1335": {
+      "virtual_address": 4515912,
+      "executable_offset": 259656,
+      "byte_length": 25,
+      "sha256": "630251ee2b7c42186d7b3e5a7dad2245d537527943aa08e08cfe6879016c0514",
+      "instruction_count": 11,
+      "normalized_instruction_sha256": "b9e6d7e710d5ec7c76685289fe22ba6cd78860994046859e09839c50c506c91c",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1532": {
+      "virtual_address": 4536092,
+      "executable_offset": 279836,
+      "byte_length": 27,
+      "sha256": "11722546aa6829b59d14965d58e75f90352ad08e881c40c09e92f0b7972582e2",
+      "instruction_count": 12,
+      "normalized_instruction_sha256": "f7c42f2ff972c391ce8e86fa8d02e20ec486a9770ba154f64874b93c8265d5be",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1662": {
+      "virtual_address": 4562272,
+      "executable_offset": 306016,
+      "byte_length": 82,
+      "sha256": "1058d855d72ff2cce24314fc7024afaa5fb9cb75a0911e24a3c743e3402d083f",
+      "instruction_count": 33,
+      "normalized_instruction_sha256": "a089fb5d45ba2b4fe0aa168e887be1fea73dae363c8908470693ceeb1e459da7",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1677": {
+      "virtual_address": 4566512,
+      "executable_offset": 310256,
+      "byte_length": 247,
+      "sha256": "988c81a47cae924a4e67e140364cbd1af95d4356aaca57c8c1ea9fa0100fc60e",
+      "instruction_count": 98,
+      "normalized_instruction_sha256": "3cad12309c390f34d22dbfd3a3ac9f95ebc96dfcac140613a818e89a70ea51e9",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1531": {
+      "virtual_address": 4536060,
+      "executable_offset": 279804,
+      "byte_length": 30,
+      "sha256": "7d39fbfc4379d5e06e402af863755b0c2f07bafa60ca6f8d28a1600e856fbf9b",
+      "instruction_count": 12,
+      "normalized_instruction_sha256": "c808d7176e983365c82c7607033e08f5e5f541f0928a9cea1426cab915fa18f0",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1661": {
+      "virtual_address": 4562188,
+      "executable_offset": 305932,
+      "byte_length": 82,
+      "sha256": "db6705ba0e0e7cc75d9eb29268540f41a8a40f8e0051c6bd541505e6ba540cda",
+      "instruction_count": 33,
+      "normalized_instruction_sha256": "f610fbc4cbbc125881567064598a2c77d89c9f8df0527912d3c796050752fb90",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "569": {
+      "virtual_address": 4354672,
+      "executable_offset": 98416,
+      "byte_length": 48,
+      "sha256": "2f10bc05d48a10039940c09c7d629d476bc32cec664066766cd6977c35d8705f",
+      "instruction_count": 21,
+      "normalized_instruction_sha256": "4e38cb59afe5074bbd465a23b9b12752d29cdf817b99e6d7e98f3f0411a27557",
+      "all_instructions_equal": true,
+      "entry_anchor": "neighbor570 Pos delta, then full instruction comparison"
+    },
+    "574": {
+      "virtual_address": 4355628,
+      "executable_offset": 99372,
+      "byte_length": 116,
+      "sha256": "8d4f4006139049e944d52e5a93e6a4cb231094f5825fa82afbd475170d3be83e",
+      "instruction_count": 32,
+      "normalized_instruction_sha256": "41f23c295bd4db019f3f5aecccaf74b5f78896da1b7ff20d97e161d7558d2c85",
+      "all_instructions_equal": true,
+      "entry_anchor": "neighbor575 Pos delta, then full instruction comparison"
+    }
+  },
+  "source_procedure_sha256": {
+    "569": "ce21c3b331dd89fb2df5b34a6bb1a9fd89dd18b5fed8ae1e124cf6063c9e8a49",
+    "570": "bc41a2e02d27cfd17bfd3663d4d522b46c9faccb36af381ce0c088827e7c6ecc",
+    "574": "1826748223db168d59bd71d2f6115ec9960a25bcce3f5d5d999f99521dd86442",
+    "575": "ad2a7ac22884f99734fcb094a5df30192ac71d6aa74bccd267f6466771d62f4c",
+    "1333": "21169ed7f6ae5c55f135027b5d3fe379217ad43964826e1dfe139473d48d8deb",
+    "1335": "44ad47a712e41ef6ae947ddcd0b47011d5ff1e639f14553a6f6d58f20773e020",
+    "1531": "5d755999b7eb2c8ee5f7a45ae4c2d8a7acbeff68565ac579e103b355095027a3",
+    "1532": "d71a0a9a315f9665fa60e93265f9170c3a091c570b256fef3a10b2854a96a61e",
+    "1661": "363054928605da0f3b97b42499d3f11e48ecbf646c931d4e9dd790dd8cec5941",
+    "1662": "77e6599556d0b585221bfd953051974c1d89c13bf2f4572982fad94c24fdc18a",
+    "1677": "e914c4f7456e0eb723ce2dce5b9e2dfa4af82a7ee1c45b3ccae783aa891f662f"
+  },
+  "adapted_native_procedures_sha256": "07b413d7ae126b448dfea3f0341b223fe01bc88f53e61f1af34f26a2c15f2be4",
+  "adapted_native_procedure_numbers": [
+    569,
+    570,
+    1335,
+    1532,
+    1662
+  ]
+}

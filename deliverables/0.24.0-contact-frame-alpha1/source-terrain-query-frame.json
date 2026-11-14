@@ -1,0 +1,65 @@
+{
+	"checks": 25000,
+	"evidence": [
+		{
+			"O_D_workingD_U_C_A_and_native_UD_exact": true,
+			"actual_native_leaf_previews": 167,
+			"antiparallel_frames_rejected_for_mapping": 68,
+			"case": "independent_native_frames",
+			"cases": 230,
+			"coarse_without_query_frame": 1,
+			"observed_query_frames": 236,
+			"unobserved_coarse_frame_claim": false,
+			"unsupported_legacy_history_frames": 1
+		},
+		{
+			"case": "old_native_classifier_unchanged",
+			"cases": 993,
+			"independent_native_execution_repeated_by_this_test": false,
+			"supported_visited_query_frames": 252
+		},
+		{
+			"case": "old_signed_root_frames",
+			"frames": 153,
+			"native_float_plane_equivalence_claim": false
+		},
+		{
+			"case": "precision_and_mutation_guards",
+			"integer_floor_residuals_proven_in_nonwrapping_domain": true,
+			"inverse_and_floor_region_are_float64_previews": true,
+			"old_phone_adapter_used_verbatim": true,
+			"phone_float32_forward_witnesses": 2,
+			"strict_canonical_frame": true
+		}
+	],
+	"exact_forward_points": 938,
+	"existing_native_classifier_cases": 993,
+	"existing_root_frames": 153,
+	"existing_supported_classifier_frames": 252,
+	"failures": 0,
+	"fixtures": {
+		"native_frames_sha256": "8c0b9a7077fa305b6c27c3864fa63f7bb364fe654c9b2e8ec100e1577ff73bdb",
+		"old_classifier_sha256": "d4ce0cf3ebfe0fd3bb1f263d047fa3a17ffc5201b8040389fdbddcc21a50e166",
+		"old_signed_root_sha256": "6cb84a1f6dff615a504c9cac7935f339291831b62a658971110a03c1cb7b6db6"
+	},
+	"native_antiparallel_frames": 68,
+	"native_coarse_without_frame": 1,
+	"native_frame_cases": 230,
+	"native_leaf_previews": 167,
+	"native_observed_frames": 236,
+	"native_unsupported_legacy_frames": 1,
+	"noncertifying_inverse_previews": 938,
+	"phone_float32_witnesses": 2,
+	"schema": 1,
+	"scope": "Read-only metadata for original F581 Q31 query-frame construction; exact native U/O/D/C/A and Point forward identity. Literal original positive-Z antiparallel branch is retained as rejected metadata. Exact floor numerator/SAR/rounding witnesses are distinct from noncertifying scalar64 inverse previews. No old kernel mutation, generic inverse uniqueness, float-plane native contact equivalence, fullmesh/body surface certificate, provider publication, sourcebank/physics/HP/time or live Android claim.",
+	"source_contract": "source-f581-quantized-query-frame-v1",
+	"sources": {
+		"scripts/source_natural_contact.gd": "e6cb189d34dc4d434b10f9fc2ef43bf8b96433845c01673f79b4d9592446658f",
+		"scripts/source_physics_bridge.gd": "c7b8550217fbce3925da741afeb3c7d58c841d91ab247c4994ecc1c45ac72262",
+		"scripts/source_surface_contact_bridge.gd": "f83bbecc35c60bfaf79cf2314d067f997b966258665a41a93f082534ba7dfdd9",
+		"scripts/source_terrain_point.gd": "caebe9f918763d6781a4885ae05e9d27aec84e584b9b45bb02cc71dc75000037",
+		"scripts/source_terrain_query.gd": "fc9bf87c182113fffa10bbad9aab150eb99ed95b089dcaac20806e5505b15731",
+		"scripts/source_terrain_query_frame.gd": "2b4be296798bf11755dc3b895a7e57fff013baad980bc1239369ddc59299b74e",
+		"tests/test_source_terrain_query_frame.gd": "63d81fb4d0eb990ab09e4183d93741df6f00cf8acbf506a9107cf70726d9c41b"
+	}
+}

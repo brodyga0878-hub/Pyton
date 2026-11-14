@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-14T21:06:05.671332+00:00",
+  "updated_utc": "2026-11-14T21:06:22.952226+00:00",
+  "duration_seconds": 17.281,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-14T21:06:05.671332+00:00",
+      "duration_seconds": 17.281,
+      "requested_suites": [
+        "source_contact_geometry_main"
+      ],
+      "executed_suites": [
+        "source_contact_geometry_main"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 1,
+  "status": "passed",
+  "passed_suites": 1,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 62,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "source_contact_geometry_main",
+      "scope": "Actual Russian geometry action, native packets in isolated viewer, source/phone state and old save preservation, complete ZIP and three compact observation references.",
+      "status": "passed",
+      "checks": 62,
+      "failures": 0,
+      "executed_utc": "2026-11-14T21:06:05.674402+00:00",
+      "suite_source": {
+        "path": "tests/test_source_contact_geometry_main.gd",
+        "bytes": 12845,
+        "sha256": "f55fc36a2f11b3509a6edea907181c6a529db60e63844cf2a313205ff928e877"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_contact_geometry_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 17.276,
+      "timed_out": false,
+      "output_bytes": 125,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/contact-frame-2026-11-14/new-main/logs/source_contact_geometry_main.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ]
+}

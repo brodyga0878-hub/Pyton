@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "visually_inspected_desktop_frames": 4,
+  "physical_phone_capture": false,
+  "composited": false,
+  "scope": "Actual Main framebuffers. Retained v4 flight console, larger independent native-leaf preview with readable controls, same packets after actual rotation, and scrolled actual collector page. No ordinary terrain replacement, physical Android, FPS or gameplay approach claim.",
+  "files": {
+    "01-retained-v4-flight-console.png": "4ff41c6698d18fde8b44e3b2a033b9d2e28d45f5985d356662e52f002fa67563",
+    "02-actual-native-contact-geometry.png": "7079cfad8edf251d49296669e2731a96541b5f1c24061ab90f297fc8f08ae444",
+    "03-rotated-native-contact-geometry.png": "0a0e747d4109bde6d6cad6d91eb3b23b87723d841ec2d86d51a9e78006984023",
+    "04-actual-native-geometry-report-ready.png": "e3dbb1778db7441edb9c0566471fc11792f105db2b844d301d00c1a2a1ff4e6e"
+  }
+}

@@ -1,0 +1,346 @@
+{
+  "version": "0.24.0-contact-frame-alpha1",
+  "version_code": 49,
+  "source_commit": "99167cc4f335936567d1185a69040420448dedc8",
+  "created_utc": "2026-11-14T21:41:49.261930+00:00",
+  "source_archive_files": 1644,
+  "source_archive_actual_files": 1482,
+  "source_archive_bytes": 33490647,
+  "runtime_frozen_files": 451,
+  "unchanged_previous_runtime_files": 440,
+  "functional_checks": 50326,
+  "functional_groups": 23,
+  "functional_failures": 0,
+  "python_packaging_tests_separate": 328,
+  "new_native_control_cases": 242,
+  "native_frame_cases": 230,
+  "native_intercepted_caller_cases": 12,
+  "native_f581_observations": 237,
+  "native_query_frames": 236,
+  "native_leaf_packets_checked": 187,
+  "native_reproduction_validator_checks_separate": 400,
+  "capture_checks_separate": 73,
+  "desktop_frames_visually_inspected": 4,
+  "package": "org.starfrontier.rebuild",
+  "abi": "arm64-v8a",
+  "min_sdk": 24,
+  "target_sdk": 36,
+  "test_key_only": true,
+  "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+  "debuggable": false,
+  "zip_and_elf_alignment_16k": true,
+  "physical_device_tested": false,
+  "production_release_ready": false,
+  "full_original_port_complete": false,
+  "full_russian_localization_complete": false,
+  "live_native_response_enabled": false,
+  "default_physical_terrain_revision": "sphere-source-ground-v4",
+  "source_geometry_identity_verified": false,
+  "actual_collector_report_ZIP": "sample-diagnostic-report.zip",
+  "actual_collector_report_included_save": false,
+  "planned_HTTPS_verification_download_count": 9,
+  "immutable_HTTPS_verified_at_packaging": false,
+  "other_auxiliary_payloads_verified_by_local_manifest_only": true,
+  "files": {
+    "DOWNLOAD_RU.txt": {
+      "bytes": 2087,
+      "sha256": "26e0afe4c751c35a2c92e2d38305df5962cca1ff4bd3dca4dfcd5744bbd35535"
+    },
+    "StarFrontier-0.24.0-contact-frame-arm64.apk": {
+      "bytes": 50304669,
+      "sha256": "7624dd646e8685aad30e0e47131b4a631526b84337cca9196d90e08cbfb5795b"
+    },
+    "StarFrontier-0.24.0-contact-frame-source.zip": {
+      "bytes": 33490647,
+      "sha256": "e43c4d469aa69e34dca8545f55a531abbac0d906ecc78f7ff5fa0b60abd3e307"
+    },
+    "android-export.log": {
+      "bytes": 6210,
+      "sha256": "247dac47506869c5747d7d7a39ade350eeb77dee658ca2bc4a583b291a4604df"
+    },
+    "android-verification.json": {
+      "bytes": 369657,
+      "sha256": "16c5c568a9c83fc0d086f1ff3105148f13903ece3b999acd7ca53794b3fe0df5"
+    },
+    "final-integration/logs/source_contact_geometry_main.log": {
+      "bytes": 125,
+      "sha256": "51dce3e104d3c227cab6356ddb8f102c0a38aa0674a73e272e07fc1ac3eb0c83"
+    },
+    "final-integration/logs/source_contact_geometry_probe.log": {
+      "bytes": 128,
+      "sha256": "0e21490597d86d0d7ccd37a10daf739afe36a3acf9e9e56ffb01eca463dfeebf"
+    },
+    "final-integration-summary.json": {
+      "bytes": 3859,
+      "sha256": "7f324499e4db8b8ff713f29298cd55301e3f94e2115f2fe7eab09fb40f513e5a"
+    },
+    "final-targeted-summary.json": {
+      "bytes": 8924,
+      "sha256": "504ed33c863d38c6158a5ed558ceeae34466ddbdaf623cf13261c321d1f921fa"
+    },
+    "native-contact-geometry-view.json": {
+      "bytes": 3018,
+      "sha256": "39844640e062053982209c9e2db26e1de09501b155bd6fa44f4f84c918aecea8"
+    },
+    "native-proof/README.md": {
+      "bytes": 7367,
+      "sha256": "a6d8d801c6592bf38587f6b1624ffcb6d0b2aa667dd01e50db5df153daf7b503"
+    },
+    "native-proof/caller-instruction-proofs.json": {
+      "bytes": 6285,
+      "sha256": "ea6914aa30f8117a4608a6fd47c81f53cbb62dc926e064b04dbb3c6ad317b966"
+    },
+    "native-proof/caller-observed-kernel.s": {
+      "bytes": 7723,
+      "sha256": "7f3ef33824aff7bde1efa067a788404ed7d25ed079593f8b7eb93d964cc0425b"
+    },
+    "native-proof/caller-source-procedures.s": {
+      "bytes": 4324,
+      "sha256": "07b413d7ae126b448dfea3f0341b223fe01bc88f53e61f1af34f26a2c15f2be4"
+    },
+    "native-proof/dos-F1333.txt": {
+      "bytes": 339,
+      "sha256": "8028a7ec6c2598cac257078b369524dd8076cb4a80ff099b71662ecf4d904b63"
+    },
+    "native-proof/dos-F1335.txt": {
+      "bytes": 339,
+      "sha256": "9b08d21bb4ec30d9abd33568aea2af6aec5f25bbd88bcb93f1041b496c173fb8"
+    },
+    "native-proof/dos-F1531.txt": {
+      "bytes": 309,
+      "sha256": "3c8a703b8e24632787559d1b91117a8af7f95daca1f2b50a95634ff424ea8d7d"
+    },
+    "native-proof/dos-F1532.txt": {
+      "bytes": 307,
+      "sha256": "482c3c675e54120bc13377b5cec0dd0a3c4aab064dd39ceb8b978a3615f71623"
+    },
+    "native-proof/dos-F1661.txt": {
+      "bytes": 889,
+      "sha256": "c53229d697d64642db61fbe16ba4eabb690f0b62e4d1a6d060ed430e4ed223fe"
+    },
+    "native-proof/dos-F1662.txt": {
+      "bytes": 889,
+      "sha256": "ea8ace3c5da292d062332fb0b48c9459bea613230c3ab08ae20bc43ad2fb840c"
+    },
+    "native-proof/dos-F1677.txt": {
+      "bytes": 2578,
+      "sha256": "abeedc87619507599aa10210ad3b9fdad1f17f18015bfd66b328a23332556e7a"
+    },
+    "native-proof/dos-F569.txt": {
+      "bytes": 565,
+      "sha256": "c3114e1cbcbfc7522ccc264c2ea93f785167ee1e8c86a1a173392df75aac6a79"
+    },
+    "native-proof/dos-F570.txt": {
+      "bytes": 4990,
+      "sha256": "14760c1b0f10fd321f34a20632d134386f423f32995b0556b60e42f49bd8a75e"
+    },
+    "native-proof/dos-F574.txt": {
+      "bytes": 931,
+      "sha256": "93a5f8d8ec9d82d7db715d07b483763550ac2e3134a116331bf2fed4046fcb51"
+    },
+    "native-proof/dos-F575.txt": {
+      "bytes": 17737,
+      "sha256": "18d3b127aef0783edc88a857c7d2510ff183bc4e5cb54c44598472498e4fb528"
+    },
+    "native-proof/frame-observed-kernel.s": {
+      "bytes": 370821,
+      "sha256": "7d88edd9e7d2a52af152028da720dbd2b0425ffe394ba1b237b10b597fa8b648"
+    },
+    "native-proof/rebuild_source_contact_frame_native.py": {
+      "bytes": 18251,
+      "sha256": "f065075c673e3e179a509eefd6e21f549d690fcceb1a6030c545c54b81ffe96e"
+    },
+    "native-proof/reprove_original_caller_instructions.py": {
+      "bytes": 2367,
+      "sha256": "ca0431413d527e3e4991d9cf263f45ea5579f98e787a2b391e94c6b8d57f5edd"
+    },
+    "native-proof/summary.json": {
+      "bytes": 2822,
+      "sha256": "6ac1b16d08932fe6832029f7f39d7964b626a0bba156f6f619a16f3e5cba4e67"
+    },
+    "native-proof/validate_source_contact_frame_native.py": {
+      "bytes": 2911,
+      "sha256": "8c6ceaf395a2330155e24b6be89775913ab109e89387122406eca9f5b3f88e67"
+    },
+    "native-proof/validation.json": {
+      "bytes": 826,
+      "sha256": "3f8947e2a07691ee37f8b1fde9ad8124a05374ee9f912a2552d0185fd8c9ba7b"
+    },
+    "new-main/logs/source_contact_geometry_main.log": {
+      "bytes": 125,
+      "sha256": "7025f058066b0b125c98ee07470aa366a0b6db2267fc66ad3f0cd1086457711f"
+    },
+    "new-main-summary.json": {
+      "bytes": 2689,
+      "sha256": "ea4379edb5b89abda88c0d1f80bb896d17ddceb8d1f3b35696112d1b73175157"
+    },
+    "packaging.json": {
+      "bytes": 103298,
+      "sha256": "236aa6d0ae231d7b825f354e63aa37f637a2ebf13bb2fd57a2cd52fbda6813dc"
+    },
+    "packaging.log": {
+      "bytes": 56510,
+      "sha256": "265b419156aec7db2f39b0f30ebceccb3ec4aecf2c775eeb9122b8fae8949e3c"
+    },
+    "regression-summary.json": {
+      "bytes": 22096,
+      "sha256": "a1beb082101d96891328284afa02c77061189b9e6a9d09597da411a472975564"
+    },
+    "regressions/logs/app_transitions.log": {
+      "bytes": 120,
+      "sha256": "0c190763c029bb01bb6bb16c947fe7d80537e36b271d22fc91c468771ba45cd4"
+    },
+    "regressions/logs/bug_report_ui.log": {
+      "bytes": 116,
+      "sha256": "53986c8b036d06d79273fcf3e6b9f828751b9f9d8e3f6d11d9fecc5aeb4261cd"
+    },
+    "regressions/logs/classic_console_main.log": {
+      "bytes": 123,
+      "sha256": "fd1b59ff7ab0184ebb05c966c93c20e81d6f74731c727c273818a1dadac0b0b3"
+    },
+    "regressions/logs/diagnostics.log": {
+      "bytes": 164,
+      "sha256": "4a1a56e7a8b1ce527097eb423ec35342c22533a03298354ca5c172c3186032e4"
+    },
+    "regressions/logs/flight_projection.log": {
+      "bytes": 10047,
+      "sha256": "e5975c1d32e6a08a7f636589baf1c72d9a8b86a2bf780a15847ccca504fc6d35"
+    },
+    "regressions/logs/graphics_integration.log": {
+      "bytes": 123,
+      "sha256": "f6b6dc847918df771b6f2ac4b0b0f0537855cf6f5247269fadb9b1f4b8ea6d06"
+    },
+    "regressions/logs/report_export.log": {
+      "bytes": 116,
+      "sha256": "6812fd589ef650008dacfb1d68e9ef1ccc3cf096f4197090ba20d44f039441fb"
+    },
+    "regressions/logs/source_contact_alignment_main.log": {
+      "bytes": 126,
+      "sha256": "b482d7e9d7470216b52a3aff4968dddd98322ccbf8aaf5056b4784b8361c3d2c"
+    },
+    "regressions/logs/source_contact_main.log": {
+      "bytes": 117,
+      "sha256": "e011d6a2a034a26f4bd292606b9838fc462cf79c1bc76bf4ac343f42cc82a8b3"
+    },
+    "regressions/logs/source_fuel_main.log": {
+      "bytes": 114,
+      "sha256": "56d10dd266bc7c99655e694d8239d01f71dc6be6d1387f40552f21c080b59b8e"
+    },
+    "regressions/logs/source_gear_main.log": {
+      "bytes": 114,
+      "sha256": "63caa373b770d451b3d8aa9b7deec6df6c6bae60a4359aba7d61e3c87668d96f"
+    },
+    "regressions/logs/source_hyperdrive_main.log": {
+      "bytes": 119,
+      "sha256": "714642268b5d030046e011e56f234bb451f4042b5a194b32c21d1e1878eecbd8"
+    },
+    "regressions/logs/source_natural_footprint.log": {
+      "bytes": 122,
+      "sha256": "66b1d872ee6be599189b71384ac4dc8c5f6bd129696f67ac0d24eada5bd76bca"
+    },
+    "regressions/logs/source_natural_footprint_main.log": {
+      "bytes": 126,
+      "sha256": "525996577b273cfb8d314aeacb841e3aa706d8dbc8c827860dc2b56095326b1f"
+    },
+    "regressions/logs/source_natural_main.log": {
+      "bytes": 117,
+      "sha256": "47acd65fc5708b42714a74d246151996b082f0ca0116e47b45a360ae4fb8876d"
+    },
+    "regressions/logs/source_spherical_main.log": {
+      "bytes": 119,
+      "sha256": "94ad0ea55abd7e0435ef0b5ab34e37b2015545dad6ae8c264a5826d379633c68"
+    },
+    "regressions/logs/source_terrain_query_trace.log": {
+      "bytes": 132,
+      "sha256": "66e16c59909487930047744844f877497866577c4679cd3a7c74d316d89aaa8e"
+    },
+    "regressions/logs/source_thermal_main.log": {
+      "bytes": 117,
+      "sha256": "778c6760648b68cfb044879f19bd0c3e3d255300008d57f8d2aa6c364285c486"
+    },
+    "runtime-freeze.json": {
+      "bytes": 50622,
+      "sha256": "f53eab6598bde567adce3a8bb2308214414159a438a205d8a000db911c23aa9f"
+    },
+    "sample-diagnostic-report.zip": {
+      "bytes": 32094,
+      "sha256": "8027459ba12586f0c063d38bc823d7f7638fe91a06267fff7fc2e9c8d6b766a7"
+    },
+    "screenshots/01-retained-v4-flight-console.png": {
+      "bytes": 342796,
+      "sha256": "4ff41c6698d18fde8b44e3b2a033b9d2e28d45f5985d356662e52f002fa67563"
+    },
+    "screenshots/02-actual-native-contact-geometry.png": {
+      "bytes": 147316,
+      "sha256": "7079cfad8edf251d49296669e2731a96541b5f1c24061ab90f297fc8f08ae444"
+    },
+    "screenshots/03-rotated-native-contact-geometry.png": {
+      "bytes": 147309,
+      "sha256": "0a0e747d4109bde6d6cad6d91eb3b23b87723d841ec2d86d51a9e78006984023"
+    },
+    "screenshots/04-actual-native-geometry-report-ready.png": {
+      "bytes": 176656,
+      "sha256": "e3dbb1778db7441edb9c0566471fc11792f105db2b844d301d00c1a2a1ff4e6e"
+    },
+    "screenshots/capture-manifest.json": {
+      "bytes": 111804,
+      "sha256": "4be3fa4f1be5ad0466cd3ba91932d1616758e9596c18d5a81413526ed56b0a60"
+    },
+    "screenshots/visual-review.json": {
+      "bytes": 875,
+      "sha256": "d480cbbe23dd1a28291b0a17fc457e9793dcaebabdfe4616e71a504cd8f2886e"
+    },
+    "source-contact-geometry-main.json": {
+      "bytes": 71847,
+      "sha256": "b665d808586a3c06e1e796f8b841d9d0e098c73c7f2251999c968ddc4a6cefad"
+    },
+    "source-contact-geometry-probe.json": {
+      "bytes": 19455,
+      "sha256": "d156ad5bf5599c90d4228dbf2862174b8eae9998c319fca50772264ceeb3d7c5"
+    },
+    "source-native-contact-geometry.json": {
+      "bytes": 9502,
+      "sha256": "c6f0a7a14d0f7cf04039b099bca25254150e679d30eb6f0592008b0b6f301ed9"
+    },
+    "source-native-contact-geometry.log": {
+      "bytes": 122,
+      "sha256": "fbe6a68f8d6051e073dc4c84055fc642ed641f762c6fdc957c951967b640277b"
+    },
+    "source-portability/contact-frame-main-feature.json": {
+      "bytes": 1069,
+      "sha256": "b29a928464e25f6ae1fdd64ffbeda7524889fce8962cd1b02bdd0dcf81123a42"
+    },
+    "source-portability/contact-frame-main-feature.log": {
+      "bytes": 125,
+      "sha256": "51dce3e104d3c227cab6356ddb8f102c0a38aa0674a73e272e07fc1ac3eb0c83"
+    },
+    "source-portability/source-archive-import.log": {
+      "bytes": 31118,
+      "sha256": "226310495d8f5d97828001d6fa6618b315fe26b64c609e0bcdc79777a889a218"
+    },
+    "source-portability/source-archive-startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "source-portability/source-native-generator.log": {
+      "bytes": 233,
+      "sha256": "836caca3b5036bfd597334c9d225997e1ef4820c9aa2d034ec5c4210fd594de8"
+    },
+    "source-portability/source-native-reproduction.json": {
+      "bytes": 1794,
+      "sha256": "9b28e27ecb28538a4d6768043ba00ab270ff4ee761005840e23edac445603f96"
+    },
+    "source-portability/source-native-validator.log": {
+      "bytes": 72,
+      "sha256": "7a119c0a39b9f9dfb06a159cf3a7532973b85f3de53051e31a22313f4a2d9007"
+    },
+    "source-portability/verification.json": {
+      "bytes": 5656,
+      "sha256": "8f1ec02d0393e4f6923beae12ad62166b0e7e9afb604d4ac42f9876bca48e540"
+    },
+    "source-terrain-query-frame.json": {
+      "bytes": 3091,
+      "sha256": "90615acaf1873272a10a118fef9a0a3738a0fca8529977a65ccb6d54af113304"
+    }
+  }
+}

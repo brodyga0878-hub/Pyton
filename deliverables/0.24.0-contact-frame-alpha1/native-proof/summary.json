@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "revision": "original-native-contact-frame-and-caller-v1",
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+  "scope": "ActualfullF576/F579/F581/F1876 frame observations across17solidmodels andretainedfootprints; nativeF1669/F1670 extra diagnostic calls are explicitly not originalF581operations. SeparatelyactualF569/F570/F1532/F1662/F1335 withF575entryobserverstub, matching57pairframes andpositiveframe-timer/zero-tick context; F572/F573/F1677 abort. Thisboundedcallerproof doesnotexecuteclassification/response/worldframeconversion. No signfix, repairedphysics, render/GPU/liveclaim.",
+  "original_provenance_sha256": {
+    "tests/fixtures/source_natural_contact_native.json": "d4ce0cf3ebfe0fd3bb1f263d047fa3a17ffc5201b8040389fdbddcc21a50e166",
+    "tests/fixtures/source_contact_field_native.json": "6cb84a1f6dff615a504c9cac7935f339291831b62a658971110a03c1cb7b6db6",
+    "tests/fixtures/source_footprint_native.json": "7fa98e4dd0b63ec9c0a608b9a11ec032aae2d55861c018212aeb50080d8bf726",
+    "validation/footprint-2026-11-14/native-proof/footprint-observed-kernel.s": "e617f196eba8065a125c0caa3683876a595c9baad33f63f82b72176db6db4eae",
+    "validation/contact-frame-2026-11-14/native-proof/caller-source-procedures.s": "07b413d7ae126b448dfea3f0341b223fe01bc88f53e61f1af34f26a2c15f2be4",
+    "validation/contact-frame-2026-11-14/native-proof/caller-instruction-proofs.json": "ea6914aa30f8117a4608a6fd47c81f53cbb62dc926e064b04dbb3c6ad317b966"
+  },
+  "generator_sha256": "f065075c673e3e179a509eefd6e21f549d690fcceb1a6030c545c54b81ffe96e",
+  "observed_frame_assembly_sha256": "7d88edd9e7d2a52af152028da720dbd2b0425ffe394ba1b237b10b597fa8b648",
+  "caller_assembly_sha256": "7f3ef33824aff7bde1efa067a788404ed7d25ed079593f8b7eb93d964cc0425b",
+  "frame_output_sha256": "3d2d41a0dad1b04a5e059e61a9aaeeab9281677251f08e23ed43f6ce2e666270",
+  "caller_output_sha256": "b38761290c0b91b675e20fed5bb8e39efcd993ac21e1fe86b5e7461ae5b43f62",
+  "frame_case_count": 230,
+  "caller_case_count": 12,
+  "case_count": 242,
+  "solid_model_count": 17,
+  "fresh_process_runs_per_bank": 3,
+  "frame_reverse_repeat_count": 230,
+  "caller_reverse_repeat_count": 12,
+  "python_expected_frame_or_subtraction_arithmetic": false,
+  "diagnostic_native_math_scope": "native_U_times_D andnative_U_times_negative_D are separateoriginalF1669 calls; native_observer_forward_q is actual32bitC+T_U(-D), usingoriginalF1876ADDsemantics. NativeNEGconstructs-D; no assumptionT(-D)=-T(D). LegacyC-T(D)is separatelylabellednative_center_minus_rotated_difference. native_U_transpose_C is separateF1670(C,U), not exactinverse ororiginalalgorithmcall."
+}

@@ -1,0 +1,89 @@
+{
+	"checks": 147,
+	"evidence": [
+		{
+			"case": "isolated_world_and_copied_F32_geometry",
+			"state": {
+				"camera_distance": 3.97521877288818,
+				"display_extent": 16.0,
+				"display_origin_f64": [
+					100000016.0,
+					20000008.0,
+					-39999984.0
+				],
+				"flight_camera_or_geometry_changed": false,
+				"last_error": "",
+				"mouse_owned": false,
+				"pitch": -0.45,
+				"pointer_count": 0,
+				"readonly_preview": true,
+				"rejected_volume_count": 0,
+				"snapshot_sha256": "cf0c99aa6caab56c5adc0a4ff0ec13cb98d000f1a326b3e33a5f991e0f89e0c6",
+				"source_contract": "source-native-leaf-isolated-inspection-view-v1",
+				"triangle_count": 1,
+				"yaw": 0.55,
+				"zoom": 1.0
+			},
+			"synthetic_fixture_not_native_proof": true
+		},
+		{
+			"case": "actual_touch_orbit_pinch_and_buttons",
+			"flight_unchanged": true,
+			"state": {
+				"camera_distance": 3.97521877288818,
+				"display_extent": 16.0,
+				"display_origin_f64": [
+					100000016.0,
+					20000008.0,
+					-39999984.0
+				],
+				"flight_camera_or_geometry_changed": false,
+				"last_error": "",
+				"mouse_owned": false,
+				"pitch": -0.45,
+				"pointer_count": 0,
+				"readonly_preview": true,
+				"rejected_volume_count": 0,
+				"snapshot_sha256": "cf0c99aa6caab56c5adc0a4ff0ec13cb98d000f1a326b3e33a5f991e0f89e0c6",
+				"source_contract": "source-native-leaf-isolated-inspection-view-v1",
+				"triangle_count": 1,
+				"yaw": 0.55,
+				"zoom": 1.0
+			}
+		},
+		{
+			"case": "blocked_pole_and_packet_lifecycle",
+			"rejected_fixtures": 11,
+			"state": {
+				"camera_distance": 2.71559119224548,
+				"display_extent": 80.0,
+				"display_origin_f64": [
+					100000016.0,
+					20000008.0,
+					-39999984.0
+				],
+				"flight_camera_or_geometry_changed": false,
+				"last_error": "",
+				"mouse_owned": false,
+				"pitch": -0.45,
+				"pointer_count": 0,
+				"readonly_preview": true,
+				"rejected_volume_count": 0,
+				"snapshot_sha256": "5056c065f9455e4221e5a425d6dccd67c5fc926f65d8e914b4cdd26177f335f0",
+				"source_contract": "source-native-leaf-isolated-inspection-view-v1",
+				"triangle_count": 3,
+				"yaw": 0.55,
+				"zoom": 1.0
+			}
+		}
+	],
+	"failures": 0,
+	"schema": 1,
+	"scope": "Isolated read-only SubViewport presentation with synthetic explicitly labelled bound packet fixtures. Actual pointer/pinch/action input, responsive layout, scalar64 centring of supplied F32 geometry, camera fitting, source/flight ownership, rejected stale/nonfinite/blocked packets and lifecycle cleanup. This UI suite does not prove native geometry correctness, source/render mesh parity, physical Android, FPS or changed flight physics.",
+	"source_contract": "source-native-leaf-isolated-inspection-view-v1",
+	"sources": {
+		"scripts/native_contact_geometry_view.gd": "ba0d27f1de641bca1da779f2933c822d05791b34c7b5f94e7ce104a2d603816e",
+		"scripts/touch_action_button.gd": "8aaf97622f0b5ba3d96b52e2aacb3a51b99c15dd48934fa2bb532bab033e696b",
+		"tests/test_native_contact_geometry_view.gd": "7005e044899b8cbf3764e3916cb448478f279508274f56e17aeb272557dabfc1"
+	}
+}

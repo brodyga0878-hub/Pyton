@@ -1,0 +1,38 @@
+{
+  "schema": "starfrontier-source-archive-native-contact-frame-reproduction-v1",
+  "source_commit": "99167cc4f335936567d1185a69040420448dedc8",
+  "archive_sha256": "e43c4d469aa69e34dca8545f55a531abbac0d906ecc78f7ff5fa0b60abd3e307",
+  "fixture_sha256": "8c0b9a7077fa305b6c27c3864fa63f7bb364fe654c9b2e8ec100e1577ff73bdb",
+  "fixture_reproduced_byte_exact": true,
+  "commands": [
+    {
+      "command": [
+        "python3",
+        "/workspace/recovery/contact-frame-source-portability/source/StarFrontier-0.24.0-contact-frame-source/validation/contact-frame-2026-11-14/native-proof/rebuild_source_contact_frame_native.py",
+        "--work",
+        "/workspace/recovery/contact-frame-source-portability/native-rebuild-work"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.191016,
+      "log_sha256": "836caca3b5036bfd597334c9d225997e1ef4820c9aa2d034ec5c4210fd594de8"
+    },
+    {
+      "command": [
+        "python3",
+        "/workspace/recovery/contact-frame-source-portability/source/StarFrontier-0.24.0-contact-frame-source/validation/contact-frame-2026-11-14/native-proof/validate_source_contact_frame_native.py"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.146572,
+      "log_sha256": "7a119c0a39b9f9dfb06a159cf3a7532973b85f3de53051e31a22313f4a2d9007"
+    }
+  ],
+  "error_markers": [],
+  "all_archived_files_unchanged": true,
+  "modified_archived_files": [],
+  "archived_files": 1482,
+  "native_validation_checks": 400,
+  "native_validation_failures": 0,
+  "native_control_cases": 242,
+  "ok": true,
+  "scope": "Included original-native generator and validator executed from the exact freshly extracted source ZIP; byte-exact fixture and all archived source/proof files retained. Repeated reproduction checks excluded from functional count; no phone execution."
+}
