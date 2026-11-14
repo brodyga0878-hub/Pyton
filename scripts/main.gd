@@ -50,6 +50,9 @@ const ContactAlignmentProbe=preload("res://scripts/source_contact_alignment_prob
 const FootprintProbe=preload("res://scripts/source_natural_footprint_probe.gd")
 const ContactGeometryProbe=preload("res://scripts/source_contact_geometry_probe.gd")
 const ContactGeometryView=preload("res://scripts/native_contact_geometry_view.gd")
+const NativeSurface=preload("res://scripts/native_surface_model.gd")
+const NativeTrial=preload("res://scripts/native_landing_trial.gd")
+const NativeSurfaceView=preload("res://scripts/source_native_surface_visual.gd")
 const Diagnostics=preload("res://scripts/game_diagnostics.gd")
 const ReportExport=preload("res://scripts/report_export.gd")
 const DockServices=preload("res://scripts/training_dock_services.gd")
@@ -68,6 +71,8 @@ var _source_contact_interval:Dictionary={}
 var _thermal_notice_level:=""
 var settings:=Settings.new()
 var saves:=SaveStore.new()
+var native_saves:=SaveStore.new()
+var native_trial_return:Dictionary={}
 var presentation:=Presentation.new()
 var camera:Camera3D
 var flight_view_rect:=Rect2()
@@ -78,6 +83,7 @@ var sunlight:DirectionalLight3D
 var planet_fill:DirectionalLight3D
 var celestial:Node3D
 var ground_view:Node3D
+var native_ground_view:Node3D
 var city_view:Node3D
 var station:Node3D
 var source_station:Node3D
@@ -165,6 +171,7 @@ func _ready()->void:
 	get_tree().auto_accept_quit=false
 	automated="--rebuild-smoke" in OS.get_cmdline_user_args() or "--rebuild-capture" in OS.get_cmdline_user_args()
 	saving_enabled=not automated
+	native_saves.directory="user://native_contact_trial"
 	diagnostics=Diagnostics.new();add_child(diagnostics)
 	if not automated:diagnostics.initialize(BuildInfo.VERSION)
 	report_export=ReportExport.new();add_child(report_export);report_export.completed.connect(_report_export_completed)
@@ -180,6 +187,7 @@ func _ready()->void:
 
 func _new_models(layout:String=World.PORT_LAYOUT)->void:
 	_close_map(false)
+	native_trial_return.clear()
 	instruments.reset();flight_time.reset();last_view="";target_site_id="";target_reference.clear();_thermal_notice_level="";source_contact_last.clear();source_contact_error="";_source_contact_interval.clear()
 	source_alignment_last.clear()
 	source_footprint_last.clear()
@@ -193,6 +201,7 @@ func _new_models(layout:String=World.PORT_LAYOUT)->void:
 	_apply_landing_gear_state()
 
 func _gear_enabled()->bool:return world!=null and world.layout_mode==World.FULL_LAYOUT
+func _native_surface_active()->bool:return surface is NativeSurface and surface.is_native_landing_trial()
 
 func _gear_context()->Dictionary:
 	# The complete source player-state dispatcher is not yet connected. Manual
@@ -304,6 +313,7 @@ func _build_world()->void:
 	camera=Camera3D.new();camera.fov=74;camera.near=0.5;camera.far=180000;add_child(camera);camera.make_current()
 	celestial=Celestial.new();add_child(celestial)
 	ground_view=SurfaceView.new();add_child(ground_view);ground_view.hide()
+	native_ground_view=NativeSurfaceView.new();add_child(native_ground_view);native_ground_view.hide()
 	city_view=CityView.new();add_child(city_view);city_view.hide()
 	player=ShipView.new();add_child(player);player.set_quality(settings.quality);player.configure(ship.profile())
 	station=StationView.new();add_child(station);station.configure(settings.quality)
@@ -435,16 +445,25 @@ func _advance_controls(dt:float)->void:
 	var plan:Dictionary=flight_time.plan_frame(dt,_time_context(manual))
 	if not plan.get("ok",false):return
 	var executed:=0;var interrupted:=false
+	var native_interval:=_native_surface_active()
 	var frame_identity:=[ship,world,nav.current_id,world.focus_id,world.site_id,surface.active]
 	for step:float in plan.steps:
 		if not flight_time.can_continue(int(plan.effective_rate),_time_context(manual)):interrupted=true;break
-		_tick(step,settings.steer(steering.limit_length()),roll,lift);executed+=1
+		_tick(step,settings.steer(steering.limit_length()),roll,lift)
+		if native_interval and not source_contact_error.is_empty():interrupted=true;break
+		executed+=1
+		# Native intervals intentionally publish a new Flight owner. This
+		# alone is not a transfer/scene transition and cannot drop frame time.
+		if native_interval and _native_surface_active():frame_identity[0]=ship
 		if frame_identity!=[ship,world,nav.current_id,world.focus_id,world.site_id,surface.active]:interrupted=true;break
 		if not flight_time.can_continue(int(plan.effective_rate),_time_context(manual)):interrupted=true;break
 	flight_time.finish_frame(int(plan.token),executed,interrupted)
 
 func _time_context(manual:=false)->Dictionary:
 	var result:={"active":active and ship.hull>0,"menu_open":menu.visible or settings_panel.visible or is_instance_valid(active_map),"busy":busy,"paused":instruments.paused,"source_world":world.layout_mode==World.FULL_LAYOUT,"manual_input":manual,"autopilot":ship.autopilot,"landing":surface.landing,"taking_off":surface.taking_off,"docked":ship.docked,"surface_active":surface.active,"combat_active":ship.combat_active,"jump_remaining":nav.remaining,"transfer_remaining":world.transfer_remaining,"speed_mps":ship.velocity.length(),"station_available":ship.station_available}
+	if _native_surface_active():
+		result.manual_input=true
+		return result
 	if nav.is_source_hyperdrive():
 		var thermal:Dictionary=nav.thermal_state(ship)
 		result.atmospheric_hazard=bool(thermal.get("atmosphere_active",false)) or float(thermal.get("heat_percent",0.0))>=75.0
@@ -467,6 +486,7 @@ func _time_context(manual:=false)->Dictionary:
 	return result
 
 func _request_time_rate(rate:int)->void:
+	if _native_surface_active() and rate!=1:_announce("В испытании исходной посадки время идёт с обычной скоростью.");return
 	if not surface.pending_source_contact().is_empty():return
 	var context:=_time_context()
 	for option:Dictionary in flight_time.rate_options(context):
@@ -476,6 +496,7 @@ func _request_time_rate(rate:int)->void:
 
 func _tick(dt:float,steering:Vector2,roll:float,lift:=0.0)->void:
 	if instruments.paused or ship.hull<=0:return
+	if _native_surface_active():_tick_native_surface(dt,steering,roll,lift);return
 	# A queued command or failed prior contact is completed before starting
 	# another simulation interval. Failed retries cannot advance gear, clocks
 	# or fuel while the unresolved pose is deliberately excluded from saves.
@@ -535,6 +556,86 @@ func _tick(dt:float,steering:Vector2,roll:float,lift:=0.0)->void:
 				fuel_commands=FuelFlightBridge.commands(ship,dt)
 			if world.protect_surface(ship,nav.elapsed_days):source_motion.reset();_announce(world.message)
 	_finish_flight_interval(dt,fuel_commands,save_after_fuel)
+
+func _tick_native_surface(dt:float,steering:Vector2,roll:float,lift:float)->void:
+	var result:Dictionary=NativeTrial.prepare(ship,nav,landing_gear,surface,dt,steering,roll,lift)
+	if not result.get("ok",false):
+		var reason:=str(result.get("reason","native_interval_rejected"))
+		if source_contact_error!=reason:
+			source_contact_error=reason;_record_event("native_trial_interval_rejected",{"reason":reason})
+			_announce("Расчёт испытания остановлен: "+reason+". Можно сохранить отчёт или вернуться к основному полёту через меню.")
+		return
+	# The controller has not changed any live owner. Publish the complete
+	# accepted interval together, including the original HP/fuel/RNG owner.
+	ship=result.candidate_ship;nav=result.candidate_nav;landing_gear=result.candidate_gear;surface=result.candidate_surface
+	source_contact_error=""
+	var stage:Dictionary=result.stage
+	source_contact_last={"mode":"native_manual_trial","policy":result.policy,"generation":surface.native_session.generation(),"contact_detected":bool(stage.get("contact_detected",false)),"landing_accepted":bool(stage.get("landing_accepted",false)),"parked_idle":bool(stage.get("parked_idle",false)),"damage_calls":stage.get("damage_calls",[]).duplicate(true),"receipt":result.interval_receipt.duplicate(true),"destruction_requested":bool(result.destruction_requested)}
+	_apply_landing_gear_state()
+	if bool(result.save_after):
+		_record_event("native_trial_park_changed",source_contact_last)
+		_native_save_game()
+		_announce("Исходное касание принято. Для взлёта нажмите «Взлететь» и удерживайте тягу вверх." if surface.landed else "Исходная парковка освобождена: взлёт выполняется тягой.")
+	if bool(result.destruction_requested):_record_event("native_trial_ship_destroyed",source_contact_last);_announce("Корабль испытания потерян. Возврат к основному полёту доступен в меню.")
+
+func _native_return_state()->Dictionary:
+	return {"ship":ship,"nav":nav,"world":world,"surface":surface,"landing_gear":landing_gear,"saving_enabled":saving_enabled,"source_motion":source_motion,"source_motion_enabled":source_motion_enabled,"target_site_id":target_site_id,"target_reference":target_reference.duplicate(true),"paused":instruments.paused,"source_contact_last":source_contact_last.duplicate(true),"source_contact_error":source_contact_error,"source_alignment_last":source_alignment_last.duplicate(true),"source_footprint_last":source_footprint_last.duplicate(true),"source_geometry_last":source_geometry_last.duplicate(true),"last_motion_result":last_motion_result.duplicate(true)}
+
+func _start_native_landing_trial()->bool:
+	if busy or not graphics_return.is_empty() or not native_trial_return.is_empty() or _native_surface_active():return false
+	if not surface.active or not surface.source_surface() or not nav.is_source_hyperdrive() or not surface.pending_source_contact().is_empty():_announce("Сначала войдите на исходную поверхность вне космопорта.");return false
+	if not surface.city_data.is_empty() or surface.underground!=null:_announce("Для испытания выберите поверхность вне города и подземного ангара.");return false
+	var payload:=_payload()
+	if payload.is_empty():return false
+	var copied:Variant=JSON.parse_string(JSON.stringify(payload))
+	var candidate:Dictionary=_decode_state(copied) if copied is Dictionary else {}
+	if candidate.is_empty():_announce("Не удалось подготовить отдельную копию полёта для испытания.");return false
+	var trial:=NativeSurface.new()
+	if not trial.initialize_from(candidate.surface,candidate.ship,candidate.world,candidate.nav.elapsed_days):_announce("Исходная посадка в этой точке недоступна: "+trial.native_last_reason);return false
+	if saving_enabled and not _save_game():return false
+	var preserved:=_native_return_state()
+	candidate.surface=trial;candidate.source_motion_enabled=false;candidate.source_motion=MotionBridge.new();candidate.target_site_id=""
+	_release_inputs();_commit_state(candidate);native_trial_return=preserved;saving_enabled=false
+	_close_menu();_apply_system();_refresh_hud();_native_save_game()
+	_record_event("native_trial_started",_native_trial_diagnostic())
+	_announce("Отдельное испытание: высота 50 м над исходной поверхностью. Выпустите шасси и садитесь вручную. Основной полёт доступен через меню.")
+	return true
+
+func _exit_native_landing_trial()->bool:
+	if busy or native_trial_return.is_empty():return false
+	_release_inputs();var saved:=native_trial_return
+	ship=saved.ship;nav=saved.nav;world=saved.world;surface=saved.surface;landing_gear=saved.landing_gear
+	saving_enabled=bool(saved.saving_enabled);source_motion=saved.source_motion;source_motion_enabled=bool(saved.source_motion_enabled)
+	target_site_id=str(saved.target_site_id);target_reference=saved.target_reference.duplicate(true);last_motion_result=saved.last_motion_result.duplicate(true)
+	source_contact_last=saved.source_contact_last.duplicate(true);source_contact_error=str(saved.source_contact_error)
+	source_alignment_last=saved.source_alignment_last.duplicate(true);source_footprint_last=saved.source_footprint_last.duplicate(true);source_geometry_last=saved.source_geometry_last.duplicate(true)
+	instruments.paused=bool(saved.paused);native_trial_return.clear();flight_time.reset();near.clear()
+	native_ground_view.clear("returned_to_primary_flight");_close_menu();_apply_system();_refresh_hud()
+	_record_event("native_trial_returned",{});_announce("Основной полёт продолжен.")
+	return true
+
+func _native_save_game()->bool:
+	if busy or not _native_surface_active():return false
+	var payload:=_payload()
+	if payload.is_empty():return false
+	var ok:=native_saves.write(payload)
+	_record_event("native_trial_save",{"ok":ok,"save_generation":native_saves.sequence,"source_generation":surface.native_session.generation()})
+	if not ok:_announce(native_saves.last_error)
+	return ok
+
+func _load_native_landing_trial()->bool:
+	if busy or not graphics_return.is_empty():return false
+	var loaded:Dictionary=native_saves.load_valid(_decode_native_trial_state)
+	if loaded.is_empty() or not loaded.surface is NativeSurface:_announce("Исправное сохранение испытания не найдено.");return false
+	var preserved:=native_trial_return if not native_trial_return.is_empty() else _native_return_state()
+	_release_inputs();_commit_state(loaded);native_trial_return=preserved;saving_enabled=false
+	_close_menu();_apply_system();_refresh_hud();_record_event("native_trial_restored",_native_trial_diagnostic())
+	_announce("Испытание восстановлено с исходной позой, историей контакта, топливом и временем.")
+	return true
+
+func _native_trial_diagnostic()->Dictionary:
+	if not _native_surface_active():return {"active":false}
+	return {"active":true,"policy":NativeTrial.POLICY,"source_generation":surface.native_session.generation(),"phase":surface.native_session.phase(),"surface_identity":surface.native_provider.snapshot_identity(),"landed":surface.landed,"save_generation":native_saves.sequence,"separate_save":true,"clock_f64_hex":NativeSurface._native_floats([nav.elapsed_days],8),"raw_body_hex":surface.native_session.raw_body().hex_encode(),"physical_autopilot_connected":false}
 
 func _finish_surface_interval(frame:int,was_landed:bool)->bool:
 	if frame!=surface.frame_index:
@@ -725,6 +826,9 @@ func _input_diagnostic_state()->Dictionary:
 func _flight_diagnostic_sample()->Dictionary:
 	if ship==null or nav==null or world==null or surface==null:return {}
 	var sample:={"ship_id":ship.ship_id,"position":[ship.position.x,ship.position.y,ship.position.z],"velocity":[ship.velocity.x,ship.velocity.y,ship.velocity.z],"target_speed":ship.target_speed,"hull":ship.hull,"docked":ship.docked,"autopilot":ship.autopilot,"system_id":nav.current_id,"focus_id":world.focus_id,"site_id":world.site_id,"jump_remaining":nav.remaining,"transfer_remaining":world.transfer_remaining,"surface":surface.active,"landed":surface.landed,"flight_phase":surface.flight_phase,"surface_motion":{"landing":surface.landing,"taking_off":surface.taking_off,"altitude_m":surface.altitude(ship) if surface.active else 0.0,"pad_distance_m":surface.pad_distance(ship) if surface.active else 0.0},"controls":_input_diagnostic_state(),"source_fuel":nav.fuel_state(ship),"landing_gear":_gear_state(),"source_contact":source_contact_last.duplicate(true),"source_contact_error":source_contact_error,"pending_source_contact":surface.pending_source_contact(),"deferred_contact_interval":_source_contact_interval.duplicate(true)}
+	if _native_surface_active():
+		sample.native_trial=_native_trial_diagnostic()
+		return sample
 	sample["source_spherical_probe"]=SphericalContactProbe.sample(world,ship,surface,nav.elapsed_days) if nav.is_source_hyperdrive() else {"ok":true,"reason":"legacy_navigation","envelope_only":true,"response_applied":false}
 	sample["source_natural_probe"]=NaturalContactProbe.sample(world,ship,surface,nav.elapsed_days) if nav.is_source_hyperdrive() else {"ok":true,"reason":"legacy_navigation","diagnostic_only":true,"response_applied":false}
 	sample["last_surface_alignment"]=source_alignment_last.duplicate(true)
@@ -734,6 +838,7 @@ func _flight_diagnostic_sample()->Dictionary:
 
 func _diagnostic_context()->Dictionary:
 	var context:=_base_diagnostic_context()
+	if _native_surface_active():context.session.native_surface_visual=native_ground_view.stats()
 	if world!=null and world.layout_mode==World.FULL_LAYOUT:
 		context.session["source_station"]=StationSession.diagnostics(ship,world,nav)
 		context.session["source_world_contract"]=world.full_system_state.duplicate(true)
@@ -755,6 +860,7 @@ func _apply_system()->void:
 	celestial.configure(world);celestial.set_quality(settings.quality);player.configure(ship.profile())
 	_apply_landing_gear_state()
 	player.set_quality(settings.quality);station.configure(settings.quality);city_view.set_quality(settings.quality)
+	if _native_surface_active():native_ground_view.set_kind(surface.kind);native_ground_view.set_quality(settings.quality)
 	if not graphics_return.is_empty():space_environment.configure(ship.STATION,settings.quality)
 	station.position=ship.STATION;camera.position=ship.position;camera.quaternion=ship.attitude;presentation_key="";_sync_scene();_update_flight_projection()
 
@@ -795,8 +901,13 @@ func _sync_scene()->void:
 	var observer:Vector3=frame*ship.position if high else ship.position
 	var blend:float=near.space_blend if preview else (Near.far_blend(surface.geoid_height(ship)) if high else 0.0)
 	position=-ship.position if not surface.active else Vector3.ZERO
-	ground_view.visible=draw!=null;ground_view.transform=near.frame if preview else Transform3D.IDENTITY
-	if not city_view.configure(draw,ground_view.transform,1.0-blend if layered else 1.0):push_error(city_view.last_error)
+	var native_draw:=_native_surface_active()
+	ground_view.visible=draw!=null and not native_draw;ground_view.transform=near.frame if preview else Transform3D.IDENTITY
+	native_ground_view.visible=native_draw
+	if native_draw:
+		if not native_ground_view.configure(surface.native_provider):push_error("Native source terrain publication failed")
+		city_view.hide()
+	elif not city_view.configure(draw,ground_view.transform,1.0-blend if layered else 1.0):push_error(city_view.last_error)
 	celestial.transform=to_scene;celestial.visible=not surface.active or high
 	station.visible=_station_here() and not preview and world.layout_mode!=World.FULL_LAYOUT
 	_sync_source_station()
@@ -811,7 +922,7 @@ func _sync_scene()->void:
 	var key:="space" if draw==null else str(draw.kind)+":"+str(settings.quality)
 	if key!=presentation_key:presentation.apply(environment.environment,draw if draw!=null else surface,settings.quality);presentation_key=key
 	if draw!=null:
-		ground_view.configure(draw);ground_view.set_view_coverage(1.0-blend if layered else 1.0)
+		if not native_draw:ground_view.configure(draw);ground_view.set_view_coverage(1.0-blend if layered else 1.0)
 		var height:float=near.height if preview else surface.altitude(ship)
 		camera.far=6000000.0 if draw.extended_flight else 180000.0;camera.near=2.0 if height>5000 else 0.5
 		presentation.update_height(environment.environment,draw,height,settings.quality,blend)
@@ -841,6 +952,10 @@ func _refresh_hud()->void:
 	var target:Vector3=navigation_target.position
 	if surface.active:target_label.text="%s · высота %.0f м\nДо площадки %.0f м"%[surface.site_name if not surface.site_name.is_empty() else world.by_id[world.focus_id].name,maxf(0,surface.altitude(ship)),surface.pad_distance(ship)]
 	else:target_label.text="%s · до цели %.0f м"%[navigation_target.label,ship.position.distance_to(target)]
+	if _native_surface_active():
+		hud.text="ИСПЫТАНИЕ ИСХОДНОЙ ПОСАДКИ · %s · %s"%[ship.profile().name,state]
+		auto_button.text="Ручная посадка";surface_button.text="Взлететь" if surface.landed else "Ручная посадка"
+		target_label.text="%s · исходный контакт\nВысота над видимой гранью %.2f м"%[world.by_id[world.focus_id].name,surface.altitude(ship)]
 	var console_state:={
 		"actual_speed_mps":ship.velocity.length(),"target_speed_mps":ship.target_speed,
 		"surface_active":surface.active,"altitude_m":surface.altitude(ship) if surface.active else 0.0,
@@ -868,6 +983,7 @@ func _refresh_hud()->void:
 				docking_label.text="Крен к проёму: %+.1f° · вращение %.2f°/с\nОтносительная скорость %.1f м/с"%[rad_to_deg(float(docking.get("roll_error_rad",0))),rad_to_deg(spin.length()),Vector3(docking.get("relative_linear_velocity_mps",Vector3.ZERO)).length()]
 
 func _navigation_target()->Dictionary:
+	if _native_surface_active():return {"position":ship.position+ship.forward()*100.0,"label":"Исходная поверхность"}
 	if surface.active:return {"position":surface.pad_position(),"label":surface.site_name}
 	if not target_site_id.is_empty():
 		var site:Dictionary=world.get_site(target_site_id)
@@ -933,6 +1049,7 @@ func _brake()->void:
 	_announce("Торможение и удержание скорости.")
 func _toggle_auto()->void:
 	if _paused_command():return
+	if _native_surface_active():_announce("В этом испытании посадка ручная. Автопилот подключается следующим блоком.");return
 	if ship.hull<=0:return
 	if surface.active:
 		if surface.landed:_begin_departure_action()
@@ -950,6 +1067,7 @@ func _toggle_auto()->void:
 		_announce("Автоподход к станции." if ship.autopilot else "Автоподход отменён.")
 func _begin_departure_action()->bool:
 	if _paused_command():return false
+	if _native_surface_active():_announce("Для взлёта нажмите «Взлететь» и удерживайте тягу вверх. Орбитальный автопилот здесь ещё не подключён.");return false
 	if busy:return false
 	_release_inputs()
 	var accepted:bool=surface.begin_departure(ship)
@@ -970,6 +1088,9 @@ func _takeoff_action()->bool:
 	return accepted
 func _dock_action()->void:
 	if _paused_command():return
+	if _native_surface_active():
+		if surface.landed:_takeoff_action();return
+		_request_landing_gear(true);_announce("Снижайтесь вручную. Касание определяет исходная геометрия корабля и поверхности.");return
 	if surface.active:
 		if surface.landed:_takeoff_action();return
 		if _gear_enabled():_request_landing_gear(true)
@@ -991,6 +1112,10 @@ func _dock_action()->void:
 
 func _surface_action()->void:
 	if _paused_command():return
+	if _native_surface_active():
+		if surface.landed:_takeoff_action()
+		else:_announce("Выполняйте посадку вручную с выпущенными шасси. Возврат к основному полёту — в меню.")
+		return
 	if busy:return
 	if surface.active:
 		if surface.landed:_takeoff_action()
@@ -1130,6 +1255,16 @@ func _show_equipment()->void:
 
 func _show_menu()->void:
 	_open_menu("КОМАНДИР")
+	if _native_surface_active():
+		_menu_text("Отдельное испытание ручной посадки по исходной геометрии. Сохранения испытания хранятся отдельно. Посадка: шасси и осторожное снижение; взлёт: «Взлететь» и тяга вверх.")
+		_menu_action("Продолжить испытание",_close_menu)
+		_menu_action("Сохранить испытание",func():
+			if _native_save_game():_announce("Испытание сохранено.");_close_menu())
+		_menu_action("Загрузить сохранённое испытание",_load_native_landing_trial)
+		_menu_action("Вернуться к основному полёту",_exit_native_landing_trial)
+		_menu_action("Отчёт об ошибке / логи",_show_bug_report)
+		_menu_action("Настройки телефона",func():menu.hide();settings_panel.configure(settings);settings_panel.show())
+		return
 	if not graphics_return.is_empty():
 		_menu_text("Графический полёт: осмотрите корабль, станцию и астероиды. Основной полёт приостановлен; этот просмотр не заменяет его сохранение.")
 		_menu_action("Продолжить графический полёт",_close_menu)
@@ -1145,6 +1280,8 @@ func _show_menu()->void:
 	if surface.active and surface.source_surface():_menu_action("Проверить высоту поверхности",_show_surface_alignment)
 	if surface.active and surface.source_surface():_menu_action("Проверить контакт всего корабля",_show_surface_footprint)
 	if surface.active and surface.source_surface():_menu_action("Исходная геометрия контакта",_show_contact_geometry)
+	if surface.active and surface.source_surface():_menu_action("Испытание исходной посадки",_start_native_landing_trial)
+	if FileAccess.file_exists(native_saves.directory+"/slot0.json") or FileAccess.file_exists(native_saves.directory+"/slot1.json"):_menu_action("Продолжить сохранённое испытание посадки",_load_native_landing_trial)
 	_menu_action("Космопорты и объекты системы",_show_system)
 	_menu_action("Маршруты между системами",_show_routes)
 	if surface.active and surface.globe!=null:_menu_action("Автовылет на орбиту",_begin_departure_action)
@@ -1216,6 +1353,7 @@ func _show_contact_geometry()->void:
 	_menu_action("Вернуться в меню",_show_menu)
 
 func _begin_graphics_demo()->void:
+	if _native_surface_active():return
 	if not surface.pending_source_contact().is_empty():_paused_command();return
 	if busy or not graphics_return.is_empty():return
 	if saving_enabled and not _save_game():return
@@ -1233,6 +1371,7 @@ func _end_graphics_demo()->void:
 	instruments.paused=bool(graphics_return.paused);flight_time.reset()
 	graphics_return={};near.clear();_close_menu();_apply_system();_refresh_hud();_announce("Основной полёт продолжен.")
 func _show_system()->void:
+	if _native_surface_active():_announce("Для карты системы вернитесь к основному полёту через меню.");return
 	if busy:return
 	var view:=SystemMap.new()
 	var state:={"star":nav.current(),"world":world.snapshot(),"elapsed_days":nav.elapsed_days,"system_name":nav.current().name}
@@ -1285,6 +1424,7 @@ func _choose_site(id:String)->void:
 	if world.begin_site_transfer(id,ship,nav):_close_menu()
 	_announce(world.message)
 func _show_routes()->void:
+	if _native_surface_active():_announce("Для галактической карты вернитесь к основному полёту через меню.");return
 	if busy:return
 	var view:=GalacticMap.new()
 	var reason:=""
@@ -1633,9 +1773,16 @@ func _decode_state(data:Dictionary)->Dictionary:
 	if not candidate_nav.validate_source_ship(candidate_ship):return {}
 	if not candidate_nav.bind_thermal_ship(candidate_ship):return {}
 	candidate_nav.apply_fuel_availability(candidate_ship)
-	var candidate_surface:=Surface.new()
+	var native_data:bool=data.surface.get("schema")==NativeSurface.NATIVE_SCHEMA
+	var candidate_surface:RefCounted=NativeSurface.new() if native_data else Surface.new()
 	candidate_surface.set_source_time(candidate_nav.elapsed_days)
 	if not candidate_surface.restore(data.surface,candidate_ship,candidate_world):return {}
+	if native_data:
+		# The normal Navigation JSON is a decimal anchor. The new strict
+		# surface owns the validated exact IEEE64 trial clock.
+		var decimal_day:Variant=JSON.parse_string(JSON.stringify(candidate_surface._source_days))
+		if decimal_day!=candidate_nav.elapsed_days or data.has("motion_session"):return {}
+		candidate_nav.elapsed_days=candidate_surface._source_days
 	if candidate_surface.active and (candidate_ship.docked or candidate_nav.remaining>0 or candidate_world.transfer_remaining>0):return {}
 	var candidate_gear:=LandingGearSession.new()
 	if data.has("gear_session"):
@@ -1686,6 +1833,7 @@ func _commit_state(data:Dictionary)->void:
 	_apply_source_fuel_state()
 	_apply_landing_gear_state()
 func _save_game()->bool:
+	if _native_surface_active():return _native_save_game()
 	if not saving_enabled or busy:return false
 	if not surface.pending_source_contact().is_empty():return false
 	if _gear_enabled() and (landing_gear==null or not landing_gear.state().get("initialized",false)):return false
@@ -1696,16 +1844,23 @@ func _save_game()->bool:
 	if not ok:_announce(saves.last_error)
 	return ok
 func _load_game()->bool:
-	var loaded:Dictionary=saves.load_valid(_decode_state)
+	var loaded:Dictionary=saves.load_valid(_decode_primary_state)
 	if not loaded.is_empty():_commit_state(loaded);return true
 	if FileAccess.file_exists(saves.directory+"/slot0.json") or FileAccess.file_exists(saves.directory+"/slot1.json"):
 		saving_enabled=false;_announce("Сохранение не прочитано. Копии оставлены; новый полёт можно начать через меню.")
 	return false
+func _decode_primary_state(data:Dictionary)->Dictionary:
+	if not data.get("surface") is Dictionary or data.surface.get("schema")==NativeSurface.NATIVE_SCHEMA:return {}
+	return _decode_state(data)
+func _decode_native_trial_state(data:Dictionary)->Dictionary:
+	if not data.get("surface") is Dictionary or data.surface.get("schema")!=NativeSurface.NATIVE_SCHEMA:return {}
+	return _decode_state(data)
 func _reload_after_contact_error()->void:
 	if surface.pending_source_contact().is_empty() or busy:return
 	if not _load_game():_announce("Исправное сохранение не найдено. Можно восстановить прежний код резервной копии.");return
 	saving_enabled=true;_close_menu();_apply_system();_announce("Загружено последнее исправное сохранение.")
 func _show_backup()->void:
+	if _native_surface_active():_announce("Снимок испытания можно вложить в ZIP через «Отчёт об ошибке / логи». Основной полёт доступен через меню.");return
 	if not graphics_return.is_empty():_announce("Для резервной копии вернитесь к основному полёту через меню.");return
 	settings_panel.hide();_open_menu("РЕЗЕРВНАЯ КОПИЯ")
 	_menu_text("Скопируйте код и сохраните его вне приложения. Для восстановления вставьте код сюда. Формат относится к этой восстановительной сборке.")
@@ -1724,9 +1879,13 @@ func _import_backup()->void:
 	var entry:Dictionary=saves.decode(backup_edit.text)
 	var loaded:Dictionary={} if entry.is_empty() else _decode_state(entry.payload)
 	if loaded.is_empty():_announce("Код повреждён или несовместим. Текущий полёт не изменён.");return
+	if loaded.surface is NativeSurface:
+		var preserved:=native_trial_return if not native_trial_return.is_empty() else _native_return_state()
+		_commit_state(loaded);native_trial_return=preserved;saving_enabled=false;_close_menu();_apply_system();_native_save_game();_announce("Снимок испытания восстановлен отдельно от основного полёта.");return
 	_commit_state(loaded);saving_enabled=true;_close_menu();_apply_system();_save_game();_announce("Резервная копия восстановлена.")
 func _apply_settings()->void:
 	Engine.max_fps=settings.fps;get_viewport().msaa_3d=settings.msaa();ground_view.set_quality(settings.quality);celestial.set_quality(settings.quality);stick.deadzone=settings.deadzone;presentation_key=""
+	if native_ground_view!=null:native_ground_view.set_quality(settings.quality)
 	player.set_quality(settings.quality);station.configure(settings.quality);city_view.set_quality(settings.quality)
 	if not graphics_return.is_empty():space_environment.configure(ship.STATION,settings.quality)
 func _settings_changed()->void:_apply_settings();settings.save_file();_record_event("settings_changed",settings.snapshot())

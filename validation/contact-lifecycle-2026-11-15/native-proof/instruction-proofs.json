@@ -1,0 +1,556 @@
+{
+  "scope": "Full listed procedures compare instruction-for-instruction with original DOS. Full F1021 and F1047 are statically proved; only the exact accepted F1021 JUMP4228 branch and intercepted F1047 entry prefix execute separately. Adapted helper list does not assert every branch/function is dynamically reached. F1910 and F48 are request observers only.",
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "procedure_count": 19,
+  "instruction_count": 1409,
+  "byte_length": 4202,
+  "adapted_new_procedure_numbers": [
+    571,
+    574,
+    575,
+    1030,
+    1042,
+    1332,
+    1333,
+    1335,
+    1501,
+    1503,
+    1504,
+    1519,
+    1520,
+    1522,
+    1552,
+    1664
+  ],
+  "full_procedures_with_only_selected_prefix_or_branch_executed": [
+    1021,
+    1047
+  ],
+  "additional_unique_opcode_entry_anchors": {
+    "1021": {
+      "virtual_address": 4460188,
+      "file_offset": 203932,
+      "unique_prefix_hex": "558bec83c4f853568b5d08be3c21640053e8660d00005953e82f10000059f6"
+    },
+    "1042": {
+      "virtual_address": 4464616,
+      "file_offset": 208360,
+      "unique_prefix_hex": "558bec8b450833d289908c00000033d2899090000000"
+    }
+  },
+  "procedures": {
+    "576": {
+      "virtual_address": 4357752,
+      "executable_offset": 101496,
+      "byte_length": 466,
+      "sha256": "2b8ae8b0a52f16b8fb101879618218e83dd9852ccecb97090c7cb3f611439227",
+      "instruction_count": 159,
+      "normalized_instruction_sha256": "4a9e41766bd5b0a51b9981f6c6b1c7c2a1050bd686803f4b8edb97664f1c7752",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1021": {
+      "virtual_address": 4460188,
+      "executable_offset": 203932,
+      "byte_length": 569,
+      "sha256": "9007e6b4e2d7ecc31f14d3973bb8371b44123421e962ff721928844df9abafaf",
+      "instruction_count": 164,
+      "normalized_instruction_sha256": "c1eb5551cc159818aa1a5014c41e675c6cf6eb649ad73b23921f02b8bbf252d8",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1042": {
+      "virtual_address": 4464616,
+      "executable_offset": 208360,
+      "byte_length": 112,
+      "sha256": "d2959c70f54a28484e6a5a9d18ff13f53f1c2739352797fb896cf04a1107fe9c",
+      "instruction_count": 26,
+      "normalized_instruction_sha256": "e49eec94e74005cb5169a7843106ebb556b6d97a8e1f6b3a52a7a237d07de459",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "571": {
+      "virtual_address": 4355296,
+      "executable_offset": 99040,
+      "byte_length": 75,
+      "sha256": "d6f72bd663b601a5c0292f2b3e52cd5025762d68c77f4fccaf3fb7334abfdda6",
+      "instruction_count": 28,
+      "normalized_instruction_sha256": "fa98f823de213559f28b67adb4c52a055a02e81e91f3834f49b52c6f0ae86761",
+      "all_instructions_equal": true,
+      "entry_anchor": "neighbor576 Pos delta, then full instruction comparison"
+    },
+    "574": {
+      "virtual_address": 4355628,
+      "executable_offset": 99372,
+      "byte_length": 116,
+      "sha256": "8d4f4006139049e944d52e5a93e6a4cb231094f5825fa82afbd475170d3be83e",
+      "instruction_count": 32,
+      "normalized_instruction_sha256": "41f23c295bd4db019f3f5aecccaf74b5f78896da1b7ff20d97e161d7558d2c85",
+      "all_instructions_equal": true,
+      "entry_anchor": "neighbor571 Pos delta, then full instruction comparison"
+    },
+    "575": {
+      "virtual_address": 4355744,
+      "executable_offset": 99488,
+      "byte_length": 2005,
+      "sha256": "33e2895597b23f2e12a3fc6f8c09a08c73042eb26f3529a2b1d911d12b77b015",
+      "instruction_count": 635,
+      "normalized_instruction_sha256": "3fd76411f5d8a7f6eeae38fdcd364b15c226b7d4c1ab338b89582501565205b5",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1333": {
+      "virtual_address": 4515862,
+      "executable_offset": 259606,
+      "byte_length": 25,
+      "sha256": "8946c4ccd895806bb39d3d393c582970d2e34c8ba60c06257447eb10186e5468",
+      "instruction_count": 11,
+      "normalized_instruction_sha256": "d404596ee05a43e6f48c9e0e3738ec8f555a7f3093ca751c86a988fd4a17721f",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1335": {
+      "virtual_address": 4515912,
+      "executable_offset": 259656,
+      "byte_length": 25,
+      "sha256": "630251ee2b7c42186d7b3e5a7dad2245d537527943aa08e08cfe6879016c0514",
+      "instruction_count": 11,
+      "normalized_instruction_sha256": "b9e6d7e710d5ec7c76685289fe22ba6cd78860994046859e09839c50c506c91c",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1503": {
+      "virtual_address": 4533130,
+      "executable_offset": 276874,
+      "byte_length": 60,
+      "sha256": "d0afd5b854572fc1f0c76c0e0baf449afecd09a825f1962dd0d1183c8612e36d",
+      "instruction_count": 26,
+      "normalized_instruction_sha256": "3792b88fc7d877002fbb423f277b13889330aeb4a267c2e60992ece42f8a0680",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1504": {
+      "virtual_address": 4533190,
+      "executable_offset": 276934,
+      "byte_length": 105,
+      "sha256": "3086b86ae6eed52dcb62404ed6eecc861949b851139ae9cd621ba08e88414e09",
+      "instruction_count": 45,
+      "normalized_instruction_sha256": "d099e08da8278053dc24678145b37096ecc8b4b700299ef8ccc39778efee99ca",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1501": {
+      "virtual_address": 4532927,
+      "executable_offset": 276671,
+      "byte_length": 64,
+      "sha256": "422940485e22b08f5173b3b64ada177be0a09e4ba2dc8599b8b36ecdee8cff04",
+      "instruction_count": 31,
+      "normalized_instruction_sha256": "248cfbe789335ff48b5beffbbae45a5b1a12021461674fa254c4023fb865889b",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1519": {
+      "virtual_address": 4535194,
+      "executable_offset": 278938,
+      "byte_length": 136,
+      "sha256": "4cf67a734da229a0a8cb12b509f70668250b4b0f3836a19146b53b0272e78ea3",
+      "instruction_count": 59,
+      "normalized_instruction_sha256": "9369229fe448116d4b12ecec5376daac76a7d0bae226162a3d7df03c02cf9996",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1520": {
+      "virtual_address": 4535330,
+      "executable_offset": 279074,
+      "byte_length": 86,
+      "sha256": "97176815c1009869daef82477468f18dd21c7dccac64b5a3714d84295f281976",
+      "instruction_count": 37,
+      "normalized_instruction_sha256": "fc2ec756cb992daf57a2342232c0b6abfc57094cc543450478e2c84f2306afd5",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1522": {
+      "virtual_address": 4535433,
+      "executable_offset": 279177,
+      "byte_length": 12,
+      "sha256": "e6001a066c6ed54cff7bf995d82867c4b0809fa6752fdfb96247378823c29291",
+      "instruction_count": 7,
+      "normalized_instruction_sha256": "0db7d02ec4a9097b59586917c6cfbf316b7b2c90a45ca38f2e5ec3f70278f243",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1552": {
+      "virtual_address": 4539176,
+      "executable_offset": 282920,
+      "byte_length": 157,
+      "sha256": "7977b9c88ca60678c48bd16343b74af7de283391e7ac94a49c27aa269eb4ee2d",
+      "instruction_count": 69,
+      "normalized_instruction_sha256": "cd64227f183024769371ba3f12cb0661a50450597477b3ca846b591d6f79cd24",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1664": {
+      "virtual_address": 4562460,
+      "executable_offset": 306204,
+      "byte_length": 65,
+      "sha256": "701108e268a44d562f19fe0c65162217e901584fb775656302d5c4c27c9b9e08",
+      "instruction_count": 27,
+      "normalized_instruction_sha256": "3f880a87895ef0d0fdc84319bb9c4bf5cb8b9f62fbdf5cbf0093b5340cc8e8c8",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1332": {
+      "virtual_address": 4515808,
+      "executable_offset": 259552,
+      "byte_length": 54,
+      "sha256": "0e214c91774522f45b3c50a19f59f2807fb95454fc24eead2749bdc795ccc03c",
+      "instruction_count": 20,
+      "normalized_instruction_sha256": "67699c8dfbc9a1c016b0e0565a14bf124326b3319e771f6184fe7623539b0411",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1030": {
+      "virtual_address": 4462196,
+      "executable_offset": 205940,
+      "byte_length": 5,
+      "sha256": "7178bc05f1e5707e6c3dae3e068488f3df05d53b0e5eb728edd1abc56533f087",
+      "instruction_count": 4,
+      "normalized_instruction_sha256": "e983503253c8f9bcd4fcf976e9da6e817747414dffbcb9485d47dd4c70960e51",
+      "all_instructions_equal": true,
+      "entry_anchor": "neighbor1021 Pos delta, then full instruction comparison"
+    },
+    "1047": {
+      "virtual_address": 4465316,
+      "executable_offset": 209060,
+      "byte_length": 65,
+      "sha256": "91d2d4a0d8e2024d5b2f741f124d016049064fbc050ab72e220ba3eb6cb1c812",
+      "instruction_count": 18,
+      "normalized_instruction_sha256": "540003733da295af1a8f9084078412405608af0ba9583cff85cccd1144111d79",
+      "all_instructions_equal": true,
+      "entry_anchor": "neighbor1042 Pos delta, then full instruction comparison"
+    }
+  },
+  "callback_words": [
+    {
+      "file_offset": 974652,
+      "symbol": "DATA_007638",
+      "address": 5225836
+    },
+    {
+      "file_offset": 974660,
+      "symbol": "DATA_007637",
+      "address": 5209452
+    },
+    {
+      "file_offset": 974664,
+      "symbol": "DATA_007638",
+      "address": 5225836
+    },
+    {
+      "file_offset": 974676,
+      "symbol": "DATA_007638",
+      "address": 5225836
+    },
+    {
+      "file_offset": 974684,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 974688,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 974732,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 974736,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 974780,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 974784,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 974828,
+      "symbol": "FUNC_001842",
+      "address": 4602012
+    },
+    {
+      "file_offset": 974832,
+      "symbol": "FUNC_001843",
+      "address": 4602404
+    },
+    {
+      "file_offset": 974876,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 974880,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 974924,
+      "symbol": "FUNC_001842",
+      "address": 4602012
+    },
+    {
+      "file_offset": 974928,
+      "symbol": "FUNC_001843",
+      "address": 4602404
+    },
+    {
+      "file_offset": 974972,
+      "symbol": "FUNC_001842",
+      "address": 4602012
+    },
+    {
+      "file_offset": 974976,
+      "symbol": "FUNC_001843",
+      "address": 4602404
+    },
+    {
+      "file_offset": 975020,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 975024,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 975068,
+      "symbol": "FUNC_001844",
+      "address": 4602480
+    },
+    {
+      "file_offset": 975072,
+      "symbol": "FUNC_001836",
+      "address": 4599036
+    },
+    {
+      "file_offset": 975116,
+      "symbol": "FUNC_001845",
+      "address": 4602660
+    },
+    {
+      "file_offset": 975120,
+      "symbol": "FUNC_001836",
+      "address": 4599036
+    },
+    {
+      "file_offset": 975164,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 975168,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 975212,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 975216,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 975260,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 975264,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 975308,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 975312,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 975356,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975360,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975364,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975368,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975372,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975376,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975380,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975384,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975388,
+      "symbol": "FUNC_001850",
+      "address": 4603696
+    },
+    {
+      "file_offset": 975392,
+      "symbol": "FUNC_001851",
+      "address": 4604296
+    },
+    {
+      "file_offset": 975396,
+      "symbol": "FUNC_001852",
+      "address": 4604912
+    },
+    {
+      "file_offset": 975400,
+      "symbol": "FUNC_001853",
+      "address": 4605524
+    },
+    {
+      "file_offset": 975404,
+      "symbol": "FUNC_001854",
+      "address": 4606208
+    },
+    {
+      "file_offset": 975408,
+      "symbol": "FUNC_001855",
+      "address": 4606908
+    },
+    {
+      "file_offset": 975412,
+      "symbol": "FUNC_001856",
+      "address": 4607608
+    },
+    {
+      "file_offset": 975416,
+      "symbol": "FUNC_001857",
+      "address": 4608320
+    },
+    {
+      "file_offset": 975420,
+      "symbol": "FUNC_001858",
+      "address": 4609092
+    },
+    {
+      "file_offset": 975424,
+      "symbol": "FUNC_001859",
+      "address": 4610124
+    },
+    {
+      "file_offset": 975428,
+      "symbol": "FUNC_001860",
+      "address": 4611176
+    },
+    {
+      "file_offset": 975432,
+      "symbol": "FUNC_001861",
+      "address": 4612224
+    },
+    {
+      "file_offset": 975436,
+      "symbol": "FUNC_001862",
+      "address": 4613284
+    },
+    {
+      "file_offset": 975440,
+      "symbol": "FUNC_001863",
+      "address": 4614416
+    },
+    {
+      "file_offset": 975444,
+      "symbol": "FUNC_001864",
+      "address": 4615564
+    },
+    {
+      "file_offset": 975448,
+      "symbol": "FUNC_001865",
+      "address": 4616712
+    },
+    {
+      "file_offset": 975452,
+      "symbol": "FUNC_001866",
+      "address": 4617864
+    },
+    {
+      "file_offset": 975456,
+      "symbol": "FUNC_001866",
+      "address": 4617864
+    },
+    {
+      "file_offset": 975460,
+      "symbol": "FUNC_001866",
+      "address": 4617864
+    },
+    {
+      "file_offset": 975464,
+      "symbol": "FUNC_001866",
+      "address": 4617864
+    },
+    {
+      "file_offset": 975468,
+      "symbol": "FUNC_001867",
+      "address": 4618432
+    },
+    {
+      "file_offset": 975472,
+      "symbol": "FUNC_001867",
+      "address": 4618432
+    },
+    {
+      "file_offset": 975476,
+      "symbol": "FUNC_001867",
+      "address": 4618432
+    },
+    {
+      "file_offset": 975480,
+      "symbol": "FUNC_001867",
+      "address": 4618432
+    }
+  ]
+}

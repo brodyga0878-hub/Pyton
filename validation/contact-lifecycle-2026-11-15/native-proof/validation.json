@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "checks": 6208,
+  "failures": 0,
+  "fixture_sha256": "0db723a520144a55fa3846d80a3e1cad58b42c18d2f904500688a05ebfbf1f8b",
+  "counts": {
+    "bounded_f1047_entry_prefixes": 3,
+    "broadphase_skips": 6,
+    "cold_f1030_ticks": 76,
+    "contacts": 77,
+    "fresh_query_altitudes": 542,
+    "native_queries": 542,
+    "native_replayed_cases": 402,
+    "natural_park_transitions": 76,
+    "noncontacts": 246,
+    "outside_coarse_gates": 17,
+    "selected_child_hits": 25,
+    "visited_volumes": 559
+  },
+  "scope": "Independent original-instruction observations; full contact query/response and separately accepted natural park fragment plus RET-only state update. Explicit host restore and direct requery controls do not prove original saves, complete F1009 dispatch, full F1021 flight, F1047 launch beyond the explicitly intercepted entry prefix or Android lifecycle."
+}

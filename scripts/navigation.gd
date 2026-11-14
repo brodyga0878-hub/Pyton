@@ -29,6 +29,20 @@ var thermal_extension_upgraded:=false
 func is_native()->bool:return galaxy.is_native()
 func is_source_hyperdrive()->bool:return _hyperdrive!=null
 
+func fork_runtime()->RefCounted:
+	# The controller treats the catalogue as read-only. Flight preparation never
+	# selects a system, generates sectors or changes this shared cache.
+	var candidate:RefCounted=get_script().new()
+	candidate.galaxy=galaxy
+	for key:String in ["current_id","selected_id","elapsed_days","fuel","remaining","pending_id","pending_fuel","station_override","message","_source_port_available","fuel_extension_upgraded","thermal_extension_upgraded"]:
+		candidate.set(key,get(key))
+	candidate.visited=visited.duplicate(true)
+	candidate.pending_source_quote=pending_source_quote.duplicate(true)
+	if _hyperdrive!=null:
+		candidate._hyperdrive=_hyperdrive.fork_runtime()
+		if candidate._hyperdrive==null:return null
+	return candidate
+
 func configure_native(start_id:int=GalaxyData.SOL_ID)->bool:
 	var candidate:=GalaxyData.new()
 	if not candidate.configure_native() or not candidate.set_focus(start_id):return false

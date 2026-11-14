@@ -472,6 +472,14 @@ func duplicate_session()->RefCounted:
 	var candidate:RefCounted=get_script().new()
 	if not candidate.restore(snapshot()):return null
 	candidate.fuel_extension_upgraded=fuel_extension_upgraded;candidate.thermal_extension_upgraded=thermal_extension_upgraded;candidate._thermal_initialization_policy=_thermal_initialization_policy;return candidate
+
+func fork_runtime()->RefCounted:
+	# An in-memory transaction copy retains all raw HP/RNG, scheduler fractions
+	# and transient notices. Cold restore remains the untrusted-file boundary.
+	if not valid():return null
+	var candidate:RefCounted=get_script().new()
+	candidate._copy(self)
+	return candidate if candidate.valid() else null
 func commit(distance_raw:int,expected:Dictionary)->Dictionary:
 	var current:=quote(distance_raw)
 	if not current.get("ok",false) or not current.get("can_jump",false):return {"ok":false,"reason":"quote_unavailable"}
