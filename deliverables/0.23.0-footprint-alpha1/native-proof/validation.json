@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "checks": 1833,
+  "failures": 0,
+  "errors": [],
+  "new_actor_cases": 65,
+  "new_ground_cases": 93,
+  "unchanged_original_classifier_cases": 993,
+  "unchanged_root_classifier_cases": 306,
+  "native_runs_per_bank": 3,
+  "same_process_reverse_repeats_per_bank": true,
+  "source_footprint_fixture_sha256": "7fa98e4dd0b63ec9c0a608b9a11ec032aae2d55861c018212aeb50080d8bf726",
+  "generator_sha256": "ef84b567e2cb4a6315a79b86240a5a5cc688f61f12902a272a1a37da45b72639",
+  "validator_sha256": "e569a20f0ede817b2c6c090e3b0aadacbf10c510621824f0deeded287b0772d3",
+  "scope": "Rebuild original archived instructions with new preserving observations. All new exact states/triangles rerun; all993 original classifier outputs and306 root positive-player outputs unchanged. No Python expected height/offset arithmetic; native witnesses only. No old fixture or kernel writes."
+}

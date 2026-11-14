@@ -1,0 +1,30 @@
+{
+  "schema": "starfrontier-source-archive-footprint-feature-v1",
+  "source_commit": "a096346eb558c07f45b966f4e622ef7b1fff4e5b",
+  "archive_sha256": "eb01da63b1694bbbd4e16d12977bdc88be639004790b99c3fddc880a2b07fce2",
+  "command": [
+    "godot",
+    "--headless",
+    "--audio-driver",
+    "Dummy",
+    "--path",
+    "/workspace/recovery/footprint-source-portability/source/StarFrontier-0.23.0-footprint-source",
+    "--script",
+    "res://tests/test_source_natural_footprint_main.gd",
+    "--",
+    "--rebuild-capture"
+  ],
+  "exit_code": 0,
+  "checks": 54,
+  "failures": 0,
+  "error_markers": [],
+  "source_actual_files": 1436,
+  "all_source_files_unchanged": true,
+  "modified_files": [],
+  "private_xdg": true,
+  "duration_seconds": 12.729971,
+  "log_sha256": "525996577b273cfb8d314aeacb841e3aa706d8dbc8c827860dc2b56095326b1f",
+  "physical_device_tested": false,
+  "ok": true,
+  "scope": "Exact fresh source archive actual Main touch/contact/report/cold/preview/log checks. Separate repeated portability proof, excluded from distinct functional count."
+}

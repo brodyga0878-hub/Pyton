@@ -1,0 +1,287 @@
+{
+  "version": "0.23.0-footprint-alpha1",
+  "version_code": 48,
+  "source_commit": "a096346eb558c07f45b966f4e622ef7b1fff4e5b",
+  "created_utc": "2026-11-14T20:15:50.959931+00:00",
+  "source_archive_files": 1596,
+  "source_archive_actual_files": 1436,
+  "source_archive_bytes": 33229194,
+  "runtime_frozen_files": 443,
+  "unchanged_previous_runtime_files": 436,
+  "functional_checks": 64484,
+  "functional_groups": 25,
+  "functional_failures": 0,
+  "python_packaging_tests_separate": 312,
+  "new_native_control_cases": 158,
+  "native_visited_volumes": 202,
+  "native_winning_integer_triangles": 188,
+  "native_reproduction_validator_checks_separate": 1833,
+  "capture_checks_separate": 61,
+  "desktop_frames_visually_inspected": 3,
+  "package": "org.starfrontier.rebuild",
+  "abi": "arm64-v8a",
+  "min_sdk": 24,
+  "target_sdk": 36,
+  "test_key_only": true,
+  "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+  "debuggable": false,
+  "zip_and_elf_alignment_16k": true,
+  "physical_device_tested": false,
+  "production_release_ready": false,
+  "full_original_port_complete": false,
+  "full_russian_localization_complete": false,
+  "live_native_response_enabled": false,
+  "default_physical_terrain_revision": "sphere-source-ground-v4",
+  "source_geometry_identity_verified": false,
+  "actual_collector_report_ZIP": "sample-diagnostic-report.zip",
+  "actual_collector_report_included_save": false,
+  "planned_HTTPS_verification_download_count": 8,
+  "immutable_HTTPS_verified_at_packaging": false,
+  "other_auxiliary_payloads_verified_by_local_manifest_only": true,
+  "files": {
+    "DOWNLOAD_RU.txt": {
+      "bytes": 2050,
+      "sha256": "a7b24ecd7c3d14d92a9d5eaf63436e05cb10ca3da6b4d59a956d57628a3a1048"
+    },
+    "StarFrontier-0.23.0-footprint-arm64.apk": {
+      "bytes": 50250655,
+      "sha256": "3566e7e174ce2b162877a394bbdb88a145c570dfabf30926a1675aab43d4a793"
+    },
+    "StarFrontier-0.23.0-footprint-source.zip": {
+      "bytes": 33229194,
+      "sha256": "eb01da63b1694bbbd4e16d12977bdc88be639004790b99c3fddc880a2b07fce2"
+    },
+    "android-export.log": {
+      "bytes": 6210,
+      "sha256": "247dac47506869c5747d7d7a39ade350eeb77dee658ca2bc4a583b291a4604df"
+    },
+    "android-verification.json": {
+      "bytes": 269912,
+      "sha256": "765577a8ffafa0c1211db6f15492da7d28470f5528335d27f47704a447cd7467"
+    },
+    "app-regressions/logs/app_transitions.log": {
+      "bytes": 120,
+      "sha256": "0c190763c029bb01bb6bb16c947fe7d80537e36b271d22fc91c468771ba45cd4"
+    },
+    "app-regressions/logs/bug_report_ui.log": {
+      "bytes": 116,
+      "sha256": "53986c8b036d06d79273fcf3e6b9f828751b9f9d8e3f6d11d9fecc5aeb4261cd"
+    },
+    "app-regressions/logs/classic_console_main.log": {
+      "bytes": 123,
+      "sha256": "fd1b59ff7ab0184ebb05c966c93c20e81d6f74731c727c273818a1dadac0b0b3"
+    },
+    "app-regressions/logs/diagnostics.log": {
+      "bytes": 164,
+      "sha256": "4a1a56e7a8b1ce527097eb423ec35342c22533a03298354ca5c172c3186032e4"
+    },
+    "app-regressions/logs/flight_projection.log": {
+      "bytes": 10047,
+      "sha256": "e5975c1d32e6a08a7f636589baf1c72d9a8b86a2bf780a15847ccca504fc6d35"
+    },
+    "app-regressions/logs/graphics_integration.log": {
+      "bytes": 123,
+      "sha256": "f6b6dc847918df771b6f2ac4b0b0f0537855cf6f5247269fadb9b1f4b8ea6d06"
+    },
+    "app-regressions/logs/report_export.log": {
+      "bytes": 116,
+      "sha256": "6812fd589ef650008dacfb1d68e9ef1ccc3cf096f4197090ba20d44f039441fb"
+    },
+    "app-regressions/logs/source_contact_alignment_main.log": {
+      "bytes": 126,
+      "sha256": "b482d7e9d7470216b52a3aff4968dddd98322ccbf8aaf5056b4784b8361c3d2c"
+    },
+    "app-regressions/logs/source_contact_main.log": {
+      "bytes": 117,
+      "sha256": "e011d6a2a034a26f4bd292606b9838fc462cf79c1bc76bf4ac343f42cc82a8b3"
+    },
+    "app-regressions/logs/source_fuel_main.log": {
+      "bytes": 114,
+      "sha256": "56d10dd266bc7c99655e694d8239d01f71dc6be6d1387f40552f21c080b59b8e"
+    },
+    "app-regressions/logs/source_gear_main.log": {
+      "bytes": 114,
+      "sha256": "63caa373b770d451b3d8aa9b7deec6df6c6bae60a4359aba7d61e3c87668d96f"
+    },
+    "app-regressions/logs/source_hyperdrive_main.log": {
+      "bytes": 119,
+      "sha256": "714642268b5d030046e011e56f234bb451f4042b5a194b32c21d1e1878eecbd8"
+    },
+    "app-regressions/logs/source_natural_main.log": {
+      "bytes": 117,
+      "sha256": "47acd65fc5708b42714a74d246151996b082f0ca0116e47b45a360ae4fb8876d"
+    },
+    "app-regressions/logs/source_spherical_main.log": {
+      "bytes": 119,
+      "sha256": "94ad0ea55abd7e0435ef0b5ab34e37b2015545dad6ae8c264a5826d379633c68"
+    },
+    "app-regressions/logs/source_thermal_main.log": {
+      "bytes": 117,
+      "sha256": "778c6760648b68cfb044879f19bd0c3e3d255300008d57f8d2aa6c364285c486"
+    },
+    "app-summary.json": {
+      "bytes": 18593,
+      "sha256": "c3cd829d7f9395867dcf64b8ef167557f764e088c6a82fde2153f4fd34f4c35f"
+    },
+    "final-targeted-summary.json": {
+      "bytes": 9140,
+      "sha256": "25bd402897fe74ca4b65f52df7ef714aae3bb27149a69f995b2cbafb44ef3fd5"
+    },
+    "kernel-regressions.json/logs/source_contact_alignment_probe.log": {
+      "bytes": 128,
+      "sha256": "445839a30c22243d3475c6f522930e46e22255ba8f0393a6d7815b656e60658b"
+    },
+    "kernel-regressions.json/logs/source_contact_field.log": {
+      "bytes": 127,
+      "sha256": "e08bf02dd38d1dcb17da4b5d95bd818a81aefa1a97c795fdb073f60f9be8c532"
+    },
+    "kernel-regressions.json/logs/source_contact_surface_render.log": {
+      "bytes": 132,
+      "sha256": "7e2ca5f093dba9b3e2e625f011ccb6c88cdf1ce59375733a61f5dcd519a4de8e"
+    },
+    "kernel-regressions.json/logs/source_contact_surface_terrain.log": {
+      "bytes": 127,
+      "sha256": "4e8c91e4aa69f7fbdb447b6e0d128bfad54a073f1f648d8af5a87caec2ea1270"
+    },
+    "kernel-regressions.json/logs/source_natural_contact.log": {
+      "bytes": 127,
+      "sha256": "bb5784fa0c3d0b6a146ff60bdb2a11a2a605a5fb39b6ca4f2e9f17b99a3b7858"
+    },
+    "kernel-regressions.json/logs/source_natural_pipeline.log": {
+      "bytes": 131,
+      "sha256": "5f452858f0a133a27eaa8af91ec97f370e5669186b98d5d2cf89b71a1539e894"
+    },
+    "kernel-regressions.json/logs/source_natural_surface_bridge.log": {
+      "bytes": 120,
+      "sha256": "66068fb3517d5b6f219096f871dabd8bebe93ee38a14a71e319bd56a298a1362"
+    },
+    "kernel-summary.json": {
+      "bytes": 9602,
+      "sha256": "7fae1c8f2f00f9acbab9d51495acd73234de88f5014a80e4a37472c7b764db21"
+    },
+    "native-proof/README.md": {
+      "bytes": 5634,
+      "sha256": "fe5cef91b191b3e4ca53429e6a79a6723bae48e73694291fd79034b99223a2e4"
+    },
+    "native-proof/candidate-inputs.json": {
+      "bytes": 167974,
+      "sha256": "3a9cacc3d7047cf21a4bb4a9afddf5bc704fb68b27cc6733e2ed70d9f3d961d7"
+    },
+    "native-proof/export_candidate_inputs.gd": {
+      "bytes": 3827,
+      "sha256": "f7a76e990dfccb5ba304d1b1f93f2846287b339956ff5720d557d263b4fa7f8c"
+    },
+    "native-proof/footprint-observed-kernel.s": {
+      "bytes": 366726,
+      "sha256": "e617f196eba8065a125c0caa3683876a595c9baad33f63f82b72176db6db4eae"
+    },
+    "native-proof/rebuild_source_footprint_native.py": {
+      "bytes": 18372,
+      "sha256": "ef84b567e2cb4a6315a79b86240a5a5cc688f61f12902a272a1a37da45b72639"
+    },
+    "native-proof/summary.json": {
+      "bytes": 3170,
+      "sha256": "533ecbc5b9dc86de80e15f89ea178c0677901658a5a5faaecf569386000b745a"
+    },
+    "native-proof/validate_source_footprint_native.py": {
+      "bytes": 3540,
+      "sha256": "e569a20f0ede817b2c6c090e3b0aadacbf10c510621824f0deeded287b0772d3"
+    },
+    "native-proof/validation.json": {
+      "bytes": 879,
+      "sha256": "c7fda99f182b175d347b271b5c264ee7854930ca3fc7ce535d018030c60a32f9"
+    },
+    "new-main/logs/source_natural_footprint_main.log": {
+      "bytes": 126,
+      "sha256": "525996577b273cfb8d314aeacb841e3aa706d8dbc8c827860dc2b56095326b1f"
+    },
+    "new-main-summary.json": {
+      "bytes": 2674,
+      "sha256": "e91c84bcf120cee71676fa836ea3261c635f882c075ba9410b43b56519998fb4"
+    },
+    "packaging.json": {
+      "bytes": 73525,
+      "sha256": "8d555f88e29ac4568b8e7bb32f30bb5930304ec99d4f76ab51c537390edaab3a"
+    },
+    "packaging.log": {
+      "bytes": 53632,
+      "sha256": "3badbfd3a3897e71675980c36b3b5a6a1b8b08d327c80ad517ea53529d8a2811"
+    },
+    "runtime-freeze.json": {
+      "bytes": 49443,
+      "sha256": "2185717f200ca1f92a925630ec7c559430be2588422c6875be3b17626d23d915"
+    },
+    "sample-diagnostic-report.zip": {
+      "bytes": 14335,
+      "sha256": "5429373dcccd56472f20862b7829c2d484e3199ec0a0188348d0f8d394ed81a0"
+    },
+    "screenshots/01-retained-flight-console.png": {
+      "bytes": 342541,
+      "sha256": "be10905118cee98612b1d075b73c72845cc2947d4d2fc762851e42e602bd9625"
+    },
+    "screenshots/02-actual-full-ship-contact-check.png": {
+      "bytes": 140840,
+      "sha256": "0cfe8a4a610e897b6803e23a0656e5235cfd8024a99413c28387f26d7ff99e3e"
+    },
+    "screenshots/03-actual-contact-report-zip-ready.png": {
+      "bytes": 176381,
+      "sha256": "dab9a5b5b683b3d5374ad4f3093d0d2097fed53f63da02845aba3f6564e36f9a"
+    },
+    "screenshots/capture-manifest.json": {
+      "bytes": 28650,
+      "sha256": "0d46a2849508dbfa56ce6deee96bd81dd31bfd3c9622440b68b80bca8532b965"
+    },
+    "screenshots/visual-review.json": {
+      "bytes": 708,
+      "sha256": "055a62dbcb5fb88d4de5bdc7625ebe3c8dedb22c3c34bbce0379ec16959527e1"
+    },
+    "source-natural-footprint-main.json": {
+      "bytes": 36874,
+      "sha256": "1b78147a22fe2027ac164a914e10bee5e4595f5873c60ee1c5b35ea6bfb83848"
+    },
+    "source-natural-footprint-probe.json": {
+      "bytes": 41350,
+      "sha256": "7f1c76caf87e0744bd9841149ca05fb3b236a80e094c631c0e01a1eb4d7609e5"
+    },
+    "source-natural-footprint-probe.log": {
+      "bytes": 122,
+      "sha256": "66b1d872ee6be599189b71384ac4dc8c5f6bd129696f67ac0d24eada5bd76bca"
+    },
+    "source-portability/footprint-main-feature.json": {
+      "bytes": 1058,
+      "sha256": "69ac82f9d8a7f383fc7a9b94a6c6933f71614d5047fc24f9ab9ce7f3200b4416"
+    },
+    "source-portability/footprint-main-feature.log": {
+      "bytes": 126,
+      "sha256": "525996577b273cfb8d314aeacb841e3aa706d8dbc8c827860dc2b56095326b1f"
+    },
+    "source-portability/source-archive-import.log": {
+      "bytes": 30538,
+      "sha256": "54cab32b53b195ec173ad077d709c0e66262726b54187b0ca85b67002f30542a"
+    },
+    "source-portability/source-archive-startup.log": {
+      "bytes": 122,
+      "sha256": "fcd75cc304f600f9ba2d2674aec3e3f2aee77b52f6baf989d42ee2bbbba46a36"
+    },
+    "source-portability/source-native-generator.log": {
+      "bytes": 241,
+      "sha256": "a96ddd4be74cafc18dff0e0d103c6a3f73fc14094a762c24df4e3df6696c2156"
+    },
+    "source-portability/source-native-reproduction.json": {
+      "bytes": 1755,
+      "sha256": "f6ac224bcffac8b78e564963c6fabccb2c0221f99f80821f30f71f0b4c54eb90"
+    },
+    "source-portability/source-native-validator.log": {
+      "bytes": 83,
+      "sha256": "2ff6bbef20a905a15a586fa09b864bd5a2fc58fca49f6f33cbe59dc5329f9581"
+    },
+    "source-portability/verification.json": {
+      "bytes": 5596,
+      "sha256": "982d5c15e4c900c491e07cf91b8209e2e9c73ca208302cc59a09c31d5c0729c3"
+    },
+    "source-terrain-query-trace.json": {
+      "bytes": 2546,
+      "sha256": "7b99edf9b31e297eb3a431d0bb7f61391f1157f8fc583ee7b386ac626a3fdfbb"
+    }
+  }
+}

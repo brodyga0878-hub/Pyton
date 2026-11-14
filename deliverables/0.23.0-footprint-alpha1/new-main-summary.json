@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-14T20:02:04.836128+00:00",
+  "updated_utc": "2026-11-14T20:02:17.079590+00:00",
+  "duration_seconds": 12.243,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-14T20:02:04.836128+00:00",
+      "duration_seconds": 12.243,
+      "requested_suites": [
+        "source_natural_footprint_main"
+      ],
+      "executed_suites": [
+        "source_natural_footprint_main"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 1,
+  "status": "passed",
+  "passed_suites": 1,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 54,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "source_natural_footprint_main",
+      "scope": "Actual Russian full-ship check, paused/state/cache isolation, ephemeral save/preview lifetime and complete diagnostic ZIP with bounded log references.",
+      "status": "passed",
+      "checks": 54,
+      "failures": 0,
+      "executed_utc": "2026-11-14T20:02:04.839098+00:00",
+      "suite_source": {
+        "path": "tests/test_source_natural_footprint_main.gd",
+        "bytes": 11585,
+        "sha256": "da6ea2d42b8847cdd31c602aa149155ff9d96beb211d59e0ae668a1e55dbcc4a"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_natural_footprint_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 12.239,
+      "timed_out": false,
+      "output_bytes": 126,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/footprint-2026-11-14/new-main/logs/source_natural_footprint_main.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ]
+}

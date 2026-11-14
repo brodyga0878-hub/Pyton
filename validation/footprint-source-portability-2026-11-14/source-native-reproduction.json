@@ -1,0 +1,38 @@
+{
+  "schema": "starfrontier-source-archive-native-footprint-reproduction-v1",
+  "source_commit": "a096346eb558c07f45b966f4e622ef7b1fff4e5b",
+  "archive_sha256": "eb01da63b1694bbbd4e16d12977bdc88be639004790b99c3fddc880a2b07fce2",
+  "fixture_sha256": "7fa98e4dd0b63ec9c0a608b9a11ec032aae2d55861c018212aeb50080d8bf726",
+  "fixture_reproduced_byte_exact": true,
+  "commands": [
+    {
+      "command": [
+        "python3",
+        "/workspace/recovery/footprint-source-portability/source/StarFrontier-0.23.0-footprint-source/validation/footprint-2026-11-14/native-proof/rebuild_source_footprint_native.py",
+        "--work",
+        "/workspace/recovery/footprint-source-portability/native-rebuild-work"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.134416,
+      "log_sha256": "a96ddd4be74cafc18dff0e0d103c6a3f73fc14094a762c24df4e3df6696c2156"
+    },
+    {
+      "command": [
+        "python3",
+        "/workspace/recovery/footprint-source-portability/source/StarFrontier-0.23.0-footprint-source/validation/footprint-2026-11-14/native-proof/validate_source_footprint_native.py"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.211186,
+      "log_sha256": "2ff6bbef20a905a15a586fa09b864bd5a2fc58fca49f6f33cbe59dc5329f9581"
+    }
+  ],
+  "error_markers": [],
+  "all_archived_files_unchanged": true,
+  "modified_archived_files": [],
+  "archived_files": 1436,
+  "native_validation_checks": 1833,
+  "native_validation_failures": 0,
+  "native_control_cases": 158,
+  "ok": true,
+  "scope": "Included original-native generator and validator executed from the exact freshly extracted source ZIP; byte-exact fixture and all archived source/proof files retained. Repeated reproduction checks excluded from functional count; no phone execution."
+}
