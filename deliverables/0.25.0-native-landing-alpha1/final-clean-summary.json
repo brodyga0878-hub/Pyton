@@ -1,0 +1,290 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-14T22:43:21.264436+00:00",
+  "updated_utc": "2026-11-14T22:43:49.340880+00:00",
+  "duration_seconds": 28.076,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-14T22:43:21.264436+00:00",
+      "duration_seconds": 28.076,
+      "requested_suites": [
+        "source_natural_park",
+        "source_natural_contact_session",
+        "source_native_surface_provider",
+        "source_native_surface_visual",
+        "native_surface_model",
+        "native_landing_trial",
+        "native_landing_trial_integration",
+        "native_landing_trial_main"
+      ],
+      "executed_suites": [
+        "source_natural_park",
+        "source_natural_contact_session",
+        "source_native_surface_provider",
+        "source_native_surface_visual",
+        "native_surface_model",
+        "native_landing_trial",
+        "native_landing_trial_integration",
+        "native_landing_trial_main"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 3,
+  "status": "passed",
+  "passed_suites": 8,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 4690,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "source_natural_park",
+      "scope": "Actual source F1021/F1042 park and cold F1030 RET native witnesses.",
+      "status": "passed",
+      "checks": 621,
+      "failures": 0,
+      "executed_utc": "2026-11-14T22:43:21.267477+00:00",
+      "suite_source": {
+        "path": "tests/test_source_natural_park.gd",
+        "bytes": 7500,
+        "sha256": "181164fa415b05bad2174f963e4ecd136ec093b1cddfe82cbd8a79ccc5dbd4a6"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_natural_park.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.714,
+      "timed_out": false,
+      "output_bytes": 110,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/contact-lifecycle-2026-11-15/final-clean/logs/source_natural_park.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_natural_contact_session",
+      "scope": "Persistent source globals, actual classifier trace, broadphase/nohit, source park, private receipts and cold replay.",
+      "status": "passed",
+      "checks": 2142,
+      "failures": 0,
+      "executed_utc": "2026-11-14T22:43:21.268006+00:00",
+      "suite_source": {
+        "path": "tests/test_source_natural_contact_session.gd",
+        "bytes": 27401,
+        "sha256": "2c91cd3c4d531784a19bf2a20cbfa54283b31416bf6f6bccd2bf2219e93aed83"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_natural_contact_session.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.978,
+      "timed_out": false,
+      "output_bytes": 122,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/contact-lifecycle-2026-11-15/final-clean/logs/source_natural_contact_session.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_native_surface_provider",
+      "scope": "Literal source leaf packet provider, exact closed triangle coverage and uppermost rendering surface; separate integer collision law.",
+      "status": "passed",
+      "checks": 1098,
+      "failures": 0,
+      "executed_utc": "2026-11-14T22:43:21.268222+00:00",
+      "suite_source": {
+        "path": "tests/test_source_native_surface_provider.gd",
+        "bytes": 16663,
+        "sha256": "9a9e5a0fb5d397e48c08730258723852349ea563cdccca6e1bcedbc505941aa0"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_native_surface_provider.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.315,
+      "timed_out": false,
+      "output_bytes": 148,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/contact-lifecycle-2026-11-15/final-clean/logs/source_native_surface_provider.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_native_surface_visual",
+      "scope": "All genuine bound source leaves rendered as their exact literal Float32 triangle packets.",
+      "status": "passed",
+      "checks": 115,
+      "failures": 0,
+      "executed_utc": "2026-11-14T22:43:21.981712+00:00",
+      "suite_source": {
+        "path": "tests/test_source_native_surface_visual.gd",
+        "bytes": 14708,
+        "sha256": "bdb6fc863ea3543488ba1c7e2269b17abd29c0e578e5fcb1c6ab8984c4635b7c"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_native_surface_visual.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.466,
+      "timed_out": false,
+      "output_bytes": 132,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/contact-lifecycle-2026-11-15/final-clean/logs/source_native_surface_visual.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "native_surface_model",
+      "scope": "Explicit native manual surface, persistent raw movement, source park, strict cold anchors and powered takeoff.",
+      "status": "passed",
+      "checks": 455,
+      "failures": 0,
+      "executed_utc": "2026-11-14T22:43:23.248218+00:00",
+      "suite_source": {
+        "path": "tests/test_native_surface_model.gd",
+        "bytes": 18149,
+        "sha256": "33a02808653fca7cafd0f5a3859504564721c285ff806e8e501ffe533efe120e"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_native_surface_model.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 10.83,
+      "timed_out": false,
+      "output_bytes": 118,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/contact-lifecycle-2026-11-15/final-clean/logs/native_surface_model.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "native_landing_trial",
+      "scope": "Atomic HP/fuel/RNG/gear/time ownership and rollback for source manual landing.",
+      "status": "passed",
+      "checks": 65,
+      "failures": 0,
+      "executed_utc": "2026-11-14T22:43:23.448882+00:00",
+      "suite_source": {
+        "path": "tests/test_native_landing_trial.gd",
+        "bytes": 11489,
+        "sha256": "c251e76c0dbf0496b1881129b8ec0f2ac70d1c72f91828ab3efdb969bf6a30e2"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_native_landing_trial.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.719,
+      "timed_out": false,
+      "output_bytes": 117,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/contact-lifecycle-2026-11-15/final-clean/logs/native_landing_trial.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "native_landing_trial_integration",
+      "scope": "Real source Earth gravity descent, gear damage, cold parked takeoff and empty propellant.",
+      "status": "passed",
+      "checks": 146,
+      "failures": 0,
+      "executed_utc": "2026-11-14T22:43:23.584301+00:00",
+      "suite_source": {
+        "path": "tests/test_native_landing_trial_integration.gd",
+        "bytes": 11194,
+        "sha256": "363550ee5f953c0bad59cfc9c76c469250f4050c6359a3ee7ba8740c3cc0780d"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_native_landing_trial_integration.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 6.59,
+      "timed_out": false,
+      "output_bytes": 130,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/contact-lifecycle-2026-11-15/final-clean/logs/native_landing_trial_integration.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "native_landing_trial_main",
+      "scope": "Actual Main native mode, isolated save, true descent/cold takeoff/return, whole frame clock and real report ZIP.",
+      "status": "passed",
+      "checks": 48,
+      "failures": 0,
+      "executed_utc": "2026-11-14T22:43:24.168178+00:00",
+      "suite_source": {
+        "path": "tests/test_native_landing_trial_main.gd",
+        "bytes": 11940,
+        "sha256": "5ebd2ee0f8e04a336b884a8595d210e64d9225dfd9ffd4ae36bd18cf93c96643"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_native_landing_trial_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 25.169,
+      "timed_out": false,
+      "output_bytes": 122,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/contact-lifecycle-2026-11-15/final-clean/logs/native_landing_trial_main.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ]
+}

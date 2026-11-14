@@ -1,0 +1,54 @@
+{
+  "schema": "starfrontier-source-archive-native-contact-lifecycle-reproduction-v1",
+  "source_commit": "efef2cadaec58448b32c50a8d585a3c1d4902cc6",
+  "archive_sha256": "c46bc666447d5e98350944fdf32b8a30bfacecd453ad937beacbd65a558fdeb4",
+  "fixture_sha256": "0db723a520144a55fa3846d80a3e1cad58b42c18d2f904500688a05ebfbf1f8b",
+  "fixture_reproduced_byte_exact": true,
+  "commands": [
+    {
+      "command": [
+        "python3",
+        "/workspace/recovery/native-landing-source-portability/source/StarFrontier-0.25.0-native-landing-source/validation/contact-lifecycle-2026-11-15/native-proof/rebuild_source_contact_lifecycle_native.py",
+        "--work",
+        "/workspace/recovery/native-landing-source-portability/native-rebuild-work"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_seconds": 0.148885,
+      "log_sha256": "0817a07148e20c469c139fb67a22e8f338b781d464188e5d8d4ed5f7ff9fe9a7",
+      "log_file": "source-native-generator.log",
+      "error_markers": [],
+      "name": "generator"
+    },
+    {
+      "command": [
+        "python3",
+        "/workspace/recovery/native-landing-source-portability/source/StarFrontier-0.25.0-native-landing-source/validation/contact-lifecycle-2026-11-15/native-proof/validate_source_contact_lifecycle_native.py",
+        "--replay"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_seconds": 0.13722,
+      "log_sha256": "939ec337ef5538018bd4622a17735857c4aa0d769f7ce3fc431e388ac2d7c61f",
+      "log_file": "source-native-validator.log",
+      "error_markers": [],
+      "name": "validator"
+    }
+  ],
+  "error_markers": [],
+  "all_archived_files_unchanged": true,
+  "modified_archived_files": [],
+  "archived_files": 1579,
+  "native_validation_checks": 6208,
+  "native_validation_failures": 0,
+  "native_control_cases": 402,
+  "native_replayed_cases": 402,
+  "native_bank_cases": {
+    "full_F574_actor_calls": 247,
+    "corrected_body_F574_requeries": 76,
+    "restored_F1030_parked_updates": 76,
+    "intercepted_F1047_entry_prefixes": 3
+  },
+  "ok": true,
+  "scope": "Archived original-instruction generator and --replay validator executed inside the exact freshly extracted ZIP. All402 bounded F574/requery/F1030/F1047-entry witnesses and the6208 validation checks replay; the fixture and every archived source/proof file remain byte-exact. This does not prove enabled-damage full F569/F570, complete launch, original save format, Android lifecycle or physical device performance. Repeated reproduction totals are excluded from distinct functional counts."
+}

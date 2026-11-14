@@ -1,0 +1,22 @@
+{
+	"checks": 1098,
+	"counts": {
+		"actor_cases": 59,
+		"atomic_rejections": 3,
+		"orientation_cases": 194,
+		"own_leaves": 93,
+		"staged_actors": 56
+	},
+	"failures": 0,
+	"schema": 1,
+	"scope": "Same-execution F576 ownleaf provider; identical literal Float32 render/height geometry; exact rational orientation controls; outward heights; lossless cold Geometry replay; separate renderonly signed root. No second F576, native/float height equality, universalmesh, sourcebank, F575/HP/time application, GPU or Android performance claim.",
+	"sources": {
+		"scripts/source_native_contact_geometry.gd": "466eb3a88f1d1426321717d7ad24f73c6f697006473311646d9e79c101f6d0c7",
+		"scripts/source_native_surface_provider.gd": "c1558516a8414783de8b3c74d97e75fa9dfd52feeaa81517d974af10e28fcc5e",
+		"scripts/source_natural_contact.gd": "e6cb189d34dc4d434b10f9fc2ef43bf8b96433845c01673f79b4d9592446658f",
+		"scripts/source_terrain_query_frame.gd": "2b4be296798bf11755dc3b895a7e57fff013baad980bc1239369ddc59299b74e",
+		"tests/fixtures/source_footprint_native.json": "7fa98e4dd0b63ec9c0a608b9a11ec032aae2d55861c018212aeb50080d8bf726",
+		"tests/fixtures/source_native_provider_orientation.json": "5bb3eaf1f52d2ac7794e40bd41ebfb87250a7e9eceb799252281b790f04ed707",
+		"tests/test_source_native_surface_provider.gd": "9a9e5a0fb5d397e48c08730258723852349ea563cdccca6e1bcedbc505941aa0"
+	}
+}

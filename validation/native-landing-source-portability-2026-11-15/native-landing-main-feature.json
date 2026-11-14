@@ -1,0 +1,39 @@
+{
+  "schema": "starfrontier-source-archive-native-landing-feature-v1",
+  "source_commit": "efef2cadaec58448b32c50a8d585a3c1d4902cc6",
+  "archive_sha256": "c46bc666447d5e98350944fdf32b8a30bfacecd453ad937beacbd65a558fdeb4",
+  "command": [
+    "godot",
+    "--headless",
+    "--audio-driver",
+    "Dummy",
+    "--path",
+    "/workspace/recovery/native-landing-source-portability/source/StarFrontier-0.25.0-native-landing-source",
+    "--script",
+    "res://tests/test_native_landing_trial_main.gd",
+    "--",
+    "--rebuild-capture"
+  ],
+  "exit_code": 0,
+  "timed_out": false,
+  "duration_seconds": 25.30223,
+  "log_sha256": "7c638bcf50ba530b4f1c2c37c0f312bd1b403849d9feba80f37e709a18d14458",
+  "log_file": "native-landing-main-feature.log",
+  "error_markers": [],
+  "checks": 48,
+  "failures": 0,
+  "expected_checks_from_archived_final_report": 48,
+  "archived_final_report": "validation/contact-lifecycle-2026-11-15/native-landing-trial-main.json",
+  "archived_final_report_sha256": "59941256d1b786a6ecff313012b45d7babb2529d987a46b7a89d53c51924434f",
+  "source_actual_files": 1579,
+  "all_source_files_unchanged": true,
+  "modified_files": [],
+  "private_xdg": {
+    "XDG_DATA_HOME": "/workspace/recovery/native-landing-source-portability/feature_main/data",
+    "XDG_CONFIG_HOME": "/workspace/recovery/native-landing-source-portability/feature_main/config",
+    "XDG_CACHE_HOME": "/workspace/recovery/native-landing-source-portability/feature_main/cache"
+  },
+  "physical_device_tested": false,
+  "ok": true,
+  "scope": "Actual production Main native manual landing, separate save/cold factory, queued takeoff, exact ordinary return, frame scheduling and optional report ZIP from the exact fresh source archive. Repeated portability checks are excluded from distinct functional totals; no Android execution."
+}

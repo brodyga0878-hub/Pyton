@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "visually_inspected_desktop_frames": 4,
+  "physical_phone_capture": false,
+  "composited": false,
+  "files": {
+    "01-native-entry-1440x720.png": "58d71cc5765d44323ef16052a7c14bfa251c1bae0d85207000856ddf6a08d2f4",
+    "02-native-manual-landing-1440x720.png": "4075647312f0deb0d83fb6f6883539a8fe2661f7f698be0900ff9cfe082371d6",
+    "03-native-powered-takeoff-960x432.png": "03042d8d1a61b7168785f77dff547955b80f6fef0f60ba1515467526ed99a479",
+    "04-native-include-save-report-960x432.png": "b389ce2459b6af1accbae320dc42f50a61727abb11b9821ccdcfd76672763393"
+  },
+  "scope": "Four actual Main desktop framebuffers reviewed: native50m entry; real53interval original accepted descent; real3interval poweredtakeoff; actual include-save report at960x432. The chasecamera follows actualship and fullbottomconsole fits. Only bounded emitted source triangles are visible, including their patch boundary. This is a functional manual trial, not fullterrain/graphics equivalence or physical Android/FPS evidence."
+}

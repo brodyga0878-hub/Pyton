@@ -1,0 +1,10 @@
+{
+  "source_commit": "efef2cadaec58448b32c50a8d585a3c1d4902cc6",
+  "files": 1579,
+  "bytes": 33223581,
+  "omitted_duplicate_historical_zip_files": [
+    "recovery/StarFrontier_recovered_sources_2026-11-04_checkpoint1.zip",
+    "recovery/StarFrontier_recovered_sources_2026-11-04_expanded.zip"
+  ],
+  "runtime_assets_or_current_source_omitted": false
+}

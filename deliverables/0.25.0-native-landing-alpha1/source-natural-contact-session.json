@@ -1,0 +1,84 @@
+{
+	"checks": 2142,
+	"counts": {
+		"actual_child_contacts": 7,
+		"actual_nohit": 31,
+		"actual_nohit_with_flag2": 31,
+		"explicit_scope_rejections": 9,
+		"native_actor_inputs": 65,
+		"prepared_queries": 93,
+		"supported_native_classifications": 56
+	},
+	"evidence": [
+		{
+			"F575_native_combined_chain_proof_claimed": false,
+			"case": "separate_original_native_bank_consumed",
+			"counts": {
+				"actual_child_contacts": 7,
+				"actual_nohit": 31,
+				"actual_nohit_with_flag2": 31,
+				"explicit_scope_rejections": 9,
+				"native_actor_inputs": 65,
+				"prepared_queries": 93,
+				"supported_native_classifications": 56
+			},
+			"raw_position_primary_fixture_adapter": true
+		},
+		{
+			"case": "native_accepted_park_cold_release",
+			"full_F1021_executed": false,
+			"mesh_AGL_not_an_input": true,
+			"park_policy": "explicit-host-natural-park-v1",
+			"source_after_body_hex": "0000000000000000d0ff017ee0ffff7e000000000000000000000000f0ffff7e000000000000000000000000000000000000000000000000000000000000992d51830000000000000000000000000000000000000000020100000000000000000000000000000000000000000000000000000000000000000000000000000000000026000000010000000000000000000000000000000000000000000000ffff00000000000000000000000000000000c100c3000000c700c900cb0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000065006600670000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a08c000000000000802500000000000000000000800000000000",
+			"source_before_s64_hex": "4a0651830000000000000000000000000000000000000000",
+			"source_fractional_velocity_preserved": true,
+			"source_player_phase32_fragment_executed": true,
+			"source_previous_low": 4294966832
+		},
+		{
+			"applied_original_damage_calls": 1,
+			"case": "existing_Hyperdrive_HP_owner_clone_commit",
+			"fractional_hull_after": 12.625,
+			"fractional_hull_before": 37.625,
+			"host_clone_and_swap_required": true,
+			"source_session_owns_HP": false
+		},
+		{
+			"case": "independent_original_F574_F575_caller_chain",
+			"counts": {
+				"accepted_source_responses": 77,
+				"corrected_genuine_nohit": 75,
+				"native_original_F574_F575_inputs": 323,
+				"original_header_skips": 6
+			},
+			"exposed_caller_difference_fields": [
+				"collision_enabled_u8",
+				"collider_parent_selected"
+			],
+			"full_F1021_not_implemented_by_session": true,
+			"original_F574_collision_enabled": 0,
+			"session_F569_F570_prefix_collision_enabled": 255
+		}
+	],
+	"failures": 0,
+	"lifecycle_counts": {
+		"accepted_source_responses": 77,
+		"corrected_genuine_nohit": 75,
+		"native_original_F574_F575_inputs": 323,
+		"original_header_skips": 6
+	},
+	"schema": 1,
+	"scope": "Explicit canonical matching-bodyfixed primary-parent raw session; exact F569/F570-prefix assignments and original F575 header, immutable actual F576/F575 continuation and same-execution trace, strict hex snapshots, private staged retry/commit, pure contact plus accepted F1021-fragment/F1042/state32 park replay. Separate native F574/F575 caller-chain inputs independently match raw bodies/history after exposing F574's disabled byte/unchanged parent pointer versus this active prefix's FF/selected parent; accepted, six header skips and genuine corrected-body nohit cases covered. Session park pointer words are explicitly isolated object references. No executed native F570 scanner/F953/full F1021 or launch scheduler, HP/RNG/fuel/clock ownership, whole-mesh admission or actual Main/Android proof. Outer host clone-and-swap remains required.",
+	"sources": {
+		"scripts/source_hyperdrive_session.gd": "c44596500a9dcd5645d9d9fce2b9a98d01cdf2abd07606046e4b6231edb8612c",
+		"scripts/source_natural_contact.gd": "e6cb189d34dc4d434b10f9fc2ef43bf8b96433845c01673f79b4d9592446658f",
+		"scripts/source_natural_contact_pipeline.gd": "8d981b53f301dd375f22faae89a439673a3f94a98278cbb2161075a85ae125be",
+		"scripts/source_natural_contact_session.gd": "5e3472a7bbe8998a30f11340a563564d43307dd1b3c482eb838126c880a728d6",
+		"scripts/source_natural_park.gd": "06c44e67f338d8e1011ace70ea6bc89cbe1fa905348c6efedffeb2686abfab14",
+		"scripts/source_surface_contact.gd": "fcfb6077f0bcabf7b6ffce98c3a3dbb23251a850175be4ef241b299fdf8d117d",
+		"scripts/source_terrain_query_trace.gd": "59871e3faa956a3bd580e30b50d5f3117e9e4a1968f48c17d615ab80e630e1b2",
+		"tests/fixtures/source_contact_lifecycle_native.json": "0db723a520144a55fa3846d80a3e1cad58b42c18d2f904500688a05ebfbf1f8b",
+		"tests/fixtures/source_footprint_native.json": "7fa98e4dd0b63ec9c0a608b9a11ec032aae2d55861c018212aeb50080d8bf726",
+		"tests/test_source_natural_contact_session.gd": "2c91cd3c4d531784a19bf2a20cbfa54283b31416bf6f6bccd2bf2219e93aed83"
+	}
+}
