@@ -44,6 +44,9 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_terrain_query_trace', 'tests/test_source_terrain_query_trace.gd', 'Observational original winning-triangle trace; unchanged integer query/classifier results and immutable input buffers against original native fixtures.', timeout=600),
+    Suite('source_natural_footprint', 'tests/test_source_natural_footprint_probe.gd', 'Ordered original full-ship volumes, scalar64 published-geometry observations, isolated history and bounded readonly response preview; no live geometry identity claim.', timeout=600),
+    Suite('source_natural_footprint_main', 'tests/test_source_natural_footprint_main.gd', 'Actual Russian full-ship check, paused/state/cache isolation, ephemeral save/preview lifetime and complete diagnostic ZIP with bounded log references.', timeout=600, user_args=('--rebuild-capture',)),
     Suite('source_contact_alignment', 'tests/test_source_contact_alignment.gd', 'Measured source placement, grid, phone frame and saved-triangle discrepancies on17landable models/three anchors/three players; characterization is not live response.', timeout=600),
     Suite('source_contact_field', 'tests/test_source_terrain_contact_field.gd', 'Certified signed F581 zeros or adjacent outward sign boundaries versus153 independent native geometry witnesses and306 actual player classifications.', timeout=600),
     Suite('source_contact_surface_terrain', 'tests/test_source_contact_surface_terrain.gd', 'Distinct opt-in v5 signed-field node sampler, strict private worker/cache restore and retained reviewed JJFFE city anchors; interpolation is not certified.', timeout=300),

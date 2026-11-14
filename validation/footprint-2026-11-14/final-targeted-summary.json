@@ -1,0 +1,212 @@
+{
+  "schema": "starfrontier-footprint-unique-targeted-summary-v1",
+  "version": "0.23.0-footprint-alpha1",
+  "created_utc": "2026-11-14T20:05:26.752440+00:00",
+  "status": "passed",
+  "checks": 64484,
+  "failures": 0,
+  "passed_suites": 25,
+  "suites": [
+    {
+      "test": "tests/test_source_terrain_contact_field.gd",
+      "checks": 3802,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/kernel-summary.json",
+      "test_source_sha256": "a4b093da4276daf860a2ddd32a2eca8f8580b048f55288b78674f0e293f65b6c"
+    },
+    {
+      "test": "tests/test_source_contact_surface_terrain.gd",
+      "checks": 51,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/kernel-summary.json",
+      "test_source_sha256": "77649f0883339ddebb1260e4abc024a692d03ea76a30e87f853952b3d76b6dac"
+    },
+    {
+      "test": "tests/test_source_contact_surface_render.gd",
+      "checks": 40,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/kernel-summary.json",
+      "test_source_sha256": "564379791b1c4867c68f3903a74e49aeb02bbee0db700d632a29e8349ac0a449"
+    },
+    {
+      "test": "tests/test_source_natural_surface_bridge.gd",
+      "checks": 140,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/kernel-summary.json",
+      "test_source_sha256": "3c6343a31a9c52ab3d34c3e4f93c971e0c3684f921dd0b443623b7ef03db98eb"
+    },
+    {
+      "test": "tests/test_source_contact_alignment_probe.gd",
+      "checks": 167,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/kernel-summary.json",
+      "test_source_sha256": "9cbdd905e0d2a37dc30e54545323581990f98689d1bb79295dd74f2bbe032cd6"
+    },
+    {
+      "test": "tests/test_source_natural_contact.gd",
+      "checks": 16185,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/kernel-summary.json",
+      "test_source_sha256": "25b3fa4fc5f60b4e9ffb1c13b24998207d654e3061d31163e5e06e80d3e9ce32"
+    },
+    {
+      "test": "tests/test_source_natural_contact_pipeline.gd",
+      "checks": 26592,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/kernel-summary.json",
+      "test_source_sha256": "9b5c27771da33dc9bc1526134472dc995e927fc0911fcb304d1a5688efc7d2b9"
+    },
+    {
+      "test": "tests/test_source_contact_alignment_main.gd",
+      "checks": 82,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/app-summary.json",
+      "test_source_sha256": "d5d49b47922cb7a1544d0cfe5d8d72313323da2cac746949c75f83fd95f3e0a8"
+    },
+    {
+      "test": "tests/test_source_natural_contact_main.gd",
+      "checks": 163,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/app-summary.json",
+      "test_source_sha256": "7dac6164b749ae29206fc873c7d65399660a00c8e055f5562d2fc041a3441e2d"
+    },
+    {
+      "test": "tests/test_source_spherical_main.gd",
+      "checks": 195,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/app-summary.json",
+      "test_source_sha256": "31e6261d8f518cec93153501c53f4251ddf67d21149a0a5d519ffd0d7fccf12b"
+    },
+    {
+      "test": "tests/test_source_contact_main.gd",
+      "checks": 220,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/app-summary.json",
+      "test_source_sha256": "4fe5094f251decdf18453c41386af507c980f658c623fb8507076310c07bbfbd"
+    },
+    {
+      "test": "tests/test_source_gear_main.gd",
+      "checks": 112,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/app-summary.json",
+      "test_source_sha256": "1cbbb9ac45692058d24dfdc5cda0bc532fe5633a282fd5493a8fb72aeadecfa3"
+    },
+    {
+      "test": "tests/test_source_thermal_main.gd",
+      "checks": 463,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/app-summary.json",
+      "test_source_sha256": "cc413076aeff8c13d2cbd0d1ebbce8ad1acd185b3dadef73385aa7704aaf0f6b"
+    },
+    {
+      "test": "tests/test_source_fuel_main.gd",
+      "checks": 397,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/app-summary.json",
+      "test_source_sha256": "31ddac2cab1eaeea39ddd8e222bf25a2b61429ae40ba25e2b8dfddee2ab1d70e"
+    },
+    {
+      "test": "tests/test_source_hyperdrive_main.gd",
+      "checks": 70,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/app-summary.json",
+      "test_source_sha256": "84f688bd98c73d50be2e3998f0780ff0ba44fa249aa10bd315840b6c6ec0f465"
+    },
+    {
+      "test": "tests/test_classic_console_main.gd",
+      "checks": 42,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/app-summary.json",
+      "test_source_sha256": "a9d2f15c1ecd3911828f96671fa52636a60fcadbfbf57230fc4cb8b12c027fcf"
+    },
+    {
+      "test": "tests/test_flight_projection.gd",
+      "checks": 691,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/app-summary.json",
+      "test_source_sha256": "a1e2569ae67b334851340782de2dab1c41ee8ceba3bb28b8ba66055d21f777d7"
+    },
+    {
+      "test": "tests/test_rebuilt_app_transitions.gd",
+      "checks": 54,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/app-summary.json",
+      "test_source_sha256": "f81dad10e23e7169ba5e5046567b335720be7e93cfe95f7445e897f25cc436a5"
+    },
+    {
+      "test": "tests/test_graphics_integration.gd",
+      "checks": 44,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/app-summary.json",
+      "test_source_sha256": "07803e334be7ce9c9feea54a6ca2a942971f99b206c213f3aed53c28c31cb34c"
+    },
+    {
+      "test": "tests/test_game_diagnostics.gd",
+      "checks": 71,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/app-summary.json",
+      "test_source_sha256": "8633e58548a1c9467e2dcbbc87274cb55e47d0628ef45f000655d1a46a94cc2d"
+    },
+    {
+      "test": "tests/test_report_export.gd",
+      "checks": 27,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/app-summary.json",
+      "test_source_sha256": "c7ccee21fb27c906336abebc9897acf6eb5b7479a30d934e69d0c3b8a55a7e80"
+    },
+    {
+      "test": "tests/test_bug_report_ui.gd",
+      "checks": 99,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/app-summary.json",
+      "test_source_sha256": "01600083741179de09a29a8f11807974eee4857fab1c2734eeaa328267770079"
+    },
+    {
+      "test": "tests/test_source_natural_footprint_main.gd",
+      "checks": 54,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/new-main-summary.json",
+      "test_source_sha256": "da6ea2d42b8847cdd31c602aa149155ff9d96beb211d59e0ae668a1e55dbcc4a"
+    },
+    {
+      "test": "tests/test_source_terrain_query_trace.gd",
+      "checks": 13071,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/source-terrain-query-trace.json",
+      "test_source_sha256": "13f93d24bf6abeff51285860f25e347888e6d8ac2078e93ed65230892f011130"
+    },
+    {
+      "test": "tests/test_source_natural_footprint_probe.gd",
+      "checks": 1652,
+      "failures": 0,
+      "proof": "validation/footprint-2026-11-14/source-natural-footprint-probe.json",
+      "test_source_sha256": "3dd98ce9d3498d65ab5b7aff756de47a5c487f0b59f2abcb6fa04a8d18e8efd0"
+    }
+  ],
+  "proofs_sha256": {
+    "validation/footprint-2026-11-14/kernel-summary.json": "7fae1c8f2f00f9acbab9d51495acd73234de88f5014a80e4a37472c7b764db21",
+    "validation/footprint-2026-11-14/app-summary.json": "c3cd829d7f9395867dcf64b8ef167557f764e088c6a82fde2153f4fd34f4c35f",
+    "validation/footprint-2026-11-14/new-main-summary.json": "e91c84bcf120cee71676fa836ea3261c635f882c075ba9410b43b56519998fb4",
+    "validation/footprint-2026-11-14/source-terrain-query-trace.json": "7b99edf9b31e297eb3a431d0bb7f61391f1157f8fc583ee7b386ac626a3fdfbb",
+    "validation/footprint-2026-11-14/source-natural-footprint-probe.json": "7f1c76caf87e0744bd9841149ca05fb3b236a80e094c631c0e01a1eb4d7609e5"
+  },
+  "new_native_control_cases": 158,
+  "new_native_actor_cases": 65,
+  "new_native_groundpoint_cases": 93,
+  "native_visited_volumes": 202,
+  "native_winning_leaf_triangles": 188,
+  "native_reproduction_validator_checks_separate": 1833,
+  "capture_checks_separate": 61,
+  "capture_frames": 3,
+  "native_controls_already_in_functional_counts": true,
+  "historical_totals_added": false,
+  "failed_development_runs_added": false,
+  "repeated_portability_and_capture_checks_added": false,
+  "default_v4_terrain_retained": true,
+  "live_response_enabled": false,
+  "source_geometry_identity_verified": false,
+  "physical_device_tested": false,
+  "production_release_ready": false,
+  "full_original_port_complete": false,
+  "scope": "One current passing result per25 distinct suites:7 preserved kernels/render-provider groups,15 actual app/log/HP/fuel/gear/console/report regressions, original integer winning-leaf observer, ordered full-ship probe, and actual new Main check/report suite. Native controls are contained in those checks and are not added again. Native reproduction validator, Python packaging regressions, framebuffer capture and fresh-source repeats are separate. This is bounded readonly diagnostics with isolated initial globals, not a new live collision session, mesh parity, full original physics or Android-device test."
+}

@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "visually_inspected_desktop_frames": 3,
+  "physical_phone_capture": false,
+  "composited": false,
+  "scope": "Actual production Main framebuffer. Flight console retained; full-ship observation page readable and fits1440x720; actual report page is a scrolled collector view. No new graphics, manual-flight, FPS or physical-device claim.",
+  "files": {
+    "01-retained-flight-console.png": "be10905118cee98612b1d075b73c72845cc2947d4d2fc762851e42e602bd9625",
+    "02-actual-full-ship-contact-check.png": "0cfe8a4a610e897b6803e23a0656e5235cfd8024a99413c28387f26d7ff99e3e",
+    "03-actual-contact-report-zip-ready.png": "dab9a5b5b683b3d5374ad4f3093d0d2097fed53f63da02845aba3f6564e36f9a"
+  }
+}

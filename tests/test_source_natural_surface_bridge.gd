@@ -9,7 +9,7 @@ const Packet=preload("res://scripts/source_surface_render_packet.gd")
 const Frame=preload("res://scripts/source_surface_render_state.gd")
 const Flight=preload("res://scripts/flight_model.gd")
 const Phone=preload("res://scripts/source_surface_contact_bridge.gd")
-const REPORT:="res://validation/alignment-2026-11-13/source-natural-surface-bridge.json"
+const REPORT:="res://build/current-test-reports/source-natural-surface-bridge.json"
 class TestWorld extends RefCounted:
 	var by_id:Dictionary={}
 	var settlements:Array=[]

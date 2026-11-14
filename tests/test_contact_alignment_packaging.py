@@ -24,6 +24,18 @@ class MockAlignmentArchive(retained.MockNaturalArchive):
 
 
 class ContactAlignmentPackaging(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        directory=tempfile.TemporaryDirectory(prefix='footprint-packaging-v47-')
+        cls.addClassCleanup(directory.cleanup);cls.project=Path(directory.name)
+        for relative in cls.project_files():
+            target=cls.project/relative;target.parent.mkdir(parents=True,exist_ok=True)
+            target.write_bytes((PROJECT/relative).read_bytes())
+        baseline=verifier._load_contact_footprint_baseline(PROJECT)
+        for relative,entry in {**baseline['files'],**baseline['evidence_source_files']}.items():
+            target=cls.project/relative;target.parent.mkdir(parents=True,exist_ok=True)
+            target.write_text(entry['source'])
+
     def setUp(self):self.archive=MockAlignmentArchive()
 
     @staticmethod
@@ -32,7 +44,7 @@ class ContactAlignmentPackaging(unittest.TestCase):
         files.update(verifier.CONTACT_ALIGNMENT_AUDITED_SOURCE_SHA256)
         files.update(verifier.FUEL_CONTACT_DEPENDENCY_SHA256)
         files.update(verifier.CONTACT_ALIGNMENT_PROTECTED_KERNEL_DATA_SHA256)
-        files.update(['tests/fixtures/alignment_v46_sources.json','tests/fixtures/source_contact_field_native.json',
+        files.update(['tests/fixtures/alignment_v46_sources.json','tests/fixtures/footprint_v47_sources.json','tests/fixtures/source_contact_field_native.json',
                       'tests/test_source_contact_surface_render.gd',
                       'validation/alignment-2026-11-13/source-contact-surface-render.json'])
         return files
@@ -41,7 +53,7 @@ class ContactAlignmentPackaging(unittest.TestCase):
         project=Path(directory)
         for relative in self.project_files():
             target=project/relative;target.parent.mkdir(parents=True,exist_ok=True)
-            target.write_bytes((PROJECT/relative).read_bytes())
+            target.write_bytes((self.project/relative).read_bytes())
         return project
 
     def mutate_json(self,project,relative,callback):
@@ -49,7 +61,7 @@ class ContactAlignmentPackaging(unittest.TestCase):
         path.write_text(json.dumps(data,ensure_ascii=False))
 
     def test_actual47_scope_retains_v4_defaults_without_compiled_asset_substitution(self):
-        result=verifier.verify_contact_alignment_runtime(self.archive,PROJECT)
+        result=verifier.verify_contact_alignment_runtime(self.archive,self.project)
         self.assertEqual(result['baseline_source_commit'],'2637168f2371937758504a54b9e17c11d279c82e')
         self.assertEqual((result['compiled_module_count'],result['integration_compiled_module_count']),(4,40))
         self.assertEqual(result['unchanged_code46_runtime_source_count'],27)
@@ -72,7 +84,7 @@ class ContactAlignmentPackaging(unittest.TestCase):
             with self.subTest(relative=relative):
                 archive=MockAlignmentArchive();del archive.entries['assets/scripts/'+Path(relative).stem+'.gdc']
                 with self.assertRaisesRegex(AssertionError,'Missing contact-alignment integration runtime'):
-                    verifier.verify_contact_alignment_runtime(archive,PROJECT)
+                    verifier.verify_contact_alignment_runtime(archive,self.project)
 
     def test_new_compiled_headers_and_truncation_reject(self):
         for name in verifier.CONTACT_ALIGNMENT_MODULES:
@@ -80,12 +92,12 @@ class ContactAlignmentPackaging(unittest.TestCase):
                 with self.subTest(name=name,size=len(raw)):
                     archive=MockAlignmentArchive();archive.entries['assets/scripts/'+name+'.gdc']=raw
                     with self.assertRaisesRegex(AssertionError,'Invalid compiled contact-alignment integration runtime'):
-                        verifier.verify_contact_alignment_runtime(archive,PROJECT)
+                        verifier.verify_contact_alignment_runtime(archive,self.project)
 
     def test_current_compiled_provider_bytes_remain_actual_in_retained_audit(self):
         path='assets/scripts/source_surface_render_state.gdc';raw=b'GDSC'+b'current47-only-exported-provider'*5
         self.archive.entries[path]=raw
-        result=verifier.verify_contact_alignment_runtime(self.archive,PROJECT)
+        result=verifier.verify_contact_alignment_runtime(self.archive,self.project)
         digest=hashlib.sha256(raw).hexdigest()
         self.assertEqual(result['integration_compiled_modules']['source_surface_render_state'],digest)
         old=result['retained_code46_source_audit']['assets']['retained_spherical_contact_assets']['retained_surface_contact_assets']
@@ -93,10 +105,10 @@ class ContactAlignmentPackaging(unittest.TestCase):
         self.assertFalse(result['retained_code46_source_audit']['compiled_assets_substituted'])
 
     def test_old46_public_gate_still_rejects_actual47_runtime(self):
-        with self.assertRaises(AssertionError):verifier.verify_natural_contact_runtime(self.archive,PROJECT)
+        with self.assertRaises(AssertionError):verifier.verify_natural_contact_runtime(self.archive,self.project)
 
     def test_baseline_comes_from_fixed_git_commit_and_exact36_sources(self):
-        data=verifier._load_contact_alignment_baseline(PROJECT)
+        data=verifier._load_contact_alignment_baseline(self.project)
         self.assertEqual(len(data['files']),36)
         self.assertEqual(data['source_commit'],'2637168f2371937758504a54b9e17c11d279c82e')
         self.assertEqual(data['audited_runtime_source_sha256'],verifier.NATURAL_CONTACT_AUDITED_SOURCE_SHA256)
@@ -146,7 +158,7 @@ class ContactAlignmentPackaging(unittest.TestCase):
                     verifier.verify_contact_alignment_runtime(self.archive,project)
 
     def test_actual_tick_save_and_v4_preference_are_checked_before_legacy_source_audit(self):
-        baseline=verifier._load_contact_alignment_baseline(PROJECT)
+        baseline=verifier._load_contact_alignment_baseline(self.project)
         for relative,name in [('scripts/main.gd','_tick'),('scripts/main.gd','_payload'),('scripts/surface_orbit_link.gd','preferred_terrain_revision')]:
             with self.subTest(function=name),tempfile.TemporaryDirectory() as directory:
                 project=self.project_copy(directory);path=project/relative;raw=path.read_text()
@@ -160,9 +172,9 @@ class ContactAlignmentPackaging(unittest.TestCase):
             with self.subTest(name=name):
                 archive=MockAlignmentArchive()
                 if 'assets/data/'+name+'.json' not in archive.entries:
-                    archive.entries['assets/data/'+name+'.json']=(PROJECT/'data'/f'{name}.json').read_bytes()
+                    archive.entries['assets/data/'+name+'.json']=(self.project/'data'/f'{name}.json').read_bytes()
                 archive.entries['assets/data/'+name+'.json']+=b' '
-                with self.assertRaises(AssertionError):verifier.verify_contact_alignment_runtime(archive,PROJECT)
+                with self.assertRaises(AssertionError):verifier.verify_contact_alignment_runtime(archive,self.project)
 
     def test_new_native_field_reference_cannot_change(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -172,7 +184,7 @@ class ContactAlignmentPackaging(unittest.TestCase):
                 verifier.verify_contact_alignment_runtime(self.archive,project)
 
     def test_native_geometry_cases_are_separate_from_actual_positive_player_classification(self):
-        result=verifier._verify_contact_field_native_reference(PROJECT)
+        result=verifier._verify_contact_field_native_reference(self.project)
         self.assertEqual((result['geometry_case_count'],result['canonical_positive_player_classifier_case_count']),(153,306))
         self.assertEqual((result['exact_zero_count'],result['adjacent_integer_boundary_count']),(39,12))
         self.assertEqual(result['geometry_only_coarse_bound_exclusions'],['model117_axis_x','model117_axis_z'])

@@ -2248,6 +2248,121 @@ def verify_contact_alignment_runtime(archive,project):
         'v4_is_default_physical_terrain':True,'v5_geometry_is_explicit_opt_in':True,'Main_new_natural_response_branch':False,'new_alignment_data_persisted_in_game_save':False,'geometry_guard_is_local_point_only':True,'whole_interpolated_triangle_certified':False,'independent_native_F575_coupled_pipeline_executed':False,'full_original_world_bank':False,'complete_original_physics':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
 
 
+
+# Code48 source pins are intentionally separate from the strict code47 gate.
+# Only source history is overlaid below; actual compiled archive bytes are used
+# by every nested check and retain their actual code48 SHA256 values.
+CONTACT_FOOTPRINT_BASELINE_SOURCE_COMMIT='39397785dde976ca46e59e0c3fa240703898057c'
+CONTACT_FOOTPRINT_BASELINE_FIXTURE_SHA256='9f533421a9717beeb8ecf112c55a3563cd74c9a9ff03777a7636d4ca38e5ac67'
+CONTACT_FOOTPRINT_BASELINE_EVIDENCE_SOURCE_SHA256={'tests/test_source_contact_surface_render.gd':'34098086bb055ea91688e2253936511efa7a00e118797233d3296e3fe5c5cd3c'}
+CONTACT_FOOTPRINT_NATIVE_REFERENCE_SHA256='7fa98e4dd0b63ec9c0a608b9a11ec032aae2d55861c018212aeb50080d8bf726'
+CONTACT_FOOTPRINT_MODULES=('source_terrain_query_trace','source_natural_footprint_probe')
+CONTACT_FOOTPRINT_AUDITED_SOURCE_SHA256={**CONTACT_ALIGNMENT_AUDITED_SOURCE_SHA256,
+    'scripts/main.gd':'3c7b5a1fa46cae71d843ba993518ffe00f5df4e920383db410f6795488dd6a7b',
+    'scripts/source_terrain_query_trace.gd':'59871e3faa956a3bd580e30b50d5f3117e9e4a1968f48c17d615ab80e630e1b2',
+    'scripts/source_natural_footprint_probe.gd':'193018b8318c4d2593e99faeb71bb56691021b1e6d78e6cfbe076512490a1dc0'}
+CONTACT_FOOTPRINT_MAIN_ALLOWED_CHANGED_FUNCTIONS={
+    '_new_models','_commit_state','_show_menu','_flight_diagnostic_sample',
+    '_flight_log_sample','_begin_graphics_demo','_end_graphics_demo'}
+
+
+def _load_contact_footprint_baseline(project):
+    raw=(project/'tests/fixtures/footprint_v47_sources.json').read_bytes()
+    assert hashlib.sha256(raw).hexdigest()==CONTACT_FOOTPRINT_BASELINE_FIXTURE_SHA256,'Changed portable code47 footprint source baseline'
+    data=json.loads(raw)
+    assert data.get('schema')==1 and data.get('source_commit')==CONTACT_FOOTPRINT_BASELINE_SOURCE_COMMIT and data.get('version_code')==47 and data.get('version')=='0.22.0-contact-alignment-alpha1','Wrong portable code47 footprint baseline identity'
+    assert data.get('audited_runtime_source_sha256')==CONTACT_ALIGNMENT_AUDITED_SOURCE_SHA256 and set(data.get('files',{}))==set(CONTACT_ALIGNMENT_AUDITED_SOURCE_SHA256),'Wrong portable code47 footprint baseline domain'
+    for relative,digest in CONTACT_ALIGNMENT_AUDITED_SOURCE_SHA256.items():
+        row=data['files'][relative]
+        assert row.get('sha256')==digest and hashlib.sha256(row.get('source','').encode()).hexdigest()==digest,'Changed portable code47 footprint source '+relative
+    assert set(data.get('evidence_source_files',{}))==set(CONTACT_FOOTPRINT_BASELINE_EVIDENCE_SOURCE_SHA256),'Wrong portable code47 evidence-helper domain'
+    for relative,digest in CONTACT_FOOTPRINT_BASELINE_EVIDENCE_SOURCE_SHA256.items():
+        row=data['evidence_source_files'][relative]
+        assert row.get('sha256')==digest and hashlib.sha256(row.get('source','').encode()).hexdigest()==digest,'Changed portable code47 evidence helper '+relative
+    return data
+
+
+def _verify_contact_footprint_preserved_functions(project,baseline):
+    old=baseline['files']['scripts/main.gd']['source'];current=(project/'scripts/main.gd').read_text()
+    names=re.findall(r'^(?:static\s+)?func\s+([A-Za-z0-9_]+)\(',old,re.M)
+    preserved={}
+    for name in names:
+        if name in CONTACT_FOOTPRINT_MAIN_ALLOWED_CHANGED_FUNCTIONS:continue
+        previous=source_function(old,name).rstrip('\n');actual=source_function(current,name).rstrip('\n')
+        assert actual==previous,'Contact footprint changed protected Main function '+name
+        preserved[name]=hashlib.sha256(actual.encode()).hexdigest()
+    assert all(name in preserved for name in ('_tick','_payload','_decode_state','_apply_pending_source_contact','_source_contact_enabled')),'Footprint preserved-function domain lost physical or save functions'
+    return preserved
+
+
+
+def _verify_contact_footprint_native_reference(project):
+    raw=(project/'tests/fixtures/source_footprint_native.json').read_bytes();data=json.loads(raw)
+    assert hashlib.sha256(raw).hexdigest()==CONTACT_FOOTPRINT_NATIVE_REFERENCE_SHA256,'Changed independent ordered-footprint native reference'
+    assert data.get('schema')==1 and data.get('revision')=='original-native-ordered-source-footprint-v1' and data.get('source_sha256')==SOURCE_IMAGE_SHA256 and data.get('source_assembly_sha256')==SOURCE_ASSEMBLY_SHA256 and data.get('source_commit')==SOURCE_ASSEMBLY_COMMIT,'Wrong ordered-footprint native provenance'
+    actors=data.get('actor_cases',[]);ground=data.get('ground_cases',[])
+    assert data.get('actor_case_count')==len(actors)==65 and data.get('visible_ground_case_count')==len(ground)==93 and data.get('case_count')==158,'Wrong ordered-footprint native case domains'
+    assert data.get('native_fresh_process_runs_per_bank')==3 and data.get('actor_reverse_repeat_count')==65 and data.get('ground_reverse_repeat_count')==93,'Incomplete ordered-footprint native reproduction'
+    assert {row['player_model']for row in actors}=={15,24,38} and {row['parent_model']for row in actors}=={117,118,122,146},'Incomplete ordered-footprint ship/natural/control domains'
+    branches=set();selected=set();fresh=set();fresh_selected=set();visited=0;triangles=0
+    for row in actors:
+        expected=row['expected'];trace=expected['volume_trace']
+        assert expected['visited_volume_count']==len(trace) and len(trace)<=3,'Native F576 walk is bounded and must retain exact visited count'
+        assert [item['child_index']for item in trace]==list(range(len(trace))),'Native F576 walk lost original order'
+        for item in trace:
+            branches.add(item['branch']);fresh.add(bool(item['query']['fresh_altitude_written']));visited+=1
+            assert len(bytes.fromhex(item['relative_before_hex']))==24 and len(bytes.fromhex(item['relative_truncated_hex']))==24,'Native footprint observer words changed'
+            triangle=item.get('winning_triangle',{})
+            if triangle.get('captured'):
+                assert len(triangle.get('positions_raw',[]))==3 and len(triangle.get('depths_s32',[]))==3,'Native winning leaf is not the original three vertices'
+                triangles+=1
+        selected.add(expected['selected_child_index'])
+        picked=int(expected['selected_child_index'])
+        if picked>=0 and trace[picked]['query']['fresh_altitude_written']:fresh_selected.add((row['player_model'],picked))
+    assert branches=={'terrain_query','outside_outer','inside_inner'} and selected=={-1,0,1,2} and fresh=={True,False},'Native footprint lost coarse, child-hit, nohit or inherited-altitude controls'
+    assert fresh_selected=={(15,0),(15,1),(24,0),(38,0),(38,1),(38,2)},'Native footprint must cover a fresh first-hit terrain query for every actual source ship volume'
+    return {'sha256':CONTACT_FOOTPRINT_NATIVE_REFERENCE_SHA256,'case_count':158,'actor_case_count':65,'visible_ground_case_count':93,'actor_visited_volume_count':visited,'actor_winning_triangle_count':triangles,'player_models':[15,24,38],'parent_models':[117,118,122,146],'fresh_process_runs_per_bank':3,'ordered_first_hit_observed':True,'source_integer_leaf_observed':True,'fresh_and_inherited_altitude_controls_present':True,'fresh_selected_player_volume_pairs':[list(pair)for pair in sorted(fresh_selected)],'unvisited_children_asserted_clear':False,'oracle_executed_by_apk_verifier':False,'original_F575_chain_proved':False,'floating_mesh_identity_proved':False}
+
+
+def verify_contact_footprint_runtime(archive,project):
+    """Code48 actual modules/pins, with strictly separated code47 history audit."""
+    names=set(archive.namelist());compiled={}
+    for relative,digest in CONTACT_FOOTPRINT_AUDITED_SOURCE_SHA256.items():
+        name=Path(relative).stem;path='assets/scripts/'+name+'.gdc'
+        assert path in names,'Missing contact-footprint integration runtime '+name
+        exported=archive.read(path)
+        assert len(exported)>64 and exported[:4]==b'GDSC','Invalid compiled contact-footprint integration runtime '+name
+        assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==digest,'Contact footprint differs from audited integration source '+relative
+        compiled[name]=hashlib.sha256(exported).hexdigest()
+    native=_verify_contact_footprint_native_reference(project)
+    baseline=_load_contact_footprint_baseline(project)
+    preserved=_verify_contact_footprint_preserved_functions(project,baseline)
+    main=(project/'scripts/main.gd').read_text()
+    action=source_function(main,'_show_surface_footprint')
+    assert main.count('FootprintProbe.sample(')==1 and 'FootprintProbe.sample(' in action and 'isolated-diagnostic-initial-state' in action and '_record_event("source_ship_footprint"' in action,'Explicit isolated fullship footprint consumer is disconnected'
+    assert 'source_footprint_last' in source_function(main,'_flight_diagnostic_sample') and 'JSON.stringify(footprint).sha256_text()' in source_function(main,'_flight_log_sample'),'Fullship footprint report/log consumer is disconnected'
+    assert all('source_footprint_last' not in source_function(main,name) for name in ('_payload','_tick','_apply_pending_source_contact')),'Readonly footprint data must not enter player save or live response'
+    probe=(project/'scripts/source_natural_footprint_probe.gd').read_text();trace=(project/'scripts/source_terrain_query_trace.gd').read_text()
+    base=source_function(probe,'_base')
+    assert all(token in base for token in ('"diagnostic_only":true','"response_applied":false','"live_response_enabled":false','"source_geometry_identity_verified":false','"whole_mesh_certified":false','"full_F569":false','"full_F570":false','"source_object_bank_present":false')),'Fullship footprint must retain explicit readonly limits'
+    sample=source_function(probe,'sample');preview=source_function(probe,'_preview')
+    assert 'classifier.classify_natural_player(operands.body,operands.parent,operands.relative,' in sample and 'Frame._inverse_rows(frame.basis)' in sample and 'iteration.relative_before_hex' in sample,'Footprint must observe actual ordered source centres and scalar64 inverse mapping'
+    assert 'Pipeline.new()._dispatch_classification(operands.body,operands.parent,operands.relative,context,classified)' in preview and '"preview_only":true' in preview and '"damage_applied":false' in preview,'Candidate continuation must keep original relative and preview-only effects'
+    assert 'SurfaceBridge._clone_provider(provider)' in source_function(probe,'_visible'),'Footprint visible-provider observation must use an isolated copy'
+    assert 'FileAccess.file_exists(TRACE_PATH)' not in sample and ('ResourceLoader.exists(TRACE_PATH)' in sample or 'Trace.new()' in sample),'Exported trace lookup must honor compiled resource remapping'
+    query=source_function(trace,'query_raw');intersection=source_function(trace,'_intersection');fraction=source_function(trace,'_plane_fraction')
+    assert trace.startswith('extends "res://scripts/source_terrain_query.gd"') and query.count('super.query_raw(')==1 and 'return result' in query,'Trace must delegate original query arithmetic unchanged'
+    assert 'if _trace_current.is_empty():return super._intersection(vertices)' in intersection and intersection.count('super._intersection(vertices)')==2 and fraction.count('super._plane_fraction(')==1,'Trace must preserve original intersection/fraction calls on each branch'
+    assert '"source_query_arithmetic_changed":false' in source_function(trace,'trace_state') and 'return _trace_rows.duplicate(true)' in source_function(trace,'read_trace'),'Trace is an isolated observation, not alternative terrain arithmetic'
+    # The old strict gate still rejects actual48 source. This immutable host
+    # source-history view restores old Main and its archived renderer evidence
+    # helper only. No compiled archive entry is substituted.
+    overrides={'scripts/main.gd':baseline['files']['scripts/main.gd']['source'],**{relative:row['source']for relative,row in baseline['evidence_source_files'].items()}}
+    retained=verify_contact_alignment_runtime(archive,_AlignmentSourceAuditPath(project,overrides))
+    audit={'source_override_count':len(overrides),'runtime_source_override_count':1,'evidence_helper_source_override_count':1,'source_override_paths':list(overrides),'compiled_assets_substituted':False,'audit_is_actual_unchanged_code47_runtime':False,'description':'Host code47 source-history/data checks only, including its immutable renderer-test helper. Actual code48 source pins and preserved physical functions are checked separately; all compiled hashes are read from the same actual archive.','assets':retained}
+    return {'baseline_source_commit':CONTACT_FOOTPRINT_BASELINE_SOURCE_COMMIT,'baseline_fixture_sha256':CONTACT_FOOTPRINT_BASELINE_FIXTURE_SHA256,'baseline_fixture_source_count':40,'compiled_modules':{name:compiled[name]for name in CONTACT_FOOTPRINT_MODULES},'compiled_module_count':2,'integration_compiled_modules':compiled,'integration_compiled_module_count':len(compiled),'audited_local_source_sha256':CONTACT_FOOTPRINT_AUDITED_SOURCE_SHA256,'preserved_Main_function_count':len(preserved),'preserved_Main_functions':preserved,'native_footprint_reference':native,'retained_code47_source_audit':audit,'unchanged_code47_runtime_source_count':39,'actual_runtime_is_unchanged_code47':False,'new_runtime_JSON_added':False,'explicit_user_command_only':True,'live_response_enabled':False,'fullmesh_geometry_certified':False,'default_physical_terrain_is_v4':True,'complete_original_physics':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
+
+
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     expected=preset_values(presets)
     signature=run(build_tools/'apksigner','verify','--verbose','--print-certs',apk)
@@ -2266,7 +2381,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={};hyperdrive_assets={};fuel_assets={};atmosphere_assets={};landing_gear_assets={};surface_contact_assets={};spherical_contact_assets={};natural_contact_assets={};contact_alignment_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={};hyperdrive_assets={};fuel_assets={};atmosphere_assets={};landing_gear_assets={};surface_contact_assets={};spherical_contact_assets={};natural_contact_assets={};contact_alignment_assets={};contact_footprint_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -2372,8 +2487,14 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
                 natural_contact_assets=verify_natural_contact_runtime(archive,presets.parent)
                 spherical_contact_assets=natural_contact_assets['retained_spherical_contact_assets']
                 surface_contact_assets=spherical_contact_assets['retained_surface_contact_assets']
-            if expected['version_code']>=47:
+            if expected['version_code']==47:
                 contact_alignment_assets=verify_contact_alignment_runtime(archive,presets.parent)
+                natural_contact_assets={**contact_alignment_assets['retained_code46_source_audit']['assets'],'host_source_history_audit_only':True,'actual_runtime_is_unchanged_code46':False}
+                spherical_contact_assets={**natural_contact_assets['retained_spherical_contact_assets'],'host_source_history_audit_only':True}
+                surface_contact_assets={**spherical_contact_assets['retained_surface_contact_assets'],'host_source_history_audit_only':True}
+            if expected['version_code']>=48:
+                contact_footprint_assets=verify_contact_footprint_runtime(archive,presets.parent)
+                contact_alignment_assets={**contact_footprint_assets['retained_code47_source_audit']['assets'],'host_source_history_audit_only':True,'actual_runtime_is_unchanged_code47':False}
                 natural_contact_assets={**contact_alignment_assets['retained_code46_source_audit']['assets'],'host_source_history_audit_only':True,'actual_runtime_is_unchanged_code46':False}
                 spherical_contact_assets={**natural_contact_assets['retained_spherical_contact_assets'],'host_source_history_audit_only':True}
                 surface_contact_assets={**spherical_contact_assets['retained_surface_contact_assets'],'host_source_history_audit_only':True}
@@ -2400,7 +2521,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'hyperdrive_assets':hyperdrive_assets,'fuel_assets':fuel_assets,'atmosphere_assets':atmosphere_assets,'landing_gear_assets':landing_gear_assets,'surface_contact_assets':surface_contact_assets,'spherical_contact_assets':spherical_contact_assets,'natural_contact_assets':natural_contact_assets,'contact_alignment_assets':contact_alignment_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'hyperdrive_assets':hyperdrive_assets,'fuel_assets':fuel_assets,'atmosphere_assets':atmosphere_assets,'landing_gear_assets':landing_gear_assets,'surface_contact_assets':surface_contact_assets,'spherical_contact_assets':spherical_contact_assets,'natural_contact_assets':natural_contact_assets,'contact_alignment_assets':contact_alignment_assets,'contact_footprint_assets':contact_footprint_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

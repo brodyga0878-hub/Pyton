@@ -1,0 +1,56 @@
+{
+	"checks": 13071,
+	"evidence": [
+		{
+			"case": "complete_original_classifier_observation",
+			"expected_native_transitions_reexecuted_by_this_test": false,
+			"full_classifier_results_equal_unmodified_kernel": true,
+			"native_fixture_cases": 993,
+			"observed_query_count": 501
+		},
+		{
+			"case": "independent_near_root_queries",
+			"geometry_cases": 153,
+			"source_SAR13_and_Q15_approximation_retained": true,
+			"winning_float_plane_is_native_intersection": false
+		},
+		{
+			"actor_controls": 65,
+			"case": "new_independent_native_winning_leaves",
+			"direct_ground_controls": 93,
+			"native_cases": 158,
+			"native_leaf_count": 188,
+			"plane_fractions_have_separate_native_observation": false,
+			"source_vertex_positions_depths_SAR_and_intercept_compared": true,
+			"unvisited_children_certified": false
+		},
+		{
+			"cap_changes_source_query_results": false,
+			"case": "private_bounded_observer_journal",
+			"max_query_records": 64,
+			"reset_changes_base_kernel_state": false,
+			"traces_are_private_copies": true
+		}
+	],
+	"existing_native_classifier_cases": 993,
+	"existing_native_geometry_cases": 153,
+	"existing_native_query_count": 501,
+	"failures": 0,
+	"fixtures": {
+		"original_classifier_sha256": "d4ce0cf3ebfe0fd3bb1f263d047fa3a17ffc5201b8040389fdbddcc21a50e166",
+		"signed_root_sha256": "6cb84a1f6dff615a504c9cac7935f339291831b62a658971110a03c1cb7b6db6",
+		"winning_leaf_sha256": "7fa98e4dd0b63ec9c0a608b9a11ec032aae2d55861c018212aeb50080d8bf726"
+	},
+	"new_native_leaf_cases": 158,
+	"new_native_leaf_count": 188,
+	"schema": 1,
+	"scope": "Private bounded observer of the actual F1876 selected leaf, original signed vertices and original super-call plane fractions. Existing native controls are reused, not new native executions. No source-field/float-plane equivalence, local provider certificate, geometry publication, HP, time, source object bank, live response or physical Android claim.",
+	"source_contract": "source-f1876-readonly-winning-triangle-trace-v1",
+	"sources": {
+		"scripts/source_natural_contact.gd": "e6cb189d34dc4d434b10f9fc2ef43bf8b96433845c01673f79b4d9592446658f",
+		"scripts/source_terrain_point.gd": "caebe9f918763d6781a4885ae05e9d27aec84e584b9b45bb02cc71dc75000037",
+		"scripts/source_terrain_query.gd": "fc9bf87c182113fffa10bbad9aab150eb99ed95b089dcaac20806e5505b15731",
+		"scripts/source_terrain_query_trace.gd": "59871e3faa956a3bd580e30b50d5f3117e9e4a1968f48c17d615ab80e630e1b2",
+		"tests/test_source_terrain_query_trace.gd": "13f93d24bf6abeff51285860f25e347888e6d8ac2078e93ed65230892f011130"
+	}
+}

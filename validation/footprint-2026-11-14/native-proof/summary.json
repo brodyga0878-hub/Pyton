@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "revision": "original-native-ordered-source-footprint-v1",
+  "source_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_commit": "7e540341d4e09aa3c92877b87d49e7f2c143ad8d",
+  "scope": "Actual original orderedF576 probe origins/quantization/radii/sourceglobals/selected-first-hit and actualF1876 winning integer triangles. ExplicitdirectF579threshold0 controls query supplied visiblegroundpoint; they are separate diagnostics and retain actualpositiveplayerrecord/originalparentbounds. Not a simultaneous/allunvisitedvolume clearance certificate, originalF575chain, modernadmissionpolicy, fulltriangle/render/GPU/device/gameplay claim.",
+  "old_source_provenance_sha256": {
+    "tests/fixtures/source_natural_contact_native.json": "d4ce0cf3ebfe0fd3bb1f263d047fa3a17ffc5201b8040389fdbddcc21a50e166",
+    "tests/fixtures/source_contact_field_native.json": "6cb84a1f6dff615a504c9cac7935f339291831b62a658971110a03c1cb7b6db6",
+    "tools/rebuild_source_natural_contact_native.py": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889",
+    "validation/natural-2026-11-13/nativeproof/natural-native.s": "2af22487e26d1415ee5463baac49bba528694b0f3e2b1eb311a72fcf8538a40b",
+    "validation/natural-2026-11-13/nativeproof/excluded-native.s": "72b13be75e38cc971e7de75e05c9c08151184cd6924e36a990d17e73e3218f29",
+    "validation/natural-2026-11-13/nativeproof/instruction-proofs.json": "7ff8e664b723c9b0afbfac0b15b60cb85dda3a633af2cb3195f28aae548f94aa"
+  },
+  "candidate_inputs_sha256": "3a9cacc3d7047cf21a4bb4a9afddf5bc704fb68b27cc6733e2ed70d9f3d961d7",
+  "generator_sha256": "ef84b567e2cb4a6315a79b86240a5a5cc688f61f12902a272a1a37da45b72639",
+  "observed_assembly_sha256": "e617f196eba8065a125c0caa3683876a595c9baad33f63f82b72176db6db4eae",
+  "actor_output_sha256": "dcd0487df4acdb9541a4e77d532aae3e5f29a0c135ff356919ee2823705874bd",
+  "ground_output_sha256": "557e30ee6cb7190b5d7a170a34319076da67d93de4b2434cabebf74c3e07a129",
+  "native_fresh_process_runs_per_bank": 3,
+  "actor_reverse_repeat_count": 65,
+  "ground_reverse_repeat_count": 93,
+  "actor_case_count": 65,
+  "visible_ground_case_count": 93,
+  "case_count": 158,
+  "source_quantization_policy": "NativeF576offsetlocals observed afterNEG/SAR16/IMUL/SAR; centres always ORIGINALinput+newsourceoffset, never cumulative or Python-computed.",
+  "previous_altitude_policy": "Actualsourcewordsbefore/aftereachF579; previous canbe inheritedatcoarsegateorcappedquery. Fresh-altitudeflagobservesactualF581writebranch, not querycallcount.",
+  "selected_trace_policy": "StopatfirstactualF579>=0; unvisitedchildrenarenotassertedclear. body14Csigncleared maystopbeforeactualchildlistterminator.",
+  "winning_triangle_policy": "ActualthreepDWORDs/depths atoriginalJUMP8002; nativeSARshift/intercept atJUMP8034. No hostvertex reconstruction/floatplane expectedvalue.",
+  "host_adaptations": "Archived low-address64bitABI pluspreservingGPR/EFLAGS observations; every originalinstructionretained. Output doublespace andexplicitinitialcollider-parentselection supported."
+}
