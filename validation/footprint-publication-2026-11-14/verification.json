@@ -1,0 +1,98 @@
+{
+  "started_utc": "2026-11-14T20:17:32.311085+00:00",
+  "version": "0.23.0-footprint-alpha1",
+  "artifact_commit": "4453064042ab45123e9386807619ac874daab51a",
+  "source_commit": "a096346eb558c07f45b966f4e622ef7b1fff4e5b",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4453064042ab45123e9386807619ac874daab51a/deliverables/0.23.0-footprint-alpha1/manifest.json",
+      "http_status": 200,
+      "bytes": 11382,
+      "sha256": "5458eefe76499ebd7f869b86c9824ba879a1019cc76e6229e048a0b3ecd99191"
+    },
+    {
+      "file": "StarFrontier-0.23.0-footprint-arm64.apk",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4453064042ab45123e9386807619ac874daab51a/deliverables/0.23.0-footprint-alpha1/StarFrontier-0.23.0-footprint-arm64.apk",
+      "http_status": 200,
+      "bytes": 50250655,
+      "sha256": "3566e7e174ce2b162877a394bbdb88a145c570dfabf30926a1675aab43d4a793",
+      "zip_crc_verified": true
+    },
+    {
+      "file": "StarFrontier-0.23.0-footprint-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4453064042ab45123e9386807619ac874daab51a/deliverables/0.23.0-footprint-alpha1/StarFrontier-0.23.0-footprint-source.zip",
+      "http_status": 200,
+      "bytes": 33229194,
+      "sha256": "eb01da63b1694bbbd4e16d12977bdc88be639004790b99c3fddc880a2b07fce2",
+      "zip_crc_verified": true,
+      "source_commit_in_zip_comment": "a096346eb558c07f45b966f4e622ef7b1fff4e5b"
+    },
+    {
+      "file": "screenshots/capture-manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4453064042ab45123e9386807619ac874daab51a/deliverables/0.23.0-footprint-alpha1/screenshots/capture-manifest.json",
+      "http_status": 200,
+      "bytes": 28650,
+      "sha256": "0d46a2849508dbfa56ce6deee96bd81dd31bfd3c9622440b68b80bca8532b965"
+    },
+    {
+      "file": "screenshots/01-retained-flight-console.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4453064042ab45123e9386807619ac874daab51a/deliverables/0.23.0-footprint-alpha1/screenshots/01-retained-flight-console.png",
+      "http_status": 200,
+      "bytes": 342541,
+      "sha256": "be10905118cee98612b1d075b73c72845cc2947d4d2fc762851e42e602bd9625"
+    },
+    {
+      "file": "screenshots/02-actual-full-ship-contact-check.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4453064042ab45123e9386807619ac874daab51a/deliverables/0.23.0-footprint-alpha1/screenshots/02-actual-full-ship-contact-check.png",
+      "http_status": 200,
+      "bytes": 140840,
+      "sha256": "0cfe8a4a610e897b6803e23a0656e5235cfd8024a99413c28387f26d7ff99e3e"
+    },
+    {
+      "file": "screenshots/03-actual-contact-report-zip-ready.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4453064042ab45123e9386807619ac874daab51a/deliverables/0.23.0-footprint-alpha1/screenshots/03-actual-contact-report-zip-ready.png",
+      "http_status": 200,
+      "bytes": 176381,
+      "sha256": "dab9a5b5b683b3d5374ad4f3093d0d2097fed53f63da02845aba3f6564e36f9a"
+    },
+    {
+      "file": "sample-diagnostic-report.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4453064042ab45123e9386807619ac874daab51a/deliverables/0.23.0-footprint-alpha1/sample-diagnostic-report.zip",
+      "http_status": 200,
+      "bytes": 14335,
+      "sha256": "5429373dcccd56472f20862b7829c2d484e3199ec0a0188348d0f8d394ed81a0",
+      "zip_crc_verified": true
+    }
+  ],
+  "status": "verified",
+  "requested_extra_files": [
+    "sample-diagnostic-report.zip"
+  ],
+  "scope": "Eight actual complete immutable HTTPS downloads: manifest, exact APK/source ZIP, capture manifest, all3screenshots and actual collector ZIP. All61 local manifest payloads separately checked;54auxiliary payloads were not individually HTTP-downloaded. Exact source ZIP was independently imported/run and its Main/native tests reproduced; all1436 archived files and443 runtime inputs unchanged. No Android-device, FPS, live-source contact, full-clone or store-ready claim.",
+  "completed_utc": "2026-11-14T20:17:54.873289+00:00",
+  "schema": "starfrontier-footprint-immutable-publication-v1",
+  "execution_policy": "require_escalated",
+  "manifest_sha256": "5458eefe76499ebd7f869b86c9824ba879a1019cc76e6229e048a0b3ecd99191",
+  "manifest_bytes": 11382,
+  "local_manifest_payload_count": 61,
+  "all_local_manifest_payload_hashes_verified": true,
+  "immutable_HTTPS_complete_downloads": 8,
+  "immutable_HTTPS_manifest_payloads_downloaded": 7,
+  "auxiliary_payloads_not_individually_downloaded": 54,
+  "all_manifest_payloads_downloaded": false,
+  "source_archive_bytes": 33229194,
+  "source_archive_sha256": "eb01da63b1694bbbd4e16d12977bdc88be639004790b99c3fddc880a2b07fce2",
+  "source_archive_entries": 1596,
+  "source_archive_actual_files": 1436,
+  "source_archive_under_32_MiB": true,
+  "runtime_frozen_files": 443,
+  "all_archived_runtime_matches_freeze": true,
+  "fresh_source_import_startup_passed": true,
+  "fresh_source_Main_feature_checks": 54,
+  "fresh_source_native_validator_checks": 1833,
+  "all_fresh_archived_files_unchanged": true,
+  "physical_device_tested": false,
+  "production_release_ready": false,
+  "source_geometry_identity_verified": false
+}

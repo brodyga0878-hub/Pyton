@@ -1,12 +1,12 @@
 # Контакт всего корабля — 0.23.0
 
-Кандидат **0.23.0-footprint-alpha1 / Android code 48** продолжает
-[согласование поверхности 0.22](SOURCE_CONTACT_ALIGNMENT_RU.md).
+Опубликованная TEST-сборка **0.23.0-footprint-alpha1 / Android code 48**
+продолжает [согласование поверхности 0.22](SOURCE_CONTACT_ALIGNMENT_RU.md).
 Функциональная проверка — **64 484 условия в 25 уникальных группах /
-0 ошибок**. Настоящий ARM64 TEST APK48 технически проверен.
-Статус публикации — **PREPUB**: исходный коммит, точный ZIP,
-переносимость и HTTPS-ссылки пока не закреплены.
-Последняя проверенная публикация — [0.22](RELEASE_0_22_0_RU.md).
+0 ошибок**. Техническая проверка APK, точного ZIP, свежая переносимость
+и неизменяемые HTTPS-ссылки завершены.
+
+[Скачать APK 0.23.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4453064042ab45123e9386807619ac874daab51a/deliverables/0.23.0-footprint-alpha1/StarFrontier-0.23.0-footprint-arm64.apk) · [Исходники 0.23.0 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4453064042ab45123e9386807619ac874daab51a/deliverables/0.23.0-footprint-alpha1/StarFrontier-0.23.0-footprint-source.zip)
 
 ## Что проверяет новый блок
 
@@ -155,8 +155,26 @@ TEST-подпись; физический телефон не испытан.
 Сертификат TEST-подписи:
 `16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25`.
 [Техническая проверка APK](../validation/footprint-2026-11-14/android-verification.json).
-Исходный коммит, точный source ZIP, свежая переносимость и HTTPS-ссылки
-ещё не закреплены.
+Точный ZIP — **33 229 194 байта / 1596 записей / 1436 файлов**,
+меньше 32 МиБ. Исходный коммит `a096346eb558c07f45b966f4e622ef7b1fff4e5b`.
+SHA256: `eb01da63b1694bbbd4e16d12977bdc88be639004790b99c3fddc880a2b07fce2`.
+Свежий импорт/обычный изолированный запуск — **10/0**, настоящий
+Main из ZIP — **54/0**. Включённый оригинальный native-генератор
+и валидатор — **1833/0**, fixture воспроизведён побайтно.
+Все **1436 файлов** после проверок неизменны; все **443 runtime-входа**
+совпали с freeze. Эти повторы не добавлены к функциональным группам.
+[Свежий импорт/запуск](../validation/footprint-source-portability-2026-11-14/verification.json),
+[Main из ZIP](../validation/footprint-source-portability-2026-11-14/footprint-main-feature.json),
+[воспроизводимость native](../validation/footprint-source-portability-2026-11-14/source-native-reproduction.json).
+
+Полным HTTPS-скачиванием проверены **восемь файлов**: манифест,
+APK, source ZIP, протокол захвата, три PNG и диагностический ZIP.
+HTTP 200, размеры, SHA, CRC архивов и Git-комментарий source ZIP совпали.
+Локально проверены все **61 payload-запись**; остальные **54
+вспомогательных файла отдельно через HTTP не скачивались**.
+[Публикация](../validation/footprint-publication-2026-11-14/verification.json). Artifact-коммит
+`4453064042ab45123e9386807619ac874daab51a`. Документы внутри source ZIP
+сохраняют PREPUB-состояние исходного коммита.
 Нативные контрольные программы относятся к проверке разработки;
 Android-игра продолжает работать на Godot ARM64 без DOS/x86-эмулятора.
 
