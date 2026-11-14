@@ -1,0 +1,110 @@
+{
+  "started_utc": "2026-11-14T21:43:34.715439+00:00",
+  "version": "0.24.0-contact-frame-alpha1",
+  "artifact_commit": "0d45eb7b27e16e73761c14dd262d8ec413819470",
+  "source_commit": "99167cc4f335936567d1185a69040420448dedc8",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/0d45eb7b27e16e73761c14dd262d8ec413819470/deliverables/0.24.0-contact-frame-alpha1/manifest.json",
+      "http_status": 200,
+      "bytes": 13492,
+      "sha256": "8220234cfbbb89d2cfa0b7b6c209a16c5f5b6c076a869b1d77e170fdb4d99ba8"
+    },
+    {
+      "file": "StarFrontier-0.24.0-contact-frame-arm64.apk",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/0d45eb7b27e16e73761c14dd262d8ec413819470/deliverables/0.24.0-contact-frame-alpha1/StarFrontier-0.24.0-contact-frame-arm64.apk",
+      "http_status": 200,
+      "bytes": 50304669,
+      "sha256": "7624dd646e8685aad30e0e47131b4a631526b84337cca9196d90e08cbfb5795b",
+      "zip_crc_verified": true
+    },
+    {
+      "file": "StarFrontier-0.24.0-contact-frame-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/0d45eb7b27e16e73761c14dd262d8ec413819470/deliverables/0.24.0-contact-frame-alpha1/StarFrontier-0.24.0-contact-frame-source.zip",
+      "http_status": 200,
+      "bytes": 33490647,
+      "sha256": "e43c4d469aa69e34dca8545f55a531abbac0d906ecc78f7ff5fa0b60abd3e307",
+      "zip_crc_verified": true,
+      "source_commit_in_zip_comment": "99167cc4f335936567d1185a69040420448dedc8"
+    },
+    {
+      "file": "screenshots/capture-manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/0d45eb7b27e16e73761c14dd262d8ec413819470/deliverables/0.24.0-contact-frame-alpha1/screenshots/capture-manifest.json",
+      "http_status": 200,
+      "bytes": 111804,
+      "sha256": "4be3fa4f1be5ad0466cd3ba91932d1616758e9596c18d5a81413526ed56b0a60"
+    },
+    {
+      "file": "screenshots/01-retained-v4-flight-console.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/0d45eb7b27e16e73761c14dd262d8ec413819470/deliverables/0.24.0-contact-frame-alpha1/screenshots/01-retained-v4-flight-console.png",
+      "http_status": 200,
+      "bytes": 342796,
+      "sha256": "4ff41c6698d18fde8b44e3b2a033b9d2e28d45f5985d356662e52f002fa67563"
+    },
+    {
+      "file": "screenshots/02-actual-native-contact-geometry.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/0d45eb7b27e16e73761c14dd262d8ec413819470/deliverables/0.24.0-contact-frame-alpha1/screenshots/02-actual-native-contact-geometry.png",
+      "http_status": 200,
+      "bytes": 147316,
+      "sha256": "7079cfad8edf251d49296669e2731a96541b5f1c24061ab90f297fc8f08ae444"
+    },
+    {
+      "file": "screenshots/03-rotated-native-contact-geometry.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/0d45eb7b27e16e73761c14dd262d8ec413819470/deliverables/0.24.0-contact-frame-alpha1/screenshots/03-rotated-native-contact-geometry.png",
+      "http_status": 200,
+      "bytes": 147309,
+      "sha256": "0a0e747d4109bde6d6cad6d91eb3b23b87723d841ec2d86d51a9e78006984023"
+    },
+    {
+      "file": "screenshots/04-actual-native-geometry-report-ready.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/0d45eb7b27e16e73761c14dd262d8ec413819470/deliverables/0.24.0-contact-frame-alpha1/screenshots/04-actual-native-geometry-report-ready.png",
+      "http_status": 200,
+      "bytes": 176656,
+      "sha256": "e3dbb1778db7441edb9c0566471fc11792f105db2b844d301d00c1a2a1ff4e6e"
+    },
+    {
+      "file": "sample-diagnostic-report.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/0d45eb7b27e16e73761c14dd262d8ec413819470/deliverables/0.24.0-contact-frame-alpha1/sample-diagnostic-report.zip",
+      "http_status": 200,
+      "bytes": 32094,
+      "sha256": "8027459ba12586f0c063d38bc823d7f7638fe91a06267fff7fc2e9c8d6b766a7",
+      "zip_crc_verified": true
+    }
+  ],
+  "status": "verified",
+  "requested_extra_files": [
+    "sample-diagnostic-report.zip"
+  ],
+  "scope": "Nine complete immutable HTTPS downloads: manifest, exact APK/source ZIP, capture manifest, all4actual screenshots and real collector ZIP. All75 local payloads hashed;67auxiliary payloads not individually HTTP-downloaded. Exact source ZIP imported/run; actualMain63 and native400 reproduced, all1482 archived files/451runtime inputs unchanged. Selected23group summary excludes superseded62check Main evidence. No physical Android/FPS/full mesh/live contact/full clone/store-ready claim.",
+  "completed_utc": "2026-11-14T21:43:58.751021+00:00",
+  "schema": "starfrontier-contact-frame-immutable-publication-v1",
+  "execution_policy": "require_escalated",
+  "manifest_sha256": "8220234cfbbb89d2cfa0b7b6c209a16c5f5b6c076a869b1d77e170fdb4d99ba8",
+  "manifest_bytes": 13492,
+  "local_manifest_payload_count": 75,
+  "all_local_manifest_payload_hashes_verified": true,
+  "immutable_HTTPS_complete_downloads": 9,
+  "immutable_HTTPS_manifest_payloads_downloaded": 8,
+  "auxiliary_payloads_not_individually_downloaded": 67,
+  "all_manifest_payloads_downloaded": false,
+  "source_archive_bytes": 33490647,
+  "source_archive_sha256": "e43c4d469aa69e34dca8545f55a531abbac0d906ecc78f7ff5fa0b60abd3e307",
+  "source_archive_entries": 1644,
+  "source_archive_actual_files": 1482,
+  "source_archive_under_32_MiB": true,
+  "runtime_frozen_files": 451,
+  "all_archived_runtime_matches_freeze": true,
+  "fresh_source_import_startup_passed": true,
+  "fresh_source_Main_feature_checks": 63,
+  "fresh_source_native_validator_checks": 400,
+  "all_fresh_archived_files_unchanged": true,
+  "superseded_passing_development_evidence_excluded_from_current_counts": [
+    "new-main-summary.json",
+    "new-main/logs/source_contact_geometry_main.log"
+  ],
+  "current_Main_result": "final-integration-summary.json / 63 checks / final source hash",
+  "physical_device_tested": false,
+  "production_release_ready": false,
+  "source_geometry_identity_verified": false
+}

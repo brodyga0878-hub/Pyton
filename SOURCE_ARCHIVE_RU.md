@@ -12,8 +12,8 @@ ZIP содержит текущий проект Godot, все рабочие и
 и исторически восстановленные исходные фрагменты.
 
 <!-- CONTACT_FRAME_CURRENT_BEGIN -->
-Исходный кандидат — **0.24.0-contact-frame-alpha1 / code 49**,
-**PREPUB**. Добавлены `source_terrain_query_frame.gd`,
+Текущая опубликованная версия исходников — **0.24.0-contact-frame-alpha1 /
+code 49**. Добавлены `source_terrain_query_frame.gd`,
 `source_native_contact_geometry.gd`, `source_contact_geometry_probe.gd`
 и `native_contact_geometry_view.gd` с UID. Исходные кадры и integer-leaf
 данные связаны с объявленной проекцией и выведенными интервалами
@@ -21,10 +21,10 @@ Q31/Float32. Каноническая проекция с нулевыми мл�
 и полный диапазон младших битов F579 SAR хранятся раздельно.
 
 Нативно проверен настоящий `qOrigin = C + T(−D)`; старый `C − T(D)`
-не удалён и не подменяет его: поэлементные Q31-floor операции
-не нечётны. Набор содержит **242 случая: 230 frame и 12 перехваченных
-caller**, 237 наблюдений F581, 236 кадров запроса и 187 проверенных
-solid-leaf пакетов. Полное выполнение цепочки F575 этим не заявляется.
+сохранён отдельно, поскольку Q31-floor операции не нечётны. Набор
+содержит **242 случая: 230 frame и 12 перехваченных caller**,
+237 наблюдений F581, 236 кадров запроса и 187 проверенных solid-leaf
+пакетов. Полное выполнение цепочки F575 этим не заявляется.
 
 Функциональная сводка — **50 326 условий в 23 уникальных группах /
 0 ошибок**. Отдельно прошли **328 Python-тестов упаковки в 12 модулях**,
@@ -37,25 +37,48 @@ Main — 73 условия / 0 ошибок**. Заморожен **451 runtime-
 Main получил команду **«Исходная геометрия контакта»**: отдельный
 3D-предпросмотр и полный контекст ZIP-отчёта. Обычный рельеф, default v4
 и живой F575 сохранены. Основа координат/проекции шага 1 готова;
-рабочий публикуемый provider и жизненный цикл контакта относятся
-к шагу 2, ручная/автоматическая посадка — к шагу 3.
+публикуемый provider и жизненный цикл контакта относятся к шагу 2,
+ручная/автоматическая посадка — к шагу 3.
 
 Настоящий ARM64 TEST APK49 технически проверен: **50 304 669 байт**,
 SHA256 `7624dd646e8685aad30e0e47131b4a631526b84337cca9196d90e08cbfb5795b`,
 min SDK 24 / target SDK 36, `debuggable=false`, ZIP/ELF 16 КиБ.
 Проверены четыре новых и 46 интеграционных compiled-модулей,
 121 сохранённый метод Main и 51 карта материалов; TEST-подпись прежняя.
-[Проверка APK](validation/contact-frame-2026-11-14/android-verification.json).
 
-Исходный коммит, точный source ZIP, его размер/SHA, переносимость
-и HTTPS-публикация пока не закреплены.
+Точный source ZIP — **33 490 647 байт / 1644 записи / 1482 файла**,
+меньше 32 МиБ. Исходный коммит `99167cc4f335936567d1185a69040420448dedc8`.
+SHA256: `e43c4d469aa69e34dca8545f55a531abbac0d906ecc78f7ff5fa0b60abd3e307`.
+Свежий импорт/обычный изолированный запуск — **10/0**, настоящий
+Main из ZIP — **63/0**, включённый native-генератор и валидатор —
+**400/0** с побайтным воспроизведением fixture. Все **1482 файла**
+после проверок неизменны; все **451 runtime-вход** совпали с freeze.
+Повторные проверки переносимости не прибавлены к функциональным группам.
+[Импорт/запуск](validation/contact-frame-source-portability-2026-11-14/verification.json),
+[Main из ZIP](validation/contact-frame-source-portability-2026-11-14/contact-frame-main-feature.json),
+[воспроизводимость native](validation/contact-frame-source-portability-2026-11-14/source-native-reproduction.json).
+
+[Скачать APK 0.24.0](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/0d45eb7b27e16e73761c14dd262d8ec413819470/deliverables/0.24.0-contact-frame-alpha1/StarFrontier-0.24.0-contact-frame-arm64.apk) · [Исходники 0.24.0 ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/0d45eb7b27e16e73761c14dd262d8ec413819470/deliverables/0.24.0-contact-frame-alpha1/StarFrontier-0.24.0-contact-frame-source.zip)
+
+[Предпросмотр исходной грани](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/0d45eb7b27e16e73761c14dd262d8ec413819470/deliverables/0.24.0-contact-frame-alpha1/screenshots/02-actual-native-contact-geometry.png) · [Поворот предпросмотра](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/0d45eb7b27e16e73761c14dd262d8ec413819470/deliverables/0.24.0-contact-frame-alpha1/screenshots/03-rotated-native-contact-geometry.png) · [Настоящий диагностический ZIP без сохранения](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/0d45eb7b27e16e73761c14dd262d8ec413819470/deliverables/0.24.0-contact-frame-alpha1/sample-diagnostic-report.zip)
+
+Полным HTTPS-скачиванием проверены **девять файлов**: манифест,
+APK, source ZIP, протокол захвата, четыре PNG и диагностический ZIP.
+HTTP 200, размеры, SHA, CRC архивов и исходный Git-комментарий ZIP
+совпали. Локально проверены все **75 payload-записей** манифеста;
+остальные **67 вспомогательных файлов отдельно через HTTP не скачивались**.
+[Проверка публикации](validation/contact-frame-publication-2026-11-14/verification.json). Artifact-коммит
+`0d45eb7b27e16e73761c14dd262d8ec413819470`. Документы внутри точного source ZIP
+сохраняют PREPUB-состояние исходного коммита.
+
 [Заметка о сборке](docs/RELEASE_0_24_0_RU.md),
-[контракт](docs/SOURCE_CONTACT_FRAME_RU.md). Последний проверенный
-исходный архив — 0.23 ниже; его доказательства не переписываются.
+[контракт](docs/SOURCE_CONTACT_FRAME_RU.md). Прежние источники,
+доказательства и опубликованные архивы 0.23 сохранены. Физический
+телефон и полный клон этим блоком не подтверждаются.
 <!-- CONTACT_FRAME_CURRENT_END -->
 
 <!-- FOOTPRINT_CURRENT_BEGIN -->
-Текущая опубликованная версия исходников — **0.23.0-footprint-alpha1 /
+Предыдущая опубликованная версия исходников — **0.23.0-footprint-alpha1 /
 code 48**. Новые модули `source_terrain_query_trace.gd` и
 `source_natural_footprint_probe.gd` сохраняют фактически посещённые
 объёмы F576, исходные смещённые центры/пороги/масштабы, выбранные
