@@ -1,0 +1,9 @@
+manifest.json: verified
+StarFrontier-0.28.0-native-station-arm64.apk: verified
+StarFrontier-0.28.0-native-station-source.zip: verified
+screenshots/capture-manifest.json: verified
+screenshots/01-earth-station-selection-1440x720.png: verified
+screenshots/02-native-station-approach-1440x720.png: verified
+screenshots/03-native-station-services-960x432.png: verified
+screenshots/04-native-station-reverse-960x432.png: verified
+sample-native-station-include-save-report.zip: verified

@@ -1,0 +1,105 @@
+{
+  "started_utc": "2026-11-16T16:09:04.471664+00:00",
+  "version": "0.28.0-native-station-alpha1",
+  "artifact_commit": "f6d802e5f34f735eef91fdc2670bc8850443511a",
+  "source_commit": "de8eb18a687d007781321436910187dff3785775",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/manifest.json",
+      "http_status": 200,
+      "bytes": 316206,
+      "sha256": "13f73782f3f3f632d15418ee6caea27009f07140616cc09dca1d812cc945fa7c"
+    },
+    {
+      "file": "StarFrontier-0.28.0-native-station-arm64.apk",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-arm64.apk",
+      "http_status": 200,
+      "bytes": 50482957,
+      "sha256": "936bbd78769e1e22f754bcab020de89ea72f457eea4c829448391dd5771538bf",
+      "zip_crc_verified": true
+    },
+    {
+      "file": "StarFrontier-0.28.0-native-station-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip",
+      "http_status": 200,
+      "bytes": 33543341,
+      "sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d",
+      "zip_crc_verified": true,
+      "source_commit_in_zip_comment": "de8eb18a687d007781321436910187dff3785775"
+    },
+    {
+      "file": "screenshots/capture-manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/screenshots/capture-manifest.json",
+      "http_status": 200,
+      "bytes": 453069,
+      "sha256": "dc914de525b4bb814d48b132dcbdd883872c8c8782e36f1912b4c5559916e13d"
+    },
+    {
+      "file": "screenshots/01-earth-station-selection-1440x720.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/screenshots/01-earth-station-selection-1440x720.png",
+      "http_status": 200,
+      "bytes": 81265,
+      "sha256": "0bf329cb7bd2b61f8427a7df97f01662fad794a6f6833ccd0ce9ab8657b68697"
+    },
+    {
+      "file": "screenshots/02-native-station-approach-1440x720.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/screenshots/02-native-station-approach-1440x720.png",
+      "http_status": 200,
+      "bytes": 259874,
+      "sha256": "510b93e8bcc3f0ab469deea3af0fcbfaf88027ee27c4ec00f7e7301fd15dcfea"
+    },
+    {
+      "file": "screenshots/03-native-station-services-960x432.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/screenshots/03-native-station-services-960x432.png",
+      "http_status": 200,
+      "bytes": 214699,
+      "sha256": "ffcc2c072a6be95e263020cf56e922ad57ae48e3c12ca4e58e8e9a6629f0ff76"
+    },
+    {
+      "file": "screenshots/04-native-station-reverse-960x432.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/screenshots/04-native-station-reverse-960x432.png",
+      "http_status": 200,
+      "bytes": 147511,
+      "sha256": "316cf945af9caa040ab19e14e65c2c3625981356c3deea4d311f7a722067cfaa"
+    },
+    {
+      "file": "sample-native-station-include-save-report.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/sample-native-station-include-save-report.zip",
+      "http_status": 200,
+      "bytes": 17259,
+      "sha256": "a45860b036605eadf01d5a2821de2373357f5f513e100800823753f488f127ea",
+      "zip_crc_verified": true
+    }
+  ],
+  "status": "verified",
+  "requested_extra_files": [
+    "sample-native-station-include-save-report.zip"
+  ],
+  "scope": "Actual complete HTTPS downloads; immutable manifest bytes, payload SHA256/length, ZIP CRC, source archive Git comment and screenshot hashes. Not physical Android execution.",
+  "completed_utc": "2026-11-16T16:09:31.936510+00:00",
+  "schema": "starfrontier-native-station-publication-v1",
+  "all_manifest_payloads_downloaded": false,
+  "local_manifest_payload_count": 110,
+  "all_local_manifest_payload_hashes_verified": true,
+  "auxiliary_payloads_not_individually_downloaded": 102,
+  "local_manifest_sha256": "13f73782f3f3f632d15418ee6caea27009f07140616cc09dca1d812cc945fa7c",
+  "actual_HTTP_download_report_sha256": "358cbd0439e413ac6ed8dfebf6dd25c9fb31346cbc1857cc76bffc7c4aa69d14",
+  "release_download_verifier_sha256": "797290c09c2fd255ac637ff23f44b57e94845e0cda87c7a3b8118342a392cd7f",
+  "runtime_freeze_sha256": "e4f8fa4a37f154c8fef97851e0203c7a8a1aec619a331ba7cc417fc2e6308d99",
+  "runtime_inputs_verified": 475,
+  "all_current_runtime_inputs_match_frozen_inputs": true,
+  "downloaded_source_archive_runtime_inputs_verified": 475,
+  "downloaded_source_archive_actual_files": 1660,
+  "downloaded_source_archive_crc_and_comment_reverified": true,
+  "local_reverification_completed_utc": "2026-11-16T16:09:40.018931+00:00",
+  "physical_device_tested": false,
+  "production_release_ready": false,
+  "full_clone_completed": false,
+  "sealed_manifest_keeps_prepublication_status": true,
+  "source_documents_keep_source_commit_prepublication_status": true,
+  "station_handoff_max_distance_m": 100000,
+  "full_35Mm_surface_to_station_transit_flown": false,
+  "ongoing_inertial_trajectory_equivalence_claimed": false,
+  "publication_scope": "Nine actual complete immutable HTTPS downloads: manifest, APK, exact source ZIP, capture manifest, four actual framebuffer PNGs and production include-save report ZIP. All local manifest payloads and all475 runtime inputs verified, including embedded downloaded source bytes. Auxiliary count explicitly records files not individually downloaded. Bounded same-parent station handoff within100km uses sampled original-ephemeris origin translation/velocity. Subsequent flight retains the existing station-following mobile law. Near-station fixtures do not prove a flown35Mm planetary-to-station transit or full F570/F606 dispatcher. No physical Android, FPS, full-clone or production-release claim."
+}
