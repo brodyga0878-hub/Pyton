@@ -1,0 +1,97 @@
+{
+  "started_utc": "2026-11-16T10:36:53.827082+00:00",
+  "version": "0.26.0-native-autopilot-alpha1",
+  "artifact_commit": "a5782a1d90804ff4b7cab9e1c07b9e71f046ad55",
+  "source_commit": "382723e75bc5030a44fa1dc640bc5229ea7481fa",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/a5782a1d90804ff4b7cab9e1c07b9e71f046ad55/deliverables/0.26.0-native-autopilot-alpha1/manifest.json",
+      "http_status": 200,
+      "bytes": 206836,
+      "sha256": "8051d718808b5d3e8b697ed52a1899d54900db53fd2ddf0d4a91819688001be5"
+    },
+    {
+      "file": "StarFrontier-0.26.0-native-autopilot-arm64.apk",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/a5782a1d90804ff4b7cab9e1c07b9e71f046ad55/deliverables/0.26.0-native-autopilot-alpha1/StarFrontier-0.26.0-native-autopilot-arm64.apk",
+      "http_status": 200,
+      "bytes": 50424911,
+      "sha256": "a18df17b6cbd3a9a601f170a084fcfd0ba680bb2fdb877cc84f370e2fa7ba0b3",
+      "zip_crc_verified": true
+    },
+    {
+      "file": "StarFrontier-0.26.0-native-autopilot-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/a5782a1d90804ff4b7cab9e1c07b9e71f046ad55/deliverables/0.26.0-native-autopilot-alpha1/StarFrontier-0.26.0-native-autopilot-source.zip",
+      "http_status": 200,
+      "bytes": 33472195,
+      "sha256": "ceb3c64f6a6e59a1caf545e5261dedcad4faa791767cb1699eddba681b063d4c",
+      "zip_crc_verified": true,
+      "source_commit_in_zip_comment": "382723e75bc5030a44fa1dc640bc5229ea7481fa"
+    },
+    {
+      "file": "screenshots/capture-manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/a5782a1d90804ff4b7cab9e1c07b9e71f046ad55/deliverables/0.26.0-native-autopilot-alpha1/screenshots/capture-manifest.json",
+      "http_status": 200,
+      "bytes": 74220,
+      "sha256": "9059ffd02ccdc13a3d1b6a1ed348accc5ccc8e2526b71a101a913dfceba634f4"
+    },
+    {
+      "file": "screenshots/01-native-autoland-1440x720.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/a5782a1d90804ff4b7cab9e1c07b9e71f046ad55/deliverables/0.26.0-native-autopilot-alpha1/screenshots/01-native-autoland-1440x720.png",
+      "http_status": 200,
+      "bytes": 477115,
+      "sha256": "ab6420c7b1fc05bc369bda07a52d05013fa13f0ae76d76b7716bbac4ca7aa1aa"
+    },
+    {
+      "file": "screenshots/02-native-auto-ascent-1440x720.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/a5782a1d90804ff4b7cab9e1c07b9e71f046ad55/deliverables/0.26.0-native-autopilot-alpha1/screenshots/02-native-auto-ascent-1440x720.png",
+      "http_status": 200,
+      "bytes": 417445,
+      "sha256": "0d6568c1b5f96f7f9baebad19f3f4f132aa3692785b088d8e5d74c790cb33bc6"
+    },
+    {
+      "file": "screenshots/03-native-space-handoff-960x432.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/a5782a1d90804ff4b7cab9e1c07b9e71f046ad55/deliverables/0.26.0-native-autopilot-alpha1/screenshots/03-native-space-handoff-960x432.png",
+      "http_status": 200,
+      "bytes": 108617,
+      "sha256": "3dd4d28bb4e810f0a4d27829ccbb2a7369e02ff0a6e32d814be8660fb1861117"
+    },
+    {
+      "file": "screenshots/04-native-autopilot-include-save-report-960x432.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/a5782a1d90804ff4b7cab9e1c07b9e71f046ad55/deliverables/0.26.0-native-autopilot-alpha1/screenshots/04-native-autopilot-include-save-report-960x432.png",
+      "http_status": 200,
+      "bytes": 88177,
+      "sha256": "7aec3cdd49ea941a6c1b74db0446f75b15b33d13bd5cc16d14fdfc0297a7bcb8"
+    },
+    {
+      "file": "sample-native-autopilot-include-save-report.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/a5782a1d90804ff4b7cab9e1c07b9e71f046ad55/deliverables/0.26.0-native-autopilot-alpha1/sample-native-autopilot-include-save-report.zip",
+      "http_status": 200,
+      "bytes": 13652,
+      "sha256": "ce40c3712b9dc016e444d4c71a4b6e063a2da1f5a595f3a4d3f67de177792d52",
+      "zip_crc_verified": true
+    }
+  ],
+  "status": "verified",
+  "requested_extra_files": [
+    "sample-native-autopilot-include-save-report.zip"
+  ],
+  "scope": "Actual complete immutable HTTPS downloads of manifest, APK, source ZIP, capture manifest, four actual framebuffer PNGs and production include-save ZIP. All 81 manifest payloads and all 467 runtime inputs also verified locally. 73 auxiliary payloads were not individually downloaded. Does not claim physical Android execution, FPS, full original autopilot or circular-orbit insertion.",
+  "completed_utc": "2026-11-16T10:37:21.880444+00:00",
+  "schema": "starfrontier-native-autopilot-publication-v1",
+  "all_manifest_payloads_downloaded": false,
+  "local_manifest_payload_count": 81,
+  "all_local_manifest_payload_hashes_verified": true,
+  "auxiliary_payloads_not_individually_downloaded": 73,
+  "local_manifest_sha256": "8051d718808b5d3e8b697ed52a1899d54900db53fd2ddf0d4a91819688001be5",
+  "release_download_verifier_sha256": "797290c09c2fd255ac637ff23f44b57e94845e0cda87c7a3b8118342a392cd7f",
+  "runtime_freeze_sha256": "a8b0a9b9b4ccff939a8e336296a2999667f7894fa3c56641959b497831fcb91d",
+  "runtime_inputs_verified": 467,
+  "all_current_runtime_inputs_match_frozen_inputs": true,
+  "local_reverification_completed_utc": "2026-11-16T10:38:50.493992+00:00",
+  "physical_device_tested": false,
+  "production_release_ready": false,
+  "full_clone_completed": false,
+  "sealed_manifest_keeps_prepublication_status": true,
+  "source_documents_keep_source_commit_prepublication_status": true
+}
