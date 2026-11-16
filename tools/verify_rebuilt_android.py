@@ -3004,6 +3004,194 @@ def verify_native_return_runtime(archive,project):
     return {'version':NATIVE_RETURN_VERSION,'version_code':52,'baseline_source_commit':NATIVE_RETURN_BASELINE_SOURCE_COMMIT,'baseline_fixture_sha256':NATIVE_RETURN_BASELINE_FIXTURE_SHA256,'baseline_runtime_source_count':54,'baseline_stored_runtime_source_delta_count':3,'baseline_metadata_source_count':2,'baseline_requires_Git':False,'compiled_module_count':2,'compiled_modules':{name:compiled[name]for name in NATIVE_RETURN_MODULES},'integration_compiled_module_count':len(compiled),'integration_compiled_modules':compiled,'audited_local_source_sha256':NATIVE_RETURN_AUDITED_SOURCE_SHA256,'protected_functions':functions,'return_and_dock_scope':scope,'metadata':metadata,'retained_runtime_inputs':runtime,'retained_code51_source_audit':audit,'unchanged_code51_runtime_source_count':51,'actual_runtime_is_unchanged_code51':False,'full_original_port_complete':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
 
 
+
+# Code53: current station continuation, immutable source-only code52 history.
+NATIVE_STATION_VERSION='0.28.0-native-station-alpha1'
+NATIVE_STATION_BASELINE_SOURCE_COMMIT='837ad517d098b4a82aaff75a48dca89c4a157d06'
+NATIVE_STATION_BASELINE_FIXTURE_PATH='tests/fixtures/code52_native_station_sources.json'
+NATIVE_STATION_BASELINE_FIXTURE_SHA256='8277a3c61b810a7adc2a1e223157f9f148908eb09b701671cadccccfc774893c'
+NATIVE_STATION_BASELINE_METADATA_SHA256={'scripts/build_info.gd':'34b320cc0232135d77d3eb872abe379514004a122dd8ca1a9969eaec3c3a5488','export_presets.cfg':'8cbba2447f7374750bd8f3a5d3322cf41b279d9674ddc600feb6419dabcbf49b'}
+NATIVE_STATION_RUNTIME_BASELINE_PATH='validation/native-return-2026-11-16/runtime-freeze.json'
+NATIVE_STATION_RUNTIME_BASELINE_SHA256='ddbcc352cf31893eeee9736e574a9f66658fa4310b8f02b58279a366049d2f2e'
+NATIVE_STATION_MODULES=('native_station_frame','native_station_trial')
+# These pins and exact Main method inventories are sealed only after root's
+# functional freeze. Pending values fail closed, never learn live bytes.
+NATIVE_STATION_AUDITED_SOURCE_SHA256={**NATIVE_RETURN_AUDITED_SOURCE_SHA256,
+    'scripts/main.gd':'98b451b1487a5adda8c6b2b5d048729f45ca21a3aa89cf4b78fc0a2fc0263d25',
+    'scripts/native_station_frame.gd':'d55138987007496fd560ee54b6059afff379e68802ffb07688f93070f16c8d3f',
+    'scripts/native_station_trial.gd':'c1853a0169e57c9b9b030dbdf0c9480a2ceaff53feaa4555d7ed2f00e56b9622',
+}
+NATIVE_STATION_ALLOWED_CHANGED_MAIN_FUNCTIONS={'_sync_source_station', '_dock_action', '_native_return_state', '_refresh_hud', '_commit_state', '_hyperdrive_service_command', '_fuel_runtime_command', '_toggle_auto', '_payload', '_native_save_game', '_brake', '_native_trial_active', '_apply_system', '_surface_action', '_exit_native_landing_trial', '_decode_primary_state', '_request_dock_clearance', '_native_trial_diagnostic', '_load_native_landing_trial', '_new_models', '_import_backup', '_show_menu', '_tick', '_decode_native_trial_state', '_show_docking_guidance', '_sync_scene', '_decode_state'}
+NATIVE_STATION_ADDED_MAIN_FUNCTIONS={'_native_station_service', '_begin_native_station_reverse', '_native_station_active', '_native_station_command', '_show_native_station_selection', '_begin_native_station_approach', '_station_render_context', '_tick_native_station', '_publish_native_station'}
+
+
+def _load_native_station_baseline(project):
+    raw=(project/NATIVE_STATION_BASELINE_FIXTURE_PATH).read_bytes()
+    assert hashlib.sha256(raw).hexdigest()==NATIVE_STATION_BASELINE_FIXTURE_SHA256,'Changed portable code52 native-station source delta'
+    data=json.loads(raw)
+    assert data.get('schema')==1 and data.get('revision')=='portable-code52-source-delta-v1' and data.get('source_commit')==NATIVE_STATION_BASELINE_SOURCE_COMMIT and data.get('version_code')==52 and data.get('version')==NATIVE_RETURN_VERSION,'Wrong portable code52 native-station baseline identity'
+    assert data.get('base_fixture')=={'path':NATIVE_RETURN_BASELINE_FIXTURE_PATH,'sha256':NATIVE_RETURN_BASELINE_FIXTURE_SHA256,'runtime_source_count':54,'evidence_source_count':1},'Wrong portable code52 native-station base link'
+    base=_load_native_return_baseline(project)
+    overrides=data.get('source_overrides',{})
+    expected={*NATIVE_RETURN_CHANGED_RUNTIME_SOURCES,*('scripts/'+name+'.gd'for name in NATIVE_RETURN_MODULES)}
+    assert set(overrides)==expected,'Wrong portable code52 native-station runtime delta domain'
+    files={relative:dict(row)for relative,row in base['files'].items()}
+    for relative,row in overrides.items():
+        digest=NATIVE_RETURN_AUDITED_SOURCE_SHA256[relative]
+        assert row.get('sha256')==digest and hashlib.sha256(row.get('source','').encode()).hexdigest()==digest,'Changed portable code52 source delta '+relative
+        files[relative]=dict(row)
+    assert data.get('audited_runtime_source_sha256')==NATIVE_RETURN_AUDITED_SOURCE_SHA256 and data.get('expanded_runtime_source_count')==len(files)==56 and {path:row['sha256']for path,row in files.items()}==NATIVE_RETURN_AUDITED_SOURCE_SHA256,'Wrong expanded portable code52 source domain'
+    metadata=data.get('metadata_source_files',{})
+    assert set(metadata)==set(NATIVE_STATION_BASELINE_METADATA_SHA256),'Wrong portable code52 metadata domain'
+    for relative,row in metadata.items():
+        digest=NATIVE_STATION_BASELINE_METADATA_SHA256[relative]
+        assert row.get('sha256')==digest and hashlib.sha256(row.get('source','').encode()).hexdigest()==digest,'Changed portable code52 metadata '+relative
+    assert data.get('runtime_freeze')=={'path':NATIVE_STATION_RUNTIME_BASELINE_PATH,'sha256':NATIVE_STATION_RUNTIME_BASELINE_SHA256,'runtime_input_count':471},'Wrong portable code52 runtime-freeze link'
+    return {**data,'files':files,'evidence_source_files':base['evidence_source_files']}
+
+
+def _verify_native_station_preserved_functions(project,baseline):
+    relative='scripts/main.gd';old=baseline['files'][relative]['source'];current=(project/relative).read_text()
+    old_names=set(re.findall(r'^(?:static\s+)?func\s+([A-Za-z0-9_]+)\(',old,re.M))
+    current_names=set(re.findall(r'^(?:static\s+)?func\s+([A-Za-z0-9_]+)\(',current,re.M))
+    assert old_names<=current_names and current_names-old_names==NATIVE_STATION_ADDED_MAIN_FUNCTIONS,'Native station changed declared Main function inventory'
+    assert NATIVE_STATION_ALLOWED_CHANGED_MAIN_FUNCTIONS<=old_names,'Native station declared an unknown old Main method'
+    kept={};changed={};added={}
+    for name in sorted(old_names):
+        previous=source_function(old,name).rstrip('\n');actual=source_function(current,name).rstrip('\n');digest=hashlib.sha256(actual.encode()).hexdigest()
+        if name in NATIVE_STATION_ALLOWED_CHANGED_MAIN_FUNCTIONS:
+            assert actual!=previous,'Native station exception no longer describes a changed Main function '+name
+            changed[name]=digest
+        else:
+            assert actual==previous,'Native station changed protected Main function '+name
+            kept[name]=digest
+    for name in sorted(NATIVE_STATION_ADDED_MAIN_FUNCTIONS):added[name]=hashlib.sha256(source_function(current,name).rstrip('\n').encode()).hexdigest()
+    unchanged={path:digest for path,digest in NATIVE_RETURN_AUDITED_SOURCE_SHA256.items()if path!=relative}
+    assert len(unchanged)==55 and all(NATIVE_STATION_AUDITED_SOURCE_SHA256.get(path)==digest for path,digest in unchanged.items()),'Native station changed a protected code52 core pin'
+    for path,digest in unchanged.items():assert hashlib.sha256((project/path).read_bytes()).hexdigest()==digest,'Native station changed protected code52 core source '+path
+    return {'preserved':{relative:kept},'modified':{relative:changed},'added':{relative:added},'unchanged_code52_core_source_count':len(unchanged),'unchanged_code52_core_source_sha256':unchanged,'all_previous_nonMain_core_sources_byte_exact':True}
+
+
+def _verify_native_station_runtime_baseline(project):
+    raw=(project/NATIVE_STATION_RUNTIME_BASELINE_PATH).read_bytes()
+    assert hashlib.sha256(raw).hexdigest()==NATIVE_STATION_RUNTIME_BASELINE_SHA256,'Changed immutable code52 runtime freeze'
+    data=json.loads(raw);frozen=data.get('files_sha256',{})
+    assert data.get('version')==NATIVE_RETURN_VERSION and data.get('version_code')==52 and data.get('files')==len(frozen)==471,'Wrong immutable code52 runtime domain'
+    allowed={'scripts/main.gd','scripts/build_info.gd','export_presets.cfg'};preserved={};changed={}
+    for relative,digest in frozen.items():
+        assert isinstance(relative,str) and isinstance(digest,str) and re.fullmatch(r'[0-9a-f]{64}',digest),'Invalid code52 runtime freeze entry'
+        actual=hashlib.sha256((project/relative).read_bytes()).hexdigest()
+        if relative in allowed:
+            assert actual!=digest,'Native station runtime exception no longer describes a changed file '+relative
+            changed[relative]=actual
+        else:
+            assert actual==digest,'Native station changed protected code52 runtime input '+relative
+            preserved[relative]=digest
+    assert set(changed)==allowed and len(preserved)==468,'Unexpected code53 runtime change domain'
+    return {'baseline_path':NATIVE_STATION_RUNTIME_BASELINE_PATH,'baseline_sha256':NATIVE_STATION_RUNTIME_BASELINE_SHA256,'baseline_version_code':52,'previous_runtime_file_count':471,'unchanged_runtime_file_count':468,'changed_runtime_file_count':3,'changed_runtime_source_sha256':changed,'protected_runtime_input_count':468,'runtime_assets_copied_for_validation':False,'all_old_undeclared_runtime_inputs_byte_exact':True}
+
+
+def _verify_native_station_metadata(project):
+    info=(project/'scripts/build_info.gd').read_text();preset=preset_values(project/'export_presets.cfg')
+    assert re.search(r'^const\s+VERSION\s*:=\s*"'+re.escape(NATIVE_STATION_VERSION)+r'"\s*$',info,re.M) and re.search(r'^const\s+VERSION_CODE\s*:=\s*53\s*$',info,re.M),'Native station UI/diagnostic version differs from code53'
+    assert preset['version_code']==53 and preset['version']==NATIVE_STATION_VERSION,'Native station Android preset version differs from code53'
+    return {'version':NATIVE_STATION_VERSION,'version_code':53,'ui_and_preset_match':True,'source_sha256':{path:hashlib.sha256((project/path).read_bytes()).hexdigest()for path in ('scripts/build_info.gd','export_presets.cfg')}}
+
+
+def _verify_native_station_frame_scope(project):
+    source=(project/'scripts/native_station_frame.gd').read_text()
+    assert 'const POLICY:="bounded-source-station-origin-handoff-v1"' in source and 'const VELOCITY_POLICY:="source-ephemeris-origin-derivative-one-second-v1"' in source,'Wrong bounded source-station frame contract'
+    relative=source_function(source,'_relative');origin=source_function(source,'_raw_origin');difference=source_function(source,'_difference');delta=source_function(source,'_delta');offset=source_function(source,'offset');mapping=source_function(source,'map_between');prepare=source_function(source,'prepare')
+    assert 'Ephemeris.evaluate_from_epoch(record,int(clock.tick_u32),int(clock.day_u32)' in relative and 'Ephemeris.add_positions(origin,point)' in origin and 'Physics.relative_from_metres(-World.ORBITAL_DOCK_LOCAL)' in origin,'Station origin must use original source ephemeris and exact World frame law'
+    assert 'const RELATIVE_CACHE_LIMIT:=256' in source and '[record.hex_encode(),int(clock.day_u32),int(clock.tick_u32)]' in relative and '_relative_cache_mutex.lock()' in relative and '_relative_cache[key].duplicate()' in relative and '_relative_cache[key]=point.duplicate()' in relative and 'return point.duplicate()' in relative and '_relative_cache_order.size()>=RELATIVE_CACHE_LIMIT' in relative,'Source ephemeris memo must be bounded, keyed by the complete record/clock and return independent raw buffers'
+    raw_subtract=re.search(r'\b_difference\(first,second\)',delta)
+    assert raw_subtract is not None and raw_subtract.start()<delta.index('Units.metres(float(value))') and '(b>0 and a<MIN_INT+b) or (b<0 and a>MAX_INT+b)' in difference,'Station origins must be subtracted as checked integers before float conversion'
+    assert '_difference(next.raw,previous.raw)' in offset and offset.index('_difference(next.raw,previous.raw)')<offset.index('Units.metres(float(raw_change[axis]))/seconds') and 'float(ticks)*86400.0/float(Clock.TICKS_PER_DAY)' in offset,'Station velocity policy must use source raw-difference samples over their actual clock spacing'
+    assert 'position_f64[axis]+float(shift.position_delta_f64[axis])' in mapping and 'float(velocity[axis])+float(shift.velocity_delta_f64[axis])' in mapping,'Frame mapping must preserve current Float64 position and transform velocity between moving origins'
+    assert 'str(site.get("parent",""))!=str(world.focus_id)' in source_function(source,'_site') and 'Geometry.MODELS' in source_function(source,'_site') and 'distance>MAX_DISTANCE_M' in prepare and 'const MAX_DISTANCE_M:=100000.0' in source,'Station handoff must remain restricted to a supported same-parent station within100km'
+    positions=[prepare.index(token)for token in ('orbit._matches(ship,nav,world,gear)','Trial._fork_ship(ship)','map_between(world,cw,orbit._position_f64,ship.velocity,nav.elapsed_days)','distance>MAX_DISTANCE_M','Orbit._guard(guard_world,cs,nav.elapsed_days)','Orbit.Atmosphere.new().sample(','cs.position=Vector3(mapped.position_f64[0]','Station.configure_flight(cs,cw,cn)')]
+    assert positions==sorted(positions) and 'bool(atmosphere.get("apply_f1014",true))' in prepare,'Station handoff must validate private current owners and source body clearance/atmosphere before publishing the mapped pose'
+    assert not re.search(r'\b(?:ship|nav|world)\.(?:position|velocity|attitude|hull|docked|elapsed_days|site_id)\s*(?:[+*/-]?=(?!=))',source) and not re.search(r'\bcs\.(?:attitude|hull)\s*(?:[+*/-]?=(?!=))',source),'Station handoff must not mutate live physical owners or fabricate HP/orientation'
+    assert not any(token in source for token in ('.step(','.advance_fuel_seconds(','.protect_surface(','.enter_surface(','.choose_site(')) and not re.search(r'\bcn\.elapsed_days\s*(?:[+*/-]?=(?!=))',source),'Station handoff must not simulate another interval or call legacy relocation'
+    assert all(token in prepare for token in ('"clock_advanced":false','"fuel_advanced":false','"hp_applied":false','"position_snapped":false','"full_original_object_bank":false','"ongoing_station_law":"existing-station-following-mobile-flight-not-inertial-trajectory-equivalence"')),'Station handoff must retain its bounded zero-time and mobile-law declarations'
+    return {'source_ephemeris_origin_difference_before_float':True,'source_clock_sampled_origin_velocity':True,'float64_position_carry_used':True,'same_parent_station_handoff_limit_m':100000,'private_source_clearance_and_atmosphere_checked':True,'boundary_preserves_actual_pose_clock_hp_fuel':True,'velocity_policy':'source-ephemeris-origin-derivative-one-second-v1','ongoing_law':'existing-station-following-mobile-flight-not-inertial-trajectory-equivalence','full_original_F570_F606_object_bank_proved':False,'circular_orbit_insertion_proved':False,'physical_device_tested':False}
+
+
+def _verify_native_station_trial_scope(project):
+    source=(project/'scripts/native_station_trial.gd').read_text()
+    assert 'const SCHEMA:="starfrontier-native-station-trial-v1"' in source and 'const POLICY:="bounded-native-station-following-atomic-flight-v1"' in source,'Wrong typed bounded station trial contract'
+    handoff=source_function(source,'prepare_handoff');step=source_function(source,'prepare');environment=source_function(source,'_environment');command=source_function(source,'prepare_command');service=source_function(source,'prepare_service');reverse=source_function(source,'prepare_reverse');snapshot=source_function(source,'snapshot');restore=source_function(source,'restore');motion=source_function(source,'_restore_motion')
+    assert 'Frame.prepare(orbit,ship,nav,gear,world,site_id)' in handoff and 'orbit.snapshot(ship,nav,world,gear)' in handoff and 'candidate._origin=Orbit._json(' in handoff,'Station trial must retain actual validated source orbit lineage'
+    positions=[step.index(token)for token in ('runtime_matches(ship,nav,world,gear)','_fork(ship,nav,gear,world)','cn.elapsed_days=before_day+seconds/86400.0','Station.refresh(cs,cw,cn,seconds)','cs.step(seconds,steering,roll,gravity,lift)','cn.sync_thermal_ship(cs)','cn.advance_fuel_seconds(seconds,context,cs)','_accept(prepared,candidate,receipt,')]
+    assert positions==sorted(positions) and step.count('cs.step(')==step.count('cn.advance_fuel_seconds(')==1,'Station interval must run real spin/CCD, motion and source fuel once on private owners'
+    assert '_position_f64.duplicate()' in step and 'position[axis]+=float(cs.velocity[axis])*seconds' in step and 'physical_anchor' in step,'Station interval must preserve small Float64 displacement and authoritative dock/collision anchors'
+    assert 'Frame.map_between(world,bodyworld,position,ship.velocity,nav.elapsed_days)' in environment and 'Atmosphere.new().sample(bodyworld,probe,' in environment and 'Orbit._guard(bodyworld,probe,nav.elapsed_days)' in environment and 'station_trial_body_hazard_requires_body_frame' in environment,'Station fuel/hazard observation must use canonical body coordinates and preserve the real guard'
+    assert all(token in command for token in ('_fork(ship,nav,gear,world)','cw.request_station_open(cn.elapsed_days,true)','cs.dock()','cs.launch()','cs.brake()')) and command.count('cw.request_station_open(cn.elapsed_days)')==2 and 'if cs.docked and cw.station_launch_ready():cs.launch()' in step and not re.search(r'\bcs\.(?:position|hull)\s*(?:[+*/-]?=(?!=))',command),'Station commands must use existing physical docking/launch/door authorities'
+    assert 'cn.service(action,id,quantity,cs)' in service and 'cn.manual_jet_refuel(cs)' in service and 'cn.set_refueller_enabled(quantity!=0,cs)' in service and 'cs.ship_id!=ship.ship_id' in service and 'Orbit._pose(cs)!=_pose_hex' in service and '_hexfloat(cn.elapsed_days)!=_days_hex' in service,'Station services must use the actual transactional owner and reject pose/time/ship-identity substitutions'
+    assert not any(token in service for token in ('.step(','.advance_fuel_seconds(')) and not re.search(r'\b(?:ship|cs)\.(?:position|velocity|attitude|hull|credits)\s*(?:[+*/-]?=(?!=))',service),'Station service adapter must not fabricate physical state, money or an interval'
+    assert 'ship.docked or ship.autopilot' in reverse and 'Frame.map_between(world,bodyworld,_position_f64,cs.velocity,cn.elapsed_days)' in reverse and 'orbit._lineage=original.orbit._lineage.duplicate(true)' in reverse and 'orbit._receipt=original.orbit._receipt.duplicate(true)' in reverse and 'Orbit._guard(bodyworld,cs,cn.elapsed_days)' in reverse and 'orbit._matches(cs,cn,bodyworld,cg)' in reverse,'Station reverse handoff must preserve current motion and original orbit lineage on guarded candidates'
+    assert 'nav.elapsed_days<=original_day' in reverse,'Station reverse must not fabricate a generation-zero original orbit witness'
+    assert not any(token in reverse for token in ('.step(','.advance_fuel_seconds(','.protect_surface(')) and not re.search(r'\b(?:ship|nav)\.(?:position|velocity|attitude|hull|elapsed_days)\s*(?:[+*/-]?=(?!=))',reverse),'Station reverse handoff must not relocate live owners or spend another interval'
+    assert all(token in snapshot for token in ('"position_f64_hex"','"elapsed_days_f64_hex"','"motion_history"','"motion_override"','"owners"')) and '_keys(data,KEYS)' in restore and 'Orbit._hash(data.origin)!=data.origin_sha256' in restore and 'Frame.prepare(original.orbit,original.ship,original.nav,original.gear,original.world,str(data.origin.site_id))' in restore and 'Vector3(position[0],position[1],position[2])!=pose.position' in restore,'Station cold save must seal current double carry, typed owners and replayable original entry'
+    assert '_legacy_vectors_match(ship,data.legacy_pose_anchor)' in restore and 'Orbit._decimal(days)!=data.legacy_days_anchor' in restore,'Station cold pose and exact clock must remain bound to their legacy decimal anchors'
+    assert 'oldworld.advance_station(seconds,nav.elapsed_days)' in motion and 'Dynamics.sample(expected_previous,expected_basis,seconds)' in motion and 'Dynamics.angular_displacement(attitude,ship.attitude)/seconds' in motion and '_vec(omega)!=_vec(expected_omega)' in motion and '_vec(shipomega)!=_vec(expected_shipomega)' in motion and 'motion.motion_pending!=expected_pending' in motion,'Station cold restore must replay actual source spin and validate measured angular/CCD history'
+    return {'atomic_existing_station_motion_and_source_fuel':True,'authoritative_dock_launch_commands_retained':True,'actual_paid_service_owner_retained':True,'station_float64_position_carry_preserved':True,'canonical_body_hazard_observer_used':True,'strict_typed_station_snapshot':True,'cold_source_spin_and_angular_history_replayed':True,'reverse_preserves_current_motion_and_original_orbit_lineage':True,'full_original_F597_autopilot_proved':False,'full_original_port_complete':False}
+
+
+def _verify_native_station_Main_scope(project):
+    source=(project/'scripts/main.gd').read_text()
+    assert 'const NativeStation=preload("res://scripts/native_station_trial.gd")' in source and 'const NativeStationFrame=preload("res://scripts/native_station_frame.gd")' in source,'Actual Main must preload both station consumers'
+    enter=source_function(source,'_begin_native_station_approach');reverse=source_function(source,'_begin_native_station_reverse');publish=source_function(source,'_publish_native_station');step=source_function(source,'_tick_native_station');payload=source_function(source,'_payload');decode=source_function(source,'_decode_state');system=source_function(source,'_apply_system')
+    assert enter.index('NativeStation.prepare_handoff(')<enter.index('_publish_native_station(prepared)') and reverse.index('native_station_trial.prepare_reverse(')<reverse.index('_publish_native_station(prepared)'),'Actual station controls must prepare the continuous handoff before publishing owners'
+    assert all(token in publish for token in ('ship=prepared.candidate_ship','nav=prepared.candidate_nav','landing_gear=prepared.candidate_gear','world=prepared.candidate_world','surface=prepared.candidate_surface','native_station_trial=prepared.get("candidate_station")','native_orbit_trial=prepared.get("candidate_orbit")','source_motion_enabled=false')),'Station publication must swap all physical owners and typed mode together'
+    assert 'if _native_station_active():_tick_native_station(dt,steering,roll,lift);return' in source_function(source,'_tick') and 'native_station_trial.prepare(ship,nav,landing_gear,world,dt,steering,roll,lift)' in step and 'native_station_trial=prepared.candidate_station' in step,'Actual Main tick must publish the station atomic interval without a legacy second interval'
+    assert not any(token in step for token in ('.step(','.advance_fuel_seconds(','_finish_flight_interval(')),'Station Main tick must not replay physical or fuel time'
+    station_system=system.split('if _native_station_active():',1)[1].split('elif _native_orbit_active():',1)[0]
+    assert 'native_station_trial.thrust_profile_enabled()' in station_system and 'StationSession.configure_flight(' not in station_system,'A render refresh must preserve the already-owned station spin/CCD history'
+    render=source_function(source,'_station_render_context');draw=source_function(source,'_sync_source_station');scene=source_function(source,'_sync_scene')
+    assert 'native_station_render_world=NativeOrbit._fork_world(world)' in render and 'return native_station_render_world' in render and 'celestial.configure(_station_render_context())' in system and 'celestial.context=_station_render_context()' in scene,'Station renderer must observe a separate private World instead of changing physical spin caches'
+    assert 'world.station_state_by_site.get(world.site_id,{}).duplicate(true) if _native_station_active()' in draw and 'ship._source_station if _native_station_active()' in draw and 'ship._source_basis if _native_station_active()' in draw and 'if surface.active or _native_orbit_active() or _native_station_active():near.clear()' in scene,'Station drawing must use the owned spin/geometry and suppress a second near-surface controller'
+    assert 'native_station_trial.prepare_command(ship,nav,landing_gear,world,action)' in source_function(source,'_native_station_command') and 'native_station_trial.prepare_service(ship,nav,landing_gear,world,action,id,quantity)' in source_function(source,'_native_station_service'),'Actual command and paid-service consumers must use private station transactions'
+    for function,consumer in (('_toggle_auto','_native_station_command("auto")'),('_dock_action','_native_station_command("launch" if ship.docked else "dock")'),('_request_dock_clearance','_native_station_command("request_open")'),('_brake','_native_station_command("brake")'),('_hyperdrive_service_command','_native_station_service(action,id,quantity)'),('_fuel_runtime_command','_native_station_service(action,"",1 if enabled else 0)')):
+        assert consumer in source_function(source,function),'Disconnected actual station input/service consumer '+function
+    assert 'native_station_trial.snapshot(ship,nav,world,landing_gear)' in payload and 'if station_state.is_empty():return {}' in payload and 'result.native_station_session=station_state' in payload,'Station payload must include its full nonempty typed cold session'
+    assert 'not station_data is Dictionary' in decode and 'NativeOrbit._decimal(exact_day)!=candidate_nav.elapsed_days' in decode and decode.index('candidate_nav.elapsed_days=exact_day')<decode.index('StationSession.restore_flight('),'Exact station clock must be validated before source spin restoration'
+    assert 'candidate_surface.active or candidate_autopilot!=null or candidate_departure or candidate_orbit!=null or data.has("motion_session") or not data.native_station_session is Dictionary' in decode and 'candidate_station.restore(data.native_station_session,candidate_ship,candidate_nav,candidate_world,candidate_gear)' in decode,'Station decoder must reject conflicting modes and invoke the strict typed cold owner'
+    assert 'data.has("native_station_session")' in source_function(source,'_decode_primary_state') and 'data.has("native_station_session")' in source_function(source,'_decode_native_trial_state') and 'native_station_trial=data.get("native_station_trial")' in source_function(source,'_commit_state'),'Ordinary and isolated save factories must keep station trials distinct'
+    return {'actual_station_controls_connected':True,'actual_paid_service_controls_connected':True,'Main_preserves_station_spin_on_render_refresh':True,'station_payload_and_strict_decoder_connected':True,'ordinary_progress_and_trial_saves_isolated':True,'station_trial_connection_supported':True,'new_original_autopilot_claimed':False}
+
+
+def _verify_native_station_scope(project):
+    return {**_verify_native_station_frame_scope(project),**_verify_native_station_trial_scope(project),**_verify_native_station_Main_scope(project)}
+
+
+
+def _verify_native_station_source_pins(pins):
+    expected={*NATIVE_RETURN_AUDITED_SOURCE_SHA256,*('scripts/'+name+'.gd'for name in NATIVE_STATION_MODULES)}
+    assert isinstance(pins,dict) and set(pins)==expected and len(pins)==58 and all(isinstance(digest,str)and re.fullmatch(r'[0-9a-f]{64}',digest)for digest in pins.values()),'Unsealed code53 native-station source pins'
+
+
+def verify_native_station_runtime(archive,project):
+    """Audit all current53 compiled entries and immutable source-only52 history."""
+    names=set(archive.namelist());compiled={}
+    _verify_native_station_source_pins(NATIVE_STATION_AUDITED_SOURCE_SHA256)
+    for relative,digest in NATIVE_STATION_AUDITED_SOURCE_SHA256.items():
+        name=Path(relative).stem;path='assets/scripts/'+name+'.gdc'
+        assert path in names,'Missing native-station integration runtime '+name
+        raw=archive.read(path)
+        assert len(raw)>64 and raw[:4]==b'GDSC','Invalid compiled native-station integration runtime '+name
+        assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==digest,'Native station differs from audited integration source '+relative
+        compiled[name]=hashlib.sha256(raw).hexdigest()
+    baseline=_load_native_station_baseline(project)
+    functions=_verify_native_station_preserved_functions(project,baseline)
+    scope=_verify_native_station_scope(project);metadata=_verify_native_station_metadata(project);runtime=_verify_native_station_runtime_baseline(project)
+    overrides={'scripts/main.gd':baseline['files']['scripts/main.gd']['source']}
+    overrides.update({path:row['source']for path,row in baseline['metadata_source_files'].items()})
+    retained=verify_native_return_runtime(archive,_AlignmentSourceAuditPath(project,overrides))
+    audit={'source_override_count':len(overrides),'source_override_paths':sorted(overrides),'compiled_assets_substituted':False,'audit_is_actual_unchanged_code52_runtime':False,'description':'Host code52 source-history/data checks only. Every compiled digest, including all nested Main/frame/trial/return/dock entries, comes from the same actual code53 APK.','assets':retained}
+    return {'version':NATIVE_STATION_VERSION,'version_code':53,'baseline_source_commit':NATIVE_STATION_BASELINE_SOURCE_COMMIT,'baseline_fixture_sha256':NATIVE_STATION_BASELINE_FIXTURE_SHA256,'baseline_runtime_source_count':56,'baseline_stored_runtime_source_delta_count':5,'baseline_metadata_source_count':2,'baseline_requires_Git':False,'compiled_module_count':2,'compiled_modules':{name:compiled[name]for name in NATIVE_STATION_MODULES},'integration_compiled_module_count':len(compiled),'integration_compiled_modules':compiled,'audited_local_source_sha256':NATIVE_STATION_AUDITED_SOURCE_SHA256,'protected_functions':functions,'station_continuation_scope':scope,'metadata':metadata,'retained_runtime_inputs':runtime,'retained_code52_source_audit':audit,'unchanged_code52_runtime_source_count':55,'actual_runtime_is_unchanged_code52':False,'full_original_port_complete':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
+
+
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     expected=preset_values(presets)
     signature=run(build_tools/'apksigner','verify','--verbose','--print-certs',apk)
@@ -3022,7 +3210,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={};hyperdrive_assets={};fuel_assets={};atmosphere_assets={};landing_gear_assets={};surface_contact_assets={};spherical_contact_assets={};natural_contact_assets={};contact_alignment_assets={};contact_footprint_assets={};contact_frame_assets={};native_landing_assets={};native_autopilot_assets={};native_return_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={};hyperdrive_assets={};fuel_assets={};atmosphere_assets={};landing_gear_assets={};surface_contact_assets={};spherical_contact_assets={};natural_contact_assets={};contact_alignment_assets={};contact_footprint_assets={};contact_frame_assets={};native_landing_assets={};native_autopilot_assets={};native_return_assets={};native_station_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -3139,7 +3327,12 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
                 natural_contact_assets={**contact_alignment_assets['retained_code46_source_audit']['assets'],'host_source_history_audit_only':True,'actual_runtime_is_unchanged_code46':False}
                 spherical_contact_assets={**natural_contact_assets['retained_spherical_contact_assets'],'host_source_history_audit_only':True}
                 surface_contact_assets={**spherical_contact_assets['retained_surface_contact_assets'],'host_source_history_audit_only':True}
-            if expected['version_code']>=52:
+            if expected['version_code']>=53:
+                assert expected['version_code']==53 and expected['version']==NATIVE_STATION_VERSION,'Unknown native-station Android version'
+                native_station_assets=verify_native_station_runtime(archive,presets.parent)
+                native_return_assets={**native_station_assets['retained_code52_source_audit']['assets'],'host_source_history_audit_only':True,'actual_runtime_is_unchanged_code52':False}
+                native_autopilot_assets={**native_return_assets['retained_code51_source_audit']['assets'],'host_source_history_audit_only':True,'actual_runtime_is_unchanged_code51':False}
+            if expected['version_code']==52:
                 assert expected['version_code']==52 and expected['version']==NATIVE_RETURN_VERSION,'Unknown native-return Android version'
                 native_return_assets=verify_native_return_runtime(archive,presets.parent)
                 native_autopilot_assets={**native_return_assets['retained_code51_source_audit']['assets'],'host_source_history_audit_only':True,'actual_runtime_is_unchanged_code51':False}
@@ -3184,7 +3377,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'hyperdrive_assets':hyperdrive_assets,'fuel_assets':fuel_assets,'atmosphere_assets':atmosphere_assets,'landing_gear_assets':landing_gear_assets,'surface_contact_assets':surface_contact_assets,'spherical_contact_assets':spherical_contact_assets,'natural_contact_assets':natural_contact_assets,'contact_alignment_assets':contact_alignment_assets,'contact_footprint_assets':contact_footprint_assets,'contact_frame_assets':contact_frame_assets,'native_landing_assets':native_landing_assets,'native_autopilot_assets':native_autopilot_assets,**({'native_return_assets':native_return_assets}if expected['version_code']>=52 else {}),'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'hyperdrive_assets':hyperdrive_assets,'fuel_assets':fuel_assets,'atmosphere_assets':atmosphere_assets,'landing_gear_assets':landing_gear_assets,'surface_contact_assets':surface_contact_assets,'spherical_contact_assets':spherical_contact_assets,'natural_contact_assets':natural_contact_assets,'contact_alignment_assets':contact_alignment_assets,'contact_footprint_assets':contact_footprint_assets,'contact_frame_assets':contact_frame_assets,'native_landing_assets':native_landing_assets,'native_autopilot_assets':native_autopilot_assets,**({'native_return_assets':native_return_assets}if expected['version_code']>=52 else {}),**({'native_station_assets':native_station_assets}if expected['version_code']>=53 else {}),'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

@@ -44,6 +44,9 @@ class Suite:
 
 
 SUITES = [
+    Suite('native_station_frame', 'tests/test_native_station_frame.gd', 'Raw source-origin transfer and sampled same-time velocity correction, bounded source-station admission and atomic owner isolation.', timeout=900),
+    Suite('native_station_trial', 'tests/test_native_station_trial.gd', 'Actual rotating dock/door flight, source HP/fuel, exact cold angular history, real service commands and reverse frame.', timeout=900),
+    Suite('native_station_main', 'tests/test_native_station_main.gd', 'Actual isolated Main planet/station frame commands, healthy dock/service/launch/cold/report/reverse and original progress preservation.', timeout=900, user_args=('--rebuild-capture',)),
     Suite('native_orbit_return', 'tests/test_native_orbit_return.gd', 'Actual inverse F64 frame transfer, airborne raw-history rebind, strict cold continuation and atomic no-contact rejection.', timeout=900),
     Suite('native_return_main', 'tests/test_native_return_main.gd', 'Actual classic-console surface return after protected20km flight, unchanged physical owners and exact cold continuation.', timeout=900, user_args=('--rebuild-capture',)),
     Suite('native_return_descent', 'tests/test_native_return_descent.gd', 'Actual20km return descent, thrust-only braking, real gear approach and exact cold source-contact landing.', timeout=900),

@@ -11,6 +11,22 @@ ZIP содержит текущий проект Godot, все рабочие и
 скрипты, сцены, тесты, инструменты сборки и генераторы текстур, документацию
 и исторически восстановленные исходные фрагменты.
 
+<!-- NATIVE_STATION_CURRENT_BEGIN -->
+Готовится точный ZIP **0.28.0-native-station-alpha1 / code 53**.
+Включаются все текущие runtime/assets/данные/тесты/инструменты, документы,
+восстановленная история и зависимости исходных native-проверок.
+Новые модули — `native_station_frame.gd` и `native_station_trial.gd`.
+Сохраняется лимит загрузки в чат: ZIP меньше 32 МиБ.
+
+Технический отчёт APK поставляется рядом с APK. В новый ZIP не дублируются
+исторические QA 0.27 и её source-portability, кроме обязательного
+`validation/native-return-2026-11-16/runtime-freeze.json`; они остаются
+в GitHub и точном ZIP 0.27 ниже. Прежние исключения дублей 0.26/0.25 и
+двух recovery ZIP сохраняются. Все текущие функциональные доказательства,
+исходники и обязательные native-proof зависимости остаются включёнными.
+Точные размеры, SHA и результаты чистой проверки будут закреплены после freeze.
+<!-- NATIVE_STATION_CURRENT_END -->
+
 <!-- NATIVE_RETURN_CURRENT_BEGIN -->
 Опубликован **0.27.0-native-return-alpha1 / code 52**.
 [Скачать точный ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/306095e9ea066639ee66e8a2104cd68a61fba342/deliverables/0.27.0-native-return-alpha1/StarFrontier-0.27.0-native-return-source.zip) из коммита

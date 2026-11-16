@@ -57,6 +57,8 @@ const NativeAutopilot=preload("res://scripts/native_surface_autopilot.gd")
 const NativeOrbit=preload("res://scripts/native_orbit_trial.gd")
 const NativeReturn=preload("res://scripts/native_orbit_return.gd")
 const DockApproach=preload("res://scripts/dock_approach_guidance.gd")
+const NativeStation=preload("res://scripts/native_station_trial.gd")
+const NativeStationFrame=preload("res://scripts/native_station_frame.gd")
 const Diagnostics=preload("res://scripts/game_diagnostics.gd")
 const ReportExport=preload("res://scripts/report_export.gd")
 const DockServices=preload("res://scripts/training_dock_services.gd")
@@ -79,6 +81,9 @@ var native_saves:=SaveStore.new()
 var native_trial_return:Dictionary={}
 var native_autopilot:RefCounted
 var native_orbit_trial:RefCounted
+var native_station_trial:RefCounted
+var native_station_render_owner:RefCounted
+var native_station_render_world:RefCounted
 var native_orbital_departure_requested:=false
 var presentation:=Presentation.new()
 var camera:Camera3D
@@ -196,7 +201,7 @@ func _new_models(layout:String=World.PORT_LAYOUT)->void:
 	_close_map(false)
 	native_trial_return.clear()
 	native_autopilot=null
-	native_orbit_trial=null;native_orbital_departure_requested=false
+	native_orbit_trial=null;native_station_trial=null;native_orbital_departure_requested=false
 	instruments.reset();flight_time.reset();last_view="";target_site_id="";target_reference.clear();_thermal_notice_level="";source_contact_last.clear();source_contact_error="";_source_contact_interval.clear()
 	source_alignment_last.clear()
 	source_footprint_last.clear()
@@ -212,7 +217,8 @@ func _new_models(layout:String=World.PORT_LAYOUT)->void:
 func _gear_enabled()->bool:return world!=null and world.layout_mode==World.FULL_LAYOUT
 func _native_surface_active()->bool:return surface is NativeSurface and surface.is_native_landing_trial()
 func _native_orbit_active()->bool:return native_orbit_trial!=null and native_orbit_trial.is_active()
-func _native_trial_active()->bool:return _native_surface_active() or _native_orbit_active()
+func _native_station_active()->bool:return native_station_trial!=null and native_station_trial.is_active()
+func _native_trial_active()->bool:return _native_surface_active() or _native_orbit_active() or _native_station_active()
 func _native_auto_active()->bool:return _native_surface_active() and native_autopilot!=null and native_autopilot.is_active()
 func _native_auto_phase_label()->String:
 	if native_autopilot==null:return "Ручное управление"
@@ -517,6 +523,7 @@ func _request_time_rate(rate:int)->void:
 
 func _tick(dt:float,steering:Vector2,roll:float,lift:=0.0)->void:
 	if instruments.paused or ship.hull<=0:return
+	if _native_station_active():_tick_native_station(dt,steering,roll,lift);return
 	if _native_orbit_active():_tick_native_orbit(dt,steering,roll,lift);return
 	if _native_surface_active():_tick_native_surface(dt,steering,roll,lift);return
 	# A queued command or failed prior contact is completed before starting
@@ -650,6 +657,77 @@ func _tick_native_orbit(dt:float,steering:Vector2,roll:float,lift:float)->void:
 	source_contact_error="";_apply_landing_gear_state()
 	if bool(prepared.get("destruction_requested",false)):_record_event("native_orbit_ship_destroyed",native_orbit_trial.diagnostics());_announce("Корабль испытания потерян. Основной полёт доступен через меню.")
 
+func _publish_native_station(prepared:Dictionary,close_menu:bool=true)->void:
+	ship=prepared.candidate_ship;nav=prepared.candidate_nav;landing_gear=prepared.candidate_gear;world=prepared.candidate_world;surface=prepared.candidate_surface
+	native_station_trial=prepared.get("candidate_station");native_orbit_trial=prepared.get("candidate_orbit");native_autopilot=null;native_orbital_departure_requested=false
+	source_motion=MotionBridge.new();source_motion_enabled=false;last_motion_result.clear();target_site_id="";target_reference.clear();near.clear();last_view=""
+	source_contact_error="";source_contact_last={"mode":"native_station_trial","receipt":prepared.get("receipt",{}).duplicate(true)}
+	_release_inputs()
+	if close_menu:_close_menu()
+	_apply_system();_refresh_hud();_native_save_game()
+
+func _begin_native_station_approach(site_id:String)->bool:
+	if _paused_command() or busy or not _native_orbit_active():return false
+	var prepared:Dictionary=NativeStation.prepare_handoff(native_orbit_trial,ship,nav,landing_gear,world,site_id)
+	if not prepared.get("ok",false):
+		_record_event("native_station_handoff_rejected",{"reason":str(prepared.get("reason","rejected")),"site_id":site_id})
+		_announce("Переход к станции сейчас недоступен. Нужна станция текущего тела на расстоянии до 100 км, вне атмосферы.");return false
+	_publish_native_station(prepared)
+	_record_event("native_station_handoff",source_contact_last);_announce("Станция подключена к полёту. Положение и скорость сохранены. «Авто» — штатный заход; службы доступны после стыковки.")
+	return true
+
+func _begin_native_station_reverse()->bool:
+	if _paused_command() or busy or not _native_station_active():return false
+	var prepared:Dictionary=native_station_trial.prepare_reverse(ship,nav,landing_gear,world)
+	if not prepared.get("ok",false):_announce("Сначала выйдите из дока и завершите текущий заход.");return false
+	_publish_native_station(prepared)
+	_record_event("native_station_reverse",source_contact_last);_announce("Планетный полёт продолжен с сохранением положения, скорости и времени. До поверхности нужно долететь.")
+	return true
+
+func _native_station_command(action:String)->bool:
+	if _paused_command() or busy or not _native_station_active():return false
+	var prepared:Dictionary=native_station_trial.prepare_command(ship,nav,landing_gear,world,action)
+	if not prepared.get("ok",false):
+		_record_event("native_station_command_rejected",{"action":action,"reason":str(prepared.get("reason","rejected"))})
+		if action=="dock":_show_docking_guidance()
+		else:_announce("Команда станции пока недоступна.")
+		return false
+	_publish_native_station(prepared,action!="request_open")
+	_record_event("native_station_command",{"action":action,"docked":ship.docked,"autopilot":ship.autopilot})
+	if action=="request_open":_announce("Открытие дока запрошено. Закройте окно или включите автоподход, чтобы продолжить полёт.")
+	elif action=="auto":_announce("Автоподход к станции." if ship.autopilot else "Автоподход отменён.")
+	elif action=="dock":_announce("Стыковка выполнена. Службы доступны в меню.")
+	elif action=="launch":_announce("Вылет ожидает открытия проёма." if ship.docked else "Вылет начат.")
+	return true
+
+func _tick_native_station(dt:float,steering:Vector2,roll:float,lift:float)->void:
+	var prepared:Dictionary=native_station_trial.prepare(ship,nav,landing_gear,world,dt,steering,roll,lift)
+	if not prepared.get("ok",false):
+		var reason:=str(prepared.get("reason","station_interval_rejected"))
+		if source_contact_error!=reason:source_contact_error=reason;_record_event("native_station_interval_rejected",{"reason":reason});_announce("Расчёт полёта у станции остановлен. Можно сохранить отчёт или вернуться к основному полёту через меню.")
+		return
+	ship=prepared.candidate_ship;nav=prepared.candidate_nav;landing_gear=prepared.candidate_gear;world=prepared.candidate_world;surface=prepared.candidate_surface;native_station_trial=prepared.candidate_station
+	source_contact_error="";_apply_landing_gear_state()
+	if prepared.get("save_after",false):_native_save_game()
+	if prepared.get("destruction_requested",false):_announce("Корабль испытания потерян. Основной полёт доступен через меню.")
+
+func _show_native_station_selection()->void:
+	if not _native_orbit_active():return
+	_open_menu("ОРБИТАЛЬНЫЕ СТАНЦИИ")
+	_menu_text("Выберите станцию текущего тела. Переход доступен рядом со станцией вне атмосферы и сохраняет фактическое расстояние. Дальний перелёт выполняется вручную.")
+	var found:=false
+	for site:Dictionary in world.settlements:
+		if str(site.parent)!=str(world.focus_id) or int(site.type_code) not in [32,33,34]:continue
+		var destination:=str(site.id);var target_world:RefCounted=NativeOrbit._fork_world(world);target_world.site_id=destination
+		var offset:Dictionary=NativeStationFrame.offset(world,target_world,nav.elapsed_days)
+		if not offset.get("ok",false):continue
+		var delta:PackedFloat64Array=offset.position_delta_f64;var distance_sq:=0.0
+		for axis in range(3):distance_sq+=pow(native_orbit_trial._position_f64[axis]+delta[axis]-float(ship.STATION[axis]),2)
+		found=true
+		_menu_action("%s · %.1f км"%[str(site.name),sqrt(distance_sq)/1000.0],func():_begin_native_station_approach(destination))
+	if not found:_menu_text("У текущего тела нет поддержанных орбитальных станций.")
+	_menu_action("Продолжить полёт",_close_menu)
+
 func _begin_native_surface_return(guided:bool=false)->bool:
 	if _paused_command() or busy or not _native_orbit_active():return false
 	var prepared:Dictionary=NativeReturn.prepare_return(native_orbit_trial,ship,nav,landing_gear,world)
@@ -691,7 +769,7 @@ func _begin_native_return_landing()->bool:
 	return true
 
 func _native_return_state()->Dictionary:
-	return {"ship":ship,"nav":nav,"world":world,"surface":surface,"landing_gear":landing_gear,"native_autopilot":native_autopilot,"native_orbit_trial":native_orbit_trial,"native_orbital_departure_requested":native_orbital_departure_requested,"saving_enabled":saving_enabled,"source_motion":source_motion,"source_motion_enabled":source_motion_enabled,"target_site_id":target_site_id,"target_reference":target_reference.duplicate(true),"paused":instruments.paused,"source_contact_last":source_contact_last.duplicate(true),"source_contact_error":source_contact_error,"source_alignment_last":source_alignment_last.duplicate(true),"source_footprint_last":source_footprint_last.duplicate(true),"source_geometry_last":source_geometry_last.duplicate(true),"last_motion_result":last_motion_result.duplicate(true)}
+	return {"ship":ship,"nav":nav,"world":world,"surface":surface,"landing_gear":landing_gear,"native_autopilot":native_autopilot,"native_orbit_trial":native_orbit_trial,"native_station_trial":native_station_trial,"native_orbital_departure_requested":native_orbital_departure_requested,"saving_enabled":saving_enabled,"source_motion":source_motion,"source_motion_enabled":source_motion_enabled,"target_site_id":target_site_id,"target_reference":target_reference.duplicate(true),"paused":instruments.paused,"source_contact_last":source_contact_last.duplicate(true),"source_contact_error":source_contact_error,"source_alignment_last":source_alignment_last.duplicate(true),"source_footprint_last":source_footprint_last.duplicate(true),"source_geometry_last":source_geometry_last.duplicate(true),"last_motion_result":last_motion_result.duplicate(true)}
 
 func _start_native_landing_trial()->bool:
 	if busy or not graphics_return.is_empty() or not native_trial_return.is_empty() or _native_surface_active():return false
@@ -718,7 +796,7 @@ func _exit_native_landing_trial()->bool:
 	_release_inputs();var saved:=native_trial_return
 	ship=saved.ship;nav=saved.nav;world=saved.world;surface=saved.surface;landing_gear=saved.landing_gear
 	native_autopilot=saved.get("native_autopilot")
-	native_orbit_trial=saved.get("native_orbit_trial");native_orbital_departure_requested=bool(saved.get("native_orbital_departure_requested",false))
+	native_orbit_trial=saved.get("native_orbit_trial");native_station_trial=saved.get("native_station_trial");native_orbital_departure_requested=bool(saved.get("native_orbital_departure_requested",false))
 	saving_enabled=bool(saved.saving_enabled);source_motion=saved.source_motion;source_motion_enabled=bool(saved.source_motion_enabled)
 	target_site_id=str(saved.target_site_id);target_reference=saved.target_reference.duplicate(true);last_motion_result=saved.last_motion_result.duplicate(true)
 	source_contact_last=saved.source_contact_last.duplicate(true);source_contact_error=str(saved.source_contact_error)
@@ -733,14 +811,14 @@ func _native_save_game()->bool:
 	var payload:=_payload()
 	if payload.is_empty():return false
 	var ok:=native_saves.write(payload)
-	_record_event("native_trial_save",{"ok":ok,"save_generation":native_saves.sequence,"mode":"orbit" if _native_orbit_active() else "surface"})
+	_record_event("native_trial_save",{"ok":ok,"save_generation":native_saves.sequence,"mode":"station" if _native_station_active() else ("orbit" if _native_orbit_active() else "surface")})
 	if not ok:_announce(native_saves.last_error)
 	return ok
 
 func _load_native_landing_trial()->bool:
 	if busy or not graphics_return.is_empty():return false
 	var loaded:Dictionary=native_saves.load_valid(_decode_native_trial_state)
-	if loaded.is_empty() or (not loaded.surface is NativeSurface and loaded.get("native_orbit_trial")==null):_announce("Исправное сохранение испытания не найдено.");return false
+	if loaded.is_empty() or (not loaded.surface is NativeSurface and loaded.get("native_orbit_trial")==null and loaded.get("native_station_trial")==null):_announce("Исправное сохранение испытания не найдено.");return false
 	var preserved:=native_trial_return if not native_trial_return.is_empty() else _native_return_state()
 	_release_inputs();_commit_state(loaded);native_trial_return=preserved;saving_enabled=false
 	_close_menu();_apply_system();_refresh_hud();_record_event("native_trial_restored",_native_trial_diagnostic())
@@ -748,6 +826,9 @@ func _load_native_landing_trial()->bool:
 	return true
 
 func _native_trial_diagnostic()->Dictionary:
+	if _native_station_active():
+		var detail:Dictionary=native_station_trial.diagnostics();detail.active=true;detail.separate_save=true;detail.save_generation=native_saves.sequence;detail.clock_f64_hex=NativeSurface._native_floats([nav.elapsed_days],8)
+		return detail
 	if _native_orbit_active():
 		var result:Dictionary=native_orbit_trial.diagnostics();result.active=true;result.separate_save=true;result.save_generation=native_saves.sequence;result.clock_f64_hex=NativeSurface._native_floats([nav.elapsed_days],8)
 		return result
@@ -966,17 +1047,28 @@ func _base_diagnostic_context()->Dictionary:
 	return {"build":{"version":BuildInfo.VERSION,"code":BuildInfo.VERSION_CODE,"channel":BuildInfo.CHANNEL},"mode":"graphics_preview" if not graphics_return.is_empty() else ("surface" if surface!=null and surface.active else "space"),"flight":_flight_diagnostic_sample(),"last_flight_sample":last_flight_sample,"settings":settings.snapshot(),"session":{"saving_enabled":saving_enabled,"save_generation":saves.sequence,"elapsed_days":nav.elapsed_days if nav!=null else 0,"source_clock":SourceClock.from_elapsed_days(nav.elapsed_days) if nav!=null else {},"source_runtime":world.source_runtime_state.duplicate(true) if world!=null else {},"source_orbit":world.orbit_backend_state.duplicate(true) if world!=null else {},"source_ports":world.port_backend_state.duplicate(true) if world!=null else {},"source_physics":world.source_physics_state.duplicate(true) if world!=null else {},"world_layout":world.layout_mode if world!=null else "","preferred_world_layout":world.preferred_layout() if world!=null else "","source_port_position_au":world.site_position_au(world.site_id,nav.elapsed_days) if world!=null and nav!=null else [],"origin_au":world.origin_au(nav.elapsed_days) if world!=null and nav!=null else []},"display":{"fps":Engine.get_frames_per_second(),"viewport":[get_viewport().get_visible_rect().size.x,get_viewport().get_visible_rect().size.y]}}
 
 func _station_here()->bool:return not _native_orbit_active() and not surface.active and (world.is_orbital_site() or (world.site_id.is_empty() and world.focus_id==world.default_id and nav.has_station()))
+func _station_render_context()->RefCounted:
+	if not _native_station_active():
+		native_station_render_owner=null;native_station_render_world=null;return world
+	if native_station_render_owner!=world:
+		native_station_render_world=NativeOrbit._fork_world(world);native_station_render_owner=world
+	return native_station_render_world
+
 func _apply_system()->void:
 	_validate_navigation_target()
 	if source_motion.is_active() and (not MotionBridge.eligible(world,ship,surface.active) or not source_motion.synchronized(world,ship,nav.elapsed_days)):source_motion.reset()
 	ship.original_port=not world.current_site().is_empty();ship.station_available=_station_here()
-	if _native_orbit_active():
+	if _native_station_active():
+		# This branch already owns the actual spin/CCD history. A zero-time
+		# StationSession.configure_flight would erase its measured angular state.
+		ship.station_available=true;ship.source_motion_profile=native_station_trial.thrust_profile_enabled()
+	elif _native_orbit_active():
 		ship.clear_source_station();ship.station_available=false;ship.source_motion_profile=native_orbit_trial.thrust_profile_enabled();ship.autopilot=false
 	elif world.layout_mode==World.FULL_LAYOUT:
 		var context:=StationSession.configure_flight(ship,world,nav)
 		if not context.ok:_announce("Не удалось подготовить исходную станцию. Сохраните отчёт об ошибке.")
 	else:ship.clear_source_station()
-	celestial.configure(world);celestial.set_quality(settings.quality);player.configure(ship.profile())
+	celestial.configure(_station_render_context());celestial.set_quality(settings.quality);player.configure(ship.profile())
 	_apply_landing_gear_state()
 	player.set_quality(settings.quality);station.configure(settings.quality);city_view.set_quality(settings.quality)
 	if _native_surface_active():native_ground_view.set_kind(surface.kind);native_ground_view.set_quality(settings.quality)
@@ -987,15 +1079,17 @@ func _sync_source_station()->void:
 	var visible_source:bool=_station_here() and world.layout_mode==World.FULL_LAYOUT and not near.active
 	source_station.visible=visible_source
 	if not visible_source:return
-	var state:Dictionary=world.source_station_state(nav.elapsed_days)
+	# The trial interval already published its exact spin and solids together.
+	# Presentation reads them without invoking another source-state getter.
+	var state:Dictionary=world.station_state_by_site.get(world.site_id,{}).duplicate(true) if _native_station_active() else world.source_station_state(nav.elapsed_days)
 	var site:Dictionary=world.current_site()
 	var key:="%s:%s:%d:%d"%[world.source_digest,world.site_id,int(site.get("source_seed",0)),int(state.get("door_u16",0))]
 	if key!=source_station_key:
-		var geometry:Dictionary=world.source_station_geometry(nav.elapsed_days)
+		var geometry:Dictionary=ship._source_station if _native_station_active() else world.source_station_geometry(nav.elapsed_days)
 		if not source_station.configure(geometry):source_station.hide();return
 		source_station_key=key
 	source_station.set_quality(settings.quality)
-	source_station.transform=Transform3D(world.source_station_basis(nav.elapsed_days),ship.STATION)
+	source_station.transform=Transform3D(ship._source_basis if _native_station_active() else world.source_station_basis(nav.elapsed_days),ship.STATION)
 
 func _pump_underground_geometry()->void:
 	if hatch_worker!=null:
@@ -1011,9 +1105,10 @@ func _pump_underground_geometry()->void:
 
 func _sync_scene()->void:
 	var draw:RefCounted=surface if surface.active else null
-	if surface.active or _native_orbit_active():near.clear()
+	if surface.active or _native_orbit_active() or _native_station_active():near.clear()
 	elif not busy and near.update(surface,ship,world,nav.elapsed_days):draw=near.drawing
 	var preview:bool=near.active;var high:bool=surface.active and surface.globe!=null and surface.extended_flight
+	if _native_station_active():celestial.context=_station_render_context()
 	var layered:bool=preview or high
 	var frame:Transform3D=near.frame if preview else (Near.world_frame(surface.globe,world,nav.elapsed_days) if high else Transform3D.IDENTITY)
 	var to_scene:Transform3D=frame.affine_inverse() if high else Transform3D.IDENTITY
@@ -1079,6 +1174,10 @@ func _refresh_hud()->void:
 	if _native_orbit_active():
 		hud.text="ИСПЫТАНИЕ · КОСМИЧЕСКИЙ ПОЛЁТ · %s"%ship.profile().name
 		auto_button.text="Автопосадка";dock_button.text="Меню";surface_button.text="К поверхности"
+	if _native_station_active():
+		hud.text="ИСПЫТАНИЕ · СТАНЦИЯ · %s"%ship.profile().name
+		auto_button.text="Службы" if ship.docked else ("Отмена" if ship.autopilot else "Авто")
+		dock_button.text="Вылететь" if ship.docked else "Стыковка";surface_button.text="К планете"
 	var console_state:={
 		"actual_speed_mps":ship.velocity.length(),"target_speed_mps":ship.target_speed,
 		"surface_active":surface.active,"altitude_m":surface.altitude(ship) if surface.active else 0.0,
@@ -1166,6 +1265,7 @@ func _set_speed(value:float)->void:
 	if surface.active:surface.landing=false;surface.cancel_vertical()
 func _brake()->void:
 	if _paused_command():return
+	if _native_station_active():_native_station_command("brake");return
 	_cancel_native_auto("brake_command")
 	ship.brake();_release_inputs()
 	if surface.active:surface.landing=false;surface.cancel_vertical()
@@ -1175,6 +1275,10 @@ func _brake()->void:
 	_announce("Торможение и удержание скорости.")
 func _toggle_auto()->void:
 	if _paused_command():return
+	if _native_station_active():
+		if ship.docked:_show_services()
+		else:_native_station_command("auto")
+		return
 	if _native_orbit_active():_begin_native_return_landing();return
 	if _native_surface_active():
 		if _native_auto_active():_cancel_native_auto("auto_button");_announce("Автоматический полёт отменён. Управление возвращено пилоту.");_refresh_hud();return
@@ -1226,6 +1330,7 @@ func _takeoff_action()->bool:
 	return accepted
 func _dock_action()->void:
 	if _paused_command():return
+	if _native_station_active():_native_station_command("launch" if ship.docked else "dock");return
 	if _native_orbit_active():_show_menu();return
 	if _native_surface_active():
 		if surface.landed:_takeoff_action();return
@@ -1252,6 +1357,7 @@ func _dock_action()->void:
 
 func _request_dock_clearance()->bool:
 	if _paused_command() or busy:return false
+	if _native_station_active():return _native_station_command("request_open")
 	if not _station_here() or not ship.station_available or not ship.has_source_station() or nav.remaining>0 or world.transfer_remaining>0 or ship.docked or ship.hull<=0 or ship.combat_active or _native_trial_active():
 		_announce("Запрос открытия доступен только у действующей орбитальной станции.");return false
 	if not world.request_station_open(nav.elapsed_days):_announce("Не удалось запросить открытие стыковочного проёма.");return false
@@ -1260,7 +1366,7 @@ func _request_dock_clearance()->bool:
 	return true
 
 func _show_docking_guidance()->void:
-	if _native_trial_active():_announce("Док доступен в основном полёте у станции. Естественная поверхность не является космопортом.");return
+	if _native_trial_active() and not _native_station_active():_announce("Док доступен у орбитальной станции. Естественная поверхность не является космопортом.");return
 	var state:Dictionary=DockApproach.status(ship)
 	if not state.get("available",false):_announce(str(state.get("message","Подход к доку сейчас недоступен.")));return
 	_open_menu("ПОДХОД К ДОКУ")
@@ -1280,6 +1386,7 @@ func _show_docking_guidance()->void:
 
 func _surface_action()->void:
 	if _paused_command():return
+	if _native_station_active():_begin_native_station_reverse();return
 	if _native_orbit_active():_begin_native_surface_return();return
 	if _native_surface_active():_begin_native_orbital_departure();return
 	if busy:return
@@ -1423,9 +1530,17 @@ func _show_equipment()->void:
 func _show_menu()->void:
 	_open_menu("КОМАНДИР")
 	if _native_trial_active():
-		_menu_text("Космический полёт испытания: скорость сохранена. «К поверхности» возвращает в исходный участок без переноса на другую высоту. Круговая орбита автоматически не формируется. Возврат к основному полёту — отдельная команда ниже." if _native_orbit_active() else "Испытание исходной посадки: автопосадка, подъём до 1 км и автовылёт в космос. Ручные команды отменяют автопилот. Сохранения хранятся отдельно.")
+		if _native_station_active():_menu_text("Полёт у станции: штатный заход, стыковка, службы и вылет. Сохранение испытания остаётся отдельным от основного прогресса. «К планете» меняет систему отсчёта с сохранением фактического положения.")
+		else:_menu_text("Космический полёт испытания: «К поверхности» возвращает в исходный участок. Для связи с орбитальной станцией подлетите к ней ближе 100 км вне атмосферы и выберите её ниже. Круговая орбита автоматически не формируется." if _native_orbit_active() else "Испытание исходной посадки: автопосадка, подъём до 1 км и автовылёт в космос. Ручные команды отменяют автопилот. Сохранения хранятся отдельно.")
 		_menu_action("Продолжить испытание",_close_menu)
+		if _native_station_active():
+			if ship.docked:_menu_action("Службы станции",_show_services)
+			else:
+				_menu_action("Условия стыковки",_show_docking_guidance)
+				_menu_action("Отменить автоподход" if ship.autopilot else "Автоподход",_toggle_auto)
+				_menu_action("К планетному полёту",_begin_native_station_reverse)
 		if _native_orbit_active():
+			_menu_action("Орбитальные станции",_show_native_station_selection)
 			_menu_action("К исходной поверхности",_begin_native_surface_return)
 			_menu_action("Вернуться и выполнить автопосадку",_begin_native_return_landing)
 		if _native_surface_active():
@@ -1753,6 +1868,8 @@ func _embed_hyperdrive_services()->void:
 func _fuel_runtime_command(action:String,enabled:bool)->void:
 	if not surface.pending_source_contact().is_empty():_paused_command();return
 	if busy or not active or not menu.visible or not is_instance_valid(hyperdrive_services_view):return
+	if _native_station_active():
+		_native_station_service(action,"",1 if enabled else 0);return
 	_release_inputs()
 	var accepted:=false
 	if action=="manual_jet_refuel":accepted=nav.manual_jet_refuel(ship)
@@ -1779,6 +1896,7 @@ func _fit_hyperdrive_menu()->void:
 func _hyperdrive_service_command(action:String,id:String,quantity:int)->void:
 	if not surface.pending_source_contact().is_empty():_paused_command();return
 	if busy:return
+	if _native_station_active():_native_station_service(action,id,quantity);return
 	_release_inputs()
 	var accepted:bool=nav.service(action,id,quantity,ship)
 	var result:={"ok":accepted,"message":nav.message}
@@ -1787,6 +1905,15 @@ func _hyperdrive_service_command(action:String,id:String,quantity:int)->void:
 	if result.get("ok",false) and saving_enabled and not _save_game():feedback+=" Изменения пока не удалось сохранить."
 	if is_instance_valid(hyperdrive_services_view):hyperdrive_services_view.configure_state(nav.service_state(ship))
 	_refresh_hud();_announce(feedback)
+
+func _native_station_service(action:String,id:String,quantity:int)->void:
+	if busy or not _native_station_active() or (not ship.docked and action not in ["manual_jet_refuel","set_refueller_enabled"]):return
+	var prepared:Dictionary=native_station_trial.prepare_service(ship,nav,landing_gear,world,action,id,quantity)
+	var feedback:=str(prepared.get("message","Операция недоступна."))
+	if prepared.get("ok",false):_publish_native_station(prepared,false)
+	_record_event("native_station_service",{"action":action,"id":id,"quantity":quantity,"accepted":bool(prepared.get("ok",false))})
+	if is_instance_valid(hyperdrive_services_view):hyperdrive_services_view.configure_state(nav.service_state(ship))
+	menu_feedback.text=feedback;_announce(feedback);_refresh_hud()
 
 func _hyperdrive_backup_folder()->String:return saves.directory.path_join("hyperdrive-backups")
 
@@ -1944,6 +2071,10 @@ func _payload()->Dictionary:
 		var orbital:Dictionary=native_orbit_trial.snapshot(ship,nav,world,landing_gear)
 		if orbital.is_empty():return {}
 		result.native_orbit_session=orbital
+	if _native_station_active():
+		var station_state:Dictionary=native_station_trial.snapshot(ship,nav,world,landing_gear)
+		if station_state.is_empty():return {}
+		result.native_station_session=station_state
 	return result
 func _decode_state(data:Dictionary)->Dictionary:
 	if data.get("schema")!="starfrontier-rebuild-game-v1":return {}
@@ -1951,6 +2082,14 @@ func _decode_state(data:Dictionary)->Dictionary:
 		if not data.get(key) is Dictionary:return {}
 	var candidate_nav:=NavigationData.new()
 	if not candidate_nav.restore(data.navigation):return {}
+	if data.has("native_station_session"):
+		# A private exact clock must precede the station factory. A rounded
+		# decimal day can otherwise move its sequential Q31 spin by one tick.
+		var station_data:Variant=data.native_station_session
+		if not station_data is Dictionary or not NativeOrbit._hex(station_data.get("elapsed_days_f64_hex"),8):return {}
+		var exact_day:float=str(station_data.elapsed_days_f64_hex).hex_decode().decode_double(0)
+		if not is_finite(exact_day) or exact_day<0 or exact_day>1e9 or NativeOrbit._decimal(exact_day)!=candidate_nav.elapsed_days:return {}
+		candidate_nav.elapsed_days=exact_day
 	var candidate_world:=World.new();candidate_world.configure(candidate_nav.current())
 	if not candidate_world.restore(data.planetary):return {}
 	var restored:=StationSession.restore_flight(candidate_world,candidate_nav,data.flight)
@@ -2021,7 +2160,12 @@ func _decode_state(data:Dictionary)->Dictionary:
 		candidate_ship.station_available=false;candidate_ship.clear_source_station()
 		candidate_orbit=NativeOrbit.new()
 		if not candidate_orbit.restore(data.native_orbit_session,candidate_ship,candidate_nav,candidate_world,candidate_gear):return {}
-	return {"ship":candidate_ship,"nav":candidate_nav,"world":candidate_world,"surface":candidate_surface,"target_site_id":candidate_target,"source_motion_enabled":candidate_motion_enabled,"source_motion":candidate_motion,"landing_gear":candidate_gear,"native_autopilot":candidate_autopilot,"native_orbit_trial":candidate_orbit,"native_orbital_departure_requested":candidate_departure}
+	var candidate_station:RefCounted
+	if data.has("native_station_session"):
+		if native_data or candidate_surface.active or candidate_autopilot!=null or candidate_departure or candidate_orbit!=null or data.has("motion_session") or not data.native_station_session is Dictionary:return {}
+		candidate_station=NativeStation.new()
+		if not candidate_station.restore(data.native_station_session,candidate_ship,candidate_nav,candidate_world,candidate_gear):return {}
+	return {"ship":candidate_ship,"nav":candidate_nav,"world":candidate_world,"surface":candidate_surface,"target_site_id":candidate_target,"source_motion_enabled":candidate_motion_enabled,"source_motion":candidate_motion,"landing_gear":candidate_gear,"native_autopilot":candidate_autopilot,"native_orbit_trial":candidate_orbit,"native_station_trial":candidate_station,"native_orbital_departure_requested":candidate_departure}
 func _commit_state(data:Dictionary)->void:
 	_close_map(false)
 	ship=data.ship;nav=data.nav;world=data.world;surface=data.surface;near.clear();instruments.reset();flight_time.reset();last_view=""
@@ -2030,7 +2174,7 @@ func _commit_state(data:Dictionary)->void:
 	source_geometry_last.clear()
 	landing_gear=data.get("landing_gear")
 	native_autopilot=data.get("native_autopilot")
-	native_orbit_trial=data.get("native_orbit_trial");native_orbital_departure_requested=bool(data.get("native_orbital_departure_requested",false))
+	native_orbit_trial=data.get("native_orbit_trial");native_station_trial=data.get("native_station_trial");native_orbital_departure_requested=bool(data.get("native_orbital_departure_requested",false))
 	if not _native_trial_active():native_trial_return.clear()
 	if landing_gear==null:landing_gear=LandingGearSession.new();landing_gear.configure(surface.landed or ship.docked)
 	target_site_id=str(data.get("target_site_id",""));target_reference.clear()
@@ -2055,10 +2199,10 @@ func _load_game()->bool:
 		saving_enabled=false;_announce("Сохранение не прочитано. Копии оставлены; новый полёт можно начать через меню.")
 	return false
 func _decode_primary_state(data:Dictionary)->Dictionary:
-	if not data.get("surface") is Dictionary or data.surface.get("schema")==NativeSurface.NATIVE_SCHEMA or data.has("native_orbit_session"):return {}
+	if not data.get("surface") is Dictionary or data.surface.get("schema")==NativeSurface.NATIVE_SCHEMA or data.has("native_orbit_session") or data.has("native_station_session"):return {}
 	return _decode_state(data)
 func _decode_native_trial_state(data:Dictionary)->Dictionary:
-	if not data.get("surface") is Dictionary or (data.surface.get("schema")!=NativeSurface.NATIVE_SCHEMA and not data.has("native_orbit_session")):return {}
+	if not data.get("surface") is Dictionary or (data.surface.get("schema")!=NativeSurface.NATIVE_SCHEMA and not data.has("native_orbit_session") and not data.has("native_station_session")):return {}
 	return _decode_state(data)
 func _reload_after_contact_error()->void:
 	if surface.pending_source_contact().is_empty() or busy:return
@@ -2084,7 +2228,7 @@ func _import_backup()->void:
 	var entry:Dictionary=saves.decode(backup_edit.text)
 	var loaded:Dictionary={} if entry.is_empty() else _decode_state(entry.payload)
 	if loaded.is_empty():_announce("Код повреждён или несовместим. Текущий полёт не изменён.");return
-	if loaded.surface is NativeSurface or loaded.get("native_orbit_trial")!=null:
+	if loaded.surface is NativeSurface or loaded.get("native_orbit_trial")!=null or loaded.get("native_station_trial")!=null:
 		var preserved:=native_trial_return if not native_trial_return.is_empty() else _native_return_state()
 		_commit_state(loaded);native_trial_return=preserved;saving_enabled=false;_close_menu();_apply_system();_native_save_game();_announce("Снимок испытания восстановлен отдельно от основного полёта.");return
 	_commit_state(loaded);saving_enabled=true;_close_menu();_apply_system();_save_game();_announce("Резервная копия восстановлена.")
