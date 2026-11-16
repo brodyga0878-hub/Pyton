@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "visually_inspected_desktop_frames": 4,
+  "physical_phone_capture": false,
+  "composited": false,
+  "files": {
+    "01-native-autoland-1440x720.png": "ab6420c7b1fc05bc369bda07a52d05013fa13f0ae76d76b7716bbac4ca7aa1aa",
+    "02-native-auto-ascent-1440x720.png": "0d6568c1b5f96f7f9baebad19f3f4f132aa3692785b088d8e5d74c790cb33bc6",
+    "03-native-space-handoff-960x432.png": "3dd4d28bb4e810f0a4d27829ccbb2a7369e02ff0a6e32d814be8660fb1861117",
+    "04-native-autopilot-include-save-report-960x432.png": "7aec3cdd49ea941a6c1b74db0446f75b15b33d13bd5cc16d14fdfc0297a7bcb8"
+  },
+  "scope": "Four actual Main framebuffers reviewed: original accepted automatic landing, physically flown1000m ascent and retracted gear, guarded20km same-velocity space handoff, real full-space-save report. Both resolutions retain the full lower console and visible external ship. The space frame faces the dark night side of Earth; its black silhouette is not presented as daylight terrain or a graphics upgrade. Source geometry remains bounded, circular insertion/fullobjectbank/physicalAndroid/FPS not claimed."
+}

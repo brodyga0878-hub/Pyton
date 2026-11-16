@@ -1,0 +1,107 @@
+{
+	"checks": 115,
+	"evidence": [
+		{
+			"actor": "118_cobra_upright_3.0",
+			"case": "genuine_native_actor_literal_triangle_soup",
+			"independent_native_execution_repeated_by_visual_test": false,
+			"provider_snapshot": "8b72a6540d82c3c4070ce7f42bd6758a3da1ed601345099b570acfd79355c775",
+			"visual": {
+				"active_child_id": 2,
+				"active_leaf_only_filled": false,
+				"all_emitted_leaves_filled": true,
+				"clear_count": 0,
+				"configured": true,
+				"detail_quality": 2,
+				"fullmesh_geometry_certified": false,
+				"generation": 12,
+				"last_clear_reason": "",
+				"last_error": "",
+				"literal_packet_vertices": true,
+				"marker_policy": "captured-leaf-centroid-with-screen-text-offset-only",
+				"native_live_response_enabled": false,
+				"overlap_policy": "literal-triangle-soup-no-displacement",
+				"palette_kind": "earth",
+				"physics_camera_clock_or_provider_written": false,
+				"provider_contract": "source-native-explicit-leaf-surface-provider-v1",
+				"publication_count": 1,
+				"rejected_publication_count": 0,
+				"render_only": true,
+				"request_binding": {
+					"generation": 12,
+					"request_sha256": "dba77981352e4821b1b67b5c7aa6d49f5232fff9ecaf52606c3c9fb1087107d4",
+					"request_token": "visual-test"
+				},
+				"shading_normal_is_native_contact_normal": false,
+				"shading_normal_policy": "double-cross-of-literal-F32-face-oriented-toward-local-up",
+				"snapshot_sha256": "8b72a6540d82c3c4070ce7f42bd6758a3da1ed601345099b570acfd79355c775",
+				"source_contract": "source-native-literal-leaf-surface-visual-v1",
+				"terrain_indices_s32_hex": "000000000100000002000000030000000400000005000000060000000700000008000000",
+				"terrain_triangle_count": 3,
+				"terrain_vertex_deformation": false,
+				"terrain_vertex_f32_hex": "e0fd56c4958231c600b3c43cccdd0a44e56531c6fee7fec4cf2fe644ae2537c60022033d57fe56c4928231c600b3c43c57dd0a44e46531c6fee7fec4712fe644ac2537c60022033dd8fd56c4978231c600b3c43ccddc0a44e76531c6fee7fec4b42fe644b12537c60022033d",
+				"terrain_vertex_f32_sha256": "933bae4c25c46e901d6fb3e89a2be7107277b26c8bc9904b200cbbb71349d60a",
+				"visited_leaf_count": 3,
+				"visited_witness_count": 2,
+				"witnesses_visible": true
+			}
+		},
+		{
+			"case": "atomic_new_generation_reject_and_clear",
+			"rejection_modes": [
+				"wrong_type",
+				"vertices",
+				"binding",
+				"snapshot",
+				"empty",
+				"disabled"
+			],
+			"visual": {
+				"active_child_id": -1,
+				"active_leaf_only_filled": false,
+				"all_emitted_leaves_filled": true,
+				"clear_count": 2,
+				"configured": false,
+				"detail_quality": 2,
+				"fullmesh_geometry_certified": false,
+				"generation": 0,
+				"last_clear_reason": "test_cleanup",
+				"last_error": "",
+				"literal_packet_vertices": true,
+				"marker_policy": "captured-leaf-centroid-with-screen-text-offset-only",
+				"native_live_response_enabled": false,
+				"overlap_policy": "literal-triangle-soup-no-displacement",
+				"palette_kind": "ice",
+				"physics_camera_clock_or_provider_written": false,
+				"provider_contract": "source-native-explicit-leaf-surface-provider-v1",
+				"publication_count": 3,
+				"rejected_publication_count": 8,
+				"render_only": true,
+				"request_binding": {
+
+				},
+				"shading_normal_is_native_contact_normal": false,
+				"shading_normal_policy": "double-cross-of-literal-F32-face-oriented-toward-local-up",
+				"snapshot_sha256": "",
+				"source_contract": "source-native-literal-leaf-surface-visual-v1",
+				"terrain_indices_s32_hex": "",
+				"terrain_triangle_count": 0,
+				"terrain_vertex_deformation": false,
+				"terrain_vertex_f32_hex": "",
+				"terrain_vertex_f32_sha256": "",
+				"visited_leaf_count": 0,
+				"visited_witness_count": 0,
+				"witnesses_visible": true
+			}
+		}
+	],
+	"failures": 0,
+	"schema": 1,
+	"scope": "Actual original actor fixture and genuine cold-rebuilt sealed native provider. Literal F32 ArrayMesh buffers for all emitted leaves, topology, hashes, bounded reused-material shading/normals, visible child markers, private source/render copies, new generation replacement, stale/internal corruption rejection and explicit cleanup. Does not independently execute original native instructions, mutate Surface/Main/flight physics, render a GPU framebuffer, test an Android phone or claim universal mesh/native-height equivalence.",
+	"sources": {
+		"scripts/source_native_surface_provider.gd": "c1558516a8414783de8b3c74d97e75fa9dfd52feeaa81517d974af10e28fcc5e",
+		"scripts/source_native_surface_visual.gd": "980cae126b582328acf18de058964504249acc440c7616a66dc2b3c7b3760853",
+		"scripts/world_surface_library.gd": "45824d82d0269a92a027ddcf5967321a8f784f000eabadb583e67a79a85a5aa2",
+		"tests/test_source_native_surface_visual.gd": "bdb6fc863ea3543488ba1c7e2269b17abd29c0e578e5fcb1c6ab8984c4635b7c"
+	}
+}

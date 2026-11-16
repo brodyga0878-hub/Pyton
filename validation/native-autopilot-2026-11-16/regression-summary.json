@@ -1,0 +1,1078 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-16T09:52:57.626257+00:00",
+  "updated_utc": "2026-11-16T10:04:55.283865+00:00",
+  "duration_seconds": 412.452,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-16T09:52:57.626257+00:00",
+      "duration_seconds": 159.171,
+      "requested_suites": [
+        "source_contact_geometry_main",
+        "source_natural_footprint_main",
+        "source_contact_alignment_main",
+        "source_natural_main",
+        "source_spherical_main",
+        "source_contact_main",
+        "source_gear_main",
+        "source_thermal_main",
+        "source_fuel_main",
+        "source_hyperdrive_main",
+        "navigation_main",
+        "flight_time_controller",
+        "source_motion_main_continuation",
+        "classic_console_main",
+        "flight_projection",
+        "flight",
+        "save_touch",
+        "app_transitions"
+      ],
+      "executed_suites": [
+        "source_contact_geometry_main",
+        "source_natural_footprint_main",
+        "source_contact_alignment_main",
+        "source_natural_main",
+        "source_spherical_main",
+        "source_contact_main",
+        "source_gear_main",
+        "source_thermal_main",
+        "source_fuel_main",
+        "source_hyperdrive_main",
+        "navigation_main",
+        "flight_time_controller",
+        "source_motion_main_continuation",
+        "classic_console_main",
+        "flight_projection",
+        "flight",
+        "save_touch",
+        "app_transitions"
+      ]
+    },
+    {
+      "started_utc": "2026-11-16T10:00:42.002960+00:00",
+      "duration_seconds": 253.281,
+      "requested_suites": [
+        "native_surface_autopilot",
+        "native_surface_ascent",
+        "native_orbit_trial",
+        "native_autopilot_main",
+        "native_ascent_main",
+        "native_orbit_main",
+        "source_natural_park",
+        "source_natural_contact_session",
+        "source_native_surface_provider",
+        "source_native_surface_visual",
+        "native_surface_model",
+        "native_landing_trial",
+        "native_landing_trial_integration",
+        "native_landing_trial_main"
+      ],
+      "executed_suites": [
+        "native_surface_autopilot",
+        "native_surface_ascent",
+        "native_orbit_trial",
+        "native_autopilot_main",
+        "native_ascent_main",
+        "native_orbit_main",
+        "source_natural_park",
+        "source_natural_contact_session",
+        "source_native_surface_provider",
+        "source_native_surface_visual",
+        "native_surface_model",
+        "native_landing_trial",
+        "native_landing_trial_integration",
+        "native_landing_trial_main"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 3,
+  "status": "passed",
+  "passed_suites": 32,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 51420,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "native_surface_autopilot",
+      "scope": "Actual filtered guidance, original accepted park, cold continuation and atomic source owners.",
+      "status": "passed",
+      "checks": 3055,
+      "failures": 0,
+      "executed_utc": "2026-11-16T10:00:42.004708+00:00",
+      "suite_source": {
+        "path": "tests/test_native_surface_autopilot.gd",
+        "bytes": 11504,
+        "sha256": "1272acc012abd7cdc19d72460216ad5b8951657a30fafb9b563a61baf3f1fb85"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_native_surface_autopilot.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 138.06,
+      "timed_out": false,
+      "output_bytes": 123,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/native_surface_autopilot.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "native_surface_ascent",
+      "scope": "Actual powered source-park release, gear clearance, unsnapped ascent and cold propulsion.",
+      "status": "passed",
+      "checks": 3211,
+      "failures": 0,
+      "executed_utc": "2026-11-16T10:00:42.004930+00:00",
+      "suite_source": {
+        "path": "tests/test_native_surface_ascent.gd",
+        "bytes": 8746,
+        "sha256": "e792d3d9b427ef5be046aab55c9cd252aad0b49329854f2bd7e79f3d52b44f7f"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_native_surface_ascent.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 57.747,
+      "timed_out": false,
+      "output_bytes": 120,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/native_surface_ascent.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "native_orbit_trial",
+      "scope": "Continuous source chart/world handoff, private source gravity/fuel space intervals, F64 movement and cold lineage.",
+      "status": "passed",
+      "checks": 402,
+      "failures": 0,
+      "executed_utc": "2026-11-16T10:00:42.005509+00:00",
+      "suite_source": {
+        "path": "tests/test_native_orbit_trial.gd",
+        "bytes": 19012,
+        "sha256": "031739d798364299fb86c948df512606a8bdbf79111a46d1d4ca93b8e2188b71"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_native_orbit_trial.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 71.069,
+      "timed_out": false,
+      "output_bytes": 116,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/native_orbit_trial.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "native_autopilot_main",
+      "scope": "Actual original-console Auto input, source landing, cancellation, shared time/fuel, old save and ZIP.",
+      "status": "passed",
+      "checks": 93,
+      "failures": 0,
+      "executed_utc": "2026-11-16T10:01:39.753909+00:00",
+      "suite_source": {
+        "path": "tests/test_native_autopilot_main.gd",
+        "bytes": 16117,
+        "sha256": "64a5c2bae80f17550120b91723ffa8af0394b639e09450bf309b60ab89253ff7"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_native_autopilot_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 68.582,
+      "timed_out": false,
+      "output_bytes": 118,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/native_autopilot_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "native_ascent_main",
+      "scope": "Actual auto launch and kilometre ascent, gear, empty fuel, exact cold and ordinary return.",
+      "status": "passed",
+      "checks": 87,
+      "failures": 0,
+      "executed_utc": "2026-11-16T10:01:53.076066+00:00",
+      "suite_source": {
+        "path": "tests/test_native_ascent_main.gd",
+        "bytes": 13228,
+        "sha256": "4760fa4ea479dd6050ef966e373f893118896ddf75966c92e5dcd09c45ecd06d"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_native_ascent_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 85.105,
+      "timed_out": false,
+      "output_bytes": 115,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/native_ascent_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "native_orbit_main",
+      "scope": "Actual protected planetary departure, continuous space handoff, render/control/cold/scheduler and independent save/report/return.",
+      "status": "passed",
+      "checks": 104,
+      "failures": 0,
+      "executed_utc": "2026-11-16T10:02:48.336637+00:00",
+      "suite_source": {
+        "path": "tests/test_native_orbit_main.gd",
+        "bytes": 25123,
+        "sha256": "2360810b424737a30c476f8088921ed48765024b0757443eb576451ca9b482f3"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_native_orbit_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 126.946,
+      "timed_out": false,
+      "output_bytes": 115,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/native_orbit_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_natural_park",
+      "scope": "Actual source F1021/F1042 park and cold F1030 RET native witnesses.",
+      "status": "passed",
+      "checks": 621,
+      "failures": 0,
+      "executed_utc": "2026-11-16T10:03:00.065672+00:00",
+      "suite_source": {
+        "path": "tests/test_source_natural_park.gd",
+        "bytes": 7500,
+        "sha256": "181164fa415b05bad2174f963e4ecd136ec093b1cddfe82cbd8a79ccc5dbd4a6"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_natural_park.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.611,
+      "timed_out": false,
+      "output_bytes": 110,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/source_natural_park.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_natural_contact_session",
+      "scope": "Persistent source globals, actual classifier trace, broadphase/nohit, source park, private receipts and cold replay.",
+      "status": "passed",
+      "checks": 2142,
+      "failures": 0,
+      "executed_utc": "2026-11-16T10:03:00.678191+00:00",
+      "suite_source": {
+        "path": "tests/test_source_natural_contact_session.gd",
+        "bytes": 27401,
+        "sha256": "2c91cd3c4d531784a19bf2a20cbfa54283b31416bf6f6bccd2bf2219e93aed83"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_natural_contact_session.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.09,
+      "timed_out": false,
+      "output_bytes": 122,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/source_natural_contact_session.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_native_surface_provider",
+      "scope": "Literal source leaf packet provider, exact closed triangle coverage and uppermost rendering surface; separate integer collision law.",
+      "status": "passed",
+      "checks": 1098,
+      "failures": 0,
+      "executed_utc": "2026-11-16T10:03:02.769183+00:00",
+      "suite_source": {
+        "path": "tests/test_source_native_surface_provider.gd",
+        "bytes": 16663,
+        "sha256": "9a9e5a0fb5d397e48c08730258723852349ea563cdccca6e1bcedbc505941aa0"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_native_surface_provider.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.599,
+      "timed_out": false,
+      "output_bytes": 148,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/source_native_surface_provider.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_native_surface_visual",
+      "scope": "All genuine bound source leaves rendered as their exact literal Float32 triangle packets.",
+      "status": "passed",
+      "checks": 115,
+      "failures": 0,
+      "executed_utc": "2026-11-16T10:03:05.369149+00:00",
+      "suite_source": {
+        "path": "tests/test_source_native_surface_visual.gd",
+        "bytes": 14708,
+        "sha256": "bdb6fc863ea3543488ba1c7e2269b17abd29c0e578e5fcb1c6ab8984c4635b7c"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_native_surface_visual.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.619,
+      "timed_out": false,
+      "output_bytes": 132,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/source_native_surface_visual.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "native_surface_model",
+      "scope": "Explicit native manual surface, persistent raw movement, source park, strict cold anchors and powered takeoff.",
+      "status": "passed",
+      "checks": 455,
+      "failures": 0,
+      "executed_utc": "2026-11-16T10:03:06.988304+00:00",
+      "suite_source": {
+        "path": "tests/test_native_surface_model.gd",
+        "bytes": 18149,
+        "sha256": "33a02808653fca7cafd0f5a3859504564721c285ff806e8e501ffe533efe120e"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_native_surface_model.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 11.562,
+      "timed_out": false,
+      "output_bytes": 118,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/native_surface_model.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "native_landing_trial",
+      "scope": "Atomic HP/fuel/RNG/gear/time ownership and rollback for source manual landing.",
+      "status": "passed",
+      "checks": 65,
+      "failures": 0,
+      "executed_utc": "2026-11-16T10:03:18.181916+00:00",
+      "suite_source": {
+        "path": "tests/test_native_landing_trial.gd",
+        "bytes": 11489,
+        "sha256": "c251e76c0dbf0496b1881129b8ec0f2ac70d1c72f91828ab3efdb969bf6a30e2"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_native_landing_trial.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.706,
+      "timed_out": false,
+      "output_bytes": 117,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/native_landing_trial.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "native_landing_trial_integration",
+      "scope": "Real source Earth gravity descent, gear damage, cold parked takeoff and empty propellant.",
+      "status": "passed",
+      "checks": 146,
+      "failures": 0,
+      "executed_utc": "2026-11-16T10:03:18.551014+00:00",
+      "suite_source": {
+        "path": "tests/test_native_landing_trial_integration.gd",
+        "bytes": 11194,
+        "sha256": "363550ee5f953c0bad59cfc9c76c469250f4050c6359a3ee7ba8740c3cc0780d"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_native_landing_trial_integration.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 6.627,
+      "timed_out": false,
+      "output_bytes": 130,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/native_landing_trial_integration.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "native_landing_trial_main",
+      "scope": "Actual Main native mode, isolated save, true descent/cold takeoff/return, whole frame clock and real report ZIP.",
+      "status": "passed",
+      "checks": 48,
+      "failures": 0,
+      "executed_utc": "2026-11-16T10:03:18.889153+00:00",
+      "suite_source": {
+        "path": "tests/test_native_landing_trial_main.gd",
+        "bytes": 11940,
+        "sha256": "5ebd2ee0f8e04a336b884a8595d210e64d9225dfd9ffd4ae36bd18cf93c96643"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_native_landing_trial_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 25.172,
+      "timed_out": false,
+      "output_bytes": 122,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/native_landing_trial_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_contact_geometry_main",
+      "scope": "Actual Russian geometry action, native packets in isolated viewer, source/phone state and old save preservation, complete ZIP and three compact observation references.",
+      "status": "passed",
+      "checks": 63,
+      "failures": 0,
+      "executed_utc": "2026-11-16T09:52:57.629476+00:00",
+      "suite_source": {
+        "path": "tests/test_source_contact_geometry_main.gd",
+        "bytes": 12953,
+        "sha256": "e67ba8f56913410372ffba95fff6bb2f85419657760b2445056f768228eaaadb"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_contact_geometry_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 23.51,
+      "timed_out": false,
+      "output_bytes": 125,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/source_contact_geometry_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_natural_footprint_main",
+      "scope": "Actual Russian full-ship check, paused/state/cache isolation, ephemeral save/preview lifetime and complete diagnostic ZIP with bounded log references.",
+      "status": "passed",
+      "checks": 54,
+      "failures": 0,
+      "executed_utc": "2026-11-16T09:52:57.629684+00:00",
+      "suite_source": {
+        "path": "tests/test_source_natural_footprint_main.gd",
+        "bytes": 11585,
+        "sha256": "da6ea2d42b8847cdd31c602aa149155ff9d96beb211d59e0ae668a1e55dbcc4a"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_natural_footprint_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 24.072,
+      "timed_out": false,
+      "output_bytes": 126,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/source_natural_footprint_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_contact_alignment_main",
+      "scope": "Actual comparison menu/report, retained gear after graphics preview, old save isolation and explicit v5 compatibility without default physics changes.",
+      "status": "passed",
+      "checks": 82,
+      "failures": 0,
+      "executed_utc": "2026-11-16T09:52:57.629938+00:00",
+      "suite_source": {
+        "path": "tests/test_source_contact_alignment_main.gd",
+        "bytes": 23466,
+        "sha256": "d5d49b47922cb7a1544d0cfe5d8d72313323da2cac746949c75f83fd95f3e0a8"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_contact_alignment_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 50.747,
+      "timed_out": false,
+      "output_bytes": 126,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/source_contact_alignment_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_natural_main",
+      "scope": "Actual Main read-only natural classifier facts in periodic logs and the diagnostic ZIP, with preserved HP, fuel, time, cold saves, menu and existing source landing.",
+      "status": "passed",
+      "checks": 163,
+      "failures": 0,
+      "executed_utc": "2026-11-16T09:53:21.140784+00:00",
+      "suite_source": {
+        "path": "tests/test_source_natural_contact_main.gd",
+        "bytes": 17209,
+        "sha256": "7dac6164b749ae29206fc873c7d65399660a00c8e055f5562d2fc041a3441e2d"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_natural_contact_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 42.313,
+      "timed_out": false,
+      "output_bytes": 117,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/source_natural_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_spherical_main",
+      "scope": "Actual Main diagnostics and report archive carry the read-only source sphere probe without changing HP, fuel, clocks, source frames or existing terrain landing.",
+      "status": "passed",
+      "checks": 195,
+      "failures": 0,
+      "executed_utc": "2026-11-16T09:53:21.703515+00:00",
+      "suite_source": {
+        "path": "tests/test_source_spherical_main.gd",
+        "bytes": 17781,
+        "sha256": "31e6261d8f518cec93153501c53f4251ddf67d21149a0a5d519ffd0d7fccf12b"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_spherical_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 42.976,
+      "timed_out": false,
+      "output_bytes": 119,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/source_spherical_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_contact_main",
+      "scope": "Actual Main source-surface landing, rebound, shared damage, fractional HP cold restore, pending-save boundary, fatal cleanup and phone lift recovery.",
+      "status": "passed",
+      "checks": 220,
+      "failures": 0,
+      "executed_utc": "2026-11-16T09:53:48.378542+00:00",
+      "suite_source": {
+        "path": "tests/test_source_contact_main.gd",
+        "bytes": 31115,
+        "sha256": "4fe5094f251decdf18453c41386af507c980f658c623fb8507076310c07bbfbd"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_contact_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 108.417,
+      "timed_out": false,
+      "output_bytes": 117,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/source_contact_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_gear_main",
+      "scope": "Actual Main gear commands, exact old/partial/invalid saves, original thermal flag polarity, source-contact damage and lift recovery; legacy Surface retains its prior phone collision adapter.",
+      "status": "passed",
+      "checks": 112,
+      "failures": 0,
+      "executed_utc": "2026-11-16T09:54:03.454827+00:00",
+      "suite_source": {
+        "path": "tests/test_source_gear_main.gd",
+        "bytes": 16582,
+        "sha256": "1cbbb9ac45692058d24dfdc5cda0bc532fe5633a282fd5493a8fb72aeadecfa3"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_gear_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 36.537,
+      "timed_out": false,
+      "output_bytes": 114,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/source_gear_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_thermal_main",
+      "scope": "Actual Main Earth/surface heat and drag, exact legacy HP anchors, raw motion continuation, fixed thermal-hook partition, natural boundary fixtures, pause/input/death/save ordering and atomic invalid-thermal restore.",
+      "status": "passed",
+      "checks": 463,
+      "failures": 0,
+      "executed_utc": "2026-11-16T09:54:04.681144+00:00",
+      "suite_source": {
+        "path": "tests/test_source_thermal_main.gd",
+        "bytes": 21582,
+        "sha256": "cc413076aeff8c13d2cbd0d1ebbce8ad1acd185b3dadef73385aa7704aaf0f6b"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_thermal_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 34.713,
+      "timed_out": false,
+      "output_bytes": 117,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/source_thermal_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_fuel_main",
+      "scope": "Actual Main fuel cadence, source movement/save continuation, automatic star/gas scooping, UI recovery, old v40 saves, pause and stale-input boundaries.",
+      "status": "passed",
+      "checks": 397,
+      "failures": 0,
+      "executed_utc": "2026-11-16T09:54:39.395306+00:00",
+      "suite_source": {
+        "path": "tests/test_source_fuel_main.gd",
+        "bytes": 16374,
+        "sha256": "31ddac2cab1eaeea39ddd8e222bf25a2b61429ae40ba25e2b8dfddee2ab1d70e"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_fuel_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 8.714,
+      "timed_out": false,
+      "output_bytes": 114,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/source_fuel_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_hyperdrive_main",
+      "scope": "Actual Main route/charge/cancel/save continuation, military fuel/waste, stale service inputs, explicit legacy migration with durable private backup and atomic invalid-v3 rejection.",
+      "status": "passed",
+      "checks": 70,
+      "failures": 0,
+      "executed_utc": "2026-11-16T09:54:39.994013+00:00",
+      "suite_source": {
+        "path": "tests/test_source_hyperdrive_main.gd",
+        "bytes": 18402,
+        "sha256": "84f688bd98c73d50be2e3998f0780ff0ba44fa249aa10bd315840b6c6ec0f465"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_hyperdrive_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 4.126,
+      "timed_out": false,
+      "output_bytes": 119,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/source_hyperdrive_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "navigation_main",
+      "scope": "Actual Main graphical map selection/confirmation, forecast isolation, raw save continuation, phone roll, clock scheduling and legacy opt-in boundaries.",
+      "status": "passed",
+      "checks": 53,
+      "failures": 0,
+      "executed_utc": "2026-11-16T09:54:44.120261+00:00",
+      "suite_source": {
+        "path": "tests/test_navigation_main.gd",
+        "bytes": 12697,
+        "sha256": "134ccfc0534ce835429cdd2c0cdbae7272c96d073ae011df03d19ee159661d73"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_navigation_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 13.512,
+      "timed_out": false,
+      "output_bytes": 118,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/navigation_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "flight_time_controller",
+      "scope": "Original timer control native references plus bounded nominal-SI scheduler, safety and exact executed-step acknowledgement.",
+      "status": "passed",
+      "checks": 36926,
+      "failures": 0,
+      "executed_utc": "2026-11-16T09:54:48.110315+00:00",
+      "suite_source": {
+        "path": "tests/test_flight_time_controller.gd",
+        "bytes": 13150,
+        "sha256": "9bd88095910c6ccc1ecd759842d5b383c10ea8c294d915d93f38151aae2d5849"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_flight_time_controller.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.483,
+      "timed_out": false,
+      "output_bytes": 128,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/flight_time_controller.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_motion_main_continuation",
+      "scope": "Actual Main three rotated savepoints retain exact next raw body, Q16 fraction, IEEE64 clock, ship pose and velocity.",
+      "status": "passed",
+      "checks": 28,
+      "failures": 0,
+      "executed_utc": "2026-11-16T09:54:48.594601+00:00",
+      "suite_source": {
+        "path": "tests/test_source_motion_main_continuation.gd",
+        "bytes": 3417,
+        "sha256": "98f30d43361747a56627170e76dbdaf1f3f7bbdefe53027ac2920899b2e5e728"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_motion_main_continuation.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 3.376,
+      "timed_out": false,
+      "output_bytes": 134,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/source_motion_main_continuation.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "classic_console_main",
+      "scope": "Actual Main console hooks, principal cameras, session pause, independent fingers, offpad takeoff and pending-jump/save boundaries.",
+      "status": "passed",
+      "checks": 42,
+      "failures": 0,
+      "executed_utc": "2026-11-16T09:54:51.971577+00:00",
+      "suite_source": {
+        "path": "tests/test_classic_console_main.gd",
+        "bytes": 10629,
+        "sha256": "a9d2f15c1ecd3911828f96671fa52636a60fcadbfbf57230fc4cb8b12c027fcf"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_classic_console_main.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.498,
+      "timed_out": false,
+      "output_bytes": 123,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/classic_console_main.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "flight_projection",
+      "scope": "Actual Main Mercury arrival, independent perspective angular scale, off-axis flight-window centre, safe-area/resize/FOV/principal views and preserved source/legacy state.",
+      "status": "passed",
+      "checks": 691,
+      "failures": 0,
+      "executed_utc": "2026-11-16T09:54:54.470580+00:00",
+      "suite_source": {
+        "path": "tests/test_flight_projection.gd",
+        "bytes": 12962,
+        "sha256": "a1e2569ae67b334851340782de2dab1c41ee8ceba3bb28b8ba66055d21f777d7"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_flight_projection.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.398,
+      "timed_out": false,
+      "output_bytes": 10047,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/flight_projection.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "flight",
+      "scope": "Rebuilt flight, phone steering inputs, adapted training economy, atomic flight saves.",
+      "status": "passed",
+      "checks": 94,
+      "failures": 0,
+      "executed_utc": "2026-11-16T09:54:56.870296+00:00",
+      "suite_source": {
+        "path": "tests/test_rebuilt_flight.gd",
+        "bytes": 11797,
+        "sha256": "4866c51adf55cf9f4ad31f0fdb17ddc10c26a76e0052a2357d64e085e5ef4e57"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_flight.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.324,
+      "timed_out": false,
+      "output_bytes": 117,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/flight.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "save_touch",
+      "scope": "Current complete save-store decoding, atomic writes/fallback and multi-finger phone input/release behavior; separate from app/device smoke.",
+      "status": "passed",
+      "checks": 71,
+      "failures": 0,
+      "executed_utc": "2026-11-16T09:54:57.195611+00:00",
+      "suite_source": {
+        "path": "tests/test_rebuilt_save_touch.gd",
+        "bytes": 16715,
+        "sha256": "c2755cdb318c5f75c8c1a348d14ed8bc4e2014a9e1bcf9807264a5a3196786f0"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_save_touch.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.367,
+      "timed_out": false,
+      "output_bytes": 121,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/save_touch.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "app_transitions",
+      "scope": "Actual Main transition locks, pending-save resume and asynchronous New Moscow entry; capture mode disables user progress loading/writing.",
+      "status": "passed",
+      "checks": 54,
+      "failures": 0,
+      "executed_utc": "2026-11-16T09:54:57.633173+00:00",
+      "suite_source": {
+        "path": "tests/test_rebuilt_app_transitions.gd",
+        "bytes": 11061,
+        "sha256": "f81dad10e23e7169ba5e5046567b335720be7e93cfe95f7445e897f25cc436a5"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_rebuilt_app_transitions.gd",
+        "--",
+        "--rebuild-capture"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 4.431,
+      "timed_out": false,
+      "output_bytes": 120,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/native-autopilot-2026-11-16/regression/logs/app_transitions.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ]
+}
