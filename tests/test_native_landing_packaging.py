@@ -20,13 +20,31 @@ class MockNativeLandingArchive(retained.MockContactFrameArchive):
 
 
 class NativeLandingPackaging(unittest.TestCase):
-    def setUp(self):self.archive=MockNativeLandingArchive()
+    @classmethod
+    def setUpClass(cls):
+        directory=tempfile.TemporaryDirectory(prefix='native-autopilot-packaging-v50-')
+        cls.addClassCleanup(directory.cleanup);cls.project=Path(directory.name)
+        for relative in cls.project_files():
+            target=cls.project/relative;target.parent.mkdir(parents=True,exist_ok=True)
+            target.write_bytes((PROJECT/relative).read_bytes())
+        baseline=verifier._load_native_autopilot_baseline(PROJECT)
+        for relative,entry in {**baseline['files'],**baseline['metadata_source_files']}.items():
+            target=cls.project/relative;target.parent.mkdir(parents=True,exist_ok=True)
+            target.write_text(entry['source'])
 
     @staticmethod
-    def source_view(overrides):return verifier._AlignmentSourceAuditPath(PROJECT,overrides)
+    def project_files():
+        files=retained.ContactFramePackaging.project_files()
+        files.update(verifier.NATIVE_LANDING_AUDITED_SOURCE_SHA256)
+        files.update(['tests/fixtures/native_autopilot_v50_sources.json','tests/fixtures/native_landing_v49_sources.json','tests/fixtures/source_contact_lifecycle_native.json','validation/contact-lifecycle-2026-11-15/native-proof/instruction-proofs.json'])
+        return files
+
+    def setUp(self):self.archive=MockNativeLandingArchive()
+
+    def source_view(self,overrides):return verifier._AlignmentSourceAuditPath(self.project,overrides)
 
     def test_actual50_scope_and_same_actual_archive_history(self):
-        result=verifier.verify_native_landing_runtime(self.archive,PROJECT)
+        result=verifier.verify_native_landing_runtime(self.archive,self.project)
         self.assertEqual((result['version'],result['version_code']),('0.25.0-native-landing-alpha1',50))
         self.assertEqual((result['compiled_module_count'],result['integration_compiled_module_count']),(6,52))
         self.assertEqual(result['unchanged_code49_runtime_source_count'],43)
@@ -57,7 +75,7 @@ class NativeLandingPackaging(unittest.TestCase):
             with self.subTest(relative=relative):
                 archive=MockNativeLandingArchive();del archive.entries['assets/scripts/'+Path(relative).stem+'.gdc']
                 with self.assertRaisesRegex(AssertionError,'Missing native-landing integration runtime'):
-                    verifier.verify_native_landing_runtime(archive,PROJECT)
+                    verifier.verify_native_landing_runtime(archive,self.project)
 
     def test_all_new_compiled_headers_and_truncation_reject(self):
         for name in verifier.NATIVE_LANDING_MODULES:
@@ -65,12 +83,12 @@ class NativeLandingPackaging(unittest.TestCase):
                 with self.subTest(name=name,size=len(raw)):
                     archive=MockNativeLandingArchive();archive.entries['assets/scripts/'+name+'.gdc']=raw
                     with self.assertRaisesRegex(AssertionError,'Invalid compiled native-landing integration runtime'):
-                        verifier.verify_native_landing_runtime(archive,PROJECT)
+                        verifier.verify_native_landing_runtime(archive,self.project)
 
     def test_all52_local_runtime_source_pins_are_strict(self):
         for relative in verifier.NATIVE_LANDING_AUDITED_SOURCE_SHA256:
             with self.subTest(relative=relative):
-                project=self.source_view({relative:(PROJECT/relative).read_text()+'\n# unaudited source change\n'})
+                project=self.source_view({relative:(self.project/relative).read_text()+'\n# unaudited source change\n'})
                 with self.assertRaisesRegex(AssertionError,'Native landing differs from audited integration source'):
                     verifier.verify_native_landing_runtime(self.archive,project)
 
@@ -79,7 +97,7 @@ class NativeLandingPackaging(unittest.TestCase):
         for name in ('main','navigation','source_hyperdrive_session'):
             raw=b'GDSC'+('only-actual-exported50-'+name).encode()*6
             self.archive.entries['assets/scripts/'+name+'.gdc']=raw;digests[name]=hashlib.sha256(raw).hexdigest()
-        result=verifier.verify_native_landing_runtime(self.archive,PROJECT)
+        result=verifier.verify_native_landing_runtime(self.archive,self.project)
         for name,digest in digests.items():
             self.assertEqual(result['integration_compiled_modules'][name],digest)
             history=result['retained_code49_source_audit']['assets']
@@ -89,14 +107,14 @@ class NativeLandingPackaging(unittest.TestCase):
 
     def test_old49_public_gate_still_rejects_actual50_source(self):
         with self.assertRaisesRegex(AssertionError,'Contact frame differs from audited integration source'):
-            verifier.verify_contact_frame_runtime(self.archive,PROJECT)
+            verifier.verify_contact_frame_runtime(self.archive,self.project)
 
     def test_portable49_expands_without_repository_commands(self):
         relatives=('tests/fixtures/native_landing_v49_sources.json','tests/fixtures/contact_frame_v48_sources.json','tests/fixtures/footprint_v47_sources.json')
         with tempfile.TemporaryDirectory() as directory:
             project=Path(directory)
             for relative in relatives:
-                target=project/relative;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes((PROJECT/relative).read_bytes())
+                target=project/relative;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes((self.project/relative).read_bytes())
             self.assertFalse((project/'.git').exists())
             with mock.patch.object(verifier,'run',side_effect=AssertionError('Commands forbidden')),mock.patch.object(verifier.subprocess,'check_output',side_effect=AssertionError('Git forbidden')):
                 expanded=verifier._load_native_landing_baseline(project)
@@ -105,7 +123,7 @@ class NativeLandingPackaging(unittest.TestCase):
             self.assertEqual(len(expanded['source_overrides']),5)
 
     def test_rehashed_fabricated49_history_is_rejected(self):
-        relative='tests/fixtures/native_landing_v49_sources.json';data=json.loads((PROJECT/relative).read_text())
+        relative='tests/fixtures/native_landing_v49_sources.json';data=json.loads((self.project/relative).read_text())
         row=data['source_overrides']['scripts/main.gd'];row['source']+='\n# fabricated history\n';row['sha256']=hashlib.sha256(row['source'].encode()).hexdigest()
         data['audited_runtime_source_sha256']['scripts/main.gd']=row['sha256']
         with self.assertRaisesRegex(AssertionError,'Changed portable code49 native-landing source delta'):
@@ -114,21 +132,21 @@ class NativeLandingPackaging(unittest.TestCase):
     def test_every_old_portable_link_is_still_pinned(self):
         for relative in ('tests/fixtures/contact_frame_v48_sources.json','tests/fixtures/footprint_v47_sources.json'):
             with self.subTest(relative=relative),self.assertRaises(AssertionError):
-                verifier._load_native_landing_baseline(self.source_view({relative:(PROJECT/relative).read_text()+' '}))
+                verifier._load_native_landing_baseline(self.source_view({relative:(self.project/relative).read_text()+' '}))
 
     def test_protected_ordinary_main_nav_and_hp_methods_cannot_change(self):
-        baseline=verifier._load_native_landing_baseline(PROJECT)
+        baseline=verifier._load_native_landing_baseline(self.project)
         for relative,name in (('scripts/main.gd','_payload'),('scripts/main.gd','_apply_pending_source_contact'),('scripts/main.gd','_finish_flight_interval'),('scripts/navigation.gd','apply_contact_damage'),('scripts/source_hyperdrive_session.gd','advance_fuel_seconds')):
             with self.subTest(relative=relative,name=name):
-                source=(PROJECT/relative).read_text();old=verifier.source_function(source,name)
+                source=(self.project/relative).read_text();old=verifier.source_function(source,name)
                 changed=source.replace(old,old.replace('\n','\n\t# protected method changed\n',1),1)
                 with self.assertRaisesRegex(AssertionError,'Native landing changed protected function'):
                     verifier._verify_native_landing_preserved_functions(self.source_view({relative:changed}),baseline)
 
     def test_unlisted_new_main_method_is_not_silently_accepted(self):
-        relative='scripts/main.gd';source=(PROJECT/relative).read_text()+'\nfunc unaudited_native_entry()->void:pass\n'
+        relative='scripts/main.gd';source=(self.project/relative).read_text()+'\nfunc unaudited_native_entry()->void:pass\n'
         with self.assertRaisesRegex(AssertionError,'Native landing changed declared function inventory'):
-            verifier._verify_native_landing_preserved_functions(self.source_view({relative:source}),verifier._load_native_landing_baseline(PROJECT))
+            verifier._verify_native_landing_preserved_functions(self.source_view({relative:source}),verifier._load_native_landing_baseline(self.project))
 
     def test_disconnected_manual_contact_park_and_atomic_host_consumers_reject(self):
         controls=(
@@ -141,12 +159,12 @@ class NativeLandingPackaging(unittest.TestCase):
         )
         for relative,old,new in controls:
             with self.subTest(relative=relative,consumer=old):
-                source=(PROJECT/relative).read_text();self.assertIn(old,source)
+                source=(self.project/relative).read_text();self.assertIn(old,source)
                 with self.assertRaises((AssertionError,ValueError)):
                     verifier._verify_native_landing_scope(self.source_view({relative:source.replace(old,new)}))
 
     def test_new_native_lifecycle_and_original_instruction_proof_are_pinned(self):
-        result=verifier._verify_native_landing_native_reference(PROJECT)
+        result=verifier._verify_native_landing_native_reference(self.project)
         self.assertEqual((result['case_count'],result['actor_case_count'],result['parked_cold_tick_case_count']),(402,247,76))
         self.assertEqual((result['procedure_count'],result['instruction_count'],result['instruction_bytes']),(19,1409,4202))
         self.assertTrue(result['accepted_F1021_fragment_F1042_F1030_proved'])
@@ -154,16 +172,16 @@ class NativeLandingPackaging(unittest.TestCase):
             self.assertFalse(result[key],key)
         for relative in ('tests/fixtures/source_contact_lifecycle_native.json','validation/contact-lifecycle-2026-11-15/native-proof/instruction-proofs.json'):
             with self.subTest(relative=relative),self.assertRaises(AssertionError):
-                verifier._verify_native_landing_native_reference(self.source_view({relative:(PROJECT/relative).read_text()+' '}))
+                verifier._verify_native_landing_native_reference(self.source_view({relative:(self.project/relative).read_text()+' '}))
 
     def test_original_runtime_data_stays_byte_exact_in_actual_archive(self):
         for name in ('ffe_natural_contact','ffe_surface_contact','ffe_terrain_query'):
             with self.subTest(name=name):
-                archive=MockNativeLandingArchive();archive.entries['assets/data/'+name+'.json']=(PROJECT/'data'/f'{name}.json').read_bytes()+b' '
-                with self.assertRaises(AssertionError):verifier.verify_native_landing_runtime(archive,PROJECT)
+                archive=MockNativeLandingArchive();archive.entries['assets/data/'+name+'.json']=(self.project/'data'/f'{name}.json').read_bytes()+b' '
+                with self.assertRaises(AssertionError):verifier.verify_native_landing_runtime(archive,self.project)
 
     def test_current50_diagnostics_and_android_version_match(self):
-        info=(PROJECT/'scripts/build_info.gd').read_text();preset=verifier.preset_values(PROJECT/'export_presets.cfg')
+        info=(self.project/'scripts/build_info.gd').read_text();preset=verifier.preset_values(self.project/'export_presets.cfg')
         self.assertIn('const VERSION_CODE:=50',info);self.assertIn('const VERSION:="0.25.0-native-landing-alpha1"',info)
         self.assertEqual((preset['version_code'],preset['version']),(50,verifier.NATIVE_LANDING_VERSION))
 

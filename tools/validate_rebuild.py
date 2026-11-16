@@ -44,6 +44,12 @@ class Suite:
 
 
 SUITES = [
+    Suite('native_surface_autopilot', 'tests/test_native_surface_autopilot.gd', 'Actual filtered guidance, original accepted park, cold continuation and atomic source owners.', timeout=900),
+    Suite('native_surface_ascent', 'tests/test_native_surface_ascent.gd', 'Actual powered source-park release, gear clearance, unsnapped ascent and cold propulsion.', timeout=900),
+    Suite('native_orbit_trial', 'tests/test_native_orbit_trial.gd', 'Continuous source chart/world handoff, private source gravity/fuel space intervals, F64 movement and cold lineage.', timeout=900),
+    Suite('native_autopilot_main', 'tests/test_native_autopilot_main.gd', 'Actual original-console Auto input, source landing, cancellation, shared time/fuel, old save and ZIP.', timeout=900, user_args=('--rebuild-capture',)),
+    Suite('native_ascent_main', 'tests/test_native_ascent_main.gd', 'Actual auto launch and kilometre ascent, gear, empty fuel, exact cold and ordinary return.', timeout=900, user_args=('--rebuild-capture',)),
+    Suite('native_orbit_main', 'tests/test_native_orbit_main.gd', 'Actual protected planetary departure, continuous space handoff, render/control/cold/scheduler and independent save/report/return.', timeout=900, user_args=('--rebuild-capture',)),
     Suite('source_natural_park', 'tests/test_source_natural_park.gd', 'Actual source F1021/F1042 park and cold F1030 RET native witnesses.', timeout=600),
     Suite('source_natural_contact_session', 'tests/test_source_natural_contact_session.gd', 'Persistent source globals, actual classifier trace, broadphase/nohit, source park, private receipts and cold replay.', timeout=600),
     Suite('source_native_surface_provider', 'tests/test_source_native_surface_provider.gd', 'Literal source leaf packet provider, exact closed triangle coverage and uppermost rendering surface; separate integer collision law.', timeout=600),

@@ -8,11 +8,18 @@ const Session=preload("res://scripts/source_natural_contact_session.gd")
 const Gear=preload("res://scripts/source_landing_gear_session.gd")
 const SCHEMA:="starfrontier-native-surface-autopilot-v1"
 const POLICY:="bounded-native-contact-phone-guidance-v1"
-const KEYS:=["schema","version","policy","mode","phase","active","steps","elapsed_f64_hex","reason","binding","snapshot_sha256"]
+const KEYS:=["schema","version","policy","mode","phase","active","steps","elapsed_f64_hex","target_height_f64_hex","launch_recontacts","reason","binding","snapshot_sha256"]
 const BINDING_KEYS:=["system_id","body_id","ship_id","source_record_hex","source_generation","raw_body_sha256","raw_parent_sha256","provider_identity","days_f64_hex","phone_pose_f32_hex"]
 const LANDING_PHASES:=["gear","align","descent"]
+const ASCENT_PHASES:=["launch","align","ascent","braking"]
 const MAX_DESCENT_MPS:=4.0
 const MIN_DESCENT_MPS:=0.35
+const MAX_ASCENT_MPS:=40.0
+const ASCENT_CLEARANCE_M:=30.0
+const MIN_ASCENT_TARGET_M:=10.0
+const MAX_ASCENT_TARGET_M:=30000.0
+const ASCENT_HEIGHT_TOLERANCE_M:=0.5
+const ASCENT_SPEED_TOLERANCE_MPS:=0.5
 const MAX_LEVEL_ERROR_RAD:=0.17453292519943295 # Ten degrees, below F575's actual acceptance cone.
 var _saved:Dictionary={}
 
@@ -42,7 +49,16 @@ func configure_land(ship:RefCounted,nav:RefCounted,surface:RefCounted)->bool:
 	var height:Dictionary=surface.height_sample(ship.position.x,ship.position.z)
 	if height.is_empty() or not is_finite(float(height.get("height",NAN))):return false
 	if not _propulsion_ok(ship,surface):return false
-	_saved=_sealed({"schema":SCHEMA,"version":1,"policy":POLICY,"mode":"landing","phase":"gear","active":true,"steps":0,"elapsed_f64_hex":_float_hex(0),"reason":"landing_requested","binding":_binding(ship,nav,surface)})
+	_saved=_sealed({"schema":SCHEMA,"version":1,"policy":POLICY,"mode":"landing","phase":"gear","active":true,"steps":0,"elapsed_f64_hex":_float_hex(0),"target_height_f64_hex":_float_hex(0),"launch_recontacts":0,"reason":"landing_requested","binding":_binding(ship,nav,surface)})
+	return true
+
+func configure_ascent(ship:RefCounted,nav:RefCounted,surface:RefCounted,target_height:float=1000.0)->bool:
+	if not _saved.is_empty() or not _valid_scene(ship,nav,surface) or not is_finite(target_height) or target_height<MIN_ASCENT_TARGET_M or target_height>MAX_ASCENT_TARGET_M:return false
+	var hit:Dictionary=surface.height_sample(ship.position.x,ship.position.z)
+	if hit.is_empty() or not _propulsion_ok(ship,surface):return false
+	var altitude:float=ship.position.y-float(hit.height)-surface.clearance(ship)
+	if not is_finite(altitude) or target_height<=altitude+ASCENT_HEIGHT_TOLERANCE_M:return false
+	_saved=_sealed({"schema":SCHEMA,"version":1,"policy":POLICY,"mode":"ascent","phase":"launch" if surface.landed else "ascent","active":true,"steps":0,"elapsed_f64_hex":_float_hex(0),"target_height_f64_hex":_float_hex(target_height),"launch_recontacts":0,"reason":"powered_ascent_requested","binding":_binding(ship,nav,surface)})
 	return true
 
 func is_active()->bool:return bool(_saved.get("active",false))
@@ -56,11 +72,15 @@ func fork_runtime()->RefCounted:
 	var copy:RefCounted=get_script().new();copy._saved=_saved.duplicate(true);return copy
 
 func restore(data:Dictionary,ship:RefCounted,nav:RefCounted,surface:RefCounted)->bool:
-	if not _saved.is_empty() or not _valid_scene(ship,nav,surface) or surface.landed or not Session._keys(data,KEYS):return false
-	if data.schema!=SCHEMA or not _whole(data.version,1,1) or data.policy!=POLICY or data.mode!="landing" or not data.active is bool or data.active!=true or data.phase not in LANDING_PHASES:return false
+	if not _saved.is_empty() or not _valid_scene(ship,nav,surface) or not Session._keys(data,KEYS):return false
+	if data.schema!=SCHEMA or not _whole(data.version,1,1) or data.policy!=POLICY or data.mode not in ["landing","ascent"] or not data.active is bool or data.active!=true:return false
+	if data.phase not in (LANDING_PHASES if data.mode=="landing" else ASCENT_PHASES) or (data.mode=="landing" and surface.landed):return false
 	if not _whole(data.steps,0,1000000000) or not data.reason is String or data.reason.length()>160 or not data.binding is Dictionary or not Session._keys(data.binding,BINDING_KEYS):return false
 	var elapsed:=_float(data.elapsed_f64_hex)
 	if not is_finite(elapsed) or elapsed<0 or elapsed>1e9 or (int(data.steps)==0 and elapsed!=0):return false
+	var target:=_float(data.target_height_f64_hex)
+	if not is_finite(target) or not _whole(data.launch_recontacts,0,60) or (data.mode=="landing" and (target!=0 or int(data.launch_recontacts)!=0)) or (data.mode=="ascent" and (target<MIN_ASCENT_TARGET_M or target>MAX_ASCENT_TARGET_M)):return false
+	if data.mode=="ascent" and surface.landed and data.phase!="launch":return false
 	var candidate:Dictionary=_json(data);var checksum:Variant=candidate.snapshot_sha256;candidate.erase("snapshot_sha256")
 	if not Session._hex(checksum,32) or Session._hash(candidate)!=checksum or _json(data.binding)!=_binding(ship,nav,surface):return false
 	_saved=_json(data);return true
@@ -82,9 +102,9 @@ static func _level_controls(ship:RefCounted,seconds:float)->Dictionary:
 	return {"steering":Vector2(0,clampf(-error.x*gain/rate,-1,1)),"roll":clampf(-error.z*gain*1.2/rate,-1,1),"angle_rad":angle}
 
 func prepare(ship:RefCounted,nav:RefCounted,gear:RefCounted,surface:RefCounted,seconds:float)->Dictionary:
-	if not is_active() or mode()!="landing":return _reject("guidance_inactive")
+	if not is_active() or mode() not in ["landing","ascent"]:return _reject("guidance_inactive")
 	if not is_finite(seconds) or seconds<=0 or seconds>1.0:return _reject("invalid_guidance_interval")
-	if not _valid_scene(ship,nav,surface) or surface.landed or _binding(ship,nav,surface)!=_saved.binding:return _reject("stale_guidance_binding")
+	if not _valid_scene(ship,nav,surface) or (mode()=="landing" and surface.landed) or _binding(ship,nav,surface)!=_saved.binding:return _reject("stale_guidance_binding")
 	if gear==null or gear.get_script()!=Gear or gear.snapshot().is_empty():return _reject("invalid_guidance_gear")
 	if not _propulsion_ok(ship,surface):return _reject("insufficient_vertical_propulsion")
 	var height:Dictionary=surface.height_sample(ship.position.x,ship.position.z)
@@ -92,21 +112,41 @@ func prepare(ship:RefCounted,nav:RefCounted,gear:RefCounted,surface:RefCounted,s
 	var altitude:float=ship.position.y-float(height.height)-surface.clearance(ship)
 	if not is_finite(altitude):return _reject("nonfinite_guidance_altitude")
 	var controls:=_level_controls(ship,seconds);var state:Dictionary=gear.state()
+	var available:float=maxf(0.25,ship.acceleration()-surface.gravity_vector.length())
+	if mode()=="ascent":
+		var target:=_float(_saved.target_height_f64_hex);var error:=target-altitude
+		var maximum:=8.0 if altitude<=ASCENT_CLEARANCE_M else MAX_ASCENT_MPS
+		var desired:=clampf(error*0.8,-4.0,minf(maximum,sqrt(2.0*available*maxf(error,0))*0.65))
+		var phase_name:="launch" if surface.landed else ("braking" if error<100.0 or ship.velocity.y>desired+0.5 else "ascent")
+		if not surface.landed and float(controls.angle_rad)>MAX_LEVEL_ERROR_RAD:desired=0.0;phase_name="align"
+		return {"ok":true,"reason":"ascent_guidance_prepared","guidance_policy":POLICY,"phase":phase_name,"steering":controls.steering,"roll":controls.roll,"lift":desired/60.0,"target_speed":0.0,"assisted":true,"gear_down":altitude<=ASCENT_CLEARANCE_M,"desired_vertical_mps":desired,"observed_render_altitude_m":altitude,"target_height_m":target,"height_is_orbit":false,"original_contact_decides_landing":true,"pose_written":false}
 	var deployed:bool=bool(state.get("deployed",false)) and bool(state.get("requested_down",false))
 	var phase_name:="descent" if deployed and float(controls.angle_rad)<=MAX_LEVEL_ERROR_RAD else ("gear" if not deployed else "align")
-	var available:float=maxf(0.25,ship.acceleration()-surface.gravity_vector.length())
 	var desired_velocity:=-clampf(sqrt(2.0*available*maxf(altitude,0))*0.5,MIN_DESCENT_MPS,MAX_DESCENT_MPS) if phase_name=="descent" else 0.0
 	return {"ok":true,"reason":"landing_guidance_prepared","guidance_policy":POLICY,"phase":phase_name,"steering":controls.steering,"roll":controls.roll,"lift":desired_velocity/60.0,"target_speed":0.0,"assisted":true,"gear_down":true,"desired_vertical_mps":desired_velocity,"observed_render_altitude_m":altitude,"original_contact_decides_landing":true,"pose_written":false}
 
 func observe(ship:RefCounted,nav:RefCounted,surface:RefCounted,accepted:Dictionary,seconds:float,planned_phase:String)->bool:
 	if not is_active() or not accepted.get("ok",false) or accepted.get("candidate_ship")!=ship or accepted.get("candidate_nav")!=nav or accepted.get("candidate_surface")!=surface or not _valid_scene(ship,nav,surface,bool(accepted.get("destruction_requested",false))):return false
-	if not is_finite(seconds) or seconds<=0 or seconds>1.0 or planned_phase not in LANDING_PHASES:return false
+	if not is_finite(seconds) or seconds<=0 or seconds>1.0 or planned_phase not in (LANDING_PHASES if mode()=="landing" else ASCENT_PHASES):return false
 	var candidate:Dictionary=_saved.duplicate(true);candidate.steps=int(candidate.steps)+1;candidate.elapsed_f64_hex=_float_hex(_float(candidate.elapsed_f64_hex)+seconds);candidate.binding=_binding(ship,nav,surface)
-	if surface.landed:
+	if bool(accepted.get("destruction_requested",false)):
+		candidate.active=false;candidate.phase="cancelled";candidate.reason="ship_destroyed"
+	elif mode()=="ascent":
+		if surface.landed:
+			if bool(accepted.get("stage",{}).get("landing_accepted",false)):candidate.launch_recontacts=int(candidate.launch_recontacts)+1
+			candidate.phase="launch";candidate.reason="source_park_recontact" if bool(accepted.get("stage",{}).get("landing_accepted",false)) else "source_park_retained"
+			if int(candidate.launch_recontacts)>=60:candidate.active=false;candidate.phase="cancelled";candidate.reason="launch_recontact_limit"
+		else:
+			var hit:Dictionary=surface.height_sample(ship.position.x,ship.position.z)
+			if hit.is_empty():return false
+			var altitude:float=ship.position.y-float(hit.height)-surface.clearance(ship)
+			var offset:float=_float(candidate.target_height_f64_hex)-altitude
+			if absf(offset)<=ASCENT_HEIGHT_TOLERANCE_M and absf(ship.velocity.y)<=ASCENT_SPEED_TOLERANCE_MPS and Vector2(ship.velocity.x,ship.velocity.z).length()<=ASCENT_SPEED_TOLERANCE_MPS:
+				candidate.active=false;candidate.phase="completed";candidate.reason="powered_ascent_height_reached"
+			else:candidate.phase=planned_phase;candidate.reason="powered_ascent_interval_accepted"
+	elif surface.landed:
 		if surface.native_session.phase()!="parked" or not accepted.get("stage") is Dictionary or not accepted.stage.get("landing_accepted",false):return false
 		candidate.active=false;candidate.phase="completed";candidate.reason="original_park_accepted"
-	elif bool(accepted.get("destruction_requested",false)):
-		candidate.active=false;candidate.phase="cancelled";candidate.reason="ship_destroyed"
 	else:candidate.phase=planned_phase;candidate.reason="landing_interval_accepted"
 	_saved=_sealed(candidate);return true
 
@@ -118,7 +158,7 @@ func advance(ship:RefCounted,nav:RefCounted,gear:RefCounted,surface:RefCounted,s
 	# The existing controller still runs with the real manual Flight input law.
 	# Guidance edits control intent only on private candidates, never a pose.
 	candidate_ship.assisted=true;candidate_ship.target_speed=0;candidate_ship.autopilot=false
-	var request:Dictionary=candidate_gear.command_request(true,Trial._gear_context(candidate_ship,surface))
+	var request:Dictionary=candidate_gear.command_request(bool(plan.gear_down),Trial._gear_context(candidate_ship,surface))
 	if not request.get("ok",false) or not request.get("accepted",false):return _reject("guidance_gear_request_rejected")
 	var accepted:=Trial.prepare(candidate_ship,nav,candidate_gear,surface,seconds,plan.steering,float(plan.roll),float(plan.lift))
 	if not accepted.get("ok",false):return accepted
