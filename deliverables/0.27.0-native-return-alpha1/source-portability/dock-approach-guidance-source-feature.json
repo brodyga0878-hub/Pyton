@@ -1,0 +1,52 @@
+{
+  "schema": "starfrontier-source-archive-code52-task-feature-v1",
+  "source_commit": "1909e283fa6a9d4dfd2d57245ce3af82eebd7a45",
+  "archive_sha256": "673ec87cdfb9434c778f11fb70fb0b443fb6811ca0e96f0eea534b02cbca391b",
+  "name": "dock_approach_guidance",
+  "test": "tests/test_dock_approach_guidance.gd",
+  "command": [
+    "godot",
+    "--headless",
+    "--audio-driver",
+    "Dummy",
+    "--path",
+    "/workspace/recovery/native-return-source-portability/source/StarFrontier-0.27.0-source",
+    "--script",
+    "res://tests/test_dock_approach_guidance.gd",
+    "--",
+    "--rebuild-capture"
+  ],
+  "exit_code": 0,
+  "timed_out": false,
+  "duration_seconds": 38.268275,
+  "log_file": "dock-approach-guidance-feature.log",
+  "log_sha256": "875cfd4fb03769a158a94cbaef26f49b61fbfb3945ba42d67235b9b0b94de4b5",
+  "error_markers": [],
+  "checks": 148,
+  "failures": 0,
+  "expected_checks_from_archived_final_report": 148,
+  "archived_final_report": "validation/native-return-2026-11-16/dock-approach-guidance.json",
+  "archived_final_report_sha256": "18fc2cf76e30938abc2ea596010c78bce541c320fa23635a55455d79122c792f",
+  "declared_source_pins": {
+    "scripts/dock_approach_guidance.gd": "410cd9389baa15ea1eb9ac7c0f25186d39fd2007d7de47e49756861032705922",
+    "scripts/flight_model.gd": "4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b",
+    "scripts/hyperdrive_services_view.gd": "70d828f819faeb8c8e31d12e1101ef82ce5d306f9cf329b2902600f82b5fe3f7",
+    "scripts/main.gd": "119f8a41cd13d77a4b689b3043238ad3ad5c9b419b75b4f1020ee9aed8465de8",
+    "scripts/navigation.gd": "339d9350bf84300a215d821a9c3cca31a9ea053a7369f20d311868d11521b233",
+    "scripts/planetary_system.gd": "f243ebb2699bce714386e87ca32bfdb35709a2c9c45178cac9fa6cb8874abc62",
+    "scripts/rotating_dock_dynamics.gd": "68eb63c19831a2828fa62a1c10126de099d7d4905859f905c4b93e37124206a4",
+    "scripts/source_station_geometry.gd": "5785d288a3a0582dc4f06db53fad4b6d52446d3d476adc894fa9b7624cf69b94",
+    "scripts/source_station_session.gd": "80807b1c4b0aefb42f6907ef7480e2792295017f681caa5608894290d8d85b8f",
+    "tests/test_dock_approach_guidance.gd": "25de20e4866e20f626c26b8d4010677aab463628ea23e3e060a5ac1230c74bb2"
+  },
+  "source_actual_files": 1641,
+  "all_source_files_unchanged": true,
+  "modified_files": [],
+  "private_xdg": {
+    "XDG_DATA_HOME": "/workspace/recovery/native-return-source-portability/feature_main/dock_approach_guidance/data",
+    "XDG_CONFIG_HOME": "/workspace/recovery/native-return-source-portability/feature_main/dock_approach_guidance/config",
+    "XDG_CACHE_HOME": "/workspace/recovery/native-return-source-portability/feature_main/dock_approach_guidance/cache"
+  },
+  "physical_device_tested": false,
+  "ok": true
+}
