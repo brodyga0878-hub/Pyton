@@ -53,6 +53,7 @@ const ContactGeometryView=preload("res://scripts/native_contact_geometry_view.gd
 const NativeSurface=preload("res://scripts/native_surface_model.gd")
 const NativeTrial=preload("res://scripts/native_landing_trial.gd")
 const NativeSurfaceView=preload("res://scripts/source_native_surface_visual.gd")
+const NativeAutopilot=preload("res://scripts/native_surface_autopilot.gd")
 const Diagnostics=preload("res://scripts/game_diagnostics.gd")
 const ReportExport=preload("res://scripts/report_export.gd")
 const DockServices=preload("res://scripts/training_dock_services.gd")
@@ -73,6 +74,7 @@ var settings:=Settings.new()
 var saves:=SaveStore.new()
 var native_saves:=SaveStore.new()
 var native_trial_return:Dictionary={}
+var native_autopilot:RefCounted
 var presentation:=Presentation.new()
 var camera:Camera3D
 var flight_view_rect:=Rect2()
@@ -188,6 +190,7 @@ func _ready()->void:
 func _new_models(layout:String=World.PORT_LAYOUT)->void:
 	_close_map(false)
 	native_trial_return.clear()
+	native_autopilot=null
 	instruments.reset();flight_time.reset();last_view="";target_site_id="";target_reference.clear();_thermal_notice_level="";source_contact_last.clear();source_contact_error="";_source_contact_interval.clear()
 	source_alignment_last.clear()
 	source_footprint_last.clear()
@@ -202,6 +205,11 @@ func _new_models(layout:String=World.PORT_LAYOUT)->void:
 
 func _gear_enabled()->bool:return world!=null and world.layout_mode==World.FULL_LAYOUT
 func _native_surface_active()->bool:return surface is NativeSurface and surface.is_native_landing_trial()
+func _native_auto_active()->bool:return _native_surface_active() and native_autopilot!=null and native_autopilot.is_active()
+func _cancel_native_auto(reason:String="manual_control")->void:
+	if native_autopilot==null:return
+	if native_autopilot.is_active():native_autopilot.cancel(reason);_record_event("native_autopilot_cancelled",{"reason":reason})
+	native_autopilot=null
 
 func _gear_context()->Dictionary:
 	# The complete source player-state dispatcher is not yet connected. Manual
@@ -558,7 +566,9 @@ func _tick(dt:float,steering:Vector2,roll:float,lift:=0.0)->void:
 	_finish_flight_interval(dt,fuel_commands,save_after_fuel)
 
 func _tick_native_surface(dt:float,steering:Vector2,roll:float,lift:float)->void:
-	var result:Dictionary=NativeTrial.prepare(ship,nav,landing_gear,surface,dt,steering,roll,lift)
+	if _native_auto_active() and (steering.length()>0.04 or absf(roll)>0.05 or absf(lift)>0.1):_cancel_native_auto("manual_input")
+	var guided:=_native_auto_active()
+	var result:Dictionary=native_autopilot.advance(ship,nav,landing_gear,surface,dt) if guided else NativeTrial.prepare(ship,nav,landing_gear,surface,dt,steering,roll,lift)
 	if not result.get("ok",false):
 		var reason:=str(result.get("reason","native_interval_rejected"))
 		if source_contact_error!=reason:
@@ -568,6 +578,7 @@ func _tick_native_surface(dt:float,steering:Vector2,roll:float,lift:float)->void
 	# The controller has not changed any live owner. Publish the complete
 	# accepted interval together, including the original HP/fuel/RNG owner.
 	ship=result.candidate_ship;nav=result.candidate_nav;landing_gear=result.candidate_gear;surface=result.candidate_surface
+	if guided:native_autopilot=result.candidate_pilot
 	source_contact_error=""
 	var stage:Dictionary=result.stage
 	source_contact_last={"mode":"native_manual_trial","policy":result.policy,"generation":surface.native_session.generation(),"contact_detected":bool(stage.get("contact_detected",false)),"landing_accepted":bool(stage.get("landing_accepted",false)),"parked_idle":bool(stage.get("parked_idle",false)),"damage_calls":stage.get("damage_calls",[]).duplicate(true),"receipt":result.interval_receipt.duplicate(true),"destruction_requested":bool(result.destruction_requested)}
@@ -579,7 +590,7 @@ func _tick_native_surface(dt:float,steering:Vector2,roll:float,lift:float)->void
 	if bool(result.destruction_requested):_record_event("native_trial_ship_destroyed",source_contact_last);_announce("Корабль испытания потерян. Возврат к основному полёту доступен в меню.")
 
 func _native_return_state()->Dictionary:
-	return {"ship":ship,"nav":nav,"world":world,"surface":surface,"landing_gear":landing_gear,"saving_enabled":saving_enabled,"source_motion":source_motion,"source_motion_enabled":source_motion_enabled,"target_site_id":target_site_id,"target_reference":target_reference.duplicate(true),"paused":instruments.paused,"source_contact_last":source_contact_last.duplicate(true),"source_contact_error":source_contact_error,"source_alignment_last":source_alignment_last.duplicate(true),"source_footprint_last":source_footprint_last.duplicate(true),"source_geometry_last":source_geometry_last.duplicate(true),"last_motion_result":last_motion_result.duplicate(true)}
+	return {"ship":ship,"nav":nav,"world":world,"surface":surface,"landing_gear":landing_gear,"native_autopilot":native_autopilot,"saving_enabled":saving_enabled,"source_motion":source_motion,"source_motion_enabled":source_motion_enabled,"target_site_id":target_site_id,"target_reference":target_reference.duplicate(true),"paused":instruments.paused,"source_contact_last":source_contact_last.duplicate(true),"source_contact_error":source_contact_error,"source_alignment_last":source_alignment_last.duplicate(true),"source_footprint_last":source_footprint_last.duplicate(true),"source_geometry_last":source_geometry_last.duplicate(true),"last_motion_result":last_motion_result.duplicate(true)}
 
 func _start_native_landing_trial()->bool:
 	if busy or not graphics_return.is_empty() or not native_trial_return.is_empty() or _native_surface_active():return false
@@ -605,6 +616,7 @@ func _exit_native_landing_trial()->bool:
 	if busy or native_trial_return.is_empty():return false
 	_release_inputs();var saved:=native_trial_return
 	ship=saved.ship;nav=saved.nav;world=saved.world;surface=saved.surface;landing_gear=saved.landing_gear
+	native_autopilot=saved.get("native_autopilot")
 	saving_enabled=bool(saved.saving_enabled);source_motion=saved.source_motion;source_motion_enabled=bool(saved.source_motion_enabled)
 	target_site_id=str(saved.target_site_id);target_reference=saved.target_reference.duplicate(true);last_motion_result=saved.last_motion_result.duplicate(true)
 	source_contact_last=saved.source_contact_last.duplicate(true);source_contact_error=str(saved.source_contact_error)
@@ -635,7 +647,7 @@ func _load_native_landing_trial()->bool:
 
 func _native_trial_diagnostic()->Dictionary:
 	if not _native_surface_active():return {"active":false}
-	return {"active":true,"policy":NativeTrial.POLICY,"source_generation":surface.native_session.generation(),"phase":surface.native_session.phase(),"surface_identity":surface.native_provider.snapshot_identity(),"landed":surface.landed,"save_generation":native_saves.sequence,"separate_save":true,"clock_f64_hex":NativeSurface._native_floats([nav.elapsed_days],8),"raw_body_hex":surface.native_session.raw_body().hex_encode(),"physical_autopilot_connected":false}
+	return {"active":true,"policy":NativeTrial.POLICY,"source_generation":surface.native_session.generation(),"phase":surface.native_session.phase(),"surface_identity":surface.native_provider.snapshot_identity(),"landed":surface.landed,"save_generation":native_saves.sequence,"separate_save":true,"clock_f64_hex":NativeSurface._native_floats([nav.elapsed_days],8),"raw_body_hex":surface.native_session.raw_body().hex_encode(),"physical_autopilot_connected":_native_auto_active(),"autopilot_phase":native_autopilot.phase() if native_autopilot!=null else "idle","original_autopilot_complete":false}
 
 func _finish_surface_interval(frame:int,was_landed:bool)->bool:
 	if frame!=surface.frame_index:
@@ -954,7 +966,8 @@ func _refresh_hud()->void:
 	else:target_label.text="%s · до цели %.0f м"%[navigation_target.label,ship.position.distance_to(target)]
 	if _native_surface_active():
 		hud.text="ИСПЫТАНИЕ ИСХОДНОЙ ПОСАДКИ · %s · %s"%[ship.profile().name,state]
-		auto_button.text="Ручная посадка";surface_button.text="Взлететь" if surface.landed else "Ручная посадка"
+		auto_button.text="Отмена" if _native_auto_active() else ("Автовзлёт" if surface.landed else "Автопосадка");surface_button.text="Взлететь" if surface.landed else "Ручная посадка"
+		if _native_auto_active():hud.text="АВТОПОСАДКА · %s · %s"%[ship.profile().name,native_autopilot.phase()]
 		target_label.text="%s · исходный контакт\nВысота над видимой гранью %.2f м"%[world.by_id[world.focus_id].name,surface.altitude(ship)]
 	var console_state:={
 		"actual_speed_mps":ship.velocity.length(),"target_speed_mps":ship.target_speed,
@@ -1037,10 +1050,12 @@ func _announce(text:String)->void:
 	if settings_panel and settings_panel.visible:settings_panel.feedback.text=text
 func _set_speed(value:float)->void:
 	if instruments.paused or not surface.pending_source_contact().is_empty():return
+	_cancel_native_auto("speed_command")
 	ship.autopilot=false;ship.target_speed=clampf(value,-100,ship.MAX_SPEED)
 	if surface.active:surface.landing=false;surface.cancel_vertical()
 func _brake()->void:
 	if _paused_command():return
+	_cancel_native_auto("brake_command")
 	ship.brake();_release_inputs()
 	if surface.active:surface.landing=false;surface.cancel_vertical()
 	if nav.remaining>0:nav.cancel_jump()
@@ -1049,7 +1064,12 @@ func _brake()->void:
 	_announce("Торможение и удержание скорости.")
 func _toggle_auto()->void:
 	if _paused_command():return
-	if _native_surface_active():_announce("В этом испытании посадка ручная. Автопилот подключается следующим блоком.");return
+	if _native_surface_active():
+		if _native_auto_active():_cancel_native_auto("auto_button");_announce("Автопосадка отменена. Управление возвращено пилоту.");_refresh_hud();return
+		if surface.landed:_begin_departure_action();return
+		var pilot:=NativeAutopilot.new()
+		if not pilot.configure_land(ship,nav,surface):_announce("Автопосадка недоступна: проверьте тягу, скорость и положение корабля.");return
+		_release_inputs();native_autopilot=pilot;_close_menu();_refresh_hud();_record_event("native_autoland_started",_native_trial_diagnostic());_announce("Автопосадка: подготовка шасси и снижение. Ручное управление или «Тормозить» отменяют её.");return
 	if ship.hull<=0:return
 	if surface.active:
 		if surface.landed:_begin_departure_action()
@@ -1080,6 +1100,7 @@ func _begin_departure_action()->bool:
 	return accepted
 func _takeoff_action()->bool:
 	if _paused_command():return false
+	_cancel_native_auto("manual_takeoff")
 	var previous_controls:=_input_diagnostic_state()
 	_release_inputs()
 	var accepted:bool=surface.take_off(ship)
@@ -1207,6 +1228,7 @@ func _control_mode_available()->bool:
 
 func _toggle_control_mode()->void:
 	if not _control_mode_available() or _blocked():return
+	_cancel_native_auto("control_mode_command")
 	_release_inputs();ship.autopilot=false
 	if surface.active:surface.landing=false;surface.cancel_vertical()
 	ship.assisted=not ship.assisted
@@ -1256,8 +1278,9 @@ func _show_equipment()->void:
 func _show_menu()->void:
 	_open_menu("КОМАНДИР")
 	if _native_surface_active():
-		_menu_text("Отдельное испытание ручной посадки по исходной геометрии. Сохранения испытания хранятся отдельно. Посадка: шасси и осторожное снижение; взлёт: «Взлететь» и тяга вверх.")
+		_menu_text("Отдельное испытание посадки по исходной геометрии. «Автопосадка» управляет тягой и шасси; ручные команды отменяют её. Сохранения испытания хранятся отдельно. Ручной взлёт: «Взлететь» и тяга вверх.")
 		_menu_action("Продолжить испытание",_close_menu)
+		if not surface.landed:_menu_action("Остановить автопосадку" if _native_auto_active() else "Автопосадка",_toggle_auto)
 		_menu_action("Сохранить испытание",func():
 			if _native_save_game():_announce("Испытание сохранено.");_close_menu())
 		_menu_action("Загрузить сохранённое испытание",_load_native_landing_trial)
@@ -1758,6 +1781,10 @@ func _payload()->Dictionary:
 		if source_motion.is_active() and not source_motion.synchronized(world,ship,nav.elapsed_days):source_motion.reset()
 		var snapshot:Dictionary=source_motion.snapshot() if MotionBridge.eligible(world,ship,surface.active) else {}
 		result.motion_session={"version":1,"profile":MotionBridge.CONTRACT,"enabled":true,"state":snapshot}
+	if _native_auto_active():
+		var automatic:Dictionary=native_autopilot.snapshot()
+		if automatic.is_empty():return {}
+		result.native_autopilot_session=automatic
 	return result
 func _decode_state(data:Dictionary)->Dictionary:
 	if data.get("schema")!="starfrontier-rebuild-game-v1":return {}
@@ -1819,7 +1846,12 @@ func _decode_state(data:Dictionary)->Dictionary:
 			# carries their exact IEEE64 bits alongside the fractional ticks.
 			if candidate_motion.is_active():candidate_nav.elapsed_days=candidate_motion.elapsed_days()
 		elif not motion.state.is_empty():return {}
-	return {"ship":candidate_ship,"nav":candidate_nav,"world":candidate_world,"surface":candidate_surface,"target_site_id":candidate_target,"source_motion_enabled":candidate_motion_enabled,"source_motion":candidate_motion,"landing_gear":candidate_gear}
+	var candidate_autopilot:RefCounted
+	if data.has("native_autopilot_session"):
+		if not native_data or not data.native_autopilot_session is Dictionary:return {}
+		candidate_autopilot=NativeAutopilot.new()
+		if not candidate_autopilot.restore(data.native_autopilot_session,candidate_ship,candidate_nav,candidate_surface):return {}
+	return {"ship":candidate_ship,"nav":candidate_nav,"world":candidate_world,"surface":candidate_surface,"target_site_id":candidate_target,"source_motion_enabled":candidate_motion_enabled,"source_motion":candidate_motion,"landing_gear":candidate_gear,"native_autopilot":candidate_autopilot}
 func _commit_state(data:Dictionary)->void:
 	_close_map(false)
 	ship=data.ship;nav=data.nav;world=data.world;surface=data.surface;near.clear();instruments.reset();flight_time.reset();last_view=""
@@ -1827,6 +1859,7 @@ func _commit_state(data:Dictionary)->void:
 	source_footprint_last.clear()
 	source_geometry_last.clear()
 	landing_gear=data.get("landing_gear")
+	native_autopilot=data.get("native_autopilot")
 	if landing_gear==null:landing_gear=LandingGearSession.new();landing_gear.configure(surface.landed or ship.docked)
 	target_site_id=str(data.get("target_site_id",""));target_reference.clear()
 	source_motion_enabled=bool(data.get("source_motion_enabled",false));source_motion=data.get("source_motion",MotionBridge.new());last_motion_result.clear()
