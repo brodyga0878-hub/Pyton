@@ -11,6 +11,22 @@ ZIP содержит текущий проект Godot, все рабочие и
 скрипты, сцены, тесты, инструменты сборки и генераторы текстур, документацию
 и исторически восстановленные исходные фрагменты.
 
+<!-- NATIVE_RETURN_CURRENT_BEGIN -->
+Подготавливается точный ZIP **0.27.0-native-return-alpha1 / code 52**.
+Все текущие runtime/assets/данные/тесты/инструменты и recovered-history
+сохраняются. Добавлены модуль обратного перехода, помощь при стыковке
+и переносимый code51 baseline. Размер остаётся меньше 32 МиБ.
+
+В новый ZIP не дублируются прежние QA-отчёты/журналы 0.26 из
+`validation/native-autopilot-2026-11-16/`, кроме обязательного
+`runtime-freeze.json`, и её историческая `native-autopilot-source-portability`.
+Эти материалы остаются в GitHub и точном ZIP 0.26 ниже. Прежняя политика
+исключения двух recovery ZIP и дублирующих QA 0.25 сохраняется;
+весь необходимый `native-proof/`, исходники и код проверок включены.
+Ни один файл репозитория не удаляется. Точные SHA/счётчики/коммит
+и проверка чистого архива будут закреплены после freeze.
+<!-- NATIVE_RETURN_CURRENT_END -->
+
 <!-- NATIVE_AUTOPILOT_CURRENT_BEGIN -->
 Опубликован **0.26.0-native-autopilot-alpha1 / code 51**.
 [Скачать точный ZIP](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/a5782a1d90804ff4b7cab9e1c07b9e71f046ad55/deliverables/0.26.0-native-autopilot-alpha1/StarFrontier-0.26.0-native-autopilot-source.zip) из коммита

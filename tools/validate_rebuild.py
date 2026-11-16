@@ -44,6 +44,11 @@ class Suite:
 
 
 SUITES = [
+    Suite('native_orbit_return', 'tests/test_native_orbit_return.gd', 'Actual inverse F64 frame transfer, airborne raw-history rebind, strict cold continuation and atomic no-contact rejection.', timeout=900),
+    Suite('native_return_main', 'tests/test_native_return_main.gd', 'Actual classic-console surface return after protected20km flight, unchanged physical owners and exact cold continuation.', timeout=900, user_args=('--rebuild-capture',)),
+    Suite('native_return_descent', 'tests/test_native_return_descent.gd', 'Actual20km return descent, thrust-only braking, real gear approach and exact cold source-contact landing.', timeout=900),
+    Suite('native_return_descent_main', 'tests/test_native_return_descent_main.gd', 'Actual Auto return/landing, mid-descent cold, full diagnostic ZIP, manual cancellation and protected ordinary progress.', timeout=900, user_args=('--rebuild-capture',)),
+    Suite('dock_approach_guidance', 'tests/test_dock_approach_guidance.gd', 'Read-only rotating dock criteria and actual Main clearance/approach/services/departure with retained legacy docking.', timeout=900, user_args=('--rebuild-capture',)),
     Suite('native_surface_autopilot', 'tests/test_native_surface_autopilot.gd', 'Actual filtered guidance, original accepted park, cold continuation and atomic source owners.', timeout=900),
     Suite('native_surface_ascent', 'tests/test_native_surface_ascent.gd', 'Actual powered source-park release, gear clearance, unsnapped ascent and cold propulsion.', timeout=900),
     Suite('native_orbit_trial', 'tests/test_native_orbit_trial.gd', 'Continuous source chart/world handoff, private source gravity/fuel space intervals, F64 movement and cold lineage.', timeout=900),

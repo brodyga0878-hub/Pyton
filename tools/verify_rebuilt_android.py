@@ -2820,6 +2820,190 @@ def verify_native_autopilot_runtime(archive,project):
     return {'version':NATIVE_AUTOPILOT_VERSION,'version_code':51,'baseline_source_commit':NATIVE_AUTOPILOT_BASELINE_SOURCE_COMMIT,'baseline_fixture_sha256':NATIVE_AUTOPILOT_BASELINE_FIXTURE_SHA256,'baseline_runtime_source_count':52,'baseline_stored_runtime_source_delta_count':9,'baseline_metadata_source_count':2,'baseline_requires_Git':False,'compiled_module_count':2,'compiled_modules':{name:compiled[name]for name in NATIVE_AUTOPILOT_MODULES},'integration_compiled_module_count':len(compiled),'integration_compiled_modules':compiled,'audited_local_source_sha256':NATIVE_AUTOPILOT_AUDITED_SOURCE_SHA256,'protected_functions':functions,'automatic_trial_scope':scope,'metadata':metadata,'retained_runtime_inputs':runtime,'retained_code50_source_audit':audit,'unchanged_code50_runtime_source_count':51,'actual_runtime_is_unchanged_code50':False,'full_original_port_complete':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
 
 
+# Code52: exact code51 source history is portable; archive bytes are always current.
+NATIVE_RETURN_VERSION='0.27.0-native-return-alpha1'
+NATIVE_RETURN_BASELINE_SOURCE_COMMIT='347f0b44c700ba4c8aeede3fd3c1cdc8ad2d4ef9'
+NATIVE_RETURN_BASELINE_FIXTURE_PATH='tests/fixtures/code51_native_return_sources.json'
+NATIVE_RETURN_BASELINE_FIXTURE_SHA256='693127a6dd7e4effc52120246d51e32dfb54fe5aa7ffef4e812fe213901479bf'
+NATIVE_RETURN_BASELINE_METADATA_SHA256={'scripts/build_info.gd':'9fe061bbbef2b960729a35d73e3db0c72f492ebc3a5a8e8858ded3b1ef554f21','export_presets.cfg':'b202542f13c4c9a1870c26e56a750c4869273373481f64ed86d18068d37f350c'}
+NATIVE_RETURN_RUNTIME_BASELINE_PATH='validation/native-autopilot-2026-11-16/runtime-freeze.json'
+NATIVE_RETURN_RUNTIME_BASELINE_SHA256='a8b0a9b9b4ccff939a8e336296a2999667f7894fa3c56641959b497831fcb91d'
+NATIVE_RETURN_MODULES=('native_orbit_return','dock_approach_guidance')
+NATIVE_RETURN_CHANGED_RUNTIME_SOURCES={'scripts/main.gd','scripts/native_surface_autopilot.gd','scripts/native_surface_model.gd'}
+# Exact code52 sources and method inventories sealed after all three feature suites.
+# Runtime verification never learns allowed bytes from a live checkout.
+NATIVE_RETURN_AUDITED_SOURCE_SHA256={**NATIVE_AUTOPILOT_AUDITED_SOURCE_SHA256,
+    'scripts/main.gd':'119f8a41cd13d77a4b689b3043238ad3ad5c9b419b75b4f1020ee9aed8465de8',
+    'scripts/native_surface_autopilot.gd':'fedc1eab979e497bc3233cdb58f4e20d3cc06203f92ecfe90e8e0cf475776733',
+    'scripts/native_surface_model.gd':'7753220ae61c5194d6d4b7f51ebc017052579e58ba515987bb5ebf7ee9713fee',
+    'scripts/native_orbit_return.gd':'3a55a0cbabfe0ce051bab9a0bbabd8cd79a5121dfd4b0606f817ee3eb641bc89',
+    'scripts/dock_approach_guidance.gd':'410cd9389baa15ea1eb9ac7c0f25186d39fd2007d7de47e49756861032705922',
+}
+NATIVE_RETURN_ALLOWED_CHANGED_FUNCTIONS={
+    'scripts/main.gd':{'_dock_action','_native_auto_phase_label','_refresh_hud','_show_menu','_surface_action','_toggle_auto'},
+    'scripts/native_surface_autopilot.gd':{'observe','prepare','restore'},
+    'scripts/native_surface_model.gd':set(),
+}
+NATIVE_RETURN_ADDED_FUNCTIONS={
+    'scripts/main.gd':{'_begin_native_return_landing','_begin_native_surface_return','_native_descent_protected','_request_dock_clearance','_show_docking_guidance'},
+    'scripts/native_surface_autopilot.gd':{'_phases','configure_descent'},
+    'scripts/native_surface_model.gd':{'rebind_airborne'},
+}
+
+
+def _load_native_return_baseline(project):
+    raw=(project/NATIVE_RETURN_BASELINE_FIXTURE_PATH).read_bytes()
+    assert hashlib.sha256(raw).hexdigest()==NATIVE_RETURN_BASELINE_FIXTURE_SHA256,'Changed portable code51 native-return source delta'
+    data=json.loads(raw)
+    assert data.get('schema')==1 and data.get('revision')=='portable-code51-source-delta-v1' and data.get('source_commit')==NATIVE_RETURN_BASELINE_SOURCE_COMMIT and data.get('version_code')==51 and data.get('version')==NATIVE_AUTOPILOT_VERSION,'Wrong portable code51 native-return baseline identity'
+    assert data.get('base_fixture')=={'path':'tests/fixtures/native_autopilot_v50_sources.json','sha256':NATIVE_AUTOPILOT_BASELINE_FIXTURE_SHA256,'runtime_source_count':52,'evidence_source_count':1},'Wrong portable code51 native-return base link'
+    base=_load_native_autopilot_baseline(project)
+    overrides=data.get('source_overrides',{})
+    assert set(overrides)=={'scripts/main.gd',*('scripts/'+name+'.gd'for name in NATIVE_AUTOPILOT_MODULES)},'Wrong portable code51 native-return runtime delta domain'
+    files={relative:dict(row)for relative,row in base['files'].items()}
+    for relative,row in overrides.items():
+        digest=NATIVE_AUTOPILOT_AUDITED_SOURCE_SHA256[relative]
+        assert row.get('sha256')==digest and hashlib.sha256(row.get('source','').encode()).hexdigest()==digest,'Changed portable code51 source delta '+relative
+        files[relative]=dict(row)
+    assert data.get('audited_runtime_source_sha256')==NATIVE_AUTOPILOT_AUDITED_SOURCE_SHA256 and data.get('expanded_runtime_source_count')==len(files)==54 and {path:row['sha256']for path,row in files.items()}==NATIVE_AUTOPILOT_AUDITED_SOURCE_SHA256,'Wrong expanded portable code51 source domain'
+    metadata=data.get('metadata_source_files',{})
+    assert set(metadata)==set(NATIVE_RETURN_BASELINE_METADATA_SHA256),'Wrong portable code51 metadata domain'
+    for relative,row in metadata.items():
+        digest=NATIVE_RETURN_BASELINE_METADATA_SHA256[relative]
+        assert row.get('sha256')==digest and hashlib.sha256(row.get('source','').encode()).hexdigest()==digest,'Changed portable code51 metadata '+relative
+    assert data.get('runtime_freeze')=={'path':NATIVE_RETURN_RUNTIME_BASELINE_PATH,'sha256':NATIVE_RETURN_RUNTIME_BASELINE_SHA256,'runtime_input_count':467},'Wrong portable code51 runtime-freeze link'
+    return {**data,'files':files,'evidence_source_files':base['evidence_source_files']}
+
+
+def _verify_native_return_preserved_functions(project,baseline):
+    kept={};changed={};added={}
+    assert set(NATIVE_RETURN_ALLOWED_CHANGED_FUNCTIONS)==set(NATIVE_RETURN_ADDED_FUNCTIONS)==NATIVE_RETURN_CHANGED_RUNTIME_SOURCES,'Wrong code52 function exception domain'
+    for relative in sorted(NATIVE_RETURN_CHANGED_RUNTIME_SOURCES):
+        old=baseline['files'][relative]['source'];current=(project/relative).read_text()
+        old_names=set(re.findall(r'^(?:static\s+)?func\s+([A-Za-z0-9_]+)\(',old,re.M))
+        current_names=set(re.findall(r'^(?:static\s+)?func\s+([A-Za-z0-9_]+)\(',current,re.M))
+        assert old_names<=current_names and current_names-old_names==NATIVE_RETURN_ADDED_FUNCTIONS[relative],'Native return changed declared function inventory '+relative
+        kept[relative]={};changed[relative]={};added[relative]={}
+        assert NATIVE_RETURN_ALLOWED_CHANGED_FUNCTIONS[relative]<=old_names,'Native return declared an unknown old method '+relative
+        for name in sorted(old_names):
+            previous=source_function(old,name).rstrip('\n');actual=source_function(current,name).rstrip('\n')
+            digest=hashlib.sha256(actual.encode()).hexdigest()
+            if name in NATIVE_RETURN_ALLOWED_CHANGED_FUNCTIONS[relative]:
+                assert actual!=previous,'Native return exception no longer describes a changed function '+relative+':'+name
+                changed[relative][name]=digest
+            else:
+                assert actual==previous,'Native return changed protected function '+relative+':'+name
+                kept[relative][name]=digest
+        for name in sorted(NATIVE_RETURN_ADDED_FUNCTIONS[relative]):added[relative][name]=hashlib.sha256(source_function(current,name).rstrip('\n').encode()).hexdigest()
+    unchanged={path:digest for path,digest in NATIVE_AUTOPILOT_AUDITED_SOURCE_SHA256.items()if path not in NATIVE_RETURN_CHANGED_RUNTIME_SOURCES}
+    assert len(unchanged)==51 and all(NATIVE_RETURN_AUDITED_SOURCE_SHA256.get(path)==digest for path,digest in unchanged.items()),'Native return changed a protected code51 core pin'
+    for relative,digest in unchanged.items():
+        assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==digest,'Native return changed protected code51 core source '+relative
+    return {'preserved':kept,'modified':changed,'added':added,'unchanged_code51_core_source_count':len(unchanged),'unchanged_code51_core_source_sha256':unchanged,'original_contact_fuel_clock_and_orbit_sources_unchanged':True}
+
+
+def _verify_native_return_runtime_baseline(project):
+    raw=(project/NATIVE_RETURN_RUNTIME_BASELINE_PATH).read_bytes()
+    assert hashlib.sha256(raw).hexdigest()==NATIVE_RETURN_RUNTIME_BASELINE_SHA256,'Changed immutable code51 runtime freeze'
+    data=json.loads(raw);frozen=data.get('files_sha256',{})
+    assert data.get('version')==NATIVE_AUTOPILOT_VERSION and data.get('version_code')==51 and data.get('files')==len(frozen)==467,'Wrong immutable code51 runtime domain'
+    allowed={*NATIVE_RETURN_CHANGED_RUNTIME_SOURCES,'scripts/build_info.gd','export_presets.cfg'}
+    preserved={};changed={}
+    for relative,digest in frozen.items():
+        assert isinstance(relative,str) and isinstance(digest,str) and len(digest)==64,'Invalid code51 runtime freeze entry'
+        actual=hashlib.sha256((project/relative).read_bytes()).hexdigest()
+        if relative in allowed:
+            assert actual!=digest,'Native return runtime exception no longer describes a changed file '+relative
+            changed[relative]=actual
+        else:
+            assert actual==digest,'Native return changed protected code51 runtime input '+relative
+            preserved[relative]=digest
+    assert set(changed)==allowed and len(preserved)==462,'Unexpected code52 runtime change domain'
+    return {'baseline_path':NATIVE_RETURN_RUNTIME_BASELINE_PATH,'baseline_sha256':NATIVE_RETURN_RUNTIME_BASELINE_SHA256,'baseline_version_code':51,'previous_runtime_file_count':467,'unchanged_runtime_file_count':462,'changed_runtime_file_count':5,'changed_runtime_source_sha256':changed,'protected_runtime_input_count':462,'runtime_assets_copied_for_validation':False,'all_old_undeclared_runtime_inputs_byte_exact':True}
+
+
+def _verify_native_return_metadata(project):
+    info=(project/'scripts/build_info.gd').read_text();preset=preset_values(project/'export_presets.cfg')
+    assert re.search(r'^const\s+VERSION\s*:=\s*"'+re.escape(NATIVE_RETURN_VERSION)+r'"\s*$',info,re.M) and re.search(r'^const\s+VERSION_CODE\s*:=\s*52\s*$',info,re.M),'Native return UI/diagnostic version differs from code52'
+    assert preset['version_code']==52 and preset['version']==NATIVE_RETURN_VERSION,'Native return Android preset version differs from code52'
+    return {'version':NATIVE_RETURN_VERSION,'version_code':52,'ui_and_preset_match':True,'source_sha256':{path:hashlib.sha256((project/path).read_bytes()).hexdigest()for path in ('scripts/build_info.gd','export_presets.cfg')}}
+
+
+def _verify_native_return_motion_scope(project):
+    # Check retained real code51 consumers against the current code52 source,
+    # independently of the separate historical source audit below.
+    retained=_verify_native_autopilot_scope(project)
+    main=(project/'scripts/main.gd').read_text();inverse=(project/'scripts/native_orbit_return.gd').read_text();surface=(project/'scripts/native_surface_model.gd').read_text();pilot=(project/'scripts/native_surface_autopilot.gd').read_text()
+    assert 'const NativeReturn=preload("res://scripts/native_orbit_return.gd")' in main and 'const POLICY:="native-trial-inverse-affine-airborne-return-v1"' in inverse,'Wrong bounded inverse return contract'
+    prepare=source_function(inverse,'prepare_return');origin=source_function(inverse,'_outbound_surface')
+    assert 'orbit._matches(ship,nav,world,gear)' in prepare and 'Orbit._valid(ship,nav,world)' in prepare and '_outbound_surface(orbit,nav)' in prepare,'Inverse return must validate current bound space owners and original lineage'
+    assert 'source_ship.restore(data.ship)' in origin and 'source_world.restore(data.world)' in origin and 'surface.restore(data.surface,source_ship,source_world)' in origin,'Inverse return must reuse the actual witnessed chart rather than create a new trial entry'
+    positions=[prepare.index(token)for token in ('Trial._fork_ship(ship)','orbit._position_f64[axis]-float(center[axis])','Phone.to_local_vector(Basis(rotation.basis),relative)','Phone.to_local_vector(chart,bodyfixed)','cs.position=Vector3(local[0],local[1],local[2])','source.fork_runtime(cs)','surface.rebind_airborne(','cn.bind_thermal_ship(cs)')]
+    assert positions==sorted(positions),'Inverse affine return must preserve the double position until its final local projection and validate private candidates'
+    assert 'Phone.to_local_vector(chart,body_velocity)' in prepare and 'cs.velocity=Vector3(velocity[0],velocity[1],velocity[2])' in prepare and 'Basis(rotation.basis).inverse()*Basis(ship.attitude)' in prepare,'Inverse return must rotate actual velocity and attitude at the same time'
+    assert 'source.height_sample(cs.position.x,cs.position.z)' in prepare and 'agl<MIN_RETURN_AGL_M or agl>MAX_RETURN_AGL_M' in prepare,'Inverse return must remain inside its observed leaf and declared airborne height limits'
+    assert not re.search(r'\b(?:ship|cs)\.velocity\s*=\s*Vector3\.ZERO',prepare) and not re.search(r'\bship\.(?:position|velocity|attitude)\s*(?:[+*/-]?=(?!=))',inverse),'Inverse return must not zero actual speed or mutate live space owners'
+    assert not re.search(r'\b(?:ship|cs)\.hull\s*(?:[+*/-]?=(?!=))',inverse) and not re.search(r'\.elapsed_days\s*(?:[+*/-]?=(?!=))',inverse) and not any(token in inverse for token in ('.enter(','.leave(','.protect(','.protect_surface(','.advance_fuel_seconds(')),'Inverse return must not reset the trial, relocate to a safe height or simulate another HP/fuel/time interval'
+    assert all(token in prepare for token in ('"clock_advanced":false','"fuel_advanced":false','"hp_applied":false','"position_snapped":false','"omega_cross_radius_added":false','"full_original_object_bank":false','"candidate_orbit":null')),'Inverse return must retain explicit zero-cost boundary and bounded velocity policy'
+    rebind=source_function(surface,'rebind_airborne')
+    assert 'native_session.phase()!="free"' in rebind and 'proposed.native_session.prepare(' in rebind and 'prepared.contact_detected or prepared.response_applied or prepared.landing_accepted' in rebind and 'not prepared.damage_calls.is_empty() or not prepared.callbacks.is_empty()' in rebind,'Airborne return must be witnessed by the real source classifier without collision, damage or callbacks'
+    positions=[rebind.index(token)for token in ('var proposed:=fork_runtime(ship)','proposed.native_session.prepare(','proposed.native_session.commit(','native_session=proposed.native_session','_native_anchor(ship)')]
+    assert positions==sorted(positions),'Airborne anchor must commit its private classification before publication'
+    assert not re.search(r'\bship\.(?:position|velocity|attitude|hull)\s*(?:[+*/-]?=(?!=))',rebind),'Airborne source rebind must not change the already-reached physical pose'
+    command=source_function(main,'_begin_native_surface_return')
+    positions=[command.index(token)for token in ('NativeReturn.prepare_return(','_native_descent_protected(prepared.candidate_ship','pilot.configure_descent(prepared.candidate_ship','ship=prepared.candidate_ship')]
+    assert positions==sorted(positions) and 'native_orbit_trial=null;native_autopilot=pilot' in command,'Guided return must prepare and validate descent on private candidates before replacing live owners'
+    assert '_begin_native_surface_return(true)' in source_function(main,'_begin_native_return_landing') and '_begin_native_return_landing()' in source_function(main,'_toggle_auto') and '_begin_native_surface_return()' in source_function(main,'_surface_action'),'Actual Auto and surface buttons must expose guided and manual return'
+    protection=source_function(main,'_native_descent_protected')
+    assert 'AtmosphereContact.new().sample(' in protection and 'candidate_nav.fuel_state(candidate_ship)' in protection and 'atmospheric_shielding_installed' in protection,'Long atmospheric descent must check actual installed equipment'
+    assert '"return_landing"' in source_function(pilot,'configure_descent') and '"entry"' in source_function(pilot,'configure_descent') and 'data.phase not in _phases(str(data.mode))' in source_function(pilot,'restore'),'Return descent must persist its own real mode and validate its phase after cold decoding'
+    plan=source_function(pilot,'prepare')
+    assert 'mode()=="return_landing" and altitude>RETURN_GEAR_HEIGHT_M' in plan and 'sqrt(2.0*available*distance)' in plan and '"gear_down":false' in plan and '"gear_down":true' in plan,'Return descent must brake with available real acceleration and request physical gear near the ground'
+    return {'explicit_separate_native_trial':True,'continuous_reverse_coordinate_handoff':True,'private_candidate_publication':True,'original_contact_decides_landing':True,'default_physical_terrain_is_v4':True,'return_velocity_policy':'inverse-rotate-current-velocity-no-added-omega-cross-radius-v1','actual_installed_atmospheric_shield_checked':True,'return_descent_cold_mode_validated':True,'retained_actual_code51_scope':retained,'full_original_F597_autopilot_proved':False,'full_original_F570_F606_object_bank_proved':False,'whole_planet_terrain_proved':False,'circular_orbit_insertion_proved':False,'physical_device_tested':False,'full_original_port_complete':False}
+
+
+def _verify_native_dock_guidance_scope(project):
+    main=(project/'scripts/main.gd').read_text();dock=(project/'scripts/dock_approach_guidance.gd').read_text()
+    assert 'const DockApproach=preload("res://scripts/dock_approach_guidance.gd")' in main and 'const POLICY:="source-station-mobile-approach-feedback-v1"' in dock,'Wrong read-only dock-feedback contract'
+    status=source_function(dock,'status')
+    assert 'ship.source_docking_telemetry()' in status and 'telemetry.relative_linear_velocity_mps.length()' in status and 'ship._source_local(ship.position)' in status and 'ship._source_basis.transposed()*Basis(ship.attitude.normalized())' in status,'Dock feedback must measure the actual rotating station frame and relative velocity'
+    assert 'result.ready=ship.can_dock()' in status and 'ship.source_collision_radii()' in status and 'Geometry._valid_geometry(geometry)' in status,'Dock feedback must retain actual hull geometry and the existing physical docking verdict'
+    assert not re.search(r'\b(?:ship|geometry)(?:\.[A-Za-z0-9_]+|\[[^\n]+?\])+\s*(?:[+*/-]?=(?!=))',dock) and not any(token in dock for token in ('ship.dock(','ship.launch(','ship.step(','.command_request(','.request_station_open(','.save(')),'Dock feedback must remain read-only and grant neither motion nor clearance'
+    window=source_function(main,'_show_docking_guidance');request=source_function(main,'_request_dock_clearance');action=source_function(main,'_dock_action')
+    assert 'DockApproach.status(ship)' in window and '_menu_text(str(state.message))' in window and all(key in window for key in ('state.relative_speed_mps','state.local_position_m','state.heading_error_rad','state.roll_error_rad','state.door_open')),'Actual dock window must show measured reasons, frame position and alignment'
+    assert '_native_trial_active()' in window and 'if state.ready:_menu_action(' in window and '_dock_action()' in window and '_request_dock_clearance)' in window and '_toggle_auto()' in window,'Dock window must keep trial/main modes distinct and use real docking, opening and legacy autopilot actions'
+    assert 'world.request_station_open(nav.elapsed_days)' in request and 'not _station_here()' in request and 'not ship.has_source_station()' in request and '_native_trial_active()' in request,'Clearance request must use the existing station owner and reject unsupported contexts'
+    assert not re.search(r'\b(?:ship|world)(?:\.[A-Za-z0-9_]+|\[[^\n]+?\])+\s*(?:[+*/-]?=(?!=))',request),'Clearance request must not write physical station or ship state directly'
+    assert 'elif ship.dock():' in action and 'elif ship.has_source_station():_show_docking_guidance()' in action and '_show_docking_guidance)' in source_function(main,'_show_menu'),'Failed source docking and the station menu must expose the actual feedback window'
+    assert not re.search(r'\bship\.(?:position|velocity|attitude|docked)\s*(?:[+*/-]?=(?!=))',action),'Dock button must leave capture and pose changes to the existing physical authority'
+    return {'readonly_dock_guidance':True,'actual_dock_authority_unchanged':True,'actual_rotating_frame_telemetry_used':True,'clearance_uses_existing_station_owner':True,'existing_dock_autopilot_unchanged':True,'native_trial_dock_connection_supported':False,'new_automatic_dock_entry_implemented':False}
+
+
+def _verify_native_return_scope(project):
+    return {**_verify_native_return_motion_scope(project),**_verify_native_dock_guidance_scope(project)}
+
+
+def verify_native_return_runtime(archive,project):
+    """Audit actual code52 bytes plus immutable source-only code51 history."""
+    names=set(archive.namelist());compiled={}
+    assert len(NATIVE_RETURN_AUDITED_SOURCE_SHA256)==56 and all(re.fullmatch(r'[0-9a-f]{64}',digest)for digest in NATIVE_RETURN_AUDITED_SOURCE_SHA256.values()),'Unsealed code52 native-return source pins'
+    for relative,digest in NATIVE_RETURN_AUDITED_SOURCE_SHA256.items():
+        name=Path(relative).stem;path='assets/scripts/'+name+'.gdc'
+        assert path in names,'Missing native-return integration runtime '+name
+        raw=archive.read(path)
+        assert len(raw)>64 and raw[:4]==b'GDSC','Invalid compiled native-return integration runtime '+name
+        assert hashlib.sha256((project/relative).read_bytes()).hexdigest()==digest,'Native return differs from audited integration source '+relative
+        compiled[name]=hashlib.sha256(raw).hexdigest()
+    baseline=_load_native_return_baseline(project)
+    functions=_verify_native_return_preserved_functions(project,baseline)
+    scope=_verify_native_return_scope(project);metadata=_verify_native_return_metadata(project);runtime=_verify_native_return_runtime_baseline(project)
+    overrides={path:baseline['files'][path]['source']for path in sorted(NATIVE_RETURN_CHANGED_RUNTIME_SOURCES)}
+    overrides.update({path:row['source']for path,row in baseline['metadata_source_files'].items()})
+    retained=verify_native_autopilot_runtime(archive,_AlignmentSourceAuditPath(project,overrides))
+    audit={'source_override_count':len(overrides),'source_override_paths':sorted(overrides),'compiled_assets_substituted':False,'audit_is_actual_unchanged_code51_runtime':False,'description':'Host code51 source-history/data checks only. Every compiled digest, including all nested Main/pilot/surface/orbit entries, comes from the same actual code52 APK.','assets':retained}
+    return {'version':NATIVE_RETURN_VERSION,'version_code':52,'baseline_source_commit':NATIVE_RETURN_BASELINE_SOURCE_COMMIT,'baseline_fixture_sha256':NATIVE_RETURN_BASELINE_FIXTURE_SHA256,'baseline_runtime_source_count':54,'baseline_stored_runtime_source_delta_count':3,'baseline_metadata_source_count':2,'baseline_requires_Git':False,'compiled_module_count':2,'compiled_modules':{name:compiled[name]for name in NATIVE_RETURN_MODULES},'integration_compiled_module_count':len(compiled),'integration_compiled_modules':compiled,'audited_local_source_sha256':NATIVE_RETURN_AUDITED_SOURCE_SHA256,'protected_functions':functions,'return_and_dock_scope':scope,'metadata':metadata,'retained_runtime_inputs':runtime,'retained_code51_source_audit':audit,'unchanged_code51_runtime_source_count':51,'actual_runtime_is_unchanged_code51':False,'full_original_port_complete':False,'compiled_source_correspondence_rebuilt_by_verifier':False,'physical_device_tested':False}
+
+
 def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     expected=preset_values(presets)
     signature=run(build_tools/'apksigner','verify','--verbose','--print-certs',apk)
@@ -2838,7 +3022,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
     for permission in FORBIDDEN_PERMISSIONS:
         assert 'android.permission.'+permission not in permissions,'Unexpected permission '+permission
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: (\w+)',signature)[1]
-    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={};hyperdrive_assets={};fuel_assets={};atmosphere_assets={};landing_gear_assets={};surface_contact_assets={};spherical_contact_assets={};natural_contact_assets={};contact_alignment_assets={};contact_footprint_assets={};contact_frame_assets={};native_landing_assets={};native_autopilot_assets={}
+    libraries={};native_assets={};graphics_assets={};diagnostic_assets={};material_assets={};surface_detail_assets={};flight_ui_assets={};city_surface_assets={};world_surface_assets={};source_world_assets={};source_orbit_assets={};source_physics_ports_assets={};source_full_assets={};classic_console_assets={};mining_kernel_assets={};navigation_assets={};map_visual_assets={};celestial_visibility_assets={};system_information_assets={};hyperdrive_assets={};fuel_assets={};atmosphere_assets={};landing_gear_assets={};surface_contact_assets={};spherical_contact_assets={};natural_contact_assets={};contact_alignment_assets={};contact_footprint_assets={};contact_frame_assets={};native_landing_assets={};native_autopilot_assets={};native_return_assets={}
     with zipfile.ZipFile(apk) as archive:
         assert archive.testzip() is None,'APK ZIP CRC failure'
         names=archive.namelist()
@@ -2955,9 +3139,14 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
                 natural_contact_assets={**contact_alignment_assets['retained_code46_source_audit']['assets'],'host_source_history_audit_only':True,'actual_runtime_is_unchanged_code46':False}
                 spherical_contact_assets={**natural_contact_assets['retained_spherical_contact_assets'],'host_source_history_audit_only':True}
                 surface_contact_assets={**spherical_contact_assets['retained_surface_contact_assets'],'host_source_history_audit_only':True}
-            if expected['version_code']>=51:
-                assert expected['version_code']==51 and expected['version']==NATIVE_AUTOPILOT_VERSION,'Unknown native-autopilot Android version'
+            if expected['version_code']>=52:
+                assert expected['version_code']==52 and expected['version']==NATIVE_RETURN_VERSION,'Unknown native-return Android version'
+                native_return_assets=verify_native_return_runtime(archive,presets.parent)
+                native_autopilot_assets={**native_return_assets['retained_code51_source_audit']['assets'],'host_source_history_audit_only':True,'actual_runtime_is_unchanged_code51':False}
+            if expected['version_code']==51:
+                assert expected['version']==NATIVE_AUTOPILOT_VERSION,'Unknown native-autopilot Android version'
                 native_autopilot_assets=verify_native_autopilot_runtime(archive,presets.parent)
+            if expected['version_code']>=51:
                 native_landing_assets={**native_autopilot_assets['retained_code50_source_audit']['assets'],'host_source_history_audit_only':True,'actual_runtime_is_unchanged_code50':False}
             if expected['version_code']==50:
                 assert expected['version']==NATIVE_LANDING_VERSION,'Unknown native-landing Android version'
@@ -2995,7 +3184,7 @@ def verify(apk,build_tools,presets,smoke=False,allow_debuggable=False):
             assert aligns
             libraries[name]=aligns
     assert libraries,'APK has no native ARM64 library'
-    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'hyperdrive_assets':hyperdrive_assets,'fuel_assets':fuel_assets,'atmosphere_assets':atmosphere_assets,'landing_gear_assets':landing_gear_assets,'surface_contact_assets':surface_contact_assets,'spherical_contact_assets':spherical_contact_assets,'natural_contact_assets':natural_contact_assets,'contact_alignment_assets':contact_alignment_assets,'contact_footprint_assets':contact_footprint_assets,'contact_frame_assets':contact_frame_assets,'native_landing_assets':native_landing_assets,'native_autopilot_assets':native_autopilot_assets,'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
+    return {**expected,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'abi':'arm64-v8a','min_sdk':24,'target_sdk':target,'signature_verified':True,'certificate_sha256':certificate,'test_key_only':True,'zipalign_16k':True,'elf_load_alignment':libraries,'forbidden_permissions_absent':True,'debuggable':debuggable,'native_data_checked':not smoke,'native_data_assets':sorted(native_assets),'graphics_runtime_assets_sha256':graphics_assets,'diagnostics_runtime_assets_sha256':diagnostic_assets,'material_assets':material_assets,'surface_detail_assets':surface_detail_assets,'city_surface_assets':city_surface_assets,'world_surface_assets':world_surface_assets,'source_world_runtime_assets':source_world_assets,'source_orbit_runtime_assets':source_orbit_assets,'source_physics_ports_runtime_assets':source_physics_ports_assets,'source_full_runtime_assets':source_full_assets,'classic_console_runtime_assets':classic_console_assets,'source_mining_kernel_assets':mining_kernel_assets,'navigation_runtime_assets':navigation_assets,'galactic_map_visual_assets':map_visual_assets,'celestial_visibility_assets':celestial_visibility_assets,'system_information_assets':system_information_assets,'hyperdrive_assets':hyperdrive_assets,'fuel_assets':fuel_assets,'atmosphere_assets':atmosphere_assets,'landing_gear_assets':landing_gear_assets,'surface_contact_assets':surface_contact_assets,'spherical_contact_assets':spherical_contact_assets,'natural_contact_assets':natural_contact_assets,'contact_alignment_assets':contact_alignment_assets,'contact_footprint_assets':contact_footprint_assets,'contact_frame_assets':contact_frame_assets,'native_landing_assets':native_landing_assets,'native_autopilot_assets':native_autopilot_assets,**({'native_return_assets':native_return_assets}if expected['version_code']>=52 else {}),'runtime_material_map_count':sum(v.get('map_count',0) for v in [material_assets,surface_detail_assets,city_surface_assets,world_surface_assets]),'flight_ui_runtime_assets_sha256':flight_ui_assets,'toolchain_smoke_only':smoke,'physical_device_tested':False,'full_original_port_complete':False,'production_signing_key_configured':False,'publication_ready':False}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

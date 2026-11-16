@@ -55,6 +55,8 @@ const NativeTrial=preload("res://scripts/native_landing_trial.gd")
 const NativeSurfaceView=preload("res://scripts/source_native_surface_visual.gd")
 const NativeAutopilot=preload("res://scripts/native_surface_autopilot.gd")
 const NativeOrbit=preload("res://scripts/native_orbit_trial.gd")
+const NativeReturn=preload("res://scripts/native_orbit_return.gd")
+const DockApproach=preload("res://scripts/dock_approach_guidance.gd")
 const Diagnostics=preload("res://scripts/game_diagnostics.gd")
 const ReportExport=preload("res://scripts/report_export.gd")
 const DockServices=preload("res://scripts/training_dock_services.gd")
@@ -214,7 +216,7 @@ func _native_trial_active()->bool:return _native_surface_active() or _native_orb
 func _native_auto_active()->bool:return _native_surface_active() and native_autopilot!=null and native_autopilot.is_active()
 func _native_auto_phase_label()->String:
 	if native_autopilot==null:return "Ручное управление"
-	var labels:={"gear":"Выпуск шасси","align":"Выравнивание","descent":"Снижение","launch":"Начало взлёта","ascent":"Набор высоты","braking":"Торможение","completed":"Готово","cancelled":"Отменён"}
+	var labels:={"gear":"Выпуск шасси","align":"Выравнивание","descent":"Снижение","entry":"Снижение с большой высоты","launch":"Начало взлёта","ascent":"Набор высоты","braking":"Торможение","completed":"Готово","cancelled":"Отменён"}
 	return str(labels.get(native_autopilot.phase(),"Автоматический полёт"))
 func _cancel_native_auto(reason:String="manual_control")->void:
 	native_orbital_departure_requested=false
@@ -648,6 +650,46 @@ func _tick_native_orbit(dt:float,steering:Vector2,roll:float,lift:float)->void:
 	source_contact_error="";_apply_landing_gear_state()
 	if bool(prepared.get("destruction_requested",false)):_record_event("native_orbit_ship_destroyed",native_orbit_trial.diagnostics());_announce("Корабль испытания потерян. Основной полёт доступен через меню.")
 
+func _begin_native_surface_return(guided:bool=false)->bool:
+	if _paused_command() or busy or not _native_orbit_active():return false
+	var prepared:Dictionary=NativeReturn.prepare_return(native_orbit_trial,ship,nav,landing_gear,world)
+	if not prepared.get("ok",false):
+		_record_event("native_surface_return_rejected",{"reason":str(prepared.get("reason","rejected"))})
+		_announce("Возврат к исходной поверхности пока недоступен: "+str(prepared.get("reason","rejected"))+". Требуется поддержанный участок и безопасная высота.")
+		return false
+	var pilot:RefCounted
+	if guided:
+		if not _native_descent_protected(prepared.candidate_ship,prepared.candidate_nav,prepared.candidate_surface,prepared.candidate_world):return false
+		pilot=NativeAutopilot.new()
+		if not pilot.configure_descent(prepared.candidate_ship,prepared.candidate_nav,prepared.candidate_surface):_announce("Автоснижение недоступно: проверьте тягу, высоту и положение корабля.");return false
+	ship=prepared.candidate_ship;nav=prepared.candidate_nav;landing_gear=prepared.candidate_gear;world=prepared.candidate_world;surface=prepared.candidate_surface
+	native_orbit_trial=null;native_autopilot=pilot;native_orbital_departure_requested=false
+	source_motion=MotionBridge.new();source_motion_enabled=false;last_motion_result.clear();target_site_id="";target_reference.clear();near.clear();last_view=""
+	source_contact_error="";source_contact_last={"mode":"native_surface_return","policy":NativeReturn.POLICY,"receipt":prepared.receipt.duplicate(true)}
+	_release_inputs();_close_menu();_apply_system();_refresh_hud();_native_save_game()
+	_record_event("native_surface_return",source_contact_last);_announce("Автоснижение к исходной поверхности начато. Перед посадкой корабль затормозит и выпустит шасси. Ручные команды или «Тормозить» отменяют наведение." if guided else "Возврат к исходной поверхности: положение, скорость и время сохранены. Управление ручное; «Авто» включает посадку.")
+	return true
+
+func _native_descent_protected(candidate_ship:RefCounted,candidate_nav:RefCounted,candidate_surface:RefCounted,candidate_world:RefCounted)->bool:
+	var atmosphere:Dictionary=AtmosphereContact.new().sample(candidate_world,candidate_ship,candidate_surface,candidate_nav.elapsed_days,false)
+	if not atmosphere.get("ok",false):_announce("Не удалось проверить условия снижения. Сохраните отчёт об ошибке.");return false
+	if bool(atmosphere.get("apply_f1014",false)) and not bool(candidate_nav.fuel_state(candidate_ship).get("atmospheric_shielding_installed",false)):
+		_announce("Для длительного снижения в этой атмосфере нужна атмосферная защита. Установите её на станции.");return false
+	return true
+
+func _begin_native_return_landing()->bool:
+	if _paused_command() or busy:return false
+	if _native_orbit_active():return _begin_native_surface_return(true)
+	if not _native_surface_active() or surface.landed:return false
+	var high:bool=surface.altitude(ship)>NativeAutopilot.RETURN_GEAR_HEIGHT_M
+	if high and not _native_descent_protected(ship,nav,surface,world):return false
+	var pilot:=NativeAutopilot.new()
+	var accepted:bool=pilot.configure_descent(ship,nav,surface) if high else pilot.configure_land(ship,nav,surface)
+	if not accepted:_announce("Автоснижение недоступно: проверьте тягу, высоту и положение корабля.");return false
+	_release_inputs();native_autopilot=pilot;native_orbital_departure_requested=false;_close_menu();_refresh_hud()
+	_record_event("native_return_landing_started",_native_trial_diagnostic());_announce("Автопосадка: снижение, торможение и выпуск шасси у поверхности. Ручные команды или «Тормозить» отменяют её.")
+	return true
+
 func _native_return_state()->Dictionary:
 	return {"ship":ship,"nav":nav,"world":world,"surface":surface,"landing_gear":landing_gear,"native_autopilot":native_autopilot,"native_orbit_trial":native_orbit_trial,"native_orbital_departure_requested":native_orbital_departure_requested,"saving_enabled":saving_enabled,"source_motion":source_motion,"source_motion_enabled":source_motion_enabled,"target_site_id":target_site_id,"target_reference":target_reference.duplicate(true),"paused":instruments.paused,"source_contact_last":source_contact_last.duplicate(true),"source_contact_error":source_contact_error,"source_alignment_last":source_alignment_last.duplicate(true),"source_footprint_last":source_footprint_last.duplicate(true),"source_geometry_last":source_geometry_last.duplicate(true),"last_motion_result":last_motion_result.duplicate(true)}
 
@@ -1036,7 +1078,7 @@ func _refresh_hud()->void:
 		target_label.text="%s · исходный контакт\nВысота над видимой гранью %.2f м"%[world.by_id[world.focus_id].name,surface.altitude(ship)]
 	if _native_orbit_active():
 		hud.text="ИСПЫТАНИЕ · КОСМИЧЕСКИЙ ПОЛЁТ · %s"%ship.profile().name
-		auto_button.text="Ручной полёт";dock_button.text="Меню";surface_button.text="Основной полёт"
+		auto_button.text="Автопосадка";dock_button.text="Меню";surface_button.text="К поверхности"
 	var console_state:={
 		"actual_speed_mps":ship.velocity.length(),"target_speed_mps":ship.target_speed,
 		"surface_active":surface.active,"altitude_m":surface.altitude(ship) if surface.active else 0.0,
@@ -1133,10 +1175,11 @@ func _brake()->void:
 	_announce("Торможение и удержание скорости.")
 func _toggle_auto()->void:
 	if _paused_command():return
-	if _native_orbit_active():_announce("В космической фазе испытания используйте ручное управление. Основной полёт доступен через меню.");return
+	if _native_orbit_active():_begin_native_return_landing();return
 	if _native_surface_active():
 		if _native_auto_active():_cancel_native_auto("auto_button");_announce("Автоматический полёт отменён. Управление возвращено пилоту.");_refresh_hud();return
 		if surface.landed:_begin_departure_action();return
+		if surface.altitude(ship)>NativeAutopilot.RETURN_GEAR_HEIGHT_M:_begin_native_return_landing();return
 		var pilot:=NativeAutopilot.new()
 		if not pilot.configure_land(ship,nav,surface):_announce("Автопосадка недоступна: проверьте тягу, скорость и положение корабля.");return
 		_release_inputs();native_autopilot=pilot;_close_menu();_refresh_hud();_record_event("native_autoland_started",_native_trial_diagnostic());_announce("Автопосадка: подготовка шасси и снижение. Ручное управление или «Тормозить» отменяют её.");return
@@ -1204,11 +1247,40 @@ func _dock_action()->void:
 		_announce("Люк закрыт: вылет ожидает открытия." if ship.docked else "Вылет начат. Корабль выходит из ангара.")
 		_save_game()
 	elif ship.dock():_announce("Стыковка выполнена. Службы доступны в меню.");_save_game()
+	elif ship.has_source_station():_show_docking_guidance()
 	else:_announce("Для стыковки: дистанция до 100 м и скорость до 12 м/с. Используйте «Авто».")
+
+func _request_dock_clearance()->bool:
+	if _paused_command() or busy:return false
+	if not _station_here() or not ship.station_available or not ship.has_source_station() or nav.remaining>0 or world.transfer_remaining>0 or ship.docked or ship.hull<=0 or ship.combat_active or _native_trial_active():
+		_announce("Запрос открытия доступен только у действующей орбитальной станции.");return false
+	if not world.request_station_open(nav.elapsed_days):_announce("Не удалось запросить открытие стыковочного проёма.");return false
+	_record_event("dock_clearance_requested",{"system_id":int(world.system_id),"site_id":str(world.site_id),"elapsed_days":nav.elapsed_days})
+	_announce("Открытие дока запрошено. Закройте окно и продолжите полёт, чтобы дождаться открытия, либо включите автоподход.")
+	return true
+
+func _show_docking_guidance()->void:
+	if _native_trial_active():_announce("Док доступен в основном полёте у станции. Естественная поверхность не является космопортом.");return
+	var state:Dictionary=DockApproach.status(ship)
+	if not state.get("available",false):_announce(str(state.get("message","Подход к доку сейчас недоступен.")));return
+	_open_menu("ПОДХОД К ДОКУ")
+	_menu_text(str(state.message))
+	if state.source:
+		var local:Vector3=state.local_position_m
+		_menu_text("Проём: %s · скорость относительно дока %.2f м/с"%["открыт" if state.door_open else "закрыт или открывается",float(state.relative_speed_mps)])
+		_menu_text("Смещение от центра дока: вправо %.1f м · вверх %.1f м · вдоль оси %.1f м"%[local.x,local.y,local.z])
+		_menu_text("Отклонение курса %.1f° · крена %.1f°"%[rad_to_deg(float(state.heading_error_rad)),rad_to_deg(float(state.roll_error_rad))])
+		_menu_text("Для захвата: полностью открытый проём, относительная скорость до 12 м/с, совпадение курса и крена, центр в пределах ±8 м вдоль оси. Весь корпус должен помещаться в свободный объём дока. Следите за вращением станции.")
+		if state.can_request_clearance and not state.door_open:_menu_action("Запросить открытие дока",_request_dock_clearance)
+		_menu_text("Пока это окно открыто, полёт и открытие двери приостановлены.")
+	else:_menu_text("Учебная станция: расстояние до 100 м и скорость до 12 м/с.")
+	if state.ready:_menu_action("Стыковаться",func():_close_menu();_dock_action())
+	if not ship.docked:_menu_action("Остановить автоподход" if ship.autopilot else "Автоподход к станции",func():_close_menu();_toggle_auto())
+	_menu_action("Продолжить полёт",_close_menu)
 
 func _surface_action()->void:
 	if _paused_command():return
-	if _native_orbit_active():_exit_native_landing_trial();return
+	if _native_orbit_active():_begin_native_surface_return();return
 	if _native_surface_active():_begin_native_orbital_departure();return
 	if busy:return
 	if surface.active:
@@ -1351,8 +1423,11 @@ func _show_equipment()->void:
 func _show_menu()->void:
 	_open_menu("КОМАНДИР")
 	if _native_trial_active():
-		_menu_text("Космический полёт испытания: скорость сохранена, управление ручное. Выход на круговую орбиту не выполняется автоматически. Сохранение и возврат к основному полёту доступны здесь." if _native_orbit_active() else "Испытание исходной посадки: автопосадка, подъём до 1 км и автовылёт в космос. Ручные команды отменяют автопилот. Сохранения хранятся отдельно.")
+		_menu_text("Космический полёт испытания: скорость сохранена. «К поверхности» возвращает в исходный участок без переноса на другую высоту. Круговая орбита автоматически не формируется. Возврат к основному полёту — отдельная команда ниже." if _native_orbit_active() else "Испытание исходной посадки: автопосадка, подъём до 1 км и автовылёт в космос. Ручные команды отменяют автопилот. Сохранения хранятся отдельно.")
 		_menu_action("Продолжить испытание",_close_menu)
+		if _native_orbit_active():
+			_menu_action("К исходной поверхности",_begin_native_surface_return)
+			_menu_action("Вернуться и выполнить автопосадку",_begin_native_return_landing)
 		if _native_surface_active():
 			_menu_action("Остановить автопилот" if _native_auto_active() else ("Автовзлёт до 1 км" if surface.landed else "Автопосадка"),_toggle_auto)
 			_menu_action("Автовзлёт до 1 км",_begin_departure_action)
@@ -1374,6 +1449,7 @@ func _show_menu()->void:
 	_menu_action("Продолжить полёт",_close_menu)
 	if not surface.pending_source_contact().is_empty():_menu_action("Загрузить последнее сохранение",_reload_after_contact_error)
 	_menu_action("Бортовой компьютер",_show_status)
+	if _station_here() and not ship.docked:_menu_action("Подход к доку · условия стыковки",_show_docking_guidance)
 	_menu_action("Груз и оборудование",_show_equipment)
 	_menu_action("Графический полёт · осмотреть обновление",_begin_graphics_demo)
 	if surface.active and surface.source_surface():_menu_action("Проверить высоту поверхности",_show_surface_alignment)

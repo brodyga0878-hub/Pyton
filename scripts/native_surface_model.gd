@@ -205,6 +205,44 @@ func _native_operands(ship:RefCounted,gear:int)->Dictionary:
 		for index in range(36):candidate[index]=old[index]
 	return {"ok":true,"frame":frame,"body":candidate,"parent":operands.parent,"relative":NativeSession._relative(candidate)}
 
+func rebind_airborne(ship:RefCounted,world:RefCounted,days:float,gear_word:int,transition_receipt:Dictionary)->Dictionary:
+	# The caller owns a private restored outbound surface and a private current
+	# ship. A frame boundary is not a physics interval: only the existing raw
+	# source anchor is advanced to that already-reached airborne pose. The real
+	# classifier witnesses the no-contact state; no response is permitted here.
+	if not is_native_landing_trial() or landed or native_session.phase()!="free" or native_session.is_pending() or not _native_stage.is_empty():return _native_fail("return_requires_free_native_surface")
+	if ship==null or world==null or ship.docked or ship.hull<=0 or not ship.surface_mode or not _native_pose_valid(_native_pose(ship.position,ship.velocity,ship.attitude)):return _native_fail("invalid_return_airborne_ship")
+	if not is_finite(days) or days<_source_days or days>1e9 or not NativeNatural._whole(gear_word,0,65535) or not NativeSession._plain(transition_receipt):return _native_fail("invalid_return_airborne_boundary")
+	if int(world.system_id)!=int(_source_system.system_id) or str(world.focus_id)!=body_id or not world.by_id.has(body_id) or str(world.by_id[body_id].get("runtime_record_hex",""))!=_native_source_record.hex_encode():return _native_fail("return_source_identity_changed")
+	var proposed:=fork_runtime(ship)
+	proposed._source_system=world;proposed._source_days=days
+	if not proposed._refresh_gravity(ship):return _native_fail("return_native_gravity_unavailable")
+	var operands:Dictionary=proposed._native_operands(ship,gear_word)
+	if not operands.get("ok",false):return operands
+	var request:={"sequence":native_session.generation()+1,"graphics_level":1,"caller_policy":NativeSession.CALLER_POLICY,"interval_receipt":transition_receipt.duplicate(true)}
+	var prepared:Dictionary=proposed.native_session.prepare(operands.body,operands.parent,operands.relative,request)
+	if not prepared.get("ok",false):return prepared
+	if prepared.contact_detected or prepared.response_applied or prepared.landing_accepted or not prepared.damage_calls.is_empty() or not prepared.callbacks.is_empty():return _native_fail("return_boundary_must_be_airborne_without_response")
+	var binding:={"generation":int(prepared.generation),"request_token":str(prepared.token),"request_sha256":str(prepared.request_sha256)}
+	var built:=NativeProvider.stage_from_classification(operands.body,operands.parent,operands.relative,prepared.classification,prepared.trace_rows,_native_phone_frame,binding)
+	var provider:RefCounted
+	var retained:=false
+	if built.get("ok",false):provider=built.provider
+	elif int(prepared.classification.get("terrain_query_calls",0))==0 and not native_provider.height_at(ship.position.x,ship.position.z).is_empty():
+		provider=native_provider;retained=true
+	else:return _native_fail("return_outside_observed_native_leaf")
+	if provider.height_at(ship.position.x,ship.position.z).is_empty():return _native_fail("return_outside_observed_native_leaf")
+	var committed:Dictionary=proposed.native_session.commit(str(prepared.token),prepared.commit_receipt)
+	if not committed.get("ok",false) or committed.get("already_committed",false):return _native_fail("return_native_anchor_commit_rejected")
+	_source_system=world;_source_days=days;native_session=proposed.native_session;native_provider=provider
+	_native_provider_retained=retained;_native_anchor(ship);_source_render_ship=ship
+	_native_takeoff_requested=false;landed=false;landing=false;taking_off=false;flight_phase="";ready_for_orbit=false
+	gravity=proposed.gravity;gravity_vector=proposed.gravity_vector
+	render_position=ship.position;render_velocity=ship.velocity;_source_render_clearance=altitude(ship)
+	native_last_reason="native_airborne_return_anchor_committed"
+	message="Возвращение к исходной поверхности: скорость сохранена. Можно включить автопосадку."
+	return {"ok":true,"reason":native_last_reason,"source_generation_before":int(prepared.generation),"source_generation_after":native_session.generation(),"source_transition_sha256":str(prepared.commit_receipt.transition_sha256),"terrain_query_calls":int(prepared.classification.get("terrain_query_calls",0)),"provider_retained_render_only":retained,"contact_detected":false,"response_applied":false,"damage_calls":[],"callbacks":[],"clock_advanced":false,"fuel_advanced":false,"hp_applied":false,"position_snapped":false}
+
 func stage_manual(ship:RefCounted,seconds:float,steering:Vector2,roll:float,lift:float,gear_word:int,interval_receipt:Dictionary)->Dictionary:
 	if not is_native_landing_trial() or not _native_stage.is_empty() or native_session.is_pending():return _native_fail("inactive_or_pending_native_trial")
 	if not is_finite(seconds) or seconds<=0 or seconds>1.0 or not steering.is_finite() or not is_finite(roll) or not is_finite(lift) or not NativeNatural._whole(gear_word,0,65535) or not NativeSession._plain(interval_receipt):return _native_fail("invalid_native_manual_interval")

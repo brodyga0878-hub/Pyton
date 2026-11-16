@@ -9,7 +9,12 @@ from unittest import mock
 import test_native_landing_packaging as retained
 
 verifier=retained.verifier
-PROJECT=retained.PROJECT
+# Keep the code51 assertions against exact portable source history as code52 evolves.
+# This wraps host source reads only; every archive byte remains the caller's actual byte.
+_code51_baseline=verifier._load_native_return_baseline(retained.PROJECT)
+PROJECT=verifier._AlignmentSourceAuditPath(retained.PROJECT,{
+    path:row['source']for path,row in {**_code51_baseline['files'],**_code51_baseline['metadata_source_files']}.items()
+})
 
 
 class MockNativeAutopilotArchive(retained.MockNativeLandingArchive):

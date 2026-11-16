@@ -12,6 +12,10 @@ const KEYS:=["schema","version","policy","mode","phase","active","steps","elapse
 const BINDING_KEYS:=["system_id","body_id","ship_id","source_record_hex","source_generation","raw_body_sha256","raw_parent_sha256","provider_identity","days_f64_hex","phone_pose_f32_hex"]
 const LANDING_PHASES:=["gear","align","descent"]
 const ASCENT_PHASES:=["launch","align","ascent","braking"]
+const RETURN_PHASES:=["entry","braking","gear","align","descent"]
+const MAX_RETURN_DESCENT_MPS:=60.0
+const RETURN_BRAKE_HEIGHT_M:=600.0
+const RETURN_GEAR_HEIGHT_M:=300.0
 const MAX_DESCENT_MPS:=4.0
 const MIN_DESCENT_MPS:=0.35
 const MAX_ASCENT_MPS:=40.0
@@ -61,6 +65,18 @@ func configure_ascent(ship:RefCounted,nav:RefCounted,surface:RefCounted,target_h
 	_saved=_sealed({"schema":SCHEMA,"version":1,"policy":POLICY,"mode":"ascent","phase":"launch" if surface.landed else "ascent","active":true,"steps":0,"elapsed_f64_hex":_float_hex(0),"target_height_f64_hex":_float_hex(target_height),"launch_recontacts":0,"reason":"powered_ascent_requested","binding":_binding(ship,nav,surface)})
 	return true
 
+func configure_descent(ship:RefCounted,nav:RefCounted,surface:RefCounted)->bool:
+	if not _saved.is_empty() or not _valid_scene(ship,nav,surface) or surface.landed or not _propulsion_ok(ship,surface):return false
+	var hit:Dictionary=surface.height_sample(ship.position.x,ship.position.z)
+	if hit.is_empty():return false
+	var altitude:float=ship.position.y-float(hit.height)-surface.clearance(ship)
+	if not is_finite(altitude) or altitude<=RETURN_GEAR_HEIGHT_M or altitude>MAX_ASCENT_TARGET_M:return false
+	_saved=_sealed({"schema":SCHEMA,"version":1,"policy":POLICY,"mode":"return_landing","phase":"entry","active":true,"steps":0,"elapsed_f64_hex":_float_hex(0),"target_height_f64_hex":_float_hex(0),"launch_recontacts":0,"reason":"powered_return_descent_requested","binding":_binding(ship,nav,surface)})
+	return true
+
+static func _phases(mode_name:String)->Array:
+	return ASCENT_PHASES if mode_name=="ascent" else (RETURN_PHASES if mode_name=="return_landing" else LANDING_PHASES)
+
 func is_active()->bool:return bool(_saved.get("active",false))
 func phase()->String:return str(_saved.get("phase","idle"))
 func mode()->String:return str(_saved.get("mode",""))
@@ -73,13 +89,13 @@ func fork_runtime()->RefCounted:
 
 func restore(data:Dictionary,ship:RefCounted,nav:RefCounted,surface:RefCounted)->bool:
 	if not _saved.is_empty() or not _valid_scene(ship,nav,surface) or not Session._keys(data,KEYS):return false
-	if data.schema!=SCHEMA or not _whole(data.version,1,1) or data.policy!=POLICY or data.mode not in ["landing","ascent"] or not data.active is bool or data.active!=true:return false
-	if data.phase not in (LANDING_PHASES if data.mode=="landing" else ASCENT_PHASES) or (data.mode=="landing" and surface.landed):return false
+	if data.schema!=SCHEMA or not _whole(data.version,1,1) or data.policy!=POLICY or data.mode not in ["landing","ascent","return_landing"] or not data.active is bool or data.active!=true:return false
+	if data.phase not in _phases(str(data.mode)) or (data.mode!="ascent" and surface.landed):return false
 	if not _whole(data.steps,0,1000000000) or not data.reason is String or data.reason.length()>160 or not data.binding is Dictionary or not Session._keys(data.binding,BINDING_KEYS):return false
 	var elapsed:=_float(data.elapsed_f64_hex)
 	if not is_finite(elapsed) or elapsed<0 or elapsed>1e9 or (int(data.steps)==0 and elapsed!=0):return false
 	var target:=_float(data.target_height_f64_hex)
-	if not is_finite(target) or not _whole(data.launch_recontacts,0,60) or (data.mode=="landing" and (target!=0 or int(data.launch_recontacts)!=0)) or (data.mode=="ascent" and (target<MIN_ASCENT_TARGET_M or target>MAX_ASCENT_TARGET_M)):return false
+	if not is_finite(target) or not _whole(data.launch_recontacts,0,60) or (data.mode!="ascent" and (target!=0 or int(data.launch_recontacts)!=0)) or (data.mode=="ascent" and (target<MIN_ASCENT_TARGET_M or target>MAX_ASCENT_TARGET_M)):return false
 	if data.mode=="ascent" and surface.landed and data.phase!="launch":return false
 	var candidate:Dictionary=_json(data);var checksum:Variant=candidate.snapshot_sha256;candidate.erase("snapshot_sha256")
 	if not Session._hex(checksum,32) or Session._hash(candidate)!=checksum or _json(data.binding)!=_binding(ship,nav,surface):return false
@@ -102,9 +118,9 @@ static func _level_controls(ship:RefCounted,seconds:float)->Dictionary:
 	return {"steering":Vector2(0,clampf(-error.x*gain/rate,-1,1)),"roll":clampf(-error.z*gain*1.2/rate,-1,1),"angle_rad":angle}
 
 func prepare(ship:RefCounted,nav:RefCounted,gear:RefCounted,surface:RefCounted,seconds:float)->Dictionary:
-	if not is_active() or mode() not in ["landing","ascent"]:return _reject("guidance_inactive")
+	if not is_active() or mode() not in ["landing","ascent","return_landing"]:return _reject("guidance_inactive")
 	if not is_finite(seconds) or seconds<=0 or seconds>1.0:return _reject("invalid_guidance_interval")
-	if not _valid_scene(ship,nav,surface) or (mode()=="landing" and surface.landed) or _binding(ship,nav,surface)!=_saved.binding:return _reject("stale_guidance_binding")
+	if not _valid_scene(ship,nav,surface) or (mode()!="ascent" and surface.landed) or _binding(ship,nav,surface)!=_saved.binding:return _reject("stale_guidance_binding")
 	if gear==null or gear.get_script()!=Gear or gear.snapshot().is_empty():return _reject("invalid_guidance_gear")
 	if not _propulsion_ok(ship,surface):return _reject("insufficient_vertical_propulsion")
 	var height:Dictionary=surface.height_sample(ship.position.x,ship.position.z)
@@ -120,6 +136,15 @@ func prepare(ship:RefCounted,nav:RefCounted,gear:RefCounted,surface:RefCounted,s
 		var phase_name:="launch" if surface.landed else ("braking" if error<100.0 or ship.velocity.y>desired+0.5 else "ascent")
 		if not surface.landed and float(controls.angle_rad)>MAX_LEVEL_ERROR_RAD:desired=0.0;phase_name="align"
 		return {"ok":true,"reason":"ascent_guidance_prepared","guidance_policy":POLICY,"phase":phase_name,"steering":controls.steering,"roll":controls.roll,"lift":desired/60.0,"target_speed":0.0,"assisted":true,"gear_down":altitude<=ASCENT_CLEARANCE_M,"desired_vertical_mps":desired,"observed_render_altitude_m":altitude,"target_height_m":target,"height_is_orbit":false,"original_contact_decides_landing":true,"pose_written":false}
+	if mode()=="return_landing" and altitude>RETURN_GEAR_HEIGHT_M:
+		# Choose only an existing thrust command. Start braking above the gear
+		# region; actual Flight/fuel limits determine the achieved deceleration.
+		var distance:=maxf(0.0,altitude-RETURN_GEAR_HEIGHT_M)
+		var maximum:=minf(MAX_RETURN_DESCENT_MPS,maxf(MAX_DESCENT_MPS,sqrt(2.0*available*distance)*0.5))
+		var phase_name:="entry" if altitude>RETURN_BRAKE_HEIGHT_M and maximum>=MAX_RETURN_DESCENT_MPS else "braking"
+		var desired:=-maximum
+		if float(controls.angle_rad)>MAX_LEVEL_ERROR_RAD:desired=0;phase_name="align"
+		return {"ok":true,"reason":"return_descent_guidance_prepared","guidance_policy":POLICY,"phase":phase_name,"steering":controls.steering,"roll":controls.roll,"lift":desired/60.0,"target_speed":0.0,"assisted":true,"gear_down":false,"desired_vertical_mps":desired,"observed_render_altitude_m":altitude,"original_contact_decides_landing":true,"pose_written":false}
 	var deployed:bool=bool(state.get("deployed",false)) and bool(state.get("requested_down",false))
 	var phase_name:="descent" if deployed and float(controls.angle_rad)<=MAX_LEVEL_ERROR_RAD else ("gear" if not deployed else "align")
 	var desired_velocity:=-clampf(sqrt(2.0*available*maxf(altitude,0))*0.5,MIN_DESCENT_MPS,MAX_DESCENT_MPS) if phase_name=="descent" else 0.0
@@ -127,7 +152,7 @@ func prepare(ship:RefCounted,nav:RefCounted,gear:RefCounted,surface:RefCounted,s
 
 func observe(ship:RefCounted,nav:RefCounted,surface:RefCounted,accepted:Dictionary,seconds:float,planned_phase:String)->bool:
 	if not is_active() or not accepted.get("ok",false) or accepted.get("candidate_ship")!=ship or accepted.get("candidate_nav")!=nav or accepted.get("candidate_surface")!=surface or not _valid_scene(ship,nav,surface,bool(accepted.get("destruction_requested",false))):return false
-	if not is_finite(seconds) or seconds<=0 or seconds>1.0 or planned_phase not in (LANDING_PHASES if mode()=="landing" else ASCENT_PHASES):return false
+	if not is_finite(seconds) or seconds<=0 or seconds>1.0 or planned_phase not in _phases(mode()):return false
 	var candidate:Dictionary=_saved.duplicate(true);candidate.steps=int(candidate.steps)+1;candidate.elapsed_f64_hex=_float_hex(_float(candidate.elapsed_f64_hex)+seconds);candidate.binding=_binding(ship,nav,surface)
 	if bool(accepted.get("destruction_requested",false)):
 		candidate.active=false;candidate.phase="cancelled";candidate.reason="ship_destroyed"
