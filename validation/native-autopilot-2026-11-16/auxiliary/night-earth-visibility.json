@@ -1,0 +1,210 @@
+{
+	"GPU_produced_by_this_diagnostic": false,
+	"after_12_render_frames_mesh_state": {
+		"cache_entries": 1,
+		"cache_limit": 4,
+		"error": "",
+		"focus_id": "earth",
+		"job_key": "",
+		"profile": "source-height-global-lod-v1",
+		"status": "ready"
+	},
+	"all_lower_rectangle_samples_hit_opaque_night_front_face": true,
+	"capture_path": "res://validation/native-autopilot-2026-11-16/screenshots/03-native-space-handoff-960x432.png",
+	"capture_sha256": "3dd4d28bb4e810f0a4d27829ccbb2a7369e02ff0a6e32d814be8660fb1861117",
+	"captured_camera_angle_error_rad": 0.0,
+	"captured_camera_position_error_m": 0.0,
+	"conclusion": "Ready Earth is in front of the captured camera on its deep night side; its opaque front faces cover the starless black lower play region. Earth is not outside the view and does not require a camera/gamma/physical-position change.",
+	"diagnostic_script_sha256": "f1d9672947078f990f7184b9400aa77f952c3e080138777d4f1c726cb12f71b5",
+	"exact_black_pixels": 21750,
+	"immediate_handoff_mesh_state": {
+		"cache_entries": 1,
+		"cache_limit": 4,
+		"error": "",
+		"focus_id": "earth",
+		"job_key": "",
+		"profile": "source-height-global-lod-v1",
+		"status": "ready"
+	},
+	"included_in_functional_check_total": false,
+	"maximum_rectangle_channel_value": 0.0,
+	"physical_android_tested": false,
+	"pixel_rectangle": [
+		245,
+		215,
+		680,
+		265
+	],
+	"pre_handoff_mesh_state": {
+		"cache_entries": 1,
+		"cache_limit": 4,
+		"error": "",
+		"focus_id": "earth",
+		"job_key": "",
+		"profile": "source-height-global-lod-v1",
+		"status": "ready"
+	},
+	"ray_samples": [
+		{
+			"capture_pixel": [
+				245.0,
+				215.0
+			],
+			"hits": 2,
+			"logical_pixel": [
+				408.333343505859,
+				358.333343505859
+			],
+			"nearest_outward_normal_ray_dot": -0.0757423937320709,
+			"nearest_outward_normal_sun_dot": -0.99911904335022,
+			"nearest_rendered_distance_m": 2110.4462890625,
+			"opaque_front_face_before_50km_starfield": true
+		},
+		{
+			"capture_pixel": [
+				462.0,
+				215.0
+			],
+			"hits": 2,
+			"logical_pixel": [
+				770.0,
+				358.333343505859
+			],
+			"nearest_outward_normal_ray_dot": -0.110595971345901,
+			"nearest_outward_normal_sun_dot": -0.99911904335022,
+			"nearest_rendered_distance_m": 1403.986328125,
+			"opaque_front_face_before_50km_starfield": true
+		},
+		{
+			"capture_pixel": [
+				679.0,
+				215.0
+			],
+			"hits": 2,
+			"logical_pixel": [
+				1131.66662597656,
+				358.333343505859
+			],
+			"nearest_outward_normal_ray_dot": -0.0953324660658836,
+			"nearest_outward_normal_sun_dot": -0.996962904930115,
+			"nearest_rendered_distance_m": 2130.93627929688,
+			"opaque_front_face_before_50km_starfield": true
+		},
+		{
+			"capture_pixel": [
+				245.0,
+				240.0
+			],
+			"hits": 2,
+			"logical_pixel": [
+				408.333343505859,
+				400.0
+			],
+			"nearest_outward_normal_ray_dot": -0.14243172109127,
+			"nearest_outward_normal_sun_dot": -0.99911904335022,
+			"nearest_rendered_distance_m": 1199.15673828125,
+			"opaque_front_face_before_50km_starfield": true
+		},
+		{
+			"capture_pixel": [
+				462.0,
+				240.0
+			],
+			"hits": 2,
+			"logical_pixel": [
+				770.0,
+				400.0
+			],
+			"nearest_outward_normal_ray_dot": -0.196364015340805,
+			"nearest_outward_normal_sun_dot": -0.99911904335022,
+			"nearest_rendered_distance_m": 850.966857910156,
+			"opaque_front_face_before_50km_starfield": true
+		},
+		{
+			"capture_pixel": [
+				679.0,
+				240.0
+			],
+			"hits": 2,
+			"logical_pixel": [
+				1131.66662597656,
+				400.0
+			],
+			"nearest_outward_normal_ray_dot": -0.165773928165436,
+			"nearest_outward_normal_sun_dot": -0.996962904930115,
+			"nearest_rendered_distance_m": 1174.27600097656,
+			"opaque_front_face_before_50km_starfield": true
+		},
+		{
+			"capture_pixel": [
+				245.0,
+				264.0
+			],
+			"hits": 2,
+			"logical_pixel": [
+				408.333343505859,
+				440.0
+			],
+			"nearest_outward_normal_ray_dot": -0.205323308706284,
+			"nearest_outward_normal_sun_dot": -0.99911904335022,
+			"nearest_rendered_distance_m": 852.349975585938,
+			"opaque_front_face_before_50km_starfield": true
+		},
+		{
+			"capture_pixel": [
+				462.0,
+				264.0
+			],
+			"hits": 2,
+			"logical_pixel": [
+				770.0,
+				440.0
+			],
+			"nearest_outward_normal_ray_dot": -0.276211082935333,
+			"nearest_outward_normal_sun_dot": -0.99911904335022,
+			"nearest_rendered_distance_m": 622.955444335938,
+			"opaque_front_face_before_50km_starfield": true
+		},
+		{
+			"capture_pixel": [
+				679.0,
+				264.0
+			],
+			"hits": 2,
+			"logical_pixel": [
+				1131.66662597656,
+				440.0
+			],
+			"nearest_outward_normal_ray_dot": -0.231980487704277,
+			"nearest_outward_normal_sun_dot": -0.996962904930115,
+			"nearest_rendered_distance_m": 825.66552734375,
+			"opaque_front_face_before_50km_starfield": true
+		}
+	],
+	"rectangle_pixels": 21750,
+	"schema": "starfrontier-native-orbit-night-visibility-cpu-v1",
+	"scope": "Auxiliary actual Main cold-lineage/handoff, ready source mesh, camera-ray, actual source sunlight and captured-pixel proof. No GPU execution, image editing, camera reorientation, gamma/light/physics changes or new functional-suite count.",
+	"source_center_separation_from_camera_forward_deg": 81.3837735080204,
+	"source_guard_altitude_m": 20013.7530207802,
+	"source_height_active": true,
+	"source_mesh_key_unchanged": true,
+	"source_sha256": {
+		"scripts/atmosphere.gdshader": "d88a7e712e9b8d7ee3237c762ebb3b58cc5a95fc520236327ed614ff5f0c1835",
+		"scripts/celestial_renderer.gd": "8930c20b150de0019f55ca8aa2c4dd84ba9bde03d164fd7cd5bc8572505de492",
+		"scripts/main.gd": "8e55259134ed014d053e788718109043c2b6c7143706b38b1ed05bab6f7f943c",
+		"scripts/native_orbit_trial.gd": "05f5219e8ff946034390000a193f23d1dd51e8c5b443c3a7d6cf2b307b6574bb",
+		"scripts/planet.gdshader": "c076faf23a1ba06a61060f9066a73b221b89a7b4cd2c1adfc7781b9034a998ad",
+		"scripts/source_global_body_mesh.gd": "dc7bdced64514126be8c92d4907fef4e92d245a073881832c64093ff37ae6721",
+		"tests/test_native_orbit_main.gd": "2360810b424737a30c476f8088921ed48765024b0757443eb576451ca9b482f3"
+	},
+	"source_surface_angular_radius_deg": 85.6644145276238,
+	"surface_cap": {
+		"cosine": 1.0,
+		"coverage": 1.0,
+		"direction": "(0.0, 1.0, 0.0)",
+		"direction_world": "(0.0, 1.0, 0.0)",
+		"enabled": false,
+		"policy": "source-ground-angular-cap-v1",
+		"radius_m": 0.0
+	}
+}

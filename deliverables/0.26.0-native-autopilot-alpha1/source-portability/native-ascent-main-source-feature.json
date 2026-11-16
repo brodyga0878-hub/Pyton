@@ -1,0 +1,51 @@
+{
+  "schema": "starfrontier-source-archive-code51-task-feature-v1",
+  "source_commit": "382723e75bc5030a44fa1dc640bc5229ea7481fa",
+  "archive_sha256": "ceb3c64f6a6e59a1caf545e5261dedcad4faa791767cb1699eddba681b063d4c",
+  "name": "native_ascent_main",
+  "test": "tests/test_native_ascent_main.gd",
+  "command": [
+    "godot",
+    "--headless",
+    "--audio-driver",
+    "Dummy",
+    "--path",
+    "/workspace/recovery/native-autopilot-source-portability/source/StarFrontier-0.26.0-native-autopilot-source",
+    "--script",
+    "res://tests/test_native_ascent_main.gd",
+    "--",
+    "--rebuild-capture"
+  ],
+  "exit_code": 0,
+  "timed_out": false,
+  "duration_seconds": 68.881652,
+  "log_file": "native-ascent-main-feature.log",
+  "log_sha256": "3e35252a2c5601c7447f5cb5bf5d9847423b8d3dbf0fac2be053b55fe562c8ac",
+  "error_markers": [],
+  "checks": 87,
+  "failures": 0,
+  "expected_checks_from_archived_final_report": 87,
+  "archived_final_report": "validation/native-autopilot-2026-11-16/native-ascent-main.json",
+  "archived_final_report_sha256": "5383f77cb45561a37aaa6d0985d030407a675d36b4c07c32cc21c53273cb3690",
+  "declared_source_pins": {
+    "scripts/main.gd": "8e55259134ed014d053e788718109043c2b6c7143706b38b1ed05bab6f7f943c",
+    "scripts/native_landing_trial.gd": "9e99d0c664a9fd2cab79424ee8c05359d0fa30bd2de34ea88a7286915285bda1",
+    "scripts/native_surface_autopilot.gd": "d055d8d3b543d79337a457463456fcdfd2e8ee82079f2e0c9e2aa1eb550d56e9",
+    "scripts/native_surface_model.gd": "9d63da249b3beadb53d88d97564b55a91b381a51b4f89c7b2f4b6a9ed794081e",
+    "scripts/source_landing_gear_session.gd": "ba8b63cbf89f30441f0bdfe01ed51af3a7e0e4679451264826039dd7b65887a0",
+    "scripts/source_native_surface_provider.gd": "c1558516a8414783de8b3c74d97e75fa9dfd52feeaa81517d974af10e28fcc5e",
+    "scripts/source_natural_contact_session.gd": "5e3472a7bbe8998a30f11340a563564d43307dd1b3c482eb838126c880a728d6",
+    "tests/test_native_ascent_main.gd": "4760fa4ea479dd6050ef966e373f893118896ddf75966c92e5dcd09c45ecd06d",
+    "tests/test_native_autopilot_main.gd": "64a5c2bae80f17550120b91723ffa8af0394b639e09450bf309b60ab89253ff7"
+  },
+  "source_actual_files": 1603,
+  "all_source_files_unchanged": true,
+  "modified_files": [],
+  "private_xdg": {
+    "XDG_DATA_HOME": "/workspace/recovery/native-autopilot-source-portability/feature_main/native_ascent_main/data",
+    "XDG_CONFIG_HOME": "/workspace/recovery/native-autopilot-source-portability/feature_main/native_ascent_main/config",
+    "XDG_CACHE_HOME": "/workspace/recovery/native-autopilot-source-portability/feature_main/native_ascent_main/cache"
+  },
+  "physical_device_tested": false,
+  "ok": true
+}

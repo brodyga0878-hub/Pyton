@@ -1,0 +1,28 @@
+{
+	"checks": 48,
+	"evidence": [
+		{
+			"case": "actual_Main_native_descent_separate_save_cold_takeoff_return",
+			"descent_intervals": 53,
+			"native_generation": 56,
+			"ordinary_owners_restored": true,
+			"ordinary_save_generation": 1,
+			"source_pose": "(0.0, -75862.42, 0.0)"
+		},
+		{
+			"archive": "StarFrontier-report-2026-11-16T10-03-42Z-0000000023449579-0001.zip",
+			"case": "production_native_include_save_ZIP",
+			"complete_native_witness_transport": true
+		}
+	],
+	"failures": 0,
+	"scope": "Production Main native manual mode, source descent, separate save/cold factory, queued takeoff, exact ordinary return and optional diagnostic ZIP; no full bank/autopilot/Android claim",
+	"sources": {
+		"scripts/main.gd": "8e55259134ed014d053e788718109043c2b6c7143706b38b1ed05bab6f7f943c",
+		"scripts/native_landing_trial.gd": "9e99d0c664a9fd2cab79424ee8c05359d0fa30bd2de34ea88a7286915285bda1",
+		"scripts/native_surface_model.gd": "9d63da249b3beadb53d88d97564b55a91b381a51b4f89c7b2f4b6a9ed794081e",
+		"scripts/source_native_surface_provider.gd": "c1558516a8414783de8b3c74d97e75fa9dfd52feeaa81517d974af10e28fcc5e",
+		"scripts/source_natural_contact_session.gd": "5e3472a7bbe8998a30f11340a563564d43307dd1b3c482eb838126c880a728d6",
+		"tests/test_native_landing_trial_main.gd": "5ebd2ee0f8e04a336b884a8595d210e64d9225dfd9ffd4ae36bd18cf93c96643"
+	}
+}

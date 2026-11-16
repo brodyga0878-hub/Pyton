@@ -1,0 +1,74 @@
+{
+	"checks": 3055,
+	"evidence": [
+		{
+			"angular_alignment_observed": false,
+			"case": "actual_guided_descent",
+			"elapsed_days": 0.000532407407407405,
+			"final_hull": 100.0,
+			"gear_wait_observed": true,
+			"initial_gear_down": false,
+			"initial_manual_tilt": false,
+			"intervals": 460,
+			"park_pose": "(0.0, -75862.09, 0.0)",
+			"render_agl": 0.182703436909941,
+			"seconds": 0.1,
+			"source_generation": 460
+		},
+		{
+			"angular_alignment_observed": false,
+			"case": "actual_guided_descent",
+			"elapsed_days": 0.000374807098765439,
+			"final_hull": 100.0,
+			"gear_wait_observed": false,
+			"initial_gear_down": true,
+			"initial_manual_tilt": false,
+			"intervals": 1943,
+			"park_pose": "(0.0, -75861.95, 0.0)",
+			"render_agl": 0.323328436909941,
+			"seconds": 0.0166666666666667,
+			"source_generation": 1943
+		},
+		{
+			"angular_alignment_observed": true,
+			"case": "actual_guided_descent",
+			"elapsed_days": 0.000506944444444442,
+			"final_hull": 100.0,
+			"gear_wait_observed": false,
+			"initial_gear_down": true,
+			"initial_manual_tilt": true,
+			"intervals": 430,
+			"park_pose": "(0.0, -75862.06, 0.0)",
+			"render_agl": 0.198500641771824,
+			"seconds": 0.1,
+			"source_generation": 431
+		},
+		{
+			"case": "warm_cold_continuation_and_stale_binding_guards",
+			"compared_intervals": 24,
+			"raw_source_history_preserved": true
+		},
+		{
+			"case": "actual_emergency_fatal_source_contact_committed",
+			"damage_calls": [
+				{
+					"amount_s32": 100,
+					"attacker_u32": 0
+				}
+			],
+			"hull": 0.0,
+			"pilot_phase": "cancelled",
+			"source_generation": 57
+		}
+	],
+	"failures": 0,
+	"scope": "Actual native Earth guided descent at0.1s/60Hz, original contact/gear/HP/fuel/time, pure owner publication and strict cold continuation; bounded phone guidance, not the original complete autopilot or physical Android.",
+	"sources": {
+		"scripts/flight_model.gd": "4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b",
+		"scripts/native_landing_trial.gd": "9e99d0c664a9fd2cab79424ee8c05359d0fa30bd2de34ea88a7286915285bda1",
+		"scripts/native_surface_autopilot.gd": "d055d8d3b543d79337a457463456fcdfd2e8ee82079f2e0c9e2aa1eb550d56e9",
+		"scripts/native_surface_model.gd": "9d63da249b3beadb53d88d97564b55a91b381a51b4f89c7b2f4b6a9ed794081e",
+		"scripts/source_natural_contact_session.gd": "5e3472a7bbe8998a30f11340a563564d43307dd1b3c482eb838126c880a728d6",
+		"tests/test_native_surface_autopilot.gd": "1272acc012abd7cdc19d72460216ad5b8951657a30fafb9b563a61baf3f1fb85"
+	}
+}
