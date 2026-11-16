@@ -1,0 +1,56 @@
+{
+	"checks": 83,
+	"evidence": [
+		{
+			"archive": "user://native-orbit-main-203578-1/reports/StarFrontier-report-2026-11-16T11-31-50Z-0000000127749506-0001.zip",
+			"case": "actual_return_descent_cold_and_include_save_ZIP",
+			"cold_compared_intervals": 6,
+			"mid_descent_altitude_m": 16833.3761540681,
+			"whole_game_factory_accepts_report": true
+		},
+		{
+			"case": "actual_console_return_and_full_native_descent",
+			"first_gear_deployment_height_m": 298.245253462305,
+			"initial_altitude_m": 19999.7102134312,
+			"interval_seconds": 0.5,
+			"largest_accepted_step_m": 30.0,
+			"maximum_downward_speed_mps": 60.0,
+			"native_intervals_excluding_cold_controls": 860,
+			"original_contact_decided_completion": true,
+			"parked_source_generation": 2335,
+			"raw_hull": 400
+		},
+		{
+			"case": "actual_return_pause_and_manual_cancel",
+			"manual_commands": [
+				"Brake",
+				"steering"
+			],
+			"physical_interval_after_manual_input": true
+		},
+		{
+			"case": "explicit_source_empty_return_fuel_rejected",
+			"fixture_changes_source_fuel_only": true,
+			"physical_pose_unmoved": true,
+			"source_disabled_axes_u8": 21
+		}
+	],
+	"failures": 0,
+	"scope": "Task2 actual Main protected flown20km outbound, real console inverse return and full powered high descent into original F576/F575 park, genuine gear schedule, no frame-boundary HP/fuel/time step, exact mid-descent cold continuation, actual include-save ZIP, pause/manual cancellation/empty source-fuel rejection and exact six-owner ordinary-flight restoration. Fixtures explicitly labelled; no full original autopilot, stationframe continuity, universal terrain, Android or FPS claim.",
+	"sources": {
+		"scripts/main.gd": "119f8a41cd13d77a4b689b3043238ad3ad5c9b419b75b4f1020ee9aed8465de8",
+		"scripts/native_landing_trial.gd": "9e99d0c664a9fd2cab79424ee8c05359d0fa30bd2de34ea88a7286915285bda1",
+		"scripts/native_orbit_return.gd": "3a55a0cbabfe0ce051bab9a0bbabd8cd79a5121dfd4b0606f817ee3eb641bc89",
+		"scripts/native_orbit_trial.gd": "05f5219e8ff946034390000a193f23d1dd51e8c5b443c3a7d6cf2b307b6574bb",
+		"scripts/native_surface_autopilot.gd": "fedc1eab979e497bc3233cdb58f4e20d3cc06203f92ecfe90e8e0cf475776733",
+		"scripts/native_surface_model.gd": "7753220ae61c5194d6d4b7f51ebc017052579e58ba515987bb5ebf7ee9713fee",
+		"scripts/source_landing_gear_session.gd": "ba8b63cbf89f30441f0bdfe01ed51af3a7e0e4679451264826039dd7b65887a0",
+		"scripts/source_native_surface_provider.gd": "c1558516a8414783de8b3c74d97e75fa9dfd52feeaa81517d974af10e28fcc5e",
+		"scripts/source_natural_contact_session.gd": "5e3472a7bbe8998a30f11340a563564d43307dd1b3c482eb838126c880a728d6",
+		"tests/test_native_ascent_main.gd": "4760fa4ea479dd6050ef966e373f893118896ddf75966c92e5dcd09c45ecd06d",
+		"tests/test_native_autopilot_main.gd": "64a5c2bae80f17550120b91723ffa8af0394b639e09450bf309b60ab89253ff7",
+		"tests/test_native_orbit_main.gd": "2360810b424737a30c476f8088921ed48765024b0757443eb576451ca9b482f3",
+		"tests/test_native_return_descent_main.gd": "f7de01666840142d11726c0a1448bf9f33007212eb53d6604902a3a5fbec53a8",
+		"tests/test_native_return_main.gd": "46eb5a59c5cf5c847b6743749bffa67b6c19a90577ccf6f561b2b54c1612de0b"
+	}
+}

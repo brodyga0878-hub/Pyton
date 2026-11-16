@@ -1,0 +1,22 @@
+{
+	"checks": 455,
+	"evidence": [
+		{
+			"case": "airborne_nohit",
+			"provider_phase": "actual_f576_visited_leaves",
+			"source_generation": 1,
+			"terrain_queries": 3
+		},
+		{
+			"case": "actual_flown_source_park",
+			"integrated_steps": 309,
+			"parked_agl_m": 3.96207548620179,
+			"physical_device_tested": false,
+			"source_generation": 310,
+			"source_native_park_witness": true
+		}
+	],
+	"failures": 0,
+	"schema": 1,
+	"scope": "Actual source Earth, real original F576/F575 session and literal Float32 geometry provider; no physical Android/device or full original object bank claim."
+}

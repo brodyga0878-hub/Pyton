@@ -1,0 +1,51 @@
+{
+	"checks": 146,
+	"evidence": [
+		{
+			"case": "actual_nohit_and_out_of_chart_rollback",
+			"failure_reason": "native_stage:mismatched_actual_classification",
+			"queries": 3
+		},
+		{
+			"case": "flown_deployed_contact",
+			"hull": 100.0,
+			"native_damage_calls": [],
+			"queries": 1,
+			"render_agl": -0.168859063090059,
+			"response_pose": "(0.0, -75862.42, 0.0)",
+			"source_generation": 53
+		},
+		{
+			"case": "flown_retracted_contact",
+			"hull": 75.0,
+			"native_damage_calls": [
+				{
+					"amount_s32": 100,
+					"attacker_u32": 0
+				}
+			],
+			"queries": 1,
+			"render_agl": -0.168859063090059,
+			"response_pose": "(0.0, -75862.42, 0.0)",
+			"source_generation": 53
+		},
+		{
+			"case": "actual_dry_park_cannot_invent_launch",
+			"fuel_commands": [
+				0,
+				0,
+				0
+			],
+			"source_generation": 53,
+			"source_pose_unchanged": true
+		},
+		{
+			"case": "strict_cold_park_then_powered_takeoff",
+			"launch_velocity": "(0.0, 0.478609, 0.0)",
+			"original_park_pose": "(0.0, -75862.42, 0.0)",
+			"source_generation": 54
+		}
+	],
+	"failures": 0,
+	"scope": "actual bounded manual source-contact trial; original F576 trace/provider/F575 + shared Nav HP/fuel/thermal/Gear; full F569 bank/autopilot/Android not claimed"
+}
