@@ -1,0 +1,97 @@
+{
+  "started_utc": "2026-11-16T11:57:31.166864+00:00",
+  "version": "0.27.0-native-return-alpha1",
+  "artifact_commit": "306095e9ea066639ee66e8a2104cd68a61fba342",
+  "source_commit": "1909e283fa6a9d4dfd2d57245ce3af82eebd7a45",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/306095e9ea066639ee66e8a2104cd68a61fba342/deliverables/0.27.0-native-return-alpha1/manifest.json",
+      "http_status": 200,
+      "bytes": 263360,
+      "sha256": "10827d62d72e0d22a0736f768c082eb8e3ed1f54361ce06a249c4a095a820b4f"
+    },
+    {
+      "file": "StarFrontier-0.27.0-native-return-arm64.apk",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/306095e9ea066639ee66e8a2104cd68a61fba342/deliverables/0.27.0-native-return-alpha1/StarFrontier-0.27.0-native-return-arm64.apk",
+      "http_status": 200,
+      "bytes": 50445743,
+      "sha256": "2615dd12ad27bf344dfe6e87f7cb47d80e4f83fb7073e8200f73e71c18b0ec88",
+      "zip_crc_verified": true
+    },
+    {
+      "file": "StarFrontier-0.27.0-native-return-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/306095e9ea066639ee66e8a2104cd68a61fba342/deliverables/0.27.0-native-return-alpha1/StarFrontier-0.27.0-native-return-source.zip",
+      "http_status": 200,
+      "bytes": 33420254,
+      "sha256": "673ec87cdfb9434c778f11fb70fb0b443fb6811ca0e96f0eea534b02cbca391b",
+      "zip_crc_verified": true,
+      "source_commit_in_zip_comment": "1909e283fa6a9d4dfd2d57245ce3af82eebd7a45"
+    },
+    {
+      "file": "screenshots/capture-manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/306095e9ea066639ee66e8a2104cd68a61fba342/deliverables/0.27.0-native-return-alpha1/screenshots/capture-manifest.json",
+      "http_status": 200,
+      "bytes": 81381,
+      "sha256": "9ae46c754ff16eeab603cbde44d7380e4ba4cea0d0f4f553a905c7fbb790b5fe"
+    },
+    {
+      "file": "screenshots/01-native-surface-return-1440x720.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/306095e9ea066639ee66e8a2104cd68a61fba342/deliverables/0.27.0-native-return-alpha1/screenshots/01-native-surface-return-1440x720.png",
+      "http_status": 200,
+      "bytes": 398008,
+      "sha256": "3d029b1cf79f6270a2d80b667e5c31edd43728116933443e4630bf8508725fda"
+    },
+    {
+      "file": "screenshots/02-native-return-descent-1440x720.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/306095e9ea066639ee66e8a2104cd68a61fba342/deliverables/0.27.0-native-return-alpha1/screenshots/02-native-return-descent-1440x720.png",
+      "http_status": 200,
+      "bytes": 397592,
+      "sha256": "7ca483d7848dec28ade5e752413d76ef5ff6e3479b7e9fd43f49a97a64db0af3"
+    },
+    {
+      "file": "screenshots/03-native-return-park-960x432.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/306095e9ea066639ee66e8a2104cd68a61fba342/deliverables/0.27.0-native-return-alpha1/screenshots/03-native-return-park-960x432.png",
+      "http_status": 200,
+      "bytes": 219609,
+      "sha256": "5a99c747daebdf5c3c184335654c967761d9ed61f371a5e94df6f6329a97b4d5"
+    },
+    {
+      "file": "screenshots/04-source-dock-guidance-960x432.png",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/306095e9ea066639ee66e8a2104cd68a61fba342/deliverables/0.27.0-native-return-alpha1/screenshots/04-source-dock-guidance-960x432.png",
+      "http_status": 200,
+      "bytes": 262056,
+      "sha256": "ff4cb2bffef63a98252274d2ed5f475f15df90a5f46fb1293adf8563ca3c499e"
+    },
+    {
+      "file": "sample-native-return-include-save-report.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/306095e9ea066639ee66e8a2104cd68a61fba342/deliverables/0.27.0-native-return-alpha1/sample-native-return-include-save-report.zip",
+      "http_status": 200,
+      "bytes": 12429,
+      "sha256": "5c80c5fb502ef38fc5c21a0393414588ee163853ad65592c1238cc0c3341d963",
+      "zip_crc_verified": true
+    }
+  ],
+  "status": "verified",
+  "requested_extra_files": [
+    "sample-native-return-include-save-report.zip"
+  ],
+  "scope": "Nine actual complete immutable HTTPS downloads: manifest, APK, source ZIP, capture manifest, four PNGs and actual production include-save ZIP. All98 manifest payloads and all471 frozen runtime inputs verified locally;90 auxiliary payloads were not individually downloaded. Bounded native trial and separate ordinary docking; no physical Android/FPS/full-clone claim.",
+  "completed_utc": "2026-11-16T11:57:58.337793+00:00",
+  "schema": "starfrontier-native-return-publication-v1",
+  "all_manifest_payloads_downloaded": false,
+  "local_manifest_payload_count": 98,
+  "all_local_manifest_payload_hashes_verified": true,
+  "auxiliary_payloads_not_individually_downloaded": 90,
+  "local_manifest_sha256": "10827d62d72e0d22a0736f768c082eb8e3ed1f54361ce06a249c4a095a820b4f",
+  "release_download_verifier_sha256": "797290c09c2fd255ac637ff23f44b57e94845e0cda87c7a3b8118342a392cd7f",
+  "runtime_freeze_sha256": "ddbcc352cf31893eeee9736e574a9f66658fa4310b8f02b58279a366049d2f2e",
+  "runtime_inputs_verified": 471,
+  "all_current_runtime_inputs_match_frozen_inputs": true,
+  "local_reverification_completed_utc": "2026-11-16T11:59:41.830915+00:00",
+  "physical_device_tested": false,
+  "production_release_ready": false,
+  "full_clone_completed": false,
+  "sealed_manifest_keeps_prepublication_status": true,
+  "source_documents_keep_source_commit_prepublication_status": true
+}
