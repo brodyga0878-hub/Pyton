@@ -1,0 +1,109 @@
+{
+	"checks": 157,
+	"evidence": [
+		{
+			"case": "genuine20km_departure_rejects_distant_station",
+			"no_flown35Mm_transit_claim": true,
+			"reason": "station_is_not_within_100km_manual_approach",
+			"site": "site13"
+		},
+		{
+			"all_input_owners_unchanged": true,
+			"case": "explicit_near_station_same_time_handoff",
+			"gravity_body": "(0.178687, -0.077684, 0.122858)",
+			"gravity_station": "(0.178687, -0.077684, 0.122858)",
+			"labelled_position_fixture_not_flown35Mm": true,
+			"receipt": {
+				"body_id": "earth",
+				"clock_advanced": false,
+				"distance_to_station_m": 8000.01456248675,
+				"fuel_advanced": false,
+				"full_original_object_bank": false,
+				"hp_applied": false,
+				"ideal_position_f64_hex": "0000000000002a40000000000000204000000000007cb540",
+				"ideal_velocity_f64_hex": "00b8a0d1fdffff3f00b0b406eaffef3f00b056842d0008c0",
+				"legacy_orbit_guard": {
+					"coarse_only": true,
+					"contract": "source-height-orbit-clearance-v1",
+					"minimum_altitude_m": 34376905.9626213,
+					"ok": true,
+					"outside_envelope": true
+				},
+				"mapping": {
+					"axes_rotated": false,
+					"body_id": "earth",
+					"from_origin_raw_s64_hex": "eb8d0940ef77ffff45c32d9b010000004a79e70102000000",
+					"from_site_id": "",
+					"full_original_object_bank": false,
+					"omega_cross_radius_added": false,
+					"origin_difference_raw_s64_hex": "1d76fcdc04000000f609544bfeffffff028c6ef90a000000",
+					"policy": "bounded-source-station-origin-handoff-v1",
+					"position_delta_f64_hex": "d036c44fd4ed7341806ab9b7bff55bc110794ec9627c8641",
+					"sample_clock_after": {
+						"day_u32": 1187063.0,
+						"tick_u32": 2173054610.0
+					},
+					"sample_clock_before": {
+						"day_u32": 1187063.0,
+						"tick_u32": 2173004900.0
+					},
+					"sample_days_after_f64_hex": "2ee2282be962783f",
+					"sample_days_before_f64_hex": "067bd846c656783f",
+					"sample_origin_difference_after_raw_s64_hex": "a205f1dc040000005803594bfeffffff095882f90a000000",
+					"sample_origin_difference_before_raw_s64_hex": "99e607dd0400000095104f4bfefffffffabf5af90a000000",
+					"sample_seconds_f64_hex": "000000a0f4ffef3f",
+					"source_days_f64_hex": "9aae00b9d75c783f",
+					"source_digest": "b57f76f8d68e700ebca0e6f1242c9a2446915930dc1b6f4b2aa170b4a1c4f9b0",
+					"source_record_hex": "c04a49003412bc0a01000a008100074430000040191e1b000000000000000000110000002701456172746800000000000000000000000000000000000000010000000000",
+					"system_id": 44341016.0,
+					"to_origin_raw_s64_hex": "ce170d63ea77ffff4fb9d94f0300000048ed7808f7ffffff",
+					"to_site_id": "site13",
+					"velocity_delta_f64_hex": "d2978be0587097c02cad815a3762844054ea9e141948a440",
+					"velocity_policy": "source-ephemeris-origin-derivative-one-second-v1"
+				},
+				"ongoing_station_law": "existing-station-following-mobile-flight-not-inertial-trajectory-equivalence",
+				"policy": "bounded-source-station-origin-handoff-v1",
+				"position_snapped": false,
+				"schema": "starfrontier-native-station-frame-handoff-v1",
+				"site_id": "site13",
+				"source_atmosphere": {
+					"apply_f1014": false,
+					"contract": "source-natural-f1014-contact-current-phone-frame-v1"
+				},
+				"source_days_f64_hex": "9aae00b9d75c783f",
+				"source_digest": "b57f76f8d68e700ebca0e6f1242c9a2446915930dc1b6f4b2aa170b4a1c4f9b0",
+				"source_pose_f32_hex": "9c6e9fcb0eaedf4ab7dd33ccc7c2bb44bbd122c4c97022c50000000000000000254d113ee1687d3f",
+				"source_record_hex": "c04a49003412bc0a01000a008100074430000040191e1b000000000000000000110000002701456172746800000000000000000000000000000000000000010000000000",
+				"station_context": {
+					"active": true,
+					"contract": "selected-source-station-session-v1",
+					"descriptor_sha256": "cfaac5a0dbaec22c496e96322dc923e689adcbbb41475aa61eb4ab8344e573f8",
+					"door_u16": 0.0,
+					"handled": true,
+					"model_index": 80.0,
+					"ok": true,
+					"site_id": "site13",
+					"source_seed": 550284234.0,
+					"status": "configured"
+				},
+				"station_pose_f32_hex": "000050410000004100e0ab45efffff3f50ff7f3f6c0140c00000000000000000254d113ee1687d3f",
+				"station_record_hex": "00003800caabcc20050022005000904e24005555312a120000000000000000000000b61020014162726168616d204c696e636f6c6e0000000000000000000a0000000000",
+				"system_id": 44341016.0,
+				"thrust_profile_enabled": false,
+				"velocity_policy": "source-ephemeris-origin-derivative-one-second-v1"
+			}
+		}
+	],
+	"failures": 0,
+	"scope": "Actual20km powered source departure rejects the distant station. A separately labelled near-station orbital pose tests exact source raw-origin translation, sampled origin velocity, canonical roundtrip, sourcegravity and zero-time physical ownership. No flown35Mm transfer, complete F570/F606 object bank or ongoing inertial-trajectory equivalence claim.",
+	"sources": {
+		"scripts/native_orbit_trial.gd": "05f5219e8ff946034390000a193f23d1dd51e8c5b443c3a7d6cf2b307b6574bb",
+		"scripts/native_station_frame.gd": "d55138987007496fd560ee54b6059afff379e68802ffb07688f93070f16c8d3f",
+		"scripts/planetary_system.gd": "f243ebb2699bce714386e87ca32bfdb35709a2c9c45178cac9fa6cb8874abc62",
+		"scripts/source_clock.gd": "b2d206a9e2e6db21635fe37d6f61ba75d2fb9f56d92f8851a77c9b11fc4dbe09",
+		"scripts/source_orbit.gd": "7091ed3bbb88e79434ce21d53b3c98bf7f01391ee8a20a736c5e7c56eef55579",
+		"scripts/source_station_session.gd": "80807b1c4b0aefb42f6907ef7480e2792295017f681caa5608894290d8d85b8f",
+		"scripts/source_units.gd": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24",
+		"tests/test_native_station_frame.gd": "af30a80cb1e29d824f8f480aa3fc670ca5eefdee9b5aabf0bef7b011ce634d71"
+	}
+}

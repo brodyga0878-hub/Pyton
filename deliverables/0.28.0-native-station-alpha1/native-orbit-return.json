@@ -1,0 +1,121 @@
+{
+	"checks": 271,
+	"evidence": [
+		{
+			"case": "actual_continuous_airborne_inverse_transfer",
+			"original_owners_unchanged": true,
+			"receipt": {
+				"airborne_rebind": {
+					"callbacks": [],
+					"clock_advanced": false,
+					"contact_detected": false,
+					"damage_calls": [],
+					"fuel_advanced": false,
+					"hp_applied": false,
+					"ok": true,
+					"position_snapped": false,
+					"provider_retained_render_only": false,
+					"reason": "native_airborne_return_anchor_committed",
+					"response_applied": false,
+					"source_generation_after": 1071.0,
+					"source_generation_before": 1070.0,
+					"source_transition_sha256": "8740fa506da14316c9e07682dc8168eba32ab82d5ccb6d68c49f4f58a1b4d479",
+					"terrain_query_calls": 3.0
+				},
+				"body_id": "earth",
+				"clock_advanced": false,
+				"days_f64_hex": "e33d9208a15b783f",
+				"fuel_advanced": false,
+				"full_original_object_bank": false,
+				"hp_applied": false,
+				"native_display_agl_m": 19999.6438071811,
+				"omega_cross_radius_added": false,
+				"outbound_lineage_sha256": "e94cbc63b80e8b04c94906ece0d6ea2a05856b4498da8d0c9ee29fda80dae9e2",
+				"phone_pose_f32_hex": "0000bc30a0365ac700000000b35d992f86e5f13e0000000000000000000000000000bc330000803f",
+				"phone_position_ideal_f64_hex": "000000000080173e80000000d446ebc00000000000000000",
+				"phone_position_rounding_error_f64_hex": "0000000000000000000000000000103e0000000000000000",
+				"phone_velocity_ideal_f64_hex": "0000006cb62bf33d7c23b3c9b03cde3f0000000000000000",
+				"policy": "native-trial-inverse-affine-airborne-return-v1",
+				"position_snapped": false,
+				"schema": "starfrontier-native-orbit-return-v1",
+				"source_record_hex": "c04a49003412bc0a01000a008100074430000040191e1b000000000000000000110000002701456172746800000000000000000000000000000000000000010000000000",
+				"space_generation": 0.0,
+				"space_pose_f32_hex": "42c7934a079fd2caaa10bacb77baf1be00000000ad4f903c4f5d023f992efbbe992efb3e4f5d023f",
+				"space_position_f64_hex": "30b08e31e8785241000000e0e0535ac1f1a00a30154277c1",
+				"system_id": 44341016.0,
+				"velocity_policy": "rotate-bodyfixed-phone-velocity-no-added-omega-cross-radius-v1"
+			},
+			"space_generation": 0
+		},
+		{
+			"case": "returned_native_cold_warm_continuation",
+			"compared_intervals": 12,
+			"source_generation": 1083
+		},
+		{
+			"case": "actual_continuous_airborne_inverse_transfer",
+			"original_owners_unchanged": true,
+			"receipt": {
+				"airborne_rebind": {
+					"callbacks": [],
+					"clock_advanced": false,
+					"contact_detected": false,
+					"damage_calls": [],
+					"fuel_advanced": false,
+					"hp_applied": false,
+					"ok": true,
+					"position_snapped": false,
+					"provider_retained_render_only": false,
+					"reason": "native_airborne_return_anchor_committed",
+					"response_applied": false,
+					"source_generation_after": 1071.0,
+					"source_generation_before": 1070.0,
+					"source_transition_sha256": "0eba0f813ef3f743f56d57762ad9831a02d940ba6d0d001f663829b78bdcd665",
+					"terrain_query_calls": 3.0
+				},
+				"body_id": "earth",
+				"clock_advanced": false,
+				"days_f64_hex": "5db69abdc969783f",
+				"fuel_advanced": false,
+				"full_original_object_bank": false,
+				"hp_applied": false,
+				"native_display_agl_m": 19999.5559056087,
+				"omega_cross_radius_added": false,
+				"outbound_lineage_sha256": "e94cbc63b80e8b04c94906ece0d6ea2a05856b4498da8d0c9ee29fda80dae9e2",
+				"phone_pose_f32_hex": "9a4e243eb1365ac718e68ebf79ce723e87e1f2bdd4d676bf390675bde605f5bdb6cafab810b37d3f",
+				"phone_position_ideal_f64_hex": "00005045d389c43f00955515d646ebc000000004c3dcf1bf",
+				"phone_position_rounding_error_f64_hex": "000000000040253e00000000d654553f000000000000503e",
+				"phone_velocity_ideal_f64_hex": "918bdf1ccf59ce3f60b5faed305cbebf00000080dadaeebf",
+				"policy": "native-trial-inverse-affine-airborne-return-v1",
+				"position_snapped": false,
+				"schema": "starfrontier-native-orbit-return-v1",
+				"source_record_hex": "c04a49003412bc0a01000a008100074430000040191e1b000000000000000000110000002701456172746800000000000000000000000000000000000000010000000000",
+				"space_generation": 70.0,
+				"space_pose_f32_hex": "42c7934a059fd2caa910bacbd068023ed4d6763f101c6e3e6d6f083f788e13bf93acca3e20f6f33e",
+				"space_position_f64_hex": "48a31a36e8785241f0f38c98e0535ac1f3cc832d154277c1",
+				"system_id": 44341016.0,
+				"velocity_policy": "rotate-bodyfixed-phone-velocity-no-added-omega-cross-radius-v1"
+			},
+			"space_generation": 70
+		},
+		{
+			"case": "returned_native_cold_warm_continuation",
+			"compared_intervals": 12,
+			"source_generation": 1083
+		},
+		{
+			"case": "typed_return_and_unsafe_zero_time_contact_guards",
+			"original_owners_unchanged": true,
+			"unsafe_reason": "return_boundary_must_be_airborne_without_response"
+		}
+	],
+	"failures": 0,
+	"scope": "Actual powered source20km departure; inverse affine return over current F64 space position and current body spin; real zero-time airborne source rebind; unchanged HP/RNG/fuel/gear/day; typed native cold and following real intervals. Bounded observed source leaf/1..30km, no full F570/F606 dispatcher, original autopilot or physical Android claim.",
+	"sources": {
+		"scripts/native_landing_trial.gd": "9e99d0c664a9fd2cab79424ee8c05359d0fa30bd2de34ea88a7286915285bda1",
+		"scripts/native_orbit_return.gd": "3a55a0cbabfe0ce051bab9a0bbabd8cd79a5121dfd4b0606f817ee3eb641bc89",
+		"scripts/native_orbit_trial.gd": "05f5219e8ff946034390000a193f23d1dd51e8c5b443c3a7d6cf2b307b6574bb",
+		"scripts/native_surface_model.gd": "7753220ae61c5194d6d4b7f51ebc017052579e58ba515987bb5ebf7ee9713fee",
+		"tests/test_native_orbit_return.gd": "11349ec8df80ab1853632b9b5ef7604b8f00d293dee2fe4074856208aa2936e1"
+	}
+}

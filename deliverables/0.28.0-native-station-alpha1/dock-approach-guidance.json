@@ -1,0 +1,60 @@
+{
+	"checks": 148,
+	"evidence": [
+		{
+			"case": "readonly_exact_source_guard_feedback",
+			"models": [
+				69,
+				72,
+				73,
+				74,
+				75,
+				76,
+				77,
+				78,
+				79,
+				80
+			],
+			"old100m_rejected": true,
+			"rotating_relative_speed_used": true,
+			"rounded_display_never_authoritative": true,
+			"supported_hulls": [
+				"cobra",
+				"eagle",
+				"shuttle"
+			]
+		},
+		{
+			"case": "legacy100m12mps_unchanged"
+		},
+		{
+			"approach_intervals": 3437,
+			"case": "actual_Main_requested_door_rotating_approach_dock_service_departure",
+			"departure_axis_m": 479.98046875,
+			"labelled_initial_outer_point_placement": true,
+			"measured_original_spin": true,
+			"real_equipment_purchase_credits": 100,
+			"remaining_hull": 100.0,
+			"seconds_per_interval": 0.1,
+			"separate_native_trial_not_attached": true,
+			"source_door_scheduler_opened": true,
+			"source_station_id": "site3"
+		}
+	],
+	"failures": 0,
+	"policy": "source-station-mobile-approach-feedback-v1",
+	"schema": 1,
+	"scope": "Read-only feedback of the exact retained mobile source dock guard and legacy training guard. Actual Main source opening request, paused modal, measured original spin, physical autopilot approach, legitimate capture, routed paid service and real launch. Initial source outer-point placement and closed-door state are labelled fixtures. This does not attach the separate native surface/orbit trial to a station, reconstruct original F597/object-bank station frames or certify physical Android/FPS.",
+	"sources": {
+		"scripts/dock_approach_guidance.gd": "410cd9389baa15ea1eb9ac7c0f25186d39fd2007d7de47e49756861032705922",
+		"scripts/flight_model.gd": "4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b",
+		"scripts/hyperdrive_services_view.gd": "70d828f819faeb8c8e31d12e1101ef82ce5d306f9cf329b2902600f82b5fe3f7",
+		"scripts/main.gd": "98b451b1487a5adda8c6b2b5d048729f45ca21a3aa89cf4b78fc0a2fc0263d25",
+		"scripts/navigation.gd": "339d9350bf84300a215d821a9c3cca31a9ea053a7369f20d311868d11521b233",
+		"scripts/planetary_system.gd": "f243ebb2699bce714386e87ca32bfdb35709a2c9c45178cac9fa6cb8874abc62",
+		"scripts/rotating_dock_dynamics.gd": "68eb63c19831a2828fa62a1c10126de099d7d4905859f905c4b93e37124206a4",
+		"scripts/source_station_geometry.gd": "5785d288a3a0582dc4f06db53fad4b6d52446d3d476adc894fa9b7624cf69b94",
+		"scripts/source_station_session.gd": "80807b1c4b0aefb42f6907ef7480e2792295017f681caa5608894290d8d85b8f",
+		"tests/test_dock_approach_guidance.gd": "25de20e4866e20f626c26b8d4010677aab463628ea23e3e060a5ac1230c74bb2"
+	}
+}

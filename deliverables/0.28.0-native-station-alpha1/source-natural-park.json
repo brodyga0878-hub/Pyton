@@ -1,0 +1,16 @@
+{
+	"checks": 621,
+	"counts": {
+		"native_acceptances": 76,
+		"native_sound_cases": 1,
+		"native_state32_cold_ticks": 76
+	},
+	"failures": 0,
+	"schema": 1,
+	"scope": "Actual original F1021 JUMP4228 accepted natural branch, F1042 resets and F1030 state32 RET only; native byte-exact body/root and command arguments, explicit captured pointer-word bindings. No full F1021 dispatcher/object bank, executed sound/UI, native launch/F1047, HP/fuel/time or Main/Android proof.",
+	"sources": {
+		"scripts/source_natural_park.gd": "06c44e67f338d8e1011ace70ea6bc89cbe1fa905348c6efedffeb2686abfab14",
+		"tests/fixtures/source_contact_lifecycle_native.json": "0db723a520144a55fa3846d80a3e1cad58b42c18d2f904500688a05ebfbf1f8b",
+		"tests/test_source_natural_park.gd": "181164fa415b05bad2174f963e4ecd136ec093b1cddfe82cbd8a79ccc5dbd4a6"
+	}
+}

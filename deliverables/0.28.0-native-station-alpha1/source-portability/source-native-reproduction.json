@@ -1,0 +1,57 @@
+{
+  "schema": "starfrontier-source-archive-native-contact-lifecycle-reproduction-v1",
+  "source_commit": "de8eb18a687d007781321436910187dff3785775",
+  "archive_sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d",
+  "fixture_sha256": "0db723a520144a55fa3846d80a3e1cad58b42c18d2f904500688a05ebfbf1f8b",
+  "fixture_reproduced_byte_exact": true,
+  "commands": [
+    {
+      "command": [
+        "python3",
+        "/workspace/recovery/native-station-source-portability/source/StarFrontier-0.28.0-source/validation/contact-lifecycle-2026-11-15/native-proof/rebuild_source_contact_lifecycle_native.py",
+        "--work",
+        "/workspace/recovery/native-station-source-portability/native-rebuild-work"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_seconds": 0.160466,
+      "log_file": "source-native-generator.log",
+      "log_sha256": "18187de59c9f9d0e306693622f1ca05be7ea6b63ee25c102c1cf241c3bc420b4",
+      "error_markers": [],
+      "name": "generator"
+    },
+    {
+      "command": [
+        "python3",
+        "/workspace/recovery/native-station-source-portability/source/StarFrontier-0.28.0-source/validation/contact-lifecycle-2026-11-15/native-proof/validate_source_contact_lifecycle_native.py",
+        "--replay"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_seconds": 0.153517,
+      "log_file": "source-native-validator.log",
+      "log_sha256": "939ec337ef5538018bd4622a17735857c4aa0d769f7ce3fc431e388ac2d7c61f",
+      "error_markers": [],
+      "name": "validator"
+    }
+  ],
+  "error_markers": [],
+  "all_archived_files_unchanged": true,
+  "modified_archived_files": [],
+  "archived_files": 1660,
+  "native_validation_checks": 6208,
+  "native_validation_failures": 0,
+  "native_control_cases": 402,
+  "native_replayed_cases": 402,
+  "pinned_runtime_inputs_verified": 475,
+  "all_runtime_inputs_match_frozen_source": true,
+  "native_bank_cases": {
+    "full_F574_actor_calls": 247,
+    "corrected_body_F574_requeries": 76,
+    "restored_F1030_parked_updates": 76,
+    "intercepted_F1047_entry_prefixes": 3
+  },
+  "new_native_oracle_claimed": false,
+  "ok": true,
+  "scope": "The unchanged archived402-case original-instruction generator and6208-check --replay validator run inside the exact fresh code53 ZIP. All archived source/proof bytes remain unchanged. This reproduces the prior bounded F574/F575/park/F1047-entry bank; it does not create a new native oracle, prove full source autopilot/launch/F573 bank conversion, circular orbit, original save format or physical Android. Repeated counts are separate from the unique47 functional total."
+}

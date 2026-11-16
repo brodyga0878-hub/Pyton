@@ -1,0 +1,106 @@
+{
+	"checks": 104,
+	"evidence": [
+		{
+			"actual_small_speed_f64_distance_m": 5.99999997764826,
+			"actual_small_speed_intervals": 360,
+			"boundary_preserved_owner_intervals": true,
+			"case": "actual_Main_autoland_powered20km_affine_handoff_and_space",
+			"equipment_service": {
+				"actual_bay_UI_purchase": true,
+				"atmospheric_shielding_installed": true,
+				"credits_after": 900,
+				"credits_before": 1000,
+				"credits_spent": 100,
+				"hull_or_heat_patched": false
+			},
+			"first_space_interval_once": true,
+			"interval_seconds": 0.5,
+			"native_boundary_altitude_m": 19999.7102134312,
+			"native_intervals": 1014,
+			"raw_hull": 400,
+			"receipt": {
+				"body_id": "earth",
+				"center_f32_hex": "4f88344b079fd2cafd0dbccb",
+				"chart_basis_f32_hex": "0000008000000000000080bf0000803f000000000000008000000000000080bf00000080",
+				"circular_orbit_inserted": false,
+				"clock_advanced": false,
+				"fuel_advanced": false,
+				"full_original_object_bank": false,
+				"hp_applied": false,
+				"ideal_position_f64_hex": "5cc20ef5aa795241000000e0e0535ac16be2d5e22c3d77c1",
+				"ideal_velocity_f64_hex": "205b3c89009ed8bf0000000000000000c0059aa676a98f3f",
+				"legacy_orbit_guard": {
+					"altitude_m": 20013.6750452733,
+					"body_id": "earth",
+					"coarse_only": false,
+					"contract": "source-height-orbit-clearance-v1",
+					"distance_m": 6993837.33621257,
+					"elevation_m": -75876.3388326985,
+					"ok": true,
+					"outside_envelope": false,
+					"terrain_radius_m": 6973823.6611673,
+					"terrain_revision": "sphere-source-ground-v4"
+				},
+				"native_display_agl_m": 19999.7102134312,
+				"omega_cross_radius_added": false,
+				"policy": "native-trial-affine-handoff-and-atomic-manual-space-v1",
+				"position_rounding_error_f64_hex": "000000487be2c53f00000000000000000000005813afc63f",
+				"position_rounding_error_m": [
+					0.170974168926477,
+					0.0,
+					0.17721788212657
+				],
+				"position_snapped": false,
+				"rotation_basis_f32_hex": "21cb7fbf000000004f7f243d000000000000803f000000004f7f24bd0000000021cb7fbf",
+				"schema": "starfrontier-native-orbit-handoff-v1",
+				"source_days_f64_hex": "1b32180f17307a3f",
+				"source_digest": "b57f76f8d68e700ebca0e6f1242c9a2446915930dc1b6f4b2aa170b4a1c4f9b0",
+				"source_generation": 1468.0,
+				"source_phone_pose_f32_hex": "000000008f365ac70000000000000000b918c53e000000000000000000000000000000000000803f",
+				"source_record_hex": "c04a49003412bc0a01000a008100074430000040191e1b000000000000000000110000002701456172746800000000000000000000000000000000000000010000000000",
+				"space_pose_f32_hex": "58cd934a079fd2ca67e9b9cb04f0c4be00000000b54b7d3c838b023f8acefabe8acefa3e838b023f",
+				"system_id": 44341016.0,
+				"thrust_profile_enabled": true,
+				"velocity_policy": "rotate-bodyfixed-phone-velocity-no-added-omega-cross-radius-v1"
+			}
+		},
+		{
+			"case": "actual_space_cold_and_guards",
+			"exact_compared_intervals": 2,
+			"normal_store_rejects_orbit": true,
+			"out_of_budget_interval_atomic": true
+		},
+		{
+			"case": "pending_orbital_intent_cold_and_early_guard",
+			"exact_compared_intervals": 4,
+			"pre_save_intervals": 10,
+			"premature_handoff_atomic": true
+		},
+		{
+			"case": "actual_unshielded_atmospheric_departure_rejected",
+			"equipment_autofitted": false
+		},
+		{
+			"archive": "StarFrontier-report-2026-11-16T15-51-53Z-0000000163859145-0001.zip",
+			"case": "actual_space_include_save_ZIP",
+			"full_space_lineage_transported": true
+		}
+	],
+	"failures": 0,
+	"scope": "Task3 actual Main protected autoland, real powered20km ascent, continuous affine space handoff, exactly one subsequent space/fuel/time interval, real render/control refresh, scheduler, cold space/ascent intent, early/typed guards, real ZIP and original-flight isolation. Atmospheric protection bought through actual source bay UI; no circular-orbit insertion/full original dispatcher/Android/FPS claim.",
+	"sources": {
+		"scripts/main.gd": "98b451b1487a5adda8c6b2b5d048729f45ca21a3aa89cf4b78fc0a2fc0263d25",
+		"scripts/native_landing_trial.gd": "9e99d0c664a9fd2cab79424ee8c05359d0fa30bd2de34ea88a7286915285bda1",
+		"scripts/native_orbit_trial.gd": "05f5219e8ff946034390000a193f23d1dd51e8c5b443c3a7d6cf2b307b6574bb",
+		"scripts/native_surface_autopilot.gd": "fedc1eab979e497bc3233cdb58f4e20d3cc06203f92ecfe90e8e0cf475776733",
+		"scripts/native_surface_model.gd": "7753220ae61c5194d6d4b7f51ebc017052579e58ba515987bb5ebf7ee9713fee",
+		"scripts/source_landing_gear_session.gd": "ba8b63cbf89f30441f0bdfe01ed51af3a7e0e4679451264826039dd7b65887a0",
+		"scripts/source_native_surface_provider.gd": "c1558516a8414783de8b3c74d97e75fa9dfd52feeaa81517d974af10e28fcc5e",
+		"scripts/source_natural_contact_session.gd": "5e3472a7bbe8998a30f11340a563564d43307dd1b3c482eb838126c880a728d6",
+		"scripts/source_orbit_surface_guard.gd": "deda7d90316172e9c8254235d07f630b286a5bc047d54d41a6e0357408c2c7c8",
+		"tests/test_native_ascent_main.gd": "4760fa4ea479dd6050ef966e373f893118896ddf75966c92e5dcd09c45ecd06d",
+		"tests/test_native_autopilot_main.gd": "64a5c2bae80f17550120b91723ffa8af0394b639e09450bf309b60ab89253ff7",
+		"tests/test_native_orbit_main.gd": "2360810b424737a30c476f8088921ed48765024b0757443eb576451ca9b482f3"
+	}
+}

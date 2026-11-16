@@ -1,0 +1,49 @@
+{
+  "schema": "starfrontier-source-archive-code53-feature-v1",
+  "source_commit": "de8eb18a687d007781321436910187dff3785775",
+  "archive_sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d",
+  "name": "native_station_frame",
+  "test": "tests/test_native_station_frame.gd",
+  "layer": "pure_kernel",
+  "command": [
+    "godot",
+    "--headless",
+    "--audio-driver",
+    "Dummy",
+    "--path",
+    "/workspace/recovery/native-station-source-portability/source/StarFrontier-0.28.0-source",
+    "--script",
+    "res://tests/test_native_station_frame.gd"
+  ],
+  "exit_code": 0,
+  "timed_out": false,
+  "duration_seconds": 62.466573,
+  "log_file": "native-station-frame-feature.log",
+  "log_sha256": "d734dbfecf2a09818e40b0b7fa6ea823eccb42645332d7388ac76f664e5694c4",
+  "error_markers": [],
+  "checks": 157,
+  "failures": 0,
+  "expected_checks_from_archived_final_report": 157,
+  "archived_final_report": "validation/native-station-2026-11-16/native-station-frame.json",
+  "archived_final_report_sha256": "a51cac4510619aeaca2d91c21e91a85a018dae7c0ea99485881f470f96a7b3af",
+  "declared_source_pins": {
+    "scripts/native_orbit_trial.gd": "05f5219e8ff946034390000a193f23d1dd51e8c5b443c3a7d6cf2b307b6574bb",
+    "scripts/native_station_frame.gd": "d55138987007496fd560ee54b6059afff379e68802ffb07688f93070f16c8d3f",
+    "scripts/planetary_system.gd": "f243ebb2699bce714386e87ca32bfdb35709a2c9c45178cac9fa6cb8874abc62",
+    "scripts/source_clock.gd": "b2d206a9e2e6db21635fe37d6f61ba75d2fb9f56d92f8851a77c9b11fc4dbe09",
+    "scripts/source_orbit.gd": "7091ed3bbb88e79434ce21d53b3c98bf7f01391ee8a20a736c5e7c56eef55579",
+    "scripts/source_station_session.gd": "80807b1c4b0aefb42f6907ef7480e2792295017f681caa5608894290d8d85b8f",
+    "scripts/source_units.gd": "42f7db81e27c5d8ef12bf7e80192e0ebc96b815cbd71b0263047d14fbdc03b24",
+    "tests/test_native_station_frame.gd": "af30a80cb1e29d824f8f480aa3fc670ca5eefdee9b5aabf0bef7b011ce634d71"
+  },
+  "source_actual_files": 1660,
+  "all_source_files_unchanged": true,
+  "modified_files": [],
+  "private_xdg": {
+    "XDG_DATA_HOME": "/workspace/recovery/native-station-source-portability/feature_tests/native_station_frame/data",
+    "XDG_CONFIG_HOME": "/workspace/recovery/native-station-source-portability/feature_tests/native_station_frame/config",
+    "XDG_CACHE_HOME": "/workspace/recovery/native-station-source-portability/feature_tests/native_station_frame/cache"
+  },
+  "physical_device_tested": false,
+  "ok": true
+}

@@ -1,0 +1,50 @@
+{
+	"checks": 3928,
+	"evidence": [
+		{
+			"case": "typed_return_guidance_guards",
+			"malformed_variants": 5,
+			"original_owners_unchanged": true
+		},
+		{
+			"case": "actual_source_empty_positive_nozzle_return_guard",
+			"filtered_upward_unit_command": [
+				0.00000017508864402771,
+				0.0000000000000306560332674621,
+				0.0
+			],
+			"original_owners_unchanged": true,
+			"propulsion_filter_respected": true,
+			"reason": "insufficient_vertical_propulsion"
+		},
+		{
+			"case": "actual20km_return_descent_to_original_park",
+			"cold_windows": 2,
+			"exact_cold_intervals": 24,
+			"final_display_agl_m": -0.0907340631628184,
+			"gear_deployed": true,
+			"hull": 100.0,
+			"interval_seconds": 0.5,
+			"intervals": 887,
+			"max_observed_step_m": 30.0,
+			"original_contact_accepted": true,
+			"phases": [
+				"entry",
+				"braking",
+				"gear",
+				"descent"
+			],
+			"source_generation": 1958,
+			"start_display_agl_m": 19999.6438071811
+		}
+	],
+	"failures": 0,
+	"scope": "Actual source20km departure and continuous inverse transfer, powered full return descent with real source gear/fuel/thermal/HP and accepted F576/F575 parked contact; high/low strict cold continuation, typed guidance and real exhausted-positive-nozzle guards. Bounded host controller, not complete original AI, universal terrain or physical Android proof.",
+	"sources": {
+		"scripts/native_landing_trial.gd": "9e99d0c664a9fd2cab79424ee8c05359d0fa30bd2de34ea88a7286915285bda1",
+		"scripts/native_orbit_return.gd": "3a55a0cbabfe0ce051bab9a0bbabd8cd79a5121dfd4b0606f817ee3eb641bc89",
+		"scripts/native_surface_autopilot.gd": "fedc1eab979e497bc3233cdb58f4e20d3cc06203f92ecfe90e8e0cf475776733",
+		"scripts/native_surface_model.gd": "7753220ae61c5194d6d4b7f51ebc017052579e58ba515987bb5ebf7ee9713fee",
+		"tests/test_native_return_descent.gd": "a8368f6dd600fa968619b5b2d7b633e33db5922d56fc1892d87f0c6e17a5420e"
+	}
+}

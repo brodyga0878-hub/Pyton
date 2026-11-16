@@ -1,0 +1,48 @@
+{
+  "schema": "starfrontier-source-archive-code53-feature-v1",
+  "source_commit": "de8eb18a687d007781321436910187dff3785775",
+  "archive_sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d",
+  "name": "native_station_trial",
+  "test": "tests/test_native_station_trial.gd",
+  "layer": "pure_kernel",
+  "command": [
+    "godot",
+    "--headless",
+    "--audio-driver",
+    "Dummy",
+    "--path",
+    "/workspace/recovery/native-station-source-portability/source/StarFrontier-0.28.0-source",
+    "--script",
+    "res://tests/test_native_station_trial.gd"
+  ],
+  "exit_code": 0,
+  "timed_out": false,
+  "duration_seconds": 176.459432,
+  "log_file": "native-station-trial-feature.log",
+  "log_sha256": "10e03e38e66e443b1b25e0d0c2a46c7af27bae70df5db7d1005c1c81f3945324",
+  "error_markers": [],
+  "checks": 219,
+  "failures": 0,
+  "expected_checks_from_archived_final_report": 219,
+  "archived_final_report": "validation/native-station-2026-11-16/native-station-trial.json",
+  "archived_final_report_sha256": "31e2e79e28e0d879c07c2ce40bb2384ddee4ab4c57842ec30cf8ad21ba746f00",
+  "declared_source_pins": {
+    "scripts/flight_model.gd": "4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b",
+    "scripts/native_orbit_trial.gd": "05f5219e8ff946034390000a193f23d1dd51e8c5b443c3a7d6cf2b307b6574bb",
+    "scripts/native_station_frame.gd": "d55138987007496fd560ee54b6059afff379e68802ffb07688f93070f16c8d3f",
+    "scripts/native_station_trial.gd": "c1853a0169e57c9b9b030dbdf0c9480a2ceaff53feaa4555d7ed2f00e56b9622",
+    "scripts/rotating_dock_dynamics.gd": "68eb63c19831a2828fa62a1c10126de099d7d4905859f905c4b93e37124206a4",
+    "scripts/source_station_session.gd": "80807b1c4b0aefb42f6907ef7480e2792295017f681caa5608894290d8d85b8f",
+    "tests/test_native_station_trial.gd": "86b3d8c59e53846817e6e80ee43fa0c280a7074cba004e3c9e355703a015a230"
+  },
+  "source_actual_files": 1660,
+  "all_source_files_unchanged": true,
+  "modified_files": [],
+  "private_xdg": {
+    "XDG_DATA_HOME": "/workspace/recovery/native-station-source-portability/feature_tests/native_station_trial/data",
+    "XDG_CONFIG_HOME": "/workspace/recovery/native-station-source-portability/feature_tests/native_station_trial/config",
+    "XDG_CACHE_HOME": "/workspace/recovery/native-station-source-portability/feature_tests/native_station_trial/cache"
+  },
+  "physical_device_tested": false,
+  "ok": true
+}
