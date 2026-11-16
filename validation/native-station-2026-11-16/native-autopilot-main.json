@@ -1,0 +1,47 @@
+{
+	"checks": 93,
+	"evidence": [
+		{
+			"case": "actual_Auto_source_landing",
+			"gear_u16": 65535,
+			"intervals": 454,
+			"raw_hull": 400,
+			"render_agl": 0.174890936909941,
+			"single_interval_prediction_matched": true,
+			"source_generation": 454
+		},
+		{
+			"case": "actual_cold_guidance_continuation",
+			"compared_intervals": 20,
+			"initial_intervals": 8,
+			"whole_game_factory_rejects_stale_guidance": true
+		},
+		{
+			"case": "pause_cancel_and_failed_interval",
+			"failed_step_atomic": true,
+			"manual_actions": [
+				"Auto",
+				"steering",
+				"Brake",
+				"throttle"
+			]
+		},
+		{
+			"archive": "StarFrontier-report-2026-11-16T15-48-59Z-0000000066501951-0001.zip",
+			"case": "actual_active_guidance_include_save_ZIP",
+			"full_guidance_transported": true
+		}
+	],
+	"failures": 0,
+	"scope": "Actual Main automatic native landing guidance, source contact, exact candidate publication, old-save compatibility, cold continuation/cancellation, isolated normal return and real report ZIP. Host guidance is not the complete original autopilot; no physical Android/FPS claim.",
+	"sources": {
+		"scripts/main.gd": "98b451b1487a5adda8c6b2b5d048729f45ca21a3aa89cf4b78fc0a2fc0263d25",
+		"scripts/native_landing_trial.gd": "9e99d0c664a9fd2cab79424ee8c05359d0fa30bd2de34ea88a7286915285bda1",
+		"scripts/native_surface_autopilot.gd": "fedc1eab979e497bc3233cdb58f4e20d3cc06203f92ecfe90e8e0cf475776733",
+		"scripts/native_surface_model.gd": "7753220ae61c5194d6d4b7f51ebc017052579e58ba515987bb5ebf7ee9713fee",
+		"scripts/source_landing_gear_session.gd": "ba8b63cbf89f30441f0bdfe01ed51af3a7e0e4679451264826039dd7b65887a0",
+		"scripts/source_native_surface_provider.gd": "c1558516a8414783de8b3c74d97e75fa9dfd52feeaa81517d974af10e28fcc5e",
+		"scripts/source_natural_contact_session.gd": "5e3472a7bbe8998a30f11340a563564d43307dd1b3c482eb838126c880a728d6",
+		"tests/test_native_autopilot_main.gd": "64a5c2bae80f17550120b91723ffa8af0394b639e09450bf309b60ab89253ff7"
+	}
+}

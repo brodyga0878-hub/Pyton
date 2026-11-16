@@ -1,0 +1,93 @@
+{
+	"checks": 402,
+	"evidence": [
+		{
+			"case": "actual_source20km_powered_flight_to_space",
+			"handoff_receipt": {
+				"body_id": "earth",
+				"center_f32_hex": "4f88344b079fd2cafd0dbccb",
+				"chart_basis_f32_hex": "0000008000000000000080bf0000803f000000000000008000000000000080bf00000080",
+				"circular_orbit_inserted": false,
+				"clock_advanced": false,
+				"fuel_advanced": false,
+				"full_original_object_bank": false,
+				"hp_applied": false,
+				"ideal_position_f64_hex": "30b08e31e8785241000000e0e0535ac1f1a00a30154277c1",
+				"ideal_velocity_f64_hex": "807251d64e37debf000000000000000040876c95f509923f",
+				"legacy_orbit_guard": {
+					"altitude_m": 20013.6503274972,
+					"body_id": "earth",
+					"coarse_only": false,
+					"contract": "source-height-orbit-clearance-v1",
+					"distance_m": 6993837.33380696,
+					"elevation_m": -75876.316520541,
+					"ok": true,
+					"outside_envelope": false,
+					"terrain_radius_m": 6973823.68347946,
+					"terrain_revision": "sphere-source-ground-v4"
+				},
+				"native_display_agl_m": 19999.6438071811,
+				"omega_cross_radius_added": false,
+				"policy": "native-trial-affine-handoff-and-atomic-manual-space-v1",
+				"position_rounding_error_f64_hex": "000000a09fe2cc3f00000000000000000000001ebeeaef3f",
+				"position_rounding_error_m": [
+					0.225666001439095,
+					0.0,
+					0.997405108064413
+				],
+				"position_snapped": false,
+				"rotation_basis_f32_hex": "6ed27fbf000000009fb9183d000000000000803f000000009fb918bd000000006ed27fbf",
+				"schema": "starfrontier-native-orbit-handoff-v1",
+				"source_days_f64_hex": "e33d9208a15b783f",
+				"source_digest": "b57f76f8d68e700ebca0e6f1242c9a2446915930dc1b6f4b2aa170b4a1c4f9b0",
+				"source_generation": 1070.0,
+				"source_phone_pose_f32_hex": "00000000a0365ac7000000000000000086e5f13e000000000000000000000000000000000000803f",
+				"source_record_hex": "c04a49003412bc0a01000a008100074430000040191e1b000000000000000000110000002701456172746800000000000000000000000000000000000000010000000000",
+				"space_pose_f32_hex": "42c7934a079fd2caaa10bacb77baf1be00000000ad4f903c4f5d023f992efbbe992efb3e4f5d023f",
+				"system_id": 44341016.0,
+				"thrust_profile_enabled": false,
+				"velocity_policy": "rotate-bodyfixed-phone-velocity-no-added-omega-cross-radius-v1"
+			},
+			"interval_seconds": 0.5,
+			"intervals": 1017,
+			"native_height_m": 19999.6438071811,
+			"ordinary_owners_unchanged": true,
+			"source_generation": 1070
+		},
+		{
+			"case": "actual_orbit_steps_and_cold_repeat",
+			"day_f64_hex": "0890dd19455f783f",
+			"full_source_object_bank": false,
+			"generations": 3,
+			"hull": 100.0
+		},
+		{
+			"case": "actual_large_frame_one_metre_per_second60Hz_coast",
+			"cold_halfway_bit_exact": true,
+			"displacement_m": [
+				0.446568243205547,
+				0.648391675204039,
+				0.616575255990028
+			],
+			"final_position_f64_hex": "a078815ee87852415a57ae7de0535ac1f4c72c20154277c1",
+			"interval_seconds": 0.0166666666666667,
+			"naive_float32_trajectory_stuck": true,
+			"start_position_f64_hex": "a8e5ec41e878524126972da7e0535ac1f8450a2a154277c1",
+			"ticks": 60,
+			"velocity_mps": [
+				0.446568220853806,
+				0.648391664028168,
+				0.616575241088867
+			]
+		}
+	],
+	"failures": 0,
+	"scope": "Genuinely flown original-contact Earth20km powered ascent; affine frame handoff; bounded manual orbit with source gravity/fuel/thermal and old-guard rejection; pure cold lineage replay. No original object-bank/F573caller/circularorbit or physical Android claim.",
+	"sources": {
+		"scripts/native_landing_trial.gd": "9e99d0c664a9fd2cab79424ee8c05359d0fa30bd2de34ea88a7286915285bda1",
+		"scripts/native_orbit_trial.gd": "05f5219e8ff946034390000a193f23d1dd51e8c5b443c3a7d6cf2b307b6574bb",
+		"scripts/native_surface_autopilot.gd": "fedc1eab979e497bc3233cdb58f4e20d3cc06203f92ecfe90e8e0cf475776733",
+		"scripts/native_surface_model.gd": "7753220ae61c5194d6d4b7f51ebc017052579e58ba515987bb5ebf7ee9713fee",
+		"tests/test_native_orbit_trial.gd": "031739d798364299fb86c948df512606a8bdbf79111a46d1d4ca93b8e2188b71"
+	}
+}

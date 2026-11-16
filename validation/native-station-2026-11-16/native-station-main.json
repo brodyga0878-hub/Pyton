@@ -1,0 +1,160 @@
+{
+	"checks": 114,
+	"evidence": [
+		{
+			"actual_source_waypoint_m": [
+				0.0,
+				0.0,
+				4097.900390625
+			],
+			"case": "explicit_near_station_setup",
+			"closed_door_is_fixture": true,
+			"fixture_outside_source_waypoint_m": 100.0,
+			"outbound_original_lineage_retained": true,
+			"placement_is_fixture_not_flown": true,
+			"planet_to_station_journey_flown": false,
+			"site_id": "site13",
+			"source_parent": "earth",
+			"station_local_axis_m": 4197.900390625
+		},
+		{
+			"approach_progress": [
+				{
+					"clock_f64_hex": "8b3dff1582437a3f",
+					"door_u16": 28260,
+					"hull": 100.0,
+					"intervals": 15,
+					"local_position_m": [
+						-0.000000952521759245428,
+						0.000000100794402158044,
+						4180.400390625
+					],
+					"phase": "staging",
+					"speed_mps": 12.0
+				},
+				{
+					"clock_f64_hex": "4c80a004ad997a3f",
+					"door_u16": 0,
+					"hull": 100.0,
+					"intervals": 86,
+					"local_position_m": [
+						-0.00000000896061358446332,
+						0.00000000347307871351177,
+						4098.72802734375
+					],
+					"phase": "enter",
+					"speed_mps": 0.0
+				},
+				{
+					"clock_f64_hex": "aaedeeeeeeee7e3f",
+					"door_u16": 0,
+					"hull": 100.0,
+					"intervals": 1000,
+					"local_position_m": [
+						0.00000000568272895407063,
+						-0.00000000415497281025523,
+						3002.42797851562
+					],
+					"phase": "enter",
+					"speed_mps": 12.0
+				},
+				{
+					"clock_f64_hex": "c49d2b0f48d6813f",
+					"door_u16": 0,
+					"hull": 100.0,
+					"intervals": 2000,
+					"local_position_m": [
+						-0.00000000147908196801438,
+						0.00000000395880661585579,
+						1802.42797851562
+					],
+					"phase": "enter",
+					"speed_mps": 12.0
+				},
+				{
+					"clock_f64_hex": "24c5dfa61835843f",
+					"door_u16": 0,
+					"hull": 100.0,
+					"intervals": 3000,
+					"local_position_m": [
+						-0.000000000313929215955966,
+						-0.00000000137716427150991,
+						602.427856445312
+					],
+					"phase": "enter",
+					"speed_mps": 12.0
+				},
+				{
+					"clock_f64_hex": "c02f14eaae62853f",
+					"door_u16": 0,
+					"hull": 100.0,
+					"intervals": 3497,
+					"local_position_m": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"phase": "",
+					"speed_mps": 0.0
+				}
+			],
+			"case": "actual_Main_connected_near_station_cycle",
+			"cold_compared_intervals": 6,
+			"departure_axis_m": 480.0,
+			"healthy_hull": 100.0,
+			"mid_door_word_u16": 45655,
+			"near_station_placement_is_explicit_fixture": true,
+			"original_parent": "earth",
+			"original_station_spin_observed": true,
+			"planet_to_station_journey_flown": false,
+			"real_equipment_remove_reinstall": true,
+			"real_hydrogen_purchase": true,
+			"reverse_zero_time": true,
+			"seconds_per_interval": 0.1,
+			"site_id": "site13",
+			"source_approach_intervals": 3497
+		},
+		{
+			"actual_source_waypoint_m": [
+				0.0,
+				0.0,
+				4097.900390625
+			],
+			"case": "explicit_near_station_setup",
+			"closed_door_is_fixture": false,
+			"fixture_outside_source_waypoint_m": 100.0,
+			"outbound_original_lineage_retained": true,
+			"placement_is_fixture_not_flown": true,
+			"planet_to_station_journey_flown": false,
+			"site_id": "site13",
+			"source_parent": "earth",
+			"station_local_axis_m": 4197.900390625
+		},
+		{
+			"all_ordinary_progress_unchanged": true,
+			"case": "actual_station_typed_restore_and_stale_interval_guards",
+			"malformed_present_extensions_rejected": true,
+			"mixed_owners_rejected": true,
+			"stale_physical_pose_is_explicit_invalid_fixture": true
+		}
+	],
+	"failures": 0,
+	"scope": "Actual Main native station phase: genuine source autoland/20km outbound and honest far-station rejection; explicitly labelled near-station placement retains that real lineage, then continuous boundary, source rotating autopilot/door/CCD, cold active and parked continuation, routed paid source services, physical departure, inverse body-frame return, malformed/mixed/stale rejection and exact six-owner ordinary-flight restoration. The many-megametre transit is not flown; no full F570/F606/F597, new original oracle, physical Android or FPS claim.",
+	"sources": {
+		"scripts/flight_model.gd": "4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b",
+		"scripts/hyperdrive_services_view.gd": "70d828f819faeb8c8e31d12e1101ef82ce5d306f9cf329b2902600f82b5fe3f7",
+		"scripts/main.gd": "98b451b1487a5adda8c6b2b5d048729f45ca21a3aa89cf4b78fc0a2fc0263d25",
+		"scripts/native_orbit_trial.gd": "05f5219e8ff946034390000a193f23d1dd51e8c5b443c3a7d6cf2b307b6574bb",
+		"scripts/native_station_frame.gd": "d55138987007496fd560ee54b6059afff379e68802ffb07688f93070f16c8d3f",
+		"scripts/native_station_trial.gd": "c1853a0169e57c9b9b030dbdf0c9480a2ceaff53feaa4555d7ed2f00e56b9622",
+		"scripts/native_surface_model.gd": "7753220ae61c5194d6d4b7f51ebc017052579e58ba515987bb5ebf7ee9713fee",
+		"scripts/navigation.gd": "339d9350bf84300a215d821a9c3cca31a9ea053a7369f20d311868d11521b233",
+		"scripts/planetary_system.gd": "f243ebb2699bce714386e87ca32bfdb35709a2c9c45178cac9fa6cb8874abc62",
+		"scripts/rotating_dock_dynamics.gd": "68eb63c19831a2828fa62a1c10126de099d7d4905859f905c4b93e37124206a4",
+		"scripts/source_station_geometry.gd": "5785d288a3a0582dc4f06db53fad4b6d52446d3d476adc894fa9b7624cf69b94",
+		"scripts/source_station_session.gd": "80807b1c4b0aefb42f6907ef7480e2792295017f681caa5608894290d8d85b8f",
+		"tests/test_native_orbit_main.gd": "2360810b424737a30c476f8088921ed48765024b0757443eb576451ca9b482f3",
+		"tests/test_native_return_main.gd": "46eb5a59c5cf5c847b6743749bffa67b6c19a90577ccf6f561b2b54c1612de0b",
+		"tests/test_native_station_main.gd": "1f83e5ede2017c5fc3d3cad95adff1b80f7ca96b3b357b631184c76142e30e3f"
+	}
+}

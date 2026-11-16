@@ -1,0 +1,9 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+STATION_MAIN_PROGRESS {"clock_f64_hex":"8b3dff1582437a3f","door_u16":28260,"hull":100.0,"intervals":15,"local_position_m":[-0.000000952521759245428,0.000000100794402158044,4180.400390625],"phase":"staging","speed_mps":12.0}
+STATION_MAIN_PROGRESS {"clock_f64_hex":"4c80a004ad997a3f","door_u16":0,"hull":100.0,"intervals":86,"local_position_m":[-0.00000000896061358446332,0.00000000347307871351177,4098.72802734375],"phase":"enter","speed_mps":0.0}
+STATION_MAIN_PROGRESS {"clock_f64_hex":"aaedeeeeeeee7e3f","door_u16":0,"hull":100.0,"intervals":1000,"local_position_m":[0.00000000568272895407063,-0.00000000415497281025523,3002.42797851562],"phase":"enter","speed_mps":12.0}
+STATION_MAIN_PROGRESS {"clock_f64_hex":"c49d2b0f48d6813f","door_u16":0,"hull":100.0,"intervals":2000,"local_position_m":[-0.00000000147908196801438,0.00000000395880661585579,1802.42797851562],"phase":"enter","speed_mps":12.0}
+STATION_MAIN_PROGRESS {"clock_f64_hex":"24c5dfa61835843f","door_u16":0,"hull":100.0,"intervals":3000,"local_position_m":[-0.000000000313929215955966,-0.00000000137716427150991,602.427856445312],"phase":"enter","speed_mps":12.0}
+STATION_MAIN_PROGRESS {"clock_f64_hex":"c02f14eaae62853f","door_u16":0,"hull":100.0,"intervals":3497,"local_position_m":[0.0,0.0,0.0],"phase":"","speed_mps":0.0}
+Native station Main: 114 checks, 0 failures

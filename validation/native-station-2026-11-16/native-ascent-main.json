@@ -1,0 +1,46 @@
+{
+	"checks": 87,
+	"evidence": [
+		{
+			"case": "actual_console_powered_ascent",
+			"final_render_altitude_m": 999.516865065864,
+			"final_velocity_mps": [
+				0.0,
+				0.417757928371429,
+				0.0
+			],
+			"first_gear_retraction_height_m": 30.2921284622909,
+			"intervals": 325,
+			"largest_accepted_position_step_m": 4.0,
+			"raw_hull": 400,
+			"source_phase": "free",
+			"target_height_m": 1000.0
+		},
+		{
+			"airborne_pre_save_intervals": 29,
+			"case": "parked_intent_and_airborne_cold_ascent",
+			"cold_compared_intervals": 20,
+			"first_powered_interval_exact": true,
+			"parked_request_restored": true
+		},
+		{
+			"case": "ascent_manual_cancel_and_source_empty_fuel",
+			"empty_source_mask_u8": 21,
+			"ordinary_flight_isolated": true,
+			"park_retained": true
+		}
+	],
+	"failures": 0,
+	"scope": "Task2 production Main automatic powered ascent from actual/cold source park to local1000m target, gear clearance, exact cold launch/airborne continuation, manual cancellation, empty source fuel and ordinary-flight isolation. Task3 orbit-frame handoff is not exercised; no full original autopilot/Android/FPS claim.",
+	"sources": {
+		"scripts/main.gd": "98b451b1487a5adda8c6b2b5d048729f45ca21a3aa89cf4b78fc0a2fc0263d25",
+		"scripts/native_landing_trial.gd": "9e99d0c664a9fd2cab79424ee8c05359d0fa30bd2de34ea88a7286915285bda1",
+		"scripts/native_surface_autopilot.gd": "fedc1eab979e497bc3233cdb58f4e20d3cc06203f92ecfe90e8e0cf475776733",
+		"scripts/native_surface_model.gd": "7753220ae61c5194d6d4b7f51ebc017052579e58ba515987bb5ebf7ee9713fee",
+		"scripts/source_landing_gear_session.gd": "ba8b63cbf89f30441f0bdfe01ed51af3a7e0e4679451264826039dd7b65887a0",
+		"scripts/source_native_surface_provider.gd": "c1558516a8414783de8b3c74d97e75fa9dfd52feeaa81517d974af10e28fcc5e",
+		"scripts/source_natural_contact_session.gd": "5e3472a7bbe8998a30f11340a563564d43307dd1b3c482eb838126c880a728d6",
+		"tests/test_native_ascent_main.gd": "4760fa4ea479dd6050ef966e373f893118896ddf75966c92e5dcd09c45ecd06d",
+		"tests/test_native_autopilot_main.gd": "64a5c2bae80f17550120b91723ffa8af0394b639e09450bf309b60ab89253ff7"
+	}
+}

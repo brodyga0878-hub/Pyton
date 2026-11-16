@@ -1,0 +1,43 @@
+{
+	"checks": 3211,
+	"evidence": [
+		{
+			"case": "actual_powered_source_ascent",
+			"final_render_height_m": 999.524575486202,
+			"final_vertical_mps": 0.411589622497559,
+			"gear_retracted": true,
+			"intervals": 345,
+			"max_observed_step_m": 4.0,
+			"orbit_claimed": false,
+			"seconds": 0.1,
+			"source_generation": 398,
+			"target_render_height_m": 1000.0
+		},
+		{
+			"case": "actual_powered_source_ascent",
+			"final_render_height_m": 99.5030659622909,
+			"final_vertical_mps": 0.40379723906517,
+			"gear_retracted": true,
+			"intervals": 688,
+			"max_observed_step_m": 0.40625,
+			"orbit_claimed": false,
+			"seconds": 0.0166666666666667,
+			"source_generation": 741,
+			"target_render_height_m": 100.0
+		},
+		{
+			"case": "cold_pending_and_airborne_ascent",
+			"exact_compared_intervals": 40
+		}
+	],
+	"failures": 0,
+	"scope": "Actual original parked source state, powered filtered ascent, source gear/HP/fuel/time, braking to bounded visible-height target and exact cold continuation. Phone guidance only; height is not an orbit, full original autopilot and physical Android remain unproved.",
+	"sources": {
+		"scripts/flight_model.gd": "4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b",
+		"scripts/native_landing_trial.gd": "9e99d0c664a9fd2cab79424ee8c05359d0fa30bd2de34ea88a7286915285bda1",
+		"scripts/native_surface_autopilot.gd": "fedc1eab979e497bc3233cdb58f4e20d3cc06203f92ecfe90e8e0cf475776733",
+		"scripts/native_surface_model.gd": "7753220ae61c5194d6d4b7f51ebc017052579e58ba515987bb5ebf7ee9713fee",
+		"scripts/source_natural_contact_session.gd": "5e3472a7bbe8998a30f11340a563564d43307dd1b3c482eb838126c880a728d6",
+		"tests/test_native_surface_ascent.gd": "e792d3d9b427ef5be046aab55c9cd252aad0b49329854f2bd7e79f3d52b44f7f"
+	}
+}

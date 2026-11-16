@@ -1,0 +1,13 @@
+{
+  "schema": "starfrontier-native-station-desktop-visual-review-v1",
+  "visually_inspected_desktop_frames": 4,
+  "files": {
+    "01-earth-station-selection-1440x720.png": "0bf329cb7bd2b61f8427a7df97f01662fad794a6f6833ccd0ce9ab8657b68697",
+    "02-native-station-approach-1440x720.png": "510b93e8bcc3f0ab469deea3af0fcbfaf88027ee27c4ec00f7e7301fd15dcfea",
+    "03-native-station-services-960x432.png": "ffcc2c072a6be95e263020cf56e922ad57ae48e3c12ca4e58e8e9a6629f0ff76",
+    "04-native-station-reverse-960x432.png": "316cf945af9caa040ab19e14e65c2c3625981356c3deea4d311f7a722067cfaa"
+  },
+  "checked_utc": "2026-11-16T15:56:08.734684+00:00",
+  "physical_device_tested": false,
+  "scope": "Root independently inspected all four actual Main framebuffers: real Earth station distances, near-station approach and complete lower console, dock-service menu, reverse body-frame flight. Approach starts at explicitly labelled actual outer waypoint plus100m; distant35Mm transit was not flown. Existing time-warp subtitle still says menu open while source time and approach advance; cosmetic text retained. Desktop software rendering is not an Android/FPS benchmark."
+}

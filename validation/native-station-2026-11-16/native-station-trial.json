@@ -1,0 +1,32 @@
+{
+	"checks": 219,
+	"evidence": [
+		{
+			"case": "private_light_probe_bitexact_comparison",
+			"cases": 3,
+			"independent_sampler_pairs": 9,
+			"physical_owner_unchanged": true,
+			"station_and_zero_hull_and_body_edge": true
+		},
+		{
+			"approach_intervals": 3490,
+			"case": "actual_station_approach_dock_service_launch_reverse",
+			"cold_enter_compared": true,
+			"final_hull": 100.0,
+			"fixture_relocation_explicit_not_flown": true,
+			"reverse_clock_unchanged": true,
+			"start": "source_outer_waypoint_plus100m"
+		}
+	],
+	"failures": 0,
+	"scope": "Bounded near-station fixture derived from an actual outbound owner. Same-time station/body boundary; existing station-following flight law, actual spin/door/CCD/autopilot/dock/source services/launch, exact cold angular history and raw HP/fuel/day ownership. Explicit far-position fixture is not a flown planet-to-station transit or full original F570/F606/AI proof.",
+	"sources": {
+		"scripts/flight_model.gd": "4bec7bd8448f7eb4f59436bcc45f09183736a274f5759124dbfa02dd5557264b",
+		"scripts/native_orbit_trial.gd": "05f5219e8ff946034390000a193f23d1dd51e8c5b443c3a7d6cf2b307b6574bb",
+		"scripts/native_station_frame.gd": "d55138987007496fd560ee54b6059afff379e68802ffb07688f93070f16c8d3f",
+		"scripts/native_station_trial.gd": "c1853a0169e57c9b9b030dbdf0c9480a2ceaff53feaa4555d7ed2f00e56b9622",
+		"scripts/rotating_dock_dynamics.gd": "68eb63c19831a2828fa62a1c10126de099d7d4905859f905c4b93e37124206a4",
+		"scripts/source_station_session.gd": "80807b1c4b0aefb42f6907ef7480e2792295017f681caa5608894290d8d85b8f",
+		"tests/test_native_station_trial.gd": "86b3d8c59e53846817e6e80ee43fa0c280a7074cba004e3c9e355703a015a230"
+	}
+}
