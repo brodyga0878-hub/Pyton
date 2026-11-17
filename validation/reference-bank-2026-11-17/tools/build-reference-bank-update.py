@@ -37,7 +37,7 @@ CORE_ROOTS = frozenset({'assets','data','scripts','scenes','tests','tools','docs
 PRIVATE_COMPONENTS = frozenset({'.git','.godot','__pycache__','node_modules',
     'private','runner-state','runner_state','state','xdg','user_data','app_userdata',
     '.cache','.config','.local','.codex','.aws'})
-TEXT_PROOF_SUFFIXES = frozenset({'.json','.log','.txt','.md','.py','.s','.asm',
+TEXT_PROOF_SUFFIXES = frozenset({'.json','.log','.txt','.md','.py','.s','.asm','.ld',
     '.c','.h','.sh','.gd','.uid','.cfg','.csv','.ini','.tsv','.toml','.yaml','.yml'})
 SECRET_SUFFIXES = frozenset({'.key','.pem','.keystore','.jks','.p12','.pfx'})
 COMPILED_SUFFIXES = frozenset({'.apk','.exe','.dll','.so','.o','.a','.pck',
@@ -158,6 +158,19 @@ def main():
         else:
             proof_files.add(name)
     require(FREEZE in proof_files,'The committed483-input runtime freeze is required')
+    required_native_inputs = {
+        CURRENT_V + 'native-proof/instruction-proof.json',
+        CURRENT_V + 'native-proof/reference-bank-observed-kernel.s',
+        CURRENT_V + 'angular-native-proof/instruction-proof.json',
+        CURRENT_V + 'angular-native-proof/source-procedures.s',
+        CURRENT_V + 'clock-native-proof/clock-source32.S',
+        CURRENT_V + 'clock-native-proof/clock-observed.S',
+        CURRENT_V + 'clock-native-proof/clock-observed.ld',
+        CURRENT_V + 'clock-native-proof/dos-clock-admission.txt',
+        CURRENT_V + 'clock-native-proof/jjffe-clock-admission-reference.asm',
+    }
+    require(required_native_inputs <= proof_files,
+            'A required native replay source or linker input would be omitted')
     read_names = core | proof_files | set(base)
     committed = blobs(repo,commit,read_names)
     for name in core:
