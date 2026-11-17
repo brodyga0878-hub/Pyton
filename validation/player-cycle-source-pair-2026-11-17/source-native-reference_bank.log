@@ -1,0 +1,9 @@
+{
+  "case_count": 444,
+  "diagnostic_cases": 16,
+  "bytes": 3363129,
+  "fixture_sha256": "474763d258cfcf694f7521cf7fb8e1637fc31f090961179780d35dc71fb4cb45",
+  "native_cases_total": 460,
+  "native_output_sha256": "1b59fbbb11bd39938bce9eac7615f581187f01fadf1d2fac6f5b57115979a303",
+  "status": "native-replayed-and-guards-verified"
+}

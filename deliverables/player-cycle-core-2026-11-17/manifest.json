@@ -1,0 +1,59 @@
+{
+  "schema": "starfrontier-player-cycle-source-checkpoint-v1",
+  "checkpoint": "player-cycle-core-2026-11-17",
+  "source_commit": "971efe8cc00a3dc193cf00631feaeaaa00919117",
+  "created_utc": "2026-11-17T10:55:01.513605+00:00",
+  "required_archive_count": 2,
+  "previous_update_archive_required": false,
+  "base_archive": {
+    "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip",
+    "bytes": 33543341,
+    "sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d",
+    "source_commit": "de8eb18a687d007781321436910187dff3785775"
+  },
+  "files": {
+    "README_RU.md": {
+      "bytes": 3592,
+      "sha256": "a161a1b8817685b464f81094b5b4c279fc63ee0ef184a1aa34a0933f37e76257"
+    },
+    "StarFrontier-player-cycle-core-update.zip": {
+      "bytes": 6355103,
+      "sha256": "1e94972c1f69c3afbfbeaffc1a102b7ef301dab1da42ed87ed4444258adfbfd3"
+    },
+    "functional-summary.json": {
+      "bytes": 26080,
+      "sha256": "021f04cb4fa65b2b50d967de8c8fadb40ffb8d6e61de6f5d78881b8cf4330295"
+    },
+    "source-pair-verification.json": {
+      "bytes": 45831,
+      "sha256": "be013dd570355d0339f847ca07b0acb210b3efb2101f3a52d9cbed36d000d247"
+    },
+    "source-update-policy.json": {
+      "bytes": 147101,
+      "sha256": "1324b8e46990ec533531a8639a22f96d54bdc87bc5142d1820d034e6370b6c72"
+    }
+  },
+  "merged_source_files": 1956,
+  "runtime_inputs": 505,
+  "unchanged_published_game_runtime_inputs": 475,
+  "unchanged_previous_backend_runtime_inputs": 492,
+  "current_functional_checks": 175925,
+  "unique_suites": 21,
+  "new_core_checks": 27687,
+  "new_core_suites": 6,
+  "fresh_core_suites": 21,
+  "fresh_core_checks_separate": 175925,
+  "native_main_generator_count": 11,
+  "native_DOS_control_cases_separate": 6023,
+  "native_JJFFE_diagnostics_separate": 16,
+  "supplemental_native_compositions_separate": 82,
+  "native_generator_count": 13,
+  "fresh_pair_verified": true,
+  "new_APK_produced": false,
+  "new_kernels_connected_to_Main": false,
+  "game_version": "0.28.0-native-station-alpha1",
+  "Android_version_code": 53,
+  "full_original_port_complete": false,
+  "physical_device_tested": false,
+  "immutable_HTTPS_verified_at_packaging": false
+}

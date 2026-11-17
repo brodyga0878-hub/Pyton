@@ -1,0 +1,12 @@
+{
+  "schema": "starfrontier-source-object-cadence-native-validation-v1",
+  "case_count": 265,
+  "fixture_sha256": "8798bd2950832fedaf0cc4bd58fc0170218399df6a8386b8a06b08e18720bfa4",
+  "native_output_sha256": "ed98ac87c3c1c5b9f680971d6d7b9d10b09a9b60fef83adc2736d3c7fb054b9f",
+  "fresh_process_runs": 3,
+  "reverse_cases": 265,
+  "consecutive_original_steps": 32,
+  "all_guards_and_unprovided_records_unchanged": true,
+  "fixture_byte_exact_replay": true,
+  "F144_callback_effects_are_explicit_observers": true
+}
