@@ -205,8 +205,8 @@ def execute(args):
     imported, _ = run([godot, '--headless', '--editor', '--audio-driver', 'Dummy', '--path', str(project),
                        '--import', '--quit'], 'source-pair-import', xdg('import'))
     startup, text = run([godot, '--headless', '--audio-driver', 'Dummy', '--path', str(project),
-                         '--script', 'res://tests/test_source_full_startup.gd', '--', '--rebuild-capture'],
-                        'source-pair-startup', xdg('startup'))
+                         '--script', 'res://tests/test_source_full_startup.gd', '--', '--source-startup-isolated'],
+                        'source-pair-startup', xdg('source_full_startup'))
     matches = COUNTS.findall(text)
     require(matches == [('10', '0')], 'Fresh normal startup must report exactly10checks/0failures')
     summary = json.loads((project / V / 'final-targeted-summary.json').read_text())
