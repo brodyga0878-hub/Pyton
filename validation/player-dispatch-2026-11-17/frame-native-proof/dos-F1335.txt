@@ -1,0 +1,11 @@
+0044e848: push ebp
+0044e849: mov ebp,esp
+0044e84b: mov edx,DWORD PTR [ebp+0x8]
+0044e84e: mov eax,DWORD PTR [ebp+0xc]
+0044e851: sub eax,DWORD PTR [ebp+0x14]
+0044e854: mov DWORD PTR [edx],eax
+0044e856: mov eax,DWORD PTR [ebp+0x10]
+0044e859: sbb eax,DWORD PTR [ebp+0x18]
+0044e85c: mov DWORD PTR [edx+0x4],eax
+0044e85f: pop ebp
+0044e860: ret 

@@ -1,0 +1,730 @@
+{
+  "schema": "starfrontier-source-frame-dispatch-instruction-proof-v1",
+  "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "whole_procedure_instruction_equality": {
+    "570": {
+      "virtual_address": 4354720,
+      "executable_offset": 98464,
+      "byte_length": 576,
+      "sha256": "52339450db7510dc4b0ac969707f9245a0da1d3fb9bad52c65bcb9f150da9cca",
+      "instruction_count": 178,
+      "normalized_instruction_sha256": "5b1369f4ebfa96dc30bcbac45d8b1b9224cce0851154096a2207f13835b3374f",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "572": {
+      "virtual_address": 4355372,
+      "executable_offset": 99116,
+      "byte_length": 132,
+      "sha256": "1d90f4b3bb36e2185907535cae8ce6fac36987eb3bf71d99f2b2564fa5f788ae",
+      "instruction_count": 55,
+      "normalized_instruction_sha256": "4c265e3dcced0ac16d4c4164da3c5e3c7186bb5417259e924bae4922567bb4ab",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "573": {
+      "virtual_address": 4355504,
+      "executable_offset": 99248,
+      "byte_length": 123,
+      "sha256": "4d5ed6ee94d6829dae4a4d5bf83fce4b06657a269affb13215542dcbbf1f994c",
+      "instruction_count": 52,
+      "normalized_instruction_sha256": "454ca6feb28c37a66b8f5193c6c6051c8817996d9f45bfec627567155ad3fddb",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1517": {
+      "virtual_address": 4535056,
+      "executable_offset": 278800,
+      "byte_length": 105,
+      "sha256": "8a2df270d39ced8189f991de3a7691cc829060f56a32bc53cbf3a657a4209c3f",
+      "instruction_count": 45,
+      "normalized_instruction_sha256": "5b8b34eb26c42c945956b18c0319702d4a6a0e8943b085f83585c83e472980ec",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1532": {
+      "virtual_address": 4536092,
+      "executable_offset": 279836,
+      "byte_length": 27,
+      "sha256": "11722546aa6829b59d14965d58e75f90352ad08e881c40c09e92f0b7972582e2",
+      "instruction_count": 12,
+      "normalized_instruction_sha256": "f7c42f2ff972c391ce8e86fa8d02e20ec486a9770ba154f64874b93c8265d5be",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1658": {
+      "virtual_address": 4561616,
+      "executable_offset": 305360,
+      "byte_length": 44,
+      "sha256": "6bdbafa74820fd4a83d1e5dfdb85032acacc6fd0e1636b481ac3f18af1ad065f",
+      "instruction_count": 23,
+      "normalized_instruction_sha256": "ee101255a4019a0c7d7e4e372bdc426e50b6f1ab72d614b370e79a41bc813f3a",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1657": {
+      "virtual_address": 4561408,
+      "executable_offset": 305152,
+      "byte_length": 207,
+      "sha256": "86d7da85e49ea3ddca538301d8ff1595065c0fb8e2a52ad7dd1b35b68bcbd6ff",
+      "instruction_count": 84,
+      "normalized_instruction_sha256": "8248127cd6d66196b4d905d201be1a2d2ba017ed215faa149d317cfafe4e45f2",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1660": {
+      "virtual_address": 4562008,
+      "executable_offset": 305752,
+      "byte_length": 177,
+      "sha256": "e23941156e2eb6f1c53020a82a29d6537e6be0b7a6af446323409fb93e3be0cc",
+      "instruction_count": 74,
+      "normalized_instruction_sha256": "dd0955a8519f7df2d6693ec66963ecfa03ef327cc77da6935c6bfb5623544ebf",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1662": {
+      "virtual_address": 4562272,
+      "executable_offset": 306016,
+      "byte_length": 82,
+      "sha256": "1058d855d72ff2cce24314fc7024afaa5fb9cb75a0911e24a3c743e3402d083f",
+      "instruction_count": 33,
+      "normalized_instruction_sha256": "a089fb5d45ba2b4fe0aa168e887be1fea73dae363c8908470693ceeb1e459da7",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1335": {
+      "virtual_address": 4515912,
+      "executable_offset": 259656,
+      "byte_length": 25,
+      "sha256": "630251ee2b7c42186d7b3e5a7dad2245d537527943aa08e08cfe6879016c0514",
+      "instruction_count": 11,
+      "normalized_instruction_sha256": "b9e6d7e710d5ec7c76685289fe22ba6cd78860994046859e09839c50c506c91c",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1669": {
+      "virtual_address": 4564080,
+      "executable_offset": 307824,
+      "byte_length": 209,
+      "sha256": "b4659d0676704a64b15ccc105df8f0a11490e32fa8a36cda946412534b252976",
+      "instruction_count": 95,
+      "normalized_instruction_sha256": "2f348f4b8ef423a8ddf1dd508d82cf58910fff38bc8ffcde6ca28be9657dd814",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1521": {
+      "virtual_address": 4535416,
+      "executable_offset": 279160,
+      "byte_length": 17,
+      "sha256": "f62a5f949cbf8da772c3cc32ae59b607e0f35cda6c3c4e1ddf848ba3b5a1b445",
+      "instruction_count": 9,
+      "normalized_instruction_sha256": "41d13ec389df5b306dbeb350873dd5272b12f7a1d61a674cb369cb6e1398f31c",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1670": {
+      "virtual_address": 4564528,
+      "executable_offset": 308272,
+      "byte_length": 209,
+      "sha256": "037f1fa90d8883d19276a9d53cbd943b53979443ee898a93e01ccdd45be455d2",
+      "instruction_count": 95,
+      "normalized_instruction_sha256": "fde73a6041c04dccecfed8c698bb446f1c738faf2e5e08011e561f750c15caf2",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1672": {
+      "virtual_address": 4564948,
+      "executable_offset": 308692,
+      "byte_length": 544,
+      "sha256": "603acc7b91fecc35b736b833b159ba9df3bf6a62ee2aaef1fba3cfdb9f537994",
+      "instruction_count": 217,
+      "normalized_instruction_sha256": "ee0f91f1b04e79bd6259c967691d4aceb54e123ccf9eaca780488cb483dd0fc3",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1673": {
+      "virtual_address": 4565492,
+      "executable_offset": 309236,
+      "byte_length": 544,
+      "sha256": "8ce733cca99a736c0c2845105fb7402ab50af2185b4442079366c4dd40f475c6",
+      "instruction_count": 217,
+      "normalized_instruction_sha256": "e106015c679c76e3bc34d6ffb096f7e8c2456fca0e40942cbf37a5f73be08976",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1677": {
+      "virtual_address": 4566512,
+      "executable_offset": 310256,
+      "byte_length": 247,
+      "sha256": "988c81a47cae924a4e67e140364cbd1af95d4356aaca57c8c1ea9fa0100fc60e",
+      "instruction_count": 98,
+      "normalized_instruction_sha256": "3cad12309c390f34d22dbfd3a3ac9f95ebc96dfcac140613a818e89a70ea51e9",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1531": {
+      "virtual_address": 4536060,
+      "executable_offset": 279804,
+      "byte_length": 30,
+      "sha256": "7d39fbfc4379d5e06e402af863755b0c2f07bafa60ca6f8d28a1600e856fbf9b",
+      "instruction_count": 12,
+      "normalized_instruction_sha256": "c808d7176e983365c82c7607033e08f5e5f541f0928a9cea1426cab915fa18f0",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1661": {
+      "virtual_address": 4562188,
+      "executable_offset": 305932,
+      "byte_length": 82,
+      "sha256": "db6705ba0e0e7cc75d9eb29268540f41a8a40f8e0051c6bd541505e6ba540cda",
+      "instruction_count": 33,
+      "normalized_instruction_sha256": "f610fbc4cbbc125881567064598a2c77d89c9f8df0527912d3c796050752fb90",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1333": {
+      "virtual_address": 4515862,
+      "executable_offset": 259606,
+      "byte_length": 25,
+      "sha256": "8946c4ccd895806bb39d3d393c582970d2e34c8ba60c06257447eb10186e5468",
+      "instruction_count": 11,
+      "normalized_instruction_sha256": "d404596ee05a43e6f48c9e0e3738ec8f555a7f3093ca751c86a988fd4a17721f",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "568": {
+      "virtual_address": 4354624,
+      "executable_offset": 98368,
+      "byte_length": 48,
+      "sha256": "bf31bffa9a0b79820474a3e275634bff0ba9b49f22611d951ebe8fe9189154ef",
+      "instruction_count": 21,
+      "normalized_instruction_sha256": "b60acb9f26ddca9505abc6cdb71f507519d9c07242e2c03a306a1960c90a0d8d",
+      "all_instructions_equal": true,
+      "entry_anchor": "neighbor570 Pos delta, then full instruction comparison"
+    },
+    "569": {
+      "virtual_address": 4354672,
+      "executable_offset": 98416,
+      "byte_length": 48,
+      "sha256": "2f10bc05d48a10039940c09c7d629d476bc32cec664066766cd6977c35d8705f",
+      "instruction_count": 21,
+      "normalized_instruction_sha256": "4e38cb59afe5074bbd465a23b9b12752d29cdf817b99e6d7e98f3f0411a27557",
+      "all_instructions_equal": true,
+      "entry_anchor": "neighbor570 Pos delta, then full instruction comparison"
+    },
+    "1663": {
+      "virtual_address": 4562356,
+      "executable_offset": 306100,
+      "byte_length": 101,
+      "sha256": "c547164a8231006b2d2c1955cb616e37ef86243e56b0ea247576077daff6c620",
+      "instruction_count": 33,
+      "normalized_instruction_sha256": "74f21ec699ba49d9d2a450d580dd333cb10f3398ec9782130707967010930ece",
+      "all_instructions_equal": true,
+      "entry_anchor": "neighbor1662 Pos delta, then full instruction comparison"
+    },
+    "1678": {
+      "virtual_address": 4566760,
+      "executable_offset": 310504,
+      "byte_length": 115,
+      "sha256": "afbb908a8a21abac8eab0dfea2e50322178a077c85929e4f949506f4e371a094",
+      "instruction_count": 49,
+      "normalized_instruction_sha256": "63213acfda3cf6500d9b6ec39369874512ecab0b7ce3848adc786e5e494d58c5",
+      "all_instructions_equal": true,
+      "entry_anchor": "neighbor1677 Pos delta, then full instruction comparison"
+    }
+  },
+  "original_callback_words": [
+    {
+      "file_offset": 974652,
+      "symbol": "DATA_007638",
+      "address": 5225836
+    },
+    {
+      "file_offset": 974660,
+      "symbol": "DATA_007637",
+      "address": 5209452
+    },
+    {
+      "file_offset": 974664,
+      "symbol": "DATA_007638",
+      "address": 5225836
+    },
+    {
+      "file_offset": 974676,
+      "symbol": "DATA_007638",
+      "address": 5225836
+    },
+    {
+      "file_offset": 974684,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 974688,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 974732,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 974736,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 974780,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 974784,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 974828,
+      "symbol": "FUNC_001842",
+      "address": 4602012
+    },
+    {
+      "file_offset": 974832,
+      "symbol": "FUNC_001843",
+      "address": 4602404
+    },
+    {
+      "file_offset": 974876,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 974880,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 974924,
+      "symbol": "FUNC_001842",
+      "address": 4602012
+    },
+    {
+      "file_offset": 974928,
+      "symbol": "FUNC_001843",
+      "address": 4602404
+    },
+    {
+      "file_offset": 974972,
+      "symbol": "FUNC_001842",
+      "address": 4602012
+    },
+    {
+      "file_offset": 974976,
+      "symbol": "FUNC_001843",
+      "address": 4602404
+    },
+    {
+      "file_offset": 975020,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 975024,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 975068,
+      "symbol": "FUNC_001844",
+      "address": 4602480
+    },
+    {
+      "file_offset": 975072,
+      "symbol": "FUNC_001836",
+      "address": 4599036
+    },
+    {
+      "file_offset": 975116,
+      "symbol": "FUNC_001845",
+      "address": 4602660
+    },
+    {
+      "file_offset": 975120,
+      "symbol": "FUNC_001836",
+      "address": 4599036
+    },
+    {
+      "file_offset": 975164,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 975168,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 975212,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 975216,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 975260,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 975264,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 975308,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 975312,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 975356,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975360,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975364,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975368,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975372,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975376,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975380,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975384,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975388,
+      "symbol": "FUNC_001850",
+      "address": 4603696
+    },
+    {
+      "file_offset": 975392,
+      "symbol": "FUNC_001851",
+      "address": 4604296
+    },
+    {
+      "file_offset": 975396,
+      "symbol": "FUNC_001852",
+      "address": 4604912
+    },
+    {
+      "file_offset": 975400,
+      "symbol": "FUNC_001853",
+      "address": 4605524
+    },
+    {
+      "file_offset": 975404,
+      "symbol": "FUNC_001854",
+      "address": 4606208
+    },
+    {
+      "file_offset": 975408,
+      "symbol": "FUNC_001855",
+      "address": 4606908
+    },
+    {
+      "file_offset": 975412,
+      "symbol": "FUNC_001856",
+      "address": 4607608
+    },
+    {
+      "file_offset": 975416,
+      "symbol": "FUNC_001857",
+      "address": 4608320
+    },
+    {
+      "file_offset": 975420,
+      "symbol": "FUNC_001858",
+      "address": 4609092
+    },
+    {
+      "file_offset": 975424,
+      "symbol": "FUNC_001859",
+      "address": 4610124
+    },
+    {
+      "file_offset": 975428,
+      "symbol": "FUNC_001860",
+      "address": 4611176
+    },
+    {
+      "file_offset": 975432,
+      "symbol": "FUNC_001861",
+      "address": 4612224
+    },
+    {
+      "file_offset": 975436,
+      "symbol": "FUNC_001862",
+      "address": 4613284
+    },
+    {
+      "file_offset": 975440,
+      "symbol": "FUNC_001863",
+      "address": 4614416
+    },
+    {
+      "file_offset": 975444,
+      "symbol": "FUNC_001864",
+      "address": 4615564
+    },
+    {
+      "file_offset": 975448,
+      "symbol": "FUNC_001865",
+      "address": 4616712
+    },
+    {
+      "file_offset": 975452,
+      "symbol": "FUNC_001866",
+      "address": 4617864
+    },
+    {
+      "file_offset": 975456,
+      "symbol": "FUNC_001866",
+      "address": 4617864
+    },
+    {
+      "file_offset": 975460,
+      "symbol": "FUNC_001866",
+      "address": 4617864
+    },
+    {
+      "file_offset": 975464,
+      "symbol": "FUNC_001866",
+      "address": 4617864
+    },
+    {
+      "file_offset": 975468,
+      "symbol": "FUNC_001867",
+      "address": 4618432
+    },
+    {
+      "file_offset": 975472,
+      "symbol": "FUNC_001867",
+      "address": 4618432
+    },
+    {
+      "file_offset": 975476,
+      "symbol": "FUNC_001867",
+      "address": 4618432
+    },
+    {
+      "file_offset": 975480,
+      "symbol": "FUNC_001867",
+      "address": 4618432
+    }
+  ],
+  "original_symbol_addresses": {
+    "DATA_007749": 5247916,
+    "DATA_007753": 5249084,
+    "DATA_007754": 5249088,
+    "DATA_007758": 5249108,
+    "DATA_007800": 5254524,
+    "DATA_007801": 5254528,
+    "DATA_007802": 5254532,
+    "DATA_008696": 6504136,
+    "DATA_008697": 6504137,
+    "DATA_008698": 6504138,
+    "DATA_008700": 6504140,
+    "DATA_008701": 6504141,
+    "DATA_008702": 6504144,
+    "DATA_008703": 6504148,
+    "DATA_008704": 6504152,
+    "DATA_008707": 6504164,
+    "DATA_008811": 6562122,
+    "DATA_009155": 6630412,
+    "FUNC_000568": 4354624,
+    "FUNC_000569": 4354672,
+    "FUNC_000570": 4354720,
+    "FUNC_000572": 4355372,
+    "FUNC_000573": 4355504,
+    "FUNC_000575": 4355744,
+    "FUNC_001333": 4515862,
+    "FUNC_001335": 4515912,
+    "FUNC_001517": 4535056,
+    "FUNC_001521": 4535416,
+    "FUNC_001531": 4536060,
+    "FUNC_001532": 4536092,
+    "FUNC_001657": 4561408,
+    "FUNC_001658": 4561616,
+    "FUNC_001660": 4562008,
+    "FUNC_001661": 4562188,
+    "FUNC_001662": 4562272,
+    "FUNC_001663": 4562356,
+    "FUNC_001669": 4564080,
+    "FUNC_001670": 4564528,
+    "FUNC_001672": 4564948,
+    "FUNC_001673": 4565492,
+    "FUNC_001677": 4566512,
+    "FUNC_001678": 4566760,
+    "_LongJmp": 1895997440,
+    "_SetJmp": 1896001536,
+    "_abs": 1896005632,
+    "_memcpy": 1896009728,
+    "DATA_007835": 5259612,
+    "DATA_007836": 5259621,
+    "DATA_007837": 5259632,
+    "DATA_007838": 5259636,
+    "DATA_007839": 5259700,
+    "DATA_007840": 5259828,
+    "DATA_007841": 5259956,
+    "DATA_007842": 5259964,
+    "DATA_007638": 5225836,
+    "DATA_007637": 5209452,
+    "DATA_007843": 5260124,
+    "FUNC_001840": 4599692,
+    "FUNC_001841": 4601672,
+    "FUNC_001842": 4602012,
+    "FUNC_001843": 4602404,
+    "FUNC_001844": 4602480,
+    "FUNC_001836": 4599036,
+    "FUNC_001845": 4602660,
+    "DATA_007844": 5260796,
+    "FUNC_001849": 4603068,
+    "DATA_007845": 5260812,
+    "FUNC_001850": 4603696,
+    "FUNC_001851": 4604296,
+    "FUNC_001852": 4604912,
+    "FUNC_001853": 4605524,
+    "FUNC_001854": 4606208,
+    "FUNC_001855": 4606908,
+    "FUNC_001856": 4607608,
+    "FUNC_001857": 4608320,
+    "FUNC_001858": 4609092,
+    "FUNC_001859": 4610124,
+    "FUNC_001860": 4611176,
+    "FUNC_001861": 4612224,
+    "FUNC_001862": 4613284,
+    "FUNC_001863": 4614416,
+    "FUNC_001864": 4615564,
+    "FUNC_001865": 4616712,
+    "FUNC_001866": 4617864,
+    "FUNC_001867": 4618432,
+    "DATA_007846": 5260924,
+    "DATA_007847": 5261020,
+    "DATA_007848": 5261596,
+    "DATA_007849": 5261684,
+    "DATA_007850": 5262272,
+    "DATA_007851": 5262624,
+    "DATA_007852": 5264976,
+    "DATA_007853": 5265104,
+    "DATA_007854": 5265616,
+    "DATA_007855": 5265618,
+    "DATA_007856": 5265648,
+    "DATA_007857": 5265650,
+    "DATA_007858": 5265680,
+    "DATA_007859": 5265682,
+    "DATA_007860": 5265712,
+    "DATA_007861": 5265714,
+    "DATA_007862": 5265744,
+    "DATA_007863": 5265746,
+    "DATA_007864": 5265776,
+    "DATA_007865": 5265778,
+    "DATA_007866": 5265808,
+    "DATA_007867": 5265810,
+    "DATA_007868": 5265840,
+    "DATA_007869": 5265842,
+    "DATA_007870": 5265872,
+    "DATA_007871": 5265874,
+    "DATA_007872": 5265904,
+    "DATA_007873": 5265906,
+    "DATA_007874": 5265936,
+    "DATA_007875": 5265938,
+    "DATA_007876": 5265968,
+    "DATA_007877": 5265970,
+    "DATA_007878": 5266000,
+    "DATA_007879": 5266002,
+    "DATA_007880": 5266032,
+    "DATA_007881": 5266034,
+    "DATA_007882": 5266064,
+    "DATA_007883": 5266066,
+    "DATA_007884": 5266096,
+    "DATA_007885": 5266098,
+    "DATA_007886": 5266128,
+    "DATA_007887": 5266130,
+    "DATA_007888": 5266160,
+    "DATA_007889": 5266162,
+    "DATA_007890": 5266192,
+    "DATA_007891": 5266194,
+    "DATA_007892": 5266224,
+    "DATA_007893": 5266368,
+    "DATA_007894": 5266848
+  },
+  "source_procedure_sha256": {
+    "568": "2e5b2fd056b50890b1124c6e171e6abb215d32ce68061f2e59ec825125edf212",
+    "569": "ce21c3b331dd89fb2df5b34a6bb1a9fd89dd18b5fed8ae1e124cf6063c9e8a49",
+    "570": "bc41a2e02d27cfd17bfd3663d4d522b46c9faccb36af381ce0c088827e7c6ecc",
+    "572": "78975d2912fe3bab3bf22a7e81eaab75f70ed3e0ad559963ee522743e334cc36",
+    "573": "1a801d2176f4f7c97a3c45f697a513440c850829ee26b2db2af275404582a62d",
+    "1333": "21169ed7f6ae5c55f135027b5d3fe379217ad43964826e1dfe139473d48d8deb",
+    "1335": "44ad47a712e41ef6ae947ddcd0b47011d5ff1e639f14553a6f6d58f20773e020",
+    "1517": "678b8bba30549de48660759a795e44faf594564f0a9bf012f1f1880569b0539f",
+    "1521": "ba18bd552b16196d550b9a49e7b86be8fdc49bac0bdee173c0ae9132ad2f3e88",
+    "1531": "5d755999b7eb2c8ee5f7a45ae4c2d8a7acbeff68565ac579e103b355095027a3",
+    "1532": "d71a0a9a315f9665fa60e93265f9170c3a091c570b256fef3a10b2854a96a61e",
+    "1657": "80105830a24374a7e4eaed0b018a3ded7ea1d3608a1f0115863f4f9ab856a68b",
+    "1658": "5e2174efa19883a50b7414c465d83517734b026f7c6a4e236b9b895395c423a2",
+    "1660": "b1abc0348a8f4d6501015f06c045c4c7d0cb3927d7bc2d87feeade7e0d6540eb",
+    "1661": "363054928605da0f3b97b42499d3f11e48ecbf646c931d4e9dd790dd8cec5941",
+    "1662": "77e6599556d0b585221bfd953051974c1d89c13bf2f4572982fad94c24fdc18a",
+    "1663": "c1d0546c788dda4cba6e5c44796a351fa59f783b4df96051a556ad6bf0b4f18b",
+    "1669": "e12b5dce42d79454bec2ef0b4c900f3159ae204d2b60f58e3a82ed1cb4b6d427",
+    "1670": "4420463a1965db7ce1644e6e2ebd4f5f3981713f2bd9125c8ec4ab9f9b1cecbd",
+    "1672": "77ec679e2af3feda678c0e9ecc9e1bd641a7cb0d1ef780729a3a24aa38559b01",
+    "1673": "d787d066dea64a8e0906abc2274976358534bc6b51117e6ee0817c3bb134bcce",
+    "1677": "e914c4f7456e0eb723ce2dce5b9e2dfa4af82a7ee1c45b3ccae783aa891f662f",
+    "1678": "ec4035f81dd88d48d2fea7d555bee6428c8a24a3760661ead0c62d650a36964c"
+  },
+  "host_assembly_sha256": "855a8771cc011a9313e2a2c96ca5670187823c8528c0224010bda091fd205b18",
+  "source_procedures_sha256": "5eb3a67ce89c4abb088fbf1dc2bcded8ef492f5dfda61dfb1600088c30a9fc99",
+  "host_adaptations": [
+    "Whole original32-bit DOS instruction equality before host adaptation",
+    "Reviewed64-bit cdecl stack-slot and saved-register adapter; all raw arithmetic remains32-bit",
+    "F1669/F1670 scratch-local8\u219216 for two64-bit epilogue pops",
+    "Low-address stack/bank; host callback-pointer slots widened only",
+    "F575 observed callback boundary records full request and applies supplied reply script; no classifier body executed"
+  ],
+  "scope": "Whole DOS F568/F569/F570, actual F572/F573 and F1677/F1678/Vec64 math; exact source scan/cooldown/rotation/cache and outputs. F575 effects are explicit supplied callback observations, not a full classifier, world, HP/fuel/time/Main or Android proof."
+}

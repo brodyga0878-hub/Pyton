@@ -1,0 +1,15 @@
+{
+  "schema": "starfrontier-source-frame-dispatch-portable-reproduction-v1",
+  "status": "verified",
+  "case_count": 317,
+  "observed_F575_callbacks": 867,
+  "actual_frame_conversions": 66,
+  "cache_byte_record_changes": 382,
+  "cache_byte_change_cases": 110,
+  "fresh_process_runs": 3,
+  "reverse_repeat_cases": 317,
+  "fixture_byte_exact": true,
+  "private_EXE_source_data_arguments_deliberately_nonexistent": true,
+  "fixture_sha256": "1c6a82c85c1ef45f230684ba653d856a64cdf89d93e199e3cce42ab99cf7499d",
+  "generator_sha256": "09f1382d12ba085f1b615fea6abbd9b3b4e7e7e829a6e88a490391d23e1e3a03"
+}

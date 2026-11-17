@@ -1,0 +1,35 @@
+{
+  "schema": "starfrontier-player-dispatch-native-validation-v1",
+  "status": "passed",
+  "case_count": 640,
+  "fixture_sha256": "2033e37070b53e2eaa90452ddf7cbb0f7484ce0453f5aba4a5dea00c5f446c8e",
+  "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "original_procedures": 36,
+  "original_instructions": 2388,
+  "fresh_process_runs": 3,
+  "reverse_repeat_cases": 640,
+  "consecutive_native_steps": 64,
+  "frame_response_cases": 55,
+  "prepared_audio_request_cases": 96,
+  "requests_by_kind": {
+    "F606": 114,
+    "F1910": 128
+  },
+  "portable_replay": {
+    "private_original_inputs": "deliberately nonexistent",
+    "proof_files": "copied to an outside private directory",
+    "fixture_byte_exact": true
+  },
+  "source_pins": {
+    "tools/rebuild_source_player_dispatch_native.py": "a8f2fcb2d086202c21f0cd56bd30ab4721a8f9ac077d9f4c003856a8d436c7e6",
+    "tests/fixtures/source_player_dispatch_native.json": "2033e37070b53e2eaa90452ddf7cbb0f7484ce0453f5aba4a5dea00c5f446c8e",
+    "validation/player-dispatch-2026-11-17/player-native-proof/instruction-proof.json": "60a12fdc0fb5b770d695e267c539ee9f422a21b98cf74c026f286ccbabeac283",
+    "validation/player-dispatch-2026-11-17/player-native-proof/source-procedures.s": "c9e08af2a922aa2ce70016d98d3573081fe6076f5ce3aad2d2a8262870269cc6",
+    "validation/player-dispatch-2026-11-17/player-native-proof/player-dispatch-native.s": "0259d13de7d8da2a58180a1ce17ce6d651a993532274beeef2b928eb37819251"
+  },
+  "expected_arithmetic_calculated_in_python": false,
+  "complete_original_F1019_or_world_scheduler_claimed": false,
+  "F606_body_executed_here": false,
+  "sound_effects_executed": false,
+  "new_Main_or_Android_claimed": false
+}

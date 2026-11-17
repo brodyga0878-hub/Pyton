@@ -1,0 +1,196 @@
+{
+  "schema": "starfrontier-dos-object-cadence-instruction-proof-v1",
+  "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "aliases": {
+    "DATA_004892": 5056420,
+    "DATA_007758": 5249108,
+    "FUNC_000144": 4297480,
+    "FUNC_000149": 4297836
+  },
+  "whole_procedure_instruction_equality": {
+    "149": {
+      "virtual_address": 4297836,
+      "executable_offset": 41580,
+      "byte_length": 127,
+      "sha256": "dd7d7dd3e42e0126c19841a23b7fecb736650bff64a8c6cc5cd2bddbccc245b2",
+      "instruction_count": 51,
+      "normalized_instruction_sha256": "79d9ba9956a4996f6652dc36e60cbd7b8ca95a116a6125f0e70549f36b993b09",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "144": {
+      "virtual_address": 4297480,
+      "executable_offset": 41224,
+      "byte_length": 32,
+      "sha256": "c6a14ed40d8fbf296b14ef64245afbfa28b68d9b82a63dc36182456853645541",
+      "instruction_count": 14,
+      "normalized_instruction_sha256": "bb3bdb018793a6a6c35a0477a603085dd51a3d9e8331c692261ec467a977a7a7",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    }
+  },
+  "source_procedures_sha256": "ce9b005b6ac490778c9052ba588a1b8b2d3d6403e45d37ad6e9b706f334c717c",
+  "original_event5_registry": [
+    {
+      "type_u8": 0,
+      "table_pointer_u32": 5159396,
+      "table_word_offset": 770980,
+      "event5_address_u32": 0,
+      "event5_word_offset": 873976
+    },
+    {
+      "type_u8": 1,
+      "table_pointer_u32": 5140856,
+      "table_word_offset": 770984,
+      "event5_address_u32": 4419628,
+      "event5_word_offset": 855436
+    },
+    {
+      "type_u8": 2,
+      "table_pointer_u32": 5116196,
+      "table_word_offset": 770988,
+      "event5_address_u32": 0,
+      "event5_word_offset": 830776
+    },
+    {
+      "type_u8": 3,
+      "table_pointer_u32": 5172624,
+      "table_word_offset": 770992,
+      "event5_address_u32": 4458692,
+      "event5_word_offset": 887204
+    },
+    {
+      "type_u8": 4,
+      "table_pointer_u32": 5064944,
+      "table_word_offset": 770996,
+      "event5_address_u32": 0,
+      "event5_word_offset": 779524
+    },
+    {
+      "type_u8": 5,
+      "table_pointer_u32": 5172412,
+      "table_word_offset": 771000,
+      "event5_address_u32": 4453760,
+      "event5_word_offset": 886992
+    },
+    {
+      "type_u8": 6,
+      "table_pointer_u32": 5140904,
+      "table_word_offset": 771004,
+      "event5_address_u32": 0,
+      "event5_word_offset": 855484
+    },
+    {
+      "type_u8": 7,
+      "table_pointer_u32": 5103064,
+      "table_word_offset": 771008,
+      "event5_address_u32": 4375832,
+      "event5_word_offset": 817644
+    },
+    {
+      "type_u8": 8,
+      "table_pointer_u32": 5172272,
+      "table_word_offset": 771012,
+      "event5_address_u32": 0,
+      "event5_word_offset": 886852
+    },
+    {
+      "type_u8": 9,
+      "table_pointer_u32": 5110124,
+      "table_word_offset": 771016,
+      "event5_address_u32": 0,
+      "event5_word_offset": 824704
+    },
+    {
+      "type_u8": 10,
+      "table_pointer_u32": 5058504,
+      "table_word_offset": 771020,
+      "event5_address_u32": 0,
+      "event5_word_offset": 773084
+    },
+    {
+      "type_u8": 11,
+      "table_pointer_u32": 5106508,
+      "table_word_offset": 771024,
+      "event5_address_u32": 4382606,
+      "event5_word_offset": 821088
+    },
+    {
+      "type_u8": 12,
+      "table_pointer_u32": 5077100,
+      "table_word_offset": 771028,
+      "event5_address_u32": 0,
+      "event5_word_offset": 791680
+    },
+    {
+      "type_u8": 13,
+      "table_pointer_u32": 4836832,
+      "table_word_offset": 771032,
+      "event5_address_u32": 0,
+      "event5_word_offset": 551412
+    },
+    {
+      "type_u8": 14,
+      "table_pointer_u32": 5070672,
+      "table_word_offset": 771036,
+      "event5_address_u32": 0,
+      "event5_word_offset": 785252
+    },
+    {
+      "type_u8": 15,
+      "table_pointer_u32": 5062892,
+      "table_word_offset": 771040,
+      "event5_address_u32": 0,
+      "event5_word_offset": 777472
+    },
+    {
+      "type_u8": 16,
+      "table_pointer_u32": 5169652,
+      "table_word_offset": 771044,
+      "event5_address_u32": 0,
+      "event5_word_offset": 884232
+    },
+    {
+      "type_u8": 17,
+      "table_pointer_u32": 5063556,
+      "table_word_offset": 771048,
+      "event5_address_u32": 4313148,
+      "event5_word_offset": 778136
+    },
+    {
+      "type_u8": 18,
+      "table_pointer_u32": 5077100,
+      "table_word_offset": 771052,
+      "event5_address_u32": 0,
+      "event5_word_offset": 791680
+    },
+    {
+      "type_u8": 19,
+      "table_pointer_u32": 4833340,
+      "table_word_offset": 771056,
+      "event5_address_u32": 0,
+      "event5_word_offset": 547920
+    },
+    {
+      "type_u8": 20,
+      "table_pointer_u32": 4779020,
+      "table_word_offset": 771060,
+      "event5_address_u32": 0,
+      "event5_word_offset": 493600
+    }
+  ],
+  "original_event5_callback_types": [
+    1,
+    3,
+    5,
+    7,
+    11,
+    17
+  ],
+  "source_procedure_sha256": {
+    "149": "4a5bc61f6a17cbf4dcf8b653d1c1d6e0328bce418232edc6ad5929cb388d9c18",
+    "144": "a2b9629273c7bf9d8dbe5218bc70ca38ef438d7b9e2bc3a15a0686dcd74e50db"
+  },
+  "scope": "Whole original DOS F149 and F144. The JJFFE laser-invulnerability addition is removed before DOS instruction proof. Native callbacks are request observers with optional declared byte effects, not original object handlers."
+}

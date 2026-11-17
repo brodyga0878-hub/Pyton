@@ -1,0 +1,14 @@
+00419308: push ebp
+00419309: mov ebp,esp
+0041930b: mov eax,DWORD PTR [ebp+0x8]
+0041930e: mov eax,DWORD PTR [eax*4+0x4d27a4]
+00419315: mov edx,DWORD PTR [ebp+0xc]
+00419318: mov eax,DWORD PTR [eax+edx*4]
+0041931b: test eax,eax
+0041931d: je 0x419326
+0041931f: mov edx,DWORD PTR [ebp+0x10]
+00419322: push edx
+00419323: call eax
+00419325: pop ecx
+00419326: pop ebp
+00419327: ret 

@@ -1,0 +1,16 @@
+{
+  "schema": "starfrontier-player-dispatch-native-source-pins-v1",
+  "sources_sha256": {
+    "tools/rebuild_source_frame_dispatch_native.py": "09f1382d12ba085f1b615fea6abbd9b3b4e7e7e829a6e88a490391d23e1e3a03",
+    "tools/rebuild_source_object_factory_native.py": "6a112f432a089e00054fae12ae701cabf1ca0ec2cb8d5633080e7b8c789e792a",
+    "tools/rebuild_source_object_cadence_native.py": "a8fb2352af38a4a925e9ecfe524bcb82c3f0e39e7bc0247c8e94c87cae170471",
+    "tools/rebuild_source_player_frame_chain_native.py": "a53d8008fcbd1428cbc50af7f0ba63d39ab714ebb7dcd75cd7c4daa136bd376b",
+    "tools/rebuild_source_player_dispatch_native.py": "a8f2fcb2d086202c21f0cd56bd30ab4721a8f9ac077d9f4c003856a8d436c7e6",
+    "tests/fixtures/source_object_cadence_native.json": "8798bd2950832fedaf0cc4bd58fc0170218399df6a8386b8a06b08e18720bfa4",
+    "tests/fixtures/source_player_dispatch_native.json": "2033e37070b53e2eaa90452ddf7cbb0f7484ce0453f5aba4a5dea00c5f446c8e",
+    "tests/fixtures/source_object_factory_native.json": "0c04db1aec7ad72125599848125eab9dde1c9d32a87b0b2e732de576403ede92",
+    "tests/fixtures/source_frame_dispatch_native.json": "1c6a82c85c1ef45f230684ba653d856a64cdf89d93e199e3cce42ab99cf7499d"
+  },
+  "new_main_native_cases": 1872,
+  "supplemental_native_composition_cases_separate": 2
+}

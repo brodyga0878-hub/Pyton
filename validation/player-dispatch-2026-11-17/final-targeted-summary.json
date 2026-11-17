@@ -1,0 +1,461 @@
+{
+  "schema": "starfrontier-player-dispatch-functional-summary-v1",
+  "status": "passed",
+  "checks": 148238,
+  "failures": 0,
+  "unique_suites": 15,
+  "suites": [
+    {
+      "name": "source_object_factory",
+      "scope": "Whole DOS F1533 raw object initialization, all149 real model resources and portable native full-record controls; no allocation or SI pose seeding.",
+      "status": "passed",
+      "checks": 4312,
+      "failures": 0,
+      "executed_utc": "2026-11-17T09:59:22.695780+00:00",
+      "suite_source": {
+        "path": "tests/test_source_object_factory.gd",
+        "bytes": 9434,
+        "sha256": "47b2f54d0491ad42950ff8f8a042410295667be8a8972247a04c66429e65bc32"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_object_factory.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.328,
+      "timed_out": false,
+      "output_bytes": 126,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/player-dispatch-2026-11-17/regression/logs/source_object_factory.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_object_cadence",
+      "scope": "Whole DOS F149/F144 descending object callback cadence, timers, observed table boundaries and ordered alias effects.",
+      "status": "passed",
+      "checks": 4191,
+      "failures": 0,
+      "executed_utc": "2026-11-17T09:59:22.696131+00:00",
+      "suite_source": {
+        "path": "tests/test_source_object_cadence.gd",
+        "bytes": 11842,
+        "sha256": "bcfdc35ad3d9aa4fe403ea595aac802bd86930e7ffd1ce3280763e2b69c6818a"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_object_cadence.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.43,
+      "timed_out": false,
+      "output_bytes": 126,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/player-dispatch-2026-11-17/regression/logs/source_object_cadence.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_player_dispatch",
+      "scope": "Whole DOS F1041/F1043 preparation and F1044/F1045 drift with actual shared scratch and source callback order.",
+      "status": "passed",
+      "checks": 6910,
+      "failures": 0,
+      "executed_utc": "2026-11-17T09:59:22.696272+00:00",
+      "suite_source": {
+        "path": "tests/test_source_player_dispatch.gd",
+        "bytes": 12930,
+        "sha256": "ac07c479fe1efb7065385be5ba7564922c6cadbf476cacb03045a7c3ea3fed3f"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_player_dispatch.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.63,
+      "timed_out": false,
+      "output_bytes": 127,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/player-dispatch-2026-11-17/regression/logs/source_player_dispatch.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_frame_dispatch",
+      "scope": "Whole DOS F568/F569/F570 frame/cooldown caller and actual rotations/caches against strict observed F575 call traces.",
+      "status": "passed",
+      "checks": 4125,
+      "failures": 0,
+      "executed_utc": "2026-11-17T09:59:23.024604+00:00",
+      "suite_source": {
+        "path": "tests/test_source_frame_dispatch.gd",
+        "bytes": 13186,
+        "sha256": "930a64b9982e0a005b5a9343b0c7e04094c2d16b51dc78759322a321fab7862f"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_frame_dispatch.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.62,
+      "timed_out": false,
+      "output_bytes": 126,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/player-dispatch-2026-11-17/regression/logs/source_frame_dispatch.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_player_dispatch_state",
+      "scope": "Actual owned F606 boundary before source thrust, complete raw dispatcher globals, cold/revision/receipt ownership and native composed control proof.",
+      "status": "passed",
+      "checks": 4195,
+      "failures": 0,
+      "executed_utc": "2026-11-17T09:59:23.127153+00:00",
+      "suite_source": {
+        "path": "tests/test_source_player_dispatch_state.gd",
+        "bytes": 27440,
+        "sha256": "53154f982eb63426b8973540f576cfc3973849990cdb4ccef77a05551c6c2ade"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_player_dispatch_state.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 4.052,
+      "timed_out": false,
+      "output_bytes": 133,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/player-dispatch-2026-11-17/regression/logs/source_player_dispatch_state.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_reference_bank",
+      "scope": "Original DOS F595/F604/F605/F606 raw indexed frame selection and whole-body/cache parity, typed cold and private transactions.",
+      "status": "passed",
+      "checks": 4618,
+      "failures": 0,
+      "executed_utc": "2026-11-17T09:59:23.327705+00:00",
+      "suite_source": {
+        "path": "tests/test_source_reference_bank.gd",
+        "bytes": 18158,
+        "sha256": "891f4541756f63589c8c364792cbfb4a63183233cef046f29652e11f5bec410a"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_reference_bank.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.419,
+      "timed_out": false,
+      "output_bytes": 126,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/player-dispatch-2026-11-17/regression/logs/source_reference_bank.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_angular_motion",
+      "scope": "Original DOS F584/F585/F609/F611 with full F1520 normalization, raw16-bit residues and dependent native sequences.",
+      "status": "passed",
+      "checks": 2355,
+      "failures": 0,
+      "executed_utc": "2026-11-17T09:59:23.645275+00:00",
+      "suite_source": {
+        "path": "tests/test_source_angular_motion.gd",
+        "bytes": 7714,
+        "sha256": "379c0f35ed5b7e609e65ac72ae2265979a427d199b1fd04004234f27714de87e"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_angular_motion.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.24,
+      "timed_out": false,
+      "output_bytes": 120,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/player-dispatch-2026-11-17/regression/logs/source_angular_motion.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_clock_pipeline",
+      "scope": "Original DOS raw counter admission, day carry/wrap/deadline, event ordering and revision-bound atomic cold owner.",
+      "status": "passed",
+      "checks": 4221,
+      "failures": 0,
+      "executed_utc": "2026-11-17T09:59:23.747348+00:00",
+      "suite_source": {
+        "path": "tests/test_source_clock_pipeline.gd",
+        "bytes": 8263,
+        "sha256": "0e718eab6e2deab7f9cab2070d19d2f32244d402d57053953606b1e75747695a"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_clock_pipeline.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.237,
+      "timed_out": false,
+      "output_bytes": 126,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/player-dispatch-2026-11-17/regression/logs/source_clock_pipeline.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_flight_state",
+      "scope": "Backward-compatible explicit raw bank/angular/clock ownership and replay-checked cold state alongside typed player callbacks.",
+      "status": "passed",
+      "checks": 9527,
+      "failures": 0,
+      "executed_utc": "2026-11-17T09:59:23.885756+00:00",
+      "suite_source": {
+        "path": "tests/test_source_flight_state.gd",
+        "bytes": 22055,
+        "sha256": "9b5b81a2cbf19a0560eba0002a40dc0a1ad87bfe4edb0d1293b3ad54d465a747"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_flight_state.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 4.601,
+      "timed_out": false,
+      "output_bytes": 118,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/player-dispatch-2026-11-17/regression/logs/source_flight_state.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "flight_time_controller",
+      "scope": "Original timer control native references plus bounded nominal-SI scheduler, safety and exact executed-step acknowledgement.",
+      "status": "passed",
+      "checks": 36926,
+      "failures": 0,
+      "executed_utc": "2026-11-17T09:59:23.985393+00:00",
+      "suite_source": {
+        "path": "tests/test_flight_time_controller.gd",
+        "bytes": 13150,
+        "sha256": "9bd88095910c6ccc1ecd759842d5b383c10ea8c294d915d93f38151aae2d5849"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_flight_time_controller.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.229,
+      "timed_out": false,
+      "output_bytes": 128,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/player-dispatch-2026-11-17/regression/logs/flight_time_controller.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_motion_pipeline",
+      "scope": "Original F598..F603/F607/F1512 persistent raw body and Q16 fraction transitions against independent native cases.",
+      "status": "passed",
+      "checks": 5240,
+      "failures": 0,
+      "executed_utc": "2026-11-17T09:59:24.215125+00:00",
+      "suite_source": {
+        "path": "tests/test_source_motion_pipeline.gd",
+        "bytes": 6095,
+        "sha256": "8efb526682c79c2b8baf65fb1e29b4ff7266d25d6695096690da8b021e5b7dca"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_motion_pipeline.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.323,
+      "timed_out": false,
+      "output_bytes": 127,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/player-dispatch-2026-11-17/regression/logs/source_motion_pipeline.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_frame_kinematics",
+      "scope": "Standalone original F572/F573 integer rotating-frame primitives versus720 native cases; not automatic F570/F606 frame selection.",
+      "status": "passed",
+      "checks": 3625,
+      "failures": 0,
+      "executed_utc": "2026-11-17T09:59:24.539078+00:00",
+      "suite_source": {
+        "path": "tests/test_source_frame_kinematics.gd",
+        "bytes": 3576,
+        "sha256": "849d8531bffafa163929b7eb8c19508567c1a93cca00120a9956a4b2b59b11bd"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_frame_kinematics.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.243,
+      "timed_out": false,
+      "output_bytes": 201,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/player-dispatch-2026-11-17/regression/logs/source_frame_kinematics.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_ground_surface",
+      "scope": "Actual F879 placement and F574 ground collision against independent original instructions.",
+      "status": "passed",
+      "checks": 30476,
+      "failures": 0,
+      "executed_utc": "2026-11-17T09:59:24.782868+00:00",
+      "suite_source": {
+        "path": "tests/test_source_ground_surface.gd",
+        "bytes": 13675,
+        "sha256": "a0ff249e67b24ba22bf9b55a0dd6bf081a6b12311b1b0fe0940547822fd3d94c"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_ground_surface.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 3.49,
+      "timed_out": false,
+      "output_bytes": 189,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/player-dispatch-2026-11-17/regression/logs/source_ground_surface.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_clock",
+      "scope": "Original F1357 calendar, F1363 display time and explicit elapsed-days bridge to the verified3250 epoch.",
+      "status": "passed",
+      "checks": 7312,
+      "failures": 0,
+      "executed_utc": "2026-11-17T09:59:27.179551+00:00",
+      "suite_source": {
+        "path": "tests/test_source_clock.gd",
+        "bytes": 4954,
+        "sha256": "f1e4d59b064070a66df4ec727c8e045e76e6eb9be158c7d1def6efb8ba3de1df"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_clock.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.139,
+      "timed_out": false,
+      "output_bytes": 194,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/player-dispatch-2026-11-17/regression/logs/source_clock.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_gravity",
+      "scope": "Original raw F603 velocity/fraction updates, F880 a4 and F1511/F1512 drift against independent native instructions; no live SI force migration.",
+      "status": "passed",
+      "checks": 20205,
+      "failures": 0,
+      "executed_utc": "2026-11-17T09:59:27.319228+00:00",
+      "suite_source": {
+        "path": "tests/test_source_gravity.gd",
+        "bytes": 8601,
+        "sha256": "a249d2f736843c2e8023f1cf2f5f1d4cd6c8de15fbda06e757ff846efb73b086"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_gravity.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.323,
+      "timed_out": false,
+      "output_bytes": 169,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/player-dispatch-2026-11-17/regression/logs/source_gravity.log",
+      "summary_lines": 1
+    }
+  ],
+  "new_core_suites": 5,
+  "new_core_checks": 23733,
+  "all_core_suites": 9,
+  "all_core_checks": 44454,
+  "dependency_suites": 6,
+  "dependency_checks": 103784,
+  "native_DOS_control_cases_separate": 3793,
+  "native_JJFFE_diagnostics_separate": 16,
+  "supplemental_native_composition_cases_separate": 2,
+  "native_or_portability_repeats_added_to_check_total": false,
+  "historical_totals_added": false,
+  "current_runtime_inputs": 492,
+  "all_475_published_game_runtime_inputs_unchanged": true,
+  "new_APK_built": false,
+  "live_Main_changed": false,
+  "full_original_player_world_pipeline_complete": false,
+  "scope": "One current passing result per15unique scripts: five new dispatcher/factory/cadence/owner groups, four existing core groups and six mathematical dependencies. Seven native banks,16JJFFE probes andtwo supplemental original native compositions remain separate. Original callbacks/F606 boundary; F575 and event/audio handlers remain observed boundaries, not full world/Main route."
+}

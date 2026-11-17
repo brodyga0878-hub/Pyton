@@ -44,10 +44,15 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_object_factory', 'tests/test_source_object_factory.gd', 'Whole DOS F1533 raw object initialization, all149 real model resources and portable native full-record controls; no allocation or SI pose seeding.', timeout=300),
+    Suite('source_object_cadence', 'tests/test_source_object_cadence.gd', 'Whole DOS F149/F144 descending object callback cadence, timers, observed table boundaries and ordered alias effects.', timeout=300),
+    Suite('source_player_dispatch', 'tests/test_source_player_dispatch.gd', 'Whole DOS F1041/F1043 preparation and F1044/F1045 drift with actual shared scratch and source callback order.', timeout=300),
+    Suite('source_frame_dispatch', 'tests/test_source_frame_dispatch.gd', 'Whole DOS F568/F569/F570 frame/cooldown caller and actual rotations/caches against strict observed F575 call traces.', timeout=300),
+    Suite('source_player_dispatch_state', 'tests/test_source_player_dispatch_state.gd', 'Actual owned F606 boundary before source thrust, complete raw dispatcher globals, cold/revision/receipt ownership and native composed control proof.', timeout=300),
     Suite('source_reference_bank', 'tests/test_source_reference_bank.gd', 'Original DOS F595/F604/F605/F606 raw indexed frame selection and whole-body/cache parity, typed cold and private transactions.', timeout=300),
     Suite('source_angular_motion', 'tests/test_source_angular_motion.gd', 'Original DOS F584/F585/F609/F611 with full F1520 normalization, raw16-bit residues and dependent native sequences.', timeout=300),
     Suite('source_clock_pipeline', 'tests/test_source_clock_pipeline.gd', 'Original DOS raw counter admission, day carry/wrap/deadline, event ordering and revision-bound atomic cold owner.', timeout=300),
-    Suite('source_flight_state', 'tests/test_source_flight_state.gd', 'Unified explicit raw bank/angular/clock ownership, private commands, replay-checked cold state and no implicit full flight dispatcher.', timeout=300),
+    Suite('source_flight_state', 'tests/test_source_flight_state.gd', 'Backward-compatible explicit raw bank/angular/clock ownership and replay-checked cold state alongside typed player callbacks.', timeout=300),
     Suite('native_station_frame', 'tests/test_native_station_frame.gd', 'Raw source-origin transfer and sampled same-time velocity correction, bounded source-station admission and atomic owner isolation.', timeout=900),
     Suite('native_station_trial', 'tests/test_native_station_trial.gd', 'Actual rotating dock/door flight, source HP/fuel, exact cold angular history, real service commands and reverse frame.', timeout=900),
     Suite('native_station_main', 'tests/test_native_station_main.gd', 'Actual isolated Main planet/station frame commands, healthy dock/service/launch/cold/report/reverse and original progress preservation.', timeout=900, user_args=('--rebuild-capture',)),

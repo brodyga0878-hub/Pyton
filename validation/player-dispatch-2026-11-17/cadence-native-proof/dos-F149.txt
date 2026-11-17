@@ -1,0 +1,51 @@
+0041946c: push ebp
+0041946d: mov ebp,esp
+0041946f: add esp,0xfffffff4
+00419472: push ebx
+00419473: push esi
+00419474: push edi
+00419475: mov eax,DWORD PTR [ebp+0xc]
+00419478: mov DWORD PTR [ebp-0xc],eax
+0041947b: mov eax,DWORD PTR [ebp+0x10]
+0041947e: mov DWORD PTR [ebp-0x8],eax
+00419481: mov eax,DWORD PTR [ebp+0x8]
+00419484: mov ds:0x501854,eax
+00419489: mov esi,0x72
+0041948e: mov eax,DWORD PTR [ebp+0x8]
+00419491: lea ebx,[eax+0x9783]
+00419497: mov eax,DWORD PTR [ebp+0x8]
+0041949a: lea edi,[eax+0x72]
+0041949d: test BYTE PTR [edi],0x1
+004194a0: je 0x4194d8
+004194a2: mov al,BYTE PTR [ebx]
+004194a4: add BYTE PTR [ebx],0xff
+004194a7: test al,al
+004194a9: jne 0x4194d8
+004194ab: mov al,BYTE PTR [ebx-0x1]
+004194ae: mov BYTE PTR [ebx],al
+004194b0: lea eax,[esi+esi*4]
+004194b3: lea eax,[esi+eax*4]
+004194b6: lea eax,[esi+eax*8]
+004194b9: add eax,eax
+004194bb: add eax,DWORD PTR [ebp+0x8]
+004194be: add eax,0x74
+004194c1: mov DWORD PTR [ebp-0x4],eax
+004194c4: lea eax,[ebp-0xc]
+004194c7: push eax
+004194c8: push 0x5
+004194ca: xor eax,eax
+004194cc: mov al,BYTE PTR [ebx-0x4]
+004194cf: push eax
+004194d0: call 0x419308
+004194d5: add esp,0xc
+004194d8: dec esi
+004194d9: add ebx,0xfffffeae
+004194df: dec edi
+004194e0: test esi,esi
+004194e2: jg 0x41949d
+004194e4: pop edi
+004194e5: pop esi
+004194e6: pop ebx
+004194e7: mov esp,ebp
+004194e9: pop ebp
+004194ea: ret 
