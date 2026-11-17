@@ -1,0 +1,25 @@
+{
+  "schema": "starfrontier-reference-bank-native-replay-validation-v1",
+  "status": "passed",
+  "checks": 5076,
+  "failures": 0,
+  "DOS_cases": 444,
+  "separate_JJFFE_COPY_boundary_diagnostics": 16,
+  "operations": {
+    "parent_velocity": 72,
+    "leave_parent": 72,
+    "enter_parent": 72,
+    "leave_then_enter": 36,
+    "select_parent": 192
+  },
+  "changed_cache_records": 296,
+  "future_COPY_callbacks": 76,
+  "fixture_sha256": "474763d258cfcf694f7521cf7fb8e1637fc31f090961179780d35dc71fb4cb45",
+  "instruction_proof_sha256": "19de6abe6d40e9ba2e94d0c60213dbbaeeb33eee01692b1c9de8416010b38554",
+  "host_assembly_sha256": "3598d2b6597c9a0a33ff8a19368ed744e9cedfc262cfe391a62655dfcd5fd7f2",
+  "fixture_byte_exact": true,
+  "input_fixture_unchanged": true,
+  "F866_body_executed": false,
+  "F148_body_executed": false,
+  "scope": "Original instruction arithmetic replay only. Three forward native processes plus reverse460 in each reproduction. F606 cache writes preserved; COPY and event observers explicit. No live Main, physical Android, full F570/F866/event/AI bank or full original clone claim."
+}

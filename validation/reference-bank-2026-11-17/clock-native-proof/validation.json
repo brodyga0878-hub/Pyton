@@ -1,0 +1,102 @@
+{
+  "schema": "starfrontier-source-clock-pipeline-native-v1",
+  "reference": "uploaded DOS FIRSTENC.EXE",
+  "executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "reviewed_jjffe_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "state_fields": [
+    "clock_low_u32",
+    "clock_day_u32",
+    "deadline_low_u32",
+    "deadline_day_u32",
+    "accelerated_counter_u32",
+    "frame_ticks_u32",
+    "system_counter_u32",
+    "system_frame_ticks_u32",
+    "system_total_u32"
+  ],
+  "case_count": 836,
+  "sequences": [
+    {
+      "name": "rollover_then_empty_and_system_wrap",
+      "case_ids": [
+        821,
+        822,
+        823,
+        824,
+        825,
+        826
+      ],
+      "state_after_used_as_next_initial": true
+    },
+    {
+      "name": "deadline_then_zero_replay",
+      "case_ids": [
+        827,
+        828,
+        829,
+        830,
+        831
+      ],
+      "state_after_used_as_next_initial": true
+    },
+    {
+      "name": "day_word_wrap",
+      "case_ids": [
+        832,
+        833,
+        834,
+        835
+      ],
+      "state_after_used_as_next_initial": true
+    }
+  ],
+  "byte_instruction_proofs": {
+    "DOS_main_clock_admission": {
+      "executable_offset": 185288,
+      "virtual_address": 4441544,
+      "byte_length": 143,
+      "sha256": "aeff4e4e945fcbfd39c2635e4537e0d7ffe736656108d0600f74be55e2a206d4",
+      "source32_reassembled_bytes_identical": true,
+      "instruction_count": 45,
+      "host_adaptation": "Source32 GAS reconstructs all143 uploaded bytes exactly. HostELF64 changes only three two-argument stack cleanups ESP+8 toRSP+16 and stack/call widths, retaining32-bit arithmetic and valid low pointers; F148 recorder preservesregisters/flags. AppendedRET at reviewed slice end."
+    }
+  },
+  "known_dos_jjffe_differences": [
+    {
+      "branch": "deadline",
+      "DOS": "day>=deadline_day AND low>=deadline_low",
+      "JJFFE": "day>deadline_day OR(day==deadline_day AND low>=deadline_low)",
+      "jjffe_comment": "FIX: Groundhog day bug"
+    },
+    {
+      "branch": "maximum_date",
+      "DOS": "No max-date F918 callback in this original slice",
+      "JJFFE": "F918(1) when carried day exceeds0x127c8e"
+    },
+    {
+      "branch": "millisecond_timer",
+      "DOS": "Not executed by this slice",
+      "JJFFE": "F1418_TimerAdvance is a separately rewritten host timer; existing1736controls do not establish DOS scheduler identity"
+    }
+  ],
+  "native_execution": {
+    "format": "host-only fixed-VA ELF64 after reviewed stack/call adaptation",
+    "no_x86_in_android": true,
+    "initial_bank_identical_fresh_processes": 3,
+    "full_bank_replay": true,
+    "reverse_case_order_identical": true,
+    "all_context_and_global_canaries_unchanged": true,
+    "all_unrelated_context_bytes_unchanged": true,
+    "expected_transitions_computed_by_python": false,
+    "assembly_sha256": "91b6c187d805f0adb7498d50a76f36d7177243df65949028434d3808e73c8edb",
+    "adapted_clock_bytes_sha256": "474f518809603f4b1dc1a9ebf09225c03013d734fdf22dc153c9cb722f396ec1",
+    "linker_sha256": "5a5f1fd07587ca54913d4b56bf04343480ed65524cd8b07da594b2179fc270a4",
+    "initial_input_sha256": "4058d335631c980217765f07ffff827c6605e975c8190559b171657b589b0fa3",
+    "full_output_sha256": "af0e832e5c22c37e6f0f729617ec0a7e2a6622d9fde70ede1550590fd339470c"
+  },
+  "scope": [
+    "Raw frame counter consumption, unsigned clock-low carry and day-word wrap, original DOS deadline predicate, ordered event21/16/15 recorder calls, system counter consumption and total wrap.",
+    "Callbacks are observed broadcasts only. Full F148 handler dispatch, F152 whole-second events, F149 object cadence, actual physics/AI/fuel/heat/collision, player frame selection, input50Hz and F1418 wall timing are outside this proof.",
+    "A raw32-bit accelerated counter carries at most one day per admission; this does not authorize dropping intermediate world events through arbitrarily multiplied dt."
+  ]
+}

@@ -1,0 +1,52 @@
+
+/workspace/ffe-original/FIRSTENC.EXE:     file format pei-i386
+
+
+Disassembly of section CODE:
+
+0043c5c8 <CODE+0x2c5c8>:
+  43c5c8:	mov    eax,ds:0x652c10
+  43c5cd:	mov    ds:0x652c0c,eax
+  43c5d2:	sub    DWORD PTR ds:0x652c10,eax
+  43c5d8:	mov    esi,DWORD PTR [ebx+0x4]
+  43c5db:	add    DWORD PTR [ebx],eax
+  43c5dd:	cmp    eax,DWORD PTR [ebx]
+  43c5df:	jbe    0x43c5e4
+  43c5e1:	inc    DWORD PTR [ebx+0x4]
+  43c5e4:	mov    eax,DWORD PTR [ebx+0x4]
+  43c5e7:	cmp    eax,DWORD PTR [ebx+0x7a]
+  43c5ea:	jb     0x43c611
+  43c5ec:	mov    eax,DWORD PTR [ebx]
+  43c5ee:	cmp    eax,DWORD PTR [ebx+0x76]
+  43c5f1:	jb     0x43c611
+  43c5f3:	mov    eax,DWORD PTR [ebx+0x76]
+  43c5f6:	mov    DWORD PTR [ebx],eax
+  43c5f8:	mov    eax,DWORD PTR [ebx+0x7a]
+  43c5fb:	mov    DWORD PTR [ebx+0x4],eax
+  43c5fe:	push   0x0
+  43c600:	push   0x15
+  43c602:	call   0x41942c
+  43c607:	add    esp,0x8
+  43c60a:	mov    DWORD PTR [ebx+0x7a],0xffffffff
+  43c611:	mov    ecx,DWORD PTR [ebx+0x4]
+  43c614:	cmp    esi,ecx
+  43c616:	je     0x43c63f
+  43c618:	mov    eax,ecx
+  43c61a:	mov    ecx,0x7
+  43c61f:	xor    edx,edx
+  43c621:	div    ecx
+  43c623:	test   edx,edx
+  43c625:	jne    0x43c633
+  43c627:	push   0x0
+  43c629:	push   0x10
+  43c62b:	call   0x41942c
+  43c630:	add    esp,0x8
+  43c633:	push   0x0
+  43c635:	push   0xf
+  43c637:	call   0x41942c
+  43c63c:	add    esp,0x8
+  43c63f:	mov    eax,ds:0x652c14
+  43c644:	mov    ds:0x6476a8,eax
+  43c649:	xor    edx,edx
+  43c64b:	mov    DWORD PTR ds:0x652c14,edx
+  43c651:	add    DWORD PTR ds:0x6388a0,eax

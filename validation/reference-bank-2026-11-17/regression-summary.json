@@ -1,0 +1,350 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-17T08:41:13.851952+00:00",
+  "updated_utc": "2026-11-17T08:41:18.793243+00:00",
+  "duration_seconds": 4.941,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-17T08:41:13.851952+00:00",
+      "duration_seconds": 4.941,
+      "requested_suites": [
+        "source_reference_bank",
+        "source_angular_motion",
+        "source_clock_pipeline",
+        "source_flight_state",
+        "flight_time_controller",
+        "source_motion_pipeline",
+        "source_frame_kinematics",
+        "source_ground_surface",
+        "source_clock",
+        "source_gravity"
+      ],
+      "executed_suites": [
+        "source_reference_bank",
+        "source_angular_motion",
+        "source_clock_pipeline",
+        "source_flight_state",
+        "flight_time_controller",
+        "source_motion_pipeline",
+        "source_frame_kinematics",
+        "source_ground_surface",
+        "source_clock",
+        "source_gravity"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 3,
+  "status": "passed",
+  "passed_suites": 10,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 124505,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "source_reference_bank",
+      "scope": "Original DOS F595/F604/F605/F606 raw indexed frame selection and whole-body/cache parity, typed cold and private transactions.",
+      "status": "passed",
+      "checks": 4618,
+      "failures": 0,
+      "executed_utc": "2026-11-17T08:41:13.854955+00:00",
+      "suite_source": {
+        "path": "tests/test_source_reference_bank.gd",
+        "bytes": 18158,
+        "sha256": "891f4541756f63589c8c364792cbfb4a63183233cef046f29652e11f5bec410a"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_reference_bank.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.513,
+      "timed_out": false,
+      "output_bytes": 126,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/reference-bank-2026-11-17/regression/logs/source_reference_bank.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_angular_motion",
+      "scope": "Original DOS F584/F585/F609/F611 with full F1520 normalization, raw16-bit residues and dependent native sequences.",
+      "status": "passed",
+      "checks": 2355,
+      "failures": 0,
+      "executed_utc": "2026-11-17T08:41:13.855128+00:00",
+      "suite_source": {
+        "path": "tests/test_source_angular_motion.gd",
+        "bytes": 7714,
+        "sha256": "379c0f35ed5b7e609e65ac72ae2265979a427d199b1fd04004234f27714de87e"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_angular_motion.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.344,
+      "timed_out": false,
+      "output_bytes": 120,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/reference-bank-2026-11-17/regression/logs/source_angular_motion.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_clock_pipeline",
+      "scope": "Original DOS raw counter admission, day carry/wrap/deadline, event ordering and revision-bound atomic cold owner.",
+      "status": "passed",
+      "checks": 4221,
+      "failures": 0,
+      "executed_utc": "2026-11-17T08:41:13.855265+00:00",
+      "suite_source": {
+        "path": "tests/test_source_clock_pipeline.gd",
+        "bytes": 8263,
+        "sha256": "0e718eab6e2deab7f9cab2070d19d2f32244d402d57053953606b1e75747695a"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_clock_pipeline.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.332,
+      "timed_out": false,
+      "output_bytes": 126,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/reference-bank-2026-11-17/regression/logs/source_clock_pipeline.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_flight_state",
+      "scope": "Unified explicit raw bank/angular/clock ownership, private commands, replay-checked cold state and no implicit full flight dispatcher.",
+      "status": "passed",
+      "checks": 9527,
+      "failures": 0,
+      "executed_utc": "2026-11-17T08:41:14.188946+00:00",
+      "suite_source": {
+        "path": "tests/test_source_flight_state.gd",
+        "bytes": 21955,
+        "sha256": "36a28a20280452dfa0fbb0a9f410628bda093bfad9cc5746dd4dc880ef95124c"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_flight_state.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 4.603,
+      "timed_out": false,
+      "output_bytes": 118,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/reference-bank-2026-11-17/regression/logs/source_flight_state.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "flight_time_controller",
+      "scope": "Original timer control native references plus bounded nominal-SI scheduler, safety and exact executed-step acknowledgement.",
+      "status": "passed",
+      "checks": 36926,
+      "failures": 0,
+      "executed_utc": "2026-11-17T08:41:14.200547+00:00",
+      "suite_source": {
+        "path": "tests/test_flight_time_controller.gd",
+        "bytes": 13150,
+        "sha256": "9bd88095910c6ccc1ecd759842d5b383c10ea8c294d915d93f38151aae2d5849"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_flight_time_controller.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.343,
+      "timed_out": false,
+      "output_bytes": 128,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/reference-bank-2026-11-17/regression/logs/flight_time_controller.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_motion_pipeline",
+      "scope": "Original F598..F603/F607/F1512 persistent raw body and Q16 fraction transitions against independent native cases.",
+      "status": "passed",
+      "checks": 5240,
+      "failures": 0,
+      "executed_utc": "2026-11-17T08:41:14.368802+00:00",
+      "suite_source": {
+        "path": "tests/test_source_motion_pipeline.gd",
+        "bytes": 6095,
+        "sha256": "8efb526682c79c2b8baf65fb1e29b4ff7266d25d6695096690da8b021e5b7dca"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_motion_pipeline.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.326,
+      "timed_out": false,
+      "output_bytes": 127,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/reference-bank-2026-11-17/regression/logs/source_motion_pipeline.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_frame_kinematics",
+      "scope": "Standalone original F572/F573 integer rotating-frame primitives versus720 native cases; not automatic F570/F606 frame selection.",
+      "status": "passed",
+      "checks": 3625,
+      "failures": 0,
+      "executed_utc": "2026-11-17T08:41:14.544474+00:00",
+      "suite_source": {
+        "path": "tests/test_source_frame_kinematics.gd",
+        "bytes": 3576,
+        "sha256": "849d8531bffafa163929b7eb8c19508567c1a93cca00120a9956a4b2b59b11bd"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_frame_kinematics.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.235,
+      "timed_out": false,
+      "output_bytes": 201,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/reference-bank-2026-11-17/regression/logs/source_frame_kinematics.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_ground_surface",
+      "scope": "Actual F879 placement and F574 ground collision against independent original instructions.",
+      "status": "passed",
+      "checks": 30476,
+      "failures": 0,
+      "executed_utc": "2026-11-17T08:41:14.694939+00:00",
+      "suite_source": {
+        "path": "tests/test_source_ground_surface.gd",
+        "bytes": 13675,
+        "sha256": "a0ff249e67b24ba22bf9b55a0dd6bf081a6b12311b1b0fe0940547822fd3d94c"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_ground_surface.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 3.504,
+      "timed_out": false,
+      "output_bytes": 189,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/reference-bank-2026-11-17/regression/logs/source_ground_surface.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_clock",
+      "scope": "Original F1357 calendar, F1363 display time and explicit elapsed-days bridge to the verified3250 epoch.",
+      "status": "passed",
+      "checks": 7312,
+      "failures": 0,
+      "executed_utc": "2026-11-17T08:41:14.780066+00:00",
+      "suite_source": {
+        "path": "tests/test_source_clock.gd",
+        "bytes": 4954,
+        "sha256": "f1e4d59b064070a66df4ec727c8e045e76e6eb9be158c7d1def6efb8ba3de1df"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_clock.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.134,
+      "timed_out": false,
+      "output_bytes": 194,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/reference-bank-2026-11-17/regression/logs/source_clock.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_gravity",
+      "scope": "Original raw F603 velocity/fraction updates, F880 a4 and F1511/F1512 drift against independent native instructions; no live SI force migration.",
+      "status": "passed",
+      "checks": 20205,
+      "failures": 0,
+      "executed_utc": "2026-11-17T08:41:14.915143+00:00",
+      "suite_source": {
+        "path": "tests/test_source_gravity.gd",
+        "bytes": 8601,
+        "sha256": "a249d2f736843c2e8023f1cf2f5f1d4cd6c8de15fbda06e757ff846efb73b086"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_gravity.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.325,
+      "timed_out": false,
+      "output_bytes": 169,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/reference-bank-2026-11-17/regression/logs/source_gravity.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ]
+}

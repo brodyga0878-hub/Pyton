@@ -1,0 +1,49 @@
+0045aee8: push ebp
+0045aee9: mov ebp,esp
+0045aeeb: push ebx
+0045aeec: push esi
+0045aeed: push edi
+0045aeee: mov ebx,DWORD PTR [ebp+0x10]
+0045aef1: mov eax,DWORD PTR [ebp+0xc]
+0045aef4: mov esi,DWORD PTR [ebp+0x8]
+0045aef7: mov dl,BYTE PTR [eax+0x56]
+0045aefa: cmp dl,BYTE PTR [ebx+0x56]
+0045aefd: jne 0x45af24
+0045aeff: mov dl,BYTE PTR [eax+0x57]
+0045af02: cmp dl,BYTE PTR [ebx+0x57]
+0045af05: jne 0x45af3e
+0045af07: push esi
+0045af08: mov edi,esi
+0045af0a: lea esi,[eax+0x3e]
+0045af0d: mov ecx,0x6
+0045af12: rep movs DWORD PTR es:[edi],DWORD PTR ds:[esi]
+0045af14: pop esi
+0045af15: add ebx,0x3e
+0045af18: push ebx
+0045af19: push esi
+0045af1a: call 0x459d60
+0045af1f: add esp,0x8
+0045af22: jmp 0x45af56
+0045af24: mov dl,BYTE PTR [ebx+0x56]
+0045af27: cmp dl,BYTE PTR [eax+0x86]
+0045af2d: jne 0x45af3e
+0045af2f: add ebx,0x3e
+0045af32: push ebx
+0045af33: push esi
+0045af34: call 0x459db4
+0045af39: add esp,0x8
+0045af3c: jmp 0x45af56
+0045af3e: push eax
+0045af3f: push esi
+0045af40: call DWORD PTR ds:0x502d84
+0045af46: add esp,0x8
+0045af49: add ebx,0x26
+0045af4c: push ebx
+0045af4d: push esi
+0045af4e: call 0x459d60
+0045af53: add esp,0x8
+0045af56: pop edi
+0045af57: pop esi
+0045af58: pop ebx
+0045af59: pop ebp
+0045af5a: ret 

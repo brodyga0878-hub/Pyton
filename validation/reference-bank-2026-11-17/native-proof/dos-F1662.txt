@@ -1,0 +1,33 @@
+00459d60: push ebp
+00459d61: mov ebp,esp
+00459d63: push ebx
+00459d64: push esi
+00459d65: mov esi,DWORD PTR [ebp+0xc]
+00459d68: mov ebx,DWORD PTR [ebp+0x8]
+00459d6b: push DWORD PTR [esi+0x4]
+00459d6e: push DWORD PTR [esi]
+00459d70: push DWORD PTR [ebx+0x4]
+00459d73: push DWORD PTR [ebx]
+00459d75: push ebx
+00459d76: call 0x44e848
+00459d7b: add esp,0x14
+00459d7e: push DWORD PTR [esi+0xc]
+00459d81: push DWORD PTR [esi+0x8]
+00459d84: push DWORD PTR [ebx+0xc]
+00459d87: push DWORD PTR [ebx+0x8]
+00459d8a: lea eax,[ebx+0x8]
+00459d8d: push eax
+00459d8e: call 0x44e848
+00459d93: add esp,0x14
+00459d96: push DWORD PTR [esi+0x14]
+00459d99: push DWORD PTR [esi+0x10]
+00459d9c: push DWORD PTR [ebx+0x14]
+00459d9f: push DWORD PTR [ebx+0x10]
+00459da2: add ebx,0x10
+00459da5: push ebx
+00459da6: call 0x44e848
+00459dab: add esp,0x14
+00459dae: pop esi
+00459daf: pop ebx
+00459db0: pop ebp
+00459db1: ret 

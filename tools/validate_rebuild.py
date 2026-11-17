@@ -44,6 +44,10 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_reference_bank', 'tests/test_source_reference_bank.gd', 'Original DOS F595/F604/F605/F606 raw indexed frame selection and whole-body/cache parity, typed cold and private transactions.', timeout=300),
+    Suite('source_angular_motion', 'tests/test_source_angular_motion.gd', 'Original DOS F584/F585/F609/F611 with full F1520 normalization, raw16-bit residues and dependent native sequences.', timeout=300),
+    Suite('source_clock_pipeline', 'tests/test_source_clock_pipeline.gd', 'Original DOS raw counter admission, day carry/wrap/deadline, event ordering and revision-bound atomic cold owner.', timeout=300),
+    Suite('source_flight_state', 'tests/test_source_flight_state.gd', 'Unified explicit raw bank/angular/clock ownership, private commands, replay-checked cold state and no implicit full flight dispatcher.', timeout=300),
     Suite('native_station_frame', 'tests/test_native_station_frame.gd', 'Raw source-origin transfer and sampled same-time velocity correction, bounded source-station admission and atomic owner isolation.', timeout=900),
     Suite('native_station_trial', 'tests/test_native_station_trial.gd', 'Actual rotating dock/door flight, source HP/fuel, exact cold angular history, real service commands and reverse frame.', timeout=900),
     Suite('native_station_main', 'tests/test_native_station_main.gd', 'Actual isolated Main planet/station frame commands, healthy dock/service/launch/cold/report/reverse and original progress preservation.', timeout=900, user_args=('--rebuild-capture',)),

@@ -1,0 +1,39 @@
+{
+  "schema": "starfrontier-original-angular-native-reproduction-v1",
+  "status": "passed",
+  "completed_utc": "2026-11-17T08:23:53.486711+00:00",
+  "fixture_sha256": "ddcd81328d778ed5225f878e561f65188e4bebdabba6e61e21c36a88b44bdf84",
+  "reproduced_fixture_sha256": "ddcd81328d778ed5225f878e561f65188e4bebdabba6e61e21c36a88b44bdf84",
+  "fixture_byte_exact": true,
+  "case_count": 641,
+  "consecutive_original_steps": 64,
+  "original_procedure_count": 12,
+  "original_instruction_count": 786,
+  "all_archived_procedures_reassembled_against_original_DOS_bytes": true,
+  "fresh_process_runs": 3,
+  "reverse_repeat_cases": 641,
+  "all_body_canaries_unchanged": true,
+  "expected_arithmetic_calculated_in_python": false,
+  "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "host_adaptations": [
+    "Reviewed original32bit cdecl saved registers/stack arguments expanded to64bit host widths; pointers constrained low32bit.",
+    "F585 original8byte local reservation expanded to16bytes for its two64bit epilogue pops; original4byte scratch arithmetic offsets unchanged.",
+    "F611 local decrement-table address uses RBX rather than EBX as a64bit host stack index; source shift value2..9 is unchanged.",
+    "Original indirect function-pointer slots use host8byte pointers; mathematical tables and raw338byte fields retain original widths.",
+    "Exact DOS abs sign/INT_MIN semantics retained in a minimal host ABI wrapper."
+  ],
+  "runtime_godot_checks": 2355,
+  "runtime_godot_failures": 0,
+  "source_sha256": {
+    "scripts/source_angular_motion.gd": "e4af479bcfcbfb7bbb927aedeae64d0859dc5d40f39b90ef7e5f942a75051a52",
+    "tests/test_source_angular_motion.gd": "379c0f35ed5b7e609e65ac72ae2265979a427d199b1fd04004234f27714de87e",
+    "tools/rebuild_source_angular_native.py": "18b185d8d4cec665b5b054a47f6c76f43cc6eca5d144d9e8e29c8553c83aa822",
+    "validation/reference-bank-2026-11-17/angular-native-proof/instruction-proof.json": "a40aa86b4400a54ff2e6fdd203cbf4c544e2498ae94138cfb5a729a3c7a290ea",
+    "validation/reference-bank-2026-11-17/angular-native-proof/source-procedures.s": "b02e82ed48d4d375990e051bd208fe4faf8299e800eaf6e3bd9456dec636dd39",
+    "validation/reference-bank-2026-11-17/angular-native-proof/angular-native.s": "fc9d708dd76d8860d04eea45f40167a23e3f1700782d92c118293645498fd3ec"
+  },
+  "full_source_player_pipeline_proved": false,
+  "physical_device_tested": false,
+  "scope": "Whole originalF584/F585/F609/F611 plus actualF1520/F1519/F1552 normalization and original math helpers; independent full DOS instruction equality before reviewed host ABI adaptation. Explicit raw angular step only; no automatic F1019/F1041 player scheduling, universal angular/linear order, full frame bank, fuel/time/collision/AI integration or Androidx86 execution claim."
+}

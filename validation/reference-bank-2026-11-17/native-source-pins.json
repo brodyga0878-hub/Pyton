@@ -1,0 +1,19 @@
+{
+  "schema": "starfrontier-reference-bank-native-final-source-pins-v1",
+  "sources_sha256": {
+    "tools/rebuild_source_reference_bank_native.py": "74d7450c081665ae8a4caed78c52a4657e686f32f3593e316e526b30395a0173",
+    "tools/rebuild_source_angular_native.py": "a6bff5508c0fd9cb02e61af69826bec536703f5429181ddb9816908dabb51ef1",
+    "tools/rebuild_source_clock_pipeline_native.py": "142bc1d64ed6ac6ced90d5c15b847beebcf8f709675c101243e8cb046e0244e2",
+    "tests/fixtures/source_reference_bank_native.json": "474763d258cfcf694f7521cf7fb8e1637fc31f090961179780d35dc71fb4cb45",
+    "tests/fixtures/source_angular_native.json": "ddcd81328d778ed5225f878e561f65188e4bebdabba6e61e21c36a88b44bdf84",
+    "tests/fixtures/source_clock_pipeline_native.json": "88ea9774bef2a5a36dc2f4011f5c59b1c8f44ca382b8ade21df4906120ddfc62"
+  },
+  "native_DOS_control_cases": {
+    "reference_bank": 444,
+    "angular": 641,
+    "clock": 836
+  },
+  "separate_JJFFE_diagnostics": 16,
+  "expected_results_computed_in_Python": false,
+  "full_F866_F1418_F597_or_Main_claimed": false
+}
