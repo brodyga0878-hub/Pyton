@@ -1,0 +1,75 @@
+{
+  "schema": "starfrontier-terrain-height-source-publication-v1",
+  "status": "verified",
+  "completed_utc": "2026-11-17T14:27:17.961423+00:00",
+  "checkpoint": "terrain-height-core-2026-11-17",
+  "artifact_commit": "c5731001496b3df4b6cbc019ea7504ceddc8fe06",
+  "source_commit": "027d76b163c9689cd41dc8746ed7e46d48aac2f4",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/c5731001496b3df4b6cbc019ea7504ceddc8fe06/deliverables/terrain-height-core-2026-11-17/manifest.json",
+      "http_status": 200,
+      "bytes": 2815,
+      "sha256": "61a34290f15ad56dfe472793d2f95cecad23373f3d632906aaf5dfad05081a68"
+    },
+    {
+      "file": "README_RU.md",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/c5731001496b3df4b6cbc019ea7504ceddc8fe06/deliverables/terrain-height-core-2026-11-17/README_RU.md",
+      "http_status": 200,
+      "bytes": 4699,
+      "sha256": "194ccb8145c04d6d46bf24a1bc7ef25ac3bbc46640d9e5636c642e55ff0d7fa9"
+    },
+    {
+      "file": "StarFrontier-terrain-height-core-update.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/c5731001496b3df4b6cbc019ea7504ceddc8fe06/deliverables/terrain-height-core-2026-11-17/StarFrontier-terrain-height-core-update.zip",
+      "http_status": 200,
+      "bytes": 11819810,
+      "sha256": "8abe087e9b2f4859c62dc7be80a74ba420b7e14e2079d2f92f7471253c414317",
+      "zip_CRC_verified": true,
+      "source_commit_in_ZIP_comment": "027d76b163c9689cd41dc8746ed7e46d48aac2f4"
+    },
+    {
+      "file": "functional-summary.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/c5731001496b3df4b6cbc019ea7504ceddc8fe06/deliverables/terrain-height-core-2026-11-17/functional-summary.json",
+      "http_status": 200,
+      "bytes": 40751,
+      "sha256": "c7a90206e0dc0fb22944def5b93d97be7a4a85bc8b299f9d3435da4a1dd776a3"
+    },
+    {
+      "file": "source-pair-verification.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/c5731001496b3df4b6cbc019ea7504ceddc8fe06/deliverables/terrain-height-core-2026-11-17/source-pair-verification.json",
+      "http_status": 200,
+      "bytes": 78534,
+      "sha256": "c79acef01f7b360a9d66056b7c08b14379468c4fb475e2ad6624436fedf01868"
+    },
+    {
+      "file": "source-update-policy.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/c5731001496b3df4b6cbc019ea7504ceddc8fe06/deliverables/terrain-height-core-2026-11-17/source-update-policy.json",
+      "http_status": 200,
+      "bytes": 247323,
+      "sha256": "34662dfdede02b3dcd1edf0ccc4dbb4da1e6acc983b052d594b40bab065a0299"
+    },
+    {
+      "file": "StarFrontier-0.28.0-native-station-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip",
+      "http_status": 200,
+      "bytes": 33543341,
+      "sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d",
+      "zip_CRC_verified": true,
+      "source_commit_in_ZIP_comment": "de8eb18a687d007781321436910187dff3785775"
+    }
+  ],
+  "actual_complete_HTTPS_downloads": 7,
+  "all_manifest_payloads_downloaded": true,
+  "manifest_payload_count": 5,
+  "required_source_archives_downloaded": 2,
+  "runtime_inputs_verified": 528,
+  "runtime_freeze_sha256": "edf285ae20a959ce215aeb436d539949b2310acc4b9af55949e71a403479f5b4",
+  "all_current_runtime_inputs_match_frozen_source": true,
+  "new_APK_produced": false,
+  "new_kernels_connected_to_Main": false,
+  "physical_device_tested": false,
+  "full_original_port_complete": false,
+  "scope": "Seven actual complete immutable HTTPS downloads: sealed manifest, all five checkpoint payloads and the complete0.28 base source ZIP. SHA/lengths, both ZIP CRCs/source comments and all528 frozen runtime inputs pass. The F581/F1876 kernels and their cold query owners are separate from Main; this is not a new APK, a complete world/damage engine or an on-device result."
+}
