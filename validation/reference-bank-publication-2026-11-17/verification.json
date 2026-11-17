@@ -1,0 +1,75 @@
+{
+  "schema": "starfrontier-reference-bank-source-publication-v1",
+  "status": "verified",
+  "completed_utc": "2026-11-17T08:53:41.485588+00:00",
+  "checkpoint": "reference-bank-core-2026-11-17",
+  "artifact_commit": "c7a0ec46371e3ac372aea6a2faaa997f38ff515e",
+  "source_commit": "4380a069c569a1a094970d226f3204112c12d2c7",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/c7a0ec46371e3ac372aea6a2faaa997f38ff515e/deliverables/reference-bank-core-2026-11-17/manifest.json",
+      "http_status": 200,
+      "bytes": 2077,
+      "sha256": "231c64adfbfbd8b6248d13a6ca8ca3a51015c1a3ec5222ff497bed019ef22dab"
+    },
+    {
+      "file": "README_RU.md",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/c7a0ec46371e3ac372aea6a2faaa997f38ff515e/deliverables/reference-bank-core-2026-11-17/README_RU.md",
+      "http_status": 200,
+      "bytes": 3224,
+      "sha256": "a4ac92c3b5afb4e731add8f30a797ee7f8ade281f4c4f0190dc7c6fca60b8e60"
+    },
+    {
+      "file": "StarFrontier-reference-bank-core-update.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/c7a0ec46371e3ac372aea6a2faaa997f38ff515e/deliverables/reference-bank-core-2026-11-17/StarFrontier-reference-bank-core-update.zip",
+      "http_status": 200,
+      "bytes": 1312879,
+      "sha256": "c1d1567d77b4eb20f5d017444fc5c27721c7984cbb5af17ccb19c6db9deb816a",
+      "zip_CRC_verified": true,
+      "source_commit_in_ZIP_comment": "4380a069c569a1a094970d226f3204112c12d2c7"
+    },
+    {
+      "file": "functional-summary.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/c7a0ec46371e3ac372aea6a2faaa997f38ff515e/deliverables/reference-bank-core-2026-11-17/functional-summary.json",
+      "http_status": 200,
+      "bytes": 11144,
+      "sha256": "0b5b087da26c875beeb9d720e856b2cf44db9aabe27ceef229bce176677b72bc"
+    },
+    {
+      "file": "source-pair-verification.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/c7a0ec46371e3ac372aea6a2faaa997f38ff515e/deliverables/reference-bank-core-2026-11-17/source-pair-verification.json",
+      "http_status": 200,
+      "bytes": 15709,
+      "sha256": "1a7dec04cf3308daeeead735f7a0a7ac0c1646255c2daafe4f19959c3e0776c1"
+    },
+    {
+      "file": "source-update-policy.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/c7a0ec46371e3ac372aea6a2faaa997f38ff515e/deliverables/reference-bank-core-2026-11-17/source-update-policy.json",
+      "http_status": 200,
+      "bytes": 18931,
+      "sha256": "69a127c5e5f2928a77eb4dbe7d5265180aeb652e1a7fe0307916bc607271d99f"
+    },
+    {
+      "file": "StarFrontier-0.28.0-native-station-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip",
+      "http_status": 200,
+      "bytes": 33543341,
+      "sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d",
+      "zip_CRC_verified": true,
+      "source_commit_in_ZIP_comment": "de8eb18a687d007781321436910187dff3785775"
+    }
+  ],
+  "actual_complete_HTTPS_downloads": 7,
+  "all_manifest_payloads_downloaded": true,
+  "manifest_payload_count": 5,
+  "required_source_archives_downloaded": 2,
+  "runtime_inputs_verified": 483,
+  "runtime_freeze_sha256": "f1f35a411612a862032adf96fe0754758c161bcc8a95cce381df9539d70ccdb7",
+  "all_current_runtime_inputs_match_frozen_source": true,
+  "new_APK_produced": false,
+  "new_kernels_connected_to_Main": false,
+  "physical_device_tested": false,
+  "full_original_port_complete": false,
+  "scope": "Seven actual complete immutable HTTPS downloads: sealed manifest, all five checkpoint payloads, and the required complete0.28 base source ZIP. Both source archive comments and CRC pass; all local payload SHA/lengths and483 frozen source inputs pass. This source foundation is not a new playable release or a flown long-range route."
+}

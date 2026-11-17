@@ -1,0 +1,8 @@
+manifest.json: verified
+README_RU.md: verified
+functional-summary.json: verified
+source-update-policy.json: verified
+source-pair-verification.json: verified
+StarFrontier-reference-bank-core-update.zip: verified
+StarFrontier-0.28.0-native-station-source.zip: verified
+{"status": "verified", "actual_complete_HTTPS_downloads": 7, "required_source_archives_downloaded": 2, "runtime_inputs": 483}
