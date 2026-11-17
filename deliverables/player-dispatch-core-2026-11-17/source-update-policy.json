@@ -1,0 +1,934 @@
+{
+  "schema": "starfrontier-player-dispatch-source-update-policy-v1",
+  "status": "verified",
+  "source_commit": "345cbc22caeee98663334ca541b9223ae6f5aedc",
+  "source_commit_utc": "2026-11-17T10:02:48+00:00",
+  "base_archive_path": "/workspace/Pyton/deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip",
+  "base_archive_repository_path": "deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip",
+  "base_archive_bytes": 33543341,
+  "base_archive_sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d",
+  "base_source_commit": "de8eb18a687d007781321436910187dff3785775",
+  "update_archive_path": "/workspace/Pyton/deliverables/player-dispatch-core-2026-11-17/StarFrontier-player-dispatch-core-update.zip",
+  "update_archive_repository_path": "deliverables/player-dispatch-core-2026-11-17/StarFrontier-player-dispatch-core-update.zip",
+  "update_archive_bytes": 3695003,
+  "update_archive_sha256": "fd7a912b2514526bcd398185869f1a2b95eb688a8ea8117cee165c56c20cdaba",
+  "update_archive_zip_entries": 224,
+  "update_actual_project_payload_files": 200,
+  "top_level_metadata_files": 1,
+  "manifest_file": "SOURCE_UPDATE_MANIFEST.json",
+  "manifest_sha256": "f30dae662c324788a693b4d81e38e42375c8708574ac80c9df0187694953074e",
+  "update_ZIP_CRC_verified": true,
+  "base_ZIP_CRC_verified": true,
+  "source_commit_comment_verified": true,
+  "strictly_below32MiB": true,
+  "requires_exact_base_archive": true,
+  "required_archive_count": 2,
+  "cumulative_update": true,
+  "previous_update_archive_required": false,
+  "previous_source_checkpoint": "reference-bank-core-2026-11-17",
+  "all_current_core_and_root_files_exact_after_overlay": true,
+  "all_current_text_proofs_included": true,
+  "all_base_source_paths_retained": true,
+  "deleted_paths": [],
+  "current_core_and_root_file_count": 1571,
+  "retained_base_source_file_count": 1660,
+  "merged_actual_project_file_count": 1854,
+  "runtime_inputs_verified": 492,
+  "unchanged_published0_28_runtime_inputs": 475,
+  "new_runtime_inputs": [
+    "data/ffe_object_factory.json",
+    "scripts/source_angular_motion.gd",
+    "scripts/source_angular_motion.gd.uid",
+    "scripts/source_clock_pipeline.gd",
+    "scripts/source_clock_pipeline.gd.uid",
+    "scripts/source_flight_state.gd",
+    "scripts/source_flight_state.gd.uid",
+    "scripts/source_frame_dispatch.gd",
+    "scripts/source_frame_dispatch.gd.uid",
+    "scripts/source_object_cadence.gd",
+    "scripts/source_object_cadence.gd.uid",
+    "scripts/source_object_factory.gd",
+    "scripts/source_object_factory.gd.uid",
+    "scripts/source_player_dispatch.gd",
+    "scripts/source_player_dispatch.gd.uid",
+    "scripts/source_reference_bank.gd",
+    "scripts/source_reference_bank.gd.uid"
+  ],
+  "previous_backend_runtime_inputs": 483,
+  "unchanged_previous_backend_runtime_inputs": 482,
+  "changed_previous_backend_runtime_inputs": [
+    "scripts/source_flight_state.gd"
+  ],
+  "added_runtime_inputs_since_previous_backend": [
+    "data/ffe_object_factory.json",
+    "scripts/source_frame_dispatch.gd",
+    "scripts/source_frame_dispatch.gd.uid",
+    "scripts/source_object_cadence.gd",
+    "scripts/source_object_cadence.gd.uid",
+    "scripts/source_object_factory.gd",
+    "scripts/source_object_factory.gd.uid",
+    "scripts/source_player_dispatch.gd",
+    "scripts/source_player_dispatch.gd.uid"
+  ],
+  "previous_backend_freeze_path": "validation/reference-bank-2026-11-17/runtime-freeze.json",
+  "previous_backend_freeze_sha256": "f1f35a411612a862032adf96fe0754758c161bcc8a95cce381df9539d70ccdb7",
+  "included_text_proof_prefixes": [
+    "validation/reference-bank-2026-11-17/",
+    "validation/player-dispatch-2026-11-17/"
+  ],
+  "native_generator_groups": [
+    "tools/rebuild_source_reference_bank_native.py",
+    "tools/rebuild_source_angular_native.py",
+    "tools/rebuild_source_clock_pipeline_native.py",
+    "tools/rebuild_source_object_factory_native.py",
+    "tools/rebuild_source_object_cadence_native.py",
+    "tools/rebuild_source_player_dispatch_native.py",
+    "tools/rebuild_source_frame_dispatch_native.py"
+  ],
+  "supplemental_native_composition_generators": [
+    "tools/rebuild_source_player_frame_chain_native.py"
+  ],
+  "supplemental_native_compositions_separate": 2,
+  "supplemental_controls_added_to_main_native_totals": false,
+  "supplemental_native_composition_proof": "validation/player-dispatch-2026-11-17/player-native-proof/player-frame-chain.json",
+  "supplemental_native_composition_proof_sha256": "4b14fb995c23a3ffe8de2f3f324e9a14b052a7de2a3da9092ecfec2edb48f69e",
+  "required_native_replay_inputs": [
+    "validation/player-dispatch-2026-11-17/cadence-native-proof/cadence-native.s",
+    "validation/player-dispatch-2026-11-17/cadence-native-proof/dos-F144.txt",
+    "validation/player-dispatch-2026-11-17/cadence-native-proof/dos-F149.txt",
+    "validation/player-dispatch-2026-11-17/cadence-native-proof/instruction-proof.json",
+    "validation/player-dispatch-2026-11-17/cadence-native-proof/source-procedures.asm",
+    "validation/player-dispatch-2026-11-17/factory-native-proof/factory-native.s",
+    "validation/player-dispatch-2026-11-17/factory-native-proof/instruction-proof.json",
+    "validation/player-dispatch-2026-11-17/factory-native-proof/source-procedures.s",
+    "validation/player-dispatch-2026-11-17/frame-native-proof/frame-dispatch-observed-kernel.s",
+    "validation/player-dispatch-2026-11-17/frame-native-proof/instruction-proof.json",
+    "validation/player-dispatch-2026-11-17/frame-native-proof/source-procedures.asm",
+    "validation/player-dispatch-2026-11-17/player-native-proof/instruction-proof.json",
+    "validation/player-dispatch-2026-11-17/player-native-proof/player-dispatch-native.s",
+    "validation/player-dispatch-2026-11-17/player-native-proof/player-frame-chain.json",
+    "validation/player-dispatch-2026-11-17/player-native-proof/source-procedures.s",
+    "validation/reference-bank-2026-11-17/angular-native-proof/instruction-proof.json",
+    "validation/reference-bank-2026-11-17/angular-native-proof/source-procedures.s",
+    "validation/reference-bank-2026-11-17/clock-native-proof/clock-observed.S",
+    "validation/reference-bank-2026-11-17/clock-native-proof/clock-observed.ld",
+    "validation/reference-bank-2026-11-17/clock-native-proof/clock-source32.S",
+    "validation/reference-bank-2026-11-17/clock-native-proof/dos-clock-admission.txt",
+    "validation/reference-bank-2026-11-17/clock-native-proof/jjffe-clock-admission-reference.asm",
+    "validation/reference-bank-2026-11-17/native-proof/instruction-proof.json",
+    "validation/reference-bank-2026-11-17/native-proof/reference-bank-observed-kernel.s",
+    "validation/reference-bank-2026-11-17/runtime-freeze.json"
+  ],
+  "factory_resource_path": "data/ffe_object_factory.json",
+  "factory_resource_models": 149,
+  "factory_resource_sha256": "c2a39b98f17721b55eac7fc5d3015e39b279fb05a002401fd3120218721894a2",
+  "runtime_freeze_sha256": "5927607cfe1a2d2a351156fd1117bfdeb0d6818471d5408a320cf841a6e1bc54",
+  "payloads": {
+    "README.md": {
+      "bytes": 116778,
+      "sha256": "a3a661e7bfa6450bd3b1095ecad0428f4e4f10a109bdd7487f7587a770b610e8"
+    },
+    "SOURCE_ARCHIVE_RU.md": {
+      "bytes": 83438,
+      "sha256": "785ebc429a66fe4b021fc209197031f3527ad552c298ccc559b15cc9097ee1d4"
+    },
+    "data/ffe_object_factory.json": {
+      "bytes": 79658,
+      "sha256": "c2a39b98f17721b55eac7fc5d3015e39b279fb05a002401fd3120218721894a2"
+    },
+    "docs/RECOVERY_AND_ROADMAP_RU.md": {
+      "bytes": 77780,
+      "sha256": "e467185713d152645c0930a3d47e3d67991c9aee51f892189c10fc60be3ecc84"
+    },
+    "docs/RELEASE_0_28_0_RU.md": {
+      "bytes": 9064,
+      "sha256": "a5a2671179b7e30c28fa2689ce4da9df980c5aa2fb77626bb8e02415bc092fe4"
+    },
+    "docs/SOURCE_NATIVE_STATION_RU.md": {
+      "bytes": 11417,
+      "sha256": "c6143eb1a9043b25bcd3073504a9b63d7f547838d36d9a5b9531802550c8c1c3"
+    },
+    "docs/SOURCE_PLAYER_DISPATCH_RU.md": {
+      "bytes": 8642,
+      "sha256": "f27b31cdcb86962012339464320124983192dc83b4dd8df7ab50382764027714"
+    },
+    "docs/SOURCE_REFERENCE_BANK_RU.md": {
+      "bytes": 9747,
+      "sha256": "0bdb60f0c5977c129c23ee8a1c7a8961bd0c702fd05116ea3c2580850a1b66a3"
+    },
+    "scripts/source_angular_motion.gd": {
+      "bytes": 6741,
+      "sha256": "e4af479bcfcbfb7bbb927aedeae64d0859dc5d40f39b90ef7e5f942a75051a52"
+    },
+    "scripts/source_angular_motion.gd.uid": {
+      "bytes": 20,
+      "sha256": "583a9c3bfba99a903392ed75e807ffe280f9186fad5f42719ac86c9d8d38a740"
+    },
+    "scripts/source_clock_pipeline.gd": {
+      "bytes": 9272,
+      "sha256": "dd95f4c243fd8043523d4ae574b96c5b96fe5487cb395b70556a0248405c39e9"
+    },
+    "scripts/source_clock_pipeline.gd.uid": {
+      "bytes": 19,
+      "sha256": "e8074c97615fd8b7d4a4ee34f9388293108d4b01686cbb3b739c9d60a8c5a9c2"
+    },
+    "scripts/source_flight_state.gd": {
+      "bytes": 18340,
+      "sha256": "f04e89bd78bd6ee3748e622c9c03eed95e5e21d62453459e14c4f723bf3765f1"
+    },
+    "scripts/source_flight_state.gd.uid": {
+      "bytes": 20,
+      "sha256": "12e28d373ad8b9e1997ab2f2a858ef38774ed2115b1ecf516ea2fb9f171ba2da"
+    },
+    "scripts/source_frame_dispatch.gd": {
+      "bytes": 9931,
+      "sha256": "313c2d052b53f1157d8e73f2468c35141e0d6abe6a062376d2c56346b8a22caf"
+    },
+    "scripts/source_frame_dispatch.gd.uid": {
+      "bytes": 20,
+      "sha256": "dd6b967211458e197e691f8f403e9759e143e42600109543b2b5d0bde3bb2989"
+    },
+    "scripts/source_object_cadence.gd": {
+      "bytes": 5516,
+      "sha256": "163a608db97d2b5b533c61f1d5fb2b985994f00220f05ea99b24a639b17ad93d"
+    },
+    "scripts/source_object_cadence.gd.uid": {
+      "bytes": 20,
+      "sha256": "4622077c604d717bd2955d57e5667d103076161a59f0ddacb5ef93b424bc086a"
+    },
+    "scripts/source_object_factory.gd": {
+      "bytes": 7134,
+      "sha256": "e97a31782edb90169a13612b2c962c7467771c9f8a163e7b7b2d3b34a09b0e86"
+    },
+    "scripts/source_object_factory.gd.uid": {
+      "bytes": 20,
+      "sha256": "f18ca65514ee313f7d857df4b1831e30c20a3fc88f2483a89dac331a1fd38d8e"
+    },
+    "scripts/source_player_dispatch.gd": {
+      "bytes": 10489,
+      "sha256": "353bba764111fe5778188ec9046adeb138212cf2cb54b4e34bcdfe1de2bd9742"
+    },
+    "scripts/source_player_dispatch.gd.uid": {
+      "bytes": 20,
+      "sha256": "6ec02eb79dae56a5cf0651b5923cca83831c5be76c5584b4ef78a43fdad5bd36"
+    },
+    "scripts/source_reference_bank.gd": {
+      "bytes": 18804,
+      "sha256": "ac9f40bb3572a8bb819ae2c0397c7b8f4685491f3e50275dd86cd7381765a251"
+    },
+    "scripts/source_reference_bank.gd.uid": {
+      "bytes": 21,
+      "sha256": "a93f21c51b88913323e4dbb11a4bcee86bd1d0da7d94f57cfa08f750d28a9b6d"
+    },
+    "tests/fixtures/source_angular_native.json": {
+      "bytes": 1310892,
+      "sha256": "ddcd81328d778ed5225f878e561f65188e4bebdabba6e61e21c36a88b44bdf84"
+    },
+    "tests/fixtures/source_clock_pipeline_native.json": {
+      "bytes": 821134,
+      "sha256": "88ea9774bef2a5a36dc2f4011f5c59b1c8f44ca382b8ade21df4906120ddfc62"
+    },
+    "tests/fixtures/source_frame_dispatch_native.json": {
+      "bytes": 6903010,
+      "sha256": "1c6a82c85c1ef45f230684ba653d856a64cdf89d93e199e3cce42ab99cf7499d"
+    },
+    "tests/fixtures/source_object_cadence_native.json": {
+      "bytes": 2341282,
+      "sha256": "8798bd2950832fedaf0cc4bd58fc0170218399df6a8386b8a06b08e18720bfa4"
+    },
+    "tests/fixtures/source_object_factory_native.json": {
+      "bytes": 2379683,
+      "sha256": "0c04db1aec7ad72125599848125eab9dde1c9d32a87b0b2e732de576403ede92"
+    },
+    "tests/fixtures/source_player_dispatch_native.json": {
+      "bytes": 2649651,
+      "sha256": "2033e37070b53e2eaa90452ddf7cbb0f7484ce0453f5aba4a5dea00c5f446c8e"
+    },
+    "tests/fixtures/source_reference_bank_native.json": {
+      "bytes": 3363129,
+      "sha256": "474763d258cfcf694f7521cf7fb8e1637fc31f090961179780d35dc71fb4cb45"
+    },
+    "tests/test_source_angular_motion.gd": {
+      "bytes": 7714,
+      "sha256": "379c0f35ed5b7e609e65ac72ae2265979a427d199b1fd04004234f27714de87e"
+    },
+    "tests/test_source_angular_motion.gd.uid": {
+      "bytes": 20,
+      "sha256": "f6f4913af6297a7114cb35c76ffcfd6136ef69cc2c333797f03859b382e9b3fb"
+    },
+    "tests/test_source_clock_pipeline.gd": {
+      "bytes": 8263,
+      "sha256": "0e718eab6e2deab7f9cab2070d19d2f32244d402d57053953606b1e75747695a"
+    },
+    "tests/test_source_clock_pipeline.gd.uid": {
+      "bytes": 20,
+      "sha256": "e6ab167367b508b51c0b151795ccee516cd5fe56b977ebf4872033687187fc72"
+    },
+    "tests/test_source_flight_state.gd": {
+      "bytes": 22055,
+      "sha256": "9b5b81a2cbf19a0560eba0002a40dc0a1ad87bfe4edb0d1293b3ad54d465a747"
+    },
+    "tests/test_source_flight_state.gd.uid": {
+      "bytes": 20,
+      "sha256": "7e54bc4c461ab2a2a86d83a21840075cd562957e7d2af4deea8b2a617c82f697"
+    },
+    "tests/test_source_frame_dispatch.gd": {
+      "bytes": 13186,
+      "sha256": "930a64b9982e0a005b5a9343b0c7e04094c2d16b51dc78759322a321fab7862f"
+    },
+    "tests/test_source_frame_dispatch.gd.uid": {
+      "bytes": 20,
+      "sha256": "880e873601c76d47952112c04f69fb073067deba50717053e191a9e36a62b1e4"
+    },
+    "tests/test_source_object_cadence.gd": {
+      "bytes": 11842,
+      "sha256": "bcfdc35ad3d9aa4fe403ea595aac802bd86930e7ffd1ce3280763e2b69c6818a"
+    },
+    "tests/test_source_object_cadence.gd.uid": {
+      "bytes": 20,
+      "sha256": "9f3a59f9c985f69790dddd8c77556c28e75c54fce7f58cc6439d28a1af067704"
+    },
+    "tests/test_source_object_factory.gd": {
+      "bytes": 9434,
+      "sha256": "47b2f54d0491ad42950ff8f8a042410295667be8a8972247a04c66429e65bc32"
+    },
+    "tests/test_source_object_factory.gd.uid": {
+      "bytes": 20,
+      "sha256": "3ce9e789dfbe67ae0ff323da9b726fad96c167bdb37738c57eecc0627ab8c1b4"
+    },
+    "tests/test_source_player_dispatch.gd": {
+      "bytes": 12930,
+      "sha256": "ac07c479fe1efb7065385be5ba7564922c6cadbf476cacb03045a7c3ea3fed3f"
+    },
+    "tests/test_source_player_dispatch.gd.uid": {
+      "bytes": 20,
+      "sha256": "6a211851fc3615fa4efe18213361525b2f7323c0fbdafb3488f46d75e94e6867"
+    },
+    "tests/test_source_player_dispatch_state.gd": {
+      "bytes": 27440,
+      "sha256": "53154f982eb63426b8973540f576cfc3973849990cdb4ccef77a05551c6c2ade"
+    },
+    "tests/test_source_player_dispatch_state.gd.uid": {
+      "bytes": 20,
+      "sha256": "87539afc2505ee4a7aae9cf08617d50918bb8c3f445adff684da78fd7e049153"
+    },
+    "tests/test_source_reference_bank.gd": {
+      "bytes": 18158,
+      "sha256": "891f4541756f63589c8c364792cbfb4a63183233cef046f29652e11f5bec410a"
+    },
+    "tests/test_source_reference_bank.gd.uid": {
+      "bytes": 21,
+      "sha256": "b7104b8e35b6fd86884fe28a47a365893c2714bca5f55823f69eb7ce3b3c9a6e"
+    },
+    "tools/rebuild_source_angular_native.py": {
+      "bytes": 19672,
+      "sha256": "a6bff5508c0fd9cb02e61af69826bec536703f5429181ddb9816908dabb51ef1"
+    },
+    "tools/rebuild_source_clock_pipeline_native.py": {
+      "bytes": 22473,
+      "sha256": "142bc1d64ed6ac6ced90d5c15b847beebcf8f709675c101243e8cb046e0244e2"
+    },
+    "tools/rebuild_source_frame_dispatch_native.py": {
+      "bytes": 24480,
+      "sha256": "09f1382d12ba085f1b615fea6abbd9b3b4e7e7e829a6e88a490391d23e1e3a03"
+    },
+    "tools/rebuild_source_object_cadence_native.py": {
+      "bytes": 20852,
+      "sha256": "a8fb2352af38a4a925e9ecfe524bcb82c3f0e39e7bc0247c8e94c87cae170471"
+    },
+    "tools/rebuild_source_object_factory_native.py": {
+      "bytes": 20093,
+      "sha256": "6a112f432a089e00054fae12ae701cabf1ca0ec2cb8d5633080e7b8c789e792a"
+    },
+    "tools/rebuild_source_player_dispatch_native.py": {
+      "bytes": 24421,
+      "sha256": "a8f2fcb2d086202c21f0cd56bd30ab4721a8f9ac077d9f4c003856a8d436c7e6"
+    },
+    "tools/rebuild_source_player_frame_chain_native.py": {
+      "bytes": 8025,
+      "sha256": "a53d8008fcbd1428cbc50af7f0ba63d39ab714ebb7dcd75cd7c4daa136bd376b"
+    },
+    "tools/rebuild_source_reference_bank_native.py": {
+      "bytes": 20598,
+      "sha256": "74d7450c081665ae8a4caed78c52a4657e686f32f3593e316e526b30395a0173"
+    },
+    "tools/validate_rebuild.py": {
+      "bytes": 59209,
+      "sha256": "4407ae6e5b44822af80e0d0ae90e8ee655573c0222cd783a6b5f3eaf15058469"
+    },
+    "validation/player-dispatch-2026-11-17/cadence-native-proof/README.md": {
+      "bytes": 2665,
+      "sha256": "14ad6d13ced7f28c43ffe139b167570adaa478c8e75819a8a7da7e2e22f14cee"
+    },
+    "validation/player-dispatch-2026-11-17/cadence-native-proof/cadence-native.s": {
+      "bytes": 11425,
+      "sha256": "21eeda45b62bc83c1bca6025054adb9d92b93a9f873c9baca0f3d388fcb2db7d"
+    },
+    "validation/player-dispatch-2026-11-17/cadence-native-proof/dos-F144.txt": {
+      "bytes": 375,
+      "sha256": "38f372b993e8f40f892f8671cf4b0218d154170031c84906b094d34483eed76f"
+    },
+    "validation/player-dispatch-2026-11-17/cadence-native-proof/dos-F149.txt": {
+      "bytes": 1360,
+      "sha256": "4f83a6c65406d29c275c85d920a0fe6bbaa8452edd1081f6d5c12e8682252321"
+    },
+    "validation/player-dispatch-2026-11-17/cadence-native-proof/instruction-proof.json": {
+      "bytes": 5559,
+      "sha256": "f4baf505d1684cdfc20fceabdc70078b21b97a59f6e9d20eb33761696d5ebd97"
+    },
+    "validation/player-dispatch-2026-11-17/cadence-native-proof/source-procedures.asm": {
+      "bytes": 1304,
+      "sha256": "ce9b005b6ac490778c9052ba588a1b8b2d3d6403e45d37ad6e9b706f334c717c"
+    },
+    "validation/player-dispatch-2026-11-17/cadence-native-proof/validation.json": {
+      "bytes": 512,
+      "sha256": "437c8758da634eeb8f7163fb8b9aed2caa61d47c2b48c883a895c61b1d8124ea"
+    },
+    "validation/player-dispatch-2026-11-17/factory-native-proof/README.md": {
+      "bytes": 1815,
+      "sha256": "23820df181e57799dc87eefdb13d29298d5005416a0d711a69855ef17623341a"
+    },
+    "validation/player-dispatch-2026-11-17/factory-native-proof/dos-disassembly.txt": {
+      "bytes": 6014,
+      "sha256": "2217cc1add86b5bf0d584bf27d753cbc781e77f13f8dc7f1ebc639b6a8b0bbf3"
+    },
+    "validation/player-dispatch-2026-11-17/factory-native-proof/factory-native.s": {
+      "bytes": 7196,
+      "sha256": "7e6bf11d2e59ffd5e13a95f34faac2620eb365f86de1f28371980977b1b22949"
+    },
+    "validation/player-dispatch-2026-11-17/factory-native-proof/godot-test.log": {
+      "bytes": 126,
+      "sha256": "3d4acbcada9690f69ecc1f9506b1f72b4f3a9300b144638096c6e565e1e5d035"
+    },
+    "validation/player-dispatch-2026-11-17/factory-native-proof/instruction-proof.json": {
+      "bytes": 7688,
+      "sha256": "31e59984ee6e9dfd3f8d6bbc3cbf7500d8b0cd5b96470f2f7c25fe15d6c1953c"
+    },
+    "validation/player-dispatch-2026-11-17/factory-native-proof/source-procedures.s": {
+      "bytes": 5412,
+      "sha256": "b81af35fca46eb3f1714fcb0aa30457234572e99cd72e4567d75c01f7679f307"
+    },
+    "validation/player-dispatch-2026-11-17/factory-native-proof/validation.json": {
+      "bytes": 3837,
+      "sha256": "6bc692b774e2be215142454c4af5271d5079a463f8a7f943f009cb40e91092d7"
+    },
+    "validation/player-dispatch-2026-11-17/final-targeted-summary.json": {
+      "bytes": 16389,
+      "sha256": "88176516ee5cda07defbc60731395d2adfb429b5838b74ba859be8381baea3a8"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/README.md": {
+      "bytes": 2931,
+      "sha256": "5afd403bccd86f0adcad9202013e90e09c6fcfe7618b0a357995cad72db66f63"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F1333.txt": {
+      "bytes": 339,
+      "sha256": "8028a7ec6c2598cac257078b369524dd8076cb4a80ff099b71662ecf4d904b63"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F1335.txt": {
+      "bytes": 339,
+      "sha256": "9b08d21bb4ec30d9abd33568aea2af6aec5f25bbd88bcb93f1041b496c173fb8"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F1517.txt": {
+      "bytes": 1239,
+      "sha256": "c6c83242bed2bca5be66a0f0fc7a0ea207638574e29cc9f94329ccea569f376d"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F1521.txt": {
+      "bytes": 209,
+      "sha256": "38545335a9b30c4a694ee19e9ab54e3565a6fba46f21ba1a7bbd370e72edd2b9"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F1531.txt": {
+      "bytes": 309,
+      "sha256": "3c8a703b8e24632787559d1b91117a8af7f95daca1f2b50a95634ff424ea8d7d"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F1532.txt": {
+      "bytes": 307,
+      "sha256": "482c3c675e54120bc13377b5cec0dd0a3c4aab064dd39ceb8b978a3615f71623"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F1657.txt": {
+      "bytes": 2164,
+      "sha256": "991daeb0808636344b76cd274b732400af1fcc7421b7daac443743033bc17874"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F1658.txt": {
+      "bytes": 503,
+      "sha256": "9cf701c70861393b5f05fdd62f6c276946c49bc458d249584675f841a862d604"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F1660.txt": {
+      "bytes": 2053,
+      "sha256": "d01d87b89e350e9fa06eedb3a3f45435e12e1a37e9703c1f5025d652d4cc4a1f"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F1661.txt": {
+      "bytes": 889,
+      "sha256": "c53229d697d64642db61fbe16ba4eabb690f0b62e4d1a6d060ed430e4ed223fe"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F1662.txt": {
+      "bytes": 889,
+      "sha256": "ea8ace3c5da292d062332fb0b48c9459bea613230c3ab08ae20bc43ad2fb840c"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F1663.txt": {
+      "bytes": 903,
+      "sha256": "0278087feeabc5274d0ad5716163f6f0e7430c87980cffeead3f0a656626e505"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F1669.txt": {
+      "bytes": 2410,
+      "sha256": "6da64e08911a9d1925382abee8afef85d1a57e41630fa01c8d98bea82e16b6ca"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F1670.txt": {
+      "bytes": 2410,
+      "sha256": "3aad385dc63fe938df642b7116706da5e6011bd7d3715fc14e65f9a6d340472e"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F1672.txt": {
+      "bytes": 5749,
+      "sha256": "6389d110e6d924deb007d26452014ebab84380cde3925255cc5080522dd503aa"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F1673.txt": {
+      "bytes": 5749,
+      "sha256": "d55d1133d14e180e8ba80f5488269edd48d8476161eb784496da85f0dce8a48c"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F1677.txt": {
+      "bytes": 2578,
+      "sha256": "abeedc87619507599aa10210ad3b9fdad1f17f18015bfd66b328a23332556e7a"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F1678.txt": {
+      "bytes": 1222,
+      "sha256": "0d2fd021f2ff8aef2ae33eb8bbe6dfe9d3e6c7f5e4843667b3395065b560fb80"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F568.txt": {
+      "bytes": 564,
+      "sha256": "96230650910422cc07dc6953beb44399217d6df93dd975964676569861d23977"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F569.txt": {
+      "bytes": 565,
+      "sha256": "c3114e1cbcbfc7522ccc264c2ea93f785167ee1e8c86a1a173392df75aac6a79"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F570.txt": {
+      "bytes": 4990,
+      "sha256": "14760c1b0f10fd321f34a20632d134386f423f32995b0556b60e42f49bd8a75e"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F572.txt": {
+      "bytes": 1368,
+      "sha256": "2f327710b298e86123653491914392ad785844b17b9505d08344433b694ab64a"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/dos-F573.txt": {
+      "bytes": 1290,
+      "sha256": "b93a5d93d409676a33fd9593ff898b1885e81c1f2307a7e1f31f25d8342484ad"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/frame-dispatch-observed-kernel.s": {
+      "bytes": 31098,
+      "sha256": "855a8771cc011a9313e2a2c96ca5670187823c8528c0224010bda091fd205b18"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/godot-test.log": {
+      "bytes": 126,
+      "sha256": "30bd4345ce69a6cc83f6e98b52192842fa2c16c9b67869e7f5b4be8c991599a9"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/instruction-proof.json": {
+      "bytes": 23122,
+      "sha256": "52566a9f44716086b50f39195941e74c1e43154f72d709eee3a493a5518122d2"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/portable-reproduction.json": {
+      "bytes": 597,
+      "sha256": "58319da90ddcd709c317d6eba9cd503f03499282a88c15d8bd3989db58125ff1"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/reproduction.json": {
+      "bytes": 322,
+      "sha256": "e3e44b210910f4a5351c5eeb9281f8f6bb1f8936c3888b6611b80a75c2fca7f1"
+    },
+    "validation/player-dispatch-2026-11-17/frame-native-proof/source-procedures.asm": {
+      "bytes": 27139,
+      "sha256": "5eb3a67ce89c4abb088fbf1dc2bcded8ef492f5dfda61dfb1600088c30a9fc99"
+    },
+    "validation/player-dispatch-2026-11-17/godot-import.log": {
+      "bytes": 1865,
+      "sha256": "fa3e63284003f3cc6f7ac945afa32c23e31ae8ac53106265d781f04fb4ffbacd"
+    },
+    "validation/player-dispatch-2026-11-17/native-source-pins.json": {
+      "bytes": 1290,
+      "sha256": "ee3b132f0ed5a4b03817501b575d8f18aedf99592f82f9219311ca3cdade9857"
+    },
+    "validation/player-dispatch-2026-11-17/player-native-proof/README_RU.md": {
+      "bytes": 3673,
+      "sha256": "ea282db675df477d9296b5a0101a6c101d20b51ae9071689629695d6ddfb3ddd"
+    },
+    "validation/player-dispatch-2026-11-17/player-native-proof/dos-disassembly.txt": {
+      "bytes": 64877,
+      "sha256": "b4e851741e4ef0280ab172711ad62ce43d6058701d29d08c404d210e0277c5bc"
+    },
+    "validation/player-dispatch-2026-11-17/player-native-proof/instruction-proof.json": {
+      "bytes": 35951,
+      "sha256": "60a12fdc0fb5b770d695e267c539ee9f422a21b98cf74c026f286ccbabeac283"
+    },
+    "validation/player-dispatch-2026-11-17/player-native-proof/player-dispatch-native.s": {
+      "bytes": 46620,
+      "sha256": "0259d13de7d8da2a58180a1ce17ce6d651a993532274beeef2b928eb37819251"
+    },
+    "validation/player-dispatch-2026-11-17/player-native-proof/player-frame-chain.json": {
+      "bytes": 56889,
+      "sha256": "4b14fb995c23a3ffe8de2f3f324e9a14b052a7de2a3da9092ecfec2edb48f69e"
+    },
+    "validation/player-dispatch-2026-11-17/player-native-proof/source-procedures.s": {
+      "bytes": 47164,
+      "sha256": "c9e08af2a922aa2ce70016d98d3573081fe6076f5ce3aad2d2a8262870269cc6"
+    },
+    "validation/player-dispatch-2026-11-17/player-native-proof/validation.json": {
+      "bytes": 1725,
+      "sha256": "db18eb3bcc919ea6f2c44a6638bc7d3e0daa40864ef75d0f3a704b2b9a82b38c"
+    },
+    "validation/player-dispatch-2026-11-17/regression-summary.json": {
+      "bytes": 17681,
+      "sha256": "b62601047a173b8a742d6a734b177f4bbcbf7b54f75802d3c090ab8cc8d6a242"
+    },
+    "validation/player-dispatch-2026-11-17/regression/logs/flight_time_controller.log": {
+      "bytes": 128,
+      "sha256": "b53b43e65f62372860d06f939b76e493c80c702a3858896a93ee7acb915d7f76"
+    },
+    "validation/player-dispatch-2026-11-17/regression/logs/source_angular_motion.log": {
+      "bytes": 120,
+      "sha256": "4ff13c4eb6707425ab465dbdda1399896febf2c4a503813d415b4adde72f65a5"
+    },
+    "validation/player-dispatch-2026-11-17/regression/logs/source_clock.log": {
+      "bytes": 194,
+      "sha256": "9056bf866be286569e270109f729e9a27bcb7e364d82894ba8868ba62f6eb2ac"
+    },
+    "validation/player-dispatch-2026-11-17/regression/logs/source_clock_pipeline.log": {
+      "bytes": 126,
+      "sha256": "ce00a4d2dbff40e2207bf60be4732a4dff5cb2a1a9e07ee7a192f3b442a44bcb"
+    },
+    "validation/player-dispatch-2026-11-17/regression/logs/source_flight_state.log": {
+      "bytes": 118,
+      "sha256": "fcddd7fe6f59901627db75d050e1176b8b35530b75897380a6cd3b4d675e5dd3"
+    },
+    "validation/player-dispatch-2026-11-17/regression/logs/source_frame_dispatch.log": {
+      "bytes": 126,
+      "sha256": "30bd4345ce69a6cc83f6e98b52192842fa2c16c9b67869e7f5b4be8c991599a9"
+    },
+    "validation/player-dispatch-2026-11-17/regression/logs/source_frame_kinematics.log": {
+      "bytes": 201,
+      "sha256": "54ed2931c93bd845bba0e9b1808231003787853b50c1cceec96cd8772f557b8e"
+    },
+    "validation/player-dispatch-2026-11-17/regression/logs/source_gravity.log": {
+      "bytes": 169,
+      "sha256": "260a54016615cf4ebf20b310540aaec8fd909637a7853120d0cc2130db7a7ad5"
+    },
+    "validation/player-dispatch-2026-11-17/regression/logs/source_ground_surface.log": {
+      "bytes": 189,
+      "sha256": "0bef27267bfa5b18e420f10715ca0c4cb8fe330d2876a6e1cf057a54180e0b69"
+    },
+    "validation/player-dispatch-2026-11-17/regression/logs/source_motion_pipeline.log": {
+      "bytes": 127,
+      "sha256": "1507e5e91ec95e962203d7856c090b7dc70d1f9e9d7b0a8a5aa96e92ecb44666"
+    },
+    "validation/player-dispatch-2026-11-17/regression/logs/source_object_cadence.log": {
+      "bytes": 126,
+      "sha256": "3fbf538604980827554ecf69dffb085600835f805ca99423f251cd3277ed9349"
+    },
+    "validation/player-dispatch-2026-11-17/regression/logs/source_object_factory.log": {
+      "bytes": 126,
+      "sha256": "3d4acbcada9690f69ecc1f9506b1f72b4f3a9300b144638096c6e565e1e5d035"
+    },
+    "validation/player-dispatch-2026-11-17/regression/logs/source_player_dispatch.log": {
+      "bytes": 127,
+      "sha256": "1072e7fe45460cac290d00bca9ad714b12656dd8a2e581b2e3ecebe6e1940f90"
+    },
+    "validation/player-dispatch-2026-11-17/regression/logs/source_player_dispatch_state.log": {
+      "bytes": 133,
+      "sha256": "e9236827e46494363f2e700080222852eafc3f9fa2767105525619299d3e24c9"
+    },
+    "validation/player-dispatch-2026-11-17/regression/logs/source_reference_bank.log": {
+      "bytes": 126,
+      "sha256": "27a9243760e8ddd1ea018aa1de5bafa7ca67ebf7b547b67a5ab52788ad3affbe"
+    },
+    "validation/player-dispatch-2026-11-17/runtime-freeze.json": {
+      "bytes": 55163,
+      "sha256": "5927607cfe1a2d2a351156fd1117bfdeb0d6818471d5408a320cf841a6e1bc54"
+    },
+    "validation/player-dispatch-2026-11-17/source-angular-motion.json": {
+      "bytes": 2274,
+      "sha256": "e04d20e13bde0897d5e4981216a4a0a7a63a934e53b51f9620c2ff3cae61fbce"
+    },
+    "validation/player-dispatch-2026-11-17/source-clock-pipeline.json": {
+      "bytes": 893,
+      "sha256": "2d5aa741daa825a7f3fcb52320e67d49d1c0417618d68239df17674b3e242a5b"
+    },
+    "validation/player-dispatch-2026-11-17/source-flight-state.json": {
+      "bytes": 1799,
+      "sha256": "82056d74a85435b56bec873925f2c15e72c8dfd42e9b2499b30fc0fb95430c7c"
+    },
+    "validation/player-dispatch-2026-11-17/source-frame-dispatch.json": {
+      "bytes": 2207,
+      "sha256": "ab09e7cd42601233320f1022a566069c993066c6fa88b06a9d849a7dda1bd318"
+    },
+    "validation/player-dispatch-2026-11-17/source-object-cadence.json": {
+      "bytes": 1398,
+      "sha256": "57781624066736ff7b47c91ad8ceae14b2032b744fafa8561286d817b5ed438e"
+    },
+    "validation/player-dispatch-2026-11-17/source-object-factory.json": {
+      "bytes": 1617,
+      "sha256": "8b69222b51570f21ca0b5ed411511cfb3fb8fb4556f843eab68d6d52c0d039a5"
+    },
+    "validation/player-dispatch-2026-11-17/source-player-dispatch-state.json": {
+      "bytes": 2826,
+      "sha256": "38c3ea2863e038d2efa48c95facc9f38476813999b5883e291dbd9c441130282"
+    },
+    "validation/player-dispatch-2026-11-17/source-player-dispatch.json": {
+      "bytes": 2164,
+      "sha256": "094907bd75c2e95055aeb187dc647c3fdf614d6fe41c1b4410c82b933cc75bbc"
+    },
+    "validation/player-dispatch-2026-11-17/source-reference-bank.json": {
+      "bytes": 1234,
+      "sha256": "72e2445c1dcc78815c1933d1a1fb4174baa65570516d80b0a1fa545b96796045"
+    },
+    "validation/player-dispatch-2026-11-17/tools/build-player-dispatch-update.py": {
+      "bytes": 28276,
+      "sha256": "bad042c5fa2df7afbf85319be42553d49eda0ff2d3f44f90ba3f8f401f8f3b7a"
+    },
+    "validation/player-dispatch-2026-11-17/tools/verify-player-dispatch-source-pair.py": {
+      "bytes": 26722,
+      "sha256": "603e25bc1c813b230a4c464627b7901dba2941115fe42e390794de4c7d569755"
+    },
+    "validation/reference-bank-2026-11-17/angular-native-proof/angular-native.s": {
+      "bytes": 15245,
+      "sha256": "fc9d708dd76d8860d04eea45f40167a23e3f1700782d92c118293645498fd3ec"
+    },
+    "validation/reference-bank-2026-11-17/angular-native-proof/dos-disassembly.txt": {
+      "bytes": 20894,
+      "sha256": "4f2515504e8fdc4436e10dfb95566f9e8afabf51124d5e9d19d41aabbc59074e"
+    },
+    "validation/reference-bank-2026-11-17/angular-native-proof/godot-test.log": {
+      "bytes": 120,
+      "sha256": "4ff13c4eb6707425ab465dbdda1399896febf2c4a503813d415b4adde72f65a5"
+    },
+    "validation/reference-bank-2026-11-17/angular-native-proof/instruction-proof.json": {
+      "bytes": 12092,
+      "sha256": "a40aa86b4400a54ff2e6fdd203cbf4c544e2498ae94138cfb5a729a3c7a290ea"
+    },
+    "validation/reference-bank-2026-11-17/angular-native-proof/source-procedures.s": {
+      "bytes": 14995,
+      "sha256": "b02e82ed48d4d375990e051bd208fe4faf8299e800eaf6e3bd9456dec636dd39"
+    },
+    "validation/reference-bank-2026-11-17/angular-native-proof/validation.json": {
+      "bytes": 2919,
+      "sha256": "5ed47dfc61ae102cd3203506d2bfc3fd462d99b81a9231955499ccd647ccd6d7"
+    },
+    "validation/reference-bank-2026-11-17/clock-native-proof/clock-observed.S": {
+      "bytes": 6406,
+      "sha256": "91b6c187d805f0adb7498d50a76f36d7177243df65949028434d3808e73c8edb"
+    },
+    "validation/reference-bank-2026-11-17/clock-native-proof/clock-observed.ld": {
+      "bytes": 385,
+      "sha256": "5a5f1fd07587ca54913d4b56bf04343480ed65524cd8b07da594b2179fc270a4"
+    },
+    "validation/reference-bank-2026-11-17/clock-native-proof/clock-source32.S": {
+      "bytes": 1737,
+      "sha256": "c796cd1b90e4aebcb3a9d74ea8b7d0553e6532d39971f29aee17e925d397a7c9"
+    },
+    "validation/reference-bank-2026-11-17/clock-native-proof/dos-clock-admission.txt": {
+      "bytes": 1530,
+      "sha256": "eebc50f8ab7383a90462e7bdeb8ebc5cdc4a16a90cab28eeb7519a2c65cd295e"
+    },
+    "validation/reference-bank-2026-11-17/clock-native-proof/jjffe-clock-admission-reference.asm": {
+      "bytes": 1188,
+      "sha256": "31624900cc6298a2a920945535a188d535894f736bc88bd7a17ede2adfe9594f"
+    },
+    "validation/reference-bank-2026-11-17/clock-native-proof/validation.json": {
+      "bytes": 3997,
+      "sha256": "f75577ffb1e4fbfa255ca83f9eae64a6b3f60d0a2bb69f205a2ddc551d8278db"
+    },
+    "validation/reference-bank-2026-11-17/final-targeted-summary.json": {
+      "bytes": 11144,
+      "sha256": "0b5b087da26c875beeb9d720e856b2cf44db9aabe27ceef229bce176677b72bc"
+    },
+    "validation/reference-bank-2026-11-17/godot-import.log": {
+      "bytes": 1690,
+      "sha256": "eb527a4d18011e2e6bb7f75588e1f5128c699e3de788887b9772e1a8c58f1990"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/README.md": {
+      "bytes": 3182,
+      "sha256": "624e57cf08f92a04513a4ab4ae5959d5d14b925f8f18ed12421c3eb994627b67"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1333.txt": {
+      "bytes": 339,
+      "sha256": "8028a7ec6c2598cac257078b369524dd8076cb4a80ff099b71662ecf4d904b63"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1335.txt": {
+      "bytes": 339,
+      "sha256": "9b08d21bb4ec30d9abd33568aea2af6aec5f25bbd88bcb93f1041b496c173fb8"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1517.txt": {
+      "bytes": 1239,
+      "sha256": "c6c83242bed2bca5be66a0f0fc7a0ea207638574e29cc9f94329ccea569f376d"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1521.txt": {
+      "bytes": 209,
+      "sha256": "38545335a9b30c4a694ee19e9ab54e3565a6fba46f21ba1a7bbd370e72edd2b9"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1531.txt": {
+      "bytes": 309,
+      "sha256": "3c8a703b8e24632787559d1b91117a8af7f95daca1f2b50a95634ff424ea8d7d"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1532.txt": {
+      "bytes": 307,
+      "sha256": "482c3c675e54120bc13377b5cec0dd0a3c4aab064dd39ceb8b978a3615f71623"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1533.txt": {
+      "bytes": 3623,
+      "sha256": "d0362862e52e641d5226af514cc67cfbb8710101f1e88407ae4ac5f11502a725"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1657.txt": {
+      "bytes": 2164,
+      "sha256": "991daeb0808636344b76cd274b732400af1fcc7421b7daac443743033bc17874"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1658.txt": {
+      "bytes": 503,
+      "sha256": "9cf701c70861393b5f05fdd62f6c276946c49bc458d249584675f841a862d604"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1660.txt": {
+      "bytes": 2053,
+      "sha256": "d01d87b89e350e9fa06eedb3a3f45435e12e1a37e9703c1f5025d652d4cc4a1f"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1661.txt": {
+      "bytes": 889,
+      "sha256": "c53229d697d64642db61fbe16ba4eabb690f0b62e4d1a6d060ed430e4ed223fe"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1662.txt": {
+      "bytes": 889,
+      "sha256": "ea8ace3c5da292d062332fb0b48c9459bea613230c3ab08ae20bc43ad2fb840c"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1663.txt": {
+      "bytes": 903,
+      "sha256": "0278087feeabc5274d0ad5716163f6f0e7430c87980cffeead3f0a656626e505"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1669.txt": {
+      "bytes": 2410,
+      "sha256": "6da64e08911a9d1925382abee8afef85d1a57e41630fa01c8d98bea82e16b6ca"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1677.txt": {
+      "bytes": 2578,
+      "sha256": "abeedc87619507599aa10210ad3b9fdad1f17f18015bfd66b328a23332556e7a"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1678.txt": {
+      "bytes": 1222,
+      "sha256": "0d2fd021f2ff8aef2ae33eb8bbe6dfe9d3e6c7f5e4843667b3395065b560fb80"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F590.txt": {
+      "bytes": 997,
+      "sha256": "c56d80aea2191d3e1822cf0032a56e8d7576451630e3e3fec65e658802d97853"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F595.txt": {
+      "bytes": 2583,
+      "sha256": "54e1acedb78475e4b64cf338f005d45395c2a3d273e1bbef6b643d35af2659c1"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F604.txt": {
+      "bytes": 1493,
+      "sha256": "f5f52810c7aa3676092a7b7dab8df1bc08c0cb129673184952e2b4a0aba21c4f"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F605.txt": {
+      "bytes": 1659,
+      "sha256": "34b013a057d42ba678416f9dc551df971c472af688b3704a5729e2dfb79f0a3f"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F606.txt": {
+      "bytes": 4756,
+      "sha256": "ba979d7bd97d717c503123cf154688764c8b98e5cb04f4b9f4a384757406f36a"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/instruction-proof.json": {
+      "bytes": 22777,
+      "sha256": "19de6abe6d40e9ba2e94d0c60213dbbaeeb33eee01692b1c9de8416010b38554"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/reference-bank-observed-kernel.s": {
+      "bytes": 24425,
+      "sha256": "3598d2b6597c9a0a33ff8a19368ed744e9cedfc262cfe391a62655dfcd5fd7f2"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/reproduction.json": {
+      "bytes": 332,
+      "sha256": "c86bc1b09e9d2670a21c1176c8f1988d7fc8326087ae1496629186a808a46fcf"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/validate_source_reference_bank_native.py": {
+      "bytes": 5296,
+      "sha256": "4630e64c6c92f8dff4a62e89ef9c22353c467c886cc6c2b952fa4ce1e6f35d53"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/validation.json": {
+      "bytes": 1105,
+      "sha256": "cf77505ac7fb978f696cc097c6904bde60aa3f1396eca30452407a525902e28b"
+    },
+    "validation/reference-bank-2026-11-17/native-source-pins.json": {
+      "bytes": 1055,
+      "sha256": "7fd0971eaf005dd0649c17581f092182350dad9d05b0de51187210b622a6ec67"
+    },
+    "validation/reference-bank-2026-11-17/regression-summary.json": {
+      "bytes": 12193,
+      "sha256": "9685913d49c790691a5b7014807b65d7709f6e632f29d15799cb30dbfc7c5b54"
+    },
+    "validation/reference-bank-2026-11-17/regression/logs/flight_time_controller.log": {
+      "bytes": 128,
+      "sha256": "b53b43e65f62372860d06f939b76e493c80c702a3858896a93ee7acb915d7f76"
+    },
+    "validation/reference-bank-2026-11-17/regression/logs/source_angular_motion.log": {
+      "bytes": 120,
+      "sha256": "4ff13c4eb6707425ab465dbdda1399896febf2c4a503813d415b4adde72f65a5"
+    },
+    "validation/reference-bank-2026-11-17/regression/logs/source_clock.log": {
+      "bytes": 194,
+      "sha256": "9056bf866be286569e270109f729e9a27bcb7e364d82894ba8868ba62f6eb2ac"
+    },
+    "validation/reference-bank-2026-11-17/regression/logs/source_clock_pipeline.log": {
+      "bytes": 126,
+      "sha256": "ce00a4d2dbff40e2207bf60be4732a4dff5cb2a1a9e07ee7a192f3b442a44bcb"
+    },
+    "validation/reference-bank-2026-11-17/regression/logs/source_flight_state.log": {
+      "bytes": 118,
+      "sha256": "fcddd7fe6f59901627db75d050e1176b8b35530b75897380a6cd3b4d675e5dd3"
+    },
+    "validation/reference-bank-2026-11-17/regression/logs/source_frame_kinematics.log": {
+      "bytes": 201,
+      "sha256": "54ed2931c93bd845bba0e9b1808231003787853b50c1cceec96cd8772f557b8e"
+    },
+    "validation/reference-bank-2026-11-17/regression/logs/source_gravity.log": {
+      "bytes": 169,
+      "sha256": "260a54016615cf4ebf20b310540aaec8fd909637a7853120d0cc2130db7a7ad5"
+    },
+    "validation/reference-bank-2026-11-17/regression/logs/source_ground_surface.log": {
+      "bytes": 189,
+      "sha256": "0bef27267bfa5b18e420f10715ca0c4cb8fe330d2876a6e1cf057a54180e0b69"
+    },
+    "validation/reference-bank-2026-11-17/regression/logs/source_motion_pipeline.log": {
+      "bytes": 127,
+      "sha256": "1507e5e91ec95e962203d7856c090b7dc70d1f9e9d7b0a8a5aa96e92ecb44666"
+    },
+    "validation/reference-bank-2026-11-17/regression/logs/source_reference_bank.log": {
+      "bytes": 126,
+      "sha256": "27a9243760e8ddd1ea018aa1de5bafa7ca67ebf7b547b67a5ab52788ad3affbe"
+    },
+    "validation/reference-bank-2026-11-17/runtime-freeze.json": {
+      "bytes": 54197,
+      "sha256": "f1f35a411612a862032adf96fe0754758c161bcc8a95cce381df9539d70ccdb7"
+    },
+    "validation/reference-bank-2026-11-17/source-angular-motion.json": {
+      "bytes": 2274,
+      "sha256": "e04d20e13bde0897d5e4981216a4a0a7a63a934e53b51f9620c2ff3cae61fbce"
+    },
+    "validation/reference-bank-2026-11-17/source-clock-pipeline.json": {
+      "bytes": 893,
+      "sha256": "2d5aa741daa825a7f3fcb52320e67d49d1c0417618d68239df17674b3e242a5b"
+    },
+    "validation/reference-bank-2026-11-17/source-flight-state.json": {
+      "bytes": 1486,
+      "sha256": "08dd7507384f6a1f965ea06f00cd2befca5a708b9600125e18535056b6845846"
+    },
+    "validation/reference-bank-2026-11-17/source-reference-bank.json": {
+      "bytes": 1234,
+      "sha256": "72e2445c1dcc78815c1933d1a1fb4174baa65570516d80b0a1fa545b96796045"
+    },
+    "validation/reference-bank-2026-11-17/tools/build-reference-bank-update.py": {
+      "bytes": 19908,
+      "sha256": "1925ca729c052dfa36841f7e14b841c27254cbfab0da86944459efb67b47e61c"
+    },
+    "validation/reference-bank-2026-11-17/tools/verify-reference-bank-source-pair.py": {
+      "bytes": 20373,
+      "sha256": "fb933d13f6fbe4a7570672a7a0f42eb392e55118f9df9c873fd8d1f6a2a95f24"
+    }
+  },
+  "omitted_current_private_or_binary_proof_paths": {},
+  "new_APK_produced": false,
+  "new_playable_release_claimed": false,
+  "physical_device_tested": false,
+  "archive_builder_sha256": "bad042c5fa2df7afbf85319be42553d49eda0ff2d3f44f90ba3f8f401f8f3b7a",
+  "scope": "Immutable cumulative player-dispatch source foundation over the exact complete0.28 source archive; no earlier small update ZIP is needed. All current core/assets/data/tests/tools/docs/history and textual proof files for both backend stages are reproduced. All492 current runtime inputs are checked: all475 original game inputs unchanged;482 of483 previous backend inputs unchanged, only SourceFlightState integrated, and9 added. The complete149-model source factory resource, all seven primary portable native-generator groups, and the separate two-control player/frame composition generator/proof dependencies are retained. The two supplemental controls are not added to the primary native-bank totals. Raw factory, cadence, bounded player-control and F570 caller work with explicit callback observations does not establish a newly integrated playable build, full collision/ephemeris/event/AI bank, long-range route or full clone."
+}
