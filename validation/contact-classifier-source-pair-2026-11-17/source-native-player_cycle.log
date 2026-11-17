@@ -1,0 +1,6 @@
+{
+  "case_count": 80,
+  "fixture_sha256": "c1ed973184be474bcbe6a2ce3dad324aeec3fa4c7cd25fad6dbe53372c171512",
+  "native_calls": 304,
+  "output": "/workspace/recovery/contact-classifier-source-pair-fresh/native/player_cycle.json"
+}

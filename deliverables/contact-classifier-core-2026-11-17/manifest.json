@@ -1,0 +1,63 @@
+{
+  "schema": "starfrontier-contact-classifier-source-checkpoint-v1",
+  "checkpoint": "contact-classifier-core-2026-11-17",
+  "source_commit": "450c8ac2e0b1f52d88e0e8b0fd0f726c928abb9b",
+  "created_utc": "2026-11-17T12:40:58.787989+00:00",
+  "required_archive_count": 2,
+  "previous_update_archive_required": false,
+  "base_archive": {
+    "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip",
+    "bytes": 33543341,
+    "sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d",
+    "source_commit": "de8eb18a687d007781321436910187dff3785775"
+  },
+  "files": {
+    "README_RU.md": {
+      "bytes": 3621,
+      "sha256": "6c2d2a1bbdec1a8084921fdacf306a956ae4bc7d888a01bbb931ca08ed8d958e"
+    },
+    "StarFrontier-contact-classifier-core-update.zip": {
+      "bytes": 7263946,
+      "sha256": "307f913e52f10ce23f88cd652a108440d9288f0a1270028960ea834a86a10eec"
+    },
+    "functional-summary.json": {
+      "bytes": 30948,
+      "sha256": "5b3e8763405bc96306fd0b98acd5bf053599eedda924b7c5ed04dfc3d96d2646"
+    },
+    "source-pair-verification.json": {
+      "bytes": 55977,
+      "sha256": "e09fa04a2acd30237f95dee25e6ff14083b3c0ff930907f2c198ef4fdcbe7619"
+    },
+    "source-update-policy.json": {
+      "bytes": 175097,
+      "sha256": "01a6f4c4c852d03896309f99eddf17a827500510f6a276fda1596914395fe9f2"
+    }
+  },
+  "merged_source_files": 2044,
+  "runtime_inputs": 513,
+  "unchanged_published_game_runtime_inputs": 475,
+  "previous_backend_runtime_inputs": 505,
+  "unchanged_previous_backend_runtime_inputs": 504,
+  "changed_previous_backend_runtime_paths": [
+    "scripts/source_frame_dispatch.gd"
+  ],
+  "current_functional_checks": 184129,
+  "unique_suites": 25,
+  "new_core_checks": 8204,
+  "new_core_suites": 4,
+  "fresh_core_suites": 25,
+  "fresh_core_checks_separate": 184129,
+  "native_main_generator_count": 13,
+  "native_DOS_control_cases_separate": 6735,
+  "native_JJFFE_diagnostics_separate": 16,
+  "supplemental_native_compositions_separate": 114,
+  "native_generator_count": 16,
+  "fresh_pair_verified": true,
+  "new_APK_produced": false,
+  "new_kernels_connected_to_Main": false,
+  "game_version": "0.28.0-native-station-alpha1",
+  "Android_version_code": 53,
+  "full_original_port_complete": false,
+  "physical_device_tested": false,
+  "immutable_HTTPS_verified_at_packaging": false
+}
