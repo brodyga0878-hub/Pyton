@@ -1,0 +1,21 @@
+{
+  "schema": "starfrontier-collision-surface-portable-rebuild-v1",
+  "ok": true,
+  "case_count": 36,
+  "fixture_sha256": "4b206eaaa29d5aed6ba41f43ca7ad0608b8c771385dd02f8e9be6a701cd8d9f2",
+  "proof_copy_used": true,
+  "private_original_paths_deliberately_absent": true,
+  "fixture_byte_exact": true,
+  "native_calls": {
+    "classifier": 72,
+    "geometry": 82,
+    "program": 92,
+    "terrain": 46
+  },
+  "fresh_process_runs_each_call": 3,
+  "reverse_native_calls_verified": true,
+  "actual_F581_calls": 46,
+  "actual_F1876_queries": 42,
+  "flat_auxiliary_guard_cases": 4,
+  "expected_arithmetic_calculated_in_python": false
+}

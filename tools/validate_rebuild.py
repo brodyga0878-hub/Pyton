@@ -44,6 +44,8 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_collision_terrain', 'tests/test_source_collision_terrain.gd', 'Whole DOS F581 and actual F1876 height query, packed corners, exact gates/pointers, persistent query words and independent native parity.', timeout=600),
+    Suite('source_collision_surface', 'tests/test_source_collision_surface.gd', 'Actual native surface composition through F575/F576/F582/F581, Root graphics alias and owned hot/cold terrain state with preserved defaults.', timeout=600),
     Suite('source_collision_resources', 'tests/test_source_collision_resources.gd', 'Exact original collision programs for149 primary and29 nested models, packed reads/children and portable original byte-span extraction.', timeout=300),
     Suite('source_collision_planes', 'tests/test_source_collision_planes.gd', 'Whole DOS F583 packed-plane arithmetic, normal/vertex origins, mirrors, shifts and independent native controls.', timeout=300),
     Suite('source_collision_transform', 'tests/test_source_collision_transform.gd', 'Whole DOS F580 nested coordinate transforms, six actual axis permutations, source shifts and recursive byte return.', timeout=300),

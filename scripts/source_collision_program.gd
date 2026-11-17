@@ -1,10 +1,11 @@
 extends RefCounted
 class_name SourceCollisionProgram
-# Original DOS F582 bytecode decisions. F583 and F580 execute their actual
-# integer geometry; F581 terrain is an explicitly matched continuation.
+# Original DOS F582 decisions with real F583/F580. A supplied raw terrain
+# state enables actual F581; the default retains matched old continuations.
 const Frame=preload("res://scripts/source_frame_dispatch.gd")
 const Planes=preload("res://scripts/source_collision_planes.gd")
 const Transform=preload("res://scripts/source_collision_transform.gd")
+const Terrain=preload("res://scripts/source_collision_terrain.gd")
 const PROFILE:="dos-firstenc-f582-collision-program-v1"
 const BODY_BYTES:=338
 const MAX_DEPTH:=32
@@ -48,13 +49,17 @@ static func skip_terrain_features(program:Variant,offset_u32:Variant=0)->Diction
 		if program.decode_s16(at)==0:return {"ok":true,"next_offset_u32":at+2,"source_order":["F1822"],"live_owners_changed":false}
 		at+=16
 	return _reject("unterminated_terrain_feature_records")
-static func execute(body:Variant,program:Variant,context:Variant,threshold_s32:Variant,globals:Variant,observations:Variant=[],resources:Variant={},primitive_u8_before:Variant=0)->Dictionary:
+static func execute(body:Variant,program:Variant,context:Variant,threshold_s32:Variant,globals:Variant,observations:Variant=[],resources:Variant={},primitive_u8_before:Variant=0,terrain_state:Variant=null)->Dictionary:
 	if not body is PackedByteArray or body.size()!=BODY_BYTES or not program is PackedByteArray or program.is_empty() or not _context(context) or not _whole(threshold_s32,-0x80000000,0x7fffffff) or not Frame._globals(globals) or not observations is Array or observations.size()>1024 or not resources is Dictionary or not _whole(primitive_u8_before,0,255):return _reject("invalid_collision_program_context")
+	if terrain_state!=null and (not Terrain._terrain_state(terrain_state) or not observations.is_empty()):return _reject("invalid_actual_terrain_context_or_observations")
 	var runner:=Program.new();runner.body=body.duplicate();runner.globals=_copy_globals(globals);runner.observations=observations.duplicate(true);runner.resources=resources.duplicate(true)
+	if terrain_state!=null:runner.terrain_state=Terrain._copy_terrain(terrain_state)
 	var result:=runner.run(program.duplicate(),_copy_context(context),int(threshold_s32),int(primitive_u8_before),0)
 	if not result.get("ok",false):return runner.stopped
 	if runner.used!=observations.size():return _reject("unused_collision_program_observations")
 	result.profile=PROFILE;result.body_after=runner.body.duplicate();result.globals_after=runner.globals.duplicate(true);result.source_order=runner.order.duplicate();result.requests=runner.requests.duplicate(true);result.observations_used=runner.used;result.live_owners_changed=false;result.F582_body_executed=true;result.F581_body_executed=false;result.full_collision_programs_executed=false
+	if terrain_state!=null:
+		result["terrain_state_after"]=runner.terrain_state.duplicate(true);result["terrain_calls"]=runner.terrain_calls.duplicate(true);result["actual_terrain_route"]=true;result.F581_body_executed=not runner.terrain_calls.is_empty()
 	return result
 
 class Program:
@@ -67,6 +72,8 @@ class Program:
 	var order:Array=[]
 	var requests:Array=[]
 	var stopped:Dictionary={}
+	var terrain_state:Variant=null
+	var terrain_calls:Array=[]
 	func fail(reason:String)->Dictionary:
 		stopped=SourceCollisionProgram._reject(reason);stopped.source_order=order.duplicate();stopped.observations_used=used;return stopped
 	func read_byte(program:PackedByteArray,at:int)->int:
@@ -92,6 +99,14 @@ class Program:
 	func boundary(program:PackedByteArray,context:Dictionary,threshold:int,at:int,depth:int)->Dictionary:
 		order.append("F581")
 		var before:Dictionary={"body":body.duplicate(),"program":program.duplicate(),"context":context.duplicate(true),"globals":globals.duplicate(true)}
+		if terrain_state!=null:
+			var actual:=SourceCollisionProgram.Terrain.execute(body,program,at,context,threshold,globals,terrain_state)
+			if not actual.get("ok",false):return fail("terrain_"+str(actual.get("reason","rejected")))
+			globals=SourceCollisionProgram._copy_globals(actual.globals_after);terrain_state=SourceCollisionProgram.Terrain._copy_terrain(actual.terrain_state_after)
+			terrain_calls.append(actual.duplicate(true))
+			for entry:String in actual.source_order:
+				if entry!="F581":order.append(entry)
+			return {"ok":true,"hit_s32":int(actual.hit_s32),"next":int(actual.next_offset_u32)}
 		var request:Dictionary={"kind":"F581","args":[at,threshold],"depth_u32":depth,"before":before}
 		if used>=observations.size():
 			fail("boundary_required");stopped.pending=request;return {}

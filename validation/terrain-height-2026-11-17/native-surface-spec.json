@@ -1,0 +1,8 @@
+{
+  "name": "collision_surface",
+  "generator": "tools/rebuild_source_collision_surface_native.py",
+  "fixture": "tests/fixtures/source_collision_surface_native.json",
+  "kind": "proof_asm",
+  "proof_dir": "validation/terrain-height-2026-11-17/surface-native-proof",
+  "supplemental": true
+}

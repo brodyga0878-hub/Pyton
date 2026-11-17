@@ -1,13 +1,14 @@
 extends RefCounted
 # Whole original F576 child loop and F579 raw coordinate preparation.
-# The live entry invokes the collision-program kernel; observed F582 replies
-# exist only as an explicit independently tested callback adapter.
+# The public entry invokes the real program kernel, with optional raw F581
+# state. Observed F582 replies remain a separately tested callback adapter.
 const Program=preload("res://scripts/source_collision_program.gd")
 const Frame=preload("res://scripts/source_frame_dispatch.gd")
 const Gravity=preload("res://scripts/source_gravity.gd")
 const Point=preload("res://scripts/source_terrain_point.gd")
 const Ground=preload("res://scripts/ground_coordinates.gd")
 const Surface=preload("res://scripts/source_ground_surface.gd")
+const TerrainState=preload("res://scripts/source_terrain_state.gd")
 const PROFILE:="dos-firstenc-f576-f579-geometry-v1"
 const DATA_PATH:="res://data/ffe_collision_programs.json"
 const RESOURCE_SHA:="7ccd9884e0c05fc4d645347301112ab972d83c40780243325f3e907d5f527013"
@@ -117,8 +118,13 @@ static func _decode_rows(rows:Variant,observed:bool)->Variant:
 				owner[context_key][key]=decoded
 		result.append(row)
 	return result
-static func _execute(body:Variant,collider:Variant,relative:Variant,globals:Variant,observations:Variant,resources:Variant,observed:bool)->Dictionary:
+static func _terrain_result(result:Dictionary,terrain:Variant)->Dictionary:
+	if terrain!=null:result["terrain_state_after"]=terrain.duplicate(true);result["actual_terrain_route"]=true
+	return result
+static func _execute(body:Variant,collider:Variant,relative:Variant,globals:Variant,observations:Variant,resources:Variant,observed:bool,terrain_state:Variant=null)->Dictionary:
 	if not _body(body) or not _body(collider) or not _vector(relative) or _globals(globals).is_empty() or not observations is Array or observations.size()>64:return _reject("invalid_F576_context")
+	if terrain_state!=null and (observed or not TerrainState.valid(terrain_state) or not observations.is_empty()):return _reject("invalid_actual_terrain_context_or_observations")
+	var terrain:Variant=terrain_state.duplicate(true) if terrain_state!=null else null
 	if observed:
 		var decoded:Variant=_decode_rows(observations,true)
 		if decoded==null:return _reject("invalid_F582_observation_bytes")
@@ -153,22 +159,24 @@ static func _execute(body:Variant,collider:Variant,relative:Variant,globals:Vari
 				if not observations[used].get("observations") is Array:return _reject("invalid_program_observation_packet")
 				replies=observations[used].observations;used+=1
 			# F579 passes the collider to F582; equipment is read there.
-			result=Program.execute(collider,prepared.program,prepared.geometry_context,prepared.threshold_s32,state,replies,models)
+			result=Program.execute(collider,prepared.program,prepared.geometry_context,prepared.threshold_s32,state,replies,models,0,terrain)
 			if not result.get("ok",false):
 				if result.get("pending") is Dictionary:
 					var pending:=result.duplicate(true);pending.iteration_u32=iteration;return pending
 				return result
+			if terrain!=null:terrain=result.terrain_state_after.duplicate(true)
 		state=Frame._copy_globals(result.globals_after);var returned:int=int(result.return_s8)
 		order.append_array(result.source_order);calls.append({"before":before,"relative_after":prepared.relative_after.duplicate(),"return_s32":returned,"primitive_u8":int(result.primitive_u8),"globals_after":state.duplicate(true),"requests":result.get("requests",[]).duplicate(true)})
+		if terrain!=null:calls[-1]["terrain_calls"]=result.terrain_calls.duplicate(true)
 		if returned>0:state.volume_flags_u8=int(state.volume_flags_u8)|0x80
 		if int(state.volume_flags_u8)!=0:
 			state.collider_index_u8=int(collider[0x86]);state.collider_ref_u32=int(collider[0x86]);state.collision_flags_u8=int(state.volume_flags_u8);state.primitive_flags_u8=int(result.primitive_u8)
 		if returned>=0:
 			if used!=observations.size():return _reject("unused_geometry_observations")
-			return {"ok":true,"profile":PROFILE,"body_after":body.duplicate(),"collider_after":collider.duplicate(),"relative_after":relative.duplicate(),"return_s32":0,"globals_after":state,"source_order":order,"calls":calls,"requests":calls,"observations_used":used,"live_owners_changed":false,"Main_integrated":false}
+			return _terrain_result({"ok":true,"profile":PROFILE,"body_after":body.duplicate(),"collider_after":collider.duplicate(),"relative_after":relative.duplicate(),"return_s32":0,"globals_after":state,"source_order":order,"calls":calls,"requests":calls,"observations_used":used,"live_owners_changed":false,"Main_integrated":false},terrain)
 		if int(body[0x14c])<128 or child>=children.size():
 			if used!=observations.size():return _reject("unused_geometry_observations")
-			return {"ok":true,"profile":PROFILE,"body_after":body.duplicate(),"collider_after":collider.duplicate(),"relative_after":relative.duplicate(),"return_s32":-1,"globals_after":state,"source_order":order,"calls":calls,"requests":calls,"observations_used":used,"live_owners_changed":false,"Main_integrated":false}
+			return _terrain_result({"ok":true,"profile":PROFILE,"body_after":body.duplicate(),"collider_after":collider.duplicate(),"relative_after":relative.duplicate(),"return_s32":-1,"globals_after":state,"source_order":order,"calls":calls,"requests":calls,"observations_used":used,"live_owners_changed":false,"Main_integrated":false},terrain)
 		var item:Variant=children[child]
 		if not item is Dictionary or not Frame._whole(item.get("axis_radius_encoded_s16"),-32768,32767) or not Frame._whole(item.get("displacement_s16"),-32768,32767) or int(item.displacement_s16)==0:return _reject("invalid_F576_child_record")
 		var encoded:int=int(item.axis_radius_encoded_s16);var axis_selector:=encoded&6
@@ -187,7 +195,7 @@ static func _execute(body:Variant,collider:Variant,relative:Variant,globals:Vari
 		for axis in range(3):local.append(_add64(source[axis],retained[axis]))
 		child+=1
 	return _reject("geometry_child_boundary_limit")
-static func execute(body:Variant,collider:Variant,relative:Variant,globals:Variant,observations:Variant=[],resources:Variant={})->Dictionary:
-	return _execute(body,collider,relative,globals,observations,resources,false)
+static func execute(body:Variant,collider:Variant,relative:Variant,globals:Variant,observations:Variant=[],resources:Variant={},terrain_state:Variant=null)->Dictionary:
+	return _execute(body,collider,relative,globals,observations,resources,false,terrain_state)
 static func execute_observed(body:Variant,collider:Variant,relative:Variant,globals:Variant,observations:Variant=[],resources:Variant={})->Dictionary:
 	return _execute(body,collider,relative,globals,observations,resources,true)

@@ -1,0 +1,39 @@
+{
+	"checks": 2355,
+	"evidence": [
+		{
+			"case": "original_angular_operations",
+			"consecutive_native_steps": 64,
+			"directed_pair_shift_sign_contexts": 96,
+			"host_abi_adaptations": [
+				"Reviewed original32bit cdecl saved registers/stack arguments expanded to64bit host widths; pointers constrained low32bit.",
+				"F585 original8byte local reservation expanded to16bytes for its two64bit epilogue pops; original4byte scratch arithmetic offsets unchanged.",
+				"F611 local decrement-table address uses RBX rather than EBX as a64bit host stack index; source shift value2..9 is unchanged.",
+				"Original indirect function-pointer slots use host8byte pointers; mathematical tables and raw338byte fields retain original widths.",
+				"Exact DOS abs sign/INT_MIN semantics retained in a minimal host ABI wrapper."
+			],
+			"native_cases": 641.0,
+			"normalizations_exercised": 92,
+			"operation_counts": {
+				"0": 336,
+				"1": 65,
+				"2": 128,
+				"3": 80,
+				"4": 32
+			},
+			"residue_changes": 288,
+			"source_pipeline_caller_order_claimed": false
+		}
+	],
+	"failures": 0,
+	"scope": "Standalone whole originalF584/F585/F609/F611 angular raw-state operations, realF1520 normalization, signed16 residues/commands and32bit wrap arithmetic versus641 nativeDOS-checked instruction cases. Source scheduling/F1019/F1041 order, full object/frame bank and live Main/Android integration remain separate.",
+	"sources": {
+		"scripts/source_angular_motion.gd": "e4af479bcfcbfb7bbb927aedeae64d0859dc5d40f39b90ef7e5f942a75051a52",
+		"scripts/source_ground_surface.gd": "e9db09fbd9c9e8a70bfba771b79627bbba6313d86b3efe781fba7b93a29e7ee7",
+		"tests/fixtures/source_angular_native.json": "ddcd81328d778ed5225f878e561f65188e4bebdabba6e61e21c36a88b44bdf84",
+		"tests/test_source_angular_motion.gd": "379c0f35ed5b7e609e65ac72ae2265979a427d199b1fd04004234f27714de87e",
+		"tools/rebuild_source_angular_native.py": "a6bff5508c0fd9cb02e61af69826bec536703f5429181ddb9816908dabb51ef1",
+		"validation/reference-bank-2026-11-17/angular-native-proof/instruction-proof.json": "a40aa86b4400a54ff2e6fdd203cbf4c544e2498ae94138cfb5a729a3c7a290ea",
+		"validation/reference-bank-2026-11-17/angular-native-proof/source-procedures.s": "b02e82ed48d4d375990e051bd208fe4faf8299e800eaf6e3bd9456dec636dd39"
+	}
+}

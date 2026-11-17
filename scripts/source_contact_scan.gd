@@ -1,13 +1,14 @@
 extends RefCounted
 # The original F569/F570 bank traversal now invokes the whole F575 kernel.
-# F576 general model programs and destruction effects still require exact
-# observed continuations. Missing geometry never becomes an empty collision.
+# Optional geometry/terrain routes execute the original model programs.
+# Destruction still needs an exact continuation; missing data is not a miss.
 const Frame=preload("res://scripts/source_frame_dispatch.gd")
 const Classifier=preload("res://scripts/source_contact_classifier.gd")
 const GeometryContact=preload("res://scripts/source_collision_contact.gd")
 const Context=preload("res://scripts/source_player_context.gd")
 const Motion=preload("res://scripts/source_player_motion.gd")
 const Clock=preload("res://scripts/source_clock_pipeline.gd")
+const TerrainState=preload("res://scripts/source_terrain_state.gd")
 const PROFILE:="dos-firstenc-actual-f569-f575-scan-v1"
 const LIMIT:=115
 
@@ -40,8 +41,10 @@ static func _observations(value:Variant)->Variant:
 				else:return null
 		result.append(row)
 	return result
-static func dispatch(body:Variant,objects:Variant,flags:Variant,root:Variant,globals:Variant,frame_ticks_u32:Variant,source_frame_byte:Variant,classifier_observations:Variant=[],enabled:Variant=true,use_geometry:Variant=false)->Dictionary:
+static func dispatch(body:Variant,objects:Variant,flags:Variant,root:Variant,globals:Variant,frame_ticks_u32:Variant,source_frame_byte:Variant,classifier_observations:Variant=[],enabled:Variant=true,use_geometry:Variant=false,terrain_state:Variant=null)->Dictionary:
 	if not Frame._raw_bank(body,objects,flags) or not Context._root(root) or root.decode_u32(0xc0)>114 or not Frame._globals(globals) or not Frame._whole(frame_ticks_u32,0,0xffffffff) or not Frame._whole(source_frame_byte,0,255) or not enabled is bool or not use_geometry is bool or not classifier_observations is Array or classifier_observations.size()>LIMIT:return _reject("invalid_actual_contact_scan_context")
+	if terrain_state!=null and (not use_geometry or not TerrainState.matches_root(root,terrain_state)):return _reject("invalid_or_unbound_actual_terrain_state")
+	var terrain:Variant=terrain_state.duplicate(true) if terrain_state!=null else null
 	for row:Variant in classifier_observations:
 		if not row is Dictionary:return _reject("invalid_classifier_observation_packet")
 		var keys:Array=["call_index_u32","observations"]
@@ -57,6 +60,7 @@ static func dispatch(body:Variant,objects:Variant,flags:Variant,root:Variant,glo
 			result.F575_body_executed=not calls.is_empty();result.full_collision_classifier=false
 			result.full_collision_program_VM=false;result.Main_integrated=false
 			if use_geometry:result["actual_geometry_route"]=true
+			if terrain!=null:result["terrain_state_after"]=terrain.duplicate(true);result["actual_terrain_route"]=true
 			return result
 		if not result.get("pending") is Dictionary:return _reject("frame_"+str(result.get("reason","rejected")))
 		var pending:Dictionary=result.pending
@@ -66,13 +70,14 @@ static func dispatch(body:Variant,objects:Variant,flags:Variant,root:Variant,glo
 		if used<classifier_observations.size() and int(classifier_observations[used].call_index_u32)==trace.size():
 			responses=_observations(classifier_observations[used].observations)
 			geometry_responses=classifier_observations[used].get("geometry_observations",[]).duplicate(true);used+=1
-		var classified:=GeometryContact.execute(pending.subject,pending.collider,pending.relative,state,responses,geometry_responses) if use_geometry else Classifier.execute(pending.subject,pending.collider,pending.relative,state,responses)
+		var classified:=GeometryContact.execute(pending.subject,pending.collider,pending.relative,state,responses,geometry_responses,terrain) if use_geometry else Classifier.execute(pending.subject,pending.collider,pending.relative,state,responses)
 		if not classified.get("ok",false):
 			var failure:=_reject("classifier_"+str(classified.get("reason","rejected")))
 			if classified.get("pending") is Dictionary:
 				failure.pending=classified.pending.duplicate(true);failure.classifier_call_index_u32=trace.size()
 			if classified.has("geometry_iteration_u32"):failure["geometry_iteration_u32"]=int(classified.geometry_iteration_u32)
 			return failure
+		if terrain!=null:terrain=classified.terrain_state_after.duplicate(true)
 		if int(classified.globals_after.player_index_u32)>114:return _reject("classifier_player_reference_outside_bank")
 		game.encode_u32(0xc0,int(classified.globals_after.player_index_u32))
 		var after:Dictionary={}

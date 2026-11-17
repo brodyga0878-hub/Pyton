@@ -1,0 +1,18 @@
+{
+	"Main_integrated": false,
+	"checks": 3962,
+	"consecutive_native_steps": 32,
+	"failures": 0,
+	"native_cases": 416,
+	"profile": "dos-firstenc-f580-nested-model-transform-v1",
+	"recursive_F582_executed": false,
+	"signed_negative_vertex_cases": 199,
+	"sources": {
+		"scripts/source_collision_transform.gd": "31b6ea121e09fa5be4e3883a595e1def8671789f365bf6d4b48aee78918d5ca1",
+		"tests/fixtures/source_collision_transform_native.json": "34801772f5c68a0d776d43295fc40ff8f987e442cb18153c91237c5b4138d0cd",
+		"tests/test_source_collision_transform.gd": "6fe9db7fe2c1d8935da9eba873e3746e6208b33807e1c057b2346e2034549e50",
+		"tools/rebuild_source_collision_transform_native.py": "578204e00affa6a417e962c71e32f4d1b3299f5329a7b955c694b1dce5f9169f",
+		"validation/collision-programs-2026-11-17/transform-native-proof/instruction-proof.json": "7deb7ea60793e4a026ef8d75840e97f80c57e2e93da14864fad9f95fc523636e",
+		"validation/collision-programs-2026-11-17/transform-native-proof/source-procedures.asm": "18a6b3ae780693c344ec862fb73a4aabc4bd901af2352123a03f83ff5d7ef011"
+	}
+}
