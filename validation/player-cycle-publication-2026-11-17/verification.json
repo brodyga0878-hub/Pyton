@@ -1,0 +1,75 @@
+{
+  "schema": "starfrontier-player-cycle-source-publication-v1",
+  "status": "verified",
+  "completed_utc": "2026-11-17T10:55:58.445453+00:00",
+  "checkpoint": "player-cycle-core-2026-11-17",
+  "artifact_commit": "93433bff95e432af8775b4a24255900b13d5c856",
+  "source_commit": "971efe8cc00a3dc193cf00631feaeaaa00919117",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/93433bff95e432af8775b4a24255900b13d5c856/deliverables/player-cycle-core-2026-11-17/manifest.json",
+      "http_status": 200,
+      "bytes": 2311,
+      "sha256": "b2bb49b07e476dc66874fe361bf665693e635be28e23692fbfa1d5b58f98e2ad"
+    },
+    {
+      "file": "README_RU.md",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/93433bff95e432af8775b4a24255900b13d5c856/deliverables/player-cycle-core-2026-11-17/README_RU.md",
+      "http_status": 200,
+      "bytes": 3592,
+      "sha256": "a161a1b8817685b464f81094b5b4c279fc63ee0ef184a1aa34a0933f37e76257"
+    },
+    {
+      "file": "StarFrontier-player-cycle-core-update.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/93433bff95e432af8775b4a24255900b13d5c856/deliverables/player-cycle-core-2026-11-17/StarFrontier-player-cycle-core-update.zip",
+      "http_status": 200,
+      "bytes": 6355103,
+      "sha256": "1e94972c1f69c3afbfbeaffc1a102b7ef301dab1da42ed87ed4444258adfbfd3",
+      "zip_CRC_verified": true,
+      "source_commit_in_ZIP_comment": "971efe8cc00a3dc193cf00631feaeaaa00919117"
+    },
+    {
+      "file": "functional-summary.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/93433bff95e432af8775b4a24255900b13d5c856/deliverables/player-cycle-core-2026-11-17/functional-summary.json",
+      "http_status": 200,
+      "bytes": 26080,
+      "sha256": "021f04cb4fa65b2b50d967de8c8fadb40ffb8d6e61de6f5d78881b8cf4330295"
+    },
+    {
+      "file": "source-pair-verification.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/93433bff95e432af8775b4a24255900b13d5c856/deliverables/player-cycle-core-2026-11-17/source-pair-verification.json",
+      "http_status": 200,
+      "bytes": 45831,
+      "sha256": "be013dd570355d0339f847ca07b0acb210b3efb2101f3a52d9cbed36d000d247"
+    },
+    {
+      "file": "source-update-policy.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/93433bff95e432af8775b4a24255900b13d5c856/deliverables/player-cycle-core-2026-11-17/source-update-policy.json",
+      "http_status": 200,
+      "bytes": 147101,
+      "sha256": "1324b8e46990ec533531a8639a22f96d54bdc87bc5142d1820d034e6370b6c72"
+    },
+    {
+      "file": "StarFrontier-0.28.0-native-station-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip",
+      "http_status": 200,
+      "bytes": 33543341,
+      "sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d",
+      "zip_CRC_verified": true,
+      "source_commit_in_ZIP_comment": "de8eb18a687d007781321436910187dff3785775"
+    }
+  ],
+  "actual_complete_HTTPS_downloads": 7,
+  "all_manifest_payloads_downloaded": true,
+  "manifest_payload_count": 5,
+  "required_source_archives_downloaded": 2,
+  "runtime_inputs_verified": 505,
+  "runtime_freeze_sha256": "072e167a41d41adc6571414dcaa83b2062da1176392ad66cc051fc118cfb21d1",
+  "all_current_runtime_inputs_match_frozen_source": true,
+  "new_APK_produced": false,
+  "new_kernels_connected_to_Main": false,
+  "physical_device_tested": false,
+  "full_original_port_complete": false,
+  "scope": "Seven actual complete immutable HTTPS downloads: sealed manifest, all five checkpoint payloads, and the required complete0.28 base source ZIP. Both source archive comments and CRC pass; all local payload SHA/lengths and all frozen source inputs pass. This source foundation is not a new playable release or a flown long-range route."
+}
