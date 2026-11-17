@@ -1,0 +1,16 @@
+{
+  "schema": "starfrontier-damage-contact-portable-verification-v1",
+  "ok": true,
+  "fixture_sha256": "61d6f3f1237fa2e02b0e3a79a4596b8fd9786a01d9adae228f793701df23f6bd",
+  "case_count": 40,
+  "actual_F953_calls": 72,
+  "actual_F1530_calls": 54,
+  "pair_two_damage_cases": 32,
+  "fresh_process_runs_each_call": 3,
+  "reverse_native_calls_verified": true,
+  "copied_proof_used": true,
+  "private_original_paths_deliberately_absent": true,
+  "fixture_byte_exact": true,
+  "all_buffer_lengths_and_sha256_valid": true,
+  "expected_arithmetic_calculated_in_python": false
+}

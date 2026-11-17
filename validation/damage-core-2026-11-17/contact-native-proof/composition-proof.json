@@ -1,0 +1,54 @@
+{
+  "schema": "starfrontier-original-damage-contact-composition-v1",
+  "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_dependencies_sha256": {
+    "data/ffe_collision_programs.json": "7ccd9884e0c05fc4d645347301112ab972d83c40780243325f3e907d5f527013",
+    "recovered-history/ground_harness/tools/build_terrain_query_reference.py": "46bbaf8fb4d80bea2c73cac728bb7385e2b46618dd908e111c632cdafda0c2cc",
+    "recovered-history/ground_harness/tools/native_reference.py": "50a1757168b4b886b1b48db6798d60feb4b73f6fb04176a0840a941ebdf6a1eb",
+    "tests/fixtures/source_object_factory_native.json": "0c04db1aec7ad72125599848125eab9dde1c9d32a87b0b2e732de576403ede92",
+    "tools/rebuild_source_collision_contact_native.py": "ddc7b1347bfe177752c4140ae1e91fc3f30effaf3352f48b19045b6ac233e338",
+    "tools/rebuild_source_contact_classifier_native.py": "f4757fc63f1679cdbf5d8a4454d6532096c9882e510982951521e8ede823a128",
+    "tools/rebuild_source_damage_contact_native.py": "b96bd9df4cef1e108435e75ec696e1b54d69c4c8d6cc9d131cc1bf973c1b4762",
+    "tools/rebuild_source_damage_native.py": "5b2bdab57b8e8ba3f7125aa12bb4d95e11cc0709d164e4c675e071aa5a3e9c8d",
+    "tools/rebuild_source_frame_dispatch_native.py": "09f1382d12ba085f1b615fea6abbd9b3b4e7e7e829a6e88a490391d23e1e3a03",
+    "tools/rebuild_source_natural_contact_native.py": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889",
+    "tools/rebuild_source_spherical_contact_native.py": "dab2371b8b9aa2346dac1fd8ad48a0690d9580cd8f3970062c0d2ce68ac7ca3b",
+    "tools/rebuild_source_surface_contact_native.py": "6cb4314fbe1004eafd9476e80e9743f94c684b4a8359101d41fa6a77a572a6f9",
+    "validation/contact-classifier-2026-11-17/native-proof/dos-disassembly.txt": "541e7bcc8b35d0c14d36595ec712d4ec52ee4e2d344a527360c4b8b9d710fdba",
+    "validation/contact-classifier-2026-11-17/native-proof/instruction-proof.json": "6ffd20248b5aec5db0c582d6a3114f79e26d83705d69a8ebf087a8df66974403",
+    "validation/contact-classifier-2026-11-17/native-proof/source-procedures.asm": "744060bc04433034189d58412d587ecb485a263cc4e8ea263d3fcd8329baae3f",
+    "validation/damage-core-2026-11-17/native-proof/damage-native.s": "33a1b0d5f1d670e55dd8f967db7cc0d338fdd49104fb12cedb4dd20faec4cfb6",
+    "validation/damage-core-2026-11-17/native-proof/dos-disassembly.txt": "5c8bba8dc81b464b71c4a7068e1f00bffcbba3d54d9ef5e9b20a2dc870bf5db4",
+    "validation/damage-core-2026-11-17/native-proof/instruction-proof.json": "9351518bfb7212f0f97be4c523534207b95f5130a2a86d4d1bf4efed4ec23e39",
+    "validation/damage-core-2026-11-17/native-proof/source-procedures.asm": "7bb7cfd2ff7aa205cdb3e270bbbbbaea4a410eaa329cef2486eeb30c1a9b2bcb"
+  },
+  "host_assembly_sha256": {
+    "classifier": "67b8f5408f8a302a63720faffaa391c5a92702989aa13108d55550f1abc4e90e",
+    "damage": "33a1b0d5f1d670e55dd8f967db7cc0d338fdd49104fb12cedb4dd20faec4cfb6"
+  },
+  "native_calls": {
+    "classifier": 112,
+    "damage": 399
+  },
+  "fresh_process_runs_each_call": 3,
+  "reverse_repeat_native_calls": {
+    "classifier": 112,
+    "damage": 399
+  },
+  "native_input_sha256": {
+    "classifier": "03c3411ca3e19b5e8aaea1e6c82523e38b892a7372a299546d8a90d57bda0288",
+    "damage": "84cbf2baab9a308128cf7e64e3499dd43b94d5c004187f0709101c6a3b42478b"
+  },
+  "native_output_sha256": {
+    "classifier": "e3a25abccc6394b0c32ef26154a79aa3d91b0d602416b2f3987e170b62c961a8",
+    "damage": "245b1efd261fe91013a90758cd21e33d2f2e28f8adf6009ba4862cc6d9fa86f2"
+  },
+  "expected_arithmetic_calculated_in_python": false,
+  "all_raw_native_canaries_verified": true,
+  "Root_player_index_binding": "Root+C0 exactly aliases classifier Frame13 player_index_u32. Actual native damage context is carried across calls, including all RNG/event/module words. Frame12 words are not altered by these supplied providers.",
+  "scope": "Original F575/F577/F578 invokes whole original F953/F34/F35/F144/F148/F1530/F1538 and resumes after each measured reply. Exact pair/body/caller/global outputs and sequential shared context are compared. External handlers/event/audio/equipment/fatal callbacks remain typed authored replies; this is not a full world, Main or Android build.",
+  "actual_F953_calls": 72,
+  "pair_two_damage_cases": 32,
+  "actual_F1530_calls": 54
+}

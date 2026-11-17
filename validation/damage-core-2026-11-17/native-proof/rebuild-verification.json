@@ -1,0 +1,103 @@
+{
+  "schema": "starfrontier-source-damage-native-rebuild-verification-v1",
+  "date_utc": "2026-11-17",
+  "fixture_sha256": "d8f25e97a65c7b04eed8f13a9252758d8866b371a57d8f1e1872cc115a3789c3",
+  "fixture_bytes": 41421515,
+  "case_count": 309,
+  "operation_counts": {
+    "damage": 261,
+    "rng1530": 16,
+    "rng922": 32
+  },
+  "external_requests": {
+    "F48": 783,
+    "F144_handler": 71,
+    "F1907": 184,
+    "F942": 77,
+    "F952": 20
+  },
+  "external_request_total": 1135,
+  "actual_source_calls": {
+    "F953": 261,
+    "F34": 783,
+    "F48": 783,
+    "F35": 261,
+    "F942": 77,
+    "F1907": 184,
+    "F148": 125,
+    "F952": 20,
+    "F1530": 56,
+    "F1538": 3,
+    "F144": 106,
+    "F144_handler": 71,
+    "F922": 32
+  },
+  "full_before_after_native_callback_snapshots": 1135,
+  "authored_mutating_callbacks": 26,
+  "reusable_f148_payload_mutations": 3,
+  "original_module_dispatch_rows": 21,
+  "original_registry_table_count": 21,
+  "event11_nonnull_modules": [
+    3,
+    11,
+    17,
+    20
+  ],
+  "event2_nonnull_modules": [
+    2,
+    3,
+    4,
+    7,
+    11,
+    12,
+    14,
+    15,
+    17,
+    18,
+    19,
+    20
+  ],
+  "actual_f922_bound_words_u32": [
+    0,
+    1,
+    2,
+    65535,
+    65536,
+    2147483647,
+    2147483648,
+    4294967295
+  ],
+  "whole_original_procedures": 8,
+  "whole_original_instructions": 241,
+  "fresh_native_processes": 3,
+  "reverse_repeat_cases": 309,
+  "consecutive_shared_root_cases": 63,
+  "all_owner_boundary_canaries_unchanged": true,
+  "immutable_model_descriptor_bytes_and_guards_unchanged": true,
+  "runtime_damage_checks": 3506,
+  "runtime_rng_checks": 305,
+  "runtime_failures": 0,
+  "expected_arithmetic_calculated_in_python": false,
+  "all_external_results_explicit": true,
+  "archive_only_replay": {
+    "original_exe_path": "/absent/FIRSTENC.EXE",
+    "original_asm_path": "/absent/ffe.asm",
+    "original_data_path": "/absent/ffedat.asm",
+    "copied_proof_files": 4,
+    "fixture_byte_exact": true,
+    "copied_proof_files_unchanged": true
+  },
+  "independent_original_reproof": {
+    "fixture_byte_exact": true,
+    "all_four_captured_proof_files_byte_exact": true
+  },
+  "coverage_limitations": [
+    "F48 event dispatch, nonnull F144 module handler bodies, F1907 audio, F942 fatal response and F952 equipment damage remain explicit ordered providers.",
+    "Original F144 actual table reads are supported for source event columns2 and11; unrelated event columns are outside this kernel.",
+    "Actual F1538 reads are bounded to original initialized-object model indices0..148; unused raw body model words remain opaque.",
+    "F144 event11 exposes its defined packet fields and sole body owner; uninitialized stack padding and local event11 packet writes are outside this boundary profile.",
+    "Optional event2 payload_after_u32 updates the actual shared F148 action/value stack packet; other boundary kinds reject this field.",
+    "The native observation transport caps64 callbacks,10 byte patches per callback and32 bytes per patch; public runtime complete before/after observations retain their independent context contract.",
+    "This is source-kernel parity; full F575/F569 orchestration, actual module handlers, live Main and Android behavior require separate integration."
+  ]
+}

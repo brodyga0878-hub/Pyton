@@ -44,6 +44,11 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_damage', 'tests/test_source_damage.gd', 'Whole DOS F953 with source event registers, real shared RNG, module loops and exact external continuations.', timeout=600),
+    Suite('source_global_rng', 'tests/test_source_global_rng.gd', 'Original F1530/F922 arithmetic sharing Root words, native boundary/interleaving controls and readonly owner validation.', timeout=600),
+    Suite('source_object_slots', 'tests/test_source_object_slots.gd', 'Original F928 allocation/F924 free, actual factory initialization, source aliases and typed module continuations.', timeout=600),
+    Suite('source_damage_state', 'tests/test_source_damage_state.gd', 'Owned damage state, shared Root/RNG/event words, atomic receipts and replay-validated cold snapshots.', timeout=600),
+    Suite('source_damage_contact', 'tests/test_source_damage_contact.gd', 'Actual F953 within F575/scan, ordered bank flag mutations and owned cold damage auxiliary state with preserved defaults.', timeout=600),
     Suite('source_collision_terrain', 'tests/test_source_collision_terrain.gd', 'Whole DOS F581 and actual F1876 height query, packed corners, exact gates/pointers, persistent query words and independent native parity.', timeout=600),
     Suite('source_collision_surface', 'tests/test_source_collision_surface.gd', 'Actual native surface composition through F575/F576/F582/F581, Root graphics alias and owned hot/cold terrain state with preserved defaults.', timeout=600),
     Suite('source_collision_resources', 'tests/test_source_collision_resources.gd', 'Exact original collision programs for149 primary and29 nested models, packed reads/children and portable original byte-span extraction.', timeout=300),

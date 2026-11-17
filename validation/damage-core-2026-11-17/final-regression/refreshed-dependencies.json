@@ -1,0 +1,133 @@
+{
+  "schema": 1,
+  "scope": "Current rebuilt standalone suites and native-reference controls only; historical totals excluded. Per-suite execution times identify bounded supplemental runs; this is not an atomic repository snapshot.",
+  "started_utc": "2026-11-17T15:02:04.450901+00:00",
+  "updated_utc": "2026-11-17T15:02:06.560510+00:00",
+  "duration_seconds": 2.11,
+  "validation_batches": [
+    {
+      "started_utc": "2026-11-17T15:02:04.450901+00:00",
+      "duration_seconds": 2.11,
+      "requested_suites": [
+        "source_collision_surface",
+        "source_collision_contact",
+        "source_contact_scan_state"
+      ],
+      "executed_suites": [
+        "source_collision_surface",
+        "source_collision_contact",
+        "source_contact_scan_state"
+      ]
+    }
+  ],
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "project": "/workspace/Pyton",
+  "jobs": 3,
+  "status": "passed",
+  "passed_suites": 3,
+  "failed_suites": [],
+  "unavailable_suites": [],
+  "checks": 1229,
+  "failures": 0,
+  "suites": [
+    {
+      "name": "source_collision_surface",
+      "scope": "Actual native surface composition through F575/F576/F582/F581, Root graphics alias and owned hot/cold terrain state with preserved defaults.",
+      "status": "passed",
+      "checks": 538,
+      "failures": 0,
+      "executed_utc": "2026-11-17T15:02:04.452906+00:00",
+      "suite_source": {
+        "path": "tests/test_source_collision_surface.gd",
+        "bytes": 22499,
+        "sha256": "e25450919811aa11c822fb5e858ae78856d02d91367f9f554e1549901ed4a1a1"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_collision_surface.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.097,
+      "timed_out": false,
+      "output_bytes": 128,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/damage-core-2026-11-17/final-regression/logs/source_collision_surface.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_collision_contact",
+      "scope": "Actual F575 geometry composition, original scan/state optional route, cold replay and independent composed native controls.",
+      "status": "passed",
+      "checks": 437,
+      "failures": 0,
+      "executed_utc": "2026-11-17T15:02:04.453252+00:00",
+      "suite_source": {
+        "path": "tests/test_source_collision_contact.gd",
+        "bytes": 20126,
+        "sha256": "8b5cc2b577505d9213459bfdca5707af2259904ba45277e149e1374d47cb3d33"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_collision_contact.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.097,
+      "timed_out": false,
+      "output_bytes": 128,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/damage-core-2026-11-17/final-regression/logs/source_collision_contact.log",
+      "summary_lines": 1
+    },
+    {
+      "name": "source_contact_scan_state",
+      "scope": "Owned raw collision bank, Root aliases, complete last-step replay and cold/revision/receipt isolation.",
+      "status": "passed",
+      "checks": 254,
+      "failures": 0,
+      "executed_utc": "2026-11-17T15:02:04.453552+00:00",
+      "suite_source": {
+        "path": "tests/test_source_contact_scan_state.gd",
+        "bytes": 12807,
+        "sha256": "c764816aff430a2520b468bb74b83c070e431781730b5fa1dfb46c4b1657c59a"
+      },
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/Pyton",
+        "--script",
+        "res://tests/test_source_contact_scan_state.gd"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.105,
+      "timed_out": false,
+      "output_bytes": 129,
+      "log_truncated": false,
+      "diagnostics": [],
+      "log": "/workspace/Pyton/validation/damage-core-2026-11-17/final-regression/logs/source_contact_scan_state.log",
+      "summary_lines": 1
+    }
+  ],
+  "coverage_limitations": [
+    {
+      "scope": "Full original model-mesh leaf native controls",
+      "status": "not_in_this_curated_run",
+      "reason": "The leaf fixture has been independently regenerated from original instructions; consult source_model_mesh/source_model_vertices suite results for actual execution coverage."
+    },
+    {
+      "scope": "Android installation, on-device rendering and physical Samsung S23 Ultra",
+      "status": "separate_validation",
+      "reason": "This runner includes isolated desktop Main scene tests; APK packaging, rendered GPU controls and physical-device behavior require their separate evidence."
+    }
+  ]
+}

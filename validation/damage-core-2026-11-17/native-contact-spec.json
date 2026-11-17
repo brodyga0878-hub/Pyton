@@ -1,0 +1,8 @@
+{
+  "name": "damage_contact",
+  "generator": "tools/rebuild_source_damage_contact_native.py",
+  "fixture": "tests/fixtures/source_damage_contact_native.json",
+  "kind": "proof_asm",
+  "proof_dir": "validation/damage-core-2026-11-17/contact-native-proof",
+  "supplemental": true
+}

@@ -1,0 +1,14 @@
+{
+  "schema": "starfrontier-object-slots-portable-verification-v1",
+  "ok": true,
+  "fixture_sha256": "de48450f692f7d589c067bea68eab764a313d544782d3f323de678637434bb04",
+  "case_count": 974,
+  "consecutive_original_steps": 24,
+  "F144_boundary_observations": 94,
+  "fresh_process_runs": 3,
+  "reverse_repeat_cases": 974,
+  "original_paths_deliberately_missing": true,
+  "copied_proof_directory_used": true,
+  "fixture_byte_exact": true,
+  "expected_arithmetic_calculated_in_python": false
+}

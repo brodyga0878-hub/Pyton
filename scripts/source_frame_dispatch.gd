@@ -1,6 +1,7 @@
 extends RefCounted
 # Original DOS F568/F569 -> F570 caller. The source classifier F575 is an
-# explicit, matched observation boundary; this module does not implement it.
+# explicit, matched observation boundary; optional flag receipts preserve
+# callback timing without introducing a second flags-bank owner.
 const Bank=preload("res://scripts/source_reference_bank.gd")
 const Frame=preload("res://scripts/source_frame_kinematics.gd")
 const Ground=preload("res://scripts/ground_coordinates.gd")
@@ -52,10 +53,14 @@ static func _raw_bank(player:Variant,objects:Variant,flags:Variant)->bool:
 			if seen.has(cursor) or not all.has(cursor):return false
 			seen[cursor]=true;cursor=int(all[cursor][0x56])
 	return true
-static func _valid_trace(trace:Variant)->bool:
+static func _valid_trace(trace:Variant,allow_flag_writes:bool=false)->bool:
 	if not trace is Array or trace.size()>115:return false
 	for row:Variant in trace:
-		if not _keys(row,TRACE_KEYS) or not _hex(row.subject_before_hex,OBJECT_BYTES) or not _hex(row.collider_before_hex,OBJECT_BYTES) or not _hex(row.relative_before_hex,24) or not _hex(row.subject_after_hex,OBJECT_BYTES) or not _hex(row.collider_after_hex,OBJECT_BYTES) or not _globals(row.globals_before) or not _globals(row.globals_after) or not _whole(row.collider_index_u8,1,MAX_INDEX) or not _whole(row.return_u8,0,255):return false
+		var keys:Array=TRACE_KEYS.duplicate()
+		if row is Dictionary and (row.has("flags_before_hex") or row.has("flags_after_hex")):
+			if not allow_flag_writes or not _hex(row.get("flags_before_hex"),FLAGS_BYTES) or not _hex(row.get("flags_after_hex"),FLAGS_BYTES):return false
+			keys.append_array(["flags_before_hex","flags_after_hex"])
+		if not _keys(row,keys) or not _hex(row.subject_before_hex,OBJECT_BYTES) or not _hex(row.collider_before_hex,OBJECT_BYTES) or not _hex(row.relative_before_hex,24) or not _hex(row.subject_after_hex,OBJECT_BYTES) or not _hex(row.collider_after_hex,OBJECT_BYTES) or not _globals(row.globals_before) or not _globals(row.globals_after) or not _whole(row.collider_index_u8,1,MAX_INDEX) or not _whole(row.return_u8,0,255):return false
 		var subject_before:=str(row.subject_before_hex).hex_decode();var subject_after:=str(row.subject_after_hex).hex_decode()
 		var collider_before:=str(row.collider_before_hex).hex_decode();var collider_after:=str(row.collider_after_hex).hex_decode()
 		# An observed classifier response does not own identity/frame selection.
@@ -70,23 +75,26 @@ static func _matrix(body:PackedByteArray)->PackedInt64Array:
 	var values:=PackedInt64Array()
 	for index in range(9):values.append(body.decode_s32(index*4))
 	return values
-static func _call(bank:RefCounted,history:Dictionary,relative:PackedInt64Array,collider_index:int,trace:Array,index:int,allow_pending:bool=false)->Dictionary:
+static func _call(bank:RefCounted,history:Dictionary,relative:PackedInt64Array,collider_index:int,trace:Array,index:int,allow_pending:bool=false,allow_flag_writes:bool=false)->Dictionary:
 	if index>=trace.size():
 		var missing:=_reject("missing_F575_observation")
 		if allow_pending:
 			missing.pending={"kind":"F575","subject":bank.raw_player(),"collider_index_u8":collider_index,"collider":bank._get_record(collider_index).duplicate(),"relative":_vector_hex(relative).hex_decode(),"globals":_copy_globals(history)}
+			if allow_flag_writes:missing.pending["bank_flags_before"]=bank.bank_flags()
 			missing.trace_consumed=index
 		return missing
 	var row:Dictionary=trace[index]
 	var collider:PackedByteArray=bank._get_record(collider_index)
 	if row.subject_before_hex!=bank._player.hex_encode() or int(row.collider_index_u8)!=collider_index or row.collider_before_hex!=collider.hex_encode() or row.relative_before_hex!=_vector_hex(relative) or not _same_globals(row.globals_before,history):return _reject("F575_observation_request_mismatch")
+	if row.has("flags_before_hex") and row.flags_before_hex!=bank._flags.hex_encode():return _reject("F575_observation_flag_request_mismatch")
 	bank._player=str(row.subject_after_hex).hex_decode()
 	bank._set_record(collider_index,str(row.collider_after_hex).hex_decode())
+	if row.has("flags_after_hex"):bank._flags=str(row.flags_after_hex).hex_decode()
 	if not _raw_bank(bank._player,bank._objects,bank._flags):return _reject("F575_observation_broke_raw_bank")
 	return {"ok":true,"globals_after":_copy_globals(row.globals_after),"return_u8":int(row.return_u8)}
 
-static func dispatch(player:Variant,objects_by_index:Variant,flags:Variant,initial_globals:Variant,frame_ticks_u32:Variant,source_frame_byte:Variant,trace:Variant,enabled:Variant=true,profile:String=PROFILE,allow_pending:Variant=false)->Dictionary:
-	if profile!=PROFILE or not _raw_bank(player,objects_by_index,flags) or not _globals(initial_globals) or not _whole(frame_ticks_u32,0,MASK) or not _whole(source_frame_byte,0,255) or not _valid_trace(trace) or not enabled is bool or not allow_pending is bool:return _reject("invalid_frame_dispatch_inputs")
+static func dispatch(player:Variant,objects_by_index:Variant,flags:Variant,initial_globals:Variant,frame_ticks_u32:Variant,source_frame_byte:Variant,trace:Variant,enabled:Variant=true,profile:String=PROFILE,allow_pending:Variant=false,allow_flag_writes:Variant=false)->Dictionary:
+	if profile!=PROFILE or not _raw_bank(player,objects_by_index,flags) or not _globals(initial_globals) or not _whole(frame_ticks_u32,0,MASK) or not _whole(source_frame_byte,0,255) or not allow_flag_writes is bool or not _valid_trace(trace,allow_flag_writes) or not enabled is bool or not allow_pending is bool:return _reject("invalid_frame_dispatch_inputs")
 	# The private bank supplies the already independently controlled F1677 path.
 	# Its public configure() has a separate F606 natural-candidate constraint;
 	# F570 collision-list flags use bit4 and have their own admission above.
@@ -99,7 +107,7 @@ static func dispatch(player:Variant,objects_by_index:Variant,flags:Variant,initi
 	var parent_index:=int(bank._player[0x56])
 	if parent_index!=0:
 		history.collider_ref_u32=parent_index
-		var response:=_call(bank,history,Bank._position(bank._player),parent_index,trace,consumed,allow_pending)
+		var response:=_call(bank,history,Bank._position(bank._player),parent_index,trace,consumed,allow_pending,allow_flag_writes)
 		if not response.get("ok",false):return response
 		consumed+=1;history=response.globals_after
 		var cooldown:int=bank._player.decode_s32(0x148)
@@ -129,7 +137,7 @@ static func dispatch(player:Variant,objects_by_index:Variant,flags:Variant,initi
 			if subject_global.size()!=3 or candidate_global.size()!=3:return _reject("source_global_frame_unavailable")
 			relative=Bank._add_position(subject_global,candidate_global,true)
 		else:relative=Bank._add_position(Bank._position(bank._player),Bank._position(candidate),true)
-		var response:=_call(bank,history,relative,index,trace,consumed,allow_pending)
+		var response:=_call(bank,history,relative,index,trace,consumed,allow_pending,allow_flag_writes)
 		if not response.get("ok",false):return response
 		consumed+=1;history=response.globals_after
 	if consumed!=trace.size():return _reject("unused_F575_observations")
