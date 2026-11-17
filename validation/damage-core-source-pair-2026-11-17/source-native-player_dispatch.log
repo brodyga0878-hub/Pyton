@@ -1,0 +1,6 @@
+{
+  "case_count": 640,
+  "frame_response_cases": 55,
+  "fixture_sha256": "2033e37070b53e2eaa90452ddf7cbb0f7484ce0453f5aba4a5dea00c5f446c8e",
+  "output": "/workspace/recovery/damage-core-source-pair-fresh/native/player_dispatch.json"
+}

@@ -1,0 +1,11 @@
+{
+  "case_count": 32,
+  "actual_F575_calls": 80,
+  "native_calls": {
+    "frame": 112,
+    "classifier": 80
+  },
+  "frame_conversion_cases": 4,
+  "cache_record_change_count": 32,
+  "fixture_sha256": "d0f5355216aeb30f5f9f66dce713609c8d13728e3992b52cf4a0c35c53ae7657"
+}
