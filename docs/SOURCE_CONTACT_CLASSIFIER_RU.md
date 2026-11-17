@@ -93,7 +93,24 @@ D8696–D8707 находятся вне окна GameRoot. D8702 — отдел�
 ## Исходники
 
 <!-- CONTACT_CLASSIFIER_PUBLICATION_BEGIN -->
-PREPUB: скачиваемое обновление ещё не запечатано. Потребуются полная основа
-0.28 и новое кумулятивное обновление, распакованные в одну папку
-`StarFrontier-0.28.0-source/`. Предыдущие малые обновления отдельно не нужны.
+Для полного проекта нужны **два ZIP**: [полная основа 0.28](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip)
+и [кумулятивное обновление](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/11e7f1d446f236607829a7c9463b086e2cf3661e/deliverables/contact-classifier-core-2026-11-17/StarFrontier-contact-classifier-core-update.zip). Сначала распакуйте основу,
+затем обновление в ту же папку `StarFrontier-0.28.0-source/`.
+Предыдущие малые обновления не требуются. Оба ZIP меньше 32 МиБ;
+обновление отдельно неполно. Включены код, тесты, текстовые доказательства
+и переносимые native-генераторы со всеми linker/source dependencies.
+
+Source-коммит: `450c8ac2e0b1f52d88e0e8b0fd0f726c928abb9b`.
+Обновление: **7 263 946 байт**, SHA256
+`307f913e52f10ce23f88cd652a108440d9288f0a1270028960ea834a86a10eec`.
+Из чистой пары проверены запуск **10/0**, все **25 наборов / 184 129/0**,
+**2044** неизменных файла и **513** runtime-входов. 16 native-команд
+воспроизвели fixtures без приватного EXE. Семь полных HTTPS-загрузок,
+размеры/SHA/CRC и Git-комментарии обоих ZIP совпали.
+[Подтверждение](../validation/contact-classifier-publication-2026-11-17/verification.json)
+и [логи чистой проверки](../validation/contact-classifier-source-pair-2026-11-17/README.md).
+
+Архив и манифест запечатаны перед проверкой опубликованных загрузок и
+остаются неизменными. PREPUB-записи внутри ZIP относятся к исходному
+коммиту до публикации; окончательное подтверждение сохранено отдельно.
 <!-- CONTACT_CLASSIFIER_PUBLICATION_END -->
