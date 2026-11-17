@@ -1,0 +1,23 @@
+{
+	"F606_alias_mutation_cases": 3,
+	"checks": 2225,
+	"consecutive_phases": 32,
+	"failures": 0,
+	"full_world_effects_executed": false,
+	"live_Main_motion_replaced": false,
+	"matched_boundaries": 1351,
+	"native_cases": 288,
+	"physical_device_tested": false,
+	"profile": "dos-firstenc-whole-player-phases-v1",
+	"source_order_post_drift_cases": 56,
+	"source_order_pre_drift_cases": 74,
+	"sources": {
+		"scripts/source_player_context.gd": "194ffaa6605019ee4b1746980533709f5a10dcaef27080510fd8586f2290fb4d",
+		"scripts/source_player_phase.gd": "cd78ff2df0089d436efe21da27b63d224e1decb2e00aa1f039485debddfe162a",
+		"tests/fixtures/source_player_phase_native.json": "4aafa3fbb5d9319d11955629b1c252264961aff0bc358c29133ad79cf2c08d9f",
+		"tests/test_source_player_phase.gd": "70cd912bda3d692eeeb248ad3b2fc779749dc1ce89dccb3ed0271a3f1e565590",
+		"tools/rebuild_source_player_phase_native.py": "eb435a9c9861b89b163335caeee8a0b94f2688bd3e5d0ee1b036e420e20ebc2e",
+		"validation/player-cycle-2026-11-17/phase-native-proof/instruction-proof.json": "65590c2964f0be014bfd4e0752cbb265fb3ba1733917b8e136f3c65b10db5233",
+		"validation/player-cycle-2026-11-17/phase-native-proof/source-procedures.s": "4a0fdeb38f8a1789a2ae4bbf9c298a93772808b7d5bca72171ac61e506cee181"
+	}
+}

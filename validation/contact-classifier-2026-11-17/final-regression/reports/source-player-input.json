@@ -1,0 +1,23 @@
+{
+	"Android_input_proven": false,
+	"F931_effects_executed": false,
+	"F931_request_cases": 100,
+	"GUI_observer_cases": 458,
+	"checks": 7171,
+	"consecutive_actual_inputs": 64,
+	"failures": 0,
+	"full_player_cycle": false,
+	"live_Main_changed": false,
+	"native_cases": 774,
+	"profile": "dos-firstenc-player-input-v1",
+	"schema": 1,
+	"scope": "Whole original DOS F1037/F1038/F1039/F1040/F1121. All220 instructions match the uploaded EXE; no JJFFE CalcKeyInput or saturation patches. This is not live Android input, full player scheduling or F931 effects.",
+	"sources": {
+		"scripts/source_player_input.gd": "c2b5a891b84515fc4a162ea40eaed66d6e05c6ea192c86c08080d4e5a5fbb910",
+		"tests/fixtures/source_player_input_native.json": "6644b8eaec991b79a28c6b26e3be8f1e8b2303a21f9fdb5d21019b6e8b6cfeb8",
+		"tests/test_source_player_input.gd": "070ccdf1feabecc558712a05c0e733a97f612a003aa96bf3b3d60f604375dea9",
+		"tools/rebuild_source_player_input_native.py": "36e35b1ffb2c51a847abf8cbf3c171f662daa4e72595c3c8052470e3602c8904",
+		"validation/player-cycle-2026-11-17/input-native-proof/instruction-proof.json": "21aa2af54f0a1e9a7d70781bad53e405949f745d8da2a9ca038c6e76f7f31fb8",
+		"validation/player-cycle-2026-11-17/input-native-proof/source-procedures.s": "70fd1cb1abcaf9cb081482f9ec9b2e537f85473da7ae9404167b98c3d7e6cd6d"
+	}
+}

@@ -44,6 +44,10 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_pair_response', 'tests/test_source_pair_response.gd', 'Actual DOS F578 pair response, signed wrapped velocity, damage callback reloads and complete raw native controls; JJFFE replacement excluded.', timeout=300),
+    Suite('source_contact_classifier', 'tests/test_source_contact_classifier.gd', 'Whole DOS F575 routing, actual F577 and DOS F578, complete player/NPC responses and matched F576/F953 boundaries.', timeout=300),
+    Suite('source_contact_scan', 'tests/test_source_contact_scan.gd', 'Actual F569/F570 bank traversal connected to whole F575, frame conversions and typed contact output with explicit unresolved geometry.', timeout=300),
+    Suite('source_contact_scan_state', 'tests/test_source_contact_scan_state.gd', 'Owned raw collision bank, Root aliases, complete last-step replay and cold/revision/receipt isolation.', timeout=300),
     Suite('source_player_mode', 'tests/test_source_player_mode.gd', 'Whole DOS F1008/F1009/F1010, actual29paired mode table, full raw callback responses and strict pending continuation.', timeout=300),
     Suite('source_player_input', 'tests/test_source_player_input.gd', 'Whole original DOS F1037/F1038/F1039/F1040/F1121 input without the later JJFFE keyboard branch.', timeout=300),
     Suite('source_player_context', 'tests/test_source_player_context.gd', 'Single raw GameRoot owner for the14 legacy control aliases and isolated roll/scratch updates.', timeout=300),

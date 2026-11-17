@@ -1,0 +1,16 @@
+{
+	"DATA9030_alias_root3F5E": true,
+	"DC_interpreted_as_new_elapsed_time": false,
+	"checks": 3126,
+	"failures": 0,
+	"live_Main_changed": false,
+	"profile": "dos-firstenc-player-root-context-v1",
+	"raw_alias_contexts": 128,
+	"schema": 1,
+	"sources": {
+		"scripts/source_player_context.gd": "194ffaa6605019ee4b1746980533709f5a10dcaef27080510fd8586f2290fb4d",
+		"scripts/source_player_dispatch.gd": "353bba764111fe5778188ec9046adeb138212cf2cb54b4e34bcdfe1de2bd9742",
+		"tests/fixtures/source_player_dispatch_native.json": "2033e37070b53e2eaa90452ddf7cbb0f7484ce0453f5aba4a5dea00c5f446c8e",
+		"tests/test_source_player_context.gd": "ff4738f6eb38191b02e1446a3b73242b9a51915f10229e0424edfb9a333ab323"
+	}
+}

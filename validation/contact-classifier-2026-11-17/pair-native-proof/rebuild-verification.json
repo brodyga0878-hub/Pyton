@@ -1,0 +1,15 @@
+{
+  "schema": "starfrontier-pair-response-rebuild-verification-v1",
+  "fixture_sha256": "016221418ecb601b995441babd8bd40a9f4cb7ed61710e33558255ea5e4c7ed4",
+  "native_case_count": 320,
+  "primary_cases_repeated_in_three_fresh_processes_and_reversed": 288,
+  "consecutive_native_steps": 32,
+  "Godot_checks": 3414,
+  "Godot_failures": 0,
+  "whole_F578_instruction_count": 114,
+  "whole_F578_byte_length": 416,
+  "portable_rebuild_without_original_files_byte_exact": true,
+  "new_Main_route_claimed": false,
+  "full_collision_pipeline_claimed": false,
+  "scope": "Actual DOS F578 arithmetic with strict observed F953 replies; no expected collision arithmetic in Python."
+}

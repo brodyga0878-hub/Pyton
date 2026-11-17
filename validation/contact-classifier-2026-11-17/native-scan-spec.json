@@ -1,0 +1,8 @@
+{
+  "name": "contact_scan",
+  "generator": "tools/rebuild_source_contact_scan_native.py",
+  "fixture": "tests/fixtures/source_contact_scan_native.json",
+  "kind": "proof_asm",
+  "proof_dir": "validation/contact-classifier-2026-11-17/scan-native-proof",
+  "supplemental": true
+}

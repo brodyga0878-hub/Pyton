@@ -1,0 +1,44 @@
+{
+  "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_dependencies_sha256": {
+    "tools/rebuild_source_contact_scan_native.py": "62ea4cde0c3e9e79fa1b6753319d2390a986a9f5b05f2cafa8f4f025e44ff7c8",
+    "tools/rebuild_source_frame_dispatch_native.py": "09f1382d12ba085f1b615fea6abbd9b3b4e7e7e829a6e88a490391d23e1e3a03",
+    "tools/rebuild_source_contact_classifier_native.py": "f4757fc63f1679cdbf5d8a4454d6532096c9882e510982951521e8ede823a128",
+    "tools/rebuild_source_surface_contact_native.py": "6cb4314fbe1004eafd9476e80e9743f94c684b4a8359101d41fa6a77a572a6f9",
+    "tools/rebuild_source_spherical_contact_native.py": "dab2371b8b9aa2346dac1fd8ad48a0690d9580cd8f3970062c0d2ce68ac7ca3b",
+    "tools/rebuild_source_natural_contact_native.py": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889",
+    "recovered-history/ground_harness/tools/native_reference.py": "50a1757168b4b886b1b48db6798d60feb4b73f6fb04176a0840a941ebdf6a1eb",
+    "validation/player-dispatch-2026-11-17/frame-native-proof/instruction-proof.json": "52566a9f44716086b50f39195941e74c1e43154f72d709eee3a493a5518122d2",
+    "validation/player-dispatch-2026-11-17/frame-native-proof/frame-dispatch-observed-kernel.s": "855a8771cc011a9313e2a2c96ca5670187823c8528c0224010bda091fd205b18",
+    "validation/contact-classifier-2026-11-17/native-proof/instruction-proof.json": "6ffd20248b5aec5db0c582d6a3114f79e26d83705d69a8ebf087a8df66974403",
+    "validation/contact-classifier-2026-11-17/native-proof/source-procedures.asm": "744060bc04433034189d58412d587ecb485a263cc4e8ea263d3fcd8329baae3f"
+  },
+  "host_assembly_sha256": {
+    "frame": "44e0169919441b0c6645ca646a44cf9d8ec7c7570af51ad47415157ee37cd52c",
+    "classifier": "37ffc313245b96c0ef2ad781a4c43f7dcb6a90a75d38ba9d84caa61a0861f687"
+  },
+  "original_frame_body_prefix_sha256": "afb648cbcdcbaf862cd8a22dec55c9537267f48449972ea9c45e2974af2e40a9",
+  "fresh_process_runs_each_call": 3,
+  "reverse_repeat_native_calls": {
+    "frame": 112,
+    "classifier": 80
+  },
+  "native_calls": {
+    "frame": 112,
+    "classifier": 80
+  },
+  "native_input_sha256": {
+    "frame": "03190dcf9da032ab2af589c91fa9472e5aabdb509b55672d5e36a853de6e57e2",
+    "classifier": "1d6d933d31a991257a4ace1fcb30f5bab4f403aa2b0c2a012ee82f58cc147b44"
+  },
+  "native_output_sha256": {
+    "frame": "c31f87f97d3e7f3d1c4c4c08d1cc397ebca7edb98fe3f62c527d537be89f4365",
+    "classifier": "ac7180cc01089dbf64a6cbd534010b135e5d153266db0b40c22bc6c460f52d27"
+  },
+  "all_raw_record_bank_and_output_canaries_verified": true,
+  "expected_arithmetic_calculated_in_python": false,
+  "frame_conversion_cases": 4,
+  "cache_record_change_count": 32,
+  "callback_transport": "Only derived ELF64 F575 observer transport expands72B to752B and copies actual native classifier output records after globals. All original frame/math instructions remain the archived prefix. F953 responses are matched identity observations, not world damage execution. No F576 generic VM response is invented."
+}

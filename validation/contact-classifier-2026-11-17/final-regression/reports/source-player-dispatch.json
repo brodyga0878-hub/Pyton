@@ -1,0 +1,29 @@
+{
+	"audio_request_cases": 128,
+	"checks": 6910,
+	"consecutive_actual_callbacks": 64,
+	"failures": 0,
+	"frame_request_cases": 114,
+	"frame_response_cases": 55,
+	"full_F606_executed": false,
+	"full_original_player_pipeline": false,
+	"live_Main_motion_replaced": false,
+	"native_cases": 640,
+	"physical_device_tested": false,
+	"profile": "dos-firstenc-player-control-dispatch-v1",
+	"schema": 1,
+	"scope": "Whole DOS F1041 control preparation, restored DOS F1043 active-low forward/reverse and damping, separate F1044/F1045 drift callbacks. Real original angular/gravity/thrust/drift kernels; F606 and audio remain explicit observed boundaries. Full338B outputs, exact procedure order and post-frame-response thrust continuation match independent native instructions. This is not universal F1019/F570 player scheduling, event effects, live Main or Android proof.",
+	"sources": {
+		"scripts/ground_coordinates.gd": "54dedcc157dea6c84c4f8ad6ff0859159d81719cafbbaa23c626cd94e1cdf7b6",
+		"scripts/source_angular_motion.gd": "e4af479bcfcbfb7bbb927aedeae64d0859dc5d40f39b90ef7e5f942a75051a52",
+		"scripts/source_gravity.gd": "058db4e5cbebd07e7420274ca07b24ccaec620f46c440081d1d6855326dc3872",
+		"scripts/source_ground_surface.gd": "e9db09fbd9c9e8a70bfba771b79627bbba6313d86b3efe781fba7b93a29e7ee7",
+		"scripts/source_motion_pipeline.gd": "478b18ed852da1549eb573e2b8d168e3b817deb684c31c50e085d30a6d98bb84",
+		"scripts/source_player_dispatch.gd": "353bba764111fe5778188ec9046adeb138212cf2cb54b4e34bcdfe1de2bd9742",
+		"tests/fixtures/source_player_dispatch_native.json": "2033e37070b53e2eaa90452ddf7cbb0f7484ce0453f5aba4a5dea00c5f446c8e",
+		"tests/test_source_player_dispatch.gd": "ac07c479fe1efb7065385be5ba7564922c6cadbf476cacb03045a7c3ea3fed3f",
+		"tools/rebuild_source_player_dispatch_native.py": "a8f2fcb2d086202c21f0cd56bd30ab4721a8f9ac077d9f4c003856a8d436c7e6",
+		"validation/player-dispatch-2026-11-17/player-native-proof/instruction-proof.json": "60a12fdc0fb5b770d695e267c539ee9f422a21b98cf74c026f286ccbabeac283",
+		"validation/player-dispatch-2026-11-17/player-native-proof/source-procedures.s": "c9e08af2a922aa2ce70016d98d3573081fe6076f5ce3aad2d2a8262870269cc6"
+	}
+}

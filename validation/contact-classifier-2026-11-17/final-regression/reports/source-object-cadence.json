@@ -1,0 +1,18 @@
+{
+	"checks": 4191,
+	"failures": 0,
+	"native_cases": 265,
+	"native_sequence_steps": 32,
+	"schema": "starfrontier-source-object-cadence-tests-v1",
+	"scope": "Whole DOS F149/F144 cadence/control request trace parity with explicit original/default or supplied event5 callback presence. Observed indexed-byte effects only; no original handler bodies, complete player/world scheduler, Main or Android proof.",
+	"sources": {
+		"scripts/source_clock_pipeline.gd": "dd95f4c243fd8043523d4ae574b96c5b96fe5487cb395b70556a0248405c39e9",
+		"scripts/source_object_cadence.gd": "163a608db97d2b5b533c61f1d5fb2b985994f00220f05ea99b24a639b17ad93d",
+		"scripts/source_reference_bank.gd": "ac9f40bb3572a8bb819ae2c0397c7b8f4685491f3e50275dd86cd7381765a251",
+		"tests/fixtures/source_object_cadence_native.json": "8798bd2950832fedaf0cc4bd58fc0170218399df6a8386b8a06b08e18720bfa4",
+		"tests/test_source_object_cadence.gd": "bcfdc35ad3d9aa4fe403ea595aac802bd86930e7ffd1ce3280763e2b69c6818a",
+		"tools/rebuild_source_object_cadence_native.py": "a8fb2352af38a4a925e9ecfe524bcb82c3f0e39e7bc0247c8e94c87cae170471",
+		"validation/player-dispatch-2026-11-17/cadence-native-proof/instruction-proof.json": "f4baf505d1684cdfc20fceabdc70078b21b97a59f6e9d20eb33761696d5ebd97",
+		"validation/player-dispatch-2026-11-17/cadence-native-proof/source-procedures.asm": "ce9b005b6ac490778c9052ba588a1b8b2d3d6403e45d37ad6e9b706f334c717c"
+	}
+}

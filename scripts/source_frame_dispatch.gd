@@ -70,8 +70,13 @@ static func _matrix(body:PackedByteArray)->PackedInt64Array:
 	var values:=PackedInt64Array()
 	for index in range(9):values.append(body.decode_s32(index*4))
 	return values
-static func _call(bank:RefCounted,history:Dictionary,relative:PackedInt64Array,collider_index:int,trace:Array,index:int)->Dictionary:
-	if index>=trace.size():return _reject("missing_F575_observation")
+static func _call(bank:RefCounted,history:Dictionary,relative:PackedInt64Array,collider_index:int,trace:Array,index:int,allow_pending:bool=false)->Dictionary:
+	if index>=trace.size():
+		var missing:=_reject("missing_F575_observation")
+		if allow_pending:
+			missing.pending={"kind":"F575","subject":bank.raw_player(),"collider_index_u8":collider_index,"collider":bank._get_record(collider_index).duplicate(),"relative":_vector_hex(relative).hex_decode(),"globals":_copy_globals(history)}
+			missing.trace_consumed=index
+		return missing
 	var row:Dictionary=trace[index]
 	var collider:PackedByteArray=bank._get_record(collider_index)
 	if row.subject_before_hex!=bank._player.hex_encode() or int(row.collider_index_u8)!=collider_index or row.collider_before_hex!=collider.hex_encode() or row.relative_before_hex!=_vector_hex(relative) or not _same_globals(row.globals_before,history):return _reject("F575_observation_request_mismatch")
@@ -80,8 +85,8 @@ static func _call(bank:RefCounted,history:Dictionary,relative:PackedInt64Array,c
 	if not _raw_bank(bank._player,bank._objects,bank._flags):return _reject("F575_observation_broke_raw_bank")
 	return {"ok":true,"globals_after":_copy_globals(row.globals_after),"return_u8":int(row.return_u8)}
 
-static func dispatch(player:Variant,objects_by_index:Variant,flags:Variant,initial_globals:Variant,frame_ticks_u32:Variant,source_frame_byte:Variant,trace:Variant,enabled:Variant=true,profile:String=PROFILE)->Dictionary:
-	if profile!=PROFILE or not _raw_bank(player,objects_by_index,flags) or not _globals(initial_globals) or not _whole(frame_ticks_u32,0,MASK) or not _whole(source_frame_byte,0,255) or not _valid_trace(trace) or not enabled is bool:return _reject("invalid_frame_dispatch_inputs")
+static func dispatch(player:Variant,objects_by_index:Variant,flags:Variant,initial_globals:Variant,frame_ticks_u32:Variant,source_frame_byte:Variant,trace:Variant,enabled:Variant=true,profile:String=PROFILE,allow_pending:Variant=false)->Dictionary:
+	if profile!=PROFILE or not _raw_bank(player,objects_by_index,flags) or not _globals(initial_globals) or not _whole(frame_ticks_u32,0,MASK) or not _whole(source_frame_byte,0,255) or not _valid_trace(trace) or not enabled is bool or not allow_pending is bool:return _reject("invalid_frame_dispatch_inputs")
 	# The private bank supplies the already independently controlled F1677 path.
 	# Its public configure() has a separate F606 natural-candidate constraint;
 	# F570 collision-list flags use bit4 and have their own admission above.
@@ -94,7 +99,7 @@ static func dispatch(player:Variant,objects_by_index:Variant,flags:Variant,initi
 	var parent_index:=int(bank._player[0x56])
 	if parent_index!=0:
 		history.collider_ref_u32=parent_index
-		var response:=_call(bank,history,Bank._position(bank._player),parent_index,trace,consumed)
+		var response:=_call(bank,history,Bank._position(bank._player),parent_index,trace,consumed,allow_pending)
 		if not response.get("ok",false):return response
 		consumed+=1;history=response.globals_after
 		var cooldown:int=bank._player.decode_s32(0x148)
@@ -124,7 +129,7 @@ static func dispatch(player:Variant,objects_by_index:Variant,flags:Variant,initi
 			if subject_global.size()!=3 or candidate_global.size()!=3:return _reject("source_global_frame_unavailable")
 			relative=Bank._add_position(subject_global,candidate_global,true)
 		else:relative=Bank._add_position(Bank._position(bank._player),Bank._position(candidate),true)
-		var response:=_call(bank,history,relative,index,trace,consumed)
+		var response:=_call(bank,history,relative,index,trace,consumed,allow_pending)
 		if not response.get("ok",false):return response
 		consumed+=1;history=response.globals_after
 	if consumed!=trace.size():return _reject("unused_F575_observations")

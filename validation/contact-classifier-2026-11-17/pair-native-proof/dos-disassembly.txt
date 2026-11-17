@@ -1,0 +1,114 @@
+004281b8: push ebp
+004281b9: mov ebp,esp
+004281bb: push ebx
+004281bc: push esi
+004281bd: mov esi,DWORD PTR [ebp+0xc]
+004281c0: mov ebx,DWORD PTR [ebp+0x8]
+004281c3: or BYTE PTR ds:0x633ec8,0x80
+004281ca: mov al,BYTE PTR [ebx+0x56]
+004281cd: cmp al,BYTE PTR [esi+0x86]
+004281d3: je 0x4281e2
+004281d5: cmp BYTE PTR [esi+0x87],0x1
+004281dc: jne 0x428265
+004281e2: mov eax,DWORD PTR [ebx+0x8c]
+004281e8: sar eax,0x2
+004281eb: neg eax
+004281ed: mov DWORD PTR [ebx+0x8c],eax
+004281f3: mov eax,DWORD PTR [ebx+0x90]
+004281f9: sar eax,0x2
+004281fc: neg eax
+004281fe: mov DWORD PTR [ebx+0x90],eax
+00428204: mov eax,DWORD PTR [ebx+0x94]
+0042820a: sar eax,0x2
+0042820d: neg eax
+0042820f: mov DWORD PTR [ebx+0x94],eax
+00428215: mov eax,DWORD PTR [ebx+0x8c]
+0042821b: push eax
+0042821c: call 0x476238
+00428221: pop ecx
+00428222: mov esi,eax
+00428224: mov eax,DWORD PTR [ebx+0x90]
+0042822a: push eax
+0042822b: call 0x476238
+00428230: pop ecx
+00428231: add esi,eax
+00428233: mov eax,DWORD PTR [ebx+0x94]
+00428239: push eax
+0042823a: call 0x476238
+0042823f: pop ecx
+00428240: add esi,eax
+00428242: mov eax,esi
+00428244: add eax,0xa
+00428247: cmp DWORD PTR [ebx+0x82],0xd
+0042824e: jbe 0x428354
+00428254: push 0x0
+00428256: push eax
+00428257: push ebx
+00428258: call 0x43df7c
+0042825d: add esp,0xc
+00428260: jmp 0x428354
+00428265: mov eax,DWORD PTR [ebx+0x8c]
+0042826b: add eax,DWORD PTR [esi+0x8c]
+00428271: sar eax,1
+00428273: mov DWORD PTR [esi+0x8c],eax
+00428279: mov DWORD PTR [ebx+0x8c],eax
+0042827f: mov eax,DWORD PTR [ebx+0x90]
+00428285: add eax,DWORD PTR [esi+0x90]
+0042828b: sar eax,1
+0042828d: mov DWORD PTR [esi+0x90],eax
+00428293: mov DWORD PTR [ebx+0x90],eax
+00428299: mov eax,DWORD PTR [ebx+0x94]
+0042829f: add eax,DWORD PTR [esi+0x94]
+004282a5: sar eax,1
+004282a7: mov DWORD PTR [esi+0x94],eax
+004282ad: mov DWORD PTR [ebx+0x94],eax
+004282b3: cmp BYTE PTR ds:0x633ecc,0x0
+004282ba: je 0x428354
+004282c0: cmp DWORD PTR [ebx+0x82],0xd
+004282c7: jbe 0x428354
+004282cd: cmp DWORD PTR [esi+0x82],0xd
+004282d4: jbe 0x428354
+004282d6: mov ax,WORD PTR [esi+0xe4]
+004282dd: cmp ax,WORD PTR [ebx+0xe4]
+004282e4: ja 0x42831c
+004282e6: xor edx,edx
+004282e8: mov dl,BYTE PTR [ebx+0x86]
+004282ee: push edx
+004282ef: movzx eax,ax
+004282f2: add eax,eax
+004282f4: push eax
+004282f5: push esi
+004282f6: call 0x43df7c
+004282fb: add esp,0xc
+004282fe: xor eax,eax
+00428300: mov al,BYTE PTR [esi+0x86]
+00428306: push eax
+00428307: movzx eax,WORD PTR [esi+0xe4]
+0042830e: add eax,eax
+00428310: push eax
+00428311: push ebx
+00428312: call 0x43df7c
+00428317: add esp,0xc
+0042831a: jmp 0x428354
+0042831c: xor eax,eax
+0042831e: mov al,BYTE PTR [ebx+0x86]
+00428324: push eax
+00428325: movzx eax,WORD PTR [ebx+0xe4]
+0042832c: add eax,eax
+0042832e: push eax
+0042832f: push esi
+00428330: call 0x43df7c
+00428335: add esp,0xc
+00428338: xor eax,eax
+0042833a: mov al,BYTE PTR [esi+0x86]
+00428340: push eax
+00428341: movzx eax,WORD PTR [ebx+0xe4]
+00428348: add eax,eax
+0042834a: push eax
+0042834b: push ebx
+0042834c: call 0x43df7c
+00428351: add esp,0xc
+00428354: pop esi
+00428355: pop ebx
+00428356: pop ebp
+00428357: ret 
