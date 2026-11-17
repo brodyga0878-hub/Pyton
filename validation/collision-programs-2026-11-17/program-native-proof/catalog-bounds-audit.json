@@ -1,0 +1,26 @@
+{
+  "schema": "starfrontier-collision-program-catalog-bounds-audit-v1",
+  "status": "verified_structural_references",
+  "resource_path": "data/ffe_collision_programs.json",
+  "resource_sha256": "7ccd9884e0c05fc4d645347301112ab972d83c40780243325f3e907d5f527013",
+  "models": 178,
+  "explicit_plane_references": 985,
+  "nested_model_record_references": 158,
+  "terrain_records": 37,
+  "conditional_records": 57,
+  "invalid_normal_vertex_read_bounds": 0,
+  "missing_nested_targets": 0,
+  "undefined_F580_axis6_or7": 0,
+  "negative_signed_F580_vertex_codes": 0,
+  "nested_graph_acyclic": true,
+  "maximum_nested_depth": 2,
+  "equipment_indices": [
+    1,
+    2,
+    23
+  ],
+  "maximum_equipment_read_end_byte": 204,
+  "source_body_bytes": 338,
+  "class_C0_with_volume80_clear": 0,
+  "scope": "Structural reference/buffer audit of the frozen extracted resource catalogue; not new expected physics, complete F581 terrain execution, Main or Android validation."
+}

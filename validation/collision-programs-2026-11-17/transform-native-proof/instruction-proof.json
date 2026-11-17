@@ -1,0 +1,42 @@
+{
+  "schema": "starfrontier-original-collision-transform-proof-v1",
+  "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_procedures_sha256": "18a6b3ae780693c344ec862fb73a4aabc4bd901af2352123a03f83ff5d7ef011",
+  "bindings": {
+    "DATA_007756": 5249096,
+    "FUNC_000582": 4361204
+  },
+  "procedures": {
+    "580": {
+      "virtual_address": 4359216,
+      "executable_offset": 102960,
+      "byte_length": 444,
+      "hex": "558bec83c4d053568b5d0c8b451050ff1548185000598bf08b460c8945dc8b46048945e08b46140346188945e48b43188945e80fbe4514d1f88d04408b53108b0c42894df8668b4c420466894dfcf6451401740b0fbe45faf7d88945eceb070fbe45fa8945ec0fbe45fb8945f00fbe45fc8945f48b43142b431885c07d13f7d88bc8d37dec8bc8d37df08bc8d37df4eb1385c0740f8bc8d365ec8bc8d365f08bc8d365f48b032b45ec8945ec8b43042b45f08945f08b43082b45f48945f4807d180075178b45ec8945d08b45f08945d48b45f48945d8e9bc0000008a4518a8207403f75deca8107403f75df0a8087403f75df48a451883e00783f8050f8795000000ff2485398542005185420065854200798542008d854200a1854200b58542008b45ec8945d08b45f08945d48b45f48945d8eb628b45ec8945d48b45f08945d88b45f48945d0eb4e8b45ec8945d88b45f08945d08b45f48945d4eb3a8b45ec8945d88b45f08945d48b45f48945d0eb268b45ec8945d48b45f08945d08b45f48945d8eb128b45ec8945d08b45f08945d88b45f48945d48b451c508b4520508b4634508d45d0508b450850e81406000083c4140fbec05e5b8be55dc3",
+      "sha256": "8c110f8d3f17f230bc93dab144bd2a6caf42b5360d4e1dae231cb71e02f4d20f",
+      "instruction_count": 152,
+      "normalized_instruction_sha256": "214b09af87432f701e25bd39f548d9620e3f1717c8600ebb5b12dd574a76b157",
+      "equivalent_MOV_encoding_only": true,
+      "all_whole_instructions_equal": true
+    }
+  },
+  "embedded_table": {
+    "virtual_address": 4359481,
+    "hex": "5185420065854200798542008d854200a1854200b5854200",
+    "targets_u32": [
+      4359505,
+      4359525,
+      4359545,
+      4359565,
+      4359585,
+      4359605
+    ],
+    "sha256": "ad5a9f9f3cd72bbbe1b0dd69437146e38572885307ae62c3508352d693b42ac9"
+  },
+  "host_adaptations": [
+    "Reviewed64 cdecl stack/register adaptation, raw32 arithmetic and low-address source buffers",
+    "Six original DWORD table slots retained; host jump loads32-bit target into EAX then jumps RAX",
+    "F1538 returns an explicitly supplied full model descriptor; F582 records the exact full transformed context/threshold/body and supplied signed-byte return"
+  ],
+  "scope": "Whole original F580 coordinate preparation and exact recursive F582 request. No F582 program execution, universal model geometry, Main or Android claim."
+}

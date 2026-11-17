@@ -1,0 +1,533 @@
+{
+  "schema": "starfrontier-f576-f579-whole-instruction-proof-v1",
+  "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "procedures": {
+    "576": {
+      "virtual_address": 4357752,
+      "executable_offset": 101496,
+      "byte_length": 466,
+      "sha256": "2b8ae8b0a52f16b8fb101879618218e83dd9852ccecb97090c7cb3f611439227",
+      "instruction_count": 159,
+      "normalized_instruction_sha256": "4a9e41766bd5b0a51b9981f6c6b1c7c2a1050bd686803f4b8edb97664f1c7752",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "579": {
+      "virtual_address": 4359000,
+      "executable_offset": 102744,
+      "byte_length": 215,
+      "sha256": "f535e8001ef4989a30b2189a20157425ce67970d55959a6b06bae7a64902c218",
+      "instruction_count": 87,
+      "normalized_instruction_sha256": "357a7db6dcbb6be55d08348c1a58e8d0eef5b2c6476a6048de42cf7abc25574b",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1334": {
+      "virtual_address": 4515887,
+      "executable_offset": 259631,
+      "byte_length": 25,
+      "sha256": "84354768135502d9299208c8bd43b3b99aa18363d2bdfb0fe11690cd0fb5d7bb",
+      "instruction_count": 13,
+      "normalized_instruction_sha256": "7833d55bfec9b4d4cd6ac0fe4ae49def2871850a01e46037fc728458119098b1",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1658": {
+      "virtual_address": 4561616,
+      "executable_offset": 305360,
+      "byte_length": 44,
+      "sha256": "6bdbafa74820fd4a83d1e5dfdb85032acacc6fd0e1636b481ac3f18af1ad065f",
+      "instruction_count": 23,
+      "normalized_instruction_sha256": "ee101255a4019a0c7d7e4e372bdc426e50b6f1ab72d614b370e79a41bc813f3a",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1657": {
+      "virtual_address": 4561408,
+      "executable_offset": 305152,
+      "byte_length": 207,
+      "sha256": "86d7da85e49ea3ddca538301d8ff1595065c0fb8e2a52ad7dd1b35b68bcbd6ff",
+      "instruction_count": 84,
+      "normalized_instruction_sha256": "8248127cd6d66196b4d905d201be1a2d2ba017ed215faa149d317cfafe4e45f2",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1660": {
+      "virtual_address": 4562008,
+      "executable_offset": 305752,
+      "byte_length": 177,
+      "sha256": "e23941156e2eb6f1c53020a82a29d6537e6be0b7a6af446323409fb93e3be0cc",
+      "instruction_count": 74,
+      "normalized_instruction_sha256": "dd0955a8519f7df2d6693ec66963ecfa03ef327cc77da6935c6bfb5623544ebf",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1670": {
+      "virtual_address": 4564528,
+      "executable_offset": 308272,
+      "byte_length": 209,
+      "sha256": "037f1fa90d8883d19276a9d53cbd943b53979443ee898a93e01ccdd45be455d2",
+      "instruction_count": 95,
+      "normalized_instruction_sha256": "fde73a6041c04dccecfed8c698bb446f1c738faf2e5e08011e561f750c15caf2",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1521": {
+      "virtual_address": 4535416,
+      "executable_offset": 279160,
+      "byte_length": 17,
+      "sha256": "f62a5f949cbf8da772c3cc32ae59b607e0f35cda6c3c4e1ddf848ba3b5a1b445",
+      "instruction_count": 9,
+      "normalized_instruction_sha256": "41d13ec389df5b306dbeb350873dd5272b12f7a1d61a674cb369cb6e1398f31c",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target"
+    },
+    "1341": {
+      "virtual_address": 4516184,
+      "executable_offset": 259928,
+      "byte_length": 127,
+      "sha256": "ce1f10cd3645a7e74e65b774758ad6160e67cc67d19b0ad4cbfa77dbcc454ef3",
+      "instruction_count": 57,
+      "normalized_instruction_sha256": "91f886eebe2baa0ba96dd39d1780e2873e9118a671b5d410235768a1f066a92f",
+      "all_instructions_equal": true,
+      "entry_anchor": "neighbor1334 Pos delta, then full instruction comparison"
+    }
+  },
+  "source_symbol_addresses": {
+    "DATA_007756": 5249096,
+    "DATA_008696": 6504136,
+    "DATA_008697": 6504137,
+    "DATA_008698": 6504138,
+    "DATA_008701": 6504141,
+    "DATA_008702": 6504144,
+    "FUNC_000576": 4357752,
+    "FUNC_000579": 4359000,
+    "FUNC_000582": 4361204,
+    "FUNC_001334": 4515887,
+    "FUNC_001341": 4516184,
+    "FUNC_001521": 4535416,
+    "FUNC_001538": 4537424,
+    "FUNC_001657": 4561408,
+    "FUNC_001658": 4561616,
+    "FUNC_001660": 4562008,
+    "FUNC_001670": 4564528,
+    "_LongJmp": 1895895040,
+    "_SetJmp": 1895899136,
+    "_abs": 1895903232,
+    "_memcpy": 1895907328,
+    "DATA_007835": 5259612,
+    "DATA_007836": 5259621,
+    "DATA_007837": 5259632,
+    "DATA_007838": 5259636,
+    "DATA_007839": 5259700,
+    "DATA_007840": 5259828,
+    "DATA_007841": 5259956,
+    "DATA_007842": 5259964,
+    "DATA_007638": 5225836,
+    "DATA_007637": 5209452,
+    "DATA_007843": 5260124,
+    "FUNC_001840": 4599692,
+    "FUNC_001841": 4601672,
+    "FUNC_001842": 4602012,
+    "FUNC_001843": 4602404,
+    "FUNC_001844": 4602480,
+    "FUNC_001836": 4599036,
+    "FUNC_001845": 4602660,
+    "DATA_007844": 5260796,
+    "FUNC_001849": 4603068,
+    "DATA_007845": 5260812,
+    "FUNC_001850": 4603696,
+    "FUNC_001851": 4604296,
+    "FUNC_001852": 4604912,
+    "FUNC_001853": 4605524,
+    "FUNC_001854": 4606208,
+    "FUNC_001855": 4606908,
+    "FUNC_001856": 4607608,
+    "FUNC_001857": 4608320,
+    "FUNC_001858": 4609092,
+    "FUNC_001859": 4610124,
+    "FUNC_001860": 4611176,
+    "FUNC_001861": 4612224,
+    "FUNC_001862": 4613284,
+    "FUNC_001863": 4614416,
+    "FUNC_001864": 4615564,
+    "FUNC_001865": 4616712,
+    "FUNC_001866": 4617864,
+    "FUNC_001867": 4618432,
+    "DATA_007846": 5260924,
+    "DATA_007847": 5261020,
+    "DATA_007848": 5261596,
+    "DATA_007849": 5261684,
+    "DATA_007850": 5262272,
+    "DATA_007851": 5262624,
+    "DATA_007852": 5264976,
+    "DATA_007853": 5265104,
+    "DATA_007854": 5265616,
+    "DATA_007855": 5265618,
+    "DATA_007856": 5265648,
+    "DATA_007857": 5265650,
+    "DATA_007858": 5265680,
+    "DATA_007859": 5265682,
+    "DATA_007860": 5265712,
+    "DATA_007861": 5265714,
+    "DATA_007862": 5265744,
+    "DATA_007863": 5265746,
+    "DATA_007864": 5265776,
+    "DATA_007865": 5265778,
+    "DATA_007866": 5265808,
+    "DATA_007867": 5265810,
+    "DATA_007868": 5265840,
+    "DATA_007869": 5265842,
+    "DATA_007870": 5265872,
+    "DATA_007871": 5265874,
+    "DATA_007872": 5265904,
+    "DATA_007873": 5265906,
+    "DATA_007874": 5265936,
+    "DATA_007875": 5265938,
+    "DATA_007876": 5265968,
+    "DATA_007877": 5265970,
+    "DATA_007878": 5266000,
+    "DATA_007879": 5266002,
+    "DATA_007880": 5266032,
+    "DATA_007881": 5266034,
+    "DATA_007882": 5266064,
+    "DATA_007883": 5266066,
+    "DATA_007884": 5266096,
+    "DATA_007885": 5266098,
+    "DATA_007886": 5266128,
+    "DATA_007887": 5266130,
+    "DATA_007888": 5266160,
+    "DATA_007889": 5266162,
+    "DATA_007890": 5266192,
+    "DATA_007891": 5266194,
+    "DATA_007892": 5266224,
+    "DATA_007893": 5266368,
+    "DATA_007894": 5266848
+  },
+  "source_procedures_sha256": "f7181055dd8ef0e91d9c6fd384290c4d24cbb0367ae66d077fe1b682ce0e710f",
+  "all_whole_instructions_equal": true,
+  "callback_words": [
+    {
+      "file_offset": 974652,
+      "symbol": "DATA_007638",
+      "address": 5225836
+    },
+    {
+      "file_offset": 974660,
+      "symbol": "DATA_007637",
+      "address": 5209452
+    },
+    {
+      "file_offset": 974664,
+      "symbol": "DATA_007638",
+      "address": 5225836
+    },
+    {
+      "file_offset": 974676,
+      "symbol": "DATA_007638",
+      "address": 5225836
+    },
+    {
+      "file_offset": 974684,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 974688,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 974732,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 974736,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 974780,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 974784,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 974828,
+      "symbol": "FUNC_001842",
+      "address": 4602012
+    },
+    {
+      "file_offset": 974832,
+      "symbol": "FUNC_001843",
+      "address": 4602404
+    },
+    {
+      "file_offset": 974876,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 974880,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 974924,
+      "symbol": "FUNC_001842",
+      "address": 4602012
+    },
+    {
+      "file_offset": 974928,
+      "symbol": "FUNC_001843",
+      "address": 4602404
+    },
+    {
+      "file_offset": 974972,
+      "symbol": "FUNC_001842",
+      "address": 4602012
+    },
+    {
+      "file_offset": 974976,
+      "symbol": "FUNC_001843",
+      "address": 4602404
+    },
+    {
+      "file_offset": 975020,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 975024,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 975068,
+      "symbol": "FUNC_001844",
+      "address": 4602480
+    },
+    {
+      "file_offset": 975072,
+      "symbol": "FUNC_001836",
+      "address": 4599036
+    },
+    {
+      "file_offset": 975116,
+      "symbol": "FUNC_001845",
+      "address": 4602660
+    },
+    {
+      "file_offset": 975120,
+      "symbol": "FUNC_001836",
+      "address": 4599036
+    },
+    {
+      "file_offset": 975164,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 975168,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 975212,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 975216,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 975260,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 975264,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 975308,
+      "symbol": "FUNC_001840",
+      "address": 4599692
+    },
+    {
+      "file_offset": 975312,
+      "symbol": "FUNC_001841",
+      "address": 4601672
+    },
+    {
+      "file_offset": 975356,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975360,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975364,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975368,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975372,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975376,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975380,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975384,
+      "symbol": "FUNC_001849",
+      "address": 4603068
+    },
+    {
+      "file_offset": 975388,
+      "symbol": "FUNC_001850",
+      "address": 4603696
+    },
+    {
+      "file_offset": 975392,
+      "symbol": "FUNC_001851",
+      "address": 4604296
+    },
+    {
+      "file_offset": 975396,
+      "symbol": "FUNC_001852",
+      "address": 4604912
+    },
+    {
+      "file_offset": 975400,
+      "symbol": "FUNC_001853",
+      "address": 4605524
+    },
+    {
+      "file_offset": 975404,
+      "symbol": "FUNC_001854",
+      "address": 4606208
+    },
+    {
+      "file_offset": 975408,
+      "symbol": "FUNC_001855",
+      "address": 4606908
+    },
+    {
+      "file_offset": 975412,
+      "symbol": "FUNC_001856",
+      "address": 4607608
+    },
+    {
+      "file_offset": 975416,
+      "symbol": "FUNC_001857",
+      "address": 4608320
+    },
+    {
+      "file_offset": 975420,
+      "symbol": "FUNC_001858",
+      "address": 4609092
+    },
+    {
+      "file_offset": 975424,
+      "symbol": "FUNC_001859",
+      "address": 4610124
+    },
+    {
+      "file_offset": 975428,
+      "symbol": "FUNC_001860",
+      "address": 4611176
+    },
+    {
+      "file_offset": 975432,
+      "symbol": "FUNC_001861",
+      "address": 4612224
+    },
+    {
+      "file_offset": 975436,
+      "symbol": "FUNC_001862",
+      "address": 4613284
+    },
+    {
+      "file_offset": 975440,
+      "symbol": "FUNC_001863",
+      "address": 4614416
+    },
+    {
+      "file_offset": 975444,
+      "symbol": "FUNC_001864",
+      "address": 4615564
+    },
+    {
+      "file_offset": 975448,
+      "symbol": "FUNC_001865",
+      "address": 4616712
+    },
+    {
+      "file_offset": 975452,
+      "symbol": "FUNC_001866",
+      "address": 4617864
+    },
+    {
+      "file_offset": 975456,
+      "symbol": "FUNC_001866",
+      "address": 4617864
+    },
+    {
+      "file_offset": 975460,
+      "symbol": "FUNC_001866",
+      "address": 4617864
+    },
+    {
+      "file_offset": 975464,
+      "symbol": "FUNC_001866",
+      "address": 4617864
+    },
+    {
+      "file_offset": 975468,
+      "symbol": "FUNC_001867",
+      "address": 4618432
+    },
+    {
+      "file_offset": 975472,
+      "symbol": "FUNC_001867",
+      "address": 4618432
+    },
+    {
+      "file_offset": 975476,
+      "symbol": "FUNC_001867",
+      "address": 4618432
+    },
+    {
+      "file_offset": 975480,
+      "symbol": "FUNC_001867",
+      "address": 4618432
+    }
+  ],
+  "scope": "Whole original F576/F579 and real Int64/vector/matrix arithmetic. F582 is a strict observed full prepared-context response, not an executed geometry program in this oracle. Public Godot entry separately invokes the real program module."
+}

@@ -28,18 +28,22 @@ static func _valid_core(value:Variant)->bool:
 	var objects:Variant=_objects(value.objects_hex)
 	return objects is Dictionary and str(value.root_hex).hex_decode().decode_u32(0xc0)<=114 and Frame._raw_bank(str(value.body_hex).hex_decode(),objects,str(value.flags_hex).hex_decode())
 static func _payload(value:Variant)->bool:
-	return value is Dictionary and Clock._keys(value,["enabled","classifier_observations"]) and value.enabled is bool and value.classifier_observations is Array and value.classifier_observations.size()<=Scan.LIMIT
+	if not value is Dictionary:return false
+	var keys:Array=["enabled","classifier_observations"]
+	if value.has("use_geometry"):keys.append("use_geometry")
+	return Clock._keys(value,keys) and value.enabled is bool and (not value.has("use_geometry") or value.use_geometry is bool) and value.classifier_observations is Array and value.classifier_observations.size()<=Scan.LIMIT
 static func _pack(body:PackedByteArray,objects:Dictionary,flags:PackedByteArray,root:PackedByteArray,globals:Dictionary,ticks:int,source_frame:int)->Dictionary:
 	var encoded:Dictionary={}
 	for index:int in objects:encoded[str(index)]=objects[index].hex_encode()
 	return {"body_hex":body.hex_encode(),"objects_hex":encoded,"flags_hex":flags.hex_encode(),"root_hex":root.hex_encode(),"globals":globals.duplicate(true),"frame_ticks_u32":ticks,"source_frame_byte":source_frame}
 static func _run(core:Dictionary,payload:Dictionary)->Dictionary:
-	var result:=Scan.dispatch(str(core.body_hex).hex_decode(),_objects(core.objects_hex),str(core.flags_hex).hex_decode(),str(core.root_hex).hex_decode(),core.globals,core.frame_ticks_u32,core.source_frame_byte,payload.classifier_observations,payload.enabled)
+	var result:=Scan.dispatch(str(core.body_hex).hex_decode(),_objects(core.objects_hex),str(core.flags_hex).hex_decode(),str(core.root_hex).hex_decode(),core.globals,core.frame_ticks_u32,core.source_frame_byte,payload.classifier_observations,payload.enabled,payload.get("use_geometry",false))
 	if not result.get("ok",false):return result
 	var next:=_pack(result.body,result.objects_by_index,result.flags,result.root_after,result.globals_after,int(core.frame_ticks_u32),int(core.source_frame_byte))
 	if not _valid_core(next):return _reject("invalid_raw_contact_result")
 	var boundary:=Scan.contact_boundary(str(core.body_hex).hex_decode(),result)
 	var receipt:Dictionary={"profile":PROFILE,"outputs":result.outputs.duplicate(true),"classifier_calls":Scan.json_value(result.classifier_calls),"raw_bank_after_sha256":Clock._hash(next),"frame_caller":result.caller_procedure,"contact_boundary_available":not boundary.is_empty(),"full_collision_program_VM":false,"Main_integrated":false,"damage_engine_executed":false}
+	if payload.get("use_geometry",false):receipt["actual_geometry_route"]=true
 	return {"ok":true,"core":next,"receipt":receipt,"contact_boundary":boundary}
 func is_active()->bool:return not _core.is_empty()
 func generation()->int:return _generation
@@ -49,8 +53,10 @@ func configure(body:Variant,objects:Variant,flags:Variant,root:Variant,globals:V
 	var core:=_pack(body,objects,flags,root,globals,int(frame_ticks_u32),int(source_frame_byte))
 	if not _valid_core(core):return false
 	_core=core;_generation=0;_witness={};_revision+=1;return true
-func prepare(classifier_observations:Variant=[],enabled:Variant=true)->Dictionary:
+func prepare(classifier_observations:Variant=[],enabled:Variant=true,use_geometry:Variant=false)->Dictionary:
 	var payload:Dictionary={"enabled":enabled,"classifier_observations":classifier_observations}
+	if not use_geometry is bool:return _reject("invalid_geometry_route_policy")
+	if use_geometry:payload["use_geometry"]=true
 	if not is_active() or _generation>=MAX_GENERATION or not _payload(payload):return _reject("invalid_owned_contact_scan_command")
 	payload=Scan.json_value(payload)
 	var result:=_run(_core,payload)
@@ -65,7 +71,7 @@ func commit(prepared:Variant)->bool:
 	if candidate==self or candidate.get_script()!=get_script():return false
 	var verified=get_script().new()
 	if not verified.restore(candidate.snapshot()) or verified._generation!=_generation+1 or Clock._hash(verified._witness.before_core)!=Clock._hash(_core):return false
-	var expected:=prepare(verified._witness.payload.classifier_observations,verified._witness.payload.enabled)
+	var expected:=prepare(verified._witness.payload.classifier_observations,verified._witness.payload.enabled,verified._witness.payload.get("use_geometry",false))
 	if not expected.get("ok",false) or Clock._hash(prepared.receipt)!=Clock._hash(expected.receipt) or Clock._hash(prepared.contact_boundary)!=Clock._hash(expected.contact_boundary):return false
 	_core=verified._core.duplicate(true);_generation=verified._generation;_witness=verified._witness.duplicate(true);_revision+=1;return true
 func snapshot()->Dictionary:

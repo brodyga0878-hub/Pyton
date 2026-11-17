@@ -1,0 +1,16 @@
+{
+  "status": "verified",
+  "case_count": 288,
+  "base_cases": 256,
+  "base_fresh_process_runs": 3,
+  "base_reverse_repeat_cases": 256,
+  "sequential_native_calls": 32,
+  "whole_original_procedures": 9,
+  "whole_original_instructions": 601,
+  "fixture_sha256": "bdedb3892cbb6234a3418280b25a9ca5ed4c6be47a09851ac9671162628aaf03",
+  "portable_absent_original_inputs_byte_exact": true,
+  "native_expected_arithmetic_calculated_in_python": false,
+  "native_F582_body_executed": false,
+  "public_runtime_uses_real_collision_program_module": true,
+  "Main_integrated": false
+}

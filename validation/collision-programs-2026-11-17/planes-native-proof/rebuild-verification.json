@@ -1,0 +1,14 @@
+{
+  "schema": "starfrontier-collision-planes-portable-rebuild-v1",
+  "ok": true,
+  "fixture_sha256": "d7de6044356b3554f2fcce60c7dffc2a3cff349283dd37b9b0145d11d98d7e95",
+  "case_count": 640,
+  "fresh_process_runs": 3,
+  "reverse_repeat_cases": 640,
+  "whole_DOS_procedures": 2,
+  "whole_DOS_instructions": 171,
+  "proof_copy_used": true,
+  "all_original_paths_deliberately_absent": true,
+  "fixture_byte_exact": true,
+  "expected_arithmetic_calculated_in_python": false
+}

@@ -1,0 +1,27 @@
+{
+	"Main_integrated": false,
+	"checks": 4233,
+	"consecutive_native_steps": 32,
+	"failures": 0,
+	"full_F581_terrain_executed": false,
+	"native_cases": 448,
+	"pending_cases": 1,
+	"profile": "dos-firstenc-f582-collision-program-v1",
+	"sources": {
+		"recovered-history/ground_harness/tools/native_reference.py": "50a1757168b4b886b1b48db6798d60feb4b73f6fb04176a0840a941ebdf6a1eb",
+		"scripts/source_collision_planes.gd": "fd8915050554c4a93c296d75b8d3dabfb7ef911429a236e45b8fad824272abff",
+		"scripts/source_collision_program.gd": "24959663af43c625eb2c1b0b0faf95785dcd0310e00306fb9102406647d980b7",
+		"scripts/source_collision_transform.gd": "31b6ea121e09fa5be4e3883a595e1def8671789f365bf6d4b48aee78918d5ca1",
+		"tests/test_source_collision_program.gd": "d7d29489dc58316a62695478ed912510b6d58895aab6175e510aea6e515ee0f5",
+		"tools/rebuild_source_collision_planes_native.py": "9ec06732d7cc19758db4b599a01522c4ff218f9ae173f38974b567562ead44cb",
+		"tools/rebuild_source_collision_program_native.py": "5715b4a0707ab126c18d5e38268b3cf843b6c267331cdd75f5791de1f1148b66",
+		"tools/rebuild_source_collision_transform_native.py": "578204e00affa6a417e962c71e32f4d1b3299f5329a7b955c694b1dce5f9169f",
+		"tools/rebuild_source_frame_dispatch_native.py": "09f1382d12ba085f1b615fea6abbd9b3b4e7e7e829a6e88a490391d23e1e3a03",
+		"tools/rebuild_source_natural_contact_native.py": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889",
+		"tools/rebuild_source_surface_contact_native.py": "6cb4314fbe1004eafd9476e80e9743f94c684b4a8359101d41fa6a77a572a6f9",
+		"validation/collision-programs-2026-11-17/planes-native-proof/instruction-proof.json": "26e4b916d74e92eee9f627c89ab2483c6d5ddc9b14247661392af6fb2e13c2a4",
+		"validation/collision-programs-2026-11-17/planes-native-proof/source-procedures.asm": "de55291f88597428b429769027a9dbca925212628abda8d240b80aed7174c2f1",
+		"validation/collision-programs-2026-11-17/transform-native-proof/instruction-proof.json": "7deb7ea60793e4a026ef8d75840e97f80c57e2e93da14864fad9f95fc523636e",
+		"validation/collision-programs-2026-11-17/transform-native-proof/source-procedures.asm": "18a6b3ae780693c344ec862fb73a4aabc4bd901af2352123a03f83ff5d7ef011"
+	}
+}

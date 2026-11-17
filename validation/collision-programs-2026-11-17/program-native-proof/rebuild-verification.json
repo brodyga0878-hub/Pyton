@@ -1,0 +1,26 @@
+{
+  "schema": "starfrontier-collision-program-rebuild-verification-v1",
+  "status": "verified",
+  "fixture_path": "tests/fixtures/source_collision_program_native.json",
+  "fixture_sha256": "33524f360435c560222473f16664cccec04a04292d0b4d64daa7a7ec68695b64",
+  "fixture_bytes": 4188147,
+  "case_count": 448,
+  "consecutive_native_steps": 32,
+  "fresh_process_runs": 3,
+  "reverse_repeat_cases": 448,
+  "original_instruction_counts": {
+    "582": 243,
+    "1822": 13
+  },
+  "runtime_checks": 4233,
+  "runtime_failures": 0,
+  "all_readonly_buffers_unchanged": true,
+  "portable_proof_copy_and_absent_original_args_reproduced_byte_exact": true,
+  "real_F583_F580_recursive_calls": true,
+  "F581_terrain_body_executed": false,
+  "source_model_descriptor_lookup_policy": "bounded explicit low-address resource-selector adapter; full supplied descriptor bytes and original F580 reads, not claimed original F1538 body execution",
+  "synthetic_C0_adjacent_bytes_policy": "two explicit input zero bytes supplied in synthetic fixtures; checked runtime never invents missing padding",
+  "expected_arithmetic_calculated_in_Python": false,
+  "new_APK_produced": false,
+  "Main_integrated": false
+}

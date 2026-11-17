@@ -1,0 +1,15 @@
+{
+  "status": "verified",
+  "private_original_inputs_deliberately_absent": true,
+  "fixture_byte_identical": true,
+  "fixture_sha256": "34801772f5c68a0d776d43295fc40ff8f987e442cb18153c91237c5b4138d0cd",
+  "case_count": 416,
+  "whole_original_DOS_instruction_count": 152,
+  "embedded_table_bytes": 24,
+  "fresh_process_runs": 3,
+  "reverse_repeat_cases": 416,
+  "consecutive_native_steps": 32,
+  "expected_arithmetic_calculated_in_Python": false,
+  "all_reassembled_byte_differences_are_equivalent_MOV_encodings": true,
+  "equivalent_MOV_differing_byte_count": 18
+}

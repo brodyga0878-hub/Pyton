@@ -1,0 +1,21 @@
+{
+	"checks": 4312,
+	"consecutive_original_steps": 32,
+	"failures": 0,
+	"native_cases": 650,
+	"profile": "dos-firstenc-raw-object-factory-v1",
+	"real_source_models": 149,
+	"schema": 1,
+	"scope": "Whole original DOS F1533/F1538/F1495/F1341 with explicit raw caller templates and pinned149 model contexts. All338-byte expected states come from independent native original arithmetic. Copy/in-place/model0/null-resource/physical-spec/default-drive domains, caller ownership and raw JSON boundary verified. No allocation, player creation, type87 assignment, SI/quaternion seeding or actual Main integration.",
+	"sources": {
+		"data/ffe_object_factory.json": "c2a39b98f17721b55eac7fc5d3015e39b279fb05a002401fd3120218721894a2",
+		"scripts/source_object_factory.gd": "e97a31782edb90169a13612b2c962c7467771c9f8a163e7b7b2d3b34a09b0e86",
+		"scripts/source_orbit.gd": "7091ed3bbb88e79434ce21d53b3c98bf7f01391ee8a20a736c5e7c56eef55579",
+		"tests/fixtures/source_object_factory_native.json": "0c04db1aec7ad72125599848125eab9dde1c9d32a87b0b2e732de576403ede92",
+		"tests/test_source_object_factory.gd": "47b2f54d0491ad42950ff8f8a042410295667be8a8972247a04c66429e65bc32",
+		"tools/rebuild_source_object_factory_native.py": "6a112f432a089e00054fae12ae701cabf1ca0ec2cb8d5633080e7b8c789e792a",
+		"validation/player-dispatch-2026-11-17/factory-native-proof/instruction-proof.json": "31e59984ee6e9dfd3f8d6bbc3cbf7500d8b0cd5b96470f2f7c25fe15d6c1953c",
+		"validation/player-dispatch-2026-11-17/factory-native-proof/source-procedures.s": "b81af35fca46eb3f1714fcb0aa30457234572e99cd72e4567d75c01f7679f307"
+	},
+	"type87_values_preserved": 256
+}

@@ -1,0 +1,40 @@
+{
+  "schema": "starfrontier-original-collision-planes-proof-v1",
+  "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_procedures_sha256": "de55291f88597428b429769027a9dbca925212628abda8d240b80aed7174c2f1",
+  "bindings": {
+    "FUNC_001656": 4561332,
+    "_abs": 4678200
+  },
+  "procedures": {
+    "583": {
+      "virtual_address": 4361860,
+      "executable_offset": 105604,
+      "byte_length": 371,
+      "hex": "558bec83c4d85356578b55108b450c8bc8d1f98d0c498b5a0c8b744bfa8975f8668b744bfe668975fc8a5df833c98acbd1f98d0c498b72108b3c4e897df0668b7c4e0466897df4a801742e0fbe45faf7d8c1e0088945e40fbe45fbc1e0088945e80fbe45fcc1e0088945ec33c08a45f8a801752bf65df2eb260fbe45fac1e0088945e40fbe45fbc1e0088945e80fbe45fcc1e0088945ecf6c3017403f65df28b42142b421885c07d25f7d88bc80fbe5df2d3fb895dd88bc80fbe5df3d3fb895ddc8bc80fbe45f4d3f88945e0eb218bc80fbe5df2d3e3895dd88bc80fbe5df3d3e3895ddc8bc80fbe45f4d3e08945e08b022945d88b42042945dc8b42082945e08b45d850e8abd20400598bd88b45dc50e89fd20400590bd88b45e050e893d20400590bd853e8060a03005983c0f385c07d0233c08bc88b55d8d3fa0faf55e48bc88b5ddcd3fb0faf5de803d38bc88b5de0d3fb0faf5dec03d3f7da03d28bc88b4508d3f83bd00f9dc083e0015f5e5b8be55dc3",
+      "sha256": "90080e9df4b70a57b9697873caca5a334018801dc338946fb26406ea8096bfbe",
+      "instruction_count": 142,
+      "normalized_instruction_sha256": "1c3f33676f52090d8e1fbbb8066b43e3e62729f61d09da8baa9bd13c9d0b534d",
+      "all_full_procedure_instructions_equal": true
+    },
+    "1656": {
+      "virtual_address": 4561332,
+      "executable_offset": 305076,
+      "byte_length": 74,
+      "hex": "558bec8b45083d00000100720ac1e810ba10000000eb0233d23d000100007206c1e80883c20883f8107206c1e80483c20483f8047206c1e80283c20283f80272058d42015dc38bc25dc3",
+      "sha256": "8bdce1d3d508b9cbf7d5fcbbf261407789d7bbf8fd917a4225db88c6d5aa2949",
+      "instruction_count": 29,
+      "normalized_instruction_sha256": "fb3430703e53a390c573480dc2a76a799a82e386edd80d2d0e4df2494995dbb6",
+      "all_full_procedure_instructions_equal": true
+    }
+  },
+  "abs_hex": "558bec8b450885c07d068bd0f7daeb028bd08bc25dc3",
+  "host_adaptations": [
+    "Reviewed ELF64 cdecl stack-slot/register adapter; original geometry operations remain signed32",
+    "Low-address raw point, normal and vertex buffers; source pointers remain four-byte fields",
+    "MOV-only observation before SETNL preserves all source arithmetic and flags",
+    "Abs/FindMSB entry counters preserve original instruction-visible values"
+  ],
+  "scope": "Whole DOS F583 packed-plane predicate and F1656 FindMSB, original Watcom abs behavior. No stream decoder, F580 recursion, F576 classifier, Main or physical Android claim."
+}

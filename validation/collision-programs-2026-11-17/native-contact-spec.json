@@ -1,0 +1,8 @@
+{
+  "name": "collision_contact",
+  "generator": "tools/rebuild_source_collision_contact_native.py",
+  "fixture": "tests/fixtures/source_collision_contact_native.json",
+  "kind": "proof_asm",
+  "proof_dir": "validation/collision-programs-2026-11-17/contact-native-proof",
+  "supplemental": true
+}

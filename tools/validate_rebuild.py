@@ -44,6 +44,12 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_collision_resources', 'tests/test_source_collision_resources.gd', 'Exact original collision programs for149 primary and29 nested models, packed reads/children and portable original byte-span extraction.', timeout=300),
+    Suite('source_collision_planes', 'tests/test_source_collision_planes.gd', 'Whole DOS F583 packed-plane arithmetic, normal/vertex origins, mirrors, shifts and independent native controls.', timeout=300),
+    Suite('source_collision_transform', 'tests/test_source_collision_transform.gd', 'Whole DOS F580 nested coordinate transforms, six actual axis permutations, source shifts and recursive byte return.', timeout=300),
+    Suite('source_collision_program', 'tests/test_source_collision_program.gd', 'Whole DOS F582/F1822, allfour classes and conditions, actual F583/F580 recursion and matched F581 terrain continuation.', timeout=300),
+    Suite('source_collision_geometry', 'tests/test_source_collision_geometry.gd', 'Whole DOS F576/F579 child loop/preparation with original arithmetic, real program route and strict terrain transport.', timeout=300),
+    Suite('source_collision_contact', 'tests/test_source_collision_contact.gd', 'Actual F575 geometry composition, original scan/state optional route, cold replay and independent composed native controls.', timeout=300),
     Suite('source_pair_response', 'tests/test_source_pair_response.gd', 'Actual DOS F578 pair response, signed wrapped velocity, damage callback reloads and complete raw native controls; JJFFE replacement excluded.', timeout=300),
     Suite('source_contact_classifier', 'tests/test_source_contact_classifier.gd', 'Whole DOS F575 routing, actual F577 and DOS F578, complete player/NPC responses and matched F576/F953 boundaries.', timeout=300),
     Suite('source_contact_scan', 'tests/test_source_contact_scan.gd', 'Actual F569/F570 bank traversal connected to whole F575, frame conversions and typed contact output with explicit unresolved geometry.', timeout=300),

@@ -1,0 +1,19 @@
+{
+	"Main_integrated": false,
+	"checks": 254,
+	"failures": 0,
+	"full_collision_program_VM": false,
+	"native_cases": 32,
+	"physical_device_tested": false,
+	"profile": "dos-firstenc-owned-contact-bank-v1",
+	"schema": 1,
+	"sources": {
+		"scripts/source_contact_classifier.gd": "523e115216a394847b4ce60c2fbad213381958a3fadece18dd2d04f896db8445",
+		"scripts/source_contact_scan.gd": "62b3fb96475a8a74c132da0df6c7509c79f3836fbd66186aefbd53ae000f3b4b",
+		"scripts/source_contact_scan_state.gd": "614ec7cdcec74c2b6a41b2a32af6ba24d5bd08b28d3ae9feea44cb98cbaa088d",
+		"scripts/source_frame_dispatch.gd": "7ca0188c723c72760e93605273e6642665992270ec7f74973667de05cd84715d",
+		"scripts/source_pair_response.gd": "744c5fce8e7961dfff20c97ad6ad88f54adc99b98bed00f8fcd86e428448c7e3",
+		"tests/fixtures/source_contact_scan_native.json": "d0f5355216aeb30f5f9f66dce713609c8d13728e3992b52cf4a0c35c53ae7657",
+		"tests/test_source_contact_scan_state.gd": "c764816aff430a2520b468bb74b83c070e431781730b5fa1dfb46c4b1657c59a"
+	}
+}

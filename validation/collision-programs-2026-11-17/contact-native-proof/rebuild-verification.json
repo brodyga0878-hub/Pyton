@@ -1,0 +1,17 @@
+{
+  "schema": "starfrontier-collision-contact-portable-rebuild-v1",
+  "ok": true,
+  "case_count": 32,
+  "fixture_sha256": "c1f5ea26093f3855d75e78822f3eddf1c13d9046b331a3c3325a5e21895ada3f",
+  "proof_copy_used": true,
+  "private_original_paths_deliberately_absent": true,
+  "fixture_byte_exact": true,
+  "native_calls": {
+    "classifier": 64,
+    "geometry": 83,
+    "program": 51
+  },
+  "fresh_process_runs_each_call": 3,
+  "reverse_native_calls_verified": true,
+  "expected_arithmetic_calculated_in_python": false
+}
