@@ -1,0 +1,410 @@
+{
+  "schema": "starfrontier-reference-bank-source-update-policy-v1",
+  "status": "verified",
+  "source_commit": "4380a069c569a1a094970d226f3204112c12d2c7",
+  "source_commit_utc": "2026-11-17T08:49:27+00:00",
+  "base_archive_path": "/workspace/Pyton/deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip",
+  "base_archive_repository_path": "deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip",
+  "base_archive_bytes": 33543341,
+  "base_archive_sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d",
+  "base_source_commit": "de8eb18a687d007781321436910187dff3785775",
+  "update_archive_path": "/workspace/Pyton/deliverables/reference-bank-core-2026-11-17/StarFrontier-reference-bank-core-update.zip",
+  "update_archive_repository_path": "deliverables/reference-bank-core-2026-11-17/StarFrontier-reference-bank-core-update.zip",
+  "update_archive_bytes": 1312879,
+  "update_archive_sha256": "c1d1567d77b4eb20f5d017444fc5c27721c7984cbb5af17ccb19c6db9deb816a",
+  "update_archive_zip_entries": 104,
+  "update_actual_project_payload_files": 89,
+  "top_level_metadata_files": 1,
+  "manifest_file": "SOURCE_UPDATE_MANIFEST.json",
+  "manifest_sha256": "52b5025f066a5778d50281b497f4ca363247933a1c7ec8e021d5f4762378ca73",
+  "update_ZIP_CRC_verified": true,
+  "base_ZIP_CRC_verified": true,
+  "source_commit_comment_verified": true,
+  "strictly_below32MiB": true,
+  "requires_exact_base_archive": true,
+  "required_archive_count": 2,
+  "all_current_core_and_root_files_exact_after_overlay": true,
+  "all_current_text_proofs_included": true,
+  "all_base_source_paths_retained": true,
+  "deleted_paths": [],
+  "current_core_and_root_file_count": 1542,
+  "retained_base_source_file_count": 1660,
+  "merged_actual_project_file_count": 1743,
+  "runtime_inputs_verified": 483,
+  "unchanged_published0_28_runtime_inputs": 475,
+  "new_runtime_inputs": [
+    "scripts/source_angular_motion.gd",
+    "scripts/source_angular_motion.gd.uid",
+    "scripts/source_clock_pipeline.gd",
+    "scripts/source_clock_pipeline.gd.uid",
+    "scripts/source_flight_state.gd",
+    "scripts/source_flight_state.gd.uid",
+    "scripts/source_reference_bank.gd",
+    "scripts/source_reference_bank.gd.uid"
+  ],
+  "runtime_freeze_sha256": "f1f35a411612a862032adf96fe0754758c161bcc8a95cce381df9539d70ccdb7",
+  "payloads": {
+    "README.md": {
+      "bytes": 114150,
+      "sha256": "95556b602cbef750862258ff5df2bc9e367d523b9f7971f41ebb6fa80624b350"
+    },
+    "SOURCE_ARCHIVE_RU.md": {
+      "bytes": 81039,
+      "sha256": "12ad5c9265024ba2a9e8c8faadfbdeab9f6f1f2dbe8390bc48bf4a1b6239a7ca"
+    },
+    "docs/RECOVERY_AND_ROADMAP_RU.md": {
+      "bytes": 76103,
+      "sha256": "cae2228ae563d514ee2fe38381edf38641cc826b301081b97440b4c4e6bc652e"
+    },
+    "docs/RELEASE_0_28_0_RU.md": {
+      "bytes": 9064,
+      "sha256": "a5a2671179b7e30c28fa2689ce4da9df980c5aa2fb77626bb8e02415bc092fe4"
+    },
+    "docs/SOURCE_NATIVE_STATION_RU.md": {
+      "bytes": 11417,
+      "sha256": "c6143eb1a9043b25bcd3073504a9b63d7f547838d36d9a5b9531802550c8c1c3"
+    },
+    "docs/SOURCE_REFERENCE_BANK_RU.md": {
+      "bytes": 8428,
+      "sha256": "c1c38d9828c7971732190b18a7e8230baae9b192d3a56be2cfe5eaecfd7097a7"
+    },
+    "scripts/source_angular_motion.gd": {
+      "bytes": 6741,
+      "sha256": "e4af479bcfcbfb7bbb927aedeae64d0859dc5d40f39b90ef7e5f942a75051a52"
+    },
+    "scripts/source_angular_motion.gd.uid": {
+      "bytes": 20,
+      "sha256": "583a9c3bfba99a903392ed75e807ffe280f9186fad5f42719ac86c9d8d38a740"
+    },
+    "scripts/source_clock_pipeline.gd": {
+      "bytes": 9272,
+      "sha256": "dd95f4c243fd8043523d4ae574b96c5b96fe5487cb395b70556a0248405c39e9"
+    },
+    "scripts/source_clock_pipeline.gd.uid": {
+      "bytes": 19,
+      "sha256": "e8074c97615fd8b7d4a4ee34f9388293108d4b01686cbb3b739c9d60a8c5a9c2"
+    },
+    "scripts/source_flight_state.gd": {
+      "bytes": 11666,
+      "sha256": "29e7ddacef8bee8db1d36a6e5af6443dfe492585bfb53ad0a38239a022ec8d83"
+    },
+    "scripts/source_flight_state.gd.uid": {
+      "bytes": 20,
+      "sha256": "12e28d373ad8b9e1997ab2f2a858ef38774ed2115b1ecf516ea2fb9f171ba2da"
+    },
+    "scripts/source_reference_bank.gd": {
+      "bytes": 18804,
+      "sha256": "ac9f40bb3572a8bb819ae2c0397c7b8f4685491f3e50275dd86cd7381765a251"
+    },
+    "scripts/source_reference_bank.gd.uid": {
+      "bytes": 21,
+      "sha256": "a93f21c51b88913323e4dbb11a4bcee86bd1d0da7d94f57cfa08f750d28a9b6d"
+    },
+    "tests/fixtures/source_angular_native.json": {
+      "bytes": 1310892,
+      "sha256": "ddcd81328d778ed5225f878e561f65188e4bebdabba6e61e21c36a88b44bdf84"
+    },
+    "tests/fixtures/source_clock_pipeline_native.json": {
+      "bytes": 821134,
+      "sha256": "88ea9774bef2a5a36dc2f4011f5c59b1c8f44ca382b8ade21df4906120ddfc62"
+    },
+    "tests/fixtures/source_reference_bank_native.json": {
+      "bytes": 3363129,
+      "sha256": "474763d258cfcf694f7521cf7fb8e1637fc31f090961179780d35dc71fb4cb45"
+    },
+    "tests/test_source_angular_motion.gd": {
+      "bytes": 7714,
+      "sha256": "379c0f35ed5b7e609e65ac72ae2265979a427d199b1fd04004234f27714de87e"
+    },
+    "tests/test_source_angular_motion.gd.uid": {
+      "bytes": 20,
+      "sha256": "f6f4913af6297a7114cb35c76ffcfd6136ef69cc2c333797f03859b382e9b3fb"
+    },
+    "tests/test_source_clock_pipeline.gd": {
+      "bytes": 8263,
+      "sha256": "0e718eab6e2deab7f9cab2070d19d2f32244d402d57053953606b1e75747695a"
+    },
+    "tests/test_source_clock_pipeline.gd.uid": {
+      "bytes": 20,
+      "sha256": "e6ab167367b508b51c0b151795ccee516cd5fe56b977ebf4872033687187fc72"
+    },
+    "tests/test_source_flight_state.gd": {
+      "bytes": 21955,
+      "sha256": "36a28a20280452dfa0fbb0a9f410628bda093bfad9cc5746dd4dc880ef95124c"
+    },
+    "tests/test_source_flight_state.gd.uid": {
+      "bytes": 20,
+      "sha256": "7e54bc4c461ab2a2a86d83a21840075cd562957e7d2af4deea8b2a617c82f697"
+    },
+    "tests/test_source_reference_bank.gd": {
+      "bytes": 18158,
+      "sha256": "891f4541756f63589c8c364792cbfb4a63183233cef046f29652e11f5bec410a"
+    },
+    "tests/test_source_reference_bank.gd.uid": {
+      "bytes": 21,
+      "sha256": "b7104b8e35b6fd86884fe28a47a365893c2714bca5f55823f69eb7ce3b3c9a6e"
+    },
+    "tools/rebuild_source_angular_native.py": {
+      "bytes": 19672,
+      "sha256": "a6bff5508c0fd9cb02e61af69826bec536703f5429181ddb9816908dabb51ef1"
+    },
+    "tools/rebuild_source_clock_pipeline_native.py": {
+      "bytes": 22473,
+      "sha256": "142bc1d64ed6ac6ced90d5c15b847beebcf8f709675c101243e8cb046e0244e2"
+    },
+    "tools/rebuild_source_reference_bank_native.py": {
+      "bytes": 20598,
+      "sha256": "74d7450c081665ae8a4caed78c52a4657e686f32f3593e316e526b30395a0173"
+    },
+    "tools/validate_rebuild.py": {
+      "bytes": 58107,
+      "sha256": "d8124c15b9280206c67f1acf983ed0f6ae403f54e4b0c3d181c46eb9ace33f41"
+    },
+    "validation/reference-bank-2026-11-17/angular-native-proof/angular-native.s": {
+      "bytes": 15245,
+      "sha256": "fc9d708dd76d8860d04eea45f40167a23e3f1700782d92c118293645498fd3ec"
+    },
+    "validation/reference-bank-2026-11-17/angular-native-proof/dos-disassembly.txt": {
+      "bytes": 20894,
+      "sha256": "4f2515504e8fdc4436e10dfb95566f9e8afabf51124d5e9d19d41aabbc59074e"
+    },
+    "validation/reference-bank-2026-11-17/angular-native-proof/godot-test.log": {
+      "bytes": 120,
+      "sha256": "4ff13c4eb6707425ab465dbdda1399896febf2c4a503813d415b4adde72f65a5"
+    },
+    "validation/reference-bank-2026-11-17/angular-native-proof/instruction-proof.json": {
+      "bytes": 12092,
+      "sha256": "a40aa86b4400a54ff2e6fdd203cbf4c544e2498ae94138cfb5a729a3c7a290ea"
+    },
+    "validation/reference-bank-2026-11-17/angular-native-proof/source-procedures.s": {
+      "bytes": 14995,
+      "sha256": "b02e82ed48d4d375990e051bd208fe4faf8299e800eaf6e3bd9456dec636dd39"
+    },
+    "validation/reference-bank-2026-11-17/angular-native-proof/validation.json": {
+      "bytes": 2919,
+      "sha256": "5ed47dfc61ae102cd3203506d2bfc3fd462d99b81a9231955499ccd647ccd6d7"
+    },
+    "validation/reference-bank-2026-11-17/clock-native-proof/clock-observed.S": {
+      "bytes": 6406,
+      "sha256": "91b6c187d805f0adb7498d50a76f36d7177243df65949028434d3808e73c8edb"
+    },
+    "validation/reference-bank-2026-11-17/clock-native-proof/clock-observed.ld": {
+      "bytes": 385,
+      "sha256": "5a5f1fd07587ca54913d4b56bf04343480ed65524cd8b07da594b2179fc270a4"
+    },
+    "validation/reference-bank-2026-11-17/clock-native-proof/clock-source32.S": {
+      "bytes": 1737,
+      "sha256": "c796cd1b90e4aebcb3a9d74ea8b7d0553e6532d39971f29aee17e925d397a7c9"
+    },
+    "validation/reference-bank-2026-11-17/clock-native-proof/dos-clock-admission.txt": {
+      "bytes": 1530,
+      "sha256": "eebc50f8ab7383a90462e7bdeb8ebc5cdc4a16a90cab28eeb7519a2c65cd295e"
+    },
+    "validation/reference-bank-2026-11-17/clock-native-proof/jjffe-clock-admission-reference.asm": {
+      "bytes": 1188,
+      "sha256": "31624900cc6298a2a920945535a188d535894f736bc88bd7a17ede2adfe9594f"
+    },
+    "validation/reference-bank-2026-11-17/clock-native-proof/validation.json": {
+      "bytes": 3997,
+      "sha256": "f75577ffb1e4fbfa255ca83f9eae64a6b3f60d0a2bb69f205a2ddc551d8278db"
+    },
+    "validation/reference-bank-2026-11-17/final-targeted-summary.json": {
+      "bytes": 11144,
+      "sha256": "0b5b087da26c875beeb9d720e856b2cf44db9aabe27ceef229bce176677b72bc"
+    },
+    "validation/reference-bank-2026-11-17/godot-import.log": {
+      "bytes": 1690,
+      "sha256": "eb527a4d18011e2e6bb7f75588e1f5128c699e3de788887b9772e1a8c58f1990"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/README.md": {
+      "bytes": 3182,
+      "sha256": "624e57cf08f92a04513a4ab4ae5959d5d14b925f8f18ed12421c3eb994627b67"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1333.txt": {
+      "bytes": 339,
+      "sha256": "8028a7ec6c2598cac257078b369524dd8076cb4a80ff099b71662ecf4d904b63"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1335.txt": {
+      "bytes": 339,
+      "sha256": "9b08d21bb4ec30d9abd33568aea2af6aec5f25bbd88bcb93f1041b496c173fb8"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1517.txt": {
+      "bytes": 1239,
+      "sha256": "c6c83242bed2bca5be66a0f0fc7a0ea207638574e29cc9f94329ccea569f376d"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1521.txt": {
+      "bytes": 209,
+      "sha256": "38545335a9b30c4a694ee19e9ab54e3565a6fba46f21ba1a7bbd370e72edd2b9"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1531.txt": {
+      "bytes": 309,
+      "sha256": "3c8a703b8e24632787559d1b91117a8af7f95daca1f2b50a95634ff424ea8d7d"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1532.txt": {
+      "bytes": 307,
+      "sha256": "482c3c675e54120bc13377b5cec0dd0a3c4aab064dd39ceb8b978a3615f71623"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1533.txt": {
+      "bytes": 3623,
+      "sha256": "d0362862e52e641d5226af514cc67cfbb8710101f1e88407ae4ac5f11502a725"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1657.txt": {
+      "bytes": 2164,
+      "sha256": "991daeb0808636344b76cd274b732400af1fcc7421b7daac443743033bc17874"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1658.txt": {
+      "bytes": 503,
+      "sha256": "9cf701c70861393b5f05fdd62f6c276946c49bc458d249584675f841a862d604"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1660.txt": {
+      "bytes": 2053,
+      "sha256": "d01d87b89e350e9fa06eedb3a3f45435e12e1a37e9703c1f5025d652d4cc4a1f"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1661.txt": {
+      "bytes": 889,
+      "sha256": "c53229d697d64642db61fbe16ba4eabb690f0b62e4d1a6d060ed430e4ed223fe"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1662.txt": {
+      "bytes": 889,
+      "sha256": "ea8ace3c5da292d062332fb0b48c9459bea613230c3ab08ae20bc43ad2fb840c"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1663.txt": {
+      "bytes": 903,
+      "sha256": "0278087feeabc5274d0ad5716163f6f0e7430c87980cffeead3f0a656626e505"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1669.txt": {
+      "bytes": 2410,
+      "sha256": "6da64e08911a9d1925382abee8afef85d1a57e41630fa01c8d98bea82e16b6ca"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1677.txt": {
+      "bytes": 2578,
+      "sha256": "abeedc87619507599aa10210ad3b9fdad1f17f18015bfd66b328a23332556e7a"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F1678.txt": {
+      "bytes": 1222,
+      "sha256": "0d2fd021f2ff8aef2ae33eb8bbe6dfe9d3e6c7f5e4843667b3395065b560fb80"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F590.txt": {
+      "bytes": 997,
+      "sha256": "c56d80aea2191d3e1822cf0032a56e8d7576451630e3e3fec65e658802d97853"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F595.txt": {
+      "bytes": 2583,
+      "sha256": "54e1acedb78475e4b64cf338f005d45395c2a3d273e1bbef6b643d35af2659c1"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F604.txt": {
+      "bytes": 1493,
+      "sha256": "f5f52810c7aa3676092a7b7dab8df1bc08c0cb129673184952e2b4a0aba21c4f"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F605.txt": {
+      "bytes": 1659,
+      "sha256": "34b013a057d42ba678416f9dc551df971c472af688b3704a5729e2dfb79f0a3f"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/dos-F606.txt": {
+      "bytes": 4756,
+      "sha256": "ba979d7bd97d717c503123cf154688764c8b98e5cb04f4b9f4a384757406f36a"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/instruction-proof.json": {
+      "bytes": 22777,
+      "sha256": "19de6abe6d40e9ba2e94d0c60213dbbaeeb33eee01692b1c9de8416010b38554"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/reference-bank-observed-kernel.s": {
+      "bytes": 24425,
+      "sha256": "3598d2b6597c9a0a33ff8a19368ed744e9cedfc262cfe391a62655dfcd5fd7f2"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/reproduction.json": {
+      "bytes": 332,
+      "sha256": "c86bc1b09e9d2670a21c1176c8f1988d7fc8326087ae1496629186a808a46fcf"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/validate_source_reference_bank_native.py": {
+      "bytes": 5296,
+      "sha256": "4630e64c6c92f8dff4a62e89ef9c22353c467c886cc6c2b952fa4ce1e6f35d53"
+    },
+    "validation/reference-bank-2026-11-17/native-proof/validation.json": {
+      "bytes": 1105,
+      "sha256": "cf77505ac7fb978f696cc097c6904bde60aa3f1396eca30452407a525902e28b"
+    },
+    "validation/reference-bank-2026-11-17/native-source-pins.json": {
+      "bytes": 1055,
+      "sha256": "7fd0971eaf005dd0649c17581f092182350dad9d05b0de51187210b622a6ec67"
+    },
+    "validation/reference-bank-2026-11-17/regression-summary.json": {
+      "bytes": 12193,
+      "sha256": "9685913d49c790691a5b7014807b65d7709f6e632f29d15799cb30dbfc7c5b54"
+    },
+    "validation/reference-bank-2026-11-17/regression/logs/flight_time_controller.log": {
+      "bytes": 128,
+      "sha256": "b53b43e65f62372860d06f939b76e493c80c702a3858896a93ee7acb915d7f76"
+    },
+    "validation/reference-bank-2026-11-17/regression/logs/source_angular_motion.log": {
+      "bytes": 120,
+      "sha256": "4ff13c4eb6707425ab465dbdda1399896febf2c4a503813d415b4adde72f65a5"
+    },
+    "validation/reference-bank-2026-11-17/regression/logs/source_clock.log": {
+      "bytes": 194,
+      "sha256": "9056bf866be286569e270109f729e9a27bcb7e364d82894ba8868ba62f6eb2ac"
+    },
+    "validation/reference-bank-2026-11-17/regression/logs/source_clock_pipeline.log": {
+      "bytes": 126,
+      "sha256": "ce00a4d2dbff40e2207bf60be4732a4dff5cb2a1a9e07ee7a192f3b442a44bcb"
+    },
+    "validation/reference-bank-2026-11-17/regression/logs/source_flight_state.log": {
+      "bytes": 118,
+      "sha256": "fcddd7fe6f59901627db75d050e1176b8b35530b75897380a6cd3b4d675e5dd3"
+    },
+    "validation/reference-bank-2026-11-17/regression/logs/source_frame_kinematics.log": {
+      "bytes": 201,
+      "sha256": "54ed2931c93bd845bba0e9b1808231003787853b50c1cceec96cd8772f557b8e"
+    },
+    "validation/reference-bank-2026-11-17/regression/logs/source_gravity.log": {
+      "bytes": 169,
+      "sha256": "260a54016615cf4ebf20b310540aaec8fd909637a7853120d0cc2130db7a7ad5"
+    },
+    "validation/reference-bank-2026-11-17/regression/logs/source_ground_surface.log": {
+      "bytes": 189,
+      "sha256": "0bef27267bfa5b18e420f10715ca0c4cb8fe330d2876a6e1cf057a54180e0b69"
+    },
+    "validation/reference-bank-2026-11-17/regression/logs/source_motion_pipeline.log": {
+      "bytes": 127,
+      "sha256": "1507e5e91ec95e962203d7856c090b7dc70d1f9e9d7b0a8a5aa96e92ecb44666"
+    },
+    "validation/reference-bank-2026-11-17/regression/logs/source_reference_bank.log": {
+      "bytes": 126,
+      "sha256": "27a9243760e8ddd1ea018aa1de5bafa7ca67ebf7b547b67a5ab52788ad3affbe"
+    },
+    "validation/reference-bank-2026-11-17/runtime-freeze.json": {
+      "bytes": 54197,
+      "sha256": "f1f35a411612a862032adf96fe0754758c161bcc8a95cce381df9539d70ccdb7"
+    },
+    "validation/reference-bank-2026-11-17/source-angular-motion.json": {
+      "bytes": 2274,
+      "sha256": "e04d20e13bde0897d5e4981216a4a0a7a63a934e53b51f9620c2ff3cae61fbce"
+    },
+    "validation/reference-bank-2026-11-17/source-clock-pipeline.json": {
+      "bytes": 893,
+      "sha256": "2d5aa741daa825a7f3fcb52320e67d49d1c0417618d68239df17674b3e242a5b"
+    },
+    "validation/reference-bank-2026-11-17/source-flight-state.json": {
+      "bytes": 1486,
+      "sha256": "08dd7507384f6a1f965ea06f00cd2befca5a708b9600125e18535056b6845846"
+    },
+    "validation/reference-bank-2026-11-17/source-reference-bank.json": {
+      "bytes": 1234,
+      "sha256": "72e2445c1dcc78815c1933d1a1fb4174baa65570516d80b0a1fa545b96796045"
+    },
+    "validation/reference-bank-2026-11-17/tools/build-reference-bank-update.py": {
+      "bytes": 19908,
+      "sha256": "1925ca729c052dfa36841f7e14b841c27254cbfab0da86944459efb67b47e61c"
+    },
+    "validation/reference-bank-2026-11-17/tools/verify-reference-bank-source-pair.py": {
+      "bytes": 20373,
+      "sha256": "fb933d13f6fbe4a7570672a7a0f42eb392e55118f9df9c873fd8d1f6a2a95f24"
+    }
+  },
+  "omitted_current_private_or_binary_proof_paths": {},
+  "new_APK_produced": false,
+  "new_playable_release_claimed": false,
+  "physical_device_tested": false,
+  "archive_builder_sha256": "1925ca729c052dfa36841f7e14b841c27254cbfab0da86944459efb67b47e61c",
+  "scope": "Immutable source foundation update. All current core/assets/data/tests/tools/docs/history and current textual proofs are reproduced by the required exact base plus this delta; all483 runtime source inputs are checked. Original raw reference-bank, angular/time/player-core work does not establish a newly integrated playable build, full long-range route, full F570/F866/event/AI bank or full clone."
+}

@@ -1,0 +1,53 @@
+{
+  "schema": "starfrontier-reference-bank-source-checkpoint-delivery-v1",
+  "checkpoint": "reference-bank-core-2026-11-17",
+  "source_commit": "4380a069c569a1a094970d226f3204112c12d2c7",
+  "created_utc": "2026-11-17T08:51:50.821963+00:00",
+  "required_archive_count": 2,
+  "base_archive": {
+    "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip",
+    "bytes": 33543341,
+    "sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d",
+    "source_commit": "de8eb18a687d007781321436910187dff3785775"
+  },
+  "files": {
+    "README_RU.md": {
+      "bytes": 3224,
+      "sha256": "a4ac92c3b5afb4e731add8f30a797ee7f8ade281f4c4f0190dc7c6fca60b8e60"
+    },
+    "StarFrontier-reference-bank-core-update.zip": {
+      "bytes": 1312879,
+      "sha256": "c1d1567d77b4eb20f5d017444fc5c27721c7984cbb5af17ccb19c6db9deb816a"
+    },
+    "functional-summary.json": {
+      "bytes": 11144,
+      "sha256": "0b5b087da26c875beeb9d720e856b2cf44db9aabe27ceef229bce176677b72bc"
+    },
+    "source-pair-verification.json": {
+      "bytes": 15709,
+      "sha256": "1a7dec04cf3308daeeead735f7a0a7ac0c1646255c2daafe4f19959c3e0776c1"
+    },
+    "source-update-policy.json": {
+      "bytes": 18931,
+      "sha256": "69a127c5e5f2928a77eb4dbe7d5265180aeb652e1a7fe0307916bc607271d99f"
+    }
+  },
+  "merged_source_files": 1743,
+  "runtime_inputs": 483,
+  "unchanged_previous_runtime_inputs": 475,
+  "current_functional_checks": 124505,
+  "unique_suites": 10,
+  "new_core_checks": 20721,
+  "new_core_suites": 4,
+  "fresh_feature_checks_separate": 20721,
+  "native_DOS_control_cases_separate": 1921,
+  "native_JJFFE_diagnostics_separate": 16,
+  "fresh_pair_verified": true,
+  "new_APK_produced": false,
+  "new_kernels_connected_to_Main": false,
+  "game_version": "0.28.0-native-station-alpha1",
+  "Android_version_code": 53,
+  "full_original_port_complete": false,
+  "physical_device_tested": false,
+  "immutable_HTTPS_verified_at_packaging": false
+}
