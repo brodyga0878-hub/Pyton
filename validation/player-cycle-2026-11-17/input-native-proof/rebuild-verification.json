@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "portable_without_original_EXE_ASM_data": true,
+  "portable_fixture_equal": true,
+  "separate_private_EXE_reproof_fixture_equal": true,
+  "all_fixture_sha256": "6644b8eaec991b79a28c6b26e3be8f1e8b2303a21f9fdb5d21019b6e8b6cfeb8",
+  "full_original_instruction_count": 220,
+  "full_original_procedures": [
+    1037,
+    1038,
+    1039,
+    1040,
+    1121
+  ],
+  "fresh_process_runs": 3,
+  "reverse_cases": 774,
+  "consecutive_original_steps": 64,
+  "Godot_input_checks": 7171,
+  "Godot_input_failures": 0
+}

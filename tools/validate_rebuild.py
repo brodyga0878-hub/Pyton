@@ -44,6 +44,12 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_player_mode', 'tests/test_source_player_mode.gd', 'Whole DOS F1008/F1009/F1010, actual29paired mode table, full raw callback responses and strict pending continuation.', timeout=300),
+    Suite('source_player_input', 'tests/test_source_player_input.gd', 'Whole original DOS F1037/F1038/F1039/F1040/F1121 input without the later JJFFE keyboard branch.', timeout=300),
+    Suite('source_player_context', 'tests/test_source_player_context.gd', 'Single raw GameRoot owner for the14 legacy control aliases and isolated roll/scratch updates.', timeout=300),
+    Suite('source_player_phase', 'tests/test_source_player_phase.gd', 'Whole DOS F1019/F1021 admission, real phase-specific kick/drift order and matched world-call boundaries.', timeout=300),
+    Suite('source_player_motion', 'tests/test_source_player_motion.gd', 'Whole DOS F1046 drift/effects and F1033/F1034 contact/decay after explicit F569 observations.', timeout=300),
+    Suite('source_player_cycle', 'tests/test_source_player_cycle.gd', 'Owned raw F1009 control composition, shared input/contact aliases and replayed cold/transaction boundaries.', timeout=300),
     Suite('source_object_factory', 'tests/test_source_object_factory.gd', 'Whole DOS F1533 raw object initialization, all149 real model resources and portable native full-record controls; no allocation or SI pose seeding.', timeout=300),
     Suite('source_object_cadence', 'tests/test_source_object_cadence.gd', 'Whole DOS F149/F144 descending object callback cadence, timers, observed table boundaries and ordered alias effects.', timeout=300),
     Suite('source_player_dispatch', 'tests/test_source_player_dispatch.gd', 'Whole DOS F1041/F1043 preparation and F1044/F1045 drift with actual shared scratch and source callback order.', timeout=300),

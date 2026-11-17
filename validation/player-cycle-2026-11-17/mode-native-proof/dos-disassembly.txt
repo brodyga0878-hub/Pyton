@@ -1,0 +1,134 @@
+F1009
+004408c4: push ebp
+004408c5: mov ebp,esp
+004408c7: push ebx
+004408c8: push esi
+004408c9: push edi
+004408ca: mov eax,DWORD PTR [ebp+0x8]
+004408cd: mov ebx,DWORD PTR [eax+0x8]
+004408d0: mov edx,DWORD PTR [eax]
+004408d2: mov ecx,edx
+004408d4: sub ecx,DWORD PTR [ebx+0xa8]
+004408da: mov esi,DWORD PTR [eax+0x4]
+004408dd: sub esi,DWORD PTR [ebx+0xac]
+004408e3: cmp edx,DWORD PTR [ebx+0xa8]
+004408e9: mov edi,0x1
+004408ee: jb 0x4408f1
+004408f0: dec edi
+004408f1: sub esi,edi
+004408f3: mov DWORD PTR [ebx+0xa8],edx
+004408f9: mov eax,DWORD PTR [eax+0x4]
+004408fc: mov DWORD PTR [ebx+0xac],eax
+00440902: mov DWORD PTR ds:0x64221c,ecx
+00440908: mov DWORD PTR ds:0x642220,esi
+0044090e: mov BYTE PTR [ebx+0x8a],0x0
+00440915: mov BYTE PTR [ebx+0x8b],0x0
+0044091c: push ebx
+0044091d: call 0x440790
+00440922: pop ecx
+00440923: push ebx
+00440924: movsx eax,BYTE PTR ds:0x642224
+0044092b: sar eax,1
+0044092d: mov eax,DWORD PTR [eax*8+0x4eee00]
+00440934: call eax
+00440936: pop ecx
+00440937: pop edi
+00440938: pop esi
+00440939: pop ebx
+0044093a: pop ebp
+0044093b: ret 
+
+F1008
+00440790: push ebp
+00440791: mov ebp,esp
+00440793: push ebx
+00440794: push esi
+00440795: mov ebx,DWORD PTR [ebp+0x8]
+00440798: mov esi,0x64213c
+0044079d: mov ax,WORD PTR [ebx+0xe8]
+004407a4: test ax,ax
+004407a7: je 0x4407e1
+004407a9: mov edx,DWORD PTR ds:0x652c0c
+004407af: cmp edx,0xffff
+004407b5: ja 0x4407d8
+004407b7: movzx eax,ax
+004407ba: cmp edx,eax
+004407bc: ja 0x4407cd
+004407be: mov ax,ds:0x652c0c
+004407c4: sub WORD PTR [ebx+0xe8],ax
+004407cb: jmp 0x4407e1
+004407cd: mov WORD PTR [ebx+0xe8],0x0
+004407d6: jmp 0x4407e1
+004407d8: mov WORD PTR [ebx+0xe8],0x0
+004407e1: cmp BYTE PTR [esi+0xe8],0x2
+004407e8: jne 0x440828
+004407ea: and WORD PTR [esi+0xc6],0xfffd
+004407f3: cmp BYTE PTR [ebx+0xff],0x1e
+004407fa: jbe 0x440813
+004407fc: test BYTE PTR [esi+0xe9],0x2
+00440803: je 0x44080a
+00440805: call 0x445aac
+0044080a: and BYTE PTR [esi+0xe9],0xfd
+00440811: jmp 0x440828
+00440813: or BYTE PTR [esi+0xe9],0x2
+0044081a: test BYTE PTR [esi+0xe9],0x2
+00440821: je 0x440828
+00440823: call 0x445aac
+00440828: test BYTE PTR [esi+0xe9],0x2
+0044082f: je 0x440857
+00440831: movzx edx,WORD PTR [ebx+0x9e]
+00440838: mov eax,ds:0x652c0c
+0044083d: shr eax,1
+0044083f: cmp edx,eax
+00440841: jbe 0x44084c
+00440843: sub WORD PTR [ebx+0x9e],ax
+0044084a: jmp 0x4408bd
+0044084c: mov WORD PTR [ebx+0x9e],0x0
+00440855: jmp 0x4408bd
+00440857: cmp BYTE PTR [esi+0xe8],0x2
+0044085e: je 0x44088c
+00440860: cmp DWORD PTR [esi+0xd8],0x186a0
+0044086a: jl 0x44088c
+0044086c: test BYTE PTR [esi+0xc6],0x2
+00440873: jne 0x440884
+00440875: push 0xffffffff
+00440877: push 0x98ce
+0044087c: call 0x444518
+00440881: add esp,0x8
+00440884: or WORD PTR [esi+0xc6],0x2
+0044088c: movzx eax,WORD PTR [ebx+0x9e]
+00440893: mov edx,DWORD PTR ds:0x652c0c
+00440899: shr edx,1
+0044089b: add eax,edx
+0044089d: cmp eax,0xffff
+004408a2: jbe 0x4408af
+004408a4: mov WORD PTR [ebx+0x9e],0xffff
+004408ad: jmp 0x4408bd
+004408af: mov eax,ds:0x652c0c
+004408b4: shr eax,1
+004408b6: add WORD PTR [ebx+0x9e],ax
+004408bd: pop esi
+004408be: pop ebx
+004408bf: pop ebp
+004408c0: ret 
+
+F1010
+0044093c: push ebp
+0044093d: mov ebp,esp
+0044093f: mov al,ds:0x642226
+00440944: cmp al,0x6
+00440946: je 0x440968
+00440948: cmp al,0x5
+0044094a: je 0x440968
+0044094c: cmp DWORD PTR ds:0x4eed78,0x0
+00440953: je 0x44095a
+00440955: call 0x443770
+0044095a: cmp DWORD PTR ds:0x4eed7c,0x0
+00440961: je 0x440968
+00440963: call 0x443834
+00440968: movsx eax,BYTE PTR ds:0x642224
+0044096f: sar eax,1
+00440971: mov eax,DWORD PTR [eax*8+0x4eee04]
+00440978: call eax
+0044097a: pop ebp
+0044097b: ret 

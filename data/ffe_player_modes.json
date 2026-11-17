@@ -1,0 +1,236 @@
+{
+  "schema": "starfrontier-source-player-modes-v1",
+  "profile": "dos-firstenc-player-mode-v1",
+  "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "root_window_bytes": 16384,
+  "table_va_u32": 5172736,
+  "table_executable_offset": 887296,
+  "table_hex": "9c0e4400b0234400480c4400b0234400741644000c39440044124400b0234400e4134400b0234400e4134400b023440048164400883a440074164400543c44003c164400803c440048164400b83c44003c164400243d440048164400943d440074164400c03d44003c164400ec3d4400481644004c3e44003c164400743e440048164400bc3e440020164400f43e4400100a4400b02344007c164400b023440074164400a841440074164400fc414400a82144007453440074164400e82244007c0944005023440074164400a4224400c4094400502344007416440010414400741644005c4144000000000000000000",
+  "table_sha256": "5ca351f375afea1a716fc26eba6ec031d211d2930c7aea3c1fc7fdc2664e3ffe",
+  "valid_phase_u8_min": 0,
+  "valid_phase_u8_max": 57,
+  "positive_odd_phases_share_preceding_pair": true,
+  "phase_pair_count": 29,
+  "modes": [
+    {
+      "phase_u8": 0,
+      "control_function_id": 1021,
+      "control_va_u32": 4460188,
+      "post_function_id": 1051,
+      "post_va_u32": 4465584
+    },
+    {
+      "phase_u8": 2,
+      "control_function_id": 1019,
+      "control_va_u32": 4459592,
+      "post_function_id": 1051,
+      "post_va_u32": 4465584
+    },
+    {
+      "phase_u8": 4,
+      "control_function_id": 1030,
+      "control_va_u32": 4462196,
+      "post_function_id": 1066,
+      "post_va_u32": 4471052
+    },
+    {
+      "phase_u8": 6,
+      "control_function_id": 1024,
+      "control_va_u32": 4461124,
+      "post_function_id": 1051,
+      "post_va_u32": 4465584
+    },
+    {
+      "phase_u8": 8,
+      "control_function_id": 1025,
+      "control_va_u32": 4461540,
+      "post_function_id": 1051,
+      "post_va_u32": 4465584
+    },
+    {
+      "phase_u8": 10,
+      "control_function_id": 1025,
+      "control_va_u32": 4461540,
+      "post_function_id": 1051,
+      "post_va_u32": 4465584
+    },
+    {
+      "phase_u8": 12,
+      "control_function_id": 1029,
+      "control_va_u32": 4462152,
+      "post_function_id": 1069,
+      "post_va_u32": 4471432
+    },
+    {
+      "phase_u8": 14,
+      "control_function_id": 1030,
+      "control_va_u32": 4462196,
+      "post_function_id": 1074,
+      "post_va_u32": 4471892
+    },
+    {
+      "phase_u8": 16,
+      "control_function_id": 1028,
+      "control_va_u32": 4462140,
+      "post_function_id": 1075,
+      "post_va_u32": 4471936
+    },
+    {
+      "phase_u8": 18,
+      "control_function_id": 1029,
+      "control_va_u32": 4462152,
+      "post_function_id": 1076,
+      "post_va_u32": 4471992
+    },
+    {
+      "phase_u8": 20,
+      "control_function_id": 1028,
+      "control_va_u32": 4462140,
+      "post_function_id": 1078,
+      "post_va_u32": 4472100
+    },
+    {
+      "phase_u8": 22,
+      "control_function_id": 1029,
+      "control_va_u32": 4462152,
+      "post_function_id": 1081,
+      "post_va_u32": 4472212
+    },
+    {
+      "phase_u8": 24,
+      "control_function_id": 1030,
+      "control_va_u32": 4462196,
+      "post_function_id": 1082,
+      "post_va_u32": 4472256
+    },
+    {
+      "phase_u8": 26,
+      "control_function_id": 1028,
+      "control_va_u32": 4462140,
+      "post_function_id": 1083,
+      "post_va_u32": 4472300
+    },
+    {
+      "phase_u8": 28,
+      "control_function_id": 1029,
+      "control_va_u32": 4462152,
+      "post_function_id": 1084,
+      "post_va_u32": 4472396
+    },
+    {
+      "phase_u8": 30,
+      "control_function_id": 1028,
+      "control_va_u32": 4462140,
+      "post_function_id": 1085,
+      "post_va_u32": 4472436
+    },
+    {
+      "phase_u8": 32,
+      "control_function_id": 1029,
+      "control_va_u32": 4462152,
+      "post_function_id": 1087,
+      "post_va_u32": 4472508
+    },
+    {
+      "phase_u8": 34,
+      "control_function_id": 1027,
+      "control_va_u32": 4462112,
+      "post_function_id": 1088,
+      "post_va_u32": 4472564
+    },
+    {
+      "phase_u8": 36,
+      "control_function_id": 1013,
+      "control_va_u32": 4459024,
+      "post_function_id": 1051,
+      "post_va_u32": 4465584
+    },
+    {
+      "phase_u8": 38,
+      "control_function_id": 1031,
+      "control_va_u32": 4462204,
+      "post_function_id": 1051,
+      "post_va_u32": 4465584
+    },
+    {
+      "phase_u8": 40,
+      "control_function_id": 1030,
+      "control_va_u32": 4462196,
+      "post_function_id": 1091,
+      "post_va_u32": 4473256
+    },
+    {
+      "phase_u8": 42,
+      "control_function_id": 1030,
+      "control_va_u32": 4462196,
+      "post_function_id": 1092,
+      "post_va_u32": 4473340
+    },
+    {
+      "phase_u8": 44,
+      "control_function_id": 1044,
+      "control_va_u32": 4465064,
+      "post_function_id": 1107,
+      "post_va_u32": 4477812
+    },
+    {
+      "phase_u8": 46,
+      "control_function_id": 1030,
+      "control_va_u32": 4462196,
+      "post_function_id": 1048,
+      "post_va_u32": 4465384
+    },
+    {
+      "phase_u8": 48,
+      "control_function_id": 1011,
+      "control_va_u32": 4458876,
+      "post_function_id": 1050,
+      "post_va_u32": 4465488
+    },
+    {
+      "phase_u8": 50,
+      "control_function_id": 1030,
+      "control_va_u32": 4462196,
+      "post_function_id": 1047,
+      "post_va_u32": 4465316
+    },
+    {
+      "phase_u8": 52,
+      "control_function_id": 1012,
+      "control_va_u32": 4458948,
+      "post_function_id": 1050,
+      "post_va_u32": 4465488
+    },
+    {
+      "phase_u8": 54,
+      "control_function_id": 1030,
+      "control_va_u32": 4462196,
+      "post_function_id": 1089,
+      "post_va_u32": 4473104
+    },
+    {
+      "phase_u8": 56,
+      "control_function_id": 1030,
+      "control_va_u32": 4462196,
+      "post_function_id": 1090,
+      "post_va_u32": 4473180
+    }
+  ],
+  "null_sentinel_phase_u8": 58,
+  "root_aliases": {
+    "mode_u8": 232,
+    "flags_u8": 233,
+    "input_mode_u8": 234,
+    "drift_ticks_low_u32": 224,
+    "drift_ticks_high_u32": 228,
+    "flags_c6_u16": 198,
+    "value_d8_s32": 216
+  },
+  "external_globals": [
+    "frame_ticks_u32",
+    "action_a_u32",
+    "action_b_u32"
+  ],
+  "scope": "Exact DOS player state control/post function table, logical function identifiers from pinned matching source layout. Function pointers are metadata only; callbacks are observed separately. Raw root window does not claim the full original GameRoot or complete player event handlers."
+}

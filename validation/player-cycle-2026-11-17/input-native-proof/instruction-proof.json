@@ -1,0 +1,98 @@
+{
+  "schema": "starfrontier-original-player-input-proof-v1",
+  "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "procedures": {
+    "1037": {
+      "virtual_address": 4463640,
+      "executable_offset": 207384,
+      "byte_length": 256,
+      "sha256": "6b9cae969f9c6ba84d0d00f97cedc7d640036142b5b54412c09120fcc7893515",
+      "instruction_count": 71,
+      "normalized_instruction_sha256": "f0f414f739839eb029947efaa90234a895b8a87720a8c3dc982930d88c7df787",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target",
+      "hex": "558bec5356578b7508bb3c216400803dae0a6300000f8de0000000f683e9000000010f85cc000000803d9411500000754383bbb8010000007d1433c08983b801000056e8b800000059e9ad0000008b83b801000050e84e420000590183b801000083bbb8010000007d0ac783b8010000ffffff7f803dae1150000075708b83b801000085c07f2ef683e90000008075648b15a8766400c1ea08528bd0582bd08993b801000085d27e4bc783b801000000000080eb3f8bbbb8010000808be9000000808b83b801000050e8da410000592983b80100008b83b80100003bf87c0485c07d1133c08983b8010000eb0780a3e90000007f56e806000000595f5e5b5dc3"
+    },
+    "1038": {
+      "virtual_address": 4463896,
+      "executable_offset": 207640,
+      "byte_length": 332,
+      "sha256": "e81e7870e1306e99a7937805cc6eadb4a5e20b7386c5a83023595c0aa8143147",
+      "instruction_count": 77,
+      "normalized_instruction_sha256": "c5a54f89e32c821088cce53e73f95b0e29a0b6ff05877bfac5e1c6b5e31e32a1",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target",
+      "hex": "558bec83c4f853568b7508bb3c2164008b83d00000008945fcff15740050008983d0000000668b83d0000000662b45fcc1e006668945f8668b83d2000000662b45fec1e006668945fa8a83ea0000003c020f84830000003c03747f80bb543f000000750c0fbf45f88bd0f7d8668945f880bb553f000000750c0fbf45fa8bd0f7d8668945fa668b45fa660186b000000080bb563f0000007510668b45f8662986b4000000e99d000000f68312020000200f8590000000668b45f8660186b200000081bbdc000000005a62027f79668b45fa662986b4000000eb6c668b45f866018304020000668b45fa662983060200006683bb06020000007d1dc683ea000000026681bb0602000000c07f3a66c7830602000001c0eb2f80bed1000000047c1dc683ea000000036681bb0602000000407c1466c78306020000ff3feb0966c78306020000ffff5e5b59595dc3"
+    },
+    "1121": {
+      "virtual_address": 4480704,
+      "executable_offset": 224448,
+      "byte_length": 84,
+      "sha256": "ce01d9a0e48c3779666a3562e92bda1c33cbe7c21ddd2552af8e1ab4d5790f97",
+      "instruction_count": 29,
+      "normalized_instruction_sha256": "df7915b001f9e7504ba54a2949f3856bdd1cb9f58c997fd094dd8f6769943701",
+      "all_instructions_equal": true,
+      "entry_anchor": "actual call/pointer target",
+      "hex": "558bec8b450833d2a9000000807407b8fffffe7feb0803c04283fa057ceac1e810408b15741150008bca81e1ff00000083f9107e140fafd089d0c1e8043dff7f00007605b8ff7f0000f72da8766400c1e8065dc3"
+    },
+    "1039": {
+      "virtual_address": 4464228,
+      "executable_offset": 207972,
+      "byte_length": 28,
+      "sha256": "7f4aaf6a19dd1d88f2d858bd66c6ecca423143e26a608f8b03e5f556d9b6a06b",
+      "instruction_count": 13,
+      "normalized_instruction_sha256": "22ad519e69c7b17567f517db6282819d8c1a9da634833d271198c8ac22b7488e",
+      "all_instructions_equal": true,
+      "entry_anchor": "neighbor1038 Pos delta, then full instruction comparison",
+      "hex": "558beca0262264003c0274043c03750a8b450850e89bfeffff595dc3"
+    },
+    "1040": {
+      "virtual_address": 4464256,
+      "executable_offset": 208000,
+      "byte_length": 102,
+      "sha256": "14e80639fd80225e8d19d097038b8374c596303ce156885a0eb4b9d71625cf6a",
+      "instruction_count": 30,
+      "normalized_instruction_sha256": "8fac77614fc8dfc14c6c8c6163c42814900c65105a721582fafe9ee5f2f5e0a5",
+      "all_instructions_equal": true,
+      "entry_anchor": "neighbor1039 Pos delta, then full instruction comparison",
+      "hex": "558becff1574005000803d26226400057452803db1115000007424f6051d2c650010741bf6051d2c6500207412803da412500000742e803dad125000007425a0262264003c0474043c06750433c0eb070fbe0526226400508b450850e8bfaeffff83c4085dc3"
+    }
+  },
+  "bindings": {
+    "DATA_007692": 5247380,
+    "DATA_007690": 5247348,
+    "FUNC_001040": 4464256,
+    "FUNC_000931": 4443552,
+    "DATA_007708": 5247652,
+    "DATA_007696": 5247409,
+    "FUNC_001037": 4463640,
+    "FUNC_001445": 4524052,
+    "DATA_007694": 5247406,
+    "DATA_007711": 5247661,
+    "DATA_009163": 6630429,
+    "DATA_008872": 6562342,
+    "FUNC_001121": 4480704,
+    "DATA_009122": 6583976,
+    "DATA_008804": 6562108,
+    "FUNC_001039": 4464228,
+    "DATA_007682": 5242996,
+    "DATA_008630": 6490798,
+    "FUNC_001038": 4463896
+  },
+  "source_procedures_sha256": "70fd1cb1abcaf9cb081482f9ec9b2e537f85473da7ae9404167b98c3d7e6cd6d",
+  "all_full_procedure_instructions_equal": true,
+  "original_root_aliases": {
+    "DATA008872": "root+EA",
+    "flight_flags": "root+E9",
+    "spin_elapsed": "root+DC",
+    "set_speed": "root+1B8",
+    "previous_GUI_accumulator": "root+D0"
+  },
+  "original_F1038_restoration": "Whole332-byte DOS body restored from original77 instructions; no inserted JJFFE CalcKeyInput/saturation/axis-camera changes.",
+  "host_adaptations": [
+    "Reviewed64bit cdecl stack/register adapter retaining original32/16/8-bit arithmetic and low-address data/stack.",
+    "Original F1038 reserves8bytes and frees them with two32bit POPs; host reservation widened8\u219216 for two64bit POPs.",
+    "GUI1445 callback returns suppliedrawu32; F931 callback records originalbodypointer andsignedmode only. No GUI/event effects executed."
+  ]
+}
