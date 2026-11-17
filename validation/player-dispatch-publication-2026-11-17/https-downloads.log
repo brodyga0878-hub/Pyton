@@ -1,0 +1,8 @@
+manifest.json: verified
+functional-summary.json: verified
+README_RU.md: verified
+source-pair-verification.json: verified
+source-update-policy.json: verified
+StarFrontier-player-dispatch-core-update.zip: verified
+StarFrontier-0.28.0-native-station-source.zip: verified
+{"status": "verified", "actual_complete_HTTPS_downloads": 7, "required_source_archives_downloaded": 2, "runtime_inputs": 492}

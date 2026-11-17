@@ -1,0 +1,75 @@
+{
+  "schema": "starfrontier-player-dispatch-source-publication-v1",
+  "status": "verified",
+  "completed_utc": "2026-11-17T10:08:23.929717+00:00",
+  "checkpoint": "player-dispatch-core-2026-11-17",
+  "artifact_commit": "4fabf7edcdcf8901b762ba6dd507c38dca659219",
+  "source_commit": "345cbc22caeee98663334ca541b9223ae6f5aedc",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4fabf7edcdcf8901b762ba6dd507c38dca659219/deliverables/player-dispatch-core-2026-11-17/manifest.json",
+      "http_status": 200,
+      "bytes": 2356,
+      "sha256": "750334e16f16586b4bd7358702438ba05b168dbc9038befa415db2acb9422dd6"
+    },
+    {
+      "file": "README_RU.md",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4fabf7edcdcf8901b762ba6dd507c38dca659219/deliverables/player-dispatch-core-2026-11-17/README_RU.md",
+      "http_status": 200,
+      "bytes": 3586,
+      "sha256": "dc0ba1387ef34287f4e9850ad11282bc7ab079081b5e8187e6ebb6e53c3a2a5a"
+    },
+    {
+      "file": "StarFrontier-player-dispatch-core-update.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4fabf7edcdcf8901b762ba6dd507c38dca659219/deliverables/player-dispatch-core-2026-11-17/StarFrontier-player-dispatch-core-update.zip",
+      "http_status": 200,
+      "bytes": 3695003,
+      "sha256": "fd7a912b2514526bcd398185869f1a2b95eb688a8ea8117cee165c56c20cdaba",
+      "zip_CRC_verified": true,
+      "source_commit_in_ZIP_comment": "345cbc22caeee98663334ca541b9223ae6f5aedc"
+    },
+    {
+      "file": "functional-summary.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4fabf7edcdcf8901b762ba6dd507c38dca659219/deliverables/player-dispatch-core-2026-11-17/functional-summary.json",
+      "http_status": 200,
+      "bytes": 16389,
+      "sha256": "88176516ee5cda07defbc60731395d2adfb429b5838b74ba859be8381baea3a8"
+    },
+    {
+      "file": "source-pair-verification.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4fabf7edcdcf8901b762ba6dd507c38dca659219/deliverables/player-dispatch-core-2026-11-17/source-pair-verification.json",
+      "http_status": 200,
+      "bytes": 36686,
+      "sha256": "c49dbcdee4f083d805981f1a166a6dfaf99f4061bdc45106d8d2bb6c53c77d3c"
+    },
+    {
+      "file": "source-update-policy.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/4fabf7edcdcf8901b762ba6dd507c38dca659219/deliverables/player-dispatch-core-2026-11-17/source-update-policy.json",
+      "http_status": 200,
+      "bytes": 44665,
+      "sha256": "fb03834753d94e8187717b51014f6c39e4b6eee546bafb1dd06e87437d31b277"
+    },
+    {
+      "file": "StarFrontier-0.28.0-native-station-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip",
+      "http_status": 200,
+      "bytes": 33543341,
+      "sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d",
+      "zip_CRC_verified": true,
+      "source_commit_in_ZIP_comment": "de8eb18a687d007781321436910187dff3785775"
+    }
+  ],
+  "actual_complete_HTTPS_downloads": 7,
+  "all_manifest_payloads_downloaded": true,
+  "manifest_payload_count": 5,
+  "required_source_archives_downloaded": 2,
+  "runtime_inputs_verified": 492,
+  "runtime_freeze_sha256": "5927607cfe1a2d2a351156fd1117bfdeb0d6818471d5408a320cf841a6e1bc54",
+  "all_current_runtime_inputs_match_frozen_source": true,
+  "new_APK_produced": false,
+  "new_kernels_connected_to_Main": false,
+  "physical_device_tested": false,
+  "full_original_port_complete": false,
+  "scope": "Seven actual complete immutable HTTPS downloads: sealed manifest, all five checkpoint payloads, and the required complete0.28 base source ZIP. Both source archive comments and CRC pass; all local payload SHA/lengths and492 frozen source inputs pass. This source foundation is not a new playable release or a flown long-range route."
+}
