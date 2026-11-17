@@ -1,0 +1,75 @@
+{
+  "schema": "starfrontier-damage-core-source-publication-v1",
+  "status": "verified",
+  "completed_utc": "2026-11-17T15:14:31.906513+00:00",
+  "checkpoint": "damage-core-2026-11-17",
+  "artifact_commit": "86d092473dce2a9b2864fbd8d8d44d968f11be00",
+  "source_commit": "e16f0e5941347fffda5c2f6f8262fb01f7336c87",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/86d092473dce2a9b2864fbd8d8d44d968f11be00/deliverables/damage-core-2026-11-17/manifest.json",
+      "http_status": 200,
+      "bytes": 2545,
+      "sha256": "914e09968f9356156143caa3476a57ce4bfe9bf70eee54806d058b066b155726"
+    },
+    {
+      "file": "README_RU.md",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/86d092473dce2a9b2864fbd8d8d44d968f11be00/deliverables/damage-core-2026-11-17/README_RU.md",
+      "http_status": 200,
+      "bytes": 4393,
+      "sha256": "e714e8243850da1103dab30b77b936fcbedf1395a8c91cc0a512a057075d35b7"
+    },
+    {
+      "file": "StarFrontier-damage-core-update.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/86d092473dce2a9b2864fbd8d8d44d968f11be00/deliverables/damage-core-2026-11-17/StarFrontier-damage-core-update.zip",
+      "http_status": 200,
+      "bytes": 14025038,
+      "sha256": "a11f927661dfd68b0e02fef8d2b46a987b5b134124a033b572f7e50ae1696cdc",
+      "zip_CRC_verified": true,
+      "source_commit_in_ZIP_comment": "e16f0e5941347fffda5c2f6f8262fb01f7336c87"
+    },
+    {
+      "file": "functional-summary.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/86d092473dce2a9b2864fbd8d8d44d968f11be00/deliverables/damage-core-2026-11-17/functional-summary.json",
+      "http_status": 200,
+      "bytes": 47516,
+      "sha256": "89be2406a246ac56d5984a43da546b358207b9931690c2fda2adee0fcdca885c"
+    },
+    {
+      "file": "source-pair-verification.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/86d092473dce2a9b2864fbd8d8d44d968f11be00/deliverables/damage-core-2026-11-17/source-pair-verification.json",
+      "http_status": 200,
+      "bytes": 87976,
+      "sha256": "021971ade4aff9358c6ce21e0e1588f7837840d57584e1db8df413c56fe3240b"
+    },
+    {
+      "file": "source-update-policy.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/86d092473dce2a9b2864fbd8d8d44d968f11be00/deliverables/damage-core-2026-11-17/source-update-policy.json",
+      "http_status": 200,
+      "bytes": 283374,
+      "sha256": "caa410fa4d749870790f1db080eadd22c153af58b585673349de3f227e591549"
+    },
+    {
+      "file": "StarFrontier-0.28.0-native-station-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip",
+      "http_status": 200,
+      "bytes": 33543341,
+      "sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d",
+      "zip_CRC_verified": true,
+      "source_commit_in_ZIP_comment": "de8eb18a687d007781321436910187dff3785775"
+    }
+  ],
+  "actual_complete_HTTPS_downloads": 7,
+  "all_manifest_payloads_downloaded": true,
+  "manifest_payload_count": 5,
+  "required_source_archives_downloaded": 2,
+  "runtime_inputs_verified": 538,
+  "runtime_freeze_sha256": "d495065dc1c3b75a53475432e807558ff828e2859cd533b3409784f0bfe57c14",
+  "all_current_runtime_inputs_match_frozen_source": true,
+  "new_APK_produced": false,
+  "new_kernels_connected_to_Main": false,
+  "physical_device_tested": false,
+  "full_original_port_complete": false,
+  "scope": "Seven actual complete immutable HTTPS downloads: sealed manifest, all five checkpoint payloads and the complete0.28 base source ZIP. SHA/lengths, both ZIP CRCs/source comments and all declared frozen runtime inputs pass. The damage/RNG/slot kernels and their state owners are separate from Main; this is not a new APK, a complete world/damage engine or an on-device result."
+}
