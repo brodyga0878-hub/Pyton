@@ -1,0 +1,76 @@
+{
+  "schema": "starfrontier-terrain-height-source-checkpoint-v1",
+  "checkpoint": "terrain-height-core-2026-11-17",
+  "source_commit": "027d76b163c9689cd41dc8746ed7e46d48aac2f4",
+  "created_utc": "2026-11-17T14:25:40.808913+00:00",
+  "required_archive_count": 2,
+  "previous_update_archive_required": false,
+  "base_archive": {
+    "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip",
+    "bytes": 33543341,
+    "sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d",
+    "source_commit": "de8eb18a687d007781321436910187dff3785775"
+  },
+  "files": {
+    "README_RU.md": {
+      "bytes": 4699,
+      "sha256": "194ccb8145c04d6d46bf24a1bc7ef25ac3bbc46640d9e5636c642e55ff0d7fa9"
+    },
+    "StarFrontier-terrain-height-core-update.zip": {
+      "bytes": 11819810,
+      "sha256": "8abe087e9b2f4859c62dc7be80a74ba420b7e14e2079d2f92f7471253c414317"
+    },
+    "functional-summary.json": {
+      "bytes": 40751,
+      "sha256": "c7a90206e0dc0fb22944def5b93d97be7a4a85bc8b299f9d3435da4a1dd776a3"
+    },
+    "source-pair-verification.json": {
+      "bytes": 78534,
+      "sha256": "c79acef01f7b360a9d66056b7c08b14379468c4fb475e2ad6624436fedf01868"
+    },
+    "source-update-policy.json": {
+      "bytes": 247323,
+      "sha256": "34662dfdede02b3dcd1edf0ccc4dbb4da1e6acc983b052d594b40bab065a0299"
+    }
+  },
+  "merged_source_files": 2267,
+  "runtime_inputs": 528,
+  "unchanged_published_game_runtime_inputs": 475,
+  "previous_backend_runtime_inputs": 524,
+  "unchanged_previous_backend_runtime_inputs": 519,
+  "changed_previous_backend_runtime_paths": [
+    "scripts/source_collision_contact.gd",
+    "scripts/source_collision_geometry.gd",
+    "scripts/source_collision_program.gd",
+    "scripts/source_contact_scan.gd",
+    "scripts/source_contact_scan_state.gd"
+  ],
+  "current_functional_checks": 216208,
+  "unique_suites": 33,
+  "new_core_checks": 5664,
+  "new_core_suites": 2,
+  "fresh_core_suites": 33,
+  "fresh_core_checks_separate": 216208,
+  "native_main_generator_count": 18,
+  "native_DOS_control_cases_separate": 8876,
+  "native_JJFFE_diagnostics_separate": 16,
+  "supplemental_native_compositions_separate": 182,
+  "native_generator_count": 23,
+  "resource_replay_count": 1,
+  "fresh_pair_verified": true,
+  "new_APK_produced": false,
+  "new_kernels_connected_to_Main": false,
+  "game_version": "0.28.0-native-station-alpha1",
+  "Android_version_code": 53,
+  "full_original_port_complete": false,
+  "physical_device_tested": false,
+  "immutable_HTTPS_verified_at_packaging": false,
+  "terrain_graphics_owner": {
+    "source_symbol": "DATA8812",
+    "root_offset_hex": "10"
+  },
+  "terrain_auxiliary_words": [
+    "DATA9283",
+    "DATA9284"
+  ]
+}

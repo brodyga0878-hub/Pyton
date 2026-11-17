@@ -1,0 +1,6 @@
+{
+  "case_count": 288,
+  "fixture_sha256": "4aafa3fbb5d9319d11955629b1c252264961aff0bc358c29133ad79cf2c08d9f",
+  "fixture_bytes": 7857050,
+  "output": "/workspace/recovery/terrain-height-source-pair-fresh/native/player_phase.json"
+}

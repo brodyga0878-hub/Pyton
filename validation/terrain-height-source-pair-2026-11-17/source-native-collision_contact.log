@@ -1,0 +1,10 @@
+{
+  "case_count": 32,
+  "actual_F582_calls": 51,
+  "native_calls": {
+    "classifier": 64,
+    "geometry": 83,
+    "program": 51
+  },
+  "fixture_sha256": "c1f5ea26093f3855d75e78822f3eddf1c13d9046b331a3c3325a5e21895ada3f"
+}

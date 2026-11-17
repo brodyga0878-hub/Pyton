@@ -1,0 +1,9 @@
+{
+  "case_count": 2,
+  "output": "/workspace/recovery/terrain-height-source-pair-fresh/native/player_frame_chain.json",
+  "sha256": "4b14fb995c23a3ffe8de2f3f324e9a14b052a7de2a3da9092ecfec2edb48f69e",
+  "wrong_order_body_differs": [
+    true,
+    false
+  ]
+}
