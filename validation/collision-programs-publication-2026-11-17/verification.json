@@ -1,0 +1,75 @@
+{
+  "schema": "starfrontier-collision-programs-source-publication-v1",
+  "status": "verified",
+  "completed_utc": "2026-11-17T13:54:14.861497+00:00",
+  "checkpoint": "collision-programs-core-2026-11-17",
+  "artifact_commit": "d6c331bb488536413f1ad9d80c7a19c6f6e72a7d",
+  "source_commit": "c3fb7596f6cdffcf1b717d764cb7a624925f2683",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/d6c331bb488536413f1ad9d80c7a19c6f6e72a7d/deliverables/collision-programs-core-2026-11-17/manifest.json",
+      "http_status": 200,
+      "bytes": 2535,
+      "sha256": "3cbbeb8a747796fe0ad6c1238d70e7e1561116d3c3bb93b053ac18ca821c2995"
+    },
+    {
+      "file": "README_RU.md",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/d6c331bb488536413f1ad9d80c7a19c6f6e72a7d/deliverables/collision-programs-core-2026-11-17/README_RU.md",
+      "http_status": 200,
+      "bytes": 4065,
+      "sha256": "9918c746052d96671b3271297636aec505512336a3c8112a1b852f04e9a3d96b"
+    },
+    {
+      "file": "StarFrontier-collision-programs-core-update.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/d6c331bb488536413f1ad9d80c7a19c6f6e72a7d/deliverables/collision-programs-core-2026-11-17/StarFrontier-collision-programs-core-update.zip",
+      "http_status": 200,
+      "bytes": 11365289,
+      "sha256": "cc023edf2c7d25f1bb85f2b8fd3594f6f1591ba53ff1593707992e6f4b9dc1f4",
+      "zip_CRC_verified": true,
+      "source_commit_in_ZIP_comment": "c3fb7596f6cdffcf1b717d764cb7a624925f2683"
+    },
+    {
+      "file": "functional-summary.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/d6c331bb488536413f1ad9d80c7a19c6f6e72a7d/deliverables/collision-programs-core-2026-11-17/functional-summary.json",
+      "http_status": 200,
+      "bytes": 38368,
+      "sha256": "7e4b67136914b523a69ac1dc31be7993f47bc2662e81ddd5a67c01940f6e7a48"
+    },
+    {
+      "file": "source-pair-verification.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/d6c331bb488536413f1ad9d80c7a19c6f6e72a7d/deliverables/collision-programs-core-2026-11-17/source-pair-verification.json",
+      "http_status": 200,
+      "bytes": 73369,
+      "sha256": "6f71e403da8bdb42e078273fe505d4f745a4b34ca39d0d67480f4ea027ace02d"
+    },
+    {
+      "file": "source-update-policy.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/d6c331bb488536413f1ad9d80c7a19c6f6e72a7d/deliverables/collision-programs-core-2026-11-17/source-update-policy.json",
+      "http_status": 200,
+      "bytes": 218292,
+      "sha256": "874319ee3854616bbbbec4c8dd6fc345723fb94a779737caa143264dfae2eb72"
+    },
+    {
+      "file": "StarFrontier-0.28.0-native-station-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip",
+      "http_status": 200,
+      "bytes": 33543341,
+      "sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d",
+      "zip_CRC_verified": true,
+      "source_commit_in_ZIP_comment": "de8eb18a687d007781321436910187dff3785775"
+    }
+  ],
+  "actual_complete_HTTPS_downloads": 7,
+  "all_manifest_payloads_downloaded": true,
+  "manifest_payload_count": 5,
+  "required_source_archives_downloaded": 2,
+  "runtime_inputs_verified": 524,
+  "runtime_freeze_sha256": "2bfc1abef4138e327d27fcc4badb5e409e0d458bcdfaf2a68f8381414afa294c",
+  "all_current_runtime_inputs_match_frozen_source": true,
+  "new_APK_produced": false,
+  "new_kernels_connected_to_Main": false,
+  "physical_device_tested": false,
+  "full_original_port_complete": false,
+  "scope": "Seven actual complete immutable HTTPS downloads: sealed manifest, all five checkpoint payloads, and the required complete0.28 base source ZIP. Both source archive comments and CRC pass; all local payload SHA/lengths and all frozen source inputs pass. The geometry kernels are separate from Main; F581 terrain and the damage engine remain explicit boundaries. This is not a new APK."
+}
