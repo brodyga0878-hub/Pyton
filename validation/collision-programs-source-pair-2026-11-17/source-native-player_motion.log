@@ -1,0 +1,10 @@
+{
+  "case_count": 600,
+  "fixture_sha256": "622178b60d3108936c868ea9ae36e95c1a72db34bb17c257e2d5fde814bf36cb",
+  "operations": {
+    "effects_f1046": 208,
+    "contact_f1033": 312,
+    "decay_f1034": 80
+  },
+  "output": "/workspace/recovery/collision-programs-source-pair-fresh/native/player_motion.json"
+}

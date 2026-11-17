@@ -1,0 +1,65 @@
+{
+  "schema": "starfrontier-collision-programs-source-checkpoint-v1",
+  "checkpoint": "collision-programs-core-2026-11-17",
+  "source_commit": "c3fb7596f6cdffcf1b717d764cb7a624925f2683",
+  "created_utc": "2026-11-17T13:52:41.452927+00:00",
+  "required_archive_count": 2,
+  "previous_update_archive_required": false,
+  "base_archive": {
+    "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip",
+    "bytes": 33543341,
+    "sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d",
+    "source_commit": "de8eb18a687d007781321436910187dff3785775"
+  },
+  "files": {
+    "README_RU.md": {
+      "bytes": 4065,
+      "sha256": "9918c746052d96671b3271297636aec505512336a3c8112a1b852f04e9a3d96b"
+    },
+    "StarFrontier-collision-programs-core-update.zip": {
+      "bytes": 11365289,
+      "sha256": "cc023edf2c7d25f1bb85f2b8fd3594f6f1591ba53ff1593707992e6f4b9dc1f4"
+    },
+    "functional-summary.json": {
+      "bytes": 38368,
+      "sha256": "7e4b67136914b523a69ac1dc31be7993f47bc2662e81ddd5a67c01940f6e7a48"
+    },
+    "source-pair-verification.json": {
+      "bytes": 73369,
+      "sha256": "6f71e403da8bdb42e078273fe505d4f745a4b34ca39d0d67480f4ea027ace02d"
+    },
+    "source-update-policy.json": {
+      "bytes": 218292,
+      "sha256": "874319ee3854616bbbbec4c8dd6fc345723fb94a779737caa143264dfae2eb72"
+    }
+  },
+  "merged_source_files": 2173,
+  "runtime_inputs": 524,
+  "unchanged_published_game_runtime_inputs": 475,
+  "previous_backend_runtime_inputs": 513,
+  "unchanged_previous_backend_runtime_inputs": 511,
+  "changed_previous_backend_runtime_paths": [
+    "scripts/source_contact_scan.gd",
+    "scripts/source_contact_scan_state.gd"
+  ],
+  "current_functional_checks": 210544,
+  "unique_suites": 31,
+  "new_core_checks": 26415,
+  "new_core_suites": 6,
+  "fresh_core_suites": 31,
+  "fresh_core_checks_separate": 210544,
+  "native_main_generator_count": 17,
+  "native_DOS_control_cases_separate": 8527,
+  "native_JJFFE_diagnostics_separate": 16,
+  "supplemental_native_compositions_separate": 146,
+  "native_generator_count": 21,
+  "resource_replay_count": 1,
+  "fresh_pair_verified": true,
+  "new_APK_produced": false,
+  "new_kernels_connected_to_Main": false,
+  "game_version": "0.28.0-native-station-alpha1",
+  "Android_version_code": 53,
+  "full_original_port_complete": false,
+  "physical_device_tested": false,
+  "immutable_HTTPS_verified_at_packaging": false
+}
