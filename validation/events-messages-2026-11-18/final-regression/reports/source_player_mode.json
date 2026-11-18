@@ -1,0 +1,41 @@
+{
+	"callback_bodies_executed": false,
+	"callback_counts": {
+		"F1062": 79,
+		"F1064": 72,
+		"F1097": 34,
+		"F1116": 155,
+		"control_phase": 164,
+		"post_phase": 140
+	},
+	"checks": 6616,
+	"consecutive_native_steps": 32,
+	"failures": 0,
+	"full_player_cycle": false,
+	"live_Main_replaced": false,
+	"native_cases": 568,
+	"observed_callback_cases": 40,
+	"pending_callback_boundaries": 102,
+	"physical_device_tested": false,
+	"profile": "dos-firstenc-player-mode-v1",
+	"schema": 1,
+	"scope": "Whole DOS F1008/F1009/F1010, exact 29 paired mode entries and odd-phase selectors, one raw16KiB root window, three non-aliased globals. Callback bodies remain explicit matched before/after observation boundaries, with strict pending prefixes for composition; this is not full handler or live Main/Android proof.",
+	"sources": {
+		"data/ffe_player_modes.json": "960a2d48ab43ca93259fe3a5618277bec998f8c6cb30671e7b234a376059e88c",
+		"recovered-history/ground_harness/tools/build_terrain_query_reference.py": "46bbaf8fb4d80bea2c73cac728bb7385e2b46618dd908e111c632cdafda0c2cc",
+		"recovered-history/ground_harness/tools/native_reference.py": "50a1757168b4b886b1b48db6798d60feb4b73f6fb04176a0840a941ebdf6a1eb",
+		"scripts/source_clock_pipeline.gd": "dd95f4c243fd8043523d4ae574b96c5b96fe5487cb395b70556a0248405c39e9",
+		"scripts/source_player_mode.gd": "fff37dabb87cd25560c42ec326e5d272b4547de7608544403afe0c46c1239a85",
+		"scripts/source_reference_bank.gd": "ac9f40bb3572a8bb819ae2c0397c7b8f4685491f3e50275dd86cd7381765a251",
+		"tests/fixtures/source_player_mode_native.json": "5f13bed8a6664f64636200b098d8485e95fad9c97c2855baab517ab8a8ebad7e",
+		"tests/test_source_player_mode.gd": "e8c1616b7c5f06a0649273bacb719c9e009da8b3fffba5f7c1639b3ce6cee4d9",
+		"tools/rebuild_ground_surface_native.py": "b90a42b63c8823daee18e41411d129285cfb572295f6650fd5db6f6183f60570",
+		"tools/rebuild_source_atmospheric_native.py": "9252d56228ba6c8b50aba384377fa91f87256591040a32110e88bd5554f04f78",
+		"tools/rebuild_source_jet_fuel_native.py": "7ed0750d60c41436feffc802a8bc7ba76647e8f07f2cefae7bbfa2a5dba660b0",
+		"tools/rebuild_source_natural_contact_native.py": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889",
+		"tools/rebuild_source_player_mode_native.py": "ba481cb81fb883d77f4e0d7203b41544371bf46b4b05cb16e7e821dee331eb1a",
+		"tools/rebuild_source_surface_contact_native.py": "6cb4314fbe1004eafd9476e80e9743f94c684b4a8359101d41fa6a77a572a6f9",
+		"validation/player-cycle-2026-11-17/mode-native-proof/instruction-proof.json": "ebe640126d4452fe6fa67e83670de4c66c11562c54fe003783d1bb11c9eca57f",
+		"validation/player-cycle-2026-11-17/mode-native-proof/source-procedures.asm": "fe31b71e2fb9a56b334949d5d4d3994e9ffb6fe3964c8736c5f8f3b4640ae053"
+	}
+}

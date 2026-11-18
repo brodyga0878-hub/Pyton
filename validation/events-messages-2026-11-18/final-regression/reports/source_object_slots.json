@@ -1,0 +1,26 @@
+{
+	"checks": 12435,
+	"failure_details": [],
+	"failures": 0,
+	"fixture_sha256": "de48450f692f7d589c067bea68eab764a313d544782d3f323de678637434bb04",
+	"full_F144_or_F942_engine": false,
+	"live_Main_integration": false,
+	"new_APK": false,
+	"profile": "dos-firstenc-object-slots-v1",
+	"sources": {
+		"data/ffe_object_factory.json": "c2a39b98f17721b55eac7fc5d3015e39b279fb05a002401fd3120218721894a2",
+		"recovered-history/ground_harness/tools/native_reference.py": "50a1757168b4b886b1b48db6798d60feb4b73f6fb04176a0840a941ebdf6a1eb",
+		"scripts/source_object_factory.gd": "e97a31782edb90169a13612b2c962c7467771c9f8a163e7b7b2d3b34a09b0e86",
+		"scripts/source_object_slots.gd": "527ea680207c864d4fbed504069c81071ab31fe3121e6890d175a84b5bd06852",
+		"scripts/source_orbit.gd": "7091ed3bbb88e79434ce21d53b3c98bf7f01391ee8a20a736c5e7c56eef55579",
+		"tests/fixtures/source_object_slots_native.json": "de48450f692f7d589c067bea68eab764a313d544782d3f323de678637434bb04",
+		"tests/test_source_object_slots.gd": "54d305597ee8c36ae37cb21bdadd3962fdcafaa717f049a2024a1d1c00dbe0c3",
+		"tools/rebuild_source_natural_contact_native.py": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889",
+		"tools/rebuild_source_object_factory_native.py": "6a112f432a089e00054fae12ae701cabf1ca0ec2cb8d5633080e7b8c789e792a",
+		"tools/rebuild_source_object_slots_native.py": "7762bae2e12b6ac7f1fa7351f298e9d86d91d894578c3bc96d6eb6e20cad99b8",
+		"validation/damage-core-2026-11-17/slots-native-proof/instruction-proof.json": "fa916027ef62c3ea15ce87b79391e4363899e37458dab4e8ef29b3dd65717b12",
+		"validation/damage-core-2026-11-17/slots-native-proof/slots-native.s": "15a6112da7d17251a1fce874b19c71a760e91f85635c168609d8d564d9bd0862",
+		"validation/damage-core-2026-11-17/slots-native-proof/source-procedures.asm": "e3a6e1fa5b500609384b3d2720447c4b42f524c9cdf52b2a41a9f03355a814c8"
+	},
+	"suite": "source_object_slots"
+}

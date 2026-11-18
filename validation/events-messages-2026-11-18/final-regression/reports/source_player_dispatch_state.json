@@ -1,0 +1,31 @@
+{
+	"checks": 4195,
+	"failures": 0,
+	"full_original_player_pipeline": false,
+	"live_Main_motion_replaced": false,
+	"native_eligible_callback_cases": 347,
+	"native_observer_cases_with_actual_F606_cache": 36,
+	"parent_identity_adapter_cases": 347,
+	"physical_device_tested": false,
+	"root_frame_low_budget_native_cases": 25,
+	"schema": 1,
+	"scope": "Actual unified raw owner invokes independent DOS player callbacks. Real Bank F606 runs at the original middle boundary before thrust; native observer-only cases distinguish actual cache writes, and isolated-parent identity metadata is explicitly adapted without changing physical input fields. Root low-budget controls bind player-ID metadata only where F585 cannot consume an angle. Mutable scratch/roll/clock aliases, factory seeding, receipt verification, cold replay and revision-bound ownership are checked. Two supplemental original native frame-chain witnesses are separate from the640 callback bank; one records an order-sensitive moving-parent result, the other is a negative control. No universal F1019/F570 scheduler or live Main claim.",
+	"sources": {
+		"data/ffe_object_factory.json": "c2a39b98f17721b55eac7fc5d3015e39b279fb05a002401fd3120218721894a2",
+		"scripts/source_angular_motion.gd": "e4af479bcfcbfb7bbb927aedeae64d0859dc5d40f39b90ef7e5f942a75051a52",
+		"scripts/source_clock_pipeline.gd": "dd95f4c243fd8043523d4ae574b96c5b96fe5487cb395b70556a0248405c39e9",
+		"scripts/source_flight_state.gd": "f04e89bd78bd6ee3748e622c9c03eed95e5e21d62453459e14c4f723bf3765f1",
+		"scripts/source_object_factory.gd": "e97a31782edb90169a13612b2c962c7467771c9f8a163e7b7b2d3b34a09b0e86",
+		"scripts/source_player_dispatch.gd": "353bba764111fe5778188ec9046adeb138212cf2cb54b4e34bcdfe1de2bd9742",
+		"scripts/source_reference_bank.gd": "ac9f40bb3572a8bb819ae2c0397c7b8f4685491f3e50275dd86cd7381765a251",
+		"tests/fixtures/source_object_factory_native.json": "0c04db1aec7ad72125599848125eab9dde1c9d32a87b0b2e732de576403ede92",
+		"tests/fixtures/source_player_dispatch_native.json": "2033e37070b53e2eaa90452ddf7cbb0f7484ce0453f5aba4a5dea00c5f446c8e",
+		"tests/fixtures/source_reference_bank_native.json": "474763d258cfcf694f7521cf7fb8e1637fc31f090961179780d35dc71fb4cb45",
+		"tests/test_source_player_dispatch_state.gd": "53154f982eb63426b8973540f576cfc3973849990cdb4ccef77a05551c6c2ade",
+		"tools/rebuild_source_player_dispatch_native.py": "a8f2fcb2d086202c21f0cd56bd30ab4721a8f9ac077d9f4c003856a8d436c7e6",
+		"tools/rebuild_source_player_frame_chain_native.py": "a53d8008fcbd1428cbc50af7f0ba63d39ab714ebb7dcd75cd7c4daa136bd376b",
+		"validation/player-dispatch-2026-11-17/player-native-proof/player-frame-chain.json": "4b14fb995c23a3ffe8de2f3f324e9a14b052a7de2a3da9092ecfec2edb48f69e"
+	},
+	"supplemental_native_frame_chain_cases": 2,
+	"supplemental_native_order_sensitive_cases": 1
+}

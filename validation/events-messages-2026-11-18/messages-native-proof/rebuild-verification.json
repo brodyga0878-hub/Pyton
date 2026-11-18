@@ -1,0 +1,41 @@
+{
+  "schema": "starfrontier-messages-rebuild-verification-v1",
+  "fixture_sha256": "96a4fd9d10517183a2c184db051998585575444fac019361676e0ff33242cdca",
+  "fixture_bytes": 865946,
+  "native_case_count": 151,
+  "whole_original_procedures": 5,
+  "whole_original_instructions": 278,
+  "consecutive_native_steps": 16,
+  "runtime_checks": 1846,
+  "runtime_failures": 0,
+  "provider_request_counts": {
+    "F217": 27,
+    "F1344": 100,
+    "F1398": 121,
+    "F1906": 30
+  },
+  "copied_proof_absent_originals": {
+    "mode": "absent-original-copy",
+    "fixture_byte_exact": true,
+    "captured_files_byte_exact": 5,
+    "fixture_sha256": "96a4fd9d10517183a2c184db051998585575444fac019361676e0ff33242cdca"
+  },
+  "independent_original_reproof": {
+    "mode": "independent-original-reproof",
+    "fixture_byte_exact": true,
+    "captured_files_byte_exact": 5,
+    "fixture_sha256": "96a4fd9d10517183a2c184db051998585575444fac019361676e0ff33242cdca"
+  },
+  "full_single_process_cohort": {
+    "case_count": 151,
+    "fresh_complete_cohort_processes": 3,
+    "reverse_single_process_cohort_verified": true,
+    "all_expected_source_owners_byte_exact": true,
+    "cohort_output_bytes": 47878922,
+    "cohort_output_sha256": "8df9d9272cc9bcada18d65a5931c55097148652a2ec523c03a6fe43f16d71789"
+  },
+  "actual_F271_backend": true,
+  "rendering_executed": false,
+  "Main_integrated": false,
+  "physical_device_tested": false
+}

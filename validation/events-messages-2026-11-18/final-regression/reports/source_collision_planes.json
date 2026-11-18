@@ -1,0 +1,25 @@
+{
+	"Main_integrated": false,
+	"checks": 7772,
+	"equality_cases": 6,
+	"failures": 0,
+	"full_collision_program_VM": false,
+	"mirror_combinations": 4,
+	"native_cases": 640,
+	"physical_device_tested": false,
+	"plane_byte_codes": 256,
+	"profile": "dos-firstenc-f583-packed-plane-v1",
+	"schema": 1,
+	"sources": {
+		"recovered-history/ground_harness/tools/native_reference.py": "50a1757168b4b886b1b48db6798d60feb4b73f6fb04176a0840a941ebdf6a1eb",
+		"scripts/source_collision_planes.gd": "fd8915050554c4a93c296d75b8d3dabfb7ef911429a236e45b8fad824272abff",
+		"tests/fixtures/source_collision_planes_native.json": "d7de6044356b3554f2fcce60c7dffc2a3cff349283dd37b9b0145d11d98d7e95",
+		"tests/test_source_collision_planes.gd": "56b63a10852029d7ad85e8d442159b610a90822faf3375e22075ec4c01a0161a",
+		"tools/rebuild_ground_surface_native.py": "b90a42b63c8823daee18e41411d129285cfb572295f6650fd5db6f6183f60570",
+		"tools/rebuild_source_atmospheric_native.py": "9252d56228ba6c8b50aba384377fa91f87256591040a32110e88bd5554f04f78",
+		"tools/rebuild_source_collision_planes_native.py": "9ec06732d7cc19758db4b599a01522c4ff218f9ae173f38974b567562ead44cb",
+		"tools/rebuild_source_surface_contact_native.py": "6cb4314fbe1004eafd9476e80e9743f94c684b4a8359101d41fa6a77a572a6f9",
+		"validation/collision-programs-2026-11-17/planes-native-proof/instruction-proof.json": "26e4b916d74e92eee9f627c89ab2483c6d5ddc9b14247661392af6fb2e13c2a4",
+		"validation/collision-programs-2026-11-17/planes-native-proof/source-procedures.asm": "de55291f88597428b429769027a9dbca925212628abda8d240b80aed7174c2f1"
+	}
+}

@@ -44,6 +44,12 @@ class Suite:
 
 
 SUITES = [
+    Suite('build_version', 'tests/test_build_version.gd', 'Current BuildInfo, Android export metadata and an actual private diagnostic session carry the same incremented version.'),
+    Suite('source_events', 'tests/test_source_events.gd', 'Original bounded event registry, dispatch snapshot and task scheduler with distinct source scratch and explicit VM boundaries.', timeout=600),
+    Suite('source_events_state', 'tests/test_source_events_state.gd', 'Owned event arena, registry and variable buffers with atomic receipts and cold replay.', timeout=600),
+    Suite('source_messages', 'tests/test_source_messages.gd', 'Whole DOS message admission and actual ten-record F271 queue backend with explicit raw caller packets and formatter boundaries.', timeout=600),
+    Suite('source_player_events', 'tests/test_source_player_events.gd', 'Whole DOS player event handlers, independent external watched index and exact observed game-service boundaries.', timeout=600),
+    Suite('source_event_services', 'tests/test_source_event_services.gd', 'Shared Root/bank event-message-player composition with real nested F48, explicit message witnesses and replay-validated owned state.', timeout=600),
     Suite('source_equipment', 'tests/test_source_equipment.gd', 'Whole original equipment/cargo/drive damage with shared Root, exact callbacks, tables and independent native parity.', timeout=600),
     Suite('source_equipment_state', 'tests/test_source_equipment_state.gd', 'Owned equipment state with atomic publication, verified callbacks and cold replay.', timeout=600),
     Suite('source_effect_factory', 'tests/test_source_effect_factory.gd', 'Exact additional source cargo/explosion model resources and original full-record factory controls.', timeout=600),

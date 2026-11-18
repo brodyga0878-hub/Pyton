@@ -1,0 +1,49 @@
+{
+  "schema": "starfrontier-events-native-rebuild-verification-v1",
+  "date_utc": "2026-11-18",
+  "fixture_sha256": "eb7bc02bc0d8ae9abbc8fd43149acf7742a79c11a31e6d7a44ffb1698a4bb2c5",
+  "fixture_bytes": 1000202,
+  "case_count": 169,
+  "whole_original_procedures": 12,
+  "whole_original_instructions": 541,
+  "fresh_native_process_runs": 3,
+  "reverse_repeat_cases": 169,
+  "consecutive_native_state_transitions": 42,
+  "explicit_external_observations": 46,
+  "external_requests": {
+    "event_callback": 31,
+    "F53": 7,
+    "F41": 4,
+    "F52": 4
+  },
+  "expected_arithmetic_calculated_in_python": false,
+  "scratch_owner_separate_from_event_registers": true,
+  "scratch_owner_original_virtual_address": "0x60bf24",
+  "event_registers_original_virtual_address": "0x60be08",
+  "event_registers_bytes": 284,
+  "scratch_words_bytes": 32,
+  "all_root_bank_event_arena_scratch_canaries_preserved": true,
+  "readonly_normalized_definition_resources_unchanged": true,
+  "void_EAX_returns_excluded": true,
+  "source_callback_token_words_preserved": true,
+  "full_arena_skips_unloaded_definition_lookup": true,
+  "heap_identity_policy": "Monotonic separate registry/variable logical IDs, capacity512, generation1. Temporary16-byte snapshots isolated; source arena16-bit generation/packed-handle wrap preserved.",
+  "archive_only": {
+    "fixture_byte_exact": true,
+    "all_five_captured_proof_files_byte_exact": true,
+    "proof_copy_used": true,
+    "private_original_paths_deliberately_absent": true
+  },
+  "original_reproof": {
+    "fixture_byte_exact": true,
+    "all_five_captured_proof_files_byte_exact": true,
+    "proof_copy_used": false,
+    "private_original_paths_deliberately_absent": false
+  },
+  "scope": "Bounded event tree/snapshot/dispatch and F51/F54/F55/F56; explicit event callback/F53/F41/F52 providers. No full VM, Main or APK claim.",
+  "runtime_parity_checks": 1444,
+  "runtime_parity_failures": 0,
+  "owned_state_parity_checks_separate": 747,
+  "owned_state_parity_failures": 0,
+  "owned_state_native_cohort_separate": 64
+}

@@ -1,0 +1,61 @@
+{
+  "schema": "starfrontier-original-event-services-composition-v1",
+  "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_dependencies_sha256": {
+    "data/ffe_object_factory.json": "c2a39b98f17721b55eac7fc5d3015e39b279fb05a002401fd3120218721894a2",
+    "tools/rebuild_source_damage_native.py": "5b2bdab57b8e8ba3f7125aa12bb4d95e11cc0709d164e4c675e071aa5a3e9c8d",
+    "tools/rebuild_source_event_services_native.py": "7a48a3a033b1790500d521e932353519a6fc8779977ce6933e61ff7df939ec5a",
+    "tools/rebuild_source_events_native.py": "37435eefdfdf89f25f6669689e9aa01f3312d5b219da2929a04675e9e05e3507",
+    "tools/rebuild_source_messages_native.py": "c24225c0e5200a4b1eb2111f605bdc81aab6bfc2e70ec0c70db2bbe19bb2441d",
+    "tools/rebuild_source_natural_contact_native.py": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889",
+    "tools/rebuild_source_player_events_native.py": "b59db11e6cd57621d0daed6003d71fc6ceb90e84c822edbf821f69fa0cd18c78",
+    "validation/events-messages-2026-11-18/events-native-proof/instruction-proof.json": "534d1c116c418745e5db1080c575f2b595f570b9f0e72c17b23f099f3bab37a5",
+    "validation/events-messages-2026-11-18/events-native-proof/source-procedures.asm": "0d1515cbc16763aeeab2b94d33b36f24c37a2f9698e487d9e9babf399977589c",
+    "validation/events-messages-2026-11-18/messages-native-proof/instruction-proof.json": "f90b482a87b58cf9fd7554fb2324d083085696f70b6a01b8faa986e3c36bdf61",
+    "validation/events-messages-2026-11-18/messages-native-proof/source-procedures.asm": "e702f5f67a55cc04ba50669189108ce2301c8a2b82e1ce82c912b04b27d19545",
+    "validation/events-messages-2026-11-18/player-events-native-proof/instruction-proof.json": "e957f1d1bab77e053388881fafe44f58a3ee134533235edc492584edec743787",
+    "validation/events-messages-2026-11-18/player-events-native-proof/source-procedures.asm": "b6f7706042c6fa2651394a1d68ad9a7545f83234bce0c5ac95bbe2258cb51dcb"
+  },
+  "native_calls": {
+    "player": 38,
+    "events": 41,
+    "messages": 27
+  },
+  "fresh_process_runs_each_call": 3,
+  "reverse_native_calls_verified": true,
+  "composition_cases": 22,
+  "player_cases": 13,
+  "message_cases": 9,
+  "actual_F48_calls": 11,
+  "actual_F271_calls": 7,
+  "negative_F61_index_cases": [
+    128,
+    255,
+    255,
+    255,
+    128
+  ],
+  "shared_owner_steps": 2,
+  "host_assembly_sha256": {
+    "player": "028c6c9f644ec7e936949194b2136d33448403c7eabfe46c6445bef74e3ab7b9",
+    "events": "c551555f96497eb06a077c354f502081e8e90503e7bfe8c209c32add26910d4a",
+    "messages": "8f101793b6f35e9dc3c4b18e25f1ed7a8b2c3715651c0d0808947f9871deb015"
+  },
+  "host_support_sha256": {
+    "player": "4f99a3b4fafb38e75b7497b55f13e9a81b9713b7fd477073996f41aeba1e7417",
+    "events": "b0f8c6a9c544f603dbe8838e524c580014f8f52c608a15ff4fc1e4b543feecef",
+    "messages": "74c64a67f33d5f3d965f4db82a1737dcf93944f0773ea88057e426e7e847f63b"
+  },
+  "actual_DOS_aliases": {
+    "root": "0x64213c",
+    "Root_clock": "0x642140",
+    "Root_screen_E8": "0x642224",
+    "watched_index": "0x4eed84",
+    "temporary_index": "0x60bf4c",
+    "scratch_words": "0x60bf24"
+  },
+  "expected_arithmetic_calculated_in_python": false,
+  "all_native_guards_verified": true,
+  "scope": "Supplemental native composition: actual whole F61/F1101/F1102/F1103 resumes after actual F48 dispatch, and whole F349/F350/F351/F352 routes into actual F271. Shared Root/bank/events/temp owners are projected without duplicate clocks/RNG/flags; D8877 watcher and event scratch are separate verified DOS owners. Formatter, wrap, UI, audio, F1104 gameover and mission VM callbacks remain explicit providers; no Main/APK claim."
+}

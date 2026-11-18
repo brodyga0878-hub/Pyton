@@ -1,0 +1,107 @@
+00445240: push ebp
+00445241: mov ebp,esp
+00445243: mov eax,DWORD PTR [ebp+0x8]
+00445246: mov edx,DWORD PTR [eax]
+00445248: push edx
+00445249: mov al,BYTE PTR [eax+0x8]
+0044524c: push eax
+0044524d: call 0x4451c4
+00445252: add esp,0x8
+00445255: pop ebp
+00445256: ret 
+
+004451c4: push ebp
+004451c5: mov ebp,esp
+004451c7: push ebx
+004451c8: push esi
+004451c9: mov ebx,DWORD PTR [ebp+0x8]
+004451cc: cmp DWORD PTR [ebp+0xc],0x0
+004451d0: jne 0x445226
+004451d2: cmp bl,BYTE PTR ds:0x64224e
+004451d8: jne 0x4451e1
+004451da: mov BYTE PTR ds:0x64224e,0x0
+004451e1: cmp bl,BYTE PTR ds:0x4eed84
+004451e7: jne 0x445213
+004451e9: mov BYTE PTR ds:0x4eed84,0x0
+004451f0: cmp BYTE PTR ds:0x642226,0x5
+004451f7: jne 0x445200
+004451f9: mov BYTE PTR ds:0x642226,0x0
+00445200: push 0x0
+00445202: push 0x14
+00445204: call 0x41d308
+00445209: add esp,0x8
+0044520c: call 0x43f81c
+00445211: jmp 0x44523b
+00445213: movsx esi,bl
+00445216: push esi
+00445217: call 0x44513c
+0044521c: pop ecx
+0044521d: push esi
+0044521e: call 0x445258
+00445223: pop ecx
+00445224: jmp 0x44523b
+00445226: movsx eax,bl
+00445229: cmp eax,DWORD PTR ds:0x6421fc
+0044522f: jne 0x44523b
+00445231: mov DWORD PTR ds:0x64224a,0x1e
+0044523b: pop esi
+0044523c: pop ebx
+0044523d: pop ebp
+0044523e: ret 
+
+0044513c: push ebp
+0044513d: mov ebp,esp
+0044513f: push ebx
+00445140: push esi
+00445141: mov ebx,DWORD PTR [ebp+0x8]
+00445144: mov esi,0x64213c
+00445149: movsx eax,BYTE PTR [esi+0xec]
+00445150: cmp ebx,eax
+00445152: je 0x44515f
+00445154: movsx eax,BYTE PTR [esi+0xed]
+0044515b: cmp ebx,eax
+0044515d: jne 0x44516e
+0044515f: push 0xffffffff
+00445161: push 0x98c2
+00445166: call 0x444518
+0044516b: add esp,0x8
+0044516e: movsx eax,BYTE PTR [esi+0xec]
+00445175: cmp ebx,eax
+00445177: jne 0x4451ab
+00445179: mov BYTE PTR [esi+0xec],0x0
+00445180: cmp ebx,DWORD PTR [esi+0xc0]
+00445186: je 0x4451ab
+00445188: cmp BYTE PTR [esi+0xe8],0x2
+0044518f: jne 0x4451ab
+00445191: mov BYTE PTR [esi+0xe8],0x0
+00445198: call 0x445aac
+0044519d: push 0xe
+0044519f: push 0x0
+004451a1: push 0x1
+004451a3: call 0x414044
+004451a8: add esp,0xc
+004451ab: movsx eax,BYTE PTR [esi+0xed]
+004451b2: cmp ebx,eax
+004451b4: jne 0x4451bd
+004451b6: mov BYTE PTR [esi+0xed],0x0
+004451bd: pop esi
+004451be: pop ebx
+004451bf: pop ebp
+004451c0: ret 
+
+0041458c: push ebp
+0041458d: mov ebp,esp
+0041458f: mov eax,DWORD PTR [ebp+0x8]
+00414592: cmp DWORD PTR [eax],0x0
+00414595: jne 0x4145b5
+00414597: movsx edx,BYTE PTR [eax+0x8]
+0041459b: mov DWORD PTR ds:0x60bf4c,edx
+004145a1: push edx
+004145a2: push 0x0
+004145a4: push 0x16
+004145a6: call 0x414044
+004145ab: add esp,0xc
+004145ae: xor eax,eax
+004145b0: mov ds:0x60bf4c,eax
+004145b5: pop ebp
+004145b6: ret 

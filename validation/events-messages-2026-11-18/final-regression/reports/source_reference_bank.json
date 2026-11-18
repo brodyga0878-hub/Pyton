@@ -1,0 +1,25 @@
+{
+	"checks": 4618,
+	"failures": 0,
+	"full_f570_caller": false,
+	"full_f585_controller": false,
+	"full_original_flight_pipeline": false,
+	"live_Main_motion_replaced": false,
+	"native_bank_cache_change_cases": 146,
+	"native_cases": 444,
+	"native_selection_cases": 192,
+	"physical_device_tested": false,
+	"profile": "dos-firstenc-reference-bank-v1",
+	"schema": "starfrontier-source-reference-bank-test-v1",
+	"separate_jjffe_copy_diagnostics": 16,
+	"sources": {
+		"scripts/ground_coordinates.gd": "54dedcc157dea6c84c4f8ad6ff0859159d81719cafbbaa23c626cd94e1cdf7b6",
+		"scripts/source_frame_kinematics.gd": "aac70ddc3237a9b97910020db6a2ac400659ab02457730e113de9c828b530689",
+		"scripts/source_gravity.gd": "058db4e5cbebd07e7420274ca07b24ccaec620f46c440081d1d6855326dc3872",
+		"scripts/source_orbit.gd": "7091ed3bbb88e79434ce21d53b3c98bf7f01391ee8a20a736c5e7c56eef55579",
+		"scripts/source_reference_bank.gd": "ac9f40bb3572a8bb819ae2c0397c7b8f4685491f3e50275dd86cd7381765a251",
+		"tests/fixtures/source_reference_bank_native.json": "474763d258cfcf694f7521cf7fb8e1637fc31f090961179780d35dc71fb4cb45",
+		"tests/test_source_reference_bank.gd": "891f4541756f63589c8c364792cbfb4a63183233cef046f29652e11f5bec410a"
+	},
+	"variant": "dos-firstenc"
+}

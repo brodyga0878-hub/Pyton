@@ -1,0 +1,23 @@
+{
+  "schema": "starfrontier-event-services-rebuild-verification-v1",
+  "fixture_sha256": "91b3c907336972f452fc140bda326d658e25c3dbd0d54e1e07af990877cf5b3b",
+  "fixture_byte_count": 374585,
+  "composition_cases": 22,
+  "native_calls": {
+    "player": 38,
+    "events": 41,
+    "messages": 27
+  },
+  "fresh_native_runs_per_call": 3,
+  "reverse_native_calls_exact": true,
+  "actual_F48_calls": 11,
+  "actual_F271_calls": 7,
+  "copied_proof_absent_original_fixture_exact": true,
+  "copied_proof_generated_files_exact": 7,
+  "expected_arithmetic_calculated_in_python": false,
+  "Main_integrated": false,
+  "full_mission_VM_executed": false,
+  "runtime_checks": 982,
+  "runtime_failures": 0,
+  "all_22_full_owner_hot_and_cold_state_replays_pass": true
+}

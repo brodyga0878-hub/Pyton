@@ -1,0 +1,14 @@
+{
+	"APK_manifest_verified_separately": true,
+	"checks": 8,
+	"failures": 0,
+	"sources": {
+		"export_presets.cfg": "7c755cbe6cf572cf2c0e7b833145a77dd94ccfc81dff58c8d36e4a67788262b5",
+		"scripts/build_info.gd": "f999bb4ae170036f74c67a327ccf1a2c029f83e5257c1d50d63f80f960996c0a",
+		"scripts/diagnostics_logger.gd": "a0a2a4a993613f3f864d669f862229db29293793a6084636bee1d4eabbf7a052",
+		"scripts/game_diagnostics.gd": "ec43f79d0971680225f0555ac9d7f6e60f41806257bae7e9c1bff8a4f73c0fc3",
+		"tests/test_build_version.gd": "43095d73611fe6bf958f01aa167c748a313851f7c23a091e5b79708473f97fe8"
+	},
+	"version": "0.29.0-events-alpha1",
+	"version_code": 54
+}
