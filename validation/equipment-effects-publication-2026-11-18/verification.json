@@ -1,0 +1,75 @@
+{
+  "schema": "starfrontier-equipment-effects-core-source-publication-v1",
+  "status": "verified",
+  "completed_utc": "2026-11-18T11:39:07.260570+00:00",
+  "checkpoint": "equipment-effects-core-2026-11-18",
+  "artifact_commit": "7b38a803464f70b92a6589cdc77b7217a00448ab",
+  "source_commit": "b506fbaa58b9a02f95bfe626457e4430822e5292",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/7b38a803464f70b92a6589cdc77b7217a00448ab/deliverables/equipment-effects-core-2026-11-18/manifest.json",
+      "http_status": 200,
+      "bytes": 2455,
+      "sha256": "b6fd679aef3d8a20ed92530a2814aa4df1a914d8e5f5c8ecdb52d1bc9ac026d1"
+    },
+    {
+      "file": "README_RU.md",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/7b38a803464f70b92a6589cdc77b7217a00448ab/deliverables/equipment-effects-core-2026-11-18/README_RU.md",
+      "http_status": 200,
+      "bytes": 4892,
+      "sha256": "6e661c106ebd6fc7b15868528c6cd74a76ca6262431180056399f0e2e7bfa22e"
+    },
+    {
+      "file": "StarFrontier-equipment-effects-core-update.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/7b38a803464f70b92a6589cdc77b7217a00448ab/deliverables/equipment-effects-core-2026-11-18/StarFrontier-equipment-effects-core-update.zip",
+      "http_status": 200,
+      "bytes": 16127032,
+      "sha256": "4ad98929053d21dff6de07671ff32a1c1dbf2d1d0b704892b0b09289c1b95e58",
+      "zip_CRC_verified": true,
+      "source_commit_in_ZIP_comment": "b506fbaa58b9a02f95bfe626457e4430822e5292"
+    },
+    {
+      "file": "functional-summary.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/7b38a803464f70b92a6589cdc77b7217a00448ab/deliverables/equipment-effects-core-2026-11-18/functional-summary.json",
+      "http_status": 200,
+      "bytes": 53257,
+      "sha256": "d40e89317ce38f3ebc49a36582c2247569ce78595abd3a0c8ab8f2e7a6a5e8ee"
+    },
+    {
+      "file": "source-pair-verification.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/7b38a803464f70b92a6589cdc77b7217a00448ab/deliverables/equipment-effects-core-2026-11-18/source-pair-verification.json",
+      "http_status": 200,
+      "bytes": 100960,
+      "sha256": "f8e97fc98b7ddff3ab3b39f97b139b3467e499e134d35daa884016ab8b8e67f8"
+    },
+    {
+      "file": "source-update-policy.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/7b38a803464f70b92a6589cdc77b7217a00448ab/deliverables/equipment-effects-core-2026-11-18/source-update-policy.json",
+      "http_status": 200,
+      "bytes": 329735,
+      "sha256": "63c926bdb394bbaa73914928c1946ae92ec2f5eaecbd5484a47a92bc76c80fef"
+    },
+    {
+      "file": "StarFrontier-0.28.0-native-station-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip",
+      "http_status": 200,
+      "bytes": 33543341,
+      "sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d",
+      "zip_CRC_verified": true,
+      "source_commit_in_ZIP_comment": "de8eb18a687d007781321436910187dff3785775"
+    }
+  ],
+  "actual_complete_HTTPS_downloads": 7,
+  "all_manifest_payloads_downloaded": true,
+  "manifest_payload_count": 5,
+  "required_source_archives_downloaded": 2,
+  "runtime_inputs_verified": 551,
+  "runtime_freeze_sha256": "c18bd5ac973f7262a53173f6355962628355644e1c213e157b760e4253cd16cf",
+  "all_current_runtime_inputs_match_frozen_source": true,
+  "new_APK_produced": false,
+  "new_kernels_connected_to_Main": false,
+  "physical_device_tested": false,
+  "full_original_port_complete": false,
+  "scope": "Seven actual complete immutable HTTPS downloads: sealed manifest, all five checkpoint payloads and the complete0.28 base source ZIP. SHA/lengths, both ZIP CRCs/source comments and all declared frozen runtime inputs pass. The equipment/effects/resource kernels and their state owners are separate from Main; this is not a new APK, a complete world/damage engine or an on-device result."
+}

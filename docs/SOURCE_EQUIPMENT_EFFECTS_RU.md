@@ -65,5 +65,33 @@ Root остаётся единственным владельцем RNG, счё�
 Подробные доказательства: [оборудование](../validation/equipment-effects-2026-11-18/equipment-native-proof/README.md), [дополнительный F1533](../validation/equipment-effects-2026-11-18/factory-native-proof/README.md), [уничтожение и груз](../validation/equipment-effects-2026-11-18/destruction-native-proof/README.md), [составной F953](../validation/equipment-effects-2026-11-18/effects-native-proof/README.md).
 
 <!-- EQUIPMENT_EFFECTS_PUBLICATION_BEGIN -->
-**PREPUB:** исходники и локальные проверки завершены. Упаковка, чистое восстановление и опубликованные ссылки будут подтверждены отдельно; новый размер архива и URL до проверки не приводятся.
+Для полного проекта нужны **два ZIP**: [полная основа 0.28](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip)
+и [кумулятивное обновление](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/7b38a803464f70b92a6589cdc77b7217a00448ab/deliverables/equipment-effects-core-2026-11-18/StarFrontier-equipment-effects-core-update.zip). Сначала распакуйте основу,
+затем обновление в ту же папку `StarFrontier-0.28.0-source/`.
+Предыдущие малые обновления не требуются. Оба ZIP меньше 32 МиБ;
+обновление отдельно неполно. Включены исходники, тесты, ресурсы,
+текстовые доказательства и переносимые генераторы с зависимостями.
+
+Source-коммит: `b506fbaa58b9a02f95bfe626457e4430822e5292`.
+Artifact-коммит: `7b38a803464f70b92a6589cdc77b7217a00448ab`.
+Обновление: **16 127 032 байт**, SHA256
+`4ad98929053d21dff6de07671ff32a1c1dbf2d1d0b704892b0b09289c1b95e58`.
+Из чистой пары проверены запуск **10/0**, все **43 наборов /
+249 807/0**, **2536** неизменных файлов и **551**
+runtime-входов. Все **538** входов прежнего ядра
+и все **475** входов игры совпадают побайтно.
+**30 native-команды** (23 основных / 7 дополнительных)
+воспроизвели **11 448 DOS-контролей**, **16** диагностик JJFFE
+и **258** отдельных композиционных сценариев без приватного EXE.
+Отдельный экстрактор восстановил точный ресурсный JSON; эти категории
+не прибавлены к функциональной сумме. Семь полных HTTPS-загрузок,
+размеры/SHA/CRC и Git-комментарии обоих ZIP совпали.
+[Подтверждение](../validation/equipment-effects-publication-2026-11-18/verification.json) и
+[отчёт чистой проверки](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/7b38a803464f70b92a6589cdc77b7217a00448ab/deliverables/equipment-effects-core-2026-11-18/source-pair-verification.json).
+
+Архив и манифест запечатаны перед проверкой опубликованных загрузок и
+остаются неизменными. PREPUB-записи внутри ZIP относятся к исходному
+коммиту до публикации; окончательное подтверждение сохранено отдельно.
+Новые ядра ещё не подключены к Main; игровой APK остаётся **0.28 / code 53**.
+Физический S23 Ultra, графика и FPS этим исходным блоком не проверялись.
 <!-- EQUIPMENT_EFFECTS_PUBLICATION_END -->
