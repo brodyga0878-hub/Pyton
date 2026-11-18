@@ -1,0 +1,93 @@
+{
+  "schema": "starfrontier-events-messages-core-0.29.0-source-checkpoint-v1",
+  "checkpoint": "events-messages-core-0.29.0-2026-11-18",
+  "source_commit": "3d8e01a0977d4be4a23414dc75952bb5ec5adb52",
+  "created_utc": "2026-11-18T12:45:10.606867+00:00",
+  "required_archive_count": 2,
+  "previous_update_archive_required": false,
+  "base_archive": {
+    "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip",
+    "bytes": 33543341,
+    "sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d",
+    "source_commit": "de8eb18a687d007781321436910187dff3785775"
+  },
+  "files": {
+    "README_RU.md": {
+      "bytes": 5405,
+      "sha256": "a8ac8da71d21a3a3a641ccc9904e0a1abcdb1fbce7c7ac6c8085de2ee77f7b1f"
+    },
+    "StarFrontier-0.29.0-events-messages-source-update.zip": {
+      "bytes": 16800432,
+      "sha256": "0fabe4bec84e7a7008bcfec08ba938f773206efc5e9dfb98e1e885523aaf7648"
+    },
+    "functional-summary.json": {
+      "bytes": 60251,
+      "sha256": "c4b6037e1bf12da1c398419fcc1ce1a3bbb903282a5fad18016e7399bc9ba567"
+    },
+    "source-pair-verification.json": {
+      "bytes": 113647,
+      "sha256": "d75cc54c83bb488a6fcd00e458be9b065dfb9bd14070ff442f7ef633ffb4a491"
+    },
+    "source-update-policy.json": {
+      "bytes": 381285,
+      "sha256": "a2fa6a1d0f4fd6ff6b061e289c9bfa8537e0c9b9d674871df8684dc5fe3a1ef2"
+    },
+    "StarFrontier-0.29.0-events-arm64.apk": {
+      "bytes": 50887999,
+      "sha256": "6c2c3c73f679cfe9962384c367803de910331bd3d7b357e143bd8fe2e106e7b8"
+    },
+    "android-verification.json": {
+      "bytes": 52756,
+      "sha256": "99c3324a91b8551ff968fc88fd3d04a8f6689effaf0f70305330c771a845df34"
+    }
+  },
+  "merged_source_files": 2704,
+  "runtime_inputs": 563,
+  "published_game_runtime_inputs": 475,
+  "unchanged_published_game_runtime_inputs": 473,
+  "previous_backend_runtime_inputs": 551,
+  "unchanged_previous_backend_runtime_inputs": 549,
+  "changed_previous_backend_runtime_paths": [
+    "export_presets.cfg",
+    "scripts/build_info.gd"
+  ],
+  "current_functional_checks": 257714,
+  "unique_suites": 49,
+  "new_core_checks": 7907,
+  "new_core_suites": 6,
+  "fresh_core_suites": 49,
+  "fresh_core_checks_separate": 257714,
+  "native_main_generator_count": 26,
+  "native_DOS_control_cases_separate": 12101,
+  "native_JJFFE_diagnostics_separate": 16,
+  "supplemental_native_compositions_separate": 280,
+  "native_generator_count": 34,
+  "resource_replay_count": 1,
+  "fresh_pair_verified": true,
+  "new_APK_produced": true,
+  "apk": {
+    "file": "StarFrontier-0.29.0-events-arm64.apk",
+    "verification_file": "android-verification.json",
+    "bytes": 50887999,
+    "sha256": "6c2c3c73f679cfe9962384c367803de910331bd3d7b357e143bd8fe2e106e7b8",
+    "version": "0.29.0-events-alpha1",
+    "version_code": 54,
+    "package": "org.starfrontier.rebuild",
+    "abi": "arm64-v8a",
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "source_commit": "3d8e01a0977d4be4a23414dc75952bb5ec5adb52",
+    "runtime_freeze_sha256": "9667869f986135de7d27b30b7baa3818981891dad54ad2a3121ee5104f716d70",
+    "signature_aapt_zipalign_rechecked_at_packaging": true
+  },
+  "version_metadata_changes_only": true,
+  "version_metadata_paths": [
+    "export_presets.cfg",
+    "scripts/build_info.gd"
+  ],
+  "new_kernels_connected_to_Main": false,
+  "game_version": "0.29.0-events-alpha1",
+  "Android_version_code": 54,
+  "full_original_port_complete": false,
+  "physical_device_tested": false,
+  "immutable_HTTPS_verified_at_packaging": false
+}

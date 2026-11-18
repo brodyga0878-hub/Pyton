@@ -1,0 +1,29 @@
+{
+  "schema": "starfrontier-events-android-build-provenance-v1",
+  "status": "verified",
+  "source_commit": "3d8e01a0977d4be4a23414dc75952bb5ec5adb52",
+  "runtime_freeze_sha256": "9667869f986135de7d27b30b7baa3818981891dad54ad2a3121ee5104f716d70",
+  "source_pair_verification_sha256": "d75cc54c83bb488a6fcd00e458be9b065dfb9bd14070ff442f7ef633ffb4a491",
+  "build_project": "/workspace/recovery/events-messages-source-pair-fresh/source/StarFrontier-0.28.0-source",
+  "command": [
+    "sh",
+    "tools/build_android.sh",
+    "--candidate"
+  ],
+  "project_selection_environment": "STARFRONTIER_PROJECT_ROOT",
+  "fresh_export_exit_code": 0,
+  "build_log": "android-build.log",
+  "build_log_sha256": "90759a94f6343a663092e0c3fb936fc652a04119081449c2ab8952f70f968a76",
+  "apk_file": "StarFrontier-0.29.0-events-arm64.apk",
+  "apk_bytes": 50887999,
+  "apk_sha256": "6c2c3c73f679cfe9962384c367803de910331bd3d7b357e143bd8fe2e106e7b8",
+  "version": "0.29.0-events-alpha1",
+  "version_code": 54,
+  "compiled_source_correspondence_independently_verified": true,
+  "compiled_scripts": 187,
+  "exact_JSON_resources": 35,
+  "all_563_runtime_inputs_unchanged_through_compilation": true,
+  "test_key_only": true,
+  "Main_integrated": false,
+  "physical_device_tested": false
+}
