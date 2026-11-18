@@ -44,6 +44,10 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_mission_programs', 'tests/test_source_mission_programs.gd', 'Actual original DOS mission descriptors, blocks, metadata, strings and shared-global resources with byte-exact portable extraction.', timeout=600),
+    Suite('source_mission_expression', 'tests/test_source_mission_expression.gd', 'Whole bounded DOS expression/global procedures, real inline jump tables, source Root tail and explicit world-service observations.', timeout=600),
+    Suite('source_mission_guards', 'tests/test_source_mission_guards.gd', 'Whole DOS guard registration walk and event-register access with real resource metadata, cursor rewinds and callback rereads.', timeout=600),
+    Suite('source_mission_services', 'tests/test_source_mission_services.gd', 'Shared mission expression/guard/event composition, actual nested kernels, one task/variable owner and replay-verified cold transactions.', timeout=600),
     Suite('build_version', 'tests/test_build_version.gd', 'Current BuildInfo, Android export metadata and an actual private diagnostic session carry the same incremented version.'),
     Suite('source_events', 'tests/test_source_events.gd', 'Original bounded event registry, dispatch snapshot and task scheduler with distinct source scratch and explicit VM boundaries.', timeout=600),
     Suite('source_events_state', 'tests/test_source_events_state.gd', 'Owned event arena, registry and variable buffers with atomic receipts and cold replay.', timeout=600),

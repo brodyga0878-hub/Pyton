@@ -1,0 +1,58 @@
+{
+  "schema": "starfrontier-mission-expression-native-rebuild-verification-v1",
+  "fixture_sha256": "ff177e8e1ec382c8bc3754907019486cc6b98246abeca3ae0f59a55dbe8fd0df",
+  "fixture_bytes": 1358558,
+  "case_count": 404,
+  "actual_DOS_resource_clause_cases": 24,
+  "original_divide_fault_domains_separate": 5,
+  "whole_original_procedures": 17,
+  "shared_previously_proved_helpers": [
+    922,
+    1530,
+    1532
+  ],
+  "new_expression_list_procedures": 14,
+  "whole_original_instructions": 1311,
+  "original_inline_table_DWORDs": 110,
+  "all_source_labels_identify_original_instruction_boundaries": true,
+  "F22_DOS_JJFFE_table_variant_slots": [
+    15,
+    16
+  ],
+  "undefined_F31_selector_slots": [
+    0,
+    1,
+    28,
+    29,
+    30,
+    33,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44
+  ],
+  "fresh_single_process_native_cohorts": 3,
+  "packets_per_cohort": 404,
+  "reverse_repeat_packets": 404,
+  "canaries_and_readonly_program_preserved": true,
+  "original_process_fault_signal": "SIGFPE",
+  "expected_complete_context_after_fault_claimed": false,
+  "portable_absent_original_fixture_byte_exact": true,
+  "independent_original_reproof_fixture_byte_exact": true,
+  "all_five_generated_proof_files_byte_exact": {
+    "instruction-proof.json": "55350cb8453c19e0126c5e09b5f6737a5062a9f4124e9be5319fbd0f15fe1d8f",
+    "source-procedures.asm": "44356c8390332726daffb37f36e2b15cda0bca2181c5f2828ea7ccb7f1e2150e",
+    "dos-disassembly.txt": "3dc8258139eb635d45ef0fdca08b26cc16d52026b8bf0b85e48567e24ddf6f80",
+    "expression-native.s": "263309ca7c101d8397b7c72fee76048ff35bd25a456c91276ad5df70fb9c8306",
+    "expression-support.c": "489b315b98d90a4228e6972f3b752b227e8b469ed2301ee8c1258d7eed2207dd"
+  },
+  "expected_arithmetic_calculated_in_python": false,
+  "Godot_checks": 3310,
+  "Godot_failures": 0,
+  "full_mission_VM_executed": false,
+  "Main_integrated": false,
+  "physical_device_tested": false
+}

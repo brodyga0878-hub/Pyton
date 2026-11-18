@@ -1,0 +1,8 @@
+{
+  "name": "mission_services",
+  "generator": "tools/rebuild_source_mission_services_native.py",
+  "fixture": "tests/fixtures/source_mission_services_native.json",
+  "kind": "proof_asm",
+  "proof_dir": "validation/mission-expressions-2026-11-18/services-native-proof",
+  "supplemental": true
+}

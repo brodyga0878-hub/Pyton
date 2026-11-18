@@ -1,0 +1,20 @@
+{
+	"Main_integrated": false,
+	"backend_calls": 138,
+	"checks": 1846,
+	"failures": 0,
+	"native_cases": 151,
+	"profile": "dos-firstenc-message-backend-v1",
+	"rendering_executed": false,
+	"sources": {
+		"scripts/source_messages.gd": "bd5f4194505a1ca9d0616a50f81ad5df2d6ea59b1e80e4f37f69f69d7f3a7edb",
+		"tests/fixtures/source_messages_native.json": "96a4fd9d10517183a2c184db051998585575444fac019361676e0ff33242cdca",
+		"tests/test_source_messages.gd": "7b304b9c5ed4f6ecbdc7f5c7eaa3ef61178d7e9e4a64981176d3f9774bd17017",
+		"tools/rebuild_source_messages_native.py": "c24225c0e5200a4b1eb2111f605bdc81aab6bfc2e70ec0c70db2bbe19bb2441d",
+		"tools/rebuild_source_natural_contact_native.py": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889",
+		"validation/events-messages-2026-11-18/messages-native-proof/instruction-proof.json": "f90b482a87b58cf9fd7554fb2324d083085696f70b6a01b8faa986e3c36bdf61",
+		"validation/events-messages-2026-11-18/messages-native-proof/messages-native.s": "8f101793b6f35e9dc3c4b18e25f1ed7a8b2c3715651c0d0808947f9871deb015",
+		"validation/events-messages-2026-11-18/messages-native-proof/messages-support.c": "74c64a67f33d5f3d965f4db82a1737dcf93944f0773ea88057e426e7e847f63b",
+		"validation/events-messages-2026-11-18/messages-native-proof/source-procedures.asm": "e702f5f67a55cc04ba50669189108ce2301c8a2b82e1ce82c912b04b27d19545"
+	}
+}

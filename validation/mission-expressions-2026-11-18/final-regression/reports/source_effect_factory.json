@@ -1,0 +1,26 @@
+{
+	"Main_integrated": false,
+	"checks": 4532,
+	"failures": 0,
+	"full_special_model_inventory": false,
+	"native_cases": 616,
+	"physical_device_tested": false,
+	"profile": "dos-firstenc-effect-factory-v1",
+	"sources": {
+		"data/ffe_effect_factory.json": "28afd09d2d3107c75d20e15fa9c431f46cddfee3a399de9a29d7310a7f782db3",
+		"data/ffe_object_factory.json": "c2a39b98f17721b55eac7fc5d3015e39b279fb05a002401fd3120218721894a2",
+		"recovered-history/ground_harness/tools/native_reference.py": "50a1757168b4b886b1b48db6798d60feb4b73f6fb04176a0840a941ebdf6a1eb",
+		"scripts/source_effect_factory.gd": "bf9be98a22fbbb2f59d49eb0a7404d59518d5b7247fcfdc1511feca5f95fd15b",
+		"scripts/source_object_factory.gd": "e97a31782edb90169a13612b2c962c7467771c9f8a163e7b7b2d3b34a09b0e86",
+		"scripts/source_orbit.gd": "7091ed3bbb88e79434ce21d53b3c98bf7f01391ee8a20a736c5e7c56eef55579",
+		"tests/fixtures/source_effect_factory_native.json": "1369d7a33befecd244c3d3cb1b3becd89dcfeea881e90e325971481ccb2c13c1",
+		"tests/test_source_effect_factory.gd": "6a449a687a172b4b175ebb8c452f23dd5bbed6400e014e0fa02e840a6286c353",
+		"tools/rebuild_source_effect_factory_native.py": "4c7f8f5f6f42b657c43c642e5e10734cd49cd54851a4a37f1a37f46268847e47",
+		"tools/rebuild_source_natural_contact_native.py": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889",
+		"tools/rebuild_source_object_factory_native.py": "6a112f432a089e00054fae12ae701cabf1ca0ec2cb8d5633080e7b8c789e792a",
+		"validation/equipment-effects-2026-11-18/factory-native-proof/factory-native.s": "3b4cb26b0dee3ed5e3a486442c052688983917596a070969bca280708e7ff305",
+		"validation/equipment-effects-2026-11-18/factory-native-proof/instruction-proof.json": "7dd56396c82da3953fc3dfcf678658d48aefef09cf6b0f0d7b07f620dac247f6",
+		"validation/equipment-effects-2026-11-18/factory-native-proof/resource-spans.json": "ea22d641dd912020beda75c4c694629bba2d0bbcaf88f2409555f3da03dfe056",
+		"validation/equipment-effects-2026-11-18/factory-native-proof/source-procedures.asm": "b81af35fca46eb3f1714fcb0aa30457234572e99cd72e4567d75c01f7679f307"
+	}
+}

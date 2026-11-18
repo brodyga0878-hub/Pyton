@@ -1,0 +1,28 @@
+{
+	"F31_body_executed_by_this_kernel": false,
+	"Main_integrated": false,
+	"checks": 1588,
+	"failures": 0,
+	"full_mission_VM_executed": false,
+	"native_callbacks": 80,
+	"native_cases": 113,
+	"profile": "dos-firstenc-mission-guards-v1",
+	"sources": {
+		"recovered-history/ground_harness/tools/build_terrain_query_reference.py": "46bbaf8fb4d80bea2c73cac728bb7385e2b46618dd908e111c632cdafda0c2cc",
+		"recovered-history/ground_harness/tools/native_reference.py": "50a1757168b4b886b1b48db6798d60feb4b73f6fb04176a0840a941ebdf6a1eb",
+		"scripts/source_mission_guards.gd": "c745a32e83e48bc7bc13c268d917873858f269c2f98199f9a0fda59c55197be3",
+		"tests/fixtures/source_mission_guards_native.json": "aea9057d78aeb41d7ea1ad6ab5d68f71bae83b7ea6a1416e7f50a18d590ae44b",
+		"tests/test_source_mission_guards.gd": "179d1dce7e34319ddcc1976204075ffca18c1767a793420d6a220d3162f3fd98",
+		"tools/rebuild_ground_surface_native.py": "b90a42b63c8823daee18e41411d129285cfb572295f6650fd5db6f6183f60570",
+		"tools/rebuild_source_atmospheric_native.py": "9252d56228ba6c8b50aba384377fa91f87256591040a32110e88bd5554f04f78",
+		"tools/rebuild_source_damage_native.py": "5b2bdab57b8e8ba3f7125aa12bb4d95e11cc0709d164e4c675e071aa5a3e9c8d",
+		"tools/rebuild_source_mission_guards_native.py": "c4a9afce799fe45f762546c0935550c81e4c0207f41b7d1bdfede08b22af693b",
+		"tools/rebuild_source_natural_contact_native.py": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889",
+		"tools/rebuild_source_surface_contact_native.py": "6cb4314fbe1004eafd9476e80e9743f94c684b4a8359101d41fa6a77a572a6f9",
+		"validation/mission-expressions-2026-11-18/guards-native-proof/dos-disassembly.txt": "ca22e9c041f7c208e37ff90fe71cd227ca55d7bbfd10083ac469737cf27899a2",
+		"validation/mission-expressions-2026-11-18/guards-native-proof/guards-host.c": "26786dc4f4ba7e565dc3947e55139ff1adf1ab016a0ed910671af0160685732f",
+		"validation/mission-expressions-2026-11-18/guards-native-proof/guards-native.s": "c0b0e9c78d421af983e8ebd7d36eaa31c6f0c8f272aae2a09f022eddffdbf379",
+		"validation/mission-expressions-2026-11-18/guards-native-proof/instruction-proof.json": "859cce320e271f404b261be7d18fc9076972ad5b71c29f3f0b6e1f817b29e9a9",
+		"validation/mission-expressions-2026-11-18/guards-native-proof/source-procedures.asm": "61162a64213e5f2b6e93bd230d87fae6994db1324bb50ae5de42b2f5dca1798c"
+	}
+}
