@@ -1,0 +1,37 @@
+{
+  "schema": "starfrontier-effect-factory-rebuild-verification-v1",
+  "status": "verified",
+  "fixture_sha256": "1369d7a33befecd244c3d3cb1b3becd89dcfeea881e90e325971481ccb2c13c1",
+  "fixture_bytes": 2252915,
+  "case_count": 616,
+  "whole_original_procedures": 4,
+  "whole_original_instructions": 214,
+  "selected_original_models": [
+    153,
+    155
+  ],
+  "null_original_table_slot": 149,
+  "fresh_native_processes": 3,
+  "reverse_repeat_cases": 616,
+  "consecutive_original_steps": 24,
+  "runtime_checks": 4532,
+  "runtime_failures": 0,
+  "runtime_parametric_adapter_model_token_proven": true,
+  "all338_output_bytes_compared": true,
+  "all_source_resource_and_boundary_canaries_unchanged": true,
+  "original_exe_included": false,
+  "absent_original_replay": {
+    "fixture_byte_exact": true,
+    "copied_proof_files_unchanged": 5,
+    "exe": "/absent/FIRSTENC.EXE",
+    "asm": "/absent/ffe.asm",
+    "data": "/absent/ffedat.asm"
+  },
+  "independent_original_reproof": {
+    "fixture_byte_exact": true,
+    "all_five_captured_files_byte_exact": true
+  },
+  "expected_arithmetic_calculated_in_python": false,
+  "full_model_inventory_claimed": false,
+  "Main_integrated": false
+}

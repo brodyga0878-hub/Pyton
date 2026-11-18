@@ -1,0 +1,8 @@
+{
+  "name": "damage_effects",
+  "generator": "tools/rebuild_source_damage_effects_native.py",
+  "fixture": "tests/fixtures/source_damage_effects_native.json",
+  "kind": "proof_asm",
+  "proof_dir": "validation/equipment-effects-2026-11-18/effects-native-proof",
+  "supplemental": true
+}

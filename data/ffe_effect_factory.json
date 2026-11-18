@@ -1,0 +1,77 @@
+{
+  "schema": "starfrontier-effect-factory-resources-v1",
+  "profile": "dos-firstenc-effect-factory-v1",
+  "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "selected_model_indices": [
+    153,
+    155
+  ],
+  "selected_model_count": 2,
+  "null_model_indices": [
+    149
+  ],
+  "descriptor_bytes": 68,
+  "physical_spec_bytes": 24,
+  "models": {
+    "153": {
+      "descriptor_hex": "124b4b001e4d4b001e000000784d4b00120000000400000000000000680000000f0000000606060006000000ff6800007f340000144d4b00a84d4b000000000000000000",
+      "collision_present": true,
+      "collision_first_byte_u8": 16,
+      "physical_spec_hex": "000000000100010000000c006400000001000000020b0000",
+      "drive_mass_table_u32": [
+        0,
+        4,
+        10,
+        25,
+        45,
+        80,
+        150,
+        250,
+        400,
+        600,
+        6,
+        12,
+        24,
+        36,
+        0
+      ]
+    },
+    "155": {
+      "descriptor_hex": "c04f4b0018524b002a00000096524b00060000000e0000000000000064000000120000000606060010000000006400000000000016524b00000000000000000000000000",
+      "collision_present": true,
+      "collision_first_byte_u8": 0,
+      "physical_spec_hex": "",
+      "drive_mass_table_u32": [
+        0,
+        4,
+        10,
+        25,
+        45,
+        80,
+        150,
+        250,
+        400,
+        600,
+        6,
+        12,
+        24,
+        36,
+        0
+      ]
+    }
+  },
+  "model_bindings": {
+    "153": {
+      "table_slot_file_offset": 764768,
+      "descriptor_pointer_u32": 4935128,
+      "descriptor_file_offset": 649688
+    },
+    "155": {
+      "table_slot_file_offset": 764776,
+      "descriptor_pointer_u32": 4936354,
+      "descriptor_file_offset": 650914
+    }
+  },
+  "original_spans_sha256": "ea22d641dd912020beda75c4c694629bba2d0bbcaf88f2409555f3da03dfe056",
+  "scope": "Only original model153 cargo and155 explosion supplement the unchanged0..148 factory catalog. Slot149 is null. No maximum table count or full effects renderer is inferred."
+}

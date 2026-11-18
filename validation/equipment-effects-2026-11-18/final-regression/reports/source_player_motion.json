@@ -1,0 +1,40 @@
+{
+	"callback_cases": {
+		"F1116": 106,
+		"F148": 14,
+		"F1906": 14,
+		"F1910": 48,
+		"F349": 14,
+		"F569": 312,
+		"F939": 96,
+		"F953": 26
+	},
+	"checks": 7446,
+	"consecutive_actual_callbacks": 48,
+	"contact_cases": 312,
+	"failures": 0,
+	"full_collision_classifier": false,
+	"live_Main_motion_replaced": false,
+	"native_cases": 600,
+	"noise_request_cases": 48,
+	"operations": [
+		"effects_f1046",
+		"contact_f1033",
+		"decay_f1034"
+	],
+	"physical_device_tested": false,
+	"profile": "dos-firstenc-player-motion-contact-v1",
+	"schema": 1,
+	"scope": "Whole original DOS F1046 drift/FX caller, F1033 after explicit source F569 observation and F1034 cargo decay. Full16KB root and338B body are compared against independent native source instructions. F939 RNG/allocation, audio/UI/destruction and F569 classification are explicit boundaries, not full effects execution.",
+	"sources": {
+		"scripts/source_fuel_scoop.gd": "de1e96fd3013de48557b340b9ca4e4d174c4d39aaebb8b2eee96250db53af296",
+		"scripts/source_gravity.gd": "058db4e5cbebd07e7420274ca07b24ccaec620f46c440081d1d6855326dc3872",
+		"scripts/source_player_motion.gd": "61e2827fb0543361946442553210505f6d64794dff189f61d9bda79509c43cbd",
+		"tests/fixtures/source_player_motion_native.json": "622178b60d3108936c868ea9ae36e95c1a72db34bb17c257e2d5fde814bf36cb",
+		"tests/test_source_player_motion.gd": "423e7debedda31d1a2cc83434452c27836056b91d5692d8d4a07ffa383c6f0be",
+		"tools/rebuild_source_player_motion_native.py": "dc826ddcf8d76f1696c51710cee4035f30fb3372ec7adc8216853faa3ed59c6d",
+		"validation/player-cycle-2026-11-17/motion-native-proof/instruction-proof.json": "1f4b37009e94658868daff34ebe99f0ae4a47e4c76db24df7069ca5e054956ab",
+		"validation/player-cycle-2026-11-17/motion-native-proof/source-procedures.s": "3acd50f10daee8cce8c1d5f813539399744560c6ed9360b6d100e1e7390d5772"
+	},
+	"trail_request_cases": 96
+}

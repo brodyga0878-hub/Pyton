@@ -44,6 +44,11 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_equipment', 'tests/test_source_equipment.gd', 'Whole original equipment/cargo/drive damage with shared Root, exact callbacks, tables and independent native parity.', timeout=600),
+    Suite('source_equipment_state', 'tests/test_source_equipment_state.gd', 'Owned equipment state with atomic publication, verified callbacks and cold replay.', timeout=600),
+    Suite('source_effect_factory', 'tests/test_source_effect_factory.gd', 'Exact additional source cargo/explosion model resources and original full-record factory controls.', timeout=600),
+    Suite('source_destruction', 'tests/test_source_destruction.gd', 'Original destruction rewards, full bank allocation, source random effects and final slot release.', timeout=600),
+    Suite('source_damage_effects', 'tests/test_source_damage_effects.gd', 'Whole damage composed with actual equipment/destruction and a single owned bank/Root across hot and cold continuation.', timeout=600),
     Suite('source_damage', 'tests/test_source_damage.gd', 'Whole DOS F953 with source event registers, real shared RNG, module loops and exact external continuations.', timeout=600),
     Suite('source_global_rng', 'tests/test_source_global_rng.gd', 'Original F1530/F922 arithmetic sharing Root words, native boundary/interleaving controls and readonly owner validation.', timeout=600),
     Suite('source_object_slots', 'tests/test_source_object_slots.gd', 'Original F928 allocation/F924 free, actual factory initialization, source aliases and typed module continuations.', timeout=600),

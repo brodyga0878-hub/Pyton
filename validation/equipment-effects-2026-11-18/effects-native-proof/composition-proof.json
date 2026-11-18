@@ -1,0 +1,48 @@
+{
+  "schema": "starfrontier-original-damage-effects-composition-v1",
+  "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_dependencies_sha256": {
+    "data/ffe_effect_factory.json": "28afd09d2d3107c75d20e15fa9c431f46cddfee3a399de9a29d7310a7f782db3",
+    "data/ffe_ground_coordinates.json": "e94e9ec86761aa1d775498a2959af201f3c6497506da481c9d49ca7f27766abf",
+    "data/ffe_object_factory.json": "c2a39b98f17721b55eac7fc5d3015e39b279fb05a002401fd3120218721894a2",
+    "tools/rebuild_source_damage_effects_native.py": "5d4563842a6cf5923f45e4dd230badf329a75362973b6ab6fa4654418b87382b",
+    "tools/rebuild_source_damage_native.py": "5b2bdab57b8e8ba3f7125aa12bb4d95e11cc0709d164e4c675e071aa5a3e9c8d",
+    "tools/rebuild_source_destruction_native.py": "aaa3950c0436d357cc5acb4cec4c4d6a2a521d0ecd0dc50410500ed6b3cc1507",
+    "tools/rebuild_source_effect_factory_native.py": "4c7f8f5f6f42b657c43c642e5e10734cd49cd54851a4a37f1a37f46268847e47",
+    "tools/rebuild_source_equipment_native.py": "848a9588b9f7d821cb2ef71923f65bfeec5cb5b28edc6f36a2c7c8d979f6f799",
+    "tools/rebuild_source_natural_contact_native.py": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889",
+    "validation/damage-core-2026-11-17/native-proof/instruction-proof.json": "9351518bfb7212f0f97be4c523534207b95f5130a2a86d4d1bf4efed4ec23e39",
+    "validation/damage-core-2026-11-17/native-proof/source-procedures.asm": "7bb7cfd2ff7aa205cdb3e270bbbbbaea4a410eaa329cef2486eeb30c1a9b2bcb",
+    "validation/equipment-effects-2026-11-18/destruction-native-proof/instruction-proof.json": "9499d86b08dc0412803c2485b759496ba67b8fec7a1778d61cd4be2976082808",
+    "validation/equipment-effects-2026-11-18/destruction-native-proof/source-procedures.asm": "1817d1c3182acf047beedc4f7f45b1d7ca13daedfec284fb81609805911d081d",
+    "validation/equipment-effects-2026-11-18/equipment-native-proof/instruction-proof.json": "40b7099ac713dbf81f8bfdd8463a3aafee75ea01f710cc16e2c2882a77946d59",
+    "validation/equipment-effects-2026-11-18/equipment-native-proof/original-resources.json": "48c022098faa3dc44cb69c20c5f90e2c5ee4592e939f5db2d3d86aa884337cb1",
+    "validation/equipment-effects-2026-11-18/equipment-native-proof/source-procedures.asm": "902b3985c9e1c985611e227adb067b39b2ecd1ef55e10f8bb6dce307109663ac"
+  },
+  "host_assembly_sha256": {
+    "damage": "1cb2f205c68086b24482bd31f1f8c413f6bd52c85c47fd7790fd978ea92a3ebd",
+    "equipment": "dff27afcacc23904c6b268c59cbaf1c94b629047b606619540d39ccc5d3b734d",
+    "destruction": "9366caeb56c7f58c6333bc268600907135ef016355244807b33e44b0238785fd"
+  },
+  "host_support_sha256": {
+    "destruction": "62cb05ffb032d382cacc1c5ff7770d72139f886cf367b14b53731591cc9c9947"
+  },
+  "native_calls": {
+    "damage": 196,
+    "equipment": 35,
+    "destruction": 47
+  },
+  "fresh_process_runs_each_call": 3,
+  "reverse_native_calls_verified": true,
+  "equipment_cases": 16,
+  "destruction_cases": 16,
+  "no_effect_cases": 4,
+  "actual_cargo_selection_F951_calls": 2,
+  "actual_displacement_F1514_calls": 6,
+  "cases_with_active_native_created_cargo153": 2,
+  "complete_native_owner_bytes_per_effect_reply": 17293,
+  "expected_arithmetic_calculated_in_python": false,
+  "all_native_canaries_verified": true,
+  "scope": "Whole original F953 receives measured whole F952 equipment or F942/F926/F927 destruction outputs, with complete bank/root/event/module ownership carried. Source targets are original0..148 ship models; newly created153/155 records are real outputs but later damage to those effect objects is outside this bounded F953 profile. Handler/VM/UI/string bodies remain typed explicit external providers; no Main or Android claim."
+}

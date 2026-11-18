@@ -1,0 +1,86 @@
+{
+  "schema": "starfrontier-effect-factory-original-spans-v1",
+  "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "selected_model_indices": [
+    153,
+    155
+  ],
+  "model_bindings": {
+    "153": {
+      "table_slot_file_offset": 764768,
+      "descriptor_pointer_u32": 4935128,
+      "descriptor_file_offset": 649688
+    },
+    "155": {
+      "table_slot_file_offset": 764776,
+      "descriptor_pointer_u32": 4936354,
+      "descriptor_file_offset": 650914
+    }
+  },
+  "spans": [
+    {
+      "role": "null-model149-slot",
+      "file_offset": 764752,
+      "byte_count": 4,
+      "hex": "00000000",
+      "sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119"
+    },
+    {
+      "role": "drive-mass-table15",
+      "file_offset": 886300,
+      "byte_count": 60,
+      "hex": "00000000040000000a000000190000002d0000005000000096000000fa0000009001000058020000060000000c000000180000002400000000000000",
+      "sha256": "46acd9e04a1ddee59a46da2a5b51cf6f7db9e2c4b1caf40027ed61275914965d"
+    },
+    {
+      "role": "model153-slot",
+      "file_offset": 764768,
+      "byte_count": 4,
+      "hex": "d84d4b00",
+      "sha256": "57424c40c9ce0c7c2708c22296449bce785da8870d0a8c2d28506fe8ccf43765"
+    },
+    {
+      "role": "model153-descriptor",
+      "file_offset": 649688,
+      "byte_count": 68,
+      "hex": "124b4b001e4d4b001e000000784d4b00120000000400000000000000680000000f0000000606060006000000ff6800007f340000144d4b00a84d4b000000000000000000",
+      "sha256": "432be44d25b7b95b07b30b3bdaae8f9f0bc4c160f5ca5e702dff037c4ff42980"
+    },
+    {
+      "role": "model153-collision-first-byte",
+      "file_offset": 649492,
+      "byte_count": 1,
+      "hex": "10",
+      "sha256": "c555eab45d08845ae9f10d452a99bfcb06f74a50b988fe7e48dd323789b88ee3"
+    },
+    {
+      "role": "model153-physical24",
+      "file_offset": 649640,
+      "byte_count": 24,
+      "hex": "000000000100010000000c006400000001000000020b0000",
+      "sha256": "1d7a9d8c548981f4228ed980b766085bd36cd26304d21f0a1beb31c262590c10"
+    },
+    {
+      "role": "model155-slot",
+      "file_offset": 764776,
+      "byte_count": 4,
+      "hex": "a2524b00",
+      "sha256": "9935393185fc4143ac467778a27580830ce54b68432d57095c2a36b364111ddb"
+    },
+    {
+      "role": "model155-descriptor",
+      "file_offset": 650914,
+      "byte_count": 68,
+      "hex": "c04f4b0018524b002a00000096524b00060000000e0000000000000064000000120000000606060010000000006400000000000016524b00000000000000000000000000",
+      "sha256": "bd68ea4d53335c03932c9fa9e5f0b3148402c7864a728c81e75bd1a71b703d38"
+    },
+    {
+      "role": "model155-collision-first-byte",
+      "file_offset": 650774,
+      "byte_count": 1,
+      "hex": "00",
+      "sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d"
+    }
+  ],
+  "scope": "Exact selected model-table bindings, descriptors, physical records, collision first bytes and drive masses. This is not the full original model inventory."
+}

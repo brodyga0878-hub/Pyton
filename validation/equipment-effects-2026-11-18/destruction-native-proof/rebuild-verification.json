@@ -1,0 +1,41 @@
+{
+  "schema": "starfrontier-source-destruction-rebuild-verification-v1",
+  "fixture_bytes": 7569570,
+  "fixture_sha256": "988b08fd107de2564f0cb2c30cf81c5a22b8c2b2cb324211740004f74661ca48",
+  "case_count": 170,
+  "whole_original_procedures": 16,
+  "whole_original_instructions": 872,
+  "actual_F926_attempts": 192,
+  "actual_cargo_allocations": 57,
+  "actual_explosion_matrices": 154,
+  "position_boundary_controls": 6,
+  "consecutive_native_steps": 12,
+  "explicit_provider_responses": 399,
+  "runtime_checks": 2486,
+  "runtime_failures": 0,
+  "all_owner_boundary_canaries_unchanged": true,
+  "all_readonly_input_resource_bytes_unchanged": true,
+  "copied_proof_absent_originals": {
+    "mode": "absent-original-copy",
+    "fixture_byte_exact": true,
+    "proof_files_byte_exact": 5,
+    "fixture_sha256": "988b08fd107de2564f0cb2c30cf81c5a22b8c2b2cb324211740004f74661ca48"
+  },
+  "independent_original_reproof": {
+    "mode": "independent-original-reproof",
+    "fixture_byte_exact": true,
+    "proof_files_byte_exact": 5,
+    "fixture_sha256": "988b08fd107de2564f0cb2c30cf81c5a22b8c2b2cb324211740004f74661ca48"
+  },
+  "complete_single_process_cohort_replay": {
+    "case_count": 170,
+    "fresh_whole_cohort_processes": 3,
+    "reverse_single_process_cohort_verified": true,
+    "all_existing_fixture_expected_owner_states_byte_exact": true,
+    "captured_output_bytes": 54139656,
+    "captured_output_sha256": "7f368a69ec9e3bbd1e95c948af6e3b0b6da932b878be0624a4e5b5b338efc5cb"
+  },
+  "new_APK_produced": false,
+  "Main_integrated": false,
+  "physical_device_tested": false
+}

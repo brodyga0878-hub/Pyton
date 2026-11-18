@@ -1,0 +1,32 @@
+{
+	"Main_integrated": false,
+	"actual_cargo_allocations": 57,
+	"actual_cargo_attempts": 192,
+	"actual_matrices": 154,
+	"checks": 2486,
+	"failures": 0,
+	"full_UI_or_module_handler_engine": false,
+	"native_cases": 170,
+	"profile": "dos-firstenc-whole-f942-destruction-v1",
+	"sources": {
+		"data/ffe_effect_factory.json": "28afd09d2d3107c75d20e15fa9c431f46cddfee3a399de9a29d7310a7f782db3",
+		"data/ffe_ground_coordinates.json": "e94e9ec86761aa1d775498a2959af201f3c6497506da481c9d49ca7f27766abf",
+		"data/ffe_object_factory.json": "c2a39b98f17721b55eac7fc5d3015e39b279fb05a002401fd3120218721894a2",
+		"scripts/body_rotation.gd": "b5d4e63331728681d1f34c73fe83cdd57120e29b352e09090da4ff147b22ed34",
+		"scripts/ground_coordinates.gd": "54dedcc157dea6c84c4f8ad6ff0859159d81719cafbbaa23c626cd94e1cdf7b6",
+		"scripts/source_damage.gd": "ea902b53614ef09ea182bfbf69034ad8679aa508f543b9158b198c7a387c816e",
+		"scripts/source_destruction.gd": "9b5f4cae262cabbe27e0bb14caed62caa097fb1b61f546bc81d36bb4f8b9894a",
+		"scripts/source_effect_factory.gd": "bf9be98a22fbbb2f59d49eb0a7404d59518d5b7247fcfdc1511feca5f95fd15b",
+		"scripts/source_global_rng.gd": "5d8dc936e9548f85c8f94913ee6b97b82eb3319dc833b9d604e4589cc933de25",
+		"scripts/source_object_factory.gd": "e97a31782edb90169a13612b2c962c7467771c9f8a163e7b7b2d3b34a09b0e86",
+		"tests/fixtures/source_destruction_native.json": "988b08fd107de2564f0cb2c30cf81c5a22b8c2b2cb324211740004f74661ca48",
+		"tests/test_source_destruction.gd": "bdd345f157fc372bd3d258e5de4174f155c2f79f27964cb4b515343d8459f289",
+		"tools/rebuild_source_damage_native.py": "5b2bdab57b8e8ba3f7125aa12bb4d95e11cc0709d164e4c675e071aa5a3e9c8d",
+		"tools/rebuild_source_destruction_native.py": "aaa3950c0436d357cc5acb4cec4c4d6a2a521d0ecd0dc50410500ed6b3cc1507",
+		"tools/rebuild_source_natural_contact_native.py": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889",
+		"validation/equipment-effects-2026-11-18/destruction-native-proof/destruction-native.s": "9366caeb56c7f58c6333bc268600907135ef016355244807b33e44b0238785fd",
+		"validation/equipment-effects-2026-11-18/destruction-native-proof/destruction-support.c": "62cb05ffb032d382cacc1c5ff7770d72139f886cf367b14b53731591cc9c9947",
+		"validation/equipment-effects-2026-11-18/destruction-native-proof/instruction-proof.json": "9499d86b08dc0412803c2485b759496ba67b8fec7a1778d61cd4be2976082808",
+		"validation/equipment-effects-2026-11-18/destruction-native-proof/source-procedures.asm": "1817d1c3182acf047beedc4f7f45b1d7ca13daedfec284fb81609805911d081d"
+	}
+}

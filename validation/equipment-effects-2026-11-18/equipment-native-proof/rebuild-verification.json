@@ -1,0 +1,45 @@
+{
+  "schema": "starfrontier-equipment-native-rebuild-verification-v1",
+  "date_utc": "2026-11-18",
+  "fixture_sha256": "3d3827bb66c49d640aea08c4238d738d470495192cbdf73eb161fcf2d02ddc63",
+  "fixture_bytes": 2598291,
+  "case_count": 503,
+  "whole_original_procedures": 16,
+  "whole_original_instructions": 389,
+  "fresh_native_process_runs": 3,
+  "reverse_repeat_cases": 503,
+  "consecutive_shared_state_steps": 23,
+  "explicit_external_observations": 276,
+  "external_requests": {
+    "F349": 212,
+    "F144_handler": 64
+  },
+  "all29_selectable_equipment_bits_native_hits": true,
+  "unreachable_rotated_bits29_30_31_consume29_rng_calls": true,
+  "successful_selection_on_attempt29": true,
+  "all38_original_cargo_positions": true,
+  "cargo_index30_word_alias_native_verified": true,
+  "all6_weapon_mounts": true,
+  "all21_original_module_dispatch_slots": true,
+  "all15_original_player_drive_indices": true,
+  "all_static_tables_and_readonly_inputs_and_canaries_unchanged": true,
+  "expected_arithmetic_calculated_in_python": false,
+  "archive_only": {
+    "fixture_byte_exact": true,
+    "all_five_captured_proof_files_byte_exact": true,
+    "proof_copy_used": true,
+    "private_original_paths_deliberately_absent": true
+  },
+  "original_reproof": {
+    "fixture_byte_exact": true,
+    "all_five_captured_proof_files_byte_exact": true,
+    "proof_copy_used": false,
+    "private_original_paths_deliberately_absent": false
+  },
+  "scope": "Whole bounded F933/F943..952 equipment/cargo updates; UI and nonnull module handler bodies remain typed external providers. No F942 debris, Main, APK or physical Android claim.",
+  "runtime_parity_checks": 4562,
+  "runtime_parity_failures": 0,
+  "owned_state_parity_checks_separate": 782,
+  "owned_state_parity_failures": 0,
+  "owned_state_native_cohort_separate": 64
+}

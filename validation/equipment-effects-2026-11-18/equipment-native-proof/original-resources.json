@@ -1,0 +1,279 @@
+{
+  "tables": {
+    "DATA_007210": {
+      "virtual_address": 5171740,
+      "file_offset": 886300,
+      "byte_count": 60,
+      "hex": "00000000040000000a000000190000002d0000005000000096000000fa0000009001000058020000060000000c000000180000002400000000000000",
+      "sha256": "46acd9e04a1ddee59a46da2a5b51cf6f7db9e2c4b1caf40027ed61275914965d",
+      "words_u32": [
+        0,
+        4,
+        10,
+        25,
+        45,
+        80,
+        150,
+        250,
+        400,
+        600,
+        6,
+        12,
+        24,
+        36,
+        0
+      ]
+    },
+    "DATA_007211": {
+      "virtual_address": 5171800,
+      "file_offset": 886360,
+      "byte_count": 120,
+      "hex": "8898000088980000899800008c980000929800008d9800008b9800009c9800008f980000a79800009e9800009f9800009998000093980000849800009d9800008798000083980000b2980000b0980000b1980000859800008698000080980000b39800007f980000989800008198000082980000b4980000",
+      "sha256": "5b45243d9bca17f65d4b705b18a0f5a79ccbc3fe9a254c34e70626f9a62514b0",
+      "words_u32": [
+        39048,
+        39048,
+        39049,
+        39052,
+        39058,
+        39053,
+        39051,
+        39068,
+        39055,
+        39079,
+        39070,
+        39071,
+        39065,
+        39059,
+        39044,
+        39069,
+        39047,
+        39043,
+        39090,
+        39088,
+        39089,
+        39045,
+        39046,
+        39040,
+        39091,
+        39039,
+        39064,
+        39041,
+        39042,
+        39092
+      ]
+    }
+  },
+  "module_registry": [
+    {
+      "module_index_u32": 0,
+      "table_pointer_u32": 5159396,
+      "pointer_file_offset": 770980,
+      "table_file_offset": 873956,
+      "span_hex": "889343000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "span_sha256": "3ef3abdc8d84aafc046f2d3d15ae251d2175820950779e3b495dc0d09798b64e",
+      "event2_handler_va_u32": 0,
+      "event11_handler_va_u32": 0
+    },
+    {
+      "module_index_u32": 1,
+      "table_pointer_u32": 5140856,
+      "pointer_file_offset": 770984,
+      "table_file_offset": 855416,
+      "span_hex": "00000000000000000000000000000000000000002c704300887143000000000000000000000000000000000000000000",
+      "span_sha256": "db0f9a2a1aec03963b68061b345db188c265af8402af0ac434bee0a1adf6010c",
+      "event2_handler_va_u32": 0,
+      "event11_handler_va_u32": 0
+    },
+    {
+      "module_index_u32": 2,
+      "table_pointer_u32": 5116196,
+      "pointer_file_offset": 770988,
+      "table_file_offset": 830756,
+      "span_hex": "973d430038454300274643002c484300ed3c4300000000000000000000000000486f4300000000000000000000000000",
+      "span_sha256": "44b4d34f9f98ed3b12259197d92e9352171532476ec686ef00b41881b01b922d",
+      "event2_handler_va_u32": 4408871,
+      "event11_handler_va_u32": 0
+    },
+    {
+      "module_index_u32": 3,
+      "table_pointer_u32": 5172624,
+      "pointer_file_offset": 770992,
+      "table_file_offset": 887184,
+      "span_hex": "c802440000044400685644003c09440050474400c4084400a40544000000000058054400000000004411440040524400",
+      "span_sha256": "9296d387ceeff3bc321623f478a0190621629681a4b52121ef757d999aa97933",
+      "event2_handler_va_u32": 4478568,
+      "event11_handler_va_u32": 4477504
+    },
+    {
+      "module_index_u32": 4,
+      "table_pointer_u32": 5064944,
+      "pointer_file_offset": 770996,
+      "table_file_offset": 779504,
+      "span_hex": "28d14100000000000cd1410024dc41000000000000000000000000000000000000000000000000000000000000000000",
+      "span_sha256": "d69a4b640bd28ac08f4fadf29cf90083d94faa698cfd1db875fd256a79fd59f7",
+      "event2_handler_va_u32": 4313356,
+      "event11_handler_va_u32": 0
+    },
+    {
+      "module_index_u32": 5,
+      "table_pointer_u32": 5172412,
+      "pointer_file_offset": 771000,
+      "table_file_offset": 886972,
+      "span_hex": "28e9430038ea43000000000054ef430028ed430080f5430000000000000000009ce94300000000000000000000000000",
+      "span_sha256": "b5c7f7c8448e7f8c0574ac8a28647b9a1370c97bacedeba2891f1403d118d805",
+      "event2_handler_va_u32": 0,
+      "event11_handler_va_u32": 0
+    },
+    {
+      "module_index_u32": 6,
+      "table_pointer_u32": 5140904,
+      "pointer_file_offset": 771004,
+      "table_file_offset": 855464,
+      "span_hex": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "span_sha256": "17b0761f87b081d5cf10757ccc89f12be355c70e2e29df288b65b30710dcbcd1",
+      "event2_handler_va_u32": 0,
+      "event11_handler_va_u32": 0
+    },
+    {
+      "module_index_u32": 7,
+      "table_pointer_u32": 5103064,
+      "pointer_file_offset": 771008,
+      "table_file_offset": 817624,
+      "span_hex": "d4b242000000000034c54200000000000000000018c542002ccb42000000000000000000000000000000000000000000",
+      "span_sha256": "a9a208835da8e4d0d3868c5d20c3925cf140543880bde04ddf3b7efcf6efd6e2",
+      "event2_handler_va_u32": 4375860,
+      "event11_handler_va_u32": 0
+    },
+    {
+      "module_index_u32": 8,
+      "table_pointer_u32": 5172272,
+      "pointer_file_offset": 771012,
+      "table_file_offset": 886832,
+      "span_hex": "cce2430000000000000000000000000080e5430000000000000000000000000000000000000000000000000000000000",
+      "span_sha256": "eef68fdb9bb347a5951b029bc85a66fea8b4905cbf2b835d0b22f80f4c7a251d",
+      "event2_handler_va_u32": 0,
+      "event11_handler_va_u32": 0
+    },
+    {
+      "module_index_u32": 9,
+      "table_pointer_u32": 5110124,
+      "pointer_file_offset": 771016,
+      "table_file_offset": 824684,
+      "span_hex": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "span_sha256": "17b0761f87b081d5cf10757ccc89f12be355c70e2e29df288b65b30710dcbcd1",
+      "event2_handler_va_u32": 0,
+      "event11_handler_va_u32": 0
+    },
+    {
+      "module_index_u32": 10,
+      "table_pointer_u32": 5058504,
+      "pointer_file_offset": 771020,
+      "table_file_offset": 773064,
+      "span_hex": "18b6410098b8410000000000b8ac4100e4af410000000000000000000000000014ba410000000000d4be410000000000",
+      "span_sha256": "64b42513e9b60709d9e8fa8b0fc6200c9b8ed8f1c66c1c7baf801e6a87a52bc5",
+      "event2_handler_va_u32": 0,
+      "event11_handler_va_u32": 0
+    },
+    {
+      "module_index_u32": 11,
+      "table_pointer_u32": 5106508,
+      "pointer_file_offset": 771024,
+      "table_file_offset": 821068,
+      "span_hex": "17d3420000000000adce420000000000000000008edf4200cfdf420000000000000000000000000000000000cf074300",
+      "span_sha256": "1231916b8f4879d805a6b1daea154a441f95ee8c3d764ebda7f93e0b8bd3d44d",
+      "event2_handler_va_u32": 4378285,
+      "event11_handler_va_u32": 4392911
+    },
+    {
+      "module_index_u32": 12,
+      "table_pointer_u32": 5077100,
+      "pointer_file_offset": 771028,
+      "table_file_offset": 791660,
+      "span_hex": "f80d4200c4194200500e4200dc1d420048204200000000000000000000000000e0184200000000000000000000000000",
+      "span_sha256": "378b97ec0a034bfa2ef1c192de399e52662728aae9d69078bd9d6313f1c12770",
+      "event2_handler_va_u32": 4329040,
+      "event11_handler_va_u32": 0
+    },
+    {
+      "module_index_u32": 13,
+      "table_pointer_u32": 4836832,
+      "pointer_file_offset": 771032,
+      "table_file_offset": 551392,
+      "span_hex": "000000000000000000000000208241000000000000000000000000000000000000000000000000000000000000000000",
+      "span_sha256": "60e0fd00e3255dea9722cd3ba5ff22e316f24e987f72b54c46b35194c976224b",
+      "event2_handler_va_u32": 0,
+      "event11_handler_va_u32": 0
+    },
+    {
+      "module_index_u32": 14,
+      "table_pointer_u32": 5070672,
+      "pointer_file_offset": 771036,
+      "table_file_offset": 785232,
+      "span_hex": "c4e24100e0e7410074f641000cf041000000000000000000ace14100000000006ce341000000000080fd410000000000",
+      "span_sha256": "427220e4c297908d42a5dc4604a00dd963d562dbb3e9769fdb4cbe0e110c432d",
+      "event2_handler_va_u32": 4322932,
+      "event11_handler_va_u32": 0
+    },
+    {
+      "module_index_u32": 15,
+      "table_pointer_u32": 5062892,
+      "pointer_file_offset": 771040,
+      "table_file_offset": 777452,
+      "span_hex": "000000000000000010bf4100e5c541000000000000000000000000000000000000000000000000002ec3410000000000",
+      "span_sha256": "ba0a0e3d994142517154ccf765913d759b4dfd380a51b6380e021c0133489615",
+      "event2_handler_va_u32": 4308752,
+      "event11_handler_va_u32": 0
+    },
+    {
+      "module_index_u32": 16,
+      "table_pointer_u32": 5169652,
+      "pointer_file_offset": 771044,
+      "table_file_offset": 884212,
+      "span_hex": "000000007cbb430000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "span_sha256": "616aadff54cb7ca6c23774401eccb7c178057bf38824e598cb6fb2d1e990eca0",
+      "event2_handler_va_u32": 0,
+      "event11_handler_va_u32": 0
+    },
+    {
+      "module_index_u32": 17,
+      "table_pointer_u32": 5063556,
+      "pointer_file_offset": 771048,
+      "table_file_offset": 778116,
+      "span_hex": "84c641000000000098c6410000000000000000003cd041000000000000000000000000000000000000000000d0d04100",
+      "span_sha256": "2cfd851df442118893351768a6bb1fd8b6431c36c790b4ffa7a2a90bc524569f",
+      "event2_handler_va_u32": 4310680,
+      "event11_handler_va_u32": 4313296
+    },
+    {
+      "module_index_u32": 18,
+      "table_pointer_u32": 5077100,
+      "pointer_file_offset": 771052,
+      "table_file_offset": 791660,
+      "span_hex": "f80d4200c4194200500e4200dc1d420048204200000000000000000000000000e0184200000000000000000000000000",
+      "span_sha256": "378b97ec0a034bfa2ef1c192de399e52662728aae9d69078bd9d6313f1c12770",
+      "event2_handler_va_u32": 4329040,
+      "event11_handler_va_u32": 0
+    },
+    {
+      "module_index_u32": 19,
+      "table_pointer_u32": 4833340,
+      "pointer_file_offset": 771056,
+      "table_file_offset": 547900,
+      "span_hex": "38744100dc6d4100a4734100006a410000000000000000000000000000000000d84e4100000000000000000000000000",
+      "span_sha256": "4596451df846f9b02944765d0993e27378cc9a30c84feeba22388e7361e1adfd",
+      "event2_handler_va_u32": 4289444,
+      "event11_handler_va_u32": 0
+    },
+    {
+      "module_index_u32": 20,
+      "table_pointer_u32": 4779020,
+      "pointer_file_offset": 771060,
+      "table_file_offset": 493580,
+      "span_hex": "18444100000000008044410000000000000000000000000000000000000000000000000000000000104541008c454100",
+      "span_sha256": "6eb6bd5a1a8028629bf2f388b41be6348917918623508e884d82d7034114ed4b",
+      "event2_handler_va_u32": 4277376,
+      "event11_handler_va_u32": 4277644
+    }
+  ]
+}

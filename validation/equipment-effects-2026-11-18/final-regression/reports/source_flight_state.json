@@ -1,0 +1,23 @@
+{
+	"checks": 9527,
+	"failures": 0,
+	"scope": "Explicit raw-flight owner integration over existing independently DOS-verified angular, indexed-frame and clock kernels. Native fixture controls are reused, not new oracle cases. Private transactions, common receipts, typed ownership, bounded one-step witness and cold continuation are checked. No original F570/F1019/F1041 caller order, F1418 timer, F597 autopilot, celestial F866 advancement, actual Main flight or physical Android claim.",
+	"source_fixture_cases_compared": {
+		"angular": 12,
+		"clock": 836,
+		"reference": 372
+	},
+	"sources": {
+		"scripts/source_angular_motion.gd": "e4af479bcfcbfb7bbb927aedeae64d0859dc5d40f39b90ef7e5f942a75051a52",
+		"scripts/source_clock_pipeline.gd": "dd95f4c243fd8043523d4ae574b96c5b96fe5487cb395b70556a0248405c39e9",
+		"scripts/source_flight_state.gd": "f04e89bd78bd6ee3748e622c9c03eed95e5e21d62453459e14c4f723bf3765f1",
+		"scripts/source_gravity.gd": "058db4e5cbebd07e7420274ca07b24ccaec620f46c440081d1d6855326dc3872",
+		"scripts/source_motion_pipeline.gd": "478b18ed852da1549eb573e2b8d168e3b817deb684c31c50e085d30a6d98bb84",
+		"scripts/source_player_dispatch.gd": "353bba764111fe5778188ec9046adeb138212cf2cb54b4e34bcdfe1de2bd9742",
+		"scripts/source_reference_bank.gd": "ac9f40bb3572a8bb819ae2c0397c7b8f4685491f3e50275dd86cd7381765a251",
+		"tests/fixtures/source_angular_native.json": "ddcd81328d778ed5225f878e561f65188e4bebdabba6e61e21c36a88b44bdf84",
+		"tests/fixtures/source_clock_pipeline_native.json": "88ea9774bef2a5a36dc2f4011f5c59b1c8f44ca382b8ade21df4906120ddfc62",
+		"tests/fixtures/source_reference_bank_native.json": "474763d258cfcf694f7521cf7fb8e1637fc31f090961179780d35dc71fb4cb45",
+		"tests/test_source_flight_state.gd": "9b5b81a2cbf19a0560eba0002a40dc0a1ad87bfe4edb0d1293b3ad54d465a747"
+	}
+}

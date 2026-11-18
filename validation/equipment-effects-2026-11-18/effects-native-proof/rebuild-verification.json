@@ -1,0 +1,33 @@
+{
+  "schema": "starfrontier-damage-effects-native-rebuild-verification-v1",
+  "status": "verified",
+  "case_count": 36,
+  "fixture_bytes": 1333920,
+  "fixture_sha256": "11a115d6b2c122a0e0dd33b82d83e93775432fec9893ebcfbbcbd424b07ba96b",
+  "equipment_cases": 16,
+  "destruction_cases": 16,
+  "no_effect_cases": 4,
+  "native_calls": {
+    "damage": 196,
+    "equipment": 35,
+    "destruction": 47
+  },
+  "fresh_process_runs_each_call": 3,
+  "reverse_native_calls_verified": true,
+  "full_native_owner_bytes_per_effect_reply": 17293,
+  "actual_F951_calls": 2,
+  "actual_F1514_calls": 6,
+  "active_native_created_cargo_cases": 2,
+  "source_dependency_hashes_current": true,
+  "copied_proof_absent_original_replay": {
+    "fixture_byte_exact": true,
+    "all_five_generated_proof_files_byte_exact": true,
+    "exe": "/absent/FIRSTENC.EXE",
+    "asm": "/absent/ffe.asm",
+    "data": "/absent/ffedat.asm"
+  },
+  "expected_arithmetic_calculated_in_python": false,
+  "event_VM_and_handler_bodies_executed": false,
+  "Main_integrated": false,
+  "physical_device_tested": false
+}
