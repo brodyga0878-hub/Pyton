@@ -1,0 +1,12 @@
+{
+  "case_count": 169,
+  "external_requests": {
+    "event_callback": 31,
+    "F53": 7,
+    "F41": 4,
+    "F52": 4
+  },
+  "sha256": "eb7bc02bc0d8ae9abbc8fd43149acf7742a79c11a31e6d7a44ffb1698a4bb2c5",
+  "bytes": 1000202,
+  "output": "/workspace/recovery/mission-expressions-source-pair-fresh/native/events.json"
+}
