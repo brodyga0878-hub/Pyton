@@ -1,0 +1,37 @@
+{
+  "schema": "starfrontier-mission-tasks-final-documentation-v1",
+  "status": "verified",
+  "source_commit": "1e9528ffa6f39d39d632e702aaf14f53bce6fc93",
+  "artifact_commit": "3c93bfe2cff19994169f2a0df560a7bfafe2c791",
+  "manifest_sha256": "21cc6664e200c52de72f6dde2c2d6ef3650c5c5ebc14b603921ea56c5deef9dc",
+  "publication_proof_sha256": "6aac9e627d435050e580ed9e4b100551dd0a8ab3071b7821db8551720eac26c7",
+  "source_pair_verification_sha256": "a63f89c2cf56a00370ef58ecc21cd9945671327c3e7cad1497ca67c7fdea22ba",
+  "android_verification_sha256": "95a6244aee138fe0f2bb14e3cd0b015b1668447bda1d771f4bd92552c2e4f5f6",
+  "android_provenance_sha256": "97df930967aebb65f6e0b7ebef52973666e7f469c3e45cde0925e359bc6a2e4a",
+  "runtime_freeze_sha256": "96feb7077764b7592fdc779bcb86de7b1adcfd865bdc3e11d15f26e6d09efce7",
+  "functional_suites": 57,
+  "functional_checks": 287815,
+  "runtime_inputs": 585,
+  "actual_complete_HTTPS_downloads": 9,
+  "compiled_scripts": 197,
+  "exact_JSON_resources": 37,
+  "updated_documents_sha256": {
+    "docs/SOURCE_MISSION_TASKS_RU.md": "7824d597cd9f13fa79031eced5aec9067d80480fdb0c4275c949256dd1bcbd39",
+    "validation/mission-tasks-2026-11-19/AUDIT_RU.md": "8329177cae6aabdb9ca1fbea46296ab5979b7cfd09e690bab51bb9bc155752ae",
+    "validation/mission-tasks-2026-11-19/WORK_LOG_RU.md": "b939e16dce03cba675faf4bc98a574878e55f31d9e40476e9c2a2c9f3dc292bd",
+    "docs/VERSIONING_RU.md": "f4d71c502006690e809f2a92a3613b476f47790845c3405f584ea0e8ae9fca01"
+  },
+  "archived_helpers_sha256": {
+    "prepare_bundle.py": "a01b1ab8afc32348ab982862d7f5ab6750504be834f81560ce83fd6e61f24297",
+    "verify_downloads.py": "bca8dfebc01e46d05601cf5dcb9ef28f428608070b46cd543b77fde21c12261f",
+    "publish_docs.py": "f8f3b39732123e31ef03aff26d55344bf65d6931d677c1a916a063f9baeb70c9",
+    "record_android_provenance.py": "36c9f30fcf92ded80fb0ded1ae316891a0f28bb5b1acb6a21afc4914d6fa2004",
+    "seal_validation.py": "8a94f7fd615abdecc79dd39b85a8357200ef17bd362175c56451eff48b01b6dd",
+    "archive_source_pair_logs.py": "e6b1de9bda808f27406bdfc17243ebfb6b83c39a5bd53af875897f67bf32e1be",
+    "finalize_evidence.py": "776cbae1ac3e80cab908dba4f26f347339351a72bf38649dcf6b05201cd39d64"
+  },
+  "sealed_payloads_and_freeze_unchanged": true,
+  "publication_markers_changed_by_this_script": false,
+  "Main_integrated": false,
+  "physical_device_tested": false
+}

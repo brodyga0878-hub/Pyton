@@ -2,7 +2,7 @@
 
 После каждого завершённого и опубликованного блока разработки меняется версия исходного проекта. Новый крупный блок повышает minor-номер; исправление повышает patch-номер. Неизменные имена API-профилей проверенных математических модулей не заменяют версию игры.
 
-Текущая версия исходного проекта: **0.31.0-tasks-alpha1**, Android versionCode **56**. Последняя опубликованная APK — **0.30.0-missions-alpha1**, code55; APK 0.31 подтверждается после её фактической сборки.
+Текущая версия исходного проекта: **0.31.0-tasks-alpha1**, Android versionCode **56**. Последняя опубликованная техническая APK — **0.31.0-tasks-alpha1**, code56; фактическая сборка и независимое соответствие исходникам подтверждены отдельными отчётами.
 
 `scripts/build_info.gd` задаёт номер для меню и диагностических архивов. Android export preset обязан содержать те же versionName/versionCode. Каждый выпускаемый APK получает code больше предыдущего; публикация включает проверку фактического Android-манифеста, подписи и контрольной суммы.
 
@@ -11,3 +11,9 @@
 Для 0.29 собран отдельный APK с code54. Проверка `tools/verify_events_android.py` читает фактические константы экспортированного BuildInfo и сравнивает все 187 скриптов APK с независимым Android export-pack из проверенной пары исходных ZIP. Прежний `tools/verify_rebuilt_android.py` сохраняет контракт исторической версии 0.28/code53. Итоговая APK и оба исходных ZIP доступны в текущем разделе README.
 
 Для 0.30 `tools/verify_mission_android.py` подтвердил code55, настоящие константы BuildInfo, прежнюю TEST-подпись, выравнивание и точные 36 JSON-ресурсов. Все 192 скрипта совпали с независимым Android export-pack из замороженной проверенной пары исходников. Исторические проверки 0.28/0.29 не переписаны. APK и оба ZIP скачаны по обычным HTTPS-ссылкам и проверены по размеру, SHA и CRC.
+
+<!-- MISSION_TASKS_FINAL_EVIDENCE_BEGIN -->
+Для 0.31 `tools/verify_task_android.py` подтвердил фактические code56/BuildInfo, ARM64, прежнюю TEST-подпись, CRC и выравнивание. Все **197** экспортированных скриптов совпали с независимой Android-компиляцией проверенной замороженной пары исходников; **37** JSON-ресурсов совпали побайтно. Source-коммит `1e9528ffa6f39d39d632e702aaf14f53bce6fc93`, artifact-коммит `3c93bfe2cff19994169f2a0df560a7bfafe2c791`. APK имеет SHA256 `4cfb8665c99b284261bba3937b7d967e8e9b6e8e2896d03eb70b3c9c69e35079` и размер 51 066 103 байт.
+
+[APK0.31](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/3c93bfe2cff19994169f2a0df560a7bfafe2c791/deliverables/mission-tasks-core-0.31.0-2026-11-19/StarFrontier-0.31.0-tasks-arm64.apk), [доказательство APK](https://raw.githubusercontent.com/brodyga0878-hub/Pyton/3c93bfe2cff19994169f2a0df560a7bfafe2c791/deliverables/mission-tasks-core-0.31.0-2026-11-19/android-verification.json) и [проверка 9 полных опубликованных загрузок](../validation/mission-tasks-publication-2026-11-19/verification.json). Исторические проверки 0.28/0.29/0.30 сохранены; новые ядра остаются вне Main. Физический S23 Ultra и FPS не проверялись.
+<!-- MISSION_TASKS_FINAL_EVIDENCE_END -->
