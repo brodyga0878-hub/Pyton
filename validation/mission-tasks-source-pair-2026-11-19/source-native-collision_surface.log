@@ -1,0 +1,12 @@
+{
+  "case_count": 36,
+  "actual_F581_calls": 46,
+  "actual_F1876_queries": 42,
+  "native_calls": {
+    "classifier": 72,
+    "geometry": 82,
+    "program": 92,
+    "terrain": 46
+  },
+  "fixture_sha256": "4b206eaaa29d5aed6ba41f43ca7ad0608b8c771385dd02f8e9be6a701cd8d9f2"
+}

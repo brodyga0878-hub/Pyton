@@ -1,0 +1,7 @@
+{
+  "case_count": 260,
+  "fixture_sha256": "91f66840d9cf7a462e5f41bcaffb51e2c580ee7f5efeb02bbe0748878e15f910",
+  "fixture_bytes": 5532107,
+  "typed_boundaries": 838,
+  "fault_domains_separate": 1
+}

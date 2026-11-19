@@ -1,0 +1,6 @@
+{
+  "case_count": 568,
+  "fixture_sha256": "5f13bed8a6664f64636200b098d8485e95fad9c97c2855baab517ab8a8ebad7e",
+  "callback_response_cases": 40,
+  "output": "/workspace/recovery/mission-tasks-source-pair-fresh/native/player_mode.json"
+}

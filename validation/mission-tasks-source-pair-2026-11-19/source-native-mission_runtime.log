@@ -1,0 +1,37 @@
+F52-real-allocation-argc0 1 0
+F52-real-allocation-argc1 4 0
+F52-real-allocation-argc2 7 0
+F52-real-allocation-argc4 13 0
+F52-valid-zero-handle-after-wrap 1 0
+F47-count0-index0-value0 1 0
+F47-count0-index0-value1 1 1
+F47-count1-index2-value1 1 1
+F47-count2-index1-valueffffffff 1 1
+F38-real-unregister-cleanup-1 1 0
+F38-real-unregister-cleanup0 1 0
+F53-real-false-predicates-0 2 1
+F53-real-false-predicates-1 3 1
+F53-real-false-predicates-2 4 1
+F37-real-model-38 2 0
+F37-real-model-117 2 0
+F37-real-model-155 2 0
+F48-snapshot-actual-task-F47 2 1
+F48-live-descriptor-and-variable-retarget 2 1
+F55-real-boot-allocation 4 1
+market-key9-dependent-0 3 1
+market-key9-dependent-1 3 1
+market-key9-dependent-2 3 1
+market-key9-dependent-3 3 1
+market-key9-dependent-4 3 1
+F54-real-final-free 0 0
+original-module0-F52-real-allocation 1 0
+original-module1-F53-real-initialization 1 1
+original-module2-clause1-real-expression 0 0
+original-F55-real-boot-and-free 3 1
+F51-full-arena-NULL-physical-pointer 0 0
+{
+  "case_count": 31,
+  "fixture_sha256": "3a2523e896e8d3cbdc3b7e149a9a591fbca2a68485e9ecdfc05cd9d41b6b7421",
+  "native_measurements": 106,
+  "bytes": 515536
+}

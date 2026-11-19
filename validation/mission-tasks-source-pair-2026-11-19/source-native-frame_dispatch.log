@@ -1,0 +1,11 @@
+{
+  "status": "native-replayed",
+  "case_count": 317,
+  "callbacks": 867,
+  "candidate_record_changes": 606,
+  "cache_byte_record_changes": 382,
+  "cache_byte_change_cases": 110,
+  "actual_frame_conversions": 66,
+  "fixture_sha256": "1c6a82c85c1ef45f230684ba653d856a64cdf89d93e199e3cce42ab99cf7499d",
+  "bytes": 6903010
+}

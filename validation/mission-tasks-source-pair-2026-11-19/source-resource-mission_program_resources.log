@@ -1,0 +1,23 @@
+{
+  "status": "verified",
+  "resource_sha256": "ebd6caa6cc4f5d9d4a606d09a61339d737fada0628eb4cd131b9af91ef5b1f27",
+  "resource_bytes": 393107,
+  "capture_sha256": "9292a646e49a2e1105d47e3b15f6758dd8ee14f656973e1d63e34fa7024fbd0b",
+  "module_count": 105,
+  "block_count": 337,
+  "captured_file_bytes": 108626,
+  "expression_selector_count": 68,
+  "mission_string_count": 468,
+  "DOS_JJFFE_descriptor_scalar_differences": [
+    {
+      "module_index_u32": 32,
+      "source_label": "DATA_001359",
+      "field": "variable_words",
+      "DOS_u32": 15,
+      "JJFFE_u32": 16,
+      "DOS_executable_offset": 478792
+    }
+  ],
+  "bytecode_semantic_execution_claimed": false,
+  "full_F41_VM_executed": false
+}

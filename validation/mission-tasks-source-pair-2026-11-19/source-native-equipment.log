@@ -1,0 +1,10 @@
+{
+  "case_count": 503,
+  "external_requests": {
+    "F349": 212,
+    "F144_handler": 64
+  },
+  "sha256": "3d3827bb66c49d640aea08c4238d738d470495192cbdf73eb161fcf2d02ddc63",
+  "bytes": 2598291,
+  "output": "/workspace/recovery/mission-tasks-source-pair-fresh/native/equipment.json"
+}
