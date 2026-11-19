@@ -1,0 +1,337 @@
+{
+  "schema": "starfrontier-original-mission-store-proof-v1",
+  "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_procedures_sha256": "cfa8fc53a845085537352bb2f86b52831e49f3fa68a1e887dce435a2bd0a87c0",
+  "bindings": {
+    "DATA_000003": 4269730,
+    "DATA_000004": 4269797,
+    "DATA_007754": 5249088,
+    "DATA_008861": 6562308,
+    "DATA_008889": 6562388,
+    "DATA_008891": 6562396,
+    "DATA_008896": 6562416,
+    "DATA_008908": 6562496,
+    "DATA_009093": 6582812,
+    "DATA_009095": 6582836,
+    "DATA_009133": 6584648,
+    "FUNC_000020": 4265060,
+    "FUNC_000022": 4265396,
+    "FUNC_000031": 4266000,
+    "FUNC_000034": 4269304,
+    "FUNC_000036": 4269352,
+    "FUNC_000037": 4269692,
+    "FUNC_000048": 4276292,
+    "FUNC_000390": 4337124,
+    "FUNC_000391": 4337268,
+    "FUNC_000392": 4337412,
+    "FUNC_000441": 4341044,
+    "FUNC_000649": 4375952,
+    "FUNC_001532": 4536092,
+    "JUMP_000333": 4269869,
+    "JUMP_000334": 4269894,
+    "JUMP_000335": 4269921,
+    "JUMP_000336": 4269968,
+    "JUMP_000337": 4270009,
+    "JUMP_000338": 4270069,
+    "JUMP_000339": 4270129,
+    "JUMP_000340": 4270185,
+    "JUMP_000341": 4270269,
+    "JUMP_000342": 4270297,
+    "JUMP_000343": 4270305,
+    "JUMP_000344": 4270333,
+    "JUMP_000345": 4270402,
+    "JUMP_000346": 4270412,
+    "JUMP_000347": 4270431,
+    "JUMP_000348": 4270491,
+    "JUMP_000349": 4270536,
+    "JUMP_000350": 4270585,
+    "JUMP_000351": 4270640,
+    "JUMP_000352": 4270682,
+    "JUMP_000353": 4270762
+  },
+  "selector_table": {
+    "symbol": "DATA_000003",
+    "virtual_address": 4269730,
+    "executable_offset": 13474,
+    "entry_count": 67,
+    "hex": "00000011100f0e0000000000000000000000000000000000000000000000000d00000c0b0a090000080700000000000006000000000000000500000000040300000201",
+    "sha256": "8a08f58d68af7e7ee4911265a594f27191b6303ccb4623c3ece473e81812e15f",
+    "all_bytes_equal": true
+  },
+  "source_code_variants": [
+    {
+      "procedure_u32": 37,
+      "selector_u32": 62,
+      "DOS_store_original_va_u32": 4270616,
+      "JJFFE_only_physical_spec_gate": true,
+      "actual_DOS_unconditional_FF_store": true,
+      "JJFFE_source_sha256": "7d5739d47c747c52bc50dc662368e69f71e854410cba74ee37fc2246515ffb59",
+      "original_capture_sha256": "d5b63725fb192207b6d59f0062d1c00bfe5e9c178b1146c477558bd8b2bdf93b"
+    }
+  ],
+  "procedures": {
+    "20": {
+      "virtual_address": 4265060,
+      "code_regions": [
+        {
+          "virtual_address": 4265060,
+          "executable_offset": 8804,
+          "hex": "558bec538b55088b0233c98a0833db8a5801c1e30803cb33db8a5802c1e31003cb33db8a5803c1e31803cb83c00489028bc15b5dc3",
+          "sha256": "2c813061b30b79c48e48db3b9f7af8e589ce7a6bdd83ab68dad7da110721b4a0",
+          "byte_length": 53,
+          "instruction_count": 25,
+          "normalized_instruction_sha256": "15ac4d0e0433564322411424deca232a6e82fb6e7499602fe7f7699767e3ab5f",
+          "all_original_instructions_equal": true,
+          "source_label_instruction_boundaries": [
+            {
+              "symbol": "FUNC_000020",
+              "instruction_index_u32": 0,
+              "original_va_u32": 4265060
+            }
+          ]
+        }
+      ],
+      "inline_tables": [],
+      "instruction_count": 25
+    },
+    "37": {
+      "virtual_address": 4269692,
+      "code_regions": [
+        {
+          "virtual_address": 4269692,
+          "executable_offset": 13436,
+          "hex": "558bec5356578b75088b06ff060fb60083f8420f87150400008a80a2264100ff2485e5264100",
+          "sha256": "389120770c010351d40dbbb959bf15aad6007cefd4b938a0fa4b9da855b29499",
+          "byte_length": 38,
+          "instruction_count": 13,
+          "normalized_instruction_sha256": "bed97f2f422fb27a760f678707b12d55b7ef62d117f330f929d5705cbbd7019d",
+          "all_original_instructions_equal": true,
+          "source_label_instruction_boundaries": [
+            {
+              "symbol": "FUNC_000037",
+              "instruction_index_u32": 0,
+              "original_va_u32": 4269692
+            }
+          ]
+        },
+        {
+          "virtual_address": 4269869,
+          "executable_offset": 13613,
+          "hex": "8b45105056e82dedffff5950e876eeffff83c408e96403000056e818edffff598bd88b45105053e89ffdffff83c408e94903000056e8fdecffff598bd88b450c8b401c8b40148b5510891498538b450c8b401c506a03e8bc18000083c40ce91a03000056e8ceecffff598bd88b450c8b40208b5510891498538b450c506a04e89318000083c40ce9f10200008b450c5056e84df0ffff83c4088bd885db0f8cda02000083fb060f8dd10200008b451089049d1c726400536a006a15e85718000083c40ce9b50200008b450c5056e811f0ffff83c4088bd885db0f8c9e02000083fb060f8d950200008b451089049d34726400536a006a0ae81b18000083c40ce979020000a148796400508b450c5056e8cfefffff83c40850ff154018500083c4088bf88b87a0000000508b45105057e8d314010083c40ce941020000a148796400508b450c5056e897efffff83c40850ff154018500083c4088bf88b450c5056e87eefffff83c4088bd881fbe80300007d5e83eb645357e85b06010083c4088b75102bf085f67e2485f60f8eed0100005357e82005010083c40885c00f85db0100004e85f67fe9e9d101000085f60f8dc90100005357e88c05010083c40885c00f85b70100004685f67ce9e9ad01000081ebe80300003b3d042264000f859b01000083fb260f8d920100000fb7045d702264008b75102bf085f67e198b155c2264008bca03cea1542264003bc87e108bf02bf2eb0a837d10007d048bf0f7de01355c2264006601345d70226400e94b0100008b450c5056e8a7eeffff83c4088bd885db0f8c3401000083fb060f8d2b0100008b451089049dc0226400536a006a11e8b116000083c40ce90f0100008b450c5056e86beeffff83c4088bd8a1487964005053ff154018500083c4088b55108990a0000000e9e20000008b450c5056e83eeeffff83c4088bd88b451050a1487964005053ff154018500083c40850e837fbffff83c408e9b10000008b450c5056e80deeffff83c4088bd8a1487964005053ff154018500083c4088a55108890ff000000536a006a17e81916000083c40ceb7a8b450c5056e8d6edffff83c4088bd8a1487964005053ff154018500083c4088a55108890fe000000eb508b450c5056e8acedffff83c4088bd88b450c5056e89dedffff83c4080518fcffff8bf053e80d9b01005985c0742285f67c1e83fe267d198b55108954f00481c6e803000056536a18e89d15000083c40c5f5e5b5dc3",
+          "sha256": "99581c4e435d799295de3798a9f90bdafc32b43f847f0492faf6a04eb863acc6",
+          "byte_length": 898,
+          "instruction_count": 301,
+          "normalized_instruction_sha256": "3cf49afcfab9a2dc142065c770234b2c2cce4447df53b060f8b1938ecb33f92a",
+          "all_original_instructions_equal": true,
+          "source_label_instruction_boundaries": [
+            {
+              "symbol": "JUMP_000333",
+              "instruction_index_u32": 0,
+              "original_va_u32": 4269869
+            },
+            {
+              "symbol": "JUMP_000334",
+              "instruction_index_u32": 9,
+              "original_va_u32": 4269894
+            },
+            {
+              "symbol": "JUMP_000335",
+              "instruction_index_u32": 19,
+              "original_va_u32": 4269921
+            },
+            {
+              "symbol": "JUMP_000336",
+              "instruction_index_u32": 36,
+              "original_va_u32": 4269968
+            },
+            {
+              "symbol": "JUMP_000337",
+              "instruction_index_u32": 51,
+              "original_va_u32": 4270009
+            },
+            {
+              "symbol": "JUMP_000338",
+              "instruction_index_u32": 69,
+              "original_va_u32": 4270069
+            },
+            {
+              "symbol": "JUMP_000339",
+              "instruction_index_u32": 87,
+              "original_va_u32": 4270129
+            },
+            {
+              "symbol": "JUMP_000340",
+              "instruction_index_u32": 106,
+              "original_va_u32": 4270185
+            },
+            {
+              "symbol": "JUMP_000341",
+              "instruction_index_u32": 136,
+              "original_va_u32": 4270269
+            },
+            {
+              "symbol": "JUMP_000342",
+              "instruction_index_u32": 146,
+              "original_va_u32": 4270297
+            },
+            {
+              "symbol": "JUMP_000343",
+              "instruction_index_u32": 148,
+              "original_va_u32": 4270305
+            },
+            {
+              "symbol": "JUMP_000344",
+              "instruction_index_u32": 158,
+              "original_va_u32": 4270333
+            },
+            {
+              "symbol": "JUMP_000345",
+              "instruction_index_u32": 177,
+              "original_va_u32": 4270402
+            },
+            {
+              "symbol": "JUMP_000346",
+              "instruction_index_u32": 181,
+              "original_va_u32": 4270412
+            },
+            {
+              "symbol": "JUMP_000347",
+              "instruction_index_u32": 184,
+              "original_va_u32": 4270431
+            },
+            {
+              "symbol": "JUMP_000348",
+              "instruction_index_u32": 202,
+              "original_va_u32": 4270491
+            },
+            {
+              "symbol": "JUMP_000349",
+              "instruction_index_u32": 216,
+              "original_va_u32": 4270536
+            },
+            {
+              "symbol": "JUMP_000350",
+              "instruction_index_u32": 233,
+              "original_va_u32": 4270585
+            },
+            {
+              "symbol": "JUMP_000351",
+              "instruction_index_u32": 252,
+              "original_va_u32": 4270640
+            },
+            {
+              "symbol": "JUMP_000352",
+              "instruction_index_u32": 266,
+              "original_va_u32": 4270682
+            },
+            {
+              "symbol": "JUMP_000353",
+              "instruction_index_u32": 296,
+              "original_va_u32": 4270762
+            }
+          ]
+        }
+      ],
+      "inline_tables": [
+        {
+          "symbol": "DATA_000004",
+          "virtual_address": 4269797,
+          "executable_offset": 13541,
+          "hex": "aa2a41005a2a4100302a4100f9294100c82941009b2941005f294100aa2a4100aa2a41006928410031284100f5274100aa2a4100b92741009027410061274100462741002d274100",
+          "sha256": "b087b1817576505200e2c48cfe0885c35f5fbca4197461c61207e2a084cc438b",
+          "entry_count": 18,
+          "target_symbols": [
+            "JUMP_000353",
+            "JUMP_000352",
+            "JUMP_000351",
+            "JUMP_000350",
+            "JUMP_000349",
+            "JUMP_000348",
+            "JUMP_000347",
+            "JUMP_000353",
+            "JUMP_000353",
+            "JUMP_000340",
+            "JUMP_000339",
+            "JUMP_000338",
+            "JUMP_000353",
+            "JUMP_000337",
+            "JUMP_000336",
+            "JUMP_000335",
+            "JUMP_000334",
+            "JUMP_000333"
+          ],
+          "target_original_va_u32": [
+            4270762,
+            4270682,
+            4270640,
+            4270585,
+            4270536,
+            4270491,
+            4270431,
+            4270762,
+            4270762,
+            4270185,
+            4270129,
+            4270069,
+            4270762,
+            4270009,
+            4269968,
+            4269921,
+            4269894,
+            4269869
+          ],
+          "all_targets_are_proved_instruction_boundaries": true
+        }
+      ],
+      "instruction_count": 314
+    },
+    "1532": {
+      "virtual_address": 4536092,
+      "code_regions": [
+        {
+          "virtual_address": 4536092,
+          "executable_offset": 279836,
+          "hex": "558bec8b45088bd08d04828d04828d04c203c003450c83c0745dc3",
+          "sha256": "11722546aa6829b59d14965d58e75f90352ad08e881c40c09e92f0b7972582e2",
+          "byte_length": 27,
+          "instruction_count": 12,
+          "normalized_instruction_sha256": "f7c42f2ff972c391ce8e86fa8d02e20ec486a9770ba154f64874b93c8265d5be",
+          "all_original_instructions_equal": true,
+          "source_label_instruction_boundaries": [
+            {
+              "symbol": "FUNC_001532",
+              "instruction_index_u32": 0,
+              "original_va_u32": 4536092
+            }
+          ]
+        }
+      ],
+      "inline_tables": [],
+      "instruction_count": 12
+    }
+  },
+  "whole_procedure_count": 3,
+  "whole_instruction_count": 351,
+  "all_code_regions_equal": true,
+  "all_source_label_instruction_boundaries_equal": true,
+  "all_inline_table_bytes_and_targets_equal": true,
+  "source_table_variants": [],
+  "unmodified_JJFFE_tables_all_equal": false,
+  "table_target_order_same_as_JJFFE": true,
+  "root_original_va_u32": 6562108,
+  "root_fields": {
+    "DATA_008861": 200,
+    "DATA_008889": 280,
+    "DATA_008891": 288,
+    "DATA_008896": 308,
+    "DATA_008908": 388,
+    "DATA_009093": 20704,
+    "DATA_009095": 20728,
+    "DATA_009133": 22540
+  },
+  "event_registers_original_va_u32": 6340104,
+  "module_globals_original_va_u32": 6340064,
+  "temporary_original_va_u32": 6340428,
+  "source_diagnostics": "F37 caller bodies execute; F31/F22/F34/F36/F48 and world operations remain exact typed continuations. Void EAX is ignored."
+}

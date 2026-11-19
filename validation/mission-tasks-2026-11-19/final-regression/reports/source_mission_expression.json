@@ -1,0 +1,29 @@
+{
+	"Main_integrated": false,
+	"checks": 3310,
+	"failures": 0,
+	"full_mission_VM_executed": false,
+	"native_cases": 404,
+	"native_fixture_pending": false,
+	"profile": "dos-firstenc-mission-expressions-v1",
+	"provider_calls": 87,
+	"sources": {
+		"data/ffe_mission_programs.json": "ebd6caa6cc4f5d9d4a606d09a61339d737fada0628eb4cd131b9af91ef5b1f27",
+		"recovered-history/ground_harness/tools/build_terrain_query_reference.py": "46bbaf8fb4d80bea2c73cac728bb7385e2b46618dd908e111c632cdafda0c2cc",
+		"recovered-history/ground_harness/tools/native_reference.py": "50a1757168b4b886b1b48db6798d60feb4b73f6fb04176a0840a941ebdf6a1eb",
+		"scripts/source_global_rng.gd": "5d8dc936e9548f85c8f94913ee6b97b82eb3319dc833b9d604e4589cc933de25",
+		"scripts/source_mission_expression.gd": "a7504b6ce5e4e570587acfeaad1919d834e20d9a9ffc42ee3af6ae6f4dd2ebdb",
+		"tests/fixtures/source_mission_expression_native.json": "ff177e8e1ec382c8bc3754907019486cc6b98246abeca3ae0f59a55dbe8fd0df",
+		"tests/test_source_mission_expression.gd": "da06e5b045cdee9152ccfe670d1d1da430e700559796033970bc9ab0ae78e054",
+		"tools/rebuild_ground_surface_native.py": "b90a42b63c8823daee18e41411d129285cfb572295f6650fd5db6f6183f60570",
+		"tools/rebuild_source_atmospheric_native.py": "9252d56228ba6c8b50aba384377fa91f87256591040a32110e88bd5554f04f78",
+		"tools/rebuild_source_jet_fuel_native.py": "7ed0750d60c41436feffc802a8bc7ba76647e8f07f2cefae7bbfa2a5dba660b0",
+		"tools/rebuild_source_natural_contact_native.py": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889",
+		"tools/rebuild_source_surface_contact_native.py": "6cb4314fbe1004eafd9476e80e9743f94c684b4a8359101d41fa6a77a572a6f9",
+		"validation/damage-core-2026-11-17/native-proof/instruction-proof.json": "9351518bfb7212f0f97be4c523534207b95f5130a2a86d4d1bf4efed4ec23e39",
+		"validation/mission-expressions-2026-11-18/expression-native-proof/expression-native.s": "263309ca7c101d8397b7c72fee76048ff35bd25a456c91276ad5df70fb9c8306",
+		"validation/mission-expressions-2026-11-18/expression-native-proof/expression-support.c": "489b315b98d90a4228e6972f3b752b227e8b469ed2301ee8c1258d7eed2207dd",
+		"validation/mission-expressions-2026-11-18/expression-native-proof/instruction-proof.json": "55350cb8453c19e0126c5e09b5f6737a5062a9f4124e9be5319fbd0f15fe1d8f",
+		"validation/mission-expressions-2026-11-18/expression-native-proof/source-procedures.asm": "44356c8390332726daffb37f36e2b15cda0bca2181c5f2828ea7ccb7f1e2150e"
+	}
+}

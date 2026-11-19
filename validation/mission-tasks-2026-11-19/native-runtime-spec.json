@@ -1,0 +1,8 @@
+{
+  "name": "mission_runtime",
+  "generator": "tools/rebuild_source_mission_runtime_native.py",
+  "fixture": "tests/fixtures/source_mission_runtime_native.json",
+  "kind": "proof_asm",
+  "proof_dir": "validation/mission-tasks-2026-11-19/runtime-native-proof",
+  "supplemental": true
+}

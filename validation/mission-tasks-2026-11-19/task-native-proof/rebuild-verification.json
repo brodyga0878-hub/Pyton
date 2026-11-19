@@ -1,0 +1,40 @@
+{
+  "schema": "starfrontier-mission-task-native-rebuild-verification-v1",
+  "date_utc": "2026-11-19",
+  "fixture_sha256": "91f66840d9cf7a462e5f41bcaffb51e2c580ee7f5efeb02bbe0748878e15f910",
+  "fixture_bytes": 5532107,
+  "case_count": 260,
+  "typed_boundary_count": 838,
+  "whole_original_procedures": 4,
+  "whole_original_instructions": 177,
+  "actual_original_module_cases": 105,
+  "fresh_native_process_cohorts": 3,
+  "reverse_repeat_cases": 260,
+  "dependent_native_transitions": 12,
+  "opaque_pointer_collision_controls": 2,
+  "fault_domains_separate": 1,
+  "fault_signal": "SIGSEGV",
+  "fault_after_state_claimed": false,
+  "portable_runtime_checks": 3831,
+  "portable_runtime_failures": 0,
+  "expected_arithmetic_calculated_in_python": false,
+  "F51_NULL_transport_token_u32": 4294967295,
+  "F52_zero_handle_is_defined": true,
+  "copied_proof_original_paths_absent": {
+    "fixture_byte_exact": true,
+    "all_five_generated_proof_files_byte_exact": true
+  },
+  "independent_original_reproof": {
+    "fixture_byte_exact": true,
+    "all_five_generated_proof_files_byte_exact": true
+  },
+  "generated_proof_files_sha256": {
+    "source-procedures.asm": "27eaaaa789c6480143b6fed8e66643894cf2f74ca22ba8f32821b064180bb204",
+    "instruction-proof.json": "ca73d157f6f1e98e2332cbbe853b8fcae95874c31b0050694141849dc3b33fd5",
+    "task-native.s": "f9d5fbc276070b04adff5ad567c683ca499821403a9d2e3ddd810f69239ffd36",
+    "task-host.c": "a5636276655f85ede68e355fae6c1fc6682f705e3d6c137b9e3feba7d8336af7",
+    "dos-disassembly.txt": "2f0f598f635d214ae9e49bdfa3c0aadec44647bad2241670b1f0aec4d468251d"
+  },
+  "generator_sha256": "f8c357a356dc6017fb7385b549046ba29e5519958dae82c39dbf0e4b3d3d49d6",
+  "scope": "Whole uploaded DOS F38/F47/F52/F53 with typed F31/F37/F41/F51/F33; no full F41, Main or physical phone claim."
+}

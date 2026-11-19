@@ -1,0 +1,21 @@
+{
+  "schema": "starfrontier-mission-model-resource-rebuild-verification-v1",
+  "resource_sha256": "0e90113470f40071336631e5777550835c330d32ff9a9968f8e1200e07200a1a",
+  "resource_bytes": 203073,
+  "capture_sha256": "01e50548a2cb67293a76f52e946e800b2a9ccbce0a638bd5ee7f1e55da614e99",
+  "capture_bytes": 308584,
+  "model_slots": 466,
+  "nonnull_models": 465,
+  "null_slots": [
+    149
+  ],
+  "physical_specs": 84,
+  "spans": 1016,
+  "captured_span_bytes": 36025,
+  "start_bound_by_original_function": 1538,
+  "end_bound_by_original_function": 1345,
+  "default_replay_four_original_paths_absent": true,
+  "independent_original_reproof_resource_and_capture_exact": true,
+  "original_geometry_targets_claimed": false,
+  "Main_integrated": false
+}

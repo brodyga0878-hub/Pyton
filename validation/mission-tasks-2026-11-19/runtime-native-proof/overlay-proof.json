@@ -1,0 +1,14 @@
+{
+  "schema": "starfrontier-mission-runtime-native-overlay-v1",
+  "source_event_host_sha256": "b0f8c6a9c544f603dbe8838e524c580014f8f52c608a15ff4fc1e4b543feecef",
+  "overlay_event_host_sha256": "213b40260a607c9d076742462346af292e62b05ad407e31e29698681f5bcae51",
+  "source_event_assembly_unchanged_sha256": "c551555f96497eb06a077c354f502081e8e90503e7bfe8c209c32add26910d4a",
+  "new_owner7": "Consecutive surviving monotonic allocations with exact bytes measured by child original F51; imports liveness, length and advances next ID.",
+  "new_owner8": "Logical free measured by child original allocator worker; imports liveness only, preserving stale allocation addresses.",
+  "allocation_profile_restriction": "Transient allocated-and-freed IDs and gaps in new surviving logical variable IDs are explicitly rejected by this native transport; no fake objects or bytes are synthesized.",
+  "arena_pointer_roundtrip": "Normalize arena descriptor+28/variable+32 pointer fields before partial byte deltas, then import after all measured allocator deltas.",
+  "registry_replay": "Calls actual original F44/F45/F50 in the same native process; existing snapshot and tree pointers are retained. Replay trace is suppressed to avoid counting child instructions twice.",
+  "model_entry_trace": "New transport preserves EAX and flags while recording actual F36/F1538/F1495/F1341 entries in a32-byte output trailer; remaining28-byte canary and readonly resources remain checked. Source model arithmetic instructions are unchanged.",
+  "game_instructions_modified": false,
+  "expected_arithmetic_calculated_in_python": false
+}

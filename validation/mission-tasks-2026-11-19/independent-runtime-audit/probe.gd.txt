@@ -1,0 +1,76 @@
+extends SceneTree
+const Runtime=preload("res://scripts/source_mission_runtime.gd")
+const State=preload("res://scripts/source_mission_runtime_state.gd")
+const Programs=preload("res://scripts/source_mission_programs.gd")
+const Scan=preload("res://scripts/source_contact_scan.gd")
+var count:=0
+var failures:=0
+func check(value:bool,label:String)->void:
+ count+=1
+ if not value: failures+=1;push_error(label)
+func bytes(size:int)->PackedByteArray:
+ var result:=PackedByteArray();result.resize(size);return result
+func _initialize()->void:call_deferred("run")
+func run()->void:
+ var programs:=Programs.load_original();var module:=Programs.module(programs,26);var slot:=7;var at:=slot*36
+ var root:=bytes(16384);root.encode_u32(0xc8,116+338);root.encode_u32(0xcc,116+676)
+ var tail:=bytes(6160);tail.encode_u32(0x180c,1)
+ var arena:=bytes(5400);arena.encode_u32(at,1);arena.encode_u16(at+4,slot);arena.encode_u16(at+6,3);arena.encode_u32(at+24,26);arena.encode_u32(at+28,Programs.REGION_LAYOUT.mission[0]+int(module.descriptor_offset_u32));arena.encode_u32(at+32,1)
+ var core:Dictionary={"root":root,"root_tail":tail,"bank":bytes(38986),"event_registers":bytes(284),"module_globals":Programs.initial_module_globals(programs),"program":Programs.read(programs,"mission",0,57560),"program_base_u32":Programs.REGION_LAYOUT.mission[0],"metadata":Programs.read(programs,"expression_metadata",0,1088),"temporary_event_index_s32":-1,"scratch_words":bytes(32),"arena":arena,"tree_root_u32":0,"nodes":{},"next_node_id_u32":1,"task_variables":{"1":bytes(int(module.variable_words_u32)*4)},"next_variable_id_u32":2,"definitions":Programs.events_definitions(programs),"market_records":{}}
+ var command:Dictionary={"kind":"expression","operation":"F20","args":[],"task_slot_s32":slot,"ip_u32":0}
+ check(Runtime._context(core),"Actual image Core18 accepted")
+ var result:=Runtime.execute(core,command);check(result.get("ok",false),"Actual frame F20 executes")
+ var broken:=core.duplicate(true);broken.arena.encode_u32(at+24,27)
+ check(not Runtime.execute(broken,command).get("ok",false),"Wrong module/descriptor rejected")
+ broken=core.duplicate(true);broken.task_variables["1"]=bytes(broken.task_variables["1"].size()+4)
+ check(not Runtime.execute(broken,command).get("ok",false),"Wrong original local size rejected")
+ var cyclic:Array=[];cyclic.append(cyclic);var bad_command:=command.duplicate(true);bad_command.args=cyclic
+ check(not Runtime.execute(core,bad_command).get("ok",false),"Cyclic command rejected before copy")
+ broken=core.duplicate(true);broken.nodes["cycle"]=broken.nodes
+ check(not Runtime.execute(broken,command).get("ok",false),"Cyclic owner rejected before copy")
+ var task_core:=core.duplicate(true);var descriptor_at:=int(task_core.arena.decode_u32(at+28))-int(task_core.program_base_u32)
+ task_core.arena.encode_u32(at+16,task_core.program.decode_u32(descriptor_at+28));task_core.arena.encode_u32(at+20,0)
+ var task_command:Dictionary={"kind":"tasks","operation":"F53","args":[slot],"task_slot_s32":slot,"ip_u32":0xffffffff}
+ var pending_result:=Runtime.execute(task_core,task_command)
+ check(pending_result.get("pending") is Dictionary,"F53 reaches typed F41")
+ if pending_result.get("pending") is Dictionary:
+  var pending:Dictionary=pending_result.pending;var after:Dictionary=pending.before.duplicate(true);after.arena.encode_u32(at,1)
+  var observed:Array=[{"kind":pending.kind,"args":pending.args.duplicate(),"task_slot_s32":pending.task_slot_s32,"ip_before_u32":pending.ip_before_u32,"ip_after_u32":pending.ip_before_u32,"before":pending.before.duplicate(true),"after":after,"return_u32":0,"input_hex":"","output_hex":""}]
+  var warm_task:=Runtime.execute(task_core,task_command,observed);check(warm_task.get("ok",false),"F53 typed F41 warm replay accepted")
+  var cold_observed:Variant=JSON.parse_string(JSON.stringify(Scan.json_value(observed)))
+  var cold_task:=Runtime.execute(Runtime.decode_context(JSON.parse_string(JSON.stringify(Scan.json_value(task_core)))),JSON.parse_string(JSON.stringify(task_command)),cold_observed)
+  check(cold_task.get("ok",false),"F53 typed F41 cold replay accepted")
+ var owner:=State.new();check(owner.configure(core),"Owner configures")
+ var prepared:=owner.prepare(command);check(prepared.get("ok",false),"Prepare yields restorable candidate")
+ check(owner.generation()==0,"Prepare doesn't publish")
+ var forged:=prepared.duplicate();forged.receipt=prepared.receipt.duplicate(true);forged.receipt.return_u32=123
+ check(not owner.commit(forged),"Forged receipt rejected")
+ check(owner.commit(prepared) and owner.generation()==1,"Verified candidate commits")
+ check(not owner.commit(prepared),"Stale prepared commit rejected")
+ var snap:=owner.snapshot();var restored:=State.new();check(restored.restore(JSON.parse_string(JSON.stringify(snap))),"Cold restore replays exact witness")
+ check(restored.raw_context()==owner.raw_context(),"Restored decoded owner equal")
+ check(not restored.prepare(command,cyclic).get("ok",false),"Cyclic observations rejected before serialization")
+ var deep:Dictionary={};var current:=deep
+ for i in range(40):var next:Dictionary={};current["deep"]=next;current=next
+ check(not restored.restore(deep),"Deep snapshot rejects before duplicate/hash")
+ var synthetic:=core.duplicate(true);synthetic.program=bytes(256);synthetic.program_base_u32=0x1000;synthetic.definitions={"0":{"descriptor_ref_u32":0x1000,"cleanup_instruction_u32":0,"variable_words_u32":2}};synthetic.task_variables={"1":bytes(8)}
+ synthetic.arena=bytes(5400);synthetic.arena.encode_u32(at,4);synthetic.arena.encode_u16(at+4,slot);synthetic.arena.encode_u16(at+6,1);synthetic.arena.encode_u32(at+24,0);synthetic.arena.encode_u32(at+28,0x1000);synthetic.arena.encode_u32(at+32,1);synthetic.arena.encode_u32(at+16,0x1040)
+ synthetic.program.encode_u32(0,0x10c0);synthetic.program.encode_u32(12,0xffffffff);synthetic.program.encode_u32(16,2);synthetic.program.encode_u32(28,0x1040);synthetic.program.encode_u32(64,0x1080);synthetic.program.encode_u32(68,1);synthetic.program.encode_u32(72,0x1060);synthetic.program[96]=4;synthetic.program.encode_u32(97,0)
+ var scheduler_command:Dictionary={"kind":"events","operation":"F54","args":[],"task_slot_s32":-1,"ip_u32":0xffffffff}
+ var scheduler_pending:=Runtime.execute(synthetic,scheduler_command);check(scheduler_pending.get("pending") is Dictionary,"Actual F54 reaches composed F53/F41")
+ if scheduler_pending.get("pending") is Dictionary:
+  var pending:Dictionary=scheduler_pending.pending
+  var observed:Array=[{"kind":pending.kind,"args":pending.args.duplicate(),"task_slot_s32":pending.task_slot_s32,"ip_before_u32":pending.ip_before_u32,"ip_after_u32":pending.ip_before_u32,"before":pending.before.duplicate(true),"after":pending.before.duplicate(true),"return_u32":0,"input_hex":"","output_hex":""}]
+  var scheduled:=Runtime.execute(synthetic,scheduler_command,observed)
+  check(scheduled.get("ok",false),"Scheduler callback composes real F33/F44")
+  if scheduled.get("ok",false):
+   check(scheduled.source_order.count("F44")==1 and scheduled.context_after.nodes.size()==1,"Registry journal preserves one actual F44 call and owner")
+ var allocation_core:=synthetic.duplicate(true);allocation_core.arena.encode_u32(at,1);allocation_core.arena.encode_u16(6,65535)
+ var allocated:=Runtime.execute(allocation_core,{"kind":"events","operation":"F51","args":[0,99],"task_slot_s32":-1,"ip_u32":0xffffffff})
+ check(allocated.get("ok",false) and allocated.kernel_result.allocated_handle_u32==0 and allocated.kernel_result.allocated_slot_s32==0 and allocated.context_after.task_variables.has("2"),"Actual F51 generation wrap yields valid handle0 and one new owner")
+ if allocated.get("ok",false):
+  var release_core:Dictionary=allocated.context_after;release_core.arena.encode_u32(0,6)
+  var released:=Runtime.execute(release_core,scheduler_command)
+  check(released.get("ok",false) and released.context_after.arena.decode_u32(0)==0 and not released.context_after.task_variables.has("2") and released.context_after.task_variables.has("1") and released.context_after.next_variable_id_u32==3,"Actual F54 frees exactly its owned environment without reusing allocator ID")
+ print("INDEPENDENT_RUNTIME_AUDIT ",count," checks ",failures," failures")
+ quit(0 if failures==0 else 1)

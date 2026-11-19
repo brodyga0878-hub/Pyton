@@ -1,0 +1,50 @@
+{
+  "schema": "starfrontier-mission-runtime-native-spec-v1",
+  "profile": "dos-firstenc-composed-mission-runtime-v1",
+  "context_keys": [
+    "root",
+    "root_tail",
+    "bank",
+    "event_registers",
+    "module_globals",
+    "program",
+    "program_base_u32",
+    "metadata",
+    "temporary_event_index_s32",
+    "scratch_words",
+    "arena",
+    "tree_root_u32",
+    "nodes",
+    "next_node_id_u32",
+    "task_variables",
+    "next_variable_id_u32",
+    "definitions",
+    "market_records"
+  ],
+  "command_keys": [
+    "kind",
+    "operation",
+    "args",
+    "task_slot_s32",
+    "ip_u32"
+  ],
+  "world_keys": [
+    "kind",
+    "args",
+    "task_slot_s32",
+    "ip_before_u32",
+    "ip_after_u32",
+    "before",
+    "after",
+    "return_u32",
+    "input_hex",
+    "output_hex"
+  ],
+  "world_optional_keys": [
+    "registry_actions"
+  ],
+  "fixture_sha256": "3a2523e896e8d3cbdc3b7e149a9a591fbca2a68485e9ecdfc05cd9d41b6b7421",
+  "case_count": 31,
+  "F41_remains_explicit": true,
+  "Main_integrated": false
+}

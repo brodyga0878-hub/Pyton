@@ -1,0 +1,27 @@
+{
+	"Main_integrated": false,
+	"actual_nonnull_models": 465,
+	"checks": 4872,
+	"failures": 0,
+	"native_cases": 566.0,
+	"profile": "dos-firstenc-model-replacement-v1",
+	"source_model_slots": 466,
+	"sources": {
+		"data/ffe_mission_models.json": "0e90113470f40071336631e5777550835c330d32ff9a9968f8e1200e07200a1a",
+		"scripts/source_clock_pipeline.gd": "dd95f4c243fd8043523d4ae574b96c5b96fe5487cb395b70556a0248405c39e9",
+		"scripts/source_frame_dispatch.gd": "e3c7fea41429251cecff11dffd344dab3d765274289d00cb0b6fc3a9bfc8d2fe",
+		"scripts/source_mission_models.gd": "9bbea00dd4d3646213f9f10ef3820d65d67b95aaf264159164b1c992245e5473",
+		"scripts/source_object_factory.gd": "e97a31782edb90169a13612b2c962c7467771c9f8a163e7b7b2d3b34a09b0e86",
+		"scripts/source_orbit.gd": "7091ed3bbb88e79434ce21d53b3c98bf7f01391ee8a20a736c5e7c56eef55579",
+		"tests/fixtures/source_model_replace_native.json": "c6245738954bc22825b1d6650a75582bf02b34efc050225d3e48e7dd7b92a79f",
+		"tests/test_source_mission_models.gd": "0b13de7dfab80e11abfb0a7ef04d33cb4543bd35199870fda27797ab05dda3d8",
+		"tools/extract_source_mission_models.py": "60a12805cccd23bfb9e2a77dab1c9c1d8cb111c26f45965fdeb059f1e3a91eb3",
+		"tools/rebuild_source_model_replace_native.py": "bd851944fd3f21785b5525dadd1fe4822043b26afcb2980c9495bb756082420a",
+		"tools/rebuild_source_natural_contact_native.py": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889",
+		"tools/rebuild_source_object_factory_native.py": "6a112f432a089e00054fae12ae701cabf1ca0ec2cb8d5633080e7b8c789e792a",
+		"validation/mission-tasks-2026-11-19/model-native-proof/instruction-proof.json": "53758ab4730d89c81d338ca204efac88417099d97ef7174a58b5fea6551c214e",
+		"validation/mission-tasks-2026-11-19/model-native-proof/model-replace-native.s": "3dbfa980f4c5e95b3ba541c5bc4106619473fd84123387d1dc9ef94feff713aa",
+		"validation/mission-tasks-2026-11-19/model-native-proof/source-procedures.asm": "16fbe3301f2915b83417df0ef43ae29999860ef2ca9e2849a31d225673142a86",
+		"validation/mission-tasks-2026-11-19/model-resources/original-spans.json": "01e50548a2cb67293a76f52e946e800b2a9ccbce0a638bd5ee7f1e55da614e99"
+	}
+}

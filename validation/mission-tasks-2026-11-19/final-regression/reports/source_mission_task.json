@@ -1,0 +1,31 @@
+{
+	"Main_integrated": false,
+	"checks": 3831,
+	"failures": 0,
+	"full_F41_executed": false,
+	"native_cases": 260,
+	"native_fixture_pending": false,
+	"profile": "dos-firstenc-mission-task-v1",
+	"provider_calls": 838,
+	"sources": {
+		"data/ffe_mission_programs.json": "ebd6caa6cc4f5d9d4a606d09a61339d737fada0628eb4cd131b9af91ef5b1f27",
+		"recovered-history/ground_harness/tools/build_terrain_query_reference.py": "46bbaf8fb4d80bea2c73cac728bb7385e2b46618dd908e111c632cdafda0c2cc",
+		"recovered-history/ground_harness/tools/native_reference.py": "50a1757168b4b886b1b48db6798d60feb4b73f6fb04176a0840a941ebdf6a1eb",
+		"scripts/source_mission_task.gd": "b0dcede4067985260682452128cb8d5718245b3269c5d4bb1dbfe0da0121c14d",
+		"tests/fixtures/source_mission_task_native.json": "91f66840d9cf7a462e5f41bcaffb51e2c580ee7f5efeb02bbe0748878e15f910",
+		"tests/test_source_mission_task.gd": "bbc361809256083c59110ef646f3c523acefbc93a7e5fb13836ecb1671a2469f",
+		"tools/rebuild_ground_surface_native.py": "b90a42b63c8823daee18e41411d129285cfb572295f6650fd5db6f6183f60570",
+		"tools/rebuild_source_atmospheric_native.py": "9252d56228ba6c8b50aba384377fa91f87256591040a32110e88bd5554f04f78",
+		"tools/rebuild_source_damage_native.py": "5b2bdab57b8e8ba3f7125aa12bb4d95e11cc0709d164e4c675e071aa5a3e9c8d",
+		"tools/rebuild_source_mission_task_native.py": "f8c357a356dc6017fb7385b549046ba29e5519958dae82c39dbf0e4b3d3d49d6",
+		"tools/rebuild_source_natural_contact_native.py": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889",
+		"tools/rebuild_source_surface_contact_native.py": "6cb4314fbe1004eafd9476e80e9743f94c684b4a8359101d41fa6a77a572a6f9",
+		"validation/events-messages-2026-11-18/events-native-proof/instruction-proof.json": "534d1c116c418745e5db1080c575f2b595f570b9f0e72c17b23f099f3bab37a5",
+		"validation/mission-expressions-2026-11-18/guards-native-proof/instruction-proof.json": "859cce320e271f404b261be7d18fc9076972ad5b71c29f3f0b6e1f817b29e9a9",
+		"validation/mission-tasks-2026-11-19/task-native-proof/dos-disassembly.txt": "2f0f598f635d214ae9e49bdfa3c0aadec44647bad2241670b1f0aec4d468251d",
+		"validation/mission-tasks-2026-11-19/task-native-proof/instruction-proof.json": "ca73d157f6f1e98e2332cbbe853b8fcae95874c31b0050694141849dc3b33fd5",
+		"validation/mission-tasks-2026-11-19/task-native-proof/source-procedures.asm": "27eaaaa789c6480143b6fed8e66643894cf2f74ca22ba8f32821b064180bb204",
+		"validation/mission-tasks-2026-11-19/task-native-proof/task-host.c": "a5636276655f85ede68e355fae6c1fc6682f705e3d6c137b9e3feba7d8336af7",
+		"validation/mission-tasks-2026-11-19/task-native-proof/task-native.s": "f9d5fbc276070b04adff5ad567c683ca499821403a9d2e3ddd810f69239ffd36"
+	}
+}

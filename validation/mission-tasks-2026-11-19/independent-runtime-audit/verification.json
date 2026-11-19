@@ -1,0 +1,32 @@
+{
+  "schema": "starfrontier-independent-mission-runtime-audit-v1",
+  "checks": 24,
+  "failures": 0,
+  "source_inputs_unchanged_during_probe": true,
+  "source_dependencies_sha256": {
+    "scripts/source_mission_runtime.gd": "22638bf2b8f60d400a2b63e0495572cb59551f91c5467235d697081c6a83817f",
+    "scripts/source_mission_runtime_state.gd": "17b26d482a133ccb8840cb2ae55e5329c7345e4367e6ae51c6b6bd431535343f",
+    "scripts/source_mission_models.gd": "9bbea00dd4d3646213f9f10ef3820d65d67b95aaf264159164b1c992245e5473",
+    "scripts/source_mission_store.gd": "c9e1e8fb392fa8815978a9e2c3664e7cfadd95a382bc82acbb6d286af75ed401",
+    "scripts/source_mission_task.gd": "b0dcede4067985260682452128cb8d5718245b3269c5d4bb1dbfe0da0121c14d",
+    "scripts/source_mission_programs.gd": "bcc77ba7cf7de1bbc98866b84f38e23b43c8b015370b7a87e0a2438abd81b824",
+    "scripts/source_mission_expression.gd": "a7504b6ce5e4e570587acfeaad1919d834e20d9a9ffc42ee3af6ae6f4dd2ebdb",
+    "scripts/source_mission_guards.gd": "c745a32e83e48bc7bc13c268d917873858f269c2f98199f9a0fda59c55197be3",
+    "scripts/source_events.gd": "99df34b55b5a054e835fb538489a2bb409e0c61955aaa3c2e862a1b9d8ea6327",
+    "scripts/source_mission_services.gd": "e4f4746a4d065155f224797bcba5e01c29e3986b14b598672af9a11760d21637",
+    "scripts/source_clock_pipeline.gd": "dd95f4c243fd8043523d4ae574b96c5b96fe5487cb395b70556a0248405c39e9",
+    "scripts/source_contact_scan.gd": "4e513331c1dda98abf9e3146de002d0ec7b168fe241d365c16ee0b5e73d4c266",
+    "scripts/source_frame_dispatch.gd": "e3c7fea41429251cecff11dffd344dab3d765274289d00cb0b6fc3a9bfc8d2fe",
+    "data/ffe_mission_programs.json": "ebd6caa6cc4f5d9d4a606d09a61339d737fada0628eb4cd131b9af91ef5b1f27",
+    "data/ffe_mission_models.json": "0e90113470f40071336631e5777550835c330d32ff9a9968f8e1200e07200a1a"
+  },
+  "probe_sha256": "9c12abee355e305c959d92fc47cfda984b31a93461aeed8e7910ccf26c263175",
+  "runner_sha256": "e870ffb6352bc690481c3ad0d6659acb8200df0e8d8f1e3dcad51d2a64fd4f8c",
+  "stdout_sha256": "883da6d358ca232cc438f93a30978817199b9c71fb9ddab04accc40e35cd4fc3",
+  "private_original_inputs_opened": false,
+  "counted_in_final_functional_sum": false,
+  "native_execution_proof": false,
+  "Main_integrated": false,
+  "full_F41_executed": false,
+  "scope": "Independent actual-image selected-frame, cold numeric ownership, typed F41, cyclic/deep preflight, prepare/commit/restore, actual F54/F53/F33/F44 journal, F51 handle wrap and F54 release controls. Separate from frozen suite and native composition totals."
+}

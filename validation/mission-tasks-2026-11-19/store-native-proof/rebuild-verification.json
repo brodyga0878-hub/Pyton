@@ -1,0 +1,58 @@
+{
+  "schema": "starfrontier-mission-store-native-rebuild-verification-v1",
+  "date_utc": "2026-11-19",
+  "fixture_sha256": "4c1415e5dc44c16290925a5b3e722c0c4d318bdfa00cf9440188c79ded42c9fb",
+  "fixture_bytes": 2647510,
+  "case_count": 467,
+  "whole_original_procedures": 3,
+  "whole_original_instructions": 351,
+  "F37_original_instructions": 314,
+  "selector_bytes": 67,
+  "jump_table_targets": 18,
+  "all_256_byte_selectors_tested": true,
+  "actual_DOS_resource_assignment_cases": 35,
+  "fresh_native_process_cohorts": 3,
+  "reverse_repeat_cases": 467,
+  "dependent_native_transitions": 5,
+  "exact_shared_owner_continuation_edges": 4,
+  "shared_program_unchanged": true,
+  "fault_domains_separate": 1,
+  "fault_signal": "SIGSEGV",
+  "fault_fresh_native_processes": 3,
+  "portable_runtime_checks": 9651,
+  "portable_runtime_failures": 0,
+  "expected_arithmetic_calculated_in_python": false,
+  "source_code_variants": [
+    {
+      "procedure_u32": 37,
+      "selector_u32": 62,
+      "DOS_store_original_va_u32": 4270616,
+      "JJFFE_only_physical_spec_gate": true,
+      "actual_DOS_unconditional_FF_store": true,
+      "JJFFE_source_sha256": "7d5739d47c747c52bc50dc662368e69f71e854410cba74ee37fc2246515ffb59",
+      "original_capture_sha256": "d5b63725fb192207b6d59f0062d1c00bfe5e9c178b1146c477558bd8b2bdf93b"
+    }
+  ],
+  "Root_capacity_offset_u32": 280,
+  "Root_used_offset_u32": 288,
+  "typed_world_calls_remain_explicit": true,
+  "Main_integrated": false,
+  "full_F41_VM_executed": false,
+  "copied_proof_original_paths_absent": {
+    "fixture_byte_exact": true,
+    "all_five_generated_proof_files_byte_exact": true
+  },
+  "independent_original_reproof": {
+    "fixture_byte_exact": true,
+    "all_five_generated_proof_files_byte_exact": true
+  },
+  "generated_proof_files_sha256": {
+    "source-procedures.asm": "cfa8fc53a845085537352bb2f86b52831e49f3fa68a1e887dce435a2bd0a87c0",
+    "instruction-proof.json": "6d83e9962738424a6d1efd0d841c053003f42e4be9a1ceca5c912e0e62ff5ef5",
+    "dos-disassembly.txt": "d037816c1d1381b6584cac91b92ff1823c0c595d5b227ac32d46b1fed2b26bf0",
+    "store-native.s": "58198f5edd17b5dfd8d9eecdd8ccb54441118e2bc236aec957c3dba34cc8cc7c",
+    "store-support.c": "6f9afd19e14bb0bec9ba56751f23a588b8c32de460ab251182d8574851eeeebc"
+  },
+  "generator_sha256": "262f3cf0382416f24d7a654075cd9bfe4ea40541dbcc5a9fe0daf52a29c4a873",
+  "scope": "Whole F37 caller plus real F20/F1532; typed expression/global/register/model/equipment/market boundaries, not full world, F41 or Main."
+}

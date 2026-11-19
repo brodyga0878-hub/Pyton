@@ -9,8 +9,8 @@ func check(value:bool,message:String)->void:
 	if not value:failures+=1;push_error(message)
 func _initialize()->void:call_deferred("run")
 func run()->void:
-	check(BuildInfo.VERSION=="0.30.0-missions-alpha1","Current checkpoint has its new project version")
-	check(BuildInfo.VERSION_CODE==55 and BuildInfo.VERSION_CODE>54,"Android update code advances from the published code54")
+	check(BuildInfo.VERSION=="0.31.0-tasks-alpha1","Current checkpoint has its new project version")
+	check(BuildInfo.VERSION_CODE==56 and BuildInfo.VERSION_CODE>55,"Android update code advances from the published code55")
 	var preset:=ConfigFile.new();check(preset.load("res://export_presets.cfg")==OK,"Android preset is readable")
 	check(preset.get_value("preset.0.options","version/name","")==BuildInfo.VERSION,"Menu/diagnostics and APK versionName agree")
 	check(preset.get_value("preset.0.options","version/code",0)==BuildInfo.VERSION_CODE,"Menu/diagnostics and APK versionCode agree")

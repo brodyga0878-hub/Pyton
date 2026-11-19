@@ -1,0 +1,179 @@
+{
+  "schema": "starfrontier-composed-mission-runtime-rebuild-verification-v1",
+  "date_utc": "2026-11-19",
+  "fixture_sha256": "3a2523e896e8d3cbdc3b7e149a9a591fbca2a68485e9ecdfc05cd9d41b6b7421",
+  "fixture_bytes": 515536,
+  "generator_sha256": "395e48105b452d0b23116d1ed76f8ba16cbcde3774ba66dc3ff8e736f14d9859",
+  "case_count": 31,
+  "native_measurement_count": 106,
+  "native_measurements_sha256": "eff8ef84298f62e3581ef2c6bc272066b8b1fb16704c1dbbe8671b8f00b269b5",
+  "fresh_process_cohorts": 3,
+  "reverse_repeat_cases": 31,
+  "persistent_logical_owners": 18,
+  "nested_dependency_calls": 75,
+  "explicit_world_observations": 16,
+  "dependent_market_sequence_steps": 5,
+  "exact_full_owner_continuation_edges": 4,
+  "actual_original_resource_cases": 4,
+  "original_descriptors_bound_per_full_resource_context": 105,
+  "unique_captured_procedures": 43,
+  "unique_captured_original_instructions": 2700,
+  "unique_executable_constituent_bodies": 42,
+  "unique_executable_constituent_original_instructions": 2690,
+  "resource_anchor_only": {
+    "procedure": "F1345",
+    "instruction_count": 10
+  },
+  "separate_original_fault_domains": 1,
+  "original_fault": {
+    "name": "F52-full-arena-null-original-fault",
+    "signal": "SIGSEGV",
+    "native_returncode": -11,
+    "fresh_native_processes": 3,
+    "actual_F51_NULL_return_u32": 4294967295,
+    "failing_task_input_sha256": "5bf88ae840fce9ca31fc835efdb08db4a4a7fdd497fafc6f2ac7098ed66cdb04",
+    "after_state_claimed": false
+  },
+  "portable_runtime_checks": 1180,
+  "portable_runtime_failures": 0,
+  "portable_runtime_test_sha256": "c61c5d7cc281f1e0672ed9041eeef48346f19185a77829540a3ced362870e297",
+  "portable_runtime_report_sha256": "aa09392c91c40cf5491c272e3dd386a09a43c7fd73be0d431c745fff4809dc95",
+  "runtime_report_source_pins": 47,
+  "runtime_report_all_source_pins_current": true,
+  "expected_arithmetic_calculated_in_python": false,
+  "full_F41_VM_executed": false,
+  "Main_integrated": false,
+  "native_transport_restrictions": [
+    "Only consecutive net surviving allocator additions; transient allocation gaps rejected."
+  ],
+  "copied_proof_replay": {
+    "fixture_byte_exact": true,
+    "all_four_generated_runtime_artifacts_byte_exact": true,
+    "all_six_constituent_proof_directories_fresh_copied": true,
+    "original_DOS_input_paths_forbidden": [
+      "/workspace/ffe-original",
+      "/workspace/ffe-upstream"
+    ],
+    "redirected_constituent_proof_reads": 34
+  },
+  "independent_original_reproof": {
+    "fixture_byte_exact": true,
+    "all_four_generated_runtime_artifacts_byte_exact": true,
+    "constituent_capture_artifact_count": 26,
+    "all_constituent_capture_artifacts_byte_exact": true,
+    "redirected_fresh_original_constituent_proof_reads": 34
+  },
+  "generated_runtime_artifacts_sha256": {
+    "events-callback-heap-overlay.c": "213b40260a607c9d076742462346af292e62b05ad407e31e29698681f5bcae51",
+    "model-composition-native.s": "5de0487546e459c809be0f2b74bb25d82c3cf8cb24d984125fb69d6903bc2217",
+    "overlay-proof.json": "8b622b30e789ec94bff7532267389a4a16a2c9f65a61dd609a90ea8143d91d95",
+    "runtime-contract.json": "ded66060954623eb9d450668078c427c2ebf803b31e6befb3ca73b91804bfe3b"
+  },
+  "independently_reproved_constituent_artifacts": [
+    {
+      "path": "validation/mission-expressions-2026-11-18/expression-native-proof/dos-disassembly.txt",
+      "sha256": "3dc8258139eb635d45ef0fdca08b26cc16d52026b8bf0b85e48567e24ddf6f80"
+    },
+    {
+      "path": "validation/mission-expressions-2026-11-18/expression-native-proof/instruction-proof.json",
+      "sha256": "55350cb8453c19e0126c5e09b5f6737a5062a9f4124e9be5319fbd0f15fe1d8f"
+    },
+    {
+      "path": "validation/mission-expressions-2026-11-18/expression-native-proof/source-procedures.asm",
+      "sha256": "44356c8390332726daffb37f36e2b15cda0bca2181c5f2828ea7ccb7f1e2150e"
+    },
+    {
+      "path": "validation/mission-tasks-2026-11-19/store-native-proof/dos-disassembly.txt",
+      "sha256": "d037816c1d1381b6584cac91b92ff1823c0c595d5b227ac32d46b1fed2b26bf0"
+    },
+    {
+      "path": "validation/mission-tasks-2026-11-19/store-native-proof/instruction-proof.json",
+      "sha256": "6d83e9962738424a6d1efd0d841c053003f42e4be9a1ceca5c912e0e62ff5ef5"
+    },
+    {
+      "path": "validation/mission-tasks-2026-11-19/store-native-proof/source-procedures.asm",
+      "sha256": "cfa8fc53a845085537352bb2f86b52831e49f3fa68a1e887dce435a2bd0a87c0"
+    },
+    {
+      "path": "validation/mission-tasks-2026-11-19/store-native-proof/store-native.s",
+      "sha256": "58198f5edd17b5dfd8d9eecdd8ccb54441118e2bc236aec957c3dba34cc8cc7c"
+    },
+    {
+      "path": "validation/mission-tasks-2026-11-19/store-native-proof/store-support.c",
+      "sha256": "6f9afd19e14bb0bec9ba56751f23a588b8c32de460ab251182d8574851eeeebc"
+    },
+    {
+      "path": "validation/mission-expressions-2026-11-18/guards-native-proof/dos-disassembly.txt",
+      "sha256": "ca22e9c041f7c208e37ff90fe71cd227ca55d7bbfd10083ac469737cf27899a2"
+    },
+    {
+      "path": "validation/mission-expressions-2026-11-18/guards-native-proof/guards-host.c",
+      "sha256": "26786dc4f4ba7e565dc3947e55139ff1adf1ab016a0ed910671af0160685732f"
+    },
+    {
+      "path": "validation/mission-expressions-2026-11-18/guards-native-proof/guards-native.s",
+      "sha256": "c0b0e9c78d421af983e8ebd7d36eaa31c6f0c8f272aae2a09f022eddffdbf379"
+    },
+    {
+      "path": "validation/mission-expressions-2026-11-18/guards-native-proof/instruction-proof.json",
+      "sha256": "859cce320e271f404b261be7d18fc9076972ad5b71c29f3f0b6e1f817b29e9a9"
+    },
+    {
+      "path": "validation/mission-expressions-2026-11-18/guards-native-proof/source-procedures.asm",
+      "sha256": "61162a64213e5f2b6e93bd230d87fae6994db1324bb50ae5de42b2f5dca1798c"
+    },
+    {
+      "path": "validation/mission-tasks-2026-11-19/task-native-proof/dos-disassembly.txt",
+      "sha256": "2f0f598f635d214ae9e49bdfa3c0aadec44647bad2241670b1f0aec4d468251d"
+    },
+    {
+      "path": "validation/mission-tasks-2026-11-19/task-native-proof/instruction-proof.json",
+      "sha256": "ca73d157f6f1e98e2332cbbe853b8fcae95874c31b0050694141849dc3b33fd5"
+    },
+    {
+      "path": "validation/mission-tasks-2026-11-19/task-native-proof/source-procedures.asm",
+      "sha256": "27eaaaa789c6480143b6fed8e66643894cf2f74ca22ba8f32821b064180bb204"
+    },
+    {
+      "path": "validation/mission-tasks-2026-11-19/task-native-proof/task-host.c",
+      "sha256": "a5636276655f85ede68e355fae6c1fc6682f705e3d6c137b9e3feba7d8336af7"
+    },
+    {
+      "path": "validation/mission-tasks-2026-11-19/task-native-proof/task-native.s",
+      "sha256": "f9d5fbc276070b04adff5ad567c683ca499821403a9d2e3ddd810f69239ffd36"
+    },
+    {
+      "path": "validation/events-messages-2026-11-18/events-native-proof/dos-disassembly.txt",
+      "sha256": "cee501d4fcfa20c63543f843278dcaf9b618bf69b212f52965a4a383f3f05d4c"
+    },
+    {
+      "path": "validation/events-messages-2026-11-18/events-native-proof/events-host.c",
+      "sha256": "b0f8c6a9c544f603dbe8838e524c580014f8f52c608a15ff4fc1e4b543feecef"
+    },
+    {
+      "path": "validation/events-messages-2026-11-18/events-native-proof/events-native.s",
+      "sha256": "c551555f96497eb06a077c354f502081e8e90503e7bfe8c209c32add26910d4a"
+    },
+    {
+      "path": "validation/events-messages-2026-11-18/events-native-proof/instruction-proof.json",
+      "sha256": "534d1c116c418745e5db1080c575f2b595f570b9f0e72c17b23f099f3bab37a5"
+    },
+    {
+      "path": "validation/events-messages-2026-11-18/events-native-proof/source-procedures.asm",
+      "sha256": "0d1515cbc16763aeeab2b94d33b36f24c37a2f9698e487d9e9babf399977589c"
+    },
+    {
+      "path": "validation/mission-tasks-2026-11-19/model-native-proof/dos-disassembly.txt",
+      "sha256": "9a39b4fbf7d31c241af4b17e114a35f9aef0d5c781d883b2496faea4244c6cb7"
+    },
+    {
+      "path": "validation/mission-tasks-2026-11-19/model-native-proof/instruction-proof.json",
+      "sha256": "53758ab4730d89c81d338ca204efac88417099d97ef7174a58b5fea6551c214e"
+    },
+    {
+      "path": "validation/mission-tasks-2026-11-19/model-native-proof/source-procedures.asm",
+      "sha256": "16fbe3301f2915b83417df0ef43ae29999860ef2ca9e2849a31d225673142a86"
+    }
+  ],
+  "scope": "Bounded native composition over Core18; real expression/store/guard/task/event/model workers. F41 and remaining world services are explicit observations; no complete mission VM, Main or APK claim."
+}
