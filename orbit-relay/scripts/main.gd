@@ -3,12 +3,14 @@ extends Node
 const Flight = preload("res://scripts/flight_sim.gd")
 const FlightView = preload("res://scripts/flight_view.gd")
 const FlightHUD = preload("res://scripts/flight_hud.gd")
+const SectorMap = preload("res://scripts/sector_map.gd")
 const SessionIO = preload("res://scripts/session_io.gd")
 const SAVE_INTERVAL := 8.0
 
 var flight := Flight.new()
 var _view := FlightView.new()
 var _hud := FlightHUD.new()
+var _map := SectorMap.new()
 var _io := SessionIO.new()
 var _save_elapsed := 0.0
 var _save_error_shown := false
@@ -27,6 +29,10 @@ func _ready() -> void:
 	add_child(_hud)
 	_hud.build()
 	_hud.action_requested.connect(_handle_action)
+	add_child(_map)
+	_map.build()
+	_map.destination_selected.connect(_select_destination)
+	_map.dismissed.connect(_close_map)
 	_build_report_panel()
 	_update_display(0.0)
 	_io.trace("session_started", {"docked": flight.docked, "deliveries": flight.deliveries})
@@ -37,7 +43,7 @@ func _process(delta: float) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if _report.visible:
+	if _report.visible or _map.is_open():
 		return
 	flight.update(delta, _hud.move_input(), _hud.roll_input(), _hud.boost_held(), _hud.brake_held())
 	_deliver_notice()
@@ -52,11 +58,11 @@ func _update_display(delta: float) -> void:
 	var final_approach := flight.autopilot and flight.autopilot_phase in ["Стыковка", "Посадка"]
 	var marker := flight.target_contact(flight.target) if final_approach else flight.target_gate(flight.target)
 	var in_view := flight.docked < 0 and not flight.landed and not _view.camera.is_position_behind(marker)
-	_hud.set_target_marker(_view.camera.unproject_position(marker) if in_view else Vector2.ZERO, in_view and not _report.visible)
+	_hud.set_target_marker(_view.camera.unproject_position(marker) if in_view else Vector2.ZERO, in_view and not _report.visible and not _map.is_open())
 
 
 func _handle_action(action: String) -> void:
-	if _report.visible:
+	if _report.visible or _map.is_open():
 		return
 	var throttle_step := 0.025 if flight.position.distance_to(flight.target_position(flight.target)) < 150.0 else 0.1
 	match action:
@@ -76,6 +82,10 @@ func _handle_action(action: String) -> void:
 			flight.mine_action()
 		"sell_ore":
 			flight.sell_ore_action()
+		"map":
+			_hud.set_input_enabled(false)
+			_map.open(flight)
+			return
 		"report":
 			_open_report()
 			return
@@ -94,9 +104,9 @@ func _deliver_notice() -> void:
 		return
 	var event := flight.status_event
 	_io.trace(event, {
-		"docked": flight.docked, "landed": flight.landed, "target": flight.target,
-		"speed": flight.speed(), "credits": flight.credits,
-		"mining_phase": flight.mining.phase, "ore_hold": flight.mining.ore_hold,
+		"docked": flight.docked, "landed_site": flight.landed_site, "target": flight.target,
+		"planned_target": flight.planned_target, "speed": flight.speed(), "credits": flight.credits,
+		"mining_phase": flight.mining.phase, "cargo_units": flight.mining.ore_hold,
 	})
 	_hud.notify(flight.status_message)
 	flight.status_event = ""
@@ -120,9 +130,14 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		if event.physical_keycode == KEY_ESCAPE:
 			_close_report()
 		return
+	if _map.is_open():
+		if event.physical_keycode == KEY_ESCAPE:
+			_close_map()
+		return
 	var actions := {
 		KEY_T: "target", KEY_F: "autopilot", KEY_R: "throttle_up", KEY_V: "throttle_down",
 		KEY_ENTER: "dock", KEY_M: "contract", KEY_G: "mine", KEY_B: "sell_ore", KEY_F8: "report",
+		KEY_N: "map",
 	}
 	if actions.has(event.physical_keycode):
 		_handle_action(actions[event.physical_keycode])
@@ -137,6 +152,8 @@ func _notification(what: int) -> void:
 	elif what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		if _report.visible:
 			_close_report()
+		elif _map.is_open():
+			_close_map()
 		else:
 			_save()
 			get_tree().quit()
@@ -223,6 +240,21 @@ func _open_report() -> void:
 	_hud.set_input_enabled(false)
 	_report_text.text = "В архив входят состояние рейса и журнал последних действий."
 	_report.show()
+
+
+func _select_destination(site_id: int) -> void:
+	if not _map.is_open() or not flight.select_target(site_id):
+		return
+	_close_map()
+	_io.trace("route_selected", {"target": site_id})
+	_hud.notify("Маршрут проложен. «%s»." % flight.target_name(site_id))
+	_save()
+	_update_display(0.0)
+
+
+func _close_map() -> void:
+	_map.close()
+	_hud.set_input_enabled(true)
 
 
 func _close_report() -> void:

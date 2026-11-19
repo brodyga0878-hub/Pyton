@@ -1,91 +1,91 @@
 extends Node3D
-## A stationary landing face on a procedural body. All heights are along +Z.
-
-const LANDING_FACE_Z := 39.0
-const LANDING_COLOR := Color("#fac974")
-const CRATERS := [
-	Vector3(-0.55, 0.35, 0.76),
-	Vector3(0.56, 0.49, 0.66),
-	Vector3(0.46, -0.54, 0.68),
-	Vector3(-0.41, -0.81, 0.42),
-	Vector3(0.29, 0.78, -0.55),
-]
-const RIG_PAINT := Color("#db9b42")
+## A surveyed field with a stable touchdown patch facing +Z.
 
 var _gate: Node3D
 var _gate_ring: MeshInstance3D
-var _rig: Node3D
-var _bit: Node3D
-var _indicator: StandardMaterial3D
-var _sparks: MultiMeshInstance3D
-var _spark_angles: Array[float] = []
 var _mining_spot: Vector3
+var _kind: String
+var _radius: float
+var _face_z: float
+var _seed: int
+var _morph_phase: float
+var _stretch: Vector3
+var _surface_color: Color
+var _accent: Color
+var _craters: Array[Vector3] = []
+var _crater_widths: Array[float] = []
 var _built := false
 
+static var _rock_shader: Shader
 
-func build(center: Vector3, pad: Vector3, gate: Vector3) -> void:
+
+func build(site: Dictionary) -> void:
 	if _built:
 		return
 	_built = true
-	position = center
-	var face := Vector3(pad.x - center.x, pad.y - center.y, LANDING_FACE_Z)
+	position = site.center
+	_kind = site.kind
+	_radius = site.radius
+	_face_z = site.pad_offset - 4.0
+	_surface_color = site.surface_color
+	_accent = site.accent
+	_seed = site.seed
+	var random := RandomNumberGenerator.new()
+	random.seed = _seed
+	_morph_phase = random.randf_range(-PI, PI)
+	_stretch = Vector3(random.randf_range(0.96, 1.13), random.randf_range(0.83, 1.07), 0.95)
+	match _kind:
+		"moon":
+			_stretch = Vector3(1.0, 0.98, 1.0)
+		"comet":
+			_stretch = Vector3(1.25, 0.72, 0.84)
+	var crater_count := 9 if _kind == "moon" else 5
+	for index in range(crater_count):
+		var angle := TAU * float(index) / crater_count + random.randf_range(-0.17, 0.17)
+		var elevation := random.randf_range(0.08, 0.82) if index % 3 != 2 else random.randf_range(-0.9, -0.25)
+		var reach := sqrt(1.0 - elevation * elevation)
+		_craters.append(Vector3(cos(angle) * reach, sin(angle) * reach, elevation))
+		_crater_widths.append(random.randf_range(0.12, 0.26))
+	var face := Vector3(0, 0, _face_z)
 	_mining_spot = face + Vector3(6.1, 0.36, 1.05)
 	_add_mesh(self, _rock_mesh(), _rock_paint(), Vector3.ZERO)
 	_make_landing_marks(face)
 	_make_deposit()
-	_make_gate(gate - center)
-	_make_rig()
+	_make_gate(Vector3(0, 0, site.gate_offset))
+	if _kind == "comet":
+		_make_comet_tail()
 
 
-func sync(ship_pose: Transform3D, selected: bool, settled: bool, flight_visible: bool, phase: int, progress: float, seconds: float) -> void:
+func mining_spot() -> Vector3:
+	return to_global(_mining_spot)
+
+
+func sync(ship_position: Vector3, selected: bool, flight_visible: bool) -> void:
 	_gate.visible = selected and flight_visible
-	_gate_ring.visible = to_local(ship_pose.origin).z > _gate.position.z + 14.0
-	var stow_world := ship_pose * Vector3(0.86, 0.42, 0.14)
-	var stow := to_local(stow_world)
-	var deploy_fraction := 0.0
-	if settled:
-		match phase:
-			1:
-				deploy_fraction = smoothstep(0.0, 1.0, progress)
-			2, 3:
-				deploy_fraction = 1.0
-			4:
-				deploy_fraction = 1.0 - smoothstep(0.0, 1.0, progress)
-	_rig.position = stow.lerp(_mining_spot, deploy_fraction)
-	_rig.position.z += sin(PI * deploy_fraction) * 2.4
-	_rig.basis = ship_pose.basis.slerp(Basis.IDENTITY, deploy_fraction).scaled(Vector3.ONE * lerpf(0.43, 1.0, deploy_fraction))
-	_indicator.albedo_color = Color("#8bf4c1") if phase == 3 else Color("#fabb64")
-	_bit.rotation.z = seconds * 12.0 if phase == 2 else 0.0
-	_bit.position.z = -0.54 - 0.34 * smoothstep(0.02, 0.27, progress) if phase == 2 else -0.32
-	_sparks.visible = settled and phase == 2
-	if _sparks.visible:
-		for index in range(_spark_angles.size()):
-			var t := fposmod(seconds * 1.5 + float(index) * 0.171, 1.0)
-			var angle := _spark_angles[index]
-			var radius := 0.32 + t * 1.45
-			var height := 0.80 * sin(PI * t) + 0.04
-			var at := _mining_spot - Vector3(0, 0, 1.0) + Vector3(cos(angle) * radius, sin(angle) * radius, height)
-			var size := lerpf(0.11, 0.025, t)
-			_sparks.multimesh.set_instance_transform(index, Transform3D(Basis.IDENTITY.scaled(Vector3.ONE * size), at))
+	_gate_ring.visible = to_local(ship_position).z > _gate.position.z + 14.0
 
 
 func _sample(direction: Vector3) -> Vector3:
 	var d := direction
-	var radius := 39.4 + sin(d.x * 7.5 + d.z * 4.5) * 2.25
-	radius += sin(d.y * 9.0 - d.x * 6.0) * cos(d.z * 10.0) * 1.20
-	radius += sin(d.y * 23.2 + d.z * 13.0) * sin(d.x * 26.0) * 0.64
-	for index in range(CRATERS.size()):
-		var distance := d.distance_to(CRATERS[index])
-		var width := 0.15 + 0.045 * float(index % 3)
+	var wobble := 0.032 if _kind == "moon" else 0.16
+	var shape := 0.975 if _kind == "moon" else 0.90
+	shape += sin(d.x * 7.5 + d.z * 4.5 + _morph_phase) * wobble * 0.62
+	shape += sin(d.y * 9.0 - d.x * 6.0 + _morph_phase) * cos(d.z * 10.0) * wobble * 0.38
+	shape += sin(d.y * 23.2 + d.z * 13.0) * sin(d.x * 26.0) * wobble * 0.14
+	if _kind == "comet":
+		shape += smoothstep(0.27, 0.74, absf(d.x)) * 0.17 - 0.07
+	for index in range(_craters.size()):
+		var distance := d.distance_to(_craters[index])
+		var width := _crater_widths[index]
 		var valley := 1.0 - smoothstep(width * 0.35, width, distance)
 		var rim := 1.0 - smoothstep(width * 0.05, width * 0.28, absf(distance - width))
-		radius += 1.65 * rim - (3.8 + float(index % 3)) * valley
-	var point := d * radius
-	point.x *= 1.08
-	point.y *= 0.88
-	var flat := smoothstep(0.90, 0.943, d.z)
-	point.z = lerpf(minf(point.z, 39.9), LANDING_FACE_Z, flat)
-	return point.limit_length(42.7)
+		shape += 0.028 * rim - 0.105 * valley
+	var point: Vector3 = d * (_radius * shape) * _stretch
+	if d.z > 0.0:
+		var from_pad := Vector2(point.x, point.y).length()
+		var flat := 1.0 - smoothstep(11.0, 23.0, from_pad)
+		point.z = lerpf(minf(point.z, _face_z + 0.9), _face_z, flat)
+	return point.limit_length(_radius - 0.3)
 
 
 func _vertex(direction: Vector3) -> PackedVector3Array:
@@ -99,27 +99,27 @@ func _vertex(direction: Vector3) -> PackedVector3Array:
 
 
 func _rock_mesh() -> ArrayMesh:
-	const MERIDIANS := 48
-	const PARALLELS := 28
+	var meridians := 52 if _kind == "moon" else 44
+	var parallels := 32 if _kind == "moon" else 26
 	var rows: Array[PackedVector3Array] = []
-	for ring in range(PARALLELS + 1):
-		var polar := PI * float(ring) / PARALLELS
+	for ring in range(parallels + 1):
+		var polar := PI * float(ring) / parallels
 		var vertices := PackedVector3Array()
-		for spoke in range(MERIDIANS):
-			var angle := TAU * float(spoke) / MERIDIANS
+		for spoke in range(meridians):
+			var angle := TAU * float(spoke) / meridians
 			var direction := Vector3(cos(angle) * sin(polar), sin(angle) * sin(polar), cos(polar))
 			vertices.append_array(_vertex(direction))
 		rows.append(vertices)
 	var geometry := SurfaceTool.new()
 	geometry.begin(Mesh.PRIMITIVE_TRIANGLES)
-	for ring in range(PARALLELS):
-		for spoke in range(MERIDIANS):
-			var next := (spoke + 1) % MERIDIANS
+	for ring in range(parallels):
+		for spoke in range(meridians):
+			var next := (spoke + 1) % meridians
 			if ring != 0:
 				_emit_vertex(geometry, rows[ring], spoke)
 				_emit_vertex(geometry, rows[ring], next)
 				_emit_vertex(geometry, rows[ring + 1], spoke)
-			if ring < PARALLELS - 1:
+			if ring < parallels - 1:
 				_emit_vertex(geometry, rows[ring], next)
 				_emit_vertex(geometry, rows[ring + 1], next)
 				_emit_vertex(geometry, rows[ring + 1], spoke)
@@ -133,10 +133,14 @@ func _emit_vertex(geometry: SurfaceTool, row: PackedVector3Array, index: int) ->
 
 
 func _rock_paint() -> ShaderMaterial:
-	var shader := Shader.new()
-	shader.code = """
+	if _rock_shader == null:
+		_rock_shader = Shader.new()
+		_rock_shader.code = """
 shader_type spatial;
 render_mode diffuse_burley;
+uniform vec4 rock_color : source_color = vec4(0.48, 0.45, 0.42, 1.0);
+uniform vec4 seam_color : source_color = vec4(0.62, 0.48, 0.36, 1.0);
+uniform float bands_strength = 1.0;
 varying vec3 rock;
 void vertex() {
 	rock = VERTEX;
@@ -164,60 +168,73 @@ void fragment() {
 	vec3 p = rock;
 	float sediment = sin(p.y * 0.17 + p.x * 0.07 + p.z * 0.16 + sin(p.x * 0.21) * 1.18);
 	float strata = sin(p.y * 0.71 + p.x * 0.18 + p.z * 0.29 + sediment * 2.80);
-	float rock_bands = clamp(0.47 + 0.27 * sediment + 0.11 * strata, 0.0, 1.0);
+	float rock_bands = clamp(0.43 + bands_strength * (0.27 * sediment + 0.11 * strata), 0.0, 1.0);
 	float coarse = deposits(p * 0.68) - 0.5;
 	float fine = grit(floor(p * 6.4)) - 0.5;
 	float detail = 1.0 - smoothstep(0.3, 1.4, length(fwidth(p * 6.4)));
-	vec3 slate = vec3(0.22, 0.24, 0.29);
-	vec3 ochre = vec3(0.42, 0.32, 0.25);
-	ALBEDO = mix(slate, ochre, rock_bands) * (0.96 + coarse * 0.28 + fine * 0.18 * detail);
+	ALBEDO = mix(rock_color.rgb, seam_color.rgb, rock_bands) * (0.96 + coarse * 0.28 + fine * 0.18 * detail);
 	METALLIC = 0.0;
 	ROUGHNESS = 0.87;
 }
 """
 	var material := ShaderMaterial.new()
-	material.shader = shader
+	material.shader = _rock_shader
+	material.set_shader_parameter("rock_color", _surface_color)
+	material.set_shader_parameter("seam_color", _surface_color.lerp(_accent, 0.31 if _kind != "moon" else 0.22))
+	material.set_shader_parameter("bands_strength", 0.37 if _kind == "moon" else 1.0)
 	return material
 
 
 func _make_landing_marks(face: Vector3) -> void:
-	var lines := _paint(LANDING_COLOR, true)
+	var lines := _paint(_accent, true)
 	var alloy := _paint(Color("#3f5867"))
 	var center := face + Vector3(0, 0, 0.045)
 	var directions: Array[Vector3] = [Vector3.RIGHT, Vector3.UP, Vector3.LEFT, Vector3.DOWN]
+	var plates: Array = []
+	var lamps: Array = []
 	for index in range(directions.size()):
 		var outward: Vector3 = directions[index]
 		var angle := float(index) * PI * 0.5
 		var point: Vector3 = center + outward * 7.2
-		_box(self, alloy, point, Vector3(1.1, 3.0, 0.10), angle)
-		_box(self, lines, point + Vector3(0, 0, 0.07), Vector3(0.24, 2.2, 0.05), angle)
-		_box(self, lines, point + outward * 0.74 + Vector3(0, 0, 0.07), Vector3(0.24, 1.0, 0.045), angle)
+		plates.append([point, Vector3(1.1, 3.0, 0.10), angle])
+		lamps.append([point + Vector3(0, 0, 0.07), Vector3(0.24, 2.2, 0.05), angle])
+		lamps.append([point + outward * 0.74 + Vector3(0, 0, 0.07), Vector3(0.24, 1.0, 0.045), angle])
 	# Spaced corners preserve the rock as the landing surface.
 	for sign_x: float in [-1.0, 1.0]:
 		for sign_y: float in [-1.0, 1.0]:
 			var corner := center + Vector3(4.65 * sign_x, 4.65 * sign_y, 0.013)
-			_box(self, lines, corner - Vector3(0.48 * sign_x, 0, 0), Vector3(1.08, 0.16, 0.035))
-			_box(self, lines, corner - Vector3(0, 0.48 * sign_y, 0), Vector3(0.16, 1.08, 0.035))
+			lamps.append([corner - Vector3(0.48 * sign_x, 0, 0), Vector3(1.08, 0.16, 0.035), 0.0])
+			lamps.append([corner - Vector3(0, 0.48 * sign_y, 0), Vector3(0.16, 1.08, 0.035), 0.0])
+	_box_batch(self, alloy, plates)
+	_box_batch(self, lines, lamps)
 
 
 func _make_deposit() -> void:
 	var crystal := PrismMesh.new()
 	crystal.size = Vector3(0.36, 0.34, 0.68)
-	var gold := _paint(Color("#a77546"))
-	var silver := _paint(Color("#b0a398"))
+	var paint := _paint(Color.WHITE)
+	paint.vertex_color_use_as_albedo = true
+	crystal.material = paint
+	var batch := MultiMesh.new()
+	batch.transform_format = MultiMesh.TRANSFORM_3D
+	batch.use_colors = true
+	batch.mesh = crystal
+	batch.instance_count = 18
 	var random := RandomNumberGenerator.new()
-	random.seed = 7819
-	for index in range(18):
-		var angle := TAU * float(index) / 18.0
+	random.seed = _seed * 7 + 7819
+	for index in range(batch.instance_count):
+		var angle := TAU * float(index) / batch.instance_count
 		var radius := random.randf_range(1.44, 2.46)
 		var at := _mining_spot - Vector3(0, 0, 0.91) + Vector3(cos(angle) * radius, sin(angle) * radius, 0.0)
-		var shard := _add_mesh(self, crystal, gold if index % 3 else silver, at)
-		shard.rotation = Vector3(random.randf_range(-0.45, 0.42), 0.24, angle)
-		shard.scale *= random.randf_range(0.50, 1.08)
+		var axes := Basis.from_euler(Vector3(random.randf_range(-0.45, 0.42), 0.24, angle))
+		axes = axes.scaled(Vector3.ONE * random.randf_range(0.50, 1.08))
+		batch.set_instance_transform(index, Transform3D(axes, at))
+		batch.set_instance_color(index, _surface_color.lerp(_accent, 0.67 if index % 3 else 0.22))
+	_add_batch(self, batch)
 
 
 func _make_gate(at: Vector3) -> void:
-	var mark := _paint(LANDING_COLOR, true)
+	var mark := _paint(_accent, true)
 	_gate = Node3D.new()
 	_gate.position = at
 	_gate.visible = false
@@ -229,43 +246,47 @@ func _make_gate(at: Vector3) -> void:
 	ring.ring_segments = 5
 	_gate_ring = _add_mesh(_gate, ring, mark, Vector3.ZERO)
 	_gate_ring.rotation.x = PI * 0.5
+	var rails: Array = []
 	for side: float in [-1.0, 1.0]:
-		for step: float in [9.0, 18.0, 27.0, 38.0, 49.0]:
-			_box(_gate, mark, Vector3(side * lerpf(9.0, 7.3, step / 50.0), -0.18, -step), Vector3(0.25, 0.22, 1.8))
+		for fraction: float in [0.17, 0.34, 0.51, 0.72, 0.93]:
+			var step := (at.z - _face_z - 12.0) * fraction
+			rails.append([Vector3(side * lerpf(9.0, 7.3, fraction), -0.18, -step), Vector3(0.25, 0.22, 1.8), 0.0])
+	_box_batch(_gate, mark, rails)
 
 
-func _make_rig() -> void:
-	_rig = Node3D.new()
-	add_child(_rig)
-	var shell := _paint(RIG_PAINT)
-	var support := _paint(Color("#293944"))
-	var drill := _paint(Color("#b8c1be"))
-	_indicator = _paint(Color("#fabb64"), true)
-	_box(_rig, shell, Vector3(0, 0, 0.0), Vector3(1.62, 1.64, 0.70))
-	_box(_rig, support, Vector3(0, 0, 0.40), Vector3(1.10, 1.13, 0.19))
-	_box(_rig, _indicator, Vector3(0.0, -0.08, 0.504), Vector3(0.62, 0.28, 0.04))
-	for x: float in [-1.0, 1.0]:
-		for y: float in [-1.0, 1.0]:
-			_box(_rig, support, Vector3(x * 0.83, y * 0.81, -0.34), Vector3(0.21, 0.23, 0.78), x * y * 0.52)
-			_box(_rig, drill, Vector3(x * 0.90, y * 0.88, -0.69), Vector3(0.49, 0.43, 0.13), x * y * 0.23)
-	_bit = Node3D.new()
-	_rig.add_child(_bit)
-	_box(_bit, drill, Vector3.ZERO, Vector3(0.24, 0.67, 0.56))
-	_box(_bit, drill, Vector3.ZERO, Vector3(0.61, 0.24, 0.45))
-	var spark := BoxMesh.new()
-	spark.size = Vector3.ONE
-	spark.material = _paint(Color("#ffbd72"), true)
-	var batch := MultiMesh.new()
-	batch.transform_format = MultiMesh.TRANSFORM_3D
-	batch.mesh = spark
-	batch.instance_count = 14
-	for index in range(batch.instance_count):
-		_spark_angles.append(TAU * fposmod(float(index) * 0.381966, 1.0))
-	_sparks = MultiMeshInstance3D.new()
-	_sparks.multimesh = batch
-	_sparks.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_sparks.visible = false
-	add_child(_sparks)
+func _make_comet_tail() -> void:
+	var geometry := SurfaceTool.new()
+	geometry.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var direction := Vector3(-0.82, 0.23, -0.51).normalized()
+	var start := direction * _radius * 0.44
+	var length := _radius * 3.3
+	var first_side := direction.cross(Vector3.UP).normalized()
+	for lateral in [first_side, direction.cross(first_side)]:
+		for segment in range(7):
+			for corner: Vector2 in [Vector2(0, 0), Vector2(0, 1), Vector2(1, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)]:
+				var t := (float(segment) + corner.x) / 7.0
+				var axis := start + direction * (length * t)
+				var width := _radius * lerpf(0.31, 0.82, t)
+				geometry.set_uv(Vector2(t, corner.y))
+				geometry.add_vertex(axis + lateral * width * (corner.y * 2.0 - 1.0))
+	var shader := Shader.new()
+	shader.code = """
+shader_type spatial;
+render_mode unshaded, blend_add, cull_disabled, depth_draw_never;
+uniform vec4 dust : source_color = vec4(0.40, 0.73, 0.85, 1.0);
+void fragment() {
+	float width = abs((UV.y - 0.5) * 2.0);
+	float shaft = 1.0 - smoothstep(0.06, 1.0, width);
+	float fade = smoothstep(0.0, 0.17, UV.x) * (1.0 - smoothstep(0.11, 1.0, UV.x));
+	float wisps = sin(UV.y * 36.0 + UV.x * 9.0) * 0.15 + 0.85;
+	ALBEDO = dust.rgb;
+	ALPHA = shaft * fade * wisps * 0.13;
+}
+"""
+	var material := ShaderMaterial.new()
+	material.shader = shader
+	material.set_shader_parameter("dust", _accent)
+	_add_mesh(self, geometry.commit(), material, Vector3.ZERO)
 
 
 func _paint(color: Color, unshaded: bool = false) -> StandardMaterial3D:
@@ -287,7 +308,23 @@ func _add_mesh(parent: Node3D, mesh: Mesh, material: Material, at: Vector3) -> M
 	return node
 
 
-func _box(parent: Node3D, paint: Material, at: Vector3, size: Vector3, turn: float = 0.0) -> void:
+func _box_batch(parent: Node3D, paint: Material, shapes: Array) -> void:
 	var mesh := BoxMesh.new()
-	mesh.size = size
-	_add_mesh(parent, mesh, paint, at).rotation.z = turn
+	mesh.size = Vector3.ONE
+	mesh.material = paint
+	var batch := MultiMesh.new()
+	batch.transform_format = MultiMesh.TRANSFORM_3D
+	batch.mesh = mesh
+	batch.instance_count = shapes.size()
+	for index in range(shapes.size()):
+		var shape: Array = shapes[index]
+		var axes := Basis(Vector3.BACK, shape[2]).scaled_local(shape[1])
+		batch.set_instance_transform(index, Transform3D(axes, shape[0]))
+	_add_batch(parent, batch)
+
+
+func _add_batch(parent: Node3D, batch: MultiMesh) -> void:
+	var instance := MultiMeshInstance3D.new()
+	instance.multimesh = batch
+	instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	parent.add_child(instance)

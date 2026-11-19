@@ -1,7 +1,8 @@
 extends Node3D
 
 const AsteroidView = preload("res://scripts/asteroid_view.gd")
-const STATION_COLORS := [Color("#5df6c9"), Color("#ffb66f")]
+const MiningRigView = preload("res://scripts/mining_rig_view.gd")
+const Catalog = preload("res://scripts/sector_catalog.gd")
 const STAR_DISTANCE := 2700.0
 const STATION_RADIAL_SEGMENTS := 20
 
@@ -11,10 +12,11 @@ var _landing_gear: Node3D
 var _jet: MeshInstance3D
 var _jet_material: ShaderMaterial
 var _stars: MeshInstance3D
-var _asteroid: Node3D
-var _stations: Array[Node3D] = []
-var _approaches: Array[Node3D] = []
-var _gate_materials: Array[StandardMaterial3D] = []
+var _mining_rig: Node3D
+var _surface_views: Dictionary[int, Node3D] = {}
+var _stations: Dictionary[int, Node3D] = {}
+var _approaches: Dictionary[int, Node3D] = {}
+var _gate_materials: Dictionary[int, StandardMaterial3D] = {}
 var _last_position := Vector3.INF
 var _camera_up := Vector3.UP
 var _flight_time := 0.0
@@ -46,21 +48,29 @@ func build() -> void:
 	_build_stars()
 	_build_planet()
 
-	for station_index in range(STATION_COLORS.size()):
+	for site_id: int in Catalog.PORT_IDS:
+		var site := Catalog.site(site_id)
 		var station := Node3D.new()
 		add_child(station)
-		_stations.append(station)
-		_build_station(station, station_index)
+		_stations[site_id] = station
+		station.position = site.center
+		_build_station(station, site_id, site.accent)
 		var approach := Node3D.new()
 		add_child(approach)
-		_approaches.append(approach)
-		_build_approach(approach, station_index)
+		_approaches[site_id] = approach
+		approach.position = site.center + Vector3.BACK * float(site.gate_offset)
+		_gate_materials[site_id] = _build_approach(approach, site.accent)
+	for site_id: int in Catalog.MINING_IDS:
+		var body := AsteroidView.new()
+		add_child(body)
+		body.build(Catalog.site(site_id))
+		_surface_views[site_id] = body
 
 	_ship = Node3D.new()
 	add_child(_ship)
 	_build_ship()
-	_asteroid = AsteroidView.new()
-	add_child(_asteroid)
+	_mining_rig = MiningRigView.new()
+	add_child(_mining_rig)
 	camera = Camera3D.new()
 	camera.fov = 67.0
 	camera.near = 0.2
@@ -78,7 +88,8 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_ship.basis = heading * Basis(Vector3.BACK, float(sim.roll))
 
 	var docked := int(sim.docked) >= 0
-	var landed: bool = sim.landed
+	var surface_id := int(sim.landed_site)
+	var landed := surface_id >= 0
 	var settled := docked or landed
 	_landing_gear.visible = landed
 	var thrust := clampf(float(sim.throttle), 0.0, 1.0)
@@ -105,15 +116,15 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_stars.position = camera.position
 	_last_position = position_now
 
-	for station_index in range(_stations.size()):
-		_stations[station_index].position = sim.station_positions[station_index]
-		_stations[station_index].rotation.z = sim.station_angle(station_index)
-		_approaches[station_index].position = sim.gate_position(station_index)
-		_approaches[station_index].visible = not settled
-		var strength := 1.45 if station_index == int(sim.target) else 0.43
-		_gate_materials[station_index].albedo_color = STATION_COLORS[station_index] * strength
-	_asteroid.build(sim.ASTEROID_CENTER, sim.ASTEROID_PAD, sim.ASTEROID_GATE)
-	_asteroid.sync(_ship.global_transform, int(sim.target) == sim.ASTEROID_TARGET, landed, not settled, int(sim.mining.phase), sim.mining.progress(), float(sim.elapsed))
+	for site_id: int in Catalog.PORT_IDS:
+		_stations[site_id].rotation.z = sim.station_angle(site_id)
+		_approaches[site_id].visible = not settled
+		var strength := 1.45 if site_id == int(sim.target) else 0.43
+		_gate_materials[site_id].albedo_color = Catalog.site(site_id).accent * strength
+	for site_id: int in Catalog.MINING_IDS:
+		_surface_views[site_id].sync(position_now, site_id == int(sim.target), not settled)
+	var deposit: Vector3 = _surface_views[surface_id].mining_spot() if landed else position_now
+	_mining_rig.sync(_ship.global_transform, deposit, int(sim.mining.phase) if landed else 0, sim.mining.progress(), float(sim.elapsed))
 
 
 func _mesh(parent: Node3D, primitive: Mesh, paint: Material, at: Vector3) -> MeshInstance3D:
@@ -183,17 +194,20 @@ func _ring(parent: Node3D, paint: Material, at: Vector3, radius: float, thicknes
 	item.rotation.x = PI * 0.5
 
 
-func _build_station(station: Node3D, index: int) -> void:
+func _build_station(station: Node3D, index: int, accent: Color) -> void:
 	var ceramic := _surface(Color("#8798ac") if index == 0 else Color("#9c8a7e"))
 	var graphite := _surface(Color("#253646"), 0.22, 0.78)
 	var panels := _surface(Color("#153c5a") if index == 0 else Color("#573043"), 0.23, 0.48)
-	var glow := _light(STATION_COLORS[index])
+	var glow := _light(accent)
 	_cylinder(station, ceramic, Vector3(0, 0, -4), 7.4, 9.1, 8.8, 12)
 	_cylinder(station, graphite, Vector3(0, 0, 0.45), 6.9, 7.5, 1.4, 12)
 	_cylinder(station, _light(Color("#080f19")), Vector3(0, 0, 1.25), 5.14, 5.14, 0.13, 22)
 	_ring(station, ceramic, Vector3(0, 0, 1.65), 5.9, 1.0, 36)
 	_ring(station, glow, Vector3(0, 0, 1.95), 5.8, 0.16, 36)
 	_ring(station, graphite, Vector3(0, 0, -6.65), 8.0, 0.7, 36)
+	if index == 3:
+		_build_ring_station(station, glow)
+		return
 
 	var struts: Array = []
 	var plates: Array = []
@@ -233,9 +247,32 @@ func _build_station(station: Node3D, index: int) -> void:
 	_box_batch(station, glow, lamps)
 
 
-func _build_approach(approach: Node3D, index: int) -> void:
-	var paint := _light(STATION_COLORS[index])
-	_gate_materials.append(paint)
+func _build_ring_station(station: Node3D, glow: StandardMaterial3D) -> void:
+	var pale := _surface(Color("#7d93c0"), 0.31, 0.58)
+	var shade := _surface(Color("#2d3b65"), 0.26, 0.72)
+	_ring(station, shade, Vector3(0, 0, -4.8), 17.9, 2.7, 44)
+	_ring(station, pale, Vector3(0, 0, -3.1), 17.9, 1.3, 44)
+	_ring(station, glow, Vector3(0, 0, -2.35), 17.8, 0.16, 44)
+	var pylons: Array = []
+	var lamps: Array = []
+	var radiators: Array = []
+	for index in range(8):
+		var angle := TAU * float(index) / 8.0 + PI * 0.125
+		var radial := Vector3(cos(angle), sin(angle), 0.0)
+		var tangent := Vector3(-radial.y, radial.x, 0.0)
+		pylons.append([radial * 12.5 + Vector3(0, 0, -3.8), Vector3(11.0, 0.9, 1.4), angle])
+		radiators.append([radial * 18.2 + Vector3(0, 0, -4.2), Vector3(4.2, 2.6, 1.22), angle])
+		lamps.append([radial * 18.5 + Vector3(0, 0, -2.98), Vector3(2.12, 0.26, 0.12), angle])
+		if index in [0, 4]:
+			for side: float in [-1.0, 1.0]:
+				radiators.append([radial * 20.3 + tangent * side * 3.6 + Vector3(0, 0, -5.6), Vector3(5.8, 1.35, 1.48), angle])
+	_box_batch(station, pale, pylons)
+	_box_batch(station, shade, radiators)
+	_box_batch(station, glow, lamps)
+
+
+func _build_approach(approach: Node3D, accent: Color) -> StandardMaterial3D:
+	var paint := _light(accent)
 	_ring(approach, paint, Vector3.ZERO, 7.4, 0.11, 48)
 	var markers: Array = []
 	for side: float in [-1.0, 1.0]:
@@ -245,6 +282,7 @@ func _build_approach(approach: Node3D, index: int) -> void:
 			var width: float = lerpf(6.4, 5.25, offset / 54.0)
 			markers.append([Vector3(side * width, -0.18, -offset), Vector3(0.14, 0.20, 1.53)])
 	_box_batch(approach, paint, markers)
+	return paint
 
 
 func _build_ship() -> void:

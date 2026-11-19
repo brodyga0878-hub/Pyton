@@ -1,0 +1,401 @@
+extends CanvasLayer
+
+signal destination_selected(site_id: int)
+signal dismissed()
+
+const Sector := preload("res://scripts/sector_catalog.gd")
+const TEXT := Color("e8f4fa")
+const MUTED := Color("a5bac7")
+const MINT := Color("9debd7")
+const BORDER := Color("365561")
+
+var _sheet: Control
+var _insets: MarginContainer
+var _chart: SectorChart
+var _here: Label
+var _detail_title: Label
+var _detail: Label
+var _close_button: Button
+var _select_button: Button
+var _site_buttons: Dictionary[int, Button] = {}
+var _touches: Dictionary[int, Button] = {}
+var _touch_sites: Dictionary[int, int] = {}
+var _flight: RefCounted
+var _candidate := -1
+
+
+func build() -> void:
+	if is_instance_valid(_sheet):
+		return
+	layer = 9
+	_sheet = Control.new()
+	add_child(_sheet)
+	_sheet.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var background := ColorRect.new()
+	background.color = Color("07121b")
+	_sheet.add_child(background)
+	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+	_insets = MarginContainer.new()
+	_sheet.add_child(_insets)
+	_insets.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 14)
+	_insets.add_child(content)
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 14)
+	content.add_child(header)
+	var title := _label(header, "Карта сектора", 32, TEXT)
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_here = _label(header, "", 17, MUTED)
+	_here.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_close_button = _button(header, "Закрыть", 44)
+	_close_button.custom_minimum_size.x = 122
+	_close_button.pressed.connect(func() -> void: dismissed.emit())
+
+	var body := HBoxContainer.new()
+	body.add_theme_constant_override("separation", 14)
+	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	content.add_child(body)
+
+	_chart = SectorChart.new()
+	_chart.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_chart.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_chart.gui_input.connect(_chart_mouse_input)
+	body.add_child(_chart)
+
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size.x = 344
+	panel.add_theme_stylebox_override("panel", _panel_style(Color("0d1d28"), BORDER, 12, 14))
+	body.add_child(panel)
+	var list := VBoxContainer.new()
+	list.add_theme_constant_override("separation", 5)
+	panel.add_child(list)
+	for id: int in Sector.PORT_IDS:
+		_add_site(list, id)
+	for id: int in Sector.MINING_IDS:
+		_add_site(list, id)
+	var spacer := Control.new()
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	list.add_child(spacer)
+	_detail_title = _label(list, "", 21, TEXT)
+	_detail = _label(list, "", 16, MUTED)
+	_detail.custom_minimum_size.y = 45.0
+	_detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_select_button = _button(list, "Проложить маршрут", 52)
+	_select_button.add_theme_stylebox_override("normal", _panel_style(Color("164f4c"), MINT, 8, 9))
+	_select_button.add_theme_stylebox_override("hover", _panel_style(Color("206760"), MINT, 8, 9))
+	_select_button.pressed.connect(_apply)
+	get_viewport().size_changed.connect(_size_changed)
+	_size_changed()
+	hide()
+
+
+func open(sim: RefCounted) -> void:
+	if not is_instance_valid(_sheet):
+		build()
+	_flight = sim
+	_touches.clear()
+	_touch_sites.clear()
+	var here := _current_site()
+	_here.text = "В полёте" if here < 0 else str(Sector.site(here).name)
+	_chart.ship_position = sim.position
+	var planned: int = sim.planned_target
+	_chart.active_site = planned if planned >= 0 else int(sim.target)
+	show()
+	_select_site(_chart.active_site)
+
+
+func close() -> void:
+	_touches.clear()
+	_touch_sites.clear()
+	_flight = null
+	hide()
+
+
+func is_open() -> bool:
+	return is_instance_valid(_sheet) and visible
+
+
+func _add_site(parent: VBoxContainer, id: int) -> void:
+	var site = Sector.site(id)
+	var button := _button(parent, str(site.name), 42)
+	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	button.clip_text = true
+	button.toggle_mode = true
+	button.pressed.connect(_select_site.bind(id))
+	_site_buttons[id] = button
+
+
+func _select_site(id: int) -> void:
+	if _flight == null or not _site_buttons.has(id):
+		return
+	_candidate = id
+	_chart.selected_site = id
+	_chart.queue_redraw()
+	for key: int in _site_buttons:
+		_site_buttons[key].set_pressed_no_signal(key == id)
+	var entry = Sector.site(id)
+	_detail_title.text = str(entry.name)
+	var distance := _distance_label(_flight.position.distance_to(entry.center))
+	var category := str(Sector.kind_name(entry.kind))
+	var here := id == _current_site()
+	_detail.text = "%s · текущая стоянка" % category if here else "%s · %s" % [category, distance]
+	if entry.kind != "port":
+		var remaining: int = _flight.mining.reserve_at(id)
+		_detail.text += "\n%s · %d ед. в залежи" % [Sector.resource_name(entry.resource), remaining]
+	else:
+		var quote: int = _flight.mining.sale_quote(id)
+		if quote > 0:
+			_detail.text += " · за груз %d кр." % quote
+		_detail.text += "\nРуда %d · кристаллы %d · лёд %d кр." % [
+			Sector.price(id, "ore"), Sector.price(id, "crystal"), Sector.price(id, "ice"),
+		]
+	_select_button.disabled = here
+
+
+func _apply() -> void:
+	if _flight != null and _site_buttons.has(_candidate) and _candidate != _current_site():
+		destination_selected.emit(_candidate)
+
+
+func _current_site() -> int:
+	if _flight.docked >= 0:
+		return _flight.docked
+	return _flight.landed_site
+
+
+func _chart_mouse_input(event: InputEvent) -> void:
+	if not event is InputEventMouseButton or event.button_index != MOUSE_BUTTON_LEFT or event.pressed:
+		return
+	var site_id := _chart.site_at(event.position)
+	if site_id != -1:
+		_select_site(site_id)
+
+
+func _input(event: InputEvent) -> void:
+	if not is_open():
+		return
+	if event is InputEventScreenTouch:
+		var touch := event as InputEventScreenTouch
+		if touch.pressed:
+			var button := _button_at(touch.position)
+			if button != null:
+				_touches[touch.index] = button
+			elif _chart.get_global_rect().has_point(touch.position):
+				var id := _chart_site_at(touch.position)
+				if id != -1:
+					_touch_sites[touch.index] = id
+		else:
+			var button: Button = _touches.get(touch.index)
+			var id: int = _touch_sites.get(touch.index, -1)
+			_touches.erase(touch.index)
+			_touch_sites.erase(touch.index)
+			if not touch.canceled:
+				if button != null and not button.disabled and button.get_global_rect().has_point(touch.position):
+					button.pressed.emit()
+				elif id != -1 and id == _chart_site_at(touch.position):
+					_select_site(id)
+		get_viewport().set_input_as_handled()
+	elif event is InputEventScreenDrag:
+		get_viewport().set_input_as_handled()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		_touches.clear()
+		_touch_sites.clear()
+
+
+func _button_at(point: Vector2) -> Button:
+	for button: Button in [_select_button, _close_button]:
+		if not button.disabled and button.get_global_rect().has_point(point):
+			return button
+	for button: Button in _site_buttons.values():
+		if button.get_global_rect().has_point(point):
+			return button
+	return null
+
+
+func _chart_site_at(point: Vector2) -> int:
+	var local := _chart.get_global_transform_with_canvas().affine_inverse() * point
+	return _chart.site_at(local)
+
+
+func _size_changed() -> void:
+	var safe_insets := Vector4(24, 20, 24, 20)
+	if OS.get_name() == "Android":
+		var window_size := Vector2(DisplayServer.window_get_size())
+		var map_size := get_viewport().get_visible_rect().size
+		var safe_area := DisplayServer.get_display_safe_area()
+		if window_size.x > 0 and window_size.y > 0 and safe_area.has_area():
+			var scale := map_size / window_size
+			safe_insets.x += maxf(0.0, safe_area.position.x * scale.x)
+			safe_insets.y += maxf(0.0, safe_area.position.y * scale.y)
+			safe_insets.z += maxf(0.0, (window_size.x - safe_area.end.x) * scale.x)
+			safe_insets.w += maxf(0.0, (window_size.y - safe_area.end.y) * scale.y)
+	_insets.add_theme_constant_override("margin_left", int(safe_insets.x))
+	_insets.add_theme_constant_override("margin_top", int(safe_insets.y))
+	_insets.add_theme_constant_override("margin_right", int(safe_insets.z))
+	_insets.add_theme_constant_override("margin_bottom", int(safe_insets.w))
+	_chart.queue_redraw()
+
+
+static func _distance_label(meters: float) -> String:
+	return "%d м" % roundi(meters) if meters < 1000.0 else "%.1f км" % (meters / 1000.0)
+
+
+static func _label(parent: Container, caption: String, font_size: int, tint: Color) -> Label:
+	var label := Label.new()
+	label.text = caption
+	label.add_theme_font_size_override("font_size", font_size)
+	label.add_theme_color_override("font_color", tint)
+	parent.add_child(label)
+	return label
+
+
+static func _button(parent: Container, caption: String, height: float) -> Button:
+	var button := Button.new()
+	button.text = caption
+	button.focus_mode = Control.FOCUS_NONE
+	button.custom_minimum_size.y = height
+	button.add_theme_font_size_override("font_size", 17)
+	button.add_theme_color_override("font_pressed_color", MINT)
+	button.add_theme_color_override("font_disabled_color", MUTED)
+	button.add_theme_stylebox_override("normal", _panel_style(Color("102632"), Color("21404e"), 8, 9))
+	button.add_theme_stylebox_override("hover", _panel_style(Color("163743"), BORDER, 8, 9))
+	button.add_theme_stylebox_override("pressed", _panel_style(Color("1b454d"), MINT, 8, 9))
+	button.add_theme_stylebox_override("disabled", _panel_style(Color("0e2630"), BORDER, 8, 9))
+	parent.add_child(button)
+	return button
+
+
+static func _panel_style(fill: Color, border: Color, radius: int, padding: int) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = fill
+	style.border_color = border
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(radius)
+	style.content_margin_left = padding
+	style.content_margin_right = padding
+	style.content_margin_top = padding / 2.0
+	style.content_margin_bottom = padding / 2.0
+	return style
+
+
+class SectorChart extends Control:
+	const GRID := Color("233c48")
+	const EDGE := Color("426775")
+	const CHART_BACKGROUND := Color("0b1a25")
+	const PLOT_MARGIN := Vector2(63, 42)
+
+	var ship_position := Vector3.ZERO
+	var active_site := -1
+	var selected_site := -1
+
+	func _ready() -> void:
+		resized.connect(queue_redraw)
+
+	func _plot_bounds() -> Rect2:
+		return Rect2(PLOT_MARGIN, (size - 2.0 * PLOT_MARGIN).max(Vector2.ONE))
+
+	func _bounds_xz() -> Rect2:
+		var minimum := Vector2(INF, INF)
+		var maximum := Vector2(-INF, -INF)
+		for id in range(Sector.SITE_COUNT):
+			var center: Vector3 = Sector.site(id).center
+			var xz := Vector2(center.x, center.z)
+			minimum = minimum.min(xz)
+			maximum = maximum.max(xz)
+		return Rect2(minimum, (maximum - minimum).max(Vector2.ONE))
+
+	func _project(position_3d: Vector3, plot: Rect2, bounds: Rect2) -> Vector2:
+		# North points along -Z. Preserve the proportions of the XZ plane.
+		var ratio := minf(plot.size.x / bounds.size.x, plot.size.y / bounds.size.y)
+		var xz := Vector2(position_3d.x, position_3d.z)
+		return plot.get_center() + (xz - bounds.get_center()) * ratio
+
+	func site_at(point: Vector2) -> int:
+		if not Rect2(Vector2.ZERO, size).has_point(point):
+			return -1
+		var best := -1
+		var distance := 30.0
+		var plot := _plot_bounds()
+		var bounds := _bounds_xz()
+		for id in range(Sector.SITE_COUNT):
+			var marker := _project(Sector.site(id).center, plot, bounds)
+			var separation := point.distance_to(marker)
+			if separation < distance:
+				best = id
+				distance = separation
+		return best
+
+	func _draw() -> void:
+		var area := Rect2(Vector2.ZERO, size)
+		draw_rect(area, CHART_BACKGROUND)
+		draw_rect(area.grow(-0.5), EDGE, false, 1.0)
+		for x in range(28, int(size.x), 48):
+			draw_line(Vector2(x, 1), Vector2(x, size.y - 1), GRID)
+		for y in range(24, int(size.y), 48):
+			draw_line(Vector2(1, y), Vector2(size.x - 1, y), GRID)
+		var font := ThemeDB.fallback_font
+		draw_string(font, Vector2(18, 28), "ВИД СВЕРХУ", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, EDGE.lightened(0.32))
+		var plot := _plot_bounds()
+		var bounds := _bounds_xz()
+		var ship := _project(ship_position, plot, bounds).clamp(Vector2(18, 35), size - Vector2(18, 28))
+		if active_site >= 0:
+			_draw_course(ship, _project(Sector.site(active_site).center, plot, bounds), Color("4d928c"), 1.5)
+		if selected_site >= 0 and selected_site != active_site:
+			_draw_course(ship, _project(Sector.site(selected_site).center, plot, bounds), Color("d9a569"), 1.8)
+		var label_boxes: Array[Rect2] = [Rect2(Vector2(11, 10), Vector2(127, 24))]
+		for id in range(Sector.SITE_COUNT):
+			var entry = Sector.site(id)
+			var marker := _project(entry.center, plot, bounds)
+			var tint: Color = entry.accent
+			if active_site == id:
+				draw_arc(marker, 17, 0, TAU, 32, MINT, 1.2, true)
+			if selected_site == id:
+				draw_arc(marker, 23, 0, TAU, 32, Color("f5ca8d"), 1.7, true)
+			if entry.kind == "port":
+				draw_rect(Rect2(marker - Vector2(7, 7), Vector2(14, 14)), tint)
+			elif entry.kind == "comet":
+				draw_line(marker - Vector2(16, -10), marker, tint, 2.0, true)
+				draw_circle(marker, 7.0, tint, true, -1.0, true)
+			elif entry.kind == "moon":
+				draw_circle(marker, 9.0, tint, true, -1.0, true)
+			else:
+				draw_colored_polygon(PackedVector2Array([marker + Vector2(-8, 3), marker + Vector2(-3, -8), marker + Vector2(7, -3), marker + Vector2(6, 7)]), tint)
+			_draw_site_label(font, str(entry.name), marker, label_boxes)
+		draw_colored_polygon(PackedVector2Array([ship + Vector2(0, -7), ship + Vector2(6, 5), ship + Vector2(0, 3), ship + Vector2(-6, 5)]), TEXT)
+		draw_string(font, Vector2(18, size.y - 14), "▲  Корабль", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, MUTED)
+
+	func _draw_course(start: Vector2, finish: Vector2, color: Color, width: float) -> void:
+		if start.distance_squared_to(finish) > 100.0:
+			draw_dashed_line(start, finish, color, width, 9.0, true, true)
+
+	func _draw_site_label(font: Font, caption: String, marker: Vector2, used: Array[Rect2]) -> void:
+		const FONT_SIZE := 16
+		var width := font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE).x
+		var size_px := Vector2(width + 10, 22)
+		var positions := [
+			marker + Vector2(17, -10),
+			marker + Vector2(-width - 26, -10),
+			marker + Vector2(-width / 2.0 - 5, 22),
+			marker + Vector2(-width / 2.0 - 5, -39),
+		]
+		var box := Rect2(positions[0].clamp(Vector2.ONE, size - size_px - Vector2.ONE), size_px)
+		for label_position: Vector2 in positions:
+			var proposed := Rect2(label_position.clamp(Vector2.ONE, size - size_px - Vector2.ONE), size_px)
+			var free := true
+			for other: Rect2 in used:
+				if other.intersects(proposed):
+					free = false
+					break
+			if free:
+				box = proposed
+				break
+		used.append(box)
+		draw_rect(box, CHART_BACKGROUND.lightened(0.022))
+		draw_string(font, box.position + Vector2(5, 16), caption, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE, TEXT)

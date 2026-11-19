@@ -44,7 +44,7 @@ func _test_legacy_save() -> void:
 		and flight.mining.ore_hold == 0,
 		"Legacy save starts with an unused mining module")
 	var upgraded := flight.snapshot()
-	_expect(upgraded.schema == 2 and upgraded.has("landed") and upgraded.has("mining"),
+	_expect(upgraded.schema == 3 and upgraded.has("landed_site") and upgraded.has("mining"),
 		"The next save is serialized in the current format")
 	flight.dock_action()
 	flight.change_target()
@@ -132,7 +132,7 @@ func _test_mining_route() -> void:
 	_expect(flight.snapshot() == mid_drill, "Cold load retains mid-drill time, pose and contract")
 
 	var malformed := mid_drill.duplicate(true)
-	malformed.landed = false
+	malformed.landed_site = -1
 	_expect(not flight.restore(malformed) and flight.snapshot() == mid_drill,
 		"An airborne save cannot carry a deployed module, and rejection is atomic")
 	malformed = mid_drill.duplicate(true)
