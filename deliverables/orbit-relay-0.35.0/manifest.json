@@ -1,0 +1,71 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.35.0",
+  "source_commit": "a50d96edd9f233928e04c399d7aa3bae2e93be14",
+  "content": {
+    "sites": 9,
+    "ports": 3,
+    "asteroids": 3,
+    "moons": 2,
+    "comets": 1,
+    "resources": 3,
+    "delivery_routes": 6
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 60,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches_0.34": true,
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 10,
+    "tested_on_device": false
+  },
+  "checks": {
+    "sector_integration": {
+      "checks": 397,
+      "failures": 0,
+      "verified_route_pairs": 72
+    },
+    "previous_suites": {
+      "flight": "passed",
+      "scene": "passed",
+      "asteroid": "59 checks, 0 failures"
+    },
+    "desktop_rendered_route": {
+      "site": "Дымка",
+      "ore_type": "ice",
+      "units_recovered": 12,
+      "port": "Перевал",
+      "sale_credits": 264
+    }
+  },
+  "files": {
+    "OrbitRelay-0.35.0-arm64.apk": {
+      "bytes": 26142420,
+      "sha256": "e8dfd530819981eb8da83d9fb22439f5869baa7d7f2d7ae1613f32a40d14e9a9"
+    },
+    "OrbitRelay-0.35.0-source.zip": {
+      "bytes": 68290,
+      "sha256": "85f07fbebcc460685eb355fe422fff3d81331b7951cc80152fd1fc613364967d"
+    },
+    "comet-approach.png": {
+      "bytes": 323098,
+      "sha256": "8c083430efb1677620d35c4ef6a225611685f9cb45ba44bcf7b419d2a288a3fe"
+    },
+    "comet-mining.png": {
+      "bytes": 416660,
+      "sha256": "c7c4cf8eb63aa1c3b10d8bc6b24f5c45673139c1d3a317e493d9d15d29ae9b66"
+    },
+    "passage-port.png": {
+      "bytes": 388795,
+      "sha256": "e87356571d526397b7d3c942e364ea7bc8e0e9385dd01a6012030fe78680d6e6"
+    },
+    "sector-map.png": {
+      "bytes": 75190,
+      "sha256": "3980e44d82ff17d75eb75468f0c70606010117db66f4598fbbdfb1d873381f49"
+    }
+  }
+}
