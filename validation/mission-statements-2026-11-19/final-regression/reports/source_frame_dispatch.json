@@ -1,0 +1,25 @@
+{
+	"actual_cache_byte_record_changes": 382,
+	"actual_cache_write_cases": 110,
+	"actual_rotation_cases": 66,
+	"checks": 4125,
+	"failures": 0,
+	"native_cases": 317,
+	"observed_classifier_calls": 867,
+	"scope": "Whole original DOS F568/F569/F570 caller control with actual independently controlled F572/F573 and F1677 cache arithmetic. Each F575 request is matched against full raw input/globals and literal observed afterstate; F575 classifier/response VM is not executed. Cache metrics compare only actual +25..+3D bytes, excluding scripted contact response edits. No original allocation/cadence/player dispatcher/Main/Android/full-clone claim.",
+	"sources": {
+		"scripts/ground_coordinates.gd": "54dedcc157dea6c84c4f8ad6ff0859159d81719cafbbaa23c626cd94e1cdf7b6",
+		"scripts/source_frame_dispatch.gd": "e3c7fea41429251cecff11dffd344dab3d765274289d00cb0b6fc3a9bfc8d2fe",
+		"scripts/source_frame_kinematics.gd": "aac70ddc3237a9b97910020db6a2ac400659ab02457730e113de9c828b530689",
+		"scripts/source_gravity.gd": "058db4e5cbebd07e7420274ca07b24ccaec620f46c440081d1d6855326dc3872",
+		"scripts/source_motion_pipeline.gd": "478b18ed852da1549eb573e2b8d168e3b817deb684c31c50e085d30a6d98bb84",
+		"scripts/source_orbit.gd": "7091ed3bbb88e79434ce21d53b3c98bf7f01391ee8a20a736c5e7c56eef55579",
+		"scripts/source_reference_bank.gd": "ac9f40bb3572a8bb819ae2c0397c7b8f4685491f3e50275dd86cd7381765a251",
+		"tests/fixtures/source_frame_dispatch_native.json": "1c6a82c85c1ef45f230684ba653d856a64cdf89d93e199e3cce42ab99cf7499d",
+		"tests/test_source_frame_dispatch.gd": "930a64b9982e0a005b5a9343b0c7e04094c2d16b51dc78759322a321fab7862f",
+		"tools/rebuild_source_frame_dispatch_native.py": "09f1382d12ba085f1b615fea6abbd9b3b4e7e7e829a6e88a490391d23e1e3a03",
+		"validation/player-dispatch-2026-11-17/frame-native-proof/frame-dispatch-observed-kernel.s": "855a8771cc011a9313e2a2c96ca5670187823c8528c0224010bda091fd205b18",
+		"validation/player-dispatch-2026-11-17/frame-native-proof/instruction-proof.json": "52566a9f44716086b50f39195941e74c1e43154f72d709eee3a493a5518122d2",
+		"validation/player-dispatch-2026-11-17/frame-native-proof/source-procedures.asm": "5eb3a67ce89c4abb088fbf1dc2bcded8ef492f5dfda61dfb1600088c30a9fc99"
+	}
+}

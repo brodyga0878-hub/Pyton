@@ -1,0 +1,14 @@
+{
+	"APK_manifest_verified_separately": true,
+	"checks": 8,
+	"failures": 0,
+	"sources": {
+		"export_presets.cfg": "66b979c03fb11179c613fd38779b74208846a9465ec87a1676177cf7dedbf25b",
+		"scripts/build_info.gd": "e74d653c6e28c510e4c9ae29721482036d95133abb0ee31f16382042b8f6af28",
+		"scripts/diagnostics_logger.gd": "a0a2a4a993613f3f864d669f862229db29293793a6084636bee1d4eabbf7a052",
+		"scripts/game_diagnostics.gd": "ec43f79d0971680225f0555ac9d7f6e60f41806257bae7e9c1bff8a4f73c0fc3",
+		"tests/test_build_version.gd": "8a4478029041fa12cbf14a3ba4bfaca103e0fb12066d25a800579ecfdabc4262"
+	},
+	"version": "0.32.0-statements-alpha1",
+	"version_code": 57
+}

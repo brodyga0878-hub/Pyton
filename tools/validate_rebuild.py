@@ -44,6 +44,9 @@ class Suite:
 
 
 SUITES = [
+    Suite('source_mission_statements', 'tests/test_source_mission_statements.gd', 'Whole DOS F41 statement dispatcher, all61 source targets, explicit invocation stack definedness and typed world continuations.', timeout=600),
+    Suite('source_mission_spawn', 'tests/test_source_mission_spawn.gd', 'Whole DOS F39/F40 spawn with original lookup, phase/matrix helpers, held body references and independent full-owner native parity.', timeout=600),
+    Suite('source_mission_vm', 'tests/test_source_mission_vm.gd', 'Actual F41/Expr/Store/Task/Event/Spawn composition with per-entry source scratch, single owners and replay-verified cold state.', timeout=600),
     Suite('source_mission_programs', 'tests/test_source_mission_programs.gd', 'Actual original DOS mission descriptors, blocks, metadata, strings and shared-global resources with byte-exact portable extraction.', timeout=600),
     Suite('source_mission_expression', 'tests/test_source_mission_expression.gd', 'Whole bounded DOS expression/global procedures, real inline jump tables, source Root tail and explicit world-service observations.', timeout=600),
     Suite('source_mission_guards', 'tests/test_source_mission_guards.gd', 'Whole DOS guard registration walk and event-register access with real resource metadata, cursor rewinds and callback rereads.', timeout=600),

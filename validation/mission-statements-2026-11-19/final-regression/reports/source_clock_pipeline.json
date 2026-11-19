@@ -1,0 +1,12 @@
+{
+	"checks": 4221,
+	"failures": 0,
+	"native_cases": 836,
+	"scope": "Uploaded DOS main-loop counter admission, raw32-bit carry/wrap/deadline and original event21/16/15 ordering; independent original instructions with callback recorders. Stateful private counter delivery, exactly-once publication and bounded replay-validated cold state. No F1418 millisecond collector, event effects, complete world scheduler, actual Main or Android claim.",
+	"sources": {
+		"scripts/source_clock.gd": "b2d206a9e2e6db21635fe37d6f61ba75d2fb9f56d92f8851a77c9b11fc4dbe09",
+		"scripts/source_clock_pipeline.gd": "dd95f4c243fd8043523d4ae574b96c5b96fe5487cb395b70556a0248405c39e9",
+		"tests/fixtures/source_clock_pipeline_native.json": "88ea9774bef2a5a36dc2f4011f5c59b1c8f44ca382b8ade21df4906120ddfc62",
+		"tests/test_source_clock_pipeline.gd": "0e718eab6e2deab7f9cab2070d19d2f32244d402d57053953606b1e75747695a"
+	}
+}

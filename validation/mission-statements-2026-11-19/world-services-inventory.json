@@ -1,0 +1,258 @@
+{
+  "schema": "starfrontier-original-mission-statement-world-inventory-v1",
+  "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "procedure": "F41",
+  "original_entry_va_u32": 4271160,
+  "original_return_instruction_va_u32": 4275614,
+  "code_regions": [
+    {
+      "original_va_u32": 4271160,
+      "instruction_count": 16,
+      "all_normalized_instructions_equal": true,
+      "normalized_original_sha256": "e75674bb8fd137d0fd6106242f2d055d535a5d1fa4ad24a2161719e7a4b0de94"
+    },
+    {
+      "original_va_u32": 4271452,
+      "instruction_count": 1414,
+      "all_normalized_instructions_equal": true,
+      "normalized_original_sha256": "b61ad9adeb5dd799fbf28a7e68bf4ceeae1f029b3f8a9c2ffee4babc7344e5db"
+    }
+  ],
+  "whole_instruction_count": 1430,
+  "jump_table": {
+    "original_va_u32": 4271208,
+    "entries": 61,
+    "all_targets_equal": true
+  },
+  "F41_DOS_JJFFE_semantic_or_table_variants": [],
+  "closed_source_callees": [
+    "F20",
+    "F23",
+    "F24",
+    "F31",
+    "F37",
+    "F38",
+    "F39",
+    "F40",
+    "F48",
+    "F52",
+    "F1532",
+    "_strlen"
+  ],
+  "explicit_world_callees_argument_counts": {
+    "F331": 6,
+    "F342": 0,
+    "F326": 0,
+    "F101": 5,
+    "F102": 1,
+    "F103": 1,
+    "F97": 1,
+    "F98": 5,
+    "F99": 2,
+    "F100": 3,
+    "F104": 2,
+    "F105": 1,
+    "F772": 1,
+    "F953": 3,
+    "F349": 1,
+    "F345": 1,
+    "F346": 1,
+    "F360": 1,
+    "F1344": 3,
+    "F352": 1,
+    "F347": 1,
+    "F332": 2,
+    "F359": 0,
+    "F314": 11,
+    "F315": 1,
+    "F664": 5,
+    "F236": 3,
+    "F665": 2,
+    "F666": 2,
+    "F668": 2,
+    "F297": 5,
+    "F290": 5,
+    "F942": 2,
+    "F926": 2,
+    "F305": 3,
+    "F304": 3,
+    "F702": 2,
+    "F291": 2
+  },
+  "world_implementation_claimed": false,
+  "source_aliases_original_va_u32": {
+    "DATA_000005": 4271208,
+    "DATA_009133": 6584648,
+    "DATA_007754": 5249088,
+    "DATA_007639": 5242220,
+    "DATA_008558": 6340420,
+    "DATA_008885": 6562374,
+    "DATA_002244": 4827670,
+    "DATA_008862": 6562312,
+    "DATA_008861": 6562308,
+    "DATA_008896": 6562416,
+    "DATA_001705": 4780156,
+    "DATA_001706": 4780160,
+    "DATA_001707": 4780164
+  },
+  "root_aliases": {
+    "DATA_008804": {
+      "owner": "root",
+      "offset_u32": 0,
+      "width_u32": 4
+    },
+    "DATA_008807": {
+      "owner": "root",
+      "offset_u32": 4,
+      "width_u32": 4
+    },
+    "DATA_008861": {
+      "owner": "root",
+      "offset_u32": 200,
+      "width_u32": 4
+    },
+    "DATA_008862": {
+      "owner": "root",
+      "offset_u32": 204,
+      "width_u32": 4
+    },
+    "DATA_008885": {
+      "owner": "root",
+      "offset_u32": 266,
+      "width_u32": 4
+    },
+    "DATA_008896": {
+      "owner": "root",
+      "offset_u32": 308,
+      "width_u32": 76
+    },
+    "DATA_009133": {
+      "owner": "root_tail",
+      "offset_u32": 6156,
+      "width_u32": 4
+    }
+  },
+  "text_cursor": {
+    "original_va_u32": 6340420,
+    "new_owner": "text_cursor_u32",
+    "semantic_representation": "offset into text_buffer",
+    "initialized_by_original_F64": true,
+    "F64_implemented_here": false,
+    "end_pointer_DATA_008559_read_by_F41": false,
+    "append_opcodes": [
+      35,
+      36,
+      45
+    ],
+    "parameter_words_written": [
+      0,
+      1,
+      2
+    ],
+    "update": "F1344 returned end offset minus one; overwrite the previous NUL on the next append."
+  },
+  "resources": {
+    "vectors": {
+      "original_va_u32": 4780156,
+      "bytes": 324,
+      "vector_count": 27,
+      "stride_bytes": 12,
+      "read_width_bytes": 2,
+      "read_axis_offsets": [
+        0,
+        4,
+        8
+      ],
+      "existing_region": "data/ffe_mission_programs.json:regions.vectors"
+    },
+    "F314_empty_string": {
+      "original_va_u32": 4827670,
+      "hex": "0000",
+      "inside_existing_mission_strings": false,
+      "transport": "Explicit known two-byte input packet and original resource VA token."
+    }
+  },
+  "scratch": {
+    "invocation_bytes": 156,
+    "seed_and_defined_mask_required": true,
+    "mask_bytes_allowed": [
+      0,
+      1
+    ],
+    "observable_windows": [
+      {
+        "offset": 0,
+        "bytes": 20,
+        "purpose": "F1344 parameters"
+      },
+      {
+        "offset": 20,
+        "bytes": 48,
+        "purpose": "UI packet"
+      },
+      {
+        "offset": 152,
+        "bytes": 4,
+        "purpose": "F304/F305 output local"
+      }
+    ],
+    "scalar_spills_claimed": false,
+    "unknown_private_bytes_preserved": true
+  },
+  "byte_arguments": {
+    "F664_argument2": {
+      "semantic_bits": 8,
+      "semantic_signed": true,
+      "actual_load_va_u32": 4377459,
+      "actual_operand": "movsx eax,BYTE PTR [ebp+0x10]"
+    },
+    "F304_argument0": {
+      "semantic_bits": 8,
+      "semantic_signed": true,
+      "actual_load_va_u32": 4325730
+    },
+    "F305_argument0": {
+      "semantic_bits": 8,
+      "semantic_signed": true,
+      "actual_load_va_u32": 4325798
+    },
+    "shared_F306_low_byte_consumption_va_u32": [
+      4325882,
+      4325886,
+      4325897,
+      4325913,
+      4325922
+    ]
+  },
+  "composition_restrictions": [
+    "Core21 composed VM retains the old mode1 bank owner; standalone F41 separately preserves bounded mode0 controls.",
+    "All statement invocations consume explicit FIFO scratch seeds; no implicit zero memory is labelled original defined data.",
+    "Existing expression output packets require fully observed all01 masks; unknown unused padding could be admitted by a future precise read-mask adapter.",
+    "Freed selected allocations may finish non-dereferencing continuations with retired local projection bytes; those bytes are never reinserted into the logical heap.",
+    "A later dereference of a freed allocation is outside the bounded owner profile, not asserted to be a universal original DOS fault."
+  ],
+  "Main_integrated": false,
+  "full_original_port_complete": false,
+  "scope": "Direct uploaded-DOS F41 opcode/callee inventory with explicit nested-provider inventory for the reused expression and new spawn kernels; not a complete world-service implementation.",
+  "nested_expression_provider_argument_counts": {
+    "F85": 2,
+    "F96": 3,
+    "F106": 1,
+    "F392": 2,
+    "F461": 1,
+    "F649": 1,
+    "F658": 1,
+    "F857": 2,
+    "F870": 1,
+    "F871": 1,
+    "F1476": 0,
+    "F909": 2,
+    "F48": 3
+  },
+  "nested_spawn_provider_argument_counts": {
+    "F927": 4,
+    "F1507": 4
+  },
+  "F1333_bankmode0_helper_scope": "Actual helper body is independently retained/proved, but successful composed Core21 mode1 controls do not execute this mode0-only call path."
+}

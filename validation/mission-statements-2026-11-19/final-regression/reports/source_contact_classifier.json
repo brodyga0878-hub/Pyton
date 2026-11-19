@@ -1,0 +1,31 @@
+{
+	"Main_integrated": false,
+	"checks": 4098,
+	"failures": 0,
+	"full_world_classifier": false,
+	"matched_boundaries": 342,
+	"native_cases": 392,
+	"pending_boundaries": 2,
+	"physical_device_tested": false,
+	"profile": "dos-firstenc-whole-f575-classifier-v1",
+	"schema": 1,
+	"sources": {
+		"data/ffe_object_factory.json": "c2a39b98f17721b55eac7fc5d3015e39b279fb05a002401fd3120218721894a2",
+		"recovered-history/ground_harness/tools/native_reference.py": "50a1757168b4b886b1b48db6798d60feb4b73f6fb04176a0840a941ebdf6a1eb",
+		"scripts/source_contact_classifier.gd": "523e115216a394847b4ce60c2fbad213381958a3fadece18dd2d04f896db8445",
+		"scripts/source_frame_dispatch.gd": "e3c7fea41429251cecff11dffd344dab3d765274289d00cb0b6fc3a9bfc8d2fe",
+		"scripts/source_object_factory.gd": "e97a31782edb90169a13612b2c962c7467771c9f8a163e7b7b2d3b34a09b0e86",
+		"scripts/source_spherical_contact.gd": "d5b484d6e5c6c6802c896fbb12df9cf13a6a7a79c8b9292dae9b31df3b772a77",
+		"scripts/source_surface_contact.gd": "fcfb6077f0bcabf7b6ffce98c3a3dbb23251a850175be4ef241b299fdf8d117d",
+		"tests/fixtures/source_contact_classifier_native.json": "52445178302dec59e1befad2b996690e8f5aa85214b5108492143771a260352a",
+		"tests/test_source_contact_classifier.gd": "7217f7987e9c831e363605b872e75af883e96b0236fe18b8f0c8c001b8b008aa",
+		"tools/rebuild_source_contact_classifier_native.py": "f4757fc63f1679cdbf5d8a4454d6532096c9882e510982951521e8ede823a128",
+		"tools/rebuild_source_frame_dispatch_native.py": "09f1382d12ba085f1b615fea6abbd9b3b4e7e7e829a6e88a490391d23e1e3a03",
+		"tools/rebuild_source_natural_contact_native.py": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889",
+		"tools/rebuild_source_spherical_contact_native.py": "dab2371b8b9aa2346dac1fd8ad48a0690d9580cd8f3970062c0d2ce68ac7ca3b",
+		"tools/rebuild_source_surface_contact_native.py": "6cb4314fbe1004eafd9476e80e9743f94c684b4a8359101d41fa6a77a572a6f9",
+		"validation/contact-classifier-2026-11-17/native-proof/classifier-native.s": "37ffc313245b96c0ef2ad781a4c43f7dcb6a90a75d38ba9d84caa61a0861f687",
+		"validation/contact-classifier-2026-11-17/native-proof/instruction-proof.json": "6ffd20248b5aec5db0c582d6a3114f79e26d83705d69a8ebf087a8df66974403",
+		"validation/contact-classifier-2026-11-17/native-proof/source-procedures.asm": "744060bc04433034189d58412d587ecb485a263cc4e8ea263d3fcd8329baae3f"
+	}
+}

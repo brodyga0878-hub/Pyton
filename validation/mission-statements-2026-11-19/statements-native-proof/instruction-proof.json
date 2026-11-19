@@ -1,0 +1,1067 @@
+{
+  "schema": "starfrontier-original-mission-statements-proof-v1",
+  "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "source_assembly_sha256": "d4f1b76aa78895d3634b182428e14f36ac57b304e56fedb67a89ee39b5f6873a",
+  "source_procedures_sha256": "92b54d3be626c9e65ea6094ad1c90a9d49a85210b29ccf9fb7bb8fa7f8ef57d1",
+  "bindings": {
+    "DATA_000005": 4271208,
+    "DATA_001705": 4780156,
+    "DATA_001706": 4780160,
+    "DATA_001707": 4780164,
+    "DATA_002244": 4827670,
+    "DATA_007639": 5242220,
+    "DATA_007754": 5249088,
+    "DATA_008558": 6340420,
+    "DATA_008861": 6562308,
+    "DATA_008862": 6562312,
+    "DATA_008885": 6562374,
+    "DATA_008896": 6562416,
+    "DATA_009133": 6584648,
+    "FUNC_000020": 4265060,
+    "FUNC_000023": 4265624,
+    "FUNC_000024": 4265648,
+    "FUNC_000031": 4266000,
+    "FUNC_000037": 4269692,
+    "FUNC_000038": 4270768,
+    "FUNC_000039": 4270868,
+    "FUNC_000040": 4270876,
+    "FUNC_000041": 4271160,
+    "FUNC_000048": 4276292,
+    "FUNC_000052": 4276672,
+    "FUNC_000097": 4290020,
+    "FUNC_000098": 4290088,
+    "FUNC_000099": 4290296,
+    "FUNC_000100": 4290440,
+    "FUNC_000101": 4290528,
+    "FUNC_000102": 4290728,
+    "FUNC_000103": 4290756,
+    "FUNC_000104": 4290784,
+    "FUNC_000105": 4290856,
+    "FUNC_000236": 4309175,
+    "FUNC_000290": 4320472,
+    "FUNC_000291": 4320780,
+    "FUNC_000297": 4323236,
+    "FUNC_000304": 4325680,
+    "FUNC_000305": 4325748,
+    "FUNC_000314": 4327384,
+    "FUNC_000315": 4327812,
+    "FUNC_000326": 4329620,
+    "FUNC_000331": 4330768,
+    "FUNC_000332": 4330904,
+    "FUNC_000342": 4331928,
+    "FUNC_000345": 4332424,
+    "FUNC_000346": 4332480,
+    "FUNC_000347": 4332616,
+    "FUNC_000349": 4332664,
+    "FUNC_000352": 4332936,
+    "FUNC_000359": 4333928,
+    "FUNC_000360": 4333980,
+    "FUNC_000664": 4377450,
+    "FUNC_000665": 4377480,
+    "FUNC_000666": 4377501,
+    "FUNC_000668": 4377543,
+    "FUNC_000702": 4382399,
+    "FUNC_000772": 4391635,
+    "FUNC_000926": 4442356,
+    "FUNC_000942": 4446748,
+    "FUNC_000953": 4448124,
+    "FUNC_001333": 4515862,
+    "FUNC_001344": 4516568,
+    "FUNC_001532": 4536092,
+    "FUNC_999980": 4656900,
+    "JUMP_000359": 4271185,
+    "JUMP_000360": 4271452,
+    "JUMP_000361": 4271462,
+    "JUMP_000362": 4271512,
+    "JUMP_000363": 4271534,
+    "JUMP_000364": 4271557,
+    "JUMP_000365": 4271580,
+    "JUMP_000366": 4271693,
+    "JUMP_000367": 4271695,
+    "JUMP_000368": 4271717,
+    "JUMP_000369": 4271727,
+    "JUMP_000370": 4271737,
+    "JUMP_000371": 4271769,
+    "JUMP_000372": 4271814,
+    "JUMP_000373": 4271852,
+    "JUMP_000374": 4271972,
+    "JUMP_000375": 4272000,
+    "JUMP_000376": 4272028,
+    "JUMP_000377": 4272056,
+    "JUMP_000378": 4272124,
+    "JUMP_000379": 4272171,
+    "JUMP_000380": 4272235,
+    "JUMP_000381": 4272282,
+    "JUMP_000382": 4272304,
+    "JUMP_000383": 4272348,
+    "JUMP_000384": 4272350,
+    "JUMP_000385": 4272366,
+    "JUMP_000386": 4272388,
+    "JUMP_000387": 4272468,
+    "JUMP_000388": 4272509,
+    "JUMP_000389": 4272543,
+    "JUMP_000390": 4272577,
+    "JUMP_000391": 4272616,
+    "JUMP_000392": 4272708,
+    "JUMP_000393": 4272758,
+    "JUMP_000394": 4272815,
+    "JUMP_000395": 4272856,
+    "JUMP_000396": 4272913,
+    "JUMP_000397": 4272983,
+    "JUMP_000398": 4273024,
+    "JUMP_000399": 4273077,
+    "JUMP_000400": 4273087,
+    "JUMP_000401": 4273137,
+    "JUMP_000402": 4273203,
+    "JUMP_000403": 4273262,
+    "JUMP_000404": 4273284,
+    "JUMP_000405": 4273399,
+    "JUMP_000406": 4273401,
+    "JUMP_000407": 4273417,
+    "JUMP_000408": 4273470,
+    "JUMP_000409": 4273533,
+    "JUMP_000410": 4273535,
+    "JUMP_000411": 4273551,
+    "JUMP_000412": 4273614,
+    "JUMP_000413": 4273616,
+    "JUMP_000414": 4273632,
+    "JUMP_000415": 4273695,
+    "JUMP_000416": 4273697,
+    "JUMP_000417": 4273713,
+    "JUMP_000418": 4273763,
+    "JUMP_000419": 4273845,
+    "JUMP_000420": 4273902,
+    "JUMP_000421": 4274010,
+    "JUMP_000422": 4274124,
+    "JUMP_000423": 4274126,
+    "JUMP_000424": 4274142,
+    "JUMP_000425": 4274247,
+    "JUMP_000426": 4274423,
+    "JUMP_000427": 4274425,
+    "JUMP_000428": 4274441,
+    "JUMP_000429": 4274520,
+    "JUMP_000430": 4274597,
+    "JUMP_000431": 4274599,
+    "JUMP_000432": 4274620,
+    "JUMP_000433": 4274622,
+    "JUMP_000434": 4274638,
+    "JUMP_000435": 4274708,
+    "JUMP_000436": 4274743,
+    "JUMP_000437": 4274847,
+    "JUMP_000438": 4274985,
+    "JUMP_000439": 4274997,
+    "JUMP_000440": 4275060,
+    "JUMP_000441": 4275136,
+    "JUMP_000442": 4275203,
+    "JUMP_000443": 4275295,
+    "JUMP_000444": 4275316,
+    "JUMP_000445": 4275321,
+    "JUMP_000446": 4275339,
+    "JUMP_000447": 4275341,
+    "JUMP_000448": 4275357,
+    "JUMP_000449": 4275451,
+    "JUMP_000450": 4275600,
+    "_strlen": 4656900
+  },
+  "root_fields": {
+    "DATA_008861": 200,
+    "DATA_008862": 204,
+    "DATA_008885": 266,
+    "DATA_008896": 308,
+    "DATA_009133": 22540
+  },
+  "root_original_va_u32": 6562108,
+  "procedures": {
+    "20": {
+      "virtual_address": 4265060,
+      "instruction_count": 25,
+      "code_regions": [
+        {
+          "virtual_address": 4265060,
+          "executable_offset": 8804,
+          "byte_length": 53,
+          "hex": "558bec538b55088b0233c98a0833db8a5801c1e30803cb33db8a5802c1e31003cb33db8a5803c1e31803cb83c00489028bc15b5dc3",
+          "sha256": "2c813061b30b79c48e48db3b9f7af8e589ce7a6bdd83ab68dad7da110721b4a0",
+          "instruction_count": 25,
+          "normalized_instruction_sha256": "15ac4d0e0433564322411424deca232a6e82fb6e7499602fe7f7699767e3ab5f",
+          "source_label_instruction_boundaries": [
+            {
+              "symbol": "FUNC_000020",
+              "instruction_index_u32": 0,
+              "original_va_u32": 4265060
+            }
+          ],
+          "all_original_instructions_equal": true
+        }
+      ],
+      "inline_tables": []
+    },
+    "23": {
+      "virtual_address": 4265624,
+      "instruction_count": 9,
+      "code_regions": [
+        {
+          "virtual_address": 4265624,
+          "executable_offset": 9368,
+          "byte_length": 22,
+          "hex": "558bec8b4508b98051010033d2f7f105f71c12005dc3",
+          "sha256": "53621f96c3af49330c67e56de53b5dafc6a085d1e1c2b01a775c147d5260d1f1",
+          "instruction_count": 9,
+          "normalized_instruction_sha256": "084a78296ddb1a3dc6625c39dd706d0e5581245dbe2d4293ca08e0a57f8a0bf9",
+          "source_label_instruction_boundaries": [
+            {
+              "symbol": "FUNC_000023",
+              "instruction_index_u32": 0,
+              "original_va_u32": 4265624
+            }
+          ],
+          "all_original_instructions_equal": true
+        }
+      ],
+      "inline_tables": []
+    },
+    "24": {
+      "virtual_address": 4265648,
+      "instruction_count": 9,
+      "code_regions": [
+        {
+          "virtual_address": 4265648,
+          "executable_offset": 9392,
+          "byte_length": 23,
+          "hex": "558bec8b4508b98051010033d2f7f169c22ec200005dc3",
+          "sha256": "cd93774d6f6435297730c5bc7b27e6675e4198d2b09809313c3297308ee9dc40",
+          "instruction_count": 9,
+          "normalized_instruction_sha256": "163b9331819cf564d18168e3750fee0a97669af57ce60fb080de83cdfd8fec23",
+          "source_label_instruction_boundaries": [
+            {
+              "symbol": "FUNC_000024",
+              "instruction_index_u32": 0,
+              "original_va_u32": 4265648
+            }
+          ],
+          "all_original_instructions_equal": true
+        }
+      ],
+      "inline_tables": []
+    },
+    "41": {
+      "virtual_address": 4271160,
+      "instruction_count": 1430,
+      "code_regions": [
+        {
+          "virtual_address": 4271160,
+          "executable_offset": 14904,
+          "byte_length": 48,
+          "hex": "558bec81c464ffffff5356578b750c8b5d0833ffe93f1100008b03ff030fb60083f83c0f872f110000ff2485682c4100",
+          "sha256": "74f56b0ecc9bcae3afc7d51169dd9afda6dd1c5c91a1167bf6c31260806ed1b5",
+          "instruction_count": 16,
+          "normalized_instruction_sha256": "e75674bb8fd137d0fd6106242f2d055d535a5d1fa4ad24a2161719e7a4b0de94",
+          "source_label_instruction_boundaries": [
+            {
+              "symbol": "FUNC_000041",
+              "instruction_index_u32": 0,
+              "original_va_u32": 4271160
+            },
+            {
+              "symbol": "JUMP_000359",
+              "instruction_index_u32": 10,
+              "original_va_u32": 4271185
+            }
+          ],
+          "all_original_instructions_equal": true
+        },
+        {
+          "virtual_address": 4271452,
+          "executable_offset": 15196,
+          "byte_length": 4163,
+          "hex": "bf01000000e92a10000053e8f8e6ffff598945ec8b4604508b45ec505653e84114000083c4108945ec8b45ec505653e8ecf8ffff83c40ce9f80f00005653e871eaffff83c40885c07408830304e9e20f000053e8b0e6ffff598945ec8b45ec83c0fc0103e9cb0f000053e899e6ffff598945ec8b45ec83c0fc0103e9b40f00005653e82deaffff83c4088945ec5653e820eaffff83c4088945e85653e813eaffff83c4088945e45653e806eaffff83c4088945e05653e8f9e9ffff83c4088945dc5653e8ece9ffff83c4088945d88b45e4898578ffffff8b45d8508b45dc508b45e050837de40074088d8578ffffffeb0233c0508b45e8508b45ec50e8b3e6000083c418e92b0f0000e82eeb0000e9210f0000e820e20000e9170f00005653e890e9ffff83c4088945ec8b45ec505653e8ebf7ffff83c40ce9f70e00005653e870e9ffff83c4088945ec8b45ec50e801fcffff598b45ec3b46040f85d40e0000bf01000000e9ca0e000053e898e5ffff598bf8897e148b461c8b44b81c894610c70604000000bf01000000e9a40e00008b038945f08b45f050e80ae00500594001035653e80be9ffff83c4088945e85653e8fee8ffff83c4088945e45653e8f1e8ffff83c4088945e05653e8e4e8ffff83c4088945dc8b45dc508b45e0508b45e4508b45e8508b45f050e89548000083c4148945ec8b45ec505653e820f7ffff83c40ce92c0e00005653e8a5e8ffff83c4088945ec8b45ec50e82e49000059e9100e00005653e889e8ffff83c4088945ec8b45ec50e82e49000059e9f40d00005653e86de8ffff83c4088945ec8b45ec50e83246000059e9d80d00005653e851e8ffff83c4088945ec5653e844e8ffff83c4088945e85653e837e8ffff83c4088945e46a006a008b45e4508b45e8508b45ec50e83446000083c414e9940d00005653e80de8ffff83c4088945ec5653e800e8ffff83c4088945e88b45e8508b45ec50e8d546000083c408e9650d00005653e8dee7ffff83c4088945ec5653e8d1e7ffff83c4088945e85653e8c4e7ffff83c4088945e48b45e4508b45e8508b45ec50e82547000083c40ce9250d00005653e89ee7ffff83c4088945ec5653e891e7ffff83c4088945e88b45e8508b45ec50e84e48000083c408e9f60c00005653e86fe7ffff83c40850e87e48000059e9e00c00005653e859e7ffff83c4088945ec8b45ec50e80dd20100598945f8837df800740c8b45f80fb68086000000eb0233c0505653e896f5ffff83c40ce9a20c00005653e81be7ffff83c40850e816faffff59e98c0c00005653e805e7ffff83c4088945ec5653e8f8e6ffff83c4088945e85653e8ebe6ffff83c4088945e48b45e4508b45e850a148796400508b45ec50ff154018500083c40850e830ae020083c40ce93c0c0000c74590ffffffff5653e8aee6ffff83c408898578ffffff8d8578ffffff50e801eb000059e9130c00005653e88ce6ffff83c408898578ffffff8d8578ffffff50e8efe9000059e9f10b00005653e86ae6ffff83c408898578ffffff8d8578ffffff50e805ea000059e9cf0b00005653e848e6ffff83c408898578ffffff33c08945908d8578ffffff50e8baef000059e9a80b00005653e821e6ffff83c4088945ec5653e814e6ffff83c4088945e88d8564ffffff508b45e850a148796400508b45ec50ff154018500083c408052401000050ff156cfd4f0083c40c8b45ec506a006a12e8080e000083c40ce94c0b00005653e8c5e5ffff83c408898578ffffff5653e8b5e5ffff83c40889857cffffff8d8578ffffff50e818e9000059e91a0b0000c74590ffffffff5653e88ce5ffff83c408898578ffffff5653e87ce5ffff83c40889857cffffff8d8578ffffff50e8cfe9000059e9e10a0000c74590ffffffff5653e853e5ffff83c408898578ffffff8d8578ffffff50e8b6ea000059e9b80a0000c74590ffffffff5653e82ae5ffff83c408898578ffffff5653e81ae5ffff83c40889857cffffff8d8578ffffff50e87dea000059e97f0a0000c74590ffffffff5653e8f1e4ffff83c408898578ffffff5653e8e1e4ffff83c40889857cffffff5653e8d1e4ffff83c4088945808d8578ffffff50e837ea000059e9390a0000c74590ffffffff5653e8abe4ffff83c408898578ffffff8d8578ffffff50e8cee8000059e9100a00005653e889e4ffff83c4088945ec5653e87ce4ffff83c40869c02ec200008945e88b45e8508b45ec50e8ebe1000083c408e9db090000e8aeed0000e9d10900005653e84ae4ffff83c4088945ec8d8564ffffff508b45ec50a144bf600050ff156cfd4f0083c40c48a344bf6000e99f0900005653e818e4ffff83c4088945ec5653e80be4ffff83c408898564ffffff8d8564ffffff508b45ec50a144bf600050ff156cfd4f0083c40c48a344bf6000e95d090000a146226400506816aa49006a006a006a006a006a006a006a006a006a07e883d3000083c42c8945ec8b45ec505653e816f2ffff83c40ce9220900005653e89be3ffff83c40850e806d5000059e90c0900005653e885e3ffff83c4088945ec5653e878e3ffff83c4088945e85653e86be3ffff83c4088945e45653e85ee3ffff83c4088945e08b45e050e8d7e1ffff59508b45e050e8e4e1ffff59508a45e4508b45e8508b45ec50e88b96010083c4148945f8837df800740c8b45f80fb68086000000eb0233c0505653e87bf1ffff83c40ce9870800005653e800e3ffff83c4088945ec5653e8f3e2ffff83c4088945e8a108226400508b45e8508b45ec50e8818b000083c40ce9520800005653e8cbe2ffff83c4088945ec5653e8bee2ffff83c4088945e88b45e8508b45ec50e82396010083c4088945f8837df800740c8b45f80fb68086000000eb0233c0505653e8f5f0ffff83c40ce9010800005653e87ae2ffff83c4088945ec5653e86de2ffff83c4088945e88b45e8508b45ec50e8e795010083c4088945f8837df800740c8b45f80fb68086000000eb0233c0505653e8a4f0ffff83c40ce9b00700005653e829e2ffff83c4088945ec5653e81ce2ffff83c4088945e88b45e8508b45ec50e8c095010083c4088945f8837df800740c8b45f80fb68086000000eb0233c0505653e853f0ffff83c40ce95f0700005653e8d8e1ffff83c408898578ffffff5653e8c8e1ffff83c40889857cffffff8d8578ffffff50e863e5000059e92d0700005653e8a6e1ffff83c4088945ec5653e899e1ffff83c408898564ffffff5653e889e1ffff83c408898568ffffff8d8564ffffff508b45ec50a144bf600050ff156cfd4f0083c40c48a344bf6000e9db060000c74590ffffffff5653e84de1ffff83c408898578ffffff5653e83de1ffff83c40889857cffffff8d8578ffffff50e860e5000059e9a20600005653e81be1ffff83c4088945ec5653e80ee1ffff83c4088945e85653e801e1ffff83c408898564ffffff8d8564ffffff508b45e850a148796400508b45ec50ff154018500083c408052401000050ff156cfd4f0083c40c8b45ec506a006a12e8f208000083c40ce9360600005653e8afe0ffff83c4088945ec5653e8a2e0ffff83c4088945e85653e895e0ffff83c4088945e45653e888e0ffff83c4088945e05653e87be0ffff83c4088945dc8b45dc508b45e0508b45e4508b45e8508b45ec50e8f0bf000083c4148945f8837df800740c8b45f80fb68086000000eb0233c0505653e8a6eeffff83c40ce9b20500005653e82be0ffff83c4088945ec5653e81ee0ffff83c4088945e85653e811e0ffff83c4088945e45653e804e0ffff83c40850e883deffff598945e05653e8f0dfffff83c4088945dc8b45dc508b45e0508b45e4508b45e8508b45ec50e899b4000083c414e9490500005653e8c2dfffff83c4088945ec5653e8b5dfffff83c4088945e85653e8a8dfffff83c4088945e45653e89bdfffff83c4088945e05653e88edfffff83c4088945dc5653e881dfffff83c4088945d85653e874dfffff83c4088945d45653e867dfffff83c4088945d05653e85adfffff83c408508b45d0508b45d4508b45d8508b45dc508b45e0508b45e4508b45e8508b45ec50e83df2ffff83c4248945f8837df800740c8b45f80fb68086000000eb0233c0505653e87bedffff83c40ce9870400005653e800dfffff83c4088945ec5653e8f3deffff83c4088945e8a148796400508b45ec50ff154018500083c4088945f8837df8000f844d0400008b45e8508b45f850e8cca0020083c408e9380400005653e8b1deffff83c4088945ec5653e8a4deffff83c4088945e8a148796400508b45e850ff154018500083c4088945f8837df80074178b45f8508b45ec05008e000050e8548f020083c408eb0233c08945f8837df800740c8b45f80fb68086000000eb0233c0505653e8b6ecffff83c40ce9c20300005653e83bdeffff83c4088945ec5653e82edeffff83c4088945e85653e821deffff83c4088945e4837dec0175198b45e4508d45fc508a45e850e868c7000083c40ce97c030000837dec020f85720300008b45e4508d45fc508a45e850e801c7000083c40ce959030000a148796400505653e8ccddffff83c40850ff154018500083c4088945f85653e8b5ddffff83c4088945e85653e8a8ddffff83c4088945c48b45c4508b45f850e844a4010083c408837de8000f84a1000000833d4879640000740e8a45e88b55f8884256e9f1020000a148796400508b45e850ff154018500083c4088945f48b45f4ff7042ff703e8b45f8ff7042ff703e8b45f883c03e50e843ad030083c4148b45f4ff704aff70468b45f8ff704aff70468b45f883c04650e822ad030083c4148b45f4ff7052ff704e8b45f8ff7052ff704e8b45f883c04e50e801ad030083c4148b45f48a40568b55f8884256e9670200008b45f8c6405600e95b0200005653e8d4dcffff83c408898578ffffff5653e8c4dcffff83c40889857cffffff5653e8b4dcffff83c4088945808d8578ffffff50e81ae0000059e91c0200005653e895dcffff83c408898578ffffff5653e885dcffff83c40889857cffffff5653e875dcffff83c4088945805653e868dcffff83c4088945848d8578ffffff50e8cedf000059e9d0010000a148796400505653e843dcffff83c40850ff154018500083c4088945f88b45f833d289908c0000008b45f833d28990900000008b45f833d2899094000000e98d0100005653e806dcffff83c4088945ec5653e8f9dbffff83c4088945e8a148796400508b45ec50ff154018500083c4088945f8816de8e8030000837de8007c39837de8267d338b45f83b0504226400750e8b45e866833c45702264000074158b45e8508b45f850e8a0b1000083c4088945f8eb0533c08945f8837df800740c8b45f80fb68086000000eb0233c0505653e8e7e9ffff83c40ce9f30000005653e86cdbffff83c408898578ffffff5653e85cdbffff83c40889857cffffff5653e84cdbffff83c4088945805653e83fdbffff83c4088945845653e832dbffff83c40889459c33c08945908d8578ffffff50e8a7e4000059e995000000a148796400505653e808dbffff83c40850ff154018500083c4088945f88b45f8c680ff0000000b8b45f88a80fe0000008b55f88882000100005653e8d5daffff83c4088b55f88882fe0000005653e8c2daffff83c4088945e48b45e48d0440668b14857cf048008b4df866899102010000668b148580f048008b4df866899104010000668b048584f048008b55f86689820601000085ff0f84b9eeffff5f5e5b8be55dc3",
+          "sha256": "2a6e6a93be6a89ddda579f5fd68f8d0e7ffcef34ccf0c082147ab40b2134ea5c",
+          "instruction_count": 1414,
+          "normalized_instruction_sha256": "b61ad9adeb5dd799fbf28a7e68bf4ceeae1f029b3f8a9c2ffee4babc7344e5db",
+          "source_label_instruction_boundaries": [
+            {
+              "symbol": "JUMP_000360",
+              "instruction_index_u32": 0,
+              "original_va_u32": 4271452
+            },
+            {
+              "symbol": "JUMP_000361",
+              "instruction_index_u32": 2,
+              "original_va_u32": 4271462
+            },
+            {
+              "symbol": "JUMP_000362",
+              "instruction_index_u32": 22,
+              "original_va_u32": 4271512
+            },
+            {
+              "symbol": "JUMP_000363",
+              "instruction_index_u32": 30,
+              "original_va_u32": 4271534
+            },
+            {
+              "symbol": "JUMP_000364",
+              "instruction_index_u32": 38,
+              "original_va_u32": 4271557
+            },
+            {
+              "symbol": "JUMP_000365",
+              "instruction_index_u32": 46,
+              "original_va_u32": 4271580
+            },
+            {
+              "symbol": "JUMP_000366",
+              "instruction_index_u32": 88,
+              "original_va_u32": 4271693
+            },
+            {
+              "symbol": "JUMP_000367",
+              "instruction_index_u32": 89,
+              "original_va_u32": 4271695
+            },
+            {
+              "symbol": "JUMP_000368",
+              "instruction_index_u32": 97,
+              "original_va_u32": 4271717
+            },
+            {
+              "symbol": "JUMP_000369",
+              "instruction_index_u32": 99,
+              "original_va_u32": 4271727
+            },
+            {
+              "symbol": "JUMP_000370",
+              "instruction_index_u32": 101,
+              "original_va_u32": 4271737
+            },
+            {
+              "symbol": "JUMP_000371",
+              "instruction_index_u32": 113,
+              "original_va_u32": 4271769
+            },
+            {
+              "symbol": "JUMP_000372",
+              "instruction_index_u32": 127,
+              "original_va_u32": 4271814
+            },
+            {
+              "symbol": "JUMP_000373",
+              "instruction_index_u32": 138,
+              "original_va_u32": 4271852
+            },
+            {
+              "symbol": "JUMP_000374",
+              "instruction_index_u32": 186,
+              "original_va_u32": 4271972
+            },
+            {
+              "symbol": "JUMP_000375",
+              "instruction_index_u32": 196,
+              "original_va_u32": 4272000
+            },
+            {
+              "symbol": "JUMP_000376",
+              "instruction_index_u32": 206,
+              "original_va_u32": 4272028
+            },
+            {
+              "symbol": "JUMP_000377",
+              "instruction_index_u32": 216,
+              "original_va_u32": 4272056
+            },
+            {
+              "symbol": "JUMP_000378",
+              "instruction_index_u32": 242,
+              "original_va_u32": 4272124
+            },
+            {
+              "symbol": "JUMP_000379",
+              "instruction_index_u32": 259,
+              "original_va_u32": 4272171
+            },
+            {
+              "symbol": "JUMP_000380",
+              "instruction_index_u32": 283,
+              "original_va_u32": 4272235
+            },
+            {
+              "symbol": "JUMP_000381",
+              "instruction_index_u32": 300,
+              "original_va_u32": 4272282
+            },
+            {
+              "symbol": "JUMP_000382",
+              "instruction_index_u32": 308,
+              "original_va_u32": 4272304
+            },
+            {
+              "symbol": "JUMP_000383",
+              "instruction_index_u32": 323,
+              "original_va_u32": 4272348
+            },
+            {
+              "symbol": "JUMP_000384",
+              "instruction_index_u32": 324,
+              "original_va_u32": 4272350
+            },
+            {
+              "symbol": "JUMP_000385",
+              "instruction_index_u32": 330,
+              "original_va_u32": 4272366
+            },
+            {
+              "symbol": "JUMP_000386",
+              "instruction_index_u32": 338,
+              "original_va_u32": 4272388
+            },
+            {
+              "symbol": "JUMP_000387",
+              "instruction_index_u32": 367,
+              "original_va_u32": 4272468
+            },
+            {
+              "symbol": "JUMP_000388",
+              "instruction_index_u32": 378,
+              "original_va_u32": 4272509
+            },
+            {
+              "symbol": "JUMP_000389",
+              "instruction_index_u32": 388,
+              "original_va_u32": 4272543
+            },
+            {
+              "symbol": "JUMP_000390",
+              "instruction_index_u32": 398,
+              "original_va_u32": 4272577
+            },
+            {
+              "symbol": "JUMP_000391",
+              "instruction_index_u32": 410,
+              "original_va_u32": 4272616
+            },
+            {
+              "symbol": "JUMP_000392",
+              "instruction_index_u32": 441,
+              "original_va_u32": 4272708
+            },
+            {
+              "symbol": "JUMP_000393",
+              "instruction_index_u32": 456,
+              "original_va_u32": 4272758
+            },
+            {
+              "symbol": "JUMP_000394",
+              "instruction_index_u32": 472,
+              "original_va_u32": 4272815
+            },
+            {
+              "symbol": "JUMP_000395",
+              "instruction_index_u32": 483,
+              "original_va_u32": 4272856
+            },
+            {
+              "symbol": "JUMP_000396",
+              "instruction_index_u32": 499,
+              "original_va_u32": 4272913
+            },
+            {
+              "symbol": "JUMP_000397",
+              "instruction_index_u32": 520,
+              "original_va_u32": 4272983
+            },
+            {
+              "symbol": "JUMP_000398",
+              "instruction_index_u32": 531,
+              "original_va_u32": 4273024
+            },
+            {
+              "symbol": "JUMP_000399",
+              "instruction_index_u32": 549,
+              "original_va_u32": 4273077
+            },
+            {
+              "symbol": "JUMP_000400",
+              "instruction_index_u32": 551,
+              "original_va_u32": 4273087
+            },
+            {
+              "symbol": "JUMP_000401",
+              "instruction_index_u32": 567,
+              "original_va_u32": 4273137
+            },
+            {
+              "symbol": "JUMP_000402",
+              "instruction_index_u32": 588,
+              "original_va_u32": 4273203
+            },
+            {
+              "symbol": "JUMP_000403",
+              "instruction_index_u32": 610,
+              "original_va_u32": 4273262
+            },
+            {
+              "symbol": "JUMP_000404",
+              "instruction_index_u32": 618,
+              "original_va_u32": 4273284
+            },
+            {
+              "symbol": "JUMP_000405",
+              "instruction_index_u32": 662,
+              "original_va_u32": 4273399
+            },
+            {
+              "symbol": "JUMP_000406",
+              "instruction_index_u32": 663,
+              "original_va_u32": 4273401
+            },
+            {
+              "symbol": "JUMP_000407",
+              "instruction_index_u32": 669,
+              "original_va_u32": 4273417
+            },
+            {
+              "symbol": "JUMP_000408",
+              "instruction_index_u32": 688,
+              "original_va_u32": 4273470
+            },
+            {
+              "symbol": "JUMP_000409",
+              "instruction_index_u32": 710,
+              "original_va_u32": 4273533
+            },
+            {
+              "symbol": "JUMP_000410",
+              "instruction_index_u32": 711,
+              "original_va_u32": 4273535
+            },
+            {
+              "symbol": "JUMP_000411",
+              "instruction_index_u32": 717,
+              "original_va_u32": 4273551
+            },
+            {
+              "symbol": "JUMP_000412",
+              "instruction_index_u32": 739,
+              "original_va_u32": 4273614
+            },
+            {
+              "symbol": "JUMP_000413",
+              "instruction_index_u32": 740,
+              "original_va_u32": 4273616
+            },
+            {
+              "symbol": "JUMP_000414",
+              "instruction_index_u32": 746,
+              "original_va_u32": 4273632
+            },
+            {
+              "symbol": "JUMP_000415",
+              "instruction_index_u32": 768,
+              "original_va_u32": 4273695
+            },
+            {
+              "symbol": "JUMP_000416",
+              "instruction_index_u32": 769,
+              "original_va_u32": 4273697
+            },
+            {
+              "symbol": "JUMP_000417",
+              "instruction_index_u32": 775,
+              "original_va_u32": 4273713
+            },
+            {
+              "symbol": "JUMP_000418",
+              "instruction_index_u32": 790,
+              "original_va_u32": 4273763
+            },
+            {
+              "symbol": "JUMP_000419",
+              "instruction_index_u32": 816,
+              "original_va_u32": 4273845
+            },
+            {
+              "symbol": "JUMP_000420",
+              "instruction_index_u32": 832,
+              "original_va_u32": 4273902
+            },
+            {
+              "symbol": "JUMP_000421",
+              "instruction_index_u32": 868,
+              "original_va_u32": 4274010
+            },
+            {
+              "symbol": "JUMP_000422",
+              "instruction_index_u32": 911,
+              "original_va_u32": 4274124
+            },
+            {
+              "symbol": "JUMP_000423",
+              "instruction_index_u32": 912,
+              "original_va_u32": 4274126
+            },
+            {
+              "symbol": "JUMP_000424",
+              "instruction_index_u32": 918,
+              "original_va_u32": 4274142
+            },
+            {
+              "symbol": "JUMP_000425",
+              "instruction_index_u32": 959,
+              "original_va_u32": 4274247
+            },
+            {
+              "symbol": "JUMP_000426",
+              "instruction_index_u32": 1028,
+              "original_va_u32": 4274423
+            },
+            {
+              "symbol": "JUMP_000427",
+              "instruction_index_u32": 1029,
+              "original_va_u32": 4274425
+            },
+            {
+              "symbol": "JUMP_000428",
+              "instruction_index_u32": 1035,
+              "original_va_u32": 4274441
+            },
+            {
+              "symbol": "JUMP_000429",
+              "instruction_index_u32": 1061,
+              "original_va_u32": 4274520
+            },
+            {
+              "symbol": "JUMP_000430",
+              "instruction_index_u32": 1088,
+              "original_va_u32": 4274597
+            },
+            {
+              "symbol": "JUMP_000431",
+              "instruction_index_u32": 1089,
+              "original_va_u32": 4274599
+            },
+            {
+              "symbol": "JUMP_000432",
+              "instruction_index_u32": 1095,
+              "original_va_u32": 4274620
+            },
+            {
+              "symbol": "JUMP_000433",
+              "instruction_index_u32": 1096,
+              "original_va_u32": 4274622
+            },
+            {
+              "symbol": "JUMP_000434",
+              "instruction_index_u32": 1102,
+              "original_va_u32": 4274638
+            },
+            {
+              "symbol": "JUMP_000435",
+              "instruction_index_u32": 1128,
+              "original_va_u32": 4274708
+            },
+            {
+              "symbol": "JUMP_000436",
+              "instruction_index_u32": 1139,
+              "original_va_u32": 4274743
+            },
+            {
+              "symbol": "JUMP_000437",
+              "instruction_index_u32": 1173,
+              "original_va_u32": 4274847
+            },
+            {
+              "symbol": "JUMP_000438",
+              "instruction_index_u32": 1218,
+              "original_va_u32": 4274985
+            },
+            {
+              "symbol": "JUMP_000439",
+              "instruction_index_u32": 1221,
+              "original_va_u32": 4274997
+            },
+            {
+              "symbol": "JUMP_000440",
+              "instruction_index_u32": 1241,
+              "original_va_u32": 4275060
+            },
+            {
+              "symbol": "JUMP_000441",
+              "instruction_index_u32": 1266,
+              "original_va_u32": 4275136
+            },
+            {
+              "symbol": "JUMP_000442",
+              "instruction_index_u32": 1286,
+              "original_va_u32": 4275203
+            },
+            {
+              "symbol": "JUMP_000443",
+              "instruction_index_u32": 1314,
+              "original_va_u32": 4275295
+            },
+            {
+              "symbol": "JUMP_000444",
+              "instruction_index_u32": 1322,
+              "original_va_u32": 4275316
+            },
+            {
+              "symbol": "JUMP_000445",
+              "instruction_index_u32": 1324,
+              "original_va_u32": 4275321
+            },
+            {
+              "symbol": "JUMP_000446",
+              "instruction_index_u32": 1329,
+              "original_va_u32": 4275339
+            },
+            {
+              "symbol": "JUMP_000447",
+              "instruction_index_u32": 1330,
+              "original_va_u32": 4275341
+            },
+            {
+              "symbol": "JUMP_000448",
+              "instruction_index_u32": 1336,
+              "original_va_u32": 4275357
+            },
+            {
+              "symbol": "JUMP_000449",
+              "instruction_index_u32": 1368,
+              "original_va_u32": 4275451
+            },
+            {
+              "symbol": "JUMP_000450",
+              "instruction_index_u32": 1406,
+              "original_va_u32": 4275600
+            }
+          ],
+          "all_original_instructions_equal": true
+        }
+      ],
+      "inline_tables": [
+        {
+          "symbol": "DATA_000005",
+          "virtual_address": 4271208,
+          "executable_offset": 14952,
+          "entry_count": 61,
+          "hex": "5c2d4100662d4100982d4100c52d4100dc2d4100652e41006f2e4100792e4100992e4100c62e4100ec2e4100642f4100802f41009c2f4100b82f4100fc2f41002b3041006b3041009a304100b0304100ee30410004314100543141007d3141009f314100c1314100e83141004432410076324100af324100d8324100113341005733410080334100b5334100bf334100f1334100333441006e34410084344100093541003e3541008f354100e03541003136410063364100b5364100ee3641005a374100de374100473841000939410058394100ce394100373a4100353b4100743b4100c03b4100033c41009d3c4100fb3c4100",
+          "sha256": "9ab51e6c5efa76f604d2bb9ada2b647c92a09bb40d880851399a6d5efd16e4bf",
+          "target_symbols": [
+            "JUMP_000360",
+            "JUMP_000361",
+            "JUMP_000362",
+            "JUMP_000364",
+            "JUMP_000365",
+            "JUMP_000368",
+            "JUMP_000369",
+            "JUMP_000370",
+            "JUMP_000371",
+            "JUMP_000372",
+            "JUMP_000373",
+            "JUMP_000374",
+            "JUMP_000375",
+            "JUMP_000376",
+            "JUMP_000377",
+            "JUMP_000378",
+            "JUMP_000379",
+            "JUMP_000380",
+            "JUMP_000381",
+            "JUMP_000382",
+            "JUMP_000385",
+            "JUMP_000386",
+            "JUMP_000387",
+            "JUMP_000388",
+            "JUMP_000389",
+            "JUMP_000390",
+            "JUMP_000391",
+            "JUMP_000392",
+            "JUMP_000393",
+            "JUMP_000394",
+            "JUMP_000395",
+            "JUMP_000396",
+            "JUMP_000397",
+            "JUMP_000398",
+            "JUMP_000399",
+            "JUMP_000400",
+            "JUMP_000401",
+            "JUMP_000402",
+            "JUMP_000403",
+            "JUMP_000404",
+            "JUMP_000407",
+            "JUMP_000408",
+            "JUMP_000411",
+            "JUMP_000414",
+            "JUMP_000417",
+            "JUMP_000418",
+            "JUMP_000419",
+            "JUMP_000420",
+            "JUMP_000421",
+            "JUMP_000424",
+            "JUMP_000425",
+            "JUMP_000428",
+            "JUMP_000429",
+            "JUMP_000434",
+            "JUMP_000436",
+            "JUMP_000439",
+            "JUMP_000440",
+            "JUMP_000441",
+            "JUMP_000442",
+            "JUMP_000448",
+            "JUMP_000449"
+          ],
+          "target_original_va_u32": [
+            4271452,
+            4271462,
+            4271512,
+            4271557,
+            4271580,
+            4271717,
+            4271727,
+            4271737,
+            4271769,
+            4271814,
+            4271852,
+            4271972,
+            4272000,
+            4272028,
+            4272056,
+            4272124,
+            4272171,
+            4272235,
+            4272282,
+            4272304,
+            4272366,
+            4272388,
+            4272468,
+            4272509,
+            4272543,
+            4272577,
+            4272616,
+            4272708,
+            4272758,
+            4272815,
+            4272856,
+            4272913,
+            4272983,
+            4273024,
+            4273077,
+            4273087,
+            4273137,
+            4273203,
+            4273262,
+            4273284,
+            4273417,
+            4273470,
+            4273551,
+            4273632,
+            4273713,
+            4273763,
+            4273845,
+            4273902,
+            4274010,
+            4274142,
+            4274247,
+            4274441,
+            4274520,
+            4274638,
+            4274743,
+            4274997,
+            4275060,
+            4275136,
+            4275203,
+            4275357,
+            4275451
+          ],
+          "all_targets_are_proved_instruction_boundaries": true
+        }
+      ]
+    },
+    "1333": {
+      "virtual_address": 4515862,
+      "instruction_count": 11,
+      "code_regions": [
+        {
+          "virtual_address": 4515862,
+          "executable_offset": 259606,
+          "byte_length": 25,
+          "hex": "558bec8b55088b450c03451489028b45101345188942045dc3",
+          "sha256": "8946c4ccd895806bb39d3d393c582970d2e34c8ba60c06257447eb10186e5468",
+          "instruction_count": 11,
+          "normalized_instruction_sha256": "d404596ee05a43e6f48c9e0e3738ec8f555a7f3093ca751c86a988fd4a17721f",
+          "source_label_instruction_boundaries": [
+            {
+              "symbol": "FUNC_001333",
+              "instruction_index_u32": 0,
+              "original_va_u32": 4515862
+            }
+          ],
+          "all_original_instructions_equal": true
+        }
+      ],
+      "inline_tables": []
+    },
+    "1532": {
+      "virtual_address": 4536092,
+      "instruction_count": 12,
+      "code_regions": [
+        {
+          "virtual_address": 4536092,
+          "executable_offset": 279836,
+          "byte_length": 27,
+          "hex": "558bec8b45088bd08d04828d04828d04c203c003450c83c0745dc3",
+          "sha256": "11722546aa6829b59d14965d58e75f90352ad08e881c40c09e92f0b7972582e2",
+          "instruction_count": 12,
+          "normalized_instruction_sha256": "f7c42f2ff972c391ce8e86fa8d02e20ec486a9770ba154f64874b93c8265d5be",
+          "source_label_instruction_boundaries": [
+            {
+              "symbol": "FUNC_001532",
+              "instruction_index_u32": 0,
+              "original_va_u32": 4536092
+            }
+          ],
+          "all_original_instructions_equal": true
+        }
+      ],
+      "inline_tables": []
+    },
+    "999980": {
+      "virtual_address": 4656900,
+      "instruction_count": 13,
+      "code_regions": [
+        {
+          "virtual_address": 4656900,
+          "executable_offset": 400644,
+          "byte_length": 25,
+          "hex": "558bec578b7d08b9ffffffff32c0fcf2aef7d18d41ff5f5dc3",
+          "sha256": "133609f9e41cf8579db496b537e65a4c415332c7aa046098ed42b6cc9b7f467b",
+          "instruction_count": 13,
+          "normalized_instruction_sha256": "301291ad53e6b6348e4b6597e26a4c45c951dbc93ec4f3254e4b4afbac19afd2",
+          "source_label_instruction_boundaries": [
+            {
+              "symbol": "FUNC_999980",
+              "instruction_index_u32": 0,
+              "original_va_u32": 4656900
+            }
+          ],
+          "all_original_instructions_equal": true
+        }
+      ],
+      "inline_tables": []
+    }
+  },
+  "whole_procedure_count": 7,
+  "whole_instruction_count": 1509,
+  "F41_instruction_count": 1430,
+  "F41_dispatch_target_count": 61,
+  "all_code_regions_equal": true,
+  "all_inline_table_bytes_and_targets_equal": true,
+  "source_code_variants": [],
+  "source_table_variants": [],
+  "unmodified_JJFFE_F41_semantics_equal": true,
+  "empty_string_resource": {
+    "original_va_u32": 4827670,
+    "hex": "0000",
+    "sha256": "96a296d224f285c67bee93c30f8a309157f0daa35dc5b87e410b78630a09cfc7"
+  },
+  "append_cursor_original_va_u32": 6340420,
+  "strlen_original_va_u32": 4656900,
+  "strlen_instruction_count": 13,
+  "entry_anchor": "F41 actual target independently retained by whole F53 lifecycle call proof; all source labels and complete code/table regions are reproved here.",
+  "host_adaptations": [
+    "Original cdecl argument slots expand4\u21928 bytes; all original156 local offsets retain their literal byte positions.",
+    "Readonly program/vector bytes are unchanged; task+8/+16/+28, Root body references and explicit destination pointers use field/call provenance only.",
+    "Only72 caller-observable stack bytes are exposed:20-byte formatter parameters,48-byte UI record and4-byte outlocal. Other84 scalar spills are excluded and their seed bytes remain transport witnesses.",
+    "Invocation seed and per-byte00/01 definedness are explicit inputs. Original stores mark only bytes actually initialized; provider writes affect only passed pointer windows.",
+    "F664 argument2 and F304/F305 argument0 normalize low8bits consumed by the actual callee interfaces; undefined high-register/stack-address residues are not host pointers or portable scalars.",
+    "F1344 is an explicit typed continuation with destination owner/offset and20 parameter bytes. Its text-return pointer becomes a destination offset; source F41 performs its own decrement.",
+    "Original _strlen13instructions execute, using host address-size only for scasb; source program capacity and callback limits are bounded transport checks, not original clipping."
+  ],
+  "scope": "Whole F41 plus actual F20/F23/F24/F1333/F1532/strlen; typed expression/store/lifecycle/spawn/UI/text/world workers remain external. No complete F1344 formatter, world services or Main claim.",
+  "typed_argument_width_evidence": [
+    {
+      "function": "F664",
+      "argument_index_u32": 2,
+      "consumed_bits_u32": 8,
+      "signed_byte_semantics": true,
+      "sites": [
+        {
+          "original_va_u32": 4377459,
+          "hex": "0fbe4510",
+          "mnemonic": "movsx",
+          "operands": "eax,BYTE PTR [ebp+0x10]"
+        }
+      ],
+      "whole_callee_claimed": false
+    },
+    {
+      "function": "F304",
+      "argument_index_u32": 0,
+      "consumed_bits_u32": 8,
+      "signed_byte_semantics": true,
+      "sites": [
+        {
+          "original_va_u32": 4325730,
+          "hex": "8a4508",
+          "mnemonic": "mov",
+          "operands": "al,BYTE PTR [ebp+0x8]"
+        }
+      ],
+      "whole_callee_claimed": false
+    },
+    {
+      "function": "F305",
+      "argument_index_u32": 0,
+      "consumed_bits_u32": 8,
+      "signed_byte_semantics": true,
+      "sites": [
+        {
+          "original_va_u32": 4325798,
+          "hex": "8a4508",
+          "mnemonic": "mov",
+          "operands": "al,BYTE PTR [ebp+0x8]"
+        }
+      ],
+      "whole_callee_claimed": false
+    },
+    {
+      "function": "F306-shared-byte-consumer",
+      "argument_index_u32": 0,
+      "consumed_bits_u32": 8,
+      "signed_byte_semantics": true,
+      "sites": [
+        {
+          "original_va_u32": 4325882,
+          "hex": "84db",
+          "mnemonic": "test",
+          "operands": "bl,bl"
+        },
+        {
+          "original_va_u32": 4325886,
+          "hex": "0fbef3",
+          "mnemonic": "movsx",
+          "operands": "esi,bl"
+        },
+        {
+          "original_va_u32": 4325897,
+          "hex": "0fbec3",
+          "mnemonic": "movsx",
+          "operands": "eax,bl"
+        },
+        {
+          "original_va_u32": 4325913,
+          "hex": "0fbec3",
+          "mnemonic": "movsx",
+          "operands": "eax,bl"
+        },
+        {
+          "original_va_u32": 4325922,
+          "hex": "0fbec3",
+          "mnemonic": "movsx",
+          "operands": "eax,bl"
+        }
+      ],
+      "whole_callee_claimed": false
+    }
+  ],
+  "bounded_strlen_admission": "Before executing the unchanged13 strlen instructions, the ABI bridge checks for NUL inside the owned immutable program span; failure is transport exit97, not an original source fault. Packet capture uses the same bounded span."
+}

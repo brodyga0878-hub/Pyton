@@ -1,0 +1,114 @@
+{
+  "schema": "starfrontier-composed-mission-vm-rebuild-verification-v1",
+  "date_utc": "2026-11-19",
+  "fixture_sha256": "5af70919e7bb15e6e9539f16b549efc143952e89f067506f77f3538fb2a1edd6",
+  "fixture_bytes": 611521,
+  "generator_sha256": "bb12fda72d5102ac2cf5b497162dedceb3f270f9fe634ae742b54b7430934729",
+  "native_cases": 34,
+  "fresh_native_cohorts": 3,
+  "reverse_repeat_cases": 34,
+  "native_child_measurements": 180,
+  "native_measurements_sha256": "4a180ee8f0961012460e41d6768647e226a8157d0a169f7b8344b939b20cfa9d",
+  "nested_dependency_calls": 146,
+  "explicit_world_observations": 21,
+  "actual_F41_invocations": 35,
+  "F41_external_world_replies": 0,
+  "full_Core21_continuation_edges": 6,
+  "original_full_105_definition_resource_cases": 1,
+  "unique_captured_procedures": 54,
+  "unique_captured_original_instructions": 4432,
+  "unique_executable_constituent_bodies": 53,
+  "unique_executable_constituent_original_instructions": 4422,
+  "resource_anchor_only": {
+    "procedure": "F1345",
+    "instruction_count": 10
+  },
+  "F41_complete_original_instructions": 1430,
+  "F41_original_dispatch_targets": 61,
+  "portable_runtime_checks": 1361,
+  "portable_runtime_failures": 0,
+  "runtime_report_source_pins": 57,
+  "runtime_report_all_source_pins_current": true,
+  "runtime_source_sha256": "3523b2740fcbef4206cd9d0cdf367c6aca68e6a4cca8eff7e439f195d28cf75a",
+  "runtime_state_source_sha256": "36f0a33d58ba27f9b96bd3345e132e22284b0477357ddd433dfa19d7862ade70",
+  "runtime_test_sha256": "980bd8cf1cce4ade67465d31db2f5c158fb5fe0318106a0edf2c8bb6e4c9c1d0",
+  "native_F41_is_closed": true,
+  "original_F39_F40_spawn_phase_matrix_closed": true,
+  "original_F1344_formatter_closed": false,
+  "expected_arithmetic_calculated_in_python": false,
+  "copied_proof_replay": {
+    "fixture_byte_exact": true,
+    "all_seven_generated_runtime_artifacts_byte_exact": true,
+    "all_eight_constituent_proof_directories_replayed": true,
+    "original_DOS_input_directories_forbidden": true,
+    "redirected_proof_reads": 44
+  },
+  "independent_original_reproof": {
+    "fixture_byte_exact": true,
+    "all_seven_generated_runtime_artifacts_byte_exact": true,
+    "all_eight_constituent_proof_directories_replayed": true,
+    "original_DOS_input_directories_forbidden": true,
+    "redirected_proof_reads": 44,
+    "independently_recaptured_constituent_artifacts": 36,
+    "all_original_recaptures_byte_exact": true
+  },
+  "generated_runtime_artifacts_sha256": {
+    "events-callback-heap-overlay.c": "213b40260a607c9d076742462346af292e62b05ad407e31e29698681f5bcae51",
+    "model-composition-native.s": "5de0487546e459c809be0f2b74bb25d82c3cf8cb24d984125fb69d6903bc2217",
+    "statements-composition-native.s": "d163bc0dacf4fb41b5f2dfb54f4ec2bc3369d8031f744a52078c09fb4fa2f94f",
+    "statements-composition-host.c": "418e9d5ad9ff75bc357bb6b4396366f629bcad545541530160e9d2505edc6a6e",
+    "spawn-composition-native.s": "b38331f779768b87a802d49e26d250212e461d52d6b2e1744de42e3dce3a8508",
+    "spawn-composition-host.c": "7281fb2e8cc1f12574353eb6f6e007fef51da3abdf12f4ea88a337f5dc638eff",
+    "vm-contract.json": "58cff899f38b517e580b235e6a0ca653b380041a29ddc5500fb8a2b289059806"
+  },
+  "constituent_proofs": [
+    {
+      "proof_dir": "validation/mission-expressions-2026-11-18/expression-native-proof",
+      "instruction_proof_sha256": "55350cb8453c19e0126c5e09b5f6737a5062a9f4124e9be5319fbd0f15fe1d8f",
+      "source_capture_sha256": "44356c8390332726daffb37f36e2b15cda0bca2181c5f2828ea7ccb7f1e2150e"
+    },
+    {
+      "proof_dir": "validation/mission-tasks-2026-11-19/store-native-proof",
+      "instruction_proof_sha256": "6d83e9962738424a6d1efd0d841c053003f42e4be9a1ceca5c912e0e62ff5ef5",
+      "source_capture_sha256": "cfa8fc53a845085537352bb2f86b52831e49f3fa68a1e887dce435a2bd0a87c0"
+    },
+    {
+      "proof_dir": "validation/mission-expressions-2026-11-18/guards-native-proof",
+      "instruction_proof_sha256": "859cce320e271f404b261be7d18fc9076972ad5b71c29f3f0b6e1f817b29e9a9",
+      "source_capture_sha256": "61162a64213e5f2b6e93bd230d87fae6994db1324bb50ae5de42b2f5dca1798c"
+    },
+    {
+      "proof_dir": "validation/mission-tasks-2026-11-19/task-native-proof",
+      "instruction_proof_sha256": "ca73d157f6f1e98e2332cbbe853b8fcae95874c31b0050694141849dc3b33fd5",
+      "source_capture_sha256": "27eaaaa789c6480143b6fed8e66643894cf2f74ca22ba8f32821b064180bb204"
+    },
+    {
+      "proof_dir": "validation/events-messages-2026-11-18/events-native-proof",
+      "instruction_proof_sha256": "534d1c116c418745e5db1080c575f2b595f570b9f0e72c17b23f099f3bab37a5",
+      "source_capture_sha256": "0d1515cbc16763aeeab2b94d33b36f24c37a2f9698e487d9e9babf399977589c"
+    },
+    {
+      "proof_dir": "validation/mission-tasks-2026-11-19/model-native-proof",
+      "instruction_proof_sha256": "53758ab4730d89c81d338ca204efac88417099d97ef7174a58b5fea6551c214e",
+      "source_capture_sha256": "16fbe3301f2915b83417df0ef43ae29999860ef2ca9e2849a31d225673142a86"
+    },
+    {
+      "proof_dir": "validation/mission-statements-2026-11-19/spawn-native-proof",
+      "instruction_proof_sha256": "25d9c1f840524027ca2272c5531ec9ca9d2b3e5c7f1aaffd27fb24704e9e19d5",
+      "source_capture_sha256": "fb1d54ae0fbce28a5571f66bf66c40668fdb0ca06edc038239d09c76133f9531"
+    },
+    {
+      "proof_dir": "validation/mission-statements-2026-11-19/statements-native-proof",
+      "instruction_proof_sha256": "5bdb952d294ddb4e558dafd3d75a97ee87a77feea2ffa433bcd4d581046e4ff0",
+      "source_capture_sha256": "92b54d3be626c9e65ea6094ad1c90a9d49a85210b29ccf9fb7bb8fa7f8ef57d1"
+    }
+  ],
+  "native_transport_restrictions": [
+    "Selected allocation byte length and module-global base cannot change inside a suspended old expression/store adapter.",
+    "Freed selected bytes are private retired projection transport and are never reinserted; a later freed-memory read/write is outside positive native corpus, not an asserted CPU fault.",
+    "The inherited callback heap overlay admits consecutive surviving new IDs; transient allocator gaps remain outside its native transport."
+  ],
+  "Main_integrated": false,
+  "full_original_port_complete": false,
+  "scope": "Native composition of actual F41 with real expression/store/guard/task/event/spawn/model kernels over Core21; formatting and unclosed world services remain explicit authored observations."
+}

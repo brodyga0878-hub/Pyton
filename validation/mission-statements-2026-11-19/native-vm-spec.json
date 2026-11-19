@@ -1,0 +1,8 @@
+{
+  "name": "mission_vm",
+  "generator": "tools/rebuild_source_mission_vm_native.py",
+  "fixture": "tests/fixtures/source_mission_vm_native.json",
+  "kind": "proof_asm",
+  "proof_dir": "validation/mission-statements-2026-11-19/vm-native-proof",
+  "supplemental": true
+}

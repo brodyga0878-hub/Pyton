@@ -1,0 +1,348 @@
+{
+	"Main_integrated": false,
+	"audit_scope": "Public Core21/VM/State, read-only implementation review",
+	"checks": 83,
+	"conditions": [
+		{
+			"condition": "Pinned original program resources load before audit",
+			"passed": true
+		},
+		{
+			"condition": "Core21 has one occurrence of every persisted owner",
+			"passed": true
+		},
+		{
+			"condition": "Real registry node contributes to the cold numeric owner audit",
+			"passed": true
+		},
+		{
+			"condition": "Core21 cold codec normalizes every scalar and all node/definition IDs",
+			"passed": true
+		},
+		{
+			"condition": "Decoded definition, registry and text cursor are canonical integers",
+			"passed": true
+		},
+		{
+			"condition": "Invocation cursor and selected record are not duplicate persistent owners",
+			"passed": true
+		},
+		{
+			"condition": "Actual stop consumes one byte and closes without a world F41 substitute",
+			"passed": true
+		},
+		{
+			"condition": "Stop preserves every persistent byte and consumes one supplied private frame",
+			"passed": true
+		},
+		{
+			"condition": "Uninitialized private bytes retain explicit seed and unknown mask",
+			"passed": true
+		},
+		{
+			"condition": "Returned after-state does not alias caller input buffers",
+			"passed": true
+		},
+		{
+			"condition": "A statement invocation cannot fabricate an omitted scratch seed",
+			"passed": true
+		},
+		{
+			"condition": "Unconsumed extra FIFO frame seeds reject",
+			"passed": true
+		},
+		{
+			"condition": "Scratch byte length is exact156",
+			"passed": true
+		},
+		{
+			"condition": "Scratch definedness admits only00or01",
+			"passed": true
+		},
+		{
+			"condition": "Scratch FIFO field cannot silently default",
+			"passed": true
+		},
+		{
+			"condition": "Missing VM owner rejects: text_buffer",
+			"passed": true
+		},
+		{
+			"condition": "Missing VM owner rejects: text_cursor_u32",
+			"passed": true
+		},
+		{
+			"condition": "Missing VM owner rejects: vectors",
+			"passed": true
+		},
+		{
+			"condition": "Actual F41 reaches its concrete world worker rather than external F41",
+			"passed": true
+		},
+		{
+			"condition": "Exact world before/after propagates a concrete world mutation",
+			"passed": true
+		},
+		{
+			"condition": "Wrong callback frame rejects atomically: task_slot_s32",
+			"passed": true
+		},
+		{
+			"condition": "Wrong callback frame rejects atomically: ip_before_u32",
+			"passed": true
+		},
+		{
+			"condition": "Wrong callback frame rejects atomically: ip_after_u32",
+			"passed": true
+		},
+		{
+			"condition": "World observations cannot replace the real F41 body",
+			"passed": true
+		},
+		{
+			"condition": "Readonly source owner cannot change: program",
+			"passed": true
+		},
+		{
+			"condition": "Readonly source owner cannot change: metadata",
+			"passed": true
+		},
+		{
+			"condition": "Readonly source owner cannot change: vectors",
+			"passed": true
+		},
+		{
+			"condition": "Readonly definition table cannot change",
+			"passed": true
+		},
+		{
+			"condition": "World service cannot resize persistent text owner",
+			"passed": true
+		},
+		{
+			"condition": "Logical heap ID counter cannot decrease",
+			"passed": true
+		},
+		{
+			"condition": "A surviving allocation cannot change its byte extent",
+			"passed": true
+		},
+		{
+			"condition": "Ignored void worker EAX is normalized rather than invented as a result",
+			"passed": true
+		},
+		{
+			"condition": "Input defined mask must match exact input extent",
+			"passed": true
+		},
+		{
+			"condition": "Output defined masks cannot claim a third provenance state",
+			"passed": true
+		},
+		{
+			"condition": "Unjournaled event-tree mutation cannot pass as a world byte patch",
+			"passed": true
+		},
+		{
+			"condition": "Actual registry journal replays one source registration without duplicate order",
+			"passed": true
+		},
+		{
+			"condition": "Unused duplicate world observations reject",
+			"passed": true
+		},
+		{
+			"condition": "All failed world controls preserve live owned state",
+			"passed": true
+		},
+		{
+			"condition": "A literal/register continuation after free finishes without resurrecting retired locals",
+			"passed": true
+		},
+		{
+			"condition": "An actual subsequent read through the freed task pointer rejects the bounded profile",
+			"passed": true
+		},
+		{
+			"condition": "Recursive expression refetches current task heap pointer and respects new owner size",
+			"passed": true
+		},
+		{
+			"condition": "Recursive expression refetches changed module descriptor before global read",
+			"passed": true
+		},
+		{
+			"condition": "Unrepresentable global pointer remains unused transport for a pure F20",
+			"passed": true
+		},
+		{
+			"condition": "Actual read of an unrepresentable global projection rejects without engine errors",
+			"passed": true
+		},
+		{
+			"condition": "Self cancellation compares the post-F38 handle and continues after generation increment",
+			"passed": true
+		},
+		{
+			"condition": "Self cancellation stops when cleanup leaves the compared packed handle unchanged",
+			"passed": true
+		},
+		{
+			"condition": "Block switch mutates the current task and stops before later world code",
+			"passed": true
+		},
+		{
+			"condition": "True conditional skips its displacement without reading it",
+			"passed": true
+		},
+		{
+			"condition": "Consecutive UI statements retain one private packet owner",
+			"passed": true
+		},
+		{
+			"condition": "Callback packet bytes and definedness survive until the next source use",
+			"passed": true
+		},
+		{
+			"condition": "Real F48 snapshot/F47 condition recursively executes a second real F41",
+			"passed": true
+		},
+		{
+			"condition": "Frame seed consumption is FIFO and private scratch returns in source unwind order",
+			"passed": true
+		},
+		{
+			"condition": "Recursive source entry cannot use an unsupplied second frame",
+			"passed": true
+		},
+		{
+			"condition": "Old expression output-buffer provider remains explicit",
+			"passed": true
+		},
+		{
+			"condition": "Fully defined old-expression buffer produces its real consumed scalar",
+			"passed": true
+		},
+		{
+			"condition": "Unknown old-expression output rejects the conservative VM transport without claiming a DOS fault",
+			"passed": true
+		},
+		{
+			"condition": "F41 nine-word creation closes through real Spawn rather than a world F40 substitute",
+			"passed": true
+		},
+		{
+			"condition": "Only allocator and actual DOS position remain typed after nine source arguments",
+			"passed": true
+		},
+		{
+			"condition": "F41 rereads returned body+86 after position mutation before real F37 store",
+			"passed": true
+		},
+		{
+			"condition": "Nine-argument widths and order survive the full F41/Spawn adapter",
+			"passed": true
+		},
+		{
+			"condition": "Spawn's closed native arithmetic does not allocate a fake statement frame",
+			"passed": true
+		},
+		{
+			"condition": "Owned VM configures once with full Core21",
+			"passed": true
+		},
+		{
+			"condition": "Prepare remains private and reviewable",
+			"passed": true
+		},
+		{
+			"condition": "Forged receipt cannot commit or mutate owned state",
+			"passed": true
+		},
+		{
+			"condition": "Verified candidate commits exactly once",
+			"passed": true
+		},
+		{
+			"condition": "Cold snapshot replays its last full statement execution",
+			"passed": true
+		},
+		{
+			"condition": "Re-signed invented after-owner fails cold replay",
+			"passed": true
+		},
+		{
+			"condition": "Restoring equal owners invalidates stale preparation revisions",
+			"passed": true
+		},
+		{
+			"condition": "Reconfiguring an earlier equal core prevents ABA commit",
+			"passed": true
+		},
+		{
+			"condition": "Cyclic core, command and snapshot are rejected before copies",
+			"passed": true
+		},
+		{
+			"condition": "Cyclic command arguments reject before serialization",
+			"passed": true
+		},
+		{
+			"condition": "Cyclic world observation graph rejects before serialization",
+			"passed": true
+		},
+		{
+			"condition": "Frozen0.31 constituent remains unchanged: scripts/source_mission_runtime.gd",
+			"passed": true
+		},
+		{
+			"condition": "Frozen0.31 constituent remains unchanged: scripts/source_mission_runtime_state.gd",
+			"passed": true
+		},
+		{
+			"condition": "Frozen0.31 constituent remains unchanged: scripts/source_mission_expression.gd",
+			"passed": true
+		},
+		{
+			"condition": "Frozen0.31 constituent remains unchanged: scripts/source_mission_store.gd",
+			"passed": true
+		},
+		{
+			"condition": "Frozen0.31 constituent remains unchanged: scripts/source_mission_task.gd",
+			"passed": true
+		},
+		{
+			"condition": "Frozen0.31 constituent remains unchanged: scripts/source_mission_guards.gd",
+			"passed": true
+		},
+		{
+			"condition": "Frozen0.31 constituent remains unchanged: scripts/source_events.gd",
+			"passed": true
+		},
+		{
+			"condition": "Frozen0.31 constituent remains unchanged: scripts/source_mission_models.gd",
+			"passed": true
+		},
+		{
+			"condition": "Frozen0.31 constituent remains unchanged: scripts/source_mission_programs.gd",
+			"passed": true
+		},
+		{
+			"condition": "Frozen0.31 constituent remains unchanged: data/ffe_mission_programs.json",
+			"passed": true
+		},
+		{
+			"condition": "Frozen0.31 constituent remains unchanged: data/ffe_mission_models.json",
+			"passed": true
+		}
+	],
+	"failures": 0,
+	"old_kernels_modified": false,
+	"source_hashes": {
+		"scripts/source_mission_spawn.gd": "fa0ed027baa3e54e47d2366e2ce5ce9e3bb195319a823cdd7056e915fd8af13e",
+		"scripts/source_mission_statements.gd": "e15c907d769aa4010074fd31081eb9d817d248574b7632e4fae9cae8507467f8",
+		"scripts/source_mission_vm.gd": "3523b2740fcbef4206cd9d0cdf367c6aca68e6a4cca8eff7e439f195d28cf75a",
+		"scripts/source_mission_vm_state.gd": "36f0a33d58ba27f9b96bd3345e132e22284b0477357ddd433dfa19d7862ade70",
+		"validation/mission-statements-2026-11-19/independent-vm-audit/audit.gd": "a1e8b95005b9b1fd14234c5284051304fdf60f1ce22a5d15aaaaecc59ae7c477"
+	}
+}

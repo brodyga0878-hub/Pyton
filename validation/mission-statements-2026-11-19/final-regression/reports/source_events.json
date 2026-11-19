@@ -1,0 +1,20 @@
+{
+	"Main_integrated": false,
+	"checks": 1444,
+	"failures": 0,
+	"full_F41_VM_executed": false,
+	"native_cases": 169,
+	"profile": "dos-firstenc-events-tree-v1",
+	"sources": {
+		"recovered-history/ground_harness/tools/build_terrain_query_reference.py": "46bbaf8fb4d80bea2c73cac728bb7385e2b46618dd908e111c632cdafda0c2cc",
+		"recovered-history/ground_harness/tools/native_reference.py": "50a1757168b4b886b1b48db6798d60feb4b73f6fb04176a0840a941ebdf6a1eb",
+		"scripts/source_events.gd": "99df34b55b5a054e835fb538489a2bb409e0c61955aaa3c2e862a1b9d8ea6327",
+		"scripts/source_frame_dispatch.gd": "e3c7fea41429251cecff11dffd344dab3d765274289d00cb0b6fc3a9bfc8d2fe",
+		"tests/fixtures/source_events_native.json": "eb7bc02bc0d8ae9abbc8fd43149acf7742a79c11a31e6d7a44ffb1698a4bb2c5",
+		"tests/test_source_events.gd": "6546a0603279ed8f8697565e5dc3840c8412cf0028576d7b585b8bde8d716cd8",
+		"tools/rebuild_source_damage_native.py": "5b2bdab57b8e8ba3f7125aa12bb4d95e11cc0709d164e4c675e071aa5a3e9c8d",
+		"tools/rebuild_source_events_native.py": "37435eefdfdf89f25f6669689e9aa01f3312d5b219da2929a04675e9e05e3507",
+		"tools/rebuild_source_natural_contact_native.py": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889",
+		"tools/rebuild_source_surface_contact_native.py": "6cb4314fbe1004eafd9476e80e9743f94c684b4a8359101d41fa6a77a572a6f9"
+	}
+}

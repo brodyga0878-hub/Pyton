@@ -1,0 +1,20 @@
+{
+	"Main_integrated": false,
+	"checks": 7340,
+	"failures": 0,
+	"native_cases": 674,
+	"native_fixture_pending": false,
+	"profile": "dos-firstenc-mission-spawn-v1",
+	"same_owner_sequence_steps": 6,
+	"sources": {
+		"data/ffe_ground_coordinates.json": "e94e9ec86761aa1d775498a2959af201f3c6497506da481c9d49ca7f27766abf",
+		"scripts/body_rotation.gd": "b5d4e63331728681d1f34c73fe83cdd57120e29b352e09090da4ff147b22ed34",
+		"scripts/ground_coordinates.gd": "54dedcc157dea6c84c4f8ad6ff0859159d81719cafbbaa23c626cd94e1cdf7b6",
+		"scripts/source_mission_expression.gd": "a7504b6ce5e4e570587acfeaad1919d834e20d9a9ffc42ee3af6ae6f4dd2ebdb",
+		"scripts/source_mission_services.gd": "e4f4746a4d065155f224797bcba5e01c29e3986b14b598672af9a11760d21637",
+		"scripts/source_mission_spawn.gd": "fa0ed027baa3e54e47d2366e2ce5ce9e3bb195319a823cdd7056e915fd8af13e",
+		"scripts/source_orbit.gd": "7091ed3bbb88e79434ce21d53b3c98bf7f01391ee8a20a736c5e7c56eef55579",
+		"tests/test_source_mission_spawn.gd": "7584b88d6a907abdbafe252d0c9f83061f759b3eb04ebd862778084f1e84ad46",
+		"tools/rebuild_source_mission_spawn_native.py": "308e95a5e089b4a61e23d9e1fafdfc55785dca0575420611a2846416e0afe083"
+	}
+}

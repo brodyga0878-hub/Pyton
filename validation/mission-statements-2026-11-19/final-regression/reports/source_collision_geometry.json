@@ -1,0 +1,21 @@
+{
+	"Main_integrated": false,
+	"checks": 2244,
+	"cold_terrain_continuations": 1,
+	"failures": 0,
+	"native_F579_calls": 378,
+	"native_F582_body_executed": false,
+	"native_cases": 288,
+	"profile": "dos-firstenc-f576-f579-geometry-v1",
+	"scope": "Whole DOS F576/F579 arithmetic and child order against original instruction oracle with explicit F582 observations; public runtime invokes actual collision VM, including typed F581 continuation and exact cold byte transport. General terrain engine remains external.",
+	"sources": {
+		"data/ffe_collision_programs.json": "7ccd9884e0c05fc4d645347301112ab972d83c40780243325f3e907d5f527013",
+		"scripts/source_collision_geometry.gd": "f1443cee17feac98d300ab2a8348d4dc72d56e3d90261c4c6cf96c1c577be2d0",
+		"scripts/source_collision_program.gd": "025660e6fbf397c07d415791a6e7be927eae81fe9037a2fb611ff0ae14d1a892",
+		"tests/fixtures/source_collision_geometry_native.json": "bdedb3892cbb6234a3418280b25a9ca5ed4c6be47a09851ac9671162628aaf03",
+		"tests/test_source_collision_geometry.gd": "a21978bd08f9a4477d5a96a4c892a0aa0a03c5f37feb828e0126c8f13d8b4234",
+		"tools/rebuild_source_collision_geometry_native.py": "f45fcfe629b5c37cc259cedfa608ed9d706fc2ce002584694de668f22d066e4c",
+		"validation/collision-programs-2026-11-17/geometry-native-proof/instruction-proof.json": "a9784a7cedd50ad696d2a0bf1e8ecad04c67f31f098db014bb5a1068dc8b98a0",
+		"validation/collision-programs-2026-11-17/geometry-native-proof/source-procedures.asm": "f7181055dd8ef0e91d9c6fd384290c4d24cbb0367ae66d077fe1b682ce0e710f"
+	}
+}

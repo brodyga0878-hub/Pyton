@@ -1,0 +1,21 @@
+{
+	"Main_integrated": false,
+	"checks": 2880,
+	"failures": 0,
+	"full_event_VM_executed": false,
+	"full_gameover_executed": false,
+	"native_cases": 333,
+	"profile": "dos-firstenc-player-module-events-v1",
+	"sources": {
+		"scripts/source_player_events.gd": "c07855d1439fd5dd29e7ecf428aee90f6133f473b995b56e4064674f65e45140",
+		"tests/fixtures/source_player_events_native.json": "783f55c6927dd1741d2659f1ecfecea1e285575d164374ca0b7d6e9f385ba82e",
+		"tests/test_source_player_events.gd": "b022128c6c7ff32fd9b1298381e0bc407dde989341f79b73dc4aaa1ff6d2fc4e",
+		"tools/rebuild_source_damage_native.py": "5b2bdab57b8e8ba3f7125aa12bb4d95e11cc0709d164e4c675e071aa5a3e9c8d",
+		"tools/rebuild_source_natural_contact_native.py": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889",
+		"tools/rebuild_source_player_events_native.py": "b59db11e6cd57621d0daed6003d71fc6ceb90e84c822edbf821f69fa0cd18c78",
+		"validation/events-messages-2026-11-18/player-events-native-proof/instruction-proof.json": "e957f1d1bab77e053388881fafe44f58a3ee134533235edc492584edec743787",
+		"validation/events-messages-2026-11-18/player-events-native-proof/player-events-native.s": "028c6c9f644ec7e936949194b2136d33448403c7eabfe46c6445bef74e3ab7b9",
+		"validation/events-messages-2026-11-18/player-events-native-proof/player-events-support.c": "4f99a3b4fafb38e75b7497b55f13e9a81b9713b7fd477073996f41aeba1e7417",
+		"validation/events-messages-2026-11-18/player-events-native-proof/source-procedures.asm": "b6f7706042c6fa2651394a1d68ad9a7545f83234bce0c5ac95bbe2258cb51dcb"
+	}
+}

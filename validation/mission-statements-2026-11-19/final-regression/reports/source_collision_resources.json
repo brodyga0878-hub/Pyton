@@ -1,0 +1,22 @@
+{
+	"Main_integrated": false,
+	"checks": 7767,
+	"child_records": 138,
+	"conditional_records": 57,
+	"failures": 0,
+	"full_collision_execution_claimed": false,
+	"models_with_recursive_dependencies": 178,
+	"original_spans": 993,
+	"primary_models": 149,
+	"profile": "dos-firstenc-collision-program-resources-v1",
+	"source_records": 389,
+	"sources": {
+		"data/ffe_collision_programs.json": "7ccd9884e0c05fc4d645347301112ab972d83c40780243325f3e907d5f527013",
+		"data/ffe_object_factory.json": "c2a39b98f17721b55eac7fc5d3015e39b279fb05a002401fd3120218721894a2",
+		"data/ffe_runtime_model_descriptors.json": "cf9c673c2bba22f0c865e77e3a7ceed5497053cdb444b80f31d7439176446818",
+		"tests/test_source_collision_resources.gd": "228414b93378b66f21f4b405c2cfe6bcb21219b0fd6520e2b936dca228bd944d",
+		"tools/extract_source_collision_programs.py": "5f4b8d3c369e33402f5fc0ef7a9976795802d5eb2f192f32daa5342c2badb9c1",
+		"validation/collision-programs-2026-11-17/resources/original-spans.json": "6b9f0d858a74389d7b9113d582fa1fec81fc74f0ecaa41fafd30212b4aebd535"
+	},
+	"terrain_records": 37
+}

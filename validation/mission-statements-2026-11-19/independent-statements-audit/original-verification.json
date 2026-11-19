@@ -1,0 +1,214 @@
+{
+  "schema": "starfrontier-independent-statements-original-audit-v1",
+  "checks": 12,
+  "failures": 0,
+  "controls": [
+    "raw-code-20-0",
+    "raw-code-23-0",
+    "raw-code-24-0",
+    "raw-code-41-0",
+    "raw-code-41-1",
+    "raw-inline-DATA_000005",
+    "raw-code-1333-0",
+    "raw-code-1532-0",
+    "raw-code-999980-0",
+    "empty-resource-two-zero-bytes",
+    "original-vector-resource-324-bytes",
+    "source-owner-aliases"
+  ],
+  "source_executable_sha256": "d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72",
+  "regions": [
+    {
+      "procedure": "20",
+      "va_u32": 4265060,
+      "bytes": 53,
+      "sha256": "2c813061b30b79c48e48db3b9f7af8e589ce7a6bdd83ab68dad7da110721b4a0",
+      "instructions": 25
+    },
+    {
+      "procedure": "23",
+      "va_u32": 4265624,
+      "bytes": 22,
+      "sha256": "53621f96c3af49330c67e56de53b5dafc6a085d1e1c2b01a775c147d5260d1f1",
+      "instructions": 9
+    },
+    {
+      "procedure": "24",
+      "va_u32": 4265648,
+      "bytes": 23,
+      "sha256": "cd93774d6f6435297730c5bc7b27e6675e4198d2b09809313c3297308ee9dc40",
+      "instructions": 9
+    },
+    {
+      "procedure": "41",
+      "va_u32": 4271160,
+      "bytes": 48,
+      "sha256": "74f56b0ecc9bcae3afc7d51169dd9afda6dd1c5c91a1167bf6c31260806ed1b5",
+      "instructions": 16
+    },
+    {
+      "procedure": "41",
+      "va_u32": 4271452,
+      "bytes": 4163,
+      "sha256": "2a6e6a93be6a89ddda579f5fd68f8d0e7ffcef34ccf0c082147ab40b2134ea5c",
+      "instructions": 1414
+    },
+    {
+      "procedure": "1333",
+      "va_u32": 4515862,
+      "bytes": 25,
+      "sha256": "8946c4ccd895806bb39d3d393c582970d2e34c8ba60c06257447eb10186e5468",
+      "instructions": 11
+    },
+    {
+      "procedure": "1532",
+      "va_u32": 4536092,
+      "bytes": 27,
+      "sha256": "11722546aa6829b59d14965d58e75f90352ad08e881c40c09e92f0b7972582e2",
+      "instructions": 12
+    },
+    {
+      "procedure": "999980",
+      "va_u32": 4656900,
+      "bytes": 25,
+      "sha256": "133609f9e41cf8579db496b537e65a4c415332c7aa046098ed42b6cc9b7f467b",
+      "instructions": 13
+    }
+  ],
+  "whole_bodies": 7,
+  "instructions": 1509,
+  "F41_instructions": 1430,
+  "inline_targets": 61,
+  "vectors_bytes": 324,
+  "empty_resource_bytes": 2,
+  "observed_alias_operands": [
+    {
+      "va_u32": 4272435,
+      "instruction": "mov    eax,ds:0x647948"
+    },
+    {
+      "va_u32": 4272653,
+      "instruction": "mov    eax,ds:0x647948"
+    },
+    {
+      "va_u32": 4273111,
+      "instruction": "mov    eax,ds:0x60bf44"
+    },
+    {
+      "va_u32": 4273127,
+      "instruction": "mov    ds:0x60bf44,eax"
+    },
+    {
+      "va_u32": 4273177,
+      "instruction": "mov    eax,ds:0x60bf44"
+    },
+    {
+      "va_u32": 4273193,
+      "instruction": "mov    ds:0x60bf44,eax"
+    },
+    {
+      "va_u32": 4273203,
+      "instruction": "mov    eax,ds:0x642246"
+    },
+    {
+      "va_u32": 4273209,
+      "instruction": "push   0x49aa16"
+    },
+    {
+      "va_u32": 4273443,
+      "instruction": "mov    eax,ds:0x642208"
+    },
+    {
+      "va_u32": 4273819,
+      "instruction": "mov    eax,ds:0x60bf44"
+    },
+    {
+      "va_u32": 4273835,
+      "instruction": "mov    ds:0x60bf44,eax"
+    },
+    {
+      "va_u32": 4273955,
+      "instruction": "mov    eax,ds:0x647948"
+    },
+    {
+      "va_u32": 4274467,
+      "instruction": "mov    eax,ds:0x647948"
+    },
+    {
+      "va_u32": 4274546,
+      "instruction": "mov    eax,ds:0x647948"
+    },
+    {
+      "va_u32": 4274743,
+      "instruction": "mov    eax,ds:0x647948"
+    },
+    {
+      "va_u32": 4274824,
+      "instruction": "cmp    DWORD PTR ds:0x647948,0x0"
+    },
+    {
+      "va_u32": 4274847,
+      "instruction": "mov    eax,ds:0x647948"
+    },
+    {
+      "va_u32": 4275136,
+      "instruction": "mov    eax,ds:0x647948"
+    },
+    {
+      "va_u32": 4275229,
+      "instruction": "mov    eax,ds:0x647948"
+    },
+    {
+      "va_u32": 4275273,
+      "instruction": "cmp    eax,DWORD PTR ds:0x642204"
+    },
+    {
+      "va_u32": 4275284,
+      "instruction": "cmp    WORD PTR [eax*2+0x642270],0x0"
+    },
+    {
+      "va_u32": 4275451,
+      "instruction": "mov    eax,ds:0x647948"
+    },
+    {
+      "va_u32": 4275546,
+      "instruction": "mov    dx,WORD PTR [eax*4+0x48f07c]"
+    },
+    {
+      "va_u32": 4275564,
+      "instruction": "mov    dx,WORD PTR [eax*4+0x48f080]"
+    },
+    {
+      "va_u32": 4275582,
+      "instruction": "mov    ax,WORD PTR [eax*4+0x48f084]"
+    }
+  ],
+  "narrow_external_byte_interfaces": [
+    {
+      "name": "F304-first-byte",
+      "va_u32": 4325730,
+      "hex": "8a4508",
+      "sha256": "8847a98ba0aa8d8ea1f37792d59f53b3b9d9efcf32d56db19fc0bf0cb6cc06e9"
+    },
+    {
+      "name": "F305-first-byte",
+      "va_u32": 4325798,
+      "hex": "8a4508",
+      "sha256": "8847a98ba0aa8d8ea1f37792d59f53b3b9d9efcf32d56db19fc0bf0cb6cc06e9"
+    },
+    {
+      "name": "F664-third-byte",
+      "va_u32": 4377459,
+      "hex": "0fbe4510",
+      "sha256": "29048798d87e30910c37da1c8f7d776e78212e58525e1227bd4a9b45e47c6b47"
+    },
+    {
+      "name": "F306-first-signed-low-byte",
+      "va_u32": 4325882,
+      "hex": "84db",
+      "sha256": "7087cf5f9f4f30301fd1b1737cfc01976911f0b4063dca2561bf9152acbfbac4"
+    }
+  ],
+  "extra_whole_external_bodies_claimed": false,
+  "counted_in_functional_totals": false
+}

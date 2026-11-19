@@ -1,0 +1,66 @@
+{
+  "schema": "starfrontier-mission-spawn-native-rebuild-verification-v1",
+  "date_utc": "2026-11-19",
+  "fixture_sha256": "6ea6d36ae97df54509447ae566b5b9935eca34f6aa474223fd8ffa55d253c379",
+  "fixture_bytes": 2380611,
+  "generator_sha256": "308e95a5e089b4a61e23d9e1fafdfc55785dca0575420611a2846416e0afe083",
+  "case_count": 674,
+  "whole_original_procedures": 9,
+  "whole_original_instructions": 290,
+  "original_procedure_instructions": {
+    "39": 5,
+    "40": 85,
+    "1532": 12,
+    "1510": 36,
+    "1509": 32,
+    "1338": 14,
+    "1675": 63,
+    "1914": 34,
+    "1521": 9
+  },
+  "fresh_native_process_runs": 3,
+  "reverse_repeat_cases": 674,
+  "all_F39_low_bytes": true,
+  "all_F40_low_byte_shifts": true,
+  "dependent_native_transitions": 8,
+  "full_three_owner_continuation_edges": 7,
+  "original_sine_table_bytes": 65536,
+  "original_sine_table_sha256": "108cff65b3eb4788b94455d87b308a98c102d05f1b399871762c4e797a192265",
+  "portable_runtime_checks": 7340,
+  "portable_runtime_failures": 0,
+  "runtime_report_source_pins": 9,
+  "runtime_report_all_source_pins_current": true,
+  "runtime_source_sha256": "fa0ed027baa3e54e47d2366e2ce5ce9e3bb195319a823cdd7056e915fd8af13e",
+  "runtime_test_sha256": "7584b88d6a907abdbafe252d0c9f83061f759b3eb04ebd862778084f1e84ad46",
+  "copied_proof_with_original_paths_absent": {
+    "fixture_byte_exact": true,
+    "all_five_generated_artifacts_byte_exact": true
+  },
+  "independent_original_reproof": {
+    "fixture_byte_exact": true,
+    "all_five_generated_artifacts_byte_exact": true
+  },
+  "generated_artifacts_sha256": {
+    "instruction-proof.json": "25d9c1f840524027ca2272c5531ec9ca9d2b3e5c7f1aaffd27fb24704e9e19d5",
+    "source-procedures.asm": "fb1d54ae0fbce28a5571f66bf66c40668fdb0ca06edc038239d09c76133f9531",
+    "dos-disassembly.txt": "4d6a111936c314f8ea7b6c5e01242acc4c297c76cc931627ea8a0087d1f2c547",
+    "spawn-native.s": "b38331f779768b87a802d49e26d250212e461d52d6b2e1744de42e3dce3a8508",
+    "spawn-host.c": "7281fb2e8cc1f12574353eb6f6e007fef51da3abdf12f4ea88a337f5dc638eff"
+  },
+  "original_fault_domains_claimed": 0,
+  "typed_transport_restrictions": [
+    "F40 parent index is transported only in0..114; F1532 source pointer arithmetic itself has no bounds guard.",
+    "F927 callback returns NULL or a canonical body offset; arbitrary invalid pointers are outside the typed profile.",
+    "Uninitialized and unconsumed F927 outlocal input is not asserted; explicit4-byte output writes remain observable."
+  ],
+  "typed_world_calls": [
+    "F927",
+    "F1507"
+  ],
+  "native_phase_and_matrix_closed": true,
+  "JJFFE_F1507_substituted": false,
+  "expected_arithmetic_calculated_in_python": false,
+  "Main_integrated": false,
+  "full_F41_VM_executed": false,
+  "scope": "Whole F39/F40 and real F1532/phase/matrix closure over Root/tail/bank. F927 and original-DOS F1507 remain typed external calls. No F41, formatting, world allocation implementation or Main claim."
+}

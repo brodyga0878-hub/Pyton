@@ -1,0 +1,55 @@
+{
+  "schema": "starfrontier-mission-vm-contract-v1",
+  "profile": "dos-firstenc-composed-mission-vm-v1",
+  "context_keys": [
+    "root",
+    "root_tail",
+    "bank",
+    "event_registers",
+    "module_globals",
+    "program",
+    "program_base_u32",
+    "metadata",
+    "temporary_event_index_s32",
+    "scratch_words",
+    "arena",
+    "tree_root_u32",
+    "nodes",
+    "next_node_id_u32",
+    "task_variables",
+    "next_variable_id_u32",
+    "definitions",
+    "market_records",
+    "text_buffer",
+    "text_cursor_u32",
+    "vectors"
+  ],
+  "command_keys": [
+    "kind",
+    "operation",
+    "args",
+    "task_slot_s32",
+    "ip_u32",
+    "statement_frames"
+  ],
+  "world_keys": [
+    "kind",
+    "args",
+    "task_slot_s32",
+    "ip_before_u32",
+    "ip_after_u32",
+    "before",
+    "after",
+    "return_u32",
+    "input_hex",
+    "output_hex",
+    "input_defined_hex",
+    "output_defined_hex"
+  ],
+  "world_optional_keys": [
+    "registry_actions"
+  ],
+  "fixture_sha256": "5af70919e7bb15e6e9539f16b549efc143952e89f067506f77f3538fb2a1edd6",
+  "case_count": 34,
+  "F41_world_boundary_forbidden": true
+}

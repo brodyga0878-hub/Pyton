@@ -1,0 +1,65 @@
+{
+  "schema": "starfrontier-independent-statements-audit-v1",
+  "status": "verified",
+  "copied_proof_replay": {
+    "fixture_sha256": "63c8c29aa3a5d606964321ed8ed32bf141a054bf96945aaf7c1698a7e0d88ab0",
+    "case_count": 362,
+    "typed_boundaries": 490,
+    "proof_files_sha256": {
+      "source-procedures.asm": "92b54d3be626c9e65ea6094ad1c90a9d49a85210b29ccf9fb7bb8fa7f8ef57d1",
+      "statements-host.c": "418e9d5ad9ff75bc357bb6b4396366f629bcad545541530160e9d2505edc6a6e",
+      "README.md": "e37a952d08cd0d559cc8954fd33d5156207a3e027dd1bd5aa49aac35e2b1e1d3",
+      "instruction-proof.json": "5bdb952d294ddb4e558dafd3d75a97ee87a77feea2ffa433bcd4d581046e4ff0",
+      "rebuild-verification.json": "9628b0e1e058c943228e2604608a2461e7ec4a43f9d7b25bd4198ac9e78faeb2",
+      "statements-native.s": "d163bc0dacf4fb41b5f2dfb54f4ec2bc3369d8031f744a52078c09fb4fa2f94f",
+      "dos-disassembly.txt": "abcd1475dd2770205302c8aba88bc0cd0a704f78e31e765450fe106952e9c23c"
+    },
+    "four_private_original_paths_deliberately_absent": true,
+    "copied_proof_files_unchanged": true,
+    "original_proof_files_unchanged": true,
+    "fixture_byte_exact": true
+  },
+  "generator_sha256": "0d11a44bc558d309af772c468efa48e96da2a971f0adf3ea57460a963f623e64",
+  "source_dependencies_sha256": {
+    "tools/rebuild_source_mission_statements_native.py": "0d11a44bc558d309af772c468efa48e96da2a971f0adf3ea57460a963f623e64",
+    "tools/rebuild_source_mission_expression_native.py": "df7ba2075770e44e858a05705f5a33da7e1504f9824fd8cf18470d6ddc609bac",
+    "tools/rebuild_source_mission_store_native.py": "262f3cf0382416f24d7a654075cd9bfe4ea40541dbcc5a9fe0daf52a29c4a873",
+    "data/ffe_mission_programs.json": "ebd6caa6cc4f5d9d4a606d09a61339d737fada0628eb4cd131b9af91ef5b1f27",
+    "validation/mission-tasks-2026-11-19/task-native-proof/instruction-proof.json": "ca73d157f6f1e98e2332cbbe853b8fcae95874c31b0050694141849dc3b33fd5",
+    "tools/rebuild_source_natural_contact_native.py": "0729aa93c90dbeb51590d830391eb1109a8920dbdb712dab948a877758a8a889",
+    "tools/rebuild_source_surface_contact_native.py": "6cb4314fbe1004eafd9476e80e9743f94c684b4a8359101d41fa6a77a572a6f9",
+    "tools/rebuild_source_atmospheric_native.py": "9252d56228ba6c8b50aba384377fa91f87256591040a32110e88bd5554f04f78",
+    "tools/rebuild_source_jet_fuel_native.py": "7ed0750d60c41436feffc802a8bc7ba76647e8f07f2cefae7bbfa2a5dba660b0",
+    "tools/rebuild_ground_surface_native.py": "b90a42b63c8823daee18e41411d129285cfb572295f6650fd5db6f6183f60570",
+    "recovered-history/ground_harness/tools/build_terrain_query_reference.py": "46bbaf8fb4d80bea2c73cac728bb7385e2b46618dd908e111c632cdafda0c2cc",
+    "recovered-history/ground_harness/tools/native_reference.py": "50a1757168b4b886b1b48db6798d60feb4b73f6fb04176a0840a941ebdf6a1eb",
+    "validation/damage-core-2026-11-17/native-proof/instruction-proof.json": "9351518bfb7212f0f97be4c523534207b95f5130a2a86d4d1bf4efed4ec23e39"
+  },
+  "native_interface_controls": {
+    "checks": 8,
+    "failures": 0,
+    "controls": [
+      "F314 has11 exact args, empty2-byte resource and arbitrary Root+10a DWORD",
+      "Arbitrary highDWORD F314 return reaches F37 without boolean conversion",
+      "F314 empty source resource contains exactly2 defined bytes",
+      "UI provider output mutates exactly its48 caller-visible bytes",
+      "UI output does not claim untouched formatter/outlocal/private bytes",
+      "Formatter writes20 bytes and preserves explicit partial definedness only there",
+      "Outlocal4 bytes preserve exact output and partial mask; other152 are untouched transport",
+      "84 private scalar-spill bytes remain seed carrier, not measured-stack claim"
+    ]
+  },
+  "original_PE_reproof_performed_in_this_run": true,
+  "carrier_bytes": 156,
+  "caller_visible_bytes": 72,
+  "formatter_parameter_bytes": 20,
+  "UI_record_bytes": 48,
+  "outlocal_bytes": 4,
+  "private_scalar_spill_seed_carrier_bytes": 84,
+  "full156_original_stack_bytes_measured": false,
+  "strlen_owned_span_preflight_required": true,
+  "scope": "Whole original F41/helper captures and all dispatch words are independently PE-audited when --exe is supplied. Portable replay opens copied captures and public resources only. Additional native controls cover exact11-argument UI calls, arbitrary DWORD returns and caller-visible byte masks. F1344/world bodies and Main remain outside the proof.",
+  "counted_in_functional_totals": false,
+  "Main_integrated": false,
+  "private_source_or_fixture_inputs_changed": false
+}

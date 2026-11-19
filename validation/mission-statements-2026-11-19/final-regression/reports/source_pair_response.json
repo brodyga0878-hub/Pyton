@@ -1,0 +1,21 @@
+{
+	"F953_body_executed": false,
+	"checks": 3414,
+	"complete_collision_pipeline": false,
+	"consecutive_actual_inputs": 32,
+	"failures": 0,
+	"live_Main_changed": false,
+	"matched_boundaries": 155,
+	"native_cases": 320,
+	"profile": "dos-firstenc-pair-response-v1",
+	"schema": 1,
+	"scope": "Whole uploaded-DOS F578 arithmetic and matched F953 boundaries only; both complete338-byte records and globals checked against independent original instructions.",
+	"sources": {
+		"scripts/source_pair_response.gd": "744c5fce8e7961dfff20c97ad6ad88f54adc99b98bed00f8fcd86e428448c7e3",
+		"tests/fixtures/source_pair_response_native.json": "016221418ecb601b995441babd8bd40a9f4cb7ed61710e33558255ea5e4c7ed4",
+		"tests/test_source_pair_response.gd": "6f935896b289df503bdab1d16cf45e715a77eeb8ca9f91b3a12fbd3adc4a79d9",
+		"tools/rebuild_source_pair_response_native.py": "6a17a763c5d8c3c918cc48000b5e77cb821258ebffe231305d493fcd5949a2cb",
+		"validation/contact-classifier-2026-11-17/pair-native-proof/instruction-proof.json": "5c6c0c5d8ae7667732ac28ef6b3049d1d34d9f0d9d88d06d974592f8f3c2470c",
+		"validation/contact-classifier-2026-11-17/pair-native-proof/source-procedures.s": "3d01c86dac5ff8783cd94f2d80a8550ea737711f920827376d62ffc4b0b8a825"
+	}
+}

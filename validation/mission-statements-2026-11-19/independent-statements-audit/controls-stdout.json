@@ -1,0 +1,14 @@
+{
+  "checks": 8,
+  "failures": 0,
+  "controls": [
+    "F314 has11 exact args, empty2-byte resource and arbitrary Root+10a DWORD",
+    "Arbitrary highDWORD F314 return reaches F37 without boolean conversion",
+    "F314 empty source resource contains exactly2 defined bytes",
+    "UI provider output mutates exactly its48 caller-visible bytes",
+    "UI output does not claim untouched formatter/outlocal/private bytes",
+    "Formatter writes20 bytes and preserves explicit partial definedness only there",
+    "Outlocal4 bytes preserve exact output and partial mask; other152 are untouched transport",
+    "84 private scalar-spill bytes remain seed carrier, not measured-stack claim"
+  ]
+}
