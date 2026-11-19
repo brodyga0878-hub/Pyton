@@ -49,15 +49,16 @@ func _physics_process(delta: float) -> void:
 func _update_display(delta: float) -> void:
 	_view.sync(flight, delta)
 	_hud.sync(flight, delta)
-	var marker := flight.docking_position(flight.target) if flight.autopilot and flight.autopilot_phase == "Стыковка" else flight.gate_position(flight.target)
-	var in_view := flight.docked < 0 and not _view.camera.is_position_behind(marker)
+	var final_approach := flight.autopilot and flight.autopilot_phase in ["Стыковка", "Посадка"]
+	var marker := flight.target_contact(flight.target) if final_approach else flight.target_gate(flight.target)
+	var in_view := flight.docked < 0 and not flight.landed and not _view.camera.is_position_behind(marker)
 	_hud.set_target_marker(_view.camera.unproject_position(marker) if in_view else Vector2.ZERO, in_view and not _report.visible)
 
 
 func _handle_action(action: String) -> void:
 	if _report.visible:
 		return
-	var throttle_step := 0.025 if flight.position.distance_to(flight.station_positions[flight.target]) < 150.0 else 0.1
+	var throttle_step := 0.025 if flight.position.distance_to(flight.target_position(flight.target)) < 150.0 else 0.1
 	match action:
 		"target":
 			flight.change_target()
@@ -71,6 +72,10 @@ func _handle_action(action: String) -> void:
 			flight.dock_action()
 		"contract":
 			flight.contract_action()
+		"mine":
+			flight.mine_action()
+		"sell_ore":
+			flight.sell_ore_action()
 		"report":
 			_open_report()
 			return
@@ -79,7 +84,7 @@ func _handle_action(action: String) -> void:
 	if action in ["target", "autopilot", "throttle_up", "throttle_down"]:
 		_io.trace(action, {"target": flight.target, "autopilot": flight.autopilot, "throttle": flight.throttle})
 	_deliver_notice()
-	if action in ["contract", "dock", "target"]:
+	if action == "target":
 		_save()
 	_update_display(0.0)
 
@@ -88,10 +93,14 @@ func _deliver_notice() -> void:
 	if flight.status_event.is_empty():
 		return
 	var event := flight.status_event
-	_io.trace(event, {"docked": flight.docked, "target": flight.target, "speed": flight.speed(), "credits": flight.credits})
+	_io.trace(event, {
+		"docked": flight.docked, "landed": flight.landed, "target": flight.target,
+		"speed": flight.speed(), "credits": flight.credits,
+		"mining_phase": flight.mining.phase, "ore_hold": flight.mining.ore_hold,
+	})
 	_hud.notify(flight.status_message)
 	flight.status_event = ""
-	if event == "dock":
+	if event in ["launch", "dock", "land", "lift", "contract", "delivery", "mining_deploy", "mining_recover", "mining_ready", "mining_loaded", "ore_sold"]:
 		_save()
 
 
@@ -113,7 +122,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		return
 	var actions := {
 		KEY_T: "target", KEY_F: "autopilot", KEY_R: "throttle_up", KEY_V: "throttle_down",
-		KEY_ENTER: "dock", KEY_M: "contract", KEY_F8: "report",
+		KEY_ENTER: "dock", KEY_M: "contract", KEY_G: "mine", KEY_B: "sell_ore", KEY_F8: "report",
 	}
 	if actions.has(event.physical_keycode):
 		_handle_action(actions[event.physical_keycode])

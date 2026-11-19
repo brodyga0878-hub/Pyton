@@ -2,6 +2,7 @@ extends CanvasLayer
 
 signal action_requested(action: String)
 
+const MiningRig := preload("res://scripts/mining_rig.gd")
 const INK := Color("eef8ff")
 const MUTED := Color("a7bac9")
 const CYAN := Color("8fe9db")
@@ -19,6 +20,9 @@ var _route_detail: Label
 var _telemetry: Label
 var _guidance: Label
 var _notice: Label
+var _notice_panel: PanelContainer
+var _commands_panel: PanelContainer
+var _mining_progress: ProgressBar
 var _right_panel: PanelContainer
 var _throttle_controls: GridContainer
 var _actions: Dictionary = {}
@@ -30,7 +34,9 @@ var _brake := false
 var _mouse_boost := false
 var _mouse_brake := false
 var _input_enabled := true
-var _docked := true
+var _parked := true
+var _lift_blocked := false
+var _mining_blocked := false
 var _notice_left := 0.0
 var _mouse_pad: SteeringPad
 
@@ -67,11 +73,22 @@ func build() -> void:
 	_pin(_bank, _safe, Vector2(0, 1), Rect2(210, -108, 112, 82))
 
 	var center := _panel(_safe, Vector2(0.5, 1), Rect2(-258, -143, 503, 117))
+	_commands_panel = center.get_parent() as PanelContainer
 	_guidance = _label(center, 17, INK)
 	_guidance.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_guidance.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_guidance.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_guidance.custom_minimum_size.y = 38
+	_mining_progress = ProgressBar.new()
+	_mining_progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_mining_progress.max_value = 1.0
+	_mining_progress.step = 0.0
+	_mining_progress.show_percentage = false
+	_mining_progress.custom_minimum_size.y = 9.0
+	_mining_progress.add_theme_stylebox_override("background", _box(Color("12313d"), LINE, 5, 0.0))
+	_mining_progress.add_theme_stylebox_override("fill", _box(AMBER, AMBER, 5, 0.0))
+	center.add_child(_mining_progress)
+	_mining_progress.hide()
 	var commands := HBoxContainer.new()
 	commands.add_theme_constant_override("separation", 7)
 	center.add_child(commands)
@@ -79,6 +96,8 @@ func build() -> void:
 	_button(commands, "autopilot", "Авто")
 	_button(commands, "dock", "Старт")
 	_button(commands, "contract", "Контракт")
+	_button(commands, "mine", "Развернуть модуль")
+	_button(commands, "sell_ore", "Продать руду")
 
 	var right := _panel(_safe, Vector2(1, 1), Rect2(-340, -215, 314, 189))
 	_right_panel = right.get_parent() as PanelContainer
@@ -93,73 +112,138 @@ func build() -> void:
 	_button(_throttle_controls, "boost", "Форсаж")
 	_button(right, "report", "Отчёт об ошибке")
 
-	var notice_stack := _panel(_safe, Vector2(0.5, 0.8), Rect2(-243, -49, 486, 46))
+	var notice_stack := _panel(_safe, Vector2(0.5, 1), Rect2(-243, -199, 486, 46))
+	_notice_panel = notice_stack.get_parent() as PanelContainer
 	_notice = _label(notice_stack, 17, AMBER)
 	_notice.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_notice.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_notice.get_parent().get_parent().hide()
+	_notice_panel.hide()
 	get_viewport().size_changed.connect(_update_safe_area)
 	_update_safe_area()
 
 func sync(sim: RefCounted, delta: float) -> void:
-	if not _docked and sim.docked >= 0:
+	var docked: bool = sim.docked >= 0
+	var landed: bool = sim.landed
+	var parked := docked or landed
+	if not _parked and parked:
 		_reset_controls()
-	_docked = sim.docked >= 0
-	_steer.visible = not _docked
-	_bank.visible = not _docked
-	_throttle_controls.visible = not _docked
-	_right_panel.offset_top = -101.0 if _docked else -215.0
-	_actions["target"].visible = not _docked
-	_actions["autopilot"].visible = not _docked
-	_marks.flight = not _docked
+	_parked = parked
+	_steer.visible = not parked
+	_bank.visible = not parked
+	_throttle_controls.visible = not parked
+	_right_panel.offset_left = -277.0 if parked else -340.0
+	_right_panel.offset_top = -101.0 if parked else -215.0
+	_actions["target"].visible = not parked
+	_actions["autopilot"].visible = not parked
+	_marks.flight = not parked
 	_marks.queue_redraw()
-	var target_name: String = sim.station_names[sim.target]
-	var meters: float = sim.position.distance_to(sim.station_positions[sim.target])
-	var contract_here: bool = sim.contract_stage != 1 or sim.docked == sim.contract_destination
-	_actions["contract"].visible = _docked and contract_here
-	if sim.contract_stage == 1:
-		_actions["contract"].text = "Сдать груз"
-	else:
-		_actions["contract"].text = "Взять контракт"
-	_actions["dock"].text = "Старт" if _docked else "Швартовка"
+
+	var mining: RefCounted = sim.mining
+	var drilling: bool = landed and mining.phase in [MiningRig.DEPLOYING, MiningRig.DRILLING, MiningRig.RETURNING]
+	_mining_progress.visible = drilling
+	if drilling:
+		_mining_progress.value = mining.progress()
+	_commands_panel.offset_top = -160.0 if drilling else -143.0
+	_notice_panel.offset_top = -215.0 if drilling else -199.0
+	_notice_panel.offset_bottom = -169.0 if drilling else -153.0
+	_lift_blocked = landed and mining.phase != MiningRig.STOWED
+	_mining_blocked = landed and mining.phase != MiningRig.READY and not mining.available_to_deploy()
+	_actions["mine"].visible = landed
+	match mining.phase:
+		MiningRig.READY:
+			_actions["mine"].text = "Забрать модуль"
+		MiningRig.DEPLOYING, MiningRig.DRILLING:
+			_actions["mine"].text = "Модуль в работе"
+		MiningRig.RETURNING:
+			_actions["mine"].text = "Подъём модуля"
+		_:
+			_actions["mine"].text = "Развернуть модуль"
+	_actions["dock"].text = "Посадка" if sim.target == sim.ASTEROID_TARGET else "Швартовка"
+	if parked:
+		_actions["dock"].text = "Взлёт" if landed else "Старт"
 	_actions["autopilot"].text = "Выкл. авто" if sim.autopilot else "Авто"
-	if _docked:
-		_route.text = "Порт  /  %s" % sim.station_names[sim.docked]
-		if sim.contract_stage == 1:
-			var destination_name: String = sim.station_names[sim.contract_destination]
-			_route_detail.text = "%s → %s" % [sim.contract_cargo(), destination_name]
-			_guidance.text = "Груз готов к сдаче." if contract_here else "Вылетите к месту доставки."
-		else:
-			var offer_name: String = sim.station_names[sim.offer_destination()]
-			_route_detail.text = "%s → %s\nОплата %d кр." % [sim.contract_cargo(), offer_name, sim.contract_reward()]
-			_guidance.text = "Выберите контракт или отправляйтесь в свободный полёт."
-		_telemetry.text = "Швартовка выполнена\nБаланс %d кр." % sim.credits
+	_actions["contract"].visible = docked and (sim.contract_stage != 1 or sim.docked == sim.contract_destination)
+	_actions["contract"].text = "Сдать груз" if sim.contract_stage == 1 else "Взять контракт"
+	_actions["sell_ore"].visible = docked and mining.ore_hold > 0
+	_refresh_disabled_actions()
+
+	if landed:
+		_sync_surface(sim, mining)
+	elif docked:
+		_sync_port(sim, mining.ore_hold)
 	else:
-		_route.text = "Курс  /  %s" % target_name
-		var distance := "%.0f м" % meters if meters < 1000.0 else "%.2f км" % (meters / 1000.0)
-		_route_detail.text = distance
-		var local_target: Vector3 = sim.attitude().transposed() * (sim.station_positions[sim.target] - sim.position)
-		if local_target.z > 0.0:
-			_route_detail.text += "  ·  цель позади"
-		if sim.contract_stage == 1:
-			_route_detail.text += "  ·  Груз для «%s»" % sim.station_names[sim.contract_destination]
-		_telemetry.text = "Скорость %.0f м/с  ·  Тяга %d%%\nКрен к порту %+.0f°" % [sim.velocity.length(), sim.throttle * 100.0, rad_to_deg(sim.roll_error(sim.target))]
-		var status: Dictionary = sim.selected_dock_status()
-		if sim.autopilot:
-			_guidance.text = "Авто  /  %s" % sim.autopilot_phase
-		elif meters < 210.0:
-			_guidance.text = "Порт готов к швартовке." if status.get("ok", false) else str(status.get("reason", ""))
-		else:
-			_guidance.text = "Курс и крен слева. Тяга и тормоз справа."
+		_sync_flight(sim, mining.ore_hold)
 	if _notice_left > 0.0:
 		_notice_left -= delta
 		if _notice_left <= 0.0:
-			_notice.get_parent().get_parent().hide()
+			_notice_panel.hide()
+
+func _sync_port(sim: RefCounted, ore_hold: int) -> void:
+	_route.text = "Порт  /  %s" % sim.station_names[sim.docked]
+	if sim.contract_stage == 1:
+		var destination: String = sim.station_names[sim.contract_destination]
+		_route_detail.text = "%s → %s" % [sim.contract_cargo(), destination]
+		_guidance.text = "Груз готов к сдаче." if sim.docked == sim.contract_destination else "Вылетите к месту доставки."
+	else:
+		var destination: String = sim.station_names[sim.offer_destination()]
+		_route_detail.text = "%s → %s\nОплата %d кр." % [sim.contract_cargo(), destination, sim.contract_reward()]
+		_guidance.text = "Для добычи выберите «Осколок» после старта."
+	if ore_hold > 0:
+		_guidance.text = "Руду можно продать за %d кр." % (ore_hold * MiningRig.PRICE)
+	_telemetry.text = "Баланс %d кр.\nРуда в трюме %d / %d ед." % [sim.credits, ore_hold, MiningRig.CAPACITY]
+
+func _sync_surface(sim: RefCounted, mining: RefCounted) -> void:
+	_route.text = "Поверхность  /  %s" % sim.target_name(sim.ASTEROID_TARGET)
+	_route_detail.text = "Руды в жиле %d ед." % mining.reserve
+	_telemetry.text = "Посадка выполнена\nРуда в трюме %d / %d ед." % [mining.ore_hold, MiningRig.CAPACITY]
+	match mining.phase:
+		MiningRig.DEPLOYING:
+			_guidance.text = "Модуль спускается на поверхность."
+		MiningRig.DRILLING:
+			_guidance.text = "Модуль бурит породу."
+		MiningRig.READY:
+			_guidance.text = "Готово %d ед. руды. Заберите модуль перед взлётом." % mining.pending_ore
+		MiningRig.RETURNING:
+			_guidance.text = "Модуль возвращается на борт."
+		_:
+			if mining.ore_hold >= MiningRig.CAPACITY:
+				_guidance.text = "Трюм заполнен. Продайте руду в порту."
+			elif mining.reserve == 0:
+				_guidance.text = "Жила исчерпана."
+			else:
+				_guidance.text = "Разверните модуль для добычи руды."
+
+func _sync_flight(sim: RefCounted, ore_hold: int) -> void:
+	var aimed_at_asteroid: bool = sim.target == sim.ASTEROID_TARGET
+	var to_target: Vector3 = sim.target_position(sim.target) - sim.position
+	var meters := to_target.length()
+	_route.text = "Курс  /  %s" % sim.target_name(sim.target)
+	_route_detail.text = "%.0f м" % meters if meters < 1000.0 else "%.2f км" % (meters / 1000.0)
+	var local_target: Vector3 = sim.attitude().transposed() * to_target
+	if local_target.z > 0.0:
+		_route_detail.text += "  ·  цель позади"
+	if sim.contract_stage == 1:
+		_route_detail.text += "  ·  Груз для «%s»" % sim.station_names[sim.contract_destination]
+	_telemetry.text = "Скорость %.0f м/с  ·  Тяга %d%%" % [sim.velocity.length(), sim.throttle * 100.0]
+	if aimed_at_asteroid:
+		_telemetry.text += "\nРуда в трюме %d / %d ед." % [ore_hold, MiningRig.CAPACITY]
+	else:
+		_telemetry.text += "\nКрен к порту %+.0f°" % rad_to_deg(sim.roll_error(sim.target))
+	if sim.autopilot:
+		_guidance.text = "Авто  /  %s" % sim.autopilot_phase
+	elif meters < 210.0:
+		var status: Dictionary = sim.selected_dock_status()
+		if status.get("ok", false):
+			_guidance.text = "Можно садиться." if aimed_at_asteroid else "Порт готов к швартовке."
+		else:
+			_guidance.text = str(status.get("reason", ""))
+	else:
+		_guidance.text = "Курс и крен слева. Тяга и тормоз справа."
 
 func notify(message: String) -> void:
 	_notice.text = message
 	_notice_left = 4.0
-	_notice.get_parent().get_parent().show()
+	_notice_panel.show()
 
 func set_target_marker(screen_position: Vector2, visible: bool) -> void:
 	_marks.target_position = screen_position
@@ -172,26 +256,31 @@ func set_input_enabled(enabled: bool) -> void:
 		return
 	if not enabled:
 		_reset_controls()
-	for button: Button in _actions.values():
-		button.disabled = not enabled
+	_refresh_disabled_actions()
+
+func _refresh_disabled_actions() -> void:
+	for action: String in _actions:
+		var button: Button = _actions[action]
+		var blocked := (action == "dock" and _lift_blocked) or (action == "mine" and _mining_blocked)
+		button.disabled = not _input_enabled or blocked
 
 func move_input() -> Vector2:
-	if _docked or not _input_enabled:
+	if _parked or not _input_enabled:
 		return Vector2.ZERO
 	var horizontal := float(_key(KEY_D, KEY_RIGHT)) - float(_key(KEY_A, KEY_LEFT))
 	var vertical := float(_key(KEY_W, KEY_UP)) - float(_key(KEY_S, KEY_DOWN))
 	return (_steer.axis + Vector2(horizontal, vertical)).limit_length()
 
 func roll_input() -> float:
-	if _docked or not _input_enabled:
+	if _parked or not _input_enabled:
 		return 0.0
 	return clampf(_bank.axis.x + float(Input.is_physical_key_pressed(KEY_E)) - float(Input.is_physical_key_pressed(KEY_Q)), -1.0, 1.0)
 
 func boost_held() -> bool:
-	return not _docked and _input_enabled and (_boost or Input.is_physical_key_pressed(KEY_SHIFT))
+	return not _parked and _input_enabled and (_boost or Input.is_physical_key_pressed(KEY_SHIFT))
 
 func brake_held() -> bool:
-	return not _docked and _input_enabled and (_brake or Input.is_physical_key_pressed(KEY_SPACE))
+	return not _parked and _input_enabled and (_brake or Input.is_physical_key_pressed(KEY_SPACE))
 
 func _key(primary: Key, alternate: Key) -> bool:
 	return Input.is_physical_key_pressed(primary) or Input.is_physical_key_pressed(alternate)
@@ -212,8 +301,7 @@ func _update_safe_area() -> void:
 func _input(event: InputEvent) -> void:
 	if not is_instance_valid(_hud) or not _input_enabled:
 		return
-	# Gameplay uses ScreenTouch directly. Report overlays can still use the
-	# platform mouse emulation while these controls are disabled.
+	# Gameplay uses ScreenTouch directly.
 	if event is InputEventMouse and event.device == InputEvent.DEVICE_ID_EMULATION:
 		get_viewport().set_input_as_handled()
 		return
@@ -257,6 +345,8 @@ func _reset_controls() -> void:
 	_mouse_brake = false
 	_steer.reset()
 	_bank.reset()
+	for button: Button in _actions.values():
+		button.self_modulate = Color.WHITE
 	_update_held()
 
 func _touch_begin(index: int, point: Vector2) -> bool:
@@ -368,7 +458,7 @@ func _button(parent: Container, action: String, caption: String) -> void:
 	button.custom_minimum_size = Vector2(0, 52)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.add_theme_font_size_override("font_size", 18)
-	button.add_theme_color_override("font_color", CYAN if action in ["dock", "contract"] else INK)
+	button.add_theme_color_override("font_color", CYAN if action in ["dock", "contract", "mine", "sell_ore"] else INK)
 	button.add_theme_color_override("font_hover_color", INK)
 	button.add_theme_stylebox_override("normal", _box(Color("12313d"), LINE, 9, 7.0))
 	button.add_theme_stylebox_override("hover", _box(Color("214454"), CYAN, 9, 7.0))

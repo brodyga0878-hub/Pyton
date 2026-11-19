@@ -1,18 +1,22 @@
 extends Node3D
 
+const AsteroidView = preload("res://scripts/asteroid_view.gd")
 const STATION_COLORS := [Color("#5df6c9"), Color("#ffb66f")]
 const STAR_DISTANCE := 2700.0
 const STATION_RADIAL_SEGMENTS := 20
 
 var camera: Camera3D
 var _ship: Node3D
+var _landing_gear: Node3D
 var _jet: MeshInstance3D
 var _jet_material: ShaderMaterial
 var _stars: MeshInstance3D
+var _asteroid: Node3D
 var _stations: Array[Node3D] = []
 var _approaches: Array[Node3D] = []
 var _gate_materials: Array[StandardMaterial3D] = []
 var _last_position := Vector3.INF
+var _camera_up := Vector3.UP
 var _flight_time := 0.0
 
 func build() -> void:
@@ -55,6 +59,8 @@ func build() -> void:
 	_ship = Node3D.new()
 	add_child(_ship)
 	_build_ship()
+	_asteroid = AsteroidView.new()
+	add_child(_asteroid)
 	camera = Camera3D.new()
 	camera.fov = 67.0
 	camera.near = 0.2
@@ -72,20 +78,30 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_ship.basis = heading * Basis(Vector3.BACK, float(sim.roll))
 
 	var docked := int(sim.docked) >= 0
+	var landed: bool = sim.landed
+	var settled := docked or landed
+	_landing_gear.visible = landed
 	var thrust := clampf(float(sim.throttle), 0.0, 1.0)
 	_flight_time += delta
-	_jet.visible = not docked and thrust > 0.01
+	_jet.visible = not settled and thrust > 0.01
 	_jet.scale = Vector3(1.0, (0.45 + thrust * 0.85) * (1.45 if sim.boost else 1.0), 1.0)
 	_jet_material.set_shader_parameter("pulse", 0.59 + sin(_flight_time * 31.0) * 0.08)
 
 	var camera_offset := Vector3(8.4, 9.2, 24.0) if docked else Vector3(0.0, 3.4, 10.5)
 	var focal_offset := Vector3(0.0, 0.0, -15.0) if docked else Vector3(0.0, 2.0, -30.0)
+	var up := heading.y
+	if landed:
+		camera_offset = Vector3(-10.4, -17.5, 14.5)
+		focal_offset = Vector3(3.6, 2.7, -4.3)
+		up = Vector3.BACK
 	var desired := position_now + heading * camera_offset
 	var jump := delta <= 0.0 or not _last_position.is_finite()
 	if not jump:
 		jump = position_now.distance_squared_to(_last_position) > 144.0
-	camera.position = desired if jump else camera.position.lerp(desired, 1.0 - exp(-delta * 14.0))
-	camera.look_at(position_now + heading * focal_offset, heading.y)
+	var blend := 1.0 - exp(-delta * 14.0)
+	camera.position = desired if jump else camera.position.lerp(desired, blend)
+	_camera_up = up if jump else _camera_up.lerp(up, blend).normalized()
+	camera.look_at(position_now + heading * focal_offset, _camera_up)
 	_stars.position = camera.position
 	_last_position = position_now
 
@@ -93,9 +109,11 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_stations[station_index].position = sim.station_positions[station_index]
 		_stations[station_index].rotation.z = sim.station_angle(station_index)
 		_approaches[station_index].position = sim.gate_position(station_index)
-		_approaches[station_index].visible = not docked
+		_approaches[station_index].visible = not settled
 		var strength := 1.45 if station_index == int(sim.target) else 0.43
 		_gate_materials[station_index].albedo_color = STATION_COLORS[station_index] * strength
+	_asteroid.build(sim.ASTEROID_CENTER, sim.ASTEROID_PAD, sim.ASTEROID_GATE)
+	_asteroid.sync(_ship.global_transform, int(sim.target) == sim.ASTEROID_TARGET, landed, not settled, int(sim.mining.phase), sim.mining.progress(), float(sim.elapsed))
 
 
 func _mesh(parent: Node3D, primitive: Mesh, paint: Material, at: Vector3) -> MeshInstance3D:
@@ -254,6 +272,19 @@ func _build_ship() -> void:
 	_box_batch(_ship, cargo, pods)
 	_box_batch(_ship, ice, lights)
 	_box_batch(_ship, shell, retaining_straps)
+	_landing_gear = Node3D.new()
+	_landing_gear.visible = false
+	_ship.add_child(_landing_gear)
+	var legs: Array = []
+	for index in range(3):
+		var angle := PI * 0.5 + TAU * float(index) / 3.0
+		var radius := Vector3(cos(angle), sin(angle), 0.0)
+		var joint := radius * 0.38 + Vector3(0, 0, -0.75)
+		var foot := radius * 1.32 + Vector3(0, 0, -3.92)
+		var strut := _cylinder(_landing_gear, shell, (joint + foot) * 0.5, 0.066, 0.1, joint.distance_to(foot), 6)
+		strut.basis = Basis.looking_at(foot - joint) * Basis(Vector3.RIGHT, PI * 0.5)
+		legs.append([foot, Vector3(0.46, 0.32, 0.13), angle])
+	_box_batch(_landing_gear, graphite, legs)
 
 	var flow := Shader.new()
 	flow.code = """

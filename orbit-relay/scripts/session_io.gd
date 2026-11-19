@@ -136,7 +136,7 @@ func copy_report_text(state: Dictionary) -> bool:
 func _report_summary(includes_state: bool) -> Dictionary:
 	return {
 		"game": "Орбитальный рейс",
-		"version": str(ProjectSettings.get_setting("application/config/version", "0.33.0")),
+		"version": str(ProjectSettings.get_setting("application/config/version", "")),
 		"godot_version": Engine.get_version_info().get("string", ""),
 		"platform": OS.get_name(),
 		"exported_utc": Time.get_datetime_string_from_system(true),
