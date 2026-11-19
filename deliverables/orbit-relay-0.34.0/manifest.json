@@ -1,0 +1,47 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.34.0",
+  "source_commit": "b795b2490d131ce7ef7083f351716f115d960120",
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 59,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches_0.33": true,
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 7,
+    "tested_on_device": false
+  },
+  "checks": {
+    "flight_and_return_contracts": "passed",
+    "scene_and_report": "passed",
+    "asteroid_integration": {
+      "checks": 59,
+      "failures": 0
+    },
+    "desktop_rendered_route": {
+      "recovered_ore": 12,
+      "sale_credits": 240
+    }
+  },
+  "files": {
+    "OrbitRelay-0.34.0-arm64.apk": {
+      "bytes": 26113265,
+      "sha256": "0d0188c7a136056a172bd14613450b69577cf3c08229357fd9d9b2fe8dd77652"
+    },
+    "OrbitRelay-0.34.0-source.zip": {
+      "bytes": 53593,
+      "sha256": "3b7ac16941f01d0602f288fb1b991cf148369e5835ed6bc3444aac5408a37af9"
+    },
+    "asteroid-approach.png": {
+      "bytes": 291904,
+      "sha256": "89ef903ead59a62cdd87e7c52bf222e31c3b372da3d909aa64fb8c699274a539"
+    },
+    "asteroid-mining.png": {
+      "bytes": 368606,
+      "sha256": "4af4b3e1c16feb790a04459d936198d173d569c04c9ac92e20a8b2264ee91c3b"
+    }
+  }
+}
