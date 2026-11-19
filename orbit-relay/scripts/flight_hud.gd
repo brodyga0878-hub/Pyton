@@ -19,6 +19,8 @@ var _bank: SteeringPad
 var _route: Label
 var _route_detail: Label
 var _telemetry: Label
+var _fuel: Label
+var _fuel_level: ProgressBar
 var _guidance: Label
 var _notice: Label
 var _notice_panel: PanelContainer
@@ -38,6 +40,7 @@ var _input_enabled := true
 var _parked := true
 var _lift_blocked := false
 var _mining_blocked := false
+var _scoop_blocked := false
 var _notice_left := 0.0
 var _mouse_pad: SteeringPad
 
@@ -61,9 +64,18 @@ func build() -> void:
 	_route = _label(route_stack, 23, CYAN)
 	_route_detail = _label(route_stack, 17, INK)
 	_route_detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	var instrument_stack := _panel(_safe, Vector2(1, 0), Rect2(-310, 24, 284, 99))
+	var instrument_stack := _panel(_safe, Vector2(1, 0), Rect2(-310, 24, 284, 114))
 	instrument_stack.alignment = BoxContainer.ALIGNMENT_CENTER
 	_telemetry = _label(instrument_stack, 17, INK)
+	_fuel = _label(instrument_stack, 16, CYAN)
+	_fuel_level = ProgressBar.new()
+	_fuel_level.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fuel_level.step = 0.0
+	_fuel_level.show_percentage = false
+	_fuel_level.custom_minimum_size.y = 7.0
+	_fuel_level.add_theme_stylebox_override("background", _box(Color("12313d"), LINE, 4, 0.0))
+	_fuel_level.add_theme_stylebox_override("fill", _box(CYAN, CYAN, 4, 0.0))
+	instrument_stack.add_child(_fuel_level)
 
 	_steer = SteeringPad.new()
 	_steer.caption = "КУРС"
@@ -96,6 +108,7 @@ func build() -> void:
 	_button(commands, "target", "Цель")
 	_button(commands, "autopilot", "Авто")
 	_button(commands, "dock", "Старт")
+	_button(commands, "scoop", "Сбор топлива")
 	_button(commands, "contract", "Контракт")
 	_button(commands, "mine", "Развернуть модуль")
 	_button(commands, "sell_ore", "Продать сырьё")
@@ -115,6 +128,7 @@ func build() -> void:
 	utilities.add_theme_constant_override("separation", 7)
 	right.add_child(utilities)
 	_button(utilities, "map", "Карта")
+	_button(utilities, "services", "Сервис")
 	_button(utilities, "report", "Отчёт")
 	_actions["report"].tooltip_text = "Отчёт об ошибке"
 
@@ -137,10 +151,11 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_steer.visible = not parked
 	_bank.visible = not parked
 	_throttle_controls.visible = not parked
-	_right_panel.offset_left = -277.0 if parked else -340.0
+	_right_panel.offset_left = -310.0 if docked else (-277.0 if landed else -340.0)
 	_right_panel.offset_top = -101.0 if parked else -215.0
 	_actions["target"].visible = not parked
 	_actions["autopilot"].visible = not parked
+	_actions["services"].visible = docked
 	_marks.flight = not parked
 	_marks.queue_redraw()
 
@@ -164,26 +179,44 @@ func sync(sim: RefCounted, delta: float) -> void:
 			_actions["mine"].text = "Подъём модуля"
 		_:
 			_actions["mine"].text = "Развернуть модуль"
+	_actions["dock"].visible = parked or sim.target != Sector.STAR_ID
 	_actions["dock"].text = "Швартовка" if Sector.is_port(sim.target) else "Посадка"
 	if parked:
 		_actions["dock"].text = "Взлёт" if landed else "Старт"
+	var scoop_status: Dictionary = {} if parked else sim.scoop_status()
+	_scoop_blocked = not sim.scooping and not scoop_status.get("ok", false)
+	_actions["scoop"].visible = not parked and (sim.target == Sector.STAR_ID or scoop_status.get("near", false) or sim.scooping)
+	_actions["scoop"].text = "Откл. сбор" if sim.scooping else "Сбор топлива"
 	_actions["autopilot"].text = "Выкл. авто" if sim.autopilot else "Авто"
 	_actions["contract"].visible = docked and (sim.contract_stage != 1 or sim.docked == sim.contract_destination)
 	_actions["contract"].text = "Сдать груз" if sim.contract_stage == 1 else "Взять контракт"
 	var sale_quote: int = mining.sale_quote(sim.docked) if docked and mining.ore_hold > 0 else 0
 	_actions["sell_ore"].visible = sale_quote > 0
 	_refresh_disabled_actions()
+	_sync_fuel(sim.ship)
 
 	if landed:
 		_sync_surface(sim, mining)
 	elif docked:
 		_sync_port(sim, mining.ore_hold, sale_quote)
 	else:
-		_sync_flight(sim, mining.ore_hold)
+		_sync_flight(sim, mining.ore_hold, scoop_status)
 	if _notice_left > 0.0:
 		_notice_left -= delta
 		if _notice_left <= 0.0:
 			_notice_panel.hide()
+
+func _sync_fuel(ship: RefCounted) -> void:
+	var capacity: float = ship.capacity()
+	var empty: bool = ship.fuel <= 0.0
+	_fuel.text = "Топливо %.1f / %.0f ед." % [ship.fuel, capacity]
+	if empty:
+		_fuel.text += " · резерв"
+	var color := AMBER if empty else CYAN
+	if _fuel.get_theme_color("font_color") != color:
+		_fuel.add_theme_color_override("font_color", color)
+	_fuel_level.max_value = capacity
+	_fuel_level.value = ship.fuel
 
 func _sync_port(sim: RefCounted, cargo: int, sale_quote: int) -> void:
 	_route.text = "Порт  /  %s" % sim.target_name(sim.docked)
@@ -225,7 +258,7 @@ func _sync_surface(sim: RefCounted, mining: RefCounted) -> void:
 			else:
 				_guidance.text = "Разверните добывающий модуль."
 
-func _sync_flight(sim: RefCounted, cargo: int) -> void:
+func _sync_flight(sim: RefCounted, cargo: int, scoop_status: Dictionary) -> void:
 	var aimed_at_port := Sector.is_port(sim.target)
 	var to_target: Vector3 = sim.target_position(sim.target) - sim.position
 	var meters := to_target.length()
@@ -241,7 +274,15 @@ func _sync_flight(sim: RefCounted, cargo: int) -> void:
 		_telemetry.text += "\nКрен к порту %+.0f°" % rad_to_deg(sim.roll_error(sim.target))
 	else:
 		_telemetry.text += "\nТрюм %d / %d ед." % [cargo, MiningRig.CAPACITY]
-	if sim.autopilot:
+	if sim.scooping:
+		_guidance.text = "Идёт сбор топлива. Удерживайте положение."
+	elif scoop_status.get("near", false):
+		_guidance.text = "Зона сбора. Включите сбор топлива." if scoop_status.get("ok", false) else str(scoop_status.get("reason", ""))
+	elif sim.target == Sector.STAR_ID:
+		_guidance.text = "Зона сбора %d–%d м от центра · до %d м/с." % [Sector.SCOOP_INNER, Sector.SCOOP_OUTER, Sector.SCOOP_SPEED]
+		if sim.autopilot:
+			_guidance.text = "Авто  /  %s\n%s" % [sim.autopilot_phase, _guidance.text]
+	elif sim.autopilot:
 		_guidance.text = "Авто  /  %s" % sim.autopilot_phase
 	elif meters < 210.0:
 		var status: Dictionary = sim.selected_dock_status()
@@ -249,6 +290,8 @@ func _sync_flight(sim: RefCounted, cargo: int) -> void:
 			_guidance.text = "Порт готов к швартовке." if aimed_at_port else "Можно садиться."
 		else:
 			_guidance.text = str(status.get("reason", ""))
+	elif sim.ship.fuel <= 0.0:
+		_guidance.text = "Резервная тяга. Заправьтесь в порту или у звезды."
 	else:
 		_guidance.text = "Курс и крен слева. Тяга и тормоз справа."
 
@@ -273,7 +316,7 @@ func set_input_enabled(enabled: bool) -> void:
 func _refresh_disabled_actions() -> void:
 	for action: String in _actions:
 		var button: Button = _actions[action]
-		var blocked := (action == "dock" and _lift_blocked) or (action == "mine" and _mining_blocked)
+		var blocked := (action == "dock" and _lift_blocked) or (action == "mine" and _mining_blocked) or (action == "scoop" and _scoop_blocked)
 		button.disabled = not _input_enabled or blocked
 
 func move_input() -> Vector2:
@@ -470,7 +513,7 @@ func _button(parent: Container, action: String, caption: String) -> void:
 	button.custom_minimum_size = Vector2(0, 52)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.add_theme_font_size_override("font_size", 18)
-	button.add_theme_color_override("font_color", CYAN if action in ["dock", "contract", "mine", "sell_ore", "map"] else INK)
+	button.add_theme_color_override("font_color", CYAN if action in ["dock", "scoop", "contract", "mine", "sell_ore", "map", "services"] else INK)
 	button.add_theme_color_override("font_hover_color", INK)
 	button.add_theme_stylebox_override("normal", _box(Color("12313d"), LINE, 9, 7.0))
 	button.add_theme_stylebox_override("hover", _box(Color("214454"), CYAN, 9, 7.0))

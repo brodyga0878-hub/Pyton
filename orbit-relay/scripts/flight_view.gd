@@ -2,6 +2,7 @@ extends Node3D
 
 const AsteroidView = preload("res://scripts/asteroid_view.gd")
 const MiningRigView = preload("res://scripts/mining_rig_view.gd")
+const StarView = preload("res://scripts/star_view.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const STAR_DISTANCE := 2700.0
 const STATION_RADIAL_SEGMENTS := 20
@@ -12,6 +13,7 @@ var _landing_gear: Node3D
 var _jet: MeshInstance3D
 var _jet_material: ShaderMaterial
 var _stars: MeshInstance3D
+var _star: Node3D
 var _mining_rig: Node3D
 var _surface_views: Dictionary[int, Node3D] = {}
 var _stations: Dictionary[int, Node3D] = {}
@@ -47,6 +49,9 @@ func build() -> void:
 
 	_build_stars()
 	_build_planet()
+	_star = StarView.new()
+	add_child(_star)
+	_star.setup(Catalog.site(Catalog.STAR_ID), Catalog.SCOOP_INNER, Catalog.SCOOP_OUTER)
 
 	for site_id: int in Catalog.PORT_IDS:
 		var site := Catalog.site(site_id)
@@ -114,6 +119,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_camera_up = up if jump else _camera_up.lerp(up, blend).normalized()
 	camera.look_at(position_now + heading * focal_offset, _camera_up)
 	_stars.position = camera.position
+	_star.update_approach(camera.global_position, position_now, int(sim.target) == Catalog.STAR_ID and not settled, bool(sim.scooping))
 	_last_position = position_now
 
 	for site_id: int in Catalog.PORT_IDS:

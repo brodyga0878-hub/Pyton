@@ -19,6 +19,7 @@ func _run() -> void:
 	_test_delivery_contracts()
 	_test_trade_and_depletion()
 	_test_legacy_recovery()
+	_test_schema_three_migration()
 	await _test_touch_map()
 	print("Sector integration: %d checks, %d failures" % [_checks, _failures.size()])
 	for failure in _failures:
@@ -127,7 +128,7 @@ func _test_legacy_recovery() -> void:
 		"Migration retains balance and the active freight route")
 
 	var before: Dictionary = flight.snapshot()
-	_expect(before.schema == 3, "Migration emits the current save schema")
+	_expect(before.schema == 4, "Migration emits the current save schema")
 	var malformed := before.duplicate(true)
 	malformed.mining.site_id = 4
 	_expect(not flight.restore(malformed) and flight.snapshot() == before,
@@ -141,7 +142,7 @@ func _test_legacy_recovery() -> void:
 	_expect(not flight.restore(malformed) and flight.snapshot() == before,
 		"Reject a resource balance without any recorded extraction atomically")
 	malformed = before.duplicate(true)
-	malformed.planned_target = Catalog.SITE_COUNT
+	malformed.planned_target = Catalog.TARGET_COUNT
 	_expect(not flight.restore(malformed) and flight.snapshot() == before,
 		"Reject an invalid planned destination atomically")
 	flight.update(0.5, Vector2.ZERO, 0.0, false, false)
@@ -152,6 +153,57 @@ func _test_legacy_recovery() -> void:
 	_expect(flight.mining.cargo_amount("ore") == 24 and flight.mining.reserve_at(2) == 96
 		and flight.mining.phase == Rig.STOWED and flight.mining.pending_ore == 0,
 		"Completing the migrated recovery deposits one batch exactly once")
+
+
+func _test_schema_three_migration() -> void:
+	# The 0.35 format still had nine targets and did not store fuel or equipment.
+	var legacy := {
+		"schema": 3, "position": [450.0, 170.0, -2022.0], "velocity": [0.0, 0.0, 0.0],
+		"yaw": 0.0, "pitch": 0.0, "roll": 0.0, "elapsed": 64.0, "throttle": 0.0,
+		"docked": -1, "landed_site": 8, "target": 8, "planned_target": 3,
+		"credits": 700, "deliveries": 2, "contract_stage": 1, "contract_origin": 3,
+		"contract_destination": 1,
+		"mining": {
+			"site_id": 8, "phase": 4, "phase_seconds": 1.5, "pending_ore": 12,
+			"cargo": {"ore": 12, "crystal": 0, "ice": 0},
+			"reserves": [0, 0, 108, 0, 96, 180, 156, 132, 216],
+		},
+	}
+	var flight := Flight.new()
+	if not _expect(flight.restore(_round_trip(legacy)), "A 0.35 save restores a rig returning on Дымка"):
+		return
+	_expect(flight.landed_site == 8 and flight.planned_target == 3 and flight.contract_origin == 3
+		and flight.contract_destination == 1 and flight.credits == 700 and flight.deliveries == 2,
+		"Migration retains the planned course, freight contract, balance and deliveries")
+	_expect(flight.mining.phase == Rig.RETURNING and flight.mining.phase_seconds == 1.5
+		and flight.mining.pending_ore == 12 and flight.mining.cargo_amount("ore") == 12
+		and flight.mining.reserve_at(2) == 108,
+		"Migration retains the recovery timer, cargo and reserves")
+	_expect(flight.ship.fuel == 100.0 and flight.ship.capacity() == 100.0
+		and not flight.ship.tank_upgraded and not flight.ship.eco_upgraded,
+		"Migration starts the ship with a full standard tank")
+	var before := flight.snapshot()
+	var invalid := legacy.duplicate(true)
+	invalid.planned_target = Catalog.STAR_ID
+	_expect(not flight.restore(invalid) and flight.snapshot() == before,
+		"A schema-three save cannot encode destinations added in schema four")
+	flight.update(0.75, Vector2.ZERO, 0.0, false, false)
+	_expect(flight.mining.phase == Rig.STOWED and flight.mining.cargo_amount("ice") == 12
+		and flight.mining.reserve_at(8) == 204 and flight.ship.fuel == 100.0,
+		"The restored rig deposits ice once while the landed ship spends no fuel")
+
+	var old_space := legacy.duplicate(true)
+	var center: Vector3 = Catalog.site(Catalog.STAR_ID).center
+	old_space.position = [center.x, center.y, center.z]
+	old_space.velocity = [5.0, 0.0, 0.0]
+	old_space.landed_site = -1
+	old_space.planned_target = -1
+	old_space.mining.phase = Rig.STOWED
+	old_space.mining.phase_seconds = 0.0
+	old_space.mining.pending_ore = 0
+	_expect(flight.restore(_round_trip(old_space)) and flight.position.is_equal_approx(flight.target_gate(Catalog.STAR_ID))
+		and flight.speed() == 0.0 and flight.target == 8 and flight.credits == 700,
+		"A 0.35 ship inside the new stellar hull moves to safety with its course and progress retained")
 
 
 func _test_touch_map() -> void:

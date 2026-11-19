@@ -2,6 +2,12 @@ extends RefCounted
 ## Stable site IDs are used by navigation, visuals and saved flights.
 
 const SITE_COUNT := 9
+const STAR_ID := SITE_COUNT
+const TARGET_COUNT := SITE_COUNT + 1
+const STAR_CLEARANCE := 250.0
+const SCOOP_INNER := 268.0
+const SCOOP_OUTER := 382.0
+const SCOOP_SPEED := 38.0
 const PORT_IDS := [0, 1, 3]
 const MINING_IDS := [2, 4, 5, 6, 7, 8]
 const RESOURCES := ["ore", "crystal", "ice"]
@@ -15,12 +21,14 @@ const SITES := [
 	{"name": "Иней", "kind": "moon", "center": Vector3(-990, -105, -1160), "radius": 86.0, "pad_offset": 86.0, "gate_offset": 163.0, "seed": 97, "surface_color": Color("#829bb4"), "accent": Color("#9fe8ff"), "resource": "ice", "reserve": 156, "drill_seconds": 8.0},
 	{"name": "Сланец", "kind": "moon", "center": Vector3(1090, -125, -1470), "radius": 105.0, "pad_offset": 105.0, "gate_offset": 182.0, "seed": 113, "surface_color": Color("#586488"), "accent": Color("#d5adff"), "resource": "crystal", "reserve": 132, "drill_seconds": 14.0},
 	{"name": "Дымка", "kind": "comet", "center": Vector3(450, 170, -2090), "radius": 68.0, "pad_offset": 68.0, "gate_offset": 142.0, "seed": 137, "surface_color": Color("#517e7e"), "accent": Color("#9fe8ff"), "resource": "ice", "reserve": 216, "drill_seconds": 10.0},
+	{"name": "Гелион", "kind": "star", "center": Vector3(2000, 380, -1850), "radius": 220.0, "pad_offset": 310.0, "gate_offset": 470.0, "accent": Color("#ffc778")},
 ]
 const PORT_PRICES := {
 	0: {"ore": 20, "crystal": 38, "ice": 14},
 	1: {"ore": 20, "crystal": 30, "ice": 27},
 	3: {"ore": 29, "crystal": 50, "ice": 22},
 }
+const FUEL_PRICES := {0: 2, 1: 3, 3: 1}
 const ROUTES := {
 	0: {1: ["Регуляторы охлаждения", 240], 3: ["Катушки связи", 340]},
 	1: {0: ["Калибровочные датчики", 180], 3: ["Оптические блоки", 280]},
@@ -29,7 +37,7 @@ const ROUTES := {
 
 
 static func site(id: int) -> Dictionary:
-	return SITES[id] if id >= 0 and id < SITE_COUNT else {}
+	return SITES[id] if id >= 0 and id < TARGET_COUNT else {}
 
 
 static func is_port(id: int) -> bool:
@@ -42,6 +50,7 @@ static func kind_name(kind: String) -> String:
 		"asteroid": return "Астероид"
 		"moon": return "Луна"
 		"comet": return "Комета"
+		"star": return "Звезда"
 		_: return ""
 
 
@@ -55,6 +64,9 @@ static func resource_name(resource: String) -> String:
 
 static func price(port_id: int, resource: String) -> int:
 	return PORT_PRICES[port_id].get(resource, 0) if is_port(port_id) else 0
+
+static func refuel_price(port_id: int) -> int:
+	return FUEL_PRICES.get(port_id, 0)
 
 
 static func contract(origin: int, destination: int) -> Array:

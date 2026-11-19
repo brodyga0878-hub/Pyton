@@ -70,19 +70,20 @@ func build() -> void:
 	panel.add_theme_stylebox_override("panel", _panel_style(Color("0d1d28"), BORDER, 12, 14))
 	body.add_child(panel)
 	var list := VBoxContainer.new()
-	list.add_theme_constant_override("separation", 5)
+	list.add_theme_constant_override("separation", 4)
 	panel.add_child(list)
 	for id: int in Sector.PORT_IDS:
 		_add_site(list, id)
 	for id: int in Sector.MINING_IDS:
 		_add_site(list, id)
+	_add_site(list, Sector.STAR_ID)
 	var spacer := Control.new()
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	list.add_child(spacer)
 	_detail_title = _label(list, "", 21, TEXT)
 	_detail = _label(list, "", 16, MUTED)
-	_detail.custom_minimum_size.y = 45.0
+	_detail.custom_minimum_size.y = 58.0
 	_detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_select_button = _button(list, "Проложить маршрут", 52)
 	_select_button.add_theme_stylebox_override("normal", _panel_style(Color("164f4c"), MINT, 8, 9))
@@ -121,7 +122,7 @@ func is_open() -> bool:
 
 func _add_site(parent: VBoxContainer, id: int) -> void:
 	var site = Sector.site(id)
-	var button := _button(parent, str(site.name), 42)
+	var button := _button(parent, str(site.name), 39)
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	button.clip_text = true
 	button.toggle_mode = true
@@ -143,16 +144,19 @@ func _select_site(id: int) -> void:
 	var category := str(Sector.kind_name(entry.kind))
 	var here := id == _current_site()
 	_detail.text = "%s · текущая стоянка" % category if here else "%s · %s" % [category, distance]
-	if entry.kind != "port":
-		var remaining: int = _flight.mining.reserve_at(id)
-		_detail.text += "\n%s · %d ед. в залежи" % [Sector.resource_name(entry.resource), remaining]
-	else:
+	if entry.kind == "port":
 		var quote: int = _flight.mining.sale_quote(id)
 		if quote > 0:
 			_detail.text += " · за груз %d кр." % quote
-		_detail.text += "\nРуда %d · кристаллы %d · лёд %d кр." % [
+		_detail.text += "\nРуда %d · кристаллы %d · лёд %d кр.\nТопливо %d кр./ед." % [
 			Sector.price(id, "ore"), Sector.price(id, "crystal"), Sector.price(id, "ice"),
+			Sector.refuel_price(id),
 		]
+	elif entry.kind == "star":
+		_detail.text += "\nСбор в %d–%d м от центра\nСкорость до %d м/с" % [Sector.SCOOP_INNER, Sector.SCOOP_OUTER, Sector.SCOOP_SPEED]
+	else:
+		var remaining: int = _flight.mining.reserve_at(id)
+		_detail.text += "\n%s · %d ед. в залежи" % [Sector.resource_name(entry.resource), remaining]
 	_select_button.disabled = here
 
 
@@ -304,7 +308,7 @@ class SectorChart extends Control:
 	func _bounds_xz() -> Rect2:
 		var minimum := Vector2(INF, INF)
 		var maximum := Vector2(-INF, -INF)
-		for id in range(Sector.SITE_COUNT):
+		for id in range(Sector.TARGET_COUNT):
 			var center: Vector3 = Sector.site(id).center
 			var xz := Vector2(center.x, center.z)
 			minimum = minimum.min(xz)
@@ -324,7 +328,7 @@ class SectorChart extends Control:
 		var distance := 30.0
 		var plot := _plot_bounds()
 		var bounds := _bounds_xz()
-		for id in range(Sector.SITE_COUNT):
+		for id in range(Sector.TARGET_COUNT):
 			var marker := _project(Sector.site(id).center, plot, bounds)
 			var separation := point.distance_to(marker)
 			if separation < distance:
@@ -350,7 +354,7 @@ class SectorChart extends Control:
 		if selected_site >= 0 and selected_site != active_site:
 			_draw_course(ship, _project(Sector.site(selected_site).center, plot, bounds), Color("d9a569"), 1.8)
 		var label_boxes: Array[Rect2] = [Rect2(Vector2(11, 10), Vector2(127, 24))]
-		for id in range(Sector.SITE_COUNT):
+		for id in range(Sector.TARGET_COUNT):
 			var entry = Sector.site(id)
 			var marker := _project(entry.center, plot, bounds)
 			var tint: Color = entry.accent
@@ -360,6 +364,11 @@ class SectorChart extends Control:
 				draw_arc(marker, 23, 0, TAU, 32, Color("f5ca8d"), 1.7, true)
 			if entry.kind == "port":
 				draw_rect(Rect2(marker - Vector2(7, 7), Vector2(14, 14)), tint)
+			elif entry.kind == "star":
+				draw_circle(marker, 7.0, tint, true, -1.0, true)
+				for ray in range(8):
+					var direction := Vector2.from_angle(ray * TAU / 8.0)
+					draw_line(marker + direction * 10.0, marker + direction * 14.0, tint, 1.7, true)
 			elif entry.kind == "comet":
 				draw_line(marker - Vector2(16, -10), marker, tint, 2.0, true)
 				draw_circle(marker, 7.0, tint, true, -1.0, true)

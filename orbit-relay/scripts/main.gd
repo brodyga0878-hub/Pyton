@@ -4,6 +4,7 @@ const Flight = preload("res://scripts/flight_sim.gd")
 const FlightView = preload("res://scripts/flight_view.gd")
 const FlightHUD = preload("res://scripts/flight_hud.gd")
 const SectorMap = preload("res://scripts/sector_map.gd")
+const PortServices = preload("res://scripts/port_services.gd")
 const SessionIO = preload("res://scripts/session_io.gd")
 const SAVE_INTERVAL := 8.0
 
@@ -11,6 +12,7 @@ var flight := Flight.new()
 var _view := FlightView.new()
 var _hud := FlightHUD.new()
 var _map := SectorMap.new()
+var _services := PortServices.new()
 var _io := SessionIO.new()
 var _save_elapsed := 0.0
 var _save_error_shown := false
@@ -33,6 +35,10 @@ func _ready() -> void:
 	_map.build()
 	_map.destination_selected.connect(_select_destination)
 	_map.dismissed.connect(_close_map)
+	add_child(_services)
+	_services.build()
+	_services.service_requested.connect(_service_purchase)
+	_services.dismissed.connect(_close_services)
 	_build_report_panel()
 	_update_display(0.0)
 	_io.trace("session_started", {"docked": flight.docked, "deliveries": flight.deliveries})
@@ -42,8 +48,12 @@ func _process(delta: float) -> void:
 	_update_display(delta)
 
 
+func _overlay_open() -> bool:
+	return _report.visible or _map.is_open() or _services.is_open()
+
+
 func _physics_process(delta: float) -> void:
-	if _report.visible or _map.is_open():
+	if _overlay_open():
 		return
 	flight.update(delta, _hud.move_input(), _hud.roll_input(), _hud.boost_held(), _hud.brake_held())
 	_deliver_notice()
@@ -55,14 +65,14 @@ func _physics_process(delta: float) -> void:
 func _update_display(delta: float) -> void:
 	_view.sync(flight, delta)
 	_hud.sync(flight, delta)
-	var final_approach := flight.autopilot and flight.autopilot_phase in ["Стыковка", "Посадка"]
+	var final_approach := flight.autopilot and flight.autopilot_phase in ["Стыковка", "Посадка", "Вход в зону сбора"]
 	var marker := flight.target_contact(flight.target) if final_approach else flight.target_gate(flight.target)
 	var in_view := flight.docked < 0 and not flight.landed and not _view.camera.is_position_behind(marker)
-	_hud.set_target_marker(_view.camera.unproject_position(marker) if in_view else Vector2.ZERO, in_view and not _report.visible and not _map.is_open())
+	_hud.set_target_marker(_view.camera.unproject_position(marker) if in_view else Vector2.ZERO, in_view and not _overlay_open())
 
 
 func _handle_action(action: String) -> void:
-	if _report.visible or _map.is_open():
+	if _overlay_open():
 		return
 	var throttle_step := 0.025 if flight.position.distance_to(flight.target_position(flight.target)) < 150.0 else 0.1
 	match action:
@@ -82,6 +92,13 @@ func _handle_action(action: String) -> void:
 			flight.mine_action()
 		"sell_ore":
 			flight.sell_ore_action()
+		"scoop":
+			flight.scoop_action()
+		"services":
+			if flight.docked >= 0:
+				_hud.set_input_enabled(false)
+				_services.open(flight)
+			return
 		"map":
 			_hud.set_input_enabled(false)
 			_map.open(flight)
@@ -107,10 +124,15 @@ func _deliver_notice() -> void:
 		"docked": flight.docked, "landed_site": flight.landed_site, "target": flight.target,
 		"planned_target": flight.planned_target, "speed": flight.speed(), "credits": flight.credits,
 		"mining_phase": flight.mining.phase, "cargo_units": flight.mining.ore_hold,
+		"fuel": flight.ship.fuel, "scooping": flight.scooping,
 	})
 	_hud.notify(flight.status_message)
 	flight.status_event = ""
-	if event in ["launch", "dock", "land", "lift", "contract", "delivery", "mining_deploy", "mining_recover", "mining_ready", "mining_loaded", "ore_sold"]:
+	if event in [
+		"launch", "dock", "land", "lift", "contract", "delivery", "mining_deploy", "mining_recover",
+		"mining_ready", "mining_loaded", "ore_sold", "service_refuel", "service_tank", "service_eco",
+		"scoop_full", "scoop_stop", "star_arrival", "fuel_empty",
+	]:
 		_save()
 
 
@@ -134,10 +156,14 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		if event.physical_keycode == KEY_ESCAPE:
 			_close_map()
 		return
+	if _services.is_open():
+		if event.physical_keycode == KEY_ESCAPE:
+			_close_services()
+		return
 	var actions := {
 		KEY_T: "target", KEY_F: "autopilot", KEY_R: "throttle_up", KEY_V: "throttle_down",
 		KEY_ENTER: "dock", KEY_M: "contract", KEY_G: "mine", KEY_B: "sell_ore", KEY_F8: "report",
-		KEY_N: "map",
+		KEY_N: "map", KEY_K: "scoop", KEY_P: "services",
 	}
 	if actions.has(event.physical_keycode):
 		_handle_action(actions[event.physical_keycode])
@@ -154,6 +180,8 @@ func _notification(what: int) -> void:
 			_close_report()
 		elif _map.is_open():
 			_close_map()
+		elif _services.is_open():
+			_close_services()
 		else:
 			_save()
 			get_tree().quit()
@@ -254,6 +282,20 @@ func _select_destination(site_id: int) -> void:
 
 func _close_map() -> void:
 	_map.close()
+	_hud.set_input_enabled(true)
+
+
+func _service_purchase(action: String) -> void:
+	if not _services.is_open():
+		return
+	flight.service_action(action)
+	_deliver_notice()
+	_services.refresh()
+	_update_display(0.0)
+
+
+func _close_services() -> void:
+	_services.close()
 	_hud.set_input_enabled(true)
 
 
