@@ -1,0 +1,104 @@
+{
+  "schema": "starfrontier-mission-statements-core-0.32.0-source-publication-v1",
+  "status": "verified",
+  "completed_utc": "2026-11-19T11:13:54.303263+00:00",
+  "checkpoint": "mission-statements-core-0.32.0-2026-11-19",
+  "artifact_commit": "de718cfbbfa74745b333d366e2cd4f1a9c75dc0e",
+  "source_commit": "54d394c5ce103a467def9cd7c554db1ba6372497",
+  "files": [
+    {
+      "file": "manifest.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/de718cfbbfa74745b333d366e2cd4f1a9c75dc0e/deliverables/mission-statements-core-0.32.0-2026-11-19/manifest.json",
+      "http_status": 200,
+      "bytes": 3695,
+      "sha256": "3845bbaea7f07d19ce78d440ed0ab44d6b637cb36376ebf7b16393bd0191367c"
+    },
+    {
+      "file": "README_RU.md",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/de718cfbbfa74745b333d366e2cd4f1a9c75dc0e/deliverables/mission-statements-core-0.32.0-2026-11-19/README_RU.md",
+      "http_status": 200,
+      "bytes": 5421,
+      "sha256": "5de9d5bc175ea1e151327d5a531cd25d7a2492aa64f3b41647549c7183712958"
+    },
+    {
+      "file": "StarFrontier-0.32.0-mission-statements-source-update.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/de718cfbbfa74745b333d366e2cd4f1a9c75dc0e/deliverables/mission-statements-core-0.32.0-2026-11-19/StarFrontier-0.32.0-mission-statements-source-update.zip",
+      "http_status": 200,
+      "bytes": 19935597,
+      "sha256": "1ec8b71d9cffdbd16aed301dad0226b3ae353aeff1a98a5d33b2df49f7a17834",
+      "zip_CRC_verified": true,
+      "source_commit_in_ZIP_comment": "54d394c5ce103a467def9cd7c554db1ba6372497"
+    },
+    {
+      "file": "functional-summary.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/de718cfbbfa74745b333d366e2cd4f1a9c75dc0e/deliverables/mission-statements-core-0.32.0-2026-11-19/functional-summary.json",
+      "http_status": 200,
+      "bytes": 73733,
+      "sha256": "b11020679eefa335e9f1db4a8078386dbd98bdc8c22ee15e0fe1a5e19515a3be"
+    },
+    {
+      "file": "source-pair-verification.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/de718cfbbfa74745b333d366e2cd4f1a9c75dc0e/deliverables/mission-statements-core-0.32.0-2026-11-19/source-pair-verification.json",
+      "http_status": 200,
+      "bytes": 147754,
+      "sha256": "0b74ff4d04850051d0e8c7ac617d6f8955e85ae9ee4b55ac1e3d21ec90a08c80"
+    },
+    {
+      "file": "source-update-policy.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/de718cfbbfa74745b333d366e2cd4f1a9c75dc0e/deliverables/mission-statements-core-0.32.0-2026-11-19/source-update-policy.json",
+      "http_status": 200,
+      "bytes": 547642,
+      "sha256": "8f002201555bf459bdc9a467a1cae7b10e2181ae4498c06b2a47211109f0e202"
+    },
+    {
+      "file": "StarFrontier-0.32.0-statements-arm64.apk",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/de718cfbbfa74745b333d366e2cd4f1a9c75dc0e/deliverables/mission-statements-core-0.32.0-2026-11-19/StarFrontier-0.32.0-statements-arm64.apk",
+      "http_status": 200,
+      "bytes": 51111869,
+      "sha256": "6f5f795048c90ba4c7f60a755da250ad7d35183235763a67ba0caf6850fa5cf6",
+      "APK_CRC_verified": true
+    },
+    {
+      "file": "android-verification.json",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/de718cfbbfa74745b333d366e2cd4f1a9c75dc0e/deliverables/mission-statements-core-0.32.0-2026-11-19/android-verification.json",
+      "http_status": 200,
+      "bytes": 54533,
+      "sha256": "1fc57de67e16b6ca7c9c6a4e99cddec2b5ef1dd5b60c3894516f6bc453bec613"
+    },
+    {
+      "file": "StarFrontier-0.28.0-native-station-source.zip",
+      "url": "https://raw.githubusercontent.com/brodyga0878-hub/Pyton/f6d802e5f34f735eef91fdc2670bc8850443511a/deliverables/0.28.0-native-station-alpha1/StarFrontier-0.28.0-native-station-source.zip",
+      "http_status": 200,
+      "bytes": 33543341,
+      "sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d",
+      "zip_CRC_verified": true,
+      "source_commit_in_ZIP_comment": "de8eb18a687d007781321436910187dff3785775"
+    }
+  ],
+  "actual_complete_HTTPS_downloads": 9,
+  "all_manifest_payloads_downloaded": true,
+  "manifest_payload_count": 7,
+  "required_source_archives_downloaded": 2,
+  "runtime_inputs_verified": 593,
+  "runtime_freeze_sha256": "29e751baee4831c0fbcbc107264901200317462fa62ef8d1579154204ef72598",
+  "all_current_runtime_inputs_match_frozen_source": true,
+  "new_APK_produced": true,
+  "apk": {
+    "file": "StarFrontier-0.32.0-statements-arm64.apk",
+    "verification_file": "android-verification.json",
+    "bytes": 51111869,
+    "sha256": "6f5f795048c90ba4c7f60a755da250ad7d35183235763a67ba0caf6850fa5cf6",
+    "version": "0.32.0-statements-alpha1",
+    "version_code": 57,
+    "package": "org.starfrontier.rebuild",
+    "abi": "arm64-v8a",
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "source_commit": "54d394c5ce103a467def9cd7c554db1ba6372497",
+    "runtime_freeze_sha256": "29e751baee4831c0fbcbc107264901200317462fa62ef8d1579154204ef72598",
+    "signature_aapt_zipalign_rechecked_at_packaging": true
+  },
+  "new_kernels_connected_to_Main": false,
+  "physical_device_tested": false,
+  "full_original_port_complete": false,
+  "scope": "All declared complete immutable HTTPS downloads: source payloads, optional technically verified APK/proof and exact0.28 base. SHA/lengths, source ZIP CRCs/comments, APK CRC when supplied and frozen runtime inputs pass. Source version0.32/code57 metadata changes are authorized; new kernels remain separate from Main and no on-device/full-port result is claimed."
+}
