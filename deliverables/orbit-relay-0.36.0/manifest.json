@@ -1,0 +1,78 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.36.0",
+  "source_commit": "0e63f944b67d92fb2d76b45e6ccb1d7bc83fbdfe",
+  "content": {
+    "targets": 10,
+    "ports": 3,
+    "asteroids": 3,
+    "moons": 2,
+    "comets": 1,
+    "stars": 1,
+    "delivery_routes": 6,
+    "port_services": [
+      "refuel",
+      "tank",
+      "eco"
+    ]
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 61,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches_0.35": true,
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 13,
+    "tested_on_device": false
+  },
+  "checks": {
+    "flight": {
+      "failures": 0
+    },
+    "scene": {
+      "failures": 0
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404,
+      "original_route_pairs": 72
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 56
+    },
+    "stellar_routes": {
+      "site_to_star_and_back_full_and_empty": 36,
+      "departures_near_star": 288
+    }
+  },
+  "files": {
+    "OrbitRelay-0.36.0-arm64.apk": {
+      "bytes": 26171565,
+      "sha256": "23acd7f4bc95612e99b978f118aa78b49d21dce39bd43a0fdf974c39f399e298"
+    },
+    "OrbitRelay-0.36.0-source.zip": {
+      "bytes": 83702,
+      "sha256": "dfb420712d57e1296dbb2e958b2cc2c763184ffa89ffff5cb9f75087bd6e33b9"
+    },
+    "star-approach.png": {
+      "bytes": 751320,
+      "sha256": "2fcc8bd5b709eb0c331be6669b0daf21602ddab45ffcff93d5db862411b45132"
+    },
+    "star-scoop.png": {
+      "bytes": 965161,
+      "sha256": "c0d03c9efbba55fe5d3298679d4c70ce13fd60954cd7a2e35c993bb0a4f9835b"
+    },
+    "port-services.png": {
+      "bytes": 106247,
+      "sha256": "579fa8a73324b4b67e4b33452848114b0d6e4c0f764d7146fb0d61cb4f4b65c3"
+    }
+  }
+}
