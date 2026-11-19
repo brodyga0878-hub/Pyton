@@ -1,0 +1,40 @@
+F41-stop 0 0 frames=1
+F41-out-of-table-bytes 0 0 frames=1
+F41-real-store-selector4 4 0 frames=1
+F41-real-store-selector6 3 0 frames=1
+F41-real-store-selector3 4 0 frames=1
+F41-real-add-overflow 4 0 frames=1
+F41-real-F39-identity 2 0 frames=1
+F41-UI-private-packet-chain 2 2 frames=1
+F41-two-formatter-parameters 3 2 frames=1
+F41-body-name-alias 3 1 frames=1
+F41-inline-NUL-None 6 1 frames=1
+F41-inline-NUL-utf8 6 1 frames=1
+F41-real-spawn-0 12 1 frames=1
+F41-real-spawn-5862 12 2 frames=1
+F41-real-F52-allocator-callee-stores 4 0 frames=1
+F54-real-child-F53-F41-continuation 3 0 frames=1
+F55-real-boot-F53-F41 5 0 frames=1
+F55-generation-self-cancel-free 6 0 frames=1
+F41-cleanup-self-halt 3 0 frames=1
+F41-generation-change-continues 4 1 frames=1
+F41-real-event-recursive-two-frames 7 1 frames=2
+F41-freed-after-last-variable-read 4 1 frames=1
+F41-descriptor-reread-between-expressions 5 1 frames=1
+F41-eleven-argument-service 2 1 frames=1
+F41-zero-argument-world 0 1 frames=1
+F41-zero-selected-velocity 1 0 frames=1
+F41-private-four-byte-outlocal-provenance 6 2 frames=1
+original-module2-real-F53-F41-resource-graph 15 1 frames=1
+shared-Core21-transition-00 3 0 frames=1
+shared-Core21-transition-01 4 0 frames=1
+shared-Core21-transition-02 4 0 frames=1
+shared-Core21-transition-03 3 0 frames=1
+shared-Core21-transition-04 5 1 frames=1
+shared-Core21-transition-05 1 1 frames=1
+{
+  "case_count": 34,
+  "fixture_sha256": "5af70919e7bb15e6e9539f16b549efc143952e89f067506f77f3538fb2a1edd6",
+  "bytes": 611521,
+  "native_measurements": 180
+}

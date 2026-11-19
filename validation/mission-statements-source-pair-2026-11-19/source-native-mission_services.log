@@ -1,0 +1,43 @@
+{
+  "case_count": 26,
+  "fixture_sha256": "bb7215f3c1d97ba25e96f6fb846a44d39c7cd59fb38cadc179200e9afcee32e7",
+  "bytes": 8224211,
+  "proof": {
+    "schema": "starfrontier-mission-services-composition-proof-v1",
+    "source_dependencies_sha256": {
+      "tools/rebuild_source_mission_services_native.py": "90c54997257aefcec044f946e1d77b8b4f2774dd96a67620d47f1de8cf31f679",
+      "tools/rebuild_source_mission_expression_native.py": "df7ba2075770e44e858a05705f5a33da7e1504f9824fd8cf18470d6ddc609bac",
+      "tools/rebuild_source_mission_guards_native.py": "c4a9afce799fe45f762546c0935550c81e4c0207f41b7d1bdfede08b22af693b",
+      "tools/rebuild_source_events_native.py": "37435eefdfdf89f25f6669689e9aa01f3312d5b219da2929a04675e9e05e3507",
+      "data/ffe_mission_programs.json": "ebd6caa6cc4f5d9d4a606d09a61339d737fada0628eb4cd131b9af91ef5b1f27",
+      "validation/mission-expressions-2026-11-18/expression-native-proof/instruction-proof.json": "55350cb8453c19e0126c5e09b5f6737a5062a9f4124e9be5319fbd0f15fe1d8f",
+      "validation/mission-expressions-2026-11-18/expression-native-proof/source-procedures.asm": "44356c8390332726daffb37f36e2b15cda0bca2181c5f2828ea7ccb7f1e2150e",
+      "validation/mission-expressions-2026-11-18/guards-native-proof/instruction-proof.json": "859cce320e271f404b261be7d18fc9076972ad5b71c29f3f0b6e1f817b29e9a9",
+      "validation/mission-expressions-2026-11-18/guards-native-proof/source-procedures.asm": "61162a64213e5f2b6e93bd230d87fae6994db1324bb50ae5de42b2f5dca1798c",
+      "validation/events-messages-2026-11-18/events-native-proof/instruction-proof.json": "534d1c116c418745e5db1080c575f2b595f570b9f0e72c17b23f099f3bab37a5",
+      "validation/events-messages-2026-11-18/events-native-proof/source-procedures.asm": "0d1515cbc16763aeeab2b94d33b36f24c37a2f9698e487d9e9babf399977589c"
+    },
+    "fresh_process_runs_each_call": 3,
+    "reverse_native_calls_verified": true,
+    "expected_arithmetic_calculated_in_python": false,
+    "native_invocations_including_fresh_and_reverse": {
+      "expression": 80,
+      "guards": 140,
+      "events": 72
+    },
+    "shared_owner_steps": 5,
+    "shared_owner_continuations": 4,
+    "shared_sequence_program_rebound": false,
+    "original_full_image_cases": 3,
+    "guard_F31_actual_expression_calls": 6,
+    "actual_registry_service_calls": 17,
+    "F47_body_executed": false,
+    "full_mission_VM_executed": false,
+    "Main_integrated": false,
+    "scope": "Measured shared-owner composition of existing independently proven native kernels. F47 remains an explicit event callback provider. Transport patches are measured byte differences; expected arithmetic is never calculated by Python.",
+    "actual_F31_calls": 6,
+    "actual_F44_calls": 9,
+    "actual_F45_calls": 2,
+    "actual_F48_calls": 6
+  }
+}

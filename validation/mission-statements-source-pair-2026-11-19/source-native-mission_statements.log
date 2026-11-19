@@ -1,0 +1,14 @@
+0 selector-000
+50 selector-050
+100 selector-100
+150 selector-150
+200 selector-200
+250 selector-250
+300 output-local-mode-0
+350 dependent-owner-and-frame-00
+{
+  "case_count": 362,
+  "typed_boundaries": 490,
+  "fixture_sha256": "63c8c29aa3a5d606964321ed8ed32bf141a054bf96945aaf7c1698a7e0d88ab0",
+  "bytes": 3515920
+}

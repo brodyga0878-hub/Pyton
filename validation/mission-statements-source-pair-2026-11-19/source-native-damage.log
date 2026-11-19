@@ -1,0 +1,13 @@
+{
+  "case_count": 309,
+  "external_requests": {
+    "F48": 783,
+    "F144_handler": 71,
+    "F1907": 184,
+    "F942": 77,
+    "F952": 20
+  },
+  "sha256": "d8f25e97a65c7b04eed8f13a9252758d8866b371a57d8f1e1872cc115a3789c3",
+  "bytes": 41421515,
+  "output": "/workspace/recovery/mission-statements-source-pair-fresh/native/damage.json"
+}

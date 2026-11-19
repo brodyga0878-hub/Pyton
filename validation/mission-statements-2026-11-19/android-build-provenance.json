@@ -1,0 +1,45 @@
+{
+  "schema": "starfrontier-mission-statements-android-build-provenance-v1",
+  "status": "verified",
+  "created_utc": "2026-11-19T11:11:09.498231+00:00",
+  "source_commit": "54d394c5ce103a467def9cd7c554db1ba6372497",
+  "runtime_freeze_sha256": "29e751baee4831c0fbcbc107264901200317462fa62ef8d1579154204ef72598",
+  "source_pair_verification_sha256": "0b74ff4d04850051d0e8c7ac617d6f8955e85ae9ee4b55ac1e3d21ec90a08c80",
+  "android_verification_sha256": "1fc57de67e16b6ca7c9c6a4e99cddec2b5ef1dd5b60c3894516f6bc453bec613",
+  "source_archives": {
+    "base": {
+      "file": "StarFrontier-0.28.0-native-station-source.zip",
+      "bytes": 33543341,
+      "sha256": "830e7219879f694a24e41f579417986f936902f6592926ff8e84dc99217b6c2d"
+    },
+    "update": {
+      "file": "StarFrontier-0.32.0-mission-statements-source-update.zip",
+      "bytes": 19935597,
+      "sha256": "1ec8b71d9cffdbd16aed301dad0226b3ae353aeff1a98a5d33b2df49f7a17834"
+    }
+  },
+  "build_project": "/workspace/recovery/mission-statements-source-pair-fresh/source/StarFrontier-0.28.0-source",
+  "command": [
+    "sh",
+    "tools/build_android.sh",
+    "--candidate"
+  ],
+  "project_selection_environment": "STARFRONTIER_PROJECT_ROOT",
+  "fresh_export_exit_code": 0,
+  "export_exit_code_source": "Caller-observed completed build_android.sh process status",
+  "build_log": "android-build.log",
+  "build_log_sha256": "dc282f7c97a4e33a12c9839ba896175f7b2f8c673c22d9cf73920279bb464d56",
+  "apk_file": "StarFrontier-0.32.0-statements-arm64.apk",
+  "apk_bytes": 51111869,
+  "apk_sha256": "6f5f795048c90ba4c7f60a755da250ad7d35183235763a67ba0caf6850fa5cf6",
+  "version": "0.32.0-statements-alpha1",
+  "version_code": 57,
+  "compiled_source_correspondence_independently_verified": true,
+  "compiled_scripts": 201,
+  "exact_JSON_resources": 37,
+  "all_runtime_inputs_unchanged_through_compilation": true,
+  "runtime_input_count": 593,
+  "test_key_only": true,
+  "Main_integrated": false,
+  "physical_device_tested": false
+}
