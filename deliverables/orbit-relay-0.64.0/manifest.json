@@ -1,0 +1,202 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.64.0",
+  "source_commit": "e033989a2fe7e7b42f2ef6d65b40d66722b190c4",
+  "content": {
+    "save_schema": 24,
+    "comparison_version": "0.63.0",
+    "crew_seats": 2,
+    "crew_offering_ports": 9,
+    "payroll_period_game_seconds": 240,
+    "arrears_suspend_role_benefits": true,
+    "paid_navigator_jump_charge_game_seconds": 2.2,
+    "tested_acceptance_matrix": {
+      "checked": 20,
+      "partial": 14,
+      "open": 10
+    }
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 89,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.63.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 39,
+    "tested_on_device": false
+  },
+  "checks": {
+    "android_report_share": {
+      "failures": 0,
+      "checks": 76
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "crew": {
+      "failures": 0,
+      "checks": 45
+    },
+    "departure": {
+      "failures": 0,
+      "checks": 32
+    },
+    "dock_access": {
+      "failures": 0,
+      "checks": 37
+    },
+    "docking": {
+      "failures": 0,
+      "checks": 76
+    },
+    "dual_fuel": {
+      "failures": 0,
+      "checks": 25
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 139
+    },
+    "flight": {
+      "failures": 0
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "frontier_freight": {
+      "failures": 0,
+      "checks": 33
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 76
+    },
+    "galactic_routes": {
+      "failures": 0,
+      "checks": 59
+    },
+    "gear": {
+      "failures": 0,
+      "checks": 28
+    },
+    "heat_shield": {
+      "failures": 0,
+      "checks": 28
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 187
+    },
+    "living": {
+      "failures": 0,
+      "checks": 77
+    },
+    "material_maps": {
+      "failures": 0,
+      "checks": 33
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "npc_freight": {
+      "failures": 0,
+      "checks": 48
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 319
+    },
+    "passengers": {
+      "failures": 0,
+      "checks": 50
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 81
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "report": {
+      "failures": 0,
+      "checks": 28
+    },
+    "scene": {
+      "failures": 0
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 191
+    },
+    "surface_guidance": {
+      "failures": 0,
+      "checks": 60
+    },
+    "crew_production_model_matrix": {
+      "checks": 395,
+      "failures": 0
+    },
+    "crew_scene_headless": {
+      "checks": 83,
+      "failures": 0
+    },
+    "crew_scene_graphical": {
+      "checks": 86,
+      "failures": 0
+    },
+    "actual_0_63_save_migration": {
+      "checks": 21,
+      "failures": 0,
+      "save_files": 3
+    }
+  },
+  "files": {
+    "OrbitRelay-0.64.0-arm64.apk": {
+      "bytes": 28662926,
+      "sha256": "5122ca6c8c35c2c3d725174de1563bb2703aaed4d3e46a95fbf5dc1682a359e8"
+    },
+    "OrbitRelay-0.64.0-source.zip": {
+      "bytes": 2161789,
+      "sha256": "c36dc5f7b33ff2e173755a5c3ea05102cefe92357a7c3ecb6be393e10645d733"
+    },
+    "crew-arrears.png": {
+      "bytes": 145223,
+      "sha256": "4d340229d954c9587240f54832968331a1e122a1298cce2737a1eaf8266d9a0b"
+    },
+    "crew-candidates.png": {
+      "bytes": 122772,
+      "sha256": "1804de4215f38f89d1d2c86458b3271258c1fd50f4d3d24af4fe507220e59b21"
+    },
+    "crew-onboard.png": {
+      "bytes": 130639,
+      "sha256": "1ecf0af5a94e7b6a27e1adf5bc69dc666e2968c730b402a2db674e256a41a485"
+    }
+  }
+}
