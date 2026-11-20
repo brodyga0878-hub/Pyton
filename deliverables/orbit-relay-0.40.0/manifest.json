@@ -1,0 +1,99 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.40.0",
+  "source_commit": "a31a727a113aadf571d46adfc61633c8e5a1d44d",
+  "content": {
+    "systems": 2,
+    "ports_with_markets": 5,
+    "tradable_goods": 5,
+    "courier_routes": 5,
+    "single_stop_delivery_routes": 8,
+    "cargo_capacity_units": [
+      24,
+      40
+    ],
+    "save_schema": 8
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 65,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches_0.39": true,
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 18,
+    "tested_on_device": false
+  },
+  "checks": {
+    "flight": {
+      "failures": 0
+    },
+    "scene": {
+      "failures": 0
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 56
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 186
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 229
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 166
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 118
+    },
+    "courier_and_trade_replay": {
+      "completed_contracts": 2,
+      "ports_visited": [
+        1,
+        3,
+        0,
+        10,
+        11
+      ],
+      "trade_units": 10,
+      "failures": 0
+    }
+  },
+  "files": {
+    "OrbitRelay-0.40.0-arm64.apk": {
+      "bytes": 26254286,
+      "sha256": "7e91b2fe18fd9fab35d1c0151f560731275f9dca48a87569514d221c1e0800b1"
+    },
+    "OrbitRelay-0.40.0-source.zip": {
+      "bytes": 135935,
+      "sha256": "576dad7c96775057f2a0e1bbc3f49e020f922aeb7f02c20e4441ec5eb08112cf"
+    },
+    "market.png": {
+      "bytes": 79180,
+      "sha256": "8afc84406ef2e0f33cce2dc3ffe79f43222b2ea9fc9dfdee945d1d2d8eab7cd1"
+    },
+    "courier.png": {
+      "bytes": 61917,
+      "sha256": "91efbf53d3d2c86d63ae6b0e134087dcc25d36c39655adfb983df2b37b8f26b6"
+    },
+    "ship-services.png": {
+      "bytes": 119968,
+      "sha256": "6b1baf34a2c40dee8e07d23605545dead45e8d197bed754be97220f025146a9d"
+    }
+  }
+}
