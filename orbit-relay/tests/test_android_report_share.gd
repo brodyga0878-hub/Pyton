@@ -50,6 +50,63 @@ class Platform:
 		calls.append("chooser"); chooser_uri = uri; return failure != "chooser"
 
 
+# Model the official JavaClassWrapper contract: neither wrap(), cached
+# constants nor get_exception() consume the last wrapped-method exception.
+class CachedSdk:
+	extends RefCounted
+	var SDK_INT: Variant = 35
+
+
+class StickyBridge:
+	extends RefCounted
+	var exception: Variant
+	var version := CachedSdk.new()
+	var other_class := RefCounted.new()
+	func wrap(name: String) -> Variant:
+		return version if name == "android.os.Build$VERSION" else other_class
+	func get_exception() -> Variant:
+		return exception
+
+
+class ThrowingProvider:
+	extends RefCounted
+	var bridge: StickyBridge
+	func getUriForFile(_context: Variant, _authority: String, _file: Variant) -> Variant:
+		bridge.exception = RefCounted.new()
+		return null
+
+
+class SuccessfulResolver:
+	extends RefCounted
+	var bridge: StickyBridge
+	var uri := UriToken.new("recovered-download")
+	func insert(_collection: Variant, _values: Variant) -> Variant:
+		# A successful wrapped Java method replaces the stored exception.
+		bridge.exception = null
+		return uri
+
+
+func _test_sticky_java_exception() -> void:
+	var bridge := StickyBridge.new()
+	var platform := Share.AndroidPlatform.new()
+	platform.bridge = bridge
+	var provider := ThrowingProvider.new()
+	provider.bridge = bridge
+	var failed: Variant = platform._call(provider, "getUriForFile", [null, "test.fileprovider", null], "file_provider_failed")
+	check(failed == null and platform.last_error == "file_provider_failed", "FileProvider method failure captures Java exception")
+	var exception: Variant = bridge.get_exception()
+	check(exception != null and bridge.get_exception() == exception, "reading get_exception does not consume a stored Java failure")
+	check(platform.sdk_int() == 35 and platform.last_error.is_empty(), "MediaStore SDK lookup succeeds after FileProvider exception")
+	check(platform.sdk_int() == 35 and bridge.get_exception() == exception, "cached SDK lookup also ignores the previous method exception")
+	check(platform._class("android.content.ContentValues") != null and bridge.get_exception() == exception, "wrapping the next Java class does not misclassify a stale exception")
+	var resolver := SuccessfulResolver.new()
+	resolver.bridge = bridge
+	var published: Variant = platform._call(resolver, "insert", [null, null], "insert_failed")
+	check(published == resolver.uri and platform.last_error.is_empty() and bridge.get_exception() == null, "next real ContentResolver method clears the previous exception and returns its URI")
+	bridge.version.SDK_INT = null
+	check(platform.sdk_int() == 0 and platform.last_error == "android_version_unavailable", "unavailable SDK constant still fails explicitly")
+
+
 func _initialize() -> void: call_deferred("run")
 func check(ok: bool, label: String) -> void:
 	checks += 1
@@ -68,6 +125,7 @@ func archive(file: String, metadata: Dictionary, event_text: String = "", extra:
 
 
 func run() -> void:
+	_test_sticky_java_exception()
 	var source := path("source")
 	var producer := SessionIO.new(); producer.trace("actual-production", {"step": 1})
 	var generated := producer.export_report({"fuel": 8, "docked": -1}, source)

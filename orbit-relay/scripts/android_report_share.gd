@@ -38,7 +38,9 @@ class AndroidPlatform:
 			return _classes[name]
 		last_error = ""
 		var result: Variant = bridge.wrap(name)
-		if bridge.get_exception() != null or result == null:
+		# wrap() and cached Java constants do not replace the exception stored
+		# by the previous wrapped Java method. Judge the class by its result.
+		if result == null:
 			last_error = "java_class_unavailable"
 			return null
 		_classes[name] = result
@@ -62,7 +64,9 @@ class AndroidPlatform:
 			return 0
 		last_error = ""
 		var result: Variant = version.SDK_INT
-		if bridge.get_exception() != null or not (result is int or result is float):
+		# SDK_INT is a cached constant, so get_exception() may still describe
+		# a failed FileProvider call before the MediaStore fallback.
+		if not (result is int or result is float):
 			last_error = "android_version_unavailable"
 			return 0
 		return int(result)
