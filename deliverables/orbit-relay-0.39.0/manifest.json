@@ -1,0 +1,103 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.39.0",
+  "source_commit": "0d2dba072932adee6c6ae13e5dde54fbbd5b7a7b",
+  "content": {
+    "systems": 2,
+    "targets": 16,
+    "solid_bodies": 9,
+    "landable_planets": 1,
+    "save_schema": 7
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 64,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches_0.38": true,
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 16,
+    "tested_on_device": false
+  },
+  "checks": {
+    "flight": {
+      "failures": 0
+    },
+    "scene": {
+      "failures": 0
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 56
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 186
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 229
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 166
+    },
+    "offpad_landing_and_lift": {
+      "solid_sites": 9,
+      "checks": 329,
+      "failures": 0
+    },
+    "offpad_reserve_to_port": {
+      "checks": 174,
+      "failures": 0
+    },
+    "later_epoch_replay": {
+      "port_routes": 222,
+      "epochs_seconds": [
+        0,
+        180,
+        600,
+        1200,
+        2400,
+        3600
+      ],
+      "failures": 0
+    }
+  },
+  "files": {
+    "OrbitRelay-0.39.0-arm64.apk": {
+      "bytes": 26225298,
+      "sha256": "892fd0c16098be648040c30ef4b207ed468c2f2590400862520aefc669638c08"
+    },
+    "OrbitRelay-0.39.0-source.zip": {
+      "bytes": 119244,
+      "sha256": "93edae0b6bf496ae9deb236e9764ac94517c3e6f25cb389571f7c1d0b67f628c"
+    },
+    "terrace-map.png": {
+      "bytes": 86955,
+      "sha256": "6ad756999af2c99c49725c373fa0eb856aa8cab3b8b6a5f25a5c561d3a5cef27"
+    },
+    "terrace-approach.png": {
+      "bytes": 692379,
+      "sha256": "1da5187bf2ddd1b8593a9cf0bfc2c602d75a9866ce73f71f5370581f9ba018d2"
+    },
+    "terrace-mining.png": {
+      "bytes": 679389,
+      "sha256": "bc356026bbc9e7b400acd5ccaf6852a032bb0e003d0a0c91c352dc91c3e77401"
+    },
+    "terrace-liftoff.png": {
+      "bytes": 180689,
+      "sha256": "02947b54141f2644b8582f3fbb1f9c7ce55679bf5cd178d1feb8df20705b23dc"
+    }
+  }
+}
