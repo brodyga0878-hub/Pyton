@@ -52,6 +52,7 @@ const ASTEROID_GATE := ASTEROID_CENTER + Vector3(0, 0, 105)
 const LANDING_SPEED := 4.0
 const LANDING_RADIUS := 8.0
 const FREE_LANDING_MAX_HEIGHT := 10.0
+const LANDING_GUIDE_HEIGHT := 90.0
 const LANDING_ANGLE := 20.0
 const IMPACT_DAMAGE_SPEED := 14.0
 const PATROL_CRUISE_SPEED := 70.0
@@ -828,10 +829,14 @@ func cancel_dock_sync() -> bool:
 
 
 func surface_status() -> Dictionary:
-	var status := {"ok": false, "near": false, "reason": "Подойдите к твёрдой поверхности", "altitude": 0.0, "slope": 0.0, "pad": false, "direction": Vector3.ZERO}
+	var status := {
+		"ok": false, "near": false, "guide": false, "reason": "Подойдите к твёрдой поверхности",
+		"altitude": 0.0, "slope": 0.0, "pad": false, "direction": Vector3.ZERO,
+	}
 	if docked >= 0 or landed or not Catalog.is_mine_site(target):
 		return status
-	var relative := position - target_position(target)
+	var center := target_position(target)
+	var relative := position - center
 	var distance := relative.length()
 	if distance < 0.01 or distance > float(Catalog.site(target).radius) + FRAME_MARGIN:
 		return status
@@ -839,23 +844,42 @@ func surface_status() -> Dictionary:
 	var over_pad := relative.z > 0.0 and Vector2(relative.x, relative.y).length() <= LANDING_RADIUS
 	var direction := Vector3.BACK if over_pad else relative / distance
 	var normal := Terrain.normal(target, direction)
-	var altitude := pad_height + Terrain.CONTACT_CLEARANCE if over_pad else distance - Terrain.radius_at(target, direction)
+	var ground_radius := Terrain.radius_at(target, direction)
+	var altitude := pad_height + Terrain.CONTACT_CLEARANCE if over_pad else distance - ground_radius
+	var relative_velocity := velocity - target_velocity(target)
+	var speed := relative_velocity.length()
+	var alignment := clampf(forward().dot(-normal), -1.0, 1.0)
+	var height_ok := altitude >= Terrain.CONTACT_CLEARANCE - 0.1 and altitude <= (11.0 if over_pad else FREE_LANDING_MAX_HEIGHT)
+	var speed_ok := speed <= LANDING_SPEED
+	var slope_ok := over_pad or Terrain.landable(target, direction)
+	var aim_ok := alignment >= cos(deg_to_rad(12.0 if over_pad else LANDING_ANGLE))
 	status.near = true
+	status.guide = altitude <= LANDING_GUIDE_HEIGHT and jump_seconds_left <= 0.0
 	status.altitude = altitude
 	status.slope = rad_to_deg(acos(clampf(normal.dot(direction), -1.0, 1.0)))
 	status.pad = over_pad
 	status.direction = direction
+	status.ground_point = center + direction * ground_radius
+	status.surface_normal = normal
+	status.descent_speed = -relative_velocity.dot(normal)
+	status.drift_speed = relative_velocity.slide(normal).length()
+	status.relative_speed = speed
+	status.aim_error_deg = rad_to_deg(acos(alignment))
+	status.height_ok = height_ok
+	status.speed_ok = speed_ok
+	status.slope_ok = slope_ok
+	status.aim_ok = aim_ok
 	if jump_seconds_left > 0.0:
 		status.reason = "Идёт зарядка прыжкового привода"
 	elif autopilot and _approach_committed and not over_pad:
 		status.reason = "Подойдите к отмеченной площадке"
-	elif altitude < Terrain.CONTACT_CLEARANCE - 0.1 or altitude > (11.0 if over_pad else FREE_LANDING_MAX_HEIGHT):
+	elif not height_ok:
 		status.reason = "Подойдите к площадке" if over_pad else "Снизьтесь до 4–10 м над поверхностью"
-	elif speed_relative_to(target) > LANDING_SPEED:
+	elif not speed_ok:
 		status.reason = "Снизьте скорость относительно поверхности до 4 м/с"
-	elif not over_pad and not Terrain.landable(target, direction):
+	elif not slope_ok:
 		status.reason = "Выберите участок с меньшим уклоном"
-	elif forward().dot(-normal) < cos(deg_to_rad(12.0 if over_pad else LANDING_ANGLE)):
+	elif not aim_ok:
 		status.reason = "Направьте нос к площадке" if over_pad else "Направьте нос к поверхности"
 	else:
 		status.ok = true

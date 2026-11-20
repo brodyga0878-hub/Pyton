@@ -37,6 +37,11 @@ var _backdrop_orbit_axis := Vector3.UP
 var _mining_rig: Node3D
 var _traffic: Node3D
 var _atmosphere: Node3D
+var _surface_guide: MeshInstance3D
+var _surface_guide_paint: StandardMaterial3D
+var _surface_guide_site := -1
+var _surface_guide_point := Vector3.INF
+var _surface_guide_normal := Vector3.ZERO
 var _surface_views: Dictionary[int, Node3D] = {}
 var _stations: Dictionary[int, Node3D] = {}
 var _approaches: Dictionary[int, Node3D] = {}
@@ -80,6 +85,10 @@ func build() -> void:
 	_traffic.set_visual_profile(_visual_profile)
 	_atmosphere = AtmosphereView.new()
 	add_child(_atmosphere)
+	_surface_guide_paint = _light(Color("#edb36c"))
+	_surface_guide_paint.cull_mode = BaseMaterial3D.CULL_DISABLED
+	_surface_guide = _mesh(self, ArrayMesh.new(), _surface_guide_paint, Vector3.ZERO)
+	_surface_guide.hide()
 	camera = Camera3D.new()
 	camera.fov = 67.0
 	camera.near = 0.2
@@ -244,6 +253,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_surface_views[site_id].position = sim.target_position(site_id)
 		var field_direction: Vector3 = sim.landing_direction if site_id == surface_id else Vector3.ZERO
 		_surface_views[site_id].sync(position_now, site_id == int(sim.target), not settled, field_direction)
+	_sync_surface_guide(sim, settled)
 	var deposit: Transform3D = sim.surface_deposit() if landed else _ship.global_transform
 	_mining_rig.sync(_ship.global_transform, deposit, int(sim.mining.phase) if landed else 0, sim.mining.progress(), float(sim.elapsed))
 	_traffic.sync(sim.traffic_contacts(), sim.combat_beams())
@@ -257,6 +267,56 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_lighting.fog_light_energy = 0.48
 		_lighting.fog_density = float(haze.density) * 0.0015
 		_lighting.fog_sky_affect = 0.0
+
+
+func _sync_surface_guide(sim: RefCounted, settled: bool) -> void:
+	var status: Dictionary = sim.surface_status()
+	var site := int(sim.target)
+	_surface_guide.visible = not settled and float(sim.jump_seconds_left) <= 0.0 and _surface_views.has(site) \
+		and bool(status.get("guide", false)) and bool(status.get("near", false)) \
+		and not bool(status.get("pad", false)) and float(status.get("altitude", INF)) <= 90.0
+	if not _surface_guide.visible:
+		return
+	var ground: Vector3 = status.ground_point
+	var normal: Vector3 = status.surface_normal
+	if not ground.is_finite() or not normal.is_finite() or normal.length_squared() < 0.5:
+		_surface_guide.hide()
+		return
+	normal = normal.normalized()
+	var center: Vector3 = ground - sim.target_position(site)
+	var reference := Vector3.RIGHT if absf(normal.dot(Vector3.UP)) > 0.95 else Vector3.UP
+	var axes := Basis.looking_at(-normal, reference)
+	# Translation follows the exact moving projection every frame. Rebuild the
+	# small conformed ribbon only after 10cm or a meaningful normal change.
+	if _surface_guide_site != site or center.distance_squared_to(_surface_guide_point) > 0.01 \
+			or normal.dot(_surface_guide_normal) < 0.99999:
+		var geometry := SurfaceTool.new()
+		geometry.begin(Mesh.PRIMITIVE_TRIANGLES)
+		geometry.set_normal(Vector3.BACK)
+		for quadrant in range(4):
+			var previous := PackedVector3Array()
+			for step in range(7):
+				var angle := quadrant * TAU * 0.25 + PI * 0.08 + float(step) * PI * 0.34 / 6.0
+				var radial := Vector2(cos(angle), sin(angle))
+				var row := PackedVector3Array()
+				for radius: float in [2.45, 2.55]:
+					var direction := (center + axes * Vector3(radial.x * radius, radial.y * radius, 0.0)).normalized()
+					# Sample the existing physical surface; this is a visual ribbon,
+					# with no displacement, new terrain, depth override or collider.
+					var point := Terrain.point(site, direction) + direction * 0.28
+					row.append(axes.transposed() * (point - center))
+				if not previous.is_empty():
+					for vertex: Vector3 in [previous[0], previous[1], row[0], previous[1], row[1], row[0]]:
+						geometry.add_vertex(vertex)
+				previous = row
+		geometry.index()
+		_surface_guide.mesh = geometry.commit()
+		_surface_guide_site = site
+		_surface_guide_point = center
+		_surface_guide_normal = normal
+	_surface_guide.position = ground
+	_surface_guide.basis = axes
+	_surface_guide_paint.albedo_color = Color("#75eac0") if bool(status.ok) else Color("#edb36c")
 
 
 func _surface_safe_camera(at: Vector3, sim: RefCounted) -> Vector3:

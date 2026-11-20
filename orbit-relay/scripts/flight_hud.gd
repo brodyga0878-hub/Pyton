@@ -49,6 +49,12 @@ var _docking_position: Label
 var _docking_motion: Label
 var _docking_roll: Label
 var _docking_ready: Label
+var _surface_panel: PanelContainer
+var _surface_status: Label
+var _surface_height: Label
+var _surface_motion: Label
+var _surface_alignment: Label
+var _surface_ready: Label
 var _guidance: Label
 var _notice: Label
 var _notice_panel: PanelContainer
@@ -168,6 +174,7 @@ func build() -> void:
 	_time_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_time_hint.hide()
 	_build_docking_instrument()
+	_build_surface_instrument()
 
 	_steer = SteeringPad.new()
 	_steer.caption = "КУРС"
@@ -304,6 +311,37 @@ func _sync_docking(status: Dictionary) -> void:
 	button.add_theme_color_override("font_color", CYAN if synced else INK)
 	button.tooltip_text = "Отключить следование крену дока (F5)" if synced else "Следовать вращению кольца по крену (F5). Курс, сдвиг и тяга остаются ручными."
 
+func _build_surface_instrument() -> void:
+	var readout := _panel(_safe, Vector2(0.5, 0), Rect2(-196, 24, 392, 148))
+	_surface_panel = readout.get_parent() as PanelContainer
+	_surface_status = _label(readout, 18, CYAN)
+	_surface_height = _label(readout, 16, INK)
+	_surface_motion = _label(readout, 16, INK)
+	_surface_alignment = _label(readout, 16, INK)
+	_surface_ready = _label(readout, 14, MUTED)
+	for label in [_surface_status, _surface_height, _surface_motion, _surface_alignment, _surface_ready]:
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_surface_panel.hide()
+
+func _sync_surface_guidance(status: Dictionary) -> void:
+	var approach := not status.is_empty() and bool(status.get("guide", false))
+	_surface_panel.visible = approach and _input_enabled
+	if not approach:
+		return
+	var ready := bool(status.ok)
+	_surface_status.text = "Можно садиться" if ready else "Посадка на площадку" if status.pad else "Посадка вне площадки"
+	_surface_status.add_theme_color_override("font_color", CYAN if ready else AMBER)
+	_surface_height.text = "Высота %.1f м · Уклон %.1f°" % [float(status.altitude), float(status.slope)]
+	_surface_height.add_theme_color_override("font_color", CYAN if status.height_ok and status.slope_ok else AMBER)
+	var descent_speed := float(status.descent_speed)
+	if absf(descent_speed) < 0.05:
+		descent_speed = 0.0
+	_surface_motion.text = "Снижение %+.1f · Снос %.1f м/с" % [descent_speed, float(status.drift_speed)]
+	_surface_motion.add_theme_color_override("font_color", CYAN if status.speed_ok else AMBER)
+	_surface_alignment.text = "Скорость %.1f м/с · Нос %.1f°" % [float(status.relative_speed), float(status.aim_error_deg)]
+	_surface_alignment.add_theme_color_override("font_color", CYAN if status.aim_ok else AMBER)
+	_surface_ready.text = "Высота %s · Скорость %s · Уклон %s · Нос %s" % ["✓" if status.height_ok else "—", "✓" if status.speed_ok else "—", "✓" if status.slope_ok else "—", "✓" if status.aim_ok else "—"]
+
 func _build_flight_modes() -> void:
 	_flight_modes = HBoxContainer.new()
 	_flight_modes.add_theme_constant_override("separation", 8)
@@ -425,8 +463,9 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_actions["contract"].text = "Отметить этап" if transfer else ("Сдать груз" if sim.contract_stage == 1 else "Взять контракт")
 	var sale_quote: int = sim.raw_sale_quote() if docked and mining.ore_hold > 0 else 0
 	_actions["sell_ore"].visible = sale_quote > 0
-	var docking_context: bool = not parked and not _jumping and Sector.is_port(sim.target) and not sim.autopilot and not approach_active and fire.is_empty() and convoy.is_empty() and not sim.patrol_course and not sim.project_course and not sim.convoy_course
-	_sync_docking(sim.docking_guidance() if docking_context else {})
+	var manual_approach: bool = not parked and not _jumping and not sim.autopilot and not approach_active and fire.is_empty() and convoy.is_empty() and not sim.patrol_course and not sim.project_course and not sim.convoy_course
+	_sync_docking(sim.docking_guidance() if manual_approach and Sector.is_port(sim.target) else {})
+	_sync_surface_guidance(sim.surface_status() if manual_approach and Sector.is_mine_site(sim.target) and not sim.scooping else {})
 	_sync_clock(sim)
 	_refresh_disabled_actions()
 	_sync_fuel(sim.ship)
@@ -632,11 +671,12 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 	if aimed_at_port:
 		_telemetry.text += "\nКрен к порту %+.0f°" % rad_to_deg(sim.roll_error(sim.target))
 	elif near_surface:
-		if entry_frame:
-			_telemetry.text += " · Уклон %.0f°" % surface.slope
-		else:
-			var altitude := ("%.1f" % maxf(0.0, float(surface.altitude))).replace(".", ",")
-			_telemetry.text += "\nВысота %s м · уклон %.0f°" % [altitude, surface.slope]
+		if not _surface_panel.visible:
+			if entry_frame:
+				_telemetry.text += " · Уклон %.0f°" % surface.slope
+			else:
+				var altitude := ("%.1f" % maxf(0.0, float(surface.altitude))).replace(".", ",")
+				_telemetry.text += "\nВысота %s м · уклон %.0f°" % [altitude, surface.slope]
 		_actions["dock"].tooltip_text = str(surface.reason)
 	if _jumping:
 		_route.text = "Прыжок  /  %s" % Sector.system(sim.jump_target).name
@@ -791,6 +831,7 @@ func set_input_enabled(enabled: bool) -> void:
 	if not enabled:
 		_reset_controls()
 		_docking_panel.hide()
+		_surface_panel.hide()
 		_actions["dock_sync"].hide()
 	_refresh_disabled_actions()
 
