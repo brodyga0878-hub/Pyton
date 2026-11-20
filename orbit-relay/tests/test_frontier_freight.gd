@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture := preload("res://tests/flight_fixture.gd")
+
 const Flight := preload("res://scripts/flight_sim.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const Economy := preload("res://scripts/port_economy.gd")
@@ -197,6 +199,7 @@ func _test_legacy_migration(flight: Flight) -> void:
 	for version in [16, 17]:
 		var legacy := _json(flight.snapshot())
 		legacy.schema = version
+		Fixture.remove_ground_ports_from_legacy(legacy)
 		legacy.ship.erase("mining_laser")
 		legacy.ship.erase("fragment_collector")
 		legacy.ship.erase("hydrogen_scoop")
@@ -218,7 +221,7 @@ func _test_legacy_migration(flight: Flight) -> void:
 		legacy.market[str(HEATHER_PORT)].medical = 10.0
 		var resumed := Flight.new()
 		if not _expect(resumed.restore(legacy) and resumed.freight.frontier_active(HEATHER) and resumed.freight.frontier_active(LIMIT)
-			and _market_without_hydrogen(resumed) == legacy.market and resumed.freight.snapshot().frontier_epochs == [flight.orbit_time, flight.orbit_time]
+			and _legacy_market(resumed) == legacy.market and resumed.freight.snapshot().frontier_epochs == [flight.orbit_time, flight.orbit_time]
 			and is_equal_approx(_route(resumed, HEATHER_SHIP, SVOD).departure_eta, FIRST_LOAD),
 			"Schema %d upgrades its old six ships and adds both new services at the save epoch without transfers" % version):
 			continue
@@ -341,8 +344,10 @@ func _expect(condition: bool, description: String) -> bool:
 	return condition
 
 
-func _market_without_hydrogen(flight: Flight) -> Dictionary:
+func _legacy_market(flight: Flight) -> Dictionary:
 	var stocks := _json(flight.market.snapshot())
+	stocks.erase(str(Catalog.GROUND_PAD))
+	stocks.erase(str(Catalog.GROUND_HANGAR))
 	for inventory: Dictionary in stocks.values():
 		inventory.erase("hydrogen")
 	return stocks

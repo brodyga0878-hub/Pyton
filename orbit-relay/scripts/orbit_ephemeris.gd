@@ -3,6 +3,8 @@ extends RefCounted
 ## catalog, and a moving parent contributes both position and velocity.
 
 const Catalog = preload("res://scripts/sector_catalog.gd")
+const Ground = preload("res://scripts/ground_port.gd")
+const Terrain = preload("res://scripts/surface_terrain.gd")
 const GRAVITY_PARAMETERS := [8500.0, 8000.0, 7600.0, 8100.0, 7400.0]
 const ORBIT_SEGMENTS := 96
 
@@ -56,6 +58,11 @@ static var _tracks: Array[Track] = _build_tracks()
 static func sample(site_id: int, seconds: float) -> Dictionary:
 	if site_id < 0 or site_id >= _tracks.size():
 		return {"position": Vector3.ZERO, "velocity": Vector3.ZERO}
+	if Ground.is_port(site_id):
+		var host := Ground.body(site_id)
+		var surface := sample(host, seconds)
+		var offset := Ground.anchor_offset(site_id, seconds)
+		return {"position": surface.position + offset, "velocity": surface.velocity + Terrain.spin_velocity(host, offset)}
 	var track := _tracks[site_id]
 	if track.period <= 0.0:
 		return {"position": track.epoch, "velocity": Vector3.ZERO}
@@ -82,6 +89,8 @@ static func sample(site_id: int, seconds: float) -> Dictionary:
 
 
 static func orbit_parent(site_id: int) -> int:
+	if Ground.is_port(site_id):
+		return Ground.body(site_id)
 	return _tracks[site_id].parent if site_id >= 0 and site_id < _tracks.size() else -1
 
 
@@ -100,6 +109,8 @@ static func orbit_points(site_id: int, epoch := 0.0) -> PackedVector3Array:
 
 
 static func period(site_id: int) -> float:
+	if Ground.is_port(site_id):
+		return period(Ground.body(site_id))
 	return _tracks[site_id].period if site_id >= 0 and site_id < _tracks.size() else 0.0
 
 

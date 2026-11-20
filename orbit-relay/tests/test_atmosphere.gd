@@ -204,6 +204,7 @@ func _test_hot_saves() -> void:
 			"Malformed atmospheric heat is rejected without affecting the loaded state")
 	var previous := state.duplicate(true)
 	previous.schema = 13
+	Fixture.remove_ground_ports_from_legacy(previous)
 	previous.ship.erase("mining_laser")
 	previous.ship.erase("fragment_collector")
 	previous.ship.erase("hydrogen_scoop")

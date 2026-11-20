@@ -42,7 +42,7 @@ func _test_ephemerides() -> void:
 	var planet_mu := Dynamics.gravity_parameter(PLANET)
 	var separation: float = system.binary_separation
 	_expect(BINARY == Catalog.PRE_BINARY_SYSTEM_COUNT and PRIMARY == Catalog.PRE_BINARY_DESTINATION_COUNT
-		and Catalog.SYSTEM_COUNT == BINARY + 1 and Catalog.DESTINATION_COUNT == MOON + 1
+		and Catalog.SYSTEM_COUNT == BINARY + 1 and Catalog.PRE_GROUND_DESTINATION_COUNT == MOON + 1
 		and Catalog.stars_for(BINARY) == [PRIMARY, COMPANION]
 		and Catalog.star_for(BINARY) == PRIMARY and Catalog.ports_for(BINARY).is_empty()
 		and Catalog.targets_for(BINARY) == [PRIMARY, COMPANION, PLANET, MOON],
@@ -210,6 +210,7 @@ func _test_schema27() -> void:
 		return
 	var state := previous.snapshot()
 	state.schema = 27
+	Fixture.remove_ground_ports_from_legacy(state)
 	state.ship.erase("mining_laser")
 	state.ship.erase("fragment_collector")
 	state.ship.erase("hydrogen_scoop")

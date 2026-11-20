@@ -153,6 +153,7 @@ func _test_previous_berth() -> void:
 	var flight := Flight.new()
 	var legacy := flight.snapshot()
 	legacy.schema = 21
+	Fixture.remove_ground_ports_from_legacy(legacy)
 	legacy.ship.erase("mining_laser")
 	legacy.ship.erase("fragment_collector")
 	legacy.ship.erase("hydrogen_scoop")

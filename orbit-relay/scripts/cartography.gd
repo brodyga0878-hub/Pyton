@@ -128,7 +128,7 @@ func snapshot() -> Dictionary:
 	return {"scans": scans, "systems": systems}
 
 
-func restore(raw: Variant, epoch: float, pre_procedural := false, pre_binary := false) -> bool:
+func restore(raw: Variant, epoch: float, pre_procedural := false, pre_binary := false, pre_ground_ports := false) -> bool:
 	if not _valid_epoch(epoch, MAX_EPOCH) or not raw is Dictionary or raw.size() != (1 if pre_procedural else 2):
 		return false
 	var surveyed_systems: Dictionary[int, float] = {}
@@ -149,6 +149,8 @@ func restore(raw: Variant, epoch: float, pre_procedural := false, pre_binary := 
 	var site_limit := Catalog.PRE_BINARY_DESTINATION_COUNT if pre_binary else Catalog.DESTINATION_COUNT
 	if pre_procedural:
 		site_limit = Catalog.AUTHORED_DESTINATION_COUNT
+	elif not pre_binary and pre_ground_ports:
+		site_limit = Catalog.PRE_GROUND_DESTINATION_COUNT
 	if not scans is Array or scans.size() > site_limit:
 		return false
 	var restored: Dictionary[int, float] = {}

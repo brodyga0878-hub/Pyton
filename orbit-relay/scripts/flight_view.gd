@@ -7,6 +7,7 @@ const StarView = preload("res://scripts/star_view.gd")
 const TrafficView = preload("res://scripts/traffic_view.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const DockAccess = preload("res://scripts/dock_access.gd")
+const Ground = preload("res://scripts/ground_port.gd")
 const ShipSystems = preload("res://scripts/ship_systems.gd")
 const Terrain = preload("res://scripts/surface_terrain.gd")
 const AtmosphereView = preload("res://scripts/atmosphere_view.gd")
@@ -25,6 +26,8 @@ const FRAGMENT_FINISH := {
 }
 const BERTH_CAMERA_OFFSET := Vector3(8.4, 9.2, 24.0)
 const BERTH_CAMERA_FOCUS := Vector3(0.0, 0.0, -15.0)
+const GROUND_CAMERA_OFFSET := Vector3(8.4, -10.0, 21.0)
+const GROUND_CAMERA_FOCUS := Vector3(0.0, 0.0, -2.0)
 const DEPARTURE_CAMERA_BLEND_START := 16.0
 const DEPARTURE_CAMERA_BLEND_END := 32.0
 const GEAR_PAD_SIZE := Vector3(0.46, 0.32, 0.13)
@@ -288,8 +291,15 @@ func _load_sector(id: int) -> void:
 		var station := Node3D.new()
 		_sector.add_child(station)
 		_stations[site_id] = station
-		_build_station(station, site_id, site.accent)
-		_dock_hatches[site_id] = _build_dock_hatch(station)
+		if Ground.is_port(site_id):
+			var enclosed := Ground.is_hangar(site_id)
+			station.name = "GroundPort_%d" % site_id
+			_build_ground_port(station, enclosed, site.accent)
+			if enclosed:
+				_dock_hatches[site_id] = _build_dock_hatch(station, true)
+		else:
+			_build_station(station, site_id, site.accent)
+			_dock_hatches[site_id] = _build_dock_hatch(station)
 		var approach := Node3D.new()
 		_sector.add_child(approach)
 		_approaches[site_id] = approach
@@ -351,8 +361,11 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var landed := surface_id >= 0
 	var settled := docked or landed
 	var berth := int(sim.docked) if docked else surface_id
+	var ground_berth := docked and Ground.is_port(berth)
+	var body_attached := landed or ground_berth
 	var ship_orientation: Basis = sim.attitude()
-	var heading := Basis.IDENTITY if docked else ship_orientation
+	var heading := Basis.IDENTITY if docked and not ground_berth else ship_orientation
+	var epoch := float(sim.orbit_time)
 	var remote_rig: Dictionary = sim.remote_rig_status()
 	var rig_deployed := bool(remote_rig.active)
 	var rig_in_view := false
@@ -364,13 +377,15 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_departure_view_port = int(departure.port) if departure.phase == "transit" else -1
 	elif landed:
 		_departure_view_port = -1
+	elif Ground.is_port(_last_berth) and not Ground.is_hangar(_last_berth):
+		_departure_view_port = _last_berth
 	_ship.position = position_now
 	_ship.basis = ship_orientation
 	_sync_landing_gear(sim.gear_extension)
 	for site_id: int in _surface_views:
 		var body := _surface_views[site_id]
 		body.position = sim.target_position(site_id)
-		body.basis = Terrain.spin_basis(site_id, float(sim.orbit_time))
+		body.basis = Terrain.spin_basis(site_id, epoch)
 		var field_direction: Vector3 = sim.landing_direction if site_id == surface_id else Vector3.ZERO
 		if rig_in_view and site_id == int(remote_rig.site):
 			field_direction = remote_rig.direction
@@ -385,25 +400,33 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var camera_offset := BERTH_CAMERA_OFFSET if docked else Vector3(0.0, 3.4, 10.5)
 	var focal_offset := BERTH_CAMERA_FOCUS if docked else Vector3(0.0, 2.0, -30.0)
 	var up := heading.y
-	if landed:
+	if ground_berth:
+		camera_offset = GROUND_CAMERA_OFFSET
+		focal_offset = GROUND_CAMERA_FOCUS
+	elif landed:
 		camera_offset = Vector3(-8.4, -13.5, 12.5)
 		focal_offset = Vector3(2.8, 2.0, -3.2)
 		up = heading.z
 	var desired := position_now + heading * camera_offset
 	var chase_weight := 1.0
 	var departure_frame := Basis.IDENTITY
+	var ground_departure := Ground.is_port(_departure_view_port)
 	if _departure_view_port >= 0:
 		var axis: Vector3 = sim.station_axis(_departure_view_port)
-		var from_hatch: Vector3 = position_now - sim.dock_hatch_position(_departure_view_port)
+		var opening: Vector3 = sim.dock_hatch_position(_departure_view_port)
+		if ground_departure and not Ground.is_hangar(_departure_view_port):
+			opening = sim.docking_position(_departure_view_port)
+		var from_hatch := position_now - opening
 		var ahead := from_hatch.dot(axis)
 		if not docked and (ahead < 0.0 or ahead >= DEPARTURE_CAMERA_BLEND_END or from_hatch.slide(axis).length_squared() >= 576.0):
 			_departure_view_port = -1
 		else:
 			var up_axis := Vector3.RIGHT if absf(axis.dot(Vector3.UP)) > 0.95 else Vector3.UP
-			departure_frame = Basis.looking_at(-axis, up_axis)
+			departure_frame = Ground.basis(_departure_view_port, epoch) if ground_departure else Basis.looking_at(-axis, up_axis)
 			chase_weight = 0.0 if docked else smoothstep(DEPARTURE_CAMERA_BLEND_START, DEPARTURE_CAMERA_BLEND_END, ahead)
 			# The ordinary chase offset places the camera behind the ship, inside the hatch just after release.
-			desired = (position_now + departure_frame * BERTH_CAMERA_OFFSET).lerp(desired, chase_weight)
+			var departure_offset := GROUND_CAMERA_OFFSET if ground_departure else BERTH_CAMERA_OFFSET
+			desired = (position_now + departure_frame * departure_offset).lerp(desired, chase_weight)
 			var camera_rotation := departure_frame.get_rotation_quaternion().slerp(heading.get_rotation_quaternion(), chase_weight)
 			up = Basis(camera_rotation).y
 	var jump := delta <= 0.0 or not _last_position.is_finite()
@@ -412,7 +435,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var blend := 1.0 - exp(-delta * 14.0)
 	var camera_start := camera.position
 	if not jump and settled and berth == _last_berth:
-		if landed:
+		if body_attached:
 			var ground_turn := ship_orientation * _last_landed_basis.transposed()
 			camera_start = position_now + ground_turn * (camera_start - _last_position)
 			_camera_up = ground_turn * _camera_up
@@ -426,7 +449,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var focal_direction := heading * focal_offset
 	if chase_weight < 1.0:
 		var travel := float(departure.progress) if docked else 1.0
-		var dock_focus := BERTH_CAMERA_FOCUS.lerp(Vector3(0.0, 0.0, -7.5), travel)
+		var dock_focus := GROUND_CAMERA_FOCUS if ground_departure else BERTH_CAMERA_FOCUS.lerp(Vector3(0.0, 0.0, -7.5), travel)
 		focal_direction = (departure_frame * dock_focus).lerp(focal_direction, chase_weight)
 	var look_target := position_now + focal_direction
 	var sight := (look_target - camera.position).normalized()
@@ -454,22 +477,24 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_backdrop_material.set_shader_parameter("weather_phase", fposmod(float(sim.orbit_time), CLOUD_CYCLE_SECONDS) / CLOUD_CYCLE_SECONDS)
 	_last_position = position_now
 	_last_berth = berth
-	_last_landed_basis = ship_orientation if landed else Basis.IDENTITY
+	_last_landed_basis = ship_orientation if body_attached else Basis.IDENTITY
 
 	var guidance: Dictionary = sim.docking_guidance()
 	for site_id: int in _stations:
 		var operational: bool = sim.station_operational(site_id)
+		var ground := Ground.is_port(site_id)
 		var axis: Vector3 = sim.station_axis(site_id)
 		var up_axis := Vector3.RIGHT if absf(axis.dot(Vector3.UP)) > 0.95 else Vector3.UP
-		var station_frame := Basis.looking_at(-axis, up_axis) * Basis(Vector3.BACK, sim.station_angle(site_id))
-		_stations[site_id].visible = operational
-		_stations[site_id].position = sim.target_position(site_id)
-		_stations[site_id].basis = station_frame
+		var station_frame := Ground.basis(site_id, epoch) if ground else Basis.looking_at(-axis, up_axis) * Basis(Vector3.BACK, sim.station_angle(site_id))
 		var contact: Vector3 = sim.docking_position(site_id)
-		var hatch := _dock_hatches[site_id]
-		var hatch_position: Vector3 = sim.dock_hatch_position(site_id)
-		hatch.position = station_frame.transposed() * (hatch_position - _stations[site_id].position)
-		hatch.sync(sim.dock_access_status(site_id))
+		_stations[site_id].visible = operational
+		_stations[site_id].position = contact if ground else sim.target_position(site_id)
+		_stations[site_id].basis = station_frame
+		if _dock_hatches.has(site_id):
+			var hatch := _dock_hatches[site_id]
+			var hatch_position: Vector3 = sim.dock_hatch_position(site_id)
+			hatch.position = station_frame.transposed() * (hatch_position - _stations[site_id].position)
+			hatch.sync(sim.dock_access_status(site_id))
 		var corridor_length: float = (sim.target_gate(site_id) - contact).dot(axis)
 		_approaches[site_id].position = contact
 		_approaches[site_id].basis = station_frame.scaled_local(Vector3(1.0, 1.0, corridor_length))
@@ -1021,7 +1046,72 @@ func _build_dock_fittings(station: Node3D, ceramic: Material, graphite: Material
 	_box_batch(_fitting(station, 2), graphite, louvers)
 
 
-func _build_dock_hatch(station: Node3D) -> DockHatch:
+func _build_ground_port(ground: Node3D, enclosed: bool, accent: Color) -> void:
+	var alloy := _panel_finish(Color("#617282"), 0.40, 0.67, Vector2(4, 3))
+	var graphite := _panel_finish(Color("#394b58"), 0.28, 0.71, Vector2(4, 4))
+	var markers := _light(accent)
+	var deck_radius := Ground.DECK_RADIUS - (1.6 if enclosed else 0.3)
+	var deck := Ground.DECK_HEIGHT
+	_cylinder(ground, alloy, Vector3(0, 0, deck - 1.23), deck_radius, deck_radius - 0.65, 2.45, 8)
+	_cylinder(ground, graphite, Vector3(0, 0, deck - 0.04), deck_radius - 0.38, deck_radius - 0.38, 0.12, 8)
+	var lights: Array = []
+	var supports: Array = []
+	for step in range(8):
+		var angle := TAU * step / 8.0
+		var radial := Vector3(cos(angle), sin(angle), 0.0)
+		lights.append([radial * (deck_radius - 1.15) + Vector3(0, 0, deck + 0.065), Vector3(0.28, 1.28, 0.09), angle])
+		if not enclosed:
+			supports.append([radial * (deck_radius - 2.30) + Vector3(0, 0, -4.9), Vector3(3.30, 2.10, 6.20), angle])
+	if enclosed:
+		var roof_z := Ground.HANGAR_TOP - 0.48
+		_mesh(ground, _ground_hangar_shell(roof_z), alloy, Vector3.ZERO)
+		_ring(ground, graphite, Vector3(0, 0, roof_z + 0.04), 8.33, 0.21, 32)
+		for angle: float in [0.0, PI * 0.5, PI, PI * 1.5]:
+			var radial := Vector3(cos(angle), sin(angle), 0.0)
+			lights.append([radial * 9.86 + Vector3(0, 0, roof_z + 0.12), Vector3(0.36, 2.18, 0.08), angle])
+			lights.append([radial * 10.90 + Vector3(0, 0, roof_z - 1.41), Vector3(0.14, 1.62, 0.14), angle])
+	else:
+		# Landing marks leave a clear central patch for the ship and its gear.
+		var paint := _light(Color("#dcebe7"))
+		var deck_marks: Array = []
+		for side: float in [-1.0, 1.0]:
+			deck_marks.append([Vector3(side * 3.88, 0, deck + 0.05), Vector3(0.30, 5.80, 0.030)])
+			deck_marks.append([Vector3(0, side * 4.40, deck + 0.05), Vector3(3.35, 0.28, 0.030)])
+			for index in range(3):
+				var stripe := side * (4.6 + 0.42 * index)
+				deck_marks.append([Vector3(stripe, side * 5.50, deck + 0.05), Vector3(0.11, 1.25, 0.030), side * -0.5])
+			lights.append([Vector3(side * 5.12, -4.55, deck + 0.35), Vector3(0.44, 0.64, 0.60)])
+		_box_batch(ground, paint, deck_marks)
+	_box_batch(ground, alloy, supports)
+	_box_batch(ground, markers, lights)
+
+
+func _ground_hangar_shell(roof_z: float) -> ArrayMesh:
+	# The roof leaves the actual hatch aperture clear as the four leaves open.
+	var geometry := SurfaceTool.new()
+	geometry.begin(Mesh.PRIMITIVE_TRIANGLES)
+	const ROOF_SEGMENTS := 24
+	var rows := [
+		Vector2(Ground.HANGAR_APERTURE + 0.54, 0.0), Vector2(10.35, 0.0),
+		Vector2(Ground.DECK_RADIUS, -1.15), Vector2(Ground.DECK_RADIUS, -Ground.FOUNDATION_DEPTH - roof_z),
+	]
+	for index in range(ROOF_SEGMENTS):
+		var first := Vector2.from_angle(TAU * index / ROOF_SEGMENTS)
+		var next := Vector2.from_angle(TAU * (index + 1) / ROOF_SEGMENTS)
+		for row in range(rows.size() - 1):
+			var inner: Vector2 = rows[row]
+			var outer: Vector2 = rows[row + 1]
+			var a := Vector3(first.x * inner.x, first.y * inner.x, roof_z + inner.y)
+			var b := Vector3(next.x * inner.x, next.y * inner.x, roof_z + inner.y)
+			var c := Vector3(next.x * outer.x, next.y * outer.x, roof_z + outer.y)
+			var d := Vector3(first.x * outer.x, first.y * outer.x, roof_z + outer.y)
+			_facet(geometry, a, b, c, Vector2.ZERO, Vector2.RIGHT, Vector2.ONE)
+			_facet(geometry, a, c, d, Vector2.ZERO, Vector2.ONE, Vector2.DOWN)
+	geometry.index()
+	return geometry.commit()
+
+
+func _build_dock_hatch(station: Node3D, ground := false) -> DockHatch:
 	var hatch := DockHatch.new()
 	hatch.name = "DockHatch"
 	hatch.signal_paint = _light(Color("#f1876e"))
@@ -1036,7 +1126,8 @@ func _build_dock_hatch(station: Node3D) -> DockHatch:
 	for quarter in range(4):
 		var angle := PI * 0.25 + float(quarter) * PI * 0.5
 		var radial := Vector3(cos(angle), sin(angle), 0)
-		supports.append([radial * 5.6 + Vector3(0, 0, -6.0), Vector3(0.54, 0.48, 12.0), angle])
+		if not ground:
+			supports.append([radial * 5.6 + Vector3(0, 0, -6.0), Vector3(0.54, 0.48, 12.0), angle])
 		signals.append([radial * 5.42 + Vector3(0, 0, 0.68), Vector3(0.20, 0.78 if quarter == 0 else 0.51, 0.10), angle])
 		var holder := Node3D.new()
 		holder.rotation.z = angle

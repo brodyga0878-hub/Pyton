@@ -5,6 +5,7 @@ signal frame_requested()
 
 const MiningRig := preload("res://scripts/mining_rig.gd")
 const Sector := preload("res://scripts/sector_catalog.gd")
+const Ground := preload("res://scripts/ground_port.gd")
 const Patrol := preload("res://scripts/patrol_encounter.gd")
 const MissionCalendar := preload("res://scripts/mission_calendar.gd")
 const INK := Color("eef8ff")
@@ -406,32 +407,47 @@ func _sync_docking(status: Dictionary, automatic: bool) -> void:
 	var visible_approach := not status.is_empty() and bool(status.get("near", false))
 	_docking_panel.visible = visible_approach and _input_enabled
 	var access: Dictionary = status.get("access", {})
+	var ground := bool(status.get("ground", false))
+	var hangar := bool(status.get("ground_hangar", false))
 	var request: Button = _actions["dock_clearance"]
+	request.tooltip_text = "Запросить разрешение на посадку в ангар (F6)" if hangar else "Запросить разрешение на вход в выбранный док (F6)"
 	_dock_clearance_blocked = automatic or not access.get("request_available", false)
 	request.visible = _docking_panel.visible and not _dock_clearance_blocked
 	var button: Button = _actions["dock_sync"]
-	button.visible = visible_approach and not automatic and _input_enabled
+	button.visible = visible_approach and not ground and not automatic and _input_enabled
 	_dock_sync_blocked = not (status.get("sync_available", false) or status.get("sync_active", false))
 	if not visible_approach:
 		return
 	var ready := bool(status.ok)
 	var synced := bool(status.sync_active)
 	_docking_status.text = "Автоматическая швартовка" if automatic else "Ручная швартовка"
-	if ready:
+	if ground:
+		if not status.in_front:
+			_docking_status.text = "Заходите сверху"
+		elif ready:
+			_docking_status.text = "Можно садиться"
+		else:
+			_docking_status.text = "Посадка в ангар" if hangar else "Посадка на площадку"
+	elif ready:
 		_docking_status.text = "Можно швартоваться"
 	elif not status.in_front:
 		_docking_status.text = "Створ с обратной стороны"
 	_docking_status.add_theme_color_override("font_color", CYAN if ready else AMBER)
-	_docking_position.text = "По оси %.1f м · Вбок %.1f м" % [float(status.axis_distance), float(status.lateral_error)]
+	var axis_label := "Над палубой" if ground else "По оси"
+	_docking_position.text = "%s %.1f м · Вбок %.1f м" % [axis_label, float(status.axis_distance), float(status.lateral_error)]
 	_docking_position.add_theme_color_override("font_color", CYAN if status.position_ok else INK)
 	var closing_speed := float(status.closing_speed)
 	if absf(closing_speed) < 0.05:
 		closing_speed = 0.0
 	_docking_motion.text = "Сближение %+.1f · Отн. %.1f м/с" % [closing_speed, float(status.relative_speed)]
 	_docking_motion.add_theme_color_override("font_color", CYAN if status.speed_ok else AMBER)
-	_docking_roll.text = "Крен %+.1f° · Курс %.1f°%s" % [float(status.roll_error_deg), float(status.aim_error_deg), " · синхр." if synced else ""]
+	_docking_roll.text = "Отклонение от вертикали %.1f°" % float(status.aim_error_deg) if ground else "Крен %+.1f° · Курс %.1f°%s" % [float(status.roll_error_deg), float(status.aim_error_deg), " · синхр." if synced else ""]
 	_docking_roll.add_theme_color_override("font_color", CYAN if status.roll_ok and status.aim_ok else AMBER)
-	_docking_ready.text = "Створ %s · Скорость %s · Крен %s · Курс %s" % ["✓" if status.position_ok else "—", "✓" if status.speed_ok else "—", "✓" if status.roll_ok else "—", "✓" if status.aim_ok else "—"]
+	if ground:
+		_docking_ready.text = "Палуба %s · Скорость %s · Ориентация %s · Шасси %s" % ["✓" if status.position_ok else "—", "✓" if status.speed_ok else "—", "✓" if status.roll_ok and status.aim_ok else "—", "✓" if status.get("gear_ok", false) else "—"]
+	else:
+		_docking_ready.text = "Створ %s · Скорость %s · Крен %s · Курс %s" % ["✓" if status.position_ok else "—", "✓" if status.speed_ok else "—", "✓" if status.roll_ok else "—", "✓" if status.aim_ok else "—"]
+	_docking_access.visible = not ground or hangar
 	_docking_access.text = _dock_access_caption(access)
 	_docking_access.add_theme_color_override("font_color", CYAN if status.get("cleared", false) else AMBER)
 	_actions["dock"].tooltip_text = str(status.get("reason", ""))
@@ -629,14 +645,19 @@ func sync(sim: RefCounted, delta: float) -> void:
 			_actions["mine"].text = "Развернуть модуль"
 	var scoop_target: bool = sim.is_scoop_site(sim.target)
 	_actions["dock"].visible = parked or (not rendezvous_active and (Sector.is_port(sim.target) or Sector.is_mine_site(sim.target)))
-	_actions["dock"].text = "Швартовка" if Sector.is_port(sim.target) else "Посадка"
+	_actions["dock"].text = "Швартовка" if Sector.is_port(sim.target) and not Ground.is_port(sim.target) else "Посадка"
 	_actions["dock"].tooltip_text = ""
 	if parked:
-		_actions["dock"].text = "Взлёт" if landed else "Запросить выход"
+		var ground_pad := Ground.is_port(sim.docked) and not Ground.is_hangar(sim.docked)
+		_actions["dock"].text = "Взлёт" if landed or ground_pad else "Запросить взлёт" if Ground.is_hangar(sim.docked) else "Запросить выход"
 		if _lift_blocked:
 			_actions["dock"].tooltip_text = "Сначала верните модуль на борт"
 		elif _departure_active:
-			_actions["dock"].text = "Отменить выход" if _departure_can_cancel else "Автоматический выход"
+			var hangar := Ground.is_hangar(sim.docked)
+			if _departure_can_cancel:
+				_actions["dock"].text = "Отменить взлёт" if hangar else "Отменить выход"
+			else:
+				_actions["dock"].text = "Автоматический взлёт" if hangar else "Автоматический выход"
 			_actions["dock"].tooltip_text = str(departure.reason)
 		elif _departure_blocked:
 			_actions["dock"].text = "Нужен экипаж" if sim.ship.crew_required() > 0 else "Выход недоступен"
@@ -657,9 +678,11 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var manual_approach: bool = dock_approach and not sim.autopilot
 	var surface: Dictionary = sim.surface_status() if not parked and Sector.is_mine_site(sim.target) else {}
 	var gear: Dictionary = sim.gear_status()
-	_sync_docking(sim.docking_guidance() if dock_approach and Sector.is_port(sim.target) else {}, sim.autopilot)
+	var docking: Dictionary = sim.docking_guidance() if dock_approach and Sector.is_port(sim.target) else {}
+	_sync_docking(docking, sim.autopilot)
 	_sync_surface_guidance(surface if manual_approach and not sim.scooping else {}, gear)
-	_sync_gear(gear, not parked and not _jumping and (surface.get("near", false) or gear.progress > 0.0 or gear.deployed))
+	var ground_approach := bool(docking.get("ground", false)) and bool(docking.get("near", false))
+	_sync_gear(gear, not parked and not _jumping and (ground_approach or surface.get("near", false) or gear.progress > 0.0 or gear.deployed))
 	_sync_clock(sim)
 	_refresh_disabled_actions()
 	_sync_fuel(sim.ship)
@@ -789,12 +812,13 @@ func _sync_passengers(sim: RefCounted) -> void:
 		_passenger_route.text = "Пассажиры → %s · %d с" % [sim.target_name(status.destination), remaining]
 
 func _sync_departure(sim: RefCounted, departure: Dictionary) -> void:
-	_route.text = "Выход / %s" % sim.target_name(departure.port)
+	var hangar := Ground.is_hangar(departure.port)
+	_route.text = "%s / %s" % ["Взлёт" if hangar else "Выход", sim.target_name(departure.port)]
 	_route_detail.text = "После выхода → %s" % sim.target_name(sim.planned_target) if sim.planned_target >= 0 else ""
-	_telemetry.text = "Корабль у причала"
+	_telemetry.text = "Корабль в ангаре" if hangar else "Корабль у причала"
 	if departure.phase == "transit":
 		var speed: float = sim.speed_relative_to(departure.port)
-		_telemetry.text = "У дока · %s м/с" % ("%.1f" % speed).replace(".", ",")
+		_telemetry.text = "%s · %s м/с" % ["Подъём" if hangar else "У дока", ("%.1f" % speed).replace(".", ",")]
 	match departure.phase:
 		"opening":
 			_guidance.text = "Створ открывается · %d%%" % roundi(_operation_progress.value * 100.0)
@@ -923,7 +947,10 @@ func _sync_clock(sim: RefCounted) -> void:
 		button.tooltip_text = "Продолжите игру для смены скорости"
 
 func _sync_port(sim: RefCounted, sale_quote: int, itinerary: Dictionary, transfer: bool) -> void:
-	_route.text = "Порт  /  %s" % sim.target_name(sim.docked)
+	var berth := "Порт"
+	if Ground.is_port(sim.docked):
+		berth = "Ангар" if Ground.is_hangar(sim.docked) else "Площадка"
+	_route.text = "%s  /  %s" % [berth, sim.target_name(sim.docked)]
 	if sim.contract_stage == 1:
 		var destination: String = sim.target_name(sim.contract_destination)
 		_route_detail.text = "%s → %s" % [sim.contract_cargo(), destination]
@@ -1010,7 +1037,7 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 		var speed: float = frame.relative_speed
 		var speed_text := ("%.1f" % speed).replace(".", ",") if near_surface else "%d" % roundi(speed)
 		_telemetry.text = "Скорость %s м/с  ·  %s" % [speed_text, _telemetry.text]
-	if aimed_at_port:
+	if aimed_at_port and not Ground.is_port(sim.target):
 		_telemetry.text += "\nКрен к порту %+.0f°" % rad_to_deg(sim.roll_error(sim.target))
 	elif near_surface:
 		if not _surface_panel.visible:
@@ -1060,7 +1087,7 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 	elif aimed_at_port and meters < 210.0:
 		var status: Dictionary = sim.selected_dock_status()
 		if status.get("ok", false):
-			_guidance.text = "Порт готов к швартовке."
+			_guidance.text = "Можно садиться." if Ground.is_port(sim.target) else "Порт готов к швартовке."
 		else:
 			_guidance.text = str(status.get("reason", ""))
 	elif patrol.get("phase") in [Patrol.OUTBOUND, Patrol.RETURN] and _actions["patrol"].visible:

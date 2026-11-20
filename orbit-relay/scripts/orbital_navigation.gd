@@ -5,6 +5,7 @@ const Catalog = preload("res://scripts/sector_catalog.gd")
 const Dynamics = preload("res://scripts/orbital_dynamics.gd")
 const Orbit = preload("res://scripts/orbit_ephemeris.gd")
 const Terrain = preload("res://scripts/surface_terrain.gd")
+const Ground = preload("res://scripts/ground_port.gd")
 const Atmosphere = preload("res://scripts/atmosphere.gd")
 const MAX_FORECAST_SECONDS := 240.0
 const FORECAST_STEP := 0.25
@@ -129,7 +130,7 @@ static func forecast(sim: RefCounted, horizon := 180.0, focus_id := -1) -> Dicti
 		var midpoint := position + velocity * (delta * 0.5)
 		velocity = Atmosphere.drag_at_epoch(system, midpoint, velocity, epoch + time - delta * 0.5, delta)
 		var next := position + velocity * delta
-		var contact := _swept_contact(blockers, previous_centers, future_centers, position, next, epoch + time - delta)
+		var contact := _swept_contact(blockers, previous_centers, future_centers, position, next, epoch + time - delta, delta)
 		if contact.id >= 0:
 			var impact_position := position.lerp(next, contact.fraction)
 			var impact_time: float = time - delta + contact.fraction * delta
@@ -187,13 +188,22 @@ static func _centers_at(blockers: Array[Dictionary], epoch: float) -> PackedVect
 
 
 static func _swept_contact(blockers: Array[Dictionary], before: PackedVector3Array, after: PackedVector3Array,
-		from: Vector3, to: Vector3, epoch: float) -> Dictionary:
+		from: Vector3, to: Vector3, epoch: float, delta: float) -> Dictionary:
 	var nearest := 2.0
 	var body := -1
 	for index in range(blockers.size()):
 		var blocker := blockers[index]
 		var start := from - before[index]
 		var end := to - after[index]
+		if Ground.is_port(blocker.id):
+			if _sphere_entry(start / 15.0, end / 15.0) >= 0.0:
+				var local_start := Ground.basis(blocker.id, epoch).transposed() * start
+				var local_end := Ground.basis(blocker.id, epoch + delta).transposed() * end
+				var entry := Ground.hull_entry(blocker.id, local_start, local_end)
+				if entry >= 0.0 and entry < nearest:
+					nearest = entry
+					body = blocker.id
+			continue
 		var axes: Vector3 = blocker.axes
 		var fraction := _sphere_entry(start / axes, end / axes)
 		if fraction < 0.0:

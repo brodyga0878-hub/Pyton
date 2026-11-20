@@ -168,6 +168,7 @@ func _test_previous_save() -> void:
 		return
 	var old := previous.snapshot()
 	old.schema = 26
+	Fixture.remove_ground_ports_from_legacy(old)
 	old.ship.erase("mining_laser")
 	old.ship.erase("fragment_collector")
 	old.ship.erase("hydrogen_scoop")

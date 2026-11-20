@@ -81,6 +81,7 @@ func _earn_outfitting() -> Flight:
 
 
 func _buy_modules(flight: Flight) -> bool:
+	var hull := flight.ship.hull
 	for offer: Dictionary in [{"id": "combat_shield", "price": 120}, {"id": "combat_ecm", "price": 90},
 			{"id": "combat_focus", "price": 170}]:
 		var balance := flight.credits
@@ -91,7 +92,7 @@ func _buy_modules(flight: Flight) -> bool:
 	var installed := flight.combat_equipment_status()
 	return _expect(flight.credits == 70 and installed.focus_owned and installed.shield_fitted and installed.ecm_fitted
 		and flight.combat_status().shield == 36.0 and flight.combat_status().shield_max == 36.0
-		and installed.weapon == "focus" and not flight.service_offer("combat_repair").allowed,
+		and installed.weapon == "focus" and flight.ship.hull == hull and not flight.service_offer("combat_repair").allowed,
 		"All three purchases apply without healing or repair charges and select the acquired laser")
 
 
@@ -171,7 +172,8 @@ func _test_active_projectile(flight: Flight) -> void:
 		"The second hostile beam launches a physical projectile"):
 		return
 	var incoming := flight.combat_status()
-	_expect(incoming.shield == 24.0 and flight.ship.hull == initial_hull and incoming.visible
+	_expect(flight.status_event == "combat_missile" and incoming.shield == 24.0
+		and flight.ship.hull == initial_hull and incoming.visible
 		and incoming.projectile_distance > 0.0 and is_equal_approx(incoming.velocity.length(), 64.0)
 		and not flight.time_status().allowed,
 		"Missile launch preserves the second shield hit, missile velocity and the time-acceleration restriction")
@@ -271,10 +273,11 @@ func _test_invalid_states(active: Dictionary) -> void:
 	var unmatched_clock := active.duplicate(true)
 	unmatched_clock.combat.projectile.expires = float(active.orbit_time) - 1.0
 	_expect(not Flight.new().restore(unmatched_clock), "An already expired projectile cannot be restored")
-	var valid_parked := Flight.new().snapshot()
+	var parked := Flight.new()
+	parked.update(float(active.orbit_time), Vector2.ZERO, 0.0, false, false)
+	var valid_parked := parked.snapshot()
+	_expect(Flight.new().restore(valid_parked), "An undamaged docked checkpoint is otherwise valid at the same epoch")
 	valid_parked.combat = active.combat.duplicate(true)
-	valid_parked.orbit_time = active.orbit_time
-	valid_parked.elapsed = active.elapsed
 	_expect(not Flight.new().restore(valid_parked), "A parked ship cannot restore an active hostile projectile")
 
 

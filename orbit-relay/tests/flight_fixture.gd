@@ -1,5 +1,6 @@
 extends RefCounted
 
+const Catalog := preload("res://scripts/sector_catalog.gd")
 const STEP := 1.0 / 60.0
 
 
@@ -24,3 +25,9 @@ static func await_departure(flight: RefCounted, maximum := 15.0, tick := Callabl
 
 static func depart(flight: RefCounted) -> bool:
 	return flight.docked >= 0 and flight.dock_action() and await_departure(flight)
+
+
+static func remove_ground_ports_from_legacy(state: Dictionary) -> void:
+	state.mining.reserves.resize(Catalog.PRE_GROUND_DESTINATION_COUNT)
+	state.market.erase(str(Catalog.GROUND_PAD))
+	state.market.erase(str(Catalog.GROUND_HANGAR))

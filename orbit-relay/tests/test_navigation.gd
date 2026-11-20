@@ -183,6 +183,7 @@ func _test_saves() -> void:
 	legacy.velocity = Vector3(2.0, -4.0, -12.0)
 	var previous := _json(legacy.snapshot())
 	previous.schema = 12
+	Fixture.remove_ground_ports_from_legacy(previous)
 	previous.ship.erase("mining_laser")
 	previous.ship.erase("fragment_collector")
 	previous.ship.erase("hydrogen_scoop")

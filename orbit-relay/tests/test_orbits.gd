@@ -338,6 +338,7 @@ func _parked(site: int, epoch := EPOCH) -> Flight:
 		state.landed_site = site
 		state.landing_direction = [0.0, 0.0, 1.0]
 		state.mining.site_id = site
+	if Catalog.is_mine_site(site) or site in [Catalog.GROUND_PAD, Catalog.GROUND_HANGAR]:
 		state.gear_extension = 1.0
 		state.gear_deployed = true
 	if not flight.restore(state):

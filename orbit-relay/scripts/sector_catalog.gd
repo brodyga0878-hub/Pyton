@@ -30,7 +30,11 @@ const BINARY_PRIMARY := PRE_BINARY_DESTINATION_COUNT
 const BINARY_SECONDARY := BINARY_PRIMARY + 1
 const BINARY_PLANET := BINARY_SECONDARY + 1
 const BINARY_MOON := BINARY_PLANET + 1
-const DESTINATION_COUNT := BINARY_MOON + 1
+const PRE_GROUND_DESTINATION_COUNT := BINARY_MOON + 1
+const GROUND_PAD := PRE_GROUND_DESTINATION_COUNT
+const GROUND_HANGAR := GROUND_PAD + 1
+const DESTINATION_COUNT := GROUND_HANGAR + 1
+const GROUND_BODY := 12
 const VELAR_STAR_ID := 14
 const TERRACE_ID := PRE_SURFACE_DESTINATION_COUNT
 const FRINGE_ARRIVAL_PORT := PRE_TRAFFIC_DESTINATION_COUNT
@@ -68,8 +72,9 @@ const SYSTEMS := [
 	},
 	{
 		"name": "Велар", "position": Vector2(3.6, -2.2), "accent": Color("#9dcaff"),
-		"description": "Голубая звезда, два порта, ледяная луна, залежи кристаллов и скальная планета «Терраса».",
-		"arrival_port": 10, "targets": [10, 11, 12, 13, VELAR_STAR_ID, TERRACE_ID], "ports": [10, 11],
+		"description": "Голубая звезда, два орбитальных порта, площадка и ангар на Лазури, залежи кристаллов и скальная планета «Терраса».",
+		"arrival_port": 10, "targets": [10, 11, 12, 13, VELAR_STAR_ID, TERRACE_ID, GROUND_PAD, GROUND_HANGAR],
+		"ports": [10, 11, GROUND_PAD, GROUND_HANGAR],
 		"mines": [12, 13, TERRACE_ID], "star": VELAR_STAR_ID, "stellar_heat": 1.16,
 	},
 	{
@@ -129,6 +134,14 @@ const SITES := [
 	{"name": "Предел", "kind": "star", "center": Vector3(2320, 265, -1775), "radius": 220.0, "pad_offset": 310.0, "gate_offset": 470.0, "accent": Color("#ddbfff")},
 	{"name": "Янтарь", "kind": "gas", "center": Vector3(-2380, -680, -3970), "radius": 460.0, "pad_offset": 505.0, "gate_offset": 650.0, "accent": Color("#efb082")},
 ]
+const GROUND_SITES := [
+	{"name": "Откос", "kind": "port", "port_class": "surface_pad", "ground_body": GROUND_BODY,
+		"ground_direction": Vector3(0.75, 0.10, 0.65), "center": Vector3(697.772583, -84.920189, -812.896179),
+		"radius": 12.0, "pad_offset": 0.0, "gate_offset": 66.0, "spin": 0.0, "angle": 0.0, "accent": Color("#ffc279")},
+	{"name": "Шлюз Лазури", "kind": "port", "port_class": "surface_hangar", "ground_body": GROUND_BODY,
+		"ground_direction": Vector3(-0.75, -0.10, 0.65), "center": Vector3(541.722168, -104.914070, -811.454041),
+		"radius": 12.0, "pad_offset": 0.0, "gate_offset": 66.0, "spin": 0.0, "angle": 0.0, "accent": Color("#78e5d2")},
+]
 const PORT_PRICES := {
 	0: {"ore": 20, "crystal": 38, "ice": 14},
 	1: {"ore": 20, "crystal": 30, "ice": 27},
@@ -139,10 +152,13 @@ const PORT_PRICES := {
 	FRINGE_SECOND_PORT: {"ore": 35, "crystal": 36, "ice": 19},
 	HEATHER_PORT: {"ore": 38, "crystal": 49, "ice": 16},
 	LIMIT_PORT: {"ore": 35, "crystal": 32, "ice": 41},
+	GROUND_PAD: {"ore": 25, "crystal": 38, "ice": 19},
+	GROUND_HANGAR: {"ore": 34, "crystal": 43, "ice": 27},
 }
 const FUEL_PRICES := {
 	0: 2, 1: 3, 3: 1, 10: 2, 11: 3, FRINGE_ARRIVAL_PORT: 2, FRINGE_SECOND_PORT: 1,
 	HEATHER_PORT: 3, LIMIT_PORT: 4,
+	GROUND_PAD: 2, GROUND_HANGAR: 3,
 }
 const ROUTES := {
 	0: {1: ["Регуляторы охлаждения", 240], 3: ["Катушки связи", 340]},
@@ -154,6 +170,8 @@ const ROUTES := {
 	FRINGE_SECOND_PORT: {FRINGE_ARRIVAL_PORT: ["Запасные гироскопы", 260]},
 	HEATHER_PORT: {FRINGE_ARRIVAL_PORT: ["Геологические пробы", 540]},
 	LIMIT_PORT: {FRINGE_SECOND_PORT: ["Сводка дальнего наблюдения", 680]},
+	GROUND_PAD: {10: ["Ледяные керны", 295], GROUND_HANGAR: ["Фильтры компрессоров", 180]},
+	GROUND_HANGAR: {10: ["Пломбы для кассет", 315], GROUND_PAD: ["Запасные опоры", 170]},
 }
 
 static var _generated := ProceduralSystems.build(AUTHORED_DESTINATION_COUNT)
@@ -162,6 +180,8 @@ static var _generated := ProceduralSystems.build(AUTHORED_DESTINATION_COUNT)
 static func site(id: int) -> Dictionary:
 	if id < 0 or id >= DESTINATION_COUNT:
 		return {}
+	if id >= PRE_GROUND_DESTINATION_COUNT:
+		return GROUND_SITES[id - GROUND_PAD]
 	if id < AUTHORED_DESTINATION_COUNT:
 		return SITES[id]
 	return _generated.sites[id - AUTHORED_DESTINATION_COUNT]
@@ -195,6 +215,8 @@ static func sector_coordinates(id: int) -> Vector2i:
 static func system_of_site(id: int) -> int:
 	if id < 0 or id >= DESTINATION_COUNT:
 		return -1
+	if id >= PRE_GROUND_DESTINATION_COUNT:
+		return VELAR_SYSTEM
 	if id >= PRE_BINARY_DESTINATION_COUNT:
 		return BINARY_SYSTEM
 	if id >= AUTHORED_DESTINATION_COUNT:

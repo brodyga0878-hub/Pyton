@@ -78,6 +78,7 @@ func _test_offers_and_migration(campaign: Dictionary) -> void:
 		"An order must be booked at an operational dock")
 	var old := _json(campaign)
 	old.schema = 11
+	Fixture.remove_ground_ports_from_legacy(old)
 	old.ship.erase("mining_laser")
 	old.ship.erase("fragment_collector")
 	old.ship.erase("hydrogen_scoop")

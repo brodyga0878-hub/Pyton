@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture := preload("res://tests/flight_fixture.gd")
+
 const Flight := preload("res://scripts/flight_sim.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const Economy := preload("res://scripts/port_economy.gd")
@@ -185,6 +187,7 @@ func _test_interval_and_migration() -> void:
 	_set_stock(historical, 0, "circuits", 37)
 	var old := _json(historical.snapshot())
 	old.schema = 15
+	Fixture.remove_ground_ports_from_legacy(old)
 	old.ship.erase("mining_laser")
 	old.ship.erase("fragment_collector")
 	old.ship.erase("hydrogen_scoop")
@@ -201,12 +204,12 @@ func _test_interval_and_migration() -> void:
 	old.orbit_time = 1234.25
 	old.elapsed = 1234.25
 	old.erase("freight")
-	if not _expect(historical.restore(old) and _market_without_hydrogen(historical) == old.market
+	if not _expect(historical.restore(old) and _legacy_market(historical) == old.market
 		and historical.orbit_time == 1234.25 and is_equal_approx(_service(historical, HOME, 0).departure_eta, FIRST_DEPARTURE),
 		"Migrating an older save preserves its market and schedules new deliveries from the saved epoch"):
 		return
 	_tick(historical, FIRST_DEPARTURE - 0.25)
-	_expect(_market_without_hydrogen(historical) == old.market and not _service(historical, HOME, 0).in_transit,
+	_expect(_legacy_market(historical) == old.market and not _service(historical, HOME, 0).in_transit,
 		"Migrated time does not retroactively replay old transactions")
 	_tick(historical, 0.5)
 	_expect(historical.market.stock(0, "circuits") == 37 - NpcFreight.CAPACITY and _service(historical, HOME, 0).in_transit,
@@ -369,8 +372,10 @@ func _expect(condition: bool, description: String) -> bool:
 	return condition
 
 
-func _market_without_hydrogen(flight: Flight) -> Dictionary:
+func _legacy_market(flight: Flight) -> Dictionary:
 	var stocks := _json(flight.market.snapshot())
+	stocks.erase(str(Catalog.GROUND_PAD))
+	stocks.erase(str(Catalog.GROUND_HANGAR))
 	for inventory: Dictionary in stocks.values():
 		inventory.erase("hydrogen")
 	return stocks

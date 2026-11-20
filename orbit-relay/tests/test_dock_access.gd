@@ -175,6 +175,7 @@ func _test_save_and_reload() -> void:
 	_set_axial_pose(resumed, ALTERNATE_PORT, Access.HATCH_AXIS_OFFSET - 0.04, 8.0)
 	var legacy := _json(resumed.snapshot())
 	legacy.schema = 20
+	Fixture.remove_ground_ports_from_legacy(legacy)
 	legacy.ship.erase("mining_laser")
 	legacy.ship.erase("fragment_collector")
 	legacy.ship.erase("hydrogen_scoop")

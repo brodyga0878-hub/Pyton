@@ -188,6 +188,7 @@ func _test_save_guards() -> void:
 		"A saved route cannot reveal or use an undiscovered frontier")
 	var older := encoded.duplicate(true)
 	older.schema = 16
+	Fixture.remove_ground_ports_from_legacy(older)
 	older.ship.erase("mining_laser")
 	older.ship.erase("fragment_collector")
 	older.ship.erase("hydrogen_scoop")

@@ -9,6 +9,7 @@ signal frame_selected(selection: int)
 signal dismissed()
 
 const Sector := preload("res://scripts/sector_catalog.gd")
+const Ground := preload("res://scripts/ground_port.gd")
 const Atmosphere := preload("res://scripts/atmosphere.gd")
 const Expedition := preload("res://scripts/expedition.gd")
 const Orbit := preload("res://scripts/orbit_ephemeris.gd")
@@ -506,6 +507,8 @@ func _select_site(id: int) -> void:
 	_detail_title.text = str(entry.name)
 	var distance := _distance_label(_flight.position.distance_to(_chart.centers[id]))
 	var category := str(Sector.kind_name(entry.kind))
+	if Ground.is_port(id):
+		category = "%s · %s" % ["Ангар" if Ground.is_hangar(id) else "Открытая площадка", Sector.site(Ground.body(id)).name]
 	var here := id == _current_site()
 	_detail.text = "%s · текущая стоянка" % category if here else "%s · %s (3D)" % [category, distance]
 	if entry.kind == "port":
@@ -663,7 +666,7 @@ func _refresh_rendezvous() -> void:
 	_rendezvous_action.text = "Отменить сближение" if active else "Начать сближение"
 	_rendezvous_action.disabled = not active and (not supported or not status.allowed)
 	_rendezvous_finish.visible = active and status.can_finish
-	_rendezvous_finish.text = "Передать на стыковку" if Sector.is_port(site) else "Передать на посадку"
+	_rendezvous_finish.text = "Передать на стыковку" if Sector.is_port(site) and not Ground.is_port(site) else "Передать на посадку"
 	_chart.queue_redraw()
 
 
@@ -1169,7 +1172,12 @@ class SectorChart extends Control:
 				draw_arc(marker, 17, 0, TAU, 32, MINT, 1.2, true)
 			if selected_site == id:
 				draw_arc(marker, 23, 0, TAU, 32, Color("f5ca8d"), 1.7, true)
-			if entry.kind == "port":
+			if Ground.is_port(id):
+				var deck := Rect2(marker - Vector2(7, 6), Vector2(14, 12))
+				var enclosed := Ground.is_hangar(id)
+				draw_rect(deck, tint, enclosed, -1.0 if enclosed else 1.8, not enclosed)
+				draw_line(marker - Vector2(2.5, 0.0), marker + Vector2(2.5, 0.0), CHART_BACKGROUND if enclosed else tint, 1.5, true)
+			elif entry.kind == "port":
 				draw_rect(Rect2(marker - Vector2(7, 7), Vector2(14, 14)), tint)
 			elif entry.kind == "star":
 				draw_circle(marker, 7.0, tint, true, -1.0, true)

@@ -198,6 +198,7 @@ func _test_previous_schema() -> void:
 		return
 	var historic := flight.snapshot()
 	historic.schema = 25
+	Fixture.remove_ground_ports_from_legacy(historic)
 	historic.ship.erase("mining_laser")
 	historic.ship.erase("fragment_collector")
 	historic.ship.erase("hydrogen_scoop")

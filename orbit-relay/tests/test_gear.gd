@@ -184,6 +184,7 @@ func _align_with_pad(flight: Flight) -> void:
 func _legacy(snapshot: Dictionary) -> Dictionary:
 	var older := snapshot.duplicate(true)
 	older.schema = 18
+	Fixture.remove_ground_ports_from_legacy(older)
 	older.ship.erase("mining_laser")
 	older.ship.erase("fragment_collector")
 	older.ship.erase("hydrogen_scoop")

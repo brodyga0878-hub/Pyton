@@ -145,6 +145,7 @@ func _test_change_of_authority() -> void:
 func _test_previous_schema() -> void:
 	var old := Flight.new().snapshot()
 	old.schema = 30
+	Fixture.remove_ground_ports_from_legacy(old)
 	old.ship.erase("mining_laser")
 	old.ship.erase("fragment_collector")
 	old.ship.erase("hydrogen_scoop")

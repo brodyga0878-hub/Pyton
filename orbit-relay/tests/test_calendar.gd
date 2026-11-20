@@ -258,6 +258,7 @@ func _test_migration() -> void:
 	_tick_until(previous, MIDNIGHT - 0.25)
 	var historical := previous.snapshot()
 	historical.schema = 34
+	Fixture.remove_ground_ports_from_legacy(historical)
 	historical.erase("time_paused")
 	historical.ship.erase("range_drive")
 	historical.ship.erase("drive_kind")

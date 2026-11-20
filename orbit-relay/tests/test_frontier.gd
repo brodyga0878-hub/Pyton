@@ -70,7 +70,7 @@ func _test_previous_save() -> void:
 		and flight.contract_route_id == "outer_relay" and flight.contract_leg == 1
 		and flight.mining.cargo_amount("circuits") == 10 and flight.mining.reserve_at(18) == 180
 		and flight.market.stock(16, "ore") == 20, "Migration preserves the courier, purchases, deposits and ship")
-	_expect(latest.schema == Flight.SAVE_SCHEMA and latest.market.size() == 9
+	_expect(latest.schema == Flight.SAVE_SCHEMA and latest.market.size() == 11
 		and latest.mining.reserves.size() == Catalog.DESTINATION_COUNT
 		and flight.mining.reserve_at(Catalog.HEATHER_PLANET) == int(Catalog.site(Catalog.HEATHER_PLANET).reserve),
 		"Migration initializes the new markets and deposits")
@@ -326,6 +326,7 @@ func _test_convoys(remote: Flight, conflict: Dictionary, saved: Dictionary) -> v
 		"The combat round incorporates the net supplies that physically arrived")
 	var legacy := saved.duplicate(true)
 	legacy.schema = 10
+	Fixture.remove_ground_ports_from_legacy(legacy)
 	legacy.ship.erase("mining_laser")
 	legacy.ship.erase("fragment_collector")
 	legacy.ship.erase("hydrogen_scoop")

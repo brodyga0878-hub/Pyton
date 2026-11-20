@@ -371,6 +371,8 @@ func _at_port(port: int) -> Flight:
 	state.system_id = Catalog.system_of_site(port)
 	state.docked = port
 	state.target = port
+	state.gear_deployed = port in [Catalog.GROUND_PAD, Catalog.GROUND_HANGAR]
+	state.gear_extension = 1.0 if state.gear_deployed else 0.0
 	_expect(flight.restore(state), "Initialize a physically docked ship at port %d" % port)
 	return flight
 

@@ -133,6 +133,7 @@ func _test_migration() -> void:
 			"A malformed equipment flag is rejected without mutating the restored flight")
 	var previous := saved.duplicate(true)
 	previous.schema = 14
+	Fixture.remove_ground_ports_from_legacy(previous)
 	previous.ship.erase("mining_laser")
 	previous.ship.erase("fragment_collector")
 	previous.ship.erase("hydrogen_scoop")

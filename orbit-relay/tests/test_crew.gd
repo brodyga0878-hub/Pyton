@@ -207,6 +207,7 @@ func _test_previous_schema() -> void:
 		return
 	var previous := flight.snapshot()
 	previous.schema = 23
+	Fixture.remove_ground_ports_from_legacy(previous)
 	previous.ship.erase("mining_laser")
 	previous.ship.erase("fragment_collector")
 	previous.ship.erase("hydrogen_scoop")

@@ -19,6 +19,8 @@ const BUY_PRICES := {
 	Catalog.FRINGE_SECOND_PORT: {"ore": 41, "crystal": 40, "ice": 24, "circuits": 37, "medical": 61, HYDROGEN: 15},
 	Catalog.HEATHER_PORT: {"ore": 45, "crystal": 56, "ice": 21, "circuits": 64, "medical": 78, HYDROGEN: 30},
 	Catalog.LIMIT_PORT: {"ore": 42, "crystal": 39, "ice": 48, "circuits": 73, "medical": 86, HYDROGEN: 37},
+	Catalog.GROUND_PAD: {"ore": 29, "crystal": 46, "ice": 23, "circuits": 57, "medical": 66, HYDROGEN: 19},
+	Catalog.GROUND_HANGAR: {"ore": 39, "crystal": 49, "ice": 32, "circuits": 39, "medical": 57, HYDROGEN: 24},
 }
 
 const SUPPLY_SELL_PRICES := {
@@ -31,11 +33,14 @@ const SUPPLY_SELL_PRICES := {
 	Catalog.FRINGE_SECOND_PORT: {"circuits": 32, "medical": 52, HYDROGEN: 11},
 	Catalog.HEATHER_PORT: {"circuits": 56, "medical": 68, HYDROGEN: 25},
 	Catalog.LIMIT_PORT: {"circuits": 63, "medical": 75, HYDROGEN: 31},
+	Catalog.GROUND_PAD: {"circuits": 50, "medical": 56, HYDROGEN: 15},
+	Catalog.GROUND_HANGAR: {"circuits": 34, "medical": 49, HYDROGEN: 19},
 }
 
 const REPAIR_PRICES := {
 	0: 2, 1: 3, 3: 2, 10: 3, 11: 2, Catalog.FRINGE_ARRIVAL_PORT: 3, Catalog.FRINGE_SECOND_PORT: 2,
 	Catalog.HEATHER_PORT: 4, Catalog.LIMIT_PORT: 4,
+	Catalog.GROUND_PAD: 3, Catalog.GROUND_HANGAR: 2,
 }
 
 const INITIAL_STOCKS := {
@@ -48,6 +53,8 @@ const INITIAL_STOCKS := {
 	"17": {"ore": 17, "crystal": 42, "ice": 36, "circuits": 43, "medical": 25, HYDROGEN: 40},
 	"20": {"ore": 23, "crystal": 19, "ice": 58, "circuits": 14, "medical": 10, HYDROGEN: 16},
 	"24": {"ore": 21, "crystal": 54, "ice": 13, "circuits": 12, "medical": 8, HYDROGEN: 12},
+	"87": {"ore": 62, "crystal": 16, "ice": 39, "circuits": 12, "medical": 18, HYDROGEN: 45},
+	"88": {"ore": 19, "crystal": 22, "ice": 12, "circuits": 46, "medical": 26, HYDROGEN: 30},
 }
 
 const COURIERS := {
@@ -90,6 +97,14 @@ const COURIERS := {
 		"id": "limit_telemetry", "origin": Catalog.LIMIT_PORT,
 		"stops": [Catalog.FRINGE_SECOND_PORT, 10, 11], "reward": 1440,
 		"title": "Архив Предела", "cargo": "Записи дальнего наблюдения",
+	},
+	"slope_samples": {
+		"id": "slope_samples", "origin": Catalog.GROUND_PAD, "stops": [11, 10], "reward": 690,
+		"title": "Сверка проб Лазури", "cargo": "Контрольные кассеты",
+	},
+	"lazur_workshop": {
+		"id": "lazur_workshop", "origin": Catalog.GROUND_HANGAR, "stops": [Catalog.GROUND_PAD, 10], "reward": 650,
+		"title": "Посылка из мастерской", "cargo": "Сменные клапаны",
 	},
 }
 
@@ -168,12 +183,15 @@ func snapshot() -> Dictionary:
 	return _stocks.duplicate(true)
 
 
-func restore(value: Variant, legacy := false, pre_expansion := false, pre_hydrogen := false) -> bool:
+func restore(value: Variant, legacy := false, pre_expansion := false, pre_hydrogen := false,
+		pre_ground_ports := false) -> bool:
 	var cutoff := Catalog.DESTINATION_COUNT
 	if legacy:
 		cutoff = Catalog.PRE_TRAFFIC_DESTINATION_COUNT
 	elif pre_expansion:
 		cutoff = Catalog.PRE_EXPANSION_DESTINATION_COUNT
+	elif pre_ground_ports:
+		cutoff = Catalog.PRE_GROUND_DESTINATION_COUNT
 	if not value is Dictionary:
 		return false
 	var restored := INITIAL_STOCKS.duplicate(true)
