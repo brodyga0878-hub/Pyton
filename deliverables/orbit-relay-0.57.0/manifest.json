@@ -1,0 +1,177 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.57.0",
+  "source_commit": "9349a98fc812e3eab8fac05637c9b38013db88fc",
+  "content": {
+    "save_schema": 18,
+    "interstellar_colony_shuttles": 2,
+    "linked_to_station_commissioning": true,
+    "legacy_colony_schedules_start_at_saved_epoch": true
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 82,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.56.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 36,
+    "tested_on_device": false
+  },
+  "checks": {
+    "android_report_share": {
+      "failures": 0,
+      "checks": 76
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "docking": {
+      "failures": 0,
+      "checks": 72
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 132
+    },
+    "flight": {
+      "failures": 0
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "frontier_freight": {
+      "failures": 0,
+      "checks": 33
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 72
+    },
+    "galactic_routes": {
+      "failures": 0,
+      "checks": 59
+    },
+    "heat_shield": {
+      "failures": 0,
+      "checks": 28
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 186
+    },
+    "living": {
+      "failures": 0,
+      "checks": 76
+    },
+    "material_maps": {
+      "failures": 0,
+      "checks": 33
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "npc_freight": {
+      "failures": 0,
+      "checks": 43
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 292
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 80
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "report": {
+      "failures": 0,
+      "checks": 28
+    },
+    "scene": {
+      "failures": 0
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 191
+    },
+    "colony_freight_model_stress": {
+      "checks": 1824,
+      "failures": 0
+    },
+    "interstellar_contact_paths": {
+      "checks": 1224,
+      "failures": 0,
+      "min_sampled_clearance_m": 117.53,
+      "max_velocity_finite_difference_error_mps": 0.222
+    },
+    "desktop_colony_freighters": {
+      "checks": 29,
+      "frames": 3,
+      "failures": 0
+    },
+    "desktop_colony_supply": {
+      "checks": 44,
+      "frames": 4,
+      "failures": 0
+    },
+    "legacy_campaign_0_56_to_0_57": {
+      "checks": 22,
+      "failures": 0
+    },
+    "android_manifest_repair": {
+      "checks": 11,
+      "failures": 0
+    }
+  },
+  "files": {
+    "OrbitRelay-0.57.0-arm64.apk": {
+      "bytes": 28572359,
+      "sha256": "83cd597447328acbfbc791019cf87fddf30dacd53be745b52b92497512dba43e"
+    },
+    "OrbitRelay-0.57.0-source.zip": {
+      "bytes": 2085015,
+      "sha256": "d0396c3eb31089e0e19871c0e45e6ae712a0c1218325d7e189e79fef5da96b87"
+    },
+    "colony-delivered.png": {
+      "bytes": 94006,
+      "sha256": "3189042a5501ec635ab687698e64bc89c620aa3bd29266ad2b820c2a7fcc744a"
+    },
+    "colony-freighter.png": {
+      "bytes": 191766,
+      "sha256": "f7ea74829075f193c163d5ff5674ff4aacb40b9ef9739aadc4082d3fe64b189a"
+    },
+    "colony-supply.png": {
+      "bytes": 95231,
+      "sha256": "9d4d6f6ac647d4e922e4d385c3b322c5e535e9475cf308b1b2915cab65a20028"
+    }
+  }
+}
