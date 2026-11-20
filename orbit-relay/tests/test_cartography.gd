@@ -200,6 +200,9 @@ func _test_previous_schema() -> void:
 	historic.schema = 25
 	historic.ship.erase("mining_laser")
 	historic.ship.erase("fragment_collector")
+	historic.ship.erase("hydrogen_scoop")
+	historic.ship.erase("fuel_pump")
+	historic.ship.erase("pump_mode")
 	historic.mining.reserves.resize(Catalog.AUTHORED_DESTINATION_COUNT)
 	historic.erase("cartography")
 	var cold := Flight.new()

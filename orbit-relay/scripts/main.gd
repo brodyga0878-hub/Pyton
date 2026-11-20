@@ -68,6 +68,8 @@ func _ready() -> void:
 	_services.build()
 	_services.service_requested.connect(_service_purchase)
 	_services.transfer_requested.connect(_fuel_transfer)
+	_services.fuel_module_removed.connect(_remove_fuel_module)
+	_services.pump_mode_requested.connect(_set_pump_mode)
 	_services.jettison_requested.connect(_jettison_cargo)
 	_services.crew_requested.connect(_crew_action)
 	_services.ship_exchange_requested.connect(_ship_exchange)
@@ -371,6 +373,7 @@ func _deliver_notice() -> void:
 		"remote_rig_deployed", "remote_rig_unloaded", "remote_rig_retrieved", "remote_rig_route", "service_refuel", "service_tank", "service_eco",
 		"scoop_full", "scoop_stop", "star_arrival", "gas_arrival", "fuel_empty", "thermal_damage",
 		"fuel_transfer", "service_jump_refuel", "cargo_jettisoned",
+		"fuel_pump_mode", "fuel_pump_transfer", "fuel_module_removed", "service_hydrogen_scoop", "service_fuel_pump",
 		"atmosphere_enter", "atmosphere_exit", "atmosphere_damage",
 		"gear_deploy", "gear_retract", "gear_ready", "gear_stowed",
 		"service_heat_shield", "service_mining_laser", "service_fragment_collector",
@@ -701,6 +704,24 @@ func _service_purchase(action: String) -> void:
 	if not _services.is_open():
 		return
 	flight.service_action(action)
+	_deliver_notice()
+	_services.refresh()
+	_update_display(0.0)
+
+
+func _remove_fuel_module(module: String) -> void:
+	if not _services.is_open():
+		return
+	flight.remove_fuel_module(module)
+	_deliver_notice()
+	_services.refresh()
+	_update_display(0.0)
+
+
+func _set_pump_mode(mode: String) -> void:
+	if not _services.is_open():
+		return
+	flight.set_fuel_pump_mode(mode)
 	_deliver_notice()
 	_services.refresh()
 	_update_display(0.0)

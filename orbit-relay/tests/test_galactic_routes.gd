@@ -190,6 +190,9 @@ func _test_save_guards() -> void:
 	older.schema = 16
 	older.ship.erase("mining_laser")
 	older.ship.erase("fragment_collector")
+	older.ship.erase("hydrogen_scoop")
+	older.ship.erase("fuel_pump")
+	older.ship.erase("pump_mode")
 	older.ship.erase("hull_id")
 	older.ship.fuel = older.ship.jump_fuel
 	older.ship.erase("jump_fuel")

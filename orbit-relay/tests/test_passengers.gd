@@ -194,6 +194,9 @@ func _test_previous_schema() -> void:
 	previous.schema = 22
 	previous.ship.erase("mining_laser")
 	previous.ship.erase("fragment_collector")
+	previous.ship.erase("hydrogen_scoop")
+	previous.ship.erase("fuel_pump")
+	previous.ship.erase("pump_mode")
 	previous.mining.reserves.resize(Catalog.AUTHORED_DESTINATION_COUNT)
 	previous.ship.erase("hull_id")
 	previous.erase("passengers")

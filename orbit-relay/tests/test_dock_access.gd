@@ -177,6 +177,9 @@ func _test_save_and_reload() -> void:
 	legacy.schema = 20
 	legacy.ship.erase("mining_laser")
 	legacy.ship.erase("fragment_collector")
+	legacy.ship.erase("hydrogen_scoop")
+	legacy.ship.erase("fuel_pump")
+	legacy.ship.erase("pump_mode")
 	legacy.mining.reserves.resize(Catalog.AUTHORED_DESTINATION_COUNT)
 	legacy.ship.erase("hull_id")
 	legacy.erase("dock_access")

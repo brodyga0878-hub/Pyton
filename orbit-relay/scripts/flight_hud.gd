@@ -50,6 +50,7 @@ var _condition: Label
 var _fuel: Label
 var _fuel_level: ProgressBar
 var _jump_fuel: Label
+var _pump_mode: Label
 var _thermal_panel: VBoxContainer
 var _entry_readout: Label
 var _thermal_label: Label
@@ -180,6 +181,8 @@ func build() -> void:
 	_fuel_level.add_theme_stylebox_override("fill", _box(CYAN, CYAN, 4, 0.0))
 	instrument_stack.add_child(_fuel_level)
 	_jump_fuel = _label(instrument_stack, 16, CYAN)
+	_pump_mode = _label(instrument_stack, 15, CYAN)
+	_pump_mode.hide()
 	_thermal_panel = VBoxContainer.new()
 	_thermal_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_thermal_panel.add_theme_constant_override("separation", 3)
@@ -732,6 +735,10 @@ func _sync_fuel(ship: RefCounted) -> void:
 	var jump_color := AMBER if ship.jump_fuel <= 0.0 else CYAN
 	if _jump_fuel.get_theme_color("font_color") != jump_color:
 		_jump_fuel.add_theme_color_override("font_color", jump_color)
+	var pump_mode := str(ship.pump_mode)
+	_pump_mode.visible = ship.fuel_pump and pump_mode != "off"
+	if _pump_mode.visible:
+		_pump_mode.text = "Автоперекачка · реактивный бак" if pump_mode == "reaction" else "Автоперекачка · прыжковый бак"
 
 func _sync_condition(hull: float, cargo: int, capacity: int) -> void:
 	_condition.text = "Корпус %d%% · Трюм %d / %d ед." % [roundi(hull), cargo, capacity]
@@ -989,7 +996,7 @@ func _frame_caption(frame: Dictionary) -> String:
 func _scoop_hint(status: Dictionary) -> String:
 	if status.ok:
 		return "Зона сбора водорода · свободно %d мест" % int(status.free)
-	if status.near:
+	if status.near or not status.get("installed", true):
 		return str(status.reason)
 	if status.kind == "gas":
 		var radius := float(status.distance) - float(status.altitude)

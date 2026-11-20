@@ -10,6 +10,14 @@ const CARGO_COST := 300
 const HEAT_SHIELD_COST := 340
 const MINING_LASER_COST := 140
 const FRAGMENT_COLLECTOR_COST := 90
+const SCOOP_COST := 150
+const SCOOP_RESALE := 75
+const FUEL_PUMP_COST := 110
+const FUEL_PUMP_RESALE := 55
+const PUMP_OFF := "off"
+const PUMP_REACTION := "reaction"
+const PUMP_JUMP := "jump"
+const PUMP_MODES := [PUMP_OFF, PUMP_REACTION, PUMP_JUMP]
 const HEAT_SHIELD_REDUCTION := 48
 const BASE_CARGO_CAPACITY := 24
 const EXPANDED_CARGO_CAPACITY := 40
@@ -33,8 +41,10 @@ const PRE_SHIELD_SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded", "hull"
 const PRE_DUAL_FUEL_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded", "heat_shield"]
 const PRE_SHIPYARD_FIELDS := ["fuel", "jump_fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded", "heat_shield"]
 const PRE_ORBITAL_MINING_FIELDS := ["hull_id", "fuel", "jump_fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded", "heat_shield"]
-const SAVE_FIELDS := ["hull_id", "fuel", "jump_fuel", "tank_upgraded", "eco_upgraded", "hull",
+const PRE_FUEL_EQUIPMENT_FIELDS := ["hull_id", "fuel", "jump_fuel", "tank_upgraded", "eco_upgraded", "hull",
 	"cargo_upgraded", "heat_shield", "mining_laser", "fragment_collector"]
+const SAVE_FIELDS := ["hull_id", "fuel", "jump_fuel", "tank_upgraded", "eco_upgraded", "hull",
+	"cargo_upgraded", "heat_shield", "mining_laser", "fragment_collector", "hydrogen_scoop", "fuel_pump", "pump_mode"]
 
 var fuel: float = BASE_CAPACITY
 var jump_fuel: float = BASE_CAPACITY
@@ -45,6 +55,9 @@ var cargo_upgraded := false
 var heat_shield := false
 var mining_laser := false
 var fragment_collector := false
+var hydrogen_scoop := true
+var fuel_pump := false
+var pump_mode := PUMP_OFF
 var hull_id: String:
 	get:
 		return _hull_id
@@ -198,6 +211,12 @@ func service_offer(action: String, unit_price: int, credits: int) -> Dictionary:
 		"fragment_collector":
 			cost = FRAGMENT_COLLECTOR_COST
 			installed = fragment_collector
+		"hydrogen_scoop":
+			cost = SCOOP_COST
+			installed = hydrogen_scoop
+		"fuel_pump":
+			cost = FUEL_PUMP_COST
+			installed = fuel_pump
 	return {"cost": cost, "allowed": cost > 0 and cost <= credits and not installed, "installed": installed}
 
 
@@ -224,7 +243,29 @@ func buy(action: String, unit_price: int, credits: int) -> int:
 			mining_laser = true
 		"fragment_collector":
 			fragment_collector = true
+		"hydrogen_scoop":
+			hydrogen_scoop = true
+		"fuel_pump":
+			fuel_pump = true
 	return offer.cost
+
+
+func remove_fuel_module(module: String) -> int:
+	if module == "hydrogen_scoop" and hydrogen_scoop:
+		hydrogen_scoop = false
+		return SCOOP_RESALE
+	if module == "fuel_pump" and fuel_pump:
+		fuel_pump = false
+		pump_mode = PUMP_OFF
+		return FUEL_PUMP_RESALE
+	return 0
+
+
+func set_pump_mode(mode: String) -> bool:
+	if not fuel_pump or mode not in PUMP_MODES:
+		return false
+	pump_mode = mode
+	return true
 
 
 func snapshot() -> Dictionary:
@@ -234,11 +275,12 @@ func snapshot() -> Dictionary:
 		"tank_upgraded": tank_upgraded, "eco_upgraded": eco_upgraded,
 		"hull": hull, "cargo_upgraded": cargo_upgraded, "heat_shield": heat_shield,
 		"mining_laser": mining_laser, "fragment_collector": fragment_collector,
+		"hydrogen_scoop": hydrogen_scoop, "fuel_pump": fuel_pump, "pump_mode": pump_mode,
 	}
 
 
 func restore(value: Variant, legacy := false, pre_shield := false, pre_dual_fuel := false,
-		pre_shipyard := false, pre_orbital_mining := false) -> bool:
+		pre_shipyard := false, pre_orbital_mining := false, pre_fuel_equipment := false) -> bool:
 	var fields := SAVE_FIELDS
 	if legacy:
 		fields = LEGACY_SAVE_FIELDS
@@ -250,6 +292,8 @@ func restore(value: Variant, legacy := false, pre_shield := false, pre_dual_fuel
 		fields = PRE_SHIPYARD_FIELDS
 	elif pre_orbital_mining:
 		fields = PRE_ORBITAL_MINING_FIELDS
+	elif pre_fuel_equipment:
+		fields = PRE_FUEL_EQUIPMENT_FIELDS
 	if not value is Dictionary or value.size() != fields.size() or not value.has_all(fields):
 		return false
 	var restored_hull_id := STARTER_HULL
@@ -261,7 +305,11 @@ func restore(value: Variant, legacy := false, pre_shield := false, pre_dual_fuel
 		return false
 	if not (legacy or pre_shield) and not value.heat_shield is bool:
 		return false
-	if fields == SAVE_FIELDS and (not value.mining_laser is bool or not value.fragment_collector is bool):
+	if "mining_laser" in fields and (not value.mining_laser is bool or not value.fragment_collector is bool):
+		return false
+	if fields == SAVE_FIELDS and (not value.hydrogen_scoop is bool or not value.fuel_pump is bool
+			or not value.pump_mode is String or value.pump_mode not in PUMP_MODES
+			or (not value.fuel_pump and value.pump_mode != PUMP_OFF)):
 		return false
 	if not (value.fuel is float or value.fuel is int):
 		return false
@@ -295,4 +343,7 @@ func restore(value: Variant, legacy := false, pre_shield := false, pre_dual_fuel
 	heat_shield = false if legacy or pre_shield else value.heat_shield
 	mining_laser = value.get("mining_laser", false)
 	fragment_collector = value.get("fragment_collector", false)
+	hydrogen_scoop = value.get("hydrogen_scoop", true)
+	fuel_pump = value.get("fuel_pump", false)
+	pump_mode = value.get("pump_mode", PUMP_OFF)
 	return true

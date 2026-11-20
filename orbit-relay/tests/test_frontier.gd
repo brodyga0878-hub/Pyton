@@ -328,6 +328,9 @@ func _test_convoys(remote: Flight, conflict: Dictionary, saved: Dictionary) -> v
 	legacy.schema = 10
 	legacy.ship.erase("mining_laser")
 	legacy.ship.erase("fragment_collector")
+	legacy.ship.erase("hydrogen_scoop")
+	legacy.ship.erase("fuel_pump")
+	legacy.ship.erase("pump_mode")
 	legacy.ship.erase("hull_id")
 	legacy.ship.erase("jump_fuel")
 	legacy.mining.cargo.erase("hydrogen")

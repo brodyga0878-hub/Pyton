@@ -194,6 +194,9 @@ func _test_handoffs_and_save() -> void:
 	earlier.schema = 15
 	earlier.ship.erase("mining_laser")
 	earlier.ship.erase("fragment_collector")
+	earlier.ship.erase("hydrogen_scoop")
+	earlier.ship.erase("fuel_pump")
+	earlier.ship.erase("pump_mode")
 	earlier.ship.erase("hull_id")
 	earlier.ship.erase("jump_fuel")
 	earlier.mining.cargo.erase("hydrogen")

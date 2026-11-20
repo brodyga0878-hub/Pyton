@@ -26,13 +26,14 @@ const FlightFrame = preload("res://scripts/flight_frame.gd")
 const Customs = preload("res://scripts/customs.gd")
 const UnattendedMining = preload("res://scripts/unattended_mining.gd")
 const OrbitalMining = preload("res://scripts/orbital_mining.gd")
-const SAVE_SCHEMA := 33
+const SAVE_SCHEMA := 34
 const REMOTE_RIG_ACCESS_DISTANCE := 20.0
 const MINING_PULSE_RANGE := 200.0
 const MINING_PULSE_FUEL := 0.4
 const MINING_BEAM_DURATION := 0.24
 const FRAGMENT_COLLECT_RANGE := 145.0
 const FRAGMENT_COLLECT_SPEED := 7.0
+const FUEL_PUMP_THRESHOLD := 0.35
 const SHIPYARD_PORTS := [0, 10, Catalog.FRINGE_ARRIVAL_PORT]
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
@@ -2082,7 +2083,61 @@ func service_action(action: String) -> bool:
 			_announce("service_mining_laser", "Горный лазер установлен. Списано %d кр." % paid)
 		"fragment_collector":
 			_announce("service_fragment_collector", "Сборщик обломков установлен. Списано %d кр." % paid)
+		"hydrogen_scoop":
+			_announce("service_hydrogen_scoop", "Сборщик водорода установлен. Списано %d кр." % paid)
+		"fuel_pump":
+			_announce("service_fuel_pump", "Топливный насос установлен. Списано %d кр." % paid)
 	return true
+
+
+func fuel_equipment_status() -> Dictionary:
+	return {
+		"scoop": ship.hydrogen_scoop, "pump": ship.fuel_pump, "mode": ship.pump_mode,
+		"station": station_services_available(),
+		"can_set_mode": ship.fuel_pump and not _departure_requested and not scooping and jump_seconds_left <= 0.0,
+		"scoop_resale": ShipSystems.SCOOP_RESALE, "pump_resale": ShipSystems.FUEL_PUMP_RESALE,
+		"canisters": mining.cargo_amount(Economy.HYDROGEN),
+	}
+
+
+func remove_fuel_module(module: String) -> bool:
+	if not station_services_available():
+		return false
+	var refund := ship.remove_fuel_module(module)
+	if refund <= 0:
+		return false
+	credits += refund
+	var name := "Сборщик водорода" if module == "hydrogen_scoop" else "Топливный насос"
+	_announce("fuel_module_removed", "%s снят. Получено %d кр." % [name, refund])
+	return true
+
+
+func set_fuel_pump_mode(mode: String) -> bool:
+	if not fuel_equipment_status().can_set_mode or ship.pump_mode == mode or not ship.set_pump_mode(mode):
+		return false
+	var label := "Реактивный бак" if mode == ShipSystems.PUMP_REACTION else "Прыжковый запас"
+	_announce("fuel_pump_mode", "Автоперелив выключен." if mode == ShipSystems.PUMP_OFF else "Автоперелив · %s." % label)
+	return true
+
+
+func _advance_fuel_pump(previous_epoch: float) -> void:
+	if not ship.fuel_pump or ship.pump_mode == ShipSystems.PUMP_OFF or scooping or mining.phase != MiningRig.STOWED:
+		return
+	# The simulated clock is the timer, so loading cannot repeat a passed second.
+	if floori(previous_epoch + 0.000001) >= floori(orbit_time + 0.000001):
+		return
+	var reaction := ship.pump_mode == ShipSystems.PUMP_REACTION
+	var capacity := ship.capacity() if reaction else ship.jump_capacity()
+	var fuel := ship.fuel if reaction else ship.jump_fuel
+	var threshold := capacity * FUEL_PUMP_THRESHOLD
+	if not reaction and jump_target >= 0:
+		threshold = maxf(threshold, Catalog.jump_cost(system_id, jump_target))
+	var units := ShipSystems.HYDROGEN_UNITS_PER_CANISTER
+	if fuel >= threshold or capacity - fuel < units:
+		return
+	if _transfer_hydrogen(ship.pump_mode, 1, units) > 0.0:
+		var tank := "реактивный бак" if reaction else "прыжковый запас"
+		_announce("fuel_pump_transfer", "Насос перелил одну канистру в %s." % tank)
 
 
 func fuel_transfer_offer(destination: String) -> Dictionary:
@@ -2107,12 +2162,23 @@ func fuel_transfer_offer(destination: String) -> Dictionary:
 
 func fuel_transfer(destination: String) -> bool:
 	var offer := fuel_transfer_offer(destination)
-	if not offer.ok or not mining.remove_cargo(Economy.HYDROGEN, offer.canisters):
+	if not offer.ok:
 		return false
-	var amount := ship.add_fuel(offer.added) if destination == "reaction" else ship.add_jump_fuel(offer.added)
+	var amount := _transfer_hydrogen(destination, int(offer.canisters), float(offer.added))
+	if amount <= 0.0:
+		return false
 	var circuit := "Реактивный бак" if destination == "reaction" else "Прыжковый запас"
-	_announce("fuel_transfer", "%s: пополнено %.1f ед. из трюма." % [circuit, amount])
+	_announce("fuel_transfer", "%s пополнен на %.1f ед. из трюма." % [circuit, amount])
 	return true
+
+
+func _transfer_hydrogen(destination: String, canisters: int, units: float) -> float:
+	if not mining.remove_cargo(Economy.HYDROGEN, canisters):
+		return 0.0
+	var added := ship.add_fuel(units) if destination == ShipSystems.PUMP_REACTION else ship.add_jump_fuel(units)
+	if added <= 0.0:
+		mining.insert_cargo(Economy.HYDROGEN, canisters)
+	return added
 
 
 func fuel_cargo_options() -> Array[Dictionary]:
@@ -2170,6 +2236,8 @@ func scoop_status() -> Dictionary:
 		reason = "Сбор доступен в полёте у звезды или газового гиганта"
 	elif jump_seconds_left > 0.0:
 		reason = "Идёт зарядка прыжкового привода"
+	elif not ship.hydrogen_scoop:
+		reason = "Установите сборщик водорода в порту"
 	elif distance < inner:
 		reason = "Поднимитесь в верхний слой атмосферы" if gas else "Отойдите от звезды до зоны сбора"
 	elif distance > outer:
@@ -2182,7 +2250,7 @@ func scoop_status() -> Dictionary:
 		reason = "Трюм заполнен. Для сбора нужна свободная ячейка"
 	return {
 		"ok": reason.is_empty(), "reason": "Можно собирать водород" if reason.is_empty() else reason,
-		"near": near, "body": body, "kind": "gas" if gas else "star", "distance": distance, "altitude": distance - radius,
+		"near": near, "installed": ship.hydrogen_scoop, "body": body, "kind": "gas" if gas else "star", "distance": distance, "altitude": distance - radius,
 		"inner": inner, "outer": outer, "max_speed": max_speed, "relative_speed": speed,
 		"progress": _scoop_progress, "scooping": scooping, "free": free,
 		"cargo_units": mining.cargo_amount(Economy.HYDROGEN),
@@ -2782,6 +2850,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		throttle = 0.0
 		set_autopilot(false)
 	_update_star_heat(delta)
+	_advance_fuel_pump(previous_orbit_time)
 	_collect_fuel(delta)
 	_apply_patrol_result(patrol.step(self, delta))
 	_apply_convoy_result(convoy_order.step(self, delta))
@@ -3124,7 +3193,8 @@ func _autopilot_step(delta: float) -> void:
 	if _approach_committed and scoop_run and displacement.length() < 2.0 and speed_relative_to(target) < 3.0:
 		set_autopilot(false)
 		throttle = 0.0
-		_announce("gas_arrival" if gas_run else "star_arrival", "Корабль в зоне сбора «%s». Можно включить сбор водорода." % target_name(target))
+		var next_step := "Можно включить сбор водорода." if ship.hydrogen_scoop else "Сборщик водорода не установлен."
+		_announce("gas_arrival" if gas_run else "star_arrival", "Корабль в зоне сбора «%s». %s" % [target_name(target), next_step])
 	elif _approach_committed and not scoop_run:
 		var status := selected_dock_status()
 		if status.ok and (mining_site or (status.range <= DOCK_AUTO_DISTANCE and status.relative_speed <= DOCK_AUTO_SPEED)):
@@ -3335,6 +3405,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_fuel_equipment := schema < 34
 	var pre_orbital_mining := schema < 33
 	var pre_remote_rig := schema < 32
 	var pre_customs := schema < 31
@@ -3524,7 +3595,7 @@ func restore(state: Dictionary) -> bool:
 	var restored_patrol := Patrol.new()
 	var restored_landing := -1
 	var restored_plan := -1
-	if not pre_fuel and not restored_ship.restore(state.get("ship"), pre_economy, pre_heat_shield, pre_dual_fuel, pre_shipyard, pre_orbital_mining):
+	if not pre_fuel and not restored_ship.restore(state.get("ship"), pre_economy, pre_heat_shield, pre_dual_fuel, pre_shipyard, pre_orbital_mining, pre_fuel_equipment):
 		return false
 	var restored_route: Array[int] = []
 	if not pre_jump_route:

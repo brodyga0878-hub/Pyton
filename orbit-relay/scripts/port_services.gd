@@ -6,6 +6,8 @@ signal jettison_requested(good: String)
 signal crew_requested(action: String, member: int)
 signal ship_exchange_requested(hull: String)
 signal customs_payment_requested()
+signal fuel_module_removed(module: String)
+signal pump_mode_requested(mode: String)
 signal dismissed()
 
 const TEXT := Color("e8f4fa")
@@ -17,7 +19,9 @@ const ShipSystems := preload("res://scripts/ship_systems.gd")
 const Crew := preload("res://scripts/crew.gd")
 const Economy := preload("res://scripts/port_economy.gd")
 const Factions := preload("res://scripts/faction_fronts.gd")
-const MINING_SERVICES := ["mining_laser", "fragment_collector"]
+const EQUIPMENT_SERVICES := ["mining_laser", "fragment_collector", "hydrogen_scoop", "fuel_pump"]
+const FUEL_MODULES := {"hydrogen_scoop": "scoop", "fuel_pump": "pump"}
+const PUMP_MODES := {"off": "Выкл.", "reaction": "В реактивный", "jump": "В прыжковый"}
 
 enum StationPage { SERVICES, CREW, YARD, CUSTOMS, MINING }
 
@@ -61,9 +65,12 @@ var _customs_receipt: Label
 var _customs_other_debts: Label
 var _mining: VBoxContainer
 var _mining_toggle: Button
+var _fuel_remove_buttons: Dictionary[String, Button] = {}
 var _station_page := StationPage.SERVICES
 var _transfers: VBoxContainer
 var _hydrogen: Label
+var _pump_controls: VBoxContainer
+var _pump_buttons: Dictionary[String, Button] = {}
 var _close_button: Button
 var _action_buttons: Dictionary[String, Button] = {}
 var _transfer_buttons: Dictionary[String, Button] = {}
@@ -156,10 +163,13 @@ func build() -> void:
 	content.add_child(_mining)
 	_add_service("mining_laser", "Горный лазер", "Откалывает сырьё от астероидов в полёте", _mining)
 	_add_service("fragment_collector", "Сборщик обломков", "Переносит обломок в свободную ячейку трюма", _mining)
+	_add_fuel_module("hydrogen_scoop", "Сборщик водорода", "Наполняет канистры у звёзд и газовых гигантов")
+	_add_fuel_module("fuel_pump", "Топливный насос", "Переливает канистры в выбранный бак")
 	_transfers = VBoxContainer.new()
 	_transfers.add_theme_constant_override("separation", 8)
 	content.add_child(_transfers)
 	_hydrogen = _label(_transfers, "", 19, TEXT)
+	_build_pump_controls()
 	_add_transfer("reaction", "В реактивный бак")
 	_add_transfer("jump", "В прыжковый запас")
 	_build_discard_row()
@@ -212,7 +222,7 @@ func refresh() -> void:
 			StationPage.CREW: _refresh_crew()
 			StationPage.YARD: _refresh_yard()
 			StationPage.CUSTOMS: _refresh_customs()
-			StationPage.MINING: _refresh_service_buttons(MINING_SERVICES)
+			StationPage.MINING: _refresh_equipment()
 			_: _refresh_services()
 
 
@@ -225,7 +235,18 @@ func _refresh_services() -> void:
 		_cargo_detail.text = "Ёмкость %d ед." % int(profile.expanded_cargo)
 	else:
 		_cargo_detail.text = "Ёмкость %d → %d ед." % [int(profile.cargo), int(profile.expanded_cargo)]
-	_refresh_service_buttons(_action_buttons.keys().filter(func(action: String) -> bool: return action not in MINING_SERVICES))
+	_refresh_service_buttons(_action_buttons.keys().filter(func(action: String) -> bool: return action not in EQUIPMENT_SERVICES))
+
+
+func _refresh_equipment() -> void:
+	_refresh_service_buttons(EQUIPMENT_SERVICES)
+	var status: Dictionary = _sim.fuel_equipment_status()
+	for module: String in _fuel_remove_buttons:
+		var key: String = FUEL_MODULES[module]
+		var button := _fuel_remove_buttons[module]
+		button.visible = bool(status[key])
+		button.disabled = not status.station
+		button.text = "Снять · +%d кр." % int(status[key + "_resale"])
 
 
 func _refresh_service_buttons(actions: Array) -> void:
@@ -264,14 +285,14 @@ func _show_page() -> void:
 	elif customs_open:
 		_title.text = "Таможня"
 	elif mining_open:
-		_title.text = "Горное оснащение"
+		_title.text = "Оснащение корабля"
 	_crew_toggle.text = "Сервис" if crew_open else "Экипаж"
 	_crew_toggle.visible = not _fuel_only
 	_yard_toggle.text = "Сервис" if yard_open else "Верфь"
 	_yard_toggle.visible = not _fuel_only and _sim.shipyard_available()
 	_customs_toggle.text = "Сервис" if customs_open else "Таможня"
 	_customs_toggle.visible = not _fuel_only
-	_mining_toggle.text = "Сервис" if mining_open else "Добыча"
+	_mining_toggle.text = "Сервис" if mining_open else "Оснащение"
 	_mining_toggle.visible = not _fuel_only
 	_port_details.visible = not _fuel_only
 	_gauges.visible = not (crew_open or yard_open or customs_open or mining_open)
@@ -594,6 +615,15 @@ func _refresh_transfers() -> void:
 	_hydrogen.text = "Канистры водорода: %d · до %d ед. топлива из каждой" % [
 		hold.cargo_amount("hydrogen"), ShipSystems.HYDROGEN_UNITS_PER_CANISTER,
 	]
+	var equipment: Dictionary = _sim.fuel_equipment_status()
+	_pump_controls.visible = equipment.pump
+	if equipment.pump:
+		for mode: String in _pump_buttons:
+			var button := _pump_buttons[mode]
+			var selected: bool = mode == equipment.mode
+			button.set_pressed_no_signal(selected)
+			button.disabled = selected or not equipment.can_set_mode
+			button.add_theme_color_override("font_disabled_color", MINT if selected else MUTED)
 	for destination: String in _transfer_buttons:
 		var offer: Dictionary = _sim.fuel_transfer_offer(destination)
 		var button := _transfer_buttons[destination]
@@ -628,11 +658,29 @@ func is_open() -> bool:
 
 
 func _request_service(action: String) -> void:
-	var page := StationPage.MINING if action in MINING_SERVICES else StationPage.SERVICES
+	var page := StationPage.MINING if action in EQUIPMENT_SERVICES else StationPage.SERVICES
 	if is_open() and not _fuel_only and _station_page == page and _sim.service_offer(action).allowed:
 		# A purchase can change the price shown for another service.
 		_touches.clear()
 		service_requested.emit(action)
+
+
+func _request_fuel_module_removal(module: String) -> void:
+	if not is_open() or _fuel_only or _station_page != StationPage.MINING:
+		return
+	var status: Dictionary = _sim.fuel_equipment_status()
+	if status.station and status[FUEL_MODULES[module]]:
+		_touches.clear()
+		fuel_module_removed.emit(module)
+
+
+func _request_pump_mode(mode: String) -> void:
+	if not is_open() or not _fuel_only:
+		return
+	var status: Dictionary = _sim.fuel_equipment_status()
+	if status.pump and status.can_set_mode and status.mode != mode:
+		_touches.clear()
+		pump_mode_requested.emit(mode)
 
 
 func _request_transfer(destination: String) -> void:
@@ -705,6 +753,40 @@ func _add_service(action: String, title: String, detail: String, parent: VBoxCon
 	return row[0]
 
 
+func _add_fuel_module(module: String, title: String, detail: String) -> void:
+	_add_service(module, title, detail, _mining)
+	var install := _action_buttons[module]
+	var row := install.get_parent() as HBoxContainer
+	install.custom_minimum_size.x = 216.0
+	var remove := _button(row)
+	remove.custom_minimum_size.x = 156.0
+	remove.add_theme_stylebox_override("normal", _style(Color("392b24"), AMBER, 7, 12))
+	remove.add_theme_stylebox_override("hover", _style(Color("4d392c"), AMBER, 7, 12))
+	remove.add_theme_stylebox_override("pressed", _style(Color("2c211c"), AMBER, 7, 12))
+	remove.pressed.connect(_request_fuel_module_removal.bind(module))
+	row.move_child(remove, install.get_index())
+	remove.hide()
+	_fuel_remove_buttons[module] = remove
+
+
+func _build_pump_controls() -> void:
+	_pump_controls = VBoxContainer.new()
+	_pump_controls.add_theme_constant_override("separation", 5)
+	_transfers.add_child(_pump_controls)
+	_label(_pump_controls, "Автоперекачка", 17, MINT)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	_pump_controls.add_child(row)
+	for mode: String in PUMP_MODES:
+		var button := _button(row)
+		button.text = PUMP_MODES[mode]
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.toggle_mode = true
+		button.pressed.connect(_request_pump_mode.bind(mode))
+		_pump_buttons[mode] = button
+	_pump_controls.hide()
+
+
 func _add_transfer(destination: String, title: String) -> void:
 	var row := _add_row(_transfers, title, "")
 	var button: Button = row[1]
@@ -768,13 +850,15 @@ func _button_at(point: Vector2) -> Button:
 		return _mining_toggle
 	var buttons: Array = _action_buttons.values()
 	if _fuel_only:
-		buttons = _transfer_buttons.values() + [_discard_choice, _discard_button]
+		buttons = _transfer_buttons.values() + _pump_buttons.values() + [_discard_choice, _discard_button]
 	elif _station_page == StationPage.CREW:
 		buttons = _crew_buttons
 	elif _station_page == StationPage.YARD:
 		buttons = _yard_rows.map(func(row: Dictionary) -> Button: return row.exchange)
 	elif _station_page == StationPage.CUSTOMS:
 		buttons = [_customs_pay]
+	elif _station_page == StationPage.MINING:
+		buttons += _fuel_remove_buttons.values()
 	for button: Button in buttons:
 		if not button.disabled and button.is_visible_in_tree() and button.get_global_rect().has_point(point):
 			return button
