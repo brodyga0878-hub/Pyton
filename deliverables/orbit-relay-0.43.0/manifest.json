@@ -1,0 +1,97 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.43.0",
+  "source_commit": "b393c177fb5d06cf0d34ea264329fd0b29a4a16d",
+  "content": {
+    "initial_known_systems": 3,
+    "total_systems": 5,
+    "frontier_expeditions": 2,
+    "survey_sites_per_expedition": 2,
+    "supply_deliveries_per_station": 2,
+    "autonomous_factions": 2,
+    "rounds_per_campaign": 3,
+    "save_schema": 10
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 68,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches_0.42": true,
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 27,
+    "tested_on_device": false
+  },
+  "checks": {
+    "flight": {
+      "failures": 0
+    },
+    "scene": {
+      "failures": 0
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 56
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 186
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 292
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 191
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 132
+    },
+    "living": {
+      "failures": 0,
+      "checks": 76
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 80
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 61
+    }
+  },
+  "files": {
+    "OrbitRelay-0.43.0-arm64.apk": {
+      "bytes": 26366351,
+      "sha256": "99f98534074ee7024b29fb036ce6da6367d83b92e40c4396697964170103c5e7"
+    },
+    "OrbitRelay-0.43.0-source.zip": {
+      "bytes": 196893,
+      "sha256": "ae0a4641f47c304885a00f2fe8221b7b53c81f85b3b8fc29cf260858d8c85fa8"
+    },
+    "construction-map.png": {
+      "bytes": 70575,
+      "sha256": "49d9a8f4b1bbc059f887fcdd4e67a0b68449f17c3b68d50c800ff785976dbb09"
+    },
+    "expansion-and-factions.png": {
+      "bytes": 145200,
+      "sha256": "54d21cf91da3717366fe5c7c6a9b57b4f4cbf3d28c7fb9230497ec3b639908e1"
+    },
+    "frontier-chart.png": {
+      "bytes": 128821,
+      "sha256": "c19de08ba43e3d2f2fac07ad2ee47ffb80be0fdf38a4b3cdf5c3476d2b58c617"
+    }
+  }
+}
