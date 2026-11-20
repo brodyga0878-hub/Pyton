@@ -49,6 +49,7 @@ func _ready() -> void:
 	add_child(_map)
 	_map.build()
 	_map.destination_selected.connect(_select_destination)
+	_map.orbit_requested.connect(_map_orbit_action)
 	_map.dismissed.connect(_close_map)
 	add_child(_galaxy)
 	_galaxy.build()
@@ -150,6 +151,8 @@ func _handle_action(action: String) -> void:
 			flight.set_autopilot(not flight.autopilot)
 		"flight_assist":
 			flight.set_flight_assist(not flight.flight_assist)
+		"orbit_cancel":
+			flight.cancel_orbit_maneuver()
 		"throttle_up":
 			flight.change_throttle(throttle_step)
 		"throttle_down":
@@ -227,6 +230,7 @@ func _deliver_notice() -> void:
 		"mining_phase": flight.mining.phase, "cargo_units": flight.mining.ore_hold,
 		"fuel": flight.ship.fuel, "scooping": flight.scooping, "star_heat": flight.star_heat,
 		"flight_assist": flight.flight_assist,
+		"orbit_maneuver": flight.orbit_maneuver,
 		"hull": flight.ship.hull, "contract_route": flight.contract_route_id, "contract_leg": flight.contract_leg,
 		"patrol_phase": flight.patrol.phase, "patrol_origin": flight.patrol.origin,
 		"convoy_id": convoy.id, "convoy_order_phase": convoy.phase, "convoy_order_kind": convoy.kind,
@@ -249,6 +253,7 @@ func _deliver_notice() -> void:
 		"convoy_order_accepted", "convoy_order_escorted", "convoy_order_failed", "convoy_order_paid",
 		"convoy_order_fire", "convoy_order_enemy_hit",
 		"flight_assist",
+		"orbit_start", "orbit_complete", "orbit_abort", "orbit_cancel",
 	]:
 		_save()
 
@@ -297,7 +302,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		if event.physical_keycode == KEY_ESCAPE:
 			_close_frontier()
 		return
-	if event.physical_keycode == KEY_ESCAPE and flight.cancel_jump():
+	if event.physical_keycode == KEY_ESCAPE and (flight.cancel_jump() or flight.cancel_orbit_maneuver()):
 		_deliver_notice()
 		get_viewport().set_input_as_handled()
 		return
@@ -318,6 +323,7 @@ func _notification(what: int) -> void:
 		return
 	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
 		flight.cancel_jump()
+		flight.cancel_orbit_maneuver()
 		flight.reset_time_scale()
 		_save()
 	elif what == NOTIFICATION_WM_GO_BACK_REQUEST:
@@ -337,7 +343,7 @@ func _notification(what: int) -> void:
 			_close_journal()
 		elif _frontier.is_open():
 			_close_frontier()
-		elif flight.cancel_jump():
+		elif flight.cancel_jump() or flight.cancel_orbit_maneuver():
 			_deliver_notice()
 		else:
 			_save()
@@ -435,6 +441,16 @@ func _select_destination(site_id: int) -> void:
 	_hud.notify("Маршрут проложен. «%s»." % flight.target_name(site_id))
 	_save()
 	_update_display(0.0)
+
+
+func _map_orbit_action() -> void:
+	if not _map.is_open():
+		return
+	var handled := flight.cancel_orbit_maneuver() if flight.orbit_maneuver else flight.start_orbit_maneuver()
+	if handled:
+		_close_map()
+		_deliver_notice()
+		_update_display(0.0)
 
 
 func _close_map() -> void:

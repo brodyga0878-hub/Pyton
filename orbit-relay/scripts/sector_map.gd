@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 signal destination_selected(site_id: int)
+signal orbit_requested()
 signal dismissed()
 
 const Sector := preload("res://scripts/sector_catalog.gd")
@@ -11,7 +12,17 @@ const TEXT := Color("e8f4fa")
 const MUTED := Color("a5bac7")
 const MINT := Color("9debd7")
 const INTERCEPT := Color("ffb18e")
+const TRAJECTORY := Color("dec1ff")
 const BORDER := Color("365561")
+const ORBIT_METRICS := [
+	["radius", "Текущий радиус"],
+	["radial_speed", "Радиальная скорость"],
+	["circular_speed", "Круговая скорость"],
+	["periapsis", "Перицентр"],
+	["apoapsis", "Апоцентр"],
+	["eccentricity", "Эксцентриситет"],
+	["period", "Период"],
+]
 
 var _sheet: Control
 var _insets: MarginContainer
@@ -24,6 +35,15 @@ var _convoy_info: Label
 var _detail_title: Label
 var _detail: Label
 var _view_button: Button
+var _trajectory_button: Button
+var _navigation_panel: VBoxContainer
+var _trajectory_panel: VBoxContainer
+var _orbit_state: Label
+var _orbit_reference: Label
+var _orbit_values: Dictionary[String, Label] = {}
+var _forecast_summary: Label
+var _orbit_note: Label
+var _orbit_button: Button
 var _close_button: Button
 var _select_button: Button
 var _site_buttons: Dictionary[int, Button] = {}
@@ -31,6 +51,7 @@ var _touches: Dictionary[int, Button] = {}
 var _touch_sites: Dictionary[int, int] = {}
 var _flight: RefCounted
 var _candidate := -1
+var _forecast_loaded := false
 
 
 func build() -> void:
@@ -62,6 +83,11 @@ func build() -> void:
 	_view_button = _button(header, "Сбоку", 44)
 	_view_button.custom_minimum_size.x = 106
 	_view_button.pressed.connect(_toggle_projection)
+	_trajectory_button = _button(header, "Траектория", 44)
+	_trajectory_button.custom_minimum_size.x = 138
+	_trajectory_button.toggle_mode = true
+	_trajectory_button.add_theme_stylebox_override("pressed", _panel_style(Color("35294b"), TRAJECTORY, 8, 9))
+	_trajectory_button.pressed.connect(_toggle_trajectory)
 	_close_button = _button(header, "Закрыть", 44)
 	_close_button.custom_minimum_size.x = 122
 	_close_button.pressed.connect(func() -> void: dismissed.emit())
@@ -81,7 +107,8 @@ func build() -> void:
 	panel.custom_minimum_size.x = 344
 	panel.add_theme_stylebox_override("panel", _panel_style(Color("0d1d28"), BORDER, 12, 14))
 	body.add_child(panel)
-	var list := VBoxContainer.new()
+	_navigation_panel = VBoxContainer.new()
+	var list := _navigation_panel
 	list.add_theme_constant_override("separation", 4)
 	panel.add_child(list)
 	for system_id in range(Sector.SYSTEM_COUNT):
@@ -111,15 +138,56 @@ func build() -> void:
 	_select_button.add_theme_stylebox_override("normal", _panel_style(Color("164f4c"), MINT, 8, 9))
 	_select_button.add_theme_stylebox_override("hover", _panel_style(Color("206760"), MINT, 8, 9))
 	_select_button.pressed.connect(_apply)
+	_build_trajectory_panel(panel)
 	get_viewport().size_changed.connect(_size_changed)
 	_size_changed()
 	hide()
+
+
+func _build_trajectory_panel(parent: PanelContainer) -> void:
+	_trajectory_panel = VBoxContainer.new()
+	_trajectory_panel.add_theme_constant_override("separation", 8)
+	parent.add_child(_trajectory_panel)
+	_label(_trajectory_panel, "Траектория корабля", 21, TRAJECTORY)
+	_orbit_state = _label(_trajectory_panel, "", 18, TEXT)
+	_orbit_state.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_orbit_reference = _label(_trajectory_panel, "", 16, MUTED)
+	_orbit_reference.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_trajectory_panel.add_child(HSeparator.new())
+	var values := GridContainer.new()
+	values.columns = 2
+	values.add_theme_constant_override("h_separation", 10)
+	values.add_theme_constant_override("v_separation", 4)
+	_trajectory_panel.add_child(values)
+	for metric: Array in ORBIT_METRICS:
+		var caption := _label(values, metric[1], 16, MUTED)
+		caption.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var value := _label(values, "", 16, TEXT)
+		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		_orbit_values[metric[0]] = value
+	_trajectory_panel.add_child(HSeparator.new())
+	_forecast_summary = _label(_trajectory_panel, "", 16, TRAJECTORY)
+	_forecast_summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_trajectory_panel.add_child(spacer)
+	_orbit_note = _label(_trajectory_panel, "", 16, MUTED)
+	_orbit_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_orbit_button = _button(_trajectory_panel, "Круговая орбита", 52)
+	_orbit_button.add_theme_stylebox_override("normal", _panel_style(Color("35294b"), TRAJECTORY, 8, 9))
+	_orbit_button.add_theme_stylebox_override("hover", _panel_style(Color("53416b"), TRAJECTORY, 8, 9))
+	_orbit_button.pressed.connect(_request_orbit)
+	_trajectory_panel.hide()
 
 
 func open(sim: RefCounted) -> void:
 	if not is_instance_valid(_sheet):
 		build()
 	_flight = sim
+	_forecast_loaded = false
+	_chart.forecast = PackedVector3Array()
+	_chart.forecast_impact = -1
 	_touches.clear()
 	_touch_sites.clear()
 	var system_id: int = sim.system_id
@@ -153,6 +221,8 @@ func open(sim: RefCounted) -> void:
 		_chart.active_site = targets[0] if not targets.is_empty() else -1
 	show()
 	_select_site(_chart.active_site)
+	if _chart.forecast_visible:
+		_refresh_trajectory()
 
 
 func _set_convoy_order(order: Dictionary) -> void:
@@ -240,6 +310,62 @@ func _toggle_projection() -> void:
 	_chart.queue_redraw()
 
 
+func _toggle_trajectory() -> void:
+	_touch_sites.clear()
+	var enabled := not _chart.forecast_visible
+	_chart.forecast_visible = enabled
+	_trajectory_button.set_pressed_no_signal(enabled)
+	_navigation_panel.visible = not enabled
+	_trajectory_panel.visible = enabled
+	if enabled:
+		_refresh_trajectory()
+	_chart.queue_redraw()
+
+
+func _refresh_trajectory() -> void:
+	if _forecast_loaded or _flight == null:
+		return
+	_forecast_loaded = true
+	var status: Dictionary = _flight.orbit_status()
+	var forecast: Dictionary = _flight.orbit_forecast()
+	_chart.forecast = forecast.points
+	_chart.forecast_impact = int(forecast.impact)
+	match str(status.classification):
+		"bound": _orbit_state.text = "Связанная орбита"
+		"escape": _orbit_state.text = "Незамкнутая траектория"
+		_: _orbit_state.text = "Орбита не рассчитана"
+	_orbit_reference.text = "Радиусы от центра звезды «%s»" % status.name
+	var measurable: bool = status.classification != "unavailable"
+	for key: String in ["radius", "periapsis", "apoapsis"]:
+		var radius := float(status[key])
+		var show_radius := (key == "radius" or measurable) and radius >= 0.0 and is_finite(radius)
+		_orbit_values[key].text = _distance_label(radius).replace(".", ",") if show_radius else "—"
+	_orbit_values["radial_speed"].text = _number_label(float(status.radial_speed), "м/с", true) if measurable else "—"
+	_orbit_values["circular_speed"].text = _number_label(float(status.circular_speed), "м/с")
+	var eccentricity := float(status.eccentricity)
+	_orbit_values["eccentricity"].text = ("%.3f" % eccentricity).replace(".", ",") if measurable and eccentricity >= 0.0 and is_finite(eccentricity) else "—"
+	_orbit_values["period"].text = _duration_label(float(status.period)) if measurable else "—"
+	_forecast_summary.add_theme_color_override("font_color", INTERCEPT if _chart.forecast_impact >= 0 else TRAJECTORY)
+	_forecast_summary.text = "Прогноз без тяги недоступен"
+	if _chart.forecast.size() >= 2 or _chart.forecast_impact >= 0:
+		var duration := _duration_label(float(forecast.seconds))
+		_forecast_summary.text = "Прогноз без тяги · %s" % duration
+		if _chart.forecast_impact >= 0:
+			_forecast_summary.text += "\nСтолкновение с объектом «%s»" % Sector.site(_chart.forecast_impact).name
+	var maneuver: bool = status.maneuver
+	_orbit_button.text = "Отменить манёвр" if maneuver else "Круговая орбита"
+	_orbit_button.disabled = not maneuver and not status.allowed
+	_orbit_note.text = str(status.reason) if _orbit_button.disabled else "Нужно Δv %s" % _number_label(float(status.delta_v), "м/с")
+	if maneuver:
+		_orbit_note.text = "Разворот на манёвр" if status.maneuver_phase == "turn" else "Корректируем скорость"
+	_chart.queue_redraw()
+
+
+func _request_orbit() -> void:
+	if is_open() and _trajectory_panel.visible and not _orbit_button.disabled:
+		orbit_requested.emit()
+
+
 func _current_site() -> int:
 	if _flight.docked >= 0:
 		return _flight.docked
@@ -273,7 +399,7 @@ func _input(event: InputEvent) -> void:
 			_touches.erase(touch.index)
 			_touch_sites.erase(touch.index)
 			if not touch.canceled:
-				if button != null and not button.disabled and button.get_global_rect().has_point(touch.position):
+				if button != null and button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(touch.position):
 					button.pressed.emit()
 				elif id != -1 and id == _chart_site_at(touch.position):
 					_select_site(id)
@@ -289,11 +415,11 @@ func _notification(what: int) -> void:
 
 
 func _button_at(point: Vector2) -> Button:
-	for button: Button in [_select_button, _view_button, _close_button]:
-		if not button.disabled and button.get_global_rect().has_point(point):
+	for button: Button in [_select_button, _orbit_button, _view_button, _trajectory_button, _close_button]:
+		if button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(point):
 			return button
 	for button: Button in _site_buttons.values():
-		if button.visible and button.get_global_rect().has_point(point):
+		if button.is_visible_in_tree() and button.get_global_rect().has_point(point):
 			return button
 	return null
 
@@ -324,6 +450,22 @@ func _size_changed() -> void:
 
 static func _distance_label(meters: float) -> String:
 	return "%d м" % roundi(meters) if meters < 1000.0 else "%.1f км" % (meters / 1000.0)
+
+
+static func _number_label(value: float, units: String, signed := false) -> String:
+	if not is_finite(value) or (value < 0.0 and not signed):
+		return "—"
+	var prefix := "+" if signed and value >= 0.05 else "−" if value <= -0.05 else ""
+	return prefix + ("%.1f" % absf(value)).replace(".", ",") + " " + units
+
+
+static func _duration_label(seconds: float) -> String:
+	if seconds < 0.0 or not is_finite(seconds):
+		return "—"
+	if seconds >= 3600.0:
+		return ("%.1f ч" % (seconds / 3600.0)).replace(".", ",")
+	var whole := roundi(seconds)
+	return "%d мин %02d с" % [floori(whole / 60.0), whole % 60] if whole >= 60 else "%d с" % whole
 
 
 static func _label(parent: Container, caption: String, font_size: int, tint: Color) -> Label:
@@ -390,6 +532,9 @@ class SectorChart extends Control:
 	var selected_site := -1
 	var orbit := PackedVector3Array()
 	var orbit_caption := ""
+	var forecast := PackedVector3Array()
+	var forecast_visible := false
+	var forecast_impact := -1
 	var traffic: Array[Dictionary] = []
 	var order_convoy := ""
 	var order_color := MINT
@@ -472,6 +617,8 @@ class SectorChart extends Control:
 			for index in orbit.size():
 				track[index] = _project(orbit[index], plot, bounds)
 			draw_polyline(track, ORBIT_COLOR, 1.7, true)
+		if forecast_visible and not forecast.is_empty():
+			_draw_forecast(plot, bounds)
 		var ship := _project(ship_position, plot, bounds).clamp(Vector2(18, 35), size - Vector2(18, 28))
 		if side_view:
 			draw_line(ship, Vector2(ship.x, plane_y), Color(STAR_PLANE_COLOR, 0.72), 1.0, true)
@@ -489,6 +636,12 @@ class SectorChart extends Control:
 			draw_rect(box, CHART_BACKGROUND)
 		draw_string(font, Vector2(18, 28), view_caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, EDGE.lightened(0.32))
 		draw_string(font, Vector2(18, size.y - 14), ship_caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, MUTED)
+		if forecast_visible and forecast.size() >= 2:
+			var legend := Rect2(165.0, 10.0, 171.0, 24.0)
+			label_boxes.append(legend)
+			draw_rect(legend, CHART_BACKGROUND)
+			draw_line(legend.position + Vector2(7, 12), legend.position + Vector2(25, 12), TRAJECTORY, 2.0, true)
+			draw_string(font, legend.position + Vector2(32, 17), "Прогноз без тяги", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, TRAJECTORY)
 		if side_view:
 			var plane_label_y := plane_y - 30.0 if plane_y >= 66.0 else plane_y + 6.0
 			var plane_legend := Rect2(11.0, plane_label_y, 145.0, 24.0)
@@ -541,6 +694,22 @@ class SectorChart extends Control:
 					_draw_site_label(font, str(contact.name), point, label_boxes)
 					break
 		_draw_ship(ship)
+
+	func _draw_forecast(plot: Rect2, bounds: Rect2) -> void:
+		var track := PackedVector2Array()
+		track.resize(forecast.size())
+		for index in forecast.size():
+			track[index] = _project(forecast[index], plot, bounds)
+		if track.size() >= 2:
+			draw_polyline(track, TRAJECTORY, 2.0, true)
+		var finish := track[track.size() - 1]
+		if not Rect2(Vector2.ZERO, size).grow(-5.0).has_point(finish):
+			return
+		if forecast_impact < 0:
+			draw_circle(finish, 3.5, TRAJECTORY, true, -1.0, true)
+		else:
+			draw_line(finish - Vector2(4, 4), finish + Vector2(4, 4), INTERCEPT, 2.0, true)
+			draw_line(finish - Vector2(4, -4), finish + Vector2(4, -4), INTERCEPT, 2.0, true)
 
 	func _draw_ship(position_2d: Vector2) -> void:
 		var heading := _plane_point(ship_heading, side_view)

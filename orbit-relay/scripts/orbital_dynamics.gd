@@ -34,6 +34,16 @@ static func acceleration(sim: RefCounted, point: Vector3) -> Vector3:
 	return total
 
 
+static func acceleration_at_epoch(system: int, point: Vector3, epoch: float) -> Vector3:
+	if system < 0 or system >= _attractors.size():
+		return Vector3.ZERO
+	var total := Vector3.ZERO
+	for source: Attractor in _attractors[system]:
+		var center: Vector3 = Orbit.sample(source.site, epoch).position
+		total += point_acceleration(point, center, source.mu, source.radius)
+	return total
+
+
 static func point_acceleration(point: Vector3, center: Vector3, mu: float, min_radius: float) -> Vector3:
 	var offset := center - point
 	var radius := maxf(min_radius, MIN_SOURCE_RADIUS)

@@ -6,6 +6,7 @@ const ShipSystems = preload("res://scripts/ship_systems.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const Orbit = preload("res://scripts/orbit_ephemeris.gd")
 const Dynamics = preload("res://scripts/orbital_dynamics.gd")
+const Navigation = preload("res://scripts/orbital_navigation.gd")
 const Terrain = preload("res://scripts/surface_terrain.gd")
 const Economy = preload("res://scripts/port_economy.gd")
 const Traffic = preload("res://scripts/sector_traffic.gd")
@@ -52,6 +53,15 @@ const CONVOY_AIM_SPACING := 142.0
 const FRAME_MARGIN := 110.0
 const STAR_WARP_MARGIN := 120.0
 const MAX_SAVED_SPEED := MAX_SPEED * 1.56 + 8.0
+const ORBIT_MIN_RADIUS := 520.0
+const ORBIT_MAX_RADIUS := 1800.0
+const ORBIT_MAX_SPEED := 30.0
+const ORBIT_MIN_FUEL := 3.0
+const ORBIT_CLEARANCE := 110.0
+const ORBIT_BURN_ACCELERATION := 12.0
+const ORBIT_SPEED_TOLERANCE := 0.12
+const ORBIT_TIMEOUT := 11.0
+const ORBIT_ALIGNMENT := cos(deg_to_rad(3.0))
 
 var position := Vector3(0, 0, -152)
 var velocity := Vector3.ZERO
@@ -61,6 +71,7 @@ var roll := 0.0
 var throttle := 0.0
 var boost := false
 var flight_assist := true
+var orbit_maneuver := false
 var docked := 0
 var landed_site := -1
 var landing_direction := Vector3.ZERO
@@ -107,6 +118,9 @@ var _sample_time := -1.0
 var _samples: Dictionary[int, Dictionary] = {}
 var _orientation := Quaternion.IDENTITY
 var _orientation_angles := Vector3.ZERO
+var _orbit_normal := Vector3.ZERO
+var _orbit_seconds := 0.0
+var _orbit_phase := ""
 
 
 func speed() -> float:
@@ -138,6 +152,8 @@ func speed_relative_to(index: int) -> float:
 func time_status() -> Dictionary:
 	if jump_seconds_left > 0.0:
 		return {"allowed": false, "reason": "Зарядка прыжкового привода"}
+	if orbit_maneuver:
+		return {"allowed": false, "reason": "Орбитальный манёвр"}
 	if scooping:
 		return {"allowed": false, "reason": "Сбор топлива"}
 	if patrol.in_danger(self):
@@ -287,7 +303,11 @@ func _rotate_manual(steer: Vector2, bank: float, delta: float) -> void:
 	if speed <= 0.000001:
 		return
 	var turn := Quaternion(rates / speed, speed * delta)
-	_orientation = (_flight_orientation() * turn).normalized()
+	_set_orientation(_flight_orientation() * turn)
+
+
+func _set_orientation(facing: Quaternion) -> void:
+	_orientation = facing.normalized()
 	var angles := Basis(_orientation).get_euler()
 	pitch = clampf(angles.x, -MAX_PITCH, MAX_PITCH)
 	yaw = clampf(angles.y, -PI, PI)
@@ -309,6 +329,87 @@ func set_flight_assist(enabled: bool) -> bool:
 
 func gravity_at(at: Vector3) -> Vector3:
 	return Dynamics.acceleration(self, at)
+
+
+func orbit_status() -> Dictionary:
+	var star := Catalog.star_for(system_id)
+	var center := target_position(star)
+	var radial := position - center
+	var mu: float = Orbit.GRAVITY_PARAMETERS[system_id]
+	var result := Navigation.elements(position, velocity, center, mu)
+	var normal := _orbit_normal if orbit_maneuver else Navigation.orbit_normal(radial, velocity, forward())
+	var delta_v := velocity.distance_to(Navigation.circular_velocity(radial, normal, mu))
+	var reason := _orbit_block_reason(star, radial.length(), not orbit_maneuver)
+	if reason.is_empty() and not orbit_maneuver and delta_v <= ORBIT_SPEED_TOLERANCE:
+		reason = "Скорость уже близка к круговой"
+	var measurable: bool = result.valid and docked < 0 and not landed and jump_seconds_left <= 0.0
+	result.merge({
+		"star": star, "name": target_name(star), "classification": (
+			("bound" if result.bound else "escape") if measurable else "unavailable"
+		),
+		"altitude": maxf(0.0, radial.length() - float(Catalog.site(star).radius)),
+		"allowed": reason.is_empty() and not orbit_maneuver,
+		"reason": "Можно выполнить орбитальный манёвр" if reason.is_empty() else reason,
+		"maneuver": orbit_maneuver, "maneuver_phase": _orbit_phase, "delta_v": delta_v,
+	})
+	return result
+
+
+func orbit_forecast() -> Dictionary:
+	return Navigation.forecast(self)
+
+
+func start_orbit_maneuver() -> bool:
+	if orbit_maneuver:
+		return false
+	var status := orbit_status()
+	if not status.allowed:
+		return false
+	_orbit_normal = Navigation.orbit_normal(position - target_position(status.star), velocity, forward())
+	reset_time_scale()
+	set_autopilot(false)
+	flight_assist = false
+	throttle = 0.0
+	boost = false
+	orbit_maneuver = true
+	_orbit_seconds = 0.0
+	_orbit_phase = "turn"
+	_announce("orbit_start", "Выход на круговую орбиту вокруг звезды «%s»." % status.name)
+	return true
+
+
+func cancel_orbit_maneuver() -> bool:
+	if not orbit_maneuver:
+		return false
+	_clear_orbit_maneuver()
+	_announce("orbit_cancel", "Манёвр отменён. Корабль продолжает полёт по инерции.")
+	return true
+
+
+func _clear_orbit_maneuver() -> void:
+	if orbit_maneuver:
+		orbit_maneuver = false
+		_orbit_phase = ""
+		throttle = 0.0
+
+
+func _orbit_block_reason(star: int, radius: float, starting: bool) -> String:
+	if docked >= 0 or landed or jump_seconds_left > 0.0:
+		return "Выйдите в открытый космос"
+	if patrol.in_danger(self) or convoy_order.in_danger(self):
+		return "Отойдите от боевого контакта"
+	if radius < ORBIT_MIN_RADIUS or radius > ORBIT_MAX_RADIUS:
+		return "Держитесь в пределах %d–%d м от центра звезды" % [int(ORBIT_MIN_RADIUS), int(ORBIT_MAX_RADIUS)]
+	if starting and speed() > ORBIT_MAX_SPEED:
+		return "Снизьте скорость до %d м/с" % int(ORBIT_MAX_SPEED)
+	if ship.fuel <= 0.0 or (starting and ship.fuel < ORBIT_MIN_FUEL):
+		return "Для манёвра нужно не менее %d ед. топлива" % int(ORBIT_MIN_FUEL)
+	if ship.hull <= ShipSystems.MIN_HULL or star_heat >= HEAT_SCOOP_LIMIT:
+		return "Манёвр требует исправного и остывшего корпуса"
+	for id: int in local_targets():
+		if id != star and position.distance_to(target_position(id)) <= float(Catalog.site(id).radius) + ORBIT_CLEARANCE:
+			return "Отойдите от объекта «%s»" % target_name(id)
+	return ""
 
 
 func offer_destination() -> int:
@@ -436,6 +537,7 @@ func select_target(index: int) -> bool:
 		planned_target = index
 	else:
 		_stop_convoy_course()
+		_clear_orbit_maneuver()
 		target = index
 		_approach_committed = false
 		if autopilot:
@@ -455,6 +557,7 @@ func set_autopilot(enabled: bool) -> void:
 	patrol_course = false
 	project_course = false
 	_stop_convoy_course()
+	_clear_orbit_maneuver()
 	autopilot = enabled and docked < 0 and not landed and jump_seconds_left <= 0.0
 	_approach_committed = false
 	_departure_leg = 0
@@ -1014,6 +1117,7 @@ func start_jump() -> bool:
 	patrol_course = false
 	project_course = false
 	_stop_convoy_course()
+	_clear_orbit_maneuver()
 	throttle = 0.0
 	boost = false
 	jump_seconds_left = JUMP_CHARGE
@@ -1196,7 +1300,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		_apply_convoy_result(convoy_order.step(self, delta))
 		return
 	if manual_input:
-		if autopilot or patrol_course or project_course or convoy_course:
+		if autopilot or patrol_course or project_course or convoy_course or orbit_maneuver:
 			set_autopilot(false)
 			_announce("manual_override", "Ручное управление")
 
@@ -1204,6 +1308,8 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 	var manual_load := 0.0
 	if autopilot:
 		_autopilot_step(delta)
+	elif orbit_maneuver:
+		_orbit_maneuver_step(delta)
 	elif convoy_course:
 		_convoy_course_step(delta)
 	elif project_course:
@@ -1243,6 +1349,48 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 	_collect_fuel(delta)
 	_apply_patrol_result(patrol.step(self, delta))
 	_apply_convoy_result(convoy_order.step(self, delta))
+
+
+func _orbit_maneuver_step(delta: float) -> void:
+	var star := Catalog.star_for(system_id)
+	var radial := position - target_position(star)
+	velocity += gravity_at(position) * delta
+	throttle = 0.0
+	_orbit_seconds += delta
+	var stop_reason := _orbit_block_reason(star, radial.length(), false)
+	if stop_reason.is_empty() and _orbit_seconds >= ORBIT_TIMEOUT:
+		stop_reason = "Не удалось выровнять скорость"
+	if not stop_reason.is_empty():
+		_clear_orbit_maneuver()
+		_announce("orbit_abort", "Манёвр прерван. %s." % stop_reason)
+		return
+	var desired := Navigation.circular_velocity(radial, _orbit_normal, Orbit.GRAVITY_PARAMETERS[system_id])
+	var correction := desired - velocity
+	var remaining := correction.length()
+	if remaining <= ORBIT_SPEED_TOLERANCE:
+		_clear_orbit_maneuver()
+		_announce("orbit_complete", "Импульс завершён. Корабль движется по инерции.")
+		return
+	var aim := correction / remaining
+	_turn_nose_toward(aim, delta)
+	_orbit_phase = "turn"
+	if forward().dot(aim) >= ORBIT_ALIGNMENT:
+		_orbit_phase = "burn"
+		var impulse := minf(remaining, ORBIT_BURN_ACCELERATION * delta)
+		velocity += forward() * impulse
+		throttle = impulse / (34.0 * delta)
+
+
+func _turn_nose_toward(direction: Vector3, delta: float) -> void:
+	var nose := forward()
+	var axis := nose.cross(direction)
+	var cosine := clampf(nose.dot(direction), -1.0, 1.0)
+	if axis.length_squared() < 0.00000001:
+		if cosine > 0.0:
+			return
+		axis = attitude().y
+	var angle := acos(cosine)
+	_set_orientation(Quaternion(axis.normalized(), minf(angle, MAX_STEER * delta)) * _flight_orientation())
 
 
 func _manual_step(delta: float, steer: Vector2, bank: float, boost_requested: bool, brake: bool, translation: Vector3) -> float:
@@ -1562,7 +1710,7 @@ func snapshot() -> Dictionary:
 		"yaw": yaw, "pitch": pitch, "roll": roll, "elapsed": elapsed,
 		"orientation": [facing.x, facing.y, facing.z, facing.w], "flight_assist": flight_assist,
 		"orbit_time": orbit_time,
-		"throttle": throttle, "docked": docked, "target": target,
+		"throttle": 0.0 if orbit_maneuver else throttle, "docked": docked, "target": target,
 		"credits": credits, "deliveries": deliveries,
 		"contract_stage": contract_stage, "contract_origin": contract_origin,
 		"contract_destination": contract_destination,
@@ -1775,6 +1923,7 @@ func restore(state: Dictionary) -> bool:
 	var velocity_limit := MAX_SAVED_SPEED if schema >= 6 else MAX_SPEED * 1.56
 	if restored_velocity.length() > velocity_limit or (restored_dock < 0 and restored_landing < 0 and _blocked(restored_position, restored_system, restored_epoch, restored_expedition)):
 		return false
+	set_autopilot(false)
 	position = restored_position
 	velocity = restored_velocity
 	yaw = float(state.yaw)
@@ -1811,7 +1960,6 @@ func restore(state: Dictionary) -> bool:
 	contract_destination = destination
 	contract_route_id = route_id
 	contract_leg = leg
-	set_autopilot(false)
 	boost = false
 	if docked >= 0:
 		_hold_docked_pose()
