@@ -47,6 +47,7 @@ func _ready() -> void:
 	add_child(_hud)
 	_hud.build()
 	_hud.action_requested.connect(_handle_action)
+	_hud.frame_requested.connect(_handle_action.bind("frame"))
 	add_child(_map)
 	_map.build()
 	_map.destination_selected.connect(_select_destination)
@@ -54,6 +55,7 @@ func _ready() -> void:
 	_map.rendezvous_requested.connect(_map_rendezvous_action)
 	_map.rendezvous_finish_requested.connect(_map_rendezvous_finish)
 	_map.survey_requested.connect(_map_survey)
+	_map.frame_selected.connect(_map_frame)
 	_map.dismissed.connect(_close_map)
 	add_child(_galaxy)
 	_galaxy.build()
@@ -161,7 +163,7 @@ func _handle_action(action: String) -> void:
 		var departure := flight.departure_status()
 		if departure.active and (action != "dock" or not departure.can_cancel):
 			return
-	var near_target := flight.reference_site() >= 0 or flight.position.distance_to(flight.target_position(flight.target)) < 150.0
+	var near_target := flight.position.distance_to(flight.target_position(flight.target)) < maxf(150.0, float(Catalog.site(flight.target).radius) + Flight.FRAME_MARGIN)
 	var throttle_step := 0.025 if near_target else 0.1
 	match action:
 		"target":
@@ -176,6 +178,8 @@ func _handle_action(action: String) -> void:
 			flight.gear_action()
 		"flight_assist":
 			flight.set_flight_assist(not flight.flight_assist)
+		"frame":
+			flight.cycle_reference_frame()
 		"orbit_cancel":
 			flight.cancel_orbit_maneuver()
 		"rendezvous_cancel":
@@ -312,6 +316,13 @@ func _deliver_notice() -> void:
 			"cargo_capacity": flight.ship.cargo_capacity(), "crew_required": flight.ship.crew_required(),
 			"system_id": flight.system_id, "orbit_time": flight.orbit_time, "reason": flight.status_message,
 		}
+	elif event == "reference_frame":
+		var frame := flight.frame_status()
+		trace_fields = {
+			"mode": frame.mode, "reference": frame.reference, "surface": frame.surface,
+			"relative_speed": frame.relative_speed, "speed": flight.speed(),
+			"system_id": flight.system_id, "orbit_time": flight.orbit_time,
+		}
 	_io.trace(event, trace_fields)
 	_hud.notify(flight.status_message)
 	flight.status_event = ""
@@ -335,7 +346,7 @@ func _deliver_notice() -> void:
 		"war_declared", "war_round", "war_captured", "war_repulsed", "war_convoy_delivered", "war_convoy_intercepted",
 		"convoy_order_accepted", "convoy_order_escorted", "convoy_order_failed", "convoy_order_paid",
 		"convoy_order_fire", "convoy_order_enemy_hit",
-		"flight_assist",
+		"flight_assist", "reference_frame",
 		"survey_record", "galaxy_scan",
 		"orbit_start", "orbit_complete", "orbit_abort", "orbit_cancel",
 		"rendezvous_start", "rendezvous_hold", "rendezvous_abort", "rendezvous_cancel", "rendezvous_finish",
@@ -401,7 +412,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_N: "map", KEY_J: "galaxy", KEY_K: "scoop", KEY_P: "services", KEY_O: "time", KEY_L: "market",
 		KEY_U: "patrol", KEY_X: "fire", KEY_I: "convoy", KEY_H: "flight_assist",
 		KEY_F2: "settings", KEY_F3: "journal", KEY_F4: "frontier",
-		KEY_F5: "dock_sync", KEY_F6: "dock_clearance", KEY_Y: "gear", KEY_C: "fuel",
+		KEY_F5: "dock_sync", KEY_F6: "dock_clearance", KEY_F7: "frame", KEY_Y: "gear", KEY_C: "fuel",
 	}
 	if actions.has(event.physical_keycode):
 		_handle_action(actions[event.physical_keycode])
@@ -588,6 +599,13 @@ func _map_rendezvous_finish() -> void:
 		_close_map()
 		_deliver_notice()
 		_update_display(0.0)
+
+
+func _map_frame(selection: int) -> void:
+	if not _map.is_open() or not flight.set_reference_frame(selection):
+		return
+	_deliver_notice()
+	_update_display(0.0)
 
 
 func _map_survey(site: int) -> void:

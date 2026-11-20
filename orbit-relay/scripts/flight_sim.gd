@@ -22,7 +22,8 @@ const DockAccess = preload("res://scripts/dock_access.gd")
 const Passengers = preload("res://scripts/passengers.gd")
 const Crew = preload("res://scripts/crew.gd")
 const Cartography = preload("res://scripts/cartography.gd")
-const SAVE_SCHEMA := 29
+const FlightFrame = preload("res://scripts/flight_frame.gd")
+const SAVE_SCHEMA := 30
 const SHIPYARD_PORTS := [0, 10, Catalog.FRINGE_ARRIVAL_PORT]
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
@@ -124,6 +125,7 @@ var convoy_order := ConvoyOrders.new()
 var passengers := Passengers.new()
 var crew := Crew.new()
 var cartography := Cartography.new()
+var frame := FlightFrame.new()
 var convoy_course := false
 var project_course := false
 var scooping := false
@@ -175,14 +177,45 @@ func speed() -> float:
 
 
 func reference_site() -> int:
-	if docked >= 0:
-		return docked
-	if landed:
-		return landed_site
-	if Catalog.is_star(target) and Orbit.period(target) <= 0.0:
-		return -1
-	var radius := float(Catalog.site(target).radius) + FRAME_MARGIN
-	return target if position.distance_squared_to(target_position(target)) <= radius * radius else -1
+	return frame.reference_site(self)
+
+
+func frame_status() -> Dictionary:
+	var site := reference_site()
+	var drift := _reference_velocity(site) if site >= 0 else Vector3.ZERO
+	var relative := Vector3.ZERO if docked >= 0 or landed else velocity - drift
+	var mode := "body"
+	if frame.choice == FlightFrame.AUTO:
+		mode = "auto"
+	elif frame.choice == FlightFrame.SYSTEM:
+		mode = "system"
+	return {
+		"mode": mode, "choice": frame.choice, "reference": site,
+		"name": Catalog.system(system_id).name if site < 0 else target_name(site),
+		"available": jump_seconds_left <= 0.0 and not _departure_requested,
+		"surface": site >= 0 and _reference_ground_weight(site) > 0.0,
+		"velocity": drift, "relative_velocity": relative, "relative_speed": relative.length(),
+	}
+
+
+func set_reference_frame(selection: int) -> bool:
+	if jump_seconds_left > 0.0 or _departure_requested or selection == frame.choice or not frame.select(selection, local_targets()):
+		return false
+	var chosen := "Автоматический выбор"
+	if selection == FlightFrame.SYSTEM:
+		chosen = "Система «%s»" % Catalog.system(system_id).name
+	elif selection >= 0:
+		chosen = target_name(selection)
+	_announce("reference_frame", "Кадр полёта · %s." % chosen)
+	return true
+
+
+func cycle_reference_frame() -> bool:
+	if frame.choice == FlightFrame.AUTO:
+		return set_reference_frame(FlightFrame.SYSTEM)
+	if frame.choice == FlightFrame.SYSTEM and target in local_targets():
+		return set_reference_frame(target)
+	return set_reference_frame(FlightFrame.AUTO)
 
 
 func relative_speed() -> float:
@@ -370,10 +403,16 @@ func surface_velocity(site: int, at_point: Vector3) -> Vector3:
 	return target_velocity(site) + Terrain.spin_velocity(site, at_point - target_position(site))
 
 
+func _reference_ground_weight(site: int) -> float:
+	if Terrain.spin_rate(site) <= 0.0:
+		return 0.0
+	var altitude := position.distance_to(target_position(site)) - float(Catalog.site(site).radius)
+	return 1.0 - smoothstep(LANDING_GUIDE_HEIGHT - 20.0, LANDING_GUIDE_HEIGHT, altitude)
+
+
 func _reference_velocity(site: int) -> Vector3:
-	if Terrain.spin_rate(site) > 0.0 and position.distance_to(target_position(site)) <= float(Catalog.site(site).radius) + LANDING_GUIDE_HEIGHT:
-		return surface_velocity(site, position)
-	return target_velocity(site)
+	var drift := target_velocity(site)
+	return drift + Terrain.spin_velocity(site, position - target_position(site)) * _reference_ground_weight(site)
 
 
 func intercept_time(index: int) -> float:
@@ -2203,6 +2242,7 @@ func _charge_jump(delta: float) -> void:
 	ship.jump_fuel -= status.cost
 	dock_access.clear()
 	system_id = jump_target
+	frame.reset_on_arrival()
 	if not _jump_route.is_empty() and _jump_route.front() == system_id:
 		_jump_route.pop_front()
 	else:
@@ -2569,11 +2609,10 @@ func _manual_step(delta: float, steer: Vector2, bank: float, boost_requested: bo
 			desired = desired.limit_length(RESERVE_SPEED)
 		velocity = velocity.move_toward(desired, drive_acceleration * delta)
 	else:
-		# Opposing thrust can brake drift without forcing it down to a new engine speed limit.
-		var relative := velocity - drift
-		var powered_limit := maxf(relative.length(), drive_speed * limit)
-		var powered := (relative + drive * drive_acceleration * delta).limit_length(powered_limit)
-		velocity = (drift + powered + gravity_at(position) * delta).limit_length(MAX_SAVED_SPEED - 1.0)
+		# The flight frame changes instruments and velocity assistance. Free coast is inertial.
+		var powered_limit := maxf(velocity.length(), drive_speed * limit)
+		var powered := (velocity + drive * drive_acceleration * delta).limit_length(powered_limit)
+		velocity = (powered + gravity_at(position) * delta).limit_length(MAX_SAVED_SPEED - 1.0)
 	return local.length()
 
 
@@ -2968,6 +3007,7 @@ func _announce(event: String, message: String) -> void:
 
 func snapshot() -> Dictionary:
 	var facing := _flight_orientation()
+	frame.reference_site(self)
 	return {
 		"schema": SAVE_SCHEMA,
 		"position": [position.x, position.y, position.z],
@@ -2992,7 +3032,7 @@ func snapshot() -> Dictionary:
 		"convoy_order": convoy_order.snapshot(),
 		"passengers": passengers.snapshot(),
 		"crew": crew.snapshot(),
-		"cartography": cartography.snapshot(),
+		"cartography": cartography.snapshot(), "frame": frame.snapshot(),
 	}
 
 
@@ -3000,6 +3040,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_frames := schema < 30
 	var pre_rotation := schema < 29
 	var pre_binary := schema < 28
 	var pre_procedural := schema < 27
@@ -3106,6 +3147,7 @@ func restore(state: Dictionary) -> bool:
 	var restored_passengers := Passengers.new()
 	var restored_crew := Crew.new()
 	var restored_cartography := Cartography.new()
+	var restored_frame := FlightFrame.new()
 	if not pre_expansion:
 		if not restored_expedition.restore(state.get("expedition")) or not restored_factions.restore(state.get("factions"), pre_thermal, pre_convoy_orders):
 			return false
@@ -3135,6 +3177,11 @@ func restore(state: Dictionary) -> bool:
 	var known := _known_systems(restored_expedition, restored_cartography)
 	if restored_system not in known or (restored_jump >= 0 and restored_jump not in known):
 		return false
+	if not pre_frames:
+		var frame_sites := Catalog.targets_for(restored_system).filter(
+			func(id: int) -> bool: return _site_available(id, restored_expedition, restored_cartography))
+		if not restored_frame.restore(state.get("frame"), frame_sites):
+			return false
 	if not _site_available(int(state.target), restored_expedition, restored_cartography):
 		return false
 	for field in ["docked", "contract_origin", "contract_destination"]:
@@ -3365,6 +3412,7 @@ func restore(state: Dictionary) -> bool:
 	passengers = restored_passengers
 	crew = restored_crew
 	cartography = restored_cartography
+	frame = restored_frame
 	star_heat = 0.0 if pre_thermal else float(state.star_heat)
 	entry_heat = 0.0 if pre_entry else float(state.entry_heat)
 	_entry_site = -1

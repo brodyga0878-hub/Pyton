@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 signal action_requested(action: String)
+signal frame_requested()
 
 const MiningRig := preload("res://scripts/mining_rig.gd")
 const Sector := preload("res://scripts/sector_catalog.gd")
@@ -93,6 +94,7 @@ var _rendezvous_finish_blocked := true
 var _dock_sync_blocked := true
 var _dock_clearance_blocked := true
 var _gear_blocked := true
+var _frame_blocked := true
 var _fire_blocked := false
 var _jumping := false
 var _notice_left := 0.0
@@ -420,12 +422,15 @@ func _build_flight_modes() -> void:
 	_pin(_flight_modes, _safe, Vector2(0, 1), FLIGHT_MODE_ROW)
 	_button(_flight_modes, "translation_mode", "Курс")
 	_button(_flight_modes, "flight_assist", "Стабилизация")
+	_button(_flight_modes, "frame", "Кадр")
+	_actions["frame"].custom_minimum_size.x = 66.0
+	_actions["frame"].tooltip_text = "Сменить систему отсчёта полёта (F7)"
 	_translation_controls = HBoxContainer.new()
 	_translation_controls.add_theme_constant_override("separation", 8)
 	_pin(_translation_controls, _safe, Vector2(0, 1), TRANSLATION_ROW)
 	_button(_translation_controls, "translation_forward", "Вперёд")
 	_button(_translation_controls, "translation_reverse", "Назад")
-	for action: String in ["translation_mode", "flight_assist", "translation_forward", "translation_reverse"]:
+	for action: String in ["translation_mode", "flight_assist", "frame", "translation_forward", "translation_reverse"]:
 		var button: Button = _actions[action]
 		button.custom_minimum_size.y = 46.0
 		button.add_theme_font_size_override("font_size", 16)
@@ -460,6 +465,8 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var assist_color := CYAN if sim.flight_assist else AMBER
 	if assist.get_theme_color("font_color") != assist_color:
 		assist.add_theme_color_override("font_color", assist_color)
+	var frame: Dictionary = {} if parked else sim.frame_status()
+	_frame_blocked = not frame.get("available", false)
 	_throttle_controls.visible = not parked
 	_actions["target"].visible = not parked
 	_actions["services"].visible = port_services
@@ -579,7 +586,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 		if sim.contract_stage != 1 and patrol.get("phase") in [Patrol.OUTBOUND, Patrol.RETURN] and patrol_button.visible:
 			_guidance.text = str(patrol.get("reason", ""))
 	else:
-		_sync_flight(sim, scoop_status, itinerary, patrol, fire, convoy, rendezvous, entry_site, surface)
+		_sync_flight(sim, scoop_status, itinerary, patrol, fire, convoy, rendezvous, entry_site, surface, frame)
 	_sync_passengers(sim)
 	_sync_thermal(stellar, entry, stellar_scoop, show_entry)
 	if _departure_blocked:
@@ -777,7 +784,7 @@ func _sync_surface(sim: RefCounted, mining: RefCounted) -> void:
 			else:
 				_guidance.text = "Разверните добывающий модуль."
 
-func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictionary, patrol: Dictionary, fire: Dictionary, convoy: Dictionary, rendezvous: Dictionary, entry_site: int, surface: Dictionary) -> void:
+func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictionary, patrol: Dictionary, fire: Dictionary, convoy: Dictionary, rendezvous: Dictionary, entry_site: int, surface: Dictionary, frame: Dictionary) -> void:
 	var project_course := bool(sim.get("project_course"))
 	var convoy_course: bool = sim.convoy_course
 	var aimed_at_port := Sector.is_port(sim.target) and fire.is_empty() and not bool(sim.patrol_course) and not project_course and not convoy_course and not bool(sim.orbit_maneuver)
@@ -795,15 +802,13 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 		var remote_system := _delivery_system(sim)
 		if not remote_system.is_empty():
 			_route_detail.text += " (%s)" % remote_system
-	var reference: int = sim.reference_site()
-	var entry_frame: bool = entry_site >= 0 and (reference == entry_site or sim.target == entry_site)
+	var reference: int = frame.reference
+	var entry_frame: bool = entry_site >= 0 and reference == entry_site and not frame.surface
 	_telemetry.text = "Тяга %d%%" % (sim.throttle * 100.0)
 	if not entry_frame:
-		var speed: float = sim.relative_speed() if reference >= 0 else sim.speed()
+		var speed: float = frame.relative_speed
 		var speed_text := ("%.1f" % speed).replace(".", ",") if near_surface else "%d" % roundi(speed)
 		_telemetry.text = "Скорость %s м/с  ·  %s" % [speed_text, _telemetry.text]
-		if reference >= 0:
-			_telemetry.text += "\nОтносительно «%s»" % sim.target_name(reference)
 	if aimed_at_port:
 		_telemetry.text += "\nКрен к порту %+.0f°" % rad_to_deg(sim.roll_error(sim.target))
 	elif near_surface:
@@ -871,6 +876,17 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 		_guidance.text = "Круглая панель — сдвиг вбок и по высоте. «Вперёд» и «Назад» удерживайте."
 	else:
 		_guidance.text = "Курс и крен справа. Тяга и тормоз слева." if _touch_mirrored else "Курс и крен слева. Тяга и тормоз справа."
+	var frame_label := "Ручной кадр" if sim.orbit_maneuver or not rendezvous.is_empty() else "Кадр"
+	_telemetry.text += "\n%s: %s" % [frame_label, _frame_caption(frame)]
+
+func _frame_caption(frame: Dictionary) -> String:
+	var name := "система" if int(frame.reference) < 0 else "«%s»" % frame.name
+	if frame.surface:
+		name = "поверхность %s" % name
+	match str(frame.mode):
+		"auto": return "Авто · %s" % name
+		"body": return name
+	return "Система"
 
 func _scoop_hint(status: Dictionary) -> String:
 	if status.ok:
@@ -1019,6 +1035,7 @@ func _refresh_disabled_actions() -> void:
 		blocked = blocked or (action == "dock_sync" and _dock_sync_blocked)
 		blocked = blocked or (action == "dock_clearance" and _dock_clearance_blocked)
 		blocked = blocked or (action == "gear" and _gear_blocked)
+		blocked = blocked or (action == "frame" and _frame_blocked)
 		var during_jump := _jumping and action not in ["throttle_down", "throttle_up", "boost", "brake"]
 		var during_departure := _departure_active and (action != "dock" or not _departure_can_cancel)
 		button.disabled = not _input_enabled or blocked or during_jump or during_departure
@@ -1191,6 +1208,8 @@ func _commit_action(action: String) -> void:
 		_translation_mode = not _translation_mode
 		_reset_controls()
 		_update_translation_mode()
+	elif action == "frame":
+		frame_requested.emit()
 	else:
 		if action == "flight_assist":
 			_reset_controls()

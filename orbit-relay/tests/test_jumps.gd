@@ -246,8 +246,12 @@ func _test_touch_route() -> void:
 	game = _open_scene()
 	await process_frame
 	flight = game.flight
-	_expect(flight.snapshot() == upon_arrival and flight.system_id == VELAR,
-		"A cold scene loads the new system and exact post-jump state")
+	var restored: Dictionary = flight.snapshot()
+	var fuel_matches := absf(float(restored.ship.fuel) - float(upon_arrival.ship.fuel)) < 0.000000001
+	restored.ship.erase("fuel")
+	upon_arrival.ship.erase("fuel")
+	_expect(restored == upon_arrival and fuel_matches and flight.system_id == VELAR,
+		"A cold scene loads the new system and preserves post-jump state through JSON")
 	_tap(game._hud._actions.get("map"), "A touch opens the new system's local map")
 	await process_frame
 	var local_map: Node = game._map

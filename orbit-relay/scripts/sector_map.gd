@@ -5,6 +5,7 @@ signal orbit_requested(focus_id: int)
 signal rendezvous_requested(site_id: int, gap: int)
 signal rendezvous_finish_requested()
 signal survey_requested(site: int)
+signal frame_selected(selection: int)
 signal dismissed()
 
 const Sector := preload("res://scripts/sector_catalog.gd")
@@ -62,6 +63,7 @@ var _rendezvous_button: Button
 var _survey_button: Button
 var _navigation_panel: VBoxContainer
 var _trajectory_panel: VBoxContainer
+var _trajectory_scroll: ScrollContainer
 var _rendezvous_panel: VBoxContainer
 var _survey_panel: VBoxContainer
 var _survey_target: Label
@@ -82,6 +84,8 @@ var _focus_buttons: Dictionary[int, Button] = {}
 var _companion_focus_choices: HBoxContainer
 var _orbit_state: Label
 var _orbit_reference: Label
+var _frame_label: Label
+var _frame_button: Button
 var _orbit_values: Dictionary[String, Label] = {}
 var _orbit_window: Label
 var _forecast_summary: Label
@@ -93,10 +97,12 @@ var _home_scoop_sites: HBoxContainer
 var _site_buttons: Dictionary[int, Button] = {}
 var _touches: Dictionary[int, Button] = {}
 var _touch_sites: Dictionary[int, int] = {}
+var _trajectory_touch := -1
 var _flight: RefCounted
 var _candidate := -1
 var _star_focus := -1
 var _orbit_focus := -1
+var _frame_focus := -1
 var _forecast_cache: Dictionary[int, Dictionary] = {}
 var _rendezvous_status: Dictionary = {}
 var _rendezvous_gap := 150
@@ -232,24 +238,44 @@ func _build_trajectory_panel(parent: PanelContainer) -> void:
 			var body := Sector.site(id)
 			if body.kind in ["planet", "moon", "gas"]:
 				_add_focus_button(_companion_focus_choices if multiple_stars else focus_choices, id, str(body.name))
-	_orbit_state = _label(_trajectory_panel, "", 18, TEXT)
+	_trajectory_scroll = ScrollContainer.new()
+	_trajectory_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_trajectory_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_trajectory_panel.add_child(_trajectory_scroll)
+	var readout := VBoxContainer.new()
+	readout.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	readout.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	readout.add_theme_constant_override("separation", 4)
+	_trajectory_scroll.add_child(readout)
+	_orbit_state = _label(readout, "", 18, TEXT)
 	_orbit_state.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_orbit_reference = _label(_trajectory_panel, "", 16, MUTED)
+	_orbit_reference = _label(readout, "", 16, MUTED)
 	_orbit_reference.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_trajectory_panel.add_child(HSeparator.new())
-	_orbit_values = _build_metrics(_trajectory_panel, ORBIT_METRICS)
-	_trajectory_panel.add_child(HSeparator.new())
-	_forecast_summary = _label(_trajectory_panel, "", 16, TRAJECTORY)
+	readout.add_child(HSeparator.new())
+	_orbit_values = _build_metrics(readout, ORBIT_METRICS)
+	readout.add_child(HSeparator.new())
+	_forecast_summary = _label(readout, "", 16, TRAJECTORY)
 	_forecast_summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_orbit_window = _label(_trajectory_panel, "", 16, MUTED)
+	_orbit_window = _label(readout, "", 16, MUTED)
 	_orbit_window.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var spacer := Control.new()
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_trajectory_panel.add_child(spacer)
-	_orbit_note = _label(_trajectory_panel, "", 16, MUTED)
+	readout.add_child(spacer)
+	_orbit_note = _label(readout, "", 16, MUTED)
 	_orbit_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_orbit_button = _button(_trajectory_panel, "Круговая орбита", 52)
+	_frame_label = _label(_trajectory_panel, "", 15, MINT)
+	_frame_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var actions := HBoxContainer.new()
+	actions.add_theme_constant_override("separation", 7)
+	_trajectory_panel.add_child(actions)
+	_frame_button = _button(actions, "Кадр системы", 52)
+	_frame_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_frame_button.add_theme_font_size_override("font_size", 16)
+	_frame_button.pressed.connect(_request_frame)
+	_orbit_button = _button(actions, "Круговая орбита", 52)
+	_orbit_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_orbit_button.add_theme_font_size_override("font_size", 16)
 	_orbit_button.add_theme_stylebox_override("normal", _panel_style(Color("35294b"), TRAJECTORY, 8, 9))
 	_orbit_button.add_theme_stylebox_override("hover", _panel_style(Color("53416b"), TRAJECTORY, 8, 9))
 	_orbit_button.pressed.connect(_request_orbit)
@@ -366,9 +392,12 @@ func open(sim: RefCounted) -> void:
 	_chart.forecast_impact = -1
 	_touches.clear()
 	_touch_sites.clear()
+	_trajectory_touch = -1
+	_trajectory_scroll.scroll_vertical = 0
 	var system_id: int = sim.system_id
 	_star_focus = Sector.star_for(system_id)
 	_orbit_focus = int(sim.orbit_maneuver_focus) if sim.orbit_maneuver and sim.orbit_maneuver_focus >= 0 else _star_focus
+	_frame_focus = -1
 	_title.text = "Карта системы «%s»" % Sector.system(system_id).name
 	var here := _current_site()
 	_here.text = "В полёте" if here < 0 else str(Sector.site(here).name)
@@ -711,7 +740,24 @@ func _refresh_trajectory() -> void:
 	_orbit_note.text = str(status.reason) if _orbit_button.disabled else "Нужно Δv %s" % _number_label(float(status.delta_v), "м/с")
 	if maneuver:
 		_orbit_note.text = "Разворот на манёвр" if status.maneuver_phase == "turn" else "Корректируем скорость"
+	_refresh_frame()
 	_chart.queue_redraw()
+
+
+func _refresh_frame() -> void:
+	var frame: Dictionary = _flight.frame_status()
+	var name := "система" if int(frame.reference) < 0 else "«%s»" % frame.name
+	if frame.surface:
+		name = "поверхность %s" % name
+	if frame.mode == "auto":
+		name = "Авто · %s" % name
+	elif frame.mode == "system":
+		name = "Система"
+	_frame_label.text = "Кадр полёта · %s" % name
+	_frame_button.text = "Кадр системы" if _frame_focus < 0 else "Кадр тела"
+	_frame_button.disabled = not frame.available or int(frame.choice) == _frame_focus
+	var proposed := "системы" if _frame_focus < 0 else "«%s»" % _flight.target_name(_frame_focus)
+	_frame_button.tooltip_text = "Использовать кадр %s для ручного пилотирования" % proposed if frame.available else "Кадр можно переключить в полёте"
 
 
 func _select_orbit_focus(id: int) -> void:
@@ -721,7 +767,16 @@ func _select_orbit_focus(id: int) -> void:
 	if not _focus_buttons.has(id) or not _chart.centers.has(body):
 		return
 	_orbit_focus = body
+	_frame_focus = body
+	_trajectory_scroll.scroll_vertical = 0
 	_refresh_trajectory()
+
+
+func _request_frame() -> void:
+	if is_open() and _trajectory_panel.visible and not _frame_button.disabled:
+		frame_selected.emit(_frame_focus)
+		if is_open():
+			_refresh_frame()
 
 
 func _request_orbit() -> void:
@@ -752,6 +807,8 @@ func _input(event: InputEvent) -> void:
 			var button := _button_at(touch.position)
 			if button != null:
 				_touches[touch.index] = button
+			elif _trajectory_touch < 0 and _trajectory_scroll.is_visible_in_tree() and _trajectory_scroll.get_global_rect().has_point(touch.position):
+				_trajectory_touch = touch.index
 			elif _chart.get_global_rect().has_point(touch.position):
 				var id := _chart_site_at(touch.position)
 				if id != -1:
@@ -761,6 +818,8 @@ func _input(event: InputEvent) -> void:
 			var id: int = _touch_sites.get(touch.index, -1)
 			_touches.erase(touch.index)
 			_touch_sites.erase(touch.index)
+			if touch.index == _trajectory_touch:
+				_trajectory_touch = -1
 			if not touch.canceled:
 				if button != null and button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(touch.position):
 					button.pressed.emit()
@@ -768,6 +827,8 @@ func _input(event: InputEvent) -> void:
 					_select_site(id)
 		get_viewport().set_input_as_handled()
 	elif event is InputEventScreenDrag:
+		if event.index == _trajectory_touch and _trajectory_scroll.is_visible_in_tree():
+			_trajectory_scroll.scroll_vertical = maxi(0, _trajectory_scroll.scroll_vertical - roundi(event.relative.y))
 		get_viewport().set_input_as_handled()
 
 
@@ -775,10 +836,14 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
 		_touches.clear()
 		_touch_sites.clear()
+		_trajectory_touch = -1
 
 
 func _button_at(point: Vector2) -> Button:
-	for button: Button in [_select_button, _orbit_button, _rendezvous_action, _rendezvous_finish, _scan_button, _view_button, _trajectory_button, _rendezvous_button, _survey_button, _close_button]:
+	for button: Button in [
+		_select_button, _frame_button, _orbit_button, _rendezvous_action, _rendezvous_finish,
+		_scan_button, _view_button, _trajectory_button, _rendezvous_button, _survey_button, _close_button,
+	]:
 		if button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(point):
 			return button
 	for button: Button in _focus_buttons.values():

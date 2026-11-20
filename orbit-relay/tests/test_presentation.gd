@@ -241,6 +241,7 @@ func _with_remote_dock(active: Dictionary) -> Flight:
 	var contact := flight.docking_position(port)
 	active.merge({"system_id": Catalog.FRINGE_SYSTEM, "docked": port, "target": port,
 		"position": [contact.x, contact.y, contact.z], "velocity": [0.0, 0.0, 0.0],
+		"frame": flight.frame.snapshot(),
 		"planned_target": -1, "jump_target": -1, "dock_access": flight.dock_access.snapshot()}, true)
 	return flight if flight.restore(active) else null
 
