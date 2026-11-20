@@ -16,6 +16,13 @@ const BACKDROP_ORBIT_SECONDS := 28800.0
 const CLOUD_CYCLE_SECONDS := 1080.0
 const CAMERA_SURFACE_CLEARANCE := 2.0
 const REMOTE_RIG_VIEW_DISTANCE := 480.0
+const FRAGMENT_VIEW_DISTANCE := 420.0
+const FRAGMENT_ROLL_AXIS := Vector3(0.36, 0.80, 0.48)
+const FRAGMENT_FINISH := {
+	"ore": [Color("#a16652"), 0.68, 0.22],
+	"crystal": [Color("#c394dd"), 0.31, 0.06],
+	"ice": [Color("#8dc7e0"), 0.42, 0.05],
+}
 const BERTH_CAMERA_OFFSET := Vector3(8.4, 9.2, 24.0)
 const BERTH_CAMERA_FOCUS := Vector3(0.0, 0.0, -15.0)
 const DEPARTURE_CAMERA_BLEND_START := 16.0
@@ -29,6 +36,7 @@ static var _panel_shader: Shader
 static var _paint_panel_data: Texture2D
 static var _brushed_panel_data: Texture2D
 static var _hatch_panel_geometry: ArrayMesh
+static var _fragment_shader: Shader
 
 
 class DockHatch extends Node3D:
@@ -77,6 +85,12 @@ var _backdrop_material: ShaderMaterial
 var _backdrop_orbit_offset := Vector3.ZERO
 var _backdrop_orbit_axis := Vector3.UP
 var _mining_rig: Node3D
+var _fragment_views: Dictionary[int, MeshInstance3D] = {}
+var _fragment_meshes: Dictionary[String, ArrayMesh] = {}
+var _fragment_paints: Dictionary[String, ShaderMaterial] = {}
+var _mining_beam: Node3D
+var _mining_beam_halo: MeshInstance3D
+var _mining_impact: MeshInstance3D
 var _traffic: Node3D
 var _atmosphere: Node3D
 var _surface_guide: MeshInstance3D
@@ -123,6 +137,7 @@ func build() -> void:
 	_build_ship_model(_ship_hull_id)
 	_mining_rig = MiningRigView.new()
 	add_child(_mining_rig)
+	_build_mining_pulse()
 	_traffic = TrafficView.new()
 	add_child(_traffic)
 	_traffic.set_visual_profile(_visual_profile)
@@ -151,6 +166,7 @@ func _load_sector(id: int) -> void:
 	_gate_materials.clear()
 	_surface_views.clear()
 	_stellar_views.clear()
+	_fragment_views.clear()
 	_sector_fittings.clear()
 	_sector_finishes.clear()
 	_system_id = id
@@ -226,6 +242,10 @@ func set_visual_profile(profile: int) -> void:
 	for finishes in [_ship_finishes, _sector_finishes]:
 		for finish: ShaderMaterial in finishes:
 			finish.set_shader_parameter("finish_quality", _visual_profile)
+	for finish: ShaderMaterial in _fragment_paints.values():
+		finish.set_shader_parameter("detail_quality", _visual_profile)
+	if is_instance_valid(_mining_beam_halo):
+		_mining_beam_halo.visible = _visual_profile > 0
 	if _backdrop_material != null:
 		_backdrop_material.set_shader_parameter("cloud_quality", _visual_profile)
 	# A profile also applies to every newly loaded surface, star and NPC.
@@ -387,6 +407,8 @@ func sync(sim: RefCounted, delta: float) -> void:
 	elif not rig_deployed:
 		var deposit: Transform3D = sim.surface_deposit() if landed else _ship.global_transform
 		_mining_rig.sync(_ship.global_transform, deposit, int(sim.mining.phase) if landed else MiningRig.STOWED, sim.mining.progress(), float(sim.elapsed))
+	_sync_fragments(sim.local_fragments(), position_now, float(sim.orbit_time))
+	_sync_mining_pulse(sim.orbital_mining_beam())
 	_traffic.sync(sim.traffic_contacts(), sim.combat_beams())
 	_atmosphere.sync(sim, camera, settled)
 	# Compatibility supports ordinary distance fog; keep it local and subtle.
@@ -398,6 +420,141 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_lighting.fog_light_energy = 0.48
 		_lighting.fog_density = float(haze.density) * 0.0015
 		_lighting.fog_sky_affect = 0.0
+
+
+func _sync_fragments(fragments: Array, pilot_position: Vector3, epoch: float) -> void:
+	var active_sites: Array[int] = []
+	for fragment: Dictionary in fragments:
+		var site := int(fragment.site)
+		var resource := str(fragment.resource)
+		var world: Vector3 = fragment.position
+		active_sites.append(site)
+		if not _fragment_views.has(site):
+			var piece := _mesh(_sector, _fragment_shape(resource), _fragment_paint(resource), world)
+			piece.name = "Fragment_%d" % site
+			_fragment_views[site] = piece
+		var piece := _fragment_views[site]
+		piece.position = world
+		piece.visible = pilot_position.distance_squared_to(world) <= FRAGMENT_VIEW_DISTANCE * FRAGMENT_VIEW_DISTANCE
+		var turn := fposmod(epoch, 13.8) * (TAU / 13.8) + float(site) * 1.37
+		piece.basis = Basis(FRAGMENT_ROLL_AXIS, turn)
+	for site: int in _fragment_views.keys():
+		if site in active_sites:
+			continue
+		var piece := _fragment_views[site]
+		_sector.remove_child(piece)
+		piece.queue_free()
+		_fragment_views.erase(site)
+
+
+func _fragment_shape(resource: String) -> ArrayMesh:
+	if _fragment_meshes.has(resource):
+		return _fragment_meshes[resource]
+	var geometry := SurfaceTool.new()
+	geometry.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var edges := PackedVector3Array([
+		Vector3(1.53, 0.03, 0.10), Vector3(0.76, 0.12, 1.07), Vector3(-0.73, -0.10, 1.25),
+		Vector3(-1.40, 0.19, 0.24), Vector3(-0.81, -0.12, -1.05), Vector3(0.54, 0.27, -1.29),
+	])
+	var top := Vector3(0.33, 1.24, 0.29)
+	var base := Vector3(-0.18, -0.83, -0.31)
+	if resource != "ore":
+		for index in range(edges.size()):
+			edges[index] *= Vector3(0.74, 1.0, 0.86)
+		top.y = 1.62
+		base.y = -1.28
+	for index in range(edges.size()):
+		var following := (index + 1) % edges.size()
+		var left := float(index) / edges.size()
+		var right := float(index + 1) / edges.size()
+		var middle := (left + right) * 0.5
+		_facet(geometry, top, edges[index], edges[following], Vector2(middle, 0.0), Vector2(left, 0.5), Vector2(right, 0.5))
+		_facet(geometry, base, edges[following], edges[index], Vector2(middle, 1.0), Vector2(right, 0.5), Vector2(left, 0.5))
+	var mesh := geometry.commit()
+	_fragment_meshes[resource] = mesh
+	return mesh
+
+
+func _fragment_paint(resource: String) -> ShaderMaterial:
+	if _fragment_paints.has(resource):
+		return _fragment_paints[resource]
+	if _fragment_shader == null:
+		_fragment_shader = Shader.new()
+		_fragment_shader.code = """
+shader_type spatial;
+render_mode diffuse_burley;
+uniform vec4 mineral_tint : source_color;
+uniform sampler2D mineral_data : filter_linear_mipmap, repeat_enable;
+uniform float roughness_base;
+uniform float metal_base;
+uniform int detail_quality;
+
+void fragment() {
+	vec3 color = mineral_tint.rgb;
+	float roughness = roughness_base;
+	if (detail_quality > 0) {
+		vec3 texel = texture(mineral_data, UV * vec2(3.5, 1.5)).rgb;
+		color *= mix(0.62, 1.42, texel.r);
+		color = mix(color, mineral_tint.rgb * 1.65, smoothstep(0.65, 0.86, texel.g) * 0.30);
+		roughness += (texel.b - 0.5) * 0.22;
+	}
+	ALBEDO = color;
+	ROUGHNESS = clamp(roughness, 0.18, 0.95);
+	METALLIC = metal_base;
+	EMISSION = color * 0.22;
+}
+"""
+	var paint := ShaderMaterial.new()
+	paint.shader = _fragment_shader
+	var finish: Array = FRAGMENT_FINISH.get(resource, FRAGMENT_FINISH.ore)
+	paint.set_shader_parameter("mineral_tint", finish[0])
+	paint.set_shader_parameter("roughness_base", finish[1])
+	paint.set_shader_parameter("metal_base", finish[2])
+	paint.set_shader_parameter("mineral_data", load("res://assets/materials/rock_ice.png" if resource == "ice" else "res://assets/materials/rock_basalt.png"))
+	paint.set_shader_parameter("detail_quality", _visual_profile)
+	_fragment_paints[resource] = paint
+	return paint
+
+
+func _build_mining_pulse() -> void:
+	_mining_beam = Node3D.new()
+	_mining_beam.name = "MiningPulse"
+	add_child(_mining_beam)
+	_cylinder(_mining_beam, _light(Color("#fff0b5")), Vector3.ZERO, 0.24, 0.24, 1.0, 6)
+	var glow := _light(Color(1.0, 0.66, 0.16, 0.38))
+	glow.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	glow.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	_mining_beam_halo = _cylinder(_mining_beam, glow, Vector3.ZERO, 0.49, 0.49, 1.0, 6)
+	_mining_beam.hide()
+	var flash := SphereMesh.new()
+	flash.radius = 0.9
+	flash.height = 1.8
+	flash.radial_segments = 7
+	flash.rings = 4
+	_mining_impact = _mesh(self, flash, glow, Vector3.ZERO)
+	_mining_impact.hide()
+
+
+func _sync_mining_pulse(shot: Dictionary) -> void:
+	_mining_beam.hide()
+	_mining_impact.hide()
+	if shot.is_empty() or float(shot.remaining) <= 0.0:
+		return
+	var start: Vector3 = shot.start
+	var finish: Vector3 = shot.end
+	var offset := finish - start
+	var distance := offset.length()
+	if not is_finite(distance) or distance < 0.1:
+		return
+	var direction := offset / distance
+	var up := Vector3.RIGHT if absf(direction.y) > 0.97 else Vector3.UP
+	var fade := lerpf(0.18, 1.0, smoothstep(0.0, 0.11, float(shot.remaining)))
+	_mining_beam.position = (start + finish) * 0.5
+	_mining_beam.basis = Basis.looking_at(direction, up).scaled_local(Vector3(fade, fade, distance))
+	_mining_beam.show()
+	_mining_impact.position = finish
+	_mining_impact.scale = Vector3.ONE * fade
+	_mining_impact.visible = _visual_profile > 0
 
 
 func _update_stellar_light(light: DirectionalLight3D, source: Vector3, observer: Vector3, strength: float) -> void:

@@ -27,6 +27,7 @@ const RIG_ACTIONS := {
 	"rig_deploy": "can_deploy", "rig_unload": "can_unload",
 	"rig_retrieve": "can_retrieve", "rig_route": "can_route",
 }
+const ORBITAL_MINING_ACTIONS := {"mining_pulse": "fire_ok", "fragment_collect": "collect_ok"}
 
 var _hud: Control
 var _safe: Control
@@ -41,6 +42,9 @@ var _passenger_route: Label
 var _rig_readout: HBoxContainer
 var _rig_summary: Label
 var _rig_status: Dictionary = {}
+var _orbital_mining_readout: Label
+var _orbital_mining_tools: HBoxContainer
+var _orbital_mining_status: Dictionary = {}
 var _telemetry: Label
 var _condition: Label
 var _fuel: Label
@@ -140,6 +144,9 @@ func build() -> void:
 	_button(_rig_readout, "rig_route", "К буру")
 	_actions["rig_route"].size_flags_horizontal = Control.SIZE_SHRINK_END
 	_rig_readout.hide()
+	_orbital_mining_readout = _label(route_stack, 16, CYAN)
+	_orbital_mining_readout.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_orbital_mining_readout.hide()
 	var course_card := route_stack.get_parent() as PanelContainer
 	var shortcuts := HBoxContainer.new()
 	shortcuts.add_theme_constant_override("separation", 8)
@@ -309,6 +316,12 @@ func build() -> void:
 	fire_button.add_theme_stylebox_override("normal", _box(Color("482b32"), ALERT, 9, 7.0))
 	fire_button.add_theme_stylebox_override("hover", _box(Color("633c45"), ALERT, 9, 7.0))
 	fire_button.add_theme_stylebox_override("pressed", _box(Color("78505a"), ALERT, 9, 7.0))
+	_orbital_mining_tools = HBoxContainer.new()
+	_orbital_mining_tools.add_theme_constant_override("separation", 7)
+	right.add_child(_orbital_mining_tools)
+	_button(_orbital_mining_tools, "mining_pulse", "Горный лазер")
+	_button(_orbital_mining_tools, "fragment_collect", "Подобрать обломок")
+	_orbital_mining_tools.hide()
 	_actions["map"].tooltip_text = "Карта звёздной системы"
 	_actions["galaxy"].tooltip_text = "Карта галактики"
 	_actions["report"].tooltip_text = "Отчёт об ошибке"
@@ -527,8 +540,11 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_fire_blocked = not fire.get("ok", false)
 	var flight_tools := patrol_button.visible or convoy_button.visible or fire_button.visible or approach_active
 	_port_tools.visible = port_services or flight_tools
+	_sync_orbital_mining({} if parked or _jumping else sim.orbital_mining_status())
 	_right_panel.visible = not _departure_active
 	_right_panel.offset_top = -157.0 if docked else (-101.0 if landed else (-274.0 if flight_tools else -215.0))
+	if _orbital_mining_tools.visible:
+		_right_panel.offset_top -= 57.0
 	_marks.flight = not parked
 	_marks.queue_redraw()
 	_sync_remote_rig(sim.remote_rig_status(), docked, landed)
@@ -637,6 +653,37 @@ func _sync_remote_rig(status: Dictionary, docked: bool, landed: bool) -> void:
 		place = "%s · %s" % [Sector.system(int(status.system)).name, place]
 	var work := "Добыча" if status.working else "Буфер полон" if int(status.stored) >= int(status.capacity) else "Жила исчерпана"
 	_rig_summary.text = "Бур · %s\n%s · %d/%d ед." % [place, work, int(status.stored), int(status.capacity)]
+
+func _sync_orbital_mining(status: Dictionary) -> void:
+	_orbital_mining_status = status
+	var laser: Button = _actions["mining_pulse"]
+	var collector: Button = _actions["fragment_collect"]
+	var fragment := bool(status.get("fragment", false))
+	var installed := bool(status.get("installed", false))
+	var visible := bool(status.get("visible", false)) and (installed or bool(status.get("collector", false)) or fragment)
+	laser.visible = visible and installed and not fragment
+	collector.visible = visible and fragment
+	_orbital_mining_tools.visible = laser.visible or collector.visible
+	_orbital_mining_readout.visible = visible
+	if not visible:
+		return
+	var resource := str(status.resource)
+	var distance := roundi(float(status.distance))
+	var reason := ""
+	if fragment:
+		_orbital_mining_readout.text = ("Обломок · %s · %d м · %.1f м/с" % [resource, distance, float(status.relative_speed)]).replace(".", ",")
+		reason = "" if status.collect_ok else str(status.collect_reason)
+		collector.tooltip_text = "Перенести обломок в трюм" if status.collect_ok else reason
+	else:
+		_orbital_mining_readout.text = "Добыча · %s · %d м" % [resource, distance]
+		var cooldown := float(status.ready_in)
+		reason = "" if status.fire_ok else str(status.fire_reason)
+		if cooldown > 0.0:
+			_orbital_mining_readout.text += (" · %.1f с" % cooldown).replace(".", ",")
+		laser.tooltip_text = "Отколоть породу горным лазером" if status.fire_ok else reason
+	if not reason.is_empty():
+		_orbital_mining_readout.text += "\n" + reason
+	_orbital_mining_readout.add_theme_color_override("font_color", CYAN if reason.is_empty() else AMBER)
 
 func _sync_passengers(sim: RefCounted) -> void:
 	var status: Dictionary = sim.passenger_status()
@@ -1088,6 +1135,7 @@ func _refresh_disabled_actions() -> void:
 		blocked = blocked or (action == "gear" and _gear_blocked)
 		blocked = blocked or (action == "frame" and _frame_blocked)
 		blocked = blocked or (RIG_ACTIONS.has(action) and not _rig_status.get(RIG_ACTIONS[action], false))
+		blocked = blocked or (ORBITAL_MINING_ACTIONS.has(action) and not _orbital_mining_status.get(ORBITAL_MINING_ACTIONS[action], false))
 		var during_jump := _jumping and action not in ["throttle_down", "throttle_up", "boost", "brake"]
 		var during_departure := _departure_active and (action != "dock" or not _departure_can_cancel)
 		button.disabled = not _input_enabled or blocked or during_jump or during_departure

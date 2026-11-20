@@ -185,6 +185,8 @@ func _test_interval_and_migration() -> void:
 	_set_stock(historical, 0, "circuits", 37)
 	var old := _json(historical.snapshot())
 	old.schema = 15
+	old.ship.erase("mining_laser")
+	old.ship.erase("fragment_collector")
 	old.ship.erase("hull_id")
 	old.ship.erase("jump_fuel")
 	old.mining.cargo.erase("hydrogen")

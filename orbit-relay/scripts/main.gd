@@ -137,11 +137,15 @@ func _update_display(delta: float) -> void:
 	if rendezvous_marker:
 		var rendezvous := flight.rendezvous_status()
 		marker = flight.target_position(rendezvous.site) if rendezvous.phase == "hold" else rendezvous.point
+	var fragment := flight.orbital_mining.fragment_state(flight.target, flight.orbit_time)
+	var fragment_marker := not fragment.is_empty() and not flight.autopilot and not signal_selected and not project_marker and not convoy_marker
+	if fragment_marker:
+		marker = fragment.position
 	var instruments_visible := flight.docked < 0 and not flight.landed and not _overlay_open() and flight.jump_seconds_left <= 0.0
 	var in_view := instruments_visible and not _view.camera.is_position_behind(marker)
 	if patrol_status.phase == Flight.Patrol.ENGAGED and patrol_status.same_system:
 		in_view = false
-	elif in_view and not flight.autopilot and not signal_selected and not project_marker and not convoy_marker and not rendezvous_marker:
+	elif in_view and not flight.autopilot and not signal_selected and not project_marker and not convoy_marker and not rendezvous_marker and not fragment_marker:
 		var surface := flight.surface_status()
 		in_view = not surface.near or surface.pad
 	_hud.set_target_marker(_view.camera.unproject_position(marker) if in_view else Vector2.ZERO, in_view)
@@ -203,6 +207,10 @@ func _handle_action(action: String) -> void:
 			flight.fire_action()
 		"mine":
 			flight.mine_action()
+		"mining_pulse":
+			flight.fire_mining_pulse()
+		"fragment_collect":
+			flight.collect_fragment()
 		"rig_deploy":
 			flight.leave_remote_rig()
 		"rig_unload":
@@ -338,6 +346,13 @@ func _deliver_notice() -> void:
 			"site": rig.site, "stored": rig.stored, "reserve": rig.reserve,
 			"system_id": flight.system_id, "orbit_time": flight.orbit_time, "landed_site": flight.landed_site,
 		}
+	elif event in ["mining_pulse", "fragment_collected"]:
+		var mining := flight.orbital_mining_status()
+		trace_fields = {
+			"site": mining.site, "fragment": mining.fragment, "resource": mining.resource,
+			"reserve": flight.mining.reserve_at(mining.site), "fuel": flight.ship.fuel,
+			"system_id": flight.system_id, "orbit_time": flight.orbit_time,
+		}
 	elif event == "reference_frame":
 		var frame := flight.frame_status()
 		trace_fields = {
@@ -358,7 +373,8 @@ func _deliver_notice() -> void:
 		"fuel_transfer", "service_jump_refuel", "cargo_jettisoned",
 		"atmosphere_enter", "atmosphere_exit", "atmosphere_damage",
 		"gear_deploy", "gear_retract", "gear_ready", "gear_stowed",
-		"service_heat_shield",
+		"service_heat_shield", "service_mining_laser", "service_fragment_collector",
+		"mining_pulse", "fragment_collected",
 		"jump_planned", "jump_complete", "route_canceled",
 		"market_buy", "market_sell", "service_repair", "service_cargo", "hull_damage", "contract_leg",
 		"passenger_accepted", "passenger_overdue", "passenger_paid", "passenger_late", "passenger_canceled",

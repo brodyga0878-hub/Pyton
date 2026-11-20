@@ -198,6 +198,8 @@ func _test_previous_schema() -> void:
 		return
 	var historic := flight.snapshot()
 	historic.schema = 25
+	historic.ship.erase("mining_laser")
+	historic.ship.erase("fragment_collector")
 	historic.mining.reserves.resize(Catalog.AUTHORED_DESTINATION_COUNT)
 	historic.erase("cartography")
 	var cold := Flight.new()

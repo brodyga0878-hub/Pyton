@@ -133,6 +133,8 @@ func _test_migration() -> void:
 			"A malformed equipment flag is rejected without mutating the restored flight")
 	var previous := saved.duplicate(true)
 	previous.schema = 14
+	previous.ship.erase("mining_laser")
+	previous.ship.erase("fragment_collector")
 	previous.ship.erase("hull_id")
 	previous.ship.erase("jump_fuel")
 	previous.mining.cargo.erase("hydrogen")

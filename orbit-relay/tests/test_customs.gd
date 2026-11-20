@@ -145,6 +145,8 @@ func _test_change_of_authority() -> void:
 func _test_previous_schema() -> void:
 	var old := Flight.new().snapshot()
 	old.schema = 30
+	old.ship.erase("mining_laser")
+	old.ship.erase("fragment_collector")
 	old.erase("customs")
 	old.mining.cargo.medical = 7
 	var migrated := Flight.new()

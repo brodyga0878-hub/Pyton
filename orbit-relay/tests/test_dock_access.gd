@@ -175,6 +175,8 @@ func _test_save_and_reload() -> void:
 	_set_axial_pose(resumed, ALTERNATE_PORT, Access.HATCH_AXIS_OFFSET - 0.04, 8.0)
 	var legacy := _json(resumed.snapshot())
 	legacy.schema = 20
+	legacy.ship.erase("mining_laser")
+	legacy.ship.erase("fragment_collector")
 	legacy.mining.reserves.resize(Catalog.AUTHORED_DESTINATION_COUNT)
 	legacy.ship.erase("hull_id")
 	legacy.erase("dock_access")

@@ -168,6 +168,8 @@ func _test_previous_save() -> void:
 		return
 	var old := previous.snapshot()
 	old.schema = 26
+	old.ship.erase("mining_laser")
+	old.ship.erase("fragment_collector")
 	old.mining.reserves.resize(Catalog.AUTHORED_DESTINATION_COUNT)
 	old.cartography.erase("systems")
 	var cold := Flight.new()

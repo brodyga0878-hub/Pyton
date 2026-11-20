@@ -8,6 +8,8 @@ const TANK_COST := 260
 const ECO_COST := 320
 const CARGO_COST := 300
 const HEAT_SHIELD_COST := 340
+const MINING_LASER_COST := 140
+const FRAGMENT_COLLECTOR_COST := 90
 const HEAT_SHIELD_REDUCTION := 48
 const BASE_CARGO_CAPACITY := 24
 const EXPANDED_CARGO_CAPACITY := 40
@@ -30,7 +32,9 @@ const LEGACY_SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded"]
 const PRE_SHIELD_SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded"]
 const PRE_DUAL_FUEL_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded", "heat_shield"]
 const PRE_SHIPYARD_FIELDS := ["fuel", "jump_fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded", "heat_shield"]
-const SAVE_FIELDS := ["hull_id", "fuel", "jump_fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded", "heat_shield"]
+const PRE_ORBITAL_MINING_FIELDS := ["hull_id", "fuel", "jump_fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded", "heat_shield"]
+const SAVE_FIELDS := ["hull_id", "fuel", "jump_fuel", "tank_upgraded", "eco_upgraded", "hull",
+	"cargo_upgraded", "heat_shield", "mining_laser", "fragment_collector"]
 
 var fuel: float = BASE_CAPACITY
 var jump_fuel: float = BASE_CAPACITY
@@ -39,6 +43,8 @@ var eco_upgraded := false
 var hull: float = MAX_HULL
 var cargo_upgraded := false
 var heat_shield := false
+var mining_laser := false
+var fragment_collector := false
 var hull_id: String:
 	get:
 		return _hull_id
@@ -186,6 +192,12 @@ func service_offer(action: String, unit_price: int, credits: int) -> Dictionary:
 		"heat_shield":
 			cost = HEAT_SHIELD_COST
 			installed = heat_shield
+		"mining_laser":
+			cost = MINING_LASER_COST
+			installed = mining_laser
+		"fragment_collector":
+			cost = FRAGMENT_COLLECTOR_COST
+			installed = fragment_collector
 	return {"cost": cost, "allowed": cost > 0 and cost <= credits and not installed, "installed": installed}
 
 
@@ -208,6 +220,10 @@ func buy(action: String, unit_price: int, credits: int) -> int:
 			cargo_upgraded = true
 		"heat_shield":
 			heat_shield = true
+		"mining_laser":
+			mining_laser = true
+		"fragment_collector":
+			fragment_collector = true
 	return offer.cost
 
 
@@ -217,10 +233,12 @@ func snapshot() -> Dictionary:
 		"fuel": fuel, "jump_fuel": jump_fuel,
 		"tank_upgraded": tank_upgraded, "eco_upgraded": eco_upgraded,
 		"hull": hull, "cargo_upgraded": cargo_upgraded, "heat_shield": heat_shield,
+		"mining_laser": mining_laser, "fragment_collector": fragment_collector,
 	}
 
 
-func restore(value: Variant, legacy := false, pre_shield := false, pre_dual_fuel := false, pre_shipyard := false) -> bool:
+func restore(value: Variant, legacy := false, pre_shield := false, pre_dual_fuel := false,
+		pre_shipyard := false, pre_orbital_mining := false) -> bool:
 	var fields := SAVE_FIELDS
 	if legacy:
 		fields = LEGACY_SAVE_FIELDS
@@ -230,16 +248,20 @@ func restore(value: Variant, legacy := false, pre_shield := false, pre_dual_fuel
 		fields = PRE_DUAL_FUEL_FIELDS
 	elif pre_shipyard:
 		fields = PRE_SHIPYARD_FIELDS
+	elif pre_orbital_mining:
+		fields = PRE_ORBITAL_MINING_FIELDS
 	if not value is Dictionary or value.size() != fields.size() or not value.has_all(fields):
 		return false
 	var restored_hull_id := STARTER_HULL
-	if fields == SAVE_FIELDS:
+	if "hull_id" in fields:
 		if not value.hull_id is String or not HULLS.has(value.hull_id):
 			return false
 		restored_hull_id = value.hull_id
 	if not value.tank_upgraded is bool or not value.eco_upgraded is bool:
 		return false
 	if not (legacy or pre_shield) and not value.heat_shield is bool:
+		return false
+	if fields == SAVE_FIELDS and (not value.mining_laser is bool or not value.fragment_collector is bool):
 		return false
 	if not (value.fuel is float or value.fuel is int):
 		return false
@@ -271,4 +293,6 @@ func restore(value: Variant, legacy := false, pre_shield := false, pre_dual_fuel
 	hull = restored_hull
 	cargo_upgraded = restored_cargo_upgrade
 	heat_shield = false if legacy or pre_shield else value.heat_shield
+	mining_laser = value.get("mining_laser", false)
+	fragment_collector = value.get("fragment_collector", false)
 	return true

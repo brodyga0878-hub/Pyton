@@ -192,6 +192,8 @@ func _test_previous_schema() -> void:
 	flight.ship.jump_fuel = 52.0
 	var previous := flight.snapshot()
 	previous.schema = 22
+	previous.ship.erase("mining_laser")
+	previous.ship.erase("fragment_collector")
 	previous.mining.reserves.resize(Catalog.AUTHORED_DESTINATION_COUNT)
 	previous.ship.erase("hull_id")
 	previous.erase("passengers")

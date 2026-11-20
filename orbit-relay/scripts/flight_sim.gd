@@ -25,8 +25,14 @@ const Cartography = preload("res://scripts/cartography.gd")
 const FlightFrame = preload("res://scripts/flight_frame.gd")
 const Customs = preload("res://scripts/customs.gd")
 const UnattendedMining = preload("res://scripts/unattended_mining.gd")
-const SAVE_SCHEMA := 32
+const OrbitalMining = preload("res://scripts/orbital_mining.gd")
+const SAVE_SCHEMA := 33
 const REMOTE_RIG_ACCESS_DISTANCE := 20.0
+const MINING_PULSE_RANGE := 200.0
+const MINING_PULSE_FUEL := 0.4
+const MINING_BEAM_DURATION := 0.24
+const FRAGMENT_COLLECT_RANGE := 145.0
+const FRAGMENT_COLLECT_SPEED := 7.0
 const SHIPYARD_PORTS := [0, 10, Catalog.FRINGE_ARRIVAL_PORT]
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
@@ -131,6 +137,8 @@ var cartography := Cartography.new()
 var frame := FlightFrame.new()
 var customs := Customs.new()
 var remote_rig := UnattendedMining.new()
+var orbital_mining := OrbitalMining.new()
+var _mining_beam: Dictionary = {}
 var convoy_course := false
 var project_course := false
 var scooping := false
@@ -1901,6 +1909,144 @@ func combat_line_clear(start: Vector3, finish: Vector3) -> bool:
 	return true
 
 
+func local_fragments() -> Array[Dictionary]:
+	var fragments: Array[Dictionary] = []
+	for site: int in orbital_mining.fragment_sites():
+		if Catalog.system_of_site(site) == system_id:
+			fragments.append(orbital_mining.fragment_state(site, orbit_time))
+	return fragments
+
+
+func orbital_mining_beam() -> Dictionary:
+	if _mining_beam.is_empty() or orbit_time >= float(_mining_beam.until):
+		return {}
+	return {
+		"start": _mining_beam.start, "end": _mining_beam.end,
+		"remaining": float(_mining_beam.until) - orbit_time,
+	}
+
+
+func orbital_mining_status() -> Dictionary:
+	var valid_site := OrbitalMining.supports_site(target) and Catalog.system_of_site(target) == system_id
+	var open_flight := docked < 0 and not landed and jump_seconds_left <= 0.0
+	var body := Catalog.site(target)
+	var center := target_position(target)
+	var ray := center - position
+	var radius := float(body.get("radius", 0.0))
+	var standoff := maxf(0.0, ray.length() - radius * Terrain.MAX_RADIUS_FACTOR)
+	var fragment := orbital_mining.fragment_state(target, orbit_time) if valid_site else {}
+	var has_fragment := not fragment.is_empty()
+	var distance := position.distance_to(fragment.position) if has_fragment else standoff
+	var relative_speed := velocity.distance_to(fragment.velocity) if has_fragment else speed_relative_to(target)
+	var ready_in := maxf(0.0, orbital_mining.ready_at - orbit_time)
+	var common := ""
+	if not open_flight or scooping:
+		common = "Добыча доступна в свободном полёте"
+	elif not valid_site:
+		common = "Выберите астероид"
+	elif patrol.in_danger(self) or convoy_order.in_danger(self):
+		common = "Выйдите из боевого контакта"
+	var fire_reason := common
+	if fire_reason.is_empty():
+		if not ship.mining_laser:
+			fire_reason = "Установите горный лазер в порту"
+		elif has_fragment:
+			fire_reason = "Сначала подберите отделённый обломок"
+		elif mining.reserve_at(target) <= 0:
+			fire_reason = "Месторождение истощено"
+		elif ship.fuel < MINING_PULSE_FUEL:
+			fire_reason = "Нужно %.1f ед. реактивного топлива" % MINING_PULSE_FUEL
+		elif ready_in > 0.0:
+			fire_reason = "Лазер остывает"
+		elif standoff > MINING_PULSE_RANGE:
+			fire_reason = "Подойдите к породе на %d м" % int(MINING_PULSE_RANGE)
+		elif not _mining_aimed(ray, radius):
+			fire_reason = "Наведите нос на астероид"
+	var collect_reason := common
+	if collect_reason.is_empty():
+		if not ship.fragment_collector:
+			collect_reason = "Установите сборщик обломков в порту"
+		elif not has_fragment:
+			collect_reason = "Рядом нет отделённого обломка"
+		elif mining.free_capacity() == 0:
+			collect_reason = "Трюм заполнен"
+		elif distance > FRAGMENT_COLLECT_RANGE:
+			collect_reason = "Подойдите к обломку на %d м" % int(FRAGMENT_COLLECT_RANGE)
+		elif relative_speed > FRAGMENT_COLLECT_SPEED:
+			collect_reason = "Снизьте скорость к обломку до %d м/с" % int(FRAGMENT_COLLECT_SPEED)
+	return {
+		"visible": open_flight and valid_site and (standoff <= 500.0 or has_fragment),
+		"installed": ship.mining_laser, "collector": ship.fragment_collector, "site": target,
+		"resource": Catalog.resource_name(str(body.get("resource", ""))), "fragment": has_fragment,
+		"distance": distance, "relative_speed": relative_speed, "ready_in": ready_in,
+		"position": fragment.get("position", Vector3.ZERO),
+		"fire_ok": fire_reason.is_empty(), "collect_ok": collect_reason.is_empty(),
+		"fire_reason": fire_reason, "collect_reason": collect_reason,
+	}
+
+
+func _mining_aimed(relative: Vector3, radius: float) -> bool:
+	var aim := forward()
+	var reach := relative.dot(aim)
+	return reach > 0.0 and (relative - aim * reach).length_squared() <= pow(radius * 0.78, 2)
+
+
+func _mining_impact(site: int) -> Vector3:
+	var center := target_position(site)
+	var to_center := center - position
+	var axis := forward()
+	var reach := to_center.dot(axis)
+	var envelope := float(Catalog.site(site).radius) * Terrain.MAX_RADIUS_FACTOR + Terrain.CONTACT_CLEARANCE
+	var miss := (to_center - axis * reach).length_squared()
+	var before := maxf(0.0, reach - sqrt(maxf(0.0, envelope * envelope - miss)) - 0.1)
+	var high := reach
+	if not _inside_hull(position + axis * high, site):
+		return Vector3.INF
+	for _iteration in range(12):
+		var mid := (before + high) * 0.5
+		if _inside_hull(position + axis * mid, site):
+			high = mid
+		else:
+			before = mid
+	if high > MINING_PULSE_RANGE or not combat_line_clear(position, position + axis * maxf(0.0, before - 0.1)):
+		return Vector3.INF
+	return position + axis * high
+
+
+func fire_mining_pulse() -> bool:
+	var status := orbital_mining_status()
+	if not status.fire_ok:
+		_announce("mining_pulse_denied", str(status.fire_reason))
+		return false
+	var hit := _mining_impact(target)
+	if not hit.is_finite():
+		_announce("mining_pulse_denied", "Горный луч не достиг открытой породы.")
+		return false
+	var direction := (hit - target_position(target)).normalized()
+	if not orbital_mining.spawn(mining, target, direction, orbit_time):
+		return false
+	reset_time_scale()
+	ship.fuel -= MINING_PULSE_FUEL
+	_mining_beam = {"start": position, "end": hit, "until": orbit_time + MINING_BEAM_DURATION}
+	_announce("mining_pulse", "Обломок отделён. Снизьте скорость и подберите его.")
+	return true
+
+
+func collect_fragment() -> bool:
+	var status := orbital_mining_status()
+	if not status.collect_ok:
+		_announce("fragment_collect_denied", str(status.collect_reason))
+		return false
+	if not combat_line_clear(position, status.position):
+		_announce("fragment_collect_denied", "Между кораблём и обломком препятствие.")
+		return false
+	if not orbital_mining.collect(mining, target):
+		return false
+	reset_time_scale()
+	_announce("fragment_collected", "Обломок в трюме · %s." % str(status.resource))
+	return true
+
+
 func service_offer(action: String) -> Dictionary:
 	var unit_price := repair_unit_price() if action == "repair" else refuel_unit_price()
 	var offer := ship.service_offer(action, unit_price, credits)
@@ -1932,6 +2078,10 @@ func service_action(action: String) -> bool:
 			_announce("service_cargo", "Вместимость трюма увеличена до %d ед." % mining.cargo_capacity)
 		"heat_shield":
 			_announce("service_heat_shield", "Теплозащита установлена. Списано %d кр." % paid)
+		"mining_laser":
+			_announce("service_mining_laser", "Горный лазер установлен. Списано %d кр." % paid)
+		"fragment_collector":
+			_announce("service_fragment_collector", "Сборщик обломков установлен. Списано %d кр." % paid)
 	return true
 
 
@@ -2374,6 +2524,7 @@ func _charge_jump(delta: float) -> void:
 	ship.jump_fuel -= status.cost
 	dock_access.clear()
 	system_id = jump_target
+	_mining_beam.clear()
 	frame.reset_on_arrival()
 	if not _jump_route.is_empty() and _jump_route.front() == system_id:
 		_jump_route.pop_front()
@@ -3176,7 +3327,7 @@ func snapshot() -> Dictionary:
 		"passengers": passengers.snapshot(),
 		"crew": crew.snapshot(),
 		"cartography": cartography.snapshot(), "frame": frame.snapshot(), "customs": customs.snapshot(),
-		"remote_rig": remote_rig.snapshot(),
+		"remote_rig": remote_rig.snapshot(), "orbital_mining": orbital_mining.snapshot(),
 	}
 
 
@@ -3184,6 +3335,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_orbital_mining := schema < 33
 	var pre_remote_rig := schema < 32
 	var pre_customs := schema < 31
 	var pre_frames := schema < 30
@@ -3372,7 +3524,7 @@ func restore(state: Dictionary) -> bool:
 	var restored_patrol := Patrol.new()
 	var restored_landing := -1
 	var restored_plan := -1
-	if not pre_fuel and not restored_ship.restore(state.get("ship"), pre_economy, pre_heat_shield, pre_dual_fuel, pre_shipyard):
+	if not pre_fuel and not restored_ship.restore(state.get("ship"), pre_economy, pre_heat_shield, pre_dual_fuel, pre_shipyard, pre_orbital_mining):
 		return false
 	var restored_route: Array[int] = []
 	if not pre_jump_route:
@@ -3414,6 +3566,14 @@ func restore(state: Dictionary) -> bool:
 			return false
 		if restored_remote_rig.active() and not _site_available(restored_remote_rig.site_id, restored_expedition, restored_cartography):
 			return false
+	var restored_orbital_mining := OrbitalMining.new()
+	if not pre_orbital_mining:
+		if not restored_orbital_mining.restore(state.get("orbital_mining"), restored_epoch, restored_mining,
+				restored_remote_rig.site_id, restored_remote_rig.stored):
+			return false
+		for site: int in restored_orbital_mining.fragment_sites():
+			if not restored_ship.mining_laser or not _site_available(site, restored_expedition, restored_cartography):
+				return false
 	if schema == 2:
 		if not state.get("landed") is bool:
 			return false
@@ -3570,6 +3730,8 @@ func restore(state: Dictionary) -> bool:
 	frame = restored_frame
 	customs = restored_customs
 	remote_rig = restored_remote_rig
+	orbital_mining = restored_orbital_mining
+	_mining_beam.clear()
 	star_heat = 0.0 if pre_thermal else float(state.star_heat)
 	entry_heat = 0.0 if pre_entry else float(state.entry_heat)
 	_entry_site = -1

@@ -17,8 +17,9 @@ const ShipSystems := preload("res://scripts/ship_systems.gd")
 const Crew := preload("res://scripts/crew.gd")
 const Economy := preload("res://scripts/port_economy.gd")
 const Factions := preload("res://scripts/faction_fronts.gd")
+const MINING_SERVICES := ["mining_laser", "fragment_collector"]
 
-enum StationPage { SERVICES, CREW, YARD, CUSTOMS }
+enum StationPage { SERVICES, CREW, YARD, CUSTOMS, MINING }
 
 var _sim: RefCounted
 var _insets: MarginContainer
@@ -58,6 +59,8 @@ var _customs_pay: Button
 var _customs_receipt_title: Label
 var _customs_receipt: Label
 var _customs_other_debts: Label
+var _mining: VBoxContainer
+var _mining_toggle: Button
 var _station_page := StationPage.SERVICES
 var _transfers: VBoxContainer
 var _hydrogen: Label
@@ -103,18 +106,18 @@ func build() -> void:
 	_title = _label(header, "Портовые службы", 30, TEXT)
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_crew_toggle = _button(header)
-	_crew_toggle.custom_minimum_size.x = 126.0
 	_crew_toggle.pressed.connect(_toggle_station_page.bind(StationPage.CREW))
 	_yard_toggle = _button(header)
-	_yard_toggle.custom_minimum_size.x = 126.0
 	_yard_toggle.pressed.connect(_toggle_station_page.bind(StationPage.YARD))
 	_customs_toggle = _button(header)
-	_customs_toggle.custom_minimum_size.x = 126.0
 	_customs_toggle.pressed.connect(_toggle_station_page.bind(StationPage.CUSTOMS))
+	_mining_toggle = _button(header)
+	_mining_toggle.pressed.connect(_toggle_station_page.bind(StationPage.MINING))
 	_close_button = _button(header)
 	_close_button.text = "Закрыть"
-	_close_button.custom_minimum_size.x = 126.0
 	_close_button.pressed.connect(func() -> void: dismissed.emit())
+	for button: Button in [_crew_toggle, _yard_toggle, _customs_toggle, _mining_toggle, _close_button]:
+		button.custom_minimum_size.x = 104.0
 
 	_port_details = HBoxContainer.new()
 	content.add_child(_port_details)
@@ -148,6 +151,11 @@ func build() -> void:
 	_build_crew(content)
 	_build_yard(content)
 	_build_customs(content)
+	_mining = VBoxContainer.new()
+	_mining.add_theme_constant_override("separation", 8)
+	content.add_child(_mining)
+	_add_service("mining_laser", "Горный лазер", "Откалывает сырьё от астероидов в полёте", _mining)
+	_add_service("fragment_collector", "Сборщик обломков", "Переносит обломок в свободную ячейку трюма", _mining)
 	_transfers = VBoxContainer.new()
 	_transfers.add_theme_constant_override("separation", 8)
 	content.add_child(_transfers)
@@ -204,6 +212,7 @@ func refresh() -> void:
 			StationPage.CREW: _refresh_crew()
 			StationPage.YARD: _refresh_yard()
 			StationPage.CUSTOMS: _refresh_customs()
+			StationPage.MINING: _refresh_service_buttons(MINING_SERVICES)
 			_: _refresh_services()
 
 
@@ -216,7 +225,11 @@ func _refresh_services() -> void:
 		_cargo_detail.text = "Ёмкость %d ед." % int(profile.expanded_cargo)
 	else:
 		_cargo_detail.text = "Ёмкость %d → %d ед." % [int(profile.cargo), int(profile.expanded_cargo)]
-	for action: String in _action_buttons:
+	_refresh_service_buttons(_action_buttons.keys().filter(func(action: String) -> bool: return action not in MINING_SERVICES))
+
+
+func _refresh_service_buttons(actions: Array) -> void:
+	for action: String in actions:
 		var offer: Dictionary = _sim.service_offer(action)
 		var button := _action_buttons[action]
 		button.disabled = not offer.allowed
@@ -240,6 +253,7 @@ func _show_page() -> void:
 	var crew_open := not _fuel_only and _station_page == StationPage.CREW
 	var yard_open := not _fuel_only and _station_page == StationPage.YARD
 	var customs_open := not _fuel_only and _station_page == StationPage.CUSTOMS
+	var mining_open := not _fuel_only and _station_page == StationPage.MINING
 	_title.text = "Портовые службы"
 	if _fuel_only:
 		_title.text = "Топливо"
@@ -249,18 +263,23 @@ func _show_page() -> void:
 		_title.text = "Верфь"
 	elif customs_open:
 		_title.text = "Таможня"
+	elif mining_open:
+		_title.text = "Горное оснащение"
 	_crew_toggle.text = "Сервис" if crew_open else "Экипаж"
 	_crew_toggle.visible = not _fuel_only
 	_yard_toggle.text = "Сервис" if yard_open else "Верфь"
 	_yard_toggle.visible = not _fuel_only and _sim.shipyard_available()
 	_customs_toggle.text = "Сервис" if customs_open else "Таможня"
 	_customs_toggle.visible = not _fuel_only
+	_mining_toggle.text = "Сервис" if mining_open else "Добыча"
+	_mining_toggle.visible = not _fuel_only
 	_port_details.visible = not _fuel_only
-	_gauges.visible = not crew_open and not yard_open and not customs_open
+	_gauges.visible = not (crew_open or yard_open or customs_open or mining_open)
 	_services.visible = not _fuel_only and _station_page == StationPage.SERVICES
 	_crew.visible = crew_open
 	_yard.visible = yard_open
 	_customs.visible = customs_open
+	_mining.visible = mining_open
 	_transfers.visible = _fuel_only
 
 
@@ -609,7 +628,8 @@ func is_open() -> bool:
 
 
 func _request_service(action: String) -> void:
-	if is_open() and not _fuel_only and _station_page == StationPage.SERVICES and _sim.service_offer(action).allowed:
+	var page := StationPage.MINING if action in MINING_SERVICES else StationPage.SERVICES
+	if is_open() and not _fuel_only and _station_page == page and _sim.service_offer(action).allowed:
 		# A purchase can change the price shown for another service.
 		_touches.clear()
 		service_requested.emit(action)
@@ -677,8 +697,8 @@ func _add_meter(parent: HBoxContainer, title: String, fill: Color, border: Color
 	return [value, bar]
 
 
-func _add_service(action: String, title: String, detail: String) -> Label:
-	var row := _add_row(_services, title, detail)
+func _add_service(action: String, title: String, detail: String, parent: VBoxContainer = null) -> Label:
+	var row := _add_row(_services if parent == null else parent, title, detail)
 	var button: Button = row[1]
 	button.pressed.connect(_request_service.bind(action))
 	_action_buttons[action] = button
@@ -744,6 +764,8 @@ func _button_at(point: Vector2) -> Button:
 		return _yard_toggle
 	if _customs_toggle.is_visible_in_tree() and _customs_toggle.get_global_rect().has_point(point):
 		return _customs_toggle
+	if _mining_toggle.is_visible_in_tree() and _mining_toggle.get_global_rect().has_point(point):
+		return _mining_toggle
 	var buttons: Array = _action_buttons.values()
 	if _fuel_only:
 		buttons = _transfer_buttons.values() + [_discard_choice, _discard_button]
