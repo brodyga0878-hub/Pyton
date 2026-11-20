@@ -81,11 +81,26 @@ func _update_display(delta: float) -> void:
 	_hud.sync(flight, delta)
 	var final_approach := flight.autopilot and flight.autopilot_phase in ["Стыковка", "Посадка", "Вход в зону сбора"]
 	var marker := flight.target_contact(flight.target) if final_approach else flight.target_gate(flight.target)
-	var in_view := flight.docked < 0 and not flight.landed and not _view.camera.is_position_behind(marker)
-	if in_view and not flight.autopilot:
+	var patrol_status := flight.patrol_status()
+	var signal_selected: bool = patrol_status.phase == Flight.Patrol.OUTBOUND and patrol_status.same_system and not flight.autopilot
+	if signal_selected:
+		marker = patrol_status.point
+	var instruments_visible := flight.docked < 0 and not flight.landed and not _overlay_open() and flight.jump_seconds_left <= 0.0
+	var in_view := instruments_visible and not _view.camera.is_position_behind(marker)
+	if patrol_status.phase == Flight.Patrol.ENGAGED and patrol_status.same_system:
+		in_view = false
+	elif in_view and not flight.autopilot and not signal_selected:
 		var surface := flight.surface_status()
 		in_view = not surface.near or surface.pad
-	_hud.set_target_marker(_view.camera.unproject_position(marker) if in_view else Vector2.ZERO, in_view and not _overlay_open() and flight.jump_seconds_left <= 0.0)
+	_hud.set_target_marker(_view.camera.unproject_position(marker) if in_view else Vector2.ZERO, in_view)
+	var markers: Array[Dictionary] = []
+	if instruments_visible:
+		for contact in flight.traffic_contacts():
+			var distance := flight.position.distance_to(contact.position)
+			if distance > 1100.0 or _view.camera.is_position_behind(contact.position):
+				continue
+			markers.append({"screen": _view.camera.unproject_position(contact.position), "role": contact.role, "name": contact.name, "distance": distance})
+	_hud.set_traffic_markers(markers)
 
 
 func _handle_action(action: String) -> void:
@@ -108,6 +123,10 @@ func _handle_action(action: String) -> void:
 			flight.dock_action()
 		"contract":
 			flight.contract_action()
+		"patrol":
+			flight.patrol_action()
+		"fire":
+			flight.fire_action()
 		"mine":
 			flight.mine_action()
 		"sell_ore":
@@ -158,6 +177,7 @@ func _deliver_notice() -> void:
 		"mining_phase": flight.mining.phase, "cargo_units": flight.mining.ore_hold,
 		"fuel": flight.ship.fuel, "scooping": flight.scooping,
 		"hull": flight.ship.hull, "contract_route": flight.contract_route_id, "contract_leg": flight.contract_leg,
+		"patrol_phase": flight.patrol.phase, "patrol_origin": flight.patrol.origin,
 		"system_id": flight.system_id, "jump_target": flight.jump_target,
 		"orbit_time": flight.orbit_time, "time_scale": flight.time_scale,
 		"offpad": flight.landed_offpad(), "landing_direction": [touchdown.x, touchdown.y, touchdown.z],
@@ -170,6 +190,7 @@ func _deliver_notice() -> void:
 		"scoop_full", "scoop_stop", "star_arrival", "fuel_empty",
 		"jump_planned", "jump_complete",
 		"market_buy", "market_sell", "service_repair", "service_cargo", "hull_damage", "contract_leg",
+		"patrol_accepted", "patrol_engaged", "patrol_fire", "patrol_enemy_hit", "patrol_retreat", "patrol_victory", "patrol_paid",
 	]:
 		_save()
 
@@ -214,6 +235,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_T: "target", KEY_F: "autopilot", KEY_R: "throttle_up", KEY_V: "throttle_down",
 		KEY_ENTER: "dock", KEY_M: "contract", KEY_G: "mine", KEY_B: "sell_ore", KEY_F8: "report",
 		KEY_N: "map", KEY_J: "galaxy", KEY_K: "scoop", KEY_P: "services", KEY_O: "time", KEY_L: "market",
+		KEY_U: "patrol", KEY_X: "fire",
 	}
 	if actions.has(event.physical_keycode):
 		_handle_action(actions[event.physical_keycode])

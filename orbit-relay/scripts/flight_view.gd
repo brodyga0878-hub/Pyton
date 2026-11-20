@@ -3,6 +3,7 @@ extends Node3D
 const AsteroidView = preload("res://scripts/asteroid_view.gd")
 const MiningRigView = preload("res://scripts/mining_rig_view.gd")
 const StarView = preload("res://scripts/star_view.gd")
+const TrafficView = preload("res://scripts/traffic_view.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const Terrain = preload("res://scripts/surface_terrain.gd")
 const STAR_DISTANCE := 2700.0
@@ -27,6 +28,7 @@ var _backdrop_planet: Node3D
 var _backdrop_orbit_offset := Vector3.ZERO
 var _backdrop_orbit_axis := Vector3.UP
 var _mining_rig: Node3D
+var _traffic: Node3D
 var _surface_views: Dictionary[int, Node3D] = {}
 var _stations: Dictionary[int, Node3D] = {}
 var _approaches: Dictionary[int, Node3D] = {}
@@ -60,6 +62,8 @@ func build() -> void:
 	_build_ship()
 	_mining_rig = MiningRigView.new()
 	add_child(_mining_rig)
+	_traffic = TrafficView.new()
+	add_child(_traffic)
 	camera = Camera3D.new()
 	camera.fov = 67.0
 	camera.near = 0.2
@@ -81,16 +85,23 @@ func _load_sector(id: int) -> void:
 	_last_position = Vector3.INF
 
 	var cool := id == Catalog.VELAR_SYSTEM
+	var fringe := id == Catalog.FRINGE_SYSTEM
 	_lighting.background_color = Color("#07091a") if cool else Color("#050910")
 	_lighting.ambient_light_color = Color("#8eaae5") if cool else Color("#99b8d0")
 	_sunlight.rotation_degrees = Vector3(-26.0, 47.0, 0.0) if cool else Vector3(-32.0, -36.0, 0.0)
 	_sunlight.light_color = Color("#b6dbff") if cool else Color("#ffefd9")
 	_fill.light_color = Color("#c8a6ee") if cool else Color("#84c8ff")
+	if fringe:
+		_lighting.background_color = Color("#091511")
+		_lighting.ambient_light_color = Color("#8da99a")
+		_sunlight.rotation_degrees = Vector3(-29.0, 68.0, 0.0)
+		_sunlight.light_color = Color("#ffe3ad")
+		_fill.light_color = Color("#81cdb0")
 
 	_sector = Node3D.new()
 	add_child(_sector)
-	_build_stars(cool)
-	_build_planet(cool)
+	_build_stars(cool, fringe)
+	_build_planet(cool, fringe)
 	_star = StarView.new()
 	_sector.add_child(_star)
 	_star.setup(Catalog.site(_star_id), Catalog.SCOOP_INNER, Catalog.SCOOP_OUTER, cool)
@@ -181,6 +192,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_surface_views[site_id].sync(position_now, site_id == int(sim.target), not settled, field_direction)
 	var deposit: Transform3D = sim.surface_deposit() if landed else _ship.global_transform
 	_mining_rig.sync(_ship.global_transform, deposit, int(sim.mining.phase) if landed else 0, sim.mining.progress(), float(sim.elapsed))
+	_traffic.sync(sim.traffic_contacts(), sim.combat_beams())
 
 
 func _surface_safe_camera(at: Vector3, sim: RefCounted) -> Vector3:
@@ -421,9 +433,9 @@ void fragment() {
 	_jet.rotation.x = PI * 0.5
 
 
-func _build_stars(cool: bool) -> void:
+func _build_stars(cool: bool, fringe: bool) -> void:
 	var generator := RandomNumberGenerator.new()
-	generator.seed = 64871 if cool else 22361
+	generator.seed = 86507 if fringe else (64871 if cool else 22361)
 	var mesh := SurfaceTool.new()
 	mesh.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for index in range(1730):
@@ -455,11 +467,14 @@ func _build_stars(cool: bool) -> void:
 	_stars = _mesh(_sector, mesh.commit(), paint, Vector3.ZERO)
 
 
-func _build_planet(cool: bool) -> void:
+func _build_planet(cool: bool, fringe: bool) -> void:
 	_backdrop_planet = Node3D.new()
 	_sector.add_child(_backdrop_planet)
 	var display_scale := 1.65 if cool else 1.0
 	var initial_center := Vector3(1125, -330, -3370) if cool else Vector3(-1450, -475, -2900)
+	if fringe:
+		display_scale = 1.18
+		initial_center = Vector3(1480, -620, -2570)
 	var star_center: Vector3 = Catalog.site(_star_id).center
 	_backdrop_planet.scale = Vector3.ONE * display_scale
 	_backdrop_orbit_offset = initial_center * display_scale - star_center
@@ -475,6 +490,7 @@ func _build_planet(cool: bool) -> void:
 shader_type spatial;
 render_mode unshaded;
 uniform bool cool = false;
+uniform bool fringe = false;
 varying vec3 surface_point;
 float strata(vec3 p) {
 	return sin(p.x * 21.0 + sin(p.z * 9.0) * 0.65) * cos(p.z * 18.0 + p.y * 13.0);
@@ -491,17 +507,22 @@ void fragment() {
 	float m = smoothstep(-0.86, 0.87, ribbons * 0.60 + details + sin(latitude * 8.0) * 0.34);
 	vec3 low = cool ? vec3(0.13, 0.20, 0.46) : vec3(0.09, 0.27, 0.37);
 	vec3 high = cool ? vec3(0.44, 0.68, 0.71) : vec3(0.65, 0.43, 0.30);
+	if (fringe) {
+		low = vec3(0.09, 0.24, 0.18);
+		high = vec3(0.78, 0.60, 0.34);
+	}
 	vec3 bands = mix(low, high, m);
 	vec3 light_dir = cool ? vec3(0.65, 0.54, 0.63) : vec3(-0.6, 0.46, 0.72);
 	float day = smoothstep(-0.23, 0.89, dot(p, normalize(light_dir)));
 	float rim = pow(1.0 - clamp(dot(normalize(NORMAL), VIEW), 0.0, 1.0), 4.0);
-	vec3 haze = cool ? vec3(0.26, 0.44, 0.70) : vec3(0.17, 0.36, 0.44);
+	vec3 haze = fringe ? vec3(0.56, 0.63, 0.28) : (cool ? vec3(0.26, 0.44, 0.70) : vec3(0.17, 0.36, 0.44));
 	ALBEDO = bands * (0.105 + day * 0.75) + rim * haze * (0.15 + day * 0.75);
 }
 """
 	var world := ShaderMaterial.new()
 	world.shader = shader
 	world.set_shader_parameter("cool", cool)
+	world.set_shader_parameter("fringe", fringe)
 	_mesh(_backdrop_planet, sphere, world, Vector3.ZERO)
 	var air := SphereMesh.new()
 	air.radius = 894.0
@@ -513,15 +534,17 @@ void fragment() {
 shader_type spatial;
 render_mode unshaded, blend_add, depth_draw_never;
 uniform bool cool = false;
+uniform bool fringe = false;
 void fragment() {
 	float rim = 1.0 - clamp(dot(normalize(NORMAL), VIEW), 0.0, 1.0);
-	ALBEDO = cool ? vec3(0.36, 0.59, 0.91) : vec3(0.22, 0.46, 0.58);
+	ALBEDO = fringe ? vec3(0.55, 0.76, 0.48) : (cool ? vec3(0.36, 0.59, 0.91) : vec3(0.22, 0.46, 0.58));
 	ALPHA = smoothstep(0.54, 0.80, rim) * (1.0 - smoothstep(0.83, 1.0, rim)) * 0.38;
 }
 """
 	var air_material := ShaderMaterial.new()
 	air_material.shader = halo
 	air_material.set_shader_parameter("cool", cool)
+	air_material.set_shader_parameter("fringe", fringe)
 	_mesh(_backdrop_planet, air, air_material, Vector3.ZERO)
 	if cool:
 		_build_planet_ring()

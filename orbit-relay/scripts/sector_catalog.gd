@@ -6,12 +6,20 @@ const STAR_ID := SITE_COUNT
 const TARGET_COUNT := SITE_COUNT + 1
 const HOME_SYSTEM := 0
 const VELAR_SYSTEM := 1
-const SYSTEM_COUNT := 2
+const PRE_TRAFFIC_SYSTEM_COUNT := 2
+const FRINGE_SYSTEM := PRE_TRAFFIC_SYSTEM_COUNT
+const SYSTEM_COUNT := PRE_TRAFFIC_SYSTEM_COUNT + 1
 const PRE_SURFACE_DESTINATION_COUNT := 15
-const DESTINATION_COUNT := PRE_SURFACE_DESTINATION_COUNT + 1
+const PRE_TRAFFIC_DESTINATION_COUNT := PRE_SURFACE_DESTINATION_COUNT + 1
+const DESTINATION_COUNT := PRE_TRAFFIC_DESTINATION_COUNT + 4
 const VELAR_STAR_ID := 14
 const TERRACE_ID := PRE_SURFACE_DESTINATION_COUNT
+const FRINGE_ARRIVAL_PORT := PRE_TRAFFIC_DESTINATION_COUNT
+const FRINGE_SECOND_PORT := FRINGE_ARRIVAL_PORT + 1
+const FRINGE_ASTEROID_ID := FRINGE_SECOND_PORT + 1
+const FRINGE_STAR_ID := FRINGE_ASTEROID_ID + 1
 const JUMP_FUEL := 26
+const JUMP_COSTS := [[0, JUMP_FUEL, 36], [JUMP_FUEL, 0, 19], [36, 19, 0]]
 const STAR_CLEARANCE := 250.0
 const SCOOP_INNER := 268.0
 const SCOOP_OUTER := 382.0
@@ -30,6 +38,14 @@ const SYSTEMS := [
 		"description": "Голубая звезда, два порта, ледяная луна, залежи кристаллов и скальная планета «Терраса».",
 		"arrival_port": 10, "targets": [10, 11, 12, 13, VELAR_STAR_ID, TERRACE_ID], "ports": [10, 11],
 		"mines": [12, 13, TERRACE_ID], "star": VELAR_STAR_ID,
+	},
+	{
+		"name": "Кромка", "position": Vector2(5.7, 0.15), "accent": Color("#ffc2a4"),
+		"description": "Два перевалочных порта и астероид «Рубец» с месторождением кристаллов.",
+		"arrival_port": FRINGE_ARRIVAL_PORT,
+		"targets": [FRINGE_ARRIVAL_PORT, FRINGE_SECOND_PORT, FRINGE_ASTEROID_ID, FRINGE_STAR_ID],
+		"ports": [FRINGE_ARRIVAL_PORT, FRINGE_SECOND_PORT],
+		"mines": [FRINGE_ASTEROID_ID], "star": FRINGE_STAR_ID,
 	},
 ]
 const RESOURCES := ["ore", "crystal", "ice"]
@@ -50,6 +66,10 @@ const SITES := [
 	{"name": "Просека", "kind": "asteroid", "center": Vector3(-260, -165, -590), "radius": 60.0, "pad_offset": 60.0, "gate_offset": 132.0, "seed": 181, "surface_color": Color("#475c5d"), "accent": Color("#98eab5"), "resource": "crystal", "reserve": 144, "drill_seconds": 13.0},
 	{"name": "Велар", "kind": "star", "center": Vector3(1800, 280, -1600), "radius": 220.0, "pad_offset": 310.0, "gate_offset": 470.0, "accent": Color("#9dcaff")},
 	{"name": "Терраса", "kind": "planet", "center": Vector3(1580, -340, -1180), "radius": 170.0, "pad_offset": 170.0, "gate_offset": 280.0, "seed": 223, "surface_color": Color("#936a55"), "accent": Color("#f3bf85"), "resource": "ore", "reserve": 240, "drill_seconds": 15.0},
+	{"name": "Рубеж", "kind": "port", "center": Vector3(0, 0, -160), "radius": 32.0, "pad_offset": 8.0, "gate_offset": 70.0, "spin": 0.26, "angle": 0.50, "accent": Color("#f4a987")},
+	{"name": "Свод", "kind": "port", "center": Vector3(-950, 130, -1240), "radius": 32.0, "pad_offset": 8.0, "gate_offset": 70.0, "spin": -0.32, "angle": 1.48, "accent": Color("#8fded1")},
+	{"name": "Рубец", "kind": "asteroid", "center": Vector3(740, -210, -1170), "radius": 72.0, "pad_offset": 72.0, "gate_offset": 149.0, "seed": 269, "surface_color": Color("#74677c"), "accent": Color("#ffc5f0"), "resource": "crystal", "reserve": 180, "drill_seconds": 12.0},
+	{"name": "Кромка", "kind": "star", "center": Vector3(1720, 310, -1600), "radius": 220.0, "pad_offset": 310.0, "gate_offset": 470.0, "accent": Color("#ffc2a4")},
 ]
 const PORT_PRICES := {
 	0: {"ore": 20, "crystal": 38, "ice": 14},
@@ -57,14 +77,18 @@ const PORT_PRICES := {
 	3: {"ore": 29, "crystal": 50, "ice": 22},
 	10: {"ore": 27, "crystal": 46, "ice": 17},
 	11: {"ore": 33, "crystal": 35, "ice": 32},
+	FRINGE_ARRIVAL_PORT: {"ore": 25, "crystal": 48, "ice": 25},
+	FRINGE_SECOND_PORT: {"ore": 35, "crystal": 36, "ice": 19},
 }
-const FUEL_PRICES := {0: 2, 1: 3, 3: 1, 10: 2, 11: 3}
+const FUEL_PRICES := {0: 2, 1: 3, 3: 1, 10: 2, 11: 3, FRINGE_ARRIVAL_PORT: 2, FRINGE_SECOND_PORT: 1}
 const ROUTES := {
 	0: {1: ["Регуляторы охлаждения", 240], 3: ["Катушки связи", 340]},
 	1: {0: ["Калибровочные датчики", 180], 3: ["Оптические блоки", 280]},
 	3: {0: ["Контейнеры с фильтрами", 320], 1: ["Сенсоры давления", 260]},
 	10: {11: ["Теплообменники", 270]},
 	11: {10: ["Защитные экраны", 230]},
+	FRINGE_ARRIVAL_PORT: {FRINGE_SECOND_PORT: ["Ретрансляторы", 290]},
+	FRINGE_SECOND_PORT: {FRINGE_ARRIVAL_PORT: ["Запасные гироскопы", 260]},
 }
 
 
@@ -79,6 +103,8 @@ static func system(id: int) -> Dictionary:
 static func system_of_site(id: int) -> int:
 	if id < 0 or id >= DESTINATION_COUNT:
 		return -1
+	if id >= PRE_TRAFFIC_DESTINATION_COUNT:
+		return FRINGE_SYSTEM
 	return HOME_SYSTEM if id < TARGET_COUNT else VELAR_SYSTEM
 
 
@@ -99,7 +125,9 @@ static func star_for(system_id: int) -> int:
 
 
 static func jump_cost(origin: int, destination: int) -> int:
-	return JUMP_FUEL if origin != destination and not system(origin).is_empty() and not system(destination).is_empty() else 0
+	if origin < 0 or origin >= SYSTEM_COUNT or destination < 0 or destination >= SYSTEM_COUNT:
+		return 0
+	return JUMP_COSTS[origin][destination]
 
 
 static func jump_distance(origin: int, destination: int) -> float:

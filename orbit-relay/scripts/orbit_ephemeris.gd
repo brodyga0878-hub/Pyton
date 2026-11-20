@@ -3,7 +3,7 @@ extends RefCounted
 ## epoch zero coincide with the chart coordinates of saves before orbital motion.
 
 const Catalog = preload("res://scripts/sector_catalog.gd")
-const GRAVITY_PARAMETERS := [8500.0, 8000.0]
+const GRAVITY_PARAMETERS := [8500.0, 8000.0, 7600.0]
 const ORBIT_SEGMENTS := 96
 
 # Eccentricity, true anomaly at the epoch and inclination adjustment in degrees.
@@ -23,6 +23,9 @@ const ELEMENTS := {
 	12: Vector3(0.020, 90.0, 0.0),
 	13: Vector3(0.001, 56.2, -0.7),
 	Catalog.TERRACE_ID: Vector3(0.032, 91.0, 12.0),
+	Catalog.FRINGE_ARRIVAL_PORT: Vector3(0.022, 102.0, 7.0),
+	Catalog.FRINGE_SECOND_PORT: Vector3(0.035, 148.0, -19.0),
+	Catalog.FRINGE_ASTEROID_ID: Vector3(0.104, 52.0, 32.0),
 }
 
 

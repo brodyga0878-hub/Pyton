@@ -1,0 +1,248 @@
+extends Node3D
+
+const BEAM_LIMIT := 4
+const UNIT_BOX_CORNERS := [
+	Vector3(-0.5, -0.5, -0.5), Vector3(0.5, -0.5, -0.5),
+	Vector3(0.5, 0.5, -0.5), Vector3(-0.5, 0.5, -0.5),
+	Vector3(-0.5, -0.5, 0.5), Vector3(0.5, -0.5, 0.5),
+	Vector3(0.5, 0.5, 0.5), Vector3(-0.5, 0.5, 0.5),
+]
+const BOX_FACES := [
+	Vector4i(0, 1, 2, 3), Vector4i(4, 7, 6, 5), Vector4i(0, 3, 7, 4),
+	Vector4i(1, 5, 6, 2), Vector4i(0, 4, 5, 1), Vector4i(3, 2, 6, 7),
+]
+
+var _ships: Dictionary[String, Node3D] = {}
+var _pool: Dictionary[String, Array] = {"trader": [], "patrol": [], "raider": []}
+var _hulls: Dictionary[String, Array] = {}
+var _beams: Array[Node3D] = []
+var _beam_paints: Array[StandardMaterial3D] = []
+var _metal: StandardMaterial3D
+var _light: StandardMaterial3D
+
+
+func sync(contacts: Array, beams: Array) -> void:
+	if _metal == null:
+		_metal = _paint(Color.WHITE, false)
+		_metal.vertex_color_use_as_albedo = true
+		_metal.metallic = 0.27
+		_metal.roughness = 0.64
+		_light = _paint(Color.WHITE, true)
+		_light.vertex_color_use_as_albedo = true
+	var active: Dictionary[String, bool] = {}
+	for contact: Dictionary in contacts:
+		var id: String = contact.id
+		var role: String = contact.role
+		if id.is_empty() or not _pool.has(role):
+			continue
+		active[id] = true
+		var actor: Node3D = _ships.get(id)
+		if actor == null:
+			actor = _acquire_ship(role)
+			_ships[id] = actor
+		actor.position = contact.position
+		var course: Vector3 = contact.get("forward", contact.velocity)
+		if course.length_squared() > 0.001:
+			var direction := course.normalized()
+			var up := Vector3.FORWARD if absf(direction.y) > 0.97 else Vector3.UP
+			actor.basis = Basis.looking_at(direction, up)
+	for id: String in _ships.keys():
+		if active.has(id):
+			continue
+		var actor := _ships[id]
+		actor.hide()
+		_pool[actor.get_meta("role")].append(actor)
+		_ships.erase(id)
+	_sync_beams(beams)
+
+
+func _acquire_ship(role: String) -> Node3D:
+	var pool := _pool[role]
+	if not pool.is_empty():
+		var reused: Node3D = pool.pop_back()
+		reused.basis = Basis.IDENTITY
+		reused.show()
+		return reused
+	if not _hulls.has(role):
+		_hulls[role] = _build_hull(role)
+	var actor := Node3D.new()
+	actor.set_meta("role", role)
+	add_child(actor)
+	var meshes := _hulls[role]
+	_mesh(actor, meshes[0], _metal)
+	_mesh(actor, meshes[1], _light)
+	return actor
+
+
+func _sync_beams(beams: Array) -> void:
+	var count := mini(beams.size(), BEAM_LIMIT)
+	while _beams.size() < count:
+		_beams.append(_make_beam())
+	for index in range(_beams.size()):
+		var node := _beams[index]
+		node.visible = index < count
+		if not node.visible:
+			continue
+		var beam: Dictionary = beams[index]
+		var start: Vector3 = beam.from
+		var finish: Vector3 = beam.to
+		var offset := finish - start
+		var length := offset.length()
+		if length <= 0.1:
+			node.hide()
+			continue
+		var direction := offset / length
+		var up := Vector3.FORWARD if absf(direction.y) > 0.97 else Vector3.UP
+		node.position = (start + finish) * 0.5
+		node.basis = Basis.looking_at(direction, up).scaled_local(Vector3(1.0, 1.0, length))
+		var tint := 2 if beam.hostile else 0
+		node.get_child(0).material_override = _beam_paints[tint]
+		node.get_child(1).material_override = _beam_paints[tint + 1]
+
+
+func _make_beam() -> Node3D:
+	if _beam_paints.is_empty():
+		_beam_paints = [
+			_paint(Color("#b7fff4"), true), _beam_halo(Color(0.16, 0.91, 0.83, 0.33)),
+			_paint(Color("#ffb391"), true), _beam_halo(Color(1.0, 0.27, 0.17, 0.36)),
+		]
+	var beam := Node3D.new()
+	add_child(beam)
+	for radius: float in [0.13, 0.31]:
+		var tube := CylinderMesh.new()
+		tube.top_radius = radius
+		tube.bottom_radius = radius
+		tube.height = 1.0
+		tube.radial_segments = 6
+		tube.rings = 1
+		_mesh(beam, tube, _beam_paints[0]).rotation.x = PI * 0.5
+	return beam
+
+
+func _build_hull(role: String) -> Array:
+	var shell := SurfaceTool.new()
+	var lamps := SurfaceTool.new()
+	shell.begin(Mesh.PRIMITIVE_TRIANGLES)
+	lamps.begin(Mesh.PRIMITIVE_TRIANGLES)
+	match role:
+		"trader": _trader(shell, lamps)
+		"patrol": _patrol(shell, lamps)
+		"raider": _raider(shell, lamps)
+	return [shell.commit(), lamps.commit()]
+
+
+func _trader(shell: SurfaceTool, lamps: SurfaceTool) -> void:
+	var ceramic := Color("#95a5ae")
+	var hull := Color("#324d57")
+	var crates := Color("#a86b44")
+	var canopy := Color("#173c48")
+	_sectioned(shell, [Vector3(0.75, 0.6, -5.7), Vector3(1.52, 1.1, -3.1), Vector3(1.68, 1.30, 4.7)], ceramic)
+	_box(shell, Vector3(0, 1.02, -3.5), Vector3(1.50, 0.63, 1.50), canopy)
+	for side: float in [-1.0, 1.0]:
+		_box(shell, Vector3(side * 2.35, -0.15, 0.5), Vector3(2.2, 1.4, 6.65), crates)
+		_box(shell, Vector3(side * 2.95, -0.52, 4.15), Vector3(1.15, 1.56, 2.50), hull)
+		for brace: float in [-2.3, 0.25, 2.75]:
+			_box(shell, Vector3(side * 2.35, -0.15, brace), Vector3(2.32, 1.52, 0.23), hull)
+		_box(lamps, Vector3(side * 2.95, -0.52, 5.43), Vector3(0.74, 0.48, 0.11), Color("#8fe0ff"))
+		_box(lamps, Vector3(side * 3.48, 0.22, -1.45), Vector3(0.14, 0.22, 0.84), Color("#ffce80"))
+
+
+func _patrol(shell: SurfaceTool, lamps: SurfaceTool) -> void:
+	var ceramic := Color("#b9cdd6")
+	var enamel := Color("#356968")
+	var hull := Color("#23414d")
+	_sectioned(shell, [Vector3(0.25, 0.25, -5.4), Vector3(1.08, 0.81, -2.4), Vector3(1.56, 0.68, 2.4), Vector3(1.15, 0.62, 4.32)], ceramic)
+	_box(shell, Vector3(0, 0.68, -2.08), Vector3(1.12, 0.41, 1.79), hull)
+	for side: float in [-1.0, 1.0]:
+		_box(shell, Vector3(side * 2.25, -0.28, 0.85), Vector3(4.42, 0.45, 2.40), enamel, side * 0.34)
+		_box(shell, Vector3(side * 3.75, -0.19, 2.00), Vector3(1.01, 0.72, 3.55), ceramic)
+		_box(shell, Vector3(side * 1.71, 0.40, 2.67), Vector3(0.29, 1.50, 1.70), hull)
+		_box(lamps, Vector3(side * 3.75, -0.19, 3.80), Vector3(0.61, 0.46, 0.11), Color("#8ae9f6"))
+		_box(lamps, Vector3(side * 3.73, 0.23, -0.25), Vector3(0.42, 0.10, 1.22), Color("#9efad6"))
+
+
+func _raider(shell: SurfaceTool, lamps: SurfaceTool) -> void:
+	var armor := Color("#6a3c48")
+	var red := Color("#bd473c")
+	var shadow := Color("#344055")
+	var lumen := Color("#ff8264")
+	_sectioned(shell, [Vector3(0.52, 0.34, -6.1), Vector3(1.82, 1.00, -2.1), Vector3(2.32, 0.84, 3.6), Vector3(1.15, 0.58, 4.72)], armor)
+	_box(shell, Vector3(0, 0.83, -1.38), Vector3(1.7, 0.53, 2.25), shadow)
+	for side: float in [-1.0, 1.0]:
+		_box(shell, Vector3(side * 2.76, -0.11, 0.83), Vector3(4.8, 0.51, 2.65), red, -side * 0.44)
+		_box(shell, Vector3(side * 4.02, 0.12, -0.70), Vector3(0.91, 0.80, 4.30), shadow, side * 0.17)
+		_box(shell, Vector3(side * 1.74, 0.29, 3.62), Vector3(1.26, 1.90, 2.10), shadow)
+		_box(lamps, Vector3(side * 1.74, 0.29, 4.70), Vector3(0.85, 1.19, 0.11), lumen)
+		_box(lamps, Vector3(side * 4.02, 0.43, -1.71), Vector3(0.43, 0.30, 1.79), Color("#ff4f3a"), side * 0.17)
+	_box(lamps, Vector3(0, 0.31, -5.52), Vector3(0.61, 0.20, 0.26), lumen)
+
+
+func _sectioned(tool: SurfaceTool, sections: Array, tint: Color) -> void:
+	var rings: Array[PackedVector3Array] = []
+	for section: Vector3 in sections:
+		var ring := PackedVector3Array()
+		for spoke in range(8):
+			var angle := TAU * (float(spoke) + 0.5) / 8.0
+			ring.append(Vector3(cos(angle) * section.x, sin(angle) * section.y, section.z))
+		rings.append(ring)
+	for index in range(rings.size() - 1):
+		for spoke in range(8):
+			var next := (spoke + 1) % 8
+			var outward := rings[index][spoke] + rings[index][next]
+			outward.z = 0.0
+			_face(tool, rings[index][spoke], rings[index][next], rings[index + 1][next], outward, tint)
+			_face(tool, rings[index][spoke], rings[index + 1][next], rings[index + 1][spoke], outward, tint)
+	for index: int in [0, rings.size() - 1]:
+		var direction := Vector3.FORWARD if index == 0 else Vector3.BACK
+		for spoke in range(1, 7):
+			_face(tool, rings[index][0], rings[index][spoke], rings[index][spoke + 1], direction, tint)
+
+
+func _box(tool: SurfaceTool, position: Vector3, size: Vector3, tint: Color, turn := 0.0) -> void:
+	var points := PackedVector3Array()
+	var axes := Basis(Vector3.UP, turn)
+	for corner: Vector3 in UNIT_BOX_CORNERS:
+		points.append(position + axes * (corner * size))
+	for corners: Vector4i in BOX_FACES:
+		var a := points[corners.x]
+		var b := points[corners.y]
+		var c := points[corners.z]
+		var d := points[corners.w]
+		var outward := (a + b + c + d) * 0.25 - position
+		_face(tool, a, b, c, outward, tint)
+		_face(tool, a, c, d, outward, tint)
+
+
+func _face(tool: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, outward: Vector3, tint: Color) -> void:
+	var normal := (b - a).cross(c - a).normalized()
+	var facing := normal.dot(outward) > 0.0
+	if not facing:
+		normal = -normal
+	for vertex: Vector3 in [a, c, b] if facing else [a, b, c]:
+		tool.set_normal(normal)
+		tool.set_color(tint)
+		tool.add_vertex(vertex)
+
+
+func _mesh(parent: Node3D, mesh: Mesh, paint: Material) -> MeshInstance3D:
+	var instance := MeshInstance3D.new()
+	instance.mesh = mesh
+	instance.material_override = paint
+	instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	parent.add_child(instance)
+	return instance
+
+
+func _paint(color: Color, unshaded: bool) -> StandardMaterial3D:
+	var paint := StandardMaterial3D.new()
+	paint.albedo_color = color
+	if unshaded:
+		paint.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	return paint
+
+
+func _beam_halo(color: Color) -> StandardMaterial3D:
+	var paint := _paint(color, true)
+	paint.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	paint.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	return paint

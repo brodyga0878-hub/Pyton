@@ -7,7 +7,9 @@ const Catalog = preload("res://scripts/sector_catalog.gd")
 const Orbit = preload("res://scripts/orbit_ephemeris.gd")
 const Terrain = preload("res://scripts/surface_terrain.gd")
 const Economy = preload("res://scripts/port_economy.gd")
-const SAVE_SCHEMA := 8
+const Traffic = preload("res://scripts/sector_traffic.gd")
+const Patrol = preload("res://scripts/patrol_encounter.gd")
+const SAVE_SCHEMA := 9
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
@@ -35,6 +37,7 @@ const LANDING_RADIUS := 8.0
 const FREE_LANDING_MAX_HEIGHT := 10.0
 const LANDING_ANGLE := 20.0
 const IMPACT_DAMAGE_SPEED := 14.0
+const PATROL_CRUISE_SPEED := 70.0
 const FRAME_MARGIN := 110.0
 const STAR_WARP_MARGIN := 120.0
 const MAX_SAVED_SPEED := MAX_SPEED * 1.56 + 8.0
@@ -55,6 +58,8 @@ var landed: bool:
 var mining := MiningRig.new()
 var ship := ShipSystems.new()
 var market := Economy.new()
+var patrol := Patrol.new()
+var patrol_course := false
 var scooping := false
 var system_id := Catalog.HOME_SYSTEM
 var jump_target := -1
@@ -115,6 +120,8 @@ func time_status() -> Dictionary:
 		return {"allowed": false, "reason": "Зарядка прыжкового привода"}
 	if scooping:
 		return {"allowed": false, "reason": "Сбор топлива"}
+	if patrol.in_danger(self):
+		return {"allowed": false, "reason": "Боевой контакт"}
 	if docked >= 0 or landed:
 		return {"allowed": true, "reason": ""}
 	var star := Catalog.star_for(system_id)
@@ -344,6 +351,7 @@ func change_throttle(amount: float) -> void:
 
 
 func set_autopilot(enabled: bool) -> void:
+	patrol_course = false
 	autopilot = enabled and docked < 0 and not landed and jump_seconds_left <= 0.0
 	_approach_committed = false
 	_departure_leg = 0
@@ -542,6 +550,83 @@ func repair_unit_price() -> int:
 	return Economy.repair_price(docked)
 
 
+func traffic_contacts() -> Array[Dictionary]:
+	var contacts := Traffic.contacts(self)
+	contacts.append_array(patrol.contacts(self))
+	return contacts
+
+
+func combat_beams() -> Array[Dictionary]:
+	if docked >= 0 or landed or jump_seconds_left > 0.0:
+		return []
+	return patrol.beams()
+
+
+func patrol_status() -> Dictionary:
+	return patrol.status(self)
+
+
+func fire_status() -> Dictionary:
+	return patrol.fire_status(self)
+
+
+func patrol_action() -> bool:
+	var status := patrol_status()
+	if not status.available:
+		return false
+	if docked >= 0:
+		if patrol.phase == Patrol.RETURN:
+			var payment := patrol.finish(docked)
+			if payment <= 0:
+				return false
+			credits += payment
+			_announce("patrol_paid", "Доклад принят. Награда %d кр." % payment)
+		else:
+			if not patrol.accept(docked):
+				return false
+			_announce("patrol_accepted", "Дозор принят. После старта выберите «К сигналу».")
+	elif patrol.phase == Patrol.RETURN:
+		select_target(patrol.origin)
+		set_autopilot(true)
+	else:
+		var follow := not patrol_course
+		set_autopilot(false)
+		patrol_course = follow
+		if not follow:
+			throttle = 0.0
+	return true
+
+
+func fire_action() -> bool:
+	var shot := patrol.fire(self)
+	_apply_patrol_result(shot)
+	return shot.get("ok", false)
+
+
+func _apply_patrol_result(result: Dictionary) -> void:
+	if result.is_empty():
+		return
+	var event: String = result.get("event", "")
+	if event.is_empty():
+		return
+	if event in ["patrol_engaged", "patrol_victory", "patrol_retreat"]:
+		reset_time_scale()
+		if patrol_course:
+			patrol_course = false
+			throttle = 0.0
+	if result.get("damage", 0.0) > 0.0:
+		ship.apply_damage(float(result.damage))
+	_announce(event, str(result.get("message", "")))
+
+
+func combat_line_clear(start: Vector3, finish: Vector3) -> bool:
+	var steps := maxi(1, ceili(start.distance_to(finish) / 8.0))
+	for step in range(1, steps + 1):
+		if _blocked(start.lerp(finish, float(step) / steps)):
+			return false
+	return true
+
+
 func service_offer(action: String) -> Dictionary:
 	var unit_price := repair_unit_price() if action == "repair" else refuel_unit_price()
 	var offer := ship.service_offer(action, unit_price, credits)
@@ -637,6 +722,8 @@ func jump_status(destination: int) -> Dictionary:
 		reason = "Выйдите в открытый космос"
 	elif autopilot or scooping:
 		reason = "Отключите автопилот и сбор топлива"
+	elif patrol.in_danger(self):
+		reason = "Выйдите из зоны боя"
 	elif speed() > JUMP_SPEED:
 		reason = "Снизьте скорость до %d м/с" % int(JUMP_SPEED)
 	elif ship.fuel < cost:
@@ -659,6 +746,7 @@ func start_jump() -> bool:
 		_announce("jump_denied", status.reason)
 		return false
 	reset_time_scale()
+	patrol_course = false
 	throttle = 0.0
 	boost = false
 	jump_seconds_left = JUMP_CHARGE
@@ -809,9 +897,11 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 	elapsed += delta
 	if docked >= 0:
 		_hold_docked_pose()
+		_apply_patrol_result(patrol.step(self, delta))
 		return
 	if landed:
 		_hold_landed_pose()
+		_apply_patrol_result(patrol.step(self, delta))
 		var mining_event := mining.update(delta)
 		match mining_event:
 			"mining_ready":
@@ -827,13 +917,15 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 			_charge_jump(delta)
 		return
 	if manual_input:
-		if autopilot:
+		if autopilot or patrol_course:
 			set_autopilot(false)
 			_announce("manual_override", "Ручное управление")
 
 	var had_fuel := ship.fuel > 0.0
 	if autopilot:
 		_autopilot_step(delta)
+	elif patrol_course:
+		_patrol_course_step(delta)
 	else:
 		yaw = wrapf(yaw - steer.x * delta * MAX_STEER, -PI, PI)
 		pitch = clampf(pitch + steer.y * delta * MAX_STEER, -MAX_PITCH, MAX_PITCH)
@@ -878,6 +970,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		throttle = 0.0
 		set_autopilot(false)
 	_collect_fuel(delta)
+	_apply_patrol_result(patrol.step(self, delta))
 
 
 func _blocked(point: Vector3, sector_id := -1, epoch := -1.0) -> bool:
@@ -1008,14 +1101,33 @@ func _autopilot_step(delta: float) -> void:
 		_arrive()
 
 
-func _transit_obstacle(course: Vector3, cruise: float) -> int:
+func _patrol_course_step(delta: float) -> void:
+	boost = false
+	var distance := 0.0
+	var waypoint: Vector3 = patrol.status(self).point
+	if patrol.phase == Patrol.OUTBOUND:
+		waypoint = _star_detour(waypoint)
+		var obstacle := _transit_obstacle(waypoint - position, PATROL_CRUISE_SPEED, false)
+		if obstacle >= 0:
+			waypoint = _transit_waypoint(obstacle, waypoint - position)
+		distance = position.distance_to(waypoint)
+	var direction := position.direction_to(waypoint)
+	if not direction.is_zero_approx():
+		_point_towards(direction, delta)
+	var cruise := PATROL_CRUISE_SPEED if ship.fuel > 0.0 else RESERVE_SPEED
+	var speed_limit := minf(cruise, distance * 0.30)
+	velocity = velocity.move_toward(direction * speed_limit, 42.0 * delta)
+	throttle = speed_limit / MAX_SPEED
+
+
+func _transit_obstacle(course: Vector3, cruise: float, skip_target := true) -> int:
 	var star := Catalog.star_for(system_id)
 	var speed_limit := cruise if ship.fuel > 0.0 else minf(cruise, RESERVE_SPEED)
 	var duration := course.length() / speed_limit
 	var earliest := INF
 	var obstacle := -1
 	for id: int in Catalog.targets_for(system_id):
-		if id == target or id == star:
+		if (skip_target and id == target) or id == star:
 			continue
 		var radial := position - target_position(id)
 		var relative_course := course - target_velocity(id) * duration
@@ -1093,6 +1205,7 @@ func snapshot() -> Dictionary:
 		"landed_site": landed_site, "planned_target": planned_target, "mining": mining.snapshot(),
 		"landing_direction": [landing_direction.x, landing_direction.y, landing_direction.z],
 		"ship": ship.snapshot(), "market": market.snapshot(), "system_id": system_id, "jump_target": jump_target,
+		"patrol": patrol.snapshot(),
 	}
 
 
@@ -1100,6 +1213,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_traffic := schema < 9
 	var pre_economy := schema < 8
 	var pre_surface := schema < 7
 	var pre_galaxy := schema < 5
@@ -1113,7 +1227,8 @@ func restore(state: Dictionary) -> bool:
 	var restored_system := Catalog.HOME_SYSTEM
 	var restored_jump := -1
 	if not pre_galaxy:
-		if not _integer(state.get("system_id"), 0, Catalog.SYSTEM_COUNT - 1) or not _integer(state.get("jump_target"), -1, Catalog.SYSTEM_COUNT - 1):
+		var systems := Catalog.PRE_TRAFFIC_SYSTEM_COUNT if pre_traffic else Catalog.SYSTEM_COUNT
+		if not _integer(state.get("system_id"), 0, systems - 1) or not _integer(state.get("jump_target"), -1, systems - 1):
 			return false
 		restored_system = int(state.system_id)
 		restored_jump = int(state.jump_target)
@@ -1132,7 +1247,9 @@ func restore(state: Dictionary) -> bool:
 		return false
 	if not _number(state.get("throttle"), 0.0, 1.0):
 		return false
-	var site_count := Catalog.PRE_SURFACE_DESTINATION_COUNT if pre_surface else Catalog.DESTINATION_COUNT
+	var site_count := Catalog.PRE_TRAFFIC_DESTINATION_COUNT if pre_traffic else Catalog.DESTINATION_COUNT
+	if pre_surface:
+		site_count = Catalog.PRE_SURFACE_DESTINATION_COUNT
 	if pre_galaxy:
 		site_count = schema + 1 if pre_sector else (Catalog.SITE_COUNT if pre_fuel else Catalog.TARGET_COUNT)
 	for field in ["docked", "contract_origin", "contract_destination"]:
@@ -1173,11 +1290,14 @@ func restore(state: Dictionary) -> bool:
 	var restored_mining := MiningRig.new()
 	var restored_ship := ShipSystems.new()
 	var restored_market := Economy.new()
+	var restored_patrol := Patrol.new()
 	var restored_landing := -1
 	var restored_plan := -1
 	if not pre_fuel and not restored_ship.restore(state.get("ship"), pre_economy):
 		return false
-	if not pre_economy and not restored_market.restore(state.get("market")):
+	if not pre_economy and not restored_market.restore(state.get("market"), pre_traffic):
+		return false
+	if not pre_traffic and not restored_patrol.restore(state.get("patrol")):
 		return false
 	var mining_count := Catalog.SITE_COUNT if pre_galaxy else site_count
 	if schema >= 2 and not restored_mining.restore(state.get("mining"), schema == 2, mining_count, restored_ship.cargo_capacity(), not pre_economy):
@@ -1255,6 +1375,7 @@ func restore(state: Dictionary) -> bool:
 	mining = restored_mining
 	ship = restored_ship
 	market = restored_market
+	patrol = restored_patrol
 	scooping = false
 	system_id = restored_system
 	jump_target = restored_jump

@@ -29,6 +29,7 @@ var _market_page: HBoxContainer
 var _courier_page: HBoxContainer
 var _goods_buttons: Dictionary[String, Button] = {}
 var _goods_labels: Dictionary[String, Array] = {}
+var _selection_icon: CommodityIcon
 var _selection_title: Label
 var _quantity_label: Label
 var _minus_button: Button
@@ -150,12 +151,8 @@ func _build_market() -> void:
 		cells.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		cells.offset_left = 12.0
 		cells.offset_right = -4.0
-		var mark := ColorRect.new()
-		mark.color = ACCENTS[good]
-		mark.custom_minimum_size = Vector2(5.0, 25.0)
-		mark.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		cells.add_child(mark)
+		var icon := _commodity_icon(cells, 34.0)
+		icon.select(good, ACCENTS[good])
 		var name := _label(cells, Economy.good_name(good), 21, TEXT)
 		name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		_goods_labels[good] = [
@@ -165,7 +162,9 @@ func _build_market() -> void:
 	_label(table, "Цены за единицу товара", 14, MUTED)
 
 	var order := _card(_market_page, 377.0, false)
-	_selection_title = _label(order, "", 28, TEXT)
+	var selected := _row(order, 12)
+	_selection_icon = _commodity_icon(selected, 42.0)
+	_selection_title = _label(selected, "", 28, TEXT)
 	_spacer(order)
 	_label(order, "Количество", 16, MUTED)
 	var quantity := _row(order, 8)
@@ -248,6 +247,7 @@ func _refresh_market() -> void:
 	_quantity = clampi(_quantity, 1, capacity)
 	var buy: Dictionary = _sim.market_quote(_selected_good, "buy", _quantity)
 	var sell: Dictionary = _sim.market_quote(_selected_good, "sell", _quantity)
+	_selection_icon.select(_selected_good, ACCENTS[_selected_good])
 	_selection_title.text = Economy.good_name(_selected_good)
 	_quantity_label.text = "%d ед." % _quantity
 	_minus_button.disabled = _quantity <= 1
@@ -442,6 +442,15 @@ static func _card(parent: Container, width: float, expand: bool) -> VBoxContaine
 	return _column(panel, 9)
 
 
+static func _commodity_icon(parent: Container, diameter: float) -> CommodityIcon:
+	var icon := CommodityIcon.new()
+	icon.custom_minimum_size = Vector2.ONE * diameter
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(icon)
+	return icon
+
+
 static func _column(parent: Container, spacing: int) -> VBoxContainer:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", spacing)
@@ -474,3 +483,63 @@ static func _style(fill: Color, border: Color, radius: int, padding: int) -> Sty
 	style.content_margin_top = padding * 0.75
 	style.content_margin_bottom = padding * 0.75
 	return style
+
+
+class CommodityIcon extends Control:
+	## One 36-unit drawing grid serves the table and the order panel.
+
+	var _commodity := ""
+	var _accent := Color.WHITE
+	var _tile := StyleBoxFlat.new()
+
+	func select(commodity: String, accent: Color) -> void:
+		if _commodity == commodity:
+			return
+		_commodity = commodity
+		_accent = accent
+		_tile.bg_color = Color("091720")
+		_tile.border_color = accent.lerp(Color("253946"), 0.70)
+		_tile.set_border_width_all(1)
+		_tile.set_corner_radius_all(7)
+		queue_redraw()
+
+	func _draw() -> void:
+		var scale_factor := minf(size.x, size.y) / 36.0
+		var scale_vector := Vector2.ONE * scale_factor
+		draw_set_transform((size - scale_vector * 36.0) * 0.5, 0.0, scale_vector)
+		draw_style_box(_tile, Rect2(0, 0, 36, 36))
+		var shadow := _accent.darkened(0.48)
+		var light := _accent.lightened(0.27)
+		match _commodity:
+			"ore":
+				_shape([Vector2(5, 23), Vector2(8, 17), Vector2(14, 16), Vector2(18, 23), Vector2(15, 29), Vector2(8, 28)], _accent)
+				_shape([Vector2(5, 23), Vector2(13, 25), Vector2(15, 29), Vector2(8, 28)], shadow)
+				_shape([Vector2(15, 20), Vector2(16, 11), Vector2(23, 7), Vector2(30, 12), Vector2(31, 21), Vector2(25, 27), Vector2(19, 25)], _accent)
+				_shape([Vector2(15, 20), Vector2(23, 17), Vector2(25, 27), Vector2(19, 25)], shadow)
+				_shape([Vector2(16, 11), Vector2(23, 7), Vector2(30, 12), Vector2(23, 17)], light)
+			"crystal":
+				_shape([Vector2(6, 24), Vector2(8, 16), Vector2(14, 19), Vector2(19, 28), Vector2(14, 30)], shadow)
+				_shape([Vector2(13, 24), Vector2(17, 10), Vector2(26, 5), Vector2(30, 13), Vector2(24, 28), Vector2(18, 31)], _accent)
+				_shape([Vector2(17, 10), Vector2(26, 5), Vector2(22, 16), Vector2(13, 24)], light)
+				_shape([Vector2(30, 13), Vector2(24, 28), Vector2(18, 31), Vector2(22, 16)], shadow)
+			"ice":
+				_shape([Vector2(7, 12), Vector2(18, 6), Vector2(29, 12), Vector2(29, 24), Vector2(18, 30), Vector2(7, 24)], _accent)
+				_shape([Vector2(7, 12), Vector2(18, 6), Vector2(29, 12), Vector2(18, 18)], light)
+				_shape([Vector2(18, 18), Vector2(29, 12), Vector2(29, 24), Vector2(18, 30)], shadow)
+				draw_line(Vector2(11, 17), Vector2(14, 23), light, 1.4, true)
+			"circuits":
+				for offset in [12, 18, 24]:
+					draw_line(Vector2(offset, 6), Vector2(offset, 30), light, 1.65, true)
+					draw_line(Vector2(6, offset), Vector2(30, offset), light, 1.65, true)
+				draw_rect(Rect2(9, 9, 18, 18), _accent)
+				draw_rect(Rect2(13, 13, 10, 10), shadow)
+				draw_rect(Rect2(16, 16, 4, 4), light)
+			"medical":
+				draw_polyline(PackedVector2Array([Vector2(13, 12), Vector2(13, 8), Vector2(23, 8), Vector2(23, 12)]), light, 1.5, true)
+				_shape([Vector2(5, 15), Vector2(8, 12), Vector2(28, 12), Vector2(31, 15), Vector2(31, 26), Vector2(28, 29), Vector2(8, 29), Vector2(5, 26)], _accent)
+				draw_rect(Rect2(7, 25, 22, 3), shadow)
+				draw_line(Vector2(18, 15), Vector2(18, 25), Color("482338"), 3.2, true)
+				draw_line(Vector2(13, 20), Vector2(23, 20), Color("482338"), 3.2, true)
+
+	func _shape(points: Array[Vector2], color: Color) -> void:
+		draw_colored_polygon(PackedVector2Array(points), color)

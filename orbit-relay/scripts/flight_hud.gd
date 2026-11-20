@@ -4,10 +4,13 @@ signal action_requested(action: String)
 
 const MiningRig := preload("res://scripts/mining_rig.gd")
 const Sector := preload("res://scripts/sector_catalog.gd")
+const Patrol := preload("res://scripts/patrol_encounter.gd")
 const INK := Color("eef8ff")
 const MUTED := Color("a7bac9")
 const CYAN := Color("8fe9db")
 const AMBER := Color("ffd396")
+const ALERT := Color("ff978c")
+const ALLY := Color("90c6ff")
 const BACK := Color(0.024, 0.057, 0.081, 0.94)
 const LINE := Color(0.24, 0.43, 0.49, 0.58)
 
@@ -46,6 +49,8 @@ var _lift_blocked := false
 var _mining_blocked := false
 var _scoop_blocked := false
 var _time_blocked := false
+var _patrol_blocked := false
+var _fire_blocked := false
 var _jumping := false
 var _notice_left := 0.0
 var _mouse_pad: SteeringPad
@@ -156,6 +161,14 @@ func build() -> void:
 	right.add_child(_port_tools)
 	_button(_port_tools, "market", "Биржа")
 	_button(_port_tools, "services", "Сервис")
+	_button(_port_tools, "patrol", "Дозор")
+	_button(_port_tools, "fire", "Огонь")
+	var fire_button: Button = _actions["fire"]
+	fire_button.size_flags_stretch_ratio = 1.35
+	fire_button.add_theme_color_override("font_color", ALERT)
+	fire_button.add_theme_stylebox_override("normal", _box(Color("482b32"), ALERT, 9, 7.0))
+	fire_button.add_theme_stylebox_override("hover", _box(Color("633c45"), ALERT, 9, 7.0))
+	fire_button.add_theme_stylebox_override("pressed", _box(Color("78505a"), ALERT, 9, 7.0))
 	_actions["map"].tooltip_text = "Карта звёздной системы"
 	_actions["galaxy"].tooltip_text = "Карта галактики"
 	_actions["report"].tooltip_text = "Отчёт об ошибке"
@@ -174,6 +187,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var docked: bool = sim.docked >= 0
 	var landed: bool = sim.landed_site >= 0
 	var parked := docked or landed
+	var patrol: Dictionary = sim.patrol_status()
 	if not _parked and parked:
 		_reset_controls()
 	_parked = parked
@@ -181,12 +195,23 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_steer.visible = not parked
 	_bank.visible = not parked
 	_throttle_controls.visible = not parked
-	_port_tools.visible = docked
-	_right_panel.offset_top = -157.0 if docked else (-101.0 if landed else -215.0)
 	_actions["target"].visible = not parked
 	_actions["autopilot"].visible = not parked
 	_actions["services"].visible = docked
 	_actions["market"].visible = docked
+	var patrol_button: Button = _actions["patrol"]
+	patrol_button.visible = not landed and not _jumping and bool(patrol.get("visible", false))
+	patrol_button.text = str(patrol.get("caption", "Дозор"))
+	patrol_button.tooltip_text = str(patrol.get("reason", ""))
+	_patrol_blocked = not bool(patrol.get("available", false))
+	var fire_button: Button = _actions["fire"]
+	fire_button.visible = not parked and not _jumping and patrol.get("phase") == Patrol.ENGAGED and bool(patrol.get("same_system", false))
+	var fire: Dictionary = sim.fire_status() if fire_button.visible else {}
+	fire_button.tooltip_text = str(fire.get("reason", ""))
+	_fire_blocked = not fire.get("ok", false)
+	var encounter_tools := patrol_button.visible or fire_button.visible
+	_port_tools.visible = docked or encounter_tools
+	_right_panel.offset_top = -157.0 if docked else (-101.0 if landed else (-274.0 if encounter_tools else -215.0))
 	_marks.flight = not parked
 	_marks.queue_redraw()
 
@@ -238,8 +263,10 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_sync_surface(sim, mining)
 	elif docked:
 		_sync_port(sim, sale_quote, itinerary, transfer)
+		if sim.contract_stage != 1 and patrol.get("phase") in [Patrol.OUTBOUND, Patrol.RETURN] and patrol_button.visible:
+			_guidance.text = str(patrol.get("reason", ""))
 	else:
-		_sync_flight(sim, scoop_status, itinerary)
+		_sync_flight(sim, scoop_status, itinerary, patrol, fire)
 	if _notice_left > 0.0:
 		_notice_left -= delta
 		if _notice_left <= 0.0:
@@ -327,8 +354,8 @@ func _sync_surface(sim: RefCounted, mining: RefCounted) -> void:
 			else:
 				_guidance.text = "Разверните добывающий модуль."
 
-func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictionary) -> void:
-	var aimed_at_port := Sector.is_port(sim.target)
+func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictionary, patrol: Dictionary, fire: Dictionary) -> void:
+	var aimed_at_port := Sector.is_port(sim.target) and fire.is_empty() and not bool(sim.patrol_course)
 	var surface: Dictionary = sim.surface_status() if Sector.is_mine_site(sim.target) else {}
 	var near_surface: bool = surface.get("near", false)
 	var to_target: Vector3 = sim.target_position(sim.target) - sim.position
@@ -360,6 +387,14 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 		_route.text = "Прыжок  /  %s" % Sector.system(sim.jump_target).name
 		_route_detail.text = "До перехода %.1f с" % sim.jump_seconds_left
 		_guidance.text = "Тормоз отменяет прыжок."
+	elif not fire.is_empty():
+		_route.text = "Дозор  /  Рейдер"
+		_route_detail.text = "Дистанция %d м · корпус %d%%" % [roundi(fire.get("distance", 0.0)), ceili(patrol.get("enemy_hull", 0.0))]
+		_guidance.text = "Цель в прицеле. Нажмите «Огонь»." if fire.ok else str(fire.get("reason", ""))
+	elif patrol.get("phase") == Patrol.OUTBOUND and sim.patrol_course and patrol.get("same_system", false):
+		_route.text = "Дозор  /  Сигнал"
+		_route_detail.text = "До района сигнала %d м" % roundi(patrol.distance)
+		_guidance.text = "Авто  /  К источнику сигнала"
 	elif sim.scooping:
 		_guidance.text = "Идёт сбор топлива. Удерживайте положение."
 	elif scoop_status.get("near", false):
@@ -381,6 +416,8 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 			_guidance.text = "Порт готов к швартовке."
 		else:
 			_guidance.text = str(status.get("reason", ""))
+	elif patrol.get("phase") in [Patrol.OUTBOUND, Patrol.RETURN] and _actions["patrol"].visible:
+		_guidance.text = str(patrol.get("reason", ""))
 	elif sim.ship.fuel <= 0.0:
 		_guidance.text = "Резервная тяга. Заправьтесь в порту или у звезды."
 	elif not surface.is_empty():
@@ -405,6 +442,14 @@ func set_target_marker(screen_position: Vector2, visible: bool) -> void:
 	_marks.target_visible = visible
 	_marks.queue_redraw()
 
+func set_traffic_markers(markers: Array[Dictionary]) -> void:
+	_marks.traffic = markers.duplicate()
+	_marks.traffic.sort_custom(func(left: Dictionary, right: Dictionary) -> bool:
+		var left_hostile: bool = left.role == "raider"
+		var right_hostile: bool = right.role == "raider"
+		return left_hostile if left_hostile != right_hostile else float(left.distance) < float(right.distance))
+	_marks.queue_redraw()
+
 func set_input_enabled(enabled: bool) -> void:
 	_input_enabled = enabled
 	if not is_instance_valid(_hud):
@@ -417,6 +462,7 @@ func _refresh_disabled_actions() -> void:
 	for action: String in _actions:
 		var button: Button = _actions[action]
 		var blocked := (action == "dock" and _lift_blocked) or (action == "mine" and _mining_blocked) or (action == "scoop" and _scoop_blocked) or (action == "time" and _time_blocked)
+		blocked = blocked or (action == "patrol" and _patrol_blocked) or (action == "fire" and _fire_blocked)
 		var during_jump := _jumping and action not in ["throttle_down", "throttle_up", "boost", "brake"]
 		button.disabled = not _input_enabled or blocked or during_jump
 
@@ -614,7 +660,7 @@ func _button(parent: Container, action: String, caption: String) -> void:
 	button.custom_minimum_size = Vector2(0, 52)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.add_theme_font_size_override("font_size", 18)
-	button.add_theme_color_override("font_color", CYAN if action in ["dock", "scoop", "contract", "mine", "sell_ore", "map", "galaxy", "market", "services", "time"] else INK)
+	button.add_theme_color_override("font_color", CYAN if action in ["dock", "scoop", "contract", "mine", "sell_ore", "map", "galaxy", "market", "services", "time", "patrol"] else INK)
 	button.add_theme_color_override("font_hover_color", INK)
 	button.add_theme_stylebox_override("normal", _box(Color("12313d"), LINE, 9, 7.0))
 	button.add_theme_stylebox_override("hover", _box(Color("214454"), CYAN, 9, 7.0))
@@ -671,9 +717,12 @@ class SteeringPad extends Control:
 		draw_string(font, Vector2((size.x - width) * 0.5, size.y - 4), caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, MUTED)
 
 class FlightMarks extends Control:
+	const MAX_CONTACTS := 3
+
 	var flight := false
 	var target_visible := false
 	var target_position := Vector2.ZERO
+	var traffic: Array[Dictionary] = []
 
 	func _draw() -> void:
 		if not flight:
@@ -681,6 +730,7 @@ class FlightMarks extends Control:
 		var center := size * 0.5
 		for direction: Vector2 in [Vector2.UP, Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT]:
 			draw_line(center + direction * 13.0, center + direction * 23.0, Color(0.57, 0.92, 0.9, 0.65), 1.5, true)
+		_draw_traffic()
 		if not target_visible:
 			return
 		var margin := Vector2(42, 112)
@@ -694,3 +744,36 @@ class FlightMarks extends Control:
 		var distance := 10.0
 		var vertices := PackedVector2Array([target + Vector2(0, -distance), target + Vector2(distance, 0), target + Vector2(0, distance), target + Vector2(-distance, 0), target + Vector2(0, -distance)])
 		draw_polyline(vertices, AMBER, 2.0, true)
+
+	func _draw_traffic() -> void:
+		var safe := Rect2(Vector2(24, 142), (size - Vector2(48, 285)).max(Vector2.ONE))
+		var font := ThemeDB.fallback_font
+		var occupied: Array[Rect2] = []
+		for contact: Dictionary in traffic:
+			var screen: Vector2 = contact.screen
+			if not safe.has_point(screen):
+				continue
+			var hostile: bool = contact.role == "raider"
+			var color := ALERT if hostile else (ALLY if contact.role == "patrol" else CYAN)
+			var caption := "%s · %d м" % [contact.name, roundi(contact.distance)]
+			var width := font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
+			var text_at := Vector2(clampf(screen.x - width * 0.5, 20.0, maxf(20.0, size.x - width - 20.0)), screen.y + 27.0)
+			var label_box := Rect2(text_at - Vector2(6, 15), Vector2(width + 12, 21))
+			var footprint := label_box.merge(Rect2(screen - Vector2(12, 12), Vector2(24, 24)))
+			if occupied.any(func(box: Rect2) -> bool: return box.intersects(footprint)):
+				continue
+			occupied.append(footprint)
+			if hostile:
+				var diamond := PackedVector2Array([
+					screen + Vector2(0, -11), screen + Vector2(9, 0), screen + Vector2(0, 11),
+					screen + Vector2(-9, 0), screen + Vector2(0, -11),
+				])
+				draw_polyline(diamond, color, 1.7, true)
+			elif contact.role == "patrol":
+				draw_rect(Rect2(screen - Vector2(7, 7), Vector2(14, 14)), color, false, 1.4)
+			else:
+				draw_arc(screen, 7.0, 0.0, TAU, 20, color, 1.4, true)
+			draw_rect(label_box, BACK)
+			draw_string(font, text_at, caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, color)
+			if occupied.size() >= MAX_CONTACTS:
+				break

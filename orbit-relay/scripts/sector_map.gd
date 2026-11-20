@@ -5,6 +5,7 @@ signal dismissed()
 
 const Sector := preload("res://scripts/sector_catalog.gd")
 const Orbit := preload("res://scripts/orbit_ephemeris.gd")
+const Patrol := preload("res://scripts/patrol_encounter.gd")
 const TEXT := Color("e8f4fa")
 const MUTED := Color("a5bac7")
 const MINT := Color("9debd7")
@@ -114,6 +115,10 @@ func open(sim: RefCounted) -> void:
 	_chart.centers.clear()
 	for id: int in Sector.targets_for(system_id):
 		_chart.centers[id] = sim.target_position(id)
+	_chart.traffic = sim.traffic_contacts()
+	var patrol: Dictionary = sim.patrol_status()
+	if patrol.get("phase") == Patrol.OUTBOUND and patrol.get("same_system", false):
+		_chart.traffic.append({"role": "signal", "position": patrol.point})
 	var planned: int = sim.planned_target
 	_chart.active_site = planned if planned >= 0 else int(sim.target)
 	show()
@@ -313,6 +318,12 @@ class SectorChart extends Control:
 	const CHART_BACKGROUND := Color("0b1a25")
 	const ORBIT_COLOR := Color("78b0daae")
 	const PLOT_MARGIN := Vector2(63, 42)
+	const CONTACT_COLORS := {
+		"trader": Color("8fe9db"),
+		"patrol": Color("90c6ff"),
+		"raider": Color("ff978c"),
+		"signal": Color("ffd396"),
+	}
 
 	var system_id := Sector.HOME_SYSTEM
 	var ship_position := Vector3.ZERO
@@ -321,6 +332,7 @@ class SectorChart extends Control:
 	var selected_site := -1
 	var orbit := PackedVector3Array()
 	var orbit_caption := ""
+	var traffic: Array[Dictionary] = []
 
 	func _ready() -> void:
 		clip_contents = true
@@ -336,6 +348,12 @@ class SectorChart extends Control:
 			var xz := Vector2(center.x, center.z)
 			minimum = minimum.min(xz)
 			maximum = maximum.max(xz)
+		for contact: Dictionary in traffic:
+			if contact.role == "signal":
+				var point: Vector3 = contact.position
+				var xz := Vector2(point.x, point.z)
+				minimum = minimum.min(xz)
+				maximum = maximum.max(xz)
 		return Rect2(minimum, (maximum - minimum).max(Vector2.ONE))
 
 	func _project(position_3d: Vector3, plot: Rect2, bounds: Rect2) -> Vector2:
@@ -399,6 +417,7 @@ class SectorChart extends Control:
 			var swatch := legend.position + Vector2(6, 12)
 			draw_line(swatch, swatch + Vector2(20, 0), ORBIT_COLOR, 1.7, true)
 			draw_string(font, legend.position + Vector2(32, 17), orbit_caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, MUTED)
+		_draw_traffic(font, plot, bounds, label_boxes)
 		for center: Vector3 in centers.values():
 			var point := _project(center, plot, bounds)
 			label_boxes.append(Rect2(point - Vector2(15, 15), Vector2(30, 30)))
@@ -430,6 +449,49 @@ class SectorChart extends Control:
 				draw_colored_polygon(PackedVector2Array([marker + Vector2(-8, 3), marker + Vector2(-3, -8), marker + Vector2(7, -3), marker + Vector2(6, 7)]), tint)
 			_draw_site_label(font, str(entry.name), marker, label_boxes)
 		draw_colored_polygon(PackedVector2Array([ship + Vector2(0, -7), ship + Vector2(6, 5), ship + Vector2(0, 3), ship + Vector2(-6, 5)]), TEXT)
+
+	func _draw_traffic(font: Font, plot: Rect2, bounds: Rect2, label_boxes: Array[Rect2]) -> void:
+		var roles: Dictionary[String, String] = {
+			"trader": "Торговец", "patrol": "Патруль", "raider": "Рейдер", "signal": "Сигнал",
+		}
+		var visible_roles: Array[String] = []
+		var limits := Rect2(Vector2(16, 36), (size - Vector2(32, 77)).max(Vector2.ONE))
+		for contact: Dictionary in traffic:
+			var point := _project(contact.position, plot, bounds)
+			if not limits.has_point(point) or not roles.has(contact.role):
+				continue
+			_draw_contact(point, contact.role)
+			if not visible_roles.has(contact.role):
+				visible_roles.append(contact.role)
+		if visible_roles.is_empty():
+			return
+		var width := 10.0
+		for role: String in visible_roles:
+			width += 29.0 + font.get_string_size(roles[role], HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
+		var legend := Rect2(size.x - width - 11.0, size.y - 32.0, width, 24.0)
+		label_boxes.append(legend)
+		draw_rect(legend, CHART_BACKGROUND)
+		var left := legend.position + Vector2(12, 12)
+		for role: String in visible_roles:
+			_draw_contact(left, role)
+			draw_string(font, left + Vector2(12, 5), roles[role], HORIZONTAL_ALIGNMENT_LEFT, -1, 14, MUTED)
+			left.x += 29.0 + font.get_string_size(roles[role], HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
+
+	func _draw_contact(point: Vector2, role: String) -> void:
+		var color: Color = CONTACT_COLORS[role]
+		match role:
+			"trader":
+				draw_arc(point, 5.5, 0.0, TAU, 20, color, 1.4, true)
+			"patrol":
+				draw_rect(Rect2(point - Vector2(5, 5), Vector2(10, 10)), color, false, 1.4)
+			_:
+				var radius := 7.0 if role == "raider" else 5.0
+				var diamond := PackedVector2Array([
+					point + Vector2.UP * radius, point + Vector2.RIGHT * radius,
+					point + Vector2.DOWN * radius, point + Vector2.LEFT * radius,
+					point + Vector2.UP * radius,
+				])
+				draw_polyline(diamond, color, 1.5, true)
 
 	func _draw_course(start: Vector2, finish: Vector2, color: Color, width: float) -> void:
 		if start.distance_squared_to(finish) > 100.0:
