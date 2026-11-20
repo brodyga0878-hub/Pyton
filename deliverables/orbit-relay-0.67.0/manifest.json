@@ -1,0 +1,214 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.67.0",
+  "source_commit": "b5dc99485ae113d566e95a5c57758e5d7d616282",
+  "content": {
+    "save_schema": 27,
+    "known_authored_systems": 5,
+    "deterministic_survey_systems": 18,
+    "survey_sectors": 6,
+    "total_targets": 83,
+    "scanner_radius_light_years": 10.5,
+    "preserved_authored_ephemerides_and_jump_tariffs": true,
+    "tested_acceptance_matrix": {
+      "checked": 25,
+      "partial": 11,
+      "open": 8
+    }
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 92,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.66.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 41,
+    "tested_on_device": false
+  },
+  "checks": {
+    "android_report_share": {
+      "failures": 0,
+      "checks": 76
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "cartography": {
+      "failures": 0,
+      "checks": 43
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "crew": {
+      "failures": 0,
+      "checks": 45
+    },
+    "departure": {
+      "failures": 0,
+      "checks": 32
+    },
+    "dock_access": {
+      "failures": 0,
+      "checks": 37
+    },
+    "docking": {
+      "failures": 0,
+      "checks": 76
+    },
+    "dual_fuel": {
+      "failures": 0,
+      "checks": 25
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 139
+    },
+    "flight": {
+      "failures": 0
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "frontier_freight": {
+      "failures": 0,
+      "checks": 33
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 76
+    },
+    "galactic_routes": {
+      "failures": 0,
+      "checks": 59
+    },
+    "gear": {
+      "failures": 0,
+      "checks": 28
+    },
+    "heat_shield": {
+      "failures": 0,
+      "checks": 28
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 187
+    },
+    "living": {
+      "failures": 0,
+      "checks": 77
+    },
+    "material_maps": {
+      "failures": 0,
+      "checks": 33
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "npc_freight": {
+      "failures": 0,
+      "checks": 48
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 535
+    },
+    "passengers": {
+      "failures": 0,
+      "checks": 50
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 81
+    },
+    "procedural_galaxy": {
+      "failures": 0,
+      "checks": 140
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "report": {
+      "failures": 0,
+      "checks": 28
+    },
+    "scene": {
+      "failures": 0
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "shipyard": {
+      "failures": 0,
+      "checks": 52
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 371
+    },
+    "surface_guidance": {
+      "failures": 0,
+      "checks": 60
+    },
+    "galaxy_scene_headless": {
+      "checks": 163,
+      "failures": 0
+    },
+    "galaxy_scene_graphical": {
+      "checks": 166,
+      "failures": 0
+    },
+    "landable_terrain_drill_placements": {
+      "checks": 5265,
+      "failures": 0
+    },
+    "real_0_66_two_system_survey_mileage": {
+      "checks": 145,
+      "failures": 0,
+      "touch_interactions": 90
+    }
+  },
+  "files": {
+    "OrbitRelay-0.67.0-arm64.apk": {
+      "bytes": 28700118,
+      "sha256": "ba15330d6e04aaa57d3807bcb353033092369c2e64c6fec81d58c10df163730e"
+    },
+    "OrbitRelay-0.67.0-source.zip": {
+      "bytes": 2193479,
+      "sha256": "45931f2c1c0fa3a832b1ae7ffa1a32324d575aa9c6f461117fdc7a89962a7515"
+    },
+    "galaxy-survey-all.png": {
+      "bytes": 193490,
+      "sha256": "8f855a2b7d500a14b002c5e78b321b572a8ee861ad6b909973cb4d69e1764468"
+    },
+    "galaxy-survey-overview.png": {
+      "bytes": 154114,
+      "sha256": "459be3b4e4ecf7904493026c70773aa6531ece38e5a400837ce94a7a0a3b9dbe"
+    },
+    "galaxy-survey-sector.png": {
+      "bytes": 130818,
+      "sha256": "96a56a03d24d4d58a9266fb7b184c92389f77858c090f7af64d09fe95fbf7db0"
+    }
+  }
+}
