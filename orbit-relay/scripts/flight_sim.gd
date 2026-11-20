@@ -12,12 +12,13 @@ const Atmosphere = preload("res://scripts/atmosphere.gd")
 const Terrain = preload("res://scripts/surface_terrain.gd")
 const Economy = preload("res://scripts/port_economy.gd")
 const NpcFreight = preload("res://scripts/npc_freight.gd")
+const GalacticRoute = preload("res://scripts/galactic_route.gd")
 const Traffic = preload("res://scripts/sector_traffic.gd")
 const Patrol = preload("res://scripts/patrol_encounter.gd")
 const Expedition = preload("res://scripts/expedition.gd")
 const FactionFronts = preload("res://scripts/faction_fronts.gd")
 const ConvoyOrders = preload("res://scripts/convoy_orders.gd")
-const SAVE_SCHEMA := 16
+const SAVE_SCHEMA := 17
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
@@ -107,6 +108,7 @@ var entry_heat := 0.0
 var system_id := Catalog.HOME_SYSTEM
 var jump_target := -1
 var jump_seconds_left := 0.0
+var _jump_route: Array[int] = []
 var target := 1
 var planned_target := -1
 var autopilot := false
@@ -1404,9 +1406,60 @@ func _collect_fuel(delta: float) -> void:
 func plan_jump(destination: int) -> bool:
 	if jump_seconds_left > 0.0 or not system_known(destination) or Catalog.jump_cost(system_id, destination) == 0:
 		return false
+	_jump_route.clear()
 	jump_target = destination
 	_announce("jump_planned", "Межзвёздный курс. «%s»." % Catalog.system(destination).name)
 	return true
+
+
+func route_preview(goal: int) -> Dictionary:
+	var known := _known_systems(expedition)
+	var capacity := ship.capacity()
+	var reachable_first_leg := GalacticRoute.plan(system_id, goal, known, capacity, ship.fuel)
+	if reachable_first_leg.available or ship.fuel >= capacity:
+		return reachable_first_leg
+	return GalacticRoute.plan(system_id, goal, known, capacity)
+
+
+func planned_route() -> Dictionary:
+	var path: Array[int] = []
+	if jump_target >= 0:
+		path.append(system_id)
+		if _jump_route.is_empty():
+			path.append(jump_target)
+		else:
+			path.append_array(_jump_route)
+	return GalacticRoute.describe(path)
+
+
+func plan_route(goal: int) -> bool:
+	if jump_seconds_left > 0.0:
+		return false
+	var plot := route_preview(goal)
+	if not plot.available:
+		return false
+	_jump_route.assign(plot.path.slice(1))
+	jump_target = plot.next
+	_announce("jump_planned", "Маршрут до «%s». Ближайший прыжок в «%s»." % [
+		Catalog.system(goal).name, Catalog.system(jump_target).name])
+	return true
+
+
+func cancel_route() -> bool:
+	if jump_seconds_left > 0.0 or jump_target < 0:
+		return false
+	_jump_route.clear()
+	jump_target = -1
+	_announce("route_canceled", "Межзвёздный маршрут снят.")
+	return true
+
+
+static func _known_systems(progress: RefCounted) -> Array[int]:
+	var systems: Array[int] = []
+	for id in range(Catalog.SYSTEM_COUNT):
+		if progress.known(id):
+			systems.append(id)
+	return systems
 
 
 func jump_status(destination: int) -> Dictionary:
@@ -1485,7 +1538,11 @@ func _charge_jump(delta: float) -> void:
 	jump_seconds_left = 0.0
 	ship.fuel -= status.cost
 	system_id = jump_target
-	jump_target = -1
+	if not _jump_route.is_empty() and _jump_route.front() == system_id:
+		_jump_route.pop_front()
+	else:
+		_jump_route.clear()
+	jump_target = -1 if _jump_route.is_empty() else _jump_route[0]
 	var arrival: int = Catalog.system(system_id).arrival_port
 	if not station_operational(arrival):
 		arrival = Catalog.system(system_id).survey_sites[0]
@@ -1497,7 +1554,10 @@ func _charge_jump(delta: float) -> void:
 	yaw = 0.0
 	pitch = 0.0
 	roll = 0.0
-	_announce("jump_complete", "Прыжок завершён. Система «%s»." % Catalog.system(system_id).name)
+	var message := "Прыжок завершён. Система «%s»." % Catalog.system(system_id).name
+	if jump_target >= 0:
+		message += " Далее «%s»." % Catalog.system(jump_target).name
+	_announce("jump_complete", message)
 
 
 func _arrive(direction := Vector3.BACK) -> void:
@@ -2113,7 +2173,7 @@ func snapshot() -> Dictionary:
 		"landed_site": landed_site, "planned_target": planned_target, "mining": mining.snapshot(),
 		"landing_direction": [landing_direction.x, landing_direction.y, landing_direction.z],
 		"ship": ship.snapshot(), "market": market.snapshot(), "freight": freight.snapshot(),
-		"system_id": system_id, "jump_target": jump_target,
+		"system_id": system_id, "jump_target": jump_target, "jump_route": _jump_route.duplicate(),
 		"patrol": patrol.snapshot(), "star_heat": star_heat, "entry_heat": entry_heat,
 		"expedition": expedition.snapshot(), "factions": factions.snapshot(),
 		"convoy_order": convoy_order.snapshot(),
@@ -2124,6 +2184,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_jump_route := schema < 17
 	var pre_freight := schema < 16
 	var pre_heat_shield := schema < 15
 	var pre_entry := schema < 14
@@ -2258,6 +2319,20 @@ func restore(state: Dictionary) -> bool:
 	var restored_plan := -1
 	if not pre_fuel and not restored_ship.restore(state.get("ship"), pre_economy, pre_heat_shield):
 		return false
+	var restored_route: Array[int] = []
+	if not pre_jump_route:
+		var remaining: Variant = state.get("jump_route")
+		if not remaining is Array or remaining.size() >= Catalog.SYSTEM_COUNT:
+			return false
+		for site: Variant in remaining:
+			if not _integer(site, 0, Catalog.SYSTEM_COUNT - 1):
+				return false
+			restored_route.append(int(site))
+		if not restored_route.is_empty():
+			var path: Array[int] = [restored_system]
+			path.append_array(restored_route)
+			if restored_route[0] != restored_jump or not GalacticRoute.valid_path(path, _known_systems(restored_expedition), restored_ship.capacity()):
+				return false
 	if not pre_economy and not restored_market.restore(state.get("market"), pre_traffic, pre_expansion):
 		return false
 	if pre_freight:
@@ -2359,6 +2434,7 @@ func restore(state: Dictionary) -> bool:
 	scooping = false
 	system_id = restored_system
 	jump_target = restored_jump
+	_jump_route = restored_route
 	jump_seconds_left = 0.0
 	target = int(state.target)
 	planned_target = restored_plan

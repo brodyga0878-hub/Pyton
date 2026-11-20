@@ -58,6 +58,7 @@ func _ready() -> void:
 	_galaxy.build()
 	_galaxy.destination_selected.connect(_plan_jump)
 	_galaxy.jump_requested.connect(_start_jump)
+	_galaxy.route_cancel_requested.connect(_cancel_jump_route)
 	_galaxy.dismissed.connect(_close_galaxy)
 	add_child(_services)
 	_services.build()
@@ -262,7 +263,7 @@ func _deliver_notice() -> void:
 		"scoop_full", "scoop_stop", "star_arrival", "fuel_empty", "thermal_damage",
 		"atmosphere_enter", "atmosphere_exit", "atmosphere_damage",
 		"service_heat_shield",
-		"jump_planned", "jump_complete",
+		"jump_planned", "jump_complete", "route_canceled",
 		"market_buy", "market_sell", "service_repair", "service_cargo", "hull_damage", "contract_leg",
 		"patrol_accepted", "patrol_engaged", "patrol_fire", "patrol_enemy_hit", "patrol_retreat", "patrol_victory", "patrol_paid",
 		"expedition_accepted", "expedition_survey", "expedition_report", "expedition_supply", "expedition_complete", "expedition_course",
@@ -523,7 +524,13 @@ func _close_map() -> void:
 
 
 func _plan_jump(destination: int) -> void:
-	if _galaxy.is_open() and flight.plan_jump(destination):
+	if _galaxy.is_open() and flight.plan_route(destination):
+		_deliver_notice()
+		_galaxy.refresh()
+
+
+func _cancel_jump_route() -> void:
+	if _galaxy.is_open() and flight.cancel_route():
 		_deliver_notice()
 		_galaxy.refresh()
 

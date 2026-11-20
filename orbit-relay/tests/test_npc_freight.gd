@@ -111,7 +111,7 @@ func _test_mid_leg_restart() -> void:
 	_tick(flight, FIRST_DEPARTURE + 15.0)
 	var persisted := _json(flight.snapshot())
 	var resumed := Flight.new()
-	if not _expect(persisted.schema == 16 and resumed.restore(persisted)
+	if not _expect(persisted.schema == Flight.SAVE_SCHEMA and resumed.restore(persisted)
 		and _service(resumed, HOME, 0) == _service(flight, HOME, 0)
 		and _service(resumed, HOME, 0).amount > 0 and resumed.market.snapshot() == flight.market.snapshot(),
 		"A cold mid-flight restore keeps the actual cargo, phase, timings and market debit"):

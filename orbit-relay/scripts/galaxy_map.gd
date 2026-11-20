@@ -2,6 +2,7 @@ extends CanvasLayer
 
 signal destination_selected(system_id: int)
 signal jump_requested()
+signal route_cancel_requested()
 signal dismissed()
 
 const Sector := preload("res://scripts/sector_catalog.gd")
@@ -21,9 +22,12 @@ var _description: Label
 var _distance: Label
 var _cost: Label
 var _fuel: Label
+var _itinerary: Label
+var _budget: Label
 var _status: Label
 var _plan_button: Button
 var _jump_button: Button
+var _cancel_route_button: Button
 var _close_button: Button
 var _system_buttons: Dictionary[int, Button] = {}
 var _touches: Dictionary[int, Button] = {}
@@ -44,7 +48,7 @@ func build() -> void:
 	add_child(_insets)
 	_insets.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var page := VBoxContainer.new()
-	page.add_theme_constant_override("separation", 16)
+	page.add_theme_constant_override("separation", 12)
 	_insets.add_child(page)
 
 	var header := HBoxContainer.new()
@@ -69,15 +73,21 @@ func build() -> void:
 	body.add_child(_chart)
 
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size.x = 374
+	panel.custom_minimum_size.x = 410
 	panel.add_theme_stylebox_override("panel", _style(Color("0d1d28"), BORDER, 12, 18))
 	body.add_child(panel)
 	var details := VBoxContainer.new()
-	details.add_theme_constant_override("separation", 5)
+	details.add_theme_constant_override("separation", 3)
 	panel.add_child(details)
+	var systems := GridContainer.new()
+	systems.columns = 2
+	systems.add_theme_constant_override("h_separation", 6)
+	systems.add_theme_constant_override("v_separation", 3)
+	details.add_child(systems)
 	for id in range(Sector.SYSTEM_COUNT):
-		var button := _button(details, str(Sector.system(id).name), 42)
+		var button := _button(systems, str(Sector.system(id).name), 42)
 		button.toggle_mode = true
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.pressed.connect(_select_system.bind(id))
 		_system_buttons[id] = button
@@ -85,29 +95,36 @@ func build() -> void:
 	_destination = _label(details, "", 26, TEXT)
 	_affiliation = _label(details, "", 16, MINT)
 	_affiliation.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_description = _label(details, "", 16, MUTED)
+	_description = _label(details, "", 15, MUTED)
 	_description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_description.custom_minimum_size.y = 47
-	_distance = _metric(details, "Расстояние")
-	_cost = _metric(details, "Цена прыжка")
+	_distance = _metric(details, "Длина пути")
+	_cost = _metric(details, "Расход пути")
 	_fuel = _metric(details, "Топливо на борту")
+	_itinerary = _label(details, "", 14, MINT)
+	_itinerary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_budget = _label(details, "", 14, MUTED)
+	_budget.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var space := Control.new()
 	space.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	space.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	details.add_child(space)
 
-	_status = _label(details, "", 16, AMBER)
+	_status = _label(details, "", 14, AMBER)
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_status.custom_minimum_size.y = 27
 	_status.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 	var routes := HBoxContainer.new()
 	routes.add_theme_constant_override("separation", 8)
 	details.add_child(routes)
-	_plan_button = _button(routes, "Проложить маршрут", 53)
+	_plan_button = _button(routes, "Проложить", 53)
 	_plan_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_plan_button.pressed.connect(_plan_route)
+	_cancel_route_button = _button(routes, "Сброс", 53)
+	_cancel_route_button.tooltip_text = "Удалить сохранённый маршрут без расхода топлива"
+	_cancel_route_button.pressed.connect(_cancel_route)
 	_jump_button = _button(routes, "Прыжок", 53)
-	_jump_button.custom_minimum_size.x = 112
+	_jump_button.custom_minimum_size.x = 106
 	_jump_button.add_theme_stylebox_override("normal", _style(Color("164f4c"), MINT, 8, 12))
 	_jump_button.add_theme_stylebox_override("hover", _style(Color("206760"), MINT, 8, 12))
 	_jump_button.pressed.connect(_start_jump)
@@ -119,7 +136,8 @@ func build() -> void:
 func open(sim: RefCounted) -> void:
 	build()
 	_flight = sim
-	_candidate = int(sim.jump_target if sim.jump_target >= 0 else sim.system_id)
+	var route: Dictionary = sim.planned_route()
+	_candidate = int(route.goal) if route.get("available", false) else int(sim.system_id)
 	_clear_touches()
 	show()
 	refresh()
@@ -129,15 +147,24 @@ func refresh() -> void:
 	if not is_open():
 		return
 	var current: int = _flight.system_id
-	var planned: int = _flight.jump_target
+	var plan: Dictionary = _flight.planned_route()
+	var has_plan: bool = plan.get("available", false)
+	var charging: bool = _flight.jump_seconds_left > 0.0
+	var planned: int = int(plan.next) if has_plan else -1
+	var goal: int = int(plan.goal) if has_plan else -1
 	if not _flight.system_known(_candidate):
 		_candidate = current
 	var selected := Sector.system(_candidate)
 	var is_current := _candidate == current
-	var is_planned := _candidate == planned
+	var is_planned := _candidate == goal
+	# A committed route remains exact after refuelling or equipment changes.
+	var preview: Dictionary = plan if is_planned else _flight.route_preview(_candidate)
+	var available: bool = preview.get("available", false) and not preview.get("legs", []).is_empty()
 	_chart.current = current
 	_chart.planned = planned
 	_chart.candidate = _candidate
+	_chart.planned_path.assign(plan.path if has_plan else [])
+	_chart.preview_path.assign(preview.path if available and not is_planned else [])
 	_current.text = "Система «%s»" % Sector.system(current).name
 	var known: Array[int] = []
 	var contested: Array[int] = []
@@ -151,9 +178,11 @@ func refresh() -> void:
 			contested.append(id)
 		var suffix := ""
 		if id == current:
-			suffix = "   ·   Корабль"
+			suffix = " · Корабль"
+		elif id == goal:
+			suffix = " · Цель"
 		elif id == planned:
-			suffix = "   ·   По маршруту"
+			suffix = " · Далее"
 		button.text = str(Sector.system(id).name) + suffix
 		button.set_pressed_no_signal(id == _candidate)
 	_chart.set_systems(known)
@@ -174,21 +203,39 @@ func refresh() -> void:
 			Expedition.BUILD:
 				_affiliation.text += " · Строится станция"
 	_description.text = str(selected.description)
-	_distance.text = "—" if is_current else "%s св. л." % _decimal(Sector.jump_distance(current, _candidate))
+	_distance.text = "%s св. л." % _decimal(float(preview.distance)) if available else "—"
 	_fuel.text = "%s / %d ед." % [_decimal(_flight.ship.fuel), int(_flight.ship.capacity())]
-	var status: Dictionary = _flight.jump_status(_candidate)
-	_cost.text = "—" if is_current else "%d ед." % int(status.cost)
-	_plan_button.disabled = is_current or is_planned
-	_plan_button.text = "Маршрут проложен" if is_planned else "Проложить маршрут"
-	_jump_button.disabled = not is_planned or not status.ok
+	_cost.text = "%d ед." % int(preview.fuel) if available else "—"
+	_itinerary.visible = available
+	_budget.visible = available
+	if available:
+		var names := PackedStringArray()
+		for system: int in preview.path:
+			names.append(str(Sector.system(system).name))
+		var count: int = preview.legs.size()
+		_itinerary.text = "%d %s · %s" % [count, "прыжок" if count == 1 else "прыжка" if count in [2, 3, 4] else "прыжков", " → ".join(names)]
+		var first: Dictionary = preview.legs[0]
+		var after_first := float(_flight.ship.fuel) - float(first.fuel)
+		var after_route := float(_flight.ship.fuel) - float(preview.fuel)
+		var first_balance := "остаток %s ед." % _decimal(after_first) if after_first >= 0.0 else "не хватает %s ед." % _decimal(-after_first)
+		var route_balance := "После всего пути: %s ед." % _decimal(after_route) if after_route >= 0.0 else "На весь путь не хватает: %s ед." % _decimal(-after_route)
+		_budget.text = "Далее %s: %d ед. · %s\n%s" % [Sector.system(int(preview.next)).name, int(first.fuel), first_balance, route_balance]
+		_budget.add_theme_color_override("font_color", MINT if after_route >= 0.0 else AMBER)
+	_plan_button.disabled = is_current or is_planned or not available or charging
+	_plan_button.text = "Сохранён" if is_planned else "Проложить"
+	_cancel_route_button.disabled = not has_plan or charging
+	var status: Dictionary = _flight.jump_status(planned) if has_plan else {}
+	_jump_button.disabled = not is_planned or not status.get("ok", false) or charging
 	var hint := "Выберите систему назначения."
 	if not is_current:
-		if not status.ok:
-			hint = str(status.reason)
+		if not available:
+			hint = str(preview.get("reason", "Нет доступного маршрута."))
 		elif is_planned:
-			hint = "Привод готов к прыжку."
+			hint = "Привод готов. Следующий переход — %s." % Sector.system(planned).name if status.get("ok", false) else str(status.get("reason", ""))
 		else:
-			hint = "Сохраните маршрут, чтобы запустить привод."
+			hint = "Проложите маршрут. Каждый прыжок запускается вручную."
+	if charging:
+		hint = "Идёт зарядка прыжкового привода."
 	_status.text = hint
 	_status.add_theme_color_override("font_color", MINT if not _jump_button.disabled else MUTED if is_current else AMBER)
 
@@ -217,9 +264,19 @@ func _plan_route() -> void:
 
 
 func _start_jump() -> void:
-	if is_open() and _flight.jump_target == _candidate and _flight.jump_status(_candidate).ok:
+	if not is_open():
+		return
+	var route: Dictionary = _flight.planned_route()
+	if _flight.jump_seconds_left <= 0.0 and route.get("available", false) and int(route.goal) == _candidate and _flight.jump_status(int(route.next)).ok:
 		_clear_touches()
 		jump_requested.emit()
+
+
+func _cancel_route() -> void:
+	if is_open() and not _cancel_route_button.disabled:
+		_clear_touches()
+		_candidate = int(_flight.system_id)
+		route_cancel_requested.emit()
 
 
 func _input(event: InputEvent) -> void:
@@ -272,7 +329,7 @@ func _clear_touches() -> void:
 
 
 func _button_at(point: Vector2) -> Button:
-	for button: Button in [_plan_button, _jump_button, _close_button]:
+	for button: Button in [_plan_button, _cancel_route_button, _jump_button, _close_button]:
 		if not button.disabled and button.get_global_rect().has_point(point):
 			return button
 	for button: Button in _system_buttons.values():
@@ -361,11 +418,14 @@ class GalaxyChart extends Control:
 	var current := -1
 	var planned := -1
 	var candidate := -1
+	var planned_path: Array[int] = []
+	var preview_path: Array[int] = []
 	var contested: Array[int] = []
 	var _sky := PackedVector3Array()
 	var _systems: Array[int] = []
 	var _center := Vector2.ZERO
 	var _extent := Vector2.ONE
+	var _label_boxes: Array[Rect2] = []
 
 	func _ready() -> void:
 		var random := RandomNumberGenerator.new()
@@ -419,36 +479,87 @@ class GalaxyChart extends Control:
 		for star in _sky:
 			var point := Vector2(star.x, star.y) * (size - Vector2.ONE * 18.0) + Vector2.ONE * 9.0
 			draw_circle(point, 0.65 + star.z * 0.95, Color(0.65, 0.80, 1.0, 0.08 + star.z * 0.32), true, -1.0, true)
+		var active := _route_path(planned_path, planned)
+		var preview_fallback := -1 if not active.is_empty() and candidate == active[-1] else candidate
+		var preview := _route_path(preview_path, preview_fallback)
+		if preview == active:
+			preview = []
 		if _systems.has(current):
-			_draw_routes()
+			_draw_routes(active, preview)
 		for id in _systems:
-			_draw_marker(id)
+			_draw_marker(id, active)
+		_label_boxes.clear()
+		# Route endpoints receive space before optional intermediate captions.
+		var order := _systems.duplicate()
+		order.sort_custom(func(a: int, b: int) -> bool:
+			return _label_priority(a, active, preview) < _label_priority(b, active, preview))
+		for id in order:
+			_draw_label(id, active, preview)
 		_draw_scale()
 
-	func _draw_routes() -> void:
-		var origin := marker_position(current)
-		for id in _systems:
-			if Sector.jump_cost(current, id) <= 0:
-				continue
-			var end := marker_position(id)
-			var direction := origin.direction_to(end)
-			var start := origin + direction * 37.0
-			var finish := end - direction * 37.0
-			var tint := Color("425e69")
-			var width := 1.2
-			if id == planned:
-				tint = MINT
-				width = 2.2
-			elif id == candidate:
-				tint = AMBER
-				width = 1.8
-			draw_dashed_line(start, finish, tint, width, 8.0, true, true)
-			if id == planned:
-				var side := direction.orthogonal() * 6.0
-				var base := finish - direction * 12.0
-				draw_colored_polygon(PackedVector2Array([finish, base + side, base - side]), tint)
+	func _route_path(requested: Array[int], fallback: int) -> Array[int]:
+		var path: Array[int] = requested.duplicate()
+		if path.is_empty() and _systems.has(current) and _systems.has(fallback) and current != fallback:
+			path = [current, fallback]
+		if path.size() < 2 or path.size() > _systems.size() or path[0] != current:
+			return []
+		var visited: Array[int] = []
+		for step in range(path.size()):
+			var id := path[step]
+			if not _systems.has(id) or visited.has(id):
+				return []
+			if step > 0 and Sector.jump_cost(path[step - 1], id) <= 0:
+				return []
+			visited.append(id)
+		return path
 
-	func _draw_marker(id: int) -> void:
+	func _has_edge(path: Array[int], a: int, b: int) -> bool:
+		for step in range(1, path.size()):
+			if (path[step - 1] == a and path[step] == b) or (path[step - 1] == b and path[step] == a):
+				return true
+		return false
+
+	func _draw_routes(active: Array[int], preview: Array[int]) -> void:
+		for id in _systems:
+			if Sector.jump_cost(current, id) <= 0 or _has_edge(active, current, id) or _has_edge(preview, current, id):
+				continue
+			_draw_leg(current, id, Color("425e69"), 1.1, true, false)
+		for step in range(1, active.size()):
+			_draw_leg(active[step - 1], active[step], MINT, 2.6, false, true)
+		for step in range(1, preview.size()):
+			var shift := 4.0 if _has_edge(active, preview[step - 1], preview[step]) else 0.0
+			_draw_leg(preview[step - 1], preview[step], AMBER, 1.8, true, true, shift)
+
+	func _leg_points(a: int, b: int, shift := 0.0) -> PackedVector2Array:
+		if not _systems.has(a) or not _systems.has(b) or Sector.jump_cost(a, b) <= 0:
+			return PackedVector2Array()
+		var origin := marker_position(a)
+		var end := marker_position(b)
+		var distance := origin.distance_to(end)
+		if distance <= 2.0:
+			return PackedVector2Array()
+		var direction := origin.direction_to(end)
+		var offset := direction.orthogonal() * shift
+		var clearance := minf(37.0, distance * 0.34)
+		return PackedVector2Array([origin + direction * clearance + offset, end - direction * clearance + offset])
+
+	func _draw_leg(a: int, b: int, tint: Color, width: float, dashed: bool, arrow: bool, shift := 0.0) -> void:
+		var points := _leg_points(a, b, shift)
+		if points.is_empty():
+			return
+		var direction := points[0].direction_to(points[1])
+		if dashed:
+			draw_dashed_line(points[0], points[1], tint, width, 7.0, true, true)
+		else:
+			draw_line(points[0], points[1], Color(tint, 0.12), width + 4.0, true)
+			draw_line(points[0], points[1], tint, width, true)
+		if arrow:
+			var length := minf(10.0, points[0].distance_to(points[1]) * 0.45)
+			var side := direction.orthogonal() * length * 0.52
+			var base := points[1] - direction * length
+			draw_colored_polygon(PackedVector2Array([points[1], base + side, base - side]), tint)
+
+	func _draw_marker(id: int, active: Array[int]) -> void:
 		var system := Sector.system(id)
 		var point := marker_position(id)
 		var accent: Color = system.accent
@@ -468,19 +579,57 @@ class GalaxyChart extends Control:
 		if id == candidate:
 			for i in range(4):
 				var angle := i * TAU * 0.25 + 0.15
-				draw_arc(point, 32.0, angle, angle + 1.27, 12, MINT if id == planned or id == current else AMBER, 2.2, true)
+				draw_arc(point, 32.0, angle, angle + 1.27, 12, MINT if active.has(id) or id == current else AMBER, 2.2, true)
+		if active.size() > 2 and (id == active[1] or id == active.back()):
+			draw_arc(point, 27.0, 0.0, TAU, 48, MINT, 1.4, true)
 
-		var annotation := "Корабль" if id == current else "Пункт назначения" if id == planned else ""
+	func _label_priority(id: int, active: Array[int], preview: Array[int]) -> int:
+		if id == current:
+			return 0
+		if not active.is_empty() and id == active.back():
+			return 1
+		if active.size() > 2 and id == active[1]:
+			return 2
+		if id == candidate or (not preview.is_empty() and id == preview.back()):
+			return 3
+		return 4 + id
+
+	func _draw_label(id: int, active: Array[int], preview: Array[int]) -> void:
+		var point := marker_position(id)
+		var annotation := ""
+		var tint := MINT
+		if id == current:
+			annotation = "Корабль"
+		elif not active.is_empty() and id == active.back():
+			annotation = "Цель маршрута"
+		elif active.size() > 2 and id == active[1]:
+			annotation = "Следующий"
+		elif active.has(id):
+			annotation = "Переход %d" % active.find(id)
+		elif not preview.is_empty() and id == preview.back():
+			annotation = "Просмотр"
+			tint = AMBER
 		var font := ThemeDB.fallback_font
-		var name_width := font.get_string_size(str(system.name), HORIZONTAL_ALIGNMENT_LEFT, -1.0, 23).x
-		var note_width := font.get_string_size(annotation, HORIZONTAL_ALIGNMENT_LEFT, -1.0, 15).x
-		var width := maxf(name_width, note_width) + 24.0
-		var height := 55.0 if not annotation.is_empty() else 32.0
-		var label_box := Rect2(point.x - width * 0.5, point.y + 43.0, width, height)
-		draw_rect(label_box, FIELD)
-		draw_string(font, point + Vector2(-name_width * 0.5, 66.0), str(system.name), HORIZONTAL_ALIGNMENT_LEFT, -1.0, 23, TEXT)
-		if not annotation.is_empty():
-			draw_string(font, point + Vector2(-note_width * 0.5, 90.0), annotation, HORIZONTAL_ALIGNMENT_LEFT, -1.0, 15, MINT)
+		var name: String = Sector.system(id).name
+		for sizes: Vector2i in [Vector2i(21, 14), Vector2i(18, 12)]:
+			var name_width := font.get_string_size(name, HORIZONTAL_ALIGNMENT_LEFT, -1.0, sizes.x).x
+			var note_width := font.get_string_size(annotation, HORIZONTAL_ALIGNMENT_LEFT, -1.0, sizes.y).x
+			var extent := Vector2(maxf(name_width, note_width) + 16.0, sizes.x + sizes.y + 11.0 if not annotation.is_empty() else sizes.x + 8.0)
+			for at: Vector2 in [point + Vector2(-extent.x * 0.5, 43.0), point - Vector2(extent.x * 0.5, 54.0 + extent.y), point + Vector2(43.0, -extent.y * 0.5), point - Vector2(43.0 + extent.x, extent.y * 0.5)]:
+				var box := Rect2(at.clamp(Vector2.ONE * 8.0, (size - extent - Vector2.ONE * 8.0).max(Vector2.ONE * 8.0)), extent)
+				var blocked := not Rect2(Vector2.ZERO, size).encloses(box)
+				for other in _label_boxes:
+					blocked = blocked or box.grow(3.0).intersects(other)
+				for system_id in _systems:
+					blocked = blocked or box.intersects(Rect2(marker_position(system_id) - Vector2(35, 45), Vector2(70, 80)))
+				if blocked:
+					continue
+				_label_boxes.append(box)
+				draw_rect(box, FIELD)
+				draw_string(font, box.position + Vector2((extent.x - name_width) * 0.5, sizes.x + 1.0), name, HORIZONTAL_ALIGNMENT_LEFT, -1.0, sizes.x, TEXT)
+				if not annotation.is_empty():
+					draw_string(font, box.position + Vector2((extent.x - note_width) * 0.5, sizes.x + sizes.y + 5.0), annotation, HORIZONTAL_ALIGNMENT_LEFT, -1.0, sizes.y, tint)
+				return
 
 	func _draw_scale() -> void:
 		var pixels := _pixels_per_light_year()
