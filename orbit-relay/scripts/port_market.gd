@@ -15,6 +15,7 @@ const PANEL := Color("0d1d28")
 const ACCENTS := {
 	"ore": Color("d8ad72"), "crystal": Color("bba5f2"), "ice": Color("9ad8ff"),
 	"circuits": Color("84dacf"), "medical": Color("edaac0"),
+	Economy.HYDROGEN: Color("b5e597"),
 }
 const INTERSTELLAR_PHASES := {
 	"waiting": "Стоянка", "departure": "Отход от порта",
@@ -690,6 +691,17 @@ class CommodityIcon extends Control:
 				draw_rect(Rect2(7, 25, 22, 3), shadow)
 				draw_line(Vector2(18, 15), Vector2(18, 25), Color("482338"), 3.2, true)
 				draw_line(Vector2(13, 20), Vector2(23, 20), Color("482338"), 3.2, true)
+			Economy.HYDROGEN:
+				var ink := Color("23392f")
+				draw_rect(Rect2(15, 5, 8, 5), light)
+				_shape([Vector2(11, 12), Vector2(15, 9), Vector2(23, 9), Vector2(27, 12),
+					Vector2(27, 28), Vector2(24, 31), Vector2(14, 31), Vector2(11, 28)], _accent)
+				draw_rect(Rect2(24, 12, 3, 16), shadow)
+				draw_line(Vector2(14, 13), Vector2(14, 26), light, 1.2, true)
+				draw_line(Vector2(16, 15), Vector2(16, 23), ink, 1.5, true)
+				draw_line(Vector2(21, 15), Vector2(21, 23), ink, 1.5, true)
+				draw_line(Vector2(16, 19), Vector2(21, 19), ink, 1.5, true)
+				draw_line(Vector2(13, 27), Vector2(25, 27), shadow, 1.5, true)
 
 	func _shape(points: Array[Vector2], color: Color) -> void:
 		draw_colored_polygon(PackedVector2Array(points), color)

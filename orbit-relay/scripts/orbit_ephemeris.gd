@@ -32,6 +32,7 @@ const ELEMENTS := {
 	Catalog.LIMIT_PORT: Vector3(0.039, 125.0, -8.0),
 	Catalog.LIMIT_PLANET: Vector3(0.041, 90.0, 25.0),
 	Catalog.LIMIT_ASTEROID: Vector3(0.077, 72.0, 9.0),
+	Catalog.GAS_GIANT_ID: Vector3(0.042, 82.0, -8.0),
 }
 
 

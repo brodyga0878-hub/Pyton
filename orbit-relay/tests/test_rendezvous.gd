@@ -130,7 +130,8 @@ func _test_reserve_speed_and_jump() -> void:
 		and peak > 12.0 and flight.position.distance_to(flight.target_position(PORT)) >= 625.0,
 		"Reserve propulsion reaches the moving station's 600-metre hold with bounded speed and zero fuel")
 	flight = _approach_station()
-	var fuel := flight.ship.fuel
+	var fuel := flight.ship.jump_fuel
+	var reaction_fuel := flight.ship.fuel
 	var destination := Catalog.VELAR_SYSTEM
 	var fare := Catalog.jump_cost(flight.system_id, destination)
 	if not _expect(flight.start_rendezvous(PORT, 600) and flight.plan_jump(destination) and flight.start_jump()
@@ -138,8 +139,8 @@ func _test_reserve_speed_and_jump() -> void:
 		"A valid interstellar departure interrupts an active rendezvous before charging"):
 		return
 	_tick(flight, 3.0)
-	_expect(flight.system_id == destination and is_equal_approx(flight.ship.fuel, fuel - fare)
-		and not flight.rendezvous_active,
+	_expect(flight.system_id == destination and is_equal_approx(flight.ship.jump_fuel, fuel - fare)
+		and flight.ship.fuel == reaction_fuel and not flight.rendezvous_active,
 		"The jump completes normally with its own fuel charge and no lingering pursuit")
 
 

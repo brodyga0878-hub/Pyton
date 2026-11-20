@@ -202,6 +202,11 @@ func _test_hot_saves() -> void:
 			"Malformed atmospheric heat is rejected without affecting the loaded state")
 	var previous := state.duplicate(true)
 	previous.schema = 13
+	previous.ship.erase("jump_fuel")
+	previous.mining.cargo.erase("hydrogen")
+	previous.mining.reserves.resize(Catalog.PRE_GAS_DESTINATION_COUNT)
+	for stocks: Dictionary in previous.market.values():
+		stocks.erase("hydrogen")
 	previous.erase("entry_heat")
 	previous.ship.erase("heat_shield")
 	_expect(resumed.restore(previous) and resumed.entry_heat == 0.0 and is_equal_approx(resumed.star_heat, 12.4)

@@ -100,7 +100,7 @@ func build() -> void:
 	_description.custom_minimum_size.y = 47
 	_distance = _metric(details, "Длина пути")
 	_cost = _metric(details, "Расход пути")
-	_fuel = _metric(details, "Топливо на борту")
+	_fuel = _metric(details, "Прыжковый запас")
 	_itinerary = _label(details, "", 14, MINT)
 	_itinerary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_budget = _label(details, "", 14, MUTED)
@@ -204,7 +204,8 @@ func refresh() -> void:
 				_affiliation.text += " · Строится станция"
 	_description.text = str(selected.description)
 	_distance.text = "%s св. л." % _decimal(float(preview.distance)) if available else "—"
-	_fuel.text = "%s / %d ед." % [_decimal(_flight.ship.fuel), int(_flight.ship.capacity())]
+	var jump_fuel: float = _flight.ship.jump_fuel
+	_fuel.text = "%s / %d ед." % [_decimal(jump_fuel), int(_flight.ship.jump_capacity())]
 	_cost.text = "%d ед." % int(preview.fuel) if available else "—"
 	_itinerary.visible = available
 	_budget.visible = available
@@ -215,8 +216,8 @@ func refresh() -> void:
 		var count: int = preview.legs.size()
 		_itinerary.text = "%d %s · %s" % [count, "прыжок" if count == 1 else "прыжка" if count in [2, 3, 4] else "прыжков", " → ".join(names)]
 		var first: Dictionary = preview.legs[0]
-		var after_first := float(_flight.ship.fuel) - float(first.fuel)
-		var after_route := float(_flight.ship.fuel) - float(preview.fuel)
+		var after_first := jump_fuel - float(first.fuel)
+		var after_route := jump_fuel - float(preview.fuel)
 		var first_balance := "остаток %s ед." % _decimal(after_first) if after_first >= 0.0 else "не хватает %s ед." % _decimal(-after_first)
 		var route_balance := "После всего пути: %s ед." % _decimal(after_route) if after_route >= 0.0 else "На весь путь не хватает: %s ед." % _decimal(-after_route)
 		_budget.text = "Далее %s: %d ед. · %s\n%s" % [Sector.system(int(preview.next)).name, int(first.fuel), first_balance, route_balance]

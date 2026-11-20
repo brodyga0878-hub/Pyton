@@ -42,10 +42,11 @@ func _test_jump_conditions() -> void:
 	flight.set_autopilot(true)
 	_expect(not flight.jump_status(VELAR).ok, "The jump drive cannot engage with autopilot running")
 	flight.set_autopilot(false)
-	flight.ship.fuel = 25.99
-	_expect(not flight.jump_status(VELAR).ok and not flight.start_jump() and flight.ship.fuel == 25.99,
-		"Insufficient fuel leaves the drive idle and the tank unchanged")
-	flight.ship.fuel = 26.0
+	flight.ship.jump_fuel = 25.99
+	_expect(not flight.jump_status(VELAR).ok and not flight.start_jump()
+		and flight.ship.jump_fuel == 25.99 and flight.ship.fuel == 100.0,
+		"A full reaction tank cannot make up an insufficient jump reserve")
+	flight.ship.jump_fuel = 26.0
 	var star: int = Catalog.star_for(HOME)
 	flight.position = flight.target_contact(star)
 	_expect(not flight.jump_status(VELAR).ok, "Jump charging is prohibited inside the stellar scoop band")
@@ -62,48 +63,50 @@ func _test_cancellation_and_commit() -> void:
 	flight.dock_action()
 	flight.position = _arrival(flight, HOME)
 	flight.velocity = Vector3.ZERO
-	flight.ship.fuel = 26.0
+	flight.ship.jump_fuel = 26.0
 	flight.plan_jump(VELAR)
 	_expect(flight.start_jump() and is_equal_approx(flight.jump_seconds_left, 2.5) and not flight.start_jump(),
 		"The countdown starts once without accepting a duplicate command")
 	_step(flight, 1.0)
-	_expect(flight.system_id == HOME and flight.ship.fuel == 26.0 and flight.jump_seconds_left > 0.0,
+	_expect(flight.system_id == HOME and flight.ship.jump_fuel == 26.0 and flight.jump_seconds_left > 0.0,
 		"Charging stays in the source system and makes no debit before commit")
 	var during: Dictionary = flight.snapshot()
 	var resumed := Flight.new()
 	_expect(resumed.restore(_round_trip(during)) and resumed.jump_target == VELAR
-		and resumed.jump_seconds_left == 0.0 and resumed.ship.fuel == 26.0,
+		and resumed.jump_seconds_left == 0.0 and resumed.ship.jump_fuel == 26.0,
 		"A save during charging retains the planned route and cancels the transient charge")
 	resumed.position = resumed.target_position(0) + Vector3.BACK * 78.0
 	resumed.velocity = Vector3.FORWARD * 42.0
 	_expect(resumed.start_jump(), "A ship can start at the valid edge of the exclusion zone")
 	_step(resumed, 0.25)
-	_expect(resumed.jump_seconds_left == 0.0 and resumed.system_id == HOME and resumed.ship.fuel == 26.0,
+	_expect(resumed.jump_seconds_left == 0.0 and resumed.system_id == HOME and resumed.ship.jump_fuel == 26.0,
 		"Coasting into an exclusion zone during charging cancels before any debit")
 	flight.update(STEP, Vector2.ZERO, 0.0, false, true)
-	_expect(flight.jump_seconds_left == 0.0 and flight.system_id == HOME and flight.ship.fuel == 26.0,
+	_expect(flight.jump_seconds_left == 0.0 and flight.system_id == HOME and flight.ship.jump_fuel == 26.0,
 		"The brake cancels charging without a fuel debit")
 	flight.start_jump()
 	flight.update(STEP, Vector2(0.5, 0.0), 0.0, false, false)
-	_expect(flight.jump_seconds_left == 0.0 and flight.system_id == HOME and flight.ship.fuel == 26.0,
+	_expect(flight.jump_seconds_left == 0.0 and flight.system_id == HOME and flight.ship.jump_fuel == 26.0,
 		"The steering pad cancels charging without a fuel debit")
 	flight.start_jump()
 	flight.change_throttle(0.1)
-	_expect(flight.jump_seconds_left == 0.0 and flight.system_id == HOME and flight.ship.fuel == 26.0,
+	_expect(flight.jump_seconds_left == 0.0 and flight.system_id == HOME and flight.ship.jump_fuel == 26.0,
 		"Changing throttle cancels charging immediately")
 	flight.start_jump()
 	flight.update(STEP, Vector2.ZERO, 0.0, true, false)
-	_expect(flight.jump_seconds_left == 0.0 and flight.system_id == HOME and flight.ship.fuel >= 25.9,
+	_expect(flight.jump_seconds_left == 0.0 and flight.system_id == HOME and flight.ship.jump_fuel == 26.0,
 		"Boost cancels charging and does not debit the jump fare")
 	flight.velocity = Vector3.ZERO
-	flight.ship.fuel = 26.0
+	flight.ship.fuel = 0.0
+	flight.ship.jump_fuel = 26.0
 	flight.start_jump()
-	_expect(flight.cancel_jump() and not flight.cancel_jump() and flight.ship.fuel == 26.0,
+	_expect(flight.cancel_jump() and not flight.cancel_jump() and flight.ship.jump_fuel == 26.0,
 		"Explicit cancellation is safe to repeat and leaves the planned route intact")
 	flight.start_jump()
 	_step(flight, Flight.JUMP_CHARGE)
 	_expect(flight.system_id == VELAR and flight.jump_target == -1 and flight.jump_seconds_left == 0.0
-		and flight.ship.fuel == 0.0 and flight.position.is_equal_approx(_arrival(flight, VELAR)),
+		and flight.ship.jump_fuel == 0.0 and flight.ship.fuel == 0.0
+		and flight.position.is_equal_approx(_arrival(flight, VELAR)),
 		"The exact fare commits once and arrives safely at the other system")
 	_expect(_fly_to(flight, int(Catalog.system(VELAR).arrival_port)) and flight.ship.fuel == 0.0,
 		"An exact-fare arrival can still dock on the reserve drive")
@@ -127,7 +130,7 @@ func _test_previous_save() -> void:
 	_expect(flight.system_id == HOME and flight.jump_target == -1 and flight.target == Catalog.STAR_ID
 		and flight.position.is_equal_approx(flight.target_contact(Catalog.STAR_ID)),
 		"Migrating retains the original flight position and local star target")
-	_expect(flight.ship.fuel == 77.25 and flight.ship.tank_upgraded and flight.ship.eco_upgraded
+	_expect(flight.ship.fuel == 77.25 and flight.ship.jump_fuel == 77.25 and flight.ship.tank_upgraded and flight.ship.eco_upgraded
 		and flight.credits == 1010 and flight.deliveries == 3 and flight.contract_destination == 1,
 		"Migrating retains current fuel, equipment, balance and freight")
 	var migrated := flight.snapshot()
@@ -200,7 +203,7 @@ func _test_touch_route() -> void:
 	_tap(chart._system_buttons.get(VELAR), "A touch previews Велар in the galaxy map")
 	_expect(flight.jump_target == -1, "Previewing a system does not plan the jump")
 	_tap(chart._plan_button, "A touch saves the jump plan")
-	_expect(chart.is_open() and chart._jump_button.disabled and flight.jump_target == VELAR and flight.ship.fuel == 100.0,
+	_expect(chart.is_open() and chart._jump_button.disabled and flight.jump_target == VELAR and flight.ship.jump_fuel == 100.0 and flight.ship.fuel == 100.0,
 		"Planning from port keeps the jump guarded and leaves the tank untouched")
 	_tap(chart._close_button, "A touch dismisses the galaxy map")
 	await process_frame
@@ -215,11 +218,13 @@ func _test_touch_route() -> void:
 	_tap(game._hud._actions.get("galaxy"), "A touch reopens the galaxy map in flight")
 	await process_frame
 	_tap(chart._system_buttons.get(VELAR), "The destination is selected for departure")
-	var first_fare_fuel: float = flight.ship.fuel
+	var first_fare_fuel: float = flight.ship.jump_fuel
+	var first_reaction_fuel: float = flight.ship.fuel
 	_tap(chart._jump_button, "A touch starts outbound charging")
 	_expect(not chart.is_open() and flight.jump_seconds_left > 0.0, "Charging dismisses the map and allows the flight clock to advance")
 	_advance(game, func() -> bool: return flight.system_id == VELAR, 4.0)
-	if not _expect(flight.system_id == VELAR and flight.target == 10 and flight.ship.fuel == first_fare_fuel - 26.0
+	if not _expect(flight.system_id == VELAR and flight.target == 10 and flight.ship.jump_fuel == first_fare_fuel - 26.0
+		and flight.ship.fuel == first_reaction_fuel
 		and flight.contract_stage == 1 and flight.contract_destination == 1 and flight.ship.capacity() == 150.0,
 		"The first jump charges one fare, selects the remote arrival port and preserves the freight and tank"):
 		game.queue_free()
@@ -253,10 +258,10 @@ func _test_touch_route() -> void:
 	chart = game._galaxy
 	_tap(chart._system_buttons.get(HOME), "A touch selects Гелион for return")
 	_tap(chart._plan_button, "A touch confirms the return plan")
-	var last_fare_fuel: float = flight.ship.fuel
+	var last_fare_fuel: float = flight.ship.jump_fuel
 	_tap(chart._jump_button, "A touch starts return charging")
 	_advance(game, func() -> bool: return flight.system_id == HOME, 4.0)
-	_expect(flight.system_id == HOME and flight.target == 0 and flight.ship.fuel == last_fare_fuel - 26.0
+	_expect(flight.system_id == HOME and flight.target == 0 and flight.ship.jump_fuel == last_fare_fuel - 26.0
 		and flight.contract_stage == 1 and flight.contract_destination == 1 and flight.credits == 520,
 		"The full touch round trip changes systems twice and charges only the jump fares")
 	_expect(flight.mining.snapshot() == mining_before and flight.mining.cargo_amount("ore") == 12,

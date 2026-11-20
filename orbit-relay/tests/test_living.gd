@@ -119,7 +119,8 @@ func _test_previous_economy_save() -> void:
 	_expect(flight.system_id == Catalog.VELAR_SYSTEM and flight.docked == 10 and flight.jump_target == 0
 		and flight.credits == 836 and flight.deliveries == 4 and flight.contract_itinerary().leg == 1
 		and flight.contract_destination == 10, "System, jump plan and active courier progress survive the migration")
-	_expect(flight.ship.fuel == 70.0 and flight.ship.hull == 82.5 and flight.mining.cargo_capacity == 40
+	_expect(flight.ship.fuel == 70.0 and flight.ship.jump_fuel == 70.0
+		and flight.ship.hull == 82.5 and flight.mining.cargo_capacity == 40
 		and flight.mining.cargo_amount("circuits") == 10 and flight.mining.cargo_amount("medical") == 9
 		and flight.mining.reserve_at(2) == 113 and flight.market.stock(0, "circuits") == 38,
 		"Upgrades, fuel, purchased freight, reserves and existing port stocks are preserved")
@@ -303,12 +304,12 @@ func _jump_from_dock(flight: Flight, system: int) -> bool:
 		if flight.jump_status(system).ok:
 			break
 		flight.update(STEP, Vector2.ZERO, 0.0, false, false)
-	var before: float = flight.ship.fuel
+	var before: float = flight.ship.jump_fuel
 	var fare: int = Catalog.jump_cost(flight.system_id, system)
 	if not flight.start_jump():
 		return false
 	_step(flight, 3.0)
-	return flight.system_id == system and is_equal_approx(flight.ship.fuel, before - fare)
+	return flight.system_id == system and is_equal_approx(flight.ship.jump_fuel, before - fare)
 
 
 func _fly_to(flight: Flight, port: int) -> bool:

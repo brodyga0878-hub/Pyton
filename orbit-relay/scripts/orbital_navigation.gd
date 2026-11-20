@@ -75,7 +75,7 @@ static func circular_velocity(radial: Vector3, normal: Vector3, mu: float) -> Ve
 static func orbit_band(focus_id: int, center: Vector3, primary_center: Vector3) -> Vector2:
 	var site := Catalog.site(focus_id)
 	var kind: String = site.get("kind", "")
-	if (kind != "planet" and kind != "moon") or not center.is_finite() or not primary_center.is_finite():
+	if kind not in ["planet", "moon", "gas"] or not center.is_finite() or not primary_center.is_finite():
 		return Vector2.ZERO
 	var separation := center.distance_to(primary_center)
 	if not is_finite(separation):
@@ -85,9 +85,13 @@ static func orbit_band(focus_id: int, center: Vector3, primary_center: Vector3) 
 	var primary_id := Catalog.star_for(Catalog.system_of_site(focus_id))
 	var primary_mu := Dynamics.gravity_parameter(primary_id)
 	var minimum := radius * Terrain.MAX_RADIUS_FACTOR + Terrain.CONTACT_CLEARANCE + LOCAL_SURFACE_MARGIN
+	var cap := radius * LOCAL_RADIUS_CAP
+	if kind == "gas":
+		minimum = radius + float(Atmosphere.profile(focus_id).get("height", 0.0)) + LOCAL_SURFACE_MARGIN
+		cap = radius * Dynamics.GAS_FULL_GRAVITY_RADII
 	# The approximate Hill radius limits where a local two-body maneuver is offered.
 	var hill := separation * pow(mu / (3.0 * primary_mu), 1.0 / 3.0)
-	return Vector2(minimum, minf(radius * LOCAL_RADIUS_CAP, HILL_FRACTION * hill))
+	return Vector2(minimum, minf(cap, HILL_FRACTION * hill))
 
 
 static func forecast(sim: RefCounted, horizon := 180.0, focus_id := -1) -> Dictionary:
@@ -171,6 +175,8 @@ static func _blockers(sim: RefCounted, ids: Array) -> Array[Dictionary]:
 			corridor = float(site.pad_offset) - PORT_CORRIDOR_INSET
 		elif Catalog.is_mine_site(id):
 			axes = Vector3.ONE * (float(site.radius) * Terrain.MAX_RADIUS_FACTOR + Terrain.CONTACT_CLEARANCE)
+		elif Catalog.is_gas_giant(id):
+			axes = Vector3.ONE * float(site.radius)
 		result.append({"id": id, "axes": axes, "corridor": corridor})
 	return result
 

@@ -1,6 +1,8 @@
 extends CanvasLayer
 
 signal service_requested(action: String)
+signal transfer_requested(destination: String)
+signal jettison_requested(good: String)
 signal dismissed()
 
 const TEXT := Color("e8f4fa")
@@ -13,17 +15,35 @@ const ShipSystems := preload("res://scripts/ship_systems.gd")
 
 var _sim: RefCounted
 var _insets: MarginContainer
+var _title: Label
+var _port_details: HBoxContainer
 var _station: Label
 var _balance: Label
 var _fuel: Label
 var _fuel_level: ProgressBar
+var _jump_fuel: Label
+var _jump_fuel_level: ProgressBar
 var _hull: Label
 var _hull_level: ProgressBar
 var _tariff: Label
+var _jump_tariff: Label
 var _repair_tariff: Label
 var _cargo_detail: Label
+var _services: VBoxContainer
+var _transfers: VBoxContainer
+var _hydrogen: Label
 var _close_button: Button
 var _action_buttons: Dictionary[String, Button] = {}
+var _transfer_buttons: Dictionary[String, Button] = {}
+var _transfer_labels: Dictionary[String, Label] = {}
+var _discard_row: PanelContainer
+var _discard_choice: Button
+var _discard_detail: Label
+var _discard_button: Button
+var _cargo_options: Array[Dictionary] = []
+var _cargo_index := 0
+var _discard_pending_good := ""
+var _fuel_only := false
 var _touches: Dictionary[int, Button] = {}
 
 
@@ -42,7 +62,7 @@ func build() -> void:
 	var center := CenterContainer.new()
 	_insets.add_child(center)
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size.x = 700.0
+	panel.custom_minimum_size.x = 748.0
 	panel.add_theme_stylebox_override("panel", _style(Color("0d1d28"), BORDER, 16, 22))
 	center.add_child(panel)
 	var content := VBoxContainer.new()
@@ -51,48 +71,67 @@ func build() -> void:
 
 	var header := HBoxContainer.new()
 	content.add_child(header)
-	_label(header, "Портовые службы", 30, TEXT).size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_title = _label(header, "Портовые службы", 30, TEXT)
+	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_close_button = _button(header)
 	_close_button.text = "Закрыть"
 	_close_button.custom_minimum_size.x = 126.0
 	_close_button.pressed.connect(func() -> void: dismissed.emit())
 
-	var details := HBoxContainer.new()
-	content.add_child(details)
-	_station = _label(details, "", 20, MINT)
+	_port_details = HBoxContainer.new()
+	content.add_child(_port_details)
+	_station = _label(_port_details, "", 20, MINT)
 	_station.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_balance = _label(details, "", 20, TEXT)
+	_balance = _label(_port_details, "", 20, TEXT)
 
 	var gauges := HBoxContainer.new()
 	gauges.add_theme_constant_override("separation", 22)
 	content.add_child(gauges)
-	var fuel_meter := _add_meter(gauges, "Топливо", Color("398c82"), MINT)
+	var fuel_meter := _add_meter(gauges, "Тяга", Color("398c82"), MINT)
 	_fuel = fuel_meter[0]
 	_fuel_level = fuel_meter[1]
+	var jump_meter := _add_meter(gauges, "Прыжки", Color("396c89"), Color("9edcff"))
+	_jump_fuel = jump_meter[0]
+	_jump_fuel_level = jump_meter[1]
 	var hull_meter := _add_meter(gauges, "Корпус", Color("947251"), AMBER)
 	_hull = hull_meter[0]
 	_hull_level = hull_meter[1]
 
-	var services := VBoxContainer.new()
-	services.add_theme_constant_override("separation", 8)
-	content.add_child(services)
-	_tariff = _add_service(services, "refuel", "Полная заправка", "")
-	_repair_tariff = _add_service(services, "repair", "Ремонт корпуса", "")
-	_add_service(services, "tank", "Увеличенный бак", "Ёмкость 150 ед.")
-	_add_service(services, "eco", "Экономичный привод", "Расход топлива ниже на 30%")
-	_cargo_detail = _add_service(services, "cargo", "Расширение трюма", "")
-	_add_service(services, "heat_shield", "Теплозащита", "Тепловая нагрузка в атмосфере ниже на %d%%" % ShipSystems.HEAT_SHIELD_REDUCTION)
+	_services = VBoxContainer.new()
+	_services.add_theme_constant_override("separation", 8)
+	content.add_child(_services)
+	_tariff = _add_service("refuel", "Заправка реактивного бака", "")
+	_jump_tariff = _add_service("jump_refuel", "Заправка прыжкового запаса", "")
+	_repair_tariff = _add_service("repair", "Ремонт корпуса", "")
+	_add_service("tank", "Увеличенные баки", "Ёмкость каждого бака 150 ед.")
+	_add_service("eco", "Экономичный привод", "Расход реактивного топлива ниже на 30%")
+	_cargo_detail = _add_service("cargo", "Расширение трюма", "")
+	_add_service("heat_shield", "Теплозащита", "Тепловая нагрузка в атмосфере ниже на %d%%" % ShipSystems.HEAT_SHIELD_REDUCTION)
+	_transfers = VBoxContainer.new()
+	_transfers.add_theme_constant_override("separation", 8)
+	content.add_child(_transfers)
+	_hydrogen = _label(_transfers, "", 19, TEXT)
+	_add_transfer("reaction", "В реактивный бак")
+	_add_transfer("jump", "В прыжковый запас")
+	_build_discard_row()
+	_transfers.hide()
 	get_viewport().size_changed.connect(_update_insets)
 	_update_insets()
 	hide()
 
 
-func open(sim: RefCounted) -> void:
-	if sim == null or not Sector.is_port(sim.docked):
+func open(sim: RefCounted, fuel_only := false) -> void:
+	if sim == null or (not fuel_only and not Sector.is_port(sim.docked)):
 		return
 	build()
 	_sim = sim
+	_fuel_only = fuel_only
+	_cargo_index = 0
+	_discard_pending_good = ""
 	_touches.clear()
+	_port_details.visible = not _fuel_only
+	_transfers.visible = _fuel_only
+	_services.visible = not _fuel_only
 	show()
 	refresh()
 
@@ -100,20 +139,34 @@ func open(sim: RefCounted) -> void:
 func refresh() -> void:
 	if not is_open():
 		return
-	if not Sector.is_port(_sim.docked):
+	if not _fuel_only and not Sector.is_port(_sim.docked):
 		dismissed.emit()
 		return
 	var capacity: float = _sim.ship.capacity()
 	var fuel: float = _sim.ship.fuel
+	var jump_capacity: float = _sim.ship.jump_capacity()
+	var jump_fuel: float = _sim.ship.jump_fuel
 	var hull: float = _sim.ship.hull
-	_station.text = _sim.target_name(_sim.docked)
-	_balance.text = "Баланс %d кр." % _sim.credits
+	_title.text = "Топливо" if _fuel_only else "Портовые службы"
 	_fuel_level.max_value = capacity
 	_fuel_level.value = fuel
-	_fuel.text = "%s / %d ед." % [("%.1f" % fuel).replace(".", ","), roundi(capacity)]
+	_fuel.text = "%s / %d ед." % [_decimal(fuel), roundi(capacity)]
+	_jump_fuel_level.max_value = jump_capacity
+	_jump_fuel_level.value = jump_fuel
+	_jump_fuel.text = "%s / %d ед." % [_decimal(jump_fuel), roundi(jump_capacity)]
 	_hull_level.value = hull
-	_hull.text = ("%.1f%%" % hull).replace(".", ",")
+	_hull.text = "%s%%" % _decimal(hull)
+	if _fuel_only:
+		_refresh_transfers()
+	else:
+		_refresh_services()
+
+
+func _refresh_services() -> void:
+	_station.text = _sim.target_name(_sim.docked)
+	_balance.text = "Баланс %d кр." % _sim.credits
 	_tariff.text = "Тариф порта · %d кр. за ед." % _sim.refuel_unit_price()
+	_jump_tariff.text = _tariff.text
 	_repair_tariff.text = "Тариф порта · %d кр. за 1%%" % _sim.repair_unit_price()
 	_cargo_detail.text = "Ёмкость 40 ед." if _sim.ship.cargo_upgraded else "Ёмкость 24 → 40 ед."
 	for action: String in _action_buttons:
@@ -122,7 +175,7 @@ func refresh() -> void:
 		button.disabled = not offer.allowed
 		if offer.installed:
 			button.text = "Установлено"
-		elif action == "refuel" and offer.cost == 0:
+		elif action in ["refuel", "jump_refuel"] and offer.cost == 0:
 			button.text = "Бак полон"
 		elif action == "repair" and offer.cost == 0:
 			button.text = "Корпус цел"
@@ -131,9 +184,37 @@ func refresh() -> void:
 		else:
 			var verb := "Установить"
 			match action:
-				"refuel": verb = "Заправить"
+				"refuel", "jump_refuel": verb = "Заправить"
 				"repair": verb = "Починить"
 			button.text = "%s · %d кр." % [verb, offer.cost]
+
+
+func _refresh_transfers() -> void:
+	var hold: RefCounted = _sim.mining
+	_hydrogen.text = "Канистры водорода: %d · до %d ед. топлива из каждой" % [
+		hold.cargo_amount("hydrogen"), ShipSystems.HYDROGEN_UNITS_PER_CANISTER,
+	]
+	for destination: String in _transfer_buttons:
+		var offer: Dictionary = _sim.fuel_transfer_offer(destination)
+		var button := _transfer_buttons[destination]
+		button.disabled = not offer.ok
+		_transfer_labels[destination].text = "%d кан. из трюма · +%s ед. топлива" % [
+			offer.canisters, _decimal(offer.added),
+		] if offer.ok else str(offer.reason)
+	if hold.free_capacity() == 0:
+		_cargo_options.assign(_sim.fuel_cargo_options())
+	else:
+		_cargo_options.clear()
+	_discard_row.visible = not _cargo_options.is_empty()
+	if not _discard_row.visible:
+		return
+	_cargo_index = posmod(_cargo_index, _cargo_options.size())
+	var selected := _cargo_options[_cargo_index]
+	_discard_choice.text = "%s  ›" % selected.name if _cargo_options.size() > 1 else str(selected.name)
+	_discard_choice.disabled = _cargo_options.size() == 1
+	var armed: bool = _discard_pending_good == selected.good
+	_discard_detail.text = "Будет выброшена 1 ед. из %d." % selected.quantity if armed else "Полный трюм · %d ед. выбранного товара" % selected.quantity
+	_discard_button.text = "Подтвердить выброс" if armed else "Освободить 1 место"
 
 
 func close() -> void:
@@ -147,10 +228,54 @@ func is_open() -> bool:
 
 
 func _request_service(action: String) -> void:
-	if is_open() and _sim.service_offer(action).allowed:
+	if is_open() and not _fuel_only and _sim.service_offer(action).allowed:
 		# A purchase can change the price shown for another service.
 		_touches.clear()
 		service_requested.emit(action)
+
+
+func _request_transfer(destination: String) -> void:
+	if is_open() and _fuel_only and _sim.fuel_transfer_offer(destination).ok:
+		_touches.clear()
+		_discard_pending_good = ""
+		transfer_requested.emit(destination)
+
+
+func _cycle_discard() -> void:
+	if is_open() and _fuel_only and _discard_row.visible:
+		_cargo_index += 1
+		_discard_pending_good = ""
+		_touches.clear()
+		refresh()
+
+
+func _confirm_discard() -> void:
+	if not is_open() or not _fuel_only or not _discard_row.visible:
+		return
+	var good: String = _cargo_options[_cargo_index].good
+	_touches.clear()
+	if _discard_pending_good == good:
+		_discard_pending_good = ""
+		jettison_requested.emit(good)
+	else:
+		_discard_pending_good = good
+		refresh()
+
+
+func _build_discard_row() -> void:
+	var row := _add_row(_transfers, "Освободить место для сбора", "")
+	_discard_detail = row[0]
+	_discard_button = row[1]
+	_discard_button.pressed.connect(_confirm_discard)
+	_discard_row = row[2]
+	var actions: HBoxContainer = _discard_button.get_parent()
+	_discard_choice = _button(actions)
+	_discard_choice.custom_minimum_size.x = 140.0
+	_discard_choice.add_theme_font_size_override("font_size", 16)
+	_discard_choice.tooltip_text = "Выбрать следующий товар"
+	_discard_choice.pressed.connect(_cycle_discard)
+	actions.move_child(_discard_choice, _discard_button.get_index())
+	_discard_button.custom_minimum_size.x = 192.0
 
 
 func _add_meter(parent: HBoxContainer, title: String, fill: Color, border: Color) -> Array[Control]:
@@ -171,9 +296,26 @@ func _add_meter(parent: HBoxContainer, title: String, fill: Color, border: Color
 	return [value, bar]
 
 
-func _add_service(parent: VBoxContainer, action: String, title: String, detail: String) -> Label:
+func _add_service(action: String, title: String, detail: String) -> Label:
+	var row := _add_row(_services, title, detail)
+	var button: Button = row[1]
+	button.pressed.connect(_request_service.bind(action))
+	_action_buttons[action] = button
+	return row[0]
+
+
+func _add_transfer(destination: String, title: String) -> void:
+	var row := _add_row(_transfers, title, "")
+	var button: Button = row[1]
+	button.text = "Перелить"
+	button.pressed.connect(_request_transfer.bind(destination))
+	_transfer_buttons[destination] = button
+	_transfer_labels[destination] = row[0]
+
+
+func _add_row(parent: VBoxContainer, title: String, detail: String) -> Array[Control]:
 	var panel := PanelContainer.new()
-	panel.add_theme_stylebox_override("panel", _style(Color("112631"), Color("263f4b"), 9, 12))
+	panel.add_theme_stylebox_override("panel", _style(Color("112631"), Color("263f4b"), 9, 6))
 	parent.add_child(panel)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 18)
@@ -185,11 +327,10 @@ func _add_service(parent: VBoxContainer, action: String, title: String, detail: 
 	row.add_child(copy)
 	_label(copy, title, 20, TEXT)
 	var description := _label(copy, detail, 15, MUTED)
+	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var button := _button(row)
 	button.custom_minimum_size.x = 268.0
-	button.pressed.connect(_request_service.bind(action))
-	_action_buttons[action] = button
-	return description
+	return [description, button, panel]
 
 
 func _input(event: InputEvent) -> void:
@@ -203,7 +344,7 @@ func _input(event: InputEvent) -> void:
 				var hit := _button_at(event.position)
 				if hit != null and hit not in _touches.values():
 					_touches[event.index] = hit
-			elif button != null and not button.disabled and button.get_global_rect().has_point(event.position):
+			elif button != null and button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(event.position):
 				button.pressed.emit()
 		get_viewport().set_input_as_handled()
 	elif event is InputEventScreenDrag:
@@ -216,8 +357,9 @@ func _input(event: InputEvent) -> void:
 func _button_at(point: Vector2) -> Button:
 	if _close_button.get_global_rect().has_point(point):
 		return _close_button
-	for button: Button in _action_buttons.values():
-		if not button.disabled and button.get_global_rect().has_point(point):
+	var buttons := _transfer_buttons.values() + [_discard_choice, _discard_button] if _fuel_only else _action_buttons.values()
+	for button: Button in buttons:
+		if not button.disabled and button.is_visible_in_tree() and button.get_global_rect().has_point(point):
 			return button
 	return null
 
@@ -242,6 +384,10 @@ func _update_insets() -> void:
 	_insets.add_theme_constant_override("margin_top", ceili(insets.y))
 	_insets.add_theme_constant_override("margin_right", ceili(insets.z))
 	_insets.add_theme_constant_override("margin_bottom", ceili(insets.w))
+
+
+static func _decimal(value: float) -> String:
+	return ("%.1f" % value).replace(".", ",")
 
 
 static func _label(parent: Container, caption: String, font_size: int, tint: Color) -> Label:

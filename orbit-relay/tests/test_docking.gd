@@ -185,6 +185,11 @@ func _test_handoffs_and_save() -> void:
 		"Reloading an active approach preserves the real pose and momentum but clears automatic bank commands")
 	var earlier := saved.duplicate(true)
 	earlier.schema = 15
+	earlier.ship.erase("jump_fuel")
+	earlier.mining.cargo.erase("hydrogen")
+	earlier.mining.reserves.resize(Catalog.PRE_GAS_DESTINATION_COUNT)
+	for stocks: Dictionary in earlier.market.values():
+		stocks.erase("hydrogen")
 	earlier.erase("freight")
 	_expect(flight.restore(earlier) and flight.dock_roll_sync == -1 and flight.target == PORT,
 		"An older flight save restores the normal approach with synchronization off")

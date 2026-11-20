@@ -3,6 +3,7 @@ extends SceneTree
 const Flight = preload("res://scripts/flight_sim.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const OrbitRelay = preload("res://main.tscn")
+const Economy = preload("res://scripts/port_economy.gd")
 const STEP := 1.0 / 60.0
 
 var _checks := 0
@@ -45,8 +46,9 @@ func _test_manual_depletion() -> void:
 	_expect(flight.ship.fuel == 0.0 and not flight.boost and flight.speed() > 10.0 and flight.speed() <= 42.05,
 		"An empty tank blocks boost and leaves bounded reserve propulsion")
 	var resumed := Flight.new()
-	_expect(resumed.restore(_round_trip(flight.snapshot())) and resumed.ship.fuel == 0.0,
-		"An empty airborne tank survives a JSON save")
+	_expect(resumed.restore(_round_trip(flight.snapshot())) and resumed.ship.fuel == 0.0
+		and resumed.ship.jump_fuel == resumed.ship.jump_capacity(),
+		"Draining propulsion never spends jump fuel, and both reserves survive a JSON save")
 	_step_flight(resumed, 2.0, false, true)
 	_expect(resumed.speed() < 0.01 and resumed.ship.fuel == 0.0,
 		"Brake can stop an empty ship and the tank never becomes negative")
@@ -73,13 +75,19 @@ func _test_scoop_safety() -> void:
 	_expect(flight.scoop_status().ok and flight.scoop_action() and flight.scooping,
 		"The scoop opens at safe speed inside the stellar band")
 	_step_flight(flight, 1.0)
-	_expect(flight.ship.fuel > 50.0 and flight.ship.fuel < flight.ship.capacity() and flight.scooping,
-		"An open scoop adds fuel gradually")
-	var gathered := flight.ship.fuel
+	_expect(flight.ship.fuel == 50.0 and flight.ship.jump_fuel == flight.ship.jump_capacity()
+		and flight.mining.cargo_amount(Economy.HYDROGEN) == 0 and flight.scooping
+		and float(flight.scoop_status().progress) > 0.0 and float(flight.scoop_status().progress) < 1.0,
+		"An open scoop fills a canister progressively without feeding either reserve")
+	_step_flight(flight, 0.6)
+	var gathered := flight.mining.cargo_amount(Economy.HYDROGEN)
+	_expect(gathered == 1 and flight.ship.fuel == 50.0 and flight.scooping,
+		"One complete canister enters the shared cargo hold")
 	flight.position = center + Vector3.BACK * 395.0
 	_step_flight(flight, STEP)
-	_expect(not flight.scooping and flight.ship.fuel == gathered,
-		"Leaving the band closes the scoop before awarding fuel")
+	_expect(not flight.scooping and flight.mining.cargo_amount(Economy.HYDROGEN) == gathered
+		and is_zero_approx(flight.scoop_status().progress),
+		"Leaving the band closes the scoop and discards only the incomplete intake")
 	flight.position = center + Vector3.BACK * 255.0
 	flight.velocity = Vector3.FORWARD * 35.0
 	flight.yaw = 0.0
@@ -87,14 +95,18 @@ func _test_scoop_safety() -> void:
 	_step_flight(flight, 1.0)
 	_expect(flight.position.distance_to(center) >= 249.98 and flight.speed() < 0.01,
 		"The star's exclusion radius protects a manual approach")
-	_expect(not flight.dock_action() and not flight.mine_action() and flight.mining.ore_hold == 0,
+	_expect(not flight.dock_action() and not flight.mine_action() and flight.mining.ore_hold == gathered,
 		"The star supports neither touchdown nor mining")
 	flight.position = center + Vector3.BACK * 310.0
-	flight.ship.fuel = flight.ship.capacity() - 0.0005
-	_expect(flight.scoop_action(), "The scoop can finish filling a nearly full tank")
-	_step_flight(flight, STEP)
-	_expect(not flight.scooping and flight.ship.fuel == flight.ship.capacity(),
-		"Stellar collection clamps the last fraction of fuel and closes")
+	flight.velocity = Vector3.ZERO
+	flight.change_throttle(-1.0)
+	flight.ship.fuel = flight.ship.capacity()
+	_expect(flight.mining.insert_cargo("ore", flight.mining.free_capacity() - 1) and flight.scoop_action(),
+		"Full engines do not prevent a scoop from filling the last cargo slot")
+	_step_flight(flight, 2.0)
+	_expect(not flight.scooping and flight.mining.free_capacity() == 0
+		and flight.mining.cargo_amount(Economy.HYDROGEN) == gathered + 1 and not flight.scoop_action(),
+		"Stellar collection stops at cargo capacity and cannot overfill the hold")
 
 
 func _test_stellar_heat() -> void:
@@ -108,13 +120,13 @@ func _test_stellar_heat() -> void:
 	if not _expect(flight.scoop_action(), "A cool ship can initially collect at the inner edge of the band"):
 		return
 	_step_flight(flight, 6.0)
-	_expect(flight.star_heat > 0.0 and flight.ship.fuel > 10.0
-		and flight.ship.fuel < 10.0 + 6.0 * Flight.SCOOP_RATE,
+	var loaded := flight.mining.cargo_amount(Economy.HYDROGEN) + float(flight.scoop_status().progress)
+	_expect(flight.star_heat > 0.0 and flight.ship.fuel == 10.0 and loaded > 1.0 and loaded < 4.2,
 		"Heating at the inner edge reduces collection below the safe stellar rate")
 	_step_flight(flight, 9.0)
 	var hot := flight.thermal_status()
-	_expect(hot.blocked and not flight.scooping and not flight.scoop_action() and flight.ship.fuel < 100.0,
-		"Sustained inner-band heat closes the scoop before the tank is full and blocks immediate reopening")
+	_expect(hot.blocked and not flight.scooping and not flight.scoop_action() and flight.mining.free_capacity() > 0,
+		"Sustained inner-band heat closes the scoop before the hold is full and blocks immediate reopening")
 	var resumed := Flight.new()
 	var saved := _round_trip(flight.snapshot())
 	_expect(resumed.restore(saved) and is_equal_approx(resumed.star_heat, flight.star_heat)
@@ -257,18 +269,31 @@ func _test_touch_route() -> void:
 		"The flight HUD displays the live heat reading inside the collection band")
 	_tap(game._hud._actions.get("scoop"), "Touch opens the scoop in the band")
 	_expect(flight.scooping, "The HUD action opens the scoop")
+	_advance(game, func() -> bool: return flight.mining.cargo_amount(Economy.HYDROGEN) >= 1, 5.0)
 	game._physics_process(0.25)
 	var active_save: Dictionary = flight.snapshot()
 	game = await _restart_scene(game)
 	flight = game.flight
-	_expect(flight.snapshot() == active_save and not flight.scooping and flight.scoop_status().ok,
-		"Restart restores the partial fuel safely with the scoop closed")
+	var restored: Dictionary = flight.snapshot()
+	var heat_preserved := is_equal_approx(restored.star_heat, active_save.star_heat)
+	restored.star_heat = active_save.star_heat
+	_expect(heat_preserved and restored == active_save and not flight.scooping and flight.scoop_status().ok
+		and flight.mining.cargo_amount(Economy.HYDROGEN) == 1 and is_zero_approx(flight.scoop_status().progress),
+		"Restart retains completed cargo canisters and shuts the scoop")
 	_tap(game._hud._actions.get("scoop"), "Touch reopens the scoop after a restart")
-	_advance(game, func() -> bool: return not flight.scooping, 20.0)
-	_expect(flight.ship.fuel == flight.ship.capacity() and not flight.scooping
-		and not flight.scoop_action() and flight.mining.snapshot() == initial_mining
+	_advance(game, func() -> bool: return flight.mining.cargo_amount(Economy.HYDROGEN) >= 4, 15.0)
+	game._update_display(0.0)
+	await process_frame
+	_tap(game._hud._actions.get("scoop"), "Touch closes the scoop after collecting cargo")
+	var gathered: Dictionary = flight.mining.snapshot()
+	var hydrogen: int = gathered.cargo[Economy.HYDROGEN]
+	gathered.cargo[Economy.HYDROGEN] = 0
+	_expect(not flight.scooping and hydrogen >= 4 and gathered == initial_mining
 		and flight.ship.hull == 100.0 and not flight.thermal_status().danger,
-		"A safe autopilot approach fills the tank with no heat damage or change to mining cargo or reserves")
+		"A safe autopilot approach collects hydrogen with no heat damage or change to mining reserves")
+	_expect(flight.fuel_transfer("reaction") and flight.ship.fuel == flight.ship.capacity()
+		and flight.mining.cargo_amount(Economy.HYDROGEN) < hydrogen and flight.ship.jump_fuel == flight.ship.jump_capacity(),
+		"Transfer from cargo fills the reaction tank without spending any jump reserve")
 	_expect(flight.select_target(1), "A port can be selected after collecting fuel")
 	flight.set_autopilot(true)
 	_advance(game, func() -> bool: return flight.docked >= 0 or not flight.autopilot, 115.0)

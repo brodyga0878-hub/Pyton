@@ -185,12 +185,13 @@ func _test_warp_interlocks() -> void:
 	scoop.cycle_time_scale()
 	scoop.cycle_time_scale()
 	scoop.ship.fuel = 50.0
+	scoop.select_target(Catalog.STAR_ID)
 	scoop.position = scoop.target_contact(Catalog.STAR_ID)
 	var scoop_started := scoop.scoop_action()
 	scoop.update(STEP, Vector2.ZERO, 0.0, false, false)
 	_expect(scoop_started and scoop.time_scale == 1 and not scoop.time_status().allowed
-		and is_equal_approx(scoop.ship.fuel, 50.0 + Flight.SCOOP_RATE * STEP),
-		"Fuel collection cannot accelerate its intake rate")
+		and scoop.ship.fuel == 50.0 and is_equal_approx(scoop.scoop_status().progress, 0.7 * STEP),
+		"Hydrogen collection cannot accelerate its intake rate")
 
 
 func _test_save_and_migration() -> void:
@@ -213,7 +214,7 @@ func _test_save_and_migration() -> void:
 	_expect(flight.restore(_round_trip(previous)) and flight.orbit_time == 0.0 and flight.elapsed == 825.0
 		and flight.landed_site == MOON and flight.position == Vector3(620.0, -95.0, -782.0)
 		and flight.jump_target == Catalog.HOME_SYSTEM and flight.mining.phase_seconds == 8.0
-		and flight.ship.fuel == 83.0 and flight.ship.eco_upgraded,
+		and flight.ship.fuel == 83.0 and flight.ship.jump_fuel == 83.0 and flight.ship.eco_upgraded,
 		"A v5 landing keeps its full progress and begins orbits at the legacy position")
 	flight.cycle_time_scale()
 	_step(flight, 1.0)
@@ -276,9 +277,9 @@ func _fly_route(flight: Flight, destination: int) -> Dictionary:
 		flight.update(STEP, Vector2.ZERO, 0.0, false, false)
 		avoided = avoided or flight.autopilot_phase == "Обход препятствия"
 	var arrived := flight.docked == destination or flight.landed_site == destination
-	if destination == Catalog.star_for(flight.system_id):
-		var distance := flight.position.distance_to(flight.target_position(destination))
-		arrived = not flight.autopilot and Catalog.SCOOP_INNER <= distance and distance <= Catalog.SCOOP_OUTER
+	if flight.is_scoop_site(destination):
+		var scoop := flight.scoop_status()
+		arrived = not flight.autopilot and scoop.body == destination and scoop.ok
 	return {"arrived": arrived, "avoided": avoided}
 
 

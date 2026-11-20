@@ -18,7 +18,7 @@ const Patrol = preload("res://scripts/patrol_encounter.gd")
 const Expedition = preload("res://scripts/expedition.gd")
 const FactionFronts = preload("res://scripts/faction_fronts.gd")
 const ConvoyOrders = preload("res://scripts/convoy_orders.gd")
-const SAVE_SCHEMA := 19
+const SAVE_SCHEMA := 20
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
@@ -28,6 +28,10 @@ const ARRIVAL_OFFSET := 90.0
 const MAX_SPEED := 145.0
 const RESERVE_SPEED := 42.0
 const SCOOP_RATE := 7.0
+const GAS_SCOOP_RATE := 8.5
+const GAS_SCOOP_MIN_ALTITUDE := 26.0
+const GAS_SCOOP_MAX_ALTITUDE := 84.0
+const GAS_SCOOP_SPEED := 36.0
 const HEAT_SCOOP_SLOW := 55.0
 const HEAT_SCOOP_LIMIT := 76.0
 const HEAT_DAMAGE_LIMIT := 85.0
@@ -107,6 +111,8 @@ var convoy_order := ConvoyOrders.new()
 var convoy_course := false
 var project_course := false
 var scooping := false
+var _scoop_body := -1
+var _scoop_progress := 0.0
 var star_heat := 0.0
 var entry_heat := 0.0
 var system_id := Catalog.HOME_SYSTEM
@@ -386,6 +392,11 @@ func orbit_status(focus_id := -1) -> Dictionary:
 		reason = "Скорость уже близка к круговой"
 	var measurable: bool = result.valid and docked < 0 and not landed and jump_seconds_left <= 0.0
 	var surface_radius := float(site.get("radius", 0.0))
+	var collision_radius := surface_radius
+	if focus == star:
+		collision_radius = Catalog.STAR_CLEARANCE
+	elif Catalog.is_mine_site(focus):
+		collision_radius = surface_radius * Terrain.MAX_RADIUS_FACTOR + Terrain.CONTACT_CLEARANCE
 	result.merge({
 		"star": star, "focus": focus, "focus_kind": site.get("kind", ""),
 		"name": str(site.get("name", "")), "classification": (
@@ -393,7 +404,7 @@ func orbit_status(focus_id := -1) -> Dictionary:
 		),
 		"altitude": maxf(0.0, float(result.radius) - surface_radius),
 		"relative_speed": relative_velocity.length(),
-		"collision_radius": Catalog.STAR_CLEARANCE if focus == star else surface_radius * Terrain.MAX_RADIUS_FACTOR + Terrain.CONTACT_CLEARANCE,
+		"collision_radius": collision_radius,
 		"approach_min": band.x, "approach_max": band.y,
 		"allowed": reason.is_empty() and not orbit_maneuver,
 		"reason": "Можно выполнить орбитальный манёвр" if reason.is_empty() else reason,
@@ -455,7 +466,7 @@ func start_rendezvous(site: int, gap := 150) -> bool:
 	_rendezvous_gap = gap
 	_rendezvous_offset = Rendezvous.choose_offset(self, site, gap)
 	_rendezvous_holding = false
-	scooping = false
+	_reset_scoop()
 	throttle = 0.0
 	boost = false
 	_announce("rendezvous_start", "Сближение с объектом «%s». Дистанция ожидания %d м." % [target_name(site), gap])
@@ -768,6 +779,8 @@ func selected_dock_status() -> Dictionary:
 		return {"ok": false, "reason": "Идёт зарядка прыжкового привода"}
 	if target == Catalog.star_for(system_id):
 		return {"ok": false, "reason": "У звезды можно собирать топливо"}
+	if Catalog.is_gas_giant(target):
+		return {"ok": false, "reason": "В атмосфере гиганта можно собирать водород"}
 	if Catalog.is_mine_site(target):
 		return surface_status()
 	return docking_guidance()
@@ -1320,9 +1333,11 @@ func service_action(action: String) -> bool:
 	credits -= paid
 	match action:
 		"refuel":
-			_announce("service_refuel", "Бак заправлен. Списано %d кр." % paid)
+			_announce("service_refuel", "Реактивный бак заправлен. Списано %d кр." % paid)
+		"jump_refuel":
+			_announce("service_jump_refuel", "Прыжковый запас пополнен. Списано %d кр." % paid)
 		"tank":
-			_announce("service_tank", "Установлен бак на %d ед. топлива." % int(ship.capacity()))
+			_announce("service_tank", "Ёмкость обоих топливных контуров увеличена до %d ед." % int(ship.capacity()))
 		"eco":
 			_announce("service_eco", "Экономичный привод установлен.")
 		"repair":
@@ -1335,25 +1350,106 @@ func service_action(action: String) -> bool:
 	return true
 
 
+func fuel_transfer_offer(destination: String) -> Dictionary:
+	if destination not in ["reaction", "jump"]:
+		return {"ok": false, "reason": "Выберите контур", "canisters": 0, "added": 0.0}
+	if jump_seconds_left > 0.0 or scooping or mining.phase != MiningRig.STOWED:
+		var reason := "Остановите сбор" if scooping else "Дождитесь завершения зарядки или верните добывающий модуль"
+		return {"ok": false, "reason": reason, "canisters": 0, "added": 0.0}
+	var missing := ship.capacity() - ship.fuel if destination == "reaction" else ship.jump_capacity() - ship.jump_fuel
+	var available := mining.cargo_amount(Economy.HYDROGEN)
+	var units := ShipSystems.HYDROGEN_UNITS_PER_CANISTER
+	var canisters := mini(available, ceili(missing / units))
+	var reason := ""
+	if missing <= 0.0:
+		reason = "Запас полон"
+	elif available <= 0:
+		reason = "В трюме нет водорода"
+	return {"ok": canisters > 0, "reason": reason, "canisters": canisters, "added": minf(missing, canisters * units)}
+
+
+func fuel_transfer(destination: String) -> bool:
+	var offer := fuel_transfer_offer(destination)
+	if not offer.ok or not mining.remove_cargo(Economy.HYDROGEN, offer.canisters):
+		return false
+	var amount := ship.add_fuel(offer.added) if destination == "reaction" else ship.add_jump_fuel(offer.added)
+	var circuit := "Реактивный бак" if destination == "reaction" else "Прыжковый запас"
+	_announce("fuel_transfer", "%s: пополнено %.1f ед. из трюма." % [circuit, amount])
+	return true
+
+
+func fuel_cargo_options() -> Array[Dictionary]:
+	var options: Array[Dictionary] = []
+	if docked >= 0 or landed or scooping or jump_seconds_left > 0.0 or mining.phase != MiningRig.STOWED:
+		return options
+	for good: String in Economy.GOODS:
+		var quantity := mining.cargo_amount(good)
+		if quantity > 0:
+			options.append({"good": good, "name": Economy.good_name(good), "quantity": quantity})
+	return options
+
+
+func jettison_cargo(good: String) -> bool:
+	if docked >= 0 or landed or scooping or jump_seconds_left > 0.0 or not mining.remove_cargo(good, 1):
+		return false
+	_announce("cargo_jettisoned", "Сброшена единица груза «%s». В трюме освободилось место." % Economy.good_name(good))
+	return true
+
+
+func is_scoop_site(site: int) -> bool:
+	return site == Catalog.star_for(system_id) or (Catalog.is_gas_giant(site) and Catalog.system_of_site(site) == system_id)
+
+
+func scoop_active_at(site: int) -> bool:
+	return scooping and _scoop_body == site
+
+
+func _scoop_site() -> int:
+	if scooping:
+		return _scoop_body
+	if is_scoop_site(target):
+		return target
+	var giant := Catalog.gas_giant_for(system_id)
+	if giant >= 0:
+		var near_radius := float(Catalog.site(giant).radius) + GAS_SCOOP_MAX_ALTITUDE + 120.0
+		if position.distance_squared_to(target_position(giant)) <= near_radius * near_radius:
+			return giant
+	return Catalog.star_for(system_id)
+
+
 func scoop_status() -> Dictionary:
-	var distance := _star_distance()
-	var near := distance <= Catalog.SCOOP_OUTER + 180.0
+	var body := _scoop_site()
+	var gas := Catalog.is_gas_giant(body)
+	var radius := float(Catalog.site(body).radius)
+	var distance := position.distance_to(target_position(body))
+	var inner := radius + GAS_SCOOP_MIN_ALTITUDE if gas else Catalog.SCOOP_INNER
+	var outer := radius + GAS_SCOOP_MAX_ALTITUDE if gas else Catalog.SCOOP_OUTER
+	var max_speed := GAS_SCOOP_SPEED if gas else Catalog.SCOOP_SPEED
+	var near := distance <= outer + (120.0 if gas else 180.0)
+	var speed := speed_relative_to(body)
+	var free := mining.free_capacity()
 	var reason := ""
 	if docked >= 0 or landed:
-		reason = "Сбор топлива доступен в полёте у звезды"
+		reason = "Сбор доступен в полёте у звезды или газового гиганта"
 	elif jump_seconds_left > 0.0:
 		reason = "Идёт зарядка прыжкового привода"
-	elif distance < Catalog.SCOOP_INNER:
-		reason = "Отойдите от звезды до зоны сбора"
-	elif distance > Catalog.SCOOP_OUTER:
-		reason = "Подойдите к отмеченной зоне сбора"
+	elif distance < inner:
+		reason = "Поднимитесь в верхний слой атмосферы" if gas else "Отойдите от звезды до зоны сбора"
+	elif distance > outer:
+		reason = "Войдите в верхний слой атмосферы" if gas else "Подойдите к отмеченной зоне сбора"
 	elif maxf(star_heat, entry_heat) >= HEAT_SCOOP_LIMIT:
-		reason = "Корпус перегрет. Отойдите от звезды, чтобы остыть"
-	elif speed() > Catalog.SCOOP_SPEED:
-		reason = "Снизьте скорость до %d м/с" % int(Catalog.SCOOP_SPEED)
-	elif ship.fuel >= ship.capacity():
-		reason = "Бак уже полон"
-	return {"ok": reason.is_empty(), "reason": "Можно собирать топливо" if reason.is_empty() else reason, "near": near}
+		reason = "Корпус перегрет. Выйдите из зоны сбора и охладите корабль"
+	elif speed > max_speed:
+		reason = "Снизьте относительную скорость до %d м/с" % int(max_speed)
+	elif free <= 0:
+		reason = "Трюм заполнен. Для сбора нужна свободная ячейка"
+	return {
+		"ok": reason.is_empty(), "reason": "Можно собирать водород" if reason.is_empty() else reason,
+		"near": near, "body": body, "kind": "gas" if gas else "star", "distance": distance, "altitude": distance - radius,
+		"inner": inner, "outer": outer, "max_speed": max_speed, "relative_speed": speed,
+		"progress": _scoop_progress, "scooping": scooping, "free": free,
+		"cargo_units": mining.cargo_amount(Economy.HYDROGEN),
+	}
 
 
 func thermal_status() -> Dictionary:
@@ -1380,7 +1476,7 @@ func atmosphere_status() -> Dictionary:
 	var in_flight := docked < 0 and not landed and jump_seconds_left <= 0.0
 	var equilibrium := _entry_heat_target(air) if in_flight else 0.0
 	var altitude: float = air.altitude
-	if air.near:
+	if air.near and Catalog.is_mine_site(air.site):
 		var from_center := position - target_position(air.site)
 		if not from_center.is_zero_approx():
 			altitude = from_center.length() - Terrain.radius_at(air.site, from_center.normalized())
@@ -1450,7 +1546,7 @@ func _heat_target(distance: float) -> float:
 	# Approach heat rises more quickly near the stellar surface. Running the collector adds heat.
 	var proximity := maxf(0.0, Catalog.SCOOP_OUTER - distance) / (Catalog.SCOOP_OUTER - Catalog.SCOOP_INNER)
 	var output := Catalog.stellar_heat(system_id)
-	return 82.0 * output * proximity * proximity + (12.0 if scooping else 0.0)
+	return 82.0 * output * proximity * proximity + (12.0 if scoop_active_at(Catalog.star_for(system_id)) else 0.0)
 
 
 func _update_star_heat(delta: float) -> void:
@@ -1472,8 +1568,7 @@ func _update_star_heat(delta: float) -> void:
 
 func scoop_action() -> bool:
 	if scooping:
-		scooping = false
-		_announce("scoop_stop", "Сбор топлива остановлен.")
+		_stop_scoop("scoop_stop", "Сбор водорода остановлен.")
 		return true
 	var status := scoop_status()
 	if not status.ok:
@@ -1481,9 +1576,22 @@ func scoop_action() -> bool:
 		return false
 	reset_time_scale()
 	_clear_rendezvous()
+	_scoop_body = status.body
+	_scoop_progress = 0.0
 	scooping = true
-	_announce("scoop_start", "Идёт сбор топлива.")
+	_announce("scoop_start", "Идёт сбор водорода в трюм.")
 	return true
+
+
+func _stop_scoop(event: String, message: String) -> void:
+	_reset_scoop()
+	_announce(event, message)
+
+
+func _reset_scoop() -> void:
+	scooping = false
+	_scoop_body = -1
+	_scoop_progress = 0.0
 
 
 func _collect_fuel(delta: float) -> void:
@@ -1491,14 +1599,21 @@ func _collect_fuel(delta: float) -> void:
 		return
 	var status := scoop_status()
 	if not status.ok:
-		scooping = false
-		_announce("scoop_stop", status.reason)
+		_stop_scoop("scoop_stop", status.reason)
 		return
-	var heat_fraction := clampf(inverse_lerp(HEAT_SCOOP_SLOW, HEAT_SCOOP_LIMIT, star_heat), 0.0, 1.0)
-	ship.add_fuel(SCOOP_RATE * lerpf(1.0, 0.45, heat_fraction) * delta)
-	if ship.fuel >= ship.capacity():
-		scooping = false
-		_announce("scoop_full", "Бак полностью заправлен от звезды.")
+	var heat_fraction := clampf(inverse_lerp(HEAT_SCOOP_SLOW, HEAT_SCOOP_LIMIT, maxf(star_heat, entry_heat)), 0.0, 1.0)
+	var rate := GAS_SCOOP_RATE if status.kind == "gas" else SCOOP_RATE
+	_scoop_progress += rate * lerpf(1.0, 0.45, heat_fraction) * delta / ShipSystems.HYDROGEN_UNITS_PER_CANISTER
+	if _scoop_progress < 1.0:
+		return
+	if not mining.insert_cargo(Economy.HYDROGEN, 1):
+		_stop_scoop("scoop_stop", "Не удалось поместить водород в трюм.")
+		return
+	_scoop_progress -= 1.0
+	if mining.free_capacity() <= 0:
+		_stop_scoop("scoop_full", "Трюм заполнен. Перелейте водород через меню «Топливо».")
+	else:
+		_announce("scoop_canister", "В трюме %d канистр водорода." % mining.cargo_amount(Economy.HYDROGEN))
 
 
 func plan_jump(destination: int) -> bool:
@@ -1512,9 +1627,9 @@ func plan_jump(destination: int) -> bool:
 
 func route_preview(goal: int) -> Dictionary:
 	var known := _known_systems(expedition)
-	var capacity := ship.capacity()
-	var reachable_first_leg := GalacticRoute.plan(system_id, goal, known, capacity, ship.fuel)
-	if reachable_first_leg.available or ship.fuel >= capacity:
+	var capacity := ship.jump_capacity()
+	var reachable_first_leg := GalacticRoute.plan(system_id, goal, known, capacity, ship.jump_fuel)
+	if reachable_first_leg.available or ship.jump_fuel >= capacity:
 		return reachable_first_leg
 	return GalacticRoute.plan(system_id, goal, known, capacity)
 
@@ -1577,8 +1692,8 @@ func jump_status(destination: int) -> Dictionary:
 		reason = "Отойдите от конвоя"
 	elif speed() > JUMP_SPEED:
 		reason = "Снизьте скорость до %d м/с" % int(JUMP_SPEED)
-	elif ship.fuel < cost:
-		reason = "Нужно %d ед. топлива" % cost
+	elif ship.jump_fuel < cost:
+		reason = "Нужно %d ед. в прыжковом запасе" % cost
 	else:
 		var star := Catalog.star_for(system_id)
 		for id: int in local_targets():
@@ -1635,7 +1750,7 @@ func _charge_jump(delta: float) -> void:
 	if jump_seconds_left > 0.000001:
 		return
 	jump_seconds_left = 0.0
-	ship.fuel -= status.cost
+	ship.jump_fuel -= status.cost
 	system_id = jump_target
 	if not _jump_route.is_empty() and _jump_route.front() == system_id:
 		_jump_route.pop_front()
@@ -1680,7 +1795,7 @@ func _hold_landed_pose() -> void:
 	roll = 0.0
 	throttle = 0.0
 	boost = false
-	scooping = false
+	_reset_scoop()
 
 
 func _lift() -> void:
@@ -1730,7 +1845,7 @@ func _dock() -> void:
 	set_autopilot(false)
 	throttle = 0.0
 	boost = false
-	scooping = false
+	_reset_scoop()
 	_hold_docked_pose()
 	_announce("dock", "Швартовка завершена. Станция «%s»." % target_name(docked))
 
@@ -1989,6 +2104,9 @@ func _inside_hull(point: Vector3, index: int, epoch := -1.0) -> bool:
 	var relative := point - center
 	if index == Catalog.star_for(Catalog.system_of_site(index)):
 		return relative.length_squared() < Catalog.STAR_CLEARANCE * Catalog.STAR_CLEARANCE
+	if Catalog.is_gas_giant(index):
+		var pressure_radius := float(Catalog.site(index).radius)
+		return relative.length_squared() < pressure_radius * pressure_radius
 	if Catalog.is_mine_site(index):
 		var outer := float(Catalog.site(index).radius) * Terrain.MAX_RADIUS_FACTOR + Terrain.CONTACT_CLEARANCE
 		var distance_squared := relative.length_squared()
@@ -2007,7 +2125,9 @@ func _inside_hull(point: Vector3, index: int, epoch := -1.0) -> bool:
 func _autopilot_step(delta: float) -> void:
 	boost = false
 	var star_run := target == Catalog.star_for(system_id)
-	var mining_site := not Catalog.is_port(target)
+	var gas_run := Catalog.is_gas_giant(target)
+	var scoop_run := star_run or gas_run
+	var mining_site := Catalog.is_mine_site(target)
 	var target_radius := Catalog.STAR_CLEARANCE if star_run else float(Catalog.site(target).radius)
 	var center := target_position(target)
 	var gate := target_gate(target)
@@ -2021,9 +2141,9 @@ func _autopilot_step(delta: float) -> void:
 		_approach_committed = true
 
 	if _approach_committed:
-		if star_run:
+		if scoop_run:
 			waypoint = target_contact(target)
-			max_speed = 32.0
+			max_speed = 30.0 if gas_run else 32.0
 			autopilot_phase = "Вход в зону сбора"
 		else:
 			waypoint = target_contact(target) + Vector3.BACK * 1.8
@@ -2036,10 +2156,10 @@ func _autopilot_step(delta: float) -> void:
 				autopilot_phase = "Стыковка"
 		_match_target_roll(delta)
 	else:
-		autopilot_phase = "К зоне сбора" if star_run else "К створу"
+		autopilot_phase = "К зоне сбора" if scoop_run else "К створу"
 		# Approach a station from the front. The side waypoint keeps a return
 		# journey from crossing the station hull from behind.
-		var front_clearance := target_radius + 22.0 if mining_site else 34.0
+		var front_clearance := target_radius + 22.0 if mining_site or gas_run else 34.0
 		var side_clearance := maxf(84.0, target_radius + 42.0)
 		if relative.z < front_clearance and absf(relative.x) < side_clearance - 7.0:
 			var side := 1.0 if relative.x >= 0.0 else -1.0
@@ -2105,11 +2225,11 @@ func _autopilot_step(delta: float) -> void:
 		desired = desired.limit_length(RESERVE_SPEED)
 	velocity = velocity.move_toward(desired, 42.0 * delta)
 	throttle = clampf(desired_speed / MAX_SPEED, 0.0, 1.0)
-	if _approach_committed and star_run and displacement.length() < 2.0 and speed() < 3.0:
+	if _approach_committed and scoop_run and displacement.length() < 2.0 and speed_relative_to(target) < 3.0:
 		set_autopilot(false)
 		throttle = 0.0
-		_announce("star_arrival", "Корабль у звезды «%s». Можно включить сбор топлива." % target_name(target))
-	elif _approach_committed and not star_run:
+		_announce("gas_arrival" if gas_run else "star_arrival", "Корабль в зоне сбора «%s». Можно включить сбор водорода." % target_name(target))
+	elif _approach_committed and not scoop_run:
 		var status := selected_dock_status()
 		if status.ok and (mining_site or (status.range <= DOCK_AUTO_DISTANCE and status.relative_speed <= DOCK_AUTO_SPEED)):
 			_arrive()
@@ -2212,7 +2332,7 @@ func _transit_obstacle(course: Vector3, cruise: float, skip_target := true) -> i
 		if fraction <= 0.0 or fraction >= earliest:
 			continue
 		var closest := radial + relative_course * fraction
-		var clearance := float(Catalog.site(id).radius) + 30.0
+		var clearance := _transit_radius(id) + 30.0
 		if closest.length_squared() < clearance * clearance:
 			earliest = fraction
 			obstacle = id
@@ -2221,7 +2341,7 @@ func _transit_obstacle(course: Vector3, cruise: float, skip_target := true) -> i
 
 func _transit_waypoint(id: int, course: Vector3) -> Vector3:
 	var center := target_position(id)
-	var radius := float(Catalog.site(id).radius)
+	var radius := _transit_radius(id)
 	var outward := (position - center).normalized()
 	var side := course.slide(outward)
 	if side.length_squared() < 0.001:
@@ -2229,6 +2349,11 @@ func _transit_waypoint(id: int, course: Vector3) -> Vector3:
 		if side.length_squared() < 0.001:
 			side = Vector3.RIGHT.slide(outward)
 	return center + outward * (radius + 55.0) + side.normalized() * (radius + 58.0)
+
+
+func _transit_radius(id: int) -> float:
+	var radius := float(Catalog.site(id).radius)
+	return radius + float(Atmosphere.profile(id).height) if Catalog.is_gas_giant(id) else radius
 
 
 func _star_detour(waypoint: Vector3) -> Vector3:
@@ -2293,6 +2418,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_dual_fuel := schema < 20
 	var pre_gear := schema < 19
 	var pre_frontier_freight := schema < 18
 	var pre_jump_route := schema < 17
@@ -2362,6 +2488,8 @@ func restore(state: Dictionary) -> bool:
 	if not _number(state.get("throttle"), 0.0, 1.0):
 		return false
 	var site_count := Catalog.PRE_EXPANSION_DESTINATION_COUNT if pre_expansion else Catalog.DESTINATION_COUNT
+	if pre_dual_fuel and not pre_expansion:
+		site_count = Catalog.PRE_GAS_DESTINATION_COUNT
 	if pre_traffic:
 		site_count = Catalog.PRE_TRAFFIC_DESTINATION_COUNT
 	if pre_surface:
@@ -2428,7 +2556,7 @@ func restore(state: Dictionary) -> bool:
 	var restored_patrol := Patrol.new()
 	var restored_landing := -1
 	var restored_plan := -1
-	if not pre_fuel and not restored_ship.restore(state.get("ship"), pre_economy, pre_heat_shield):
+	if not pre_fuel and not restored_ship.restore(state.get("ship"), pre_economy, pre_heat_shield, pre_dual_fuel):
 		return false
 	var restored_route: Array[int] = []
 	if not pre_jump_route:
@@ -2442,9 +2570,9 @@ func restore(state: Dictionary) -> bool:
 		if not restored_route.is_empty():
 			var path: Array[int] = [restored_system]
 			path.append_array(restored_route)
-			if restored_route[0] != restored_jump or not GalacticRoute.valid_path(path, _known_systems(restored_expedition), restored_ship.capacity()):
+			if restored_route[0] != restored_jump or not GalacticRoute.valid_path(path, _known_systems(restored_expedition), restored_ship.jump_capacity()):
 				return false
-	if not pre_economy and not restored_market.restore(state.get("market"), pre_traffic, pre_expansion):
+	if not pre_economy and not restored_market.restore(state.get("market"), pre_traffic, pre_expansion, pre_dual_fuel):
 		return false
 	if pre_freight:
 		restored_freight.reset(restored_epoch)
@@ -2462,7 +2590,7 @@ func restore(state: Dictionary) -> bool:
 	if restored_patrol.origin >= 0 and not _site_available(restored_patrol.origin, restored_expedition):
 		return false
 	var mining_count := Catalog.SITE_COUNT if pre_galaxy else site_count
-	if schema >= 2 and not restored_mining.restore(state.get("mining"), schema == 2, mining_count, restored_ship.cargo_capacity(), not pre_economy):
+	if schema >= 2 and not restored_mining.restore(state.get("mining"), schema == 2, mining_count, restored_ship.cargo_capacity(), not pre_economy, pre_dual_fuel):
 		return false
 	if schema == 2:
 		if not state.get("landed") is bool:
@@ -2529,6 +2657,13 @@ func restore(state: Dictionary) -> bool:
 				var direction := relative.normalized()
 				restored_position = center + Terrain.contact(obstacle, direction) + direction * 3.0
 				restored_velocity = Vector3.ZERO
+	# The new gas giant can overlap a valid position from a pre-giant flight.
+	if pre_dual_fuel and restored_system == Catalog.HOME_SYSTEM and restored_dock < 0 and restored_landing < 0:
+		var giant := Catalog.GAS_GIANT_ID
+		if _inside_hull(restored_position, giant, restored_epoch):
+			var center: Vector3 = Orbit.sample(giant, restored_epoch).position
+			restored_position = center + Vector3.BACK * float(Catalog.site(giant).gate_offset)
+			restored_velocity = Vector3.ZERO
 	var velocity_limit := MAX_SAVED_SPEED if schema >= 6 else MAX_SPEED * 1.56
 	if restored_velocity.length() > velocity_limit or (restored_dock < 0 and restored_landing < 0 and _blocked(restored_position, restored_system, restored_epoch, restored_expedition)):
 		return false
@@ -2561,7 +2696,7 @@ func restore(state: Dictionary) -> bool:
 	star_heat = 0.0 if pre_thermal else float(state.star_heat)
 	entry_heat = 0.0 if pre_entry else float(state.entry_heat)
 	_entry_site = -1
-	scooping = false
+	_reset_scoop()
 	system_id = restored_system
 	jump_target = restored_jump
 	_jump_route = restored_route

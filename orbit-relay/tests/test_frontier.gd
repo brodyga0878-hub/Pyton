@@ -64,6 +64,7 @@ func _test_previous_save() -> void:
 		return
 	var latest := flight.snapshot()
 	_expect(flight.credits == 836 and flight.ship.hull == 82.5 and flight.ship.fuel == 70.0
+		and flight.ship.jump_fuel == 70.0 and flight.mining.cargo_amount("hydrogen") == 0
 		and flight.contract_route_id == "outer_relay" and flight.contract_leg == 1
 		and flight.mining.cargo_amount("circuits") == 10 and flight.mining.reserve_at(18) == 180
 		and flight.market.stock(16, "ore") == 20, "Migration preserves the courier, purchases, deposits and ship")
@@ -171,8 +172,9 @@ func _test_heather_project() -> Flight:
 		return null
 	_expect(port in reloaded.local_ports() and port in reloaded.local_targets() and not reloaded.traffic_contacts().is_empty(),
 		"The newly commissioned port enters navigation and generates autonomous traffic")
-	if not _expect(_dock_at(reloaded, port) and reloaded.market_trade("ore", "buy", 1) and reloaded.service_action("refuel"),
-		"The finished station can actually dock, sell goods and refuel ships (%s)" % reloaded.status_message):
+	if not _expect(_dock_at(reloaded, port) and reloaded.market_trade("ore", "buy", 1)
+		and reloaded.service_action("refuel") and reloaded.service_action("jump_refuel"),
+		"The finished station can actually dock, sell goods and supply both reserves (%s)" % reloaded.status_message):
 		return null
 	_expect(reloaded.offer_destination() >= 0 and reloaded.contract_action() and reloaded.jump_target != HEATHER,
 		"The completed frontier dock offers outbound freight alongside its market")
@@ -204,7 +206,8 @@ func _test_limit_project(commissioned: Flight) -> void:
 		"The second expedition surveys both sites, including its asteroid (%s)" % flight.status_message):
 		return
 	if not _expect(_jump_to(flight, departure) and _dock_at(flight, 10) and flight.project_action()
-		and _buy(flight, {"ore": 8, "medical": 3, "crystal": 4, "circuits": 3}) and flight.service_action("refuel"),
+		and _buy(flight, {"ore": 8, "medical": 3, "crystal": 4, "circuits": 3})
+		and flight.service_action("refuel") and flight.service_action("jump_refuel"),
 		"The Velar sponsor can process the report, sell materials and fuel the second expedition (%s)" % flight.status_message):
 		return
 	if not _expect(_jump_to(flight, LIMIT) and _guide_to_project(flight) and flight.project_action() and flight.project_action()
@@ -321,6 +324,11 @@ func _test_convoys(remote: Flight, conflict: Dictionary, saved: Dictionary) -> v
 		"The combat round incorporates the net supplies that physically arrived")
 	var legacy := saved.duplicate(true)
 	legacy.schema = 10
+	legacy.ship.erase("jump_fuel")
+	legacy.mining.cargo.erase("hydrogen")
+	legacy.mining.reserves.resize(Catalog.PRE_GAS_DESTINATION_COUNT)
+	for stocks: Dictionary in legacy.market.values():
+		stocks.erase("hydrogen")
 	legacy.ship.erase("heat_shield")
 	legacy.erase("star_heat")
 	for record: Dictionary in legacy.factions.frontiers:
@@ -408,14 +416,14 @@ func _jump_to(flight: Flight, system: int) -> bool:
 		if flight.jump_status(system).ok:
 			break
 		_tick(flight)
-	var before := flight.ship.fuel
+	var before := flight.ship.jump_fuel
 	if not flight.start_jump():
 		return false
 	for _frame in range(roundi(3.0 / STEP)):
 		if flight.jump_seconds_left <= 0.0:
 			break
 		_tick(flight)
-	return flight.system_id == system and is_equal_approx(flight.ship.fuel, before - fare)
+	return flight.system_id == system and is_equal_approx(flight.ship.jump_fuel, before - fare)
 
 
 func _guide_to_project(flight: Flight) -> bool:

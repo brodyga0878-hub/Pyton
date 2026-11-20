@@ -15,7 +15,9 @@ const SYSTEM_COUNT := LIMIT_SYSTEM + 1
 const PRE_SURFACE_DESTINATION_COUNT := 15
 const PRE_TRAFFIC_DESTINATION_COUNT := PRE_SURFACE_DESTINATION_COUNT + 1
 const PRE_EXPANSION_DESTINATION_COUNT := PRE_TRAFFIC_DESTINATION_COUNT + 4
-const DESTINATION_COUNT := PRE_EXPANSION_DESTINATION_COUNT + 8
+const PRE_GAS_DESTINATION_COUNT := PRE_EXPANSION_DESTINATION_COUNT + 8
+const GAS_GIANT_ID := PRE_GAS_DESTINATION_COUNT
+const DESTINATION_COUNT := GAS_GIANT_ID + 1
 const VELAR_STAR_ID := 14
 const TERRACE_ID := PRE_SURFACE_DESTINATION_COUNT
 const FRINGE_ARRIVAL_PORT := PRE_TRAFFIC_DESTINATION_COUNT
@@ -47,9 +49,9 @@ const MINING_IDS := [2, 4, 5, 6, 7, 8]
 const SYSTEMS := [
 	{
 		"name": "Гелион", "position": Vector2.ZERO, "accent": Color("#ffc778"),
-		"description": "Три порта, шесть месторождений и жёлтая звезда с зоной сбора топлива.",
-		"arrival_port": 0, "targets": [0, 1, 2, 3, 4, 5, 6, 7, 8, STAR_ID], "ports": PORT_IDS,
-		"mines": MINING_IDS, "star": STAR_ID, "stellar_heat": 1.0,
+		"description": "Три порта, шесть месторождений, жёлтая звезда и газовый гигант «Янтарь».",
+		"arrival_port": 0, "targets": [0, 1, 2, 3, 4, 5, 6, 7, 8, STAR_ID, GAS_GIANT_ID], "ports": PORT_IDS,
+		"mines": MINING_IDS, "star": STAR_ID, "gas_giant": GAS_GIANT_ID, "stellar_heat": 1.0,
 	},
 	{
 		"name": "Велар", "position": Vector2(3.6, -2.2), "accent": Color("#9dcaff"),
@@ -112,6 +114,7 @@ const SITES := [
 	{"name": "Северина", "kind": "planet", "center": Vector3(860, -250, -1050), "radius": 143.0, "pad_offset": 143.0, "gate_offset": 257.0, "seed": 503, "surface_color": Color("#766b8f"), "accent": Color("#cbc2f5"), "resource": "ore", "reserve": 252, "drill_seconds": 13.0},
 	{"name": "Стежка", "kind": "asteroid", "center": Vector3(1490, 110, -1800), "radius": 67.0, "pad_offset": 67.0, "gate_offset": 143.0, "seed": 509, "surface_color": Color("#71697e"), "accent": Color("#e5b9fa"), "resource": "crystal", "reserve": 216, "drill_seconds": 15.0},
 	{"name": "Предел", "kind": "star", "center": Vector3(2320, 265, -1775), "radius": 220.0, "pad_offset": 310.0, "gate_offset": 470.0, "accent": Color("#ddbfff")},
+	{"name": "Янтарь", "kind": "gas", "center": Vector3(-2380, -680, -3970), "radius": 460.0, "pad_offset": 505.0, "gate_offset": 650.0, "accent": Color("#efb082")},
 ]
 const PORT_PRICES := {
 	0: {"ore": 20, "crystal": 38, "ice": 14},
@@ -152,6 +155,8 @@ static func system(id: int) -> Dictionary:
 static func system_of_site(id: int) -> int:
 	if id < 0 or id >= DESTINATION_COUNT:
 		return -1
+	if id == GAS_GIANT_ID:
+		return HOME_SYSTEM
 	if id >= LIMIT_PORT:
 		return LIMIT_SYSTEM
 	if id >= PRE_EXPANSION_DESTINATION_COUNT:
@@ -175,6 +180,10 @@ static func mines_for(system_id: int) -> Array:
 
 static func star_for(system_id: int) -> int:
 	return system(system_id).get("star", -1)
+
+
+static func gas_giant_for(system_id: int) -> int:
+	return system(system_id).get("gas_giant", -1)
 
 
 static func stellar_heat(system_id: int) -> float:
@@ -202,12 +211,17 @@ static func is_mine_site(id: int) -> bool:
 	return id in mines_for(system_of_site(id))
 
 
+static func is_gas_giant(id: int) -> bool:
+	return site(id).get("kind", "") == "gas"
+
+
 static func kind_name(kind: String) -> String:
 	match kind:
 		"port": return "Порт"
 		"asteroid": return "Астероид"
 		"moon": return "Луна"
 		"planet": return "Планета"
+		"gas": return "Газовый гигант"
 		"comet": return "Комета"
 		"star": return "Звезда"
 		_: return ""

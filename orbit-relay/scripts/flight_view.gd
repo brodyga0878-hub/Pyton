@@ -34,6 +34,7 @@ var _fill: DirectionalLight3D
 var _sector: Node3D
 var _system_id := -1
 var _star_id := -1
+var _gas_giant_id := -1
 var _stars: MeshInstance3D
 var _star: Node3D
 var _backdrop_planet: Node3D
@@ -116,6 +117,7 @@ func _load_sector(id: int) -> void:
 	_sector_finishes.clear()
 	_system_id = id
 	_star_id = Catalog.star_for(id)
+	_gas_giant_id = Catalog.gas_giant_for(id)
 	_last_position = Vector3.INF
 
 	var cool := id == Catalog.VELAR_SYSTEM
@@ -135,7 +137,7 @@ func _load_sector(id: int) -> void:
 	_sector = Node3D.new()
 	add_child(_sector)
 	_build_stars(cool, fringe)
-	_build_planet(cool, fringe)
+	_build_gas_giant(cool, fringe)
 	_star = StarView.new()
 	_sector.add_child(_star)
 	_star.set_visual_profile(_visual_profile)
@@ -231,11 +233,16 @@ func sync(sim: RefCounted, delta: float) -> void:
 	camera.look_at(look_target, _camera_up)
 	_stars.position = camera.position
 	_star.position = sim.target_position(_star_id)
-	var backdrop_phase := TAU * fposmod(float(sim.orbit_time), BACKDROP_ORBIT_SECONDS) / BACKDROP_ORBIT_SECONDS
-	_backdrop_planet.position = _star.position + _backdrop_orbit_offset.rotated(_backdrop_orbit_axis, backdrop_phase)
+	if _gas_giant_id >= 0:
+		_backdrop_planet.position = sim.target_position(_gas_giant_id)
+		var light_direction := (_star.position - _backdrop_planet.position).normalized()
+		_backdrop_material.set_shader_parameter("light_direction", light_direction)
+	else:
+		var backdrop_phase := TAU * fposmod(float(sim.orbit_time), BACKDROP_ORBIT_SECONDS) / BACKDROP_ORBIT_SECONDS
+		_backdrop_planet.position = _star.position + _backdrop_orbit_offset.rotated(_backdrop_orbit_axis, backdrop_phase)
 	if _visual_profile > 0:
 		_backdrop_material.set_shader_parameter("weather_phase", fposmod(float(sim.orbit_time), CLOUD_CYCLE_SECONDS) / CLOUD_CYCLE_SECONDS)
-	_star.update_approach(camera.global_position, position_now, int(sim.target) == _star_id and not settled, bool(sim.scooping))
+	_star.update_approach(camera.global_position, position_now, int(sim.target) == _star_id and not settled, bool(sim.scoop_active_at(_star_id)))
 	_last_position = position_now
 	_last_berth = berth
 
@@ -356,6 +363,13 @@ func _surface_safe_camera(at: Vector3, sim: RefCounted) -> Vector3:
 		var threshold := Terrain.radius_at(site_id, direction) + CAMERA_SURFACE_CLEARANCE
 		if relative.length_squared() < threshold * threshold:
 			at = center + direction * threshold
+	if _gas_giant_id >= 0:
+		var center: Vector3 = sim.target_position(_gas_giant_id)
+		var offset := at - center
+		var limit := float(Catalog.site(_gas_giant_id).radius) + CAMERA_SURFACE_CLEARANCE
+		if offset.length_squared() < limit * limit:
+			var outward := Vector3.BACK if offset.is_zero_approx() else offset.normalized()
+			at = center + outward * limit
 	return at
 
 
@@ -838,22 +852,25 @@ func _build_stars(cool: bool, fringe: bool) -> void:
 	_stars = _mesh(_sector, mesh.commit(), paint, Vector3.ZERO)
 
 
-func _build_planet(cool: bool, fringe: bool) -> void:
+func _build_gas_giant(cool: bool, fringe: bool) -> void:
 	_backdrop_planet = Node3D.new()
 	_sector.add_child(_backdrop_planet)
-	var display_scale := 1.65 if cool else 1.0
-	var initial_center := Vector3(1125, -330, -3370) if cool else Vector3(-1450, -475, -2900)
-	if fringe:
-		display_scale = 1.18
-		initial_center = Vector3(1480, -620, -2570)
-	var star_center: Vector3 = Catalog.site(_star_id).center
-	_backdrop_planet.scale = Vector3.ONE * display_scale
-	_backdrop_orbit_offset = initial_center * display_scale - star_center
-	_backdrop_orbit_axis = _backdrop_orbit_offset.cross(Vector3.UP).normalized()
+	var physical := _gas_giant_id >= 0
+	_backdrop_planet.name = "GasGiant_%d" % _gas_giant_id if physical else "DistantGasGiant"
+	if not physical:
+		var display_scale := 1.65 if cool else 1.0
+		var initial_center := Vector3(1125, -330, -3370) if cool else Vector3(-1450, -475, -2900)
+		if fringe:
+			display_scale = 1.18
+			initial_center = Vector3(1480, -620, -2570)
+		var star_center: Vector3 = Catalog.site(_star_id).center
+		_backdrop_planet.scale = Vector3.ONE * display_scale
+		_backdrop_orbit_offset = initial_center * display_scale - star_center
+		_backdrop_orbit_axis = _backdrop_orbit_offset.cross(Vector3.UP).normalized()
 
 	var sphere := SphereMesh.new()
-	sphere.radius = 870.0
-	sphere.height = 1740.0
+	sphere.radius = float(Catalog.site(_gas_giant_id).radius) if physical else 870.0
+	sphere.height = sphere.radius * 2.0
 	sphere.radial_segments = 56
 	sphere.rings = 26
 	var shader := Shader.new()
@@ -865,6 +882,7 @@ uniform bool fringe = false;
 uniform sampler2D cloud_detail : repeat_enable, filter_linear_mipmap_anisotropic;
 uniform int cloud_quality = 1;
 uniform float weather_phase = 0.0;
+uniform vec3 light_direction = vec3(-0.6, 0.46, 0.72);
 varying vec3 surface_point;
 float strata(vec3 p) {
 	return sin(p.x * 21.0 + sin(p.z * 9.0) * 0.65) * cos(p.z * 18.0 + p.y * 13.0);
@@ -906,8 +924,7 @@ void fragment() {
 	}
 	vec3 bands = mix(low, high, m);
 	bands = mix(bands, high * 1.17, wisps * (0.38 + 0.62 * m));
-	vec3 light_dir = cool ? vec3(0.65, 0.54, 0.63) : vec3(-0.6, 0.46, 0.72);
-	float day = smoothstep(-0.23, 0.89, dot(p, normalize(light_dir)));
+	float day = smoothstep(-0.23, 0.89, dot(p, normalize(light_direction)));
 	float rim = pow(1.0 - clamp(dot(normalize(NORMAL), VIEW), 0.0, 1.0), 4.0);
 	vec3 haze = fringe ? vec3(0.56, 0.63, 0.28) : (cool ? vec3(0.26, 0.44, 0.70) : vec3(0.17, 0.36, 0.44));
 	ALBEDO = bands * (0.105 + day * 0.75) + rim * haze * (0.15 + day * 0.75);
@@ -917,8 +934,12 @@ void fragment() {
 	_backdrop_material.shader = shader
 	_backdrop_material.set_shader_parameter("cool", cool)
 	_backdrop_material.set_shader_parameter("fringe", fringe)
+	_backdrop_material.set_shader_parameter("light_direction", Vector3(0.65, 0.54, 0.63) if cool else Vector3(-0.6, 0.46, 0.72))
 	_backdrop_material.set_shader_parameter("cloud_detail", preload("res://assets/materials/cloud_bands.png"))
 	_mesh(_backdrop_planet, sphere, _backdrop_material, Vector3.ZERO)
+	if physical:
+		# The live atmosphere is rendered at the density and size used in flight.
+		return
 	var air := SphereMesh.new()
 	air.radius = 894.0
 	air.height = 1788.0

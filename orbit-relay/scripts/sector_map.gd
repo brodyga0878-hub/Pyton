@@ -69,6 +69,7 @@ var _orbit_note: Label
 var _orbit_button: Button
 var _close_button: Button
 var _select_button: Button
+var _home_scoop_sites: HBoxContainer
 var _site_buttons: Dictionary[int, Button] = {}
 var _touches: Dictionary[int, Button] = {}
 var _touch_sites: Dictionary[int, int] = {}
@@ -148,7 +149,14 @@ func build() -> void:
 			_add_site(list, id)
 		for id: int in Sector.mines_for(system_id):
 			_add_site(list, id)
-		_add_site(list, Sector.star_for(system_id))
+		if system_id == Sector.HOME_SYSTEM:
+			_home_scoop_sites = HBoxContainer.new()
+			_home_scoop_sites.add_theme_constant_override("separation", 4)
+			list.add_child(_home_scoop_sites)
+			_add_site(_home_scoop_sites, Sector.star_for(system_id))
+			_add_site(_home_scoop_sites, Sector.GAS_GIANT_ID)
+		else:
+			_add_site(list, Sector.star_for(system_id))
 	_convoy_order = VBoxContainer.new()
 	_convoy_order.add_theme_constant_override("separation", 3)
 	list.add_child(_convoy_order)
@@ -187,9 +195,9 @@ func _build_trajectory_panel(parent: PanelContainer) -> void:
 	_trajectory_panel.add_child(focus_choices)
 	_add_focus_button(focus_choices, -1, "Звезда")
 	for system_id in range(Sector.SYSTEM_COUNT):
-		for id: int in Sector.mines_for(system_id):
+		for id: int in Sector.targets_for(system_id):
 			var body := Sector.site(id)
-			if body.kind in ["planet", "moon"]:
+			if body.kind in ["planet", "moon", "gas"]:
 				_add_focus_button(focus_choices, id, str(body.name))
 	_orbit_state = _label(_trajectory_panel, "", 18, TEXT)
 	_orbit_state.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -299,6 +307,7 @@ func open(sim: RefCounted) -> void:
 	var here := _current_site()
 	_here.text = "В полёте" if here < 0 else str(Sector.site(here).name)
 	var targets: Array = sim.local_targets()
+	_home_scoop_sites.visible = system_id == Sector.HOME_SYSTEM
 	for id: int in _site_buttons:
 		_site_buttons[id].visible = targets.has(id)
 	for id: int in _focus_buttons:
@@ -357,11 +366,12 @@ func is_open() -> bool:
 	return is_instance_valid(_sheet) and visible
 
 
-func _add_site(parent: VBoxContainer, id: int) -> void:
+func _add_site(parent: Container, id: int) -> void:
 	var site = Sector.site(id)
 	var button := _button(parent, str(site.name), 39)
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	button.clip_text = true
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.toggle_mode = true
 	button.pressed.connect(_select_site.bind(id))
 	_site_buttons[id] = button
@@ -398,6 +408,11 @@ func _select_site(id: int) -> void:
 		]
 	elif entry.kind == "star":
 		_detail.text += "\nСбор в %d–%d м от центра\nСкорость до %d м/с" % [Sector.SCOOP_INNER, Sector.SCOOP_OUTER, Sector.SCOOP_SPEED]
+	elif Sector.is_gas_giant(id):
+		var atmosphere := Atmosphere.profile(id)
+		_detail.text += "\nСбор водорода в облаках · без посадки"
+		if not atmosphere.is_empty():
+			_detail.text += "\nТолщина атмосферы · %d м" % roundi(float(atmosphere.height))
 	else:
 		var remaining: int = _flight.mining.reserve_at(id)
 		_detail.text += "\n%s · %d ед. в залежи" % [Sector.resource_name(entry.resource), remaining]
@@ -947,6 +962,11 @@ class SectorChart extends Control:
 				draw_circle(marker, 12.0, tint, true, -1.0, true)
 				draw_line(marker + Vector2(-10, 4), marker + Vector2(10, -4), tint.darkened(0.34), 2.5, true)
 				draw_arc(marker, 12.0, 0.0, TAU, 32, tint.lightened(0.38), 1.4, true)
+			elif entry.kind == "gas":
+				draw_circle(marker, 13.0, tint, true, -1.0, true)
+				for stripe: int in [-5, 0, 5]:
+					draw_line(marker + Vector2(-11, stripe), marker + Vector2(11, stripe), tint.darkened(0.34), 1.7, true)
+				draw_arc(marker, 13.0, 0.0, TAU, 36, tint.lightened(0.32), 1.4, true)
 			else:
 				draw_colored_polygon(PackedVector2Array([marker + Vector2(-8, 3), marker + Vector2(-3, -8), marker + Vector2(7, -3), marker + Vector2(6, 7)]), tint)
 			_draw_site_label(font, str(entry.name), marker, label_boxes)

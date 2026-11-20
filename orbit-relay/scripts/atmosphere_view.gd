@@ -36,7 +36,7 @@ func setup(system_id: int) -> void:
 	_shell_meshes.clear()
 	_shell_paints.clear()
 	_system = system_id
-	for site_id: int in Catalog.mines_for(system_id):
+	for site_id: int in Catalog.targets_for(system_id):
 		var profile: Dictionary = Atmosphere.profile(site_id)
 		if profile.is_empty():
 			continue

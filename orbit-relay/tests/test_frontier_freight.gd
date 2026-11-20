@@ -197,6 +197,11 @@ func _test_legacy_migration(flight: Flight) -> void:
 	for version in [16, 17]:
 		var legacy := _json(flight.snapshot())
 		legacy.schema = version
+		legacy.ship.erase("jump_fuel")
+		legacy.mining.cargo.erase("hydrogen")
+		legacy.mining.reserves.resize(Catalog.PRE_GAS_DESTINATION_COUNT)
+		for stocks: Dictionary in legacy.market.values():
+			stocks.erase("hydrogen")
 		legacy.freight.ships = legacy.freight.ships.slice(0, 6)
 		legacy.freight.erase("frontier_epochs")
 		if version < 17:
@@ -205,7 +210,7 @@ func _test_legacy_migration(flight: Flight) -> void:
 		legacy.market[str(HEATHER_PORT)].medical = 10.0
 		var resumed := Flight.new()
 		if not _expect(resumed.restore(legacy) and resumed.freight.frontier_active(HEATHER) and resumed.freight.frontier_active(LIMIT)
-			and _json(resumed.market.snapshot()) == legacy.market and resumed.freight.snapshot().frontier_epochs == [flight.orbit_time, flight.orbit_time]
+			and _market_without_hydrogen(resumed) == legacy.market and resumed.freight.snapshot().frontier_epochs == [flight.orbit_time, flight.orbit_time]
 			and is_equal_approx(_route(resumed, HEATHER_SHIP, SVOD).departure_eta, FIRST_LOAD),
 			"Schema %d upgrades its old six ships and adds both new services at the save epoch without transfers" % version):
 			continue
@@ -326,3 +331,10 @@ func _expect(condition: bool, description: String) -> bool:
 	if not condition:
 		_failures.append(description)
 	return condition
+
+
+func _market_without_hydrogen(flight: Flight) -> Dictionary:
+	var stocks := _json(flight.market.snapshot())
+	for inventory: Dictionary in stocks.values():
+		inventory.erase("hydrogen")
+	return stocks

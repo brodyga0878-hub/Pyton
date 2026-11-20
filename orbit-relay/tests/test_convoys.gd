@@ -76,6 +76,11 @@ func _test_offers_and_migration(campaign: Dictionary) -> void:
 		"An order must be booked at an operational dock")
 	var old := _json(campaign)
 	old.schema = 11
+	old.ship.erase("jump_fuel")
+	old.mining.cargo.erase("hydrogen")
+	old.mining.reserves.resize(Catalog.PRE_GAS_DESTINATION_COUNT)
+	for stocks: Dictionary in old.market.values():
+		stocks.erase("hydrogen")
 	old.ship.erase("heat_shield")
 	old.erase("convoy_order")
 	for record: Dictionary in old.factions.frontiers:

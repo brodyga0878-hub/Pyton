@@ -80,28 +80,28 @@ func _test_planner() -> void:
 
 func _test_fuel_preview_and_overrides() -> void:
 	var flight := _known_flight()
-	var fuel := flight.ship.fuel
+	var fuel := flight.ship.jump_fuel
 	var unplanned := flight.snapshot()
 	var preview := flight.route_preview(LIMIT)
 	_expect(preview.available and preview.path == [HOME, VELAR, LIMIT] and flight.snapshot() == unplanned,
 		"The newly reachable relay preview neither arms a jump nor mutates the save")
 	if not _expect(flight.plan_route(LIMIT) and flight.jump_target == VELAR
-		and flight.planned_route().path == preview.path and flight.ship.fuel == fuel and not flight.start_jump(),
+		and flight.planned_route().path == preview.path and flight.ship.jump_fuel == fuel and not flight.start_jump(),
 		"Planning commits the next target while the ship remains docked and its fuel is unchanged"):
 		return
 	var active := flight.snapshot()
 	_expect(not flight.plan_route(HOME) and not flight.plan_route(Catalog.SYSTEM_COUNT) and flight.snapshot() == active,
 		"Invalid goals leave the existing valid route and fuel intact")
-	_expect(flight.service_action("refuel") and flight.ship.fuel == flight.ship.capacity()
+	_expect(flight.service_action("jump_refuel") and flight.ship.jump_fuel == flight.ship.jump_capacity()
 		and flight.planned_route().path == [HOME, VELAR, LIMIT] and flight.route_preview(LIMIT).path == [HOME, LIMIT],
 		"Topping up allows a new direct preview but does not silently replace the activated route")
 	_expect(flight.plan_jump(FRINGE) and flight.planned_route().path == [HOME, FRINGE]
 		and flight.snapshot().jump_route.is_empty(),
 		"Explicit direct planning used by mission workflows replaces the stored chain")
 	_expect(flight.cancel_route() and not flight.cancel_route() and flight.jump_target == -1
-		and not flight.planned_route().available and flight.ship.fuel == flight.ship.capacity(),
+		and not flight.planned_route().available and flight.ship.jump_fuel == flight.ship.jump_capacity(),
 		"Cancel removes the route idempotently and has no fuel cost")
-	flight.ship.fuel = 5.0
+	flight.ship.jump_fuel = 5.0
 	_expect(flight.route_preview(LIMIT).path == [HOME, LIMIT] and flight.plan_route(LIMIT)
 		and flight.jump_target == LIMIT and not flight.jump_status(LIMIT).ok,
 		"If no departure is affordable, the map still plans the capacity-valid route for after refuelling")
@@ -112,41 +112,41 @@ func _test_hops_and_refuel() -> void:
 	if not _expect(flight.plan_route(LIMIT) and _depart(flight), "Launch and clear the source dock with the real relay selected"):
 		return
 	var cost := Catalog.jump_cost(HOME, VELAR)
-	var earliest := flight.ship.fuel
+	var earliest := flight.ship.jump_fuel
 	if not _expect(flight.start_jump() and not flight.cancel_route() and not flight.plan_jump(FRINGE)
 		and not flight.plan_route(HEATHER), "An active charge cannot silently change goals or cancel its itinerary"):
 		return
 	_tick(flight, 1.0)
-	_expect(flight.system_id == HOME and flight.ship.fuel == earliest and flight.planned_route().path == [HOME, VELAR, LIMIT],
+	_expect(flight.system_id == HOME and flight.ship.jump_fuel == earliest and flight.planned_route().path == [HOME, VELAR, LIMIT],
 		"Charging the first leg does not debit fuel or consume any destination before commit")
 	var saved := _json(flight.snapshot())
 	var resumed := Flight.new()
-	if not _expect(resumed.restore(saved) and resumed.jump_seconds_left == 0.0 and resumed.ship.fuel == earliest
+	if not _expect(resumed.restore(saved) and resumed.jump_seconds_left == 0.0 and resumed.ship.jump_fuel == earliest
 		and resumed.planned_route().path == [HOME, VELAR, LIMIT] and saved.jump_route == [float(VELAR), float(LIMIT)],
 		"A cold restore during charging keeps both frozen legs and clears only the transient countdown"):
 		return
 	flight.cancel_jump()
-	_expect(flight.ship.fuel == earliest and flight.planned_route().path == [HOME, VELAR, LIMIT],
+	_expect(flight.ship.jump_fuel == earliest and flight.planned_route().path == [HOME, VELAR, LIMIT],
 		"Aborting a jump leaves both its fare and the route intact")
 	if not _expect(resumed.start_jump(), "A restored route can be confirmed explicitly again"):
 		return
 	_tick(resumed, 3.0)
-	if not _expect(resumed.system_id == VELAR and is_equal_approx(resumed.ship.fuel, earliest - cost)
+	if not _expect(resumed.system_id == VELAR and is_equal_approx(resumed.ship.jump_fuel, earliest - cost)
 		and resumed.jump_target == LIMIT and resumed.jump_seconds_left == 0.0 and resumed.planned_route().path == [VELAR, LIMIT],
 		"Arrival charges only the first fare and selects the next hop without starting it"):
 		return
-	var before_delay := resumed.ship.fuel
+	var before_delay := resumed.ship.jump_fuel
 	_tick(resumed, 5.0)
-	_expect(resumed.system_id == VELAR and resumed.ship.fuel == before_delay and not resumed.start_jump(),
+	_expect(resumed.system_id == VELAR and resumed.ship.jump_fuel == before_delay and not resumed.start_jump(),
 		"The second leg waits for both a deliberate command and sufficient new fuel")
 	var arrival_port: int = Catalog.system(VELAR).arrival_port
 	if not _expect(_dock_at(resumed, arrival_port) and resumed.planned_route().path == [VELAR, LIMIT],
 		"The explicit route survives actual automatic docking at its relay port"):
 		return
-	var fee: int = resumed.service_offer("refuel").cost
+	var fee: int = resumed.service_offer("jump_refuel").cost
 	var prior_balance := resumed.credits
-	if not _expect(fee > 0 and resumed.service_action("refuel") and resumed.credits == prior_balance - fee
-		and resumed.ship.fuel == resumed.ship.capacity() and not resumed.start_jump(),
+	if not _expect(fee > 0 and resumed.service_action("jump_refuel") and resumed.credits == prior_balance - fee
+		and resumed.ship.jump_fuel == resumed.ship.jump_capacity() and not resumed.start_jump(),
 		"The relay's normal services refill the tank and enforce takeoff before continuing"):
 		return
 	var parked_copy := Flight.new()
@@ -154,12 +154,12 @@ func _test_hops_and_refuel() -> void:
 		and parked_copy.planned_route().path == [VELAR, LIMIT] and _depart(parked_copy),
 		"A refuel stop saves and restores the remaining route with no replayed first jump"):
 		return
-	var next_fuel := parked_copy.ship.fuel
+	var next_fuel := parked_copy.ship.jump_fuel
 	if not _expect(parked_copy.start_jump(), "Confirm the second jump after taking off and clearing the relay"):
 		return
 	_tick(parked_copy, 3.0)
 	_expect(parked_copy.system_id == LIMIT and parked_copy.jump_target == -1 and not parked_copy.planned_route().available
-		and is_equal_approx(parked_copy.ship.fuel, next_fuel - Catalog.jump_cost(VELAR, LIMIT)),
+		and is_equal_approx(parked_copy.ship.jump_fuel, next_fuel - Catalog.jump_cost(VELAR, LIMIT)),
 		"The last jump debits its own tariff once and clears the completed route")
 
 
@@ -186,6 +186,12 @@ func _test_save_guards() -> void:
 		"A saved route cannot reveal or use an undiscovered frontier")
 	var older := encoded.duplicate(true)
 	older.schema = 16
+	older.ship.fuel = older.ship.jump_fuel
+	older.ship.erase("jump_fuel")
+	older.mining.cargo.erase("hydrogen")
+	older.mining.reserves.resize(Catalog.PRE_GAS_DESTINATION_COUNT)
+	for stocks: Dictionary in older.market.values():
+		stocks.erase("hydrogen")
 	older.jump_target = LIMIT
 	older.erase("jump_route")
 	older.freight.erase("frontier_epochs")
@@ -259,7 +265,7 @@ func _known_flight() -> Flight:
 	flight.freight.activate_frontier(HEATHER, 0.0)
 	flight.freight.activate_frontier(LIMIT, 0.0)
 	saved.freight = flight.freight.snapshot()
-	saved.ship.fuel = 34.0
+	saved.ship.jump_fuel = 34.0
 	saved.credits = 1000
 	_expect(flight.restore(saved), "Prepare an existing game with both frontier systems discovered and a partly filled tank")
 	return flight

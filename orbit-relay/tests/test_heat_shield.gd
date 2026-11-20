@@ -131,6 +131,11 @@ func _test_migration() -> void:
 			"A malformed equipment flag is rejected without mutating the restored flight")
 	var previous := saved.duplicate(true)
 	previous.schema = 14
+	previous.ship.erase("jump_fuel")
+	previous.mining.cargo.erase("hydrogen")
+	previous.mining.reserves.resize(Catalog.PRE_GAS_DESTINATION_COUNT)
+	for stocks: Dictionary in previous.market.values():
+		stocks.erase("hydrogen")
 	previous.ship.erase("heat_shield")
 	_expect(reopened.restore(previous) and not reopened.ship.heat_shield and reopened.ship.entry_heat_factor() == 1.0
 		and reopened.credits == 551 and reopened.entry_heat == flight.entry_heat and is_equal_approx(reopened.star_heat, 12.25),

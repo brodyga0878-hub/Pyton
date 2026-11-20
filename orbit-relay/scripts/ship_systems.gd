@@ -3,6 +3,7 @@ extends RefCounted
 
 const BASE_CAPACITY := 100.0
 const EXTRA_CAPACITY := 50.0
+const HYDROGEN_UNITS_PER_CANISTER := 10
 const TANK_COST := 260
 const ECO_COST := 320
 const CARGO_COST := 300
@@ -14,9 +15,11 @@ const MAX_HULL := 100.0
 const MIN_HULL := 1.0
 const LEGACY_SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded"]
 const PRE_SHIELD_SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded"]
-const SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded", "heat_shield"]
+const PRE_DUAL_FUEL_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded", "heat_shield"]
+const SAVE_FIELDS := ["fuel", "jump_fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded", "heat_shield"]
 
 var fuel: float = BASE_CAPACITY
+var jump_fuel: float = BASE_CAPACITY
 var tank_upgraded := false
 var eco_upgraded := false
 var hull: float = MAX_HULL
@@ -26,6 +29,10 @@ var heat_shield := false
 
 func capacity() -> float:
 	return BASE_CAPACITY + EXTRA_CAPACITY if tank_upgraded else BASE_CAPACITY
+
+
+func jump_capacity() -> float:
+	return capacity()
 
 
 func cargo_capacity() -> int:
@@ -56,8 +63,20 @@ func add_fuel(amount: float) -> float:
 	return fuel - previous
 
 
+func add_jump_fuel(amount: float) -> float:
+	if amount <= 0.0 or not is_finite(amount):
+		return 0.0
+	var previous := jump_fuel
+	jump_fuel = minf(jump_capacity(), jump_fuel + amount)
+	return jump_fuel - previous
+
+
 func quote_refill(unit_price: int) -> int:
 	return _service_cost(ceili(capacity() - fuel), unit_price)
+
+
+func quote_jump_refill(unit_price: int) -> int:
+	return _service_cost(ceili(jump_capacity() - jump_fuel), unit_price)
 
 
 func quote_repair(unit_price: int) -> int:
@@ -87,6 +106,8 @@ func service_offer(action: String, unit_price: int, credits: int) -> Dictionary:
 	match action:
 		"refuel":
 			cost = quote_refill(unit_price)
+		"jump_refuel":
+			cost = quote_jump_refill(unit_price)
 		"repair":
 			cost = quote_repair(unit_price)
 		"tank":
@@ -111,6 +132,8 @@ func buy(action: String, unit_price: int, credits: int) -> int:
 	match action:
 		"refuel":
 			fuel = capacity()
+		"jump_refuel":
+			jump_fuel = jump_capacity()
 		"repair":
 			hull = MAX_HULL
 		"tank":
@@ -126,13 +149,18 @@ func buy(action: String, unit_price: int, credits: int) -> int:
 
 func snapshot() -> Dictionary:
 	return {
-		"fuel": fuel, "tank_upgraded": tank_upgraded, "eco_upgraded": eco_upgraded,
+		"fuel": fuel, "jump_fuel": jump_fuel,
+		"tank_upgraded": tank_upgraded, "eco_upgraded": eco_upgraded,
 		"hull": hull, "cargo_upgraded": cargo_upgraded, "heat_shield": heat_shield,
 	}
 
 
-func restore(value: Variant, legacy := false, pre_shield := false) -> bool:
-	var fields := LEGACY_SAVE_FIELDS if legacy else (PRE_SHIELD_SAVE_FIELDS if pre_shield else SAVE_FIELDS)
+func restore(value: Variant, legacy := false, pre_shield := false, pre_dual_fuel := false) -> bool:
+	var fields := PRE_DUAL_FUEL_FIELDS if pre_dual_fuel else SAVE_FIELDS
+	if legacy:
+		fields = LEGACY_SAVE_FIELDS
+	elif pre_shield:
+		fields = PRE_SHIELD_SAVE_FIELDS
 	if not value is Dictionary or value.size() != fields.size() or not value.has_all(fields):
 		return false
 	if not value.tank_upgraded is bool or not value.eco_upgraded is bool:
@@ -145,6 +173,13 @@ func restore(value: Variant, legacy := false, pre_shield := false) -> bool:
 	var restored_capacity := BASE_CAPACITY + EXTRA_CAPACITY if value.tank_upgraded else BASE_CAPACITY
 	if not is_finite(restored_fuel) or restored_fuel < 0.0 or restored_fuel > restored_capacity:
 		return false
+	var restored_jump_fuel := restored_fuel
+	if not (legacy or pre_shield or pre_dual_fuel):
+		if not (value.jump_fuel is float or value.jump_fuel is int):
+			return false
+		restored_jump_fuel = float(value.jump_fuel)
+		if not is_finite(restored_jump_fuel) or restored_jump_fuel < 0.0 or restored_jump_fuel > restored_capacity:
+			return false
 	var restored_hull := MAX_HULL
 	var restored_cargo_upgrade := false
 	if not legacy:
@@ -155,6 +190,7 @@ func restore(value: Variant, legacy := false, pre_shield := false) -> bool:
 			return false
 		restored_cargo_upgrade = value.cargo_upgraded
 	fuel = restored_fuel
+	jump_fuel = restored_jump_fuel
 	tank_upgraded = value.tank_upgraded
 	eco_upgraded = value.eco_upgraded
 	hull = restored_hull

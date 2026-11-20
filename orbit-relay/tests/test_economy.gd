@@ -169,12 +169,14 @@ func _test_legacy_save() -> void:
 	var flight := Flight.new()
 	if not _expect(flight.restore(_round_trip(legacy)), "A literal 0.39 save migrates into the economy version"):
 		return
-	_expect(flight.ship.fuel == 84.25 and flight.ship.tank_upgraded and flight.ship.eco_upgraded
+	_expect(flight.ship.fuel == 84.25 and flight.ship.jump_fuel == 84.25
+		and flight.ship.tank_upgraded and flight.ship.eco_upgraded
 		and flight.ship.hull == 100.0 and flight.mining.cargo_capacity == 24
 		and flight.credits == 188 and flight.deliveries == 2 and flight.contract_destination == 1,
 		"Migration initializes hull and the standard hold while keeping the established upgrades and freight")
 	_expect(flight.mining.cargo_amount("ore") == 12 and flight.mining.cargo_amount("circuits") == 0
-		and flight.mining.cargo_amount("medical") == 0 and flight.mining.reserve_at(2) == 108
+		and flight.mining.cargo_amount("medical") == 0 and flight.mining.cargo_amount(Economy.HYDROGEN) == 0
+		and flight.mining.reserve_at(2) == 108
 		and flight.market_quote("circuits", "buy", 1).stock == Flight.new().market_quote("circuits", "buy", 1).stock,
 		"Old mined resources, untouched market slots and starting station inventories migrate together")
 	var modern := flight.snapshot()

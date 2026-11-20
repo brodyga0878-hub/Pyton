@@ -7,6 +7,9 @@ const Orbit = preload("res://scripts/orbit_ephemeris.gd")
 # Multiply radius cubed by a scaled density to get mu in game units (m^3/s^2).
 const PLANET_DENSITY := 0.00022
 const MOON_DENSITY := 0.00010
+const GAS_GIANT_DENSITY := 0.000024
+const GAS_FULL_GRAVITY_RADII := 2.4
+const GAS_FIELD_RADII := 3.0
 const MIN_SOURCE_RADIUS := 0.001
 
 
@@ -14,11 +17,13 @@ class Attractor:
 	var site: int
 	var radius: float
 	var mu: float
+	var localized: bool
 
-	func _init(site_id: int, source_radius: float, gravity: float) -> void:
+	func _init(site_id: int, source_radius: float, gravity: float, local_field := false) -> void:
 		site = site_id
 		radius = source_radius
 		mu = gravity
+		localized = local_field
 
 
 static var _attractors: Array[Array] = _build_attractors()
@@ -29,9 +34,12 @@ static func gravity_parameter(site_id: int) -> float:
 	var kind: String = site.get("kind", "")
 	if kind == "star":
 		return Orbit.GRAVITY_PARAMETERS[Catalog.system_of_site(site_id)]
-	if kind != "planet" and kind != "moon":
-		return 0.0
-	var density := PLANET_DENSITY if kind == "planet" else MOON_DENSITY
+	var density := 0.0
+	match kind:
+		"planet": density = PLANET_DENSITY
+		"moon": density = MOON_DENSITY
+		"gas": density = GAS_GIANT_DENSITY
+		_: return 0.0
 	var radius: float = site.radius
 	return density * radius * radius * radius
 
@@ -42,7 +50,7 @@ static func acceleration(sim: RefCounted, point: Vector3) -> Vector3:
 		return Vector3.ZERO
 	var total := Vector3.ZERO
 	for source: Attractor in _attractors[system]:
-		total += point_acceleration(point, sim.target_position(source.site), source.mu, source.radius)
+		total += _source_acceleration(source, point, sim.target_position(source.site))
 	return total
 
 
@@ -52,8 +60,19 @@ static func acceleration_at_epoch(system: int, point: Vector3, epoch: float) -> 
 	var total := Vector3.ZERO
 	for source: Attractor in _attractors[system]:
 		var center: Vector3 = Orbit.sample(source.site, epoch).position
-		total += point_acceleration(point, center, source.mu, source.radius)
+		total += _source_acceleration(source, point, center)
 	return total
+
+
+static func _source_acceleration(source: Attractor, point: Vector3, center: Vector3) -> Vector3:
+	var weight := 1.0
+	if source.localized:
+		# Retain the local well without perturbing legacy trajectories elsewhere.
+		var relative_radius := point.distance_to(center) / source.radius
+		if relative_radius >= GAS_FIELD_RADII:
+			return Vector3.ZERO
+		weight -= smoothstep(GAS_FULL_GRAVITY_RADII, GAS_FIELD_RADII, relative_radius)
+	return point_acceleration(point, center, source.mu * weight, source.radius)
 
 
 static func point_acceleration(point: Vector3, center: Vector3, mu: float, min_radius: float) -> Vector3:
@@ -75,6 +94,6 @@ static func _build_attractors() -> Array[Array]:
 				continue
 			var mu := gravity_parameter(site_id)
 			if mu > 0.0:
-				sources.append(Attractor.new(site_id, Catalog.site(site_id).radius, mu))
+				sources.append(Attractor.new(site_id, Catalog.site(site_id).radius, mu, Catalog.is_gas_giant(site_id)))
 		by_system.append(sources)
 	return by_system

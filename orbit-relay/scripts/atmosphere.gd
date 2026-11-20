@@ -11,6 +11,7 @@ const HEAT_REFERENCE_SPEED := 44.0
 const HEAT_SCALE := 85.0
 const MAX_HEAT_TARGET := 210.0
 const PROFILES := {
+	Catalog.GAS_GIANT_ID: {"height": 100.0, "density": 1.75, "color": Color("#edb37e")},
 	Catalog.TERRACE_ID: {"height": 46.0, "density": 1.0, "color": Color("#87bdff")},
 	Catalog.HEATHER_PLANET: {"height": 38.0, "density": 1.18, "color": Color("#d9b77e")},
 	Catalog.LIMIT_PLANET: {"height": 41.0, "density": 0.82, "color": Color("#9bcadf")},

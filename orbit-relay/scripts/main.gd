@@ -63,6 +63,8 @@ func _ready() -> void:
 	add_child(_services)
 	_services.build()
 	_services.service_requested.connect(_service_purchase)
+	_services.transfer_requested.connect(_fuel_transfer)
+	_services.jettison_requested.connect(_jettison_cargo)
 	_services.dismissed.connect(_close_services)
 	add_child(_market)
 	_market.build()
@@ -196,6 +198,10 @@ func _handle_action(action: String) -> void:
 				_hud.set_input_enabled(false)
 				_services.open(flight)
 			return
+		"fuel":
+			_hud.set_input_enabled(false)
+			_services.open(flight, true)
+			return
 		"market":
 			if flight.docked >= 0:
 				_hud.set_input_enabled(false)
@@ -245,6 +251,7 @@ func _deliver_notice() -> void:
 		"planned_target": flight.planned_target, "speed": flight.speed(), "credits": flight.credits,
 		"mining_phase": flight.mining.phase, "cargo_units": flight.mining.ore_hold,
 		"fuel": flight.ship.fuel, "scooping": flight.scooping, "star_heat": flight.star_heat,
+		"jump_fuel": flight.ship.jump_fuel, "hydrogen_canisters": flight.mining.cargo_amount("hydrogen"),
 		"entry_heat": flight.entry_heat, "heat_shield": flight.ship.heat_shield,
 		"gear_extension": flight.gear_extension, "gear_deployed": flight.gear_deployed,
 		"flight_assist": flight.flight_assist,
@@ -263,7 +270,8 @@ func _deliver_notice() -> void:
 	if event in [
 		"launch", "dock", "land", "lift", "contract", "delivery", "mining_deploy", "mining_recover",
 		"mining_ready", "mining_loaded", "ore_sold", "service_refuel", "service_tank", "service_eco",
-		"scoop_full", "scoop_stop", "star_arrival", "fuel_empty", "thermal_damage",
+		"scoop_full", "scoop_stop", "star_arrival", "gas_arrival", "fuel_empty", "thermal_damage",
+		"fuel_transfer", "service_jump_refuel", "cargo_jettisoned",
 		"atmosphere_enter", "atmosphere_exit", "atmosphere_damage",
 		"gear_deploy", "gear_retract", "gear_ready", "gear_stowed",
 		"service_heat_shield",
@@ -335,7 +343,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_N: "map", KEY_J: "galaxy", KEY_K: "scoop", KEY_P: "services", KEY_O: "time", KEY_L: "market",
 		KEY_U: "patrol", KEY_X: "fire", KEY_I: "convoy", KEY_H: "flight_assist",
 		KEY_F2: "settings", KEY_F3: "journal", KEY_F4: "frontier",
-		KEY_F5: "dock_sync", KEY_Y: "gear",
+		KEY_F5: "dock_sync", KEY_Y: "gear", KEY_C: "fuel",
 	}
 	if actions.has(event.physical_keycode):
 		_handle_action(actions[event.physical_keycode])
@@ -559,6 +567,24 @@ func _service_purchase(action: String) -> void:
 	if not _services.is_open():
 		return
 	flight.service_action(action)
+	_deliver_notice()
+	_services.refresh()
+	_update_display(0.0)
+
+
+func _fuel_transfer(destination: String) -> void:
+	if not _services.is_open():
+		return
+	flight.fuel_transfer(destination)
+	_deliver_notice()
+	_services.refresh()
+	_update_display(0.0)
+
+
+func _jettison_cargo(good: String) -> void:
+	if not _services.is_open():
+		return
+	flight.jettison_cargo(good)
 	_deliver_notice()
 	_services.refresh()
 	_update_display(0.0)

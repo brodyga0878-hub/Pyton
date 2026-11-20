@@ -74,7 +74,7 @@ func status(sim: RefCounted) -> Dictionary:
 		result.caption = "Передать отчёт"
 		result.reason = "Вернитесь с отчётом в порт «%s»." % Catalog.site(port).name
 		if sim.system_id == system:
-			result.reason += " Топливо для обратного прыжка можно собрать у звезды."
+			result.reason += " Для обратного прыжка соберите водород у звезды и перелейте его в прыжковый запас."
 		return result
 	var area := Catalog.system(system)
 	var site := -1
@@ -98,8 +98,8 @@ func status(sim: RefCounted) -> Dictionary:
 		result.reason = "Выполните прыжок в систему «%s»." % area.name
 		if phase == SURVEY:
 			result.reason += " Действующего порта там пока нет."
-		elif sim.ship.fuel < Catalog.jump_cost(sim.system_id, system) + 5:
-			result.reason += " Топливо можно бесплатно собрать у местной звезды."
+		elif sim.ship.jump_fuel < Catalog.jump_cost(sim.system_id, system):
+			result.reason += " Водород можно собрать у местной звезды и перелить в прыжковый запас."
 		return result
 	var point: Vector3 = sim.target_gate(site)
 	if phase == BUILD:

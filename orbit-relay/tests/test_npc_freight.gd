@@ -185,15 +185,20 @@ func _test_interval_and_migration() -> void:
 	_set_stock(historical, 0, "circuits", 37)
 	var old := _json(historical.snapshot())
 	old.schema = 15
+	old.ship.erase("jump_fuel")
+	old.mining.cargo.erase("hydrogen")
+	old.mining.reserves.resize(Catalog.PRE_GAS_DESTINATION_COUNT)
+	for stocks: Dictionary in old.market.values():
+		stocks.erase("hydrogen")
 	old.orbit_time = 1234.25
 	old.elapsed = 1234.25
 	old.erase("freight")
-	if not _expect(historical.restore(old) and _json(historical.market.snapshot()) == old.market
+	if not _expect(historical.restore(old) and _market_without_hydrogen(historical) == old.market
 		and historical.orbit_time == 1234.25 and is_equal_approx(_service(historical, HOME, 0).departure_eta, FIRST_DEPARTURE),
 		"Migrating an older save preserves its market and schedules new deliveries from the saved epoch"):
 		return
 	_tick(historical, FIRST_DEPARTURE - 0.25)
-	_expect(_json(historical.market.snapshot()) == old.market and not _service(historical, HOME, 0).in_transit,
+	_expect(_market_without_hydrogen(historical) == old.market and not _service(historical, HOME, 0).in_transit,
 		"Migrated time does not retroactively replay old transactions")
 	_tick(historical, 0.5)
 	_expect(historical.market.stock(0, "circuits") == 37 - NpcFreight.CAPACITY and _service(historical, HOME, 0).in_transit,
@@ -354,3 +359,10 @@ func _expect(condition: bool, description: String) -> bool:
 	if not condition:
 		_failures.append(description)
 	return condition
+
+
+func _market_without_hydrogen(flight: Flight) -> Dictionary:
+	var stocks := _json(flight.market.snapshot())
+	for inventory: Dictionary in stocks.values():
+		inventory.erase("hydrogen")
+	return stocks
