@@ -21,9 +21,34 @@ class Profile:
 	var base_height: float
 	var crater_directions: Array[Vector3] = []
 	var crater_widths: Array[float] = []
+	var spin_axis := Vector3.UP
+	var spin_rate := 0.0
+	var spin_period := 0.0
 
 
 static var _profiles: Dictionary[int, Profile] = _build_profiles()
+
+
+static func spin_rate(id: int) -> float:
+	var profile: Profile = _profiles.get(id)
+	return profile.spin_rate if profile != null else 0.0
+
+
+static func spin_basis(id: int, epoch: float) -> Basis:
+	# Body-local to inertial. At the reference epoch the landing pad faces +Z.
+	var profile: Profile = _profiles.get(id)
+	if profile == null or profile.spin_rate == 0.0 or epoch == 0.0 or not is_finite(epoch):
+		return Basis.IDENTITY
+	var angle := fposmod(epoch, profile.spin_period) * profile.spin_rate
+	return Basis(profile.spin_axis, angle)
+
+
+static func spin_velocity(id: int, world_offset: Vector3) -> Vector3:
+	# Velocity about the center only. Add its orbital velocity in the flight frame.
+	var profile: Profile = _profiles.get(id)
+	if profile == null or profile.spin_rate == 0.0 or not world_offset.is_finite():
+		return Vector3.ZERO
+	return profile.spin_axis.cross(world_offset) * profile.spin_rate
 
 
 static func point(id: int, direction: Vector3) -> Vector3:
@@ -188,5 +213,13 @@ static func _build_profiles() -> Dictionary[int, Profile]:
 			var reach := sqrt(1.0 - elevation * elevation)
 			profile.crater_directions.append(Vector3(cos(angle) * reach, sin(angle) * reach, elevation))
 			profile.crater_widths.append(random.randf_range(0.12, 0.26))
+		if Catalog.is_generated_system(Catalog.system_of_site(id)):
+			# A separate seed keeps rotation independent of terrain sampling and its artwork.
+			random.seed = int(entry.seed) ^ 0x5E4F9B2D
+			profile.spin_rate = random.randf_range(0.025, 0.052)
+			profile.spin_period = TAU / profile.spin_rate
+			var tilt := deg_to_rad(random.randf_range(6.0, 28.0))
+			var azimuth := random.randf_range(0.0, TAU)
+			profile.spin_axis = Vector3(cos(azimuth) * sin(tilt), cos(tilt), sin(azimuth) * sin(tilt)).normalized()
 		result[id] = profile
 	return result

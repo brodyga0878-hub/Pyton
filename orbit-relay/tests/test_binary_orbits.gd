@@ -185,6 +185,16 @@ func _check_secondary_limits(flight: Flight) -> void:
 	probe.ship.jump_fuel = probe.ship.jump_capacity()
 	_expect(probe.plan_jump(HOME) and not probe.jump_status(HOME).ok and not probe.start_jump()
 		and not probe.time_status().allowed, "The companion blocks jump charge and accelerated time within its shell")
+	var star := probe.target_position(COMPANION)
+	var approaching := probe.target_velocity(COMPANION).normalized()
+	probe.position = star + approaching * (Catalog.SCOOP_OUTER + 0.5)
+	probe.velocity = Vector3.ZERO
+	var fuel := probe.ship.jump_fuel
+	_expect(probe.position.distance_to(star) > Catalog.SCOOP_OUTER
+		and not probe.jump_status(HOME).ok and not probe.start_jump() and probe.ship.jump_fuel == fuel,
+		"Charge is blocked before ignition if the moving companion would overtake the ship during the countdown")
+	probe.position += approaching * 12.0
+	_expect(probe.jump_status(HOME).ok, "A safe interval beyond the companion permits charging again")
 	probe.position = probe.target_position(COMPANION) + Vector3.BACK * (Catalog.SCOOP_INNER - 28.0)
 	probe.velocity = probe.target_velocity(COMPANION)
 	_expect(not probe.scoop_status().ok and probe.thermal_status().danger

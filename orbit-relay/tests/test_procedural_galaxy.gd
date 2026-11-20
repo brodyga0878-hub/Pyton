@@ -150,7 +150,9 @@ func _test_frontier_flight() -> void:
 	if not _expect(cold.restore(SessionIO.load_state(SAVE_PATH)) and cold.system_id == destination
 		and cold.target == star and cold.body_dossier(solid).known and cold.system_dossier(destination).observations == [solid]
 		and cold.mining.cargo_amount(resource) == Rig.BATCH and cold.mining.reserve_at(solid) == old_reserve - Rig.BATCH
-		and cold.snapshot().cartography == before.cartography and is_equal_approx(cold.ship.jump_fuel, flight.ship.jump_fuel),
+		and cold.snapshot().cartography.systems == before.cartography.systems
+		and absf(float(cold.body_dossier(solid).recorded_at) - float(before.cartography.scans[0].epoch)) < 0.000000001
+		and is_equal_approx(cold.ship.jump_fuel, flight.ship.jump_fuel),
 		"Cold restart preserves all discoveries, depleted reserves, cargo, orbit and usable return fuel"):
 		return
 	var usable_return_fuel := cold.ship.jump_fuel

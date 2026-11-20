@@ -3,6 +3,7 @@ extends RefCounted
 
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const Orbit := preload("res://scripts/orbit_ephemeris.gd")
+const Terrain := preload("res://scripts/surface_terrain.gd")
 const Dynamics := preload("res://scripts/orbital_dynamics.gd")
 const Atmosphere := preload("res://scripts/atmosphere.gd")
 const Economy := preload("res://scripts/port_economy.gd")
@@ -215,7 +216,7 @@ static func _body_data(sim: RefCounted, site_id: int, site: Dictionary) -> Dicti
 		"atmosphere_density": float(atmosphere.get("density", 0.0)),
 		"resource": resource, "resource_name": Catalog.resource_name(resource) if not resource.is_empty() else "",
 		"reserve": sim.mining.reserve_at(site_id) if not resource.is_empty() else 0,
-		"spin": float(site.get("spin", 0.0)),
+		"spin": float(site.spin) if Catalog.is_port(site_id) else Terrain.spin_rate(site_id),
 	}
 
 

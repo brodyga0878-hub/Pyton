@@ -22,11 +22,12 @@ const DockAccess = preload("res://scripts/dock_access.gd")
 const Passengers = preload("res://scripts/passengers.gd")
 const Crew = preload("res://scripts/crew.gd")
 const Cartography = preload("res://scripts/cartography.gd")
-const SAVE_SCHEMA := 28
+const SAVE_SCHEMA := 29
 const SHIPYARD_PORTS := [0, 10, Catalog.FRINGE_ARRIVAL_PORT]
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
+const JUMP_BRAKE := 67.0
 const NAVIGATOR_JUMP_CHARGE := 2.2
 const JUMP_SPEED := 42.0
 const JUMP_CLEARANCE := 45.0
@@ -188,7 +189,7 @@ func relative_speed() -> float:
 	if docked >= 0 or landed:
 		return 0.0
 	var site := reference_site()
-	return speed_relative_to(site) if site >= 0 else speed()
+	return velocity.distance_to(_reference_velocity(site)) if site >= 0 else speed()
 
 
 func speed_relative_to(index: int) -> float:
@@ -353,21 +354,35 @@ func _orbital_state(index: int) -> Dictionary:
 	return _samples[index]
 
 
+func _surface_axis(index: int, epoch: float) -> Vector3:
+	return Terrain.spin_basis(index, epoch).z
+
+
 func target_gate(index: int) -> Vector3:
-	return target_position(index) + Vector3.BACK * float(Catalog.site(index).gate_offset)
+	return target_position(index) + _surface_axis(index, orbit_time) * float(Catalog.site(index).gate_offset)
 
 
 func target_contact(index: int) -> Vector3:
-	return target_position(index) + Vector3.BACK * float(Catalog.site(index).pad_offset)
+	return target_position(index) + _surface_axis(index, orbit_time) * float(Catalog.site(index).pad_offset)
+
+
+func surface_velocity(site: int, at_point: Vector3) -> Vector3:
+	return target_velocity(site) + Terrain.spin_velocity(site, at_point - target_position(site))
+
+
+func _reference_velocity(site: int) -> Vector3:
+	if Terrain.spin_rate(site) > 0.0 and position.distance_to(target_position(site)) <= float(Catalog.site(site).radius) + LANDING_GUIDE_HEIGHT:
+		return surface_velocity(site, position)
+	return target_velocity(site)
 
 
 func intercept_time(index: int) -> float:
 	if Catalog.system_of_site(index) != system_id:
 		return 0.0
 	var from_gate := target_gate(index) - position
-	var drift := target_velocity(index)
+	var drift := surface_velocity(index, target_gate(index))
 	var cruise := _cruise_limit(118.0)
-	var speed_difference := cruise * cruise - drift.length_squared()
+	var speed_difference := maxf(1.0, cruise * cruise - drift.length_squared())
 	var projection := from_gate.dot(drift)
 	return (projection + sqrt(projection * projection + speed_difference * from_gate.length_squared())) / speed_difference
 
@@ -830,7 +845,7 @@ func set_autopilot(enabled: bool) -> void:
 		var center := target_position(index)
 		var offset := position - center
 		var near_distance := float(Catalog.site(index).radius) + 48.0
-		if index != target and Catalog.is_mine_site(index) and offset.length_squared() < near_distance * near_distance and offset.normalized().dot(Vector3.BACK) < 0.96:
+		if index != target and Catalog.is_mine_site(index) and offset.length_squared() < near_distance * near_distance and (Terrain.spin_rate(index) > 0.0 or offset.normalized().dot(Vector3.BACK) < 0.96):
 			_departure_site = index
 			_departure_axis = offset.normalized()
 			_departure_leg = 1
@@ -1115,17 +1130,20 @@ func surface_status() -> Dictionary:
 	if docked >= 0 or landed or not Catalog.is_mine_site(target):
 		return status
 	var center := target_position(target)
-	var relative := position - center
+	var rotation := Terrain.spin_basis(target, orbit_time)
+	var relative := rotation.transposed() * (position - center)
 	var distance := relative.length()
 	if distance < 0.01 or distance > float(Catalog.site(target).radius) + FRAME_MARGIN:
 		return status
 	var pad_height := relative.z - float(Catalog.site(target).pad_offset)
 	var over_pad := relative.z > 0.0 and Vector2(relative.x, relative.y).length() <= LANDING_RADIUS
 	var direction := Vector3.BACK if over_pad else relative / distance
-	var normal := Terrain.normal(target, direction)
+	var local_normal := Terrain.normal(target, direction)
+	var normal := rotation * local_normal
 	var ground_radius := Terrain.radius_at(target, direction)
+	var ground_point := center + rotation * (direction * ground_radius)
 	var altitude := pad_height + Terrain.CONTACT_CLEARANCE if over_pad else distance - ground_radius
-	var relative_velocity := velocity - target_velocity(target)
+	var relative_velocity := velocity - surface_velocity(target, ground_point)
 	var speed := relative_velocity.length()
 	var alignment := clampf(forward().dot(-normal), -1.0, 1.0)
 	var height_ok := altitude >= Terrain.CONTACT_CLEARANCE - 0.1 and altitude <= (11.0 if over_pad else FREE_LANDING_MAX_HEIGHT)
@@ -1135,10 +1153,10 @@ func surface_status() -> Dictionary:
 	status.near = true
 	status.guide = altitude <= LANDING_GUIDE_HEIGHT and jump_seconds_left <= 0.0
 	status.altitude = altitude
-	status.slope = rad_to_deg(acos(clampf(normal.dot(direction), -1.0, 1.0)))
+	status.slope = rad_to_deg(acos(clampf(local_normal.dot(direction), -1.0, 1.0)))
 	status.pad = over_pad
 	status.direction = direction
-	status.ground_point = center + direction * ground_radius
+	status.ground_point = ground_point
 	status.surface_normal = normal
 	status.descent_speed = -relative_velocity.dot(normal)
 	status.drift_speed = relative_velocity.slide(normal).length()
@@ -1174,15 +1192,14 @@ func landed_offpad() -> bool:
 
 
 func landed_basis() -> Basis:
-	return Terrain.basis(landed_site, landing_direction) if landed else Basis.IDENTITY
+	return Terrain.spin_basis(landed_site, orbit_time) * Terrain.basis(landed_site, landing_direction) if landed else Basis.IDENTITY
 
 
 func surface_deposit() -> Transform3D:
 	if not landed:
 		return Transform3D(Basis.IDENTITY, position)
-	var deposit := Terrain.deposit(landed_site, landing_direction)
-	deposit.origin += target_position(landed_site)
-	return deposit
+	var surface := Transform3D(Terrain.spin_basis(landed_site, orbit_time), target_position(landed_site))
+	return surface * Terrain.deposit(landed_site, landing_direction)
 
 
 func dock_action() -> bool:
@@ -1879,7 +1896,7 @@ func atmosphere_status() -> Dictionary:
 	if air.near and Catalog.is_mine_site(air.site):
 		var from_center := position - target_position(air.site)
 		if not from_center.is_zero_approx():
-			altitude = from_center.length() - Terrain.radius_at(air.site, from_center.normalized())
+			altitude = from_center.length() - Terrain.radius_at(air.site, Terrain.spin_basis(air.site, orbit_time).transposed() * from_center.normalized())
 	air.merge({
 		"name": target_name(air.site), "heat": entry_heat,
 		"visible": in_flight and (air.near or entry_heat >= 1.0),
@@ -2111,7 +2128,29 @@ func jump_status(destination: int) -> Dictionary:
 			if position.distance_squared_to(target_position(id)) <= clearance * clearance:
 				reason = "Отойдите от объекта «%s»" % target_name(id)
 				break
+			if jump_seconds_left <= 0.0 and Catalog.is_star(id) and Orbit.period(id) > 0.0 and not _clear_during_charge(id, clearance):
+				reason = "Звезда «%s» приблизится во время зарядки. Отойдите дальше." % target_name(id)
+				break
 	return {"ok": reason.is_empty(), "reason": "Можно зарядить прыжковый привод" if reason.is_empty() else reason, "cost": cost}
+
+
+func _clear_during_charge(star: int, clearance: float) -> bool:
+	var duration := NAVIGATOR_JUMP_CHARGE if crew.active_role("navigator") else JUMP_CHARGE
+	var stop := speed() / JUMP_BRAKE
+	# The continuous estimate allows for the discrete braking step in flight.
+	var limit := clearance + 0.5 * speed() * MAX_FLIGHT_STEP + 0.02
+	var previous := position - target_position(star)
+	for part in range(1, 7):
+		var moment := duration * part / 6.0
+		var braking_time := minf(moment, stop)
+		var displacement := velocity * (braking_time * (1.0 - 0.5 * braking_time / stop)) if stop > 0.0 else Vector3.ZERO
+		var moving_center: Vector3 = Orbit.sample(star, orbit_time + moment).position
+		var offset := position + displacement - moving_center
+		var closest := Geometry3D.get_closest_point_to_segment(Vector3.ZERO, previous, offset)
+		if closest.length_squared() <= limit * limit:
+			return false
+		previous = offset
+	return true
 
 
 func start_jump() -> bool:
@@ -2146,7 +2185,7 @@ func cancel_jump() -> bool:
 
 
 func _charge_jump(delta: float) -> void:
-	velocity = velocity.move_toward(Vector3.ZERO, 67.0 * delta)
+	velocity = velocity.move_toward(Vector3.ZERO, JUMP_BRAKE * delta)
 	var next := position + velocity * delta
 	if _blocked(next):
 		velocity = Vector3.ZERO
@@ -2201,8 +2240,9 @@ func _arrive(direction := Vector3.BACK) -> void:
 
 
 func _hold_landed_pose() -> void:
-	position = target_position(landed_site) + Terrain.contact(landed_site, landing_direction)
-	velocity = Vector3.ZERO
+	var rotation := Terrain.spin_basis(landed_site, orbit_time)
+	position = target_position(landed_site) + rotation * Terrain.contact(landed_site, landing_direction)
+	velocity = surface_velocity(landed_site, position) if Terrain.spin_rate(landed_site) > 0.0 else Vector3.ZERO
 	yaw = 0.0
 	pitch = 0.0
 	roll = 0.0
@@ -2213,17 +2253,23 @@ func _hold_landed_pose() -> void:
 
 func _lift() -> void:
 	var origin := landed_site
-	var away := Terrain.normal(origin, landing_direction)
+	var ground_basis := landed_basis()
+	var away := ground_basis.z
+	var inherited_velocity := surface_velocity(origin, position)
 	var offpad := landed_offpad()
+	var rotates := Terrain.spin_rate(origin) > 0.0
 	reset_time_scale()
 	landed_site = -1
 	landing_direction = Vector3.ZERO
 	_command_gear(false)
-	yaw = atan2(-away.x, -away.z) if offpad else PI
-	pitch = clampf(asin(clampf(away.y, -1.0, 1.0)), -MAX_PITCH, MAX_PITCH)
-	if offpad:
+	if rotates:
+		_set_orientation((ground_basis * Basis(Vector3.UP, PI)).get_rotation_quaternion())
+	else:
+		yaw = atan2(-away.x, -away.z) if offpad else PI
+		pitch = clampf(asin(clampf(away.y, -1.0, 1.0)), -MAX_PITCH, MAX_PITCH)
+	if offpad or rotates:
 		position += away * 0.35
-	velocity = target_velocity(origin) + away * 9.0
+	velocity = inherited_velocity + away * 9.0
 	target = _departure_target(_default_port(origin))
 	_announce("lift", "Взлёт с поверхности. «%s»." % target_name(origin))
 
@@ -2383,7 +2429,8 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		position = next
 	else:
 		reset_time_scale()
-		var impact_speed := speed_relative_to(obstacle)
+		var rotates := Terrain.spin_rate(obstacle) > 0.0
+		var impact_speed := velocity.distance_to(surface_velocity(obstacle, next)) if rotates else speed_relative_to(obstacle)
 		var damage := ship.apply_damage(clampf((impact_speed - IMPACT_DAMAGE_SPEED) * 0.32, 0.0, 45.0))
 		if damage > 0.0:
 			_announce("hull_damage", "Корпус повреждён. Прочность %.0f%%." % ship.hull)
@@ -2392,10 +2439,20 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		elif velocity.length_squared() > 0.05:
 			_announce("clearance", "Защитное торможение у препятствия")
 		var caught_by_motion := _inside_hull(position, obstacle)
-		if caught_by_motion or shutter >= 0:
-			var previous_center: Vector3 = Orbit.sample(obstacle, previous_orbit_time).position
-			position += target_position(obstacle) - previous_center
-		velocity = target_velocity(obstacle) if caught_by_motion or shutter >= 0 else Vector3.ZERO
+		if rotates:
+			if caught_by_motion:
+				var previous_center: Vector3 = Orbit.sample(obstacle, previous_orbit_time).position
+				var previous_frame := Terrain.spin_basis(obstacle, previous_orbit_time)
+				var local := previous_frame.transposed() * (position - previous_center)
+				position = target_position(obstacle) + Terrain.spin_basis(obstacle, orbit_time) * local
+				if _inside_hull(position, obstacle):
+					position = _outside_rotating_surface(position, obstacle, orbit_time)
+			velocity = surface_velocity(obstacle, position)
+		else:
+			if caught_by_motion or shutter >= 0:
+				var previous_center: Vector3 = Orbit.sample(obstacle, previous_orbit_time).position
+				position += target_position(obstacle) - previous_center
+			velocity = target_velocity(obstacle) if caught_by_motion or shutter >= 0 else Vector3.ZERO
 		throttle = 0.0
 		set_autopilot(false)
 	_update_star_heat(delta)
@@ -2495,7 +2552,7 @@ func _manual_step(delta: float, steer: Vector2, bank: float, boost_requested: bo
 	var had_fuel := ship.fuel > 0.0
 	boost = boost_requested and not brake and had_fuel
 	var reference := reference_site()
-	var drift := target_velocity(reference) if reference >= 0 else Vector3.ZERO
+	var drift := _reference_velocity(reference) if reference >= 0 else Vector3.ZERO
 	if brake:
 		throttle = 0.0
 		velocity = velocity.move_toward(drift, 67.0 * delta)
@@ -2540,7 +2597,7 @@ func _obstacle_at(point: Vector3, sector_id := -1, epoch := -1.0, progress: RefC
 	return -1
 
 
-func _inside_hull(point: Vector3, index: int, epoch := -1.0) -> bool:
+func _inside_hull(point: Vector3, index: int, epoch := -1.0, fixed_surface := false) -> bool:
 	var center: Vector3 = target_position(index) if epoch < 0.0 else Orbit.sample(index, epoch).position
 	var relative := point - center
 	if Catalog.is_star(index):
@@ -2556,7 +2613,10 @@ func _inside_hull(point: Vector3, index: int, epoch := -1.0) -> bool:
 			return false
 		if distance_squared < 0.0001:
 			return true
-		var radius := Terrain.radius_at(index, relative.normalized()) + Terrain.CONTACT_CLEARANCE - 0.025
+		var direction := relative.normalized()
+		if not fixed_surface:
+			direction = Terrain.spin_basis(index, orbit_time if epoch < 0.0 else epoch).transposed() * direction
+		var radius := Terrain.radius_at(index, direction) + Terrain.CONTACT_CLEARANCE - 0.025
 		return distance_squared < radius * radius
 	# A narrow corridor leads into the illuminated docking collar.
 	var inside_corridor := relative.z >= float(Catalog.site(index).pad_offset) - 0.8 and Vector2(relative.x, relative.y).length() < 4.4
@@ -2589,6 +2649,16 @@ func _closed_hatch_between(from: Vector3, to: Vector3, previous_epoch: float) ->
 	return -1
 
 
+
+func _outside_rotating_surface(point: Vector3, site: int, epoch: float) -> Vector3:
+	var center: Vector3 = Orbit.sample(site, epoch).position
+	var outward := (point - center).normalized()
+	if outward.is_zero_approx():
+		outward = _surface_axis(site, epoch)
+	var direction := Terrain.spin_basis(site, epoch).transposed() * outward
+	var radius := Terrain.radius_at(site, direction) + Terrain.CONTACT_CLEARANCE + 0.5
+	return center + outward * radius
+
 func _autopilot_step(delta: float) -> void:
 	boost = false
 	var star_run := Catalog.is_star(target)
@@ -2599,11 +2669,14 @@ func _autopilot_step(delta: float) -> void:
 	var target_radius := Catalog.stellar_clearance(target) if star_run else float(Catalog.site(target).radius)
 	var center := target_position(target)
 	var gate := target_gate(target)
-	var drift := target_velocity(target)
+	var surface_frame := Terrain.spin_basis(target, orbit_time)
+	var rotates := Terrain.spin_rate(target) > 0.0
+	var drift := surface_velocity(target, gate)
 	var relative := position - center
+	var approach_offset := surface_frame.transposed() * relative
 	var waypoint := gate
 	var max_speed := 118.0
-	var aim := Vector3.FORWARD
+	var aim := -surface_frame.z
 	var waiting_for_port := false
 	var retreating := false
 	if port_run and _approach_committed and not dock_access.status(target, orbit_time).ready:
@@ -2613,7 +2686,7 @@ func _autopilot_step(delta: float) -> void:
 		var corridor := position - docking_position(target)
 		retreating = corridor.z >= -0.8 and corridor.z < HULL_Z and corridor.slide(station_axis(target)).length_squared() <= DockAccess.HATCH_RADIUS * DockAccess.HATCH_RADIUS
 
-	if _departure_leg == 0 and not _approach_committed and position.distance_to(gate) < 3.4 and speed_relative_to(target) < 7.0:
+	if _departure_leg == 0 and not _approach_committed and position.distance_to(gate) < 3.4 and velocity.distance_to(drift) < 7.0:
 		if port_run and not dock_access.status(target, orbit_time).ready:
 			dock_clearance_action()
 			waiting_for_port = true
@@ -2632,7 +2705,8 @@ func _autopilot_step(delta: float) -> void:
 			max_speed = 30.0 if gas_run else 32.0
 			autopilot_phase = "Вход в зону сбора"
 		else:
-			waypoint = target_contact(target) + Vector3.BACK * 1.8
+			waypoint = target_contact(target) + surface_frame.z * 1.8
+			drift = surface_velocity(target, waypoint)
 			max_speed = 13.0 if mining_site else 19.0
 			if mining_site:
 				_command_gear(true)
@@ -2647,13 +2721,15 @@ func _autopilot_step(delta: float) -> void:
 		# journey from crossing the station hull from behind.
 		var front_clearance := target_radius + 22.0 if mining_site or gas_run else 34.0
 		var side_clearance := maxf(84.0, target_radius + 42.0)
-		if relative.z < front_clearance and absf(relative.x) < side_clearance - 7.0:
-			var side := 1.0 if relative.x >= 0.0 else -1.0
-			waypoint = center + Vector3(side * side_clearance, relative.y, minf(relative.z, front_clearance))
+		if approach_offset.z < front_clearance and absf(approach_offset.x) < side_clearance - 7.0:
+			var side := 1.0 if approach_offset.x >= 0.0 else -1.0
+			waypoint = center + surface_frame * Vector3(side * side_clearance, approach_offset.y, minf(approach_offset.z, front_clearance))
+			drift = surface_velocity(target, waypoint)
 			autopilot_phase = "Обход объекта"
-		elif relative.z < front_clearance + 6.0:
-			var side := 1.0 if relative.x >= 0.0 else -1.0
-			waypoint = center + Vector3(side * side_clearance, 0.0, front_clearance + 21.0)
+		elif approach_offset.z < front_clearance + 6.0:
+			var side := 1.0 if approach_offset.x >= 0.0 else -1.0
+			waypoint = center + surface_frame * Vector3(side * side_clearance, 0.0, front_clearance + 21.0)
+			drift = surface_velocity(target, waypoint)
 			autopilot_phase = "Обход объекта"
 		if _departure_leg > 0:
 			var departure := target_position(_departure_site)
@@ -2680,8 +2756,11 @@ func _autopilot_step(delta: float) -> void:
 	var displacement := waypoint - position
 	var direction := displacement
 	if waypoint == gate and not star_run and _departure_leg == 0 and displacement.length_squared() > 62500.0:
-		var forecast: Vector3 = Orbit.sample(target, orbit_time + intercept_time(target)).position
+		var meeting_epoch := orbit_time + intercept_time(target)
+		var forecast: Vector3 = Orbit.sample(target, meeting_epoch).position
 		direction += forecast - center
+		if rotates:
+			direction += (_surface_axis(target, meeting_epoch) - surface_frame.z) * float(Catalog.site(target).gate_offset)
 		drift = Vector3.ZERO
 		autopilot_phase = "Перехват движущейся цели"
 	if not _approach_committed and _departure_leg == 0:
@@ -2921,6 +3000,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_rotation := schema < 29
 	var pre_binary := schema < 28
 	var pre_procedural := schema < 27
 	var pre_cartography := schema < 26
@@ -3157,9 +3237,20 @@ func restore(state: Dictionary) -> bool:
 			return false
 		if not restored_direction.is_normalized() or not Terrain.landable(restored_landing, restored_direction):
 			return false
-		var center: Vector3 = Orbit.sample(restored_landing, restored_epoch).position
-		var contact := center + Terrain.contact(restored_landing, restored_direction)
-		if not restored_position.is_equal_approx(contact) or not restored_velocity.is_zero_approx():
+		var orbit := Orbit.sample(restored_landing, restored_epoch)
+		var local_contact := Terrain.contact(restored_landing, restored_direction)
+		var offset := Terrain.spin_basis(restored_landing, restored_epoch) * local_contact
+		var contact: Vector3 = orbit.position + offset
+		var ground_velocity := Vector3.ZERO
+		if Terrain.spin_rate(restored_landing) > 0.0:
+			ground_velocity = orbit.velocity + Terrain.spin_velocity(restored_landing, offset)
+		if pre_rotation:
+			var old_contact: Vector3 = orbit.position + local_contact
+			if not restored_position.is_equal_approx(old_contact) or not restored_velocity.is_zero_approx():
+				return false
+			restored_position = contact
+			restored_velocity = ground_velocity
+		elif not restored_position.is_equal_approx(contact) or not restored_velocity.is_equal_approx(ground_velocity):
 			return false
 	elif restored_mining.phase != MiningRig.STOWED or restored_direction != Vector3.ZERO:
 		return false
@@ -3233,6 +3324,11 @@ func restore(state: Dictionary) -> bool:
 		if _inside_hull(restored_position, giant, restored_epoch):
 			var center: Vector3 = Orbit.sample(giant, restored_epoch).position
 			restored_position = center + Vector3.BACK * float(Catalog.site(giant).gate_offset)
+			restored_velocity = Vector3.ZERO
+	if pre_rotation and not pre_procedural and restored_dock < 0 and restored_landing < 0:
+		var obstacle := _obstacle_at(restored_position, restored_system, restored_epoch, restored_expedition, restored_cartography)
+		if Terrain.spin_rate(obstacle) > 0.0 and not _inside_hull(restored_position, obstacle, restored_epoch, true):
+			restored_position = _outside_rotating_surface(restored_position, obstacle, restored_epoch)
 			restored_velocity = Vector3.ZERO
 	var velocity_limit := MAX_SAVED_SPEED if schema >= 6 else MAX_SPEED * 1.56
 	if restored_velocity.length() > velocity_limit or (restored_dock < 0 and restored_landing < 0 and _blocked(restored_position, restored_system, restored_epoch, restored_expedition, restored_cartography)):

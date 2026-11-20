@@ -129,7 +129,7 @@ static func forecast(sim: RefCounted, horizon := 180.0, focus_id := -1) -> Dicti
 		var midpoint := position + velocity * (delta * 0.5)
 		velocity = Atmosphere.drag_at_epoch(system, midpoint, velocity, epoch + time - delta * 0.5, delta)
 		var next := position + velocity * delta
-		var contact := _swept_contact(blockers, previous_centers, future_centers, position, next)
+		var contact := _swept_contact(blockers, previous_centers, future_centers, position, next, epoch + time - delta)
 		if contact.id >= 0:
 			var impact_position := position.lerp(next, contact.fraction)
 			var impact_time: float = time - delta + contact.fraction * delta
@@ -187,7 +187,7 @@ static func _centers_at(blockers: Array[Dictionary], epoch: float) -> PackedVect
 
 
 static func _swept_contact(blockers: Array[Dictionary], before: PackedVector3Array, after: PackedVector3Array,
-		from: Vector3, to: Vector3) -> Dictionary:
+		from: Vector3, to: Vector3, epoch: float) -> Dictionary:
 	var nearest := 2.0
 	var body := -1
 	for index in range(blockers.size()):
@@ -207,7 +207,8 @@ static func _swept_contact(blockers: Array[Dictionary], before: PackedVector3Arr
 					continue
 		elif fraction == 0.0 and Catalog.is_mine_site(blocker.id) and start.dot(end - start) >= 0.0:
 			# An ascent can begin inside the terrain envelope but outside the local surface.
-			var surface := Terrain.radius_at(blocker.id, start.normalized()) + Terrain.CONTACT_CLEARANCE - 0.025
+			var local_direction := Terrain.spin_basis(blocker.id, epoch).transposed() * start.normalized()
+			var surface := Terrain.radius_at(blocker.id, local_direction) + Terrain.CONTACT_CLEARANCE - 0.025
 			if start.length_squared() >= surface * surface:
 				continue
 		if fraction < nearest:

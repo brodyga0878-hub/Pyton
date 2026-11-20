@@ -89,6 +89,7 @@ var _approaches: Dictionary[int, Node3D] = {}
 var _gate_materials: Dictionary[int, StandardMaterial3D] = {}
 var _last_position := Vector3.INF
 var _last_berth := -1
+var _last_landed_basis := Basis.IDENTITY
 var _departure_view_port := -1
 var _camera_up := Vector3.UP
 var _flight_time := 0.0
@@ -261,6 +262,12 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_ship.position = position_now
 	_ship.basis = ship_orientation
 	_sync_landing_gear(sim.gear_extension)
+	for site_id: int in _surface_views:
+		var body := _surface_views[site_id]
+		body.position = sim.target_position(site_id)
+		body.basis = Terrain.spin_basis(site_id, float(sim.orbit_time))
+		var field_direction: Vector3 = sim.landing_direction if site_id == surface_id else Vector3.ZERO
+		body.sync(position_now, site_id == int(sim.target), not settled, field_direction)
 	var thrust := clampf(float(sim.throttle), 0.0, 1.0)
 	_flight_time += delta
 	_jet.visible = not settled and thrust > 0.01
@@ -297,7 +304,12 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var blend := 1.0 - exp(-delta * 14.0)
 	var camera_start := camera.position
 	if not jump and settled and berth == _last_berth:
-		camera_start += position_now - _last_position
+		if landed:
+			var ground_turn := ship_orientation * _last_landed_basis.transposed()
+			camera_start = position_now + ground_turn * (camera_start - _last_position)
+			_camera_up = ground_turn * _camera_up
+		else:
+			camera_start += position_now - _last_position
 	var chase_origin := desired if jump else camera_start.lerp(desired, blend)
 	camera.position = _surface_safe_camera(chase_origin, sim)
 	if not settled:
@@ -334,6 +346,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_backdrop_material.set_shader_parameter("weather_phase", fposmod(float(sim.orbit_time), CLOUD_CYCLE_SECONDS) / CLOUD_CYCLE_SECONDS)
 	_last_position = position_now
 	_last_berth = berth
+	_last_landed_basis = ship_orientation if landed else Basis.IDENTITY
 
 	var guidance: Dictionary = sim.docking_guidance()
 	for site_id: int in _stations:
@@ -355,10 +368,6 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_approaches[site_id].visible = operational and not settled and corridor_length > 0.0 \
 			and int(guidance.port) == site_id and bool(guidance.near) and bool(guidance.in_front)
 		_gate_materials[site_id].albedo_color = Color("#75eac0") if bool(guidance.get("ok", false)) else Color("#edb36c")
-	for site_id: int in _surface_views:
-		_surface_views[site_id].position = sim.target_position(site_id)
-		var field_direction: Vector3 = sim.landing_direction if site_id == surface_id else Vector3.ZERO
-		_surface_views[site_id].sync(position_now, site_id == int(sim.target), not settled, field_direction)
 	_sync_surface_guide(sim, settled)
 	var deposit: Transform3D = sim.surface_deposit() if landed else _ship.global_transform
 	_mining_rig.sync(_ship.global_transform, deposit, int(sim.mining.phase) if landed else 0, sim.mining.progress(), float(sim.elapsed))
@@ -417,12 +426,14 @@ func _sync_surface_guide(sim: RefCounted, settled: bool) -> void:
 	if not ground.is_finite() or not normal.is_finite() or normal.length_squared() < 0.5:
 		_surface_guide.hide()
 		return
-	normal = normal.normalized()
-	var center: Vector3 = ground - sim.target_position(site)
+	var body := _surface_views[site]
+	var spin := body.basis
+	var inverse_spin := spin.transposed()
+	normal = (inverse_spin * normal).normalized()
+	var center := inverse_spin * (ground - body.position)
 	var reference := Vector3.RIGHT if absf(normal.dot(Vector3.UP)) > 0.95 else Vector3.UP
 	var axes := Basis.looking_at(-normal, reference)
-	# Translation follows the exact moving projection every frame. Rebuild the
-	# small conformed ribbon only after 10cm or a meaningful normal change.
+	# Cache body-local geometry so ground rotation only changes the transform.
 	if _surface_guide_site != site or center.distance_squared_to(_surface_guide_point) > 0.01 \
 			or normal.dot(_surface_guide_normal) < 0.99999:
 		var geometry := SurfaceTool.new()
@@ -450,20 +461,22 @@ func _sync_surface_guide(sim: RefCounted, settled: bool) -> void:
 		_surface_guide_point = center
 		_surface_guide_normal = normal
 	_surface_guide.position = ground
-	_surface_guide.basis = axes
+	_surface_guide.basis = spin * axes
 	_surface_guide_paint.albedo_color = Color("#75eac0") if bool(status.ok) else Color("#edb36c")
 
 
 func _surface_safe_camera(at: Vector3, sim: RefCounted) -> Vector3:
 	# The chase offset points into the rock during the first moment of an outward launch.
 	for site_id: int in _surface_views:
-		var center: Vector3 = sim.target_position(site_id)
+		var body := _surface_views[site_id]
+		var center := body.position
 		var relative := at - center
 		var outer := float(Catalog.site(site_id).radius) * Terrain.MAX_RADIUS_FACTOR + CAMERA_SURFACE_CLEARANCE
 		if relative.length_squared() >= outer * outer:
 			continue
-		var direction := Vector3.BACK if relative.is_zero_approx() else relative.normalized()
-		var threshold := Terrain.radius_at(site_id, direction) + CAMERA_SURFACE_CLEARANCE
+		var direction := body.basis.z if relative.is_zero_approx() else relative.normalized()
+		var local_direction := body.basis.transposed() * direction
+		var threshold := Terrain.radius_at(site_id, local_direction) + CAMERA_SURFACE_CLEARANCE
 		if relative.length_squared() < threshold * threshold:
 			at = center + direction * threshold
 	if _gas_giant_id >= 0:
