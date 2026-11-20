@@ -1,0 +1,95 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.38.0",
+  "source_commit": "a683deb556654273de5b1368b6615c0cdb290e38",
+  "content": {
+    "systems": 2,
+    "targets": 15,
+    "orbiting_bodies": 13,
+    "time_scales": [
+      1,
+      4,
+      16
+    ],
+    "save_schema": 6
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 63,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches_0.37": true,
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 15,
+    "tested_on_device": false
+  },
+  "checks": {
+    "flight": {
+      "failures": 0
+    },
+    "scene": {
+      "failures": 0
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 56
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 146
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 214,
+      "shifted_route_pairs": 110
+    },
+    "later_epoch_replay": {
+      "port_routes": 210,
+      "epochs_seconds": [
+        0,
+        180,
+        600,
+        1200,
+        2400,
+        3600
+      ],
+      "failures": 0
+    }
+  },
+  "files": {
+    "OrbitRelay-0.38.0-arm64.apk": {
+      "bytes": 26212845,
+      "sha256": "020c0672157af13c1a005050db6b389fc16a230083f3e220cc39c3571707b585"
+    },
+    "OrbitRelay-0.38.0-source.zip": {
+      "bytes": 108659,
+      "sha256": "2809d306fcd07ff8f73394ec79de176edd12af838ca25a46fc15765a63a9201e"
+    },
+    "orbit-map.png": {
+      "bytes": 90260,
+      "sha256": "8a489898ff5d93da7909672ab0144535b2306107de2d9686acd8210d6fbbe8e9"
+    },
+    "moving-approach.png": {
+      "bytes": 279663,
+      "sha256": "b45efe39ddb420e972b3f7e901e6c6e8a4af659888467e579c07746de80d632c"
+    },
+    "time-warp.png": {
+      "bytes": 239431,
+      "sha256": "037afa5aca92049bf83c0b6c2988ca6b367db6fa54fd0ad4b85bc24f8026261d"
+    },
+    "orbital-mining.png": {
+      "bytes": 446769,
+      "sha256": "4ab8fb3ec63e71a4941f9e67a6bda4016371c4920f9377f8797098ea686de76f"
+    }
+  }
+}
