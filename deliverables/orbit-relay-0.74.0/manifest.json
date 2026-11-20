@@ -1,0 +1,254 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.74.0",
+  "source_commit": "e0c702e5d1682daae1bde65fdc15ba169d2ebb80",
+  "content": {
+    "save_schema": 34,
+    "removable_hydrogen_scoop": true,
+    "optional_automatic_fuel_pump": true,
+    "pump_modes": [
+      "off",
+      "reaction",
+      "jump"
+    ],
+    "whole_canister_per_simulated_second": true,
+    "same_separate_tanks_and_manual_transfer": true,
+    "tested_acceptance_matrix": {
+      "checked": 32,
+      "partial": 8,
+      "open": 4
+    }
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 99,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.73.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 45,
+    "tested_on_device": false
+  },
+  "checks": {
+    "android_report_share": {
+      "failures": 0,
+      "checks": 76
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "binary_orbits": {
+      "failures": 0,
+      "checks": 55
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "cartography": {
+      "failures": 0,
+      "checks": 43
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "crew": {
+      "failures": 0,
+      "checks": 45
+    },
+    "customs": {
+      "failures": 0,
+      "checks": 28
+    },
+    "departure": {
+      "failures": 0,
+      "checks": 32
+    },
+    "dock_access": {
+      "failures": 0,
+      "checks": 37
+    },
+    "docking": {
+      "failures": 0,
+      "checks": 76
+    },
+    "dual_fuel": {
+      "failures": 0,
+      "checks": 25
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 139
+    },
+    "flight": {
+      "failures": 0
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "frontier_freight": {
+      "failures": 0,
+      "checks": 33
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 76
+    },
+    "fuel_modules": {
+      "failures": 0,
+      "checks": 36
+    },
+    "galactic_routes": {
+      "failures": 0,
+      "checks": 59
+    },
+    "gear": {
+      "failures": 0,
+      "checks": 28
+    },
+    "heat_shield": {
+      "failures": 0,
+      "checks": 28
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 187
+    },
+    "living": {
+      "failures": 0,
+      "checks": 77
+    },
+    "material_maps": {
+      "failures": 0,
+      "checks": 33
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "npc_freight": {
+      "failures": 0,
+      "checks": 48
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "orbital_mining": {
+      "failures": 0,
+      "checks": 34
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 535
+    },
+    "passengers": {
+      "failures": 0,
+      "checks": 50
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 81
+    },
+    "procedural_galaxy": {
+      "failures": 0,
+      "checks": 140
+    },
+    "reference_frames": {
+      "failures": 0,
+      "checks": 46
+    },
+    "remote_rig": {
+      "failures": 0,
+      "checks": 35
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "report": {
+      "failures": 0,
+      "checks": 28
+    },
+    "scene": {
+      "failures": 0
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "shipyard": {
+      "failures": 0,
+      "checks": 52
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 381
+    },
+    "surface_guidance": {
+      "failures": 0,
+      "checks": 60
+    },
+    "surface_rotation": {
+      "failures": 0,
+      "checks": 154
+    },
+    "fuel_equipment_model": {
+      "checks": 71,
+      "failures": 0
+    },
+    "whole_canister_headroom_and_warp": {
+      "checks": 7,
+      "failures": 0
+    },
+    "fuel_ui_headless": {
+      "checks": 44,
+      "failures": 0
+    },
+    "fuel_ui_gl": {
+      "checks": 47,
+      "failures": 0
+    },
+    "actual_0_73_equipment_and_inventory_migration": {
+      "checks": 15,
+      "failures": 0,
+      "save_files": 3
+    },
+    "frozen_0_74_gas_and_pump_mileage": {
+      "checks": 35,
+      "failures": 0,
+      "touch_interactions": 10
+    }
+  },
+  "files": {
+    "OrbitRelay-0.74.0-arm64.apk": {
+      "bytes": 28770390,
+      "sha256": "56ebd330490849f428301fabfefeee3bd406c765d016e66d22148e0450fdde68"
+    },
+    "OrbitRelay-0.74.0-source.zip": {
+      "bytes": 2252082,
+      "sha256": "0a8fa4f65312c9ae88ab15031186e792558074cfcef37f90855d8d0f971c00e5"
+    },
+    "fuel-module-equipment.png": {
+      "bytes": 146437,
+      "sha256": "e91f4f98e14d7de2dabd968fa2a8a2013d0075e59a0ef5253708dfa5812a0db7"
+    },
+    "fuel-pump-cockpit.png": {
+      "bytes": 1131982,
+      "sha256": "a2266e54b789c20dffd22f87c5e7ecc235484659050efa1c8c1fb920e386b673"
+    },
+    "fuel-pump-modes.png": {
+      "bytes": 444683,
+      "sha256": "d9d85d06875796d88b983020d81ec0796eb0f7bc3381506db2756c0864b14a3b"
+    }
+  }
+}
