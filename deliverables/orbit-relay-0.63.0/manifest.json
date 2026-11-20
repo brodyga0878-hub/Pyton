@@ -1,0 +1,215 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.63.0",
+  "source_commit": "de74776bc727d7a9430714491c5e24f701c52674",
+  "content": {
+    "save_schema": 23,
+    "comparison_version": "0.62.0",
+    "passenger_cabin_capacity": 2,
+    "simultaneous_passenger_bookings": 1,
+    "passenger_route_board_and_journal": true,
+    "advance_deadline_reputation_and_debt": true,
+    "ride_cabins_independent_of_hold": true,
+    "tested_acceptance_matrix": {
+      "checked": 20,
+      "partial": 13,
+      "open": 11
+    }
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 88,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.62.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 38,
+    "tested_on_device": false
+  },
+  "checks": {
+    "android_report_share": {
+      "failures": 0,
+      "checks": 76
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "departure": {
+      "failures": 0,
+      "checks": 32
+    },
+    "dock_access": {
+      "failures": 0,
+      "checks": 37
+    },
+    "docking": {
+      "failures": 0,
+      "checks": 76
+    },
+    "dual_fuel": {
+      "failures": 0,
+      "checks": 25
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 139
+    },
+    "flight": {
+      "failures": 0
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "frontier_freight": {
+      "failures": 0,
+      "checks": 33
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 76
+    },
+    "galactic_routes": {
+      "failures": 0,
+      "checks": 59
+    },
+    "gear": {
+      "failures": 0,
+      "checks": 28
+    },
+    "heat_shield": {
+      "failures": 0,
+      "checks": 28
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 187
+    },
+    "living": {
+      "failures": 0,
+      "checks": 77
+    },
+    "material_maps": {
+      "failures": 0,
+      "checks": 33
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "npc_freight": {
+      "failures": 0,
+      "checks": 48
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 319
+    },
+    "passengers": {
+      "failures": 0,
+      "checks": 50
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 81
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "report": {
+      "failures": 0,
+      "checks": 28
+    },
+    "scene": {
+      "failures": 0
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 191
+    },
+    "surface_guidance": {
+      "failures": 0,
+      "checks": 60
+    },
+    "passenger_model_matrix": {
+      "checks": 1130,
+      "failures": 0
+    },
+    "passenger_board_headless": {
+      "checks": 86,
+      "failures": 0
+    },
+    "passenger_board_graphical": {
+      "checks": 91,
+      "failures": 0
+    },
+    "passenger_journal_headless": {
+      "checks": 72,
+      "failures": 0
+    },
+    "passenger_journal_graphical": {
+      "checks": 75,
+      "failures": 0
+    },
+    "actual_0_62_save_migration": {
+      "checks": 14,
+      "failures": 0,
+      "save_files": 3
+    },
+    "real_legacy_passenger_trip": {
+      "checks": 22,
+      "failures": 0,
+      "save_files": 2
+    }
+  },
+  "files": {
+    "OrbitRelay-0.63.0-arm64.apk": {
+      "bytes": 28646399,
+      "sha256": "92ff40178e6617f7c306b468d9cc67354143e3884accccc32d3a91cb17f16c27"
+    },
+    "OrbitRelay-0.63.0-source.zip": {
+      "bytes": 2150852,
+      "sha256": "d8fba71af053e22517f766bb4e68080d7ba1d3e285da9cf60ef520e05fa16b95"
+    },
+    "passenger-arrived.png": {
+      "bytes": 98032,
+      "sha256": "822d9d57efe861cbef04bd3a4311d5d7b4c7cb680a052e5361a5909d82ec6c04"
+    },
+    "passenger-board.png": {
+      "bytes": 77382,
+      "sha256": "60ed235a216796869b029ba9f2f763830729b59e6089e3d4170f95594ccf6175"
+    },
+    "passenger-debt.png": {
+      "bytes": 88659,
+      "sha256": "d5455ae51507d71bd758cbdf84f61b122391f6d88336ca19d6bb24e186e281c7"
+    },
+    "passenger-journal.png": {
+      "bytes": 61859,
+      "sha256": "b20bcc912fed37f8263ea6e7d5ea1351ca7be1c70250d305a729ae503230ce17"
+    }
+  }
+}
