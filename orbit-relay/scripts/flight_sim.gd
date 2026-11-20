@@ -2865,16 +2865,18 @@ func _advance_hyperspace_calendar(duration: float) -> void:
 	var arrival_epoch := orbit_time + duration
 	var due := factions.next_event_time()
 	while due <= arrival_epoch:
-		if due > orbit_time:
-			_advance_background_clock(due - orbit_time)
+		var advance := maxf(0.0, due - orbit_time)
+		if advance > 0.0:
+			_advance_background_clock(advance)
 		_advance_front(due)
 		_advance_mission_deadlines()
-		_apply_convoy_result(convoy_order.step(self, 0.0))
+		_apply_convoy_result(convoy_order.step(self, advance))
 		due = factions.next_event_time()
-	if arrival_epoch > orbit_time:
-		_advance_background_clock(arrival_epoch - orbit_time)
+	var remainder := maxf(0.0, arrival_epoch - orbit_time)
+	if remainder > 0.0:
+		_advance_background_clock(remainder)
 	_advance_mission_deadlines()
-	_apply_convoy_result(convoy_order.step(self, 0.0))
+	_apply_convoy_result(convoy_order.step(self, remainder))
 
 
 func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, brake: bool, manual_input: bool, translation: Vector3) -> void:

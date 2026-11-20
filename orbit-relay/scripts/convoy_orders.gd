@@ -143,7 +143,8 @@ func in_danger(sim: RefCounted) -> bool:
 
 
 func step(sim: RefCounted, delta: float) -> Dictionary:
-	if not is_finite(delta) or delta <= 0.0:
+	# An exact calendar boundary can settle a delivered or expired contract.
+	if not is_finite(delta) or delta < 0.0:
 		return {}
 	_shot_delay = maxf(0.0, _shot_delay - delta)
 	_player_flash = maxf(0.0, _player_flash - delta)

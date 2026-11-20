@@ -3,6 +3,8 @@ extends SceneTree
 const Calendar := preload("res://scripts/mission_calendar.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const Crew := preload("res://scripts/crew.gd")
+const Expedition := preload("res://scripts/expedition.gd")
+const Fronts := preload("res://scripts/faction_fronts.gd")
 const Fixture := preload("res://tests/flight_fixture.gd")
 const Flight := preload("res://scripts/flight_sim.gd")
 const Session := preload("res://scripts/session_io.gd")
@@ -25,6 +27,7 @@ func _run() -> void:
 	var flight := _outfit_real_ship()
 	if flight != null:
 		_test_paid_transit(flight)
+	_test_convoy_during_transit()
 	print("Hyperspace integration: %d checks, %d failures" % [_checks, _failures.size()])
 	for failure: String in _failures:
 		printerr(failure)
@@ -205,6 +208,84 @@ func _test_paid_transit(flight: Flight) -> void:
 		_expect(arrived.ship.jump_fuel == float(snapshot.ship.jump_fuel) and arrived.credits == int(snapshot.credits)
 			and arrived.passenger_status().overdue and arrived.system_id == destination,
 			"A later cold load does not replay any jump, passenger or payroll completion")
+
+
+func _test_convoy_during_transit() -> void:
+	var flight := Flight.new()
+	var station := Catalog.HEATHER_SYSTEM
+	var funded_foundation := flight.snapshot()
+	funded_foundation.credits = 1000
+	funded_foundation.expedition.projects[0] = {
+		"phase": Expedition.COMPLETE, "sponsor_port": 0, "sponsor": 0,
+		"scan_index": Expedition.SURVEY_TOTAL, "build_index": Expedition.BUILD_TOTAL,
+	}
+	var fronts := Fronts.new()
+	if not _expect(fronts.commission(station, 0, 0.0) and flight.freight.activate_frontier(station, 0.0),
+		"Prepare a commissioned frontier system through the campaign fixture"):
+		return
+	funded_foundation.factions = fronts.snapshot()
+	funded_foundation.freight = flight.freight.snapshot()
+	if not _expect(flight.restore(funded_foundation) and flight.service_action("tank") and flight.service_action("jump_refuel"),
+		"The sponsored pilot fits and fuels the return-capable tank at the real port"):
+		return
+	_tick(flight, Fronts.FOUNDING_GRACE)
+	var escort: Dictionary = {}
+	for offer: Dictionary in flight.convoy_offers():
+		if offer.kind == "escort":
+			escort = offer
+			break
+	if not _expect(not escort.is_empty() and flight.convoy_action(station, escort.id)
+		and Fixture.depart(flight) and _fly_clear(flight, station) and flight.start_jump()
+		and _advance(flight, func() -> bool: return flight.system_id == station, 4.0),
+		"Accept the real escort order and physically jump into the war zone"):
+		return
+	var balance := flight.credits
+	if not _expect(flight.convoy_action() and _advance(flight,
+		func() -> bool: return flight.convoy_status().phase == "escorted", 55.0)
+		and flight.factions.convoy(station, escort.id).assistance == "escort" and flight.credits == balance,
+		"Fly actual formation until the convoy is protected, while the reward still awaits delivery"):
+		return
+	var due := float(escort.deadline)
+	var travel := flight.jump_travel_seconds(station, HOME)
+	var nearest := int(flight.local_targets()[0])
+	for site: int in flight.local_targets():
+		if flight.position.distance_squared_to(flight.target_position(site)) < flight.position.distance_squared_to(flight.target_position(nearest)):
+			nearest = site
+	var outward := (flight.position - flight.target_position(nearest)).normalized()
+	flight.yaw = atan2(-outward.x, -outward.z)
+	flight.pitch = asin(clampf(outward.y, -1.0, 1.0))
+	if not _expect(flight.plan_route(HOME) and _fly_clear(flight, HOME),
+		"Clear the source system and plot a real return jump from the escorted convoy"):
+		return
+	flight.change_throttle(-flight.throttle)
+	_tick_until(flight, due - minf(12.0, travel * 0.5))
+	if not _expect(flight.orbit_time < due - Flight.JUMP_CHARGE and flight.orbit_time + travel > due
+		and flight.convoy_status().phase == "escorted" and flight.start_jump(),
+		"The scheduled delivery falls within paid transit, after the visible charge ends"):
+		return
+	if not _expect(_advance(flight, func() -> bool: return flight.jump_progress_status().phase == "transit", Flight.JUMP_CHARGE)
+		and flight.credits == balance and flight.orbit_time < due,
+		"Entering paid transit neither delivers the convoy early nor pays its escort"):
+		return
+	var paid_path := "user://hyperspace-convoy-paid.json"
+	var resumed := Flight.new()
+	if not _expect(Session.save_state(flight.snapshot(), paid_path) == OK and resumed.restore(Session.load_state(paid_path))
+		and resumed.jump_progress_status().phase == "transit" and resumed.convoy_status().phase == "escorted",
+		"Cold-load the committed jump while the escorted convoy is still en route"):
+		return
+	if not _expect(_advance(resumed, func() -> bool: return resumed.system_id == HOME, 1.0)
+		and resumed.orbit_time > due and resumed.factions.convoy(station, escort.id).stage == "delivered"
+		and resumed.convoy_status().phase == "succeeded" and resumed.credits == balance + int(escort.reward),
+		"The convoy delivery and escort reward are already reconciled on the exact arrival frame"):
+		return
+	var arrived_path := "user://hyperspace-convoy-arrived.json"
+	var arrived := Flight.new()
+	if not _expect(Session.save_state(resumed.snapshot(), arrived_path) == OK and arrived.restore(Session.load_state(arrived_path)),
+		"The arrival frame contains a complete and loadable paid escort result"):
+		return
+	_tick(arrived, 0.25)
+	_expect(arrived.convoy_status().phase == "succeeded" and arrived.credits == balance + int(escort.reward),
+		"Loading after arrival and stepping normally cannot pay the delivered escort again")
 
 
 func _prepare_deadlines(flight: Flight) -> bool:
