@@ -1,0 +1,109 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.41.0",
+  "source_commit": "3fdb0db1d4c5c3a0c73bc26c83c0e08e88700245",
+  "content": {
+    "systems": 3,
+    "targets": 20,
+    "ports_with_markets": 7,
+    "solid_bodies": 10,
+    "market_icons": 5,
+    "regular_contacts_per_system": 3,
+    "save_schema": 9
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 66,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches_0.40": true,
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 21,
+    "tested_on_device": false
+  },
+  "checks": {
+    "flight": {
+      "failures": 0
+    },
+    "scene": {
+      "failures": 0
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 56
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 186
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 258
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 171
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 132
+    },
+    "living": {
+      "failures": 0,
+      "checks": 76
+    },
+    "patrol_replay": {
+      "complete_runs": 42,
+      "ports": 7,
+      "epochs_seconds": [
+        0,
+        180,
+        1200,
+        3600,
+        7200,
+        15000
+      ],
+      "failures": 0
+    },
+    "traffic_clearance": {
+      "checked_poses": 30006,
+      "failures": 0
+    }
+  },
+  "files": {
+    "OrbitRelay-0.41.0-arm64.apk": {
+      "bytes": 26291639,
+      "sha256": "83f5e771abaeab81b4d62c17cd1c83234e4829bdf6b2112582a1d0ca78c757d7"
+    },
+    "OrbitRelay-0.41.0-source.zip": {
+      "bytes": 155607,
+      "sha256": "ee70488a740ff91a25411e8587963576ce7620a173401cda1e74285fa55f0842"
+    },
+    "market-icons.png": {
+      "bytes": 83980,
+      "sha256": "15dc419863e008fdeeed27f1fde5081c6ec5e2703d6921a389c9305af7a96840"
+    },
+    "patrol-fire.png": {
+      "bytes": 92889,
+      "sha256": "fe2611c79e29a2e1ea7a3982c60fd69127ca499099f714e5908b84d1253b1ccc"
+    },
+    "kromka-chart.png": {
+      "bytes": 102872,
+      "sha256": "9dc7addcf8d8f846cd5ae67e16d85e99440a86022487cb0fac3f5a6644a0f9f9"
+    },
+    "kromka-arrival.png": {
+      "bytes": 266718,
+      "sha256": "1c5dc46a3aa5037923708e1914e949a75e880e9e473a260facb37e3f046358ad"
+    }
+  }
+}
