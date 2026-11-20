@@ -1,0 +1,286 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.76.0",
+  "source_commit": "9d3f920068c4ffc187922fef024a9f9b8cef1fd7",
+  "content": {
+    "save_schema": 36,
+    "standard_and_long_range_drive": true,
+    "loaded_mass_changes_travel_time": true,
+    "range_drive_fare_fraction": 0.75,
+    "paid_hyperspace_persists_pause_and_reload": true,
+    "calendar_and_convoy_events_applied_at_arrival": true,
+    "tested_acceptance_matrix": {
+      "checked": 34,
+      "partial": 7,
+      "open": 3
+    }
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 101,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.75.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 46,
+    "tested_on_device": false
+  },
+  "checks": {
+    "android_report_share": {
+      "failures": 0,
+      "checks": 76
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "binary_orbits": {
+      "failures": 0,
+      "checks": 55
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "calendar": {
+      "failures": 0,
+      "checks": 53
+    },
+    "cartography": {
+      "failures": 0,
+      "checks": 43
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "crew": {
+      "failures": 0,
+      "checks": 45
+    },
+    "customs": {
+      "failures": 0,
+      "checks": 28
+    },
+    "departure": {
+      "failures": 0,
+      "checks": 32
+    },
+    "dock_access": {
+      "failures": 0,
+      "checks": 37
+    },
+    "docking": {
+      "failures": 0,
+      "checks": 76
+    },
+    "dual_fuel": {
+      "failures": 0,
+      "checks": 25
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 139
+    },
+    "flight": {
+      "failures": 0
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "frontier_freight": {
+      "failures": 0,
+      "checks": 33
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 76
+    },
+    "fuel_modules": {
+      "failures": 0,
+      "checks": 36
+    },
+    "galactic_routes": {
+      "failures": 0,
+      "checks": 59
+    },
+    "gear": {
+      "failures": 0,
+      "checks": 28
+    },
+    "heat_shield": {
+      "failures": 0,
+      "checks": 28
+    },
+    "hyperspace": {
+      "failures": 0,
+      "checks": 64
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 187
+    },
+    "living": {
+      "failures": 0,
+      "checks": 77
+    },
+    "material_maps": {
+      "failures": 0,
+      "checks": 33
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "npc_freight": {
+      "failures": 0,
+      "checks": 48
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "orbital_mining": {
+      "failures": 0,
+      "checks": 34
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 535
+    },
+    "passengers": {
+      "failures": 0,
+      "checks": 50
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 81
+    },
+    "procedural_galaxy": {
+      "failures": 0,
+      "checks": 140
+    },
+    "reference_frames": {
+      "failures": 0,
+      "checks": 46
+    },
+    "remote_rig": {
+      "failures": 0,
+      "checks": 35
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "report": {
+      "failures": 0,
+      "checks": 28
+    },
+    "scene": {
+      "failures": 0
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "shipyard": {
+      "failures": 0,
+      "checks": 52
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 381
+    },
+    "surface_guidance": {
+      "failures": 0,
+      "checks": 60
+    },
+    "surface_rotation": {
+      "failures": 0,
+      "checks": 154
+    },
+    "drive_and_route_model": {
+      "checks": 1174,
+      "failures": 0
+    },
+    "faction_clock_due_order": {
+      "checks": 2193,
+      "failures": 0
+    },
+    "same_tank_standard_vs_long_range_real_flight": {
+      "checks": 24,
+      "failures": 0
+    },
+    "paid_convoy_same_arrival_frame": {
+      "checks": 11,
+      "failures": 0,
+      "also_in_checked_in_suite": true
+    },
+    "hyperspace_cockpit_headless": {
+      "checks": 24,
+      "failures": 0
+    },
+    "hyperspace_cockpit_gl": {
+      "checks": 31,
+      "failures": 0
+    },
+    "drive_shop_and_galaxy_headless": {
+      "checks": 38,
+      "failures": 0
+    },
+    "drive_shop_and_galaxy_gl": {
+      "checks": 42,
+      "failures": 0
+    },
+    "actual_0_75_three_flight_saves": {
+      "checks": 18,
+      "failures": 0
+    },
+    "frozen_0_76_real_paid_and_extended_route": {
+      "checks": 41,
+      "failures": 0,
+      "touch_interactions": 9
+    }
+  },
+  "files": {
+    "OrbitRelay-0.76.0-arm64.apk": {
+      "bytes": 28786941,
+      "sha256": "08b42488df621af6762f1aa2b459b177fbcb02f16f21c6cfdc5cb43ef83f70f4"
+    },
+    "OrbitRelay-0.76.0-source.zip": {
+      "bytes": 2270295,
+      "sha256": "7e05d10aa576dac4f10509e0556cc721b28869f7979c0d299d11fbf453694971"
+    },
+    "drive-route-estimate.png": {
+      "bytes": 145072,
+      "sha256": "b7d7c2604aa9a520477555565e13cd88246bff8950e7b284443a83ce27d115d6"
+    },
+    "drive-shop.png": {
+      "bytes": 134991,
+      "sha256": "1f46387e7245bf4fcceb970ca16efddab6111bac0c197c56fa405ede95cca60c"
+    },
+    "hypercharge-eta.png": {
+      "bytes": 105658,
+      "sha256": "31b6d148b2ec0acdae2dfb80abf4645ad38efd5859822c5b87100deee2fec4b4"
+    },
+    "hyperspace-arrival.png": {
+      "bytes": 447665,
+      "sha256": "9b251700e1b36dcc7fec658d12fa567c44acf032d3faa1b7462e5a18d5bab108"
+    },
+    "hyperspace-in-flight.png": {
+      "bytes": 83693,
+      "sha256": "e601577ca295f31a7fa5424c5eee1a8192bbcd395c4c8ababd225e5e1b3a9d12"
+    },
+    "hyperspace-paused.png": {
+      "bytes": 82812,
+      "sha256": "3cc6effb13e1810e43b28eb1a21851f21622beee4bd5d965ac5944cfb8f9c720"
+    }
+  }
+}
