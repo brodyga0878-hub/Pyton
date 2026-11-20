@@ -1,0 +1,81 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.37.0",
+  "source_commit": "b119175cdcb2e2465e5470a6ebb75dfd07715585",
+  "content": {
+    "systems": 2,
+    "targets": 15,
+    "ports": 5,
+    "asteroids": 4,
+    "moons": 3,
+    "comets": 1,
+    "stars": 2,
+    "delivery_routes": 8,
+    "jump_fuel_units": 26,
+    "jump_charge_seconds": 2.5
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 62,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches_0.36": true,
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 14,
+    "tested_on_device": false
+  },
+  "checks": {
+    "flight": {
+      "failures": 0
+    },
+    "scene": {
+      "failures": 0
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 56
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 146,
+      "velar_local_route_pairs": 20,
+      "velar_local_fuel_configurations": 2
+    }
+  },
+  "files": {
+    "OrbitRelay-0.37.0-arm64.apk": {
+      "bytes": 26196296,
+      "sha256": "06e3736569bae6d48f7672b2a6811aed2cb909d41347d0a3da5678f0d5b8fb78"
+    },
+    "OrbitRelay-0.37.0-source.zip": {
+      "bytes": 98148,
+      "sha256": "562fff0d5777a1fa1f8c8cf500262aff1387340a2c5c38b853943ee2a41ada48"
+    },
+    "galaxy-map.png": {
+      "bytes": 96683,
+      "sha256": "43371dbc030d79d18d571c92ef048647b21618231ab160640f00d318c07896ea"
+    },
+    "velar-arrival.png": {
+      "bytes": 336127,
+      "sha256": "44ba04926af961c6c150717d4a6e93354559f689351122380902e1b8d4e3d81a"
+    },
+    "velar-local-map.png": {
+      "bytes": 69722,
+      "sha256": "8bcd0e9e7f7a4ca48b9036891d6f40ee57e7dff44e2041a235741686e26d9cd5"
+    },
+    "velar-scoop.png": {
+      "bytes": 991705,
+      "sha256": "8c948fe095368bc275b87d0711e7c6cffd47cb7c55871ee485387d001669294c"
+    }
+  }
+}
