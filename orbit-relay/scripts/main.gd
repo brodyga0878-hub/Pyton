@@ -215,7 +215,7 @@ func _deliver_notice() -> void:
 		"docked": flight.docked, "landed_site": flight.landed_site, "target": flight.target,
 		"planned_target": flight.planned_target, "speed": flight.speed(), "credits": flight.credits,
 		"mining_phase": flight.mining.phase, "cargo_units": flight.mining.ore_hold,
-		"fuel": flight.ship.fuel, "scooping": flight.scooping,
+		"fuel": flight.ship.fuel, "scooping": flight.scooping, "star_heat": flight.star_heat,
 		"hull": flight.ship.hull, "contract_route": flight.contract_route_id, "contract_leg": flight.contract_leg,
 		"patrol_phase": flight.patrol.phase, "patrol_origin": flight.patrol.origin,
 		"faction": flight.factions.owner(flight.system_id),
@@ -228,12 +228,12 @@ func _deliver_notice() -> void:
 	if event in [
 		"launch", "dock", "land", "lift", "contract", "delivery", "mining_deploy", "mining_recover",
 		"mining_ready", "mining_loaded", "ore_sold", "service_refuel", "service_tank", "service_eco",
-		"scoop_full", "scoop_stop", "star_arrival", "fuel_empty",
+		"scoop_full", "scoop_stop", "star_arrival", "fuel_empty", "thermal_damage",
 		"jump_planned", "jump_complete",
 		"market_buy", "market_sell", "service_repair", "service_cargo", "hull_damage", "contract_leg",
 		"patrol_accepted", "patrol_engaged", "patrol_fire", "patrol_enemy_hit", "patrol_retreat", "patrol_victory", "patrol_paid",
 		"expedition_accepted", "expedition_survey", "expedition_report", "expedition_supply", "expedition_complete", "expedition_course",
-		"war_declared", "war_round", "war_captured", "war_repulsed",
+		"war_declared", "war_round", "war_captured", "war_repulsed", "war_convoy_delivered", "war_convoy_intercepted",
 	]:
 		_save()
 

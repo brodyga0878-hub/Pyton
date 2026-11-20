@@ -328,6 +328,7 @@ class SectorChart extends Control:
 		"trader": Color("8fe9db"),
 		"patrol": Color("90c6ff"),
 		"raider": Color("ff978c"),
+		"convoy": Color("ffd081"),
 		"signal": Color("ffd396"),
 		"worksite": Color("ffc077"),
 	}
@@ -360,6 +361,11 @@ class SectorChart extends Control:
 				var xz := Vector2(point.x, point.z)
 				minimum = minimum.min(xz)
 				maximum = maximum.max(xz)
+			elif contact.role == "convoy":
+				for point: Vector3 in [contact.route_start, contact.route_end]:
+					var xz := Vector2(point.x, point.z)
+					minimum = minimum.min(xz)
+					maximum = maximum.max(xz)
 		return Rect2(minimum, (maximum - minimum).max(Vector2.ONE))
 
 	func _project(position_3d: Vector3, plot: Rect2, bounds: Rect2) -> Vector2:
@@ -459,7 +465,7 @@ class SectorChart extends Control:
 	func _draw_traffic(font: Font, plot: Rect2, bounds: Rect2, label_boxes: Array[Rect2]) -> void:
 		var roles: Dictionary[String, String] = {
 			"trader": "Торговец", "patrol": "Патруль", "raider": "Рейдер", "signal": "Сигнал",
-			"worksite": "Стройплощадка",
+			"convoy": "Конвой", "worksite": "Стройплощадка",
 		}
 		var visible_roles: Array[String] = []
 		var limits := Rect2(Vector2(16, 36), (size - Vector2(32, 77)).max(Vector2.ONE))
@@ -467,6 +473,9 @@ class SectorChart extends Control:
 			var point := _project(contact.position, plot, bounds)
 			if not limits.has_point(point) or not roles.has(contact.role):
 				continue
+			if contact.role == "convoy":
+				var arrival := _project(contact.route_end, plot, bounds)
+				_draw_course(point, arrival, Color("ffd08191"), 1.3)
 			_draw_contact(point, contact.role)
 			if not visible_roles.has(contact.role):
 				visible_roles.append(contact.role)
@@ -491,6 +500,9 @@ class SectorChart extends Control:
 				draw_arc(point, 5.5, 0.0, TAU, 20, color, 1.4, true)
 			"patrol":
 				draw_rect(Rect2(point - Vector2(5, 5), Vector2(10, 10)), color, false, 1.4)
+			"convoy":
+				draw_rect(Rect2(point - Vector2(8, 4), Vector2(16, 8)), color, false, 1.4)
+				draw_line(point - Vector2(0, 4), point + Vector2(0, 4), color, 1.4, true)
 			"worksite":
 				draw_arc(point, 8.0, 0.0, TAU, 24, color, 1.4, true)
 				draw_line(point - Vector2(4, 0), point + Vector2(4, 0), color, 1.4, true)

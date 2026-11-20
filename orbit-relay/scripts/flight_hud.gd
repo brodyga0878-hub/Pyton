@@ -11,12 +11,14 @@ const CYAN := Color("8fe9db")
 const AMBER := Color("ffd396")
 const ALERT := Color("ff978c")
 const ALLY := Color("90c6ff")
+const CONVOY := Color("ffd081")
 const BACK := Color(0.024, 0.057, 0.081, 0.94)
 const LINE := Color(0.24, 0.43, 0.49, 0.58)
 const COURSE_PAD := Rect2(26, -170, 172, 144)
 const ROLL_PAD := Rect2(210, -108, 112, 82)
 const ACTION_COLUMN := Rect2(-340, -215, 314, 189)
 const TOUCH_GAINS := [0.72, 1.0, 1.36]
+const MARK_PRIORITY := {"raider": 0, "convoy": 1}
 
 var _hud: Control
 var _safe: Control
@@ -29,6 +31,10 @@ var _telemetry: Label
 var _condition: Label
 var _fuel: Label
 var _fuel_level: ProgressBar
+var _thermal_panel: VBoxContainer
+var _thermal_label: Label
+var _thermal_level: ProgressBar
+var _thermal_fill: StyleBoxFlat
 var _clock: Label
 var _time_hint: Label
 var _guidance: Label
@@ -113,6 +119,21 @@ func build() -> void:
 	_fuel_level.add_theme_stylebox_override("background", _box(Color("12313d"), LINE, 4, 0.0))
 	_fuel_level.add_theme_stylebox_override("fill", _box(CYAN, CYAN, 4, 0.0))
 	instrument_stack.add_child(_fuel_level)
+	_thermal_panel = VBoxContainer.new()
+	_thermal_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_thermal_panel.add_theme_constant_override("separation", 3)
+	instrument_stack.add_child(_thermal_panel)
+	_thermal_label = _label(_thermal_panel, 16, CYAN)
+	_thermal_level = ProgressBar.new()
+	_thermal_level.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_thermal_level.step = 0.0
+	_thermal_level.show_percentage = false
+	_thermal_level.custom_minimum_size.y = 7.0
+	_thermal_level.add_theme_stylebox_override("background", _box(Color("12313d"), LINE, 4, 0.0))
+	_thermal_fill = _box(CYAN, CYAN, 4, 0.0)
+	_thermal_level.add_theme_stylebox_override("fill", _thermal_fill)
+	_thermal_panel.add_child(_thermal_level)
+	_thermal_panel.hide()
 	var clock_row := HBoxContainer.new()
 	clock_row.add_theme_constant_override("separation", 8)
 	instrument_stack.add_child(clock_row)
@@ -272,6 +293,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_scoop_blocked = not sim.scooping and not scoop_status.get("ok", false)
 	_actions["scoop"].visible = not parked and (star_target or scoop_status.get("near", false) or sim.scooping)
 	_actions["scoop"].text = "Откл. сбор" if sim.scooping else "Сбор топлива"
+	_actions["scoop"].tooltip_text = "Остановить сбор" if sim.scooping else str(scoop_status.get("reason", ""))
 	_actions["autopilot"].text = "Выкл. авто" if sim.autopilot else "Авто"
 	var itinerary: Dictionary = sim.contract_itinerary() if sim.contract_stage == 1 else {}
 	var transfer: bool = not itinerary.is_empty() and int(itinerary.leg) + 1 < itinerary.stops.size()
@@ -292,6 +314,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 			_guidance.text = str(patrol.get("reason", ""))
 	else:
 		_sync_flight(sim, scoop_status, itinerary, patrol, fire)
+	_sync_thermal({} if parked else sim.thermal_status(), sim.scooping)
 	if _notice_left > 0.0:
 		_notice_left -= delta
 		if _notice_left <= 0.0:
@@ -314,6 +337,41 @@ func _sync_condition(hull: float, cargo: int, capacity: int) -> void:
 	var color := AMBER if hull < 40.0 else INK
 	if _condition.get_theme_color("font_color") != color:
 		_condition.add_theme_color_override("font_color", color)
+
+func _sync_thermal(status: Dictionary, scooping: bool) -> void:
+	_thermal_panel.visible = status.get("visible", false)
+	var guidance_color := INK
+	if _thermal_panel.visible:
+		var meter_color := CYAN
+		var suffix := " · остывает" if status.cooling else ""
+		if status.danger or status.level == "critical":
+			meter_color = ALERT
+			suffix = " · критический" if status.level == "critical" else " · опасность"
+		elif status.level == "warm" or status.level == "hot":
+			meter_color = AMBER
+		_thermal_label.text = "Нагрев %d%%%s" % [roundi(status.heat), suffix]
+		_thermal_level.value = status.heat
+		if _thermal_fill.bg_color != meter_color:
+			_thermal_fill.bg_color = meter_color
+			_thermal_fill.border_color = meter_color
+			_thermal_label.add_theme_color_override("font_color", meter_color)
+		if not _jumping:
+			if status.level == "critical":
+				_guidance.text = "Критический перегрев. Корпус повреждается. Уходите от звезды."
+				guidance_color = ALERT
+			elif status.danger:
+				_guidance.text = "Опасная близость к звезде. Развернитесь от неё и увеличьте тягу."
+				guidance_color = ALERT
+			elif status.blocked:
+				_guidance.text = "Перегрев. Отойдите от звезды и дождитесь остывания."
+				if status.cooling and status.distance > Sector.SCOOP_OUTER:
+					_guidance.text = "Корпус остывает. Сбор топлива пока заблокирован."
+				guidance_color = ALERT
+			elif status.level == "hot" and scooping:
+				_guidance.text = "Высокий нагрев. Остановите сбор и отойдите от звезды."
+				guidance_color = AMBER
+	if _guidance.get_theme_color("font_color") != guidance_color:
+		_guidance.add_theme_color_override("font_color", guidance_color)
 
 func _sync_clock(sim: RefCounted) -> void:
 	var seconds := floori(sim.orbit_time + 0.000001)
@@ -476,9 +534,9 @@ func set_target_marker(screen_position: Vector2, visible: bool) -> void:
 func set_traffic_markers(markers: Array[Dictionary]) -> void:
 	_marks.traffic = markers.duplicate()
 	_marks.traffic.sort_custom(func(left: Dictionary, right: Dictionary) -> bool:
-		var left_hostile: bool = left.role == "raider"
-		var right_hostile: bool = right.role == "raider"
-		return left_hostile if left_hostile != right_hostile else float(left.distance) < float(right.distance))
+		var left_priority: int = MARK_PRIORITY.get(left.role, 2)
+		var right_priority: int = MARK_PRIORITY.get(right.role, 2)
+		return left_priority < right_priority if left_priority != right_priority else float(left.distance) < float(right.distance))
 	_marks.queue_redraw()
 
 func set_input_enabled(enabled: bool) -> void:
@@ -807,7 +865,10 @@ class FlightMarks extends Control:
 			if not safe.has_point(screen):
 				continue
 			var hostile: bool = contact.role == "raider"
+			var convoy: bool = contact.role == "convoy"
 			var color := ALERT if hostile else (ALLY if contact.role == "patrol" else CYAN)
+			if convoy:
+				color = CONVOY
 			var caption := "%s · %d м" % [contact.name, roundi(contact.distance)]
 			var width := font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
 			var text_at := Vector2(clampf(screen.x - width * 0.5, 20.0, maxf(20.0, size.x - width - 20.0)), screen.y + 27.0)
@@ -824,6 +885,9 @@ class FlightMarks extends Control:
 				draw_polyline(diamond, color, 1.7, true)
 			elif contact.role == "patrol":
 				draw_rect(Rect2(screen - Vector2(7, 7), Vector2(14, 14)), color, false, 1.4)
+			elif convoy:
+				draw_rect(Rect2(screen - Vector2(10, 8), Vector2(20, 16)), color, false, 1.4)
+				draw_rect(Rect2(screen - Vector2(5, 4), Vector2(10, 8)), color, false, 1.4)
 			else:
 				draw_arc(screen, 7.0, 0.0, TAU, 20, color, 1.4, true)
 			draw_rect(label_box, BACK)

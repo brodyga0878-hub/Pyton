@@ -10,6 +10,7 @@ const INK := Color("edf7f9")
 const MUTED := Color("adc0c9")
 const MINT := Color("a4e9d6")
 const AMBER := Color("f0c59a")
+const ALERT := Color("ffa79e")
 const BORDER := Color("355360")
 const STAGES := ["Принять заказ", "Обследовать систему", "Сдать отчёт", "Снабдить стройку"]
 const NEWS_LIMIT := 3
@@ -27,8 +28,12 @@ var _reason: Label
 var _project_button: Button
 var _close_button: Button
 var _systems: Array[Dictionary] = []
+var _convoy_panel: VBoxContainer
+var _convoys: Array[Label] = []
+var _news_scroll: ScrollContainer
 var _news: Array[Label] = []
 var _touches: Dictionary[int, Button] = {}
+var _news_finger := -1
 
 
 func build() -> void:
@@ -69,6 +74,8 @@ func open(sim: RefCounted) -> void:
 	build()
 	_sim = sim
 	_touches.clear()
+	_news_finger = -1
+	_news_scroll.scroll_vertical = 0
 	show()
 	refresh()
 
@@ -84,6 +91,7 @@ func refresh() -> void:
 
 func close() -> void:
 	_touches.clear()
+	_news_finger = -1
 	_sim = null
 	hide()
 
@@ -121,8 +129,17 @@ func _build_fronts(body: HBoxContainer) -> void:
 		_systems.append(_status_row(systems, str(Sector.system(id).name)))
 	var divider := HSeparator.new()
 	card.add_child(divider)
+	_convoy_panel = _column(card, 3)
+	_label(_convoy_panel, "Конвои фракций", 23, INK)
+	for index in range(Factions.FRONTIER_SYSTEMS.size() * Factions.FACTIONS.size()):
+		_convoys.append(_label(_convoy_panel, "", 16, INK))
 	_label(card, "События фракций", 23, INK)
-	var events := _column(card, 8)
+	_news_scroll = ScrollContainer.new()
+	_news_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_news_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	card.add_child(_news_scroll)
+	var events := _column(_news_scroll, 8)
+	events.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	for index in range(NEWS_LIMIT):
 		_news.append(_label(events, "", 16, MUTED))
 
@@ -197,6 +214,7 @@ func _refresh_project(status: Dictionary) -> void:
 
 
 func _refresh_fronts(status: Dictionary) -> void:
+	var convoy_count := 0
 	for id in range(_systems.size()):
 		var row := _systems[id]
 		row.panel.visible = _sim.system_known(id)
@@ -212,12 +230,35 @@ func _refresh_fronts(status: Dictionary) -> void:
 			if front.stage == "war":
 				row.state.text += " · Оспаривается (%d%%)" % int(front.pressure)
 				row.state.modulate = AMBER
+		for convoy: Dictionary in front.get("convoys", []):
+			_sync_convoy(_convoys[convoy_count], id, convoy)
+			convoy_count += 1
+	_convoy_panel.visible = convoy_count > 0
+	for index in range(_convoys.size()):
+		_convoys[index].visible = index < convoy_count
 	var news: Array = _sim.factions.news()
 	for index in range(_news.size()):
 		var item := _news[index]
 		item.visible = index < news.size() or index == 0
 		if item.visible:
 			item.text = str(news[index]) if index < news.size() else "Сводок пока нет."
+
+
+func _sync_convoy(line: Label, system: int, convoy: Dictionary) -> void:
+	var seconds := maxi(0, ceili(float(convoy.due_at) - _sim.orbit_time))
+	var state := "В пути · %d с" % seconds
+	var tint := INK
+	match convoy.stage:
+		"delivered":
+			state = "Доставлен"
+			tint = MINT
+		"intercepted":
+			state = "Перехвачен"
+			tint = ALERT
+	line.text = "%s · %s · %s ×%d · %s" % [
+		Sector.system(system).name, Factions.faction_name(convoy.faction), convoy.shipment, convoy.units, state,
+	]
+	line.add_theme_color_override("font_color", tint)
 
 
 func _request_project() -> void:
@@ -232,18 +273,25 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
 		var button: Button = _touches.get(event.index)
 		_touches.erase(event.index)
+		if event.index == _news_finger:
+			_news_finger = -1
 		if not event.canceled:
 			if event.pressed:
 				var hit := _button_at(event.position)
 				if hit != null and hit not in _touches.values():
 					_touches[event.index] = hit
+				elif _news_finger < 0 and _news_scroll.get_v_scroll_bar().visible and _news_scroll.get_global_rect().has_point(event.position):
+					_news_finger = event.index
 			elif button != null and button.visible and not button.disabled and button.get_global_rect().has_point(event.position):
 				button.pressed.emit()
 		get_viewport().set_input_as_handled()
 	elif event is InputEventScreenDrag:
-		var held: Button = _touches.get(event.index)
-		if held != null and not held.get_global_rect().has_point(event.position):
-			_touches.erase(event.index)
+		if event.index == _news_finger:
+			_news_scroll.scroll_vertical -= roundi(event.relative.y)
+		else:
+			var held: Button = _touches.get(event.index)
+			if held != null and not held.get_global_rect().has_point(event.position):
+				_touches.erase(event.index)
 		get_viewport().set_input_as_handled()
 
 
@@ -257,6 +305,7 @@ func _button_at(point: Vector2) -> Button:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_APPLICATION_PAUSED:
 		_touches.clear()
+		_news_finger = -1
 
 
 func _update_insets() -> void:

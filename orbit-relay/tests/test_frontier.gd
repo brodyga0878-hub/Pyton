@@ -241,17 +241,23 @@ func _test_wars(commissioned: Flight) -> void:
 	if not _expect(resumed.restore(saved) and _round_trip(resumed.factions.snapshot()) == saved.factions,
 		"Saving during the fighting preserves its phase, challenger, strength and next phase deadline"):
 		return
+	_test_convoys(remote, conflict, saved)
 	var captured := false
 	var repelled := false
+	var delivered := false
+	var intercepted := false
 	for _frame in range(500):
 		var previous_owner := remote.factions.owner(HEATHER)
 		_tick(remote, 1.0)
 		captured = captured or (remote.status_event == "war_captured" and remote.factions.owner(HEATHER) == 1 - previous_owner)
 		repelled = repelled or remote.status_event == "war_repulsed"
-		if captured and repelled:
+		delivered = delivered or remote.status_event == "war_convoy_delivered"
+		intercepted = intercepted or remote.status_event == "war_convoy_intercepted"
+		if captured and repelled and delivered and intercepted:
 			break
 	_expect(captured and repelled and remote.docked == 0 and remote.system_id == HOME,
 		"Autonomous campaigns advance while the player is elsewhere and can end in both conquest and repulse")
+	_expect(delivered and intercepted, "Remote simulation produces both deliveries and interceptions")
 	_expect(remote.factions.owner(0) == 0 and remote.factions.owner(1) == 1 and remote.factions.owner(2) == 0
 		and remote.factions.owner(LIMIT) == -1 and remote.station_operational(Catalog.HEATHER_PORT)
 		and remote.factions.news().size() <= FactionFronts.MAX_NEWS,
@@ -264,6 +270,78 @@ func _test_wars(commissioned: Flight) -> void:
 	saved = _round_trip(current)
 	_expect(resumed.restore(saved) and _round_trip(resumed.factions.snapshot()) == saved.factions,
 		"Cold restoring after multiple campaigns preserves territory, schedules and war reports")
+
+
+func _test_convoys(remote: Flight, conflict: Dictionary, saved: Dictionary) -> void:
+	var convoys := remote.factions.active_convoys(HEATHER)
+	if not _expect(convoys.size() == 2 and convoys[0].faction != convoys[1].faction
+		and convoys[0].due_at != convoys[1].due_at and conflict.next_event_at < conflict.next_at
+		and remote.factions.active_convoys(HOME).is_empty(),
+		"At the opening of a frontier battle, both factions send supplies with separate deadlines"):
+		return
+	var local := _at_port(remote, Catalog.HEATHER_PORT)
+	var sooner: Dictionary = convoys[0] if convoys[0].due_at < convoys[1].due_at else convoys[1]
+	var later: Dictionary = convoys[1] if sooner.id == convoys[0].id else convoys[0]
+	var visible := _convoy_traffic(local)
+	_expect(visible.size() == convoys.size() and visible.has(sooner.id) and visible.has(later.id)
+		and visible[sooner.id].position.is_finite() and visible[later.id].velocity.is_finite(),
+		"Scheduled reinforcements appear in local flight traffic as physical convoy contacts")
+	_tick(remote, (float(sooner.due_at) - remote.orbit_time - 0.5) / remote.time_scale)
+	_expect(remote.factions.active_convoys(HEATHER).size() == 2 and remote.factions.owner(HEATHER) == conflict.owner,
+		"Both cargo ships stay active until the earlier arrival deadline")
+	_tick(remote, 1.0 / remote.time_scale)
+	var pending := remote.factions.active_convoys(HEATHER)
+	_expect(pending.size() == 1 and pending[0].id == later.id
+		and remote.status_event in ["war_convoy_delivered", "war_convoy_intercepted"]
+		and remote.factions.system_state(HEATHER).round == conflict.round,
+		"At the first arrival deadline only the earlier convoy resolves while the combat round remains in progress")
+	local = _at_port(remote, Catalog.HEATHER_PORT)
+	var remaining := _convoy_traffic(local)
+	_expect(remaining.size() == 1 and remaining.has(later.id) and visible.has(later.id)
+		and remaining[later.id].position.distance_to(visible[later.id].position) > 20.0,
+		"The remaining convoy travels along its local route while the resolved convoy leaves the contacts")
+	var resolved := _round_trip(remote.snapshot())
+	var resumed := Flight.new()
+	_expect(resumed.restore(resolved) and _round_trip(resumed.factions.snapshot()) == resolved.factions,
+		"Saving between two arrivals holds both the completed outcome and the convoy still en route")
+	var invalid := resolved.duplicate(true)
+	invalid.factions.frontiers[0].convoys[0].due_at = 0
+	_expect(not resumed.restore(invalid) and _round_trip(resumed.factions.snapshot()) == resolved.factions,
+		"A convoy due before its launch is rejected without discarding the active campaign")
+	_tick(remote, (float(later.due_at) - remote.orbit_time + 0.5) / remote.time_scale)
+	var aftermath := remote.factions.system_state(HEATHER)
+	var logistics := 0
+	for convoy: Dictionary in aftermath.convoys:
+		if convoy.stage == "delivered":
+			logistics += 2 * int(convoy.units) * (1 if convoy.faction == conflict.challenger else -1)
+	_expect(remote.factions.active_convoys(HEATHER).is_empty(), "The second convoy resolves at its own later deadline")
+	_tick(remote, (float(conflict.next_at) - remote.orbit_time + 0.5) / remote.time_scale)
+	_expect(remote.status_event == "war_round" and remote.factions.system_state(HEATHER).round == conflict.round + 1
+		and ("%+d п. п." % logistics) in remote.status_message,
+		"The combat round incorporates the net supplies that physically arrived")
+	var legacy := saved.duplicate(true)
+	legacy.schema = 10
+	legacy.erase("star_heat")
+	for record: Dictionary in legacy.factions.frontiers:
+		record.erase("convoys")
+		record.erase("legacy_round")
+	if not _expect(resumed.restore(legacy) and resumed.star_heat == 0.0
+		and resumed.factions.active_convoys(HEATHER).is_empty() and resumed.factions.owner(HEATHER) == conflict.owner
+		and is_equal_approx(resumed.factions.system_state(HEATHER).next_at, conflict.next_at),
+		"An older in-progress war migrates without duplicating supplies or moving its round deadline"):
+		return
+	_tick(resumed, float(conflict.next_at) - resumed.orbit_time + 0.5)
+	_expect(resumed.factions.system_state(HEATHER).round == conflict.round + 1
+		and resumed.factions.active_convoys(HEATHER).size() == 2,
+		"The migrated campaign dispatches supplies automatically when its next round begins")
+
+
+func _convoy_traffic(flight: Flight) -> Dictionary:
+	var contacts := {}
+	for contact: Dictionary in flight.traffic_contacts():
+		if contact.role == "convoy":
+			contacts[contact.id] = contact
+	return contacts
 
 
 func _test_board() -> void:

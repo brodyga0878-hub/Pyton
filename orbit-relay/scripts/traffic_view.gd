@@ -13,7 +13,7 @@ const BOX_FACES := [
 ]
 
 var _ships: Dictionary[String, Node3D] = {}
-var _pool: Dictionary[String, Array] = {"trader": [], "patrol": [], "raider": []}
+var _pool: Dictionary[String, Array] = {"trader": [], "patrol": [], "raider": [], "convoy": []}
 var _hulls: Dictionary[String, Array] = {}
 var _trim: Array[MeshInstance3D] = []
 var _beams: Array[Node3D] = []
@@ -143,6 +143,7 @@ func _build_hull(role: String) -> Array:
 		"trader": _trader(shell, lamps)
 		"patrol": _patrol(shell, lamps)
 		"raider": _raider(shell, lamps)
+		"convoy": _convoy(shell, lamps)
 	_add_role_trim(trim, role)
 	return [shell.commit(), lamps.commit(), trim.commit()]
 
@@ -206,6 +207,10 @@ func _add_role_trim(tool: SurfaceTool, role: String) -> void:
 				_box(tool, Vector3(side * 2.8, 0.19, 0.8), Vector3(1.14, 0.19, 1.84), Color("#943b34"), -side * 0.44)
 				for index in range(3):
 					_box(tool, Vector3(side * 2.64, 0.33, 0.09 + index * 0.52), Vector3(0.64, 0.07, 0.16), Color("#dc8a67"), -side * 0.44)
+			"convoy":
+				for position_z: float in [-3.3, 1.3]:
+					_box(tool, Vector3(side * 3.15, 1.11, position_z), Vector3(2.1, 0.14, 0.20), Color("#f4bf6e"))
+					_box(tool, Vector3(side * 4.46, 0.16, position_z), Vector3(0.13, 0.85, 2.35), Color("#603e27"))
 
 
 func _trader(shell: SurfaceTool, lamps: SurfaceTool) -> void:
@@ -222,6 +227,28 @@ func _trader(shell: SurfaceTool, lamps: SurfaceTool) -> void:
 			_box(shell, Vector3(side * 2.35, -0.15, brace), Vector3(2.32, 1.52, 0.23), hull)
 		_box(lamps, Vector3(side * 2.95, -0.52, 5.43), Vector3(0.74, 0.48, 0.11), Color("#8fe0ff"))
 		_box(lamps, Vector3(side * 3.48, 0.22, -1.45), Vector3(0.14, 0.22, 0.84), Color("#ffce80"))
+
+
+func _convoy(shell: SurfaceTool, lamps: SurfaceTool) -> void:
+	var structure := Color("#384953")
+	var frame := Color("#acbbc2")
+	var cargo := Color("#a77c47")
+	var beacon := Color("#ffcc80")
+	_sectioned(shell, [
+		Vector3(0.8, 0.37, -8.1), Vector3(1.52, 1.1, -5.9),
+		Vector3(1.79, 0.99, 5.9), Vector3(1.3, 0.79, 7.2),
+	], frame)
+	_box(shell, Vector3(0.0, 1.0, -6.06), Vector3(1.79, 0.72, 2.50), Color("#1d4152"))
+	_box(shell, Vector3(0.0, -0.92, 0.3), Vector3(8.82, 0.8, 8.9), structure)
+	for side: float in [-1.0, 1.0]:
+		for position_z: float in [-2.9, 1.7]:
+			_box(shell, Vector3(side * 3.03, -0.02, position_z), Vector3(2.72, 2.1, 3.97), cargo)
+			_box(shell, Vector3(side * 3.03, -0.02, position_z + 1.83), Vector3(2.86, 2.23, 0.28), structure)
+		_box(shell, Vector3(side * 2.8, -0.14, 5.64), Vector3(2.68, 2.12, 3.16), frame)
+		_box(shell, Vector3(side * 2.8, -0.14, 7.24), Vector3(1.84, 1.39, 0.32), structure)
+		_box(lamps, Vector3(side * 2.8, -0.14, 7.41), Vector3(1.14, 0.76, 0.08), Color("#9fecff"))
+		_box(lamps, Vector3(side * 4.38, 0.64, -4.18), Vector3(0.23, 0.26, 0.65), beacon)
+		_box(lamps, Vector3(side * 4.38, 0.64, 3.21), Vector3(0.23, 0.26, 0.65), beacon)
 
 
 func _patrol(shell: SurfaceTool, lamps: SurfaceTool) -> void:

@@ -49,13 +49,13 @@ const SYSTEMS := [
 		"name": "Гелион", "position": Vector2.ZERO, "accent": Color("#ffc778"),
 		"description": "Три порта, шесть месторождений и жёлтая звезда с зоной сбора топлива.",
 		"arrival_port": 0, "targets": [0, 1, 2, 3, 4, 5, 6, 7, 8, STAR_ID], "ports": PORT_IDS,
-		"mines": MINING_IDS, "star": STAR_ID,
+		"mines": MINING_IDS, "star": STAR_ID, "stellar_heat": 1.0,
 	},
 	{
 		"name": "Велар", "position": Vector2(3.6, -2.2), "accent": Color("#9dcaff"),
 		"description": "Голубая звезда, два порта, ледяная луна, залежи кристаллов и скальная планета «Терраса».",
 		"arrival_port": 10, "targets": [10, 11, 12, 13, VELAR_STAR_ID, TERRACE_ID], "ports": [10, 11],
-		"mines": [12, 13, TERRACE_ID], "star": VELAR_STAR_ID,
+		"mines": [12, 13, TERRACE_ID], "star": VELAR_STAR_ID, "stellar_heat": 1.16,
 	},
 	{
 		"name": "Кромка", "position": Vector2(5.7, 0.15), "accent": Color("#ffc2a4"),
@@ -63,7 +63,7 @@ const SYSTEMS := [
 		"arrival_port": FRINGE_ARRIVAL_PORT,
 		"targets": [FRINGE_ARRIVAL_PORT, FRINGE_SECOND_PORT, FRINGE_ASTEROID_ID, FRINGE_STAR_ID],
 		"ports": [FRINGE_ARRIVAL_PORT, FRINGE_SECOND_PORT],
-		"mines": [FRINGE_ASTEROID_ID], "star": FRINGE_STAR_ID,
+		"mines": [FRINGE_ASTEROID_ID], "star": FRINGE_STAR_ID, "stellar_heat": 0.89,
 	},
 	{
 		"name": "Вереск", "position": Vector2(7.7, -2.5), "accent": Color("#b9e4af"),
@@ -71,7 +71,7 @@ const SYSTEMS := [
 		"arrival_port": HEATHER_PORT, "construction_port": HEATHER_PORT, "frontier": true,
 		"survey_sites": [HEATHER_PLANET, HEATHER_MOON],
 		"targets": [HEATHER_PORT, HEATHER_PLANET, HEATHER_MOON, HEATHER_STAR], "ports": [HEATHER_PORT],
-		"mines": [HEATHER_PLANET, HEATHER_MOON], "star": HEATHER_STAR,
+		"mines": [HEATHER_PLANET, HEATHER_MOON], "star": HEATHER_STAR, "stellar_heat": 0.95,
 	},
 	{
 		"name": "Предел", "position": Vector2(10.1, -4.0), "accent": Color("#ddbfff"),
@@ -79,7 +79,7 @@ const SYSTEMS := [
 		"arrival_port": LIMIT_PORT, "construction_port": LIMIT_PORT, "frontier": true,
 		"survey_sites": [LIMIT_PLANET, LIMIT_ASTEROID],
 		"targets": [LIMIT_PORT, LIMIT_PLANET, LIMIT_ASTEROID, LIMIT_STAR], "ports": [LIMIT_PORT],
-		"mines": [LIMIT_PLANET, LIMIT_ASTEROID], "star": LIMIT_STAR,
+		"mines": [LIMIT_PLANET, LIMIT_ASTEROID], "star": LIMIT_STAR, "stellar_heat": 1.12,
 	},
 ]
 const RESOURCES := ["ore", "crystal", "ice"]
@@ -175,6 +175,10 @@ static func mines_for(system_id: int) -> Array:
 
 static func star_for(system_id: int) -> int:
 	return system(system_id).get("star", -1)
+
+
+static func stellar_heat(system_id: int) -> float:
+	return system(system_id).get("stellar_heat", 1.0)
 
 
 static func jump_cost(origin: int, destination: int) -> int:

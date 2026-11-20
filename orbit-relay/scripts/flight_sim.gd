@@ -11,7 +11,7 @@ const Traffic = preload("res://scripts/sector_traffic.gd")
 const Patrol = preload("res://scripts/patrol_encounter.gd")
 const Expedition = preload("res://scripts/expedition.gd")
 const FactionFronts = preload("res://scripts/faction_fronts.gd")
-const SAVE_SCHEMA := 10
+const SAVE_SCHEMA := 11
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
@@ -21,6 +21,9 @@ const ARRIVAL_OFFSET := 90.0
 const MAX_SPEED := 145.0
 const RESERVE_SPEED := 42.0
 const SCOOP_RATE := 7.0
+const HEAT_SCOOP_SLOW := 55.0
+const HEAT_SCOOP_LIMIT := 76.0
+const HEAT_DAMAGE_LIMIT := 85.0
 const MAX_STEER := 1.45
 const MAX_PITCH := 1.42
 const MAX_ROLL := 1.9
@@ -66,6 +69,7 @@ var expedition := Expedition.new()
 var factions := FactionFronts.new()
 var project_course := false
 var scooping := false
+var star_heat := 0.0
 var system_id := Catalog.HOME_SYSTEM
 var jump_target := -1
 var jump_seconds_left := 0.0
@@ -129,6 +133,8 @@ func time_status() -> Dictionary:
 		return {"allowed": false, "reason": "Боевой контакт"}
 	if docked >= 0 or landed:
 		return {"allowed": true, "reason": ""}
+	if star_heat >= HEAT_SCOOP_LIMIT:
+		return {"allowed": false, "reason": "Корпус ещё горячий"}
 	var star := Catalog.star_for(system_id)
 	for id: int in local_targets():
 		var radius := Catalog.SCOOP_OUTER + STAR_WARP_MARGIN if id == star else float(Catalog.site(id).radius) + FRAME_MARGIN
@@ -738,7 +744,7 @@ func service_action(action: String) -> bool:
 
 
 func scoop_status() -> Dictionary:
-	var distance := position.distance_to(target_position(Catalog.star_for(system_id)))
+	var distance := _star_distance()
 	var near := distance <= Catalog.SCOOP_OUTER + 180.0
 	var reason := ""
 	if docked >= 0 or landed:
@@ -749,11 +755,60 @@ func scoop_status() -> Dictionary:
 		reason = "Отойдите от звезды до зоны сбора"
 	elif distance > Catalog.SCOOP_OUTER:
 		reason = "Подойдите к отмеченной зоне сбора"
+	elif star_heat >= HEAT_SCOOP_LIMIT:
+		reason = "Корпус перегрет. Отойдите от звезды, чтобы остыть"
 	elif speed() > Catalog.SCOOP_SPEED:
 		reason = "Снизьте скорость до %d м/с" % int(Catalog.SCOOP_SPEED)
 	elif ship.fuel >= ship.capacity():
 		reason = "Бак уже полон"
 	return {"ok": reason.is_empty(), "reason": "Можно собирать топливо" if reason.is_empty() else reason, "near": near}
+
+
+func thermal_status() -> Dictionary:
+	var distance := _star_distance()
+	var in_flight := docked < 0 and not landed
+	var level := "normal"
+	if star_heat >= HEAT_DAMAGE_LIMIT:
+		level = "critical"
+	elif star_heat >= 65.0:
+		level = "hot"
+	elif star_heat >= 35.0:
+		level = "warm"
+	return {
+		"heat": star_heat, "distance": distance, "level": level,
+		"visible": in_flight and (distance <= Catalog.SCOOP_OUTER or star_heat >= 1.0),
+		"danger": in_flight and distance < Catalog.SCOOP_INNER,
+		"blocked": star_heat >= HEAT_SCOOP_LIMIT,
+		"cooling": star_heat - _heat_target(distance) > 0.1,
+	}
+
+
+func _star_distance() -> float:
+	return position.distance_to(target_position(Catalog.star_for(system_id)))
+
+
+func _heat_target(distance: float) -> float:
+	# Approach heat rises more quickly near the stellar surface. Running the collector adds heat.
+	var proximity := maxf(0.0, Catalog.SCOOP_OUTER - distance) / (Catalog.SCOOP_OUTER - Catalog.SCOOP_INNER)
+	var output := Catalog.stellar_heat(system_id)
+	return 82.0 * output * proximity * proximity + (12.0 if scooping else 0.0)
+
+
+func _update_star_heat(delta: float) -> void:
+	var exposed := docked < 0 and not landed and jump_seconds_left <= 0.0
+	var equilibrium := _heat_target(_star_distance()) if exposed else 0.0
+	if star_heat == 0.0 and equilibrium == 0.0:
+		return
+	var previous := star_heat
+	var response := 0.17 if equilibrium > star_heat else 0.28
+	star_heat = clampf(lerpf(star_heat, equilibrium, 1.0 - exp(-response * delta)), 0.0, 100.0)
+	if star_heat < 0.05:
+		star_heat = 0.0
+	if exposed and star_heat >= HEAT_DAMAGE_LIMIT:
+		var severity := inverse_lerp(HEAT_DAMAGE_LIMIT, 100.0, star_heat)
+		ship.apply_damage(lerpf(0.7, 6.0, severity) * delta)
+		if previous < HEAT_DAMAGE_LIMIT:
+			_announce("thermal_damage", "Критический перегрев. Отойдите от звезды, корпус повреждается.")
 
 
 func scoop_action() -> bool:
@@ -779,7 +834,8 @@ func _collect_fuel(delta: float) -> void:
 		scooping = false
 		_announce("scoop_stop", status.reason)
 		return
-	ship.add_fuel(SCOOP_RATE * delta)
+	var heat_fraction := clampf(inverse_lerp(HEAT_SCOOP_SLOW, HEAT_SCOOP_LIMIT, star_heat), 0.0, 1.0)
+	ship.add_fuel(SCOOP_RATE * lerpf(1.0, 0.45, heat_fraction) * delta)
 	if ship.fuel >= ship.capacity():
 		scooping = false
 		_announce("scoop_full", "Бак полностью заправлен от звезды.")
@@ -983,10 +1039,12 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		_announce(front.event, front.message)
 	if docked >= 0:
 		_hold_docked_pose()
+		_update_star_heat(delta)
 		_apply_patrol_result(patrol.step(self, delta))
 		return
 	if landed:
 		_hold_landed_pose()
+		_update_star_heat(delta)
 		_apply_patrol_result(patrol.step(self, delta))
 		var mining_event := mining.update(delta)
 		match mining_event:
@@ -1001,6 +1059,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 			cancel_jump()
 		else:
 			_charge_jump(delta)
+		_update_star_heat(delta)
 		return
 	if manual_input:
 		if autopilot or patrol_course or project_course:
@@ -1057,6 +1116,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		velocity = target_velocity(obstacle) if caught_by_motion else Vector3.ZERO
 		throttle = 0.0
 		set_autopilot(false)
+	_update_star_heat(delta)
 	_collect_fuel(delta)
 	_apply_patrol_result(patrol.step(self, delta))
 
@@ -1320,7 +1380,7 @@ func snapshot() -> Dictionary:
 		"landed_site": landed_site, "planned_target": planned_target, "mining": mining.snapshot(),
 		"landing_direction": [landing_direction.x, landing_direction.y, landing_direction.z],
 		"ship": ship.snapshot(), "market": market.snapshot(), "system_id": system_id, "jump_target": jump_target,
-		"patrol": patrol.snapshot(),
+		"patrol": patrol.snapshot(), "star_heat": star_heat,
 		"expedition": expedition.snapshot(), "factions": factions.snapshot(),
 	}
 
@@ -1329,6 +1389,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_thermal := schema < 11
 	var pre_expansion := schema < 10
 	var pre_traffic := schema < 9
 	var pre_economy := schema < 8
@@ -1336,6 +1397,8 @@ func restore(state: Dictionary) -> bool:
 	var pre_galaxy := schema < 5
 	var pre_fuel := schema < 4
 	var pre_sector := schema < 3
+	if not pre_thermal and not _number(state.get("star_heat"), 0.0, 100.0):
+		return false
 	var restored_epoch := 0.0
 	if schema >= 6:
 		if not _number(state.get("orbit_time"), 0.0, 3155760000.0):
@@ -1383,7 +1446,7 @@ func restore(state: Dictionary) -> bool:
 	var restored_expedition := Expedition.new()
 	var restored_factions := FactionFronts.new()
 	if not pre_expansion:
-		if not restored_expedition.restore(state.get("expedition")) or not restored_factions.restore(state.get("factions")):
+		if not restored_expedition.restore(state.get("expedition")) or not restored_factions.restore(state.get("factions"), pre_thermal):
 			return false
 		for system in range(Catalog.CORE_SYSTEM_COUNT, Catalog.SYSTEM_COUNT):
 			if restored_expedition.commissioned(system) != (restored_factions.owner(system) >= 0):
@@ -1516,6 +1579,7 @@ func restore(state: Dictionary) -> bool:
 	patrol = restored_patrol
 	expedition = restored_expedition
 	factions = restored_factions
+	star_heat = 0.0 if pre_thermal else float(state.star_heat)
 	scooping = false
 	system_id = restored_system
 	jump_target = restored_jump

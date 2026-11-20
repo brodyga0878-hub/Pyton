@@ -16,6 +16,8 @@ func _initialize() -> void:
 func _run() -> void:
 	_test_manual_depletion()
 	_test_scoop_safety()
+	_test_stellar_heat()
+	_test_heat_and_time_acceleration()
 	_test_rear_stellar_departure()
 	_test_service_rules()
 	await _test_touch_route()
@@ -93,6 +95,75 @@ func _test_scoop_safety() -> void:
 	_step_flight(flight, STEP)
 	_expect(not flight.scooping and flight.ship.fuel == flight.ship.capacity(),
 		"Stellar collection clamps the last fraction of fuel and closes")
+
+
+func _test_stellar_heat() -> void:
+	var flight := Flight.new()
+	flight.dock_action()
+	flight.select_target(Catalog.STAR_ID)
+	var center := flight.target_position(Catalog.STAR_ID)
+	flight.position = center + Vector3.BACK * (Catalog.SCOOP_INNER + 1.0)
+	flight.velocity = Vector3.ZERO
+	flight.ship.fuel = 10.0
+	if not _expect(flight.scoop_action(), "A cool ship can initially collect at the inner edge of the band"):
+		return
+	_step_flight(flight, 6.0)
+	_expect(flight.star_heat > 0.0 and flight.ship.fuel > 10.0
+		and flight.ship.fuel < 10.0 + 6.0 * Flight.SCOOP_RATE,
+		"Heating at the inner edge reduces collection below the safe stellar rate")
+	_step_flight(flight, 9.0)
+	var hot := flight.thermal_status()
+	_expect(hot.blocked and not flight.scooping and not flight.scoop_action() and flight.ship.fuel < 100.0,
+		"Sustained inner-band heat closes the scoop before the tank is full and blocks immediate reopening")
+	var resumed := Flight.new()
+	var saved := _round_trip(flight.snapshot())
+	_expect(resumed.restore(saved) and is_equal_approx(resumed.star_heat, flight.star_heat)
+		and resumed.thermal_status().blocked and not resumed.scooping,
+		"Reloading a hot ship preserves its temperature and continues to block collection")
+	var intact := resumed.snapshot()
+	for invalid: Variant in [-1, 101, "50", INF]:
+		var malformed := saved.duplicate(true)
+		malformed.star_heat = invalid
+		_expect(not resumed.restore(malformed) and resumed.snapshot() == intact,
+			"An invalid saved temperature is rejected atomically: %s" % invalid)
+	flight.position = center + Vector3.BACK * (Catalog.STAR_CLEARANCE + 0.3)
+	var hull_before := flight.ship.hull
+	_step_flight(flight, 22.0)
+	_expect(flight.thermal_status().danger and flight.thermal_status().level == "critical"
+		and flight.ship.hull < hull_before and flight.ship.hull > 0.0,
+		"Sustained exposure just above the stellar exclusion radius damages the hull")
+	flight.yaw = PI
+	flight.change_throttle(0.45)
+	_step_flight(flight, 7.0)
+	flight.change_throttle(-1.0)
+	_step_flight(flight, 1.5, false, true)
+	var hull_after_retreat := flight.ship.hull
+	_expect(flight.position.distance_to(center) > Catalog.SCOOP_OUTER and flight.thermal_status().cooling,
+		"Moving beyond the collection band begins cooling the ship")
+	_step_flight(flight, 45.0)
+	_expect(flight.star_heat < 1.0 and is_equal_approx(flight.ship.hull, hull_after_retreat)
+		and not flight.thermal_status().blocked,
+		"Cooling clears the hazardous state without further hull damage or implicit repairs")
+	flight.position = center + Vector3.BACK * 310.0
+	_expect(flight.scoop_action(), "A cooled ship can collect fuel again at the safe stellar radius")
+
+
+func _test_heat_and_time_acceleration() -> void:
+	var flight := Flight.new()
+	flight.dock_action()
+	var center := flight.target_position(Catalog.STAR_ID)
+	flight.position = center + Vector3.BACK * (Catalog.SCOOP_OUTER + Flight.STAR_WARP_MARGIN + 18.0)
+	flight.velocity = Vector3.FORWARD * 27.0
+	flight.yaw = 0.0
+	flight.change_throttle(0.20)
+	if not _expect(flight.cycle_time_scale() and flight.cycle_time_scale() and flight.time_scale == 16,
+		"Time acceleration is available outside the stellar approach margin"):
+		return
+	var clock_before := flight.orbit_time
+	flight.update(2.0, Vector2.ZERO, 0.0, false, false)
+	_expect(flight.time_scale == 1 and flight.orbit_time - clock_before < 6.0
+		and flight.position.distance_to(center) > Catalog.SCOOP_OUTER and not flight.cycle_time_scale(),
+		"Crossing the stellar margin cancels x16 before the ship reaches the dangerous band")
 
 
 func _test_rear_stellar_departure() -> void:
@@ -181,6 +252,9 @@ func _test_touch_route() -> void:
 		"The approach uses fuel and leaves collection under manual control")
 	game._update_display(0.0)
 	await process_frame
+	_expect(game._hud._thermal_panel.is_visible_in_tree()
+		and is_equal_approx(game._hud._thermal_level.value, flight.star_heat),
+		"The flight HUD displays the live heat reading inside the collection band")
 	_tap(game._hud._actions.get("scoop"), "Touch opens the scoop in the band")
 	_expect(flight.scooping, "The HUD action opens the scoop")
 	game._physics_process(0.25)
@@ -192,8 +266,9 @@ func _test_touch_route() -> void:
 	_tap(game._hud._actions.get("scoop"), "Touch reopens the scoop after a restart")
 	_advance(game, func() -> bool: return not flight.scooping, 20.0)
 	_expect(flight.ship.fuel == flight.ship.capacity() and not flight.scooping
-		and not flight.scoop_action() and flight.mining.snapshot() == initial_mining,
-		"A full tank stops stellar collection without changing mining cargo or reserves")
+		and not flight.scoop_action() and flight.mining.snapshot() == initial_mining
+		and flight.ship.hull == 100.0 and not flight.thermal_status().danger,
+		"A safe autopilot approach fills the tank with no heat damage or change to mining cargo or reserves")
 	_expect(flight.select_target(1), "A port can be selected after collecting fuel")
 	flight.set_autopilot(true)
 	_advance(game, func() -> bool: return flight.docked >= 0 or not flight.autopilot, 115.0)
@@ -203,6 +278,7 @@ func _test_touch_route() -> void:
 		return
 	game._update_display(0.0)
 	await process_frame
+	_expect(not game._hud._thermal_panel.is_visible_in_tree(), "The stellar heat indicator clears when docked")
 	_tap(game._hud._actions.get("services"), "Touch opens the port services panel")
 	await process_frame
 	var services: Node = game._services

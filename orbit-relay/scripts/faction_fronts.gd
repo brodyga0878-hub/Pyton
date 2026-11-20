@@ -7,12 +7,16 @@ const CORE_OWNERS := [0, 1, 0]
 const FRONTIER_SYSTEMS := [Catalog.HEATHER_SYSTEM, Catalog.LIMIT_SYSTEM]
 const FOUNDING_GRACE := 360.0
 const ROUND_SECONDS := 180.0
+const ATTACK_CONVOY_SECONDS := 90.0
+const DEFENCE_CONVOY_SECONDS := 120.0
 const TRUCE_SECONDS := 480.0
 const CAMPAIGN_ROUNDS := 3
 const MAX_NEWS := 8
 const MAX_ORBIT_CLOCK := 3155760000.0
 const MAX_CAMPAIGNS := 10000000
 const RECORD_FIELDS := ["owner", "stage", "pressure", "challenger", "next_at", "round", "campaign"]
+const CONVOY_FIELDS := ["id", "faction", "stage", "launched_at", "due_at", "shipment", "units"]
+const SHIPMENTS := ["Запасные узлы", "Энергоячейки"]
 
 var _frontiers: Array[Dictionary] = [_new_frontier(), _new_frontier()]
 var _news: Array[String] = []
@@ -34,8 +38,21 @@ func system_state(system: int) -> Dictionary:
 	if index < 0:
 		var core_owner := owner(system)
 		return {"owner": core_owner, "stage": "core" if core_owner >= 0 else "neutral", "pressure": 0,
-			"challenger": -1, "next_at": 0.0}
-	return _frontiers[index].duplicate()
+			"challenger": -1, "next_at": 0.0, "next_event_at": 0.0, "convoys": []}
+	var frontier := _frontiers[index]
+	var state := frontier.duplicate(true)
+	state.next_event_at = _next_event_at(frontier)
+	return state
+
+
+func active_convoys(system: int) -> Array[Dictionary]:
+	var convoys: Array[Dictionary] = []
+	var index := FRONTIER_SYSTEMS.find(system)
+	if index >= 0:
+		for convoy: Dictionary in _frontiers[index].convoys:
+			if convoy.stage == "en_route":
+				convoys.append(convoy.duplicate())
+	return convoys
 
 
 func news() -> Array[String]:
@@ -63,30 +80,39 @@ func advance(now: float) -> Dictionary:
 	var next_due := INF
 	for candidate in range(_frontiers.size()):
 		var record := _frontiers[candidate]
-		if record.owner >= 0 and record.next_at <= now and record.next_at < next_due:
+		var due := _next_event_at(record)
+		if record.owner >= 0 and due <= now and due < next_due:
 			index = candidate
-			next_due = record.next_at
+			next_due = due
 	if index < 0:
 		return {}
 
 	var frontier := _frontiers[index]
-	var system := _system_name(FRONTIER_SYSTEMS[index])
+	var system_id: int = FRONTIER_SYSTEMS[index]
+	var system := _system_name(system_id)
+	for convoy: Dictionary in frontier.convoys:
+		if convoy.stage == "en_route" and convoy.due_at == next_due:
+			return _resolve_convoy(frontier, convoy, system_id)
+
 	if frontier.stage == "peace":
 		frontier.stage = "war"
 		frontier.challenger = 1 - int(frontier.owner)
 		frontier.pressure = 16
 		frontier.campaign = mini(int(frontier.campaign) + 1, MAX_CAMPAIGNS)
 		_schedule(frontier, now, ROUND_SECONDS)
-		return _event("war_declared", "Фракция «%s» оспаривает контроль над системой «%s». К рубежу идут подкрепления." % [
+		_dispatch_convoys(frontier, system_id)
+		return _event("war_declared", "Фракция «%s» оспаривает контроль над системой «%s». Обе стороны отправили конвои." % [
 			faction_name(frontier.challenger), system,
 		])
 
+	var supply_bonus := _delivered_supply_bonus(frontier)
 	frontier.round += 1
-	frontier.pressure = clampi(int(frontier.pressure) + _pressure_delta(index), 0, 100)
+	frontier.pressure = clampi(int(frontier.pressure) + _pressure_delta(index) + supply_bonus, 0, 100)
 	if frontier.round < CAMPAIGN_ROUNDS:
 		_schedule(frontier, now, ROUND_SECONDS)
-		return _event("war_round", "Фронт в системе «%s». Сила наступления %d%%, раунд %d из %d." % [
-			system, frontier.pressure, frontier.round, CAMPAIGN_ROUNDS,
+		_dispatch_convoys(frontier, system_id)
+		return _event("war_round", "Фронт в системе «%s». Сила наступления %d%%, завершён раунд %d из %d. Вклад конвоев %+d п. п." % [
+			system, frontier.pressure, frontier.round, CAMPAIGN_ROUNDS, supply_bonus,
 		])
 
 	var captured: bool = frontier.pressure >= 55
@@ -96,13 +122,15 @@ func advance(now: float) -> Dictionary:
 	frontier.challenger = -1
 	frontier.pressure = 0
 	frontier.round = 0
+	frontier.convoys.clear()
+	frontier.legacy_round = false
 	_schedule(frontier, now, TRUCE_SECONDS)
 	if captured:
-		return _event("war_captured", "Контроль над системой «%s» перешёл к фракции «%s». Заключено перемирие." % [
-			system, faction_name(frontier.owner),
+		return _event("war_captured", "Контроль над системой «%s» перешёл к фракции «%s». Заключено перемирие. Вклад конвоев в решающем раунде %+d п. п." % [
+			system, faction_name(frontier.owner), supply_bonus,
 		])
-	return _event("war_repulsed", "Фракция «%s» удержала систему «%s». Заключено перемирие." % [
-		faction_name(frontier.owner), system,
+	return _event("war_repulsed", "Фракция «%s» удержала систему «%s». Заключено перемирие. Вклад конвоев в решающем раунде %+d п. п." % [
+		faction_name(frontier.owner), system, supply_bonus,
 	])
 
 
@@ -110,7 +138,7 @@ func snapshot() -> Dictionary:
 	return {"frontiers": _frontiers.duplicate(true), "news": _news.duplicate()}
 
 
-func restore(payload: Variant) -> bool:
+func restore(payload: Variant, legacy_convoys := false) -> bool:
 	if not payload is Dictionary or payload.size() != 2:
 		return false
 	var records: Variant = payload.get("frontiers")
@@ -118,12 +146,19 @@ func restore(payload: Variant) -> bool:
 	if not records is Array or records.size() != FRONTIER_SYSTEMS.size() or not reports is Array or reports.size() > MAX_NEWS:
 		return false
 	var restored_frontiers: Array[Dictionary] = []
-	for record in records:
-		if not _valid_record(record):
+	for index in range(records.size()):
+		var record: Variant = records[index]
+		if not _valid_record(record, FRONTIER_SYSTEMS[index], legacy_convoys):
 			return false
-		restored_frontiers.append({"owner": int(record.owner), "stage": record.stage,
+		var legacy_round: bool = record.stage == "war" if legacy_convoys else record.legacy_round
+		var restored := {"owner": int(record.owner), "stage": record.stage,
 			"pressure": int(record.pressure), "challenger": int(record.challenger), "next_at": float(record.next_at),
-			"round": int(record.round), "campaign": int(record.campaign)})
+			"round": int(record.round), "campaign": int(record.campaign), "convoys": [], "legacy_round": legacy_round}
+		if restored.stage == "war" and not legacy_round:
+			_dispatch_convoys(restored, FRONTIER_SYSTEMS[index])
+			for slot in range(restored.convoys.size()):
+				restored.convoys[slot].stage = record.convoys[slot].stage
+		restored_frontiers.append(restored)
 	var restored_news: Array[String] = []
 	for report in reports:
 		if not report is String or report.is_empty() or report.length() > 240:
@@ -134,16 +169,73 @@ func restore(payload: Variant) -> bool:
 	return true
 
 
+static func _next_event_at(frontier: Dictionary) -> float:
+	var due: float = frontier.next_at
+	for convoy: Dictionary in frontier.convoys:
+		if convoy.stage == "en_route":
+			due = minf(due, convoy.due_at)
+	return due
+
+
+static func _dispatch_convoys(frontier: Dictionary, system: int) -> void:
+	var launched_at := float(frontier.next_at) - ROUND_SECONDS
+	var attacker: int = frontier.challenger
+	var defender: int = frontier.owner
+	frontier.legacy_round = false
+	frontier.convoys = [
+		_convoy(frontier, system, attacker, launched_at, ATTACK_CONVOY_SECONDS),
+		_convoy(frontier, system, defender, launched_at, DEFENCE_CONVOY_SECONDS),
+	]
+
+
+static func _convoy(frontier: Dictionary, system: int, faction: int, launched_at: float, duration: float) -> Dictionary:
+	var campaign: int = frontier.campaign
+	var turn: int = frontier.round
+	var units := 3 + (system * 13 + campaign * 7 + turn * 3 + faction * 2) % 5
+	return {"id": "front-%d-%d-%d-%d" % [system, campaign, turn, faction], "faction": faction,
+		"stage": "en_route", "launched_at": launched_at, "due_at": launched_at + duration,
+		"shipment": SHIPMENTS[faction], "units": units}
+
+
+func _resolve_convoy(frontier: Dictionary, convoy: Dictionary, system: int) -> Dictionary:
+	var faction: int = convoy.faction
+	var opposition := 1 - faction
+	var campaign: int = frontier.campaign
+	var turn: int = frontier.round
+	var escort := _holdings(faction) + (system * 11 + campaign * 7 + turn * 11 + faction * 3) % 17
+	var blockade := _holdings(opposition) + (system * 5 + campaign * 11 + turn * 3 + faction * 5) % 17
+	var cargo := "«%s», %d ед." % [str(convoy.shipment).to_lower(), convoy.units]
+	if escort + 3 >= blockade:
+		convoy.stage = "delivered"
+		return _event("war_convoy_delivered", "Конвой фракции «%s» доставил снабжение в систему «%s». Груз %s" % [
+			faction_name(faction), _system_name(system), cargo,
+		])
+	convoy.stage = "intercepted"
+	return _event("war_convoy_intercepted", "Фракция «%s» перехватила конвой фракции «%s» в системе «%s». Потерян груз %s" % [
+		faction_name(opposition), faction_name(faction), _system_name(system), cargo,
+	])
+
+
+static func _delivered_supply_bonus(frontier: Dictionary) -> int:
+	var bonus := 0
+	for convoy: Dictionary in frontier.convoys:
+		if convoy.stage == "delivered":
+			var points := 2 * int(convoy.units)
+			bonus += points if convoy.faction == frontier.challenger else -points
+	return bonus
+
+
 func _pressure_delta(index: int) -> int:
 	var frontier := _frontiers[index]
 	var attacker: int = frontier.challenger
 	var defender: int = frontier.owner
 	var campaign: int = frontier.campaign
 	var turn: int = frontier.round
-	# Holdings support fleets, and alternating supply windows can reverse an advantage.
+	# Keep the original balance for an already active round restored from a v10 save.
+	var holdings_weight := 6 if frontier.legacy_round else 4
 	var opening := 12 if (campaign + index) % 2 == 1 else -10
-	var attack := 6 * _holdings(attacker) + (index * 11 + campaign * 7 + turn * 5) % 13
-	var defence := 6 * _holdings(defender) + (index * 7 + campaign * 5 + turn * 3) % 11
+	var attack := holdings_weight * _holdings(attacker) + (index * 11 + campaign * 7 + turn * 5) % 13
+	var defence := holdings_weight * _holdings(defender) + (index * 7 + campaign * 5 + turn * 3) % 11
 	return 16 + opening + attack - defence
 
 
@@ -174,11 +266,12 @@ static func _schedule(frontier: Dictionary, now: float, interval: float) -> void
 
 static func _new_frontier() -> Dictionary:
 	return {"owner": -1, "stage": "neutral", "pressure": 0, "challenger": -1, "next_at": 0.0,
-		"round": 0, "campaign": 0}
+		"round": 0, "campaign": 0, "convoys": [], "legacy_round": false}
 
 
-static func _valid_record(record: Variant) -> bool:
-	if not record is Dictionary or record.size() != RECORD_FIELDS.size() or not record.has_all(RECORD_FIELDS):
+static func _valid_record(record: Variant, system: int, legacy_convoys: bool) -> bool:
+	var expected_fields := RECORD_FIELDS.size() if legacy_convoys else RECORD_FIELDS.size() + 2
+	if not record is Dictionary or record.size() != expected_fields or not record.has_all(RECORD_FIELDS):
 		return false
 	if not record.stage is String or record.stage not in ["neutral", "peace", "war"]:
 		return false
@@ -188,6 +281,8 @@ static func _valid_record(record: Variant) -> bool:
 		return false
 	if not _integer(record.campaign, 0, MAX_CAMPAIGNS) or not _number(record.next_at, 0.0, MAX_ORBIT_CLOCK + TRUCE_SECONDS):
 		return false
+	if not legacy_convoys and not _valid_convoys(record, system):
+		return false
 	if record.stage == "neutral":
 		return record.owner == -1 and record.challenger == -1 and record.pressure == 0 and record.round == 0 \
 			and record.campaign == 0 and record.next_at == 0.0
@@ -196,6 +291,37 @@ static func _valid_record(record: Variant) -> bool:
 	if record.stage == "peace":
 		return record.challenger == -1 and record.pressure == 0 and record.round == 0
 	return record.challenger == 1 - int(record.owner) and record.campaign > 0 and (record.round > 0 or record.pressure == 16)
+
+
+static func _valid_convoys(frontier: Dictionary, system: int) -> bool:
+	var convoys: Variant = frontier.get("convoys")
+	var legacy_round: Variant = frontier.get("legacy_round")
+	if not convoys is Array or not legacy_round is bool:
+		return false
+	if frontier.stage != "war":
+		return convoys.is_empty() and not legacy_round
+	if legacy_round:
+		return convoys.is_empty()
+	if convoys.size() != 2 or frontier.owner < 0 or frontier.challenger < 0 or frontier.next_at < ROUND_SECONDS:
+		return false
+	var launched_at := float(frontier.next_at) - ROUND_SECONDS
+	return _valid_convoy(convoys[0], _convoy(frontier, system, int(frontier.challenger), launched_at, ATTACK_CONVOY_SECONDS)) \
+		and _valid_convoy(convoys[1], _convoy(frontier, system, int(frontier.owner), launched_at, DEFENCE_CONVOY_SECONDS)) \
+		and (convoys[1].stage == "en_route" or convoys[0].stage != "en_route")
+
+
+static func _valid_convoy(convoy: Variant, expected: Dictionary) -> bool:
+	if not convoy is Dictionary or convoy.size() != CONVOY_FIELDS.size() or not convoy.has_all(CONVOY_FIELDS):
+		return false
+	if not convoy.stage is String or convoy.stage not in ["en_route", "delivered", "intercepted"]:
+		return false
+	if not _integer(convoy.faction, expected.faction, expected.faction) or not _integer(convoy.units, expected.units, expected.units):
+		return false
+	if not _number(convoy.launched_at, 0.0, MAX_ORBIT_CLOCK) or not _number(convoy.due_at, 0.0, MAX_ORBIT_CLOCK + ROUND_SECONDS):
+		return false
+	return convoy.id is String and convoy.id == expected.id and convoy.shipment is String and convoy.shipment == expected.shipment \
+		and absf(float(convoy.launched_at) - float(expected.launched_at)) < 0.00001 \
+		and absf(float(convoy.due_at) - float(expected.due_at)) < 0.00001
 
 
 static func _system_name(system: int) -> String:

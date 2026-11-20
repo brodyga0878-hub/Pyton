@@ -1,9 +1,10 @@
 extends RefCounted
-## Positions and velocities of autonomous civilian craft in the active system.
+## Positions and velocities of autonomous craft in the active system.
 
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const Terrain = preload("res://scripts/surface_terrain.gd")
 const TRADER_NAMES := ["Торговец «Вектор»", "Торговец «Каскад»"]
+const CONVOY_NAMES := ["Конвой Маяков", "Конвой Лиги"]
 const TRADE_PERIOD := 106.0
 const PATROL_PERIOD := 54.0
 
@@ -54,7 +55,28 @@ static func contacts(sim: RefCounted) -> Array[Dictionary]:
 		"id": "patrol-%d" % sim.system_id, "name": "Патруль «Дозор»", "role": "patrol",
 		"position": sample.position, "velocity": sample.velocity, "hull": 100.0,
 	})
+	for convoy: Dictionary in sim.factions.active_convoys(sim.system_id):
+		result.append(_convoy_contact(sim, first, convoy))
 	return result
+
+
+static func _convoy_contact(sim: RefCounted, port: int, convoy: Dictionary) -> Dictionary:
+	# The two factions use opposite lanes and approach rally points clear of the dock.
+	var faction: int = convoy.faction
+	var side := -1.0 if faction == 0 else 1.0
+	var gate: Vector3 = sim.target_gate(port)
+	var start := gate + Vector3(side * 542.0, 154.0, 378.0)
+	var finish := gate + Vector3(side * 126.0, 73.0, -82.0)
+	var route := finish - start
+	var duration := float(convoy.due_at) - float(convoy.launched_at)
+	var progress := clampf((float(sim.orbit_time) - float(convoy.launched_at)) / duration, 0.0, 1.0)
+	var drift: Vector3 = sim.target_velocity(port)
+	var sample := clear_hulls(sim, start + route * progress, drift + route / duration, 28.0)
+	return {
+		"id": convoy.id, "name": CONVOY_NAMES[faction], "role": "convoy",
+		"position": sample.position, "velocity": sample.velocity, "hull": 100.0,
+		"route_start": start, "route_end": finish,
+	}
 
 
 static func clear_hulls(sim: RefCounted, at: Vector3, velocity: Vector3, margin := 22.0, system := -1) -> Dictionary:

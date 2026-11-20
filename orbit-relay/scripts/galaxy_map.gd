@@ -140,12 +140,15 @@ func refresh() -> void:
 	_chart.candidate = _candidate
 	_current.text = "Система «%s»" % Sector.system(current).name
 	var known: Array[int] = []
+	var contested: Array[int] = []
 	for id in _system_buttons:
 		var button := _system_buttons[id]
 		button.visible = _flight.system_known(id)
 		if not button.visible:
 			continue
 		known.append(id)
+		if _flight.factions.system_state(id).stage == "war":
+			contested.append(id)
 		var suffix := ""
 		if id == current:
 			suffix = "   ·   Корабль"
@@ -154,10 +157,13 @@ func refresh() -> void:
 		button.text = str(Sector.system(id).name) + suffix
 		button.set_pressed_no_signal(id == _candidate)
 	_chart.set_systems(known)
+	_chart.contested = contested
 	_chart.queue_redraw()
 
 	_destination.text = str(selected.name)
 	_affiliation.text = _flight.system_faction_name(_candidate)
+	if contested.has(_candidate):
+		_affiliation.text += " · Оспаривается"
 	var frontier: Dictionary = _flight.frontier_status()
 	if int(frontier.get("system", -1)) == _candidate:
 		match int(frontier.get("phase", Expedition.LOCKED)):
@@ -355,6 +361,7 @@ class GalaxyChart extends Control:
 	var current := -1
 	var planned := -1
 	var candidate := -1
+	var contested: Array[int] = []
 	var _sky := PackedVector3Array()
 	var _systems: Array[int] = []
 	var _center := Vector2.ZERO
@@ -450,6 +457,12 @@ class GalaxyChart extends Control:
 		draw_arc(point, 23.0, 0.0, TAU, 48, Color(accent, 0.70), 1.2, true)
 		draw_circle(point, 9.0, accent, true, -1.0, true)
 		draw_circle(point, 4.0, accent.lerp(Color.WHITE, 0.72), true, -1.0, true)
+		if contested.has(id):
+			var warning := point + Vector2(20, -19)
+			draw_circle(warning, 8.0, FIELD, true, -1.0, true)
+			draw_arc(warning, 6.0, 0.0, TAU, 18, AMBER, 1.5, true)
+			draw_line(warning - Vector2(0, 3), warning, AMBER, 1.4, true)
+			draw_circle(warning + Vector2(0, 2.4), 0.9, AMBER, true, -1.0, true)
 		if id == current:
 			draw_colored_polygon(PackedVector2Array([point + Vector2(0, -43), point + Vector2(6, -34), point + Vector2(-6, -34)]), MINT)
 		if id == candidate:
