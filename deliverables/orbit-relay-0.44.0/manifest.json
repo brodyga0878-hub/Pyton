@@ -1,0 +1,125 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.44.0",
+  "source_commit": "5af67ca0551f45c04a491763c4f4d137224d49ea",
+  "content": {
+    "initial_known_systems": 3,
+    "total_systems": 5,
+    "stars_with_thermal_simulation": 5,
+    "convoys_per_round": 2,
+    "convoy_outcomes": [
+      "delivered",
+      "intercepted"
+    ],
+    "save_schema": 11
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 69,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches_0.43": true,
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 27,
+    "tested_on_device": false
+  },
+  "checks": {
+    "flight": {
+      "failures": 0
+    },
+    "scene": {
+      "failures": 0
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 72
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 186
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 292
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 191
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 132
+    },
+    "living": {
+      "failures": 0,
+      "checks": 76
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 80
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "stellar_sweep": {
+      "autopilot_tank_fills": 10,
+      "heat_damage_runs": 5,
+      "failures": 0
+    },
+    "desktop_ui": {
+      "checks": 54,
+      "failures": 0,
+      "viewports": [
+        [
+          1280,
+          720
+        ],
+        [
+          1600,
+          720
+        ]
+      ]
+    }
+  },
+  "files": {
+    "OrbitRelay-0.44.0-arm64.apk": {
+      "bytes": 26378639,
+      "sha256": "b099365a7aafa0b643399ae4f33564359c56287014cad634c8420f3ec43db993"
+    },
+    "OrbitRelay-0.44.0-source.zip": {
+      "bytes": 203978,
+      "sha256": "90b99d47f2c31ea22072df8d73b5e4d09b583527a49e33f772e0fb322ada0101"
+    },
+    "convoy-in-flight.png": {
+      "bytes": 189093,
+      "sha256": "97d362ae8431e0e8adbfb253fa10a7b20b67b8c8b2334a392e1812a5a04b1c47"
+    },
+    "convoy-route-map.png": {
+      "bytes": 77529,
+      "sha256": "38137c10f8a7cb4b4b5dfc4d51f85acd0fd73ea599b5f252e435e7c427750e62"
+    },
+    "convoys.png": {
+      "bytes": 152329,
+      "sha256": "d37c84008928bc4098517433246ccbdb620430fe7db07d32c1104b8998734555"
+    },
+    "star-heat.png": {
+      "bytes": 867471,
+      "sha256": "bf6316d27b952d893630145aa6f3247195e2482f05c7fa043f5c74af19566867"
+    },
+    "stellar-refueling.png": {
+      "bytes": 946650,
+      "sha256": "20b386b6c48a7b6988ff32193d3c95d3b712f28c543e14039cdc70b31ba3a4a9"
+    }
+  }
+}
