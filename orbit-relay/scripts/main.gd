@@ -230,7 +230,7 @@ func _deliver_notice() -> void:
 		"mining_phase": flight.mining.phase, "cargo_units": flight.mining.ore_hold,
 		"fuel": flight.ship.fuel, "scooping": flight.scooping, "star_heat": flight.star_heat,
 		"flight_assist": flight.flight_assist,
-		"orbit_maneuver": flight.orbit_maneuver,
+		"orbit_maneuver": flight.orbit_maneuver, "orbit_maneuver_focus": flight.orbit_maneuver_focus,
 		"hull": flight.ship.hull, "contract_route": flight.contract_route_id, "contract_leg": flight.contract_leg,
 		"patrol_phase": flight.patrol.phase, "patrol_origin": flight.patrol.origin,
 		"convoy_id": convoy.id, "convoy_order_phase": convoy.phase, "convoy_order_kind": convoy.kind,
@@ -443,10 +443,10 @@ func _select_destination(site_id: int) -> void:
 	_update_display(0.0)
 
 
-func _map_orbit_action() -> void:
+func _map_orbit_action(focus_id: int) -> void:
 	if not _map.is_open():
 		return
-	var handled := flight.cancel_orbit_maneuver() if flight.orbit_maneuver else flight.start_orbit_maneuver()
+	var handled := flight.cancel_orbit_maneuver() if flight.orbit_maneuver else flight.start_orbit_maneuver(focus_id)
 	if handled:
 		_close_map()
 		_deliver_notice()

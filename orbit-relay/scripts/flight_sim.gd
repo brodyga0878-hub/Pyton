@@ -72,6 +72,7 @@ var throttle := 0.0
 var boost := false
 var flight_assist := true
 var orbit_maneuver := false
+var orbit_maneuver_focus := -1
 var docked := 0
 var landed_site := -1
 var landing_direction := Vector3.ZERO
@@ -331,23 +332,34 @@ func gravity_at(at: Vector3) -> Vector3:
 	return Dynamics.acceleration(self, at)
 
 
-func orbit_status() -> Dictionary:
+func orbit_status(focus_id := -1) -> Dictionary:
 	var star := Catalog.star_for(system_id)
-	var center := target_position(star)
+	var focus := _orbit_focus(focus_id)
+	var site := Catalog.site(focus)
+	var mu := Dynamics.gravity_parameter(focus) if Catalog.system_of_site(focus) == system_id else 0.0
+	var center := target_position(focus) if mu > 0.0 else Vector3.ZERO
+	var relative_velocity := velocity - target_velocity(focus) if mu > 0.0 else Vector3.ZERO
 	var radial := position - center
-	var mu: float = Orbit.GRAVITY_PARAMETERS[system_id]
-	var result := Navigation.elements(position, velocity, center, mu)
-	var normal := _orbit_normal if orbit_maneuver else Navigation.orbit_normal(radial, velocity, forward())
-	var delta_v := velocity.distance_to(Navigation.circular_velocity(radial, normal, mu))
-	var reason := _orbit_block_reason(star, radial.length(), not orbit_maneuver)
-	if reason.is_empty() and not orbit_maneuver and delta_v <= ORBIT_SPEED_TOLERANCE:
+	var result := Navigation.elements(position, relative_velocity, center, mu)
+	var normal := _orbit_normal if orbit_maneuver else Navigation.orbit_normal(radial, relative_velocity, forward())
+	var delta_v := relative_velocity.distance_to(Navigation.circular_velocity(radial, normal, mu))
+	var band := _orbit_band(focus, center) if mu > 0.0 else Vector2.ZERO
+	var reason := "Выберите звезду, планету или луну этой системы"
+	if mu > 0.0:
+		reason = _orbit_block_reason(focus, radial.length(), relative_velocity.length(), band, not orbit_maneuver)
+	if reason.is_empty() and not orbit_maneuver and delta_v <= _orbit_speed_tolerance(focus, float(result.circular_speed)):
 		reason = "Скорость уже близка к круговой"
 	var measurable: bool = result.valid and docked < 0 and not landed and jump_seconds_left <= 0.0
+	var surface_radius := float(site.get("radius", 0.0))
 	result.merge({
-		"star": star, "name": target_name(star), "classification": (
+		"star": star, "focus": focus, "focus_kind": site.get("kind", ""),
+		"name": str(site.get("name", "")), "classification": (
 			("bound" if result.bound else "escape") if measurable else "unavailable"
 		),
-		"altitude": maxf(0.0, radial.length() - float(Catalog.site(star).radius)),
+		"altitude": maxf(0.0, float(result.radius) - surface_radius),
+		"relative_speed": relative_velocity.length(),
+		"collision_radius": Catalog.STAR_CLEARANCE if focus == star else surface_radius * Terrain.MAX_RADIUS_FACTOR + Terrain.CONTACT_CLEARANCE,
+		"approach_min": band.x, "approach_max": band.y,
 		"allowed": reason.is_empty() and not orbit_maneuver,
 		"reason": "Можно выполнить орбитальный манёвр" if reason.is_empty() else reason,
 		"maneuver": orbit_maneuver, "maneuver_phase": _orbit_phase, "delta_v": delta_v,
@@ -355,26 +367,28 @@ func orbit_status() -> Dictionary:
 	return result
 
 
-func orbit_forecast() -> Dictionary:
-	return Navigation.forecast(self)
+func orbit_forecast(focus_id := -1) -> Dictionary:
+	return Navigation.forecast(self, 180.0, _orbit_focus(focus_id))
 
 
-func start_orbit_maneuver() -> bool:
+func start_orbit_maneuver(focus_id := -1) -> bool:
 	if orbit_maneuver:
 		return false
-	var status := orbit_status()
+	var status := orbit_status(focus_id)
 	if not status.allowed:
 		return false
-	_orbit_normal = Navigation.orbit_normal(position - target_position(status.star), velocity, forward())
+	var focus: int = status.focus
+	_orbit_normal = Navigation.orbit_normal(position - target_position(focus), velocity - target_velocity(focus), forward())
 	reset_time_scale()
 	set_autopilot(false)
 	flight_assist = false
 	throttle = 0.0
 	boost = false
 	orbit_maneuver = true
+	orbit_maneuver_focus = focus
 	_orbit_seconds = 0.0
 	_orbit_phase = "turn"
-	_announce("orbit_start", "Выход на круговую орбиту вокруг звезды «%s»." % status.name)
+	_announce("orbit_start", "Выход на круговую орбиту. Ориентир — «%s»." % status.name)
 	return true
 
 
@@ -389,25 +403,49 @@ func cancel_orbit_maneuver() -> bool:
 func _clear_orbit_maneuver() -> void:
 	if orbit_maneuver:
 		orbit_maneuver = false
+		orbit_maneuver_focus = -1
 		_orbit_phase = ""
 		throttle = 0.0
 
 
-func _orbit_block_reason(star: int, radius: float, starting: bool) -> String:
+func _orbit_focus(requested: int) -> int:
+	if orbit_maneuver:
+		return orbit_maneuver_focus
+	return Catalog.star_for(system_id) if requested == -1 else requested
+
+
+func _orbit_band(focus: int, center: Vector3) -> Vector2:
+	var star := Catalog.star_for(system_id)
+	if focus == star:
+		return Vector2(ORBIT_MIN_RADIUS, ORBIT_MAX_RADIUS)
+	return Navigation.orbit_band(focus, center, target_position(star))
+
+
+func _orbit_speed_tolerance(focus: int, circular_speed: float) -> float:
+	if focus == Catalog.star_for(system_id):
+		return ORBIT_SPEED_TOLERANCE
+	return clampf(circular_speed * 0.025, 0.015, ORBIT_SPEED_TOLERANCE)
+
+
+func _orbit_block_reason(focus: int, radius: float, relative_speed: float, band: Vector2, starting: bool) -> String:
 	if docked >= 0 or landed or jump_seconds_left > 0.0:
 		return "Выйдите в открытый космос"
 	if patrol.in_danger(self) or convoy_order.in_danger(self):
 		return "Отойдите от боевого контакта"
-	if radius < ORBIT_MIN_RADIUS or radius > ORBIT_MAX_RADIUS:
-		return "Держитесь в пределах %d–%d м от центра звезды" % [int(ORBIT_MIN_RADIUS), int(ORBIT_MAX_RADIUS)]
-	if starting and speed() > ORBIT_MAX_SPEED:
-		return "Снизьте скорость до %d м/с" % int(ORBIT_MAX_SPEED)
+	if band.x >= band.y:
+		return "Для круговой орбиты вокруг этого тела сейчас нет безопасного диапазона"
+	if radius < band.x or radius > band.y:
+		return "Держитесь в пределах %d–%d м от центра «%s»" % [ceili(band.x), floori(band.y), target_name(focus)]
+	if starting and relative_speed > ORBIT_MAX_SPEED:
+		return "Снизьте скорость относительно цели до %d м/с" % int(ORBIT_MAX_SPEED)
 	if ship.fuel <= 0.0 or (starting and ship.fuel < ORBIT_MIN_FUEL):
 		return "Для манёвра нужно не менее %d ед. топлива" % int(ORBIT_MIN_FUEL)
 	if ship.hull <= ShipSystems.MIN_HULL or star_heat >= HEAT_SCOOP_LIMIT:
 		return "Манёвр требует исправного и остывшего корпуса"
+	var star := Catalog.star_for(system_id)
 	for id: int in local_targets():
-		if id != star and position.distance_to(target_position(id)) <= float(Catalog.site(id).radius) + ORBIT_CLEARANCE:
+		var clearance := Catalog.SCOOP_OUTER + 50.0 if id == star else float(Catalog.site(id).radius) + ORBIT_CLEARANCE
+		if id != focus and position.distance_to(target_position(id)) <= clearance:
 			return "Отойдите от объекта «%s»" % target_name(id)
 	return ""
 
@@ -1352,22 +1390,25 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 
 
 func _orbit_maneuver_step(delta: float) -> void:
-	var star := Catalog.star_for(system_id)
-	var radial := position - target_position(star)
+	var focus := orbit_maneuver_focus
+	var center := target_position(focus)
+	var radial := position - center
+	var drift := target_velocity(focus)
 	velocity += gravity_at(position) * delta
 	throttle = 0.0
 	_orbit_seconds += delta
-	var stop_reason := _orbit_block_reason(star, radial.length(), false)
+	var stop_reason := _orbit_block_reason(focus, radial.length(), velocity.distance_to(drift), _orbit_band(focus, center), false)
 	if stop_reason.is_empty() and _orbit_seconds >= ORBIT_TIMEOUT:
 		stop_reason = "Не удалось выровнять скорость"
 	if not stop_reason.is_empty():
 		_clear_orbit_maneuver()
 		_announce("orbit_abort", "Манёвр прерван. %s." % stop_reason)
 		return
-	var desired := Navigation.circular_velocity(radial, _orbit_normal, Orbit.GRAVITY_PARAMETERS[system_id])
+	var circular := Navigation.circular_velocity(radial, _orbit_normal, Dynamics.gravity_parameter(focus))
+	var desired := drift + circular
 	var correction := desired - velocity
 	var remaining := correction.length()
-	if remaining <= ORBIT_SPEED_TOLERANCE:
+	if remaining <= _orbit_speed_tolerance(focus, circular.length()):
 		_clear_orbit_maneuver()
 		_announce("orbit_complete", "Импульс завершён. Корабль движется по инерции.")
 		return

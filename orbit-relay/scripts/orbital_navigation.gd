@@ -1,5 +1,5 @@
 extends RefCounted
-## Stellar osculating elements and an engine-off forecast in the system frame.
+## Osculating elements and an engine-off forecast in the system or body frame.
 
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const Dynamics = preload("res://scripts/orbital_dynamics.gd")
@@ -12,6 +12,9 @@ const MIN_RADIUS := 0.001
 const PARABOLIC_ENERGY_FRACTION := 0.000001
 const PORT_CORRIDOR_RADIUS := 4.4
 const PORT_CORRIDOR_INSET := 0.8
+const LOCAL_SURFACE_MARGIN := 18.0
+const LOCAL_RADIUS_CAP := 3.5
+const HILL_FRACTION := 0.85
 
 
 static func elements(at: Vector3, velocity: Vector3, center: Vector3, mu: float) -> Dictionary:
@@ -68,8 +71,29 @@ static func circular_velocity(radial: Vector3, normal: Vector3, mu: float) -> Ve
 	return tangent.normalized() * sqrt(mu / radius)
 
 
-static func forecast(sim: RefCounted, horizon := 180.0) -> Dictionary:
-	var result := {"points": PackedVector3Array(), "seconds": 0.0, "impact": -1}
+static func orbit_band(focus_id: int, center: Vector3, primary_center: Vector3) -> Vector2:
+	var site := Catalog.site(focus_id)
+	var kind: String = site.get("kind", "")
+	if (kind != "planet" and kind != "moon") or not center.is_finite() or not primary_center.is_finite():
+		return Vector2.ZERO
+	var separation := center.distance_to(primary_center)
+	if not is_finite(separation):
+		return Vector2.ZERO
+	var radius: float = site.radius
+	var mu := Dynamics.gravity_parameter(focus_id)
+	var primary_id := Catalog.star_for(Catalog.system_of_site(focus_id))
+	var primary_mu := Dynamics.gravity_parameter(primary_id)
+	var minimum := radius * Terrain.MAX_RADIUS_FACTOR + Terrain.CONTACT_CLEARANCE + LOCAL_SURFACE_MARGIN
+	# The approximate Hill radius limits where a local two-body maneuver is offered.
+	var hill := separation * pow(mu / (3.0 * primary_mu), 1.0 / 3.0)
+	return Vector2(minimum, minf(radius * LOCAL_RADIUS_CAP, HILL_FRACTION * hill))
+
+
+static func forecast(sim: RefCounted, horizon := 180.0, focus_id := -1) -> Dictionary:
+	var result := {
+		"points": PackedVector3Array(), "relative_points": PackedVector3Array(), "focus_id": -1,
+		"seconds": 0.0, "impact": -1,
+	}
 	var system: int = sim.system_id
 	var epoch: float = sim.orbit_time
 	var position: Vector3 = sim.position
@@ -79,7 +103,14 @@ static func forecast(sim: RefCounted, horizon := 180.0) -> Dictionary:
 			or horizon <= 0.0 or sim.docked >= 0 or sim.landed or sim.jump_seconds_left > 0.0:
 		return result
 
-	var blockers := _blockers(sim)
+	var ids: Array = sim.local_targets()
+	var relative := focus_id in ids
+	var focus_start := Vector3.ZERO
+	var relative_points := PackedVector3Array()
+	if relative:
+		focus_start = Orbit.sample(focus_id, epoch).position
+		relative_points.append(position)
+	var blockers := _blockers(sim, ids)
 	var previous_centers := _centers_at(blockers, epoch)
 	var duration := minf(horizon, MAX_FORECAST_SECONDS)
 	var steps := ceili(duration / FORECAST_STEP)
@@ -94,19 +125,39 @@ static func forecast(sim: RefCounted, horizon := 180.0) -> Dictionary:
 		var contact := _swept_contact(blockers, previous_centers, future_centers, position, next)
 		if contact.id >= 0:
 			var impact_position := position.lerp(next, contact.fraction)
-			if impact_position != points[-1]:
+			var impact_time: float = time - delta + contact.fraction * delta
+			var impact_moved := impact_position != points[-1]
+			if impact_moved:
 				points.append(impact_position)
-			return {"points": points, "seconds": time - delta + contact.fraction * delta, "impact": contact.id}
+			if relative:
+				var projection := _relative_position(impact_position, focus_id, focus_start, epoch + impact_time)
+				if impact_moved or projection != relative_points[-1]:
+					relative_points.append(projection)
+			result.seconds = impact_time
+			result.impact = contact.id
+			break
 		position = next
 		previous_centers = future_centers
 		if step % sample_every == 0 or step == steps:
 			points.append(position)
-	return {"points": points, "seconds": duration, "impact": -1}
+			if relative:
+				relative_points.append(_relative_position(position, focus_id, focus_start, epoch + time))
+	result.points = points
+	result.relative_points = relative_points
+	result.focus_id = focus_id if relative else -1
+	if result.impact < 0:
+		result.seconds = duration
+	return result
 
 
-static func _blockers(sim: RefCounted) -> Array[Dictionary]:
+static func _relative_position(position: Vector3, focus_id: int, focus_start: Vector3, epoch: float) -> Vector3:
+	var future: Vector3 = Orbit.sample(focus_id, epoch).position
+	return position + (focus_start - future)
+
+
+static func _blockers(sim: RefCounted, ids: Array) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	for id: int in sim.local_targets():
+	for id: int in ids:
 		var site := Catalog.site(id)
 		var axes := Vector3.ONE * Catalog.STAR_CLEARANCE
 		var corridor := INF

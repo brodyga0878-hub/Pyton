@@ -533,7 +533,7 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 		_route_detail.text = "Дистанция %d м · корпус %d%%" % [roundi(fire.get("distance", 0.0)), ceili(patrol.get("enemy_hull", 0.0))]
 		_guidance.text = "Цель в прицеле. Нажмите «Огонь»." if fire.ok else str(fire.get("reason", ""))
 	elif sim.orbit_maneuver:
-		_sync_orbit_flight(sim.orbit_status())
+		_sync_orbit_flight(sim.orbit_status(), sim.throttle)
 	elif not convoy.is_empty() and (convoy_course or not fire.is_empty()):
 		_sync_convoy_flight(convoy, fire)
 	elif patrol.get("phase") == Patrol.OUTBOUND and sim.patrol_course and patrol.get("same_system", false):
@@ -579,20 +579,24 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 	else:
 		_guidance.text = "Курс и крен справа. Тяга и тормоз слева." if _touch_mirrored else "Курс и крен слева. Тяга и тормоз справа."
 
-func _sync_orbit_flight(orbit: Dictionary) -> void:
+func _sync_orbit_flight(orbit: Dictionary, throttle: float) -> void:
 	_route.text = "Орбита  /  %s" % orbit.name
-	var distance := "%d м" % roundi(orbit.radius) if orbit.radius < 1000.0 else "%.2f км" % (orbit.radius / 1000.0)
-	_route_detail.text = ("Осталось Δv %.1f м/с · круговая %.1f м/с\nОт центра %s · радиальная %+.1f м/с" % [
-		orbit.delta_v, orbit.circular_speed, distance, orbit.radial_speed,
+	var altitude := "%d м" % roundi(orbit.altitude) if orbit.altitude < 1000.0 else "%.2f км" % (orbit.altitude / 1000.0)
+	_route_detail.text = ("Осталось Δv %.1f м/с · круговая %.1f м/с\nВысота %s · радиальная %+.1f м/с" % [
+		orbit.delta_v, orbit.circular_speed, altitude, orbit.radial_speed,
 	]).replace(".", ",")
+	var relative := ("%.1f" % orbit.relative_speed).replace(".", ",")
+	_telemetry.text = "Скорость %s м/с  ·  Тяга %d%%\nОтносительно «%s»" % [relative, throttle * 100.0, orbit.name]
 	var phase := "Разворот на манёвр" if orbit.maneuver_phase == "turn" else "Корректируем скорость"
 	var hint := "Ручное управление прервёт манёвр."
 	var periapsis := float(orbit.periapsis)
 	var future_approach: bool = orbit.classification == "bound" or orbit.radial_speed < 0.0
-	if future_approach and periapsis >= 0.0 and periapsis < Sector.SCOOP_INNER:
-		hint = "Без тяги траектория проходит через зону сильного нагрева."
-		if periapsis <= float(Sector.site(orbit.star).radius):
-			hint = "Без тяги траектория пересекает звезду."
+	if future_approach and periapsis >= 0.0:
+		var stellar: bool = orbit.focus_kind == "star"
+		if periapsis <= float(orbit.collision_radius):
+			hint = "Без тяги возможно столкновение со звездой." if stellar else "Без тяги возможен удар о поверхность."
+		elif stellar and periapsis < Sector.SCOOP_INNER:
+			hint = "Без тяги траектория проходит через зону сильного нагрева."
 	_guidance.text = "%s. %s" % [phase, hint]
 
 func _sync_convoy_flight(convoy: Dictionary, fire: Dictionary) -> void:
