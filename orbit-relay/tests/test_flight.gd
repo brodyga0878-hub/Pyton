@@ -51,8 +51,16 @@ func _test_flight_controls() -> void:
 	flight.set_autopilot(true)
 	flight.update(1.0 / 60.0, Vector2.RIGHT, 0.0, false, false)
 	_check(not flight.autopilot, "Steering overrides autopilot")
-	flight.position = flight.docking_position(1) + Vector3(0, 0, 3)
-	flight.target = 1
+	flight.select_target(1)
+	flight.position = flight.docking_position(1) + Vector3.BACK * 12.0
+	flight.velocity = flight.target_velocity(1)
+	if not flight.dock_clearance_action():
+		_check(false, "The pilot can request passage through the selected station hatch")
+		return
+	var wait: float = flight.dock_access_status(1).wait
+	flight.update(wait + 0.1, Vector2.ZERO, 0.0, false, false)
+	_check(flight.dock_access_status(1).ready, "The pilot can enter once the hatch opens")
+	flight.position = flight.docking_position(1) + Vector3.BACK * 3.0
 	flight.velocity = flight.target_velocity(1)
 	flight.yaw = 0.0
 	flight.roll = flight.station_angle(1) + 0.8

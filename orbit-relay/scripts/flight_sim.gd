@@ -18,7 +18,8 @@ const Patrol = preload("res://scripts/patrol_encounter.gd")
 const Expedition = preload("res://scripts/expedition.gd")
 const FactionFronts = preload("res://scripts/faction_fronts.gd")
 const ConvoyOrders = preload("res://scripts/convoy_orders.gd")
-const SAVE_SCHEMA := 20
+const DockAccess = preload("res://scripts/dock_access.gd")
+const SAVE_SCHEMA := 21
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
@@ -92,6 +93,7 @@ var orbit_maneuver_focus := -1
 var rendezvous_active := false
 var docked := 0
 var dock_roll_sync := -1
+var dock_access := DockAccess.new()
 var landed_site := -1
 var landing_direction := Vector3.ZERO
 var landed: bool:
@@ -242,6 +244,10 @@ func gate_position(index: int) -> Vector3:
 
 func docking_position(index: int) -> Vector3:
 	return target_contact(index)
+
+
+func dock_hatch_position(index: int) -> Vector3:
+	return docking_position(index) + station_axis(index) * DockAccess.HATCH_AXIS_OFFSET
 
 
 func target_name(index: int) -> String:
@@ -722,6 +728,8 @@ func select_target(index: int) -> bool:
 		_clear_orbit_maneuver()
 		_clear_rendezvous()
 		cancel_dock_sync()
+		if target != index:
+			dock_access.clear()
 		target = index
 		_approach_committed = false
 		if autopilot:
@@ -789,7 +797,8 @@ func selected_dock_status() -> Dictionary:
 func docking_guidance() -> Dictionary:
 	if docked >= 0 or landed or jump_seconds_left > 0.0 or Catalog.system_of_site(target) != system_id or not station_operational(target):
 		return {"near": false, "in_front": false, "port": -1, "ok": false, "sync_available": false,
-			"sync_active": false, "reason": "Выберите действующий порт в текущей системе"}
+			"sync_active": false, "cleared": false, "access": dock_access_status(target),
+			"reason": "Выберите действующий порт в текущей системе"}
 	var axis := station_axis(target)
 	var displacement := position - docking_position(target)
 	var relative_velocity := velocity - target_velocity(target)
@@ -803,12 +812,18 @@ func docking_guidance() -> Dictionary:
 	var in_front := axis_distance >= -0.8
 	var near := distance <= DOCK_GUIDE_DISTANCE
 	var position_ok := in_front and distance <= 7.0 and off_axis.length() <= 3.1
+	var crossed_hatch := axis_distance <= DockAccess.HATCH_AXIS_OFFSET
 	var speed_ok := speed <= DOCK_SPEED
 	var aim_ok := nose_error <= DOCK_AIM_ERROR
 	var roll_ok := absf(bank_error) <= DOCK_ROLL_ERROR
+	var access := dock_access_status(target, displacement)
 	var reason := "Можно швартоваться"
-	if not position_ok:
+	if not access.ready:
+		reason = access.reason
+	elif not position_ok:
 		reason = "Подойдите к центру стыковочного кольца"
+	elif not crossed_hatch:
+		reason = "Войдите через открытый створ"
 	elif not speed_ok:
 		reason = "Снизьте скорость относительно станции до 5 м/с"
 	elif not aim_ok:
@@ -817,7 +832,8 @@ func docking_guidance() -> Dictionary:
 		reason = "Совместите крен с кольцом"
 	var manual_flight := not (autopilot or orbit_maneuver or rendezvous_active or patrol_course or project_course or convoy_course)
 	return {
-		"near": near, "in_front": in_front, "port": target, "ok": position_ok and speed_ok and aim_ok and roll_ok,
+		"near": near, "in_front": in_front, "port": target, "ok": access.ready and position_ok and crossed_hatch and speed_ok and aim_ok and roll_ok,
+		"access": access, "cleared": access.ready, "crossed_hatch": crossed_hatch,
 		"axis_distance": axis_distance, "range": distance, "off_axis": off_axis, "lateral_error": off_axis.length(),
 		"closing_speed": -relative_velocity.dot(axis), "relative_speed": speed, "aim_error_deg": rad_to_deg(nose_error),
 		"roll_error_deg": rad_to_deg(bank_error), "spin_deg_sec": rad_to_deg(float(Catalog.site(target).spin)),
@@ -825,6 +841,37 @@ func docking_guidance() -> Dictionary:
 		"sync_available": manual_flight and near and in_front and nose_error <= deg_to_rad(DOCK_SYNC_AIM),
 		"sync_active": dock_roll_sync == target, "reason": reason,
 	}
+
+
+func dock_access_status(site: int, displacement := Vector3.INF) -> Dictionary:
+	var status := dock_access.status(site, orbit_time)
+	status.request_available = false
+	status.reason = "Выберите действующий порт в текущей системе"
+	if Catalog.system_of_site(site) != system_id or not station_operational(site):
+		return status
+	if not displacement.is_finite():
+		displacement = position - docking_position(site)
+	var in_range := displacement.length_squared() <= DOCK_GUIDE_DISTANCE * DOCK_GUIDE_DISTANCE
+	var in_front := displacement.dot(station_axis(site)) >= -0.8
+	status.request_available = (not landed and docked < 0 and jump_seconds_left <= 0.0
+		and site == target and in_range and in_front and status.phase == "closed")
+	match status.phase:
+		"queued": status.reason = "Ожидайте допуска перед створом"
+		"opening": status.reason = "Створ открывается"
+		"open": status.reason = "Проход открыт"
+		"closing": status.reason = "Створ закрывается. Дождитесь нового допуска"
+		_:
+			status.reason = "Запросите допуск" if status.request_available else "Подойдите к створу действующего порта"
+	return status
+
+
+func dock_clearance_action() -> bool:
+	var status := dock_access_status(target)
+	if not status.request_available or not dock_access.request(target, orbit_time, freight_status(target)):
+		return false
+	reset_time_scale()
+	_announce("dock_request", "Запрос на швартовку. Ожидайте перед створом «%s»." % target_name(target))
+	return true
 
 
 func toggle_dock_sync() -> bool:
@@ -993,6 +1040,8 @@ func dock_action() -> bool:
 	var status := selected_dock_status()
 	if status.get("awaiting_gear", false) and not gear_deployed and not autopilot:
 		_command_gear(true)
+		return false
+	if Catalog.is_port(target) and dock_clearance_action():
 		return false
 	if not status.ok:
 		_announce("dock_denied" if Catalog.is_port(target) else "landing_denied", status.reason)
@@ -1713,6 +1762,7 @@ func start_jump() -> bool:
 		return false
 	reset_time_scale()
 	cancel_dock_sync()
+	dock_access.clear()
 	patrol_course = false
 	project_course = false
 	_stop_convoy_course()
@@ -1751,6 +1801,7 @@ func _charge_jump(delta: float) -> void:
 		return
 	jump_seconds_left = 0.0
 	ship.jump_fuel -= status.cost
+	dock_access.clear()
 	system_id = jump_target
 	if not _jump_route.is_empty() and _jump_route.front() == system_id:
 		_jump_route.pop_front()
@@ -1840,6 +1891,7 @@ func _departure_target(default_target: int) -> int:
 
 func _dock() -> void:
 	docked = target
+	dock_access.settle(orbit_time)
 	gear_extension = 0.0
 	gear_deployed = false
 	set_autopilot(false)
@@ -1881,6 +1933,13 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 	orbit_time += delta
 	elapsed += delta
 	freight.advance(market, previous_orbit_time, orbit_time)
+	if docked < 0 and not landed and dock_access.port == target:
+		var before := dock_access.status(target, previous_orbit_time)
+		var access := dock_access.status(target, orbit_time)
+		if access.ready and not before.ready:
+			_announce("dock_ready", "Створ открыт. Допуск «%s» получен." % target_name(target))
+		elif before.ready and not access.ready:
+			_announce("dock_expired", "Окно швартовки закрыто. Запросите новый допуск.")
 	var front := factions.advance(orbit_time)
 	if not front.is_empty():
 		_announce(front.event, front.message)
@@ -1947,7 +2006,8 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		return
 	_atmosphere_step(delta)
 	var next := position + velocity * delta
-	var obstacle := _obstacle_at(next)
+	var shutter := _closed_hatch_between(position, next, previous_orbit_time)
+	var obstacle := shutter if shutter >= 0 else _obstacle_at(next)
 	if obstacle < 0:
 		position = next
 	else:
@@ -1956,13 +2016,15 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		var damage := ship.apply_damage(clampf((impact_speed - IMPACT_DAMAGE_SPEED) * 0.32, 0.0, 45.0))
 		if damage > 0.0:
 			_announce("hull_damage", "Корпус повреждён. Прочность %.0f%%." % ship.hull)
+		elif shutter >= 0:
+			_announce("dock_denied", "Створ закрыт. Запросите допуск перед входом.")
 		elif velocity.length_squared() > 0.05:
 			_announce("clearance", "Защитное торможение у препятствия")
 		var caught_by_motion := _inside_hull(position, obstacle)
-		if caught_by_motion:
+		if caught_by_motion or shutter >= 0:
 			var previous_center: Vector3 = Orbit.sample(obstacle, previous_orbit_time).position
 			position += target_position(obstacle) - previous_center
-		velocity = target_velocity(obstacle) if caught_by_motion else Vector3.ZERO
+		velocity = target_velocity(obstacle) if caught_by_motion or shutter >= 0 else Vector3.ZERO
 		throttle = 0.0
 		set_autopilot(false)
 	_update_star_heat(delta)
@@ -2122,12 +2184,38 @@ func _inside_hull(point: Vector3, index: int, epoch := -1.0) -> bool:
 	return hull.length_squared() < 1.0 and not inside_corridor
 
 
+func _closed_hatch_between(from: Vector3, to: Vector3, previous_epoch: float) -> int:
+	for port: int in local_ports():
+		var destination := docking_position(port)
+		if to.distance_squared_to(destination) > 400.0:
+			continue
+		var axis := station_axis(port)
+		var offset := axis * DockAccess.HATCH_AXIS_OFFSET
+		var end := to - destination - offset
+		var end_depth := end.dot(axis)
+		if end_depth > 0.0:
+			continue
+		var earlier: Dictionary = Orbit.sample(port, previous_epoch)
+		var earlier_hatch: Vector3 = earlier.position + axis * float(Catalog.site(port).pad_offset) + offset
+		var start := from - earlier_hatch
+		var start_depth := start.dot(axis)
+		# A ship already inside the plane can always leave under its own power.
+		if start_depth < 0.0 or start_depth <= end_depth:
+			continue
+		var crossing := start.lerp(end, clampf(start_depth / (start_depth - end_depth), 0.0, 1.0))
+		if crossing.slide(axis).length_squared() <= DockAccess.HATCH_RADIUS * DockAccess.HATCH_RADIUS:
+			if not dock_access.status(port, orbit_time).ready:
+				return port
+	return -1
+
+
 func _autopilot_step(delta: float) -> void:
 	boost = false
 	var star_run := target == Catalog.star_for(system_id)
 	var gas_run := Catalog.is_gas_giant(target)
 	var scoop_run := star_run or gas_run
 	var mining_site := Catalog.is_mine_site(target)
+	var port_run := Catalog.is_port(target)
 	var target_radius := Catalog.STAR_CLEARANCE if star_run else float(Catalog.site(target).radius)
 	var center := target_position(target)
 	var gate := target_gate(target)
@@ -2136,11 +2224,29 @@ func _autopilot_step(delta: float) -> void:
 	var waypoint := gate
 	var max_speed := 118.0
 	var aim := Vector3.FORWARD
+	var waiting_for_port := false
+	var retreating := false
+	if port_run and _approach_committed and not dock_access.status(target, orbit_time).ready:
+		_approach_committed = false
+		retreating = true
+	elif port_run and not _approach_committed:
+		var corridor := position - docking_position(target)
+		retreating = corridor.z >= -0.8 and corridor.z < HULL_Z and corridor.slide(station_axis(target)).length_squared() <= DockAccess.HATCH_RADIUS * DockAccess.HATCH_RADIUS
 
 	if _departure_leg == 0 and not _approach_committed and position.distance_to(gate) < 3.4 and speed_relative_to(target) < 7.0:
-		_approach_committed = true
+		if port_run and not dock_access.status(target, orbit_time).ready:
+			dock_clearance_action()
+			waiting_for_port = true
+		else:
+			_approach_committed = true
 
-	if _approach_committed:
+	if retreating:
+		autopilot_phase = "Отход от закрытого створа"
+		max_speed = 24.0
+	elif waiting_for_port:
+		autopilot_phase = "Ожидание допуска"
+		_match_target_roll(delta)
+	elif _approach_committed:
 		if scoop_run:
 			waypoint = target_contact(target)
 			max_speed = 30.0 if gas_run else 32.0
@@ -2399,6 +2505,7 @@ func snapshot() -> Dictionary:
 		"orientation": [facing.x, facing.y, facing.z, facing.w], "flight_assist": flight_assist,
 		"orbit_time": orbit_time,
 		"throttle": 0.0 if orbit_maneuver or rendezvous_active else throttle, "docked": docked, "target": target,
+		"dock_access": dock_access.snapshot(),
 		"credits": credits, "deliveries": deliveries,
 		"contract_stage": contract_stage, "contract_origin": contract_origin,
 		"contract_destination": contract_destination,
@@ -2418,6 +2525,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_dock_access := schema < 21
 	var pre_dual_fuel := schema < 20
 	var pre_gear := schema < 19
 	var pre_frontier_freight := schema < 18
@@ -2549,6 +2657,7 @@ func restore(state: Dictionary) -> bool:
 	var restored_position := Vector3(state.position[0], state.position[1], state.position[2])
 	var restored_velocity := Vector3(state.velocity[0], state.velocity[1], state.velocity[2])
 	var restored_dock := int(state.docked)
+	var restored_access := DockAccess.new()
 	var restored_mining := MiningRig.new()
 	var restored_ship := ShipSystems.new()
 	var restored_market := Economy.new()
@@ -2623,6 +2732,15 @@ func restore(state: Dictionary) -> bool:
 			return false
 	elif restored_mining.phase != MiningRig.STOWED or restored_direction != Vector3.ZERO:
 		return false
+	if not pre_dock_access:
+		if not restored_access.restore(state.get("dock_access"), restored_epoch):
+			return false
+		if restored_access.port >= 0:
+			if Catalog.system_of_site(restored_access.port) != restored_system or not _site_available(restored_access.port, restored_expedition):
+				return false
+			var phase: String = restored_access.status(restored_access.port, restored_epoch).phase
+			if phase in ["queued", "opening", "open"] and (restored_access.port != int(state.target) or restored_dock >= 0 or restored_landing >= 0):
+				return false
 	var restored_gear := 1.0 if restored_landing >= 0 else 0.0
 	var restored_gear_command := restored_landing >= 0
 	if not pre_gear:
@@ -2681,6 +2799,7 @@ func restore(state: Dictionary) -> bool:
 	orbit_time = restored_epoch
 	time_scale = 1
 	docked = restored_dock
+	dock_access = restored_access
 	landed_site = restored_landing
 	landing_direction = restored_direction
 	gear_extension = restored_gear

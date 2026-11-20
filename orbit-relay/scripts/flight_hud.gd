@@ -50,6 +50,7 @@ var _docking_position: Label
 var _docking_motion: Label
 var _docking_roll: Label
 var _docking_ready: Label
+var _docking_access: Label
 var _surface_panel: PanelContainer
 var _surface_status: Label
 var _surface_height: Label
@@ -86,6 +87,7 @@ var _patrol_blocked := false
 var _convoy_blocked := false
 var _rendezvous_finish_blocked := true
 var _dock_sync_blocked := true
+var _dock_clearance_blocked := true
 var _gear_blocked := true
 var _fire_blocked := false
 var _jumping := false
@@ -299,21 +301,35 @@ func _build_docking_instrument() -> void:
 	_docking_motion = _label(readout, 16, INK)
 	_docking_roll = _label(readout, 16, AMBER)
 	_docking_ready = _label(readout, 14, MUTED)
-	for label in [_docking_status, _docking_position, _docking_motion, _docking_roll, _docking_ready]:
+	_docking_access = _label(readout, 16, AMBER)
+	for label in [_docking_status, _docking_position, _docking_motion, _docking_roll, _docking_ready, _docking_access]:
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_button(readout, "dock_clearance", "Запросить допуск")
+	var request: Button = _actions["dock_clearance"]
+	request.tooltip_text = "Запросить разрешение на вход в выбранный док (F6)"
+	request.custom_minimum_size.y = 48.0
+	request.hide()
 	_docking_panel.hide()
 
-func _sync_docking(status: Dictionary) -> void:
+func _sync_docking(status: Dictionary, automatic: bool) -> void:
 	var visible_approach := not status.is_empty() and bool(status.get("near", false))
 	_docking_panel.visible = visible_approach and _input_enabled
+	var access: Dictionary = status.get("access", {})
+	var request: Button = _actions["dock_clearance"]
+	_dock_clearance_blocked = automatic or not access.get("request_available", false)
+	request.visible = _docking_panel.visible and not _dock_clearance_blocked
 	var button: Button = _actions["dock_sync"]
-	button.visible = visible_approach and _input_enabled
+	button.visible = visible_approach and not automatic and _input_enabled
 	_dock_sync_blocked = not (status.get("sync_available", false) or status.get("sync_active", false))
 	if not visible_approach:
 		return
 	var ready := bool(status.ok)
 	var synced := bool(status.sync_active)
-	_docking_status.text = "Можно швартоваться" if ready else "Ручная швартовка" if status.in_front else "Створ с обратной стороны"
+	_docking_status.text = "Автоматическая швартовка" if automatic else "Ручная швартовка"
+	if ready:
+		_docking_status.text = "Можно швартоваться"
+	elif not status.in_front:
+		_docking_status.text = "Створ с обратной стороны"
 	_docking_status.add_theme_color_override("font_color", CYAN if ready else AMBER)
 	_docking_position.text = "По оси %.1f м · Вбок %.1f м" % [float(status.axis_distance), float(status.lateral_error)]
 	_docking_position.add_theme_color_override("font_color", CYAN if status.position_ok else INK)
@@ -325,9 +341,24 @@ func _sync_docking(status: Dictionary) -> void:
 	_docking_roll.text = "Крен %+.1f° · Курс %.1f°%s" % [float(status.roll_error_deg), float(status.aim_error_deg), " · синхр." if synced else ""]
 	_docking_roll.add_theme_color_override("font_color", CYAN if status.roll_ok and status.aim_ok else AMBER)
 	_docking_ready.text = "Створ %s · Скорость %s · Крен %s · Курс %s" % ["✓" if status.position_ok else "—", "✓" if status.speed_ok else "—", "✓" if status.roll_ok else "—", "✓" if status.aim_ok else "—"]
+	_docking_access.text = _dock_access_caption(access)
+	_docking_access.add_theme_color_override("font_color", CYAN if status.get("cleared", false) else AMBER)
+	_actions["dock"].tooltip_text = str(status.get("reason", ""))
 	button.text = "Снять синхр." if synced else "Крен дока"
 	button.add_theme_color_override("font_color", CYAN if synced else INK)
 	button.tooltip_text = "Отключить следование крену дока (F5)" if synced else "Следовать вращению кольца по крену (F5). Курс, сдвиг и тяга остаются ручными."
+
+func _dock_access_caption(access: Dictionary) -> String:
+	match access.get("phase", "closed"):
+		"queued":
+			return "Ожидание допуска · %d с" % ceili(float(access.wait))
+		"opening":
+			return "Створ открывается · %d%%" % roundi(float(access.open_fraction) * 100.0)
+		"open":
+			return "Проход открыт · допуск ещё %d с" % ceili(float(access.remaining))
+		"closing":
+			return "Створ закрывается"
+	return "Допуск не запрошен"
 
 func _build_surface_instrument() -> void:
 	var readout := _panel(_safe, Vector2(0.5, 0), Rect2(-196, 24, 392, 148))
@@ -497,10 +528,11 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_actions["contract"].text = "Отметить этап" if transfer else ("Сдать груз" if sim.contract_stage == 1 else "Взять контракт")
 	var sale_quote: int = sim.raw_sale_quote() if docked and mining.ore_hold > 0 else 0
 	_actions["sell_ore"].visible = sale_quote > 0
-	var manual_approach: bool = not parked and not _jumping and not sim.autopilot and not approach_active and fire.is_empty() and convoy.is_empty() and not sim.patrol_course and not sim.project_course and not sim.convoy_course
+	var dock_approach: bool = not parked and not _jumping and not approach_active and fire.is_empty() and convoy.is_empty() and not sim.patrol_course and not sim.project_course and not sim.convoy_course
+	var manual_approach: bool = dock_approach and not sim.autopilot
 	var surface: Dictionary = sim.surface_status() if not parked and Sector.is_mine_site(sim.target) else {}
 	var gear: Dictionary = sim.gear_status()
-	_sync_docking(sim.docking_guidance() if manual_approach and Sector.is_port(sim.target) else {})
+	_sync_docking(sim.docking_guidance() if dock_approach and Sector.is_port(sim.target) else {}, sim.autopilot)
 	_sync_surface_guidance(surface if manual_approach and not sim.scooping else {}, gear)
 	_sync_gear(gear, not parked and not _jumping and (surface.get("near", false) or gear.progress > 0.0 or gear.deployed))
 	_sync_clock(sim)
@@ -887,6 +919,7 @@ func set_input_enabled(enabled: bool) -> void:
 		_docking_panel.hide()
 		_surface_panel.hide()
 		_actions["dock_sync"].hide()
+		_actions["dock_clearance"].hide()
 		_actions["gear"].hide()
 	_refresh_disabled_actions()
 
@@ -920,6 +953,7 @@ func _refresh_disabled_actions() -> void:
 		blocked = blocked or (action == "patrol" and _patrol_blocked) or (action == "convoy" and _convoy_blocked) or (action == "fire" and _fire_blocked)
 		blocked = blocked or (action == "rendezvous_finish" and _rendezvous_finish_blocked)
 		blocked = blocked or (action == "dock_sync" and _dock_sync_blocked)
+		blocked = blocked or (action == "dock_clearance" and _dock_clearance_blocked)
 		blocked = blocked or (action == "gear" and _gear_blocked)
 		var during_jump := _jumping and action not in ["throttle_down", "throttle_up", "boost", "brake"]
 		button.disabled = not _input_enabled or blocked or during_jump

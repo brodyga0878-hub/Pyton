@@ -124,6 +124,12 @@ func _test_station_docking() -> void:
 		"Gear is stowed and its command is unavailable at an orbital berth")
 	flight.dock_action()
 	flight.select_target(1)
+	flight.position = flight.docking_position(1) + flight.station_axis(1) * 12.0
+	flight.velocity = flight.target_velocity(1)
+	if not _expect(flight.dock_clearance_action(), "Station access does not depend on the landing gear"):
+		return
+	_tick(flight, float(flight.dock_access_status(1).wait) + STEP)
+	_expect(flight.dock_access_status(1).ready, "Orbital clearance is granted with the gear stowed")
 	flight.position = flight.docking_position(1) + flight.station_axis(1) * 1.0
 	flight.velocity = flight.target_velocity(1)
 	flight.yaw = 0.0

@@ -5,6 +5,7 @@ const MiningRigView = preload("res://scripts/mining_rig_view.gd")
 const StarView = preload("res://scripts/star_view.gd")
 const TrafficView = preload("res://scripts/traffic_view.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
+const DockAccess = preload("res://scripts/dock_access.gd")
 const Terrain = preload("res://scripts/surface_terrain.gd")
 const AtmosphereView = preload("res://scripts/atmosphere_view.gd")
 const STAR_DISTANCE := 2700.0
@@ -13,10 +14,34 @@ const BACKDROP_ORBIT_SECONDS := 28800.0
 const CLOUD_CYCLE_SECONDS := 1080.0
 const CAMERA_SURFACE_CLEARANCE := 2.0
 const GEAR_PAD_SIZE := Vector3(0.46, 0.32, 0.13)
+const HATCH_HINGE_RADIUS := DockAccess.HATCH_RADIUS + 0.26
+const HATCH_LEAF_RADIUS := DockAccess.HATCH_RADIUS + 0.12
+const HATCH_HALF_DEPTH := 0.10
 
 static var _panel_shader: Shader
 static var _paint_panel_data: Texture2D
 static var _brushed_panel_data: Texture2D
+static var _hatch_panel_geometry: ArrayMesh
+
+
+class DockHatch extends Node3D:
+	var leaves: Array[Node3D] = []
+	var signal_paint: StandardMaterial3D
+	var _fraction := -1.0
+
+	func sync(access: Dictionary) -> void:
+		var fraction := clampf(float(access.get("open_fraction", 0.0)), 0.0, 1.0)
+		if fraction != _fraction:
+			_fraction = fraction
+			for carrier: Node3D in leaves:
+				carrier.rotation.y = -fraction * PI * 0.5
+		var tint := Color("#f1876e")
+		if access.get("ready", false):
+			tint = Color("#75eac0")
+		elif fraction > 0.0 or float(access.get("wait", 0.0)) > 0.0:
+			tint = Color("#edb36c")
+		if signal_paint.albedo_color != tint:
+			signal_paint.albedo_color = tint
 
 var camera: Camera3D
 var _ship: Node3D
@@ -51,6 +76,7 @@ var _surface_guide_point := Vector3.INF
 var _surface_guide_normal := Vector3.ZERO
 var _surface_views: Dictionary[int, Node3D] = {}
 var _stations: Dictionary[int, Node3D] = {}
+var _dock_hatches: Dictionary[int, DockHatch] = {}
 var _approaches: Dictionary[int, Node3D] = {}
 var _gate_materials: Dictionary[int, StandardMaterial3D] = {}
 var _last_position := Vector3.INF
@@ -110,6 +136,7 @@ func _load_sector(id: int) -> void:
 		remove_child(_sector)
 		_sector.queue_free()
 	_stations.clear()
+	_dock_hatches.clear()
 	_approaches.clear()
 	_gate_materials.clear()
 	_surface_views.clear()
@@ -149,6 +176,7 @@ func _load_sector(id: int) -> void:
 		_sector.add_child(station)
 		_stations[site_id] = station
 		_build_station(station, site_id, site.accent)
+		_dock_hatches[site_id] = _build_dock_hatch(station)
 		var approach := Node3D.new()
 		_sector.add_child(approach)
 		_approaches[site_id] = approach
@@ -256,6 +284,10 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_stations[site_id].position = sim.target_position(site_id)
 		_stations[site_id].basis = station_frame
 		var contact: Vector3 = sim.docking_position(site_id)
+		var hatch := _dock_hatches[site_id]
+		var hatch_position: Vector3 = sim.dock_hatch_position(site_id)
+		hatch.position = station_frame.transposed() * (hatch_position - _stations[site_id].position)
+		hatch.sync(sim.dock_access_status(site_id))
 		var corridor_length: float = (sim.target_gate(site_id) - contact).dot(axis)
 		_approaches[site_id].position = contact
 		_approaches[site_id].basis = station_frame.scaled_local(Vector3(1.0, 1.0, corridor_length))
@@ -616,6 +648,67 @@ func _build_dock_fittings(station: Node3D, ceramic: Material, graphite: Material
 	_box_batch(collar, graphite, panels)
 	_box_batch(collar, glow, lamps)
 	_box_batch(_fitting(station, 2), graphite, louvers)
+
+
+func _build_dock_hatch(station: Node3D) -> DockHatch:
+	var hatch := DockHatch.new()
+	hatch.name = "DockHatch"
+	hatch.signal_paint = _light(Color("#f1876e"))
+	station.add_child(hatch)
+	var steel := _surface(Color("#526878"), 0.46, 0.49)
+	var dark := _surface(Color("#23323f"), 0.51, 0.60)
+	var stripe := _light(Color("#efb881"))
+	_ring(hatch, dark, Vector3(0, 0, -0.10), 5.30, 1.20, 32)
+	_ring(hatch, steel, Vector3(0, 0, 0.32), 5.00, 0.64, 32)
+	var supports: Array = []
+	var signals: Array = []
+	for quarter in range(4):
+		var angle := PI * 0.25 + float(quarter) * PI * 0.5
+		var radial := Vector3(cos(angle), sin(angle), 0)
+		supports.append([radial * 5.6 + Vector3(0, 0, -6.0), Vector3(0.54, 0.48, 12.0), angle])
+		signals.append([radial * 5.42 + Vector3(0, 0, 0.68), Vector3(0.20, 0.78 if quarter == 0 else 0.51, 0.10), angle])
+		var holder := Node3D.new()
+		holder.rotation.z = angle
+		hatch.add_child(holder)
+		var hinge := Node3D.new()
+		hinge.position.x = HATCH_HINGE_RADIUS
+		holder.add_child(hinge)
+		hatch.leaves.append(hinge)
+		_mesh(hinge, _hatch_sector_mesh(), steel, Vector3.ZERO)
+		_box_batch(hinge, dark, [[Vector3(-1.65, 0, 0.11), Vector3(3.7, 0.59, 0.13)]])
+		_box_batch(hinge, stripe, [
+			[Vector3(-1.72, -0.11, 0.19), Vector3(0.78, 0.12, 0.03), -0.47],
+			[Vector3(-2.48, -0.11, 0.19), Vector3(0.78, 0.12, 0.03), -0.47],
+		])
+	_box_batch(hatch, steel, supports)
+	_box_batch(hatch, hatch.signal_paint, signals)
+	return hatch
+
+
+func _hatch_sector_mesh() -> ArrayMesh:
+	if _hatch_panel_geometry != null:
+		return _hatch_panel_geometry
+	var outline := PackedVector2Array([Vector2(-HATCH_HINGE_RADIUS, 0)])
+	for segment in range(9):
+		var angle := lerpf(-PI * 0.25 + 0.003, PI * 0.25 - 0.003, float(segment) / 8.0)
+		outline.append(Vector2.from_angle(angle) * HATCH_LEAF_RADIUS - Vector2(HATCH_HINGE_RADIUS, 0))
+	var front := PackedVector3Array()
+	var rear := PackedVector3Array()
+	for point in outline:
+		front.append(Vector3(point.x, point.y, HATCH_HALF_DEPTH))
+		rear.append(Vector3(point.x, point.y, -HATCH_HALF_DEPTH))
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var uv := Vector2.ZERO
+	for point in range(1, outline.size() - 1):
+		_facet(tool, front[0], front[point + 1], front[point], uv, uv, uv)
+		_facet(tool, rear[0], rear[point], rear[point + 1], uv, uv, uv)
+	for point in range(outline.size()):
+		var next := (point + 1) % outline.size()
+		_facet(tool, front[point], front[next], rear[next], uv, uv, uv)
+		_facet(tool, front[point], rear[next], rear[point], uv, uv, uv)
+	_hatch_panel_geometry = tool.commit()
+	return _hatch_panel_geometry
 
 
 func _build_ring_station(station: Node3D, glow: StandardMaterial3D) -> void:

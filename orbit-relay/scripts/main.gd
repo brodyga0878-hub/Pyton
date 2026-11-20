@@ -161,6 +161,8 @@ func _handle_action(action: String) -> void:
 			flight.set_autopilot(not flight.autopilot)
 		"dock_sync":
 			flight.toggle_dock_sync()
+		"dock_clearance":
+			flight.dock_clearance_action()
 		"gear":
 			flight.gear_action()
 		"flight_assist":
@@ -246,7 +248,7 @@ func _deliver_notice() -> void:
 	var event := flight.status_event
 	var touchdown := flight.landing_direction
 	var convoy := flight.convoy_status()
-	_io.trace(event, {
+	var trace_fields := {
 		"docked": flight.docked, "landed_site": flight.landed_site, "target": flight.target,
 		"planned_target": flight.planned_target, "speed": flight.speed(), "credits": flight.credits,
 		"mining_phase": flight.mining.phase, "cargo_units": flight.mining.ore_hold,
@@ -264,11 +266,20 @@ func _deliver_notice() -> void:
 		"system_id": flight.system_id, "jump_target": flight.jump_target,
 		"orbit_time": flight.orbit_time, "time_scale": flight.time_scale,
 		"offpad": flight.landed_offpad(), "landing_direction": [touchdown.x, touchdown.y, touchdown.z],
-	})
+	}
+	if event in ["dock_request", "dock_ready", "dock_expired", "dock_denied"]:
+		var access := flight.dock_access_status(flight.target)
+		trace_fields = {
+			"port": flight.target, "phase": access.phase, "open_fraction": access.open_fraction,
+			"wait_seconds": access.wait, "remaining_seconds": access.remaining, "reason": flight.status_message,
+			"system_id": flight.system_id, "orbit_time": flight.orbit_time, "speed": flight.speed(),
+		}
+	_io.trace(event, trace_fields)
 	_hud.notify(flight.status_message)
 	flight.status_event = ""
 	if event in [
 		"launch", "dock", "land", "lift", "contract", "delivery", "mining_deploy", "mining_recover",
+		"dock_request", "dock_ready", "dock_expired",
 		"mining_ready", "mining_loaded", "ore_sold", "service_refuel", "service_tank", "service_eco",
 		"scoop_full", "scoop_stop", "star_arrival", "gas_arrival", "fuel_empty", "thermal_damage",
 		"fuel_transfer", "service_jump_refuel", "cargo_jettisoned",
@@ -343,7 +354,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_N: "map", KEY_J: "galaxy", KEY_K: "scoop", KEY_P: "services", KEY_O: "time", KEY_L: "market",
 		KEY_U: "patrol", KEY_X: "fire", KEY_I: "convoy", KEY_H: "flight_assist",
 		KEY_F2: "settings", KEY_F3: "journal", KEY_F4: "frontier",
-		KEY_F5: "dock_sync", KEY_Y: "gear", KEY_C: "fuel",
+		KEY_F5: "dock_sync", KEY_F6: "dock_clearance", KEY_Y: "gear", KEY_C: "fuel",
 	}
 	if actions.has(event.physical_keycode):
 		_handle_action(actions[event.physical_keycode])

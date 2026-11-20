@@ -2,6 +2,7 @@ extends SceneTree
 
 const Flight := preload("res://scripts/flight_sim.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
+const DockAccess := preload("res://scripts/dock_access.gd")
 const OrbitRelay := preload("res://main.tscn")
 const PORT := 1
 const VELAR_PORT := 11
@@ -56,8 +57,13 @@ func _test_manual_thresholds() -> void:
 	flight.yaw = 0.14
 	flight.roll = wrapf(flight.station_angle(PORT) + 0.15, -PI, PI)
 	var near := flight.docking_guidance()
-	_expect(near.ok and near.position_ok and near.speed_ok and near.roll_ok and near.aim_ok,
-		"A front approach inside all four tolerances is ready for ordinary manual docking")
+	_expect(not near.ok and not near.cleared and near.position_ok and near.speed_ok and near.roll_ok and near.aim_ok,
+		"An otherwise valid approach cannot dock without authorization")
+	_set_offset(flight, PORT, Vector3.BACK * 12.0)
+	flight.velocity = flight.target_velocity(PORT)
+	if not _expect(flight.dock_clearance_action() and _await_open(flight, PORT),
+		"The geometrical tolerances are measured in a genuinely open approach"):
+		return
 	_set_offset(flight, PORT, Vector3(0.0, 0.0, 7.2))
 	_expect(not flight.docking_guidance().position_ok and not flight.dock_action(),
 		"The manual docking contact still requires at most seven metres of true range")
@@ -212,17 +218,23 @@ func _test_autodock(port: int) -> void:
 		return
 	flight.set_autopilot(true)
 	var last := {}
+	var queued := false
+	var opened := false
 	for _frame in range(roundi(120.0 / STEP)):
 		if not flight.autopilot:
 			break
 		var state := flight.docking_guidance()
+		var access := flight.dock_access_status(port)
+		queued = queued or access.phase == "queued"
+		opened = opened or bool(access.ready)
 		_tick(flight)
 		if flight.docked == port:
 			last = state
 	_expect(flight.docked == port and not flight.autopilot and flight.dock_roll_sync == -1
 		and flight.ship.hull == 100.0 and not last.is_empty()
-		and last.range < 2.95 and last.relative_speed < 3.3 and absf(flight.roll_error(port)) < 0.02,
-		"The actual autopilot reaches final-capture range and speed before docking at moving port %d (%s)" % [
+		and last.range < 2.95 and last.relative_speed < 3.3 and absf(flight.roll_error(port)) < 0.02
+		and queued and opened and last.cleared,
+		"Autopilot queues, gains clearance and reaches final-capture range at moving port %d (%s)" % [
 			port, flight.status_message,
 		])
 
@@ -236,20 +248,31 @@ func _test_touch_controls() -> void:
 	viewport.add_child(game)
 	game.set_process(false)
 	game.set_physics_process(false)
-	var flight := _at_approach(PORT, Vector3.BACK * 5.0, Vector3.ZERO)
+	var flight := _at_approach(PORT, Vector3.BACK * 12.0, Vector3.ZERO)
 	flight.roll = wrapf(flight.station_angle(PORT) + 0.9, -PI, PI)
 	game.flight = flight
 	game._update_display(0.0)
 	await process_frame
 	_expect(game._hud._docking_panel.is_visible_in_tree() and game._hud._docking_motion.is_visible_in_tree(),
 		"The real flight HUD shows the moving-station approach instruments")
+	_tap(viewport, game._hud._actions["dock_clearance"], "Request clearance from the touch HUD")
+	await process_frame
+	_expect(flight.dock_access_status(PORT).phase == "queued" and flight.docked < 0
+		and "Ожидание допуска" in game._hud._docking_access.text,
+		"Request input queues the actual station and displays the wait without attaching the ship")
 	_tap(viewport, game._hud._actions["dock_sync"], "Engage station roll synchronization from the touch HUD")
 	await process_frame
 	_expect(flight.dock_roll_sync == PORT and flight.docked < 0, "Touch arms rotation only and does not dock the ship")
-	_tick(flight, 3.0)
+	if not _expect(_await_open(flight, PORT), "The requested hatch physically reaches the fully open position"):
+		viewport.queue_free()
+		await process_frame
+		return
+	_set_offset(flight, PORT, Vector3.BACK * minf(5.0, DockAccess.HATCH_AXIS_OFFSET - 1.0))
+	flight.velocity = flight.target_velocity(PORT)
 	game._update_display(0.0)
 	await process_frame
-	_expect(flight.docking_guidance().ok and game._hud._docking_roll.is_visible_in_tree(),
+	_expect(flight.docking_guidance().ok and game._hud._docking_roll.is_visible_in_tree()
+		and "Проход открыт" in game._hud._docking_access.text,
 		"The pilot can see the resulting readiness before choosing to dock")
 	_tap(viewport, game._hud._actions["dock"], "Complete manual docking through the regular touch action")
 	await process_frame
@@ -291,6 +314,14 @@ func _set_offset(flight: Flight, port: int, offset: Vector3) -> void:
 
 func _tick(flight: Flight, delta := STEP) -> void:
 	flight.update(delta, Vector2.ZERO, 0.0, false, false)
+
+
+func _await_open(flight: Flight, port: int) -> bool:
+	for _frame in range(ceili((DockAccess.MAX_QUEUE_SECONDS + DockAccess.OPENING_SECONDS + STEP) / STEP)):
+		if flight.dock_access_status(port).ready:
+			return true
+		_tick(flight)
+	return bool(flight.dock_access_status(port).ready)
 
 
 func _json(value: Dictionary) -> Dictionary:

@@ -67,6 +67,12 @@ func _test_moving_contacts() -> void:
 	_expect(eta > 0.0 and is_finite(eta)
 		and gate.distance_to(Orbit.sample(1, flight.orbit_time + eta).position + Vector3.BACK * 70.0) > 0.5,
 		"An intercept estimate advances the moving gate past its present position")
+	flight.position = flight.target_contact(1) + Vector3.BACK * 12.0
+	flight.velocity = flight.target_velocity(1)
+	if not _expect(flight.dock_clearance_action(), "Request access before testing contact in the moving frame"):
+		return
+	_step(flight, float(flight.dock_access_status(1).wait) + 0.1)
+	_expect(flight.dock_access_status(1).ready, "The authorization opens the moving hatch at its new orbital position")
 	flight.position = flight.target_contact(1) + Vector3.BACK * 3.0
 	flight.yaw = 0.0
 	flight.roll = flight.station_angle(1)
