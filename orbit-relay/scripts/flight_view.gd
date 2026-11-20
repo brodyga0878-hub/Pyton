@@ -131,7 +131,7 @@ func _load_sector(id: int) -> void:
 		var approach := Node3D.new()
 		_sector.add_child(approach)
 		_approaches[site_id] = approach
-		_gate_materials[site_id] = _build_approach(approach, site.accent)
+		_gate_materials[site_id] = _build_approach(approach)
 	for site_id: int in Catalog.mines_for(id):
 		var body := AsteroidView.new()
 		_sector.add_child(body)
@@ -216,15 +216,22 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_last_position = position_now
 	_last_berth = berth
 
+	var guidance: Dictionary = sim.docking_guidance()
 	for site_id: int in _stations:
 		var operational: bool = sim.station_operational(site_id)
+		var axis: Vector3 = sim.station_axis(site_id)
+		var up_axis := Vector3.RIGHT if absf(axis.dot(Vector3.UP)) > 0.95 else Vector3.UP
+		var station_frame := Basis.looking_at(-axis, up_axis) * Basis(Vector3.BACK, sim.station_angle(site_id))
 		_stations[site_id].visible = operational
 		_stations[site_id].position = sim.target_position(site_id)
-		_stations[site_id].rotation.z = sim.station_angle(site_id)
-		_approaches[site_id].position = sim.target_gate(site_id)
-		_approaches[site_id].visible = operational and not settled
-		var strength := 1.45 if site_id == int(sim.target) else 0.43
-		_gate_materials[site_id].albedo_color = Catalog.site(site_id).accent * strength
+		_stations[site_id].basis = station_frame
+		var contact: Vector3 = sim.docking_position(site_id)
+		var corridor_length: float = (sim.target_gate(site_id) - contact).dot(axis)
+		_approaches[site_id].position = contact
+		_approaches[site_id].basis = station_frame.scaled_local(Vector3(1.0, 1.0, corridor_length))
+		_approaches[site_id].visible = operational and not settled and corridor_length > 0.0 \
+			and int(guidance.port) == site_id and bool(guidance.near) and bool(guidance.in_front)
+		_gate_materials[site_id].albedo_color = Color("#75eac0") if bool(guidance.get("ok", false)) else Color("#edb36c")
 	for site_id: int in _surface_views:
 		_surface_views[site_id].position = sim.target_position(site_id)
 		var field_direction: Vector3 = sim.landing_direction if site_id == surface_id else Vector3.ZERO
@@ -493,16 +500,23 @@ func _build_ring_station(station: Node3D, glow: StandardMaterial3D) -> void:
 	_box_batch(station, glow, lamps)
 
 
-func _build_approach(approach: Node3D, accent: Color) -> StandardMaterial3D:
-	var paint := _light(accent)
-	_ring(approach, paint, Vector3.ZERO, 7.4, 0.11, 48)
+func _build_approach(approach: Node3D) -> StandardMaterial3D:
+	var paint := _light(Color("#edb36c"))
 	var markers: Array = []
-	for side: float in [-1.0, 1.0]:
-		markers.append([Vector3(side * 7.4, 0, 0), Vector3(0.30, 2.05, 0.16)])
-		markers.append([Vector3(0, side * 7.4, 0), Vector3(2.05, 0.30, 0.16)])
-		for offset: float in [8.0, 16.0, 24.0, 34.0, 44.0, 54.0]:
-			var width: float = lerpf(6.4, 5.25, offset / 54.0)
-			markers.append([Vector3(side * width, -0.18, -offset), Vector3(0.14, 0.20, 1.53)])
+	# Four open brackets taper from the real approach gate to the contact.
+	# Local Z is normalized here; sync stretches it to the actual moving corridor.
+	# A single unshaded batch stays legible without bloom, overlays or a filled tunnel.
+	for step in range(4):
+		var depth := float(step) / 3.0
+		var width := lerpf(3.6, 7.4, depth)
+		var length := lerpf(1.05, 1.75, depth)
+		var stroke := lerpf(0.085, 0.14, depth)
+		for x: float in [-1.0, 1.0]:
+			for y: float in [-1.0, 1.0]:
+				markers.append([Vector3(x * (width - length * 0.5), y * width, depth), Vector3(length, stroke, 0.002)])
+				markers.append([Vector3(x * width, y * (width - length * 0.5), depth), Vector3(stroke, length, 0.002)])
+		# The upper key makes the rotating frame unambiguous even for a square gate.
+		markers.append([Vector3(0, width + 0.60, depth), Vector3(length * 0.70, stroke * 1.7, 0.002)])
 	_box_batch(approach, paint, markers)
 	return paint
 

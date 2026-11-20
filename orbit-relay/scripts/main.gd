@@ -156,6 +156,8 @@ func _handle_action(action: String) -> void:
 			flight.change_target()
 		"autopilot":
 			flight.set_autopilot(not flight.autopilot)
+		"dock_sync":
+			flight.toggle_dock_sync()
 		"flight_assist":
 			flight.set_flight_assist(not flight.flight_assist)
 		"orbit_cancel":
@@ -328,6 +330,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_N: "map", KEY_J: "galaxy", KEY_K: "scoop", KEY_P: "services", KEY_O: "time", KEY_L: "market",
 		KEY_U: "patrol", KEY_X: "fire", KEY_I: "convoy", KEY_H: "flight_assist",
 		KEY_F2: "settings", KEY_F3: "journal", KEY_F4: "frontier",
+		KEY_F5: "dock_sync",
 	}
 	if actions.has(event.physical_keycode):
 		_handle_action(actions[event.physical_keycode])
@@ -347,6 +350,7 @@ func _notification(what: int) -> void:
 			flight.cancel_jump()
 			flight.cancel_orbit_maneuver()
 			flight.cancel_rendezvous()
+			flight.cancel_dock_sync()
 			flight.reset_time_scale()
 		_save()
 	elif what == NOTIFICATION_WM_GO_BACK_REQUEST:

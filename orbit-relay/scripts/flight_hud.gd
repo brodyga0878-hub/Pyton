@@ -43,6 +43,12 @@ var _thermal_level: ProgressBar
 var _thermal_fill: StyleBoxFlat
 var _clock: Label
 var _time_hint: Label
+var _docking_panel: PanelContainer
+var _docking_status: Label
+var _docking_position: Label
+var _docking_motion: Label
+var _docking_roll: Label
+var _docking_ready: Label
 var _guidance: Label
 var _notice: Label
 var _notice_panel: PanelContainer
@@ -71,6 +77,7 @@ var _time_blocked := false
 var _patrol_blocked := false
 var _convoy_blocked := false
 var _rendezvous_finish_blocked := true
+var _dock_sync_blocked := true
 var _fire_blocked := false
 var _jumping := false
 var _notice_left := 0.0
@@ -160,6 +167,7 @@ func build() -> void:
 	_time_hint = _label(instrument_stack, 15, AMBER)
 	_time_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_time_hint.hide()
+	_build_docking_instrument()
 
 	_steer = SteeringPad.new()
 	_steer.caption = "КУРС"
@@ -192,6 +200,9 @@ func build() -> void:
 	center.add_child(commands)
 	_button(commands, "target", "Цель")
 	_button(commands, "autopilot", "Авто")
+	_button(commands, "dock_sync", "Крен дока")
+	_actions["dock_sync"].tooltip_text = "Следовать вращению кольца по крену (F5). Курс, сдвиг и тяга остаются под вашим управлением."
+	_actions["dock_sync"].hide()
 	_button(commands, "dock", "Старт")
 	_button(commands, "scoop", "Сбор топлива")
 	_button(commands, "contract", "Контракт")
@@ -254,6 +265,44 @@ func build() -> void:
 	get_viewport().size_changed.connect(_update_safe_area)
 	_update_safe_area()
 	_apply_touch_layout()
+
+func _build_docking_instrument() -> void:
+	var readout := _panel(_safe, Vector2(0.5, 0), Rect2(-196, 24, 392, 148))
+	_docking_panel = readout.get_parent() as PanelContainer
+	_docking_status = _label(readout, 18, CYAN)
+	_docking_position = _label(readout, 16, INK)
+	_docking_motion = _label(readout, 16, INK)
+	_docking_roll = _label(readout, 16, AMBER)
+	_docking_ready = _label(readout, 14, MUTED)
+	for label in [_docking_status, _docking_position, _docking_motion, _docking_roll, _docking_ready]:
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_docking_panel.hide()
+
+func _sync_docking(status: Dictionary) -> void:
+	var visible_approach := not status.is_empty() and bool(status.get("near", false))
+	_docking_panel.visible = visible_approach and _input_enabled
+	var button: Button = _actions["dock_sync"]
+	button.visible = visible_approach and _input_enabled
+	_dock_sync_blocked = not (status.get("sync_available", false) or status.get("sync_active", false))
+	if not visible_approach:
+		return
+	var ready := bool(status.ok)
+	var synced := bool(status.sync_active)
+	_docking_status.text = "Можно швартоваться" if ready else "Ручная швартовка" if status.in_front else "Створ с обратной стороны"
+	_docking_status.add_theme_color_override("font_color", CYAN if ready else AMBER)
+	_docking_position.text = "По оси %.1f м · Вбок %.1f м" % [float(status.axis_distance), float(status.lateral_error)]
+	_docking_position.add_theme_color_override("font_color", CYAN if status.position_ok else INK)
+	var closing_speed := float(status.closing_speed)
+	if absf(closing_speed) < 0.05:
+		closing_speed = 0.0
+	_docking_motion.text = "Сближение %+.1f · Отн. %.1f м/с" % [closing_speed, float(status.relative_speed)]
+	_docking_motion.add_theme_color_override("font_color", CYAN if status.speed_ok else AMBER)
+	_docking_roll.text = "Крен %+.1f° · Курс %.1f°%s" % [float(status.roll_error_deg), float(status.aim_error_deg), " · синхр." if synced else ""]
+	_docking_roll.add_theme_color_override("font_color", CYAN if status.roll_ok and status.aim_ok else AMBER)
+	_docking_ready.text = "Створ %s · Скорость %s · Крен %s · Курс %s" % ["✓" if status.position_ok else "—", "✓" if status.speed_ok else "—", "✓" if status.roll_ok else "—", "✓" if status.aim_ok else "—"]
+	button.text = "Снять синхр." if synced else "Крен дока"
+	button.add_theme_color_override("font_color", CYAN if synced else INK)
+	button.tooltip_text = "Отключить следование крену дока (F5)" if synced else "Следовать вращению кольца по крену (F5). Курс, сдвиг и тяга остаются ручными."
 
 func _build_flight_modes() -> void:
 	_flight_modes = HBoxContainer.new()
@@ -376,6 +425,8 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_actions["contract"].text = "Отметить этап" if transfer else ("Сдать груз" if sim.contract_stage == 1 else "Взять контракт")
 	var sale_quote: int = sim.raw_sale_quote() if docked and mining.ore_hold > 0 else 0
 	_actions["sell_ore"].visible = sale_quote > 0
+	var docking_context: bool = not parked and not _jumping and Sector.is_port(sim.target) and not sim.autopilot and not approach_active and fire.is_empty() and convoy.is_empty() and not sim.patrol_course and not sim.project_course and not sim.convoy_course
+	_sync_docking(sim.docking_guidance() if docking_context else {})
 	_sync_clock(sim)
 	_refresh_disabled_actions()
 	_sync_fuel(sim.ship)
@@ -739,6 +790,8 @@ func set_input_enabled(enabled: bool) -> void:
 		return
 	if not enabled:
 		_reset_controls()
+		_docking_panel.hide()
+		_actions["dock_sync"].hide()
 	_refresh_disabled_actions()
 
 func set_touch_preferences(sensitivity: int, mirrored: bool) -> void:
@@ -770,6 +823,7 @@ func _refresh_disabled_actions() -> void:
 		var blocked := (action == "dock" and _lift_blocked) or (action == "mine" and _mining_blocked) or (action == "scoop" and _scoop_blocked) or (action == "time" and _time_blocked)
 		blocked = blocked or (action == "patrol" and _patrol_blocked) or (action == "convoy" and _convoy_blocked) or (action == "fire" and _fire_blocked)
 		blocked = blocked or (action == "rendezvous_finish" and _rendezvous_finish_blocked)
+		blocked = blocked or (action == "dock_sync" and _dock_sync_blocked)
 		var during_jump := _jumping and action not in ["throttle_down", "throttle_up", "boost", "brake"]
 		button.disabled = not _input_enabled or blocked or during_jump
 

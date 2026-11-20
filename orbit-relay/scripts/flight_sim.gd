@@ -37,6 +37,10 @@ const MAX_ROLL := 1.9
 const DOCK_SPEED := 5.0
 const DOCK_ROLL_ERROR := 0.16
 const DOCK_AIM_ERROR := 0.15
+const DOCK_GUIDE_DISTANCE := 180.0
+const DOCK_SYNC_AIM := 32.0
+const DOCK_AUTO_DISTANCE := 2.7
+const DOCK_AUTO_SPEED := 3.0
 const HULL_X := 32.0
 const HULL_Y := 27.0
 const HULL_Z := 23.0
@@ -80,6 +84,7 @@ var orbit_maneuver := false
 var orbit_maneuver_focus := -1
 var rendezvous_active := false
 var docked := 0
+var dock_roll_sync := -1
 var landed_site := -1
 var landing_direction := Vector3.ZERO
 var landed: bool:
@@ -297,6 +302,11 @@ func intercept_time(index: int) -> float:
 
 func roll_error(index: int) -> float:
 	return angle_difference(roll, station_angle(index) if Catalog.is_port(index) else 0.0)
+
+
+func _match_target_roll(delta: float) -> void:
+	var turn := clampf(roll_error(target), -MAX_ROLL * delta, MAX_ROLL * delta)
+	roll = wrapf(roll + turn, -PI, PI)
 
 
 func attitude() -> Basis:
@@ -692,6 +702,7 @@ func select_target(index: int) -> bool:
 		_stop_convoy_course()
 		_clear_orbit_maneuver()
 		_clear_rendezvous()
+		cancel_dock_sync()
 		target = index
 		_approach_committed = false
 		if autopilot:
@@ -703,11 +714,13 @@ func change_throttle(amount: float) -> void:
 	if docked < 0 and not landed:
 		reset_time_scale()
 		cancel_jump()
-		set_autopilot(false)
+		if dock_roll_sync < 0:
+			set_autopilot(false)
 		throttle = clampf(throttle + amount, 0.0, 1.0)
 
 
 func set_autopilot(enabled: bool) -> void:
+	cancel_dock_sync()
 	patrol_course = false
 	project_course = false
 	_stop_convoy_course()
@@ -749,16 +762,67 @@ func selected_dock_status() -> Dictionary:
 		return {"ok": false, "reason": "У звезды можно собирать топливо"}
 	if Catalog.is_mine_site(target):
 		return surface_status()
-	var relative := position - docking_position(target)
-	if relative.length() > 7.0 or relative.z < -0.8 or Vector2(relative.x, relative.y).length() > 3.1:
-		return {"ok": false, "reason": "Подойдите к центру стыковочного кольца"}
-	if speed_relative_to(target) > DOCK_SPEED:
-		return {"ok": false, "reason": "Снизьте скорость относительно станции до 5 м/с"}
-	if forward().dot(Vector3.FORWARD) < cos(DOCK_AIM_ERROR):
-		return {"ok": false, "reason": "Направьте нос в створ"}
-	if absf(roll_error(target)) > DOCK_ROLL_ERROR:
-		return {"ok": false, "reason": "Совместите крен с кольцом"}
-	return {"ok": true, "reason": "Можно швартоваться"}
+	return docking_guidance()
+
+
+func docking_guidance() -> Dictionary:
+	if docked >= 0 or landed or jump_seconds_left > 0.0 or Catalog.system_of_site(target) != system_id or not station_operational(target):
+		return {"near": false, "in_front": false, "port": -1, "ok": false, "sync_available": false,
+			"sync_active": false, "reason": "Выберите действующий порт в текущей системе"}
+	var axis := station_axis(target)
+	var displacement := position - docking_position(target)
+	var relative_velocity := velocity - target_velocity(target)
+	var local_offset := displacement.rotated(axis, -station_angle(target))
+	var off_axis := Vector2(local_offset.x, local_offset.y)
+	var axis_distance := displacement.dot(axis)
+	var distance := displacement.length()
+	var speed := relative_velocity.length()
+	var nose_error := acos(clampf(forward().dot(-axis), -1.0, 1.0))
+	var bank_error := roll_error(target)
+	var in_front := axis_distance >= -0.8
+	var near := distance <= DOCK_GUIDE_DISTANCE
+	var position_ok := in_front and distance <= 7.0 and off_axis.length() <= 3.1
+	var speed_ok := speed <= DOCK_SPEED
+	var aim_ok := nose_error <= DOCK_AIM_ERROR
+	var roll_ok := absf(bank_error) <= DOCK_ROLL_ERROR
+	var reason := "Можно швартоваться"
+	if not position_ok:
+		reason = "Подойдите к центру стыковочного кольца"
+	elif not speed_ok:
+		reason = "Снизьте скорость относительно станции до 5 м/с"
+	elif not aim_ok:
+		reason = "Направьте нос в створ"
+	elif not roll_ok:
+		reason = "Совместите крен с кольцом"
+	var manual_flight := not (autopilot or orbit_maneuver or rendezvous_active or patrol_course or project_course or convoy_course)
+	return {
+		"near": near, "in_front": in_front, "port": target, "ok": position_ok and speed_ok and aim_ok and roll_ok,
+		"axis_distance": axis_distance, "range": distance, "off_axis": off_axis, "lateral_error": off_axis.length(),
+		"closing_speed": -relative_velocity.dot(axis), "relative_speed": speed, "aim_error_deg": rad_to_deg(nose_error),
+		"roll_error_deg": rad_to_deg(bank_error), "spin_deg_sec": rad_to_deg(float(Catalog.site(target).spin)),
+		"position_ok": position_ok, "speed_ok": speed_ok, "aim_ok": aim_ok, "roll_ok": roll_ok,
+		"sync_available": manual_flight and near and in_front and nose_error <= deg_to_rad(DOCK_SYNC_AIM),
+		"sync_active": dock_roll_sync == target, "reason": reason,
+	}
+
+
+func toggle_dock_sync() -> bool:
+	if cancel_dock_sync():
+		_announce("dock_sync_off", "Помощник крена выключен.")
+		return true
+	if not docking_guidance().sync_available:
+		return false
+	reset_time_scale()
+	dock_roll_sync = target
+	_announce("dock_sync_on", "Помощник крена следует вращению дока.")
+	return true
+
+
+func cancel_dock_sync() -> bool:
+	if dock_roll_sync < 0:
+		return false
+	dock_roll_sync = -1
+	return true
 
 
 func surface_status() -> Dictionary:
@@ -1382,6 +1446,7 @@ func start_jump() -> bool:
 		_announce("jump_denied", status.reason)
 		return false
 	reset_time_scale()
+	cancel_dock_sync()
 	patrol_course = false
 	project_course = false
 	_stop_convoy_course()
@@ -1708,7 +1773,14 @@ func _turn_nose_toward(direction: Vector3, delta: float) -> void:
 
 
 func _manual_step(delta: float, steer: Vector2, bank: float, boost_requested: bool, brake: bool, translation: Vector3) -> float:
+	if absf(bank) > 0.12 and cancel_dock_sync():
+		_announce("dock_sync_manual", "Ручное управление креном.")
 	_rotate_manual(steer, bank, delta)
+	if dock_roll_sync >= 0:
+		if dock_roll_sync != target or not docking_guidance().sync_available:
+			cancel_dock_sync()
+		else:
+			_match_target_roll(delta)
 	var had_fuel := ship.fuel > 0.0
 	boost = boost_requested and not brake and had_fuel
 	var reference := reference_site()
@@ -1794,7 +1866,7 @@ func _autopilot_step(delta: float) -> void:
 			waypoint = target_contact(target) + Vector3.BACK * 1.8
 			max_speed = 13.0 if mining_site else 19.0
 			autopilot_phase = "Посадка" if mining_site else "Стыковка"
-		roll = wrapf(roll + clampf(roll_error(target), -MAX_ROLL * delta, MAX_ROLL * delta), -PI, PI)
+		_match_target_roll(delta)
 	else:
 		autopilot_phase = "К зоне сбора" if star_run else "К створу"
 		# Approach a station from the front. The side waypoint keeps a return
@@ -1869,8 +1941,10 @@ func _autopilot_step(delta: float) -> void:
 		set_autopilot(false)
 		throttle = 0.0
 		_announce("star_arrival", "Корабль у звезды «%s». Можно включить сбор топлива." % target_name(target))
-	elif _approach_committed and not star_run and selected_dock_status().ok:
-		_arrive()
+	elif _approach_committed and not star_run:
+		var status := selected_dock_status()
+		if status.ok and (mining_site or (status.range <= DOCK_AUTO_DISTANCE and status.relative_speed <= DOCK_AUTO_SPEED)):
+			_arrive()
 
 
 func _patrol_course_step(delta: float) -> void:
