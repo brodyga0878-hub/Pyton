@@ -42,6 +42,8 @@ func _campaign() -> Dictionary:
 	if not _expect(fronts.commission(HEATHER, 0, 0.0), "Prepare the sponsor's commissioned station"):
 		return {}
 	snapshot.factions = fronts.snapshot()
+	flight.freight.activate_frontier(HEATHER, 0.0)
+	snapshot.freight = flight.freight.snapshot()
 	if not _expect(flight.restore(snapshot), "Load a valid completed expedition through the flight save path"):
 		return {}
 	_tick(flight, FactionFronts.FOUNDING_GRACE + STEP)

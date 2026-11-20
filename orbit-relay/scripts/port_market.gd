@@ -16,6 +16,10 @@ const ACCENTS := {
 	"ore": Color("d8ad72"), "crystal": Color("bba5f2"), "ice": Color("9ad8ff"),
 	"circuits": Color("84dacf"), "medical": Color("edaac0"),
 }
+const INTERSTELLAR_PHASES := {
+	"waiting": "Стоянка", "departure": "Отход от порта",
+	"hyperspace": "Гиперпереход", "arrival": "Заход в порт",
+}
 
 var _sim: RefCounted
 var _insets: MarginContainer
@@ -325,10 +329,14 @@ func _refresh_freight() -> void:
 			continue
 		var status: Dictionary = statuses[i]
 		var travelling := bool(status.in_transit)
+		var interstellar := bool(status.get("interstellar", false))
 		widgets.name.text = str(status.name)
-		widgets.state.text = "В пути" if travelling else "Стоянка"
+		var phase_label := "В пути" if travelling else "Стоянка"
+		if interstellar:
+			phase_label = str(INTERSTELLAR_PHASES.get(str(status.get("visual_phase", "")), phase_label))
+		widgets.state.text = phase_label
 		widgets.state.add_theme_color_override("font_color", MINT if travelling else AMBER)
-		widgets.route.text = "%s  →  %s" % [_sim.target_name(int(status.origin)), _sim.target_name(int(status.destination))]
+		widgets.route.text = "%s  →  %s" % [_freight_port_name(int(status.origin), interstellar), _freight_port_name(int(status.destination), interstellar)]
 		var good := str(status.good)
 		var amount := int(status.amount)
 		widgets.icon.visible = amount > 0
@@ -340,7 +348,7 @@ func _refresh_freight() -> void:
 		var last_port := int(status.last_port)
 		var last_good := str(status.last_good)
 		var last_delivered := int(status.last_delivered)
-		var where: String = "здесь" if last_port == int(_sim.docked) else _sim.target_name(last_port) if last_port >= 0 else ""
+		var where: String = "здесь" if last_port == int(_sim.docked) else _freight_port_name(last_port, interstellar) if last_port >= 0 else ""
 		if last_port < 0:
 			widgets.delivered.text = "Первое прибытие ещё впереди."
 		elif last_good.is_empty():
@@ -349,6 +357,14 @@ func _refresh_freight() -> void:
 			widgets.delivered.text = "Последняя разгрузка (%s): +%d ед. · %s" % [where, last_delivered, Economy.good_name(last_good)]
 		else:
 			widgets.delivered.text = "Последняя разгрузка (%s): склад заполнен, груз остался на борту." % where
+
+
+func _freight_port_name(port: int, interstellar: bool) -> String:
+	var name: String = _sim.target_name(port)
+	if not interstellar:
+		return name
+	var system := Sector.system_of_site(port)
+	return "%s · %s" % [Sector.system(system).name, name] if system >= 0 else name
 
 
 static func _eta(seconds: float) -> String:

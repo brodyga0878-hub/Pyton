@@ -18,7 +18,7 @@ const Patrol = preload("res://scripts/patrol_encounter.gd")
 const Expedition = preload("res://scripts/expedition.gd")
 const FactionFronts = preload("res://scripts/faction_fronts.gd")
 const ConvoyOrders = preload("res://scripts/convoy_orders.gd")
-const SAVE_SCHEMA := 17
+const SAVE_SCHEMA := 18
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
@@ -1120,6 +1120,7 @@ func project_action() -> bool:
 	credits += int(result.get("credits", 0))
 	if result.has("commissioned"):
 		factions.commission(result.commissioned, result.owner, orbit_time)
+		freight.activate_frontier(result.commissioned, orbit_time)
 	if result.has("planned_system"):
 		plan_jump(result.planned_system)
 	_announce(result.event, result.message)
@@ -2184,6 +2185,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_frontier_freight := schema < 18
 	var pre_jump_route := schema < 17
 	var pre_freight := schema < 16
 	var pre_heat_shield := schema < 15
@@ -2337,8 +2339,15 @@ func restore(state: Dictionary) -> bool:
 		return false
 	if pre_freight:
 		restored_freight.reset(restored_epoch)
-	elif not restored_freight.restore(state.get("freight"), restored_epoch):
+	elif not restored_freight.restore(state.get("freight"), restored_epoch, pre_frontier_freight):
 		return false
+	for frontier: int in Expedition.FRONTIER_SYSTEMS:
+		var commissioned := restored_expedition.commissioned(frontier)
+		if pre_frontier_freight:
+			if commissioned and not restored_freight.activate_frontier(frontier, restored_epoch):
+				return false
+		elif restored_freight.frontier_active(frontier) != commissioned:
+			return false
 	if not pre_traffic and not restored_patrol.restore(state.get("patrol")):
 		return false
 	if restored_patrol.origin >= 0 and not _site_available(restored_patrol.origin, restored_expedition):

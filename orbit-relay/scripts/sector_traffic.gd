@@ -18,11 +18,18 @@ static func contacts(sim: RefCounted) -> Array[Dictionary]:
 	var departure: Vector3 = sim.target_gate(first) + Vector3(0.0, 106.0, 26.0)
 	var departure_velocity: Vector3 = sim.target_velocity(first)
 	var services: Array = sim.freight.services(int(sim.system_id), float(sim.orbit_time))
+	var has_local_service := false
 	for service: Dictionary in services:
-		result.append(_freighter_contact(sim, service))
-	if services.is_empty() and ports.size() == 1:
-		# A newly commissioned single-port colony has no inter-port service yet.
-		# Preserve its deterministic loiterer rather than inventing a cargo leg.
+		if bool(service.get("interstellar", false)):
+			var contact := _interstellar_contact(sim, service)
+			if not contact.is_empty():
+				result.append(contact)
+		else:
+			has_local_service = true
+			result.append(_freighter_contact(sim, service))
+	if not has_local_service and ports.size() == 1:
+		# The original colony loiterer remains separate from visiting interstellar
+		# freighters, including when they disappear from the local frame to jump.
 		var rate := TAU / TRADE_PERIOD
 		var angle := fposmod(float(sim.orbit_time), TRADE_PERIOD) * rate + 0.55
 		var at := departure + Vector3(250.0 * cos(angle), sin(angle * 2.0) * 25.0, 176.0 * sin(angle))
@@ -78,6 +85,48 @@ static func _freighter_contact(sim: RefCounted, service: Dictionary) -> Dictiona
 	if not bool(service.in_transit) and int(service.last_port) >= 0:
 		# Turn the nose during the real layover, not instantly at the delivery
 		# boundary. The next destination is also the previous origin on a shuttle.
+		var turn := clampf(1.0 - float(service.departure_eta) / Freight.LAYOVER_SECONDS, 0.0, 1.0)
+		var direction := forward.normalized()
+		var axis := Vector3.UP - direction * direction.y
+		if axis.length_squared() < 0.0001:
+			axis = Vector3.RIGHT - direction * direction.x
+		forward = (-direction).rotated(axis.normalized(), PI * smoothstep(0.0, 1.0, turn))
+	if forward.length_squared() < 0.0001:
+		forward = Vector3.FORWARD
+	return {
+		"id": str(service.id), "name": str(service.name), "role": "trader",
+		"position": sample.position, "velocity": sample.velocity, "forward": forward.normalized(), "hull": 100.0,
+		"freight": service.duplicate(true),
+	}
+
+
+static func _interstellar_contact(sim: RefCounted, service: Dictionary) -> Dictionary:
+	var port := int(service.local_port)
+	var phase := str(service.visual_phase)
+	if Catalog.system_of_site(port) != int(sim.system_id) or not sim.station_operational(port) \
+			or phase not in ["waiting", "departure", "arrival"]:
+		return {}
+	# Each endpoint owns its own local lane. Remote coordinates never enter it.
+	# Both visiting services have berths clear of the dock and the local shuttles.
+	var side := 1.0 if int(service.slot) % 2 == 0 else -1.0
+	var berth := Vector3(side * 72.0, 57.0, 48.0)
+	var jump := Vector3(side * 840.0, 325.0, 690.0)
+	var lane := jump - berth
+	var progress := float(service.local_progress)
+	var advance := float(service.local_speed_fraction)
+	var bow := Vector3(side * 32.0, 42.0, 0.0)
+	var bend := 16.0 * progress * progress * (1.0 - progress) * (1.0 - progress)
+	var bend_slope := 32.0 * progress * (1.0 - progress) * (1.0 - 2.0 * progress)
+	var at: Vector3 = sim.target_gate(port) + berth.lerp(jump, progress) + bow * bend
+	var drift: Vector3 = sim.target_velocity(port)
+	var course := lane + bow * bend_slope
+	var sample := clear_hulls(sim, at, drift + course * advance)
+	var coasting := clear_hulls(sim, at, drift)
+	var advancing := clear_hulls(sim, at, drift + course)
+	var forward: Vector3 = advancing.velocity - coasting.velocity
+	if phase == "arrival":
+		forward = -forward
+	elif phase == "waiting" and int(service.last_port) == port:
 		var turn := clampf(1.0 - float(service.departure_eta) / Freight.LAYOVER_SECONDS, 0.0, 1.0)
 		var direction := forward.normalized()
 		var axis := Vector3.UP - direction * direction.y

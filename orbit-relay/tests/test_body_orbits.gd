@@ -215,6 +215,8 @@ func _approach(focus: int, port: int, extra_clearance: float) -> Flight:
 		var fronts := FactionFronts.new()
 		fronts.commission(system, 0, 0.0)
 		saved.factions = fronts.snapshot()
+		flight.freight.activate_frontier(system, 0.0)
+		saved.freight = flight.freight.snapshot()
 	var dock := flight.docking_position(port)
 	saved.merge({"system_id": system, "docked": port, "target": port, "position": [dock.x, dock.y, dock.z]}, true)
 	_expect(flight.restore(saved) and flight.dock_action(), "Launch a ship in the system with orbital focus %d" % focus)

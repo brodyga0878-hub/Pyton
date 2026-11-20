@@ -188,6 +188,8 @@ func _test_save_guards() -> void:
 	older.schema = 16
 	older.jump_target = LIMIT
 	older.erase("jump_route")
+	older.freight.erase("frontier_epochs")
+	older.freight.ships = older.freight.ships.slice(0, 6)
 	_expect(flight.restore(older) and flight.jump_target == LIMIT and flight.planned_route().path == [HOME, LIMIT]
 		and flight.snapshot().jump_route.is_empty() and flight.route_preview(LIMIT).path == [HOME, VELAR, LIMIT],
 		"A schema-16 direct destination survives even when a fresh preview would prefer a relay")
@@ -254,6 +256,9 @@ func _known_flight() -> Flight:
 	politics.commission(HEATHER, 0, 0.0)
 	politics.commission(LIMIT, 0, 0.0)
 	saved.factions = politics.snapshot()
+	flight.freight.activate_frontier(HEATHER, 0.0)
+	flight.freight.activate_frontier(LIMIT, 0.0)
+	saved.freight = flight.freight.snapshot()
 	saved.ship.fuel = 34.0
 	saved.credits = 1000
 	_expect(flight.restore(saved), "Prepare an existing game with both frontier systems discovered and a partly filled tank")

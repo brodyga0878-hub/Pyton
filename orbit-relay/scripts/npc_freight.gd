@@ -1,13 +1,18 @@
 extends RefCounted
-## Scheduled local freight moves stock between ports without creating inventory.
+## Scheduled freight moves stock between operational ports without creating inventory.
 
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const Economy = preload("res://scripts/port_economy.gd")
 const TRADER_NAMES := ["Торговец «Вектор»", "Торговец «Каскад»"]
 const FIRST_DEPARTURES := [28.0, 62.0]
+const LOCAL_ROUTE_COUNT := 6
+const FRONTIER_SYSTEMS := [Catalog.HEATHER_SYSTEM, Catalog.LIMIT_SYSTEM]
+const FRONTIER_NAMES := ["Шаттл «Перешеек»", "Шаттл «Меридиан»"]
+const FRONTIER_DEPARTURE := 28.0
 const TRANSIT_SECONDS := 50.0
 const LAYOVER_SECONDS := 16.0
 const LEG_SECONDS := TRANSIT_SECONDS + LAYOVER_SECONDS
+const LOCAL_TRANSIT_SECONDS := 12.0
 const CAPACITY := 8
 const STOCK_FLOOR := 6
 const MAX_EPOCH := 3155760000.0
@@ -18,10 +23,13 @@ const ROUTES := [
 	{"ports": [10, 11], "goods": ["medical", "ore"]},
 	{"ports": [Catalog.FRINGE_ARRIVAL_PORT, Catalog.FRINGE_SECOND_PORT], "goods": ["ore", "circuits"]},
 	{"ports": [Catalog.FRINGE_SECOND_PORT, Catalog.FRINGE_ARRIVAL_PORT], "goods": ["crystal", "ice"]},
+	{"ports": [Catalog.FRINGE_SECOND_PORT, Catalog.HEATHER_PORT], "goods": ["medical", "ice"]},
+	{"ports": [Catalog.HEATHER_PORT, Catalog.LIMIT_PORT], "goods": ["circuits", "crystal"]},
 ]
 const SHIP_FIELDS := ["id", "step", "good", "amount", "last_good", "last_delivered"]
 
 var _seed_epoch := 0.0
+var _frontier_epochs: Array[float] = [-1.0, -1.0]
 var _ships: Array[Dictionary] = []
 var _next_ship := -1
 var _next_epoch := INF
@@ -35,10 +43,27 @@ func reset(epoch := 0.0) -> void:
 	if not _valid_epoch(epoch):
 		return
 	_seed_epoch = epoch
+	_frontier_epochs.fill(-1.0)
 	_ships.clear()
 	for index in range(ROUTES.size()):
-		_ships.append({"id": _id(index), "step": 0, "good": "", "amount": 0, "last_good": "", "last_delivered": 0})
+		_ships.append(_empty_ship(index))
 	_refresh_schedule()
+
+
+func activate_frontier(system: int, epoch: float) -> bool:
+	var slot := FRONTIER_SYSTEMS.find(system)
+	if slot < 0 or not _valid_epoch(epoch) or epoch < _seed_epoch or _frontier_epochs[slot] >= 0.0:
+		return false
+	if slot > 0 and (_frontier_epochs[slot - 1] < 0.0 or epoch < _frontier_epochs[slot - 1]):
+		return false
+	_frontier_epochs[slot] = epoch
+	_refresh_schedule()
+	return true
+
+
+func frontier_active(system: int) -> bool:
+	var slot := FRONTIER_SYSTEMS.find(system)
+	return slot >= 0 and _frontier_epochs[slot] >= 0.0
 
 
 func advance(market: RefCounted, previous_epoch: float, next_epoch: float) -> void:
@@ -59,50 +84,81 @@ func advance(market: RefCounted, previous_epoch: float, next_epoch: float) -> vo
 
 func services(system: int, epoch: float) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	if system < 0 or system >= Catalog.CORE_SYSTEM_COUNT or not _valid_epoch(epoch):
+	if system < 0 or system >= Catalog.SYSTEM_COUNT or not _valid_epoch(epoch):
 		return result
-	for slot in range(TRADER_NAMES.size()):
-		result.append(_service(system, slot, epoch))
+	if system < Catalog.CORE_SYSTEM_COUNT:
+		for slot in range(TRADER_NAMES.size()):
+			result.append(_service(system, slot, epoch))
+	for index in range(LOCAL_ROUTE_COUNT, _ships.size()):
+		if not _active(index) or epoch < _route_seed(index):
+			continue
+		var service := _service_for(index, epoch)
+		if service.system == system:
+			result.append(service)
 	return result
 
 
 func status_for(port: int, epoch: float) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	for service: Dictionary in services(Catalog.system_of_site(port), epoch):
-		if service.origin == port or service.destination == port:
-			result.append(service)
+	if not _valid_epoch(epoch):
+		return result
+	for index in range(_ships.size()):
+		if _active(index) and epoch >= _route_seed(index) and port in ROUTES[index].ports:
+			result.append(_service_for(index, epoch))
 	return result
 
 
 func snapshot() -> Dictionary:
-	return {"seed_epoch": _seed_epoch, "ships": _ships.duplicate(true)}
+	return {"seed_epoch": _seed_epoch, "ships": _ships.duplicate(true), "frontier_epochs": _frontier_epochs.duplicate()}
 
 
-func restore(raw: Variant, epoch: float) -> bool:
-	if not _valid_epoch(epoch) or not raw is Dictionary or raw.size() != 2:
+func restore(raw: Variant, epoch: float, legacy_frontier := false) -> bool:
+	if not _valid_epoch(epoch) or not raw is Dictionary or raw.size() != (2 if legacy_frontier else 3):
 		return false
 	var seed: Variant = raw.get("seed_epoch")
 	var records: Variant = raw.get("ships")
-	if not _valid_epoch(seed) or seed > epoch or not records is Array or records.size() != ROUTES.size():
+	var count := LOCAL_ROUTE_COUNT if legacy_frontier else ROUTES.size()
+	if not _valid_epoch(seed) or seed > epoch or not records is Array or records.size() != count:
 		return false
+	var frontier_epochs: Array[float] = [-1.0, -1.0]
+	if not legacy_frontier:
+		var raw_epochs: Variant = raw.get("frontier_epochs")
+		if not raw_epochs is Array or raw_epochs.size() != FRONTIER_SYSTEMS.size():
+			return false
+		for slot in range(raw_epochs.size()):
+			var activation: Variant = raw_epochs[slot]
+			if activation == -1.0:
+				continue
+			if not _valid_epoch(activation) or activation < seed or activation > epoch:
+				return false
+			if slot > 0 and (frontier_epochs[slot - 1] < 0.0 or activation < frontier_epochs[slot - 1]):
+				return false
+			frontier_epochs[slot] = float(activation)
 	var restored: Array[Dictionary] = []
 	for index in range(records.size()):
 		var record: Variant = records[index]
-		var step := _steps_through(index, epoch, float(seed))
+		var route_seed := float(seed) if index < LOCAL_ROUTE_COUNT else frontier_epochs[index - LOCAL_ROUTE_COUNT]
+		var step := _steps_through(index, epoch, route_seed) if route_seed >= 0.0 else 0
 		if not _valid_ship(index, step, record):
 			return false
 		restored.append({
 			"id": _id(index), "step": step, "good": str(record.good), "amount": int(record.amount),
 			"last_good": str(record.last_good), "last_delivered": int(record.last_delivered),
 		})
+	for index in range(restored.size(), ROUTES.size()):
+		restored.append(_empty_ship(index))
 	_seed_epoch = float(seed)
+	_frontier_epochs = frontier_epochs
 	_ships = restored
 	_refresh_schedule()
 	return true
 
 
 func _service(system: int, slot: int, epoch: float) -> Dictionary:
-	var index := system * TRADER_NAMES.size() + slot
+	return _service_for(system * TRADER_NAMES.size() + slot, epoch)
+
+
+func _service_for(index: int, epoch: float) -> Dictionary:
 	var ship := _ships[index]
 	var step: int = ship.step
 	var route: Dictionary = ROUTES[index]
@@ -111,10 +167,14 @@ func _service(system: int, slot: int, epoch: float) -> Dictionary:
 	var origin: int = route.ports[direction]
 	var destination: int = route.ports[1 - direction]
 	var in_transit := step % 2 == 1
-	var remaining := maxf(0.0, _event_time(index, step, _seed_epoch) - epoch)
-	var elapsed := clampf(1.0 - remaining / TRANSIT_SECONDS, 0.0, 1.0) if in_transit else 0.0
-	return {
-		"id": ship.id, "name": TRADER_NAMES[slot], "system": system, "slot": slot,
+	var remaining := maxf(0.0, _event_time(index, step, _route_seed(index)) - epoch)
+	var seconds := clampf(TRANSIT_SECONDS - remaining, 0.0, TRANSIT_SECONDS) if in_transit else 0.0
+	var elapsed := seconds / TRANSIT_SECONDS
+	var interstellar := index >= LOCAL_ROUTE_COUNT
+	var slot := TRADER_NAMES.size() + index - LOCAL_ROUTE_COUNT if interstellar else index % TRADER_NAMES.size()
+	var name: String = FRONTIER_NAMES[index - LOCAL_ROUTE_COUNT] if interstellar else TRADER_NAMES[slot]
+	var service := {
+		"id": ship.id, "name": name, "system": Catalog.system_of_site(origin), "slot": slot,
 		"origin": origin, "destination": destination, "in_transit": in_transit,
 		"progress": smoothstep(0.0, 1.0, elapsed),
 		"speed_fraction": 6.0 * elapsed * (1.0 - elapsed) / TRANSIT_SECONDS,
@@ -122,7 +182,31 @@ func _service(system: int, slot: int, epoch: float) -> Dictionary:
 		"arrival_eta": remaining if in_transit else remaining + TRANSIT_SECONDS,
 		"good": ship.good if ship.amount > 0 else route.goods[direction], "amount": ship.amount,
 		"last_port": origin if leg > 0 else -1, "last_good": ship.last_good, "last_delivered": ship.last_delivered,
+		"interstellar": interstellar, "visual_phase": "transit" if in_transit else "waiting",
+		"local_port": -1 if in_transit else origin, "local_progress": 0.0, "local_speed_fraction": 0.0,
 	}
+	if interstellar:
+		_place_shuttle(service, seconds)
+	return service
+
+
+static func _place_shuttle(service: Dictionary, seconds: float) -> void:
+	if not service.in_transit:
+		return
+	var arriving := seconds >= TRANSIT_SECONDS - LOCAL_TRANSIT_SECONDS
+	if seconds >= LOCAL_TRANSIT_SECONDS and not arriving:
+		service.visual_phase = "hyperspace"
+		service.system = -1
+		return
+	var local_time := seconds - (TRANSIT_SECONDS - LOCAL_TRANSIT_SECONDS) if arriving else seconds
+	var progress := clampf(local_time / LOCAL_TRANSIT_SECONDS, 0.0, 1.0)
+	var eased := smoothstep(0.0, 1.0, progress)
+	var speed := 6.0 * progress * (1.0 - progress) / LOCAL_TRANSIT_SECONDS
+	service.visual_phase = "arrival" if arriving else "departure"
+	service.local_port = service.destination if arriving else service.origin
+	service.system = Catalog.system_of_site(service.local_port)
+	service.local_progress = 1.0 - eased if arriving else eased
+	service.local_speed_fraction = -speed if arriving else speed
 
 
 func _trade_event(index: int, market: RefCounted) -> void:
@@ -154,6 +238,8 @@ func _trade_event(index: int, market: RefCounted) -> void:
 
 func _can_trade(market: RefCounted) -> bool:
 	for index in range(_ships.size()):
+		if not _active(index):
+			continue
 		var ship := _ships[index]
 		var route: Dictionary = ROUTES[index]
 		for direction in range(2):
@@ -169,8 +255,10 @@ func _can_trade(market: RefCounted) -> bool:
 
 func _skip_without_trade(epoch: float) -> void:
 	for index in range(_ships.size()):
+		if not _active(index):
+			continue
 		var ship := _ships[index]
-		var step := _steps_through(index, epoch, _seed_epoch)
+		var step := _steps_through(index, epoch, _route_seed(index))
 		if step <= int(ship.step):
 			continue
 		if _leg_index(step) > _leg_index(ship.step):
@@ -184,10 +272,20 @@ func _refresh_schedule() -> void:
 	_next_ship = -1
 	_next_epoch = INF
 	for index in range(_ships.size()):
-		var due := _event_time(index, int(_ships[index].step), _seed_epoch)
+		if not _active(index):
+			continue
+		var due := _event_time(index, int(_ships[index].step), _route_seed(index))
 		if due < _next_epoch:
 			_next_epoch = due
 			_next_ship = index
+
+
+func _active(index: int) -> bool:
+	return index < LOCAL_ROUTE_COUNT or _frontier_epochs[index - LOCAL_ROUTE_COUNT] >= 0.0
+
+
+func _route_seed(index: int) -> float:
+	return _seed_epoch if index < LOCAL_ROUTE_COUNT else _frontier_epochs[index - LOCAL_ROUTE_COUNT]
 
 
 static func _steps_through(index: int, epoch: float, seed: float) -> int:
@@ -204,7 +302,8 @@ static func _steps_through(index: int, epoch: float, seed: float) -> int:
 
 
 static func _event_time(index: int, step: int, seed: float) -> float:
-	return seed + float(FIRST_DEPARTURES[index % TRADER_NAMES.size()]) + _leg_index(step) * LEG_SECONDS + (TRANSIT_SECONDS if step % 2 == 1 else 0.0)
+	var first := FRONTIER_DEPARTURE if index >= LOCAL_ROUTE_COUNT else float(FIRST_DEPARTURES[index % TRADER_NAMES.size()])
+	return seed + first + _leg_index(step) * LEG_SECONDS + (TRANSIT_SECONDS if step % 2 == 1 else 0.0)
 
 
 static func _leg_index(step: int) -> int:
@@ -212,7 +311,13 @@ static func _leg_index(step: int) -> int:
 
 
 static func _id(index: int) -> String:
+	if index >= LOCAL_ROUTE_COUNT:
+		return "freighter-frontier-%d" % FRONTIER_SYSTEMS[index - LOCAL_ROUTE_COUNT]
 	return "trader-%d-%d" % [floori(float(index) / TRADER_NAMES.size()), index % TRADER_NAMES.size()]
+
+
+static func _empty_ship(index: int) -> Dictionary:
+	return {"id": _id(index), "step": 0, "good": "", "amount": 0, "last_good": "", "last_delivered": 0}
 
 
 static func _pickup_size(market: RefCounted, origin: int, destination: int, good: String) -> int:
