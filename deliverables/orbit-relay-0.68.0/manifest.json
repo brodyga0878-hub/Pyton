@@ -1,0 +1,228 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.68.0",
+  "source_commit": "8bcff0f0d0114108646f59789a89ca3cf2c2b1de",
+  "content": {
+    "save_schema": 28,
+    "total_systems": 24,
+    "total_targets": 87,
+    "binary_system": "Элиора",
+    "analytic_barycentric_pair": true,
+    "moon_position_and_velocity_include_parent_motion": true,
+    "both_stars_support_gravity_thermal_and_refuel": true,
+    "earlier_catalog_and_ephemerides_preserved": true,
+    "tested_acceptance_matrix": {
+      "checked": 26,
+      "partial": 11,
+      "open": 7
+    }
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 93,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.67.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 41,
+    "tested_on_device": false
+  },
+  "checks": {
+    "android_report_share": {
+      "failures": 0,
+      "checks": 76
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "binary_orbits": {
+      "failures": 0,
+      "checks": 53
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "cartography": {
+      "failures": 0,
+      "checks": 43
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "crew": {
+      "failures": 0,
+      "checks": 45
+    },
+    "departure": {
+      "failures": 0,
+      "checks": 32
+    },
+    "dock_access": {
+      "failures": 0,
+      "checks": 37
+    },
+    "docking": {
+      "failures": 0,
+      "checks": 76
+    },
+    "dual_fuel": {
+      "failures": 0,
+      "checks": 25
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 139
+    },
+    "flight": {
+      "failures": 0
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "frontier_freight": {
+      "failures": 0,
+      "checks": 33
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 76
+    },
+    "galactic_routes": {
+      "failures": 0,
+      "checks": 59
+    },
+    "gear": {
+      "failures": 0,
+      "checks": 28
+    },
+    "heat_shield": {
+      "failures": 0,
+      "checks": 28
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 187
+    },
+    "living": {
+      "failures": 0,
+      "checks": 77
+    },
+    "material_maps": {
+      "failures": 0,
+      "checks": 33
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "npc_freight": {
+      "failures": 0,
+      "checks": 48
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 535
+    },
+    "passengers": {
+      "failures": 0,
+      "checks": 50
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 81
+    },
+    "procedural_galaxy": {
+      "failures": 0,
+      "checks": 140
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "report": {
+      "failures": 0,
+      "checks": 28
+    },
+    "scene": {
+      "failures": 0
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "shipyard": {
+      "failures": 0,
+      "checks": 52
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 381
+    },
+    "surface_guidance": {
+      "failures": 0,
+      "checks": 60
+    },
+    "binary_orbit_model": {
+      "checks": 7221,
+      "failures": 0
+    },
+    "binary_flight_18_epochs": {
+      "checks": 180,
+      "failures": 0
+    },
+    "binary_scene_headless": {
+      "checks": 20,
+      "failures": 0
+    },
+    "binary_scene_graphical": {
+      "checks": 23,
+      "failures": 0
+    },
+    "actual_0_67_ephemeris_and_migration": {
+      "checks": 1003,
+      "failures": 0,
+      "save_files": 1
+    },
+    "actual_0_67_two_save_migration_and_binary_mileage": {
+      "checks": 191,
+      "failures": 0,
+      "save_files": 2
+    }
+  },
+  "files": {
+    "OrbitRelay-0.68.0-arm64.apk": {
+      "bytes": 28708310,
+      "sha256": "76c14cf0973d2eda9a30e76175a01fd178524604ab6f995294953b4f36fe3855"
+    },
+    "OrbitRelay-0.68.0-source.zip": {
+      "bytes": 2201236,
+      "sha256": "1a2ddeb67aa2b3498d6134374d63bcee66750dd8ea1c1846443fedfc0a91008e"
+    },
+    "chart-companion-forecast.png": {
+      "bytes": 145966,
+      "sha256": "383080ffd187a610afb8faa7b85e89cce558ad3be84d8f5a744d6ff9b866fc31"
+    },
+    "chart-moon-orbit.png": {
+      "bytes": 93598,
+      "sha256": "737c4aa250a27da418ef26a6fee3c3e430fc6ed86efde2519bf7e7f95f8378bf"
+    },
+    "flight-binary.png": {
+      "bytes": 249957,
+      "sha256": "70615106cfd291d536f5f098cbd4f838f9207f9b5048aff936afb463aed0ca66"
+    }
+  }
+}
