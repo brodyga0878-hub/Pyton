@@ -9,6 +9,7 @@ const MINT := Color("9debd7")
 const AMBER := Color("ffd396")
 const BORDER := Color("365561")
 const Sector := preload("res://scripts/sector_catalog.gd")
+const ShipSystems := preload("res://scripts/ship_systems.gd")
 
 var _sim: RefCounted
 var _insets: MarginContainer
@@ -72,11 +73,15 @@ func build() -> void:
 	_hull = hull_meter[0]
 	_hull_level = hull_meter[1]
 
-	_tariff = _add_service(content, "refuel", "Полная заправка", "")
-	_repair_tariff = _add_service(content, "repair", "Ремонт корпуса", "")
-	_add_service(content, "tank", "Увеличенный бак", "Ёмкость 150 ед.")
-	_add_service(content, "eco", "Экономичный привод", "Расход топлива ниже на 30%")
-	_cargo_detail = _add_service(content, "cargo", "Расширение трюма", "")
+	var services := VBoxContainer.new()
+	services.add_theme_constant_override("separation", 8)
+	content.add_child(services)
+	_tariff = _add_service(services, "refuel", "Полная заправка", "")
+	_repair_tariff = _add_service(services, "repair", "Ремонт корпуса", "")
+	_add_service(services, "tank", "Увеличенный бак", "Ёмкость 150 ед.")
+	_add_service(services, "eco", "Экономичный привод", "Расход топлива ниже на 30%")
+	_cargo_detail = _add_service(services, "cargo", "Расширение трюма", "")
+	_add_service(services, "heat_shield", "Теплозащита", "Тепловая нагрузка в атмосфере ниже на %d%%" % ShipSystems.HEAT_SHIELD_REDUCTION)
 	get_viewport().size_changed.connect(_update_insets)
 	_update_insets()
 	hide()

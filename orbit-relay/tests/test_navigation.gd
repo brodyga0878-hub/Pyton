@@ -181,6 +181,7 @@ func _test_saves() -> void:
 	legacy.velocity = Vector3(2.0, -4.0, -12.0)
 	var previous := _json(legacy.snapshot())
 	previous.schema = 12
+	previous.ship.erase("heat_shield")
 	previous.erase("orientation")
 	previous.erase("flight_assist")
 	_expect(resumed.restore(previous) and resumed.flight_assist and _same_attitude(resumed.attitude(), legacy.attitude())

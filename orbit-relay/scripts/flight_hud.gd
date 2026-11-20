@@ -430,6 +430,8 @@ func _sync_thermal(stellar: Dictionary, entry: Dictionary, scooping: bool, atmos
 		_entry_readout.text = ("%s · высота %.1f м\nОтн. %.1f · верт. %+.1f м/с" % [
 			entry.name, entry.altitude, entry.relative_speed, entry.vertical_speed,
 		]).replace(".", ",")
+		if entry.inside and entry.get("shielded", false):
+			_entry_readout.text += "\nТеплозащита · −%d%% нагрузки" % int(entry.heat_reduction)
 	var guidance_color := INK
 	if _thermal_panel.visible:
 		var entering: bool = atmosphere and (entry.inside or (entry.near and entry.vertical_speed < 0.0))

@@ -74,6 +74,7 @@ func _test_offers_and_migration(campaign: Dictionary) -> void:
 		"An order must be booked at an operational dock")
 	var old := _json(campaign)
 	old.schema = 11
+	old.ship.erase("heat_shield")
 	old.erase("convoy_order")
 	for record: Dictionary in old.factions.frontiers:
 		for convoy: Dictionary in record.convoys:

@@ -16,7 +16,7 @@ const Patrol = preload("res://scripts/patrol_encounter.gd")
 const Expedition = preload("res://scripts/expedition.gd")
 const FactionFronts = preload("res://scripts/faction_fronts.gd")
 const ConvoyOrders = preload("res://scripts/convoy_orders.gd")
-const SAVE_SCHEMA := 14
+const SAVE_SCHEMA := 15
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
@@ -1123,6 +1123,8 @@ func service_action(action: String) -> bool:
 		"cargo":
 			mining.cargo_capacity = ship.cargo_capacity()
 			_announce("service_cargo", "Вместимость трюма увеличена до %d ед." % mining.cargo_capacity)
+		"heat_shield":
+			_announce("service_heat_shield", "Теплозащита установлена. Списано %d кр." % paid)
 	return true
 
 
@@ -1169,7 +1171,7 @@ func thermal_status() -> Dictionary:
 func atmosphere_status() -> Dictionary:
 	var air := Atmosphere.sample(self, position, velocity)
 	var in_flight := docked < 0 and not landed and jump_seconds_left <= 0.0
-	var equilibrium := Atmosphere.heat_target(air.relative_speed, air.density) if in_flight else 0.0
+	var equilibrium := _entry_heat_target(air) if in_flight else 0.0
 	var altitude: float = air.altitude
 	if air.near:
 		var from_center := position - target_position(air.site)
@@ -1180,6 +1182,8 @@ func atmosphere_status() -> Dictionary:
 		"visible": in_flight and (air.near or entry_heat >= 1.0),
 		"heating": equilibrium > entry_heat + 0.1,
 		"cooling": equilibrium < entry_heat - 0.1,
+		"shielded": ship.heat_shield,
+		"heat_reduction": ShipSystems.HEAT_SHIELD_REDUCTION if ship.heat_shield else 0,
 		"level": _entry_heat_level(), "safe_speed": Atmosphere.SAFE_ENTRY_SPEED,
 	})
 	air.altitude = altitude
@@ -1207,7 +1211,11 @@ func _atmosphere_step(delta: float) -> void:
 			_announce("atmosphere_exit", "Корабль вышел из атмосферы.")
 	if air.inside:
 		velocity = Atmosphere.drag(velocity, air.drift, air.density, delta)
-	_update_entry_heat(delta, Atmosphere.heat_target(air.relative_speed, air.density), true)
+	_update_entry_heat(delta, _entry_heat_target(air), true)
+
+
+func _entry_heat_target(air: Dictionary) -> float:
+	return Atmosphere.heat_target(air.relative_speed, air.density) * ship.entry_heat_factor()
 
 
 func _update_entry_heat(delta: float, equilibrium := 0.0, airborne := false) -> void:
@@ -1997,6 +2005,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_heat_shield := schema < 15
 	var pre_entry := schema < 14
 	var pre_navigation := schema < 13
 	var pre_convoy_orders := schema < 12
@@ -2126,7 +2135,7 @@ func restore(state: Dictionary) -> bool:
 	var restored_patrol := Patrol.new()
 	var restored_landing := -1
 	var restored_plan := -1
-	if not pre_fuel and not restored_ship.restore(state.get("ship"), pre_economy):
+	if not pre_fuel and not restored_ship.restore(state.get("ship"), pre_economy, pre_heat_shield):
 		return false
 	if not pre_economy and not restored_market.restore(state.get("market"), pre_traffic, pre_expansion):
 		return false

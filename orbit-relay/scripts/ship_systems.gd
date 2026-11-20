@@ -6,18 +6,22 @@ const EXTRA_CAPACITY := 50.0
 const TANK_COST := 260
 const ECO_COST := 320
 const CARGO_COST := 300
+const HEAT_SHIELD_COST := 340
+const HEAT_SHIELD_REDUCTION := 48
 const BASE_CARGO_CAPACITY := 24
 const EXPANDED_CARGO_CAPACITY := 40
 const MAX_HULL := 100.0
 const MIN_HULL := 1.0
 const LEGACY_SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded"]
-const SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded"]
+const PRE_SHIELD_SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded"]
+const SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded", "heat_shield"]
 
 var fuel: float = BASE_CAPACITY
 var tank_upgraded := false
 var eco_upgraded := false
 var hull: float = MAX_HULL
 var cargo_upgraded := false
+var heat_shield := false
 
 
 func capacity() -> float:
@@ -26,6 +30,10 @@ func capacity() -> float:
 
 func cargo_capacity() -> int:
 	return EXPANDED_CARGO_CAPACITY if cargo_upgraded else BASE_CARGO_CAPACITY
+
+
+func entry_heat_factor() -> float:
+	return 1.0 - HEAT_SHIELD_REDUCTION / 100.0 if heat_shield else 1.0
 
 
 func burn(delta: float, load: float, boost: bool) -> void:
@@ -90,6 +98,9 @@ func service_offer(action: String, unit_price: int, credits: int) -> Dictionary:
 		"cargo":
 			cost = CARGO_COST
 			installed = cargo_upgraded
+		"heat_shield":
+			cost = HEAT_SHIELD_COST
+			installed = heat_shield
 	return {"cost": cost, "allowed": cost > 0 and cost <= credits and not installed, "installed": installed}
 
 
@@ -108,21 +119,25 @@ func buy(action: String, unit_price: int, credits: int) -> int:
 			eco_upgraded = true
 		"cargo":
 			cargo_upgraded = true
+		"heat_shield":
+			heat_shield = true
 	return offer.cost
 
 
 func snapshot() -> Dictionary:
 	return {
 		"fuel": fuel, "tank_upgraded": tank_upgraded, "eco_upgraded": eco_upgraded,
-		"hull": hull, "cargo_upgraded": cargo_upgraded,
+		"hull": hull, "cargo_upgraded": cargo_upgraded, "heat_shield": heat_shield,
 	}
 
 
-func restore(value: Variant, legacy := false) -> bool:
-	var fields := LEGACY_SAVE_FIELDS if legacy else SAVE_FIELDS
+func restore(value: Variant, legacy := false, pre_shield := false) -> bool:
+	var fields := LEGACY_SAVE_FIELDS if legacy else (PRE_SHIELD_SAVE_FIELDS if pre_shield else SAVE_FIELDS)
 	if not value is Dictionary or value.size() != fields.size() or not value.has_all(fields):
 		return false
 	if not value.tank_upgraded is bool or not value.eco_upgraded is bool:
+		return false
+	if not (legacy or pre_shield) and not value.heat_shield is bool:
 		return false
 	if not (value.fuel is float or value.fuel is int):
 		return false
@@ -144,4 +159,5 @@ func restore(value: Variant, legacy := false) -> bool:
 	eco_upgraded = value.eco_upgraded
 	hull = restored_hull
 	cargo_upgraded = restored_cargo_upgrade
+	heat_shield = false if legacy or pre_shield else value.heat_shield
 	return true

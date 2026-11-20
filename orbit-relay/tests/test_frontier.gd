@@ -321,6 +321,7 @@ func _test_convoys(remote: Flight, conflict: Dictionary, saved: Dictionary) -> v
 		"The combat round incorporates the net supplies that physically arrived")
 	var legacy := saved.duplicate(true)
 	legacy.schema = 10
+	legacy.ship.erase("heat_shield")
 	legacy.erase("star_heat")
 	for record: Dictionary in legacy.factions.frontiers:
 		record.erase("convoys")

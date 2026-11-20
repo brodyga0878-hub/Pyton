@@ -189,7 +189,7 @@ func _test_hot_saves() -> void:
 	hot.credits = 318
 	var state := JSON.parse_string(JSON.stringify(hot.snapshot(), "", true, true)) as Dictionary
 	var resumed := Flight.new()
-	if not _expect(state.schema == 14 and resumed.restore(state) and is_equal_approx(resumed.entry_heat, hot.entry_heat)
+	if not _expect(state.schema == Flight.SAVE_SCHEMA and resumed.restore(state) and is_equal_approx(resumed.entry_heat, hot.entry_heat)
 		and is_equal_approx(resumed.star_heat, hot.star_heat) and resumed.velocity.distance_to(hot.velocity) < 0.001,
 		"Cold restarts preserve atmospheric and stellar heat independently with existing momentum"):
 		return
@@ -202,6 +202,7 @@ func _test_hot_saves() -> void:
 	var previous := state.duplicate(true)
 	previous.schema = 13
 	previous.erase("entry_heat")
+	previous.ship.erase("heat_shield")
 	_expect(resumed.restore(previous) and resumed.entry_heat == 0.0 and is_equal_approx(resumed.star_heat, 12.4)
 		and resumed.credits == 318 and resumed.system_id == Catalog.VELAR_SYSTEM,
 		"Schema-13 saves migrate with a cool shield while retaining existing stellar heat and ship progress")
