@@ -5,6 +5,7 @@ const MiningRig = preload("res://scripts/mining_rig.gd")
 const ShipSystems = preload("res://scripts/ship_systems.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const Orbit = preload("res://scripts/orbit_ephemeris.gd")
+const Dynamics = preload("res://scripts/orbital_dynamics.gd")
 const Terrain = preload("res://scripts/surface_terrain.gd")
 const Economy = preload("res://scripts/port_economy.gd")
 const Traffic = preload("res://scripts/sector_traffic.gd")
@@ -12,7 +13,7 @@ const Patrol = preload("res://scripts/patrol_encounter.gd")
 const Expedition = preload("res://scripts/expedition.gd")
 const FactionFronts = preload("res://scripts/faction_fronts.gd")
 const ConvoyOrders = preload("res://scripts/convoy_orders.gd")
-const SAVE_SCHEMA := 12
+const SAVE_SCHEMA := 13
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
@@ -26,7 +27,8 @@ const HEAT_SCOOP_SLOW := 55.0
 const HEAT_SCOOP_LIMIT := 76.0
 const HEAT_DAMAGE_LIMIT := 85.0
 const MAX_STEER := 1.45
-const MAX_PITCH := 1.42
+const MAX_PITCH := PI * 0.5
+const LEGACY_MAX_PITCH := 1.42
 const MAX_ROLL := 1.9
 const DOCK_SPEED := 5.0
 const DOCK_ROLL_ERROR := 0.16
@@ -58,6 +60,7 @@ var pitch := 0.0
 var roll := 0.0
 var throttle := 0.0
 var boost := false
+var flight_assist := true
 var docked := 0
 var landed_site := -1
 var landing_direction := Vector3.ZERO
@@ -102,6 +105,8 @@ var _departure_leg := 0
 var _departure_axis := Vector3.ZERO
 var _sample_time := -1.0
 var _samples: Dictionary[int, Dictionary] = {}
+var _orientation := Quaternion.IDENTITY
+var _orientation_angles := Vector3.ZERO
 
 
 func speed() -> float:
@@ -263,12 +268,47 @@ func roll_error(index: int) -> float:
 func attitude() -> Basis:
 	if landed:
 		return landed_basis()
-	var heading := Basis.from_euler(Vector3(pitch, yaw, 0.0))
-	return heading * Basis(Vector3.BACK, roll)
+	return Basis(_flight_orientation())
 
 
 func forward() -> Vector3:
 	return attitude() * Vector3.FORWARD
+
+
+func _flight_orientation() -> Quaternion:
+	# Approach controllers still set the individual aiming angles.
+	var angles := Vector3(pitch, yaw, roll)
+	return _orientation if angles == _orientation_angles else Quaternion.from_euler(angles)
+
+
+func _rotate_manual(steer: Vector2, bank: float, delta: float) -> void:
+	var rates := Vector3(steer.y * MAX_STEER, -steer.x * MAX_STEER, bank * MAX_ROLL)
+	var speed := rates.length()
+	if speed <= 0.000001:
+		return
+	var turn := Quaternion(rates / speed, speed * delta)
+	_orientation = (_flight_orientation() * turn).normalized()
+	var angles := Basis(_orientation).get_euler()
+	pitch = clampf(angles.x, -MAX_PITCH, MAX_PITCH)
+	yaw = clampf(angles.y, -PI, PI)
+	roll = clampf(angles.z, -PI, PI)
+	_orientation_angles = Vector3(pitch, yaw, roll)
+
+
+func set_flight_assist(enabled: bool) -> bool:
+	if enabled == flight_assist or jump_seconds_left > 0.0:
+		return false
+	reset_time_scale()
+	set_autopilot(false)
+	flight_assist = enabled
+	throttle = 0.0
+	boost = false
+	_announce("flight_assist", "Стабилизация включена." if enabled else "Режим инерции. Тормоз гасит дрейф.")
+	return true
+
+
+func gravity_at(at: Vector3) -> Vector3:
+	return Dynamics.acceleration(self, at)
 
 
 func offer_destination() -> int:
@@ -1103,24 +1143,25 @@ func _hold_docked_pose() -> void:
 	pitch = 0.0
 
 
-func update(delta: float, steer: Vector2, bank: float, boost_requested: bool, brake: bool) -> void:
+func update(delta: float, steer: Vector2, bank: float, boost_requested: bool, brake: bool, translation := Vector3.ZERO) -> void:
 	if not is_finite(delta) or delta <= 0.0:
 		return
-	var manual_input := steer.length_squared() > 0.04 or absf(bank) > 0.12 or boost_requested or brake
+	var traverse := translation.limit_length() if translation.is_finite() else Vector3.ZERO
+	var manual_input := steer.length_squared() > 0.04 or absf(bank) > 0.12 or boost_requested or brake or not traverse.is_zero_approx()
 	if manual_input or (time_scale > 1 and not time_status().allowed):
 		reset_time_scale()
 	if docked >= 0 or landed:
-		_step(delta * time_scale, steer, bank, boost_requested, brake, manual_input)
+		_step(delta * time_scale, steer, bank, boost_requested, brake, manual_input, traverse)
 		return
 	var steps := maxi(1, ceili(delta * time_scale / MAX_FLIGHT_STEP - 0.000001))
 	var interval := delta / steps
 	for step in range(steps):
 		if time_scale > 1 and not time_status().allowed:
 			reset_time_scale()
-		_step(interval * time_scale, steer, bank, boost_requested, brake, manual_input)
+		_step(interval * time_scale, steer, bank, boost_requested, brake, manual_input, traverse)
 
 
-func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, brake: bool, manual_input: bool) -> void:
+func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, brake: bool, manual_input: bool, translation: Vector3) -> void:
 	var previous_orbit_time := orbit_time
 	orbit_time += delta
 	elapsed += delta
@@ -1160,6 +1201,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 			_announce("manual_override", "Ручное управление")
 
 	var had_fuel := ship.fuel > 0.0
+	var manual_load := 0.0
 	if autopilot:
 		_autopilot_step(delta)
 	elif convoy_course:
@@ -1169,24 +1211,9 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 	elif patrol_course:
 		_patrol_course_step(delta)
 	else:
-		yaw = wrapf(yaw - steer.x * delta * MAX_STEER, -PI, PI)
-		pitch = clampf(pitch + steer.y * delta * MAX_STEER, -MAX_PITCH, MAX_PITCH)
-		roll = wrapf(roll + bank * delta * MAX_ROLL, -PI, PI)
-		boost = boost_requested and not brake and had_fuel
-		var reference := reference_site()
-		var desired_velocity := target_velocity(reference) if reference >= 0 else Vector3.ZERO
-		if brake:
-			throttle = 0.0
-		elif boost:
-			desired_velocity += forward() * MAX_SPEED * 1.55
-		else:
-			desired_velocity += forward() * (MAX_SPEED if had_fuel else RESERVE_SPEED) * throttle
-		if not had_fuel:
-			desired_velocity = desired_velocity.limit_length(RESERVE_SPEED)
-		var acceleration := 34.0 if had_fuel else 20.0
-		velocity = velocity.move_toward(desired_velocity, (67.0 if brake else acceleration) * delta)
+		manual_load = _manual_step(delta, steer, bank, boost_requested, brake, translation)
 
-	ship.burn(delta, throttle, boost)
+	ship.burn(delta, maxf(throttle, manual_load), boost)
 	if had_fuel and ship.fuel <= 0.0:
 		_announce("fuel_empty", "Бак пуст. Включён резервный ход до 42 м/с.")
 
@@ -1216,6 +1243,36 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 	_collect_fuel(delta)
 	_apply_patrol_result(patrol.step(self, delta))
 	_apply_convoy_result(convoy_order.step(self, delta))
+
+
+func _manual_step(delta: float, steer: Vector2, bank: float, boost_requested: bool, brake: bool, translation: Vector3) -> float:
+	_rotate_manual(steer, bank, delta)
+	var had_fuel := ship.fuel > 0.0
+	boost = boost_requested and not brake and had_fuel
+	var reference := reference_site()
+	var drift := target_velocity(reference) if reference >= 0 else Vector3.ZERO
+	if brake:
+		throttle = 0.0
+		velocity = velocity.move_toward(drift, 67.0 * delta)
+		return 0.0
+	var thrust := 1.55 if boost else throttle
+	var local := Vector3(translation.x, translation.y, -translation.z - thrust)
+	var limit := 1.55 if boost else 1.0
+	var drive := attitude() * local.limit_length(limit)
+	var drive_acceleration := 34.0 if had_fuel else 20.0
+	var drive_speed := MAX_SPEED if had_fuel else RESERVE_SPEED
+	if flight_assist:
+		var desired := drift + drive * drive_speed
+		if not had_fuel:
+			desired = desired.limit_length(RESERVE_SPEED)
+		velocity = velocity.move_toward(desired, drive_acceleration * delta)
+	else:
+		# Opposing thrust can brake drift without forcing it down to a new engine speed limit.
+		var relative := velocity - drift
+		var powered_limit := maxf(relative.length(), drive_speed * limit)
+		var powered := (relative + drive * drive_acceleration * delta).limit_length(powered_limit)
+		velocity = (drift + powered + gravity_at(position) * delta).limit_length(MAX_SAVED_SPEED - 1.0)
+	return local.length()
 
 
 func _blocked(point: Vector3, sector_id := -1, epoch := -1.0, progress: RefCounted = null) -> bool:
@@ -1497,11 +1554,13 @@ func _announce(event: String, message: String) -> void:
 
 
 func snapshot() -> Dictionary:
+	var facing := _flight_orientation()
 	return {
 		"schema": SAVE_SCHEMA,
 		"position": [position.x, position.y, position.z],
 		"velocity": [velocity.x, velocity.y, velocity.z],
 		"yaw": yaw, "pitch": pitch, "roll": roll, "elapsed": elapsed,
+		"orientation": [facing.x, facing.y, facing.z, facing.w], "flight_assist": flight_assist,
 		"orbit_time": orbit_time,
 		"throttle": throttle, "docked": docked, "target": target,
 		"credits": credits, "deliveries": deliveries,
@@ -1521,6 +1580,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_navigation := schema < 13
 	var pre_convoy_orders := schema < 12
 	var pre_thermal := schema < 11
 	var pre_expansion := schema < 10
@@ -1531,6 +1591,8 @@ func restore(state: Dictionary) -> bool:
 	var pre_fuel := schema < 4
 	var pre_sector := schema < 3
 	if not pre_thermal and not _number(state.get("star_heat"), 0.0, 100.0):
+		return false
+	if not pre_navigation and not state.get("flight_assist") is bool:
 		return false
 	var restored_epoch := 0.0
 	if schema >= 6:
@@ -1556,10 +1618,26 @@ func restore(state: Dictionary) -> bool:
 		for item in state[key]:
 			if not _number(item, -limit, limit):
 				return false
-	if not _number(state.get("yaw"), -PI, PI) or not _number(state.get("pitch"), -MAX_PITCH, MAX_PITCH):
+	var pitch_limit := LEGACY_MAX_PITCH if pre_navigation else MAX_PITCH
+	if not _number(state.get("yaw"), -PI, PI) or not _number(state.get("pitch"), -pitch_limit, pitch_limit):
 		return false
 	if not _number(state.get("roll"), -PI, PI) or not _number(state.get("elapsed"), 0.0, 3155760000.0):
 		return false
+	var restored_angles := Vector3(state.pitch, state.yaw, state.roll)
+	var restored_orientation := Quaternion.from_euler(restored_angles)
+	if not pre_navigation:
+		var encoded: Variant = state.get("orientation")
+		if not encoded is Array or encoded.size() != 4:
+			return false
+		for component in encoded:
+			if not _number(component, -1.0, 1.0):
+				return false
+		var saved := Quaternion(encoded[0], encoded[1], encoded[2], encoded[3])
+		if absf(saved.length_squared() - 1.0) > 0.0001:
+			return false
+		if absf(saved.dot(restored_orientation)) < 0.9999:
+			return false
+		restored_orientation = saved
 	if not _number(state.get("throttle"), 0.0, 1.0):
 		return false
 	var site_count := Catalog.PRE_EXPANSION_DESTINATION_COUNT if pre_expansion else Catalog.DESTINATION_COUNT
@@ -1702,6 +1780,9 @@ func restore(state: Dictionary) -> bool:
 	yaw = float(state.yaw)
 	pitch = float(state.pitch)
 	roll = float(state.roll)
+	_orientation_angles = restored_angles
+	_orientation = restored_orientation
+	flight_assist = true if pre_navigation else state.flight_assist
 	throttle = float(state.throttle)
 	elapsed = float(state.elapsed)
 	orbit_time = restored_epoch

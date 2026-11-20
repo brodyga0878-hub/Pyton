@@ -94,7 +94,7 @@ func _overlay_open() -> bool:
 func _physics_process(delta: float) -> void:
 	if _overlay_open():
 		return
-	flight.update(delta, _hud.move_input(), _hud.roll_input(), _hud.boost_held(), _hud.brake_held())
+	flight.update(delta, _hud.move_input(), _hud.roll_input(), _hud.boost_held(), _hud.brake_held(), _hud.translation_input())
 	_deliver_notice()
 	_save_elapsed += delta
 	if _save_elapsed >= SAVE_INTERVAL:
@@ -148,6 +148,8 @@ func _handle_action(action: String) -> void:
 			flight.change_target()
 		"autopilot":
 			flight.set_autopilot(not flight.autopilot)
+		"flight_assist":
+			flight.set_flight_assist(not flight.flight_assist)
 		"throttle_up":
 			flight.change_throttle(throttle_step)
 		"throttle_down":
@@ -224,6 +226,7 @@ func _deliver_notice() -> void:
 		"planned_target": flight.planned_target, "speed": flight.speed(), "credits": flight.credits,
 		"mining_phase": flight.mining.phase, "cargo_units": flight.mining.ore_hold,
 		"fuel": flight.ship.fuel, "scooping": flight.scooping, "star_heat": flight.star_heat,
+		"flight_assist": flight.flight_assist,
 		"hull": flight.ship.hull, "contract_route": flight.contract_route_id, "contract_leg": flight.contract_leg,
 		"patrol_phase": flight.patrol.phase, "patrol_origin": flight.patrol.origin,
 		"convoy_id": convoy.id, "convoy_order_phase": convoy.phase, "convoy_order_kind": convoy.kind,
@@ -245,6 +248,7 @@ func _deliver_notice() -> void:
 		"war_declared", "war_round", "war_captured", "war_repulsed", "war_convoy_delivered", "war_convoy_intercepted",
 		"convoy_order_accepted", "convoy_order_escorted", "convoy_order_failed", "convoy_order_paid",
 		"convoy_order_fire", "convoy_order_enemy_hit",
+		"flight_assist",
 	]:
 		_save()
 
@@ -301,7 +305,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_T: "target", KEY_F: "autopilot", KEY_R: "throttle_up", KEY_V: "throttle_down",
 		KEY_ENTER: "dock", KEY_M: "contract", KEY_G: "mine", KEY_B: "sell_ore", KEY_F8: "report",
 		KEY_N: "map", KEY_J: "galaxy", KEY_K: "scoop", KEY_P: "services", KEY_O: "time", KEY_L: "market",
-		KEY_U: "patrol", KEY_X: "fire", KEY_I: "convoy",
+		KEY_U: "patrol", KEY_X: "fire", KEY_I: "convoy", KEY_H: "flight_assist",
 		KEY_F2: "settings", KEY_F3: "journal", KEY_F4: "frontier",
 	}
 	if actions.has(event.physical_keycode):

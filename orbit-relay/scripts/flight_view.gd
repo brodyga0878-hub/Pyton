@@ -164,9 +164,10 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var landed := surface_id >= 0
 	var settled := docked or landed
 	var berth := int(sim.docked) if docked else surface_id
-	var heading: Basis = sim.landed_basis() if landed else Basis.from_euler(Vector3(float(sim.pitch), float(sim.yaw), 0.0))
+	var ship_orientation: Basis = sim.attitude()
+	var heading := Basis.IDENTITY if docked else ship_orientation
 	_ship.position = position_now
-	_ship.basis = heading if landed else sim.attitude()
+	_ship.basis = ship_orientation
 	_landing_gear.visible = landed
 	var thrust := clampf(float(sim.throttle), 0.0, 1.0)
 	_flight_time += delta

@@ -16,8 +16,11 @@ const BACK := Color(0.024, 0.057, 0.081, 0.94)
 const LINE := Color(0.24, 0.43, 0.49, 0.58)
 const COURSE_PAD := Rect2(26, -170, 172, 144)
 const ROLL_PAD := Rect2(210, -108, 112, 82)
+const FLIGHT_MODE_ROW := Rect2(26, -224, 296, 46)
+const TRANSLATION_ROW := Rect2(26, -279, 296, 46)
 const ACTION_COLUMN := Rect2(-340, -215, 314, 189)
 const TOUCH_GAINS := [0.72, 1.0, 1.36]
+const HOLD_ACTIONS := ["boost", "brake", "translation_forward", "translation_reverse"]
 const MARK_PRIORITY := {"raider": 0, "convoy": 1}
 
 var _hud: Control
@@ -25,6 +28,8 @@ var _safe: Control
 var _marks: FlightMarks
 var _steer: SteeringPad
 var _bank: SteeringPad
+var _flight_modes: HBoxContainer
+var _translation_controls: HBoxContainer
 var _route: Label
 var _route_detail: Label
 var _telemetry: Label
@@ -51,8 +56,9 @@ var _steer_finger := -1
 var _bank_finger := -1
 var _boost := false
 var _brake := false
-var _mouse_boost := false
-var _mouse_brake := false
+var _mouse_held: Dictionary[String, bool] = {}
+var _translation_mode := false
+var _translation_depth := 0.0
 var _input_enabled := true
 var _touch_gain := 1.0
 var _touch_mirrored := false
@@ -156,6 +162,7 @@ func build() -> void:
 	_bank.caption = "КРЕН"
 	_bank.horizontal = true
 	_pin(_bank, _safe, Vector2(0, 1), ROLL_PAD)
+	_build_flight_modes()
 
 	var center := _panel(_safe, Vector2(0.5, 1), Rect2(-258, -143, 503, 117))
 	_commands_panel = center.get_parent() as PanelContainer
@@ -231,6 +238,26 @@ func build() -> void:
 	_update_safe_area()
 	_apply_touch_layout()
 
+func _build_flight_modes() -> void:
+	_flight_modes = HBoxContainer.new()
+	_flight_modes.add_theme_constant_override("separation", 8)
+	_pin(_flight_modes, _safe, Vector2(0, 1), FLIGHT_MODE_ROW)
+	_button(_flight_modes, "translation_mode", "Курс")
+	_button(_flight_modes, "flight_assist", "Стабилизация")
+	_translation_controls = HBoxContainer.new()
+	_translation_controls.add_theme_constant_override("separation", 8)
+	_pin(_translation_controls, _safe, Vector2(0, 1), TRANSLATION_ROW)
+	_button(_translation_controls, "translation_forward", "Вперёд")
+	_button(_translation_controls, "translation_reverse", "Назад")
+	for action: String in ["translation_mode", "flight_assist", "translation_forward", "translation_reverse"]:
+		var button: Button = _actions[action]
+		button.custom_minimum_size.y = 46.0
+		button.add_theme_font_size_override("font_size", 16)
+	_actions["translation_forward"].tooltip_text = "Удерживайте для движения вперёд (9)"
+	_actions["translation_reverse"].tooltip_text = "Удерживайте для движения назад (3)"
+	_flight_modes.hide()
+	_update_translation_mode()
+
 func sync(sim: RefCounted, delta: float) -> void:
 	var docked: bool = sim.docked >= 0
 	var landed: bool = sim.landed_site >= 0
@@ -242,6 +269,14 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_jumping = sim.jump_seconds_left > 0.0
 	_steer.visible = not parked
 	_bank.visible = not parked
+	_flight_modes.visible = not parked
+	_translation_controls.visible = not parked and _translation_mode
+	var assist: Button = _actions["flight_assist"]
+	assist.text = "Стабилизация" if sim.flight_assist else "Инерция"
+	assist.tooltip_text = "Отключить автоматическую стабилизацию" if sim.flight_assist else "Включить автоматическую стабилизацию"
+	var assist_color := CYAN if sim.flight_assist else AMBER
+	if assist.get_theme_color("font_color") != assist_color:
+		assist.add_theme_color_override("font_color", assist_color)
 	_throttle_controls.visible = not parked
 	_actions["target"].visible = not parked
 	_actions["autopilot"].visible = not parked
@@ -531,6 +566,8 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 		_guidance.text = "Резервная тяга. Заправьтесь в порту или у звезды."
 	elif not surface.is_empty():
 		_guidance.text = "Подойдите к поверхности вручную или включите «Авто» для захода на площадку."
+	elif _translation_mode:
+		_guidance.text = "Круглая панель — сдвиг вбок и по высоте. «Вперёд» и «Назад» удерживайте."
 	else:
 		_guidance.text = "Курс и крен справа. Тяга и тормоз слева." if _touch_mirrored else "Курс и крен слева. Тяга и тормоз справа."
 
@@ -594,6 +631,8 @@ func set_touch_preferences(sensitivity: int, mirrored: bool) -> void:
 func _apply_touch_layout() -> void:
 	_place_touch_control(_steer, COURSE_PAD, false)
 	_place_touch_control(_bank, ROLL_PAD, false)
+	_place_touch_control(_flight_modes, FLIGHT_MODE_ROW, false)
+	_place_touch_control(_translation_controls, TRANSLATION_ROW, false)
 	_place_touch_control(_right_panel, ACTION_COLUMN, true)
 
 func _place_touch_control(control: Control, placement: Rect2, starts_right: bool) -> void:
@@ -616,7 +655,20 @@ func move_input() -> Vector2:
 		return Vector2.ZERO
 	var horizontal := float(_key(KEY_D, KEY_RIGHT)) - float(_key(KEY_A, KEY_LEFT))
 	var vertical := float(_key(KEY_W, KEY_UP)) - float(_key(KEY_S, KEY_DOWN))
-	return (_steer.axis * _touch_gain + Vector2(horizontal, vertical)).limit_length()
+	var touch := Vector2.ZERO if _translation_mode else _steer.axis * _touch_gain
+	return (touch + Vector2(horizontal, vertical)).limit_length()
+
+func translation_input() -> Vector3:
+	if _parked or _jumping or not _input_enabled:
+		return Vector3.ZERO
+	var horizontal := float(_key(KEY_6, KEY_KP_6)) - float(_key(KEY_4, KEY_KP_4))
+	var vertical := float(_key(KEY_8, KEY_KP_8)) - float(_key(KEY_2, KEY_KP_2))
+	var depth := float(_key(KEY_9, KEY_KP_9)) - float(_key(KEY_3, KEY_KP_3))
+	var keyboard := Vector3(horizontal, vertical, depth)
+	if not _translation_mode:
+		return keyboard.limit_length()
+	var stick := _steer.axis * _touch_gain
+	return (keyboard + Vector3(stick.x, stick.y, _translation_depth)).limit_length()
 
 func roll_input() -> float:
 	if _parked or not _input_enabled:
@@ -689,8 +741,7 @@ func _reset_controls() -> void:
 	_steer_finger = -1
 	_bank_finger = -1
 	_mouse_pad = null
-	_mouse_boost = false
-	_mouse_brake = false
+	_mouse_held.clear()
 	_steer.reset()
 	_bank.reset()
 	for button: Button in _actions.values():
@@ -714,7 +765,7 @@ func _touch_begin(index: int, point: Vector2) -> bool:
 		var button: Button = _actions[action]
 		if not button.disabled and _hit(button, point):
 			_touch_owner[index] = action
-			if action == "boost" or action == "brake":
+			if action in HOLD_ACTIONS:
 				_update_held()
 			else:
 				button.self_modulate = CYAN
@@ -733,28 +784,53 @@ func _touch_end(index: int, point: Vector2, canceled: bool) -> bool:
 		"bank":
 			_bank_finger = -1
 			_bank.reset()
-		"boost", "brake":
+		"boost", "brake", "translation_forward", "translation_reverse":
 			_update_held()
 		_:
 			var button: Button = _actions[action]
 			if not _touch_owner.values().has(action):
 				button.self_modulate = Color.WHITE
 			if not canceled and not button.disabled and _hit(button, point):
-				action_requested.emit(action)
+				_commit_action(action)
 	return true
 
 func _update_held() -> void:
-	_boost = _touch_owner.values().has("boost") or _mouse_boost
-	_brake = _touch_owner.values().has("brake") or _mouse_brake
+	var touches := _touch_owner.values()
+	_boost = "boost" in touches or _mouse_held.has("boost")
+	_brake = "brake" in touches or _mouse_held.has("brake")
+	var forward := "translation_forward" in touches or _mouse_held.has("translation_forward")
+	var reverse := "translation_reverse" in touches or _mouse_held.has("translation_reverse")
+	_translation_depth = float(forward) - float(reverse)
 	_actions["boost"].self_modulate = CYAN if _boost else Color.WHITE
 	_actions["brake"].self_modulate = AMBER if _brake else Color.WHITE
+	_actions["translation_forward"].self_modulate = CYAN if forward else Color.WHITE
+	_actions["translation_reverse"].self_modulate = CYAN if reverse else Color.WHITE
 
 func _set_mouse_hold(action: String, active: bool) -> void:
-	if action == "boost":
-		_mouse_boost = active
+	if active:
+		_mouse_held[action] = true
 	else:
-		_mouse_brake = active
+		_mouse_held.erase(action)
 	_update_held()
+
+func _commit_action(action: String) -> void:
+	if action == "translation_mode":
+		_translation_mode = not _translation_mode
+		_reset_controls()
+		_update_translation_mode()
+	else:
+		if action == "flight_assist":
+			_reset_controls()
+		action_requested.emit(action)
+
+func _update_translation_mode() -> void:
+	_translation_controls.visible = not _parked and _translation_mode
+	_steer.caption = "СДВИГ" if _translation_mode else "КУРС"
+	_steer.queue_redraw()
+	var toggle: Button = _actions["translation_mode"]
+	toggle.text = "Сдвиг" if _translation_mode else "Курс"
+	toggle.add_theme_color_override("font_color", CYAN if _translation_mode else INK)
+	toggle.tooltip_text = "Переключить на поворот корабля" if _translation_mode else "Переключить на сдвиг вбок и по высоте"
 
 func _hit(control: Control, point: Vector2) -> bool:
 	return control.is_visible_in_tree() and control.get_global_rect().has_point(point)
@@ -813,11 +889,11 @@ func _button(parent: Container, action: String, caption: String) -> void:
 	button.add_theme_stylebox_override("pressed", _box(Color("2c5a65"), CYAN, 9, 7.0))
 	parent.add_child(button)
 	_actions[action] = button
-	if action in ["boost", "brake"]:
+	if action in HOLD_ACTIONS:
 		button.button_down.connect(func() -> void: _set_mouse_hold(action, true))
 		button.button_up.connect(func() -> void: _set_mouse_hold(action, false))
 	else:
-		button.pressed.connect(func() -> void: action_requested.emit(action))
+		button.pressed.connect(_commit_action.bind(action))
 
 class SteeringPad extends Control:
 	var caption := ""

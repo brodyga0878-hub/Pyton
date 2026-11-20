@@ -23,6 +23,7 @@ var _convoy_name: Label
 var _convoy_info: Label
 var _detail_title: Label
 var _detail: Label
+var _view_button: Button
 var _close_button: Button
 var _select_button: Button
 var _site_buttons: Dictionary[int, Button] = {}
@@ -58,6 +59,9 @@ func build() -> void:
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_here = _label(header, "", 17, MUTED)
 	_here.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_view_button = _button(header, "Сбоку", 44)
+	_view_button.custom_minimum_size.x = 106
+	_view_button.pressed.connect(_toggle_projection)
 	_close_button = _button(header, "Закрыть", 44)
 	_close_button.custom_minimum_size.x = 122
 	_close_button.pressed.connect(func() -> void: dismissed.emit())
@@ -126,6 +130,12 @@ func open(sim: RefCounted) -> void:
 	for id: int in _site_buttons:
 		_site_buttons[id].visible = targets.has(id)
 	_chart.ship_position = sim.position
+	_chart.ship_heading = sim.forward()
+	var star_center: Vector3 = sim.target_position(Sector.star_for(system_id))
+	_chart.star_plane_y = star_center.y
+	var height := _chart.ship_position.y - star_center.y
+	var height_sign := "+" if height >= 0.5 else "−" if height <= -0.5 else ""
+	_chart.ship_height = height_sign + _distance_label(absf(height))
 	_chart.centers.clear()
 	for id: int in targets:
 		_chart.centers[id] = sim.target_position(id)
@@ -157,7 +167,7 @@ func _set_convoy_order(order: Dictionary) -> void:
 	var objective := "Перехват" if intercept else ("Под охраной" if order.phase == "escorted" else "Сопровождение")
 	var remaining := maxi(0, ceili(float(order.remaining)))
 	var time := "%d:%02d" % [floori(remaining / 60.0), remaining % 60]
-	_convoy_info.text = "%s · %s\nДо цели %s" % [objective, time, _distance_label(float(order.distance))]
+	_convoy_info.text = "%s · %s\nДо цели %s (3D)" % [objective, time, _distance_label(float(order.distance))]
 
 
 func close() -> void:
@@ -199,7 +209,7 @@ func _select_site(id: int) -> void:
 	var distance := _distance_label(_flight.position.distance_to(_chart.centers[id]))
 	var category := str(Sector.kind_name(entry.kind))
 	var here := id == _current_site()
-	_detail.text = "%s · текущая стоянка" % category if here else "%s · %s" % [category, distance]
+	_detail.text = "%s · текущая стоянка" % category if here else "%s · %s (3D)" % [category, distance]
 	if entry.kind == "port":
 		var quote: int = _flight.mining.sale_quote(id)
 		if quote > 0:
@@ -221,6 +231,13 @@ func _select_site(id: int) -> void:
 func _apply() -> void:
 	if _flight != null and _chart.centers.has(_candidate) and _candidate != _current_site():
 		destination_selected.emit(_candidate)
+
+
+func _toggle_projection() -> void:
+	_touch_sites.clear()
+	_chart.side_view = not _chart.side_view
+	_view_button.text = "Сверху" if _chart.side_view else "Сбоку"
+	_chart.queue_redraw()
 
 
 func _current_site() -> int:
@@ -272,7 +289,7 @@ func _notification(what: int) -> void:
 
 
 func _button_at(point: Vector2) -> Button:
-	for button: Button in [_select_button, _close_button]:
+	for button: Button in [_select_button, _view_button, _close_button]:
 		if not button.disabled and button.get_global_rect().has_point(point):
 			return button
 	for button: Button in _site_buttons.values():
@@ -352,6 +369,7 @@ class SectorChart extends Control:
 	const EDGE := Color("426775")
 	const CHART_BACKGROUND := Color("0b1a25")
 	const ORBIT_COLOR := Color("78b0daae")
+	const STAR_PLANE_COLOR := Color("496879")
 	const PLOT_MARGIN := Vector2(63, 42)
 	const CONTACT_COLORS := {
 		"trader": Color("8fe9db"),
@@ -363,6 +381,10 @@ class SectorChart extends Control:
 	}
 
 	var ship_position := Vector3.ZERO
+	var ship_heading := Vector3.FORWARD
+	var ship_height := ""
+	var star_plane_y := 0.0
+	var side_view := false
 	var centers: Dictionary[int, Vector3] = {}
 	var active_site := -1
 	var selected_site := -1
@@ -380,30 +402,38 @@ class SectorChart extends Control:
 		return Rect2(PLOT_MARGIN, (size - 2.0 * PLOT_MARGIN).max(Vector2.ONE))
 
 	func _bounds_xz() -> Rect2:
+		return _bounds_for_plane(false)
+
+	func _bounds() -> Rect2:
+		return _bounds_for_plane(true) if side_view else _bounds_xz()
+
+	func _bounds_for_plane(side: bool) -> Rect2:
 		var minimum := Vector2(INF, INF)
 		var maximum := Vector2(-INF, -INF)
-		for center: Vector3 in centers.values():
-			var xz := Vector2(center.x, center.z)
-			minimum = minimum.min(xz)
-			maximum = maximum.max(xz)
+		var positions: Array[Vector3] = centers.values()
+		if side:
+			positions.append(ship_position)
+			for orbit_point: Vector3 in orbit:
+				positions.append(orbit_point)
 		for contact: Dictionary in traffic:
-			if contact.role in ["signal", "worksite"]:
-				var point: Vector3 = contact.position
-				var xz := Vector2(point.x, point.z)
-				minimum = minimum.min(xz)
-				maximum = maximum.max(xz)
-			elif contact.role == "convoy":
-				for point: Vector3 in [contact.route_start, contact.route_end]:
-					var xz := Vector2(point.x, point.z)
-					minimum = minimum.min(xz)
-					maximum = maximum.max(xz)
+			if side or contact.role in ["signal", "worksite"]:
+				positions.append(contact.position)
+			if contact.role == "convoy":
+				positions.append(contact.route_start)
+				positions.append(contact.route_end)
+		for position_3d: Vector3 in positions:
+			var point := _plane_point(position_3d, side)
+			minimum = minimum.min(point)
+			maximum = maximum.max(point)
 		return Rect2(minimum, (maximum - minimum).max(Vector2.ONE))
 
+	static func _plane_point(position_3d: Vector3, side: bool) -> Vector2:
+		# East points right in both views. The side view replaces north with elevation.
+		return Vector2(position_3d.x, -position_3d.y if side else position_3d.z)
+
 	func _project(position_3d: Vector3, plot: Rect2, bounds: Rect2) -> Vector2:
-		# North points along -Z. Preserve the proportions of the XZ plane.
 		var ratio := minf(plot.size.x / bounds.size.x, plot.size.y / bounds.size.y)
-		var xz := Vector2(position_3d.x, position_3d.z)
-		return plot.get_center() + (xz - bounds.get_center()) * ratio
+		return plot.get_center() + (_plane_point(position_3d, side_view) - bounds.get_center()) * ratio
 
 	func site_at(point: Vector2) -> int:
 		if centers.is_empty() or not Rect2(Vector2.ZERO, size).has_point(point):
@@ -411,7 +441,7 @@ class SectorChart extends Control:
 		var best := -1
 		var distance := 30.0
 		var plot := _plot_bounds()
-		var bounds := _bounds_xz()
+		var bounds := _bounds()
 		for id: int in centers:
 			var marker := _project(centers[id], plot, bounds)
 			var separation := point.distance_to(marker)
@@ -432,7 +462,10 @@ class SectorChart extends Control:
 			draw_line(Vector2(1, y), Vector2(size.x - 1, y), GRID)
 		var font := ThemeDB.fallback_font
 		var plot := _plot_bounds()
-		var bounds := _bounds_xz()
+		var bounds := _bounds()
+		var plane_y := _project(Vector3(0.0, star_plane_y, 0.0), plot, bounds).y
+		if side_view:
+			draw_dashed_line(Vector2(1.0, plane_y), Vector2(size.x - 1.0, plane_y), STAR_PLANE_COLOR, 1.2, 7.0, true, true)
 		if orbit.size() >= 2:
 			var track := PackedVector2Array()
 			track.resize(orbit.size())
@@ -440,18 +473,28 @@ class SectorChart extends Control:
 				track[index] = _project(orbit[index], plot, bounds)
 			draw_polyline(track, ORBIT_COLOR, 1.7, true)
 		var ship := _project(ship_position, plot, bounds).clamp(Vector2(18, 35), size - Vector2(18, 28))
+		if side_view:
+			draw_line(ship, Vector2(ship.x, plane_y), Color(STAR_PLANE_COLOR, 0.72), 1.0, true)
 		if centers.has(active_site):
 			_draw_course(ship, _project(centers[active_site], plot, bounds), Color("4d928c"), 1.5)
 		if centers.has(selected_site) and selected_site != active_site:
 			_draw_course(ship, _project(centers[selected_site], plot, bounds), Color("d9a569"), 1.8)
-		var label_boxes: Array[Rect2] = [
-			Rect2(11, 10, 127, 24),
-			Rect2(11, size.y - 32, 112, 24),
-		]
+		var view_caption := "ВИД СБОКУ · XY" if side_view else "ВИД СВЕРХУ · XZ"
+		var ship_caption := "▲  Корабль"
+		if side_view:
+			ship_caption += " · Высота %s" % ship_height
+		var ship_legend_width := font.get_string_size(ship_caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x + 22.0
+		var label_boxes: Array[Rect2] = [Rect2(11, 10, 148, 24), Rect2(11, size.y - 32, ship_legend_width, 24)]
 		for box: Rect2 in label_boxes:
 			draw_rect(box, CHART_BACKGROUND)
-		draw_string(font, Vector2(18, 28), "ВИД СВЕРХУ", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, EDGE.lightened(0.32))
-		draw_string(font, Vector2(18, size.y - 14), "▲  Корабль", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, MUTED)
+		draw_string(font, Vector2(18, 28), view_caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, EDGE.lightened(0.32))
+		draw_string(font, Vector2(18, size.y - 14), ship_caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, MUTED)
+		if side_view:
+			var plane_label_y := plane_y - 30.0 if plane_y >= 66.0 else plane_y + 6.0
+			var plane_legend := Rect2(11.0, plane_label_y, 145.0, 24.0)
+			label_boxes.append(plane_legend)
+			draw_rect(plane_legend, CHART_BACKGROUND)
+			draw_string(font, plane_legend.position + Vector2(7, 17), "Плоскость звезды", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, MUTED)
 		if not orbit_caption.is_empty():
 			var width := font.get_string_size(orbit_caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x + 40.0
 			var legend := Rect2(size.x - width - 11.0, 10, width, 24)
@@ -497,7 +540,22 @@ class SectorChart extends Control:
 					var point := _project(contact.position, plot, bounds)
 					_draw_site_label(font, str(contact.name), point, label_boxes)
 					break
-		draw_colored_polygon(PackedVector2Array([ship + Vector2(0, -7), ship + Vector2(6, 5), ship + Vector2(0, 3), ship + Vector2(-6, 5)]), TEXT)
+		_draw_ship(ship)
+
+	func _draw_ship(position_2d: Vector2) -> void:
+		var heading := _plane_point(ship_heading, side_view)
+		if heading.length_squared() < 0.001:
+			draw_arc(position_2d, 6.0, 0.0, TAU, 18, TEXT, 1.5, true)
+			draw_circle(position_2d, 2.0, TEXT, true, -1.0, true)
+			return
+		var ahead := heading.normalized()
+		var right := ahead.orthogonal()
+		draw_colored_polygon(PackedVector2Array([
+			position_2d + ahead * 9.0,
+			position_2d - ahead * 6.0 + right * 6.0,
+			position_2d - ahead * 3.0,
+			position_2d - ahead * 6.0 - right * 6.0,
+		]), TEXT)
 
 	func _draw_traffic(font: Font, plot: Rect2, bounds: Rect2, ship: Vector2, label_boxes: Array[Rect2]) -> void:
 		var roles: Dictionary[String, String] = {
