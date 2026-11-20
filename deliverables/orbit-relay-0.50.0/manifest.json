@@ -1,0 +1,159 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.50.0",
+  "source_commit": "94bd9024f7f1c486cd4b1bcb6a2b65ca9e3d7924",
+  "content": {
+    "atmosphere_profiles": {
+      "Терраса": {
+        "height_m": 46,
+        "surface_density_relative": 1.0
+      },
+      "Ковыль": {
+        "height_m": 38,
+        "surface_density_relative": 1.18
+      },
+      "Северина": {
+        "height_m": 41,
+        "surface_density_relative": 0.82
+      }
+    },
+    "entry_reference_speed_m_s": 38,
+    "entry_hull_damage_threshold_percent": 85,
+    "forecast_atmospheric_drag": true,
+    "save_schema": 14
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 75,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches_0.49": true,
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 33,
+    "tested_on_device": false
+  },
+  "checks": {
+    "flight": {
+      "failures": 0
+    },
+    "scene": {
+      "failures": 0
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 72
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 186
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 292
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 191
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 132
+    },
+    "living": {
+      "failures": 0,
+      "checks": 76
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 80
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "atmospheric_flight_sweep": {
+      "guided_descents_and_lifts": 9,
+      "heating_cases": 3,
+      "planets": 3,
+      "failures": 0
+    },
+    "atmosphere_mathematics": {
+      "checks": 712,
+      "failures": 0
+    },
+    "desktop_flight_ui": {
+      "checks": 19,
+      "failures": 0,
+      "viewports": [
+        [
+          1280,
+          720
+        ],
+        [
+          1600,
+          720
+        ]
+      ]
+    }
+  },
+  "files": {
+    "OrbitRelay-0.50.0-arm64.apk": {
+      "bytes": 26469747,
+      "sha256": "3114132bd4e9020d886754f7c743a6eba941dd1b347d9a4df3eff8951174e239"
+    },
+    "OrbitRelay-0.50.0-source.zip": {
+      "bytes": 267575,
+      "sha256": "bd34cda4e546b417b17cfe9ff9f34728fd82190f34a49ce84858173b47c4c115"
+    },
+    "atmosphere-map-side.png": {
+      "bytes": 114559,
+      "sha256": "f2bc9b8307558063629f29885cf23e785d26e3368dd222f3817be03ff9f3c2a5"
+    },
+    "atmosphere-map.png": {
+      "bytes": 108313,
+      "sha256": "4809659e007b9cedf0abbc22101e35ed96352c0cc6037976afe4bb7a11d6c620"
+    },
+    "atmosphere-trajectory-map.png": {
+      "bytes": 148433,
+      "sha256": "159ed3867772ee497ff5ba9ca24622441e4f6753fa3a9703abf933dea76cadc7"
+    },
+    "atmospheric-entry-hud.png": {
+      "bytes": 316078,
+      "sha256": "76e09434108ff2559db9d49801fa6a8ea2aeea18a929fbfc425147ee5116697b"
+    }
+  }
+}
