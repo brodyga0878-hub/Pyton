@@ -5,6 +5,7 @@ signal dismissed()
 
 const Sector = preload("res://scripts/sector_catalog.gd")
 const Patrol = preload("res://scripts/patrol_encounter.gd")
+const MissionCalendar = preload("res://scripts/mission_calendar.gd")
 const INK := Color("edf7f9")
 const MUTED := Color("adc0c9")
 const MINT := Color("a4e9d6")
@@ -17,6 +18,7 @@ enum Page { WORK, PASSENGERS, RIG }
 var _sim: RefCounted
 var _insets: MarginContainer
 var _location: Label
+var _clock_readout: Label
 var _delivery_title: Label
 var _delivery_step: Label
 var _delivery_cargo: Label
@@ -45,6 +47,7 @@ var _rig_reserve: Label
 var _rig_hint: Label
 var _passenger_route: Label
 var _passenger_status: Label
+var _passenger_deadline: Label
 var _passenger_cabins: Label
 var _passenger_payment: Label
 var _passenger_record: Label
@@ -72,9 +75,16 @@ func build() -> void:
 	header.add_theme_constant_override("separation", 18)
 	page.add_child(header)
 	_label(header, "Журнал заданий", 34, INK).size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_location = _label(header, "", 19, MINT)
+	var context := VBoxContainer.new()
+	context.alignment = BoxContainer.ALIGNMENT_CENTER
+	context.add_theme_constant_override("separation", 2)
+	header.add_child(context)
+	_location = _label(context, "", 19, MINT)
 	_location.autowrap_mode = TextServer.AUTOWRAP_OFF
-	_location.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_location.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_clock_readout = _label(context, "", 17, MUTED)
+	_clock_readout.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_clock_readout.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_close_button = _button(header, "Закрыть")
 	_close_button.custom_minimum_size.x = 128.0
 	_close_button.pressed.connect(func() -> void: dismissed.emit())
@@ -126,6 +136,10 @@ func refresh() -> void:
 	if not is_open():
 		return
 	_location.text = "Система «%s»" % Sector.system(_sim.system_id).name
+	var clock: Dictionary = _sim.clock_status()
+	_clock_readout.text = str(clock.stamp)
+	if clock.paused:
+		_clock_readout.text += " · Пауза"
 	_refresh_delivery()
 	_refresh_patrol()
 	_refresh_passengers()
@@ -177,6 +191,7 @@ func _build_passengers() -> void:
 	var card := _card(_passenger_page)
 	_passenger_route = _label(card, "", 29, INK)
 	_passenger_status = _label(card, "", 20, MINT)
+	_passenger_deadline = _label(card, "", 18, MUTED)
 	_passenger_cabins = _label(card, "", 18, MUTED)
 	_passenger_payment = _label(card, "", 19, INK)
 	_passenger_record = _label(card, "", 18, MUTED)
@@ -352,6 +367,7 @@ func _refresh_passengers() -> void:
 	]
 	_passenger_cabins.text = "Занято мест · %d из %d" % [int(status.seats), int(status.capacity)]
 	_passenger_payment.visible = active
+	_passenger_deadline.visible = active
 	if not active:
 		_passenger_route.text = "Пассажирских рейсов нет"
 		var debt := int(status.debt)
@@ -377,6 +393,7 @@ func _refresh_passengers() -> void:
 	_passenger_status.visible = true
 	_passenger_status.text = "Срок истёк" if overdue else "Осталось %d с" % remaining
 	_passenger_status.add_theme_color_override("font_color", AMBER if overdue or remaining <= 60 else MINT)
+	_passenger_deadline.text = "Срок прибытия · %s" % MissionCalendar.stamp(float(status.deadline))
 	_passenger_payment.text = "Аванс %d кр. · К получению %d кр." % [
 		int(status.advance), maxi(0, int(status.fare) - int(status.advance)),
 	]

@@ -26,7 +26,8 @@ const FlightFrame = preload("res://scripts/flight_frame.gd")
 const Customs = preload("res://scripts/customs.gd")
 const UnattendedMining = preload("res://scripts/unattended_mining.gd")
 const OrbitalMining = preload("res://scripts/orbital_mining.gd")
-const SAVE_SCHEMA := 34
+const MissionCalendar = preload("res://scripts/mission_calendar.gd")
+const SAVE_SCHEMA := 35
 const REMOTE_RIG_ACCESS_DISTANCE := 20.0
 const MINING_PULSE_RANGE := 200.0
 const MINING_PULSE_FUEL := 0.4
@@ -165,6 +166,7 @@ var contract_leg := -1
 var elapsed := 0.0
 var orbit_time := 0.0
 var time_scale := 1
+var time_paused := false
 var status_event := ""
 var status_message := ""
 
@@ -244,6 +246,25 @@ func speed_relative_to(index: int) -> float:
 	return (velocity - target_velocity(index)).length()
 
 
+func clock_status() -> Dictionary:
+	var label := MissionCalendar.stamp(orbit_time)
+	var parts := label.split(" · ", false, 1)
+	return {
+		"stamp": label, "date": parts[0] if parts.size() == 2 else "",
+		"clock": parts[1] if parts.size() == 2 else "", "epoch": orbit_time,
+		"paused": time_paused, "scale": time_scale,
+	}
+
+
+func toggle_time_pause() -> bool:
+	time_paused = not time_paused
+	if time_paused:
+		_announce("time_paused", "Ход времени приостановлен.")
+	else:
+		_announce("time_resumed", "Ход времени возобновлён.")
+	return true
+
+
 func time_status() -> Dictionary:
 	if jump_seconds_left > 0.0:
 		return {"allowed": false, "reason": "Зарядка прыжкового привода"}
@@ -275,6 +296,9 @@ func time_status() -> Dictionary:
 
 
 func cycle_time_scale() -> bool:
+	if time_paused:
+		_announce("time_denied", "Возобновите ход времени.")
+		return false
 	var availability := time_status()
 	if not availability.allowed:
 		_announce("time_denied", "Ускорение недоступно. %s." % availability.reason)
@@ -2715,7 +2739,7 @@ func _hold_docked_pose() -> void:
 
 
 func update(delta: float, steer: Vector2, bank: float, boost_requested: bool, brake: bool, translation := Vector3.ZERO) -> void:
-	if not is_finite(delta) or delta <= 0.0:
+	if time_paused or not is_finite(delta) or delta <= 0.0:
 		return
 	var traverse := translation.limit_length() if translation.is_finite() else Vector3.ZERO
 	var manual_input := steer.length_squared() > 0.04 or absf(bank) > 0.12 or boost_requested or brake or not traverse.is_zero_approx()
@@ -3378,7 +3402,7 @@ func snapshot() -> Dictionary:
 		"velocity": [velocity.x, velocity.y, velocity.z],
 		"yaw": yaw, "pitch": pitch, "roll": roll, "elapsed": elapsed,
 		"orientation": [facing.x, facing.y, facing.z, facing.w], "flight_assist": flight_assist,
-		"orbit_time": orbit_time,
+		"orbit_time": orbit_time, "time_paused": time_paused,
 		"throttle": 0.0 if orbit_maneuver or rendezvous_active else throttle, "docked": docked, "target": target,
 		"dock_access": dock_access.snapshot(),
 		"departure_requested": _departure_requested, "departure_seconds": _departure_seconds,
@@ -3405,6 +3429,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_calendar := schema < 35
 	var pre_fuel_equipment := schema < 34
 	var pre_orbital_mining := schema < 33
 	var pre_remote_rig := schema < 32
@@ -3441,6 +3466,8 @@ func restore(state: Dictionary) -> bool:
 	if not pre_entry and not _number(state.get("entry_heat"), 0.0, 100.0):
 		return false
 	if not pre_navigation and not state.get("flight_assist") is bool:
+		return false
+	if not pre_calendar and not state.get("time_paused") is bool:
 		return false
 	var restored_epoch := 0.0
 	if schema >= 6:
@@ -3779,6 +3806,7 @@ func restore(state: Dictionary) -> bool:
 	elapsed = float(state.elapsed)
 	orbit_time = restored_epoch
 	time_scale = 1
+	time_paused = false if pre_calendar else state.time_paused
 	docked = restored_dock
 	dock_access = restored_access
 	_departure_requested = restored_departure

@@ -100,6 +100,7 @@ var _lift_blocked := false
 var _mining_blocked := false
 var _scoop_blocked := false
 var _time_blocked := false
+var _time_paused := false
 var _patrol_blocked := false
 var _convoy_blocked := false
 var _rendezvous_finish_blocked := true
@@ -203,15 +204,20 @@ func build() -> void:
 	_thermal_panel.add_child(_thermal_level)
 	_thermal_panel.hide()
 	var clock_row := HBoxContainer.new()
-	clock_row.add_theme_constant_override("separation", 8)
+	clock_row.add_theme_constant_override("separation", 5)
 	instrument_stack.add_child(clock_row)
 	_clock = _label(clock_row, 16, MUTED)
 	_clock.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_clock.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_button(clock_row, "time", "1×")
 	var time_button: Button = _actions["time"]
-	time_button.custom_minimum_size.x = 68.0
+	time_button.custom_minimum_size.x = 48.0
 	time_button.size_flags_horizontal = Control.SIZE_SHRINK_END
+	_button(clock_row, "time_pause", "Пауза")
+	var pause_button: Button = _actions["time_pause"]
+	pause_button.custom_minimum_size.x = 108.0
+	pause_button.size_flags_horizontal = Control.SIZE_SHRINK_END
+	pause_button.add_theme_font_size_override("font_size", 16)
 	_time_hint = _label(instrument_stack, 15, AMBER)
 	_time_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_time_hint.hide()
@@ -816,18 +822,26 @@ func _stellar_guidance(status: Dictionary, scooping: bool) -> Color:
 	return INK
 
 func _sync_clock(sim: RefCounted) -> void:
-	var seconds := floori(sim.orbit_time + 0.000001)
-	var hours := floori(seconds / 3600.0)
-	var minutes := floori(seconds / 60.0) % 60
-	_clock.text = "Время %02d:%02d:%02d" % [hours, minutes, seconds % 60]
+	var calendar: Dictionary = sim.clock_status()
+	var paused := bool(calendar.paused)
+	if _time_paused != paused:
+		_time_paused = paused
+		_reset_controls()
+		_clock.add_theme_color_override("font_color", AMBER if paused else MUTED)
+	_clock.text = "%s\n%s" % [calendar.date, calendar.clock]
 	var status: Dictionary = sim.time_status()
-	var scale: int = sim.time_scale
+	var scale: int = calendar.scale
 	var button: Button = _actions["time"]
-	_time_blocked = not status.allowed and scale <= 1
+	var pause_button: Button = _actions["time_pause"]
+	pause_button.text = "Продолжить" if paused else "Пауза"
+	pause_button.tooltip_text = "Продолжить игровое время (F9)" if paused else "Остановить игровое время (F9)"
+	_time_blocked = paused or (not status.allowed and scale <= 1)
 	button.text = "%d×" % scale
-	_time_hint.visible = not status.allowed
+	_time_hint.visible = not paused and not status.allowed
 	_time_hint.text = "Ускорение недоступно. %s" % status.reason if _time_hint.visible else ""
 	button.tooltip_text = _time_hint.text if _time_hint.visible else "Сменить скорость игрового времени (O)"
+	if paused:
+		button.tooltip_text = "Продолжите игру для смены скорости"
 
 func _sync_port(sim: RefCounted, sale_quote: int, itinerary: Dictionary, transfer: bool) -> void:
 	_route.text = "Порт  /  %s" % sim.target_name(sim.docked)
@@ -1143,12 +1157,13 @@ func _refresh_disabled_actions() -> void:
 		blocked = blocked or (action == "frame" and _frame_blocked)
 		blocked = blocked or (RIG_ACTIONS.has(action) and not _rig_status.get(RIG_ACTIONS[action], false))
 		blocked = blocked or (ORBITAL_MINING_ACTIONS.has(action) and not _orbital_mining_status.get(ORBITAL_MINING_ACTIONS[action], false))
-		var during_jump := _jumping and action not in ["throttle_down", "throttle_up", "boost", "brake"]
-		var during_departure := _departure_active and (action != "dock" or not _departure_can_cancel)
-		button.disabled = not _input_enabled or blocked or during_jump or during_departure
+		var manual_thrust := action in HOLD_ACTIONS or action in ["throttle_down", "throttle_up"]
+		var during_jump := _jumping and action not in ["time_pause", "throttle_down", "throttle_up", "boost", "brake"]
+		var during_departure := _departure_active and action != "time_pause" and (action != "dock" or not _departure_can_cancel)
+		button.disabled = not _input_enabled or blocked or during_jump or during_departure or (_time_paused and manual_thrust)
 
 func move_input() -> Vector2:
-	if _parked or not _input_enabled:
+	if _parked or _time_paused or not _input_enabled:
 		return Vector2.ZERO
 	var horizontal := float(_key(KEY_D, KEY_RIGHT)) - float(_key(KEY_A, KEY_LEFT))
 	var vertical := float(_key(KEY_W, KEY_UP)) - float(_key(KEY_S, KEY_DOWN))
@@ -1156,7 +1171,7 @@ func move_input() -> Vector2:
 	return (touch + Vector2(horizontal, vertical)).limit_length()
 
 func translation_input() -> Vector3:
-	if _parked or _jumping or not _input_enabled:
+	if _parked or _jumping or _time_paused or not _input_enabled:
 		return Vector3.ZERO
 	var horizontal := float(_key(KEY_6, KEY_KP_6)) - float(_key(KEY_4, KEY_KP_4))
 	var vertical := float(_key(KEY_8, KEY_KP_8)) - float(_key(KEY_2, KEY_KP_2))
@@ -1168,16 +1183,16 @@ func translation_input() -> Vector3:
 	return (keyboard + Vector3(stick.x, stick.y, _translation_depth)).limit_length()
 
 func roll_input() -> float:
-	if _parked or not _input_enabled:
+	if _parked or _time_paused or not _input_enabled:
 		return 0.0
 	var keyboard := float(Input.is_physical_key_pressed(KEY_E)) - float(Input.is_physical_key_pressed(KEY_Q))
 	return clampf(_bank.axis.x * _touch_gain + keyboard, -1.0, 1.0)
 
 func boost_held() -> bool:
-	return not _parked and _input_enabled and (_boost or Input.is_physical_key_pressed(KEY_SHIFT))
+	return not _parked and not _time_paused and _input_enabled and (_boost or Input.is_physical_key_pressed(KEY_SHIFT))
 
 func brake_held() -> bool:
-	return not _parked and _input_enabled and (_brake or Input.is_physical_key_pressed(KEY_SPACE))
+	return not _parked and not _time_paused and _input_enabled and (_brake or Input.is_physical_key_pressed(KEY_SPACE))
 
 func _key(primary: Key, alternate: Key) -> bool:
 	return Input.is_physical_key_pressed(primary) or Input.is_physical_key_pressed(alternate)
@@ -1213,7 +1228,7 @@ func _input(event: InputEvent) -> void:
 			_bank.update_point(event.position)
 		get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if event.pressed:
+		if event.pressed and not _time_paused:
 			if _hit(_steer, event.position):
 				_mouse_pad = _steer
 			elif _hit(_bank, event.position):
@@ -1248,12 +1263,12 @@ func _reset_controls() -> void:
 func _touch_begin(index: int, point: Vector2) -> bool:
 	if _touch_owner.has(index):
 		return true
-	if _hit(_steer, point) and _steer_finger == -1:
+	if not _time_paused and _hit(_steer, point) and _steer_finger == -1:
 		_steer_finger = index
 		_touch_owner[index] = "steer"
 		_steer.update_point(point)
 		return true
-	if _hit(_bank, point) and _bank_finger == -1:
+	if not _time_paused and _hit(_bank, point) and _bank_finger == -1:
 		_bank_finger = index
 		_touch_owner[index] = "bank"
 		_bank.update_point(point)

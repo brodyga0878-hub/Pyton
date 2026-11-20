@@ -109,7 +109,7 @@ func _overlay_open() -> bool:
 
 
 func _physics_process(delta: float) -> void:
-	if _overlay_open():
+	if _overlay_open() or flight.time_paused:
 		return
 	flight.update(delta, _hud.move_input(), _hud.roll_input(), _hud.boost_held(), _hud.brake_held(), _hud.translation_input())
 	_deliver_notice()
@@ -164,11 +164,11 @@ func _update_display(delta: float) -> void:
 func _handle_action(action: String) -> void:
 	if _overlay_open():
 		return
-	if flight.jump_seconds_left > 0.0 and action not in ["throttle_up", "throttle_down"]:
+	if flight.jump_seconds_left > 0.0 and action not in ["throttle_up", "throttle_down", "time_pause"]:
 		return
 	if flight.docked >= 0:
 		var departure := flight.departure_status()
-		if departure.active and (action != "dock" or not departure.can_cancel):
+		if departure.active and action != "time_pause" and (action != "dock" or not departure.can_cancel):
 			return
 	var near_target := flight.position.distance_to(flight.target_position(flight.target)) < maxf(150.0, float(Catalog.site(flight.target).radius) + Flight.FRAME_MARGIN)
 	var throttle_step := 0.025 if near_target else 0.1
@@ -227,6 +227,8 @@ func _handle_action(action: String) -> void:
 			flight.scoop_action()
 		"time":
 			flight.cycle_time_scale()
+		"time_pause":
+			flight.toggle_time_pause()
 		"services":
 			if flight.station_services_available():
 				_hud.set_input_enabled(false)
@@ -355,6 +357,12 @@ func _deliver_notice() -> void:
 			"reserve": flight.mining.reserve_at(mining.site), "fuel": flight.ship.fuel,
 			"system_id": flight.system_id, "orbit_time": flight.orbit_time,
 		}
+	elif event in ["time_paused", "time_resumed"]:
+		var clock := flight.clock_status()
+		trace_fields = {
+			"stamp": clock.stamp, "paused": clock.paused, "time_scale": clock.scale,
+			"orbit_time": clock.epoch, "system_id": flight.system_id,
+		}
 	elif event == "reference_frame":
 		var frame := flight.frame_status()
 		trace_fields = {
@@ -388,7 +396,7 @@ func _deliver_notice() -> void:
 		"war_declared", "war_round", "war_captured", "war_repulsed", "war_convoy_delivered", "war_convoy_intercepted",
 		"convoy_order_accepted", "convoy_order_escorted", "convoy_order_failed", "convoy_order_paid",
 		"convoy_order_fire", "convoy_order_enemy_hit",
-		"flight_assist", "reference_frame",
+		"flight_assist", "reference_frame", "time_paused", "time_resumed",
 		"survey_record", "galaxy_scan", "customs_inspection", "customs_paid",
 		"orbit_start", "orbit_complete", "orbit_abort", "orbit_cancel",
 		"rendezvous_start", "rendezvous_hold", "rendezvous_abort", "rendezvous_cancel", "rendezvous_finish",
@@ -454,7 +462,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_N: "map", KEY_J: "galaxy", KEY_K: "scoop", KEY_P: "services", KEY_O: "time", KEY_L: "market",
 		KEY_U: "patrol", KEY_X: "fire", KEY_I: "convoy", KEY_H: "flight_assist",
 		KEY_F2: "settings", KEY_F3: "journal", KEY_F4: "frontier",
-		KEY_F5: "dock_sync", KEY_F6: "dock_clearance", KEY_F7: "frame", KEY_Y: "gear", KEY_C: "fuel",
+		KEY_F5: "dock_sync", KEY_F6: "dock_clearance", KEY_F7: "frame", KEY_F9: "time_pause", KEY_Y: "gear", KEY_C: "fuel",
 	}
 	if actions.has(event.physical_keycode):
 		_handle_action(actions[event.physical_keycode])
