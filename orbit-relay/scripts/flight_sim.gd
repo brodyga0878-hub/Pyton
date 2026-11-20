@@ -6,7 +6,8 @@ const ShipSystems = preload("res://scripts/ship_systems.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const Orbit = preload("res://scripts/orbit_ephemeris.gd")
 const Terrain = preload("res://scripts/surface_terrain.gd")
-const SAVE_SCHEMA := 7
+const Economy = preload("res://scripts/port_economy.gd")
+const SAVE_SCHEMA := 8
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
@@ -33,6 +34,7 @@ const LANDING_SPEED := 4.0
 const LANDING_RADIUS := 8.0
 const FREE_LANDING_MAX_HEIGHT := 10.0
 const LANDING_ANGLE := 20.0
+const IMPACT_DAMAGE_SPEED := 14.0
 const FRAME_MARGIN := 110.0
 const STAR_WARP_MARGIN := 120.0
 const MAX_SAVED_SPEED := MAX_SPEED * 1.56 + 8.0
@@ -52,6 +54,7 @@ var landed: bool:
 		return landed_site >= 0
 var mining := MiningRig.new()
 var ship := ShipSystems.new()
+var market := Economy.new()
 var scooping := false
 var system_id := Catalog.HOME_SYSTEM
 var jump_target := -1
@@ -65,6 +68,8 @@ var deliveries := 0
 var contract_stage := 0
 var contract_origin := -1
 var contract_destination := -1
+var contract_route_id := ""
+var contract_leg := -1
 var elapsed := 0.0
 var orbit_time := 0.0
 var time_scale := 1
@@ -237,8 +242,48 @@ func contract_reward() -> int:
 
 func _current_contract() -> Array:
 	if contract_stage == 1:
+		if not contract_route_id.is_empty():
+			var route := Economy.courier(contract_route_id)
+			return [route.cargo, route.reward]
 		return Catalog.contract(contract_origin, contract_destination)
 	return Catalog.contract(docked, offer_destination())
+
+
+func courier_offer() -> Dictionary:
+	return Economy.courier_at(docked)
+
+
+func contract_itinerary() -> Dictionary:
+	if contract_route_id.is_empty():
+		return {}
+	var route := Economy.courier(contract_route_id)
+	route.leg = contract_leg
+	route.completed = contract_stage == 2
+	return route
+
+
+func accept_courier(route_id: String) -> bool:
+	var offer := courier_offer()
+	if offer.is_empty() or offer.id != route_id or contract_stage == 1:
+		return false
+	contract_origin = docked
+	contract_stage = 1
+	contract_route_id = route_id
+	contract_leg = 0
+	contract_destination = offer.stops[0]
+	_plan_contract_leg()
+	_announce("contract", "Курьерский рейс. Первая остановка «%s»." % target_name(contract_destination))
+	return true
+
+
+func _plan_contract_leg() -> void:
+	var destination_system := Catalog.system_of_site(contract_destination)
+	if destination_system == system_id:
+		target = contract_destination
+		planned_target = contract_destination
+	else:
+		planned_target = -1
+		jump_target = destination_system
 
 
 func contract_action() -> bool:
@@ -247,6 +292,14 @@ func contract_action() -> bool:
 	if contract_stage == 1:
 		if docked != contract_destination:
 			return false
+		if not contract_route_id.is_empty():
+			var stops: Array = Economy.courier(contract_route_id).stops
+			if contract_leg + 1 < stops.size():
+				contract_leg += 1
+				contract_destination = stops[contract_leg]
+				_plan_contract_leg()
+				_announce("contract_leg", "Этап принят. Следующая остановка «%s»." % target_name(contract_destination))
+				return true
 		var reward := contract_reward()
 		credits += reward
 		deliveries += 1
@@ -254,6 +307,8 @@ func contract_action() -> bool:
 		_announce("delivery", "Груз принят. Начислено %d кр." % reward)
 	else:
 		contract_stage = 1
+		contract_route_id = ""
+		contract_leg = -1
 		contract_origin = docked
 		contract_destination = offer_destination()
 		target = contract_destination
@@ -421,11 +476,61 @@ func mine_action() -> bool:
 func sell_ore_action() -> bool:
 	if docked < 0:
 		return false
+	var cargo_before := {}
+	for good: String in Catalog.RESOURCES:
+		cargo_before[good] = mining.cargo_amount(good)
 	var earned := mining.sell(docked)
 	if earned == 0:
 		return false
+	for good: String in Catalog.RESOURCES:
+		var sold: int = cargo_before[good] - mining.cargo_amount(good)
+		if sold > 0:
+			market.change_stock(docked, good, sold)
 	credits += earned
 	_announce("ore_sold", "Сырьё продано. Начислено %d кр." % earned)
+	return true
+
+
+func market_quote(good: String, side: String, quantity: int) -> Dictionary:
+	var unit := Economy.price(docked, good, side)
+	var stock := market.stock(docked, good)
+	var owned := mining.cargo_amount(good)
+	var cost := unit * quantity if quantity > 0 and quantity <= ship.cargo_capacity() else 0
+	var reason := ""
+	if docked < 0:
+		reason = "Рынок доступен после швартовки"
+	elif unit <= 0 or cost <= 0:
+		reason = "Выберите товар и количество"
+	elif side == "buy":
+		if stock < quantity:
+			reason = "В порту недостаточно товара"
+		elif mining.free_capacity() < quantity:
+			reason = "В трюме мало места"
+		elif credits < cost:
+			reason = "Недостаточно кредитов"
+	elif owned < quantity:
+		reason = "В трюме недостаточно товара"
+	return {"ok": reason.is_empty(), "cost": cost, "unit": unit, "stock": stock, "owned": owned, "reason": reason}
+
+
+func market_trade(good: String, side: String, quantity: int) -> bool:
+	var quote := market_quote(good, side, quantity)
+	if not quote.ok:
+		return false
+	if side == "buy":
+		if not mining.insert_cargo(good, quantity):
+			return false
+		if not market.change_stock(docked, good, -quantity):
+			mining.remove_cargo(good, quantity)
+			return false
+		credits -= quote.cost
+		_announce("market_buy", "Куплено %d ед. товара «%s» за %d кр." % [quantity, Economy.good_name(good), quote.cost])
+	else:
+		if not mining.remove_cargo(good, quantity):
+			return false
+		market.change_stock(docked, good, quantity)
+		credits += quote.cost
+		_announce("market_sell", "Продано %d ед. товара «%s» за %d кр." % [quantity, Economy.good_name(good), quote.cost])
 	return true
 
 
@@ -433,8 +538,13 @@ func refuel_unit_price() -> int:
 	return Catalog.refuel_price(docked)
 
 
+func repair_unit_price() -> int:
+	return Economy.repair_price(docked)
+
+
 func service_offer(action: String) -> Dictionary:
-	var offer := ship.service_offer(action, refuel_unit_price(), credits)
+	var unit_price := repair_unit_price() if action == "repair" else refuel_unit_price()
+	var offer := ship.service_offer(action, unit_price, credits)
 	offer.allowed = offer.allowed and Catalog.is_port(docked)
 	return offer
 
@@ -442,7 +552,8 @@ func service_offer(action: String) -> Dictionary:
 func service_action(action: String) -> bool:
 	if not service_offer(action).allowed:
 		return false
-	var paid := ship.buy(action, refuel_unit_price(), credits)
+	var unit_price := repair_unit_price() if action == "repair" else refuel_unit_price()
+	var paid := ship.buy(action, unit_price, credits)
 	if paid <= 0:
 		return false
 	credits -= paid
@@ -453,6 +564,11 @@ func service_action(action: String) -> bool:
 			_announce("service_tank", "Установлен бак на %d ед. топлива." % int(ship.capacity()))
 		"eco":
 			_announce("service_eco", "Экономичный привод установлен.")
+		"repair":
+			_announce("service_repair", "Корпус отремонтирован. Списано %d кр." % paid)
+		"cargo":
+			mining.cargo_capacity = ship.cargo_capacity()
+			_announce("service_cargo", "Вместимость трюма увеличена до %d ед." % mining.cargo_capacity)
 	return true
 
 
@@ -577,8 +693,11 @@ func _charge_jump(delta: float) -> void:
 	ship.fuel -= status.cost
 	system_id = jump_target
 	jump_target = -1
-	target = Catalog.system(system_id).arrival_port
-	position = target_gate(target) + Vector3.BACK * ARRIVAL_OFFSET
+	var arrival: int = Catalog.system(system_id).arrival_port
+	target = arrival
+	if contract_stage == 1 and not contract_route_id.is_empty() and Catalog.system_of_site(contract_destination) == system_id:
+		target = contract_destination
+	position = target_gate(arrival) + Vector3.BACK * ARRIVAL_OFFSET
 	velocity = Vector3.ZERO
 	yaw = 0.0
 	pitch = 0.0
@@ -745,7 +864,11 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		position = next
 	else:
 		reset_time_scale()
-		if velocity.length_squared() > 0.05:
+		var impact_speed := speed_relative_to(obstacle)
+		var damage := ship.apply_damage(clampf((impact_speed - IMPACT_DAMAGE_SPEED) * 0.32, 0.0, 45.0))
+		if damage > 0.0:
+			_announce("hull_damage", "Корпус повреждён. Прочность %.0f%%." % ship.hull)
+		elif velocity.length_squared() > 0.05:
 			_announce("clearance", "Защитное торможение у препятствия")
 		var caught_by_motion := _inside_hull(position, obstacle)
 		if caught_by_motion:
@@ -966,9 +1089,10 @@ func snapshot() -> Dictionary:
 		"credits": credits, "deliveries": deliveries,
 		"contract_stage": contract_stage, "contract_origin": contract_origin,
 		"contract_destination": contract_destination,
+		"contract_route_id": contract_route_id, "contract_leg": contract_leg,
 		"landed_site": landed_site, "planned_target": planned_target, "mining": mining.snapshot(),
 		"landing_direction": [landing_direction.x, landing_direction.y, landing_direction.z],
-		"ship": ship.snapshot(), "system_id": system_id, "jump_target": jump_target,
+		"ship": ship.snapshot(), "market": market.snapshot(), "system_id": system_id, "jump_target": jump_target,
 	}
 
 
@@ -976,6 +1100,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_economy := schema < 8
 	var pre_surface := schema < 7
 	var pre_galaxy := schema < 5
 	var pre_fuel := schema < 4
@@ -1024,21 +1149,38 @@ func restore(state: Dictionary) -> bool:
 	var stage := int(state.contract_stage)
 	var origin := int(state.contract_origin)
 	var destination := int(state.contract_destination)
+	var route_id := ""
+	var leg := -1
+	if not pre_economy:
+		if not state.get("contract_route_id") is String or not _integer(state.get("contract_leg"), -1, 2):
+			return false
+		route_id = state.contract_route_id
+		leg = int(state.contract_leg)
 	if stage == 0 and (origin != -1 or destination != -1):
 		return false
-	if stage != 0 and Catalog.contract(origin, destination).is_empty():
-		return false
+	if route_id.is_empty():
+		if leg != -1 or (stage != 0 and Catalog.contract(origin, destination).is_empty()):
+			return false
+	else:
+		var route := Economy.courier(route_id)
+		if stage == 0 or route.is_empty() or route.origin != origin or leg < 0 or leg >= route.stops.size():
+			return false
+		if route.stops[leg] != destination or (stage == 2 and leg != route.stops.size() - 1):
+			return false
 	var restored_position := Vector3(state.position[0], state.position[1], state.position[2])
 	var restored_velocity := Vector3(state.velocity[0], state.velocity[1], state.velocity[2])
 	var restored_dock := int(state.docked)
 	var restored_mining := MiningRig.new()
 	var restored_ship := ShipSystems.new()
+	var restored_market := Economy.new()
 	var restored_landing := -1
 	var restored_plan := -1
-	var mining_count := Catalog.SITE_COUNT if pre_galaxy else site_count
-	if schema >= 2 and not restored_mining.restore(state.get("mining"), schema == 2, mining_count):
+	if not pre_fuel and not restored_ship.restore(state.get("ship"), pre_economy):
 		return false
-	if not pre_fuel and not restored_ship.restore(state.get("ship")):
+	if not pre_economy and not restored_market.restore(state.get("market")):
+		return false
+	var mining_count := Catalog.SITE_COUNT if pre_galaxy else site_count
+	if schema >= 2 and not restored_mining.restore(state.get("mining"), schema == 2, mining_count, restored_ship.cargo_capacity(), not pre_economy):
 		return false
 	if schema == 2:
 		if not state.get("landed") is bool:
@@ -1112,6 +1254,7 @@ func restore(state: Dictionary) -> bool:
 	landing_direction = restored_direction
 	mining = restored_mining
 	ship = restored_ship
+	market = restored_market
 	scooping = false
 	system_id = restored_system
 	jump_target = restored_jump
@@ -1123,6 +1266,8 @@ func restore(state: Dictionary) -> bool:
 	contract_stage = stage
 	contract_origin = origin
 	contract_destination = destination
+	contract_route_id = route_id
+	contract_leg = leg
 	set_autopilot(false)
 	boost = false
 	if docked >= 0:

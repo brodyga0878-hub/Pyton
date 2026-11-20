@@ -6,6 +6,7 @@ const FlightHUD = preload("res://scripts/flight_hud.gd")
 const SectorMap = preload("res://scripts/sector_map.gd")
 const GalaxyMap = preload("res://scripts/galaxy_map.gd")
 const PortServices = preload("res://scripts/port_services.gd")
+const PortMarket = preload("res://scripts/port_market.gd")
 const SessionIO = preload("res://scripts/session_io.gd")
 const SAVE_INTERVAL := 8.0
 
@@ -15,6 +16,7 @@ var _hud := FlightHUD.new()
 var _map := SectorMap.new()
 var _galaxy := GalaxyMap.new()
 var _services := PortServices.new()
+var _market := PortMarket.new()
 var _io := SessionIO.new()
 var _save_elapsed := 0.0
 var _save_error_shown := false
@@ -46,6 +48,11 @@ func _ready() -> void:
 	_services.build()
 	_services.service_requested.connect(_service_purchase)
 	_services.dismissed.connect(_close_services)
+	add_child(_market)
+	_market.build()
+	_market.trade_requested.connect(_market_trade)
+	_market.courier_requested.connect(_accept_courier)
+	_market.dismissed.connect(_close_market)
 	_build_report_panel()
 	_update_display(0.0)
 	_io.trace("session_started", {"system_id": flight.system_id, "docked": flight.docked, "deliveries": flight.deliveries})
@@ -56,7 +63,7 @@ func _process(delta: float) -> void:
 
 
 func _overlay_open() -> bool:
-	return _report.visible or _map.is_open() or _galaxy.is_open() or _services.is_open()
+	return _report.visible or _map.is_open() or _galaxy.is_open() or _services.is_open() or _market.is_open()
 
 
 func _physics_process(delta: float) -> void:
@@ -114,6 +121,11 @@ func _handle_action(action: String) -> void:
 				_hud.set_input_enabled(false)
 				_services.open(flight)
 			return
+		"market":
+			if flight.docked >= 0:
+				_hud.set_input_enabled(false)
+				_market.open(flight)
+			return
 		"map":
 			_hud.set_input_enabled(false)
 			_map.open(flight)
@@ -145,6 +157,7 @@ func _deliver_notice() -> void:
 		"planned_target": flight.planned_target, "speed": flight.speed(), "credits": flight.credits,
 		"mining_phase": flight.mining.phase, "cargo_units": flight.mining.ore_hold,
 		"fuel": flight.ship.fuel, "scooping": flight.scooping,
+		"hull": flight.ship.hull, "contract_route": flight.contract_route_id, "contract_leg": flight.contract_leg,
 		"system_id": flight.system_id, "jump_target": flight.jump_target,
 		"orbit_time": flight.orbit_time, "time_scale": flight.time_scale,
 		"offpad": flight.landed_offpad(), "landing_direction": [touchdown.x, touchdown.y, touchdown.z],
@@ -156,6 +169,7 @@ func _deliver_notice() -> void:
 		"mining_ready", "mining_loaded", "ore_sold", "service_refuel", "service_tank", "service_eco",
 		"scoop_full", "scoop_stop", "star_arrival", "fuel_empty",
 		"jump_planned", "jump_complete",
+		"market_buy", "market_sell", "service_repair", "service_cargo", "hull_damage", "contract_leg",
 	]:
 		_save()
 
@@ -188,6 +202,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		if event.physical_keycode == KEY_ESCAPE:
 			_close_services()
 		return
+	if _market.is_open():
+		if event.physical_keycode == KEY_ESCAPE:
+			_close_market()
+		return
 	if event.physical_keycode == KEY_ESCAPE and flight.cancel_jump():
 		_deliver_notice()
 		get_viewport().set_input_as_handled()
@@ -195,7 +213,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	var actions := {
 		KEY_T: "target", KEY_F: "autopilot", KEY_R: "throttle_up", KEY_V: "throttle_down",
 		KEY_ENTER: "dock", KEY_M: "contract", KEY_G: "mine", KEY_B: "sell_ore", KEY_F8: "report",
-		KEY_N: "map", KEY_J: "galaxy", KEY_K: "scoop", KEY_P: "services", KEY_O: "time",
+		KEY_N: "map", KEY_J: "galaxy", KEY_K: "scoop", KEY_P: "services", KEY_O: "time", KEY_L: "market",
 	}
 	if actions.has(event.physical_keycode):
 		_handle_action(actions[event.physical_keycode])
@@ -218,6 +236,8 @@ func _notification(what: int) -> void:
 			_close_galaxy()
 		elif _services.is_open():
 			_close_services()
+		elif _market.is_open():
+			_close_market()
 		elif flight.cancel_jump():
 			_deliver_notice()
 		else:
@@ -356,6 +376,25 @@ func _service_purchase(action: String) -> void:
 
 func _close_services() -> void:
 	_services.close()
+	_hud.set_input_enabled(true)
+
+
+func _market_trade(good: String, side: String, quantity: int) -> void:
+	if _market.is_open() and flight.market_trade(good, side, quantity):
+		_deliver_notice()
+		_update_display(0.0)
+	_market.refresh()
+
+
+func _accept_courier(route_id: String) -> void:
+	if _market.is_open() and flight.accept_courier(route_id):
+		_deliver_notice()
+		_update_display(0.0)
+	_market.refresh()
+
+
+func _close_market() -> void:
+	_market.close()
 	_hud.set_input_enabled(true)
 
 

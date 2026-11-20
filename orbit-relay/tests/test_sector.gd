@@ -92,7 +92,8 @@ func _test_trade_and_depletion() -> void:
 		"Sale cannot pay the same cargo twice")
 
 	var last_deposit: Dictionary = flight.snapshot()
-	last_deposit.mining.cargo = {"ore": 0, "crystal": 0, "ice": 0}
+	for good: String in last_deposit.mining.cargo:
+		last_deposit.mining.cargo[good] = 0
 	last_deposit.mining.reserves[4] = 12
 	_expect(resumed.restore(last_deposit), "A saved site with one batch left loads")
 	_recover_batch(resumed, 4)
@@ -128,7 +129,7 @@ func _test_legacy_recovery() -> void:
 		"Migration retains balance and the active freight route")
 
 	var before: Dictionary = flight.snapshot()
-	_expect(before.schema == 7, "Migration emits the current save schema")
+	_expect(before.schema == Flight.SAVE_SCHEMA, "Migration emits the current save schema")
 	var malformed := before.duplicate(true)
 	malformed.mining.site_id = 4
 	_expect(not flight.restore(malformed) and flight.snapshot() == before,
@@ -137,10 +138,10 @@ func _test_legacy_recovery() -> void:
 	malformed.landed_site = 1
 	_expect(not flight.restore(malformed) and flight.snapshot() == before,
 		"Reject a port ID used as the landed site atomically")
-	malformed = before.duplicate(true)
-	malformed.mining.cargo.ice = 1
+	malformed = legacy.duplicate(true)
+	malformed.mining.reserve = 120
 	_expect(not flight.restore(malformed) and flight.snapshot() == before,
-		"Reject a resource balance without any recorded extraction atomically")
+		"Reject a legacy resource balance without any recorded extraction atomically")
 	malformed = before.duplicate(true)
 	malformed.planned_target = Catalog.TARGET_COUNT
 	_expect(not flight.restore(malformed) and flight.snapshot() == before,

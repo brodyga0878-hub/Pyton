@@ -125,10 +125,11 @@ func _test_terrain_collision() -> void:
 	var protected := false
 	for _frame in range(30):
 		flight.update(STEP, Vector2.ZERO, 0.0, false, false)
-		protected = protected or flight.status_event == "clearance"
+		protected = protected or flight.status_event in ["clearance", "hull_damage"]
 	var relative := flight.position - flight.target_position(8)
-	_expect(protected and not flight.landed and relative.length() >= Terrain.radius_at(8, relative.normalized()) + 3.9,
-		"Protective braking keeps a fast descent outside the actual comet terrain")
+	_expect(protected and flight.ship.hull < 100.0 and not flight.landed
+		and relative.length() >= Terrain.radius_at(8, relative.normalized()) + 3.9,
+		"A fast descent damages the hull, and protective braking keeps it outside the comet terrain")
 
 
 func _test_empty_tank_comet_departure() -> void:
@@ -172,10 +173,10 @@ func _test_orbital_save_migration() -> void:
 		and flight.position.is_equal_approx(contact) and flight.orbit_time == 210.5 and flight.planned_target == 1,
 		"Migration preserves the moving pad pose, epoch and planned route")
 	var upgraded := flight.snapshot()
-	_expect(upgraded.schema == 7 and upgraded.mining.reserves.size() == Catalog.DESTINATION_COUNT
+	_expect(upgraded.schema == Flight.SAVE_SCHEMA and upgraded.mining.reserves.size() == Catalog.DESTINATION_COUNT
 		and flight.mining.reserve_at(PLANET) == int(Catalog.site(PLANET).reserve)
 		and flight.mining.reserve_at(8) == 216 and flight.mining.phase == Rig.RETURNING,
-		"Schema 7 keeps old reserves and initializes the rocky planet deposit")
+		"The current schema keeps old reserves and initializes the rocky planet deposit")
 	flight.update(2.0, Vector2.ZERO, 0.0, false, false)
 	_expect(flight.mining.cargo_amount("ice") == Rig.BATCH and flight.mining.reserve_at(8) == 216 - Rig.BATCH
 		and flight.mining.phase == Rig.STOWED and flight.dock_action() and flight.target == 1,

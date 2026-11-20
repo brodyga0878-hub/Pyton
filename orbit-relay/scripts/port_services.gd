@@ -6,6 +6,7 @@ signal dismissed()
 const TEXT := Color("e8f4fa")
 const MUTED := Color("a5bac7")
 const MINT := Color("9debd7")
+const AMBER := Color("ffd396")
 const BORDER := Color("365561")
 const Sector := preload("res://scripts/sector_catalog.gd")
 
@@ -15,7 +16,11 @@ var _station: Label
 var _balance: Label
 var _fuel: Label
 var _fuel_level: ProgressBar
+var _hull: Label
+var _hull_level: ProgressBar
 var _tariff: Label
+var _repair_tariff: Label
+var _cargo_detail: Label
 var _close_button: Button
 var _action_buttons: Dictionary[String, Button] = {}
 var _touches: Dictionary[int, Button] = {}
@@ -57,26 +62,21 @@ func build() -> void:
 	_station.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_balance = _label(details, "", 20, TEXT)
 
-	var gauge := HBoxContainer.new()
-	gauge.add_theme_constant_override("separation", 14)
-	content.add_child(gauge)
-	_label(gauge, "Топливо", 17, MUTED)
-	_fuel_level = ProgressBar.new()
-	_fuel_level.show_percentage = false
-	_fuel_level.step = 0.0
-	_fuel_level.custom_minimum_size.y = 10.0
-	_fuel_level.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_fuel_level.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_fuel_level.add_theme_stylebox_override("background", _style(Color("07121b"), BORDER, 5, 0))
-	_fuel_level.add_theme_stylebox_override("fill", _style(Color("398c82"), MINT, 5, 0))
-	gauge.add_child(_fuel_level)
-	_fuel = _label(gauge, "", 17, TEXT)
-	_fuel.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_fuel.custom_minimum_size.x = 120.0
+	var gauges := HBoxContainer.new()
+	gauges.add_theme_constant_override("separation", 22)
+	content.add_child(gauges)
+	var fuel_meter := _add_meter(gauges, "Топливо", Color("398c82"), MINT)
+	_fuel = fuel_meter[0]
+	_fuel_level = fuel_meter[1]
+	var hull_meter := _add_meter(gauges, "Корпус", Color("947251"), AMBER)
+	_hull = hull_meter[0]
+	_hull_level = hull_meter[1]
 
 	_tariff = _add_service(content, "refuel", "Полная заправка", "")
+	_repair_tariff = _add_service(content, "repair", "Ремонт корпуса", "")
 	_add_service(content, "tank", "Увеличенный бак", "Ёмкость 150 ед.")
 	_add_service(content, "eco", "Экономичный привод", "Расход топлива ниже на 30%")
+	_cargo_detail = _add_service(content, "cargo", "Расширение трюма", "")
 	get_viewport().size_changed.connect(_update_insets)
 	_update_insets()
 	hide()
@@ -100,12 +100,17 @@ func refresh() -> void:
 		return
 	var capacity: float = _sim.ship.capacity()
 	var fuel: float = _sim.ship.fuel
+	var hull: float = _sim.ship.hull
 	_station.text = _sim.target_name(_sim.docked)
 	_balance.text = "Баланс %d кр." % _sim.credits
 	_fuel_level.max_value = capacity
 	_fuel_level.value = fuel
 	_fuel.text = "%s / %d ед." % [("%.1f" % fuel).replace(".", ","), roundi(capacity)]
+	_hull_level.value = hull
+	_hull.text = ("%.1f%%" % hull).replace(".", ",")
 	_tariff.text = "Тариф порта · %d кр. за ед." % _sim.refuel_unit_price()
+	_repair_tariff.text = "Тариф порта · %d кр. за 1%%" % _sim.repair_unit_price()
+	_cargo_detail.text = "Ёмкость 40 ед." if _sim.ship.cargo_upgraded else "Ёмкость 24 → 40 ед."
 	for action: String in _action_buttons:
 		var offer: Dictionary = _sim.service_offer(action)
 		var button := _action_buttons[action]
@@ -114,10 +119,15 @@ func refresh() -> void:
 			button.text = "Установлено"
 		elif action == "refuel" and offer.cost == 0:
 			button.text = "Бак полон"
+		elif action == "repair" and offer.cost == 0:
+			button.text = "Корпус цел"
 		elif button.disabled:
 			button.text = "%d кр. · не хватает средств" % offer.cost
 		else:
-			var verb := "Заправить" if action == "refuel" else "Установить"
+			var verb := "Установить"
+			match action:
+				"refuel": verb = "Заправить"
+				"repair": verb = "Починить"
 			button.text = "%s · %d кр." % [verb, offer.cost]
 
 
@@ -136,6 +146,24 @@ func _request_service(action: String) -> void:
 		# A purchase can change the price shown for another service.
 		_touches.clear()
 		service_requested.emit(action)
+
+
+func _add_meter(parent: HBoxContainer, title: String, fill: Color, border: Color) -> Array[Control]:
+	var column := VBoxContainer.new()
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	parent.add_child(column)
+	var caption := HBoxContainer.new()
+	column.add_child(caption)
+	_label(caption, title, 17, MUTED).size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var value := _label(caption, "", 17, TEXT)
+	var bar := ProgressBar.new()
+	bar.show_percentage = false
+	bar.step = 0.0
+	bar.custom_minimum_size.y = 10.0
+	bar.add_theme_stylebox_override("background", _style(Color("07121b"), BORDER, 5, 0))
+	bar.add_theme_stylebox_override("fill", _style(fill, border, 5, 0))
+	column.add_child(bar)
+	return [value, bar]
 
 
 func _add_service(parent: VBoxContainer, action: String, title: String, detail: String) -> Label:

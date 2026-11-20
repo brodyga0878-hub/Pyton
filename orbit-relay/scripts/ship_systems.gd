@@ -1,19 +1,31 @@
 extends RefCounted
-## Fuel and permanently installed equipment for one ship.
+## Fuel, hull condition and permanently installed equipment for one ship.
 
 const BASE_CAPACITY := 100.0
 const EXTRA_CAPACITY := 50.0
 const TANK_COST := 260
 const ECO_COST := 320
-const SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded"]
+const CARGO_COST := 300
+const BASE_CARGO_CAPACITY := 24
+const EXPANDED_CARGO_CAPACITY := 40
+const MAX_HULL := 100.0
+const MIN_HULL := 1.0
+const LEGACY_SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded"]
+const SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded"]
 
 var fuel: float = BASE_CAPACITY
 var tank_upgraded := false
 var eco_upgraded := false
+var hull: float = MAX_HULL
+var cargo_upgraded := false
 
 
 func capacity() -> float:
 	return BASE_CAPACITY + EXTRA_CAPACITY if tank_upgraded else BASE_CAPACITY
+
+
+func cargo_capacity() -> int:
+	return EXPANDED_CARGO_CAPACITY if cargo_upgraded else BASE_CARGO_CAPACITY
 
 
 func burn(delta: float, load: float, boost: bool) -> void:
@@ -37,7 +49,22 @@ func add_fuel(amount: float) -> float:
 
 
 func quote_refill(unit_price: int) -> int:
-	var missing_units := ceili(capacity() - fuel)
+	return _service_cost(ceili(capacity() - fuel), unit_price)
+
+
+func quote_repair(unit_price: int) -> int:
+	return _service_cost(ceili(MAX_HULL - hull), unit_price)
+
+
+func apply_damage(amount: float) -> float:
+	if amount <= 0.0 or not is_finite(amount):
+		return 0.0
+	var previous := hull
+	hull = maxf(MIN_HULL, hull - amount)
+	return previous - hull
+
+
+static func _service_cost(missing_units: int, unit_price: int) -> int:
 	if missing_units <= 0 or unit_price <= 0:
 		return 0
 	@warning_ignore("integer_division")
@@ -52,12 +79,17 @@ func service_offer(action: String, unit_price: int, credits: int) -> Dictionary:
 	match action:
 		"refuel":
 			cost = quote_refill(unit_price)
+		"repair":
+			cost = quote_repair(unit_price)
 		"tank":
 			cost = TANK_COST
 			installed = tank_upgraded
 		"eco":
 			cost = ECO_COST
 			installed = eco_upgraded
+		"cargo":
+			cost = CARGO_COST
+			installed = cargo_upgraded
 	return {"cost": cost, "allowed": cost > 0 and cost <= credits and not installed, "installed": installed}
 
 
@@ -68,19 +100,27 @@ func buy(action: String, unit_price: int, credits: int) -> int:
 	match action:
 		"refuel":
 			fuel = capacity()
+		"repair":
+			hull = MAX_HULL
 		"tank":
 			tank_upgraded = true
 		"eco":
 			eco_upgraded = true
+		"cargo":
+			cargo_upgraded = true
 	return offer.cost
 
 
 func snapshot() -> Dictionary:
-	return {"fuel": fuel, "tank_upgraded": tank_upgraded, "eco_upgraded": eco_upgraded}
+	return {
+		"fuel": fuel, "tank_upgraded": tank_upgraded, "eco_upgraded": eco_upgraded,
+		"hull": hull, "cargo_upgraded": cargo_upgraded,
+	}
 
 
-func restore(value: Variant) -> bool:
-	if not value is Dictionary or value.size() != SAVE_FIELDS.size() or not value.has_all(SAVE_FIELDS):
+func restore(value: Variant, legacy := false) -> bool:
+	var fields := LEGACY_SAVE_FIELDS if legacy else SAVE_FIELDS
+	if not value is Dictionary or value.size() != fields.size() or not value.has_all(fields):
 		return false
 	if not value.tank_upgraded is bool or not value.eco_upgraded is bool:
 		return false
@@ -90,7 +130,18 @@ func restore(value: Variant) -> bool:
 	var restored_capacity := BASE_CAPACITY + EXTRA_CAPACITY if value.tank_upgraded else BASE_CAPACITY
 	if not is_finite(restored_fuel) or restored_fuel < 0.0 or restored_fuel > restored_capacity:
 		return false
+	var restored_hull := MAX_HULL
+	var restored_cargo_upgrade := false
+	if not legacy:
+		if not value.cargo_upgraded is bool or not (value.hull is float or value.hull is int):
+			return false
+		restored_hull = float(value.hull)
+		if not is_finite(restored_hull) or restored_hull < MIN_HULL or restored_hull > MAX_HULL:
+			return false
+		restored_cargo_upgrade = value.cargo_upgraded
 	fuel = restored_fuel
 	tank_upgraded = value.tank_upgraded
 	eco_upgraded = value.eco_upgraded
+	hull = restored_hull
+	cargo_upgraded = restored_cargo_upgrade
 	return true

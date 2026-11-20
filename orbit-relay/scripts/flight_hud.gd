@@ -19,6 +19,7 @@ var _bank: SteeringPad
 var _route: Label
 var _route_detail: Label
 var _telemetry: Label
+var _condition: Label
 var _fuel: Label
 var _fuel_level: ProgressBar
 var _clock: Label
@@ -30,7 +31,7 @@ var _commands_panel: PanelContainer
 var _mining_progress: ProgressBar
 var _right_panel: PanelContainer
 var _throttle_controls: GridContainer
-var _utilities: GridContainer
+var _port_tools: HBoxContainer
 var _actions: Dictionary = {}
 var _touch_owner: Dictionary = {}
 var _steer_finger := -1
@@ -73,6 +74,7 @@ func build() -> void:
 	instrument_stack.alignment = BoxContainer.ALIGNMENT_CENTER
 	_telemetry = _label(instrument_stack, 17, INK)
 	_telemetry.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_condition = _label(instrument_stack, 16, INK)
 	_fuel = _label(instrument_stack, 16, CYAN)
 	_fuel_level = ProgressBar.new()
 	_fuel_level.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -143,18 +145,21 @@ func build() -> void:
 	_button(_throttle_controls, "throttle_up", "Тяга +")
 	_button(_throttle_controls, "brake", "Тормоз")
 	_button(_throttle_controls, "boost", "Форсаж")
-	_utilities = GridContainer.new()
-	_utilities.columns = 3
-	_utilities.add_theme_constant_override("h_separation", 7)
-	_utilities.add_theme_constant_override("v_separation", 7)
-	right.add_child(_utilities)
-	_button(_utilities, "map", "Карта")
-	_button(_utilities, "galaxy", "Галактика")
-	_button(_utilities, "services", "Сервис")
-	_button(_utilities, "report", "Отчёт")
+	var utilities := HBoxContainer.new()
+	utilities.add_theme_constant_override("separation", 7)
+	right.add_child(utilities)
+	_button(utilities, "map", "Карта")
+	_button(utilities, "galaxy", "Галактика")
+	_button(utilities, "report", "Отчёт")
+	_port_tools = HBoxContainer.new()
+	_port_tools.add_theme_constant_override("separation", 7)
+	right.add_child(_port_tools)
+	_button(_port_tools, "market", "Биржа")
+	_button(_port_tools, "services", "Сервис")
 	_actions["map"].tooltip_text = "Карта звёздной системы"
 	_actions["galaxy"].tooltip_text = "Карта галактики"
 	_actions["report"].tooltip_text = "Отчёт об ошибке"
+	_actions["market"].tooltip_text = "Рынок и курьерские рейсы"
 
 	var notice_stack := _panel(_safe, Vector2(0.5, 1), Rect2(-243, -199, 486, 46))
 	_notice_panel = notice_stack.get_parent() as PanelContainer
@@ -176,11 +181,12 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_steer.visible = not parked
 	_bank.visible = not parked
 	_throttle_controls.visible = not parked
-	_utilities.columns = 2 if docked else 3
+	_port_tools.visible = docked
 	_right_panel.offset_top = -157.0 if docked else (-101.0 if landed else -215.0)
 	_actions["target"].visible = not parked
 	_actions["autopilot"].visible = not parked
 	_actions["services"].visible = docked
+	_actions["market"].visible = docked
 	_marks.flight = not parked
 	_marks.queue_redraw()
 
@@ -217,20 +223,23 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_actions["scoop"].visible = not parked and (star_target or scoop_status.get("near", false) or sim.scooping)
 	_actions["scoop"].text = "Откл. сбор" if sim.scooping else "Сбор топлива"
 	_actions["autopilot"].text = "Выкл. авто" if sim.autopilot else "Авто"
+	var itinerary: Dictionary = sim.contract_itinerary() if sim.contract_stage == 1 else {}
+	var transfer: bool = not itinerary.is_empty() and int(itinerary.leg) + 1 < itinerary.stops.size()
 	_actions["contract"].visible = docked and (sim.contract_stage != 1 or sim.docked == sim.contract_destination)
-	_actions["contract"].text = "Сдать груз" if sim.contract_stage == 1 else "Взять контракт"
+	_actions["contract"].text = "Отметить этап" if transfer else ("Сдать груз" if sim.contract_stage == 1 else "Взять контракт")
 	var sale_quote: int = mining.sale_quote(sim.docked) if docked and mining.ore_hold > 0 else 0
 	_actions["sell_ore"].visible = sale_quote > 0
 	_sync_clock(sim)
 	_refresh_disabled_actions()
 	_sync_fuel(sim.ship)
+	_sync_condition(sim.ship.hull, mining.ore_hold, mining.cargo_capacity)
 
 	if landed:
 		_sync_surface(sim, mining)
 	elif docked:
-		_sync_port(sim, mining.ore_hold, sale_quote)
+		_sync_port(sim, sale_quote, itinerary, transfer)
 	else:
-		_sync_flight(sim, mining.ore_hold, scoop_status)
+		_sync_flight(sim, scoop_status, itinerary)
 	if _notice_left > 0.0:
 		_notice_left -= delta
 		if _notice_left <= 0.0:
@@ -248,6 +257,12 @@ func _sync_fuel(ship: RefCounted) -> void:
 	_fuel_level.max_value = capacity
 	_fuel_level.value = ship.fuel
 
+func _sync_condition(hull: float, cargo: int, capacity: int) -> void:
+	_condition.text = "Корпус %d%% · Трюм %d / %d ед." % [roundi(hull), cargo, capacity]
+	var color := AMBER if hull < 40.0 else INK
+	if _condition.get_theme_color("font_color") != color:
+		_condition.add_theme_color_override("font_color", color)
+
 func _sync_clock(sim: RefCounted) -> void:
 	var seconds := floori(sim.orbit_time + 0.000001)
 	var hours := floori(seconds / 3600.0)
@@ -262,25 +277,30 @@ func _sync_clock(sim: RefCounted) -> void:
 	_time_hint.text = "Ускорение недоступно. %s" % status.reason if _time_hint.visible else ""
 	button.tooltip_text = _time_hint.text if _time_hint.visible else "Сменить скорость игрового времени (O)"
 
-func _sync_port(sim: RefCounted, cargo: int, sale_quote: int) -> void:
+func _sync_port(sim: RefCounted, sale_quote: int, itinerary: Dictionary, transfer: bool) -> void:
 	_route.text = "Порт  /  %s" % sim.target_name(sim.docked)
 	if sim.contract_stage == 1:
 		var destination: String = sim.target_name(sim.contract_destination)
 		_route_detail.text = "%s → %s" % [sim.contract_cargo(), destination]
+		if not itinerary.is_empty():
+			_route_detail.text = "%s · %s\nСледующий порт — «%s»" % [_leg_label(itinerary), itinerary.title, destination]
 		var remote_system := _delivery_system(sim)
 		if not remote_system.is_empty():
-			_guidance.text = "Для сдачи груза нужен прыжок в систему «%s»." % remote_system
+			_guidance.text = "Следующая остановка в системе «%s». Проверьте курс на галактической карте." % remote_system
 		else:
-			_guidance.text = "Груз готов к сдаче." if sim.docked == sim.contract_destination else "Вылетите к месту доставки."
+			_guidance.text = "Вылетите к месту доставки."
+			if sim.docked == sim.contract_destination:
+				_guidance.text = "Отметьте прибытие, чтобы продолжить рейс." if transfer else "Груз готов к сдаче."
 	else:
 		var destination: String = sim.target_name(sim.offer_destination())
 		_route_detail.text = "%s → %s\nОплата %d кр." % [sim.contract_cargo(), destination, sim.contract_reward()]
 		_guidance.text = "Выберите пункт назначения на карте."
-	if sim.planned_target >= 0:
+	var ready_to_deliver: bool = sim.contract_stage == 1 and sim.docked == sim.contract_destination
+	if sim.planned_target >= 0 and not ready_to_deliver:
 		_guidance.text = "После старта курс на «%s»." % sim.target_name(sim.planned_target)
-	if sale_quote > 0:
+	if sale_quote > 0 and sim.contract_stage != 1:
 		_guidance.text = "Сырьё можно продать за %d кр." % sale_quote
-	_telemetry.text = "Баланс %d кр.\nТрюм %d / %d ед." % [sim.credits, cargo, MiningRig.CAPACITY]
+	_telemetry.text = "Баланс %d кр." % sim.credits
 
 func _sync_surface(sim: RefCounted, mining: RefCounted) -> void:
 	_route.text = "Поверхность  /  %s" % sim.target_name(sim.landed_site)
@@ -289,7 +309,7 @@ func _sync_surface(sim: RefCounted, mining: RefCounted) -> void:
 	if sim.planned_target >= 0:
 		_route_detail.text += "\nПосле взлёта → %s" % sim.target_name(sim.planned_target)
 	var landing_site := "Вне площадки" if sim.landed_offpad() else "Площадка"
-	_telemetry.text = "%s\nТрюм %d / %d ед." % [landing_site, mining.ore_hold, MiningRig.CAPACITY]
+	_telemetry.text = landing_site
 	match mining.phase:
 		MiningRig.DEPLOYING:
 			_guidance.text = "Модуль спускается на поверхность."
@@ -300,14 +320,14 @@ func _sync_surface(sim: RefCounted, mining: RefCounted) -> void:
 		MiningRig.RETURNING:
 			_guidance.text = "Модуль возвращается на борт."
 		_:
-			if mining.ore_hold >= MiningRig.CAPACITY:
-				_guidance.text = "Трюм заполнен. Продайте сырьё в порту."
+			if mining.ore_hold >= mining.cargo_capacity:
+				_guidance.text = "Трюм заполнен. Продайте груз в порту."
 			elif mining.reserve == 0:
 				_guidance.text = "Жила исчерпана."
 			else:
 				_guidance.text = "Разверните добывающий модуль."
 
-func _sync_flight(sim: RefCounted, cargo: int, scoop_status: Dictionary) -> void:
+func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictionary) -> void:
 	var aimed_at_port := Sector.is_port(sim.target)
 	var surface: Dictionary = sim.surface_status() if Sector.is_mine_site(sim.target) else {}
 	var near_surface: bool = surface.get("near", false)
@@ -319,7 +339,8 @@ func _sync_flight(sim: RefCounted, cargo: int, scoop_status: Dictionary) -> void
 	if local_target.z > 0.0:
 		_route_detail.text += "  ·  цель позади"
 	if sim.contract_stage == 1:
-		_route_detail.text += "  ·  Груз для «%s»" % sim.target_name(sim.contract_destination)
+		var delivery := "Груз для" if itinerary.is_empty() else _leg_label(itinerary)
+		_route_detail.text += "\n%s · «%s»" % [delivery, sim.target_name(sim.contract_destination)]
 		var remote_system := _delivery_system(sim)
 		if not remote_system.is_empty():
 			_route_detail.text += " (%s)" % remote_system
@@ -335,8 +356,6 @@ func _sync_flight(sim: RefCounted, cargo: int, scoop_status: Dictionary) -> void
 		var altitude := ("%.1f" % maxf(0.0, float(surface.altitude))).replace(".", ",")
 		_telemetry.text += "\nВысота %s м · уклон %.0f°" % [altitude, surface.slope]
 		_actions["dock"].tooltip_text = str(surface.reason)
-	else:
-		_telemetry.text += "\nТрюм %d / %d ед." % [cargo, MiningRig.CAPACITY]
 	if _jumping:
 		_route.text = "Прыжок  /  %s" % Sector.system(sim.jump_target).name
 		_route_detail.text = "До перехода %.1f с" % sim.jump_seconds_left
@@ -372,6 +391,9 @@ func _sync_flight(sim: RefCounted, cargo: int, scoop_status: Dictionary) -> void
 func _delivery_system(sim: RefCounted) -> String:
 	var destination_system := Sector.system_of_site(sim.contract_destination)
 	return "" if destination_system == sim.system_id else str(Sector.system(destination_system).name)
+
+func _leg_label(itinerary: Dictionary) -> String:
+	return "Этап %d/%d" % [int(itinerary.leg) + 1, itinerary.stops.size()]
 
 func notify(message: String) -> void:
 	_notice.text = message
@@ -592,7 +614,7 @@ func _button(parent: Container, action: String, caption: String) -> void:
 	button.custom_minimum_size = Vector2(0, 52)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.add_theme_font_size_override("font_size", 18)
-	button.add_theme_color_override("font_color", CYAN if action in ["dock", "scoop", "contract", "mine", "sell_ore", "map", "galaxy", "services", "time"] else INK)
+	button.add_theme_color_override("font_color", CYAN if action in ["dock", "scoop", "contract", "mine", "sell_ore", "map", "galaxy", "market", "services", "time"] else INK)
 	button.add_theme_color_override("font_hover_color", INK)
 	button.add_theme_stylebox_override("normal", _box(Color("12313d"), LINE, 9, 7.0))
 	button.add_theme_stylebox_override("hover", _box(Color("214454"), CYAN, 9, 7.0))

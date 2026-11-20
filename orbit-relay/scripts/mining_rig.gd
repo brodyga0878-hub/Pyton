@@ -1,14 +1,16 @@
 extends RefCounted
-## The detachable rig draws from one deposit and shares a hold across resources.
+## The detachable rig loads the same hold used for market cargo.
 
 const Catalog = preload("res://scripts/sector_catalog.gd")
+const Economy = preload("res://scripts/port_economy.gd")
+const ShipSystems = preload("res://scripts/ship_systems.gd")
 
 const STOWED := 0
 const DEPLOYING := 1
 const DRILLING := 2
 const READY := 3
 const RETURNING := 4
-const CAPACITY := 24
+const CAPACITY := ShipSystems.BASE_CARGO_CAPACITY
 const BATCH := 12
 const PRICE := 20
 const INITIAL_RESERVE := 120
@@ -23,6 +25,7 @@ const LEGACY_SAVE_FIELDS := ["phase", "phase_seconds", "ore_hold", "reserve", "p
 var phase: int = STOWED
 var phase_seconds := 0.0
 var pending_ore := 0
+var cargo_capacity := CAPACITY
 var site_id: int:
 	get:
 		return _site_id
@@ -34,7 +37,7 @@ var reserve: int:
 		return _reserves[_site_id]
 
 var _site_id := FIRST_MINE_SITE
-var _cargo: Dictionary = {"ore": 0, "crystal": 0, "ice": 0}
+var _cargo: Dictionary = _empty_cargo()
 var _reserves: Array[int] = _initial_reserves()
 
 
@@ -53,8 +56,26 @@ func cargo_amount(resource: String) -> int:
 	return int(_cargo.get(resource, 0))
 
 
+func free_capacity() -> int:
+	return maxi(0, cargo_capacity - ore_hold)
+
+
+func insert_cargo(good: String, count: int) -> bool:
+	if phase != STOWED or not _cargo.has(good) or count <= 0 or count > free_capacity():
+		return false
+	_cargo[good] += count
+	return true
+
+
+func remove_cargo(good: String, count: int) -> bool:
+	if phase != STOWED or count <= 0 or count > cargo_amount(good):
+		return false
+	_cargo[good] -= count
+	return true
+
+
 func available_to_deploy() -> bool:
-	return phase == STOWED and _next_batch(ore_hold, reserve) > 0
+	return phase == STOWED and _next_batch(free_capacity(), reserve) > 0
 
 
 func action() -> String:
@@ -85,7 +106,7 @@ func update(delta: float) -> String:
 				phase = DRILLING
 			DRILLING:
 				phase = READY
-				pending_ore = _next_batch(ore_hold, reserve)
+				pending_ore = _next_batch(free_capacity(), reserve)
 				return "mining_ready"
 			RETURNING:
 				var resource: String = Catalog.site(_site_id).resource
@@ -133,7 +154,8 @@ func snapshot() -> Dictionary:
 	}
 
 
-func restore(value: Variant, legacy: bool = false, reserve_slots := Catalog.DESTINATION_COUNT) -> bool:
+func restore(value: Variant, legacy := false, reserve_slots := Catalog.DESTINATION_COUNT,
+		capacity := CAPACITY, market_cargo := false) -> bool:
 	if legacy and value is Dictionary and value.size() == LEGACY_SAVE_FIELDS.size() and value.has_all(LEGACY_SAVE_FIELDS):
 		value = _upgrade_legacy(value)
 	if not value is Dictionary or value.size() != SAVE_FIELDS.size() or not value.has_all(SAVE_FIELDS):
@@ -141,13 +163,18 @@ func restore(value: Variant, legacy: bool = false, reserve_slots := Catalog.DEST
 	if not _integer_in_range(value.phase, STOWED, RETURNING):
 		return false
 	var saved_count := Catalog.SITE_COUNT if legacy else reserve_slots
+	if saved_count <= 0 or saved_count > Catalog.DESTINATION_COUNT:
+		return false
+	if capacity != CAPACITY and capacity != ShipSystems.EXPANDED_CARGO_CAPACITY:
+		return false
 	if not _integer_in_range(value.site_id, 0, saved_count - 1) or not Catalog.is_mine_site(int(value.site_id)):
 		return false
 	if not _integer_in_range(value.pending_ore, 0, BATCH):
 		return false
 	if not (value.phase_seconds is int or value.phase_seconds is float):
 		return false
-	if not value.cargo is Dictionary or value.cargo.size() != RESOURCES.size() or not value.cargo.has_all(RESOURCES):
+	var cargo_fields := Economy.GOODS if market_cargo else RESOURCES
+	if not value.cargo is Dictionary or value.cargo.size() != cargo_fields.size() or not value.cargo.has_all(cargo_fields):
 		return false
 	if not value.reserves is Array or value.reserves.size() != saved_count:
 		return false
@@ -171,17 +198,18 @@ func restore(value: Variant, legacy: bool = false, reserve_slots := Catalog.DEST
 			return false
 		var remaining := int(value.reserves[id])
 		restored_reserves[id] = remaining
-		if Catalog.is_mine_site(id):
+		if not market_cargo and Catalog.is_mine_site(id):
 			extracted[deposit.resource] += initial_reserve - remaining
-	var restored_cargo: Dictionary = {}
-	for resource: String in RESOURCES:
-		if not _integer_in_range(value.cargo[resource], 0, mini(CAPACITY, int(extracted[resource]))):
+	var restored_cargo := _empty_cargo()
+	for good: String in cargo_fields:
+		var limit := capacity if market_cargo else mini(capacity, int(extracted[good]))
+		if not _integer_in_range(value.cargo[good], 0, limit):
 			return false
-		restored_cargo[resource] = int(value.cargo[resource])
+		restored_cargo[good] = int(value.cargo[good])
 	var restored_hold := _hold_size(restored_cargo)
-	if restored_hold > CAPACITY:
+	if restored_hold > capacity:
 		return false
-	var batch := _next_batch(restored_hold, restored_reserves[restored_site])
+	var batch := _next_batch(capacity - restored_hold, restored_reserves[restored_site])
 	if restored_phase != STOWED and batch == 0:
 		return false
 	var expected_pending := batch if restored_phase in [READY, RETURNING] else 0
@@ -194,6 +222,7 @@ func restore(value: Variant, legacy: bool = false, reserve_slots := Catalog.DEST
 	_cargo = restored_cargo
 	_reserves = restored_reserves
 	pending_ore = restored_pending
+	cargo_capacity = capacity
 	return true
 
 
@@ -219,10 +248,17 @@ static func _initial_reserves() -> Array[int]:
 	return result
 
 
+static func _empty_cargo() -> Dictionary:
+	var cargo := {}
+	for good: String in Economy.GOODS:
+		cargo[good] = 0
+	return cargo
+
+
 static func _hold_size(cargo: Dictionary) -> int:
 	var total := 0
-	for resource: String in RESOURCES:
-		total += int(cargo[resource])
+	for good: String in Economy.GOODS:
+		total += int(cargo[good])
 	return total
 
 
@@ -238,8 +274,8 @@ static func _phase_duration(value: int, id: int) -> float:
 			return 0.0
 
 
-static func _next_batch(hold: int, deposit: int) -> int:
-	return mini(BATCH, mini(CAPACITY - hold, deposit))
+static func _next_batch(available_space: int, deposit: int) -> int:
+	return mini(BATCH, mini(available_space, deposit))
 
 
 static func _integer_in_range(value: Variant, lower: int, upper: int) -> bool:

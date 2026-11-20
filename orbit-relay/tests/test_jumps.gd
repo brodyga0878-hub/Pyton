@@ -131,7 +131,7 @@ func _test_previous_save() -> void:
 		and flight.credits == 1010 and flight.deliveries == 3 and flight.contract_destination == 1,
 		"Migrating retains current fuel, equipment, balance and freight")
 	var migrated := flight.snapshot()
-	_expect(migrated.schema == 7 and migrated.mining.reserves.size() == Catalog.DESTINATION_COUNT
+	_expect(migrated.schema == Flight.SAVE_SCHEMA and migrated.mining.reserves.size() == Catalog.DESTINATION_COUNT
 		and flight.mining.ore_hold == 24 and flight.mining.reserve_at(4) == 84
 		and flight.mining.reserve_at(12) == int(Catalog.site(12).reserve)
 		and flight.mining.reserve_at(13) == int(Catalog.site(13).reserve),
