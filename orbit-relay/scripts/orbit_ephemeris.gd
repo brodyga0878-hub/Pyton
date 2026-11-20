@@ -85,14 +85,21 @@ static func period(site_id: int) -> float:
 	return _tracks[site_id].period if site_id >= 0 and site_id < _tracks.size() else 0.0
 
 
+static func gravity_parameter(system_id: int) -> float:
+	if system_id >= 0 and system_id < Catalog.AUTHORED_SYSTEM_COUNT:
+		return GRAVITY_PARAMETERS[system_id]
+	return Catalog.system(system_id).get("gravity_parameter", 0.0)
+
+
 static func _build_tracks() -> Array[Track]:
 	var result: Array[Track] = []
 	for site_id in range(Catalog.DESTINATION_COUNT):
 		var track := Track.new()
-		track.epoch = Catalog.site(site_id).center
-		if ELEMENTS.has(site_id):
+		var site := Catalog.site(site_id)
+		track.epoch = site.center
+		var elements: Vector3 = ELEMENTS.get(site_id, site.get("orbital_elements", Vector3.ZERO))
+		if elements != Vector3.ZERO:
 			var system_id := Catalog.system_of_site(site_id)
-			var elements: Vector3 = ELEMENTS[site_id]
 			var eccentricity := elements.x
 			track.eccentricity = eccentricity
 			track.focus = Catalog.site(Catalog.star_for(system_id)).center
@@ -108,7 +115,7 @@ static func _build_tracks() -> Array[Track]:
 			track.minor_axis = (radial * sine + tangent * cosine) * (semi_major * axis_factor)
 			track.eccentric_at_epoch = atan2(axis_factor * sine, eccentricity + cosine)
 			track.mean_at_epoch = track.eccentric_at_epoch - eccentricity * sin(track.eccentric_at_epoch)
-			track.mean_motion = sqrt(GRAVITY_PARAMETERS[system_id] / (semi_major * semi_major * semi_major))
+			track.mean_motion = sqrt(gravity_parameter(system_id) / (semi_major * semi_major * semi_major))
 			track.period = TAU / track.mean_motion
 			track.points.append(track.epoch)
 			for segment in range(1, ORBIT_SEGMENTS):

@@ -198,6 +198,7 @@ func _test_previous_schema() -> void:
 		return
 	var historic := flight.snapshot()
 	historic.schema = 25
+	historic.mining.reserves.resize(Catalog.AUTHORED_DESTINATION_COUNT)
 	historic.erase("cartography")
 	var cold := Flight.new()
 	_expect(cold.restore(historic) and cold.snapshot().cartography.scans.is_empty() and not cold.body_dossier(0).known

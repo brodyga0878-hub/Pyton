@@ -60,6 +60,7 @@ func _ready() -> void:
 	_galaxy.destination_selected.connect(_plan_jump)
 	_galaxy.jump_requested.connect(_start_jump)
 	_galaxy.route_cancel_requested.connect(_cancel_jump_route)
+	_galaxy.galaxy_scan_requested.connect(_galaxy_scan)
 	_galaxy.dismissed.connect(_close_galaxy)
 	add_child(_services)
 	_services.build()
@@ -335,7 +336,7 @@ func _deliver_notice() -> void:
 		"convoy_order_accepted", "convoy_order_escorted", "convoy_order_failed", "convoy_order_paid",
 		"convoy_order_fire", "convoy_order_enemy_hit",
 		"flight_assist",
-		"survey_record",
+		"survey_record", "galaxy_scan",
 		"orbit_start", "orbit_complete", "orbit_abort", "orbit_cancel",
 		"rendezvous_start", "rendezvous_hold", "rendezvous_abort", "rendezvous_cancel", "rendezvous_finish",
 	]:
@@ -596,6 +597,14 @@ func _map_survey(site: int) -> void:
 		_io.trace("atlas_observation", {"site": site, "system": flight.system_id, "orbit_time": flight.orbit_time})
 		_deliver_notice()
 	_map.refresh_survey()
+
+
+func _galaxy_scan() -> void:
+	if not _galaxy.is_open():
+		return
+	if flight.scan_galaxy():
+		_deliver_notice()
+	_galaxy.refresh()
 
 
 func _close_map() -> void:

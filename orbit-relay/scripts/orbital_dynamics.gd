@@ -33,7 +33,7 @@ static func gravity_parameter(site_id: int) -> float:
 	var site := Catalog.site(site_id)
 	var kind: String = site.get("kind", "")
 	if kind == "star":
-		return Orbit.GRAVITY_PARAMETERS[Catalog.system_of_site(site_id)]
+		return Orbit.gravity_parameter(Catalog.system_of_site(site_id))
 	var density := 0.0
 	match kind:
 		"planet": density = PLANET_DENSITY

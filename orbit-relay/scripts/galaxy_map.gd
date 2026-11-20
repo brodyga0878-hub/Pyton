@@ -3,6 +3,7 @@ extends CanvasLayer
 signal destination_selected(system_id: int)
 signal jump_requested()
 signal route_cancel_requested()
+signal galaxy_scan_requested()
 signal dismissed()
 
 const Sector := preload("res://scripts/sector_catalog.gd")
@@ -13,12 +14,14 @@ const MUTED := Color("a5bac7")
 const MINT := Color("9debd7")
 const AMBER := Color("f3c991")
 const BORDER := Color("365561")
+const SYSTEMS_PER_PAGE := 6
 
 var _insets: MarginContainer
 var _chart: GalaxyChart
 var _current: Label
 var _destination: Label
 var _affiliation: Label
+var _coordinates: Label
 var _description: Label
 var _distance: Label
 var _cost: Label
@@ -31,18 +34,33 @@ var _jump_button: Button
 var _cancel_route_button: Button
 var _close_button: Button
 var _dossier_button: Button
+var _scope_button: Button
+var _projection_button: Button
+var _ship_button: Button
+var _scan_button: Button
+var _scope_label: Label
+var _scan_label: Label
+var _page_label: Label
+var _previous_page_button: Button
+var _next_page_button: Button
+var _route_scroll: ScrollContainer
 var _route_details: VBoxContainer
 var _dossier_scroll: ScrollContainer
 var _dossier_ports: Label
 var _dossier_stock: Label
 var _dossier_freight: Label
 var _dossier_observations: Label
-var _dossier_touch := -1
+var _scroll_touch := -1
 var _system_buttons: Dictionary[int, Button] = {}
 var _touches: Dictionary[int, Button] = {}
 var _map_touches: Dictionary[int, int] = {}
 var _flight: RefCounted
 var _candidate := -1
+var _sector_focus := -1
+var _elevation := false
+var _system_page := 0
+var _last_scan_count := 0
+var _known: Array[int] = []
 
 
 func build() -> void:
@@ -79,11 +97,7 @@ func build() -> void:
 	body.add_theme_constant_override("separation", 16)
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	page.add_child(body)
-	_chart = GalaxyChart.new()
-	_chart.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_chart.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_chart.gui_input.connect(_chart_mouse_input)
-	body.add_child(_chart)
+	_build_chart(body)
 
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size.x = 410
@@ -94,28 +108,34 @@ func build() -> void:
 	panel.add_child(details)
 	var systems := GridContainer.new()
 	systems.columns = 2
+	systems.custom_minimum_size.y = 138
 	systems.add_theme_constant_override("h_separation", 6)
 	systems.add_theme_constant_override("v_separation", 3)
 	details.add_child(systems)
 	for id in range(Sector.SYSTEM_COUNT):
-		var button := _button(systems, str(Sector.system(id).name), 42)
+		var button := _button(systems, "", 44)
 		button.toggle_mode = true
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		button.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		button.pressed.connect(_select_system.bind(id))
 		_system_buttons[id] = button
+	_build_pager(details)
 	details.add_child(HSeparator.new())
 	_destination = _label(details, "", 26, TEXT)
 	_affiliation = _label(details, "", 16, MINT)
 	_affiliation.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_coordinates = _label(details, "", 14, MUTED)
 	var pages := Control.new()
 	pages.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	pages.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	details.add_child(pages)
+	_route_scroll = _page_scroll(pages)
 	_route_details = VBoxContainer.new()
 	_route_details.add_theme_constant_override("separation", 3)
-	pages.add_child(_route_details)
-	_route_details.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_route_details.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_route_details.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_route_scroll.add_child(_route_details)
 	_description = _label(_route_details, "", 15, MUTED)
 	_description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_description.custom_minimum_size.y = 47
@@ -155,12 +175,71 @@ func build() -> void:
 	hide()
 
 
+func _build_chart(parent: HBoxContainer) -> void:
+	var column := VBoxContainer.new()
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	column.add_theme_constant_override("separation", 7)
+	parent.add_child(column)
+	var tools := HBoxContainer.new()
+	tools.add_theme_constant_override("separation", 7)
+	column.add_child(tools)
+	_scope_button = _button(tools, "Сектор", 44)
+	_scope_button.custom_minimum_size.x = 110
+	_scope_button.tooltip_text = "Переключить обзор и ближний вид выбранной системы"
+	_scope_button.pressed.connect(_toggle_scope)
+	_projection_button = _button(tools, "Вид X/Y", 44)
+	_projection_button.custom_minimum_size.x = 110
+	_projection_button.tooltip_text = "Переключить горизонтальную и боковую проекции"
+	_projection_button.pressed.connect(_toggle_projection)
+	_ship_button = _button(tools, "К кораблю", 44)
+	_ship_button.pressed.connect(_go_to_ship)
+	var gap := Control.new()
+	gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tools.add_child(gap)
+	_scan_button = _button(tools, "Радиоскан", 44)
+	_scan_button.pressed.connect(_scan_galaxy)
+	_scope_label = _label(column, "", 15, MINT)
+	_scope_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_chart = GalaxyChart.new()
+	_chart.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_chart.gui_input.connect(_chart_mouse_input)
+	column.add_child(_chart)
+	_scan_label = _label(column, "", 14, MUTED)
+	_scan_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+
+
+func _build_pager(parent: VBoxContainer) -> void:
+	var pager := HBoxContainer.new()
+	pager.add_theme_constant_override("separation", 8)
+	parent.add_child(pager)
+	_previous_page_button = _button(pager, "‹", 44)
+	_previous_page_button.custom_minimum_size.x = 56
+	_previous_page_button.add_theme_font_size_override("font_size", 24)
+	_previous_page_button.tooltip_text = "Предыдущая страница систем"
+	_previous_page_button.pressed.connect(_turn_page.bind(-1))
+	_page_label = _label(pager, "", 15, MUTED)
+	_page_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_page_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_page_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_next_page_button = _button(pager, "›", 44)
+	_next_page_button.custom_minimum_size.x = 56
+	_next_page_button.add_theme_font_size_override("font_size", 24)
+	_next_page_button.tooltip_text = "Следующая страница систем"
+	_next_page_button.pressed.connect(_turn_page.bind(1))
+
+
 func open(sim: RefCounted) -> void:
 	build()
 	_flight = sim
 	var route: Dictionary = sim.planned_route()
 	_candidate = int(route.goal) if route.get("available", false) else int(sim.system_id)
+	_sector_focus = -1
+	_last_scan_count = 0
+	_collect_known_systems()
+	_page_for_candidate()
 	_clear_touches()
+	_route_scroll.scroll_vertical = 0
 	_show_dossier(false)
 	show()
 	refresh()
@@ -175,8 +254,10 @@ func refresh() -> void:
 	var charging: bool = _flight.jump_seconds_left > 0.0
 	var planned: int = int(plan.next) if has_plan else -1
 	var goal: int = int(plan.goal) if has_plan else -1
+	_collect_known_systems()
 	if not _flight.system_known(_candidate):
 		_candidate = current
+		_page_for_candidate()
 	var selected := Sector.system(_candidate)
 	var is_current := _candidate == current
 	var is_planned := _candidate == goal
@@ -186,33 +267,19 @@ func refresh() -> void:
 	_chart.current = current
 	_chart.planned = planned
 	_chart.candidate = _candidate
+	_chart.jump_capacity = float(_flight.ship.jump_capacity())
 	_chart.planned_path.assign(plan.path if has_plan else [])
 	_chart.preview_path.assign(preview.path if available and not is_planned else [])
 	_current.text = "Система «%s»" % Sector.system(current).name
-	var known: Array[int] = []
-	var contested: Array[int] = []
-	for id in _system_buttons:
-		var button := _system_buttons[id]
-		button.visible = _flight.system_known(id)
-		if not button.visible:
-			continue
-		known.append(id)
-		if _flight.factions.system_state(id).stage == "war":
-			contested.append(id)
-		var suffix := ""
-		if id == current:
-			suffix = " · Корабль"
-		elif id == goal:
-			suffix = " · Цель"
-		elif id == planned:
-			suffix = " · Далее"
-		button.text = str(Sector.system(id).name) + suffix
-		button.set_pressed_no_signal(id == _candidate)
-	_chart.set_systems(known)
+	var contested: Array[int] = _known.filter(func(id: int) -> bool: return _flight.factions.system_state(id).stage == "war")
+	_refresh_catalog(current, goal, planned)
+	_refresh_scanner()
 	_chart.contested = contested
 	_chart.queue_redraw()
 
 	_destination.text = str(selected.name)
+	var position := Sector.system_position3(_candidate)
+	_coordinates.text = "X %s   Y %s   Z %s св. л." % [_decimal(position.x), _decimal(position.y), _decimal(position.z)]
 	_affiliation.text = _flight.system_faction_name(_candidate)
 	if contested.has(_candidate):
 		_affiliation.text += " · Оспаривается"
@@ -266,11 +333,121 @@ func refresh() -> void:
 		_refresh_dossier()
 
 
+func _collect_known_systems() -> void:
+	_known.clear()
+	for id in range(Sector.SYSTEM_COUNT):
+		if _flight.system_known(id):
+			_known.append(id)
+
+
+func _scope_systems() -> Array[int]:
+	if _sector_focus < 0:
+		return _known
+	var coordinates := Sector.sector_coordinates(_sector_focus)
+	return _known.filter(func(id: int) -> bool: return Sector.sector_coordinates(id) == coordinates)
+
+
+func _page_for_candidate() -> void:
+	var index := _scope_systems().find(_candidate)
+	_system_page = maxi(0, floori(float(index) / SYSTEMS_PER_PAGE))
+
+
+func _refresh_catalog(current: int, goal: int, planned: int) -> void:
+	var systems := _scope_systems()
+	var pages := maxi(1, ceili(float(systems.size()) / SYSTEMS_PER_PAGE))
+	_system_page = clampi(_system_page, 0, pages - 1)
+	var first := _system_page * SYSTEMS_PER_PAGE
+	var last := mini(first + SYSTEMS_PER_PAGE, systems.size())
+	var listed := systems.slice(first, last)
+	for id in _system_buttons:
+		var button := _system_buttons[id]
+		button.visible = listed.has(id)
+		if not button.visible:
+			button.text = ""
+			continue
+		var suffix := ""
+		if id == current:
+			suffix = " · Корабль"
+		elif id == goal:
+			suffix = " · Цель"
+		elif id == planned:
+			suffix = " · Далее"
+		button.text = str(Sector.system(id).name) + suffix
+		button.set_pressed_no_signal(id == _candidate)
+	_previous_page_button.disabled = _system_page == 0
+	_next_page_button.disabled = _system_page + 1 >= pages
+	_page_label.text = "%d–%d из %d" % [first + 1, last, systems.size()]
+	_scope_button.text = "Обзор" if _sector_focus >= 0 else "Сектор"
+	_projection_button.text = "Вид X/Z" if _elevation else "Вид X/Y"
+	if _sector_focus >= 0:
+		var sector := Sector.sector_coordinates(_sector_focus)
+		_scope_label.text = "Сектор %d / %d · %d × %d св. л. в X/Y · Известно систем: %d" % [
+			sector.x, sector.y, int(Sector.SECTOR_SIZE), int(Sector.SECTOR_SIZE), systems.size()
+		]
+	else:
+		_scope_label.text = "Обзор · Известно систем: %d" % systems.size()
+	_chart.set_systems(_known, systems, _sector_focus, _elevation)
+
+
+func _refresh_scanner() -> void:
+	var scan: Dictionary = _flight.galaxy_scan_status()
+	_scan_button.disabled = not scan.allowed
+	_scan_button.tooltip_text = "Искать новые системы возле корабля" if scan.allowed else str(scan.reason)
+	var result := "Новых сигналов: %d" % int(scan.unseen_count) if scan.allowed else str(scan.reason)
+	if _last_scan_count > 0:
+		result = "Открыто систем: %d · %s" % [_last_scan_count, result]
+	_scan_label.text = "Радиус поиска %s св. л. · %s" % [_decimal(float(scan.range)), result]
+
+
+func _toggle_scope() -> void:
+	if is_open():
+		_clear_touches()
+		_sector_focus = _candidate if _sector_focus < 0 else -1
+		_page_for_candidate()
+		refresh()
+
+
+func _toggle_projection() -> void:
+	if is_open():
+		_clear_touches()
+		_elevation = not _elevation
+		refresh()
+
+
+func _go_to_ship() -> void:
+	if is_open():
+		_sector_focus = int(_flight.system_id)
+		_select_system(_sector_focus)
+
+
+func _turn_page(delta: int) -> void:
+	if is_open():
+		_clear_touches()
+		_system_page += delta
+		refresh()
+
+
+func _scan_galaxy() -> void:
+	if is_open() and not _scan_button.disabled:
+		_clear_touches()
+		var before := _known.size()
+		galaxy_scan_requested.emit()
+		if is_open():
+			_collect_known_systems()
+			_last_scan_count = maxi(0, _known.size() - before)
+			refresh()
+
+
+static func _page_scroll(parent: Control) -> ScrollContainer:
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	parent.add_child(scroll)
+	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	return scroll
+
+
 func _build_dossier(parent: Control) -> void:
-	_dossier_scroll = ScrollContainer.new()
-	_dossier_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	parent.add_child(_dossier_scroll)
-	_dossier_scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_dossier_scroll = _page_scroll(parent)
 	var content := VBoxContainer.new()
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content.add_theme_constant_override("separation", 6)
@@ -332,6 +509,7 @@ func _toggle_dossier() -> void:
 func _show_dossier(shown: bool) -> void:
 	_dossier_scroll.visible = shown
 	_dossier_scroll.scroll_vertical = 0
+	_route_scroll.visible = not shown
 	_route_details.visible = not shown
 	_dossier_button.text = "Маршрут" if shown else "Досье"
 	_dossier_button.set_pressed_no_signal(shown)
@@ -372,7 +550,9 @@ func _select_system(id: int) -> void:
 	if is_open() and _flight.system_known(id):
 		if _candidate != id:
 			_dossier_scroll.scroll_vertical = 0
+			_route_scroll.scroll_vertical = 0
 		_candidate = id
+		_page_for_candidate()
 		_clear_touches()
 		refresh()
 
@@ -396,40 +576,44 @@ func _cancel_route() -> void:
 	if is_open() and not _cancel_route_button.disabled:
 		_clear_touches()
 		_candidate = int(_flight.system_id)
+		if _sector_focus >= 0:
+			_sector_focus = _candidate
+		_page_for_candidate()
 		route_cancel_requested.emit()
 
 
 func _input(event: InputEvent) -> void:
 	if not is_open():
 		return
+	var scroll := _dossier_scroll if _dossier_scroll.visible else _route_scroll
 	if event is InputEventScreenTouch:
 		var button: Button = _touches.get(event.index)
 		var system_id: int = _map_touches.get(event.index, -1)
 		_touches.erase(event.index)
 		_map_touches.erase(event.index)
-		if event.index == _dossier_touch:
-			_dossier_touch = -1
+		if event.index == _scroll_touch:
+			_scroll_touch = -1
 		if not event.canceled:
 			if event.pressed:
 				var hit := _button_at(event.position)
 				if hit != null:
 					if hit not in _touches.values():
 						_touches[event.index] = hit
-				elif _dossier_scroll.visible and _dossier_scroll.get_global_rect().has_point(event.position):
-					if _dossier_touch < 0:
-						_dossier_touch = event.index
+				elif scroll.get_global_rect().has_point(event.position):
+					if _scroll_touch < 0:
+						_scroll_touch = event.index
 				else:
 					var marker := _chart_system_at(event.position)
 					if marker >= 0 and marker not in _map_touches.values():
 						_map_touches[event.index] = marker
-			elif button != null and not button.disabled and button.get_global_rect().has_point(event.position):
+			elif button != null and button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(event.position):
 				button.pressed.emit()
 			elif system_id >= 0 and _chart_system_at(event.position) == system_id:
 				_select_system(system_id)
 		get_viewport().set_input_as_handled()
 	elif event is InputEventScreenDrag:
-		if event.index == _dossier_touch:
-			_dossier_scroll.scroll_vertical = maxi(0, _dossier_scroll.scroll_vertical - roundi(event.relative.y))
+		if event.index == _scroll_touch:
+			scroll.scroll_vertical = maxi(0, scroll.scroll_vertical - roundi(event.relative.y))
 		var button: Button = _touches.get(event.index)
 		if button != null and not button.get_global_rect().has_point(event.position):
 			_touches.erase(event.index)
@@ -453,11 +637,14 @@ func _notification(what: int) -> void:
 func _clear_touches() -> void:
 	_touches.clear()
 	_map_touches.clear()
-	_dossier_touch = -1
+	_scroll_touch = -1
 
 
 func _button_at(point: Vector2) -> Button:
-	for button: Button in [_plan_button, _cancel_route_button, _jump_button, _dossier_button, _close_button]:
+	for button: Button in [
+		_plan_button, _cancel_route_button, _jump_button, _dossier_button, _close_button,
+		_scope_button, _projection_button, _ship_button, _scan_button, _previous_page_button, _next_page_button
+	]:
 		if not button.disabled and button.get_global_rect().has_point(point):
 			return button
 	for button: Button in _system_buttons.values():
@@ -546,14 +733,19 @@ class GalaxyChart extends Control:
 	var current := -1
 	var planned := -1
 	var candidate := -1
+	var jump_capacity := 0.0
 	var planned_path: Array[int] = []
 	var preview_path: Array[int] = []
 	var contested: Array[int] = []
 	var _sky := PackedVector3Array()
+	var _known_systems: Array[int] = []
 	var _systems: Array[int] = []
+	var _points: Dictionary[int, Vector2] = {}
 	var _center := Vector2.ZERO
 	var _extent := Vector2.ONE
 	var _label_boxes: Array[Rect2] = []
+	var _detailed := false
+	var _elevation := false
 
 	func _ready() -> void:
 		var random := RandomNumberGenerator.new()
@@ -562,21 +754,37 @@ class GalaxyChart extends Control:
 			_sky.append(Vector3(random.randf(), random.randf(), random.randf()))
 		resized.connect(queue_redraw)
 
-	func set_systems(systems: Array[int]) -> void:
+	func set_systems(known: Array[int], systems: Array[int], focus: int, elevation: bool) -> void:
+		_known_systems = known
 		_systems = systems
+		_detailed = focus >= 0
+		_elevation = elevation
+		_points.clear()
 		if _systems.is_empty():
 			return
 		var low := Vector2(INF, INF)
 		var high := Vector2(-INF, -INF)
 		for id in _systems:
-			var point: Vector2 = Sector.system(id).position
+			var coordinates := Sector.system_position3(id)
+			var point := Vector2(coordinates.x, -coordinates.z if elevation else coordinates.y)
+			_points[id] = point
 			low = low.min(point)
 			high = high.max(point)
+		if _detailed:
+			var corner := Vector2(Sector.sector_coordinates(focus)) * Sector.SECTOR_SIZE
+			low.x = corner.x
+			high.x = corner.x + Sector.SECTOR_SIZE
+			if elevation:
+				low.y = minf(low.y, -Sector.SECTOR_SIZE * 0.5)
+				high.y = maxf(high.y, Sector.SECTOR_SIZE * 0.5)
+			else:
+				low.y = corner.y
+				high.y = corner.y + Sector.SECTOR_SIZE
 		_center = (low + high) * 0.5
 		_extent = (high - low).max(Vector2.ONE)
 
 	func marker_position(id: int) -> Vector2:
-		return size * 0.5 + (Sector.system(id).position - _center) * _pixels_per_light_year()
+		return size * 0.5 + (_points.get(id, _center) - _center) * _pixels_per_light_year()
 
 	func system_at(point: Vector2) -> int:
 		if not Rect2(Vector2.ZERO, size).has_point(point):
@@ -607,13 +815,15 @@ class GalaxyChart extends Control:
 		for star in _sky:
 			var point := Vector2(star.x, star.y) * (size - Vector2.ONE * 18.0) + Vector2.ONE * 9.0
 			draw_circle(point, 0.65 + star.z * 0.95, Color(0.65, 0.80, 1.0, 0.08 + star.z * 0.32), true, -1.0, true)
+		if _detailed:
+			var span := _extent * _pixels_per_light_year()
+			draw_rect(Rect2((size - span) * 0.5, span), BORDER, false, 1.0)
 		var active := _route_path(planned_path, planned)
 		var preview_fallback := -1 if not active.is_empty() and candidate == active[-1] else candidate
 		var preview := _route_path(preview_path, preview_fallback)
 		if preview == active:
 			preview = []
-		if _systems.has(current):
-			_draw_routes(active, preview)
+		_draw_routes(active, preview)
 		for id in _systems:
 			_draw_marker(id, active)
 		_label_boxes.clear()
@@ -624,17 +834,19 @@ class GalaxyChart extends Control:
 		for id in order:
 			_draw_label(id, active, preview)
 		_draw_scale()
+		draw_string(ThemeDB.fallback_font, size - Vector2(81, 17), "X →  Z ↑" if _elevation else "X →  Y ↓",
+			HORIZONTAL_ALIGNMENT_LEFT, -1.0, 14, MUTED)
 
 	func _route_path(requested: Array[int], fallback: int) -> Array[int]:
 		var path: Array[int] = requested.duplicate()
-		if path.is_empty() and _systems.has(current) and _systems.has(fallback) and current != fallback:
+		if path.is_empty() and _known_systems.has(current) and _known_systems.has(fallback) and current != fallback:
 			path = [current, fallback]
-		if path.size() < 2 or path.size() > _systems.size() or path[0] != current:
+		if path.size() < 2 or path.size() > _known_systems.size() or path[0] != current:
 			return []
 		var visited: Array[int] = []
 		for step in range(path.size()):
 			var id := path[step]
-			if not _systems.has(id) or visited.has(id):
+			if not _known_systems.has(id) or visited.has(id):
 				return []
 			if step > 0 and Sector.jump_cost(path[step - 1], id) <= 0:
 				return []
@@ -648,10 +860,12 @@ class GalaxyChart extends Control:
 		return false
 
 	func _draw_routes(active: Array[int], preview: Array[int]) -> void:
-		for id in _systems:
-			if Sector.jump_cost(current, id) <= 0 or _has_edge(active, current, id) or _has_edge(preview, current, id):
-				continue
-			_draw_leg(current, id, Color("425e69"), 1.1, true, false)
+		if _systems.has(current):
+			for id in _systems:
+				var cost := Sector.jump_cost(current, id)
+				if cost <= 0 or cost > jump_capacity or _has_edge(active, current, id) or _has_edge(preview, current, id):
+					continue
+				_draw_leg(current, id, Color("425e69"), 1.1, true, false)
 		for step in range(1, active.size()):
 			_draw_leg(active[step - 1], active[step], MINT, 2.6, false, true)
 		for step in range(1, preview.size()):
@@ -691,11 +905,12 @@ class GalaxyChart extends Control:
 		var system := Sector.system(id)
 		var point := marker_position(id)
 		var accent: Color = system.accent
-		draw_circle(point, 32.0, Color(accent, 0.07), true, -1.0, true)
-		draw_circle(point, 18.0, Color(accent, 0.16), true, -1.0, true)
-		draw_arc(point, 23.0, 0.0, TAU, 48, Color(accent, 0.70), 1.2, true)
-		draw_circle(point, 9.0, accent, true, -1.0, true)
-		draw_circle(point, 4.0, accent.lerp(Color.WHITE, 0.72), true, -1.0, true)
+		var scale := _marker_scale(id, active)
+		draw_circle(point, 32.0 * scale, Color(accent, 0.07), true, -1.0, true)
+		draw_circle(point, 18.0 * scale, Color(accent, 0.16), true, -1.0, true)
+		draw_arc(point, 23.0 * scale, 0.0, TAU, 48, Color(accent, 0.70), 1.2, true)
+		draw_circle(point, 9.0 * scale, accent, true, -1.0, true)
+		draw_circle(point, 4.0 * scale, accent.lerp(Color.WHITE, 0.72), true, -1.0, true)
 		if contested.has(id):
 			var warning := point + Vector2(20, -19)
 			draw_circle(warning, 8.0, FIELD, true, -1.0, true)
@@ -710,6 +925,9 @@ class GalaxyChart extends Control:
 				draw_arc(point, 32.0, angle, angle + 1.27, 12, MINT if active.has(id) or id == current else AMBER, 2.2, true)
 		if active.size() > 2 and (id == active[1] or id == active.back()):
 			draw_arc(point, 27.0, 0.0, TAU, 48, MINT, 1.4, true)
+
+	func _marker_scale(id: int, active: Array[int]) -> float:
+		return 0.55 if not _detailed and Sector.is_generated_system(id) and id != current and id != candidate and not active.has(id) else 1.0
 
 	func _label_priority(id: int, active: Array[int], preview: Array[int]) -> int:
 		if id == current:
@@ -737,6 +955,9 @@ class GalaxyChart extends Control:
 		elif not preview.is_empty() and id == preview.back():
 			annotation = "Просмотр"
 			tint = AMBER
+		elif id == candidate:
+			annotation = "Выбрано"
+			tint = AMBER
 		var font := ThemeDB.fallback_font
 		var name: String = Sector.system(id).name
 		for sizes: Vector2i in [Vector2i(21, 14), Vector2i(18, 12)]:
@@ -749,7 +970,8 @@ class GalaxyChart extends Control:
 				for other in _label_boxes:
 					blocked = blocked or box.grow(3.0).intersects(other)
 				for system_id in _systems:
-					blocked = blocked or box.intersects(Rect2(marker_position(system_id) - Vector2(35, 45), Vector2(70, 80)))
+					var scale := _marker_scale(system_id, active)
+					blocked = blocked or box.intersects(Rect2(marker_position(system_id) - Vector2(35, 45) * scale, Vector2(70, 80) * scale))
 				if blocked:
 					continue
 				_label_boxes.append(box)

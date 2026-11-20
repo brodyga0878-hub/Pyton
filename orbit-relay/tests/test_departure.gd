@@ -153,6 +153,7 @@ func _test_previous_berth() -> void:
 	var flight := Flight.new()
 	var legacy := flight.snapshot()
 	legacy.schema = 21
+	legacy.mining.reserves.resize(Catalog.AUTHORED_DESTINATION_COUNT)
 	legacy.ship.erase("hull_id")
 	legacy.erase("departure_requested")
 	legacy.erase("departure_seconds")

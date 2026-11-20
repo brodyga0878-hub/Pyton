@@ -173,6 +173,7 @@ func _test_previous_schema() -> void:
 	flight.ship.fuel = 31.0
 	var previous := flight.snapshot()
 	previous.schema = 24
+	previous.mining.reserves.resize(Catalog.AUTHORED_DESTINATION_COUNT)
 	previous.ship.erase("hull_id")
 	var cold := Flight.new()
 	if not _expect(cold.restore(previous) and cold.ship.hull_id == COURIER and cold.ship.hull == 83.0

@@ -22,7 +22,7 @@ const DockAccess = preload("res://scripts/dock_access.gd")
 const Passengers = preload("res://scripts/passengers.gd")
 const Crew = preload("res://scripts/crew.gd")
 const Cartography = preload("res://scripts/cartography.gd")
-const SAVE_SCHEMA := 26
+const SAVE_SCHEMA := 27
 const SHIPYARD_PORTS := [0, 10, Catalog.FRINGE_ARRIVAL_PORT]
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
@@ -270,7 +270,7 @@ func target_name(index: int) -> String:
 
 
 func system_known(index: int) -> bool:
-	return expedition.known(index)
+	return expedition.known(index) or cartography.discovered(index)
 
 
 func system_faction_name(index: int) -> String:
@@ -297,6 +297,26 @@ func survey_action(site: int) -> bool:
 	return true
 
 
+func galaxy_scan_status() -> Dictionary:
+	var count := cartography.neighbors_to_discover(system_id).size() if system_known(system_id) else 0
+	var reason := ""
+	if jump_seconds_left > 0.0 or _departure_requested:
+		reason = "Дождитесь окончания манёвра"
+	elif count == 0:
+		reason = "В пределах радиуса нет неизвестных систем"
+	return {"allowed": reason.is_empty(), "unseen_count": count, "range": Catalog.GENERATED_SCAN_RANGE, "reason": reason}
+
+
+func scan_galaxy() -> bool:
+	if not galaxy_scan_status().allowed:
+		return false
+	var count := cartography.discover_from(system_id, orbit_time)
+	if count <= 0:
+		return false
+	_announce("galaxy_scan", "Новые звёздные отметки на карте · %d." % count)
+	return true
+
+
 func local_targets() -> Array:
 	var targets := Catalog.targets_for(system_id)
 	if system_id < Catalog.CORE_SYSTEM_COUNT or expedition.commissioned(system_id):
@@ -308,10 +328,12 @@ func local_ports() -> Array:
 	return Catalog.ports_for(system_id) if system_id < Catalog.CORE_SYSTEM_COUNT or expedition.commissioned(system_id) else []
 
 
-func _site_available(index: int, progress: RefCounted) -> bool:
+func _site_available(index: int, progress: RefCounted, atlas: RefCounted = null) -> bool:
 	var system := Catalog.system_of_site(index)
 	if system >= 0 and system < Catalog.CORE_SYSTEM_COUNT:
 		return true
+	if Catalog.is_generated_system(system):
+		return (cartography if atlas == null else atlas).discovered(system)
 	return progress.known(system) and (not Catalog.is_port(index) or progress.commissioned(system))
 
 
@@ -1996,7 +2018,7 @@ func plan_jump(destination: int) -> bool:
 
 
 func route_preview(goal: int) -> Dictionary:
-	var known := _known_systems(expedition)
+	var known := _known_systems(expedition, cartography)
 	var capacity := ship.jump_capacity()
 	var reachable_first_leg := GalacticRoute.plan(system_id, goal, known, capacity, ship.jump_fuel)
 	if reachable_first_leg.available or ship.jump_fuel >= capacity:
@@ -2037,10 +2059,10 @@ func cancel_route() -> bool:
 	return true
 
 
-static func _known_systems(progress: RefCounted) -> Array[int]:
+static func _known_systems(progress: RefCounted, atlas: RefCounted) -> Array[int]:
 	var systems: Array[int] = []
 	for id in range(Catalog.SYSTEM_COUNT):
-		if progress.known(id):
+		if progress.known(id) or atlas.discovered(id):
 			systems.append(id)
 	return systems
 
@@ -2129,9 +2151,10 @@ func _charge_jump(delta: float) -> void:
 	else:
 		_jump_route.clear()
 	jump_target = -1 if _jump_route.is_empty() else _jump_route[0]
-	var arrival: int = Catalog.system(system_id).arrival_port
-	if not station_operational(arrival):
-		arrival = Catalog.system(system_id).survey_sites[0]
+	var destination := Catalog.system(system_id)
+	var arrival := int(destination.get("arrival_target", destination.arrival_port))
+	if not Catalog.is_generated_system(system_id) and not station_operational(arrival):
+		arrival = int(destination.survey_sites[0])
 	target = arrival
 	if contract_stage == 1 and Catalog.system_of_site(contract_destination) == system_id and _site_available(contract_destination, expedition) and (not contract_route_id.is_empty() or contract_origin >= Catalog.PRE_EXPANSION_DESTINATION_COUNT):
 		target = contract_destination
@@ -2487,14 +2510,14 @@ func _acceleration_limit(acceleration: float) -> float:
 	return acceleration * ship.accel_factor() if ship.fuel > 0.0 else acceleration
 
 
-func _blocked(point: Vector3, sector_id := -1, epoch := -1.0, progress: RefCounted = null) -> bool:
-	return _obstacle_at(point, sector_id, epoch, progress) >= 0
+func _blocked(point: Vector3, sector_id := -1, epoch := -1.0, progress: RefCounted = null, atlas: RefCounted = null) -> bool:
+	return _obstacle_at(point, sector_id, epoch, progress, atlas) >= 0
 
 
-func _obstacle_at(point: Vector3, sector_id := -1, epoch := -1.0, progress: RefCounted = null) -> int:
+func _obstacle_at(point: Vector3, sector_id := -1, epoch := -1.0, progress: RefCounted = null, atlas: RefCounted = null) -> int:
 	var history := expedition if progress == null else progress
 	for index: int in Catalog.targets_for(system_id if sector_id < 0 else sector_id):
-		if _site_available(index, history) and _inside_hull(point, index, epoch):
+		if _site_available(index, history, atlas) and _inside_hull(point, index, epoch):
 			return index
 	return -1
 
@@ -2866,6 +2889,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_procedural := schema < 27
 	var pre_cartography := schema < 26
 	var pre_shipyard := schema < 25
 	var pre_crew := schema < 24
@@ -2903,7 +2927,7 @@ func restore(state: Dictionary) -> bool:
 	var restored_system := Catalog.HOME_SYSTEM
 	var restored_jump := -1
 	if not pre_galaxy:
-		var systems := Catalog.SYSTEM_COUNT
+		var systems := Catalog.AUTHORED_SYSTEM_COUNT if pre_procedural else Catalog.SYSTEM_COUNT
 		if pre_expansion:
 			systems = Catalog.PRE_TRAFFIC_SYSTEM_COUNT if pre_traffic else Catalog.CORE_SYSTEM_COUNT
 		if not _integer(state.get("system_id"), 0, systems - 1) or not _integer(state.get("jump_target"), -1, systems - 1):
@@ -2942,6 +2966,8 @@ func restore(state: Dictionary) -> bool:
 	if not _number(state.get("throttle"), 0.0, 1.0):
 		return false
 	var site_count := Catalog.PRE_EXPANSION_DESTINATION_COUNT if pre_expansion else Catalog.DESTINATION_COUNT
+	if pre_procedural and not pre_expansion:
+		site_count = Catalog.AUTHORED_DESTINATION_COUNT
 	if pre_dual_fuel and not pre_expansion:
 		site_count = Catalog.PRE_GAS_DESTINATION_COUNT
 	if pre_traffic:
@@ -2966,7 +2992,7 @@ func restore(state: Dictionary) -> bool:
 	if not pre_expansion:
 		if not restored_expedition.restore(state.get("expedition")) or not restored_factions.restore(state.get("factions"), pre_thermal, pre_convoy_orders):
 			return false
-		for system in range(Catalog.CORE_SYSTEM_COUNT, Catalog.SYSTEM_COUNT):
+		for system in Expedition.FRONTIER_SYSTEMS:
 			if restored_expedition.commissioned(system) != (restored_factions.owner(system) >= 0):
 				return false
 	if not pre_convoy_orders and not restored_convoy_order.restore(state.get("convoy_order"), restored_factions, restored_expedition):
@@ -2984,14 +3010,15 @@ func restore(state: Dictionary) -> bool:
 			if not _site_available(member.origin, restored_expedition):
 				return false
 	if not pre_cartography:
-		if not restored_cartography.restore(state.get("cartography"), restored_epoch):
+		if not restored_cartography.restore(state.get("cartography"), restored_epoch, pre_procedural):
 			return false
 		for site: int in restored_cartography.surveyed_sites():
-			if not _site_available(site, restored_expedition):
+			if not _site_available(site, restored_expedition, restored_cartography):
 				return false
-	if not restored_expedition.known(restored_system) or (restored_jump >= 0 and not restored_expedition.known(restored_jump)):
+	var known := _known_systems(restored_expedition, restored_cartography)
+	if restored_system not in known or (restored_jump >= 0 and restored_jump not in known):
 		return false
-	if not _site_available(int(state.target), restored_expedition):
+	if not _site_available(int(state.target), restored_expedition, restored_cartography):
 		return false
 	for field in ["docked", "contract_origin", "contract_destination"]:
 		if int(state[field]) >= 0 and not _site_available(int(state[field]), restored_expedition):
@@ -3046,7 +3073,7 @@ func restore(state: Dictionary) -> bool:
 		if not restored_route.is_empty():
 			var path: Array[int] = [restored_system]
 			path.append_array(restored_route)
-			if restored_route[0] != restored_jump or not GalacticRoute.valid_path(path, _known_systems(restored_expedition), restored_ship.jump_capacity()):
+			if restored_route[0] != restored_jump or not GalacticRoute.valid_path(path, known, restored_ship.jump_capacity()):
 				return false
 	if not pre_economy and not restored_market.restore(state.get("market"), pre_traffic, pre_expansion, pre_dual_fuel):
 		return false
@@ -3140,7 +3167,7 @@ func restore(state: Dictionary) -> bool:
 		restored_gear = float(state.gear_extension)
 		restored_gear_command = state.gear_deployed
 	if restored_plan >= 0:
-		if Catalog.system_of_site(restored_plan) != restored_system or not _site_available(restored_plan, restored_expedition) or restored_plan == restored_dock or restored_plan == restored_landing or (restored_dock < 0 and restored_landing < 0):
+		if Catalog.system_of_site(restored_plan) != restored_system or not _site_available(restored_plan, restored_expedition, restored_cartography) or restored_plan == restored_dock or restored_plan == restored_landing or (restored_dock < 0 and restored_landing < 0):
 			return false
 	# Earlier saves may occupy coordinates where a new hull was added.
 	if pre_fuel and restored_dock < 0 and restored_landing < 0:
@@ -3171,7 +3198,7 @@ func restore(state: Dictionary) -> bool:
 			restored_position = center + Vector3.BACK * float(Catalog.site(giant).gate_offset)
 			restored_velocity = Vector3.ZERO
 	var velocity_limit := MAX_SAVED_SPEED if schema >= 6 else MAX_SPEED * 1.56
-	if restored_velocity.length() > velocity_limit or (restored_dock < 0 and restored_landing < 0 and _blocked(restored_position, restored_system, restored_epoch, restored_expedition)):
+	if restored_velocity.length() > velocity_limit or (restored_dock < 0 and restored_landing < 0 and _blocked(restored_position, restored_system, restored_epoch, restored_expedition, restored_cartography)):
 		return false
 	set_autopilot(false)
 	position = restored_position

@@ -12,6 +12,7 @@ const SCAN_SPEED_LIMIT := 34.0
 const MAX_EPOCH := 3155760000.0
 
 var _records: Dictionary[int, float] = {}
+var _discovered: Dictionary[int, float] = {}
 
 
 func body_status(sim: RefCounted, site_id: int) -> Dictionary:
@@ -46,6 +47,9 @@ func body_status(sim: RefCounted, site_id: int) -> Dictionary:
 func record(site_id: int, epoch: float) -> bool:
 	if Catalog.site(site_id).is_empty() or _records.has(site_id) or not _valid_epoch(epoch, MAX_EPOCH):
 		return false
+	var system_id := Catalog.system_of_site(site_id)
+	if Catalog.is_generated_system(system_id) and (not discovered(system_id) or _discovered[system_id] > epoch):
+		return false
 	_records[site_id] = epoch
 	return true
 
@@ -54,6 +58,29 @@ func surveyed_sites() -> Array[int]:
 	var sites := _records.keys()
 	sites.sort()
 	return sites
+
+
+func discovered(system_id: int) -> bool:
+	return _discovered.has(system_id)
+
+
+func neighbors_to_discover(system_id: int) -> Array[int]:
+	var neighbors: Array[int] = []
+	if Catalog.system(system_id).is_empty() or (Catalog.is_generated_system(system_id) and not discovered(system_id)):
+		return neighbors
+	for candidate in range(Catalog.AUTHORED_SYSTEM_COUNT, Catalog.SYSTEM_COUNT):
+		if candidate != system_id and not discovered(candidate) and Catalog.jump_distance(system_id, candidate) <= Catalog.GENERATED_SCAN_RANGE:
+			neighbors.append(candidate)
+	return neighbors
+
+
+func discover_from(system_id: int, epoch: float) -> int:
+	if not _valid_epoch(epoch, MAX_EPOCH):
+		return 0
+	var neighbors := neighbors_to_discover(system_id)
+	for candidate in neighbors:
+		_discovered[candidate] = epoch
+	return neighbors.size()
 
 
 func system_status(sim: RefCounted, system_id: int) -> Dictionary:
@@ -92,32 +119,56 @@ func snapshot() -> Dictionary:
 	var scans: Array[Dictionary] = []
 	for site_id in surveyed_sites():
 		scans.append({"site": site_id, "epoch": _records[site_id]})
-	return {"scans": scans}
+	var systems: Array[Dictionary] = []
+	var ids := _discovered.keys()
+	ids.sort()
+	for system_id: int in ids:
+		systems.append({"system": system_id, "epoch": _discovered[system_id]})
+	return {"scans": scans, "systems": systems}
 
 
-func restore(raw: Variant, epoch: float) -> bool:
-	if not _valid_epoch(epoch, MAX_EPOCH) or not raw is Dictionary or raw.size() != 1:
+func restore(raw: Variant, epoch: float, pre_procedural := false) -> bool:
+	if not _valid_epoch(epoch, MAX_EPOCH) or not raw is Dictionary or raw.size() != (1 if pre_procedural else 2):
 		return false
+	var surveyed_systems: Dictionary[int, float] = {}
+	if not pre_procedural:
+		var systems: Variant = raw.get("systems")
+		if not systems is Array or systems.size() > Catalog.SYSTEM_COUNT - Catalog.AUTHORED_SYSTEM_COUNT:
+			return false
+		var previous := Catalog.AUTHORED_SYSTEM_COUNT - 1
+		for item: Variant in systems:
+			if not item is Dictionary or item.size() != 2 or not item.has_all(["system", "epoch"]):
+				return false
+			if not _valid_sorted_id(item.system, previous, Catalog.SYSTEM_COUNT) or not _valid_epoch(item.epoch, epoch):
+				return false
+			previous = int(item.system)
+			surveyed_systems[previous] = float(item.epoch)
 	var scans: Variant = raw.get("scans")
-	if not scans is Array or scans.size() > Catalog.DESTINATION_COUNT:
+	var site_limit := Catalog.AUTHORED_DESTINATION_COUNT if pre_procedural else Catalog.DESTINATION_COUNT
+	if not scans is Array or scans.size() > site_limit:
 		return false
 	var restored: Dictionary[int, float] = {}
 	var previous_site := -1
 	for scan: Variant in scans:
 		if not scan is Dictionary or scan.size() != 2 or not scan.has_all(["site", "epoch"]):
 			return false
-		var number: Variant = scan.site
-		if not (number is int or number is float) or not is_finite(float(number)) \
-				or number != floorf(float(number)) or number <= previous_site \
-				or number >= Catalog.DESTINATION_COUNT or not _valid_epoch(scan.epoch, epoch):
+		if not _valid_sorted_id(scan.site, previous_site, site_limit) or not _valid_epoch(scan.epoch, epoch):
 			return false
-		var site_id := int(number)
+		var site_id := int(scan.site)
 		if Catalog.site(site_id).is_empty():
+			return false
+		var system_id := Catalog.system_of_site(site_id)
+		if Catalog.is_generated_system(system_id) and (not surveyed_systems.has(system_id) or surveyed_systems[system_id] > float(scan.epoch)):
 			return false
 		restored[site_id] = float(scan.epoch)
 		previous_site = site_id
 	_records = restored
+	_discovered = surveyed_systems
 	return true
+
+
+static func _valid_sorted_id(value: Variant, prior: int, high: int) -> bool:
+	return (value is int or value is float) and is_finite(float(value)) and value == floorf(float(value)) and prior < value and value < high
 
 
 static func _valid_epoch(value: Variant, high: float) -> bool:

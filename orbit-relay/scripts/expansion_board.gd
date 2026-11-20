@@ -190,7 +190,7 @@ func _build_fronts(body: HBoxContainer) -> void:
 	var card := _card(body, 414.0)
 	_label(card, "Контроль систем", 25, INK)
 	var systems := _column(card, 3)
-	for id in range(Sector.SYSTEM_COUNT):
+	for id in range(Sector.AUTHORED_SYSTEM_COUNT):
 		_systems.append(_status_row(systems, str(Sector.system(id).name)))
 	var divider := HSeparator.new()
 	card.add_child(divider)

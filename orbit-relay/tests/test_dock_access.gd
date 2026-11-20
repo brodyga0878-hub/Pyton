@@ -3,6 +3,7 @@ extends SceneTree
 const Flight := preload("res://scripts/flight_sim.gd")
 const Access := preload("res://scripts/dock_access.gd")
 const Freight := preload("res://scripts/npc_freight.gd")
+const Catalog := preload("res://scripts/sector_catalog.gd")
 const Fixture = preload("res://tests/flight_fixture.gd")
 const PORT := 0
 const ALTERNATE_PORT := 1
@@ -174,6 +175,7 @@ func _test_save_and_reload() -> void:
 	_set_axial_pose(resumed, ALTERNATE_PORT, Access.HATCH_AXIS_OFFSET - 0.04, 8.0)
 	var legacy := _json(resumed.snapshot())
 	legacy.schema = 20
+	legacy.mining.reserves.resize(Catalog.AUTHORED_DESTINATION_COUNT)
 	legacy.ship.erase("hull_id")
 	legacy.erase("dock_access")
 	var earlier := Flight.new()

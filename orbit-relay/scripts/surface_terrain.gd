@@ -7,6 +7,8 @@ const MAX_RADIUS_FACTOR := 1.12
 const MAX_LANDING_SLOPE := 28.0
 const NORMAL_STEP := 0.0015
 const MINIMUM_NORMAL_COS := cos(deg_to_rad(MAX_LANDING_SLOPE))
+const DRILL_CLEARANCE := 1.05
+const DRILL_MAX_GROUND_DISTANCE_SQUARED := 100.0
 
 
 class Profile:
@@ -69,15 +71,22 @@ static func deposit(id: int, direction: Vector3) -> Transform3D:
 		return Transform3D.IDENTITY
 	var unit := _unit(direction)
 	if unit == Vector3.BACK:
-		return Transform3D(Basis.IDENTITY, Vector3(6.1, 0.36, profile.pad_face + 1.05))
+		return Transform3D(Basis.IDENTITY, Vector3(6.1, 0.36, profile.pad_face + DRILL_CLEARANCE))
 	var axes := basis(id, unit)
 	var tangent_offset := axes.x * 6.1 + axes.y * 0.36
+	var cross_offset := axes.y * 6.1 - axes.x * 0.36
 	var ground := unit * _height(profile, unit)
-	var nearby := _unit(ground + tangent_offset)
-	if not landable(id, nearby):
-		nearby = _unit(ground - tangent_offset)
-	var deposit_basis := basis(id, nearby)
-	return Transform3D(deposit_basis, point(id, nearby) + deposit_basis.z * 1.05)
+	# Keep the usual placement first and search shorter offsets on uneven terrain.
+	for step: float in [1.0, 0.5, 0.25]:
+		for offset: Vector3 in [tangent_offset, -tangent_offset, cross_offset, -cross_offset]:
+			var nearby := _unit(ground + offset * step)
+			var drill_normal := normal(id, nearby)
+			if drill_normal.dot(nearby) < MINIMUM_NORMAL_COS:
+				continue
+			var drill_ground := point(id, nearby)
+			if drill_ground.distance_squared_to(ground) <= DRILL_MAX_GROUND_DISTANCE_SQUARED:
+				return Transform3D(_tangent_basis(drill_normal), drill_ground + drill_normal * DRILL_CLEARANCE)
+	return Transform3D(axes, ground + axes.z * DRILL_CLEARANCE)
 
 
 static func landable(id: int, direction: Vector3) -> bool:

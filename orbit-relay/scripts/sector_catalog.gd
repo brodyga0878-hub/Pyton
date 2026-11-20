@@ -1,6 +1,10 @@
 extends RefCounted
 ## Stable site IDs are used by navigation, visuals and saved flights.
 
+const ProceduralSystems = preload("res://scripts/procedural_systems.gd")
+const SECTOR_SIZE := ProceduralSystems.SECTOR_SIZE
+const GENERATED_SCAN_RANGE := 10.5
+const GENERATED_SYSTEM_COUNT := ProceduralSystems.SECTOR_COUNT * ProceduralSystems.SYSTEMS_PER_SECTOR
 const SITE_COUNT := 9
 const STAR_ID := SITE_COUNT
 const TARGET_COUNT := SITE_COUNT + 1
@@ -11,13 +15,15 @@ const FRINGE_SYSTEM := PRE_TRAFFIC_SYSTEM_COUNT
 const CORE_SYSTEM_COUNT := PRE_TRAFFIC_SYSTEM_COUNT + 1
 const HEATHER_SYSTEM := CORE_SYSTEM_COUNT
 const LIMIT_SYSTEM := HEATHER_SYSTEM + 1
-const SYSTEM_COUNT := LIMIT_SYSTEM + 1
+const AUTHORED_SYSTEM_COUNT := LIMIT_SYSTEM + 1
+const SYSTEM_COUNT := AUTHORED_SYSTEM_COUNT + GENERATED_SYSTEM_COUNT
 const PRE_SURFACE_DESTINATION_COUNT := 15
 const PRE_TRAFFIC_DESTINATION_COUNT := PRE_SURFACE_DESTINATION_COUNT + 1
 const PRE_EXPANSION_DESTINATION_COUNT := PRE_TRAFFIC_DESTINATION_COUNT + 4
 const PRE_GAS_DESTINATION_COUNT := PRE_EXPANSION_DESTINATION_COUNT + 8
 const GAS_GIANT_ID := PRE_GAS_DESTINATION_COUNT
-const DESTINATION_COUNT := GAS_GIANT_ID + 1
+const AUTHORED_DESTINATION_COUNT := GAS_GIANT_ID + 1
+const DESTINATION_COUNT := AUTHORED_DESTINATION_COUNT + GENERATED_SYSTEM_COUNT * ProceduralSystems.TARGETS_PER_SYSTEM
 const VELAR_STAR_ID := 14
 const TERRACE_ID := PRE_SURFACE_DESTINATION_COUNT
 const FRINGE_ARRIVAL_PORT := PRE_TRAFFIC_DESTINATION_COUNT
@@ -143,18 +149,48 @@ const ROUTES := {
 	LIMIT_PORT: {FRINGE_SECOND_PORT: ["Сводка дальнего наблюдения", 680]},
 }
 
+static var _generated := ProceduralSystems.build(AUTHORED_DESTINATION_COUNT)
+
 
 static func site(id: int) -> Dictionary:
-	return SITES[id] if id >= 0 and id < DESTINATION_COUNT else {}
+	if id < 0 or id >= DESTINATION_COUNT:
+		return {}
+	if id < AUTHORED_DESTINATION_COUNT:
+		return SITES[id]
+	return _generated.sites[id - AUTHORED_DESTINATION_COUNT]
 
 
 static func system(id: int) -> Dictionary:
-	return SYSTEMS[id] if id >= 0 and id < SYSTEM_COUNT else {}
+	if id < 0 or id >= SYSTEM_COUNT:
+		return {}
+	if id < AUTHORED_SYSTEM_COUNT:
+		return SYSTEMS[id]
+	return _generated.systems[id - AUTHORED_SYSTEM_COUNT]
+
+
+static func is_generated_system(id: int) -> bool:
+	return id >= AUTHORED_SYSTEM_COUNT and id < SYSTEM_COUNT
+
+
+static func system_position3(id: int) -> Vector3:
+	var entry := system(id)
+	if is_generated_system(id):
+		return entry.position_3d
+	var position: Vector2 = entry.get("position", Vector2.ZERO)
+	return Vector3(position.x, position.y, 0.0)
+
+
+static func sector_coordinates(id: int) -> Vector2i:
+	var position := system_position3(id)
+	return Vector2i(floori(position.x / SECTOR_SIZE), floori(position.y / SECTOR_SIZE))
 
 
 static func system_of_site(id: int) -> int:
 	if id < 0 or id >= DESTINATION_COUNT:
 		return -1
+	if id >= AUTHORED_DESTINATION_COUNT:
+		@warning_ignore("integer_division")
+		return AUTHORED_SYSTEM_COUNT + (id - AUTHORED_DESTINATION_COUNT) / ProceduralSystems.TARGETS_PER_SYSTEM
 	if id == GAS_GIANT_ID:
 		return HOME_SYSTEM
 	if id >= LIMIT_PORT:
@@ -191,14 +227,18 @@ static func stellar_heat(system_id: int) -> float:
 
 
 static func jump_cost(origin: int, destination: int) -> int:
-	if origin < 0 or origin >= SYSTEM_COUNT or destination < 0 or destination >= SYSTEM_COUNT:
+	if origin == destination or origin < 0 or origin >= SYSTEM_COUNT or destination < 0 or destination >= SYSTEM_COUNT:
 		return 0
-	return JUMP_COSTS[origin][destination]
+	if origin < AUTHORED_SYSTEM_COUNT and destination < AUTHORED_SYSTEM_COUNT:
+		return JUMP_COSTS[origin][destination]
+	return ceili(jump_distance(origin, destination) * 7.0 + 5.0)
 
 
 static func jump_distance(origin: int, destination: int) -> float:
-	if jump_cost(origin, destination) == 0:
+	if origin == destination or origin < 0 or origin >= SYSTEM_COUNT or destination < 0 or destination >= SYSTEM_COUNT:
 		return 0.0
+	if is_generated_system(origin) or is_generated_system(destination):
+		return system_position3(origin).distance_to(system_position3(destination))
 	var departure: Vector2 = system(origin).position
 	return departure.distance_to(system(destination).position)
 
