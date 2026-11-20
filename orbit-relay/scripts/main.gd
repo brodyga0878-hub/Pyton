@@ -65,6 +65,7 @@ func _ready() -> void:
 	_services.service_requested.connect(_service_purchase)
 	_services.transfer_requested.connect(_fuel_transfer)
 	_services.jettison_requested.connect(_jettison_cargo)
+	_services.crew_requested.connect(_crew_action)
 	_services.dismissed.connect(_close_services)
 	add_child(_market)
 	_market.build()
@@ -294,6 +295,13 @@ func _deliver_notice() -> void:
 			"credits": flight.credits, "remaining_seconds": passengers.remaining, "reason": flight.status_message,
 			"system_id": flight.system_id, "orbit_time": flight.orbit_time,
 		}
+	elif event.begins_with("crew_"):
+		var crew := flight.crew_status()
+		trace_fields = {
+			"port": flight.docked, "crew": crew.count, "arrears": crew.arrears, "credits": flight.credits,
+			"engineer": crew.engineer, "navigator": crew.navigator, "next_due": crew.next_due,
+			"system_id": flight.system_id, "orbit_time": flight.orbit_time, "reason": flight.status_message,
+		}
 	_io.trace(event, trace_fields)
 	_hud.notify(flight.status_message)
 	flight.status_event = ""
@@ -311,6 +319,7 @@ func _deliver_notice() -> void:
 		"market_buy", "market_sell", "service_repair", "service_cargo", "hull_damage", "contract_leg",
 		"passenger_accepted", "passenger_overdue", "passenger_paid", "passenger_late", "passenger_canceled",
 		"passenger_debt_paid", "passenger_course",
+		"crew_hired", "crew_dismissed", "crew_payroll", "crew_arrears_paid",
 		"patrol_accepted", "patrol_engaged", "patrol_fire", "patrol_enemy_hit", "patrol_retreat", "patrol_victory", "patrol_paid",
 		"expedition_accepted", "expedition_survey", "expedition_report", "expedition_supply", "expedition_complete", "expedition_course",
 		"war_declared", "war_round", "war_captured", "war_repulsed", "war_convoy_delivered", "war_convoy_intercepted",
@@ -628,6 +637,20 @@ func _jettison_cargo(good: String) -> void:
 	_deliver_notice()
 	_services.refresh()
 	_update_display(0.0)
+
+
+func _crew_action(action: String, member: int) -> void:
+	if not _services.is_open() or not flight.station_services_available():
+		return
+	var changed := false
+	match action:
+		"hire": changed = flight.crew_hire(member)
+		"dismiss": changed = flight.crew_dismiss(member)
+		"pay": changed = flight.crew_pay(member)
+	if changed:
+		_deliver_notice()
+		_update_display(0.0)
+	_services.refresh()
 
 
 func _close_services() -> void:

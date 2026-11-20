@@ -20,10 +20,12 @@ const FactionFronts = preload("res://scripts/faction_fronts.gd")
 const ConvoyOrders = preload("res://scripts/convoy_orders.gd")
 const DockAccess = preload("res://scripts/dock_access.gd")
 const Passengers = preload("res://scripts/passengers.gd")
-const SAVE_SCHEMA := 23
+const Crew = preload("res://scripts/crew.gd")
+const SAVE_SCHEMA := 24
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
+const NAVIGATOR_JUMP_CHARGE := 2.2
 const JUMP_SPEED := 42.0
 const JUMP_CLEARANCE := 45.0
 const ARRIVAL_OFFSET := 90.0
@@ -117,6 +119,7 @@ var expedition := Expedition.new()
 var factions := FactionFronts.new()
 var convoy_order := ConvoyOrders.new()
 var passengers := Passengers.new()
+var crew := Crew.new()
 var convoy_course := false
 var project_course := false
 var scooping := false
@@ -1304,20 +1307,20 @@ func _nearest_interstellar_port() -> int:
 func passenger_accept(destination: int) -> bool:
 	for offer in passenger_board():
 		if int(offer.destination) == destination and offer.available:
-			return _apply_passenger_result(passengers.begin(docked, destination, orbit_time))
+			return _apply_service_result(passengers.begin(docked, destination, orbit_time))
 	return false
 
 
 func passenger_discharge() -> bool:
 	if not passenger_status().can_discharge:
 		return false
-	return _apply_passenger_result(passengers.discharge(docked, orbit_time, credits))
+	return _apply_service_result(passengers.discharge(docked, orbit_time, credits))
 
 
 func passenger_repay() -> bool:
 	if not passenger_status().can_repay:
 		return false
-	return _apply_passenger_result(passengers.repay(credits))
+	return _apply_service_result(passengers.repay(credits))
 
 
 func passenger_follow() -> bool:
@@ -1332,12 +1335,52 @@ func passenger_follow() -> bool:
 	return selected
 
 
-func _apply_passenger_result(result: Dictionary) -> bool:
+func _apply_service_result(result: Dictionary) -> bool:
 	if result.is_empty() or not result.ok:
 		return false
 	credits += int(result.credits)
 	_announce(result.event, result.message)
 	return true
+
+
+func crew_status() -> Dictionary:
+	var status := crew.status(orbit_time)
+	status.engineer = crew.active_role("engineer")
+	status.navigator = crew.active_role("navigator")
+	var at_berth := station_services_available()
+	for member: Dictionary in status.members:
+		member.can_dismiss = at_berth and member.arrears == 0
+		member.can_pay = at_berth and member.arrears > 0 and credits > 0
+	return status
+
+
+func crew_candidates() -> Array[Dictionary]:
+	if not station_services_available():
+		return []
+	var status := crew.status(orbit_time)
+	var offers := Crew.candidates(docked)
+	for offer: Dictionary in offers:
+		var hired: bool = status.members.any(func(member: Dictionary) -> bool: return member.id == offer.id)
+		offer.available = not hired and status.count < status.capacity and credits >= offer.fee
+	return offers
+
+
+func crew_hire(id: int) -> bool:
+	if not station_services_available():
+		return false
+	return _apply_service_result(crew.hire(id, docked, orbit_time, credits))
+
+
+func crew_dismiss(id: int) -> bool:
+	if not station_services_available():
+		return false
+	return _apply_service_result(crew.dismiss(id))
+
+
+func crew_pay(id: int) -> bool:
+	if not station_services_available():
+		return false
+	return _apply_service_result(crew.pay(id, credits))
 
 
 func market_trade(good: String, side: String, quantity: int) -> bool:
@@ -1374,7 +1417,8 @@ func refuel_unit_price() -> int:
 
 
 func repair_unit_price() -> int:
-	return Economy.repair_price(docked)
+	var base := Economy.repair_price(docked)
+	return maxi(1, base - 1) if base > 0 and crew.active_role("engineer") else base
 
 
 func traffic_contacts() -> Array[Dictionary]:
@@ -1977,7 +2021,7 @@ func start_jump() -> bool:
 	throttle = 0.0
 	boost = false
 	_command_gear(false)
-	jump_seconds_left = JUMP_CHARGE
+	jump_seconds_left = NAVIGATOR_JUMP_CHARGE if crew.active_role("navigator") else JUMP_CHARGE
 	_announce("jump_charging", "Прыжковый привод заряжается.")
 	return true
 
@@ -2153,7 +2197,8 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 	var front := factions.advance(orbit_time)
 	if not front.is_empty():
 		_announce(front.event, front.message)
-	_apply_passenger_result(passengers.advance(orbit_time))
+	_apply_service_result(passengers.advance(orbit_time))
+	_apply_service_result(crew.advance(orbit_time, credits))
 	if docked >= 0:
 		if _departure_requested:
 			_advance_departure(delta)
@@ -2734,6 +2779,7 @@ func snapshot() -> Dictionary:
 		"expedition": expedition.snapshot(), "factions": factions.snapshot(),
 		"convoy_order": convoy_order.snapshot(),
 		"passengers": passengers.snapshot(),
+		"crew": crew.snapshot(),
 	}
 
 
@@ -2741,6 +2787,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_crew := schema < 24
 	var pre_passengers := schema < 23
 	var pre_departure := schema < 22
 	var pre_dock_access := schema < 21
@@ -2833,6 +2880,7 @@ func restore(state: Dictionary) -> bool:
 	var restored_factions := FactionFronts.new()
 	var restored_convoy_order := ConvoyOrders.new()
 	var restored_passengers := Passengers.new()
+	var restored_crew := Crew.new()
 	if not pre_expansion:
 		if not restored_expedition.restore(state.get("expedition")) or not restored_factions.restore(state.get("factions"), pre_thermal, pre_convoy_orders):
 			return false
@@ -2847,6 +2895,12 @@ func restore(state: Dictionary) -> bool:
 		var manifest := restored_passengers.status(restored_epoch)
 		if manifest.active and (not _site_available(manifest.origin, restored_expedition) or not _site_available(manifest.destination, restored_expedition)):
 			return false
+	if not pre_crew:
+		if not restored_crew.restore(state.get("crew"), restored_epoch):
+			return false
+		for member: Dictionary in restored_crew.status(restored_epoch).members:
+			if not _site_available(member.origin, restored_expedition):
+				return false
 	if not restored_expedition.known(restored_system) or (restored_jump >= 0 and not restored_expedition.known(restored_jump)):
 		return false
 	if not _site_available(int(state.target), restored_expedition):
@@ -3059,6 +3113,7 @@ func restore(state: Dictionary) -> bool:
 	factions = restored_factions
 	convoy_order = restored_convoy_order
 	passengers = restored_passengers
+	crew = restored_crew
 	star_heat = 0.0 if pre_thermal else float(state.star_heat)
 	entry_heat = 0.0 if pre_entry else float(state.entry_heat)
 	_entry_site = -1

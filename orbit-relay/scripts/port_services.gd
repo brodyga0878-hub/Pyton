@@ -3,6 +3,7 @@ extends CanvasLayer
 signal service_requested(action: String)
 signal transfer_requested(destination: String)
 signal jettison_requested(good: String)
+signal crew_requested(action: String, member: int)
 signal dismissed()
 
 const TEXT := Color("e8f4fa")
@@ -10,8 +11,8 @@ const MUTED := Color("a5bac7")
 const MINT := Color("9debd7")
 const AMBER := Color("ffd396")
 const BORDER := Color("365561")
-const Sector := preload("res://scripts/sector_catalog.gd")
 const ShipSystems := preload("res://scripts/ship_systems.gd")
+const Crew := preload("res://scripts/crew.gd")
 
 var _sim: RefCounted
 var _insets: MarginContainer
@@ -19,6 +20,7 @@ var _title: Label
 var _port_details: HBoxContainer
 var _station: Label
 var _balance: Label
+var _gauges: HBoxContainer
 var _fuel: Label
 var _fuel_level: ProgressBar
 var _jump_fuel: Label
@@ -30,6 +32,15 @@ var _jump_tariff: Label
 var _repair_tariff: Label
 var _cargo_detail: Label
 var _services: VBoxContainer
+var _crew: VBoxContainer
+var _crew_toggle: Button
+var _crew_summary: Label
+var _crew_payroll: Label
+var _crew_empty: Label
+var _crew_candidate_rows: Array[Dictionary] = []
+var _crew_member_rows: Array[Dictionary] = []
+var _crew_buttons: Array[Button] = []
+var _crew_open := false
 var _transfers: VBoxContainer
 var _hydrogen: Label
 var _close_button: Button
@@ -73,6 +84,9 @@ func build() -> void:
 	content.add_child(header)
 	_title = _label(header, "Портовые службы", 30, TEXT)
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_crew_toggle = _button(header)
+	_crew_toggle.custom_minimum_size.x = 126.0
+	_crew_toggle.pressed.connect(_toggle_crew)
 	_close_button = _button(header)
 	_close_button.text = "Закрыть"
 	_close_button.custom_minimum_size.x = 126.0
@@ -84,16 +98,16 @@ func build() -> void:
 	_station.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_balance = _label(_port_details, "", 20, TEXT)
 
-	var gauges := HBoxContainer.new()
-	gauges.add_theme_constant_override("separation", 22)
-	content.add_child(gauges)
-	var fuel_meter := _add_meter(gauges, "Тяга", Color("398c82"), MINT)
+	_gauges = HBoxContainer.new()
+	_gauges.add_theme_constant_override("separation", 22)
+	content.add_child(_gauges)
+	var fuel_meter := _add_meter(_gauges, "Тяга", Color("398c82"), MINT)
 	_fuel = fuel_meter[0]
 	_fuel_level = fuel_meter[1]
-	var jump_meter := _add_meter(gauges, "Прыжки", Color("396c89"), Color("9edcff"))
+	var jump_meter := _add_meter(_gauges, "Прыжки", Color("396c89"), Color("9edcff"))
 	_jump_fuel = jump_meter[0]
 	_jump_fuel_level = jump_meter[1]
-	var hull_meter := _add_meter(gauges, "Корпус", Color("947251"), AMBER)
+	var hull_meter := _add_meter(_gauges, "Корпус", Color("947251"), AMBER)
 	_hull = hull_meter[0]
 	_hull_level = hull_meter[1]
 
@@ -107,6 +121,7 @@ func build() -> void:
 	_add_service("eco", "Экономичный привод", "Расход реактивного топлива ниже на 30%")
 	_cargo_detail = _add_service("cargo", "Расширение трюма", "")
 	_add_service("heat_shield", "Теплозащита", "Тепловая нагрузка в атмосфере ниже на %d%%" % ShipSystems.HEAT_SHIELD_REDUCTION)
+	_build_crew(content)
 	_transfers = VBoxContainer.new()
 	_transfers.add_theme_constant_override("separation", 8)
 	content.add_child(_transfers)
@@ -121,17 +136,16 @@ func build() -> void:
 
 
 func open(sim: RefCounted, fuel_only := false) -> void:
-	if sim == null or (not fuel_only and not Sector.is_port(sim.docked)):
+	if sim == null or (not fuel_only and not sim.station_services_available()):
 		return
 	build()
 	_sim = sim
 	_fuel_only = fuel_only
+	_crew_open = false
 	_cargo_index = 0
 	_discard_pending_good = ""
 	_touches.clear()
-	_port_details.visible = not _fuel_only
-	_transfers.visible = _fuel_only
-	_services.visible = not _fuel_only
+	_show_page()
 	show()
 	refresh()
 
@@ -139,7 +153,7 @@ func open(sim: RefCounted, fuel_only := false) -> void:
 func refresh() -> void:
 	if not is_open():
 		return
-	if not _fuel_only and not Sector.is_port(_sim.docked):
+	if not _fuel_only and not _sim.station_services_available():
 		dismissed.emit()
 		return
 	var capacity: float = _sim.ship.capacity()
@@ -147,7 +161,6 @@ func refresh() -> void:
 	var jump_capacity: float = _sim.ship.jump_capacity()
 	var jump_fuel: float = _sim.ship.jump_fuel
 	var hull: float = _sim.ship.hull
-	_title.text = "Топливо" if _fuel_only else "Портовые службы"
 	_fuel_level.max_value = capacity
 	_fuel_level.value = fuel
 	_fuel.text = "%s / %d ед." % [_decimal(fuel), roundi(capacity)]
@@ -159,12 +172,15 @@ func refresh() -> void:
 	if _fuel_only:
 		_refresh_transfers()
 	else:
-		_refresh_services()
+		_station.text = _sim.target_name(_sim.docked)
+		_balance.text = "Баланс %d кр." % _sim.credits
+		if _crew_open:
+			_refresh_crew()
+		else:
+			_refresh_services()
 
 
 func _refresh_services() -> void:
-	_station.text = _sim.target_name(_sim.docked)
-	_balance.text = "Баланс %d кр." % _sim.credits
 	_tariff.text = "Тариф порта · %d кр. за ед." % _sim.refuel_unit_price()
 	_jump_tariff.text = _tariff.text
 	_repair_tariff.text = "Тариф порта · %d кр. за 1%%" % _sim.repair_unit_price()
@@ -187,6 +203,168 @@ func _refresh_services() -> void:
 				"refuel", "jump_refuel": verb = "Заправить"
 				"repair": verb = "Починить"
 			button.text = "%s · %d кр." % [verb, offer.cost]
+
+
+func _show_page() -> void:
+	_title.text = "Топливо" if _fuel_only else ("Экипаж" if _crew_open else "Портовые службы")
+	_crew_toggle.text = "Сервис" if _crew_open else "Экипаж"
+	_crew_toggle.visible = not _fuel_only
+	_port_details.visible = not _fuel_only
+	_gauges.visible = not _crew_open
+	_services.visible = not _fuel_only and not _crew_open
+	_crew.visible = _crew_open
+	_transfers.visible = _fuel_only
+
+
+func _toggle_crew() -> void:
+	if not is_open() or _fuel_only:
+		return
+	_crew_open = not _crew_open
+	_touches.clear()
+	_show_page()
+	refresh()
+
+
+func _build_crew(parent: VBoxContainer) -> void:
+	_crew = VBoxContainer.new()
+	_crew.add_theme_constant_override("separation", 12)
+	parent.add_child(_crew)
+	var overview := HBoxContainer.new()
+	_crew.add_child(overview)
+	_crew_summary = _label(overview, "", 21, TEXT)
+	_crew_summary.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_crew_payroll = _label(overview, "", 17, MUTED)
+	var panels := HBoxContainer.new()
+	panels.add_theme_constant_override("separation", 12)
+	_crew.add_child(panels)
+	var candidates := _crew_column(panels, "Кандидаты в порту")
+	var members := _crew_column(panels, "На борту")
+	_crew_empty = _label(members, "На борту пока только пилот.", 17, MUTED)
+	_crew_empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	for index in range(Crew.CAPACITY):
+		var candidate := _crew_card(candidates)
+		candidate.hire = _button(candidate.actions)
+		candidate.hire.pressed.connect(_request_crew.bind("hire", index))
+		_crew_buttons.append(candidate.hire)
+		_crew_candidate_rows.append(candidate)
+
+		var member := _crew_card(members)
+		member.pay = _button(member.actions)
+		member.pay.pressed.connect(_request_crew.bind("pay", index))
+		member.dismiss = _button(member.actions)
+		member.dismiss.text = "Уволить"
+		member.dismiss.pressed.connect(_request_crew.bind("dismiss", index))
+		_crew_buttons.append_array([member.pay, member.dismiss])
+		_crew_member_rows.append(member)
+	_crew.hide()
+
+
+func _crew_column(parent: HBoxContainer, title: String) -> VBoxContainer:
+	var column := VBoxContainer.new()
+	column.custom_minimum_size.x = 338.0
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	column.add_theme_constant_override("separation", 8)
+	parent.add_child(column)
+	_label(column, title, 20, TEXT)
+	return column
+
+
+func _crew_card(parent: VBoxContainer) -> Dictionary:
+	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", _style(Color("112631"), Color("263f4b"), 9, 10))
+	parent.add_child(panel)
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 5)
+	panel.add_child(content)
+	var title := _label(content, "", 20, TEXT)
+	var role := _label(content, "", 16, MINT)
+	role.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var detail := _label(content, "", 15, MUTED)
+	detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var actions := HBoxContainer.new()
+	actions.add_theme_constant_override("separation", 8)
+	content.add_child(actions)
+	return {"panel": panel, "title": title, "role": role, "detail": detail, "actions": actions, "id": -1}
+
+
+func _refresh_crew() -> void:
+	var status: Dictionary = _sim.crew_status()
+	var candidates: Array = _sim.crew_candidates()
+	var members: Array = status.members
+	_crew_summary.text = "Места %d / %d" % [status.count, status.capacity]
+	var arrears := int(status.arrears)
+	if arrears > 0:
+		_crew_payroll.text = "Задолженность %d кр." % arrears
+	elif not members.is_empty():
+		_crew_payroll.text = "Следующая выплата через %s" % _crew_eta(float(status.next_due))
+	_crew_payroll.visible = not members.is_empty()
+	_crew_payroll.add_theme_color_override("font_color", AMBER if arrears > 0 else MUTED)
+	_crew_empty.visible = members.is_empty()
+	var aboard: Array[int] = []
+	for member: Dictionary in members:
+		aboard.append(int(member.id))
+	for index in range(_crew_candidate_rows.size()):
+		var row := _crew_candidate_rows[index]
+		row.panel.visible = index < candidates.size()
+		row.id = -1
+		if not row.panel.visible:
+			continue
+		var candidate: Dictionary = candidates[index]
+		row.id = int(candidate.id)
+		row.title.text = str(candidate.name)
+		row.role.text = _crew_role(str(candidate.role))
+		row.detail.text = "Жалованье %d кр. каждые 4:00" % int(candidate.wage)
+		row.hire.disabled = not bool(candidate.available)
+		if row.id in aboard:
+			row.hire.text = "Уже на борту"
+		elif members.size() >= int(status.capacity):
+			row.hire.text = "Нет места"
+		elif int(candidate.fee) > int(_sim.credits):
+			row.hire.text = "Нужно %d кр." % int(candidate.fee)
+		else:
+			row.hire.text = "Нанять · %d кр." % int(candidate.fee)
+	for index in range(_crew_member_rows.size()):
+		var row := _crew_member_rows[index]
+		row.panel.visible = index < members.size()
+		row.id = -1
+		if not row.panel.visible:
+			continue
+		var member: Dictionary = members[index]
+		var debt := int(member.get("arrears", member.get("debt", 0)))
+		row.id = int(member.id)
+		row.title.text = str(member.name)
+		row.role.text = _crew_role(str(member.role))
+		row.role.add_theme_color_override("font_color", AMBER if debt > 0 else MINT)
+		row.detail.text = "Жалованье %d кр. через %s" % [int(member.wage), _crew_eta(float(member.next_due))]
+		if debt > 0:
+			row.detail.text += "\nДолг %d кр. · Не на вахте" % debt
+		row.pay.visible = debt > 0
+		var payment := mini(debt, int(_sim.credits))
+		row.pay.disabled = not bool(member.get("can_pay", payment > 0))
+		row.pay.text = "Внести %d кр." % payment if payment > 0 else "Погасить долг"
+		row.dismiss.disabled = not bool(member.get("can_dismiss", debt == 0))
+		row.dismiss.tooltip_text = "Сначала погасите долг" if debt > 0 else ""
+
+
+func _request_crew(action: String, index: int) -> void:
+	if not is_open() or not _crew_open:
+		return
+	var row := _crew_candidate_rows[index] if action == "hire" else _crew_member_rows[index]
+	var button: Button = row[action]
+	if row.id >= 0 and button.is_visible_in_tree() and not button.disabled:
+		_touches.clear()
+		crew_requested.emit(action, int(row.id))
+
+
+func _crew_eta(due: float) -> String:
+	var seconds := ceili(maxf(0.0, due - float(_sim.orbit_time)))
+	return "%d:%02d" % [floori(seconds / 60.0), seconds % 60]
+
+
+static func _crew_role(role: String) -> String:
+	if role == "engineer":
+		return "Механик · ремонт дешевле на 1 кр. за 1% корпуса"
+	return "Штурман · зарядка прыжка за 2,2 с"
 
 
 func _refresh_transfers() -> void:
@@ -228,7 +406,7 @@ func is_open() -> bool:
 
 
 func _request_service(action: String) -> void:
-	if is_open() and not _fuel_only and _sim.service_offer(action).allowed:
+	if is_open() and not _fuel_only and not _crew_open and _sim.service_offer(action).allowed:
 		# A purchase can change the price shown for another service.
 		_touches.clear()
 		service_requested.emit(action)
@@ -357,7 +535,13 @@ func _input(event: InputEvent) -> void:
 func _button_at(point: Vector2) -> Button:
 	if _close_button.get_global_rect().has_point(point):
 		return _close_button
-	var buttons := _transfer_buttons.values() + [_discard_choice, _discard_button] if _fuel_only else _action_buttons.values()
+	if _crew_toggle.is_visible_in_tree() and _crew_toggle.get_global_rect().has_point(point):
+		return _crew_toggle
+	var buttons: Array = _action_buttons.values()
+	if _fuel_only:
+		buttons = _transfer_buttons.values() + [_discard_choice, _discard_button]
+	elif _crew_open:
+		buttons = _crew_buttons
 	for button: Button in buttons:
 		if not button.disabled and button.is_visible_in_tree() and button.get_global_rect().has_point(point):
 			return button
