@@ -2,17 +2,21 @@ extends CanvasLayer
 
 signal destination_selected(site_id: int)
 signal orbit_requested(focus_id: int)
+signal rendezvous_requested(site_id: int, gap: int)
+signal rendezvous_finish_requested()
 signal dismissed()
 
 const Sector := preload("res://scripts/sector_catalog.gd")
 const Expedition := preload("res://scripts/expedition.gd")
 const Orbit := preload("res://scripts/orbit_ephemeris.gd")
 const Patrol := preload("res://scripts/patrol_encounter.gd")
+const Rendezvous := preload("res://scripts/rendezvous_navigation.gd")
 const TEXT := Color("e8f4fa")
 const MUTED := Color("a5bac7")
 const MINT := Color("9debd7")
 const INTERCEPT := Color("ffb18e")
 const TRAJECTORY := Color("dec1ff")
+const RENDEZVOUS := Color("9bd9ff")
 const BORDER := Color("365561")
 const ORBIT_METRICS := [
 	["radius", "Текущий радиус"],
@@ -23,6 +27,12 @@ const ORBIT_METRICS := [
 	["apoapsis", "Апоцентр"],
 	["eccentricity", "Эксцентриситет"],
 	["period", "Период"],
+]
+const RENDEZVOUS_METRICS := [
+	["eta", "Оценка времени встречи"],
+	["distance", "До текущей точки (3D)"],
+	["relative_speed", "Относительная скорость"],
+	["shift", "Смещение точки"],
 ]
 
 var _sheet: Control
@@ -37,8 +47,17 @@ var _detail_title: Label
 var _detail: Label
 var _view_button: Button
 var _trajectory_button: Button
+var _rendezvous_button: Button
 var _navigation_panel: VBoxContainer
 var _trajectory_panel: VBoxContainer
+var _rendezvous_panel: VBoxContainer
+var _rendezvous_gap_buttons: Dictionary[int, Button] = {}
+var _rendezvous_target: Label
+var _rendezvous_stage: Label
+var _rendezvous_values: Dictionary[String, Label] = {}
+var _rendezvous_hint: Label
+var _rendezvous_finish: Button
+var _rendezvous_action: Button
 var _focus_buttons: Dictionary[int, Button] = {}
 var _orbit_state: Label
 var _orbit_reference: Label
@@ -57,6 +76,8 @@ var _candidate := -1
 var _star_focus := -1
 var _orbit_focus := -1
 var _forecast_cache: Dictionary[int, Dictionary] = {}
+var _rendezvous_status: Dictionary = {}
+var _rendezvous_gap := 150
 
 
 func build() -> void:
@@ -93,6 +114,11 @@ func build() -> void:
 	_trajectory_button.toggle_mode = true
 	_trajectory_button.add_theme_stylebox_override("pressed", _panel_style(Color("35294b"), TRAJECTORY, 8, 9))
 	_trajectory_button.pressed.connect(_toggle_trajectory)
+	_rendezvous_button = _button(header, "Сближение", 44)
+	_rendezvous_button.custom_minimum_size.x = 138
+	_rendezvous_button.toggle_mode = true
+	_rendezvous_button.add_theme_stylebox_override("pressed", _panel_style(Color("193952"), RENDEZVOUS, 8, 9))
+	_rendezvous_button.pressed.connect(_toggle_rendezvous)
 	_close_button = _button(header, "Закрыть", 44)
 	_close_button.custom_minimum_size.x = 122
 	_close_button.pressed.connect(func() -> void: dismissed.emit())
@@ -144,6 +170,7 @@ func build() -> void:
 	_select_button.add_theme_stylebox_override("hover", _panel_style(Color("206760"), MINT, 8, 9))
 	_select_button.pressed.connect(_apply)
 	_build_trajectory_panel(panel)
+	_build_rendezvous_panel(panel)
 	get_viewport().size_changed.connect(_size_changed)
 	_size_changed()
 	hide()
@@ -168,17 +195,7 @@ func _build_trajectory_panel(parent: PanelContainer) -> void:
 	_orbit_reference = _label(_trajectory_panel, "", 16, MUTED)
 	_orbit_reference.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_trajectory_panel.add_child(HSeparator.new())
-	var values := GridContainer.new()
-	values.columns = 2
-	values.add_theme_constant_override("h_separation", 10)
-	values.add_theme_constant_override("v_separation", 4)
-	_trajectory_panel.add_child(values)
-	for metric: Array in ORBIT_METRICS:
-		var caption := _label(values, metric[1], 16, MUTED)
-		caption.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		var value := _label(values, "", 16, TEXT)
-		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		_orbit_values[metric[0]] = value
+	_orbit_values = _build_metrics(_trajectory_panel, ORBIT_METRICS)
 	_trajectory_panel.add_child(HSeparator.new())
 	_forecast_summary = _label(_trajectory_panel, "", 16, TRAJECTORY)
 	_forecast_summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -197,6 +214,60 @@ func _build_trajectory_panel(parent: PanelContainer) -> void:
 	_trajectory_panel.hide()
 
 
+func _build_rendezvous_panel(parent: PanelContainer) -> void:
+	_rendezvous_panel = VBoxContainer.new()
+	_rendezvous_panel.add_theme_constant_override("separation", 8)
+	parent.add_child(_rendezvous_panel)
+	_label(_rendezvous_panel, "План сближения", 21, RENDEZVOUS)
+	_rendezvous_target = _label(_rendezvous_panel, "", 21, TEXT)
+	_rendezvous_target.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_rendezvous_stage = _label(_rendezvous_panel, "", 16, MUTED)
+	_rendezvous_panel.add_child(HSeparator.new())
+	_label(_rendezvous_panel, "Отступ от расчётного контура", 16, MUTED)
+	var choices := HBoxContainer.new()
+	choices.add_theme_constant_override("separation", 5)
+	_rendezvous_panel.add_child(choices)
+	for gap: int in Rendezvous.GAPS:
+		var button := _button(choices, "%d м" % gap, 43)
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.toggle_mode = true
+		button.add_theme_stylebox_override("pressed", _panel_style(Color("193952"), RENDEZVOUS, 8, 8))
+		button.pressed.connect(_select_rendezvous_gap.bind(gap))
+		_rendezvous_gap_buttons[gap] = button
+	_rendezvous_panel.add_child(HSeparator.new())
+	_rendezvous_values = _build_metrics(_rendezvous_panel, RENDEZVOUS_METRICS)
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_rendezvous_panel.add_child(spacer)
+	_rendezvous_hint = _label(_rendezvous_panel, "", 16, MUTED)
+	_rendezvous_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_rendezvous_finish = _button(_rendezvous_panel, "Передать на стыковку", 48)
+	_rendezvous_finish.add_theme_stylebox_override("normal", _panel_style(Color("174455"), MINT, 8, 9))
+	_rendezvous_finish.pressed.connect(_request_rendezvous_finish)
+	_rendezvous_action = _button(_rendezvous_panel, "Начать сближение", 52)
+	_rendezvous_action.add_theme_stylebox_override("normal", _panel_style(Color("193952"), RENDEZVOUS, 8, 9))
+	_rendezvous_action.add_theme_stylebox_override("hover", _panel_style(Color("264f6e"), RENDEZVOUS, 8, 9))
+	_rendezvous_action.pressed.connect(_request_rendezvous)
+	_rendezvous_panel.hide()
+
+
+static func _build_metrics(parent: Container, metrics: Array) -> Dictionary[String, Label]:
+	var result: Dictionary[String, Label] = {}
+	var values := GridContainer.new()
+	values.columns = 2
+	values.add_theme_constant_override("h_separation", 10)
+	values.add_theme_constant_override("v_separation", 4)
+	parent.add_child(values)
+	for metric: Array in metrics:
+		var caption := _label(values, metric[1], 16, MUTED)
+		caption.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var value := _label(values, "", 16, TEXT)
+		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		result[metric[0]] = value
+	return result
+
+
 func _add_focus_button(parent: Container, id: int, caption: String) -> void:
 	var button := _button(parent, caption, 43)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -212,6 +283,9 @@ func open(sim: RefCounted) -> void:
 		build()
 	_flight = sim
 	_forecast_cache.clear()
+	_rendezvous_status.clear()
+	_rendezvous_gap = 150
+	_chart.rendezvous = {}
 	_chart.forecast = PackedVector3Array()
 	_chart.system_forecast = PackedVector3Array()
 	_chart.forecast_impact = -1
@@ -295,6 +369,8 @@ func _add_site(parent: VBoxContainer, id: int) -> void:
 func _select_site(id: int) -> void:
 	if _flight == null or not _chart.centers.has(id):
 		return
+	if _rendezvous_panel.visible and _rendezvous_status.get("active", false):
+		return
 	_candidate = id
 	_chart.selected_site = id
 	_chart.orbit = Orbit.orbit_points(id)
@@ -327,6 +403,8 @@ func _select_site(id: int) -> void:
 		if entry.kind == "planet":
 			_detail.text += "\nТвёрдая поверхность"
 	_select_button.disabled = here
+	if _rendezvous_panel.visible:
+		_refresh_rendezvous()
 
 
 func _apply() -> void:
@@ -342,15 +420,73 @@ func _toggle_projection() -> void:
 
 
 func _toggle_trajectory() -> void:
+	_set_panel("navigation" if _trajectory_panel.visible else "trajectory")
+
+
+func _toggle_rendezvous() -> void:
+	_set_panel("navigation" if _rendezvous_panel.visible else "rendezvous")
+
+
+func _set_panel(panel: String) -> void:
 	_touch_sites.clear()
-	var enabled := not _chart.forecast_visible
-	_chart.forecast_visible = enabled
-	_trajectory_button.set_pressed_no_signal(enabled)
-	_navigation_panel.visible = not enabled
-	_trajectory_panel.visible = enabled
-	if enabled:
+	_navigation_panel.visible = panel == "navigation"
+	_trajectory_panel.visible = panel == "trajectory"
+	_rendezvous_panel.visible = panel == "rendezvous"
+	_chart.forecast_visible = _trajectory_panel.visible
+	_chart.rendezvous_visible = _rendezvous_panel.visible
+	_trajectory_button.set_pressed_no_signal(_trajectory_panel.visible)
+	_rendezvous_button.set_pressed_no_signal(_rendezvous_panel.visible)
+	if _trajectory_panel.visible:
 		_refresh_trajectory()
+	elif _rendezvous_panel.visible:
+		_refresh_rendezvous()
 	_chart.queue_redraw()
+
+
+func _refresh_rendezvous() -> void:
+	_rendezvous_status = _flight.rendezvous_status(_candidate, _rendezvous_gap)
+	var status := _rendezvous_status
+	var site: int = status.site
+	var active: bool = status.active
+	var supported := _chart.centers.has(site) and Rendezvous.supports(site)
+	var has_point: bool = supported and status.has_point
+	_chart.rendezvous = status if has_point else {}
+	_rendezvous_target.text = str(Sector.site(site).name) if _chart.centers.has(site) else "Цель не выбрана"
+	_rendezvous_stage.text = "Удержание позиции" if status.phase == "hold" else "Автосближение" if active else "Предварительный расчёт"
+	var selected_gap: int = status.gap if active else _rendezvous_gap
+	for gap: int in _rendezvous_gap_buttons:
+		var button := _rendezvous_gap_buttons[gap]
+		button.disabled = active or not supported
+		button.set_pressed_no_signal(gap == selected_gap)
+	_rendezvous_values["eta"].text = _duration_label(float(status.eta)) if has_point else "—"
+	_rendezvous_values["distance"].text = _distance_label(float(status.distance)).replace(".", ",") if has_point else "—"
+	_rendezvous_values["relative_speed"].text = _number_label(float(status.relative_speed), "м/с") if supported else "—"
+	var shift: float = status.point.distance_to(status.predicted) if has_point else 0.0
+	_rendezvous_values["shift"].text = _distance_label(shift).replace(".", ",") if has_point and status.eta >= 0.0 else "—"
+	_rendezvous_hint.text = str(status.reason)
+	_rendezvous_action.text = "Отменить сближение" if active else "Начать сближение"
+	_rendezvous_action.disabled = not active and (not supported or not status.allowed)
+	_rendezvous_finish.visible = active and status.can_finish
+	_rendezvous_finish.text = "Передать на стыковку" if Sector.is_port(site) else "Передать на посадку"
+	_chart.queue_redraw()
+
+
+func _select_rendezvous_gap(gap: int) -> void:
+	if not is_open() or not _rendezvous_panel.visible or not _rendezvous_gap_buttons.has(gap):
+		return
+	if not _rendezvous_gap_buttons[gap].disabled:
+		_rendezvous_gap = gap
+		_refresh_rendezvous()
+
+
+func _request_rendezvous() -> void:
+	if is_open() and _rendezvous_panel.visible and not _rendezvous_action.disabled:
+		rendezvous_requested.emit(int(_rendezvous_status.site), int(_rendezvous_status.gap))
+
+
+func _request_rendezvous_finish() -> void:
+	if is_open() and _rendezvous_finish.is_visible_in_tree() and _rendezvous_status.get("can_finish", false):
+		rendezvous_finish_requested.emit()
 
 
 func _refresh_trajectory() -> void:
@@ -474,10 +610,13 @@ func _notification(what: int) -> void:
 
 
 func _button_at(point: Vector2) -> Button:
-	for button: Button in [_select_button, _orbit_button, _view_button, _trajectory_button, _close_button]:
+	for button: Button in [_select_button, _orbit_button, _rendezvous_action, _rendezvous_finish, _view_button, _trajectory_button, _rendezvous_button, _close_button]:
 		if button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(point):
 			return button
 	for button: Button in _focus_buttons.values():
+		if button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(point):
+			return button
+	for button: Button in _rendezvous_gap_buttons.values():
 		if button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(point):
 			return button
 	for button: Button in _site_buttons.values():
@@ -600,6 +739,8 @@ class SectorChart extends Control:
 	var system_forecast := PackedVector3Array()
 	var forecast_visible := false
 	var forecast_impact := -1
+	var rendezvous_visible := false
+	var rendezvous: Dictionary = {}
 	var traffic: Array[Dictionary] = []
 	var order_convoy := ""
 	var order_color := MINT
@@ -625,6 +766,10 @@ class SectorChart extends Control:
 			positions.append(ship_position)
 			for orbit_point: Vector3 in orbit:
 				positions.append(orbit_point)
+		if rendezvous_visible and not rendezvous.is_empty():
+			positions.append(rendezvous.point)
+			if rendezvous.eta >= 0.0:
+				positions.append(rendezvous.predicted)
 		for contact: Dictionary in traffic:
 			if side or contact.role in ["signal", "worksite"]:
 				positions.append(contact.position)
@@ -690,9 +835,12 @@ class SectorChart extends Control:
 		var ship := _project(ship_position, plot, bounds).clamp(Vector2(18, 35), size - Vector2(18, 28))
 		if side_view:
 			draw_line(ship, Vector2(ship.x, plane_y), Color(STAR_PLANE_COLOR, 0.72), 1.0, true)
-		if centers.has(active_site):
+		var has_rendezvous := rendezvous_visible and not rendezvous.is_empty()
+		if has_rendezvous:
+			_draw_rendezvous(plot, bounds, ship)
+		if not has_rendezvous and centers.has(active_site):
 			_draw_course(ship, _project(centers[active_site], plot, bounds), Color("4d928c"), 1.5)
-		if centers.has(selected_site) and selected_site != active_site:
+		if not has_rendezvous and centers.has(selected_site) and selected_site != active_site:
 			_draw_course(ship, _project(centers[selected_site], plot, bounds), Color("d9a569"), 1.8)
 		var view_caption := "ВИД СБОКУ · XY" if side_view else "ВИД СВЕРХУ · XZ"
 		var ship_caption := "▲  Корабль"
@@ -707,10 +855,14 @@ class SectorChart extends Control:
 		if forecast_visible and forecast.size() >= 2:
 			var relative := not system_forecast.is_empty()
 			var caption := "Относительно тела" if relative else "Прогноз без тяги"
-			var legend := _draw_forecast_legend(font, 165.0, caption, TRAJECTORY)
+			var legend := _draw_line_legend(font, 165.0, caption, TRAJECTORY)
 			label_boxes.append(legend)
 			if relative:
-				label_boxes.append(_draw_forecast_legend(font, legend.end.x + 6.0, "В системе", SYSTEM_FORECAST_COLOR))
+				label_boxes.append(_draw_line_legend(font, legend.end.x + 6.0, "В системе", SYSTEM_FORECAST_COLOR))
+		elif has_rendezvous:
+			label_boxes.append(_draw_rendezvous_legend(font, 165.0, "Точка сейчас", SYSTEM_FORECAST_COLOR, false))
+			if rendezvous.eta >= 0.0:
+				label_boxes.append(_draw_rendezvous_legend(font, label_boxes[-1].end.x + 6.0, "Точка встречи", RENDEZVOUS, true))
 		if side_view:
 			var plane_label_y := plane_y - 30.0 if plane_y >= 66.0 else plane_y + 6.0
 			var plane_legend := Rect2(11.0, plane_label_y, 145.0, 24.0)
@@ -733,6 +885,8 @@ class SectorChart extends Control:
 			var entry = Sector.site(id)
 			var marker := _project(centers[id], plot, bounds)
 			var tint: Color = entry.accent
+			if has_rendezvous and rendezvous.site == id:
+				draw_arc(marker, 28.0, 0.0, TAU, 36, RENDEZVOUS, 1.7, true)
 			if forecast_visible and orbit_focus == id:
 				for quarter in range(4):
 					var start_angle := quarter * TAU / 4.0 + 0.14
@@ -768,13 +922,44 @@ class SectorChart extends Control:
 					break
 		_draw_ship(ship)
 
-	func _draw_forecast_legend(font: Font, x: float, caption: String, color: Color) -> Rect2:
+	func _draw_line_legend(font: Font, x: float, caption: String, color: Color) -> Rect2:
 		var width := font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x + 40.0
 		var legend := Rect2(x, 10.0, width, 24.0)
 		draw_rect(legend, CHART_BACKGROUND)
 		draw_line(legend.position + Vector2(7, 12), legend.position + Vector2(25, 12), color, 2.0, true)
 		draw_string(font, legend.position + Vector2(32, 17), caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, color)
 		return legend
+
+	func _draw_rendezvous(plot: Rect2, bounds: Rect2, ship: Vector2) -> void:
+		var current := _project(rendezvous.point, plot, bounds)
+		if rendezvous.eta < 0.0:
+			_draw_rendezvous_point(current, SYSTEM_FORECAST_COLOR, false)
+			return
+		var predicted := _project(rendezvous.predicted, plot, bounds)
+		if current.distance_squared_to(predicted) > 16.0:
+			draw_dashed_line(current, predicted, SYSTEM_FORECAST_COLOR, 1.4, 5.0, true, true)
+			_draw_rendezvous_point(current, SYSTEM_FORECAST_COLOR, false)
+		_draw_course(ship, predicted, RENDEZVOUS, 1.9)
+		_draw_rendezvous_point(predicted, RENDEZVOUS, true)
+
+	func _draw_rendezvous_legend(font: Font, x: float, caption: String, color: Color, filled: bool) -> Rect2:
+		var width := font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x + 32.0
+		var legend := Rect2(x, 10.0, width, 24.0)
+		draw_rect(legend, CHART_BACKGROUND)
+		_draw_rendezvous_point(legend.position + Vector2(12.0, 12.0), color, filled)
+		draw_string(font, legend.position + Vector2(24.0, 17.0), caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, color)
+		return legend
+
+	func _draw_rendezvous_point(point: Vector2, color: Color, filled: bool) -> void:
+		var mark := PackedVector2Array([
+			point + Vector2.UP * 6.0, point + Vector2.RIGHT * 6.0,
+			point + Vector2.DOWN * 6.0, point + Vector2.LEFT * 6.0,
+		])
+		if filled:
+			draw_colored_polygon(mark, color)
+		else:
+			mark.append(mark[0])
+			draw_polyline(mark, color, 1.5, true)
 
 	func _draw_forecast(points: PackedVector3Array, plot: Rect2, bounds: Rect2, color: Color, mark_impact: bool) -> void:
 		var track := PackedVector2Array()

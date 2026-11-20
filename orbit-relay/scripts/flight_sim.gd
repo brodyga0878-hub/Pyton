@@ -7,6 +7,7 @@ const Catalog = preload("res://scripts/sector_catalog.gd")
 const Orbit = preload("res://scripts/orbit_ephemeris.gd")
 const Dynamics = preload("res://scripts/orbital_dynamics.gd")
 const Navigation = preload("res://scripts/orbital_navigation.gd")
+const Rendezvous = preload("res://scripts/rendezvous_navigation.gd")
 const Terrain = preload("res://scripts/surface_terrain.gd")
 const Economy = preload("res://scripts/port_economy.gd")
 const Traffic = preload("res://scripts/sector_traffic.gd")
@@ -62,6 +63,8 @@ const ORBIT_BURN_ACCELERATION := 12.0
 const ORBIT_SPEED_TOLERANCE := 0.12
 const ORBIT_TIMEOUT := 11.0
 const ORBIT_ALIGNMENT := cos(deg_to_rad(3.0))
+const RENDEZVOUS_HOLD_DISTANCE := 4.0
+const RENDEZVOUS_HOLD_SPEED := 1.0
 
 var position := Vector3(0, 0, -152)
 var velocity := Vector3.ZERO
@@ -73,6 +76,7 @@ var boost := false
 var flight_assist := true
 var orbit_maneuver := false
 var orbit_maneuver_focus := -1
+var rendezvous_active := false
 var docked := 0
 var landed_site := -1
 var landing_direction := Vector3.ZERO
@@ -122,6 +126,10 @@ var _orientation_angles := Vector3.ZERO
 var _orbit_normal := Vector3.ZERO
 var _orbit_seconds := 0.0
 var _orbit_phase := ""
+var _rendezvous_site := -1
+var _rendezvous_gap := 150
+var _rendezvous_offset := Vector3.ZERO
+var _rendezvous_holding := false
 
 
 func speed() -> float:
@@ -155,6 +163,8 @@ func time_status() -> Dictionary:
 		return {"allowed": false, "reason": "Зарядка прыжкового привода"}
 	if orbit_maneuver:
 		return {"allowed": false, "reason": "Орбитальный манёвр"}
+	if rendezvous_active:
+		return {"allowed": false, "reason": "Сближение с объектом" if not _rendezvous_holding else "Удержание позиции"}
 	if scooping:
 		return {"allowed": false, "reason": "Сбор топлива"}
 	if patrol.in_danger(self):
@@ -371,6 +381,102 @@ func orbit_forecast(focus_id := -1) -> Dictionary:
 	return Navigation.forecast(self, 180.0, _orbit_focus(focus_id))
 
 
+func rendezvous_status(site_id := -1, gap := 150) -> Dictionary:
+	var site := _rendezvous_site if rendezvous_active else (target if site_id == -1 else site_id)
+	var separation := _rendezvous_gap if rendezvous_active else gap
+	var reason := _rendezvous_block_reason(site, separation)
+	var clear_to_proceed := reason.is_empty()
+	var has_point := Rendezvous.supports(site) and site in local_targets() and separation in Rendezvous.GAPS
+	var point := Vector3.ZERO
+	var predicted := Vector3.ZERO
+	var eta := -1.0
+	var distance := -1.0
+	var relative := -1.0
+	if has_point:
+		var offset := _rendezvous_offset if rendezvous_active else Rendezvous.choose_offset(self, site, separation)
+		var plan := Rendezvous.plan(self, site, offset)
+		point = plan.point
+		predicted = plan.predicted
+		eta = 0.0 if _rendezvous_holding else float(plan.eta)
+		distance = position.distance_to(point)
+		relative = speed_relative_to(site)
+	var phase := "idle"
+	if rendezvous_active:
+		phase = "hold" if _rendezvous_holding else "approach"
+	var settled := _rendezvous_holding and distance <= RENDEZVOUS_HOLD_DISTANCE and relative <= RENDEZVOUS_HOLD_SPEED
+	if reason.is_empty():
+		match phase:
+			"idle": reason = "Можно начать сближение"
+			"approach": reason = "Идём к точке встречи и снижаем относительную скорость"
+			"hold": reason = "Скорость выровнена. Можно продолжить к цели" if settled else "Восстанавливаем позицию"
+	return {
+		"site": site, "name": target_name(site), "kind": str(Catalog.site(site).get("kind", "")),
+		"allowed": not rendezvous_active and has_point and clear_to_proceed,
+		"reason": reason, "active": rendezvous_active, "phase": phase,
+		"gap": separation, "has_point": has_point, "point": point, "predicted": predicted, "eta": eta,
+		"distance": distance, "relative_speed": relative,
+		"can_finish": rendezvous_active and settled and clear_to_proceed,
+	}
+
+
+func start_rendezvous(site: int, gap := 150) -> bool:
+	if rendezvous_active or not _rendezvous_block_reason(site, gap).is_empty():
+		return false
+	reset_time_scale()
+	set_autopilot(false)
+	select_target(site)
+	rendezvous_active = true
+	_rendezvous_site = site
+	_rendezvous_gap = gap
+	_rendezvous_offset = Rendezvous.choose_offset(self, site, gap)
+	_rendezvous_holding = false
+	scooping = false
+	throttle = 0.0
+	boost = false
+	_announce("rendezvous_start", "Сближение с объектом «%s». Дистанция ожидания %d м." % [target_name(site), gap])
+	return true
+
+
+func cancel_rendezvous() -> bool:
+	if not rendezvous_active:
+		return false
+	_clear_rendezvous()
+	_announce("rendezvous_cancel", "Сближение отменено. Ручное управление.")
+	return true
+
+
+func finish_rendezvous() -> bool:
+	var status := rendezvous_status()
+	if not status.can_finish or not select_target(status.site):
+		return false
+	set_autopilot(true)
+	var operation := "Стыковка" if Catalog.is_port(status.site) else "Посадка"
+	_announce("rendezvous_finish", "%s. Автопилот ведёт к объекту «%s»." % [operation, status.name])
+	return true
+
+
+func _clear_rendezvous() -> void:
+	if rendezvous_active:
+		rendezvous_active = false
+		_rendezvous_site = -1
+		_rendezvous_holding = false
+		throttle = 0.0
+
+
+func _rendezvous_block_reason(site: int, gap: int) -> String:
+	if not Rendezvous.supports(site) or site not in local_targets():
+		return "Выберите действующий порт или твёрдое тело этой системы"
+	if gap not in Rendezvous.GAPS:
+		return "Выберите дистанцию ожидания"
+	if docked >= 0 or landed or jump_seconds_left > 0.0:
+		return "Выйдите в открытый космос"
+	if patrol.in_danger(self) or convoy_order.in_danger(self):
+		return "Отойдите от боевого контакта"
+	if ship.hull <= ShipSystems.MIN_HULL:
+		return "Восстановите корпус в порту"
+	return ""
+
+
 func start_orbit_maneuver(focus_id := -1) -> bool:
 	if orbit_maneuver:
 		return false
@@ -576,6 +682,7 @@ func select_target(index: int) -> bool:
 	else:
 		_stop_convoy_course()
 		_clear_orbit_maneuver()
+		_clear_rendezvous()
 		target = index
 		_approach_committed = false
 		if autopilot:
@@ -596,6 +703,7 @@ func set_autopilot(enabled: bool) -> void:
 	project_course = false
 	_stop_convoy_course()
 	_clear_orbit_maneuver()
+	_clear_rendezvous()
 	autopilot = enabled and docked < 0 and not landed and jump_seconds_left <= 0.0
 	_approach_committed = false
 	_departure_leg = 0
@@ -1089,6 +1197,7 @@ func scoop_action() -> bool:
 		_announce("scoop_denied", status.reason)
 		return false
 	reset_time_scale()
+	_clear_rendezvous()
 	scooping = true
 	_announce("scoop_start", "Идёт сбор топлива.")
 	return true
@@ -1156,6 +1265,7 @@ func start_jump() -> bool:
 	project_course = false
 	_stop_convoy_course()
 	_clear_orbit_maneuver()
+	_clear_rendezvous()
 	throttle = 0.0
 	boost = false
 	jump_seconds_left = JUMP_CHARGE
@@ -1338,7 +1448,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		_apply_convoy_result(convoy_order.step(self, delta))
 		return
 	if manual_input:
-		if autopilot or patrol_course or project_course or convoy_course or orbit_maneuver:
+		if autopilot or patrol_course or project_course or convoy_course or orbit_maneuver or rendezvous_active:
 			set_autopilot(false)
 			_announce("manual_override", "Ручное управление")
 
@@ -1348,6 +1458,8 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		_autopilot_step(delta)
 	elif orbit_maneuver:
 		_orbit_maneuver_step(delta)
+	elif rendezvous_active:
+		_rendezvous_step(delta)
 	elif convoy_course:
 		_convoy_course_step(delta)
 	elif project_course:
@@ -1387,6 +1499,40 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 	_collect_fuel(delta)
 	_apply_patrol_result(patrol.step(self, delta))
 	_apply_convoy_result(convoy_order.step(self, delta))
+
+
+func _rendezvous_step(delta: float) -> void:
+	var site := _rendezvous_site
+	var reason := _rendezvous_block_reason(site, _rendezvous_gap)
+	if not reason.is_empty():
+		_clear_rendezvous()
+		_announce("rendezvous_abort", "Сближение прервано. %s." % reason)
+		return
+	boost = false
+	var plan := Rendezvous.plan(self, site, _rendezvous_offset)
+	var aim_point: Vector3 = plan.point
+	var drift: Vector3 = plan.velocity
+	var waypoint := Rendezvous.route_waypoint(self, plan)
+	var detouring := not (waypoint.is_equal_approx(aim_point) or waypoint.is_equal_approx(plan.predicted))
+	var offset := waypoint - position
+	var aim := target_position(site) - position if _rendezvous_holding else offset
+	if aim.length_squared() > 0.001:
+		_turn_nose_toward(aim.normalized(), delta)
+	var cruise := Rendezvous.CRUISE_SPEED if ship.fuel > 0.0 else RESERVE_SPEED
+	if detouring:
+		cruise = minf(cruise, 58.0)
+	var distance := offset.length()
+	var requested := minf(cruise, minf(sqrt(30.0 * distance), 0.8 * distance))
+	var desired := offset.normalized() * requested
+	if not detouring:
+		desired += drift
+	if ship.fuel <= 0.0:
+		desired = desired.limit_length(RESERVE_SPEED)
+	velocity = velocity.move_toward(desired, 40.0 * delta)
+	throttle = requested / MAX_SPEED if distance >= 0.25 else 0.0
+	if not _rendezvous_holding and not detouring and position.distance_to(aim_point) <= RENDEZVOUS_HOLD_DISTANCE and velocity.distance_to(drift) <= RENDEZVOUS_HOLD_SPEED:
+		_rendezvous_holding = true
+		_announce("rendezvous_hold", "Скорость выровнена. Удерживаем дистанцию %d м от объекта «%s»." % [_rendezvous_gap, target_name(site)])
 
 
 func _orbit_maneuver_step(delta: float) -> void:
@@ -1751,7 +1897,7 @@ func snapshot() -> Dictionary:
 		"yaw": yaw, "pitch": pitch, "roll": roll, "elapsed": elapsed,
 		"orientation": [facing.x, facing.y, facing.z, facing.w], "flight_assist": flight_assist,
 		"orbit_time": orbit_time,
-		"throttle": 0.0 if orbit_maneuver else throttle, "docked": docked, "target": target,
+		"throttle": 0.0 if orbit_maneuver or rendezvous_active else throttle, "docked": docked, "target": target,
 		"credits": credits, "deliveries": deliveries,
 		"contract_stage": contract_stage, "contract_origin": contract_origin,
 		"contract_destination": contract_destination,

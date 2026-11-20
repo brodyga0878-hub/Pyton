@@ -50,6 +50,8 @@ func _ready() -> void:
 	_map.build()
 	_map.destination_selected.connect(_select_destination)
 	_map.orbit_requested.connect(_map_orbit_action)
+	_map.rendezvous_requested.connect(_map_rendezvous_action)
+	_map.rendezvous_finish_requested.connect(_map_rendezvous_finish)
 	_map.dismissed.connect(_close_map)
 	add_child(_galaxy)
 	_galaxy.build()
@@ -119,11 +121,15 @@ func _update_display(delta: float) -> void:
 	var convoy_marker: bool = flight.convoy_course and convoy.has_point
 	if convoy_marker:
 		marker = convoy.point
+	var rendezvous_marker := flight.rendezvous_active
+	if rendezvous_marker:
+		var rendezvous := flight.rendezvous_status()
+		marker = flight.target_position(rendezvous.site) if rendezvous.phase == "hold" else rendezvous.point
 	var instruments_visible := flight.docked < 0 and not flight.landed and not _overlay_open() and flight.jump_seconds_left <= 0.0
 	var in_view := instruments_visible and not _view.camera.is_position_behind(marker)
 	if patrol_status.phase == Flight.Patrol.ENGAGED and patrol_status.same_system:
 		in_view = false
-	elif in_view and not flight.autopilot and not signal_selected and not project_marker and not convoy_marker:
+	elif in_view and not flight.autopilot and not signal_selected and not project_marker and not convoy_marker and not rendezvous_marker:
 		var surface := flight.surface_status()
 		in_view = not surface.near or surface.pad
 	_hud.set_target_marker(_view.camera.unproject_position(marker) if in_view else Vector2.ZERO, in_view)
@@ -153,6 +159,10 @@ func _handle_action(action: String) -> void:
 			flight.set_flight_assist(not flight.flight_assist)
 		"orbit_cancel":
 			flight.cancel_orbit_maneuver()
+		"rendezvous_cancel":
+			flight.cancel_rendezvous()
+		"rendezvous_finish":
+			flight.finish_rendezvous()
 		"throttle_up":
 			flight.change_throttle(throttle_step)
 		"throttle_down":
@@ -231,6 +241,7 @@ func _deliver_notice() -> void:
 		"fuel": flight.ship.fuel, "scooping": flight.scooping, "star_heat": flight.star_heat,
 		"flight_assist": flight.flight_assist,
 		"orbit_maneuver": flight.orbit_maneuver, "orbit_maneuver_focus": flight.orbit_maneuver_focus,
+		"rendezvous_active": flight.rendezvous_active,
 		"hull": flight.ship.hull, "contract_route": flight.contract_route_id, "contract_leg": flight.contract_leg,
 		"patrol_phase": flight.patrol.phase, "patrol_origin": flight.patrol.origin,
 		"convoy_id": convoy.id, "convoy_order_phase": convoy.phase, "convoy_order_kind": convoy.kind,
@@ -254,6 +265,7 @@ func _deliver_notice() -> void:
 		"convoy_order_fire", "convoy_order_enemy_hit",
 		"flight_assist",
 		"orbit_start", "orbit_complete", "orbit_abort", "orbit_cancel",
+		"rendezvous_start", "rendezvous_hold", "rendezvous_abort", "rendezvous_cancel", "rendezvous_finish",
 	]:
 		_save()
 
@@ -302,7 +314,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		if event.physical_keycode == KEY_ESCAPE:
 			_close_frontier()
 		return
-	if event.physical_keycode == KEY_ESCAPE and (flight.cancel_jump() or flight.cancel_orbit_maneuver()):
+	if event.physical_keycode == KEY_ESCAPE and (flight.cancel_jump() or flight.cancel_orbit_maneuver() or flight.cancel_rendezvous()):
 		_deliver_notice()
 		get_viewport().set_input_as_handled()
 		return
@@ -324,6 +336,7 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
 		flight.cancel_jump()
 		flight.cancel_orbit_maneuver()
+		flight.cancel_rendezvous()
 		flight.reset_time_scale()
 		_save()
 	elif what == NOTIFICATION_WM_GO_BACK_REQUEST:
@@ -343,7 +356,7 @@ func _notification(what: int) -> void:
 			_close_journal()
 		elif _frontier.is_open():
 			_close_frontier()
-		elif flight.cancel_jump() or flight.cancel_orbit_maneuver():
+		elif flight.cancel_jump() or flight.cancel_orbit_maneuver() or flight.cancel_rendezvous():
 			_deliver_notice()
 		else:
 			_save()
@@ -448,6 +461,23 @@ func _map_orbit_action(focus_id: int) -> void:
 		return
 	var handled := flight.cancel_orbit_maneuver() if flight.orbit_maneuver else flight.start_orbit_maneuver(focus_id)
 	if handled:
+		_close_map()
+		_deliver_notice()
+		_update_display(0.0)
+
+
+func _map_rendezvous_action(site_id: int, gap: int) -> void:
+	if not _map.is_open():
+		return
+	var handled := flight.cancel_rendezvous() if flight.rendezvous_active else flight.start_rendezvous(site_id, gap)
+	if handled:
+		_close_map()
+		_deliver_notice()
+		_update_display(0.0)
+
+
+func _map_rendezvous_finish() -> void:
+	if _map.is_open() and flight.finish_rendezvous():
 		_close_map()
 		_deliver_notice()
 		_update_display(0.0)

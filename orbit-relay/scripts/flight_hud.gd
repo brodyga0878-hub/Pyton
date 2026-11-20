@@ -69,6 +69,7 @@ var _scoop_blocked := false
 var _time_blocked := false
 var _patrol_blocked := false
 var _convoy_blocked := false
+var _rendezvous_finish_blocked := true
 var _fire_blocked := false
 var _jumping := false
 var _notice_left := 0.0
@@ -220,6 +221,13 @@ func build() -> void:
 	_actions["orbit_cancel"].tooltip_text = "Прекратить орбитальный манёвр и остаться в режиме инерции"
 	_actions["orbit_cancel"].add_theme_color_override("font_color", AMBER)
 	_actions["orbit_cancel"].hide()
+	_button(_port_tools, "rendezvous_cancel", "Отмена")
+	_actions["rendezvous_cancel"].tooltip_text = "Прервать сближение с выбранной целью"
+	_actions["rendezvous_cancel"].add_theme_color_override("font_color", AMBER)
+	_actions["rendezvous_cancel"].hide()
+	_button(_port_tools, "rendezvous_finish", "К швартовке")
+	_actions["rendezvous_finish"].add_theme_color_override("font_color", CYAN)
+	_actions["rendezvous_finish"].hide()
 	_button(_port_tools, "fire", "Огонь")
 	var fire_button: Button = _actions["fire"]
 	fire_button.size_flags_stretch_ratio = 1.35
@@ -283,11 +291,17 @@ func sync(sim: RefCounted, delta: float) -> void:
 		assist.add_theme_color_override("font_color", assist_color)
 	_throttle_controls.visible = not parked
 	_actions["target"].visible = not parked
-	_actions["autopilot"].visible = not parked
 	_actions["services"].visible = docked
 	_actions["market"].visible = docked
 	var orbit_active: bool = not parked and not _jumping and sim.orbit_maneuver
 	_actions["orbit_cancel"].visible = orbit_active
+	var rendezvous: Dictionary = {}
+	if not parked and not _jumping and sim.rendezvous_active:
+		rendezvous = sim.rendezvous_status()
+	var rendezvous_active := not rendezvous.is_empty()
+	_actions["autopilot"].visible = not parked and not rendezvous_active
+	_sync_rendezvous_actions(rendezvous)
+	var approach_active := orbit_active or rendezvous_active
 	var patrol_fight: bool = patrol.get("phase") == Patrol.ENGAGED and patrol.get("same_system", false)
 	var convoy: Dictionary = {}
 	if not parked and not _jumping and not patrol_fight:
@@ -295,14 +309,14 @@ func sync(sim: RefCounted, delta: float) -> void:
 		if mission.active and mission.local:
 			convoy = mission
 	var convoy_button: Button = _actions["convoy"]
-	convoy_button.visible = not orbit_active and not convoy.is_empty()
+	convoy_button.visible = not approach_active and not convoy.is_empty()
 	convoy_button.text = "Снять курс" if sim.convoy_course else "К конвою"
 	if convoy.get("phase") == "escorted":
 		convoy_button.text = "Сопровождён"
 	convoy_button.tooltip_text = str(convoy.get("reason", ""))
 	_convoy_blocked = not convoy.get("can_route", false)
 	var patrol_button: Button = _actions["patrol"]
-	patrol_button.visible = not landed and not _jumping and not orbit_active and not convoy_button.visible and bool(patrol.get("visible", false))
+	patrol_button.visible = not landed and not _jumping and not approach_active and not convoy_button.visible and bool(patrol.get("visible", false))
 	patrol_button.text = str(patrol.get("caption", "Дозор"))
 	patrol_button.tooltip_text = str(patrol.get("reason", ""))
 	_patrol_blocked = not bool(patrol.get("available", false))
@@ -311,7 +325,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var fire: Dictionary = sim.fire_status() if fire_button.visible else {}
 	fire_button.tooltip_text = str(fire.get("reason", ""))
 	_fire_blocked = not fire.get("ok", false)
-	var flight_tools := patrol_button.visible or convoy_button.visible or fire_button.visible or orbit_active
+	var flight_tools := patrol_button.visible or convoy_button.visible or fire_button.visible or approach_active
 	_port_tools.visible = docked or flight_tools
 	_right_panel.offset_top = -157.0 if docked else (-101.0 if landed else (-274.0 if flight_tools else -215.0))
 	_marks.flight = not parked
@@ -338,7 +352,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_:
 			_actions["mine"].text = "Развернуть модуль"
 	var star_target: bool = sim.target == Sector.star_for(sim.system_id)
-	_actions["dock"].visible = parked or not star_target
+	_actions["dock"].visible = parked or not (star_target or rendezvous_active)
 	_actions["dock"].text = "Швартовка" if Sector.is_port(sim.target) else "Посадка"
 	_actions["dock"].tooltip_text = ""
 	if parked:
@@ -369,7 +383,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 		if sim.contract_stage != 1 and patrol.get("phase") in [Patrol.OUTBOUND, Patrol.RETURN] and patrol_button.visible:
 			_guidance.text = str(patrol.get("reason", ""))
 	else:
-		_sync_flight(sim, scoop_status, itinerary, patrol, fire, convoy)
+		_sync_flight(sim, scoop_status, itinerary, patrol, fire, convoy, rendezvous)
 	_sync_thermal({} if parked else sim.thermal_status(), sim.scooping)
 	if _notice_left > 0.0:
 		_notice_left -= delta
@@ -493,7 +507,7 @@ func _sync_surface(sim: RefCounted, mining: RefCounted) -> void:
 			else:
 				_guidance.text = "Разверните добывающий модуль."
 
-func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictionary, patrol: Dictionary, fire: Dictionary, convoy: Dictionary) -> void:
+func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictionary, patrol: Dictionary, fire: Dictionary, convoy: Dictionary, rendezvous: Dictionary) -> void:
 	var project_course := bool(sim.get("project_course"))
 	var convoy_course: bool = sim.convoy_course
 	var aimed_at_port := Sector.is_port(sim.target) and fire.is_empty() and not bool(sim.patrol_course) and not project_course and not convoy_course and not bool(sim.orbit_maneuver)
@@ -534,6 +548,8 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 		_guidance.text = "Цель в прицеле. Нажмите «Огонь»." if fire.ok else str(fire.get("reason", ""))
 	elif sim.orbit_maneuver:
 		_sync_orbit_flight(sim.orbit_status(), sim.throttle)
+	elif not rendezvous.is_empty():
+		_sync_rendezvous_flight(rendezvous, sim.throttle)
 	elif not convoy.is_empty() and (convoy_course or not fire.is_empty()):
 		_sync_convoy_flight(convoy, fire)
 	elif patrol.get("phase") == Patrol.OUTBOUND and sim.patrol_course and patrol.get("same_system", false):
@@ -585,8 +601,7 @@ func _sync_orbit_flight(orbit: Dictionary, throttle: float) -> void:
 	_route_detail.text = ("Осталось Δv %.1f м/с · круговая %.1f м/с\nВысота %s · радиальная %+.1f м/с" % [
 		orbit.delta_v, orbit.circular_speed, altitude, orbit.radial_speed,
 	]).replace(".", ",")
-	var relative := ("%.1f" % orbit.relative_speed).replace(".", ",")
-	_telemetry.text = "Скорость %s м/с  ·  Тяга %d%%\nОтносительно «%s»" % [relative, throttle * 100.0, orbit.name]
+	_sync_relative_motion(orbit.name, orbit.relative_speed, throttle)
 	var phase := "Разворот на манёвр" if orbit.maneuver_phase == "turn" else "Корректируем скорость"
 	var hint := "Ручное управление прервёт манёвр."
 	var periapsis := float(orbit.periapsis)
@@ -598,6 +613,36 @@ func _sync_orbit_flight(orbit: Dictionary, throttle: float) -> void:
 		elif stellar and periapsis < Sector.SCOOP_INNER:
 			hint = "Без тяги траектория проходит через зону сильного нагрева."
 	_guidance.text = "%s. %s" % [phase, hint]
+
+func _sync_rendezvous_actions(status: Dictionary) -> void:
+	_actions["rendezvous_cancel"].visible = not status.is_empty()
+	var finish: Button = _actions["rendezvous_finish"]
+	finish.visible = status.get("phase") == "hold"
+	_rendezvous_finish_blocked = not status.get("can_finish", false)
+	if finish.visible:
+		finish.text = _rendezvous_finish_caption(status.kind)
+		finish.tooltip_text = str(status.reason) if _rendezvous_finish_blocked else "Передать управление автопилоту для финального захода"
+
+func _sync_rendezvous_flight(status: Dictionary, throttle: float) -> void:
+	var holding: bool = status.phase == "hold"
+	_route.text = "%s  /  %s" % ["Ожидание" if holding else "Сближение", status.name]
+	var distance := "—"
+	if status.has_point:
+		distance = ("%.1f м" % status.distance).replace(".", ",") if status.distance < 100.0 else "%d м" % roundi(status.distance)
+	_route_detail.text = "До точки %s · отступ %d м" % [distance, status.gap]
+	if not holding and status.eta > 0.0:
+		_route_detail.text += "\nПодход примерно через %d с" % ceili(status.eta)
+	_sync_relative_motion(status.name, status.relative_speed, throttle)
+	_guidance.text = str(status.reason)
+	if holding and status.can_finish:
+		_guidance.text = "Точка ожидания удерживается. Для захода нажмите «%s»." % _rendezvous_finish_caption(status.kind)
+
+func _sync_relative_motion(label: String, speed: float, throttle: float) -> void:
+	var relative := ("%.1f" % speed).replace(".", ",")
+	_telemetry.text = "Скорость %s м/с  ·  Тяга %d%%\nОтносительно «%s»" % [relative, throttle * 100.0, label]
+
+static func _rendezvous_finish_caption(kind: String) -> String:
+	return "К швартовке" if kind == "port" else "К посадке"
 
 func _sync_convoy_flight(convoy: Dictionary, fire: Dictionary) -> void:
 	var escort: bool = convoy.kind == "escort"
@@ -675,6 +720,7 @@ func _refresh_disabled_actions() -> void:
 		var button: Button = _actions[action]
 		var blocked := (action == "dock" and _lift_blocked) or (action == "mine" and _mining_blocked) or (action == "scoop" and _scoop_blocked) or (action == "time" and _time_blocked)
 		blocked = blocked or (action == "patrol" and _patrol_blocked) or (action == "convoy" and _convoy_blocked) or (action == "fire" and _fire_blocked)
+		blocked = blocked or (action == "rendezvous_finish" and _rendezvous_finish_blocked)
 		var during_jump := _jumping and action not in ["throttle_down", "throttle_up", "boost", "brake"]
 		button.disabled = not _input_enabled or blocked or during_jump
 
