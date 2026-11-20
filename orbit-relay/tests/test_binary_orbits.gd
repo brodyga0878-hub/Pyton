@@ -215,6 +215,8 @@ func _test_schema27() -> void:
 	state.ship.erase("hydrogen_scoop")
 	state.ship.erase("fuel_pump")
 	state.ship.erase("pump_mode")
+	state.ship.erase("range_drive")
+	state.ship.erase("drive_kind")
 	state.mining.reserves.resize(Catalog.PRE_BINARY_DESTINATION_COUNT)
 	var cold := Flight.new()
 	_expect(cold.restore(state) and cold.docked == 0 and cold.body_dossier(0).known and not cold.system_known(BINARY)

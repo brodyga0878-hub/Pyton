@@ -193,6 +193,8 @@ func _test_save_guards() -> void:
 	older.ship.erase("hydrogen_scoop")
 	older.ship.erase("fuel_pump")
 	older.ship.erase("pump_mode")
+	older.ship.erase("range_drive")
+	older.ship.erase("drive_kind")
 	older.ship.erase("hull_id")
 	older.ship.fuel = older.ship.jump_fuel
 	older.ship.erase("jump_fuel")

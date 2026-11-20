@@ -202,6 +202,8 @@ func _test_legacy_migration(flight: Flight) -> void:
 		legacy.ship.erase("hydrogen_scoop")
 		legacy.ship.erase("fuel_pump")
 		legacy.ship.erase("pump_mode")
+		legacy.ship.erase("range_drive")
+		legacy.ship.erase("drive_kind")
 		legacy.ship.erase("hull_id")
 		legacy.ship.erase("jump_fuel")
 		legacy.mining.cargo.erase("hydrogen")

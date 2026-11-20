@@ -114,13 +114,15 @@ func _leave_site_and_save_away(flight: Flight) -> Flight:
 	if not _expect(flight.dock_action() and not flight.landed and flight.remote_rig_status().active, "Lift off while keeping the unattended drill installed"):
 		return null
 	_expect(not flight.unload_remote_rig() and not flight.retrieve_remote_rig(), "The drill cannot be accessed by an airborne ship")
+	var local := flight.remote_rig_status()
 	if not _expect(flight.plan_jump(HOME) and _jump(flight, HOME, SITE), "Leave the installation behind across a real interstellar jump"):
 		return null
 	var remote := flight.remote_rig_status()
 	if not _expect(remote.active and not remote.same_system and not remote.near and remote.system == REGION and remote.point == Vector3.ZERO
-		and remote.stored < 48 and remote.working and not remote.can_unload and not remote.can_retrieve
-		and SessionIO.save_state(flight.snapshot(), SAVE_PATH) == OK,
-		"An unfinished remote batch remains inaccessible from another system and can be saved there"):
+		and remote.stored > local.stored and remote.stored + remote.reserve == local.stored + local.reserve
+		and remote.working == (remote.reserve > 0 and remote.stored < remote.capacity)
+		and not remote.can_unload and not remote.can_retrieve and SessionIO.save_state(flight.snapshot(), SAVE_PATH) == OK,
+		"Mining progresses over the calendar jump without duplicating stock, and the distant drill remains inaccessible and saveable"):
 		return null
 	var cold := Flight.new()
 	if not _expect(cold.restore(SessionIO.load_state(SAVE_PATH)), "Reload the active drill while elsewhere"):

@@ -9,6 +9,7 @@ signal dismissed()
 const Sector := preload("res://scripts/sector_catalog.gd")
 const Expedition := preload("res://scripts/expedition.gd")
 const Economy := preload("res://scripts/port_economy.gd")
+const MissionCalendar := preload("res://scripts/mission_calendar.gd")
 const TEXT := Color("e8f4fa")
 const MUTED := Color("a5bac7")
 const MINT := Color("9debd7")
@@ -26,8 +27,12 @@ var _description: Label
 var _distance: Label
 var _cost: Label
 var _fuel: Label
+var _drive: Label
+var _travel_time: Label
+var _arrival: Label
 var _itinerary: Label
 var _budget: Label
+var _leg_times: Label
 var _status: Label
 var _plan_button: Button
 var _jump_button: Button
@@ -144,10 +149,16 @@ func build() -> void:
 	_distance = _metric(_route_details, "Длина пути")
 	_cost = _metric(_route_details, "Расход пути")
 	_fuel = _metric(_route_details, "Прыжковый запас")
+	_drive = _metric(_route_details, "Привод")
+	_travel_time = _metric(_route_details, "Время переходов")
+	_arrival = _label(_route_details, "", 14, MUTED)
+	_arrival.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_itinerary = _label(_route_details, "", 14, MINT)
 	_itinerary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_budget = _label(_route_details, "", 14, MUTED)
 	_budget.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_leg_times = _label(_route_details, "", 14, MUTED)
+	_leg_times.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var space := Control.new()
 	space.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	space.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -266,10 +277,12 @@ func refresh() -> void:
 	# A committed route remains exact after refuelling or equipment changes.
 	var preview: Dictionary = plan if is_planned else _flight.route_preview(_candidate)
 	var available: bool = preview.get("available", false) and not preview.get("legs", []).is_empty()
+	var drive: Dictionary = _flight.jump_drive_status()
 	_chart.current = current
 	_chart.planned = planned
 	_chart.candidate = _candidate
-	_chart.jump_capacity = float(_flight.ship.jump_capacity())
+	_chart.jump_capacity = float(drive.jump_capacity)
+	_chart.jump_tariff = Callable(_flight, "jump_tariff")
 	_chart.planned_path.assign(plan.path if has_plan else [])
 	_chart.preview_path.assign(preview.path if available and not is_planned else [])
 	_current.text = "Система «%s»" % Sector.system(current).name
@@ -297,8 +310,10 @@ func refresh() -> void:
 	_description.text = str(selected.description)
 	_distance.text = "%s св. л." % _decimal(float(preview.distance)) if available else "—"
 	var jump_fuel: float = _flight.ship.jump_fuel
-	_fuel.text = "%s / %d ед." % [_decimal(jump_fuel), int(_flight.ship.jump_capacity())]
+	_fuel.text = "%s / %d ед." % [_decimal(jump_fuel), roundi(_chart.jump_capacity)]
 	_cost.text = "%d ед." % int(preview.fuel) if available else "—"
+	_drive.text = "%s · груз %d / %d" % [drive.name, int(drive.load), int(drive.capacity)]
+	_refresh_travel_estimates(preview, available)
 	_itinerary.visible = available
 	_budget.visible = available
 	if available:
@@ -328,11 +343,27 @@ func refresh() -> void:
 		else:
 			hint = "Проложите маршрут. Каждый прыжок запускается вручную."
 	if charging:
-		hint = "Идёт зарядка прыжкового привода."
+		hint = "Идёт межзвёздный переход." if _flight.jump_progress_status().is_transit else "Идёт зарядка прыжкового привода."
 	_status.text = hint
 	_status.add_theme_color_override("font_color", MINT if not _jump_button.disabled else MUTED if is_current else AMBER)
 	if _dossier_scroll.visible:
 		_refresh_dossier()
+
+
+func _refresh_travel_estimates(preview: Dictionary, available: bool) -> void:
+	var seconds := float(preview.get("seconds", 0.0)) if available else 0.0
+	_travel_time.text = _duration(seconds) if seconds > 0.0 else "—"
+	_arrival.visible = seconds > 0.0
+	_leg_times.visible = seconds > 0.0
+	if seconds <= 0.0:
+		return
+	_arrival.text = "Прибытие по расчёту · %s" % MissionCalendar.stamp(float(_flight.orbit_time) + seconds)
+	var schedule := PackedStringArray()
+	for leg: Dictionary in preview.legs:
+		var origin := str(Sector.system(int(leg.origin)).name)
+		var destination := str(Sector.system(int(leg.destination)).name)
+		schedule.append("%s → %s · %s" % [origin, destination, _duration(float(leg.seconds))])
+	_leg_times.text = "\n".join(schedule)
 
 
 func _collect_known_systems() -> void:
@@ -708,6 +739,12 @@ static func _decimal(value: float) -> String:
 	return ("%.1f" % value).replace(".", ",")
 
 
+@warning_ignore("integer_division")
+static func _duration(seconds: float) -> String:
+	var rounded := ceili(maxf(0.0, seconds))
+	return "%02d:%02d:%02d" % [rounded / 3600, rounded / 60 % 60, rounded % 60]
+
+
 static func _metric(parent: Container, caption: String) -> Label:
 	var row := HBoxContainer.new()
 	parent.add_child(row)
@@ -763,6 +800,7 @@ class GalaxyChart extends Control:
 	var planned := -1
 	var candidate := -1
 	var jump_capacity := 0.0
+	var jump_tariff: Callable
 	var planned_path: Array[int] = []
 	var preview_path: Array[int] = []
 	var contested: Array[int] = []
@@ -877,7 +915,7 @@ class GalaxyChart extends Control:
 			var id := path[step]
 			if not _known_systems.has(id) or visited.has(id):
 				return []
-			if step > 0 and Sector.jump_cost(path[step - 1], id) <= 0:
+			if step > 0 and not _leg_reachable(path[step - 1], id):
 				return []
 			visited.append(id)
 		return path
@@ -891,8 +929,7 @@ class GalaxyChart extends Control:
 	func _draw_routes(active: Array[int], preview: Array[int]) -> void:
 		if _systems.has(current):
 			for id in _systems:
-				var cost := Sector.jump_cost(current, id)
-				if cost <= 0 or cost > jump_capacity or _has_edge(active, current, id) or _has_edge(preview, current, id):
+				if not _leg_reachable(current, id) or _has_edge(active, current, id) or _has_edge(preview, current, id):
 					continue
 				_draw_leg(current, id, Color("425e69"), 1.1, true, false)
 		for step in range(1, active.size()):
@@ -902,7 +939,7 @@ class GalaxyChart extends Control:
 			_draw_leg(preview[step - 1], preview[step], AMBER, 1.8, true, true, shift)
 
 	func _leg_points(a: int, b: int, shift := 0.0) -> PackedVector2Array:
-		if not _systems.has(a) or not _systems.has(b) or Sector.jump_cost(a, b) <= 0:
+		if not _systems.has(a) or not _systems.has(b) or not _leg_reachable(a, b):
 			return PackedVector2Array()
 		var origin := marker_position(a)
 		var end := marker_position(b)
@@ -913,6 +950,10 @@ class GalaxyChart extends Control:
 		var offset := direction.orthogonal() * shift
 		var clearance := minf(37.0, distance * 0.34)
 		return PackedVector2Array([origin + direction * clearance + offset, end - direction * clearance + offset])
+
+	func _leg_reachable(a: int, b: int) -> bool:
+		var units := int(jump_tariff.call(a, b)) if jump_tariff.is_valid() else 0
+		return units > 0 and units <= jump_capacity
 
 	func _draw_leg(a: int, b: int, tint: Color, width: float, dashed: bool, arrow: bool, shift := 0.0) -> void:
 		var points := _leg_points(a, b, shift)

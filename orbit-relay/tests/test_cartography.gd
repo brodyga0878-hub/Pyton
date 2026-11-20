@@ -203,6 +203,8 @@ func _test_previous_schema() -> void:
 	historic.ship.erase("hydrogen_scoop")
 	historic.ship.erase("fuel_pump")
 	historic.ship.erase("pump_mode")
+	historic.ship.erase("range_drive")
+	historic.ship.erase("drive_kind")
 	historic.mining.reserves.resize(Catalog.AUTHORED_DESTINATION_COUNT)
 	historic.erase("cartography")
 	var cold := Flight.new()

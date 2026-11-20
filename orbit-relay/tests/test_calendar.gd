@@ -259,6 +259,8 @@ func _test_migration() -> void:
 	var historical := previous.snapshot()
 	historical.schema = 34
 	historical.erase("time_paused")
+	historical.ship.erase("range_drive")
+	historical.ship.erase("drive_kind")
 	var restored := Flight.new()
 	if not _expect(restored.restore(historical) and not restored.time_paused
 		and restored.clock_status().stamp == "01.01.2478 · 23:59:59",

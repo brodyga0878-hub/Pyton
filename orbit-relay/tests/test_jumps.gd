@@ -250,7 +250,12 @@ func _test_touch_route() -> void:
 	var fuel_matches := absf(float(restored.ship.fuel) - float(upon_arrival.ship.fuel)) < 0.000000001
 	restored.ship.erase("fuel")
 	upon_arrival.ship.erase("fuel")
-	_expect(restored == upon_arrival and fuel_matches and flight.system_id == VELAR,
+	var clocks_match := true
+	for key: String in ["elapsed", "orbit_time"]:
+		clocks_match = clocks_match and absf(float(restored[key]) - float(upon_arrival[key])) < 0.000000001
+		restored.erase(key)
+		upon_arrival.erase(key)
+	_expect(restored == upon_arrival and fuel_matches and clocks_match and flight.system_id == VELAR,
 		"A cold scene loads the new system and preserves post-jump state through JSON")
 	_tap(game._hud._actions.get("map"), "A touch opens the new system's local map")
 	await process_frame

@@ -197,6 +197,8 @@ func _test_handoffs_and_save() -> void:
 	earlier.ship.erase("hydrogen_scoop")
 	earlier.ship.erase("fuel_pump")
 	earlier.ship.erase("pump_mode")
+	earlier.ship.erase("range_drive")
+	earlier.ship.erase("drive_kind")
 	earlier.ship.erase("hull_id")
 	earlier.ship.erase("jump_fuel")
 	earlier.mining.cargo.erase("hydrogen")

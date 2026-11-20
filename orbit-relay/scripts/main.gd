@@ -70,6 +70,7 @@ func _ready() -> void:
 	_services.transfer_requested.connect(_fuel_transfer)
 	_services.fuel_module_removed.connect(_remove_fuel_module)
 	_services.pump_mode_requested.connect(_set_pump_mode)
+	_services.drive_selected.connect(_select_drive)
 	_services.jettison_requested.connect(_jettison_cargo)
 	_services.crew_requested.connect(_crew_action)
 	_services.ship_exchange_requested.connect(_ship_exchange)
@@ -363,6 +364,13 @@ func _deliver_notice() -> void:
 			"stamp": clock.stamp, "paused": clock.paused, "time_scale": clock.scale,
 			"orbit_time": clock.epoch, "system_id": flight.system_id,
 		}
+	elif event == "jump_committed":
+		var transit := flight.jump_progress_status()
+		trace_fields = {
+			"system_id": flight.system_id, "destination": transit.destination, "fare": transit.fare,
+			"game_seconds": transit.duration, "arrival_epoch": transit.arrival_epoch,
+			"drive": flight.ship.drive_kind, "fuel_remaining": flight.ship.jump_fuel,
+		}
 	elif event == "reference_frame":
 		var frame := flight.frame_status()
 		trace_fields = {
@@ -386,7 +394,8 @@ func _deliver_notice() -> void:
 		"gear_deploy", "gear_retract", "gear_ready", "gear_stowed",
 		"service_heat_shield", "service_mining_laser", "service_fragment_collector",
 		"mining_pulse", "fragment_collected",
-		"jump_planned", "jump_complete", "route_canceled",
+		"jump_planned", "jump_committed", "jump_complete", "route_canceled",
+		"service_range_drive", "jump_drive_selected",
 		"market_buy", "market_sell", "service_repair", "service_cargo", "hull_damage", "contract_leg",
 		"passenger_accepted", "passenger_overdue", "passenger_paid", "passenger_late", "passenger_canceled",
 		"passenger_debt_paid", "passenger_course",
@@ -712,6 +721,15 @@ func _service_purchase(action: String) -> void:
 	if not _services.is_open():
 		return
 	flight.service_action(action)
+	_deliver_notice()
+	_services.refresh()
+	_update_display(0.0)
+
+
+func _select_drive(id: String) -> void:
+	if not _services.is_open():
+		return
+	flight.select_jump_drive(id)
 	_deliver_notice()
 	_services.refresh()
 	_update_display(0.0)

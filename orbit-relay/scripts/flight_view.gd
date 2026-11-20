@@ -58,6 +58,63 @@ class DockHatch extends Node3D:
 		if signal_paint.albedo_color != tint:
 			signal_paint.albedo_color = tint
 
+class HyperTransitOverlay extends Control:
+	const TRAIL_COUNTS := [24, 40, 56]
+	const COOL := Color("#8fe9f4")
+	const WARM := Color("#ffc27a")
+
+	var _progress := 0.0
+	var _profile := 1
+	var _trails := PackedVector2Array()
+	var _highlights := PackedVector2Array()
+	var _trails_color := PackedColorArray()
+	var _highlights_color := PackedColorArray()
+
+	func _ready() -> void:
+		resized.connect(queue_redraw)
+
+	func set_profile(profile: int) -> void:
+		if _profile != profile:
+			_profile = profile
+			queue_redraw()
+
+	func sync(active: bool, progress: float) -> void:
+		if not active:
+			hide()
+			return
+		if not visible or _progress != progress:
+			_progress = progress
+			show()
+			queue_redraw()
+
+	func _draw() -> void:
+		draw_rect(Rect2(Vector2.ZERO, size), Color(0.02, 0.07, 0.13, 0.64))
+		var count: int = TRAIL_COUNTS[_profile]
+		_trails.resize(count * 2)
+		_highlights.resize(count * 2)
+		_trails_color.resize(count)
+		_highlights_color.resize(count)
+		var center := size * Vector2(0.53, 0.46)
+		var extent := size * Vector2(0.66, 0.77)
+		for index in range(count):
+			var direction := Vector2.from_angle(float(index) * 2.39996323) * extent
+			var reach := fposmod(float(index) * 0.61803399 + _progress * 3.2, 1.0)
+			var radius := lerpf(0.11, 1.17, reach)
+			var length := lerpf(0.034, 0.29, reach * reach)
+			var head := center + direction * radius
+			var pair := index * 2
+			_trails[pair] = head - direction * length
+			_trails[pair + 1] = head
+			_highlights[pair] = head - direction * length * 0.30
+			_highlights[pair + 1] = head
+			var alpha := smoothstep(0.0, 0.26, reach) * (1.0 - smoothstep(0.80, 1.0, reach))
+			var ink := WARM if index % 5 == 0 else COOL
+			_trails_color[index] = Color(ink, alpha * 0.32)
+			_highlights_color[index] = Color(ink, alpha * 0.86)
+		# Two batches keep the effect independent of world objects and texture quality.
+		draw_multiline_colors(_trails, _trails_color, 2.8)
+		draw_multiline_colors(_highlights, _highlights_color, 1.6)
+
 var camera: Camera3D
 var _ship: Node3D
 var _ship_hull_id := ShipSystems.STARTER_HULL
@@ -93,6 +150,7 @@ var _mining_beam_halo: MeshInstance3D
 var _mining_impact: MeshInstance3D
 var _traffic: Node3D
 var _atmosphere: Node3D
+var _hyper_transit: HyperTransitOverlay
 var _surface_guide: MeshInstance3D
 var _surface_guide_paint: StandardMaterial3D
 var _surface_guide_site := -1
@@ -153,6 +211,14 @@ func build() -> void:
 	camera.far = 8000.0
 	add_child(camera)
 	camera.make_current()
+	var transit_layer := CanvasLayer.new()
+	transit_layer.layer = 0
+	add_child(transit_layer)
+	_hyper_transit = HyperTransitOverlay.new()
+	_hyper_transit.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	transit_layer.add_child(_hyper_transit)
+	_hyper_transit.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_hyper_transit.hide()
 	set_visual_profile(_visual_profile)
 
 
@@ -257,6 +323,8 @@ func set_visual_profile(profile: int) -> void:
 		_traffic.set_visual_profile(_visual_profile)
 	if is_instance_valid(_atmosphere):
 		_atmosphere.set_visual_profile(_visual_profile)
+	if is_instance_valid(_hyper_transit):
+		_hyper_transit.set_profile(_visual_profile)
 
 
 func sync(sim: RefCounted, delta: float) -> void:
@@ -264,6 +332,12 @@ func sync(sim: RefCounted, delta: float) -> void:
 		build()
 	if _system_id != int(sim.system_id):
 		_load_sector(sim.system_id)
+	var jump_status: Dictionary = sim.jump_progress_status()
+	var transit := bool(jump_status.is_transit)
+	_hyper_transit.sync(transit, float(jump_status.progress))
+	_sector.visible = not transit
+	_traffic.visible = not transit
+	_atmosphere.visible = not transit
 	var hull_id := str(sim.ship.hull_id)
 	if hull_id != _ship_hull_id:
 		_build_ship_model(hull_id)
@@ -300,9 +374,10 @@ func sync(sim: RefCounted, delta: float) -> void:
 		body.sync(position_now, site_id == int(sim.target), not settled, field_direction)
 	var thrust := clampf(float(sim.throttle), 0.0, 1.0)
 	_flight_time += delta
-	_jet.visible = not settled and thrust > 0.01
-	_jet.scale = Vector3(1.0, (0.45 + thrust * 0.85) * (1.45 if sim.boost else 1.0), 1.0)
-	_jet_material.set_shader_parameter("pulse", 0.59 + sin(_flight_time * 31.0) * 0.08)
+	_jet.visible = transit or (not settled and thrust > 0.01)
+	var plume_length := 1.35 if transit else (0.45 + thrust * 0.85) * (1.45 if sim.boost else 1.0)
+	_jet.scale = Vector3(1.0, plume_length, 1.0)
+	_jet_material.set_shader_parameter("pulse", 0.69 if transit else 0.59 + sin(_flight_time * 31.0) * 0.08)
 
 	var camera_offset := BERTH_CAMERA_OFFSET if docked else Vector3(0.0, 3.4, 10.5)
 	var focal_offset := BERTH_CAMERA_FOCUS if docked else Vector3(0.0, 2.0, -30.0)
@@ -408,7 +483,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 		var deposit: Transform3D = sim.surface_deposit() if landed else _ship.global_transform
 		_mining_rig.sync(_ship.global_transform, deposit, int(sim.mining.phase) if landed else MiningRig.STOWED, sim.mining.progress(), float(sim.elapsed))
 	_sync_fragments(sim.local_fragments(), position_now, float(sim.orbit_time))
-	_sync_mining_pulse(sim.orbital_mining_beam())
+	_sync_mining_pulse({} if transit else sim.orbital_mining_beam())
 	_traffic.sync(sim.traffic_contacts(), sim.combat_beams())
 	_atmosphere.sync(sim, camera, settled)
 	# Compatibility supports ordinary distance fog; keep it local and subtle.

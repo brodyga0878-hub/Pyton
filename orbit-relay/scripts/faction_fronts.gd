@@ -102,6 +102,14 @@ func commission(system: int, sponsor: int, now: float) -> bool:
 	return true
 
 
+func next_event_time() -> float:
+	var next_due := INF
+	for frontier: Dictionary in _frontiers:
+		if frontier.owner >= 0:
+			next_due = minf(next_due, _next_event_at(frontier))
+	return next_due
+
+
 func advance(now: float) -> Dictionary:
 	if not _number(now, 0.0, MAX_ORBIT_CLOCK):
 		return {}

@@ -27,7 +27,7 @@ const Customs = preload("res://scripts/customs.gd")
 const UnattendedMining = preload("res://scripts/unattended_mining.gd")
 const OrbitalMining = preload("res://scripts/orbital_mining.gd")
 const MissionCalendar = preload("res://scripts/mission_calendar.gd")
-const SAVE_SCHEMA := 35
+const SAVE_SCHEMA := 36
 const REMOTE_RIG_ACCESS_DISTANCE := 20.0
 const MINING_PULSE_RANGE := 200.0
 const MINING_PULSE_FUEL := 0.4
@@ -39,6 +39,8 @@ const SHIPYARD_PORTS := [0, 10, Catalog.FRINGE_ARRIVAL_PORT]
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
+const JUMP_TRANSIT_WALL := 0.45
+const SAVE_CLOCK_LIMIT := 3155760000.0
 const JUMP_BRAKE := 67.0
 const NAVIGATOR_JUMP_CHARGE := 2.2
 const JUMP_SPEED := 42.0
@@ -151,6 +153,9 @@ var entry_heat := 0.0
 var system_id := Catalog.HOME_SYSTEM
 var jump_target := -1
 var jump_seconds_left := 0.0
+var _jump_charge_total := JUMP_CHARGE
+var _jump_transit_duration := 0.0
+var _jump_paid_fare := 0
 var _jump_route: Array[int] = []
 var target := 1
 var planned_target := -1
@@ -908,7 +913,7 @@ func station_services_available() -> bool:
 
 
 func change_throttle(amount: float) -> void:
-	if docked < 0 and not landed:
+	if docked < 0 and not landed and _jump_transit_duration <= 0.0:
 		reset_time_scale()
 		cancel_jump()
 		if dock_roll_sync < 0:
@@ -1571,7 +1576,7 @@ func _nearest_interstellar_port() -> int:
 	var selected := -1
 	var best_cost := 1000000
 	for system in range(Catalog.SYSTEM_COUNT):
-		var cost := Catalog.jump_cost(system_id, system)
+		var cost := jump_tariff(system_id, system)
 		if cost <= 0 or cost >= best_cost or not system_known(system):
 			continue
 		for port: int in Catalog.ports_for(system):
@@ -2111,6 +2116,8 @@ func service_action(action: String) -> bool:
 			_announce("service_hydrogen_scoop", "Сборщик водорода установлен. Списано %d кр." % paid)
 		"fuel_pump":
 			_announce("service_fuel_pump", "Топливный насос установлен. Списано %d кр." % paid)
+		"range_drive":
+			_announce("service_range_drive", "Дальний привод «Вектор» установлен. Списано %d кр." % paid)
 	return true
 
 
@@ -2155,7 +2162,7 @@ func _advance_fuel_pump(previous_epoch: float) -> void:
 	var fuel := ship.fuel if reaction else ship.jump_fuel
 	var threshold := capacity * FUEL_PUMP_THRESHOLD
 	if not reaction and jump_target >= 0:
-		threshold = maxf(threshold, Catalog.jump_cost(system_id, jump_target))
+		threshold = maxf(threshold, jump_tariff(system_id, jump_target))
 	var units := ShipSystems.HYDROGEN_UNITS_PER_CANISTER
 	if fuel >= threshold or capacity - fuel < units:
 		return
@@ -2457,8 +2464,61 @@ func _collect_fuel(delta: float) -> void:
 		_announce("scoop_canister", "В трюме %d канистр водорода." % mining.cargo_amount(Economy.HYDROGEN))
 
 
+func jump_tariff(origin: int, destination: int) -> int:
+	return ship.jump_tariff(Catalog.jump_cost(origin, destination))
+
+
+func jump_travel_seconds(origin: int, destination: int) -> float:
+	return ship.jump_duration(Catalog.jump_distance(origin, destination), mining.ore_hold)
+
+
+func jump_drive_status() -> Dictionary:
+	return {
+		"id": ship.drive_kind, "name": ship.drive_name(), "have_range": ship.range_drive,
+		"can_select": station_services_available() and ship.range_drive,
+		"load": mining.ore_hold, "capacity": ship.cargo_capacity(), "jump_capacity": ship.jump_capacity(),
+	}
+
+
+func select_jump_drive(id: String) -> bool:
+	if not station_services_available() or ship.drive_kind == id or not ship.select_drive(id):
+		return false
+	var route_adjusted := false
+	if not _jump_route.is_empty():
+		var path: Array[int] = [system_id]
+		path.append_array(_jump_route)
+		var known := _known_systems(expedition, cartography)
+		if not GalacticRoute.valid_path(path, known, ship.jump_capacity(), jump_tariff):
+			var replacement := route_preview(_jump_route.back())
+			_jump_route.clear()
+			if replacement.available:
+				_jump_route.assign(replacement.path.slice(1))
+			jump_target = -1 if _jump_route.is_empty() else _jump_route.front()
+			route_adjusted = true
+	var note := " Маршрут обновлён." if route_adjusted and jump_target >= 0 else ""
+	if route_adjusted and jump_target < 0:
+		note = " Выберите новый межзвёздный курс."
+	_announce("jump_drive_selected", "Активный привод · %s.%s" % [ship.drive_name(), note])
+	return true
+
+
+func jump_progress_status() -> Dictionary:
+	var active := jump_seconds_left > 0.0
+	var transit := _jump_transit_duration > 0.0
+	var duration := _jump_transit_duration if transit else jump_travel_seconds(system_id, jump_target)
+	var time_left := jump_seconds_left if transit else maxf(0.0, jump_seconds_left - JUMP_TRANSIT_WALL)
+	var phase_length := JUMP_TRANSIT_WALL if transit else _jump_charge_total - JUMP_TRANSIT_WALL
+	var fare := _jump_paid_fare if transit else jump_tariff(system_id, jump_target)
+	return {
+		"phase": ("transit" if transit else "charge") if active else "idle", "active": active, "is_transit": transit,
+		"remaining": time_left, "duration": duration, "fare": fare, "destination": jump_target,
+		"progress": clampf(1.0 - time_left / phase_length, 0.0, 1.0) if active else 0.0,
+		"arrival_epoch": orbit_time + duration + (0.0 if transit else time_left),
+	}
+
+
 func plan_jump(destination: int) -> bool:
-	if jump_seconds_left > 0.0 or not system_known(destination) or Catalog.jump_cost(system_id, destination) == 0:
+	if jump_seconds_left > 0.0 or not system_known(destination) or jump_tariff(system_id, destination) == 0:
 		return false
 	_jump_route.clear()
 	jump_target = destination
@@ -2469,10 +2529,10 @@ func plan_jump(destination: int) -> bool:
 func route_preview(goal: int) -> Dictionary:
 	var known := _known_systems(expedition, cartography)
 	var capacity := ship.jump_capacity()
-	var reachable_first_leg := GalacticRoute.plan(system_id, goal, known, capacity, ship.jump_fuel)
+	var reachable_first_leg := GalacticRoute.plan(system_id, goal, known, capacity, ship.jump_fuel, jump_tariff, jump_travel_seconds)
 	if reachable_first_leg.available or ship.jump_fuel >= capacity:
 		return reachable_first_leg
-	return GalacticRoute.plan(system_id, goal, known, capacity)
+	return GalacticRoute.plan(system_id, goal, known, capacity, INF, jump_tariff, jump_travel_seconds)
 
 
 func planned_route() -> Dictionary:
@@ -2483,7 +2543,7 @@ func planned_route() -> Dictionary:
 			path.append(jump_target)
 		else:
 			path.append_array(_jump_route)
-	return GalacticRoute.describe(path)
+	return GalacticRoute.describe(path, jump_tariff, jump_travel_seconds)
 
 
 func plan_route(goal: int) -> bool:
@@ -2517,9 +2577,12 @@ static func _known_systems(progress: RefCounted, atlas: RefCounted) -> Array[int
 
 
 func jump_status(destination: int) -> Dictionary:
-	var cost := Catalog.jump_cost(system_id, destination) if system_known(destination) else 0
+	var cost := jump_tariff(system_id, destination) if system_known(destination) else 0
 	var reason := ""
-	if cost == 0:
+	var duration := jump_travel_seconds(system_id, destination)
+	if _jump_transit_duration > 0.0:
+		reason = "Корабль в гиперпространстве"
+	elif cost == 0:
 		reason = "Выберите другую звёздную систему"
 	elif docked >= 0 or landed:
 		reason = "Выйдите в открытый космос"
@@ -2535,6 +2598,8 @@ func jump_status(destination: int) -> Dictionary:
 		reason = "Снизьте скорость до %d м/с" % int(JUMP_SPEED)
 	elif ship.jump_fuel < cost:
 		reason = "Нужно %d ед. в прыжковом запасе" % cost
+	elif orbit_time + duration + JUMP_CHARGE > SAVE_CLOCK_LIMIT:
+		reason = "Прыжок выходит за пределы календаря"
 	else:
 		for id: int in local_targets():
 			var clearance := Catalog.SCOOP_OUTER if Catalog.is_star(id) else float(Catalog.site(id).radius) + JUMP_CLEARANCE
@@ -2544,7 +2609,7 @@ func jump_status(destination: int) -> Dictionary:
 			if jump_seconds_left <= 0.0 and Catalog.is_star(id) and Orbit.period(id) > 0.0 and not _clear_during_charge(id, clearance):
 				reason = "Звезда «%s» приблизится во время зарядки. Отойдите дальше." % target_name(id)
 				break
-	return {"ok": reason.is_empty(), "reason": "Можно зарядить прыжковый привод" if reason.is_empty() else reason, "cost": cost}
+	return {"ok": reason.is_empty(), "reason": "Можно зарядить прыжковый привод" if reason.is_empty() else reason, "cost": cost, "duration": duration}
 
 
 func _clear_during_charge(star: int, clearance: float) -> bool:
@@ -2584,13 +2649,14 @@ func start_jump() -> bool:
 	throttle = 0.0
 	boost = false
 	_command_gear(false)
-	jump_seconds_left = NAVIGATOR_JUMP_CHARGE if crew.active_role("navigator") else JUMP_CHARGE
+	_jump_charge_total = NAVIGATOR_JUMP_CHARGE if crew.active_role("navigator") else JUMP_CHARGE
+	jump_seconds_left = _jump_charge_total
 	_announce("jump_charging", "Прыжковый привод заряжается.")
 	return true
 
 
 func cancel_jump() -> bool:
-	if jump_seconds_left <= 0.0:
+	if jump_seconds_left <= 0.0 or _jump_transit_duration > 0.0:
 		return false
 	jump_seconds_left = 0.0
 	_announce("jump_canceled", "Прыжок отменён. Топливо сохранено.")
@@ -2610,10 +2676,29 @@ func _charge_jump(delta: float) -> void:
 		cancel_jump()
 		return
 	jump_seconds_left -= delta
-	if jump_seconds_left > 0.000001:
+	if jump_seconds_left > JUMP_TRANSIT_WALL + 0.000001:
 		return
+	jump_seconds_left = minf(jump_seconds_left, JUMP_TRANSIT_WALL)
+	_jump_transit_duration = float(status.duration)
+	_jump_paid_fare = int(status.cost)
+	ship.jump_fuel -= _jump_paid_fare
+	velocity = Vector3.ZERO
+	_announce("jump_committed", "Переход в гиперпространство · %d ед. топлива." % _jump_paid_fare)
+
+
+func _advance_jump_transit(delta: float) -> void:
+	var remaining := jump_seconds_left - delta
+	if remaining > 0.000001:
+		jump_seconds_left = remaining
+		return
+	_advance_hyperspace_calendar(_jump_transit_duration)
 	jump_seconds_left = 0.0
-	ship.jump_fuel -= status.cost
+	_jump_transit_duration = 0.0
+	_jump_paid_fare = 0
+	_finish_jump_arrival()
+
+
+func _finish_jump_arrival() -> void:
 	dock_access.clear()
 	system_id = jump_target
 	_mining_beam.clear()
@@ -2756,13 +2841,48 @@ func update(delta: float, steer: Vector2, bank: float, boost_requested: bool, br
 		_step(interval * time_scale, steer, bank, boost_requested, brake, manual_input, traverse)
 
 
-func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, brake: bool, manual_input: bool, translation: Vector3) -> void:
-	var previous_orbit_time := orbit_time
+func _advance_background_clock(delta: float) -> void:
+	var previous := orbit_time
 	orbit_time += delta
 	elapsed += delta
 	if remote_rig.active():
 		remote_rig.advance(mining, orbit_time)
-	freight.advance(market, previous_orbit_time, orbit_time)
+	freight.advance(market, previous, orbit_time)
+
+
+func _advance_mission_deadlines() -> void:
+	_apply_service_result(passengers.advance(orbit_time))
+	_apply_service_result(crew.advance(orbit_time, credits))
+
+
+func _advance_front(epoch: float) -> void:
+	var result := factions.advance(epoch)
+	if not result.is_empty():
+		_announce(result.event, result.message)
+
+
+func _advance_hyperspace_calendar(duration: float) -> void:
+	var arrival_epoch := orbit_time + duration
+	var due := factions.next_event_time()
+	while due <= arrival_epoch:
+		if due > orbit_time:
+			_advance_background_clock(due - orbit_time)
+		_advance_front(due)
+		_advance_mission_deadlines()
+		_apply_convoy_result(convoy_order.step(self, 0.0))
+		due = factions.next_event_time()
+	if arrival_epoch > orbit_time:
+		_advance_background_clock(arrival_epoch - orbit_time)
+	_advance_mission_deadlines()
+	_apply_convoy_result(convoy_order.step(self, 0.0))
+
+
+func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, brake: bool, manual_input: bool, translation: Vector3) -> void:
+	if _jump_transit_duration > 0.0:
+		_advance_jump_transit(delta)
+		return
+	var previous_orbit_time := orbit_time
+	_advance_background_clock(delta)
 	if docked < 0 and not landed and dock_access.port == target:
 		var before := dock_access.status(target, previous_orbit_time)
 		var access := dock_access.status(target, orbit_time)
@@ -2770,11 +2890,8 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 			_announce("dock_ready", "Створ открыт. Допуск «%s» получен." % target_name(target))
 		elif before.ready and not access.ready:
 			_announce("dock_expired", "Окно швартовки закрыто. Запросите новый допуск.")
-	var front := factions.advance(orbit_time)
-	if not front.is_empty():
-		_announce(front.event, front.message)
-	_apply_service_result(passengers.advance(orbit_time))
-	_apply_service_result(crew.advance(orbit_time, credits))
+	_advance_front(orbit_time)
+	_advance_mission_deadlines()
 	if docked >= 0:
 		if _departure_requested:
 			_advance_departure(delta)
@@ -2805,6 +2922,8 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 			cancel_jump()
 		else:
 			_charge_jump(delta)
+			if _jump_transit_duration > 0.0:
+				return
 		_update_star_heat(delta)
 		_update_entry_heat(delta)
 		_apply_convoy_result(convoy_order.step(self, delta))
@@ -3396,6 +3515,9 @@ func _announce(event: String, message: String) -> void:
 func snapshot() -> Dictionary:
 	var facing := _flight_orientation()
 	frame.reference_site(self)
+	var transit := {}
+	if _jump_transit_duration > 0.0:
+		transit = {"remaining": jump_seconds_left, "duration": _jump_transit_duration, "fare": _jump_paid_fare}
 	return {
 		"schema": SAVE_SCHEMA,
 		"position": [position.x, position.y, position.z],
@@ -3415,6 +3537,7 @@ func snapshot() -> Dictionary:
 		"gear_extension": gear_extension, "gear_deployed": gear_deployed,
 		"ship": ship.snapshot(), "market": market.snapshot(), "freight": freight.snapshot(),
 		"system_id": system_id, "jump_target": jump_target, "jump_route": _jump_route.duplicate(),
+		"jump_transit": transit,
 		"patrol": patrol.snapshot(), "star_heat": star_heat, "entry_heat": entry_heat,
 		"expedition": expedition.snapshot(), "factions": factions.snapshot(),
 		"convoy_order": convoy_order.snapshot(),
@@ -3429,6 +3552,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_jump_drive := schema < 36
 	var pre_calendar := schema < 35
 	var pre_fuel_equipment := schema < 34
 	var pre_orbital_mining := schema < 33
@@ -3622,7 +3746,7 @@ func restore(state: Dictionary) -> bool:
 	var restored_patrol := Patrol.new()
 	var restored_landing := -1
 	var restored_plan := -1
-	if not pre_fuel and not restored_ship.restore(state.get("ship"), pre_economy, pre_heat_shield, pre_dual_fuel, pre_shipyard, pre_orbital_mining, pre_fuel_equipment):
+	if not pre_fuel and not restored_ship.restore(state.get("ship"), pre_economy, pre_heat_shield, pre_dual_fuel, pre_shipyard, pre_orbital_mining, pre_fuel_equipment, pre_jump_drive):
 		return false
 	var restored_route: Array[int] = []
 	if not pre_jump_route:
@@ -3636,7 +3760,8 @@ func restore(state: Dictionary) -> bool:
 		if not restored_route.is_empty():
 			var path: Array[int] = [restored_system]
 			path.append_array(restored_route)
-			if restored_route[0] != restored_jump or not GalacticRoute.valid_path(path, known, restored_ship.jump_capacity()):
+			var tariff := func(a: int, b: int) -> int: return restored_ship.jump_tariff(Catalog.jump_cost(a, b))
+			if restored_route[0] != restored_jump or not GalacticRoute.valid_path(path, known, restored_ship.jump_capacity(), tariff):
 				return false
 	if not pre_economy and not restored_market.restore(state.get("market"), pre_traffic, pre_expansion, pre_dual_fuel):
 		return false
@@ -3744,6 +3869,22 @@ func restore(state: Dictionary) -> bool:
 		var permit := restored_access.status(restored_dock, restored_epoch)
 		if not permit.ready or permit.remaining + DockAccess.CLOCK_PRECISION < DEPARTURE_SECONDS - restored_departure_seconds:
 			return false
+	var restored_transit: Variant = {} if pre_jump_drive else state.get("jump_transit")
+	if not restored_transit is Dictionary:
+		return false
+	if not restored_transit.is_empty():
+		var fare := restored_ship.jump_tariff(Catalog.jump_cost(restored_system, restored_jump))
+		var duration := restored_ship.jump_duration(Catalog.jump_distance(restored_system, restored_jump), restored_mining.ore_hold)
+		if not restored_transit.has_all(["remaining", "duration", "fare"]) or restored_transit.size() != 3:
+			return false
+		if restored_dock >= 0 or restored_landing >= 0 or restored_departure or fare <= 0 or duration <= 0.0:
+			return false
+		if not _number(restored_transit.remaining, 0.000001, JUMP_TRANSIT_WALL) or not _integer(restored_transit.fare, fare, fare):
+			return false
+		if not _number(restored_transit.duration, duration, duration) or restored_epoch + duration > SAVE_CLOCK_LIMIT:
+			return false
+		if restored_ship.jump_fuel + fare > restored_ship.jump_capacity() or not restored_velocity.is_zero_approx() or float(state.throttle) != 0.0:
+			return false
 	var restored_gear := 1.0 if restored_landing >= 0 else 0.0
 	var restored_gear_command := restored_landing >= 0
 	if not pre_gear:
@@ -3838,7 +3979,9 @@ func restore(state: Dictionary) -> bool:
 	system_id = restored_system
 	jump_target = restored_jump
 	_jump_route = restored_route
-	jump_seconds_left = 0.0
+	jump_seconds_left = float(restored_transit.get("remaining", 0.0))
+	_jump_transit_duration = float(restored_transit.get("duration", 0.0))
+	_jump_paid_fare = int(restored_transit.get("fare", 0))
 	target = int(state.target)
 	planned_target = restored_plan
 	credits = int(state.credits)

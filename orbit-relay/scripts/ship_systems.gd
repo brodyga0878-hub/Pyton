@@ -14,6 +14,11 @@ const SCOOP_COST := 150
 const SCOOP_RESALE := 75
 const FUEL_PUMP_COST := 110
 const FUEL_PUMP_RESALE := 55
+const RANGE_DRIVE_COST := 450
+const DRIVE_STANDARD := "standard"
+const DRIVE_RANGE := "range"
+const STANDARD_DRIVE_NAME := "Штатный"
+const RANGE_DRIVE_NAME := "Вектор"
 const PUMP_OFF := "off"
 const PUMP_REACTION := "reaction"
 const PUMP_JUMP := "jump"
@@ -43,8 +48,11 @@ const PRE_SHIPYARD_FIELDS := ["fuel", "jump_fuel", "tank_upgraded", "eco_upgrade
 const PRE_ORBITAL_MINING_FIELDS := ["hull_id", "fuel", "jump_fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded", "heat_shield"]
 const PRE_FUEL_EQUIPMENT_FIELDS := ["hull_id", "fuel", "jump_fuel", "tank_upgraded", "eco_upgraded", "hull",
 	"cargo_upgraded", "heat_shield", "mining_laser", "fragment_collector"]
-const SAVE_FIELDS := ["hull_id", "fuel", "jump_fuel", "tank_upgraded", "eco_upgraded", "hull",
+const PRE_JUMP_DRIVE_FIELDS := ["hull_id", "fuel", "jump_fuel", "tank_upgraded", "eco_upgraded", "hull",
 	"cargo_upgraded", "heat_shield", "mining_laser", "fragment_collector", "hydrogen_scoop", "fuel_pump", "pump_mode"]
+const SAVE_FIELDS := ["hull_id", "fuel", "jump_fuel", "tank_upgraded", "eco_upgraded", "hull",
+	"cargo_upgraded", "heat_shield", "mining_laser", "fragment_collector", "hydrogen_scoop", "fuel_pump", "pump_mode",
+	"range_drive", "drive_kind"]
 
 var fuel: float = BASE_CAPACITY
 var jump_fuel: float = BASE_CAPACITY
@@ -58,6 +66,8 @@ var fragment_collector := false
 var hydrogen_scoop := true
 var fuel_pump := false
 var pump_mode := PUMP_OFF
+var range_drive := false
+var drive_kind := DRIVE_STANDARD
 var hull_id: String:
 	get:
 		return _hull_id
@@ -86,6 +96,29 @@ func capacity() -> float:
 
 func jump_capacity() -> float:
 	return capacity()
+
+
+func drive_name() -> String:
+	return RANGE_DRIVE_NAME if drive_kind == DRIVE_RANGE else STANDARD_DRIVE_NAME
+
+
+func select_drive(id: String) -> bool:
+	if id == drive_kind or (id != DRIVE_STANDARD and (id != DRIVE_RANGE or not range_drive)):
+		return false
+	drive_kind = id
+	return true
+
+
+func jump_tariff(base: int) -> int:
+	return ceili(base * 0.75) if drive_kind == DRIVE_RANGE and base > 0 else base
+
+
+func jump_duration(distance: float, payload: int) -> float:
+	if not is_finite(distance) or distance <= 0.0:
+		return 0.0
+	var unloaded_seconds := 7.0 + 2.5 * distance if drive_kind == DRIVE_RANGE else 12.0 + 4.0 * distance
+	var load_ratio := clampf(float(payload) / cargo_capacity(), 0.0, 1.0)
+	return ceilf(unloaded_seconds * (1.0 + 0.6 * load_ratio))
 
 
 func cargo_capacity() -> int:
@@ -217,6 +250,9 @@ func service_offer(action: String, unit_price: int, credits: int) -> Dictionary:
 		"fuel_pump":
 			cost = FUEL_PUMP_COST
 			installed = fuel_pump
+		"range_drive":
+			cost = RANGE_DRIVE_COST
+			installed = range_drive
 	return {"cost": cost, "allowed": cost > 0 and cost <= credits and not installed, "installed": installed}
 
 
@@ -247,6 +283,9 @@ func buy(action: String, unit_price: int, credits: int) -> int:
 			hydrogen_scoop = true
 		"fuel_pump":
 			fuel_pump = true
+		"range_drive":
+			range_drive = true
+			drive_kind = DRIVE_RANGE
 	return offer.cost
 
 
@@ -276,11 +315,12 @@ func snapshot() -> Dictionary:
 		"hull": hull, "cargo_upgraded": cargo_upgraded, "heat_shield": heat_shield,
 		"mining_laser": mining_laser, "fragment_collector": fragment_collector,
 		"hydrogen_scoop": hydrogen_scoop, "fuel_pump": fuel_pump, "pump_mode": pump_mode,
+		"range_drive": range_drive, "drive_kind": drive_kind,
 	}
 
 
 func restore(value: Variant, legacy := false, pre_shield := false, pre_dual_fuel := false,
-		pre_shipyard := false, pre_orbital_mining := false, pre_fuel_equipment := false) -> bool:
+		pre_shipyard := false, pre_orbital_mining := false, pre_fuel_equipment := false, pre_jump_drive := false) -> bool:
 	var fields := SAVE_FIELDS
 	if legacy:
 		fields = LEGACY_SAVE_FIELDS
@@ -294,6 +334,8 @@ func restore(value: Variant, legacy := false, pre_shield := false, pre_dual_fuel
 		fields = PRE_ORBITAL_MINING_FIELDS
 	elif pre_fuel_equipment:
 		fields = PRE_FUEL_EQUIPMENT_FIELDS
+	elif pre_jump_drive:
+		fields = PRE_JUMP_DRIVE_FIELDS
 	if not value is Dictionary or value.size() != fields.size() or not value.has_all(fields):
 		return false
 	var restored_hull_id := STARTER_HULL
@@ -307,9 +349,13 @@ func restore(value: Variant, legacy := false, pre_shield := false, pre_dual_fuel
 		return false
 	if "mining_laser" in fields and (not value.mining_laser is bool or not value.fragment_collector is bool):
 		return false
-	if fields == SAVE_FIELDS and (not value.hydrogen_scoop is bool or not value.fuel_pump is bool
+	if "pump_mode" in fields and (not value.hydrogen_scoop is bool or not value.fuel_pump is bool
 			or not value.pump_mode is String or value.pump_mode not in PUMP_MODES
 			or (not value.fuel_pump and value.pump_mode != PUMP_OFF)):
+		return false
+	if "drive_kind" in fields and (not value.range_drive is bool or not value.drive_kind is String
+			or value.drive_kind not in [DRIVE_STANDARD, DRIVE_RANGE]
+			or (not value.range_drive and value.drive_kind == DRIVE_RANGE)):
 		return false
 	if not (value.fuel is float or value.fuel is int):
 		return false
@@ -346,4 +392,6 @@ func restore(value: Variant, legacy := false, pre_shield := false, pre_dual_fuel
 	hydrogen_scoop = value.get("hydrogen_scoop", true)
 	fuel_pump = value.get("fuel_pump", false)
 	pump_mode = value.get("pump_mode", PUMP_OFF)
+	range_drive = value.get("range_drive", false)
+	drive_kind = value.get("drive_kind", DRIVE_STANDARD)
 	return true

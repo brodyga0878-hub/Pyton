@@ -188,6 +188,8 @@ func _test_saves() -> void:
 	previous.ship.erase("hydrogen_scoop")
 	previous.ship.erase("fuel_pump")
 	previous.ship.erase("pump_mode")
+	previous.ship.erase("range_drive")
+	previous.ship.erase("drive_kind")
 	previous.ship.erase("hull_id")
 	previous.ship.erase("jump_fuel")
 	previous.mining.cargo.erase("hydrogen")

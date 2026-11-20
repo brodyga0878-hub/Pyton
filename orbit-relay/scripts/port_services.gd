@@ -8,6 +8,7 @@ signal ship_exchange_requested(hull: String)
 signal customs_payment_requested()
 signal fuel_module_removed(module: String)
 signal pump_mode_requested(mode: String)
+signal drive_selected(drive: String)
 signal dismissed()
 
 const TEXT := Color("e8f4fa")
@@ -19,9 +20,10 @@ const ShipSystems := preload("res://scripts/ship_systems.gd")
 const Crew := preload("res://scripts/crew.gd")
 const Economy := preload("res://scripts/port_economy.gd")
 const Factions := preload("res://scripts/faction_fronts.gd")
-const EQUIPMENT_SERVICES := ["mining_laser", "fragment_collector", "hydrogen_scoop", "fuel_pump"]
+const EQUIPMENT_SERVICES := ["mining_laser", "fragment_collector", "hydrogen_scoop", "fuel_pump", "range_drive"]
 const FUEL_MODULES := {"hydrogen_scoop": "scoop", "fuel_pump": "pump"}
 const PUMP_MODES := {"off": "Выкл.", "reaction": "В реактивный", "jump": "В прыжковый"}
+const DRIVE_LABELS := {"standard": ShipSystems.STANDARD_DRIVE_NAME, "range": ShipSystems.RANGE_DRIVE_NAME}
 
 enum StationPage { SERVICES, CREW, YARD, CUSTOMS, MINING }
 
@@ -66,6 +68,8 @@ var _customs_other_debts: Label
 var _mining: VBoxContainer
 var _mining_toggle: Button
 var _fuel_remove_buttons: Dictionary[String, Button] = {}
+var _drive_summary: Label
+var _drive_buttons: Dictionary[String, Button] = {}
 var _station_page := StationPage.SERVICES
 var _transfers: VBoxContainer
 var _hydrogen: Label
@@ -165,6 +169,7 @@ func build() -> void:
 	_add_service("fragment_collector", "Сборщик обломков", "Переносит обломок в свободную ячейку трюма", _mining)
 	_add_fuel_module("hydrogen_scoop", "Сборщик водорода", "Наполняет канистры у звёзд и газовых гигантов")
 	_add_fuel_module("fuel_pump", "Топливный насос", "Переливает канистры в выбранный бак")
+	_build_drive_selection()
 	_transfers = VBoxContainer.new()
 	_transfers.add_theme_constant_override("separation", 8)
 	content.add_child(_transfers)
@@ -247,6 +252,18 @@ func _refresh_equipment() -> void:
 		button.visible = bool(status[key])
 		button.disabled = not status.station
 		button.text = "Снять · +%d кр." % int(status[key + "_resale"])
+	var drive: Dictionary = _sim.jump_drive_status()
+	_drive_summary.text = "«%s» · груз %d / %d · бак %d ед." % [
+		drive.name, int(drive.load), int(drive.capacity), roundi(float(drive.jump_capacity)),
+	]
+	for id: String in _drive_buttons:
+		var button := _drive_buttons[id]
+		var selected: bool = drive.id == id
+		button.set_pressed_no_signal(selected)
+		button.disabled = selected or not drive.can_select or (id == "range" and not drive.have_range)
+		button.tooltip_text = "Привод активен" if selected else "Выбрать привод для следующего вылета"
+		if id == "range" and not drive.have_range:
+			button.tooltip_text = "Сначала установите привод дальнего хода"
 
 
 func _refresh_service_buttons(actions: Array) -> void:
@@ -683,6 +700,15 @@ func _request_pump_mode(mode: String) -> void:
 		pump_mode_requested.emit(mode)
 
 
+func _request_drive_selection(drive: String) -> void:
+	if not is_open() or _fuel_only or _station_page != StationPage.MINING or not _drive_buttons.has(drive):
+		return
+	var status: Dictionary = _sim.jump_drive_status()
+	if status.can_select and status.id != drive and (drive != "range" or status.have_range):
+		_touches.clear()
+		drive_selected.emit(drive)
+
+
 func _request_transfer(destination: String) -> void:
 	if is_open() and _fuel_only and _sim.fuel_transfer_offer(destination).ok:
 		_touches.clear()
@@ -767,6 +793,23 @@ func _add_fuel_module(module: String, title: String, detail: String) -> void:
 	row.move_child(remove, install.get_index())
 	remove.hide()
 	_fuel_remove_buttons[module] = remove
+
+
+func _build_drive_selection() -> void:
+	_add_service("range_drive", "Привод «%s»" % ShipSystems.RANGE_DRIVE_NAME,
+		"Дальний ход с меньшим расходом и временем переходов", _mining)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	_mining.add_child(row)
+	_drive_summary = _label(row, "", 17, MINT)
+	_drive_summary.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_drive_summary.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	for id: String in DRIVE_LABELS:
+		var button := _button(row)
+		button.text = DRIVE_LABELS[id]
+		button.toggle_mode = true
+		button.pressed.connect(_request_drive_selection.bind(id))
+		_drive_buttons[id] = button
 
 
 func _build_pump_controls() -> void:
@@ -858,7 +901,7 @@ func _button_at(point: Vector2) -> Button:
 	elif _station_page == StationPage.CUSTOMS:
 		buttons = [_customs_pay]
 	elif _station_page == StationPage.MINING:
-		buttons += _fuel_remove_buttons.values()
+		buttons += _fuel_remove_buttons.values() + _drive_buttons.values()
 	for button: Button in buttons:
 		if not button.disabled and button.is_visible_in_tree() and button.get_global_rect().has_point(point):
 			return button

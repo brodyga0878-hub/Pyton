@@ -6,6 +6,7 @@ signal frame_requested()
 const MiningRig := preload("res://scripts/mining_rig.gd")
 const Sector := preload("res://scripts/sector_catalog.gd")
 const Patrol := preload("res://scripts/patrol_encounter.gd")
+const MissionCalendar := preload("res://scripts/mission_calendar.gd")
 const INK := Color("eef8ff")
 const MUTED := Color("a7bac9")
 const CYAN := Color("8fe9db")
@@ -110,6 +111,7 @@ var _gear_blocked := true
 var _frame_blocked := true
 var _fire_blocked := false
 var _jumping := false
+var _jump_transit := false
 var _notice_left := 0.0
 var _mouse_pad: SteeringPad
 
@@ -498,11 +500,15 @@ func sync(sim: RefCounted, delta: float) -> void:
 	if not _parked and parked:
 		_reset_controls()
 	_parked = parked
-	_jumping = sim.jump_seconds_left > 0.0
-	_steer.visible = not parked
-	_bank.visible = not parked
-	_flight_modes.visible = not parked
-	_translation_controls.visible = not parked and _translation_mode
+	var jump: Dictionary = sim.jump_progress_status()
+	if bool(jump.is_transit) and not _jump_transit:
+		_reset_controls()
+	_jumping = bool(jump.active)
+	_jump_transit = bool(jump.is_transit)
+	_steer.visible = not parked and not _jump_transit
+	_bank.visible = _steer.visible
+	_flight_modes.visible = _steer.visible
+	_translation_controls.visible = _steer.visible and _translation_mode
 	var assist: Button = _actions["flight_assist"]
 	assist.text = "Стабилизация" if sim.flight_assist else "Инерция"
 	assist.tooltip_text = "Отключить автоматическую стабилизацию" if sim.flight_assist else "Включить автоматическую стабилизацию"
@@ -554,19 +560,21 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_right_panel.offset_top = -157.0 if docked else (-101.0 if landed else (-274.0 if flight_tools else -215.0))
 	if _orbital_mining_tools.visible:
 		_right_panel.offset_top -= 57.0
-	_marks.flight = not parked
+	_marks.flight = not parked and not _jump_transit
 	_marks.queue_redraw()
 	_sync_remote_rig(sim.remote_rig_status(), docked, landed)
 
 	var mining: RefCounted = sim.mining
 	var drilling: bool = landed and mining.phase in [MiningRig.DEPLOYING, MiningRig.DRILLING, MiningRig.RETURNING]
 	var departure_progress: bool = _departure_active and departure.phase in ["opening", "transit"]
-	var show_progress := drilling or departure_progress
+	var show_progress := drilling or departure_progress or _jumping
 	_operation_progress.visible = show_progress
 	if drilling:
 		_operation_progress.value = mining.progress()
 	elif departure_progress:
 		_operation_progress.value = departure.progress
+	elif _jumping:
+		_operation_progress.value = float(jump.progress)
 	_commands_panel.offset_top = -160.0 if show_progress else -143.0
 	_notice_panel.offset_top = -215.0 if show_progress else -199.0
 	_notice_panel.offset_bottom = -169.0 if show_progress else -153.0
@@ -619,8 +627,8 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_refresh_disabled_actions()
 	_sync_fuel(sim.ship)
 	_sync_condition(sim.ship.hull, mining.ore_hold, mining.cargo_capacity)
-	var stellar: Dictionary = {} if parked else sim.thermal_status()
-	var entry: Dictionary = {} if parked else sim.atmosphere_status()
+	var stellar: Dictionary = {} if parked or _jump_transit else sim.thermal_status()
+	var entry: Dictionary = {} if parked or _jump_transit else sim.atmosphere_status()
 	var stellar_scoop: bool = sim.scooping and scoop_status.get("kind", "") == "star"
 	var show_entry := _prefer_entry_meter(stellar, entry, stellar_scoop)
 	var entry_site := int(entry.site) if show_entry and (entry.near or entry.inside) else -1
@@ -634,7 +642,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 		if sim.contract_stage != 1 and patrol.get("phase") in [Patrol.OUTBOUND, Patrol.RETURN] and patrol_button.visible:
 			_guidance.text = str(patrol.get("reason", ""))
 	else:
-		_sync_flight(sim, scoop_status, itinerary, patrol, fire, convoy, rendezvous, entry_site, surface, frame)
+		_sync_flight(sim, scoop_status, itinerary, patrol, fire, convoy, rendezvous, entry_site, surface, frame, jump)
 	_sync_passengers(sim)
 	_sync_thermal(stellar, entry, stellar_scoop, show_entry)
 	if _departure_blocked:
@@ -837,7 +845,7 @@ func _sync_clock(sim: RefCounted) -> void:
 	pause_button.tooltip_text = "Продолжить игровое время (F9)" if paused else "Остановить игровое время (F9)"
 	_time_blocked = paused or (not status.allowed and scale <= 1)
 	button.text = "%d×" % scale
-	_time_hint.visible = not paused and not status.allowed
+	_time_hint.visible = not paused and not _jumping and not status.allowed
 	_time_hint.text = "Ускорение недоступно. %s" % status.reason if _time_hint.visible else ""
 	button.tooltip_text = _time_hint.text if _time_hint.visible else "Сменить скорость игрового времени (O)"
 	if paused:
@@ -903,7 +911,10 @@ func _sync_surface(sim: RefCounted, mining: RefCounted) -> void:
 			else:
 				_guidance.text = "Разверните добывающий модуль."
 
-func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictionary, patrol: Dictionary, fire: Dictionary, convoy: Dictionary, rendezvous: Dictionary, entry_site: int, surface: Dictionary, frame: Dictionary) -> void:
+func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictionary, patrol: Dictionary, fire: Dictionary, convoy: Dictionary, rendezvous: Dictionary, entry_site: int, surface: Dictionary, frame: Dictionary, jump: Dictionary) -> void:
+	if _jumping:
+		_sync_jump(jump)
+		return
 	var project_course := bool(sim.get("project_course"))
 	var convoy_course: bool = sim.convoy_course
 	var aimed_at_port := Sector.is_port(sim.target) and fire.is_empty() and not bool(sim.patrol_course) and not project_course and not convoy_course and not bool(sim.orbit_maneuver)
@@ -938,11 +949,7 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 				var altitude := ("%.1f" % maxf(0.0, float(surface.altitude))).replace(".", ",")
 				_telemetry.text += "\nВысота %s м · уклон %.0f°" % [altitude, surface.slope]
 		_actions["dock"].tooltip_text = str(surface.reason)
-	if _jumping:
-		_route.text = "Прыжок  /  %s" % Sector.system(sim.jump_target).name
-		_route_detail.text = "До перехода %.1f с" % sim.jump_seconds_left
-		_guidance.text = "Тормоз отменяет прыжок."
-	elif not fire.is_empty() and convoy.is_empty():
+	if not fire.is_empty() and convoy.is_empty():
 		_route.text = "Дозор  /  Рейдер"
 		_route_detail.text = "Дистанция %d м · корпус %d%%" % [roundi(fire.get("distance", 0.0)), ceili(patrol.get("enemy_hull", 0.0))]
 		_guidance.text = "Цель в прицеле. Нажмите «Огонь»." if fire.ok else str(fire.get("reason", ""))
@@ -997,6 +1004,27 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 		_guidance.text = "Курс и крен справа. Тяга и тормоз слева." if _touch_mirrored else "Курс и крен слева. Тяга и тормоз справа."
 	var frame_label := "Ручной кадр" if sim.orbit_maneuver or not rendezvous.is_empty() else "Кадр"
 	_telemetry.text += "\n%s: %s" % [frame_label, _frame_caption(frame)]
+
+func _sync_jump(jump: Dictionary) -> void:
+	var destination := str(Sector.system(int(jump.destination)).name)
+	var remaining := ("%.1f" % float(jump.remaining)).replace(".", ",")
+	var arrival := MissionCalendar.stamp(float(jump.get("arrival_epoch", -1.0)))
+	var duration_seconds := ceili(float(jump.duration))
+	var duration := "%d мин %02d с" % [floori(duration_seconds / 60.0), duration_seconds % 60]
+	if duration_seconds < 60:
+		duration = "%d с" % duration_seconds
+	if _jump_transit:
+		_route.text = "Гиперпространство"
+		_route_detail.text = "До выхода %s с · %s" % [remaining, destination]
+		_telemetry.text = "Время перелёта · %s" % duration
+		_guidance.text = "Топливо списано · %d ед." % int(jump.fare)
+	else:
+		_route.text = "Зарядка  /  %s" % destination
+		_route_detail.text = "До старта %s с · расход %d ед." % [remaining, int(jump.fare)]
+		_telemetry.text = "Время перелёта · %s" % duration
+		_guidance.text = "Тормоз отменяет зарядку."
+	if not arrival.is_empty():
+		_route_detail.text += "\nПрибытие · %s" % arrival
 
 func _frame_caption(frame: Dictionary) -> String:
 	var name := "система" if int(frame.reference) < 0 else "«%s»" % frame.name
@@ -1158,12 +1186,13 @@ func _refresh_disabled_actions() -> void:
 		blocked = blocked or (RIG_ACTIONS.has(action) and not _rig_status.get(RIG_ACTIONS[action], false))
 		blocked = blocked or (ORBITAL_MINING_ACTIONS.has(action) and not _orbital_mining_status.get(ORBITAL_MINING_ACTIONS[action], false))
 		var manual_thrust := action in HOLD_ACTIONS or action in ["throttle_down", "throttle_up"]
-		var during_jump := _jumping and action not in ["time_pause", "throttle_down", "throttle_up", "boost", "brake"]
+		var charge_control := action in ["throttle_down", "throttle_up", "boost", "brake"] and not _jump_transit
+		var during_jump := _jumping and action != "time_pause" and not charge_control
 		var during_departure := _departure_active and action != "time_pause" and (action != "dock" or not _departure_can_cancel)
 		button.disabled = not _input_enabled or blocked or during_jump or during_departure or (_time_paused and manual_thrust)
 
 func move_input() -> Vector2:
-	if _parked or _time_paused or not _input_enabled:
+	if _parked or _jump_transit or _time_paused or not _input_enabled:
 		return Vector2.ZERO
 	var horizontal := float(_key(KEY_D, KEY_RIGHT)) - float(_key(KEY_A, KEY_LEFT))
 	var vertical := float(_key(KEY_W, KEY_UP)) - float(_key(KEY_S, KEY_DOWN))
@@ -1183,16 +1212,16 @@ func translation_input() -> Vector3:
 	return (keyboard + Vector3(stick.x, stick.y, _translation_depth)).limit_length()
 
 func roll_input() -> float:
-	if _parked or _time_paused or not _input_enabled:
+	if _parked or _jump_transit or _time_paused or not _input_enabled:
 		return 0.0
 	var keyboard := float(Input.is_physical_key_pressed(KEY_E)) - float(Input.is_physical_key_pressed(KEY_Q))
 	return clampf(_bank.axis.x * _touch_gain + keyboard, -1.0, 1.0)
 
 func boost_held() -> bool:
-	return not _parked and not _time_paused and _input_enabled and (_boost or Input.is_physical_key_pressed(KEY_SHIFT))
+	return not _parked and not _jump_transit and not _time_paused and _input_enabled and (_boost or Input.is_physical_key_pressed(KEY_SHIFT))
 
 func brake_held() -> bool:
-	return not _parked and not _time_paused and _input_enabled and (_brake or Input.is_physical_key_pressed(KEY_SPACE))
+	return not _parked and not _jump_transit and not _time_paused and _input_enabled and (_brake or Input.is_physical_key_pressed(KEY_SPACE))
 
 func _key(primary: Key, alternate: Key) -> bool:
 	return Input.is_physical_key_pressed(primary) or Input.is_physical_key_pressed(alternate)

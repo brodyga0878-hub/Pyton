@@ -1,11 +1,13 @@
 extends RefCounted
 ## Plans only through discovered systems and uses the tank's capacity per leg.
 ## An optional first-leg budget accounts for fuel already in the tank.
+## Fare and travel-time callbacks take the origin and destination of a leg.
 
 const Catalog := preload("res://scripts/sector_catalog.gd")
 
 
-static func plan(origin: int, goal: int, known: Array[int], capacity: float, first_budget := INF) -> Dictionary:
+static func plan(origin: int, goal: int, known: Array[int], capacity: float, first_budget := INF,
+		tariff: Callable = Callable(), duration: Callable = Callable()) -> Dictionary:
 	if not _valid_system(origin) or not _valid_system(goal):
 		return _unavailable("Выберите звёздную систему")
 	if origin == goal:
@@ -36,12 +38,12 @@ static func plan(origin: int, goal: int, known: Array[int], capacity: float, fir
 		if current < 0:
 			break
 		if current == goal:
-			return describe(label.path)
+			return describe(label.path, tariff, duration)
 		remaining.erase(current)
 		# Costs are positive: every prefix of an optimal route settles before its endpoint.
 		var leg_limit := launch_limit if current == origin else capacity
 		for destination: int in remaining:
-			var fuel := Catalog.jump_cost(current, destination)
+			var fuel := _leg_cost(current, destination, tariff)
 			if fuel <= 0 or fuel > leg_limit:
 				continue
 			var path: Array[int] = label.path.duplicate()
@@ -52,39 +54,55 @@ static func plan(origin: int, goal: int, known: Array[int], capacity: float, fir
 	return _unavailable(no_route)
 
 
-static func describe(path: Array[int]) -> Dictionary:
+static func describe(path: Array[int], tariff: Callable = Callable(), duration: Callable = Callable()) -> Dictionary:
 	if not _valid_nodes(path):
 		return _unavailable("Укажите маршрут между разными системами без повторов")
 	var legs: Array[Dictionary] = []
 	var total_fuel := 0
 	var total_distance := 0.0
+	var total_seconds := 0.0
+	var include_duration := duration.is_valid()
 	for index in range(1, path.size()):
 		var origin := path[index - 1]
 		var destination := path[index]
-		var fuel := Catalog.jump_cost(origin, destination)
+		var fuel := _leg_cost(origin, destination, tariff)
 		if fuel <= 0:
 			return _unavailable("Один из переходов маршрута недоступен")
 		var distance := Catalog.jump_distance(origin, destination)
-		legs.append({"origin": origin, "destination": destination, "fuel": fuel, "distance": distance})
+		var leg := {"origin": origin, "destination": destination, "fuel": fuel, "distance": distance}
+		if include_duration:
+			var seconds := float(duration.call(origin, destination))
+			if not is_finite(seconds) or seconds <= 0.0:
+				return _unavailable("Для одного из переходов не рассчитано время")
+			leg.seconds = seconds
+			total_seconds += seconds
+		legs.append(leg)
 		total_fuel += fuel
 		total_distance += distance
-	return {
+	var route := {
 		"available": true, "path": path.duplicate(), "legs": legs, "fuel": total_fuel,
 		"distance": total_distance, "next": path[1], "goal": path[-1], "reason": "",
 	}
+	if include_duration:
+		route.seconds = total_seconds
+	return route
 
 
-static func valid_path(path: Array[int], known: Array[int], capacity: float) -> bool:
+static func valid_path(path: Array[int], known: Array[int], capacity: float, tariff: Callable = Callable()) -> bool:
 	if not _valid_capacity(capacity) or not _valid_nodes(path):
 		return false
 	for system: int in path:
 		if system not in known:
 			return false
 	for index in range(1, path.size()):
-		var fuel := Catalog.jump_cost(path[index - 1], path[index])
+		var fuel := _leg_cost(path[index - 1], path[index], tariff)
 		if fuel <= 0 or fuel > capacity:
 			return false
 	return true
+
+
+static func _leg_cost(origin: int, destination: int, tariff: Callable) -> int:
+	return int(tariff.call(origin, destination)) if tariff.is_valid() else Catalog.jump_cost(origin, destination)
 
 
 static func _better(candidate: Dictionary, incumbent: Dictionary) -> bool:

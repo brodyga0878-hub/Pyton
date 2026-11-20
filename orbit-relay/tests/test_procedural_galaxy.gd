@@ -173,6 +173,8 @@ func _test_previous_save() -> void:
 	old.ship.erase("hydrogen_scoop")
 	old.ship.erase("fuel_pump")
 	old.ship.erase("pump_mode")
+	old.ship.erase("range_drive")
+	old.ship.erase("drive_kind")
 	old.mining.reserves.resize(Catalog.AUTHORED_DESTINATION_COUNT)
 	old.cartography.erase("systems")
 	var cold := Flight.new()
