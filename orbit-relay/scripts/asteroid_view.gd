@@ -123,28 +123,19 @@ uniform float bands_strength = 1.0;
 uniform float terrain_regions = 0.0;
 uniform float ice_fraction = 0.0;
 uniform int profile = 1;
+// Linear packed data: neutral-centered tone, height, roughness. No sRGB decode.
+uniform sampler2D surface_detail : filter_linear_mipmap, repeat_enable;
+uniform vec3 detail_offset = vec3(0.0);
 varying vec3 rock;
+varying vec3 rock_normal;
 void vertex() {
 	rock = VERTEX;
+	rock_normal = NORMAL;
 }
-float grit(vec3 p) {
-	p = fract(p * 0.3183099 + vec3(0.17, 0.29, 0.1));
-	p *= 17.0;
-	return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
-}
-float deposits(vec3 p) {
-	vec3 cell = floor(p);
-	vec3 f = fract(p);
-	f = f * f * (3.0 - 2.0 * f);
-	vec2 a = vec2(
-		mix(grit(cell), grit(cell + vec3(1.0, 0.0, 0.0)), f.x),
-		mix(grit(cell + vec3(0.0, 1.0, 0.0)), grit(cell + vec3(1.0, 1.0, 0.0)), f.x)
-	);
-	vec2 b = vec2(
-		mix(grit(cell + vec3(0.0, 0.0, 1.0)), grit(cell + vec3(1.0, 0.0, 1.0)), f.x),
-		mix(grit(cell + vec3(0.0, 1.0, 1.0)), grit(cell + vec3(1.0, 1.0, 1.0)), f.x)
-	);
-	return mix(mix(a.x, a.y, f.y), mix(b.x, b.y, f.y), f.z);
+vec3 triplanar_data(vec3 p, vec3 weights) {
+	return texture(surface_detail, p.yz).rgb * weights.x
+		+ texture(surface_detail, p.zx).rgb * weights.y
+		+ texture(surface_detail, p.xy).rgb * weights.z;
 }
 float strata_mask(float bedding, float rough, float width) {
 	float ripple = abs(sin(bedding + rough));
@@ -169,30 +160,35 @@ void fragment() {
 	vec3 stone = mix(rock_color.rgb, seam_color.rgb, broad);
 	float roughness = mix(0.90, 0.71, ice_fraction);
 	if (profile > 0) {
-		float grains = deposits(p * 0.73);
-		float fault = deposits(p * 0.12 + vec3(4.0, 8.0, 0.0));
+		// Stable model-local projection has no spherical UV seam or world-space crawl.
+		vec3 weights = abs(normalize(rock_normal));
+		weights *= weights;
+		weights *= weights;
+		weights /= max(weights.x + weights.y + weights.z, 0.00001);
+		vec3 detail = triplanar_data(p * 0.11 + detail_offset, weights);
+		float grains = detail.r;
+		float fault = detail.g;
 		float layer_breaks = smoothstep(0.30, 0.77, grains * 0.57 + fault * 0.43);
 		float lamina = strata_mask(bedding * 1.27, fault * 12.0 + grains * 1.4 + sediment * 0.73, 0.09) * layer_breaks;
-		float relief = (grains - 0.5) * 0.27 + lamina * bands_strength * 0.035;
+		float relief = (detail.g - 0.5) * 0.23 + lamina * bands_strength * 0.035;
 		float minerals = smoothstep(0.46, 0.68, fault + grains * 0.14);
-		stone *= 0.82 + grains * 0.28;
+		stone *= 1.0 + (grains - 0.5) * 0.62;
 		stone = mix(stone, stone * vec3(0.67, 0.73, 0.82), minerals * terrain_regions);
 		stone = mix(stone, seam_color.rgb * 1.06, lamina * bands_strength * 0.23);
 		stone = mix(stone, stone * vec3(0.81, 1.06, 1.17), ice_fraction * minerals * 0.38);
-		roughness += (grains - 0.5) * 0.18 - lamina * ice_fraction * 0.16;
+		roughness = mix(roughness, detail.b, 0.58) - lamina * ice_fraction * 0.12;
 		if (profile == 2) {
-			float resolution = 1.0 - smoothstep(0.22, 1.1, length(fwidth(p * 4.3)));
-			float fine = deposits(p * 4.3 + vec3(11.0, 7.0, 3.0)) - 0.5;
-			float fault_edge = abs(fault + grains * 0.11 - 0.55);
-			float fractures = (1.0 - smoothstep(0.011, 0.056 + fwidth(fault_edge), fault_edge)) * layer_breaks;
-			stone *= 1.0 + resolution * (fine * 0.33 - fractures * 0.17);
-			relief += resolution * (fine * 0.104 - fractures * 0.030);
+			float resolution = 1.0 - smoothstep(0.22, 1.1, length(fwidth(p * 0.73)));
+			vec3 fine = triplanar_data(p * 0.73 + detail_offset.zxy + vec3(0.19, 0.37, 0.61), weights);
+			stone *= 1.0 + resolution * (fine.r - 0.5) * 0.28;
+			relief += resolution * (fine.g - 0.5) * 0.047;
+			roughness += resolution * (fine.b - 0.5) * 0.09;
 		}
 		NORMAL = relief_normal(VERTEX, normalize(NORMAL), relief);
 	}
 	ALBEDO = stone;
 	METALLIC = 0.0;
-	ROUGHNESS = clamp(roughness, 0.55, 0.98);
+	ROUGHNESS = clamp(roughness, mix(0.55, 0.30, ice_fraction), 0.98);
 }
 """
 	var material := ShaderMaterial.new()
@@ -202,6 +198,8 @@ void fragment() {
 	material.set_shader_parameter("bands_strength", 0.42 if _kind == "moon" else 1.0)
 	material.set_shader_parameter("terrain_regions", 0.79 if _kind == "planet" else 0.31)
 	material.set_shader_parameter("ice_fraction", 1.0 if _kind == "moon" or _kind == "comet" else 0.0)
+	material.set_shader_parameter("surface_detail", load("res://assets/materials/rock_ice.png" if _kind == "moon" or _kind == "comet" else "res://assets/materials/rock_basalt.png"))
+	material.set_shader_parameter("detail_offset", Vector3(fposmod(_seed * 0.137, 1.0), fposmod(_seed * 0.319, 1.0), fposmod(_seed * 0.571, 1.0)))
 	return material
 
 

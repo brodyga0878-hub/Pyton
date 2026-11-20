@@ -10,9 +10,12 @@ const AtmosphereView = preload("res://scripts/atmosphere_view.gd")
 const STAR_DISTANCE := 2700.0
 const STATION_RADIAL_SEGMENTS := 20
 const BACKDROP_ORBIT_SECONDS := 28800.0
+const CLOUD_CYCLE_SECONDS := 1080.0
 const CAMERA_SURFACE_CLEARANCE := 2.0
 
 static var _panel_shader: Shader
+static var _paint_panel_data: Texture2D
+static var _brushed_panel_data: Texture2D
 
 var camera: Camera3D
 var _ship: Node3D
@@ -28,6 +31,7 @@ var _star_id := -1
 var _stars: MeshInstance3D
 var _star: Node3D
 var _backdrop_planet: Node3D
+var _backdrop_material: ShaderMaterial
 var _backdrop_orbit_offset := Vector3.ZERO
 var _backdrop_orbit_axis := Vector3.UP
 var _mining_rig: Node3D
@@ -149,6 +153,8 @@ func set_visual_profile(profile: int) -> void:
 	for finishes in [_ship_finishes, _sector_finishes]:
 		for finish: ShaderMaterial in finishes:
 			finish.set_shader_parameter("finish_quality", _visual_profile)
+	if _backdrop_material != null:
+		_backdrop_material.set_shader_parameter("cloud_quality", _visual_profile)
 	# A profile also applies to every newly loaded surface, star and NPC.
 	for body: Node3D in _surface_views.values():
 		body.set_visual_profile(_visual_profile)
@@ -212,6 +218,8 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_star.position = sim.target_position(_star_id)
 	var backdrop_phase := TAU * fposmod(float(sim.orbit_time), BACKDROP_ORBIT_SECONDS) / BACKDROP_ORBIT_SECONDS
 	_backdrop_planet.position = _star.position + _backdrop_orbit_offset.rotated(_backdrop_orbit_axis, backdrop_phase)
+	if _visual_profile > 0:
+		_backdrop_material.set_shader_parameter("weather_phase", fposmod(float(sim.orbit_time), CLOUD_CYCLE_SECONDS) / CLOUD_CYCLE_SECONDS)
 	_star.update_approach(camera.global_position, position_now, int(sim.target) == _star_id and not settled, bool(sim.scooping))
 	_last_position = position_now
 	_last_berth = berth
@@ -284,7 +292,7 @@ func _surface(color: Color, metallic := 0.25, roughness := 0.65) -> StandardMate
 	return paint
 
 
-func _panel_finish(color: Color, metallic: float, roughness: float, seams: Vector2, ship := false) -> ShaderMaterial:
+func _panel_finish(color: Color, metallic: float, roughness: float, seams: Vector2, ship := false, specular := 0.43) -> ShaderMaterial:
 	if _panel_shader == null:
 		_panel_shader = Shader.new()
 		_panel_shader.code = """
@@ -293,8 +301,14 @@ render_mode diffuse_burley;
 uniform vec4 paint : source_color;
 uniform float metal = 0.3;
 uniform float rough = 0.6;
+uniform float base_specular = 0.43;
 uniform vec2 seams = vec2(2.0, 3.0);
 uniform int finish_quality = 1;
+// Packed linear material data: R tone, G height, B roughness.
+uniform sampler2D panel_data : filter_linear_mipmap, repeat_enable;
+uniform vec2 panel_repeat = vec2(2.0, 2.0);
+uniform float rough_center = 0.52;
+uniform float bump_depth = 0.003;
 
 void fragment() {
 	vec3 surface = paint.rgb;
@@ -310,18 +324,36 @@ void fragment() {
 		float variation = sin(dot(floor(cell), vec2(7.1, 5.3))) * 0.063 * fade;
 		surface *= 1.0 + variation + ridge * 0.15 - seam * 0.52;
 		micro_roughness += seam * 0.17 - ridge * 0.08;
+		// The economy profile never enters this branch or samples a map.
+		vec3 detail = texture(panel_data, UV * panel_repeat).rgb;
+		float fidelity = finish_quality > 1 ? 1.0 : 0.45;
+		float wear = (detail.r - 0.5) * fidelity;
+		surface *= 1.0 + wear * 0.30;
+		micro_roughness += (detail.b - rough_center) * fidelity * 0.32;
 		if (finish_quality > 1) {
-			float grain = sin(UV.y * 305.0 + cos(UV.x * 17.0 + sin(UV.y * 13.0)) * 2.8);
-			float tint = sin(UV.x * 28.0 + sin(UV.y * 8.0) * 3.2);
-			float visible = 1.0 - smoothstep(0.25, 1.2, fwidth(UV.y * 305.0));
-			surface *= 1.0 + grain * visible * 0.048 + tint * 0.037;
-			micro_roughness += grain * visible * 0.045;
+			// Surface-gradient bump also works on the custom hull, which has
+			// UVs and normals but no tangent stream. One filtered sample only.
+			float height = detail.g - 0.5 + ridge * 0.045 - seam * 0.10;
+			vec3 n = normalize(NORMAL);
+			vec3 sx = dFdx(VERTEX);
+			vec3 sy = dFdy(VERTEX);
+			float hx = dFdx(height);
+			float hy = dFdy(height);
+			vec3 r1 = cross(sy, n);
+			vec3 r2 = cross(n, sx);
+			float jacobian = dot(sx, r1);
+			if (abs(jacobian) > 0.000000001) {
+				vec3 bump = bump_depth * sign(jacobian) * (hx * r1 + hy * r2) / abs(jacobian);
+				// Keep rigid panel highlights stable even at grazing angles.
+				bump *= min(1.0, 0.15 / max(length(bump), 0.000001));
+				NORMAL = normalize(n - bump);
+			}
 		}
 	}
 	ALBEDO = surface;
 	METALLIC = metal;
 	ROUGHNESS = clamp(micro_roughness, 0.16, 0.96);
-	SPECULAR = 0.43;
+	SPECULAR = base_specular;
 }
 """
 	var finish := ShaderMaterial.new()
@@ -329,7 +361,17 @@ void fragment() {
 	finish.set_shader_parameter("paint", color)
 	finish.set_shader_parameter("metal", metallic)
 	finish.set_shader_parameter("rough", roughness)
+	finish.set_shader_parameter("base_specular", specular)
 	finish.set_shader_parameter("seams", seams)
+	if _paint_panel_data == null:
+		_paint_panel_data = load("res://assets/materials/metal_paint.png") as Texture2D
+	if _brushed_panel_data == null:
+		_brushed_panel_data = load("res://assets/materials/metal_brushed.png") as Texture2D
+	var brushed := metallic >= 0.45 or roughness >= 0.65
+	finish.set_shader_parameter("panel_data", _brushed_panel_data if brushed else _paint_panel_data)
+	finish.set_shader_parameter("panel_repeat", Vector2(2.0, 3.0) if ship else Vector2(3.0, 2.0))
+	finish.set_shader_parameter("rough_center", 0.32 if brushed else 0.52)
+	finish.set_shader_parameter("bump_depth", 0.003 if ship else 0.014)
 	if ship:
 		_ship_finishes.append(finish)
 	else:
@@ -576,7 +618,7 @@ func _build_ship() -> void:
 	var shell := _panel_finish(Color("#c2c8c6"), 0.35, 0.48, Vector2(7.0, 3.0), true)
 	var graphite := _panel_finish(Color("#354853"), 0.49, 0.58, Vector2(4.0, 3.0), true)
 	var cargo := _panel_finish(Color("#be7548"), 0.31, 0.51, Vector2(6.0, 2.0), true)
-	var bare_metal := _surface(Color("#778b96"), 0.61, 0.32)
+	var bare_metal := _panel_finish(Color("#778b96"), 0.61, 0.32, Vector2(4, 2), true, 0.5)
 	var ice := _light(Color("#8df8e6"))
 	var warm := _light(Color("#fbb768"))
 	var canopy := _surface(Color("#214f70"), 0.38, 0.18)
@@ -730,6 +772,9 @@ shader_type spatial;
 render_mode unshaded;
 uniform bool cool = false;
 uniform bool fringe = false;
+uniform sampler2D cloud_detail : repeat_enable, filter_linear_mipmap_anisotropic;
+uniform int cloud_quality = 1;
+uniform float weather_phase = 0.0;
 varying vec3 surface_point;
 float strata(vec3 p) {
 	return sin(p.x * 21.0 + sin(p.z * 9.0) * 0.65) * cos(p.z * 18.0 + p.y * 13.0);
@@ -741,9 +786,28 @@ void fragment() {
 	vec3 p = normalize(surface_point);
 	float latitude = p.y + p.x * 0.23 + strata(p) * 0.009;
 	float warp = sin(p.z * 10.0 + p.x * 13.0) * 0.52;
+	float breakup = 0.0;
+	float wisps = 0.0;
+	if (cloud_quality > 0) {
+		// Integer repeats and full-tile phase wraps meet across the sphere seam.
+		// Fade noise into the continuous latitude bands at the two poles.
+		float polar_fade = smoothstep(0.012, 0.12, min(UV.y, 1.0 - UV.y));
+		vec2 bands_uv = vec2(UV.x * 4.0 + weather_phase, UV.y * 13.0);
+		bands_uv += vec2(p.y * 0.12, sin(p.x * 6.0 + p.z * 7.0) * 0.18);
+		vec3 storm = texture(cloud_detail, bands_uv).rgb;
+		warp += (storm.g - 0.5) * 2.18 * polar_fade;
+		breakup = (storm.r - 0.5) * 0.26 * polar_fade;
+		wisps = smoothstep(0.38, 0.78, storm.b) * polar_fade * 0.19;
+		if (cloud_quality > 1) {
+			vec2 fine_uv = vec2(UV.x * 9.0 - weather_phase * 2.0, UV.y * 24.0) + storm.rg * 0.13;
+			vec3 fine = texture(cloud_detail, fine_uv).rgb;
+			breakup += (fine.r - 0.5) * 0.19 * polar_fade;
+			wisps += smoothstep(0.52, 0.81, fine.g + storm.b * 0.18) * polar_fade * 0.28;
+		}
+	}
 	float ribbons = sin(latitude * 26.0 + warp);
 	float details = sin(latitude * 112.0 + sin(p.x * 25.0) * 1.5) * 0.1;
-	float m = smoothstep(-0.86, 0.87, ribbons * 0.60 + details + sin(latitude * 8.0) * 0.34);
+	float m = smoothstep(-0.86, 0.87, ribbons * 0.60 + details + sin(latitude * 8.0) * 0.34 + breakup);
 	vec3 low = cool ? vec3(0.13, 0.20, 0.46) : vec3(0.09, 0.27, 0.37);
 	vec3 high = cool ? vec3(0.44, 0.68, 0.71) : vec3(0.65, 0.43, 0.30);
 	if (fringe) {
@@ -751,6 +815,7 @@ void fragment() {
 		high = vec3(0.78, 0.60, 0.34);
 	}
 	vec3 bands = mix(low, high, m);
+	bands = mix(bands, high * 1.17, wisps * (0.38 + 0.62 * m));
 	vec3 light_dir = cool ? vec3(0.65, 0.54, 0.63) : vec3(-0.6, 0.46, 0.72);
 	float day = smoothstep(-0.23, 0.89, dot(p, normalize(light_dir)));
 	float rim = pow(1.0 - clamp(dot(normalize(NORMAL), VIEW), 0.0, 1.0), 4.0);
@@ -758,11 +823,12 @@ void fragment() {
 	ALBEDO = bands * (0.105 + day * 0.75) + rim * haze * (0.15 + day * 0.75);
 }
 """
-	var world := ShaderMaterial.new()
-	world.shader = shader
-	world.set_shader_parameter("cool", cool)
-	world.set_shader_parameter("fringe", fringe)
-	_mesh(_backdrop_planet, sphere, world, Vector3.ZERO)
+	_backdrop_material = ShaderMaterial.new()
+	_backdrop_material.shader = shader
+	_backdrop_material.set_shader_parameter("cool", cool)
+	_backdrop_material.set_shader_parameter("fringe", fringe)
+	_backdrop_material.set_shader_parameter("cloud_detail", preload("res://assets/materials/cloud_bands.png"))
+	_mesh(_backdrop_planet, sphere, _backdrop_material, Vector3.ZERO)
 	var air := SphereMesh.new()
 	air.radius = 894.0
 	air.height = 1788.0
