@@ -23,7 +23,8 @@ const Passengers = preload("res://scripts/passengers.gd")
 const Crew = preload("res://scripts/crew.gd")
 const Cartography = preload("res://scripts/cartography.gd")
 const FlightFrame = preload("res://scripts/flight_frame.gd")
-const SAVE_SCHEMA := 30
+const Customs = preload("res://scripts/customs.gd")
+const SAVE_SCHEMA := 31
 const SHIPYARD_PORTS := [0, 10, Catalog.FRINGE_ARRIVAL_PORT]
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
@@ -126,6 +127,7 @@ var passengers := Passengers.new()
 var crew := Crew.new()
 var cartography := Cartography.new()
 var frame := FlightFrame.new()
+var customs := Customs.new()
 var convoy_course := false
 var project_course := false
 var scooping := false
@@ -1303,6 +1305,36 @@ func _raw_sale_orders() -> Array[Dictionary]:
 	return orders
 
 
+func customs_status(system := -1) -> Dictionary:
+	var region := system_id if system < 0 else system
+	var authority := factions.owner(region) if system_known(region) else -1
+	var status := customs.status(authority)
+	var available := region == system_id and station_services_available() and authority >= 0
+	status.merge({
+		"authority": authority, "authority_name": FactionFronts.faction_name(authority),
+		"medical_allowance": Customs.allowance(authority, "medical"),
+		"medical_aboard": mining.cargo_amount("medical"), "available": available,
+		"can_pay": available and credits > 0 and int(status.debt) > 0,
+	})
+	return status
+
+
+func customs_pay() -> bool:
+	var status := customs_status()
+	return status.can_pay and _apply_service_result(customs.pay(int(status.authority), credits))
+
+
+func _inspect_docked_cargo() -> void:
+	var authority := factions.owner(system_id)
+	var good := "medical"
+	var excess := Customs.excess(authority, good, mining.cargo_amount(good))
+	if excess <= 0 or not mining.remove_cargo(good, excess):
+		return
+	var result := customs.record(authority, docked, good, excess, orbit_time)
+	if not _apply_service_result(result):
+		mining.insert_cargo(good, excess)
+
+
 func market_quote(good: String, side: String, quantity: int) -> Dictionary:
 	var unit := market.trade_value(docked, good, side, 1)
 	var stock := market.stock(docked, good)
@@ -1314,7 +1346,10 @@ func market_quote(good: String, side: String, quantity: int) -> Dictionary:
 	elif unit <= 0 or cost <= 0:
 		reason = "Выберите товар и количество"
 	elif side == "buy":
-		if stock < quantity:
+		var allowance := Customs.allowance(factions.owner(system_id), good)
+		if allowance >= 0 and owned + quantity > allowance:
+			reason = "Таможенный лимит на борту · %d ед." % allowance
+		elif stock < quantity:
 			reason = "В порту недостаточно товара"
 		elif mining.free_capacity() < quantity:
 			reason = "В трюме мало места"
@@ -1334,6 +1369,9 @@ func market_limit(good: String, side: String) -> int:
 		return mini(mining.cargo_amount(good), Economy.MAX_STOCK - market.stock(docked, good))
 	var lower := 0
 	var upper := mini(market.stock(docked, good), mining.free_capacity())
+	var allowance := Customs.allowance(factions.owner(system_id), good)
+	if allowance >= 0:
+		upper = mini(upper, maxi(0, allowance - mining.cargo_amount(good)))
 	while lower < upper:
 		var count := ceili((lower + upper) * 0.5)
 		if market.trade_value(docked, good, side, count) <= credits:
@@ -2352,6 +2390,7 @@ func _dock() -> void:
 	_reset_scoop()
 	_hold_docked_pose()
 	_announce("dock", "Швартовка завершена. Станция «%s»." % target_name(docked))
+	_inspect_docked_cargo()
 
 
 func _hold_docked_pose() -> void:
@@ -3032,7 +3071,7 @@ func snapshot() -> Dictionary:
 		"convoy_order": convoy_order.snapshot(),
 		"passengers": passengers.snapshot(),
 		"crew": crew.snapshot(),
-		"cartography": cartography.snapshot(), "frame": frame.snapshot(),
+		"cartography": cartography.snapshot(), "frame": frame.snapshot(), "customs": customs.snapshot(),
 	}
 
 
@@ -3040,6 +3079,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_customs := schema < 31
 	var pre_frames := schema < 30
 	var pre_rotation := schema < 29
 	var pre_binary := schema < 28
@@ -3148,6 +3188,9 @@ func restore(state: Dictionary) -> bool:
 	var restored_crew := Crew.new()
 	var restored_cartography := Cartography.new()
 	var restored_frame := FlightFrame.new()
+	var restored_customs := Customs.new()
+	if not pre_customs and not restored_customs.restore(state.get("customs"), restored_epoch):
+		return false
 	if not pre_expansion:
 		if not restored_expedition.restore(state.get("expedition")) or not restored_factions.restore(state.get("factions"), pre_thermal, pre_convoy_orders):
 			return false
@@ -3413,6 +3456,7 @@ func restore(state: Dictionary) -> bool:
 	crew = restored_crew
 	cartography = restored_cartography
 	frame = restored_frame
+	customs = restored_customs
 	star_heat = 0.0 if pre_thermal else float(state.star_heat)
 	entry_heat = 0.0 if pre_entry else float(state.entry_heat)
 	_entry_site = -1

@@ -48,6 +48,8 @@ var _freight_drag := -1
 var _freight_drag_position := Vector2.ZERO
 var _goods_buttons: Dictionary[String, Button] = {}
 var _goods_labels: Dictionary[String, Array] = {}
+var _medical_name: Label
+var _customs_rule: Label
 var _selection_icon: CommodityIcon
 var _selection_title: Label
 var _quantity_label: Label
@@ -197,6 +199,8 @@ func _build_market() -> void:
 		icon.select(good, ACCENTS[good])
 		var name := _label(cells, Economy.good_name(good), 21, TEXT)
 		name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		if good == "medical":
+			_medical_name = name
 		_goods_labels[good] = [
 			_table_cell(cells, "", 19, TEXT), _table_cell(cells, "", 19, TEXT),
 			_table_cell(cells, "", 19, AMBER), _table_cell(cells, "", 19, MINT),
@@ -208,6 +212,9 @@ func _build_market() -> void:
 	var selected := _row(order, 12)
 	_selection_icon = _commodity_icon(selected, 42.0)
 	_selection_title = _label(selected, "", 28, TEXT)
+	_customs_rule = _label(order, "", 16, AMBER)
+	_customs_rule.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_customs_rule.hide()
 	_spacer(order)
 	_label(order, "Количество", 16, MUTED)
 	var quantity := _row(order, 8)
@@ -527,6 +534,7 @@ func _refresh_market() -> void:
 	var sell: Dictionary = _sim.market_quote(_selected_good, "sell", _quantity)
 	_selection_icon.select(_selected_good, ACCENTS[_selected_good])
 	_selection_title.text = Economy.good_name(_selected_good)
+	_refresh_customs()
 	_quantity_label.text = "%d ед." % _quantity
 	_minus_button.disabled = _quantity <= 1
 	_plus_button.disabled = _quantity >= capacity
@@ -534,6 +542,24 @@ func _refresh_market() -> void:
 	_sell_max_button.disabled = _limit("sell") < 1
 	_quote(_buy_button, _buy_hint, "Купить", buy)
 	_quote(_sell_button, _sell_hint, "Продать", sell)
+
+
+func _refresh_customs() -> void:
+	var customs: Dictionary = _sim.customs_status()
+	var authority := int(customs.get("authority", -1))
+	var allowance := int(customs.get("medical_allowance", -1))
+	var aboard := int(customs.get("medical_aboard", 0))
+	var restricted := authority >= 0 and allowance >= 0
+	var medicine_selected := _selected_good == "medical"
+	var authority_name := str(customs.get("authority_name", ""))
+	_medical_name.add_theme_color_override("font_color", AMBER if restricted else TEXT)
+	_goods_buttons["medical"].tooltip_text = "Лимит медикаментов · %d ед. В трюме %d ед." % [allowance, aboard] if restricted else ""
+	_customs_rule.visible = restricted or (authority >= 0 and medicine_selected)
+	_customs_rule.add_theme_color_override("font_color", AMBER if restricted else MUTED)
+	if restricted:
+		_customs_rule.text = "%s допускает до %d ед. медикаментов для личного пользования.\nВ трюме %d ед." % [authority_name, allowance, aboard]
+	else:
+		_customs_rule.text = "%s · свободная торговля медикаментами." % authority_name if _customs_rule.visible else ""
 
 
 func _refresh_courier() -> void:

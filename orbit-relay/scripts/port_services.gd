@@ -5,6 +5,7 @@ signal transfer_requested(destination: String)
 signal jettison_requested(good: String)
 signal crew_requested(action: String, member: int)
 signal ship_exchange_requested(hull: String)
+signal customs_payment_requested()
 signal dismissed()
 
 const TEXT := Color("e8f4fa")
@@ -14,8 +15,10 @@ const AMBER := Color("ffd396")
 const BORDER := Color("365561")
 const ShipSystems := preload("res://scripts/ship_systems.gd")
 const Crew := preload("res://scripts/crew.gd")
+const Economy := preload("res://scripts/port_economy.gd")
+const Factions := preload("res://scripts/faction_fronts.gd")
 
-enum StationPage { SERVICES, CREW, YARD }
+enum StationPage { SERVICES, CREW, YARD, CUSTOMS }
 
 var _sim: RefCounted
 var _insets: MarginContainer
@@ -46,6 +49,15 @@ var _crew_buttons: Array[Button] = []
 var _yard: VBoxContainer
 var _yard_toggle: Button
 var _yard_rows: Array[Dictionary] = []
+var _customs: VBoxContainer
+var _customs_toggle: Button
+var _customs_office: Label
+var _customs_law: Label
+var _customs_fine: Label
+var _customs_pay: Button
+var _customs_receipt_title: Label
+var _customs_receipt: Label
+var _customs_other_debts: Label
 var _station_page := StationPage.SERVICES
 var _transfers: VBoxContainer
 var _hydrogen: Label
@@ -96,6 +108,9 @@ func build() -> void:
 	_yard_toggle = _button(header)
 	_yard_toggle.custom_minimum_size.x = 126.0
 	_yard_toggle.pressed.connect(_toggle_station_page.bind(StationPage.YARD))
+	_customs_toggle = _button(header)
+	_customs_toggle.custom_minimum_size.x = 126.0
+	_customs_toggle.pressed.connect(_toggle_station_page.bind(StationPage.CUSTOMS))
 	_close_button = _button(header)
 	_close_button.text = "Закрыть"
 	_close_button.custom_minimum_size.x = 126.0
@@ -132,6 +147,7 @@ func build() -> void:
 	_add_service("heat_shield", "Теплозащита", "Тепловая нагрузка в атмосфере ниже на %d%%" % ShipSystems.HEAT_SHIELD_REDUCTION)
 	_build_crew(content)
 	_build_yard(content)
+	_build_customs(content)
 	_transfers = VBoxContainer.new()
 	_transfers.add_theme_constant_override("separation", 8)
 	content.add_child(_transfers)
@@ -187,6 +203,7 @@ func refresh() -> void:
 		match _station_page:
 			StationPage.CREW: _refresh_crew()
 			StationPage.YARD: _refresh_yard()
+			StationPage.CUSTOMS: _refresh_customs()
 			_: _refresh_services()
 
 
@@ -222,6 +239,7 @@ func _refresh_services() -> void:
 func _show_page() -> void:
 	var crew_open := not _fuel_only and _station_page == StationPage.CREW
 	var yard_open := not _fuel_only and _station_page == StationPage.YARD
+	var customs_open := not _fuel_only and _station_page == StationPage.CUSTOMS
 	_title.text = "Портовые службы"
 	if _fuel_only:
 		_title.text = "Топливо"
@@ -229,15 +247,20 @@ func _show_page() -> void:
 		_title.text = "Экипаж"
 	elif yard_open:
 		_title.text = "Верфь"
+	elif customs_open:
+		_title.text = "Таможня"
 	_crew_toggle.text = "Сервис" if crew_open else "Экипаж"
 	_crew_toggle.visible = not _fuel_only
 	_yard_toggle.text = "Сервис" if yard_open else "Верфь"
 	_yard_toggle.visible = not _fuel_only and _sim.shipyard_available()
+	_customs_toggle.text = "Сервис" if customs_open else "Таможня"
+	_customs_toggle.visible = not _fuel_only
 	_port_details.visible = not _fuel_only
-	_gauges.visible = not crew_open and not yard_open
+	_gauges.visible = not crew_open and not yard_open and not customs_open
 	_services.visible = not _fuel_only and _station_page == StationPage.SERVICES
 	_crew.visible = crew_open
 	_yard.visible = yard_open
+	_customs.visible = customs_open
 	_transfers.visible = _fuel_only
 
 
@@ -479,6 +502,74 @@ func _request_yard_exchange(id: String) -> void:
 			return
 
 
+func _build_customs(parent: VBoxContainer) -> void:
+	_customs = VBoxContainer.new()
+	_customs.add_theme_constant_override("separation", 10)
+	parent.add_child(_customs)
+	_customs_office = _label(_customs, "", 22, MINT)
+	_customs_office.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_customs_law = _label(_customs, "", 17, TEXT)
+	_customs_law.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var settlement := _add_row(_customs, "Местный штраф", "")
+	_customs_fine = settlement[0]
+	_customs_pay = settlement[1]
+	_customs_pay.pressed.connect(_request_customs_payment)
+	_customs.add_child(HSeparator.new())
+	_customs_receipt_title = _label(_customs, "Журнал изъятий", 19, TEXT)
+	_customs_receipt = _label(_customs, "", 16, MUTED)
+	_customs_receipt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_customs.add_child(HSeparator.new())
+	_label(_customs, "Долги в других юрисдикциях", 19, TEXT)
+	_customs_other_debts = _label(_customs, "", 16, MUTED)
+	_customs_other_debts.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_customs.hide()
+
+
+func _refresh_customs() -> void:
+	var status: Dictionary = _sim.customs_status()
+	var authority := int(status.authority)
+	_customs_office.text = str(status.authority_name)
+	var allowance := int(status.medical_allowance)
+	var law := "Лимит ввоза %d ед." % allowance if allowance >= 0 else "Свободный ввоз"
+	_customs_law.text = "Медикаменты на борту: %d ед. · %s" % [int(status.medical_aboard), law]
+	var debt := int(status.debt)
+	var payment := mini(debt, int(_sim.credits))
+	_customs_fine.text = "К оплате %d кр." % debt if debt > 0 else "Задолженности нет"
+	_customs_fine.add_theme_color_override("font_color", AMBER if debt > 0 else MUTED)
+	_customs_pay.disabled = not status.can_pay
+	_customs_pay.text = "Внести %d кр." % payment if payment < debt else "Оплатить %d кр." % payment
+	if _customs_pay.disabled:
+		_customs_pay.text = "Оплата недоступна" if not status.available else "Нет средств" if debt > 0 else "Платёж не требуется"
+	var receipt: Dictionary = status.notice
+	_customs_receipt_title.text = "Журнал изъятий" if receipt.is_empty() else "Последнее изъятие · всего %d" % int(status.violations)
+	_customs_receipt.text = "В журнале нет изъятий."
+	if not receipt.is_empty():
+		_customs_receipt.text = "%s · %s · %s\n%s · изъято %d ед. · штраф %d кр." % [
+			_sim.target_name(int(receipt.port)), Factions.faction_name(int(receipt.authority)),
+			_customs_clock(float(receipt.epoch)), Economy.good_name(str(receipt.good)), int(receipt.quantity), int(receipt.fine),
+		]
+	var foreign := PackedStringArray()
+	for row: Dictionary in status.debts:
+		if int(row.authority) != authority:
+			foreign.append("%s · %d кр." % [row.name, int(row.amount)])
+	_customs_other_debts.text = "\n".join(foreign) if not foreign.is_empty() else "Задолженности нет."
+	if not foreign.is_empty() and debt > 0:
+		_customs_other_debts.text += "\nВсего по всем юрисдикциям: %d кр." % int(status.total_debt)
+
+
+static func _customs_clock(epoch: float) -> String:
+	var seconds := floori(epoch)
+	var hour := floori(seconds / 3600.0)
+	var clock := "%02d:%02d:%02d" % [hour % 24, floori(seconds / 60.0) % 60, seconds % 60]
+	return "День %d · %s" % [floori(hour / 24.0) + 1, clock] if hour >= 24 else clock
+
+
+func _request_customs_payment() -> void:
+	if is_open() and not _fuel_only and _station_page == StationPage.CUSTOMS and _sim.customs_status().can_pay:
+		_touches.clear()
+		customs_payment_requested.emit()
+
+
 func _refresh_transfers() -> void:
 	var hold: RefCounted = _sim.mining
 	_hydrogen.text = "Канистры водорода: %d · до %d ед. топлива из каждой" % [
@@ -651,6 +742,8 @@ func _button_at(point: Vector2) -> Button:
 		return _crew_toggle
 	if _yard_toggle.is_visible_in_tree() and _yard_toggle.get_global_rect().has_point(point):
 		return _yard_toggle
+	if _customs_toggle.is_visible_in_tree() and _customs_toggle.get_global_rect().has_point(point):
+		return _customs_toggle
 	var buttons: Array = _action_buttons.values()
 	if _fuel_only:
 		buttons = _transfer_buttons.values() + [_discard_choice, _discard_button]
@@ -658,6 +751,8 @@ func _button_at(point: Vector2) -> Button:
 		buttons = _crew_buttons
 	elif _station_page == StationPage.YARD:
 		buttons = _yard_rows.map(func(row: Dictionary) -> Button: return row.exchange)
+	elif _station_page == StationPage.CUSTOMS:
+		buttons = [_customs_pay]
 	for button: Button in buttons:
 		if not button.disabled and button.is_visible_in_tree() and button.get_global_rect().has_point(point):
 			return button

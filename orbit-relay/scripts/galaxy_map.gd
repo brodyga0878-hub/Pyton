@@ -47,6 +47,8 @@ var _route_scroll: ScrollContainer
 var _route_details: VBoxContainer
 var _dossier_scroll: ScrollContainer
 var _dossier_ports: Label
+var _dossier_customs: PanelContainer
+var _dossier_customs_rule: Label
 var _dossier_stock: Label
 var _dossier_freight: Label
 var _dossier_observations: Label
@@ -454,6 +456,12 @@ func _build_dossier(parent: Control) -> void:
 	_dossier_scroll.add_child(content)
 	_label(content, "Действующие порты", 17, MINT)
 	_dossier_ports = _dossier_text(content)
+	_dossier_customs = PanelContainer.new()
+	_dossier_customs.add_theme_stylebox_override("panel", _style(Color("27241e"), Color("7a5f40"), 8, 9.0))
+	content.add_child(_dossier_customs)
+	_dossier_customs_rule = _dossier_text(_dossier_customs)
+	_dossier_customs_rule.add_theme_color_override("font_color", AMBER)
+	_dossier_customs.hide()
 	_label(content, "Товары на складах", 17, MINT)
 	_dossier_stock = _dossier_text(content)
 	_label(content, "Межзвёздные поставки", 17, MINT)
@@ -465,6 +473,8 @@ func _build_dossier(parent: Control) -> void:
 
 func _refresh_dossier() -> void:
 	var system: Dictionary = _flight.system_dossier(_candidate)
+	_dossier_customs_rule.text = _dossier_customs_warning(system)
+	_dossier_customs.visible = not _dossier_customs_rule.text.is_empty()
 	if not system.known:
 		_dossier_ports.text = "Сведения о системе ещё не получены."
 		_dossier_stock.text = "Нет сведений."
@@ -496,6 +506,23 @@ func _refresh_dossier() -> void:
 	if system.observations.is_empty():
 		observations.append("Для замера подойдите к телу и откройте данные на карте системы.")
 	_dossier_observations.text = "\n".join(observations)
+
+
+func _dossier_customs_warning(system: Dictionary) -> String:
+	if not system.known or system.ports.is_empty():
+		return ""
+	var customs: Dictionary = _flight.customs_status(_candidate)
+	var allowance := int(customs.get("medical_allowance", -1))
+	if int(customs.get("authority", -1)) < 0 or allowance < 0:
+		return ""
+	var aboard := int(customs.get("medical_aboard", 0))
+	var excess := maxi(0, aboard - allowance)
+	var warning := "Таможня · %s\nДо %d ед. медикаментов для личного пользования.\nВ трюме %d ед." % [
+		customs.authority_name, allowance, aboard,
+	]
+	if excess > 0:
+		warning += " При стыковке изымут %d ед. и начислят штраф." % excess
+	return warning
 
 
 func _toggle_dossier() -> void:

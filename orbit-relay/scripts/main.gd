@@ -71,6 +71,7 @@ func _ready() -> void:
 	_services.jettison_requested.connect(_jettison_cargo)
 	_services.crew_requested.connect(_crew_action)
 	_services.ship_exchange_requested.connect(_ship_exchange)
+	_services.customs_payment_requested.connect(_customs_pay)
 	_services.dismissed.connect(_close_services)
 	add_child(_market)
 	_market.build()
@@ -316,6 +317,13 @@ func _deliver_notice() -> void:
 			"cargo_capacity": flight.ship.cargo_capacity(), "crew_required": flight.ship.crew_required(),
 			"system_id": flight.system_id, "orbit_time": flight.orbit_time, "reason": flight.status_message,
 		}
+	elif event in ["customs_inspection", "customs_paid"]:
+		var customs := flight.customs_status()
+		trace_fields = {
+			"port": flight.docked, "authority": customs.authority, "unpaid": customs.debt,
+			"credits": flight.credits, "system_id": flight.system_id, "orbit_time": flight.orbit_time,
+			"notice": customs.notice,
+		}
 	elif event == "reference_frame":
 		var frame := flight.frame_status()
 		trace_fields = {
@@ -347,7 +355,7 @@ func _deliver_notice() -> void:
 		"convoy_order_accepted", "convoy_order_escorted", "convoy_order_failed", "convoy_order_paid",
 		"convoy_order_fire", "convoy_order_enemy_hit",
 		"flight_assist", "reference_frame",
-		"survey_record", "galaxy_scan",
+		"survey_record", "galaxy_scan", "customs_inspection", "customs_paid",
 		"orbit_start", "orbit_complete", "orbit_abort", "orbit_cancel",
 		"rendezvous_start", "rendezvous_hold", "rendezvous_abort", "rendezvous_cancel", "rendezvous_finish",
 	]:
@@ -694,6 +702,15 @@ func _crew_action(action: String, member: int) -> void:
 		"dismiss": changed = flight.crew_dismiss(member)
 		"pay": changed = flight.crew_pay(member)
 	if changed:
+		_deliver_notice()
+		_update_display(0.0)
+	_services.refresh()
+
+
+func _customs_pay() -> void:
+	if not _services.is_open():
+		return
+	if flight.customs_pay():
 		_deliver_notice()
 		_update_display(0.0)
 	_services.refresh()
