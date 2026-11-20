@@ -1,0 +1,201 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.55.0",
+  "source_commit": "0c79513e7f74985eb8a174d967d21ad3d7e9f854",
+  "content": {
+    "save_schema": 16,
+    "seamless_material_maps": 5,
+    "texture_resolution": [
+      512,
+      512
+    ],
+    "mip_levels_below_base": 9,
+    "surface_materials": [
+      "basalt",
+      "ice",
+      "brushed metal",
+      "painted metal",
+      "gas clouds"
+    ]
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 80,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.54.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 35,
+    "tested_on_device": false
+  },
+  "checks": {
+    "android_report_share": {
+      "failures": 0,
+      "checks": 76
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "docking": {
+      "failures": 0,
+      "checks": 72
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 132
+    },
+    "flight": {
+      "failures": 0
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 72
+    },
+    "heat_shield": {
+      "failures": 0,
+      "checks": 28
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 186
+    },
+    "living": {
+      "failures": 0,
+      "checks": 76
+    },
+    "material_maps": {
+      "failures": 0,
+      "checks": 33
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "npc_freight": {
+      "failures": 0,
+      "checks": 43
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 292
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 80
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "report": {
+      "failures": 0,
+      "checks": 28
+    },
+    "scene": {
+      "failures": 0
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 191
+    },
+    "material_regeneration": {
+      "files": 5,
+      "byte_identical": true,
+      "repeat_seams_verified": true
+    },
+    "desktop_rock_materials": {
+      "checks": 42,
+      "failures": 0,
+      "pairs": 3
+    },
+    "desktop_panel_materials": {
+      "checks": 68,
+      "failures": 0,
+      "baseline_checks": 64,
+      "economy_pixel_match": true
+    },
+    "desktop_gas_materials": {
+      "checks": 80,
+      "failures": 0,
+      "economy_pixel_match": true,
+      "weather_phase_wrap_pixel_match": true
+    },
+    "android_manifest_repair": {
+      "checks": 11,
+      "failures": 0
+    }
+  },
+  "files": {
+    "OrbitRelay-0.55.0-arm64.apk": {
+      "bytes": 28555812,
+      "sha256": "019808b455fa740881e09af7823758789dc9d85366dddb52fdbe259347bbce42"
+    },
+    "OrbitRelay-0.55.0-source.zip": {
+      "bytes": 2068434,
+      "sha256": "4c61fba761b4a11f9728a92b7b64ecfceb4bc37098eb565bbe86b064676991f2"
+    },
+    "asteroid-basalt.png": {
+      "bytes": 732832,
+      "sha256": "7a5c97572235fcb26b50276d247ebc8b8def41251201b1d9e22e900f0c593419"
+    },
+    "gas-after.png": {
+      "bytes": 150942,
+      "sha256": "25bbcf4b061464c153902d26927b9c2ed415a30d07a6a67f1810e6159d630664"
+    },
+    "gas-before.png": {
+      "bytes": 113775,
+      "sha256": "64ab91ad417f5445e3b3322464f90ad5bc13ceae52d13721fa62a628131161ed"
+    },
+    "ice-after.png": {
+      "bytes": 1248125,
+      "sha256": "da36fc18890658500c6b37efb05b39d6216809a7fc00b244ca4339e90ffbac89"
+    },
+    "ice-before.png": {
+      "bytes": 1056803,
+      "sha256": "9bdaff7eac873c2f3b871920fc447ec5a1288e05088b2e6bec1cd3397aff7c40"
+    },
+    "rocky-planet.png": {
+      "bytes": 1230070,
+      "sha256": "d8f4addff112bca2ad34d21eaccbbebc924ff54ee2ddd521b5aed0db57733ec3"
+    },
+    "ship-materials.png": {
+      "bytes": 401318,
+      "sha256": "918df393d2cbbf685f59f3bb535c77204d921d9c859893f7487052fc88b605ad"
+    },
+    "station-after.png": {
+      "bytes": 413306,
+      "sha256": "38034395cb8d6d44df3b94d2f893d3868ca8bb37938942df15e752674ba2824f"
+    },
+    "station-before.png": {
+      "bytes": 323820,
+      "sha256": "5996b860ea8727fe37dd2ba12f19a8298dde4d2d6e9c5eefed3fa7519dd2fdd7"
+    }
+  }
+}
