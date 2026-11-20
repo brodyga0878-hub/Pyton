@@ -284,6 +284,8 @@ func _parked(id: int) -> RefCounted:
 		state.landed_site = id
 		state.landing_direction = [0.0, 0.0, 1.0]
 		state.mining.site_id = id
+		state.gear_extension = 1.0
+		state.gear_deployed = true
 	_expect(flight.restore(state), "Initialize a docked or landed flight at site %d" % id)
 	return flight
 

@@ -18,7 +18,7 @@ const Patrol = preload("res://scripts/patrol_encounter.gd")
 const Expedition = preload("res://scripts/expedition.gd")
 const FactionFronts = preload("res://scripts/faction_fronts.gd")
 const ConvoyOrders = preload("res://scripts/convoy_orders.gd")
-const SAVE_SCHEMA := 18
+const SAVE_SCHEMA := 19
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
@@ -54,6 +54,7 @@ const LANDING_RADIUS := 8.0
 const FREE_LANDING_MAX_HEIGHT := 10.0
 const LANDING_GUIDE_HEIGHT := 90.0
 const LANDING_ANGLE := 20.0
+const GEAR_TRAVEL_SECONDS := 1.4
 const IMPACT_DAMAGE_SPEED := 14.0
 const PATROL_CRUISE_SPEED := 70.0
 const CONVOY_CRUISE_SPEED := 105.0
@@ -92,6 +93,8 @@ var landing_direction := Vector3.ZERO
 var landed: bool:
 	get:
 		return landed_site >= 0
+var gear_extension := 0.0
+var gear_deployed := false
 var mining := MiningRig.new()
 var ship := ShipSystems.new()
 var market := Economy.new()
@@ -174,6 +177,8 @@ func speed_relative_to(index: int) -> float:
 func time_status() -> Dictionary:
 	if jump_seconds_left > 0.0:
 		return {"allowed": false, "reason": "Зарядка прыжкового привода"}
+	if gear_extension != (1.0 if gear_deployed else 0.0):
+		return {"allowed": false, "reason": "Шасси в движении"}
 	if orbit_maneuver:
 		return {"allowed": false, "reason": "Орбитальный манёвр"}
 	if rendezvous_active:
@@ -828,10 +833,72 @@ func cancel_dock_sync() -> bool:
 	return true
 
 
+func gear_status() -> Dictionary:
+	var reason := ""
+	if docked >= 0:
+		reason = "Корабль в орбитальном доке"
+	elif landed:
+		reason = "Поднимитесь с поверхности"
+	elif jump_seconds_left > 0.0:
+		reason = "Идёт зарядка прыжкового привода"
+	elif autopilot and Catalog.is_mine_site(target):
+		reason = "Выпуском управляет посадочный автопилот"
+	var locked := _gear_locked()
+	var caption := "Шасси убрано"
+	if locked:
+		caption = "Шасси выпущено"
+	elif gear_deployed:
+		caption = "Выпуск шасси · %d%%" % floori(gear_extension * 100.0)
+	elif gear_extension > 0.0:
+		caption = "Уборка шасси · %d%%" % floori(gear_extension * 100.0)
+	return {
+		"progress": gear_extension, "deployed": gear_deployed, "locked": locked,
+		"allowed": reason.is_empty(), "reason": reason, "text": caption,
+	}
+
+
+func gear_action() -> bool:
+	var status := gear_status()
+	if not status.allowed:
+		_announce("gear_denied", status.reason)
+		return false
+	_command_gear(not gear_deployed)
+	return true
+
+
+func _gear_locked() -> bool:
+	return gear_deployed and gear_extension == 1.0
+
+
+func _command_gear(deployed: bool) -> void:
+	if gear_deployed == deployed:
+		return
+	reset_time_scale()
+	gear_deployed = deployed
+	if deployed:
+		_announce("gear_deploy", "Выпускается шасси.")
+	else:
+		_announce("gear_retract", "Шасси убирается.")
+
+
+func _advance_gear(delta: float) -> void:
+	var stop := 1.0 if gear_deployed else 0.0
+	if gear_extension == stop:
+		return
+	gear_extension = move_toward(gear_extension, stop, delta / GEAR_TRAVEL_SECONDS)
+	if is_equal_approx(gear_extension, stop):
+		gear_extension = stop
+		if gear_deployed:
+			_announce("gear_ready", "Шасси выпущено.")
+		else:
+			_announce("gear_stowed", "Шасси убрано.")
+
+
 func surface_status() -> Dictionary:
 	var status := {
 		"ok": false, "near": false, "guide": false, "reason": "Подойдите к твёрдой поверхности",
 		"altitude": 0.0, "slope": 0.0, "pad": false, "direction": Vector3.ZERO,
+		"gear_ok": _gear_locked(), "awaiting_gear": false,
 	}
 	if docked >= 0 or landed or not Catalog.is_mine_site(target):
 		return status
@@ -881,6 +948,9 @@ func surface_status() -> Dictionary:
 		status.reason = "Выберите участок с меньшим уклоном"
 	elif not aim_ok:
 		status.reason = "Направьте нос к площадке" if over_pad else "Направьте нос к поверхности"
+	elif not status.gear_ok:
+		status.awaiting_gear = true
+		status.reason = "Дождитесь выпуска шасси" if gear_deployed else "Выпустите шасси"
 	else:
 		status.ok = true
 		status.reason = "Можно садиться"
@@ -908,6 +978,9 @@ func dock_action() -> bool:
 		_launch()
 		return true
 	var status := selected_dock_status()
+	if status.get("awaiting_gear", false) and not gear_deployed and not autopilot:
+		_command_gear(true)
+		return false
 	if not status.ok:
 		_announce("dock_denied" if Catalog.is_port(target) else "landing_denied", status.reason)
 		return false
@@ -1532,6 +1605,7 @@ func start_jump() -> bool:
 	_clear_rendezvous()
 	throttle = 0.0
 	boost = false
+	_command_gear(false)
 	jump_seconds_left = JUMP_CHARGE
 	_announce("jump_charging", "Прыжковый привод заряжается.")
 	return true
@@ -1616,6 +1690,7 @@ func _lift() -> void:
 	reset_time_scale()
 	landed_site = -1
 	landing_direction = Vector3.ZERO
+	_command_gear(false)
 	yaw = atan2(-away.x, -away.z) if offpad else PI
 	pitch = clampf(asin(clampf(away.y, -1.0, 1.0)), -MAX_PITCH, MAX_PITCH)
 	if offpad:
@@ -1650,6 +1725,8 @@ func _departure_target(default_target: int) -> int:
 
 func _dock() -> void:
 	docked = target
+	gear_extension = 0.0
+	gear_deployed = false
 	set_autopilot(false)
 	throttle = 0.0
 	boost = false
@@ -1713,6 +1790,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		_apply_convoy_result(convoy_order.step(self, delta))
 		return
 
+	_advance_gear(delta)
 	if jump_seconds_left > 0.0:
 		if manual_input:
 			cancel_jump()
@@ -1950,7 +2028,12 @@ func _autopilot_step(delta: float) -> void:
 		else:
 			waypoint = target_contact(target) + Vector3.BACK * 1.8
 			max_speed = 13.0 if mining_site else 19.0
-			autopilot_phase = "Посадка" if mining_site else "Стыковка"
+			if mining_site:
+				_command_gear(true)
+				autopilot_phase = "Посадка" if _gear_locked() else "Выпуск шасси"
+			else:
+				_command_gear(false)
+				autopilot_phase = "Стыковка"
 		_match_target_roll(delta)
 	else:
 		autopilot_phase = "К зоне сбора" if star_run else "К створу"
@@ -2197,6 +2280,7 @@ func snapshot() -> Dictionary:
 		"contract_route_id": contract_route_id, "contract_leg": contract_leg,
 		"landed_site": landed_site, "planned_target": planned_target, "mining": mining.snapshot(),
 		"landing_direction": [landing_direction.x, landing_direction.y, landing_direction.z],
+		"gear_extension": gear_extension, "gear_deployed": gear_deployed,
 		"ship": ship.snapshot(), "market": market.snapshot(), "freight": freight.snapshot(),
 		"system_id": system_id, "jump_target": jump_target, "jump_route": _jump_route.duplicate(),
 		"patrol": patrol.snapshot(), "star_heat": star_heat, "entry_heat": entry_heat,
@@ -2209,6 +2293,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_gear := schema < 19
 	var pre_frontier_freight := schema < 18
 	var pre_jump_route := schema < 17
 	var pre_freight := schema < 16
@@ -2410,6 +2495,16 @@ func restore(state: Dictionary) -> bool:
 			return false
 	elif restored_mining.phase != MiningRig.STOWED or restored_direction != Vector3.ZERO:
 		return false
+	var restored_gear := 1.0 if restored_landing >= 0 else 0.0
+	var restored_gear_command := restored_landing >= 0
+	if not pre_gear:
+		if not _number(state.get("gear_extension"), 0.0, 1.0) or not state.get("gear_deployed") is bool:
+			return false
+		if restored_dock >= 0 or restored_landing >= 0:
+			if float(state.gear_extension) != restored_gear or state.gear_deployed != restored_gear_command:
+				return false
+		restored_gear = float(state.gear_extension)
+		restored_gear_command = state.gear_deployed
 	if restored_plan >= 0:
 		if Catalog.system_of_site(restored_plan) != restored_system or not _site_available(restored_plan, restored_expedition) or restored_plan == restored_dock or restored_plan == restored_landing or (restored_dock < 0 and restored_landing < 0):
 			return false
@@ -2453,6 +2548,8 @@ func restore(state: Dictionary) -> bool:
 	docked = restored_dock
 	landed_site = restored_landing
 	landing_direction = restored_direction
+	gear_extension = restored_gear
+	gear_deployed = restored_gear_command
 	mining = restored_mining
 	ship = restored_ship
 	market = restored_market

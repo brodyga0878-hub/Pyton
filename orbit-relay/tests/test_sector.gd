@@ -270,6 +270,8 @@ func _at_site(site: int) -> RefCounted:
 		state.landed_site = site
 		state.landing_direction = [0.0, 0.0, 1.0]
 		state.mining.site_id = site
+		state.gear_extension = 1.0
+		state.gear_deployed = true
 	_expect(flight.restore(state), "Restore the parked starting state at site %d" % site)
 	return flight
 

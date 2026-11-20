@@ -166,6 +166,7 @@ func _test_offpad_landing() -> void:
 	flight.velocity = flight.target_velocity(PLANET) - direction * 2.1
 	flight.yaw = atan2(-inward.x, -inward.z)
 	flight.pitch = asin(inward.y)
+	flight.gear_action()
 	if not _expect(flight.atmosphere_status().inside and flight.atmosphere_status().vertical_speed < -1.8,
 		"A manual off-pad approach senses its actual low-speed descent in the atmosphere"):
 		return

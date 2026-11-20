@@ -12,6 +12,7 @@ const STATION_RADIAL_SEGMENTS := 20
 const BACKDROP_ORBIT_SECONDS := 28800.0
 const CLOUD_CYCLE_SECONDS := 1080.0
 const CAMERA_SURFACE_CLEARANCE := 2.0
+const GEAR_PAD_SIZE := Vector3(0.46, 0.32, 0.13)
 
 static var _panel_shader: Shader
 static var _paint_panel_data: Texture2D
@@ -20,6 +21,11 @@ static var _brushed_panel_data: Texture2D
 var camera: Camera3D
 var _ship: Node3D
 var _landing_gear: Node3D
+var _gear_struts: Array[MeshInstance3D] = []
+var _gear_joints: Array[Vector3] = []
+var _gear_feet: Array[Vector3] = []
+var _gear_pads: MultiMesh
+var _gear_progress := -1.0
 var _jet: MeshInstance3D
 var _jet_material: ShaderMaterial
 var _lighting: Environment
@@ -189,7 +195,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var heading := Basis.IDENTITY if docked else ship_orientation
 	_ship.position = position_now
 	_ship.basis = ship_orientation
-	_landing_gear.visible = landed
+	_sync_landing_gear(sim.gear_extension)
 	var thrust := clampf(float(sim.throttle), 0.0, 1.0)
 	_flight_time += delta
 	_jet.visible = not settled and thrust > 0.01
@@ -267,6 +273,25 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_lighting.fog_light_energy = 0.48
 		_lighting.fog_density = float(haze.density) * 0.0015
 		_lighting.fog_sky_affect = 0.0
+
+
+func _sync_landing_gear(progress: float) -> void:
+	if progress == _gear_progress:
+		return
+	_gear_progress = progress
+	_landing_gear.visible = progress > 0.0
+	if not _landing_gear.visible:
+		return
+	var travel := lerpf(0.02, 1.0, smoothstep(0.0, 1.0, progress))
+	for index in range(_gear_struts.size()):
+		var joint := _gear_joints[index]
+		var foot := joint.lerp(_gear_feet[index], travel)
+		var axis := foot - joint
+		var axes := Basis.looking_at(axis) * Basis(Vector3.RIGHT, PI * 0.5)
+		_gear_struts[index].transform = Transform3D(axes.scaled_local(Vector3(1.0, travel, 1.0)), (joint + foot) * 0.5)
+		var angle := PI * 0.5 + TAU * float(index) / 3.0
+		var pad_axes := Basis(Vector3.BACK, angle).scaled_local(GEAR_PAD_SIZE)
+		_gear_pads.set_instance_transform(index, Transform3D(pad_axes, foot))
 
 
 func _sync_surface_guide(sim: RefCounted, settled: bool) -> void:
@@ -456,9 +481,9 @@ func _light(color: Color) -> StandardMaterial3D:
 	return paint
 
 
-func _box_batch(parent: Node3D, paint: Material, shapes: Array) -> void:
+func _box_batch(parent: Node3D, paint: Material, shapes: Array) -> MultiMesh:
 	if shapes.is_empty():
-		return
+		return null
 	var mesh := BoxMesh.new()
 	mesh.size = Vector3.ONE
 	mesh.material = paint
@@ -475,6 +500,7 @@ func _box_batch(parent: Node3D, paint: Material, shapes: Array) -> void:
 	instance.multimesh = batch
 	instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	parent.add_child(instance)
+	return batch
 
 
 func _cylinder(parent: Node3D, paint: Material, at: Vector3, radius_front: float, radius_back: float, length: float, segments := STATION_RADIAL_SEGMENTS) -> MeshInstance3D:
@@ -735,6 +761,7 @@ func _build_ship() -> void:
 	_box_batch(detail, warm, service_slots)
 	_ring(trim, graphite, Vector3(0, 0.02, 1.77), 0.47, 0.045, 30)
 	_landing_gear = Node3D.new()
+	_landing_gear.name = "LandingGear"
 	_landing_gear.visible = false
 	_ship.add_child(_landing_gear)
 	var legs: Array = []
@@ -745,8 +772,11 @@ func _build_ship() -> void:
 		var foot := radius * 1.32 + Vector3(0, 0, -3.92)
 		var strut := _cylinder(_landing_gear, shell, (joint + foot) * 0.5, 0.066, 0.1, joint.distance_to(foot), 6)
 		strut.basis = Basis.looking_at(foot - joint) * Basis(Vector3.RIGHT, PI * 0.5)
-		legs.append([foot, Vector3(0.46, 0.32, 0.13), angle])
-	_box_batch(_landing_gear, graphite, legs)
+		_gear_struts.append(strut)
+		_gear_joints.append(joint)
+		_gear_feet.append(foot)
+		legs.append([foot, GEAR_PAD_SIZE, angle])
+	_gear_pads = _box_batch(_landing_gear, graphite, legs)
 
 	var flow := Shader.new()
 	flow.code = """

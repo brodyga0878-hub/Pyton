@@ -104,7 +104,7 @@ func _test_first_service(flight: Flight) -> Flight:
 		return null
 	var cold := Flight.new()
 	var saved := _json(flight.snapshot())
-	if not _expect(saved.schema == 18 and cold.restore(saved) and cold.freight.snapshot() == flight.freight.snapshot()
+	if not _expect(saved.schema == Flight.SAVE_SCHEMA and cold.restore(saved) and cold.freight.snapshot() == flight.freight.snapshot()
 		and cold.market.snapshot() == flight.market.snapshot()
 		and _route(cold, HEATHER_SHIP, HEATHER_PORT) == between,
 		"Cold restart in hyperspace keeps the cargo, both markets, ETA and visual phase"):

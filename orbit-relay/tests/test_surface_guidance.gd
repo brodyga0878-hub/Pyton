@@ -122,6 +122,8 @@ func _test_touch_cycle() -> void:
 	var tangent := Terrain.basis(COMET, direction).x
 	seed.ship.fuel = 0.0
 	seed.velocity += tangent * 5.0
+	seed.gear_extension = 0.0
+	seed.gear_deployed = false
 	if not _expect(SessionIO.save_state(seed.snapshot()) == OK, "The off-pad approach can be saved"):
 		return
 	var game := _open_game()
@@ -130,14 +132,17 @@ func _test_touch_cycle() -> void:
 	_expect(game._hud._surface_panel.is_visible_in_tree() and not flight.surface_status().speed_ok
 		and "Скорость —" in game._hud._surface_ready.text,
 		"The first displayed approach detects dangerous sideways motion from the saved flight")
+	_expect(game._hud._surface_gear.text == "Шасси убрано" and not game._view._landing_gear.visible,
+		"The retracted gear matches the instrument and is hidden on the ship")
 	_touch(game._hud._actions["dock"])
 	_expect(not flight.landed, "Touch does not bypass the surface warning")
 	flight.velocity = flight.target_velocity(COMET)
 	game._update_display(0.0)
 	await process_frame
-	_expect(game._hud._surface_panel.is_visible_in_tree() and flight.surface_status().ok
+	_expect(game._hud._surface_panel.is_visible_in_tree() and not flight.surface_status().ok
+		and not flight.surface_status().gear_ok
 		and "Скорость ✓" in game._hud._surface_ready.text,
-		"The display returns to the ready state after matching ground speed")
+		"Matching ground speed clears the speed warning while the retracted gear still blocks touchdown")
 	_touch(game._hud._actions["map"])
 	_expect(game._map.visible and not game._hud._surface_panel.is_visible_in_tree(),
 		"The surface guide goes away while the system map is open")
@@ -146,12 +151,31 @@ func _test_touch_cycle() -> void:
 	game._update_display(0.0)
 	await process_frame
 	_expect(game._hud._surface_panel.is_visible_in_tree(), "Closing the map restores live surface guidance")
+	_touch(game._hud._actions["gear"])
+	_expect(flight.gear_deployed and not flight.surface_status().gear_ok,
+		"The touch gear control starts the timed deployment")
+	var travel_ticks := ceili(Flight.GEAR_TRAVEL_SECONDS / STEP)
+	var first_ticks := floori(travel_ticks * 0.5)
+	for _frame in range(first_ticks):
+		game._physics_process(STEP)
+	game._update_display(0.0)
+	_expect(game._view._landing_gear.visible and "Выпуск шасси" in game._hud._surface_gear.text
+		and "%" in game._hud._actions["gear"].text and not flight.surface_status().ok,
+		"The moving struts and percentage are visible while touchdown remains unavailable")
+	for _frame in range(travel_ticks - first_ticks + 1):
+		game._physics_process(STEP)
+	game._update_display(0.0)
+	await process_frame
+	_expect(flight.surface_status().ok and flight.surface_status().gear_ok
+		and game._hud._surface_gear.text == "Шасси выпущено",
+		"Touchdown is ready only once the visible approach has fully extended gear")
 	_touch(game._hud._actions["dock"])
 	game._update_display(0.0)
 	await process_frame
 	var dock_button: Button = game._hud._actions["dock"]
 	_expect(flight.landed_offpad() and flight.landed_site == COMET and flight.landing_direction.dot(direction) > 0.9999
 		and not game._hud._surface_panel.is_visible_in_tree() and not flight.surface_status().guide
+		and not game._hud._actions["gear"].visible and game._view._landing_gear.visible
 		and dock_button.text == "Взлёт" and not dock_button.disabled,
 		"After touchdown on the sampled patch the flight guide is replaced by an enabled lift action")
 	var reserve := flight.mining.reserve_at(COMET)
@@ -205,6 +229,8 @@ func _approach(site: int, direction: Vector3, height: float) -> Flight:
 	flight.position = flight.target_position(site) + Terrain.point(site, direction) + direction * height
 	flight.velocity = flight.target_velocity(site)
 	_aim(flight, -Terrain.normal(site, direction))
+	flight.gear_extension = 1.0
+	flight.gear_deployed = true
 	return flight
 
 

@@ -109,7 +109,7 @@ func _physics_process(delta: float) -> void:
 func _update_display(delta: float) -> void:
 	_view.sync(flight, delta)
 	_hud.sync(flight, delta)
-	var final_approach := flight.autopilot and flight.autopilot_phase in ["Стыковка", "Посадка", "Вход в зону сбора"]
+	var final_approach := flight.autopilot and flight.autopilot_phase in ["Стыковка", "Посадка", "Выпуск шасси", "Вход в зону сбора"]
 	var marker := flight.target_contact(flight.target) if final_approach else flight.target_gate(flight.target)
 	var patrol_status := flight.patrol_status()
 	var signal_selected: bool = patrol_status.phase == Flight.Patrol.OUTBOUND and patrol_status.same_system and not flight.autopilot
@@ -159,6 +159,8 @@ func _handle_action(action: String) -> void:
 			flight.set_autopilot(not flight.autopilot)
 		"dock_sync":
 			flight.toggle_dock_sync()
+		"gear":
+			flight.gear_action()
 		"flight_assist":
 			flight.set_flight_assist(not flight.flight_assist)
 		"orbit_cancel":
@@ -244,6 +246,7 @@ func _deliver_notice() -> void:
 		"mining_phase": flight.mining.phase, "cargo_units": flight.mining.ore_hold,
 		"fuel": flight.ship.fuel, "scooping": flight.scooping, "star_heat": flight.star_heat,
 		"entry_heat": flight.entry_heat, "heat_shield": flight.ship.heat_shield,
+		"gear_extension": flight.gear_extension, "gear_deployed": flight.gear_deployed,
 		"flight_assist": flight.flight_assist,
 		"orbit_maneuver": flight.orbit_maneuver, "orbit_maneuver_focus": flight.orbit_maneuver_focus,
 		"rendezvous_active": flight.rendezvous_active,
@@ -262,6 +265,7 @@ func _deliver_notice() -> void:
 		"mining_ready", "mining_loaded", "ore_sold", "service_refuel", "service_tank", "service_eco",
 		"scoop_full", "scoop_stop", "star_arrival", "fuel_empty", "thermal_damage",
 		"atmosphere_enter", "atmosphere_exit", "atmosphere_damage",
+		"gear_deploy", "gear_retract", "gear_ready", "gear_stowed",
 		"service_heat_shield",
 		"jump_planned", "jump_complete", "route_canceled",
 		"market_buy", "market_sell", "service_repair", "service_cargo", "hull_damage", "contract_leg",
@@ -331,7 +335,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_N: "map", KEY_J: "galaxy", KEY_K: "scoop", KEY_P: "services", KEY_O: "time", KEY_L: "market",
 		KEY_U: "patrol", KEY_X: "fire", KEY_I: "convoy", KEY_H: "flight_assist",
 		KEY_F2: "settings", KEY_F3: "journal", KEY_F4: "frontier",
-		KEY_F5: "dock_sync",
+		KEY_F5: "dock_sync", KEY_Y: "gear",
 	}
 	if actions.has(event.physical_keycode):
 		_handle_action(actions[event.physical_keycode])

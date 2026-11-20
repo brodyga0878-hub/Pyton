@@ -55,6 +55,7 @@ var _surface_height: Label
 var _surface_motion: Label
 var _surface_alignment: Label
 var _surface_ready: Label
+var _surface_gear: Label
 var _guidance: Label
 var _notice: Label
 var _notice_panel: PanelContainer
@@ -84,6 +85,7 @@ var _patrol_blocked := false
 var _convoy_blocked := false
 var _rendezvous_finish_blocked := true
 var _dock_sync_blocked := true
+var _gear_blocked := true
 var _fire_blocked := false
 var _jumping := false
 var _notice_left := 0.0
@@ -210,6 +212,11 @@ func build() -> void:
 	_button(commands, "dock_sync", "Крен дока")
 	_actions["dock_sync"].tooltip_text = "Следовать вращению кольца по крену (F5). Курс, сдвиг и тяга остаются под вашим управлением."
 	_actions["dock_sync"].hide()
+	_button(commands, "gear", "Шасси")
+	var gear_button: Button = _actions["gear"]
+	gear_button.name = "LandingGear"
+	gear_button.custom_minimum_size.x = 118.0
+	gear_button.hide()
 	_button(commands, "dock", "Старт")
 	_button(commands, "scoop", "Сбор топлива")
 	_button(commands, "contract", "Контракт")
@@ -319,11 +326,12 @@ func _build_surface_instrument() -> void:
 	_surface_motion = _label(readout, 16, INK)
 	_surface_alignment = _label(readout, 16, INK)
 	_surface_ready = _label(readout, 14, MUTED)
-	for label in [_surface_status, _surface_height, _surface_motion, _surface_alignment, _surface_ready]:
+	_surface_gear = _label(readout, 15, AMBER)
+	for label in [_surface_status, _surface_height, _surface_motion, _surface_alignment, _surface_ready, _surface_gear]:
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_surface_panel.hide()
 
-func _sync_surface_guidance(status: Dictionary) -> void:
+func _sync_surface_guidance(status: Dictionary, gear: Dictionary) -> void:
 	var approach := not status.is_empty() and bool(status.get("guide", false))
 	_surface_panel.visible = approach and _input_enabled
 	if not approach:
@@ -341,6 +349,21 @@ func _sync_surface_guidance(status: Dictionary) -> void:
 	_surface_alignment.text = "Скорость %.1f м/с · Нос %.1f°" % [float(status.relative_speed), float(status.aim_error_deg)]
 	_surface_alignment.add_theme_color_override("font_color", CYAN if status.aim_ok else AMBER)
 	_surface_ready.text = "Высота %s · Скорость %s · Уклон %s · Нос %s" % ["✓" if status.height_ok else "—", "✓" if status.speed_ok else "—", "✓" if status.slope_ok else "—", "✓" if status.aim_ok else "—"]
+	_surface_gear.text = str(gear.text)
+	_surface_gear.add_theme_color_override("font_color", CYAN if gear.locked else AMBER)
+
+func _sync_gear(gear: Dictionary, shown: bool) -> void:
+	var button: Button = _actions["gear"]
+	button.visible = shown and _input_enabled
+	_gear_blocked = not bool(gear.allowed)
+	if not button.visible:
+		return
+	var moving := (float(gear.progress) != (1.0 if gear.deployed else 0.0))
+	var percentage := floori(100.0 * float(gear.progress))
+	button.text = "Шасси %d%%" % percentage if moving else "Шасси"
+	button.add_theme_color_override("font_color", CYAN if gear.locked else AMBER)
+	var hint := "Убрать шасси (Y)" if gear.deployed else "Выпустить шасси (Y)"
+	button.tooltip_text = "%s\n%s" % [gear.text, gear.reason if _gear_blocked else hint]
 
 func _build_flight_modes() -> void:
 	_flight_modes = HBoxContainer.new()
@@ -464,8 +487,11 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var sale_quote: int = sim.raw_sale_quote() if docked and mining.ore_hold > 0 else 0
 	_actions["sell_ore"].visible = sale_quote > 0
 	var manual_approach: bool = not parked and not _jumping and not sim.autopilot and not approach_active and fire.is_empty() and convoy.is_empty() and not sim.patrol_course and not sim.project_course and not sim.convoy_course
+	var surface: Dictionary = sim.surface_status() if not parked and Sector.is_mine_site(sim.target) else {}
+	var gear: Dictionary = sim.gear_status()
 	_sync_docking(sim.docking_guidance() if manual_approach and Sector.is_port(sim.target) else {})
-	_sync_surface_guidance(sim.surface_status() if manual_approach and Sector.is_mine_site(sim.target) and not sim.scooping else {})
+	_sync_surface_guidance(surface if manual_approach and not sim.scooping else {}, gear)
+	_sync_gear(gear, not parked and not _jumping and (surface.get("near", false) or gear.progress > 0.0 or gear.deployed))
 	_sync_clock(sim)
 	_refresh_disabled_actions()
 	_sync_fuel(sim.ship)
@@ -482,7 +508,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 		if sim.contract_stage != 1 and patrol.get("phase") in [Patrol.OUTBOUND, Patrol.RETURN] and patrol_button.visible:
 			_guidance.text = str(patrol.get("reason", ""))
 	else:
-		_sync_flight(sim, scoop_status, itinerary, patrol, fire, convoy, rendezvous, entry_site)
+		_sync_flight(sim, scoop_status, itinerary, patrol, fire, convoy, rendezvous, entry_site, surface)
 	_sync_thermal(stellar, entry, sim.scooping, show_entry)
 	if _notice_left > 0.0:
 		_notice_left -= delta
@@ -640,11 +666,10 @@ func _sync_surface(sim: RefCounted, mining: RefCounted) -> void:
 			else:
 				_guidance.text = "Разверните добывающий модуль."
 
-func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictionary, patrol: Dictionary, fire: Dictionary, convoy: Dictionary, rendezvous: Dictionary, entry_site: int) -> void:
+func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictionary, patrol: Dictionary, fire: Dictionary, convoy: Dictionary, rendezvous: Dictionary, entry_site: int, surface: Dictionary) -> void:
 	var project_course := bool(sim.get("project_course"))
 	var convoy_course: bool = sim.convoy_course
 	var aimed_at_port := Sector.is_port(sim.target) and fire.is_empty() and not bool(sim.patrol_course) and not project_course and not convoy_course and not bool(sim.orbit_maneuver)
-	var surface: Dictionary = sim.surface_status() if Sector.is_mine_site(sim.target) else {}
 	var near_surface: bool = surface.get("near", false)
 	var to_target: Vector3 = sim.target_position(sim.target) - sim.position
 	var meters := to_target.length()
@@ -833,6 +858,7 @@ func set_input_enabled(enabled: bool) -> void:
 		_docking_panel.hide()
 		_surface_panel.hide()
 		_actions["dock_sync"].hide()
+		_actions["gear"].hide()
 	_refresh_disabled_actions()
 
 func set_touch_preferences(sensitivity: int, mirrored: bool) -> void:
@@ -865,6 +891,7 @@ func _refresh_disabled_actions() -> void:
 		blocked = blocked or (action == "patrol" and _patrol_blocked) or (action == "convoy" and _convoy_blocked) or (action == "fire" and _fire_blocked)
 		blocked = blocked or (action == "rendezvous_finish" and _rendezvous_finish_blocked)
 		blocked = blocked or (action == "dock_sync" and _dock_sync_blocked)
+		blocked = blocked or (action == "gear" and _gear_blocked)
 		var during_jump := _jumping and action not in ["throttle_down", "throttle_up", "boost", "brake"]
 		button.disabled = not _input_enabled or blocked or during_jump
 

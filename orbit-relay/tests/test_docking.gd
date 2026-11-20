@@ -195,6 +195,8 @@ func _test_handoffs_and_save() -> void:
 		flight.yaw = 0.0
 		flight.pitch = 0.0
 		flight.roll = 0.0
+		flight.gear_extension = 1.0
+		flight.gear_deployed = true
 		_expect(flight.dock_action() and flight.landed_site == 2 and flight.dock_roll_sync == -1,
 			"A normal surface landing does not inherit a station's bank correction")
 

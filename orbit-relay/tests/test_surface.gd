@@ -330,6 +330,8 @@ func _approach(site: int, direction: Vector3, epoch := EPOCH) -> Flight:
 	flight.position = flight.target_position(site) + Terrain.contact(site, direction) + direction * 3.0
 	flight.velocity = flight.target_velocity(site)
 	_aim(flight, -Terrain.normal(site, direction))
+	flight.gear_extension = 1.0
+	flight.gear_deployed = true
 	return flight
 
 

@@ -93,6 +93,8 @@ func _test_moving_contacts() -> void:
 	surface.select_target(MOON)
 	surface.position = surface.target_contact(MOON) + Vector3.BACK * 3.0
 	surface.yaw = 0.0
+	surface.gear_extension = 1.0
+	surface.gear_deployed = true
 	surface.velocity = surface.target_velocity(MOON) + Vector3.FORWARD * 4.5
 	_expect(not surface.dock_action(), "Touchdown rejects excessive speed relative to the moon")
 	surface.velocity = surface.target_velocity(MOON) + Vector3.FORWARD * 2.0
@@ -324,6 +326,8 @@ func _parked(site: int, epoch := EPOCH) -> Flight:
 		state.landed_site = site
 		state.landing_direction = [0.0, 0.0, 1.0]
 		state.mining.site_id = site
+		state.gear_extension = 1.0
+		state.gear_deployed = true
 	if not flight.restore(state):
 		_failures.append("Dynamic contact fixture at site %d could not be restored" % site)
 	return flight

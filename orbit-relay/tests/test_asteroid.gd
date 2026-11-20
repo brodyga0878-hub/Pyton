@@ -75,6 +75,8 @@ func _test_manual_approach() -> void:
 	flight.position = flight.target_contact(Flight.ASTEROID_TARGET) + Vector3(0.0, 0.0, 3.0)
 	flight.velocity = flight.target_velocity(Flight.ASTEROID_TARGET) + Vector3(0.0, 0.0, -12.0)
 	flight.yaw = 0.0
+	flight.gear_extension = 1.0
+	flight.gear_deployed = true
 	_expect(not flight.dock_action() and not flight.landed, "Landing rejects excessive speed")
 	flight.velocity = flight.target_velocity(Flight.ASTEROID_TARGET)
 	flight.yaw = PI
