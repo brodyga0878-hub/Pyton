@@ -1,0 +1,172 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.54.0",
+  "source_commit": "d796a3f8e154ad66a5efd45e7155a48bcdc7204f",
+  "content": {
+    "save_schema": 16,
+    "moving_dock_guidance": true,
+    "manual_roll_assist": true,
+    "dock_guide_distance_m": 180,
+    "autodock_capture_distance_m": 2.7,
+    "autodock_max_relative_speed_mps": 3
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 79,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.53.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 35,
+    "tested_on_device": false
+  },
+  "checks": {
+    "android_report_share": {
+      "failures": 0,
+      "checks": 76
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "docking": {
+      "failures": 0,
+      "checks": 72
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 132
+    },
+    "flight": {
+      "failures": 0
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 72
+    },
+    "heat_shield": {
+      "failures": 0,
+      "checks": 28
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 186
+    },
+    "living": {
+      "failures": 0,
+      "checks": 76
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "npc_freight": {
+      "failures": 0,
+      "checks": 43
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 292
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 80
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "report": {
+      "failures": 0,
+      "checks": 28
+    },
+    "scene": {
+      "failures": 0
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 191
+    },
+    "docking_approach_matrix": {
+      "cases": 168,
+      "failures": 0,
+      "ports": 7,
+      "max_sampled_final_gap_m": 2.6987,
+      "max_sampled_prior_relative_speed_mps": 1.4778
+    },
+    "dock_guide_geometry": {
+      "checks": 31,
+      "failures": 0
+    },
+    "desktop_docking_render": {
+      "checks": 24,
+      "failures": 0
+    },
+    "desktop_docking_controls": {
+      "checks": 30,
+      "failures": 0,
+      "viewports": [
+        [
+          1280,
+          720
+        ],
+        [
+          1600,
+          720
+        ]
+      ]
+    },
+    "android_manifest_repair": {
+      "checks": 11,
+      "failures": 0
+    }
+  },
+  "files": {
+    "OrbitRelay-0.54.0-arm64.apk": {
+      "bytes": 26486264,
+      "sha256": "e762a9e0a5df9f132efeb85cdb327de825aebf12b2d87bb55d9bc5ab80acc495"
+    },
+    "OrbitRelay-0.54.0-source.zip": {
+      "bytes": 316358,
+      "sha256": "865b2568eda3fe65770037e79defd1833966d85e59d2f073fe489a3a63a910ff"
+    },
+    "dock-approach.png": {
+      "bytes": 232688,
+      "sha256": "f72ff73156fe7f67bec59338e6e17fab3bca040ab3fe10894945ecf20955455e"
+    },
+    "dock-ready.png": {
+      "bytes": 215090,
+      "sha256": "4369b65f4e5c7a79dbfca9f230cd29151c4b6a3020b09d212225ebb07286c06e"
+    },
+    "dock-roll-sync.png": {
+      "bytes": 404816,
+      "sha256": "d73ad1f476753c7719b8ea55738b14ab9ec330c7a755521f6857ac91ba85a0cf"
+    }
+  }
+}
