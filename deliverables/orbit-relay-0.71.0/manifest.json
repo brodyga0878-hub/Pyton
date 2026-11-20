@@ -1,0 +1,246 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.71.0",
+  "source_commit": "b74523f5ad83f71fbc673b69d282031e8648d538",
+  "content": {
+    "save_schema": 31,
+    "checked_on_physical_docking": true,
+    "local_authority_and_historical_receipt": true,
+    "league_personal_medicine_allowance": 4,
+    "fine_base": 100,
+    "fine_per_excess_unit": 45,
+    "partial_settlement_and_foreign_debt_view": true,
+    "tested_acceptance_matrix": {
+      "checked": 29,
+      "partial": 9,
+      "open": 6
+    }
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 96,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.70.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 43,
+    "tested_on_device": false
+  },
+  "checks": {
+    "android_report_share": {
+      "failures": 0,
+      "checks": 76
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "binary_orbits": {
+      "failures": 0,
+      "checks": 55
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "cartography": {
+      "failures": 0,
+      "checks": 43
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "crew": {
+      "failures": 0,
+      "checks": 45
+    },
+    "customs": {
+      "failures": 0,
+      "checks": 28
+    },
+    "departure": {
+      "failures": 0,
+      "checks": 32
+    },
+    "dock_access": {
+      "failures": 0,
+      "checks": 37
+    },
+    "docking": {
+      "failures": 0,
+      "checks": 76
+    },
+    "dual_fuel": {
+      "failures": 0,
+      "checks": 25
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 139
+    },
+    "flight": {
+      "failures": 0
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "frontier_freight": {
+      "failures": 0,
+      "checks": 33
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 76
+    },
+    "galactic_routes": {
+      "failures": 0,
+      "checks": 59
+    },
+    "gear": {
+      "failures": 0,
+      "checks": 28
+    },
+    "heat_shield": {
+      "failures": 0,
+      "checks": 28
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 187
+    },
+    "living": {
+      "failures": 0,
+      "checks": 77
+    },
+    "material_maps": {
+      "failures": 0,
+      "checks": 33
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "npc_freight": {
+      "failures": 0,
+      "checks": 48
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 535
+    },
+    "passengers": {
+      "failures": 0,
+      "checks": 50
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 81
+    },
+    "procedural_galaxy": {
+      "failures": 0,
+      "checks": 140
+    },
+    "reference_frames": {
+      "failures": 0,
+      "checks": 46
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "report": {
+      "failures": 0,
+      "checks": 28
+    },
+    "scene": {
+      "failures": 0
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "shipyard": {
+      "failures": 0,
+      "checks": 52
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 381
+    },
+    "surface_guidance": {
+      "failures": 0,
+      "checks": 60
+    },
+    "surface_rotation": {
+      "failures": 0,
+      "checks": 154
+    },
+    "customs_model": {
+      "checks": 230,
+      "failures": 0
+    },
+    "market_and_galaxy_customs_headless": {
+      "checks": 18,
+      "failures": 0
+    },
+    "market_and_galaxy_customs_graphical": {
+      "checks": 20,
+      "failures": 0
+    },
+    "customs_service_headless": {
+      "checks": 93,
+      "failures": 0
+    },
+    "customs_service_graphical": {
+      "checks": 95,
+      "failures": 0
+    },
+    "actual_0_70_legacy_parked_cargo": {
+      "checks": 8,
+      "failures": 0
+    },
+    "frozen_0_71_physical_customs_circuit": {
+      "checks": 50,
+      "failures": 0,
+      "archived_saves": 2
+    }
+  },
+  "files": {
+    "OrbitRelay-0.71.0-arm64.apk": {
+      "bytes": 28733194,
+      "sha256": "92755e6745b6a95cbc590279f0eeb05335cd5a7f08715310ea6589b5d8f4e029"
+    },
+    "OrbitRelay-0.71.0-source.zip": {
+      "bytes": 2224580,
+      "sha256": "1224672140d0c7d2271bfcfe463c9a2cf162a15646cc6ff3c53b0a44e774108a"
+    },
+    "customs-foreign-balance.png": {
+      "bytes": 136106,
+      "sha256": "b6c1974361b1aad56c7cc8673625e1eb5db30e97c87d07f60cdb4e1375c8154d"
+    },
+    "customs-league-receipt.png": {
+      "bytes": 189733,
+      "sha256": "6398d31facc5eefcbb276f41ed8caf719de5fa4212751eb22cc3a642bc778a07"
+    },
+    "velar-import-dossier.png": {
+      "bytes": 171000,
+      "sha256": "d52e520dae6adf6753188e774ee097d3514afaf9144ea0d1587e5553c12384ba"
+    },
+    "velar-market-medication-cap.png": {
+      "bytes": 113917,
+      "sha256": "122fabfbba294e84764d53683234c33ad3b2ca026560b429d9a5d7c1f540e13c"
+    }
+  }
+}
