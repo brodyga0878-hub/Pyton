@@ -1,0 +1,208 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.61.0",
+  "source_commit": "784e5a9d7768761d90132821835c75968ba34c33",
+  "content": {
+    "save_schema": 21,
+    "comparison_version": "0.60.0",
+    "orbital_inbound_hatch_with_timed_clearance": true,
+    "ports": 9,
+    "clearance_window_seconds": 26,
+    "restorable_slot_and_queue": true,
+    "tested_acceptance_matrix": {
+      "checked": 18,
+      "partial": 14,
+      "open": 12
+    }
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 86,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.60.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 37,
+    "tested_on_device": false
+  },
+  "checks": {
+    "android_report_share": {
+      "failures": 0,
+      "checks": 76
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "dock_access": {
+      "failures": 0,
+      "checks": 36
+    },
+    "docking": {
+      "failures": 0,
+      "checks": 76
+    },
+    "dual_fuel": {
+      "failures": 0,
+      "checks": 25
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 139
+    },
+    "flight": {
+      "failures": 0
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "frontier_freight": {
+      "failures": 0,
+      "checks": 33
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 75
+    },
+    "galactic_routes": {
+      "failures": 0,
+      "checks": 59
+    },
+    "gear": {
+      "failures": 0,
+      "checks": 28
+    },
+    "heat_shield": {
+      "failures": 0,
+      "checks": 28
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 186
+    },
+    "living": {
+      "failures": 0,
+      "checks": 76
+    },
+    "material_maps": {
+      "failures": 0,
+      "checks": 33
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "npc_freight": {
+      "failures": 0,
+      "checks": 48
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 319
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 80
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "report": {
+      "failures": 0,
+      "checks": 28
+    },
+    "scene": {
+      "failures": 0
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 191
+    },
+    "surface_guidance": {
+      "failures": 0,
+      "checks": 60
+    },
+    "dock_clock_and_traffic": {
+      "checks": 1187,
+      "failures": 0
+    },
+    "dock_core_approaches": {
+      "checks": 168,
+      "failures": 0
+    },
+    "dock_all_ports_reserve_approaches": {
+      "checks": 72,
+      "failures": 0
+    },
+    "dock_touch_ui_headless": {
+      "checks": 73,
+      "failures": 0
+    },
+    "dock_touch_ui_graphical": {
+      "checks": 77,
+      "failures": 0
+    },
+    "hatch_model_headless": {
+      "checks": 8,
+      "failures": 0
+    },
+    "hatch_model_graphical": {
+      "checks": 11,
+      "failures": 0
+    },
+    "actual_0_60_save_migration": {
+      "checks": 11,
+      "failures": 0
+    }
+  },
+  "files": {
+    "OrbitRelay-0.61.0-arm64.apk": {
+      "bytes": 28609380,
+      "sha256": "c483050f1a8fedb9ae1149d905230656f945d0241da0af497c69445bb553107e"
+    },
+    "OrbitRelay-0.61.0-source.zip": {
+      "bytes": 2131333,
+      "sha256": "d6ed2b7395752c933f46f52cb6668811281640ca347d5c5c56b220e68bb7aa2c"
+    },
+    "dock-hatch-closed.png": {
+      "bytes": 349095,
+      "sha256": "a9ddd35e4092e168989c6eca3e5c21c6d5a1196d2e323240be92fb132862e14c"
+    },
+    "dock-hatch-open.png": {
+      "bytes": 372920,
+      "sha256": "55770cdfc93eb22c978d191be3dad684bb8c55ca44687067209ddbcf761f28e5"
+    },
+    "dock-hatch-opening.png": {
+      "bytes": 403636,
+      "sha256": "993f2246f7399bdf29fb33bc429238846e97d9482d8d5942756573308eace9b6"
+    },
+    "dock-permission-autopilot.png": {
+      "bytes": 240005,
+      "sha256": "02b4376b982d6cb67dbd0eaa98d94d3f200c654739ebb95141cab64dd867a5f7"
+    }
+  }
+}
