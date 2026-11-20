@@ -1,0 +1,125 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.42.0",
+  "source_commit": "1284ee6b5da6bb9e71930f2a846e1593210d1b58",
+  "content": {
+    "systems": 3,
+    "graphics_profiles": 3,
+    "touch_sensitivity_levels": 3,
+    "touch_layouts": 2,
+    "journal_tracks": [
+      "delivery",
+      "patrol"
+    ],
+    "save_schema": 9
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 67,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches_0.41": true,
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 24,
+    "tested_on_device": false
+  },
+  "checks": {
+    "flight": {
+      "failures": 0
+    },
+    "scene": {
+      "failures": 0
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 56
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 186
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 258
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 171
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 132
+    },
+    "living": {
+      "failures": 0,
+      "checks": 76
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 80
+    },
+    "presentation_desktop_gl": {
+      "checks": 81,
+      "failures": 0,
+      "driver": "Mesa llvmpipe"
+    },
+    "fixed_dock_frame": {
+      "viewport": [
+        1280,
+        720
+      ],
+      "economy": {
+        "draw_calls": 91,
+        "primitives": 36072
+      },
+      "detailed": {
+        "draw_calls": 120,
+        "primitives": 66024
+      }
+    }
+  },
+  "files": {
+    "OrbitRelay-0.42.0-arm64.apk": {
+      "bytes": 26329004,
+      "sha256": "4285f55ff5df9e0b4eb04ff06d4fae612a59bdce0f92e39d48daeb63b80c2382"
+    },
+    "OrbitRelay-0.42.0-source.zip": {
+      "bytes": 175197,
+      "sha256": "f9f0e38f0778cf9a3c04361b914550e42ae41734dae2899716acae5f3874aec0"
+    },
+    "journal.png": {
+      "bytes": 77190,
+      "sha256": "4f6de40ee735ba293aadc7a66ce6d119609dde0840797dcfee4f2ccbdfbbfbd6"
+    },
+    "settings.png": {
+      "bytes": 102382,
+      "sha256": "b76b7cba643e633c091c26ac066e95c8dde5035b9e357045842cf6eb8bda73c6"
+    },
+    "ship-station.png": {
+      "bytes": 315462,
+      "sha256": "ee933afa424a4bbd366efc8641455369de6ce08b2964443b5d036289a6735d74"
+    },
+    "ship-station-economy.png": {
+      "bytes": 180609,
+      "sha256": "4d1dc4fff7aacdec8f2f1ea3d917b941196823f7bd7c58d218a36da2563960be"
+    },
+    "terrace-detail.png": {
+      "bytes": 776905,
+      "sha256": "a671d1412f7c78534f822bdcd2af2f5e5716d594b3bfbc8fe428051aeda837b9"
+    },
+    "touch-mirrored.png": {
+      "bytes": 211495,
+      "sha256": "dc6e6542cc1c70f10a60f8ff714b7fde0c51053d4f9c328fbabef3d20ab33d95"
+    }
+  }
+}
