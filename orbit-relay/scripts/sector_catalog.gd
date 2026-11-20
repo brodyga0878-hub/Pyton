@@ -4,7 +4,7 @@ extends RefCounted
 const ProceduralSystems = preload("res://scripts/procedural_systems.gd")
 const SECTOR_SIZE := ProceduralSystems.SECTOR_SIZE
 const GENERATED_SCAN_RANGE := 10.5
-const GENERATED_SYSTEM_COUNT := ProceduralSystems.SECTOR_COUNT * ProceduralSystems.SYSTEMS_PER_SECTOR
+const GENERATED_SYSTEM_COUNT := ProceduralSystems.SINGLE_SYSTEM_COUNT + 1
 const SITE_COUNT := 9
 const STAR_ID := SITE_COUNT
 const TARGET_COUNT := SITE_COUNT + 1
@@ -16,6 +16,8 @@ const CORE_SYSTEM_COUNT := PRE_TRAFFIC_SYSTEM_COUNT + 1
 const HEATHER_SYSTEM := CORE_SYSTEM_COUNT
 const LIMIT_SYSTEM := HEATHER_SYSTEM + 1
 const AUTHORED_SYSTEM_COUNT := LIMIT_SYSTEM + 1
+const PRE_BINARY_SYSTEM_COUNT := AUTHORED_SYSTEM_COUNT + ProceduralSystems.SINGLE_SYSTEM_COUNT
+const BINARY_SYSTEM := PRE_BINARY_SYSTEM_COUNT
 const SYSTEM_COUNT := AUTHORED_SYSTEM_COUNT + GENERATED_SYSTEM_COUNT
 const PRE_SURFACE_DESTINATION_COUNT := 15
 const PRE_TRAFFIC_DESTINATION_COUNT := PRE_SURFACE_DESTINATION_COUNT + 1
@@ -23,7 +25,12 @@ const PRE_EXPANSION_DESTINATION_COUNT := PRE_TRAFFIC_DESTINATION_COUNT + 4
 const PRE_GAS_DESTINATION_COUNT := PRE_EXPANSION_DESTINATION_COUNT + 8
 const GAS_GIANT_ID := PRE_GAS_DESTINATION_COUNT
 const AUTHORED_DESTINATION_COUNT := GAS_GIANT_ID + 1
-const DESTINATION_COUNT := AUTHORED_DESTINATION_COUNT + GENERATED_SYSTEM_COUNT * ProceduralSystems.TARGETS_PER_SYSTEM
+const PRE_BINARY_DESTINATION_COUNT := AUTHORED_DESTINATION_COUNT + ProceduralSystems.SINGLE_SYSTEM_COUNT * ProceduralSystems.TARGETS_PER_SYSTEM
+const BINARY_PRIMARY := PRE_BINARY_DESTINATION_COUNT
+const BINARY_SECONDARY := BINARY_PRIMARY + 1
+const BINARY_PLANET := BINARY_SECONDARY + 1
+const BINARY_MOON := BINARY_PLANET + 1
+const DESTINATION_COUNT := BINARY_MOON + 1
 const VELAR_STAR_ID := 14
 const TERRACE_ID := PRE_SURFACE_DESTINATION_COUNT
 const FRINGE_ARRIVAL_PORT := PRE_TRAFFIC_DESTINATION_COUNT
@@ -188,6 +195,8 @@ static func sector_coordinates(id: int) -> Vector2i:
 static func system_of_site(id: int) -> int:
 	if id < 0 or id >= DESTINATION_COUNT:
 		return -1
+	if id >= PRE_BINARY_DESTINATION_COUNT:
+		return BINARY_SYSTEM
 	if id >= AUTHORED_DESTINATION_COUNT:
 		@warning_ignore("integer_division")
 		return AUTHORED_SYSTEM_COUNT + (id - AUTHORED_DESTINATION_COUNT) / ProceduralSystems.TARGETS_PER_SYSTEM
@@ -216,6 +225,19 @@ static func mines_for(system_id: int) -> Array:
 
 static func star_for(system_id: int) -> int:
 	return system(system_id).get("star", -1)
+
+
+static func stars_for(system_id: int) -> Array:
+	var entry := system(system_id)
+	return entry.get("stars", [entry.star]) if not entry.is_empty() else []
+
+
+static func is_star(site_id: int) -> bool:
+	return site(site_id).get("kind", "") == "star"
+
+
+static func stellar_clearance(site_id: int) -> float:
+	return site(site_id).get("star_clearance", STAR_CLEARANCE)
 
 
 static func gas_giant_for(system_id: int) -> int:

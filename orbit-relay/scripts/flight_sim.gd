@@ -22,7 +22,7 @@ const DockAccess = preload("res://scripts/dock_access.gd")
 const Passengers = preload("res://scripts/passengers.gd")
 const Crew = preload("res://scripts/crew.gd")
 const Cartography = preload("res://scripts/cartography.gd")
-const SAVE_SCHEMA := 27
+const SAVE_SCHEMA := 28
 const SHIPYARD_PORTS := [0, 10, Catalog.FRINGE_ARRIVAL_PORT]
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
@@ -178,7 +178,7 @@ func reference_site() -> int:
 		return docked
 	if landed:
 		return landed_site
-	if target == Catalog.star_for(system_id):
+	if Catalog.is_star(target) and Orbit.period(target) <= 0.0:
 		return -1
 	var radius := float(Catalog.site(target).radius) + FRAME_MARGIN
 	return target if position.distance_squared_to(target_position(target)) <= radius * radius else -1
@@ -218,9 +218,8 @@ func time_status() -> Dictionary:
 		return {"allowed": false, "reason": "Полёт в атмосфере"}
 	if maxf(star_heat, entry_heat) >= HEAT_SCOOP_LIMIT:
 		return {"allowed": false, "reason": "Корпус ещё горячий"}
-	var star := Catalog.star_for(system_id)
 	for id: int in local_targets():
-		var radius := Catalog.SCOOP_OUTER + STAR_WARP_MARGIN if id == star else float(Catalog.site(id).radius) + FRAME_MARGIN
+		var radius := Catalog.SCOOP_OUTER + STAR_WARP_MARGIN if Catalog.is_star(id) else float(Catalog.site(id).radius) + FRAME_MARGIN
 		if position.distance_squared_to(target_position(id)) <= radius * radius:
 			return {"allowed": false, "reason": "Рядом «%s»" % target_name(id)}
 	return {"allowed": true, "reason": ""}
@@ -452,8 +451,8 @@ func orbit_status(focus_id := -1) -> Dictionary:
 	var measurable: bool = result.valid and docked < 0 and not landed and jump_seconds_left <= 0.0
 	var surface_radius := float(site.get("radius", 0.0))
 	var collision_radius := surface_radius
-	if focus == star:
-		collision_radius = Catalog.STAR_CLEARANCE
+	if Catalog.is_star(focus):
+		collision_radius = Catalog.stellar_clearance(focus)
 	elif Catalog.is_mine_site(focus):
 		collision_radius = surface_radius * Terrain.MAX_RADIUS_FACTOR + Terrain.CONTACT_CLEARANCE
 	result.merge({
@@ -617,13 +616,22 @@ func _orbit_focus(requested: int) -> int:
 
 func _orbit_band(focus: int, center: Vector3) -> Vector2:
 	var star := Catalog.star_for(system_id)
-	if focus == star:
+	if Catalog.is_star(focus):
+		if Catalog.stars_for(system_id).size() > 1:
+			# A local circular burn would cross the shared gravitational region.
+			return Vector2.ZERO
 		return Vector2(ORBIT_MIN_RADIUS, ORBIT_MAX_RADIUS)
-	return Navigation.orbit_band(focus, center, target_position(star))
+	var parent := Orbit.orbit_parent(focus)
+	if parent >= 0:
+		return Navigation.orbit_band(focus, center, target_position(parent), Dynamics.gravity_parameter(parent))
+	if Catalog.stars_for(system_id).size() > 1:
+		var barycenter: Vector3 = Catalog.system(system_id).barycenter
+		return Navigation.orbit_band(focus, center, barycenter, Orbit.gravity_parameter(system_id))
+	return Navigation.orbit_band(focus, center, target_position(star), Dynamics.gravity_parameter(star))
 
 
 func _orbit_speed_tolerance(focus: int, circular_speed: float) -> float:
-	if focus == Catalog.star_for(system_id):
+	if Catalog.is_star(focus):
 		return ORBIT_SPEED_TOLERANCE
 	return clampf(circular_speed * 0.025, 0.015, ORBIT_SPEED_TOLERANCE)
 
@@ -645,9 +653,8 @@ func _orbit_block_reason(focus: int, radius: float, relative_speed: float, band:
 		return "Манёвр требует исправного и остывшего корпуса"
 	if Atmosphere.sample(self, position, velocity).inside:
 		return "Выйдите из атмосферы для орбитального манёвра"
-	var star := Catalog.star_for(system_id)
 	for id: int in local_targets():
-		var clearance := Catalog.SCOOP_OUTER + 50.0 if id == star else float(Catalog.site(id).radius) + ORBIT_CLEARANCE
+		var clearance := Catalog.SCOOP_OUTER + 50.0 if Catalog.is_star(id) else float(Catalog.site(id).radius) + ORBIT_CLEARANCE
 		if id != focus and position.distance_to(target_position(id)) <= clearance:
 			return "Отойдите от объекта «%s»" % target_name(id)
 	return ""
@@ -818,7 +825,7 @@ func set_autopilot(enabled: bool) -> void:
 	if not autopilot:
 		return
 	for index: int in local_targets():
-		if index == Catalog.star_for(system_id):
+		if Catalog.is_star(index):
 			continue
 		var center := target_position(index)
 		var offset := position - center
@@ -843,7 +850,7 @@ func selected_dock_status() -> Dictionary:
 		return {"ok": ready, "reason": "Можно взлететь" if ready else "Сначала верните модуль на борт"}
 	if jump_seconds_left > 0.0:
 		return {"ok": false, "reason": "Идёт зарядка прыжкового привода"}
-	if target == Catalog.star_for(system_id):
+	if Catalog.is_star(target):
 		return {"ok": false, "reason": "У звезды можно собирать топливо"}
 	if Catalog.is_gas_giant(target):
 		return {"ok": false, "reason": "В атмосфере гиганта можно собирать водород"}
@@ -1789,7 +1796,7 @@ func jettison_cargo(good: String) -> bool:
 
 
 func is_scoop_site(site: int) -> bool:
-	return site == Catalog.star_for(system_id) or (Catalog.is_gas_giant(site) and Catalog.system_of_site(site) == system_id)
+	return Catalog.system_of_site(site) == system_id and (Catalog.is_star(site) or Catalog.is_gas_giant(site))
 
 
 func scoop_active_at(site: int) -> bool:
@@ -1806,7 +1813,7 @@ func _scoop_site() -> int:
 		var near_radius := float(Catalog.site(giant).radius) + GAS_SCOOP_MAX_ALTITUDE + 120.0
 		if position.distance_squared_to(target_position(giant)) <= near_radius * near_radius:
 			return giant
-	return Catalog.star_for(system_id)
+	return _nearest_star()
 
 
 func scoop_status() -> Dictionary:
@@ -1845,7 +1852,8 @@ func scoop_status() -> Dictionary:
 
 
 func thermal_status() -> Dictionary:
-	var distance := _star_distance()
+	var star := _nearest_star()
+	var distance := position.distance_to(target_position(star))
 	var in_flight := docked < 0 and not landed
 	var level := "normal"
 	if star_heat >= HEAT_DAMAGE_LIMIT:
@@ -1855,11 +1863,11 @@ func thermal_status() -> Dictionary:
 	elif star_heat >= 35.0:
 		level = "warm"
 	return {
-		"heat": star_heat, "distance": distance, "level": level,
+		"heat": star_heat, "body": star, "distance": distance, "level": level,
 		"visible": in_flight and (distance <= Catalog.SCOOP_OUTER or star_heat >= 1.0),
 		"danger": in_flight and distance < Catalog.SCOOP_INNER,
 		"blocked": star_heat >= HEAT_SCOOP_LIMIT,
-		"cooling": star_heat - _heat_target(distance) > 0.1,
+		"cooling": star_heat - _heat_target() > 0.1,
 	}
 
 
@@ -1930,20 +1938,31 @@ func _update_entry_heat(delta: float, equilibrium := 0.0, airborne := false) -> 
 			_announce("atmosphere_damage", "Критический нагрев при входе. Корпус повреждается.")
 
 
-func _star_distance() -> float:
-	return position.distance_to(target_position(Catalog.star_for(system_id)))
+func _nearest_star() -> int:
+	var nearest := Catalog.star_for(system_id)
+	var distance := INF
+	for id: int in Catalog.stars_for(system_id):
+		var separation := position.distance_squared_to(target_position(id))
+		if separation < distance:
+			distance = separation
+			nearest = id
+	return nearest
 
 
-func _heat_target(distance: float) -> float:
-	# Approach heat rises more quickly near the stellar surface. Running the collector adds heat.
-	var proximity := maxf(0.0, Catalog.SCOOP_OUTER - distance) / (Catalog.SCOOP_OUTER - Catalog.SCOOP_INNER)
-	var output := Catalog.stellar_heat(system_id)
-	return 82.0 * output * proximity * proximity + (12.0 if scoop_active_at(Catalog.star_for(system_id)) else 0.0)
+func _heat_target() -> float:
+	# Each illuminated star heats the ship. The collector adds heat only while running.
+	var total := 0.0
+	for id: int in Catalog.stars_for(system_id):
+		var distance := position.distance_to(target_position(id))
+		var proximity := maxf(0.0, Catalog.SCOOP_OUTER - distance) / (Catalog.SCOOP_OUTER - Catalog.SCOOP_INNER)
+		var output: float = Catalog.site(id).get("stellar_heat", Catalog.stellar_heat(system_id))
+		total += 82.0 * output * proximity * proximity + (12.0 if scoop_active_at(id) else 0.0)
+	return total
 
 
 func _update_star_heat(delta: float) -> void:
 	var exposed := docked < 0 and not landed and jump_seconds_left <= 0.0
-	var equilibrium := _heat_target(_star_distance()) if exposed else 0.0
+	var equilibrium := _heat_target() if exposed else 0.0
 	if star_heat == 0.0 and equilibrium == 0.0:
 		return
 	var previous := star_heat
@@ -2087,9 +2106,8 @@ func jump_status(destination: int) -> Dictionary:
 	elif ship.jump_fuel < cost:
 		reason = "Нужно %d ед. в прыжковом запасе" % cost
 	else:
-		var star := Catalog.star_for(system_id)
 		for id: int in local_targets():
-			var clearance := Catalog.SCOOP_OUTER if id == star else float(Catalog.site(id).radius) + JUMP_CLEARANCE
+			var clearance := Catalog.SCOOP_OUTER if Catalog.is_star(id) else float(Catalog.site(id).radius) + JUMP_CLEARANCE
 			if position.distance_squared_to(target_position(id)) <= clearance * clearance:
 				reason = "Отойдите от объекта «%s»" % target_name(id)
 				break
@@ -2525,8 +2543,9 @@ func _obstacle_at(point: Vector3, sector_id := -1, epoch := -1.0, progress: RefC
 func _inside_hull(point: Vector3, index: int, epoch := -1.0) -> bool:
 	var center: Vector3 = target_position(index) if epoch < 0.0 else Orbit.sample(index, epoch).position
 	var relative := point - center
-	if index == Catalog.star_for(Catalog.system_of_site(index)):
-		return relative.length_squared() < Catalog.STAR_CLEARANCE * Catalog.STAR_CLEARANCE
+	if Catalog.is_star(index):
+		var clearance := Catalog.stellar_clearance(index)
+		return relative.length_squared() < clearance * clearance
 	if Catalog.is_gas_giant(index):
 		var pressure_radius := float(Catalog.site(index).radius)
 		return relative.length_squared() < pressure_radius * pressure_radius
@@ -2572,12 +2591,12 @@ func _closed_hatch_between(from: Vector3, to: Vector3, previous_epoch: float) ->
 
 func _autopilot_step(delta: float) -> void:
 	boost = false
-	var star_run := target == Catalog.star_for(system_id)
+	var star_run := Catalog.is_star(target)
 	var gas_run := Catalog.is_gas_giant(target)
 	var scoop_run := star_run or gas_run
 	var mining_site := Catalog.is_mine_site(target)
 	var port_run := Catalog.is_port(target)
-	var target_radius := Catalog.STAR_CLEARANCE if star_run else float(Catalog.site(target).radius)
+	var target_radius := Catalog.stellar_clearance(target) if star_run else float(Catalog.site(target).radius)
 	var center := target_position(target)
 	var gate := target_gate(target)
 	var drift := target_velocity(target)
@@ -2651,8 +2670,8 @@ func _autopilot_step(delta: float) -> void:
 			max_speed = 36.0
 			if position.distance_to(waypoint) < 4.0 and speed_relative_to(_departure_site) < 8.0:
 				_departure_leg = 2 if _departure_leg == 1 and _departure_axis == Vector3.ZERO else 0
-		elif not star_run:
-			var detour := _star_detour(waypoint)
+		else:
+			var detour := _star_detour(waypoint, target if star_run else -1)
 			if detour != waypoint:
 				waypoint = detour
 				drift = Vector3.ZERO
@@ -2781,13 +2800,12 @@ func _convoy_course_step(delta: float) -> void:
 
 
 func _transit_obstacle(course: Vector3, cruise: float, skip_target := true) -> int:
-	var star := Catalog.star_for(system_id)
 	var speed_limit := _cruise_limit(cruise)
 	var duration := course.length() / speed_limit
 	var earliest := INF
 	var obstacle := -1
 	for id: int in local_targets():
-		if (skip_target and id == target) or id == star:
+		if (skip_target and id == target) or Catalog.is_star(id):
 			continue
 		var radial := position - target_position(id)
 		var relative_course := course - target_velocity(id) * duration
@@ -2822,25 +2840,39 @@ func _transit_radius(id: int) -> float:
 	return radius + float(Atmosphere.profile(id).height) if Catalog.is_gas_giant(id) else radius
 
 
-func _star_detour(waypoint: Vector3) -> Vector3:
-	var center := target_position(Catalog.star_for(system_id))
-	var radial := position - center
+func _star_detour(waypoint: Vector3, excluded := -1) -> Vector3:
 	var course := waypoint - position
+	var length_squared := course.length_squared()
 	var margin_squared := Catalog.SCOOP_INNER * Catalog.SCOOP_INNER
-	if radial.length_squared() < margin_squared:
-		return center + radial.normalized() * (Catalog.STAR_CLEARANCE + 60.0)
-	if course.length_squared() < 0.001:
+	var obstacle := -1
+	var earliest := INF
+	for id: int in Catalog.stars_for(system_id):
+		if id == excluded:
+			continue
+		var center := target_position(id)
+		var radial := position - center
+		var clearance := maxf(Catalog.SCOOP_INNER + 1.0, Catalog.stellar_clearance(id) + 60.0)
+		if radial.length_squared() < margin_squared:
+			var exit_axis := Vector3.BACK if radial.is_zero_approx() else radial.normalized()
+			return center + exit_axis * clearance
+		if length_squared < 0.001:
+			continue
+		var fraction := clampf(-radial.dot(course) / length_squared, 0.0, 1.0)
+		var closest := radial + course * fraction
+		if fraction < earliest and closest.length_squared() < margin_squared:
+			obstacle = id
+			earliest = fraction
+	if obstacle < 0:
 		return waypoint
-	var closest := radial + course * clampf(-radial.dot(course) / course.length_squared(), 0.0, 1.0)
-	if closest.length_squared() >= margin_squared:
-		return waypoint
-	var outward := radial.normalized()
+	var center := target_position(obstacle)
+	var outward := (position - center).normalized()
 	var sideways := course.slide(outward)
 	if sideways.length_squared() < 0.001:
 		sideways = Vector3.RIGHT.slide(outward)
 		if sideways.length_squared() < 0.001:
 			sideways = Vector3.UP.slide(outward)
-	return center + outward * (Catalog.STAR_CLEARANCE + 60.0) + sideways.normalized() * 210.0
+	var clearance := maxf(Catalog.SCOOP_INNER + 1.0, Catalog.stellar_clearance(obstacle) + 60.0)
+	return center + outward * clearance + sideways.normalized() * 210.0
 
 
 func _point_towards(direction: Vector3, delta: float) -> void:
@@ -2889,6 +2921,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_binary := schema < 28
 	var pre_procedural := schema < 27
 	var pre_cartography := schema < 26
 	var pre_shipyard := schema < 25
@@ -2927,7 +2960,9 @@ func restore(state: Dictionary) -> bool:
 	var restored_system := Catalog.HOME_SYSTEM
 	var restored_jump := -1
 	if not pre_galaxy:
-		var systems := Catalog.AUTHORED_SYSTEM_COUNT if pre_procedural else Catalog.SYSTEM_COUNT
+		var systems := Catalog.PRE_BINARY_SYSTEM_COUNT if pre_binary else Catalog.SYSTEM_COUNT
+		if pre_procedural:
+			systems = Catalog.AUTHORED_SYSTEM_COUNT
 		if pre_expansion:
 			systems = Catalog.PRE_TRAFFIC_SYSTEM_COUNT if pre_traffic else Catalog.CORE_SYSTEM_COUNT
 		if not _integer(state.get("system_id"), 0, systems - 1) or not _integer(state.get("jump_target"), -1, systems - 1):
@@ -2966,6 +3001,8 @@ func restore(state: Dictionary) -> bool:
 	if not _number(state.get("throttle"), 0.0, 1.0):
 		return false
 	var site_count := Catalog.PRE_EXPANSION_DESTINATION_COUNT if pre_expansion else Catalog.DESTINATION_COUNT
+	if pre_binary and not pre_expansion:
+		site_count = Catalog.PRE_BINARY_DESTINATION_COUNT
 	if pre_procedural and not pre_expansion:
 		site_count = Catalog.AUTHORED_DESTINATION_COUNT
 	if pre_dual_fuel and not pre_expansion:
@@ -3010,7 +3047,7 @@ func restore(state: Dictionary) -> bool:
 			if not _site_available(member.origin, restored_expedition):
 				return false
 	if not pre_cartography:
-		if not restored_cartography.restore(state.get("cartography"), restored_epoch, pre_procedural):
+		if not restored_cartography.restore(state.get("cartography"), restored_epoch, pre_procedural, pre_binary):
 			return false
 		for site: int in restored_cartography.surveyed_sites():
 			if not _site_available(site, restored_expedition, restored_cartography):

@@ -72,18 +72,16 @@ static func circular_velocity(radial: Vector3, normal: Vector3, mu: float) -> Ve
 	return tangent.normalized() * sqrt(mu / radius)
 
 
-static func orbit_band(focus_id: int, center: Vector3, primary_center: Vector3) -> Vector2:
+static func orbit_band(focus_id: int, center: Vector3, primary_center: Vector3, primary_mu: float) -> Vector2:
 	var site := Catalog.site(focus_id)
 	var kind: String = site.get("kind", "")
 	if kind not in ["planet", "moon", "gas"] or not center.is_finite() or not primary_center.is_finite():
 		return Vector2.ZERO
 	var separation := center.distance_to(primary_center)
-	if not is_finite(separation):
+	if not is_finite(separation) or primary_mu <= 0.0:
 		return Vector2.ZERO
 	var radius: float = site.radius
 	var mu := Dynamics.gravity_parameter(focus_id)
-	var primary_id := Catalog.star_for(Catalog.system_of_site(focus_id))
-	var primary_mu := Dynamics.gravity_parameter(primary_id)
 	var minimum := radius * Terrain.MAX_RADIUS_FACTOR + Terrain.CONTACT_CLEARANCE + LOCAL_SURFACE_MARGIN
 	var cap := radius * LOCAL_RADIUS_CAP
 	if kind == "gas":
@@ -168,7 +166,7 @@ static func _blockers(sim: RefCounted, ids: Array) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for id: int in ids:
 		var site := Catalog.site(id)
-		var axes := Vector3.ONE * Catalog.STAR_CLEARANCE
+		var axes := Vector3.ONE * Catalog.stellar_clearance(id)
 		var corridor := INF
 		if Catalog.is_port(id):
 			axes = Vector3(sim.HULL_X, sim.HULL_Y, sim.HULL_Z)

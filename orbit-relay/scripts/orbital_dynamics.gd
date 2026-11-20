@@ -31,6 +31,8 @@ static var _attractors: Array[Array] = _build_attractors()
 
 static func gravity_parameter(site_id: int) -> float:
 	var site := Catalog.site(site_id)
+	if site.has("mu"):
+		return float(site.mu)
 	var kind: String = site.get("kind", "")
 	if kind == "star":
 		return Orbit.gravity_parameter(Catalog.system_of_site(site_id))
@@ -87,10 +89,11 @@ static func point_acceleration(point: Vector3, center: Vector3, mu: float, min_r
 static func _build_attractors() -> Array[Array]:
 	var by_system: Array[Array] = []
 	for system_id in range(Catalog.SYSTEM_COUNT):
-		var star_id := Catalog.star_for(system_id)
-		var sources: Array[Attractor] = [Attractor.new(star_id, Catalog.STAR_CLEARANCE, gravity_parameter(star_id))]
+		var sources: Array[Attractor] = []
+		for star_id: int in Catalog.stars_for(system_id):
+			sources.append(Attractor.new(star_id, Catalog.stellar_clearance(star_id), gravity_parameter(star_id)))
 		for site_id: int in Catalog.targets_for(system_id):
-			if site_id == star_id:
+			if Catalog.is_star(site_id):
 				continue
 			var mu := gravity_parameter(site_id)
 			if mu > 0.0:

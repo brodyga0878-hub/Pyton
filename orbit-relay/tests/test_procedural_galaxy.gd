@@ -34,7 +34,7 @@ func _run() -> void:
 
 func _test_catalog() -> void:
 	_expect(FIRST_GENERATED == 5 and Catalog.AUTHORED_DESTINATION_COUNT == 29
-		and Catalog.SYSTEM_COUNT == 23 and Catalog.DESTINATION_COUNT == 83,
+		and Catalog.PRE_BINARY_SYSTEM_COUNT == 23 and Catalog.PRE_BINARY_DESTINATION_COUNT == 83,
 		"Procedural systems append stable IDs to the 5 authored systems and 29 sites")
 	_expect(Catalog.star_for(HOME) == Catalog.STAR_ID and Catalog.gas_giant_for(HOME) == Catalog.GAS_GIANT_ID
 		and Catalog.ports_for(Catalog.HEATHER_SYSTEM) == [Catalog.HEATHER_PORT]
@@ -45,7 +45,7 @@ func _test_catalog() -> void:
 			_expect(Catalog.jump_cost(origin, destination) == Catalog.JUMP_COSTS[origin][destination],
 				"Existing route tariff %d → %d is stable" % [origin, destination])
 	var positions: Array[Vector3] = []
-	for system in range(FIRST_GENERATED, Catalog.SYSTEM_COUNT):
+	for system in range(FIRST_GENERATED, Catalog.PRE_BINARY_SYSTEM_COUNT):
 		var row := Catalog.system(system)
 		var position := Catalog.system_position3(system)
 		var sector := Catalog.sector_coordinates(system)

@@ -68,6 +68,8 @@ var _star_id := -1
 var _gas_giant_id := -1
 var _stars: MeshInstance3D
 var _star: Node3D
+var _stellar_views: Dictionary[int, Node3D] = {}
+var _companion_id := -1
 var _backdrop_planet: Node3D
 var _backdrop_material: ShaderMaterial
 var _backdrop_orbit_offset := Vector3.ZERO
@@ -145,11 +147,16 @@ func _load_sector(id: int) -> void:
 	_approaches.clear()
 	_gate_materials.clear()
 	_surface_views.clear()
+	_stellar_views.clear()
 	_sector_fittings.clear()
 	_sector_finishes.clear()
 	_system_id = id
 	_star_id = Catalog.star_for(id)
 	_gas_giant_id = Catalog.gas_giant_for(id)
+	_backdrop_planet = null
+	_backdrop_material = null
+	var local_stars := Catalog.stars_for(id)
+	_companion_id = int(local_stars[1]) if local_stars.size() > 1 else -1
 	_last_position = Vector3.INF
 	_departure_view_port = -1
 
@@ -159,7 +166,10 @@ func _load_sector(id: int) -> void:
 	_lighting.ambient_light_color = Color("#8eaae5") if cool else Color("#99b8d0")
 	_sunlight.rotation_degrees = Vector3(-26.0, 47.0, 0.0) if cool else Vector3(-32.0, -36.0, 0.0)
 	_sunlight.light_color = Color("#b6dbff") if cool else Color("#ffefd9")
+	_sunlight.light_energy = 1.22
+	_fill.rotation_degrees = Vector3(16.0, 145.0, 0.0)
 	_fill.light_color = Color("#c8a6ee") if cool else Color("#84c8ff")
+	_fill.light_energy = 0.39
 	if fringe:
 		_lighting.background_color = Color("#091511")
 		_lighting.ambient_light_color = Color("#8da99a")
@@ -170,11 +180,20 @@ func _load_sector(id: int) -> void:
 	_sector = Node3D.new()
 	add_child(_sector)
 	_build_stars(cool, fringe)
-	_build_gas_giant(cool, fringe)
-	_star = StarView.new()
-	_sector.add_child(_star)
-	_star.set_visual_profile(_visual_profile)
-	_star.setup(Catalog.site(_star_id), Catalog.SCOOP_INNER, Catalog.SCOOP_OUTER, cool)
+	if _companion_id < 0 or _gas_giant_id >= 0:
+		_build_gas_giant(cool, fringe)
+	for site_id: int in local_stars:
+		var site := Catalog.site(site_id)
+		var star := StarView.new()
+		star.name = "Star_%d" % site_id
+		_sector.add_child(star)
+		star.set_visual_profile(_visual_profile)
+		star.setup(site, Catalog.SCOOP_INNER, Catalog.SCOOP_OUTER, bool(site.get("cool_star", cool)))
+		_stellar_views[site_id] = star
+	_star = _stellar_views[_star_id]
+	if _companion_id >= 0:
+		_sunlight.light_color = Color.WHITE.lerp(Catalog.site(_star_id).accent, 0.48)
+		_fill.light_color = Color.WHITE.lerp(Catalog.site(_companion_id).accent, 0.50)
 
 	for site_id: int in Catalog.ports_for(id):
 		var site := Catalog.site(site_id)
@@ -209,9 +228,10 @@ func set_visual_profile(profile: int) -> void:
 	# A profile also applies to every newly loaded surface, star and NPC.
 	for body: Node3D in _surface_views.values():
 		body.set_visual_profile(_visual_profile)
-	for layer: Node3D in [_star, _traffic]:
-		if is_instance_valid(layer):
-			layer.set_visual_profile(_visual_profile)
+	for star: Node3D in _stellar_views.values():
+		star.set_visual_profile(_visual_profile)
+	if is_instance_valid(_traffic):
+		_traffic.set_visual_profile(_visual_profile)
 	if is_instance_valid(_atmosphere):
 		_atmosphere.set_visual_profile(_visual_profile)
 
@@ -296,17 +316,22 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_camera_up = up if absf(sight.dot(up)) < 0.995 else heading.x
 	camera.look_at(look_target, _camera_up)
 	_stars.position = camera.position
-	_star.position = sim.target_position(_star_id)
+	for site_id: int in _stellar_views:
+		var star := _stellar_views[site_id]
+		star.position = sim.target_position(site_id)
+		star.update_approach(camera.global_position, position_now, int(sim.target) == site_id and not settled, bool(sim.scoop_active_at(site_id)))
+	if _companion_id >= 0:
+		_update_stellar_light(_sunlight, _star.position, position_now, 1.10)
+		_update_stellar_light(_fill, _stellar_views[_companion_id].position, position_now, 0.65)
 	if _gas_giant_id >= 0:
 		_backdrop_planet.position = sim.target_position(_gas_giant_id)
 		var light_direction := (_star.position - _backdrop_planet.position).normalized()
 		_backdrop_material.set_shader_parameter("light_direction", light_direction)
-	else:
+	elif _backdrop_planet != null:
 		var backdrop_phase := TAU * fposmod(float(sim.orbit_time), BACKDROP_ORBIT_SECONDS) / BACKDROP_ORBIT_SECONDS
 		_backdrop_planet.position = _star.position + _backdrop_orbit_offset.rotated(_backdrop_orbit_axis, backdrop_phase)
-	if _visual_profile > 0:
+	if _visual_profile > 0 and _backdrop_material != null:
 		_backdrop_material.set_shader_parameter("weather_phase", fposmod(float(sim.orbit_time), CLOUD_CYCLE_SECONDS) / CLOUD_CYCLE_SECONDS)
-	_star.update_approach(camera.global_position, position_now, int(sim.target) == _star_id and not settled, bool(sim.scoop_active_at(_star_id)))
 	_last_position = position_now
 	_last_berth = berth
 
@@ -348,6 +373,16 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_lighting.fog_light_energy = 0.48
 		_lighting.fog_density = float(haze.density) * 0.0015
 		_lighting.fog_sky_affect = 0.0
+
+
+func _update_stellar_light(light: DirectionalLight3D, source: Vector3, observer: Vector3, strength: float) -> void:
+	var light_travel := observer - source
+	var distance_squared := light_travel.length_squared()
+	if distance_squared > 1.0:
+		var incoming := light_travel.normalized()
+		var up := Vector3.BACK if absf(incoming.y) > 0.96 else Vector3.UP
+		light.basis = Basis.looking_at(incoming, up)
+	light.light_energy = strength * lerpf(0.25, 1.0, 1.0 / (1.0 + distance_squared / 2250000.0))
 
 
 func _sync_landing_gear(progress: float) -> void:

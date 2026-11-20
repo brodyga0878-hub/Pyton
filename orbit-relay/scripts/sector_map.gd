@@ -79,6 +79,7 @@ var _rendezvous_hint: Label
 var _rendezvous_finish: Button
 var _rendezvous_action: Button
 var _focus_buttons: Dictionary[int, Button] = {}
+var _companion_focus_choices: HBoxContainer
 var _orbit_state: Label
 var _orbit_reference: Label
 var _orbit_values: Dictionary[String, Label] = {}
@@ -179,7 +180,8 @@ func build() -> void:
 			_add_site(_home_scoop_sites, Sector.star_for(system_id))
 			_add_site(_home_scoop_sites, Sector.GAS_GIANT_ID)
 		else:
-			_add_site(list, Sector.star_for(system_id))
+			for star_id: int in Sector.stars_for(system_id):
+				_add_site(list, star_id)
 	_convoy_order = VBoxContainer.new()
 	_convoy_order.add_theme_constant_override("separation", 3)
 	list.add_child(_convoy_order)
@@ -218,11 +220,18 @@ func _build_trajectory_panel(parent: PanelContainer) -> void:
 	focus_choices.add_theme_constant_override("separation", 5)
 	_trajectory_panel.add_child(focus_choices)
 	_add_focus_button(focus_choices, -1, "Звезда")
+	_companion_focus_choices = HBoxContainer.new()
+	_companion_focus_choices.add_theme_constant_override("separation", 5)
+	_trajectory_panel.add_child(_companion_focus_choices)
 	for system_id in range(Sector.SYSTEM_COUNT):
+		var stellar_ids := Sector.stars_for(system_id)
+		var multiple_stars := stellar_ids.size() > 1
+		for star_id: int in stellar_ids.slice(1):
+			_add_focus_button(focus_choices, star_id, str(Sector.site(star_id).name))
 		for id: int in Sector.targets_for(system_id):
 			var body := Sector.site(id)
 			if body.kind in ["planet", "moon", "gas"]:
-				_add_focus_button(focus_choices, id, str(body.name))
+				_add_focus_button(_companion_focus_choices if multiple_stars else focus_choices, id, str(body.name))
 	_orbit_state = _label(_trajectory_panel, "", 18, TEXT)
 	_orbit_state.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_orbit_reference = _label(_trajectory_panel, "", 16, MUTED)
@@ -364,16 +373,25 @@ func open(sim: RefCounted) -> void:
 	var here := _current_site()
 	_here.text = "В полёте" if here < 0 else str(Sector.site(here).name)
 	var targets: Array = sim.local_targets()
+	var stellar_ids := Sector.stars_for(system_id)
+	var multiple_stars := stellar_ids.size() > 1
 	_home_scoop_sites.visible = system_id == Sector.HOME_SYSTEM
 	for id: int in _site_buttons:
 		_site_buttons[id].visible = targets.has(id)
 	for id: int in _focus_buttons:
 		_focus_buttons[id].visible = id == -1 or targets.has(id)
+	_companion_focus_choices.visible = multiple_stars
+	_focus_buttons[-1].text = str(Sector.site(_star_focus).name) if multiple_stars else "Звезда"
+	_chart.center_of_mass = Sector.system(system_id).get("barycenter", Vector3.INF)
+	_chart.stellar_orbits.clear()
+	if multiple_stars:
+		for star_id: int in stellar_ids:
+			_chart.stellar_orbits[star_id] = Orbit.orbit_points(star_id, float(sim.orbit_time))
 	_chart.ship_position = sim.position
 	_chart.ship_heading = sim.forward()
 	var star_center: Vector3 = sim.target_position(_star_focus)
-	_chart.star_plane_y = star_center.y
-	var height := _chart.ship_position.y - star_center.y
+	_chart.star_plane_y = _chart.center_of_mass.y if _chart.center_of_mass.is_finite() else star_center.y
+	var height := _chart.ship_position.y - _chart.star_plane_y
 	var height_sign := "+" if height >= 0.5 else "−" if height <= -0.5 else ""
 	_chart.ship_height = height_sign + _distance_label(absf(height))
 	_chart.centers.clear()
@@ -442,11 +460,16 @@ func _select_site(id: int) -> void:
 		return
 	_candidate = id
 	_chart.selected_site = id
-	_chart.orbit = Orbit.orbit_points(id)
+	_chart.orbit = Orbit.orbit_points(id, float(_flight.orbit_time))
 	_chart.orbit_caption = ""
 	if not _chart.orbit.is_empty():
 		var orbital_velocity: Vector3 = _flight.target_velocity(id)
-		_chart.orbit_caption = "Орбита цели · %s м/с" % ("%.1f" % orbital_velocity.length()).replace(".", ",")
+		var parent := Orbit.orbit_parent(id)
+		var reference := "Орбита цели"
+		if parent >= 0:
+			orbital_velocity -= _flight.target_velocity(parent)
+			reference = "Вокруг «%s»" % Sector.site(parent).name
+		_chart.orbit_caption = "%s · %s м/с" % [reference, ("%.1f" % orbital_velocity.length()).replace(".", ",")]
 	_chart.queue_redraw()
 	for key: int in _site_buttons:
 		_site_buttons[key].set_pressed_no_signal(key == id)
@@ -644,16 +667,17 @@ func _refresh_trajectory() -> void:
 	var entry := _forecast_cache[_orbit_focus]
 	var status: Dictionary = entry.status
 	var forecast: Dictionary = entry.forecast
-	var stellar := _orbit_focus == _star_focus
+	var stellar := Sector.is_star(_orbit_focus)
+	var moving_reference := Orbit.period(_orbit_focus) > 0.0
 	_chart.orbit_focus = _orbit_focus
-	_chart.forecast = forecast.points if stellar else forecast.relative_points
-	_chart.system_forecast = PackedVector3Array() if stellar else forecast.points
+	_chart.forecast = forecast.relative_points if moving_reference else forecast.points
+	_chart.system_forecast = forecast.points if moving_reference else PackedVector3Array()
 	_chart.forecast_impact = int(forecast.impact)
 	var maneuver: bool = status.maneuver
 	for id: int in _focus_buttons:
 		var button := _focus_buttons[id]
 		button.disabled = maneuver
-		button.set_pressed_no_signal(id == _orbit_focus or (id == -1 and stellar))
+		button.set_pressed_no_signal(id == _orbit_focus or (id == -1 and _orbit_focus == _star_focus))
 	match str(status.classification):
 		"bound": _orbit_state.text = "Связанная орбита"
 		"escape": _orbit_state.text = "Незамкнутая траектория"
@@ -872,6 +896,8 @@ class SectorChart extends Control:
 	var ship_heading := Vector3.FORWARD
 	var ship_height := ""
 	var star_plane_y := 0.0
+	var center_of_mass := Vector3.INF
+	var stellar_orbits: Dictionary[int, PackedVector3Array] = {}
 	var side_view := false
 	var centers: Dictionary[int, Vector3] = {}
 	var active_site := -1
@@ -908,7 +934,11 @@ class SectorChart extends Control:
 		var positions: Array[Vector3] = centers.values()
 		if side:
 			positions.append(ship_position)
+		if side or center_of_mass.is_finite():
 			for orbit_point: Vector3 in orbit:
+				positions.append(orbit_point)
+		for points: PackedVector3Array in stellar_orbits.values():
+			for orbit_point: Vector3 in points:
 				positions.append(orbit_point)
 		if rendezvous_visible and not rendezvous.is_empty():
 			positions.append(rendezvous.point)
@@ -992,12 +1022,10 @@ class SectorChart extends Control:
 		var atmosphere := _atmosphere_outline()
 		if not atmosphere.is_empty():
 			_draw_atmosphere(atmosphere, plot, bounds)
-		if orbit.size() >= 2:
-			var track := PackedVector2Array()
-			track.resize(orbit.size())
-			for index in orbit.size():
-				track[index] = _project(orbit[index], plot, bounds)
-			draw_polyline(track, ORBIT_COLOR, 1.7, true)
+		for id: int in stellar_orbits:
+			if id != selected_site:
+				_draw_orbit(stellar_orbits[id], plot, bounds, Color(Sector.site(id).accent, 0.48), 1.2)
+		_draw_orbit(orbit, plot, bounds, ORBIT_COLOR, 1.7)
 		if forecast_visible:
 			if not system_forecast.is_empty():
 				_draw_forecast(system_forecast, plot, bounds, SYSTEM_FORECAST_COLOR, true)
@@ -1040,10 +1068,11 @@ class SectorChart extends Control:
 			label_boxes.append(_draw_line_legend(font, 165.0, caption, atmosphere.color, y))
 		if side_view:
 			var plane_label_y := plane_y - 30.0 if plane_y >= 66.0 else plane_y + 6.0
-			var plane_legend := Rect2(11.0, plane_label_y, 145.0, 24.0)
+			var plane_caption := "Плоскость барицентра" if center_of_mass.is_finite() else "Плоскость звезды"
+			var plane_legend := Rect2(11.0, plane_label_y, 185.0 if center_of_mass.is_finite() else 145.0, 24.0)
 			label_boxes.append(plane_legend)
 			draw_rect(plane_legend, CHART_BACKGROUND)
-			draw_string(font, plane_legend.position + Vector2(7, 17), "Плоскость звезды", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, MUTED)
+			draw_string(font, plane_legend.position + Vector2(7, 17), plane_caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, MUTED)
 		if not orbit_caption.is_empty():
 			var width := font.get_string_size(orbit_caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x + 40.0
 			var legend := Rect2(size.x - width - 11.0, 10, width, 24)
@@ -1056,6 +1085,11 @@ class SectorChart extends Control:
 		for center: Vector3 in centers.values():
 			var point := _project(center, plot, bounds)
 			label_boxes.append(Rect2(point - Vector2(15, 15), Vector2(30, 30)))
+		if center_of_mass.is_finite():
+			var mass_marker := _project(center_of_mass, plot, bounds)
+			draw_line(mass_marker - Vector2(5, 0), mass_marker + Vector2(5, 0), MUTED, 1.5, true)
+			draw_line(mass_marker - Vector2(0, 5), mass_marker + Vector2(0, 5), MUTED, 1.5, true)
+			_draw_site_label(font, "Барицентр", mass_marker, label_boxes)
 		for id: int in centers:
 			var entry = Sector.site(id)
 			var marker := _project(centers[id], plot, bounds)
@@ -1101,6 +1135,15 @@ class SectorChart extends Control:
 					_draw_site_label(font, str(contact.name), point, label_boxes)
 					break
 		_draw_ship(ship)
+
+	func _draw_orbit(points: PackedVector3Array, plot: Rect2, bounds: Rect2, color: Color, width: float) -> void:
+		if points.size() < 2:
+			return
+		var track := PackedVector2Array()
+		track.resize(points.size())
+		for index in points.size():
+			track[index] = _project(points[index], plot, bounds)
+		draw_polyline(track, color, width, true)
 
 	func _draw_atmosphere(atmosphere: Dictionary, plot: Rect2, bounds: Rect2) -> void:
 		var center: Vector3 = centers[atmosphere.site]

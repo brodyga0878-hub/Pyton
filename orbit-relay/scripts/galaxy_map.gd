@@ -531,6 +531,8 @@ static func _observation_text(report: Dictionary) -> String:
 	var details := PackedStringArray(["радиус %s м" % _decimal(float(data.radius))])
 	if float(data.period) > 0.0:
 		details.append("период %s мин" % _decimal(float(data.period) / 60.0))
+		if not str(data.orbit_reference).is_empty():
+			details.append(str(data.orbit_reference))
 	if float(data.atmosphere_height) > 0.0:
 		details.append("атмосфера %s м" % _decimal(float(data.atmosphere_height)))
 	return "%s · %s" % [report.name, " · ".join(details)]

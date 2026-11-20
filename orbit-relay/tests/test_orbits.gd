@@ -35,7 +35,7 @@ func _run() -> void:
 
 
 func _test_ephemeris() -> void:
-	for site in range(Catalog.DESTINATION_COUNT):
+	for site in range(Catalog.PRE_BINARY_DESTINATION_COUNT):
 		var initial := Orbit.sample(site, 0.0)
 		var future := Orbit.sample(site, EPOCH)
 		var path := Orbit.orbit_points(site)

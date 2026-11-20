@@ -9,6 +9,7 @@ const SECTORS := [
 	Vector2i(1, 0), Vector2i(1, 1), Vector2i(2, 0),
 ]
 const SECTOR_COUNT := len(SECTORS)
+const SINGLE_SYSTEM_COUNT := SECTOR_COUNT * SYSTEMS_PER_SECTOR
 const NAMES := [
 	"Тальвена", "Ирсавель", "Морикса", "Вестрида", "Ольвенир", "Астрэва",
 	"Ниварис", "Сельтура", "Каэлин", "Дорвейн", "Ярсела", "Энтурин",
@@ -56,9 +57,67 @@ static func build(first_target: int) -> Dictionary:
 			})
 			sites.append(_body(name, star_center, seed, 10, true))
 			sites.append(_body(name, star_center, seed, 30, false))
+	_append_binary(systems, sites, first_target + sites.size())
 	for site in sites:
 		site.make_read_only()
 	return {"systems": systems, "sites": sites}
+
+
+static func _append_binary(systems: Array[Dictionary], sites: Array[Dictionary], primary_id: int) -> void:
+	# Keep the order of the original systems and their three sites stable for saves.
+	const NAME := "Элиора"
+	const SEED := 158397423
+	const POSITION := Vector3(2.2, 5.2, 0.4)
+	const BARYCENTER := Vector3(1800, 220, -1720)
+	const SEPARATION := 960.0
+	const PRIMARY_MU := 6000.0
+	const SECONDARY_MU := 3000.0
+	const TOTAL_MU := PRIMARY_MU + SECONDARY_MU
+	var secondary_id := primary_id + 1
+	var planet_id := secondary_id + 1
+	var moon_id := planet_id + 1
+	var primary_center := BARYCENTER - Vector3.RIGHT * (SEPARATION * SECONDARY_MU / TOTAL_MU)
+	var secondary_center := BARYCENTER + Vector3.RIGHT * (SEPARATION * PRIMARY_MU / TOTAL_MU)
+	var planet_center := BARYCENTER + Vector3(-0.6, 0, 0.8) * 3350.0
+	# The lunar orbit clears the approach gates of both solid bodies at every phase.
+	var moon_center := planet_center + Vector3(0.8, 0, -0.6) * 380.0
+	var system := {
+		"name": NAME, "position": Vector2(POSITION.x, POSITION.y), "position_3d": POSITION,
+		"sector": Vector2i.ZERO, "seed": SEED, "accent": STELLAR_COLORS[1],
+		"description": "Необитаемая двойная система. Каменистая планета обращается вокруг обеих звёзд и имеет собственную луну.",
+		"arrival_port": -1, "arrival_target": primary_id, "star": primary_id, "stars": [primary_id, secondary_id],
+		"targets": [primary_id, secondary_id, planet_id, moon_id], "ports": [],
+		"mines": [planet_id, moon_id], "survey_sites": [planet_id, moon_id],
+		"stellar_heat": 1.08, "gravity_parameter": TOTAL_MU,
+		"barycenter": BARYCENTER, "binary_separation": SEPARATION, "binary_inclination": 14.0,
+	}
+	for key: String in ["stars", "targets", "ports", "mines", "survey_sites"]:
+		system[key].make_read_only()
+	system.make_read_only()
+	systems.append(system)
+	sites.append({
+		"name": "%s A" % NAME, "kind": "star", "center": primary_center, "radius": 220.0,
+		"pad_offset": 310.0, "gate_offset": 470.0, "accent": STELLAR_COLORS[1],
+		"mu": PRIMARY_MU, "star_clearance": 250.0, "stellar_heat": 1.08, "cool_star": false,
+	})
+	sites.append({
+		"name": "%s B" % NAME, "kind": "star", "center": secondary_center, "radius": 175.0,
+		"pad_offset": 310.0, "gate_offset": 470.0, "accent": STELLAR_COLORS[2],
+		"mu": SECONDARY_MU, "star_clearance": 205.0, "stellar_heat": 0.82, "cool_star": true,
+	})
+	sites.append({
+		"name": "%s I" % NAME, "kind": "planet", "center": planet_center, "radius": 150.0,
+		"pad_offset": 150.0, "gate_offset": 245.0, "seed": SEED + 1,
+		"surface_color": Color("#657e8c"), "accent": Color("#92c5e1"), "resource": "ore",
+		"reserve": 228, "drill_seconds": 11.0, "mu": 742.5, "orbit_inclination": 23.0,
+	})
+	sites.append({
+		"name": "%s I-a" % NAME, "kind": "moon", "center": moon_center, "radius": 54.0,
+		"pad_offset": 54.0, "gate_offset": 128.0, "seed": SEED + 2,
+		"surface_color": Color("#776e8a"), "accent": MINERAL_COLORS[1], "resource": "crystal",
+		"reserve": 144, "drill_seconds": 12.0, "mu": 15.7464,
+		"orbit_parent": planet_id, "orbit_inclination": -29.0,
+	})
 
 
 static func _system_position(sector: Vector2i, slot: int, seed: int) -> Vector3:

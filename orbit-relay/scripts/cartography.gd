@@ -127,24 +127,27 @@ func snapshot() -> Dictionary:
 	return {"scans": scans, "systems": systems}
 
 
-func restore(raw: Variant, epoch: float, pre_procedural := false) -> bool:
+func restore(raw: Variant, epoch: float, pre_procedural := false, pre_binary := false) -> bool:
 	if not _valid_epoch(epoch, MAX_EPOCH) or not raw is Dictionary or raw.size() != (1 if pre_procedural else 2):
 		return false
 	var surveyed_systems: Dictionary[int, float] = {}
 	if not pre_procedural:
+		var system_limit := Catalog.PRE_BINARY_SYSTEM_COUNT if pre_binary else Catalog.SYSTEM_COUNT
 		var systems: Variant = raw.get("systems")
-		if not systems is Array or systems.size() > Catalog.SYSTEM_COUNT - Catalog.AUTHORED_SYSTEM_COUNT:
+		if not systems is Array or systems.size() > system_limit - Catalog.AUTHORED_SYSTEM_COUNT:
 			return false
 		var previous := Catalog.AUTHORED_SYSTEM_COUNT - 1
 		for item: Variant in systems:
 			if not item is Dictionary or item.size() != 2 or not item.has_all(["system", "epoch"]):
 				return false
-			if not _valid_sorted_id(item.system, previous, Catalog.SYSTEM_COUNT) or not _valid_epoch(item.epoch, epoch):
+			if not _valid_sorted_id(item.system, previous, system_limit) or not _valid_epoch(item.epoch, epoch):
 				return false
 			previous = int(item.system)
 			surveyed_systems[previous] = float(item.epoch)
 	var scans: Variant = raw.get("scans")
-	var site_limit := Catalog.AUTHORED_DESTINATION_COUNT if pre_procedural else Catalog.DESTINATION_COUNT
+	var site_limit := Catalog.PRE_BINARY_DESTINATION_COUNT if pre_binary else Catalog.DESTINATION_COUNT
+	if pre_procedural:
+		site_limit = Catalog.AUTHORED_DESTINATION_COUNT
 	if not scans is Array or scans.size() > site_limit:
 		return false
 	var restored: Dictionary[int, float] = {}
@@ -201,8 +204,12 @@ static func _body_data(sim: RefCounted, site_id: int, site: Dictionary) -> Dicti
 	var atmosphere := Atmosphere.profile(site_id)
 	var radius: float = site.radius
 	var resource: String = site.get("resource", "")
+	var parent := Orbit.orbit_parent(site_id)
 	return {
 		"radius": radius, "period": Orbit.period(site_id),
+		"orbit_parent": parent,
+		"orbit_reference": str(Catalog.site(parent).name) if parent >= 0 else (
+			"Центр масс звёзд" if Catalog.system_of_site(site_id) == Catalog.BINARY_SYSTEM else ""),
 		"gravity": Dynamics.gravity_parameter(site_id) / (radius * radius),
 		"atmosphere_height": float(atmosphere.get("height", 0.0)),
 		"atmosphere_density": float(atmosphere.get("density", 0.0)),

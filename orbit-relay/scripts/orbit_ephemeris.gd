@@ -1,6 +1,6 @@
 extends RefCounted
-## Elliptic two-body orbits around each system's fixed primary. Positions at
-## epoch zero coincide with the chart coordinates of saves before orbital motion.
+## Analytic orbits in the system's inertial frame. Epoch positions match the
+## catalog, and a moving parent contributes both position and velocity.
 
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const GRAVITY_PARAMETERS := [8500.0, 8000.0, 7600.0, 8100.0, 7400.0]
@@ -37,6 +37,7 @@ const ELEMENTS := {
 
 
 class Track:
+	var parent := -1
 	var epoch: Vector3
 	var focus: Vector3
 	var major_axis: Vector3
@@ -62,23 +63,40 @@ static func sample(site_id: int, seconds: float) -> Dictionary:
 	if seconds != 0.0 and is_finite(seconds):
 		var mean := wrapf(track.mean_at_epoch + track.mean_motion * fposmod(seconds, track.period), -PI, PI)
 		eccentric_angle = mean
-		# Newton iteration for E - e*sin(E) = M. Catalog eccentricities are below 0.2.
-		for iteration in range(4):
-			var error := eccentric_angle - track.eccentricity * sin(eccentric_angle) - mean
-			var slope := 1.0 - track.eccentricity * cos(eccentric_angle)
-			eccentric_angle -= error / slope
+		if track.eccentricity > 0.0:
+			# Newton iteration for E - e*sin(E) = M. Catalog eccentricities are below 0.2.
+			for iteration in range(4):
+				var error := eccentric_angle - track.eccentricity * sin(eccentric_angle) - mean
+				var slope := 1.0 - track.eccentricity * cos(eccentric_angle)
+				eccentric_angle -= error / slope
 	var sine := sin(eccentric_angle)
 	var cosine := cos(eccentric_angle)
 	var angular_speed := track.mean_motion / (1.0 - track.eccentricity * cosine)
 	var velocity := (track.minor_axis * cosine - track.major_axis * sine) * angular_speed
 	var position := track.epoch if seconds == 0.0 else _position(track, sine, cosine)
+	if track.parent >= 0:
+		var parent := sample(track.parent, seconds)
+		position += parent.position
+		velocity += parent.velocity
 	return {"position": position, "velocity": velocity}
 
 
-static func orbit_points(site_id: int) -> PackedVector3Array:
+static func orbit_parent(site_id: int) -> int:
+	return _tracks[site_id].parent if site_id >= 0 and site_id < _tracks.size() else -1
+
+
+static func orbit_points(site_id: int, epoch := 0.0) -> PackedVector3Array:
 	if site_id < 0 or site_id >= _tracks.size():
 		return PackedVector3Array()
-	return _tracks[site_id].points
+	var track := _tracks[site_id]
+	if track.parent < 0:
+		return track.points
+	var center: Vector3 = sample(track.parent, epoch).position
+	var result := PackedVector3Array()
+	result.resize(track.points.size())
+	for index in range(track.points.size()):
+		result[index] = center + track.points[index]
+	return result
 
 
 static func period(site_id: int) -> float:
@@ -94,8 +112,11 @@ static func gravity_parameter(system_id: int) -> float:
 static func _build_tracks() -> Array[Track]:
 	var result: Array[Track] = []
 	for site_id in range(Catalog.DESTINATION_COUNT):
-		var track := Track.new()
 		var site := Catalog.site(site_id)
+		if Catalog.system_of_site(site_id) == Catalog.BINARY_SYSTEM:
+			result.append(_build_binary_track(site))
+			continue
+		var track := Track.new()
 		track.epoch = site.center
 		var elements: Vector3 = ELEMENTS.get(site_id, site.get("orbital_elements", Vector3.ZERO))
 		if elements != Vector3.ZERO:
@@ -117,13 +138,46 @@ static func _build_tracks() -> Array[Track]:
 			track.mean_at_epoch = track.eccentric_at_epoch - eccentricity * sin(track.eccentric_at_epoch)
 			track.mean_motion = sqrt(gravity_parameter(system_id) / (semi_major * semi_major * semi_major))
 			track.period = TAU / track.mean_motion
-			track.points.append(track.epoch)
-			for segment in range(1, ORBIT_SEGMENTS):
-				var angle := track.eccentric_at_epoch + TAU * float(segment) / ORBIT_SEGMENTS
-				track.points.append(_position(track, sin(angle), cos(angle)))
-			track.points.append(track.epoch)
+			_build_points(track)
 		result.append(track)
 	return result
+
+
+static func _build_binary_track(site: Dictionary) -> Track:
+	var system := Catalog.system(Catalog.BINARY_SYSTEM)
+	var track := Track.new()
+	track.parent = int(site.get("orbit_parent", -1))
+	track.focus = system.barycenter
+	track.epoch = site.center
+	var mu := gravity_parameter(Catalog.BINARY_SYSTEM)
+	if track.parent >= 0:
+		var parent := Catalog.site(track.parent)
+		track.epoch -= parent.center
+		track.focus = Vector3.ZERO
+		mu = float(parent.mu)
+	track.major_axis = track.epoch - track.focus
+	var semimajor := track.major_axis.length()
+	var tilt_axis := track.major_axis.normalized()
+	var inclination := float(site.get("orbit_inclination", system.binary_inclination))
+	if site.kind == "star":
+		# Both stellar tracks use opposite scaled axes of the same relative orbit.
+		# Its angular rate depends on the total mass and full stellar separation.
+		semimajor = system.binary_separation
+		tilt_axis = Vector3.RIGHT
+	var normal := Vector3.UP.rotated(tilt_axis, deg_to_rad(inclination))
+	track.minor_axis = track.major_axis.cross(normal)
+	track.mean_motion = sqrt(mu / (semimajor * semimajor * semimajor))
+	track.period = TAU / track.mean_motion
+	_build_points(track)
+	return track
+
+
+static func _build_points(track: Track) -> void:
+	track.points.append(track.epoch)
+	for segment in range(1, ORBIT_SEGMENTS):
+		var angle := track.eccentric_at_epoch + TAU * float(segment) / ORBIT_SEGMENTS
+		track.points.append(_position(track, sin(angle), cos(angle)))
+	track.points.append(track.epoch)
 
 
 static func _position(track: Track, sine: float, cosine: float) -> Vector3:

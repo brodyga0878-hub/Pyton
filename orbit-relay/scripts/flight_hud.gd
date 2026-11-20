@@ -566,7 +566,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_sync_condition(sim.ship.hull, mining.ore_hold, mining.cargo_capacity)
 	var stellar: Dictionary = {} if parked else sim.thermal_status()
 	var entry: Dictionary = {} if parked else sim.atmosphere_status()
-	var stellar_scoop: bool = sim.scoop_active_at(Sector.star_for(sim.system_id))
+	var stellar_scoop: bool = sim.scooping and scoop_status.get("kind", "") == "star"
 	var show_entry := _prefer_entry_meter(stellar, entry, stellar_scoop)
 	var entry_site := int(entry.site) if show_entry and (entry.near or entry.inside) else -1
 
