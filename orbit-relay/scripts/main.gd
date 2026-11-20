@@ -152,6 +152,10 @@ func _handle_action(action: String) -> void:
 		return
 	if flight.jump_seconds_left > 0.0 and action not in ["throttle_up", "throttle_down"]:
 		return
+	if flight.docked >= 0:
+		var departure := flight.departure_status()
+		if departure.active and (action != "dock" or not departure.can_cancel):
+			return
 	var near_target := flight.reference_site() >= 0 or flight.position.distance_to(flight.target_position(flight.target)) < 150.0
 	var throttle_step := 0.025 if near_target else 0.1
 	match action:
@@ -196,7 +200,7 @@ func _handle_action(action: String) -> void:
 		"time":
 			flight.cycle_time_scale()
 		"services":
-			if flight.docked >= 0:
+			if flight.station_services_available():
 				_hud.set_input_enabled(false)
 				_services.open(flight)
 			return
@@ -205,7 +209,7 @@ func _handle_action(action: String) -> void:
 			_services.open(flight, true)
 			return
 		"market":
-			if flight.docked >= 0:
+			if flight.station_services_available():
 				_hud.set_input_enabled(false)
 				_market.open(flight)
 			return
@@ -274,12 +278,20 @@ func _deliver_notice() -> void:
 			"wait_seconds": access.wait, "remaining_seconds": access.remaining, "reason": flight.status_message,
 			"system_id": flight.system_id, "orbit_time": flight.orbit_time, "speed": flight.speed(),
 		}
+	elif event in ["departure_requested", "departure_canceled", "departure_open"]:
+		var departure := flight.departure_status()
+		trace_fields = {
+			"port": flight.docked, "phase": departure.phase, "progress": departure.progress,
+			"wait_seconds": departure.wait, "reason": flight.status_message,
+			"system_id": flight.system_id, "orbit_time": flight.orbit_time,
+		}
 	_io.trace(event, trace_fields)
 	_hud.notify(flight.status_message)
 	flight.status_event = ""
 	if event in [
 		"launch", "dock", "land", "lift", "contract", "delivery", "mining_deploy", "mining_recover",
 		"dock_request", "dock_ready", "dock_expired",
+		"departure_requested", "departure_canceled", "departure_open",
 		"mining_ready", "mining_loaded", "ore_sold", "service_refuel", "service_tank", "service_eco",
 		"scoop_full", "scoop_stop", "star_arrival", "gas_arrival", "fuel_empty", "thermal_damage",
 		"fuel_transfer", "service_jump_refuel", "cargo_jettisoned",
@@ -344,6 +356,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		if event.physical_keycode == KEY_ESCAPE:
 			_close_frontier()
 		return
+	if event.physical_keycode == KEY_ESCAPE and flight.departure_status().can_cancel:
+		_handle_action("dock")
+		get_viewport().set_input_as_handled()
+		return
 	if event.physical_keycode == KEY_ESCAPE and (flight.cancel_jump() or flight.cancel_orbit_maneuver() or flight.cancel_rendezvous()):
 		_deliver_notice()
 		get_viewport().set_input_as_handled()
@@ -394,6 +410,8 @@ func _notification(what: int) -> void:
 			_close_journal()
 		elif _frontier.is_open():
 			_close_frontier()
+		elif flight.departure_status().can_cancel:
+			_handle_action("dock")
 		elif flight.cancel_jump() or flight.cancel_orbit_maneuver() or flight.cancel_rendezvous():
 			_deliver_notice()
 		else:

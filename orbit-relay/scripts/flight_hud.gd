@@ -62,7 +62,7 @@ var _guidance: Label
 var _notice: Label
 var _notice_panel: PanelContainer
 var _commands_panel: PanelContainer
-var _mining_progress: ProgressBar
+var _operation_progress: ProgressBar
 var _right_panel: PanelContainer
 var _throttle_controls: GridContainer
 var _port_tools: HBoxContainer
@@ -79,6 +79,8 @@ var _input_enabled := true
 var _touch_gain := 1.0
 var _touch_mirrored := false
 var _parked := true
+var _departure_active := false
+var _departure_can_cancel := false
 var _lift_blocked := false
 var _mining_blocked := false
 var _scoop_blocked := false
@@ -198,16 +200,16 @@ func build() -> void:
 	_guidance.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_guidance.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_guidance.custom_minimum_size.y = 38
-	_mining_progress = ProgressBar.new()
-	_mining_progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_mining_progress.max_value = 1.0
-	_mining_progress.step = 0.0
-	_mining_progress.show_percentage = false
-	_mining_progress.custom_minimum_size.y = 9.0
-	_mining_progress.add_theme_stylebox_override("background", _box(Color("12313d"), LINE, 5, 0.0))
-	_mining_progress.add_theme_stylebox_override("fill", _box(AMBER, AMBER, 5, 0.0))
-	center.add_child(_mining_progress)
-	_mining_progress.hide()
+	_operation_progress = ProgressBar.new()
+	_operation_progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_operation_progress.max_value = 1.0
+	_operation_progress.step = 0.0
+	_operation_progress.show_percentage = false
+	_operation_progress.custom_minimum_size.y = 9.0
+	_operation_progress.add_theme_stylebox_override("background", _box(Color("12313d"), LINE, 5, 0.0))
+	_operation_progress.add_theme_stylebox_override("fill", _box(AMBER, AMBER, 5, 0.0))
+	center.add_child(_operation_progress)
+	_operation_progress.hide()
 	var commands := HBoxContainer.new()
 	commands.add_theme_constant_override("separation", 7)
 	center.add_child(commands)
@@ -221,7 +223,7 @@ func build() -> void:
 	gear_button.name = "LandingGear"
 	gear_button.custom_minimum_size.x = 118.0
 	gear_button.hide()
-	_button(commands, "dock", "Старт")
+	_button(commands, "dock", "Запросить выход")
 	_button(commands, "scoop", "Сбор топлива")
 	_button(commands, "contract", "Контракт")
 	_button(commands, "mine", "Развернуть модуль")
@@ -431,6 +433,12 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var docked: bool = sim.docked >= 0
 	var landed: bool = sim.landed_site >= 0
 	var parked := docked or landed
+	var departure: Dictionary = sim.departure_status()
+	if not _departure_active and departure.active:
+		_reset_controls()
+	_departure_active = departure.active
+	_departure_can_cancel = departure.can_cancel
+	var port_services: bool = sim.station_services_available()
 	var patrol: Dictionary = sim.patrol_status()
 	if not _parked and parked:
 		_reset_controls()
@@ -448,8 +456,8 @@ func sync(sim: RefCounted, delta: float) -> void:
 		assist.add_theme_color_override("font_color", assist_color)
 	_throttle_controls.visible = not parked
 	_actions["target"].visible = not parked
-	_actions["services"].visible = docked
-	_actions["market"].visible = docked
+	_actions["services"].visible = port_services
+	_actions["market"].visible = port_services
 	var orbit_active: bool = not parked and not _jumping and sim.orbit_maneuver
 	_actions["orbit_cancel"].visible = orbit_active
 	var rendezvous: Dictionary = {}
@@ -473,7 +481,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	convoy_button.tooltip_text = str(convoy.get("reason", ""))
 	_convoy_blocked = not convoy.get("can_route", false)
 	var patrol_button: Button = _actions["patrol"]
-	patrol_button.visible = not landed and not _jumping and not approach_active and not convoy_button.visible and bool(patrol.get("visible", false))
+	patrol_button.visible = not landed and not _departure_active and not _jumping and not approach_active and not convoy_button.visible and bool(patrol.get("visible", false))
 	patrol_button.text = str(patrol.get("caption", "Дозор"))
 	patrol_button.tooltip_text = str(patrol.get("reason", ""))
 	_patrol_blocked = not bool(patrol.get("available", false))
@@ -483,19 +491,24 @@ func sync(sim: RefCounted, delta: float) -> void:
 	fire_button.tooltip_text = str(fire.get("reason", ""))
 	_fire_blocked = not fire.get("ok", false)
 	var flight_tools := patrol_button.visible or convoy_button.visible or fire_button.visible or approach_active
-	_port_tools.visible = docked or flight_tools
+	_port_tools.visible = port_services or flight_tools
+	_right_panel.visible = not _departure_active
 	_right_panel.offset_top = -157.0 if docked else (-101.0 if landed else (-274.0 if flight_tools else -215.0))
 	_marks.flight = not parked
 	_marks.queue_redraw()
 
 	var mining: RefCounted = sim.mining
 	var drilling: bool = landed and mining.phase in [MiningRig.DEPLOYING, MiningRig.DRILLING, MiningRig.RETURNING]
-	_mining_progress.visible = drilling
+	var departure_progress: bool = _departure_active and departure.phase in ["opening", "transit"]
+	var show_progress := drilling or departure_progress
+	_operation_progress.visible = show_progress
 	if drilling:
-		_mining_progress.value = mining.progress()
-	_commands_panel.offset_top = -160.0 if drilling else -143.0
-	_notice_panel.offset_top = -215.0 if drilling else -199.0
-	_notice_panel.offset_bottom = -169.0 if drilling else -153.0
+		_operation_progress.value = mining.progress()
+	elif departure_progress:
+		_operation_progress.value = departure.progress
+	_commands_panel.offset_top = -160.0 if show_progress else -143.0
+	_notice_panel.offset_top = -215.0 if show_progress else -199.0
+	_notice_panel.offset_bottom = -169.0 if show_progress else -153.0
 	_lift_blocked = landed and mining.phase != MiningRig.STOWED
 	_mining_blocked = landed and mining.phase != MiningRig.READY and not mining.available_to_deploy()
 	_actions["mine"].visible = landed
@@ -513,9 +526,12 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_actions["dock"].text = "Швартовка" if Sector.is_port(sim.target) else "Посадка"
 	_actions["dock"].tooltip_text = ""
 	if parked:
-		_actions["dock"].text = "Взлёт" if landed else "Старт"
+		_actions["dock"].text = "Взлёт" if landed else "Запросить выход"
 		if _lift_blocked:
 			_actions["dock"].tooltip_text = "Сначала верните модуль на борт"
+		elif _departure_active:
+			_actions["dock"].text = "Отменить выход" if _departure_can_cancel else "Автоматический выход"
+			_actions["dock"].tooltip_text = str(departure.reason)
 	var scoop_status: Dictionary = {} if parked else sim.scoop_status()
 	_scoop_blocked = not sim.scooping and not scoop_status.get("ok", false)
 	_actions["scoop"].visible = not parked and (scoop_target or scoop_status.get("near", false) or sim.scooping)
@@ -524,9 +540,9 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_actions["autopilot"].text = "Выкл. авто" if sim.autopilot else "Авто"
 	var itinerary: Dictionary = sim.contract_itinerary() if sim.contract_stage == 1 else {}
 	var transfer: bool = not itinerary.is_empty() and int(itinerary.leg) + 1 < itinerary.stops.size()
-	_actions["contract"].visible = docked and (sim.contract_stage != 1 or sim.docked == sim.contract_destination)
+	_actions["contract"].visible = port_services and (sim.contract_stage != 1 or sim.docked == sim.contract_destination)
 	_actions["contract"].text = "Отметить этап" if transfer else ("Сдать груз" if sim.contract_stage == 1 else "Взять контракт")
-	var sale_quote: int = sim.raw_sale_quote() if docked and mining.ore_hold > 0 else 0
+	var sale_quote: int = sim.raw_sale_quote() if port_services and mining.ore_hold > 0 else 0
 	_actions["sell_ore"].visible = sale_quote > 0
 	var dock_approach: bool = not parked and not _jumping and not approach_active and fire.is_empty() and convoy.is_empty() and not sim.patrol_course and not sim.project_course and not sim.convoy_course
 	var manual_approach: bool = dock_approach and not sim.autopilot
@@ -547,6 +563,8 @@ func sync(sim: RefCounted, delta: float) -> void:
 
 	if landed:
 		_sync_surface(sim, mining)
+	elif _departure_active:
+		_sync_departure(sim, departure)
 	elif docked:
 		_sync_port(sim, sale_quote, itinerary, transfer)
 		if sim.contract_stage != 1 and patrol.get("phase") in [Patrol.OUTBOUND, Patrol.RETURN] and patrol_button.visible:
@@ -558,6 +576,23 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_notice_left -= delta
 		if _notice_left <= 0.0:
 			_notice_panel.hide()
+
+func _sync_departure(sim: RefCounted, departure: Dictionary) -> void:
+	_route.text = "Выход / %s" % sim.target_name(departure.port)
+	_route_detail.text = "После выхода → %s" % sim.target_name(sim.planned_target) if sim.planned_target >= 0 else ""
+	_telemetry.text = "Корабль у причала"
+	if departure.phase == "transit":
+		var speed: float = sim.speed_relative_to(departure.port)
+		_telemetry.text = "У дока · %s м/с" % ("%.1f" % speed).replace(".", ",")
+	match departure.phase:
+		"opening":
+			_guidance.text = "Створ открывается · %d%%" % roundi(_operation_progress.value * 100.0)
+		"transit":
+			_guidance.text = "Проход через створ · %d%%" % roundi(_operation_progress.value * 100.0)
+		_:
+			_guidance.text = str(departure.reason)
+			if departure.wait > 0.0:
+				_guidance.text += " · %d с" % ceili(departure.wait)
 
 func _sync_fuel(ship: RefCounted) -> void:
 	var capacity: float = ship.capacity()
@@ -956,7 +991,8 @@ func _refresh_disabled_actions() -> void:
 		blocked = blocked or (action == "dock_clearance" and _dock_clearance_blocked)
 		blocked = blocked or (action == "gear" and _gear_blocked)
 		var during_jump := _jumping and action not in ["throttle_down", "throttle_up", "boost", "brake"]
-		button.disabled = not _input_enabled or blocked or during_jump
+		var during_departure := _departure_active and (action != "dock" or not _departure_can_cancel)
+		button.disabled = not _input_enabled or blocked or during_jump or during_departure
 
 func move_input() -> Vector2:
 	if _parked or not _input_enabled:

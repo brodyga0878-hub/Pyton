@@ -1,6 +1,7 @@
 extends SceneTree
 
 const Flight := preload("res://scripts/flight_sim.gd")
+const Fixture = preload("res://tests/flight_fixture.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const DockAccess := preload("res://scripts/dock_access.gd")
 const OrbitRelay := preload("res://main.tscn")
@@ -293,7 +294,7 @@ func _station_departure(port: int) -> Flight:
 		"position": [berth.x, berth.y, berth.z]}, true)
 	_expect(flight.restore(saved), "Load a docked state in the destination's system")
 	_tick(flight, 137.0)
-	_expect(flight.dock_action() and flight.docked < 0, "Launch normally from the nearby station")
+	_expect(Fixture.launch(flight), "Seed an airborne ship at the nearby port")
 	return flight
 
 

@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture = preload("res://tests/flight_fixture.gd")
+
 const Flight := preload("res://scripts/flight_sim.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const Expedition := preload("res://scripts/expedition.gd")
@@ -409,7 +411,7 @@ func _at_port(flight: Flight, port: int) -> Flight:
 
 
 func _jump_to(flight: Flight, system: int) -> bool:
-	if (flight.docked >= 0 and not flight.dock_action()) or not flight.plan_jump(system):
+	if (flight.docked >= 0 and not Fixture.launch(flight)) or not flight.plan_jump(system):
 		return false
 	var fare := Catalog.jump_cost(flight.system_id, system)
 	flight.change_throttle(0.18)

@@ -1,6 +1,7 @@
 extends SceneTree
 
 const Flight = preload("res://scripts/flight_sim.gd")
+const Fixture = preload("res://tests/flight_fixture.gd")
 
 var failures: Array[String] = []
 
@@ -18,7 +19,7 @@ func _test_route_and_recovery() -> void:
 	var flight := Flight.new()
 	_check(flight.contract_action() and flight.contract_destination == 1, "First cargo can be accepted at its origin")
 	_check(not flight.contract_action(), "Contract cannot be paid at its origin")
-	_check(flight.dock_action() and flight.docked == -1, "Launch is available from station services")
+	_check(Fixture.depart(flight), "Launch is available from station services")
 	_check(not flight.dock_action(), "Remote docking is rejected")
 	_fly_to_station(flight, 1)
 	_check(flight.contract_action() and flight.credits == 240 and flight.deliveries == 1, "Receiving station pays for delivered cargo")
@@ -26,7 +27,7 @@ func _test_route_and_recovery() -> void:
 	var cold := JSON.parse_string(JSON.stringify(flight.snapshot())) as Dictionary
 	_check(recovered.restore(cold) and recovered.docked == 1 and recovered.credits == 240, "A cold load retains station, cargo progress and credits")
 	_check(recovered.contract_action() and recovered.credits == 240 and recovered.contract_destination == 0, "Repeated action starts a new return cargo without repaying the previous one")
-	recovered.dock_action()
+	_check(Fixture.depart(recovered), "A recovered ship can request departure from a different berth")
 	_fly_to_station(recovered, 0)
 	_check(recovered.contract_action() and recovered.credits == 420 and recovered.deliveries == 2, "Return leg completes from the back of the target station")
 	var good := recovered.snapshot()
@@ -47,7 +48,7 @@ func _fly_to_station(flight: RefCounted, destination: int) -> void:
 
 func _test_flight_controls() -> void:
 	var flight := Flight.new()
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.set_autopilot(true)
 	flight.update(1.0 / 60.0, Vector2.RIGHT, 0.0, false, false)
 	_check(not flight.autopilot, "Steering overrides autopilot")
@@ -70,7 +71,7 @@ func _test_flight_controls() -> void:
 	_check(not flight.dock_action(), "Manual docking rejects excessive speed")
 	flight.velocity = flight.target_velocity(1)
 	_check(flight.dock_action() and flight.docked == 1, "Manual docking accepts a slow aligned approach")
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.change_throttle(0.4)
 	for _step in range(80):
 		flight.update(1.0 / 60.0, Vector2.ZERO, 0.0, false, true)

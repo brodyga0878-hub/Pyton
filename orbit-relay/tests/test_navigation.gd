@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture = preload("res://tests/flight_fixture.gd")
+
 const Flight := preload("res://scripts/flight_sim.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const OrbitRelay := preload("res://main.tscn")
@@ -248,7 +250,7 @@ func _test_touch() -> void:
 
 
 func _travel(flight: Flight, destination: int) -> bool:
-	if not flight.select_target(destination) or not flight.dock_action():
+	if not flight.select_target(destination) or not Fixture.depart(flight):
 		return false
 	flight.set_autopilot(true)
 	for _frame in range(roundi(150.0 / STEP)):
@@ -266,7 +268,7 @@ func _free_flight(port: int = 0) -> Flight:
 		saved.docked = port
 		saved.target = port
 		_expect(flight.restore(saved), "Load a real port in an isolated star system")
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.position = OPEN_SPACE
 	flight.velocity = Vector3.ZERO
 	flight.yaw = 0.0

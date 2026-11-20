@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture = preload("res://tests/flight_fixture.gd")
+
 const Flight = preload("res://scripts/flight_sim.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const OrbitRelay = preload("res://main.tscn")
@@ -33,7 +35,7 @@ func _test_manual_depletion() -> void:
 	_step_flight(flight, 5.0, true)
 	_expect(flight.ship.fuel == 100.0 and flight.speed() == 0.0,
 		"A docked ship neither moves nor spends fuel under held boost")
-	_expect(flight.dock_action(), "Manual test launches from Маяк-7")
+	_expect(Fixture.depart(flight), "Manual test launches from Маяк-7")
 	flight.change_throttle(1.0)
 	_step_flight(flight, 2.0)
 	_expect(flight.ship.fuel > 96.0 and flight.ship.fuel < 99.0 and flight.speed() > 50.0,
@@ -60,7 +62,7 @@ func _test_scoop_safety() -> void:
 	var star := Catalog.site(Catalog.STAR_ID)
 	var center: Vector3 = star.center
 	_expect(not flight.scoop_status().ok and not flight.scoop_action(), "The scoop stays closed in port")
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.select_target(Catalog.STAR_ID)
 	_expect(not flight.scoop_status().ok and not flight.scoop_action(), "Selecting a distant star grants no fuel")
 	flight.position = center + Vector3.BACK * 395.0
@@ -111,7 +113,7 @@ func _test_scoop_safety() -> void:
 
 func _test_stellar_heat() -> void:
 	var flight := Flight.new()
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.select_target(Catalog.STAR_ID)
 	var center := flight.target_position(Catalog.STAR_ID)
 	flight.position = center + Vector3.BACK * (Catalog.SCOOP_INNER + 1.0)
@@ -162,7 +164,7 @@ func _test_stellar_heat() -> void:
 
 func _test_heat_and_time_acceleration() -> void:
 	var flight := Flight.new()
-	flight.dock_action()
+	Fixture.launch(flight)
 	var center := flight.target_position(Catalog.STAR_ID)
 	flight.position = center + Vector3.BACK * (Catalog.SCOOP_OUTER + Flight.STAR_WARP_MARGIN + 18.0)
 	flight.velocity = Vector3.FORWARD * 27.0
@@ -180,7 +182,7 @@ func _test_heat_and_time_acceleration() -> void:
 
 func _test_rear_stellar_departure() -> void:
 	var flight := Flight.new()
-	flight.dock_action()
+	Fixture.launch(flight)
 	var center: Vector3 = Catalog.site(Catalog.STAR_ID).center
 	flight.position = center + Vector3.FORWARD * 310.0
 	flight.velocity = Vector3.ZERO
@@ -216,7 +218,7 @@ func _test_service_rules() -> void:
 		"The port accepts exact payment and fills the missing fuel")
 	_expect(not flight.service_action("refuel") and flight.credits == 0, "A full tank cannot be charged twice")
 	flight.credits = 1000
-	flight.dock_action()
+	Fixture.launch(flight)
 	_step_flight(flight, 2.0, true)
 	_expect(not flight.service_offer("refuel").allowed and not flight.service_action("refuel")
 		and not flight.service_action("tank") and not flight.service_action("eco") and flight.credits == 1000,
@@ -227,7 +229,7 @@ func _test_service_rules() -> void:
 	_expect(efficient.service_action("eco") and efficient.credits == 0, "The economy upgrade consumes its quoted fee")
 	var standard := Flight.new()
 	for ship in [standard, efficient]:
-		ship.dock_action()
+		Fixture.launch(ship)
 		ship.change_throttle(0.6)
 		_step_flight(ship, 10.0)
 	_expect(efficient.ship.fuel > standard.ship.fuel and is_equal_approx(efficient.speed(), standard.speed()),
@@ -249,7 +251,9 @@ func _test_touch_route() -> void:
 	await process_frame
 	_expect(flight.planned_target == Catalog.STAR_ID and not game._map.is_open(),
 		"The chart stores the star course until launch")
-	_tap(game._hud._actions.get("dock"), "Touch launches on the planned course")
+	_tap(game._hud._actions.get("dock"), "Touch requests departure on the planned course")
+	_expect(Fixture.await_departure(flight, 15.0, game._physics_process), "The port ejects the ship along its approved corridor")
+	game._update_display(0.0)
 	await process_frame
 	_tap(game._hud._actions.get("autopilot"), "Touch starts the star approach")
 	_advance(game, func() -> bool: return not flight.autopilot, 115.0)

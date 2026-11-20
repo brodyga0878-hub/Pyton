@@ -13,6 +13,10 @@ const STATION_RADIAL_SEGMENTS := 20
 const BACKDROP_ORBIT_SECONDS := 28800.0
 const CLOUD_CYCLE_SECONDS := 1080.0
 const CAMERA_SURFACE_CLEARANCE := 2.0
+const BERTH_CAMERA_OFFSET := Vector3(8.4, 9.2, 24.0)
+const BERTH_CAMERA_FOCUS := Vector3(0.0, 0.0, -15.0)
+const DEPARTURE_CAMERA_BLEND_START := 16.0
+const DEPARTURE_CAMERA_BLEND_END := 32.0
 const GEAR_PAD_SIZE := Vector3(0.46, 0.32, 0.13)
 const HATCH_HINGE_RADIUS := DockAccess.HATCH_RADIUS + 0.26
 const HATCH_LEAF_RADIUS := DockAccess.HATCH_RADIUS + 0.12
@@ -81,6 +85,7 @@ var _approaches: Dictionary[int, Node3D] = {}
 var _gate_materials: Dictionary[int, StandardMaterial3D] = {}
 var _last_position := Vector3.INF
 var _last_berth := -1
+var _departure_view_port := -1
 var _camera_up := Vector3.UP
 var _flight_time := 0.0
 var _visual_profile := 1
@@ -146,6 +151,7 @@ func _load_sector(id: int) -> void:
 	_star_id = Catalog.star_for(id)
 	_gas_giant_id = Catalog.gas_giant_for(id)
 	_last_position = Vector3.INF
+	_departure_view_port = -1
 
 	var cool := id == Catalog.VELAR_SYSTEM
 	var fringe := id == Catalog.FRINGE_SYSTEM
@@ -223,6 +229,11 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var berth := int(sim.docked) if docked else surface_id
 	var ship_orientation: Basis = sim.attitude()
 	var heading := Basis.IDENTITY if docked else ship_orientation
+	var departure: Dictionary = sim.departure_status()
+	if docked:
+		_departure_view_port = int(departure.port) if departure.phase == "transit" else -1
+	elif landed:
+		_departure_view_port = -1
 	_ship.position = position_now
 	_ship.basis = ship_orientation
 	_sync_landing_gear(sim.gear_extension)
@@ -232,14 +243,30 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_jet.scale = Vector3(1.0, (0.45 + thrust * 0.85) * (1.45 if sim.boost else 1.0), 1.0)
 	_jet_material.set_shader_parameter("pulse", 0.59 + sin(_flight_time * 31.0) * 0.08)
 
-	var camera_offset := Vector3(8.4, 9.2, 24.0) if docked else Vector3(0.0, 3.4, 10.5)
-	var focal_offset := Vector3(0.0, 0.0, -15.0) if docked else Vector3(0.0, 2.0, -30.0)
+	var camera_offset := BERTH_CAMERA_OFFSET if docked else Vector3(0.0, 3.4, 10.5)
+	var focal_offset := BERTH_CAMERA_FOCUS if docked else Vector3(0.0, 2.0, -30.0)
 	var up := heading.y
 	if landed:
 		camera_offset = Vector3(-8.4, -13.5, 12.5)
 		focal_offset = Vector3(2.8, 2.0, -3.2)
 		up = heading.z
 	var desired := position_now + heading * camera_offset
+	var chase_weight := 1.0
+	var departure_frame := Basis.IDENTITY
+	if _departure_view_port >= 0:
+		var axis: Vector3 = sim.station_axis(_departure_view_port)
+		var from_hatch: Vector3 = position_now - sim.dock_hatch_position(_departure_view_port)
+		var ahead := from_hatch.dot(axis)
+		if not docked and (ahead < 0.0 or ahead >= DEPARTURE_CAMERA_BLEND_END or from_hatch.slide(axis).length_squared() >= 576.0):
+			_departure_view_port = -1
+		else:
+			var up_axis := Vector3.RIGHT if absf(axis.dot(Vector3.UP)) > 0.95 else Vector3.UP
+			departure_frame = Basis.looking_at(-axis, up_axis)
+			chase_weight = 0.0 if docked else smoothstep(DEPARTURE_CAMERA_BLEND_START, DEPARTURE_CAMERA_BLEND_END, ahead)
+			# The ordinary chase offset places the camera behind the ship, inside the hatch just after release.
+			desired = (position_now + departure_frame * BERTH_CAMERA_OFFSET).lerp(desired, chase_weight)
+			var camera_rotation := departure_frame.get_rotation_quaternion().slerp(heading.get_rotation_quaternion(), chase_weight)
+			up = Basis(camera_rotation).y
 	var jump := delta <= 0.0 or not _last_position.is_finite()
 	if not jump:
 		jump = position_now.distance_squared_to(_last_position) > 144.0
@@ -252,7 +279,12 @@ func sync(sim: RefCounted, delta: float) -> void:
 	if not settled:
 		var close_follow := smoothstep(0.0, 7.0, camera.position.distance_to(chase_origin))
 		focal_offset = focal_offset.lerp(Vector3(0.0, 0.4, -2.5), close_follow)
-	var look_target := position_now + heading * focal_offset
+	var focal_direction := heading * focal_offset
+	if chase_weight < 1.0:
+		var travel := float(departure.progress) if docked else 1.0
+		var dock_focus := BERTH_CAMERA_FOCUS.lerp(Vector3(0.0, 0.0, -7.5), travel)
+		focal_direction = (departure_frame * dock_focus).lerp(focal_direction, chase_weight)
+	var look_target := position_now + focal_direction
 	var sight := (look_target - camera.position).normalized()
 	var blended_up := _camera_up.lerp(up, blend).normalized()
 	_camera_up = up if jump or blended_up.is_zero_approx() else blended_up

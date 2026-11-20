@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture = preload("res://tests/flight_fixture.gd")
+
 const Flight := preload("res://scripts/flight_sim.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const Route := preload("res://scripts/galactic_route.gd")
@@ -272,7 +274,7 @@ func _known_flight() -> Flight:
 
 
 func _depart(flight: Flight) -> bool:
-	if flight.docked < 0 or not flight.dock_action():
+	if flight.docked < 0 or not Fixture.depart(flight):
 		return false
 	flight.change_throttle(0.18)
 	for _frame in range(roundi(9.0 / STEP)):

@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture = preload("res://tests/flight_fixture.gd")
+
 const Flight = preload("res://scripts/flight_sim.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const Patrol = preload("res://scripts/patrol_encounter.gd")
@@ -48,7 +50,7 @@ func _test_traffic() -> void:
 			"System %d has civilian and patrol traffic before accepting a task" % system)
 		_expect(flight.traffic_contacts() == initial and not flight.fire_status().ok and not flight.fire_action(),
 			"Sampling the same time is deterministic and friendly contacts are not combat targets")
-		_expect(flight.dock_action(), "Traffic does not block a normal launch in system %d" % system)
+		_expect(Fixture.depart(flight), "Traffic does not block a normal launch in system %d" % system)
 		_step(flight, 12.0)
 		var moved := 0
 		for contact: Dictionary in flight.traffic_contacts():
@@ -167,7 +169,9 @@ func _test_touch_patrol() -> void:
 	_expect(flight.patrol_status().phase == Patrol.OUTBOUND and flight.credits == 0,
 		"Accepting a patrol starts an optional mission without paying its reward")
 	_expect(not flight.fire_action(), "The accepted assignment does not enable shooting in dock")
-	_tap(game._hud._actions.get("dock"), "Launch for the assigned patrol")
+	_tap(game._hud._actions.get("dock"), "Request departure for the assigned patrol")
+	_expect(Fixture.await_departure(flight, 15.0, game._physics_process), "The assigned patrol retains its course after departure")
+	game._update_display(0.0)
 	await process_frame
 	_tap(game._hud._actions.get("patrol"), "Switch on the guidance to the incident by touch")
 	_expect(flight.patrol_course, "The touch command engages actual patrol course assistance")
@@ -297,7 +301,7 @@ func _at_port(port: int) -> Flight:
 
 
 func _jump_from_dock(flight: Flight, system: int) -> bool:
-	if not flight.dock_action() or not flight.plan_jump(system):
+	if not Fixture.depart(flight) or not flight.plan_jump(system):
 		return false
 	flight.change_throttle(0.18)
 	for _frame in range(roundi(12.0 / STEP)):
@@ -313,7 +317,7 @@ func _jump_from_dock(flight: Flight, system: int) -> bool:
 
 
 func _fly_to(flight: Flight, port: int) -> bool:
-	if not flight.select_target(port) or (flight.docked >= 0 and not flight.dock_action()):
+	if not flight.select_target(port) or (flight.docked >= 0 and not Fixture.depart(flight)):
 		return false
 	flight.set_autopilot(true)
 	for _frame in range(roundi(100.0 / STEP)):

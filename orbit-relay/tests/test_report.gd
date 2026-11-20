@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture = preload("res://tests/flight_fixture.gd")
+
 const Flight := preload("res://scripts/flight_sim.gd")
 const SessionIO := preload("res://scripts/session_io.gd")
 const OrbitRelay := preload("res://main.tscn")
@@ -154,7 +156,7 @@ func _test_overlay() -> void:
 	game.set_physics_process(false)
 	game.flight = Flight.new()
 	game.flight.credits = 318
-	game.flight.dock_action()
+	Fixture.launch(game.flight)
 	var assigned_path := _workspace.path_join("touch.zip")
 	game._io = TestSessionIO.new(assigned_path)
 	game._io.trace("overlay_probe", {"target": game.flight.target})

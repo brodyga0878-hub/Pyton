@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture = preload("res://tests/flight_fixture.gd")
+
 const Flight = preload("res://scripts/flight_sim.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const Orbit = preload("res://scripts/orbit_ephemeris.gd")
@@ -96,7 +98,7 @@ func _test_landing_limits() -> void:
 		_expect(flight.landed_offpad() and flight.landing_direction.dot(direction) > 0.9999,
 			"Touchdown records the selected patch instead of relocating to the marked pad")
 	var star := Flight.new()
-	star.dock_action()
+	Fixture.launch(star)
 	star.select_target(Catalog.STAR_ID)
 	star.position = star.target_contact(Catalog.STAR_ID)
 	star.velocity = Vector3.ZERO

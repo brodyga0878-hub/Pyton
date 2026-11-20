@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture = preload("res://tests/flight_fixture.gd")
+
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const Economy = preload("res://scripts/port_economy.gd")
 const Flight = preload("res://scripts/flight_sim.gd")
@@ -56,7 +58,7 @@ func _check_gas_autopilot_and_jump() -> void:
 	var flight := Flight.new()
 	flight.ship.fuel = 0.0
 	flight.ship.jump_fuel = 2.0
-	_check(flight.dock_action() and flight.select_target(Giant), "An empty maneuver tank still allows station departure")
+	_check(Fixture.depart(flight) and flight.select_target(Giant), "An empty maneuver tank still allows station departure")
 	flight.set_autopilot(true)
 	for _frame in range(60 * 180):
 		if not flight.autopilot:
@@ -94,7 +96,7 @@ func _check_gas_autopilot_and_jump() -> void:
 
 func _check_collecting_with_full_cargo() -> void:
 	var flight := Flight.new()
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.select_target(Catalog.STAR_ID)
 	flight.position = flight.target_contact(Catalog.STAR_ID)
 	flight.velocity = Vector3.ZERO
@@ -116,7 +118,7 @@ func _check_collecting_with_full_cargo() -> void:
 
 func _gas_approach(altitude: float) -> Flight:
 	var flight := Flight.new()
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.select_target(Giant)
 	flight.position = flight.target_position(Giant) + Vector3.BACK * (float(Catalog.site(Giant).radius) + altitude)
 	flight.velocity = flight.target_velocity(Giant)

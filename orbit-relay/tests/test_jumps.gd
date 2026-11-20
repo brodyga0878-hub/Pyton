@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture = preload("res://tests/flight_fixture.gd")
+
 const Flight = preload("res://scripts/flight_sim.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const OrbitRelay = preload("res://main.tscn")
@@ -33,7 +35,7 @@ func _test_jump_conditions() -> void:
 		and not flight.plan_jump(Catalog.SYSTEM_COUNT), "A current, unknown or unplanned destination cannot start a jump")
 	_expect(flight.plan_jump(VELAR) and flight.jump_status(VELAR).cost == 26
 		and not flight.jump_status(VELAR).ok and not flight.start_jump(), "Planning from the dock quotes the jump but keeps it locked")
-	flight.dock_action()
+	Fixture.launch(flight)
 	_expect(not flight.jump_status(VELAR).ok, "The jump remains locked during departure close to the port")
 	flight.position = _arrival(flight, HOME)
 	flight.velocity = Vector3.BACK * 43.0
@@ -60,7 +62,7 @@ func _test_jump_conditions() -> void:
 
 func _test_cancellation_and_commit() -> void:
 	var flight := Flight.new()
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.position = _arrival(flight, HOME)
 	flight.velocity = Vector3.ZERO
 	flight.ship.jump_fuel = 26.0
@@ -207,7 +209,9 @@ func _test_touch_route() -> void:
 		"Planning from port keeps the jump guarded and leaves the tank untouched")
 	_tap(chart._close_button, "A touch dismisses the galaxy map")
 	await process_frame
-	_tap(game._hud._actions.get("dock"), "A touch launches on the current system's local flight controls")
+	_tap(game._hud._actions.get("dock"), "A touch requests departure on the current system's local flight controls")
+	_expect(Fixture.await_departure(flight, 15.0, game._physics_process), "The departure is completed before clearing for the jump")
+	game._update_display(0.0)
 	await process_frame
 	_tap(game._hud._actions.get("throttle_up"), "A touch increases departure thrust")
 	_tap(game._hud._actions.get("throttle_up"), "A second touch increases departure thrust")
@@ -299,7 +303,7 @@ func _at_destination(id: int) -> RefCounted:
 	if id != Catalog.VELAR_STAR_ID:
 		return _parked(id)
 	var flight := _parked(int(Catalog.system(VELAR).arrival_port))
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.target = id
 	flight.position = flight.target_contact(id)
 	flight.velocity = Vector3.ZERO
@@ -307,7 +311,7 @@ func _at_destination(id: int) -> RefCounted:
 
 
 func _fly_to(flight: RefCounted, id: int) -> bool:
-	if (flight.docked >= 0 or flight.landed) and not flight.dock_action():
+	if (flight.docked >= 0 and not Fixture.launch(flight)) or (flight.landed and not flight.dock_action()):
 		return false
 	if not flight.select_target(id):
 		return false

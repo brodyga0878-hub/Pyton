@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture = preload("res://tests/flight_fixture.gd")
+
 const Flight = preload("res://scripts/flight_sim.gd")
 const Orbit = preload("res://scripts/orbit_ephemeris.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
@@ -60,7 +62,7 @@ func _test_ephemeris() -> void:
 
 func _test_moving_contacts() -> void:
 	var flight := _parked(0)
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.select_target(1)
 	var gate := flight.target_gate(1)
 	var eta := flight.intercept_time(1)
@@ -90,12 +92,13 @@ func _test_moving_contacts() -> void:
 	_expect(flight.position.distance_to(first) > 0.7 and flight.position == flight.target_contact(1)
 		and is_equal_approx(flight.roll, flight.station_angle(1)) and is_zero_approx(flight.relative_speed()),
 		"A docked ship follows the orbit and rotation of its station")
+	var departed := Fixture.depart(flight)
 	var reference_velocity := flight.target_velocity(1)
-	_expect(flight.dock_action() and flight.velocity.distance_to(reference_velocity + Vector3.BACK * 6.0) < 0.02,
+	_expect(departed and flight.velocity.distance_to(reference_velocity + Vector3.BACK * 6.0) < 0.02,
 		"Launching from a station retains its inertial velocity")
 
 	var surface := _parked(10)
-	surface.dock_action()
+	Fixture.launch(surface)
 	surface.select_target(MOON)
 	surface.position = surface.target_contact(MOON) + Vector3.BACK * 3.0
 	surface.yaw = 0.0
@@ -163,7 +166,7 @@ func _test_warp_interlocks() -> void:
 		_expect(flight.time_scale == 1 and is_equal_approx(flight.orbit_time - before, STEP),
 			"Manual steering and emergency brake each restore 1× before stepping")
 	var close := _parked(0)
-	close.dock_action()
+	Fixture.launch(close)
 	_expect(not close.time_status().allowed and not close.cycle_time_scale() and close.time_scale == 1,
 		"Accelerated time cannot be armed beside the launch station")
 	close.select_target(1)
@@ -272,7 +275,9 @@ func _test_moving_obstacle_detours() -> void:
 
 
 func _fly_route(flight: Flight, destination: int) -> Dictionary:
-	if flight.docked >= 0 or flight.landed:
+	if flight.docked >= 0:
+		Fixture.launch(flight)
+	elif flight.landed:
 		flight.dock_action()
 	flight.select_target(destination)
 	flight.set_autopilot(true)
@@ -342,7 +347,7 @@ func _parked(site: int, epoch := EPOCH) -> Flight:
 
 func _clear_flight() -> Flight:
 	var flight := _parked(0)
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.position = Vector3(-7000.0, 4200.0, 4500.0)
 	flight.velocity = Vector3.ZERO
 	flight.yaw = 0.0

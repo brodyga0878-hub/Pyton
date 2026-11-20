@@ -2,6 +2,7 @@ extends SceneTree
 
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const Flight := preload("res://scripts/flight_sim.gd")
+const Fixture := preload("res://tests/flight_fixture.gd")
 const Rig := preload("res://scripts/mining_rig.gd")
 const ASTEROID := Flight.ASTEROID_TARGET
 const STEP := 1.0 / 60.0
@@ -104,7 +105,7 @@ func _test_reversal() -> void:
 
 func _test_automatic_landing() -> void:
 	var flight := Flight.new()
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.select_target(ASTEROID)
 	flight.set_autopilot(true)
 	var moving_before_touchdown := false
@@ -122,7 +123,7 @@ func _test_station_docking() -> void:
 	var flight := Flight.new()
 	_expect(not flight.gear_action() and flight.gear_extension == 0.0,
 		"Gear is stowed and its command is unavailable at an orbital berth")
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.select_target(1)
 	flight.position = flight.docking_position(1) + flight.station_axis(1) * 12.0
 	flight.velocity = flight.target_velocity(1)
@@ -147,7 +148,7 @@ func _test_station_docking() -> void:
 
 func _test_jump_stowage() -> void:
 	var flight := Flight.new()
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.position = Vector3(-7000.0, 4200.0, 4500.0)
 	flight.velocity = Vector3.ZERO
 	_expect(flight.cycle_time_scale() and flight.time_scale > 1 and flight.gear_action()
@@ -166,7 +167,7 @@ func _test_jump_stowage() -> void:
 
 func _pad_approach() -> Flight:
 	var flight := Flight.new()
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.select_target(ASTEROID)
 	_align_with_pad(flight)
 	return flight

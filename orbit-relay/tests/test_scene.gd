@@ -2,6 +2,7 @@ extends SceneTree
 
 const Scene = preload("res://main.tscn")
 const SessionIO = preload("res://scripts/session_io.gd")
+const Fixture = preload("res://tests/flight_fixture.gd")
 
 var failures: Array[String] = []
 
@@ -17,7 +18,9 @@ func _run() -> void:
 	var hud: CanvasLayer = game._hud
 	hud.action_requested.emit("contract")
 	hud.action_requested.emit("dock")
-	_check(game.flight.docked == -1 and game.flight.contract_stage == 1, "The HUD starts a contracted flight")
+	_check(game.flight.docked == 0 and game.flight.departure_status().active
+		and game.flight.contract_stage == 1, "The HUD requests departure for a contracted flight")
+	_check(Fixture.await_departure(game.flight, 15.0, game._physics_process), "The HUD departure advances into a normal flight")
 	hud.action_requested.emit("autopilot")
 	_check(game.flight.autopilot, "The HUD engages autopilot")
 	hud.action_requested.emit("report")

@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture = preload("res://tests/flight_fixture.gd")
+
 const Flight := preload("res://scripts/flight_sim.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const Ephemeris := preload("res://scripts/orbit_ephemeris.gd")
@@ -219,7 +221,7 @@ func _approach(focus: int, port: int, extra_clearance: float) -> Flight:
 		saved.freight = flight.freight.snapshot()
 	var dock := flight.docking_position(port)
 	saved.merge({"system_id": system, "docked": port, "target": port, "position": [dock.x, dock.y, dock.z]}, true)
-	_expect(flight.restore(saved) and flight.dock_action(), "Launch a ship in the system with orbital focus %d" % focus)
+	_expect(flight.restore(saved) and Fixture.launch(flight), "Launch a ship in the system with orbital focus %d" % focus)
 	var center := flight.target_position(focus)
 	var primary := flight.target_position(Catalog.star_for(system))
 	var normal := center.direction_to(primary)

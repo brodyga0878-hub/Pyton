@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture = preload("res://tests/flight_fixture.gd")
+
 const Flight := preload("res://scripts/flight_sim.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const Expedition := preload("res://scripts/expedition.gd")
@@ -71,7 +73,7 @@ func _test_offers_and_migration(campaign: Dictionary) -> void:
 	_expect(not flight.factions.escort_convoy(HEATHER, intercept.id, 0)
 		and flight.factions.intercept_convoy(HEATHER, escort.id, 0).is_empty() and flight.snapshot() == before,
 		"An enemy convoy cannot be escorted for this faction and an ally cannot be claimed as an interception")
-	_expect(flight.dock_action() and flight.convoy_offers().is_empty()
+	_expect(Fixture.launch(flight) and flight.convoy_offers().is_empty()
 		and not flight.convoy_action(HEATHER, escort.id),
 		"An order must be booked at an operational dock")
 	var old := _json(campaign)
@@ -276,7 +278,7 @@ func _at_port(state: Dictionary, system: int, port: int) -> Flight:
 
 
 func _jump_to_heather(flight: Flight) -> bool:
-	if flight.jump_target != HEATHER or not flight.dock_action():
+	if flight.jump_target != HEATHER or not Fixture.launch(flight):
 		return false
 	flight.change_throttle(0.18)
 	if not _wait_for(flight, 15.0, func() -> bool: return flight.jump_status(HEATHER).ok) or not flight.start_jump():

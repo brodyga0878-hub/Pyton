@@ -3,6 +3,7 @@ extends SceneTree
 const Flight := preload("res://scripts/flight_sim.gd")
 const Access := preload("res://scripts/dock_access.gd")
 const Freight := preload("res://scripts/npc_freight.gd")
+const Fixture = preload("res://tests/flight_fixture.gd")
 const PORT := 0
 const ALTERNATE_PORT := 1
 const STEP := 1.0 / 60.0
@@ -75,8 +76,10 @@ func _test_hatch_passage() -> void:
 	var docked_save := _json(flight.snapshot())
 	_expect(flight.restore(docked_save) and flight.docked == PORT and flight.dock_access_status(PORT).phase == "closing",
 		"Reloading a new berth retains the timed close without reviving its authorization")
-	_expect(flight.dock_action() and _distance_along_axis(flight, PORT) > Access.HATCH_AXIS_OFFSET
-		and flight.docked == -1, "An ordinary launch starts beyond the hatch and needs no inbound authorization")
+	_expect(flight.dock_action() and flight.docked == PORT and flight.departure_status().active,
+		"An ordinary launch waits for its own authorization after inbound capture")
+	_expect(Fixture.await_departure(flight) and _distance_along_axis(flight, PORT) > Access.HATCH_AXIS_OFFSET,
+		"The outbound passage finishes beyond the hatch")
 
 
 func _test_freight_wait() -> void:
@@ -186,7 +189,7 @@ func _approach(port: int, epoch := 0.0) -> Flight:
 	var flight := Flight.new()
 	if epoch > 0.0:
 		_tick(flight, epoch)
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.select_target(port)
 	flight.set_flight_assist(false)
 	_set_axial_pose(flight, port, 32.0)

@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture = preload("res://tests/flight_fixture.gd")
+
 const Flight = preload("res://scripts/flight_sim.gd")
 const Rig = preload("res://scripts/mining_rig.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
@@ -250,8 +252,8 @@ func _test_touch_map() -> void:
 	await process_frame
 	_expect(game.flight.docked == 0 and game.flight.planned_target == 8,
 		"The map course survives a regular scene restart before departure")
-	_tap(game._hud._actions.get("dock"), "Launch on the selected course")
-	_expect(game.flight.docked == -1 and game.flight.target == 8,
+	_tap(game._hud._actions.get("dock"), "Request departure on the selected course")
+	_expect(Fixture.await_departure(game.flight, 15.0, game._physics_process) and game.flight.target == 8,
 		"Launch honors the destination selected while docked")
 	game.queue_free()
 	await process_frame
@@ -278,7 +280,8 @@ func _at_site(site: int) -> RefCounted:
 
 func _fly_to(flight: RefCounted, site: int, route: String) -> bool:
 	if flight.docked >= 0 or flight.landed:
-		if not _expect(flight.dock_action(), "%s: launch" % route):
+		var launched: bool = Fixture.launch(flight) if flight.docked >= 0 else flight.dock_action()
+		if not _expect(launched, "%s: launch" % route):
 			return false
 	if not _expect(flight.select_target(site), "%s: select target" % route):
 		return false

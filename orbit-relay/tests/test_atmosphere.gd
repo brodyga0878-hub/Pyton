@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture = preload("res://tests/flight_fixture.gd")
+
 const Flight := preload("res://scripts/flight_sim.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const Atmosphere := preload("res://scripts/atmosphere.gd")
@@ -246,7 +248,7 @@ func _launch() -> Flight:
 	var dock := flight.docking_position(10)
 	state.merge({"system_id": Catalog.VELAR_SYSTEM, "docked": 10, "target": 10,
 		"position": [dock.x, dock.y, dock.z]}, true)
-	_expect(flight.restore(state) and flight.dock_action() and flight.select_target(PLANET) and flight.set_flight_assist(false),
+	_expect(flight.restore(state) and Fixture.launch(flight) and flight.select_target(PLANET) and flight.set_flight_assist(false),
 		"Launch a normal ship in the atmosphere test system")
 	return flight
 

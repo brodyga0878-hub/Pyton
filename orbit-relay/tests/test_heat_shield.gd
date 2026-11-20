@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture = preload("res://tests/flight_fixture.gd")
+
 const Flight := preload("res://scripts/flight_sim.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const Terrain := preload("res://scripts/surface_terrain.gd")
@@ -57,7 +59,7 @@ func _test_purchase() -> void:
 		"Even a sufficient balance cannot purchase the installed equipment twice")
 	var airborne := Flight.new()
 	airborne.credits = COST
-	airborne.dock_action()
+	Fixture.launch(airborne)
 	var airborne_state := airborne.snapshot()
 	_expect(not airborne.service_offer(SERVICE).allowed and not airborne.service_action(SERVICE)
 		and airborne.snapshot() == airborne_state, "An airborne customer cannot buy port equipment")
@@ -91,7 +93,7 @@ func _test_other_damage() -> void:
 	var protected := _ship(true)
 	var star := Catalog.STAR_ID
 	for flight: Flight in [ordinary, protected]:
-		flight.dock_action()
+		Fixture.launch(flight)
 		flight.position = flight.target_position(star) + Vector3.BACK * 251.0
 		flight.velocity = Vector3.ZERO
 		_tick(flight, 13.0)
@@ -102,7 +104,7 @@ func _test_other_damage() -> void:
 	ordinary = _ship(false)
 	protected = _ship(true)
 	for flight: Flight in [ordinary, protected]:
-		flight.dock_action()
+		Fixture.launch(flight)
 		flight.select_target(2)
 		flight.set_flight_assist(false)
 		flight.position = flight.target_position(2) + Terrain.contact(2, Vector3.BACK) + Vector3.BACK * 5.0
@@ -190,7 +192,7 @@ func _entry(flight: Flight) -> Flight:
 	var dock := flight.docking_position(port)
 	current.merge({"system_id": Catalog.VELAR_SYSTEM, "docked": port, "target": port,
 		"position": [dock.x, dock.y, dock.z]}, true)
-	_expect(flight.restore(current) and flight.dock_action() and flight.select_target(PLANET) and flight.set_flight_assist(false),
+	_expect(flight.restore(current) and Fixture.launch(flight) and flight.select_target(PLANET) and flight.set_flight_assist(false),
 		"Launch a live inertial ship for an equivalent atmospheric pass")
 	var stand_off := float(Catalog.site(PLANET).radius) * Terrain.MAX_RADIUS_FACTOR + Terrain.CONTACT_CLEARANCE + 4.0
 	flight.position = flight.target_position(PLANET) + Vector3.RIGHT * stand_off

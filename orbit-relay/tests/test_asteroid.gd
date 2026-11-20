@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture = preload("res://tests/flight_fixture.gd")
+
 const Flight = preload("res://scripts/flight_sim.gd")
 const MiningRig = preload("res://scripts/mining_rig.gd")
 const OrbitRelay = preload("res://main.tscn")
@@ -48,7 +50,7 @@ func _test_legacy_save() -> void:
 		"landed_site", "landing_direction", "mining", "ship", "system_id", "jump_target", "orbit_time",
 	]),
 		"The next save is serialized in the current format")
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.change_target()
 	flight.change_target()
 	flight.set_autopilot(true)
@@ -70,7 +72,7 @@ func _test_legacy_save() -> void:
 
 func _test_manual_approach() -> void:
 	var flight := Flight.new()
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.target = Flight.ASTEROID_TARGET
 	flight.position = flight.target_contact(Flight.ASTEROID_TARGET) + Vector3(0.0, 0.0, 3.0)
 	flight.velocity = flight.target_velocity(Flight.ASTEROID_TARGET) + Vector3(0.0, 0.0, -12.0)
@@ -99,8 +101,9 @@ func _test_mining_route() -> void:
 	_touch(game, "contract")
 	await process_frame
 	_touch(game, "dock")
-	_expect(game.flight.docked == -1 and game.flight.contract_destination == 1,
-		"Touch controls launch with a station contract")
+	_expect(Fixture.await_departure(game.flight, 15.0, game._physics_process) and game.flight.contract_destination == 1,
+		"Touch controls launch through the dock with a station contract")
+	game._update_display(0.0)
 	await process_frame
 	_touch(game, "target")
 	_expect(game.flight.target == Flight.ASTEROID_TARGET,

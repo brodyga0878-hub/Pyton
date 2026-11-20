@@ -19,7 +19,7 @@ const Expedition = preload("res://scripts/expedition.gd")
 const FactionFronts = preload("res://scripts/faction_fronts.gd")
 const ConvoyOrders = preload("res://scripts/convoy_orders.gd")
 const DockAccess = preload("res://scripts/dock_access.gd")
-const SAVE_SCHEMA := 21
+const SAVE_SCHEMA := 22
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
@@ -47,6 +47,9 @@ const DOCK_GUIDE_DISTANCE := 180.0
 const DOCK_SYNC_AIM := 32.0
 const DOCK_AUTO_DISTANCE := 2.7
 const DOCK_AUTO_SPEED := 3.0
+const DEPARTURE_SECONDS := 3.2
+const DEPARTURE_DISTANCE := 15.0
+const DEPARTURE_SPEED := 6.0
 const HULL_X := 32.0
 const HULL_Y := 27.0
 const HULL_Z := 23.0
@@ -94,6 +97,8 @@ var rendezvous_active := false
 var docked := 0
 var dock_roll_sync := -1
 var dock_access := DockAccess.new()
+var _departure_requested := false
+var _departure_seconds := -1.0
 var landed_site := -1
 var landing_direction := Vector3.ZERO
 var landed: bool:
@@ -185,6 +190,8 @@ func speed_relative_to(index: int) -> float:
 func time_status() -> Dictionary:
 	if jump_seconds_left > 0.0:
 		return {"allowed": false, "reason": "Зарядка прыжкового привода"}
+	if _departure_requested:
+		return {"allowed": false, "reason": "Выход из дока"}
 	if gear_extension != (1.0 if gear_deployed else 0.0):
 		return {"allowed": false, "reason": "Шасси в движении"}
 	if orbit_maneuver:
@@ -680,7 +687,7 @@ func _plan_contract_leg() -> void:
 
 
 func contract_action() -> bool:
-	if docked < 0:
+	if not station_services_available():
 		return false
 	if contract_stage == 1:
 		if docked != contract_destination:
@@ -729,12 +736,16 @@ func select_target(index: int) -> bool:
 		_clear_rendezvous()
 		cancel_dock_sync()
 		if target != index:
-			dock_access.clear()
+			dock_access.cancel(orbit_time)
 		target = index
 		_approach_committed = false
 		if autopilot:
 			set_autopilot(true)
 	return true
+
+
+func station_services_available() -> bool:
+	return not _departure_requested and station_operational(docked)
 
 
 func change_throttle(amount: float) -> void:
@@ -779,7 +790,8 @@ func set_autopilot(enabled: bool) -> void:
 
 func selected_dock_status() -> Dictionary:
 	if docked >= 0:
-		return {"ok": true, "reason": "Можно стартовать"}
+		var exit := departure_status()
+		return {"ok": not exit.active or exit.can_cancel, "reason": exit.reason}
 	if landed:
 		var ready := mining.phase == MiningRig.STOWED
 		return {"ok": ready, "reason": "Можно взлететь" if ready else "Сначала верните модуль на борт"}
@@ -872,6 +884,84 @@ func dock_clearance_action() -> bool:
 	reset_time_scale()
 	_announce("dock_request", "Запрос на швартовку. Ожидайте перед створом «%s»." % target_name(target))
 	return true
+
+
+func departure_status() -> Dictionary:
+	var status := {"active": _departure_requested, "can_cancel": false, "phase": "idle",
+		"progress": 0.0, "wait": 0.0, "reason": "Запросите выход", "port": docked}
+	if not _departure_requested:
+		return status
+	var access := dock_access.status(docked, orbit_time)
+	if _departure_seconds >= 0.0:
+		status.phase = "transit"
+		status.progress = _departure_seconds / DEPARTURE_SECONDS
+		status.reason = "Корабль проходит через открытый створ"
+	else:
+		status.phase = "opening" if access.phase == "opening" else "waiting"
+		status.can_cancel = true
+		status.progress = access.open_fraction if access.phase == "opening" else 0.0
+		status.wait = access.wait
+		if access.phase == "closing":
+			status.wait += DockAccess.HEADING_SECONDS + DockAccess.OPENING_SECONDS
+		status.reason = "Створ открывается для выхода" if access.phase == "opening" else "Ожидайте разрешения на выход"
+	return status
+
+
+func _departure_action() -> bool:
+	if _departure_requested:
+		if _departure_seconds >= 0.0:
+			return false
+		dock_access.cancel(orbit_time)
+		_departure_requested = false
+		_announce("departure_canceled", "Выход отменён. Корабль остаётся в доке.")
+		return true
+	if not station_operational(docked):
+		return false
+	reset_time_scale()
+	_departure_requested = true
+	_request_departure_slot()
+	_announce("departure_requested", "Запрос выхода из «%s» передан." % target_name(docked))
+	return true
+
+
+func _request_departure_slot() -> void:
+	if dock_access.status(docked, orbit_time).phase == "closed":
+		dock_access.request(docked, orbit_time, freight_status(docked))
+
+
+func _advance_departure(delta: float) -> void:
+	if _departure_seconds < 0.0:
+		var access := dock_access.status(docked, orbit_time)
+		if access.ready:
+			_departure_seconds = 0.0
+			_hold_departure_pose()
+			_announce("departure_open", "Створ открыт. Корабль выходит из дока.")
+		else:
+			_request_departure_slot()
+			_hold_docked_pose()
+		return
+	_departure_seconds += delta
+	if _departure_seconds >= DEPARTURE_SECONDS:
+		dock_access.settle(orbit_time)
+		_launch()
+	else:
+		_hold_departure_pose()
+
+
+func _hold_departure_pose() -> void:
+	var progress := clampf(_departure_seconds / DEPARTURE_SECONDS, 0.0, 1.0)
+	# Cubic motion starts at rest in the moving dock and matches the release speed.
+	var tangent := DEPARTURE_SPEED * DEPARTURE_SECONDS
+	var a := 3.0 * DEPARTURE_DISTANCE - tangent
+	var b := tangent - 2.0 * DEPARTURE_DISTANCE
+	var distance := progress * progress * (a + b * progress)
+	var rate := progress * (2.0 * a + 3.0 * b * progress) / DEPARTURE_SECONDS
+	var axis := station_axis(docked)
+	position = docking_position(docked) + axis * distance
+	velocity = target_velocity(docked) + axis * rate
+	yaw = PI
+	pitch = 0.0
+	roll = station_angle(docked)
 
 
 func toggle_dock_sync() -> bool:
@@ -1035,8 +1125,7 @@ func surface_deposit() -> Transform3D:
 
 func dock_action() -> bool:
 	if docked >= 0:
-		_launch()
-		return true
+		return _departure_action()
 	var status := selected_dock_status()
 	if status.get("awaiting_gear", false) and not gear_deployed and not autopilot:
 		_command_gear(true)
@@ -1087,7 +1176,7 @@ func raw_sale_quote() -> int:
 
 func _raw_sale_orders() -> Array[Dictionary]:
 	var orders: Array[Dictionary] = []
-	if docked < 0 or mining.phase != MiningRig.STOWED:
+	if not station_services_available() or mining.phase != MiningRig.STOWED:
 		return orders
 	for good: String in Catalog.RESOURCES:
 		var quantity := market_limit(good, "sell")
@@ -1102,7 +1191,7 @@ func market_quote(good: String, side: String, quantity: int) -> Dictionary:
 	var owned := mining.cargo_amount(good)
 	var cost := market.trade_value(docked, good, side, quantity) if quantity <= ship.cargo_capacity() else 0
 	var reason := ""
-	if docked < 0:
+	if not station_services_available():
 		reason = "Рынок доступен после швартовки"
 	elif unit <= 0 or cost <= 0:
 		reason = "Выберите товар и количество"
@@ -1121,7 +1210,7 @@ func market_quote(good: String, side: String, quantity: int) -> Dictionary:
 
 
 func market_limit(good: String, side: String) -> int:
-	if not Catalog.is_port(docked) or Economy.price(docked, good, side) <= 0:
+	if not station_services_available() or Economy.price(docked, good, side) <= 0:
 		return 0
 	if side == "sell":
 		return mini(mining.cargo_amount(good), Economy.MAX_STOCK - market.stock(docked, good))
@@ -1257,6 +1346,8 @@ func _stop_convoy_course() -> void:
 
 
 func project_action() -> bool:
+	if _departure_requested:
+		return false
 	var status := frontier_status()
 	if not status.can_act:
 		if status.route_system >= 0 and status.route_system != system_id:
@@ -1291,6 +1382,8 @@ func fire_status() -> Dictionary:
 
 
 func patrol_action() -> bool:
+	if _departure_requested:
+		return false
 	var status := patrol_status()
 	if not status.available:
 		return false
@@ -1368,7 +1461,7 @@ func combat_line_clear(start: Vector3, finish: Vector3) -> bool:
 func service_offer(action: String) -> Dictionary:
 	var unit_price := repair_unit_price() if action == "repair" else refuel_unit_price()
 	var offer := ship.service_offer(action, unit_price, credits)
-	offer.allowed = offer.allowed and Catalog.is_port(docked)
+	offer.allowed = offer.allowed and station_services_available()
 	return offer
 
 
@@ -1402,6 +1495,8 @@ func service_action(action: String) -> bool:
 func fuel_transfer_offer(destination: String) -> Dictionary:
 	if destination not in ["reaction", "jump"]:
 		return {"ok": false, "reason": "Выберите контур", "canisters": 0, "added": 0.0}
+	if _departure_requested:
+		return {"ok": false, "reason": "Дождитесь выхода из дока", "canisters": 0, "added": 0.0}
 	if jump_seconds_left > 0.0 or scooping or mining.phase != MiningRig.STOWED:
 		var reason := "Остановите сбор" if scooping else "Дождитесь завершения зарядки или верните добывающий модуль"
 		return {"ok": false, "reason": reason, "canisters": 0, "added": 0.0}
@@ -1869,13 +1964,17 @@ func _lift() -> void:
 func _launch() -> void:
 	var origin := docked
 	reset_time_scale()
-	position = docking_position(origin) + station_axis(origin) * 15.0
+	position = docking_position(origin) + station_axis(origin) * DEPARTURE_DISTANCE
 	yaw = PI
 	pitch = 0.0
+	if _departure_requested:
+		roll = station_angle(origin)
 	throttle = 0.0
-	velocity = target_velocity(origin) + station_axis(origin) * 6.0
+	velocity = target_velocity(origin) + station_axis(origin) * DEPARTURE_SPEED
 	target = _departure_target(_default_port(origin))
 	docked = -1
+	_departure_requested = false
+	_departure_seconds = -1.0
 	_announce("launch", "Старт со станции «%s»." % target_name(origin))
 
 
@@ -1917,7 +2016,7 @@ func update(delta: float, steer: Vector2, bank: float, boost_requested: bool, br
 	var manual_input := steer.length_squared() > 0.04 or absf(bank) > 0.12 or boost_requested or brake or not traverse.is_zero_approx()
 	if manual_input or (time_scale > 1 and not time_status().allowed):
 		reset_time_scale()
-	if docked >= 0 or landed:
+	if (docked >= 0 and not _departure_requested) or landed:
 		_step(delta * time_scale, steer, bank, boost_requested, brake, manual_input, traverse)
 		return
 	var steps := maxi(1, ceili(delta * time_scale / MAX_FLIGHT_STEP - 0.000001))
@@ -1944,7 +2043,10 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 	if not front.is_empty():
 		_announce(front.event, front.message)
 	if docked >= 0:
-		_hold_docked_pose()
+		if _departure_requested:
+			_advance_departure(delta)
+		else:
+			_hold_docked_pose()
 		_update_star_heat(delta)
 		_update_entry_heat(delta)
 		_apply_patrol_result(patrol.step(self, delta))
@@ -2506,6 +2608,7 @@ func snapshot() -> Dictionary:
 		"orbit_time": orbit_time,
 		"throttle": 0.0 if orbit_maneuver or rendezvous_active else throttle, "docked": docked, "target": target,
 		"dock_access": dock_access.snapshot(),
+		"departure_requested": _departure_requested, "departure_seconds": _departure_seconds,
 		"credits": credits, "deliveries": deliveries,
 		"contract_stage": contract_stage, "contract_origin": contract_origin,
 		"contract_destination": contract_destination,
@@ -2525,6 +2628,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_departure := schema < 22
 	var pre_dock_access := schema < 21
 	var pre_dual_fuel := schema < 20
 	var pre_gear := schema < 19
@@ -2732,15 +2836,34 @@ func restore(state: Dictionary) -> bool:
 			return false
 	elif restored_mining.phase != MiningRig.STOWED or restored_direction != Vector3.ZERO:
 		return false
+	var restored_departure := false
+	var restored_departure_seconds := -1.0
+	if not pre_departure:
+		if not state.get("departure_requested") is bool or not _number(state.get("departure_seconds"), -1.0, DEPARTURE_SECONDS):
+			return false
+		restored_departure = state.departure_requested
+		restored_departure_seconds = float(state.departure_seconds)
+		if (restored_departure_seconds < 0.0 and restored_departure_seconds != -1.0) or (not restored_departure and restored_departure_seconds != -1.0) or restored_departure_seconds == DEPARTURE_SECONDS:
+			return false
+		if restored_departure and (restored_dock < 0 or restored_landing >= 0):
+			return false
 	if not pre_dock_access:
 		if not restored_access.restore(state.get("dock_access"), restored_epoch):
 			return false
 		if restored_access.port >= 0:
 			if Catalog.system_of_site(restored_access.port) != restored_system or not _site_available(restored_access.port, restored_expedition):
 				return false
-			var phase: String = restored_access.status(restored_access.port, restored_epoch).phase
-			if phase in ["queued", "opening", "open"] and (restored_access.port != int(state.target) or restored_dock >= 0 or restored_landing >= 0):
+			var access := restored_access.status(restored_access.port, restored_epoch)
+			var access_port := restored_dock if restored_departure else int(state.target)
+			if access.phase in ["queued", "opening", "open"] and (restored_access.port != access_port
+					or (restored_dock >= 0 and not restored_departure) or restored_landing >= 0):
 				return false
+	if restored_departure and restored_access.port != restored_dock:
+		return false
+	if restored_departure and restored_departure_seconds >= 0.0:
+		var permit := restored_access.status(restored_dock, restored_epoch)
+		if not permit.ready or permit.remaining + DockAccess.CLOCK_PRECISION < DEPARTURE_SECONDS - restored_departure_seconds:
+			return false
 	var restored_gear := 1.0 if restored_landing >= 0 else 0.0
 	var restored_gear_command := restored_landing >= 0
 	if not pre_gear:
@@ -2800,6 +2923,8 @@ func restore(state: Dictionary) -> bool:
 	time_scale = 1
 	docked = restored_dock
 	dock_access = restored_access
+	_departure_requested = restored_departure
+	_departure_seconds = restored_departure_seconds
 	landed_site = restored_landing
 	landing_direction = restored_direction
 	gear_extension = restored_gear
@@ -2831,7 +2956,10 @@ func restore(state: Dictionary) -> bool:
 	contract_leg = leg
 	boost = false
 	if docked >= 0:
-		_hold_docked_pose()
+		if _departure_seconds >= 0.0:
+			_hold_departure_pose()
+		else:
+			_hold_docked_pose()
 	elif landed:
 		_hold_landed_pose()
 	return true

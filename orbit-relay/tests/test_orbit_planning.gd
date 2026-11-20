@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture = preload("res://tests/flight_fixture.gd")
+
 const Flight := preload("res://scripts/flight_sim.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const Ephemeris := preload("res://scripts/orbit_ephemeris.gd")
@@ -70,7 +72,7 @@ func _test_advisory_forecast() -> void:
 
 func _test_moving_impact() -> void:
 	var flight := Flight.new()
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.set_flight_assist(false)
 	const ASTEROID := 2
 	const LEAD_TIME := 55.0
@@ -257,7 +259,7 @@ func _angled_approach() -> Flight:
 	var docking := flight.docking_position(port)
 	saved.merge({"system_id": Catalog.FRINGE_SYSTEM, "docked": port, "target": port,
 		"position": [docking.x, docking.y, docking.z]}, true)
-	_expect(flight.restore(saved) and flight.dock_action(), "Launch a test ship in the Kromka system")
+	_expect(flight.restore(saved) and Fixture.launch(flight), "Launch a test ship in the Kromka system")
 	flight.position = flight.target_position(STAR) + Vector3.BACK * RADIUS
 	flight.velocity = Vector3(0.67, 0.74, 0.0).normalized() * 2.4 + Vector3.BACK * 0.85
 	flight.yaw = 0.0

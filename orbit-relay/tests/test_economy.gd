@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture = preload("res://tests/flight_fixture.gd")
+
 const Flight = preload("res://scripts/flight_sim.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const Economy = preload("res://scripts/port_economy.gd")
@@ -69,7 +71,7 @@ func _test_trade_guards() -> void:
 	_expect(not flight.market_trade("circuits", "buy", 2) and not flight.market_trade("circuits", "sell", 3)
 		and not flight.sell_ore_action() and flight.snapshot() == paid,
 		"Repeated unaffordable purchases, overselling and raw quick sale cannot duplicate trade cargo")
-	flight.dock_action()
+	Fixture.launch(flight)
 	var launched := flight.snapshot()
 	_expect(not flight.market_quote("circuits", "sell", 1).ok and not flight.market_trade("circuits", "sell", 1)
 		and not flight.market_trade("ore", "buy", 1) and flight.snapshot() == launched,
@@ -88,7 +90,7 @@ func _test_trade_guards() -> void:
 
 func _test_hull_and_hold() -> void:
 	var flight := Flight.new()
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.select_target(Catalog.STAR_ID)
 	var star_center := flight.target_position(Catalog.STAR_ID)
 	flight.position = star_center + Vector3.BACK * (Catalog.STAR_CLEARANCE + 0.02)
@@ -345,7 +347,10 @@ func _test_touch_trade_and_courier() -> void:
 
 
 func _touch_fly(game: Node, destination: int) -> bool:
-	_tap(game._hud._actions.get("dock"), "Launch to courier stop %d" % destination)
+	_tap(game._hud._actions.get("dock"), "Request departure to courier stop %d" % destination)
+	if not Fixture.await_departure(game.flight, 15.0, game._physics_process):
+		return false
+	game._update_display(0.0)
 	await process_frame
 	_tap(game._hud._actions.get("autopilot"), "Engage autopilot for courier stop %d" % destination)
 	for _frame in range(roundi(125.0 / STEP)):
@@ -373,7 +378,7 @@ func _at_port(port: int) -> Flight:
 func _fly_to(flight: Flight, destination: int) -> bool:
 	if not flight.select_target(destination):
 		return false
-	if (flight.docked >= 0 or flight.landed) and not flight.dock_action():
+	if (flight.docked >= 0 and not Fixture.launch(flight)) or (flight.landed and not flight.dock_action()):
 		return false
 	flight.set_autopilot(true)
 	for _frame in range(roundi(125.0 / STEP)):
@@ -384,7 +389,7 @@ func _fly_to(flight: Flight, destination: int) -> bool:
 
 
 func _jump_to(flight: Flight, system: int) -> bool:
-	if (flight.docked >= 0 and not flight.dock_action()) or not flight.plan_jump(system):
+	if (flight.docked >= 0 and not Fixture.launch(flight)) or not flight.plan_jump(system):
 		return false
 	flight.change_throttle(0.18)
 	for _frame in range(roundi(12.0 / STEP)):

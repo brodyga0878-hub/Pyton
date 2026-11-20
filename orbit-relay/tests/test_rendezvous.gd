@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture = preload("res://tests/flight_fixture.gd")
+
 const Flight := preload("res://scripts/flight_sim.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const Ephemeris := preload("res://scripts/orbit_ephemeris.gd")
@@ -80,7 +82,7 @@ func _test_stern_approach() -> void:
 
 func _test_surface_after_star_detour() -> void:
 	var flight := Flight.new()
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.orbit_time = 80.0
 	var star := flight.target_position(Catalog.STAR_ID)
 	var moon := flight.target_position(MOON)
@@ -152,7 +154,7 @@ func _test_denial_and_save() -> void:
 		_expect(not flight.rendezvous_status(invalid, 150).allowed and not flight.start_rendezvous(invalid, 150),
 			"A star, remote port or nonexistent site is not a local rendezvous target (%d)" % invalid)
 	var frontier := Flight.new()
-	var jumped := frontier.project_action() and frontier.dock_action()
+	var jumped := frontier.project_action() and Fixture.launch(frontier)
 	frontier.change_throttle(0.25)
 	for _frame in range(roundi(8.0 / STEP)):
 		if frontier.jump_status(Catalog.HEATHER_SYSTEM).ok:
@@ -228,7 +230,7 @@ func _test_chart_to_hud() -> void:
 
 func _approach_station() -> Flight:
 	var flight := Flight.new()
-	flight.dock_action()
+	Fixture.launch(flight)
 	flight.orbit_time = 340.0
 	flight.select_target(2)
 	flight.position = flight.target_position(PORT) + Vector3(4.0, -96.0, -540.0)

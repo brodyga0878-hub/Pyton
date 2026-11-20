@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Fixture = preload("res://tests/flight_fixture.gd")
+
 const OrbitRelay := preload("res://main.tscn")
 const Flight := preload("res://scripts/flight_sim.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
@@ -112,9 +114,10 @@ func _test_settings_scene() -> void:
 	var restored: Dictionary = JSON.parse_string(JSON.stringify(game.flight.snapshot()))
 	_expect(restored == flight_before and restored.schema == Flight.SAVE_SCHEMA,
 		"Cold start restores the unchanged docked flight alongside the preferences")
-	_tap(game._hud._actions.get("dock"), "Launch after restarting with mirrored settings")
+	_tap(game._hud._actions.get("dock"), "Request departure after restarting with mirrored settings")
+	_expect(Fixture.await_departure(game.flight, 15.0, game._physics_process), "The normal departure sequence works with mirrored settings")
+	game._update_display(0.0)
 	await process_frame
-	_expect(game.flight.docked < 0, "The normal takeoff action still works with mirrored settings")
 	_check_layout(game._hud, true, "1280×720 mirrored")
 	var touchdown_throttle: float = game.flight.throttle
 	_tap(game._hud._actions.get("throttle_up"), "Increase throttle from the mirrored left action column")
@@ -178,7 +181,9 @@ func _test_journal_scene() -> void:
 	await process_frame
 	_expect(not game._journal.is_open() and flight.planned_target == 1 and flight.contract_leg == courier_leg
 		and flight.credits == 0, "Following a courier sets its port without advancing or paying the contract")
-	_tap(game._hud._actions.get("dock"), "Launch with concurrent journal tasks")
+	_tap(game._hud._actions.get("dock"), "Request departure with concurrent journal tasks")
+	_expect(Fixture.await_departure(flight, 15.0, game._physics_process), "The departure completes with both tasks still active")
+	game._update_display(0.0)
 	await process_frame
 	_tap(game._hud._actions.get("journal"), "Open the journal from flight again")
 	await process_frame
@@ -236,7 +241,7 @@ func _with_remote_dock(active: Dictionary) -> Flight:
 	var contact := flight.docking_position(port)
 	active.merge({"system_id": Catalog.FRINGE_SYSTEM, "docked": port, "target": port,
 		"position": [contact.x, contact.y, contact.z], "velocity": [0.0, 0.0, 0.0],
-		"planned_target": -1, "jump_target": -1}, true)
+		"planned_target": -1, "jump_target": -1, "dock_access": flight.dock_access.snapshot()}, true)
 	return flight if flight.restore(active) else null
 
 
