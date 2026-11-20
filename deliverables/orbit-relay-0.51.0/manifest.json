@@ -1,0 +1,134 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.51.0",
+  "source_commit": "91a0c18e49b9a78c2c8da349c0031cc094bb3ce0",
+  "content": {
+    "save_schema": 15,
+    "heat_shield_cost": 340,
+    "atmospheric_heat_load_reduction_percent": 48
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 76,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.50.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 33,
+    "tested_on_device": false
+  },
+  "checks": {
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 132
+    },
+    "flight": {
+      "failures": 0
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 72
+    },
+    "heat_shield": {
+      "failures": 0,
+      "checks": 28
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 186
+    },
+    "living": {
+      "failures": 0,
+      "checks": 76
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 292
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 80
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "scene": {
+      "failures": 0
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 191
+    },
+    "matched_entry_passes": {
+      "passes": 9,
+      "failures": 0
+    },
+    "desktop_services_and_hud": {
+      "checks": 24,
+      "failures": 0,
+      "viewports": [
+        [
+          1280,
+          720
+        ],
+        [
+          1600,
+          720
+        ]
+      ]
+    }
+  },
+  "files": {
+    "OrbitRelay-0.51.0-arm64.apk": {
+      "bytes": 26469747,
+      "sha256": "b361a0a60ae96761fbbd8aa0bc602ac3696c3f19dc223888cd71f3307f9bd4f5"
+    },
+    "OrbitRelay-0.51.0-source.zip": {
+      "bytes": 271657,
+      "sha256": "d771ec10957ed3ace10151b15ffbd0e53a07d9994d4bfeed22517f9f2ac6d75b"
+    },
+    "heat-shield-entry.png": {
+      "bytes": 331925,
+      "sha256": "b5ac26c2ae1266ab212e7f9616ae478346dc22c70a2ca06b5859dbcc725a749f"
+    },
+    "heat-shield-service.png": {
+      "bytes": 129761,
+      "sha256": "eb5478fa5f38ff9c04f4e57a3254c1b7f8f2a31801063b60ec47158820ef9378"
+    }
+  }
+}
