@@ -52,6 +52,14 @@ func reserve_at(id: int) -> int:
 	return _reserves[id] if id >= 0 and id < _reserves.size() else 0
 
 
+func extract_remote(site: int, amount: int) -> int:
+	if phase != STOWED or amount <= 0 or not Catalog.is_mine_site(site):
+		return 0
+	var extracted := mini(amount, _reserves[site])
+	_reserves[site] -= extracted
+	return extracted
+
+
 func cargo_amount(resource: String) -> int:
 	return int(_cargo.get(resource, 0))
 

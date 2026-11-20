@@ -12,6 +12,8 @@ const AMBER := Color("f0c59a")
 const BORDER := Color("355360")
 const PATROL_STEPS := ["Найти источник сигнала", "Перехватить рейдера", "Вернуться с докладом"]
 
+enum Page { WORK, PASSENGERS, RIG }
+
 var _sim: RefCounted
 var _insets: MarginContainer
 var _location: Label
@@ -31,8 +33,16 @@ var _patrol_stops: Array[Label] = []
 var _patrol_tags: Array[Label] = []
 var _work_page: HBoxContainer
 var _passenger_page: HBoxContainer
+var _rig_page: HBoxContainer
 var _work_tab: Button
 var _passenger_tab: Button
+var _rig_tab: Button
+var _rig_title: Label
+var _rig_location: Label
+var _rig_work: Label
+var _rig_stock: Label
+var _rig_reserve: Label
+var _rig_hint: Label
 var _passenger_route: Label
 var _passenger_status: Label
 var _passenger_cabins: Label
@@ -73,11 +83,14 @@ func build() -> void:
 	page.add_child(tabs)
 	_work_tab = _button(tabs, "Доставка и дозор")
 	_passenger_tab = _button(tabs, "Пассажиры")
-	for tab: Button in [_work_tab, _passenger_tab]:
+	_rig_tab = _button(tabs, "Бур")
+	for tab: Button in [_work_tab, _passenger_tab, _rig_tab]:
 		tab.toggle_mode = true
 		tab.custom_minimum_size.x = 174.0
-	_work_tab.pressed.connect(_show_passengers.bind(false))
-	_passenger_tab.pressed.connect(_show_passengers.bind(true))
+	_work_tab.pressed.connect(_show_page.bind(Page.WORK))
+	_passenger_tab.pressed.connect(_show_page.bind(Page.PASSENGERS))
+	_rig_tab.pressed.connect(_show_page.bind(Page.RIG))
+	_rig_tab.hide()
 
 	_work_page = HBoxContainer.new()
 	_work_page.add_theme_constant_override("separation", 16)
@@ -89,7 +102,11 @@ func build() -> void:
 	_passenger_page.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	page.add_child(_passenger_page)
 	_build_passengers()
-	_show_passengers(false)
+	_rig_page = HBoxContainer.new()
+	_rig_page.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	page.add_child(_rig_page)
+	_build_rig()
+	_show_page(Page.WORK)
 	get_viewport().size_changed.connect(_update_insets)
 	_update_insets()
 	hide()
@@ -112,6 +129,7 @@ func refresh() -> void:
 	_refresh_delivery()
 	_refresh_patrol()
 	_refresh_passengers()
+	_refresh_rig()
 
 
 func close() -> void:
@@ -167,12 +185,60 @@ func _build_passengers() -> void:
 	_add_follow_button(card, "passenger")
 
 
-func _show_passengers(show_passengers: bool) -> void:
+func _build_rig() -> void:
+	var card := _card(_rig_page)
+	_rig_title = _label(card, "", 29, INK)
+	_rig_location = _label(card, "", 19, MINT)
+	_rig_work = _label(card, "", 20, INK)
+	_rig_stock = _label(card, "", 20, INK)
+	_rig_reserve = _label(card, "", 19, MUTED)
+	_spacer(card)
+	_rig_hint = _label(card, "", 19, INK)
+	_add_follow_button(card, "rig")
+
+
+func _show_page(page: Page) -> void:
 	_touches.clear()
-	_work_page.visible = not show_passengers
-	_passenger_page.visible = show_passengers
-	_work_tab.set_pressed_no_signal(not show_passengers)
-	_passenger_tab.set_pressed_no_signal(show_passengers)
+	_work_page.visible = page == Page.WORK
+	_passenger_page.visible = page == Page.PASSENGERS
+	_rig_page.visible = page == Page.RIG
+	_work_tab.set_pressed_no_signal(_work_page.visible)
+	_passenger_tab.set_pressed_no_signal(_passenger_page.visible)
+	_rig_tab.set_pressed_no_signal(_rig_page.visible)
+
+
+func _refresh_rig() -> void:
+	var status: Dictionary = _sim.remote_rig_status()
+	_rig_tab.visible = status.active
+	if not status.active:
+		if _rig_page.visible:
+			_show_page(Page.WORK)
+		return
+	_rig_title.text = "Бур на «%s»" % status.name
+	_rig_location.text = "Система «%s»" % Sector.system(int(status.system)).name
+	if status.same_system and float(status.distance) >= 0.0:
+		var distance := float(status.distance)
+		var range_text := "%.0f м" % distance if distance < 1000.0 else "%.2f км" % (distance / 1000.0)
+		_rig_location.text += " · До установки %s" % range_text.replace(".", ",")
+	var stored := int(status.stored)
+	var capacity := int(status.capacity)
+	_rig_stock.text = "%s в буфере · %d / %d ед." % [status.resource, stored, capacity]
+	_rig_reserve.text = "Запас в грунте · %d ед." % int(status.reserve)
+	_rig_work.text = "Следующая партия через %d с" % ceili(float(status.remaining)) if status.working else "Буфер заполнен" if stored >= capacity else "Запас в грунте исчерпан"
+	if status.near:
+		if stored == 0:
+			_rig_hint.text = "Пустой бур можно забрать на борт."
+		else:
+			_rig_hint.text = "Выгрузите сырьё в трюм." if status.can_unload else "Освободите место в трюме для выгрузки."
+	elif _sim.landed_site >= 0:
+		_rig_hint.text = "Взлетите, чтобы вернуться к установке."
+	elif status.navigating:
+		_rig_hint.text = "Автопилот ведёт к установке."
+	elif status.same_system and _sim.docked >= 0:
+		_rig_hint.text = "Выберите установку целью после выхода из дока."
+	else:
+		_rig_hint.text = "Автопилот зайдёт на точку установки." if status.same_system else "Маршрут вернёт к системе, где работает бур."
+	_follow("rig", "К буру" if status.can_route and not status.navigating else "")
 
 
 func _refresh_delivery() -> void:
@@ -385,8 +451,8 @@ func _input(event: InputEvent) -> void:
 func _button_at(point: Vector2) -> Button:
 	if _close_button.get_global_rect().has_point(point):
 		return _close_button
-	for tab: Button in [_work_tab, _passenger_tab]:
-		if tab.get_global_rect().has_point(point):
+	for tab: Button in [_work_tab, _passenger_tab, _rig_tab]:
+		if tab.is_visible_in_tree() and tab.get_global_rect().has_point(point):
 			return tab
 	for button: Button in _follow_buttons.values():
 		if button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(point):

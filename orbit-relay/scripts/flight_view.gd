@@ -1,6 +1,7 @@
 extends Node3D
 
 const AsteroidView = preload("res://scripts/asteroid_view.gd")
+const MiningRig = preload("res://scripts/mining_rig.gd")
 const MiningRigView = preload("res://scripts/mining_rig_view.gd")
 const StarView = preload("res://scripts/star_view.gd")
 const TrafficView = preload("res://scripts/traffic_view.gd")
@@ -14,6 +15,7 @@ const STATION_RADIAL_SEGMENTS := 20
 const BACKDROP_ORBIT_SECONDS := 28800.0
 const CLOUD_CYCLE_SECONDS := 1080.0
 const CAMERA_SURFACE_CLEARANCE := 2.0
+const REMOTE_RIG_VIEW_DISTANCE := 480.0
 const BERTH_CAMERA_OFFSET := Vector3(8.4, 9.2, 24.0)
 const BERTH_CAMERA_FOCUS := Vector3(0.0, 0.0, -15.0)
 const DEPARTURE_CAMERA_BLEND_START := 16.0
@@ -254,6 +256,12 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var berth := int(sim.docked) if docked else surface_id
 	var ship_orientation: Basis = sim.attitude()
 	var heading := Basis.IDENTITY if docked else ship_orientation
+	var remote_rig: Dictionary = sim.remote_rig_status()
+	var rig_deployed := bool(remote_rig.active)
+	var rig_in_view := false
+	if rig_deployed and bool(remote_rig.same_system):
+		var rig_point: Vector3 = remote_rig.point
+		rig_in_view = position_now.distance_squared_to(rig_point) <= REMOTE_RIG_VIEW_DISTANCE * REMOTE_RIG_VIEW_DISTANCE
 	var departure: Dictionary = sim.departure_status()
 	if docked:
 		_departure_view_port = int(departure.port) if departure.phase == "transit" else -1
@@ -267,6 +275,8 @@ func sync(sim: RefCounted, delta: float) -> void:
 		body.position = sim.target_position(site_id)
 		body.basis = Terrain.spin_basis(site_id, float(sim.orbit_time))
 		var field_direction: Vector3 = sim.landing_direction if site_id == surface_id else Vector3.ZERO
+		if rig_in_view and site_id == int(remote_rig.site):
+			field_direction = remote_rig.direction
 		body.sync(position_now, site_id == int(sim.target), not settled, field_direction)
 	var thrust := clampf(float(sim.throttle), 0.0, 1.0)
 	_flight_time += delta
@@ -369,8 +379,14 @@ func sync(sim: RefCounted, delta: float) -> void:
 			and int(guidance.port) == site_id and bool(guidance.near) and bool(guidance.in_front)
 		_gate_materials[site_id].albedo_color = Color("#75eac0") if bool(guidance.get("ok", false)) else Color("#edb36c")
 	_sync_surface_guide(sim, settled)
-	var deposit: Transform3D = sim.surface_deposit() if landed else _ship.global_transform
-	_mining_rig.sync(_ship.global_transform, deposit, int(sim.mining.phase) if landed else 0, sim.mining.progress(), float(sim.elapsed))
+	_mining_rig.visible = rig_in_view or not rig_deployed
+	if rig_in_view:
+		var rig_pose: Transform3D = sim.remote_rig_transform()
+		var phase := MiningRig.DRILLING if bool(remote_rig.working) else MiningRig.READY
+		_mining_rig.sync(rig_pose, rig_pose, phase, float(remote_rig.get("progress", 1.0)), float(sim.elapsed))
+	elif not rig_deployed:
+		var deposit: Transform3D = sim.surface_deposit() if landed else _ship.global_transform
+		_mining_rig.sync(_ship.global_transform, deposit, int(sim.mining.phase) if landed else MiningRig.STOWED, sim.mining.progress(), float(sim.elapsed))
 	_traffic.sync(sim.traffic_contacts(), sim.combat_beams())
 	_atmosphere.sync(sim, camera, settled)
 	# Compatibility supports ordinary distance fog; keep it local and subtle.

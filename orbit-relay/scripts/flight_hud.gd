@@ -23,6 +23,10 @@ const ACTION_COLUMN := Rect2(-340, -215, 314, 189)
 const TOUCH_GAINS := [0.72, 1.0, 1.36]
 const HOLD_ACTIONS := ["boost", "brake", "translation_forward", "translation_reverse"]
 const MARK_PRIORITY := {"raider": 0, "convoy": 1}
+const RIG_ACTIONS := {
+	"rig_deploy": "can_deploy", "rig_unload": "can_unload",
+	"rig_retrieve": "can_retrieve", "rig_route": "can_route",
+}
 
 var _hud: Control
 var _safe: Control
@@ -34,6 +38,9 @@ var _translation_controls: HBoxContainer
 var _route: Label
 var _route_detail: Label
 var _passenger_route: Label
+var _rig_readout: HBoxContainer
+var _rig_summary: Label
+var _rig_status: Dictionary = {}
 var _telemetry: Label
 var _condition: Label
 var _fuel: Label
@@ -123,6 +130,16 @@ func build() -> void:
 	_passenger_route = _label(route_stack, 16, CYAN)
 	_passenger_route.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_passenger_route.hide()
+	_rig_readout = HBoxContainer.new()
+	_rig_readout.add_theme_constant_override("separation", 8)
+	route_stack.add_child(_rig_readout)
+	_rig_summary = _label(_rig_readout, 16, CYAN)
+	_rig_summary.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_rig_summary.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_rig_summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_button(_rig_readout, "rig_route", "К буру")
+	_actions["rig_route"].size_flags_horizontal = Control.SIZE_SHRINK_END
+	_rig_readout.hide()
 	var course_card := route_stack.get_parent() as PanelContainer
 	var shortcuts := HBoxContainer.new()
 	shortcuts.add_theme_constant_override("separation", 8)
@@ -234,6 +251,11 @@ func build() -> void:
 	_button(commands, "scoop", "Сбор топлива")
 	_button(commands, "contract", "Контракт")
 	_button(commands, "mine", "Развернуть модуль")
+	_button(commands, "rig_deploy", "Оставить бур")
+	_actions["rig_deploy"].tooltip_text = "Бур будет добывать сырьё после взлёта"
+	_button(commands, "rig_unload", "Выгрузить")
+	_button(commands, "rig_retrieve", "Забрать бур")
+	_actions["rig_retrieve"].tooltip_text = "Вернуть пустой бур на борт"
 	_button(commands, "sell_ore", "Продать сырьё")
 
 	var right := _panel(_safe, Vector2(1, 1), ACTION_COLUMN)
@@ -509,6 +531,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_right_panel.offset_top = -157.0 if docked else (-101.0 if landed else (-274.0 if flight_tools else -215.0))
 	_marks.flight = not parked
 	_marks.queue_redraw()
+	_sync_remote_rig(sim.remote_rig_status(), docked, landed)
 
 	var mining: RefCounted = sim.mining
 	var drilling: bool = landed and mining.phase in [MiningRig.DEPLOYING, MiningRig.DRILLING, MiningRig.RETURNING]
@@ -524,7 +547,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_notice_panel.offset_bottom = -169.0 if show_progress else -153.0
 	_lift_blocked = landed and mining.phase != MiningRig.STOWED
 	_mining_blocked = landed and mining.phase != MiningRig.READY and not mining.available_to_deploy()
-	_actions["mine"].visible = landed
+	_actions["mine"].visible = landed and not _rig_status.active
 	match mining.phase:
 		MiningRig.READY:
 			_actions["mine"].text = "Забрать модуль"
@@ -596,6 +619,24 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_notice_left -= delta
 		if _notice_left <= 0.0:
 			_notice_panel.hide()
+
+func _sync_remote_rig(status: Dictionary, docked: bool, landed: bool) -> void:
+	_rig_status = status
+	_rig_readout.visible = status.active
+	_actions["rig_deploy"].visible = landed and status.can_deploy
+	_actions["rig_unload"].visible = status.near and int(status.stored) > 0
+	_actions["rig_retrieve"].visible = status.near
+	_actions["rig_retrieve"].tooltip_text = "Сначала выгрузите сырьё" if int(status.stored) > 0 else "Вернуть пустой бур на борт"
+	_actions["rig_unload"].tooltip_text = "Перенести добычу в трюм" if status.can_unload else "Освободите место в трюме"
+	_actions["rig_route"].visible = status.can_route and not status.navigating
+	_actions["rig_route"].tooltip_text = "Выбрать цель после выхода" if status.same_system and docked else "Заход к точке установки" if status.same_system else "Проложить межзвёздный маршрут к буру"
+	if not status.active:
+		return
+	var place := str(status.name)
+	if not status.same_system:
+		place = "%s · %s" % [Sector.system(int(status.system)).name, place]
+	var work := "Добыча" if status.working else "Буфер полон" if int(status.stored) >= int(status.capacity) else "Жила исчерпана"
+	_rig_summary.text = "Бур · %s\n%s · %d/%d ед." % [place, work, int(status.stored), int(status.capacity)]
 
 func _sync_passengers(sim: RefCounted) -> void:
 	var status: Dictionary = sim.passenger_status()
@@ -767,6 +808,16 @@ func _sync_surface(sim: RefCounted, mining: RefCounted) -> void:
 		_route_detail.text += "\nПосле взлёта → %s" % sim.target_name(sim.planned_target)
 	var landing_site := "Вне площадки" if sim.landed_offpad() else "Площадка"
 	_telemetry.text = landing_site
+	if _rig_status.active:
+		if _rig_status.near:
+			_guidance.text = "Выгрузите сырьё или оставьте бур на грунте." if int(_rig_status.stored) > 0 else "Можно забрать бур или оставить его на грунте."
+			if int(_rig_status.stored) > 0 and not _rig_status.can_unload:
+				_guidance.text = "Трюм заполнен. Бур хранит добытое сырьё."
+		elif int(_rig_status.site) == int(sim.landed_site):
+			_guidance.text = "Взлетите и выберите «К буру» для посадки рядом с установкой."
+		else:
+			_guidance.text = "Бур оставлен на другом теле. Можно взлететь."
+		return
 	match mining.phase:
 		MiningRig.DEPLOYING:
 			_guidance.text = "Модуль спускается на поверхность."
@@ -1036,6 +1087,7 @@ func _refresh_disabled_actions() -> void:
 		blocked = blocked or (action == "dock_clearance" and _dock_clearance_blocked)
 		blocked = blocked or (action == "gear" and _gear_blocked)
 		blocked = blocked or (action == "frame" and _frame_blocked)
+		blocked = blocked or (RIG_ACTIONS.has(action) and not _rig_status.get(RIG_ACTIONS[action], false))
 		var during_jump := _jumping and action not in ["throttle_down", "throttle_up", "boost", "brake"]
 		var during_departure := _departure_active and (action != "dock" or not _departure_can_cancel)
 		button.disabled = not _input_enabled or blocked or during_jump or during_departure

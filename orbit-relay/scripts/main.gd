@@ -203,6 +203,14 @@ func _handle_action(action: String) -> void:
 			flight.fire_action()
 		"mine":
 			flight.mine_action()
+		"rig_deploy":
+			flight.leave_remote_rig()
+		"rig_unload":
+			flight.unload_remote_rig()
+		"rig_retrieve":
+			flight.retrieve_remote_rig()
+		"rig_route":
+			flight.track_remote_rig()
 		"sell_ore":
 			flight.sell_ore_action()
 		"scoop":
@@ -324,6 +332,12 @@ func _deliver_notice() -> void:
 			"credits": flight.credits, "system_id": flight.system_id, "orbit_time": flight.orbit_time,
 			"notice": customs.notice,
 		}
+	elif event.begins_with("remote_rig_"):
+		var rig := flight.remote_rig_status()
+		trace_fields = {
+			"site": rig.site, "stored": rig.stored, "reserve": rig.reserve,
+			"system_id": flight.system_id, "orbit_time": flight.orbit_time, "landed_site": flight.landed_site,
+		}
 	elif event == "reference_frame":
 		var frame := flight.frame_status()
 		trace_fields = {
@@ -338,7 +352,8 @@ func _deliver_notice() -> void:
 		"launch", "dock", "land", "lift", "contract", "delivery", "mining_deploy", "mining_recover",
 		"dock_request", "dock_ready", "dock_expired",
 		"departure_requested", "departure_canceled", "departure_open", "departure_crew_denied",
-		"mining_ready", "mining_loaded", "ore_sold", "service_refuel", "service_tank", "service_eco",
+		"mining_ready", "mining_loaded", "ore_sold",
+		"remote_rig_deployed", "remote_rig_unloaded", "remote_rig_retrieved", "remote_rig_route", "service_refuel", "service_tank", "service_eco",
 		"scoop_full", "scoop_stop", "star_arrival", "gas_arrival", "fuel_empty", "thermal_damage",
 		"fuel_transfer", "service_jump_refuel", "cargo_jettisoned",
 		"atmosphere_enter", "atmosphere_exit", "atmosphere_damage",
@@ -808,6 +823,8 @@ func _follow_journal(kind: String) -> void:
 				selected = flight.patrol_course or flight.patrol_action()
 	elif kind == "passenger":
 		selected = flight.passenger_follow()
+	elif kind == "rig":
+		selected = flight.track_remote_rig()
 	if not selected:
 		_journal.refresh()
 		return

@@ -24,7 +24,9 @@ const Crew = preload("res://scripts/crew.gd")
 const Cartography = preload("res://scripts/cartography.gd")
 const FlightFrame = preload("res://scripts/flight_frame.gd")
 const Customs = preload("res://scripts/customs.gd")
-const SAVE_SCHEMA := 31
+const UnattendedMining = preload("res://scripts/unattended_mining.gd")
+const SAVE_SCHEMA := 32
+const REMOTE_RIG_ACCESS_DISTANCE := 20.0
 const SHIPYARD_PORTS := [0, 10, Catalog.FRINGE_ARRIVAL_PORT]
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
@@ -128,6 +130,7 @@ var crew := Crew.new()
 var cartography := Cartography.new()
 var frame := FlightFrame.new()
 var customs := Customs.new()
+var remote_rig := UnattendedMining.new()
 var convoy_course := false
 var project_course := false
 var scooping := false
@@ -157,6 +160,7 @@ var status_event := ""
 var status_message := ""
 
 var _approach_committed := false
+var _rig_approach := false
 var _departure_site := -1
 var _departure_leg := 0
 var _departure_axis := Vector3.ZERO
@@ -393,12 +397,25 @@ func _surface_axis(index: int, epoch: float) -> Vector3:
 	return Terrain.spin_basis(index, epoch).z
 
 
+func _rig_landing_target(index: int) -> bool:
+	return _rig_approach and remote_rig.site_id == index and remote_rig.active()
+
+
+func _approach_axis(index: int, epoch: float) -> Vector3:
+	if _rig_landing_target(index):
+		return Terrain.spin_basis(index, epoch) * remote_rig.direction
+	return _surface_axis(index, epoch)
+
+
 func target_gate(index: int) -> Vector3:
-	return target_position(index) + _surface_axis(index, orbit_time) * float(Catalog.site(index).gate_offset)
+	return target_position(index) + _approach_axis(index, orbit_time) * float(Catalog.site(index).gate_offset)
 
 
 func target_contact(index: int) -> Vector3:
-	return target_position(index) + _surface_axis(index, orbit_time) * float(Catalog.site(index).pad_offset)
+	var center := target_position(index)
+	if _rig_landing_target(index):
+		return center + Terrain.spin_basis(index, orbit_time) * Terrain.contact(index, remote_rig.direction)
+	return center + _surface_axis(index, orbit_time) * float(Catalog.site(index).pad_offset)
 
 
 func surface_velocity(site: int, at_point: Vector3) -> Vector3:
@@ -867,6 +884,7 @@ func change_throttle(amount: float) -> void:
 
 
 func set_autopilot(enabled: bool) -> void:
+	_rig_approach = false
 	cancel_dock_sync()
 	patrol_course = false
 	project_course = false
@@ -1209,7 +1227,7 @@ func surface_status() -> Dictionary:
 	status.aim_ok = aim_ok
 	if jump_seconds_left > 0.0:
 		status.reason = "Идёт зарядка прыжкового привода"
-	elif autopilot and _approach_committed and not over_pad:
+	elif autopilot and _approach_committed and not over_pad and not _rig_landing_target(target):
 		status.reason = "Подойдите к отмеченной площадке"
 	elif not height_ok:
 		status.reason = "Подойдите к площадке" if over_pad else "Снизьтесь до 4–10 м над поверхностью"
@@ -1262,8 +1280,84 @@ func dock_action() -> bool:
 	return true
 
 
+func remote_rig_transform() -> Transform3D:
+	var site: int = remote_rig.site_id
+	if not remote_rig.active() or Catalog.system_of_site(site) != system_id:
+		return Transform3D.IDENTITY
+	var surface := Transform3D(Terrain.spin_basis(site, orbit_time), target_position(site))
+	return surface * Terrain.deposit(site, remote_rig.direction)
+
+
+func remote_rig_status() -> Dictionary:
+	var active := remote_rig.active()
+	var site: int = remote_rig.site_id
+	var region := Catalog.system_of_site(site)
+	var same_system := active and region == system_id
+	var point := remote_rig_transform().origin if same_system else Vector3.ZERO
+	var distance := position.distance_to(point) if same_system else -1.0
+	var near := false
+	if active and landed_site == site:
+		var ground := Terrain.contact(site, landing_direction)
+		var installation := Terrain.contact(site, remote_rig.direction)
+		distance = ground.distance_to(installation)
+		near = distance <= REMOTE_RIG_ACCESS_DISTANCE
+	var good := str(Catalog.site(site).get("resource", ""))
+	return {
+		"active": active, "site": site, "system": region, "same_system": same_system,
+		"stored": remote_rig.stored, "capacity": UnattendedMining.CAPACITY,
+		"working": active and remote_rig.next_epoch >= 0.0,
+		"remaining": maxf(0.0, remote_rig.next_epoch - orbit_time), "reserve": mining.reserve_at(site),
+		"point": point, "direction": remote_rig.direction, "name": target_name(site),
+		"resource": Catalog.resource_name(good), "distance": distance, "near": near,
+		"can_deploy": not active and landed and mining.phase == MiningRig.STOWED and mining.reserve_at(landed_site) > 0,
+		"can_unload": near and remote_rig.stored > 0 and mining.free_capacity() > 0,
+		"can_retrieve": near and remote_rig.stored == 0,
+		"can_route": active and not landed and jump_seconds_left <= 0.0 and not _departure_requested,
+		"navigating": _rig_landing_target(target),
+	}
+
+
+func leave_remote_rig() -> bool:
+	if not remote_rig_status().can_deploy or not remote_rig.deploy(mining, landed_site, landing_direction, orbit_time):
+		return false
+	_announce("remote_rig_deployed", "Бур оставлен на «%s». Можно взлетать." % target_name(landed_site))
+	return true
+
+
+func unload_remote_rig() -> bool:
+	if not remote_rig_status().can_unload:
+		return false
+	var units := remote_rig.unload(mining, orbit_time)
+	if units <= 0:
+		return false
+	_announce("remote_rig_unloaded", "Из бура выгружено %d ед. сырья." % units)
+	return true
+
+
+func retrieve_remote_rig() -> bool:
+	if not remote_rig_status().can_retrieve or not remote_rig.retrieve():
+		return false
+	_announce("remote_rig_retrieved", "Бур возвращён на борт.")
+	return true
+
+
+func track_remote_rig() -> bool:
+	var status := remote_rig_status()
+	if not status.can_route:
+		return false
+	if not status.same_system:
+		return plan_route(int(status.system))
+	if not select_target(int(status.site)):
+		return false
+	if docked < 0:
+		set_autopilot(true)
+		_rig_approach = true
+	_announce("remote_rig_route", "Курс к участку бурения на «%s»." % status.name)
+	return true
+
+
 func mine_action() -> bool:
-	if not landed:
+	if not landed or remote_rig.active():
 		return false
 	var event := mining.action()
 	match event:
@@ -2423,6 +2517,8 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 	var previous_orbit_time := orbit_time
 	orbit_time += delta
 	elapsed += delta
+	if remote_rig.active():
+		remote_rig.advance(mining, orbit_time)
 	freight.advance(market, previous_orbit_time, orbit_time)
 	if docked < 0 and not landed and dock_access.port == target:
 		var before := dock_access.status(target, previous_orbit_time)
@@ -2748,13 +2844,20 @@ func _autopilot_step(delta: float) -> void:
 	var center := target_position(target)
 	var gate := target_gate(target)
 	var surface_frame := Terrain.spin_basis(target, orbit_time)
+	var remote_landing := _rig_landing_target(target)
+	var landing_normal := surface_frame.z
+	if remote_landing:
+		var outward := surface_frame * remote_rig.direction
+		landing_normal = surface_frame * Terrain.normal(target, remote_rig.direction)
+		var guide_up := Vector3.RIGHT if absf(outward.y) > 0.95 else Vector3.UP
+		surface_frame = Basis.looking_at(-outward, guide_up)
 	var rotates := Terrain.spin_rate(target) > 0.0
 	var drift := surface_velocity(target, gate)
 	var relative := position - center
 	var approach_offset := surface_frame.transposed() * relative
 	var waypoint := gate
 	var max_speed := 118.0
-	var aim := -surface_frame.z
+	var aim := -landing_normal
 	var waiting_for_port := false
 	var retreating := false
 	if port_run and _approach_committed and not dock_access.status(target, orbit_time).ready:
@@ -2783,7 +2886,7 @@ func _autopilot_step(delta: float) -> void:
 			max_speed = 30.0 if gas_run else 32.0
 			autopilot_phase = "Вход в зону сбора"
 		else:
-			waypoint = target_contact(target) + surface_frame.z * 1.8
+			waypoint = target_contact(target) + landing_normal * 1.8
 			drift = surface_velocity(target, waypoint)
 			max_speed = 13.0 if mining_site else 19.0
 			if mining_site:
@@ -2838,7 +2941,7 @@ func _autopilot_step(delta: float) -> void:
 		var forecast: Vector3 = Orbit.sample(target, meeting_epoch).position
 		direction += forecast - center
 		if rotates:
-			direction += (_surface_axis(target, meeting_epoch) - surface_frame.z) * float(Catalog.site(target).gate_offset)
+			direction += (_approach_axis(target, meeting_epoch) - surface_frame.z) * float(Catalog.site(target).gate_offset)
 		drift = Vector3.ZERO
 		autopilot_phase = "Перехват движущейся цели"
 	if not _approach_committed and _departure_leg == 0:
@@ -2874,7 +2977,8 @@ func _autopilot_step(delta: float) -> void:
 	elif _approach_committed and not scoop_run:
 		var status := selected_dock_status()
 		if status.ok and (mining_site or (status.range <= DOCK_AUTO_DISTANCE and status.relative_speed <= DOCK_AUTO_SPEED)):
-			_arrive()
+			if not remote_landing or position.distance_to(target_contact(target)) <= REMOTE_RIG_ACCESS_DISTANCE:
+				_arrive(status.direction if remote_landing else Vector3.BACK)
 
 
 func _patrol_course_step(delta: float) -> void:
@@ -3072,6 +3176,7 @@ func snapshot() -> Dictionary:
 		"passengers": passengers.snapshot(),
 		"crew": crew.snapshot(),
 		"cartography": cartography.snapshot(), "frame": frame.snapshot(), "customs": customs.snapshot(),
+		"remote_rig": remote_rig.snapshot(),
 	}
 
 
@@ -3079,6 +3184,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_remote_rig := schema < 32
 	var pre_customs := schema < 31
 	var pre_frames := schema < 30
 	var pre_rotation := schema < 29
@@ -3302,6 +3408,12 @@ func restore(state: Dictionary) -> bool:
 	var mining_count := Catalog.SITE_COUNT if pre_galaxy else site_count
 	if schema >= 2 and not restored_mining.restore(state.get("mining"), schema == 2, mining_count, restored_ship.cargo_capacity(), not pre_economy, pre_dual_fuel):
 		return false
+	var restored_remote_rig := UnattendedMining.new()
+	if not pre_remote_rig:
+		if not restored_remote_rig.restore(state.get("remote_rig"), restored_epoch, restored_mining):
+			return false
+		if restored_remote_rig.active() and not _site_available(restored_remote_rig.site_id, restored_expedition, restored_cartography):
+			return false
 	if schema == 2:
 		if not state.get("landed") is bool:
 			return false
@@ -3457,6 +3569,7 @@ func restore(state: Dictionary) -> bool:
 	cartography = restored_cartography
 	frame = restored_frame
 	customs = restored_customs
+	remote_rig = restored_remote_rig
 	star_heat = 0.0 if pre_thermal else float(state.star_heat)
 	entry_heat = 0.0 if pre_entry else float(state.entry_heat)
 	_entry_site = -1
