@@ -2,6 +2,7 @@ extends CanvasLayer
 
 signal trade_requested(good: String, side: String, quantity: int)
 signal courier_requested(route_id: String)
+signal passenger_requested(action: String, destination: int)
 signal dismissed()
 
 const Economy := preload("res://scripts/port_economy.gd")
@@ -21,6 +22,7 @@ const INTERSTELLAR_PHASES := {
 	"waiting": "Стоянка", "departure": "Отход от порта",
 	"hyperspace": "Гиперпереход", "arrival": "Заход в порт",
 }
+const PASSENGER_OFFER_COUNT := 3
 
 var _sim: RefCounted
 var _insets: MarginContainer
@@ -29,10 +31,12 @@ var _balance: Label
 var _hold: Label
 var _market_tab: Button
 var _courier_tab: Button
+var _passenger_tab: Button
 var _freight_tab: Button
 var _close_button: Button
 var _market_page: HBoxContainer
 var _courier_page: HBoxContainer
+var _passenger_page: HBoxContainer
 var _freight_page: VBoxContainer
 var _freight_scroll: ScrollContainer
 var _freight_list: VBoxContainer
@@ -63,6 +67,16 @@ var _courier_cargo: Label
 var _courier_reward: Label
 var _courier_hint: Label
 var _courier_button: Button
+var _passenger_offer_rows: Array[Dictionary] = []
+var _passenger_empty: Label
+var _passenger_manifest: Label
+var _passenger_route: Label
+var _passenger_time: Label
+var _passenger_payment: Label
+var _passenger_reason: Label
+var _passenger_ledger: Label
+var _passenger_discharge_button: Button
+var _passenger_repay_button: Button
 var _touches: Dictionary[int, Button] = {}
 var _buttons: Array[Button] = []
 var _selected_good := "ore"
@@ -93,20 +107,24 @@ func build() -> void:
 	var tabs := _row(page, 8)
 	_market_tab = _button(tabs, "Рынок", 44.0)
 	_courier_tab = _button(tabs, "Рейсы", 44.0)
+	_passenger_tab = _button(tabs, "Пассажиры", 44.0)
 	_freight_tab = _button(tabs, "Снабжение", 44.0)
-	for tab in [_market_tab, _courier_tab, _freight_tab]:
+	for tab in [_market_tab, _courier_tab, _passenger_tab, _freight_tab]:
 		tab.toggle_mode = true
 		tab.custom_minimum_size.x = 145.0
 	_market_tab.pressed.connect(_show_courier.bind(false))
 	_courier_tab.pressed.connect(_show_courier.bind(true))
+	_passenger_tab.pressed.connect(_show_page.bind("passenger"))
 	_freight_tab.pressed.connect(_show_page.bind("freight"))
 	_market_page = _row(page, 16)
 	_courier_page = _row(page, 16)
+	_passenger_page = _row(page, 16)
 	_freight_page = _column(page, 10)
-	for body in [_market_page, _courier_page, _freight_page]:
+	for body in [_market_page, _courier_page, _passenger_page, _freight_page]:
 		body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_build_market()
 	_build_courier()
+	_build_passengers()
 	_build_freight()
 	get_viewport().size_changed.connect(_update_insets)
 	_update_insets()
@@ -146,6 +164,8 @@ func refresh() -> void:
 	_hold.text = "Трюм %d / %d ед." % [int(_sim.mining.ore_hold), int(_sim.mining.cargo_capacity)]
 	if _freight_page.visible:
 		_refresh_freight()
+	elif _passenger_page.visible:
+		_refresh_passengers()
 	elif _courier_page.visible:
 		_refresh_courier()
 	else:
@@ -257,11 +277,129 @@ func _show_page(page: String) -> void:
 	_freight_drag = -1
 	_market_page.visible = page == "market"
 	_courier_page.visible = page == "courier"
+	_passenger_page.visible = page == "passenger"
 	_freight_page.visible = page == "freight"
 	_market_tab.set_pressed_no_signal(page == "market")
 	_courier_tab.set_pressed_no_signal(page == "courier")
+	_passenger_tab.set_pressed_no_signal(page == "passenger")
 	_freight_tab.set_pressed_no_signal(page == "freight")
 	refresh()
+
+
+func _build_passengers() -> void:
+	var offers := _card(_passenger_page, 530.0, true)
+	_label(offers, "Рейсы из порта", 28, TEXT)
+	_passenger_empty = _label(offers, "Из этого порта пока нет пассажирских рейсов.", 18, MUTED)
+	_passenger_empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	for index in range(PASSENGER_OFFER_COUNT):
+		var card := PanelContainer.new()
+		card.add_theme_stylebox_override("panel", _style(Color("112631"), BORDER, 9, 12))
+		card.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		offers.add_child(card)
+		var row := _row(card, 16)
+		var detail := _column(row, 2)
+		detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		detail.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		var route := _label(detail, "", 22, TEXT)
+		route.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		var terms := _label(detail, "", 16, MUTED)
+		var payment := _label(detail, "", 16, MINT)
+		payment.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		var accept := _button(row, "Принять", 48.0, true)
+		accept.custom_minimum_size.x = 126.0
+		accept.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		accept.pressed.connect(_accept_passenger.bind(index))
+		_passenger_offer_rows.append({
+			"card": card, "route": route, "terms": terms, "payment": payment, "accept": accept, "destination": -1,
+		})
+	_spacer(offers)
+
+	var manifest := _card(_passenger_page, 414.0, false)
+	_passenger_manifest = _label(manifest, "", 28, TEXT)
+	_passenger_route = _label(manifest, "", 20, TEXT)
+	_passenger_time = _label(manifest, "", 21, MINT)
+	_passenger_payment = _label(manifest, "", 17, MUTED)
+	for line in [_passenger_manifest, _passenger_route, _passenger_payment]:
+		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_spacer(manifest)
+	_passenger_reason = _label(manifest, "", 17, MUTED)
+	_passenger_reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_passenger_ledger = _label(manifest, "", 17, MUTED)
+	_passenger_ledger.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_passenger_discharge_button = _button(manifest, "Высадить", 52.0, true)
+	_passenger_discharge_button.pressed.connect(_settle_passengers.bind("discharge"))
+	_passenger_repay_button = _button(manifest, "Погасить долг", 52.0, true)
+	_passenger_repay_button.pressed.connect(_settle_passengers.bind("repay"))
+
+
+func _refresh_passengers() -> void:
+	var status: Dictionary = _sim.passenger_status()
+	var offers: Array[Dictionary] = _sim.passenger_board()
+	_hold.text = "Места %d / %d" % [int(status.seats), int(status.capacity)]
+	_passenger_empty.visible = offers.is_empty()
+	for index in range(_passenger_offer_rows.size()):
+		var widgets := _passenger_offer_rows[index]
+		widgets.card.visible = index < offers.size()
+		widgets.destination = -1
+		if not widgets.card.visible:
+			continue
+		var offer := offers[index]
+		widgets.destination = int(offer.destination)
+		var interstellar: bool = Sector.system_of_site(widgets.destination) != _sim.system_id
+		widgets.route.text = _freight_port_name(widgets.destination, interstellar)
+		widgets.terms.text = "%s · срок %s" % [_passenger_count(int(offer.seats)), _eta(float(offer.duration))]
+		widgets.payment.text = "Аванс %d кр. · При высадке %d кр." % [int(offer.advance), int(offer.fare) - int(offer.advance)]
+		widgets.accept.disabled = not bool(offer.available)
+	_passenger_manifest.text = "На борту · %s" % _passenger_count(int(status.seats)) if status.active else "Свободных мест · %d" % int(status.capacity)
+	_passenger_route.visible = status.active
+	_passenger_time.visible = status.active
+	_passenger_payment.visible = status.active
+	if status.active:
+		var origin := int(status.origin)
+		var destination := int(status.destination)
+		var interstellar := Sector.system_of_site(origin) != Sector.system_of_site(destination)
+		_passenger_route.text = "%s\n→ %s" % [_freight_port_name(origin, interstellar), _freight_port_name(destination, interstellar)]
+		_passenger_time.text = "Срок истёк" if status.overdue else "До срока %s" % _eta(float(status.remaining))
+		_passenger_time.add_theme_color_override("font_color", AMBER if status.overdue else MINT)
+		_passenger_payment.text = ("К возврату %d кр. аванса" % int(status.advance)) if status.overdue \
+			else "Аванс %d кр. · При высадке %d кр." % [int(status.advance), int(status.fare) - int(status.advance)]
+	_passenger_reason.text = str(status.reason)
+	if status.canceling:
+		_passenger_reason.text += "\nПри отмене потребуется вернуть аванс."
+	_passenger_ledger.text = "Репутация %d · Выполнено %d · Просрочено %d" % [int(status.reputation), int(status.completed), int(status.late)]
+	var debt := int(status.debt)
+	_passenger_reason.visible = (status.active or debt > 0) and not _passenger_reason.text.is_empty()
+	if debt > 0:
+		_passenger_ledger.text += "\nДолг по авансу %d кр." % debt
+	_passenger_discharge_button.visible = status.active
+	_passenger_discharge_button.disabled = not status.can_discharge
+	_passenger_discharge_button.text = "Отменить рейс" if status.canceling else "Высадить пассажиров"
+	_passenger_repay_button.visible = debt > 0
+	_passenger_repay_button.disabled = not status.can_repay
+	var payment := mini(debt, int(_sim.credits))
+	_passenger_repay_button.text = "Внести %d кр." % payment if payment > 0 and payment < debt else "Погасить долг"
+
+
+func _accept_passenger(index: int) -> void:
+	if not is_open() or not _passenger_page.visible:
+		return
+	var offer := _passenger_offer_rows[index]
+	if offer.card.visible and not offer.accept.disabled:
+		_touches.clear()
+		passenger_requested.emit("accept", offer.destination)
+
+
+func _settle_passengers(action: String) -> void:
+	if not is_open() or not _passenger_page.visible:
+		return
+	var button := _passenger_discharge_button if action == "discharge" else _passenger_repay_button
+	if button.visible and not button.disabled:
+		_touches.clear()
+		passenger_requested.emit(action, -1)
+
+
+static func _passenger_count(seats: int) -> String:
+	return "1 пассажир" if seats == 1 else "%d пассажира" % seats
 
 
 func _build_freight() -> void:

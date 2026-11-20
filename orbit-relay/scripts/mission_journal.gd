@@ -29,6 +29,16 @@ var _patrol_reward: Label
 var _patrol_rows: Array[HBoxContainer] = []
 var _patrol_stops: Array[Label] = []
 var _patrol_tags: Array[Label] = []
+var _work_page: HBoxContainer
+var _passenger_page: HBoxContainer
+var _work_tab: Button
+var _passenger_tab: Button
+var _passenger_route: Label
+var _passenger_status: Label
+var _passenger_cabins: Label
+var _passenger_payment: Label
+var _passenger_record: Label
+var _passenger_next: Label
 var _close_button: Button
 var _follow_buttons: Dictionary[String, Button] = {}
 var _touches: Dictionary[int, Button] = {}
@@ -58,12 +68,28 @@ func build() -> void:
 	_close_button = _button(header, "Закрыть")
 	_close_button.custom_minimum_size.x = 128.0
 	_close_button.pressed.connect(func() -> void: dismissed.emit())
-	var body := HBoxContainer.new()
-	body.add_theme_constant_override("separation", 16)
-	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	page.add_child(body)
-	_build_delivery(body)
-	_build_patrol(body)
+	var tabs := HBoxContainer.new()
+	tabs.add_theme_constant_override("separation", 8)
+	page.add_child(tabs)
+	_work_tab = _button(tabs, "Доставка и дозор")
+	_passenger_tab = _button(tabs, "Пассажиры")
+	for tab: Button in [_work_tab, _passenger_tab]:
+		tab.toggle_mode = true
+		tab.custom_minimum_size.x = 174.0
+	_work_tab.pressed.connect(_show_passengers.bind(false))
+	_passenger_tab.pressed.connect(_show_passengers.bind(true))
+
+	_work_page = HBoxContainer.new()
+	_work_page.add_theme_constant_override("separation", 16)
+	_work_page.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	page.add_child(_work_page)
+	_build_delivery(_work_page)
+	_build_patrol(_work_page)
+	_passenger_page = HBoxContainer.new()
+	_passenger_page.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	page.add_child(_passenger_page)
+	_build_passengers()
+	_show_passengers(false)
 	get_viewport().size_changed.connect(_update_insets)
 	_update_insets()
 	hide()
@@ -85,6 +111,7 @@ func refresh() -> void:
 	_location.text = "Система «%s»" % Sector.system(_sim.system_id).name
 	_refresh_delivery()
 	_refresh_patrol()
+	_refresh_passengers()
 
 
 func close() -> void:
@@ -126,6 +153,26 @@ func _build_patrol(parent: HBoxContainer) -> void:
 	_spacer(card)
 	_patrol_next = _label(card, "", 19, INK)
 	_add_follow_button(card, "patrol")
+
+
+func _build_passengers() -> void:
+	var card := _card(_passenger_page)
+	_passenger_route = _label(card, "", 29, INK)
+	_passenger_status = _label(card, "", 20, MINT)
+	_passenger_cabins = _label(card, "", 18, MUTED)
+	_passenger_payment = _label(card, "", 19, INK)
+	_passenger_record = _label(card, "", 18, MUTED)
+	_spacer(card)
+	_passenger_next = _label(card, "", 19, INK)
+	_add_follow_button(card, "passenger")
+
+
+func _show_passengers(show_passengers: bool) -> void:
+	_touches.clear()
+	_work_page.visible = not show_passengers
+	_passenger_page.visible = show_passengers
+	_work_tab.set_pressed_no_signal(not show_passengers)
+	_passenger_tab.set_pressed_no_signal(show_passengers)
 
 
 func _refresh_delivery() -> void:
@@ -231,6 +278,69 @@ func _refresh_patrol() -> void:
 	_follow("patrol", follow_caption)
 
 
+func _refresh_passengers() -> void:
+	var status: Dictionary = _sim.passenger_status()
+	var active := bool(status.active)
+	_passenger_record.text = "Завершено %d · Просрочено %d · Репутация %+d" % [
+		int(status.completed), int(status.late), int(status.reputation),
+	]
+	_passenger_cabins.text = "Занято мест · %d из %d" % [int(status.seats), int(status.capacity)]
+	_passenger_payment.visible = active
+	if not active:
+		_passenger_route.text = "Пассажирских рейсов нет"
+		var debt := int(status.debt)
+		_passenger_status.visible = debt > 0
+		_passenger_status.text = "Долг по авансу · %d кр." % debt
+		_passenger_status.add_theme_color_override("font_color", AMBER)
+		_passenger_next.text = "Откройте «Биржа» → «Пассажиры» в порту."
+		if debt > 0:
+			_passenger_next.text = "Погасите долг на бирже во вкладке «Пассажиры», чтобы брать новые рейсы."
+		_follow("passenger", "")
+		return
+
+	var origin := int(status.origin)
+	var destination := int(status.destination)
+	var start: String = _sim.target_name(origin)
+	var arrival: String = _sim.target_name(destination)
+	var arrival_system := Sector.system_of_site(destination)
+	_passenger_route.text = "«%s» → «%s»" % [start, arrival]
+	if Sector.system_of_site(origin) != arrival_system:
+		_passenger_route.text += " · %s" % Sector.system(arrival_system).name
+	var overdue := bool(status.overdue)
+	var remaining := ceili(maxf(0.0, float(status.remaining)))
+	_passenger_status.visible = true
+	_passenger_status.text = "Срок истёк" if overdue else "Осталось %d с" % remaining
+	_passenger_status.add_theme_color_override("font_color", AMBER if overdue or remaining <= 60 else MINT)
+	_passenger_payment.text = "Аванс %d кр. · К получению %d кр." % [
+		int(status.advance), maxi(0, int(status.fare) - int(status.advance)),
+	]
+	var caption := ""
+	if overdue:
+		_passenger_payment.text = "Аванс к возврату · %d кр." % int(status.advance)
+		if status.can_discharge:
+			_passenger_next.text = "Высадите пассажиров во вкладке «Пассажиры» на бирже."
+		else:
+			_passenger_next.text = str(status.reason)
+			var port := int(status.route_port)
+			if port >= 0:
+				var system := Sector.system_of_site(port)
+				_passenger_next.text = "Высадите пассажиров в порту «%s»." % _sim.target_name(port)
+				if system != _sim.system_id:
+					_passenger_next.text = "Прыгните в систему «%s». Затем высадите пассажиров в порту «%s»." % [
+						Sector.system(system).name, _sim.target_name(port),
+					]
+				caption = "К ближайшему порту" if system == _sim.system_id else "Проложить прыжок"
+	elif status.can_discharge and not status.canceling:
+		_passenger_next.text = "Порт назначения достигнут. Высадите пассажиров на бирже."
+	elif arrival_system != _sim.system_id:
+		_passenger_next.text = "Прыгните в систему «%s» и состыкуйтесь в порту назначения." % Sector.system(arrival_system).name
+		caption = "Проложить прыжок"
+	else:
+		_passenger_next.text = "Состыкуйтесь в порту назначения."
+		caption = "Курс к порту"
+	_follow("passenger", caption if status.can_follow else "")
+
+
 func _follow(kind: String, caption: String) -> void:
 	var button := _follow_buttons[kind]
 	button.text = caption
@@ -246,7 +356,7 @@ func _add_follow_button(parent: Control, kind: String) -> void:
 
 func _request_follow(kind: String) -> void:
 	var button := _follow_buttons[kind]
-	if is_open() and button.visible and not button.disabled:
+	if is_open() and button.is_visible_in_tree() and not button.disabled:
 		_touches.clear()
 		follow_requested.emit(kind)
 
@@ -262,7 +372,7 @@ func _input(event: InputEvent) -> void:
 				var hit := _button_at(event.position)
 				if hit != null and hit not in _touches.values():
 					_touches[event.index] = hit
-			elif button != null and button.visible and not button.disabled and button.get_global_rect().has_point(event.position):
+			elif button != null and button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(event.position):
 				button.pressed.emit()
 		get_viewport().set_input_as_handled()
 	elif event is InputEventScreenDrag:
@@ -275,8 +385,11 @@ func _input(event: InputEvent) -> void:
 func _button_at(point: Vector2) -> Button:
 	if _close_button.get_global_rect().has_point(point):
 		return _close_button
+	for tab: Button in [_work_tab, _passenger_tab]:
+		if tab.get_global_rect().has_point(point):
+			return tab
 	for button: Button in _follow_buttons.values():
-		if button.visible and not button.disabled and button.get_global_rect().has_point(point):
+		if button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(point):
 			return button
 	return null
 

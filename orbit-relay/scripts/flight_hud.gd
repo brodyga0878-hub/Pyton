@@ -32,6 +32,7 @@ var _flight_modes: HBoxContainer
 var _translation_controls: HBoxContainer
 var _route: Label
 var _route_detail: Label
+var _passenger_route: Label
 var _telemetry: Label
 var _condition: Label
 var _fuel: Label
@@ -116,6 +117,9 @@ func build() -> void:
 	_route = _label(route_stack, 23, CYAN)
 	_route_detail = _label(route_stack, 17, INK)
 	_route_detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_passenger_route = _label(route_stack, 16, CYAN)
+	_passenger_route.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_passenger_route.hide()
 	var course_card := route_stack.get_parent() as PanelContainer
 	var shortcuts := HBoxContainer.new()
 	shortcuts.add_theme_constant_override("separation", 8)
@@ -571,11 +575,27 @@ func sync(sim: RefCounted, delta: float) -> void:
 			_guidance.text = str(patrol.get("reason", ""))
 	else:
 		_sync_flight(sim, scoop_status, itinerary, patrol, fire, convoy, rendezvous, entry_site, surface)
+	_sync_passengers(sim)
 	_sync_thermal(stellar, entry, stellar_scoop, show_entry)
 	if _notice_left > 0.0:
 		_notice_left -= delta
 		if _notice_left <= 0.0:
 			_notice_panel.hide()
+
+func _sync_passengers(sim: RefCounted) -> void:
+	var status: Dictionary = sim.passenger_status()
+	_passenger_route.visible = bool(status.active)
+	if not _passenger_route.visible:
+		return
+	var overdue := bool(status.overdue)
+	var remaining := ceili(maxf(0.0, float(status.remaining)))
+	var color := ALERT if overdue else (AMBER if remaining <= 60 else CYAN)
+	if _passenger_route.get_theme_color("font_color") != color:
+		_passenger_route.add_theme_color_override("font_color", color)
+	if overdue:
+		_passenger_route.text = "Пассажиры · Просрочка · Высадка в порту"
+	else:
+		_passenger_route.text = "Пассажиры → %s · %d с" % [sim.target_name(status.destination), remaining]
 
 func _sync_departure(sim: RefCounted, departure: Dictionary) -> void:
 	_route.text = "Выход / %s" % sim.target_name(departure.port)

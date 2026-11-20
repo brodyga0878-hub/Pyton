@@ -70,6 +70,7 @@ func _ready() -> void:
 	_market.build()
 	_market.trade_requested.connect(_market_trade)
 	_market.courier_requested.connect(_accept_courier)
+	_market.passenger_requested.connect(_passenger_action)
 	_market.dismissed.connect(_close_market)
 	add_child(_settings)
 	_settings.build()
@@ -285,6 +286,14 @@ func _deliver_notice() -> void:
 			"wait_seconds": departure.wait, "reason": flight.status_message,
 			"system_id": flight.system_id, "orbit_time": flight.orbit_time,
 		}
+	elif event.begins_with("passenger_"):
+		var passengers := flight.passenger_status()
+		trace_fields = {
+			"port": flight.docked, "origin": passengers.origin, "destination": passengers.destination,
+			"seats": passengers.seats, "overdue": passengers.overdue, "debt": passengers.debt,
+			"credits": flight.credits, "remaining_seconds": passengers.remaining, "reason": flight.status_message,
+			"system_id": flight.system_id, "orbit_time": flight.orbit_time,
+		}
 	_io.trace(event, trace_fields)
 	_hud.notify(flight.status_message)
 	flight.status_event = ""
@@ -300,6 +309,8 @@ func _deliver_notice() -> void:
 		"service_heat_shield",
 		"jump_planned", "jump_complete", "route_canceled",
 		"market_buy", "market_sell", "service_repair", "service_cargo", "hull_damage", "contract_leg",
+		"passenger_accepted", "passenger_overdue", "passenger_paid", "passenger_late", "passenger_canceled",
+		"passenger_debt_paid", "passenger_course",
 		"patrol_accepted", "patrol_engaged", "patrol_fire", "patrol_enemy_hit", "patrol_retreat", "patrol_victory", "patrol_paid",
 		"expedition_accepted", "expedition_survey", "expedition_report", "expedition_supply", "expedition_complete", "expedition_course",
 		"war_declared", "war_round", "war_captured", "war_repulsed", "war_convoy_delivered", "war_convoy_intercepted",
@@ -638,6 +649,20 @@ func _accept_courier(route_id: String) -> void:
 	_market.refresh()
 
 
+func _passenger_action(action: String, destination: int) -> void:
+	if not _market.is_open():
+		return
+	var changed := false
+	match action:
+		"accept": changed = flight.passenger_accept(destination)
+		"discharge": changed = flight.passenger_discharge()
+		"repay": changed = flight.passenger_repay()
+	if changed:
+		_deliver_notice()
+		_update_display(0.0)
+	_market.refresh()
+
+
 func _close_market() -> void:
 	_market.close()
 	_hud.set_input_enabled(true)
@@ -686,6 +711,8 @@ func _follow_journal(kind: String) -> void:
 				selected = flight.plan_jump(Catalog.system_of_site(flight.patrol.origin))
 			elif flight.docked < 0 and not flight.landed and status.available:
 				selected = flight.patrol_course or flight.patrol_action()
+	elif kind == "passenger":
+		selected = flight.passenger_follow()
 	if not selected:
 		_journal.refresh()
 		return
