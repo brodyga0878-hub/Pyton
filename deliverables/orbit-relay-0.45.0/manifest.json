@@ -1,0 +1,132 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.45.0",
+  "source_commit": "cf88558280d7cc12370a352e7cd7446935ecb84b",
+  "content": {
+    "known_after_expansion": 5,
+    "contested_systems": 2,
+    "convoy_order_types": [
+      "escort",
+      "intercept"
+    ],
+    "convoy_rewards": {
+      "escort": 360,
+      "intercept": 420
+    },
+    "save_schema": 12
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 70,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches_0.44": true,
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 28,
+    "tested_on_device": false
+  },
+  "checks": {
+    "flight": {
+      "failures": 0
+    },
+    "scene": {
+      "failures": 0
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 72
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 186
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 292
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 191
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 132
+    },
+    "living": {
+      "failures": 0,
+      "checks": 76
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 80
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "convoy_route_matrix": {
+      "routes": 20,
+      "departure_ports": 5,
+      "destination_systems": 2,
+      "failures": 0
+    },
+    "desktop_ui": {
+      "checks": 37,
+      "failures": 0,
+      "viewports": [
+        [
+          1280,
+          720
+        ],
+        [
+          1600,
+          720
+        ]
+      ]
+    }
+  },
+  "files": {
+    "OrbitRelay-0.45.0-arm64.apk": {
+      "bytes": 26403376,
+      "sha256": "61363fa65acaca3cf4aa7db0d5aa227b3851875a67e83bf700873b96595d372c"
+    },
+    "OrbitRelay-0.45.0-source.zip": {
+      "bytes": 218152,
+      "sha256": "2a83252325f59f9b887ddc8936a400f6d5fca352347787fff3da3c83cff7bb99"
+    },
+    "convoy-escort.png": {
+      "bytes": 317175,
+      "sha256": "f72360b5c6b8b5766beb970b4809660a35b8cdff0493d5a7f3d27b781dc5cb7a"
+    },
+    "convoy-intercept.png": {
+      "bytes": 109826,
+      "sha256": "932ca541923915133e063e4e43fdd3f05b5124064c0f03fd1bb733bece6b8199"
+    },
+    "convoy-order-map.png": {
+      "bytes": 89508,
+      "sha256": "9c0c68752b64da01190327864c54d8e3f137cfa1432291991e6118b72fa1ed2d"
+    },
+    "convoy-orders.png": {
+      "bytes": 181091,
+      "sha256": "dd92ad250254019fe76daa274497a2e2a79331c9bb2a1a51f76c0ef3e8ac1b89"
+    },
+    "intercept-order-map.png": {
+      "bytes": 87095,
+      "sha256": "3338a0e38363799287a4dead1e7551a7d77a5dfc54a60b3543891533bca288b9"
+    }
+  }
+}
