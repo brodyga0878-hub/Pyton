@@ -1,0 +1,254 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.72.0",
+  "source_commit": "471fb4e086e7b1594428e0758a25deb1af6ff873",
+  "content": {
+    "save_schema": 32,
+    "persistent_remote_drill_capacity": 48,
+    "extraction_while_player_away": true,
+    "shared_geological_reserve_with_manual_mining": true,
+    "explicit_unload_and_retrieve": true,
+    "moving_offpad_approach": true,
+    "tested_acceptance_matrix": {
+      "checked": 30,
+      "partial": 9,
+      "open": 5
+    }
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 97,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.71.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 44,
+    "tested_on_device": false
+  },
+  "checks": {
+    "android_report_share": {
+      "failures": 0,
+      "checks": 76
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "binary_orbits": {
+      "failures": 0,
+      "checks": 55
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "cartography": {
+      "failures": 0,
+      "checks": 43
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "crew": {
+      "failures": 0,
+      "checks": 45
+    },
+    "customs": {
+      "failures": 0,
+      "checks": 28
+    },
+    "departure": {
+      "failures": 0,
+      "checks": 32
+    },
+    "dock_access": {
+      "failures": 0,
+      "checks": 37
+    },
+    "docking": {
+      "failures": 0,
+      "checks": 76
+    },
+    "dual_fuel": {
+      "failures": 0,
+      "checks": 25
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 139
+    },
+    "flight": {
+      "failures": 0
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "frontier_freight": {
+      "failures": 0,
+      "checks": 33
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 76
+    },
+    "galactic_routes": {
+      "failures": 0,
+      "checks": 59
+    },
+    "gear": {
+      "failures": 0,
+      "checks": 28
+    },
+    "heat_shield": {
+      "failures": 0,
+      "checks": 28
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 187
+    },
+    "living": {
+      "failures": 0,
+      "checks": 77
+    },
+    "material_maps": {
+      "failures": 0,
+      "checks": 33
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "npc_freight": {
+      "failures": 0,
+      "checks": 48
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 535
+    },
+    "passengers": {
+      "failures": 0,
+      "checks": 50
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 81
+    },
+    "procedural_galaxy": {
+      "failures": 0,
+      "checks": 140
+    },
+    "reference_frames": {
+      "failures": 0,
+      "checks": 46
+    },
+    "remote_rig": {
+      "failures": 0,
+      "checks": 35
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "report": {
+      "failures": 0,
+      "checks": 28
+    },
+    "scene": {
+      "failures": 0
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "shipyard": {
+      "failures": 0,
+      "checks": 52
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 381
+    },
+    "surface_guidance": {
+      "failures": 0,
+      "checks": 60
+    },
+    "surface_rotation": {
+      "failures": 0,
+      "checks": 154
+    },
+    "unattended_mining_model": {
+      "checks": 1594,
+      "failures": 0
+    },
+    "unchanged_legacy_manual_phase_traces": {
+      "checks": 260,
+      "failures": 0
+    },
+    "drill_graphics_headless": {
+      "checks": 19,
+      "failures": 0
+    },
+    "drill_graphics_gl": {
+      "checks": 21,
+      "failures": 0
+    },
+    "drill_hud_journal_headless": {
+      "checks": 60,
+      "failures": 0
+    },
+    "drill_hud_journal_gl": {
+      "checks": 62,
+      "failures": 0
+    },
+    "actual_0_71_manual_phases": {
+      "checks": 25,
+      "failures": 0,
+      "save_files": 4
+    },
+    "frozen_0_72_real_binary_moon_install_and_return": {
+      "checks": 27,
+      "failures": 0,
+      "patch_return_error_m": 0.6535
+    }
+  },
+  "files": {
+    "OrbitRelay-0.72.0-arm64.apk": {
+      "bytes": 28745651,
+      "sha256": "97a100f91f78a2b60459212d2e894b8e6463eee09d6259044d83edb09757b042"
+    },
+    "OrbitRelay-0.72.0-source.zip": {
+      "bytes": 2234275,
+      "sha256": "f859a8ac2f5ac52579266faa03b30b84875b57d65fc2bfc252dd987deaa5dd52"
+    },
+    "approach-left-drill.png": {
+      "bytes": 770205,
+      "sha256": "98dc0168d8b371eee9b6c5bc2ab50ec88c255ef02ce988f3aebd7a9c63d6a3e3"
+    },
+    "rig-journal-remote.png": {
+      "bytes": 59131,
+      "sha256": "30c43de4ab364485eb2b06fd59625c747c173d80b5b5f2bce5b0278e20c6683c"
+    },
+    "rig-surface-unload.png": {
+      "bytes": 769914,
+      "sha256": "197b4ad323a61218356bdc1e0396331cf5a9fdba34eca7bb1d7d58b4cf7a06be"
+    },
+    "unattended-drill-on-asteroid.png": {
+      "bytes": 648332,
+      "sha256": "4ab0b563444f0a699086356d6ff1972099c6fc6eced313b67f19efc1aaa4aaa0"
+    }
+  }
+}
