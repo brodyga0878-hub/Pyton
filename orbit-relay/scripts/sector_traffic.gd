@@ -60,6 +60,16 @@ static func contacts(sim: RefCounted) -> Array[Dictionary]:
 	return result
 
 
+static func convoy_contact(sim: RefCounted, id: String) -> Dictionary:
+	if id.is_empty():
+		return {}
+	var convoy: Dictionary = sim.factions.convoy(sim.system_id, id)
+	if convoy.is_empty() or convoy.stage != "en_route":
+		return {}
+	var ports: Array = sim.local_ports()
+	return {} if ports.is_empty() else _convoy_contact(sim, int(ports[0]), convoy)
+
+
 static func _convoy_contact(sim: RefCounted, port: int, convoy: Dictionary) -> Dictionary:
 	# The two factions use opposite lanes and approach rally points clear of the dock.
 	var faction: int = convoy.faction

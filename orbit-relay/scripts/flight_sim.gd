@@ -11,7 +11,8 @@ const Traffic = preload("res://scripts/sector_traffic.gd")
 const Patrol = preload("res://scripts/patrol_encounter.gd")
 const Expedition = preload("res://scripts/expedition.gd")
 const FactionFronts = preload("res://scripts/faction_fronts.gd")
-const SAVE_SCHEMA := 11
+const ConvoyOrders = preload("res://scripts/convoy_orders.gd")
+const SAVE_SCHEMA := 12
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
@@ -43,6 +44,9 @@ const FREE_LANDING_MAX_HEIGHT := 10.0
 const LANDING_ANGLE := 20.0
 const IMPACT_DAMAGE_SPEED := 14.0
 const PATROL_CRUISE_SPEED := 70.0
+const CONVOY_CRUISE_SPEED := 105.0
+const CONVOY_ESCORT_SPACING := 54.0
+const CONVOY_AIM_SPACING := 142.0
 const FRAME_MARGIN := 110.0
 const STAR_WARP_MARGIN := 120.0
 const MAX_SAVED_SPEED := MAX_SPEED * 1.56 + 8.0
@@ -67,6 +71,8 @@ var patrol := Patrol.new()
 var patrol_course := false
 var expedition := Expedition.new()
 var factions := FactionFronts.new()
+var convoy_order := ConvoyOrders.new()
+var convoy_course := false
 var project_course := false
 var scooping := false
 var star_heat := 0.0
@@ -131,6 +137,8 @@ func time_status() -> Dictionary:
 		return {"allowed": false, "reason": "Сбор топлива"}
 	if patrol.in_danger(self):
 		return {"allowed": false, "reason": "Боевой контакт"}
+	if convoy_course or convoy_order.in_danger(self):
+		return {"allowed": false, "reason": "Сближение с конвоем"}
 	if docked >= 0 or landed:
 		return {"allowed": true, "reason": ""}
 	if star_heat >= HEAT_SCOOP_LIMIT:
@@ -387,6 +395,7 @@ func select_target(index: int) -> bool:
 	if docked >= 0 or landed:
 		planned_target = index
 	else:
+		_stop_convoy_course()
 		target = index
 		_approach_committed = false
 		if autopilot:
@@ -405,6 +414,7 @@ func change_throttle(amount: float) -> void:
 func set_autopilot(enabled: bool) -> void:
 	patrol_course = false
 	project_course = false
+	_stop_convoy_course()
 	autopilot = enabled and docked < 0 and not landed and jump_seconds_left <= 0.0
 	_approach_committed = false
 	_departure_leg = 0
@@ -606,13 +616,21 @@ func repair_unit_price() -> int:
 func traffic_contacts() -> Array[Dictionary]:
 	var contacts := Traffic.contacts(self)
 	contacts.append_array(patrol.contacts(self))
+	var order := convoy_order.status(self)
+	if order.active and order.local and order.kind == "intercept":
+		for contact in contacts:
+			if contact.id == order.id:
+				contact.hull = order.enemy_hull
+				break
 	return contacts
 
 
 func combat_beams() -> Array[Dictionary]:
 	if docked >= 0 or landed or jump_seconds_left > 0.0:
 		return []
-	return patrol.beams()
+	var beams := patrol.beams()
+	beams.append_array(convoy_order.beams())
+	return beams
 
 
 func patrol_status() -> Dictionary:
@@ -621,6 +639,57 @@ func patrol_status() -> Dictionary:
 
 func frontier_status() -> Dictionary:
 	return expedition.status(self)
+
+
+func convoy_offers() -> Array[Dictionary]:
+	return convoy_order.offers(self)
+
+
+func convoy_status() -> Dictionary:
+	var status := convoy_order.status(self)
+	var patrol_engaged := patrol.in_danger(self)
+	status.escort_time = status.formation_time
+	status.escort_total = status.formation_required
+	status.fire_visible = status.fire_visible and not patrol_engaged
+	if status.local and patrol_engaged:
+		status.can_route = false
+		if status.active:
+			status.reason = "Сначала выйдите из боевого контакта «Дозора»."
+	return status
+
+
+func convoy_action(system := -1, id := "") -> bool:
+	if jump_seconds_left > 0.0:
+		return false
+	if not id.is_empty():
+		var accepted := convoy_order.accept(self, system, id)
+		if accepted.is_empty():
+			return false
+		_stop_convoy_course()
+		if system != system_id:
+			plan_jump(system)
+		_apply_convoy_result(accepted)
+		return true
+	if convoy_course:
+		_stop_convoy_course()
+		_announce("convoy_order_course", "Сближение с конвоем отменено.")
+		return true
+	var status := convoy_status()
+	if not status.can_route:
+		return false
+	if not status.local:
+		return plan_jump(status.system)
+	reset_time_scale()
+	set_autopilot(false)
+	convoy_course = true
+	_announce("convoy_order_course", "Проложен курс к конвою. «%s»." % status.name)
+	return true
+
+
+func _stop_convoy_course() -> void:
+	if convoy_course:
+		convoy_course = false
+		throttle = 0.0
 
 
 func project_action() -> bool:
@@ -653,7 +722,7 @@ func project_action() -> bool:
 
 
 func fire_status() -> Dictionary:
-	return patrol.fire_status(self)
+	return convoy_order.fire_status(self) if convoy_status().fire_visible else patrol.fire_status(self)
 
 
 func patrol_action() -> bool:
@@ -684,6 +753,10 @@ func patrol_action() -> bool:
 
 
 func fire_action() -> bool:
+	if convoy_status().fire_visible:
+		var result := convoy_order.fire(self)
+		_apply_convoy_result(result)
+		return result.get("ok", false)
 	var shot := patrol.fire(self)
 	_apply_patrol_result(shot)
 	return shot.get("ok", false)
@@ -697,11 +770,25 @@ func _apply_patrol_result(result: Dictionary) -> void:
 		return
 	if event in ["patrol_engaged", "patrol_victory", "patrol_retreat"]:
 		reset_time_scale()
+		if event == "patrol_engaged":
+			_stop_convoy_course()
 		if patrol_course:
 			patrol_course = false
 			throttle = 0.0
 	if result.get("damage", 0.0) > 0.0:
 		ship.apply_damage(float(result.damage))
+	_announce(event, str(result.get("message", "")))
+
+
+func _apply_convoy_result(result: Dictionary) -> void:
+	var event: String = result.get("event", "")
+	if event.is_empty():
+		return
+	if event in ["convoy_order_escorted", "convoy_order_paid", "convoy_order_failed"]:
+		_stop_convoy_course()
+	if result.has("damage"):
+		ship.apply_damage(float(result.damage))
+	credits += int(result.get("credits", 0))
 	_announce(event, str(result.get("message", "")))
 
 
@@ -860,6 +947,8 @@ func jump_status(destination: int) -> Dictionary:
 		reason = "Отключите автопилот и сбор топлива"
 	elif patrol.in_danger(self):
 		reason = "Выйдите из зоны боя"
+	elif convoy_order.in_danger(self):
+		reason = "Отойдите от конвоя"
 	elif speed() > JUMP_SPEED:
 		reason = "Снизьте скорость до %d м/с" % int(JUMP_SPEED)
 	elif ship.fuel < cost:
@@ -884,6 +973,7 @@ func start_jump() -> bool:
 	reset_time_scale()
 	patrol_course = false
 	project_course = false
+	_stop_convoy_course()
 	throttle = 0.0
 	boost = false
 	jump_seconds_left = JUMP_CHARGE
@@ -1041,6 +1131,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		_hold_docked_pose()
 		_update_star_heat(delta)
 		_apply_patrol_result(patrol.step(self, delta))
+		_apply_convoy_result(convoy_order.step(self, delta))
 		return
 	if landed:
 		_hold_landed_pose()
@@ -1052,6 +1143,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 				_announce(mining_event, "Добыто %d ед. сырья. Заберите модуль." % mining.pending_ore)
 			"mining_loaded":
 				_announce(mining_event, "Модуль на борту. Сырьё в трюме. Можно взлетать.")
+		_apply_convoy_result(convoy_order.step(self, delta))
 		return
 
 	if jump_seconds_left > 0.0:
@@ -1060,15 +1152,18 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		else:
 			_charge_jump(delta)
 		_update_star_heat(delta)
+		_apply_convoy_result(convoy_order.step(self, delta))
 		return
 	if manual_input:
-		if autopilot or patrol_course or project_course:
+		if autopilot or patrol_course or project_course or convoy_course:
 			set_autopilot(false)
 			_announce("manual_override", "Ручное управление")
 
 	var had_fuel := ship.fuel > 0.0
 	if autopilot:
 		_autopilot_step(delta)
+	elif convoy_course:
+		_convoy_course_step(delta)
 	elif project_course:
 		_project_course_step(delta)
 	elif patrol_course:
@@ -1096,6 +1191,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		_announce("fuel_empty", "Бак пуст. Включён резервный ход до 42 м/с.")
 
 	if docked >= 0 or landed:
+		_apply_convoy_result(convoy_order.step(self, delta))
 		return
 	var next := position + velocity * delta
 	var obstacle := _obstacle_at(next)
@@ -1119,6 +1215,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 	_update_star_heat(delta)
 	_collect_fuel(delta)
 	_apply_patrol_result(patrol.step(self, delta))
+	_apply_convoy_result(convoy_order.step(self, delta))
 
 
 func _blocked(point: Vector3, sector_id := -1, epoch := -1.0, progress: RefCounted = null) -> bool:
@@ -1295,6 +1392,40 @@ func _project_course_step(delta: float) -> void:
 		throttle = 0.0
 
 
+func _convoy_course_step(delta: float) -> void:
+	boost = false
+	var order := convoy_status()
+	if not order.can_route or not order.has_point or not order.local:
+		_stop_convoy_course()
+		return
+	var contact: Vector3 = order.point
+	var drift: Vector3 = order.point_velocity
+	var radial := contact.direction_to(position)
+	var escort: bool = order.kind == "escort"
+	if escort and drift.length_squared() > 0.25:
+		radial = -drift.normalized()
+	if radial.is_zero_approx():
+		radial = Vector3.BACK
+	var spacing := CONVOY_ESCORT_SPACING if escort else CONVOY_AIM_SPACING
+	var slot := contact + radial * spacing
+	var waypoint := _star_detour(slot)
+	var obstacle := _transit_obstacle(waypoint - position, CONVOY_CRUISE_SPEED, false)
+	if obstacle >= 0:
+		waypoint = _transit_waypoint(obstacle, waypoint - position)
+	var detouring := waypoint != slot
+	var course := position.direction_to(waypoint)
+	var aim := position.direction_to(contact) if not detouring and order.distance <= 350.0 else course
+	if not aim.is_zero_approx():
+		_point_towards(aim, delta)
+	var cruise := CONVOY_CRUISE_SPEED if ship.fuel > 0.0 else RESERVE_SPEED
+	var speed_limit := minf(cruise, position.distance_to(waypoint) * 0.56)
+	var desired := course * speed_limit
+	if not detouring:
+		desired += drift
+	velocity = velocity.move_toward(desired.limit_length(cruise), 42.0 * delta)
+	throttle = speed_limit / MAX_SPEED
+
+
 func _transit_obstacle(course: Vector3, cruise: float, skip_target := true) -> int:
 	var star := Catalog.star_for(system_id)
 	var speed_limit := cruise if ship.fuel > 0.0 else minf(cruise, RESERVE_SPEED)
@@ -1382,6 +1513,7 @@ func snapshot() -> Dictionary:
 		"ship": ship.snapshot(), "market": market.snapshot(), "system_id": system_id, "jump_target": jump_target,
 		"patrol": patrol.snapshot(), "star_heat": star_heat,
 		"expedition": expedition.snapshot(), "factions": factions.snapshot(),
+		"convoy_order": convoy_order.snapshot(),
 	}
 
 
@@ -1389,6 +1521,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_convoy_orders := schema < 12
 	var pre_thermal := schema < 11
 	var pre_expansion := schema < 10
 	var pre_traffic := schema < 9
@@ -1445,12 +1578,15 @@ func restore(state: Dictionary) -> bool:
 		return false
 	var restored_expedition := Expedition.new()
 	var restored_factions := FactionFronts.new()
+	var restored_convoy_order := ConvoyOrders.new()
 	if not pre_expansion:
-		if not restored_expedition.restore(state.get("expedition")) or not restored_factions.restore(state.get("factions"), pre_thermal):
+		if not restored_expedition.restore(state.get("expedition")) or not restored_factions.restore(state.get("factions"), pre_thermal, pre_convoy_orders):
 			return false
 		for system in range(Catalog.CORE_SYSTEM_COUNT, Catalog.SYSTEM_COUNT):
 			if restored_expedition.commissioned(system) != (restored_factions.owner(system) >= 0):
 				return false
+	if not pre_convoy_orders and not restored_convoy_order.restore(state.get("convoy_order"), restored_factions, restored_expedition):
+		return false
 	if not restored_expedition.known(restored_system) or (restored_jump >= 0 and not restored_expedition.known(restored_jump)):
 		return false
 	if not _site_available(int(state.target), restored_expedition):
@@ -1579,6 +1715,7 @@ func restore(state: Dictionary) -> bool:
 	patrol = restored_patrol
 	expedition = restored_expedition
 	factions = restored_factions
+	convoy_order = restored_convoy_order
 	star_heat = 0.0 if pre_thermal else float(state.star_heat)
 	scooping = false
 	system_id = restored_system

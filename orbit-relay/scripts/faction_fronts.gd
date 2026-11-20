@@ -55,6 +55,35 @@ func active_convoys(system: int) -> Array[Dictionary]:
 	return convoys
 
 
+func convoy(system: int, id: String) -> Dictionary:
+	return _find_convoy(system, id).duplicate()
+
+
+func escort_convoy(system: int, id: String, sponsor_faction: int) -> bool:
+	var shipment := _find_convoy(system, id)
+	if shipment.is_empty() or shipment.stage != "en_route" or shipment.assistance != "none" or shipment.faction != sponsor_faction:
+		return false
+	shipment.assistance = "escort"
+	return true
+
+
+func intercept_convoy(system: int, id: String, sponsor_faction: int) -> Dictionary:
+	var shipment := _find_convoy(system, id)
+	if shipment.is_empty() or shipment.stage != "en_route" or shipment.assistance != "none" or shipment.faction != 1 - sponsor_faction:
+		return {}
+	shipment.assistance = "intercept"
+	return _finish_convoy(shipment, system, false)
+
+
+func _find_convoy(system: int, id: String) -> Dictionary:
+	var index := FRONTIER_SYSTEMS.find(system)
+	if index >= 0:
+		for shipment: Dictionary in _frontiers[index].convoys:
+			if shipment.id == id:
+				return shipment
+	return {}
+
+
 func news() -> Array[String]:
 	return _news.duplicate()
 
@@ -138,7 +167,7 @@ func snapshot() -> Dictionary:
 	return {"frontiers": _frontiers.duplicate(true), "news": _news.duplicate()}
 
 
-func restore(payload: Variant, legacy_convoys := false) -> bool:
+func restore(payload: Variant, legacy_convoys := false, pre_assistance := false) -> bool:
 	if not payload is Dictionary or payload.size() != 2:
 		return false
 	var records: Variant = payload.get("frontiers")
@@ -148,7 +177,7 @@ func restore(payload: Variant, legacy_convoys := false) -> bool:
 	var restored_frontiers: Array[Dictionary] = []
 	for index in range(records.size()):
 		var record: Variant = records[index]
-		if not _valid_record(record, FRONTIER_SYSTEMS[index], legacy_convoys):
+		if not _valid_record(record, FRONTIER_SYSTEMS[index], legacy_convoys, pre_assistance):
 			return false
 		var legacy_round: bool = record.stage == "war" if legacy_convoys else record.legacy_round
 		var restored := {"owner": int(record.owner), "stage": record.stage,
@@ -158,6 +187,8 @@ func restore(payload: Variant, legacy_convoys := false) -> bool:
 			_dispatch_convoys(restored, FRONTIER_SYSTEMS[index])
 			for slot in range(restored.convoys.size()):
 				restored.convoys[slot].stage = record.convoys[slot].stage
+				if not pre_assistance:
+					restored.convoys[slot].assistance = record.convoys[slot].assistance
 		restored_frontiers.append(restored)
 	var restored_news: Array[String] = []
 	for report in reports:
@@ -194,25 +225,38 @@ static func _convoy(frontier: Dictionary, system: int, faction: int, launched_at
 	var units := 3 + (system * 13 + campaign * 7 + turn * 3 + faction * 2) % 5
 	return {"id": "front-%d-%d-%d-%d" % [system, campaign, turn, faction], "faction": faction,
 		"stage": "en_route", "launched_at": launched_at, "due_at": launched_at + duration,
-		"shipment": SHIPMENTS[faction], "units": units}
+		"shipment": SHIPMENTS[faction], "units": units, "assistance": "none"}
 
 
 func _resolve_convoy(frontier: Dictionary, convoy: Dictionary, system: int) -> Dictionary:
 	var faction: int = convoy.faction
-	var opposition := 1 - faction
 	var campaign: int = frontier.campaign
 	var turn: int = frontier.round
 	var escort := _holdings(faction) + (system * 11 + campaign * 7 + turn * 11 + faction * 3) % 17
-	var blockade := _holdings(opposition) + (system * 5 + campaign * 11 + turn * 3 + faction * 5) % 17
+	var blockade := _holdings(1 - faction) + (system * 5 + campaign * 11 + turn * 3 + faction * 5) % 17
+	return _finish_convoy(convoy, system, convoy.assistance == "escort" or escort + 3 >= blockade)
+
+
+func _finish_convoy(convoy: Dictionary, system: int, delivered: bool) -> Dictionary:
+	var faction: int = convoy.faction
+	var name := _system_name(system)
 	var cargo := "«%s», %d ед." % [str(convoy.shipment).to_lower(), convoy.units]
-	if escort + 3 >= blockade:
+	if delivered:
 		convoy.stage = "delivered"
+		if convoy.assistance == "escort":
+			return _event("war_convoy_delivered", "С вашей охраной конвой фракции «%s» доставил снабжение в систему «%s». Груз %s" % [
+				faction_name(faction), name, cargo,
+			])
 		return _event("war_convoy_delivered", "Конвой фракции «%s» доставил снабжение в систему «%s». Груз %s" % [
-			faction_name(faction), _system_name(system), cargo,
+			faction_name(faction), name, cargo,
 		])
 	convoy.stage = "intercepted"
+	if convoy.assistance == "intercept":
+		return _event("war_convoy_intercepted", "Вы сорвали поставку фракции «%s» в системе «%s». Потерян груз %s" % [
+			faction_name(faction), name, cargo,
+		])
 	return _event("war_convoy_intercepted", "Фракция «%s» перехватила конвой фракции «%s» в системе «%s». Потерян груз %s" % [
-		faction_name(opposition), faction_name(faction), _system_name(system), cargo,
+		faction_name(1 - faction), faction_name(faction), name, cargo,
 	])
 
 
@@ -269,7 +313,7 @@ static func _new_frontier() -> Dictionary:
 		"round": 0, "campaign": 0, "convoys": [], "legacy_round": false}
 
 
-static func _valid_record(record: Variant, system: int, legacy_convoys: bool) -> bool:
+static func _valid_record(record: Variant, system: int, legacy_convoys: bool, pre_assistance: bool) -> bool:
 	var expected_fields := RECORD_FIELDS.size() if legacy_convoys else RECORD_FIELDS.size() + 2
 	if not record is Dictionary or record.size() != expected_fields or not record.has_all(RECORD_FIELDS):
 		return false
@@ -281,7 +325,7 @@ static func _valid_record(record: Variant, system: int, legacy_convoys: bool) ->
 		return false
 	if not _integer(record.campaign, 0, MAX_CAMPAIGNS) or not _number(record.next_at, 0.0, MAX_ORBIT_CLOCK + TRUCE_SECONDS):
 		return false
-	if not legacy_convoys and not _valid_convoys(record, system):
+	if not legacy_convoys and not _valid_convoys(record, system, pre_assistance):
 		return false
 	if record.stage == "neutral":
 		return record.owner == -1 and record.challenger == -1 and record.pressure == 0 and record.round == 0 \
@@ -293,7 +337,7 @@ static func _valid_record(record: Variant, system: int, legacy_convoys: bool) ->
 	return record.challenger == 1 - int(record.owner) and record.campaign > 0 and (record.round > 0 or record.pressure == 16)
 
 
-static func _valid_convoys(frontier: Dictionary, system: int) -> bool:
+static func _valid_convoys(frontier: Dictionary, system: int, pre_assistance: bool) -> bool:
 	var convoys: Variant = frontier.get("convoys")
 	var legacy_round: Variant = frontier.get("legacy_round")
 	if not convoys is Array or not legacy_round is bool:
@@ -305,13 +349,16 @@ static func _valid_convoys(frontier: Dictionary, system: int) -> bool:
 	if convoys.size() != 2 or frontier.owner < 0 or frontier.challenger < 0 or frontier.next_at < ROUND_SECONDS:
 		return false
 	var launched_at := float(frontier.next_at) - ROUND_SECONDS
-	return _valid_convoy(convoys[0], _convoy(frontier, system, int(frontier.challenger), launched_at, ATTACK_CONVOY_SECONDS)) \
-		and _valid_convoy(convoys[1], _convoy(frontier, system, int(frontier.owner), launched_at, DEFENCE_CONVOY_SECONDS)) \
-		and (convoys[1].stage == "en_route" or convoys[0].stage != "en_route")
+	var attacker := _convoy(frontier, system, int(frontier.challenger), launched_at, ATTACK_CONVOY_SECONDS)
+	var defender := _convoy(frontier, system, int(frontier.owner), launched_at, DEFENCE_CONVOY_SECONDS)
+	return _valid_convoy(convoys[0], attacker, pre_assistance) and _valid_convoy(convoys[1], defender, pre_assistance) \
+		and (convoys[1].stage == "en_route" or convoys[0].stage != "en_route" \
+			or (not pre_assistance and convoys[1].assistance == "intercept"))
 
 
-static func _valid_convoy(convoy: Variant, expected: Dictionary) -> bool:
-	if not convoy is Dictionary or convoy.size() != CONVOY_FIELDS.size() or not convoy.has_all(CONVOY_FIELDS):
+static func _valid_convoy(convoy: Variant, expected: Dictionary, pre_assistance: bool) -> bool:
+	var field_count := CONVOY_FIELDS.size() if pre_assistance else CONVOY_FIELDS.size() + 1
+	if not convoy is Dictionary or convoy.size() != field_count or not convoy.has_all(CONVOY_FIELDS):
 		return false
 	if not convoy.stage is String or convoy.stage not in ["en_route", "delivered", "intercepted"]:
 		return false
@@ -319,6 +366,12 @@ static func _valid_convoy(convoy: Variant, expected: Dictionary) -> bool:
 		return false
 	if not _number(convoy.launched_at, 0.0, MAX_ORBIT_CLOCK) or not _number(convoy.due_at, 0.0, MAX_ORBIT_CLOCK + ROUND_SECONDS):
 		return false
+	if not pre_assistance:
+		var assistance: Variant = convoy.get("assistance")
+		if not assistance is String or assistance not in ["none", "escort", "intercept"]:
+			return false
+		if (assistance == "escort" and convoy.stage == "intercepted") or (assistance == "intercept" and convoy.stage != "intercepted"):
+			return false
 	return convoy.id is String and convoy.id == expected.id and convoy.shipment is String and convoy.shipment == expected.shipment \
 		and absf(float(convoy.launched_at) - float(expected.launched_at)) < 0.00001 \
 		and absf(float(convoy.due_at) - float(expected.due_at)) < 0.00001

@@ -75,6 +75,7 @@ func _ready() -> void:
 	add_child(_frontier)
 	_frontier.build()
 	_frontier.project_requested.connect(_project_action)
+	_frontier.convoy_requested.connect(_convoy_action)
 	_frontier.dismissed.connect(_close_frontier)
 	_build_report_panel()
 	_apply_presentation()
@@ -113,11 +114,15 @@ func _update_display(delta: float) -> void:
 	var project_marker: bool = flight.project_course and project.has_point
 	if project_marker:
 		marker = project.point
+	var convoy := flight.convoy_status()
+	var convoy_marker: bool = flight.convoy_course and convoy.has_point
+	if convoy_marker:
+		marker = convoy.point
 	var instruments_visible := flight.docked < 0 and not flight.landed and not _overlay_open() and flight.jump_seconds_left <= 0.0
 	var in_view := instruments_visible and not _view.camera.is_position_behind(marker)
 	if patrol_status.phase == Flight.Patrol.ENGAGED and patrol_status.same_system:
 		in_view = false
-	elif in_view and not flight.autopilot and not signal_selected and not project_marker:
+	elif in_view and not flight.autopilot and not signal_selected and not project_marker and not convoy_marker:
 		var surface := flight.surface_status()
 		in_view = not surface.near or surface.pad
 	_hud.set_target_marker(_view.camera.unproject_position(marker) if in_view else Vector2.ZERO, in_view)
@@ -153,6 +158,8 @@ func _handle_action(action: String) -> void:
 			flight.contract_action()
 		"patrol":
 			flight.patrol_action()
+		"convoy":
+			flight.convoy_action()
 		"fire":
 			flight.fire_action()
 		"mine":
@@ -211,6 +218,7 @@ func _deliver_notice() -> void:
 		return
 	var event := flight.status_event
 	var touchdown := flight.landing_direction
+	var convoy := flight.convoy_status()
 	_io.trace(event, {
 		"docked": flight.docked, "landed_site": flight.landed_site, "target": flight.target,
 		"planned_target": flight.planned_target, "speed": flight.speed(), "credits": flight.credits,
@@ -218,6 +226,7 @@ func _deliver_notice() -> void:
 		"fuel": flight.ship.fuel, "scooping": flight.scooping, "star_heat": flight.star_heat,
 		"hull": flight.ship.hull, "contract_route": flight.contract_route_id, "contract_leg": flight.contract_leg,
 		"patrol_phase": flight.patrol.phase, "patrol_origin": flight.patrol.origin,
+		"convoy_id": convoy.id, "convoy_order_phase": convoy.phase, "convoy_order_kind": convoy.kind,
 		"faction": flight.factions.owner(flight.system_id),
 		"system_id": flight.system_id, "jump_target": flight.jump_target,
 		"orbit_time": flight.orbit_time, "time_scale": flight.time_scale,
@@ -234,6 +243,8 @@ func _deliver_notice() -> void:
 		"patrol_accepted", "patrol_engaged", "patrol_fire", "patrol_enemy_hit", "patrol_retreat", "patrol_victory", "patrol_paid",
 		"expedition_accepted", "expedition_survey", "expedition_report", "expedition_supply", "expedition_complete", "expedition_course",
 		"war_declared", "war_round", "war_captured", "war_repulsed", "war_convoy_delivered", "war_convoy_intercepted",
+		"convoy_order_accepted", "convoy_order_escorted", "convoy_order_failed", "convoy_order_paid",
+		"convoy_order_fire", "convoy_order_enemy_hit",
 	]:
 		_save()
 
@@ -290,7 +301,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_T: "target", KEY_F: "autopilot", KEY_R: "throttle_up", KEY_V: "throttle_down",
 		KEY_ENTER: "dock", KEY_M: "contract", KEY_G: "mine", KEY_B: "sell_ore", KEY_F8: "report",
 		KEY_N: "map", KEY_J: "galaxy", KEY_K: "scoop", KEY_P: "services", KEY_O: "time", KEY_L: "market",
-		KEY_U: "patrol", KEY_X: "fire",
+		KEY_U: "patrol", KEY_X: "fire", KEY_I: "convoy",
 		KEY_F2: "settings", KEY_F3: "journal", KEY_F4: "frontier",
 	}
 	if actions.has(event.physical_keycode):
@@ -550,6 +561,17 @@ func _project_action() -> void:
 		if routed:
 			_close_frontier()
 		_update_display(0.0)
+	_frontier.refresh()
+
+
+func _convoy_action(system: int, id: String) -> void:
+	if not _frontier.is_open() or not flight.convoy_action(system, id):
+		return
+	var routed := id.is_empty() and flight.status_event in ["convoy_order_course", "jump_planned"]
+	_deliver_notice()
+	if routed:
+		_close_frontier()
+	_update_display(0.0)
 	_frontier.refresh()
 
 

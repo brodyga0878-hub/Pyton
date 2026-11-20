@@ -10,6 +10,7 @@ const Patrol := preload("res://scripts/patrol_encounter.gd")
 const TEXT := Color("e8f4fa")
 const MUTED := Color("a5bac7")
 const MINT := Color("9debd7")
+const INTERCEPT := Color("ffb18e")
 const BORDER := Color("365561")
 
 var _sheet: Control
@@ -17,6 +18,9 @@ var _insets: MarginContainer
 var _chart: SectorChart
 var _title: Label
 var _here: Label
+var _convoy_order: VBoxContainer
+var _convoy_name: Label
+var _convoy_info: Label
 var _detail_title: Label
 var _detail: Label
 var _close_button: Button
@@ -82,6 +86,15 @@ func build() -> void:
 		for id: int in Sector.mines_for(system_id):
 			_add_site(list, id)
 		_add_site(list, Sector.star_for(system_id))
+	_convoy_order = VBoxContainer.new()
+	_convoy_order.add_theme_constant_override("separation", 3)
+	list.add_child(_convoy_order)
+	_convoy_order.add_child(HSeparator.new())
+	_convoy_name = _label(_convoy_order, "", 19, MINT)
+	_convoy_name.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_convoy_info = _label(_convoy_order, "", 16, MUTED)
+	_convoy_info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_convoy_order.hide()
 	var spacer := Control.new()
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -117,6 +130,7 @@ func open(sim: RefCounted) -> void:
 	for id: int in targets:
 		_chart.centers[id] = sim.target_position(id)
 	_chart.traffic = sim.traffic_contacts()
+	_set_convoy_order(sim.convoy_status())
 	var patrol: Dictionary = sim.patrol_status()
 	if patrol.get("phase") == Patrol.OUTBOUND and patrol.get("same_system", false):
 		_chart.traffic.append({"role": "signal", "position": patrol.point})
@@ -129,6 +143,21 @@ func open(sim: RefCounted) -> void:
 		_chart.active_site = targets[0] if not targets.is_empty() else -1
 	show()
 	_select_site(_chart.active_site)
+
+
+func _set_convoy_order(order: Dictionary) -> void:
+	_convoy_order.visible = order.get("active", false) and order.get("local", false) and order.get("has_point", false)
+	_chart.order_convoy = str(order.id) if _convoy_order.visible else ""
+	if not _convoy_order.visible:
+		return
+	var intercept: bool = order.kind == "intercept"
+	_chart.order_color = INTERCEPT if intercept else MINT
+	_convoy_name.add_theme_color_override("font_color", _chart.order_color)
+	_convoy_name.text = str(order.name)
+	var objective := "Перехват" if intercept else ("Под охраной" if order.phase == "escorted" else "Сопровождение")
+	var remaining := maxi(0, ceili(float(order.remaining)))
+	var time := "%d:%02d" % [floori(remaining / 60.0), remaining % 60]
+	_convoy_info.text = "%s · %s\nДо цели %s" % [objective, time, _distance_label(float(order.distance))]
 
 
 func close() -> void:
@@ -340,6 +369,8 @@ class SectorChart extends Control:
 	var orbit := PackedVector3Array()
 	var orbit_caption := ""
 	var traffic: Array[Dictionary] = []
+	var order_convoy := ""
+	var order_color := MINT
 
 	func _ready() -> void:
 		clip_contents = true
@@ -429,7 +460,7 @@ class SectorChart extends Control:
 			var swatch := legend.position + Vector2(6, 12)
 			draw_line(swatch, swatch + Vector2(20, 0), ORBIT_COLOR, 1.7, true)
 			draw_string(font, legend.position + Vector2(32, 17), orbit_caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, MUTED)
-		_draw_traffic(font, plot, bounds, label_boxes)
+		_draw_traffic(font, plot, bounds, ship, label_boxes)
 		for center: Vector3 in centers.values():
 			var point := _project(center, plot, bounds)
 			label_boxes.append(Rect2(point - Vector2(15, 15), Vector2(30, 30)))
@@ -460,9 +491,15 @@ class SectorChart extends Control:
 			else:
 				draw_colored_polygon(PackedVector2Array([marker + Vector2(-8, 3), marker + Vector2(-3, -8), marker + Vector2(7, -3), marker + Vector2(6, 7)]), tint)
 			_draw_site_label(font, str(entry.name), marker, label_boxes)
+		if not order_convoy.is_empty():
+			for contact: Dictionary in traffic:
+				if contact.get("id", "") == order_convoy:
+					var point := _project(contact.position, plot, bounds)
+					_draw_site_label(font, str(contact.name), point, label_boxes)
+					break
 		draw_colored_polygon(PackedVector2Array([ship + Vector2(0, -7), ship + Vector2(6, 5), ship + Vector2(0, 3), ship + Vector2(-6, 5)]), TEXT)
 
-	func _draw_traffic(font: Font, plot: Rect2, bounds: Rect2, label_boxes: Array[Rect2]) -> void:
+	func _draw_traffic(font: Font, plot: Rect2, bounds: Rect2, ship: Vector2, label_boxes: Array[Rect2]) -> void:
 		var roles: Dictionary[String, String] = {
 			"trader": "Торговец", "patrol": "Патруль", "raider": "Рейдер", "signal": "Сигнал",
 			"convoy": "Конвой", "worksite": "Стройплощадка",
@@ -475,7 +512,12 @@ class SectorChart extends Control:
 				continue
 			if contact.role == "convoy":
 				var arrival := _project(contact.route_end, plot, bounds)
-				_draw_course(point, arrival, Color("ffd08191"), 1.3)
+				if contact.id == order_convoy:
+					_draw_course(ship, point, order_color, 1.8)
+					_draw_course(point, arrival, Color(order_color, 0.66), 1.5)
+					draw_arc(point, 13.0, 0.0, TAU, 24, order_color, 1.7, true)
+				else:
+					_draw_course(point, arrival, Color("ffd08191"), 1.3)
 			_draw_contact(point, contact.role)
 			if not visible_roles.has(contact.role):
 				visible_roles.append(contact.role)

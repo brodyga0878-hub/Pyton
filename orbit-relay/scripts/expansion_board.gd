@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 signal project_requested()
+signal convoy_requested(system: int, id: String)
 signal dismissed()
 
 const Sector = preload("res://scripts/sector_catalog.gd")
@@ -14,10 +15,13 @@ const ALERT := Color("ffa79e")
 const BORDER := Color("355360")
 const STAGES := ["Принять заказ", "Обследовать систему", "Сдать отчёт", "Снабдить стройку"]
 const NEWS_LIMIT := 3
+const OFFER_LIMIT := 4
 
 var _sim: RefCounted
 var _insets: MarginContainer
 var _location: Label
+var _project_panel: VBoxContainer
+var _project_tab: Button
 var _project_title: Label
 var _issuer: Label
 var _reward: Label
@@ -26,12 +30,21 @@ var _supplies: VBoxContainer
 var _materials: Array[Label] = []
 var _reason: Label
 var _project_button: Button
+var _convoy_tab: Button
+var _convoy_orders: VBoxContainer
+var _convoy_title: Label
+var _convoy_info: Label
+var _convoy_briefing: Label
+var _convoy_route: Button
+var _convoy_offers: Array = []
+var _offer_rows: Array[Dictionary] = []
 var _close_button: Button
 var _systems: Array[Dictionary] = []
 var _convoy_panel: VBoxContainer
 var _convoys: Array[Label] = []
 var _news_scroll: ScrollContainer
 var _news: Array[Label] = []
+var _touch_buttons: Array[Button] = []
 var _touches: Dictionary[int, Button] = {}
 var _news_finger := -1
 
@@ -57,6 +70,7 @@ func build() -> void:
 	_close_button = _button(header, "Закрыть")
 	_close_button.custom_minimum_size.x = 128.0
 	_close_button.pressed.connect(func() -> void: dismissed.emit())
+	_touch_buttons.append(_close_button)
 	var body := HBoxContainer.new()
 	body.add_theme_constant_override("separation", 16)
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -86,6 +100,7 @@ func refresh() -> void:
 	var status: Dictionary = _sim.frontier_status()
 	_location.text = "Система «%s»" % Sector.system(_sim.system_id).name
 	_refresh_project(status)
+	_refresh_convoy_orders()
 	_refresh_fronts(status)
 
 
@@ -102,6 +117,37 @@ func is_open() -> bool:
 
 func _build_project(body: HBoxContainer) -> void:
 	var card := _card(body, 458.0)
+	var tabs := HBoxContainer.new()
+	tabs.add_theme_constant_override("separation", 8)
+	card.add_child(tabs)
+	_project_tab = _tab(tabs, "Экспедиция", false)
+	_convoy_tab = _tab(tabs, "Заказы конвоев", true)
+	_project_panel = _column(card, 10)
+	_project_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_build_expedition(_project_panel)
+	_build_convoy_orders(card)
+	_show_section(false)
+
+
+func _tab(parent: HBoxContainer, caption: String, convoy: bool) -> Button:
+	var button := _button(parent, caption)
+	button.custom_minimum_size.y = 48.0
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.toggle_mode = true
+	button.pressed.connect(_show_section.bind(convoy))
+	_touch_buttons.append(button)
+	return button
+
+
+func _show_section(convoy: bool) -> void:
+	_project_tab.set_pressed_no_signal(not convoy)
+	_convoy_tab.set_pressed_no_signal(convoy)
+	_project_panel.visible = not convoy
+	_convoy_orders.visible = convoy
+	_touches.clear()
+
+
+func _build_expedition(card: VBoxContainer) -> void:
 	_project_title = _label(card, "", 29, INK)
 	_issuer = _label(card, "", 17, MUTED)
 	_reward = _label(card, "", 16, MINT)
@@ -119,6 +165,25 @@ func _build_project(body: HBoxContainer) -> void:
 	_reason = _label(card, "", 18, INK)
 	_project_button = _button(card, "")
 	_project_button.pressed.connect(_request_project)
+	_touch_buttons.append(_project_button)
+
+
+func _build_convoy_orders(card: VBoxContainer) -> void:
+	_convoy_orders = _column(card, 11)
+	_convoy_orders.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_convoy_title = _label(_convoy_orders, "", 27, INK)
+	_convoy_info = _label(_convoy_orders, "", 17, MINT)
+	_convoy_briefing = _label(_convoy_orders, "", 17, MUTED)
+	for index in range(OFFER_LIMIT):
+		var row := _column(_convoy_orders, 4)
+		var details := _label(row, "", 16, MUTED)
+		var take := _button(row, "")
+		take.pressed.connect(_take_convoy.bind(index))
+		_touch_buttons.append(take)
+		_offer_rows.append({"row": row, "details": details, "button": take})
+	_convoy_route = _button(_convoy_orders, "")
+	_convoy_route.pressed.connect(_route_convoy)
+	_touch_buttons.append(_convoy_route)
 
 
 func _build_fronts(body: HBoxContainer) -> void:
@@ -213,6 +278,58 @@ func _refresh_project(status: Dictionary) -> void:
 	)
 
 
+func _refresh_convoy_orders() -> void:
+	var mission: Dictionary = _sim.convoy_status()
+	var active: bool = mission.active
+	var finished: bool = mission.phase in ["succeeded", "failed"]
+	_convoy_offers = _sim.convoy_offers() if not active and _sim.docked >= 0 else []
+	_convoy_title.text = "Заказы фракций"
+	_convoy_info.visible = active or finished
+	_convoy_info.text = ""
+	_convoy_info.add_theme_color_override("font_color", ALERT if mission.phase == "failed" else MINT)
+	_convoy_route.visible = active and mission.phase != "escorted"
+	if active:
+		_convoy_title.text = "%s · %s" % [_convoy_kind(mission.kind), mission.name]
+		_convoy_info.text = "%s · %d кр. · Осталось %s" % [
+			Sector.system(mission.system).name, mission.reward, _remaining(mission.remaining),
+		]
+		_convoy_briefing.text = str(mission.reason)
+		if mission.local:
+			_convoy_route.text = "Отключить помощь" if _sim.convoy_course else "К цели заказа"
+		else:
+			_convoy_route.text = "Проложить прыжок"
+		_convoy_route.disabled = not mission.can_route
+	else:
+		if finished:
+			_convoy_info.text = str(mission.reason)
+		if _sim.docked < 0:
+			_convoy_briefing.text = "Пришвартуйтесь к действующему порту, чтобы принять заказ фракции."
+		elif _convoy_offers.is_empty():
+			_convoy_briefing.text = "В этом порту сейчас нет заказов. Они появляются, пока на рубежах идут боевые поставки."
+		else:
+			var sponsor: Dictionary = _convoy_offers[0]
+			_convoy_briefing.text = "%s · «%s»" % [Factions.faction_name(sponsor.faction), _sim.target_name(sponsor.port)]
+	for index in range(_offer_rows.size()):
+		var row := _offer_rows[index]
+		row.row.visible = index < _convoy_offers.size()
+		if not row.row.visible:
+			continue
+		var offer: Dictionary = _convoy_offers[index]
+		row.details.text = "%s · «%s» · До прибытия %s" % [
+			offer.name, Sector.system(offer.system).name, _remaining(float(offer.deadline) - _sim.orbit_time),
+		]
+		row.button.text = "Взять · %s · %d кр." % [_convoy_kind(offer.kind), offer.reward]
+
+
+static func _convoy_kind(kind: String) -> String:
+	return "Сопровождение" if kind == "escort" else "Перехват"
+
+
+static func _remaining(time: float) -> String:
+	var seconds := maxi(0, ceili(time))
+	return "%d:%02d" % [floori(seconds / 60.0), seconds % 60]
+
+
 func _refresh_fronts(status: Dictionary) -> void:
 	var convoy_count := 0
 	for id in range(_systems.size()):
@@ -262,9 +379,23 @@ func _sync_convoy(line: Label, system: int, convoy: Dictionary) -> void:
 
 
 func _request_project() -> void:
-	if is_open() and _project_button.visible and not _project_button.disabled:
+	if is_open() and _project_button.is_visible_in_tree() and not _project_button.disabled:
 		_touches.clear()
 		project_requested.emit()
+
+
+func _take_convoy(index: int) -> void:
+	if not is_open() or not _convoy_orders.visible or index >= _convoy_offers.size():
+		return
+	var offer: Dictionary = _convoy_offers[index]
+	_touches.clear()
+	convoy_requested.emit(offer.system, offer.id)
+
+
+func _route_convoy() -> void:
+	if is_open() and _convoy_route.is_visible_in_tree() and not _convoy_route.disabled:
+		_touches.clear()
+		convoy_requested.emit(-1, "")
 
 
 func _input(event: InputEvent) -> void:
@@ -282,7 +413,7 @@ func _input(event: InputEvent) -> void:
 					_touches[event.index] = hit
 				elif _news_finger < 0 and _news_scroll.get_v_scroll_bar().visible and _news_scroll.get_global_rect().has_point(event.position):
 					_news_finger = event.index
-			elif button != null and button.visible and not button.disabled and button.get_global_rect().has_point(event.position):
+			elif button != null and button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(event.position):
 				button.pressed.emit()
 		get_viewport().set_input_as_handled()
 	elif event is InputEventScreenDrag:
@@ -296,8 +427,8 @@ func _input(event: InputEvent) -> void:
 
 
 func _button_at(point: Vector2) -> Button:
-	for button: Button in [_close_button, _project_button]:
-		if button.visible and not button.disabled and button.get_global_rect().has_point(point):
+	for button: Button in _touch_buttons:
+		if button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(point):
 			return button
 	return null
 

@@ -62,6 +62,7 @@ var _mining_blocked := false
 var _scoop_blocked := false
 var _time_blocked := false
 var _patrol_blocked := false
+var _convoy_blocked := false
 var _fire_blocked := false
 var _jumping := false
 var _notice_left := 0.0
@@ -207,6 +208,7 @@ func build() -> void:
 	_button(_port_tools, "market", "Биржа")
 	_button(_port_tools, "services", "Сервис")
 	_button(_port_tools, "patrol", "Дозор")
+	_button(_port_tools, "convoy", "К конвою")
 	_button(_port_tools, "fire", "Огонь")
 	var fire_button: Button = _actions["fire"]
 	fire_button.size_flags_stretch_ratio = 1.35
@@ -245,17 +247,30 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_actions["autopilot"].visible = not parked
 	_actions["services"].visible = docked
 	_actions["market"].visible = docked
+	var patrol_fight: bool = patrol.get("phase") == Patrol.ENGAGED and patrol.get("same_system", false)
+	var convoy: Dictionary = {}
+	if not parked and not _jumping and not patrol_fight:
+		var mission: Dictionary = sim.convoy_status()
+		if mission.active and mission.local:
+			convoy = mission
+	var convoy_button: Button = _actions["convoy"]
+	convoy_button.visible = not convoy.is_empty()
+	convoy_button.text = "Снять курс" if sim.convoy_course else "К конвою"
+	if convoy.get("phase") == "escorted":
+		convoy_button.text = "Сопровождён"
+	convoy_button.tooltip_text = str(convoy.get("reason", ""))
+	_convoy_blocked = not convoy.get("can_route", false)
 	var patrol_button: Button = _actions["patrol"]
-	patrol_button.visible = not landed and not _jumping and bool(patrol.get("visible", false))
+	patrol_button.visible = not landed and not _jumping and not convoy_button.visible and bool(patrol.get("visible", false))
 	patrol_button.text = str(patrol.get("caption", "Дозор"))
 	patrol_button.tooltip_text = str(patrol.get("reason", ""))
 	_patrol_blocked = not bool(patrol.get("available", false))
 	var fire_button: Button = _actions["fire"]
-	fire_button.visible = not parked and not _jumping and patrol.get("phase") == Patrol.ENGAGED and bool(patrol.get("same_system", false))
+	fire_button.visible = not parked and not _jumping and (patrol_fight or convoy.get("fire_visible", false))
 	var fire: Dictionary = sim.fire_status() if fire_button.visible else {}
 	fire_button.tooltip_text = str(fire.get("reason", ""))
 	_fire_blocked = not fire.get("ok", false)
-	var encounter_tools := patrol_button.visible or fire_button.visible
+	var encounter_tools := patrol_button.visible or convoy_button.visible or fire_button.visible
 	_port_tools.visible = docked or encounter_tools
 	_right_panel.offset_top = -157.0 if docked else (-101.0 if landed else (-274.0 if encounter_tools else -215.0))
 	_marks.flight = not parked
@@ -313,7 +328,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 		if sim.contract_stage != 1 and patrol.get("phase") in [Patrol.OUTBOUND, Patrol.RETURN] and patrol_button.visible:
 			_guidance.text = str(patrol.get("reason", ""))
 	else:
-		_sync_flight(sim, scoop_status, itinerary, patrol, fire)
+		_sync_flight(sim, scoop_status, itinerary, patrol, fire, convoy)
 	_sync_thermal({} if parked else sim.thermal_status(), sim.scooping)
 	if _notice_left > 0.0:
 		_notice_left -= delta
@@ -437,9 +452,10 @@ func _sync_surface(sim: RefCounted, mining: RefCounted) -> void:
 			else:
 				_guidance.text = "Разверните добывающий модуль."
 
-func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictionary, patrol: Dictionary, fire: Dictionary) -> void:
+func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictionary, patrol: Dictionary, fire: Dictionary, convoy: Dictionary) -> void:
 	var project_course := bool(sim.get("project_course"))
-	var aimed_at_port := Sector.is_port(sim.target) and fire.is_empty() and not bool(sim.patrol_course) and not project_course
+	var convoy_course: bool = sim.convoy_course
+	var aimed_at_port := Sector.is_port(sim.target) and fire.is_empty() and not bool(sim.patrol_course) and not project_course and not convoy_course
 	var surface: Dictionary = sim.surface_status() if Sector.is_mine_site(sim.target) else {}
 	var near_surface: bool = surface.get("near", false)
 	var to_target: Vector3 = sim.target_position(sim.target) - sim.position
@@ -471,10 +487,12 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 		_route.text = "Прыжок  /  %s" % Sector.system(sim.jump_target).name
 		_route_detail.text = "До перехода %.1f с" % sim.jump_seconds_left
 		_guidance.text = "Тормоз отменяет прыжок."
-	elif not fire.is_empty():
+	elif not fire.is_empty() and convoy.is_empty():
 		_route.text = "Дозор  /  Рейдер"
 		_route_detail.text = "Дистанция %d м · корпус %d%%" % [roundi(fire.get("distance", 0.0)), ceili(patrol.get("enemy_hull", 0.0))]
 		_guidance.text = "Цель в прицеле. Нажмите «Огонь»." if fire.ok else str(fire.get("reason", ""))
+	elif not convoy.is_empty() and (convoy_course or not fire.is_empty()):
+		_sync_convoy_flight(convoy, fire)
 	elif patrol.get("phase") == Patrol.OUTBOUND and sim.patrol_course and patrol.get("same_system", false):
 		_route.text = "Дозор  /  Сигнал"
 		_route_detail.text = "До района сигнала %d м" % roundi(patrol.distance)
@@ -486,6 +504,8 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 		_guidance.text = "Авто  /  К точке экспедиции"
 	elif sim.scooping:
 		_guidance.text = "Идёт сбор топлива. Удерживайте положение."
+	elif not convoy.is_empty() and not sim.autopilot:
+		_sync_convoy_flight(convoy, fire)
 	elif scoop_status.get("near", false):
 		_guidance.text = "Зона сбора. Включите сбор топлива." if scoop_status.get("ok", false) else str(scoop_status.get("reason", ""))
 	elif sim.target == Sector.star_for(sim.system_id):
@@ -513,6 +533,21 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 		_guidance.text = "Подойдите к поверхности вручную или включите «Авто» для захода на площадку."
 	else:
 		_guidance.text = "Курс и крен справа. Тяга и тормоз слева." if _touch_mirrored else "Курс и крен слева. Тяга и тормоз справа."
+
+func _sync_convoy_flight(convoy: Dictionary, fire: Dictionary) -> void:
+	var escort: bool = convoy.kind == "escort"
+	_route.text = "%s  /  %s" % ["Эскорт" if escort else "Перехват", convoy.name]
+	var distance := roundi(convoy.distance)
+	_route_detail.text = "Дистанция %d м" % distance if distance >= 0 else ""
+	if not _route_detail.text.is_empty():
+		_route_detail.text += " · "
+	if escort:
+		_route_detail.text += "Рядом %d из %d с" % [floori(convoy.escort_time), ceili(convoy.escort_total)]
+	else:
+		_route_detail.text += "Корпус цели %d%%" % ceili(convoy.enemy_hull)
+	_guidance.text = str(convoy.reason)
+	if not fire.is_empty():
+		_guidance.text = "Цель в прицеле. Нажмите «Огонь»." if fire.ok else str(fire.get("reason", convoy.reason))
 
 func _delivery_system(sim: RefCounted) -> String:
 	var destination_system := Sector.system_of_site(sim.contract_destination)
@@ -572,7 +607,7 @@ func _refresh_disabled_actions() -> void:
 	for action: String in _actions:
 		var button: Button = _actions[action]
 		var blocked := (action == "dock" and _lift_blocked) or (action == "mine" and _mining_blocked) or (action == "scoop" and _scoop_blocked) or (action == "time" and _time_blocked)
-		blocked = blocked or (action == "patrol" and _patrol_blocked) or (action == "fire" and _fire_blocked)
+		blocked = blocked or (action == "patrol" and _patrol_blocked) or (action == "convoy" and _convoy_blocked) or (action == "fire" and _fire_blocked)
 		var during_jump := _jumping and action not in ["throttle_down", "throttle_up", "boost", "brake"]
 		button.disabled = not _input_enabled or blocked or during_jump
 
@@ -771,7 +806,7 @@ func _button(parent: Container, action: String, caption: String) -> void:
 	button.custom_minimum_size = Vector2(0, 52)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.add_theme_font_size_override("font_size", 18)
-	button.add_theme_color_override("font_color", CYAN if action in ["dock", "scoop", "contract", "mine", "sell_ore", "map", "galaxy", "market", "services", "time", "patrol"] else INK)
+	button.add_theme_color_override("font_color", CYAN if action in ["dock", "scoop", "contract", "mine", "sell_ore", "map", "galaxy", "market", "services", "time", "patrol", "convoy"] else INK)
 	button.add_theme_color_override("font_hover_color", INK)
 	button.add_theme_stylebox_override("normal", _box(Color("12313d"), LINE, 9, 7.0))
 	button.add_theme_stylebox_override("hover", _box(Color("214454"), CYAN, 9, 7.0))
