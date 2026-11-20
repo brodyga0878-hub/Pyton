@@ -8,18 +8,36 @@ const HOME_SYSTEM := 0
 const VELAR_SYSTEM := 1
 const PRE_TRAFFIC_SYSTEM_COUNT := 2
 const FRINGE_SYSTEM := PRE_TRAFFIC_SYSTEM_COUNT
-const SYSTEM_COUNT := PRE_TRAFFIC_SYSTEM_COUNT + 1
+const CORE_SYSTEM_COUNT := PRE_TRAFFIC_SYSTEM_COUNT + 1
+const HEATHER_SYSTEM := CORE_SYSTEM_COUNT
+const LIMIT_SYSTEM := HEATHER_SYSTEM + 1
+const SYSTEM_COUNT := LIMIT_SYSTEM + 1
 const PRE_SURFACE_DESTINATION_COUNT := 15
 const PRE_TRAFFIC_DESTINATION_COUNT := PRE_SURFACE_DESTINATION_COUNT + 1
-const DESTINATION_COUNT := PRE_TRAFFIC_DESTINATION_COUNT + 4
+const PRE_EXPANSION_DESTINATION_COUNT := PRE_TRAFFIC_DESTINATION_COUNT + 4
+const DESTINATION_COUNT := PRE_EXPANSION_DESTINATION_COUNT + 8
 const VELAR_STAR_ID := 14
 const TERRACE_ID := PRE_SURFACE_DESTINATION_COUNT
 const FRINGE_ARRIVAL_PORT := PRE_TRAFFIC_DESTINATION_COUNT
 const FRINGE_SECOND_PORT := FRINGE_ARRIVAL_PORT + 1
 const FRINGE_ASTEROID_ID := FRINGE_SECOND_PORT + 1
 const FRINGE_STAR_ID := FRINGE_ASTEROID_ID + 1
+const HEATHER_PORT := PRE_EXPANSION_DESTINATION_COUNT
+const HEATHER_PLANET := HEATHER_PORT + 1
+const HEATHER_MOON := HEATHER_PORT + 2
+const HEATHER_STAR := HEATHER_PORT + 3
+const LIMIT_PORT := HEATHER_PORT + 4
+const LIMIT_PLANET := LIMIT_PORT + 1
+const LIMIT_ASTEROID := LIMIT_PORT + 2
+const LIMIT_STAR := LIMIT_PORT + 3
 const JUMP_FUEL := 26
-const JUMP_COSTS := [[0, JUMP_FUEL, 36], [JUMP_FUEL, 0, 19], [36, 19, 0]]
+const JUMP_COSTS := [
+	[0, JUMP_FUEL, 36, 48, 66],
+	[JUMP_FUEL, 0, 19, 25, 42],
+	[36, 19, 0, 19, 36],
+	[48, 25, 19, 0, 18],
+	[66, 42, 36, 18, 0],
+]
 const STAR_CLEARANCE := 250.0
 const SCOOP_INNER := 268.0
 const SCOOP_OUTER := 382.0
@@ -47,6 +65,22 @@ const SYSTEMS := [
 		"ports": [FRINGE_ARRIVAL_PORT, FRINGE_SECOND_PORT],
 		"mines": [FRINGE_ASTEROID_ID], "star": FRINGE_STAR_ID,
 	},
+	{
+		"name": "Вереск", "position": Vector2(7.7, -2.5), "accent": Color("#b9e4af"),
+		"description": "Каменистый Ковыль и ледяная луна Ломь. На орбите предусмотрено место для форпоста.",
+		"arrival_port": HEATHER_PORT, "construction_port": HEATHER_PORT, "frontier": true,
+		"survey_sites": [HEATHER_PLANET, HEATHER_MOON],
+		"targets": [HEATHER_PORT, HEATHER_PLANET, HEATHER_MOON, HEATHER_STAR], "ports": [HEATHER_PORT],
+		"mines": [HEATHER_PLANET, HEATHER_MOON], "star": HEATHER_STAR,
+	},
+	{
+		"name": "Предел", "position": Vector2(10.1, -4.0), "accent": Color("#ddbfff"),
+		"description": "Скальная Северина и кристаллическая Стежка. Дальний узел рассчитан на межзвёздные рейсы.",
+		"arrival_port": LIMIT_PORT, "construction_port": LIMIT_PORT, "frontier": true,
+		"survey_sites": [LIMIT_PLANET, LIMIT_ASTEROID],
+		"targets": [LIMIT_PORT, LIMIT_PLANET, LIMIT_ASTEROID, LIMIT_STAR], "ports": [LIMIT_PORT],
+		"mines": [LIMIT_PLANET, LIMIT_ASTEROID], "star": LIMIT_STAR,
+	},
 ]
 const RESOURCES := ["ore", "crystal", "ice"]
 const SITES := [
@@ -70,6 +104,14 @@ const SITES := [
 	{"name": "Свод", "kind": "port", "center": Vector3(-950, 130, -1240), "radius": 32.0, "pad_offset": 8.0, "gate_offset": 70.0, "spin": -0.32, "angle": 1.48, "accent": Color("#8fded1")},
 	{"name": "Рубец", "kind": "asteroid", "center": Vector3(740, -210, -1170), "radius": 72.0, "pad_offset": 72.0, "gate_offset": 149.0, "seed": 269, "surface_color": Color("#74677c"), "accent": Color("#ffc5f0"), "resource": "crystal", "reserve": 180, "drill_seconds": 12.0},
 	{"name": "Кромка", "kind": "star", "center": Vector3(1720, 310, -1600), "radius": 220.0, "pad_offset": 310.0, "gate_offset": 470.0, "accent": Color("#ffc2a4")},
+	{"name": "Форпост Вереска", "kind": "port", "center": Vector3(0, 0, -160), "radius": 32.0, "pad_offset": 8.0, "gate_offset": 70.0, "spin": 0.24, "angle": 2.12, "accent": Color("#addda1")},
+	{"name": "Ковыль", "kind": "planet", "center": Vector3(950, -225, -985), "radius": 146.0, "pad_offset": 146.0, "gate_offset": 254.0, "seed": 419, "surface_color": Color("#837658"), "accent": Color("#dcc386"), "resource": "ore", "reserve": 276, "drill_seconds": 14.0},
+	{"name": "Ломь", "kind": "moon", "center": Vector3(1580, 90, -1670), "radius": 78.0, "pad_offset": 78.0, "gate_offset": 153.0, "seed": 427, "surface_color": Color("#739b9f"), "accent": Color("#a0e8d9"), "resource": "ice", "reserve": 168, "drill_seconds": 9.0},
+	{"name": "Вереск", "kind": "star", "center": Vector3(2350, 160, -1650), "radius": 220.0, "pad_offset": 310.0, "gate_offset": 470.0, "accent": Color("#b9e4af")},
+	{"name": "Дальний узел", "kind": "port", "center": Vector3(0, 0, -160), "radius": 32.0, "pad_offset": 8.0, "gate_offset": 70.0, "spin": -0.19, "angle": 1.1, "accent": Color("#d5bbf3")},
+	{"name": "Северина", "kind": "planet", "center": Vector3(860, -250, -1050), "radius": 143.0, "pad_offset": 143.0, "gate_offset": 257.0, "seed": 503, "surface_color": Color("#766b8f"), "accent": Color("#cbc2f5"), "resource": "ore", "reserve": 252, "drill_seconds": 13.0},
+	{"name": "Стежка", "kind": "asteroid", "center": Vector3(1490, 110, -1800), "radius": 67.0, "pad_offset": 67.0, "gate_offset": 143.0, "seed": 509, "surface_color": Color("#71697e"), "accent": Color("#e5b9fa"), "resource": "crystal", "reserve": 216, "drill_seconds": 15.0},
+	{"name": "Предел", "kind": "star", "center": Vector3(2320, 265, -1775), "radius": 220.0, "pad_offset": 310.0, "gate_offset": 470.0, "accent": Color("#ddbfff")},
 ]
 const PORT_PRICES := {
 	0: {"ore": 20, "crystal": 38, "ice": 14},
@@ -79,8 +121,13 @@ const PORT_PRICES := {
 	11: {"ore": 33, "crystal": 35, "ice": 32},
 	FRINGE_ARRIVAL_PORT: {"ore": 25, "crystal": 48, "ice": 25},
 	FRINGE_SECOND_PORT: {"ore": 35, "crystal": 36, "ice": 19},
+	HEATHER_PORT: {"ore": 38, "crystal": 49, "ice": 16},
+	LIMIT_PORT: {"ore": 35, "crystal": 32, "ice": 41},
 }
-const FUEL_PRICES := {0: 2, 1: 3, 3: 1, 10: 2, 11: 3, FRINGE_ARRIVAL_PORT: 2, FRINGE_SECOND_PORT: 1}
+const FUEL_PRICES := {
+	0: 2, 1: 3, 3: 1, 10: 2, 11: 3, FRINGE_ARRIVAL_PORT: 2, FRINGE_SECOND_PORT: 1,
+	HEATHER_PORT: 3, LIMIT_PORT: 4,
+}
 const ROUTES := {
 	0: {1: ["Регуляторы охлаждения", 240], 3: ["Катушки связи", 340]},
 	1: {0: ["Калибровочные датчики", 180], 3: ["Оптические блоки", 280]},
@@ -89,6 +136,8 @@ const ROUTES := {
 	11: {10: ["Защитные экраны", 230]},
 	FRINGE_ARRIVAL_PORT: {FRINGE_SECOND_PORT: ["Ретрансляторы", 290]},
 	FRINGE_SECOND_PORT: {FRINGE_ARRIVAL_PORT: ["Запасные гироскопы", 260]},
+	HEATHER_PORT: {FRINGE_ARRIVAL_PORT: ["Геологические пробы", 540]},
+	LIMIT_PORT: {FRINGE_SECOND_PORT: ["Сводка дальнего наблюдения", 680]},
 }
 
 
@@ -103,6 +152,10 @@ static func system(id: int) -> Dictionary:
 static func system_of_site(id: int) -> int:
 	if id < 0 or id >= DESTINATION_COUNT:
 		return -1
+	if id >= LIMIT_PORT:
+		return LIMIT_SYSTEM
+	if id >= PRE_EXPANSION_DESTINATION_COUNT:
+		return HEATHER_SYSTEM
 	if id >= PRE_TRAFFIC_DESTINATION_COUNT:
 		return FRINGE_SYSTEM
 	return HOME_SYSTEM if id < TARGET_COUNT else VELAR_SYSTEM
@@ -174,3 +227,9 @@ static func refuel_price(port_id: int) -> int:
 
 static func contract(origin: int, destination: int) -> Array:
 	return ROUTES[origin].get(destination, []) if is_port(origin) else []
+
+
+static func first_contract_destination(origin: int) -> int:
+	if not ROUTES.has(origin):
+		return -1
+	return ROUTES[origin].keys()[0]

@@ -27,7 +27,7 @@ func _run() -> void:
 
 
 func _test_traffic() -> void:
-	for system: int in range(Catalog.SYSTEM_COUNT):
+	for system: int in range(Catalog.CORE_SYSTEM_COUNT):
 		var arrival: int = Catalog.system(system).arrival_port
 		var flight := _at_port(arrival)
 		var initial := flight.traffic_contacts()

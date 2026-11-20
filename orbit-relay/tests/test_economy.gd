@@ -30,7 +30,7 @@ func _run() -> void:
 
 
 func _test_local_tariffs() -> void:
-	for system in range(Catalog.SYSTEM_COUNT):
+	for system in range(Catalog.CORE_SYSTEM_COUNT):
 		for port: int in Catalog.ports_for(system):
 			var flight := _at_port(port)
 			flight.credits = 2000

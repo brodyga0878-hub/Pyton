@@ -10,6 +10,7 @@ const PortMarket = preload("res://scripts/port_market.gd")
 const DisplaySettings = preload("res://scripts/display_settings.gd")
 const PresentationMenu = preload("res://scripts/presentation_menu.gd")
 const MissionJournal = preload("res://scripts/mission_journal.gd")
+const ExpansionBoard = preload("res://scripts/expansion_board.gd")
 const SessionIO = preload("res://scripts/session_io.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const SAVE_INTERVAL := 8.0
@@ -25,6 +26,7 @@ var _services := PortServices.new()
 var _market := PortMarket.new()
 var _settings := PresentationMenu.new()
 var _journal := MissionJournal.new()
+var _frontier := ExpansionBoard.new()
 var _io := SessionIO.new()
 var _save_elapsed := 0.0
 var _save_error_shown := false
@@ -70,6 +72,10 @@ func _ready() -> void:
 	_journal.build()
 	_journal.follow_requested.connect(_follow_journal)
 	_journal.dismissed.connect(_close_journal)
+	add_child(_frontier)
+	_frontier.build()
+	_frontier.project_requested.connect(_project_action)
+	_frontier.dismissed.connect(_close_frontier)
 	_build_report_panel()
 	_apply_presentation()
 	_update_display(0.0)
@@ -81,7 +87,7 @@ func _process(delta: float) -> void:
 
 
 func _overlay_open() -> bool:
-	return _report.visible or _map.is_open() or _galaxy.is_open() or _services.is_open() or _market.is_open() or _settings.is_open() or _journal.is_open()
+	return _report.visible or _map.is_open() or _galaxy.is_open() or _services.is_open() or _market.is_open() or _settings.is_open() or _journal.is_open() or _frontier.is_open()
 
 
 func _physics_process(delta: float) -> void:
@@ -103,11 +109,15 @@ func _update_display(delta: float) -> void:
 	var signal_selected: bool = patrol_status.phase == Flight.Patrol.OUTBOUND and patrol_status.same_system and not flight.autopilot
 	if signal_selected:
 		marker = patrol_status.point
+	var project := flight.frontier_status()
+	var project_marker: bool = flight.project_course and project.has_point
+	if project_marker:
+		marker = project.point
 	var instruments_visible := flight.docked < 0 and not flight.landed and not _overlay_open() and flight.jump_seconds_left <= 0.0
 	var in_view := instruments_visible and not _view.camera.is_position_behind(marker)
 	if patrol_status.phase == Flight.Patrol.ENGAGED and patrol_status.same_system:
 		in_view = false
-	elif in_view and not flight.autopilot and not signal_selected:
+	elif in_view and not flight.autopilot and not signal_selected and not project_marker:
 		var surface := flight.surface_status()
 		in_view = not surface.near or surface.pad
 	_hud.set_target_marker(_view.camera.unproject_position(marker) if in_view else Vector2.ZERO, in_view)
@@ -182,6 +192,10 @@ func _handle_action(action: String) -> void:
 			_hud.set_input_enabled(false)
 			_journal.open(flight)
 			return
+		"frontier":
+			_hud.set_input_enabled(false)
+			_frontier.open(flight)
+			return
 		_:
 			return
 	if action in ["target", "autopilot", "throttle_up", "throttle_down"]:
@@ -204,6 +218,7 @@ func _deliver_notice() -> void:
 		"fuel": flight.ship.fuel, "scooping": flight.scooping,
 		"hull": flight.ship.hull, "contract_route": flight.contract_route_id, "contract_leg": flight.contract_leg,
 		"patrol_phase": flight.patrol.phase, "patrol_origin": flight.patrol.origin,
+		"faction": flight.factions.owner(flight.system_id),
 		"system_id": flight.system_id, "jump_target": flight.jump_target,
 		"orbit_time": flight.orbit_time, "time_scale": flight.time_scale,
 		"offpad": flight.landed_offpad(), "landing_direction": [touchdown.x, touchdown.y, touchdown.z],
@@ -217,6 +232,8 @@ func _deliver_notice() -> void:
 		"jump_planned", "jump_complete",
 		"market_buy", "market_sell", "service_repair", "service_cargo", "hull_damage", "contract_leg",
 		"patrol_accepted", "patrol_engaged", "patrol_fire", "patrol_enemy_hit", "patrol_retreat", "patrol_victory", "patrol_paid",
+		"expedition_accepted", "expedition_survey", "expedition_report", "expedition_supply", "expedition_complete", "expedition_course",
+		"war_declared", "war_round", "war_captured", "war_repulsed",
 	]:
 		_save()
 
@@ -261,6 +278,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		if event.physical_keycode == KEY_ESCAPE:
 			_close_journal()
 		return
+	if _frontier.is_open():
+		if event.physical_keycode == KEY_ESCAPE:
+			_close_frontier()
+		return
 	if event.physical_keycode == KEY_ESCAPE and flight.cancel_jump():
 		_deliver_notice()
 		get_viewport().set_input_as_handled()
@@ -270,7 +291,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_ENTER: "dock", KEY_M: "contract", KEY_G: "mine", KEY_B: "sell_ore", KEY_F8: "report",
 		KEY_N: "map", KEY_J: "galaxy", KEY_K: "scoop", KEY_P: "services", KEY_O: "time", KEY_L: "market",
 		KEY_U: "patrol", KEY_X: "fire",
-		KEY_F2: "settings", KEY_F3: "journal",
+		KEY_F2: "settings", KEY_F3: "journal", KEY_F4: "frontier",
 	}
 	if actions.has(event.physical_keycode):
 		_handle_action(actions[event.physical_keycode])
@@ -299,6 +320,8 @@ func _notification(what: int) -> void:
 			_close_settings()
 		elif _journal.is_open():
 			_close_journal()
+		elif _frontier.is_open():
+			_close_frontier()
 		elif flight.cancel_jump():
 			_deliver_notice()
 		else:
@@ -515,6 +538,23 @@ func _follow_journal(kind: String) -> void:
 
 func _close_journal() -> void:
 	_journal.close()
+	_hud.set_input_enabled(true)
+
+
+func _project_action() -> void:
+	if not _frontier.is_open():
+		return
+	if flight.project_action():
+		var routed := flight.status_event in ["expedition_course", "jump_planned"]
+		_deliver_notice()
+		if routed:
+			_close_frontier()
+		_update_display(0.0)
+	_frontier.refresh()
+
+
+func _close_frontier() -> void:
+	_frontier.close()
 	_hud.set_input_enabled(true)
 
 

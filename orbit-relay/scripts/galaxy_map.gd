@@ -5,6 +5,7 @@ signal jump_requested()
 signal dismissed()
 
 const Sector := preload("res://scripts/sector_catalog.gd")
+const Expedition := preload("res://scripts/expedition.gd")
 const TEXT := Color("e8f4fa")
 const MUTED := Color("a5bac7")
 const MINT := Color("9debd7")
@@ -15,6 +16,7 @@ var _insets: MarginContainer
 var _chart: GalaxyChart
 var _current: Label
 var _destination: Label
+var _affiliation: Label
 var _description: Label
 var _distance: Label
 var _cost: Label
@@ -71,19 +73,21 @@ func build() -> void:
 	panel.add_theme_stylebox_override("panel", _style(Color("0d1d28"), BORDER, 12, 18))
 	body.add_child(panel)
 	var details := VBoxContainer.new()
-	details.add_theme_constant_override("separation", 9)
+	details.add_theme_constant_override("separation", 5)
 	panel.add_child(details)
 	for id in range(Sector.SYSTEM_COUNT):
-		var button := _button(details, str(Sector.system(id).name), 44)
+		var button := _button(details, str(Sector.system(id).name), 42)
 		button.toggle_mode = true
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.pressed.connect(_select_system.bind(id))
 		_system_buttons[id] = button
 	details.add_child(HSeparator.new())
 	_destination = _label(details, "", 26, TEXT)
+	_affiliation = _label(details, "", 16, MINT)
+	_affiliation.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_description = _label(details, "", 16, MUTED)
 	_description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_description.custom_minimum_size.y = 70
+	_description.custom_minimum_size.y = 47
 	_distance = _metric(details, "Расстояние")
 	_cost = _metric(details, "Цена прыжка")
 	_fuel = _metric(details, "Топливо на борту")
@@ -94,11 +98,16 @@ func build() -> void:
 
 	_status = _label(details, "", 16, AMBER)
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_status.custom_minimum_size.y = 50
+	_status.custom_minimum_size.y = 27
 	_status.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
-	_plan_button = _button(details, "Проложить маршрут", 49)
+	var routes := HBoxContainer.new()
+	routes.add_theme_constant_override("separation", 8)
+	details.add_child(routes)
+	_plan_button = _button(routes, "Проложить маршрут", 53)
+	_plan_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_plan_button.pressed.connect(_plan_route)
-	_jump_button = _button(details, "Прыжок", 53)
+	_jump_button = _button(routes, "Прыжок", 53)
+	_jump_button.custom_minimum_size.x = 112
 	_jump_button.add_theme_stylebox_override("normal", _style(Color("164f4c"), MINT, 8, 12))
 	_jump_button.add_theme_stylebox_override("hover", _style(Color("206760"), MINT, 8, 12))
 	_jump_button.pressed.connect(_start_jump)
@@ -121,16 +130,22 @@ func refresh() -> void:
 		return
 	var current: int = _flight.system_id
 	var planned: int = _flight.jump_target
+	if not _flight.system_known(_candidate):
+		_candidate = current
 	var selected := Sector.system(_candidate)
 	var is_current := _candidate == current
 	var is_planned := _candidate == planned
 	_chart.current = current
 	_chart.planned = planned
 	_chart.candidate = _candidate
-	_chart.queue_redraw()
 	_current.text = "Система «%s»" % Sector.system(current).name
+	var known: Array[int] = []
 	for id in _system_buttons:
 		var button := _system_buttons[id]
+		button.visible = _flight.system_known(id)
+		if not button.visible:
+			continue
+		known.append(id)
 		var suffix := ""
 		if id == current:
 			suffix = "   ·   Корабль"
@@ -138,8 +153,20 @@ func refresh() -> void:
 			suffix = "   ·   По маршруту"
 		button.text = str(Sector.system(id).name) + suffix
 		button.set_pressed_no_signal(id == _candidate)
+	_chart.set_systems(known)
+	_chart.queue_redraw()
 
 	_destination.text = str(selected.name)
+	_affiliation.text = _flight.system_faction_name(_candidate)
+	var frontier: Dictionary = _flight.frontier_status()
+	if int(frontier.get("system", -1)) == _candidate:
+		match int(frontier.get("phase", Expedition.LOCKED)):
+			Expedition.SURVEY:
+				_affiliation.text += " · Идёт обследование"
+			Expedition.REPORT:
+				_affiliation.text += " · Ожидается отчёт"
+			Expedition.BUILD:
+				_affiliation.text += " · Строится станция"
 	_description.text = str(selected.description)
 	_distance.text = "—" if is_current else "%s св. л." % _decimal(Sector.jump_distance(current, _candidate))
 	_fuel.text = "%s / %d ед." % [_decimal(_flight.ship.fuel), int(_flight.ship.capacity())]
@@ -171,7 +198,7 @@ func is_open() -> bool:
 
 
 func _select_system(id: int) -> void:
-	if is_open() and _system_buttons.has(id):
+	if is_open() and _flight.system_known(id):
 		_candidate = id
 		_clear_touches()
 		refresh()
@@ -243,7 +270,7 @@ func _button_at(point: Vector2) -> Button:
 		if not button.disabled and button.get_global_rect().has_point(point):
 			return button
 	for button: Button in _system_buttons.values():
-		if button.get_global_rect().has_point(point):
+		if button.is_visible_in_tree() and button.get_global_rect().has_point(point):
 			return button
 	return null
 
@@ -329,6 +356,7 @@ class GalaxyChart extends Control:
 	var planned := -1
 	var candidate := -1
 	var _sky := PackedVector3Array()
+	var _systems: Array[int] = []
 	var _center := Vector2.ZERO
 	var _extent := Vector2.ONE
 
@@ -337,15 +365,20 @@ class GalaxyChart extends Control:
 		random.seed = 77106
 		for i in range(128):
 			_sky.append(Vector3(random.randf(), random.randf(), random.randf()))
+		resized.connect(queue_redraw)
+
+	func set_systems(systems: Array[int]) -> void:
+		_systems = systems
+		if _systems.is_empty():
+			return
 		var low := Vector2(INF, INF)
 		var high := Vector2(-INF, -INF)
-		for id in range(Sector.SYSTEM_COUNT):
+		for id in _systems:
 			var point: Vector2 = Sector.system(id).position
 			low = low.min(point)
 			high = high.max(point)
 		_center = (low + high) * 0.5
 		_extent = (high - low).max(Vector2.ONE)
-		resized.connect(queue_redraw)
 
 	func marker_position(id: int) -> Vector2:
 		return size * 0.5 + (Sector.system(id).position - _center) * _pixels_per_light_year()
@@ -355,7 +388,7 @@ class GalaxyChart extends Control:
 			return -1
 		var nearest := -1
 		var limit := 45.0 * 45.0
-		for id in range(Sector.SYSTEM_COUNT):
+		for id in _systems:
 			var distance := marker_position(id).distance_squared_to(point)
 			if distance <= limit:
 				nearest = id
@@ -379,15 +412,15 @@ class GalaxyChart extends Control:
 		for star in _sky:
 			var point := Vector2(star.x, star.y) * (size - Vector2.ONE * 18.0) + Vector2.ONE * 9.0
 			draw_circle(point, 0.65 + star.z * 0.95, Color(0.65, 0.80, 1.0, 0.08 + star.z * 0.32), true, -1.0, true)
-		if current >= 0:
+		if _systems.has(current):
 			_draw_routes()
-		for id in range(Sector.SYSTEM_COUNT):
+		for id in _systems:
 			_draw_marker(id)
 		_draw_scale()
 
 	func _draw_routes() -> void:
 		var origin := marker_position(current)
-		for id in range(Sector.SYSTEM_COUNT):
+		for id in _systems:
 			if Sector.jump_cost(current, id) <= 0:
 				continue
 			var end := marker_position(id)

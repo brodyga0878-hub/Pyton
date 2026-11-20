@@ -13,6 +13,8 @@ const BUY_PRICES := {
 	11: {"ore": 38, "crystal": 40, "ice": 37, "circuits": 65, "medical": 77},
 	Catalog.FRINGE_ARRIVAL_PORT: {"ore": 30, "crystal": 54, "ice": 33, "circuits": 56, "medical": 72},
 	Catalog.FRINGE_SECOND_PORT: {"ore": 41, "crystal": 40, "ice": 24, "circuits": 37, "medical": 61},
+	Catalog.HEATHER_PORT: {"ore": 45, "crystal": 56, "ice": 21, "circuits": 64, "medical": 78},
+	Catalog.LIMIT_PORT: {"ore": 42, "crystal": 39, "ice": 48, "circuits": 73, "medical": 86},
 }
 
 const SUPPLY_SELL_PRICES := {
@@ -23,9 +25,14 @@ const SUPPLY_SELL_PRICES := {
 	11: {"circuits": 55, "medical": 68},
 	Catalog.FRINGE_ARRIVAL_PORT: {"circuits": 50, "medical": 65},
 	Catalog.FRINGE_SECOND_PORT: {"circuits": 32, "medical": 52},
+	Catalog.HEATHER_PORT: {"circuits": 56, "medical": 68},
+	Catalog.LIMIT_PORT: {"circuits": 63, "medical": 75},
 }
 
-const REPAIR_PRICES := {0: 2, 1: 3, 3: 2, 10: 3, 11: 2, Catalog.FRINGE_ARRIVAL_PORT: 3, Catalog.FRINGE_SECOND_PORT: 2}
+const REPAIR_PRICES := {
+	0: 2, 1: 3, 3: 2, 10: 3, 11: 2, Catalog.FRINGE_ARRIVAL_PORT: 3, Catalog.FRINGE_SECOND_PORT: 2,
+	Catalog.HEATHER_PORT: 4, Catalog.LIMIT_PORT: 4,
+}
 
 const INITIAL_STOCKS := {
 	"0": {"ore": 45, "crystal": 12, "ice": 56, "circuits": 48, "medical": 13},
@@ -35,6 +42,8 @@ const INITIAL_STOCKS := {
 	"11": {"ore": 8, "crystal": 32, "ice": 7, "circuits": 8, "medical": 9},
 	"16": {"ore": 37, "crystal": 12, "ice": 16, "circuits": 14, "medical": 11},
 	"17": {"ore": 17, "crystal": 42, "ice": 36, "circuits": 43, "medical": 25},
+	"20": {"ore": 23, "crystal": 19, "ice": 58, "circuits": 14, "medical": 10},
+	"24": {"ore": 21, "crystal": 54, "ice": 13, "circuits": 12, "medical": 8},
 }
 
 const COURIERS := {
@@ -67,6 +76,16 @@ const COURIERS := {
 		"id": "fringe_beacons", "origin": Catalog.FRINGE_SECOND_PORT,
 		"stops": [Catalog.FRINGE_ARRIVAL_PORT, 10, 11], "reward": 1100,
 		"title": "Маяки Кромки", "cargo": "Маячные компенсаторы",
+	},
+	"heather_cores": {
+		"id": "heather_cores", "origin": Catalog.HEATHER_PORT,
+		"stops": [Catalog.FRINGE_ARRIVAL_PORT, Catalog.FRINGE_SECOND_PORT], "reward": 1050,
+		"title": "Керны Вереска", "cargo": "Кассеты с кернами",
+	},
+	"limit_telemetry": {
+		"id": "limit_telemetry", "origin": Catalog.LIMIT_PORT,
+		"stops": [Catalog.FRINGE_SECOND_PORT, 10, 11], "reward": 1440,
+		"title": "Архив Предела", "cargo": "Записи дальнего наблюдения",
 	},
 }
 
@@ -127,16 +146,20 @@ func snapshot() -> Dictionary:
 	return _stocks.duplicate(true)
 
 
-func restore(value: Variant, legacy := false) -> bool:
-	var expected_ports := INITIAL_STOCKS.size()
+func restore(value: Variant, legacy := false, pre_expansion := false) -> bool:
+	var cutoff := Catalog.DESTINATION_COUNT
 	if legacy:
-		expected_ports -= Catalog.ports_for(Catalog.FRINGE_SYSTEM).size()
-	if not value is Dictionary or value.size() != expected_ports:
+		cutoff = Catalog.PRE_TRAFFIC_DESTINATION_COUNT
+	elif pre_expansion:
+		cutoff = Catalog.PRE_EXPANSION_DESTINATION_COUNT
+	if not value is Dictionary:
 		return false
 	var restored := INITIAL_STOCKS.duplicate(true)
+	var required_ports := 0
 	for port: String in INITIAL_STOCKS:
-		if legacy and int(port) >= Catalog.PRE_TRAFFIC_DESTINATION_COUNT:
+		if int(port) >= cutoff:
 			continue
+		required_ports += 1
 		var inventory: Variant = value.get(port)
 		if not inventory is Dictionary or inventory.size() != GOODS.size():
 			return false
@@ -149,5 +172,7 @@ func restore(value: Variant, legacy := false) -> bool:
 				return false
 			counts[good] = int(count)
 		restored[port] = counts
+	if value.size() != required_ports:
+		return false
 	_stocks = restored
 	return true

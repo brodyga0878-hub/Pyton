@@ -210,10 +210,12 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_last_berth = berth
 
 	for site_id: int in _stations:
+		var operational: bool = sim.station_operational(site_id)
+		_stations[site_id].visible = operational
 		_stations[site_id].position = sim.target_position(site_id)
 		_stations[site_id].rotation.z = sim.station_angle(site_id)
 		_approaches[site_id].position = sim.target_gate(site_id)
-		_approaches[site_id].visible = not settled
+		_approaches[site_id].visible = operational and not settled
 		var strength := 1.45 if site_id == int(sim.target) else 0.43
 		_gate_materials[site_id].albedo_color = Catalog.site(site_id).accent * strength
 	for site_id: int in _surface_views:

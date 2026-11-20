@@ -10,7 +10,7 @@ const PATROL_PERIOD := 54.0
 
 static func contacts(sim: RefCounted) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	var ports := Catalog.ports_for(sim.system_id)
+	var ports: Array = sim.local_ports()
 	if ports.is_empty():
 		return result
 	var first: int = ports[0]
@@ -27,7 +27,7 @@ static func contacts(sim: RefCounted) -> Array[Dictionary]:
 		lateral = cross_lane.normalized()
 		var cross_velocity := Vector3.UP.cross(arrival_velocity - departure_velocity)
 		lateral_velocity = cross_velocity.slide(lateral) / cross_lane.length()
-	for index in range(TRADER_NAMES.size()):
+	for index in range(TRADER_NAMES.size() if ports.size() > 1 else 1):
 		var rate := TAU / TRADE_PERIOD
 		var angle := fposmod(float(sim.orbit_time), TRADE_PERIOD) * rate + 0.55 + PI * index
 		var fraction := (1.0 - cos(angle)) * 0.5
@@ -35,10 +35,12 @@ static func contacts(sim: RefCounted) -> Array[Dictionary]:
 		var side := 46.0 if index == 0 else -46.0
 		var height := Vector3.UP * (sin(angle * 2.0) * 25.0)
 		var climb := Vector3.UP * (cos(angle * 2.0) * rate * 50.0)
-		var sample := clear_hulls(
-			sim, departure + lane * fraction + lateral * side + height,
-			departure_velocity.lerp(arrival_velocity, fraction) + lane * advance + lateral_velocity * side + climb,
-		)
+		var at := departure + lane * fraction + lateral * side + height
+		var velocity := departure_velocity.lerp(arrival_velocity, fraction) + lane * advance + lateral_velocity * side + climb
+		if ports.size() == 1:
+			at = departure + Vector3(250.0 * cos(angle), height.y, 176.0 * sin(angle))
+			velocity = departure_velocity + Vector3(-250.0 * sin(angle) * rate, climb.y, 176.0 * cos(angle) * rate)
+		var sample := clear_hulls(sim, at, velocity)
 		result.append({
 			"id": "trader-%d-%d" % [sim.system_id, index], "name": TRADER_NAMES[index], "role": "trader",
 			"position": sample.position, "velocity": sample.velocity, "hull": 100.0,
@@ -63,6 +65,8 @@ static func clear_hulls(sim: RefCounted, at: Vector3, velocity: Vector3, margin 
 	var rise := 0.0
 	var climb := 0.0
 	for id: int in Catalog.targets_for(sector):
+		if Catalog.is_port(id) and not sim.station_operational(id):
+			continue
 		var center: Vector3 = sim.target_position(id)
 		var radius := float(Catalog.site(id).radius)
 		if id == star:

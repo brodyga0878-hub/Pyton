@@ -110,8 +110,8 @@ func _test_settings_scene() -> void:
 	_expect(game.presentation.snapshot() == saved_settings and game._view._visual_profile == 0
 		and _viewport.msaa_3d == Viewport.MSAA_DISABLED, "Reopening the application restores the saved view preset")
 	var restored: Dictionary = JSON.parse_string(JSON.stringify(game.flight.snapshot()))
-	_expect(restored == flight_before and restored.schema == 9,
-		"Cold start restores the unchanged schema-9 docked flight alongside the preferences")
+	_expect(restored == flight_before and restored.schema == Flight.SAVE_SCHEMA,
+		"Cold start restores the unchanged docked flight alongside the preferences")
 	_tap(game._hud._actions.get("dock"), "Launch after restarting with mirrored settings")
 	await process_frame
 	_expect(game.flight.docked < 0, "The normal takeoff action still works with mirrored settings")

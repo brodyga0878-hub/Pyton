@@ -9,7 +9,9 @@ const Terrain = preload("res://scripts/surface_terrain.gd")
 const Economy = preload("res://scripts/port_economy.gd")
 const Traffic = preload("res://scripts/sector_traffic.gd")
 const Patrol = preload("res://scripts/patrol_encounter.gd")
-const SAVE_SCHEMA := 9
+const Expedition = preload("res://scripts/expedition.gd")
+const FactionFronts = preload("res://scripts/faction_fronts.gd")
+const SAVE_SCHEMA := 10
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
@@ -60,6 +62,9 @@ var ship := ShipSystems.new()
 var market := Economy.new()
 var patrol := Patrol.new()
 var patrol_course := false
+var expedition := Expedition.new()
+var factions := FactionFronts.new()
+var project_course := false
 var scooping := false
 var system_id := Catalog.HOME_SYSTEM
 var jump_target := -1
@@ -125,7 +130,7 @@ func time_status() -> Dictionary:
 	if docked >= 0 or landed:
 		return {"allowed": true, "reason": ""}
 	var star := Catalog.star_for(system_id)
-	for id: int in Catalog.targets_for(system_id):
+	for id: int in local_targets():
 		var radius := Catalog.SCOOP_OUTER + STAR_WARP_MARGIN if id == star else float(Catalog.site(id).radius) + FRAME_MARGIN
 		if position.distance_squared_to(target_position(id)) <= radius * radius:
 			return {"allowed": false, "reason": "Рядом «%s»" % target_name(id)}
@@ -168,7 +173,37 @@ func docking_position(index: int) -> Vector3:
 
 
 func target_name(index: int) -> String:
-	return Catalog.site(index).name
+	return str(Catalog.site(index).get("name", ""))
+
+
+func system_known(index: int) -> bool:
+	return expedition.known(index)
+
+
+func system_faction_name(index: int) -> String:
+	return FactionFronts.faction_name(factions.owner(index))
+
+
+func station_operational(index: int) -> bool:
+	return Catalog.is_port(index) and _site_available(index, expedition)
+
+
+func local_targets() -> Array:
+	var targets := Catalog.targets_for(system_id)
+	if system_id < Catalog.CORE_SYSTEM_COUNT or expedition.commissioned(system_id):
+		return targets
+	return targets.filter(func(id: int) -> bool: return not Catalog.is_port(id))
+
+
+func local_ports() -> Array:
+	return Catalog.ports_for(system_id) if system_id < Catalog.CORE_SYSTEM_COUNT or expedition.commissioned(system_id) else []
+
+
+func _site_available(index: int, progress: RefCounted) -> bool:
+	var system := Catalog.system_of_site(index)
+	if system >= 0 and system < Catalog.CORE_SYSTEM_COUNT:
+		return true
+	return progress.known(system) and (not Catalog.is_port(index) or progress.commissioned(system))
 
 
 func target_position(index: int) -> Vector3:
@@ -227,14 +262,22 @@ func offer_destination() -> int:
 		return -1
 	if not Catalog.contract(docked, planned_target).is_empty():
 		return planned_target
-	return _default_port(docked)
+	var local := _default_port(docked)
+	return local if not Catalog.contract(docked, local).is_empty() else Catalog.first_contract_destination(docked)
 
 
 func _default_port(excluded := -1) -> int:
-	for id: int in Catalog.ports_for(system_id):
+	var ports := local_ports()
+	for id: int in ports:
 		if id != excluded:
 			return id
-	return -1
+	if not ports.is_empty():
+		return ports[0]
+	var surfaces := Catalog.mines_for(system_id)
+	for id: int in surfaces:
+		if id != excluded:
+			return id
+	return surfaces[0]
 
 
 func contract_cargo() -> String:
@@ -318,19 +361,22 @@ func contract_action() -> bool:
 		contract_leg = -1
 		contract_origin = docked
 		contract_destination = offer_destination()
-		target = contract_destination
+		if Catalog.system_of_site(contract_destination) == system_id:
+			target = contract_destination
+		else:
+			_plan_contract_leg()
 		_announce("contract", "Груз на борту. Пункт назначения — %s." % target_name(contract_destination))
 	return true
 
 
 func change_target() -> void:
 	if docked < 0 and not landed:
-		var options := Catalog.targets_for(system_id)
+		var options := local_targets()
 		select_target(options[(options.find(target) + 1) % options.size()])
 
 
 func select_target(index: int) -> bool:
-	if jump_seconds_left > 0.0 or Catalog.system_of_site(index) != system_id or index == docked or index == landed_site:
+	if jump_seconds_left > 0.0 or Catalog.system_of_site(index) != system_id or index == docked or index == landed_site or not _site_available(index, expedition):
 		return false
 	if docked >= 0 or landed:
 		planned_target = index
@@ -352,6 +398,7 @@ func change_throttle(amount: float) -> void:
 
 func set_autopilot(enabled: bool) -> void:
 	patrol_course = false
+	project_course = false
 	autopilot = enabled and docked < 0 and not landed and jump_seconds_left <= 0.0
 	_approach_committed = false
 	_departure_leg = 0
@@ -359,7 +406,7 @@ func set_autopilot(enabled: bool) -> void:
 	autopilot_phase = "К створу" if autopilot else ""
 	if not autopilot:
 		return
-	for index: int in Catalog.targets_for(system_id):
+	for index: int in local_targets():
 		if index == Catalog.star_for(system_id):
 			continue
 		var center := target_position(index)
@@ -566,6 +613,39 @@ func patrol_status() -> Dictionary:
 	return patrol.status(self)
 
 
+func frontier_status() -> Dictionary:
+	return expedition.status(self)
+
+
+func project_action() -> bool:
+	var status := frontier_status()
+	if not status.can_act:
+		if status.route_system >= 0 and status.route_system != system_id:
+			return plan_jump(status.route_system)
+		if status.route_port >= 0 and select_target(status.route_port):
+			if docked < 0 and not landed:
+				set_autopilot(true)
+			_announce("expedition_course", "Курс к порту заказчика.")
+			return true
+		if not status.can_follow:
+			return false
+		set_autopilot(false)
+		project_course = true
+		_announce("expedition_course", "Курс к цели экспедиции.")
+		return true
+	var result := expedition.act(self)
+	if not result.get("ok", false):
+		return false
+	project_course = false
+	credits += int(result.get("credits", 0))
+	if result.has("commissioned"):
+		factions.commission(result.commissioned, result.owner, orbit_time)
+	if result.has("planned_system"):
+		plan_jump(result.planned_system)
+	_announce(result.event, result.message)
+	return true
+
+
 func fire_status() -> Dictionary:
 	return patrol.fire_status(self)
 
@@ -706,7 +786,7 @@ func _collect_fuel(delta: float) -> void:
 
 
 func plan_jump(destination: int) -> bool:
-	if jump_seconds_left > 0.0 or Catalog.jump_cost(system_id, destination) == 0:
+	if jump_seconds_left > 0.0 or not system_known(destination) or Catalog.jump_cost(system_id, destination) == 0:
 		return false
 	jump_target = destination
 	_announce("jump_planned", "Межзвёздный курс. «%s»." % Catalog.system(destination).name)
@@ -714,7 +794,7 @@ func plan_jump(destination: int) -> bool:
 
 
 func jump_status(destination: int) -> Dictionary:
-	var cost := Catalog.jump_cost(system_id, destination)
+	var cost := Catalog.jump_cost(system_id, destination) if system_known(destination) else 0
 	var reason := ""
 	if cost == 0:
 		reason = "Выберите другую звёздную систему"
@@ -730,7 +810,7 @@ func jump_status(destination: int) -> Dictionary:
 		reason = "Нужно %d ед. топлива" % cost
 	else:
 		var star := Catalog.star_for(system_id)
-		for id: int in Catalog.targets_for(system_id):
+		for id: int in local_targets():
 			var clearance := Catalog.SCOOP_OUTER if id == star else float(Catalog.site(id).radius) + JUMP_CLEARANCE
 			if position.distance_squared_to(target_position(id)) <= clearance * clearance:
 				reason = "Отойдите от объекта «%s»" % target_name(id)
@@ -747,6 +827,7 @@ func start_jump() -> bool:
 		return false
 	reset_time_scale()
 	patrol_course = false
+	project_course = false
 	throttle = 0.0
 	boost = false
 	jump_seconds_left = JUMP_CHARGE
@@ -782,8 +863,10 @@ func _charge_jump(delta: float) -> void:
 	system_id = jump_target
 	jump_target = -1
 	var arrival: int = Catalog.system(system_id).arrival_port
+	if not station_operational(arrival):
+		arrival = Catalog.system(system_id).survey_sites[0]
 	target = arrival
-	if contract_stage == 1 and not contract_route_id.is_empty() and Catalog.system_of_site(contract_destination) == system_id:
+	if contract_stage == 1 and Catalog.system_of_site(contract_destination) == system_id and _site_available(contract_destination, expedition) and (not contract_route_id.is_empty() or contract_origin >= Catalog.PRE_EXPANSION_DESTINATION_COUNT):
 		target = contract_destination
 	position = target_gate(arrival) + Vector3.BACK * ARRIVAL_OFFSET
 	velocity = Vector3.ZERO
@@ -829,7 +912,7 @@ func _lift() -> void:
 	if offpad:
 		position += away * 0.35
 	velocity = target_velocity(origin) + away * 9.0
-	target = _departure_target(_default_port())
+	target = _departure_target(_default_port(origin))
 	_announce("lift", "Взлёт с поверхности. «%s»." % target_name(origin))
 
 
@@ -895,6 +978,9 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 	var previous_orbit_time := orbit_time
 	orbit_time += delta
 	elapsed += delta
+	var front := factions.advance(orbit_time)
+	if not front.is_empty():
+		_announce(front.event, front.message)
 	if docked >= 0:
 		_hold_docked_pose()
 		_apply_patrol_result(patrol.step(self, delta))
@@ -917,13 +1003,15 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 			_charge_jump(delta)
 		return
 	if manual_input:
-		if autopilot or patrol_course:
+		if autopilot or patrol_course or project_course:
 			set_autopilot(false)
 			_announce("manual_override", "Ручное управление")
 
 	var had_fuel := ship.fuel > 0.0
 	if autopilot:
 		_autopilot_step(delta)
+	elif project_course:
+		_project_course_step(delta)
 	elif patrol_course:
 		_patrol_course_step(delta)
 	else:
@@ -973,13 +1061,14 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 	_apply_patrol_result(patrol.step(self, delta))
 
 
-func _blocked(point: Vector3, sector_id := -1, epoch := -1.0) -> bool:
-	return _obstacle_at(point, sector_id, epoch) >= 0
+func _blocked(point: Vector3, sector_id := -1, epoch := -1.0, progress: RefCounted = null) -> bool:
+	return _obstacle_at(point, sector_id, epoch, progress) >= 0
 
 
-func _obstacle_at(point: Vector3, sector_id := -1, epoch := -1.0) -> int:
+func _obstacle_at(point: Vector3, sector_id := -1, epoch := -1.0, progress: RefCounted = null) -> int:
+	var history := expedition if progress == null else progress
 	for index: int in Catalog.targets_for(system_id if sector_id < 0 else sector_id):
-		if _inside_hull(point, index, epoch):
+		if _site_available(index, history) and _inside_hull(point, index, epoch):
 			return index
 	return -1
 
@@ -1120,13 +1209,39 @@ func _patrol_course_step(delta: float) -> void:
 	throttle = speed_limit / MAX_SPEED
 
 
+func _project_course_step(delta: float) -> void:
+	boost = false
+	var status := frontier_status()
+	if not status.has_point or (not status.can_follow and not status.ready):
+		project_course = false
+		throttle = 0.0
+		return
+	var point: Vector3 = status.point
+	var distance := position.distance_to(point)
+	var waypoint := _star_detour(point)
+	var obstacle := _transit_obstacle(waypoint - position, PATROL_CRUISE_SPEED, false)
+	if obstacle >= 0:
+		waypoint = _transit_waypoint(obstacle, waypoint - position)
+	var direction := position.direction_to(waypoint)
+	if not direction.is_zero_approx():
+		_point_towards(direction, delta)
+	var cruise := PATROL_CRUISE_SPEED if ship.fuel > 0.0 else RESERVE_SPEED
+	var speed_limit := minf(cruise, position.distance_to(waypoint) * 0.34)
+	var drift := target_velocity(status.site) if waypoint == point else Vector3.ZERO
+	velocity = velocity.move_toward((direction * speed_limit + drift).limit_length(cruise), 42.0 * delta)
+	throttle = speed_limit / MAX_SPEED
+	if status.ready and distance <= 24.0 and velocity.distance_to(drift) < 9.0:
+		project_course = false
+		throttle = 0.0
+
+
 func _transit_obstacle(course: Vector3, cruise: float, skip_target := true) -> int:
 	var star := Catalog.star_for(system_id)
 	var speed_limit := cruise if ship.fuel > 0.0 else minf(cruise, RESERVE_SPEED)
 	var duration := course.length() / speed_limit
 	var earliest := INF
 	var obstacle := -1
-	for id: int in Catalog.targets_for(system_id):
+	for id: int in local_targets():
 		if (skip_target and id == target) or id == star:
 			continue
 		var radial := position - target_position(id)
@@ -1206,6 +1321,7 @@ func snapshot() -> Dictionary:
 		"landing_direction": [landing_direction.x, landing_direction.y, landing_direction.z],
 		"ship": ship.snapshot(), "market": market.snapshot(), "system_id": system_id, "jump_target": jump_target,
 		"patrol": patrol.snapshot(),
+		"expedition": expedition.snapshot(), "factions": factions.snapshot(),
 	}
 
 
@@ -1213,6 +1329,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_expansion := schema < 10
 	var pre_traffic := schema < 9
 	var pre_economy := schema < 8
 	var pre_surface := schema < 7
@@ -1227,7 +1344,9 @@ func restore(state: Dictionary) -> bool:
 	var restored_system := Catalog.HOME_SYSTEM
 	var restored_jump := -1
 	if not pre_galaxy:
-		var systems := Catalog.PRE_TRAFFIC_SYSTEM_COUNT if pre_traffic else Catalog.SYSTEM_COUNT
+		var systems := Catalog.SYSTEM_COUNT
+		if pre_expansion:
+			systems = Catalog.PRE_TRAFFIC_SYSTEM_COUNT if pre_traffic else Catalog.CORE_SYSTEM_COUNT
 		if not _integer(state.get("system_id"), 0, systems - 1) or not _integer(state.get("jump_target"), -1, systems - 1):
 			return false
 		restored_system = int(state.system_id)
@@ -1247,7 +1366,9 @@ func restore(state: Dictionary) -> bool:
 		return false
 	if not _number(state.get("throttle"), 0.0, 1.0):
 		return false
-	var site_count := Catalog.PRE_TRAFFIC_DESTINATION_COUNT if pre_traffic else Catalog.DESTINATION_COUNT
+	var site_count := Catalog.PRE_EXPANSION_DESTINATION_COUNT if pre_expansion else Catalog.DESTINATION_COUNT
+	if pre_traffic:
+		site_count = Catalog.PRE_TRAFFIC_DESTINATION_COUNT
 	if pre_surface:
 		site_count = Catalog.PRE_SURFACE_DESTINATION_COUNT
 	if pre_galaxy:
@@ -1259,6 +1380,21 @@ func restore(state: Dictionary) -> bool:
 			return false
 	if not _integer(state.get("target"), 0, site_count - 1) or not _integer(state.get("contract_stage"), 0, 2):
 		return false
+	var restored_expedition := Expedition.new()
+	var restored_factions := FactionFronts.new()
+	if not pre_expansion:
+		if not restored_expedition.restore(state.get("expedition")) or not restored_factions.restore(state.get("factions")):
+			return false
+		for system in range(Catalog.CORE_SYSTEM_COUNT, Catalog.SYSTEM_COUNT):
+			if restored_expedition.commissioned(system) != (restored_factions.owner(system) >= 0):
+				return false
+	if not restored_expedition.known(restored_system) or (restored_jump >= 0 and not restored_expedition.known(restored_jump)):
+		return false
+	if not _site_available(int(state.target), restored_expedition):
+		return false
+	for field in ["docked", "contract_origin", "contract_destination"]:
+		if int(state[field]) >= 0 and not _site_available(int(state[field]), restored_expedition):
+			return false
 	if Catalog.system_of_site(int(state.target)) != restored_system or (int(state.docked) >= 0 and Catalog.system_of_site(int(state.docked)) != restored_system):
 		return false
 	if not _integer(state.get("credits"), 0, 1000000000) or not _integer(state.get("deliveries"), 0, 10000000):
@@ -1295,9 +1431,11 @@ func restore(state: Dictionary) -> bool:
 	var restored_plan := -1
 	if not pre_fuel and not restored_ship.restore(state.get("ship"), pre_economy):
 		return false
-	if not pre_economy and not restored_market.restore(state.get("market"), pre_traffic):
+	if not pre_economy and not restored_market.restore(state.get("market"), pre_traffic, pre_expansion):
 		return false
 	if not pre_traffic and not restored_patrol.restore(state.get("patrol")):
+		return false
+	if restored_patrol.origin >= 0 and not _site_available(restored_patrol.origin, restored_expedition):
 		return false
 	var mining_count := Catalog.SITE_COUNT if pre_galaxy else site_count
 	if schema >= 2 and not restored_mining.restore(state.get("mining"), schema == 2, mining_count, restored_ship.cargo_capacity(), not pre_economy):
@@ -1334,7 +1472,7 @@ func restore(state: Dictionary) -> bool:
 	elif restored_mining.phase != MiningRig.STOWED or restored_direction != Vector3.ZERO:
 		return false
 	if restored_plan >= 0:
-		if Catalog.system_of_site(restored_plan) != restored_system or restored_plan == restored_dock or restored_plan == restored_landing or (restored_dock < 0 and restored_landing < 0):
+		if Catalog.system_of_site(restored_plan) != restored_system or not _site_available(restored_plan, restored_expedition) or restored_plan == restored_dock or restored_plan == restored_landing or (restored_dock < 0 and restored_landing < 0):
 			return false
 	# Earlier saves may occupy coordinates where a new hull was added.
 	if pre_fuel and restored_dock < 0 and restored_landing < 0:
@@ -1346,7 +1484,7 @@ func restore(state: Dictionary) -> bool:
 				break
 	# A legacy ship can be clear of the old sphere yet overlap the new terrain.
 	if pre_surface and restored_dock < 0 and restored_landing < 0:
-		var obstacle := _obstacle_at(restored_position, restored_system, restored_epoch)
+		var obstacle := _obstacle_at(restored_position, restored_system, restored_epoch, restored_expedition)
 		if Catalog.is_mine_site(obstacle):
 			var center: Vector3 = Orbit.sample(obstacle, restored_epoch).position
 			var relative := restored_position - center
@@ -1358,7 +1496,7 @@ func restore(state: Dictionary) -> bool:
 				restored_position = center + Terrain.contact(obstacle, direction) + direction * 3.0
 				restored_velocity = Vector3.ZERO
 	var velocity_limit := MAX_SAVED_SPEED if schema >= 6 else MAX_SPEED * 1.56
-	if restored_velocity.length() > velocity_limit or (restored_dock < 0 and restored_landing < 0 and _blocked(restored_position, restored_system, restored_epoch)):
+	if restored_velocity.length() > velocity_limit or (restored_dock < 0 and restored_landing < 0 and _blocked(restored_position, restored_system, restored_epoch, restored_expedition)):
 		return false
 	position = restored_position
 	velocity = restored_velocity
@@ -1376,6 +1514,8 @@ func restore(state: Dictionary) -> bool:
 	ship = restored_ship
 	market = restored_market
 	patrol = restored_patrol
+	expedition = restored_expedition
+	factions = restored_factions
 	scooping = false
 	system_id = restored_system
 	jump_target = restored_jump

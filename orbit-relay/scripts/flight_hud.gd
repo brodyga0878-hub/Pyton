@@ -84,15 +84,17 @@ func build() -> void:
 	var course_card := route_stack.get_parent() as PanelContainer
 	var shortcuts := HBoxContainer.new()
 	shortcuts.add_theme_constant_override("separation", 8)
-	_pin(shortcuts, _safe, Vector2.ZERO, Rect2(26, 131, 276, 48))
+	_pin(shortcuts, _safe, Vector2.ZERO, Rect2(26, 131, 407, 48))
 	_button(shortcuts, "journal", "Журнал")
 	_button(shortcuts, "settings", "Настройки")
-	for action: String in ["journal", "settings"]:
+	_button(shortcuts, "frontier", "Освоение")
+	for action: String in ["journal", "settings", "frontier"]:
 		var button: Button = _actions[action]
 		button.custom_minimum_size.y = 48.0
 		button.add_theme_font_size_override("font_size", 16)
 	_actions["journal"].tooltip_text = "Журнал заданий"
 	_actions["settings"].tooltip_text = "Графика и управление"
+	_actions["frontier"].tooltip_text = "Разведка, строительство и фракции"
 	course_card.resized.connect(func() -> void:
 		shortcuts.offset_top = course_card.position.y + course_card.size.y + 8.0
 		shortcuts.offset_bottom = shortcuts.offset_top + 48.0
@@ -378,7 +380,8 @@ func _sync_surface(sim: RefCounted, mining: RefCounted) -> void:
 				_guidance.text = "Разверните добывающий модуль."
 
 func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictionary, patrol: Dictionary, fire: Dictionary) -> void:
-	var aimed_at_port := Sector.is_port(sim.target) and fire.is_empty() and not bool(sim.patrol_course)
+	var project_course := bool(sim.get("project_course"))
+	var aimed_at_port := Sector.is_port(sim.target) and fire.is_empty() and not bool(sim.patrol_course) and not project_course
 	var surface: Dictionary = sim.surface_status() if Sector.is_mine_site(sim.target) else {}
 	var near_surface: bool = surface.get("near", false)
 	var to_target: Vector3 = sim.target_position(sim.target) - sim.position
@@ -418,6 +421,11 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 		_route.text = "Дозор  /  Сигнал"
 		_route_detail.text = "До района сигнала %d м" % roundi(patrol.distance)
 		_guidance.text = "Авто  /  К источнику сигнала"
+	elif project_course:
+		var project: Dictionary = sim.frontier_status()
+		_route.text = "Освоение  /  %s" % ("Стройплощадка" if int(project.phase) == 3 else "Разведка")
+		_route_detail.text = "До точки экспедиции %d м" % roundi(project.distance)
+		_guidance.text = "Авто  /  К точке экспедиции"
 	elif sim.scooping:
 		_guidance.text = "Идёт сбор топлива. Удерживайте положение."
 	elif scoop_status.get("near", false):

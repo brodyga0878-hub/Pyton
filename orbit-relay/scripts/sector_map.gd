@@ -4,6 +4,7 @@ signal destination_selected(site_id: int)
 signal dismissed()
 
 const Sector := preload("res://scripts/sector_catalog.gd")
+const Expedition := preload("res://scripts/expedition.gd")
 const Orbit := preload("res://scripts/orbit_ephemeris.gd")
 const Patrol := preload("res://scripts/patrol_encounter.gd")
 const TEXT := Color("e8f4fa")
@@ -108,19 +109,24 @@ func open(sim: RefCounted) -> void:
 	_title.text = "Карта системы «%s»" % Sector.system(system_id).name
 	var here := _current_site()
 	_here.text = "В полёте" if here < 0 else str(Sector.site(here).name)
+	var targets: Array = sim.local_targets()
 	for id: int in _site_buttons:
-		_site_buttons[id].visible = Sector.system_of_site(id) == system_id
-	_chart.system_id = system_id
+		_site_buttons[id].visible = targets.has(id)
 	_chart.ship_position = sim.position
 	_chart.centers.clear()
-	for id: int in Sector.targets_for(system_id):
+	for id: int in targets:
 		_chart.centers[id] = sim.target_position(id)
 	_chart.traffic = sim.traffic_contacts()
 	var patrol: Dictionary = sim.patrol_status()
 	if patrol.get("phase") == Patrol.OUTBOUND and patrol.get("same_system", false):
 		_chart.traffic.append({"role": "signal", "position": patrol.point})
+	var frontier: Dictionary = sim.frontier_status()
+	if frontier.get("phase") == Expedition.BUILD and frontier.get("system") == system_id and frontier.get("has_point", false):
+		_chart.traffic.append({"role": "worksite", "position": frontier.point})
 	var planned: int = sim.planned_target
-	_chart.active_site = planned if planned >= 0 else int(sim.target)
+	_chart.active_site = planned if targets.has(planned) else int(sim.target)
+	if not targets.has(_chart.active_site):
+		_chart.active_site = targets[0] if not targets.is_empty() else -1
 	show()
 	_select_site(_chart.active_site)
 
@@ -147,7 +153,7 @@ func _add_site(parent: VBoxContainer, id: int) -> void:
 
 
 func _select_site(id: int) -> void:
-	if _flight == null or Sector.system_of_site(id) != _flight.system_id:
+	if _flight == null or not _chart.centers.has(id):
 		return
 	_candidate = id
 	_chart.selected_site = id
@@ -184,7 +190,7 @@ func _select_site(id: int) -> void:
 
 
 func _apply() -> void:
-	if _flight != null and Sector.system_of_site(_candidate) == _flight.system_id and _candidate != _current_site():
+	if _flight != null and _chart.centers.has(_candidate) and _candidate != _current_site():
 		destination_selected.emit(_candidate)
 
 
@@ -323,9 +329,9 @@ class SectorChart extends Control:
 		"patrol": Color("90c6ff"),
 		"raider": Color("ff978c"),
 		"signal": Color("ffd396"),
+		"worksite": Color("ffc077"),
 	}
 
-	var system_id := Sector.HOME_SYSTEM
 	var ship_position := Vector3.ZERO
 	var centers: Dictionary[int, Vector3] = {}
 	var active_site := -1
@@ -349,7 +355,7 @@ class SectorChart extends Control:
 			minimum = minimum.min(xz)
 			maximum = maximum.max(xz)
 		for contact: Dictionary in traffic:
-			if contact.role == "signal":
+			if contact.role in ["signal", "worksite"]:
 				var point: Vector3 = contact.position
 				var xz := Vector2(point.x, point.z)
 				minimum = minimum.min(xz)
@@ -369,7 +375,7 @@ class SectorChart extends Control:
 		var distance := 30.0
 		var plot := _plot_bounds()
 		var bounds := _bounds_xz()
-		for id: int in Sector.targets_for(system_id):
+		for id: int in centers:
 			var marker := _project(centers[id], plot, bounds)
 			var separation := point.distance_to(marker)
 			if separation < distance:
@@ -397,9 +403,9 @@ class SectorChart extends Control:
 				track[index] = _project(orbit[index], plot, bounds)
 			draw_polyline(track, ORBIT_COLOR, 1.7, true)
 		var ship := _project(ship_position, plot, bounds).clamp(Vector2(18, 35), size - Vector2(18, 28))
-		if active_site >= 0:
+		if centers.has(active_site):
 			_draw_course(ship, _project(centers[active_site], plot, bounds), Color("4d928c"), 1.5)
-		if selected_site >= 0 and selected_site != active_site:
+		if centers.has(selected_site) and selected_site != active_site:
 			_draw_course(ship, _project(centers[selected_site], plot, bounds), Color("d9a569"), 1.8)
 		var label_boxes: Array[Rect2] = [
 			Rect2(11, 10, 127, 24),
@@ -421,7 +427,7 @@ class SectorChart extends Control:
 		for center: Vector3 in centers.values():
 			var point := _project(center, plot, bounds)
 			label_boxes.append(Rect2(point - Vector2(15, 15), Vector2(30, 30)))
-		for id: int in Sector.targets_for(system_id):
+		for id: int in centers:
 			var entry = Sector.site(id)
 			var marker := _project(centers[id], plot, bounds)
 			var tint: Color = entry.accent
@@ -453,6 +459,7 @@ class SectorChart extends Control:
 	func _draw_traffic(font: Font, plot: Rect2, bounds: Rect2, label_boxes: Array[Rect2]) -> void:
 		var roles: Dictionary[String, String] = {
 			"trader": "Торговец", "patrol": "Патруль", "raider": "Рейдер", "signal": "Сигнал",
+			"worksite": "Стройплощадка",
 		}
 		var visible_roles: Array[String] = []
 		var limits := Rect2(Vector2(16, 36), (size - Vector2(32, 77)).max(Vector2.ONE))
@@ -484,6 +491,10 @@ class SectorChart extends Control:
 				draw_arc(point, 5.5, 0.0, TAU, 20, color, 1.4, true)
 			"patrol":
 				draw_rect(Rect2(point - Vector2(5, 5), Vector2(10, 10)), color, false, 1.4)
+			"worksite":
+				draw_arc(point, 8.0, 0.0, TAU, 24, color, 1.4, true)
+				draw_line(point - Vector2(4, 0), point + Vector2(4, 0), color, 1.4, true)
+				draw_line(point - Vector2(0, 4), point + Vector2(0, 4), color, 1.4, true)
 			_:
 				var radius := 7.0 if role == "raider" else 5.0
 				var diamond := PackedVector2Array([

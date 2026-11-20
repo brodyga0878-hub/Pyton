@@ -241,7 +241,7 @@ func _test_save_and_migration() -> void:
 
 
 func _test_shifted_routes() -> void:
-	for system in range(Catalog.SYSTEM_COUNT):
+	for system in range(Catalog.CORE_SYSTEM_COUNT):
 		var destinations := Catalog.targets_for(system)
 		for origin: int in destinations:
 			for destination: int in destinations:
