@@ -1,0 +1,145 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.48.0",
+  "source_commit": "c17248cc52f4441ff210641b7dc765698855a23f",
+  "content": {
+    "focus_kinds": [
+      "star",
+      "planet",
+      "moon"
+    ],
+    "forecast_frames": [
+      "system",
+      "body_relative"
+    ],
+    "forecast_seconds": 180,
+    "forecast_projections": [
+      "XZ",
+      "XY"
+    ],
+    "maneuver_max_relative_entry_speed_m_s": 30,
+    "save_schema": 13
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 73,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches_0.47": true,
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 30,
+    "tested_on_device": false
+  },
+  "checks": {
+    "flight": {
+      "failures": 0
+    },
+    "scene": {
+      "failures": 0
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 72
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 186
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 292
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 191
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 132
+    },
+    "living": {
+      "failures": 0,
+      "checks": 76
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 80
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "moving_body_sweep": {
+      "maneuvers": 54,
+      "complete_planetary_orbits": 2,
+      "complete_lunar_orbits": 2,
+      "failures": 0
+    },
+    "local_orbit_mathematics": {
+      "checks": 2266,
+      "failures": 0
+    },
+    "desktop_flight_ui": {
+      "checks": 34,
+      "failures": 0,
+      "viewports": [
+        [
+          1280,
+          720
+        ],
+        [
+          1600,
+          720
+        ]
+      ]
+    }
+  },
+  "files": {
+    "OrbitRelay-0.48.0-arm64.apk": {
+      "bytes": 26440578,
+      "sha256": "40116f1cabf42c19e0ac2accdaed73d8c8463f9411ca8f4f11e324e88ad8f8d7"
+    },
+    "OrbitRelay-0.48.0-source.zip": {
+      "bytes": 245638,
+      "sha256": "3814eabeb7c7a25199fbaf4ecacc3fe07ae0ba30d73a1b348dfd63b7ccc39d15"
+    },
+    "planet-orbit-hud.png": {
+      "bytes": 700652,
+      "sha256": "81ca0700ea699719a661208b16d16ade51b95f1fdd689c841d6730103b0aad8b"
+    },
+    "planet-trajectory-map-side.png": {
+      "bytes": 126419,
+      "sha256": "7873ea954f21e25a63c0460f77c9e41bad2a9d50ac125282bf4787900eb78124"
+    },
+    "planet-trajectory-map.png": {
+      "bytes": 131845,
+      "sha256": "8ac100efbb7f820744fd5c705b94f096f14da00814fe2683a187c5b99eb52eea"
+    }
+  }
+}
