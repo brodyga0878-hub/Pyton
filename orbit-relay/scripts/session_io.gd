@@ -1,5 +1,6 @@
 extends RefCounted
 
+const AndroidReportShare = preload("res://scripts/android_report_share.gd")
 const SAVE_PATH = "user://flight.json"
 const REPORT_DIR = "user://reports"
 const DOWNLOAD_SUBDIR = "OrbitalRelay"
@@ -55,14 +56,14 @@ func trace(event: String, fields: Dictionary = {}) -> void:
 
 
 func export_report(state: Dictionary, path: String = "") -> Dictionary:
-	var state_bytes := _state_bytes(state)
+	var android_download := path.is_empty() and OS.has_feature("android")
 	var fallback_path := ""
 	if path.is_empty():
-		var stamp := Time.get_datetime_string_from_system(true).replace(":", "-")
-		fallback_path = REPORT_DIR.path_join("orbital-relay-%s-%d.zip" % [stamp, Time.get_ticks_usec()])
+		fallback_path = _next_report_path()
 		path = _desktop_download_path(fallback_path)
 
 	var destination := ProjectSettings.globalize_path(path)
+	var state_bytes := _state_bytes(state)
 	var result := _write_report_archive(destination, state_bytes)
 	if result != OK and not fallback_path.is_empty() and fallback_path != path:
 		destination = ProjectSettings.globalize_path(fallback_path)
@@ -77,15 +78,43 @@ func export_report(state: Dictionary, path: String = "") -> Dictionary:
 		"public_downloads": false,
 		"clipboard_copied": false,
 	}
-	if OS.has_feature("android"):
-		var published := _android_publish_zip(destination)
-		if published:
-			response["path"] = "Download/%s/%s" % [DOWNLOAD_SUBDIR, destination.get_file()]
+	if android_download:
+		var published := AndroidReportShare.publish(destination)
+		if published.ok:
+			response["path"] = published.path
+			response["file"] = published.file
 			response["public_downloads"] = true
 			DirAccess.remove_absolute(destination)
 		else:
 			response["clipboard_copied"] = copy_report_text(state)
 	return response
+
+
+func share_report(state: Dictionary) -> Dictionary:
+	if not OS.has_feature("android"):
+		return {
+			"ok": false, "shared": false, "path": "", "file": "", "public_downloads": false,
+			"reason": "Системное меню «Поделиться» доступно на Android.",
+		}
+	var destination := ProjectSettings.globalize_path(_next_report_path())
+	var result := _write_report_archive(destination, _state_bytes(state))
+	if result != OK:
+		return _report_error(result)
+	var handoff := AndroidReportShare.share(destination)
+	var available_path := str(handoff.get("path", ""))
+	return {
+		"ok": true,
+		"shared": handoff.ok,
+		"path": destination if available_path.is_empty() else available_path,
+		"file": handoff.get("file", destination.get_file()),
+		"public_downloads": handoff.get("public_downloads", false),
+		"reason": handoff.get("reason", ""),
+	}
+
+
+static func _next_report_path() -> String:
+	var stamp := Time.get_datetime_string_from_system(true).replace(":", "-")
+	return REPORT_DIR.path_join("orbital-relay-%s-%d.zip" % [stamp, Time.get_ticks_usec()])
 
 
 func _write_report_archive(destination: String, state_bytes: PackedByteArray) -> Error:
@@ -280,7 +309,10 @@ static func _pack(zip: ZIPPacker, filename: String, bytes: PackedByteArray) -> E
 
 
 static func _report_error(error: Error) -> Dictionary:
-	return {"ok": false, "path": "", "file": "", "error": error, "reason": error_string(error)}
+	return {
+		"ok": false, "shared": false, "path": "", "file": "", "public_downloads": false,
+		"error": error, "reason": error_string(error),
+	}
 
 
 static func _desktop_download_path(private_path: String) -> String:
@@ -290,58 +322,3 @@ static func _desktop_download_path(private_path: String) -> String:
 	if downloads.is_empty() or not DirAccess.dir_exists_absolute(downloads):
 		return private_path
 	return downloads.path_join(DOWNLOAD_SUBDIR).path_join(private_path.get_file())
-
-
-static func _android_publish_zip(local_path: String) -> bool:
-	# AndroidRuntime and JavaClassWrapper are shipped with the Android export
-	# template. MediaStore allows creating our own ZIP in Downloads without
-	# granting general access to shared storage.
-	if not Engine.has_singleton("AndroidRuntime") or not Engine.has_singleton("JavaClassWrapper"):
-		return false
-	var archive_bytes := FileAccess.get_file_as_bytes(local_path)
-	if archive_bytes.size() < 22:
-		return false
-	var runtime: Variant = Engine.get_singleton("AndroidRuntime")
-	var bridge: Variant = Engine.get_singleton("JavaClassWrapper")
-	var version: Variant = bridge.wrap("android.os.Build$VERSION")
-	if version == null or int(version.SDK_INT) < 29:
-		return false
-
-	var context: Variant = runtime.getApplicationContext()
-	if context == null:
-		return false
-	var resolver: Variant = context.getContentResolver()
-	var downloads: Variant = bridge.wrap("android.provider.MediaStore$Downloads")
-	var values_class: Variant = bridge.wrap("android.content.ContentValues")
-	if resolver == null or downloads == null or values_class == null:
-		return false
-	var collection: Variant = downloads.getContentUri("external_primary")
-	if collection == null:
-		return false
-	var values: Variant = values_class.new()
-	if values == null:
-		return false
-	values.put("_display_name", local_path.get_file())
-	values.put("mime_type", "application/zip")
-	values.put("relative_path", "Download/" + DOWNLOAD_SUBDIR + "/")
-	values.put("is_pending", "1")
-	var uri: Variant = resolver.insert(collection, values)
-	if uri == null:
-		return false
-
-	var stream: Variant = resolver.openOutputStream(uri, "w")
-	if stream == null:
-		resolver.delete(uri, "", PackedStringArray())
-		return false
-	stream.write(archive_bytes)
-	var written: bool = bridge.get_exception() == null
-	stream.close()
-	var closed: bool = bridge.get_exception() == null
-	if written and closed:
-		var ready: Variant = values_class.new()
-		ready.put("is_pending", "0")
-		var updated: Variant = resolver.update(uri, ready, "", PackedStringArray())
-		if updated != null and int(updated) == 1:
-			return true
-	resolver.delete(uri, "", PackedStringArray())
-	return false

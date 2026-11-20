@@ -34,6 +34,7 @@ var _report: CenterContainer
 var _report_text: Label
 var _report_buttons: Array[Button] = []
 var _report_touches: Dictionary[int, Button] = {}
+var _report_sharing := false
 
 
 func _ready() -> void:
@@ -336,11 +337,17 @@ func _unhandled_key_input(event: InputEvent) -> void:
 func _notification(what: int) -> void:
 	if not is_node_ready():
 		return
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_APPLICATION_PAUSED:
+		_report_touches.clear()
+	if what == NOTIFICATION_APPLICATION_FOCUS_IN or what == NOTIFICATION_APPLICATION_RESUMED:
+		_report_sharing = false
 	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
-		flight.cancel_jump()
-		flight.cancel_orbit_maneuver()
-		flight.cancel_rendezvous()
-		flight.reset_time_scale()
+		var sharing_report := what == NOTIFICATION_APPLICATION_PAUSED and _report.visible and _report_sharing
+		if not sharing_report:
+			flight.cancel_jump()
+			flight.cancel_orbit_maneuver()
+			flight.cancel_rendezvous()
+			flight.reset_time_scale()
 		_save()
 	elif what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		if _report.visible:
@@ -405,8 +412,17 @@ func _build_report_panel() -> void:
 	_report_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_report_text.add_theme_font_size_override("font_size", 18)
 	contents.add_child(_report_text)
-	var buttons := HBoxContainer.new()
-	buttons.add_theme_constant_override("separation", 10)
+	var buttons: Container
+	if OS.has_feature("android"):
+		var grid := GridContainer.new()
+		grid.columns = 2
+		grid.add_theme_constant_override("h_separation", 10)
+		grid.add_theme_constant_override("v_separation", 10)
+		buttons = grid
+		_add_report_button(buttons, "Поделиться ZIP", _share_report)
+	else:
+		buttons = HBoxContainer.new()
+		buttons.add_theme_constant_override("separation", 10)
 	contents.add_child(buttons)
 	_add_report_button(buttons, "Сохранить ZIP", _export_report)
 	_add_report_button(buttons, "Копировать текст", _copy_report)
@@ -427,25 +443,36 @@ func _add_report_button(parent: Container, caption: String, action: Callable) ->
 
 
 func _input(event: InputEvent) -> void:
-	if _report == null or not _report.visible or not event is InputEventScreenTouch:
+	if _report == null or not _report.visible:
 		return
-	var touch := event as InputEventScreenTouch
-	if touch.pressed:
-		for button in _report_buttons:
-			if button.get_global_rect().has_point(touch.position):
-				_report_touches[touch.index] = button
-				break
-	else:
-		var button: Button = _report_touches.get(touch.index)
-		_report_touches.erase(touch.index)
-		if button != null and not touch.canceled and button.get_global_rect().has_point(touch.position):
-			button.pressed.emit()
-	get_viewport().set_input_as_handled()
+	if event is InputEventScreenTouch:
+		var button: Button = _report_touches.get(event.index)
+		_report_touches.erase(event.index)
+		if not event.canceled:
+			if event.pressed:
+				for candidate in _report_buttons:
+					if _report_button_hit(candidate, event.position) and candidate not in _report_touches.values():
+						_report_touches[event.index] = candidate
+						break
+			elif _report_button_hit(button, event.position):
+				button.pressed.emit()
+		get_viewport().set_input_as_handled()
+	elif event is InputEventScreenDrag:
+		if not _report_button_hit(_report_touches.get(event.index), event.position):
+			_report_touches.erase(event.index)
+		get_viewport().set_input_as_handled()
+
+
+static func _report_button_hit(button: Button, position: Vector2) -> bool:
+	return button != null and button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(position)
 
 
 func _open_report() -> void:
 	_hud.set_input_enabled(false)
-	_report_text.text = "В архив входят состояние рейса и журнал последних действий."
+	_report_touches.clear()
+	_report_text.text = "В ZIP входят версия игры, состояние рейса и последние события."
+	if OS.has_feature("android"):
+		_report_text.text += "\nПри отправке вы выбираете приложение и получателя."
 	_report.show()
 
 
@@ -635,22 +662,47 @@ func _close_frontier() -> void:
 
 func _close_report() -> void:
 	_report_touches.clear()
+	_report_sharing = false
 	_report.hide()
 	_hud.set_input_enabled(true)
 
 
 func _export_report() -> void:
+	_report_touches.clear()
 	var result := _io.export_report(flight.snapshot())
 	if not result.ok:
 		_report_text.text = "Не удалось записать архив. Можно скопировать текст отчёта."
 		return
 	if result.get("public_downloads", false):
-		_report_text.text = "Архив сохранён в папке загрузок.\n%s" % result.path
+		_report_text.text = "ZIP сохранён в «Загрузках».\n%s" % result.path
 	elif OS.has_feature("android"):
-		_report_text.text = "Архив сохранён в памяти игры. %s" % ("Текст отчёта скопирован." if result.get("clipboard_copied", false) else "Можно скопировать текст отчёта.")
+		_report_text.text = "ZIP сохранён в памяти игры. Используйте «Поделиться ZIP»."
+		_report_text.text += " Текст отчёта скопирован." if result.get("clipboard_copied", false) else " Можно скопировать текст."
 	else:
-		_report_text.text = "Архив сохранён.\n%s" % result.path
+		_report_text.text = "ZIP сохранён.\n%s" % result.path
+
+
+func _share_report() -> void:
+	if not _report.visible or _report_sharing:
+		return
+	_report_touches.clear()
+	if not OS.has_feature("android"):
+		_report_text.text = "На этом устройстве можно сохранить ZIP или скопировать текст."
+		return
+	_report_sharing = true
+	var result := _io.share_report(flight.snapshot())
+	if result.get("shared", false):
+		_report_text.text = "Игра открыла системное меню отправки ZIP."
+		return
+	_report_sharing = false
+	if not result.ok:
+		_report_text.text = "Не удалось подготовить ZIP. Можно скопировать текст отчёта."
+	elif result.get("public_downloads", false):
+		_report_text.text = "Меню отправки недоступно. Передайте ZIP из «Загрузок».\n%s" % result.path
+	else:
+		_report_text.text = "Меню отправки недоступно. ZIP сохранён в памяти игры. Попробуйте «Сохранить ZIP» или скопируйте текст."
 
 
 func _copy_report() -> void:
+	_report_touches.clear()
 	_report_text.text = "Текст отчёта скопирован." if _io.copy_report_text(flight.snapshot()) else "Буфер обмена сейчас недоступен."
