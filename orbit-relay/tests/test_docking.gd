@@ -192,6 +192,7 @@ func _test_handoffs_and_save() -> void:
 		"Reloading an active approach preserves the real pose and momentum but clears automatic bank commands")
 	var earlier := saved.duplicate(true)
 	earlier.schema = 15
+	earlier.ship.erase("hull_id")
 	earlier.ship.erase("jump_fuel")
 	earlier.mining.cargo.erase("hydrogen")
 	earlier.mining.reserves.resize(Catalog.PRE_GAS_DESTINATION_COUNT)

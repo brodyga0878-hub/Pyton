@@ -192,6 +192,7 @@ func _test_previous_schema() -> void:
 	flight.ship.jump_fuel = 52.0
 	var previous := flight.snapshot()
 	previous.schema = 22
+	previous.ship.erase("hull_id")
 	previous.erase("passengers")
 	if not _expect(flight.restore(previous) and not flight.passenger_status().active
 		and int(flight.passenger_status().capacity) == 2 and int(flight.passenger_status().debt) == 0

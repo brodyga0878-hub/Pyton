@@ -36,7 +36,7 @@ static func plan(sim: RefCounted, site: int, offset: Vector3) -> Dictionary:
 	var point: Vector3 = sim.target_position(site) + offset
 	var velocity: Vector3 = sim.target_velocity(site)
 	var position: Vector3 = sim.position
-	var cruise := CRUISE_SPEED if sim.ship.fuel > 0.0 else minf(CRUISE_SPEED, sim.RESERVE_SPEED)
+	var cruise: float = sim._cruise_limit(CRUISE_SPEED)
 	var eta := minf(position.distance_to(point) / cruise, MAX_INTERCEPT_SECONDS)
 	var epoch: float = sim.orbit_time
 	# Orbital motion is much slower than cruise, so this bounded iteration

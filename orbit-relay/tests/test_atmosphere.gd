@@ -204,6 +204,7 @@ func _test_hot_saves() -> void:
 			"Malformed atmospheric heat is rejected without affecting the loaded state")
 	var previous := state.duplicate(true)
 	previous.schema = 13
+	previous.ship.erase("hull_id")
 	previous.ship.erase("jump_fuel")
 	previous.mining.cargo.erase("hydrogen")
 	previous.mining.reserves.resize(Catalog.PRE_GAS_DESTINATION_COUNT)

@@ -4,6 +4,7 @@ signal service_requested(action: String)
 signal transfer_requested(destination: String)
 signal jettison_requested(good: String)
 signal crew_requested(action: String, member: int)
+signal ship_exchange_requested(hull: String)
 signal dismissed()
 
 const TEXT := Color("e8f4fa")
@@ -13,6 +14,8 @@ const AMBER := Color("ffd396")
 const BORDER := Color("365561")
 const ShipSystems := preload("res://scripts/ship_systems.gd")
 const Crew := preload("res://scripts/crew.gd")
+
+enum StationPage { SERVICES, CREW, YARD }
 
 var _sim: RefCounted
 var _insets: MarginContainer
@@ -40,7 +43,10 @@ var _crew_empty: Label
 var _crew_candidate_rows: Array[Dictionary] = []
 var _crew_member_rows: Array[Dictionary] = []
 var _crew_buttons: Array[Button] = []
-var _crew_open := false
+var _yard: VBoxContainer
+var _yard_toggle: Button
+var _yard_rows: Array[Dictionary] = []
+var _station_page := StationPage.SERVICES
 var _transfers: VBoxContainer
 var _hydrogen: Label
 var _close_button: Button
@@ -86,7 +92,10 @@ func build() -> void:
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_crew_toggle = _button(header)
 	_crew_toggle.custom_minimum_size.x = 126.0
-	_crew_toggle.pressed.connect(_toggle_crew)
+	_crew_toggle.pressed.connect(_toggle_station_page.bind(StationPage.CREW))
+	_yard_toggle = _button(header)
+	_yard_toggle.custom_minimum_size.x = 126.0
+	_yard_toggle.pressed.connect(_toggle_station_page.bind(StationPage.YARD))
 	_close_button = _button(header)
 	_close_button.text = "Закрыть"
 	_close_button.custom_minimum_size.x = 126.0
@@ -122,6 +131,7 @@ func build() -> void:
 	_cargo_detail = _add_service("cargo", "Расширение трюма", "")
 	_add_service("heat_shield", "Теплозащита", "Тепловая нагрузка в атмосфере ниже на %d%%" % ShipSystems.HEAT_SHIELD_REDUCTION)
 	_build_crew(content)
+	_build_yard(content)
 	_transfers = VBoxContainer.new()
 	_transfers.add_theme_constant_override("separation", 8)
 	content.add_child(_transfers)
@@ -141,7 +151,7 @@ func open(sim: RefCounted, fuel_only := false) -> void:
 	build()
 	_sim = sim
 	_fuel_only = fuel_only
-	_crew_open = false
+	_station_page = StationPage.SERVICES
 	_cargo_index = 0
 	_discard_pending_good = ""
 	_touches.clear()
@@ -174,17 +184,21 @@ func refresh() -> void:
 	else:
 		_station.text = _sim.target_name(_sim.docked)
 		_balance.text = "Баланс %d кр." % _sim.credits
-		if _crew_open:
-			_refresh_crew()
-		else:
-			_refresh_services()
+		match _station_page:
+			StationPage.CREW: _refresh_crew()
+			StationPage.YARD: _refresh_yard()
+			_: _refresh_services()
 
 
 func _refresh_services() -> void:
 	_tariff.text = "Тариф порта · %d кр. за ед." % _sim.refuel_unit_price()
 	_jump_tariff.text = _tariff.text
 	_repair_tariff.text = "Тариф порта · %d кр. за 1%%" % _sim.repair_unit_price()
-	_cargo_detail.text = "Ёмкость 40 ед." if _sim.ship.cargo_upgraded else "Ёмкость 24 → 40 ед."
+	var profile := ShipSystems.profile(_sim.ship.hull_id)
+	if _sim.ship.cargo_upgraded:
+		_cargo_detail.text = "Ёмкость %d ед." % int(profile.expanded_cargo)
+	else:
+		_cargo_detail.text = "Ёмкость %d → %d ед." % [int(profile.cargo), int(profile.expanded_cargo)]
 	for action: String in _action_buttons:
 		var offer: Dictionary = _sim.service_offer(action)
 		var button := _action_buttons[action]
@@ -206,20 +220,33 @@ func _refresh_services() -> void:
 
 
 func _show_page() -> void:
-	_title.text = "Топливо" if _fuel_only else ("Экипаж" if _crew_open else "Портовые службы")
-	_crew_toggle.text = "Сервис" if _crew_open else "Экипаж"
+	var crew_open := not _fuel_only and _station_page == StationPage.CREW
+	var yard_open := not _fuel_only and _station_page == StationPage.YARD
+	_title.text = "Портовые службы"
+	if _fuel_only:
+		_title.text = "Топливо"
+	elif crew_open:
+		_title.text = "Экипаж"
+	elif yard_open:
+		_title.text = "Верфь"
+	_crew_toggle.text = "Сервис" if crew_open else "Экипаж"
 	_crew_toggle.visible = not _fuel_only
+	_yard_toggle.text = "Сервис" if yard_open else "Верфь"
+	_yard_toggle.visible = not _fuel_only and _sim.shipyard_available()
 	_port_details.visible = not _fuel_only
-	_gauges.visible = not _crew_open
-	_services.visible = not _fuel_only and not _crew_open
-	_crew.visible = _crew_open
+	_gauges.visible = not crew_open and not yard_open
+	_services.visible = not _fuel_only and _station_page == StationPage.SERVICES
+	_crew.visible = crew_open
+	_yard.visible = yard_open
 	_transfers.visible = _fuel_only
 
 
-func _toggle_crew() -> void:
+func _toggle_station_page(page: StationPage) -> void:
 	if not is_open() or _fuel_only:
 		return
-	_crew_open = not _crew_open
+	if page == StationPage.YARD and not _sim.shipyard_available():
+		return
+	_station_page = StationPage.SERVICES if _station_page == page else page
 	_touches.clear()
 	_show_page()
 	refresh()
@@ -347,7 +374,7 @@ func _refresh_crew() -> void:
 
 
 func _request_crew(action: String, index: int) -> void:
-	if not is_open() or not _crew_open:
+	if not is_open() or _station_page != StationPage.CREW:
 		return
 	var row := _crew_candidate_rows[index] if action == "hire" else _crew_member_rows[index]
 	var button: Button = row[action]
@@ -365,6 +392,91 @@ static func _crew_role(role: String) -> String:
 	if role == "engineer":
 		return "Механик · ремонт дешевле на 1 кр. за 1% корпуса"
 	return "Штурман · зарядка прыжка за 2,2 с"
+
+
+func _build_yard(parent: VBoxContainer) -> void:
+	_yard = VBoxContainer.new()
+	_yard.add_theme_constant_override("separation", 12)
+	parent.add_child(_yard)
+	var hulls := HBoxContainer.new()
+	hulls.add_theme_constant_override("separation", 12)
+	_yard.add_child(hulls)
+	for id: String in ShipSystems.hull_ids():
+		var row := _yard_card(hulls, ShipSystems.profile(id))
+		_yard_rows.append(row)
+	var terms := _label(_yard,
+		"Верфь переносит оборудование, топливо и данные кают. Новый корпус выдаётся исправным. Весь груз должен помещаться в новый трюм.",
+		16, MUTED)
+	terms.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_yard.hide()
+
+
+func _yard_card(parent: HBoxContainer, profile: Dictionary) -> Dictionary:
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size.x = 338.0
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	panel.add_theme_stylebox_override("panel", _style(Color("112631"), Color("263f4b"), 9, 14))
+	parent.add_child(panel)
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 8)
+	panel.add_child(content)
+	_label(content, str(profile.name), 24, TEXT)
+	var description := _label(content, str(profile.description), 16, MUTED)
+	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var hold := _label(content, "", 17, MINT)
+	_label(content, "Специалисты для выхода · %d" % int(profile.crew_required), 17, TEXT)
+	var mobility := _label(content, "Скорость %d%% · Разгон %d%%\nРасход реактивного топлива %d%%" % [
+		roundi(float(profile.speed_factor) * 100.0), roundi(float(profile.accel_factor) * 100.0),
+		roundi(float(profile.burn_factor) * 100.0),
+	], 16, MUTED)
+	mobility.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var cost := _label(content, "", 17, TEXT)
+	var reason := _label(content, "", 16, AMBER)
+	reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var exchange := _button(content)
+	exchange.pressed.connect(_request_yard_exchange.bind(str(profile.id)))
+	return {"id": str(profile.id), "panel": panel, "hold": hold, "cost": cost, "reason": reason, "exchange": exchange}
+
+
+func _refresh_yard() -> void:
+	var offers: Array[Dictionary] = _sim.shipyard_offers()
+	for row in _yard_rows:
+		row.panel.hide()
+	for offer in offers:
+		for row in _yard_rows:
+			if row.id != offer.id:
+				continue
+			row.panel.show()
+			row.hold.text = "Трюм %d ед. · с расширением %d" % [int(offer.cargo), int(offer.expanded_cargo)]
+			if _sim.ship.cargo_upgraded:
+				row.hold.text = "Трюм %d ед. с установленным расширением" % int(offer.cargo_capacity)
+			row.hold.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			var installed := bool(offer.installed)
+			var net := int(offer.net_cost)
+			row.cost.text = "Цена %d кр." % int(offer.price)
+			if not installed:
+				row.cost.text += " · Зачёт %d кр." % int(offer.trade_in)
+			row.cost.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			row.reason.text = "" if installed or offer.available else str(offer.reason)
+			row.reason.visible = not row.reason.text.is_empty()
+			row.exchange.disabled = installed or not bool(offer.available)
+			if installed:
+				row.exchange.text = "Ваш корабль"
+			elif net >= 0:
+				row.exchange.text = "Обменять · доплата %d кр." % net
+			else:
+				row.exchange.text = "Обменять · к получению %d кр." % -net
+			break
+
+
+func _request_yard_exchange(id: String) -> void:
+	if not is_open() or _station_page != StationPage.YARD:
+		return
+	for row in _yard_rows:
+		if row.id == id and row.exchange.is_visible_in_tree() and not row.exchange.disabled:
+			_touches.clear()
+			ship_exchange_requested.emit(id)
+			return
 
 
 func _refresh_transfers() -> void:
@@ -406,7 +518,7 @@ func is_open() -> bool:
 
 
 func _request_service(action: String) -> void:
-	if is_open() and not _fuel_only and not _crew_open and _sim.service_offer(action).allowed:
+	if is_open() and not _fuel_only and _station_page == StationPage.SERVICES and _sim.service_offer(action).allowed:
 		# A purchase can change the price shown for another service.
 		_touches.clear()
 		service_requested.emit(action)
@@ -537,11 +649,15 @@ func _button_at(point: Vector2) -> Button:
 		return _close_button
 	if _crew_toggle.is_visible_in_tree() and _crew_toggle.get_global_rect().has_point(point):
 		return _crew_toggle
+	if _yard_toggle.is_visible_in_tree() and _yard_toggle.get_global_rect().has_point(point):
+		return _yard_toggle
 	var buttons: Array = _action_buttons.values()
 	if _fuel_only:
 		buttons = _transfer_buttons.values() + [_discard_choice, _discard_button]
-	elif _crew_open:
+	elif _station_page == StationPage.CREW:
 		buttons = _crew_buttons
+	elif _station_page == StationPage.YARD:
+		buttons = _yard_rows.map(func(row: Dictionary) -> Button: return row.exchange)
 	for button: Button in buttons:
 		if not button.disabled and button.is_visible_in_tree() and button.get_global_rect().has_point(point):
 			return button

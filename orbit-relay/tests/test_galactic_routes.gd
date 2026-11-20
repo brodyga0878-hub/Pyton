@@ -188,6 +188,7 @@ func _test_save_guards() -> void:
 		"A saved route cannot reveal or use an undiscovered frontier")
 	var older := encoded.duplicate(true)
 	older.schema = 16
+	older.ship.erase("hull_id")
 	older.ship.fuel = older.ship.jump_fuel
 	older.ship.erase("jump_fuel")
 	older.mining.cargo.erase("hydrogen")

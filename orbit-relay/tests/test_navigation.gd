@@ -183,6 +183,7 @@ func _test_saves() -> void:
 	legacy.velocity = Vector3(2.0, -4.0, -12.0)
 	var previous := _json(legacy.snapshot())
 	previous.schema = 12
+	previous.ship.erase("hull_id")
 	previous.ship.erase("jump_fuel")
 	previous.mining.cargo.erase("hydrogen")
 	previous.mining.reserves.resize(Catalog.PRE_GAS_DESTINATION_COUNT)

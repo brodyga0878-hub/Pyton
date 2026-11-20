@@ -197,6 +197,7 @@ func _test_legacy_migration(flight: Flight) -> void:
 	for version in [16, 17]:
 		var legacy := _json(flight.snapshot())
 		legacy.schema = version
+		legacy.ship.erase("hull_id")
 		legacy.ship.erase("jump_fuel")
 		legacy.mining.cargo.erase("hydrogen")
 		legacy.mining.reserves.resize(Catalog.PRE_GAS_DESTINATION_COUNT)

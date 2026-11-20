@@ -184,6 +184,7 @@ func _align_with_pad(flight: Flight) -> void:
 func _legacy(snapshot: Dictionary) -> Dictionary:
 	var older := snapshot.duplicate(true)
 	older.schema = 18
+	older.ship.erase("hull_id")
 	older.ship.erase("jump_fuel")
 	older.mining.cargo.erase("hydrogen")
 	older.mining.reserves.resize(Catalog.PRE_GAS_DESTINATION_COUNT)

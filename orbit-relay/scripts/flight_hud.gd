@@ -82,6 +82,7 @@ var _touch_mirrored := false
 var _parked := true
 var _departure_active := false
 var _departure_can_cancel := false
+var _departure_blocked := false
 var _lift_blocked := false
 var _mining_blocked := false
 var _scoop_blocked := false
@@ -442,6 +443,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_reset_controls()
 	_departure_active = departure.active
 	_departure_can_cancel = departure.can_cancel
+	_departure_blocked = docked and not _departure_active and not bool(departure.get("can_request", true))
 	var port_services: bool = sim.station_services_available()
 	var patrol: Dictionary = sim.patrol_status()
 	if not _parked and parked:
@@ -536,6 +538,9 @@ func sync(sim: RefCounted, delta: float) -> void:
 		elif _departure_active:
 			_actions["dock"].text = "Отменить выход" if _departure_can_cancel else "Автоматический выход"
 			_actions["dock"].tooltip_text = str(departure.reason)
+		elif _departure_blocked:
+			_actions["dock"].text = "Нужен экипаж" if sim.ship.crew_required() > 0 else "Выход недоступен"
+			_actions["dock"].tooltip_text = str(departure.reason)
 	var scoop_status: Dictionary = {} if parked else sim.scoop_status()
 	_scoop_blocked = not sim.scooping and not scoop_status.get("ok", false)
 	_actions["scoop"].visible = not parked and (scoop_target or scoop_status.get("near", false) or sim.scooping)
@@ -577,6 +582,9 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_sync_flight(sim, scoop_status, itinerary, patrol, fire, convoy, rendezvous, entry_site, surface)
 	_sync_passengers(sim)
 	_sync_thermal(stellar, entry, stellar_scoop, show_entry)
+	if _departure_blocked:
+		_guidance.text = str(departure.reason)
+		_guidance.add_theme_color_override("font_color", AMBER)
 	if _notice_left > 0.0:
 		_notice_left -= delta
 		if _notice_left <= 0.0:
@@ -1004,7 +1012,8 @@ func _place_touch_control(control: Control, placement: Rect2, starts_right: bool
 func _refresh_disabled_actions() -> void:
 	for action: String in _actions:
 		var button: Button = _actions[action]
-		var blocked := (action == "dock" and _lift_blocked) or (action == "mine" and _mining_blocked) or (action == "scoop" and _scoop_blocked) or (action == "time" and _time_blocked)
+		var blocked := (action == "dock" and (_lift_blocked or _departure_blocked)) or (action == "mine" and _mining_blocked)
+		blocked = blocked or (action == "scoop" and _scoop_blocked) or (action == "time" and _time_blocked)
 		blocked = blocked or (action == "patrol" and _patrol_blocked) or (action == "convoy" and _convoy_blocked) or (action == "fire" and _fire_blocked)
 		blocked = blocked or (action == "rendezvous_finish" and _rendezvous_finish_blocked)
 		blocked = blocked or (action == "dock_sync" and _dock_sync_blocked)

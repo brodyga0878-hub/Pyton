@@ -326,6 +326,7 @@ func _test_convoys(remote: Flight, conflict: Dictionary, saved: Dictionary) -> v
 		"The combat round incorporates the net supplies that physically arrived")
 	var legacy := saved.duplicate(true)
 	legacy.schema = 10
+	legacy.ship.erase("hull_id")
 	legacy.ship.erase("jump_fuel")
 	legacy.mining.cargo.erase("hydrogen")
 	legacy.mining.reserves.resize(Catalog.PRE_GAS_DESTINATION_COUNT)

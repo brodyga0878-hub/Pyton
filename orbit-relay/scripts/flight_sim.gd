@@ -21,7 +21,8 @@ const ConvoyOrders = preload("res://scripts/convoy_orders.gd")
 const DockAccess = preload("res://scripts/dock_access.gd")
 const Passengers = preload("res://scripts/passengers.gd")
 const Crew = preload("res://scripts/crew.gd")
-const SAVE_SCHEMA := 24
+const SAVE_SCHEMA := 25
+const SHIPYARD_PORTS := [0, 10, Catalog.FRINGE_ARRIVAL_PORT]
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
@@ -326,7 +327,7 @@ func intercept_time(index: int) -> float:
 		return 0.0
 	var from_gate := target_gate(index) - position
 	var drift := target_velocity(index)
-	var cruise := 118.0 if ship.fuel > 0.0 else RESERVE_SPEED
+	var cruise := _cruise_limit(118.0)
 	var speed_difference := cruise * cruise - drift.length_squared()
 	var projection := from_gate.dot(drift)
 	return (projection + sqrt(projection * projection + speed_difference * from_gate.length_squared())) / speed_difference
@@ -796,7 +797,7 @@ func set_autopilot(enabled: bool) -> void:
 func selected_dock_status() -> Dictionary:
 	if docked >= 0:
 		var exit := departure_status()
-		return {"ok": not exit.active or exit.can_cancel, "reason": exit.reason}
+		return {"ok": exit.can_request or exit.can_cancel, "reason": exit.reason}
 	if landed:
 		var ready := mining.phase == MiningRig.STOWED
 		return {"ok": ready, "reason": "Можно взлететь" if ready else "Сначала верните модуль на борт"}
@@ -892,9 +893,14 @@ func dock_clearance_action() -> bool:
 
 
 func departure_status() -> Dictionary:
+	var required := ship.crew_required()
+	var hired: int = crew.status(orbit_time).count if docked >= 0 and required > 0 else 0
 	var status := {"active": _departure_requested, "can_cancel": false, "phase": "idle",
-		"progress": 0.0, "wait": 0.0, "reason": "Запросите выход", "port": docked}
+		"progress": 0.0, "wait": 0.0, "reason": "Запросите выход", "port": docked,
+		"can_request": docked >= 0 and not _departure_requested and hired >= required}
 	if not _departure_requested:
+		if docked >= 0 and hired < required:
+			status.reason = "Для выхода нужен экипаж: %d из %d. Откройте Сервис → Экипаж." % [hired, required]
 		return status
 	var access := dock_access.status(docked, orbit_time)
 	if _departure_seconds >= 0.0:
@@ -921,6 +927,10 @@ func _departure_action() -> bool:
 		_announce("departure_canceled", "Выход отменён. Корабль остаётся в доке.")
 		return true
 	if not station_operational(docked):
+		return false
+	var status := departure_status()
+	if not status.can_request:
+		_announce("departure_crew_denied", status.reason)
 		return false
 	reset_time_scale()
 	_departure_requested = true
@@ -1381,6 +1391,49 @@ func crew_pay(id: int) -> bool:
 	if not station_services_available():
 		return false
 	return _apply_service_result(crew.pay(id, credits))
+
+
+func shipyard_available() -> bool:
+	return station_services_available() and docked in SHIPYARD_PORTS
+
+
+func shipyard_offers() -> Array[Dictionary]:
+	var offers: Array[Dictionary] = []
+	if shipyard_available():
+		for id in ShipSystems.hull_ids():
+			offers.append(shipyard_offer(id))
+	return offers
+
+
+func shipyard_offer(id: String) -> Dictionary:
+	var offer := ShipSystems.profile(id)
+	if offer.is_empty():
+		return offer
+	offer.installed = ship.hull_id == id
+	offer.trade_in = ship.trade_in_value()
+	offer.net_cost = int(offer.price) - int(offer.trade_in)
+	offer.cargo_capacity = ship.cargo_capacity_for(id)
+	offer.reason = ""
+	if not shipyard_available():
+		offer.reason = "Обмен доступен на действующей верфи"
+	elif offer.installed:
+		offer.reason = "Текущий корпус"
+	elif mining.phase != MiningRig.STOWED or mining.ore_hold > offer.cargo_capacity:
+		offer.reason = "Освободите место в трюме, чтобы груз поместился"
+	elif offer.net_cost > credits:
+		offer.reason = "Недостаточно кредитов"
+	offer.available = offer.reason.is_empty()
+	return offer
+
+
+func shipyard_swap(id: String) -> bool:
+	var offer := shipyard_offer(id)
+	if offer.is_empty() or not offer.available or not ship.swap_hull(id):
+		return false
+	credits -= int(offer.net_cost)
+	mining.cargo_capacity = ship.cargo_capacity()
+	_announce("ship_exchange", "Обмен завершён. Корабль %s." % offer.name)
+	return true
 
 
 func market_trade(good: String, side: String, quantity: int) -> bool:
@@ -2309,7 +2362,7 @@ func _rendezvous_step(delta: float) -> void:
 	var aim := target_position(site) - position if _rendezvous_holding else offset
 	if aim.length_squared() > 0.001:
 		_turn_nose_toward(aim.normalized(), delta)
-	var cruise := Rendezvous.CRUISE_SPEED if ship.fuel > 0.0 else RESERVE_SPEED
+	var cruise := _cruise_limit(Rendezvous.CRUISE_SPEED)
 	if detouring:
 		cruise = minf(cruise, 58.0)
 	var distance := offset.length()
@@ -2319,7 +2372,7 @@ func _rendezvous_step(delta: float) -> void:
 		desired += drift
 	if ship.fuel <= 0.0:
 		desired = desired.limit_length(RESERVE_SPEED)
-	velocity = velocity.move_toward(desired, 40.0 * delta)
+	velocity = velocity.move_toward(desired, _acceleration_limit(40.0) * delta)
 	throttle = requested / MAX_SPEED if distance >= 0.25 else 0.0
 	if not _rendezvous_holding and not detouring and position.distance_to(aim_point) <= RENDEZVOUS_HOLD_DISTANCE and velocity.distance_to(drift) <= RENDEZVOUS_HOLD_SPEED:
 		_rendezvous_holding = true
@@ -2354,7 +2407,7 @@ func _orbit_maneuver_step(delta: float) -> void:
 	_orbit_phase = "turn"
 	if forward().dot(aim) >= ORBIT_ALIGNMENT:
 		_orbit_phase = "burn"
-		var impulse := minf(remaining, ORBIT_BURN_ACCELERATION * delta)
+		var impulse := minf(remaining, _acceleration_limit(ORBIT_BURN_ACCELERATION) * delta)
 		velocity += forward() * impulse
 		throttle = impulse / (34.0 * delta)
 
@@ -2392,8 +2445,8 @@ func _manual_step(delta: float, steer: Vector2, bank: float, boost_requested: bo
 	var local := Vector3(translation.x, translation.y, -translation.z - thrust)
 	var limit := 1.55 if boost else 1.0
 	var drive := attitude() * local.limit_length(limit)
-	var drive_acceleration := 34.0 if had_fuel else 20.0
-	var drive_speed := MAX_SPEED if had_fuel else RESERVE_SPEED
+	var drive_acceleration := 34.0 * ship.accel_factor() if had_fuel else 20.0
+	var drive_speed := _cruise_limit(MAX_SPEED)
 	if flight_assist:
 		var desired := drift + drive * drive_speed
 		if not had_fuel:
@@ -2406,6 +2459,14 @@ func _manual_step(delta: float, steer: Vector2, bank: float, boost_requested: bo
 		var powered := (relative + drive * drive_acceleration * delta).limit_length(powered_limit)
 		velocity = (drift + powered + gravity_at(position) * delta).limit_length(MAX_SAVED_SPEED - 1.0)
 	return local.length()
+
+
+func _cruise_limit(speed_with_fuel: float) -> float:
+	return speed_with_fuel * ship.speed_factor() if ship.fuel > 0.0 else minf(speed_with_fuel, RESERVE_SPEED)
+
+
+func _acceleration_limit(acceleration: float) -> float:
+	return acceleration * ship.accel_factor() if ship.fuel > 0.0 else acceleration
 
 
 func _blocked(point: Vector3, sector_id := -1, epoch := -1.0, progress: RefCounted = null) -> bool:
@@ -2582,14 +2643,13 @@ func _autopilot_step(delta: float) -> void:
 			max_speed = entry_limit
 			autopilot_phase = "Торможение перед входом" if clearance > 0.0 else "Снижение в атмосфере"
 	_point_towards(aim, delta)
-	if ship.fuel <= 0.0:
-		max_speed = minf(max_speed, RESERVE_SPEED)
+	max_speed = _cruise_limit(max_speed)
 	var desired_speed := minf(max_speed, minf(sqrt(42.0 * displacement.length()), displacement.length() * 1.6))
 	var desired := drift + direction.normalized() * desired_speed
 	if ship.fuel <= 0.0:
 		desired = desired.limit_length(RESERVE_SPEED)
-	velocity = velocity.move_toward(desired, 42.0 * delta)
-	throttle = clampf(desired_speed / MAX_SPEED, 0.0, 1.0)
+	velocity = velocity.move_toward(desired, _acceleration_limit(42.0) * delta)
+	throttle = clampf(desired_speed / (MAX_SPEED * ship.speed_factor()), 0.0, 1.0)
 	if _approach_committed and scoop_run and displacement.length() < 2.0 and speed_relative_to(target) < 3.0:
 		set_autopilot(false)
 		throttle = 0.0
@@ -2613,9 +2673,9 @@ func _patrol_course_step(delta: float) -> void:
 	var direction := position.direction_to(waypoint)
 	if not direction.is_zero_approx():
 		_point_towards(direction, delta)
-	var cruise := PATROL_CRUISE_SPEED if ship.fuel > 0.0 else RESERVE_SPEED
+	var cruise := _cruise_limit(PATROL_CRUISE_SPEED)
 	var speed_limit := minf(cruise, distance * 0.30)
-	velocity = velocity.move_toward(direction * speed_limit, 42.0 * delta)
+	velocity = velocity.move_toward(direction * speed_limit, _acceleration_limit(42.0) * delta)
 	throttle = speed_limit / MAX_SPEED
 
 
@@ -2635,10 +2695,10 @@ func _project_course_step(delta: float) -> void:
 	var direction := position.direction_to(waypoint)
 	if not direction.is_zero_approx():
 		_point_towards(direction, delta)
-	var cruise := PATROL_CRUISE_SPEED if ship.fuel > 0.0 else RESERVE_SPEED
+	var cruise := _cruise_limit(PATROL_CRUISE_SPEED)
 	var speed_limit := minf(cruise, position.distance_to(waypoint) * 0.34)
 	var drift := target_velocity(status.site) if waypoint == point else Vector3.ZERO
-	velocity = velocity.move_toward((direction * speed_limit + drift).limit_length(cruise), 42.0 * delta)
+	velocity = velocity.move_toward((direction * speed_limit + drift).limit_length(cruise), _acceleration_limit(42.0) * delta)
 	throttle = speed_limit / MAX_SPEED
 	if status.ready and distance <= 24.0 and velocity.distance_to(drift) < 9.0:
 		project_course = false
@@ -2670,18 +2730,18 @@ func _convoy_course_step(delta: float) -> void:
 	var aim := position.direction_to(contact) if not detouring and order.distance <= 350.0 else course
 	if not aim.is_zero_approx():
 		_point_towards(aim, delta)
-	var cruise := CONVOY_CRUISE_SPEED if ship.fuel > 0.0 else RESERVE_SPEED
+	var cruise := _cruise_limit(CONVOY_CRUISE_SPEED)
 	var speed_limit := minf(cruise, position.distance_to(waypoint) * 0.56)
 	var desired := course * speed_limit
 	if not detouring:
 		desired += drift
-	velocity = velocity.move_toward(desired.limit_length(cruise), 42.0 * delta)
+	velocity = velocity.move_toward(desired.limit_length(cruise), _acceleration_limit(42.0) * delta)
 	throttle = speed_limit / MAX_SPEED
 
 
 func _transit_obstacle(course: Vector3, cruise: float, skip_target := true) -> int:
 	var star := Catalog.star_for(system_id)
-	var speed_limit := cruise if ship.fuel > 0.0 else minf(cruise, RESERVE_SPEED)
+	var speed_limit := _cruise_limit(cruise)
 	var duration := course.length() / speed_limit
 	var earliest := INF
 	var obstacle := -1
@@ -2787,6 +2847,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_shipyard := schema < 25
 	var pre_crew := schema < 24
 	var pre_passengers := schema < 23
 	var pre_departure := schema < 22
@@ -2944,7 +3005,7 @@ func restore(state: Dictionary) -> bool:
 	var restored_patrol := Patrol.new()
 	var restored_landing := -1
 	var restored_plan := -1
-	if not pre_fuel and not restored_ship.restore(state.get("ship"), pre_economy, pre_heat_shield, pre_dual_fuel):
+	if not pre_fuel and not restored_ship.restore(state.get("ship"), pre_economy, pre_heat_shield, pre_dual_fuel, pre_shipyard):
 		return false
 	var restored_route: Array[int] = []
 	if not pre_jump_route:
@@ -3021,6 +3082,8 @@ func restore(state: Dictionary) -> bool:
 		if (restored_departure_seconds < 0.0 and restored_departure_seconds != -1.0) or (not restored_departure and restored_departure_seconds != -1.0) or restored_departure_seconds == DEPARTURE_SECONDS:
 			return false
 		if restored_departure and (restored_dock < 0 or restored_landing >= 0):
+			return false
+		if restored_departure and restored_crew.status(restored_epoch).count < restored_ship.crew_required():
 			return false
 	if not pre_dock_access:
 		if not restored_access.restore(state.get("dock_access"), restored_epoch):

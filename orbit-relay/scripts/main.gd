@@ -66,6 +66,7 @@ func _ready() -> void:
 	_services.transfer_requested.connect(_fuel_transfer)
 	_services.jettison_requested.connect(_jettison_cargo)
 	_services.crew_requested.connect(_crew_action)
+	_services.ship_exchange_requested.connect(_ship_exchange)
 	_services.dismissed.connect(_close_services)
 	add_child(_market)
 	_market.build()
@@ -295,11 +296,18 @@ func _deliver_notice() -> void:
 			"credits": flight.credits, "remaining_seconds": passengers.remaining, "reason": flight.status_message,
 			"system_id": flight.system_id, "orbit_time": flight.orbit_time,
 		}
-	elif event.begins_with("crew_"):
+	elif event.begins_with("crew_") or event == "departure_crew_denied":
 		var crew := flight.crew_status()
 		trace_fields = {
 			"port": flight.docked, "crew": crew.count, "arrears": crew.arrears, "credits": flight.credits,
 			"engineer": crew.engineer, "navigator": crew.navigator, "next_due": crew.next_due,
+			"hull_id": flight.ship.hull_id, "crew_required": flight.ship.crew_required(),
+			"system_id": flight.system_id, "orbit_time": flight.orbit_time, "reason": flight.status_message,
+		}
+	elif event == "ship_exchange":
+		trace_fields = {
+			"port": flight.docked, "hull_id": flight.ship.hull_id, "credits": flight.credits,
+			"cargo_capacity": flight.ship.cargo_capacity(), "crew_required": flight.ship.crew_required(),
 			"system_id": flight.system_id, "orbit_time": flight.orbit_time, "reason": flight.status_message,
 		}
 	_io.trace(event, trace_fields)
@@ -308,7 +316,7 @@ func _deliver_notice() -> void:
 	if event in [
 		"launch", "dock", "land", "lift", "contract", "delivery", "mining_deploy", "mining_recover",
 		"dock_request", "dock_ready", "dock_expired",
-		"departure_requested", "departure_canceled", "departure_open",
+		"departure_requested", "departure_canceled", "departure_open", "departure_crew_denied",
 		"mining_ready", "mining_loaded", "ore_sold", "service_refuel", "service_tank", "service_eco",
 		"scoop_full", "scoop_stop", "star_arrival", "gas_arrival", "fuel_empty", "thermal_damage",
 		"fuel_transfer", "service_jump_refuel", "cargo_jettisoned",
@@ -319,7 +327,7 @@ func _deliver_notice() -> void:
 		"market_buy", "market_sell", "service_repair", "service_cargo", "hull_damage", "contract_leg",
 		"passenger_accepted", "passenger_overdue", "passenger_paid", "passenger_late", "passenger_canceled",
 		"passenger_debt_paid", "passenger_course",
-		"crew_hired", "crew_dismissed", "crew_payroll", "crew_arrears_paid",
+		"crew_hired", "crew_dismissed", "crew_payroll", "crew_arrears_paid", "ship_exchange",
 		"patrol_accepted", "patrol_engaged", "patrol_fire", "patrol_enemy_hit", "patrol_retreat", "patrol_victory", "patrol_paid",
 		"expedition_accepted", "expedition_survey", "expedition_report", "expedition_supply", "expedition_complete", "expedition_course",
 		"war_declared", "war_round", "war_captured", "war_repulsed", "war_convoy_delivered", "war_convoy_intercepted",
@@ -648,6 +656,15 @@ func _crew_action(action: String, member: int) -> void:
 		"dismiss": changed = flight.crew_dismiss(member)
 		"pay": changed = flight.crew_pay(member)
 	if changed:
+		_deliver_notice()
+		_update_display(0.0)
+	_services.refresh()
+
+
+func _ship_exchange(hull: String) -> void:
+	if not _services.is_open() or not flight.shipyard_available():
+		return
+	if flight.shipyard_swap(hull):
 		_deliver_notice()
 		_update_display(0.0)
 	_services.refresh()

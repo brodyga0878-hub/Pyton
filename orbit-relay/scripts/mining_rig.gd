@@ -165,7 +165,7 @@ func restore(value: Variant, legacy := false, reserve_slots := Catalog.DESTINATI
 	var saved_count := Catalog.SITE_COUNT if legacy else reserve_slots
 	if saved_count <= 0 or saved_count > Catalog.DESTINATION_COUNT:
 		return false
-	if capacity != CAPACITY and capacity != ShipSystems.EXPANDED_CARGO_CAPACITY:
+	if not ShipSystems.is_cargo_capacity(capacity):
 		return false
 	if not _integer_in_range(value.site_id, 0, saved_count - 1) or not Catalog.is_mine_site(int(value.site_id)):
 		return false

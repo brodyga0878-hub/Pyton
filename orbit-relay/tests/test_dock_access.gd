@@ -174,6 +174,7 @@ func _test_save_and_reload() -> void:
 	_set_axial_pose(resumed, ALTERNATE_PORT, Access.HATCH_AXIS_OFFSET - 0.04, 8.0)
 	var legacy := _json(resumed.snapshot())
 	legacy.schema = 20
+	legacy.ship.erase("hull_id")
 	legacy.erase("dock_access")
 	var earlier := Flight.new()
 	if not _expect(earlier.restore(legacy) and earlier.dock_access_status(ALTERNATE_PORT).phase == "closed"

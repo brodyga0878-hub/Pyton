@@ -1,5 +1,5 @@
 extends RefCounted
-## Fuel, hull condition and permanently installed equipment for one ship.
+## Hull profile, fuel, condition and compatible installed equipment for one ship.
 
 const BASE_CAPACITY := 100.0
 const EXTRA_CAPACITY := 50.0
@@ -13,10 +13,24 @@ const BASE_CARGO_CAPACITY := 24
 const EXPANDED_CARGO_CAPACITY := 40
 const MAX_HULL := 100.0
 const MIN_HULL := 1.0
+const STARTER_HULL := "courier"
+const FREIGHTER_HULL := "freighter"
+const TRADE_IN_PERCENT := 68
+const HULLS := {
+	STARTER_HULL: {"id": STARTER_HULL, "name": "Курьер «Стриж»",
+		"description": "Курьерский корабль для одиночного пилота. Быстро меняет курс и скорость.",
+		"price": 1000, "cargo": BASE_CARGO_CAPACITY, "expanded_cargo": EXPANDED_CARGO_CAPACITY,
+		"crew_required": 0, "speed_factor": 1.0, "accel_factor": 1.0, "burn_factor": 1.0},
+	FREIGHTER_HULL: {"id": FREIGHTER_HULL, "name": "Фрахтовик «Кедр»",
+		"description": "Фрахтовик с вместительным трюмом и местом специалиста. Медленнее разгоняется и расходует больше топлива.",
+		"price": 2200, "cargo": 44, "expanded_cargo": 60,
+		"crew_required": 1, "speed_factor": 0.80, "accel_factor": 0.76, "burn_factor": 1.18},
+}
 const LEGACY_SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded"]
 const PRE_SHIELD_SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded"]
 const PRE_DUAL_FUEL_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded", "heat_shield"]
-const SAVE_FIELDS := ["fuel", "jump_fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded", "heat_shield"]
+const PRE_SHIPYARD_FIELDS := ["fuel", "jump_fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded", "heat_shield"]
+const SAVE_FIELDS := ["hull_id", "fuel", "jump_fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded", "heat_shield"]
 
 var fuel: float = BASE_CAPACITY
 var jump_fuel: float = BASE_CAPACITY
@@ -25,6 +39,26 @@ var eco_upgraded := false
 var hull: float = MAX_HULL
 var cargo_upgraded := false
 var heat_shield := false
+var hull_id: String:
+	get:
+		return _hull_id
+var _hull_id := STARTER_HULL
+
+
+static func profile(id: String) -> Dictionary:
+	var entry: Dictionary = HULLS.get(id, {})
+	return entry.duplicate()
+
+
+static func hull_ids() -> Array[String]:
+	return [STARTER_HULL, FREIGHTER_HULL]
+
+
+static func is_cargo_capacity(capacity: int) -> bool:
+	for entry: Dictionary in HULLS.values():
+		if capacity == entry.cargo or capacity == entry.expanded_cargo:
+			return true
+	return false
 
 
 func capacity() -> float:
@@ -36,7 +70,37 @@ func jump_capacity() -> float:
 
 
 func cargo_capacity() -> int:
-	return EXPANDED_CARGO_CAPACITY if cargo_upgraded else BASE_CARGO_CAPACITY
+	return cargo_capacity_for(_hull_id)
+
+
+func cargo_capacity_for(id: String) -> int:
+	var entry: Dictionary = HULLS.get(id, {})
+	return int(entry.get("expanded_cargo" if cargo_upgraded else "cargo", 0))
+
+
+func crew_required() -> int:
+	return int(HULLS[_hull_id].crew_required)
+
+
+func speed_factor() -> float:
+	return float(HULLS[_hull_id].speed_factor)
+
+
+func accel_factor() -> float:
+	return float(HULLS[_hull_id].accel_factor)
+
+
+func trade_in_value() -> int:
+	var price := int(HULLS[_hull_id].price)
+	return floori(price * clampf(hull, MIN_HULL, MAX_HULL) * TRADE_IN_PERCENT / 10000.0)
+
+
+func swap_hull(id: String) -> bool:
+	if id == _hull_id or not HULLS.has(id):
+		return false
+	_hull_id = id
+	hull = MAX_HULL
+	return true
 
 
 func entry_heat_factor() -> float:
@@ -49,7 +113,7 @@ func burn(delta: float, load: float, boost: bool) -> void:
 	var throttle := clampf(load, 0.0, 1.0)
 	if throttle == 0.0 and not boost:
 		return
-	var rate := 3.0 if boost else 0.2 + 0.9 * throttle
+	var rate := (3.0 if boost else 0.2 + 0.9 * throttle) * float(HULLS[_hull_id].burn_factor)
 	if eco_upgraded:
 		rate *= 0.7
 	fuel = maxf(0.0, fuel - delta * rate)
@@ -149,20 +213,30 @@ func buy(action: String, unit_price: int, credits: int) -> int:
 
 func snapshot() -> Dictionary:
 	return {
+		"hull_id": _hull_id,
 		"fuel": fuel, "jump_fuel": jump_fuel,
 		"tank_upgraded": tank_upgraded, "eco_upgraded": eco_upgraded,
 		"hull": hull, "cargo_upgraded": cargo_upgraded, "heat_shield": heat_shield,
 	}
 
 
-func restore(value: Variant, legacy := false, pre_shield := false, pre_dual_fuel := false) -> bool:
-	var fields := PRE_DUAL_FUEL_FIELDS if pre_dual_fuel else SAVE_FIELDS
+func restore(value: Variant, legacy := false, pre_shield := false, pre_dual_fuel := false, pre_shipyard := false) -> bool:
+	var fields := SAVE_FIELDS
 	if legacy:
 		fields = LEGACY_SAVE_FIELDS
 	elif pre_shield:
 		fields = PRE_SHIELD_SAVE_FIELDS
+	elif pre_dual_fuel:
+		fields = PRE_DUAL_FUEL_FIELDS
+	elif pre_shipyard:
+		fields = PRE_SHIPYARD_FIELDS
 	if not value is Dictionary or value.size() != fields.size() or not value.has_all(fields):
 		return false
+	var restored_hull_id := STARTER_HULL
+	if fields == SAVE_FIELDS:
+		if not value.hull_id is String or not HULLS.has(value.hull_id):
+			return false
+		restored_hull_id = value.hull_id
 	if not value.tank_upgraded is bool or not value.eco_upgraded is bool:
 		return false
 	if not (legacy or pre_shield) and not value.heat_shield is bool:
@@ -193,6 +267,7 @@ func restore(value: Variant, legacy := false, pre_shield := false, pre_dual_fuel
 	jump_fuel = restored_jump_fuel
 	tank_upgraded = value.tank_upgraded
 	eco_upgraded = value.eco_upgraded
+	_hull_id = restored_hull_id
 	hull = restored_hull
 	cargo_upgraded = restored_cargo_upgrade
 	heat_shield = false if legacy or pre_shield else value.heat_shield

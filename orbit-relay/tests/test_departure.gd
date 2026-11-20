@@ -153,6 +153,7 @@ func _test_previous_berth() -> void:
 	var flight := Flight.new()
 	var legacy := flight.snapshot()
 	legacy.schema = 21
+	legacy.ship.erase("hull_id")
 	legacy.erase("departure_requested")
 	legacy.erase("departure_seconds")
 	_expect(flight.restore(legacy) and flight.departure_status().phase == "idle"

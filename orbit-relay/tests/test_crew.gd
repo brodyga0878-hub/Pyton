@@ -207,6 +207,7 @@ func _test_previous_schema() -> void:
 		return
 	var previous := flight.snapshot()
 	previous.schema = 23
+	previous.ship.erase("hull_id")
 	previous.erase("crew")
 	var cold := Flight.new()
 	if not _expect(cold.restore(previous) and int(cold.crew_status().count) == 0
