@@ -86,9 +86,10 @@ func _test_trade_and_depletion() -> void:
 		"Mixed cargo and both reserve debits survive a JSON save")
 	if not _fly_to(resumed, 3, "Mixed cargo to Перевал"):
 		return
-	_expect(resumed.sell_ore_action() and resumed.credits == 948 and resumed.mining.ore_hold == 0,
+	var quoted_payment: int = resumed.market_quote("ore", "sell", 12).cost + resumed.market_quote("crystal", "sell", 12).cost
+	_expect(resumed.sell_ore_action() and resumed.credits == quoted_payment and resumed.mining.ore_hold == 0,
 		"Перевал pays its own quote and empties the hold")
-	_expect(not resumed.sell_ore_action() and resumed.credits == 948,
+	_expect(not resumed.sell_ore_action() and resumed.credits == quoted_payment,
 		"Sale cannot pay the same cargo twice")
 
 	var last_deposit: Dictionary = flight.snapshot()

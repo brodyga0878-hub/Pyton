@@ -310,6 +310,7 @@ func _test_time_button() -> void:
 
 func _parked(site: int, epoch := EPOCH) -> Flight:
 	var flight := Flight.new()
+	flight.freight.reset(epoch)
 	var state := flight.snapshot()
 	var center: Vector3 = Orbit.sample(site, epoch).position
 	var touch := center + Vector3.BACK * float(Catalog.site(site).pad_offset)

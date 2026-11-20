@@ -145,11 +145,11 @@ func _test_hull_and_hold() -> void:
 	if not _expect(_fly_to(upgraded, 3), "The mixed hold can reach a market at a different port"):
 		return
 	var previous_credits: int = upgraded.credits
-	var raw_stock: int = upgraded.market_quote("ore", "sell", 3).stock
+	var ore_sale := upgraded.market_quote("ore", "sell", 3)
 	_expect(upgraded.sell_ore_action() and upgraded.mining.cargo_amount("ore") == 0
 		and upgraded.mining.cargo_amount("circuits") == 37
-		and upgraded.credits == previous_credits + 3 * Economy.price(3, "ore", "sell")
-		and upgraded.market_quote("ore", "sell", 1).stock == raw_stock + 3,
+		and upgraded.credits == previous_credits + ore_sale.cost
+		and upgraded.market_quote("ore", "sell", 1).stock == ore_sale.stock + 3,
 		"The raw-resource shortcut sells the ore and replenishes stock while retaining manufactured goods")
 
 

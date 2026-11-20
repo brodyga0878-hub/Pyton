@@ -374,7 +374,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var transfer: bool = not itinerary.is_empty() and int(itinerary.leg) + 1 < itinerary.stops.size()
 	_actions["contract"].visible = docked and (sim.contract_stage != 1 or sim.docked == sim.contract_destination)
 	_actions["contract"].text = "Отметить этап" if transfer else ("Сдать груз" if sim.contract_stage == 1 else "Взять контракт")
-	var sale_quote: int = mining.sale_quote(sim.docked) if docked and mining.ore_hold > 0 else 0
+	var sale_quote: int = sim.raw_sale_quote() if docked and mining.ore_hold > 0 else 0
 	_actions["sell_ore"].visible = sale_quote > 0
 	_sync_clock(sim)
 	_refresh_disabled_actions()

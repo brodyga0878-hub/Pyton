@@ -4,6 +4,8 @@ extends RefCounted
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const GOODS := ["ore", "crystal", "ice", "circuits", "medical"]
 const MAX_STOCK := 96
+const STOCK_PER_PRICE_STEP := 6.0
+const MAX_STOCK_PRICE_CHANGE := 8
 
 const BUY_PRICES := {
 	0: {"ore": 23, "crystal": 43, "ice": 17, "circuits": 34, "medical": 68},
@@ -129,6 +131,23 @@ static func courier(id: String) -> Dictionary:
 func stock(port: int, good: String) -> int:
 	var inventory: Dictionary = _stocks.get(str(port), {})
 	return inventory.get(good, 0)
+
+
+func trade_value(port: int, good: String, side: String, quantity: int) -> int:
+	var base := price(port, good, side)
+	if base <= 0 or quantity <= 0 or quantity > MAX_STOCK:
+		return 0
+	var normal_stock := int(INITIAL_STOCKS[str(port)][good])
+	var supply := stock(port, good)
+	var total := 0
+	for index in range(quantity):
+		# The same stock levels apply when reversing a buy and sell. The
+		# local bid/ask spread therefore applies to every unit of a bulk order.
+		var slot := supply - index if side == "buy" else supply + index + 1
+		var shortage := normal_stock - clampi(slot, 0, MAX_STOCK)
+		var steps := mini(floori(absi(shortage) / STOCK_PER_PRICE_STEP), MAX_STOCK_PRICE_CHANGE)
+		total += maxi(1, base + signi(shortage) * steps)
+	return total
 
 
 func change_stock(port: int, good: String, amount: int) -> bool:

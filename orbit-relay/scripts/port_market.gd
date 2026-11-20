@@ -24,9 +24,19 @@ var _balance: Label
 var _hold: Label
 var _market_tab: Button
 var _courier_tab: Button
+var _freight_tab: Button
 var _close_button: Button
 var _market_page: HBoxContainer
 var _courier_page: HBoxContainer
+var _freight_page: VBoxContainer
+var _freight_scroll: ScrollContainer
+var _freight_list: VBoxContainer
+var _freight_count: Label
+var _freight_empty: PanelContainer
+var _freight_empty_label: Label
+var _freight_rows: Array[Dictionary] = []
+var _freight_drag := -1
+var _freight_drag_position := Vector2.ZERO
 var _goods_buttons: Dictionary[String, Button] = {}
 var _goods_labels: Dictionary[String, Array] = {}
 var _selection_icon: CommodityIcon
@@ -78,17 +88,21 @@ func build() -> void:
 	var tabs := _row(page, 8)
 	_market_tab = _button(tabs, "Рынок", 44.0)
 	_courier_tab = _button(tabs, "Рейсы", 44.0)
-	for tab in [_market_tab, _courier_tab]:
+	_freight_tab = _button(tabs, "Снабжение", 44.0)
+	for tab in [_market_tab, _courier_tab, _freight_tab]:
 		tab.toggle_mode = true
 		tab.custom_minimum_size.x = 145.0
 	_market_tab.pressed.connect(_show_courier.bind(false))
 	_courier_tab.pressed.connect(_show_courier.bind(true))
+	_freight_tab.pressed.connect(_show_page.bind("freight"))
 	_market_page = _row(page, 16)
 	_courier_page = _row(page, 16)
-	for body in [_market_page, _courier_page]:
+	_freight_page = _column(page, 10)
+	for body in [_market_page, _courier_page, _freight_page]:
 		body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_build_market()
 	_build_courier()
+	_build_freight()
 	get_viewport().size_changed.connect(_update_insets)
 	_update_insets()
 	hide()
@@ -107,6 +121,7 @@ func open(sim: RefCounted) -> void:
 
 func close() -> void:
 	_touches.clear()
+	_freight_drag = -1
 	_sim = null
 	hide()
 
@@ -124,7 +139,9 @@ func refresh() -> void:
 	_station.text = _sim.target_name(_sim.docked)
 	_balance.text = "Баланс %d кр." % int(_sim.credits)
 	_hold.text = "Трюм %d / %d ед." % [int(_sim.mining.ore_hold), int(_sim.mining.cargo_capacity)]
-	if _courier_page.visible:
+	if _freight_page.visible:
+		_refresh_freight()
+	elif _courier_page.visible:
 		_refresh_courier()
 	else:
 		_refresh_market()
@@ -159,7 +176,8 @@ func _build_market() -> void:
 			_table_cell(cells, "", 19, TEXT), _table_cell(cells, "", 19, TEXT),
 			_table_cell(cells, "", 19, AMBER), _table_cell(cells, "", 19, MINT),
 		]
-	_label(table, "Цены за единицу товара", 14, MUTED)
+	var prices := _label(table, "Цены зависят от запасов. Итог пересчитывается с количеством.", 14, MUTED)
+	prices.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 	var order := _card(_market_page, 377.0, false)
 	var selected := _row(order, 12)
@@ -225,12 +243,117 @@ func _build_courier() -> void:
 
 
 func _show_courier(show_courier: bool) -> void:
+	# Preserve this entry point for the existing market/courier integration.
+	_show_page("courier" if show_courier else "market")
+
+
+func _show_page(page: String) -> void:
 	_touches.clear()
-	_market_page.visible = not show_courier
-	_courier_page.visible = show_courier
-	_market_tab.set_pressed_no_signal(not show_courier)
-	_courier_tab.set_pressed_no_signal(show_courier)
+	_freight_drag = -1
+	_market_page.visible = page == "market"
+	_courier_page.visible = page == "courier"
+	_freight_page.visible = page == "freight"
+	_market_tab.set_pressed_no_signal(page == "market")
+	_courier_tab.set_pressed_no_signal(page == "courier")
+	_freight_tab.set_pressed_no_signal(page == "freight")
 	refresh()
+
+
+func _build_freight() -> void:
+	var header := _row(_freight_page, 12)
+	_label(header, "Грузовые корабли порта", 26, TEXT).size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_freight_count = _label(header, "", 18, MINT)
+	var note := _label(_freight_page, "Груз списывается при отправлении и поступает на склад по прибытии. Пока биржа открыта, время приостановлено.", 16, MUTED)
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_freight_scroll = ScrollContainer.new()
+	_freight_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_freight_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_freight_page.add_child(_freight_scroll)
+	_freight_list = _column(_freight_scroll, 10)
+	_freight_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_freight_empty = PanelContainer.new()
+	_freight_empty.add_theme_stylebox_override("panel", _style(PANEL, BORDER, 12, 20))
+	_freight_empty.custom_minimum_size.y = 180.0
+	_freight_list.add_child(_freight_empty)
+	var empty_content := _column(_freight_empty, 10)
+	_label(empty_content, "У этого порта пока нет регулярных грузовых рейсов", 24, TEXT)
+	_freight_empty_label = _label(empty_content, "Доступные товары и цены — на вкладке «Рынок».", 19, MUTED)
+	_freight_empty_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+
+
+func _add_freight_row() -> void:
+	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", _style(PANEL, BORDER, 11, 15))
+	panel.custom_minimum_size.y = 152.0
+	_freight_list.add_child(panel)
+	var content := _column(panel, 6)
+	var header := _row(content, 14)
+	var name := _label(header, "", 22, TEXT)
+	name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var state := _label(header, "", 17, MINT)
+	var route := _label(content, "", 19, MUTED)
+	route.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var manifest := _row(content, 10)
+	var icon := _commodity_icon(manifest, 30.0)
+	var cargo := _label(manifest, "", 19, TEXT)
+	cargo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var eta := _label(manifest, "", 18, AMBER)
+	var progress := ProgressBar.new()
+	progress.min_value = 0.0
+	progress.max_value = 1.0
+	progress.show_percentage = false
+	progress.custom_minimum_size.y = 5.0
+	progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	progress.add_theme_stylebox_override("background", _style(Color("172e3a"), Color("172e3a"), 2, 0))
+	progress.add_theme_stylebox_override("fill", _style(Color("70bfb0"), Color("70bfb0"), 2, 0))
+	content.add_child(progress)
+	var delivered := _label(content, "", 15, MUTED)
+	delivered.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_freight_rows.append({"panel": panel, "name": name, "state": state, "route": route, "icon": icon, "cargo": cargo, "eta": eta, "progress": progress, "delivered": delivered})
+
+
+func _refresh_freight() -> void:
+	var statuses: Array[Dictionary] = _sim.freight_status(int(_sim.docked))
+	_freight_count.text = "%d корабля" % statuses.size() if statuses.size() in [2, 3, 4] else "%d корабль" % statuses.size() if statuses.size() == 1 else "%d кораблей" % statuses.size()
+	_freight_empty.visible = statuses.is_empty()
+	while _freight_rows.size() < statuses.size():
+		_add_freight_row()
+	for i in range(_freight_rows.size()):
+		var widgets: Dictionary = _freight_rows[i]
+		widgets.panel.visible = i < statuses.size()
+		if i >= statuses.size():
+			continue
+		var status: Dictionary = statuses[i]
+		var travelling := bool(status.in_transit)
+		widgets.name.text = str(status.name)
+		widgets.state.text = "В пути" if travelling else "Стоянка"
+		widgets.state.add_theme_color_override("font_color", MINT if travelling else AMBER)
+		widgets.route.text = "%s  →  %s" % [_sim.target_name(int(status.origin)), _sim.target_name(int(status.destination))]
+		var good := str(status.good)
+		var amount := int(status.amount)
+		widgets.icon.visible = amount > 0
+		widgets.icon.select(good, ACCENTS.get(good, MUTED))
+		widgets.cargo.text = "%s · %d ед. на борту" % [Economy.good_name(good), amount] if amount > 0 else "На борту нет груза"
+		widgets.eta.text = "Прибытие через %s" % _eta(float(status.arrival_eta)) if travelling else "Вылет %s · прибытие %s" % [_eta(float(status.departure_eta)), _eta(float(status.arrival_eta))]
+		widgets.progress.value = clampf(float(status.progress), 0.0, 1.0)
+		widgets.progress.visible = travelling
+		var last_port := int(status.last_port)
+		var last_good := str(status.last_good)
+		var last_delivered := int(status.last_delivered)
+		var where: String = "здесь" if last_port == int(_sim.docked) else _sim.target_name(last_port) if last_port >= 0 else ""
+		if last_port < 0:
+			widgets.delivered.text = "Первое прибытие ещё впереди."
+		elif last_good.is_empty():
+			widgets.delivered.text = "В последнем прибытии груз не разгружался."
+		elif last_delivered > 0:
+			widgets.delivered.text = "Последняя разгрузка (%s): +%d ед. · %s" % [where, last_delivered, Economy.good_name(last_good)]
+		else:
+			widgets.delivered.text = "Последняя разгрузка (%s): склад заполнен, груз остался на борту." % where
+
+
+static func _eta(seconds: float) -> String:
+	var total := maxi(0, ceili(seconds))
+	return "%d:%02d" % [total / 60, total % 60]
 
 
 func _refresh_market() -> void:
@@ -252,8 +375,8 @@ func _refresh_market() -> void:
 	_quantity_label.text = "%d ед." % _quantity
 	_minus_button.disabled = _quantity <= 1
 	_plus_button.disabled = _quantity >= capacity
-	_buy_max_button.disabled = _limit("buy", buy) < 1
-	_sell_max_button.disabled = _limit("sell", sell) < 1
+	_buy_max_button.disabled = _limit("buy") < 1
+	_sell_max_button.disabled = _limit("sell") < 1
 	_quote(_buy_button, _buy_hint, "Купить", buy)
 	_quote(_sell_button, _sell_hint, "Продать", sell)
 
@@ -304,13 +427,8 @@ func _quote(button: Button, hint: Label, verb: String, quote: Dictionary) -> voi
 	hint.text = str(quote.reason) if button.disabled else ""
 
 
-func _limit(side: String, quote: Dictionary) -> int:
-	if side == "sell":
-		return int(quote.owned)
-	if int(quote.unit) < 1:
-		return 0
-	var free := int(_sim.mining.cargo_capacity) - int(_sim.mining.ore_hold)
-	return mini(free, mini(int(quote.stock), floori(float(_sim.credits) / int(quote.unit))))
+func _limit(side: String) -> int:
+	return int(_sim.market_limit(_selected_good, side))
 
 
 func _select_good(good: String) -> void:
@@ -331,7 +449,7 @@ func _change_quantity(step: int) -> void:
 func _max_quantity(side: String) -> void:
 	if is_open():
 		_touches.clear()
-		_quantity = maxi(1, _limit(side, _sim.market_quote(_selected_good, side, 1)))
+		_quantity = maxi(1, _limit(side))
 		refresh()
 
 
@@ -353,6 +471,16 @@ func _input(event: InputEvent) -> void:
 	if not is_open():
 		return
 	if event is InputEventScreenTouch:
+		if event.index == _freight_drag:
+			if not event.pressed or event.canceled:
+				_freight_drag = -1
+			get_viewport().set_input_as_handled()
+			return
+		if event.pressed and not event.canceled and _freight_page.visible and _freight_drag < 0 and _freight_scroll.get_global_rect().has_point(event.position):
+			_freight_drag = event.index
+			_freight_drag_position = event.position
+			get_viewport().set_input_as_handled()
+			return
 		var button: Button = _touches.get(event.index)
 		_touches.erase(event.index)
 		if not event.canceled:
@@ -365,6 +493,11 @@ func _input(event: InputEvent) -> void:
 				button.pressed.emit()
 		get_viewport().set_input_as_handled()
 	elif event is InputEventScreenDrag:
+		if event.index == _freight_drag:
+			_freight_scroll.scroll_vertical -= roundi(event.position.y - _freight_drag_position.y)
+			_freight_drag_position = event.position
+			get_viewport().set_input_as_handled()
+			return
 		var button: Button = _touches.get(event.index)
 		if button != null and not _hit(button, event.position):
 			_touches.erase(event.index)
@@ -374,6 +507,7 @@ func _input(event: InputEvent) -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_APPLICATION_PAUSED:
 		_touches.clear()
+		_freight_drag = -1
 
 
 func _update_insets() -> void:

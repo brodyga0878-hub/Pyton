@@ -324,6 +324,7 @@ func _approach(site: int, direction: Vector3, epoch := EPOCH) -> Flight:
 	flight.system_id = Catalog.system_of_site(site)
 	flight.orbit_time = epoch
 	flight.elapsed = epoch
+	flight.freight.reset(epoch)
 	flight.docked = -1
 	flight.target = site
 	flight.position = flight.target_position(site) + Terrain.contact(site, direction) + direction * 3.0

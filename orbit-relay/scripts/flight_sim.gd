@@ -11,12 +11,13 @@ const Rendezvous = preload("res://scripts/rendezvous_navigation.gd")
 const Atmosphere = preload("res://scripts/atmosphere.gd")
 const Terrain = preload("res://scripts/surface_terrain.gd")
 const Economy = preload("res://scripts/port_economy.gd")
+const NpcFreight = preload("res://scripts/npc_freight.gd")
 const Traffic = preload("res://scripts/sector_traffic.gd")
 const Patrol = preload("res://scripts/patrol_encounter.gd")
 const Expedition = preload("res://scripts/expedition.gd")
 const FactionFronts = preload("res://scripts/faction_fronts.gd")
 const ConvoyOrders = preload("res://scripts/convoy_orders.gd")
-const SAVE_SCHEMA := 15
+const SAVE_SCHEMA := 16
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
@@ -87,6 +88,7 @@ var landed: bool:
 var mining := MiningRig.new()
 var ship := ShipSystems.new()
 var market := Economy.new()
+var freight := NpcFreight.new()
 var patrol := Patrol.new()
 var patrol_course := false
 var expedition := Expedition.new()
@@ -841,28 +843,39 @@ func mine_action() -> bool:
 
 
 func sell_ore_action() -> bool:
-	if docked < 0:
-		return false
-	var cargo_before := {}
-	for good: String in Catalog.RESOURCES:
-		cargo_before[good] = mining.cargo_amount(good)
-	var earned := mining.sell(docked)
+	var earned := 0
+	for order in _raw_sale_orders():
+		if _sell_market_cargo(order.good, order.quantity):
+			earned += int(order.payment)
 	if earned == 0:
 		return false
-	for good: String in Catalog.RESOURCES:
-		var sold: int = cargo_before[good] - mining.cargo_amount(good)
-		if sold > 0:
-			market.change_stock(docked, good, sold)
 	credits += earned
 	_announce("ore_sold", "Сырьё продано. Начислено %d кр." % earned)
 	return true
 
+func raw_sale_quote() -> int:
+	var total := 0
+	for order in _raw_sale_orders():
+		total += int(order.payment)
+	return total
+
+
+func _raw_sale_orders() -> Array[Dictionary]:
+	var orders: Array[Dictionary] = []
+	if docked < 0 or mining.phase != MiningRig.STOWED:
+		return orders
+	for good: String in Catalog.RESOURCES:
+		var quantity := market_limit(good, "sell")
+		if quantity > 0:
+			orders.append({"good": good, "quantity": quantity, "payment": market.trade_value(docked, good, "sell", quantity)})
+	return orders
+
 
 func market_quote(good: String, side: String, quantity: int) -> Dictionary:
-	var unit := Economy.price(docked, good, side)
+	var unit := market.trade_value(docked, good, side, 1)
 	var stock := market.stock(docked, good)
 	var owned := mining.cargo_amount(good)
-	var cost := unit * quantity if quantity > 0 and quantity <= ship.cargo_capacity() else 0
+	var cost := market.trade_value(docked, good, side, quantity) if quantity <= ship.cargo_capacity() else 0
 	var reason := ""
 	if docked < 0:
 		reason = "Рынок доступен после швартовки"
@@ -877,7 +890,29 @@ func market_quote(good: String, side: String, quantity: int) -> Dictionary:
 			reason = "Недостаточно кредитов"
 	elif owned < quantity:
 		reason = "В трюме недостаточно товара"
+	elif quantity > Economy.MAX_STOCK - stock:
+		reason = "На складе порта не хватает места"
 	return {"ok": reason.is_empty(), "cost": cost, "unit": unit, "stock": stock, "owned": owned, "reason": reason}
+
+
+func market_limit(good: String, side: String) -> int:
+	if not Catalog.is_port(docked) or Economy.price(docked, good, side) <= 0:
+		return 0
+	if side == "sell":
+		return mini(mining.cargo_amount(good), Economy.MAX_STOCK - market.stock(docked, good))
+	var lower := 0
+	var upper := mini(market.stock(docked, good), mining.free_capacity())
+	while lower < upper:
+		var count := ceili((lower + upper) * 0.5)
+		if market.trade_value(docked, good, side, count) <= credits:
+			lower = count
+		else:
+			upper = count - 1
+	return lower
+
+
+func freight_status(port: int) -> Array[Dictionary]:
+	return freight.status_for(port, orbit_time)
 
 
 func market_trade(good: String, side: String, quantity: int) -> bool:
@@ -893,12 +928,20 @@ func market_trade(good: String, side: String, quantity: int) -> bool:
 		credits -= quote.cost
 		_announce("market_buy", "Куплено %d ед. товара «%s» за %d кр." % [quantity, Economy.good_name(good), quote.cost])
 	else:
-		if not mining.remove_cargo(good, quantity):
+		if not _sell_market_cargo(good, quantity):
 			return false
-		market.change_stock(docked, good, quantity)
 		credits += quote.cost
 		_announce("market_sell", "Продано %d ед. товара «%s» за %d кр." % [quantity, Economy.good_name(good), quote.cost])
 	return true
+
+
+func _sell_market_cargo(good: String, quantity: int) -> bool:
+	if not mining.remove_cargo(good, quantity):
+		return false
+	if market.change_stock(docked, good, quantity):
+		return true
+	mining.insert_cargo(good, quantity)
+	return false
 
 
 func refuel_unit_price() -> int:
@@ -1495,6 +1538,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 	var previous_orbit_time := orbit_time
 	orbit_time += delta
 	elapsed += delta
+	freight.advance(market, previous_orbit_time, orbit_time)
 	var front := factions.advance(orbit_time)
 	if not front.is_empty():
 		_announce(front.event, front.message)
@@ -1994,7 +2038,8 @@ func snapshot() -> Dictionary:
 		"contract_route_id": contract_route_id, "contract_leg": contract_leg,
 		"landed_site": landed_site, "planned_target": planned_target, "mining": mining.snapshot(),
 		"landing_direction": [landing_direction.x, landing_direction.y, landing_direction.z],
-		"ship": ship.snapshot(), "market": market.snapshot(), "system_id": system_id, "jump_target": jump_target,
+		"ship": ship.snapshot(), "market": market.snapshot(), "freight": freight.snapshot(),
+		"system_id": system_id, "jump_target": jump_target,
 		"patrol": patrol.snapshot(), "star_heat": star_heat, "entry_heat": entry_heat,
 		"expedition": expedition.snapshot(), "factions": factions.snapshot(),
 		"convoy_order": convoy_order.snapshot(),
@@ -2005,6 +2050,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_freight := schema < 16
 	var pre_heat_shield := schema < 15
 	var pre_entry := schema < 14
 	var pre_navigation := schema < 13
@@ -2132,12 +2178,17 @@ func restore(state: Dictionary) -> bool:
 	var restored_mining := MiningRig.new()
 	var restored_ship := ShipSystems.new()
 	var restored_market := Economy.new()
+	var restored_freight := NpcFreight.new()
 	var restored_patrol := Patrol.new()
 	var restored_landing := -1
 	var restored_plan := -1
 	if not pre_fuel and not restored_ship.restore(state.get("ship"), pre_economy, pre_heat_shield):
 		return false
 	if not pre_economy and not restored_market.restore(state.get("market"), pre_traffic, pre_expansion):
+		return false
+	if pre_freight:
+		restored_freight.reset(restored_epoch)
+	elif not restored_freight.restore(state.get("freight"), restored_epoch):
 		return false
 	if not pre_traffic and not restored_patrol.restore(state.get("patrol")):
 		return false
@@ -2223,6 +2274,7 @@ func restore(state: Dictionary) -> bool:
 	mining = restored_mining
 	ship = restored_ship
 	market = restored_market
+	freight = restored_freight
 	patrol = restored_patrol
 	expedition = restored_expedition
 	factions = restored_factions

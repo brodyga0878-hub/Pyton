@@ -178,8 +178,8 @@ func _test_mining_route() -> void:
 		return
 	game._update_display(0.0)
 	await process_frame
+	var ore_reward: int = flight.market_quote("ore", "sell", MiningRig.BATCH).cost
 	_touch(game, "sell_ore")
-	var ore_reward := MiningRig.BATCH * MiningRig.PRICE
 	_expect(flight.credits == ore_reward and flight.mining.ore_hold == 0, "Touch sale exchanges the batch for credits")
 	_expect(not flight.sell_ore_action() and flight.credits == ore_reward,
 		"Selling an empty hold cannot credit the same ore again")

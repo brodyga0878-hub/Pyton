@@ -3,7 +3,7 @@ extends RefCounted
 
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const Terrain = preload("res://scripts/surface_terrain.gd")
-const TRADER_NAMES := ["Торговец «Вектор»", "Торговец «Каскад»"]
+const Freight = preload("res://scripts/npc_freight.gd")
 const CONVOY_NAMES := ["Конвой Маяков", "Конвой Лиги"]
 const TRADE_PERIOD := 106.0
 const PATROL_PERIOD := 54.0
@@ -15,35 +15,21 @@ static func contacts(sim: RefCounted) -> Array[Dictionary]:
 	if ports.is_empty():
 		return result
 	var first: int = ports[0]
-	var last: int = ports[ports.size() - 1]
 	var departure: Vector3 = sim.target_gate(first) + Vector3(0.0, 106.0, 26.0)
-	var arrival: Vector3 = sim.target_gate(last) + Vector3(0.0, 106.0, 26.0)
 	var departure_velocity: Vector3 = sim.target_velocity(first)
-	var arrival_velocity: Vector3 = sim.target_velocity(last)
-	var lane := arrival - departure
-	var cross_lane := Vector3.UP.cross(lane)
-	var lateral := Vector3.RIGHT
-	var lateral_velocity := Vector3.ZERO
-	if cross_lane.length_squared() > 0.01:
-		lateral = cross_lane.normalized()
-		var cross_velocity := Vector3.UP.cross(arrival_velocity - departure_velocity)
-		lateral_velocity = cross_velocity.slide(lateral) / cross_lane.length()
-	for index in range(TRADER_NAMES.size() if ports.size() > 1 else 1):
+	var services: Array = sim.freight.services(int(sim.system_id), float(sim.orbit_time))
+	for service: Dictionary in services:
+		result.append(_freighter_contact(sim, service))
+	if services.is_empty() and ports.size() == 1:
+		# A newly commissioned single-port colony has no inter-port service yet.
+		# Preserve its deterministic loiterer rather than inventing a cargo leg.
 		var rate := TAU / TRADE_PERIOD
-		var angle := fposmod(float(sim.orbit_time), TRADE_PERIOD) * rate + 0.55 + PI * index
-		var fraction := (1.0 - cos(angle)) * 0.5
-		var advance := 0.5 * sin(angle) * rate
-		var side := 46.0 if index == 0 else -46.0
-		var height := Vector3.UP * (sin(angle * 2.0) * 25.0)
-		var climb := Vector3.UP * (cos(angle * 2.0) * rate * 50.0)
-		var at := departure + lane * fraction + lateral * side + height
-		var velocity := departure_velocity.lerp(arrival_velocity, fraction) + lane * advance + lateral_velocity * side + climb
-		if ports.size() == 1:
-			at = departure + Vector3(250.0 * cos(angle), height.y, 176.0 * sin(angle))
-			velocity = departure_velocity + Vector3(-250.0 * sin(angle) * rate, climb.y, 176.0 * cos(angle) * rate)
+		var angle := fposmod(float(sim.orbit_time), TRADE_PERIOD) * rate + 0.55
+		var at := departure + Vector3(250.0 * cos(angle), sin(angle * 2.0) * 25.0, 176.0 * sin(angle))
+		var velocity := departure_velocity + Vector3(-250.0 * sin(angle) * rate, cos(angle * 2.0) * rate * 50.0, 176.0 * cos(angle) * rate)
 		var sample := clear_hulls(sim, at, velocity)
 		result.append({
-			"id": "trader-%d-%d" % [sim.system_id, index], "name": TRADER_NAMES[index], "role": "trader",
+			"id": "trader-%d-0" % sim.system_id, "name": Freight.TRADER_NAMES[0], "role": "trader",
 			"position": sample.position, "velocity": sample.velocity, "hull": 100.0,
 		})
 	var patrol_rate := TAU / PATROL_PERIOD
@@ -58,6 +44,53 @@ static func contacts(sim: RefCounted) -> Array[Dictionary]:
 	for convoy: Dictionary in sim.factions.active_convoys(sim.system_id):
 		result.append(_convoy_contact(sim, first, convoy))
 	return result
+
+
+static func _freighter_contact(sim: RefCounted, service: Dictionary) -> Dictionary:
+	# Berths depend on port and ship slot, never on the direction of a leg.
+	# Arrival may relabel destination as origin while progress returns to zero;
+	# the physical endpoint and its orbital drift therefore remain identical.
+	var side := 1.0 if int(service.slot) == 0 else -1.0
+	var berth_offset := Vector3(side * 34.0, 30.0, 24.0)
+	var departure: Vector3 = sim.target_gate(int(service.origin)) + berth_offset
+	var arrival: Vector3 = sim.target_gate(int(service.destination)) + berth_offset
+	var departure_velocity: Vector3 = sim.target_velocity(int(service.origin))
+	var arrival_velocity: Vector3 = sim.target_velocity(int(service.destination))
+	var lane := arrival - departure
+	var progress := float(service.progress)
+	var advance := float(service.speed_fraction)
+	# This bow and its derivative vanish at both ends. A fixed world-space
+	# bow also avoids a lateral sign flip when the two route endpoints swap.
+	var bow := Vector3(side * 46.0, 28.0, 0.0)
+	var bend := 16.0 * progress * progress * (1.0 - progress) * (1.0 - progress)
+	var bend_slope := 32.0 * progress * (1.0 - progress) * (1.0 - 2.0 * progress)
+	var at := departure.lerp(arrival, progress) + bow * bend
+	var drift := departure_velocity.lerp(arrival_velocity, progress)
+	var course := lane + bow * bend_slope
+	var velocity := drift + course * advance
+	var sample := clear_hulls(sim, at, velocity)
+	# Subtract the co-moving solution from its unit-progress derivative. The
+	# clearance map is affine in velocity at a fixed position, so this retains
+	# its climb without orbital drift or a zero-speed division at the berth.
+	var coasting := clear_hulls(sim, at, drift)
+	var advancing := clear_hulls(sim, at, drift + course)
+	var forward: Vector3 = advancing.velocity - coasting.velocity
+	if not bool(service.in_transit) and int(service.last_port) >= 0:
+		# Turn the nose during the real layover, not instantly at the delivery
+		# boundary. The next destination is also the previous origin on a shuttle.
+		var turn := clampf(1.0 - float(service.departure_eta) / Freight.LAYOVER_SECONDS, 0.0, 1.0)
+		var direction := forward.normalized()
+		var axis := Vector3.UP - direction * direction.y
+		if axis.length_squared() < 0.0001:
+			axis = Vector3.RIGHT - direction * direction.x
+		forward = (-direction).rotated(axis.normalized(), PI * smoothstep(0.0, 1.0, turn))
+	if forward.length_squared() < 0.0001:
+		forward = Vector3.FORWARD
+	return {
+		"id": str(service.id), "name": str(service.name), "role": "trader",
+		"position": sample.position, "velocity": sample.velocity, "forward": forward.normalized(), "hull": 100.0,
+		"freight": service.duplicate(true),
+	}
 
 
 static func convoy_contact(sim: RefCounted, id: String) -> Dictionary:

@@ -169,8 +169,8 @@ func _test_velar_routes() -> void:
 	_step(mining_flight, 3.0)
 	_expect(mining_flight.mining.cargo_amount("ice") == 12 and mining_flight.mining.reserve_at(12) == reserve - 12
 		and _fly_to(mining_flight, 11), "Mining on the remote moon yields a batch and permits takeoff")
-	var price := Catalog.price(11, "ice")
-	_expect(mining_flight.sell_ore_action() and mining_flight.credits == price * 12
+	var quoted_payment: int = mining_flight.market_quote("ice", "sell", 12).cost
+	_expect(mining_flight.sell_ore_action() and mining_flight.credits == quoted_payment
 		and mining_flight.service_action("refuel") and mining_flight.ship.fuel == 100.0,
 		"The remote market buys its moon ice and provides a working refuel service")
 
