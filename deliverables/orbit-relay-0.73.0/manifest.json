@@ -1,0 +1,258 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.73.0",
+  "source_commit": "fbf426eab4a3247af41c14ea3e37d214895f26b5",
+  "content": {
+    "save_schema": 33,
+    "separate_mining_laser_and_fragment_collector": true,
+    "mining_pulse_reaction_fuel": 0.4,
+    "fragments_physically_drift": true,
+    "shared_deposits_with_ground_mining": true,
+    "leftover_fragment_persists_across_holds_and_jumps": true,
+    "tested_acceptance_matrix": {
+      "checked": 31,
+      "partial": 9,
+      "open": 4
+    }
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 98,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.72.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 45,
+    "tested_on_device": false
+  },
+  "checks": {
+    "android_report_share": {
+      "failures": 0,
+      "checks": 76
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "binary_orbits": {
+      "failures": 0,
+      "checks": 55
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "cartography": {
+      "failures": 0,
+      "checks": 43
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "crew": {
+      "failures": 0,
+      "checks": 45
+    },
+    "customs": {
+      "failures": 0,
+      "checks": 28
+    },
+    "departure": {
+      "failures": 0,
+      "checks": 32
+    },
+    "dock_access": {
+      "failures": 0,
+      "checks": 37
+    },
+    "docking": {
+      "failures": 0,
+      "checks": 76
+    },
+    "dual_fuel": {
+      "failures": 0,
+      "checks": 25
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 139
+    },
+    "flight": {
+      "failures": 0
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "frontier_freight": {
+      "failures": 0,
+      "checks": 33
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 76
+    },
+    "galactic_routes": {
+      "failures": 0,
+      "checks": 59
+    },
+    "gear": {
+      "failures": 0,
+      "checks": 28
+    },
+    "heat_shield": {
+      "failures": 0,
+      "checks": 28
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 187
+    },
+    "living": {
+      "failures": 0,
+      "checks": 77
+    },
+    "material_maps": {
+      "failures": 0,
+      "checks": 33
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "npc_freight": {
+      "failures": 0,
+      "checks": 48
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "orbital_mining": {
+      "failures": 0,
+      "checks": 34
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 535
+    },
+    "passengers": {
+      "failures": 0,
+      "checks": 50
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 81
+    },
+    "procedural_galaxy": {
+      "failures": 0,
+      "checks": 140
+    },
+    "reference_frames": {
+      "failures": 0,
+      "checks": 46
+    },
+    "remote_rig": {
+      "failures": 0,
+      "checks": 35
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "report": {
+      "failures": 0,
+      "checks": 28
+    },
+    "scene": {
+      "failures": 0
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "shipyard": {
+      "failures": 0,
+      "checks": 52
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 381
+    },
+    "surface_guidance": {
+      "failures": 0,
+      "checks": 60
+    },
+    "surface_rotation": {
+      "failures": 0,
+      "checks": 154
+    },
+    "orbital_fragment_model": {
+      "checks": 1056,
+      "failures": 0
+    },
+    "ship_equipment_model": {
+      "checks": 43,
+      "failures": 0
+    },
+    "fragment_render_headless": {
+      "checks": 23,
+      "failures": 0
+    },
+    "fragment_render_gl": {
+      "checks": 25,
+      "failures": 0
+    },
+    "mining_equipment_cockpit_headless": {
+      "checks": 40,
+      "failures": 0
+    },
+    "mining_equipment_cockpit_gl": {
+      "checks": 43,
+      "failures": 0
+    },
+    "exact_0_72_four_save_types": {
+      "checks": 16,
+      "failures": 0,
+      "save_files": 4
+    },
+    "frozen_0_73_freighter_and_asteroid_mileage": {
+      "checks": 21,
+      "failures": 0,
+      "touch_interactions": 6
+    }
+  },
+  "files": {
+    "OrbitRelay-0.73.0-arm64.apk": {
+      "bytes": 28762198,
+      "sha256": "a5b0c69c57478099950c732b069b291af79e4ef3fe60644e2c196f22633e835e"
+    },
+    "OrbitRelay-0.73.0-source.zip": {
+      "bytes": 2245397,
+      "sha256": "17999180e321bd1e14193944906abfd8f044bb73fca3b055934f865665f047cc"
+    },
+    "asteroid-mining-pulse.png": {
+      "bytes": 182579,
+      "sha256": "f33779d0e9a587f7bea010a2d88e2086cb43464a4860f94b36d429915fafae70"
+    },
+    "fragment-collector-cockpit.png": {
+      "bytes": 181868,
+      "sha256": "d31eb4299ecbfc6bbb080f3f22f347d72d8b2b2aaeb7e7b90409feb7296cb43e"
+    },
+    "free-orbital-fragment.png": {
+      "bytes": 271169,
+      "sha256": "8c798b25617814f6240164e012f2959e580b6b2202e4aed83b45d039aa2eed2d"
+    },
+    "mining-equipment.png": {
+      "bytes": 133513,
+      "sha256": "742aff8150a98a047a69b915577fdcc803c989533b7b8e4545ffaee06f20ff80"
+    }
+  }
+}
