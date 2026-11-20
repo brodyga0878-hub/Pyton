@@ -3,6 +3,7 @@ extends SceneTree
 const Flight := preload("res://scripts/flight_sim.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const Economy := preload("res://scripts/port_economy.gd")
+const Expedition := preload("res://scripts/expedition.gd")
 const NpcFreight := preload("res://scripts/npc_freight.gd")
 const OrbitRelay := preload("res://main.tscn")
 const HOME := Catalog.HOME_SYSTEM
@@ -23,6 +24,7 @@ func _run() -> void:
 	_test_remote_shipments()
 	_test_capacity_guards()
 	_test_mid_leg_restart()
+	_test_rounded_arrival_restart()
 	_test_interval_and_migration()
 	_test_stock_sensitive_prices()
 	_test_quick_sale()
@@ -126,6 +128,42 @@ func _test_mid_leg_restart() -> void:
 	_expect(resumed.market.snapshot() == flight.market.snapshot() and resumed.freight.snapshot() == flight.freight.snapshot()
 		and _service(resumed, HOME, 0).last_delivered == NpcFreight.CAPACITY,
 		"Once resumed, the same leg unloads only once and the next dock schedule remains deterministic")
+
+
+func _test_rounded_arrival_restart() -> void:
+	var flight := Flight.new()
+	_tick(flight, 34.0)
+	var frontier := flight.expedition.snapshot()
+	frontier.projects[0] = {"phase": Expedition.COMPLETE, "sponsor_port": 0, "sponsor": 0,
+		"scan_index": Expedition.SURVEY_TOTAL, "build_index": Expedition.BUILD_TOTAL}
+	if not _expect(flight.expedition.restore(frontier) and flight.factions.commission(Catalog.HEATHER_SYSTEM, 0, flight.orbit_time)
+		and flight.freight.activate_frontier(Catalog.HEATHER_SYSTEM, flight.orbit_time), "Prepare two simultaneous scheduled arrivals"):
+		return
+	_tick(flight, 78.0 - 1e-14)
+	var saved := _json(flight.snapshot())
+	# Round to the boundary if the JSON writer happened to retain the final digit.
+	saved.orbit_time = 112.0
+	var resumed := Flight.new()
+	var core_stock := flight.market.stock(3, "medical")
+	var frontier_stock := flight.market.stock(Catalog.HEATHER_PORT, "medical")
+	if not _expect(flight.orbit_time < 112.0 and saved.freight.ships[1].amount == NpcFreight.CAPACITY
+		and saved.freight.ships[6].amount == NpcFreight.CAPACITY and resumed.restore(saved)
+		and resumed.freight.snapshot() == flight.freight.snapshot(), "A rounded arrival epoch preserves both pending ledgers on restart"):
+		return
+	var stale := saved.duplicate(true)
+	stale.orbit_time = 112.01
+	var before := resumed.snapshot()
+	_expect(not resumed.restore(stale) and resumed.snapshot() == before, "A stale arrival step away from the boundary is still rejected atomically")
+	_tick(resumed, 0.5)
+	var delivered := _json(resumed.snapshot())
+	delivered.orbit_time = 112.0 - 1e-12
+	_expect(resumed.market.stock(3, "medical") == core_stock + NpcFreight.CAPACITY
+		and resumed.market.stock(Catalog.HEATHER_PORT, "medical") == frontier_stock + NpcFreight.CAPACITY
+		and resumed.restore(delivered), "Pending arrivals unload, and a backward-rounded clock accepts both completed steps")
+	_tick(resumed, 0.5)
+	_expect(resumed.market.stock(3, "medical") == core_stock + NpcFreight.CAPACITY
+		and resumed.market.stock(Catalog.HEATHER_PORT, "medical") == frontier_stock + NpcFreight.CAPACITY,
+		"Neither cargo is delivered twice after reopening the completed boundary")
 
 
 func _test_interval_and_migration() -> void:

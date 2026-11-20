@@ -69,9 +69,10 @@ func frontier_active(system: int) -> bool:
 func advance(market: RefCounted, previous_epoch: float, next_epoch: float) -> void:
 	if next_epoch <= previous_epoch or next_epoch < _next_epoch or not _valid_epoch(previous_epoch) or not _valid_epoch(next_epoch):
 		return
-	if previous_epoch >= _next_epoch:
-		# An externally advanced clock should not retrospectively mutate inventories.
-		_skip_without_trade(previous_epoch)
+	var roundtrip_slack := _clock_tolerance(previous_epoch)
+	if previous_epoch - _next_epoch > roundtrip_slack:
+		# Skip genuine clock gaps but execute a pending event at a rounded save boundary.
+		_skip_without_trade(previous_epoch - roundtrip_slack)
 	var long_advance := next_epoch - previous_epoch >= LEG_SECONDS * 4.0
 	while _next_epoch <= next_epoch:
 		if long_advance and not _can_trade(market):
@@ -138,7 +139,9 @@ func restore(raw: Variant, epoch: float, legacy_frontier := false) -> bool:
 	for index in range(records.size()):
 		var record: Variant = records[index]
 		var route_seed := float(seed) if index < LOCAL_ROUTE_COUNT else frontier_epochs[index - LOCAL_ROUTE_COUNT]
-		var step := _steps_through(index, epoch, route_seed) if route_seed >= 0.0 else 0
+		var step := _restored_step(index, epoch, route_seed, record)
+		if step < 0:
+			return false
 		if not _valid_ship(index, step, record):
 			return false
 		restored.append({
@@ -304,6 +307,24 @@ static func _steps_through(index: int, epoch: float, seed: float) -> int:
 static func _event_time(index: int, step: int, seed: float) -> float:
 	var first := FRONTIER_DEPARTURE if index >= LOCAL_ROUTE_COUNT else float(FIRST_DEPARTURES[index % TRADER_NAMES.size()])
 	return seed + first + _leg_index(step) * LEG_SECONDS + (TRANSIT_SECONDS if step % 2 == 1 else 0.0)
+
+
+static func _restored_step(index: int, epoch: float, seed: float, record: Variant) -> int:
+	var saved: Variant = record.get("step") if record is Dictionary else null
+	if not (saved is int or saved is float):
+		return -1
+	var expected := _steps_through(index, epoch, seed) if seed >= 0.0 else 0
+	if saved == expected:
+		return expected
+	if seed < 0.0 or saved < 0 or (saved != expected - 1 and saved != expected + 1):
+		return -1
+	var boundary := _event_time(index, mini(int(saved), expected), seed)
+	# The stock update follows the event that actually ran, even if JSON rounded the clock.
+	return int(saved) if absf(epoch - boundary) <= _clock_tolerance(epoch) else -1
+
+
+static func _clock_tolerance(epoch: float) -> float:
+	return maxf(1e-10, absf(epoch) * 2e-14)
 
 
 static func _leg_index(step: int) -> int:
