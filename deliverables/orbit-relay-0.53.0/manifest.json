@@ -1,0 +1,162 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.53.0",
+  "source_commit": "6b93c6336fa6eecb956dfa45af784a210884e4f3",
+  "content": {
+    "save_schema": 16,
+    "scheduled_npc_freighters": 6,
+    "freight_systems": 3,
+    "inventory_based_market_prices": true
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 78,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.52.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 35,
+    "tested_on_device": false
+  },
+  "checks": {
+    "android_report_share": {
+      "failures": 0,
+      "checks": 76
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 132
+    },
+    "flight": {
+      "failures": 0
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 72
+    },
+    "heat_shield": {
+      "failures": 0,
+      "checks": 28
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 186
+    },
+    "living": {
+      "failures": 0,
+      "checks": 76
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "npc_freight": {
+      "failures": 0,
+      "checks": 43
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 292
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 80
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "report": {
+      "failures": 0,
+      "checks": 28
+    },
+    "scene": {
+      "failures": 0
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 191
+    },
+    "bulk_price_matrix": {
+      "checks": 137700,
+      "failures": 0
+    },
+    "freight_economy_stress": {
+      "checks": 5724,
+      "failures": 0,
+      "max_simulated_years": 100
+    },
+    "freight_contact_paths": {
+      "checks": 2050,
+      "failures": 0,
+      "max_velocity_error_mps": 0.035866,
+      "min_sampled_clearance_m": 24.101
+    },
+    "desktop_supply_overlay": {
+      "checks": 30,
+      "failures": 0,
+      "viewports": [
+        [
+          1280,
+          720
+        ],
+        [
+          1600,
+          720
+        ]
+      ]
+    },
+    "android_manifest_repair": {
+      "checks": 11,
+      "failures": 0
+    }
+  },
+  "files": {
+    "OrbitRelay-0.53.0-arm64.apk": {
+      "bytes": 26482168,
+      "sha256": "6d7c00b917e59447d87dd08b07d5d296acbd64d3a11fcba96181b87ace210506"
+    },
+    "OrbitRelay-0.53.0-source.zip": {
+      "bytes": 309515,
+      "sha256": "e5881b92ee2a4ba6ca22aea2b65f38befd4f858ad89fb8fe8b507ca8f374bc55"
+    },
+    "market-supply.png": {
+      "bytes": 82705,
+      "sha256": "d367bf42aae5c95fdef0c433675606afd24062ac2d2f099824c65d46a86126cb"
+    },
+    "market-trade.png": {
+      "bytes": 98385,
+      "sha256": "cf5665b4a8a42a474e6baa1e89a7e6722804464425db147a53851e8568dfdcd0"
+    }
+  }
+}
