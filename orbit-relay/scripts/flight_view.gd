@@ -4,9 +4,11 @@ const AsteroidView = preload("res://scripts/asteroid_view.gd")
 const MiningRigView = preload("res://scripts/mining_rig_view.gd")
 const StarView = preload("res://scripts/star_view.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
+const Terrain = preload("res://scripts/surface_terrain.gd")
 const STAR_DISTANCE := 2700.0
 const STATION_RADIAL_SEGMENTS := 20
 const BACKDROP_ORBIT_SECONDS := 28800.0
+const CAMERA_SURFACE_CLEARANCE := 2.0
 
 var camera: Camera3D
 var _ship: Node3D
@@ -106,7 +108,7 @@ func _load_sector(id: int) -> void:
 	for site_id: int in Catalog.mines_for(id):
 		var body := AsteroidView.new()
 		_sector.add_child(body)
-		body.build(Catalog.site(site_id))
+		body.build(Catalog.site(site_id), site_id)
 		_surface_views[site_id] = body
 
 
@@ -115,16 +117,15 @@ func sync(sim: RefCounted, delta: float) -> void:
 		build()
 	if _system_id != int(sim.system_id):
 		_load_sector(sim.system_id)
-	var heading := Basis.from_euler(Vector3(float(sim.pitch), float(sim.yaw), 0.0))
 	var position_now: Vector3 = sim.position
-	_ship.position = position_now
-	_ship.basis = heading * Basis(Vector3.BACK, float(sim.roll))
-
 	var docked := int(sim.docked) >= 0
 	var surface_id := int(sim.landed_site)
 	var landed := surface_id >= 0
 	var settled := docked or landed
 	var berth := int(sim.docked) if docked else surface_id
+	var heading: Basis = sim.landed_basis() if landed else Basis.from_euler(Vector3(float(sim.pitch), float(sim.yaw), 0.0))
+	_ship.position = position_now
+	_ship.basis = heading if landed else sim.attitude()
 	_landing_gear.visible = landed
 	var thrust := clampf(float(sim.throttle), 0.0, 1.0)
 	_flight_time += delta
@@ -136,9 +137,9 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var focal_offset := Vector3(0.0, 0.0, -15.0) if docked else Vector3(0.0, 2.0, -30.0)
 	var up := heading.y
 	if landed:
-		camera_offset = Vector3(-10.4, -17.5, 14.5)
-		focal_offset = Vector3(3.6, 2.7, -4.3)
-		up = Vector3.BACK
+		camera_offset = Vector3(-8.4, -13.5, 12.5)
+		focal_offset = Vector3(2.8, 2.0, -3.2)
+		up = heading.z
 	var desired := position_now + heading * camera_offset
 	var jump := delta <= 0.0 or not _last_position.is_finite()
 	if not jump:
@@ -147,9 +148,18 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var camera_start := camera.position
 	if not jump and settled and berth == _last_berth:
 		camera_start += position_now - _last_position
-	camera.position = desired if jump else camera_start.lerp(desired, blend)
-	_camera_up = up if jump else _camera_up.lerp(up, blend).normalized()
-	camera.look_at(position_now + heading * focal_offset, _camera_up)
+	var chase_origin := desired if jump else camera_start.lerp(desired, blend)
+	camera.position = _surface_safe_camera(chase_origin, sim)
+	if not settled:
+		var close_follow := smoothstep(0.0, 7.0, camera.position.distance_to(chase_origin))
+		focal_offset = focal_offset.lerp(Vector3(0.0, 0.4, -2.5), close_follow)
+	var look_target := position_now + heading * focal_offset
+	var sight := (look_target - camera.position).normalized()
+	var blended_up := _camera_up.lerp(up, blend).normalized()
+	_camera_up = up if jump or blended_up.is_zero_approx() else blended_up
+	if absf(sight.dot(_camera_up)) > 0.995:
+		_camera_up = up if absf(sight.dot(up)) < 0.995 else heading.x
+	camera.look_at(look_target, _camera_up)
 	_stars.position = camera.position
 	_star.position = sim.target_position(_star_id)
 	var backdrop_phase := TAU * fposmod(float(sim.orbit_time), BACKDROP_ORBIT_SECONDS) / BACKDROP_ORBIT_SECONDS
@@ -167,9 +177,25 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_gate_materials[site_id].albedo_color = Catalog.site(site_id).accent * strength
 	for site_id: int in _surface_views:
 		_surface_views[site_id].position = sim.target_position(site_id)
-		_surface_views[site_id].sync(position_now, site_id == int(sim.target), not settled)
-	var deposit: Vector3 = _surface_views[surface_id].mining_spot() if landed else position_now
+		var field_direction: Vector3 = sim.landing_direction if site_id == surface_id else Vector3.ZERO
+		_surface_views[site_id].sync(position_now, site_id == int(sim.target), not settled, field_direction)
+	var deposit: Transform3D = sim.surface_deposit() if landed else _ship.global_transform
 	_mining_rig.sync(_ship.global_transform, deposit, int(sim.mining.phase) if landed else 0, sim.mining.progress(), float(sim.elapsed))
+
+
+func _surface_safe_camera(at: Vector3, sim: RefCounted) -> Vector3:
+	# The chase offset points into the rock during the first moment of an outward launch.
+	for site_id: int in _surface_views:
+		var center: Vector3 = sim.target_position(site_id)
+		var relative := at - center
+		var outer := float(Catalog.site(site_id).radius) * Terrain.MAX_RADIUS_FACTOR + CAMERA_SURFACE_CLEARANCE
+		if relative.length_squared() >= outer * outer:
+			continue
+		var direction := Vector3.BACK if relative.is_zero_approx() else relative.normalized()
+		var threshold := Terrain.radius_at(site_id, direction) + CAMERA_SURFACE_CLEARANCE
+		if relative.length_squared() < threshold * threshold:
+			at = center + direction * threshold
+	return at
 
 
 func _mesh(parent: Node3D, primitive: Mesh, paint: Material, at: Vector3) -> MeshInstance3D:

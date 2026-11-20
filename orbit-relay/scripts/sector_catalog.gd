@@ -7,8 +7,10 @@ const TARGET_COUNT := SITE_COUNT + 1
 const HOME_SYSTEM := 0
 const VELAR_SYSTEM := 1
 const SYSTEM_COUNT := 2
-const DESTINATION_COUNT := 15
+const PRE_SURFACE_DESTINATION_COUNT := 15
+const DESTINATION_COUNT := PRE_SURFACE_DESTINATION_COUNT + 1
 const VELAR_STAR_ID := 14
+const TERRACE_ID := PRE_SURFACE_DESTINATION_COUNT
 const JUMP_FUEL := 26
 const STAR_CLEARANCE := 250.0
 const SCOOP_INNER := 268.0
@@ -25,9 +27,9 @@ const SYSTEMS := [
 	},
 	{
 		"name": "Велар", "position": Vector2(3.6, -2.2), "accent": Color("#9dcaff"),
-		"description": "Голубая звезда, порты «Створ» и «Гранитный причал». Ледяная луна и залежи кристаллов.",
-		"arrival_port": 10, "targets": [10, 11, 12, 13, VELAR_STAR_ID], "ports": [10, 11],
-		"mines": [12, 13], "star": VELAR_STAR_ID,
+		"description": "Голубая звезда, два порта, ледяная луна, залежи кристаллов и скальная планета «Терраса».",
+		"arrival_port": 10, "targets": [10, 11, 12, 13, VELAR_STAR_ID, TERRACE_ID], "ports": [10, 11],
+		"mines": [12, 13, TERRACE_ID], "star": VELAR_STAR_ID,
 	},
 ]
 const RESOURCES := ["ore", "crystal", "ice"]
@@ -47,6 +49,7 @@ const SITES := [
 	{"name": "Лазурь", "kind": "moon", "center": Vector3(620, -95, -880), "radius": 98.0, "pad_offset": 98.0, "gate_offset": 174.0, "seed": 163, "surface_color": Color("#658bad"), "accent": Color("#83dfff"), "resource": "ice", "reserve": 192, "drill_seconds": 11.0},
 	{"name": "Просека", "kind": "asteroid", "center": Vector3(-260, -165, -590), "radius": 60.0, "pad_offset": 60.0, "gate_offset": 132.0, "seed": 181, "surface_color": Color("#475c5d"), "accent": Color("#98eab5"), "resource": "crystal", "reserve": 144, "drill_seconds": 13.0},
 	{"name": "Велар", "kind": "star", "center": Vector3(1800, 280, -1600), "radius": 220.0, "pad_offset": 310.0, "gate_offset": 470.0, "accent": Color("#9dcaff")},
+	{"name": "Терраса", "kind": "planet", "center": Vector3(1580, -340, -1180), "radius": 170.0, "pad_offset": 170.0, "gate_offset": 280.0, "seed": 223, "surface_color": Color("#936a55"), "accent": Color("#f3bf85"), "resource": "ore", "reserve": 240, "drill_seconds": 15.0},
 ]
 const PORT_PRICES := {
 	0: {"ore": 20, "crystal": 38, "ice": 14},
@@ -119,6 +122,7 @@ static func kind_name(kind: String) -> String:
 		"port": return "Порт"
 		"asteroid": return "Астероид"
 		"moon": return "Луна"
+		"planet": return "Планета"
 		"comet": return "Комета"
 		"star": return "Звезда"
 		_: return ""

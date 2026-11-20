@@ -22,6 +22,7 @@ const ELEMENTS := {
 	11: Vector3(0.150, 43.8, 4.6),
 	12: Vector3(0.020, 90.0, 0.0),
 	13: Vector3(0.001, 56.2, -0.7),
+	Catalog.TERRACE_ID: Vector3(0.032, 91.0, 12.0),
 }
 
 

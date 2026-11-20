@@ -173,6 +173,8 @@ func _select_site(id: int) -> void:
 	else:
 		var remaining: int = _flight.mining.reserve_at(id)
 		_detail.text += "\n%s · %d ед. в залежи" % [Sector.resource_name(entry.resource), remaining]
+		if entry.kind == "planet":
+			_detail.text += "\nТвёрдая поверхность"
 	_select_button.disabled = here
 
 
@@ -420,6 +422,10 @@ class SectorChart extends Control:
 				draw_circle(marker, 7.0, tint, true, -1.0, true)
 			elif entry.kind == "moon":
 				draw_circle(marker, 9.0, tint, true, -1.0, true)
+			elif entry.kind == "planet":
+				draw_circle(marker, 12.0, tint, true, -1.0, true)
+				draw_line(marker + Vector2(-10, 4), marker + Vector2(10, -4), tint.darkened(0.34), 2.5, true)
+				draw_arc(marker, 12.0, 0.0, TAU, 32, tint.lightened(0.38), 1.4, true)
 			else:
 				draw_colored_polygon(PackedVector2Array([marker + Vector2(-8, 3), marker + Vector2(-3, -8), marker + Vector2(7, -3), marker + Vector2(6, 7)]), tint)
 			_draw_site_label(font, str(entry.name), marker, label_boxes)

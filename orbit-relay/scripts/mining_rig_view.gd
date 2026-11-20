@@ -8,11 +8,13 @@ var _sparks: MultiMeshInstance3D
 var _spark_angles: Array[float] = []
 
 
-func sync(ship_pose: Transform3D, mining_spot: Vector3, phase: int, progress: float, seconds: float) -> void:
+func sync(ship_pose: Transform3D, mining_pose: Transform3D, phase: int, progress: float, seconds: float) -> void:
 	if _rig == null:
 		_make_rig()
-	var stow := to_local(ship_pose * Vector3(0.86, 0.42, 0.14))
-	var deposit := to_local(mining_spot)
+	var local_space := global_transform.affine_inverse()
+	var ship_local := local_space * ship_pose
+	var stow := ship_local * Vector3(0.86, 0.42, 0.14)
+	var deposit := local_space * mining_pose
 	var deploy_fraction := 0.0
 	match phase:
 		1:
@@ -21,9 +23,8 @@ func sync(ship_pose: Transform3D, mining_spot: Vector3, phase: int, progress: fl
 			deploy_fraction = 1.0
 		4:
 			deploy_fraction = 1.0 - smoothstep(0.0, 1.0, progress)
-	_rig.position = stow.lerp(deposit, deploy_fraction)
-	_rig.position.z += sin(PI * deploy_fraction) * 2.4
-	_rig.basis = ship_pose.basis.slerp(Basis.IDENTITY, deploy_fraction).scaled(Vector3.ONE * lerpf(0.43, 1.0, deploy_fraction))
+	_rig.position = stow.lerp(deposit.origin, deploy_fraction) + deposit.basis.z * (sin(PI * deploy_fraction) * 2.4)
+	_rig.basis = ship_local.basis.slerp(deposit.basis, deploy_fraction).scaled(Vector3.ONE * lerpf(0.43, 1.0, deploy_fraction))
 	_indicator.albedo_color = Color("#8bf4c1") if phase == 3 else Color("#fabb64")
 	_bit.rotation.z = seconds * 12.0 if phase == 2 else 0.0
 	_bit.position.z = -0.54 - 0.34 * smoothstep(0.02, 0.27, progress) if phase == 2 else -0.32
@@ -34,7 +35,7 @@ func sync(ship_pose: Transform3D, mining_spot: Vector3, phase: int, progress: fl
 			var angle := _spark_angles[index]
 			var radius := 0.32 + t * 1.45
 			var height := 0.80 * sin(PI * t) + 0.04
-			var at := deposit - Vector3(0, 0, 1.0) + Vector3(cos(angle) * radius, sin(angle) * radius, height)
+			var at := deposit * Vector3(cos(angle) * radius, sin(angle) * radius, height - 1.0)
 			var size := lerpf(0.11, 0.025, t)
 			_sparks.multimesh.set_instance_transform(index, Transform3D(Basis.IDENTITY.scaled(Vector3.ONE * size), at))
 

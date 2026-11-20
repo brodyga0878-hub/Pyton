@@ -38,7 +38,7 @@ func _test_ephemeris() -> void:
 		var future := Orbit.sample(site, EPOCH)
 		var path := Orbit.orbit_points(site)
 		_expect(initial.position == Catalog.site(site).center,
-			"Site %d preserves the exact 0.37 position at the epoch" % site)
+			"Site %d matches the exact catalog position at the epoch" % site)
 		if site == Catalog.star_for(Catalog.system_of_site(site)):
 			_expect(future.position == initial.position and future.velocity == Vector3.ZERO and path.is_empty(),
 				"Star %d remains at the focus with no moving orbit" % site)
@@ -321,6 +321,7 @@ func _parked(site: int, epoch := EPOCH) -> Flight:
 	state.docked = site if Catalog.is_port(site) else -1
 	if Catalog.is_mine_site(site):
 		state.landed_site = site
+		state.landing_direction = [0.0, 0.0, 1.0]
 		state.mining.site_id = site
 	if not flight.restore(state):
 		_failures.append("Dynamic contact fixture at site %d could not be restored" % site)

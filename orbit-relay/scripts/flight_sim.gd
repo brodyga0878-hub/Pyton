@@ -5,7 +5,8 @@ const MiningRig = preload("res://scripts/mining_rig.gd")
 const ShipSystems = preload("res://scripts/ship_systems.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const Orbit = preload("res://scripts/orbit_ephemeris.gd")
-const SAVE_SCHEMA := 6
+const Terrain = preload("res://scripts/surface_terrain.gd")
+const SAVE_SCHEMA := 7
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
@@ -30,6 +31,8 @@ const ASTEROID_PAD := ASTEROID_CENTER + Vector3(0, 0, 43)
 const ASTEROID_GATE := ASTEROID_CENTER + Vector3(0, 0, 105)
 const LANDING_SPEED := 4.0
 const LANDING_RADIUS := 8.0
+const FREE_LANDING_MAX_HEIGHT := 10.0
+const LANDING_ANGLE := 20.0
 const FRAME_MARGIN := 110.0
 const STAR_WARP_MARGIN := 120.0
 const MAX_SAVED_SPEED := MAX_SPEED * 1.56 + 8.0
@@ -43,6 +46,7 @@ var throttle := 0.0
 var boost := false
 var docked := 0
 var landed_site := -1
+var landing_direction := Vector3.ZERO
 var landed: bool:
 	get:
 		return landed_site >= 0
@@ -70,6 +74,7 @@ var status_message := ""
 var _approach_committed := false
 var _departure_site := -1
 var _departure_leg := 0
+var _departure_axis := Vector3.ZERO
 var _sample_time := -1.0
 var _samples: Dictionary[int, Dictionary] = {}
 
@@ -195,6 +200,8 @@ func roll_error(index: int) -> float:
 
 
 func attitude() -> Basis:
+	if landed:
+		return landed_basis()
 	var heading := Basis.from_euler(Vector3(pitch, yaw, 0.0))
 	return heading * Basis(Vector3.BACK, roll)
 
@@ -285,6 +292,7 @@ func set_autopilot(enabled: bool) -> void:
 	autopilot = enabled and docked < 0 and not landed and jump_seconds_left <= 0.0
 	_approach_committed = false
 	_departure_leg = 0
+	_departure_axis = Vector3.ZERO
 	autopilot_phase = "К створу" if autopilot else ""
 	if not autopilot:
 		return
@@ -294,6 +302,11 @@ func set_autopilot(enabled: bool) -> void:
 		var center := target_position(index)
 		var offset := position - center
 		var near_distance := float(Catalog.site(index).radius) + 48.0
+		if index != target and Catalog.is_mine_site(index) and offset.length_squared() < near_distance * near_distance and offset.normalized().dot(Vector3.BACK) < 0.96:
+			_departure_site = index
+			_departure_axis = offset.normalized()
+			_departure_leg = 1
+			break
 		if index != target and offset.length() < near_distance and offset.z >= 0.0 and target_position(target).z < center.z:
 			_departure_site = index
 			_departure_leg = 1
@@ -310,8 +323,8 @@ func selected_dock_status() -> Dictionary:
 		return {"ok": false, "reason": "Идёт зарядка прыжкового привода"}
 	if target == Catalog.star_for(system_id):
 		return {"ok": false, "reason": "У звезды можно собирать топливо"}
-	if not Catalog.is_port(target):
-		return _landing_status()
+	if Catalog.is_mine_site(target):
+		return surface_status()
 	var relative := position - docking_position(target)
 	if relative.length() > 7.0 or relative.z < -0.8 or Vector2(relative.x, relative.y).length() > 3.1:
 		return {"ok": false, "reason": "Подойдите к центру стыковочного кольца"}
@@ -324,15 +337,56 @@ func selected_dock_status() -> Dictionary:
 	return {"ok": true, "reason": "Можно швартоваться"}
 
 
-func _landing_status() -> Dictionary:
-	var offset := position - target_contact(target)
-	if offset.z < -0.1 or offset.z > 7.0 or Vector2(offset.x, offset.y).length() > LANDING_RADIUS:
-		return {"ok": false, "reason": "Подойдите к отмеченной площадке"}
-	if speed_relative_to(target) > LANDING_SPEED:
-		return {"ok": false, "reason": "Снизьте скорость относительно площадки до 4 м/с"}
-	if forward().dot(Vector3.FORWARD) < cos(deg_to_rad(12.0)):
-		return {"ok": false, "reason": "Направьте нос к площадке"}
-	return {"ok": true, "reason": "Можно садиться"}
+func surface_status() -> Dictionary:
+	var status := {"ok": false, "near": false, "reason": "Подойдите к твёрдой поверхности", "altitude": 0.0, "slope": 0.0, "pad": false, "direction": Vector3.ZERO}
+	if docked >= 0 or landed or not Catalog.is_mine_site(target):
+		return status
+	var relative := position - target_position(target)
+	var distance := relative.length()
+	if distance < 0.01 or distance > float(Catalog.site(target).radius) + FRAME_MARGIN:
+		return status
+	var pad_height := relative.z - float(Catalog.site(target).pad_offset)
+	var over_pad := relative.z > 0.0 and Vector2(relative.x, relative.y).length() <= LANDING_RADIUS
+	var direction := Vector3.BACK if over_pad else relative / distance
+	var normal := Terrain.normal(target, direction)
+	var altitude := pad_height + Terrain.CONTACT_CLEARANCE if over_pad else distance - Terrain.radius_at(target, direction)
+	status.near = true
+	status.altitude = altitude
+	status.slope = rad_to_deg(acos(clampf(normal.dot(direction), -1.0, 1.0)))
+	status.pad = over_pad
+	status.direction = direction
+	if jump_seconds_left > 0.0:
+		status.reason = "Идёт зарядка прыжкового привода"
+	elif autopilot and _approach_committed and not over_pad:
+		status.reason = "Подойдите к отмеченной площадке"
+	elif altitude < Terrain.CONTACT_CLEARANCE - 0.1 or altitude > (11.0 if over_pad else FREE_LANDING_MAX_HEIGHT):
+		status.reason = "Подойдите к площадке" if over_pad else "Снизьтесь до 4–10 м над поверхностью"
+	elif speed_relative_to(target) > LANDING_SPEED:
+		status.reason = "Снизьте скорость относительно поверхности до 4 м/с"
+	elif not over_pad and not Terrain.landable(target, direction):
+		status.reason = "Выберите участок с меньшим уклоном"
+	elif forward().dot(-normal) < cos(deg_to_rad(12.0 if over_pad else LANDING_ANGLE)):
+		status.reason = "Направьте нос к площадке" if over_pad else "Направьте нос к поверхности"
+	else:
+		status.ok = true
+		status.reason = "Можно садиться"
+	return status
+
+
+func landed_offpad() -> bool:
+	return landed and not landing_direction.is_equal_approx(Vector3.BACK)
+
+
+func landed_basis() -> Basis:
+	return Terrain.basis(landed_site, landing_direction) if landed else Basis.IDENTITY
+
+
+func surface_deposit() -> Transform3D:
+	if not landed:
+		return Transform3D(Basis.IDENTITY, position)
+	var deposit := Terrain.deposit(landed_site, landing_direction)
+	deposit.origin += target_position(landed_site)
+	return deposit
 
 
 func dock_action() -> bool:
@@ -346,7 +400,7 @@ func dock_action() -> bool:
 	if landed:
 		_lift()
 	else:
-		_arrive()
+		_arrive(status.get("direction", Vector3.BACK))
 	return true
 
 
@@ -532,19 +586,21 @@ func _charge_jump(delta: float) -> void:
 	_announce("jump_complete", "Прыжок завершён. Система «%s»." % Catalog.system(system_id).name)
 
 
-func _arrive() -> void:
-	if not Catalog.is_port(target):
+func _arrive(direction := Vector3.BACK) -> void:
+	if Catalog.is_mine_site(target):
 		mining.select_site(target)
 		landed_site = target
+		landing_direction = direction.normalized()
 		set_autopilot(false)
 		_hold_landed_pose()
-		_announce("land", "Посадка завершена. «%s»." % target_name(landed_site))
+		var location := "Вне площадки" if landed_offpad() else "Площадка"
+		_announce("land", "Посадка завершена. %s на «%s»." % [location, target_name(landed_site)])
 	else:
 		_dock()
 
 
 func _hold_landed_pose() -> void:
-	position = target_contact(landed_site)
+	position = target_position(landed_site) + Terrain.contact(landed_site, landing_direction)
 	velocity = Vector3.ZERO
 	yaw = 0.0
 	pitch = 0.0
@@ -556,12 +612,18 @@ func _hold_landed_pose() -> void:
 
 func _lift() -> void:
 	var origin := landed_site
+	var away := Terrain.normal(origin, landing_direction)
+	var offpad := landed_offpad()
 	reset_time_scale()
 	landed_site = -1
-	yaw = PI
-	velocity = target_velocity(origin) + Vector3.BACK * 9.0
+	landing_direction = Vector3.ZERO
+	yaw = atan2(-away.x, -away.z) if offpad else PI
+	pitch = clampf(asin(clampf(away.y, -1.0, 1.0)), -MAX_PITCH, MAX_PITCH)
+	if offpad:
+		position += away * 0.35
+	velocity = target_velocity(origin) + away * 9.0
 	target = _departure_target(_default_port())
-	_announce("lift", "Взлёт. Площадка «%s»." % target_name(origin))
+	_announce("lift", "Взлёт с поверхности. «%s»." % target_name(origin))
 
 
 func _launch() -> void:
@@ -711,9 +773,15 @@ func _inside_hull(point: Vector3, index: int, epoch := -1.0) -> bool:
 	var relative := point - center
 	if index == Catalog.star_for(Catalog.system_of_site(index)):
 		return relative.length_squared() < Catalog.STAR_CLEARANCE * Catalog.STAR_CLEARANCE
-	if not Catalog.is_port(index):
-		var radius := float(Catalog.site(index).radius)
-		return relative.length_squared() < radius * radius
+	if Catalog.is_mine_site(index):
+		var outer := float(Catalog.site(index).radius) * Terrain.MAX_RADIUS_FACTOR + Terrain.CONTACT_CLEARANCE
+		var distance_squared := relative.length_squared()
+		if distance_squared >= outer * outer:
+			return false
+		if distance_squared < 0.0001:
+			return true
+		var radius := Terrain.radius_at(index, relative.normalized()) + Terrain.CONTACT_CLEARANCE - 0.025
+		return distance_squared < radius * radius
 	# A narrow corridor leads into the illuminated docking collar.
 	var inside_corridor := relative.z >= float(Catalog.site(index).pad_offset) - 0.8 and Vector2(relative.x, relative.y).length() < 4.4
 	var hull := Vector3(relative.x / HULL_X, relative.y / HULL_Y, relative.z / HULL_Z)
@@ -764,14 +832,17 @@ func _autopilot_step(delta: float) -> void:
 			var departure := target_position(_departure_site)
 			drift = target_velocity(_departure_site)
 			var departure_radius := float(Catalog.site(_departure_site).radius)
-			var forward_clearance := departure_radius + 30.0 if not Catalog.is_port(_departure_site) else 53.0
-			var exit_point := departure + Vector3.BACK * forward_clearance
-			var side := 1.0 if center.x >= departure.x else -1.0
-			waypoint = exit_point if _departure_leg == 1 else exit_point + Vector3(side * maxf(83, departure_radius + 42.0), 0, 0)
+			if _departure_axis == Vector3.ZERO:
+				var forward_clearance := departure_radius + 30.0 if not Catalog.is_port(_departure_site) else 53.0
+				var exit_point := departure + Vector3.BACK * forward_clearance
+				var side := 1.0 if center.x >= departure.x else -1.0
+				waypoint = exit_point if _departure_leg == 1 else exit_point + Vector3(side * maxf(83, departure_radius + 42.0), 0, 0)
+			else:
+				waypoint = departure + _departure_axis * (departure_radius * Terrain.MAX_RADIUS_FACTOR + 48.0)
 			autopilot_phase = "Выход из зоны объекта"
 			max_speed = 36.0
 			if position.distance_to(waypoint) < 4.0 and speed_relative_to(_departure_site) < 8.0:
-				_departure_leg = 2 if _departure_leg == 1 else 0
+				_departure_leg = 2 if _departure_leg == 1 and _departure_axis == Vector3.ZERO else 0
 		elif not star_run:
 			var detour := _star_detour(waypoint)
 			if detour != waypoint:
@@ -828,8 +899,8 @@ func _transit_obstacle(course: Vector3, cruise: float) -> int:
 		var travel_squared := relative_course.length_squared()
 		if travel_squared < 0.001:
 			continue
-		var fraction := -radial.dot(relative_course) / travel_squared
-		if fraction <= 0.0 or fraction > 1.0 or fraction >= earliest:
+		var fraction := minf(1.0, -radial.dot(relative_course) / travel_squared)
+		if fraction <= 0.0 or fraction >= earliest:
 			continue
 		var closest := radial + relative_course * fraction
 		var clearance := float(Catalog.site(id).radius) + 30.0
@@ -896,6 +967,7 @@ func snapshot() -> Dictionary:
 		"contract_stage": contract_stage, "contract_origin": contract_origin,
 		"contract_destination": contract_destination,
 		"landed_site": landed_site, "planned_target": planned_target, "mining": mining.snapshot(),
+		"landing_direction": [landing_direction.x, landing_direction.y, landing_direction.z],
 		"ship": ship.snapshot(), "system_id": system_id, "jump_target": jump_target,
 	}
 
@@ -904,6 +976,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_surface := schema < 7
 	var pre_galaxy := schema < 5
 	var pre_fuel := schema < 4
 	var pre_sector := schema < 3
@@ -934,7 +1007,7 @@ func restore(state: Dictionary) -> bool:
 		return false
 	if not _number(state.get("throttle"), 0.0, 1.0):
 		return false
-	var site_count := Catalog.DESTINATION_COUNT
+	var site_count := Catalog.PRE_SURFACE_DESTINATION_COUNT if pre_surface else Catalog.DESTINATION_COUNT
 	if pre_galaxy:
 		site_count = schema + 1 if pre_sector else (Catalog.SITE_COUNT if pre_fuel else Catalog.TARGET_COUNT)
 	for field in ["docked", "contract_origin", "contract_destination"]:
@@ -962,7 +1035,8 @@ func restore(state: Dictionary) -> bool:
 	var restored_ship := ShipSystems.new()
 	var restored_landing := -1
 	var restored_plan := -1
-	if schema >= 2 and not restored_mining.restore(state.get("mining"), schema == 2, pre_galaxy):
+	var mining_count := Catalog.SITE_COUNT if pre_galaxy else site_count
+	if schema >= 2 and not restored_mining.restore(state.get("mining"), schema == 2, mining_count):
 		return false
 	if not pre_fuel and not restored_ship.restore(state.get("ship")):
 		return false
@@ -976,14 +1050,26 @@ func restore(state: Dictionary) -> bool:
 			return false
 		restored_landing = int(state.landed_site)
 		restored_plan = int(state.planned_target)
+	var restored_direction := Vector3.ZERO
+	if not pre_surface:
+		if not state.get("landing_direction") is Array or state.landing_direction.size() != 3:
+			return false
+		for component in state.landing_direction:
+			if not _number(component, -1.0, 1.0):
+				return false
+		restored_direction = Vector3(state.landing_direction[0], state.landing_direction[1], state.landing_direction[2])
+	elif restored_landing >= 0:
+		restored_direction = Vector3.BACK
 	if restored_landing >= 0:
 		if not Catalog.is_mine_site(restored_landing) or restored_dock >= 0 or int(state.target) != restored_landing or restored_mining.site_id != restored_landing:
 			return false
+		if not restored_direction.is_normalized() or not Terrain.landable(restored_landing, restored_direction):
+			return false
 		var center: Vector3 = Orbit.sample(restored_landing, restored_epoch).position
-		var contact := center + Vector3.BACK * float(Catalog.site(restored_landing).pad_offset)
+		var contact := center + Terrain.contact(restored_landing, restored_direction)
 		if not restored_position.is_equal_approx(contact) or not restored_velocity.is_zero_approx():
 			return false
-	elif restored_mining.phase != MiningRig.STOWED:
+	elif restored_mining.phase != MiningRig.STOWED or restored_direction != Vector3.ZERO:
 		return false
 	if restored_plan >= 0:
 		if Catalog.system_of_site(restored_plan) != restored_system or restored_plan == restored_dock or restored_plan == restored_landing or (restored_dock < 0 and restored_landing < 0):
@@ -996,6 +1082,19 @@ func restore(state: Dictionary) -> bool:
 				restored_position = center + Vector3.BACK * float(Catalog.site(index).gate_offset)
 				restored_velocity = Vector3.ZERO
 				break
+	# A legacy ship can be clear of the old sphere yet overlap the new terrain.
+	if pre_surface and restored_dock < 0 and restored_landing < 0:
+		var obstacle := _obstacle_at(restored_position, restored_system, restored_epoch)
+		if Catalog.is_mine_site(obstacle):
+			var center: Vector3 = Orbit.sample(obstacle, restored_epoch).position
+			var relative := restored_position - center
+			if obstacle >= site_count:
+				restored_position = center + Vector3.BACK * float(Catalog.site(obstacle).gate_offset)
+				restored_velocity = Vector3.ZERO
+			elif relative.length() >= float(Catalog.site(obstacle).radius) - 0.01:
+				var direction := relative.normalized()
+				restored_position = center + Terrain.contact(obstacle, direction) + direction * 3.0
+				restored_velocity = Vector3.ZERO
 	var velocity_limit := MAX_SAVED_SPEED if schema >= 6 else MAX_SPEED * 1.56
 	if restored_velocity.length() > velocity_limit or (restored_dock < 0 and restored_landing < 0 and _blocked(restored_position, restored_system, restored_epoch)):
 		return false
@@ -1010,6 +1109,7 @@ func restore(state: Dictionary) -> bool:
 	time_scale = 1
 	docked = restored_dock
 	landed_site = restored_landing
+	landing_direction = restored_direction
 	mining = restored_mining
 	ship = restored_ship
 	scooping = false

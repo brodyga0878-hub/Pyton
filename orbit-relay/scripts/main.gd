@@ -75,6 +75,9 @@ func _update_display(delta: float) -> void:
 	var final_approach := flight.autopilot and flight.autopilot_phase in ["Стыковка", "Посадка", "Вход в зону сбора"]
 	var marker := flight.target_contact(flight.target) if final_approach else flight.target_gate(flight.target)
 	var in_view := flight.docked < 0 and not flight.landed and not _view.camera.is_position_behind(marker)
+	if in_view and not flight.autopilot:
+		var surface := flight.surface_status()
+		in_view = not surface.near or surface.pad
 	_hud.set_target_marker(_view.camera.unproject_position(marker) if in_view else Vector2.ZERO, in_view and not _overlay_open() and flight.jump_seconds_left <= 0.0)
 
 
@@ -83,7 +86,8 @@ func _handle_action(action: String) -> void:
 		return
 	if flight.jump_seconds_left > 0.0 and action not in ["throttle_up", "throttle_down"]:
 		return
-	var throttle_step := 0.025 if flight.position.distance_to(flight.target_position(flight.target)) < 150.0 else 0.1
+	var near_target := flight.reference_site() >= 0 or flight.position.distance_to(flight.target_position(flight.target)) < 150.0
+	var throttle_step := 0.025 if near_target else 0.1
 	match action:
 		"target":
 			flight.change_target()
@@ -135,6 +139,7 @@ func _deliver_notice() -> void:
 	if flight.status_event.is_empty():
 		return
 	var event := flight.status_event
+	var touchdown := flight.landing_direction
 	_io.trace(event, {
 		"docked": flight.docked, "landed_site": flight.landed_site, "target": flight.target,
 		"planned_target": flight.planned_target, "speed": flight.speed(), "credits": flight.credits,
@@ -142,6 +147,7 @@ func _deliver_notice() -> void:
 		"fuel": flight.ship.fuel, "scooping": flight.scooping,
 		"system_id": flight.system_id, "jump_target": flight.jump_target,
 		"orbit_time": flight.orbit_time, "time_scale": flight.time_scale,
+		"offpad": flight.landed_offpad(), "landing_direction": [touchdown.x, touchdown.y, touchdown.z],
 	})
 	_hud.notify(flight.status_message)
 	flight.status_event = ""

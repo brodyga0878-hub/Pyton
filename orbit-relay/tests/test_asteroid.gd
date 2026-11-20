@@ -44,7 +44,9 @@ func _test_legacy_save() -> void:
 		and flight.mining.ore_hold == 0,
 		"Legacy save starts with an unused mining module")
 	var upgraded := flight.snapshot()
-	_expect(upgraded.schema == 6 and upgraded.has_all(["landed_site", "mining", "ship", "system_id", "jump_target", "orbit_time"]),
+	_expect(upgraded.schema == 7 and upgraded.has_all([
+		"landed_site", "landing_direction", "mining", "ship", "system_id", "jump_target", "orbit_time",
+	]),
 		"The next save is serialized in the current format")
 	flight.dock_action()
 	flight.change_target()
@@ -78,8 +80,8 @@ func _test_manual_approach() -> void:
 	flight.yaw = PI
 	_expect(not flight.dock_action() and not flight.landed, "Landing rejects a ship facing away")
 	flight.yaw = 0.0
-	flight.position.x += 10.0
-	_expect(not flight.dock_action() and not flight.landed, "Landing rejects a position outside the site")
+	flight.position.z += 20.0
+	_expect(not flight.dock_action() and not flight.landed, "Landing rejects a position too high above the site")
 	flight.position = flight.target_contact(Flight.ASTEROID_TARGET) + Vector3(0.0, 0.0, 3.0)
 	flight.velocity = flight.target_velocity(Flight.ASTEROID_TARGET) + Vector3(0.0, 0.0, -2.0)
 	_expect(flight.dock_action() and flight.landed and flight.docked == -1,

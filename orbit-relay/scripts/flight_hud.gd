@@ -207,8 +207,11 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var star_target: bool = sim.target == Sector.star_for(sim.system_id)
 	_actions["dock"].visible = parked or not star_target
 	_actions["dock"].text = "Швартовка" if Sector.is_port(sim.target) else "Посадка"
+	_actions["dock"].tooltip_text = ""
 	if parked:
 		_actions["dock"].text = "Взлёт" if landed else "Старт"
+		if _lift_blocked:
+			_actions["dock"].tooltip_text = "Сначала верните модуль на борт"
 	var scoop_status: Dictionary = {} if parked else sim.scoop_status()
 	_scoop_blocked = not sim.scooping and not scoop_status.get("ok", false)
 	_actions["scoop"].visible = not parked and (star_target or scoop_status.get("near", false) or sim.scooping)
@@ -285,7 +288,8 @@ func _sync_surface(sim: RefCounted, mining: RefCounted) -> void:
 	_route_detail.text = "%s · запас %d ед." % [Sector.resource_name(site.resource), mining.reserve_at(sim.landed_site)]
 	if sim.planned_target >= 0:
 		_route_detail.text += "\nПосле взлёта → %s" % sim.target_name(sim.planned_target)
-	_telemetry.text = "Посадка выполнена\nТрюм %d / %d ед." % [mining.ore_hold, MiningRig.CAPACITY]
+	var landing_site := "Вне площадки" if sim.landed_offpad() else "Площадка"
+	_telemetry.text = "%s\nТрюм %d / %d ед." % [landing_site, mining.ore_hold, MiningRig.CAPACITY]
 	match mining.phase:
 		MiningRig.DEPLOYING:
 			_guidance.text = "Модуль спускается на поверхность."
@@ -305,6 +309,8 @@ func _sync_surface(sim: RefCounted, mining: RefCounted) -> void:
 
 func _sync_flight(sim: RefCounted, cargo: int, scoop_status: Dictionary) -> void:
 	var aimed_at_port := Sector.is_port(sim.target)
+	var surface: Dictionary = sim.surface_status() if Sector.is_mine_site(sim.target) else {}
+	var near_surface: bool = surface.get("near", false)
 	var to_target: Vector3 = sim.target_position(sim.target) - sim.position
 	var meters := to_target.length()
 	_route.text = "Курс  /  %s" % sim.target_name(sim.target)
@@ -319,11 +325,16 @@ func _sync_flight(sim: RefCounted, cargo: int, scoop_status: Dictionary) -> void
 			_route_detail.text += " (%s)" % remote_system
 	var reference: int = sim.reference_site()
 	var speed: float = sim.relative_speed() if reference >= 0 else sim.speed()
-	_telemetry.text = "Скорость %.0f м/с  ·  Тяга %d%%" % [speed, sim.throttle * 100.0]
+	var speed_text := ("%.1f" % speed).replace(".", ",") if near_surface else "%d" % roundi(speed)
+	_telemetry.text = "Скорость %s м/с  ·  Тяга %d%%" % [speed_text, sim.throttle * 100.0]
 	if reference >= 0:
 		_telemetry.text += "\nОтносительно «%s»" % sim.target_name(reference)
 	if aimed_at_port:
 		_telemetry.text += "\nКрен к порту %+.0f°" % rad_to_deg(sim.roll_error(sim.target))
+	elif near_surface:
+		var altitude := ("%.1f" % maxf(0.0, float(surface.altitude))).replace(".", ",")
+		_telemetry.text += "\nВысота %s м · уклон %.0f°" % [altitude, surface.slope]
+		_actions["dock"].tooltip_text = str(surface.reason)
 	else:
 		_telemetry.text += "\nТрюм %d / %d ед." % [cargo, MiningRig.CAPACITY]
 	if _jumping:
@@ -340,14 +351,21 @@ func _sync_flight(sim: RefCounted, cargo: int, scoop_status: Dictionary) -> void
 			_guidance.text = "Авто  /  %s\n%s" % [sim.autopilot_phase, _guidance.text]
 	elif sim.autopilot:
 		_guidance.text = "Авто  /  %s" % sim.autopilot_phase
-	elif meters < 210.0:
+	elif near_surface:
+		if surface.ok:
+			_guidance.text = "Можно сесть на площадку." if surface.pad else "Можно сесть вне площадки."
+		else:
+			_guidance.text = str(surface.reason)
+	elif aimed_at_port and meters < 210.0:
 		var status: Dictionary = sim.selected_dock_status()
 		if status.get("ok", false):
-			_guidance.text = "Порт готов к швартовке." if aimed_at_port else "Можно садиться."
+			_guidance.text = "Порт готов к швартовке."
 		else:
 			_guidance.text = str(status.get("reason", ""))
 	elif sim.ship.fuel <= 0.0:
 		_guidance.text = "Резервная тяга. Заправьтесь в порту или у звезды."
+	elif not surface.is_empty():
+		_guidance.text = "Подойдите к поверхности вручную или включите «Авто» для захода на площадку."
 	else:
 		_guidance.text = "Курс и крен слева. Тяга и тормоз справа."
 

@@ -131,7 +131,7 @@ func _test_previous_save() -> void:
 		and flight.credits == 1010 and flight.deliveries == 3 and flight.contract_destination == 1,
 		"Migrating retains current fuel, equipment, balance and freight")
 	var migrated := flight.snapshot()
-	_expect(migrated.schema == 6 and migrated.mining.reserves.size() == Catalog.DESTINATION_COUNT
+	_expect(migrated.schema == 7 and migrated.mining.reserves.size() == Catalog.DESTINATION_COUNT
 		and flight.mining.ore_hold == 24 and flight.mining.reserve_at(4) == 84
 		and flight.mining.reserve_at(12) == int(Catalog.site(12).reserve)
 		and flight.mining.reserve_at(13) == int(Catalog.site(13).reserve),
@@ -282,6 +282,7 @@ func _parked(id: int) -> RefCounted:
 	state.docked = id if Catalog.is_port(id) else -1
 	if Catalog.is_mine_site(id):
 		state.landed_site = id
+		state.landing_direction = [0.0, 0.0, 1.0]
 		state.mining.site_id = id
 	_expect(flight.restore(state), "Initialize a docked or landed flight at site %d" % id)
 	return flight

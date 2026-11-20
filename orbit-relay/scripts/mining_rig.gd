@@ -133,14 +133,14 @@ func snapshot() -> Dictionary:
 	}
 
 
-func restore(value: Variant, legacy: bool = false, pre_galaxy: bool = false) -> bool:
+func restore(value: Variant, legacy: bool = false, reserve_slots := Catalog.DESTINATION_COUNT) -> bool:
 	if legacy and value is Dictionary and value.size() == LEGACY_SAVE_FIELDS.size() and value.has_all(LEGACY_SAVE_FIELDS):
 		value = _upgrade_legacy(value)
 	if not value is Dictionary or value.size() != SAVE_FIELDS.size() or not value.has_all(SAVE_FIELDS):
 		return false
 	if not _integer_in_range(value.phase, STOWED, RETURNING):
 		return false
-	var saved_count := Catalog.SITE_COUNT if pre_galaxy or legacy else Catalog.DESTINATION_COUNT
+	var saved_count := Catalog.SITE_COUNT if legacy else reserve_slots
 	if not _integer_in_range(value.site_id, 0, saved_count - 1) or not Catalog.is_mine_site(int(value.site_id)):
 		return false
 	if not _integer_in_range(value.pending_ore, 0, BATCH):
