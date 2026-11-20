@@ -6,6 +6,7 @@ const StarView = preload("res://scripts/star_view.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const STAR_DISTANCE := 2700.0
 const STATION_RADIAL_SEGMENTS := 20
+const BACKDROP_ORBIT_SECONDS := 28800.0
 
 var camera: Camera3D
 var _ship: Node3D
@@ -20,12 +21,16 @@ var _system_id := -1
 var _star_id := -1
 var _stars: MeshInstance3D
 var _star: Node3D
+var _backdrop_planet: Node3D
+var _backdrop_orbit_offset := Vector3.ZERO
+var _backdrop_orbit_axis := Vector3.UP
 var _mining_rig: Node3D
 var _surface_views: Dictionary[int, Node3D] = {}
 var _stations: Dictionary[int, Node3D] = {}
 var _approaches: Dictionary[int, Node3D] = {}
 var _gate_materials: Dictionary[int, StandardMaterial3D] = {}
 var _last_position := Vector3.INF
+var _last_berth := -1
 var _camera_up := Vector3.UP
 var _flight_time := 0.0
 
@@ -56,7 +61,7 @@ func build() -> void:
 	camera = Camera3D.new()
 	camera.fov = 67.0
 	camera.near = 0.2
-	camera.far = 5200.0
+	camera.far = 8000.0
 	add_child(camera)
 	camera.make_current()
 
@@ -93,12 +98,10 @@ func _load_sector(id: int) -> void:
 		var station := Node3D.new()
 		_sector.add_child(station)
 		_stations[site_id] = station
-		station.position = site.center
 		_build_station(station, site_id, site.accent)
 		var approach := Node3D.new()
 		_sector.add_child(approach)
 		_approaches[site_id] = approach
-		approach.position = site.center + Vector3.BACK * float(site.gate_offset)
 		_gate_materials[site_id] = _build_approach(approach, site.accent)
 	for site_id: int in Catalog.mines_for(id):
 		var body := AsteroidView.new()
@@ -121,6 +124,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var surface_id := int(sim.landed_site)
 	var landed := surface_id >= 0
 	var settled := docked or landed
+	var berth := int(sim.docked) if docked else surface_id
 	_landing_gear.visible = landed
 	var thrust := clampf(float(sim.throttle), 0.0, 1.0)
 	_flight_time += delta
@@ -140,19 +144,29 @@ func sync(sim: RefCounted, delta: float) -> void:
 	if not jump:
 		jump = position_now.distance_squared_to(_last_position) > 144.0
 	var blend := 1.0 - exp(-delta * 14.0)
-	camera.position = desired if jump else camera.position.lerp(desired, blend)
+	var camera_start := camera.position
+	if not jump and settled and berth == _last_berth:
+		camera_start += position_now - _last_position
+	camera.position = desired if jump else camera_start.lerp(desired, blend)
 	_camera_up = up if jump else _camera_up.lerp(up, blend).normalized()
 	camera.look_at(position_now + heading * focal_offset, _camera_up)
 	_stars.position = camera.position
+	_star.position = sim.target_position(_star_id)
+	var backdrop_phase := TAU * fposmod(float(sim.orbit_time), BACKDROP_ORBIT_SECONDS) / BACKDROP_ORBIT_SECONDS
+	_backdrop_planet.position = _star.position + _backdrop_orbit_offset.rotated(_backdrop_orbit_axis, backdrop_phase)
 	_star.update_approach(camera.global_position, position_now, int(sim.target) == _star_id and not settled, bool(sim.scooping))
 	_last_position = position_now
+	_last_berth = berth
 
 	for site_id: int in _stations:
+		_stations[site_id].position = sim.target_position(site_id)
 		_stations[site_id].rotation.z = sim.station_angle(site_id)
+		_approaches[site_id].position = sim.target_gate(site_id)
 		_approaches[site_id].visible = not settled
 		var strength := 1.45 if site_id == int(sim.target) else 0.43
 		_gate_materials[site_id].albedo_color = Catalog.site(site_id).accent * strength
 	for site_id: int in _surface_views:
+		_surface_views[site_id].position = sim.target_position(site_id)
 		_surface_views[site_id].sync(position_now, site_id == int(sim.target), not settled)
 	var deposit: Vector3 = _surface_views[surface_id].mining_spot() if landed else position_now
 	_mining_rig.sync(_ship.global_transform, deposit, int(sim.mining.phase) if landed else 0, sim.mining.progress(), float(sim.elapsed))
@@ -416,6 +430,15 @@ func _build_stars(cool: bool) -> void:
 
 
 func _build_planet(cool: bool) -> void:
+	_backdrop_planet = Node3D.new()
+	_sector.add_child(_backdrop_planet)
+	var display_scale := 1.65 if cool else 1.0
+	var initial_center := Vector3(1125, -330, -3370) if cool else Vector3(-1450, -475, -2900)
+	var star_center: Vector3 = Catalog.site(_star_id).center
+	_backdrop_planet.scale = Vector3.ONE * display_scale
+	_backdrop_orbit_offset = initial_center * display_scale - star_center
+	_backdrop_orbit_axis = _backdrop_orbit_offset.cross(Vector3.UP).normalized()
+
 	var sphere := SphereMesh.new()
 	sphere.radius = 870.0
 	sphere.height = 1740.0
@@ -453,8 +476,7 @@ void fragment() {
 	var world := ShaderMaterial.new()
 	world.shader = shader
 	world.set_shader_parameter("cool", cool)
-	var center := Vector3(1125, -330, -3370) if cool else Vector3(-1450, -475, -2900)
-	_mesh(_sector, sphere, world, center)
+	_mesh(_backdrop_planet, sphere, world, Vector3.ZERO)
 	var air := SphereMesh.new()
 	air.radius = 894.0
 	air.height = 1788.0
@@ -474,12 +496,12 @@ void fragment() {
 	var air_material := ShaderMaterial.new()
 	air_material.shader = halo
 	air_material.set_shader_parameter("cool", cool)
-	_mesh(_sector, air, air_material, center)
+	_mesh(_backdrop_planet, air, air_material, Vector3.ZERO)
 	if cool:
-		_build_planet_ring(center)
+		_build_planet_ring()
 
 
-func _build_planet_ring(center: Vector3) -> void:
+func _build_planet_ring() -> void:
 	var disc := QuadMesh.new()
 	disc.size = Vector2(3210.0, 3210.0)
 	var shader := Shader.new()
@@ -502,5 +524,5 @@ void fragment() {
 """
 	var paint := ShaderMaterial.new()
 	paint.shader = shader
-	var ring := _mesh(_sector, disc, paint, center)
+	var ring := _mesh(_backdrop_planet, disc, paint, Vector3.ZERO)
 	ring.basis = Basis(Vector3.FORWARD, -0.37) * Basis(Vector3.RIGHT, 1.12)

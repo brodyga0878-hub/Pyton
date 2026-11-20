@@ -21,6 +21,8 @@ var _route_detail: Label
 var _telemetry: Label
 var _fuel: Label
 var _fuel_level: ProgressBar
+var _clock: Label
+var _time_hint: Label
 var _guidance: Label
 var _notice: Label
 var _notice_panel: PanelContainer
@@ -42,6 +44,7 @@ var _parked := true
 var _lift_blocked := false
 var _mining_blocked := false
 var _scoop_blocked := false
+var _time_blocked := false
 var _jumping := false
 var _notice_left := 0.0
 var _mouse_pad: SteeringPad
@@ -66,9 +69,10 @@ func build() -> void:
 	_route = _label(route_stack, 23, CYAN)
 	_route_detail = _label(route_stack, 17, INK)
 	_route_detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	var instrument_stack := _panel(_safe, Vector2(1, 0), Rect2(-310, 24, 284, 114))
+	var instrument_stack := _panel(_safe, Vector2(1, 0), Rect2(-310, 24, 284, 159))
 	instrument_stack.alignment = BoxContainer.ALIGNMENT_CENTER
 	_telemetry = _label(instrument_stack, 17, INK)
+	_telemetry.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_fuel = _label(instrument_stack, 16, CYAN)
 	_fuel_level = ProgressBar.new()
 	_fuel_level.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -78,6 +82,19 @@ func build() -> void:
 	_fuel_level.add_theme_stylebox_override("background", _box(Color("12313d"), LINE, 4, 0.0))
 	_fuel_level.add_theme_stylebox_override("fill", _box(CYAN, CYAN, 4, 0.0))
 	instrument_stack.add_child(_fuel_level)
+	var clock_row := HBoxContainer.new()
+	clock_row.add_theme_constant_override("separation", 8)
+	instrument_stack.add_child(clock_row)
+	_clock = _label(clock_row, 16, MUTED)
+	_clock.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_clock.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_button(clock_row, "time", "1×")
+	var time_button: Button = _actions["time"]
+	time_button.custom_minimum_size.x = 68.0
+	time_button.size_flags_horizontal = Control.SIZE_SHRINK_END
+	_time_hint = _label(instrument_stack, 15, AMBER)
+	_time_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_time_hint.hide()
 
 	_steer = SteeringPad.new()
 	_steer.caption = "КУРС"
@@ -201,6 +218,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_actions["contract"].text = "Сдать груз" if sim.contract_stage == 1 else "Взять контракт"
 	var sale_quote: int = mining.sale_quote(sim.docked) if docked and mining.ore_hold > 0 else 0
 	_actions["sell_ore"].visible = sale_quote > 0
+	_sync_clock(sim)
 	_refresh_disabled_actions()
 	_sync_fuel(sim.ship)
 
@@ -226,6 +244,20 @@ func _sync_fuel(ship: RefCounted) -> void:
 		_fuel.add_theme_color_override("font_color", color)
 	_fuel_level.max_value = capacity
 	_fuel_level.value = ship.fuel
+
+func _sync_clock(sim: RefCounted) -> void:
+	var seconds := floori(sim.orbit_time + 0.000001)
+	var hours := floori(seconds / 3600.0)
+	var minutes := floori(seconds / 60.0) % 60
+	_clock.text = "Время %02d:%02d:%02d" % [hours, minutes, seconds % 60]
+	var status: Dictionary = sim.time_status()
+	var scale: int = sim.time_scale
+	var button: Button = _actions["time"]
+	_time_blocked = not status.allowed and scale <= 1
+	button.text = "%d×" % scale
+	_time_hint.visible = not status.allowed
+	_time_hint.text = "Ускорение недоступно. %s" % status.reason if _time_hint.visible else ""
+	button.tooltip_text = _time_hint.text if _time_hint.visible else "Сменить скорость игрового времени (O)"
 
 func _sync_port(sim: RefCounted, cargo: int, sale_quote: int) -> void:
 	_route.text = "Порт  /  %s" % sim.target_name(sim.docked)
@@ -285,7 +317,11 @@ func _sync_flight(sim: RefCounted, cargo: int, scoop_status: Dictionary) -> void
 		var remote_system := _delivery_system(sim)
 		if not remote_system.is_empty():
 			_route_detail.text += " (%s)" % remote_system
-	_telemetry.text = "Скорость %.0f м/с  ·  Тяга %d%%" % [sim.velocity.length(), sim.throttle * 100.0]
+	var reference: int = sim.reference_site()
+	var speed: float = sim.relative_speed() if reference >= 0 else sim.speed()
+	_telemetry.text = "Скорость %.0f м/с  ·  Тяга %d%%" % [speed, sim.throttle * 100.0]
+	if reference >= 0:
+		_telemetry.text += "\nОтносительно «%s»" % sim.target_name(reference)
 	if aimed_at_port:
 		_telemetry.text += "\nКрен к порту %+.0f°" % rad_to_deg(sim.roll_error(sim.target))
 	else:
@@ -340,7 +376,7 @@ func set_input_enabled(enabled: bool) -> void:
 func _refresh_disabled_actions() -> void:
 	for action: String in _actions:
 		var button: Button = _actions[action]
-		var blocked := (action == "dock" and _lift_blocked) or (action == "mine" and _mining_blocked) or (action == "scoop" and _scoop_blocked)
+		var blocked := (action == "dock" and _lift_blocked) or (action == "mine" and _mining_blocked) or (action == "scoop" and _scoop_blocked) or (action == "time" and _time_blocked)
 		var during_jump := _jumping and action not in ["throttle_down", "throttle_up", "boost", "brake"]
 		button.disabled = not _input_enabled or blocked or during_jump
 
@@ -538,7 +574,7 @@ func _button(parent: Container, action: String, caption: String) -> void:
 	button.custom_minimum_size = Vector2(0, 52)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.add_theme_font_size_override("font_size", 18)
-	button.add_theme_color_override("font_color", CYAN if action in ["dock", "scoop", "contract", "mine", "sell_ore", "map", "galaxy", "services"] else INK)
+	button.add_theme_color_override("font_color", CYAN if action in ["dock", "scoop", "contract", "mine", "sell_ore", "map", "galaxy", "services", "time"] else INK)
 	button.add_theme_color_override("font_hover_color", INK)
 	button.add_theme_stylebox_override("normal", _box(Color("12313d"), LINE, 9, 7.0))
 	button.add_theme_stylebox_override("hover", _box(Color("214454"), CYAN, 9, 7.0))

@@ -128,7 +128,7 @@ func _test_legacy_recovery() -> void:
 		"Migration retains balance and the active freight route")
 
 	var before: Dictionary = flight.snapshot()
-	_expect(before.schema == 5, "Migration emits the current save schema")
+	_expect(before.schema == 6, "Migration emits the current save schema")
 	var malformed := before.duplicate(true)
 	malformed.mining.site_id = 4
 	_expect(not flight.restore(malformed) and flight.snapshot() == before,
@@ -235,7 +235,7 @@ func _test_touch_map() -> void:
 	_tap(game._hud._actions.get("map"), "Reopen the sector map")
 	await process_frame
 	var chart: Control = map._chart
-	var point: Vector2 = chart._project(Catalog.site(8).center, chart._plot_bounds(), chart._bounds_xz())
+	var point: Vector2 = chart._project(game.flight.target_position(8), chart._plot_bounds(), chart._bounds_xz())
 	_push_tap(chart.get_global_transform_with_canvas() * point)
 	await process_frame
 	_tap(map._select_button, "Apply the planned route")

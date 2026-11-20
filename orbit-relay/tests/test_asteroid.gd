@@ -44,7 +44,7 @@ func _test_legacy_save() -> void:
 		and flight.mining.ore_hold == 0,
 		"Legacy save starts with an unused mining module")
 	var upgraded := flight.snapshot()
-	_expect(upgraded.schema == 5 and upgraded.has_all(["landed_site", "mining", "ship", "system_id", "jump_target"]),
+	_expect(upgraded.schema == 6 and upgraded.has_all(["landed_site", "mining", "ship", "system_id", "jump_target", "orbit_time"]),
 		"The next save is serialized in the current format")
 	flight.dock_action()
 	flight.change_target()
@@ -52,11 +52,11 @@ func _test_legacy_save() -> void:
 	flight.set_autopilot(true)
 	var passed_behind := false
 	for _step in range(int(100.0 / STEP)):
-		passed_behind = passed_behind or flight.position.z < Flight.ASTEROID_CENTER.z
+		passed_behind = passed_behind or flight.position.z < flight.target_position(Flight.ASTEROID_TARGET).z
 		if flight.landed or not flight.autopilot:
 			break
 		flight.update(STEP, Vector2.ZERO, 0.0, false, false)
-	_expect(passed_behind and flight.landed and flight.position.is_equal_approx(Flight.ASTEROID_PAD),
+	_expect(passed_behind and flight.landed and flight.position.is_equal_approx(flight.target_contact(Flight.ASTEROID_TARGET)),
 		"Departure from Тихий порт travels around the back of the asteroid before landing")
 	var old_space_position := legacy_save.duplicate(true)
 	old_space_position.docked = -1
@@ -70,18 +70,18 @@ func _test_manual_approach() -> void:
 	var flight := Flight.new()
 	flight.dock_action()
 	flight.target = Flight.ASTEROID_TARGET
-	flight.position = Flight.ASTEROID_PAD + Vector3(0.0, 0.0, 3.0)
-	flight.velocity = Vector3(0.0, 0.0, -12.0)
+	flight.position = flight.target_contact(Flight.ASTEROID_TARGET) + Vector3(0.0, 0.0, 3.0)
+	flight.velocity = flight.target_velocity(Flight.ASTEROID_TARGET) + Vector3(0.0, 0.0, -12.0)
 	flight.yaw = 0.0
 	_expect(not flight.dock_action() and not flight.landed, "Landing rejects excessive speed")
-	flight.velocity = Vector3.ZERO
+	flight.velocity = flight.target_velocity(Flight.ASTEROID_TARGET)
 	flight.yaw = PI
 	_expect(not flight.dock_action() and not flight.landed, "Landing rejects a ship facing away")
 	flight.yaw = 0.0
 	flight.position.x += 10.0
 	_expect(not flight.dock_action() and not flight.landed, "Landing rejects a position outside the site")
-	flight.position = Flight.ASTEROID_PAD + Vector3(0.0, 0.0, 3.0)
-	flight.velocity = Vector3(0.0, 0.0, -2.0)
+	flight.position = flight.target_contact(Flight.ASTEROID_TARGET) + Vector3(0.0, 0.0, 3.0)
+	flight.velocity = flight.target_velocity(Flight.ASTEROID_TARGET) + Vector3(0.0, 0.0, -2.0)
 	_expect(flight.dock_action() and flight.landed and flight.docked == -1,
 		"An aligned, slow approach lands on the asteroid instead of at a port")
 
@@ -109,7 +109,7 @@ func _test_mining_route() -> void:
 		await _close_scene(game)
 		return
 	var flight: RefCounted = game.flight
-	_expect(flight.position.is_equal_approx(Flight.ASTEROID_PAD) and flight.speed() < 0.001,
+	_expect(flight.position.is_equal_approx(flight.target_contact(Flight.ASTEROID_TARGET)) and flight.relative_speed() < 0.001,
 		"The landed ship is stationary on the site")
 	_expect(not flight.sell_ore_action(), "Ore is sold through a port only")
 	game._update_display(0.0)
@@ -129,15 +129,16 @@ func _test_mining_route() -> void:
 		"Drilling alone does not fill the cargo bay")
 	game = await _restart_scene(game)
 	flight = game.flight
-	_expect(flight.snapshot() == mid_drill, "Cold load retains mid-drill time, pose and contract")
+	var resumed_drill: Dictionary = flight.snapshot()
+	_expect(_matches_disk_snapshot(resumed_drill, mid_drill), "Cold load retains mid-drill time, pose and contract")
 
-	var malformed := mid_drill.duplicate(true)
+	var malformed := resumed_drill.duplicate(true)
 	malformed.landed_site = -1
-	_expect(not flight.restore(malformed) and flight.snapshot() == mid_drill,
+	_expect(not flight.restore(malformed) and flight.snapshot() == resumed_drill,
 		"An airborne save cannot carry a deployed module, and rejection is atomic")
-	malformed = mid_drill.duplicate(true)
+	malformed = resumed_drill.duplicate(true)
 	malformed.mining.phase_seconds = 999.0
-	_expect(not flight.restore(malformed) and flight.snapshot() == mid_drill,
+	_expect(not flight.restore(malformed) and flight.snapshot() == resumed_drill,
 		"An invalid phase timer is rejected before changing the flight")
 	_advance(game, func() -> bool: return flight.mining.phase == MiningRig.READY, 15.0)
 	_expect(flight.mining.phase == MiningRig.READY and flight.mining.ore_hold == 0
@@ -152,7 +153,7 @@ func _test_mining_route() -> void:
 	var mid_return: Dictionary = flight.snapshot()
 	game = await _restart_scene(game)
 	flight = game.flight
-	_expect(flight.snapshot() == mid_return, "Cold load restores transit of the module")
+	_expect(_matches_disk_snapshot(flight.snapshot(), mid_return), "Cold load restores transit of the module")
 	_advance(game, func() -> bool: return flight.mining.phase == MiningRig.STOWED, 4.0)
 	_expect(flight.mining.phase == MiningRig.STOWED and flight.mining.ore_hold == MiningRig.BATCH
 		and flight.mining.pending_ore == 0 and flight.mining.reserve == stock - MiningRig.BATCH,
@@ -232,6 +233,15 @@ func _touch(game: Node, action: String, enabled := true) -> void:
 func _close_scene(game: Node) -> void:
 	game.queue_free()
 	await process_frame
+
+
+func _matches_disk_snapshot(actual: Dictionary, expected: Dictionary) -> bool:
+	# The JSON parser can shift a full-precision fuel value by a few ulps.
+	if absf(actual.ship.fuel - expected.ship.fuel) > 0.0000000001:
+		return false
+	var normalized := expected.duplicate(true)
+	normalized.ship.fuel = actual.ship.fuel
+	return actual == normalized
 
 
 func _expect(condition: bool, message: String) -> bool:

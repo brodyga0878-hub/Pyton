@@ -35,7 +35,7 @@ func _test_jump_conditions() -> void:
 		and not flight.jump_status(VELAR).ok and not flight.start_jump(), "Planning from the dock quotes the jump but keeps it locked")
 	flight.dock_action()
 	_expect(not flight.jump_status(VELAR).ok, "The jump remains locked during departure close to the port")
-	flight.position = _arrival(HOME)
+	flight.position = _arrival(flight, HOME)
 	flight.velocity = Vector3.BACK * 43.0
 	_expect(not flight.jump_status(VELAR).ok, "Exceeding the departure speed limit prevents charging")
 	flight.velocity = Vector3.ZERO
@@ -60,7 +60,7 @@ func _test_jump_conditions() -> void:
 func _test_cancellation_and_commit() -> void:
 	var flight := Flight.new()
 	flight.dock_action()
-	flight.position = _arrival(HOME)
+	flight.position = _arrival(flight, HOME)
 	flight.velocity = Vector3.ZERO
 	flight.ship.fuel = 26.0
 	flight.plan_jump(VELAR)
@@ -101,9 +101,9 @@ func _test_cancellation_and_commit() -> void:
 	_expect(flight.cancel_jump() and not flight.cancel_jump() and flight.ship.fuel == 26.0,
 		"Explicit cancellation is safe to repeat and leaves the planned route intact")
 	flight.start_jump()
-	_step(flight, 3.0)
+	_step(flight, Flight.JUMP_CHARGE)
 	_expect(flight.system_id == VELAR and flight.jump_target == -1 and flight.jump_seconds_left == 0.0
-		and flight.ship.fuel == 0.0 and flight.position.is_equal_approx(_arrival(VELAR)),
+		and flight.ship.fuel == 0.0 and flight.position.is_equal_approx(_arrival(flight, VELAR)),
 		"The exact fare commits once and arrives safely at the other system")
 	_expect(_fly_to(flight, int(Catalog.system(VELAR).arrival_port)) and flight.ship.fuel == 0.0,
 		"An exact-fare arrival can still dock on the reserve drive")
@@ -131,7 +131,7 @@ func _test_previous_save() -> void:
 		and flight.credits == 1010 and flight.deliveries == 3 and flight.contract_destination == 1,
 		"Migrating retains current fuel, equipment, balance and freight")
 	var migrated := flight.snapshot()
-	_expect(migrated.schema == 5 and migrated.mining.reserves.size() == Catalog.DESTINATION_COUNT
+	_expect(migrated.schema == 6 and migrated.mining.reserves.size() == Catalog.DESTINATION_COUNT
 		and flight.mining.ore_hold == 24 and flight.mining.reserve_at(4) == 84
 		and flight.mining.reserve_at(12) == int(Catalog.site(12).reserve)
 		and flight.mining.reserve_at(13) == int(Catalog.site(13).reserve),
@@ -263,14 +263,13 @@ func _test_touch_route() -> void:
 		"Mining cargo and the depleted deposit persist across both jumps")
 	game._update_display(STEP)
 	_expect(game._view._system_id == HOME and game._view._stations.keys() == Catalog.ports_for(HOME),
-		"The return restores just the home-sector scene even though its arrival position is identical")
+		"The return restores just the home-sector scene")
 	game.queue_free()
 	await process_frame
 
 
-func _arrival(system_id: int) -> Vector3:
-	var port := Catalog.site(int(Catalog.system(system_id).arrival_port))
-	return port.center + Vector3.BACK * (float(port.gate_offset) + 90.0)
+func _arrival(flight: RefCounted, system_id: int) -> Vector3:
+	return flight.target_gate(int(Catalog.system(system_id).arrival_port)) + Vector3.BACK * 90.0
 
 
 func _parked(id: int) -> RefCounted:

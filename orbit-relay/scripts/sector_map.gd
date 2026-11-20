@@ -4,6 +4,7 @@ signal destination_selected(site_id: int)
 signal dismissed()
 
 const Sector := preload("res://scripts/sector_catalog.gd")
+const Orbit := preload("res://scripts/orbit_ephemeris.gd")
 const TEXT := Color("e8f4fa")
 const MUTED := Color("a5bac7")
 const MINT := Color("9debd7")
@@ -110,6 +111,9 @@ func open(sim: RefCounted) -> void:
 		_site_buttons[id].visible = Sector.system_of_site(id) == system_id
 	_chart.system_id = system_id
 	_chart.ship_position = sim.position
+	_chart.centers.clear()
+	for id: int in Sector.targets_for(system_id):
+		_chart.centers[id] = sim.target_position(id)
 	var planned: int = sim.planned_target
 	_chart.active_site = planned if planned >= 0 else int(sim.target)
 	show()
@@ -142,12 +146,17 @@ func _select_site(id: int) -> void:
 		return
 	_candidate = id
 	_chart.selected_site = id
+	_chart.orbit = Orbit.orbit_points(id)
+	_chart.orbit_caption = ""
+	if not _chart.orbit.is_empty():
+		var orbital_velocity: Vector3 = _flight.target_velocity(id)
+		_chart.orbit_caption = "Орбита цели · %s м/с" % ("%.1f" % orbital_velocity.length()).replace(".", ",")
 	_chart.queue_redraw()
 	for key: int in _site_buttons:
 		_site_buttons[key].set_pressed_no_signal(key == id)
 	var entry = Sector.site(id)
 	_detail_title.text = str(entry.name)
-	var distance := _distance_label(_flight.position.distance_to(entry.center))
+	var distance := _distance_label(_flight.position.distance_to(_chart.centers[id]))
 	var category := str(Sector.kind_name(entry.kind))
 	var here := id == _current_site()
 	_detail.text = "%s · текущая стоянка" % category if here else "%s · %s" % [category, distance]
@@ -300,14 +309,19 @@ class SectorChart extends Control:
 	const GRID := Color("233c48")
 	const EDGE := Color("426775")
 	const CHART_BACKGROUND := Color("0b1a25")
+	const ORBIT_COLOR := Color("78b0daae")
 	const PLOT_MARGIN := Vector2(63, 42)
 
 	var system_id := Sector.HOME_SYSTEM
 	var ship_position := Vector3.ZERO
+	var centers: Dictionary[int, Vector3] = {}
 	var active_site := -1
 	var selected_site := -1
+	var orbit := PackedVector3Array()
+	var orbit_caption := ""
 
 	func _ready() -> void:
+		clip_contents = true
 		resized.connect(queue_redraw)
 
 	func _plot_bounds() -> Rect2:
@@ -316,8 +330,7 @@ class SectorChart extends Control:
 	func _bounds_xz() -> Rect2:
 		var minimum := Vector2(INF, INF)
 		var maximum := Vector2(-INF, -INF)
-		for id: int in Sector.targets_for(system_id):
-			var center: Vector3 = Sector.site(id).center
+		for center: Vector3 in centers.values():
 			var xz := Vector2(center.x, center.z)
 			minimum = minimum.min(xz)
 			maximum = maximum.max(xz)
@@ -330,14 +343,14 @@ class SectorChart extends Control:
 		return plot.get_center() + (xz - bounds.get_center()) * ratio
 
 	func site_at(point: Vector2) -> int:
-		if not Rect2(Vector2.ZERO, size).has_point(point):
+		if centers.is_empty() or not Rect2(Vector2.ZERO, size).has_point(point):
 			return -1
 		var best := -1
 		var distance := 30.0
 		var plot := _plot_bounds()
 		var bounds := _bounds_xz()
 		for id: int in Sector.targets_for(system_id):
-			var marker := _project(Sector.site(id).center, plot, bounds)
+			var marker := _project(centers[id], plot, bounds)
 			var separation := point.distance_to(marker)
 			if separation < distance:
 				best = id
@@ -347,24 +360,49 @@ class SectorChart extends Control:
 	func _draw() -> void:
 		var area := Rect2(Vector2.ZERO, size)
 		draw_rect(area, CHART_BACKGROUND)
+		if centers.is_empty():
+			return
 		draw_rect(area.grow(-0.5), EDGE, false, 1.0)
 		for x in range(28, int(size.x), 48):
 			draw_line(Vector2(x, 1), Vector2(x, size.y - 1), GRID)
 		for y in range(24, int(size.y), 48):
 			draw_line(Vector2(1, y), Vector2(size.x - 1, y), GRID)
 		var font := ThemeDB.fallback_font
-		draw_string(font, Vector2(18, 28), "ВИД СВЕРХУ", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, EDGE.lightened(0.32))
 		var plot := _plot_bounds()
 		var bounds := _bounds_xz()
+		if orbit.size() >= 2:
+			var track := PackedVector2Array()
+			track.resize(orbit.size())
+			for index in orbit.size():
+				track[index] = _project(orbit[index], plot, bounds)
+			draw_polyline(track, ORBIT_COLOR, 1.7, true)
 		var ship := _project(ship_position, plot, bounds).clamp(Vector2(18, 35), size - Vector2(18, 28))
 		if active_site >= 0:
-			_draw_course(ship, _project(Sector.site(active_site).center, plot, bounds), Color("4d928c"), 1.5)
+			_draw_course(ship, _project(centers[active_site], plot, bounds), Color("4d928c"), 1.5)
 		if selected_site >= 0 and selected_site != active_site:
-			_draw_course(ship, _project(Sector.site(selected_site).center, plot, bounds), Color("d9a569"), 1.8)
-		var label_boxes: Array[Rect2] = [Rect2(Vector2(11, 10), Vector2(127, 24))]
+			_draw_course(ship, _project(centers[selected_site], plot, bounds), Color("d9a569"), 1.8)
+		var label_boxes: Array[Rect2] = [
+			Rect2(11, 10, 127, 24),
+			Rect2(11, size.y - 32, 112, 24),
+		]
+		for box: Rect2 in label_boxes:
+			draw_rect(box, CHART_BACKGROUND)
+		draw_string(font, Vector2(18, 28), "ВИД СВЕРХУ", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, EDGE.lightened(0.32))
+		draw_string(font, Vector2(18, size.y - 14), "▲  Корабль", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, MUTED)
+		if not orbit_caption.is_empty():
+			var width := font.get_string_size(orbit_caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x + 40.0
+			var legend := Rect2(size.x - width - 11.0, 10, width, 24)
+			label_boxes.append(legend)
+			draw_rect(legend, CHART_BACKGROUND)
+			var swatch := legend.position + Vector2(6, 12)
+			draw_line(swatch, swatch + Vector2(20, 0), ORBIT_COLOR, 1.7, true)
+			draw_string(font, legend.position + Vector2(32, 17), orbit_caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, MUTED)
+		for center: Vector3 in centers.values():
+			var point := _project(center, plot, bounds)
+			label_boxes.append(Rect2(point - Vector2(15, 15), Vector2(30, 30)))
 		for id: int in Sector.targets_for(system_id):
 			var entry = Sector.site(id)
-			var marker := _project(entry.center, plot, bounds)
+			var marker := _project(centers[id], plot, bounds)
 			var tint: Color = entry.accent
 			if active_site == id:
 				draw_arc(marker, 17, 0, TAU, 32, MINT, 1.2, true)
@@ -386,7 +424,6 @@ class SectorChart extends Control:
 				draw_colored_polygon(PackedVector2Array([marker + Vector2(-8, 3), marker + Vector2(-3, -8), marker + Vector2(7, -3), marker + Vector2(6, 7)]), tint)
 			_draw_site_label(font, str(entry.name), marker, label_boxes)
 		draw_colored_polygon(PackedVector2Array([ship + Vector2(0, -7), ship + Vector2(6, 5), ship + Vector2(0, 3), ship + Vector2(-6, 5)]), TEXT)
-		draw_string(font, Vector2(18, size.y - 14), "▲  Корабль", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, MUTED)
 
 	func _draw_course(start: Vector2, finish: Vector2, color: Color, width: float) -> void:
 		if start.distance_squared_to(finish) > 100.0:

@@ -53,20 +53,20 @@ func _test_flight_controls() -> void:
 	_check(not flight.autopilot, "Steering overrides autopilot")
 	flight.position = flight.docking_position(1) + Vector3(0, 0, 3)
 	flight.target = 1
-	flight.velocity = Vector3.ZERO
+	flight.velocity = flight.target_velocity(1)
 	flight.yaw = 0.0
 	flight.roll = flight.station_angle(1) + 0.8
 	_check(not flight.dock_action(), "Manual docking rejects roll misalignment")
 	flight.roll = flight.station_angle(1)
-	flight.velocity = Vector3(0, 0, -6)
+	flight.velocity = flight.target_velocity(1) + Vector3(0, 0, -6)
 	_check(not flight.dock_action(), "Manual docking rejects excessive speed")
-	flight.velocity = Vector3.ZERO
+	flight.velocity = flight.target_velocity(1)
 	_check(flight.dock_action() and flight.docked == 1, "Manual docking accepts a slow aligned approach")
 	flight.dock_action()
 	flight.change_throttle(0.4)
 	for _step in range(80):
 		flight.update(1.0 / 60.0, Vector2.ZERO, 0.0, false, true)
-	_check(flight.speed() < 0.01 and flight.throttle == 0.0, "Emergency braking brings the ship to a stop")
+	_check(flight.relative_speed() < 0.01 and flight.throttle == 0.0, "Emergency braking brings the ship to a stop in its active reference frame")
 
 
 func _check(condition: bool, message: String) -> void:

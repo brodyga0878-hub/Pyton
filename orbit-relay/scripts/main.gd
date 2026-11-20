@@ -103,6 +103,8 @@ func _handle_action(action: String) -> void:
 			flight.sell_ore_action()
 		"scoop":
 			flight.scoop_action()
+		"time":
+			flight.cycle_time_scale()
 		"services":
 			if flight.docked >= 0:
 				_hud.set_input_enabled(false)
@@ -139,6 +141,7 @@ func _deliver_notice() -> void:
 		"mining_phase": flight.mining.phase, "cargo_units": flight.mining.ore_hold,
 		"fuel": flight.ship.fuel, "scooping": flight.scooping,
 		"system_id": flight.system_id, "jump_target": flight.jump_target,
+		"orbit_time": flight.orbit_time, "time_scale": flight.time_scale,
 	})
 	_hud.notify(flight.status_message)
 	flight.status_event = ""
@@ -186,7 +189,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	var actions := {
 		KEY_T: "target", KEY_F: "autopilot", KEY_R: "throttle_up", KEY_V: "throttle_down",
 		KEY_ENTER: "dock", KEY_M: "contract", KEY_G: "mine", KEY_B: "sell_ore", KEY_F8: "report",
-		KEY_N: "map", KEY_J: "galaxy", KEY_K: "scoop", KEY_P: "services",
+		KEY_N: "map", KEY_J: "galaxy", KEY_K: "scoop", KEY_P: "services", KEY_O: "time",
 	}
 	if actions.has(event.physical_keycode):
 		_handle_action(actions[event.physical_keycode])
@@ -198,6 +201,7 @@ func _notification(what: int) -> void:
 		return
 	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
 		flight.cancel_jump()
+		flight.reset_time_scale()
 		_save()
 	elif what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		if _report.visible:
