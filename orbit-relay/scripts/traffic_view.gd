@@ -15,18 +15,27 @@ const BOX_FACES := [
 var _ships: Dictionary[String, Node3D] = {}
 var _pool: Dictionary[String, Array] = {"trader": [], "patrol": [], "raider": []}
 var _hulls: Dictionary[String, Array] = {}
+var _trim: Array[MeshInstance3D] = []
 var _beams: Array[Node3D] = []
 var _beam_paints: Array[StandardMaterial3D] = []
-var _metal: StandardMaterial3D
+var _metal: ShaderMaterial
 var _light: StandardMaterial3D
+var _visual_profile := 1
+
+
+func set_visual_profile(profile: int) -> void:
+	_visual_profile = clampi(profile, 0, 2)
+	if _metal != null:
+		_metal.set_shader_parameter("profile", _visual_profile)
+	for detail: MeshInstance3D in _trim:
+		detail.visible = _visual_profile > 0
+	for beam: Node3D in _beams:
+		beam.get_child(1).visible = _visual_profile > 0
 
 
 func sync(contacts: Array, beams: Array) -> void:
 	if _metal == null:
-		_metal = _paint(Color.WHITE, false)
-		_metal.vertex_color_use_as_albedo = true
-		_metal.metallic = 0.27
-		_metal.roughness = 0.64
+		_metal = _hull_finish()
 		_light = _paint(Color.WHITE, true)
 		_light.vertex_color_use_as_albedo = true
 	var active: Dictionary[String, bool] = {}
@@ -71,6 +80,9 @@ func _acquire_ship(role: String) -> Node3D:
 	var meshes := _hulls[role]
 	_mesh(actor, meshes[0], _metal)
 	_mesh(actor, meshes[1], _light)
+	var detail := _mesh(actor, meshes[2], _metal)
+	detail.visible = _visual_profile > 0
+	_trim.append(detail)
 	return actor
 
 
@@ -108,7 +120,7 @@ func _make_beam() -> Node3D:
 		]
 	var beam := Node3D.new()
 	add_child(beam)
-	for radius: float in [0.13, 0.31]:
+	for radius: float in [0.16, 0.31]:
 		var tube := CylinderMesh.new()
 		tube.top_radius = radius
 		tube.bottom_radius = radius
@@ -116,19 +128,84 @@ func _make_beam() -> Node3D:
 		tube.radial_segments = 6
 		tube.rings = 1
 		_mesh(beam, tube, _beam_paints[0]).rotation.x = PI * 0.5
+	beam.get_child(1).visible = _visual_profile > 0
 	return beam
 
 
 func _build_hull(role: String) -> Array:
 	var shell := SurfaceTool.new()
 	var lamps := SurfaceTool.new()
+	var trim := SurfaceTool.new()
 	shell.begin(Mesh.PRIMITIVE_TRIANGLES)
 	lamps.begin(Mesh.PRIMITIVE_TRIANGLES)
+	trim.begin(Mesh.PRIMITIVE_TRIANGLES)
 	match role:
 		"trader": _trader(shell, lamps)
 		"patrol": _patrol(shell, lamps)
 		"raider": _raider(shell, lamps)
-	return [shell.commit(), lamps.commit()]
+	_add_role_trim(trim, role)
+	return [shell.commit(), lamps.commit(), trim.commit()]
+
+
+func _hull_finish() -> ShaderMaterial:
+	var shader := Shader.new()
+	shader.code = """
+shader_type spatial;
+render_mode diffuse_burley;
+uniform int profile = 1;
+varying vec3 finish_position;
+varying vec3 paint_color;
+void vertex() {
+	finish_position = VERTEX;
+	paint_color = COLOR.rgb;
+}
+float fine_line(float coordinate, float width) {
+	float footprint = fwidth(coordinate);
+	float pivot = abs(fract(coordinate) - 0.5);
+	return (1.0 - smoothstep(width, width + footprint + 0.010, pivot))
+		* (1.0 - smoothstep(0.12, 0.47, footprint));
+}
+void fragment() {
+	vec3 p = finish_position;
+	vec3 paint = paint_color;
+	float roughness = 0.71;
+	if (profile > 0) {
+		float plating = sin(p.z * 2.8 + p.x * 0.69);
+		float seams = max(fine_line(p.z * 0.63 + 0.21, 0.021), fine_line(abs(p.x) * 0.51 + p.y * 0.10, 0.014));
+		paint *= 1.0 + plating * 0.058 - seams * 0.29;
+		roughness = 0.63 + plating * 0.052 + seams * 0.093;
+		if (profile == 2) {
+			float brush = sin(p.z * 39.0 + sin(p.x * 11.0)) * (1.0 - smoothstep(0.23, 1.3, fwidth(p.z * 39.0)));
+			float ribs = fine_line(abs(p.x) * 2.2 + p.z * 0.13, 0.016);
+			paint *= 1.0 + brush * 0.051 + ribs * 0.039;
+			roughness -= brush * 0.059;
+		}
+	}
+	ALBEDO = paint;
+	METALLIC = 0.24;
+	ROUGHNESS = clamp(roughness, 0.47, 0.85);
+}
+"""
+	var finish := ShaderMaterial.new()
+	finish.shader = shader
+	finish.set_shader_parameter("profile", _visual_profile)
+	return finish
+
+
+func _add_role_trim(tool: SurfaceTool, role: String) -> void:
+	for side: float in [-1.0, 1.0]:
+		match role:
+			"trader":
+				_box(tool, Vector3(side * 2.35, 0.63, 0.71), Vector3(1.48, 0.12, 4.38), Color("#765643"))
+				for index in range(5):
+					_box(tool, Vector3(side * 2.91, 0.74, -0.81 + index * 0.31), Vector3(0.10, 0.11, 0.17), Color("#efc194"))
+			"patrol":
+				_box(tool, Vector3(side * 3.74, 0.23, 1.66), Vector3(0.84, 0.12, 1.2), Color("#2b4e55"))
+				_box(tool, Vector3(side * 2.13, 0.16, 1.08), Vector3(0.54, 0.11, 0.25), Color("#b8d2de"), side * 0.34)
+			"raider":
+				_box(tool, Vector3(side * 2.8, 0.19, 0.8), Vector3(1.14, 0.19, 1.84), Color("#943b34"), -side * 0.44)
+				for index in range(3):
+					_box(tool, Vector3(side * 2.64, 0.33, 0.09 + index * 0.52), Vector3(0.64, 0.07, 0.16), Color("#dc8a67"), -side * 0.44)
 
 
 func _trader(shell: SurfaceTool, lamps: SurfaceTool) -> void:

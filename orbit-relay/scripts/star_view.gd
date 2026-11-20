@@ -9,9 +9,13 @@ static var _shared_plasma: ImageTexture
 
 var _radius := 0.0
 var _corona: MeshInstance3D
+var _sphere: SphereMesh
+var _photosphere_paint: ShaderMaterial
+var _corona_paint: ShaderMaterial
 var _guide: MeshInstance3D
 var _guide_paint: StandardMaterial3D
 var _scoop_stream: MeshInstance3D
+var _visual_profile := 1
 
 
 func setup(star: Dictionary, scoop_inner: float, scoop_outer: float, cool := false) -> void:
@@ -19,6 +23,7 @@ func setup(star: Dictionary, scoop_inner: float, scoop_outer: float, cool := fal
 	_radius = star.radius
 	_build_photosphere(cool)
 	_build_corona(cool)
+	set_visual_profile(_visual_profile)
 	var safe_offset := clampf(float(star.pad_offset), scoop_inner, scoop_outer)
 	_build_guide(safe_offset)
 	_build_scoop_stream()
@@ -30,6 +35,16 @@ func setup(star: Dictionary, scoop_inner: float, scoop_outer: float, cool := fal
 	glow.omni_attenuation = 1.7
 	glow.shadow_enabled = false
 	add_child(glow)
+
+
+func set_visual_profile(profile: int) -> void:
+	_visual_profile = clampi(profile, 0, 2)
+	if _sphere == null:
+		return
+	_sphere.radial_segments = [40, 64, 80][_visual_profile]
+	_sphere.rings = [24, 36, 48][_visual_profile]
+	_photosphere_paint.set_shader_parameter("profile", _visual_profile)
+	_corona_paint.set_shader_parameter("profile", _visual_profile)
 
 
 func update_approach(camera_position: Vector3, ship_position: Vector3, active_target: bool, scooping: bool) -> void:
@@ -58,39 +73,46 @@ func update_approach(camera_position: Vector3, ship_position: Vector3, active_ta
 
 
 func _build_photosphere(cool: bool) -> void:
-	var sphere := SphereMesh.new()
-	sphere.radius = _radius
-	sphere.height = _radius * 2.0
-	sphere.radial_segments = 64
-	sphere.rings = 36
+	_sphere = SphereMesh.new()
+	_sphere.radius = _radius
+	_sphere.height = _radius * 2.0
 	var shader := Shader.new()
 	shader.code = """
 shader_type spatial;
 render_mode unshaded;
 uniform sampler2D plasma : filter_linear_mipmap, repeat_enable;
 uniform bool cool = false;
+uniform int profile = 1;
 void fragment() {
 	vec2 uv = vec2(UV.x + TIME * 0.006, UV.y);
-	vec2 flow = uv + vec2(sin(UV.y * 18.0 - TIME * 0.39) * 0.013 + TIME * 0.005, 0.0);
 	vec2 cells = texture(plasma, uv).rg;
-	float surge = texture(plasma, flow).r;
-	float heat = cells.r * 0.66 + surge * 0.25 + cells.g * 0.09;
+	float heat = cells.r * 0.91 + cells.g * 0.09;
+	float granules = 0.0;
+	if (profile > 0) {
+		vec2 flow = uv + vec2(sin(UV.y * 18.0 - TIME * 0.39) * 0.013 + TIME * 0.005, 0.0);
+		heat += (texture(plasma, flow).r - cells.r) * 0.25;
+	}
+	if (profile == 2) {
+		vec2 inner = texture(plasma, uv * vec2(4.0, 1.0) - vec2(TIME * 0.023, 0.0)).rg;
+		granules = (inner.g - 0.5) * sin(UV.y * 3.141593);
+		heat += granules * 0.14;
+	}
 	float ribbons = smoothstep(0.24, 0.67, heat);
-	float sparks = smoothstep(0.46, 0.77, heat + cells.g * 0.11);
-	vec3 low = cool ? vec3(0.13, 0.29, 0.68) : vec3(0.56, 0.092, 0.015);
+	float sparks = smoothstep(0.45, 0.77, heat + cells.g * 0.11 + granules * 0.19);
+	vec3 low = cool ? vec3(0.10, 0.22, 0.54) : vec3(0.51, 0.055, 0.010);
 	vec3 high = cool ? vec3(0.43, 0.75, 1.0) : vec3(1.0, 0.54, 0.105);
 	vec3 peak = cool ? vec3(0.93, 0.99, 1.0) : vec3(1.0, 0.91, 0.54);
 	float limb = smoothstep(0.0, 0.63, max(dot(normalize(NORMAL), VIEW), 0.0));
-	ALBEDO = mix(mix(low, high, ribbons), peak, sparks * 0.74) * (0.73 + limb * 0.27);
+	ALBEDO = mix(mix(low, high, ribbons), peak, sparks * 0.76) * (0.69 + limb * 0.31);
 }
 """
-	var paint := ShaderMaterial.new()
-	paint.shader = shader
+	_photosphere_paint = ShaderMaterial.new()
+	_photosphere_paint.shader = shader
 	if _shared_plasma == null:
 		_shared_plasma = _plasma_texture()
-	paint.set_shader_parameter("plasma", _shared_plasma)
-	paint.set_shader_parameter("cool", cool)
-	_add_mesh(sphere, paint)
+	_photosphere_paint.set_shader_parameter("plasma", _shared_plasma)
+	_photosphere_paint.set_shader_parameter("cool", cool)
+	_add_mesh(_sphere, _photosphere_paint)
 
 
 static func _plasma_texture() -> ImageTexture:
@@ -128,27 +150,37 @@ func _build_corona(cool: bool) -> void:
 shader_type spatial;
 render_mode unshaded, blend_add, depth_draw_never, cull_disabled;
 uniform bool cool = false;
+uniform int profile = 1;
 void fragment() {
 	vec2 p = (UV * 2.0 - 1.0) * 1.48;
 	float r = length(p);
 	if (r > 1.47) {
 		discard;
 	}
-	float angle = atan(p.y, p.x);
-	float rays = 0.5 + 0.5 * sin(angle * 23.0 + sin(angle * 7.0) * 1.8 + TIME * 0.21);
-	float tongues = max(0.0, sin(angle * 9.0 + sin(angle * 4.0 + sin(angle * 3.0)) * 2.2 - TIME * 0.16));
+	float rays = 0.0;
+	float tongues = 0.0;
+	float arcs = 0.0;
+	if (profile > 0) {
+		float angle = atan(p.y, p.x + 0.000001);
+		rays = 0.5 + 0.5 * sin(angle * 23.0 + sin(angle * 7.0) * 1.8 + TIME * 0.21);
+		tongues = max(0.0, sin(angle * 9.0 + sin(angle * 4.0 + sin(angle * 3.0)) * 2.2 - TIME * 0.16));
+		if (profile == 2) {
+			float loops = sin(angle * 16.0 + (r - 1.0) * 11.0 + sin(angle * 3.0 - TIME * 0.17));
+			arcs = smoothstep(0.75, 0.96, loops) * (1.0 - smoothstep(1.02, 1.30, r));
+		}
+	}
 	float fringe = (1.0 - smoothstep(1.0, 1.11 + tongues * 0.17, r)) * (0.56 + rays * 0.44);
 	float haze = (1.0 - smoothstep(1.0, 1.47, r)) * (0.68 + tongues * 0.32);
 	vec3 outer = cool ? vec3(0.16, 0.35, 0.94) : vec3(0.90, 0.20, 0.024);
 	vec3 inner = cool ? vec3(0.54, 0.80, 1.0) : vec3(1.0, 0.56, 0.11);
 	ALBEDO = mix(outer, inner, fringe);
-	ALPHA = fringe * 0.52 + haze * 0.23;
+	ALPHA = fringe * 0.52 + haze * 0.23 + arcs * 0.12;
 }
 """
-	var paint := ShaderMaterial.new()
-	paint.shader = shader
-	paint.set_shader_parameter("cool", cool)
-	_corona = _add_mesh(quad, paint)
+	_corona_paint = ShaderMaterial.new()
+	_corona_paint.shader = shader
+	_corona_paint.set_shader_parameter("cool", cool)
+	_corona = _add_mesh(quad, _corona_paint)
 	_corona.visible = false
 
 

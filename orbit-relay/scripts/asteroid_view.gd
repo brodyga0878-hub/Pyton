@@ -6,6 +6,8 @@ const Surface = preload("res://scripts/surface_terrain.gd")
 var _gate: Node3D
 var _gate_ring: MeshInstance3D
 var _field_deposit: MultiMeshInstance3D
+var _debris: MultiMeshInstance3D
+var _surface_paint: ShaderMaterial
 var _last_field_direction := Vector3.ZERO
 var _site_id: int
 var _kind: String
@@ -15,6 +17,7 @@ var _seed: int
 var _surface_color: Color
 var _accent: Color
 var _built := false
+var _visual_profile := 1
 
 static var _rock_shader: Shader
 
@@ -32,17 +35,30 @@ func build(site: Dictionary, site_id: int) -> void:
 	_accent = site.accent
 	_seed = site.seed
 	var face := Vector3(0, 0, _face_z)
-	_add_mesh(self, _rock_mesh(), _rock_paint(), Vector3.ZERO)
+	_surface_paint = _rock_paint()
+	_add_mesh(self, _rock_mesh(), _surface_paint, Vector3.ZERO)
 	_make_landing_marks(face)
 	var crystals := _make_deposit()
 	_add_batch(self, crystals).transform = Surface.deposit(_site_id, Vector3.BACK)
 	_field_deposit = _add_batch(self, crystals)
 	_field_deposit.hide()
 	_make_gate(Vector3(0, 0, site.gate_offset))
-	if _kind == "planet":
-		_make_planet_rocks()
 	if _kind == "comet":
 		_make_comet_tail()
+	set_visual_profile(_visual_profile)
+
+
+func set_visual_profile(profile: int) -> void:
+	_visual_profile = clampi(profile, 0, 2)
+	if _surface_paint == null:
+		return
+	_surface_paint.set_shader_parameter("profile", _visual_profile)
+	if _visual_profile > 0 and _debris == null:
+		_debris = _make_surface_debris()
+	if _debris != null:
+		_debris.visible = _visual_profile > 0
+		var count := _debris.multimesh.instance_count
+		_debris.multimesh.visible_instance_count = count if _visual_profile == 2 else ceili(count * 0.56)
 
 
 func sync(ship_position: Vector3, selected: bool, flight_visible: bool, field_direction: Vector3) -> void:
@@ -105,6 +121,8 @@ uniform vec4 rock_color : source_color = vec4(0.48, 0.45, 0.42, 1.0);
 uniform vec4 seam_color : source_color = vec4(0.62, 0.48, 0.36, 1.0);
 uniform float bands_strength = 1.0;
 uniform float terrain_regions = 0.0;
+uniform float ice_fraction = 0.0;
+uniform int profile = 1;
 varying vec3 rock;
 void vertex() {
 	rock = VERTEX;
@@ -128,31 +146,62 @@ float deposits(vec3 p) {
 	);
 	return mix(mix(a.x, a.y, f.y), mix(b.x, b.y, f.y), f.z);
 }
+float strata_mask(float bedding, float rough, float width) {
+	float ripple = abs(sin(bedding + rough));
+	return 1.0 - smoothstep(width, width + 0.15 + fwidth(ripple), ripple);
+}
+vec3 relief_normal(vec3 position, vec3 n, float height) {
+	// A screen-space surface gradient works on seamless spherical rock coordinates.
+	vec3 dx = dFdx(position);
+	vec3 dy = dFdy(position);
+	vec3 along_x = cross(dy, n);
+	vec3 along_y = cross(n, dx);
+	float det = dot(dx, along_x);
+	vec3 gradient = along_x * dFdx(height) + along_y * dFdy(height);
+	return normalize(n - gradient * sign(det) / max(abs(det), 0.00001));
+}
 void fragment() {
 	vec3 p = rock;
-	float sediment = sin(p.y * 0.17 + p.x * 0.07 + p.z * 0.16 + sin(p.x * 0.21) * 1.18);
-	float strata = sin(p.y * 0.71 + p.x * 0.18 + p.z * 0.29 + sediment * 2.80);
-	float rock_bands = clamp(0.43 + bands_strength * (0.27 * sediment + 0.11 * strata), 0.0, 1.0);
-	float coarse = deposits(p * 0.68) - 0.5;
-	float fine = grit(floor(p * 6.4)) - 0.5;
-	float detail = 1.0 - smoothstep(0.3, 1.4, length(fwidth(p * 6.4)));
-	vec3 stone = mix(rock_color.rgb, seam_color.rgb, rock_bands);
-	if (terrain_regions > 0.0) {
-		float provinces = deposits(p * 0.034 + vec3(9.2, 1.7, 3.4));
-		float basalt = smoothstep(0.42, 0.64, provinces + coarse * 0.066);
-		stone = mix(stone, stone * vec3(0.57, 0.67, 0.79), basalt * terrain_regions);
+	float bedding = dot(p, vec3(0.21, 0.72, 0.34));
+	float sediment = sin(bedding * 0.24 + sin(p.x * 0.18) * 0.98);
+	float strata = sin(bedding + sediment * 1.77);
+	float broad = 0.40 + bands_strength * (0.23 * sediment + 0.10 * strata);
+	vec3 stone = mix(rock_color.rgb, seam_color.rgb, broad);
+	float roughness = mix(0.90, 0.71, ice_fraction);
+	if (profile > 0) {
+		float grains = deposits(p * 0.73);
+		float fault = deposits(p * 0.12 + vec3(4.0, 8.0, 0.0));
+		float layer_breaks = smoothstep(0.30, 0.77, grains * 0.57 + fault * 0.43);
+		float lamina = strata_mask(bedding * 1.27, fault * 12.0 + grains * 1.4 + sediment * 0.73, 0.09) * layer_breaks;
+		float relief = (grains - 0.5) * 0.27 + lamina * bands_strength * 0.035;
+		float minerals = smoothstep(0.46, 0.68, fault + grains * 0.14);
+		stone *= 0.82 + grains * 0.28;
+		stone = mix(stone, stone * vec3(0.67, 0.73, 0.82), minerals * terrain_regions);
+		stone = mix(stone, seam_color.rgb * 1.06, lamina * bands_strength * 0.23);
+		stone = mix(stone, stone * vec3(0.81, 1.06, 1.17), ice_fraction * minerals * 0.38);
+		roughness += (grains - 0.5) * 0.18 - lamina * ice_fraction * 0.16;
+		if (profile == 2) {
+			float resolution = 1.0 - smoothstep(0.22, 1.1, length(fwidth(p * 4.3)));
+			float fine = deposits(p * 4.3 + vec3(11.0, 7.0, 3.0)) - 0.5;
+			float fault_edge = abs(fault + grains * 0.11 - 0.55);
+			float fractures = (1.0 - smoothstep(0.011, 0.056 + fwidth(fault_edge), fault_edge)) * layer_breaks;
+			stone *= 1.0 + resolution * (fine * 0.33 - fractures * 0.17);
+			relief += resolution * (fine * 0.104 - fractures * 0.030);
+		}
+		NORMAL = relief_normal(VERTEX, normalize(NORMAL), relief);
 	}
-	ALBEDO = stone * (0.96 + coarse * 0.28 + fine * 0.18 * detail);
+	ALBEDO = stone;
 	METALLIC = 0.0;
-	ROUGHNESS = 0.87;
+	ROUGHNESS = clamp(roughness, 0.55, 0.98);
 }
 """
 	var material := ShaderMaterial.new()
 	material.shader = _rock_shader
 	material.set_shader_parameter("rock_color", _surface_color)
-	material.set_shader_parameter("seam_color", _surface_color.lerp(_accent, 0.31 if _kind != "moon" else 0.22))
-	material.set_shader_parameter("bands_strength", 0.37 if _kind == "moon" else 1.0)
-	material.set_shader_parameter("terrain_regions", 0.85 if _kind == "planet" else 0.0)
+	material.set_shader_parameter("seam_color", _surface_color.lerp(_accent, 0.40 if _kind != "moon" else 0.28))
+	material.set_shader_parameter("bands_strength", 0.42 if _kind == "moon" else 1.0)
+	material.set_shader_parameter("terrain_regions", 0.79 if _kind == "planet" else 0.31)
+	material.set_shader_parameter("ice_fraction", 1.0 if _kind == "moon" or _kind == "comet" else 0.0)
 	return material
 
 
@@ -204,7 +253,7 @@ func _make_deposit() -> MultiMesh:
 	return batch
 
 
-func _make_planet_rocks() -> void:
+func _make_surface_debris() -> MultiMeshInstance3D:
 	var stone := SphereMesh.new()
 	stone.radius = 1.0
 	stone.height = 2.0
@@ -217,28 +266,32 @@ func _make_planet_rocks() -> void:
 	batch.transform_format = MultiMesh.TRANSFORM_3D
 	batch.use_colors = true
 	batch.mesh = stone
-	batch.instance_count = 176
+	var world_samples := 128 if _kind == "planet" else 48
+	batch.instance_count = world_samples + (96 if _kind == "planet" else 30)
 	var random := RandomNumberGenerator.new()
 	random.seed = _seed * 19 + 137
 	for index in range(batch.instance_count):
 		var angle := TAU * fposmod(float(index) * 0.61803398875, 1.0)
 		var direction: Vector3
-		if index < 128:
-			var pole := 1.0 - 2.0 * (float(index) + 0.5) / 128.0
+		if index < world_samples:
+			var pole := 1.0 - 2.0 * (float(index) + 0.5) / world_samples
 			var equator := sqrt(1.0 - pole * pole)
 			direction = Vector3(equator * cos(angle), pole, equator * sin(angle))
 		else:
-			var radial := random.randf_range(16.0, 41.0)
+			var radial := random.randf_range(13.0, minf(45.0, _radius * 0.83))
 			direction = Vector3(cos(angle) * radial, sin(angle) * radial, _face_z).normalized()
 		var ground := Surface.point(_site_id, direction)
 		var terrain_axes := Surface.basis(_site_id, direction)
 		var spin := Basis(Vector3.BACK, random.randf_range(0.0, TAU))
-		var size := random.randf_range(0.17, 0.8)
-		var axes := (terrain_axes * spin).scaled_local(Vector3(size * 1.5, size, size * 0.68))
-		batch.set_instance_transform(index, Transform3D(axes, ground - terrain_axes.z * 0.025))
+		var size := random.randf_range(0.12, 0.87 if _kind == "planet" else 0.60)
+		var axes := (terrain_axes * spin).scaled_local(Vector3(size * 1.6, size, size * 0.56))
+		# Preserve the exact clear disk and omit the visible rocks from the surveyed pad.
+		if ground.z > 0.0 and Vector2(ground.x, ground.y).length() <= 11.0:
+			axes = axes.scaled(0.001 * Vector3.ONE)
+		batch.set_instance_transform(index, Transform3D(axes, ground - terrain_axes.z * 0.09))
 		var tint := _surface_color.lerp(_accent, random.randf_range(0.0, 0.26))
 		batch.set_instance_color(index, tint.darkened(random.randf_range(0.02, 0.31)))
-	_add_batch(self, batch)
+	return _add_batch(self, batch)
 
 
 func _make_gate(at: Vector3) -> void:

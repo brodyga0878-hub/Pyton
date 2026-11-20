@@ -13,6 +13,10 @@ const ALERT := Color("ff978c")
 const ALLY := Color("90c6ff")
 const BACK := Color(0.024, 0.057, 0.081, 0.94)
 const LINE := Color(0.24, 0.43, 0.49, 0.58)
+const COURSE_PAD := Rect2(26, -170, 172, 144)
+const ROLL_PAD := Rect2(210, -108, 112, 82)
+const ACTION_COLUMN := Rect2(-340, -215, 314, 189)
+const TOUCH_GAINS := [0.72, 1.0, 1.36]
 
 var _hud: Control
 var _safe: Control
@@ -44,6 +48,8 @@ var _brake := false
 var _mouse_boost := false
 var _mouse_brake := false
 var _input_enabled := true
+var _touch_gain := 1.0
+var _touch_mirrored := false
 var _parked := true
 var _lift_blocked := false
 var _mining_blocked := false
@@ -75,6 +81,22 @@ func build() -> void:
 	_route = _label(route_stack, 23, CYAN)
 	_route_detail = _label(route_stack, 17, INK)
 	_route_detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var course_card := route_stack.get_parent() as PanelContainer
+	var shortcuts := HBoxContainer.new()
+	shortcuts.add_theme_constant_override("separation", 8)
+	_pin(shortcuts, _safe, Vector2.ZERO, Rect2(26, 131, 276, 48))
+	_button(shortcuts, "journal", "Журнал")
+	_button(shortcuts, "settings", "Настройки")
+	for action: String in ["journal", "settings"]:
+		var button: Button = _actions[action]
+		button.custom_minimum_size.y = 48.0
+		button.add_theme_font_size_override("font_size", 16)
+	_actions["journal"].tooltip_text = "Журнал заданий"
+	_actions["settings"].tooltip_text = "Графика и управление"
+	course_card.resized.connect(func() -> void:
+		shortcuts.offset_top = course_card.position.y + course_card.size.y + 8.0
+		shortcuts.offset_bottom = shortcuts.offset_top + 48.0
+	)
 	var instrument_stack := _panel(_safe, Vector2(1, 0), Rect2(-310, 24, 284, 159))
 	instrument_stack.alignment = BoxContainer.ALIGNMENT_CENTER
 	_telemetry = _label(instrument_stack, 17, INK)
@@ -105,11 +127,11 @@ func build() -> void:
 
 	_steer = SteeringPad.new()
 	_steer.caption = "КУРС"
-	_pin(_steer, _safe, Vector2(0, 1), Rect2(26, -170, 172, 144))
+	_pin(_steer, _safe, Vector2(0, 1), COURSE_PAD)
 	_bank = SteeringPad.new()
 	_bank.caption = "КРЕН"
 	_bank.horizontal = true
-	_pin(_bank, _safe, Vector2(0, 1), Rect2(210, -108, 112, 82))
+	_pin(_bank, _safe, Vector2(0, 1), ROLL_PAD)
 
 	var center := _panel(_safe, Vector2(0.5, 1), Rect2(-258, -143, 503, 117))
 	_commands_panel = center.get_parent() as PanelContainer
@@ -139,7 +161,7 @@ func build() -> void:
 	_button(commands, "mine", "Развернуть модуль")
 	_button(commands, "sell_ore", "Продать сырьё")
 
-	var right := _panel(_safe, Vector2(1, 1), Rect2(-340, -215, 314, 189))
+	var right := _panel(_safe, Vector2(1, 1), ACTION_COLUMN)
 	_right_panel = right.get_parent() as PanelContainer
 	_throttle_controls = GridContainer.new()
 	_throttle_controls.columns = 2
@@ -182,6 +204,7 @@ func build() -> void:
 	_notice_panel.hide()
 	get_viewport().size_changed.connect(_update_safe_area)
 	_update_safe_area()
+	_apply_touch_layout()
 
 func sync(sim: RefCounted, delta: float) -> void:
 	var docked: bool = sim.docked >= 0
@@ -423,7 +446,7 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 	elif not surface.is_empty():
 		_guidance.text = "Подойдите к поверхности вручную или включите «Авто» для захода на площадку."
 	else:
-		_guidance.text = "Курс и крен слева. Тяга и тормоз справа."
+		_guidance.text = "Курс и крен справа. Тяга и тормоз слева." if _touch_mirrored else "Курс и крен слева. Тяга и тормоз справа."
 
 func _delivery_system(sim: RefCounted) -> String:
 	var destination_system := Sector.system_of_site(sim.contract_destination)
@@ -458,6 +481,27 @@ func set_input_enabled(enabled: bool) -> void:
 		_reset_controls()
 	_refresh_disabled_actions()
 
+func set_touch_preferences(sensitivity: int, mirrored: bool) -> void:
+	_touch_gain = TOUCH_GAINS[clampi(sensitivity, 0, TOUCH_GAINS.size() - 1)]
+	if _touch_mirrored == mirrored:
+		return
+	_touch_mirrored = mirrored
+	if is_instance_valid(_hud):
+		_reset_controls()
+		_apply_touch_layout()
+
+func _apply_touch_layout() -> void:
+	_place_touch_control(_steer, COURSE_PAD, false)
+	_place_touch_control(_bank, ROLL_PAD, false)
+	_place_touch_control(_right_panel, ACTION_COLUMN, true)
+
+func _place_touch_control(control: Control, placement: Rect2, starts_right: bool) -> void:
+	var anchor := 1.0 if starts_right != _touch_mirrored else 0.0
+	control.anchor_left = anchor
+	control.anchor_right = anchor
+	control.offset_left = -placement.end.x if _touch_mirrored else placement.position.x
+	control.offset_right = -placement.position.x if _touch_mirrored else placement.end.x
+
 func _refresh_disabled_actions() -> void:
 	for action: String in _actions:
 		var button: Button = _actions[action]
@@ -471,12 +515,13 @@ func move_input() -> Vector2:
 		return Vector2.ZERO
 	var horizontal := float(_key(KEY_D, KEY_RIGHT)) - float(_key(KEY_A, KEY_LEFT))
 	var vertical := float(_key(KEY_W, KEY_UP)) - float(_key(KEY_S, KEY_DOWN))
-	return (_steer.axis + Vector2(horizontal, vertical)).limit_length()
+	return (_steer.axis * _touch_gain + Vector2(horizontal, vertical)).limit_length()
 
 func roll_input() -> float:
 	if _parked or not _input_enabled:
 		return 0.0
-	return clampf(_bank.axis.x + float(Input.is_physical_key_pressed(KEY_E)) - float(Input.is_physical_key_pressed(KEY_Q)), -1.0, 1.0)
+	var keyboard := float(Input.is_physical_key_pressed(KEY_E)) - float(Input.is_physical_key_pressed(KEY_Q))
+	return clampf(_bank.axis.x * _touch_gain + keyboard, -1.0, 1.0)
 
 func boost_held() -> bool:
 	return not _parked and _input_enabled and (_boost or Input.is_physical_key_pressed(KEY_SHIFT))
