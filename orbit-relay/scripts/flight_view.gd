@@ -12,6 +12,12 @@ var _ship: Node3D
 var _landing_gear: Node3D
 var _jet: MeshInstance3D
 var _jet_material: ShaderMaterial
+var _lighting: Environment
+var _sunlight: DirectionalLight3D
+var _fill: DirectionalLight3D
+var _sector: Node3D
+var _system_id := -1
+var _star_id := -1
 var _stars: MeshInstance3D
 var _star: Node3D
 var _mining_rig: Node3D
@@ -27,49 +33,20 @@ func build() -> void:
 	if is_instance_valid(camera):
 		return
 	var space := WorldEnvironment.new()
-	var lighting := Environment.new()
-	lighting.background_mode = Environment.BG_COLOR
-	lighting.background_color = Color("#050910")
-	lighting.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	lighting.ambient_light_color = Color("#99b8d0")
-	lighting.ambient_light_energy = 0.63
-	space.environment = lighting
+	_lighting = Environment.new()
+	_lighting.background_mode = Environment.BG_COLOR
+	_lighting.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	_lighting.ambient_light_energy = 0.63
+	space.environment = _lighting
 	add_child(space)
 
-	var sunlight := DirectionalLight3D.new()
-	sunlight.rotation_degrees = Vector3(-32.0, -36.0, 0.0)
-	sunlight.light_color = Color("#ffefd9")
-	sunlight.light_energy = 1.3
-	add_child(sunlight)
-	var fill := DirectionalLight3D.new()
-	fill.rotation_degrees = Vector3(16.0, 145.0, 0.0)
-	fill.light_color = Color("#84c8ff")
-	fill.light_energy = 0.47
-	add_child(fill)
-
-	_build_stars()
-	_build_planet()
-	_star = StarView.new()
-	add_child(_star)
-	_star.setup(Catalog.site(Catalog.STAR_ID), Catalog.SCOOP_INNER, Catalog.SCOOP_OUTER)
-
-	for site_id: int in Catalog.PORT_IDS:
-		var site := Catalog.site(site_id)
-		var station := Node3D.new()
-		add_child(station)
-		_stations[site_id] = station
-		station.position = site.center
-		_build_station(station, site_id, site.accent)
-		var approach := Node3D.new()
-		add_child(approach)
-		_approaches[site_id] = approach
-		approach.position = site.center + Vector3.BACK * float(site.gate_offset)
-		_gate_materials[site_id] = _build_approach(approach, site.accent)
-	for site_id: int in Catalog.MINING_IDS:
-		var body := AsteroidView.new()
-		add_child(body)
-		body.build(Catalog.site(site_id))
-		_surface_views[site_id] = body
+	_sunlight = DirectionalLight3D.new()
+	_sunlight.light_energy = 1.3
+	add_child(_sunlight)
+	_fill = DirectionalLight3D.new()
+	_fill.rotation_degrees = Vector3(16.0, 145.0, 0.0)
+	_fill.light_energy = 0.47
+	add_child(_fill)
 
 	_ship = Node3D.new()
 	add_child(_ship)
@@ -84,9 +61,57 @@ func build() -> void:
 	camera.make_current()
 
 
+func _load_sector(id: int) -> void:
+	if is_instance_valid(_sector):
+		remove_child(_sector)
+		_sector.queue_free()
+	_stations.clear()
+	_approaches.clear()
+	_gate_materials.clear()
+	_surface_views.clear()
+	_system_id = id
+	_star_id = Catalog.star_for(id)
+	_last_position = Vector3.INF
+
+	var cool := id == Catalog.VELAR_SYSTEM
+	_lighting.background_color = Color("#07091a") if cool else Color("#050910")
+	_lighting.ambient_light_color = Color("#8eaae5") if cool else Color("#99b8d0")
+	_sunlight.rotation_degrees = Vector3(-26.0, 47.0, 0.0) if cool else Vector3(-32.0, -36.0, 0.0)
+	_sunlight.light_color = Color("#b6dbff") if cool else Color("#ffefd9")
+	_fill.light_color = Color("#c8a6ee") if cool else Color("#84c8ff")
+
+	_sector = Node3D.new()
+	add_child(_sector)
+	_build_stars(cool)
+	_build_planet(cool)
+	_star = StarView.new()
+	_sector.add_child(_star)
+	_star.setup(Catalog.site(_star_id), Catalog.SCOOP_INNER, Catalog.SCOOP_OUTER, cool)
+
+	for site_id: int in Catalog.ports_for(id):
+		var site := Catalog.site(site_id)
+		var station := Node3D.new()
+		_sector.add_child(station)
+		_stations[site_id] = station
+		station.position = site.center
+		_build_station(station, site_id, site.accent)
+		var approach := Node3D.new()
+		_sector.add_child(approach)
+		_approaches[site_id] = approach
+		approach.position = site.center + Vector3.BACK * float(site.gate_offset)
+		_gate_materials[site_id] = _build_approach(approach, site.accent)
+	for site_id: int in Catalog.mines_for(id):
+		var body := AsteroidView.new()
+		_sector.add_child(body)
+		body.build(Catalog.site(site_id))
+		_surface_views[site_id] = body
+
+
 func sync(sim: RefCounted, delta: float) -> void:
 	if not is_instance_valid(camera):
 		build()
+	if _system_id != int(sim.system_id):
+		_load_sector(sim.system_id)
 	var heading := Basis.from_euler(Vector3(float(sim.pitch), float(sim.yaw), 0.0))
 	var position_now: Vector3 = sim.position
 	_ship.position = position_now
@@ -119,15 +144,15 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_camera_up = up if jump else _camera_up.lerp(up, blend).normalized()
 	camera.look_at(position_now + heading * focal_offset, _camera_up)
 	_stars.position = camera.position
-	_star.update_approach(camera.global_position, position_now, int(sim.target) == Catalog.STAR_ID and not settled, bool(sim.scooping))
+	_star.update_approach(camera.global_position, position_now, int(sim.target) == _star_id and not settled, bool(sim.scooping))
 	_last_position = position_now
 
-	for site_id: int in Catalog.PORT_IDS:
+	for site_id: int in _stations:
 		_stations[site_id].rotation.z = sim.station_angle(site_id)
 		_approaches[site_id].visible = not settled
 		var strength := 1.45 if site_id == int(sim.target) else 0.43
 		_gate_materials[site_id].albedo_color = Catalog.site(site_id).accent * strength
-	for site_id: int in Catalog.MINING_IDS:
+	for site_id: int in _surface_views:
 		_surface_views[site_id].sync(position_now, site_id == int(sim.target), not settled)
 	var deposit: Vector3 = _surface_views[surface_id].mining_spot() if landed else position_now
 	_mining_rig.sync(_ship.global_transform, deposit, int(sim.mining.phase) if landed else 0, sim.mining.progress(), float(sim.elapsed))
@@ -211,7 +236,7 @@ func _build_station(station: Node3D, index: int, accent: Color) -> void:
 	_ring(station, ceramic, Vector3(0, 0, 1.65), 5.9, 1.0, 36)
 	_ring(station, glow, Vector3(0, 0, 1.95), 5.8, 0.16, 36)
 	_ring(station, graphite, Vector3(0, 0, -6.65), 8.0, 0.7, 36)
-	if index == 3:
+	if index in [3, 10]:
 		_build_ring_station(station, glow)
 		return
 
@@ -356,9 +381,9 @@ void fragment() {
 	_jet.rotation.x = PI * 0.5
 
 
-func _build_stars() -> void:
+func _build_stars(cool: bool) -> void:
 	var generator := RandomNumberGenerator.new()
-	generator.seed = 22361
+	generator.seed = 64871 if cool else 22361
 	var mesh := SurfaceTool.new()
 	mesh.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for index in range(1730):
@@ -387,10 +412,10 @@ func _build_stars() -> void:
 	var paint := _light(Color.WHITE)
 	paint.vertex_color_use_as_albedo = true
 	paint.cull_mode = BaseMaterial3D.CULL_DISABLED
-	_stars = _mesh(self, mesh.commit(), paint, Vector3.ZERO)
+	_stars = _mesh(_sector, mesh.commit(), paint, Vector3.ZERO)
 
 
-func _build_planet() -> void:
+func _build_planet(cool: bool) -> void:
 	var sphere := SphereMesh.new()
 	sphere.radius = 870.0
 	sphere.height = 1740.0
@@ -400,6 +425,7 @@ func _build_planet() -> void:
 	shader.code = """
 shader_type spatial;
 render_mode unshaded;
+uniform bool cool = false;
 varying vec3 surface_point;
 float strata(vec3 p) {
 	return sin(p.x * 21.0 + sin(p.z * 9.0) * 0.65) * cos(p.z * 18.0 + p.y * 13.0);
@@ -414,16 +440,21 @@ void fragment() {
 	float ribbons = sin(latitude * 26.0 + warp);
 	float details = sin(latitude * 112.0 + sin(p.x * 25.0) * 1.5) * 0.1;
 	float m = smoothstep(-0.86, 0.87, ribbons * 0.60 + details + sin(latitude * 8.0) * 0.34);
-	vec3 bands = mix(vec3(0.09, 0.27, 0.37), vec3(0.65, 0.43, 0.30), m);
-	float day = smoothstep(-0.23, 0.89, dot(p, normalize(vec3(-0.6, 0.46, 0.72))));
+	vec3 low = cool ? vec3(0.13, 0.20, 0.46) : vec3(0.09, 0.27, 0.37);
+	vec3 high = cool ? vec3(0.44, 0.68, 0.71) : vec3(0.65, 0.43, 0.30);
+	vec3 bands = mix(low, high, m);
+	vec3 light_dir = cool ? vec3(0.65, 0.54, 0.63) : vec3(-0.6, 0.46, 0.72);
+	float day = smoothstep(-0.23, 0.89, dot(p, normalize(light_dir)));
 	float rim = pow(1.0 - clamp(dot(normalize(NORMAL), VIEW), 0.0, 1.0), 4.0);
-	ALBEDO = bands * (0.105 + day * 0.75) + rim * vec3(0.17, 0.36, 0.44) * (0.15 + day * 0.75);
+	vec3 haze = cool ? vec3(0.26, 0.44, 0.70) : vec3(0.17, 0.36, 0.44);
+	ALBEDO = bands * (0.105 + day * 0.75) + rim * haze * (0.15 + day * 0.75);
 }
 """
 	var world := ShaderMaterial.new()
 	world.shader = shader
-	var center := Vector3(-1450, -475, -2900)
-	_mesh(self, sphere, world, center)
+	world.set_shader_parameter("cool", cool)
+	var center := Vector3(1125, -330, -3370) if cool else Vector3(-1450, -475, -2900)
+	_mesh(_sector, sphere, world, center)
 	var air := SphereMesh.new()
 	air.radius = 894.0
 	air.height = 1788.0
@@ -433,12 +464,43 @@ void fragment() {
 	halo.code = """
 shader_type spatial;
 render_mode unshaded, blend_add, depth_draw_never;
+uniform bool cool = false;
 void fragment() {
 	float rim = 1.0 - clamp(dot(normalize(NORMAL), VIEW), 0.0, 1.0);
-	ALBEDO = vec3(0.22, 0.46, 0.58);
+	ALBEDO = cool ? vec3(0.36, 0.59, 0.91) : vec3(0.22, 0.46, 0.58);
 	ALPHA = smoothstep(0.54, 0.80, rim) * (1.0 - smoothstep(0.83, 1.0, rim)) * 0.38;
 }
 """
 	var air_material := ShaderMaterial.new()
 	air_material.shader = halo
-	_mesh(self, air, air_material, center)
+	air_material.set_shader_parameter("cool", cool)
+	_mesh(_sector, air, air_material, center)
+	if cool:
+		_build_planet_ring(center)
+
+
+func _build_planet_ring(center: Vector3) -> void:
+	var disc := QuadMesh.new()
+	disc.size = Vector2(3210.0, 3210.0)
+	var shader := Shader.new()
+	shader.code = """
+shader_type spatial;
+render_mode unshaded, blend_mix, cull_disabled, depth_draw_never;
+void fragment() {
+	vec2 radial = UV * 2.0 - 1.0;
+	float radius = length(radial);
+	if (radius < 0.63 || radius > 0.988) {
+		discard;
+	}
+	float rim = smoothstep(0.63, 0.69, radius) * (1.0 - smoothstep(0.955, 0.988, radius));
+	float bands = 0.61 + 0.22 * sin(radius * 155.0) + 0.16 * sin(radius * 423.0);
+	float gap = smoothstep(0.005, 0.024, abs(radius - 0.833));
+	float light = 0.52 + 0.43 * smoothstep(-0.8, 0.92, radial.x - radial.y * 0.4);
+	ALBEDO = mix(vec3(0.42, 0.42, 0.67), vec3(0.56, 0.78, 0.87), bands) * light;
+	ALPHA = bands * rim * gap * 0.55;
+}
+"""
+	var paint := ShaderMaterial.new()
+	paint.shader = shader
+	var ring := _mesh(_sector, disc, paint, center)
+	ring.basis = Basis(Vector3.FORWARD, -0.37) * Basis(Vector3.RIGHT, 1.12)

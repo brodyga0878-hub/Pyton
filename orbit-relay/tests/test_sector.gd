@@ -128,7 +128,7 @@ func _test_legacy_recovery() -> void:
 		"Migration retains balance and the active freight route")
 
 	var before: Dictionary = flight.snapshot()
-	_expect(before.schema == 4, "Migration emits the current save schema")
+	_expect(before.schema == 5, "Migration emits the current save schema")
 	var malformed := before.duplicate(true)
 	malformed.mining.site_id = 4
 	_expect(not flight.restore(malformed) and flight.snapshot() == before,

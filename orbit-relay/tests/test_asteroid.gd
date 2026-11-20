@@ -44,7 +44,7 @@ func _test_legacy_save() -> void:
 		and flight.mining.ore_hold == 0,
 		"Legacy save starts with an unused mining module")
 	var upgraded := flight.snapshot()
-	_expect(upgraded.schema == 4 and upgraded.has_all(["landed_site", "mining", "ship"]),
+	_expect(upgraded.schema == 5 and upgraded.has_all(["landed_site", "mining", "ship", "system_id", "jump_target"]),
 		"The next save is serialized in the current format")
 	flight.dock_action()
 	flight.change_target()

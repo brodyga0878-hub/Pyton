@@ -5,6 +5,8 @@ const TEXTURE_HEIGHT := 512
 const CORONA_SPAN := 1.48
 const MARKER_RADIUS := 10.5
 
+static var _shared_plasma: ImageTexture
+
 var _radius := 0.0
 var _corona: MeshInstance3D
 var _guide: MeshInstance3D
@@ -12,17 +14,17 @@ var _guide_paint: StandardMaterial3D
 var _scoop_stream: MeshInstance3D
 
 
-func setup(star: Dictionary, scoop_inner: float, scoop_outer: float) -> void:
+func setup(star: Dictionary, scoop_inner: float, scoop_outer: float, cool := false) -> void:
 	position = star.center
 	_radius = star.radius
-	_build_photosphere()
-	_build_corona()
+	_build_photosphere(cool)
+	_build_corona(cool)
 	var safe_offset := clampf(float(star.pad_offset), scoop_inner, scoop_outer)
 	_build_guide(safe_offset)
 	_build_scoop_stream()
 
 	var glow := OmniLight3D.new()
-	glow.light_color = Color("#ffb461")
+	glow.light_color = Color("#9dcbff") if cool else Color("#ffb461")
 	glow.light_energy = 1.65
 	glow.omni_range = 950.0
 	glow.omni_attenuation = 1.7
@@ -55,7 +57,7 @@ func update_approach(camera_position: Vector3, ship_position: Vector3, active_ta
 		_scoop_stream.look_at(global_position, up)
 
 
-func _build_photosphere() -> void:
+func _build_photosphere(cool: bool) -> void:
 	var sphere := SphereMesh.new()
 	sphere.radius = _radius
 	sphere.height = _radius * 2.0
@@ -66,6 +68,7 @@ func _build_photosphere() -> void:
 shader_type spatial;
 render_mode unshaded;
 uniform sampler2D plasma : filter_linear_mipmap, repeat_enable;
+uniform bool cool = false;
 void fragment() {
 	vec2 uv = vec2(UV.x + TIME * 0.006, UV.y);
 	vec2 flow = uv + vec2(sin(UV.y * 18.0 - TIME * 0.39) * 0.013 + TIME * 0.005, 0.0);
@@ -74,19 +77,23 @@ void fragment() {
 	float heat = cells.r * 0.66 + surge * 0.25 + cells.g * 0.09;
 	float ribbons = smoothstep(0.24, 0.67, heat);
 	float sparks = smoothstep(0.46, 0.77, heat + cells.g * 0.11);
-	vec3 copper = mix(vec3(0.56, 0.092, 0.015), vec3(1.0, 0.54, 0.105), ribbons);
-	vec3 yellow = vec3(1.0, 0.91, 0.54);
+	vec3 low = cool ? vec3(0.13, 0.29, 0.68) : vec3(0.56, 0.092, 0.015);
+	vec3 high = cool ? vec3(0.43, 0.75, 1.0) : vec3(1.0, 0.54, 0.105);
+	vec3 peak = cool ? vec3(0.93, 0.99, 1.0) : vec3(1.0, 0.91, 0.54);
 	float limb = smoothstep(0.0, 0.63, max(dot(normalize(NORMAL), VIEW), 0.0));
-	ALBEDO = mix(copper, yellow, sparks * 0.74) * (0.73 + limb * 0.27);
+	ALBEDO = mix(mix(low, high, ribbons), peak, sparks * 0.74) * (0.73 + limb * 0.27);
 }
 """
 	var paint := ShaderMaterial.new()
 	paint.shader = shader
-	paint.set_shader_parameter("plasma", _plasma_texture())
+	if _shared_plasma == null:
+		_shared_plasma = _plasma_texture()
+	paint.set_shader_parameter("plasma", _shared_plasma)
+	paint.set_shader_parameter("cool", cool)
 	_add_mesh(sphere, paint)
 
 
-func _plasma_texture() -> ImageTexture:
+static func _plasma_texture() -> ImageTexture:
 	# Evaluate a volume on a sphere so the longitude seam and poles join naturally.
 	var noise := FastNoiseLite.new()
 	noise.seed = 20351
@@ -114,12 +121,13 @@ func _plasma_texture() -> ImageTexture:
 	return ImageTexture.create_from_image(image)
 
 
-func _build_corona() -> void:
+func _build_corona(cool: bool) -> void:
 	var quad := QuadMesh.new()
 	var shader := Shader.new()
 	shader.code = """
 shader_type spatial;
 render_mode unshaded, blend_add, depth_draw_never, cull_disabled;
+uniform bool cool = false;
 void fragment() {
 	vec2 p = (UV * 2.0 - 1.0) * 1.48;
 	float r = length(p);
@@ -131,12 +139,15 @@ void fragment() {
 	float tongues = max(0.0, sin(angle * 9.0 + sin(angle * 4.0 + sin(angle * 3.0)) * 2.2 - TIME * 0.16));
 	float fringe = (1.0 - smoothstep(1.0, 1.11 + tongues * 0.17, r)) * (0.56 + rays * 0.44);
 	float haze = (1.0 - smoothstep(1.0, 1.47, r)) * (0.68 + tongues * 0.32);
-	ALBEDO = mix(vec3(0.90, 0.20, 0.024), vec3(1.0, 0.56, 0.11), fringe);
+	vec3 outer = cool ? vec3(0.16, 0.35, 0.94) : vec3(0.90, 0.20, 0.024);
+	vec3 inner = cool ? vec3(0.54, 0.80, 1.0) : vec3(1.0, 0.56, 0.11);
+	ALBEDO = mix(outer, inner, fringe);
 	ALPHA = fringe * 0.52 + haze * 0.23;
 }
 """
 	var paint := ShaderMaterial.new()
 	paint.shader = shader
+	paint.set_shader_parameter("cool", cool)
 	_corona = _add_mesh(quad, paint)
 	_corona.visible = false
 

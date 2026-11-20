@@ -28,6 +28,7 @@ var _commands_panel: PanelContainer
 var _mining_progress: ProgressBar
 var _right_panel: PanelContainer
 var _throttle_controls: GridContainer
+var _utilities: GridContainer
 var _actions: Dictionary = {}
 var _touch_owner: Dictionary = {}
 var _steer_finger := -1
@@ -41,6 +42,7 @@ var _parked := true
 var _lift_blocked := false
 var _mining_blocked := false
 var _scoop_blocked := false
+var _jumping := false
 var _notice_left := 0.0
 var _mouse_pad: SteeringPad
 
@@ -124,12 +126,17 @@ func build() -> void:
 	_button(_throttle_controls, "throttle_up", "Тяга +")
 	_button(_throttle_controls, "brake", "Тормоз")
 	_button(_throttle_controls, "boost", "Форсаж")
-	var utilities := HBoxContainer.new()
-	utilities.add_theme_constant_override("separation", 7)
-	right.add_child(utilities)
-	_button(utilities, "map", "Карта")
-	_button(utilities, "services", "Сервис")
-	_button(utilities, "report", "Отчёт")
+	_utilities = GridContainer.new()
+	_utilities.columns = 3
+	_utilities.add_theme_constant_override("h_separation", 7)
+	_utilities.add_theme_constant_override("v_separation", 7)
+	right.add_child(_utilities)
+	_button(_utilities, "map", "Карта")
+	_button(_utilities, "galaxy", "Галактика")
+	_button(_utilities, "services", "Сервис")
+	_button(_utilities, "report", "Отчёт")
+	_actions["map"].tooltip_text = "Карта звёздной системы"
+	_actions["galaxy"].tooltip_text = "Карта галактики"
 	_actions["report"].tooltip_text = "Отчёт об ошибке"
 
 	var notice_stack := _panel(_safe, Vector2(0.5, 1), Rect2(-243, -199, 486, 46))
@@ -148,11 +155,12 @@ func sync(sim: RefCounted, delta: float) -> void:
 	if not _parked and parked:
 		_reset_controls()
 	_parked = parked
+	_jumping = sim.jump_seconds_left > 0.0
 	_steer.visible = not parked
 	_bank.visible = not parked
 	_throttle_controls.visible = not parked
-	_right_panel.offset_left = -310.0 if docked else (-277.0 if landed else -340.0)
-	_right_panel.offset_top = -101.0 if parked else -215.0
+	_utilities.columns = 2 if docked else 3
+	_right_panel.offset_top = -157.0 if docked else (-101.0 if landed else -215.0)
 	_actions["target"].visible = not parked
 	_actions["autopilot"].visible = not parked
 	_actions["services"].visible = docked
@@ -179,13 +187,14 @@ func sync(sim: RefCounted, delta: float) -> void:
 			_actions["mine"].text = "Подъём модуля"
 		_:
 			_actions["mine"].text = "Развернуть модуль"
-	_actions["dock"].visible = parked or sim.target != Sector.STAR_ID
+	var star_target: bool = sim.target == Sector.star_for(sim.system_id)
+	_actions["dock"].visible = parked or not star_target
 	_actions["dock"].text = "Швартовка" if Sector.is_port(sim.target) else "Посадка"
 	if parked:
 		_actions["dock"].text = "Взлёт" if landed else "Старт"
 	var scoop_status: Dictionary = {} if parked else sim.scoop_status()
 	_scoop_blocked = not sim.scooping and not scoop_status.get("ok", false)
-	_actions["scoop"].visible = not parked and (sim.target == Sector.STAR_ID or scoop_status.get("near", false) or sim.scooping)
+	_actions["scoop"].visible = not parked and (star_target or scoop_status.get("near", false) or sim.scooping)
 	_actions["scoop"].text = "Откл. сбор" if sim.scooping else "Сбор топлива"
 	_actions["autopilot"].text = "Выкл. авто" if sim.autopilot else "Авто"
 	_actions["contract"].visible = docked and (sim.contract_stage != 1 or sim.docked == sim.contract_destination)
@@ -223,7 +232,11 @@ func _sync_port(sim: RefCounted, cargo: int, sale_quote: int) -> void:
 	if sim.contract_stage == 1:
 		var destination: String = sim.target_name(sim.contract_destination)
 		_route_detail.text = "%s → %s" % [sim.contract_cargo(), destination]
-		_guidance.text = "Груз готов к сдаче." if sim.docked == sim.contract_destination else "Вылетите к месту доставки."
+		var remote_system := _delivery_system(sim)
+		if not remote_system.is_empty():
+			_guidance.text = "Для сдачи груза нужен прыжок в систему «%s»." % remote_system
+		else:
+			_guidance.text = "Груз готов к сдаче." if sim.docked == sim.contract_destination else "Вылетите к месту доставки."
 	else:
 		var destination: String = sim.target_name(sim.offer_destination())
 		_route_detail.text = "%s → %s\nОплата %d кр." % [sim.contract_cargo(), destination, sim.contract_reward()]
@@ -269,16 +282,23 @@ func _sync_flight(sim: RefCounted, cargo: int, scoop_status: Dictionary) -> void
 		_route_detail.text += "  ·  цель позади"
 	if sim.contract_stage == 1:
 		_route_detail.text += "  ·  Груз для «%s»" % sim.target_name(sim.contract_destination)
+		var remote_system := _delivery_system(sim)
+		if not remote_system.is_empty():
+			_route_detail.text += " (%s)" % remote_system
 	_telemetry.text = "Скорость %.0f м/с  ·  Тяга %d%%" % [sim.velocity.length(), sim.throttle * 100.0]
 	if aimed_at_port:
 		_telemetry.text += "\nКрен к порту %+.0f°" % rad_to_deg(sim.roll_error(sim.target))
 	else:
 		_telemetry.text += "\nТрюм %d / %d ед." % [cargo, MiningRig.CAPACITY]
-	if sim.scooping:
+	if _jumping:
+		_route.text = "Прыжок  /  %s" % Sector.system(sim.jump_target).name
+		_route_detail.text = "До перехода %.1f с" % sim.jump_seconds_left
+		_guidance.text = "Тормоз отменяет прыжок."
+	elif sim.scooping:
 		_guidance.text = "Идёт сбор топлива. Удерживайте положение."
 	elif scoop_status.get("near", false):
 		_guidance.text = "Зона сбора. Включите сбор топлива." if scoop_status.get("ok", false) else str(scoop_status.get("reason", ""))
-	elif sim.target == Sector.STAR_ID:
+	elif sim.target == Sector.star_for(sim.system_id):
 		_guidance.text = "Зона сбора %d–%d м от центра · до %d м/с." % [Sector.SCOOP_INNER, Sector.SCOOP_OUTER, Sector.SCOOP_SPEED]
 		if sim.autopilot:
 			_guidance.text = "Авто  /  %s\n%s" % [sim.autopilot_phase, _guidance.text]
@@ -294,6 +314,10 @@ func _sync_flight(sim: RefCounted, cargo: int, scoop_status: Dictionary) -> void
 		_guidance.text = "Резервная тяга. Заправьтесь в порту или у звезды."
 	else:
 		_guidance.text = "Курс и крен слева. Тяга и тормоз справа."
+
+func _delivery_system(sim: RefCounted) -> String:
+	var destination_system := Sector.system_of_site(sim.contract_destination)
+	return "" if destination_system == sim.system_id else str(Sector.system(destination_system).name)
 
 func notify(message: String) -> void:
 	_notice.text = message
@@ -317,7 +341,8 @@ func _refresh_disabled_actions() -> void:
 	for action: String in _actions:
 		var button: Button = _actions[action]
 		var blocked := (action == "dock" and _lift_blocked) or (action == "mine" and _mining_blocked) or (action == "scoop" and _scoop_blocked)
-		button.disabled = not _input_enabled or blocked
+		var during_jump := _jumping and action not in ["throttle_down", "throttle_up", "boost", "brake"]
+		button.disabled = not _input_enabled or blocked or during_jump
 
 func move_input() -> Vector2:
 	if _parked or not _input_enabled:
@@ -513,7 +538,7 @@ func _button(parent: Container, action: String, caption: String) -> void:
 	button.custom_minimum_size = Vector2(0, 52)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.add_theme_font_size_override("font_size", 18)
-	button.add_theme_color_override("font_color", CYAN if action in ["dock", "scoop", "contract", "mine", "sell_ore", "map", "services"] else INK)
+	button.add_theme_color_override("font_color", CYAN if action in ["dock", "scoop", "contract", "mine", "sell_ore", "map", "galaxy", "services"] else INK)
 	button.add_theme_color_override("font_hover_color", INK)
 	button.add_theme_stylebox_override("normal", _box(Color("12313d"), LINE, 9, 7.0))
 	button.add_theme_stylebox_override("hover", _box(Color("214454"), CYAN, 9, 7.0))

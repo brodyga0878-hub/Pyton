@@ -4,12 +4,32 @@ extends RefCounted
 const SITE_COUNT := 9
 const STAR_ID := SITE_COUNT
 const TARGET_COUNT := SITE_COUNT + 1
+const HOME_SYSTEM := 0
+const VELAR_SYSTEM := 1
+const SYSTEM_COUNT := 2
+const DESTINATION_COUNT := 15
+const VELAR_STAR_ID := 14
+const JUMP_FUEL := 26
 const STAR_CLEARANCE := 250.0
 const SCOOP_INNER := 268.0
 const SCOOP_OUTER := 382.0
 const SCOOP_SPEED := 38.0
 const PORT_IDS := [0, 1, 3]
 const MINING_IDS := [2, 4, 5, 6, 7, 8]
+const SYSTEMS := [
+	{
+		"name": "Гелион", "position": Vector2.ZERO, "accent": Color("#ffc778"),
+		"description": "Три порта, шесть месторождений и жёлтая звезда с зоной сбора топлива.",
+		"arrival_port": 0, "targets": [0, 1, 2, 3, 4, 5, 6, 7, 8, STAR_ID], "ports": PORT_IDS,
+		"mines": MINING_IDS, "star": STAR_ID,
+	},
+	{
+		"name": "Велар", "position": Vector2(3.6, -2.2), "accent": Color("#9dcaff"),
+		"description": "Голубая звезда, порты «Створ» и «Гранитный причал». Ледяная луна и залежи кристаллов.",
+		"arrival_port": 10, "targets": [10, 11, 12, 13, VELAR_STAR_ID], "ports": [10, 11],
+		"mines": [12, 13], "star": VELAR_STAR_ID,
+	},
+]
 const RESOURCES := ["ore", "crystal", "ice"]
 const SITES := [
 	{"name": "Маяк-7", "kind": "port", "center": Vector3(0, 0, -160), "radius": 32.0, "pad_offset": 8.0, "gate_offset": 70.0, "spin": 0.19, "angle": 0.0, "accent": Color("#5df6c9")},
@@ -22,26 +42,76 @@ const SITES := [
 	{"name": "Сланец", "kind": "moon", "center": Vector3(1090, -125, -1470), "radius": 105.0, "pad_offset": 105.0, "gate_offset": 182.0, "seed": 113, "surface_color": Color("#586488"), "accent": Color("#d5adff"), "resource": "crystal", "reserve": 132, "drill_seconds": 14.0},
 	{"name": "Дымка", "kind": "comet", "center": Vector3(450, 170, -2090), "radius": 68.0, "pad_offset": 68.0, "gate_offset": 142.0, "seed": 137, "surface_color": Color("#517e7e"), "accent": Color("#9fe8ff"), "resource": "ice", "reserve": 216, "drill_seconds": 10.0},
 	{"name": "Гелион", "kind": "star", "center": Vector3(2000, 380, -1850), "radius": 220.0, "pad_offset": 310.0, "gate_offset": 470.0, "accent": Color("#ffc778")},
+	{"name": "Створ", "kind": "port", "center": Vector3(0, 0, -160), "radius": 32.0, "pad_offset": 8.0, "gate_offset": 70.0, "spin": -0.23, "angle": 0.74, "accent": Color("#76bcff")},
+	{"name": "Гранитный причал", "kind": "port", "center": Vector3(-540, 110, -1080), "radius": 32.0, "pad_offset": 8.0, "gate_offset": 70.0, "spin": 0.29, "angle": 1.85, "accent": Color("#f2ab8d")},
+	{"name": "Лазурь", "kind": "moon", "center": Vector3(620, -95, -880), "radius": 98.0, "pad_offset": 98.0, "gate_offset": 174.0, "seed": 163, "surface_color": Color("#658bad"), "accent": Color("#83dfff"), "resource": "ice", "reserve": 192, "drill_seconds": 11.0},
+	{"name": "Просека", "kind": "asteroid", "center": Vector3(-260, -165, -590), "radius": 60.0, "pad_offset": 60.0, "gate_offset": 132.0, "seed": 181, "surface_color": Color("#475c5d"), "accent": Color("#98eab5"), "resource": "crystal", "reserve": 144, "drill_seconds": 13.0},
+	{"name": "Велар", "kind": "star", "center": Vector3(1800, 280, -1600), "radius": 220.0, "pad_offset": 310.0, "gate_offset": 470.0, "accent": Color("#9dcaff")},
 ]
 const PORT_PRICES := {
 	0: {"ore": 20, "crystal": 38, "ice": 14},
 	1: {"ore": 20, "crystal": 30, "ice": 27},
 	3: {"ore": 29, "crystal": 50, "ice": 22},
+	10: {"ore": 27, "crystal": 46, "ice": 17},
+	11: {"ore": 33, "crystal": 35, "ice": 32},
 }
-const FUEL_PRICES := {0: 2, 1: 3, 3: 1}
+const FUEL_PRICES := {0: 2, 1: 3, 3: 1, 10: 2, 11: 3}
 const ROUTES := {
 	0: {1: ["Регуляторы охлаждения", 240], 3: ["Катушки связи", 340]},
 	1: {0: ["Калибровочные датчики", 180], 3: ["Оптические блоки", 280]},
 	3: {0: ["Контейнеры с фильтрами", 320], 1: ["Сенсоры давления", 260]},
+	10: {11: ["Теплообменники", 270]},
+	11: {10: ["Защитные экраны", 230]},
 }
 
 
 static func site(id: int) -> Dictionary:
-	return SITES[id] if id >= 0 and id < TARGET_COUNT else {}
+	return SITES[id] if id >= 0 and id < DESTINATION_COUNT else {}
+
+
+static func system(id: int) -> Dictionary:
+	return SYSTEMS[id] if id >= 0 and id < SYSTEM_COUNT else {}
+
+
+static func system_of_site(id: int) -> int:
+	if id < 0 or id >= DESTINATION_COUNT:
+		return -1
+	return HOME_SYSTEM if id < TARGET_COUNT else VELAR_SYSTEM
+
+
+static func targets_for(system_id: int) -> Array:
+	return system(system_id).get("targets", [])
+
+
+static func ports_for(system_id: int) -> Array:
+	return system(system_id).get("ports", [])
+
+
+static func mines_for(system_id: int) -> Array:
+	return system(system_id).get("mines", [])
+
+
+static func star_for(system_id: int) -> int:
+	return system(system_id).get("star", -1)
+
+
+static func jump_cost(origin: int, destination: int) -> int:
+	return JUMP_FUEL if origin != destination and not system(origin).is_empty() and not system(destination).is_empty() else 0
+
+
+static func jump_distance(origin: int, destination: int) -> float:
+	if jump_cost(origin, destination) == 0:
+		return 0.0
+	var departure: Vector2 = system(origin).position
+	return departure.distance_to(system(destination).position)
 
 
 static func is_port(id: int) -> bool:
-	return id in PORT_IDS
+	return id in ports_for(system_of_site(id))
+
+
+static func is_mine_site(id: int) -> bool:
+	return id in mines_for(system_of_site(id))
 
 
 static func kind_name(kind: String) -> String:
@@ -64,6 +134,7 @@ static func resource_name(resource: String) -> String:
 
 static func price(port_id: int, resource: String) -> int:
 	return PORT_PRICES[port_id].get(resource, 0) if is_port(port_id) else 0
+
 
 static func refuel_price(port_id: int) -> int:
 	return FUEL_PRICES.get(port_id, 0)

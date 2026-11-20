@@ -39,7 +39,7 @@ var _reserves: Array[int] = _initial_reserves()
 
 
 func select_site(id: int) -> bool:
-	if phase != STOWED or not _is_mine_site(id):
+	if phase != STOWED or not Catalog.is_mine_site(id):
 		return false
 	_site_id = id
 	return true
@@ -98,7 +98,7 @@ func update(delta: float) -> String:
 
 
 func sale_quote(port_id: int) -> int:
-	if phase != STOWED or port_id < 0 or port_id >= Catalog.SITE_COUNT or not Catalog.is_port(port_id):
+	if phase != STOWED or not Catalog.is_port(port_id):
 		return 0
 	var total := 0
 	for resource: String in RESOURCES:
@@ -133,14 +133,15 @@ func snapshot() -> Dictionary:
 	}
 
 
-func restore(value: Variant, legacy: bool = false) -> bool:
+func restore(value: Variant, legacy: bool = false, pre_galaxy: bool = false) -> bool:
 	if legacy and value is Dictionary and value.size() == LEGACY_SAVE_FIELDS.size() and value.has_all(LEGACY_SAVE_FIELDS):
 		value = _upgrade_legacy(value)
 	if not value is Dictionary or value.size() != SAVE_FIELDS.size() or not value.has_all(SAVE_FIELDS):
 		return false
 	if not _integer_in_range(value.phase, STOWED, RETURNING):
 		return false
-	if not _integer_in_range(value.site_id, 0, Catalog.SITE_COUNT - 1) or not _is_mine_site(int(value.site_id)):
+	var saved_count := Catalog.SITE_COUNT if pre_galaxy or legacy else Catalog.DESTINATION_COUNT
+	if not _integer_in_range(value.site_id, 0, saved_count - 1) or not Catalog.is_mine_site(int(value.site_id)):
 		return false
 	if not _integer_in_range(value.pending_ore, 0, BATCH):
 		return false
@@ -148,7 +149,7 @@ func restore(value: Variant, legacy: bool = false) -> bool:
 		return false
 	if not value.cargo is Dictionary or value.cargo.size() != RESOURCES.size() or not value.cargo.has_all(RESOURCES):
 		return false
-	if not value.reserves is Array or value.reserves.size() != Catalog.SITE_COUNT:
+	if not value.reserves is Array or value.reserves.size() != saved_count:
 		return false
 
 	var restored_site := int(value.site_id)
@@ -161,16 +162,16 @@ func restore(value: Variant, legacy: bool = false) -> bool:
 	if (duration == 0.0 and restored_seconds != 0.0) or (duration > 0.0 and restored_seconds >= duration):
 		return false
 
-	var restored_reserves: Array[int] = []
+	var restored_reserves := _initial_reserves()
 	var extracted := {"ore": 0, "crystal": 0, "ice": 0}
-	for id in range(Catalog.SITE_COUNT):
+	for id in range(saved_count):
 		var deposit := Catalog.site(id)
-		var initial_reserve := int(deposit.get("reserve", 0))
+		var initial_reserve := restored_reserves[id]
 		if not _integer_in_range(value.reserves[id], 0, initial_reserve):
 			return false
 		var remaining := int(value.reserves[id])
-		restored_reserves.append(remaining)
-		if not Catalog.is_port(id):
+		restored_reserves[id] = remaining
+		if Catalog.is_mine_site(id):
 			extracted[deposit.resource] += initial_reserve - remaining
 	var restored_cargo: Dictionary = {}
 	for resource: String in RESOURCES:
@@ -199,7 +200,7 @@ func restore(value: Variant, legacy: bool = false) -> bool:
 static func _upgrade_legacy(value: Dictionary) -> Dictionary:
 	# The original deposit keeps its site ID and resource. Other sites open intact.
 	var reserves: Array = []
-	reserves.assign(_initial_reserves())
+	reserves.assign(_initial_reserves().slice(0, Catalog.SITE_COUNT))
 	reserves[FIRST_MINE_SITE] = value.reserve
 	return {
 		"site_id": FIRST_MINE_SITE,
@@ -213,13 +214,9 @@ static func _upgrade_legacy(value: Dictionary) -> Dictionary:
 
 static func _initial_reserves() -> Array[int]:
 	var result: Array[int] = []
-	for id in range(Catalog.SITE_COUNT):
+	for id in range(Catalog.DESTINATION_COUNT):
 		result.append(int(Catalog.site(id).get("reserve", 0)))
 	return result
-
-
-static func _is_mine_site(id: int) -> bool:
-	return id >= 0 and id < Catalog.SITE_COUNT and not Catalog.is_port(id) and Catalog.site(id).resource in RESOURCES
 
 
 static func _hold_size(cargo: Dictionary) -> int:

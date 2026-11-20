@@ -12,6 +12,7 @@ const BORDER := Color("365561")
 var _sheet: Control
 var _insets: MarginContainer
 var _chart: SectorChart
+var _title: Label
 var _here: Label
 var _detail_title: Label
 var _detail: Label
@@ -46,8 +47,8 @@ func build() -> void:
 	var header := HBoxContainer.new()
 	header.add_theme_constant_override("separation", 14)
 	content.add_child(header)
-	var title := _label(header, "Карта сектора", 32, TEXT)
-	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_title = _label(header, "Карта сектора", 32, TEXT)
+	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_here = _label(header, "", 17, MUTED)
 	_here.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_close_button = _button(header, "Закрыть", 44)
@@ -72,11 +73,12 @@ func build() -> void:
 	var list := VBoxContainer.new()
 	list.add_theme_constant_override("separation", 4)
 	panel.add_child(list)
-	for id: int in Sector.PORT_IDS:
-		_add_site(list, id)
-	for id: int in Sector.MINING_IDS:
-		_add_site(list, id)
-	_add_site(list, Sector.STAR_ID)
+	for system_id in range(Sector.SYSTEM_COUNT):
+		for id: int in Sector.ports_for(system_id):
+			_add_site(list, id)
+		for id: int in Sector.mines_for(system_id):
+			_add_site(list, id)
+		_add_site(list, Sector.star_for(system_id))
 	var spacer := Control.new()
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -100,8 +102,13 @@ func open(sim: RefCounted) -> void:
 	_flight = sim
 	_touches.clear()
 	_touch_sites.clear()
+	var system_id: int = sim.system_id
+	_title.text = "Карта системы «%s»" % Sector.system(system_id).name
 	var here := _current_site()
 	_here.text = "В полёте" if here < 0 else str(Sector.site(here).name)
+	for id: int in _site_buttons:
+		_site_buttons[id].visible = Sector.system_of_site(id) == system_id
+	_chart.system_id = system_id
 	_chart.ship_position = sim.position
 	var planned: int = sim.planned_target
 	_chart.active_site = planned if planned >= 0 else int(sim.target)
@@ -131,7 +138,7 @@ func _add_site(parent: VBoxContainer, id: int) -> void:
 
 
 func _select_site(id: int) -> void:
-	if _flight == null or not _site_buttons.has(id):
+	if _flight == null or Sector.system_of_site(id) != _flight.system_id:
 		return
 	_candidate = id
 	_chart.selected_site = id
@@ -161,7 +168,7 @@ func _select_site(id: int) -> void:
 
 
 func _apply() -> void:
-	if _flight != null and _site_buttons.has(_candidate) and _candidate != _current_site():
+	if _flight != null and Sector.system_of_site(_candidate) == _flight.system_id and _candidate != _current_site():
 		destination_selected.emit(_candidate)
 
 
@@ -218,7 +225,7 @@ func _button_at(point: Vector2) -> Button:
 		if not button.disabled and button.get_global_rect().has_point(point):
 			return button
 	for button: Button in _site_buttons.values():
-		if button.get_global_rect().has_point(point):
+		if button.visible and button.get_global_rect().has_point(point):
 			return button
 	return null
 
@@ -295,6 +302,7 @@ class SectorChart extends Control:
 	const CHART_BACKGROUND := Color("0b1a25")
 	const PLOT_MARGIN := Vector2(63, 42)
 
+	var system_id := Sector.HOME_SYSTEM
 	var ship_position := Vector3.ZERO
 	var active_site := -1
 	var selected_site := -1
@@ -308,7 +316,7 @@ class SectorChart extends Control:
 	func _bounds_xz() -> Rect2:
 		var minimum := Vector2(INF, INF)
 		var maximum := Vector2(-INF, -INF)
-		for id in range(Sector.TARGET_COUNT):
+		for id: int in Sector.targets_for(system_id):
 			var center: Vector3 = Sector.site(id).center
 			var xz := Vector2(center.x, center.z)
 			minimum = minimum.min(xz)
@@ -328,7 +336,7 @@ class SectorChart extends Control:
 		var distance := 30.0
 		var plot := _plot_bounds()
 		var bounds := _bounds_xz()
-		for id in range(Sector.TARGET_COUNT):
+		for id: int in Sector.targets_for(system_id):
 			var marker := _project(Sector.site(id).center, plot, bounds)
 			var separation := point.distance_to(marker)
 			if separation < distance:
@@ -354,7 +362,7 @@ class SectorChart extends Control:
 		if selected_site >= 0 and selected_site != active_site:
 			_draw_course(ship, _project(Sector.site(selected_site).center, plot, bounds), Color("d9a569"), 1.8)
 		var label_boxes: Array[Rect2] = [Rect2(Vector2(11, 10), Vector2(127, 24))]
-		for id in range(Sector.TARGET_COUNT):
+		for id: int in Sector.targets_for(system_id):
 			var entry = Sector.site(id)
 			var marker := _project(entry.center, plot, bounds)
 			var tint: Color = entry.accent

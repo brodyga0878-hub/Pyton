@@ -1,10 +1,14 @@
 extends RefCounted
-## Ports and the mining site use the same flight coordinates.
+## Flight coordinates are local to the current star system.
 
 const MiningRig = preload("res://scripts/mining_rig.gd")
 const ShipSystems = preload("res://scripts/ship_systems.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
-const SAVE_SCHEMA := 4
+const SAVE_SCHEMA := 5
+const JUMP_CHARGE := 2.5
+const JUMP_SPEED := 42.0
+const JUMP_CLEARANCE := 45.0
+const ARRIVAL_OFFSET := 90.0
 const MAX_SPEED := 145.0
 const RESERVE_SPEED := 42.0
 const SCOOP_RATE := 7.0
@@ -39,6 +43,9 @@ var landed: bool:
 var mining := MiningRig.new()
 var ship := ShipSystems.new()
 var scooping := false
+var system_id := Catalog.HOME_SYSTEM
+var jump_target := -1
+var jump_seconds_left := 0.0
 var target := 1
 var planned_target := -1
 var autopilot := false
@@ -112,7 +119,14 @@ func offer_destination() -> int:
 		return -1
 	if not Catalog.contract(docked, planned_target).is_empty():
 		return planned_target
-	return 1 if docked == 0 else 0
+	return _default_port(docked)
+
+
+func _default_port(excluded := -1) -> int:
+	for id: int in Catalog.ports_for(system_id):
+		if id != excluded:
+			return id
+	return -1
 
 
 func contract_cargo() -> String:
@@ -153,11 +167,12 @@ func contract_action() -> bool:
 
 func change_target() -> void:
 	if docked < 0 and not landed:
-		select_target((target + 1) % Catalog.TARGET_COUNT)
+		var options := Catalog.targets_for(system_id)
+		select_target(options[(options.find(target) + 1) % options.size()])
 
 
 func select_target(index: int) -> bool:
-	if index < 0 or index >= Catalog.TARGET_COUNT or index == docked or index == landed_site:
+	if jump_seconds_left > 0.0 or Catalog.system_of_site(index) != system_id or index == docked or index == landed_site:
 		return false
 	if docked >= 0 or landed:
 		planned_target = index
@@ -171,18 +186,21 @@ func select_target(index: int) -> bool:
 
 func change_throttle(amount: float) -> void:
 	if docked < 0 and not landed:
+		cancel_jump()
 		set_autopilot(false)
 		throttle = clampf(throttle + amount, 0.0, 1.0)
 
 
 func set_autopilot(enabled: bool) -> void:
-	autopilot = enabled and docked < 0 and not landed
+	autopilot = enabled and docked < 0 and not landed and jump_seconds_left <= 0.0
 	_approach_committed = false
 	_departure_leg = 0
 	autopilot_phase = "К створу" if autopilot else ""
 	if not autopilot:
 		return
-	for index in range(Catalog.SITE_COUNT):
+	for index: int in Catalog.targets_for(system_id):
+		if index == Catalog.star_for(system_id):
+			continue
 		var center := target_position(index)
 		var offset := position - center
 		var near_distance := float(Catalog.site(index).radius) + 48.0
@@ -198,7 +216,9 @@ func selected_dock_status() -> Dictionary:
 	if landed:
 		var ready := mining.phase == MiningRig.STOWED
 		return {"ok": ready, "reason": "Можно взлететь" if ready else "Сначала верните модуль на борт"}
-	if target == Catalog.STAR_ID:
+	if jump_seconds_left > 0.0:
+		return {"ok": false, "reason": "Идёт зарядка прыжкового привода"}
+	if target == Catalog.star_for(system_id):
 		return {"ok": false, "reason": "У звезды можно собирать топливо"}
 	if not Catalog.is_port(target):
 		return _landing_status()
@@ -293,11 +313,13 @@ func service_action(action: String) -> bool:
 
 
 func scoop_status() -> Dictionary:
-	var distance := position.distance_to(target_position(Catalog.STAR_ID))
+	var distance := position.distance_to(target_position(Catalog.star_for(system_id)))
 	var near := distance <= Catalog.SCOOP_OUTER + 180.0
 	var reason := ""
 	if docked >= 0 or landed:
-		reason = "Сбор топлива доступен в полёте у «Гелиона»"
+		reason = "Сбор топлива доступен в полёте у звезды"
+	elif jump_seconds_left > 0.0:
+		reason = "Идёт зарядка прыжкового привода"
 	elif distance < Catalog.SCOOP_INNER:
 		reason = "Отойдите от звезды до зоны сбора"
 	elif distance > Catalog.SCOOP_OUTER:
@@ -337,6 +359,87 @@ func _collect_fuel(delta: float) -> void:
 		_announce("scoop_full", "Бак полностью заправлен от звезды.")
 
 
+func plan_jump(destination: int) -> bool:
+	if jump_seconds_left > 0.0 or Catalog.jump_cost(system_id, destination) == 0:
+		return false
+	jump_target = destination
+	_announce("jump_planned", "Межзвёздный курс. «%s»." % Catalog.system(destination).name)
+	return true
+
+
+func jump_status(destination: int) -> Dictionary:
+	var cost := Catalog.jump_cost(system_id, destination)
+	var reason := ""
+	if cost == 0:
+		reason = "Выберите другую звёздную систему"
+	elif docked >= 0 or landed:
+		reason = "Выйдите в открытый космос"
+	elif autopilot or scooping:
+		reason = "Отключите автопилот и сбор топлива"
+	elif speed() > JUMP_SPEED:
+		reason = "Снизьте скорость до %d м/с" % int(JUMP_SPEED)
+	elif ship.fuel < cost:
+		reason = "Нужно %d ед. топлива" % cost
+	else:
+		var star := Catalog.star_for(system_id)
+		for id: int in Catalog.targets_for(system_id):
+			var clearance := Catalog.SCOOP_OUTER if id == star else float(Catalog.site(id).radius) + JUMP_CLEARANCE
+			if position.distance_squared_to(target_position(id)) <= clearance * clearance:
+				reason = "Отойдите от объекта «%s»" % target_name(id)
+				break
+	return {"ok": reason.is_empty(), "reason": "Можно зарядить прыжковый привод" if reason.is_empty() else reason, "cost": cost}
+
+
+func start_jump() -> bool:
+	if jump_seconds_left > 0.0:
+		return false
+	var status := jump_status(jump_target)
+	if not status.ok:
+		_announce("jump_denied", status.reason)
+		return false
+	throttle = 0.0
+	boost = false
+	jump_seconds_left = JUMP_CHARGE
+	_announce("jump_charging", "Прыжковый привод заряжается.")
+	return true
+
+
+func cancel_jump() -> bool:
+	if jump_seconds_left <= 0.0:
+		return false
+	jump_seconds_left = 0.0
+	_announce("jump_canceled", "Прыжок отменён. Топливо сохранено.")
+	return true
+
+
+func _charge_jump(delta: float) -> void:
+	velocity = velocity.move_toward(Vector3.ZERO, 67.0 * delta)
+	var next := position + velocity * delta
+	if _blocked(next):
+		velocity = Vector3.ZERO
+		cancel_jump()
+		return
+	position = next
+	var status := jump_status(jump_target)
+	if not status.ok:
+		cancel_jump()
+		return
+	jump_seconds_left -= delta
+	if jump_seconds_left > 0.000001:
+		return
+	jump_seconds_left = 0.0
+	ship.fuel -= status.cost
+	system_id = jump_target
+	jump_target = -1
+	target = Catalog.system(system_id).arrival_port
+	position = target_gate(target) + Vector3.BACK * ARRIVAL_OFFSET
+	velocity = Vector3.ZERO
+	yaw = 0.0
+	pitch = 0.0
+	roll = 0.0
+	_announce("jump_complete", "Прыжок завершён. Система «%s»." % Catalog.system(system_id).name)
+
+
 func _arrive() -> void:
 	if not Catalog.is_port(target):
 		mining.select_site(target)
@@ -364,7 +467,7 @@ func _lift() -> void:
 	landed_site = -1
 	yaw = PI
 	velocity = Vector3.BACK * 9.0
-	target = _departure_target(0)
+	target = _departure_target(_default_port())
 	_announce("lift", "Взлёт. Площадка «%s»." % target_name(origin))
 
 
@@ -375,7 +478,7 @@ func _launch() -> void:
 	pitch = 0.0
 	throttle = 0.0
 	velocity = station_axis(origin) * 6.0
-	target = _departure_target(1 if origin == 0 else 0)
+	target = _departure_target(_default_port(origin))
 	docked = -1
 	_announce("launch", "Старт со станции «%s»." % target_name(origin))
 
@@ -385,7 +488,7 @@ func _departure_target(default_target: int) -> int:
 	planned_target = -1
 	if requested >= 0:
 		return requested
-	if contract_stage == 1 and contract_destination != docked:
+	if contract_stage == 1 and contract_destination != docked and Catalog.system_of_site(contract_destination) == system_id:
 		return contract_destination
 	return default_target
 
@@ -424,7 +527,14 @@ func update(delta: float, steer: Vector2, bank: float, boost_requested: bool, br
 				_announce(mining_event, "Модуль на борту. Сырьё в трюме. Можно взлетать.")
 		return
 
-	if steer.length_squared() > 0.04 or absf(bank) > 0.12 or boost_requested or brake:
+	var manual_input := steer.length_squared() > 0.04 or absf(bank) > 0.12 or boost_requested or brake
+	if jump_seconds_left > 0.0:
+		if manual_input:
+			cancel_jump()
+		else:
+			_charge_jump(delta)
+		return
+	if manual_input:
 		if autopilot:
 			set_autopilot(false)
 			_announce("manual_override", "Ручное управление")
@@ -465,8 +575,8 @@ func update(delta: float, steer: Vector2, bank: float, boost_requested: bool, br
 	_collect_fuel(delta)
 
 
-func _blocked(point: Vector3) -> bool:
-	for index in range(Catalog.TARGET_COUNT):
+func _blocked(point: Vector3, sector_id := -1) -> bool:
+	for index: int in Catalog.targets_for(system_id if sector_id < 0 else sector_id):
 		if _inside_hull(point, index):
 			return true
 	return false
@@ -474,7 +584,7 @@ func _blocked(point: Vector3) -> bool:
 
 func _inside_hull(point: Vector3, index: int) -> bool:
 	var relative := point - target_position(index)
-	if index == Catalog.STAR_ID:
+	if index == Catalog.star_for(Catalog.system_of_site(index)):
 		return relative.length_squared() < Catalog.STAR_CLEARANCE * Catalog.STAR_CLEARANCE
 	if not Catalog.is_port(index):
 		var radius := float(Catalog.site(index).radius)
@@ -487,7 +597,7 @@ func _inside_hull(point: Vector3, index: int) -> bool:
 
 func _autopilot_step(delta: float) -> void:
 	boost = false
-	var star_run := target == Catalog.STAR_ID
+	var star_run := target == Catalog.star_for(system_id)
 	var mining_site := not Catalog.is_port(target)
 	var target_radius := Catalog.STAR_CLEARANCE if star_run else float(Catalog.site(target).radius)
 	var center := target_position(target)
@@ -556,13 +666,13 @@ func _autopilot_step(delta: float) -> void:
 	if _approach_committed and star_run and displacement.length() < 2.0 and speed() < 3.0:
 		set_autopilot(false)
 		throttle = 0.0
-		_announce("star_arrival", "Корабль у «Гелиона». Можно включить сбор топлива.")
+		_announce("star_arrival", "Корабль у звезды «%s». Можно включить сбор топлива." % target_name(target))
 	elif _approach_committed and not star_run and selected_dock_status().ok:
 		_arrive()
 
 
 func _star_detour(waypoint: Vector3) -> Vector3:
-	var center := target_position(Catalog.STAR_ID)
+	var center := target_position(Catalog.star_for(system_id))
 	var radial := position - center
 	var course := waypoint - position
 	var margin_squared := Catalog.SCOOP_INNER * Catalog.SCOOP_INNER
@@ -605,7 +715,7 @@ func snapshot() -> Dictionary:
 		"contract_stage": contract_stage, "contract_origin": contract_origin,
 		"contract_destination": contract_destination,
 		"landed_site": landed_site, "planned_target": planned_target, "mining": mining.snapshot(),
-		"ship": ship.snapshot(),
+		"ship": ship.snapshot(), "system_id": system_id, "jump_target": jump_target,
 	}
 
 
@@ -613,8 +723,18 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
-	var old_save := schema < SAVE_SCHEMA
+	var pre_galaxy := schema < 5
+	var pre_fuel := schema < 4
 	var pre_sector := schema < 3
+	var restored_system := Catalog.HOME_SYSTEM
+	var restored_jump := -1
+	if not pre_galaxy:
+		if not _integer(state.get("system_id"), 0, Catalog.SYSTEM_COUNT - 1) or not _integer(state.get("jump_target"), -1, Catalog.SYSTEM_COUNT - 1):
+			return false
+		restored_system = int(state.system_id)
+		restored_jump = int(state.jump_target)
+		if restored_jump >= 0 and Catalog.jump_cost(restored_system, restored_jump) == 0:
+			return false
 	for key in ["position", "velocity"]:
 		if not state.get(key) is Array or state[key].size() != 3:
 			return false
@@ -628,13 +748,17 @@ func restore(state: Dictionary) -> bool:
 		return false
 	if not _number(state.get("throttle"), 0.0, 1.0):
 		return false
+	var site_count := Catalog.DESTINATION_COUNT
+	if pre_galaxy:
+		site_count = schema + 1 if pre_sector else (Catalog.SITE_COUNT if pre_fuel else Catalog.TARGET_COUNT)
 	for field in ["docked", "contract_origin", "contract_destination"]:
-		if not _integer(state.get(field), -1, 1 if pre_sector else Catalog.SITE_COUNT - 1):
+		if not _integer(state.get(field), -1, site_count - 1):
 			return false
 		if int(state[field]) >= 0 and not Catalog.is_port(int(state[field])):
 			return false
-	var old_site_count := schema + 1 if pre_sector else (Catalog.SITE_COUNT if old_save else Catalog.TARGET_COUNT)
-	if not _integer(state.get("target"), 0, old_site_count - 1) or not _integer(state.get("contract_stage"), 0, 2):
+	if not _integer(state.get("target"), 0, site_count - 1) or not _integer(state.get("contract_stage"), 0, 2):
+		return false
+	if Catalog.system_of_site(int(state.target)) != restored_system or (int(state.docked) >= 0 and Catalog.system_of_site(int(state.docked)) != restored_system):
 		return false
 	if not _integer(state.get("credits"), 0, 1000000000) or not _integer(state.get("deliveries"), 0, 10000000):
 		return false
@@ -652,9 +776,9 @@ func restore(state: Dictionary) -> bool:
 	var restored_ship := ShipSystems.new()
 	var restored_landing := -1
 	var restored_plan := -1
-	if schema >= 2 and not restored_mining.restore(state.get("mining"), schema == 2):
+	if schema >= 2 and not restored_mining.restore(state.get("mining"), schema == 2, pre_galaxy):
 		return false
-	if not old_save and not restored_ship.restore(state.get("ship")):
+	if not pre_fuel and not restored_ship.restore(state.get("ship")):
 		return false
 	if schema == 2:
 		if not state.get("landed") is bool:
@@ -662,27 +786,28 @@ func restore(state: Dictionary) -> bool:
 		if state.landed:
 			restored_landing = ASTEROID_TARGET
 	elif not pre_sector:
-		if not _integer(state.get("landed_site"), -1, Catalog.SITE_COUNT - 1) or not _integer(state.get("planned_target"), -1, old_site_count - 1):
+		if not _integer(state.get("landed_site"), -1, site_count - 1) or not _integer(state.get("planned_target"), -1, site_count - 1):
 			return false
 		restored_landing = int(state.landed_site)
 		restored_plan = int(state.planned_target)
 	if restored_landing >= 0:
-		if Catalog.is_port(restored_landing) or restored_dock >= 0 or int(state.target) != restored_landing or restored_mining.site_id != restored_landing:
+		if not Catalog.is_mine_site(restored_landing) or restored_dock >= 0 or int(state.target) != restored_landing or restored_mining.site_id != restored_landing:
 			return false
 		if not restored_position.is_equal_approx(target_contact(restored_landing)) or not restored_velocity.is_zero_approx():
 			return false
 	elif restored_mining.phase != MiningRig.STOWED:
 		return false
-	if restored_plan >= 0 and (restored_plan == restored_dock or restored_plan == restored_landing or (restored_dock < 0 and restored_landing < 0)):
-		return false
+	if restored_plan >= 0:
+		if Catalog.system_of_site(restored_plan) != restored_system or restored_plan == restored_dock or restored_plan == restored_landing or (restored_dock < 0 and restored_landing < 0):
+			return false
 	# Earlier saves may occupy coordinates where a new hull was added.
-	if old_save and restored_dock < 0 and restored_landing < 0:
-		for index in range(old_site_count, Catalog.TARGET_COUNT):
+	if pre_fuel and restored_dock < 0 and restored_landing < 0:
+		for index in range(site_count, Catalog.TARGET_COUNT):
 			if _inside_hull(restored_position, index):
 				restored_position = target_gate(index)
 				restored_velocity = Vector3.ZERO
 				break
-	if restored_velocity.length() > MAX_SPEED * 1.56 or (restored_dock < 0 and _blocked(restored_position)):
+	if restored_velocity.length() > MAX_SPEED * 1.56 or (restored_dock < 0 and _blocked(restored_position, restored_system)):
 		return false
 	position = restored_position
 	velocity = restored_velocity
@@ -696,6 +821,9 @@ func restore(state: Dictionary) -> bool:
 	mining = restored_mining
 	ship = restored_ship
 	scooping = false
+	system_id = restored_system
+	jump_target = restored_jump
+	jump_seconds_left = 0.0
 	target = int(state.target)
 	planned_target = restored_plan
 	credits = int(state.credits)
