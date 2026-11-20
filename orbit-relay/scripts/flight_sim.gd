@@ -21,7 +21,8 @@ const ConvoyOrders = preload("res://scripts/convoy_orders.gd")
 const DockAccess = preload("res://scripts/dock_access.gd")
 const Passengers = preload("res://scripts/passengers.gd")
 const Crew = preload("res://scripts/crew.gd")
-const SAVE_SCHEMA := 25
+const Cartography = preload("res://scripts/cartography.gd")
+const SAVE_SCHEMA := 26
 const SHIPYARD_PORTS := [0, 10, Catalog.FRINGE_ARRIVAL_PORT]
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
@@ -121,6 +122,7 @@ var factions := FactionFronts.new()
 var convoy_order := ConvoyOrders.new()
 var passengers := Passengers.new()
 var crew := Crew.new()
+var cartography := Cartography.new()
 var convoy_course := false
 var project_course := false
 var scooping := false
@@ -277,6 +279,22 @@ func system_faction_name(index: int) -> String:
 
 func station_operational(index: int) -> bool:
 	return Catalog.is_port(index) and _site_available(index, expedition)
+
+
+func body_dossier(site: int) -> Dictionary:
+	return cartography.body_status(self, site)
+
+
+func system_dossier(system: int) -> Dictionary:
+	return cartography.system_status(self, system)
+
+
+func survey_action(site: int) -> bool:
+	var scan := body_dossier(site)
+	if not scan.can_scan or not cartography.record(site, orbit_time):
+		return false
+	_announce("survey_record", "Данные «%s» записаны в атлас." % target_name(site))
+	return true
 
 
 func local_targets() -> Array:
@@ -2840,6 +2858,7 @@ func snapshot() -> Dictionary:
 		"convoy_order": convoy_order.snapshot(),
 		"passengers": passengers.snapshot(),
 		"crew": crew.snapshot(),
+		"cartography": cartography.snapshot(),
 	}
 
 
@@ -2847,6 +2866,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_cartography := schema < 26
 	var pre_shipyard := schema < 25
 	var pre_crew := schema < 24
 	var pre_passengers := schema < 23
@@ -2942,6 +2962,7 @@ func restore(state: Dictionary) -> bool:
 	var restored_convoy_order := ConvoyOrders.new()
 	var restored_passengers := Passengers.new()
 	var restored_crew := Crew.new()
+	var restored_cartography := Cartography.new()
 	if not pre_expansion:
 		if not restored_expedition.restore(state.get("expedition")) or not restored_factions.restore(state.get("factions"), pre_thermal, pre_convoy_orders):
 			return false
@@ -2961,6 +2982,12 @@ func restore(state: Dictionary) -> bool:
 			return false
 		for member: Dictionary in restored_crew.status(restored_epoch).members:
 			if not _site_available(member.origin, restored_expedition):
+				return false
+	if not pre_cartography:
+		if not restored_cartography.restore(state.get("cartography"), restored_epoch):
+			return false
+		for site: int in restored_cartography.surveyed_sites():
+			if not _site_available(site, restored_expedition):
 				return false
 	if not restored_expedition.known(restored_system) or (restored_jump >= 0 and not restored_expedition.known(restored_jump)):
 		return false
@@ -3177,6 +3204,7 @@ func restore(state: Dictionary) -> bool:
 	convoy_order = restored_convoy_order
 	passengers = restored_passengers
 	crew = restored_crew
+	cartography = restored_cartography
 	star_heat = 0.0 if pre_thermal else float(state.star_heat)
 	entry_heat = 0.0 if pre_entry else float(state.entry_heat)
 	_entry_site = -1

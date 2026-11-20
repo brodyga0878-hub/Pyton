@@ -7,6 +7,7 @@ signal dismissed()
 
 const Sector := preload("res://scripts/sector_catalog.gd")
 const Expedition := preload("res://scripts/expedition.gd")
+const Economy := preload("res://scripts/port_economy.gd")
 const TEXT := Color("e8f4fa")
 const MUTED := Color("a5bac7")
 const MINT := Color("9debd7")
@@ -29,6 +30,14 @@ var _plan_button: Button
 var _jump_button: Button
 var _cancel_route_button: Button
 var _close_button: Button
+var _dossier_button: Button
+var _route_details: VBoxContainer
+var _dossier_scroll: ScrollContainer
+var _dossier_ports: Label
+var _dossier_stock: Label
+var _dossier_freight: Label
+var _dossier_observations: Label
+var _dossier_touch := -1
 var _system_buttons: Dictionary[int, Button] = {}
 var _touches: Dictionary[int, Button] = {}
 var _map_touches: Dictionary[int, int] = {}
@@ -58,6 +67,10 @@ func build() -> void:
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_current = _label(header, "", 18, MINT)
 	_current.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_dossier_button = _button(header, "Досье", 48)
+	_dossier_button.custom_minimum_size.x = 124
+	_dossier_button.toggle_mode = true
+	_dossier_button.pressed.connect(_toggle_dossier)
 	_close_button = _button(header, "Закрыть", 48)
 	_close_button.custom_minimum_size.x = 124
 	_close_button.pressed.connect(func() -> void: dismissed.emit())
@@ -95,25 +108,34 @@ func build() -> void:
 	_destination = _label(details, "", 26, TEXT)
 	_affiliation = _label(details, "", 16, MINT)
 	_affiliation.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_description = _label(details, "", 15, MUTED)
+	var pages := Control.new()
+	pages.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pages.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	details.add_child(pages)
+	_route_details = VBoxContainer.new()
+	_route_details.add_theme_constant_override("separation", 3)
+	pages.add_child(_route_details)
+	_route_details.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_description = _label(_route_details, "", 15, MUTED)
 	_description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_description.custom_minimum_size.y = 47
-	_distance = _metric(details, "Длина пути")
-	_cost = _metric(details, "Расход пути")
-	_fuel = _metric(details, "Прыжковый запас")
-	_itinerary = _label(details, "", 14, MINT)
+	_distance = _metric(_route_details, "Длина пути")
+	_cost = _metric(_route_details, "Расход пути")
+	_fuel = _metric(_route_details, "Прыжковый запас")
+	_itinerary = _label(_route_details, "", 14, MINT)
 	_itinerary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_budget = _label(details, "", 14, MUTED)
+	_budget = _label(_route_details, "", 14, MUTED)
 	_budget.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var space := Control.new()
 	space.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	space.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	details.add_child(space)
+	_route_details.add_child(space)
 
-	_status = _label(details, "", 14, AMBER)
+	_status = _label(_route_details, "", 14, AMBER)
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_status.custom_minimum_size.y = 27
 	_status.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+	_build_dossier(pages)
 	var routes := HBoxContainer.new()
 	routes.add_theme_constant_override("separation", 8)
 	details.add_child(routes)
@@ -139,6 +161,7 @@ func open(sim: RefCounted) -> void:
 	var route: Dictionary = sim.planned_route()
 	_candidate = int(route.goal) if route.get("available", false) else int(sim.system_id)
 	_clear_touches()
+	_show_dossier(false)
 	show()
 	refresh()
 
@@ -239,6 +262,100 @@ func refresh() -> void:
 		hint = "Идёт зарядка прыжкового привода."
 	_status.text = hint
 	_status.add_theme_color_override("font_color", MINT if not _jump_button.disabled else MUTED if is_current else AMBER)
+	if _dossier_scroll.visible:
+		_refresh_dossier()
+
+
+func _build_dossier(parent: Control) -> void:
+	_dossier_scroll = ScrollContainer.new()
+	_dossier_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	parent.add_child(_dossier_scroll)
+	_dossier_scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var content := VBoxContainer.new()
+	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content.add_theme_constant_override("separation", 6)
+	_dossier_scroll.add_child(content)
+	_label(content, "Действующие порты", 17, MINT)
+	_dossier_ports = _dossier_text(content)
+	_label(content, "Товары на складах", 17, MINT)
+	_dossier_stock = _dossier_text(content)
+	_label(content, "Межзвёздные поставки", 17, MINT)
+	_dossier_freight = _dossier_text(content)
+	_label(content, "Замеры тел", 17, MINT)
+	_dossier_observations = _dossier_text(content)
+	_dossier_scroll.hide()
+
+
+func _refresh_dossier() -> void:
+	var system: Dictionary = _flight.system_dossier(_candidate)
+	if not system.known:
+		_dossier_ports.text = "Сведения о системе ещё не получены."
+		_dossier_stock.text = "Нет сведений."
+		_dossier_freight.text = "Нет сведений."
+		_dossier_observations.text = "Нет замеров."
+		return
+	var ports := PackedStringArray()
+	for port: int in system.ports:
+		ports.append(str(Sector.site(port).name))
+	_dossier_ports.text = " · ".join(ports) if not ports.is_empty() else "Действующих портов нет."
+	var stock := PackedStringArray()
+	for good: String in Economy.GOODS:
+		if system.goods.has(good):
+			stock.append("%s %d" % [Economy.good_name(good), int(system.goods[good])])
+	_dossier_stock.text = " · ".join(stock) if not stock.is_empty() else "Нет складских записей."
+	var freight := PackedStringArray()
+	for shipment: Dictionary in system.imports:
+		freight.append(_shipment_text("Входящий", shipment, int(shipment.origin)))
+	for shipment: Dictionary in system.exports:
+		freight.append(_shipment_text("Исходящий", shipment, int(shipment.destination)))
+	_dossier_freight.text = "\n".join(freight) if not freight.is_empty() else "Межзвёздных грузов в пути нет."
+	var observations := PackedStringArray([
+		"Обследовано %d из %d." % [int(system.scan_count), int(system.target_count)]
+	])
+	for site: int in system.observations:
+		var report: Dictionary = _flight.body_dossier(site)
+		if report.known:
+			observations.append(_observation_text(report))
+	if system.observations.is_empty():
+		observations.append("Для замера подойдите к телу и откройте данные на карте системы.")
+	_dossier_observations.text = "\n".join(observations)
+
+
+func _toggle_dossier() -> void:
+	if is_open():
+		_clear_touches()
+		_show_dossier(not _dossier_scroll.visible)
+		if _dossier_scroll.visible:
+			_refresh_dossier()
+
+
+func _show_dossier(shown: bool) -> void:
+	_dossier_scroll.visible = shown
+	_dossier_scroll.scroll_vertical = 0
+	_route_details.visible = not shown
+	_dossier_button.text = "Маршрут" if shown else "Досье"
+	_dossier_button.set_pressed_no_signal(shown)
+
+
+static func _dossier_text(content: Container) -> Label:
+	var label := _label(content, "", 15, TEXT)
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	return label
+
+
+static func _shipment_text(direction: String, shipment: Dictionary, port: int) -> String:
+	var system := Sector.system(Sector.system_of_site(port))
+	return "%s · %s, %d ед. · %s" % [direction, shipment.good_name, int(shipment.amount), system.name]
+
+
+static func _observation_text(report: Dictionary) -> String:
+	var data: Dictionary = report.data
+	var details := PackedStringArray(["радиус %s м" % _decimal(float(data.radius))])
+	if float(data.period) > 0.0:
+		details.append("период %s мин" % _decimal(float(data.period) / 60.0))
+	if float(data.atmosphere_height) > 0.0:
+		details.append("атмосфера %s м" % _decimal(float(data.atmosphere_height)))
+	return "%s · %s" % [report.name, " · ".join(details)]
 
 
 func close() -> void:
@@ -253,6 +370,8 @@ func is_open() -> bool:
 
 func _select_system(id: int) -> void:
 	if is_open() and _flight.system_known(id):
+		if _candidate != id:
+			_dossier_scroll.scroll_vertical = 0
 		_candidate = id
 		_clear_touches()
 		refresh()
@@ -288,12 +407,17 @@ func _input(event: InputEvent) -> void:
 		var system_id: int = _map_touches.get(event.index, -1)
 		_touches.erase(event.index)
 		_map_touches.erase(event.index)
+		if event.index == _dossier_touch:
+			_dossier_touch = -1
 		if not event.canceled:
 			if event.pressed:
 				var hit := _button_at(event.position)
 				if hit != null:
 					if hit not in _touches.values():
 						_touches[event.index] = hit
+				elif _dossier_scroll.visible and _dossier_scroll.get_global_rect().has_point(event.position):
+					if _dossier_touch < 0:
+						_dossier_touch = event.index
 				else:
 					var marker := _chart_system_at(event.position)
 					if marker >= 0 and marker not in _map_touches.values():
@@ -304,6 +428,8 @@ func _input(event: InputEvent) -> void:
 				_select_system(system_id)
 		get_viewport().set_input_as_handled()
 	elif event is InputEventScreenDrag:
+		if event.index == _dossier_touch:
+			_dossier_scroll.scroll_vertical = maxi(0, _dossier_scroll.scroll_vertical - roundi(event.relative.y))
 		var button: Button = _touches.get(event.index)
 		if button != null and not button.get_global_rect().has_point(event.position):
 			_touches.erase(event.index)
@@ -327,10 +453,11 @@ func _notification(what: int) -> void:
 func _clear_touches() -> void:
 	_touches.clear()
 	_map_touches.clear()
+	_dossier_touch = -1
 
 
 func _button_at(point: Vector2) -> Button:
-	for button: Button in [_plan_button, _cancel_route_button, _jump_button, _close_button]:
+	for button: Button in [_plan_button, _cancel_route_button, _jump_button, _dossier_button, _close_button]:
 		if not button.disabled and button.get_global_rect().has_point(point):
 			return button
 	for button: Button in _system_buttons.values():

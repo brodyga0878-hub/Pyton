@@ -4,6 +4,7 @@ signal destination_selected(site_id: int)
 signal orbit_requested(focus_id: int)
 signal rendezvous_requested(site_id: int, gap: int)
 signal rendezvous_finish_requested()
+signal survey_requested(site: int)
 signal dismissed()
 
 const Sector := preload("res://scripts/sector_catalog.gd")
@@ -35,6 +36,15 @@ const RENDEZVOUS_METRICS := [
 	["relative_speed", "Относительная скорость"],
 	["shift", "Смещение точки"],
 ]
+const SURVEY_METRICS := [
+	["radius", "Радиус модели"],
+	["period", "Период обращения"],
+	["gravity", "Гравитация на границе"],
+	["atmosphere_height", "Атмосферный слой"],
+	["atmosphere_density", "Относительная плотность"],
+	["resource", "Запас сырья"],
+	["spin", "Вращение"],
+]
 
 var _sheet: Control
 var _insets: MarginContainer
@@ -49,9 +59,18 @@ var _detail: Label
 var _view_button: Button
 var _trajectory_button: Button
 var _rendezvous_button: Button
+var _survey_button: Button
 var _navigation_panel: VBoxContainer
 var _trajectory_panel: VBoxContainer
 var _rendezvous_panel: VBoxContainer
+var _survey_panel: VBoxContainer
+var _survey_target: Label
+var _survey_state: Label
+var _survey_approach: Label
+var _survey_note: Label
+var _survey_values: Dictionary[String, Label] = {}
+var _survey_status: Dictionary = {}
+var _scan_button: Button
 var _rendezvous_gap_buttons: Dictionary[int, Button] = {}
 var _rendezvous_target: Label
 var _rendezvous_stage: Label
@@ -121,6 +140,10 @@ func build() -> void:
 	_rendezvous_button.toggle_mode = true
 	_rendezvous_button.add_theme_stylebox_override("pressed", _panel_style(Color("193952"), RENDEZVOUS, 8, 9))
 	_rendezvous_button.pressed.connect(_toggle_rendezvous)
+	_survey_button = _button(header, "Данные", 44)
+	_survey_button.custom_minimum_size.x = 100
+	_survey_button.toggle_mode = true
+	_survey_button.pressed.connect(_toggle_survey)
 	_close_button = _button(header, "Закрыть", 44)
 	_close_button.custom_minimum_size.x = 122
 	_close_button.pressed.connect(func() -> void: dismissed.emit())
@@ -180,6 +203,7 @@ func build() -> void:
 	_select_button.pressed.connect(_apply)
 	_build_trajectory_panel(panel)
 	_build_rendezvous_panel(panel)
+	_build_survey_panel(panel)
 	get_viewport().size_changed.connect(_size_changed)
 	_size_changed()
 	hide()
@@ -259,6 +283,39 @@ func _build_rendezvous_panel(parent: PanelContainer) -> void:
 	_rendezvous_action.add_theme_stylebox_override("hover", _panel_style(Color("264f6e"), RENDEZVOUS, 8, 9))
 	_rendezvous_action.pressed.connect(_request_rendezvous)
 	_rendezvous_panel.hide()
+
+
+func _build_survey_panel(parent: PanelContainer) -> void:
+	_survey_panel = VBoxContainer.new()
+	_survey_panel.add_theme_constant_override("separation", 8)
+	parent.add_child(_survey_panel)
+	_survey_target = _label(_survey_panel, "", 22, TEXT)
+	_survey_target.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_survey_state = _label(_survey_panel, "", 17, MINT)
+	_survey_state.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_survey_panel.add_child(HSeparator.new())
+	_survey_approach = _label(_survey_panel, "", 16, MUTED)
+	_survey_approach.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	for metric: Array in SURVEY_METRICS:
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 10)
+		_survey_panel.add_child(row)
+		var caption := _label(row, metric[1], 16, MUTED)
+		caption.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var value := _label(row, "", 16, TEXT)
+		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		_survey_values[metric[0]] = value
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_survey_panel.add_child(spacer)
+	_survey_note = _label(_survey_panel, "", 16, MUTED)
+	_survey_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_scan_button = _button(_survey_panel, "Сканировать", 52)
+	_scan_button.add_theme_stylebox_override("normal", _panel_style(Color("164f4c"), MINT, 8, 9))
+	_scan_button.add_theme_stylebox_override("hover", _panel_style(Color("206760"), MINT, 8, 9))
+	_scan_button.pressed.connect(_request_survey)
+	_survey_panel.hide()
 
 
 static func _build_metrics(parent: Container, metrics: Array) -> Dictionary[String, Label]:
@@ -358,6 +415,7 @@ func _set_convoy_order(order: Dictionary) -> void:
 func close() -> void:
 	_touches.clear()
 	_touch_sites.clear()
+	_survey_status.clear()
 	_flight = null
 	hide()
 
@@ -425,6 +483,8 @@ func _select_site(id: int) -> void:
 	_select_button.disabled = here
 	if _rendezvous_panel.visible:
 		_refresh_rendezvous()
+	elif _survey_panel.visible:
+		refresh_survey()
 
 
 func _apply() -> void:
@@ -447,20 +507,84 @@ func _toggle_rendezvous() -> void:
 	_set_panel("navigation" if _rendezvous_panel.visible else "rendezvous")
 
 
+func _toggle_survey() -> void:
+	_set_panel("navigation" if _survey_panel.visible else "survey")
+
+
 func _set_panel(panel: String) -> void:
 	_touch_sites.clear()
 	_navigation_panel.visible = panel == "navigation"
 	_trajectory_panel.visible = panel == "trajectory"
 	_rendezvous_panel.visible = panel == "rendezvous"
+	_survey_panel.visible = panel == "survey"
 	_chart.forecast_visible = _trajectory_panel.visible
 	_chart.rendezvous_visible = _rendezvous_panel.visible
 	_trajectory_button.set_pressed_no_signal(_trajectory_panel.visible)
 	_rendezvous_button.set_pressed_no_signal(_rendezvous_panel.visible)
+	_survey_button.set_pressed_no_signal(_survey_panel.visible)
 	if _trajectory_panel.visible:
 		_refresh_trajectory()
 	elif _rendezvous_panel.visible:
 		_refresh_rendezvous()
+	elif _survey_panel.visible:
+		refresh_survey()
 	_chart.queue_redraw()
+
+
+func refresh_survey() -> void:
+	if not is_open() or _flight == null or not _survey_panel.visible:
+		return
+	_survey_status = _flight.body_dossier(_candidate)
+	var known := bool(_survey_status.get("known", false))
+	var can_scan := bool(_survey_status.get("can_scan", false))
+	var range_to_center := float(_survey_status.get("range", -1.0))
+	var relative_speed := float(_survey_status.get("relative_speed", -1.0))
+	_survey_target.text = str(_survey_status.get("name", "Цель не выбрана"))
+	_survey_state.text = "Наблюдение сохранено" if known else "Данных наблюдения пока нет"
+	if not known and can_scan:
+		_survey_state.text = "Сканирование доступно"
+	_survey_state.add_theme_color_override("font_color", MINT if known or can_scan else MUTED)
+	_survey_approach.visible = not known and range_to_center >= 0.0 and relative_speed >= 0.0
+	if _survey_approach.visible:
+		_survey_approach.text = "До центра %s\nОтносительная скорость %s" % [
+			_distance_label(range_to_center).replace(".", ","), _number_label(relative_speed, "м/с"),
+		]
+	_survey_note.text = str(_survey_status.get("reason", "Выберите объект на карте."))
+	if known:
+		_survey_note.text = "Время наблюдения · %s" % _duration_label(float(_survey_status.recorded_at))
+	elif can_scan:
+		_survey_note.text = ""
+	_survey_note.visible = not _survey_note.text.is_empty()
+	_scan_button.visible = not known
+	_scan_button.disabled = not can_scan
+	_show_survey_values(_survey_status.get("data", {}) if known else {})
+
+
+func _show_survey_values(data: Dictionary) -> void:
+	var radius := float(data.get("radius", 0.0))
+	var period := float(data.get("period", 0.0))
+	var gravity := float(data.get("gravity", 0.0))
+	var atmosphere := float(data.get("atmosphere_height", 0.0))
+	var spin := float(data.get("spin", 0.0))
+	var resource := str(data.get("resource_name", ""))
+	_set_survey_value("radius", _distance_label(radius).replace(".", ",") if radius > 0.0 else "")
+	_set_survey_value("period", _duration_label(period) if period > 0.0 else "")
+	_set_survey_value("gravity", ("%.3f м/с²" % gravity).replace(".", ",") if gravity > 0.0 else "")
+	_set_survey_value("atmosphere_height", _distance_label(atmosphere).replace(".", ",") if atmosphere > 0.0 else "")
+	_set_survey_value("atmosphere_density", ("%.2f" % float(data.get("atmosphere_density", 0.0))).replace(".", ",") if atmosphere > 0.0 else "")
+	_set_survey_value("resource", "%s · %d ед." % [resource, int(data.get("reserve", 0))] if not resource.is_empty() else "")
+	_set_survey_value("spin", _number_label(rad_to_deg(spin), "°/с", true) if spin != 0.0 else "")
+
+
+func _set_survey_value(key: String, value: String) -> void:
+	var label := _survey_values[key]
+	label.get_parent().visible = not value.is_empty()
+	label.text = value
+
+
+func _request_survey() -> void:
+	if is_open() and _survey_panel.visible and not _scan_button.disabled:
+		survey_requested.emit(_candidate)
 
 
 func _refresh_rendezvous() -> void:
@@ -630,7 +754,7 @@ func _notification(what: int) -> void:
 
 
 func _button_at(point: Vector2) -> Button:
-	for button: Button in [_select_button, _orbit_button, _rendezvous_action, _rendezvous_finish, _view_button, _trajectory_button, _rendezvous_button, _close_button]:
+	for button: Button in [_select_button, _orbit_button, _rendezvous_action, _rendezvous_finish, _scan_button, _view_button, _trajectory_button, _rendezvous_button, _survey_button, _close_button]:
 		if button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(point):
 			return button
 	for button: Button in _focus_buttons.values():

@@ -53,6 +53,7 @@ func _ready() -> void:
 	_map.orbit_requested.connect(_map_orbit_action)
 	_map.rendezvous_requested.connect(_map_rendezvous_action)
 	_map.rendezvous_finish_requested.connect(_map_rendezvous_finish)
+	_map.survey_requested.connect(_map_survey)
 	_map.dismissed.connect(_close_map)
 	add_child(_galaxy)
 	_galaxy.build()
@@ -334,6 +335,7 @@ func _deliver_notice() -> void:
 		"convoy_order_accepted", "convoy_order_escorted", "convoy_order_failed", "convoy_order_paid",
 		"convoy_order_fire", "convoy_order_enemy_hit",
 		"flight_assist",
+		"survey_record",
 		"orbit_start", "orbit_complete", "orbit_abort", "orbit_cancel",
 		"rendezvous_start", "rendezvous_hold", "rendezvous_abort", "rendezvous_cancel", "rendezvous_finish",
 	]:
@@ -585,6 +587,15 @@ func _map_rendezvous_finish() -> void:
 		_close_map()
 		_deliver_notice()
 		_update_display(0.0)
+
+
+func _map_survey(site: int) -> void:
+	if not _map.is_open():
+		return
+	if flight.survey_action(site):
+		_io.trace("atlas_observation", {"site": site, "system": flight.system_id, "orbit_time": flight.orbit_time})
+		_deliver_notice()
+	_map.refresh_survey()
 
 
 func _close_map() -> void:
