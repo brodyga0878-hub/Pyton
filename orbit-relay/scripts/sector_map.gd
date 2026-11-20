@@ -7,6 +7,7 @@ signal rendezvous_finish_requested()
 signal dismissed()
 
 const Sector := preload("res://scripts/sector_catalog.gd")
+const Atmosphere := preload("res://scripts/atmosphere.gd")
 const Expedition := preload("res://scripts/expedition.gd")
 const Orbit := preload("res://scripts/orbit_ephemeris.gd")
 const Patrol := preload("res://scripts/patrol_encounter.gd")
@@ -402,6 +403,10 @@ func _select_site(id: int) -> void:
 		_detail.text += "\n%s · %d ед. в залежи" % [Sector.resource_name(entry.resource), remaining]
 		if entry.kind == "planet":
 			_detail.text += "\nТвёрдая поверхность"
+			var atmosphere := Atmosphere.profile(id)
+			if not atmosphere.is_empty():
+				_detail.text += "\nТолщина атмосферы · %d м" % roundi(float(atmosphere.height))
+				_detail.text += "\nОтн. плотность у поверхности · %s" % ("%.2f" % float(atmosphere.density)).replace(".", ",")
 	_select_button.disabled = here
 	if _rendezvous_panel.visible:
 		_refresh_rendezvous()
@@ -780,7 +785,31 @@ class SectorChart extends Control:
 			var point := _plane_point(position_3d, side)
 			minimum = minimum.min(point)
 			maximum = maximum.max(point)
+		var atmosphere := _atmosphere_outline()
+		if not atmosphere.is_empty():
+			var center := _plane_point(centers[atmosphere.site], side)
+			var radius := Vector2.ONE * float(atmosphere.outer_radius)
+			minimum = minimum.min(center - radius)
+			maximum = maximum.max(center + radius)
 		return Rect2(minimum, (maximum - minimum).max(Vector2.ONE))
+
+	func _atmosphere_outline() -> Dictionary:
+		var site := selected_site
+		if forecast_visible and not Atmosphere.profile(orbit_focus).is_empty():
+			site = orbit_focus
+		elif rendezvous_visible and not rendezvous.is_empty():
+			site = int(rendezvous.site)
+		if not centers.has(site):
+			return {}
+		var atmosphere := Atmosphere.profile(site)
+		if atmosphere.is_empty():
+			return {}
+		var radius := float(Sector.site(site).radius)
+		var tint: Color = atmosphere.color
+		return {
+			"site": site, "inner_radius": radius, "outer_radius": radius + float(atmosphere.height),
+			"color": tint.lightened(0.24),
+		}
 
 	static func _plane_point(position_3d: Vector3, side: bool) -> Vector2:
 		# East points right in both views. The side view replaces north with elevation.
@@ -821,6 +850,9 @@ class SectorChart extends Control:
 		var plane_y := _project(Vector3(0.0, star_plane_y, 0.0), plot, bounds).y
 		if side_view:
 			draw_dashed_line(Vector2(1.0, plane_y), Vector2(size.x - 1.0, plane_y), STAR_PLANE_COLOR, 1.2, 7.0, true, true)
+		var atmosphere := _atmosphere_outline()
+		if not atmosphere.is_empty():
+			_draw_atmosphere(atmosphere, plot, bounds)
 		if orbit.size() >= 2:
 			var track := PackedVector2Array()
 			track.resize(orbit.size())
@@ -863,6 +895,10 @@ class SectorChart extends Control:
 			label_boxes.append(_draw_rendezvous_legend(font, 165.0, "Точка сейчас", SYSTEM_FORECAST_COLOR, false))
 			if rendezvous.eta >= 0.0:
 				label_boxes.append(_draw_rendezvous_legend(font, label_boxes[-1].end.x + 6.0, "Точка встречи", RENDEZVOUS, true))
+		if not atmosphere.is_empty():
+			var y := 37.0 if forecast_visible or has_rendezvous else 10.0
+			var caption := "Граница атмосферы · %s" % Sector.site(atmosphere.site).name
+			label_boxes.append(_draw_line_legend(font, 165.0, caption, atmosphere.color, y))
 		if side_view:
 			var plane_label_y := plane_y - 30.0 if plane_y >= 66.0 else plane_y + 6.0
 			var plane_legend := Rect2(11.0, plane_label_y, 145.0, 24.0)
@@ -922,9 +958,18 @@ class SectorChart extends Control:
 					break
 		_draw_ship(ship)
 
-	func _draw_line_legend(font: Font, x: float, caption: String, color: Color) -> Rect2:
+	func _draw_atmosphere(atmosphere: Dictionary, plot: Rect2, bounds: Rect2) -> void:
+		var center: Vector3 = centers[atmosphere.site]
+		var marker := _project(center, plot, bounds)
+		var inner := _project(center + Vector3.RIGHT * float(atmosphere.inner_radius), plot, bounds).distance_to(marker)
+		var outer := _project(center + Vector3.RIGHT * float(atmosphere.outer_radius), plot, bounds).distance_to(marker)
+		var tint: Color = atmosphere.color
+		draw_arc(marker, (inner + outer) * 0.5, 0.0, TAU, 64, Color(tint, 0.12), outer - inner, true)
+		draw_arc(marker, outer, 0.0, TAU, 64, tint, 1.6, true)
+
+	func _draw_line_legend(font: Font, x: float, caption: String, color: Color, y := 10.0) -> Rect2:
 		var width := font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x + 40.0
-		var legend := Rect2(x, 10.0, width, 24.0)
+		var legend := Rect2(x, y, width, 24.0)
 		draw_rect(legend, CHART_BACKGROUND)
 		draw_line(legend.position + Vector2(7, 12), legend.position + Vector2(25, 12), color, 2.0, true)
 		draw_string(font, legend.position + Vector2(32, 17), caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, color)

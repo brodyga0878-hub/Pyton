@@ -37,6 +37,7 @@ var _condition: Label
 var _fuel: Label
 var _fuel_level: ProgressBar
 var _thermal_panel: VBoxContainer
+var _entry_readout: Label
 var _thermal_label: Label
 var _thermal_level: ProgressBar
 var _thermal_fill: StyleBoxFlat
@@ -131,7 +132,11 @@ func build() -> void:
 	_thermal_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_thermal_panel.add_theme_constant_override("separation", 3)
 	instrument_stack.add_child(_thermal_panel)
+	_entry_readout = _label(_thermal_panel, 15, INK)
+	_entry_readout.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_entry_readout.hide()
 	_thermal_label = _label(_thermal_panel, 16, CYAN)
+	_thermal_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_thermal_level = ProgressBar.new()
 	_thermal_level.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_thermal_level.step = 0.0
@@ -375,6 +380,10 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_refresh_disabled_actions()
 	_sync_fuel(sim.ship)
 	_sync_condition(sim.ship.hull, mining.ore_hold, mining.cargo_capacity)
+	var stellar: Dictionary = {} if parked else sim.thermal_status()
+	var entry: Dictionary = {} if parked else sim.atmosphere_status()
+	var show_entry := _prefer_entry_meter(stellar, entry, sim.scooping)
+	var entry_site := int(entry.site) if show_entry and (entry.near or entry.inside) else -1
 
 	if landed:
 		_sync_surface(sim, mining)
@@ -383,8 +392,8 @@ func sync(sim: RefCounted, delta: float) -> void:
 		if sim.contract_stage != 1 and patrol.get("phase") in [Patrol.OUTBOUND, Patrol.RETURN] and patrol_button.visible:
 			_guidance.text = str(patrol.get("reason", ""))
 	else:
-		_sync_flight(sim, scoop_status, itinerary, patrol, fire, convoy, rendezvous)
-	_sync_thermal({} if parked else sim.thermal_status(), sim.scooping)
+		_sync_flight(sim, scoop_status, itinerary, patrol, fire, convoy, rendezvous, entry_site)
+	_sync_thermal(stellar, entry, sim.scooping, show_entry)
 	if _notice_left > 0.0:
 		_notice_left -= delta
 		if _notice_left <= 0.0:
@@ -408,40 +417,72 @@ func _sync_condition(hull: float, cargo: int, capacity: int) -> void:
 	if _condition.get_theme_color("font_color") != color:
 		_condition.add_theme_color_override("font_color", color)
 
-func _sync_thermal(status: Dictionary, scooping: bool) -> void:
+func _prefer_entry_meter(stellar: Dictionary, entry: Dictionary, scooping: bool) -> bool:
+	var stellar_close: bool = stellar.get("visible", false) and stellar.distance <= Sector.SCOOP_OUTER
+	var stellar_priority: bool = stellar_close and (scooping or stellar.danger or stellar.blocked)
+	return entry.get("visible", false) and not stellar_priority
+
+func _sync_thermal(stellar: Dictionary, entry: Dictionary, scooping: bool, atmosphere: bool) -> void:
+	var status := entry if atmosphere else stellar
 	_thermal_panel.visible = status.get("visible", false)
+	_entry_readout.visible = atmosphere and (entry.near or entry.inside)
+	if _entry_readout.visible:
+		_entry_readout.text = ("%s · высота %.1f м\nОтн. %.1f · верт. %+.1f м/с" % [
+			entry.name, entry.altitude, entry.relative_speed, entry.vertical_speed,
+		]).replace(".", ",")
 	var guidance_color := INK
 	if _thermal_panel.visible:
+		var entering: bool = atmosphere and (entry.inside or (entry.near and entry.vertical_speed < 0.0))
+		var too_fast: bool = entering and entry.relative_speed > entry.safe_speed
 		var meter_color := CYAN
 		var suffix := " · остывает" if status.cooling else ""
-		if status.danger or status.level == "critical":
+		if status.get("danger", false) or status.level == "critical":
 			meter_color = ALERT
 			suffix = " · критический" if status.level == "critical" else " · опасность"
-		elif status.level == "warm" or status.level == "hot":
+		elif too_fast or status.level == "warm" or status.level == "hot":
 			meter_color = AMBER
-		_thermal_label.text = "Нагрев %d%%%s" % [roundi(status.heat), suffix]
+		var caption := "Нагрев корпуса" if atmosphere else "Нагрев"
+		if atmosphere and status.level == "critical":
+			caption = "Критический нагрев"
+			suffix = ""
+		_thermal_label.text = "%s %d%%%s" % [caption, roundi(status.heat), suffix]
 		_thermal_level.value = status.heat
 		if _thermal_fill.bg_color != meter_color:
 			_thermal_fill.bg_color = meter_color
 			_thermal_fill.border_color = meter_color
 			_thermal_label.add_theme_color_override("font_color", meter_color)
 		if not _jumping:
-			if status.level == "critical":
-				_guidance.text = "Критический перегрев. Корпус повреждается. Уходите от звезды."
-				guidance_color = ALERT
-			elif status.danger:
-				_guidance.text = "Опасная близость к звезде. Развернитесь от неё и увеличьте тягу."
-				guidance_color = ALERT
-			elif status.blocked:
-				_guidance.text = "Перегрев. Отойдите от звезды и дождитесь остывания."
-				if status.cooling and status.distance > Sector.SCOOP_OUTER:
-					_guidance.text = "Корпус остывает. Сбор топлива пока заблокирован."
-				guidance_color = ALERT
-			elif status.level == "hot" and scooping:
-				_guidance.text = "Высокий нагрев. Остановите сбор и отойдите от звезды."
-				guidance_color = AMBER
+			guidance_color = _entry_guidance(entry, too_fast) if atmosphere else _stellar_guidance(stellar, scooping)
 	if _guidance.get_theme_color("font_color") != guidance_color:
 		_guidance.add_theme_color_override("font_color", guidance_color)
+
+func _entry_guidance(entry: Dictionary, too_fast: bool) -> Color:
+	if entry.level == "critical":
+		_guidance.text = "Критический нагрев. Дождитесь остывания корпуса."
+		if too_fast:
+			_guidance.text = "Критический нагрев. Снизьте скорость до %d м/с." % int(entry.safe_speed)
+		return ALERT
+	if too_fast:
+		_guidance.text = "Снизьте скорость до %d м/с для безопасного входа." % int(entry.safe_speed)
+		return AMBER
+	return INK
+
+func _stellar_guidance(status: Dictionary, scooping: bool) -> Color:
+	if status.level == "critical":
+		_guidance.text = "Критический перегрев. Корпус повреждается. Уходите от звезды."
+		return ALERT
+	if status.danger:
+		_guidance.text = "Опасная близость к звезде. Развернитесь от неё и увеличьте тягу."
+		return ALERT
+	if status.blocked:
+		_guidance.text = "Перегрев. Отойдите от звезды и дождитесь остывания."
+		if status.cooling and status.distance > Sector.SCOOP_OUTER:
+			_guidance.text = "Корпус остывает. Сбор топлива пока заблокирован."
+		return ALERT
+	if status.level == "hot" and scooping:
+		_guidance.text = "Высокий нагрев. Остановите сбор и отойдите от звезды."
+		return AMBER
+	return INK
 
 func _sync_clock(sim: RefCounted) -> void:
 	var seconds := floori(sim.orbit_time + 0.000001)
@@ -507,7 +548,7 @@ func _sync_surface(sim: RefCounted, mining: RefCounted) -> void:
 			else:
 				_guidance.text = "Разверните добывающий модуль."
 
-func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictionary, patrol: Dictionary, fire: Dictionary, convoy: Dictionary, rendezvous: Dictionary) -> void:
+func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictionary, patrol: Dictionary, fire: Dictionary, convoy: Dictionary, rendezvous: Dictionary, entry_site: int) -> void:
 	var project_course := bool(sim.get("project_course"))
 	var convoy_course: bool = sim.convoy_course
 	var aimed_at_port := Sector.is_port(sim.target) and fire.is_empty() and not bool(sim.patrol_course) and not project_course and not convoy_course and not bool(sim.orbit_maneuver)
@@ -527,16 +568,22 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 		if not remote_system.is_empty():
 			_route_detail.text += " (%s)" % remote_system
 	var reference: int = sim.reference_site()
-	var speed: float = sim.relative_speed() if reference >= 0 else sim.speed()
-	var speed_text := ("%.1f" % speed).replace(".", ",") if near_surface else "%d" % roundi(speed)
-	_telemetry.text = "Скорость %s м/с  ·  Тяга %d%%" % [speed_text, sim.throttle * 100.0]
-	if reference >= 0:
-		_telemetry.text += "\nОтносительно «%s»" % sim.target_name(reference)
+	var entry_frame: bool = entry_site >= 0 and (reference == entry_site or sim.target == entry_site)
+	_telemetry.text = "Тяга %d%%" % (sim.throttle * 100.0)
+	if not entry_frame:
+		var speed: float = sim.relative_speed() if reference >= 0 else sim.speed()
+		var speed_text := ("%.1f" % speed).replace(".", ",") if near_surface else "%d" % roundi(speed)
+		_telemetry.text = "Скорость %s м/с  ·  %s" % [speed_text, _telemetry.text]
+		if reference >= 0:
+			_telemetry.text += "\nОтносительно «%s»" % sim.target_name(reference)
 	if aimed_at_port:
 		_telemetry.text += "\nКрен к порту %+.0f°" % rad_to_deg(sim.roll_error(sim.target))
 	elif near_surface:
-		var altitude := ("%.1f" % maxf(0.0, float(surface.altitude))).replace(".", ",")
-		_telemetry.text += "\nВысота %s м · уклон %.0f°" % [altitude, surface.slope]
+		if entry_frame:
+			_telemetry.text += " · Уклон %.0f°" % surface.slope
+		else:
+			var altitude := ("%.1f" % maxf(0.0, float(surface.altitude))).replace(".", ",")
+			_telemetry.text += "\nВысота %s м · уклон %.0f°" % [altitude, surface.slope]
 		_actions["dock"].tooltip_text = str(surface.reason)
 	if _jumping:
 		_route.text = "Прыжок  /  %s" % Sector.system(sim.jump_target).name

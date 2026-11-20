@@ -6,6 +6,7 @@ const StarView = preload("res://scripts/star_view.gd")
 const TrafficView = preload("res://scripts/traffic_view.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const Terrain = preload("res://scripts/surface_terrain.gd")
+const AtmosphereView = preload("res://scripts/atmosphere_view.gd")
 const STAR_DISTANCE := 2700.0
 const STATION_RADIAL_SEGMENTS := 20
 const BACKDROP_ORBIT_SECONDS := 28800.0
@@ -31,6 +32,7 @@ var _backdrop_orbit_offset := Vector3.ZERO
 var _backdrop_orbit_axis := Vector3.UP
 var _mining_rig: Node3D
 var _traffic: Node3D
+var _atmosphere: Node3D
 var _surface_views: Dictionary[int, Node3D] = {}
 var _stations: Dictionary[int, Node3D] = {}
 var _approaches: Dictionary[int, Node3D] = {}
@@ -72,6 +74,8 @@ func build() -> void:
 	_traffic = TrafficView.new()
 	add_child(_traffic)
 	_traffic.set_visual_profile(_visual_profile)
+	_atmosphere = AtmosphereView.new()
+	add_child(_atmosphere)
 	camera = Camera3D.new()
 	camera.fov = 67.0
 	camera.near = 0.2
@@ -151,6 +155,8 @@ func set_visual_profile(profile: int) -> void:
 	for layer: Node3D in [_star, _traffic]:
 		if is_instance_valid(layer):
 			layer.set_visual_profile(_visual_profile)
+	if is_instance_valid(_atmosphere):
+		_atmosphere.set_visual_profile(_visual_profile)
 
 
 func sync(sim: RefCounted, delta: float) -> void:
@@ -226,6 +232,16 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var deposit: Transform3D = sim.surface_deposit() if landed else _ship.global_transform
 	_mining_rig.sync(_ship.global_transform, deposit, int(sim.mining.phase) if landed else 0, sim.mining.progress(), float(sim.elapsed))
 	_traffic.sync(sim.traffic_contacts(), sim.combat_beams())
+	_atmosphere.sync(sim, camera, settled)
+	# Compatibility supports ordinary distance fog; keep it local and subtle.
+	# It never covers the CanvasLayer instruments and is absent outside air.
+	var haze: Dictionary = _atmosphere.local_haze()
+	_lighting.fog_enabled = bool(haze.get("inside", false))
+	if _lighting.fog_enabled:
+		_lighting.fog_light_color = haze.color
+		_lighting.fog_light_energy = 0.48
+		_lighting.fog_density = float(haze.density) * 0.0015
+		_lighting.fog_sky_affect = 0.0
 
 
 func _surface_safe_camera(at: Vector3, sim: RefCounted) -> Vector3:

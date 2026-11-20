@@ -8,6 +8,7 @@ const Orbit = preload("res://scripts/orbit_ephemeris.gd")
 const Dynamics = preload("res://scripts/orbital_dynamics.gd")
 const Navigation = preload("res://scripts/orbital_navigation.gd")
 const Rendezvous = preload("res://scripts/rendezvous_navigation.gd")
+const Atmosphere = preload("res://scripts/atmosphere.gd")
 const Terrain = preload("res://scripts/surface_terrain.gd")
 const Economy = preload("res://scripts/port_economy.gd")
 const Traffic = preload("res://scripts/sector_traffic.gd")
@@ -15,7 +16,7 @@ const Patrol = preload("res://scripts/patrol_encounter.gd")
 const Expedition = preload("res://scripts/expedition.gd")
 const FactionFronts = preload("res://scripts/faction_fronts.gd")
 const ConvoyOrders = preload("res://scripts/convoy_orders.gd")
-const SAVE_SCHEMA := 13
+const SAVE_SCHEMA := 14
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
@@ -95,6 +96,7 @@ var convoy_course := false
 var project_course := false
 var scooping := false
 var star_heat := 0.0
+var entry_heat := 0.0
 var system_id := Catalog.HOME_SYSTEM
 var jump_target := -1
 var jump_seconds_left := 0.0
@@ -130,6 +132,7 @@ var _rendezvous_site := -1
 var _rendezvous_gap := 150
 var _rendezvous_offset := Vector3.ZERO
 var _rendezvous_holding := false
+var _entry_site := -1
 
 
 func speed() -> float:
@@ -173,7 +176,9 @@ func time_status() -> Dictionary:
 		return {"allowed": false, "reason": "Сближение с конвоем"}
 	if docked >= 0 or landed:
 		return {"allowed": true, "reason": ""}
-	if star_heat >= HEAT_SCOOP_LIMIT:
+	if Atmosphere.sample(self, position, velocity).inside:
+		return {"allowed": false, "reason": "Полёт в атмосфере"}
+	if maxf(star_heat, entry_heat) >= HEAT_SCOOP_LIMIT:
 		return {"allowed": false, "reason": "Корпус ещё горячий"}
 	var star := Catalog.star_for(system_id)
 	for id: int in local_targets():
@@ -546,8 +551,10 @@ func _orbit_block_reason(focus: int, radius: float, relative_speed: float, band:
 		return "Снизьте скорость относительно цели до %d м/с" % int(ORBIT_MAX_SPEED)
 	if ship.fuel <= 0.0 or (starting and ship.fuel < ORBIT_MIN_FUEL):
 		return "Для манёвра нужно не менее %d ед. топлива" % int(ORBIT_MIN_FUEL)
-	if ship.hull <= ShipSystems.MIN_HULL or star_heat >= HEAT_SCOOP_LIMIT:
+	if ship.hull <= ShipSystems.MIN_HULL or maxf(star_heat, entry_heat) >= HEAT_SCOOP_LIMIT:
 		return "Манёвр требует исправного и остывшего корпуса"
+	if Atmosphere.sample(self, position, velocity).inside:
+		return "Выйдите из атмосферы для орбитального манёвра"
 	var star := Catalog.star_for(system_id)
 	for id: int in local_targets():
 		var clearance := Catalog.SCOOP_OUTER + 50.0 if id == star else float(Catalog.site(id).radius) + ORBIT_CLEARANCE
@@ -1131,7 +1138,7 @@ func scoop_status() -> Dictionary:
 		reason = "Отойдите от звезды до зоны сбора"
 	elif distance > Catalog.SCOOP_OUTER:
 		reason = "Подойдите к отмеченной зоне сбора"
-	elif star_heat >= HEAT_SCOOP_LIMIT:
+	elif maxf(star_heat, entry_heat) >= HEAT_SCOOP_LIMIT:
 		reason = "Корпус перегрет. Отойдите от звезды, чтобы остыть"
 	elif speed() > Catalog.SCOOP_SPEED:
 		reason = "Снизьте скорость до %d м/с" % int(Catalog.SCOOP_SPEED)
@@ -1157,6 +1164,67 @@ func thermal_status() -> Dictionary:
 		"blocked": star_heat >= HEAT_SCOOP_LIMIT,
 		"cooling": star_heat - _heat_target(distance) > 0.1,
 	}
+
+
+func atmosphere_status() -> Dictionary:
+	var air := Atmosphere.sample(self, position, velocity)
+	var in_flight := docked < 0 and not landed and jump_seconds_left <= 0.0
+	var equilibrium := Atmosphere.heat_target(air.relative_speed, air.density) if in_flight else 0.0
+	var altitude: float = air.altitude
+	if air.near:
+		var from_center := position - target_position(air.site)
+		if not from_center.is_zero_approx():
+			altitude = from_center.length() - Terrain.radius_at(air.site, from_center.normalized())
+	air.merge({
+		"name": target_name(air.site), "heat": entry_heat,
+		"visible": in_flight and (air.near or entry_heat >= 1.0),
+		"heating": equilibrium > entry_heat + 0.1,
+		"cooling": equilibrium < entry_heat - 0.1,
+		"level": _entry_heat_level(), "safe_speed": Atmosphere.SAFE_ENTRY_SPEED,
+	})
+	air.altitude = altitude
+	return air
+
+
+func _entry_heat_level() -> String:
+	if entry_heat >= HEAT_DAMAGE_LIMIT:
+		return "critical"
+	if entry_heat >= 65.0:
+		return "hot"
+	if entry_heat >= 35.0:
+		return "warm"
+	return "normal"
+
+
+func _atmosphere_step(delta: float) -> void:
+	var air := Atmosphere.sample(self, position + velocity * delta * 0.5, velocity)
+	var current: int = air.site if air.inside else -1
+	if _entry_site != current:
+		_entry_site = current
+		if current >= 0:
+			_announce("atmosphere_enter", "Вход в атмосферу планеты «%s»." % target_name(current))
+		else:
+			_announce("atmosphere_exit", "Корабль вышел из атмосферы.")
+	if air.inside:
+		velocity = Atmosphere.drag(velocity, air.drift, air.density, delta)
+	_update_entry_heat(delta, Atmosphere.heat_target(air.relative_speed, air.density), true)
+
+
+func _update_entry_heat(delta: float, equilibrium := 0.0, airborne := false) -> void:
+	if not airborne:
+		_entry_site = -1
+	if entry_heat == 0.0 and equilibrium == 0.0:
+		return
+	var previous := entry_heat
+	var response := 0.90 if equilibrium > entry_heat else 0.30
+	entry_heat = clampf(lerpf(entry_heat, equilibrium, 1.0 - exp(-response * delta)), 0.0, 100.0)
+	if entry_heat < 0.05:
+		entry_heat = 0.0
+	if airborne and entry_heat >= HEAT_DAMAGE_LIMIT:
+		var severity := inverse_lerp(HEAT_DAMAGE_LIMIT, 100.0, entry_heat)
+		ship.apply_damage(lerpf(0.7, 8.0, severity) * delta)
+		if previous < HEAT_DAMAGE_LIMIT:
+			_announce("atmosphere_damage", "Критический нагрев при входе. Корпус повреждается.")
 
 
 func _star_distance() -> float:
@@ -1235,6 +1303,8 @@ func jump_status(destination: int) -> Dictionary:
 		reason = "Выйдите в открытый космос"
 	elif autopilot or scooping:
 		reason = "Отключите автопилот и сбор топлива"
+	elif Atmosphere.sample(self, position, velocity).inside:
+		reason = "Выйдите из атмосферы"
 	elif patrol.in_danger(self):
 		reason = "Выйдите из зоны боя"
 	elif convoy_order.in_danger(self):
@@ -1423,12 +1493,14 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 	if docked >= 0:
 		_hold_docked_pose()
 		_update_star_heat(delta)
+		_update_entry_heat(delta)
 		_apply_patrol_result(patrol.step(self, delta))
 		_apply_convoy_result(convoy_order.step(self, delta))
 		return
 	if landed:
 		_hold_landed_pose()
 		_update_star_heat(delta)
+		_update_entry_heat(delta)
 		_apply_patrol_result(patrol.step(self, delta))
 		var mining_event := mining.update(delta)
 		match mining_event:
@@ -1445,6 +1517,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		else:
 			_charge_jump(delta)
 		_update_star_heat(delta)
+		_update_entry_heat(delta)
 		_apply_convoy_result(convoy_order.step(self, delta))
 		return
 	if manual_input:
@@ -1474,8 +1547,10 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		_announce("fuel_empty", "Бак пуст. Включён резервный ход до 42 м/с.")
 
 	if docked >= 0 or landed:
+		_update_entry_heat(delta)
 		_apply_convoy_result(convoy_order.step(self, delta))
 		return
+	_atmosphere_step(delta)
 	var next := position + velocity * delta
 	var obstacle := _obstacle_at(next)
 	if obstacle < 0:
@@ -1722,6 +1797,13 @@ func _autopilot_step(delta: float) -> void:
 	if not _approach_committed and direction.length_squared() > 0.25:
 		aim = direction.normalized()
 
+	var atmosphere := Atmosphere.profile(target)
+	if not atmosphere.is_empty() and _departure_leg == 0 and relative.dot(direction) < 0.0:
+		var clearance := maxf(0.0, relative.length() - target_radius - float(atmosphere.height))
+		var entry_limit := sqrt(Atmosphere.SAFE_ENTRY_SPEED * Atmosphere.SAFE_ENTRY_SPEED + 64.0 * clearance)
+		if entry_limit < max_speed:
+			max_speed = entry_limit
+			autopilot_phase = "Торможение перед входом" if clearance > 0.0 else "Снижение в атмосфере"
 	_point_towards(aim, delta)
 	if ship.fuel <= 0.0:
 		max_speed = minf(max_speed, RESERVE_SPEED)
@@ -1905,7 +1987,7 @@ func snapshot() -> Dictionary:
 		"landed_site": landed_site, "planned_target": planned_target, "mining": mining.snapshot(),
 		"landing_direction": [landing_direction.x, landing_direction.y, landing_direction.z],
 		"ship": ship.snapshot(), "market": market.snapshot(), "system_id": system_id, "jump_target": jump_target,
-		"patrol": patrol.snapshot(), "star_heat": star_heat,
+		"patrol": patrol.snapshot(), "star_heat": star_heat, "entry_heat": entry_heat,
 		"expedition": expedition.snapshot(), "factions": factions.snapshot(),
 		"convoy_order": convoy_order.snapshot(),
 	}
@@ -1915,6 +1997,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_entry := schema < 14
 	var pre_navigation := schema < 13
 	var pre_convoy_orders := schema < 12
 	var pre_thermal := schema < 11
@@ -1926,6 +2009,8 @@ func restore(state: Dictionary) -> bool:
 	var pre_fuel := schema < 4
 	var pre_sector := schema < 3
 	if not pre_thermal and not _number(state.get("star_heat"), 0.0, 100.0):
+		return false
+	if not pre_entry and not _number(state.get("entry_heat"), 0.0, 100.0):
 		return false
 	if not pre_navigation and not state.get("flight_assist") is bool:
 		return false
@@ -2134,6 +2219,8 @@ func restore(state: Dictionary) -> bool:
 	factions = restored_factions
 	convoy_order = restored_convoy_order
 	star_heat = 0.0 if pre_thermal else float(state.star_heat)
+	entry_heat = 0.0 if pre_entry else float(state.entry_heat)
+	_entry_site = -1
 	scooping = false
 	system_id = restored_system
 	jump_target = restored_jump
