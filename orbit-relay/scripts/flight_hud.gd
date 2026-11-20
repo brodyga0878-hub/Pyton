@@ -52,6 +52,13 @@ var _fuel: Label
 var _fuel_level: ProgressBar
 var _jump_fuel: Label
 var _pump_mode: Label
+var _combat_readout: VBoxContainer
+var _combat_weapon: Label
+var _combat_shield_status: Label
+var _combat_shield: ProgressBar
+var _combat_shield_fill: StyleBoxFlat
+var _combat_damage: Label
+var _projectile_alert: Label
 var _thermal_panel: VBoxContainer
 var _entry_readout: Label
 var _thermal_label: Label
@@ -110,6 +117,7 @@ var _dock_clearance_blocked := true
 var _gear_blocked := true
 var _frame_blocked := true
 var _fire_blocked := false
+var _ecm_blocked := true
 var _jumping := false
 var _jump_transit := false
 var _notice_left := 0.0
@@ -186,6 +194,7 @@ func build() -> void:
 	_jump_fuel = _label(instrument_stack, 16, CYAN)
 	_pump_mode = _label(instrument_stack, 15, CYAN)
 	_pump_mode.hide()
+	_build_combat_instrument(instrument_stack)
 	_thermal_panel = VBoxContainer.new()
 	_thermal_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_thermal_panel.add_theme_constant_override("separation", 3)
@@ -327,6 +336,11 @@ func build() -> void:
 	fire_button.add_theme_stylebox_override("normal", _box(Color("482b32"), ALERT, 9, 7.0))
 	fire_button.add_theme_stylebox_override("hover", _box(Color("633c45"), ALERT, 9, 7.0))
 	fire_button.add_theme_stylebox_override("pressed", _box(Color("78505a"), ALERT, 9, 7.0))
+	_button(_port_tools, "ecm", "РЭБ")
+	var ecm: Button = _actions["ecm"]
+	ecm.add_theme_color_override("font_color", AMBER)
+	ecm.add_theme_stylebox_override("normal", _box(Color("443323"), AMBER, 9, 7.0))
+	ecm.hide()
 	_orbital_mining_tools = HBoxContainer.new()
 	_orbital_mining_tools.add_theme_constant_override("separation", 7)
 	right.add_child(_orbital_mining_tools)
@@ -347,6 +361,28 @@ func build() -> void:
 	get_viewport().size_changed.connect(_update_safe_area)
 	_update_safe_area()
 	_apply_touch_layout()
+
+func _build_combat_instrument(parent: VBoxContainer) -> void:
+	_combat_readout = VBoxContainer.new()
+	_combat_readout.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_combat_readout.add_theme_constant_override("separation", 3)
+	parent.add_child(_combat_readout)
+	_combat_weapon = _label(_combat_readout, 15, INK)
+	_combat_weapon.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_combat_shield_status = _label(_combat_readout, 15, CYAN)
+	_combat_shield = ProgressBar.new()
+	_combat_shield.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_combat_shield.max_value = 1.0
+	_combat_shield.step = 0.0
+	_combat_shield.show_percentage = false
+	_combat_shield.custom_minimum_size.y = 6.0
+	_combat_shield.add_theme_stylebox_override("background", _box(Color("12313d"), LINE, 4, 0.0))
+	_combat_shield_fill = _box(CYAN, CYAN, 4, 0.0)
+	_combat_shield.add_theme_stylebox_override("fill", _combat_shield_fill)
+	_combat_readout.add_child(_combat_shield)
+	_combat_damage = _label(_combat_readout, 15, ALERT)
+	_projectile_alert = _label(_combat_readout, 16, ALERT)
+	_combat_readout.hide()
 
 func _build_docking_instrument() -> void:
 	var readout := _panel(_safe, Vector2(0.5, 0), Rect2(-196, 24, 392, 148))
@@ -553,7 +589,8 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var fire: Dictionary = sim.fire_status() if fire_button.visible else {}
 	fire_button.tooltip_text = str(fire.get("reason", ""))
 	_fire_blocked = not fire.get("ok", false)
-	var flight_tools := patrol_button.visible or convoy_button.visible or fire_button.visible or approach_active
+	_sync_combat({} if parked or _jumping else sim.combat_status())
+	var flight_tools: bool = patrol_button.visible or convoy_button.visible or fire_button.visible or _actions["ecm"].visible or approach_active
 	_port_tools.visible = port_services or flight_tools
 	_sync_orbital_mining({} if parked or _jumping else sim.orbital_mining_status())
 	_right_panel.visible = not _departure_active
@@ -652,6 +689,40 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_notice_left -= delta
 		if _notice_left <= 0.0:
 			_notice_panel.hide()
+
+func _sync_combat(status: Dictionary) -> void:
+	var ecm: Button = _actions["ecm"]
+	var incoming := bool(status.get("projectile", false))
+	_combat_readout.visible = bool(status.get("visible", false)) or incoming
+	ecm.visible = incoming
+	_ecm_blocked = not bool(status.get("ecm_ok", false))
+	ecm.tooltip_text = str(status.get("ecm_reason", "")) if _ecm_blocked else "Сбить приближающуюся ракету"
+	if not _combat_readout.visible:
+		return
+	var heat := clampi(roundi(float(status.heat)), 0, 100)
+	_combat_weapon.text = "%s · нагрев %d%%" % [str(status.name), heat]
+	var heat_color := AMBER if heat >= 65 else INK
+	if str(status.get("fire_blocked", "")).begins_with("Перегрев"):
+		heat_color = ALERT
+	if _combat_weapon.get_theme_color("font_color") != heat_color:
+		_combat_weapon.add_theme_color_override("font_color", heat_color)
+	var shield_max := maxf(0.0, float(status.shield_max))
+	var shield := clampf(float(status.shield), 0.0, shield_max)
+	_combat_shield.visible = shield_max > 0.0
+	_combat_shield_status.text = "Щит %d / %d ед." % [roundi(shield), roundi(shield_max)] if _combat_shield.visible else "Щит 0 ед."
+	if _combat_shield.visible:
+		_combat_shield.value = shield / shield_max
+		var shield_color := CYAN if _combat_shield.value >= 0.35 else AMBER
+		if _combat_shield_fill.bg_color != shield_color:
+			_combat_shield_fill.bg_color = shield_color
+			_combat_shield_fill.border_color = shield_color
+	var damaged := str(status.get("damaged", ""))
+	_combat_damage.visible = not damaged.is_empty()
+	if _combat_damage.visible:
+		_combat_damage.text = "Повреждено устройство РЭБ" if damaged == "ecm" else "Повреждён лазер «Нить»"
+	_projectile_alert.visible = incoming
+	if incoming:
+		_projectile_alert.text = "Приближается ракета · %d м" % ceili(float(status.projectile_distance))
 
 func _sync_remote_rig(status: Dictionary, docked: bool, landed: bool) -> void:
 	_rig_status = status
@@ -1178,6 +1249,7 @@ func _refresh_disabled_actions() -> void:
 		var blocked := (action == "dock" and (_lift_blocked or _departure_blocked)) or (action == "mine" and _mining_blocked)
 		blocked = blocked or (action == "scoop" and _scoop_blocked) or (action == "time" and _time_blocked)
 		blocked = blocked or (action == "patrol" and _patrol_blocked) or (action == "convoy" and _convoy_blocked) or (action == "fire" and _fire_blocked)
+		blocked = blocked or (action == "ecm" and (_ecm_blocked or _time_paused))
 		blocked = blocked or (action == "rendezvous_finish" and _rendezvous_finish_blocked)
 		blocked = blocked or (action == "dock_sync" and _dock_sync_blocked)
 		blocked = blocked or (action == "dock_clearance" and _dock_clearance_blocked)

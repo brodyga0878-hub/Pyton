@@ -148,6 +148,8 @@ var _fragment_paints: Dictionary[String, ShaderMaterial] = {}
 var _mining_beam: Node3D
 var _mining_beam_halo: MeshInstance3D
 var _mining_impact: MeshInstance3D
+var _combat_projectile: Node3D
+var _combat_projectile_trail: MeshInstance3D
 var _traffic: Node3D
 var _atmosphere: Node3D
 var _hyper_transit: HyperTransitOverlay
@@ -196,6 +198,7 @@ func build() -> void:
 	_mining_rig = MiningRigView.new()
 	add_child(_mining_rig)
 	_build_mining_pulse()
+	_build_combat_projectile()
 	_traffic = TrafficView.new()
 	add_child(_traffic)
 	_traffic.set_visual_profile(_visual_profile)
@@ -484,6 +487,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_mining_rig.sync(_ship.global_transform, deposit, int(sim.mining.phase) if landed else MiningRig.STOWED, sim.mining.progress(), float(sim.elapsed))
 	_sync_fragments(sim.local_fragments(), position_now, float(sim.orbit_time))
 	_sync_mining_pulse({} if transit else sim.orbital_mining_beam())
+	_sync_combat_projectile({} if transit or settled else sim.combat_status())
 	_traffic.sync(sim.traffic_contacts(), sim.combat_beams())
 	_atmosphere.sync(sim, camera, settled)
 	# Compatibility supports ordinary distance fog; keep it local and subtle.
@@ -630,6 +634,41 @@ func _sync_mining_pulse(shot: Dictionary) -> void:
 	_mining_impact.position = finish
 	_mining_impact.scale = Vector3.ONE * fade
 	_mining_impact.visible = _visual_profile > 0
+
+func _build_combat_projectile() -> void:
+	_combat_projectile = Node3D.new()
+	_combat_projectile.name = "CombatProjectile"
+	add_child(_combat_projectile)
+	var body := CapsuleMesh.new()
+	body.radius = 0.43
+	body.height = 2.18
+	body.radial_segments = 10
+	body.rings = 4
+	var shell := _mesh(_combat_projectile, body, _light(Color("#ffd199")), Vector3.ZERO)
+	shell.rotation_degrees.x = 90.0
+	var glow := _light(Color(1.0, 0.34, 0.17, 0.60))
+	glow.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	glow.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	_combat_projectile_trail = _cylinder(_combat_projectile, glow, Vector3(0.0, 0.0, 3.24), 0.02, 0.62, 4.3, 8)
+	_combat_projectile.hide()
+
+
+func _sync_combat_projectile(status: Dictionary) -> void:
+	_combat_projectile.visible = bool(status.get("projectile", false))
+	if not _combat_projectile.visible:
+		return
+	var position_now: Vector3 = status.position
+	var velocity: Vector3 = status.velocity
+	if not position_now.is_finite() or not velocity.is_finite():
+		_combat_projectile.hide()
+		return
+	var direction := Vector3.FORWARD if velocity.is_zero_approx() else velocity.normalized()
+	var up := Vector3.RIGHT if absf(direction.y) > 0.97 else Vector3.UP
+	_combat_projectile.position = position_now
+	_combat_projectile.basis = Basis.looking_at(direction, up)
+	var exhaust_scale := clampf(velocity.length() / 48.0, 0.65, 1.7)
+	_combat_projectile_trail.scale.y = exhaust_scale
+	_combat_projectile_trail.position.z = 1.09 + 2.15 * exhaust_scale
 
 
 func _update_stellar_light(light: DirectionalLight3D, source: Vector3, observer: Vector3, strength: float) -> void:

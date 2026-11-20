@@ -9,6 +9,7 @@ signal customs_payment_requested()
 signal fuel_module_removed(module: String)
 signal pump_mode_requested(mode: String)
 signal drive_selected(drive: String)
+signal weapon_selected(weapon: String)
 signal dismissed()
 
 const TEXT := Color("e8f4fa")
@@ -21,9 +22,11 @@ const Crew := preload("res://scripts/crew.gd")
 const Economy := preload("res://scripts/port_economy.gd")
 const Factions := preload("res://scripts/faction_fronts.gd")
 const EQUIPMENT_SERVICES := ["mining_laser", "fragment_collector", "hydrogen_scoop", "fuel_pump", "range_drive"]
+const DEFENSE_SERVICES := ["combat_shield", "combat_ecm", "combat_focus", "combat_repair"]
 const FUEL_MODULES := {"hydrogen_scoop": "scoop", "fuel_pump": "pump"}
 const PUMP_MODES := {"off": "Выкл.", "reaction": "В реактивный", "jump": "В прыжковый"}
 const DRIVE_LABELS := {"standard": ShipSystems.STANDARD_DRIVE_NAME, "range": ShipSystems.RANGE_DRIVE_NAME}
+const WEAPON_LABELS := {"pulse": "Каскад", "focus": "Нить"}
 
 enum StationPage { SERVICES, CREW, YARD, CUSTOMS, MINING }
 
@@ -65,8 +68,16 @@ var _customs_pay: Button
 var _customs_receipt_title: Label
 var _customs_receipt: Label
 var _customs_other_debts: Label
+var _equipment: VBoxContainer
+var _equipment_flight_tab: Button
+var _equipment_defense_tab: Button
 var _mining: VBoxContainer
 var _mining_toggle: Button
+var _defense: VBoxContainer
+var _defense_open := false
+var _weapon_summary: Label
+var _module_condition: Label
+var _weapon_buttons: Dictionary[String, Button] = {}
 var _fuel_remove_buttons: Dictionary[String, Button] = {}
 var _drive_summary: Label
 var _drive_buttons: Dictionary[String, Button] = {}
@@ -162,14 +173,23 @@ func build() -> void:
 	_build_crew(content)
 	_build_yard(content)
 	_build_customs(content)
+	_equipment = VBoxContainer.new()
+	_equipment.add_theme_constant_override("separation", 8)
+	content.add_child(_equipment)
+	var equipment_tabs := HBoxContainer.new()
+	equipment_tabs.add_theme_constant_override("separation", 8)
+	_equipment.add_child(equipment_tabs)
+	_equipment_flight_tab = _add_equipment_tab(equipment_tabs, "Добыча и полёт", false)
+	_equipment_defense_tab = _add_equipment_tab(equipment_tabs, "Оборона", true)
 	_mining = VBoxContainer.new()
 	_mining.add_theme_constant_override("separation", 8)
-	content.add_child(_mining)
+	_equipment.add_child(_mining)
 	_add_service("mining_laser", "Горный лазер", "Откалывает сырьё от астероидов в полёте", _mining)
 	_add_service("fragment_collector", "Сборщик обломков", "Переносит обломок в свободную ячейку трюма", _mining)
 	_add_fuel_module("hydrogen_scoop", "Сборщик водорода", "Наполняет канистры у звёзд и газовых гигантов")
 	_add_fuel_module("fuel_pump", "Топливный насос", "Переливает канистры в выбранный бак")
 	_build_drive_selection()
+	_build_defense()
 	_transfers = VBoxContainer.new()
 	_transfers.add_theme_constant_override("separation", 8)
 	content.add_child(_transfers)
@@ -191,6 +211,7 @@ func open(sim: RefCounted, fuel_only := false) -> void:
 	_sim = sim
 	_fuel_only = fuel_only
 	_station_page = StationPage.SERVICES
+	_defense_open = false
 	_cargo_index = 0
 	_discard_pending_good = ""
 	_touches.clear()
@@ -227,7 +248,11 @@ func refresh() -> void:
 			StationPage.CREW: _refresh_crew()
 			StationPage.YARD: _refresh_yard()
 			StationPage.CUSTOMS: _refresh_customs()
-			StationPage.MINING: _refresh_equipment()
+			StationPage.MINING:
+				if _defense_open:
+					_refresh_defense()
+				else:
+					_refresh_equipment()
 			_: _refresh_services()
 
 
@@ -240,7 +265,8 @@ func _refresh_services() -> void:
 		_cargo_detail.text = "Ёмкость %d ед." % int(profile.expanded_cargo)
 	else:
 		_cargo_detail.text = "Ёмкость %d → %d ед." % [int(profile.cargo), int(profile.expanded_cargo)]
-	_refresh_service_buttons(_action_buttons.keys().filter(func(action: String) -> bool: return action not in EQUIPMENT_SERVICES))
+	_refresh_service_buttons(_action_buttons.keys().filter(func(action: String) -> bool:
+		return action not in EQUIPMENT_SERVICES and action not in DEFENSE_SERVICES))
 
 
 func _refresh_equipment() -> void:
@@ -266,6 +292,24 @@ func _refresh_equipment() -> void:
 			button.tooltip_text = "Сначала установите привод дальнего хода"
 
 
+func _refresh_defense() -> void:
+	_refresh_service_buttons(DEFENSE_SERVICES)
+	var status: Dictionary = _sim.combat_equipment_status()
+	_weapon_summary.text = "Активный лазер · «%s»" % status.name
+	match status.damaged:
+		"focus": _module_condition.text = "Повреждён лазер «Нить»"
+		"ecm": _module_condition.text = "Повреждён модуль помех"
+		_: _module_condition.text = "Восстанавливает повреждённое оборудование"
+	if status.damaged.is_empty():
+		_action_buttons["combat_repair"].text = "Модули исправны"
+	for id: String in _weapon_buttons:
+		var button := _weapon_buttons[id]
+		var selected: bool = status.weapon == id
+		button.set_pressed_no_signal(selected)
+		button.disabled = selected or not status.station or (id == "focus" and (not status.focus_owned or status.damaged == id))
+		button.add_theme_color_override("font_disabled_color", MINT if selected else MUTED)
+
+
 func _refresh_service_buttons(actions: Array) -> void:
 	for action: String in actions:
 		var offer: Dictionary = _sim.service_offer(action)
@@ -283,7 +327,7 @@ func _refresh_service_buttons(actions: Array) -> void:
 			var verb := "Установить"
 			match action:
 				"refuel", "jump_refuel": verb = "Заправить"
-				"repair": verb = "Починить"
+				"repair", "combat_repair": verb = "Починить"
 			button.text = "%s · %d кр." % [verb, offer.cost]
 
 
@@ -317,7 +361,13 @@ func _show_page() -> void:
 	_crew.visible = crew_open
 	_yard.visible = yard_open
 	_customs.visible = customs_open
-	_mining.visible = mining_open
+	_equipment.visible = mining_open
+	_mining.visible = not _defense_open
+	_defense.visible = _defense_open
+	_equipment_flight_tab.set_pressed_no_signal(not _defense_open)
+	_equipment_defense_tab.set_pressed_no_signal(_defense_open)
+	_equipment_flight_tab.disabled = not _defense_open
+	_equipment_defense_tab.disabled = _defense_open
 	_transfers.visible = _fuel_only
 
 
@@ -675,7 +725,10 @@ func is_open() -> bool:
 
 
 func _request_service(action: String) -> void:
-	var page := StationPage.MINING if action in EQUIPMENT_SERVICES else StationPage.SERVICES
+	var defense := action in DEFENSE_SERVICES
+	var page := StationPage.MINING if defense or action in EQUIPMENT_SERVICES else StationPage.SERVICES
+	if page == StationPage.MINING and defense != _defense_open:
+		return
 	if is_open() and not _fuel_only and _station_page == page and _sim.service_offer(action).allowed:
 		# A purchase can change the price shown for another service.
 		_touches.clear()
@@ -683,7 +736,7 @@ func _request_service(action: String) -> void:
 
 
 func _request_fuel_module_removal(module: String) -> void:
-	if not is_open() or _fuel_only or _station_page != StationPage.MINING:
+	if not is_open() or _fuel_only or _station_page != StationPage.MINING or _defense_open:
 		return
 	var status: Dictionary = _sim.fuel_equipment_status()
 	if status.station and status[FUEL_MODULES[module]]:
@@ -701,12 +754,22 @@ func _request_pump_mode(mode: String) -> void:
 
 
 func _request_drive_selection(drive: String) -> void:
-	if not is_open() or _fuel_only or _station_page != StationPage.MINING or not _drive_buttons.has(drive):
+	if not is_open() or _fuel_only or _station_page != StationPage.MINING or _defense_open:
 		return
 	var status: Dictionary = _sim.jump_drive_status()
-	if status.can_select and status.id != drive and (drive != "range" or status.have_range):
+	if status.can_select and status.id != drive and (drive == "standard" or (drive == "range" and status.have_range)):
 		_touches.clear()
 		drive_selected.emit(drive)
+
+
+func _request_weapon_selection(weapon: String) -> void:
+	if not is_open() or _fuel_only or _station_page != StationPage.MINING or not _defense_open:
+		return
+	var status: Dictionary = _sim.combat_equipment_status()
+	var usable: bool = weapon == "pulse" or (weapon == "focus" and status.focus_owned and status.damaged != weapon)
+	if status.station and status.weapon != weapon and usable:
+		_touches.clear()
+		weapon_selected.emit(weapon)
 
 
 func _request_transfer(destination: String) -> void:
@@ -812,6 +875,47 @@ func _build_drive_selection() -> void:
 		_drive_buttons[id] = button
 
 
+func _add_equipment_tab(parent: HBoxContainer, label: String, defense: bool) -> Button:
+	var button := _button(parent)
+	button.text = label
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.toggle_mode = true
+	button.add_theme_color_override("font_disabled_color", MINT)
+	button.pressed.connect(_select_equipment_page.bind(defense))
+	return button
+
+
+func _select_equipment_page(defense: bool) -> void:
+	if not is_open() or _station_page != StationPage.MINING or _defense_open == defense:
+		return
+	_defense_open = defense
+	_touches.clear()
+	_show_page()
+	refresh()
+
+
+func _build_defense() -> void:
+	_defense = VBoxContainer.new()
+	_defense.add_theme_constant_override("separation", 8)
+	_equipment.add_child(_defense)
+	_add_service("combat_shield", "Генератор щита", "Поглощает урон, пока есть заряд", _defense)
+	_add_service("combat_ecm", "Модуль помех", "Срывает наведение входящих ракет", _defense)
+	_add_service("combat_focus", "Лазер «Нить»", "Стреляет дальше и быстрее нагревается", _defense)
+	_module_condition = _add_service("combat_repair", "Ремонт модулей", "", _defense)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	_defense.add_child(row)
+	_weapon_summary = _label(row, "", 17, MINT)
+	_weapon_summary.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_weapon_summary.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	for id: String in WEAPON_LABELS:
+		var button := _button(row)
+		button.text = WEAPON_LABELS[id]
+		button.toggle_mode = true
+		button.pressed.connect(_request_weapon_selection.bind(id))
+		_weapon_buttons[id] = button
+
+
 func _build_pump_controls() -> void:
 	_pump_controls = VBoxContainer.new()
 	_pump_controls.add_theme_constant_override("separation", 5)
@@ -901,7 +1005,11 @@ func _button_at(point: Vector2) -> Button:
 	elif _station_page == StationPage.CUSTOMS:
 		buttons = [_customs_pay]
 	elif _station_page == StationPage.MINING:
-		buttons += _fuel_remove_buttons.values() + _drive_buttons.values()
+		buttons += [_equipment_flight_tab, _equipment_defense_tab]
+		if _defense_open:
+			buttons += _weapon_buttons.values()
+		else:
+			buttons += _fuel_remove_buttons.values() + _drive_buttons.values()
 	for button: Button in buttons:
 		if not button.disabled and button.is_visible_in_tree() and button.get_global_rect().has_point(point):
 			return button

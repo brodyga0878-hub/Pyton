@@ -71,6 +71,7 @@ func _ready() -> void:
 	_services.fuel_module_removed.connect(_remove_fuel_module)
 	_services.pump_mode_requested.connect(_set_pump_mode)
 	_services.drive_selected.connect(_select_drive)
+	_services.weapon_selected.connect(_select_weapon)
 	_services.jettison_requested.connect(_jettison_cargo)
 	_services.crew_requested.connect(_crew_action)
 	_services.ship_exchange_requested.connect(_ship_exchange)
@@ -208,6 +209,8 @@ func _handle_action(action: String) -> void:
 			flight.convoy_action()
 		"fire":
 			flight.fire_action()
+		"ecm":
+			flight.use_ecm()
 		"mine":
 			flight.mine_action()
 		"mining_pulse":
@@ -396,6 +399,8 @@ func _deliver_notice() -> void:
 		"mining_pulse", "fragment_collected",
 		"jump_planned", "jump_committed", "jump_complete", "route_canceled",
 		"service_range_drive", "jump_drive_selected",
+		"service_combat_shield", "service_combat_ecm", "service_combat_focus", "service_combat_repair",
+		"combat_weapon_selected", "combat_missile", "combat_missile_hit", "combat_ecm",
 		"market_buy", "market_sell", "service_repair", "service_cargo", "hull_damage", "contract_leg",
 		"passenger_accepted", "passenger_overdue", "passenger_paid", "passenger_late", "passenger_canceled",
 		"passenger_debt_paid", "passenger_course",
@@ -721,6 +726,15 @@ func _service_purchase(action: String) -> void:
 	if not _services.is_open():
 		return
 	flight.service_action(action)
+	_deliver_notice()
+	_services.refresh()
+	_update_display(0.0)
+
+
+func _select_weapon(weapon: String) -> void:
+	if not _services.is_open():
+		return
+	flight.select_weapon(weapon)
 	_deliver_notice()
 	_services.refresh()
 	_update_display(0.0)

@@ -144,18 +144,20 @@ func step(sim: RefCounted, delta: float) -> Dictionary:
 	_attack_delay = ENEMY_DELAY
 	_enemy_flash = BEAM_DURATION
 	_enemy_beam = {"from": source, "to": sim.position, "hostile": true}
-	return {"event": "patrol_enemy_hit", "message": "Импульс рейдера повредил корпус.", "damage": 6.0 + sim.system_id}
+	return {"event": "patrol_enemy_hit", "message": "Импульс рейдера повредил корпус.",
+		"damage": 6.0 + sim.system_id, "source": source}
 
 
-func fire_status(sim: RefCounted) -> Dictionary:
+func fire_status(sim: RefCounted, range_bonus := 0.0) -> Dictionary:
 	if not in_danger(sim):
 		return {"ok": false, "reason": "Нет цели для огня", "distance": -1.0}
 	var at := _enemy_position(sim)
 	var offset: Vector3 = at - sim.position
 	var distance := offset.length()
+	var effective_range := BEAM_RANGE + (maxf(0.0, range_bonus) if is_finite(range_bonus) else 0.0)
 	var reason := "Можно стрелять"
-	if distance > BEAM_RANGE:
-		reason = "Сблизьтесь до %d м" % int(BEAM_RANGE)
+	if distance > effective_range:
+		reason = "Сблизьтесь до %d м" % int(effective_range)
 	elif distance <= 0.01 or sim.forward().dot(offset / distance) < AIM_COSINE:
 		reason = "Наведите нос на рейдера"
 	elif not sim.combat_line_clear(sim.position, at):
@@ -165,8 +167,8 @@ func fire_status(sim: RefCounted) -> Dictionary:
 	return {"ok": reason == "Можно стрелять", "reason": reason, "distance": distance}
 
 
-func fire(sim: RefCounted) -> Dictionary:
-	var ready := fire_status(sim)
+func fire(sim: RefCounted, range_bonus := 0.0) -> Dictionary:
+	var ready := fire_status(sim, range_bonus)
 	if not ready.ok:
 		return {"ok": false, "event": "", "message": ready.reason}
 	_shot_delay = PLAYER_DELAY

@@ -27,7 +27,8 @@ const Customs = preload("res://scripts/customs.gd")
 const UnattendedMining = preload("res://scripts/unattended_mining.gd")
 const OrbitalMining = preload("res://scripts/orbital_mining.gd")
 const MissionCalendar = preload("res://scripts/mission_calendar.gd")
-const SAVE_SCHEMA := 36
+const CombatSystems = preload("res://scripts/combat_systems.gd")
+const SAVE_SCHEMA := 37
 const REMOTE_RIG_ACCESS_DISTANCE := 20.0
 const MINING_PULSE_RANGE := 200.0
 const MINING_PULSE_FUEL := 0.4
@@ -35,6 +36,8 @@ const MINING_BEAM_DURATION := 0.24
 const FRAGMENT_COLLECT_RANGE := 145.0
 const FRAGMENT_COLLECT_SPEED := 7.0
 const FUEL_PUMP_THRESHOLD := 0.35
+const MISSILE_DAMAGE := 28.0
+const MISSILE_HIT_RADIUS := 3.0
 const SHIPYARD_PORTS := [0, 10, Catalog.FRINGE_ARRIVAL_PORT]
 const TIME_SCALES := [1, 4, 16]
 const MAX_FLIGHT_STEP := 1.0 / 60.0
@@ -142,6 +145,7 @@ var frame := FlightFrame.new()
 var customs := Customs.new()
 var remote_rig := UnattendedMining.new()
 var orbital_mining := OrbitalMining.new()
+var combat := CombatSystems.new()
 var _mining_beam: Dictionary = {}
 var convoy_course := false
 var project_course := false
@@ -283,7 +287,7 @@ func time_status() -> Dictionary:
 		return {"allowed": false, "reason": "Сближение с объектом" if not _rendezvous_holding else "Удержание позиции"}
 	if scooping:
 		return {"allowed": false, "reason": "Сбор топлива"}
-	if patrol.in_danger(self):
+	if patrol.in_danger(self) or not combat.projectile_status().is_empty():
 		return {"allowed": false, "reason": "Боевой контакт"}
 	if convoy_course or convoy_order.in_danger(self):
 		return {"allowed": false, "reason": "Сближение с конвоем"}
@@ -1858,8 +1862,59 @@ func project_action() -> bool:
 	return true
 
 
+func combat_equipment_status() -> Dictionary:
+	return {
+		"weapon": combat.weapon, "name": combat.profile().name, "shield_fitted": combat.shield_fitted,
+		"ecm_fitted": combat.ecm_fitted, "focus_owned": combat.focus_owned, "damaged": combat.damaged,
+		"station": station_services_available(),
+	}
+
+
+func select_weapon(id: String) -> bool:
+	if not station_services_available() or not combat.select_weapon(id):
+		return false
+	_announce("combat_weapon_selected", "Активный лазер · %s." % combat.profile().name)
+	return true
+
+
+func combat_status() -> Dictionary:
+	var incoming := combat.projectile_status()
+	var active := not incoming.is_empty()
+	var parked := docked >= 0 or landed or jump_seconds_left > 0.0
+	var local_contact := patrol.in_danger(self) or convoy_order.in_danger(self)
+	var reason := combat.ecm_denial(position, orbit_time)
+	if parked:
+		reason = "Помехи доступны в открытом полёте"
+	return {
+		"visible": not parked and (local_contact or active or combat.heat > 0.01 or combat.shield_fitted),
+		"heat": combat.heat, "shield": combat.shield,
+		"shield_max": CombatSystems.SHIELD_CAPACITY if combat.shield_fitted else 0.0,
+		"weapon": combat.weapon, "name": combat.profile().name, "damaged": combat.damaged,
+		"projectile": active, "projectile_distance": position.distance_to(incoming.position) if active else -1.0,
+		"ecm_fitted": combat.ecm_fitted, "ecm_ok": reason.is_empty(), "ecm_reason": reason,
+		"position": incoming.get("position", Vector3.ZERO), "velocity": incoming.get("velocity", Vector3.ZERO),
+		"fire_blocked": combat.fire_denial(orbit_time),
+	}
+
+
+func use_ecm() -> bool:
+	var status := combat_status()
+	if not status.ecm_ok or not combat.use_ecm(position, orbit_time):
+		return false
+	reset_time_scale()
+	_announce("combat_ecm", "Радиопомехи сорвали подлёт ракеты.")
+	return true
+
+
 func fire_status() -> Dictionary:
-	return convoy_order.fire_status(self) if convoy_status().fire_visible else patrol.fire_status(self)
+	var bonus := float(combat.profile().range_bonus)
+	var status := convoy_order.fire_status(self, bonus) if convoy_status().fire_visible else patrol.fire_status(self, bonus)
+	if status.ok:
+		var reason := combat.fire_denial(orbit_time)
+		if not reason.is_empty():
+			status.ok = false
+			status.reason = reason
+	return status
 
 
 func patrol_action() -> bool:
@@ -1892,12 +1947,19 @@ func patrol_action() -> bool:
 
 
 func fire_action() -> bool:
-	if convoy_status().fire_visible:
-		var result := convoy_order.fire(self)
-		_apply_convoy_result(result)
-		return result.get("ok", false)
-	var shot := patrol.fire(self)
-	_apply_patrol_result(shot)
+	var status := fire_status()
+	if not status.ok:
+		return false
+	var bonus := float(combat.profile().range_bonus)
+	var against_convoy := bool(convoy_status().fire_visible)
+	var shot := convoy_order.fire(self, bonus) if against_convoy else patrol.fire(self, bonus)
+	if shot.get("ok", false):
+		combat.record_fire(orbit_time)
+		reset_time_scale()
+	if against_convoy:
+		_apply_convoy_result(shot)
+	else:
+		_apply_patrol_result(shot)
 	return shot.get("ok", false)
 
 
@@ -1910,13 +1972,15 @@ func _apply_patrol_result(result: Dictionary) -> void:
 	if event in ["patrol_engaged", "patrol_victory", "patrol_retreat"]:
 		reset_time_scale()
 		if event == "patrol_engaged":
+			combat.reset_salvos()
 			_stop_convoy_course()
 		if patrol_course:
 			patrol_course = false
 			throttle = 0.0
 	if result.get("damage", 0.0) > 0.0:
-		ship.apply_damage(float(result.damage))
-	_announce(event, str(result.get("message", "")))
+		_apply_hostile_beam(event, result)
+	else:
+		_announce(event, str(result.get("message", "")))
 
 
 func _apply_convoy_result(result: Dictionary) -> void:
@@ -1925,10 +1989,56 @@ func _apply_convoy_result(result: Dictionary) -> void:
 		return
 	if event in ["convoy_order_escorted", "convoy_order_paid", "convoy_order_failed"]:
 		_stop_convoy_course()
-	if result.has("damage"):
-		ship.apply_damage(float(result.damage))
 	credits += int(result.get("credits", 0))
-	_announce(event, str(result.get("message", "")))
+	if result.get("damage", 0.0) > 0.0:
+		_apply_hostile_beam(event, result)
+	else:
+		_announce(event, str(result.get("message", "")))
+
+
+func _apply_hostile_beam(event: String, result: Dictionary) -> void:
+	var amount := float(result.damage)
+	var remainder := combat.absorb_hit(amount, orbit_time)
+	if remainder > 0.0:
+		ship.apply_damage(remainder)
+	var message := str(result.get("message", ""))
+	if remainder < amount:
+		message = "Щит поглотил %.0f ед. урона." % (amount - remainder)
+		if remainder > 0.0:
+			message += " Корпус получил %.0f ед." % remainder
+	var source: Variant = result.get("source")
+	if source is Vector3 and combat.incoming_shot(source, position, system_id, orbit_time):
+		reset_time_scale()
+		_announce("combat_missile", message + " Противник выпустил ракету.")
+	else:
+		_announce(event, message)
+
+
+func _advance_combat_projectile(previous_ship: Vector3, delta: float) -> void:
+	var sweep := combat.advance_projectile(orbit_time, delta)
+	if sweep.is_empty():
+		return
+	if int(sweep.system) != system_id or not combat_line_clear(sweep.from, sweep.to):
+		combat.clear_projectile()
+		return
+	var relative_start: Vector3 = sweep.from - previous_ship
+	var relative_end: Vector3 = sweep.to - position
+	var nearest := Geometry3D.get_closest_point_to_segment(Vector3.ZERO, relative_start, relative_end)
+	if nearest.length_squared() > MISSILE_HIT_RADIUS * MISSILE_HIT_RADIUS:
+		return
+	combat.clear_projectile()
+	var remainder := combat.absorb_hit(MISSILE_DAMAGE, orbit_time)
+	if remainder <= 0.0:
+		_announce("combat_missile_hit", "Щит принял удар ракеты.")
+		return
+	ship.apply_damage(remainder)
+	var module := combat.damage_module()
+	var message := "Ракета повредила корпус. Прочность %.0f%%." % ship.hull
+	if module == "focus":
+		message += " Оптика лазера «Нить» отключена."
+	elif module == "ecm":
+		message += " Блок радиопомех отключён."
+	_announce("combat_missile_hit", message)
 
 
 func combat_line_clear(start: Vector3, finish: Vector3) -> bool:
@@ -2079,7 +2189,7 @@ func collect_fragment() -> bool:
 
 func service_offer(action: String) -> Dictionary:
 	var unit_price := repair_unit_price() if action == "repair" else refuel_unit_price()
-	var offer := ship.service_offer(action, unit_price, credits)
+	var offer := combat.service_offer(action, credits) if action.begins_with("combat_") else ship.service_offer(action, unit_price, credits)
 	offer.allowed = offer.allowed and station_services_available()
 	return offer
 
@@ -2088,7 +2198,7 @@ func service_action(action: String) -> bool:
 	if not service_offer(action).allowed:
 		return false
 	var unit_price := repair_unit_price() if action == "repair" else refuel_unit_price()
-	var paid := ship.buy(action, unit_price, credits)
+	var paid := combat.buy(action, credits) if action.begins_with("combat_") else ship.buy(action, unit_price, credits)
 	if paid <= 0:
 		return false
 	credits -= paid
@@ -2118,6 +2228,14 @@ func service_action(action: String) -> bool:
 			_announce("service_fuel_pump", "Топливный насос установлен. Списано %d кр." % paid)
 		"range_drive":
 			_announce("service_range_drive", "Дальний привод «Вектор» установлен. Списано %d кр." % paid)
+		"combat_shield":
+			_announce("service_combat_shield", "Генератор щита установлен. Списано %d кр." % paid)
+		"combat_ecm":
+			_announce("service_combat_ecm", "Блок радиопомех установлен. Списано %d кр." % paid)
+		"combat_focus":
+			_announce("service_combat_focus", "Лазер «Нить» установлен. Списано %d кр." % paid)
+		"combat_repair":
+			_announce("service_combat_repair", "Выведенный из строя модуль восстановлен. Списано %d кр." % paid)
 	return true
 
 
@@ -2590,7 +2708,7 @@ func jump_status(destination: int) -> Dictionary:
 		reason = "Отключите автопилот и сбор топлива"
 	elif Atmosphere.sample(self, position, velocity).inside:
 		reason = "Выйдите из атмосферы"
-	elif patrol.in_danger(self):
+	elif patrol.in_danger(self) or not combat.projectile_status().is_empty():
 		reason = "Выйдите из зоны боя"
 	elif convoy_order.in_danger(self):
 		reason = "Отойдите от конвоя"
@@ -2727,6 +2845,7 @@ func _finish_jump_arrival() -> void:
 
 
 func _arrive(direction := Vector3.BACK) -> void:
+	combat.clear_projectile()
 	if Catalog.is_mine_site(target):
 		mining.select_site(target)
 		landed_site = target
@@ -2845,6 +2964,7 @@ func _advance_background_clock(delta: float) -> void:
 	var previous := orbit_time
 	orbit_time += delta
 	elapsed += delta
+	combat.advance_energy(previous, orbit_time)
 	if remote_rig.active():
 		remote_rig.advance(mining, orbit_time)
 	freight.advance(market, previous, orbit_time)
@@ -2961,6 +3081,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		_apply_convoy_result(convoy_order.step(self, delta))
 		return
 	_atmosphere_step(delta)
+	var previous_ship := position
 	var next := position + velocity * delta
 	var shutter := _closed_hatch_between(position, next, previous_orbit_time)
 	var obstacle := shutter if shutter >= 0 else _obstacle_at(next)
@@ -2997,6 +3118,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 	_update_star_heat(delta)
 	_advance_fuel_pump(previous_orbit_time)
 	_collect_fuel(delta)
+	_advance_combat_projectile(previous_ship, delta)
 	_apply_patrol_result(patrol.step(self, delta))
 	_apply_convoy_result(convoy_order.step(self, delta))
 
@@ -3547,6 +3669,7 @@ func snapshot() -> Dictionary:
 		"crew": crew.snapshot(),
 		"cartography": cartography.snapshot(), "frame": frame.snapshot(), "customs": customs.snapshot(),
 		"remote_rig": remote_rig.snapshot(), "orbital_mining": orbital_mining.snapshot(),
+		"combat": combat.snapshot(),
 	}
 
 
@@ -3554,6 +3677,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_combat := schema < 37
 	var pre_jump_drive := schema < 36
 	var pre_calendar := schema < 35
 	var pre_fuel_equipment := schema < 34
@@ -3887,6 +4011,11 @@ func restore(state: Dictionary) -> bool:
 			return false
 		if restored_ship.jump_fuel + fare > restored_ship.jump_capacity() or not restored_velocity.is_zero_approx() or float(state.throttle) != 0.0:
 			return false
+	var restored_combat := CombatSystems.new()
+	if not pre_combat and not restored_combat.restore(state.get("combat"), restored_epoch, restored_system):
+		return false
+	if not restored_combat.projectile_status().is_empty() and (restored_dock >= 0 or restored_landing >= 0 or not restored_transit.is_empty()):
+		return false
 	var restored_gear := 1.0 if restored_landing >= 0 else 0.0
 	var restored_gear_command := restored_landing >= 0
 	if not pre_gear:
@@ -3973,6 +4102,7 @@ func restore(state: Dictionary) -> bool:
 	customs = restored_customs
 	remote_rig = restored_remote_rig
 	orbital_mining = restored_orbital_mining
+	combat = restored_combat
 	_mining_beam.clear()
 	star_heat = 0.0 if pre_thermal else float(state.star_heat)
 	entry_heat = 0.0 if pre_entry else float(state.entry_heat)

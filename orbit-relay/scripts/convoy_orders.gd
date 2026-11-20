@@ -166,17 +166,17 @@ func step(sim: RefCounted, delta: float) -> Dictionary:
 	return _defend(sim, contact, delta)
 
 
-func fire_status(sim: RefCounted) -> Dictionary:
+func fire_status(sim: RefCounted, range_bonus := 0.0) -> Dictionary:
 	if kind != INTERCEPT or phase != ACTIVE or sim.system_id != system or not _airborne(sim):
 		return {"ok": false, "reason": "Нет цели для огня", "distance": -1.0}
-	return _aim_status(sim, Traffic.convoy_contact(sim, convoy_id))
+	return _aim_status(sim, Traffic.convoy_contact(sim, convoy_id), range_bonus)
 
 
-func fire(sim: RefCounted) -> Dictionary:
+func fire(sim: RefCounted, range_bonus := 0.0) -> Dictionary:
 	if kind != INTERCEPT or phase != ACTIVE or sim.system_id != system or not _airborne(sim):
 		return {"ok": false, "message": "Нет цели для огня"}
 	var contact := Traffic.convoy_contact(sim, convoy_id)
-	var ready := _aim_status(sim, contact)
+	var ready := _aim_status(sim, contact, range_bonus)
 	if not ready.ok:
 		return {"ok": false, "message": ready.reason}
 	var hull := maxf(0.0, enemy_hull - PLAYER_DAMAGE)
@@ -263,20 +263,22 @@ func _defend(sim: RefCounted, contact: Dictionary, delta: float) -> Dictionary:
 		return {}
 	_attack_delay = DEFENCE_DELAY
 	_enemy_flash = BEAM_DURATION
-	_enemy_beam = {"from": contact.position, "to": sim.position, "hostile": true}
-	return {"event": "convoy_order_enemy_hit", "message": "Охрана конвоя повредила корпус.", "damage": 7.0}
+	var source: Vector3 = contact.position
+	_enemy_beam = {"from": source, "to": sim.position, "hostile": true}
+	return {"event": "convoy_order_enemy_hit", "message": "Охрана конвоя повредила корпус.", "damage": 7.0, "source": source}
 
 
-func _aim_status(sim: RefCounted, contact: Dictionary) -> Dictionary:
+func _aim_status(sim: RefCounted, contact: Dictionary, range_bonus: float) -> Dictionary:
 	if contact.is_empty():
 		return {"ok": false, "reason": "Конвой завершил рейс", "distance": -1.0}
 	var offset: Vector3 = contact.position - sim.position
 	var distance := offset.length()
+	var effective_range := BEAM_RANGE + (maxf(0.0, range_bonus) if is_finite(range_bonus) else 0.0)
 	var reason := ""
 	if sim.ship.hull <= 1.0:
 		reason = "Восстановите корпус в порту"
-	elif distance > BEAM_RANGE:
-		reason = "Сблизьтесь до %d м" % int(BEAM_RANGE)
+	elif distance > effective_range:
+		reason = "Сблизьтесь до %d м" % int(effective_range)
 	elif distance <= 0.01 or sim.forward().dot(offset / distance) < AIM_COSINE:
 		reason = "Наведите нос на конвой"
 	elif not sim.combat_line_clear(sim.position, contact.position):
