@@ -211,19 +211,47 @@ func _test_scan_touch() -> void:
 	var chart: Node = game._galaxy
 	_tap(viewport, game._hud._actions["galaxy"], "Open the actual galactic chart with ordinary touch")
 	await process_frame
-	var uncharted_button: Button = chart._system_buttons[FIRST_GENERATED]
-	_expect(chart.is_open() and not uncharted_button.is_visible_in_tree() and uncharted_button.text.is_empty(),
+	_expect(chart.is_open() and not chart._system_buttons.has(FIRST_GENERATED),
 		"The chart does not list undiscovered systems")
 	var count := int(flight.galaxy_scan_status().unseen_count)
 	_tap(viewport, chart._scan_button, "Use the real galactic scanner button by touch")
 	await process_frame
 	var stored := SessionIO.load_state()
-	_expect(chart.is_open() and chart._scan_button.disabled and count > 0 and uncharted_button.is_visible_in_tree()
+	_expect(chart.is_open() and chart._scan_button.disabled and count > 0 and chart._system_buttons.has(FIRST_GENERATED)
 		and flight.system_known(FIRST_GENERATED) and int(chart._last_scan_count) == count
 		and stored.get("cartography", {}).get("systems", []).size() == count,
 		"New galactic coordinates are saved immediately, and the player remains on the map with the result")
+	await _test_catalog_pages(viewport, chart)
 	viewport.queue_free()
 	await process_frame
+
+
+func _test_catalog_pages(viewport: SubViewport, chart: Node) -> void:
+	if not _expect(chart._catalog_buttons.size() == 6 and chart._system_buttons.size() == 6
+		and not chart._next_page_button.disabled, "Six reusable catalog controls serve multiple pages"):
+		return
+	var slot: Button = chart._system_buttons[HOME]
+	var first_position := slot.get_global_rect().get_center()
+	_touch(viewport, 20, first_position, true)
+	_tap(viewport, chart._next_page_button, "Turn the catalog page with a system touch still held")
+	await process_frame
+	var next_id: int = chart._known[6]
+	_expect(not chart._system_buttons.has(HOME) and chart._system_buttons.get(next_id) == slot,
+		"The second page binds the same first button to the next system")
+	_touch(viewport, 20, slot.get_global_rect().get_center(), false)
+	_expect(chart._candidate == HOME, "Releasing a touch held across the page change cannot select a different system")
+	_tap(viewport, slot, "A fresh touch selects the system newly bound to the reused button")
+	_expect(chart._candidate == next_id and chart._system_page == 1, "The second page selects the correct target")
+	var mouse_position := slot.get_global_rect().get_center()
+	_mouse_button(viewport, mouse_position, true)
+	_tap(viewport, chart._previous_page_button, "Return to the first page with the mouse still held")
+	await process_frame
+	_mouse_button(viewport, slot.get_global_rect().get_center(), false)
+	_expect(chart._candidate == next_id, "A desktop mouse release after remapping cannot select the new contents of a held button")
+	_mouse_button(viewport, slot.get_global_rect().get_center(), true)
+	chart.refresh()
+	_mouse_button(viewport, slot.get_global_rect().get_center(), false)
+	_expect(chart._candidate == HOME, "A normal refresh retains a current desktop click and selects its original system")
 
 
 func _tap(viewport: SubViewport, button: Button, description: String) -> void:
@@ -231,11 +259,23 @@ func _tap(viewport: SubViewport, button: Button, description: String) -> void:
 		and button.get_global_rect().size.y >= 44.0, description):
 		return
 	for pressed: bool in [true, false]:
-		var event := InputEventScreenTouch.new()
-		event.index = 19
-		event.position = button.get_global_rect().get_center()
-		event.pressed = pressed
-		viewport.push_input(event, true)
+		_touch(viewport, 19, button.get_global_rect().get_center(), pressed)
+
+
+func _touch(viewport: SubViewport, index: int, point: Vector2, pressed: bool) -> void:
+	var event := InputEventScreenTouch.new()
+	event.index = index
+	event.position = point
+	event.pressed = pressed
+	viewport.push_input(event, true)
+
+
+func _mouse_button(viewport: SubViewport, point: Vector2, pressed: bool) -> void:
+	var event := InputEventMouseButton.new()
+	event.button_index = MOUSE_BUTTON_LEFT
+	event.position = point
+	event.pressed = pressed
+	viewport.push_input(event, true)
 
 
 func _approach(flight: Flight, site: int) -> bool:

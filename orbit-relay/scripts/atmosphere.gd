@@ -17,7 +17,7 @@ const PROFILES := {
 	Catalog.LIMIT_PLANET: {"height": 41.0, "density": 0.82, "color": Color("#9bcadf")},
 }
 
-static var _system_sites: PackedInt32Array = _build_system_sites()
+static var _system_sites: Dictionary[int, int] = _build_system_sites()
 
 
 static func profile(site: int) -> Dictionary:
@@ -82,13 +82,11 @@ static func _depth(altitude: float, height: float) -> float:
 
 
 static func _site_for_system(system: int) -> int:
-	return _system_sites[system] if system >= 0 and system < _system_sites.size() else -1
+	return _system_sites.get(system, -1)
 
 
-static func _build_system_sites() -> PackedInt32Array:
-	var sites := PackedInt32Array()
-	sites.resize(Catalog.SYSTEM_COUNT)
-	sites.fill(-1)
+static func _build_system_sites() -> Dictionary[int, int]:
+	var sites: Dictionary[int, int] = {}
 	for site: int in PROFILES:
 		sites[Catalog.system_of_site(site)] = site
 	return sites

@@ -379,8 +379,8 @@ func _test_board() -> void:
 	await process_frame
 	_tap(viewport, game._hud._actions["galaxy"], "The galaxy map opens by touching the flight HUD")
 	await process_frame
-	_expect(game._galaxy.is_open() and not game._galaxy._system_buttons[HEATHER].is_visible_in_tree()
-		and not game._galaxy._system_buttons[LIMIT].is_visible_in_tree(),
+	_expect(game._galaxy.is_open() and not game._galaxy._system_buttons.has(HEATHER)
+		and not game._galaxy._system_buttons.has(LIMIT),
 		"The map shows no orbit controls for undiscovered systems")
 	_tap(viewport, game._galaxy._close_button, "Close the galaxy map")
 	await process_frame
@@ -399,8 +399,7 @@ func _test_board() -> void:
 		await process_frame
 		_tap(viewport, game._hud._actions["galaxy"], "Reopen the updated galaxy map")
 		await process_frame
-		_expect(game._galaxy._system_buttons[HEATHER].is_visible_in_tree()
-			and not game._galaxy._system_buttons[LIMIT].is_visible_in_tree(),
+		_expect(game._galaxy._system_buttons.has(HEATHER) and not game._galaxy._system_buttons.has(LIMIT),
 			"The map now exposes just the newly revealed frontier")
 	viewport.queue_free()
 	await process_frame

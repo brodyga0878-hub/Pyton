@@ -23,8 +23,10 @@ static func plan(origin: int, goal: int, known: Array[int], capacity: float, fir
 		return _unavailable(no_route)
 	var launch_limit := minf(capacity, first_budget)
 	var remaining: Array[int] = []
-	for system in range(Catalog.SYSTEM_COUNT):
-		if system in known:
+	var included: Dictionary[int, bool] = {}
+	for system: int in known:
+		if _valid_system(system) and not included.has(system):
+			included[system] = true
 			remaining.append(system)
 	var first: Array[int] = [origin]
 	var best: Dictionary[int, Dictionary] = {origin: {"fuel": 0, "path": first}}

@@ -34,7 +34,7 @@ const CivilianTraffic = preload("res://scripts/civilian_traffic.gd")
 const PilotCareer = preload("res://scripts/pilot_career.gd")
 const BranchingStory = preload("res://scripts/branching_story.gd")
 const SectorNews = preload("res://scripts/sector_news.gd")
-const SAVE_SCHEMA := 45
+const SAVE_SCHEMA := 46
 const INTERRUPTED_LABELS := {
 	"autopilot": "автопилот", "rig_approach": "заход к буру", "orbit_maneuver": "орбитальный манёвр",
 	"rendezvous": "автоматическое сближение", "patrol_course": "наведение дозора",
@@ -372,6 +372,10 @@ func target_name(index: int) -> String:
 
 func system_known(index: int) -> bool:
 	return expedition.known(index) or cartography.discovered(index)
+
+
+func known_systems() -> Array[int]:
+	return _known_systems(expedition, cartography)
 
 
 func system_faction_name(index: int) -> String:
@@ -1726,11 +1730,14 @@ func _nearest_passenger_berth() -> int:
 func _nearest_interstellar_port() -> int:
 	var selected := -1
 	var best_cost := 1000000
-	for system in range(Catalog.SYSTEM_COUNT):
-		var cost := jump_tariff(system_id, system)
-		if cost <= 0 or cost >= best_cost or not system_known(system):
+	for system: int in known_systems():
+		var ports := Catalog.ports_for(system)
+		if ports.is_empty():
 			continue
-		for port: int in Catalog.ports_for(system):
+		var cost := jump_tariff(system_id, system)
+		if cost <= 0 or cost >= best_cost:
+			continue
+		for port: int in ports:
 			if station_operational(port):
 				selected = port
 				best_cost = cost
@@ -3011,9 +3018,10 @@ func cancel_route() -> bool:
 
 static func _known_systems(progress: RefCounted, atlas: RefCounted) -> Array[int]:
 	var systems: Array[int] = []
-	for id in range(Catalog.SYSTEM_COUNT):
-		if progress.known(id) or atlas.discovered(id):
+	for id in range(Catalog.AUTHORED_SYSTEM_COUNT):
+		if progress.known(id):
 			systems.append(id)
+	systems.append_array(atlas.discovered_systems())
 	return systems
 
 
@@ -4104,6 +4112,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_expanded_galaxy := schema < 46
 	var pre_lazur_spin := schema < 45
 	var pre_resume := schema < 44
 	var pre_news := schema < 43
@@ -4161,8 +4170,10 @@ func restore(state: Dictionary) -> bool:
 		restored_epoch = float(state.orbit_time)
 	var restored_system := Catalog.HOME_SYSTEM
 	var restored_jump := -1
+	var systems := Catalog.PRE_EXPANDED_SYSTEM_COUNT if pre_expanded_galaxy else Catalog.SYSTEM_COUNT
 	if not pre_galaxy:
-		var systems := Catalog.PRE_BINARY_SYSTEM_COUNT if pre_binary else Catalog.SYSTEM_COUNT
+		if pre_binary:
+			systems = Catalog.PRE_BINARY_SYSTEM_COUNT
 		if pre_procedural:
 			systems = Catalog.AUTHORED_SYSTEM_COUNT
 		if pre_expansion:
@@ -4202,7 +4213,11 @@ func restore(state: Dictionary) -> bool:
 		restored_orientation = saved
 	if not _number(state.get("throttle"), 0.0, 1.0):
 		return false
-	var site_count := Catalog.PRE_EXPANSION_DESTINATION_COUNT if pre_expansion else (Catalog.PRE_GROUND_DESTINATION_COUNT if pre_ground_ports else Catalog.DESTINATION_COUNT)
+	var site_count := Catalog.PRE_EXPANDED_DESTINATION_COUNT if pre_expanded_galaxy else Catalog.DESTINATION_COUNT
+	if pre_ground_ports:
+		site_count = Catalog.PRE_GROUND_DESTINATION_COUNT
+	if pre_expansion:
+		site_count = Catalog.PRE_EXPANSION_DESTINATION_COUNT
 	if pre_binary and not pre_expansion:
 		site_count = Catalog.PRE_BINARY_DESTINATION_COUNT
 	if pre_procedural and not pre_expansion:
@@ -4253,7 +4268,8 @@ func restore(state: Dictionary) -> bool:
 			if not _site_available(member.origin, restored_expedition):
 				return false
 	if not pre_cartography:
-		if not restored_cartography.restore(state.get("cartography"), restored_epoch, pre_procedural, pre_binary, pre_ground_ports):
+		if not restored_cartography.restore(state.get("cartography"), restored_epoch, pre_procedural, pre_binary,
+			pre_ground_ports, pre_expanded_galaxy):
 			return false
 		for site: int in restored_cartography.surveyed_sites():
 			if not _site_available(site, restored_expedition, restored_cartography):
@@ -4335,12 +4351,12 @@ func restore(state: Dictionary) -> bool:
 	var restored_route: Array[int] = []
 	if not pre_jump_route:
 		var remaining: Variant = state.get("jump_route")
-		if not remaining is Array or remaining.size() >= Catalog.SYSTEM_COUNT:
+		if not remaining is Array or remaining.size() >= systems:
 			return false
-		for site: Variant in remaining:
-			if not _integer(site, 0, Catalog.SYSTEM_COUNT - 1):
+		for system: Variant in remaining:
+			if not _integer(system, 0, systems - 1):
 				return false
-			restored_route.append(int(site))
+			restored_route.append(int(system))
 		if not restored_route.is_empty():
 			var path: Array[int] = [restored_system]
 			path.append_array(restored_route)

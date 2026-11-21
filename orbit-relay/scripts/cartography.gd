@@ -69,12 +69,18 @@ func discovered(system_id: int) -> bool:
 	return _discovered.has(system_id)
 
 
+func discovered_systems() -> Array[int]:
+	var systems := _discovered.keys()
+	systems.sort()
+	return systems
+
+
 func neighbors_to_discover(system_id: int) -> Array[int]:
 	var neighbors: Array[int] = []
 	if Catalog.system(system_id).is_empty() or (Catalog.is_generated_system(system_id) and not discovered(system_id)):
 		return neighbors
-	for candidate in range(Catalog.AUTHORED_SYSTEM_COUNT, Catalog.SYSTEM_COUNT):
-		if candidate != system_id and not discovered(candidate) and Catalog.jump_distance(system_id, candidate) <= Catalog.GENERATED_SCAN_RANGE:
+	for candidate: int in Catalog.generated_systems_near(system_id, Catalog.GENERATED_SCAN_RANGE):
+		if not discovered(candidate):
 			neighbors.append(candidate)
 	return neighbors
 
@@ -125,19 +131,20 @@ func snapshot() -> Dictionary:
 	for site_id in surveyed_sites():
 		scans.append({"site": site_id, "epoch": _records[site_id]})
 	var systems: Array[Dictionary] = []
-	var ids := _discovered.keys()
-	ids.sort()
-	for system_id: int in ids:
+	for system_id: int in discovered_systems():
 		systems.append({"system": system_id, "epoch": _discovered[system_id]})
 	return {"scans": scans, "systems": systems}
 
 
-func restore(raw: Variant, epoch: float, pre_procedural := false, pre_binary := false, pre_ground_ports := false) -> bool:
+func restore(raw: Variant, epoch: float, pre_procedural := false, pre_binary := false, pre_ground_ports := false,
+		pre_expanded_galaxy := false) -> bool:
 	if not _valid_epoch(epoch, MAX_EPOCH) or not raw is Dictionary or raw.size() != (1 if pre_procedural else 2):
 		return false
 	var surveyed_systems: Dictionary[int, float] = {}
 	if not pre_procedural:
 		var system_limit := Catalog.PRE_BINARY_SYSTEM_COUNT if pre_binary else Catalog.SYSTEM_COUNT
+		if not pre_binary and pre_expanded_galaxy:
+			system_limit = Catalog.PRE_EXPANDED_SYSTEM_COUNT
 		var systems: Variant = raw.get("systems")
 		if not systems is Array or systems.size() > system_limit - Catalog.AUTHORED_SYSTEM_COUNT:
 			return false
@@ -155,6 +162,8 @@ func restore(raw: Variant, epoch: float, pre_procedural := false, pre_binary := 
 		site_limit = Catalog.AUTHORED_DESTINATION_COUNT
 	elif not pre_binary and pre_ground_ports:
 		site_limit = Catalog.PRE_GROUND_DESTINATION_COUNT
+	elif not pre_binary and pre_expanded_galaxy:
+		site_limit = Catalog.PRE_EXPANDED_DESTINATION_COUNT
 	if not scans is Array or scans.size() > site_limit:
 		return false
 	var restored: Dictionary[int, float] = {}

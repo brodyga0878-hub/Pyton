@@ -7,6 +7,7 @@ const Ground = preload("res://scripts/ground_port.gd")
 const Terrain = preload("res://scripts/surface_terrain.gd")
 const GRAVITY_PARAMETERS := [8500.0, 8000.0, 7600.0, 8100.0, 7400.0]
 const ORBIT_SEGMENTS := 96
+const MAX_CACHED_TRACKS := 64
 
 # Eccentricity, true anomaly at the epoch and inclination adjustment in degrees.
 # The inclination adjustment rotates the path about the initial star-to-site ray.
@@ -52,18 +53,19 @@ class Track:
 	var points := PackedVector3Array()
 
 
-static var _tracks: Array[Track] = _build_tracks()
+# Track parameters are cheap to reconstruct after leaving a system. Only the map builds path vertices.
+static var _tracks: Dictionary[int, Track] = {}
 
 
 static func sample(site_id: int, seconds: float) -> Dictionary:
-	if site_id < 0 or site_id >= _tracks.size():
+	if site_id < 0 or site_id >= Catalog.DESTINATION_COUNT:
 		return {"position": Vector3.ZERO, "velocity": Vector3.ZERO}
 	if Ground.is_port(site_id):
 		var host := Ground.body(site_id)
 		var surface := sample(host, seconds)
 		var offset := Ground.anchor_offset(site_id, seconds)
 		return {"position": surface.position + offset, "velocity": surface.velocity + Terrain.spin_velocity(host, offset)}
-	var track := _tracks[site_id]
+	var track := _track_for(site_id)
 	if track.period <= 0.0:
 		return {"position": track.epoch, "velocity": Vector3.ZERO}
 	var eccentric_angle := track.eccentric_at_epoch
@@ -91,13 +93,15 @@ static func sample(site_id: int, seconds: float) -> Dictionary:
 static func orbit_parent(site_id: int) -> int:
 	if Ground.is_port(site_id):
 		return Ground.body(site_id)
-	return _tracks[site_id].parent if site_id >= 0 and site_id < _tracks.size() else -1
+	return _track_for(site_id).parent if site_id >= 0 and site_id < Catalog.DESTINATION_COUNT else -1
 
 
 static func orbit_points(site_id: int, epoch := 0.0) -> PackedVector3Array:
-	if site_id < 0 or site_id >= _tracks.size():
+	if site_id < 0 or site_id >= Catalog.DESTINATION_COUNT:
 		return PackedVector3Array()
-	var track := _tracks[site_id]
+	var track := _track_for(site_id)
+	if track.period > 0.0 and track.points.is_empty():
+		_build_points(track)
 	if track.parent < 0:
 		return track.points
 	var center: Vector3 = sample(track.parent, epoch).position
@@ -111,7 +115,7 @@ static func orbit_points(site_id: int, epoch := 0.0) -> PackedVector3Array:
 static func period(site_id: int) -> float:
 	if Ground.is_port(site_id):
 		return period(Ground.body(site_id))
-	return _tracks[site_id].period if site_id >= 0 and site_id < _tracks.size() else 0.0
+	return _track_for(site_id).period if site_id >= 0 and site_id < Catalog.DESTINATION_COUNT else 0.0
 
 
 static func gravity_parameter(system_id: int) -> float:
@@ -120,38 +124,44 @@ static func gravity_parameter(system_id: int) -> float:
 	return Catalog.system(system_id).get("gravity_parameter", 0.0)
 
 
-static func _build_tracks() -> Array[Track]:
-	var result: Array[Track] = []
-	for site_id in range(Catalog.DESTINATION_COUNT):
-		var site := Catalog.site(site_id)
-		if Catalog.system_of_site(site_id) == Catalog.BINARY_SYSTEM:
-			result.append(_build_binary_track(site))
-			continue
-		var track := Track.new()
-		track.epoch = site.center
-		var elements: Vector3 = ELEMENTS.get(site_id, site.get("orbital_elements", Vector3.ZERO))
-		if elements != Vector3.ZERO:
-			var system_id := Catalog.system_of_site(site_id)
-			var eccentricity := elements.x
-			track.eccentricity = eccentricity
-			track.focus = Catalog.site(Catalog.star_for(system_id)).center
-			var offset := track.epoch - track.focus
-			var radial := offset.normalized()
-			var tangent := radial.cross(Vector3.UP).normalized().rotated(radial, deg_to_rad(elements.z))
-			var true_anomaly := deg_to_rad(elements.y)
-			var cosine := cos(true_anomaly)
-			var sine := sin(true_anomaly)
-			var axis_factor := sqrt(1.0 - eccentricity * eccentricity)
-			var semi_major := offset.length() * (1.0 + eccentricity * cosine) / (axis_factor * axis_factor)
-			track.major_axis = (radial * cosine - tangent * sine) * semi_major
-			track.minor_axis = (radial * sine + tangent * cosine) * (semi_major * axis_factor)
-			track.eccentric_at_epoch = atan2(axis_factor * sine, eccentricity + cosine)
-			track.mean_at_epoch = track.eccentric_at_epoch - eccentricity * sin(track.eccentric_at_epoch)
-			track.mean_motion = sqrt(gravity_parameter(system_id) / (semi_major * semi_major * semi_major))
-			track.period = TAU / track.mean_motion
-			_build_points(track)
-		result.append(track)
-	return result
+static func _track_for(site_id: int) -> Track:
+	if _tracks.has(site_id):
+		return _tracks[site_id]
+	if _tracks.size() >= MAX_CACHED_TRACKS:
+		_tracks.erase(_tracks.keys()[0])
+	var track := _build_track(site_id)
+	_tracks[site_id] = track
+	return track
+
+
+static func _build_track(site_id: int) -> Track:
+	var site := Catalog.site(site_id)
+	var system_id := Catalog.system_of_site(site_id)
+	if system_id == Catalog.BINARY_SYSTEM:
+		return _build_binary_track(site)
+	var track := Track.new()
+	track.epoch = site.center
+	var elements: Vector3 = ELEMENTS.get(site_id, site.get("orbital_elements", Vector3.ZERO))
+	if elements == Vector3.ZERO:
+		return track
+	var eccentricity := elements.x
+	track.eccentricity = eccentricity
+	track.focus = Catalog.site(Catalog.star_for(system_id)).center
+	var offset := track.epoch - track.focus
+	var radial := offset.normalized()
+	var tangent := radial.cross(Vector3.UP).normalized().rotated(radial, deg_to_rad(elements.z))
+	var true_anomaly := deg_to_rad(elements.y)
+	var cosine := cos(true_anomaly)
+	var sine := sin(true_anomaly)
+	var axis_factor := sqrt(1.0 - eccentricity * eccentricity)
+	var semi_major := offset.length() * (1.0 + eccentricity * cosine) / (axis_factor * axis_factor)
+	track.major_axis = (radial * cosine - tangent * sine) * semi_major
+	track.minor_axis = (radial * sine + tangent * cosine) * (semi_major * axis_factor)
+	track.eccentric_at_epoch = atan2(axis_factor * sine, eccentricity + cosine)
+	track.mean_at_epoch = track.eccentric_at_epoch - eccentricity * sin(track.eccentric_at_epoch)
+	track.mean_motion = sqrt(gravity_parameter(system_id) / (semi_major * semi_major * semi_major))
+	track.period = TAU / track.mean_motion
+	return track
 
 
 static func _build_binary_track(site: Dictionary) -> Track:
@@ -179,7 +189,6 @@ static func _build_binary_track(site: Dictionary) -> Track:
 	track.minor_axis = track.major_axis.cross(normal)
 	track.mean_motion = sqrt(mu / (semimajor * semimajor * semimajor))
 	track.period = TAU / track.mean_motion
-	_build_points(track)
 	return track
 
 

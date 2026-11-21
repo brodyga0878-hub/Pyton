@@ -10,11 +10,17 @@ const SECTORS := [
 ]
 const SECTOR_COUNT := len(SECTORS)
 const SINGLE_SYSTEM_COUNT := SECTOR_COUNT * SYSTEMS_PER_SECTOR
+const FRONTIER_RADIUS := 4
+const FRONTIER_WIDTH := 2 * FRONTIER_RADIUS + 1
+const OCCUPIED_CORE_SECTORS := [Vector2i.ZERO, Vector2i(0, -1), Vector2i(1, -1)]
+const FRONTIER_SYSTEM_COUNT := FRONTIER_WIDTH * FRONTIER_WIDTH - SECTOR_COUNT - len(OCCUPIED_CORE_SECTORS)
 const NAMES := [
 	"Тальвена", "Ирсавель", "Морикса", "Вестрида", "Ольвенир", "Астрэва",
 	"Ниварис", "Сельтура", "Каэлин", "Дорвейн", "Ярсела", "Энтурин",
 	"Ровайна", "Остриэль", "Тавернис", "Умберас", "Меллория", "Зарвелион",
 ]
+const FRONTIER_PREFIXES := ["Айл", "Брин", "Вэр", "Гарн", "Дел", "Ирн", "Кел", "Лэйс", "Морн", "Нэв", "Орк", "Рин"]
+const FRONTIER_SUFFIXES := ["адар", "алис", "авен", "еваль", "ирас", "онир", "ория", "улет", "эсса", "ювар"]
 const SLOT_OFFSETS := [Vector2.ZERO, Vector2(-2.0, 1.5), Vector2(1.7, -1.7)]
 const STELLAR_COLORS := [Color("#ffc195"), Color("#ffe3a8"), Color("#b4d7ff")]
 const SURFACE_COLORS := [Color("#906d5f"), Color("#776e8a"), Color("#69919d")]
@@ -29,38 +35,78 @@ static func build(first_target: int) -> Dictionary:
 		for slot in range(SYSTEMS_PER_SECTOR):
 			var seed := ((sector.x + 17) * 73856093 ^ (sector.y + 17) * 19349663 ^ (slot + 1) * 83492791) & 0x7fffffff
 			var name: String = NAMES[systems.size()]
-			var star_id := first_target + sites.size()
-			var planet_id := star_id + 1
-			var asteroid_id := star_id + 2
 			var position := _system_position(sector, slot, seed)
-			var star_color: Color = STELLAR_COLORS[floori(_sample(seed, 3) * STELLAR_COLORS.size())]
-			var star_center := Vector3(
-				lerpf(1660.0, 1960.0, _sample(seed, 4)), lerpf(150.0, 310.0, _sample(seed, 5)),
-				lerpf(-1910.0, -1580.0, _sample(seed, 6)))
-			var system := {
-				"name": name, "position": Vector2(position.x, position.y), "position_3d": position,
-				"sector": sector, "seed": seed, "accent": star_color,
-				"description": "Необитаемая система. Каменистая планета и астероид доступны для исследования.",
-				"arrival_port": -1, "arrival_target": star_id, "star": star_id,
-				"targets": [star_id, planet_id, asteroid_id], "ports": [],
-				"mines": [planet_id, asteroid_id], "survey_sites": [planet_id, asteroid_id],
-				"stellar_heat": lerpf(0.85, 1.18, _sample(seed, 7)),
-				"gravity_parameter": lerpf(7350.0, 8950.0, _sample(seed, 8)),
-			}
-			for key: String in ["targets", "ports", "mines", "survey_sites"]:
-				system[key].make_read_only()
-			system.make_read_only()
-			systems.append(system)
-			sites.append({
-				"name": name, "kind": "star", "center": star_center, "radius": 220.0,
-				"pad_offset": 310.0, "gate_offset": 470.0, "accent": star_color,
-			})
-			sites.append(_body(name, star_center, seed, 10, true))
-			sites.append(_body(name, star_center, seed, 30, false))
+			_append_single(systems, sites, first_target + sites.size(), sector, seed, name, position)
 	_append_binary(systems, sites, first_target + sites.size())
 	for site in sites:
 		site.make_read_only()
 	return {"systems": systems, "sites": sites}
+
+
+static func build_frontier(first_target: int) -> Dictionary:
+	var systems: Array[Dictionary] = []
+	var sites: Array[Dictionary] = []
+	# Adding an outer ring appends its IDs after all previously published rings.
+	for ring in range(1, FRONTIER_RADIUS + 1):
+		for y in range(-ring, ring + 1):
+			for x in range(-ring, ring + 1):
+				if maxi(absi(x), absi(y)) != ring:
+					continue
+				var sector := Vector2i(x, y)
+				if sector in SECTORS or sector in OCCUPIED_CORE_SECTORS:
+					continue
+				var seed := ((x + 157) * 73856093 ^ (y + 179) * 19349663 ^ 613683211) & 0x7fffffff
+				var center := (Vector2(sector) + Vector2(0.5, 0.5)) * SECTOR_SIZE
+				var jitter := Vector2(_sample(seed, 0) - 0.5, _sample(seed, 1) - 0.5) * 0.8
+				var plane := center + jitter
+				var position := Vector3(plane.x, plane.y, lerpf(-0.7, 0.7, _sample(seed, 2)))
+				var name := _frontier_name(systems.size())
+				_append_single(systems, sites, first_target + sites.size(), sector, seed, name, position)
+	for site in sites:
+		site.make_read_only()
+	return {"systems": systems, "sites": sites}
+
+
+static func _frontier_name(index: int) -> String:
+	var suffixes := FRONTIER_SUFFIXES.size()
+	var names_per_cycle := FRONTIER_PREFIXES.size() * suffixes
+	var slot := index % names_per_cycle
+	@warning_ignore("integer_division")
+	var prefix := slot / suffixes
+	var name := str(FRONTIER_PREFIXES[prefix]) + str(FRONTIER_SUFFIXES[slot % suffixes])
+	@warning_ignore("integer_division")
+	var cycle := index / names_per_cycle
+	return name if cycle == 0 else "%s-%d" % [name, cycle + 1]
+
+
+static func _append_single(systems: Array[Dictionary], sites: Array[Dictionary], star_id: int,
+		sector: Vector2i, seed: int, name: String, position: Vector3) -> void:
+	var planet_id := star_id + 1
+	var asteroid_id := star_id + 2
+	var star_color: Color = STELLAR_COLORS[floori(_sample(seed, 3) * STELLAR_COLORS.size())]
+	var star_center := Vector3(
+		lerpf(1660.0, 1960.0, _sample(seed, 4)), lerpf(150.0, 310.0, _sample(seed, 5)),
+		lerpf(-1910.0, -1580.0, _sample(seed, 6)))
+	var system := {
+		"name": name, "position": Vector2(position.x, position.y), "position_3d": position,
+		"sector": sector, "seed": seed, "accent": star_color,
+		"description": "Необитаемая система. Каменистая планета и астероид доступны для исследования.",
+		"arrival_port": -1, "arrival_target": star_id, "star": star_id,
+		"targets": [star_id, planet_id, asteroid_id], "ports": [],
+		"mines": [planet_id, asteroid_id], "survey_sites": [planet_id, asteroid_id],
+		"stellar_heat": lerpf(0.85, 1.18, _sample(seed, 7)),
+		"gravity_parameter": lerpf(7350.0, 8950.0, _sample(seed, 8)),
+	}
+	for key: String in ["targets", "ports", "mines", "survey_sites"]:
+		system[key].make_read_only()
+	system.make_read_only()
+	systems.append(system)
+	sites.append({
+		"name": name, "kind": "star", "center": star_center, "radius": 220.0,
+		"pad_offset": 310.0, "gate_offset": 470.0, "accent": star_color,
+	})
+	sites.append(_body(name, star_center, seed, 10, true))
+	sites.append(_body(name, star_center, seed, 30, false))
 
 
 static func _append_binary(systems: Array[Dictionary], sites: Array[Dictionary], primary_id: int) -> void:

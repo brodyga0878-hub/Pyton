@@ -58,9 +58,11 @@ var _dossier_stock: Label
 var _dossier_freight: Label
 var _dossier_observations: Label
 var _scroll_touch := -1
+var _catalog_buttons: Array[Button] = []
 var _system_buttons: Dictionary[int, Button] = {}
 var _touches: Dictionary[int, Button] = {}
 var _map_touches: Dictionary[int, int] = {}
+var _mouse_catalog_button: Button
 var _flight: RefCounted
 var _candidate := -1
 var _sector_focus := -1
@@ -119,14 +121,14 @@ func build() -> void:
 	systems.add_theme_constant_override("h_separation", 6)
 	systems.add_theme_constant_override("v_separation", 3)
 	details.add_child(systems)
-	for id in range(Sector.SYSTEM_COUNT):
+	for _slot in range(SYSTEMS_PER_PAGE):
 		var button := _button(systems, "", 44)
 		button.toggle_mode = true
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		button.pressed.connect(_select_system.bind(id))
-		_system_buttons[id] = button
+		button.pressed.connect(_select_listed_system.bind(button))
+		_catalog_buttons.append(button)
 	_build_pager(details)
 	details.add_child(HSeparator.new())
 	_destination = _label(details, "", 26, TEXT)
@@ -367,10 +369,7 @@ func _refresh_travel_estimates(preview: Dictionary, available: bool) -> void:
 
 
 func _collect_known_systems() -> void:
-	_known.clear()
-	for id in range(Sector.SYSTEM_COUNT):
-		if _flight.system_known(id):
-			_known.append(id)
+	_known = _flight.known_systems()
 
 
 func _scope_systems() -> Array[int]:
@@ -392,12 +391,17 @@ func _refresh_catalog(current: int, goal: int, planned: int) -> void:
 	var first := _system_page * SYSTEMS_PER_PAGE
 	var last := mini(first + SYSTEMS_PER_PAGE, systems.size())
 	var listed := systems.slice(first, last)
-	for id in _system_buttons:
-		var button := _system_buttons[id]
-		button.visible = listed.has(id)
+	if _system_buttons.keys() != listed:
+		_clear_touches()
+	_system_buttons.clear()
+	for slot in range(_catalog_buttons.size()):
+		var button := _catalog_buttons[slot]
+		button.visible = slot < listed.size()
 		if not button.visible:
 			button.text = ""
 			continue
+		var id: int = listed[slot]
+		_system_buttons[id] = button
 		var suffix := ""
 		if id == current:
 			suffix = " · Корабль"
@@ -606,6 +610,12 @@ func is_open() -> bool:
 	return _flight != null and visible
 
 
+func _select_listed_system(button: Button) -> void:
+	var id: Variant = _system_buttons.find_key(button)
+	if id is int:
+		_select_system(id)
+
+
 func _select_system(id: int) -> void:
 	if is_open() and _flight.system_known(id):
 		if _candidate != id:
@@ -680,6 +690,15 @@ func _input(event: InputEvent) -> void:
 		if _map_touches.has(event.index) and _chart_system_at(event.position) != _map_touches[event.index]:
 			_map_touches.erase(event.index)
 		get_viewport().set_input_as_handled()
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		# A physical button can show a different system after changing pages.
+		var hit := _catalog_button_at(event.position)
+		var held := _mouse_catalog_button
+		_mouse_catalog_button = hit if event.pressed else null
+		if not event.pressed and held != null and held == hit:
+			hit.pressed.emit()
+		if hit != null or held != null:
+			get_viewport().set_input_as_handled()
 
 
 func _chart_mouse_input(event: InputEvent) -> void:
@@ -698,6 +717,7 @@ func _clear_touches() -> void:
 	_touches.clear()
 	_map_touches.clear()
 	_scroll_touch = -1
+	_mouse_catalog_button = null
 
 
 func _button_at(point: Vector2) -> Button:
@@ -707,6 +727,10 @@ func _button_at(point: Vector2) -> Button:
 	]:
 		if not button.disabled and button.get_global_rect().has_point(point):
 			return button
+	return _catalog_button_at(point)
+
+
+func _catalog_button_at(point: Vector2) -> Button:
 	for button: Button in _system_buttons.values():
 		if button.is_visible_in_tree() and button.get_global_rect().has_point(point):
 			return button

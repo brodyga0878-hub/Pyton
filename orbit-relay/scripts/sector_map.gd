@@ -82,6 +82,7 @@ var _rendezvous_hint: Label
 var _rendezvous_finish: Button
 var _rendezvous_action: Button
 var _focus_buttons: Dictionary[int, Button] = {}
+var _focus_choices: HBoxContainer
 var _companion_focus_choices: HBoxContainer
 var _orbit_state: Label
 var _orbit_reference: Label
@@ -94,8 +95,9 @@ var _orbit_note: Label
 var _orbit_button: Button
 var _close_button: Button
 var _select_button: Button
-var _home_scoop_sites: HBoxContainer
+var _site_list: VBoxContainer
 var _site_buttons: Dictionary[int, Button] = {}
+var _listed_targets: Array = []
 var _touches: Dictionary[int, Button] = {}
 var _touch_sites: Dictionary[int, int] = {}
 var _trajectory_touch := -1
@@ -175,20 +177,9 @@ func build() -> void:
 	var list := _navigation_panel
 	list.add_theme_constant_override("separation", 4)
 	panel.add_child(list)
-	for system_id in range(Sector.SYSTEM_COUNT):
-		for id: int in Sector.ports_for(system_id):
-			_add_site(list, id)
-		for id: int in Sector.mines_for(system_id):
-			_add_site(list, id)
-		if system_id == Sector.HOME_SYSTEM:
-			_home_scoop_sites = HBoxContainer.new()
-			_home_scoop_sites.add_theme_constant_override("separation", 4)
-			list.add_child(_home_scoop_sites)
-			_add_site(_home_scoop_sites, Sector.star_for(system_id))
-			_add_site(_home_scoop_sites, Sector.GAS_GIANT_ID)
-		else:
-			for star_id: int in Sector.stars_for(system_id):
-				_add_site(list, star_id)
+	_site_list = VBoxContainer.new()
+	_site_list.add_theme_constant_override("separation", 4)
+	list.add_child(_site_list)
 	_convoy_order = VBoxContainer.new()
 	_convoy_order.add_theme_constant_override("separation", 3)
 	list.add_child(_convoy_order)
@@ -223,22 +214,12 @@ func _build_trajectory_panel(parent: PanelContainer) -> void:
 	_trajectory_panel.add_theme_constant_override("separation", 8)
 	parent.add_child(_trajectory_panel)
 	_label(_trajectory_panel, "Траектория корабля", 21, TRAJECTORY)
-	var focus_choices := HBoxContainer.new()
-	focus_choices.add_theme_constant_override("separation", 5)
-	_trajectory_panel.add_child(focus_choices)
-	_add_focus_button(focus_choices, -1, "Звезда")
+	_focus_choices = HBoxContainer.new()
+	_focus_choices.add_theme_constant_override("separation", 5)
+	_trajectory_panel.add_child(_focus_choices)
 	_companion_focus_choices = HBoxContainer.new()
 	_companion_focus_choices.add_theme_constant_override("separation", 5)
 	_trajectory_panel.add_child(_companion_focus_choices)
-	for system_id in range(Sector.SYSTEM_COUNT):
-		var stellar_ids := Sector.stars_for(system_id)
-		var multiple_stars := stellar_ids.size() > 1
-		for star_id: int in stellar_ids.slice(1):
-			_add_focus_button(focus_choices, star_id, str(Sector.site(star_id).name))
-		for id: int in Sector.targets_for(system_id):
-			var body := Sector.site(id)
-			if body.kind in ["planet", "moon", "gas"]:
-				_add_focus_button(_companion_focus_choices if multiple_stars else focus_choices, id, str(body.name))
 	_trajectory_scroll = ScrollContainer.new()
 	_trajectory_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_trajectory_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -405,13 +386,7 @@ func open(sim: RefCounted) -> void:
 	var targets: Array = sim.local_targets()
 	var stellar_ids := Sector.stars_for(system_id)
 	var multiple_stars := stellar_ids.size() > 1
-	_home_scoop_sites.visible = system_id == Sector.HOME_SYSTEM
-	for id: int in _site_buttons:
-		_site_buttons[id].visible = targets.has(id)
-	for id: int in _focus_buttons:
-		_focus_buttons[id].visible = id == -1 or targets.has(id)
-	_companion_focus_choices.visible = multiple_stars
-	_focus_buttons[-1].text = str(Sector.site(_star_focus).name) if multiple_stars else "Звезда"
+	_refresh_target_buttons(system_id, targets, stellar_ids)
 	_chart.center_of_mass = Sector.system(system_id).get("barycenter", Vector3.INF)
 	_chart.stellar_orbits.clear()
 	if multiple_stars:
@@ -476,6 +451,42 @@ func close() -> void:
 
 func is_open() -> bool:
 	return is_instance_valid(_sheet) and visible
+
+
+func _refresh_target_buttons(system_id: int, targets: Array, stellar_ids: Array) -> void:
+	if _listed_targets == targets:
+		return
+	_listed_targets = targets.duplicate()
+	_site_buttons.clear()
+	_focus_buttons.clear()
+	for container: Container in [_site_list, _focus_choices, _companion_focus_choices]:
+		for child in container.get_children():
+			container.remove_child(child)
+			child.queue_free()
+
+	for id: int in Sector.ports_for(system_id) + Sector.mines_for(system_id):
+		if targets.has(id):
+			_add_site(_site_list, id)
+	if system_id == Sector.HOME_SYSTEM:
+		var scoop_sites := HBoxContainer.new()
+		scoop_sites.add_theme_constant_override("separation", 4)
+		_site_list.add_child(scoop_sites)
+		_add_site(scoop_sites, _star_focus)
+		_add_site(scoop_sites, Sector.GAS_GIANT_ID)
+	else:
+		for id: int in stellar_ids:
+			_add_site(_site_list, id)
+
+	var multiple_stars := stellar_ids.size() > 1
+	_companion_focus_choices.visible = multiple_stars
+	_add_focus_button(_focus_choices, -1, str(Sector.site(_star_focus).name) if multiple_stars else "Звезда")
+	for id: int in stellar_ids.slice(1):
+		_add_focus_button(_focus_choices, id, str(Sector.site(id).name))
+	var body_focuses := _companion_focus_choices if multiple_stars else _focus_choices
+	for id: int in targets:
+		var body := Sector.site(id)
+		if body.kind in ["planet", "moon", "gas"]:
+			_add_focus_button(body_focuses, id, str(body.name))
 
 
 func _add_site(parent: Container, id: int) -> void:

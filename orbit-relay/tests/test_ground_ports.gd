@@ -38,7 +38,7 @@ func _run() -> void:
 
 func _test_catalog() -> void:
 	_expect(Catalog.PRE_GROUND_DESTINATION_COUNT == 87 and PAD == 87 and HANGAR == 88
-		and Catalog.DESTINATION_COUNT == 89 and Catalog.system(Catalog.VELAR_SYSTEM).arrival_port == ORBITAL
+		and Catalog.PRE_EXPANDED_DESTINATION_COUNT == 89 and Catalog.system(Catalog.VELAR_SYSTEM).arrival_port == ORBITAL
 		and Catalog.ports_for(Catalog.VELAR_SYSTEM) == [10, 11, PAD, HANGAR],
 		"New surface destinations append to the catalog without redirecting the existing orbital arrival")
 	_expect(Catalog.site(PAD).name == "Откос" and Catalog.site(HANGAR).name == "Шлюз Лазури"
@@ -67,7 +67,7 @@ func _test_catalog() -> void:
 		"Ballistic prediction distinguishes the sky, the roof and the floor beyond the open corridor")
 	var ship := Flight.new()
 	var saved := ship.snapshot()
-	_expect(saved.market.size() == 11 and saved.mining.reserves.size() == 89
+	_expect(saved.market.size() == 11 and saved.mining.reserves.size() == Catalog.DESTINATION_COUNT
 		and ship.mining.reserve_at(BODY) == 192 and ship.mining.reserve_at(PAD) == 0 and ship.mining.reserve_at(HANGAR) == 0,
 		"Ground markets get their own stocks while the existing moon remains the mining deposit")
 

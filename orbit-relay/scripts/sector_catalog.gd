@@ -4,7 +4,7 @@ extends RefCounted
 const ProceduralSystems = preload("res://scripts/procedural_systems.gd")
 const SECTOR_SIZE := ProceduralSystems.SECTOR_SIZE
 const GENERATED_SCAN_RANGE := 10.5
-const GENERATED_SYSTEM_COUNT := ProceduralSystems.SINGLE_SYSTEM_COUNT + 1
+const GENERATED_SYSTEM_COUNT := ProceduralSystems.SINGLE_SYSTEM_COUNT + 1 + ProceduralSystems.FRONTIER_SYSTEM_COUNT
 const SITE_COUNT := 9
 const STAR_ID := SITE_COUNT
 const TARGET_COUNT := SITE_COUNT + 1
@@ -18,6 +18,7 @@ const LIMIT_SYSTEM := HEATHER_SYSTEM + 1
 const AUTHORED_SYSTEM_COUNT := LIMIT_SYSTEM + 1
 const PRE_BINARY_SYSTEM_COUNT := AUTHORED_SYSTEM_COUNT + ProceduralSystems.SINGLE_SYSTEM_COUNT
 const BINARY_SYSTEM := PRE_BINARY_SYSTEM_COUNT
+const PRE_EXPANDED_SYSTEM_COUNT := BINARY_SYSTEM + 1
 const SYSTEM_COUNT := AUTHORED_SYSTEM_COUNT + GENERATED_SYSTEM_COUNT
 const PRE_SURFACE_DESTINATION_COUNT := 15
 const PRE_TRAFFIC_DESTINATION_COUNT := PRE_SURFACE_DESTINATION_COUNT + 1
@@ -33,7 +34,8 @@ const BINARY_MOON := BINARY_PLANET + 1
 const PRE_GROUND_DESTINATION_COUNT := BINARY_MOON + 1
 const GROUND_PAD := PRE_GROUND_DESTINATION_COUNT
 const GROUND_HANGAR := GROUND_PAD + 1
-const DESTINATION_COUNT := GROUND_HANGAR + 1
+const PRE_EXPANDED_DESTINATION_COUNT := GROUND_HANGAR + 1
+const DESTINATION_COUNT := PRE_EXPANDED_DESTINATION_COUNT + ProceduralSystems.FRONTIER_SYSTEM_COUNT * ProceduralSystems.TARGETS_PER_SYSTEM
 const GROUND_BODY := 12
 const VELAR_STAR_ID := 14
 const TERRACE_ID := PRE_SURFACE_DESTINATION_COUNT
@@ -175,11 +177,15 @@ const ROUTES := {
 }
 
 static var _generated := ProceduralSystems.build(AUTHORED_DESTINATION_COUNT)
+static var _frontier := ProceduralSystems.build_frontier(PRE_EXPANDED_DESTINATION_COUNT)
+static var _generated_by_sector := _index_generated_systems()
 
 
 static func site(id: int) -> Dictionary:
 	if id < 0 or id >= DESTINATION_COUNT:
 		return {}
+	if id >= PRE_EXPANDED_DESTINATION_COUNT:
+		return _frontier.sites[id - PRE_EXPANDED_DESTINATION_COUNT]
 	if id >= PRE_GROUND_DESTINATION_COUNT:
 		return GROUND_SITES[id - GROUND_PAD]
 	if id < AUTHORED_DESTINATION_COUNT:
@@ -190,6 +196,8 @@ static func site(id: int) -> Dictionary:
 static func system(id: int) -> Dictionary:
 	if id < 0 or id >= SYSTEM_COUNT:
 		return {}
+	if id >= PRE_EXPANDED_SYSTEM_COUNT:
+		return _frontier.systems[id - PRE_EXPANDED_SYSTEM_COUNT]
 	if id < AUTHORED_SYSTEM_COUNT:
 		return SYSTEMS[id]
 	return _generated.systems[id - AUTHORED_SYSTEM_COUNT]
@@ -212,9 +220,41 @@ static func sector_coordinates(id: int) -> Vector2i:
 	return Vector2i(floori(position.x / SECTOR_SIZE), floori(position.y / SECTOR_SIZE))
 
 
+static func generated_systems_near(system_id: int, radius: float) -> Array[int]:
+	var found: Array[int] = []
+	if system_id < 0 or system_id >= SYSTEM_COUNT or not is_finite(radius) or radius <= 0.0:
+		return found
+	var position := system_position3(system_id)
+	var plane := Vector2(position.x, position.y)
+	var extent := Vector2.ONE * minf(radius, SECTOR_SIZE * ProceduralSystems.FRONTIER_WIDTH)
+	var first := Vector2i(((plane - extent) / SECTOR_SIZE).floor())
+	var last := Vector2i(((plane + extent) / SECTOR_SIZE).floor())
+	var edge := ProceduralSystems.FRONTIER_RADIUS
+	for y in range(maxi(first.y, -edge), mini(last.y, edge) + 1):
+		for x in range(maxi(first.x, -edge), mini(last.x, edge) + 1):
+			for candidate: int in _generated_by_sector.get(Vector2i(x, y), []):
+				if candidate != system_id and position.distance_to(system_position3(candidate)) <= radius:
+					found.append(candidate)
+	found.sort()
+	return found
+
+
+static func _index_generated_systems() -> Dictionary:
+	var sectors := {}
+	for id in range(AUTHORED_SYSTEM_COUNT, SYSTEM_COUNT):
+		var sector := sector_coordinates(id)
+		if not sectors.has(sector):
+			sectors[sector] = []
+		sectors[sector].append(id)
+	return sectors
+
+
 static func system_of_site(id: int) -> int:
 	if id < 0 or id >= DESTINATION_COUNT:
 		return -1
+	if id >= PRE_EXPANDED_DESTINATION_COUNT:
+		@warning_ignore("integer_division")
+		return PRE_EXPANDED_SYSTEM_COUNT + (id - PRE_EXPANDED_DESTINATION_COUNT) / ProceduralSystems.TARGETS_PER_SYSTEM
 	if id >= PRE_GROUND_DESTINATION_COUNT:
 		return VELAR_SYSTEM
 	if id >= PRE_BINARY_DESTINATION_COUNT:

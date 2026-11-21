@@ -11,6 +11,7 @@ const GAS_GIANT_DENSITY := 0.000024
 const GAS_FULL_GRAVITY_RADII := 2.4
 const GAS_FIELD_RADII := 3.0
 const MIN_SOURCE_RADIUS := 0.001
+const MAX_CACHED_SYSTEMS := 8
 
 
 class Attractor:
@@ -26,7 +27,8 @@ class Attractor:
 		localized = local_field
 
 
-static var _attractors: Array[Array] = _build_attractors()
+# Local flight and trajectory prediction share the sources for the system they sample.
+static var _attractors: Dictionary[int, Array] = {}
 
 
 static func gravity_parameter(site_id: int) -> float:
@@ -48,19 +50,19 @@ static func gravity_parameter(site_id: int) -> float:
 
 static func acceleration(sim: RefCounted, point: Vector3) -> Vector3:
 	var system: int = sim.system_id
-	if system < 0 or system >= _attractors.size():
+	if system < 0 or system >= Catalog.SYSTEM_COUNT:
 		return Vector3.ZERO
 	var total := Vector3.ZERO
-	for source: Attractor in _attractors[system]:
+	for source: Attractor in _sources_for(system):
 		total += _source_acceleration(source, point, sim.target_position(source.site))
 	return total
 
 
 static func acceleration_at_epoch(system: int, point: Vector3, epoch: float) -> Vector3:
-	if system < 0 or system >= _attractors.size():
+	if system < 0 or system >= Catalog.SYSTEM_COUNT:
 		return Vector3.ZERO
 	var total := Vector3.ZERO
-	for source: Attractor in _attractors[system]:
+	for source: Attractor in _sources_for(system):
 		var center: Vector3 = Orbit.sample(source.site, epoch).position
 		total += _source_acceleration(source, point, center)
 	return total
@@ -86,17 +88,19 @@ static func point_acceleration(point: Vector3, center: Vector3, mu: float, min_r
 	return offset * (mu / (sampling_radius_squared * sqrt(sampling_radius_squared)))
 
 
-static func _build_attractors() -> Array[Array]:
-	var by_system: Array[Array] = []
-	for system_id in range(Catalog.SYSTEM_COUNT):
-		var sources: Array[Attractor] = []
-		for star_id: int in Catalog.stars_for(system_id):
-			sources.append(Attractor.new(star_id, Catalog.stellar_clearance(star_id), gravity_parameter(star_id)))
-		for site_id: int in Catalog.targets_for(system_id):
-			if Catalog.is_star(site_id):
-				continue
-			var mu := gravity_parameter(site_id)
-			if mu > 0.0:
-				sources.append(Attractor.new(site_id, Catalog.site(site_id).radius, mu, Catalog.is_gas_giant(site_id)))
-		by_system.append(sources)
-	return by_system
+static func _sources_for(system_id: int) -> Array[Attractor]:
+	if _attractors.has(system_id):
+		return _attractors[system_id]
+	if _attractors.size() >= MAX_CACHED_SYSTEMS:
+		_attractors.erase(_attractors.keys()[0])
+	var sources: Array[Attractor] = []
+	for star_id: int in Catalog.stars_for(system_id):
+		sources.append(Attractor.new(star_id, Catalog.stellar_clearance(star_id), gravity_parameter(star_id)))
+	for site_id: int in Catalog.targets_for(system_id):
+		if Catalog.is_star(site_id):
+			continue
+		var mu := gravity_parameter(site_id)
+		if mu > 0.0:
+			sources.append(Attractor.new(site_id, Catalog.site(site_id).radius, mu, Catalog.is_gas_giant(site_id)))
+	_attractors[system_id] = sources
+	return sources
