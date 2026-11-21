@@ -1,0 +1,324 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.93.0",
+  "source_commit": "95b520bb543767136bf8e0ff38fd7d3e883b72ce",
+  "content": {
+    "save_schema": 47,
+    "systems": 512,
+    "stars": 513,
+    "targets": 1553,
+    "solid_mineable_sites": 1028,
+    "new_systems": 416,
+    "outer_arms": 4,
+    "previous_ids_preserved": 96,
+    "previous_target_ids_preserved": 305,
+    "tested_acceptance_matrix": {
+      "checked": 46,
+      "partial": 0,
+      "open": 0
+    }
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 118,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.92.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 57,
+    "tested_on_device": false
+  },
+  "checks": {
+    "android_report_share": {
+      "failures": 0,
+      "checks": 76
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "binary_orbits": {
+      "failures": 0,
+      "checks": 55
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "branching_story": {
+      "failures": 0,
+      "checks": 26
+    },
+    "calendar": {
+      "failures": 0,
+      "checks": 53
+    },
+    "cartography": {
+      "failures": 0,
+      "checks": 43
+    },
+    "civilian_traffic": {
+      "failures": 0,
+      "checks": 41
+    },
+    "combat_outfitting": {
+      "failures": 0,
+      "checks": 76
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "crew": {
+      "failures": 0,
+      "checks": 45
+    },
+    "customs": {
+      "failures": 0,
+      "checks": 28
+    },
+    "departure": {
+      "failures": 0,
+      "checks": 32
+    },
+    "dock_access": {
+      "failures": 0,
+      "checks": 37
+    },
+    "docking": {
+      "failures": 0,
+      "checks": 76
+    },
+    "dual_fuel": {
+      "failures": 0,
+      "checks": 25
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 155
+    },
+    "expanded_galaxy": {
+      "failures": 0,
+      "checks": 3084
+    },
+    "flight": {
+      "failures": 0
+    },
+    "flight_audio": {
+      "failures": 0,
+      "checks": 28
+    },
+    "flight_camera": {
+      "failures": 0,
+      "checks": 18
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "frontier_freight": {
+      "failures": 0,
+      "checks": 33
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 76
+    },
+    "fuel_modules": {
+      "failures": 0,
+      "checks": 36
+    },
+    "galactic_atlas": {
+      "failures": 0,
+      "checks": 22
+    },
+    "galactic_routes": {
+      "failures": 0,
+      "checks": 59
+    },
+    "gear": {
+      "failures": 0,
+      "checks": 28
+    },
+    "ground_ports": {
+      "failures": 0,
+      "checks": 41
+    },
+    "heat_shield": {
+      "failures": 0,
+      "checks": 28
+    },
+    "hyperspace": {
+      "failures": 0,
+      "checks": 64
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 295
+    },
+    "lazur_rotation": {
+      "failures": 0,
+      "checks": 243
+    },
+    "living": {
+      "failures": 0,
+      "checks": 83
+    },
+    "material_maps": {
+      "failures": 0,
+      "checks": 38
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "npc_freight": {
+      "failures": 0,
+      "checks": 48
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "orbital_mining": {
+      "failures": 0,
+      "checks": 34
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 561
+    },
+    "passengers": {
+      "failures": 0,
+      "checks": 50
+    },
+    "pilot_career": {
+      "failures": 0,
+      "checks": 44
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 88
+    },
+    "procedural_galaxy": {
+      "failures": 0,
+      "checks": 149
+    },
+    "reference_frames": {
+      "failures": 0,
+      "checks": 46
+    },
+    "remote_rig": {
+      "failures": 0,
+      "checks": 35
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "report": {
+      "failures": 0,
+      "checks": 28
+    },
+    "save_backup": {
+      "failures": 0,
+      "checks": 28
+    },
+    "save_phases": {
+      "failures": 0,
+      "checks": 72
+    },
+    "scene": {
+      "failures": 0
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "sector_news": {
+      "failures": 0,
+      "checks": 30
+    },
+    "shipyard": {
+      "failures": 0,
+      "checks": 52
+    },
+    "speed_hold": {
+      "failures": 0,
+      "checks": 54
+    },
+    "stellar_lighting": {
+      "failures": 0,
+      "checks": 9
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 5261
+    },
+    "surface_guidance": {
+      "failures": 0,
+      "checks": 60
+    },
+    "surface_rotation": {
+      "failures": 0,
+      "checks": 2597
+    },
+    "compiled_outer_arm_expeditions": {
+      "checks": 215,
+      "failures": 0,
+      "voyages": 4,
+      "jumps": 191,
+      "stellar_scoops": 204
+    },
+    "compiled_route_distance_index_vs_uncropped_reference": {
+      "checks": 54,
+      "failures": 0
+    },
+    "compiled_atlas_interaction": {
+      "checks": 22,
+      "failures": 0
+    },
+    "compiled_software_opengl_es_atlas": {
+      "checks": 22,
+      "touch_interactions": 9,
+      "failures": 0
+    },
+    "compiled_older_flight_compatibility": {
+      "checks": 2816,
+      "different_payloads": 2052,
+      "failures": 0
+    },
+    "entire_sector_index": {
+      "checks": 6896,
+      "failures": 0
+    },
+    "legacy_surface_samples_byte_identical": {
+      "checks": 37080,
+      "failures": 0
+    }
+  },
+  "files": {
+    "OrbitRelay-0.93.0-arm64.apk": {
+      "bytes": 34179038,
+      "sha256": "68a0d80ea265448ef4a0a1896ae055376518ce1a8e543852a1411f7a561b4e52"
+    },
+    "OrbitRelay-0.93.0-source.zip": {
+      "bytes": 6755034,
+      "sha256": "996972431c062e3116181858f39eca4dbfa05b9a997061ca2d436461b91204af"
+    },
+    "galaxy-atlas.png": {
+      "bytes": 145466,
+      "sha256": "9cf663eb3624f5ca6e7e84513f3a9653c45acd9c04980de9c20d492a48ffb1b0"
+    },
+    "local-sector.png": {
+      "bytes": 114736,
+      "sha256": "dbb97cc2e9a1468ef97451da5ec7b61da07f25fd7e8671625d475387258644ea"
+    }
+  }
+}
