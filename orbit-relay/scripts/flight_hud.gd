@@ -2,6 +2,7 @@ extends CanvasLayer
 
 signal action_requested(action: String)
 signal frame_requested()
+signal navigation_requested(site: int, from_view: bool)
 
 const MiningRig := preload("res://scripts/mining_rig.gd")
 const Sector := preload("res://scripts/sector_catalog.gd")
@@ -28,6 +29,8 @@ const TOUCH_GAINS := [0.72, 1.0, 1.36]
 const CONTACT_NOTICE_DISTANCE := 1100.0
 const HOLD_ACTIONS := ["boost", "brake", "translation_forward", "translation_reverse"]
 const MARK_PRIORITY := {"raider": 0, "convoy": 1}
+const NAV_DRAG_THRESHOLD := 12.0
+const NAV_MOUSE := -2
 const RIG_ACTIONS := {
 	"rig_deploy": "can_deploy", "rig_unload": "can_unload",
 	"rig_retrieve": "can_retrieve", "rig_route": "can_route",
@@ -95,6 +98,11 @@ var _operation_progress: ProgressBar
 var _right_panel: PanelContainer
 var _throttle_controls: GridContainer
 var _port_tools: HBoxContainer
+var _navigation_drawer: PanelContainer
+var _navigation_list: ItemList
+var _navigation_sites: Array[int] = []
+var _navigation_blockers: Array[Control] = []
+var _navigation_presses: Dictionary[int, NavigationPress] = {}
 var _actions: Dictionary = {}
 var _touch_owner: Dictionary = {}
 var _steer_finger := -1
@@ -178,13 +186,15 @@ func build() -> void:
 	_button(shortcuts, "journal", "Журнал")
 	_button(shortcuts, "settings", "Настройки")
 	_button(shortcuts, "frontier", "Освоение")
-	for action: String in ["journal", "settings", "frontier"]:
+	_button(shortcuts, "navigation_toggle", "Цели")
+	for action: String in ["journal", "settings", "frontier", "navigation_toggle"]:
 		var button: Button = _actions[action]
 		button.custom_minimum_size.y = 48.0
 		button.add_theme_font_size_override("font_size", 16)
 	_actions["journal"].tooltip_text = "Журнал заданий"
 	_actions["settings"].tooltip_text = "Графика и управление"
 	_actions["frontier"].tooltip_text = "Разведка, строительство и фракции"
+	_actions["navigation_toggle"].tooltip_text = "Объекты текущей системы и подписи в полёте (F12)"
 	course_card.resized.connect(func() -> void:
 		shortcuts.offset_top = course_card.position.y + course_card.size.y + 8.0
 		shortcuts.offset_bottom = shortcuts.offset_top + 48.0
@@ -377,9 +387,40 @@ func build() -> void:
 	_notice.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_notice.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_notice_panel.hide()
+	_build_navigation_drawer()
+	_navigation_blockers.assign([
+		course_card, shortcuts, instrument_stack.get_parent(), _steer, _bank, _camera_controls,
+		_flight_modes, _translation_controls, _commands_panel, _right_panel, _notice_panel,
+		_docking_panel, _surface_panel, _navigation_drawer,
+	])
 	get_viewport().size_changed.connect(_update_safe_area)
 	_update_safe_area()
 	_apply_touch_layout()
+
+func _build_navigation_drawer() -> void:
+	var stack := _panel(_safe, Vector2(0.5, 0.5), Rect2(-240, -176, 480, 310))
+	_navigation_drawer = stack.get_parent() as PanelContainer
+	_navigation_drawer.mouse_filter = Control.MOUSE_FILTER_STOP
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 6)
+	stack.add_child(header)
+	var title := _label(header, 21, CYAN)
+	title.text = "Объекты системы"
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	for action: String in ["object_labels", "navigation_close"]:
+		_button(header, action, "Подписи вкл." if action == "object_labels" else "Закрыть")
+		_actions[action].add_theme_font_size_override("font_size", 16)
+		_actions[action].custom_minimum_size.y = 46.0
+		_actions[action].size_flags_horizontal = Control.SIZE_SHRINK_END
+	_actions["object_labels"].tooltip_text = "Показывать названия объектов и контактов поверх сцены"
+	_navigation_list = ItemList.new()
+	_navigation_list.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_navigation_list.add_theme_font_size_override("font_size", 18)
+	_navigation_list.add_theme_constant_override("v_separation", 16)
+	_navigation_list.add_theme_stylebox_override("panel", _box(Color("102730"), LINE, 8, 8.0))
+	_navigation_list.item_selected.connect(_select_navigation_row)
+	stack.add_child(_navigation_list)
+	_navigation_drawer.hide()
 
 func _build_combat_instrument(parent: VBoxContainer) -> void:
 	_combat_readout = VBoxContainer.new()
@@ -640,6 +681,8 @@ func sync(sim: RefCounted, delta: float) -> void:
 	if _orbital_mining_tools.visible:
 		_right_panel.offset_top -= 57.0
 	_marks.flight = not parked and not _jump_transit
+	if not _marks.flight and _navigation_drawer.visible:
+		close_navigation()
 	_marks.queue_redraw()
 	_sync_remote_rig(sim.remote_rig_status(), docked, landed)
 
@@ -1325,12 +1368,56 @@ func set_traffic_markers(markers: Array[Dictionary]) -> void:
 		return left_priority < right_priority if left_priority != right_priority else float(left.distance) < float(right.distance))
 	_marks.queue_redraw()
 
+func set_navigation_targets(sites: Array, selected: int) -> void:
+	if _navigation_sites != sites:
+		_navigation_sites.assign(sites)
+		_navigation_list.clear()
+		for site: int in _navigation_sites:
+			var body := Sector.site(site)
+			_navigation_list.add_item("%s  ·  %s" % [body.name, Sector.kind_name(body.kind)])
+		_refresh_disabled_actions()
+	var index := _navigation_sites.find(selected)
+	if index < 0:
+		_navigation_list.deselect_all()
+	elif not _navigation_list.is_selected(index):
+		_navigation_list.select(index)
+
+func set_navigation_markers(markers: Array[Dictionary]) -> void:
+	var exclude: Array[Rect2] = []
+	for control: Control in _navigation_blockers:
+		if control.is_visible_in_tree():
+			exclude.append(control.get_global_rect())
+	_marks.set_navigation(markers, _safe.get_global_rect().grow(-20.0), exclude)
+
+func toggle_navigation() -> void:
+	if not _input_enabled or _parked or _jumping:
+		return
+	if _navigation_drawer.visible:
+		close_navigation()
+	elif not _navigation_sites.is_empty():
+		_navigation_drawer.show()
+
+func close_navigation() -> bool:
+	if not _navigation_drawer.visible:
+		return false
+	_navigation_drawer.hide()
+	return true
+
+func _select_navigation_row(index: int) -> void:
+	if _navigation_drawer.visible and _input_enabled and index >= 0 and index < _navigation_sites.size():
+		_request_navigation(_navigation_sites[index], false)
+
+func _request_navigation(site: int, from_view: bool) -> void:
+	close_navigation()
+	navigation_requested.emit(site, from_view)
+
 func set_input_enabled(enabled: bool) -> void:
 	_input_enabled = enabled
 	if not is_instance_valid(_hud):
 		return
 	if not enabled:
 		_reset_controls()
+		close_navigation()
 		_docking_panel.hide()
 		_surface_panel.hide()
 		_actions["dock_sync"].hide()
@@ -1376,6 +1463,7 @@ func _refresh_disabled_actions() -> void:
 		blocked = blocked or (action == "frame" and _frame_blocked)
 		blocked = blocked or (action == "autopilot" and _autopilot_blocked)
 		blocked = blocked or (action == "speed_hold" and (_speed_hold_blocked or _time_paused))
+		blocked = blocked or (action == "navigation_toggle" and (_parked or _navigation_sites.is_empty()))
 		blocked = blocked or (RIG_ACTIONS.has(action) and not _rig_status.get(RIG_ACTIONS[action], false))
 		blocked = blocked or (ORBITAL_MINING_ACTIONS.has(action) and not _orbital_mining_status.get(ORBITAL_MINING_ACTIONS[action], false))
 		var manual_thrust := action in HOLD_ACTIONS or action in ["throttle_down", "throttle_up"]
@@ -1440,7 +1528,7 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		return
 	if event is InputEventScreenTouch:
-		var handled := _touch_begin(event.index, event.position) if event.pressed else _touch_end(event.index, event.position, event.canceled)
+		var handled := _touch_begin(event.index, event.position) if event.pressed and not event.canceled else _touch_end(event.index, event.position, event.canceled)
 		if handled:
 			get_viewport().set_input_as_handled()
 	elif event is InputEventScreenDrag and _touch_owner.has(event.index):
@@ -1448,22 +1536,32 @@ func _input(event: InputEvent) -> void:
 			_steer.update_point(event.position)
 		elif event.index == _bank_finger:
 			_bank.update_point(event.position)
+		elif _navigation_presses.has(event.index):
+			_drag_navigation(event.index, event.position)
 		get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if event.pressed and not _time_paused:
-			if _hit(_steer, event.position):
-				_mouse_pad = _steer
-			elif _hit(_bank, event.position):
-				_mouse_pad = _bank
+		if event.pressed:
+			if not _time_paused:
+				if _hit(_steer, event.position):
+					_mouse_pad = _steer
+				elif _hit(_bank, event.position):
+					_mouse_pad = _bank
 			if is_instance_valid(_mouse_pad):
 				_mouse_pad.update_point(event.position)
+				get_viewport().set_input_as_handled()
+			elif _begin_navigation_press(NAV_MOUSE, event.position, false):
 				get_viewport().set_input_as_handled()
 		elif is_instance_valid(_mouse_pad):
 			_mouse_pad.reset()
 			_mouse_pad = null
 			get_viewport().set_input_as_handled()
+		elif _end_navigation_press(NAV_MOUSE, event.position, false):
+			get_viewport().set_input_as_handled()
 	elif event is InputEventMouseMotion and is_instance_valid(_mouse_pad):
 		_mouse_pad.update_point(event.position)
+		get_viewport().set_input_as_handled()
+	elif event is InputEventMouseMotion and _navigation_presses.has(NAV_MOUSE):
+		_drag_navigation(NAV_MOUSE, event.position)
 		get_viewport().set_input_as_handled()
 
 func _notification(what: int) -> void:
@@ -1472,6 +1570,7 @@ func _notification(what: int) -> void:
 
 func _reset_controls() -> void:
 	_touch_owner.clear()
+	_navigation_presses.clear()
 	_steer_finger = -1
 	_bank_finger = -1
 	_mouse_pad = null
@@ -1504,6 +1603,9 @@ func _touch_begin(index: int, point: Vector2) -> bool:
 			else:
 				button.self_modulate = CYAN
 			return true
+	if _begin_navigation_press(index, point, true):
+		_touch_owner[index] = "navigation_press"
+		return true
 	return false
 
 func _touch_end(index: int, point: Vector2, canceled: bool) -> bool:
@@ -1520,6 +1622,8 @@ func _touch_end(index: int, point: Vector2, canceled: bool) -> bool:
 			_bank.reset()
 		"boost", "brake", "translation_forward", "translation_reverse":
 			_update_held()
+		"navigation_press":
+			_end_navigation_press(index, point, canceled)
 		_:
 			var button: Button = _actions[action]
 			if not _touch_owner.values().has(action):
@@ -1527,6 +1631,53 @@ func _touch_end(index: int, point: Vector2, canceled: bool) -> bool:
 			if not canceled and not button.disabled and _hit(button, point):
 				_commit_action(action)
 	return true
+
+func _begin_navigation_press(index: int, point: Vector2, allow_drawer: bool) -> bool:
+	if _parked or _jumping:
+		return false
+	var from_view := not _hit(_navigation_drawer, point)
+	if not from_view and not allow_drawer:
+		return false
+	var site := _navigation_marker_at(point) if from_view else _navigation_row_at(point)
+	if from_view and site < 0:
+		return false
+	var press := NavigationPress.new()
+	press.site = site
+	press.point = point
+	press.from_view = from_view
+	press.scroll_origin = _navigation_list.get_v_scroll_bar().value
+	_navigation_presses[index] = press
+	return true
+
+func _drag_navigation(index: int, point: Vector2) -> void:
+	var press := _navigation_presses[index]
+	var movement := point - press.point
+	press.dragged = press.dragged or movement.length() > NAV_DRAG_THRESHOLD
+	if press.dragged and not press.from_view:
+		_navigation_list.get_v_scroll_bar().value = press.scroll_origin - movement.y
+
+func _end_navigation_press(index: int, point: Vector2, canceled: bool) -> bool:
+	var press: NavigationPress = _navigation_presses.get(index)
+	if press == null:
+		return false
+	_navigation_presses.erase(index)
+	if not canceled and not press.dragged and not _parked and not _jumping and press.site >= 0:
+		var current := _navigation_marker_at(point) if press.from_view else _navigation_row_at(point)
+		if current == press.site:
+			_request_navigation(press.site, press.from_view)
+	return true
+
+func _navigation_row_at(point: Vector2) -> int:
+	if not _hit(_navigation_list, point):
+		return -1
+	var index := _navigation_list.get_item_at_position(point - _navigation_list.get_global_rect().position, true)
+	return _navigation_sites[index] if index >= 0 and index < _navigation_sites.size() else -1
+
+func _navigation_marker_at(point: Vector2) -> int:
+	for control: Control in _navigation_blockers:
+		if _hit(control, point):
+			return -1
+	return _marks.navigation_at(point)
 
 func _update_held() -> void:
 	var touches := _touch_owner.values()
@@ -1554,6 +1705,14 @@ func _commit_action(action: String) -> void:
 		_update_translation_mode()
 	elif action == "frame":
 		frame_requested.emit()
+	elif action == "navigation_toggle":
+		toggle_navigation()
+	elif action == "navigation_close":
+		close_navigation()
+	elif action == "object_labels":
+		_marks.object_labels = not _marks.object_labels
+		_actions["object_labels"].text = "Подписи вкл." if _marks.object_labels else "Подписи выкл."
+		_marks.queue_redraw()
 	else:
 		if action == "flight_assist":
 			_reset_controls()
@@ -1674,14 +1833,49 @@ class SteeringPad extends Control:
 		var width := font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
 		draw_string(font, Vector2((size.x - width) * 0.5, size.y - 4), caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, MUTED)
 
+class NavigationPress extends RefCounted:
+	var site := -1
+	var point := Vector2.ZERO
+	var from_view := false
+	var dragged := false
+	var scroll_origin := 0.0
+
 class FlightMarks extends Control:
 	const MAX_CONTACTS := 3
+	const MAX_NAVIGATION_MARKERS := 6
+	const NAVIGATION_HIT_RADIUS := 22.0
 
 	var flight := false
 	var forward_aim := true
 	var target_visible := false
 	var target_position := Vector2.ZERO
+	var object_labels := true
 	var traffic: Array[Dictionary] = []
+	var navigation: Array[Dictionary] = []
+	var _excluded: Array[Rect2] = []
+
+	func set_navigation(markers: Array[Dictionary], safe_area: Rect2, excluded: Array[Rect2]) -> void:
+		navigation.clear()
+		_excluded = excluded
+		for marker: Dictionary in markers:
+			var screen: Vector2 = marker.screen
+			if not safe_area.has_point(screen) or _excluded.any(func(rect: Rect2) -> bool: return rect.grow(12.0).has_point(screen)):
+				continue
+			if navigation.any(func(other: Dictionary) -> bool: return screen.distance_to(other.screen) < NAVIGATION_HIT_RADIUS * 2.0):
+				continue
+			navigation.append(marker)
+			if navigation.size() >= MAX_NAVIGATION_MARKERS:
+				break
+		queue_redraw()
+
+	func navigation_at(point: Vector2) -> int:
+		if not flight:
+			return -1
+		for marker: Dictionary in navigation:
+			var screen: Vector2 = marker.screen
+			if screen.distance_squared_to(point) <= NAVIGATION_HIT_RADIUS * NAVIGATION_HIT_RADIUS:
+				return marker.id
+		return -1
 
 	func _draw() -> void:
 		if not flight:
@@ -1690,7 +1884,7 @@ class FlightMarks extends Control:
 		if forward_aim:
 			for direction: Vector2 in [Vector2.UP, Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT]:
 				draw_line(center + direction * 13.0, center + direction * 23.0, Color(0.57, 0.92, 0.9, 0.65), 1.5, true)
-		_draw_traffic()
+		_draw_navigation(_draw_traffic())
 		if not target_visible:
 			return
 		var margin := Vector2(42, 112)
@@ -1705,7 +1899,31 @@ class FlightMarks extends Control:
 		var vertices := PackedVector2Array([target + Vector2(0, -distance), target + Vector2(distance, 0), target + Vector2(0, distance), target + Vector2(-distance, 0), target + Vector2(0, -distance)])
 		draw_polyline(vertices, AMBER, 2.0, true)
 
-	func _draw_traffic() -> void:
+	func _draw_navigation(occupied: Array[Rect2]) -> void:
+		var font := ThemeDB.fallback_font
+		for marker: Dictionary in navigation:
+			var screen: Vector2 = marker.screen
+			var color := AMBER if marker.active else CYAN
+			draw_line(screen - Vector2(10, 6), screen - Vector2(4, 6), color, 1.8, true)
+			draw_line(screen + Vector2(4, -6), screen + Vector2(10, -6), color, 1.8, true)
+			draw_line(screen + Vector2(-10, 6), screen + Vector2(-4, 6), color, 1.8, true)
+			draw_line(screen + Vector2(4, 6), screen + Vector2(10, 6), color, 1.8, true)
+			draw_circle(screen, 1.8, color, true, -1.0, true)
+			if not object_labels:
+				continue
+			var caption: String = marker.name
+			var width := font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
+			var text_at := Vector2(clampf(screen.x - width * 0.5, 16.0, maxf(16.0, size.x - width - 16.0)), screen.y + 25.0)
+			var label_box := Rect2(text_at - Vector2(5, 14), Vector2(width + 10, 19))
+			if _excluded.any(func(rect: Rect2) -> bool: return rect.intersects(label_box)):
+				continue
+			if occupied.any(func(rect: Rect2) -> bool: return rect.intersects(label_box)):
+				continue
+			occupied.append(label_box)
+			draw_rect(label_box, BACK)
+			draw_string(font, text_at, caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, color)
+
+	func _draw_traffic() -> Array[Rect2]:
 		var safe := Rect2(Vector2(24, 142), (size - Vector2(48, 285)).max(Vector2.ONE))
 		var font := ThemeDB.fallback_font
 		var occupied: Array[Rect2] = []
@@ -1722,7 +1940,9 @@ class FlightMarks extends Control:
 			var width := font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
 			var text_at := Vector2(clampf(screen.x - width * 0.5, 20.0, maxf(20.0, size.x - width - 20.0)), screen.y + 27.0)
 			var label_box := Rect2(text_at - Vector2(6, 15), Vector2(width + 12, 21))
-			var footprint := label_box.merge(Rect2(screen - Vector2(12, 12), Vector2(24, 24)))
+			var footprint := Rect2(screen - Vector2(12, 12), Vector2(24, 24))
+			if object_labels:
+				footprint = label_box.merge(footprint)
 			if occupied.any(func(box: Rect2) -> bool: return box.intersects(footprint)):
 				continue
 			occupied.append(footprint)
@@ -1739,7 +1959,9 @@ class FlightMarks extends Control:
 				draw_rect(Rect2(screen - Vector2(5, 4), Vector2(10, 8)), color, false, 1.4)
 			else:
 				draw_arc(screen, 7.0, 0.0, TAU, 20, color, 1.4, true)
-			draw_rect(label_box, BACK)
-			draw_string(font, text_at, caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, color)
+			if object_labels:
+				draw_rect(label_box, BACK)
+				draw_string(font, text_at, caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, color)
 			if occupied.size() >= MAX_CONTACTS:
 				break
+		return occupied

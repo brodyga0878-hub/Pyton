@@ -6,6 +6,7 @@ const Orbit := preload("res://scripts/orbit_ephemeris.gd")
 const Terrain := preload("res://scripts/surface_terrain.gd")
 const Dynamics := preload("res://scripts/orbital_dynamics.gd")
 const Atmosphere := preload("res://scripts/atmosphere.gd")
+const Ground := preload("res://scripts/ground_port.gd")
 const Economy := preload("res://scripts/port_economy.gd")
 
 const SCAN_CLEARANCE := 145.0
@@ -207,28 +208,67 @@ static func _scan_reason(sim: RefCounted, status: Dictionary) -> String:
 
 
 static func _body_data(sim: RefCounted, site_id: int, site: Dictionary) -> Dictionary:
-	var atmosphere := Atmosphere.profile(site_id)
 	var radius: float = site.radius
+	var mu := Dynamics.gravity_parameter(site_id)
 	var resource: String = site.get("resource", "")
-	var parent := Orbit.orbit_parent(site_id)
-	var host := int(site.get("ground_body", -1))
+	var kind: String = site.kind
+	var host := Ground.body(site_id)
+	var atmosphere := Atmosphere.profile(host if host >= 0 else site_id)
+	var solid := Catalog.is_mine_site(site_id)
 	var spin := Terrain.spin_rate(site_id)
 	if host >= 0:
 		spin = Terrain.spin_rate(host)
 	elif Catalog.is_port(site_id):
 		spin = float(site.spin)
-	return {
-		"radius": radius, "period": Orbit.period(site_id),
-		"orbit_parent": parent,
-		"orbit_reference": str(Catalog.site(parent).name) if parent >= 0 else (
-			"Центр масс звёзд" if Catalog.system_of_site(site_id) == Catalog.BINARY_SYSTEM else ""),
-		"gravity": Dynamics.gravity_parameter(site_id) / (radius * radius),
+	var scoop := kind if Catalog.is_star(site_id) or Catalog.is_gas_giant(site_id) else ""
+	var data := {
+		"radius": radius, "diameter": radius * 2.0, "gravity_parameter": mu,
+		"gravity": mu / (radius * radius),
+		"surface_class": _surface_class(site_id, kind, host, solid),
 		"atmosphere_height": float(atmosphere.get("height", 0.0)),
 		"atmosphere_density": float(atmosphere.get("density", 0.0)),
+		"landing_max_slope": Terrain.MAX_LANDING_SLOPE if solid else 0.0,
+		"contact_clearance": Terrain.CONTACT_CLEARANCE if solid else 0.0,
+		"scoop_kind": scoop,
 		"resource": resource, "resource_name": Catalog.resource_name(resource) if not resource.is_empty() else "",
 		"reserve": sim.mining.reserve_at(site_id) if not resource.is_empty() else 0,
-		"spin": spin,
+		"spin": spin, "spin_period": TAU / absf(spin) if spin != 0.0 else 0.0,
 	}
+	data.merge(_orbit_data(site_id, host))
+	return data
+
+
+static func _orbit_data(site_id: int, host: int) -> Dictionary:
+	var body := host if host >= 0 else site_id
+	var period := Orbit.period(body)
+	var system := Catalog.system_of_site(site_id)
+	var parent := Orbit.orbit_parent(body)
+	var reference := ""
+	if parent >= 0:
+		reference = Catalog.site(parent).name
+	elif period > 0.0:
+		if Catalog.stars_for(system).size() > 1:
+			reference = "Центр масс звёзд"
+		else:
+			parent = Catalog.star_for(system)
+			reference = Catalog.site(parent).name
+	var extrema := Orbit.extrema(body)
+	return {
+		"period": period, "orbit_parent": parent, "orbit_reference": reference,
+		"periapsis": extrema.x, "apoapsis": extrema.y,
+		"ground_body": host,
+		"ground_reference": str(Catalog.site(host).get("name", "")),
+	}
+
+
+static func _surface_class(site: int, kind: String, host: int, solid: bool) -> String:
+	if solid:
+		return "solid"
+	if host >= 0:
+		return "ground_hangar" if Ground.is_hangar(site) else "ground_pad"
+	if kind == "port":
+		return "orbital_port"
+	return kind
 
 
 static func _warehouse_totals(sim: RefCounted, ports: Array[int]) -> Dictionary:

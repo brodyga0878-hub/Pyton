@@ -4,10 +4,6 @@ extends RefCounted
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const Orbit = preload("res://scripts/orbit_ephemeris.gd")
 
-# Multiply radius cubed by a scaled density to get mu in game units (m^3/s^2).
-const PLANET_DENSITY := 0.00022
-const MOON_DENSITY := 0.00010
-const GAS_GIANT_DENSITY := 0.000024
 const GAS_FULL_GRAVITY_RADII := 2.4
 const GAS_FIELD_RADII := 3.0
 const MIN_SOURCE_RADIUS := 0.001
@@ -32,20 +28,7 @@ static var _attractors: Dictionary[int, Array] = {}
 
 
 static func gravity_parameter(site_id: int) -> float:
-	var site := Catalog.site(site_id)
-	if site.has("mu"):
-		return float(site.mu)
-	var kind: String = site.get("kind", "")
-	if kind == "star":
-		return Orbit.gravity_parameter(Catalog.system_of_site(site_id))
-	var density := 0.0
-	match kind:
-		"planet": density = PLANET_DENSITY
-		"moon": density = MOON_DENSITY
-		"gas": density = GAS_GIANT_DENSITY
-		_: return 0.0
-	var radius: float = site.radius
-	return density * radius * radius * radius
+	return Orbit.body_gravity_parameter(site_id)
 
 
 static func acceleration(sim: RefCounted, point: Vector3) -> Vector3:

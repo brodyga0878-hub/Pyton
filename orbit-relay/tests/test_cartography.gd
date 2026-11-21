@@ -5,6 +5,7 @@ const Fixture := preload("res://tests/flight_fixture.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const Survey := preload("res://scripts/cartography.gd")
 const Orbit := preload("res://scripts/orbit_ephemeris.gd")
+const Terrain := preload("res://scripts/surface_terrain.gd")
 const Dynamics := preload("res://scripts/orbital_dynamics.gd")
 const Atmosphere := preload("res://scripts/atmosphere.gd")
 const Expedition := preload("res://scripts/expedition.gd")
@@ -31,6 +32,7 @@ func _initialize() -> void:
 func _run() -> void:
 	_test_scan_interlocks()
 	_test_real_observations()
+	_test_orbit_dossiers()
 	_test_systems_and_trade()
 	_test_previous_schema()
 	await _test_scan_touch()
@@ -71,6 +73,10 @@ func _test_scan_interlocks() -> void:
 	_expect(flight.survey_action(STAR) and _matches_physics(flight, STAR)
 		and flight.body_dossier(STAR).data.period == 0.0 and float(flight.body_dossier(STAR).data.gravity) > 0.0,
 		"A safe co-moving stellar observation reports stellar gravity and no orbit around itself")
+	var star: Dictionary = flight.body_dossier(STAR).data
+	_expect(star.orbit_parent == -1 and star.periapsis == 0.0 and star.apoapsis == 0.0
+		and star.surface_class == "star" and star.scoop_kind == "star" and star.landing_max_slope == 0.0,
+		"A lone star has a stellar scoop zone but supplies neither a surface landing nor an invented orbit")
 
 
 func _test_real_observations() -> void:
@@ -97,6 +103,13 @@ func _test_real_observations() -> void:
 	_expect(record.known and not record.can_scan and float(record.recorded_at) == saved_at
 		and float(record.data.atmosphere_height) > 0.0 and str(record.data.resource).is_empty(),
 		"The gas observation stores its first game clock and carries no fictitious surface resource")
+	var giant: Dictionary = record.data
+	var initial_giant_radius: float = Catalog.site(GIANT).center.distance_to(Catalog.site(STAR).center)
+	_expect(giant.orbit_parent == STAR and giant.orbit_reference == Catalog.site(STAR).name
+		and giant.periapsis < initial_giant_radius and giant.apoapsis > initial_giant_radius,
+		"The gas world's eccentric orbit is measured from its actual primary star")
+	_expect(giant.surface_class == "gas" and giant.scoop_kind == "gas" and giant.contact_clearance == 0.0,
+		"The giant allows atmospheric hydrogen collection and supplies no solid contact")
 	_expect(not flight.survey_action(GIANT) and flight.body_dossier(GIANT).recorded_at == saved_at,
 		"A repeated scan cannot duplicate or move the observation timestamp")
 	if not _expect(_jump_from_body(flight, GIANT), "The scanned ship physically leaves the atmosphere and jumps to Velar"):
@@ -112,6 +125,10 @@ func _test_real_observations() -> void:
 	_expect(_matches_physics(flight, TERRACE) and planet.data.resource == Catalog.site(TERRACE).resource
 		and int(planet.data.reserve) == flight.mining.reserve_at(TERRACE),
 		"The observed rocky world reveals the actual atmosphere and available mineral reserve")
+	_expect(planet.data.surface_class == "solid" and planet.data.scoop_kind.is_empty()
+		and planet.data.contact_clearance == Terrain.CONTACT_CLEARANCE
+		and planet.data.landing_max_slope == Terrain.MAX_LANDING_SLOPE,
+		"An atmospheric rock can be landed on with the actual terrain limits and cannot be scooped")
 	_expect(flight.system_dossier(HOME).observations == [GIANT]
 		and flight.system_dossier(VELAR).observations == [TERRACE]
 		and int(flight.system_dossier(VELAR).scan_count) == 1,
@@ -135,6 +152,44 @@ func _test_real_observations() -> void:
 	invalid.cartography.scans[0].epoch = cold.orbit_time + 1.0
 	_expect(not cold.restore(invalid) and cold.snapshot() == retained,
 		"A future observation cannot modify the loaded atlas")
+
+
+func _test_orbit_dossiers() -> void:
+	var flight := Flight.new()
+	var primary := Catalog.BINARY_PRIMARY
+	var planet := Catalog.BINARY_PLANET
+	var moon := Catalog.BINARY_MOON
+	if not _expect(flight.body_dossier(moon).data.is_empty() and flight.scan_galaxy()
+		and flight.body_dossier(moon).data.is_empty() and Fixture.launch(flight),
+		"Discovering a system leaves its detailed lunar measurements locked until local observation"):
+		return
+	flight.system_id = Catalog.BINARY_SYSTEM
+	for site: int in [primary, moon]:
+		flight.position = flight.target_position(site) + Vector3.BACK * (float(Catalog.site(site).radius) + 100.0)
+		flight.velocity = flight.target_velocity(site)
+		if not _expect(flight.survey_action(site), "Record the binary system object from an actual approach"):
+			return
+	var star_data: Dictionary = flight.body_dossier(primary).data
+	var barycenter: Vector3 = Catalog.system(Catalog.BINARY_SYSTEM).barycenter
+	var orbital_radius := barycenter.distance_to(Catalog.site(primary).center)
+	_expect(star_data.orbit_parent == -1 and star_data.orbit_reference == "Центр масс звёзд"
+		and is_equal_approx(star_data.periapsis, orbital_radius) and is_equal_approx(star_data.apoapsis, orbital_radius),
+		"A binary component reports the radius of its own orbit about the barycenter")
+	var moon_data: Dictionary = flight.body_dossier(moon).data
+	_expect(moon_data.orbit_parent == planet and moon_data.orbit_reference == Catalog.site(planet).name
+		and is_equal_approx(moon_data.period, Orbit.period(moon)), "The nested moon reports its own moving parent and period")
+
+	flight.system_id = VELAR
+	var port := Catalog.GROUND_PAD
+	flight.position = flight.target_position(port)
+	flight.velocity = flight.target_velocity(port)
+	if not _expect(flight.survey_action(port), "Record the rotating surface berth locally"):
+		return
+	var ground: Dictionary = flight.body_dossier(port).data
+	_expect(ground.surface_class == "ground_pad" and ground.ground_body == Catalog.GROUND_BODY
+		and ground.orbit_parent == Catalog.VELAR_STAR_ID and is_equal_approx(ground.period, Orbit.period(Catalog.GROUND_BODY))
+		and is_equal_approx(ground.spin_period, TAU / absf(Terrain.spin_rate(Catalog.GROUND_BODY))),
+		"The berth distinguishes its surface attachment, host orbit and shared body rotation")
 
 
 func _test_systems_and_trade() -> void:
@@ -240,13 +295,36 @@ func _test_scan_touch() -> void:
 	_tap(viewport, map_ui._survey_button, "Open the selected object's data card")
 	await process_frame
 	_expect(map_ui.is_open() and not flight.body_dossier(ASTEROID).known
-		and map_ui._scan_button.is_visible_in_tree(), "The actual card offers observation rather than showing invented measurements")
+		and map_ui._scan_button.is_visible_in_tree() and not map_ui._survey_values.diameter.is_visible_in_tree()
+		and not map_ui._survey_values.contact.is_visible_in_tree(), "The actual card hides detailed metrics until observation")
 	_tap(viewport, map_ui._scan_button, "Record the observation using the actual map button")
 	await process_frame
 	var stored := SessionIO.load_state()
 	_expect(map_ui.is_open() and stored.get("cartography", {}).get("scans", []).size() == 1
 		and flight.body_dossier(ASTEROID).known and not map_ui._scan_button.is_visible_in_tree(),
 		"The Main-bound scan saves immediately, refreshes the card and cannot be requested twice")
+	_expect(map_ui._survey_values.diameter.is_visible_in_tree() and map_ui._survey_values.contact.is_visible_in_tree()
+		and map_ui._survey_values.orbit_reference.text == Catalog.site(STAR).name,
+		"The recorded card displays physical, orbital and surface details together")
+	viewport.size = Vector2i(1080, 420)
+	await process_frame
+	var scroll: ScrollContainer = map_ui._survey_scroll
+	var point := scroll.get_global_rect().get_center()
+	var press := InputEventScreenTouch.new()
+	press.index = 15
+	press.position = point
+	press.pressed = true
+	viewport.push_input(press, true)
+	var drag := InputEventScreenDrag.new()
+	drag.index = press.index
+	drag.position = point - Vector2(0.0, 90.0)
+	drag.relative = Vector2(0.0, -90.0)
+	viewport.push_input(drag, true)
+	var release := press.duplicate() as InputEventScreenTouch
+	release.pressed = false
+	release.position = drag.position
+	viewport.push_input(release, true)
+	_expect(scroll.scroll_vertical > 0, "Touch scrolling reaches the extra dossier rows in a short landscape viewport")
 	viewport.queue_free()
 	await process_frame
 
@@ -258,7 +336,9 @@ func _matches_physics(flight: Flight, site: int) -> bool:
 	var data: Dictionary = packet.data
 	var radius := float(Catalog.site(site).radius)
 	var atmosphere := Atmosphere.profile(site)
-	return is_equal_approx(float(data.radius), radius) and is_equal_approx(float(data.period), Orbit.period(site)) \
+	return is_equal_approx(float(data.radius), radius) and is_equal_approx(float(data.diameter), radius * 2.0) \
+		and is_equal_approx(float(data.gravity_parameter), Dynamics.gravity_parameter(site)) \
+		and is_equal_approx(float(data.period), Orbit.period(site)) \
 		and is_equal_approx(float(data.gravity), Dynamics.gravity_parameter(site) / (radius * radius)) \
 		and is_equal_approx(float(data.atmosphere_height), float(atmosphere.get("height", 0.0))) \
 		and is_equal_approx(float(data.atmosphere_density), float(atmosphere.get("density", 0.0)))

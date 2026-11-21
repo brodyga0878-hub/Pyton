@@ -6,6 +6,7 @@ const Catalog = preload("res://scripts/sector_catalog.gd")
 const Ground = preload("res://scripts/ground_port.gd")
 const Terrain = preload("res://scripts/surface_terrain.gd")
 const GRAVITY_PARAMETERS := [8500.0, 8000.0, 7600.0, 8100.0, 7400.0]
+const BODY_DENSITIES := {"planet": 0.00022, "moon": 0.00010, "gas": 0.000024}
 const ORBIT_SEGMENTS := 96
 const MAX_CACHED_TRACKS := 64
 
@@ -118,10 +119,30 @@ static func period(site_id: int) -> float:
 	return _track_for(site_id).period if site_id >= 0 and site_id < Catalog.DESTINATION_COUNT else 0.0
 
 
+static func extrema(site_id: int) -> Vector2:
+	if site_id < 0 or site_id >= Catalog.DESTINATION_COUNT or Ground.is_port(site_id):
+		return Vector2.ZERO
+	var track := _track_for(site_id)
+	if track.period <= 0.0:
+		return Vector2.ZERO
+	return Vector2(1.0 - track.eccentricity, 1.0 + track.eccentricity) * track.major_axis.length()
+
+
 static func gravity_parameter(system_id: int) -> float:
 	if system_id >= 0 and system_id < Catalog.AUTHORED_SYSTEM_COUNT:
 		return GRAVITY_PARAMETERS[system_id]
 	return Catalog.system(system_id).get("gravity_parameter", 0.0)
+
+
+static func body_gravity_parameter(site_id: int) -> float:
+	var site := Catalog.site(site_id)
+	if site.has("mu"):
+		return float(site.mu)
+	var kind: String = site.get("kind", "")
+	if kind == "star":
+		return gravity_parameter(Catalog.system_of_site(site_id))
+	var radius: float = site.get("radius", 0.0)
+	return float(BODY_DENSITIES.get(kind, 0.0)) * radius * radius * radius
 
 
 static func _track_for(site_id: int) -> Track:
@@ -146,7 +167,13 @@ static func _build_track(site_id: int) -> Track:
 		return track
 	var eccentricity := elements.x
 	track.eccentricity = eccentricity
-	track.focus = Catalog.site(Catalog.star_for(system_id)).center
+	track.parent = int(site.get("orbit_parent", -1))
+	var mu := gravity_parameter(system_id)
+	if track.parent >= 0:
+		track.epoch -= Vector3(Catalog.site(track.parent).center)
+		mu = body_gravity_parameter(track.parent)
+	else:
+		track.focus = Catalog.site(Catalog.star_for(system_id)).center
 	var offset := track.epoch - track.focus
 	var radial := offset.normalized()
 	var tangent := radial.cross(Vector3.UP).normalized().rotated(radial, deg_to_rad(elements.z))
@@ -159,7 +186,7 @@ static func _build_track(site_id: int) -> Track:
 	track.minor_axis = (radial * sine + tangent * cosine) * (semi_major * axis_factor)
 	track.eccentric_at_epoch = atan2(axis_factor * sine, eccentricity + cosine)
 	track.mean_at_epoch = track.eccentric_at_epoch - eccentricity * sin(track.eccentric_at_epoch)
-	track.mean_motion = sqrt(gravity_parameter(system_id) / (semi_major * semi_major * semi_major))
+	track.mean_motion = sqrt(mu / (semi_major * semi_major * semi_major))
 	track.period = TAU / track.mean_motion
 	return track
 

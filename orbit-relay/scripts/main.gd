@@ -5,6 +5,7 @@ const FlightView = preload("res://scripts/flight_view.gd")
 const FlightCamera = preload("res://scripts/flight_camera.gd")
 const FlightAudio = preload("res://scripts/flight_audio.gd")
 const FlightHUD = preload("res://scripts/flight_hud.gd")
+const CockpitContacts = preload("res://scripts/cockpit_contacts.gd")
 const SectorMap = preload("res://scripts/sector_map.gd")
 const GalaxyMap = preload("res://scripts/galaxy_map.gd")
 const PortServices = preload("res://scripts/port_services.gd")
@@ -67,6 +68,7 @@ func _ready() -> void:
 	_hud.build()
 	_hud.action_requested.connect(_handle_action)
 	_hud.frame_requested.connect(_handle_action.bind("frame"))
+	_hud.navigation_requested.connect(_select_cockpit_target)
 	add_child(_map)
 	_map.build()
 	_map.destination_selected.connect(_select_destination)
@@ -92,6 +94,7 @@ func _ready() -> void:
 	_services.drive_selected.connect(_select_drive)
 	_services.weapon_selected.connect(_select_weapon)
 	_services.jettison_requested.connect(_jettison_cargo)
+	_services.cargo_pod_requested.connect(_cargo_pod_action)
 	_services.crew_requested.connect(_crew_action)
 	_services.ship_exchange_requested.connect(_ship_exchange)
 	_services.customs_payment_requested.connect(_customs_pay)
@@ -150,7 +153,8 @@ func _overlay_open() -> bool:
 func _physics_process(delta: float) -> void:
 	if not _flight_active or _overlay_open() or flight.time_paused:
 		return
-	flight.update(delta, _hud.move_input(), _hud.roll_input(), _hud.boost_held(), _hud.brake_held(), _hud.translation_input())
+	var steering := presentation.pilot_steering(_hud.move_input())
+	flight.update(delta, steering, _hud.roll_input(), _hud.boost_held(), _hud.brake_held(), _hud.translation_input())
 	if not flight.status_event.is_empty():
 		_deliver_notice()
 	else:
@@ -192,13 +196,17 @@ func _update_display(delta: float) -> void:
 	var hostile_marker: bool = local_traffic.fire_visible and not flight.autopilot and not signal_selected and not project_marker and not convoy_marker and not rendezvous_marker and not fragment_marker
 	if hostile_marker:
 		marker = local_traffic.position
+	var pod: Dictionary = flight.cargo_pod_status()
+	var cargo_marker: bool = pod.active and pod.tracking and not flight.autopilot
+	if cargo_marker:
+		marker = pod.position
+	var special_marker := signal_selected or project_marker or convoy_marker or rendezvous_marker or fragment_marker or hostile_marker or cargo_marker
 	var instruments_visible := flight.docked < 0 and not flight.landed and not _overlay_open() and flight.jump_seconds_left <= 0.0
 	var forward_aim := _view.shows_forward_aim()
 	var bearing := ""
 	if instruments_visible and forward_aim and _camera_mode == FlightCamera.Mode.COCKPIT and flight.ship.autopilot_fitted:
 		var point := marker
-		var route_marker := not signal_selected and not project_marker and not convoy_marker and not rendezvous_marker and not fragment_marker and not hostile_marker
-		if route_marker and flight.docking_guidance().get("near", false):
+		if not special_marker and flight.docking_guidance().get("near", false):
 			point = flight.target_contact(flight.target)
 		var offset := point - flight.position
 		if offset.length_squared() >= 0.25:
@@ -210,7 +218,7 @@ func _update_display(delta: float) -> void:
 	var in_view := instruments_visible and not _view.camera.is_position_behind(marker)
 	if patrol_status.phase == Flight.Patrol.ENGAGED and patrol_status.same_system:
 		in_view = false
-	elif in_view and not flight.autopilot and not signal_selected and not project_marker and not convoy_marker and not rendezvous_marker and not fragment_marker and not hostile_marker:
+	elif in_view and not flight.autopilot and not special_marker:
 		var surface := flight.surface_status()
 		in_view = not surface.near or surface.pad
 	_hud.set_target_marker(_view.camera.unproject_position(marker) if in_view else Vector2.ZERO, in_view)
@@ -222,6 +230,26 @@ func _update_display(delta: float) -> void:
 				continue
 			markers.append({"screen": _view.camera.unproject_position(contact.position), "role": contact.role, "name": contact.name, "distance": distance})
 	_hud.set_traffic_markers(markers)
+	var sites := flight.local_targets()
+	_hud.set_navigation_targets(sites, flight.target)
+	var navigation_markers: Array[Dictionary] = []
+	if instruments_visible:
+		navigation_markers = CockpitContacts.project(flight, _view.camera, sites)
+	_hud.set_navigation_markers(navigation_markers)
+
+
+func _select_cockpit_target(site: int, from_view: bool) -> void:
+	if not _flight_active or _overlay_open() or flight.docked >= 0 or flight.landed or flight.jump_seconds_left > 0.0:
+		return
+	var sites := flight.local_targets()
+	if site not in sites or (from_view and not CockpitContacts.is_visible(flight, _view.camera, sites, site)):
+		return
+	if not flight.select_target(site):
+		return
+	_io.trace("route_selected", {"target": site, "source": "marker" if from_view else "onboard"})
+	_hud.notify("Цель · %s" % flight.target_name(site))
+	_save()
+	_update_display(0.0)
 
 
 func _handle_action(action: String) -> void:
@@ -468,7 +496,7 @@ func _deliver_notice() -> void:
 		"mining_ready", "mining_loaded", "ore_sold",
 		"remote_rig_deployed", "remote_rig_unloaded", "remote_rig_retrieved", "remote_rig_route", "service_refuel", "service_tank", "service_eco",
 		"scoop_full", "scoop_stop", "star_arrival", "gas_arrival", "fuel_empty", "thermal_damage",
-		"fuel_transfer", "service_jump_refuel", "cargo_jettisoned",
+		"fuel_transfer", "service_jump_refuel", "cargo_jettisoned", "cargo_pod_targeted", "cargo_pod_collected",
 		"fuel_pump_mode", "fuel_pump_transfer", "fuel_module_removed", "service_hydrogen_scoop", "service_fuel_pump",
 		"atmosphere_enter", "atmosphere_exit", "atmosphere_damage",
 		"gear_deploy", "gear_retract", "gear_ready", "gear_stowed",
@@ -699,6 +727,13 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		if event.physical_keycode == KEY_ESCAPE:
 			_close_frontier()
 		return
+	if event.physical_keycode == KEY_F12:
+		_hud.toggle_navigation()
+		get_viewport().set_input_as_handled()
+		return
+	if event.physical_keycode == KEY_ESCAPE and _hud.close_navigation():
+		get_viewport().set_input_as_handled()
+		return
 	if event.physical_keycode == KEY_ESCAPE and flight.departure_status().can_cancel:
 		_handle_action("dock")
 		get_viewport().set_input_as_handled()
@@ -759,6 +794,8 @@ func _notification(what: int) -> void:
 			_close_journal()
 		elif _frontier.is_open():
 			_close_frontier()
+		elif _hud.close_navigation():
+			return
 		elif flight.departure_status().can_cancel:
 			_handle_action("dock")
 		elif flight.cancel_jump() or flight.cancel_orbit_maneuver() or flight.cancel_rendezvous():
@@ -1026,6 +1063,19 @@ func _jettison_cargo(good: String) -> void:
 	if not _services.is_open():
 		return
 	flight.jettison_cargo(good)
+	_deliver_notice()
+	_services.refresh()
+	_update_display(0.0)
+
+
+func _cargo_pod_action(action: String) -> void:
+	if not _services.is_open():
+		return
+	if action == "track":
+		if flight.target_cargo_pod():
+			_close_services()
+	elif action == "collect":
+		flight.collect_cargo_pod()
 	_deliver_notice()
 	_services.refresh()
 	_update_display(0.0)

@@ -3,6 +3,7 @@ extends CanvasLayer
 signal service_requested(action: String)
 signal transfer_requested(destination: String)
 signal jettison_requested(good: String)
+signal cargo_pod_requested(action: String)
 signal crew_requested(action: String, member: int)
 signal ship_exchange_requested(hull: String)
 signal customs_payment_requested()
@@ -96,6 +97,10 @@ var _discard_row: PanelContainer
 var _discard_choice: Button
 var _discard_detail: Label
 var _discard_button: Button
+var _cargo_pod_row: PanelContainer
+var _cargo_pod_detail: Label
+var _cargo_pod_track: Button
+var _cargo_pod_collect: Button
 var _cargo_options: Array[Dictionary] = []
 var _cargo_index := 0
 var _discard_pending_good := ""
@@ -202,6 +207,7 @@ func build() -> void:
 	_add_transfer("reaction", "В реактивный бак")
 	_add_transfer("jump", "В прыжковый запас")
 	_build_discard_row()
+	_build_cargo_pod_row()
 	_transfers.hide()
 	get_viewport().size_changed.connect(_update_insets)
 	_update_insets()
@@ -710,10 +716,8 @@ func _refresh_transfers() -> void:
 		_transfer_labels[destination].text = "%d кан. из трюма · +%s ед. топлива" % [
 			offer.canisters, _decimal(offer.added),
 		] if offer.ok else str(offer.reason)
-	if hold.free_capacity() == 0:
-		_cargo_options.assign(_sim.fuel_cargo_options())
-	else:
-		_cargo_options.clear()
+	_cargo_options.assign(_sim.fuel_cargo_options())
+	_refresh_cargo_pod()
 	_discard_row.visible = not _cargo_options.is_empty()
 	if not _discard_row.visible:
 		return
@@ -722,8 +726,25 @@ func _refresh_transfers() -> void:
 	_discard_choice.text = "%s  ›" % selected.name if _cargo_options.size() > 1 else str(selected.name)
 	_discard_choice.disabled = _cargo_options.size() == 1
 	var armed: bool = _discard_pending_good == selected.good
-	_discard_detail.text = "Будет выброшена 1 ед. из %d." % selected.quantity if armed else "Полный трюм · %d ед. выбранного товара" % selected.quantity
-	_discard_button.text = "Подтвердить выброс" if armed else "Освободить 1 место"
+	_discard_detail.text = "Будет выброшена 1 ед. из %d." % selected.quantity if armed else "%d ед. выбранного товара" % selected.quantity
+	_discard_button.text = "Подтвердить выброс" if armed else "Сбросить 1 ед."
+	var offer: Dictionary = _sim.jettison_status(str(selected.good))
+	_discard_button.disabled = not offer.ok
+	if not offer.ok:
+		_discard_detail.text = str(offer.reason)
+
+
+func _refresh_cargo_pod() -> void:
+	var status: Dictionary = _sim.cargo_pod_status()
+	_cargo_pod_row.visible = status.active
+	if not status.active:
+		return
+	_cargo_pod_detail.text = "%s · %.0f м · %.1f м/с\n%s" % [
+		status.name, status.distance, status.relative_speed, status.reason,
+	]
+	_cargo_pod_track.text = "Следующая метка" if status.tracking and status.count > 1 else "Показать метку"
+	_cargo_pod_track.disabled = not status.targetable
+	_cargo_pod_collect.disabled = not status.collectible
 
 
 func close() -> void:
@@ -827,7 +848,7 @@ func _confirm_discard() -> void:
 
 
 func _build_discard_row() -> void:
-	var row := _add_row(_transfers, "Освободить место для сбора", "")
+	var row := _add_row(_transfers, "Выбросить груз", "")
 	_discard_detail = row[0]
 	_discard_button = row[1]
 	_discard_button.pressed.connect(_confirm_discard)
@@ -840,6 +861,28 @@ func _build_discard_row() -> void:
 	_discard_choice.pressed.connect(_cycle_discard)
 	actions.move_child(_discard_choice, _discard_button.get_index())
 	_discard_button.custom_minimum_size.x = 192.0
+
+
+func _build_cargo_pod_row() -> void:
+	var row := _add_row(_transfers, "Грузовой контейнер", "")
+	_cargo_pod_detail = row[0]
+	_cargo_pod_collect = row[1]
+	_cargo_pod_collect.text = "Подобрать"
+	_cargo_pod_collect.custom_minimum_size.x = 144.0
+	_cargo_pod_collect.pressed.connect(_request_cargo_pod.bind("collect"))
+	_cargo_pod_row = row[2]
+	var actions: HBoxContainer = _cargo_pod_collect.get_parent()
+	_cargo_pod_track = _button(actions)
+	_cargo_pod_track.custom_minimum_size.x = 170.0
+	_cargo_pod_track.text = "Показать метку"
+	_cargo_pod_track.pressed.connect(_request_cargo_pod.bind("track"))
+	actions.move_child(_cargo_pod_track, _cargo_pod_collect.get_index())
+
+
+func _request_cargo_pod(action: String) -> void:
+	if is_open() and _fuel_only and _cargo_pod_row.visible:
+		_touches.clear()
+		cargo_pod_requested.emit(action)
 
 
 func _add_meter(parent: HBoxContainer, title: String, fill: Color, border: Color) -> Array[Control]:
@@ -1031,7 +1074,7 @@ func _button_at(point: Vector2) -> Button:
 		return _mining_toggle
 	var buttons: Array = _action_buttons.values()
 	if _fuel_only:
-		buttons = _transfer_buttons.values() + _pump_buttons.values() + [_discard_choice, _discard_button]
+		buttons = _transfer_buttons.values() + _pump_buttons.values() + [_discard_choice, _discard_button, _cargo_pod_track, _cargo_pod_collect]
 	elif _station_page == StationPage.CREW:
 		buttons = _crew_buttons
 	elif _station_page == StationPage.YARD:

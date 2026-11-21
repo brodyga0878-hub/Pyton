@@ -31,8 +31,9 @@ func _test_catalog() -> void:
 	_expect(Catalog.PRE_EXPANDED_SYSTEM_COUNT == 24 and Catalog.PRE_ATLAS_SYSTEM_COUNT == 96
 		and Catalog.PRE_EXPANDED_DESTINATION_COUNT == 89 and Catalog.PRE_ATLAS_DESTINATION_COUNT == 305,
 		"The previous expansion still occupies its original system and target IDs")
-	_expect(Catalog.SYSTEM_COUNT == 512 and Catalog.DESTINATION_COUNT == 1553,
-		"The atlas adds exactly 416 systems and 1248 targets to the previous region")
+	_expect(Catalog.SYSTEM_COUNT == 512 and Catalog.PRE_RICH_SYSTEMS_DESTINATION_COUNT == 1553
+		and Catalog.DESTINATION_COUNT == 1585,
+		"The atlas preserves its 1553 base sites and appends 32 new moons and gas giants")
 	var names := {}
 	var targets := {}
 	var sectors := {}
@@ -57,7 +58,7 @@ func _test_catalog() -> void:
 				sectors[sector] = true
 			var planet: int = row.mines[0]
 			var ephemeris := Orbit.sample(planet, 123.0)
-			_expect(row.sector == sector and row.targets.size() == 3 and row.ports.is_empty()
+			_expect(row.sector == sector and row.targets.size() in [3, 4] and row.ports.is_empty()
 				and row.arrival_target == row.star and Orbit.period(planet) > 0.0
 				and ephemeris.position.is_finite() and not Vector3(ephemeris.velocity).is_zero_approx(),
 				"The generated system has a navigable primary and orbiting survey targets")

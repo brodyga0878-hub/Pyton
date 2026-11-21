@@ -187,6 +187,7 @@ var _backdrop_orbit_offset := Vector3.ZERO
 var _backdrop_orbit_axis := Vector3.UP
 var _mining_rig: Node3D
 var _fragment_views: Dictionary[int, MeshInstance3D] = {}
+var _cargo_pod_views: Dictionary[int, Node3D] = {}
 var _fragment_meshes: Dictionary[String, ArrayMesh] = {}
 var _fragment_paints: Dictionary[String, ShaderMaterial] = {}
 var _mining_beam: Node3D
@@ -285,6 +286,7 @@ func _load_sector(id: int) -> void:
 	_surface_views.clear()
 	_stellar_views.clear()
 	_fragment_views.clear()
+	_cargo_pod_views.clear()
 	_sector_fittings.clear()
 	_sector_finishes.clear()
 	_system_id = id
@@ -576,6 +578,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 		var deposit: Transform3D = sim.surface_deposit() if landed else _ship.global_transform
 		_mining_rig.sync(_ship.global_transform, deposit, int(sim.mining.phase) if landed else MiningRig.STOWED, sim.mining.progress(), float(sim.elapsed))
 	_sync_fragments(sim.local_fragments(), position_now, float(sim.orbit_time))
+	_sync_cargo_pods([] if transit else sim.local_cargo_pods(), position_now, epoch)
 	_sync_mining_pulse({} if transit else sim.orbital_mining_beam())
 	_sync_combat_projectile({} if transit or settled else sim.combat_status())
 	_traffic.sync(sim.traffic_contacts(), sim.combat_beams())
@@ -614,6 +617,43 @@ func _sync_fragments(fragments: Array, pilot_position: Vector3, epoch: float) ->
 		_sector.remove_child(piece)
 		piece.queue_free()
 		_fragment_views.erase(site)
+
+
+func _sync_cargo_pods(pods: Array, pilot_position: Vector3, epoch: float) -> void:
+	var present: Array[int] = []
+	for pod: Dictionary in pods:
+		var id := int(pod.id)
+		var at: Vector3 = pod.position
+		present.append(id)
+		if not _cargo_pod_views.has(id):
+			_cargo_pod_views[id] = _build_cargo_pod(id)
+		var view := _cargo_pod_views[id]
+		view.position = at
+		view.basis = Basis(Vector3(1.0, 0.6, 0.2).normalized(), fposmod(epoch, 21.0) * TAU / 21.0 + float(id % 12))
+		view.visible = at.distance_squared_to(pilot_position) <= FRAGMENT_VIEW_DISTANCE * FRAGMENT_VIEW_DISTANCE
+	for id: int in _cargo_pod_views.keys():
+		if id not in present:
+			_cargo_pod_views[id].hide()
+			_cargo_pod_views[id].queue_free()
+			_cargo_pod_views.erase(id)
+
+
+func _build_cargo_pod(id: int) -> Node3D:
+	var pod := Node3D.new()
+	pod.name = "CargoPod_%d" % id
+	_sector.add_child(pod)
+	var shell := BoxMesh.new()
+	shell.size = Vector3(2.1, 1.8, 3.2)
+	_mesh(pod, shell, _surface(Color("#b67a42"), 0.35, 0.56), Vector3.ZERO)
+	_box_batch(pod, _surface(Color("#3a4a55"), 0.55, 0.4), [
+		[Vector3(0.0, 0.0, -1.16), Vector3(2.24, 1.92, 0.24)],
+		[Vector3(0.0, 0.0, 1.16), Vector3(2.24, 1.92, 0.24)],
+	])
+	_box_batch(pod, _light(Color("#81eadb")), [
+		[Vector3(0.0, 0.0, -1.64), Vector3(0.84, 0.20, 0.08)],
+		[Vector3(0.0, 0.0, 1.64), Vector3(0.84, 0.20, 0.08)],
+	])
+	return pod
 
 
 func _fragment_shape(resource: String) -> ArrayMesh:

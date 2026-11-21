@@ -8,7 +8,10 @@ const Catalog := preload("res://scripts/sector_catalog.gd")
 const Patrol := preload("res://scripts/patrol_encounter.gd")
 const Settings := preload("res://scripts/display_settings.gd")
 const SessionIO := preload("res://scripts/session_io.gd")
-const DEFAULTS := {"quality": 1, "sensitivity": 1, "layout": 0, "notification_volume": 2}
+const DEFAULTS := {
+	"quality": 1, "sensitivity": 1, "layout": 0, "notification_volume": 2,
+	"invert_yaw": 0, "invert_pitch": 0,
+}
 
 var _viewport: SubViewport
 var _checks := 0
@@ -26,6 +29,7 @@ func _run() -> void:
 	_viewport.own_world_3d = true
 	root.add_child(_viewport)
 	await _test_settings_scene()
+	await _test_pilot_axes_scene()
 	await _test_journal_scene()
 	print("Presentation integration: %d checks, %d failures" % [_checks, _failures.size()])
 	for failure: String in _failures:
@@ -44,6 +48,10 @@ func _test_preferences() -> void:
 	_expect(settings.change("sensitivity", 0) and settings.change("layout", 1)
 		and settings.change("notification_volume", 3),
 		"The preference model accepts precise sensitivity, mirrored controls and louder cues")
+	_expect(settings.change("invert_yaw", 1) and settings.invert_pitch == 0,
+		"Changing the horizontal axis leaves the vertical setting alone")
+	_expect(settings.change("invert_pitch", 1) and settings.invert_yaw == 1,
+		"Changing the vertical axis leaves the horizontal setting alone")
 	var changed := settings.snapshot()
 	for invalid: Variant in [null, [], {"quality": 2}, {"quality": 2, "sensitivity": 1, "layout": 1, "extra": 1},
 		{"quality": 3, "sensitivity": 1, "layout": 1}, {"quality": 0, "sensitivity": 1.25, "layout": 0},
@@ -57,20 +65,30 @@ func _test_preferences() -> void:
 		invalid.notification_volume = malformed_volume
 		_expect(not settings.restore(invalid) and settings.snapshot() == changed,
 			"Out-of-range, fractional and nonnumeric volume values are rejected atomically")
+	for axis: String in ["invert_yaw", "invert_pitch"]:
+		for value: Variant in [-1, 2, true, 0.5, "1"]:
+			var invalid := changed.duplicate()
+			invalid[axis] = value
+			_expect(not settings.restore(invalid) and settings.snapshot() == changed,
+				"An invalid %s preference changes none of the saved choices" % axis)
 	var path := "user://presentation-integration-%d.json" % OS.get_process_id()
 	var previous_flight := SessionIO.load_state()
 	_expect(settings.save_preferences(path) == OK, "Preferences write their own JSON file")
 	var reloaded := Settings.new()
 	_expect(reloaded.load_preferences(path) and reloaded.snapshot() == changed,
-		"A fresh preference object restores all four persisted choices")
+		"A fresh preference object restores all choices including both axes")
 	_expect(SessionIO.save_state({"quality": 0, "sensitivity": "fast", "layout": 0}, path) == OK,
 		"Write a valid JSON file with invalid preference values")
 	_expect(not reloaded.load_preferences(path) and reloaded.snapshot() == changed,
 		"An invalid on-disk preference record applies none of its values")
 	var legacy := {"quality": 0, "sensitivity": 2, "layout": 1}
 	_expect(SessionIO.save_state(legacy, path) == OK and reloaded.load_preferences(path)
-		and reloaded.snapshot() == {"quality": 0, "sensitivity": 2, "layout": 1, "notification_volume": 2},
-		"An exact older three-field file migrates with the normal notification level")
+		and reloaded.snapshot() == legacy.merged({"notification_volume": 2, "invert_yaw": 0, "invert_pitch": 0}),
+		"An older three-field file migrates with the normal axes and notification level")
+	var version_095 := legacy.merged({"notification_volume": 3})
+	_expect(SessionIO.save_state(version_095, path) == OK and reloaded.load_preferences(path)
+		and reloaded.snapshot() == version_095.merged({"invert_yaw": 0, "invert_pitch": 0}),
+		"A 0.95 preference file preserves existing choices and defaults both axes")
 	_expect(SessionIO.load_state() == previous_flight, "Preference I/O leaves the existing flight record untouched")
 	DirAccess.remove_absolute(path)
 	DirAccess.remove_absolute(path + ".previous")
@@ -107,8 +125,13 @@ func _test_settings_scene() -> void:
 	_tap(game._settings._choice_buttons["layout"][1], "Move the action column to the left using a real touch")
 	_tap(game._settings._choice_buttons["sensitivity"][0], "Select precise steering using a real touch")
 	_tap(game._settings._choice_buttons["notification_volume"][1], "Select quiet notification cues using a real touch")
+	_tap(game._settings._choice_buttons["invert_yaw"][1], "Toggle horizontal inversion using a real touch")
+	_expect(game.presentation.invert_yaw == 1 and game.presentation.invert_pitch == 0,
+		"Horizontal inversion remains independent in the settings scene")
+	_tap(game._settings._choice_buttons["invert_pitch"][1], "Toggle vertical inversion using a real touch")
 	var saved_settings: Dictionary = game.presentation.snapshot()
-	_expect(saved_settings == {"quality": 0, "sensitivity": 0, "layout": 1, "notification_volume": 1}
+	_expect(saved_settings == {"quality": 0, "sensitivity": 0, "layout": 1, "notification_volume": 1,
+		"invert_yaw": 1, "invert_pitch": 1}
 		and game._audio.level == 1,
 		"The accepted choices are reflected in the running game")
 	_expect(SessionIO.load_state() == flight_before and not flight_before.has("quality"),
@@ -170,6 +193,101 @@ func _test_settings_scene() -> void:
 	_check_layout(game._hud, true, "1600×720 mirrored")
 	game.queue_free()
 	await process_frame
+
+
+func _test_pilot_axes_scene() -> void:
+	_viewport.size = Vector2i(854, 480)
+	var game := _open_game()
+	game.presentation.restore(DEFAULTS)
+	game._apply_presentation()
+	await process_frame
+	_tap(game._hud._actions.get("settings"), "Open settings in a compact landscape viewport")
+	await process_frame
+	var visible := _viewport.get_visible_rect().grow(0.5)
+	for button: Button in game._settings._buttons:
+		_expect(visible.encloses(button.get_global_rect()) and button.size.y >= 40.0,
+			"The compact settings screen fits the full touch target for %s" % button.text)
+	for hint: Label in game._settings._descriptions.values():
+		_expect(visible.encloses(hint.get_global_rect()), "The compact settings screen keeps each setting description visible")
+	_tap(game._settings._close_button, "Close the compact settings sheet")
+	_viewport.size = Vector2i(1280, 720)
+	await process_frame
+
+	for use_keyboard: bool in [false, true]:
+		var source := "Keyboard" if use_keyboard else "Touch pad"
+		var normal := _manual_turn(game, 0, 0, use_keyboard)
+		_expect(normal.x < -0.005 and normal.y > 0.005,
+			"%s reaches both manual ship rotation axes" % source)
+		_expect(_manual_turn(game, 1, 0, use_keyboard).is_equal_approx(Vector2(-normal.x, normal.y)),
+			"%s reverses only yaw with horizontal inversion" % source)
+		_expect(_manual_turn(game, 0, 1, use_keyboard).is_equal_approx(Vector2(normal.x, -normal.y)),
+			"%s reverses only pitch with vertical inversion" % source)
+		_expect(_manual_turn(game, 1, 1, use_keyboard).is_equal_approx(-normal),
+			"%s reverses both axes when both options are enabled" % source)
+
+	var normal_motion := _translation_and_roll(game, 0)
+	_expect(absf(normal_motion.w) > 0.005 and Vector3(normal_motion.x, normal_motion.y, normal_motion.z).length() > 0.05
+		and _translation_and_roll(game, 1).is_equal_approx(normal_motion),
+		"Pilot axis inversion preserves independent roll and lateral thrust")
+	var normal_autopilot := _autopilot_facing(game, 0)
+	_expect(normal_autopilot.is_equal_approx(_autopilot_facing(game, 1)),
+		"Steering inversion leaves the autopilot's commands unchanged")
+	game.queue_free()
+	await process_frame
+
+
+func _manual_turn(game: Node, yaw_mode: int, pitch_mode: int, use_keyboard: bool) -> Vector2:
+	var pilot := _airborne_pilot(game, yaw_mode, pitch_mode)
+	var area: Rect2 = game._hud._steer.get_global_rect()
+	var neutral := area.get_center() - Vector2(0.0, 9.0)
+	var position := neutral + Vector2(area.size.x * 0.18, -area.size.y * 0.16)
+	if use_keyboard:
+		_key_event(KEY_D, true)
+		_key_event(KEY_W, true)
+	else:
+		_touch(34, position, true)
+	game._physics_process(Fixture.STEP)
+	if use_keyboard:
+		_key_event(KEY_D, false)
+		_key_event(KEY_W, false)
+	else:
+		_touch(34, position, false)
+	return Vector2(pilot.yaw, pilot.pitch)
+
+
+func _translation_and_roll(game: Node, inversion: int) -> Vector4:
+	var pilot := _airborne_pilot(game, inversion, inversion)
+	var before := pilot.velocity
+	for key: Key in [KEY_6, KEY_8, KEY_E]:
+		_key_event(key, true)
+	game._physics_process(Fixture.STEP)
+	for key: Key in [KEY_6, KEY_8, KEY_E]:
+		_key_event(key, false)
+	var movement := pilot.velocity - before
+	return Vector4(movement.x, movement.y, movement.z, pilot.roll)
+
+
+func _autopilot_facing(game: Node, inversion: int) -> Basis:
+	var pilot := _airborne_pilot(game, inversion, inversion)
+	pilot.select_target(1)
+	pilot.set_autopilot(true)
+	game._physics_process(0.15)
+	_expect(pilot.autopilot and not pilot.attitude().is_equal_approx(Basis.IDENTITY),
+		"The real route autopilot remains active and rotates the ship")
+	return pilot.attitude()
+
+
+func _airborne_pilot(game: Node, yaw_mode: int, pitch_mode: int) -> Flight:
+	game.presentation.change("invert_yaw", yaw_mode)
+	game.presentation.change("invert_pitch", pitch_mode)
+	var pilot := Flight.new()
+	Fixture.launch(pilot)
+	pilot.yaw = 0.0
+	pilot.pitch = 0.0
+	pilot.roll = 0.0
+	game.flight = pilot
+	game._update_display(0.0)
+	return pilot
 
 
 func _test_journal_scene() -> void:
@@ -304,18 +422,19 @@ func _roll_probe(hud: CanvasLayer) -> float:
 
 
 func _keyboard_steering(hud: CanvasLayer) -> Vector2:
+	_key_event(KEY_W, true)
+	var measured: Vector2 = hud.move_input()
+	_key_event(KEY_W, false)
+	return measured
+
+
+func _key_event(key: Key, pressed: bool) -> void:
 	var event := InputEventKey.new()
-	event.keycode = KEY_W
-	event.physical_keycode = KEY_W
-	event.pressed = true
+	event.keycode = key
+	event.physical_keycode = key
+	event.pressed = pressed
 	Input.parse_input_event(event)
 	Input.flush_buffered_events()
-	var measured: Vector2 = hud.move_input()
-	var released := event.duplicate() as InputEventKey
-	released.pressed = false
-	Input.parse_input_event(released)
-	Input.flush_buffered_events()
-	return measured
 
 
 func _press_escape() -> void:

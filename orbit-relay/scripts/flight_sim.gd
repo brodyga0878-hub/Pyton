@@ -26,6 +26,7 @@ const FlightFrame = preload("res://scripts/flight_frame.gd")
 const Customs = preload("res://scripts/customs.gd")
 const UnattendedMining = preload("res://scripts/unattended_mining.gd")
 const OrbitalMining = preload("res://scripts/orbital_mining.gd")
+const CargoPods = preload("res://scripts/cargo_pods.gd")
 const MissionCalendar = preload("res://scripts/mission_calendar.gd")
 const CombatSystems = preload("res://scripts/combat_systems.gd")
 const Ground = preload("res://scripts/ground_port.gd")
@@ -34,7 +35,7 @@ const CivilianTraffic = preload("res://scripts/civilian_traffic.gd")
 const PilotCareer = preload("res://scripts/pilot_career.gd")
 const BranchingStory = preload("res://scripts/branching_story.gd")
 const SectorNews = preload("res://scripts/sector_news.gd")
-const SAVE_SCHEMA := 47
+const SAVE_SCHEMA := 48
 const INTERRUPTED_LABELS := {
 	"autopilot": "автопилот", "rig_approach": "заход к буру", "orbit_maneuver": "орбитальный манёвр",
 	"rendezvous": "автоматическое сближение", "patrol_course": "наведение дозора",
@@ -160,6 +161,7 @@ var speed_hold := SpeedHold.new()
 var customs := Customs.new()
 var remote_rig := UnattendedMining.new()
 var orbital_mining := OrbitalMining.new()
+var _cargo_pods := CargoPods.new()
 var combat := CombatSystems.new()
 var ambient := CivilianTraffic.new()
 var career := PilotCareer.new()
@@ -940,6 +942,7 @@ func change_target() -> void:
 func select_target(index: int) -> bool:
 	if jump_seconds_left > 0.0 or Catalog.system_of_site(index) != system_id or index == docked or index == landed_site or not _site_available(index, expedition):
 		return false
+	_cargo_pods.tracked = -1
 	if docked >= 0 or landed:
 		planned_target = index
 	else:
@@ -1058,6 +1061,7 @@ func set_autopilot(enabled: bool) -> void:
 	autopilot_phase = "К створу" if autopilot else ""
 	if not autopilot:
 		return
+	_cargo_pods.tracked = -1
 	_release_speed_hold(false)
 	for index: int in local_targets():
 		if Catalog.is_star(index):
@@ -2671,11 +2675,130 @@ func fuel_cargo_options() -> Array[Dictionary]:
 	return options
 
 
+func jettison_status(good: String) -> Dictionary:
+	var reason := _cargo_flight_reason()
+	var direction := Vector3.ZERO
+	if reason.is_empty():
+		if mining.cargo_amount(good) <= 0:
+			reason = "В трюме нет выбранного товара."
+		elif not _cargo_pods.can_eject():
+			reason = "Слишком много выброшенных контейнеров. Подберите один из них."
+		else:
+			direction = _cargo_release_direction()
+			if direction.is_zero_approx():
+				reason = "Слишком близко к препятствиям для выброса."
+	return {"ok": reason.is_empty(), "reason": reason, "direction": direction}
+
+
 func jettison_cargo(good: String) -> bool:
-	if docked >= 0 or landed or scooping or jump_seconds_left > 0.0 or not mining.remove_cargo(good, 1):
+	var offer := jettison_status(good)
+	if not offer.ok:
+		_announce("cargo_jettison_denied", offer.reason)
 		return false
-	_announce("cargo_jettisoned", "Сброшена единица груза «%s». В трюме освободилось место." % Economy.good_name(good))
+	var direction: Vector3 = offer.direction
+	var origin := position + direction * CargoPods.EJECT_CLEARANCE
+	var drift := velocity + direction * CargoPods.EJECT_SPEED
+	if not _cargo_pods.eject(mining, system_id, good, origin, drift, orbit_time, MAX_SAVED_SPEED + CargoPods.EJECT_SPEED):
+		_announce("cargo_jettison_denied", "Не удалось выпустить контейнер.")
+		return false
+	reset_time_scale()
+	_announce("cargo_jettisoned", "Контейнер выпущен · %s. В трюме освободилось место." % Economy.good_name(good))
 	return true
+
+
+func local_cargo_pods() -> Array[Dictionary]:
+	var pods := _cargo_pods.local(system_id, orbit_time)
+	pods.sort_custom(func(left: Dictionary, right: Dictionary) -> bool:
+		var left_distance := position.distance_squared_to(left.position)
+		var right_distance := position.distance_squared_to(right.position)
+		return int(left.id) < int(right.id) if left_distance == right_distance else left_distance < right_distance)
+	return pods
+
+
+func cargo_pod_status(id := -1) -> Dictionary:
+	var pods := local_cargo_pods()
+	var preferred := _cargo_pods.tracked if id == -1 else id
+	var index := _cargo_pod_index(pods, preferred)
+	if index == -1 and id == -1 and not pods.is_empty():
+		index = 0
+	var pod: Dictionary = {} if index < 0 else pods[index]
+	var active := index >= 0
+	var contact: Vector3 = pod.get("position", Vector3.ZERO)
+	var drift: Vector3 = pod.get("velocity", Vector3.ZERO)
+	var distance := position.distance_to(contact) if active else -1.0
+	var relative_speed := velocity.distance_to(drift) if active else -1.0
+	var flight_reason := _cargo_flight_reason()
+	var targetable := active and flight_reason.is_empty()
+	var reason := flight_reason
+	if reason.is_empty():
+		if not active:
+			reason = "В этой системе нет доступного контейнера."
+		elif not ship.fragment_collector:
+			reason = "Установите сборщик обломков в порту."
+		elif mining.free_capacity() == 0:
+			reason = "Трюм заполнен."
+		elif distance > FRAGMENT_COLLECT_RANGE:
+			reason = "Подойдите к контейнеру на %d м." % int(FRAGMENT_COLLECT_RANGE)
+		elif relative_speed > FRAGMENT_COLLECT_SPEED:
+			reason = "Снизьте скорость к контейнеру до %d м/с." % int(FRAGMENT_COLLECT_SPEED)
+	return {"active": active, "id": int(pod.get("id", -1)), "count": pods.size(), "position": contact, "velocity": drift,
+		"good": str(pod.get("good", "")), "name": Economy.good_name(str(pod.good)) if active else "",
+		"distance": distance, "relative_speed": relative_speed, "remaining": float(pod.get("remaining", 0.0)),
+		"tracking": active and _cargo_pods.tracked == int(pod.id), "targetable": targetable,
+		"collectible": reason.is_empty(), "reason": reason}
+
+
+func target_cargo_pod(id := -1) -> bool:
+	var status := cargo_pod_status(id)
+	if not status.targetable:
+		_announce("cargo_pod_target_denied", _cargo_flight_reason() if status.active else "Контейнер недоступен.")
+		return false
+	if id == -1 and status.tracking and int(status.count) > 1:
+		var pods := local_cargo_pods()
+		var index := _cargo_pod_index(pods, int(status.id))
+		status = cargo_pod_status(int(pods[(index + 1) % pods.size()].id))
+	_cargo_pods.tracked = int(status.id)
+	_announce("cargo_pod_targeted", "Контейнер отмечен · %s." % str(status.name))
+	return true
+
+
+func collect_cargo_pod(id := -1) -> bool:
+	var status := cargo_pod_status(id)
+	if not status.collectible:
+		_announce("cargo_pod_collect_denied", status.reason)
+		return false
+	if not combat_line_clear(position, status.position):
+		_announce("cargo_pod_collect_denied", "Между кораблём и контейнером препятствие.")
+		return false
+	if not _cargo_pods.collect(mining, int(status.id)):
+		_announce("cargo_pod_collect_denied", "Не удалось принять контейнер в трюм.")
+		return false
+	reset_time_scale()
+	_announce("cargo_pod_collected", "Контейнер принят · %s." % str(status.name))
+	return true
+
+
+func _cargo_flight_reason() -> String:
+	if docked >= 0 or landed or jump_seconds_left > 0.0 or mining.phase != MiningRig.STOWED:
+		return "Контейнеры доступны в свободном полёте."
+	if scooping:
+		return "Сначала остановите сбор водорода."
+	return ""
+
+
+func _cargo_release_direction() -> Vector3:
+	var axes := attitude()
+	for direction: Vector3 in [axes.x, -axes.x, axes.y, -axes.y, axes.z, -axes.z]:
+		if combat_line_clear(position, position + direction * CargoPods.EJECT_CLEARANCE):
+			return direction
+	return Vector3.ZERO
+
+
+static func _cargo_pod_index(pods: Array[Dictionary], id: int) -> int:
+	for index in range(pods.size()):
+		if int(pods[index].id) == id:
+			return index
+	return -1
 
 
 func is_scoop_site(site: int) -> bool:
@@ -3090,6 +3213,7 @@ func start_jump() -> bool:
 		return false
 	reset_time_scale()
 	ambient.interrupt()
+	_cargo_pods.tracked = -1
 	_release_speed_hold(false)
 	cancel_dock_sync()
 	dock_access.clear()
@@ -3310,6 +3434,7 @@ func update(delta: float, steer: Vector2, bank: float, boost_requested: bool, br
 func _advance_background_clock(delta: float) -> void:
 	var previous := orbit_time
 	orbit_time += delta
+	_cargo_pods.advance(orbit_time)
 	elapsed += delta
 	combat.advance_energy(previous, orbit_time)
 	if remote_rig.active():
@@ -4101,6 +4226,7 @@ func snapshot() -> Dictionary:
 		"crew": crew.snapshot(),
 		"cartography": cartography.snapshot(), "frame": frame.snapshot(), "customs": customs.snapshot(),
 		"remote_rig": remote_rig.snapshot(), "orbital_mining": orbital_mining.snapshot(),
+		"cargo_pods": _cargo_pods.snapshot(),
 		"combat": combat.snapshot(),
 		"ambient": ambient.snapshot(), "career": career.snapshot(),
 		"story": story.snapshot(), "news": news.snapshot(),
@@ -4113,6 +4239,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_rich_systems := schema < 48
 	var pre_atlas := schema < 47
 	var pre_expanded_galaxy := schema < 46
 	var pre_lazur_spin := schema < 45
@@ -4218,6 +4345,8 @@ func restore(state: Dictionary) -> bool:
 	if not _number(state.get("throttle"), 0.0, 1.0):
 		return false
 	var site_count := Catalog.PRE_ATLAS_DESTINATION_COUNT if pre_atlas else Catalog.DESTINATION_COUNT
+	if pre_rich_systems and not pre_atlas:
+		site_count = Catalog.PRE_RICH_SYSTEMS_DESTINATION_COUNT
 	if pre_expanded_galaxy:
 		site_count = Catalog.PRE_EXPANDED_DESTINATION_COUNT
 	if pre_ground_ports:
@@ -4282,9 +4411,12 @@ func restore(state: Dictionary) -> bool:
 	var known := _known_systems(restored_expedition, restored_cartography)
 	if restored_system not in known or (restored_jump >= 0 and restored_jump not in known):
 		return false
+	var restored_cargo_pods := CargoPods.new()
+	if schema >= 48 and not restored_cargo_pods.restore(state.get("cargo_pods"), restored_epoch, restored_system, known, MAX_SAVED_SPEED + CargoPods.EJECT_SPEED):
+		return false
 	if not pre_frames:
 		var frame_sites := Catalog.targets_for(restored_system).filter(
-			func(id: int) -> bool: return _site_available(id, restored_expedition, restored_cartography))
+			func(id: int) -> bool: return id < site_count and _site_available(id, restored_expedition, restored_cartography))
 		if not restored_frame.restore(state.get("frame"), frame_sites):
 			return false
 	if not _site_available(int(state.target), restored_expedition, restored_cartography):
@@ -4419,8 +4551,10 @@ func restore(state: Dictionary) -> bool:
 	if not pre_remote_rig:
 		if not restored_remote_rig.restore(state.get("remote_rig"), restored_epoch, restored_mining):
 			return false
-		if restored_remote_rig.active() and not _site_available(restored_remote_rig.site_id, restored_expedition, restored_cartography):
-			return false
+		if restored_remote_rig.active():
+			var rig_site := restored_remote_rig.site_id
+			if rig_site >= site_count or not _site_available(rig_site, restored_expedition, restored_cartography):
+				return false
 	var restored_orbital_mining := OrbitalMining.new()
 	if not pre_orbital_mining:
 		if not restored_orbital_mining.restore(state.get("orbital_mining"), restored_epoch, restored_mining,
@@ -4595,6 +4729,12 @@ func restore(state: Dictionary) -> bool:
 			var center: Vector3 = Orbit.sample(giant, restored_epoch).position
 			restored_position = center + Vector3.BACK * float(Catalog.site(giant).gate_offset)
 			restored_velocity = Vector3.ZERO
+	if pre_rich_systems and restored_system >= Catalog.PRE_ATLAS_SYSTEM_COUNT and restored_dock < 0 and restored_landing < 0:
+		var obstacle := _obstacle_at(restored_position, restored_system, restored_epoch, restored_expedition, restored_cartography)
+		if obstacle >= Catalog.PRE_RICH_SYSTEMS_DESTINATION_COUNT:
+			var body := Orbit.sample(obstacle, restored_epoch)
+			restored_position = body.position + Vector3.BACK * float(Catalog.site(obstacle).gate_offset)
+			restored_velocity = body.velocity
 	if pre_rotation and not pre_procedural and restored_dock < 0 and restored_landing < 0:
 		var obstacle := _obstacle_at(restored_position, restored_system, restored_epoch, restored_expedition, restored_cartography)
 		if Terrain.spin_rate(obstacle) > 0.0 and not _inside_hull(restored_position, obstacle, restored_epoch, true):
@@ -4651,6 +4791,7 @@ func restore(state: Dictionary) -> bool:
 	customs = restored_customs
 	remote_rig = restored_remote_rig
 	orbital_mining = restored_orbital_mining
+	_cargo_pods = restored_cargo_pods
 	combat = restored_combat
 	ambient = restored_ambient
 	career = restored_career

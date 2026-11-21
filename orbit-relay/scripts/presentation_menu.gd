@@ -14,17 +14,19 @@ const ROW_TITLES := {
 	"sensitivity": "Чувствительность",
 	"layout": "Сенсорная раскладка",
 	"notification_volume": "Громкость сигналов",
+	"invert_yaw": "Горизонтальная ось",
+	"invert_pitch": "Вертикальная ось",
 }
 const ROW_HINTS := {
 	"quality": [
 		"До 30 кадров/с · упрощённые материалы и эффекты",
 		"До 60 кадров/с · сглаживание 2×",
-		"До 60 кадров/с · сглаживание 4× и дополнительные детали",
+		"До 60 кадров/с · сглаживание 4×",
 	],
 	"sensitivity": [
-		"Плавнее на малых отклонениях",
-		"Стандартный отклик на отклонение",
-		"Быстрее на малых отклонениях",
+		"Плавнее при малом отклонении",
+		"Обычный отклик",
+		"Быстрее при малом отклонении",
 	],
 	"layout": [
 		"Курс и крен слева. Тяга и действия справа.",
@@ -32,10 +34,12 @@ const ROW_HINTS := {
 	],
 	"notification_volume": [
 		"Только предупреждения на экране",
-		"Приглушённые сигналы полёта",
-		"Сигналы сближения, стыковки, перегрева и опасности",
-		"Повышенная громкость сигналов полёта",
+		"Тихие сигналы полёта",
+		"Обычная громкость",
+		"Повышенная громкость",
 	],
+	"invert_yaw": ["Вправо — поворот вправо", "Вправо — поворот влево"],
+	"invert_pitch": ["Вверх — нос поднимается", "Вверх — нос опускается"],
 }
 
 var _settings: RefCounted
@@ -63,11 +67,11 @@ func build() -> void:
 	_insets.add_child(center)
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size.x = 790
-	panel.add_theme_stylebox_override("panel", _style(Color("0d1d28"), BORDER, 16, 22))
+	panel.add_theme_stylebox_override("panel", _style(Color("0d1d28"), BORDER, 16, 16))
 	center.add_child(panel)
 
 	var content := VBoxContainer.new()
-	content.add_theme_constant_override("separation", 10)
+	content.add_theme_constant_override("separation", 8)
 	panel.add_child(content)
 	var header := HBoxContainer.new()
 	header.add_theme_constant_override("separation", 12)
@@ -80,8 +84,13 @@ func build() -> void:
 	_close_button.custom_minimum_size.x = 126
 	_close_button.pressed.connect(_request_close)
 
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", 10)
+	grid.add_theme_constant_override("v_separation", 6)
+	content.add_child(grid)
 	for field: String in Settings.OPTIONS:
-		_add_choices(content, field)
+		_add_choices(grid, field)
 	get_viewport().size_changed.connect(_update_insets)
 	_update_insets()
 	hide()
@@ -121,14 +130,15 @@ func is_open() -> bool:
 
 func _add_choices(parent: Container, field: String) -> void:
 	var strip := PanelContainer.new()
-	strip.add_theme_stylebox_override("panel", _style(Color("10242e"), Color("263f4d"), 10, 12))
+	strip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	strip.add_theme_stylebox_override("panel", _style(Color("10242e"), Color("263f4d"), 10, 7))
 	parent.add_child(strip)
 	var group := VBoxContainer.new()
-	group.add_theme_constant_override("separation", 6)
+	group.add_theme_constant_override("separation", 3)
 	strip.add_child(group)
-	_label(group, ROW_TITLES[field], 21, TEXT)
+	_label(group, ROW_TITLES[field], 18, TEXT)
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 9)
+	row.add_theme_constant_override("separation", 6)
 	group.add_child(row)
 	var radio := ButtonGroup.new()
 	var buttons: Array[Button] = []
@@ -141,7 +151,9 @@ func _add_choices(parent: Container, field: String) -> void:
 		button.pressed.connect(_request_preference.bind(field, index))
 		buttons.append(button)
 	_choice_buttons[field] = buttons
-	_descriptions[field] = _label(group, "", 16, MUTED)
+	var hint := _label(group, "", 16, MUTED)
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_descriptions[field] = hint
 
 
 func _request_preference(field: String, value: int) -> void:
@@ -210,14 +222,14 @@ func _update_insets() -> void:
 func _button(parent: Container, caption: String) -> Button:
 	var button := Button.new()
 	button.text = caption
-	button.custom_minimum_size.y = 54
-	button.add_theme_font_size_override("font_size", 18)
+	button.custom_minimum_size.y = 48
+	button.add_theme_font_size_override("font_size", 16)
 	button.add_theme_color_override("font_color", TEXT)
 	button.add_theme_color_override("font_pressed_color", MINT)
-	button.add_theme_stylebox_override("normal", _style(Color("142e3a"), BORDER, 8, 12))
-	button.add_theme_stylebox_override("hover", _style(Color("1b4250"), Color("55848d"), 8, 12))
-	button.add_theme_stylebox_override("pressed", _style(Color("174441"), MINT, 8, 12))
-	button.add_theme_stylebox_override("hover_pressed", _style(Color("1b514e"), MINT, 8, 12))
+	button.add_theme_stylebox_override("normal", _style(Color("142e3a"), BORDER, 8, 8))
+	button.add_theme_stylebox_override("hover", _style(Color("1b4250"), Color("55848d"), 8, 8))
+	button.add_theme_stylebox_override("pressed", _style(Color("174441"), MINT, 8, 8))
+	button.add_theme_stylebox_override("hover_pressed", _style(Color("1b514e"), MINT, 8, 8))
 	var focus := _style(Color.TRANSPARENT, TEXT, 8, 0)
 	focus.draw_center = false
 	focus.set_border_width_all(2)

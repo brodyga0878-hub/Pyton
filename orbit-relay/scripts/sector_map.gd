@@ -40,12 +40,22 @@ const RENDEZVOUS_METRICS := [
 ]
 const SURVEY_METRICS := [
 	["radius", "Радиус модели"],
+	["diameter", "Диаметр модели"],
+	["gravity", "Притяжение на радиусе"],
+	["gravity_parameter", "Параметр тяготения μ"],
+	["ground_reference", "На поверхности"],
+	["orbit_reference", "Центр орбиты"],
 	["period", "Период обращения"],
-	["gravity", "Гравитация на границе"],
+	["periapsis", "Перицентр"],
+	["apoapsis", "Апоцентр"],
+	["spin_period", "Период вращения"],
+	["spin", "Угловая скорость"],
+	["surface", "Посадка и стыковка"],
+	["contact", "Касание грунта"],
 	["atmosphere_height", "Атмосферный слой"],
 	["atmosphere_density", "Относительная плотность"],
+	["scoop", "Сбор водорода"],
 	["resource", "Запас сырья"],
-	["spin", "Вращение"],
 ]
 
 var _sheet: Control
@@ -70,6 +80,8 @@ var _survey_panel: VBoxContainer
 var _survey_target: Label
 var _survey_state: Label
 var _survey_approach: Label
+var _survey_scroll: ScrollContainer
+var _survey_scale: Label
 var _survey_note: Label
 var _survey_values: Dictionary[String, Label] = {}
 var _survey_status: Dictionary = {}
@@ -100,7 +112,7 @@ var _site_buttons: Dictionary[int, Button] = {}
 var _listed_targets: Array = []
 var _touches: Dictionary[int, Button] = {}
 var _touch_sites: Dictionary[int, int] = {}
-var _trajectory_touch := -1
+var _scroll_touch := -1
 var _flight: RefCounted
 var _candidate := -1
 var _star_focus := -1
@@ -313,19 +325,29 @@ func _build_survey_panel(parent: PanelContainer) -> void:
 	_survey_panel.add_child(HSeparator.new())
 	_survey_approach = _label(_survey_panel, "", 16, MUTED)
 	_survey_approach.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_survey_scroll = ScrollContainer.new()
+	_survey_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_survey_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_survey_panel.add_child(_survey_scroll)
+	var content := VBoxContainer.new()
+	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content.add_theme_constant_override("separation", 7)
+	_survey_scroll.add_child(content)
+	_survey_scale = _label(content, "Размеры, время и гравитация в масштабе модели.", 15, MUTED)
+	_survey_scale.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	for metric: Array in SURVEY_METRICS:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 10)
-		_survey_panel.add_child(row)
+		content.add_child(row)
 		var caption := _label(row, metric[1], 16, MUTED)
 		caption.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		caption.size_flags_stretch_ratio = 0.90
+		caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		var value := _label(row, "", 16, TEXT)
+		value.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		value.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		_survey_values[metric[0]] = value
-	var spacer := Control.new()
-	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_survey_panel.add_child(spacer)
 	_survey_note = _label(_survey_panel, "", 16, MUTED)
 	_survey_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_scan_button = _button(_survey_panel, "Сканировать", 52)
@@ -374,8 +396,9 @@ func open(sim: RefCounted) -> void:
 	_chart.forecast_impact = -1
 	_touches.clear()
 	_touch_sites.clear()
-	_trajectory_touch = -1
+	_scroll_touch = -1
 	_trajectory_scroll.scroll_vertical = 0
+	_survey_scroll.scroll_vertical = 0
 	var system_id: int = sim.system_id
 	_star_focus = Sector.star_for(system_id)
 	_orbit_focus = int(sim.orbit_maneuver_focus) if sim.orbit_maneuver and sim.orbit_maneuver_focus >= 0 else _star_focus
@@ -444,6 +467,7 @@ func open_atlas(sim: RefCounted, site: int) -> void:
 func close() -> void:
 	_touches.clear()
 	_touch_sites.clear()
+	_scroll_touch = -1
 	_survey_status.clear()
 	_flight = null
 	hide()
@@ -505,6 +529,8 @@ func _select_site(id: int) -> void:
 		return
 	if _rendezvous_panel.visible and _rendezvous_status.get("active", false):
 		return
+	if _candidate != id:
+		_survey_scroll.scroll_vertical = 0
 	_candidate = id
 	_chart.selected_site = id
 	_chart.orbit = Orbit.orbit_points(id, float(_flight.orbit_time))
@@ -585,6 +611,7 @@ func _toggle_survey() -> void:
 
 func _set_panel(panel: String) -> void:
 	_touch_sites.clear()
+	_scroll_touch = -1
 	_navigation_panel.visible = panel == "navigation"
 	_trajectory_panel.visible = panel == "trajectory"
 	_rendezvous_panel.visible = panel == "rendezvous"
@@ -633,19 +660,68 @@ func refresh_survey() -> void:
 
 
 func _show_survey_values(data: Dictionary) -> void:
-	var radius := float(data.get("radius", 0.0))
-	var period := float(data.get("period", 0.0))
-	var gravity := float(data.get("gravity", 0.0))
-	var atmosphere := float(data.get("atmosphere_height", 0.0))
+	_survey_scale.visible = not data.is_empty()
+	for key: String in ["radius", "diameter", "periapsis", "apoapsis"]:
+		var distance := float(data.get(key, 0.0))
+		_set_survey_value(key, _distance_label(distance).replace(".", ",") if distance > 0.0 else "")
+	for key: String in ["period", "spin_period"]:
+		var seconds := float(data.get(key, 0.0))
+		_set_survey_value(key, _duration_label(seconds) if seconds > 0.0 else "")
+	var surface := str(data.get("surface_class", ""))
+	var link := str(data.get("ground_reference", ""))
+	var center := str(data.get("orbit_reference", ""))
+	var mu := float(data.get("gravity_parameter", 0.0))
+	_set_survey_value("ground_reference", link)
+	_set_survey_value("orbit_reference", center if not center.is_empty() or surface != "star" else "Неподвижна в системе")
+	_gravity_survey(surface, mu, float(data.get("gravity", 0.0)))
 	var spin := float(data.get("spin", 0.0))
-	var resource := str(data.get("resource_name", ""))
-	_set_survey_value("radius", _distance_label(radius).replace(".", ",") if radius > 0.0 else "")
-	_set_survey_value("period", _duration_label(period) if period > 0.0 else "")
-	_set_survey_value("gravity", ("%.3f м/с²" % gravity).replace(".", ",") if gravity > 0.0 else "")
-	_set_survey_value("atmosphere_height", _distance_label(atmosphere).replace(".", ",") if atmosphere > 0.0 else "")
-	_set_survey_value("atmosphere_density", ("%.2f" % float(data.get("atmosphere_density", 0.0))).replace(".", ",") if atmosphere > 0.0 else "")
-	_set_survey_value("resource", "%s · %d ед." % [resource, int(data.get("reserve", 0))] if not resource.is_empty() else "")
 	_set_survey_value("spin", _number_label(rad_to_deg(spin), "°/с", true) if spin != 0.0 else "")
+	_set_survey_value("surface", _surface_survey(surface, spin))
+	var contact := ""
+	if surface == "solid":
+		contact = "Уклон до %d° · зазор от грунта %d м · выпустите шасси" % [
+			roundi(float(data.landing_max_slope)), roundi(float(data.contact_clearance)),
+		]
+	_set_survey_value("contact", contact)
+	var atmosphere := float(data.get("atmosphere_height", 0.0))
+	var atmosphere_text := _distance_label(atmosphere).replace(".", ",") if atmosphere > 0.0 else ""
+	if atmosphere_text.is_empty() and surface in ["solid", "ground_pad", "ground_hangar"]:
+		atmosphere_text = "Профиля нет"
+	_set_survey_value("atmosphere_height", atmosphere_text)
+	_set_survey_value("atmosphere_density", ("%.2f" % float(data.get("atmosphere_density", 0.0))).replace(".", ",") if atmosphere > 0.0 else "")
+	_set_survey_value("scoop", _scoop_survey(str(data.get("scoop_kind", ""))))
+	var resource := str(data.get("resource_name", ""))
+	_set_survey_value("resource", "%s · %d ед." % [resource, int(data.get("reserve", 0))] if not resource.is_empty() else "")
+
+
+func _gravity_survey(surface: String, mu: float, gravity: float) -> void:
+	var value := ""
+	if mu > 0.0:
+		value = ("%.3f м/с²" % gravity).replace(".", ",")
+	elif surface == "solid":
+		value = "Собственного поля в модели нет"
+	_set_survey_value("gravity", value)
+	_set_survey_value("gravity_parameter", _number_label(mu, "м³/с²") if mu > 0.0 else "")
+
+
+static func _surface_survey(surface: String, spin: float) -> String:
+	match surface:
+		"solid": return "Твёрдый грунт · уравняйте скорость с поверхностью"
+		"ground_pad": return "Открытая площадка · заход вместе с поверхностью"
+		"ground_hangar": return "Ангар · заход вместе с поверхностью"
+		"orbital_port": return "Синхронизируйте крен с доком" if spin != 0.0 else "Заход через створ дока"
+		"gas": return "Газ · посадки нет"
+		"star": return "Посадки нет"
+		_: return ""
+
+
+static func _scoop_survey(kind: String) -> String:
+	match kind:
+		"star": return "%d–%d м от центра · до %d м/с · нужен сборщик" % [
+			Sector.SCOOP_INNER, Sector.SCOOP_OUTER, Sector.SCOOP_SPEED,
+		]
+		"gas": return "Верхний слой атмосферы · нужен сборщик"
+		_: return ""
 
 
 func _set_survey_value(key: String, value: String) -> void:
@@ -821,14 +897,15 @@ func _chart_mouse_input(event: InputEvent) -> void:
 func _input(event: InputEvent) -> void:
 	if not is_open():
 		return
+	var scroll := _survey_scroll if _survey_panel.visible else _trajectory_scroll
 	if event is InputEventScreenTouch:
 		var touch := event as InputEventScreenTouch
 		if touch.pressed:
 			var button := _button_at(touch.position)
 			if button != null:
 				_touches[touch.index] = button
-			elif _trajectory_touch < 0 and _trajectory_scroll.is_visible_in_tree() and _trajectory_scroll.get_global_rect().has_point(touch.position):
-				_trajectory_touch = touch.index
+			elif _scroll_touch < 0 and scroll.is_visible_in_tree() and scroll.get_global_rect().has_point(touch.position):
+				_scroll_touch = touch.index
 			elif _chart.get_global_rect().has_point(touch.position):
 				var id := _chart_site_at(touch.position)
 				if id != -1:
@@ -838,8 +915,8 @@ func _input(event: InputEvent) -> void:
 			var id: int = _touch_sites.get(touch.index, -1)
 			_touches.erase(touch.index)
 			_touch_sites.erase(touch.index)
-			if touch.index == _trajectory_touch:
-				_trajectory_touch = -1
+			if touch.index == _scroll_touch:
+				_scroll_touch = -1
 			if not touch.canceled:
 				if button != null and button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(touch.position):
 					button.pressed.emit()
@@ -847,8 +924,8 @@ func _input(event: InputEvent) -> void:
 					_select_site(id)
 		get_viewport().set_input_as_handled()
 	elif event is InputEventScreenDrag:
-		if event.index == _trajectory_touch and _trajectory_scroll.is_visible_in_tree():
-			_trajectory_scroll.scroll_vertical = maxi(0, _trajectory_scroll.scroll_vertical - roundi(event.relative.y))
+		if event.index == _scroll_touch and scroll.is_visible_in_tree():
+			scroll.scroll_vertical = maxi(0, scroll.scroll_vertical - roundi(event.relative.y))
 		get_viewport().set_input_as_handled()
 
 
@@ -856,7 +933,7 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
 		_touches.clear()
 		_touch_sites.clear()
-		_trajectory_touch = -1
+		_scroll_touch = -1
 
 
 func _button_at(point: Vector2) -> Button:

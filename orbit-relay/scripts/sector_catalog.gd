@@ -39,7 +39,8 @@ const GROUND_PAD := PRE_GROUND_DESTINATION_COUNT
 const GROUND_HANGAR := GROUND_PAD + 1
 const PRE_EXPANDED_DESTINATION_COUNT := GROUND_HANGAR + 1
 const PRE_ATLAS_DESTINATION_COUNT := PRE_EXPANDED_DESTINATION_COUNT + ProceduralSystems.FRONTIER_SYSTEM_COUNT * ProceduralSystems.TARGETS_PER_SYSTEM
-const DESTINATION_COUNT := PRE_ATLAS_DESTINATION_COUNT + ProceduralSystems.OUTER_SYSTEM_COUNT * ProceduralSystems.TARGETS_PER_SYSTEM
+const PRE_RICH_SYSTEMS_DESTINATION_COUNT := PRE_ATLAS_DESTINATION_COUNT + ProceduralSystems.OUTER_SYSTEM_COUNT * ProceduralSystems.TARGETS_PER_SYSTEM
+const DESTINATION_COUNT := PRE_RICH_SYSTEMS_DESTINATION_COUNT + ProceduralSystems.MOON_COUNT + ProceduralSystems.GAS_GIANT_COUNT
 const GROUND_BODY := 12
 const VELAR_STAR_ID := 14
 const TERRACE_ID := PRE_SURFACE_DESTINATION_COUNT
@@ -266,6 +267,8 @@ static func _index_generated_systems() -> Dictionary:
 static func system_of_site(id: int) -> int:
 	if id < 0 or id >= DESTINATION_COUNT:
 		return -1
+	if id >= PRE_RICH_SYSTEMS_DESTINATION_COUNT:
+		return PRE_ATLAS_SYSTEM_COUNT + int(site(id).system_index)
 	if id >= PRE_ATLAS_DESTINATION_COUNT:
 		@warning_ignore("integer_division")
 		return PRE_ATLAS_SYSTEM_COUNT + (id - PRE_ATLAS_DESTINATION_COUNT) / ProceduralSystems.TARGETS_PER_SYSTEM

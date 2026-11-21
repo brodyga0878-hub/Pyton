@@ -20,6 +20,9 @@ const ARM_MEMBER_SUFFIXES := ["", "а", "б", "в"]
 const ARM_GROUP_COUNT := 26
 const ARM_GROUP_SIZE := len(ARM_MEMBER_SUFFIXES)
 const OUTER_SYSTEM_COUNT := len(ARM_ROOTS) * ARM_GROUP_COUNT * ARM_GROUP_SIZE
+const COMPANION_GROUPS := [0, 6, 12, 18]
+const MOON_COUNT := len(ARM_ROOTS) * len(COMPANION_GROUPS)
+const GAS_GIANT_COUNT := MOON_COUNT
 const NAMES := [
 	"Тальвена", "Ирсавель", "Морикса", "Вестрида", "Ольвенир", "Астрэва",
 	"Ниварис", "Сельтура", "Каэлин", "Дорвейн", "Ярсела", "Энтурин",
@@ -104,9 +107,74 @@ static func build_outer(first_target: int, frontier: Array[Dictionary]) -> Dicti
 					occupied.append(position)
 				var sector := Vector2i(floori(position.x / SECTOR_SIZE), floori(position.y / SECTOR_SIZE))
 				_append_single(systems, sites, first_target + sites.size(), sector, seed, name, position)
+	# Append bodies only after every existing site ID has been assigned.
+	for arm in range(ARM_ROOTS.size()):
+		for group: int in COMPANION_GROUPS:
+			var relay_index := (arm * ARM_GROUP_COUNT + group) * ARM_GROUP_SIZE
+			_append_outer_moon(systems, sites, relay_index + 1, first_target)
+			_append_outer_giant(systems, sites, relay_index + 2, first_target)
 	for site: Dictionary in sites:
 		site.make_read_only()
 	return {"systems": systems, "sites": sites}
+
+
+static func _append_outer_moon(systems: Array[Dictionary], sites: Array[Dictionary], system_index: int,
+		first_target: int) -> void:
+	var system := systems[system_index].duplicate()
+	var parent_id := int(system.targets[1])
+	var parent := sites[parent_id - first_target]
+	var seed: int = system.seed
+	var radius := lerpf(40.0, 53.0, _sample(seed, 60))
+	var orbital_radius := float(parent.gate_offset) + radius + 64.0
+	var ray := Vector3.BACK.rotated(Vector3.UP, TAU * _sample(seed, 61))
+	var id := first_target + sites.size()
+	sites.append({
+		"name": "%s I-а" % system.name, "kind": "moon", "system_index": system_index,
+		"center": Vector3(parent.center) + ray * orbital_radius, "orbit_parent": parent_id,
+		"orbital_elements": Vector3(0.012, 360.0 * _sample(seed, 62), 60.0 + 18.0 * _sample(seed, 63)),
+		"radius": radius, "pad_offset": radius, "gate_offset": radius + 78.0,
+		"seed": seed ^ 0x4A1072, "surface_color": Color("#72808b"), "accent": MINERAL_COLORS[2],
+		"resource": "ice", "reserve": 96 + floori(_sample(seed, 64) * 9.0) * 12,
+		"drill_seconds": lerpf(8.0, 13.0, _sample(seed, 65)),
+	})
+	system.targets = system.targets + [id]
+	system.mines = system.mines + [id]
+	system.survey_sites = system.survey_sites + [id]
+	system.description += " У планеты есть ледяная луна."
+	for key: String in ["targets", "mines", "survey_sites"]:
+		system[key].make_read_only()
+	system.make_read_only()
+	systems[system_index] = system
+
+
+static func _append_outer_giant(systems: Array[Dictionary], sites: Array[Dictionary], system_index: int,
+		first_target: int) -> void:
+	var system := systems[system_index].duplicate()
+	var star_id := int(system.star)
+	var star := sites[star_id - first_target]
+	var seed: int = system.seed
+	var radius := lerpf(416.0, 492.0, _sample(seed, 71))
+	var orbital_radius := lerpf(3850.0, 4260.0, _sample(seed, 72))
+	var ray := Vector3.BACK.rotated(Vector3.UP, TAU * _sample(seed, 73)).rotated(Vector3.RIGHT, 0.17)
+	var id := first_target + sites.size()
+	var atmosphere := {"height": lerpf(100.0, 126.0, _sample(seed, 74)),
+		"density": lerpf(1.28, 1.81, _sample(seed, 75)), "color": Color("#efb488")}
+	atmosphere.make_read_only()
+	sites.append({
+		"name": "%s II" % system.name, "kind": "gas", "system_index": system_index,
+		"center": Vector3(star.center) + ray * orbital_radius, "orbit_parent": star_id,
+		"orbital_elements": Vector3(0.035, 360.0 * _sample(seed, 76), 12.0),
+		"radius": radius, "pad_offset": radius, "gate_offset": radius + 160.0,
+		"accent": atmosphere.color, "atmosphere": atmosphere,
+	})
+	system.targets = system.targets + [id]
+	system.survey_sites = system.survey_sites + [id]
+	system.gas_giant = id
+	system.description += " В верхних слоях атмосферы газового гиганта доступен сбор водорода."
+	system.targets.make_read_only()
+	system.survey_sites.make_read_only()
+	system.make_read_only()
+	systems[system_index] = system
 
 
 static func _arm_origin(frontier: Array[Dictionary], sector: Vector2i) -> Vector3:

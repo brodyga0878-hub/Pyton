@@ -21,7 +21,9 @@ static var _system_sites: Dictionary[int, int] = _build_system_sites()
 
 
 static func profile(site: int) -> Dictionary:
-	return PROFILES.get(site, {})
+	if PROFILES.has(site):
+		return PROFILES[site]
+	return Catalog.site(site).get("atmosphere", {})
 
 
 static func sample(sim: RefCounted, point: Vector3, velocity: Vector3) -> Dictionary:
@@ -87,6 +89,10 @@ static func _site_for_system(system: int) -> int:
 
 static func _build_system_sites() -> Dictionary[int, int]:
 	var sites: Dictionary[int, int] = {}
+	for system in range(Catalog.SYSTEM_COUNT):
+		var giant := Catalog.gas_giant_for(system)
+		if giant >= 0:
+			sites[system] = giant
 	for site: int in PROFILES:
 		sites[Catalog.system_of_site(site)] = site
 	return sites
