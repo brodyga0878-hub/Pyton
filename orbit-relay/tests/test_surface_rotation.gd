@@ -57,7 +57,10 @@ func _test_spin_geometry() -> void:
 		_expect(spin_component.length() > 0.1 and absf(spin_component.dot(offset)) < 0.002
 			and spin_component.distance_to((after - before) / 0.1) < 0.003,
 			"Site %d has tangential ground velocity that agrees with numerical position change" % site)
-	_expect(count == 39, "Lazur and all generated solid surfaces, including the binary planet and moon, rotate")
+	var expected_count := 1 # Lazur is the rotating authored moon.
+	for system in range(Catalog.AUTHORED_SYSTEM_COUNT, Catalog.SYSTEM_COUNT):
+		expected_count += Catalog.mines_for(system).size()
+	_expect(count == expected_count, "Lazur and all generated solid surfaces, including outer-sector bodies, rotate")
 
 
 func _fly_to_marked_pad() -> Flight:
