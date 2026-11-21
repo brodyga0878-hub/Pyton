@@ -1,0 +1,404 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.97.0",
+  "source_commit": "60eeab8a14dea0ef27cb671a6d0a7735af803d11",
+  "content": {
+    "save_schema": 49,
+    "systems": 512,
+    "stars": 513,
+    "targets": 1585,
+    "solid_mineable_sites": 1044,
+    "audited_rows": [
+      "W21",
+      "FLT-04",
+      "JMP-02",
+      "ECO-02",
+      "ECO-03",
+      "ECO-04",
+      "S-09",
+      "S-11",
+      "MED-01",
+      "MED-02",
+      "S-20",
+      "S-19"
+    ],
+    "regular_market_goods": 33,
+    "new_market_goods": 27,
+    "market_contacts": 6,
+    "priced_berths": 3,
+    "music_tracks": 4,
+    "action_audio_cues": 17,
+    "max_parked_time_scale": 256,
+    "max_flying_time_scale": 16,
+    "tested_acceptance_matrix": {
+      "checked": 71,
+      "partial": 0,
+      "open": 0
+    },
+    "apk_runtime_source_commit": "10be9b122857e24db45fb041d30624d80b463797"
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 122,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.96.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 66,
+    "tested_on_device": false
+  },
+  "checks": {
+    "android_report_share": {
+      "failures": 0,
+      "checks": 76
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "binary_orbits": {
+      "failures": 0,
+      "checks": 55
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "branching_story": {
+      "failures": 0,
+      "checks": 26
+    },
+    "calendar": {
+      "failures": 0,
+      "checks": 53
+    },
+    "cargo_console": {
+      "failures": 0,
+      "checks": 14
+    },
+    "cargo_pods": {
+      "failures": 0,
+      "checks": 30
+    },
+    "cartography": {
+      "failures": 0,
+      "checks": 56
+    },
+    "civilian_traffic": {
+      "failures": 0,
+      "checks": 41
+    },
+    "cockpit_navigation": {
+      "failures": 0,
+      "checks": 26
+    },
+    "combat_outfitting": {
+      "failures": 0,
+      "checks": 76
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "crew": {
+      "failures": 0,
+      "checks": 45
+    },
+    "customs": {
+      "failures": 0,
+      "checks": 28
+    },
+    "departure": {
+      "failures": 0,
+      "checks": 32
+    },
+    "dock_access": {
+      "failures": 0,
+      "checks": 37
+    },
+    "docking": {
+      "failures": 0,
+      "checks": 76
+    },
+    "dual_fuel": {
+      "failures": 0,
+      "checks": 25
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 155
+    },
+    "expanded_galaxy": {
+      "failures": 0,
+      "checks": 3117
+    },
+    "extended_session": {
+      "failures": 0,
+      "checks": 27
+    },
+    "flight": {
+      "failures": 0
+    },
+    "flight_audio": {
+      "failures": 0,
+      "checks": 67
+    },
+    "flight_camera": {
+      "failures": 0,
+      "checks": 18
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "frontier_freight": {
+      "failures": 0,
+      "checks": 33
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 76
+    },
+    "fuel_modules": {
+      "failures": 0,
+      "checks": 37
+    },
+    "galactic_atlas": {
+      "failures": 0,
+      "checks": 30
+    },
+    "galactic_routes": {
+      "failures": 0,
+      "checks": 59
+    },
+    "gear": {
+      "failures": 0,
+      "checks": 28
+    },
+    "generated_companions": {
+      "failures": 0,
+      "checks": 85
+    },
+    "ground_ports": {
+      "failures": 0,
+      "checks": 41
+    },
+    "heat_shield": {
+      "failures": 0,
+      "checks": 28
+    },
+    "hyperspace": {
+      "failures": 0,
+      "checks": 64
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 295
+    },
+    "lazur_rotation": {
+      "failures": 0,
+      "checks": 243
+    },
+    "living": {
+      "failures": 0,
+      "checks": 83
+    },
+    "market_industry": {
+      "failures": 0,
+      "checks": 65
+    },
+    "mass_and_thrust": {
+      "failures": 0,
+      "checks": 36
+    },
+    "material_maps": {
+      "failures": 0,
+      "checks": 38
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "npc_freight": {
+      "failures": 0,
+      "checks": 48
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "orbital_mining": {
+      "failures": 0,
+      "checks": 34
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 561
+    },
+    "passengers": {
+      "failures": 0,
+      "checks": 50
+    },
+    "pilot_career": {
+      "failures": 0,
+      "checks": 44
+    },
+    "port_accounts": {
+      "failures": 0,
+      "checks": 28
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 172
+    },
+    "procedural_galaxy": {
+      "failures": 0,
+      "checks": 149
+    },
+    "reference_frames": {
+      "failures": 0,
+      "checks": 46
+    },
+    "remote_rig": {
+      "failures": 0,
+      "checks": 35
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "report": {
+      "failures": 0,
+      "checks": 37
+    },
+    "save_backup": {
+      "failures": 0,
+      "checks": 28
+    },
+    "save_phases": {
+      "failures": 0,
+      "checks": 72
+    },
+    "scene": {
+      "failures": 0
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "sector_news": {
+      "failures": 0,
+      "checks": 30
+    },
+    "shipyard": {
+      "failures": 0,
+      "checks": 52
+    },
+    "speed_hold": {
+      "failures": 0,
+      "checks": 54
+    },
+    "stellar_lighting": {
+      "failures": 0,
+      "checks": 9
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 5341
+    },
+    "surface_guidance": {
+      "failures": 0,
+      "checks": 60
+    },
+    "surface_rotation": {
+      "failures": 0,
+      "checks": 2645
+    },
+    "system_dossier": {
+      "failures": 0,
+      "checks": 30
+    },
+    "time_warp": {
+      "failures": 0,
+      "checks": 17
+    },
+    "voyage_entry": {
+      "failures": 0,
+      "checks": 45
+    },
+    "voyage_import": {
+      "failures": 0,
+      "checks": 40
+    },
+    "voyage_library": {
+      "failures": 0,
+      "checks": 34
+    },
+    "android_provider_packing": {
+      "checks": 11,
+      "failures": 0
+    },
+    "signed_apk_feature_suites": {
+      "checks": 685,
+      "suites": {
+        "market_industry": 65,
+        "mass_and_thrust": 36,
+        "port_accounts": 28,
+        "economy": 155,
+        "customs": 28,
+        "hyperspace": 64,
+        "flight_audio": 67,
+        "presentation": 172,
+        "time_warp": 17,
+        "cockpit_navigation": 26,
+        "extended_session": 27
+      },
+      "failures": 0
+    },
+    "signed_apk_soundtrack_import": {
+      "checks": 4,
+      "native_imported_loops": 4,
+      "failures": 0
+    },
+    "signed_apk_legacy_corpus": {
+      "distinct": 2053,
+      "accepted": 2053,
+      "first_schema": 1,
+      "last_old_schema": 47,
+      "target_schema": 49,
+      "failures": 0
+    },
+    "signed_0_96_session_migration": {
+      "checks": 146,
+      "operations": {
+        "docked": 26,
+        "named": 27,
+        "paid": 32,
+        "recover": 33,
+        "zip": 28
+      },
+      "old_schema": 48,
+      "target_schema": 49,
+      "observations": 1585,
+      "legacy_goods": 6,
+      "paid_jump_repeated_debits": 0,
+      "failures": 0
+    }
+  },
+  "files": {
+    "OrbitRelay-0.97.0-arm64.apk": {
+      "bytes": 35664260,
+      "sha256": "1c8eb7a6125af39c3fda7e05dd12ce354ba0e79722c8901a2aedc9b25d717000"
+    },
+    "OrbitRelay-0.97.0-source.zip": {
+      "bytes": 13819505,
+      "sha256": "dacda5780bac430c527a2c8d6654e01e8619b722f00c4d3ee0bd9b88ec45391c"
+    }
+  }
+}
