@@ -14,10 +14,15 @@ const PresentationMenu = preload("res://scripts/presentation_menu.gd")
 const MissionJournal = preload("res://scripts/mission_journal.gd")
 const ExpansionBoard = preload("res://scripts/expansion_board.gd")
 const SessionIO = preload("res://scripts/session_io.gd")
+const VoyageMenu = preload("res://scripts/voyage_menu.gd")
+const VoyageLibrary = preload("res://scripts/voyage_library.gd")
+const VoyageImport = preload("res://scripts/voyage_import.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const SAVE_INTERVAL := 8.0
 const ANTIALIASING := [Viewport.MSAA_DISABLED, Viewport.MSAA_2X, Viewport.MSAA_4X]
 const REPORT_JOURNAL_ONLY := "В ZIP только журнал и сведения о версии. Состояние рейса недоступно."
+
+@export var show_voyage_menu_on_launch := false
 
 var flight := Flight.new()
 var presentation := DisplaySettings.new()
@@ -32,6 +37,9 @@ var _market := PortMarket.new()
 var _settings := PresentationMenu.new()
 var _journal := MissionJournal.new()
 var _frontier := ExpansionBoard.new()
+var _voyages := VoyageMenu.new()
+var _voyage_picker: FileDialog
+var _flight_active := false
 var _io := SessionIO.new()
 var _save_elapsed := 0.0
 var _save_error_shown := false
@@ -45,7 +53,10 @@ var _report_sharing := false
 
 func _ready() -> void:
 	presentation.load_preferences()
-	var loaded := SessionIO.load_valid_state(SessionIO.SAVE_PATH, flight.restore)
+	_flight_active = not show_voyage_menu_on_launch
+	var loaded := SessionIO.LoadResult.NO_SAVE
+	if _flight_active:
+		loaded = SessionIO.load_valid_state(SessionIO.SAVE_PATH, flight.restore)
 	_preserve_backup_on_next_save = loaded == SessionIO.LoadResult.BACKUP
 	if loaded != SessionIO.LoadResult.NO_SAVE:
 		_io.trace("load", {"accepted": loaded != SessionIO.LoadResult.INVALID, "backup": _preserve_backup_on_next_save})
@@ -95,6 +106,7 @@ func _ready() -> void:
 	_settings.build()
 	_settings.preference_requested.connect(_change_preference)
 	_settings.dismissed.connect(_close_settings)
+	_settings.voyages_requested.connect(_open_voyages_from_settings)
 	add_child(_journal)
 	_journal.build()
 	_journal.follow_requested.connect(_follow_journal)
@@ -106,9 +118,15 @@ func _ready() -> void:
 	_frontier.project_requested.connect(_project_action)
 	_frontier.convoy_requested.connect(_convoy_action)
 	_frontier.dismissed.connect(_close_frontier)
+	add_child(_voyages)
+	_voyages.build()
+	_voyages.action_requested.connect(_voyage_action)
 	_build_report_panel()
 	_apply_presentation()
 	_update_display(0.0)
+	if show_voyage_menu_on_launch:
+		_open_voyages()
+		return
 	var flight_notice := flight.status_message if not flight.status_event.is_empty() else ""
 	_deliver_notice()
 	if loaded == SessionIO.LoadResult.BACKUP:
@@ -118,7 +136,7 @@ func _ready() -> void:
 		_hud.notify(message)
 	elif loaded == SessionIO.LoadResult.INVALID:
 		_hud.notify("Сохранённый рейс недоступен. Начат новый рейс.")
-	_io.trace("session_started", {"system_id": flight.system_id, "docked": flight.docked, "deliveries": flight.deliveries, "presentation": presentation.snapshot()})
+	_trace_voyage_start()
 
 
 func _process(delta: float) -> void:
@@ -126,11 +144,11 @@ func _process(delta: float) -> void:
 
 
 func _overlay_open() -> bool:
-	return _report.visible or _map.is_open() or _galaxy.is_open() or _services.is_open() or _market.is_open() or _settings.is_open() or _journal.is_open() or _frontier.is_open()
+	return _voyages.is_open() or _report.visible or _map.is_open() or _galaxy.is_open() or _services.is_open() or _market.is_open() or _settings.is_open() or _journal.is_open() or _frontier.is_open()
 
 
 func _physics_process(delta: float) -> void:
-	if _overlay_open() or flight.time_paused:
+	if not _flight_active or _overlay_open() or flight.time_paused:
 		return
 	flight.update(delta, _hud.move_input(), _hud.roll_input(), _hud.boost_held(), _hud.brake_held(), _hud.translation_input())
 	if not flight.status_event.is_empty():
@@ -207,7 +225,10 @@ func _update_display(delta: float) -> void:
 
 
 func _handle_action(action: String) -> void:
-	if _overlay_open():
+	if not _flight_active or _overlay_open():
+		return
+	if action == "voyages":
+		_open_voyages()
 		return
 	if flight.jump_seconds_left > 0.0 and action not in ["throttle_up", "throttle_down", "time_pause"]:
 		return
@@ -477,10 +498,12 @@ func _deliver_notice() -> void:
 		_save()
 
 
-func _save() -> void:
+func _save(keep_backup: bool = false) -> void:
+	if not _flight_active:
+		return
 	_save_elapsed = 0.0
-	var result := SessionIO.save_state(flight.snapshot(), SessionIO.SAVE_PATH, _preserve_backup_on_next_save)
-	if result == OK:
+	var result := SessionIO.save_state(flight.snapshot(), SessionIO.SAVE_PATH, keep_backup or _preserve_backup_on_next_save)
+	if result == OK and not keep_backup:
 		_preserve_backup_on_next_save = false
 	if result != OK and not _save_error_shown:
 		_hud.notify("Не удалось сохранить рейс.")
@@ -488,8 +511,161 @@ func _save() -> void:
 	_save_error_shown = result != OK
 
 
+func _open_voyages_from_settings() -> void:
+	_settings.close()
+	_open_voyages()
+
+
+func _open_voyages() -> void:
+	var primary_available := _flight_active or _read_voyage(SessionIO.SAVE_PATH) != null
+	var backup_available := _read_voyage(SessionIO.BACKUP_PATH) != null
+	_hud.set_input_enabled(false)
+	_voyages.open(not _flight_active, primary_available, backup_available, VoyageLibrary.list_slots())
+	if not primary_available and not backup_available and (FileAccess.file_exists(SessionIO.SAVE_PATH) or FileAccess.file_exists(SessionIO.BACKUP_PATH)):
+		_voyages.notify("Автосохранения повреждены. Выберите именную копию, отчёт ZIP или новый рейс.")
+
+
+func _refresh_voyages() -> void:
+	_voyages.refresh(_flight_active or _read_voyage(SessionIO.SAVE_PATH) != null,
+		_read_voyage(SessionIO.BACKUP_PATH) != null, VoyageLibrary.list_slots())
+
+
+static func _read_voyage(path: String) -> Flight:
+	var state := SessionIO.load_single_state(path)
+	if state.is_empty():
+		return null
+	var candidate := Flight.new()
+	return candidate if candidate.restore(state) else null
+
+
+func _voyage_action(action: String, slot_id: String, slot_name: String) -> void:
+	if not _voyages.is_open():
+		return
+	match action:
+		"continue", "close":
+			if _flight_active:
+				_close_voyages()
+			elif action == "continue":
+				var candidate := _read_voyage(SessionIO.SAVE_PATH)
+				if candidate != null:
+					_activate_voyage(candidate, "Рейс продолжен.")
+				else:
+					_refresh_voyages()
+					_voyages.notify("Автосохранение недоступно.")
+		"new":
+			_replace_voyage(Flight.new(), "Начат новый рейс.")
+		"recover":
+			var candidate := _read_voyage(SessionIO.BACKUP_PATH)
+			if candidate == null:
+				_refresh_voyages()
+				_voyages.notify("Резервная копия недоступна.")
+				return
+			_replace_voyage(candidate, "Рейс восстановлен из резервной копии.")
+		"load":
+			var candidate := Flight.new()
+			if not VoyageLibrary.load_slot(slot_id, candidate.restore):
+				_refresh_voyages()
+				_voyages.notify("Не удалось загрузить именную копию.")
+				return
+			_replace_voyage(candidate, "Именная копия загружена.")
+		"create":
+			if _flight_active:
+				var result := VoyageLibrary.create_slot(slot_name, flight.snapshot())
+				_show_voyage_library_result(int(result.get("error", OK if result.ok else FAILED)), "Именная копия сохранена.")
+		"rename":
+			_show_voyage_library_result(VoyageLibrary.rename_slot(slot_id, slot_name), "Имя копии изменено.")
+		"delete":
+			_show_voyage_library_result(VoyageLibrary.delete_slot(slot_id), "Именная копия удалена.")
+		"import":
+			_open_voyage_file()
+
+
+func _close_voyages() -> void:
+	_voyages.close()
+	_hud.set_input_enabled(true)
+
+
+func _show_voyage_library_result(error: Error, success_message: String) -> void:
+	if error == OK:
+		_refresh_voyages()
+	_voyages.notify(success_message if error == OK else VoyageLibrary.error_message(error))
+
+
+func _replace_voyage(candidate: Flight, message: String) -> void:
+	var rotate_previous := _flight_active or _read_voyage(SessionIO.SAVE_PATH) != null
+	if _flight_active:
+		# Checkpoint the outgoing live flight so rotation also covers the time
+		# since the last autosave. Keep the older backup until this succeeds.
+		if SessionIO.save_state(flight.snapshot(), SessionIO.SAVE_PATH, true) != OK:
+			_voyages.notify("Не удалось сохранить текущий рейс. Переключение отменено.")
+			return
+	if SessionIO.save_state(candidate.snapshot(), SessionIO.SAVE_PATH, not rotate_previous) != OK:
+		_voyages.notify("Не удалось записать выбранный рейс. Переключение отменено.")
+		return
+	_preserve_backup_on_next_save = not rotate_previous and FileAccess.file_exists(SessionIO.BACKUP_PATH)
+	_activate_voyage(candidate, message)
+
+
+func _activate_voyage(candidate: Flight, message: String) -> void:
+	flight = candidate
+	_flight_active = true
+	_save_elapsed = 0.0
+	_save_error_shown = false
+	_io = SessionIO.new()
+	_camera_mode = FlightCamera.Mode.EXTERIOR
+	_view.select_camera_mode(_camera_mode)
+	_close_voyages()
+	var interruption := flight.status_message if not flight.status_event.is_empty() else ""
+	_deliver_notice()
+	_hud.notify(message if interruption.is_empty() else message + " " + interruption)
+	_update_display(0.0)
+	_trace_voyage_start()
+
+
+func _trace_voyage_start() -> void:
+	_io.trace("session_started", {"system_id": flight.system_id, "docked": flight.docked, "deliveries": flight.deliveries, "presentation": presentation.snapshot()})
+
+
+func _open_voyage_file() -> void:
+	var native_available := DisplayServer.has_feature(DisplayServer.FEATURE_NATIVE_DIALOG_FILE)
+	if OS.has_feature("android") and not native_available:
+		_voyages.notify("На этом устройстве системный выбор ZIP недоступен.")
+		return
+	if _voyage_picker == null:
+		_voyage_picker = FileDialog.new()
+		_voyage_picker.title = "Выбрать отчёт о рейсе"
+		_voyage_picker.access = FileDialog.ACCESS_FILESYSTEM
+		_voyage_picker.file_mode = FileDialog.FILE_MODE_OPEN_FILE
+		_voyage_picker.use_native_dialog = native_available
+		_voyage_picker.add_filter("*.zip", "Отчёт ZIP", "application/zip")
+		_voyage_picker.size = Vector2i(850, 480)
+		_voyage_picker.file_selected.connect(_import_voyage_file)
+		add_child(_voyage_picker)
+		var downloads := OS.get_system_dir(OS.SYSTEM_DIR_DOWNLOADS)
+		if DirAccess.dir_exists_absolute(downloads):
+			_voyage_picker.current_dir = downloads
+	_voyage_picker.popup_file_dialog()
+
+
+func _import_voyage_file(path: String) -> void:
+	if not _voyages.is_open():
+		return
+	var candidate := Flight.new()
+	var result := VoyageImport.load_report(path, candidate.restore)
+	if result == ERR_UNAVAILABLE:
+		_voyages.notify("В этом отчёте есть только журнал. Выберите ZIP с состоянием рейса.")
+	elif result != OK:
+		_voyages.notify("Не удалось прочитать рейс из ZIP. Проверьте выбранный файл.")
+	else:
+		_replace_voyage(candidate, "Рейс восстановлен из отчёта ZIP.")
+
+
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
+		return
+	if _voyages.is_open():
+		if event.physical_keycode == KEY_ESCAPE:
+			_voyages.handle_back()
 		return
 	if _report.visible:
 		if event.physical_keycode == KEY_ESCAPE:
@@ -537,7 +713,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_N: "map", KEY_J: "galaxy", KEY_K: "scoop", KEY_P: "services", KEY_O: "time", KEY_L: "market",
 		KEY_U: "patrol", KEY_X: "fire", KEY_I: "convoy", KEY_H: "flight_assist",
 		KEY_F1: "camera", KEY_F2: "settings", KEY_F3: "journal", KEY_F4: "frontier",
-		KEY_F5: "dock_sync", KEY_F6: "dock_clearance", KEY_F7: "frame", KEY_F9: "time_pause", KEY_F10: "speed_hold", KEY_Y: "gear", KEY_C: "fuel",
+		KEY_F5: "dock_sync", KEY_F6: "dock_clearance", KEY_F7: "frame", KEY_F9: "time_pause", KEY_F10: "speed_hold", KEY_F11: "voyages", KEY_Y: "gear", KEY_C: "fuel",
 	}
 	if actions.has(event.physical_keycode):
 		_handle_action(actions[event.physical_keycode])
@@ -552,6 +728,9 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_IN or what == NOTIFICATION_APPLICATION_RESUMED:
 		_report_sharing = false
 	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
+		if _voyages.is_open():
+			_save(true)
+			return
 		var sharing_report := what == NOTIFICATION_APPLICATION_PAUSED and _report.visible and _report_sharing
 		# Preserve the interruption receipt before changing the live controls.
 		_save()
@@ -562,7 +741,9 @@ func _notification(what: int) -> void:
 			flight.cancel_dock_sync()
 			flight.reset_time_scale()
 	elif what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		if _report.visible:
+		if _voyages.is_open():
+			_voyages.handle_back()
+		elif _report.visible:
 			_close_report()
 		elif _map.is_open():
 			_close_map()

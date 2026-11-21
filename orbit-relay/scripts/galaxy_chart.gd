@@ -1,6 +1,8 @@
 extends Control
 ## Projects catalog coordinates and displays discovered systems, routes and source density.
 
+signal rotation_availability_changed(available: bool)
+
 const Sector := preload("res://scripts/sector_catalog.gd")
 const TEXT := Color("e8f4fa")
 const MUTED := Color("a5bac7")
@@ -13,6 +15,7 @@ const MAX_ZOOM := 32.0
 const DENSITY_SIDE := 224
 const DENSITY_RADIUS := 6
 const MAX_LABELS := 24
+const ROTATION_RADIANS_PER_PIXEL := 0.009
 
 static var _density_by_projection: Dictionary[bool, Dictionary] = {}
 
@@ -26,10 +29,14 @@ var preview_path: Array[int] = []
 var contested: Array[int] = []
 var _known_systems: Array[int] = []
 var _systems: Array[int] = []
+var _positions: Dictionary[int, Vector3] = {}
 var _points: Dictionary[int, Vector2] = {}
 var _center := Vector2.ZERO
+var _origin := Vector3.ZERO
 var _extent := Vector2.ONE
 var _view_offset := Vector2.ZERO
+var _view_depth := 0.0
+var _orbit_angles := Vector2.ZERO
 var _zoom := MIN_ZOOM
 var _focus := -1
 var _atlas := false
@@ -50,15 +57,22 @@ func set_systems(known: Array[int], systems: Array[int], focus: int, elevation: 
 	_focus = focus
 	_detailed = focus >= 0
 	_elevation = elevation
-	_points.clear()
+	_positions.clear()
 	for id in _systems:
-		_points[id] = _project(id, _elevation)
+		_positions[id] = Sector.system_position3(id)
 	var former_center := _center
+	var former_origin := _origin
 	_update_frame()
 	if context_changed:
 		reset_view()
+		return
+	if not _orbit_angles.is_zero_approx():
+		var shift := _view_basis() * (former_origin - _origin)
+		_view_offset += Vector2(shift.x, shift.y)
+		_view_depth += shift.z
 	elif _zoom != MIN_ZOOM or not _view_offset.is_zero_approx():
 		_view_offset = _bound_offset(_view_offset + former_center - _center)
+	_update_points()
 	queue_redraw()
 
 
@@ -68,11 +82,15 @@ func set_atlas(active: bool) -> void:
 	_atlas = active
 	_update_frame()
 	reset_view()
+	rotation_availability_changed.emit(not _atlas)
 
 
 func reset_view() -> void:
 	_view_offset = Vector2.ZERO
+	_view_depth = 0.0
+	_orbit_angles = Vector2.ZERO
 	_zoom = MIN_ZOOM
+	_update_points()
 	queue_redraw()
 
 
@@ -81,6 +99,40 @@ func pan_by(pixel_delta: Vector2) -> void:
 		return
 	_view_offset = _bound_offset(_view_offset - pixel_delta / _pixels_per_light_year())
 	queue_redraw()
+
+
+func rotate_by(pixel_delta: Vector2) -> void:
+	if _atlas or not pixel_delta.is_finite() or pixel_delta.is_zero_approx():
+		return
+	# Keep the actual point at the center of the screen fixed when orbiting a panned map.
+	var center_offset := _view_basis().transposed() * Vector3(_view_offset.x, _view_offset.y, _view_depth)
+	_orbit_angles += pixel_delta * ROTATION_RADIANS_PER_PIXEL
+	_orbit_angles = Vector2(wrapf(_orbit_angles.x, -PI, PI), wrapf(_orbit_angles.y, -PI, PI))
+	var rotated_offset := _view_basis() * center_offset
+	_view_offset = Vector2(rotated_offset.x, rotated_offset.y)
+	_view_depth = rotated_offset.z
+	_update_points()
+	queue_redraw()
+
+
+func _view_basis() -> Basis:
+	return Basis(Vector3.RIGHT, _orbit_angles.y + (PI * 0.5 if _elevation else 0.0)) * Basis(Vector3.BACK, _orbit_angles.x)
+
+
+func _update_points() -> void:
+	_points.clear()
+	if _orbit_angles.is_zero_approx():
+		for id in _systems:
+			_points[id] = _map_plane(_positions[id], _elevation)
+		return
+	var basis := _view_basis()
+	for id in _systems:
+		_points[id] = _project_orbit(_positions[id], basis)
+
+
+func _project_orbit(coordinates: Vector3, basis: Basis) -> Vector2:
+	var local := basis * (coordinates - _origin)
+	return _center + Vector2(local.x, local.y)
 
 
 func zoom_by(factor: float, anchor: Vector2) -> void:
@@ -116,26 +168,25 @@ func _update_frame() -> void:
 		return
 	if _systems.is_empty():
 		_center = Vector2.ZERO
+		_origin = Vector3.ZERO
 		_extent = Vector2.ONE
 		return
-	var low := Vector2(INF, INF)
-	var high := Vector2(-INF, -INF)
-	for id in _systems:
-		var point := _points[id]
+	var low := Vector3(INF, INF, INF)
+	var high := Vector3(-INF, -INF, -INF)
+	for point in _positions.values():
 		low = low.min(point)
 		high = high.max(point)
 	if _detailed:
 		var corner := Vector2(Sector.sector_coordinates(_focus)) * Sector.SECTOR_SIZE
 		low.x = corner.x
 		high.x = corner.x + Sector.SECTOR_SIZE
-		if _elevation:
-			low.y = minf(low.y, -Sector.SECTOR_SIZE * 0.5)
-			high.y = maxf(high.y, Sector.SECTOR_SIZE * 0.5)
-		else:
-			low.y = corner.y
-			high.y = corner.y + Sector.SECTOR_SIZE
-	_center = (low + high) * 0.5
-	_extent = (high - low).max(Vector2.ONE)
+		low.y = corner.y
+		high.y = corner.y + Sector.SECTOR_SIZE
+		low.z = minf(low.z, -Sector.SECTOR_SIZE * 0.5)
+		high.z = maxf(high.z, Sector.SECTOR_SIZE * 0.5)
+	_origin = (low + high) * 0.5
+	_center = _map_plane(_origin, _elevation)
+	_extent = _map_plane(high - low, _elevation).abs().max(Vector2.ONE)
 
 
 func marker_position(id: int) -> Vector2:
@@ -147,7 +198,10 @@ func _project_to_view(point: Vector2) -> Vector2:
 
 
 static func _project(id: int, elevation: bool) -> Vector2:
-	var coordinates := Sector.system_position3(id)
+	return _map_plane(Sector.system_position3(id), elevation)
+
+
+static func _map_plane(coordinates: Vector3, elevation: bool) -> Vector2:
 	return Vector2(coordinates.x, -coordinates.z if elevation else coordinates.y)
 
 
@@ -212,8 +266,13 @@ func _draw() -> void:
 			break
 	draw_rect(bounds.grow(-0.5), BORDER, false, 1.0)
 	_draw_scale()
-	draw_string(ThemeDB.fallback_font, size - Vector2(81, 17), "X →  Z ↑" if _elevation else "X →  Y ↓",
-		HORIZONTAL_ALIGNMENT_LEFT, -1.0, 14, MUTED)
+	var legend := "X →  Z ↑" if _elevation else "X →  Y ↓"
+	if not _orbit_angles.is_zero_approx():
+		var tilt := _orbit_angles.y + (PI * 0.5 if _elevation else 0.0)
+		legend = "Азимут %d° · Наклон %d°" % [roundi(rad_to_deg(_orbit_angles.x)), roundi(rad_to_deg(wrapf(tilt, -PI, PI)))]
+	var font := ThemeDB.fallback_font
+	var legend_width := font.get_string_size(legend, HORIZONTAL_ALIGNMENT_LEFT, -1.0, 14).x
+	draw_string(font, size - Vector2(legend_width + 16.0, 17.0), legend, HORIZONTAL_ALIGNMENT_LEFT, -1.0, 14, MUTED)
 
 
 func _draw_density(bounds: Rect2) -> void:
@@ -266,10 +325,12 @@ static func _density_layer(elevation: bool) -> Dictionary:
 
 func _draw_sector_border() -> void:
 	var bounds := Rect2(Vector2.ZERO, size).grow(-1.0)
-	var left_top := _project_to_view(_center - _extent * 0.5)
-	var right_bottom := _project_to_view(_center + _extent * 0.5)
-	var corners := PackedVector2Array([left_top, Vector2(right_bottom.x, left_top.y),
-		right_bottom, Vector2(left_top.x, right_bottom.y)])
+	var basis := _view_basis()
+	var corners := PackedVector2Array()
+	for direction: Vector2 in [Vector2(-1, -1), Vector2(1, -1), Vector2(1, 1), Vector2(-1, 1)]:
+		var offset := direction * _extent * 0.5
+		var plane_point := Vector3(offset.x, 0.0, -offset.y) if _elevation else Vector3(offset.x, offset.y, 0.0)
+		corners.append(_project_to_view(_project_orbit(_origin + plane_point, basis)))
 	for index in range(corners.size()):
 		var edge := _clip_segment(corners[index], corners[(index + 1) % corners.size()], bounds)
 		if edge.size() == 2:

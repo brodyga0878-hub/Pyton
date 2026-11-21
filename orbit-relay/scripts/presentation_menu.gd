@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 signal preference_requested(field: String, value: int)
+signal voyages_requested()
 signal dismissed()
 
 const Settings := preload("res://scripts/display_settings.gd")
@@ -72,6 +73,9 @@ func build() -> void:
 	header.add_theme_constant_override("separation", 12)
 	content.add_child(header)
 	_label(header, "Настройки", 31, TEXT).size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var voyages_button := _button(header, "Рейсы")
+	voyages_button.custom_minimum_size.x = 126
+	voyages_button.pressed.connect(func(): voyages_requested.emit())
 	_close_button = _button(header, "Закрыть")
 	_close_button.custom_minimum_size.x = 126
 	_close_button.pressed.connect(_request_close)

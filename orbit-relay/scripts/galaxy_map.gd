@@ -11,6 +11,7 @@ const GalaxyChart := preload("res://scripts/galaxy_chart.gd")
 const Expedition := preload("res://scripts/expedition.gd")
 const Economy := preload("res://scripts/port_economy.gd")
 const MissionCalendar := preload("res://scripts/mission_calendar.gd")
+const SystemDossier := preload("res://scripts/system_dossier.gd")
 const TEXT := Color("e8f4fa")
 const MUTED := Color("a5bac7")
 const MINT := Color("9debd7")
@@ -19,6 +20,8 @@ const BORDER := Color("365561")
 const SYSTEMS_PER_PAGE := 6
 const CHART_MOUSE := -2
 const DRAG_THRESHOLD := 12.0
+
+enum DossierPage { OVERVIEW, TRADE }
 
 var _insets: MarginContainer
 var _chart: GalaxyChart
@@ -45,6 +48,7 @@ var _dossier_button: Button
 var _scope_button: Button
 var _atlas_button: Button
 var _projection_button: Button
+var _drag_button: Button
 var _ship_button: Button
 var _zoom_in_button: Button
 var _zoom_out_button: Button
@@ -56,12 +60,18 @@ var _previous_page_button: Button
 var _next_page_button: Button
 var _route_scroll: ScrollContainer
 var _route_details: VBoxContainer
+var _dossier_layout: VBoxContainer
 var _dossier_scroll: ScrollContainer
+var _dossier_pages: Array[VBoxContainer] = []
+var _dossier_tabs: Array[Button] = []
+var _dossier_stars: Label
+var _dossier_population: Label
 var _dossier_ports: Label
 var _dossier_customs: PanelContainer
 var _dossier_customs_rule: Label
 var _dossier_stock: Label
-var _dossier_freight: Label
+var _dossier_imports: Label
+var _dossier_exports: Label
 var _dossier_observations: Label
 var _scroll_touch := -1
 var _catalog_buttons: Array[Button] = []
@@ -73,6 +83,7 @@ var _chart_press_point := Vector2.ZERO
 var _chart_last_point := Vector2.ZERO
 var _chart_pressed_system := -1
 var _chart_dragged := false
+var _rotate_drag := false
 var _flight: RefCounted
 var _candidate := -1
 var _sector_focus := -1
@@ -219,7 +230,7 @@ func _build_chart(parent: HBoxContainer) -> void:
 	_atlas_button.pressed.connect(_toggle_atlas)
 	_projection_button = _button(tools, "Вид X/Y", 44)
 	_projection_button.custom_minimum_size.x = 110
-	_projection_button.tooltip_text = "Переключить горизонтальную и боковую проекции"
+	_projection_button.tooltip_text = "Переключить горизонтальную и боковую проекции, сбросив поворот"
 	_projection_button.pressed.connect(_toggle_projection)
 	_ship_button = _button(tools, "К кораблю", 44)
 	_ship_button.pressed.connect(_go_to_ship)
@@ -237,11 +248,22 @@ func _build_chart(parent: HBoxContainer) -> void:
 	tools.add_child(gap)
 	_scan_button = _button(tools, "Радиоскан", 44)
 	_scan_button.pressed.connect(_scan_galaxy)
-	_scope_label = _label(column, "", 15, MINT)
+	var scope := HBoxContainer.new()
+	scope.add_theme_constant_override("separation", 7)
+	column.add_child(scope)
+	_scope_label = _label(scope, "", 15, MINT)
+	_scope_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_scope_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_scope_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_drag_button = _button(scope, "Поворот", 44)
+	_drag_button.custom_minimum_size.x = 108
+	_drag_button.toggle_mode = true
+	_drag_button.pressed.connect(_toggle_drag_mode)
 	_chart = GalaxyChart.new()
+	_chart.rotation_availability_changed.connect(_set_rotation_available)
 	_chart.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	column.add_child(_chart)
+	_set_rotation_available(true)
 	_scan_label = _label(column, "", 14, MUTED)
 	_scan_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 
@@ -490,6 +512,26 @@ func _toggle_projection() -> void:
 		refresh()
 
 
+func _toggle_drag_mode() -> void:
+	if is_open() and not _drag_button.disabled:
+		_clear_touches()
+		_rotate_drag = not _rotate_drag
+		_set_rotation_available(true)
+
+
+func _set_rotation_available(available: bool) -> void:
+	if not available:
+		_rotate_drag = false
+	_drag_button.disabled = not available
+	_drag_button.set_pressed_no_signal(_rotate_drag)
+	if not available:
+		_drag_button.tooltip_text = "Атлас плотности поддерживает две проекции. Свободный поворот доступен в обзоре и секторе."
+	elif _rotate_drag:
+		_drag_button.tooltip_text = "Проведите по карте для поворота. Нажмите сюда для сдвига карты."
+	else:
+		_drag_button.tooltip_text = "Проведите по карте для сдвига. Нажмите сюда для поворота карты."
+
+
 func _go_to_ship() -> void:
 	if is_open():
 		_atlas = false
@@ -537,38 +579,67 @@ static func _page_scroll(parent: Control) -> ScrollContainer:
 
 
 func _build_dossier(parent: Control) -> void:
-	_dossier_scroll = _page_scroll(parent)
-	var content := VBoxContainer.new()
-	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	content.add_theme_constant_override("separation", 6)
-	_dossier_scroll.add_child(content)
-	_label(content, "Действующие порты", 17, MINT)
-	_dossier_ports = _dossier_text(content)
+	_dossier_layout = VBoxContainer.new()
+	_dossier_layout.add_theme_constant_override("separation", 6)
+	parent.add_child(_dossier_layout)
+	_dossier_layout.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var tabs := HBoxContainer.new()
+	_dossier_layout.add_child(tabs)
+	_dossier_scroll = ScrollContainer.new()
+	_dossier_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_dossier_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_dossier_layout.add_child(_dossier_scroll)
+	var pages := VBoxContainer.new()
+	pages.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_dossier_scroll.add_child(pages)
+	for title: String in ["Сведения", "Торговля"]:
+		var tab := _button(tabs, title, 44)
+		tab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		tab.toggle_mode = true
+		tab.pressed.connect(_set_dossier_page.bind(_dossier_tabs.size()))
+		_dossier_tabs.append(tab)
+		var page := VBoxContainer.new()
+		page.add_theme_constant_override("separation", 6)
+		pages.add_child(page)
+		_dossier_pages.append(page)
+
+	var overview := _dossier_pages[DossierPage.OVERVIEW]
+	_label(overview, "Звёзды системы", 17, MINT)
+	_dossier_stars = _dossier_text(overview)
+	_label(overview, "Население и управление", 17, MINT)
+	_dossier_population = _dossier_text(overview)
+	_label(overview, "Действующие порты", 17, MINT)
+	_dossier_ports = _dossier_text(overview)
+	_label(overview, "Замеры тел", 17, MINT)
+	_dossier_observations = _dossier_text(overview)
+
+	var trade := _dossier_pages[DossierPage.TRADE]
 	_dossier_customs = PanelContainer.new()
 	_dossier_customs.add_theme_stylebox_override("panel", _style(Color("27241e"), Color("7a5f40"), 8, 9.0))
-	content.add_child(_dossier_customs)
+	trade.add_child(_dossier_customs)
 	_dossier_customs_rule = _dossier_text(_dossier_customs)
 	_dossier_customs_rule.add_theme_color_override("font_color", AMBER)
 	_dossier_customs.hide()
-	_label(content, "Товары на складах", 17, MINT)
-	_dossier_stock = _dossier_text(content)
-	_label(content, "Межзвёздные поставки", 17, MINT)
-	_dossier_freight = _dossier_text(content)
-	_label(content, "Замеры тел", 17, MINT)
-	_dossier_observations = _dossier_text(content)
-	_dossier_scroll.hide()
+	_label(trade, "Товары на складах", 17, MINT)
+	_dossier_stock = _dossier_text(trade)
+	_label(trade, "Импорт в пути", 17, MINT)
+	_dossier_imports = _dossier_text(trade)
+	_label(trade, "Экспорт в пути", 17, MINT)
+	_dossier_exports = _dossier_text(trade)
+	_show_dossier(false)
 
 
 func _refresh_dossier() -> void:
-	var system: Dictionary = _flight.system_dossier(_candidate)
+	var system := SystemDossier.read(_flight, _candidate)
 	_dossier_customs_rule.text = _dossier_customs_warning(system)
 	_dossier_customs.visible = not _dossier_customs_rule.text.is_empty()
 	if not system.known:
-		_dossier_ports.text = "Сведения о системе ещё не получены."
-		_dossier_stock.text = "Нет сведений."
-		_dossier_freight.text = "Нет сведений."
-		_dossier_observations.text = "Нет замеров."
+		for label: Label in [_dossier_stars, _dossier_population, _dossier_ports, _dossier_observations,
+				_dossier_stock, _dossier_imports, _dossier_exports]:
+			label.text = "Сведения о системе ещё не получены."
 		return
+	_dossier_stars.text = _stellar_summary(system.stars)
+	_dossier_population.text = "%s\n%s\n%s" % [system.population, system.economy, system.authority]
 	var ports := PackedStringArray()
 	for port: int in system.ports:
 		ports.append(str(Sector.site(port).name))
@@ -577,13 +648,9 @@ func _refresh_dossier() -> void:
 	for good: String in Economy.GOODS:
 		if system.goods.has(good):
 			stock.append("%s %d" % [Economy.good_name(good), int(system.goods[good])])
-	_dossier_stock.text = " · ".join(stock) if not stock.is_empty() else "Нет складских записей."
-	var freight := PackedStringArray()
-	for shipment: Dictionary in system.imports:
-		freight.append(_shipment_text("Входящий", shipment, int(shipment.origin)))
-	for shipment: Dictionary in system.exports:
-		freight.append(_shipment_text("Исходящий", shipment, int(shipment.destination)))
-	_dossier_freight.text = "\n".join(freight) if not freight.is_empty() else "Межзвёздных грузов в пути нет."
+	_dossier_stock.text = " · ".join(stock) if not stock.is_empty() else "Действующих портовых рынков нет."
+	_dossier_imports.text = _shipment_list(system.imports, "origin")
+	_dossier_exports.text = _shipment_list(system.exports, "destination")
 	var observations := PackedStringArray([
 		"Обследовано %d из %d." % [int(system.scan_count), int(system.target_count)]
 	])
@@ -622,12 +689,21 @@ func _toggle_dossier() -> void:
 
 
 func _show_dossier(shown: bool) -> void:
+	_dossier_layout.visible = shown
 	_dossier_scroll.visible = shown
-	_dossier_scroll.scroll_vertical = 0
+	_set_dossier_page(DossierPage.OVERVIEW)
 	_route_scroll.visible = not shown
 	_route_details.visible = not shown
 	_dossier_button.text = "Маршрут" if shown else "Досье"
 	_dossier_button.set_pressed_no_signal(shown)
+
+
+func _set_dossier_page(index: int) -> void:
+	for page in range(_dossier_pages.size()):
+		_dossier_pages[page].visible = index == page
+		_dossier_tabs[page].set_pressed_no_signal(index == page)
+	_dossier_scroll.scroll_vertical = 0
+	_scroll_touch = -1
 
 
 static func _dossier_text(content: Container) -> Label:
@@ -636,9 +712,25 @@ static func _dossier_text(content: Container) -> Label:
 	return label
 
 
-static func _shipment_text(direction: String, shipment: Dictionary, port: int) -> String:
-	var system := Sector.system(Sector.system_of_site(port))
-	return "%s · %s, %d ед. · %s" % [direction, shipment.good_name, int(shipment.amount), system.name]
+static func _stellar_summary(stars: Array[Dictionary]) -> String:
+	var lines := PackedStringArray()
+	match stars.size():
+		1: lines.append("Одиночная звезда")
+		2: lines.append("Двойная звезда")
+		_: lines.append("Звёзд в системе: %d" % stars.size())
+	for star in stars:
+		var spectral := str(star.spectral_class)
+		lines.append(str(star.name) if spectral.is_empty() else "%s · %s" % [star.name, spectral])
+	return "\n".join(lines)
+
+
+static func _shipment_list(shipments: Array[Dictionary], endpoint: String) -> String:
+	var lines := PackedStringArray()
+	for shipment in shipments:
+		var port := int(shipment[endpoint])
+		var system := Sector.system(Sector.system_of_site(port))
+		lines.append("%s · %d ед. · %s, %s" % [shipment.good_name, int(shipment.amount), system.name, Sector.site(port).name])
+	return "\n".join(lines) if not lines.is_empty() else "Межзвёздных грузов в пути нет."
 
 
 static func _observation_text(report: Dictionary) -> String:
@@ -782,7 +874,11 @@ func _move_chart_gesture(point: Vector2) -> void:
 	if not _chart_dragged and local.distance_to(_chart_press_point) < DRAG_THRESHOLD:
 		return
 	_chart_dragged = true
-	_chart.pan_by(local - _chart_last_point)
+	var delta := local - _chart_last_point
+	if _rotate_drag:
+		_chart.rotate_by(delta)
+	else:
+		_chart.pan_by(delta)
 	_chart_last_point = local
 
 
@@ -807,9 +903,12 @@ func _clear_touches() -> void:
 
 
 func _button_at(point: Vector2) -> Button:
+	for tab in _dossier_tabs:
+		if tab.is_visible_in_tree() and tab.get_global_rect().has_point(point):
+			return tab
 	for button: Button in [
 		_plan_button, _cancel_route_button, _jump_button, _dossier_button, _close_button,
-		_scope_button, _atlas_button, _projection_button, _ship_button, _zoom_in_button, _zoom_out_button,
+		_scope_button, _atlas_button, _projection_button, _drag_button, _ship_button, _zoom_in_button, _zoom_out_button,
 		_scan_button, _previous_page_button, _next_page_button
 	]:
 		if not button.disabled and button.get_global_rect().has_point(point):

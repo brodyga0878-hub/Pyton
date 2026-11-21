@@ -2,6 +2,7 @@ extends RefCounted
 
 const AndroidReportShare = preload("res://scripts/android_report_share.gd")
 const SAVE_PATH = "user://flight.json"
+const BACKUP_PATH = SAVE_PATH + ".previous"
 const REPORT_DIR = "user://reports"
 const DOWNLOAD_SUBDIR = "OrbitalRelay"
 const MAX_STATE_BYTES = 512 * 1024
@@ -33,11 +34,14 @@ static func save_state(state: Dictionary, path: String = SAVE_PATH, preserve_bac
 
 
 static func load_state(path: String = SAVE_PATH) -> Dictionary:
-	var destination := ProjectSettings.globalize_path(path)
-	var primary := _parse_save(_read_save(destination))
+	var primary := load_single_state(path)
 	if primary.is_empty():
-		return _parse_save(_read_save(destination + ".previous"))
+		return load_single_state(path + ".previous")
 	return primary
+
+
+static func load_single_state(path: String) -> Dictionary:
+	return _parse_save(_read_save(ProjectSettings.globalize_path(path)))
 
 
 static func load_valid_state(path: String, validator: Callable) -> LoadResult:
