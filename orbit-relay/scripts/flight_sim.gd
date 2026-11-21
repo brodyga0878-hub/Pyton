@@ -32,7 +32,8 @@ const Ground = preload("res://scripts/ground_port.gd")
 const SpeedHold = preload("res://scripts/speed_hold.gd")
 const CivilianTraffic = preload("res://scripts/civilian_traffic.gd")
 const PilotCareer = preload("res://scripts/pilot_career.gd")
-const SAVE_SCHEMA := 41
+const BranchingStory = preload("res://scripts/branching_story.gd")
+const SAVE_SCHEMA := 42
 const REMOTE_RIG_ACCESS_DISTANCE := 20.0
 const MINING_PULSE_RANGE := 200.0
 const MINING_PULSE_FUEL := 0.4
@@ -153,6 +154,7 @@ var orbital_mining := OrbitalMining.new()
 var combat := CombatSystems.new()
 var ambient := CivilianTraffic.new()
 var career := PilotCareer.new()
+var story := BranchingStory.new()
 var _mining_beam: Dictionary = {}
 var convoy_course := false
 var project_course := false
@@ -1781,6 +1783,38 @@ func career_follow() -> bool:
 	if not (select_target(destination) if sector == system_id else plan_route(sector)):
 		return false
 	_announce("career_dispatch_course", "Курс служебной депеши на «%s»." % target_name(destination))
+	return true
+
+
+func story_status() -> Dictionary:
+	var berth := docked if station_services_available() else -1
+	var result := story.status(berth, deliveries, cartography.surveyed_sites())
+	result.merge(story.snapshot())
+	result.can_follow = result.can_follow and not _departure_requested and jump_seconds_left <= 0.0
+	return result
+
+
+func story_action(action: String) -> bool:
+	if not station_services_available():
+		return false
+	var receipt := story.perform(action, docked, deliveries, cartography.surveyed_sites(), orbit_time)
+	if receipt.is_empty():
+		return false
+	credits += int(receipt.credits)
+	career.note_story_result(receipt.trust)
+	_announce("story_" + str(receipt.action), receipt.message)
+	return true
+
+
+func story_follow() -> bool:
+	var status := story_status()
+	if not status.can_follow:
+		return false
+	var destination := int(status.target)
+	var sector := Catalog.system_of_site(destination)
+	if not (select_target(destination) if sector == system_id else plan_route(sector)):
+		return false
+	_announce("story_course", "Курс «Слепой поправки» на «%s»." % target_name(destination))
 	return true
 
 
@@ -3941,6 +3975,7 @@ func snapshot() -> Dictionary:
 		"remote_rig": remote_rig.snapshot(), "orbital_mining": orbital_mining.snapshot(),
 		"combat": combat.snapshot(),
 		"ambient": ambient.snapshot(), "career": career.snapshot(),
+		"story": story.snapshot(),
 		"speed_hold": speed_hold.snapshot(),
 	}
 
@@ -3949,6 +3984,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_story := schema < 42
 	var pre_career := schema < 41
 	var pre_ambient_traffic := schema < 40
 	var pre_speed_hold := schema < 39
@@ -4137,6 +4173,21 @@ func restore(state: Dictionary) -> bool:
 			return false
 		if route.stops[leg] != destination or (stage == 2 and leg != route.stops.size() - 1):
 			return false
+	var restored_story := BranchingStory.new()
+	if not pre_story:
+		var story_state: Variant = state.get("story")
+		if not restored_story.restore(story_state, restored_epoch):
+			return false
+		if story_state.entry == "freight" and int(state.deliveries) <= 0:
+			return false
+		if story_state.entry == "survey":
+			var observed := restored_cartography.observation_time(BranchingStory.ENTRY_SCAN)
+			if observed < 0.0 or observed > float(story_state.briefed_at):
+				return false
+		if story_state.branch == BranchingStory.REGISTRY and float(story_state.settled_at) >= 0.0:
+			var observed := restored_cartography.observation_time(BranchingStory.AUDIT_BODY)
+			if observed < 0.0 or observed > float(story_state.settled_at):
+				return false
 	var restored_position := Vector3(state.position[0], state.position[1], state.position[2])
 	var restored_velocity := Vector3(state.velocity[0], state.velocity[1], state.velocity[2])
 	var restored_dock := int(state.docked)
@@ -4430,6 +4481,7 @@ func restore(state: Dictionary) -> bool:
 	combat = restored_combat
 	ambient = restored_ambient
 	career = restored_career
+	story = restored_story
 	speed_hold = restored_speed
 	_mining_beam.clear()
 	star_heat = 0.0 if pre_thermal else float(state.star_heat)

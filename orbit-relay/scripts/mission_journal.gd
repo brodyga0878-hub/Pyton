@@ -2,19 +2,26 @@ extends CanvasLayer
 
 signal follow_requested(kind: String)
 signal career_requested()
+signal story_requested(action: String)
 signal dismissed()
 
 const Sector = preload("res://scripts/sector_catalog.gd")
 const Patrol = preload("res://scripts/patrol_encounter.gd")
 const MissionCalendar = preload("res://scripts/mission_calendar.gd")
+const Story = preload("res://scripts/branching_story.gd")
 const INK := Color("edf7f9")
 const MUTED := Color("adc0c9")
 const MINT := Color("a4e9d6")
 const AMBER := Color("f0c59a")
 const BORDER := Color("355360")
 const PATROL_STEPS := ["Найти источник сигнала", "Перехватить рейдера", "Вернуться с докладом"]
+const STORY_OPTION_COUNT := 4
+const STORY_DATES := {
+	"settled_at": "Завершено", "key_at": "Получен ключ",
+	"chosen_at": "Принято решение", "briefed_at": "Получен запрос",
+}
 
-enum Page { WORK, PASSENGERS, RIG, CAREER }
+enum Page { WORK, PASSENGERS, RIG, CAREER, STORY }
 
 var _sim: RefCounted
 var _insets: MarginContainer
@@ -38,10 +45,12 @@ var _work_page: HBoxContainer
 var _passenger_page: HBoxContainer
 var _rig_page: HBoxContainer
 var _career_page: HBoxContainer
+var _story_page: HBoxContainer
 var _work_tab: Button
 var _passenger_tab: Button
 var _rig_tab: Button
 var _career_tab: Button
+var _story_tab: Button
 var _rig_title: Label
 var _rig_location: Label
 var _rig_work: Label
@@ -63,6 +72,13 @@ var _dispatch_sponsor: Label
 var _dispatch_time: Label
 var _dispatch_hint: Label
 var _career_action: Button
+var _story_title: Label
+var _story_branch: Label
+var _story_objective: Label
+var _story_route: Label
+var _story_date: Label
+var _story_choices: GridContainer
+var _story_options: Array[Dictionary] = []
 var _close_button: Button
 var _follow_buttons: Dictionary[String, Button] = {}
 var _touches: Dictionary[int, Button] = {}
@@ -106,13 +122,15 @@ func build() -> void:
 	_passenger_tab = _button(tabs, "Пассажиры")
 	_rig_tab = _button(tabs, "Бур")
 	_career_tab = _button(tabs, "Карьера")
-	for tab: Button in [_work_tab, _passenger_tab, _rig_tab, _career_tab]:
+	_story_tab = _button(tabs, "Сюжет")
+	for tab: Button in [_work_tab, _passenger_tab, _rig_tab, _career_tab, _story_tab]:
 		tab.toggle_mode = true
 		tab.custom_minimum_size.x = 174.0
 	_work_tab.pressed.connect(_show_page.bind(Page.WORK))
 	_passenger_tab.pressed.connect(_show_page.bind(Page.PASSENGERS))
 	_rig_tab.pressed.connect(_show_page.bind(Page.RIG))
 	_career_tab.pressed.connect(_show_page.bind(Page.CAREER))
+	_story_tab.pressed.connect(_show_page.bind(Page.STORY))
 	_rig_tab.hide()
 
 	_work_page = HBoxContainer.new()
@@ -134,6 +152,10 @@ func build() -> void:
 	_career_page.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	page.add_child(_career_page)
 	_build_career()
+	_story_page = HBoxContainer.new()
+	_story_page.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	page.add_child(_story_page)
+	_build_story()
 	_show_page(Page.WORK)
 	get_viewport().size_changed.connect(_update_insets)
 	_update_insets()
@@ -164,6 +186,8 @@ func refresh() -> void:
 	_refresh_rig()
 	if _career_page.visible:
 		_refresh_career()
+	if _story_page.visible:
+		_refresh_story()
 
 
 func close() -> void:
@@ -266,18 +290,46 @@ func _build_career() -> void:
 	_add_follow_button(board, "career")
 
 
+func _build_story() -> void:
+	var card := _card(_story_page)
+	_story_title = _label(card, "", 29, INK)
+	_story_branch = _label(card, "", 19, AMBER)
+	_story_objective = _label(card, "", 22, INK)
+	_story_route = _label(card, "", 19, MINT)
+	_story_date = _label(card, "", 17, MUTED)
+	_spacer(card)
+	_story_choices = GridContainer.new()
+	_story_choices.add_theme_constant_override("h_separation", 16)
+	_story_choices.add_theme_constant_override("v_separation", 14)
+	card.add_child(_story_choices)
+	for _index in range(STORY_OPTION_COUNT):
+		var choice := VBoxContainer.new()
+		choice.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		choice.add_theme_constant_override("separation", 7)
+		_story_choices.add_child(choice)
+		var button := _button(choice, "")
+		button.pressed.connect(_request_story.bind(button))
+		var detail := _label(choice, "", 17, MUTED)
+		_story_options.append({"row": choice, "button": button, "detail": detail})
+	_add_follow_button(card, "story")
+
+
 func _show_page(page: Page) -> void:
 	_touches.clear()
 	_work_page.visible = page == Page.WORK
 	_passenger_page.visible = page == Page.PASSENGERS
 	_rig_page.visible = page == Page.RIG
 	_career_page.visible = page == Page.CAREER
+	_story_page.visible = page == Page.STORY
 	_work_tab.set_pressed_no_signal(_work_page.visible)
 	_passenger_tab.set_pressed_no_signal(_passenger_page.visible)
 	_rig_tab.set_pressed_no_signal(_rig_page.visible)
 	_career_tab.set_pressed_no_signal(_career_page.visible)
+	_story_tab.set_pressed_no_signal(_story_page.visible)
 	if _career_page.visible and is_open():
 		_refresh_career()
+	if _story_page.visible and is_open():
+		_refresh_story()
 
 
 func _refresh_rig() -> void:
@@ -541,6 +593,64 @@ func _request_career() -> void:
 		career_requested.emit()
 
 
+func _refresh_story() -> void:
+	var status: Dictionary = _sim.story_status()
+	_story_title.text = str(status.title)
+	_story_objective.text = str(status.objective)
+	_story_branch.text = str(Story.BRANCHES.get(status.branch, {}).get("name", ""))
+	_story_branch.visible = not _story_branch.text.is_empty()
+	_story_date.text = ""
+	for field: String in STORY_DATES:
+		var epoch := float(status.get(field, -1.0))
+		if epoch >= 0.0:
+			_story_date.text = "%s · %s" % [STORY_DATES[field], MissionCalendar.stamp(epoch)]
+			break
+	_story_date.visible = not _story_date.text.is_empty()
+
+	var actions: Array = status.actions
+	_story_choices.visible = not actions.is_empty()
+	_story_choices.columns = 1 if actions.size() < 2 else 2
+	for index in range(_story_options.size()):
+		var choice := _story_options[index]
+		choice.row.visible = index < actions.size()
+		if index >= actions.size():
+			choice.button.set_meta("story_action", "")
+			continue
+		var action: Dictionary = actions[index]
+		choice.button.text = str(action.name)
+		choice.button.set_meta("story_action", str(action.id))
+		choice.button.disabled = _sim.jump_seconds_left > 0.0
+		choice.detail.text = str(action.detail)
+		choice.detail.visible = not choice.detail.text.is_empty()
+
+	var target := int(status.target)
+	var system := Sector.system_of_site(target)
+	_story_route.visible = system >= 0
+	if _story_route.visible:
+		_story_route.text = "«%s» · %s" % [_sim.target_name(target), Sector.system(system).name]
+	var caption := ""
+	if status.can_follow and system >= 0:
+		if system != _sim.system_id:
+			caption = "Проложить прыжок"
+		elif target == _sim.landed_site:
+			caption = "Открыть атлас"
+		else:
+			caption = "Курс к порту" if Sector.is_port(target) else "К объекту"
+	_follow("story", caption)
+
+
+func _request_story(button: Button) -> void:
+	if not is_open() or not button.is_visible_in_tree() or button.disabled:
+		return
+	var id := str(button.get_meta("story_action", ""))
+	var status: Dictionary = _sim.story_status()
+	for option: Dictionary in status.actions:
+		if option.id == id:
+			_touches.clear()
+			story_requested.emit(id)
+			return
+
+
 func _follow(kind: String, caption: String) -> void:
 	var button := _follow_buttons[kind]
 	button.text = caption
@@ -585,11 +695,15 @@ func _input(event: InputEvent) -> void:
 func _button_at(point: Vector2) -> Button:
 	if _close_button.get_global_rect().has_point(point):
 		return _close_button
-	for tab: Button in [_work_tab, _passenger_tab, _rig_tab, _career_tab]:
+	for tab: Button in [_work_tab, _passenger_tab, _rig_tab, _career_tab, _story_tab]:
 		if tab.is_visible_in_tree() and tab.get_global_rect().has_point(point):
 			return tab
 	if _career_action.is_visible_in_tree() and not _career_action.disabled and _career_action.get_global_rect().has_point(point):
 		return _career_action
+	for option in _story_options:
+		var button: Button = option.button
+		if button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(point):
+			return button
 	for button: Button in _follow_buttons.values():
 		if button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(point):
 			return button

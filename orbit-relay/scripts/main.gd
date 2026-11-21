@@ -91,6 +91,7 @@ func _ready() -> void:
 	_journal.build()
 	_journal.follow_requested.connect(_follow_journal)
 	_journal.career_requested.connect(_career_dispatch)
+	_journal.story_requested.connect(_story_action)
 	_journal.dismissed.connect(_close_journal)
 	add_child(_frontier)
 	_frontier.build()
@@ -424,6 +425,7 @@ func _deliver_notice() -> void:
 		"convoy_order_fire", "convoy_order_enemy_hit",
 		"ambient_engaged", "ambient_fire", "ambient_enemy_hit", "ambient_victory",
 		"career_dispatch_accepted", "career_dispatch_paid", "career_dispatch_expired", "career_dispatch_course",
+		"story_brief", "story_registry", "story_mirror", "story_collect_key", "story_submit", "story_course",
 		"flight_assist", "reference_frame", "time_paused", "time_resumed", "autopilot_equipment", "speed_hold_on", "speed_hold_off",
 		"survey_record", "galaxy_scan", "customs_inspection", "customs_paid",
 		"orbit_start", "orbit_complete", "orbit_abort", "orbit_cancel",
@@ -918,6 +920,14 @@ func _follow_journal(kind: String) -> void:
 		selected = flight.track_remote_rig()
 	elif kind == "career":
 		selected = flight.career_follow()
+	elif kind == "story":
+		var status := flight.story_status()
+		if status.can_follow and status.stage == "observe" and int(status.target) == flight.landed_site:
+			_close_journal()
+			_hud.set_input_enabled(false)
+			_map.open_atlas(flight, int(status.target))
+			return
+		selected = flight.story_follow()
 	if not selected:
 		_journal.refresh()
 		return
@@ -933,6 +943,15 @@ func _career_dispatch() -> void:
 	if not _journal.is_open():
 		return
 	flight.career_dispatch_action()
+	_deliver_notice()
+	_journal.refresh()
+	_update_display(0.0)
+
+
+func _story_action(action: String) -> void:
+	if not _journal.is_open():
+		return
+	flight.story_action(action)
 	_deliver_notice()
 	_journal.refresh()
 	_update_display(0.0)

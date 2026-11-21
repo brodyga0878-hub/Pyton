@@ -460,6 +460,12 @@ func _set_convoy_order(order: Dictionary) -> void:
 	_convoy_info.text = "%s · %s\nДо цели %s (3D)" % [objective, time, _distance_label(float(order.distance))]
 
 
+func open_atlas(sim: RefCounted, site: int) -> void:
+	open(sim)
+	_select_site(site)
+	_set_panel("survey")
+
+
 func close() -> void:
 	_touches.clear()
 	_touch_sites.clear()

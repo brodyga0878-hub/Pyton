@@ -106,6 +106,11 @@ func note_customs_violation(issuer: int) -> bool:
 	return true
 
 
+func note_story_result(trust: Dictionary) -> void:
+	for issuer: int in range(_trust.size()):
+		_change_trust(issuer, int(trust.get(issuer, 0)))
+
+
 func dispatch_offer(issuer: int, origin: int, destination: int, epoch: float) -> Dictionary:
 	var reason := ""
 	if not _valid_faction(issuer) or not _valid_route(origin, destination):

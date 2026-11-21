@@ -61,6 +61,10 @@ func surveyed_sites() -> Array[int]:
 	return sites
 
 
+func observation_time(site_id: int) -> float:
+	return _records.get(site_id, -1.0)
+
+
 func discovered(system_id: int) -> bool:
 	return _discovered.has(system_id)
 
