@@ -142,14 +142,16 @@ float strata_mask(float bedding, float rough, float width) {
 	return 1.0 - smoothstep(width, width + 0.15 + fwidth(ripple), ripple);
 }
 vec3 relief_normal(vec3 position, vec3 n, float height) {
-	// A screen-space surface gradient works on seamless spherical rock coordinates.
+	// Bound subpixel slopes at grazing angles without changing model geometry.
 	vec3 dx = dFdx(position);
 	vec3 dy = dFdy(position);
 	vec3 along_x = cross(dy, n);
 	vec3 along_y = cross(n, dx);
 	float det = dot(dx, along_x);
-	vec3 gradient = along_x * dFdx(height) + along_y * dFdy(height);
-	return normalize(n - gradient * sign(det) / max(abs(det), 0.00001));
+	vec3 gradient = (along_x * dFdx(height) + along_y * dFdy(height))
+		* sign(det) / max(abs(det), 0.00001);
+	gradient *= inversesqrt(max(1.0, dot(gradient, gradient) * 3.1));
+	return normalize(n - gradient);
 }
 void fragment() {
 	vec3 p = rock;
@@ -159,6 +161,7 @@ void fragment() {
 	float broad = 0.40 + bands_strength * (0.23 * sediment + 0.10 * strata);
 	vec3 stone = mix(rock_color.rgb, seam_color.rgb, broad);
 	float roughness = mix(0.90, 0.71, ice_fraction);
+	float sheen = 0.5;
 	if (profile > 0) {
 		// Stable model-local projection has no spherical UV seam or world-space crawl.
 		vec3 weights = abs(normalize(rock_normal));
@@ -170,24 +173,28 @@ void fragment() {
 		float fault = detail.g;
 		float layer_breaks = smoothstep(0.30, 0.77, grains * 0.57 + fault * 0.43);
 		float lamina = strata_mask(bedding * 1.27, fault * 12.0 + grains * 1.4 + sediment * 0.73, 0.09) * layer_breaks;
-		float relief = (detail.g - 0.5) * 0.23 + lamina * bands_strength * 0.035;
-		float minerals = smoothstep(0.46, 0.68, fault + grains * 0.14);
-		stone *= 1.0 + (grains - 0.5) * 0.62;
-		stone = mix(stone, stone * vec3(0.67, 0.73, 0.82), minerals * terrain_regions);
-		stone = mix(stone, seam_color.rgb * 1.06, lamina * bands_strength * 0.23);
-		stone = mix(stone, stone * vec3(0.81, 1.06, 1.17), ice_fraction * minerals * 0.38);
-		roughness = mix(roughness, detail.b, 0.58) - lamina * ice_fraction * 0.12;
+		float crevice = 1.0 - smoothstep(0.36, 0.51, fault);
+		float mineral = smoothstep(0.48, 0.71, grains + fault * 0.11);
+		float frost = ice_fraction * smoothstep(0.48, 0.70, grains) * crevice;
+		float relief = (fault - 0.5) * 0.24 + lamina * bands_strength * 0.044;
+		stone *= 1.0 + (grains - 0.5) * 0.81 - crevice * 0.10;
+		stone = mix(stone, stone * vec3(0.71, 0.75, 0.82), mineral * terrain_regions);
+		stone = mix(stone, seam_color.rgb * 1.06, lamina * bands_strength * 0.24);
+		stone = mix(stone, seam_color.rgb * vec3(0.96, 1.07, 1.12), frost * 0.70);
+		roughness = mix(roughness, detail.b, 0.64) - frost * 0.22;
+		sheen = mix(0.35, 0.49 + frost * 0.15, ice_fraction);
 		if (profile == 2) {
 			float resolution = 1.0 - smoothstep(0.22, 1.1, length(fwidth(p * 0.73)));
 			vec3 fine = triplanar_data(p * 0.73 + detail_offset.zxy + vec3(0.19, 0.37, 0.61), weights);
-			stone *= 1.0 + resolution * (fine.r - 0.5) * 0.28;
-			relief += resolution * (fine.g - 0.5) * 0.047;
+			stone *= 1.0 + resolution * (fine.r - 0.5) * 0.32;
+			relief += resolution * (fine.g - 0.5) * 0.052;
 			roughness += resolution * (fine.b - 0.5) * 0.09;
 		}
 		NORMAL = relief_normal(VERTEX, normalize(NORMAL), relief);
 	}
 	ALBEDO = stone;
 	METALLIC = 0.0;
+	SPECULAR = sheen;
 	ROUGHNESS = clamp(roughness, mix(0.55, 0.30, ice_fraction), 0.98);
 }
 """

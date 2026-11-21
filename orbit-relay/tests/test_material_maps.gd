@@ -5,7 +5,8 @@ const Flight := preload("res://scripts/flight_sim.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const MATERIAL_DIR := "res://assets/materials/"
 const MAPS := ["rock_basalt", "rock_ice", "metal_brushed", "metal_paint", "cloud_bands"]
-const MAP_SIZE := Vector2i(512, 512)
+const MAP_SIZE := Vector2i(1024, 1024)
+const MIP_COUNT := 10
 
 var _checks := 0
 var _failures: Array[String] = []
@@ -32,16 +33,19 @@ func _test_imported_maps() -> void:
 		var texture := ResourceLoader.load(path, "Texture2D") as Texture2D
 		if not _expect(texture != null and decoded == OK and source.get_size() == MAP_SIZE
 			and texture.get_size() == Vector2(MAP_SIZE) and source.get_format() == Image.FORMAT_RGB8,
-			"%s loads as a 512-pixel packed RGB resource from a clean import" % name):
+			"%s loads as a 1024-pixel packed RGB resource from a clean import" % name):
 			continue
 		var imported := texture.get_image()
-		if not _expect(imported != null and imported.has_mipmaps() and imported.get_mipmap_count() == 9,
+		if not _expect(imported != null and imported.has_mipmaps() and imported.get_mipmap_count() == MIP_COUNT,
 			"%s has a complete runtime mip chain down to one texel" % name):
 			continue
 		var lowest := Vector3.ONE
 		var highest := Vector3.ZERO
 		var separate := 0
-		var matches := true
+		var pixels := source.get_data()
+		_expect(imported.get_format() == Image.FORMAT_RGB8
+			and imported.get_data().slice(0, pixels.size()) == pixels,
+			"%s keeps all packed linear channel bytes after import" % name)
 		for y in range(0, MAP_SIZE.y, 13):
 			for x in range(0, MAP_SIZE.x, 13):
 				var color := source.get_pixel(x, y)
@@ -50,8 +54,6 @@ func _test_imported_maps() -> void:
 				highest = highest.max(channels)
 				if channels.x != channels.y and channels.y != channels.z:
 					separate += 1
-				matches = matches and color.is_equal_approx(imported.get_pixel(x, y))
-		_expect(matches, "%s preserves the packed RGB data in the actual imported texture" % name)
 		var span := highest - lowest
 		_expect(span.x > 0.05 and span.y > 0.05 and span.z > 0.035 and separate > 100,
 			"%s carries separately varying tone, relief and surface detail channels" % name)
@@ -89,6 +91,11 @@ func _test_live_materials() -> void:
 		"Two faces sharing the same rock map retain individual deterministic offsets")
 	var gas: ShaderMaterial = view._backdrop_material
 	_expect(_asset(gas, "cloud_detail") == "cloud_bands", "The actual giant binds the cloud data atlas")
+	for terrain: ShaderMaterial in [rock_paint, moon_paint, comet_paint]:
+		_expect(_has_packed_sampler(terrain, "surface_detail"),
+			"The live terrain shader repeats its one packed resource with linear mip filtering")
+	_expect(_has_packed_sampler(gas, "cloud_detail"),
+		"The live giant shader repeats its one cloud resource with linear mip filtering")
 	var ship: Array[ShaderMaterial] = view._ship_finishes
 	var stations: Array[ShaderMaterial] = view._sector_finishes
 	var metal: Array[ShaderMaterial] = ship.duplicate()
@@ -96,6 +103,11 @@ func _test_live_materials() -> void:
 	_expect(not ship.is_empty() and not stations.is_empty()
 		and _metal_data_is_bound(ship) and _metal_data_is_bound(stations),
 		"Actual ship and station finishes both bind painted and brushed packed materials")
+	var finishes_pack_one_map := true
+	for finish: ShaderMaterial in metal:
+		finishes_pack_one_map = finishes_pack_one_map and _has_packed_sampler(finish, "panel_data")
+	_expect(finishes_pack_one_map,
+		"Painted and brushed finishes repeat one packed resource each with linear mip filtering")
 	for quality in [0, 2, 1, 2]:
 		game.presentation.change("quality", quality)
 		game._apply_presentation()
@@ -135,6 +147,17 @@ func _test_live_materials() -> void:
 			"Rebuilding the sector carries the chosen profile through new terrain, clouds and stations")
 	viewport.queue_free()
 	await process_frame
+
+
+func _has_packed_sampler(material: ShaderMaterial, parameter: String) -> bool:
+	if material == null or material.shader == null:
+		return false
+	var declarations := RegEx.create_from_string("\\buniform\\s+sampler\\w+\\s+(\\w+)\\s*(?::\\s*([^;]+))?;")
+	var matches := declarations.search_all(material.shader.code)
+	if matches.size() != 1 or matches[0].get_string(1) != parameter:
+		return false
+	var hints := matches[0].get_string(2)
+	return "filter_linear_mipmap" in hints and "repeat_enable" in hints and "source_color" not in hints
 
 
 func _metal_data_is_bound(finishes: Array[ShaderMaterial]) -> bool:

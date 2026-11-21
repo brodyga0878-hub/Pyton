@@ -907,27 +907,32 @@ uniform float bump_depth = 0.003;
 void fragment() {
 	vec3 surface = paint.rgb;
 	float micro_roughness = rough;
+	float surface_metal = metal;
 	if (finish_quality > 0) {
 		vec2 cell = UV * seams;
 		vec2 edge = 0.5 - abs(fract(cell) - 0.5);
 		float spacing = min(edge.x, edge.y);
 		float pixel = max(fwidth(cell.x), fwidth(cell.y));
-		float fade = 1.0 - smoothstep(0.10, 0.42, pixel);
+		float fade = 1.0 - smoothstep(0.09, 0.37, pixel);
 		float seam = (1.0 - smoothstep(0.014, 0.042 + pixel * 0.45, spacing)) * fade;
 		float ridge = (1.0 - smoothstep(0.006, 0.021 + pixel * 0.45, abs(spacing - 0.060))) * fade;
 		float variation = sin(dot(floor(cell), vec2(7.1, 5.3))) * 0.063 * fade;
-		surface *= 1.0 + variation + ridge * 0.15 - seam * 0.52;
+		surface *= 1.0 + variation + ridge * 0.12 - seam * 0.36;
 		micro_roughness += seam * 0.17 - ridge * 0.08;
 		// The economy profile never enters this branch or samples a map.
 		vec3 detail = texture(panel_data, UV * panel_repeat).rgb;
-		float fidelity = finish_quality > 1 ? 1.0 : 0.45;
+		float fidelity = finish_quality > 1 ? 1.0 : 0.62;
 		float wear = (detail.r - 0.5) * fidelity;
-		surface *= 1.0 + wear * 0.30;
-		micro_roughness += (detail.b - rough_center) * fidelity * 0.32;
+		float abrasion = (1.0 - smoothstep(0.36, 0.50, detail.r * 0.56 + detail.g * 0.44)) * fidelity;
+		float bare = abrasion * (0.33 + ridge * 0.27);
+		surface *= 1.0 + wear * 0.47;
+		surface = mix(surface, mix(surface * 0.64, vec3(0.33, 0.39, 0.42), 0.43), bare);
+		micro_roughness += (detail.b - rough_center) * fidelity * 0.45 - bare * 0.11;
+		surface_metal = mix(metal, max(metal, 0.60), bare);
 		if (finish_quality > 1) {
 			// Surface-gradient bump also works on the custom hull, which has
 			// UVs and normals but no tangent stream. One filtered sample only.
-			float height = detail.g - 0.5 + ridge * 0.045 - seam * 0.10;
+			float height = detail.g - 0.5 + ridge * 0.042 - seam * 0.08;
 			vec3 n = normalize(NORMAL);
 			vec3 sx = dFdx(VERTEX);
 			vec3 sy = dFdy(VERTEX);
@@ -945,7 +950,7 @@ void fragment() {
 		}
 	}
 	ALBEDO = surface;
-	METALLIC = metal;
+	METALLIC = surface_metal;
 	ROUGHNESS = clamp(micro_roughness, 0.16, 0.96);
 	SPECULAR = base_specular;
 }
@@ -965,7 +970,7 @@ void fragment() {
 	finish.set_shader_parameter("panel_data", _brushed_panel_data if brushed else _paint_panel_data)
 	finish.set_shader_parameter("panel_repeat", Vector2(2.0, 3.0) if ship else Vector2(3.0, 2.0))
 	finish.set_shader_parameter("rough_center", 0.32 if brushed else 0.52)
-	finish.set_shader_parameter("bump_depth", 0.003 if ship else 0.014)
+	finish.set_shader_parameter("bump_depth", 0.0045 if ship else 0.014)
 	if ship:
 		_ship_finishes.append(finish)
 	else:
@@ -1615,6 +1620,7 @@ void fragment() {
 	float warp = sin(p.z * 10.0 + p.x * 13.0) * 0.52;
 	float breakup = 0.0;
 	float wisps = 0.0;
+	float cloud_shadow = 0.0;
 	if (cloud_quality > 0) {
 		// Integer repeats and full-tile phase wraps meet across the sphere seam.
 		// Fade noise into the continuous latitude bands at the two poles.
@@ -1622,14 +1628,16 @@ void fragment() {
 		vec2 bands_uv = vec2(UV.x * 4.0 + weather_phase, UV.y * 13.0);
 		bands_uv += vec2(p.y * 0.12, sin(p.x * 6.0 + p.z * 7.0) * 0.18);
 		vec3 storm = texture(cloud_detail, bands_uv).rgb;
-		warp += (storm.g - 0.5) * 2.18 * polar_fade;
-		breakup = (storm.r - 0.5) * 0.26 * polar_fade;
-		wisps = smoothstep(0.38, 0.78, storm.b) * polar_fade * 0.19;
+		float fold = storm.r * 0.61 + storm.g * 0.39;
+		warp += (storm.g - 0.5) * 2.34 * polar_fade;
+		breakup = (fold - 0.5) * 0.32 * polar_fade;
+		wisps = smoothstep(0.48, 0.66, storm.b + (fold - 0.5) * 0.17) * polar_fade * 0.24;
+		cloud_shadow = (1.0 - smoothstep(0.33, 0.53, fold)) * polar_fade;
 		if (cloud_quality > 1) {
 			vec2 fine_uv = vec2(UV.x * 9.0 - weather_phase * 2.0, UV.y * 24.0) + storm.rg * 0.13;
 			vec3 fine = texture(cloud_detail, fine_uv).rgb;
 			breakup += (fine.r - 0.5) * 0.19 * polar_fade;
-			wisps += smoothstep(0.52, 0.81, fine.g + storm.b * 0.18) * polar_fade * 0.28;
+			wisps += smoothstep(0.50, 0.76, fine.g * 0.76 + storm.b * 0.31) * polar_fade * 0.31;
 		}
 	}
 	float ribbons = sin(latitude * 26.0 + warp);
@@ -1642,7 +1650,8 @@ void fragment() {
 		high = vec3(0.78, 0.60, 0.34);
 	}
 	vec3 bands = mix(low, high, m);
-	bands = mix(bands, high * 1.17, wisps * (0.38 + 0.62 * m));
+	bands = mix(bands, high * vec3(1.16, 1.12, 1.07), wisps * (0.38 + 0.62 * m));
+	bands *= 1.0 - cloud_shadow * 0.18;
 	float day = smoothstep(-0.23, 0.89, dot(p, normalize(light_direction)));
 	float rim = pow(1.0 - clamp(dot(normalize(NORMAL), VIEW), 0.0, 1.0), 4.0);
 	vec3 haze = fringe ? vec3(0.56, 0.63, 0.28) : (cool ? vec3(0.26, 0.44, 0.70) : vec3(0.17, 0.36, 0.44));
