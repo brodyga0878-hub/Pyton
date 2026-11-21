@@ -15,6 +15,12 @@ class TestSessionIO extends SessionIO:
 	func export_report(state: Dictionary, path: String = "") -> Dictionary:
 		return super.export_report(state, destination if path.is_empty() else path)
 
+class InvalidSnapshotFlight extends Flight:
+	func snapshot() -> Dictionary:
+		var state := super.snapshot()
+		state["invalid"] = Vector3.BACK
+		return state
+
 var _checks := 0
 var _failures: Array[String] = []
 var _workspace: String
@@ -57,6 +63,8 @@ func _test_archive() -> void:
 		and result.file == "diagnostics.zip" and not result.public_downloads,
 		"An explicit ZIP export returns its exact local file path"):
 		return
+	_expect(result.get("includes_flight_state", false) == true,
+		"A full ZIP export reports that it includes the flight state")
 	var contents := _read_zip(result.path)
 	var files := contents.keys()
 	files.sort()
@@ -95,6 +103,8 @@ func _test_invalid_state_and_destination() -> void:
 	var archive := _workspace.path_join("partial.zip")
 	var partial := log.export_report(unsafe_state, archive)
 	if _expect(partial.ok, "A malformed flight still allows a journal-only archive"):
+		_expect(partial.get("includes_flight_state", true) == false,
+			"A journal-only ZIP export reports that it omits the flight state")
 		var contents := _read_zip(partial.path)
 		var report := _dictionary(contents.get("report.json", ""))
 		_expect(not report.get("includes_flight_state", true) and not contents.has("flight.json")
@@ -168,6 +178,9 @@ func _test_overlay() -> void:
 	game._physics_process(0.75)
 	_expect(game._report.visible and not game._hud._input_enabled and game.flight.elapsed == elapsed,
 		"The overlay freezes flight motion and consumes input while open")
+	_expect("состояние рейса" in game._report_text.text.to_lower()
+		and "только журнал" not in game._report_text.text.to_lower(),
+		"The report overlay advertises the full flight state when the snapshot is valid")
 	if not _expect(game._report_buttons.size() == 3, "Desktop exposes local save, text copy and close controls"):
 		viewport.queue_free()
 		await process_frame
@@ -183,7 +196,8 @@ func _test_overlay() -> void:
 	var contents := _read_zip(assigned_path)
 	_expect(_dictionary(contents.get("flight.json", "")) == _json(game.flight.snapshot())
 		and "overlay_probe" in str(contents.get("events.jsonl", ""))
-		and "touch.zip" in game._report_text.text and game._report.visible,
+		and "touch.zip" in game._report_text.text and "только журнал" not in game._report_text.text.to_lower()
+		and game._report.visible,
 		"Saving from the real overlay writes the shown flight, journal and accessible ZIP filename")
 	var copy: Button = game._report_buttons[1]
 	_tap(viewport, copy, "Request the text copy fallback by touch")
@@ -196,8 +210,36 @@ func _test_overlay() -> void:
 	game._physics_process(0.25)
 	_expect(not game._report.visible and game._report_touches.is_empty() and game._hud._input_enabled
 		and game.flight.elapsed > elapsed, "Closing releases the captured fingers and resumes real flight")
+	await _test_journal_only_overlay(viewport, game)
 	viewport.queue_free()
 	await process_frame
+
+
+func _test_journal_only_overlay(viewport: SubViewport, game: Node) -> void:
+	game.flight = InvalidSnapshotFlight.new()
+	Fixture.launch(game.flight)
+	var assigned_path := _workspace.path_join("journal-only.zip")
+	var absolute_path := ProjectSettings.globalize_path(assigned_path)
+	game._io = TestSessionIO.new(assigned_path)
+	game._io.trace("journal_only_probe")
+	game._update_display(0.0)
+	await process_frame
+	_tap(viewport, game._hud._actions["report"], "Open the report overlay with an invalid flight snapshot")
+	await process_frame
+	var preview: String = game._report_text.text.to_lower()
+	_expect(game._report.visible and "только журнал" in preview and "состояни" in preview
+		and "рейса" in preview and not FileAccess.file_exists(assigned_path),
+		"The overlay tells the player before exporting that the ZIP will omit the flight state")
+	_tap(viewport, game._report_buttons[0], "Write the journal-only report ZIP by touch")
+	await process_frame
+	_expect(game._report.visible and "только журнал" in game._report_text.text.to_lower()
+		and absolute_path in game._report_text.text,
+		"The overlay confirms journal-only export and still gives the archive path")
+	var contents := _read_zip(assigned_path)
+	_expect(contents.size() == 2 and not contents.has("flight.json")
+		and _dictionary(contents.get("report.json", "")).get("includes_flight_state", true) == false
+		and "journal_only_probe" in str(contents.get("events.jsonl", "")),
+		"The ZIP from the overlay contains the journal and metadata without the flight state")
 
 
 func _read_zip(path: String) -> Dictionary:

@@ -4,11 +4,11 @@ const AndroidReportShare = preload("res://scripts/android_report_share.gd")
 const SAVE_PATH = "user://flight.json"
 const REPORT_DIR = "user://reports"
 const DOWNLOAD_SUBDIR = "OrbitalRelay"
-const MAX_STATE_BYTES = 256 * 1024
+const MAX_STATE_BYTES = 512 * 1024
 const MAX_EVENT_BYTES = 768
 const MAX_EVENTS = 48
 const MAX_DEPTH = 12
-const MAX_NODES = 4096
+const MAX_EVENT_NODES = 64
 const MAX_SAFE_INTEGER = 9007199254740991
 
 enum LoadResult { NO_SAVE, PRIMARY, BACKUP, INVALID }
@@ -59,7 +59,7 @@ func trace(event: String, fields: Dictionary = {}) -> void:
 		"elapsed_ms": Time.get_ticks_msec() - _started_msec,
 		"event": event.left(80),
 	}
-	if _is_plain_json(fields, 0, [64]):
+	if _is_plain_json(fields, 0, [MAX_EVENT_NODES]):
 		entry["fields"] = fields
 	var line := JSON.stringify(entry, "", true, true)
 	if line.to_utf8_buffer().size() > MAX_EVENT_BYTES:
@@ -68,6 +68,10 @@ func trace(event: String, fields: Dictionary = {}) -> void:
 	_events.append(line)
 	if _events.size() > MAX_EVENTS:
 		_events.pop_front()
+
+
+static func can_archive_flight(state: Dictionary) -> bool:
+	return not _state_bytes(state).is_empty()
 
 
 func export_report(state: Dictionary, path: String = "") -> Dictionary:
@@ -92,6 +96,7 @@ func export_report(state: Dictionary, path: String = "") -> Dictionary:
 		"file": destination.get_file(),
 		"public_downloads": false,
 		"clipboard_copied": false,
+		"includes_flight_state": not state_bytes.is_empty(),
 	}
 	if android_download:
 		var published := AndroidReportShare.publish(destination)
@@ -112,7 +117,8 @@ func share_report(state: Dictionary) -> Dictionary:
 			"reason": "Системное меню «Поделиться» доступно на Android.",
 		}
 	var destination := ProjectSettings.globalize_path(_next_report_path())
-	var result := _write_report_archive(destination, _state_bytes(state))
+	var state_bytes := _state_bytes(state)
+	var result := _write_report_archive(destination, state_bytes)
 	if result != OK:
 		return _report_error(result)
 	var handoff := AndroidReportShare.share(destination)
@@ -124,6 +130,7 @@ func share_report(state: Dictionary) -> Dictionary:
 		"file": handoff.get("file", destination.get_file()),
 		"public_downloads": handoff.get("public_downloads", false),
 		"reason": handoff.get("reason", ""),
+		"includes_flight_state": not state_bytes.is_empty(),
 	}
 
 
@@ -168,9 +175,8 @@ func copy_report_text(state: Dictionary) -> bool:
 	var state_bytes := _state_bytes(state)
 	var text := JSON.stringify(_report_summary(not state_bytes.is_empty()))
 	if not state_bytes.is_empty():
-		text += "\n" + JSON.stringify(state, "", true, true)
-	# Short enough to paste into a message when the public Downloads export
-	# is unavailable. The full journal is in the local ZIP.
+		text += "\n" + state_bytes.get_string_from_utf8()
+	# Keep the recent journal tail for the clipboard fallback.
 	for index in range(maxi(0, _events.size() - 16), _events.size()):
 		text += "\n" + _events[index]
 	DisplayServer.clipboard_set(text)
@@ -219,7 +225,9 @@ static func _is_plain_json(value: Variant, depth: int, remaining: Array) -> bool
 
 
 static func _state_bytes(state: Dictionary) -> PackedByteArray:
-	if state.is_empty() or not _is_plain_json(state, 0, [MAX_NODES]):
+	# Each JSON value takes at least one byte. Use the file-size limit
+	# to bound traversal without rejecting small but wide catalogues.
+	if state.is_empty() or not _is_plain_json(state, 0, [MAX_STATE_BYTES]):
 		return PackedByteArray()
 	var bytes := JSON.stringify(state, "", true, true).to_utf8_buffer()
 	return bytes if bytes.size() <= MAX_STATE_BYTES else PackedByteArray()
@@ -245,7 +253,7 @@ static func _parse_save(bytes: PackedByteArray) -> Dictionary:
 	if json.parse(bytes.get_string_from_utf8()) != OK:
 		return {}
 	var state: Variant = json.data
-	if not state is Dictionary or not _is_plain_json(state, 0, [MAX_NODES]):
+	if not state is Dictionary or not _is_plain_json(state, 0, [bytes.size()]):
 		return {}
 	return state
 

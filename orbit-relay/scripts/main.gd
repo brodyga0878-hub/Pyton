@@ -17,6 +17,7 @@ const SessionIO = preload("res://scripts/session_io.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const SAVE_INTERVAL := 8.0
 const ANTIALIASING := [Viewport.MSAA_DISABLED, Viewport.MSAA_2X, Viewport.MSAA_4X]
+const REPORT_JOURNAL_ONLY := "В ZIP только журнал и сведения о версии. Состояние рейса недоступно."
 
 var flight := Flight.new()
 var presentation := DisplaySettings.new()
@@ -683,7 +684,10 @@ static func _report_button_hit(button: Button, position: Vector2) -> bool:
 func _open_report() -> void:
 	_hud.set_input_enabled(false)
 	_report_touches.clear()
-	_report_text.text = "В ZIP входят версия игры, состояние рейса и последние события."
+	if SessionIO.can_archive_flight(flight.snapshot()):
+		_report_text.text = "В ZIP входят версия игры, состояние рейса и последние события."
+	else:
+		_report_text.text = REPORT_JOURNAL_ONLY
 	if OS.has_feature("android"):
 		_report_text.text += "\nПри отправке вы выбираете приложение и получателя."
 	_report.show()
@@ -1056,6 +1060,7 @@ func _export_report() -> void:
 		_report_text.text += " Текст отчёта скопирован." if result.get("clipboard_copied", false) else " Можно скопировать текст."
 	else:
 		_report_text.text = "ZIP сохранён.\n%s" % result.path
+	_show_report_scope(result)
 
 
 func _share_report() -> void:
@@ -1069,6 +1074,7 @@ func _share_report() -> void:
 	var result := _io.share_report(flight.snapshot())
 	if result.get("shared", false):
 		_report_text.text = "Игра открыла системное меню отправки ZIP."
+		_show_report_scope(result)
 		return
 	_report_sharing = false
 	if not result.ok:
@@ -1077,6 +1083,13 @@ func _share_report() -> void:
 		_report_text.text = "Меню отправки недоступно. Передайте ZIP из «Загрузок».\n%s" % result.path
 	else:
 		_report_text.text = "Меню отправки недоступно. ZIP сохранён в памяти игры. Попробуйте «Сохранить ZIP» или скопируйте текст."
+	if result.ok:
+		_show_report_scope(result)
+
+
+func _show_report_scope(result: Dictionary) -> void:
+	if not result.includes_flight_state:
+		_report_text.text += "\n" + REPORT_JOURNAL_ONLY
 
 
 func _copy_report() -> void:
