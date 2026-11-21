@@ -301,16 +301,13 @@ func _load_sector(id: int) -> void:
 	var fringe := id == Catalog.FRINGE_SYSTEM
 	_lighting.background_color = Color("#07091a") if cool else Color("#050910")
 	_lighting.ambient_light_color = Color("#8eaae5") if cool else Color("#99b8d0")
-	_sunlight.rotation_degrees = Vector3(-26.0, 47.0, 0.0) if cool else Vector3(-32.0, -36.0, 0.0)
 	_sunlight.light_color = Color("#b6dbff") if cool else Color("#ffefd9")
-	_sunlight.light_energy = 1.22
 	_fill.rotation_degrees = Vector3(16.0, 145.0, 0.0)
 	_fill.light_color = Color("#c8a6ee") if cool else Color("#84c8ff")
 	_fill.light_energy = 0.39
 	if fringe:
 		_lighting.background_color = Color("#091511")
 		_lighting.ambient_light_color = Color("#8da99a")
-		_sunlight.rotation_degrees = Vector3(-29.0, 68.0, 0.0)
 		_sunlight.light_color = Color("#ffe3ad")
 		_fill.light_color = Color("#81cdb0")
 
@@ -530,8 +527,9 @@ func sync(sim: RefCounted, delta: float) -> void:
 		var star := _stellar_views[site_id]
 		star.position = sim.target_position(site_id)
 		star.update_approach(camera.global_position, position_now, int(sim.target) == site_id and not settled, bool(sim.scoop_active_at(site_id)))
+	var primary_strength := 1.45 if _companion_id < 0 else 1.10
+	_update_stellar_light(_sunlight, _star.position, position_now, primary_strength)
 	if _companion_id >= 0:
-		_update_stellar_light(_sunlight, _star.position, position_now, 1.10)
 		_update_stellar_light(_fill, _stellar_views[_companion_id].position, position_now, 0.65)
 	if _gas_giant_id >= 0:
 		_backdrop_planet.position = sim.target_position(_gas_giant_id)
