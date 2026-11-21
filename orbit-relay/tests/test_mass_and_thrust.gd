@@ -19,6 +19,7 @@ var _failures := 0
 func _initialize() -> void:
 	_test_axes()
 	_test_mass_effects()
+	_test_expanded_hulls()
 	_test_route_budget()
 	_test_paid_receipts()
 	print("Mass and thrust integration: %d checks, %d failures" % [_checks, _failures])
@@ -81,6 +82,34 @@ func _test_mass_effects() -> void:
 	_expect(standard_fare > base and loaded.jump_tariff(START, DESTINATION) < standard_fare
 		and float(loaded.jump_drive_status().max_range_ly) > standard_range,
 		"Mass increases the tariff and a lighter propulsion coefficient increases useful jump range")
+
+
+func _test_expanded_hulls() -> void:
+	var interceptor := _free_flight(Ship.INTERCEPTOR_HULL)
+	var hauler := _free_flight(Ship.HAULER_HULL)
+	var loaded := _free_flight(Ship.HAULER_HULL)
+	loaded.ship.cargo_upgraded = true
+	loaded.mining.cargo_capacity = loaded.ship.cargo_capacity()
+	var payload := loaded.mining.cargo_capacity
+	if not _expect(payload == Ship.MAX_CARGO_CAPACITY and loaded.mining.insert_cargo("ore", payload),
+		"The heavy transport can carry its entire expanded payload"):
+		return
+	var interceptor_mass := interceptor.ship.flight_mass(0)
+	var empty_mass := hauler.ship.flight_mass(0)
+	var loaded_mass := loaded.ship.flight_mass(payload)
+	_expect(interceptor.ship.dry_mass() < hauler.ship.dry_mass() and interceptor_mass < empty_mass and empty_mass < loaded_mass
+		and interceptor.jump_tariff(START, DESTINATION) < hauler.jump_tariff(START, DESTINATION)
+		and hauler.jump_tariff(START, DESTINATION) < loaded.jump_tariff(START, DESTINATION),
+		"Dry hull hardware and real payload raise mass and the actual jump quotation")
+	for flight: Flight in [interceptor, hauler, loaded]:
+		_step_axis(flight, Vector3.FORWARD)
+	_expect(interceptor.speed() > hauler.speed() and hauler.speed() > loaded.speed()
+		and is_equal_approx(loaded.speed() / hauler.speed(), empty_mass / loaded_mass),
+		"The interceptor has greater acceleration and the fully loaded transport follows the thrust-to-mass ratio")
+	for flight: Flight in [interceptor, hauler, loaded]:
+		flight.update(STEP, Vector2.ZERO, 1.0, false, false)
+	_expect(absf(interceptor.roll) > absf(hauler.roll) and absf(hauler.roll) > absf(loaded.roll),
+		"The tracked roll response distinguishes both new hulls and the heavier load")
 
 
 func _test_route_budget() -> void:

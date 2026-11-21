@@ -111,6 +111,7 @@ func _ready() -> void:
 	_services.cargo_pod_requested.connect(_cargo_pod_action)
 	_services.crew_requested.connect(_crew_action)
 	_services.ship_exchange_requested.connect(_ship_exchange)
+	_services.ship_yard_requested.connect(_ship_yard_action)
 	_services.customs_payment_requested.connect(_customs_pay)
 	_services.law_radio_requested.connect(_open_law_radio)
 	_services.dismissed.connect(_close_services)
@@ -546,10 +547,11 @@ func _deliver_notice() -> void:
 			"hull_id": flight.ship.hull_id, "crew_required": flight.ship.crew_required(),
 			"system_id": flight.system_id, "orbit_time": flight.orbit_time, "reason": flight.status_message,
 		}
-	elif event == "ship_exchange":
+	elif event in ["ship_exchange", "ship_purchased", "ship_switched", "ship_sold"]:
 		trace_fields = {
 			"port": flight.docked, "hull_id": flight.ship.hull_id, "credits": flight.credits,
 			"cargo_capacity": flight.ship.cargo_capacity(), "crew_required": flight.ship.crew_required(),
+			"stored_hulls": flight.shipyard_storage().size(),
 			"system_id": flight.system_id, "orbit_time": flight.orbit_time, "reason": flight.status_message,
 		}
 	elif event in ["customs_inspection", "customs_paid"]:
@@ -629,6 +631,7 @@ func _deliver_notice() -> void:
 		"passenger_accepted", "passenger_overdue", "passenger_paid", "passenger_late", "passenger_canceled",
 		"passenger_debt_paid", "passenger_course",
 		"crew_hired", "crew_dismissed", "crew_payroll", "crew_arrears_paid", "ship_exchange",
+		"ship_purchased", "ship_switched", "ship_sold",
 		"patrol_accepted", "patrol_engaged", "patrol_fire", "patrol_enemy_hit", "patrol_retreat", "patrol_victory", "patrol_paid",
 		"expedition_accepted", "expedition_survey", "expedition_report", "expedition_supply", "expedition_complete", "expedition_course",
 		"missing_accepted", "missing_clue", "missing_evidence", "missing_boarded", "missing_paid", "missing_expired",
@@ -1280,6 +1283,15 @@ func _ship_exchange(hull: String) -> void:
 	if not _services.is_open() or not flight.shipyard_available():
 		return
 	if flight.shipyard_swap(hull):
+		_deliver_notice()
+		_update_display(0.0)
+	_services.refresh()
+
+
+func _ship_yard_action(action: String, id: String) -> void:
+	if not _services.is_open() or not flight.shipyard_available():
+		return
+	if flight.shipyard_action(action, id):
 		_deliver_notice()
 		_update_display(0.0)
 	_services.refresh()

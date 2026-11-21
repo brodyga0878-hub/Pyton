@@ -52,7 +52,8 @@ const RigFleet := preload("res://scripts/rig_fleet.gd")
 const StationHull := preload("res://scripts/station_hull.gd")
 const LawNetwork := preload("res://scripts/law_network.gd")
 const FlightRadio := preload("res://scripts/flight_radio.gd")
-const SAVE_SCHEMA := 51
+const ShipHangar := preload("res://scripts/ship_hangar.gd")
+const SAVE_SCHEMA := 52
 const INTERRUPTED_LABELS := {
 	"autopilot": "автопилот", "rig_approach": "заход к буру", "orbit_maneuver": "орбитальный манёвр",
 	"rendezvous": "автоматическое сближение", "patrol_course": "наведение дозора",
@@ -72,6 +73,8 @@ const MISSILE_DAMAGE := 28.0
 const MISSILE_HIT_RADIUS := 3.0
 const SHIPYARD_PORTS := [0, 10, Catalog.FRINGE_ARRIVAL_PORT]
 const SHIPYARD_STOCK_SECONDS := 600.0
+const SHIPYARD_FEATURES_START := 5
+const SHIPYARD_FEATURES_PERIOD := 8
 const TIME_SCALES := [1, 4, 16]
 const SETTLED_TIME_SCALES := [1, 4, 16, 64, 256]
 const COAST_TIME_SCALES := [1, 4, 16, 64]
@@ -175,6 +178,7 @@ var gear_extension := 0.0
 var gear_deployed := false
 var mining := MiningRig.new()
 var ship := ShipSystems.new()
+var _ship_hangar := ShipHangar.new()
 var market := Economy.new()
 var freight := NpcFreight.new()
 var patrol := Patrol.new()
@@ -2433,8 +2437,12 @@ func crew_pay(id: int) -> bool:
 
 
 func shipyard_available() -> bool:
-	return station_services_available() and (docked in SHIPYARD_PORTS \
-		or (docked in [Catalog.HEATHER_PORT, Catalog.LIMIT_PORT] and factions.owner(system_id) >= 0))
+	return station_services_available() and _is_shipyard_port(docked) \
+		and (docked in SHIPYARD_PORTS or factions.owner(system_id) >= 0)
+
+
+static func _is_shipyard_port(port: int) -> bool:
+	return port in SHIPYARD_PORTS or port in [Catalog.HEATHER_PORT, Catalog.LIMIT_PORT]
 
 
 func _shipyard_stock() -> Array[String]:
@@ -2443,7 +2451,13 @@ func _shipyard_stock() -> Array[String]:
 	var shift := floori(orbit_time / SHIPYARD_STOCK_SECONDS)
 	if shift == 0:
 		return [ShipSystems.STARTER_HULL, ShipSystems.FREIGHTER_HULL]
-	var specialty := ShipSystems.SURVEY_HULL if docked in [0, 10, Catalog.HEATHER_PORT] else ShipSystems.UTILITY_HULL
+	var exploration_yard := docked in [0, 10, Catalog.HEATHER_PORT]
+	if shift >= SHIPYARD_FEATURES_START:
+		var featured := (shift - SHIPYARD_FEATURES_START) % SHIPYARD_FEATURES_PERIOD
+		if featured == 0 or featured == 3:
+			var interceptor := exploration_yard == (featured == 0)
+			return [ShipSystems.STARTER_HULL, ShipSystems.INTERCEPTOR_HULL if interceptor else ShipSystems.HAULER_HULL]
+	var specialty := ShipSystems.SURVEY_HULL if exploration_yard else ShipSystems.UTILITY_HULL
 	var other := ShipSystems.UTILITY_HULL if specialty == ShipSystems.SURVEY_HULL else ShipSystems.SURVEY_HULL
 	var rotating: Array[String] = [ShipSystems.FREIGHTER_HULL, specialty, specialty, other]
 	var slot := posmod(shift + factions.owner(system_id) + local_ports().size(), rotating.size())
@@ -2469,19 +2483,36 @@ func shipyard_offer(id: String) -> Dictionary:
 	offer.trade_in = ship.trade_in_value()
 	offer.net_cost = int(offer.price) - int(offer.trade_in)
 	offer.cargo_capacity = ship.cargo_capacity_for(id)
-	offer.reason = ""
+	var reason := ""
 	if not shipyard_available():
-		offer.reason = "Обмен доступен на действующей верфи"
+		reason = "Обмен доступен на действующей верфи"
 	elif offer.installed:
-		offer.reason = "Текущий корпус"
+		reason = "Модель уже используется"
 	elif id not in _shipyard_stock():
-		offer.reason = "Этого корпуса нет в текущем предложении верфи"
-	elif mining.phase != MiningRig.STOWED or mining.ore_hold > offer.cargo_capacity:
-		offer.reason = "Освободите место в трюме, чтобы груз поместился"
-	elif offer.net_cost > credits:
-		offer.reason = "Недостаточно кредитов"
+		reason = "Этого корпуса нет в текущем предложении верфи"
+	else:
+		reason = _yard_cargo_denial(offer.cargo_capacity)
+	offer.reason = reason
+	offer.purchase_reason = reason
+	offer.purchase_cost = int(offer.price)
+	if reason.is_empty():
+		if offer.net_cost > credits:
+			offer.reason = "Недостаточно кредитов"
+		elif credits - int(offer.net_cost) > 1000000000:
+			offer.reason = "Для зачёта нужен запас по балансу"
+		if not _ship_hangar.can_park():
+			offer.purchase_reason = "Свободных мест хранения нет"
+		elif int(offer.purchase_cost) > credits:
+			offer.purchase_reason = "Недостаточно кредитов для покупки за полную цену"
 	offer.available = offer.reason.is_empty()
+	offer.purchase_ok = offer.purchase_reason.is_empty()
 	return offer
+
+
+func _yard_cargo_denial(capacity: int) -> String:
+	if mining.phase != MiningRig.STOWED or mining.ore_hold > capacity:
+		return "Освободите место в трюме, чтобы груз поместился"
+	return ""
 
 
 func shipyard_swap(id: String) -> bool:
@@ -2491,6 +2522,82 @@ func shipyard_swap(id: String) -> bool:
 	credits -= int(offer.net_cost)
 	mining.cargo_capacity = ship.cargo_capacity()
 	_announce("ship_exchange", "Обмен завершён. Корабль %s." % offer.name)
+	return true
+
+
+func shipyard_storage_limit() -> int:
+	return ShipHangar.LIMIT
+
+
+func shipyard_storage() -> Array[Dictionary]:
+	var offers: Array[Dictionary] = []
+	for record: Dictionary in _ship_hangar.rows():
+		offers.append(_stored_hull_offer(record))
+	return offers
+
+
+func _stored_hull_offer(record: Dictionary) -> Dictionary:
+	var berth := int(record.port)
+	var hull_id := str(record.hull)
+	var name := str(ShipSystems.profile(hull_id).name)
+	var price := ShipHangar.appraisal(record)
+	var reason := ""
+	if not shipyard_available() or docked != berth:
+		reason = "Сделка доступна на верфи «%s»" % target_name(berth)
+	var switch_reason := reason
+	var sale_reason := reason
+	if reason.is_empty():
+		switch_reason = _yard_cargo_denial(ship.cargo_capacity_for(hull_id))
+		if switch_reason.is_empty() and not _ship_hangar.can_replace():
+			switch_reason = "Исчерпан журнал мест хранения"
+		if price > 1000000000 - credits:
+			sale_reason = "Для выплаты нужен запас по балансу"
+	return {
+		"id": ShipHangar.key(record.slot), "hull": hull_id, "name": name, "port": berth,
+		"condition": float(record.condition), "sell_price": price,
+		"can_switch": switch_reason.is_empty(), "switch_reason": switch_reason,
+		"can_sell": sale_reason.is_empty(), "sell_reason": sale_reason,
+	}
+
+
+func shipyard_action(action: String, id: String) -> bool:
+	if action == "purchase":
+		return _purchase_hull(id)
+	var record := _ship_hangar.find(id)
+	if record.is_empty():
+		return false
+	var offer := _stored_hull_offer(record)
+	if action == "switch" and offer.can_switch:
+		var former_hull := ship.hull_id
+		var former_condition := ship.hull
+		if former_hull != offer.hull and not ship.swap_hull(offer.hull):
+			return false
+		ship.hull = float(record.condition)
+		_ship_hangar.release(id)
+		_ship_hangar.park(former_hull, former_condition, docked)
+		mining.cargo_capacity = ship.cargo_capacity()
+		_announce("ship_switched", "Активный корабль · %s. Прежний корпус оставлен в ангаре." % offer.name)
+		return true
+	if action == "sell" and offer.can_sell:
+		_ship_hangar.release(id)
+		credits += int(offer.sell_price)
+		_announce("ship_sold", "%s продан за %d кр." % [offer.name, int(offer.sell_price)])
+		return true
+	return false
+
+
+func _purchase_hull(id: String) -> bool:
+	var offer := shipyard_offer(id)
+	if offer.is_empty() or not offer.purchase_ok:
+		return false
+	var former_hull := ship.hull_id
+	var former_condition := ship.hull
+	if not ship.swap_hull(id):
+		return false
+	_ship_hangar.park(former_hull, former_condition, docked)
+	credits -= int(offer.purchase_cost)
+	mining.cargo_capacity = ship.cargo_capacity()
+	_announce("ship_purchased", "Куплен %s за %d кр. Прежний корпус оставлен в ангаре." % [offer.name, int(offer.purchase_cost)])
 	return true
 
 
@@ -4731,7 +4838,9 @@ func _lift() -> void:
 	var inherited_velocity := surface_velocity(origin, position)
 	var offpad := landed_offpad()
 	var rotates := Terrain.spin_rate(origin) > 0.0
+	var was_paused := time_paused
 	reset_time_scale()
+	time_paused = false
 	landed_site = -1
 	landing_direction = Vector3.ZERO
 	_command_gear(false)
@@ -4744,7 +4853,10 @@ func _lift() -> void:
 		position += away * 0.35
 	velocity = inherited_velocity + away * 9.0
 	target = _departure_target(_default_port(origin))
-	_announce("lift", "Взлёт с поверхности. «%s»." % target_name(origin))
+	var message := "Взлёт с поверхности. «%s»." % target_name(origin)
+	if was_paused:
+		message += " Ход времени возобновлён."
+	_announce("lift", message)
 
 
 func _launch() -> void:
@@ -5773,7 +5885,8 @@ func snapshot() -> Dictionary:
 		"landed_site": landed_site, "planned_target": planned_target, "mining": mining.snapshot(),
 		"landing_direction": [landing_direction.x, landing_direction.y, landing_direction.z],
 		"gear_extension": gear_extension, "gear_deployed": gear_deployed,
-		"ship": ship.snapshot(), "military_drive": ship.military_snapshot(), "market": market.snapshot(), "freight": freight.snapshot(),
+		"ship": ship.snapshot(), "ship_hangar": _ship_hangar.snapshot(), "military_drive": ship.military_snapshot(),
+		"market": market.snapshot(), "freight": freight.snapshot(),
 		"market_contacts": market.hidden_snapshot(),
 		"system_id": system_id, "jump_target": jump_target, "jump_route": _jump_route.duplicate(),
 		"jump_transit": transit,
@@ -5959,7 +6072,7 @@ func restore(state: Dictionary) -> bool:
 	var restored_cartography := Cartography.new()
 	var restored_frame := FlightFrame.new()
 	var restored_customs := Customs.new()
-	if not pre_customs and not restored_customs.restore(state.get("customs"), restored_epoch, pre_assortment):
+	if not pre_customs and not restored_customs.restore(state.get("customs"), restored_epoch, pre_assortment, schema < 52):
 		return false
 	if not pre_expansion:
 		if not restored_expedition.restore(state.get("expedition")) or not restored_factions.restore(state.get("factions"), pre_thermal, pre_convoy_orders):
@@ -6085,6 +6198,10 @@ func restore(state: Dictionary) -> bool:
 		restored_port_account.anchor(restored_dock, restored_epoch)
 	var restored_access := DockAccess.new()
 	var restored_mining := MiningRig.new()
+	var restored_hangar := ShipHangar.new()
+	if schema >= 52 and not restored_hangar.restore(state.get("ship_hangar"),
+		func(port: int) -> bool: return _is_shipyard_port(port) and _site_available(port, restored_expedition, restored_cartography)):
+		return false
 	var restored_ship := ShipSystems.new()
 	var restored_escape := EscapePod.new()
 	var restored_maintenance := ShipMaintenance.new()
@@ -6105,6 +6222,8 @@ func restore(state: Dictionary) -> bool:
 	var restored_plan := -1
 	if not pre_fuel and not restored_ship.restore(state.get("ship"), pre_economy, pre_heat_shield, pre_dual_fuel,
 			pre_shipyard, pre_orbital_mining, pre_fuel_equipment, pre_jump_drive, pre_speed_hold, restored_military, schema >= 51):
+		return false
+	if schema < 52 and restored_ship.hull_id in [ShipSystems.INTERCEPTOR_HULL, ShipSystems.HAULER_HULL]:
 		return false
 	if (restored_ship.hull == 0.0) != restored_escape.active:
 		return false
@@ -6471,6 +6590,7 @@ func restore(state: Dictionary) -> bool:
 	gear_deployed = restored_gear_command
 	mining = restored_mining
 	ship = restored_ship
+	_ship_hangar = restored_hangar
 	market = restored_market
 	freight = restored_freight
 	patrol = restored_patrol

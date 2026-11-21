@@ -168,7 +168,7 @@ var _gear_joints: Array[Vector3] = []
 var _gear_feet: Array[Vector3] = []
 var _gear_pads: MultiMesh
 var _gear_progress := -1.0
-var _jet: MeshInstance3D
+var _jets: Array[MeshInstance3D] = []
 var _jet_material: ShaderMaterial
 var _lighting: Environment
 var _sunlight: DirectionalLight3D
@@ -478,13 +478,17 @@ func sync(sim: RefCounted, delta: float) -> void:
 		body.sync(position_now, site_id == int(sim.target), not settled, field_direction)
 	var thrust := clampf(float(sim.throttle), 0.0, 1.0)
 	_flight_time += delta
-	_jet.visible = transit or (not settled and not in_escape and thrust > 0.01)
+	var show_jet := transit or (not settled and not in_escape and thrust > 0.01)
 	var plume_length := 1.35 if transit else (0.45 + thrust * 0.85) * (1.45 if sim.boost else 1.0)
-	_jet.scale = Vector3(1.0, plume_length, 1.0)
+	for jet: MeshInstance3D in _jets:
+		jet.visible = show_jet
+		jet.scale = Vector3(1.0, plume_length, 1.0)
 	_jet_material.set_shader_parameter("pulse", 0.69 if transit else 0.59 + sin(_flight_time * 31.0) * 0.08)
 
 	var camera_offset := BERTH_CAMERA_OFFSET if docked else Vector3(0.0, 3.4, 10.5)
 	var focal_offset := BERTH_CAMERA_FOCUS if docked else Vector3(0.0, 2.0, -30.0)
+	if not settled and hull_id == ShipSystems.HAULER_HULL:
+		camera_offset = Vector3(0.0, 4.0, 13.0)
 	var up := heading.y
 	if ground_berth:
 		camera_offset = GROUND_CAMERA_OFFSET
@@ -545,7 +549,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	if absf(sight.dot(_camera_up)) > 0.995:
 		_camera_up = up if absf(sight.dot(up)) < 0.995 else heading.x
 	var exterior := Transform3D(Basis.looking_at(sight, _camera_up), _exterior_position)
-	var freighter := hull_id in [ShipSystems.FREIGHTER_HULL, ShipSystems.UTILITY_HULL]
+	var freighter := hull_id in [ShipSystems.FREIGHTER_HULL, ShipSystems.UTILITY_HULL, ShipSystems.HAULER_HULL]
 	# Keep the established framing during the automatic berth operation.
 	var forced_exterior := settled or transit or in_escape
 	var previous_mode: int = _camera_director.mode
@@ -1594,6 +1598,7 @@ func _build_ship_model(hull_id: String) -> void:
 		_ship.queue_free()
 	_ship_fittings.clear()
 	_ship_finishes.clear()
+	_jets.clear()
 	_gear_struts.clear()
 	_gear_joints.clear()
 	_gear_feet.clear()
@@ -1619,6 +1624,12 @@ func _build_ship_model(hull_id: String) -> void:
 		var scanner := _panel_finish(Color("7ad6cf"), 0.56, 0.43, Vector2(3.0, 2.0), true)
 		_sectioned_shell(_ship, scanner, [Vector3(-0.55, 0.12, 0.07), Vector3(-0.08, 0.19, 0.16),
 			Vector3(0.38, 0.17, 0.11)], Vector3(0.0, 0.74, 0.0))
+	elif hull_id == ShipSystems.INTERCEPTOR_HULL:
+		_ship.name = "InterceptorHull"
+		_build_interceptor()
+	elif hull_id == ShipSystems.HAULER_HULL:
+		_ship.name = "HaulerHull"
+		_build_hauler()
 	else:
 		_build_ship()
 
@@ -1763,6 +1774,68 @@ func _build_freighter() -> void:
 	_build_ship_jet(Vector3(0, -0.18, 2.95), 0.44)
 
 
+func _build_interceptor() -> void:
+	var ceramic := _panel_finish(Color("a45159"), 0.37, 0.38, Vector2(6, 2), true)
+	var frame := _panel_finish(Color("253741"), 0.58, 0.55, Vector2(4, 2), true)
+	var tips := _panel_finish(Color("d5a763"), 0.48, 0.42, Vector2(4, 1), true)
+	var canopy := _surface(Color("31546e"), 0.44, 0.19)
+	var engine := _light(Color("a2daff"))
+	_sectioned_shell(_ship, ceramic, [Vector3(-2.1, 0.13, 0.08), Vector3(-1.3, 0.32, 0.24),
+		Vector3(0.25, 0.55, 0.34), Vector3(1.62, 0.43, 0.27)])
+	_sectioned_shell(_ship, canopy, [Vector3(-1.27, 0.15, 0.06), Vector3(-0.83, 0.27, 0.22),
+		Vector3(-0.2, 0.32, 0.20), Vector3(0.36, 0.19, 0.07)], Vector3(0, 0.27, 0))
+	var wings: Array[Vector3] = [Vector3(-0.56, 0.12, 0.04), Vector3(0.10, 0.54, 0.07),
+		Vector3(1.02, 0.89, 0.09), Vector3(1.79, 0.61, 0.05)]
+	var pods: Array[Vector3] = [Vector3(0.14, 0.13, 0.13), Vector3(0.50, 0.26, 0.24),
+		Vector3(1.54, 0.26, 0.24), Vector3(1.87, 0.23, 0.22)]
+	var trims: Array = []
+	for side: float in [-1.0, 1.0]:
+		_sectioned_shell(_ship, frame, wings, Vector3(side * 1.1, -0.12, 0))
+		_sectioned_shell(_ship, ceramic, pods, Vector3(side * 0.59, -0.15, 0))
+		_ring(_ship, frame, Vector3(side * 0.59, -0.15, 1.86), 0.23, 0.10, 14)
+		_cylinder(_ship, engine, Vector3(side * 0.59, -0.15, 1.91), 0.14, 0.14, 0.07, 12)
+		trims.append([Vector3(side * 1.67, 0.34, 1.12), Vector3(0.18, 0.94, 0.76), -side * 0.23])
+		trims.append([Vector3(side * 1.69, -0.04, 0.74), Vector3(0.16, 0.09, 0.57)])
+	_box_batch(_ship, tips, trims)
+	_box_batch(_fitting(_ship, 1), engine, [[Vector3(0, 0.32, 1.48), Vector3(0.32, 0.04, 0.11)]])
+	_build_ship_gear(ceramic, frame)
+	_build_ship_jet(Vector3(0.59, -0.15, 2.44), 0.19, true)
+
+
+func _build_hauler() -> void:
+	var ceramic := _panel_finish(Color("b0c2aa"), 0.32, 0.48, Vector2(7, 2), true)
+	var frame := _panel_finish(Color("354647"), 0.59, 0.55, Vector2(4, 2), true)
+	var crates := _panel_finish(Color("829365"), 0.34, 0.61, Vector2(5, 3), true)
+	var girders := _panel_finish(Color("b09b62"), 0.52, 0.39, Vector2(5, 2), true)
+	var canopy := _surface(Color("285872"), 0.39, 0.18)
+	var engine := _light(Color("8cddca"))
+	_sectioned_shell(_ship, frame, [Vector3(-2.91, 0.48, 0.23), Vector3(-2.40, 0.67, 0.36),
+		Vector3(2.46, 0.67, 0.36), Vector3(2.87, 0.54, 0.35)], Vector3(0, -0.18, 0))
+	_sectioned_shell(_ship, ceramic, [Vector3(-3.01, 0.36, 0.20), Vector3(-2.49, 0.66, 0.41),
+		Vector3(-1.22, 0.66, 0.45), Vector3(-0.79, 0.48, 0.33)], Vector3(0, 0.47, 0))
+	_sectioned_shell(_ship, canopy, [Vector3(-2.76, 0.40, 0.08), Vector3(-2.44, 0.54, 0.20),
+		Vector3(-1.55, 0.54, 0.19), Vector3(-1.4, 0.43, 0.08)], Vector3(0, 0.80, 0))
+	var braces: Array = []
+	var lamps: Array = []
+	for side: float in [-1.0, 1.0]:
+		var beam := side * 1.9
+		_sectioned_shell(_ship, frame, [Vector3(-2.51, 0.39, 0.20), Vector3(-2.02, 0.57, 0.36),
+			Vector3(2.22, 0.57, 0.40), Vector3(2.94, 0.43, 0.36)], Vector3(beam, -0.30, 0))
+		for at: float in [-1.52, 0.14, 1.80]:
+			_sectioned_shell(_ship, crates, [Vector3(-0.74, 0.57, 0.40), Vector3(-0.58, 0.72, 0.47),
+				Vector3(0.58, 0.72, 0.47), Vector3(0.74, 0.57, 0.40)], Vector3(side * 1.29, 0.47, at))
+			braces.append([Vector3(side * 1.33, 0.0, at), Vector3(1.54, 0.23, 0.34)])
+			braces.append([Vector3(side * 1.29, 0.965, at), Vector3(1.35, 0.071, 0.16)])
+			lamps.append([Vector3(beam + side * 0.39, 0.12, at), Vector3(0.17, 0.06, 0.09)])
+		_cylinder(_ship, frame, Vector3(beam, -0.30, 2.77), 0.43, 0.50, 0.45, 16)
+		_ring(_ship, girders, Vector3(beam, -0.30, 3.01), 0.42, 0.12, 20)
+		_cylinder(_ship, engine, Vector3(beam, -0.30, 3.04), 0.26, 0.26, 0.10, 16)
+	_box_batch(_ship, girders, braces)
+	_box_batch(_fitting(_ship, 1), engine, lamps)
+	_build_ship_gear(ceramic, frame)
+	_build_ship_jet(Vector3(1.9, -0.30, 3.60), 0.37, true)
+
+
 func _build_ship_gear(shell: Material, graphite: Material) -> void:
 	_landing_gear = Node3D.new()
 	_landing_gear.name = "LandingGear"
@@ -1783,7 +1856,7 @@ func _build_ship_gear(shell: Material, graphite: Material) -> void:
 	_gear_pads = _box_batch(_landing_gear, graphite, legs)
 
 
-func _build_ship_jet(at: Vector3, radius := 0.35) -> void:
+func _build_ship_jet(at: Vector3, radius := 0.35, mirrored := false) -> void:
 	var flow := Shader.new()
 	flow.code = """
 shader_type spatial;
@@ -1806,8 +1879,13 @@ void fragment() {
 	flare.height = 1.6
 	flare.radial_segments = 10
 	flare.rings = 1
-	_jet = _mesh(_ship, flare, _jet_material, at)
-	_jet.rotation.x = PI * 0.5
+	var placements: Array[Vector3] = [at]
+	if mirrored:
+		placements.append(Vector3(-at.x, at.y, at.z))
+	for position_at: Vector3 in placements:
+		var jet := _mesh(_ship, flare, _jet_material, position_at)
+		jet.rotation.x = PI * 0.5
+		_jets.append(jet)
 
 
 func _build_stars(cool: bool, fringe: bool) -> void:

@@ -3,6 +3,7 @@ extends SceneTree
 const Flight := preload("res://scripts/flight_sim.gd")
 const Fixture := preload("res://tests/flight_fixture.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
+const Customs := preload("res://scripts/customs.gd")
 const ShipSystems := preload("res://scripts/ship_systems.gd")
 const SessionIO := preload("res://scripts/session_io.gd")
 const Main := preload("res://main.tscn")
@@ -23,6 +24,7 @@ func _initialize() -> void:
 func _run() -> void:
 	_test_licenses_and_quotes()
 	_test_rotating_stock()
+	_test_featured_hulls()
 	_test_upgrade_and_travel()
 	_test_flight_characteristics()
 	_test_previous_schema()
@@ -85,7 +87,7 @@ func _test_rotating_stock() -> void:
 	flight.credits = 7000
 	var survey := ShipSystems.SURVEY_HULL
 	var tug := ShipSystems.UTILITY_HULL
-	_expect(ShipSystems.hull_ids().size() == 4 and not flight.shipyard_swap(survey)
+	_expect(ShipSystems.hull_ids().size() == 6 and not flight.shipyard_swap(survey)
 		and not flight.shipyard_swap(tug) and flight.credits == 7000,
 		"The wider hull catalogue does not let a pilot buy what this shift has not listed")
 	flight.update(Flight.SHIPYARD_STOCK_SECONDS * 2.0, Vector2.ZERO, 0.0, false, false)
@@ -109,6 +111,60 @@ func _test_rotating_stock() -> void:
 		and restored.ship.thrust_acceleration(Vector3.RIGHT, 0).x > scout_side,
 		"The working tug trades turn speed for stronger side thrust and a wider hold with a crew requirement")
 	_expect(not restored.dock_action() and restored.docked == 0, "A tug without its required crew cannot depart")
+
+
+func _test_featured_hulls() -> void:
+	var survey := ShipSystems.SURVEY_HULL
+	var tug := ShipSystems.UTILITY_HULL
+	var interceptor := ShipSystems.INTERCEPTOR_HULL
+	var hauler := ShipSystems.HAULER_HULL
+	var shift := Flight.SHIPYARD_STOCK_SECONDS
+	var initial := {0: [FREIGHTER, FREIGHTER, survey, survey, tug],
+		10: [FREIGHTER, survey, tug, FREIGHTER, survey],
+		16: [FREIGHTER, survey, FREIGHTER, tug, tug]}
+	for port: int in initial:
+		var yard := _at_port(port)
+		for expected: String in initial[port]:
+			var offers := yard.shipyard_offers()
+			_expect(offers.size() == 2 and offers[0].id == COURIER and offers[1].id == expected,
+				"The first five shifts at yard %d retain the previous selection" % port)
+			yard.update(shift, Vector2.ZERO, 0.0, false, false)
+		_expect(yard.shipyard_offers()[1].id == (hauler if port == 16 else interceptor),
+			"Advanced stock follows this port's role while keeping two active cards")
+	var pilot := Flight.new()
+	pilot.credits = 16000
+	pilot.update(5.0 * shift, Vector2.ZERO, 0.0, false, false)
+	var listed := pilot.shipyard_offer(interceptor)
+	_expect(listed.available and int(listed.crew_required) == 0 and not pilot.shipyard_offer(hauler).available,
+		"The interceptor is physically stocked while the early hauler request is refused")
+	var opening_balance := pilot.credits
+	if not _expect(pilot.shipyard_swap(interceptor) and pilot.ship.hull_id == interceptor
+		and pilot.mining.cargo_capacity == 12 and pilot.credits == opening_balance - int(listed.net_cost),
+		"Install the listed interceptor through the real yard quote"):
+		return
+	var solo := Flight.new()
+	var checkpoint := pilot.snapshot()
+	_expect(solo.restore(JSON.parse_string(JSON.stringify(checkpoint))) and Fixture.depart(solo)
+		and solo.ship.hull_id == interceptor and solo.ship.crew_required() == 0,
+		"The new interceptor survives cold load and actually departs with its pilot alone")
+	checkpoint.schema = 51
+	_expect(not Flight.new().restore(checkpoint), "A 0.99 format cannot claim an interceptor that did not exist yet")
+	var fast_roll := pilot.ship.roll_rate(0)
+	var fast_forward := pilot.ship.thrust_acceleration(Vector3.FORWARD, 0).z
+	pilot.update(3.0 * shift, Vector2.ZERO, 0.0, false, false)
+	_expect(pilot.shipyard_swap(hauler) and pilot.ship.hull_id == hauler and pilot.mining.cargo_capacity == 58
+		and pilot.ship.crew_required() == 2 and pilot.ship.roll_rate(0) < fast_roll and pilot.ship.thrust_acceleration(Vector3.FORWARD, 0).z < fast_forward,
+		"The rotating yard delivers a heavier profile with different acceleration and expanded crew rules")
+	_expect(not pilot.dock_action(), "Departing the long-haul ship requires actual onboard specialists")
+	var crew := pilot.crew_candidates()
+	_expect(pilot.crew_hire(int(crew[0].id)) and not pilot.dock_action() and pilot.crew_hire(int(crew[1].id))
+		and pilot.service_action("cargo") and pilot.mining.insert_cargo("ore", 80) and Fixture.depart(pilot),
+		"The working hauler departs with two paid specialists and all 80 expanded cargo units")
+	var customs := Customs.new()
+	var seized := customs.record(1, 10, "weapon_parts", 80, 25.0)
+	_expect(seized.ok and Customs.new().restore(customs.snapshot(), 25.0)
+		and not Customs.new().restore(customs.snapshot(), 25.0, false, true),
+		"The larger single seizure is supported by current holds and rejected in the earlier save shape")
 
 
 func _test_upgrade_and_travel() -> void:
@@ -261,6 +317,17 @@ func _test_yard_touch() -> void:
 		and reopened.credits == flight.credits, "The Main-bound purchase transfers credits and writes a resumable hull")
 	_expect(is_instance_valid(exchange) and exchange.disabled,
 		"The current hull's touch control cannot charge for a repeated installation")
+	flight.update(Flight.SHIPYARD_STOCK_SECONDS * 5.0, Vector2.ZERO, 0.0, false, false)
+	services.refresh()
+	await process_frame
+	var featured: Array[String] = []
+	var fits := true
+	for row: Dictionary in services._yard_rows:
+		if row.panel.is_visible_in_tree():
+			featured.append(row.id)
+			fits = fits and viewport.get_visible_rect().grow(0.5).encloses(row.exchange.get_global_rect())
+	_expect(featured == [COURIER, ShipSystems.INTERCEPTOR_HULL] and fits,
+		"The expanded catalogue uses only the two current yard cards and both stay in the landscape viewport")
 	viewport.queue_free()
 	await process_frame
 

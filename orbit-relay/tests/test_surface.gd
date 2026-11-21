@@ -37,6 +37,7 @@ func _run() -> void:
 	print("Surface integration: %d checks, %d failures" % [_checks, _failures.size()])
 	for failure: String in _failures:
 		printerr(failure)
+	await create_timer(0.15).timeout
 	quit(0 if _failures.is_empty() else 1)
 
 
@@ -294,6 +295,22 @@ func _test_surface_cycle(site: int) -> void:
 		"%s recovery loads one batch and depletes the matching stock once" % name)
 	game._update_display(0.0)
 	await process_frame
+	_tap(game, "time", true, name)
+	_expect(flight.time_scale > 1, "%s can speed up time while stopped on the surface" % name)
+	_tap(game, "time_pause", true, name)
+	var paused_epoch := flight.orbit_time
+	game._physics_process(STEP)
+	_expect(flight.time_paused and flight.orbit_time == paused_epoch and SessionIO.load_state().time_paused,
+		"%s pauses and persists the clock while still on the surface" % name)
+	await _close_scene(game)
+	game = _open_scene()
+	await process_frame
+	flight = game.flight
+	if not _expect(flight.time_paused and flight.landed_offpad() and flight.landed_site == site
+		and flight.orbit_time == paused_epoch and flight.planned_target == next,
+		"%s resumes on the same patch with its saved pause and planned departure" % name):
+		await _close_scene(game)
+		return
 	var body_velocity := flight.surface_velocity(site, flight.position)
 	var launch_normal := flight.landed_basis().z
 	_tap(game, "dock", true, name)
@@ -302,12 +319,22 @@ func _test_surface_cycle(site: int) -> void:
 		and flight.ship.fuel == 0.0 and departure.dot(launch_normal) > 7.0
 		and departure.slide(launch_normal).length() < 0.05,
 		"%s lifts by touch in the local outward direction with an empty tank" % name)
+	_expect(not flight.time_paused and flight.time_scale == 1 and not game._hud._actions["throttle_up"].disabled
+		and not SessionIO.load_state().time_paused,
+		"%s touch takeoff resumes normal time and immediately restores thrust controls" % name)
 	for _frame in range(40):
 		game._physics_process(STEP)
 	var clearance := Terrain.spin_basis(site, flight.orbit_time).transposed() * (flight.position - flight.target_position(site))
 	_expect(clearance.length() > Terrain.radius_at(site, clearance.normalized()) + 4.4
-		and flight.mining.cargo_amount(resource) == Rig.BATCH,
+		and flight.mining.cargo_amount(resource) == Rig.BATCH and flight.orbit_time > paused_epoch,
 		"%s can leave the actual terrain cleanly with the recovered cargo" % name)
+	game._update_display(0.0)
+	await process_frame
+	_tap(game, "autopilot", true, name)
+	_expect(flight.autopilot and flight.target == next, "%s can engage autopilot toward the queued port after lifting" % name)
+	_tap(game, "throttle_up", true, name)
+	_expect(not flight.autopilot and flight.throttle > 0.0,
+		"%s manual touch throttle can take control back from autopilot" % name)
 	await _close_scene(game)
 
 

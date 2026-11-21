@@ -6,6 +6,7 @@ signal jettison_requested(good: String)
 signal cargo_pod_requested(action: String)
 signal crew_requested(action: String, member: int)
 signal ship_exchange_requested(hull: String)
+signal ship_yard_requested(action: String, id: String)
 signal customs_payment_requested()
 signal law_radio_requested()
 signal fuel_module_removed(module: String)
@@ -37,9 +38,11 @@ const PUMP_MODES := {"off": "Выкл.", "reaction": "В реактивный", 
 const DRIVE_LABELS := {"standard": ShipSystems.STANDARD_DRIVE_NAME, "range": ShipSystems.RANGE_DRIVE_NAME,
 	"military": ShipSystems.MILITARY_DRIVE_NAME}
 const WEAPON_LABELS := {"pulse": "Каскад", "focus": "Нить"}
+const STORED_HULLS_PER_PAGE := 2
 
 enum StationPage { SERVICES, CREW, YARD, CUSTOMS, MINING, BERTH }
 enum EquipmentPage { FLIGHT, DEFENSE, NAVIGATION, ORDNANCE, MILITARY, RIGS }
+enum YardPage { OFFERS, HANGAR }
 
 var _sim: RefCounted
 var _insets: MarginContainer
@@ -69,8 +72,26 @@ var _crew_member_rows: Array[Dictionary] = []
 var _crew_buttons: Array[Button] = []
 var _yard: VBoxContainer
 var _yard_toggle: Button
+var _yard_page := YardPage.OFFERS
+var _yard_tabs: Dictionary[int, Button] = {}
+var _yard_offers: VBoxContainer
 var _yard_rows: Array[Dictionary] = []
 var _yard_stock_hint: Label
+var _yard_hangar: VBoxContainer
+var _yard_stored_browse: VBoxContainer
+var _yard_stored_rows: Array[Dictionary] = []
+var _yard_stored_empty: Label
+var _yard_stored_status: Label
+var _yard_stored_pager: HBoxContainer
+var _yard_stored_prev: Button
+var _yard_stored_next: Button
+var _yard_stored_position: Label
+var _yard_stored_page := 0
+var _yard_sale: VBoxContainer
+var _yard_sale_summary: Label
+var _yard_sale_confirm: Button
+var _yard_sale_cancel: Button
+var _yard_sale_id := ""
 var _customs: VBoxContainer
 var _customs_toggle: Button
 var _customs_office: Label
@@ -275,6 +296,9 @@ func open(sim: RefCounted, fuel_only := false) -> void:
 	_fuel_only = fuel_only
 	_station_page = StationPage.SERVICES
 	_equipment_page = EquipmentPage.FLIGHT
+	_yard_page = YardPage.OFFERS
+	_yard_stored_page = 0
+	_yard_sale_id = ""
 	_cargo_index = 0
 	_discard_pending_good = ""
 	_touches.clear()
@@ -539,6 +563,7 @@ func _toggle_station_page(page: StationPage) -> void:
 	if page == StationPage.YARD and not _sim.shipyard_available():
 		return
 	_station_page = StationPage.SERVICES if _station_page == page else page
+	_yard_sale_id = ""
 	_touches.clear()
 	_show_page()
 	refresh()
@@ -690,17 +715,31 @@ func _build_yard(parent: VBoxContainer) -> void:
 	_yard = VBoxContainer.new()
 	_yard.add_theme_constant_override("separation", 12)
 	parent.add_child(_yard)
+	var tabs := HBoxContainer.new()
+	tabs.add_theme_constant_override("separation", 8)
+	_yard.add_child(tabs)
+	for page: YardPage in [YardPage.OFFERS, YardPage.HANGAR]:
+		var tab := _button(tabs)
+		tab.text = "В продаже" if page == YardPage.OFFERS else "Ангар"
+		tab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		tab.toggle_mode = true
+		tab.pressed.connect(_select_yard_page.bind(page))
+		_yard_tabs[page] = tab
+	_yard_offers = VBoxContainer.new()
+	_yard_offers.add_theme_constant_override("separation", 8)
+	_yard.add_child(_yard_offers)
 	var hulls := HBoxContainer.new()
 	hulls.add_theme_constant_override("separation", 12)
-	_yard.add_child(hulls)
+	_yard_offers.add_child(hulls)
 	for id: String in ShipSystems.hull_ids():
 		var row := _yard_card(hulls, ShipSystems.profile(id))
 		_yard_rows.append(row)
-	_yard_stock_hint = _label(_yard, "", 16, MINT)
-	var terms := _label(_yard,
-		"Верфь переносит оборудование, топливо и данные кают. Новый корпус выдаётся исправным. Весь груз должен помещаться в новый трюм.",
+	_yard_stock_hint = _label(_yard_offers, "", 16, MINT)
+	var terms := _label(_yard_offers,
+		"При покупке старый корпус остаётся в ангаре этого порта. Оборудование, топливо, экипаж, пассажиры и груз переходят на выбранный корабль.",
 		16, MUTED)
 	terms.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_build_yard_hangar()
 	_yard.hide()
 
 
@@ -731,10 +770,36 @@ func _yard_card(parent: HBoxContainer, profile: Dictionary) -> Dictionary:
 	reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var exchange := _button(content)
 	exchange.pressed.connect(_request_yard_exchange.bind(str(profile.id)))
-	return {"id": str(profile.id), "panel": panel, "hold": hold, "cost": cost, "reason": reason, "exchange": exchange}
+	var purchase := _button(content)
+	purchase.pressed.connect(_request_yard_purchase.bind(str(profile.id)))
+	return {"id": str(profile.id), "panel": panel, "hold": hold, "cost": cost, "reason": reason,
+		"exchange": exchange, "purchase": purchase}
 
 
 func _refresh_yard() -> void:
+	var offers := _yard_page == YardPage.OFFERS
+	_yard_offers.visible = offers
+	_yard_hangar.visible = not offers
+	for page: int in _yard_tabs:
+		var tab := _yard_tabs[page]
+		tab.set_pressed_no_signal(page == _yard_page)
+		tab.disabled = page == _yard_page
+	if offers:
+		_refresh_yard_offers()
+	else:
+		_refresh_yard_hangar()
+
+
+func _select_yard_page(page: YardPage) -> void:
+	if not _yard_actions_available() or page == _yard_page:
+		return
+	_yard_page = page
+	_yard_sale_id = ""
+	_touches.clear()
+	_refresh_yard()
+
+
+func _refresh_yard_offers() -> void:
 	var offers: Array[Dictionary] = _sim.shipyard_offers()
 	_yard_stock_hint.text = "Обновление предложения · %s." % Calendar.stamp(float(_sim.shipyard_restock_time()))
 	for row in _yard_rows:
@@ -754,9 +819,13 @@ func _refresh_yard() -> void:
 			if not installed:
 				row.cost.text += " · Зачёт %d кр." % int(offer.trade_in)
 			row.cost.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			row.reason.text = "" if installed or offer.available else str(offer.reason)
-			row.reason.visible = not row.reason.text.is_empty()
+			var exchange_reason := "" if installed or offer.available else str(offer.reason)
+			var purchase_reason := "" if installed or offer.purchase_ok else str(offer.purchase_reason)
+			_update_yard_reason(row.reason, exchange_reason, purchase_reason, "Обмен", "Покупка")
 			row.exchange.disabled = installed or not bool(offer.available)
+			row.purchase.visible = not installed or bool(offer.purchase_ok)
+			row.purchase.disabled = not bool(offer.purchase_ok)
+			row.purchase.text = "Купить за %d кр." % int(offer.purchase_cost)
 			if installed:
 				row.exchange.text = "Ваш корабль"
 			elif net >= 0:
@@ -767,13 +836,194 @@ func _refresh_yard() -> void:
 
 
 func _request_yard_exchange(id: String) -> void:
-	if not is_open() or _station_page != StationPage.YARD:
+	if not _yard_actions_available() or _yard_page != YardPage.OFFERS:
 		return
 	for row in _yard_rows:
 		if row.id == id and row.exchange.is_visible_in_tree() and not row.exchange.disabled:
 			_touches.clear()
 			ship_exchange_requested.emit(id)
 			return
+
+
+func _request_yard_purchase(id: String) -> void:
+	if not _yard_actions_available() or _yard_page != YardPage.OFFERS:
+		return
+	for row: Dictionary in _yard_rows:
+		if row.id == id and row.purchase.is_visible_in_tree() and not row.purchase.disabled:
+			_touches.clear()
+			ship_yard_requested.emit("purchase", id)
+			return
+
+
+func _build_yard_hangar() -> void:
+	_yard_hangar = VBoxContainer.new()
+	_yard_hangar.add_theme_constant_override("separation", 9)
+	_yard.add_child(_yard_hangar)
+	_yard_stored_browse = VBoxContainer.new()
+	_yard_stored_browse.add_theme_constant_override("separation", 9)
+	_yard_hangar.add_child(_yard_stored_browse)
+	_yard_stored_status = _label(_yard_stored_browse, "", 17, MINT)
+	var hulls := HBoxContainer.new()
+	hulls.add_theme_constant_override("separation", 12)
+	_yard_stored_browse.add_child(hulls)
+	for slot in range(STORED_HULLS_PER_PAGE):
+		_yard_stored_rows.append(_yard_storage_card(hulls, slot))
+	_yard_stored_empty = _label(_yard_stored_browse, "В ангаре пусто.", 18, MUTED)
+	_yard_stored_pager = HBoxContainer.new()
+	_yard_stored_browse.add_child(_yard_stored_pager)
+	_yard_stored_prev = _button(_yard_stored_pager)
+	_yard_stored_prev.text = "Назад"
+	_yard_stored_prev.custom_minimum_size.x = 130.0
+	_yard_stored_prev.pressed.connect(_turn_yard_storage_page.bind(-1))
+	_yard_stored_position = _label(_yard_stored_pager, "", 16, MUTED)
+	_yard_stored_position.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_yard_stored_position.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_yard_stored_position.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_yard_stored_next = _button(_yard_stored_pager)
+	_yard_stored_next.text = "Далее"
+	_yard_stored_next.custom_minimum_size.x = 130.0
+	_yard_stored_next.pressed.connect(_turn_yard_storage_page.bind(1))
+	_yard_sale = VBoxContainer.new()
+	_yard_sale.add_theme_constant_override("separation", 12)
+	_yard_hangar.add_child(_yard_sale)
+	_yard_sale_summary = _label(_yard_sale, "", 20, TEXT)
+	_yard_sale_summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var decision := HBoxContainer.new()
+	decision.add_theme_constant_override("separation", 12)
+	_yard_sale.add_child(decision)
+	_yard_sale_cancel = _button(decision)
+	_yard_sale_cancel.text = "Отмена"
+	_yard_sale_cancel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_yard_sale_cancel.pressed.connect(_cancel_yard_sale)
+	_yard_sale_confirm = _button(decision)
+	_yard_sale_confirm.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_yard_sale_confirm.pressed.connect(_confirm_yard_sale)
+	_yard_sale.hide()
+
+
+func _yard_storage_card(parent: HBoxContainer, slot: int) -> Dictionary:
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size.x = 338.0
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	panel.add_theme_stylebox_override("panel", _style(Color("112631"), Color("263f4b"), 9, 14))
+	parent.add_child(panel)
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 8)
+	panel.add_child(content)
+	var title := _label(content, "", 23, TEXT)
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var location := _label(content, "", 17, MINT)
+	location.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var condition := _label(content, "", 17, TEXT)
+	var reason := _label(content, "", 16, AMBER)
+	reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var switch := _button(content)
+	switch.text = "Пересесть"
+	switch.pressed.connect(_request_yard_switch.bind(slot))
+	var sell := _button(content)
+	sell.pressed.connect(_prepare_yard_sale.bind(slot))
+	return {"id": "", "panel": panel, "title": title, "location": location, "condition": condition,
+		"reason": reason, "switch": switch, "sell": sell}
+
+
+func _refresh_yard_hangar() -> void:
+	var stored: Array[Dictionary] = _sim.shipyard_storage()
+	var sale := _yard_record(stored, _yard_sale_id)
+	if sale.is_empty() or not bool(sale.can_sell):
+		_yard_sale_id = ""
+	var confirming := not _yard_sale_id.is_empty()
+	_yard_sale.visible = confirming
+	_yard_stored_browse.visible = not confirming
+	if confirming:
+		_yard_sale_summary.text = "Продать %s? Порт · %s" % [sale.name, _sim.target_name(int(sale.port))]
+		_yard_sale_confirm.text = "Продать за %d кр." % int(sale.sell_price)
+		return
+	var pages := maxi(1, ceili(float(stored.size()) / STORED_HULLS_PER_PAGE))
+	_yard_stored_page = clampi(_yard_stored_page, 0, pages - 1)
+	_yard_stored_status.text = "На хранении · %d из %d" % [stored.size(), _sim.shipyard_storage_limit()]
+	_yard_stored_empty.visible = stored.is_empty()
+	_yard_stored_pager.visible = pages > 1
+	_yard_stored_position.text = "%d / %d" % [_yard_stored_page + 1, pages]
+	_yard_stored_prev.disabled = _yard_stored_page == 0
+	_yard_stored_next.disabled = _yard_stored_page == pages - 1
+	for slot in range(_yard_stored_rows.size()):
+		var index := _yard_stored_page * STORED_HULLS_PER_PAGE + slot
+		var row := _yard_stored_rows[slot]
+		var record := stored[index] if index < stored.size() else {}
+		var id := str(record.get("id", ""))
+		if row.id != id:
+			_touches.clear()
+		row.id = id
+		row.panel.visible = not id.is_empty()
+		if id.is_empty():
+			continue
+		row.title.text = str(record.name)
+		row.location.text = "Порт · %s" % _sim.target_name(int(record.port))
+		row.condition.text = "Состояние корпуса · %.0f%%" % float(record.condition)
+		row.switch.disabled = not bool(record.can_switch)
+		row.sell.disabled = not bool(record.can_sell)
+		row.sell.text = "Продать · %d кр." % int(record.sell_price)
+		_update_yard_reason(row.reason, str(record.switch_reason), str(record.sell_reason), "Пересадка", "Продажа")
+
+
+func _update_yard_reason(label: Label, first: String, second: String, first_action: String, second_action: String) -> void:
+	if first.is_empty() or second.is_empty() or first == second:
+		label.text = first if not first.is_empty() else second
+	else:
+		label.text = "%s: %s\n%s: %s" % [first_action, first, second_action, second]
+	label.visible = not label.text.is_empty()
+
+
+func _yard_record(stored: Array[Dictionary], id: String) -> Dictionary:
+	for record: Dictionary in stored:
+		if record.id == id:
+			return record
+	return {}
+
+
+func _yard_actions_available() -> bool:
+	return is_open() and _station_page == StationPage.YARD and _sim.shipyard_available()
+
+
+func _turn_yard_storage_page(direction: int) -> void:
+	if not _yard_actions_available() or _yard_page != YardPage.HANGAR or not _yard_sale_id.is_empty():
+		return
+	_yard_stored_page += direction
+	_touches.clear()
+	_refresh_yard_hangar()
+
+
+func _request_yard_switch(slot: int) -> void:
+	if not _yard_actions_available() or _yard_page != YardPage.HANGAR or not _yard_sale_id.is_empty():
+		return
+	var row := _yard_stored_rows[slot]
+	if row.switch.is_visible_in_tree() and not row.switch.disabled:
+		_touches.clear()
+		ship_yard_requested.emit("switch", str(row.id))
+
+
+func _prepare_yard_sale(slot: int) -> void:
+	if not _yard_actions_available() or _yard_page != YardPage.HANGAR or not _yard_sale_id.is_empty():
+		return
+	var row := _yard_stored_rows[slot]
+	if row.sell.is_visible_in_tree() and not row.sell.disabled:
+		_yard_sale_id = str(row.id)
+		_touches.clear()
+		_refresh_yard_hangar()
+
+
+func _cancel_yard_sale() -> void:
+	_yard_sale_id = ""
+	_touches.clear()
+	_refresh_yard_hangar()
+
+
+func _confirm_yard_sale() -> void:
+	if not _yard_actions_available() or _yard_page != YardPage.HANGAR or _yard_sale_id.is_empty():
+		return
+	var id := _yard_sale_id
+	_cancel_yard_sale()
+	ship_yard_requested.emit("sell", id)
 
 
 func _build_customs(parent: VBoxContainer) -> void:
@@ -1369,7 +1619,16 @@ func _button_at(point: Vector2) -> Button:
 	elif _station_page == StationPage.CREW:
 		buttons = _crew_buttons
 	elif _station_page == StationPage.YARD:
-		buttons = _yard_rows.map(func(row: Dictionary) -> Button: return row.exchange)
+		buttons = _yard_tabs.values()
+		if _yard_page == YardPage.OFFERS:
+			for row: Dictionary in _yard_rows:
+				buttons.append_array([row.exchange, row.purchase])
+		elif _yard_sale_id.is_empty():
+			buttons.append_array([_yard_stored_prev, _yard_stored_next])
+			for row: Dictionary in _yard_stored_rows:
+				buttons.append_array([row.switch, row.sell])
+		else:
+			buttons.append_array([_yard_sale_cancel, _yard_sale_confirm])
 	elif _station_page == StationPage.CUSTOMS:
 		buttons = [_customs_pay, _law_radio]
 	elif _station_page == StationPage.BERTH:

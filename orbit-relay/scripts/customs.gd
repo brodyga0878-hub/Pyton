@@ -7,7 +7,8 @@ const ShipSystems = preload("res://scripts/ship_systems.gd")
 const Economy = preload("res://scripts/port_economy.gd")
 const VELAR_AUTHORITY := 1
 const MEDICAL_ALLOWANCE := 4
-const MAX_HOLD := ShipSystems.HULLS[ShipSystems.FREIGHTER_HULL].expanded_cargo
+const LEGACY_MAX_HOLD := ShipSystems.HULLS[ShipSystems.FREIGHTER_HULL].expanded_cargo
+const MAX_HOLD := ShipSystems.MAX_CARGO_CAPACITY
 const BASE_FINE := 100
 const UNIT_FINE := 45
 const MAX_DEBT := 1000000000
@@ -75,7 +76,7 @@ func snapshot() -> Dictionary:
 	return {"debts": _debts.duplicate(), "notice": _notice.duplicate(), "violations": _violations}
 
 
-func restore(raw: Variant, epoch: float, pre_assortment := false) -> bool:
+func restore(raw: Variant, epoch: float, pre_assortment := false, pre_large_holds := false) -> bool:
 	if not raw is Dictionary or not _valid_epoch(epoch) or not _has_fields(raw, SAVE_FIELDS):
 		return false
 	if not raw.debts is Array or raw.debts.size() != Factions.FACTIONS.size():
@@ -91,8 +92,9 @@ func restore(raw: Variant, epoch: float, pre_assortment := false) -> bool:
 		debts.append(int(raw.debts[authority]))
 	var notice: Dictionary = {}
 	if violations > 0:
-		notice = _restore_notice(raw.notice, epoch, pre_assortment)
-		var max_seizure := MAX_HOLD - MEDICAL_ALLOWANCE if pre_assortment else MAX_HOLD
+		var hold_limit := LEGACY_MAX_HOLD if pre_assortment or pre_large_holds else MAX_HOLD
+		notice = _restore_notice(raw.notice, epoch, pre_assortment, hold_limit)
+		var max_seizure := hold_limit - MEDICAL_ALLOWANCE if pre_assortment else hold_limit
 		if notice.is_empty() or debts[0] + debts[1] > _fine(max_seizure) * (violations - 1) + int(notice.fine):
 			return false
 	elif not raw.notice.is_empty() or debts[0] + debts[1] != 0:
@@ -103,7 +105,7 @@ func restore(raw: Variant, epoch: float, pre_assortment := false) -> bool:
 	return true
 
 
-static func _restore_notice(raw: Dictionary, epoch: float, pre_assortment: bool) -> Dictionary:
+static func _restore_notice(raw: Dictionary, epoch: float, pre_assortment: bool, hold_limit: int) -> Dictionary:
 	if not _has_fields(raw, NOTICE_FIELDS):
 		return {}
 	if not _valid_integer(raw.authority, 0, Factions.FACTIONS.size() - 1):
@@ -112,9 +114,9 @@ static func _restore_notice(raw: Dictionary, epoch: float, pre_assortment: bool)
 		return {}
 	if pre_assortment and raw.good != "medical":
 		return {}
-	if not _valid_integer(raw.quantity, 1, MAX_HOLD):
+	if not _valid_integer(raw.quantity, 1, hold_limit):
 		return {}
-	if not _valid_violation(int(raw.authority), int(raw.port), raw.good, int(raw.quantity)):
+	if not _valid_violation(int(raw.authority), int(raw.port), raw.good, int(raw.quantity), hold_limit):
 		return {}
 	var fine := _fine(int(raw.quantity))
 	if not _valid_integer(raw.fine, fine, fine):
@@ -128,9 +130,9 @@ static func _restore_notice(raw: Dictionary, epoch: float, pre_assortment: bool)
 		"quantity": int(raw.quantity), "fine": fine, "epoch": issued_at}
 
 
-static func _valid_violation(authority: int, port: int, good: String, quantity: int) -> bool:
+static func _valid_violation(authority: int, port: int, good: String, quantity: int, hold_limit := MAX_HOLD) -> bool:
 	var limit := allowance(authority, good)
-	if limit < 0 or quantity < 1 or quantity > MAX_HOLD - limit or not Catalog.is_port(port):
+	if limit < 0 or quantity < 1 or quantity > hold_limit - limit or not Catalog.is_port(port):
 		return false
 	var system := Catalog.system_of_site(port)
 	if system < Factions.CORE_OWNERS.size():

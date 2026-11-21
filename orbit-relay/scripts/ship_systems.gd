@@ -56,6 +56,9 @@ const STARTER_HULL := "courier"
 const FREIGHTER_HULL := "freighter"
 const SURVEY_HULL := "surveyor"
 const UTILITY_HULL := "utility"
+const INTERCEPTOR_HULL := "interceptor"
+const HAULER_HULL := "hauler"
+const MAX_CARGO_CAPACITY := 80
 const TRADE_IN_PERCENT := 68
 const HULLS := {
 	STARTER_HULL: {"id": STARTER_HULL, "name": "Курьер «Стриж»",
@@ -80,6 +83,16 @@ const HULLS := {
 		"price": 2450, "cargo": 34, "expanded_cargo": 50, "dry_mass": 58.0, "roll_rate": 1.48,
 		"thrust_positive": Vector3(2690.0, 2850.0, 1540.0), "thrust_negative": Vector3(2710.0, 2600.0, 1630.0),
 		"crew_required": 1, "speed_factor": 0.89, "accel_factor": 0.81, "burn_factor": 1.08},
+	INTERCEPTOR_HULL: {"id": INTERCEPTOR_HULL, "name": "Перехватчик «Сокол»",
+		"description": "Перехватчик для одного пилота. Быстро разгоняется и разворачивается, но расходует больше топлива и берёт мало груза.",
+		"price": 2950, "cargo": 12, "expanded_cargo": 22, "dry_mass": 48.0, "roll_rate": 2.70,
+		"thrust_positive": Vector3(1620.0, 1750.0, 2020.0), "thrust_negative": Vector3(1550.0, 1490.0, 2670.0),
+		"crew_required": 0, "speed_factor": 1.23, "accel_factor": 1.29, "burn_factor": 1.32},
+	HAULER_HULL: {"id": HAULER_HULL, "name": "Тяжеловоз «Меридиан»",
+		"description": "Тяжеловоз с самым большим трюмом. Медленно меняет курс и требует двух специалистов.",
+		"price": 3820, "cargo": 58, "expanded_cargo": MAX_CARGO_CAPACITY, "dry_mass": 84.0, "roll_rate": 0.92,
+		"thrust_positive": Vector3(1500.0, 1770.0, 1910.0), "thrust_negative": Vector3(1440.0, 1560.0, 2170.0),
+		"crew_required": 2, "speed_factor": 0.73, "accel_factor": 0.68, "burn_factor": 1.37},
 }
 const LEGACY_SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded"]
 const PRE_SHIELD_SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded"]
@@ -127,7 +140,7 @@ static func profile(id: String) -> Dictionary:
 
 
 static func hull_ids() -> Array[String]:
-	return [STARTER_HULL, FREIGHTER_HULL, SURVEY_HULL, UTILITY_HULL]
+	return [STARTER_HULL, FREIGHTER_HULL, SURVEY_HULL, UTILITY_HULL, INTERCEPTOR_HULL, HAULER_HULL]
 
 
 static func is_cargo_capacity(capacity: int) -> bool:
