@@ -10,6 +10,7 @@ const MINIMUM_NORMAL_COS := cos(deg_to_rad(MAX_LANDING_SLOPE))
 const DRILL_CLEARANCE := 1.05
 const DRILL_MAX_GROUND_DISTANCE_SQUARED := 100.0
 const LAZUR_SPIN_RATE := 0.025
+const MAX_CACHED_PROFILES := 64
 
 
 class Profile:
@@ -27,17 +28,17 @@ class Profile:
 	var spin_period := 0.0
 
 
-static var _profiles: Dictionary[int, Profile] = _build_profiles()
+static var _profiles: Dictionary[int, Profile] = {}
 
 
 static func spin_rate(id: int) -> float:
-	var profile: Profile = _profiles.get(id)
+	var profile := _profile_for(id)
 	return profile.spin_rate if profile != null else 0.0
 
 
 static func spin_basis(id: int, epoch: float) -> Basis:
 	# Body-local to inertial. At the reference epoch the landing pad faces +Z.
-	var profile: Profile = _profiles.get(id)
+	var profile := _profile_for(id)
 	if profile == null or profile.spin_rate == 0.0 or epoch == 0.0 or not is_finite(epoch):
 		return Basis.IDENTITY
 	var angle := fposmod(epoch, profile.spin_period) * profile.spin_rate
@@ -46,14 +47,14 @@ static func spin_basis(id: int, epoch: float) -> Basis:
 
 static func spin_velocity(id: int, world_offset: Vector3) -> Vector3:
 	# Velocity about the center only. Add its orbital velocity in the flight frame.
-	var profile: Profile = _profiles.get(id)
+	var profile := _profile_for(id)
 	if profile == null or profile.spin_rate == 0.0 or not world_offset.is_finite():
 		return Vector3.ZERO
 	return profile.spin_axis.cross(world_offset) * profile.spin_rate
 
 
 static func point(id: int, direction: Vector3) -> Vector3:
-	var profile: Profile = _profiles.get(id)
+	var profile := _profile_for(id)
 	if profile == null:
 		return Vector3.ZERO
 	var unit := _unit(direction)
@@ -61,7 +62,7 @@ static func point(id: int, direction: Vector3) -> Vector3:
 
 
 static func radius_at(id: int, direction: Vector3) -> float:
-	var profile: Profile = _profiles.get(id)
+	var profile := _profile_for(id)
 	if profile == null:
 		return 0.0
 	return _height(profile, _unit(direction))
@@ -69,7 +70,7 @@ static func radius_at(id: int, direction: Vector3) -> float:
 
 static func normal(id: int, direction: Vector3) -> Vector3:
 	var unit := _unit(direction)
-	var profile: Profile = _profiles.get(id)
+	var profile := _profile_for(id)
 	if profile == null or unit == Vector3.BACK:
 		return unit
 	var around := _tangent_basis(unit)
@@ -85,14 +86,14 @@ static func basis(id: int, direction: Vector3) -> Basis:
 
 static func contact(id: int, direction: Vector3) -> Vector3:
 	var unit := _unit(direction)
-	var profile: Profile = _profiles.get(id)
+	var profile := _profile_for(id)
 	if profile == null:
 		return Vector3.ZERO
 	return unit * (_height(profile, unit) + CONTACT_CLEARANCE)
 
 
 static func deposit(id: int, direction: Vector3) -> Transform3D:
-	var profile: Profile = _profiles.get(id)
+	var profile := _profile_for(id)
 	if profile == null:
 		return Transform3D.IDENTITY
 	var unit := _unit(direction)
@@ -116,7 +117,7 @@ static func deposit(id: int, direction: Vector3) -> Transform3D:
 
 
 static func landable(id: int, direction: Vector3) -> bool:
-	if not _profiles.has(id) or not direction.is_finite() or direction.is_zero_approx():
+	if not direction.is_finite() or direction.is_zero_approx() or not Catalog.is_mine_site(id):
 		return false
 	var unit := _unit(direction)
 	return normal(id, unit).dot(unit) >= MINIMUM_NORMAL_COS
@@ -177,50 +178,56 @@ static func _unit(direction: Vector3) -> Vector3:
 	return direction.normalized()
 
 
-static func _build_profiles() -> Dictionary[int, Profile]:
-	var result: Dictionary[int, Profile] = {}
-	for id in range(Catalog.DESTINATION_COUNT):
-		if not Catalog.is_mine_site(id):
-			continue
-		var entry := Catalog.site(id)
-		var profile := Profile.new()
-		profile.kind = entry.kind
-		profile.radius = entry.radius
-		profile.pad_face = float(entry.pad_offset) - CONTACT_CLEARANCE
-		var random := RandomNumberGenerator.new()
-		random.seed = entry.seed
-		profile.morph_phase = random.randf_range(-PI, PI)
-		profile.stretch = Vector3(random.randf_range(0.96, 1.13), random.randf_range(0.83, 1.07), 0.95)
-		profile.wobble = 0.085
-		profile.base_height = 0.90
-		var crater_count := 5
-		match profile.kind:
-			"moon":
-				profile.stretch = Vector3(1.0, 0.98, 1.0)
-				profile.wobble = 0.032
-				profile.base_height = 0.975
-				crater_count = 9
-			"comet":
-				profile.stretch = Vector3(1.24, 0.82, 0.88)
-				profile.wobble = 0.068
-			"planet":
-				profile.stretch = Vector3(1.0, 0.98, 1.0)
-				profile.wobble = 0.026
-				profile.base_height = 0.985
-				crater_count = 7
-		for index in range(crater_count):
-			var angle := TAU * float(index) / crater_count + random.randf_range(-0.17, 0.17)
-			var elevation := random.randf_range(0.08, 0.82) if index % 3 != 2 else random.randf_range(-0.9, -0.25)
-			var reach := sqrt(1.0 - elevation * elevation)
-			profile.crater_directions.append(Vector3(cos(angle) * reach, sin(angle) * reach, elevation))
-			profile.crater_widths.append(random.randf_range(0.12, 0.26))
-		if id == Catalog.GROUND_BODY or Catalog.is_generated_system(Catalog.system_of_site(id)):
-			# A separate seed keeps rotation independent of terrain sampling and its artwork.
-			random.seed = int(entry.seed) ^ 0x5E4F9B2D
-			profile.spin_rate = LAZUR_SPIN_RATE if id == Catalog.GROUND_BODY else random.randf_range(0.025, 0.052)
-			profile.spin_period = TAU / profile.spin_rate
-			var tilt := deg_to_rad(random.randf_range(6.0, 28.0))
-			var azimuth := random.randf_range(0.0, TAU)
-			profile.spin_axis = Vector3(cos(azimuth) * sin(tilt), cos(tilt), sin(azimuth) * sin(tilt)).normalized()
-		result[id] = profile
-	return result
+static func _profile_for(id: int) -> Profile:
+	var profile: Profile = _profiles.get(id)
+	if profile != null or not Catalog.is_mine_site(id):
+		return profile
+	if _profiles.size() >= MAX_CACHED_PROFILES:
+		_profiles.erase(_profiles.keys()[0])
+	profile = _build_profile(id)
+	_profiles[id] = profile
+	return profile
+
+
+static func _build_profile(id: int) -> Profile:
+	var entry := Catalog.site(id)
+	var profile := Profile.new()
+	profile.kind = entry.kind
+	profile.radius = entry.radius
+	profile.pad_face = float(entry.pad_offset) - CONTACT_CLEARANCE
+	var random := RandomNumberGenerator.new()
+	random.seed = entry.seed
+	profile.morph_phase = random.randf_range(-PI, PI)
+	profile.stretch = Vector3(random.randf_range(0.96, 1.13), random.randf_range(0.83, 1.07), 0.95)
+	profile.wobble = 0.085
+	profile.base_height = 0.90
+	var crater_count := 5
+	match profile.kind:
+		"moon":
+			profile.stretch = Vector3(1.0, 0.98, 1.0)
+			profile.wobble = 0.032
+			profile.base_height = 0.975
+			crater_count = 9
+		"comet":
+			profile.stretch = Vector3(1.24, 0.82, 0.88)
+			profile.wobble = 0.068
+		"planet":
+			profile.stretch = Vector3(1.0, 0.98, 1.0)
+			profile.wobble = 0.026
+			profile.base_height = 0.985
+			crater_count = 7
+	for index in range(crater_count):
+		var angle := TAU * float(index) / crater_count + random.randf_range(-0.17, 0.17)
+		var elevation := random.randf_range(0.08, 0.82) if index % 3 != 2 else random.randf_range(-0.9, -0.25)
+		var reach := sqrt(1.0 - elevation * elevation)
+		profile.crater_directions.append(Vector3(cos(angle) * reach, sin(angle) * reach, elevation))
+		profile.crater_widths.append(random.randf_range(0.12, 0.26))
+	if id == Catalog.GROUND_BODY or Catalog.is_generated_system(Catalog.system_of_site(id)):
+		# A separate seed keeps rotation independent of terrain sampling and its artwork.
+		random.seed = int(entry.seed) ^ 0x5E4F9B2D
+		profile.spin_rate = LAZUR_SPIN_RATE if id == Catalog.GROUND_BODY else random.randf_range(0.025, 0.052)
+		profile.spin_period = TAU / profile.spin_rate
+		var tilt := deg_to_rad(random.randf_range(6.0, 28.0))
+		var azimuth := random.randf_range(0.0, TAU)
+		profile.spin_axis = Vector3(cos(azimuth) * sin(tilt), cos(tilt), sin(azimuth) * sin(tilt)).normalized()
+	return profile

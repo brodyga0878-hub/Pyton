@@ -136,15 +136,12 @@ func snapshot() -> Dictionary:
 	return {"scans": scans, "systems": systems}
 
 
-func restore(raw: Variant, epoch: float, pre_procedural := false, pre_binary := false, pre_ground_ports := false,
-		pre_expanded_galaxy := false) -> bool:
+func restore(raw: Variant, epoch: float, pre_procedural := false, system_limit := Catalog.SYSTEM_COUNT,
+		site_limit := Catalog.DESTINATION_COUNT) -> bool:
 	if not _valid_epoch(epoch, MAX_EPOCH) or not raw is Dictionary or raw.size() != (1 if pre_procedural else 2):
 		return false
 	var surveyed_systems: Dictionary[int, float] = {}
 	if not pre_procedural:
-		var system_limit := Catalog.PRE_BINARY_SYSTEM_COUNT if pre_binary else Catalog.SYSTEM_COUNT
-		if not pre_binary and pre_expanded_galaxy:
-			system_limit = Catalog.PRE_EXPANDED_SYSTEM_COUNT
 		var systems: Variant = raw.get("systems")
 		if not systems is Array or systems.size() > system_limit - Catalog.AUTHORED_SYSTEM_COUNT:
 			return false
@@ -157,13 +154,6 @@ func restore(raw: Variant, epoch: float, pre_procedural := false, pre_binary := 
 			previous = int(item.system)
 			surveyed_systems[previous] = float(item.epoch)
 	var scans: Variant = raw.get("scans")
-	var site_limit := Catalog.PRE_BINARY_DESTINATION_COUNT if pre_binary else Catalog.DESTINATION_COUNT
-	if pre_procedural:
-		site_limit = Catalog.AUTHORED_DESTINATION_COUNT
-	elif not pre_binary and pre_ground_ports:
-		site_limit = Catalog.PRE_GROUND_DESTINATION_COUNT
-	elif not pre_binary and pre_expanded_galaxy:
-		site_limit = Catalog.PRE_EXPANDED_DESTINATION_COUNT
 	if not scans is Array or scans.size() > site_limit:
 		return false
 	var restored: Dictionary[int, float] = {}

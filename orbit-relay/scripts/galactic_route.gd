@@ -7,7 +7,7 @@ const Catalog := preload("res://scripts/sector_catalog.gd")
 
 
 static func plan(origin: int, goal: int, known: Array[int], capacity: float, first_budget := INF,
-		tariff: Callable = Callable(), duration: Callable = Callable()) -> Dictionary:
+		tariff: Callable = Callable(), duration: Callable = Callable(), nearby: Callable = Callable()) -> Dictionary:
 	if not _valid_system(origin) or not _valid_system(goal):
 		return _unavailable("Выберите звёздную систему")
 	if origin == goal:
@@ -42,9 +42,13 @@ static func plan(origin: int, goal: int, known: Array[int], capacity: float, fir
 		if current == goal:
 			return describe(label.path, tariff, duration)
 		remaining.erase(current)
+		included.erase(current)
 		# Costs are positive: every prefix of an optimal route settles before its endpoint.
 		var leg_limit := launch_limit if current == origin else capacity
-		for destination: int in remaining:
+		var candidates: Array[int] = nearby.call(current, leg_limit) if nearby.is_valid() else remaining
+		for destination: int in candidates:
+			if not included.has(destination):
+				continue
 			var fuel := _leg_cost(current, destination, tariff)
 			if fuel <= 0 or fuel > leg_limit:
 				continue

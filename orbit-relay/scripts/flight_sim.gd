@@ -34,7 +34,7 @@ const CivilianTraffic = preload("res://scripts/civilian_traffic.gd")
 const PilotCareer = preload("res://scripts/pilot_career.gd")
 const BranchingStory = preload("res://scripts/branching_story.gd")
 const SectorNews = preload("res://scripts/sector_news.gd")
-const SAVE_SCHEMA := 46
+const SAVE_SCHEMA := 47
 const INTERRUPTED_LABELS := {
 	"autopilot": "автопилот", "rig_approach": "заход к буру", "orbit_maneuver": "орбитальный манёвр",
 	"rendezvous": "автоматическое сближение", "patrol_course": "наведение дозора",
@@ -2977,10 +2977,11 @@ func plan_jump(destination: int) -> bool:
 func route_preview(goal: int) -> Dictionary:
 	var known := _known_systems(expedition, cartography)
 	var capacity := ship.jump_capacity()
-	var reachable_first_leg := GalacticRoute.plan(system_id, goal, known, capacity, ship.jump_fuel, jump_tariff, jump_travel_seconds)
+	var nearby := func(origin: int, budget: float) -> Array[int]: return Catalog.jump_candidates(origin, ship.base_jump_budget(budget))
+	var reachable_first_leg := GalacticRoute.plan(system_id, goal, known, capacity, ship.jump_fuel, jump_tariff, jump_travel_seconds, nearby)
 	if reachable_first_leg.available or ship.jump_fuel >= capacity:
 		return reachable_first_leg
-	return GalacticRoute.plan(system_id, goal, known, capacity, INF, jump_tariff, jump_travel_seconds)
+	return GalacticRoute.plan(system_id, goal, known, capacity, INF, jump_tariff, jump_travel_seconds, nearby)
 
 
 func planned_route() -> Dictionary:
@@ -4112,6 +4113,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_atlas := schema < 47
 	var pre_expanded_galaxy := schema < 46
 	var pre_lazur_spin := schema < 45
 	var pre_resume := schema < 44
@@ -4170,7 +4172,9 @@ func restore(state: Dictionary) -> bool:
 		restored_epoch = float(state.orbit_time)
 	var restored_system := Catalog.HOME_SYSTEM
 	var restored_jump := -1
-	var systems := Catalog.PRE_EXPANDED_SYSTEM_COUNT if pre_expanded_galaxy else Catalog.SYSTEM_COUNT
+	var systems := Catalog.PRE_ATLAS_SYSTEM_COUNT if pre_atlas else Catalog.SYSTEM_COUNT
+	if pre_expanded_galaxy:
+		systems = Catalog.PRE_EXPANDED_SYSTEM_COUNT
 	if not pre_galaxy:
 		if pre_binary:
 			systems = Catalog.PRE_BINARY_SYSTEM_COUNT
@@ -4213,7 +4217,9 @@ func restore(state: Dictionary) -> bool:
 		restored_orientation = saved
 	if not _number(state.get("throttle"), 0.0, 1.0):
 		return false
-	var site_count := Catalog.PRE_EXPANDED_DESTINATION_COUNT if pre_expanded_galaxy else Catalog.DESTINATION_COUNT
+	var site_count := Catalog.PRE_ATLAS_DESTINATION_COUNT if pre_atlas else Catalog.DESTINATION_COUNT
+	if pre_expanded_galaxy:
+		site_count = Catalog.PRE_EXPANDED_DESTINATION_COUNT
 	if pre_ground_ports:
 		site_count = Catalog.PRE_GROUND_DESTINATION_COUNT
 	if pre_expansion:
@@ -4268,8 +4274,7 @@ func restore(state: Dictionary) -> bool:
 			if not _site_available(member.origin, restored_expedition):
 				return false
 	if not pre_cartography:
-		if not restored_cartography.restore(state.get("cartography"), restored_epoch, pre_procedural, pre_binary,
-			pre_ground_ports, pre_expanded_galaxy):
+		if not restored_cartography.restore(state.get("cartography"), restored_epoch, pre_procedural, systems, site_count):
 			return false
 		for site: int in restored_cartography.surveyed_sites():
 			if not _site_available(site, restored_expedition, restored_cartography):

@@ -7,6 +7,7 @@ signal galaxy_scan_requested()
 signal dismissed()
 
 const Sector := preload("res://scripts/sector_catalog.gd")
+const GalaxyChart := preload("res://scripts/galaxy_chart.gd")
 const Expedition := preload("res://scripts/expedition.gd")
 const Economy := preload("res://scripts/port_economy.gd")
 const MissionCalendar := preload("res://scripts/mission_calendar.gd")
@@ -16,6 +17,8 @@ const MINT := Color("9debd7")
 const AMBER := Color("f3c991")
 const BORDER := Color("365561")
 const SYSTEMS_PER_PAGE := 6
+const CHART_MOUSE := -2
+const DRAG_THRESHOLD := 12.0
 
 var _insets: MarginContainer
 var _chart: GalaxyChart
@@ -40,8 +43,11 @@ var _cancel_route_button: Button
 var _close_button: Button
 var _dossier_button: Button
 var _scope_button: Button
+var _atlas_button: Button
 var _projection_button: Button
 var _ship_button: Button
+var _zoom_in_button: Button
+var _zoom_out_button: Button
 var _scan_button: Button
 var _scope_label: Label
 var _scan_label: Label
@@ -61,11 +67,16 @@ var _scroll_touch := -1
 var _catalog_buttons: Array[Button] = []
 var _system_buttons: Dictionary[int, Button] = {}
 var _touches: Dictionary[int, Button] = {}
-var _map_touches: Dictionary[int, int] = {}
 var _mouse_catalog_button: Button
+var _chart_pointer := -1
+var _chart_press_point := Vector2.ZERO
+var _chart_last_point := Vector2.ZERO
+var _chart_pressed_system := -1
+var _chart_dragged := false
 var _flight: RefCounted
 var _candidate := -1
 var _sector_focus := -1
+var _atlas := false
 var _elevation := false
 var _system_page := 0
 var _last_scan_count := 0
@@ -202,12 +213,24 @@ func _build_chart(parent: HBoxContainer) -> void:
 	_scope_button.custom_minimum_size.x = 110
 	_scope_button.tooltip_text = "Переключить обзор и ближний вид выбранной системы"
 	_scope_button.pressed.connect(_toggle_scope)
+	_atlas_button = _button(tools, "Атлас", 44)
+	_atlas_button.toggle_mode = true
+	_atlas_button.tooltip_text = "Показать плотность всего звёздного каталога"
+	_atlas_button.pressed.connect(_toggle_atlas)
 	_projection_button = _button(tools, "Вид X/Y", 44)
 	_projection_button.custom_minimum_size.x = 110
 	_projection_button.tooltip_text = "Переключить горизонтальную и боковую проекции"
 	_projection_button.pressed.connect(_toggle_projection)
 	_ship_button = _button(tools, "К кораблю", 44)
 	_ship_button.pressed.connect(_go_to_ship)
+	_zoom_out_button = _button(tools, "−", 44)
+	_zoom_out_button.custom_minimum_size.x = 44
+	_zoom_out_button.tooltip_text = "Уменьшить масштаб карты"
+	_zoom_out_button.pressed.connect(_zoom_chart.bind(1.0 / 1.5))
+	_zoom_in_button = _button(tools, "+", 44)
+	_zoom_in_button.custom_minimum_size.x = 44
+	_zoom_in_button.tooltip_text = "Увеличить масштаб карты"
+	_zoom_in_button.pressed.connect(_zoom_chart.bind(1.5))
 	var gap := Control.new()
 	gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -218,7 +241,6 @@ func _build_chart(parent: HBoxContainer) -> void:
 	_scope_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	_chart = GalaxyChart.new()
 	_chart.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_chart.gui_input.connect(_chart_mouse_input)
 	column.add_child(_chart)
 	_scan_label = _label(column, "", 14, MUTED)
 	_scan_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -250,6 +272,8 @@ func open(sim: RefCounted) -> void:
 	var route: Dictionary = sim.planned_route()
 	_candidate = int(route.goal) if route.get("available", false) else int(sim.system_id)
 	_sector_focus = -1
+	_atlas = false
+	_chart.reset_view()
 	_last_scan_count = 0
 	_collect_known_systems()
 	_page_for_candidate()
@@ -415,15 +439,20 @@ func _refresh_catalog(current: int, goal: int, planned: int) -> void:
 	_next_page_button.disabled = _system_page + 1 >= pages
 	_page_label.text = "%d–%d из %d" % [first + 1, last, systems.size()]
 	_scope_button.text = "Обзор" if _sector_focus >= 0 else "Сектор"
+	_atlas_button.set_pressed_no_signal(_atlas)
 	_projection_button.text = "Вид X/Z" if _elevation else "Вид X/Y"
 	if _sector_focus >= 0:
 		var sector := Sector.sector_coordinates(_sector_focus)
 		_scope_label.text = "Сектор %d / %d · %d × %d св. л. в X/Y · Известно систем: %d" % [
 			sector.x, sector.y, int(Sector.SECTOR_SIZE), int(Sector.SECTOR_SIZE), systems.size()
 		]
+	elif _atlas:
+		_scope_label.text = "Атлас плотности · Систем в каталоге: %d · Открыто: %d" % [Sector.SYSTEM_COUNT, systems.size()]
 	else:
 		_scope_label.text = "Обзор · Известно систем: %d" % systems.size()
+	_chart.set_atlas(_atlas)
 	_chart.set_systems(_known, systems, _sector_focus, _elevation)
+	_update_zoom_buttons()
 
 
 func _refresh_scanner() -> void:
@@ -439,7 +468,17 @@ func _refresh_scanner() -> void:
 func _toggle_scope() -> void:
 	if is_open():
 		_clear_touches()
+		_atlas = false
 		_sector_focus = _candidate if _sector_focus < 0 else -1
+		_page_for_candidate()
+		refresh()
+
+
+func _toggle_atlas() -> void:
+	if is_open():
+		_clear_touches()
+		_atlas = not _atlas
+		_sector_focus = -1
 		_page_for_candidate()
 		refresh()
 
@@ -453,8 +492,22 @@ func _toggle_projection() -> void:
 
 func _go_to_ship() -> void:
 	if is_open():
+		_atlas = false
+		_chart.reset_view()
 		_sector_focus = int(_flight.system_id)
 		_select_system(_sector_focus)
+
+
+func _zoom_chart(factor: float, anchor := Vector2.INF) -> void:
+	if is_open():
+		_clear_touches()
+		_chart.zoom_by(factor, anchor if anchor.is_finite() else _chart.size * 0.5)
+		_update_zoom_buttons()
+
+
+func _update_zoom_buttons() -> void:
+	_zoom_in_button.disabled = not _chart.can_zoom_in()
+	_zoom_out_button.disabled = not _chart.can_zoom_out()
 
 
 func _turn_page(delta: int) -> void:
@@ -658,9 +711,7 @@ func _input(event: InputEvent) -> void:
 	var scroll := _dossier_scroll if _dossier_scroll.visible else _route_scroll
 	if event is InputEventScreenTouch:
 		var button: Button = _touches.get(event.index)
-		var system_id: int = _map_touches.get(event.index, -1)
 		_touches.erase(event.index)
-		_map_touches.erase(event.index)
 		if event.index == _scroll_touch:
 			_scroll_touch = -1
 		if not event.canceled:
@@ -672,25 +723,35 @@ func _input(event: InputEvent) -> void:
 				elif scroll.get_global_rect().has_point(event.position):
 					if _scroll_touch < 0:
 						_scroll_touch = event.index
-				else:
-					var marker := _chart_system_at(event.position)
-					if marker >= 0 and marker not in _map_touches.values():
-						_map_touches[event.index] = marker
+				elif _chart.get_global_rect().has_point(event.position):
+					_begin_chart_gesture(event.index, event.position)
 			elif button != null and button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(event.position):
 				button.pressed.emit()
-			elif system_id >= 0 and _chart_system_at(event.position) == system_id:
-				_select_system(system_id)
+		if not event.pressed and event.index == _chart_pointer:
+			_end_chart_gesture(event.position, event.canceled)
 		get_viewport().set_input_as_handled()
 	elif event is InputEventScreenDrag:
-		if event.index == _scroll_touch:
+		if event.index == _chart_pointer:
+			_move_chart_gesture(event.position)
+		elif event.index == _scroll_touch:
 			scroll.scroll_vertical = maxi(0, scroll.scroll_vertical - roundi(event.relative.y))
 		var button: Button = _touches.get(event.index)
 		if button != null and not button.get_global_rect().has_point(event.position):
 			_touches.erase(event.index)
-		if _map_touches.has(event.index) and _chart_system_at(event.position) != _map_touches[event.index]:
-			_map_touches.erase(event.index)
 		get_viewport().set_input_as_handled()
-	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+	elif event is InputEventMouseMotion and _chart_pointer == CHART_MOUSE:
+		_move_chart_gesture(event.position)
+		get_viewport().set_input_as_handled()
+	elif event is InputEventMouseButton:
+		_mouse_chart_event(event)
+
+
+func _mouse_chart_event(event: InputEventMouseButton) -> void:
+	var over_chart := _chart.get_global_rect().has_point(event.position)
+	if event.pressed and over_chart and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+		_zoom_chart(1.5 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 1.0 / 1.5, _chart_local(event.position))
+		get_viewport().set_input_as_handled()
+	elif event.button_index == MOUSE_BUTTON_LEFT:
 		# A physical button can show a different system after changing pages.
 		var hit := _catalog_button_at(event.position)
 		var held := _mouse_catalog_button
@@ -699,13 +760,38 @@ func _input(event: InputEvent) -> void:
 			hit.pressed.emit()
 		if hit != null or held != null:
 			get_viewport().set_input_as_handled()
+		elif event.pressed and over_chart:
+			_begin_chart_gesture(CHART_MOUSE, event.position)
+			get_viewport().set_input_as_handled()
+		if not event.pressed and _chart_pointer == CHART_MOUSE:
+			_end_chart_gesture(event.position, false)
+			get_viewport().set_input_as_handled()
 
 
-func _chart_mouse_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
-		var id := _chart.system_at(event.position)
-		if id >= 0:
-			_select_system(id)
+func _begin_chart_gesture(pointer: int, point: Vector2) -> void:
+	if _chart_pointer == -1:
+		_chart_pointer = pointer
+		_chart_press_point = _chart_local(point)
+		_chart_last_point = _chart_press_point
+		_chart_pressed_system = _chart.system_at(_chart_press_point)
+		_chart_dragged = false
+
+
+func _move_chart_gesture(point: Vector2) -> void:
+	var local := _chart_local(point)
+	if not _chart_dragged and local.distance_to(_chart_press_point) < DRAG_THRESHOLD:
+		return
+	_chart_dragged = true
+	_chart.pan_by(local - _chart_last_point)
+	_chart_last_point = local
+
+
+func _end_chart_gesture(point: Vector2, canceled: bool) -> void:
+	var keep := not canceled and not _chart_dragged and _chart_pressed_system >= 0
+	var id := _chart_pressed_system
+	_chart_pointer = -1
+	if keep and _chart_system_at(point) == id:
+		_select_system(id)
 
 
 func _notification(what: int) -> void:
@@ -715,15 +801,16 @@ func _notification(what: int) -> void:
 
 func _clear_touches() -> void:
 	_touches.clear()
-	_map_touches.clear()
 	_scroll_touch = -1
 	_mouse_catalog_button = null
+	_chart_pointer = -1
 
 
 func _button_at(point: Vector2) -> Button:
 	for button: Button in [
 		_plan_button, _cancel_route_button, _jump_button, _dossier_button, _close_button,
-		_scope_button, _projection_button, _ship_button, _scan_button, _previous_page_button, _next_page_button
+		_scope_button, _atlas_button, _projection_button, _ship_button, _zoom_in_button, _zoom_out_button,
+		_scan_button, _previous_page_button, _next_page_button
 	]:
 		if not button.disabled and button.get_global_rect().has_point(point):
 			return button
@@ -738,8 +825,11 @@ func _catalog_button_at(point: Vector2) -> Button:
 
 
 func _chart_system_at(point: Vector2) -> int:
-	var local := _chart.get_global_transform_with_canvas().affine_inverse() * point
-	return _chart.system_at(local)
+	return _chart.system_at(_chart_local(point))
+
+
+func _chart_local(point: Vector2) -> Vector2:
+	return _chart.get_global_transform_with_canvas().affine_inverse() * point
 
 
 func _update_insets() -> void:
@@ -814,275 +904,3 @@ static func _style(fill: Color, border: Color, radius: int, padding: float) -> S
 	box.content_margin_top = padding * 0.65
 	box.content_margin_bottom = padding * 0.65
 	return box
-
-
-class GalaxyChart extends Control:
-	const FIELD := Color("081622")
-	const GRID := Color("162c39")
-
-	var current := -1
-	var planned := -1
-	var candidate := -1
-	var jump_capacity := 0.0
-	var jump_tariff: Callable
-	var planned_path: Array[int] = []
-	var preview_path: Array[int] = []
-	var contested: Array[int] = []
-	var _sky := PackedVector3Array()
-	var _known_systems: Array[int] = []
-	var _systems: Array[int] = []
-	var _points: Dictionary[int, Vector2] = {}
-	var _center := Vector2.ZERO
-	var _extent := Vector2.ONE
-	var _label_boxes: Array[Rect2] = []
-	var _detailed := false
-	var _elevation := false
-
-	func _ready() -> void:
-		var random := RandomNumberGenerator.new()
-		random.seed = 77106
-		for i in range(128):
-			_sky.append(Vector3(random.randf(), random.randf(), random.randf()))
-		resized.connect(queue_redraw)
-
-	func set_systems(known: Array[int], systems: Array[int], focus: int, elevation: bool) -> void:
-		_known_systems = known
-		_systems = systems
-		_detailed = focus >= 0
-		_elevation = elevation
-		_points.clear()
-		if _systems.is_empty():
-			return
-		var low := Vector2(INF, INF)
-		var high := Vector2(-INF, -INF)
-		for id in _systems:
-			var coordinates := Sector.system_position3(id)
-			var point := Vector2(coordinates.x, -coordinates.z if elevation else coordinates.y)
-			_points[id] = point
-			low = low.min(point)
-			high = high.max(point)
-		if _detailed:
-			var corner := Vector2(Sector.sector_coordinates(focus)) * Sector.SECTOR_SIZE
-			low.x = corner.x
-			high.x = corner.x + Sector.SECTOR_SIZE
-			if elevation:
-				low.y = minf(low.y, -Sector.SECTOR_SIZE * 0.5)
-				high.y = maxf(high.y, Sector.SECTOR_SIZE * 0.5)
-			else:
-				low.y = corner.y
-				high.y = corner.y + Sector.SECTOR_SIZE
-		_center = (low + high) * 0.5
-		_extent = (high - low).max(Vector2.ONE)
-
-	func marker_position(id: int) -> Vector2:
-		return size * 0.5 + (_points.get(id, _center) - _center) * _pixels_per_light_year()
-
-	func system_at(point: Vector2) -> int:
-		if not Rect2(Vector2.ZERO, size).has_point(point):
-			return -1
-		var nearest := -1
-		var limit := 45.0 * 45.0
-		for id in _systems:
-			var distance := marker_position(id).distance_squared_to(point)
-			if distance <= limit:
-				nearest = id
-				limit = distance
-		return nearest
-
-	func _pixels_per_light_year() -> float:
-		var span := (size - Vector2(210, 200)).max(Vector2.ONE)
-		return minf(span.x / _extent.x, span.y / _extent.y)
-
-	func _draw() -> void:
-		var bounds := Rect2(Vector2.ZERO, size)
-		draw_rect(bounds, FIELD)
-		draw_rect(bounds.grow(-0.5), BORDER, false, 1.0)
-		for step in range(1, 8):
-			var x := size.x * step / 8.0
-			draw_line(Vector2(x, 1), Vector2(x, size.y - 1), GRID)
-		for step in range(1, 6):
-			var y := size.y * step / 6.0
-			draw_line(Vector2(1, y), Vector2(size.x - 1, y), GRID)
-		for star in _sky:
-			var point := Vector2(star.x, star.y) * (size - Vector2.ONE * 18.0) + Vector2.ONE * 9.0
-			draw_circle(point, 0.65 + star.z * 0.95, Color(0.65, 0.80, 1.0, 0.08 + star.z * 0.32), true, -1.0, true)
-		if _detailed:
-			var span := _extent * _pixels_per_light_year()
-			draw_rect(Rect2((size - span) * 0.5, span), BORDER, false, 1.0)
-		var active := _route_path(planned_path, planned)
-		var preview_fallback := -1 if not active.is_empty() and candidate == active[-1] else candidate
-		var preview := _route_path(preview_path, preview_fallback)
-		if preview == active:
-			preview = []
-		_draw_routes(active, preview)
-		for id in _systems:
-			_draw_marker(id, active)
-		_label_boxes.clear()
-		# Route endpoints receive space before optional intermediate captions.
-		var order := _systems.duplicate()
-		order.sort_custom(func(a: int, b: int) -> bool:
-			return _label_priority(a, active, preview) < _label_priority(b, active, preview))
-		for id in order:
-			_draw_label(id, active, preview)
-		_draw_scale()
-		draw_string(ThemeDB.fallback_font, size - Vector2(81, 17), "X →  Z ↑" if _elevation else "X →  Y ↓",
-			HORIZONTAL_ALIGNMENT_LEFT, -1.0, 14, MUTED)
-
-	func _route_path(requested: Array[int], fallback: int) -> Array[int]:
-		var path: Array[int] = requested.duplicate()
-		if path.is_empty() and _known_systems.has(current) and _known_systems.has(fallback) and current != fallback:
-			path = [current, fallback]
-		if path.size() < 2 or path.size() > _known_systems.size() or path[0] != current:
-			return []
-		var visited: Array[int] = []
-		for step in range(path.size()):
-			var id := path[step]
-			if not _known_systems.has(id) or visited.has(id):
-				return []
-			if step > 0 and not _leg_reachable(path[step - 1], id):
-				return []
-			visited.append(id)
-		return path
-
-	func _has_edge(path: Array[int], a: int, b: int) -> bool:
-		for step in range(1, path.size()):
-			if (path[step - 1] == a and path[step] == b) or (path[step - 1] == b and path[step] == a):
-				return true
-		return false
-
-	func _draw_routes(active: Array[int], preview: Array[int]) -> void:
-		if _systems.has(current):
-			for id in _systems:
-				if not _leg_reachable(current, id) or _has_edge(active, current, id) or _has_edge(preview, current, id):
-					continue
-				_draw_leg(current, id, Color("425e69"), 1.1, true, false)
-		for step in range(1, active.size()):
-			_draw_leg(active[step - 1], active[step], MINT, 2.6, false, true)
-		for step in range(1, preview.size()):
-			var shift := 4.0 if _has_edge(active, preview[step - 1], preview[step]) else 0.0
-			_draw_leg(preview[step - 1], preview[step], AMBER, 1.8, true, true, shift)
-
-	func _leg_points(a: int, b: int, shift := 0.0) -> PackedVector2Array:
-		if not _systems.has(a) or not _systems.has(b) or not _leg_reachable(a, b):
-			return PackedVector2Array()
-		var origin := marker_position(a)
-		var end := marker_position(b)
-		var distance := origin.distance_to(end)
-		if distance <= 2.0:
-			return PackedVector2Array()
-		var direction := origin.direction_to(end)
-		var offset := direction.orthogonal() * shift
-		var clearance := minf(37.0, distance * 0.34)
-		return PackedVector2Array([origin + direction * clearance + offset, end - direction * clearance + offset])
-
-	func _leg_reachable(a: int, b: int) -> bool:
-		var units := int(jump_tariff.call(a, b)) if jump_tariff.is_valid() else 0
-		return units > 0 and units <= jump_capacity
-
-	func _draw_leg(a: int, b: int, tint: Color, width: float, dashed: bool, arrow: bool, shift := 0.0) -> void:
-		var points := _leg_points(a, b, shift)
-		if points.is_empty():
-			return
-		var direction := points[0].direction_to(points[1])
-		if dashed:
-			draw_dashed_line(points[0], points[1], tint, width, 7.0, true, true)
-		else:
-			draw_line(points[0], points[1], Color(tint, 0.12), width + 4.0, true)
-			draw_line(points[0], points[1], tint, width, true)
-		if arrow:
-			var length := minf(10.0, points[0].distance_to(points[1]) * 0.45)
-			var side := direction.orthogonal() * length * 0.52
-			var base := points[1] - direction * length
-			draw_colored_polygon(PackedVector2Array([points[1], base + side, base - side]), tint)
-
-	func _draw_marker(id: int, active: Array[int]) -> void:
-		var system := Sector.system(id)
-		var point := marker_position(id)
-		var accent: Color = system.accent
-		var scale := _marker_scale(id, active)
-		draw_circle(point, 32.0 * scale, Color(accent, 0.07), true, -1.0, true)
-		draw_circle(point, 18.0 * scale, Color(accent, 0.16), true, -1.0, true)
-		draw_arc(point, 23.0 * scale, 0.0, TAU, 48, Color(accent, 0.70), 1.2, true)
-		draw_circle(point, 9.0 * scale, accent, true, -1.0, true)
-		draw_circle(point, 4.0 * scale, accent.lerp(Color.WHITE, 0.72), true, -1.0, true)
-		if contested.has(id):
-			var warning := point + Vector2(20, -19)
-			draw_circle(warning, 8.0, FIELD, true, -1.0, true)
-			draw_arc(warning, 6.0, 0.0, TAU, 18, AMBER, 1.5, true)
-			draw_line(warning - Vector2(0, 3), warning, AMBER, 1.4, true)
-			draw_circle(warning + Vector2(0, 2.4), 0.9, AMBER, true, -1.0, true)
-		if id == current:
-			draw_colored_polygon(PackedVector2Array([point + Vector2(0, -43), point + Vector2(6, -34), point + Vector2(-6, -34)]), MINT)
-		if id == candidate:
-			for i in range(4):
-				var angle := i * TAU * 0.25 + 0.15
-				draw_arc(point, 32.0, angle, angle + 1.27, 12, MINT if active.has(id) or id == current else AMBER, 2.2, true)
-		if active.size() > 2 and (id == active[1] or id == active.back()):
-			draw_arc(point, 27.0, 0.0, TAU, 48, MINT, 1.4, true)
-
-	func _marker_scale(id: int, active: Array[int]) -> float:
-		return 0.55 if not _detailed and Sector.is_generated_system(id) and id != current and id != candidate and not active.has(id) else 1.0
-
-	func _label_priority(id: int, active: Array[int], preview: Array[int]) -> int:
-		if id == current:
-			return 0
-		if not active.is_empty() and id == active.back():
-			return 1
-		if active.size() > 2 and id == active[1]:
-			return 2
-		if id == candidate or (not preview.is_empty() and id == preview.back()):
-			return 3
-		return 4 + id
-
-	func _draw_label(id: int, active: Array[int], preview: Array[int]) -> void:
-		var point := marker_position(id)
-		var annotation := ""
-		var tint := MINT
-		if id == current:
-			annotation = "Корабль"
-		elif not active.is_empty() and id == active.back():
-			annotation = "Цель маршрута"
-		elif active.size() > 2 and id == active[1]:
-			annotation = "Следующий"
-		elif active.has(id):
-			annotation = "Переход %d" % active.find(id)
-		elif not preview.is_empty() and id == preview.back():
-			annotation = "Просмотр"
-			tint = AMBER
-		elif id == candidate:
-			annotation = "Выбрано"
-			tint = AMBER
-		var font := ThemeDB.fallback_font
-		var name: String = Sector.system(id).name
-		for sizes: Vector2i in [Vector2i(21, 14), Vector2i(18, 12)]:
-			var name_width := font.get_string_size(name, HORIZONTAL_ALIGNMENT_LEFT, -1.0, sizes.x).x
-			var note_width := font.get_string_size(annotation, HORIZONTAL_ALIGNMENT_LEFT, -1.0, sizes.y).x
-			var extent := Vector2(maxf(name_width, note_width) + 16.0, sizes.x + sizes.y + 11.0 if not annotation.is_empty() else sizes.x + 8.0)
-			for at: Vector2 in [point + Vector2(-extent.x * 0.5, 43.0), point - Vector2(extent.x * 0.5, 54.0 + extent.y), point + Vector2(43.0, -extent.y * 0.5), point - Vector2(43.0 + extent.x, extent.y * 0.5)]:
-				var box := Rect2(at.clamp(Vector2.ONE * 8.0, (size - extent - Vector2.ONE * 8.0).max(Vector2.ONE * 8.0)), extent)
-				var blocked := not Rect2(Vector2.ZERO, size).encloses(box)
-				for other in _label_boxes:
-					blocked = blocked or box.grow(3.0).intersects(other)
-				for system_id in _systems:
-					var scale := _marker_scale(system_id, active)
-					blocked = blocked or box.intersects(Rect2(marker_position(system_id) - Vector2(35, 45) * scale, Vector2(70, 80) * scale))
-				if blocked:
-					continue
-				_label_boxes.append(box)
-				draw_rect(box, FIELD)
-				draw_string(font, box.position + Vector2((extent.x - name_width) * 0.5, sizes.x + 1.0), name, HORIZONTAL_ALIGNMENT_LEFT, -1.0, sizes.x, TEXT)
-				if not annotation.is_empty():
-					draw_string(font, box.position + Vector2((extent.x - note_width) * 0.5, sizes.x + sizes.y + 5.0), annotation, HORIZONTAL_ALIGNMENT_LEFT, -1.0, sizes.y, tint)
-				return
-
-	func _draw_scale() -> void:
-		var pixels := _pixels_per_light_year()
-		var units := 1.0
-		if pixels < 20.0:
-			units = 5.0
-		var left := Vector2(22, 27)
-		var right := left + Vector2(pixels * units, 0)
-		draw_line(left, right, MUTED, 1.0, true)
-		draw_line(left - Vector2(0, 4), left + Vector2(0, 4), MUTED, 1.0, true)
-		draw_line(right - Vector2(0, 4), right + Vector2(0, 4), MUTED, 1.0, true)
-		draw_string(ThemeDB.fallback_font, right + Vector2(10, 5), "%d св. л." % int(units), HORIZONTAL_ALIGNMENT_LEFT, -1.0, 14, MUTED)

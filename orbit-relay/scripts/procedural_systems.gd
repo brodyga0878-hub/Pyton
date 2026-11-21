@@ -14,6 +14,12 @@ const FRONTIER_RADIUS := 4
 const FRONTIER_WIDTH := 2 * FRONTIER_RADIUS + 1
 const OCCUPIED_CORE_SECTORS := [Vector2i.ZERO, Vector2i(0, -1), Vector2i(1, -1)]
 const FRONTIER_SYSTEM_COUNT := FRONTIER_WIDTH * FRONTIER_WIDTH - SECTOR_COUNT - len(OCCUPIED_CORE_SECTORS)
+const ARM_ROOTS := [Vector2i(4, 0), Vector2i(0, 4), Vector2i(-4, -1), Vector2i(-1, -4)]
+const ARM_NAMES := ["Кадир", "Талерис", "Мирас", "Сирин"]
+const ARM_MEMBER_SUFFIXES := ["", "а", "б", "в"]
+const ARM_GROUP_COUNT := 26
+const ARM_GROUP_SIZE := len(ARM_MEMBER_SUFFIXES)
+const OUTER_SYSTEM_COUNT := len(ARM_ROOTS) * ARM_GROUP_COUNT * ARM_GROUP_SIZE
 const NAMES := [
 	"Тальвена", "Ирсавель", "Морикса", "Вестрида", "Ольвенир", "Астрэва",
 	"Ниварис", "Сельтура", "Каэлин", "Дорвейн", "Ярсела", "Энтурин",
@@ -65,6 +71,80 @@ static func build_frontier(first_target: int) -> Dictionary:
 	for site in sites:
 		site.make_read_only()
 	return {"systems": systems, "sites": sites}
+
+
+static func build_outer(first_target: int, frontier: Array[Dictionary]) -> Dictionary:
+	var centers: Array[Vector3] = []
+	var occupied: Array[Vector3] = []
+	for system: Dictionary in frontier:
+		occupied.append(system.position_3d)
+	# Plan the relay chain first so cluster members cannot overlap an upcoming relay.
+	for arm in range(ARM_ROOTS.size()):
+		var position := _arm_origin(frontier, ARM_ROOTS[arm])
+		for group in range(ARM_GROUP_COUNT):
+			var seed := _arm_seed(arm, group, 0)
+			var heading := _arm_heading(arm, group)
+			var step := lerpf(5.9, 8.4, _sample(seed, 0))
+			position += Vector3(cos(heading) * step, sin(heading) * step, 0.0)
+			position.z = lerpf(-0.9, 0.9, _sample(seed, 1))
+			centers.append(position)
+			occupied.append(position)
+
+	var systems: Array[Dictionary] = []
+	var sites: Array[Dictionary] = []
+	for arm in range(ARM_ROOTS.size()):
+		for group in range(ARM_GROUP_COUNT):
+			var center := centers[arm * ARM_GROUP_COUNT + group]
+			for slot in range(ARM_GROUP_SIZE):
+				var seed := _arm_seed(arm, group, slot)
+				var position := center
+				var name := "%s-%02d%s" % [ARM_NAMES[arm], group + 1, ARM_MEMBER_SUFFIXES[slot]]
+				if slot != 0:
+					position = _cluster_member(center, _arm_heading(arm, group), seed, slot, occupied)
+					occupied.append(position)
+				var sector := Vector2i(floori(position.x / SECTOR_SIZE), floori(position.y / SECTOR_SIZE))
+				_append_single(systems, sites, first_target + sites.size(), sector, seed, name, position)
+	for site: Dictionary in sites:
+		site.make_read_only()
+	return {"systems": systems, "sites": sites}
+
+
+static func _arm_origin(frontier: Array[Dictionary], sector: Vector2i) -> Vector3:
+	for system: Dictionary in frontier:
+		if system.sector == sector:
+			return system.position_3d
+	return Vector3.ZERO
+
+
+static func _arm_heading(arm: int, group: int) -> float:
+	var base := Vector2(ARM_ROOTS[arm]).angle()
+	var bend := (0.045 + float(arm) * 0.002) * float(group + 1)
+	return base + bend + sin(float(group) * 0.47 + float(arm)) * 0.13
+
+
+static func _arm_seed(arm: int, group: int, slot: int) -> int:
+	return ((arm + 31) * 9473179 ^ (group + 101) * 29781251 ^ (slot + 1) * 10868519) & 0x7fffffff
+
+
+static func _cluster_member(center: Vector3, heading: float, seed: int, slot: int,
+		occupied: Array[Vector3]) -> Vector3:
+	var bearing := heading + TAU * float(slot) / float(ARM_GROUP_SIZE - 1) + lerpf(-0.55, 0.55, _sample(seed, 0))
+	var best := center
+	var best_clearance := 0.0
+	for attempt in range(16):
+		var angle := bearing + float(attempt) * 2.39996322972865
+		var distance := lerpf(2.2, 5.8, _sample(seed, attempt + 1))
+		var position := center + Vector3(cos(angle) * distance, sin(angle) * distance, lerpf(-2.2, 2.2, _sample(seed, 19)))
+		var clearance := INF
+		for existing: Vector3 in occupied:
+			var offset := existing - position
+			clearance = minf(clearance, offset.x * offset.x + offset.y * offset.y)
+		if clearance >= 2.25:
+			return position
+		if clearance > best_clearance:
+			best_clearance = clearance
+			best = position
+	return best
 
 
 static func _frontier_name(index: int) -> String:

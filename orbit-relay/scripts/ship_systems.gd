@@ -17,6 +17,7 @@ const FUEL_PUMP_RESALE := 55
 const RANGE_DRIVE_COST := 450
 const DRIVE_STANDARD := "standard"
 const DRIVE_RANGE := "range"
+const RANGE_TARIFF_FACTOR := 0.75
 const STANDARD_DRIVE_NAME := "Штатный"
 const RANGE_DRIVE_NAME := "Вектор"
 const PUMP_OFF := "off"
@@ -114,7 +115,12 @@ func select_drive(id: String) -> bool:
 
 
 func jump_tariff(base: int) -> int:
-	return ceili(base * 0.75) if drive_kind == DRIVE_RANGE and base > 0 else base
+	return ceili(base * RANGE_TARIFF_FACTOR) if drive_kind == DRIVE_RANGE and base > 0 else base
+
+
+func base_jump_budget(fuel: float) -> int:
+	var units := floori(fuel)
+	return floori(units / RANGE_TARIFF_FACTOR) if drive_kind == DRIVE_RANGE else units
 
 
 func jump_duration(distance: float, payload: int) -> float:

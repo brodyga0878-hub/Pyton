@@ -28,9 +28,11 @@ func _run() -> void:
 
 
 func _test_catalog() -> void:
-	_expect(Catalog.PRE_EXPANDED_SYSTEM_COUNT == 24 and Catalog.SYSTEM_COUNT == 96
-		and Catalog.PRE_EXPANDED_DESTINATION_COUNT == 89 and Catalog.DESTINATION_COUNT == 305,
-		"The expanded region appends 72 systems and 216 targets after the original IDs")
+	_expect(Catalog.PRE_EXPANDED_SYSTEM_COUNT == 24 and Catalog.PRE_ATLAS_SYSTEM_COUNT == 96
+		and Catalog.PRE_EXPANDED_DESTINATION_COUNT == 89 and Catalog.PRE_ATLAS_DESTINATION_COUNT == 305,
+		"The previous expansion still occupies its original system and target IDs")
+	_expect(Catalog.SYSTEM_COUNT == 512 and Catalog.DESTINATION_COUNT == 1553,
+		"The atlas adds exactly 416 systems and 1248 targets to the previous region")
 	var names := {}
 	var targets := {}
 	var sectors := {}
@@ -51,7 +53,8 @@ func _test_catalog() -> void:
 			targets[target] = true
 		if system >= Catalog.PRE_EXPANDED_SYSTEM_COUNT:
 			var sector := Catalog.sector_coordinates(system)
-			sectors[sector] = true
+			if system < Catalog.PRE_ATLAS_SYSTEM_COUNT:
+				sectors[sector] = true
 			var planet: int = row.mines[0]
 			var ephemeris := Orbit.sample(planet, 123.0)
 			_expect(row.sector == sector and row.targets.size() == 3 and row.ports.is_empty()
