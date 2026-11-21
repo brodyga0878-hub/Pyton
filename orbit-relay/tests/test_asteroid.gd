@@ -23,6 +23,8 @@ func _run() -> void:
 	print("Asteroid integration: %d checks, %d failures" % [_checks, _failures.size()])
 	for failure in _failures:
 		printerr(failure)
+	# Let the headless mixer retire playback after the final scene is freed.
+	await create_timer(0.15).timeout
 	quit(0 if _failures.is_empty() else 1)
 
 
