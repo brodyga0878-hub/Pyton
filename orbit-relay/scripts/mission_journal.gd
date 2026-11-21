@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 signal follow_requested(kind: String)
+signal career_requested()
 signal dismissed()
 
 const Sector = preload("res://scripts/sector_catalog.gd")
@@ -13,7 +14,7 @@ const AMBER := Color("f0c59a")
 const BORDER := Color("355360")
 const PATROL_STEPS := ["Найти источник сигнала", "Перехватить рейдера", "Вернуться с докладом"]
 
-enum Page { WORK, PASSENGERS, RIG }
+enum Page { WORK, PASSENGERS, RIG, CAREER }
 
 var _sim: RefCounted
 var _insets: MarginContainer
@@ -36,9 +37,11 @@ var _patrol_tags: Array[Label] = []
 var _work_page: HBoxContainer
 var _passenger_page: HBoxContainer
 var _rig_page: HBoxContainer
+var _career_page: HBoxContainer
 var _work_tab: Button
 var _passenger_tab: Button
 var _rig_tab: Button
+var _career_tab: Button
 var _rig_title: Label
 var _rig_location: Label
 var _rig_work: Label
@@ -52,6 +55,14 @@ var _passenger_cabins: Label
 var _passenger_payment: Label
 var _passenger_record: Label
 var _passenger_next: Label
+var _combat_title: Label
+var _combat_points: Label
+var _faction_cards: Array[Dictionary] = []
+var _dispatch_route: Label
+var _dispatch_sponsor: Label
+var _dispatch_time: Label
+var _dispatch_hint: Label
+var _career_action: Button
 var _close_button: Button
 var _follow_buttons: Dictionary[String, Button] = {}
 var _touches: Dictionary[int, Button] = {}
@@ -94,12 +105,14 @@ func build() -> void:
 	_work_tab = _button(tabs, "Доставка и дозор")
 	_passenger_tab = _button(tabs, "Пассажиры")
 	_rig_tab = _button(tabs, "Бур")
-	for tab: Button in [_work_tab, _passenger_tab, _rig_tab]:
+	_career_tab = _button(tabs, "Карьера")
+	for tab: Button in [_work_tab, _passenger_tab, _rig_tab, _career_tab]:
 		tab.toggle_mode = true
 		tab.custom_minimum_size.x = 174.0
 	_work_tab.pressed.connect(_show_page.bind(Page.WORK))
 	_passenger_tab.pressed.connect(_show_page.bind(Page.PASSENGERS))
 	_rig_tab.pressed.connect(_show_page.bind(Page.RIG))
+	_career_tab.pressed.connect(_show_page.bind(Page.CAREER))
 	_rig_tab.hide()
 
 	_work_page = HBoxContainer.new()
@@ -116,6 +129,11 @@ func build() -> void:
 	_rig_page.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	page.add_child(_rig_page)
 	_build_rig()
+	_career_page = HBoxContainer.new()
+	_career_page.add_theme_constant_override("separation", 16)
+	_career_page.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	page.add_child(_career_page)
+	_build_career()
 	_show_page(Page.WORK)
 	get_viewport().size_changed.connect(_update_insets)
 	_update_insets()
@@ -144,6 +162,8 @@ func refresh() -> void:
 	_refresh_patrol()
 	_refresh_passengers()
 	_refresh_rig()
+	if _career_page.visible:
+		_refresh_career()
 
 
 func close() -> void:
@@ -212,14 +232,52 @@ func _build_rig() -> void:
 	_add_follow_button(card, "rig")
 
 
+func _build_career() -> void:
+	var standing := _card(_career_page)
+	_combat_title = _label(standing, "", 28, INK)
+	_combat_points = _label(standing, "", 18, MUTED)
+	for _issuer in range(2):
+		var panel := PanelContainer.new()
+		panel.add_theme_stylebox_override("panel", _style(Color("132832"), BORDER, 9, 12))
+		standing.add_child(panel)
+		var faction := VBoxContainer.new()
+		faction.add_theme_constant_override("separation", 5)
+		panel.add_child(faction)
+		var title := _label(faction, "", 22, INK)
+		var ranks := HBoxContainer.new()
+		ranks.add_theme_constant_override("separation", 12)
+		faction.add_child(ranks)
+		var rank := _label(ranks, "", 19, INK)
+		rank.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var trust := _label(ranks, "", 18, MINT)
+		trust.autowrap_mode = TextServer.AUTOWRAP_OFF
+		var access := _label(faction, "", 17, MUTED)
+		_faction_cards.append({"title": title, "rank": rank, "trust": trust, "access": access})
+
+	var board := _card(_career_page)
+	_label(board, "Служебная депеша", 28, INK)
+	_dispatch_route = _label(board, "", 23, INK)
+	_dispatch_sponsor = _label(board, "", 19, MINT)
+	_dispatch_time = _label(board, "", 18, MUTED)
+	_spacer(board)
+	_dispatch_hint = _label(board, "", 18, MUTED)
+	_career_action = _button(board, "")
+	_career_action.pressed.connect(_request_career)
+	_add_follow_button(board, "career")
+
+
 func _show_page(page: Page) -> void:
 	_touches.clear()
 	_work_page.visible = page == Page.WORK
 	_passenger_page.visible = page == Page.PASSENGERS
 	_rig_page.visible = page == Page.RIG
+	_career_page.visible = page == Page.CAREER
 	_work_tab.set_pressed_no_signal(_work_page.visible)
 	_passenger_tab.set_pressed_no_signal(_passenger_page.visible)
 	_rig_tab.set_pressed_no_signal(_rig_page.visible)
+	_career_tab.set_pressed_no_signal(_career_page.visible)
+	if _career_page.visible and is_open():
+		_refresh_career()
 
 
 func _refresh_rig() -> void:
@@ -424,6 +482,65 @@ func _refresh_passengers() -> void:
 	_follow("passenger", caption if status.can_follow else "")
 
 
+func _refresh_career() -> void:
+	var status: Dictionary = _sim.career_status()
+	var factions: Array = status.factions
+	_combat_title.text = "Боевой ранг · %s" % status.combat_title
+	_combat_points.text = "Боевые очки · %d" % int(status.combat_points)
+	for issuer in range(_faction_cards.size()):
+		var card := _faction_cards[issuer]
+		var faction: Dictionary = factions[issuer]
+		card.title.text = faction.name
+		card.rank.text = "%s · %d очк." % [faction.service_title, int(faction.service_points)]
+		card.trust.text = "Доверие %+d" % int(faction.trust)
+		card.trust.add_theme_color_override("font_color", AMBER if int(faction.trust) < 0 else MINT)
+		card.access.text = "Допуск · Служебный курьер" if faction.dispatch_role else str(faction.dispatch_reason)
+		card.access.add_theme_color_override("font_color", MINT if faction.dispatch_role else MUTED)
+
+	var active: bool = status.dispatch.active
+	var dispatch: Dictionary = status.dispatch if active else status.offer
+	var origin := int(dispatch.get("origin", -1))
+	var destination := int(dispatch.get("destination", -1))
+	var issuer := int(dispatch.get("issuer", -1))
+	var routed := Sector.is_port(origin) and Sector.is_port(destination)
+	_dispatch_route.visible = routed
+	_dispatch_sponsor.visible = routed and issuer >= 0 and issuer < factions.size()
+	_dispatch_time.visible = routed
+	if routed:
+		_dispatch_route.text = "«%s» → «%s»" % [_sim.target_name(origin), _sim.target_name(destination)]
+		if _dispatch_sponsor.visible:
+			_dispatch_sponsor.text = "%s · %d кр." % [factions[issuer].name, int(dispatch.reward)]
+		if active:
+			var remaining := ceili(float(dispatch.remaining))
+			_dispatch_time.text = "Срок · %s · %d с" % [MissionCalendar.stamp(float(dispatch.deadline)), remaining]
+			_dispatch_time.add_theme_color_override("font_color", AMBER if remaining <= 60 else MUTED)
+		else:
+			_dispatch_time.text = "Срок после приёма · %d с" % int(dispatch.duration)
+			_dispatch_time.add_theme_color_override("font_color", MUTED)
+
+	var allowed: bool = dispatch.get("allowed", false)
+	_career_action.text = "Сдать депешу" if active else "Принять депешу"
+	_career_action.visible = bool(status.can_submit) if active else routed
+	_career_action.disabled = _sim.jump_seconds_left > 0.0 or not (status.can_submit if active else allowed)
+	_dispatch_hint.text = ""
+	if active and not status.can_submit:
+		_dispatch_hint.text = "Сдайте депешу в порту назначения."
+	elif not active and not allowed:
+		_dispatch_hint.text = dispatch.get("reason", "Пришвартуйтесь в порту фракции, чтобы взять депешу.")
+	_dispatch_hint.visible = not _dispatch_hint.text.is_empty()
+	var route_caption := "Курс к порту" if Sector.system_of_site(destination) == _sim.system_id else "Проложить прыжок"
+	_follow("career", route_caption if active and status.can_follow else "")
+
+
+func _request_career() -> void:
+	if not is_open() or not _career_action.is_visible_in_tree() or _career_action.disabled:
+		return
+	var status: Dictionary = _sim.career_status()
+	if status.can_submit or (not status.dispatch.active and status.offer.get("allowed", false)):
+		_touches.clear()
+		career_requested.emit()
+
+
 func _follow(kind: String, caption: String) -> void:
 	var button := _follow_buttons[kind]
 	button.text = caption
@@ -468,9 +585,11 @@ func _input(event: InputEvent) -> void:
 func _button_at(point: Vector2) -> Button:
 	if _close_button.get_global_rect().has_point(point):
 		return _close_button
-	for tab: Button in [_work_tab, _passenger_tab, _rig_tab]:
+	for tab: Button in [_work_tab, _passenger_tab, _rig_tab, _career_tab]:
 		if tab.is_visible_in_tree() and tab.get_global_rect().has_point(point):
 			return tab
+	if _career_action.is_visible_in_tree() and not _career_action.disabled and _career_action.get_global_rect().has_point(point):
+		return _career_action
 	for button: Button in _follow_buttons.values():
 		if button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(point):
 			return button

@@ -31,7 +31,8 @@ const CombatSystems = preload("res://scripts/combat_systems.gd")
 const Ground = preload("res://scripts/ground_port.gd")
 const SpeedHold = preload("res://scripts/speed_hold.gd")
 const CivilianTraffic = preload("res://scripts/civilian_traffic.gd")
-const SAVE_SCHEMA := 40
+const PilotCareer = preload("res://scripts/pilot_career.gd")
+const SAVE_SCHEMA := 41
 const REMOTE_RIG_ACCESS_DISTANCE := 20.0
 const MINING_PULSE_RANGE := 200.0
 const MINING_PULSE_FUEL := 0.4
@@ -151,6 +152,7 @@ var remote_rig := UnattendedMining.new()
 var orbital_mining := OrbitalMining.new()
 var combat := CombatSystems.new()
 var ambient := CivilianTraffic.new()
+var career := PilotCareer.new()
 var _mining_beam: Dictionary = {}
 var convoy_course := false
 var project_course := false
@@ -174,6 +176,7 @@ var credits := 0
 var deliveries := 0
 var contract_stage := 0
 var contract_origin := -1
+var _contract_issuer := -1
 var contract_destination := -1
 var contract_route_id := ""
 var contract_leg := -1
@@ -848,6 +851,7 @@ func accept_courier(route_id: String) -> bool:
 	if offer.is_empty() or offer.id != route_id or contract_stage == 1:
 		return false
 	contract_origin = docked
+	_contract_issuer = factions.owner(system_id)
 	contract_stage = 1
 	contract_route_id = route_id
 	contract_leg = 0
@@ -884,6 +888,8 @@ func contract_action() -> bool:
 		var reward := contract_reward()
 		credits += reward
 		deliveries += 1
+		career.note_delivery(_contract_issuer)
+		_contract_issuer = -1
 		contract_stage = 2
 		_announce("delivery", "Груз принят. Начислено %d кр." % reward)
 	else:
@@ -891,6 +897,7 @@ func contract_action() -> bool:
 		contract_route_id = ""
 		contract_leg = -1
 		contract_origin = docked
+		_contract_issuer = factions.owner(system_id)
 		contract_destination = offer_destination()
 		if Catalog.system_of_site(contract_destination) == system_id:
 			target = contract_destination
@@ -1579,7 +1586,9 @@ func _inspect_docked_cargo() -> void:
 	if excess <= 0 or not mining.remove_cargo(good, excess):
 		return
 	var result := customs.record(authority, docked, good, excess, orbit_time)
-	if not _apply_service_result(result):
+	if _apply_service_result(result):
+		career.note_customs_violation(authority)
+	else:
 		mining.insert_cargo(good, excess)
 
 
@@ -1739,6 +1748,39 @@ func _apply_service_result(result: Dictionary) -> bool:
 		return false
 	credits += int(result.credits)
 	_announce(result.event, result.message)
+	return true
+
+
+func career_status() -> Dictionary:
+	var result := career.status()
+	var dispatch := career.dispatch_status(orbit_time)
+	var service := station_services_available()
+	var destination := int(dispatch.destination)
+	result.dispatch = dispatch
+	result.offer = career.dispatch_offer(factions.owner(system_id), docked, _default_port(docked), orbit_time) if service else {}
+	result.can_submit = service and dispatch.active and docked == destination
+	result.can_follow = dispatch.active and docked != destination and jump_seconds_left <= 0.0 and not _departure_requested
+	return result
+
+
+func career_dispatch_action() -> bool:
+	if not station_services_available():
+		return false
+	var dispatch := career.dispatch_status(orbit_time)
+	if dispatch.active:
+		return _apply_service_result(career.finish_dispatch(docked, orbit_time))
+	return _apply_service_result(career.accept_dispatch(factions.owner(system_id), docked, _default_port(docked), orbit_time))
+
+
+func career_follow() -> bool:
+	var status := career_status()
+	if not status.can_follow:
+		return false
+	var destination := int(status.dispatch.destination)
+	var sector := Catalog.system_of_site(destination)
+	if not (select_target(destination) if sector == system_id else plan_route(sector)):
+		return false
+	_announce("career_dispatch_course", "Курс служебной депеши на «%s»." % target_name(destination))
 	return true
 
 
@@ -2069,10 +2111,12 @@ func patrol_action() -> bool:
 			if payment <= 0:
 				return false
 			credits += payment
+			career.note_patrol_report(docked)
 			_announce("patrol_paid", "Доклад принят. Награда %d кр." % payment)
 		else:
 			if not patrol.accept(docked):
 				return false
+			career.note_patrol_accept(factions.owner(system_id), docked)
 			_announce("patrol_accepted", "Дозор принят. После старта выберите «К сигналу».")
 	elif patrol.phase == Patrol.RETURN:
 		select_target(patrol.origin)
@@ -2117,6 +2161,8 @@ func _apply_ambient_result(result: Dictionary) -> void:
 	var event := str(result.get("event", ""))
 	if event.is_empty():
 		return
+	if event == "ambient_victory":
+		career.note_ambient_victory()
 	if event == "ambient_engaged":
 		reset_time_scale()
 		if not patrol.in_danger(self) and not convoy_order.in_danger(self):
@@ -2138,6 +2184,8 @@ func _apply_patrol_result(result: Dictionary) -> void:
 		if event == "patrol_engaged":
 			combat.reset_salvos()
 			_stop_convoy_course()
+		elif event == "patrol_victory":
+			career.note_patrol_victory()
 		if patrol_course:
 			patrol_course = false
 			throttle = 0.0
@@ -2153,6 +2201,8 @@ func _apply_convoy_result(result: Dictionary) -> void:
 		return
 	if event in ["convoy_order_escorted", "convoy_order_paid", "convoy_order_failed"]:
 		_stop_convoy_course()
+	if event in ["convoy_order_paid", "convoy_order_failed"]:
+		career.note_convoy_result(convoy_order.faction, convoy_order.target_faction, convoy_order.kind, event == "convoy_order_paid")
 	credits += int(result.get("credits", 0))
 	if result.get("damage", 0.0) > 0.0:
 		_apply_hostile_beam(event, result)
@@ -3154,6 +3204,7 @@ func _advance_background_clock(delta: float) -> void:
 func _advance_mission_deadlines() -> void:
 	_apply_service_result(passengers.advance(orbit_time))
 	_apply_service_result(crew.advance(orbit_time, credits))
+	_apply_service_result(career.advance(orbit_time))
 
 
 func _advance_front(epoch: float) -> void:
@@ -3872,6 +3923,7 @@ func snapshot() -> Dictionary:
 		"departure_requested": _departure_requested, "departure_seconds": _departure_seconds,
 		"credits": credits, "deliveries": deliveries,
 		"contract_stage": contract_stage, "contract_origin": contract_origin,
+		"contract_issuer": _contract_issuer,
 		"contract_destination": contract_destination,
 		"contract_route_id": contract_route_id, "contract_leg": contract_leg,
 		"landed_site": landed_site, "planned_target": planned_target, "mining": mining.snapshot(),
@@ -3888,7 +3940,7 @@ func snapshot() -> Dictionary:
 		"cartography": cartography.snapshot(), "frame": frame.snapshot(), "customs": customs.snapshot(),
 		"remote_rig": remote_rig.snapshot(), "orbital_mining": orbital_mining.snapshot(),
 		"combat": combat.snapshot(),
-		"ambient": ambient.snapshot(),
+		"ambient": ambient.snapshot(), "career": career.snapshot(),
 		"speed_hold": speed_hold.snapshot(),
 	}
 
@@ -3897,6 +3949,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_career := schema < 41
 	var pre_ambient_traffic := schema < 40
 	var pre_speed_hold := schema < 39
 	var pre_ground_ports := schema < 38
@@ -4129,6 +4182,33 @@ func restore(state: Dictionary) -> bool:
 		return false
 	if restored_patrol.origin >= 0 and not _site_available(restored_patrol.origin, restored_expedition):
 		return false
+	var restored_career := PilotCareer.new()
+	var active_patrol := restored_patrol.phase in [Patrol.OUTBOUND, Patrol.ENGAGED, Patrol.RETURN]
+	var report_only := restored_patrol.phase == Patrol.RETURN
+	var restored_contract_issuer := -1
+	if pre_career:
+		if active_patrol:
+			var sponsor := restored_factions.owner(Catalog.system_of_site(restored_patrol.origin))
+			restored_career.note_patrol_accept(sponsor, restored_patrol.origin, report_only)
+		if stage == 1:
+			restored_contract_issuer = restored_factions.owner(Catalog.system_of_site(origin))
+	else:
+		var career_state: Variant = state.get("career")
+		if not restored_career.restore(career_state, restored_epoch):
+			return false
+		if not _integer(state.get("contract_issuer"), -1, FactionFronts.FACTIONS.size() - 1):
+			return false
+		restored_contract_issuer = int(state.contract_issuer)
+		if stage != 1 and restored_contract_issuer != -1:
+			return false
+		var has_patrol_record: bool = not career_state.patrol.is_empty()
+		if active_patrol != has_patrol_record:
+			return false
+		if active_patrol and (int(career_state.patrol.origin) != restored_patrol.origin or career_state.patrol.victory != report_only):
+			return false
+		var dispatch := restored_career.dispatch_status(restored_epoch)
+		if dispatch.active and (not _site_available(int(dispatch.origin), restored_expedition) or not _site_available(int(dispatch.destination), restored_expedition)):
+			return false
 	var mining_count := Catalog.SITE_COUNT if pre_galaxy else site_count
 	if schema >= 2 and not restored_mining.restore(state.get("mining"), schema == 2, mining_count, restored_ship.cargo_capacity(), not pre_economy, pre_dual_fuel):
 		return false
@@ -4349,6 +4429,7 @@ func restore(state: Dictionary) -> bool:
 	orbital_mining = restored_orbital_mining
 	combat = restored_combat
 	ambient = restored_ambient
+	career = restored_career
 	speed_hold = restored_speed
 	_mining_beam.clear()
 	star_heat = 0.0 if pre_thermal else float(state.star_heat)
@@ -4367,6 +4448,7 @@ func restore(state: Dictionary) -> bool:
 	deliveries = int(state.deliveries)
 	contract_stage = stage
 	contract_origin = origin
+	_contract_issuer = restored_contract_issuer
 	contract_destination = destination
 	contract_route_id = route_id
 	contract_leg = leg

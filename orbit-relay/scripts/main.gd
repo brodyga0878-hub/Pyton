@@ -90,6 +90,7 @@ func _ready() -> void:
 	add_child(_journal)
 	_journal.build()
 	_journal.follow_requested.connect(_follow_journal)
+	_journal.career_requested.connect(_career_dispatch)
 	_journal.dismissed.connect(_close_journal)
 	add_child(_frontier)
 	_frontier.build()
@@ -422,6 +423,7 @@ func _deliver_notice() -> void:
 		"convoy_order_accepted", "convoy_order_escorted", "convoy_order_failed", "convoy_order_paid",
 		"convoy_order_fire", "convoy_order_enemy_hit",
 		"ambient_engaged", "ambient_fire", "ambient_enemy_hit", "ambient_victory",
+		"career_dispatch_accepted", "career_dispatch_paid", "career_dispatch_expired", "career_dispatch_course",
 		"flight_assist", "reference_frame", "time_paused", "time_resumed", "autopilot_equipment", "speed_hold_on", "speed_hold_off",
 		"survey_record", "galaxy_scan", "customs_inspection", "customs_paid",
 		"orbit_start", "orbit_complete", "orbit_abort", "orbit_cancel",
@@ -914,6 +916,8 @@ func _follow_journal(kind: String) -> void:
 		selected = flight.passenger_follow()
 	elif kind == "rig":
 		selected = flight.track_remote_rig()
+	elif kind == "career":
+		selected = flight.career_follow()
 	if not selected:
 		_journal.refresh()
 		return
@@ -922,6 +926,15 @@ func _follow_journal(kind: String) -> void:
 		_save()
 	else:
 		_deliver_notice()
+	_update_display(0.0)
+
+
+func _career_dispatch() -> void:
+	if not _journal.is_open():
+		return
+	flight.career_dispatch_action()
+	_deliver_notice()
+	_journal.refresh()
 	_update_display(0.0)
 
 
