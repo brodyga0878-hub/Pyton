@@ -10,6 +10,7 @@ const Economy := preload("res://scripts/port_economy.gd")
 const Rig := preload("res://scripts/mining_rig.gd")
 const FirstMoon := Catalog.PRE_RICH_SYSTEMS_DESTINATION_COUNT
 const FirstGiant := FirstMoon + 1
+const GasBypassCase := 1564 # Талерис-07б approaches the skimming entry from behind the giant.
 
 var _checks := 0
 var _failures := 0
@@ -101,7 +102,7 @@ func _test_lunar_flight() -> void:
 
 
 func _test_giant_flight() -> void:
-	var giant := FirstGiant
+	var giant := GasBypassCase
 	var flight := _near_body(giant, 45.0, 140.0)
 	if not _expect(flight != null, "Seed a discovered gas-giant system"):
 		return

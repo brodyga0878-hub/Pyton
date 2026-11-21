@@ -3849,6 +3849,8 @@ func _autopilot_step(delta: float) -> void:
 	var ground := Ground.is_port(target)
 	var needs_clearance := port_run and (not ground or Ground.is_hangar(target))
 	var target_radius := Catalog.stellar_clearance(target) if star_run else float(Catalog.site(target).radius)
+	var atmosphere := Atmosphere.profile(target)
+	var bypass_radius := target_radius + float(atmosphere.height) if gas_run else target_radius
 	var center := target_position(target)
 	var gate := target_gate(target)
 	var surface_frame := Ground.basis(target, orbit_time) if ground else Terrain.spin_basis(target, orbit_time)
@@ -3909,8 +3911,8 @@ func _autopilot_step(delta: float) -> void:
 		autopilot_phase = "К зоне сбора" if scoop_run else "К створу"
 		# Approach a station from the front. The side waypoint keeps a return
 		# journey from crossing the station hull from behind.
-		var front_clearance := target_radius + 22.0 if mining_site or gas_run else 34.0
-		var side_clearance := maxf(84.0, target_radius + 42.0)
+		var front_clearance := bypass_radius + 22.0 if mining_site or gas_run else 34.0
+		var side_clearance := maxf(84.0, bypass_radius + 42.0)
 		if ground and approach_offset.z < 34.0:
 			waypoint = center + landing_normal * 50.0
 			drift = surface_velocity(target, waypoint)
@@ -3971,8 +3973,8 @@ func _autopilot_step(delta: float) -> void:
 	if not _approach_committed and direction.length_squared() > 0.25:
 		aim = direction.normalized()
 
-	var atmosphere := Atmosphere.profile(target)
-	if not atmosphere.is_empty() and _departure_leg == 0 and relative.dot(direction) < 0.0:
+	var in_gas_layer := gas_run and relative.length_squared() <= bypass_radius * bypass_radius
+	if not atmosphere.is_empty() and _departure_leg == 0 and (relative.dot(direction) < 0.0 or in_gas_layer):
 		var clearance := maxf(0.0, relative.length() - target_radius - float(atmosphere.height))
 		var entry_limit := sqrt(Atmosphere.SAFE_ENTRY_SPEED * Atmosphere.SAFE_ENTRY_SPEED + 64.0 * clearance)
 		if entry_limit < max_speed:
