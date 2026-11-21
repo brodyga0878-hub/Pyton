@@ -76,9 +76,16 @@ func _test_takeoff_and_cold_load() -> void:
 	air._launch()
 	air.position = Vector3(310.0, 4000.0, 8500.0)
 	air.velocity = Vector3.ZERO
-	_expect(air.time_status().allowed and air.time_status().max_rate == 16
-		and air.cycle_time_scale() and air.cycle_time_scale() and air.cycle_time_scale() and air.time_scale == 1,
-		"In-flight controls cannot select stationary 64× or 256× simulation")
+	_expect(air.time_status().allowed and air.time_status().max_rate == 64
+		and air.cycle_time_scale() and air.cycle_time_scale() and air.cycle_time_scale() and air.time_scale == 64,
+		"An unobstructed coast can accelerate to 64× while 256× stays reserved for stops")
+	var coast_start := air.orbit_time
+	air.update(0.25, Vector2.ZERO, 0.0, false, false)
+	_expect(is_equal_approx(air.orbit_time, coast_start + 16.0), "Fast coasting advances the physical and mission clock")
+	air.position = air.target_position(1) + Vector3.BACK * 220.0
+	air.update(STEP, Vector2.ZERO, 0.0, false, false)
+	_expect(air.time_scale == 1 and air.time_status().max_rate <= 16,
+		"Entering the approach safety envelope stops high-rate coasting before collision")
 
 
 func _test_time_button() -> void:

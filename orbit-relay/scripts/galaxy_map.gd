@@ -15,6 +15,7 @@ const Expedition := preload("res://scripts/expedition.gd")
 const Economy := preload("res://scripts/port_economy.gd")
 const MissionCalendar := preload("res://scripts/mission_calendar.gd")
 const SystemDossier := preload("res://scripts/system_dossier.gd")
+const NamedSystems := preload("res://scripts/named_systems.gd")
 const TEXT := Color("e8f4fa")
 const MUTED := Color("a5bac7")
 const MINT := Color("9debd7")
@@ -24,7 +25,7 @@ const SYSTEMS_PER_PAGE := 6
 const CHART_MOUSE := -2
 const DRAG_THRESHOLD := 12.0
 
-enum DossierPage { OVERVIEW, TRADE }
+enum DossierPage { OVERVIEW, TRADE, ARCHIVE }
 
 var _insets: MarginContainer
 var _chart: GalaxyChart
@@ -69,6 +70,7 @@ var _scan_label: Label
 var _page_label: Label
 var _previous_page_button: Button
 var _next_page_button: Button
+var _directory_button: Button
 var _route_scroll: ScrollContainer
 var _route_details: VBoxContainer
 var _dossier_layout: VBoxContainer
@@ -83,7 +85,10 @@ var _dossier_customs_rule: Label
 var _dossier_stock: Label
 var _dossier_imports: Label
 var _dossier_exports: Label
+var _dossier_secondary: Label
 var _dossier_observations: Label
+var _dossier_archive_title: Label
+var _dossier_archive_text: Label
 var _scroll_touch := -1
 var _catalog_buttons: Array[Button] = []
 var _system_buttons: Dictionary[int, Button] = {}
@@ -99,6 +104,7 @@ var _flight: RefCounted
 var _candidate := -1
 var _sector_focus := -1
 var _atlas := false
+var _directory := false
 var _elevation := false
 var _system_page := 0
 var _last_scan_count := 0
@@ -319,6 +325,9 @@ func _build_pager(parent: VBoxContainer) -> void:
 	_next_page_button.add_theme_font_size_override("font_size", 24)
 	_next_page_button.tooltip_text = "Следующая страница систем"
 	_next_page_button.pressed.connect(_turn_page.bind(1))
+	_directory_button = _button(pager, "Именные", 44)
+	_directory_button.toggle_mode = true
+	_directory_button.pressed.connect(_toggle_directory)
 
 
 func open(sim: RefCounted) -> void:
@@ -329,6 +338,7 @@ func open(sim: RefCounted) -> void:
 	_candidate = int(route.goal) if route.get("available", false) else int(sim.system_id)
 	_sector_focus = -1
 	_atlas = false
+	_directory = false
 	_chart.reset_view()
 	_last_scan_count = 0
 	_collect_known_systems()
@@ -391,7 +401,7 @@ func refresh() -> void:
 				_affiliation.text += " · Строится станция"
 	_description.text = str(selected.description)
 	_distance.text = "%s св. л." % _decimal(float(preview.distance)) if available else "—"
-	var jump_fuel: float = _flight.ship.jump_fuel
+	var jump_fuel: float = drive.reserve
 	_fuel.text = "%s / %d ед." % [_decimal(jump_fuel), roundi(_chart.jump_capacity)]
 	_cost.text = "%d ед." % int(preview.fuel) if available else "—"
 	_drive.text = "%s · %s т · до %s св. л." % [
@@ -501,12 +511,17 @@ func _scope_systems() -> Array[int]:
 
 
 func _page_for_candidate() -> void:
-	var index := _scope_systems().find(_candidate)
+	var index := _listed_systems().find(_candidate)
 	_system_page = maxi(0, floori(float(index) / SYSTEMS_PER_PAGE))
 
 
+func _listed_systems() -> Array[int]:
+	return _known.filter(func(id: int) -> bool: return id in NamedSystems.IDS) if _directory else _scope_systems()
+
+
 func _refresh_catalog(current: int, goal: int, planned: int) -> void:
-	var systems := _scope_systems()
+	var scoped := _scope_systems()
+	var systems := _listed_systems()
 	var pages := maxi(1, ceili(float(systems.size()) / SYSTEMS_PER_PAGE))
 	_system_page = clampi(_system_page, 0, pages - 1)
 	var first := _system_page * SYSTEMS_PER_PAGE
@@ -535,20 +550,23 @@ func _refresh_catalog(current: int, goal: int, planned: int) -> void:
 	_previous_page_button.disabled = _system_page == 0
 	_next_page_button.disabled = _system_page + 1 >= pages
 	_page_label.text = "%d–%d из %d" % [first + 1, last, systems.size()]
+	_directory_button.set_pressed_no_signal(_directory)
+	_directory_button.text = "Все" if _directory else "Именные"
+	_directory_button.tooltip_text = "Показать все открытые системы" if _directory else "Открыть справочник известных именных систем"
 	_scope_button.text = "Обзор" if _sector_focus >= 0 else "Сектор"
 	_atlas_button.set_pressed_no_signal(_atlas)
 	_projection_button.text = "Вид X/Z" if _elevation else "Вид X/Y"
 	if _sector_focus >= 0:
 		var sector := Sector.sector_coordinates(_sector_focus)
 		_scope_label.text = "Сектор %d / %d · %d × %d св. л. в X/Y · Известно систем: %d" % [
-			sector.x, sector.y, int(Sector.SECTOR_SIZE), int(Sector.SECTOR_SIZE), systems.size()
+			sector.x, sector.y, int(Sector.SECTOR_SIZE), int(Sector.SECTOR_SIZE), scoped.size()
 		]
 	elif _atlas:
-		_scope_label.text = "Атлас плотности · Систем в каталоге: %d · Открыто: %d" % [Sector.SYSTEM_COUNT, systems.size()]
+		_scope_label.text = "Атлас плотности · Систем в каталоге: %d · Открыто: %d" % [Sector.SYSTEM_COUNT, scoped.size()]
 	else:
-		_scope_label.text = "Обзор · Известно систем: %d" % systems.size()
+		_scope_label.text = "Обзор · Известно систем: %d" % scoped.size()
 	_chart.set_atlas(_atlas)
-	_chart.set_systems(_known, systems, _sector_focus, _elevation)
+	_chart.set_systems(_known, scoped, _sector_focus, _elevation)
 	_update_zoom_buttons()
 
 
@@ -634,6 +652,15 @@ func _turn_page(delta: int) -> void:
 		refresh()
 
 
+func _toggle_directory() -> void:
+	if not is_open():
+		return
+	_clear_touches()
+	_directory = not _directory
+	_page_for_candidate()
+	refresh()
+
+
 func _scan_galaxy() -> void:
 	if is_open() and not _scan_button.disabled:
 		_clear_touches()
@@ -667,7 +694,7 @@ func _build_dossier(parent: Control) -> void:
 	var pages := VBoxContainer.new()
 	pages.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_dossier_scroll.add_child(pages)
-	for title: String in ["Сведения", "Торговля"]:
+	for title: String in ["Сведения", "Торговля", "Архив"]:
 		var tab := _button(tabs, title, 44)
 		tab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		tab.toggle_mode = true
@@ -695,12 +722,18 @@ func _build_dossier(parent: Control) -> void:
 	_dossier_customs_rule = _dossier_text(_dossier_customs)
 	_dossier_customs_rule.add_theme_color_override("font_color", AMBER)
 	_dossier_customs.hide()
-	_label(trade, "Основные товары на складах", 17, MINT)
+	_label(trade, "Складские остатки по категориям", 17, MINT)
 	_dossier_stock = _dossier_text(trade)
 	_label(trade, "Импорт в пути", 17, MINT)
 	_dossier_imports = _dossier_text(trade)
 	_label(trade, "Экспорт в пути", 17, MINT)
 	_dossier_exports = _dossier_text(trade)
+	_label(trade, "Второстепенные потребности и производство", 17, MINT)
+	_dossier_secondary = _dossier_text(trade)
+	var archive := _dossier_pages[DossierPage.ARCHIVE]
+	_dossier_archive_title = _label(archive, "", 20, MINT)
+	_dossier_archive_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_dossier_archive_text = _dossier_text(archive)
 	_show_dossier(false)
 
 
@@ -710,20 +743,33 @@ func _refresh_dossier() -> void:
 	_dossier_customs.visible = not _dossier_customs_rule.text.is_empty()
 	if not system.known:
 		for label: Label in [_dossier_stars, _dossier_population, _dossier_ports, _dossier_observations,
-				_dossier_stock, _dossier_imports, _dossier_exports]:
+				_dossier_stock, _dossier_imports, _dossier_exports, _dossier_secondary, _dossier_archive_text]:
 			label.text = "Сведения о системе ещё не получены."
+		_dossier_archive_title.text = ""
 		return
 	_dossier_stars.text = _stellar_summary(system.stars)
 	_dossier_population.text = "%s\n%s\n%s" % [system.population, system.economy, system.authority]
+	var inhabitants: Vector2i = system.population_range
+	if inhabitants.y > 0:
+		_dossier_population.text += "\nПостоянные вахты · %d–%d человек" % [inhabitants.x, inhabitants.y]
+	if not str(system.regime).is_empty():
+		_dossier_population.text += "\n" + str(system.regime)
+	var archive: Array = system.archive
+	_dossier_archive_title.text = str(archive[0]) if not archive.is_empty() else "Описание системы"
+	_dossier_archive_text.text = "\n\n".join(archive.slice(1)) if not archive.is_empty() else str(system.description)
 	var ports := PackedStringArray()
 	for port: int in system.ports:
 		ports.append(str(Sector.site(port).name))
 	_dossier_ports.text = " · ".join(ports) if not ports.is_empty() else "Действующих портов нет."
 	var stock := PackedStringArray()
-	for good: String in Economy.LEGACY_GOODS:
-		if system.goods.has(good):
-			stock.append("%s %d" % [Economy.good_name(good), int(system.goods[good])])
-	_dossier_stock.text = " · ".join(stock) if not stock.is_empty() else "Действующих портовых рынков нет."
+	for group in range(Economy.GROUPS.size()):
+		var items := PackedStringArray()
+		for good: String in Economy.goods_for_group(group):
+			if system.goods.has(good):
+				items.append("%s %d" % [Economy.good_name(good), int(system.goods[good])])
+		if not items.is_empty():
+			stock.append("%s · %s" % [Economy.GROUPS[group], ", ".join(items)])
+	_dossier_stock.text = "\n".join(stock) if not stock.is_empty() else "Действующих портовых рынков нет."
 	_dossier_imports.text = _shipment_list(system.imports, "origin")
 	_dossier_exports.text = _shipment_list(system.exports, "destination")
 	var flows := _port_supply_flows(system.ports)
@@ -731,6 +777,10 @@ func _refresh_dossier() -> void:
 		_dossier_imports.text += "\nПортам нужны: " + ", ".join(flows.imports)
 	if not flows.exports.is_empty():
 		_dossier_exports.text += "\nМестное производство: " + ", ".join(flows.exports)
+	_dossier_secondary.text = "Потребности · %s\nПроизводство · %s" % [
+		", ".join(flows.secondary_imports) if not flows.secondary_imports.is_empty() else "—",
+		", ".join(flows.secondary_exports) if not flows.secondary_exports.is_empty() else "—",
+	] if not system.ports.is_empty() else "Действующих портовых рынков нет."
 	var observations := PackedStringArray([
 		"Обследовано %d из %d." % [int(system.scan_count), int(system.target_count)]
 	])
@@ -776,11 +826,12 @@ func _port_supply_flows(ports: Array) -> Dictionary:
 	ranked.sort_custom(func(a: String, b: String) -> bool:
 		return absi(int(supply[a])) > absi(int(supply[b])) if absi(int(supply[a])) != absi(int(supply[b])) else a < b)
 	for good: String in ranked:
-		if supply[good] < 0 and imports.size() < 3:
+		if supply[good] < 0:
 			imports.append(Economy.good_name(good))
-		elif supply[good] > 0 and exports.size() < 3:
+		elif supply[good] > 0:
 			exports.append(Economy.good_name(good))
-	return {"imports": imports, "exports": exports}
+	return {"imports": imports.slice(0, 3), "exports": exports.slice(0, 3),
+		"secondary_imports": imports.slice(3), "secondary_exports": exports.slice(3)}
 
 
 func _toggle_dossier() -> void:
@@ -1042,7 +1093,7 @@ func _button_at(point: Vector2) -> Button:
 		_plan_button, _cancel_route_button, _jump_button, _emergency_button, _echo_track, _echo_analyze,
 		_dossier_button, _close_button,
 		_scope_button, _atlas_button, _projection_button, _drag_button, _ship_button, _zoom_in_button, _zoom_out_button,
-		_scan_button, _previous_page_button, _next_page_button
+		_scan_button, _previous_page_button, _next_page_button, _directory_button
 	]:
 		if button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(point):
 			return button

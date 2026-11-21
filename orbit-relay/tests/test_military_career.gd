@@ -150,6 +150,7 @@ func _test_interception() -> void:
 		"The military report pays its own contract without a second bounty")
 	var old := checkpoint.duplicate(true)
 	old.schema = 49
+	Fixture.remove_schema_51_from_legacy(old)
 	Fixture.remove_extended_career_from_legacy(old)
 	Fixture.remove_ordnance_from_legacy(old)
 	var migrated := Flight.new()

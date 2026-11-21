@@ -164,6 +164,7 @@ void fragment() {
 	float span = max(0.0, finish - start);
 	float optical = 0.0;
 	float daylight = 0.0;
+	float low_haze = 0.0;
 	float steps = profile == 0 ? 3.0 : (profile == 1 ? 5.0 : 7.0);
 	for (int i = 0; i < 7; i++) {
 		if (float(i) >= steps) break;
@@ -172,16 +173,22 @@ void fragment() {
 		float depth = clamp((air_height - altitude) / max(1.0, air_height), 0.0, 1.0);
 		float density = depth * depth;
 		optical += density;
+		low_haze += density * density;
 		daylight += density * smoothstep(-0.24, 0.50, dot(normalize(point), sun_direction));
 	}
 	float light = daylight / max(optical, 0.0001);
+	float haze_fraction = low_haze / max(optical, 0.0001);
 	optical *= span / (steps * max(1.0, air_height));
 	float opacity = min(0.48, 1.0 - exp(-optical * air_density * 0.46));
 	float view_sun = dot(ray, sun_direction);
 	float phase = 0.72 + 0.28 * view_sun * view_sun;
 	vec3 color = air_color.rgb * (0.18 + light * 0.82) * phase;
 	float sunset = (1.0 - abs(light * 2.0 - 1.0)) * max(0.0, dot(ray, sun_direction));
-	color = mix(color, vec3(0.93, 0.53, 0.27), sunset * 0.22);
+	// Dense lower air scatters more forward light than the upper limb.
+	float forward_glow = pow(max(0.0, view_sun), 6.0) * haze_fraction * light;
+	float haze_mix = clamp(sunset * (0.17 + haze_fraction * 0.21) + forward_glow * 0.22, 0.0, 0.45);
+	color = mix(color, vec3(0.98, 0.63, 0.37), haze_mix);
+	opacity = min(0.48, opacity + forward_glow * opacity * 0.18);
 	if (profile > 0) {
 		vec3 p = normalize(origin + ray * (start + span * 0.5));
 		float strands = sin(p.x * 39.0 + p.z * 25.0 + sin(p.y * 31.0) * 1.8 + time_now * 0.018);

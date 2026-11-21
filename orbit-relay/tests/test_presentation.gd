@@ -11,6 +11,7 @@ const SessionIO := preload("res://scripts/session_io.gd")
 const DEFAULTS := {
 	"quality": 1, "sensitivity": 1, "layout": 0, "notification_volume": 2,
 	"invert_yaw": 0, "invert_pitch": 0, "effects_volume": 2, "music_volume": 1, "music_mode": 0,
+	"language": 0,
 }
 
 var _viewport: SubViewport
@@ -52,6 +53,8 @@ func _test_preferences() -> void:
 		"Changing the horizontal axis leaves the vertical setting alone")
 	_expect(settings.change("invert_pitch", 1) and settings.invert_yaw == 1,
 		"Changing the vertical axis leaves the horizontal setting alone")
+	_expect(settings.change("language", 1) and settings.language == 1,
+		"Changing the cockpit language is independent of controls and audio")
 	var changed := settings.snapshot()
 	for invalid: Variant in [null, [], {"quality": 2}, {"quality": 2, "sensitivity": 1, "layout": 1, "extra": 1},
 		{"quality": 3, "sensitivity": 1, "layout": 1}, {"quality": 0, "sensitivity": 1.25, "layout": 0},
@@ -93,7 +96,12 @@ func _test_preferences() -> void:
 	_expect(SessionIO.save_state(version_096, path) == OK and reloaded.load_preferences(path)
 		and reloaded.snapshot() == DEFAULTS.merged(version_096, true),
 		"A 0.96 preference file retains both inverted axes and supplies the new audio defaults")
-	for field: String in ["effects_volume", "music_volume", "music_mode"]:
+	var version_097 := DEFAULTS.merged(version_096, true)
+	version_097.erase("language")
+	_expect(SessionIO.save_state(version_097, path) == OK and reloaded.load_preferences(path)
+		and reloaded.language == 0 and reloaded.invert_pitch == 1,
+		"A preference file from before bilingual UI keeps its choices and defaults to Russian")
+	for field: String in ["effects_volume", "music_volume", "music_mode", "language"]:
 		var invalid := reloaded.snapshot()
 		invalid[field] = Settings.OPTIONS[field].size()
 		_expect(not reloaded.restore(invalid) and reloaded.snapshot() == DEFAULTS.merged(version_096, true),
@@ -147,7 +155,8 @@ func _test_settings_scene() -> void:
 	_tap(game._settings._choice_buttons["invert_pitch"][1], "Toggle vertical inversion using a real touch")
 	var saved_settings: Dictionary = game.presentation.snapshot()
 	_expect(saved_settings == {"quality": 0, "sensitivity": 0, "layout": 1, "notification_volume": 1,
-		"invert_yaw": 1, "invert_pitch": 1, "effects_volume": 0, "music_volume": 3, "music_mode": 1}
+		"invert_yaw": 1, "invert_pitch": 1, "effects_volume": 0, "music_volume": 3, "music_mode": 1,
+		"language": 0}
 		and game._audio.level == 1 and game._audio.effects_level == 0
 		and game._audio.music.level == 3 and game._audio.music.mode == 1,
 		"The accepted choices are reflected in the running game")

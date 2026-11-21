@@ -3,6 +3,10 @@ extends CanvasLayer
 signal follow_requested(kind: String)
 signal career_requested(kind: String)
 signal story_requested(action: String)
+signal subscription_requested(id: String)
+signal calendar_wait_requested(epoch: float)
+signal operations_requested()
+signal rig_selected(slot: int)
 signal dismissed()
 
 const Sector = preload("res://scripts/sector_catalog.gd")
@@ -60,6 +64,7 @@ var _rig_work: Label
 var _rig_stock: Label
 var _rig_reserve: Label
 var _rig_hint: Label
+var _rig_slots: Array[Button] = []
 var _passenger_route: Label
 var _passenger_status: Label
 var _passenger_deadline: Label
@@ -87,6 +92,7 @@ var _story_route: Label
 var _story_date: Label
 var _story_choices: GridContainer
 var _story_options: Array[Dictionary] = []
+var _operations_button: Button
 var _close_button: Button
 var _follow_buttons: Dictionary[String, Button] = {}
 var _touches: Dictionary[int, Button] = {}
@@ -169,6 +175,8 @@ func build() -> void:
 	_news_page = NewsJournal.new()
 	page.add_child(_news_page)
 	_news_page.story_requested.connect(_show_page.bind(Page.STORY))
+	_news_page.subscription_requested.connect(subscription_requested.emit)
+	_news_page.calendar_wait_requested.connect(calendar_wait_requested.emit)
 	_show_page(Page.WORK)
 	get_viewport().size_changed.connect(_update_insets)
 	_update_insets()
@@ -263,6 +271,14 @@ func _build_passengers() -> void:
 
 func _build_rig() -> void:
 	var card := _card(_rig_page)
+	var selector := HBoxContainer.new()
+	selector.add_theme_constant_override("separation", 8)
+	card.add_child(selector)
+	for slot in range(3):
+		var button := _button(selector, "")
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.pressed.connect(func() -> void: rig_selected.emit(slot))
+		_rig_slots.append(button)
 	_rig_title = _label(card, "", 29, INK)
 	_rig_location = _label(card, "", 19, MINT)
 	_rig_work = _label(card, "", 20, INK)
@@ -340,6 +356,8 @@ func _build_story() -> void:
 		var detail := _label(choice, "", 17, MUTED)
 		_story_options.append({"row": choice, "button": button, "detail": detail})
 	_add_follow_button(card, "story")
+	_operations_button = _button(card, "Особые операции")
+	_operations_button.pressed.connect(func() -> void: operations_requested.emit())
 
 
 func _show_page(page: Page) -> void:
@@ -366,9 +384,23 @@ func _show_page(page: Page) -> void:
 
 func _refresh_rig() -> void:
 	var status: Dictionary = _sim.remote_rig_status()
-	_rig_tab.visible = status.active
+	var fleet: Array = _sim.rig_fleet_status()
+	_rig_tab.visible = status.active or fleet.size() > 1
+	for index in range(_rig_slots.size()):
+		var button := _rig_slots[index]
+		button.visible = fleet.size() > 1 and index < fleet.size()
+		if button.visible:
+			button.text = fleet[index].name
+			button.disabled = fleet[index].selected
 	if not status.active:
-		if _rig_page.visible:
+		_rig_title.text = "Выбранный бур на борту"
+		_rig_location.text = ""
+		_rig_stock.text = ""
+		_rig_reserve.text = ""
+		_rig_work.text = ""
+		_rig_hint.text = "После посадки на месторождение оставьте выбранный бур на поверхности."
+		_follow("rig", "")
+		if not _rig_tab.visible and _rig_page.visible:
 			_show_page(Page.WORK)
 		return
 	_rig_title.text = "Бур на «%s»" % status.name
@@ -767,6 +799,9 @@ func _request_follow(kind: String) -> void:
 func _input(event: InputEvent) -> void:
 	if not is_open():
 		return
+	if _news_page.visible and _news_page.scroll_touch(event):
+		get_viewport().set_input_as_handled()
+		return
 	if event is InputEventScreenTouch:
 		var button: Button = _touches.get(event.index)
 		_touches.erase(event.index)
@@ -793,6 +828,11 @@ func _button_at(point: Vector2) -> Button:
 			return tab
 	if _news_page.visible:
 		return _news_page.button_at(point)
+	if _operations_button.is_visible_in_tree() and _operations_button.get_global_rect().has_point(point):
+		return _operations_button
+	for button: Button in _rig_slots:
+		if button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(point):
+			return button
 	for button: Button in _career_buttons.values():
 		if button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(point):
 			return button
@@ -828,6 +868,10 @@ func _update_insets() -> void:
 	_insets.add_theme_constant_override("margin_top", ceili(insets.y))
 	_insets.add_theme_constant_override("margin_right", ceili(insets.z))
 	_insets.add_theme_constant_override("margin_bottom", ceili(insets.w))
+	var available := get_viewport().get_visible_rect().size.x - insets.x - insets.z
+	var tab_width := 126.0 if available < 960.0 else 174.0
+	for tab: Button in [_work_tab, _passenger_tab, _rig_tab, _career_tab, _story_tab, _news_tab]:
+		tab.custom_minimum_size.x = tab_width
 
 
 static func _card(parent: Control) -> VBoxContainer:

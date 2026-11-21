@@ -16,6 +16,7 @@ var _failures: Array[String] = []
 func _initialize() -> void:
 	_test_request_zone()
 	_test_hatch_passage()
+	_test_rotating_arm_collision()
 	_test_freight_wait()
 	_test_expiry_and_retarget()
 	_test_save_and_reload()
@@ -81,6 +82,23 @@ func _test_hatch_passage() -> void:
 		"An ordinary launch waits for its own authorization after inbound capture")
 	_expect(Fixture.await_departure(flight) and _distance_along_axis(flight, PORT) > Access.HATCH_AXIS_OFFSET,
 		"The outbound passage finishes beyond the hatch")
+
+
+func _test_rotating_arm_collision() -> void:
+	var flight := Flight.new()
+	var center := flight.target_position(PORT)
+	var arm := Vector3(18.0, 0.0, -4.0).rotated(Vector3.BACK, flight.station_angle(PORT))
+	var gap := Vector3(14.0, 14.0, -4.0).rotated(Vector3.BACK, flight.station_angle(PORT))
+	_expect(flight._obstacle_at(center + arm) == PORT and not flight._blocked(center + gap),
+		"The rotating port arm is solid while open space between the arms permits passage")
+	flight.elapsed += PI / 4.0 / float(Catalog.site(PORT).spin)
+	_expect(not flight._blocked(center + arm), "The same point clears when the actual station arm rotates away")
+	var ring := flight.target_position(3)
+	var ring_angle := flight.station_angle(3)
+	var rim := Vector3(18.0, 0.0, -4.8).rotated(Vector3.BACK, ring_angle)
+	var inner_gap := Vector3(12.0, 0.0, -4.8).rotated(Vector3.BACK, ring_angle)
+	_expect(flight._obstacle_at(ring + rim) == 3 and not flight._blocked(ring + inner_gap),
+		"The ring blocks at the physical rim and has a free interior gap between spokes")
 
 
 func _test_freight_wait() -> void:

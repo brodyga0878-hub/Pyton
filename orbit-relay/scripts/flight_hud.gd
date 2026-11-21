@@ -11,6 +11,7 @@ const Ground := preload("res://scripts/ground_port.gd")
 const Patrol := preload("res://scripts/patrol_encounter.gd")
 const MissionCalendar := preload("res://scripts/mission_calendar.gd")
 const FlightCamera := preload("res://scripts/flight_camera.gd")
+const Text := preload("res://scripts/flight_text.gd")
 const FlightScanner := preload("res://scripts/flight_scanner_view.gd")
 const INK := Color("eef8ff")
 const MUTED := Color("a7bac9")
@@ -38,6 +39,9 @@ const RIG_ACTIONS := {
 	"rig_retrieve": "can_retrieve", "rig_route": "can_route",
 }
 const ORBITAL_MINING_ACTIONS := {"mining_pulse": "fire_ok", "fragment_collect": "collect_ok"}
+const PROCESSOR_ACTIONS := {
+	"processor_deploy": "can_deploy", "processor_feed": "can_feed", "processor_unload": "can_unload",
+	"processor_retrieve": "can_retrieve", "processor_route": "can_route"}
 
 var _hud: Control
 var _safe: Control
@@ -58,6 +62,9 @@ var _rig_status: Dictionary = {}
 var _orbital_mining_readout: Label
 var _orbital_mining_tools: HBoxContainer
 var _orbital_mining_status: Dictionary = {}
+var _processor_status: Dictionary = {}
+var _processor_readout: HBoxContainer
+var _processor_summary: Label
 var _telemetry: Label
 var _condition: Label
 var _fuel: Label
@@ -69,6 +76,11 @@ var _ordnance_tools: HBoxContainer
 var _missile_blocked := true
 var _missile_next_blocked := true
 var _decoy_blocked := true
+var _pulse_blocked := true
+var _in_escape := false
+var _rescue_signal_blocked := true
+var _rescue_panel: PanelContainer
+var _rescue_caption: Label
 var _combat_weapon: Label
 var _combat_shield_status: Label
 var _combat_shield: ProgressBar
@@ -107,7 +119,12 @@ var _throttle_controls: GridContainer
 var _port_tools: HBoxContainer
 var _navigation_drawer: PanelContainer
 var _navigation_switches: HBoxContainer
+var _navigation_cameras: HBoxContainer
+var _navigation_hint: Label
+var _navigation_title: Label
 var _navigation_list: ItemList
+var _navigation_computer_ready := true
+var _missile_camera_ready := false
 var _navigation_corridor_enabled := false
 var _navigation_sites: Array[int] = []
 var _navigation_blockers: Array[Control] = []
@@ -123,7 +140,7 @@ var _combat_lock := ""
 var _scanner_range := 1400.0
 var _mapper_fitted := false
 var _scanner_can_lock := false
-var _combat_lock_presses: Dictionary[int, String] = {}
+var _contact_action_presses: Dictionary[int, String] = {}
 var _actions: Dictionary = {}
 var _touch_owner: Dictionary = {}
 var _steer_finger := -1
@@ -197,6 +214,14 @@ func build() -> void:
 	_button(_rig_readout, "rig_route", "К буру")
 	_actions["rig_route"].size_flags_horizontal = Control.SIZE_SHRINK_END
 	_rig_readout.hide()
+	_processor_readout = HBoxContainer.new()
+	_processor_readout.add_theme_constant_override("separation", 8)
+	route_stack.add_child(_processor_readout)
+	_processor_summary = _label(_processor_readout, 16, CYAN)
+	_processor_summary.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_processor_summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_button(_processor_readout, "processor_route", "К лаборатории")
+	_processor_readout.hide()
 	_orbital_mining_readout = _label(route_stack, 16, CYAN)
 	_orbital_mining_readout.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_orbital_mining_readout.hide()
@@ -207,9 +232,10 @@ func build() -> void:
 	_button(shortcuts, "journal", "Журнал")
 	_button(shortcuts, "settings", "Настройки")
 	_button(shortcuts, "frontier", "Освоение")
-	_button(shortcuts, "navigation_toggle", "Цели")
+	_button(shortcuts, "navigation_toggle", Text.text("NAV_SHORTCUT"))
 	_button(shortcuts, "recon", "Съёмка")
-	for action: String in ["journal", "settings", "frontier", "navigation_toggle", "recon"]:
+	_button(shortcuts, "comms", Text.text("LINK_SHORTCUT"))
+	for action: String in ["journal", "settings", "frontier", "navigation_toggle", "recon", "comms"]:
 		var button: Button = _actions[action]
 		button.custom_minimum_size.y = 48.0
 		button.add_theme_font_size_override("font_size", 16)
@@ -335,6 +361,11 @@ func build() -> void:
 	_button(commands, "rig_unload", "Выгрузить")
 	_button(commands, "rig_retrieve", "Забрать бур")
 	_actions["rig_retrieve"].tooltip_text = "Вернуть пустой бур на борт"
+	_button(commands, "processor_deploy", "Установить лабораторию")
+	_actions["processor_deploy"].tooltip_text = "Переработать 2 ед. льда и 1 ед. зерна"
+	_button(commands, "processor_feed", "Загрузить сырьё")
+	_button(commands, "processor_unload", "Забрать медикаменты")
+	_button(commands, "processor_retrieve", "Забрать лабораторию")
 	_button(commands, "sell_ore", "Продать сырьё")
 
 	var right := _panel(_safe, Vector2(1, 1), ACTION_COLUMN)
@@ -394,14 +425,22 @@ func build() -> void:
 	ecm.add_theme_stylebox_override("normal", _box(Color("443323"), AMBER, 9, 7.0))
 	ecm.hide()
 	_ordnance_tools = HBoxContainer.new()
-	_ordnance_tools.add_theme_constant_override("separation", 7)
+	_ordnance_tools.add_theme_constant_override("separation", 4)
 	right.add_child(_ordnance_tools)
 	_button(_ordnance_tools, "missile_next", "Место")
 	_button(_ordnance_tools, "missile_fire", "Пуск")
 	_button(_ordnance_tools, "decoy", "Ловушка")
-	for action: String in ["missile_next", "missile_fire", "decoy"]:
-		_actions[action].add_theme_font_size_override("font_size", 16)
+	_button(_ordnance_tools, "energy_pulse", "Импульс")
+	for action: String in ["missile_next", "missile_fire", "decoy", "energy_pulse"]:
+		var control: Button = _actions[action]
+		control.add_theme_font_size_override("font_size", 16)
+		for state: String in ["normal", "hover", "pressed"]:
+			var skin := control.get_theme_stylebox(state)
+			skin.set_content_margin(SIDE_LEFT, 2.0)
+			skin.set_content_margin(SIDE_RIGHT, 2.0)
 	_ordnance_tools.hide()
+	_button(right, "rescue_eject", "Покинуть корабль")
+	_actions["rescue_eject"].hide()
 	_orbital_mining_tools = HBoxContainer.new()
 	_orbital_mining_tools.add_theme_constant_override("separation", 7)
 	right.add_child(_orbital_mining_tools)
@@ -420,14 +459,25 @@ func build() -> void:
 	_notice.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_notice_panel.hide()
 	_build_navigation_drawer()
+	_build_rescue_panel()
 	_navigation_blockers.assign([
 		course_card, shortcuts, instrument_stack.get_parent(), _steer, _bank, _camera_controls,
 		_flight_modes, _translation_controls, _commands_panel, _right_panel, _notice_panel,
-		_docking_panel, _surface_panel, _navigation_drawer,
+		_docking_panel, _surface_panel, _navigation_drawer, _rescue_panel,
 	])
 	get_viewport().size_changed.connect(_update_safe_area)
 	_update_safe_area()
 	_apply_touch_layout()
+
+func _build_rescue_panel() -> void:
+	var body := _panel(_safe, Vector2(0.5, 0.5), Rect2(-222, -108, 444, 164))
+	_rescue_panel = body.get_parent() as PanelContainer
+	var title := _label(body, 24, AMBER)
+	title.text = "Спасательная капсула"
+	_rescue_caption = _label(body, 18, INK)
+	_rescue_caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_button(body, "rescue_signal", "Передать сигнал бедствия")
+	_rescue_panel.hide()
 
 func _build_navigation_drawer() -> void:
 	var stack := _panel(_safe, Vector2(0.5, 0.5), Rect2(-240, -176, 480, 330))
@@ -436,11 +486,10 @@ func _build_navigation_drawer() -> void:
 	var header := HBoxContainer.new()
 	header.add_theme_constant_override("separation", 6)
 	stack.add_child(header)
-	var title := _label(header, 21, CYAN)
-	title.text = "Объекты системы"
-	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_button(header, "scanner_toggle", "Сканер")
-	_button(header, "navigation_close", "Закрыть")
+	_navigation_title = _label(header, 21, CYAN)
+	_navigation_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_button(header, "scanner_toggle", Text.text("SCANNER"))
+	_button(header, "navigation_close", Text.text("NAV_CLOSE"))
 	_actions["navigation_close"].size_flags_horizontal = Control.SIZE_SHRINK_END
 	_actions["scanner_toggle"].size_flags_horizontal = Control.SIZE_SHRINK_END
 	_navigation_switches = HBoxContainer.new()
@@ -449,7 +498,12 @@ func _build_navigation_drawer() -> void:
 	_button(_navigation_switches, "object_labels", "")
 	_button(_navigation_switches, "navigation_corridor", "")
 	_button(_navigation_switches, "ship_markers", "")
-	for action: String in ["navigation_close", "scanner_toggle", "object_labels", "navigation_corridor", "ship_markers"]:
+	_navigation_cameras = HBoxContainer.new()
+	_navigation_cameras.add_theme_constant_override("separation", 6)
+	stack.add_child(_navigation_cameras)
+	_button(_navigation_cameras, "camera_observer", Text.text("CAMERA_OBSERVER"))
+	_button(_navigation_cameras, "camera_missile", Text.text("CAMERA_MISSILE"))
+	for action: String in ["navigation_close", "scanner_toggle", "object_labels", "navigation_corridor", "ship_markers", "camera_observer", "camera_missile"]:
 		_actions[action].add_theme_font_size_override("font_size", 16)
 		_actions[action].custom_minimum_size.y = 46.0
 	_actions["object_labels"].tooltip_text = "Показывать названия объектов и контактов поверх сцены"
@@ -463,7 +517,11 @@ func _build_navigation_drawer() -> void:
 	_navigation_list.add_theme_stylebox_override("panel", _box(Color("102730"), LINE, 8, 8.0))
 	_navigation_list.item_selected.connect(_select_navigation_row)
 	stack.add_child(_navigation_list)
+	_navigation_hint = _label(stack, 17, MUTED)
+	_navigation_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_navigation_hint.hide()
 	_build_scanner(stack)
+	_refresh_navigation_language()
 	_navigation_drawer.hide()
 
 func _build_scanner(parent: VBoxContainer) -> void:
@@ -490,17 +548,18 @@ func _build_scanner(parent: VBoxContainer) -> void:
 	var actions := HBoxContainer.new()
 	actions.add_theme_constant_override("separation", 7)
 	_scanner_panel.add_child(actions)
-	_button(actions, "combat_lock", "Взять на прицел")
-	_button(actions, "combat_unlock", "Снять захват")
-	for action: String in ["combat_lock", "combat_unlock"]:
+	_button(actions, "combat_lock", Text.text("SCANNER_LOCK"))
+	_button(actions, "combat_unlock", Text.text("SCANNER_CLEAR"))
+	_button(actions, "comms_contact", Text.text("LINK_SHORTCUT"))
+	for action: String in ["combat_lock", "combat_unlock", "comms_contact"]:
 		_actions[action].custom_minimum_size.y = 46.0
 		_actions[action].add_theme_font_size_override("font_size", 16)
 	_scanner_panel.hide()
 
 func _update_navigation_switches() -> void:
-	_actions["object_labels"].text = "Подписи вкл." if _marks.object_labels else "Подписи выкл."
-	_actions["navigation_corridor"].text = "Коридор вкл." if _navigation_corridor_enabled else "Коридор выкл."
-	_actions["ship_markers"].text = "Корабли вкл." if _marks.ship_markers else "Корабли выкл."
+	_actions["object_labels"].text = Text.text("NAV_LABELS_ON" if _marks.object_labels else "NAV_LABELS_OFF")
+	_actions["navigation_corridor"].text = Text.text("NAV_GUIDE_ON" if _navigation_corridor_enabled else "NAV_GUIDE_OFF")
+	_actions["ship_markers"].text = Text.text("NAV_SHIPS_ON" if _marks.ship_markers else "NAV_SHIPS_OFF")
 
 func _build_combat_instrument(parent: VBoxContainer) -> void:
 	_combat_readout = VBoxContainer.new()
@@ -774,6 +833,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 		close_navigation()
 	_marks.queue_redraw()
 	_sync_remote_rig(sim.remote_rig_status(), docked, landed)
+	_sync_processor(sim.processor_status(), landed)
 
 	var mining: RefCounted = sim.mining
 	var drilling: bool = landed and mining.phase in [MiningRig.DEPLOYING, MiningRig.DRILLING, MiningRig.RETURNING]
@@ -849,6 +909,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_sync_surface_guidance(surface if manual_approach and not sim.scooping else {}, gear)
 	var ground_approach := bool(docking.get("ground", false)) and bool(docking.get("near", false))
 	_sync_gear(gear, not parked and not _jumping and (ground_approach or surface.get("near", false) or gear.progress > 0.0 or gear.deployed))
+	_sync_escape(sim.escape_status())
 	_sync_clock(sim)
 	_refresh_disabled_actions()
 	_sync_fuel(sim.ship)
@@ -878,6 +939,36 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_notice_left -= delta
 		if _notice_left <= 0.0:
 			_notice_panel.hide()
+
+func _sync_escape(status: Dictionary) -> void:
+	var active: bool = status.active
+	if active and not _in_escape:
+		_reset_controls()
+		close_navigation()
+	_in_escape = active
+	var eject: Button = _actions["rescue_eject"]
+	eject.visible = status.can_eject
+	eject.tooltip_text = "Отделить спасательную капсулу"
+	if eject.visible:
+		_right_panel.offset_top -= 57.0
+	_rescue_panel.visible = active and _input_enabled
+	_rescue_signal_blocked = not status.can_signal
+	if active:
+		_steer.hide()
+		_bank.hide()
+		_camera_controls.hide()
+		_flight_modes.hide()
+		_translation_controls.hide()
+		_throttle_controls.hide()
+		_port_tools.hide()
+		_ordnance_tools.hide()
+		_orbital_mining_tools.hide()
+		_docking_panel.hide()
+		_surface_panel.hide()
+		_marks.flight = false
+		_rescue_caption.text = str(status.reason)
+		if status.waiting:
+			_rescue_caption.text += "\n«%s» · %d с" % [status.destination_name, ceili(status.remaining)]
 
 func _sync_speed_hold(status: Dictionary) -> void:
 	var enabled := bool(status.get("enabled", false))
@@ -919,10 +1010,10 @@ func _sync_combat(status: Dictionary) -> void:
 	var ecm: Button = _actions["ecm"]
 	var incoming := bool(status.get("projectile", false))
 	_combat_readout.visible = bool(status.get("visible", false)) or incoming
-	ecm.visible = incoming
+	ecm.visible = incoming and bool(status.get("ecm_fitted", false))
 	_ecm_blocked = not bool(status.get("ecm_ok", false))
 	ecm.tooltip_text = str(status.get("ecm_reason", "")) if _ecm_blocked else "Сбить приближающуюся ракету"
-	_sync_ordnance(status.get("missile", {}), status.get("decoy", {}))
+	_sync_ordnance(status.get("missile", {}), status.get("decoy", {}), status.get("pulse", {}))
 	if not _combat_readout.visible:
 		return
 	var heat := clampi(roundi(float(status.heat)), 0, 100)
@@ -967,6 +1058,25 @@ func _sync_remote_rig(status: Dictionary, docked: bool, landed: bool) -> void:
 		place = "%s · %s" % [Sector.system(int(status.system)).name, place]
 	var work := "Добыча" if status.working else "Буфер полон" if int(status.stored) >= int(status.capacity) else "Жила исчерпана"
 	_rig_summary.text = "Бур · %s\n%s · %d/%d ед." % [place, work, int(status.stored), int(status.capacity)]
+
+
+func _sync_processor(status: Dictionary, landed: bool) -> void:
+	_processor_status = status
+	_processor_readout.visible = status.active or (status.installed and landed)
+	_actions["processor_route"].visible = status.can_route and not status.navigating
+	_actions["processor_deploy"].visible = status.can_deploy
+	_actions["processor_feed"].visible = status.can_feed
+	_actions["processor_unload"].visible = status.near and int(status.ready) > 0
+	_actions["processor_retrieve"].visible = status.can_retrieve
+	if not status.active:
+		_processor_summary.text = "Медлаборатория · нужно 2 ед. льда и 1 ед. зерна"
+		return
+	var place := str(status.name)
+	if not status.same_system:
+		place = "%s · %s" % [Sector.system(int(status.system)).name, place]
+	var progress := "%d с до готовности" % ceili(float(status.remaining)) if status.working else "%d ед. медикаментов" % int(status.ready)
+	_processor_summary.text = "Медлаборатория · %s\n%s" % [place, progress]
+
 
 func _sync_orbital_mining(status: Dictionary) -> void:
 	_orbital_mining_status = status
@@ -1043,8 +1153,10 @@ func _sync_fuel(ship: RefCounted) -> void:
 		_fuel.add_theme_color_override("font_color", color)
 	_fuel_level.max_value = capacity
 	_fuel_level.value = ship.fuel
-	_jump_fuel.text = "Прыжки %s / %.0f ед." % [("%.1f" % ship.jump_fuel).replace(".", ","), ship.jump_capacity()]
-	var jump_color := AMBER if ship.jump_fuel <= 0.0 else CYAN
+	var jump_reserve: float = ship.active_jump_fuel()
+	var jump_name := "Военный бак" if ship.drive_kind == "military" else "Прыжки"
+	_jump_fuel.text = "%s %s / %.0f ед." % [jump_name, ("%.1f" % jump_reserve).replace(".", ","), ship.active_jump_capacity()]
+	var jump_color := AMBER if jump_reserve <= 0.0 else CYAN
 	if _jump_fuel.get_theme_color("font_color") != jump_color:
 		_jump_fuel.add_theme_color_override("font_color", jump_color)
 	var pump_mode := str(ship.pump_mode)
@@ -1340,6 +1452,8 @@ func _sync_jump(jump: Dictionary) -> void:
 		_route_detail.text += "\nПрибытие · %s" % arrival
 
 func _frame_caption(frame: Dictionary) -> String:
+	if frame.rotating:
+		return "Вращение «%s»" % frame.name
 	var name := "система" if int(frame.reference) < 0 else "«%s»" % frame.name
 	if frame.surface:
 		name = "поверхность %s" % name
@@ -1443,9 +1557,9 @@ func set_target_marker(screen_position: Vector2, visible: bool) -> void:
 
 func set_camera_view(mode: int, shows_forward_aim: bool, bearing: String) -> void:
 	var button: Button = _actions["camera"]
-	button.text = FlightCamera.MODE_NAMES[mode]
-	var next_mode: String = FlightCamera.MODE_NAMES[(mode + 1) % FlightCamera.MODE_NAMES.size()]
-	button.tooltip_text = "Ракурс. Следующий вид «%s» (F1)" % next_mode
+	button.text = FlightCamera.translated_name(mode)
+	var next_mode := FlightCamera.translated_name(FlightCamera.next_basic(mode))
+	button.tooltip_text = Text.text("CAMERA_NEXT") % next_mode
 	_marks.forward_aim = shows_forward_aim
 	_camera_instrument.text = bearing
 	_camera_instrument.visible = not bearing.is_empty()
@@ -1458,7 +1572,13 @@ func set_traffic_markers(markers: Array[Dictionary]) -> void:
 		return left_priority < right_priority if left_priority != right_priority else float(left.distance) < float(right.distance))
 	_marks.queue_redraw()
 
-func set_navigation_targets(sites: Array, selected: int) -> void:
+func set_navigation_targets(sites: Array, selected: int, computer_installed := true, missile_ready := false) -> void:
+	var equipment_changed := computer_installed != _navigation_computer_ready or missile_ready != _missile_camera_ready
+	_navigation_computer_ready = computer_installed
+	_missile_camera_ready = missile_ready
+	if equipment_changed:
+		_show_scanner(_scanner_panel.visible)
+		_refresh_disabled_actions()
 	if _navigation_sites != sites:
 		_navigation_sites.assign(sites)
 		_navigation_list.clear()
@@ -1475,9 +1595,12 @@ func set_navigation_targets(sites: Array, selected: int) -> void:
 func scanner_is_open() -> bool:
 	return _navigation_drawer.visible and _scanner_panel.visible
 
+func radio_contact_id() -> String:
+	return _scanner_focus if scanner_is_open() and _scanner_ids.has(_scanner_focus) else ""
+
 func set_combat_lock(id: String, caption: String, marker: Dictionary) -> void:
 	_combat_lock = id
-	_combat_lock_readout.text = "Захват · %s" % caption
+	_combat_lock_readout.text = Text.text("SCANNER_LOCKED") % caption
 	_combat_lock_readout.visible = not id.is_empty()
 	_marks.combat_lock = marker
 	_marks.queue_redraw()
@@ -1506,16 +1629,17 @@ func _refresh_scanner_selection() -> void:
 		_scanner_list.select(index)
 		_scanner_can_lock = contact.attackable and _scanner_focus != _combat_lock
 		var relative: Vector3 = contact.relative
-		_scanner_detail.text = "%d м · высота %+.0f м" % [roundi(contact.distance), relative.y]
+		_scanner_detail.text = Text.text("SCANNER_ALTITUDE") % [roundi(contact.distance), relative.y]
 		if _mapper_fitted:
-			var names := {"raider": "Рейдер", "convoy": "Конвой", "trader": "Транспорт", "patrol": "Патруль"}
-			_scanner_detail.text += "\n%s · %.1f м/с · корпус %.0f%%" % [
-				names.get(contact.role, "Судно"), contact.relative_speed, contact.hull]
+			var names := {"raider": "SCANNER_RAIDER", "convoy": "SCANNER_CONVOY", "trader": "SCANNER_TRADER",
+				"patrol": "SCANNER_PATROL", "relay": "SCANNER_RELAY"}
+			var role := Text.text(names.get(contact.role, "SCANNER_SHIP"))
+			_scanner_detail.text += "\n" + Text.text("SCANNER_DETAIL") % [role, contact.relative_speed, contact.hull]
 		else:
-			_scanner_detail.text += "\nДосье доступно с радаром-картографом."
+			_scanner_detail.text += "\n" + Text.text("SCANNER_MAPPER")
 	else:
 		_scanner_list.deselect_all()
-		_scanner_detail.text = "В пределах сканера нет кораблей." if _scanner_ids.is_empty() else "Выберите контакт в списке."
+		_scanner_detail.text = Text.text("SCANNER_NONE" if _scanner_ids.is_empty() else "SCANNER_PICK")
 	_scanner_radar.read_contacts(_scanner_rows, _scanner_range, _scanner_focus, _combat_lock)
 	_refresh_disabled_actions()
 
@@ -1526,9 +1650,29 @@ func _select_scanner_row(index: int) -> void:
 
 func _show_scanner(active: bool) -> void:
 	_scanner_panel.visible = active
-	_navigation_list.visible = not active
+	_navigation_list.visible = not active and _navigation_computer_ready
+	_navigation_hint.visible = not active and not _navigation_computer_ready
 	_navigation_switches.visible = not active
-	_actions["scanner_toggle"].text = "К целям" if active else "Сканер"
+	_navigation_cameras.visible = not active
+	_actions["scanner_toggle"].text = Text.text("NAV_LIST" if active else "SCANNER")
+
+func _refresh_navigation_language() -> void:
+	_navigation_title.text = Text.text("NAV_TITLE")
+	_navigation_hint.text = Text.text("NAV_NO_COMPUTER")
+	_actions["navigation_toggle"].text = Text.text("NAV_SHORTCUT")
+	_actions["navigation_close"].text = Text.text("NAV_CLOSE")
+	_actions["camera_observer"].text = Text.text("CAMERA_OBSERVER")
+	_actions["camera_missile"].text = Text.text("CAMERA_MISSILE")
+	_actions["camera_missile"].tooltip_text = Text.text("CAMERA_LOCK_REQUIRED")
+	_actions["combat_lock"].text = Text.text("SCANNER_LOCK")
+	_actions["combat_unlock"].text = Text.text("SCANNER_CLEAR")
+
+func apply_interface_language() -> void:
+	_refresh_navigation_language()
+	_update_navigation_switches()
+	_actions["comms"].text = Text.text("LINK_SHORTCUT")
+	_actions["comms_contact"].text = Text.text("LINK_SHORTCUT")
+	_show_scanner(_scanner_panel.visible)
 
 func set_navigation_markers(markers: Array[Dictionary]) -> void:
 	var exclude: Array[Rect2] = []
@@ -1544,11 +1688,12 @@ func ship_markers_enabled() -> bool:
 	return _marks.ship_markers
 
 func toggle_navigation() -> void:
-	if not _input_enabled or _parked or _jumping:
+	if not _input_enabled or _parked or _jumping or _in_escape:
 		return
 	if _navigation_drawer.visible:
 		close_navigation()
 	elif not _navigation_sites.is_empty():
+		_refresh_navigation_language()
 		_show_scanner(false)
 		_navigation_drawer.show()
 
@@ -1559,7 +1704,7 @@ func close_navigation() -> bool:
 	return true
 
 func _select_navigation_row(index: int) -> void:
-	if _navigation_drawer.visible and _input_enabled and index >= 0 and index < _navigation_sites.size():
+	if _navigation_drawer.visible and _navigation_computer_ready and _input_enabled and index >= 0 and index < _navigation_sites.size():
 		_request_navigation(_navigation_sites[index], false)
 
 func _request_navigation(site: int, from_view: bool) -> void:
@@ -1604,7 +1749,7 @@ func _place_touch_control(control: Control, placement: Rect2, starts_right: bool
 	control.offset_left = -placement.end.x if _touch_mirrored else placement.position.x
 	control.offset_right = -placement.position.x if _touch_mirrored else placement.end.x
 
-func _sync_ordnance(missile: Dictionary, decoy: Dictionary) -> void:
+func _sync_ordnance(missile: Dictionary, decoy: Dictionary, pulse: Dictionary) -> void:
 	var next_button: Button = _actions["missile_next"]
 	var fire_button: Button = _actions["missile_fire"]
 	var decoy_button: Button = _actions["decoy"]
@@ -1614,15 +1759,20 @@ func _sync_ordnance(missile: Dictionary, decoy: Dictionary) -> void:
 	fire_button.visible = bool(missile.get("fitted", false))
 	next_button.visible = fire_button.visible
 	decoy_button.visible = count > 0 or bool(decoy.get("active", false))
-	_ordnance_tools.visible = fire_button.visible or decoy_button.visible
+	var pulse_button: Button = _actions["energy_pulse"]
+	pulse_button.visible = int(pulse.get("count", 0)) > 0 or bool(pulse.get("active", false))
+	pulse_button.text = "Импульс %d" % int(pulse.get("count", 0))
+	pulse_button.tooltip_text = str(pulse.get("reason", ""))
+	_pulse_blocked = not bool(pulse.get("ready", false))
+	_ordnance_tools.visible = fire_button.visible or decoy_button.visible or pulse_button.visible
 	_missile_next_blocked = int(missile.get("next_slot", -1)) < 0
 	_missile_blocked = not bool(missile.get("ready", false))
 	_decoy_blocked = not bool(decoy.get("ready", false))
 	next_button.text = "Место %d" % (armed + 1) if armed >= 0 else "Пусто"
 	next_button.tooltip_text = "Следующее заряженное место (])"
-	fire_button.text = "Пуск · %d" % loaded
+	fire_button.text = "Пуск %d" % loaded
 	fire_button.tooltip_text = str(missile.get("reason", "")) if _missile_blocked else "Пуск «%s» (Z)" % missile.name
-	decoy_button.text = "Ловушка · %d" % count
+	decoy_button.text = "Ловушка %d" % count
 	decoy_button.tooltip_text = str(decoy.get("reason", "")) if _decoy_blocked else "Выбросить ложную цель ([)"
 
 
@@ -1635,6 +1785,8 @@ func _refresh_disabled_actions() -> void:
 		blocked = blocked or (action == "ecm" and (_ecm_blocked or _time_paused))
 		blocked = blocked or (action == "missile_next" and (_missile_next_blocked or _time_paused))
 		blocked = blocked or (action == "missile_fire" and _missile_blocked) or (action == "decoy" and _decoy_blocked)
+		blocked = blocked or (action == "energy_pulse" and _pulse_blocked) or (action == "rescue_signal" and _rescue_signal_blocked)
+		blocked = blocked or (_in_escape and action not in ["rescue_signal", "settings", "report", "time_pause"])
 		blocked = blocked or (action == "rendezvous_finish" and _rendezvous_finish_blocked)
 		blocked = blocked or (action == "dock_sync" and _dock_sync_blocked)
 		blocked = blocked or (action == "dock_clearance" and _dock_clearance_blocked)
@@ -1645,7 +1797,10 @@ func _refresh_disabled_actions() -> void:
 		blocked = blocked or (action == "navigation_toggle" and (_parked or _navigation_sites.is_empty()))
 		blocked = blocked or (action == "combat_lock" and not _scanner_can_lock)
 		blocked = blocked or (action == "combat_unlock" and _combat_lock.is_empty())
+		blocked = blocked or (action == "comms_contact" and _scanner_focus.is_empty())
+		blocked = blocked or (action == "camera_missile" and not _missile_camera_ready)
 		blocked = blocked or (RIG_ACTIONS.has(action) and not _rig_status.get(RIG_ACTIONS[action], false))
+		blocked = blocked or (PROCESSOR_ACTIONS.has(action) and not _processor_status.get(PROCESSOR_ACTIONS[action], false))
 		blocked = blocked or (ORBITAL_MINING_ACTIONS.has(action) and not _orbital_mining_status.get(ORBITAL_MINING_ACTIONS[action], false))
 		var manual_thrust := action in HOLD_ACTIONS or action in ["throttle_down", "throttle_up"]
 		var charge_control := action in ["throttle_down", "throttle_up", "boost", "brake"] and not _jump_transit
@@ -1654,7 +1809,7 @@ func _refresh_disabled_actions() -> void:
 		button.disabled = not _input_enabled or blocked or during_jump or during_departure or (_time_paused and manual_thrust)
 
 func move_input() -> Vector2:
-	if _parked or _jump_transit or _time_paused or not _input_enabled:
+	if _parked or _in_escape or _jump_transit or _time_paused or not _input_enabled:
 		return Vector2.ZERO
 	var horizontal := float(_key(KEY_D, KEY_RIGHT)) - float(_key(KEY_A, KEY_LEFT))
 	var vertical := float(_key(KEY_W, KEY_UP)) - float(_key(KEY_S, KEY_DOWN))
@@ -1662,7 +1817,7 @@ func move_input() -> Vector2:
 	return (touch + Vector2(horizontal, vertical)).limit_length()
 
 func translation_input() -> Vector3:
-	if _parked or _jumping or _time_paused or not _input_enabled:
+	if _parked or _in_escape or _jumping or _time_paused or not _input_enabled:
 		return Vector3.ZERO
 	var horizontal := float(_key(KEY_6, KEY_KP_6)) - float(_key(KEY_4, KEY_KP_4))
 	var vertical := float(_key(KEY_8, KEY_KP_8)) - float(_key(KEY_2, KEY_KP_2))
@@ -1674,16 +1829,16 @@ func translation_input() -> Vector3:
 	return (keyboard + Vector3(stick.x, stick.y, _translation_depth)).limit_length()
 
 func roll_input() -> float:
-	if _parked or _jump_transit or _time_paused or not _input_enabled:
+	if _parked or _in_escape or _jump_transit or _time_paused or not _input_enabled:
 		return 0.0
 	var keyboard := float(Input.is_physical_key_pressed(KEY_E)) - float(Input.is_physical_key_pressed(KEY_Q))
 	return clampf(_bank.axis.x * _touch_gain + keyboard, -1.0, 1.0)
 
 func boost_held() -> bool:
-	return not _parked and not _jump_transit and not _time_paused and _input_enabled and (_boost or Input.is_physical_key_pressed(KEY_SHIFT))
+	return not _parked and not _in_escape and not _jump_transit and not _time_paused and _input_enabled and (_boost or Input.is_physical_key_pressed(KEY_SHIFT))
 
 func brake_held() -> bool:
-	return not _parked and not _jump_transit and not _time_paused and _input_enabled and (_brake or Input.is_physical_key_pressed(KEY_SPACE))
+	return not _parked and not _in_escape and not _jump_transit and not _time_paused and _input_enabled and (_brake or Input.is_physical_key_pressed(KEY_SPACE))
 
 func _key(primary: Key, alternate: Key) -> bool:
 	return Input.is_physical_key_pressed(primary) or Input.is_physical_key_pressed(alternate)
@@ -1752,7 +1907,7 @@ func _notification(what: int) -> void:
 func _reset_controls() -> void:
 	_touch_owner.clear()
 	_navigation_presses.clear()
-	_combat_lock_presses.clear()
+	_contact_action_presses.clear()
 	_steer_finger = -1
 	_bank_finger = -1
 	_mouse_pad = null
@@ -1780,8 +1935,8 @@ func _touch_begin(index: int, point: Vector2) -> bool:
 		var button: Button = _actions[action]
 		if not button.disabled and _hit(button, point):
 			_touch_owner[index] = action
-			if action == "combat_lock":
-				_combat_lock_presses[index] = _scanner_focus
+			if action in ["combat_lock", "comms_contact"]:
+				_contact_action_presses[index] = _scanner_focus
 			if action in HOLD_ACTIONS:
 				_update_held()
 			else:
@@ -1797,8 +1952,8 @@ func _touch_end(index: int, point: Vector2, canceled: bool) -> bool:
 		return false
 	var action: String = _touch_owner[index]
 	_touch_owner.erase(index)
-	var selected_contact: String = _combat_lock_presses.get(index, "")
-	_combat_lock_presses.erase(index)
+	var selected_contact: String = _contact_action_presses.get(index, "")
+	_contact_action_presses.erase(index)
 	match action:
 		"steer":
 			_steer_finger = -1
@@ -1814,7 +1969,7 @@ func _touch_end(index: int, point: Vector2, canceled: bool) -> bool:
 			var button: Button = _actions[action]
 			if not _touch_owner.values().has(action):
 				button.self_modulate = Color.WHITE
-			var unchanged := action != "combat_lock" or selected_contact == _scanner_focus
+			var unchanged := action not in ["combat_lock", "comms_contact"] or selected_contact == _scanner_focus
 			if not canceled and unchanged and not button.disabled and _hit(button, point):
 				_commit_action(action)
 	return true
@@ -1924,8 +2079,16 @@ func _commit_action(action: String) -> void:
 		toggle_navigation()
 	elif action == "navigation_close":
 		close_navigation()
+	elif action == "camera_observer" or action == "camera_missile":
+		close_navigation()
+		action_requested.emit(action)
 	elif action == "scanner_toggle":
 		_show_scanner(not scanner_is_open())
+	elif action == "comms":
+		close_navigation()
+		action_requested.emit("comms")
+	elif action == "comms_contact":
+		action_requested.emit("comms")
 	elif action == "combat_lock":
 		combat_target_requested.emit(_scanner_focus)
 	elif action == "combat_unlock":

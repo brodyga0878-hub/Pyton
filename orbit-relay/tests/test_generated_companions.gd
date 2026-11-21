@@ -29,7 +29,7 @@ func _test_appended_geometry() -> void:
 	var moons := 0
 	var giants := 0
 	var visited := {}
-	for id in range(FirstMoon, Catalog.DESTINATION_COUNT):
+	for id in range(FirstMoon, Catalog.PRE_REACH_DESTINATION_COUNT):
 		var system := Catalog.system_of_site(id)
 		var body := Catalog.site(id)
 		var parent := Orbit.orbit_parent(id)
@@ -58,7 +58,7 @@ func _test_appended_geometry() -> void:
 				and float(layer.height) > Flight.GAS_SCOOP_MAX_ALTITUDE and float(layer.density) > 0.0
 				and range_to_parent.x - float(body.radius) - float(layer.height) > Orbit.extrema(asteroid).y + float(Catalog.site(asteroid).gate_offset),
 				"The non-landable giant %d adds a real atmosphere beyond the older approaches" % id)
-	_expect(moons == 16 and giants == 16 and Catalog.SYSTEM_COUNT == 512 and FirstMoon == 1553,
+	_expect(moons == 16 and giants == 16 and Catalog.PRE_REACH_SYSTEM_COUNT == 512 and FirstMoon == 1553,
 		"Sixteen moons and sixteen gas giants append to the 1,553 historical bodies")
 
 

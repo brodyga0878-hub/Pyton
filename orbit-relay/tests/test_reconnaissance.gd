@@ -86,6 +86,7 @@ func _test_deadline() -> void:
 	flight.recon_action("accept")
 	var older := flight.snapshot()
 	older.schema = 49
+	Fixture.remove_schema_51_from_legacy(older)
 	older.erase("reconnaissance")
 	Fixture.remove_extended_career_from_legacy(older)
 	Fixture.remove_ordnance_from_legacy(older)

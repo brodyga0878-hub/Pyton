@@ -17,6 +17,16 @@ const FUEL_PUMP_RESALE := 55
 const RANGE_DRIVE_COST := 450
 const DRIVE_STANDARD := "standard"
 const DRIVE_RANGE := "range"
+const DRIVE_MILITARY := "military"
+const MILITARY_DRIVE_NAME := "Арсенал"
+const MILITARY_DRIVE_COST := 680
+const MILITARY_CAPACITY := 120.0
+const MILITARY_WASTE_CAPACITY := 18
+const MILITARY_WASTE_INTERVAL := 10.0
+const MILITARY_FUEL_SURCHARGE := 3
+const MILITARY_DISPOSAL_PRICE := 2
+const MILITARY_TARIFF_FACTOR := 0.56
+const MILITARY_MASS_SENSITIVITY := 0.70
 const RANGE_TARIFF_FACTOR := 0.75
 const RANGE_MASS_SENSITIVITY := 0.82
 const STANDARD_MASS_SENSITIVITY := 1.0
@@ -44,6 +54,8 @@ const MAX_HULL := 100.0
 const MIN_HULL := 1.0
 const STARTER_HULL := "courier"
 const FREIGHTER_HULL := "freighter"
+const SURVEY_HULL := "surveyor"
+const UTILITY_HULL := "utility"
 const TRADE_IN_PERCENT := 68
 const HULLS := {
 	STARTER_HULL: {"id": STARTER_HULL, "name": "Курьер «Стриж»",
@@ -58,6 +70,16 @@ const HULLS := {
 		"dry_mass": FREIGHTER_DRY_MASS, "roll_rate": 1.35,
 		"thrust_positive": Vector3(1250.0, 1310.0, 1180.0), "thrust_negative": Vector3(1130.0, 1070.0, 1674.432),
 		"crew_required": 1, "speed_factor": 0.80, "accel_factor": 0.76, "burn_factor": 1.18},
+	SURVEY_HULL: {"id": SURVEY_HULL, "name": "Разведчик «Отклик»",
+		"description": "Лёгкий разведчик с быстрым разворотом и небольшим трюмом.",
+		"price": 1680, "cargo": 18, "expanded_cargo": 32, "dry_mass": 43.0, "roll_rate": 2.35,
+		"thrust_positive": Vector3(1780.0, 1560.0, 1840.0), "thrust_negative": Vector3(1650.0, 1420.0, 2110.0),
+		"crew_required": 0, "speed_factor": 1.12, "accel_factor": 1.16, "burn_factor": 0.92},
+	UTILITY_HULL: {"id": UTILITY_HULL, "name": "Буксир «Призма»",
+		"description": "Рабочий корабль с мощными боковыми двигателями. Нужен один специалист.",
+		"price": 2450, "cargo": 34, "expanded_cargo": 50, "dry_mass": 58.0, "roll_rate": 1.48,
+		"thrust_positive": Vector3(2690.0, 2850.0, 1540.0), "thrust_negative": Vector3(2710.0, 2600.0, 1630.0),
+		"crew_required": 1, "speed_factor": 0.89, "accel_factor": 0.81, "burn_factor": 1.08},
 }
 const LEGACY_SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded"]
 const PRE_SHIELD_SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded"]
@@ -88,6 +110,9 @@ var hydrogen_scoop := true
 var fuel_pump := false
 var pump_mode := PUMP_OFF
 var range_drive := false
+var military_drive := false
+var military_fuel := 0.0
+var military_waste := 0
 var drive_kind := DRIVE_STANDARD
 var autopilot_fitted := true
 var hull_id: String:
@@ -102,7 +127,7 @@ static func profile(id: String) -> Dictionary:
 
 
 static func hull_ids() -> Array[String]:
-	return [STARTER_HULL, FREIGHTER_HULL]
+	return [STARTER_HULL, FREIGHTER_HULL, SURVEY_HULL, UTILITY_HULL]
 
 
 static func is_cargo_capacity(capacity: int) -> bool:
@@ -121,13 +146,50 @@ func jump_capacity() -> float:
 
 
 func drive_name() -> String:
-	return RANGE_DRIVE_NAME if drive_kind == DRIVE_RANGE else STANDARD_DRIVE_NAME
+	match drive_kind:
+		DRIVE_RANGE: return RANGE_DRIVE_NAME
+		DRIVE_MILITARY: return MILITARY_DRIVE_NAME
+	return STANDARD_DRIVE_NAME
 
 
 func select_drive(id: String) -> bool:
-	if id == drive_kind or (id != DRIVE_STANDARD and (id != DRIVE_RANGE or not range_drive)):
+	if id == drive_kind or not drive_available(id):
 		return false
 	drive_kind = id
+	return true
+
+
+func drive_available(id: String) -> bool:
+	return id == DRIVE_STANDARD or (id == DRIVE_RANGE and range_drive) or (id == DRIVE_MILITARY and military_drive)
+
+
+func active_jump_fuel() -> float:
+	return military_fuel if drive_kind == DRIVE_MILITARY else jump_fuel
+
+
+func active_jump_capacity() -> float:
+	return MILITARY_CAPACITY if drive_kind == DRIVE_MILITARY else jump_capacity()
+
+
+func waste_for_jump(cost: int) -> int:
+	return ceili(float(cost) / MILITARY_WASTE_INTERVAL) if drive_kind == DRIVE_MILITARY else 0
+
+
+func waste_budget(waste := -1) -> float:
+	if drive_kind != DRIVE_MILITARY:
+		return active_jump_capacity()
+	var inventory := military_waste if waste < 0 else waste
+	return float(MILITARY_WASTE_CAPACITY - inventory) * MILITARY_WASTE_INTERVAL
+
+
+func pay_jump(cost: int) -> bool:
+	if cost <= 0 or cost > active_jump_fuel() or cost > waste_budget():
+		return false
+	if drive_kind == DRIVE_MILITARY:
+		military_fuel -= cost
+		military_waste += waste_for_jump(cost)
+	else:
+		jump_fuel -= cost
 	return true
 
 
@@ -135,18 +197,20 @@ func legacy_jump_tariff(base: int) -> int:
 	return ceili(base * RANGE_TARIFF_FACTOR) if drive_kind == DRIVE_RANGE and base > 0 else base
 
 
-func jump_tariff(base: int, payload: int, jump_reserve := -1.0) -> int:
+func jump_tariff(base: int, payload: int, jump_reserve := -1.0, waste := -1) -> int:
 	if base <= 0:
 		return 0
-	return ceili(float(base) * _jump_mass_multiplier(payload, jump_reserve) - TARIFF_TOLERANCE)
+	return ceili(float(base) * _jump_mass_multiplier(payload, jump_reserve, waste) - TARIFF_TOLERANCE)
 
 
-func base_jump_budget(budget: float, payload: int, jump_reserve := -1.0) -> int:
-	return floori((floorf(budget) + TARIFF_TOLERANCE) / _jump_mass_multiplier(payload, jump_reserve))
+func base_jump_budget(budget: float, payload: int, jump_reserve := -1.0, waste := -1) -> int:
+	return floori((floorf(budget) + TARIFF_TOLERANCE) / _jump_mass_multiplier(payload, jump_reserve, waste))
 
 
-func _jump_mass_multiplier(payload: int, jump_reserve: float) -> float:
-	var relative_mass := flight_mass(payload, jump_reserve) / REFERENCE_MASS
+func _jump_mass_multiplier(payload: int, jump_reserve: float, waste: int) -> float:
+	var relative_mass := flight_mass(payload, jump_reserve, waste) / REFERENCE_MASS
+	if drive_kind == DRIVE_MILITARY:
+		return MILITARY_TARIFF_FACTOR * (1.0 + (relative_mass - 1.0) * MILITARY_MASS_SENSITIVITY)
 	if drive_kind == DRIVE_RANGE:
 		return RANGE_TARIFF_FACTOR * (1.0 + (relative_mass - 1.0) * RANGE_MASS_SENSITIVITY)
 	return 1.0 + (relative_mass - 1.0) * STANDARD_MASS_SENSITIVITY
@@ -157,13 +221,15 @@ static func minimum_jump_tariff(base: int) -> int:
 	# rejects impossible legs while allowing a previously valid route to remain selected.
 	var lightest_mass := COURIER_DRY_MASS - SCOOP_MASS - AUTOPILOT_MASS
 	var relative_mass := lightest_mass / REFERENCE_MASS
-	return ceili(float(base) * RANGE_TARIFF_FACTOR * (1.0 + (relative_mass - 1.0) * RANGE_MASS_SENSITIVITY) - TARIFF_TOLERANCE)
+	return ceili(float(base) * MILITARY_TARIFF_FACTOR * (1.0 + (relative_mass - 1.0) * MILITARY_MASS_SENSITIVITY) - TARIFF_TOLERANCE)
 
 
 func jump_duration(distance: float, payload: int) -> float:
 	if not is_finite(distance) or distance <= 0.0:
 		return 0.0
 	var unloaded_seconds := 7.0 + 2.5 * distance if drive_kind == DRIVE_RANGE else 12.0 + 4.0 * distance
+	if drive_kind == DRIVE_MILITARY:
+		unloaded_seconds = 6.0 + 2.1 * distance
 	var load_ratio := clampf(float(payload) / cargo_capacity(), 0.0, 1.0)
 	return ceilf(unloaded_seconds * (1.0 + 0.6 * load_ratio))
 
@@ -189,9 +255,12 @@ func dry_mass() -> float:
 	return float(HULLS[_hull_id].dry_mass)
 
 
-func flight_mass(payload: int, jump_reserve := -1.0) -> float:
-	var reserve := jump_fuel if jump_reserve < 0.0 else jump_reserve
+func flight_mass(payload: int, jump_reserve := -1.0, waste := -1) -> float:
+	var military_selected := drive_kind == DRIVE_MILITARY
+	var reserve := jump_fuel if jump_reserve < 0.0 or military_selected else jump_reserve
+	var special := military_fuel if jump_reserve < 0.0 or not military_selected else jump_reserve
 	var mass := dry_mass() + float(payload) * CARGO_UNIT_MASS + (fuel + reserve) * FUEL_UNIT_MASS
+	mass += 0.9 + special * 0.006 + float(military_waste if waste < 0 else waste) * 0.06 if military_drive else 0.0
 	mass += TANK_HARDWARE_MASS if tank_upgraded else 0.0
 	mass += 0.45 if cargo_upgraded else 0.0
 	mass += 0.45 if heat_shield else 0.0
@@ -277,11 +346,11 @@ func quote_repair(unit_price: int) -> int:
 	return _service_cost(ceili(MAX_HULL - hull), unit_price)
 
 
-func apply_damage(amount: float) -> float:
+func apply_damage(amount: float, can_destroy := false) -> float:
 	if amount <= 0.0 or not is_finite(amount):
 		return 0.0
 	var previous := hull
-	hull = maxf(MIN_HULL, hull - amount)
+	hull = maxf(0.0 if can_destroy else MIN_HULL, hull - amount)
 	return previous - hull
 
 
@@ -296,6 +365,7 @@ static func _service_cost(missing_units: int, unit_price: int) -> int:
 
 func service_offer(action: String, unit_price: int, credits: int) -> Dictionary:
 	var cost := 0
+	var units := 0
 	var installed := false
 	match action:
 		"refuel":
@@ -331,7 +401,18 @@ func service_offer(action: String, unit_price: int, credits: int) -> Dictionary:
 		"range_drive":
 			cost = RANGE_DRIVE_COST
 			installed = range_drive
-	return {"cost": cost, "allowed": cost > 0 and cost <= credits and not installed, "installed": installed}
+		"military_drive":
+			cost = MILITARY_DRIVE_COST
+			installed = military_drive
+		"military_refuel":
+			var price := unit_price + MILITARY_FUEL_SURCHARGE
+			if military_drive and price > 0:
+				units = mini(int(MILITARY_CAPACITY - military_fuel), floori(float(credits) / price))
+				cost = _service_cost(units, price)
+		"military_waste":
+			units = mini(military_waste, floori(float(credits) / MILITARY_DISPOSAL_PRICE))
+			cost = _service_cost(units, MILITARY_DISPOSAL_PRICE)
+	return {"cost": cost, "units": units, "allowed": cost > 0 and cost <= credits and not installed, "installed": installed}
 
 
 func buy(action: String, unit_price: int, credits: int) -> int:
@@ -364,6 +445,12 @@ func buy(action: String, unit_price: int, credits: int) -> int:
 		"range_drive":
 			range_drive = true
 			drive_kind = DRIVE_RANGE
+		"military_drive":
+			military_drive = true
+		"military_refuel":
+			military_fuel += int(offer.units)
+		"military_waste":
+			military_waste -= int(offer.units)
 	return offer.cost
 
 
@@ -404,9 +491,26 @@ func snapshot() -> Dictionary:
 	}
 
 
+func military_snapshot() -> Dictionary:
+	return {"installed": military_drive, "fuel": military_fuel, "waste": military_waste}
+
+
 func restore(value: Variant, legacy := false, pre_shield := false, pre_dual_fuel := false,
 		pre_shipyard := false, pre_orbital_mining := false, pre_fuel_equipment := false, pre_jump_drive := false,
-		pre_autopilot_equipment := false) -> bool:
+		pre_autopilot_equipment := false, military: Variant = null, can_destroy := false) -> bool:
+	var fitted := false
+	var reserve := 0.0
+	var waste := 0
+	if military != null:
+		if not military is Dictionary or military.size() != 3 or not military.get("installed") is bool:
+			return false
+		if not _storage_units(military.get("fuel"), MILITARY_CAPACITY) or not _storage_units(military.get("waste"), MILITARY_WASTE_CAPACITY):
+			return false
+		fitted = military.installed
+		reserve = float(military.fuel)
+		waste = int(military.waste)
+		if not fitted and (reserve != 0.0 or waste != 0):
+			return false
 	var fields := SAVE_FIELDS
 	if legacy:
 		fields = LEGACY_SAVE_FIELDS
@@ -442,8 +546,9 @@ func restore(value: Variant, legacy := false, pre_shield := false, pre_dual_fuel
 			or (not value.fuel_pump and value.pump_mode != PUMP_OFF)):
 		return false
 	if "drive_kind" in fields and (not value.range_drive is bool or not value.drive_kind is String
-			or value.drive_kind not in [DRIVE_STANDARD, DRIVE_RANGE]
-			or (not value.range_drive and value.drive_kind == DRIVE_RANGE)):
+			or value.drive_kind not in [DRIVE_STANDARD, DRIVE_RANGE, DRIVE_MILITARY]
+			or (not value.range_drive and value.drive_kind == DRIVE_RANGE)
+			or (not fitted and value.drive_kind == DRIVE_MILITARY)):
 		return false
 	if "autopilot_fitted" in fields and not value.autopilot_fitted is bool:
 		return false
@@ -466,7 +571,7 @@ func restore(value: Variant, legacy := false, pre_shield := false, pre_dual_fuel
 		if not value.cargo_upgraded is bool or not (value.hull is float or value.hull is int):
 			return false
 		restored_hull = float(value.hull)
-		if not is_finite(restored_hull) or restored_hull < MIN_HULL or restored_hull > MAX_HULL:
+		if not is_finite(restored_hull) or restored_hull < (0.0 if can_destroy else MIN_HULL) or restored_hull > MAX_HULL:
 			return false
 		restored_cargo_upgrade = value.cargo_upgraded
 	fuel = restored_fuel
@@ -485,4 +590,11 @@ func restore(value: Variant, legacy := false, pre_shield := false, pre_dual_fuel
 	autopilot_fitted = value.get("autopilot_fitted", true)
 	range_drive = value.get("range_drive", false)
 	drive_kind = value.get("drive_kind", DRIVE_STANDARD)
+	military_drive = fitted
+	military_fuel = reserve
+	military_waste = waste
 	return true
+
+
+static func _storage_units(value: Variant, limit: float) -> bool:
+	return (value is int or value is float) and is_finite(float(value)) and value >= 0 and value <= limit and value == int(value)

@@ -22,10 +22,45 @@ func _initialize() -> void:
 
 func _run() -> void:
 	_test_remote_operation()
+	_test_rig_fleet()
 	print("Remote mining integration: %d checks, %d failures" % [_checks, _failures.size()])
 	for failure: String in _failures:
 		printerr(failure)
 	quit(0 if _failures.is_empty() else 1)
+
+
+func _test_rig_fleet() -> void:
+	var flight := Flight.new()
+	flight.credits = 800
+	_expect(flight.service_action("buy_rig") and flight.service_action("buy_rig")
+		and not flight.service_action("buy_rig") and flight.rig_fleet_status().size() == 3 and flight.credits == 510,
+		"Buy spare drills up to a hard ownership limit")
+	_expect(flight.select_rig_slot(2) and flight.service_action("sell_rig") and flight.rig_fleet_status().size() == 2
+		and flight.credits == 575 and not flight.service_action("sell_rig"), "A free spare can be sold once")
+	if not _expect(Fixture.launch(flight) and _land_offpad(flight, _landable(2), 2) and flight.leave_remote_rig(),
+		"The first drill deploys at a physical asteroid"):
+		return
+	_expect(flight.select_rig_slot(1) and not flight.leave_remote_rig(),
+		"A second drill cannot duplicate or overdraw the same deposit")
+	if not _expect(flight.dock_action() and _land_offpad(flight, _landable(4), 4) and flight.leave_remote_rig(),
+		"A separately selected drill can be deployed at a second physical asteroid"):
+		return
+	_tick(flight, 45.0)
+	var both := flight.snapshot()
+	_expect(int(both.remote_rig.stored) > 0 and int(both.rig_fleet.extra[0].stored) > 0
+		and flight.mining.ore_hold == 0, "Both detached drills extract independently with actual elapsed time")
+	var cold := Flight.new()
+	_expect(SessionIO.save_state(both, "user://rig-fleet.json") == OK
+		and cold.restore(SessionIO.load_state("user://rig-fleet.json"))
+		and cold.remote_rig_status().site == 4 and cold.select_rig_slot(0) and cold.remote_rig_status().site == 2,
+		"Both installations and the active slot migrate through serialized reload")
+
+
+func _landable(site: int) -> Vector3:
+	for direction: Vector3 in [Vector3.RIGHT, Vector3.LEFT, Vector3.UP, Vector3.DOWN, Vector3.BACK, Vector3.FORWARD]:
+		if Terrain.landable(site, direction):
+			return direction
+	return Vector3.ZERO
 
 
 func _test_remote_operation() -> void:
@@ -186,15 +221,15 @@ func _choose_offpad_patch(flight: Flight) -> Vector3:
 	return Vector3.ZERO
 
 
-func _land_offpad(flight: Flight, direction: Vector3) -> bool:
-	if not flight.select_target(SITE):
+func _land_offpad(flight: Flight, direction: Vector3, site := SITE) -> bool:
+	if direction.is_zero_approx() or not flight.select_target(site):
 		return false
-	var spin := Terrain.spin_basis(SITE, flight.orbit_time)
-	var center := flight.target_position(SITE)
-	var ground := center + spin * Terrain.point(SITE, direction)
-	var aim := -(spin * Terrain.normal(SITE, direction))
-	flight.position = center + spin * (Terrain.contact(SITE, direction) + direction * 3.0)
-	flight.velocity = flight.surface_velocity(SITE, ground)
+	var spin := Terrain.spin_basis(site, flight.orbit_time)
+	var center := flight.target_position(site)
+	var ground := center + spin * Terrain.point(site, direction)
+	var aim := -(spin * Terrain.normal(site, direction))
+	flight.position = center + spin * (Terrain.contact(site, direction) + direction * 3.0)
+	flight.velocity = flight.surface_velocity(site, ground)
 	flight.yaw = atan2(-aim.x, -aim.z)
 	flight.pitch = asin(clampf(aim.y, -1.0, 1.0))
 	flight.gear_deployed = true

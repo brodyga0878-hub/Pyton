@@ -13,7 +13,7 @@ const BOX_FACES := [
 ]
 
 var _ships: Dictionary[String, Node3D] = {}
-var _pool: Dictionary[String, Array] = {"trader": [], "patrol": [], "raider": [], "convoy": []}
+var _pool: Dictionary[String, Array] = {"trader": [], "patrol": [], "raider": [], "convoy": [], "relay": []}
 var _hulls: Dictionary[String, Array] = {}
 var _trim: Array[MeshInstance3D] = []
 var _beams: Array[Node3D] = []
@@ -50,6 +50,8 @@ func sync(contacts: Array, beams: Array) -> void:
 			actor = _acquire_ship(role)
 			_ships[id] = actor
 		actor.position = contact.position
+		if role == "relay":
+			actor.get_child(1).visible = float(contact.get("hull", 0.0)) > 0.0
 		var course: Vector3 = contact.get("forward", contact.velocity)
 		if course.length_squared() > 0.001:
 			var direction := course.normalized()
@@ -144,6 +146,7 @@ func _build_hull(role: String) -> Array:
 		"patrol": _patrol(shell, lamps)
 		"raider": _raider(shell, lamps)
 		"convoy": _convoy(shell, lamps)
+		"relay": _relay(shell, lamps)
 	_add_role_trim(trim, role)
 	return [shell.commit(), lamps.commit(), trim.commit()]
 
@@ -211,6 +214,23 @@ func _add_role_trim(tool: SurfaceTool, role: String) -> void:
 				for position_z: float in [-3.3, 1.3]:
 					_box(tool, Vector3(side * 3.15, 1.11, position_z), Vector3(2.1, 0.14, 0.20), Color("#f4bf6e"))
 					_box(tool, Vector3(side * 4.46, 0.16, position_z), Vector3(0.13, 0.85, 2.35), Color("#603e27"))
+			"relay":
+				for slat: int in range(6):
+					_box(tool, Vector3(side * (4.3 + slat * 1.29), 0.23, 0.0), Vector3(0.10, 0.08, 4.4), Color("4b8492"))
+
+
+func _relay(shell: SurfaceTool, lamps: SurfaceTool) -> void:
+	var frame := Color("9daaa9")
+	_box(shell, Vector3.ZERO, Vector3(4.0, 3.2, 5.5), Color("627a7b"))
+	_box(shell, Vector3(0, 4.9, 0), Vector3(0.45, 8.0, 0.42), frame)
+	_box(shell, Vector3(0, 8.0, -1.15), Vector3(0.67, 0.40, 3.40), frame)
+	_box(shell, Vector3(0, 0, 0), Vector3(25.0, 0.45, 0.57), frame)
+	for side: float in [-1.0, 1.0]:
+		_box(shell, Vector3(side * 8.30, 0.05, 0), Vector3(9.0, 0.36, 4.55), Color("264e7a"))
+		_box(shell, Vector3(side * 12.75, 0.16, 0), Vector3(0.24, 0.65, 4.60), frame)
+		_box(lamps, Vector3(side * 12.83, 0.52, 0.05), Vector3(0.42, 0.28, 0.40), Color("b0ffe4"))
+	_box(lamps, Vector3(0, 9.1, 0), Vector3(0.67, 0.43, 0.56), Color("ffe583"))
+	_box(lamps, Vector3(0, 0.65, -2.80), Vector3(2.14, 0.42, 0.14), Color("93e8d1"))
 
 
 func _trader(shell: SurfaceTool, lamps: SurfaceTool) -> void:

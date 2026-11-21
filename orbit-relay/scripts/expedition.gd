@@ -98,7 +98,7 @@ func status(sim: RefCounted) -> Dictionary:
 		result.reason = "Выполните прыжок в систему «%s»." % area.name
 		if phase == SURVEY:
 			result.reason += " Действующего порта там пока нет."
-		elif sim.ship.jump_fuel < sim.jump_tariff(sim.system_id, system):
+		elif sim.ship.active_jump_fuel() < sim.jump_tariff(sim.system_id, system):
 			result.reason += " Водород можно собрать у местной звезды и перелить в прыжковый запас."
 		return result
 	var point: Vector3 = sim.target_gate(site)

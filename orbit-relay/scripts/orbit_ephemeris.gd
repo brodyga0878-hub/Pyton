@@ -74,7 +74,7 @@ static func sample(site_id: int, seconds: float) -> Dictionary:
 		var mean := wrapf(track.mean_at_epoch + track.mean_motion * fposmod(seconds, track.period), -PI, PI)
 		eccentric_angle = mean
 		if track.eccentricity > 0.0:
-			# Newton iteration for E - e*sin(E) = M. Catalog eccentricities are below 0.2.
+			# Newton iteration for E - e*sin(E) = M.
 			for iteration in range(4):
 				var error := eccentric_angle - track.eccentricity * sin(eccentric_angle) - mean
 				var slope := 1.0 - track.eccentricity * cos(eccentric_angle)
@@ -158,8 +158,9 @@ static func _track_for(site_id: int) -> Track:
 static func _build_track(site_id: int) -> Track:
 	var site := Catalog.site(site_id)
 	var system_id := Catalog.system_of_site(site_id)
-	if system_id == Catalog.BINARY_SYSTEM:
-		return _build_binary_track(site)
+	var system := Catalog.system(system_id)
+	if system.has("barycenter"):
+		return _build_binary_track(site, system)
 	var track := Track.new()
 	track.epoch = site.center
 	var elements: Vector3 = ELEMENTS.get(site_id, site.get("orbital_elements", Vector3.ZERO))
@@ -191,13 +192,12 @@ static func _build_track(site_id: int) -> Track:
 	return track
 
 
-static func _build_binary_track(site: Dictionary) -> Track:
-	var system := Catalog.system(Catalog.BINARY_SYSTEM)
+static func _build_binary_track(site: Dictionary, system: Dictionary) -> Track:
 	var track := Track.new()
 	track.parent = int(site.get("orbit_parent", -1))
 	track.focus = system.barycenter
 	track.epoch = site.center
-	var mu := gravity_parameter(Catalog.BINARY_SYSTEM)
+	var mu := float(system.gravity_parameter)
 	if track.parent >= 0:
 		var parent := Catalog.site(track.parent)
 		track.epoch -= parent.center

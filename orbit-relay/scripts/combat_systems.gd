@@ -3,10 +3,13 @@ extends RefCounted
 
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const Ordnance := preload("res://scripts/combat_ordnance.gd")
+const CombatPulse := preload("res://scripts/combat_pulse.gd")
 
 const PULSE := "pulse"
 const FOCUS := "focus"
 const ECM := "ecm"
+const LAUNCHER_MODULE := "launcher"
+const PULSE_MODULE := "energy_pulse"
 const SHIELD_COST := 120
 const FOCUS_COST := 170
 const ECM_COST := 90
@@ -46,6 +49,7 @@ var ecm_fitted := false
 var ecm_advanced := false
 var damaged := ""
 var ordnance := Ordnance.new()
+var pulse := CombatPulse.new()
 
 var _fire_ready_at := 0.0
 var _shield_recharge_at := 0.0
@@ -75,6 +79,9 @@ func service_offer(action: String, credits: int) -> Dictionary:
 				return {"allowed": false, "cost": cost, "installed": false, "reason": "Установите базовый модуль РЭБ."}
 		"combat_repair":
 			cost = REPAIR_COST if not damaged.is_empty() else 0
+		"combat_energy_pulse":
+			cost = CombatPulse.COST
+			installed = pulse.count > 0
 		_:
 			return ordnance.offer(action, credits)
 	return {"allowed": cost > 0 and not installed and credits >= cost, "cost": cost, "installed": installed}
@@ -97,6 +104,8 @@ func buy(action: String, credits: int) -> int:
 			ecm_advanced = true
 		"combat_repair":
 			damaged = ""
+		"combat_energy_pulse":
+			pulse.count = 1
 		_:
 			return ordnance.buy(action, credits)
 	return int(offer.cost)
@@ -136,6 +145,7 @@ func record_fire(epoch: float) -> void:
 func advance_energy(previous: float, now: float) -> void:
 	if not _valid_epoch(previous) or not _valid_epoch(now) or now <= previous:
 		return
+	pulse.advance(now)
 	heat = maxf(0.0, heat - (now - previous) * COOLING_RATE)
 	if shield_fitted and shield < SHIELD_CAPACITY:
 		var recharge_time := maxf(0.0, now - maxf(previous, _shield_recharge_at))
@@ -160,6 +170,10 @@ func damage_module() -> String:
 		damaged = FOCUS
 	elif ecm_fitted:
 		damaged = ECM
+	elif ordnance.fitted:
+		damaged = LAUNCHER_MODULE
+	elif pulse.count > 0:
+		damaged = PULSE_MODULE
 	return damaged
 
 
@@ -189,7 +203,7 @@ func projectile_status() -> Dictionary:
 
 
 func has_active_ordnance() -> bool:
-	return not _projectile.is_empty() or not ordnance.missile.is_empty() or not ordnance.decoy.is_empty()
+	return not _projectile.is_empty() or not ordnance.missile.is_empty() or not ordnance.decoy.is_empty() or not pulse.wave.is_empty()
 
 
 func advance_projectile(epoch: float, delta: float, aim := Vector3.INF) -> Dictionary:
@@ -223,6 +237,7 @@ func clear_transients() -> void:
 	clear_projectile()
 	ordnance.missile.clear()
 	ordnance.decoy.clear()
+	pulse.wave.clear()
 
 
 func ecm_denial(ship_position: Vector3, epoch: float) -> String:
@@ -265,31 +280,40 @@ func snapshot() -> Dictionary:
 		"focus_owned": focus_owned, "weapon": weapon, "damaged": damaged, "fire_ready_at": _fire_ready_at,
 		"shield_recharge_at": _shield_recharge_at, "ecm_ready_at": _ecm_ready_at,
 		"projectile_ready_at": _projectile_ready_at, "salvos": _salvos, "projectile": encoded,
-		"ecm_advanced": ecm_advanced, "ordnance": ordnance.snapshot(),
+		"ecm_advanced": ecm_advanced, "ordnance": ordnance.snapshot(), "energy_pulse": pulse.snapshot(),
 	}
 
 
-func restore(raw: Variant, epoch: float, system: int, legacy := false) -> bool:
+func restore(raw: Variant, epoch: float, system: int, legacy := false, pre_pulse := false) -> bool:
 	if not _valid_epoch(epoch) or system < 0 or system >= Catalog.SYSTEM_COUNT:
 		return false
-	if not raw is Dictionary or raw.size() != SAVE_FIELDS.size() + (0 if legacy else 2) or not raw.has_all(SAVE_FIELDS):
+	var extra_fields := 0 if legacy else (2 if pre_pulse else 3)
+	if not raw is Dictionary or raw.size() != SAVE_FIELDS.size() + extra_fields or not raw.has_all(SAVE_FIELDS):
 		return false
 	if not raw.shield_fitted is bool or not raw.ecm_fitted is bool or not raw.focus_owned is bool:
 		return false
 	if not raw.weapon is String or not PROFILES.has(raw.weapon) or (raw.weapon == FOCUS and not raw.focus_owned):
 		return false
-	if not raw.damaged is String or raw.damaged not in ["", FOCUS, ECM]:
+	var damage_types := ["", FOCUS, ECM] if legacy or pre_pulse else ["", FOCUS, ECM, LAUNCHER_MODULE, PULSE_MODULE]
+	if not raw.damaged is String or raw.damaged not in damage_types:
 		return false
 	if (raw.damaged == FOCUS and not raw.focus_owned) or (raw.damaged == ECM and not raw.ecm_fitted):
 		return false
 	var restored_ordnance := Ordnance.new()
+	var restored_pulse := CombatPulse.new()
 	var advanced := false
 	if not legacy:
 		if not raw.get("ecm_advanced") is bool or (raw.ecm_advanced and not raw.ecm_fitted):
 			return false
 		if not restored_ordnance.restore(raw.get("ordnance"), epoch, system):
 			return false
+		if not pre_pulse and not restored_pulse.restore(raw.get("energy_pulse"), epoch, system):
+			return false
 		advanced = raw.ecm_advanced
+	if raw.damaged == LAUNCHER_MODULE and not restored_ordnance.fitted:
+		return false
+	if raw.damaged == PULSE_MODULE and restored_pulse.count == 0:
+		return false
 	var shield_limit := SHIELD_CAPACITY if raw.shield_fitted else 0.0
 	if not _number(raw.heat, 0.0, MAX_HEAT) or not _number(raw.shield, 0.0, shield_limit):
 		return false
@@ -314,6 +338,7 @@ func restore(raw: Variant, epoch: float, system: int, legacy := false) -> bool:
 	ecm_fitted = raw.ecm_fitted
 	ecm_advanced = advanced
 	ordnance = restored_ordnance
+	pulse = restored_pulse
 	focus_owned = raw.focus_owned
 	weapon = raw.weapon
 	damaged = raw.damaged

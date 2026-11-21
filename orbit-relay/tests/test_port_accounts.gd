@@ -60,6 +60,7 @@ func _test_charges_and_legacy() -> void:
 		"Restart does not charge a second time for the same completed day")
 	var legacy := restarted.snapshot()
 	legacy.schema = 48
+	Fixture.remove_schema_51_from_legacy(legacy)
 	Fixture.remove_extended_career_from_legacy(legacy)
 	Fixture.remove_ordnance_from_legacy(legacy)
 	legacy.erase("port_account")

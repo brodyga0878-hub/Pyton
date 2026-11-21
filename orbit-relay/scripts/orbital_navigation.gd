@@ -124,12 +124,14 @@ static func forecast(sim: RefCounted, horizon := 180.0, focus_id := -1) -> Dicti
 	for step in range(1, steps + 1):
 		var time := step * delta
 		var future_centers := _centers_at(blockers, epoch + time)
-		velocity += Dynamics.acceleration_at_epoch(system, position, epoch + time) * delta
+		var half_step := delta * 0.5
+		velocity += Dynamics.acceleration_at_epoch(system, position, epoch + time - delta) * half_step
 		# Sample halfway through the coast step so a fast entry sees drag even
 		# if the segment starts just above the atmosphere.
-		var midpoint := position + velocity * (delta * 0.5)
-		velocity = Atmosphere.drag_at_epoch(system, midpoint, velocity, epoch + time - delta * 0.5, delta)
+		var midpoint := position + velocity * half_step
+		velocity = Atmosphere.drag_at_epoch(system, midpoint, velocity, epoch + time - half_step, delta)
 		var next := position + velocity * delta
+		velocity += Dynamics.acceleration_at_epoch(system, next, epoch + time) * half_step
 		var contact := _swept_contact(blockers, previous_centers, future_centers, position, next, epoch + time - delta, delta)
 		if contact.id >= 0:
 			var impact_position := position.lerp(next, contact.fraction)

@@ -6,6 +6,7 @@ signal rendezvous_requested(site_id: int, gap: int)
 signal rendezvous_finish_requested()
 signal survey_requested(site: int)
 signal frame_selected(selection: int)
+signal frame_rotation_selected(selection: int)
 signal dismissed()
 
 const Sector := preload("res://scripts/sector_catalog.gd")
@@ -41,9 +42,12 @@ const RENDEZVOUS_METRICS := [
 const SURVEY_METRICS := [
 	["radius", "Радиус модели"],
 	["diameter", "Диаметр модели"],
+	["mass_kg", "Гравитационная масса модели"],
+	["temperature_k", "Оценка температуры"],
 	["gravity", "Притяжение на радиусе"],
 	["gravity_parameter", "Параметр тяготения μ"],
 	["ground_reference", "На поверхности"],
+	["associated_ports", "Действующие порты"],
 	["orbit_reference", "Центр орбиты"],
 	["period", "Период обращения"],
 	["periapsis", "Перицентр"],
@@ -100,6 +104,7 @@ var _orbit_state: Label
 var _orbit_reference: Label
 var _frame_label: Label
 var _frame_button: Button
+var _frame_rotation_button: Button
 var _orbit_values: Dictionary[String, Label] = {}
 var _orbit_window: Label
 var _forecast_summary: Label
@@ -267,6 +272,11 @@ func _build_trajectory_panel(parent: PanelContainer) -> void:
 	_frame_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_frame_button.add_theme_font_size_override("font_size", 16)
 	_frame_button.pressed.connect(_request_frame)
+	_frame_rotation_button = _button(actions, "По вращению", 52)
+	_frame_rotation_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_frame_rotation_button.add_theme_font_size_override("font_size", 16)
+	_frame_rotation_button.tooltip_text = "Кадр вращающейся поверхности или станции"
+	_frame_rotation_button.pressed.connect(_request_rotating_frame)
 	_orbit_button = _button(actions, "Круговая орбита", 52)
 	_orbit_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_orbit_button.add_theme_font_size_override("font_size", 16)
@@ -671,7 +681,15 @@ func _show_survey_values(data: Dictionary) -> void:
 	var link := str(data.get("ground_reference", ""))
 	var center := str(data.get("orbit_reference", ""))
 	var mu := float(data.get("gravity_parameter", 0.0))
+	var temperature := float(data.get("temperature_k", 0.0))
+	_set_survey_value("mass_kg", _mass_survey(float(data.get("mass_kg", 0.0))))
+	_set_survey_value("temperature_k", "%d К · %s" % [roundi(temperature),
+		"фотосфера по классу звезды" if surface == "star" else "равновесная в модели"] if temperature > 0.0 else "")
 	_set_survey_value("ground_reference", link)
+	var port_names := PackedStringArray()
+	for port: int in data.get("associated_ports", []):
+		port_names.append(Sector.site(port).name)
+	_set_survey_value("associated_ports", " · ".join(port_names))
 	_set_survey_value("orbit_reference", center if not center.is_empty() or surface != "star" else "Неподвижна в системе")
 	_gravity_survey(surface, mu, float(data.get("gravity", 0.0)))
 	var spin := float(data.get("spin", 0.0))
@@ -692,6 +710,14 @@ func _show_survey_values(data: Dictionary) -> void:
 	_set_survey_value("scoop", _scoop_survey(str(data.get("scoop_kind", ""))))
 	var resource := str(data.get("resource_name", ""))
 	_set_survey_value("resource", "%s · %d ед." % [resource, int(data.get("reserve", 0))] if not resource.is_empty() else "")
+
+
+static func _mass_survey(mass: float) -> String:
+	if mass <= 0.0:
+		return ""
+	var exponent := floori(log(mass) / log(10.0))
+	var quantity := ("%.2f" % (mass / pow(10.0, exponent))).replace(".", ",")
+	return "%s × 10^%d кг" % [quantity, exponent]
 
 
 func _gravity_survey(surface: String, mu: float, gravity: float) -> void:
@@ -845,13 +871,17 @@ func _refresh_frame() -> void:
 	var name := "система" if int(frame.reference) < 0 else "«%s»" % frame.name
 	if frame.surface:
 		name = "поверхность %s" % name
+	if frame.rotating:
+		name = "вращение «%s»" % frame.name
 	if frame.mode == "auto":
 		name = "Авто · %s" % name
 	elif frame.mode == "system":
 		name = "Система"
 	_frame_label.text = "Кадр полёта · %s" % name
 	_frame_button.text = "Кадр системы" if _frame_focus < 0 else "Кадр тела"
-	_frame_button.disabled = not frame.available or int(frame.choice) == _frame_focus
+	_frame_button.disabled = not frame.available or (int(frame.choice) == _frame_focus and not frame.rotating)
+	_frame_rotation_button.visible = _flight.can_rotate_reference(_frame_focus)
+	_frame_rotation_button.disabled = not frame.available or (int(frame.choice) == _frame_focus and frame.rotating)
 	var proposed := "системы" if _frame_focus < 0 else "«%s»" % _flight.target_name(_frame_focus)
 	_frame_button.tooltip_text = "Использовать кадр %s для ручного пилотирования" % proposed if frame.available else "Кадр можно переключить в полёте"
 
@@ -871,6 +901,13 @@ func _select_orbit_focus(id: int) -> void:
 func _request_frame() -> void:
 	if is_open() and _trajectory_panel.visible and not _frame_button.disabled:
 		frame_selected.emit(_frame_focus)
+		if is_open():
+			_refresh_frame()
+
+
+func _request_rotating_frame() -> void:
+	if is_open() and _trajectory_panel.visible and _frame_rotation_button.visible and not _frame_rotation_button.disabled:
+		frame_rotation_selected.emit(_frame_focus)
 		if is_open():
 			_refresh_frame()
 
@@ -938,7 +975,7 @@ func _notification(what: int) -> void:
 
 func _button_at(point: Vector2) -> Button:
 	for button: Button in [
-		_select_button, _frame_button, _orbit_button, _rendezvous_action, _rendezvous_finish,
+		_select_button, _frame_button, _frame_rotation_button, _orbit_button, _rendezvous_action, _rendezvous_finish,
 		_scan_button, _view_button, _trajectory_button, _rendezvous_button, _survey_button, _close_button,
 	]:
 		if button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(point):

@@ -1,5 +1,7 @@
 extends Control
 
+const Text := preload("res://scripts/flight_text.gd")
+
 const GRID := Color("40626d")
 const TEXT := Color("b8dadd")
 const FRIENDLY := Color("79ddd1")
@@ -35,8 +37,8 @@ func _draw() -> void:
 	draw_line(center - Vector2(0, radius), center + Vector2(0, radius), GRID, 1.0, true)
 	draw_circle(center, 3.0, TEXT, true, -1.0, true)
 	var font := ThemeDB.fallback_font
-	draw_string(font, center - Vector2(15, radius + 3), "НОС", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, TEXT)
-	draw_string(font, center + Vector2(-20, radius + 15), "%d м" % roundi(_range), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, TEXT)
+	draw_string(font, center - Vector2(15, radius + 3), Text.text("SCANNER_NOSE"), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, TEXT)
+	draw_string(font, center + Vector2(-20, radius + 15), Text.text("SCANNER_RANGE") % roundi(_range), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, TEXT)
 	for contact: Dictionary in _contacts:
 		var point := _contact_points(contact.relative, center, radius)
 		var tint := HOSTILE if contact.attackable else FRIENDLY

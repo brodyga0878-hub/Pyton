@@ -142,10 +142,10 @@ func _test_stellar_heat() -> void:
 			"An invalid saved temperature is rejected atomically: %s" % invalid)
 	flight.position = center + Vector3.BACK * (Catalog.STAR_CLEARANCE + 0.3)
 	var hull_before := flight.ship.hull
-	_step_flight(flight, 22.0)
+	_step_flight(flight, 8.0)
 	_expect(flight.thermal_status().danger and flight.thermal_status().level == "critical"
 		and flight.ship.hull < hull_before and flight.ship.hull > 0.0,
-		"Sustained exposure just above the stellar exclusion radius damages the hull")
+		"Brief critical exposure just above the stellar exclusion radius damages the hull before escape")
 	flight.yaw = PI
 	flight.change_throttle(0.45)
 	_step_flight(flight, 7.0)

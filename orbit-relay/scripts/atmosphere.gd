@@ -3,6 +3,7 @@ extends RefCounted
 
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const Orbit = preload("res://scripts/orbit_ephemeris.gd")
+const Terrain = preload("res://scripts/surface_terrain.gd")
 
 const SAFE_ENTRY_SPEED := 38.0
 const NEAR_MARGIN := 90.0
@@ -10,6 +11,7 @@ const DRAG_COEFFICIENT := 0.004
 const HEAT_REFERENCE_SPEED := 44.0
 const HEAT_SCALE := 85.0
 const MAX_HEAT_TARGET := 210.0
+const GAS_ROTATION := 0.005
 const PROFILES := {
 	Catalog.GAS_GIANT_ID: {"height": 100.0, "density": 1.75, "color": Color("#edb37e")},
 	Catalog.TERRACE_ID: {"height": 46.0, "density": 1.0, "color": Color("#87bdff")},
@@ -36,8 +38,8 @@ static func sample(sim: RefCounted, point: Vector3, velocity: Vector3) -> Dictio
 		}
 
 	var center: Vector3 = sim.target_position(site)
-	var drift: Vector3 = sim.target_velocity(site)
 	var radial := point - center
+	var drift := air_drift(site, radial, sim.target_velocity(site))
 	var relative := velocity - drift
 	var layer := profile(site)
 	var height: float = layer.height
@@ -66,10 +68,18 @@ static func drag_at_epoch(system: int, point: Vector3, velocity: Vector3, epoch:
 	if site < 0 or not point.is_finite() or not is_finite(epoch):
 		return velocity
 	var state := Orbit.sample(site, epoch)
-	var altitude := point.distance_to(state.position) - float(Catalog.site(site).radius)
+	var radial := point - Vector3(state.position)
+	var altitude := radial.length() - float(Catalog.site(site).radius)
 	var layer := profile(site)
 	var depth := _depth(altitude, layer.height)
-	return drag(velocity, state.velocity, float(layer.density) * depth * depth, delta)
+	return drag(velocity, air_drift(site, radial, state.velocity), float(layer.density) * depth * depth, delta)
+
+
+static func air_drift(site: int, radial: Vector3, orbital: Vector3) -> Vector3:
+	# Solid bodies entrain the air above the rotating surface. Giant cloud belts
+	# use a slower planetary rotation because there is no solid reference pad.
+	var rotation := Vector3.UP.cross(radial) * GAS_ROTATION if Catalog.is_gas_giant(site) else Terrain.spin_velocity(site, radial)
+	return orbital + rotation
 
 
 static func heat_target(relative_speed: float, density: float) -> float:

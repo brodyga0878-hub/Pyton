@@ -6,7 +6,7 @@ const SECTOR_SIZE := ProceduralSystems.SECTOR_SIZE
 const GENERATED_SCAN_RANGE := 10.5
 const GENERATED_JUMP_ENTRY := 5.0
 const GENERATED_JUMP_PER_LIGHT_YEAR := 7.0
-const GENERATED_SYSTEM_COUNT := ProceduralSystems.SINGLE_SYSTEM_COUNT + 1 + ProceduralSystems.FRONTIER_SYSTEM_COUNT + ProceduralSystems.OUTER_SYSTEM_COUNT
+const GENERATED_SYSTEM_COUNT := ProceduralSystems.SINGLE_SYSTEM_COUNT + 1 + ProceduralSystems.FRONTIER_SYSTEM_COUNT + ProceduralSystems.OUTER_SYSTEM_COUNT + ProceduralSystems.REACH_SYSTEM_COUNT
 const SITE_COUNT := 9
 const STAR_ID := SITE_COUNT
 const TARGET_COUNT := SITE_COUNT + 1
@@ -22,6 +22,7 @@ const PRE_BINARY_SYSTEM_COUNT := AUTHORED_SYSTEM_COUNT + ProceduralSystems.SINGL
 const BINARY_SYSTEM := PRE_BINARY_SYSTEM_COUNT
 const PRE_EXPANDED_SYSTEM_COUNT := BINARY_SYSTEM + 1
 const PRE_ATLAS_SYSTEM_COUNT := PRE_EXPANDED_SYSTEM_COUNT + ProceduralSystems.FRONTIER_SYSTEM_COUNT
+const PRE_REACH_SYSTEM_COUNT := PRE_ATLAS_SYSTEM_COUNT + ProceduralSystems.OUTER_SYSTEM_COUNT
 const SYSTEM_COUNT := AUTHORED_SYSTEM_COUNT + GENERATED_SYSTEM_COUNT
 const PRE_SURFACE_DESTINATION_COUNT := 15
 const PRE_TRAFFIC_DESTINATION_COUNT := PRE_SURFACE_DESTINATION_COUNT + 1
@@ -40,7 +41,8 @@ const GROUND_HANGAR := GROUND_PAD + 1
 const PRE_EXPANDED_DESTINATION_COUNT := GROUND_HANGAR + 1
 const PRE_ATLAS_DESTINATION_COUNT := PRE_EXPANDED_DESTINATION_COUNT + ProceduralSystems.FRONTIER_SYSTEM_COUNT * ProceduralSystems.TARGETS_PER_SYSTEM
 const PRE_RICH_SYSTEMS_DESTINATION_COUNT := PRE_ATLAS_DESTINATION_COUNT + ProceduralSystems.OUTER_SYSTEM_COUNT * ProceduralSystems.TARGETS_PER_SYSTEM
-const DESTINATION_COUNT := PRE_RICH_SYSTEMS_DESTINATION_COUNT + ProceduralSystems.MOON_COUNT + ProceduralSystems.GAS_GIANT_COUNT
+const PRE_REACH_DESTINATION_COUNT := PRE_RICH_SYSTEMS_DESTINATION_COUNT + ProceduralSystems.MOON_COUNT + ProceduralSystems.GAS_GIANT_COUNT
+const DESTINATION_COUNT := PRE_REACH_DESTINATION_COUNT + ProceduralSystems.REACH_SITE_COUNT
 const GROUND_BODY := 12
 const VELAR_STAR_ID := 14
 const TERRACE_ID := PRE_SURFACE_DESTINATION_COUNT
@@ -184,12 +186,15 @@ const ROUTES := {
 static var _generated := ProceduralSystems.build(AUTHORED_DESTINATION_COUNT)
 static var _frontier := ProceduralSystems.build_frontier(PRE_EXPANDED_DESTINATION_COUNT)
 static var _outer := ProceduralSystems.build_outer(PRE_ATLAS_DESTINATION_COUNT, _frontier.systems)
+static var _reach := ProceduralSystems.build_reach(PRE_REACH_DESTINATION_COUNT, _outer.systems)
 static var _generated_index := _index_generated_systems()
 
 
 static func site(id: int) -> Dictionary:
 	if id < 0 or id >= DESTINATION_COUNT:
 		return {}
+	if id >= PRE_REACH_DESTINATION_COUNT:
+		return _reach.sites[id - PRE_REACH_DESTINATION_COUNT]
 	if id >= PRE_ATLAS_DESTINATION_COUNT:
 		return _outer.sites[id - PRE_ATLAS_DESTINATION_COUNT]
 	if id >= PRE_EXPANDED_DESTINATION_COUNT:
@@ -204,6 +209,8 @@ static func site(id: int) -> Dictionary:
 static func system(id: int) -> Dictionary:
 	if id < 0 or id >= SYSTEM_COUNT:
 		return {}
+	if id >= PRE_REACH_SYSTEM_COUNT:
+		return _reach.systems[id - PRE_REACH_SYSTEM_COUNT]
 	if id >= PRE_ATLAS_SYSTEM_COUNT:
 		return _outer.systems[id - PRE_ATLAS_SYSTEM_COUNT]
 	if id >= PRE_EXPANDED_SYSTEM_COUNT:
@@ -267,6 +274,8 @@ static func _index_generated_systems() -> Dictionary:
 static func system_of_site(id: int) -> int:
 	if id < 0 or id >= DESTINATION_COUNT:
 		return -1
+	if id >= PRE_REACH_DESTINATION_COUNT:
+		return PRE_REACH_SYSTEM_COUNT + int(_reach.owners[id - PRE_REACH_DESTINATION_COUNT])
 	if id >= PRE_RICH_SYSTEMS_DESTINATION_COUNT:
 		return PRE_ATLAS_SYSTEM_COUNT + int(site(id).system_index)
 	if id >= PRE_ATLAS_DESTINATION_COUNT:

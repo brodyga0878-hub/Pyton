@@ -47,7 +47,7 @@ func _test_previous_atlas_area() -> void:
 	var stars := 0
 	for id in range(Catalog.SYSTEM_COUNT):
 		stars += Catalog.stars_for(id).size()
-	_expect(Catalog.SYSTEM_COUNT == 512 and stars == 513,
+	_expect(Catalog.SYSTEM_COUNT == 1024 and stars == 1037,
 		"Actual star components are counted separately from selectable systems")
 
 
@@ -92,7 +92,7 @@ func _test_map_ui() -> void:
 	_expect(pilot.planned_route().goal == Catalog.VELAR_SYSTEM, "Create a real planned route before changing views")
 	_tap(map._atlas_button)
 	await process_frame
-	_expect(map._atlas and map._atlas_button.button_pressed and map._scope_label.text.contains("512")
+	_expect(map._atlas and map._atlas_button.button_pressed and map._scope_label.text.contains(str(Catalog.SYSTEM_COUNT))
 		and map._drag_button.disabled
 		and chart._systems.size() == 3 and chart._points.size() == 3 and not map._system_buttons.has(Catalog.SYSTEM_COUNT - 1),
 		"Atlas reveals whole-catalog density without revealing undiscovered destinations or expanding the known list")
@@ -157,6 +157,18 @@ func _test_map_ui() -> void:
 	_mouse(sector_end, false)
 	_expect(map._chart_pointer == -1 and not chart._orbit_angles.is_zero_approx(),
 		"Left mouse drag rotates the sector from the fixed side projection")
+	_tap(map._directory_button)
+	await process_frame
+	_expect(map._directory and map._listed_systems() == [Catalog.HOME_SYSTEM, Catalog.VELAR_SYSTEM, Catalog.FRINGE_SYSTEM],
+		"The directory shows the three known named systems without disclosing unopened core dossiers")
+	_tap(map._system_buttons[Catalog.VELAR_SYSTEM])
+	_tap(map._dossier_button)
+	await process_frame
+	_tap(map._dossier_tabs[2])
+	await process_frame
+	_expect(map._dossier_archive_title.text == "Орбита и поверхность Лазури"
+		and map._dossier_archive_text.text.count("\n\n") == 1 and map._dossier_pages[2].is_visible_in_tree(),
+		"Open the authored archive of another known system using the actual touch controls")
 	_expect(pilot.snapshot() == before, "Exploring each map view leaves the flight, fuel, discoveries and planned route intact")
 	_canvas.queue_free()
 	await process_frame

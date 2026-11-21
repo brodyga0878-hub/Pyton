@@ -36,6 +36,7 @@ static func remove_ground_ports_from_legacy(state: Dictionary) -> void:
 
 
 static func remove_expanded_market_from_legacy(state: Dictionary) -> void:
+	remove_schema_51_from_legacy(state)
 	remove_extended_career_from_legacy(state)
 	remove_ordnance_from_legacy(state)
 	for good: String in Economy.NEW_GOODS:
@@ -43,6 +44,14 @@ static func remove_expanded_market_from_legacy(state: Dictionary) -> void:
 		for inventory: Dictionary in state.market.values():
 			inventory.erase(good)
 	state.erase("market_contacts")
+
+
+static func remove_schema_51_from_legacy(state: Dictionary) -> void:
+	if state.mining.reserves.size() > Catalog.PRE_REACH_DESTINATION_COUNT:
+		state.mining.reserves.resize(Catalog.PRE_REACH_DESTINATION_COUNT)
+	state.combat.erase("energy_pulse")
+	state.patrol.erase("tactics")
+	state.erase("law")
 
 
 static func remove_extended_career_from_legacy(state: Dictionary) -> void:
@@ -55,4 +64,7 @@ static func remove_ordnance_from_legacy(state: Dictionary) -> void:
 	if state.has("combat"):
 		state.combat.erase("ordnance")
 		state.combat.erase("ecm_advanced")
+		state.combat.erase("energy_pulse")
 		state.combat.projectile.erase("hardened")
+	if state.get("patrol") is Dictionary:
+		state.patrol.erase("tactics")

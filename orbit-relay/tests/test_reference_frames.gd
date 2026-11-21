@@ -26,6 +26,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	_test_body_fixed_frame()
 	var arrived := _binary_arrival()
 	if arrived != null:
 		_test_coasting_handoff(arrived)
@@ -54,6 +55,46 @@ func _binary_arrival() -> Flight:
 		"Reach the binary system by guided station departure and a real star drive jump"):
 		return null
 	return flight
+
+
+func _test_body_fixed_frame() -> void:
+	var flight := Flight.new()
+	Fixture.launch(flight)
+	const PORT := 0
+	flight.position = flight.target_position(PORT) + Vector3(180.0, -25.0, 130.0)
+	flight.velocity = Vector3(9.0, -3.0, 16.0)
+	var position := flight.position
+	var velocity := flight.velocity
+	var attitude := flight.attitude()
+	if not _expect(flight.can_rotate_reference(PORT) and not flight.set_reference_frame(Catalog.STAR_ID, true)
+		and flight.set_reference_frame(PORT, true) and flight.position == position and flight.velocity == velocity
+		and flight.attitude().is_equal_approx(attitude), "Selecting a rotating berth frame preserves the instantaneous world pose"):
+		return
+	var initial := flight.frame_status()
+	var spin := float(Catalog.site(PORT).spin)
+	var coupling := flight.station_axis(PORT).cross(position - flight.target_position(PORT)) * spin
+	_expect(initial.rotating and Vector3(initial.velocity).is_equal_approx(flight.target_velocity(PORT) + coupling)
+		and (Vector3(initial.origin) + initial.basis * initial.local_position).is_equal_approx(position)
+		and (Vector3(initial.velocity) + initial.basis * initial.local_velocity).is_equal_approx(velocity)
+		and (initial.basis * initial.local_attitude).is_equal_approx(attitude),
+		"Berth axes, position, attitude and relative velocity reconstruct the same inertial ship state")
+	for _index in range(18):
+		flight.update(STEP, Vector2.ZERO, 0.0, false, false)
+	var updated := flight.frame_status()
+	_expect(not flight.attitude().is_equal_approx(attitude) and updated.local_attitude.is_equal_approx(initial.local_attitude),
+		"Assisted flight holds the selected station's local attitude as the berth rotates")
+	flight.set_flight_assist(false)
+	attitude = flight.attitude()
+	for _index in range(18):
+		flight.update(STEP, Vector2.ZERO, 0.0, false, false)
+	_expect(flight.attitude().is_equal_approx(attitude) and not flight.frame_status().local_attitude.is_equal_approx(updated.local_attitude),
+		"Unaided inertial flight keeps its absolute attitude regardless of the instrument frame")
+	var save := flight.snapshot()
+	var cold := Flight.new()
+	_expect(cold.restore(save) and cold.frame_status().rotating and cold.frame_status().basis.is_equal_approx(flight.frame_status().basis),
+		"Cold restore recovers the chosen rotation and its physical epoch")
+	save.frame.erase("rotating")
+	_expect(Flight.new().restore(save), "Old two-field frame saves still open with an ordinary body frame")
 
 
 func _test_coasting_handoff(arrived: Flight) -> void:
@@ -235,6 +276,11 @@ func _test_touch(arrived: Flight) -> void:
 		and saved.get("frame", {}).get("choice") == MOON and flight.position == position
 		and flight.velocity == velocity and flight.attitude().is_equal_approx(attitude),
 		"The real chart applies the explicit moon frame while preserving the current course and flight state")
+	_tap(viewport, map._frame_rotation_button, "Switch to the rotating moon frame by touch")
+	await process_frame
+	_expect(flight.frame_status().rotating and SessionIO.load_state().get("frame", {}).get("rotating", false)
+		and flight.position == position and flight.attitude().is_equal_approx(attitude),
+		"The chart applies and saves the rotating frame without moving or turning the ship")
 	viewport.queue_free()
 	await process_frame
 

@@ -81,7 +81,7 @@ func snapshot() -> Dictionary:
 	return {"ready_at": ready_at, "fragments": fragments}
 
 
-func restore(raw: Variant, epoch: float, rig: RefCounted, remote_site := -1, remote_stored := 0) -> bool:
+func restore(raw: Variant, epoch: float, rig: RefCounted, stored_by_site := {}) -> bool:
 	if not _valid_epoch(epoch) or not raw is Dictionary or raw.size() != 2:
 		return false
 	if not _number(raw.get("ready_at"), 0.0, epoch + PULSE_SECONDS + CLOCK_TOLERANCE):
@@ -101,7 +101,7 @@ func restore(raw: Variant, epoch: float, rig: RefCounted, remote_site := -1, rem
 		if restored.has(site) or not supports_site(site):
 			return false
 		var extracted := int(Catalog.site(site).reserve) - int(rig.reserve_at(site))
-		var remote := remote_stored if site == remote_site else 0
+		var remote := int(stored_by_site.get(site, 0))
 		if extracted <= remote:
 			return false
 		if not _number(fragment.created, 0.0, epoch) or float(fragment.created) + PULSE_SECONDS > deadline + CLOCK_TOLERANCE:

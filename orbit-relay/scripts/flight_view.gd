@@ -188,6 +188,7 @@ var _backdrop_orbit_axis := Vector3.UP
 var _mining_rig: Node3D
 var _fragment_views: Dictionary[int, MeshInstance3D] = {}
 var _cargo_pod_views: Dictionary[int, Node3D] = {}
+var _processor_view: Node3D
 var _fragment_meshes: Dictionary[String, ArrayMesh] = {}
 var _fragment_paints: Dictionary[String, ShaderMaterial] = {}
 var _mining_beam: Node3D
@@ -197,6 +198,10 @@ var _combat_projectile: Node3D
 var _combat_projectile_trail: MeshInstance3D
 var _player_missile: Node3D
 var _player_decoy: Node3D
+var _pulse_wave: Node3D
+var _pulse_wave_paint: StandardMaterial3D
+var _escape_capsule: Node3D
+var _escape_wreck: Node3D
 var _traffic: Node3D
 var _atmosphere: Node3D
 var _hyper_transit: HyperTransitOverlay
@@ -248,6 +253,7 @@ func build() -> void:
 	_build_mining_pulse()
 	_build_combat_projectile()
 	_build_player_ordnance()
+	_build_emergency_models()
 	_traffic = TrafficView.new()
 	add_child(_traffic)
 	_traffic.set_visual_profile(_visual_profile)
@@ -397,6 +403,10 @@ func select_camera_mode(mode: int) -> bool:
 	return true
 
 
+func preferred_camera_mode() -> int:
+	return _preferred_camera_mode
+
+
 func shows_forward_aim() -> bool:
 	return _camera_director.shows_forward_aim()
 
@@ -434,6 +444,8 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var surface_id := int(sim.landed_site)
 	var landed := surface_id >= 0
 	var settled := docked or landed
+	var escape: Dictionary = sim.escape_status()
+	var in_escape: bool = escape.active
 	var berth := int(sim.docked) if docked else surface_id
 	var ground_berth := docked and Ground.is_port(berth)
 	var body_attached := landed or ground_berth
@@ -466,7 +478,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 		body.sync(position_now, site_id == int(sim.target), not settled, field_direction)
 	var thrust := clampf(float(sim.throttle), 0.0, 1.0)
 	_flight_time += delta
-	_jet.visible = transit or (not settled and thrust > 0.01)
+	_jet.visible = transit or (not settled and not in_escape and thrust > 0.01)
 	var plume_length := 1.35 if transit else (0.45 + thrust * 0.85) * (1.45 if sim.boost else 1.0)
 	_jet.scale = Vector3(1.0, plume_length, 1.0)
 	_jet_material.set_shader_parameter("pulse", 0.69 if transit else 0.59 + sin(_flight_time * 31.0) * 0.08)
@@ -533,14 +545,31 @@ func sync(sim: RefCounted, delta: float) -> void:
 	if absf(sight.dot(_camera_up)) > 0.995:
 		_camera_up = up if absf(sight.dot(up)) < 0.995 else heading.x
 	var exterior := Transform3D(Basis.looking_at(sight, _camera_up), _exterior_position)
-	var freighter := hull_id == ShipSystems.FREIGHTER_HULL
+	var freighter := hull_id in [ShipSystems.FREIGHTER_HULL, ShipSystems.UTILITY_HULL]
 	# Keep the established framing during the automatic berth operation.
-	var forced_exterior := settled or transit
-	_camera_director.select(FlightCamera.Mode.EXTERIOR if forced_exterior else _preferred_camera_mode)
-	var shot_cut := cut or (forced_exterior and _camera_director.transitioning())
-	camera.transform = _camera_director.sample(_ship.transform, exterior, delta, freighter, shot_cut)
+	var forced_exterior := settled or transit or in_escape
+	var previous_mode: int = _camera_director.mode
+	var missile_camera: Dictionary = sim.missile_camera_record() if _preferred_camera_mode == FlightCamera.Mode.MISSILE else {}
+	if _preferred_camera_mode == FlightCamera.Mode.MISSILE and missile_camera.is_empty():
+		_preferred_camera_mode = FlightCamera.Mode.EXTERIOR
+	var mode := FlightCamera.Mode.EXTERIOR if forced_exterior else _preferred_camera_mode
+	var changed := _camera_director.select(mode)
+	var special := Transform3D.IDENTITY
+	if mode == FlightCamera.Mode.OBSERVER:
+		var origin := _surface_safe_camera(position_now + heading * Vector3(-17, 9, 13), sim)
+		special = _focused_shot(origin, position_now + heading * Vector3(0, 0, -3))
+	elif mode == FlightCamera.Mode.MISSILE:
+		var missile_at: Vector3 = missile_camera.position
+		var course: Vector3 = Vector3(missile_camera.velocity).normalized()
+		var missile_basis := Basis.looking_at(course, Vector3.RIGHT if absf(course.y) > 0.95 else Vector3.UP)
+		var origin := _surface_safe_camera(missile_at + missile_basis * Vector3(1.8, 2.7, 8.0), sim)
+		special = _focused_shot(origin, missile_at + course * 8.0)
+	var missile_cut := changed and (mode == FlightCamera.Mode.MISSILE or previous_mode == FlightCamera.Mode.MISSILE)
+	var shot_cut := cut or missile_cut or (forced_exterior and _camera_director.transitioning())
+	camera.transform = _camera_director.sample(_ship.transform, exterior, delta, freighter, shot_cut, special)
 	camera.fov = _camera_director.field_of_view
-	_ship.visible = _camera_director.shows_hull()
+	_ship.visible = not in_escape and _camera_director.shows_hull()
+	_sync_escape_models(escape, position_now, heading)
 	_cockpit_canopy.sync(_camera_director.cockpit_mix)
 	_stars.position = camera.position
 	for site_id: int in _stellar_views:
@@ -597,8 +626,9 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_mining_rig.sync(_ship.global_transform, deposit, int(sim.mining.phase) if landed else MiningRig.STOWED, sim.mining.progress(), float(sim.elapsed))
 	_sync_fragments(sim.local_fragments(), position_now, float(sim.orbit_time))
 	_sync_cargo_pods([] if transit else sim.local_cargo_pods(), position_now, epoch)
+	_sync_surface_processor(sim, position_now, transit)
 	_sync_mining_pulse({} if transit else sim.orbital_mining_beam())
-	var combat_state: Dictionary = {} if transit or settled else sim.combat_status()
+	var combat_state: Dictionary = {} if transit or settled or in_escape else sim.combat_status()
 	_sync_combat_projectile(combat_state)
 	_sync_player_ordnance(combat_state)
 	_traffic.sync(sim.traffic_contacts(), sim.combat_beams())
@@ -612,6 +642,14 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_lighting.fog_light_energy = 0.48
 		_lighting.fog_density = float(haze.density) * 0.0015
 		_lighting.fog_sky_affect = 0.0
+
+
+static func _focused_shot(origin: Vector3, focus: Vector3) -> Transform3D:
+	var direction := origin.direction_to(focus)
+	if direction.is_zero_approx():
+		direction = Vector3.FORWARD
+	var up := Vector3.RIGHT if absf(direction.y) > 0.95 else Vector3.UP
+	return Transform3D(Basis.looking_at(direction, up), origin)
 
 
 func _sync_fragments(fragments: Array, pilot_position: Vector3, epoch: float) -> void:
@@ -656,6 +694,29 @@ func _sync_cargo_pods(pods: Array, pilot_position: Vector3, epoch: float) -> voi
 			_cargo_pod_views[id].hide()
 			_cargo_pod_views[id].queue_free()
 			_cargo_pod_views.erase(id)
+
+
+func _sync_surface_processor(sim: RefCounted, pilot_position: Vector3, transit: bool) -> void:
+	var status: Dictionary = sim.processor_status()
+	if transit or not status.same_system or pilot_position.distance_squared_to(status.point) > 400.0 * 400.0:
+		if is_instance_valid(_processor_view):
+			_processor_view.hide()
+		return
+	if not is_instance_valid(_processor_view) or _processor_view.get_parent() != _sector:
+		_processor_view = Node3D.new()
+		_processor_view.name = "SurfaceMedicalProcessor"
+		_sector.add_child(_processor_view)
+		_box_batch(_processor_view, _surface(Color("#324c57"), 0.62, 0.35), [
+			[Vector3(0, 0, 0.9), Vector3(5.2, 3.1, 1.8)],
+			[Vector3(0, 0, 2.15), Vector3(3.3, 2.2, 0.7)],
+		])
+		_box_batch(_processor_view, _light(Color("#f4da8f")), [
+			[Vector3(0, -1.62, 1.0), Vector3(3.7, 0.1, 0.22)],
+			[Vector3(0, 1.62, 1.0), Vector3(3.7, 0.1, 0.22)],
+		])
+	var anchor: Transform3D = sim.processor_transform()
+	_processor_view.transform = anchor.translated_local(Vector3(6.0, 0.0, 0.0))
+	_processor_view.show()
 
 
 func _build_cargo_pod(id: int) -> Node3D:
@@ -849,6 +910,17 @@ func _build_player_ordnance() -> void:
 	_mesh(_player_decoy, core, _light(Color("#ffe6a0")), Vector3.ZERO)
 	_ring(_player_decoy, _light(Color("#d09cfb")), Vector3.ZERO, 1.50, 0.19, 12)
 	_player_decoy.hide()
+	_pulse_wave = Node3D.new()
+	add_child(_pulse_wave)
+	_pulse_wave_paint = _light(Color(0.37, 0.88, 1.0, 0.55))
+	_pulse_wave_paint.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_pulse_wave_paint.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	_ring(_pulse_wave, _pulse_wave_paint, Vector3.ZERO, 1.0, 0.014, 24)
+	var tilted := Node3D.new()
+	tilted.rotation.x = PI * 0.5
+	_pulse_wave.add_child(tilted)
+	_ring(tilted, _pulse_wave_paint, Vector3.ZERO, 1.0, 0.010, 24)
+	_pulse_wave.hide()
 
 
 func _sync_player_ordnance(status: Dictionary) -> void:
@@ -856,6 +928,50 @@ func _sync_player_ordnance(status: Dictionary) -> void:
 	var decoy: Dictionary = status.get("decoy", {})
 	_place_ordnance(_player_missile, launcher.get("projectile", {}))
 	_place_ordnance(_player_decoy, decoy if decoy.get("active", false) else {})
+	var pulse: Dictionary = status.get("pulse", {})
+	_pulse_wave.visible = bool(pulse.get("active", false))
+	if _pulse_wave.visible:
+		_pulse_wave.position = pulse.position
+		_pulse_wave.scale = Vector3.ONE * maxf(0.1, pulse.radius)
+		var tint := _pulse_wave_paint.albedo_color
+		tint.a = lerpf(0.66, 0.05, clampf(pulse.progress, 0.0, 1.0))
+		_pulse_wave_paint.albedo_color = tint
+
+
+func _build_emergency_models() -> void:
+	_escape_capsule = Node3D.new()
+	_escape_capsule.name = "EscapeCapsule"
+	add_child(_escape_capsule)
+	var capsule_paint := _surface(Color("9eacb0"), 0.48, 0.49)
+	_cylinder(_escape_capsule, capsule_paint, Vector3.ZERO, 1.0, 0.72, 3.0, 8)
+	var bezel := _light(Color("69cbce"))
+	_ring(_escape_capsule, bezel, Vector3(0, 0, -0.71), 0.88, 0.13, 14)
+	_ring(_escape_capsule, _light(Color("efb979")), Vector3(0, 0, 0.92), 0.92, 0.15, 14)
+	_escape_capsule.hide()
+
+	_escape_wreck = Node3D.new()
+	_escape_wreck.name = "EscapeWreck"
+	add_child(_escape_wreck)
+	var charred := _surface(Color("353435"), 0.29, 0.82)
+	_box_batch(_escape_wreck, charred, [
+		[Vector3.ZERO, Vector3(5.0, 1.2, 4.0), 0.19],
+		[Vector3(-4.0, -0.9, 1.7), Vector3(3.3, 0.44, 2.3), -0.31],
+		[Vector3(3.9, 0.56, -1.8), Vector3(2.0, 0.67, 2.5), 0.62],
+	])
+	_box_batch(_escape_wreck, _light(Color("c97841")), [
+		[Vector3(-0.4, 0.6, -0.8), Vector3(1.0, 0.15, 0.39)],
+		[Vector3(1.2, 0.6, 0.9), Vector3(0.49, 0.14, 0.3)],
+	])
+	_escape_wreck.hide()
+
+
+func _sync_escape_models(status: Dictionary, at: Vector3, heading: Basis) -> void:
+	_escape_capsule.visible = status.active
+	_escape_wreck.visible = status.wreck_visible
+	if _escape_capsule.visible:
+		_escape_capsule.transform = Transform3D(heading, at)
+	if _escape_wreck.visible:
+		_escape_wreck.position = status.wreck_position
 
 
 func _place_ordnance(model: Node3D, record: Dictionary) -> void:
@@ -1488,8 +1604,29 @@ func _build_ship_model(hull_id: String) -> void:
 	if hull_id == ShipSystems.FREIGHTER_HULL:
 		_ship.name = "FreighterHull"
 		_build_freighter()
+	elif hull_id == ShipSystems.UTILITY_HULL:
+		_ship.name = "UtilityHull"
+		_build_freighter()
+		_apply_hull_proportions(Vector3(1.06, 0.82, 0.86))
+		var thruster := _panel_finish(Color("bd8249"), 0.51, 0.39, Vector2(4.0, 2.0), true)
+		for side: float in [-1.0, 1.0]:
+			_sectioned_shell(_ship, thruster, [Vector3(-0.36, 0.20, 0.13), Vector3(0.25, 0.36, 0.25),
+				Vector3(1.12, 0.31, 0.22)], Vector3(side * 2.05, 0.10, 0.22))
+	elif hull_id == ShipSystems.SURVEY_HULL:
+		_ship.name = "SurveyHull"
+		_build_ship()
+		_apply_hull_proportions(Vector3(0.74, 0.88, 1.12))
+		var scanner := _panel_finish(Color("7ad6cf"), 0.56, 0.43, Vector2(3.0, 2.0), true)
+		_sectioned_shell(_ship, scanner, [Vector3(-0.55, 0.12, 0.07), Vector3(-0.08, 0.19, 0.16),
+			Vector3(0.38, 0.17, 0.11)], Vector3(0.0, 0.74, 0.0))
 	else:
 		_build_ship()
+
+
+func _apply_hull_proportions(factors: Vector3) -> void:
+	for child: Node in _ship.get_children():
+		if child is Node3D:
+			child.transform = Transform3D(child.basis.scaled(factors), child.position * factors)
 
 
 func _build_ship() -> void:

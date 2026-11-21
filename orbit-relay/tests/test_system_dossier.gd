@@ -60,6 +60,15 @@ func _test_known_systems(flight: Flight, map: GalaxyMap) -> void:
 	_tap(map._dossier_tabs[GalaxyMap.DossierPage.TRADE], "Open the separate trade page with touch")
 	await process_frame
 	var velar := flight.system_dossier(VELAR)
+	_expect(Economy.GOODS.all(func(good: String) -> bool:
+		return "%s %d" % [Economy.good_name(good), int(velar.goods[good])] in map._dossier_stock.text),
+		"The trade dossier displays all supported public-market commodities and stocks")
+	var flows := map._port_supply_flows(velar.ports)
+	_expect(map._dossier_secondary.is_visible_in_tree()
+		and not flows.secondary_imports.is_empty() and not flows.secondary_exports.is_empty()
+		and "%s" % flows.secondary_imports[0] in map._dossier_secondary.text
+		and "%s" % flows.secondary_exports[0] in map._dossier_secondary.text,
+		"Lesser demand and production are shown separately from the top trade flows")
 	_expect(map._dossier_stock.is_visible_in_tree() and not map._dossier_stars.is_visible_in_tree()
 		and "Медикаменты %d" % int(velar.goods.medical) in map._dossier_stock.text
 		and map._dossier_customs_rule.is_visible_in_tree() and "До 4 ед." in map._dossier_customs_rule.text

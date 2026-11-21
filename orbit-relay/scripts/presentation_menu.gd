@@ -19,6 +19,7 @@ const ROW_TITLES := {
 	"music_mode": "Режим музыки",
 	"invert_yaw": "Горизонтальная ось",
 	"invert_pitch": "Вертикальная ось",
+	"language": "Язык кабины и связи",
 }
 const ROW_HINTS := {
 	"quality": [
@@ -46,6 +47,7 @@ const ROW_HINTS := {
 	"music_mode": ["Музыка меняется при манёврах и в бою", "Мелодия свободного полёта звучит постоянно"],
 	"invert_yaw": ["Вправо — поворот вправо", "Вправо — поворот влево"],
 	"invert_pitch": ["Вверх — нос поднимается", "Вверх — нос опускается"],
+	"language": ["Названия ракурсов, сканер и канал связи", "Camera, scanner and link controls in English"],
 }
 
 var _settings: RefCounted

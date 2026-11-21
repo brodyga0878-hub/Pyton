@@ -7,6 +7,7 @@ signal cargo_pod_requested(action: String)
 signal crew_requested(action: String, member: int)
 signal ship_exchange_requested(hull: String)
 signal customs_payment_requested()
+signal law_radio_requested()
 signal fuel_module_removed(module: String)
 signal pump_mode_requested(mode: String)
 signal drive_selected(drive: String)
@@ -24,18 +25,21 @@ const Crew := preload("res://scripts/crew.gd")
 const Economy := preload("res://scripts/port_economy.gd")
 const Factions := preload("res://scripts/faction_fronts.gd")
 const Calendar := preload("res://scripts/mission_calendar.gd")
-const EQUIPMENT_SERVICES := ["mining_laser", "fragment_collector", "hydrogen_scoop", "fuel_pump", "range_drive"]
-const DEFENSE_SERVICES := ["combat_shield", "combat_ecm", "combat_focus", "combat_repair"]
-const NAVIGATION_SERVICES := ["radar_mapper", "hyperspace_analyzer", "jump_repair"]
+const EQUIPMENT_SERVICES := ["mining_laser", "fragment_collector", "hydrogen_scoop", "fuel_pump", "range_drive", "surface_processor"]
+const MILITARY_SERVICES := ["military_drive", "military_refuel", "military_waste"]
+const DEFENSE_SERVICES := ["combat_shield", "combat_ecm", "combat_focus", "combat_repair", "combat_energy_pulse", "combat_maintenance", "combat_auto_repair"]
+const RIG_SERVICES := ["buy_rig", "sell_rig"]
+const NAVIGATION_SERVICES := ["navigation_computer", "radar_mapper", "hyperspace_analyzer", "jump_repair"]
 const ORDNANCE_SERVICES := ["combat_launcher", "combat_missile_dart", "combat_missile_lance", "combat_ecm_advanced", "combat_decoy"]
 const MISSILE_LABELS := {"dart": "Дротик", "lance": "Копьё"}
 const FUEL_MODULES := {"hydrogen_scoop": "scoop", "fuel_pump": "pump"}
 const PUMP_MODES := {"off": "Выкл.", "reaction": "В реактивный", "jump": "В прыжковый"}
-const DRIVE_LABELS := {"standard": ShipSystems.STANDARD_DRIVE_NAME, "range": ShipSystems.RANGE_DRIVE_NAME}
+const DRIVE_LABELS := {"standard": ShipSystems.STANDARD_DRIVE_NAME, "range": ShipSystems.RANGE_DRIVE_NAME,
+	"military": ShipSystems.MILITARY_DRIVE_NAME}
 const WEAPON_LABELS := {"pulse": "Каскад", "focus": "Нить"}
 
 enum StationPage { SERVICES, CREW, YARD, CUSTOMS, MINING, BERTH }
-enum EquipmentPage { FLIGHT, DEFENSE, NAVIGATION, ORDNANCE }
+enum EquipmentPage { FLIGHT, DEFENSE, NAVIGATION, ORDNANCE, MILITARY, RIGS }
 
 var _sim: RefCounted
 var _insets: MarginContainer
@@ -66,6 +70,7 @@ var _crew_buttons: Array[Button] = []
 var _yard: VBoxContainer
 var _yard_toggle: Button
 var _yard_rows: Array[Dictionary] = []
+var _yard_stock_hint: Label
 var _customs: VBoxContainer
 var _customs_toggle: Button
 var _customs_office: Label
@@ -75,6 +80,9 @@ var _customs_pay: Button
 var _customs_receipt_title: Label
 var _customs_receipt: Label
 var _customs_other_debts: Label
+var _custody_summary: Label
+var _law_radio: Button
+var _custody_row: Control
 var _berth: VBoxContainer
 var _berth_toggle: Button
 var _berth_rates: Label
@@ -89,6 +97,8 @@ var _civic_donate: Button
 var _equipment: VBoxContainer
 var _equipment_tabs: Dictionary[int, Button] = {}
 var _equipment_page := EquipmentPage.FLIGHT
+var _rig_equipment: VBoxContainer
+var _rig_equipment_status: Label
 var _mining: VBoxContainer
 var _mining_toggle: Button
 var _defense: VBoxContainer
@@ -103,6 +113,9 @@ var _missile_buttons: Array[Button] = []
 var _fuel_remove_buttons: Dictionary[String, Button] = {}
 var _drive_summary: Label
 var _drive_buttons: Dictionary[String, Button] = {}
+var _military: VBoxContainer
+var _military_summary: Label
+var _military_select: Button
 var _station_page := StationPage.SERVICES
 var _transfers: VBoxContainer
 var _hydrogen: Label
@@ -212,14 +225,30 @@ func build() -> void:
 	_add_equipment_tab(equipment_tabs, "Оборона", EquipmentPage.DEFENSE)
 	_add_equipment_tab(equipment_tabs, "Навигация", EquipmentPage.NAVIGATION)
 	_add_equipment_tab(equipment_tabs, "Боезапас", EquipmentPage.ORDNANCE)
+	_add_equipment_tab(equipment_tabs, "Военный привод", EquipmentPage.MILITARY)
+	_add_equipment_tab(equipment_tabs, "Буры", EquipmentPage.RIGS)
 	_mining = VBoxContainer.new()
 	_mining.add_theme_constant_override("separation", 8)
 	_equipment.add_child(_mining)
 	_add_service("mining_laser", "Горный лазер", "Откалывает сырьё от астероидов в полёте", _mining)
 	_add_service("fragment_collector", "Сборщик обломков", "Переносит обломок в свободную ячейку трюма", _mining)
+	_add_service("surface_processor", "Медлаборатория", "После посадки перерабатывает 2 ед. льда и 1 ед. зерна в 2 ед. медикаментов", _mining)
 	_add_fuel_module("hydrogen_scoop", "Сборщик водорода", "Наполняет канистры у звёзд и газовых гигантов")
 	_add_fuel_module("fuel_pump", "Топливный насос", "Переливает канистры в выбранный бак")
 	_build_drive_selection()
+	_build_rig_equipment()
+	_military = VBoxContainer.new()
+	_military.add_theme_constant_override("separation", 8)
+	_equipment.add_child(_military)
+	var military_controls := HBoxContainer.new()
+	_military.add_child(military_controls)
+	_military_summary = _label(military_controls, "", 17, MINT)
+	_military_summary.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_military_select = _button(military_controls)
+	_military_select.pressed.connect(_request_drive_selection.bind(ShipSystems.DRIVE_MILITARY))
+	_add_service("military_drive", "Привод «Арсенал»", "Военный бак и герметичная ёмкость отходов", _military)
+	_add_service("military_refuel", "Военное топливо", "Порт пополняет отдельный запас по доступным средствам", _military)
+	_add_service("military_waste", "Радиоактивные отходы", "Порт принимает содержимое герметичной ёмкости", _military)
 	_build_defense()
 	_build_navigation()
 	_build_ordnance()
@@ -289,6 +318,8 @@ func refresh() -> void:
 					EquipmentPage.DEFENSE: _refresh_defense()
 					EquipmentPage.NAVIGATION: _refresh_navigation()
 					EquipmentPage.ORDNANCE: _refresh_ordnance()
+					EquipmentPage.MILITARY: _refresh_military()
+					EquipmentPage.RIGS: _refresh_rig_equipment()
 			_: _refresh_services()
 
 
@@ -302,7 +333,31 @@ func _refresh_services() -> void:
 	else:
 		_cargo_detail.text = "Ёмкость %d → %d ед." % [int(profile.cargo), int(profile.expanded_cargo)]
 	_refresh_service_buttons(_action_buttons.keys().filter(func(action: String) -> bool:
-		return action not in EQUIPMENT_SERVICES and action not in DEFENSE_SERVICES and action not in NAVIGATION_SERVICES and action not in ORDNANCE_SERVICES))
+		return action not in EQUIPMENT_SERVICES and action not in DEFENSE_SERVICES and action not in NAVIGATION_SERVICES \
+			and action not in ORDNANCE_SERVICES and action not in MILITARY_SERVICES and action not in RIG_SERVICES))
+
+
+func _build_rig_equipment() -> void:
+	_rig_equipment = VBoxContainer.new()
+	_rig_equipment.add_theme_constant_override("separation", 8)
+	_equipment.add_child(_rig_equipment)
+	_rig_equipment_status = _label(_rig_equipment, "", 18, MINT)
+	_add_service("buy_rig", "Запасной автономный бур", "До трёх буров у одного пилота", _rig_equipment)
+	_add_service("sell_rig", "Продать запасной бур", "Выберите свободный запасной бур в журнале перед продажей", _rig_equipment)
+
+
+func _refresh_rig_equipment() -> void:
+	var fleet: Array = _sim.rig_fleet_status()
+	var labels := PackedStringArray()
+	for row: Dictionary in fleet:
+		labels.append(row.name + (" ◀" if row.selected else ""))
+	_rig_equipment_status.text = " · ".join(labels)
+	_refresh_service_buttons(RIG_SERVICES)
+	var buy: Button = _action_buttons["buy_rig"]
+	var sell: Button = _action_buttons["sell_rig"]
+	buy.text = "Все места заняты" if fleet.size() >= 3 else (
+		"Купить · %d кр." % _sim.service_offer("buy_rig").cost if not buy.disabled else buy.text)
+	sell.text = "Выберите свободный бур" if sell.disabled else "Продать · +%d кр." % _sim.service_offer("sell_rig").cost
 
 
 func _refresh_flight_equipment() -> void:
@@ -322,10 +377,35 @@ func _refresh_flight_equipment() -> void:
 		var button := _drive_buttons[id]
 		var selected: bool = drive.id == id
 		button.set_pressed_no_signal(selected)
-		button.disabled = selected or not drive.can_select or (id == "range" and not drive.have_range)
+		button.disabled = selected or not drive.can_select or not _sim.ship.drive_available(id)
 		button.tooltip_text = "Привод активен" if selected else "Выбрать привод для следующего вылета"
 		if id == "range" and not drive.have_range:
 			button.tooltip_text = "Сначала установите привод дальнего хода"
+		elif id == ShipSystems.DRIVE_MILITARY and not drive.have_military:
+			button.tooltip_text = "Привод можно приобрести во вкладке «Военный привод»"
+
+
+func _refresh_military() -> void:
+	_refresh_service_buttons(MILITARY_SERVICES)
+	var drive: Dictionary = _sim.jump_drive_status()
+	_military_summary.text = "Топливо %d/%d · Отходы %d/%d ед." % [
+		int(drive.military_fuel), int(drive.military_capacity), int(drive.military_waste), int(drive.waste_capacity)]
+	_military_select.disabled = not drive.have_military or drive.id == ShipSystems.DRIVE_MILITARY
+	_military_select.text = "Активен" if drive.id == ShipSystems.DRIVE_MILITARY else "Выбрать «Арсенал»"
+	for action: String in ["military_refuel", "military_waste"]:
+		var button := _action_buttons[action]
+		var offer: Dictionary = _sim.service_offer(action)
+		if not drive.have_military:
+			button.text = "Сначала установите привод"
+		elif action == "military_refuel" and drive.military_fuel >= drive.military_capacity:
+			button.text = "Бак полон"
+		elif action == "military_waste" and int(drive.military_waste) == 0:
+			button.text = "Отходов нет"
+		elif offer.allowed:
+			button.text = "%s %d ед. · %d кр." % [
+				"Заправить" if action == "military_refuel" else "Сдать", int(offer.units), int(offer.cost)]
+		else:
+			button.text = "Недостаточно средств"
 
 
 func _refresh_defense() -> void:
@@ -351,6 +431,8 @@ func _refresh_navigation() -> void:
 	_autopilot_button.disabled = not equipment.available
 	_autopilot_button.text = "Снять в отсек" if equipment.installed else "Установить"
 	_refresh_service_buttons(NAVIGATION_SERVICES)
+	var computer: Dictionary = _sim.navigation_computer_status()
+	_action_buttons["navigation_computer"].text = "Снять в отсек" if computer.installed else "Установить"
 	var repair: Button = _action_buttons["jump_repair"]
 	repair.text = "Перезапустить" if not repair.disabled else "Привод исправен"
 
@@ -441,6 +523,8 @@ func _show_page() -> void:
 	_defense.visible = _equipment_page == EquipmentPage.DEFENSE
 	_navigation.visible = _equipment_page == EquipmentPage.NAVIGATION
 	_ordnance.visible = _equipment_page == EquipmentPage.ORDNANCE
+	_military.visible = _equipment_page == EquipmentPage.MILITARY
+	_rig_equipment.visible = _equipment_page == EquipmentPage.RIGS
 	for page: int in _equipment_tabs:
 		var tab := _equipment_tabs[page]
 		var selected := page == _equipment_page
@@ -612,6 +696,7 @@ func _build_yard(parent: VBoxContainer) -> void:
 	for id: String in ShipSystems.hull_ids():
 		var row := _yard_card(hulls, ShipSystems.profile(id))
 		_yard_rows.append(row)
+	_yard_stock_hint = _label(_yard, "", 16, MINT)
 	var terms := _label(_yard,
 		"Верфь переносит оборудование, топливо и данные кают. Новый корпус выдаётся исправным. Весь груз должен помещаться в новый трюм.",
 		16, MUTED)
@@ -651,6 +736,7 @@ func _yard_card(parent: HBoxContainer, profile: Dictionary) -> Dictionary:
 
 func _refresh_yard() -> void:
 	var offers: Array[Dictionary] = _sim.shipyard_offers()
+	_yard_stock_hint.text = "Обновление предложения · %s." % Calendar.stamp(float(_sim.shipyard_restock_time()))
 	for row in _yard_rows:
 		row.panel.hide()
 	for offer in offers:
@@ -702,6 +788,15 @@ func _build_customs(parent: VBoxContainer) -> void:
 	_customs_fine = settlement[0]
 	_customs_pay = settlement[1]
 	_customs_pay.pressed.connect(_request_customs_payment)
+	var police := _add_row(_customs, "Служба порядка", "")
+	_custody_summary = police[0]
+	_law_radio = police[1]
+	_custody_row = police[2]
+	_law_radio.text = "Вызвать дозор"
+	_law_radio.pressed.connect(func() -> void:
+		if is_open() and _station_page == StationPage.CUSTOMS:
+			_touches.clear()
+			law_radio_requested.emit())
 	_customs.add_child(HSeparator.new())
 	_customs_receipt_title = _label(_customs, "Журнал изъятий", 19, TEXT)
 	_customs_receipt = _label(_customs, "", 16, MUTED)
@@ -715,6 +810,10 @@ func _build_customs(parent: VBoxContainer) -> void:
 
 func _refresh_customs() -> void:
 	var status: Dictionary = _sim.customs_status()
+	var police: Dictionary = _sim.law_status()
+	_custody_row.visible = bool(police.detained) or int(police.wanted) > 0 or int(police.debt) > 0
+	_custody_summary.text = "Розыск %d · взыскания %d кр.%s" % [int(police.wanted), int(police.debt),
+		" · задержан" if police.detained else ""]
 	var authority := int(status.authority)
 	_customs_office.text = str(status.authority_name)
 	var allowance := int(status.medical_allowance)
@@ -895,7 +994,13 @@ func is_open() -> bool:
 
 func _request_service(action: String) -> void:
 	var page := StationPage.SERVICES
-	if action in NAVIGATION_SERVICES:
+	if action in RIG_SERVICES and _equipment_page != EquipmentPage.RIGS:
+		return
+	if action in MILITARY_SERVICES:
+		page = StationPage.MINING
+		if _equipment_page != EquipmentPage.MILITARY:
+			return
+	elif action in NAVIGATION_SERVICES:
 		page = StationPage.MINING
 		if _equipment_page != EquipmentPage.NAVIGATION:
 			return
@@ -911,6 +1016,8 @@ func _request_service(action: String) -> void:
 		page = StationPage.MINING
 		if _equipment_page != EquipmentPage.DEFENSE:
 			return
+	if action in RIG_SERVICES:
+		page = StationPage.MINING
 	if not is_open() or _fuel_only or _station_page != page or not _sim.service_offer(action).allowed:
 		return
 	# A purchase can change the price shown for another service.
@@ -937,10 +1044,11 @@ func _request_pump_mode(mode: String) -> void:
 
 
 func _request_drive_selection(drive: String) -> void:
-	if not is_open() or _fuel_only or _station_page != StationPage.MINING or _equipment_page != EquipmentPage.FLIGHT:
+	if not is_open() or _fuel_only or _station_page != StationPage.MINING \
+			or _equipment_page not in [EquipmentPage.FLIGHT, EquipmentPage.MILITARY]:
 		return
 	var status: Dictionary = _sim.jump_drive_status()
-	if status.can_select and status.id != drive and (drive == "standard" or (drive == "range" and status.have_range)):
+	if status.can_select and status.id != drive and _sim.ship.drive_available(drive):
 		_touches.clear()
 		drive_selected.emit(drive)
 
@@ -1115,6 +1223,9 @@ func _build_defense() -> void:
 	_add_service("combat_ecm", "Модуль помех", "Срывает наведение входящих ракет", _defense)
 	_add_service("combat_focus", "Лазер «Нить»", "Стреляет дальше и быстрее нагревается", _defense)
 	_module_condition = _add_service("combat_repair", "Ремонт модулей", "", _defense)
+	_add_service("combat_energy_pulse", "Импульсная ячейка", "Один защитный импульс по враждебным кораблям в зоне действия", _defense)
+	_add_service("combat_maintenance", "Обслужить привод", "Восстанавливает ресурс после перелётов и повреждений", _defense)
+	_add_service("combat_auto_repair", "Авторемонт", "Чинит отключённый модуль в спокойном полёте", _defense)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
 	_defense.add_child(row)
@@ -1135,6 +1246,7 @@ func _build_navigation() -> void:
 	var row := _add_row(_navigation, "Бортовой автопилот", "Ведёт к цели, управляет стыковкой и посадкой")
 	_autopilot_button = row[1]
 	_autopilot_button.pressed.connect(_request_autopilot_equipment)
+	_add_service("navigation_computer", "Навигационный компьютер", "Список целей, пеленг и ракетная камера", _navigation)
 	_add_service("radar_mapper", "Радар-картограф", "Досье выбранного корабля на бортовом сканере", _navigation)
 	_add_service("hyperspace_analyzer", "Анализатор следов", "Читает назначение и время перехода", _navigation)
 	_add_service("jump_repair", "Ремонт гиперпривода", "Восстанавливает привод после аварийного перехода", _navigation)
@@ -1251,7 +1363,7 @@ func _button_at(point: Vector2) -> Button:
 		return _berth_toggle
 	if _mining_toggle.is_visible_in_tree() and _mining_toggle.get_global_rect().has_point(point):
 		return _mining_toggle
-	var buttons: Array = _action_buttons.values()
+	var buttons: Array = _action_buttons.values() + [_military_select]
 	if _fuel_only:
 		buttons = _transfer_buttons.values() + _pump_buttons.values() + [_discard_choice, _discard_button, _cargo_pod_track, _cargo_pod_collect]
 	elif _station_page == StationPage.CREW:
@@ -1259,7 +1371,7 @@ func _button_at(point: Vector2) -> Button:
 	elif _station_page == StationPage.YARD:
 		buttons = _yard_rows.map(func(row: Dictionary) -> Button: return row.exchange)
 	elif _station_page == StationPage.CUSTOMS:
-		buttons = [_customs_pay]
+		buttons = [_customs_pay, _law_radio]
 	elif _station_page == StationPage.BERTH:
 		buttons = [_berth_pay, _berth_defer, _civic_donate]
 	elif _station_page == StationPage.MINING:

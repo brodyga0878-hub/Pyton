@@ -22,6 +22,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	_test_licenses_and_quotes()
+	_test_rotating_stock()
 	_test_upgrade_and_travel()
 	_test_flight_characteristics()
 	_test_previous_schema()
@@ -77,6 +78,37 @@ func _test_licenses_and_quotes() -> void:
 			return
 	_expect(flight.credits < original and flight.ship.hull_id == COURIER,
 		"Repeated round trips impose a loss rather than minting credits")
+
+
+func _test_rotating_stock() -> void:
+	var flight := Flight.new()
+	flight.credits = 7000
+	var survey := ShipSystems.SURVEY_HULL
+	var tug := ShipSystems.UTILITY_HULL
+	_expect(ShipSystems.hull_ids().size() == 4 and not flight.shipyard_swap(survey)
+		and not flight.shipyard_swap(tug) and flight.credits == 7000,
+		"The wider hull catalogue does not let a pilot buy what this shift has not listed")
+	flight.update(Flight.SHIPYARD_STOCK_SECONDS * 2.0, Vector2.ZERO, 0.0, false, false)
+	var quote := flight.shipyard_offer(survey)
+	_expect(quote.available and flight.shipyard_offers()[1].id == survey
+		and flight.shipyard_restock_time() == Flight.SHIPYARD_STOCK_SECONDS * 3.0,
+		"The next shipyard shift changes the actual purchase offer and announces the next refresh")
+	_expect(flight.mining.insert_cargo("ore", 19) and not flight.shipyard_swap(survey) and flight.credits == 7000,
+		"The smaller reconnaissance hull respects the actual fit of the original hold")
+	_expect(flight.mining.remove_cargo("ore", 2) and flight.shipyard_swap(survey)
+		and flight.mining.cargo_capacity == 18 and flight.mining.cargo_amount("ore") == 17
+		and flight.credits == 7000 - int(quote.net_cost), "Exchange installs the offered smaller hull and preserves the cargo")
+	var scout_roll := flight.ship.roll_rate(0)
+	var scout_side := flight.ship.thrust_acceleration(Vector3.RIGHT, 0).x
+	var restored := Flight.new()
+	_expect(restored.restore(JSON.parse_string(JSON.stringify(flight.snapshot()))) and restored.ship.hull_id == survey
+		and restored.shipyard_offers()[1].id == survey, "The purchased hull and shift remain exact after cold load")
+	restored.update(Flight.SHIPYARD_STOCK_SECONDS * 2.0, Vector2.ZERO, 0.0, false, false)
+	_expect(restored.shipyard_offers()[1].id == tug and restored.shipyard_swap(tug) and restored.ship.crew_required() == 1
+		and restored.mining.cargo_capacity == 34 and restored.ship.roll_rate(0) < scout_roll
+		and restored.ship.thrust_acceleration(Vector3.RIGHT, 0).x > scout_side,
+		"The working tug trades turn speed for stronger side thrust and a wider hold with a crew requirement")
+	_expect(not restored.dock_action() and restored.docked == 0, "A tug without its required crew cannot depart")
 
 
 func _test_upgrade_and_travel() -> void:

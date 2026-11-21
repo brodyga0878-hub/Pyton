@@ -23,6 +23,14 @@ const OUTER_SYSTEM_COUNT := len(ARM_ROOTS) * ARM_GROUP_COUNT * ARM_GROUP_SIZE
 const COMPANION_GROUPS := [0, 6, 12, 18]
 const MOON_COUNT := len(ARM_ROOTS) * len(COMPANION_GROUPS)
 const GAS_GIANT_COUNT := MOON_COUNT
+const REACH_GROUP_COUNT := 32
+const REACH_SYSTEM_COUNT := len(ARM_ROOTS) * REACH_GROUP_COUNT * ARM_GROUP_SIZE
+const REACH_BINARY_GROUPS := [3, 15, 27]
+const REACH_MOON_GROUPS := [2, 7, 12, 17, 22, 29]
+const REACH_GIANT_GROUPS := [4, 11, 18, 25]
+const REACH_COMET_GROUPS := [1, 6, 11, 16, 21, 26]
+const REACH_SITE_COUNT := REACH_SYSTEM_COUNT * TARGETS_PER_SYSTEM + len(ARM_ROOTS) * (
+	len(REACH_BINARY_GROUPS) + len(REACH_MOON_GROUPS) + len(REACH_GIANT_GROUPS) + len(REACH_COMET_GROUPS))
 const NAMES := [
 	"Тальвена", "Ирсавель", "Морикса", "Вестрида", "Ольвенир", "Астрэва",
 	"Ниварис", "Сельтура", "Каэлин", "Дорвейн", "Ярсела", "Энтурин",
@@ -116,6 +124,92 @@ static func build_outer(first_target: int, frontier: Array[Dictionary]) -> Dicti
 	for site: Dictionary in sites:
 		site.make_read_only()
 	return {"systems": systems, "sites": sites}
+
+
+static func build_reach(first_target: int, outer: Array[Dictionary]) -> Dictionary:
+	var systems: Array[Dictionary] = []
+	var sites: Array[Dictionary] = []
+	var occupied: Array[Vector3] = []
+	for old: Dictionary in outer:
+		occupied.append(old.position_3d)
+	var relays: Array[Vector3] = []
+	var headings: Array[float] = []
+	# Continue from the established tips. Every new relay has a short leg to its predecessor.
+	for arm in range(ARM_ROOTS.size()):
+		var previous: Vector3 = outer[((arm + 1) * ARM_GROUP_COUNT - 1) * ARM_GROUP_SIZE].position_3d
+		var outward := Vector2(previous.x, previous.y).angle()
+		for group in range(REACH_GROUP_COUNT):
+			var seed := _arm_seed(arm, ARM_GROUP_COUNT + group, 0)
+			var heading := outward + 0.24 * sin(float(group) * 0.19 + arm) + 0.008 * group
+			var step := lerpf(6.0, 7.45, _sample(seed, 0))
+			previous += Vector3(cos(heading) * step, sin(heading) * step, 0.0)
+			previous.z = lerpf(-1.35, 1.35, _sample(seed, 1))
+			relays.append(previous)
+			headings.append(heading)
+			occupied.append(previous)
+
+	for arm in range(ARM_ROOTS.size()):
+		for group in range(REACH_GROUP_COUNT):
+			var relay := arm * REACH_GROUP_COUNT + group
+			var center := relays[relay]
+			for slot in range(ARM_GROUP_SIZE):
+				var seed := _arm_seed(arm, ARM_GROUP_COUNT + group, slot)
+				var position := center
+				if slot != 0:
+					position = _cluster_member(center, headings[relay], seed, slot, occupied)
+					occupied.append(position)
+				var name := "%s-%02d%s" % [ARM_NAMES[arm], ARM_GROUP_COUNT + group + 1, ARM_MEMBER_SUFFIXES[slot]]
+				var sector := Vector2i(floori(position.x / SECTOR_SIZE), floori(position.y / SECTOR_SIZE))
+				var next_site := first_target + sites.size()
+				if slot == 0 and group in REACH_BINARY_GROUPS:
+					_append_binary(systems, sites, next_site, {"name": name, "seed": seed, "position": position, "sector": sector,
+						"separation": lerpf(870.0, 1100.0, _sample(seed, 77)), "primary_mu": lerpf(5400.0, 6500.0, _sample(seed, 78)),
+						"secondary_mu": lerpf(2550.0, 3500.0, _sample(seed, 79))})
+				else:
+					_append_single(systems, sites, next_site, sector, seed, name, position)
+				var index := systems.size() - 1
+				if slot == 1 and group in REACH_MOON_GROUPS:
+					_append_outer_moon(systems, sites, index, first_target)
+				elif slot == 2 and group in REACH_GIANT_GROUPS:
+					_append_outer_giant(systems, sites, index, first_target)
+				elif slot == 3 and group in REACH_COMET_GROUPS:
+					_append_reach_comet(systems, sites, index, first_target)
+	var owners := PackedInt32Array()
+	owners.resize(sites.size())
+	for index in range(systems.size()):
+		for id: int in systems[index].targets:
+			owners[id - first_target] = index
+	for site: Dictionary in sites:
+		site.make_read_only()
+	return {"systems": systems, "sites": sites, "owners": owners}
+
+
+static func _append_reach_comet(systems: Array[Dictionary], sites: Array[Dictionary], system_index: int,
+		first_target: int) -> void:
+	var system := systems[system_index].duplicate()
+	var star := sites[int(system.star) - first_target]
+	var seed: int = system.seed
+	var eccentricity := lerpf(0.34, 0.42, _sample(seed, 81))
+	var anomaly := TAU * _sample(seed, 82)
+	var semimajor := lerpf(4600.0, 5700.0, _sample(seed, 83))
+	var distance := semimajor * (1.0 - eccentricity * eccentricity) / (1.0 + eccentricity * cos(anomaly))
+	var axis := Vector3.BACK.rotated(Vector3.UP, TAU * _sample(seed, 84))
+	var radius := lerpf(43.0, 68.0, _sample(seed, 85))
+	var id := first_target + sites.size()
+	sites.append({"name": "%s / комета" % system.name, "kind": "comet", "orbit_parent": int(system.star),
+		"center": Vector3(star.center) + axis * distance,
+		"orbital_elements": Vector3(eccentricity, rad_to_deg(anomaly), lerpf(24.0, 61.0, _sample(seed, 86))),
+		"radius": radius, "pad_offset": radius, "gate_offset": radius + 86.0, "seed": seed ^ 0x4AB613,
+		"surface_color": Color("#58757c"), "accent": MINERAL_COLORS[2], "resource": "ice",
+		"reserve": 120 + floori(_sample(seed, 87) * 10.0) * 12, "drill_seconds": lerpf(8.0, 13.0, _sample(seed, 88))})
+	system.targets = system.targets + [id]
+	system.mines = system.mines + [id]
+	system.survey_sites = system.survey_sites + [id]
+	system.description += " По вытянутой орбите движется ледяная комета."
+	for key: String in ["targets", "mines", "survey_sites"]:
+		system[key].make_read_only()
+	system.make_read_only()
+	systems[system_index] = system
 
 
 static func _append_outer_moon(systems: Array[Dictionary], sites: Array[Dictionary], system_index: int,
@@ -258,57 +352,58 @@ static func _append_single(systems: Array[Dictionary], sites: Array[Dictionary],
 	sites.append(_body(name, star_center, seed, 30, false))
 
 
-static func _append_binary(systems: Array[Dictionary], sites: Array[Dictionary], primary_id: int) -> void:
+static func _append_binary(systems: Array[Dictionary], sites: Array[Dictionary], primary_id: int, entry := {}) -> void:
 	# Keep the order of the original systems and their three sites stable for saves.
-	const NAME := "Элиора"
-	const SEED := 158397423
-	const POSITION := Vector3(2.2, 5.2, 0.4)
+	var name: String = entry.get("name", "Элиора")
+	var seed: int = entry.get("seed", 158397423)
+	var position: Vector3 = entry.get("position", Vector3(2.2, 5.2, 0.4))
+	var sector: Vector2i = entry.get("sector", Vector2i.ZERO)
 	const BARYCENTER := Vector3(1800, 220, -1720)
-	const SEPARATION := 960.0
-	const PRIMARY_MU := 6000.0
-	const SECONDARY_MU := 3000.0
-	const TOTAL_MU := PRIMARY_MU + SECONDARY_MU
+	var separation: float = entry.get("separation", 960.0)
+	var primary_mu: float = entry.get("primary_mu", 6000.0)
+	var secondary_mu: float = entry.get("secondary_mu", 3000.0)
+	var total_mu := primary_mu + secondary_mu
 	var secondary_id := primary_id + 1
 	var planet_id := secondary_id + 1
 	var moon_id := planet_id + 1
-	var primary_center := BARYCENTER - Vector3.RIGHT * (SEPARATION * SECONDARY_MU / TOTAL_MU)
-	var secondary_center := BARYCENTER + Vector3.RIGHT * (SEPARATION * PRIMARY_MU / TOTAL_MU)
+	var primary_center := BARYCENTER - Vector3.RIGHT * (separation * secondary_mu / total_mu)
+	var secondary_center := BARYCENTER + Vector3.RIGHT * (separation * primary_mu / total_mu)
 	var planet_center := BARYCENTER + Vector3(-0.6, 0, 0.8) * 3350.0
 	# The lunar orbit clears the approach gates of both solid bodies at every phase.
 	var moon_center := planet_center + Vector3(0.8, 0, -0.6) * 380.0
 	var system := {
-		"name": NAME, "position": Vector2(POSITION.x, POSITION.y), "position_3d": POSITION,
-		"sector": Vector2i.ZERO, "seed": SEED, "accent": STELLAR_COLORS[1],
+		"name": name, "position": Vector2(position.x, position.y), "position_3d": position,
+		"sector": sector, "seed": seed, "accent": STELLAR_COLORS[1],
 		"description": "Необитаемая двойная система. Каменистая планета обращается вокруг обеих звёзд и имеет собственную луну.",
 		"arrival_port": -1, "arrival_target": primary_id, "star": primary_id, "stars": [primary_id, secondary_id],
 		"targets": [primary_id, secondary_id, planet_id, moon_id], "ports": [],
 		"mines": [planet_id, moon_id], "survey_sites": [planet_id, moon_id],
-		"stellar_heat": 1.08, "gravity_parameter": TOTAL_MU,
-		"barycenter": BARYCENTER, "binary_separation": SEPARATION, "binary_inclination": 14.0,
+		"stellar_heat": 1.08, "gravity_parameter": total_mu,
+		"barycenter": BARYCENTER, "binary_separation": separation, "binary_inclination": 14.0,
 	}
 	for key: String in ["stars", "targets", "ports", "mines", "survey_sites"]:
 		system[key].make_read_only()
 	system.make_read_only()
 	systems.append(system)
 	sites.append({
-		"name": "%s A" % NAME, "kind": "star", "center": primary_center, "radius": 220.0,
+		"name": "%s A" % name, "kind": "star", "center": primary_center, "radius": 220.0,
 		"pad_offset": 310.0, "gate_offset": 470.0, "accent": STELLAR_COLORS[1],
-		"mu": PRIMARY_MU, "star_clearance": 250.0, "stellar_heat": 1.08, "cool_star": false,
+		"mu": primary_mu, "star_clearance": 250.0, "stellar_heat": 1.08, "cool_star": false,
 	})
 	sites.append({
-		"name": "%s B" % NAME, "kind": "star", "center": secondary_center, "radius": 175.0,
+		"name": "%s B" % name, "kind": "star", "center": secondary_center, "radius": 175.0,
 		"pad_offset": 310.0, "gate_offset": 470.0, "accent": STELLAR_COLORS[2],
-		"mu": SECONDARY_MU, "star_clearance": 205.0, "stellar_heat": 0.82, "cool_star": true,
+		"mu": secondary_mu, "star_clearance": 205.0, "stellar_heat": 0.82, "cool_star": true,
 	})
 	sites.append({
-		"name": "%s I" % NAME, "kind": "planet", "center": planet_center, "radius": 150.0,
-		"pad_offset": 150.0, "gate_offset": 245.0, "seed": SEED + 1,
+		"name": "%s I" % name, "kind": "planet", "center": planet_center, "radius": 150.0,
+		"pad_offset": 150.0, "gate_offset": 245.0, "seed": seed + 1,
 		"surface_color": Color("#657e8c"), "accent": Color("#92c5e1"), "resource": "ore",
 		"reserve": 228, "drill_seconds": 11.0, "mu": 742.5, "orbit_inclination": 23.0,
 	})
 	sites.append({
-		"name": "%s I-a" % NAME, "kind": "moon", "center": moon_center, "radius": 54.0,
-		"pad_offset": 54.0, "gate_offset": 128.0, "seed": SEED + 2,
+		"name": "%s I-a" % name, "kind": "moon", "center": moon_center, "radius": 54.0,
+		"pad_offset": 54.0, "gate_offset": 128.0, "seed": seed + 2,
 		"surface_color": Color("#776e8a"), "accent": MINERAL_COLORS[1], "resource": "crystal",
 		"reserve": 144, "drill_seconds": 12.0, "mu": 15.7464,
 		"orbit_parent": planet_id, "orbit_inclination": -29.0,

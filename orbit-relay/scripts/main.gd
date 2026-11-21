@@ -3,6 +3,7 @@ extends Node
 const Flight = preload("res://scripts/flight_sim.gd")
 const FlightView = preload("res://scripts/flight_view.gd")
 const FlightCamera = preload("res://scripts/flight_camera.gd")
+const FlightText = preload("res://scripts/flight_text.gd")
 const FlightAudio = preload("res://scripts/flight_audio.gd")
 const FlightHUD = preload("res://scripts/flight_hud.gd")
 const CockpitContacts = preload("res://scripts/cockpit_contacts.gd")
@@ -15,6 +16,8 @@ const PresentationMenu = preload("res://scripts/presentation_menu.gd")
 const MissionJournal = preload("res://scripts/mission_journal.gd")
 const ExpansionBoard = preload("res://scripts/expansion_board.gd")
 const ReconPanel = preload("res://scripts/recon_panel.gd")
+const OperationsPanel = preload("res://scripts/operations_panel.gd")
+const FlightCommsView = preload("res://scripts/flight_comms_view.gd")
 const SessionIO = preload("res://scripts/session_io.gd")
 const VoyageMenu = preload("res://scripts/voyage_menu.gd")
 const VoyageLibrary = preload("res://scripts/voyage_library.gd")
@@ -40,6 +43,8 @@ var _settings := PresentationMenu.new()
 var _journal := MissionJournal.new()
 var _frontier := ExpansionBoard.new()
 var _recon := ReconPanel.new()
+var _operations_panel := OperationsPanel.new()
+var _comms := FlightCommsView.new()
 var _voyages := VoyageMenu.new()
 var _voyage_picker: FileDialog
 var _flight_active := false
@@ -56,6 +61,7 @@ var _report_sharing := false
 
 func _ready() -> void:
 	presentation.load_preferences()
+	FlightText.set_language(presentation.language)
 	_flight_active = not show_voyage_menu_on_launch
 	var loaded := SessionIO.LoadResult.NO_SAVE
 	if _flight_active:
@@ -80,6 +86,7 @@ func _ready() -> void:
 	_map.rendezvous_finish_requested.connect(_map_rendezvous_finish)
 	_map.survey_requested.connect(_map_survey)
 	_map.frame_selected.connect(_map_frame)
+	_map.frame_rotation_selected.connect(_map_frame.bind(true))
 	_map.dismissed.connect(_close_map)
 	add_child(_galaxy)
 	_galaxy.build()
@@ -105,6 +112,7 @@ func _ready() -> void:
 	_services.crew_requested.connect(_crew_action)
 	_services.ship_exchange_requested.connect(_ship_exchange)
 	_services.customs_payment_requested.connect(_customs_pay)
+	_services.law_radio_requested.connect(_open_law_radio)
 	_services.dismissed.connect(_close_services)
 	add_child(_market)
 	_market.build()
@@ -122,6 +130,10 @@ func _ready() -> void:
 	_journal.follow_requested.connect(_follow_journal)
 	_journal.career_requested.connect(_career_dispatch)
 	_journal.story_requested.connect(_story_action)
+	_journal.operations_requested.connect(_open_operations)
+	_journal.rig_selected.connect(_select_rig_slot)
+	_journal.subscription_requested.connect(_subscribe_news)
+	_journal.calendar_wait_requested.connect(_calendar_wait)
 	_journal.dismissed.connect(_close_journal)
 	add_child(_frontier)
 	_frontier.build()
@@ -133,6 +145,14 @@ func _ready() -> void:
 	_recon.build()
 	_recon.action_requested.connect(_recon_action)
 	_recon.dismissed.connect(_close_recon)
+	add_child(_operations_panel)
+	_operations_panel.build()
+	_operations_panel.operation_requested.connect(_operation_action)
+	_operations_panel.dismissed.connect(_close_operations)
+	add_child(_comms)
+	_comms.build()
+	_comms.command_requested.connect(_comms_action)
+	_comms.dismissed.connect(_close_comms)
 	add_child(_voyages)
 	_voyages.build()
 	_voyages.action_requested.connect(_voyage_action)
@@ -160,7 +180,7 @@ func _process(delta: float) -> void:
 
 
 func _overlay_open() -> bool:
-	return _voyages.is_open() or _report.visible or _map.is_open() or _galaxy.is_open() or _services.is_open() or _market.is_open() or _settings.is_open() or _journal.is_open() or _frontier.is_open() or _recon.is_open()
+	return _voyages.is_open() or _report.visible or _map.is_open() or _galaxy.is_open() or _services.is_open() or _market.is_open() or _settings.is_open() or _journal.is_open() or _frontier.is_open() or _recon.is_open() or _operations_panel.is_open() or _comms.is_open()
 
 
 func _physics_process(delta: float) -> void:
@@ -182,6 +202,7 @@ func _physics_process(delta: float) -> void:
 
 func _update_display(delta: float) -> void:
 	_view.sync(flight, delta)
+	_camera_mode = _view.preferred_camera_mode()
 	_hud.sync(flight, delta)
 	var combat_lock := flight.combat_lock_contact()
 	var final_approach := flight.autopilot and flight.autopilot_phase in ["Стыковка", "Посадка", "Выпуск шасси", "Вход в зону сбора"]
@@ -218,11 +239,14 @@ func _update_display(delta: float) -> void:
 	var echo_marker: bool = echo.active and echo.tracking and echo.targetable
 	if echo_marker:
 		marker = echo.position
-	var special_marker := signal_selected or project_marker or convoy_marker or rendezvous_marker or fragment_marker or hostile_marker or cargo_marker or echo_marker
+	var operation := flight.operation_marker()
+	if not operation.is_empty():
+		marker = operation.position
+	var special_marker := signal_selected or project_marker or convoy_marker or rendezvous_marker or fragment_marker or hostile_marker or cargo_marker or echo_marker or not operation.is_empty()
 	var instruments_visible := flight.docked < 0 and not flight.landed and not _overlay_open() and flight.jump_seconds_left <= 0.0
 	var forward_aim := _view.shows_forward_aim()
 	var bearing := ""
-	if instruments_visible and forward_aim and _camera_mode == FlightCamera.Mode.COCKPIT and flight.ship.autopilot_fitted:
+	if instruments_visible and forward_aim and _camera_mode == FlightCamera.Mode.COCKPIT and flight.navigation_computer_fitted:
 		var point := marker
 		if not special_marker and flight.docking_guidance().get("near", false):
 			point = flight.target_contact(flight.target)
@@ -231,7 +255,7 @@ func _update_display(delta: float) -> void:
 			var course := flight.attitude().transposed() * offset.normalized()
 			var azimuth := rad_to_deg(atan2(course.x, -course.z))
 			var elevation := rad_to_deg(asin(clampf(course.y, -1.0, 1.0)))
-			bearing = "Пеленг %+.0f° · угол %+.0f°" % [azimuth, elevation]
+			bearing = FlightText.text("NAV_BEARING") % [azimuth, elevation]
 	_hud.set_camera_view(_camera_mode, forward_aim, bearing)
 	var in_view := instruments_visible and not _view.camera.is_position_behind(marker)
 	var patrol_engaged: bool = patrol_status.phase == Flight.Patrol.ENGAGED and patrol_status.same_system
@@ -264,7 +288,7 @@ func _update_display(delta: float) -> void:
 	if _hud.scanner_is_open():
 		_hud.set_scanner_status(flight.scanner_status(contacts))
 	var sites := flight.local_targets()
-	_hud.set_navigation_targets(sites, flight.target)
+	_hud.set_navigation_targets(sites, flight.target, flight.navigation_computer_fitted, not flight.missile_camera_record().is_empty())
 	var navigation_markers: Array[Dictionary] = []
 	if instruments_visible:
 		navigation_markers = CockpitContacts.project(flight, _view.camera, sites)
@@ -278,6 +302,8 @@ func _update_display(delta: float) -> void:
 
 func _select_cockpit_target(site: int, from_view: bool) -> void:
 	if not _flight_active or _overlay_open() or flight.docked >= 0 or flight.landed or flight.jump_seconds_left > 0.0:
+		return
+	if not from_view and not flight.navigation_computer_fitted:
 		return
 	var sites := flight.local_targets()
 	if site not in sites or (from_view and not CockpitContacts.is_visible(flight, _view.camera, sites, site)):
@@ -305,6 +331,8 @@ func _handle_action(action: String) -> void:
 		return
 	if action == "voyages":
 		_open_voyages()
+		return
+	if flight.escape_status().active and action not in ["rescue_signal", "time_pause", "report", "settings", "camera"]:
 		return
 	if flight.jump_seconds_left > 0.0 and action not in ["throttle_up", "throttle_down", "time_pause"]:
 		return
@@ -334,8 +362,14 @@ func _handle_action(action: String) -> void:
 		"camera":
 			if flight.docked >= 0 or flight.landed:
 				return
-			_camera_mode = (_camera_mode + 1) % FlightCamera.MODE_NAMES.size()
+			_camera_mode = FlightCamera.next_basic(_camera_mode)
 			_view.select_camera_mode(_camera_mode)
+		"camera_observer":
+			if flight.docked < 0 and not flight.landed:
+				_view.select_camera_mode(FlightCamera.Mode.OBSERVER)
+		"camera_missile":
+			if not flight.missile_camera_record().is_empty():
+				_view.select_camera_mode(FlightCamera.Mode.MISSILE)
 		"speed_hold":
 			flight.toggle_speed_hold()
 		"orbit_cancel":
@@ -366,6 +400,12 @@ func _handle_action(action: String) -> void:
 			flight.launch_missile(flight.combat_lock_id())
 		"decoy":
 			flight.launch_decoy()
+		"energy_pulse":
+			flight.launch_energy_pulse()
+		"rescue_signal":
+			flight.request_rescue()
+		"rescue_eject":
+			flight.eject_escape_pod()
 		"mine":
 			flight.mine_action()
 		"mining_pulse":
@@ -380,6 +420,8 @@ func _handle_action(action: String) -> void:
 			flight.retrieve_remote_rig()
 		"rig_route":
 			flight.track_remote_rig()
+		"processor_deploy", "processor_feed", "processor_unload", "processor_retrieve", "processor_route":
+			flight.processor_action(action)
 		"sell_ore":
 			flight.sell_ore_action()
 		"scoop":
@@ -428,6 +470,13 @@ func _handle_action(action: String) -> void:
 		"recon":
 			_hud.set_input_enabled(false)
 			_recon.open(flight)
+			return
+		"operations":
+			_open_operations()
+			return
+		"comms":
+			var id := _hud.radio_contact_id()
+			_open_comms(id if not id.is_empty() else flight.combat_lock_id())
 			return
 		_:
 			return
@@ -535,7 +584,8 @@ func _deliver_notice() -> void:
 			"system_id": flight.system_id, "destination": transit.destination, "fare": transit.fare,
 			"emergency": transit.emergency, "requested": transit.requested,
 			"game_seconds": transit.duration, "arrival_epoch": transit.arrival_epoch,
-			"drive": flight.ship.drive_kind, "fuel_remaining": flight.ship.jump_fuel,
+			"drive": flight.ship.drive_kind, "fuel_remaining": flight.ship.active_jump_fuel(),
+			"military_waste": flight.ship.military_waste,
 		}
 	elif event == "emergency_jump_arrival":
 		trace_fields = {"system_id": flight.system_id, "orbit_time": flight.orbit_time,
@@ -557,6 +607,8 @@ func _deliver_notice() -> void:
 		"departure_requested", "departure_canceled", "departure_open", "departure_crew_denied",
 		"mining_ready", "mining_loaded", "ore_sold",
 		"remote_rig_deployed", "remote_rig_unloaded", "remote_rig_retrieved", "remote_rig_route", "service_refuel", "service_tank", "service_eco",
+		"processor_deploy", "processor_feed", "processor_ready", "processor_unload", "processor_retrieve",
+		"service_surface_processor", "service_military_drive", "service_military_refuel", "service_military_waste",
 		"scoop_full", "scoop_stop", "star_arrival", "gas_arrival", "fuel_empty", "thermal_damage",
 		"fuel_transfer", "service_jump_refuel", "cargo_jettisoned", "cargo_pod_targeted", "cargo_pod_collected",
 		"berth_bill", "berth_payment", "berth_permit", "civic_donation",
@@ -582,6 +634,12 @@ func _deliver_notice() -> void:
 		"missing_accepted", "missing_clue", "missing_evidence", "missing_boarded", "missing_paid", "missing_expired",
 		"missing_disembarked", "missing_course",
 		"recon_camera_installed", "recon_accepted", "recon_captured", "recon_paid", "recon_expired", "recon_cancelled", "recon_course",
+		"operation_equipment", "operation_progress", "operation_paid", "operation_expired", "operation_hit", "operation_intercepted", "operation_course",
+		"law_challenge", "law_pursuit", "law_interdiction", "law_arrest", "law_answer", "law_paid", "law_contest",
+		"law_bribe", "law_release", "law_departure_denied", "comms_route", "comms_distress",
+		"combat_energy_pulse", "ship_destroyed", "escape_ejected", "rescue_signal", "rescue_complete", "service_combat_energy_pulse",
+		"service_combat_maintenance", "service_combat_auto_repair", "combat_auto_repaired",
+		"remote_rig_bought", "remote_rig_sold", "remote_rig_selected",
 		"war_declared", "war_round", "war_captured", "war_repulsed", "war_convoy_delivered", "war_convoy_intercepted",
 		"convoy_order_accepted", "convoy_order_escorted", "convoy_order_failed", "convoy_order_paid",
 		"convoy_order_fire", "convoy_order_enemy_hit",
@@ -589,7 +647,7 @@ func _deliver_notice() -> void:
 		"career_dispatch_accepted", "career_dispatch_paid", "career_dispatch_expired", "career_dispatch_course",
 		"career_order_accepted", "career_order_proved", "career_order_course", "career_order_paid", "career_order_expired", "career_order_removed",
 		"story_brief", "story_registry", "story_mirror", "story_collect_key", "story_submit", "story_course",
-		"flight_assist", "reference_frame", "time_paused", "time_resumed", "autopilot_equipment", "speed_hold_on", "speed_hold_off",
+		"flight_assist", "reference_frame", "time_paused", "time_resumed", "autopilot_equipment", "navigation_computer", "speed_hold_on", "speed_hold_off",
 		"survey_record", "galaxy_scan", "customs_inspection", "customs_paid",
 		"orbit_start", "orbit_complete", "orbit_abort", "orbit_cancel",
 		"rendezvous_start", "rendezvous_hold", "rendezvous_abort", "rendezvous_cancel", "rendezvous_finish",
@@ -802,6 +860,14 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		if event.physical_keycode == KEY_ESCAPE:
 			_close_recon()
 		return
+	if _operations_panel.is_open():
+		if event.physical_keycode == KEY_ESCAPE:
+			_close_operations()
+		return
+	if _comms.is_open():
+		if event.physical_keycode == KEY_ESCAPE:
+			_comms.handle_back()
+		return
 	if event.physical_keycode == KEY_F12:
 		_hud.toggle_navigation()
 		get_viewport().set_input_as_handled()
@@ -823,6 +889,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_N: "map", KEY_J: "galaxy", KEY_K: "scoop", KEY_P: "services", KEY_O: "time", KEY_L: "market",
 		KEY_U: "patrol", KEY_X: "fire", KEY_I: "convoy", KEY_H: "flight_assist", KEY_Q: "recon",
 		KEY_Z: "missile_fire", KEY_BRACKETRIGHT: "missile_next", KEY_BRACKETLEFT: "decoy",
+		KEY_SEMICOLON: "operations", KEY_BACKSLASH: "comms",
 		KEY_F1: "camera", KEY_F2: "settings", KEY_F3: "journal", KEY_F4: "frontier",
 		KEY_F5: "dock_sync", KEY_F6: "dock_clearance", KEY_F7: "frame", KEY_F9: "time_pause", KEY_F10: "speed_hold", KEY_F11: "voyages", KEY_Y: "gear", KEY_C: "fuel",
 	}
@@ -872,6 +939,10 @@ func _notification(what: int) -> void:
 			_close_frontier()
 		elif _recon.is_open():
 			_close_recon()
+		elif _operations_panel.is_open():
+			_close_operations()
+		elif _comms.is_open():
+			_comms.handle_back()
 		elif _hud.close_navigation():
 			return
 		elif flight.departure_status().can_cancel:
@@ -1026,8 +1097,8 @@ func _map_rendezvous_finish() -> void:
 		_update_display(0.0)
 
 
-func _map_frame(selection: int) -> void:
-	if not _map.is_open() or not flight.set_reference_frame(selection):
+func _map_frame(selection: int, rotating := false) -> void:
+	if not _map.is_open() or not flight.set_reference_frame(selection, rotating):
 		return
 	_deliver_notice()
 	_update_display(0.0)
@@ -1256,6 +1327,8 @@ func _close_market() -> void:
 
 
 func _apply_presentation() -> void:
+	FlightText.set_language(presentation.language)
+	_hud.apply_interface_language()
 	var viewport := get_viewport()
 	viewport.msaa_3d = ANTIALIASING[presentation.quality]
 	if DisplayServer.get_name() != "headless":
@@ -1403,6 +1476,81 @@ func _recon_action(action: String) -> void:
 func _close_recon() -> void:
 	_recon.close()
 	_hud.set_input_enabled(true)
+
+
+func _open_operations() -> void:
+	if _journal.is_open():
+		_journal.close()
+	_hud.set_input_enabled(false)
+	_operations_panel.open(flight)
+
+
+func _operation_action(id: String, action: String) -> void:
+	if not _operations_panel.is_open():
+		return
+	var done := flight.operation_action(id, action)
+	var message := flight.status_message if done else "Команда пока недоступна."
+	if done and action == "follow":
+		_close_operations()
+	else:
+		_operations_panel.refresh(message)
+	_deliver_notice()
+	_update_display(0.0)
+
+
+func _close_operations() -> void:
+	_operations_panel.close()
+	_hud.set_input_enabled(true)
+
+
+func _open_comms(id := "") -> void:
+	_hud.close_navigation()
+	_hud.set_input_enabled(false)
+	_comms.open(flight, id)
+
+
+func _open_law_radio() -> void:
+	_services.close()
+	_open_comms()
+
+
+func _select_rig_slot(slot: int) -> void:
+	if _journal.is_open() and flight.select_rig_slot(slot):
+		_deliver_notice()
+		_journal.refresh()
+
+
+func _comms_action(action: String) -> void:
+	if not _comms.is_open():
+		return
+	flight.comms_action(action, _comms.contact_id())
+	_deliver_notice()
+	_comms.refresh()
+	_update_display(0.0)
+
+
+func _close_comms() -> void:
+	_comms.close()
+	_hud.set_input_enabled(true)
+
+
+func _subscribe_news(id: String) -> void:
+	if not _journal.is_open():
+		return
+	var subscribed := flight.subscribe_news(id)
+	_deliver_notice()
+	if subscribed:
+		_save()
+	_journal.refresh()
+
+
+func _calendar_wait(epoch: float) -> void:
+	if not _journal.is_open():
+		return
+	if flight.wait_on_calendar(epoch):
+		_close_journal()
+	_deliver_notice()
+	_update_display(0.0)
 
 
 func _close_report() -> void:

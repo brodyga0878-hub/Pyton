@@ -19,6 +19,7 @@ const OPTIONS := {
 	FlightAudio.EFFECT_VOLUME_KEY: FlightAudio.LEVEL_LABELS,
 	Music.VOLUME_KEY: FlightAudio.LEVEL_LABELS,
 	Music.MODE_KEY: Music.MODE_LABELS,
+	"language": ["Русский", "English"],
 }
 const AUDIO_FIELDS := [FlightAudio.VOLUME_KEY, FlightAudio.EFFECT_VOLUME_KEY, Music.VOLUME_KEY, Music.MODE_KEY]
 
@@ -31,6 +32,7 @@ var invert_pitch := 0
 var effects_volume := FlightAudio.DEFAULT_LEVEL
 var music_volume := Music.DEFAULT_LEVEL
 var music_mode := Music.CONTEXTUAL
+var language := 0
 
 
 func snapshot() -> Dictionary:
@@ -40,6 +42,7 @@ func snapshot() -> Dictionary:
 		"invert_yaw": invert_yaw, "invert_pitch": invert_pitch,
 		FlightAudio.EFFECT_VOLUME_KEY: effects_volume,
 		Music.VOLUME_KEY: music_volume, Music.MODE_KEY: music_mode,
+		"language": language,
 	}
 
 
@@ -53,6 +56,8 @@ func restore(value: Variant) -> bool:
 		fields = PRE_INVERSION_FIELDS
 	elif value.size() == PRE_AUDIO_MIX_FIELDS.size():
 		fields = PRE_AUDIO_MIX_FIELDS
+	elif value.size() == OPTIONS.size() - 1:
+		fields.erase("language")
 	if value.size() != fields.size():
 		return false
 	for field: String in fields:
@@ -67,6 +72,7 @@ func restore(value: Variant) -> bool:
 	effects_volume = int(value.get(FlightAudio.EFFECT_VOLUME_KEY, FlightAudio.DEFAULT_LEVEL))
 	music_volume = int(value.get(Music.VOLUME_KEY, Music.DEFAULT_LEVEL))
 	music_mode = int(value.get(Music.MODE_KEY, Music.CONTEXTUAL))
+	language = int(value.get("language", 0))
 	return true
 
 

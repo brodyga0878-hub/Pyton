@@ -1,10 +1,13 @@
 extends RefCounted
 ## Presentation-only shot changes. World trajectory and flight inputs remain in FlightSim.
 
-enum Mode { EXTERIOR, COCKPIT, REAR }
+enum Mode { EXTERIOR, COCKPIT, REAR, OBSERVER, MISSILE }
 
-const MODE_NAMES := ["Снаружи", "Кабина", "Назад"]
-const FIELD_OF_VIEW := [67.0, 73.0, 69.0]
+const Text := preload("res://scripts/flight_text.gd")
+const MODE_NAMES := ["Снаружи", "Кабина", "Назад", "Обзор", "Ракета"]
+const MODE_KEYS := ["CAMERA_EXTERIOR", "CAMERA_COCKPIT", "CAMERA_REAR", "CAMERA_OBSERVER", "CAMERA_MISSILE"]
+const FIELD_OF_VIEW := [67.0, 73.0, 69.0, 59.0, 66.0]
+const BASIC_MODE_COUNT := 3
 const STARTER_SEAT := Vector3(0.0, 0.58, -0.73)
 const FREIGHTER_SEAT := Vector3(0.0, 0.92, -1.28)
 const HULL_CLEARANCE := 4.5
@@ -36,7 +39,15 @@ func select(next: int) -> bool:
 
 
 func cycle() -> void:
-	select((mode + 1) % MODE_NAMES.size())
+	select(next_basic(mode))
+
+
+static func next_basic(current: int) -> int:
+	return (current + 1) % BASIC_MODE_COUNT if current < BASIC_MODE_COUNT else Mode.EXTERIOR
+
+
+static func translated_name(current: int) -> String:
+	return Text.text(MODE_KEYS[current])
 
 
 func transitioning() -> bool:
@@ -44,8 +55,13 @@ func transitioning() -> bool:
 
 
 func sample(ship: Transform3D, exterior: Transform3D, delta: float, freighter := false,
-		cut := false) -> Transform3D:
-	var goal := ship.affine_inverse() * exterior if mode == Mode.EXTERIOR else _seat_pose(freighter)
+		cut := false, special := Transform3D.IDENTITY) -> Transform3D:
+	var ship_relative := _seat_pose(freighter)
+	if mode == Mode.EXTERIOR:
+		ship_relative = ship.affine_inverse() * exterior
+	elif mode in [Mode.OBSERVER, Mode.MISSILE]:
+		ship_relative = ship.affine_inverse() * special
+	var goal := ship_relative
 	var target_fov: float = FIELD_OF_VIEW[mode]
 	var target_cockpit := float(mode == Mode.COCKPIT)
 	if cut or not _initialized:
@@ -78,6 +94,8 @@ func shows_hull() -> bool:
 
 
 func shows_forward_aim() -> bool:
+	if mode in [Mode.OBSERVER, Mode.MISSILE]:
+		return false
 	return (mode == Mode.EXTERIOR and not transitioning()) or _local_pose.basis.z.dot(Vector3.BACK) >= 0.5
 
 

@@ -8,10 +8,15 @@ const Dynamics := preload("res://scripts/orbital_dynamics.gd")
 const Atmosphere := preload("res://scripts/atmosphere.gd")
 const Ground := preload("res://scripts/ground_port.gd")
 const Economy := preload("res://scripts/port_economy.gd")
+const Dossier := preload("res://scripts/system_dossier.gd")
 
 const SCAN_CLEARANCE := 145.0
 const SCAN_SPEED_LIMIT := 34.0
 const MAX_EPOCH := 3155760000.0
+const GRAVITATIONAL_CONSTANT := 6.67430e-11
+const TEMPERATURE_REFERENCE := 278.0
+const ORBITAL_REFERENCE := 1000.0
+const STELLAR_RADIUS_REFERENCE := 220.0
 
 var _records: Dictionary[int, float] = {}
 var _discovered: Dictionary[int, float] = {}
@@ -38,7 +43,7 @@ func body_status(sim: RefCounted, site_id: int) -> Dictionary:
 		status.relative_speed = sim.speed_relative_to(site_id)
 	if status.known:
 		status.recorded_at = _records[site_id]
-		status.data = _body_data(sim, site_id, site)
+		status.data = _body_data(sim, site_id, site, status.recorded_at)
 	status.reason = _scan_reason(sim, status)
 	status.can_scan = status.reason.is_empty()
 	if status.can_scan:
@@ -207,7 +212,7 @@ static func _scan_reason(sim: RefCounted, status: Dictionary) -> String:
 	return ""
 
 
-static func _body_data(sim: RefCounted, site_id: int, site: Dictionary) -> Dictionary:
+static func _body_data(sim: RefCounted, site_id: int, site: Dictionary, epoch: float) -> Dictionary:
 	var radius: float = site.radius
 	var mu := Dynamics.gravity_parameter(site_id)
 	var resource: String = site.get("resource", "")
@@ -224,6 +229,9 @@ static func _body_data(sim: RefCounted, site_id: int, site: Dictionary) -> Dicti
 	var data := {
 		"radius": radius, "diameter": radius * 2.0, "gravity_parameter": mu,
 		"gravity": mu / (radius * radius),
+		"mass_kg": mu / GRAVITATIONAL_CONSTANT,
+		"temperature_k": _temperature(site_id, kind, epoch),
+		"associated_ports": _associated_ports(sim, site_id),
 		"surface_class": _surface_class(site_id, kind, host, solid),
 		"atmosphere_height": float(atmosphere.get("height", 0.0)),
 		"atmosphere_density": float(atmosphere.get("density", 0.0)),
@@ -236,6 +244,38 @@ static func _body_data(sim: RefCounted, site_id: int, site: Dictionary) -> Dicti
 	}
 	data.merge(_orbit_data(site_id, host))
 	return data
+
+
+static func _temperature(site_id: int, kind: String, epoch: float) -> float:
+	if kind == "star":
+		return Dossier.stellar_temperature(site_id)
+	if kind == "port":
+		return 0.0
+	# Estimate equilibrium under the scaled survey model, using the observed orbital geometry.
+	var center: Vector3 = Orbit.sample(site_id, epoch).position
+	var irradiance := 0.0
+	for star_id: int in Catalog.stars_for(Catalog.system_of_site(site_id)):
+		var temperature := Dossier.stellar_temperature(star_id)
+		if temperature <= 0.0:
+			continue
+		var radius: float = Catalog.site(star_id).radius
+		var star_center: Vector3 = Orbit.sample(star_id, epoch).position
+		var range_to_star := maxf(radius, center.distance_to(star_center))
+		irradiance += pow(temperature / 5772.0, 4.0) * pow(radius / STELLAR_RADIUS_REFERENCE * ORBITAL_REFERENCE / range_to_star, 2.0)
+	return TEMPERATURE_REFERENCE * pow(irradiance, 0.25)
+
+
+static func _associated_ports(sim: RefCounted, site_id: int) -> Array[int]:
+	var ports: Array[int] = []
+	if Catalog.is_port(site_id):
+		return ports
+	var system_id := Catalog.system_of_site(site_id)
+	for port: int in Catalog.ports_for(system_id):
+		var host := Ground.body(port)
+		var reference := host if host >= 0 else int(_orbit_data(port, -1).orbit_parent)
+		if reference == site_id and sim.station_operational(port):
+			ports.append(port)
+	return ports
 
 
 static func _orbit_data(site_id: int, host: int) -> Dictionary:

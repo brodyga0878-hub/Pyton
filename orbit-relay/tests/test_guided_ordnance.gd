@@ -3,6 +3,7 @@ extends SceneTree
 const Combat := preload("res://scripts/combat_systems.gd")
 const Flight := preload("res://scripts/flight_sim.gd")
 const FlightView := preload("res://scripts/flight_view.gd")
+const Camera := preload("res://scripts/flight_camera.gd")
 const Fixture := preload("res://tests/flight_fixture.gd")
 const Ordnance := preload("res://scripts/combat_ordnance.gd")
 const Patrol := preload("res://scripts/patrol_encounter.gd")
@@ -82,6 +83,11 @@ func _test_player_rack() -> void:
 	_view.sync(flight, 0.0)
 	_expect(_view._player_missile.is_visible_in_tree() and _view._player_missile.global_position.is_equal_approx(launched.position)
 		and not _view._player_decoy.visible, "The rendered player missile appears at the actual rail position")
+	_view.select_camera_mode(Camera.Mode.MISSILE)
+	_view.sync(flight, 0.0)
+	_expect(_view.preferred_camera_mode() == Camera.Mode.MISSILE and not _view.shows_forward_aim()
+		and _view.camera.global_position.distance_to(launched.position) < 10.0,
+		"The fitted, live missile camera is attached to the actual projectile")
 	flight.update(0.10, Vector2.ZERO, 0.0, false, false)
 	var flight_path: Dictionary = flight.missile_status().projectile
 	if not _expect(not flight_path.is_empty() and Vector3(flight_path.velocity).angle_to(launched.velocity) > 0.02
@@ -112,7 +118,8 @@ func _test_player_rack() -> void:
 		and cold.missile_status().projectile.is_empty() and cold.combat_equipment_status().missile_ammo.dart == 1,
 		"The in-flight missile hits the original moving actor exactly once and keeps the other rail")
 	_view.sync(cold, 0.0)
-	_expect(not _view._player_missile.visible, "The player missile model disappears after the actual impact")
+	_expect(not _view._player_missile.visible and _view.preferred_camera_mode() == Camera.Mode.EXTERIOR,
+		"The missile model and its camera disappear after the actual impact")
 
 
 func _test_hostile_guidance() -> void:

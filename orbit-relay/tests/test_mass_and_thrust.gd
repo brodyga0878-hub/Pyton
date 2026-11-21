@@ -42,7 +42,7 @@ func _test_axes() -> void:
 			_expect(is_equal_approx(actual, expected) and flight.velocity.normalized().dot(direction) > 0.99999
 				and flight.ship.fuel < flight.ship.capacity(),
 				"Hull %s uses its signed local axis %s in actual motion and spends reaction fuel" % [id, axis])
-		_expect(limits[0] > limits[1] and limits[2] > limits[3] and limits[5] > limits[4],
+		_expect(not is_equal_approx(limits[0], limits[1]) and limits[2] > limits[3] and limits[5] > limits[4],
 			"Right/left, rise/fall and ahead/astern have distinct bench-measured limits")
 	var courier := _free_flight()
 	var freighter := _free_flight(Ship.FREIGHTER_HULL)

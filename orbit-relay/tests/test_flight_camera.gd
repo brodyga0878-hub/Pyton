@@ -42,7 +42,7 @@ func _test_camera_geometry() -> void:
 	_expect(camera.sample(ship, exterior, 0.0).is_equal_approx(exterior) and camera.shows_hull()
 		and camera.shows_forward_aim() and camera.cockpit_mix == 0.0 and camera.field_of_view == 67.0,
 		"Existing outside framing remains the default camera")
-	_expect(not camera.select(-1) and not camera.select(3) and not camera.select(Camera.Mode.EXTERIOR),
+	_expect(not camera.select(-1) and not camera.select(5) and not camera.select(Camera.Mode.EXTERIOR),
 		"An invalid or already selected camera leaves the current mode untouched")
 	if not _expect(camera.select(Camera.Mode.COCKPIT) and camera.transitioning()
 		and camera.sample(ship, exterior, 0.0).is_equal_approx(exterior),
@@ -130,6 +130,16 @@ func _test_real_views() -> void:
 	await process_frame
 	_expect(game._camera_mode == Camera.Mode.EXTERIOR and game._view._ship.visible and game._view.shows_forward_aim(),
 		"The mirrored touch command wraps from rear back to the native exterior view")
+	_tap(game._hud._actions["navigation_toggle"])
+	await process_frame
+	_expect(game._hud._actions["camera_missile"].disabled, "The missile picture requires a live projectile")
+	_tap(game._hud._actions["camera_observer"])
+	game._update_display(TRANSITION)
+	_expect(game._camera_mode == Camera.Mode.OBSERVER and game._view._ship.visible
+		and _relative_camera(game).origin.x < -10.0 and not game._view.shows_forward_aim(),
+		"The actual touch camera option opens a distinct side-observer shot")
+	_press_camera_shortcut()
+	game._update_display(TRANSITION)
 	_test_unfitted_camera(game)
 	game.queue_free()
 	await process_frame
@@ -137,11 +147,13 @@ func _test_real_views() -> void:
 
 func _test_unfitted_camera(game: Node) -> void:
 	var old := Flight.new()
-	if not _expect(old.autopilot_equipment_action() and not old.ship.autopilot_fitted
+	if not _expect(old.service_action("navigation_computer") and not old.navigation_computer_fitted and old.ship.autopilot_fitted
+		and old.autopilot_equipment_action() and not old.ship.autopilot_fitted
 		and Session.save_state(old.snapshot(), MANUAL_SAVE) == OK, "Save a pilot with the navigation computer removed at its actual port"):
 		return
 	var pilot := Flight.new()
-	if not _expect(pilot.restore(Session.load_state(MANUAL_SAVE)) and not pilot.ship.autopilot_fitted and Fixture.depart(pilot),
+	if not _expect(pilot.restore(Session.load_state(MANUAL_SAVE)) and not pilot.navigation_computer_fitted
+		and not pilot.ship.autopilot_fitted and Fixture.depart(pilot),
 		"An unfitted cold ship still releases normally into manual flight"):
 		return
 	game.flight = pilot
@@ -155,6 +167,12 @@ func _test_unfitted_camera(game: Node) -> void:
 		and not game._hud._camera_instrument.is_visible_in_tree() and game._hud._camera_instrument.text.is_empty()
 		and navigation.disabled and not velocity_hold.disabled and pilot.snapshot() == baseline,
 		"The same real cockpit works with manual speed instrumentation while the missing course computer stays disabled")
+	game._hud.toggle_navigation()
+	var before_target: int = pilot.target
+	game._select_cockpit_target(2, false)
+	_expect(not game._hud._navigation_list.visible and game._hud._navigation_hint.visible
+		and pilot.target == before_target, "The onboard list is gated at the interface and command handler")
+	game._hud.close_navigation()
 
 
 func _relative_camera(game: Node) -> Transform3D:

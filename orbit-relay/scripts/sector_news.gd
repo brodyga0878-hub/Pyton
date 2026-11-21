@@ -6,7 +6,7 @@ const Calendar = preload("res://scripts/mission_calendar.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const MINUTE := 60.0
 const DAY := Calendar.SECONDS_PER_DAY
-const START_OFFSET := float(Calendar.START_UNIX % int(DAY))
+const START_OFFSET := Calendar.START_DAY_OFFSET
 const MAX_REPORTS := 96
 const MAX_ARCHIVE := 32
 const MAX_TEXT := 480
@@ -108,6 +108,18 @@ func article(id: String, epoch: float) -> Dictionary:
 		return {}
 	var report: Dictionary = _reports.get(id, {})
 	return _display_report(report, epoch) if not report.is_empty() and float(report.published_at) <= epoch else {}
+
+
+func periodical_articles(prefix: String, systems: Array[int], after: float, published_at: float) -> Array[Dictionary]:
+	var articles: Array[Dictionary] = []
+	for report: Dictionary in _reports.values():
+		var published := float(report.published_at)
+		var system := int(report.system)
+		if published > after and published <= published_at and str(report.kind).begins_with(prefix) \
+				and (system == -1 or system in systems):
+			articles.append(_display_report(report, published_at))
+	articles.sort_custom(_newest_first)
+	return articles
 
 
 func snapshot() -> Dictionary:

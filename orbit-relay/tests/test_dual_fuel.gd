@@ -37,10 +37,10 @@ func _check_gas_conditions() -> void:
 		"A gas collector cannot accidentally invoke landing or mining")
 	_check(not _gas_approach(90.0).scoop_action() and not _gas_approach(20.0).scoop_action(),
 		"Collection below and above the useful layer is rejected")
-	flight.velocity += Vector3.RIGHT * (Flight.GAS_SCOOP_SPEED + 2.0)
+	flight.velocity = Vector3(air.drift) + Vector3.RIGHT * (Flight.GAS_SCOOP_SPEED + 2.0)
 	_check(not flight.scoop_status().ok and not flight.scoop_action(),
 		"Excess speed is checked relative to the moving atmosphere")
-	flight.velocity = flight.target_velocity(Giant)
+	flight.velocity = air.drift
 	flight.entry_heat = Flight.HEAT_SCOOP_LIMIT
 	_check(not flight.scoop_action(), "A heat-cutoff gas scoop cannot be restarted")
 	flight.entry_heat = 0.0

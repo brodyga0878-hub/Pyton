@@ -32,6 +32,9 @@ static func attackable(sim: RefCounted) -> Dictionary:
 			convoy.hull = order.enemy_hull
 			convoy.channel = "convoy"
 			contacts[convoy.id] = convoy
+	var operation: Dictionary = sim.operation_contact()
+	if not operation.is_empty():
+		contacts[operation.id] = operation
 	return contacts
 
 

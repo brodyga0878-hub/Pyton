@@ -31,9 +31,10 @@ func _test_catalog() -> void:
 	_expect(Catalog.PRE_EXPANDED_SYSTEM_COUNT == 24 and Catalog.PRE_ATLAS_SYSTEM_COUNT == 96
 		and Catalog.PRE_EXPANDED_DESTINATION_COUNT == 89 and Catalog.PRE_ATLAS_DESTINATION_COUNT == 305,
 		"The previous expansion still occupies its original system and target IDs")
-	_expect(Catalog.SYSTEM_COUNT == 512 and Catalog.PRE_RICH_SYSTEMS_DESTINATION_COUNT == 1553
-		and Catalog.DESTINATION_COUNT == 1585,
-		"The atlas preserves its 1553 base sites and appends 32 new moons and gas giants")
+	_expect(Catalog.PRE_REACH_SYSTEM_COUNT == 512 and Catalog.PRE_RICH_SYSTEMS_DESTINATION_COUNT == 1553
+		and Catalog.PRE_REACH_DESTINATION_COUNT == 1585 and Catalog.SYSTEM_COUNT == 1024
+		and Catalog.DESTINATION_COUNT == 3197,
+		"The outer reach appends 512 systems and preserves all 1,585 historical catalog IDs")
 	var names := {}
 	var targets := {}
 	var sectors := {}
