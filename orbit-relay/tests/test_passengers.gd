@@ -28,6 +28,8 @@ func _run() -> void:
 	print("Passenger integration: %d checks, %d failures" % [_checks, _failures.size()])
 	for failure: String in _failures:
 		printerr(failure)
+	# Let the mixer retire stopped playback before the SceneTree shuts down.
+	await create_timer(0.15).timeout
 	quit(0 if _failures.is_empty() else 1)
 
 
