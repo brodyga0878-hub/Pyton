@@ -23,6 +23,7 @@ const FLIGHT_MODE_ROW := Rect2(26, -224, 350, 46)
 const TRANSLATION_ROW := Rect2(26, -279, 296, 46)
 const ACTION_COLUMN := Rect2(-340, -215, 314, 189)
 const TOUCH_GAINS := [0.72, 1.0, 1.36]
+const CONTACT_NOTICE_DISTANCE := 1100.0
 const HOLD_ACTIONS := ["boost", "brake", "translation_forward", "translation_reverse"]
 const MARK_PRIORITY := {"raider": 0, "convoy": 1}
 const RIG_ACTIONS := {
@@ -41,6 +42,7 @@ var _translation_controls: HBoxContainer
 var _route: Label
 var _route_detail: Label
 var _passenger_route: Label
+var _ambient_alert: Label
 var _rig_readout: HBoxContainer
 var _rig_summary: Label
 var _rig_status: Dictionary = {}
@@ -149,6 +151,9 @@ func build() -> void:
 	_passenger_route = _label(route_stack, 16, CYAN)
 	_passenger_route.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_passenger_route.hide()
+	_ambient_alert = _label(route_stack, 16, AMBER)
+	_ambient_alert.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_ambient_alert.hide()
 	_rig_readout = HBoxContainer.new()
 	_rig_readout.add_theme_constant_override("separation", 8)
 	route_stack.add_child(_rig_readout)
@@ -606,8 +611,11 @@ func sync(sim: RefCounted, delta: float) -> void:
 	patrol_button.text = str(patrol.get("caption", "Дозор"))
 	patrol_button.tooltip_text = str(patrol.get("reason", ""))
 	_patrol_blocked = not bool(patrol.get("available", false))
+	var ambient: Dictionary = {} if parked or _jumping else sim.ambient_status()
+	_sync_ambient(ambient)
+	var mission_fire := patrol_fight or bool(convoy.get("fire_visible", false))
 	var fire_button: Button = _actions["fire"]
-	fire_button.visible = not parked and not _jumping and (patrol_fight or convoy.get("fire_visible", false))
+	fire_button.visible = not parked and not _jumping and (mission_fire or ambient.get("fire_visible", false))
 	var fire: Dictionary = sim.fire_status() if fire_button.visible else {}
 	fire_button.tooltip_text = str(fire.get("reason", ""))
 	_fire_blocked = not fire.get("ok", false)
@@ -688,7 +696,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_actions["contract"].text = "Отметить этап" if transfer else ("Сдать груз" if sim.contract_stage == 1 else "Взять контракт")
 	var sale_quote: int = sim.raw_sale_quote() if port_services and mining.ore_hold > 0 else 0
 	_actions["sell_ore"].visible = sale_quote > 0
-	var dock_approach: bool = not parked and not _jumping and not approach_active and fire.is_empty() and convoy.is_empty() and not sim.patrol_course and not sim.project_course and not sim.convoy_course
+	var dock_approach: bool = not parked and not _jumping and not approach_active and not mission_fire and convoy.is_empty() and not sim.patrol_course and not sim.project_course and not sim.convoy_course
 	var manual_approach: bool = dock_approach and not sim.autopilot
 	var surface: Dictionary = sim.surface_status() if not parked and Sector.is_mine_site(sim.target) else {}
 	var gear: Dictionary = sim.gear_status()
@@ -741,6 +749,27 @@ func _sync_speed_hold(status: Dictionary) -> void:
 	var step := int(status.get("step", 0))
 	_actions["throttle_down"].tooltip_text = "Уменьшить заданную скорость на %d м/с (V)" % step if enabled else "Уменьшить тягу (V)"
 	_actions["throttle_up"].tooltip_text = "Увеличить заданную скорость на %d м/с (R)" % step if enabled else "Увеличить тягу (R)"
+
+func _sync_ambient(status: Dictionary) -> void:
+	var phase := str(status.get("phase", "clear"))
+	var distance := float(status.get("distance", INF))
+	var hostile := bool(status.get("hostile", false)) and distance >= 0.0 and distance <= CONTACT_NOTICE_DISTANCE
+	_ambient_alert.visible = hostile or phase == "relief"
+	if not _ambient_alert.visible:
+		return
+	var tint := AMBER
+	if phase == "relief":
+		_ambient_alert.text = "Транспорт вернулся на маршрут."
+		tint = CYAN
+	else:
+		var motion := " отступает" if phase == "retreat" else ""
+		_ambient_alert.text = "%s%s · %d м · корпус %d%%" % [status.name, motion, roundi(distance), ceili(float(status.hull))]
+		if phase == "retreat":
+			tint = CYAN
+		elif status.get("danger", false):
+			tint = ALERT
+	if _ambient_alert.get_theme_color("font_color") != tint:
+		_ambient_alert.add_theme_color_override("font_color", tint)
 
 func _sync_combat(status: Dictionary) -> void:
 	var ecm: Button = _actions["ecm"]
@@ -1081,7 +1110,8 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 				var altitude := ("%.1f" % maxf(0.0, float(surface.altitude))).replace(".", ",")
 				_telemetry.text += "\nВысота %s м · уклон %.0f°" % [altitude, surface.slope]
 		_actions["dock"].tooltip_text = str(surface.reason)
-	if not fire.is_empty() and convoy.is_empty():
+	var ambient_fire := str(fire.get("channel", "")) == "ambient"
+	if not fire.is_empty() and not ambient_fire and convoy.is_empty():
 		_route.text = "Дозор  /  Рейдер"
 		_route_detail.text = "Дистанция %d м · корпус %d%%" % [roundi(fire.get("distance", 0.0)), ceili(patrol.get("enemy_hull", 0.0))]
 		_guidance.text = "Цель в прицеле. Нажмите «Огонь»." if fire.ok else str(fire.get("reason", ""))
@@ -1089,8 +1119,8 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 		_sync_orbit_flight(sim.orbit_status(), sim.throttle)
 	elif not rendezvous.is_empty():
 		_sync_rendezvous_flight(rendezvous, sim.throttle)
-	elif not convoy.is_empty() and (convoy_course or not fire.is_empty()):
-		_sync_convoy_flight(convoy, fire)
+	elif not convoy.is_empty() and (convoy_course or (not ambient_fire and not fire.is_empty())):
+		_sync_convoy_flight(convoy, {} if ambient_fire else fire)
 	elif patrol.get("phase") == Patrol.OUTBOUND and sim.patrol_course and patrol.get("same_system", false):
 		_route.text = "Дозор  /  Сигнал"
 		_route_detail.text = "До района сигнала %d м" % roundi(patrol.distance)
@@ -1106,7 +1136,7 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 			int(scoop_status.get("cargo_units", 0)), int(scoop_status.get("free", 0)),
 		]
 	elif not convoy.is_empty() and not sim.autopilot:
-		_sync_convoy_flight(convoy, fire)
+		_sync_convoy_flight(convoy, {} if ambient_fire else fire)
 	elif scoop_status.get("near", false) or sim.is_scoop_site(sim.target):
 		_guidance.text = _scoop_hint(scoop_status)
 		if sim.autopilot:
@@ -1132,6 +1162,8 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 		_guidance.text = "Подойдите к поверхности вручную."
 		if not _autopilot_blocked:
 			_guidance.text += " Для захода на площадку можно включить «Авто»."
+	elif ambient_fire:
+		_guidance.text = "Рейдер в прицеле. Нажмите «Огонь»." if fire.ok else str(fire.get("reason", ""))
 	elif _translation_mode:
 		_guidance.text = "Круглая панель — сдвиг вбок и по высоте. «Вперёд» и «Назад» удерживайте."
 	elif holding:

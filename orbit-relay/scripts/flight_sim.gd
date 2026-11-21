@@ -30,7 +30,8 @@ const MissionCalendar = preload("res://scripts/mission_calendar.gd")
 const CombatSystems = preload("res://scripts/combat_systems.gd")
 const Ground = preload("res://scripts/ground_port.gd")
 const SpeedHold = preload("res://scripts/speed_hold.gd")
-const SAVE_SCHEMA := 39
+const CivilianTraffic = preload("res://scripts/civilian_traffic.gd")
+const SAVE_SCHEMA := 40
 const REMOTE_RIG_ACCESS_DISTANCE := 20.0
 const MINING_PULSE_RANGE := 200.0
 const MINING_PULSE_FUEL := 0.4
@@ -149,6 +150,7 @@ var customs := Customs.new()
 var remote_rig := UnattendedMining.new()
 var orbital_mining := OrbitalMining.new()
 var combat := CombatSystems.new()
+var ambient := CivilianTraffic.new()
 var _mining_beam: Dictionary = {}
 var convoy_course := false
 var project_course := false
@@ -290,7 +292,7 @@ func time_status() -> Dictionary:
 		return {"allowed": false, "reason": "Сближение с объектом" if not _rendezvous_holding else "Удержание позиции"}
 	if scooping:
 		return {"allowed": false, "reason": "Сбор топлива"}
-	if patrol.in_danger(self) or not combat.projectile_status().is_empty():
+	if patrol.in_danger(self) or ambient.in_danger(self) or not combat.projectile_status().is_empty():
 		return {"allowed": false, "reason": "Боевой контакт"}
 	if convoy_course or convoy_order.in_danger(self):
 		return {"allowed": false, "reason": "Сближение с конвоем"}
@@ -687,7 +689,7 @@ func _rendezvous_block_reason(site: int, gap: int) -> String:
 		return "Выйдите в открытый космос"
 	if not ship.autopilot_fitted:
 		return "Автопилот снят. Его можно установить в порту."
-	if patrol.in_danger(self) or convoy_order.in_danger(self):
+	if patrol.in_danger(self) or convoy_order.in_danger(self) or ambient.in_danger(self):
 		return "Отойдите от боевого контакта"
 	if ship.hull <= ShipSystems.MIN_HULL:
 		return "Восстановите корпус в порту"
@@ -765,7 +767,7 @@ func _orbit_block_reason(focus: int, radius: float, relative_speed: float, band:
 		return "Выйдите в открытый космос"
 	if not ship.autopilot_fitted:
 		return "Автопилот снят. Его можно установить в порту."
-	if patrol.in_danger(self) or convoy_order.in_danger(self):
+	if patrol.in_danger(self) or convoy_order.in_danger(self) or ambient.in_danger(self):
 		return "Отойдите от боевого контакта"
 	if band.x >= band.y:
 		return "Для круговой орбиты вокруг этого тела сейчас нет безопасного диапазона"
@@ -1870,6 +1872,7 @@ func traffic_contacts() -> Array[Dictionary]:
 			if contact.id == order.id:
 				contact.hull = order.enemy_hull
 				break
+	contacts.append_array(ambient.contacts(self))
 	return contacts
 
 
@@ -1878,7 +1881,14 @@ func combat_beams() -> Array[Dictionary]:
 		return []
 	var beams := patrol.beams()
 	beams.append_array(convoy_order.beams())
+	beams.append_array(ambient.beams(self))
 	return beams
+
+
+func ambient_status() -> Dictionary:
+	var status := ambient.status(self)
+	status.fire_visible = status.hostile and _manual_speed_available() and status.distance <= 520.0
+	return status
 
 
 func patrol_status() -> Dictionary:
@@ -1999,7 +2009,7 @@ func combat_status() -> Dictionary:
 	var incoming := combat.projectile_status()
 	var active := not incoming.is_empty()
 	var parked := docked >= 0 or landed or jump_seconds_left > 0.0
-	var local_contact := patrol.in_danger(self) or convoy_order.in_danger(self)
+	var local_contact := patrol.in_danger(self) or convoy_order.in_danger(self) or ambient.in_danger(self)
 	var reason := combat.ecm_denial(position, orbit_time)
 	if parked:
 		reason = "Помехи доступны в открытом полёте"
@@ -2026,13 +2036,25 @@ func use_ecm() -> bool:
 
 func fire_status() -> Dictionary:
 	var bonus := float(combat.profile().range_bonus)
-	var status := convoy_order.fire_status(self, bonus) if convoy_status().fire_visible else patrol.fire_status(self, bonus)
+	var channel := _fire_channel()
+	var status := {}
+	match channel:
+		"convoy": status = convoy_order.fire_status(self, bonus)
+		"patrol": status = patrol.fire_status(self, bonus)
+		"ambient": status = ambient.fire_status(self, bonus)
+	status.channel = channel
 	if status.ok:
 		var reason := combat.fire_denial(orbit_time)
 		if not reason.is_empty():
 			status.ok = false
 			status.reason = reason
 	return status
+
+
+func _fire_channel() -> String:
+	if convoy_status().fire_visible:
+		return "convoy"
+	return "patrol" if patrol.in_danger(self) else "ambient"
 
 
 func patrol_action() -> bool:
@@ -2075,16 +2097,34 @@ func fire_action() -> bool:
 	if not status.ok:
 		return false
 	var bonus := float(combat.profile().range_bonus)
-	var against_convoy := bool(convoy_status().fire_visible)
-	var shot := convoy_order.fire(self, bonus) if against_convoy else patrol.fire(self, bonus)
+	var channel: String = status.channel
+	var shot := {}
+	match channel:
+		"convoy": shot = convoy_order.fire(self, bonus)
+		"patrol": shot = patrol.fire(self, bonus)
+		"ambient": shot = ambient.fire(self, bonus)
 	if shot.get("ok", false):
 		combat.record_fire(orbit_time)
 		reset_time_scale()
-	if against_convoy:
-		_apply_convoy_result(shot)
-	else:
-		_apply_patrol_result(shot)
+	match channel:
+		"convoy": _apply_convoy_result(shot)
+		"patrol": _apply_patrol_result(shot)
+		"ambient": _apply_ambient_result(shot)
 	return shot.get("ok", false)
+
+
+func _apply_ambient_result(result: Dictionary) -> void:
+	var event := str(result.get("event", ""))
+	if event.is_empty():
+		return
+	if event == "ambient_engaged":
+		reset_time_scale()
+		if not patrol.in_danger(self) and not convoy_order.in_danger(self):
+			combat.reset_salvos()
+	if result.has("damage"):
+		_apply_hostile_beam(event, result)
+	else:
+		_announce(event, str(result.get("message", "")))
 
 
 func _apply_patrol_result(result: Dictionary) -> void:
@@ -2208,7 +2248,7 @@ func orbital_mining_status() -> Dictionary:
 		common = "Добыча доступна в свободном полёте"
 	elif not valid_site:
 		common = "Выберите астероид"
-	elif patrol.in_danger(self) or convoy_order.in_danger(self):
+	elif patrol.in_danger(self) or convoy_order.in_danger(self) or ambient.in_danger(self):
 		common = "Выйдите из боевого контакта"
 	var fire_reason := common
 	if fire_reason.is_empty():
@@ -2834,7 +2874,7 @@ func jump_status(destination: int) -> Dictionary:
 		reason = "Отключите автопилот и сбор топлива"
 	elif Atmosphere.sample(self, position, velocity).inside:
 		reason = "Выйдите из атмосферы"
-	elif patrol.in_danger(self) or not combat.projectile_status().is_empty():
+	elif patrol.in_danger(self) or ambient.in_danger(self) or not combat.projectile_status().is_empty():
 		reason = "Выйдите из зоны боя"
 	elif convoy_order.in_danger(self):
 		reason = "Отойдите от конвоя"
@@ -2883,6 +2923,7 @@ func start_jump() -> bool:
 		_announce("jump_denied", status.reason)
 		return false
 	reset_time_scale()
+	ambient.interrupt()
 	_release_speed_hold(false)
 	cancel_dock_sync()
 	dock_access.clear()
@@ -2973,6 +3014,7 @@ func _finish_jump_arrival() -> void:
 
 func _arrive(direction := Vector3.BACK) -> void:
 	combat.clear_projectile()
+	ambient.interrupt()
 	_release_speed_hold(false)
 	if Catalog.is_mine_site(target):
 		mining.select_site(target)
@@ -3055,6 +3097,7 @@ func _departure_target(default_target: int) -> int:
 
 func _dock() -> void:
 	docked = target
+	ambient.interrupt()
 	_release_speed_hold(false)
 	dock_access.settle(orbit_time)
 	gear_deployed = Ground.is_port(docked)
@@ -3260,6 +3303,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 	_advance_combat_projectile(previous_ship, delta)
 	_apply_patrol_result(patrol.step(self, delta))
 	_apply_convoy_result(convoy_order.step(self, delta))
+	_apply_ambient_result(ambient.step(self, delta))
 
 
 func _rendezvous_step(delta: float) -> void:
@@ -3844,6 +3888,7 @@ func snapshot() -> Dictionary:
 		"cartography": cartography.snapshot(), "frame": frame.snapshot(), "customs": customs.snapshot(),
 		"remote_rig": remote_rig.snapshot(), "orbital_mining": orbital_mining.snapshot(),
 		"combat": combat.snapshot(),
+		"ambient": ambient.snapshot(),
 		"speed_hold": speed_hold.snapshot(),
 	}
 
@@ -3852,6 +3897,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_ambient_traffic := schema < 40
 	var pre_speed_hold := schema < 39
 	var pre_ground_ports := schema < 38
 	var pre_combat := schema < 37
@@ -4191,6 +4237,14 @@ func restore(state: Dictionary) -> bool:
 		if restored_ship.jump_fuel + fare > restored_ship.jump_capacity() or not restored_velocity.is_zero_approx() or float(state.throttle) != 0.0:
 			return false
 	var restored_combat := CombatSystems.new()
+	var restored_ambient := CivilianTraffic.new()
+	if not pre_ambient_traffic:
+		var ambient_state: Variant = state.get("ambient")
+		if not restored_ambient.restore(ambient_state, restored_epoch):
+			return false
+		var engaged := int(ambient_state.engaged_system)
+		if engaged != -1 and (engaged != restored_system or restored_dock >= 0 or restored_landing >= 0 or not restored_transit.is_empty()):
+			return false
 	var restored_speed := SpeedHold.new()
 	if not pre_speed_hold and not restored_speed.restore(state.get("speed_hold")):
 		return false
@@ -4294,6 +4348,7 @@ func restore(state: Dictionary) -> bool:
 	remote_rig = restored_remote_rig
 	orbital_mining = restored_orbital_mining
 	combat = restored_combat
+	ambient = restored_ambient
 	speed_hold = restored_speed
 	_mining_beam.clear()
 	star_heat = 0.0 if pre_thermal else float(state.star_heat)

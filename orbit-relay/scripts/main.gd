@@ -145,11 +145,15 @@ func _update_display(delta: float) -> void:
 	var fragment_marker := not fragment.is_empty() and not flight.autopilot and not signal_selected and not project_marker and not convoy_marker
 	if fragment_marker:
 		marker = fragment.position
+	var local_traffic := flight.ambient_status()
+	var hostile_marker: bool = local_traffic.fire_visible and not flight.autopilot and not signal_selected and not project_marker and not convoy_marker and not rendezvous_marker and not fragment_marker
+	if hostile_marker:
+		marker = local_traffic.position
 	var instruments_visible := flight.docked < 0 and not flight.landed and not _overlay_open() and flight.jump_seconds_left <= 0.0
 	var in_view := instruments_visible and not _view.camera.is_position_behind(marker)
 	if patrol_status.phase == Flight.Patrol.ENGAGED and patrol_status.same_system:
 		in_view = false
-	elif in_view and not flight.autopilot and not signal_selected and not project_marker and not convoy_marker and not rendezvous_marker and not fragment_marker:
+	elif in_view and not flight.autopilot and not signal_selected and not project_marker and not convoy_marker and not rendezvous_marker and not fragment_marker and not hostile_marker:
 		var surface := flight.surface_status()
 		in_view = not surface.near or surface.pad
 	_hud.set_target_marker(_view.camera.unproject_position(marker) if in_view else Vector2.ZERO, in_view)
@@ -417,6 +421,7 @@ func _deliver_notice() -> void:
 		"war_declared", "war_round", "war_captured", "war_repulsed", "war_convoy_delivered", "war_convoy_intercepted",
 		"convoy_order_accepted", "convoy_order_escorted", "convoy_order_failed", "convoy_order_paid",
 		"convoy_order_fire", "convoy_order_enemy_hit",
+		"ambient_engaged", "ambient_fire", "ambient_enemy_hit", "ambient_victory",
 		"flight_assist", "reference_frame", "time_paused", "time_resumed", "autopilot_equipment", "speed_hold_on", "speed_hold_off",
 		"survey_record", "galaxy_scan", "customs_inspection", "customs_paid",
 		"orbit_start", "orbit_complete", "orbit_abort", "orbit_cancel",
