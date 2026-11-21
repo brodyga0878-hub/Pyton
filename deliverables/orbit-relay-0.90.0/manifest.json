@@ -1,0 +1,346 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.90.0",
+  "source_commit": "6e0be1ac3578e9b913477ce2a1bf35a701661b5e",
+  "content": {
+    "save_schema": 45,
+    "tested_acceptance_matrix": {
+      "checked": 44,
+      "partial": 0,
+      "open": 0
+    },
+    "systems": 24,
+    "catalog_targets": 89,
+    "port_definitions": 11,
+    "solid_mineable_sites": 52,
+    "native_elf_libraries_with_16k_load_segments": 2,
+    "native_engine_load_segments_checked": 6,
+    "validates_primary_and_previous_save_candidates": true
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 115,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.89.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 56,
+    "tested_on_device": false
+  },
+  "checks": {
+    "android_report_share": {
+      "failures": 0,
+      "checks": 76
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "binary_orbits": {
+      "failures": 0,
+      "checks": 55
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "branching_story": {
+      "failures": 0,
+      "checks": 26
+    },
+    "calendar": {
+      "failures": 0,
+      "checks": 53
+    },
+    "cartography": {
+      "failures": 0,
+      "checks": 43
+    },
+    "civilian_traffic": {
+      "failures": 0,
+      "checks": 41
+    },
+    "combat_outfitting": {
+      "failures": 0,
+      "checks": 76
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "crew": {
+      "failures": 0,
+      "checks": 45
+    },
+    "customs": {
+      "failures": 0,
+      "checks": 28
+    },
+    "departure": {
+      "failures": 0,
+      "checks": 32
+    },
+    "dock_access": {
+      "failures": 0,
+      "checks": 37
+    },
+    "docking": {
+      "failures": 0,
+      "checks": 76
+    },
+    "dual_fuel": {
+      "failures": 0,
+      "checks": 25
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 155
+    },
+    "flight": {
+      "failures": 0
+    },
+    "flight_audio": {
+      "failures": 0,
+      "checks": 28
+    },
+    "flight_camera": {
+      "failures": 0,
+      "checks": 18
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "frontier_freight": {
+      "failures": 0,
+      "checks": 33
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 76
+    },
+    "fuel_modules": {
+      "failures": 0,
+      "checks": 36
+    },
+    "galactic_routes": {
+      "failures": 0,
+      "checks": 59
+    },
+    "gear": {
+      "failures": 0,
+      "checks": 28
+    },
+    "ground_ports": {
+      "failures": 0,
+      "checks": 41
+    },
+    "heat_shield": {
+      "failures": 0,
+      "checks": 28
+    },
+    "hyperspace": {
+      "failures": 0,
+      "checks": 64
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 295
+    },
+    "lazur_rotation": {
+      "failures": 0,
+      "checks": 243
+    },
+    "living": {
+      "failures": 0,
+      "checks": 83
+    },
+    "material_maps": {
+      "failures": 0,
+      "checks": 38
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "npc_freight": {
+      "failures": 0,
+      "checks": 48
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "orbital_mining": {
+      "failures": 0,
+      "checks": 34
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 561
+    },
+    "passengers": {
+      "failures": 0,
+      "checks": 50
+    },
+    "pilot_career": {
+      "failures": 0,
+      "checks": 44
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 88
+    },
+    "procedural_galaxy": {
+      "failures": 0,
+      "checks": 140
+    },
+    "reference_frames": {
+      "failures": 0,
+      "checks": 46
+    },
+    "remote_rig": {
+      "failures": 0,
+      "checks": 35
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "report": {
+      "failures": 0,
+      "checks": 28
+    },
+    "save_backup": {
+      "failures": 0,
+      "checks": 28
+    },
+    "save_phases": {
+      "failures": 0,
+      "checks": 72
+    },
+    "scene": {
+      "failures": 0
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "sector_news": {
+      "failures": 0,
+      "checks": 30
+    },
+    "shipyard": {
+      "failures": 0,
+      "checks": 52
+    },
+    "speed_hold": {
+      "failures": 0,
+      "checks": 54
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 381
+    },
+    "surface_guidance": {
+      "failures": 0,
+      "checks": 60
+    },
+    "surface_rotation": {
+      "failures": 0,
+      "checks": 157
+    },
+    "compiled_0_59_reserve_supply_loop": {
+      "checks": 73,
+      "failures": 0,
+      "touch_interactions": 42
+    },
+    "compiled_0_82_colony_and_autonomous_war": {
+      "checks": 146,
+      "failures": 0,
+      "touch_interactions": 94
+    },
+    "compiled_tactical_cold_reloads": {
+      "checks": 91,
+      "failures": 0,
+      "touch_interactions": 31
+    },
+    "compiled_rotating_moon_ports": {
+      "checks": 49,
+      "failures": 0,
+      "touch_interactions": 19
+    },
+    "compiled_comet_and_stellar_hazard": {
+      "checks": 69,
+      "failures": 0,
+      "touch_interactions": 40
+    },
+    "compiled_manual_inertia": {
+      "checks": 39,
+      "failures": 0,
+      "touch_interactions": 23
+    },
+    "compiled_backup_recovery": {
+      "checks": 39,
+      "failures": 0
+    },
+    "compiled_real_1x_corrupt_primary_recovery": {
+      "wall_seconds": 180.021,
+      "game_seconds": 180.0,
+      "engine_physics_frames": 10802,
+      "checks": 42,
+      "touch_interactions": 18,
+      "failures": 0
+    },
+    "compiled_software_opengl_es_stress": {
+      "checks": 668,
+      "touch_interactions": 156,
+      "scene_loads": 96,
+      "failures": 0
+    },
+    "compiled_software_opengl_stress": {
+      "checks": 668,
+      "touch_interactions": 156,
+      "scene_loads": 96,
+      "failures": 0
+    },
+    "compiled_autonomous_world_16x_endurance": {
+      "wall_seconds": 3300.0,
+      "game_seconds": 52216.533,
+      "last_autonomous_campaign": 52,
+      "maximum_retained_reports": 96,
+      "largest_report_flight_json_bytes": 40728,
+      "checkpoints": 56,
+      "checks": 557,
+      "failures": 0
+    },
+    "compiled_independent_four_body_lift": {
+      "checks": 85,
+      "failures": 0
+    },
+    "compiled_independent_archival_detached_rig": {
+      "checks": 30,
+      "failures": 0
+    }
+  },
+  "files": {
+    "OrbitRelay-0.90.0-arm64.apk": {
+      "bytes": 34162495,
+      "sha256": "e2d9ac2ef7457e98a91ba0e4678026af2259534820ba4934ec56a5088d0c9cb5"
+    },
+    "OrbitRelay-0.90.0-source.zip": {
+      "bytes": 6739575,
+      "sha256": "70822af04f59cbf925c91ed9344f17d086b9f3e046df78518f436082bc9ca66b"
+    },
+    "cold-backup-hatch-recovery.png": {
+      "bytes": 1087545,
+      "sha256": "6f156c1fff2bf327f410f9b0744a0e8a7e8e7542c1a7257b0d4d0e7a8fbb0986"
+    }
+  }
+}
