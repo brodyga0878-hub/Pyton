@@ -1,0 +1,305 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.89.0",
+  "source_commit": "2e7f9a32243e9c1152c12ba776e5ba6ebc3f9a76",
+  "content": {
+    "save_schema": 45,
+    "updated_goods_icons": 6,
+    "tested_touch_viewport_widths": [
+      1280,
+      1544,
+      1600
+    ],
+    "non_icon_pixels_identical": true,
+    "tested_acceptance_matrix": {
+      "checked": 44,
+      "partial": 0,
+      "open": 0
+    }
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 114,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.88.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 56,
+    "tested_on_device": false
+  },
+  "checks": {
+    "android_report_share": {
+      "failures": 0,
+      "checks": 76
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "binary_orbits": {
+      "failures": 0,
+      "checks": 55
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "branching_story": {
+      "failures": 0,
+      "checks": 26
+    },
+    "calendar": {
+      "failures": 0,
+      "checks": 53
+    },
+    "cartography": {
+      "failures": 0,
+      "checks": 43
+    },
+    "civilian_traffic": {
+      "failures": 0,
+      "checks": 41
+    },
+    "combat_outfitting": {
+      "failures": 0,
+      "checks": 76
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "crew": {
+      "failures": 0,
+      "checks": 45
+    },
+    "customs": {
+      "failures": 0,
+      "checks": 28
+    },
+    "departure": {
+      "failures": 0,
+      "checks": 32
+    },
+    "dock_access": {
+      "failures": 0,
+      "checks": 37
+    },
+    "docking": {
+      "failures": 0,
+      "checks": 76
+    },
+    "dual_fuel": {
+      "failures": 0,
+      "checks": 25
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 155
+    },
+    "flight": {
+      "failures": 0
+    },
+    "flight_audio": {
+      "failures": 0,
+      "checks": 28
+    },
+    "flight_camera": {
+      "failures": 0,
+      "checks": 18
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "frontier_freight": {
+      "failures": 0,
+      "checks": 33
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 76
+    },
+    "fuel_modules": {
+      "failures": 0,
+      "checks": 36
+    },
+    "galactic_routes": {
+      "failures": 0,
+      "checks": 59
+    },
+    "gear": {
+      "failures": 0,
+      "checks": 28
+    },
+    "ground_ports": {
+      "failures": 0,
+      "checks": 41
+    },
+    "heat_shield": {
+      "failures": 0,
+      "checks": 28
+    },
+    "hyperspace": {
+      "failures": 0,
+      "checks": 64
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 295
+    },
+    "lazur_rotation": {
+      "failures": 0,
+      "checks": 243
+    },
+    "living": {
+      "failures": 0,
+      "checks": 83
+    },
+    "material_maps": {
+      "failures": 0,
+      "checks": 38
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "npc_freight": {
+      "failures": 0,
+      "checks": 48
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "orbital_mining": {
+      "failures": 0,
+      "checks": 34
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 561
+    },
+    "passengers": {
+      "failures": 0,
+      "checks": 50
+    },
+    "pilot_career": {
+      "failures": 0,
+      "checks": 44
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 88
+    },
+    "procedural_galaxy": {
+      "failures": 0,
+      "checks": 140
+    },
+    "reference_frames": {
+      "failures": 0,
+      "checks": 46
+    },
+    "remote_rig": {
+      "failures": 0,
+      "checks": 35
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "report": {
+      "failures": 0,
+      "checks": 28
+    },
+    "save_phases": {
+      "failures": 0,
+      "checks": 72
+    },
+    "scene": {
+      "failures": 0
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "sector_news": {
+      "failures": 0,
+      "checks": 30
+    },
+    "shipyard": {
+      "failures": 0,
+      "checks": 52
+    },
+    "speed_hold": {
+      "failures": 0,
+      "checks": 54
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 381
+    },
+    "surface_guidance": {
+      "failures": 0,
+      "checks": 60
+    },
+    "surface_rotation": {
+      "failures": 0,
+      "checks": 157
+    },
+    "compiled_market_trade_gestures": {
+      "checks": 205,
+      "failures": 0,
+      "touch_interactions": 87
+    },
+    "compiled_render_profile_and_scene_soak": {
+      "checks": 668,
+      "failures": 0,
+      "touch_interactions": 156,
+      "scene_loads": 96
+    },
+    "compiled_0_82_to_0_89_real_colony_and_consequence": {
+      "checks": 146,
+      "failures": 0,
+      "touch_interactions": 94
+    },
+    "compiled_0_59_to_0_89_reserve_cross_system_flight": {
+      "checks": 73,
+      "failures": 0,
+      "touch_interactions": 42
+    },
+    "compiled_0_89_live_one_times_cold_soak": {
+      "checks": 37,
+      "failures": 0,
+      "touch_interactions": 18,
+      "wall_seconds": 180.01
+    }
+  },
+  "files": {
+    "OrbitRelay-0.89.0-arm64.apk": {
+      "bytes": 34158399,
+      "sha256": "6d6a7457841e1386241a8f5906da76fbe4b968a0547aab193d82d6f1232bcdff"
+    },
+    "OrbitRelay-0.89.0-source.zip": {
+      "bytes": 6735240,
+      "sha256": "857c1052ea8e9596258a365f5b754fc3d7e59b6f151baa51a387fc5785a3ec19"
+    },
+    "market-1280.png": {
+      "bytes": 105993,
+      "sha256": "41a35bfb750908539914c7fd4391d7bf01bfc6213eeadc7846f3e7ea295d0af6"
+    },
+    "market-1544.png": {
+      "bytes": 107720,
+      "sha256": "734d41bbb70dcbd02a80532d58921c5401ea694dd16babfb901b837656f2c756"
+    },
+    "market-1600.png": {
+      "bytes": 108022,
+      "sha256": "0567608556c5d3a3f42910a84e7f24cd24c3634c41ab6a900a4f6e78c4bb77e7"
+    }
+  }
+}
