@@ -1,7 +1,6 @@
 extends SceneTree
 
 const Catalog := preload("res://scripts/sector_catalog.gd")
-const Economy := preload("res://scripts/port_economy.gd")
 const Fixture := preload("res://tests/flight_fixture.gd")
 const Flight := preload("res://scripts/flight_sim.gd")
 const Ship := preload("res://scripts/ship_systems.gd")
@@ -139,14 +138,10 @@ func _test_paid_receipts() -> void:
 	_finish_from_json(ticket, fare, initial_fuel)
 	var legacy := ticket.duplicate(true)
 	legacy.schema = 48
+	Fixture.remove_expanded_market_from_legacy(legacy)
 	legacy.jump_transit.erase("pricing")
 	legacy.jump_transit.fare = Catalog.jump_cost(START, DESTINATION)
 	legacy.ship.jump_fuel = initial_fuel - int(legacy.jump_transit.fare)
-	for good: String in Economy.NEW_GOODS:
-		legacy.mining.cargo.erase(good)
-		for stock: Dictionary in legacy.market.values():
-			stock.erase(good)
-	legacy.erase("market_contacts")
 	legacy.erase("port_account")
 	legacy.erase("civic")
 	var restored := Flight.new()

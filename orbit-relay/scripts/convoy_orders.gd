@@ -179,16 +179,30 @@ func fire(sim: RefCounted, range_bonus := 0.0) -> Dictionary:
 	var ready := _aim_status(sim, contact, range_bonus)
 	if not ready.ok:
 		return {"ok": false, "message": ready.reason}
-	var hull := maxf(0.0, enemy_hull - PLAYER_DAMAGE)
+	var result := _take_hit(sim, PLAYER_DAMAGE)
+	if result.ok:
+		_shot_delay = PLAYER_DELAY
+		_player_flash = BEAM_DURATION
+		_player_beam = {"from": sim.position + sim.forward() * 2.5, "to": contact.position, "hostile": false}
+	return result
+
+
+func missile_hit(sim: RefCounted, id: String, damage: float) -> Dictionary:
+	if id != convoy_id or kind != INTERCEPT or phase != ACTIVE or sim.system_id != system or not _airborne(sim):
+		return {}
+	if Traffic.convoy_contact(sim, convoy_id).is_empty():
+		return {}
+	return _take_hit(sim, damage)
+
+
+func _take_hit(sim: RefCounted, damage: float) -> Dictionary:
+	var hull := maxf(0.0, enemy_hull - damage)
 	var interdiction: Dictionary = {}
 	if hull == 0.0:
 		interdiction = sim.factions.intercept_convoy(system, convoy_id, faction)
 		if interdiction.is_empty():
 			return {"ok": false, "message": "Конвой завершил рейс."}
 	enemy_hull = hull
-	_shot_delay = PLAYER_DELAY
-	_player_flash = BEAM_DURATION
-	_player_beam = {"from": sim.position + sim.forward() * 2.5, "to": contact.position, "hostile": false}
 	if hull == 0.0:
 		var outcome := _pay(str(interdiction.message))
 		outcome.ok = true

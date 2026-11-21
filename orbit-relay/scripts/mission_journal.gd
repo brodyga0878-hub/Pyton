@@ -1,7 +1,7 @@
 extends CanvasLayer
 
 signal follow_requested(kind: String)
-signal career_requested()
+signal career_requested(kind: String)
 signal story_requested(action: String)
 signal dismissed()
 
@@ -69,12 +69,17 @@ var _passenger_record: Label
 var _passenger_next: Label
 var _combat_title: Label
 var _combat_points: Label
+var _bounty_record: Label
 var _faction_cards: Array[Dictionary] = []
 var _dispatch_route: Label
 var _dispatch_sponsor: Label
 var _dispatch_time: Label
 var _dispatch_hint: Label
 var _career_action: Button
+var _career_buttons: Dictionary[String, Button] = {}
+var _career_choice := "dispatch"
+var _career_action_kind := "dispatch"
+var _order_title: Label
 var _story_title: Label
 var _story_branch: Label
 var _story_objective: Label
@@ -272,6 +277,7 @@ func _build_career() -> void:
 	var standing := _card(_career_page)
 	_combat_title = _label(standing, "", 28, INK)
 	_combat_points = _label(standing, "", 18, MUTED)
+	_bounty_record = _label(standing, "", 16, MINT)
 	for _issuer in range(2):
 		var panel := PanelContainer.new()
 		panel.add_theme_stylebox_override("panel", _style(Color("132832"), BORDER, 9, 12))
@@ -291,7 +297,17 @@ func _build_career() -> void:
 		_faction_cards.append({"title": title, "rank": rank, "trust": trust, "access": access})
 
 	var board := _card(_career_page)
-	_label(board, "Служебная депеша", 28, INK)
+	_order_title = _label(board, "Приказы фракций", 27, INK)
+	var kinds := HBoxContainer.new()
+	kinds.add_theme_constant_override("separation", 7)
+	board.add_child(kinds)
+	var options := {"dispatch": "Депеша", "recon": "Разведка", "intercept": "Охрана"}
+	for kind: String in options:
+		var option := _button(kinds, options[kind])
+		option.toggle_mode = true
+		option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		option.pressed.connect(_choose_career_order.bind(kind))
+		_career_buttons[kind] = option
 	_dispatch_route = _label(board, "", 23, INK)
 	_dispatch_sponsor = _label(board, "", 19, MINT)
 	_dispatch_time = _label(board, "", 18, MUTED)
@@ -555,6 +571,11 @@ func _refresh_career() -> void:
 	var factions: Array = status.factions
 	_combat_title.text = "Боевой ранг · %s" % status.combat_title
 	_combat_points.text = "Боевые очки · %d" % int(status.combat_points)
+	if int(status.combat_next) >= 0:
+		_combat_points.text += " · следующий ранг %d" % int(status.combat_next)
+	_bounty_record.text = "Премии за розыск · %d · %d кр." % [status.bounty_awards, status.bounty_credits]
+	if not status.wanted.is_empty():
+		_bounty_record.text += "\nВ розыске %s · %d кр." % [status.wanted.name, status.wanted.reward]
 	for issuer in range(_faction_cards.size()):
 		var card := _faction_cards[issuer]
 		var faction: Dictionary = factions[issuer]
@@ -565,8 +586,17 @@ func _refresh_career() -> void:
 		card.access.text = "Допуск · Служебный курьер" if faction.dispatch_role else str(faction.dispatch_reason)
 		card.access.add_theme_color_override("font_color", MINT if faction.dispatch_role else MUTED)
 
+	var busy: bool = status.order.active or status.dispatch.active
+	_career_action_kind = str(status.order.kind) if status.order.active else "dispatch" if status.dispatch.active else _career_choice
+	for kind: String in _career_buttons:
+		_career_buttons[kind].disabled = busy and kind != _career_action_kind
+		_career_buttons[kind].set_pressed_no_signal(kind == _career_action_kind)
+	if _career_action_kind != "dispatch":
+		_refresh_military_order(status, factions)
+		return
 	var active: bool = status.dispatch.active
 	var dispatch: Dictionary = status.dispatch if active else status.offer
+	_order_title.text = "Служебная депеша"
 	var origin := int(dispatch.get("origin", -1))
 	var destination := int(dispatch.get("destination", -1))
 	var issuer := int(dispatch.get("issuer", -1))
@@ -600,13 +630,60 @@ func _refresh_career() -> void:
 	_follow("career", route_caption if active and status.can_follow else "")
 
 
+func _refresh_military_order(status: Dictionary, factions: Array) -> void:
+	var active: bool = status.order.active
+	var order: Dictionary = status.order if active else status.order_offers.get(_career_action_kind, {})
+	var origin := int(order.get("origin", -1))
+	var issuer := int(order.get("issuer", -1))
+	var reconnaissance := _career_action_kind == "recon"
+	var proved: bool = order.get("proved", false)
+	var allowed: bool = order.get("allowed", false)
+	_order_title.text = str(order.get("name", "Разведка рубежа" if reconnaissance else "Охрана сектора"))
+	_dispatch_route.visible = Sector.is_port(origin)
+	_dispatch_sponsor.visible = issuer >= 0 and issuer < factions.size()
+	_dispatch_time.visible = not order.is_empty()
+	if _dispatch_route.visible:
+		var objective: String = _sim.target_name(int(order.site)) if reconnaissance and int(order.site) >= 0 else "Рейдер местного маршрута"
+		_dispatch_route.text = "Вернитесь в «%s»." % _sim.target_name(origin) if proved else objective
+	if _dispatch_sponsor.visible:
+		_dispatch_sponsor.text = "%s · %d кр." % [factions[issuer].name, int(order.reward)]
+	if _dispatch_time.visible:
+		if active:
+			var left := ceili(float(order.remaining))
+			_dispatch_time.text = "Срок · %s · %d с" % [MissionCalendar.stamp(float(order.deadline)), left]
+			_dispatch_time.add_theme_color_override("font_color", AMBER if left <= 60 else MUTED)
+		else:
+			_dispatch_time.text = "Срок после приёма · %d с" % int(order.duration)
+			_dispatch_time.add_theme_color_override("font_color", MUTED)
+	_career_action.visible = not order.is_empty() and (not active or proved or reconnaissance)
+	_career_action.text = ("Сдать доклад" if proved else "Записать разведданные") if active else "Принять приказ"
+	_career_action.disabled = _sim.jump_seconds_left > 0.0 or not (status.order_can_submit or status.order_can_probe if active else allowed)
+	if not active and not allowed:
+		_dispatch_hint.text = str(order.get("reason", "Пришвартуйтесь в порту фракции."))
+	elif proved:
+		_dispatch_hint.text = "Доклад принимают в порту выдачи приказа."
+	elif reconnaissance:
+		_dispatch_hint.text = "Наведите нос на объект, сблизьтесь до 180 м от поверхности и снизьте относительную скорость до 45 м/с."
+	else:
+		_dispatch_hint.text = "Перехватите рейдера в этой системе. Его можно выбрать в списке целей."
+	_dispatch_hint.visible = true
+	var route := int(status.order_route)
+	var caption := "Проложить прыжок" if Sector.system_of_site(route) != _sim.system_id else "Курс к цели"
+	_follow("career", caption if active and status.order_can_follow else "")
+
+
+func _choose_career_order(kind: String) -> void:
+	if is_open() and not _career_buttons[kind].disabled:
+		_career_choice = kind
+		_touches.clear()
+		_refresh_career()
+
+
 func _request_career() -> void:
 	if not is_open() or not _career_action.is_visible_in_tree() or _career_action.disabled:
 		return
-	var status: Dictionary = _sim.career_status()
-	if status.can_submit or (not status.dispatch.active and status.offer.get("allowed", false)):
-		_touches.clear()
-		career_requested.emit()
+	_touches.clear()
+	career_requested.emit(_career_action_kind)
 
 
 func _refresh_story() -> void:
@@ -716,6 +793,9 @@ func _button_at(point: Vector2) -> Button:
 			return tab
 	if _news_page.visible:
 		return _news_page.button_at(point)
+	for button: Button in _career_buttons.values():
+		if button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(point):
+			return button
 	if _career_action.is_visible_in_tree() and not _career_action.disabled and _career_action.get_global_rect().has_point(point):
 		return _career_action
 	for option in _story_options:

@@ -385,7 +385,7 @@ func _build_passengers() -> void:
 func _refresh_passengers() -> void:
 	var status: Dictionary = _sim.passenger_status()
 	var offers: Array[Dictionary] = _sim.passenger_board()
-	_hold.text = "Места %d / %d" % [int(status.seats), int(status.capacity)]
+	_hold.text = "Места %d / %d" % [int(status.capacity) - int(status.free_seats), int(status.capacity)]
 	_passenger_empty.visible = offers.is_empty()
 	for index in range(_passenger_offer_rows.size()):
 		var widgets := _passenger_offer_rows[index]
@@ -400,7 +400,9 @@ func _refresh_passengers() -> void:
 		widgets.terms.text = "%s · срок %s" % [_passenger_count(int(offer.seats)), _eta(float(offer.duration))]
 		widgets.payment.text = "Аванс %d кр. · При высадке %d кр." % [int(offer.advance), int(offer.fare) - int(offer.advance)]
 		widgets.accept.disabled = not bool(offer.available)
-	_passenger_manifest.text = "На борту · %s" % _passenger_count(int(status.seats)) if status.active else "Свободных мест · %d" % int(status.capacity)
+	_passenger_manifest.text = "На борту · %s" % _passenger_count(int(status.seats)) if status.active else "Свободных мест · %d" % int(status.free_seats)
+	if int(status.rescue_seats) > 0:
+		_passenger_manifest.text += " · Ива Севрина на борту"
 	_passenger_route.visible = status.active
 	_passenger_time.visible = status.active
 	_passenger_payment.visible = status.active

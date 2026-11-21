@@ -149,20 +149,33 @@ func fire(sim: RefCounted, range_bonus := 0.0) -> Dictionary:
 	if not ready.ok:
 		return {"ok": false, "event": "", "message": ready.reason}
 	var epoch: float = sim.orbit_time
+	_sync_beams(sim.system_id, epoch)
+	_player_beam = {"from": sim.position + sim.forward() * 2.5, "to": ready.position,
+		"hostile": false, "expires": epoch + BEAM_DURATION}
+	return _take_hit(sim, SHOT_DAMAGE)
+
+
+func missile_hit(sim: RefCounted, id: String, amount: float) -> Dictionary:
+	var contact := status(sim)
+	if not _airborne(sim) or not contact.hostile or id != contact.id:
+		return {}
+	return _take_hit(sim, amount)
+
+
+func _take_hit(sim: RefCounted, amount: float) -> Dictionary:
+	var epoch: float = sim.orbit_time
 	var system: int = sim.system_id
 	var cycle := _cycle(system, epoch)
 	var phase := _phase(system, epoch)
 	var damage := _damage_record(system, cycle)
-	var total := minf(RAIDER_HULL, float(damage.get("damage", 0.0)) + SHOT_DAMAGE)
+	var total := minf(RAIDER_HULL, float(damage.get("damage", 0.0)) + amount)
 	var remaining := maxf(0.0, RAIDER_HULL - total - _scheduled_damage("raider", system, phase, epoch))
 	_raider_damage[system] = {"cycle": cycle, "damage": total, "defeated": epoch if remaining <= 0.0 else -1.0}
-	_sync_beams(system, epoch)
-	_player_beam = {"from": sim.position + sim.forward() * 2.5, "to": ready.position,
-		"hostile": false, "expires": epoch + BEAM_DURATION}
 	if remaining > 0.0:
 		return {"ok": true, "event": "ambient_fire", "message": "Попадание. Корпус рейдера %.0f%%." % remaining}
 	_clear_engagement()
-	return {"ok": true, "event": "ambient_victory", "message": "Рейдер обезврежен. Транспорт продолжает рейс."}
+	return {"ok": true, "event": "ambient_victory", "message": "Рейдер обезврежен. Транспорт продолжает рейс.",
+		"system": system, "cycle": cycle}
 
 
 func step(sim: RefCounted, delta: float) -> Dictionary:

@@ -2,6 +2,9 @@ extends CanvasLayer
 
 signal destination_selected(system_id: int)
 signal jump_requested()
+signal emergency_jump_requested()
+signal hyperspace_track_requested()
+signal hyperspace_analysis_requested(id: String)
 signal route_cancel_requested()
 signal galaxy_scan_requested()
 signal dismissed()
@@ -42,6 +45,14 @@ var _leg_times: Label
 var _status: Label
 var _plan_button: Button
 var _jump_button: Button
+var _emergency_row: HBoxContainer
+var _emergency_label: Label
+var _emergency_button: Button
+var _emergency_armed := false
+var _echo_row: HBoxContainer
+var _echo_label: Label
+var _echo_track: Button
+var _echo_analyze: Button
 var _cancel_route_button: Button
 var _close_button: Button
 var _dossier_button: Button
@@ -193,6 +204,16 @@ func build() -> void:
 	_status.custom_minimum_size.y = 27
 	_status.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 	_build_dossier(pages)
+	_emergency_row = HBoxContainer.new()
+	_emergency_row.add_theme_constant_override("separation", 8)
+	details.add_child(_emergency_row)
+	_emergency_label = _label(_emergency_row, "", 14, AMBER)
+	_emergency_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_emergency_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_emergency_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_emergency_button = _button(_emergency_row, "Аварийный прыжок", 44)
+	_emergency_button.pressed.connect(_request_emergency_jump)
+	_emergency_row.hide()
 	var routes := HBoxContainer.new()
 	routes.add_theme_constant_override("separation", 8)
 	details.add_child(routes)
@@ -266,6 +287,18 @@ func _build_chart(parent: HBoxContainer) -> void:
 	_set_rotation_available(true)
 	_scan_label = _label(column, "", 14, MUTED)
 	_scan_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_echo_row = HBoxContainer.new()
+	_echo_row.add_theme_constant_override("separation", 7)
+	column.add_child(_echo_row)
+	_echo_label = _label(_echo_row, "", 14, MINT)
+	_echo_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_echo_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_echo_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_echo_track = _button(_echo_row, "Навестись", 44)
+	_echo_track.pressed.connect(_request_hyperspace_track)
+	_echo_analyze = _button(_echo_row, "Анализ", 44)
+	_echo_analyze.pressed.connect(_request_hyperspace_analysis)
+	_echo_row.hide()
 
 
 func _build_pager(parent: VBoxContainer) -> void:
@@ -291,6 +324,7 @@ func _build_pager(parent: VBoxContainer) -> void:
 func open(sim: RefCounted) -> void:
 	build()
 	_flight = sim
+	_emergency_armed = false
 	var route: Dictionary = sim.planned_route()
 	_candidate = int(route.goal) if route.get("available", false) else int(sim.system_id)
 	_sector_focus = -1
@@ -385,6 +419,8 @@ func refresh() -> void:
 	_cancel_route_button.disabled = not has_plan or charging
 	var status: Dictionary = _flight.jump_status(planned) if has_plan else {}
 	_jump_button.disabled = not is_planned or not status.get("ok", false) or charging
+	_refresh_emergency_jump(is_planned, charging)
+	_refresh_hyperspace_echo()
 	var hint := "Выберите систему назначения."
 	if not is_current:
 		if not available:
@@ -415,6 +451,42 @@ func _refresh_travel_estimates(preview: Dictionary, available: bool) -> void:
 		var destination := str(Sector.system(int(leg.destination)).name)
 		schedule.append("%s → %s · %s" % [origin, destination, _duration(float(leg.seconds))])
 	_leg_times.text = "\n".join(schedule)
+
+
+func _refresh_emergency_jump(planned: bool, charging: bool) -> void:
+	var status: Dictionary = _flight.emergency_jump_status()
+	_emergency_row.visible = planned and not charging and bool(status.damage_eligible)
+	_emergency_button.disabled = not bool(status.ok)
+	if not _emergency_row.visible or _emergency_button.disabled:
+		_emergency_armed = false
+	_emergency_button.text = "Подтвердить" if _emergency_armed else "Аварийный прыжок"
+	if int(status.destination) < 0 or not status.ok:
+		_emergency_label.text = str(status.reason)
+	else:
+		var refuge := str(Sector.system(int(status.destination)).name)
+		_emergency_label.text = "Выход в «%s» · %d ед." % [refuge, int(status.cost)]
+		if status.fault_risk:
+			_emergency_label.text += " · Привод потребует перезапуска"
+
+
+func _refresh_hyperspace_echo() -> void:
+	var echo: Dictionary = _flight.hyperspace_trail_status()
+	_echo_row.visible = bool(echo.active)
+	_echo_track.disabled = not bool(echo.targetable)
+	_echo_track.text = "Следующий" if echo.tracking and int(echo.count) > 1 else "Навестись"
+	_echo_analyze.disabled = not bool(echo.readable)
+	if not echo.active:
+		return
+	var distance := "%d м" % roundi(float(echo.distance))
+	if not echo.readable:
+		_echo_label.text = "Гиперпространственный след · %s\n%s" % [distance, echo.reason]
+		return
+	var kind: String = {"departure": "Уходящий", "incoming": "Прибывающий", "residual": "Остаточный"}.get(echo.kind, "След")
+	var origin := str(Sector.system(int(echo.origin)).name)
+	var destination := str(Sector.system(int(echo.destination)).name)
+	var timing := " · до выхода %s" % _duration(float(echo.eta)) if float(echo.eta) > 0.0 else ""
+	_echo_label.text = "%s · %s · %s\n%s → %s · %s т%s" % [
+		kind, echo.name, distance, origin, destination, _decimal(float(echo.mass)), timing]
 
 
 func _collect_known_systems() -> void:
@@ -795,6 +867,7 @@ func _select_listed_system(button: Button) -> void:
 func _select_system(id: int) -> void:
 	if is_open() and _flight.system_known(id):
 		if _candidate != id:
+			_emergency_armed = false
 			_dossier_scroll.scroll_vertical = 0
 			_route_scroll.scroll_vertical = 0
 		_candidate = id
@@ -816,6 +889,34 @@ func _start_jump() -> void:
 	if _flight.jump_seconds_left <= 0.0 and route.get("available", false) and int(route.goal) == _candidate and _flight.jump_status(int(route.next)).ok:
 		_clear_touches()
 		jump_requested.emit()
+
+
+func _request_emergency_jump() -> void:
+	if not is_open() or not _emergency_row.visible or _emergency_button.disabled:
+		return
+	var status: Dictionary = _flight.emergency_jump_status()
+	if not status.ok:
+		refresh()
+		return
+	_clear_touches()
+	if _emergency_armed:
+		_emergency_armed = false
+		emergency_jump_requested.emit()
+	else:
+		_emergency_armed = true
+		_refresh_emergency_jump(true, false)
+
+
+func _request_hyperspace_track() -> void:
+	if is_open() and _echo_row.visible and not _echo_track.disabled:
+		_clear_touches()
+		hyperspace_track_requested.emit()
+
+
+func _request_hyperspace_analysis() -> void:
+	if is_open() and _echo_row.visible and not _echo_analyze.disabled:
+		_clear_touches()
+		hyperspace_analysis_requested.emit(str(_flight.hyperspace_trail_status().id))
 
 
 func _cancel_route() -> void:
@@ -938,11 +1039,12 @@ func _button_at(point: Vector2) -> Button:
 		if tab.is_visible_in_tree() and tab.get_global_rect().has_point(point):
 			return tab
 	for button: Button in [
-		_plan_button, _cancel_route_button, _jump_button, _dossier_button, _close_button,
+		_plan_button, _cancel_route_button, _jump_button, _emergency_button, _echo_track, _echo_analyze,
+		_dossier_button, _close_button,
 		_scope_button, _atlas_button, _projection_button, _drag_button, _ship_button, _zoom_in_button, _zoom_out_button,
 		_scan_button, _previous_page_button, _next_page_button
 	]:
-		if not button.disabled and button.get_global_rect().has_point(point):
+		if button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(point):
 			return button
 	return _catalog_button_at(point)
 

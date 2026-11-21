@@ -13,6 +13,7 @@ const TRANSIT_SECONDS := 50.0
 const LAYOVER_SECONDS := 16.0
 const LEG_SECONDS := TRANSIT_SECONDS + LAYOVER_SECONDS
 const LOCAL_TRANSIT_SECONDS := 12.0
+const TRACE_RESIDUAL_SECONDS := 26.0
 const CAPACITY := 8
 const STOCK_FLOOR := 6
 const MAX_EPOCH := 3155760000.0
@@ -96,6 +97,39 @@ func services(system: int, epoch: float) -> Array[Dictionary]:
 		var service := _service_for(index, epoch)
 		if service.system == system:
 			result.append(service)
+	return result
+
+
+func hyperspace_windows(system: int, epoch: float) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for index in range(LOCAL_ROUTE_COUNT, _ships.size()):
+		var ship := _ships[index]
+		var step := int(ship.step)
+		if not _active(index) or step <= 0:
+			continue
+		var in_transit := step % 2 == 1
+		var departure_step := step - (1 if in_transit else 2)
+		var depart_at := _event_time(index, departure_step, _route_seed(index)) + LOCAL_TRANSIT_SECONDS
+		var arrive_at := depart_at + TRANSIT_SECONDS - 2.0 * LOCAL_TRANSIT_SECONDS
+		var remaining := arrive_at + TRACE_RESIDUAL_SECONDS - epoch
+		if epoch < depart_at or remaining <= 0.0:
+			continue
+		var leg := _leg_index(departure_step)
+		var direction := leg % 2
+		var origin := int(ROUTES[index].ports[direction])
+		var destination := int(ROUTES[index].ports[1 - direction])
+		var origin_system := Catalog.system_of_site(origin)
+		var destination_system := Catalog.system_of_site(destination)
+		if system not in [origin_system, destination_system]:
+			continue
+		var departure := system == origin_system
+		var kind := "departure" if departure else ("incoming" if epoch < arrive_at else "residual")
+		var cargo := int(ship.amount) + (0 if in_transit else int(ship.last_delivered))
+		result.append({"id": "%s-echo-%d-%d" % [ship.id, leg, system], "name": FRONTIER_NAMES[index - LOCAL_ROUTE_COUNT],
+			"kind": kind, "origin": origin_system, "destination": destination_system,
+			"slot": TRADER_NAMES.size() + index - LOCAL_ROUTE_COUNT, "port": origin if departure else destination,
+			"cargo": cargo, "eta": maxf(0.0, arrive_at - epoch) if kind != "residual" else -1.0,
+			"remaining": remaining})
 	return result
 
 

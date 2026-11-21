@@ -14,6 +14,7 @@ const DisplaySettings = preload("res://scripts/display_settings.gd")
 const PresentationMenu = preload("res://scripts/presentation_menu.gd")
 const MissionJournal = preload("res://scripts/mission_journal.gd")
 const ExpansionBoard = preload("res://scripts/expansion_board.gd")
+const ReconPanel = preload("res://scripts/recon_panel.gd")
 const SessionIO = preload("res://scripts/session_io.gd")
 const VoyageMenu = preload("res://scripts/voyage_menu.gd")
 const VoyageLibrary = preload("res://scripts/voyage_library.gd")
@@ -38,6 +39,7 @@ var _market := PortMarket.new()
 var _settings := PresentationMenu.new()
 var _journal := MissionJournal.new()
 var _frontier := ExpansionBoard.new()
+var _recon := ReconPanel.new()
 var _voyages := VoyageMenu.new()
 var _voyage_picker: FileDialog
 var _flight_active := false
@@ -69,6 +71,7 @@ func _ready() -> void:
 	_hud.action_requested.connect(_handle_action)
 	_hud.frame_requested.connect(_handle_action.bind("frame"))
 	_hud.navigation_requested.connect(_select_cockpit_target)
+	_hud.combat_target_requested.connect(_select_cockpit_contact)
 	add_child(_map)
 	_map.build()
 	_map.destination_selected.connect(_select_destination)
@@ -82,12 +85,16 @@ func _ready() -> void:
 	_galaxy.build()
 	_galaxy.destination_selected.connect(_plan_jump)
 	_galaxy.jump_requested.connect(_start_jump)
+	_galaxy.emergency_jump_requested.connect(_start_jump.bind(true))
+	_galaxy.hyperspace_track_requested.connect(_target_hyperspace_trail)
+	_galaxy.hyperspace_analysis_requested.connect(_analyze_hyperspace_trail)
 	_galaxy.route_cancel_requested.connect(_cancel_jump_route)
 	_galaxy.galaxy_scan_requested.connect(_galaxy_scan)
 	_galaxy.dismissed.connect(_close_galaxy)
 	add_child(_services)
 	_services.build()
 	_services.service_requested.connect(_service_purchase)
+	_services.missile_selected.connect(_select_missile)
 	_services.transfer_requested.connect(_fuel_transfer)
 	_services.fuel_module_removed.connect(_remove_fuel_module)
 	_services.pump_mode_requested.connect(_set_pump_mode)
@@ -120,7 +127,12 @@ func _ready() -> void:
 	_frontier.build()
 	_frontier.project_requested.connect(_project_action)
 	_frontier.convoy_requested.connect(_convoy_action)
+	_frontier.search_requested.connect(_search_action)
 	_frontier.dismissed.connect(_close_frontier)
+	add_child(_recon)
+	_recon.build()
+	_recon.action_requested.connect(_recon_action)
+	_recon.dismissed.connect(_close_recon)
 	add_child(_voyages)
 	_voyages.build()
 	_voyages.action_requested.connect(_voyage_action)
@@ -148,7 +160,7 @@ func _process(delta: float) -> void:
 
 
 func _overlay_open() -> bool:
-	return _voyages.is_open() or _report.visible or _map.is_open() or _galaxy.is_open() or _services.is_open() or _market.is_open() or _settings.is_open() or _journal.is_open() or _frontier.is_open()
+	return _voyages.is_open() or _report.visible or _map.is_open() or _galaxy.is_open() or _services.is_open() or _market.is_open() or _settings.is_open() or _journal.is_open() or _frontier.is_open() or _recon.is_open()
 
 
 func _physics_process(delta: float) -> void:
@@ -171,6 +183,7 @@ func _physics_process(delta: float) -> void:
 func _update_display(delta: float) -> void:
 	_view.sync(flight, delta)
 	_hud.sync(flight, delta)
+	var combat_lock := flight.combat_lock_contact()
 	var final_approach := flight.autopilot and flight.autopilot_phase in ["Стыковка", "Посадка", "Выпуск шасси", "Вход в зону сбора"]
 	var marker := flight.target_contact(flight.target) if final_approach else flight.target_gate(flight.target)
 	var patrol_status := flight.patrol_status()
@@ -194,14 +207,18 @@ func _update_display(delta: float) -> void:
 	if fragment_marker:
 		marker = fragment.position
 	var local_traffic := flight.ambient_status()
-	var hostile_marker: bool = local_traffic.fire_visible and not flight.autopilot and not signal_selected and not project_marker and not convoy_marker and not rendezvous_marker and not fragment_marker
+	var hostile_marker: bool = combat_lock.is_empty() and local_traffic.fire_visible and not flight.autopilot and not signal_selected and not project_marker and not convoy_marker and not rendezvous_marker and not fragment_marker
 	if hostile_marker:
 		marker = local_traffic.position
 	var pod: Dictionary = flight.cargo_pod_status()
 	var cargo_marker: bool = pod.active and pod.tracking and not flight.autopilot
 	if cargo_marker:
 		marker = pod.position
-	var special_marker := signal_selected or project_marker or convoy_marker or rendezvous_marker or fragment_marker or hostile_marker or cargo_marker
+	var echo := flight.hyperspace_trail_status()
+	var echo_marker: bool = echo.active and echo.tracking and echo.targetable
+	if echo_marker:
+		marker = echo.position
+	var special_marker := signal_selected or project_marker or convoy_marker or rendezvous_marker or fragment_marker or hostile_marker or cargo_marker or echo_marker
 	var instruments_visible := flight.docked < 0 and not flight.landed and not _overlay_open() and flight.jump_seconds_left <= 0.0
 	var forward_aim := _view.shows_forward_aim()
 	var bearing := ""
@@ -224,14 +241,28 @@ func _update_display(delta: float) -> void:
 		var surface := flight.surface_status()
 		in_view = not surface.near or surface.pad
 	_hud.set_target_marker(_view.camera.unproject_position(marker) if in_view else Vector2.ZERO, in_view)
+	var active_mark := {}
+	if instruments_visible and not combat_lock.is_empty():
+		var contact_position: Vector3 = combat_lock.position
+		if not _view.camera.is_position_behind(contact_position) and flight.combat_line_clear(_view.camera.global_position, contact_position):
+			active_mark.screen = _view.camera.unproject_position(contact_position)
+	_hud.set_combat_lock(str(combat_lock.get("id", "")), str(combat_lock.get("name", "")), active_mark)
 	var markers: Array[Dictionary] = []
+	var contacts: Array[Dictionary] = []
+	if instruments_visible and (_hud.ship_markers_enabled() or _hud.scanner_is_open()):
+		contacts = flight.traffic_contacts()
 	if instruments_visible and _hud.ship_markers_enabled():
-		for contact in flight.traffic_contacts():
+		var targetable := flight.combat_targetable_contacts()
+		for contact: Dictionary in contacts:
 			var distance := flight.position.distance_to(contact.position)
 			if distance > 1100.0 or _view.camera.is_position_behind(contact.position):
 				continue
-			markers.append({"screen": _view.camera.unproject_position(contact.position), "role": contact.role, "name": contact.name, "distance": distance})
+			var lockable := targetable.has(contact.id) and flight.combat_line_clear(_view.camera.global_position, contact.position)
+			markers.append({"screen": _view.camera.unproject_position(contact.position), "role": contact.role,
+				"name": contact.name, "distance": distance, "id": contact.id, "lockable": lockable})
 	_hud.set_traffic_markers(markers)
+	if _hud.scanner_is_open():
+		_hud.set_scanner_status(flight.scanner_status(contacts))
 	var sites := flight.local_targets()
 	_hud.set_navigation_targets(sites, flight.target)
 	var navigation_markers: Array[Dictionary] = []
@@ -256,6 +287,16 @@ func _select_cockpit_target(site: int, from_view: bool) -> void:
 	_io.trace("route_selected", {"target": site, "source": "marker" if from_view else "onboard"})
 	_hud.notify("Цель · %s" % flight.target_name(site))
 	_save()
+	_update_display(0.0)
+
+
+func _select_cockpit_contact(id: String) -> void:
+	if not _flight_active or _overlay_open() or flight.docked >= 0 or flight.landed or flight.jump_seconds_left > 0.0:
+		return
+	if not flight.select_combat_contact(id):
+		_hud.notify("Контакт недоступен для захвата.")
+		return
+	_deliver_notice()
 	_update_display(0.0)
 
 
@@ -319,6 +360,12 @@ func _handle_action(action: String) -> void:
 			flight.fire_action()
 		"ecm":
 			flight.use_ecm()
+		"missile_next":
+			flight.select_missile_slot(flight.next_missile_slot())
+		"missile_fire":
+			flight.launch_missile(flight.combat_lock_id())
+		"decoy":
+			flight.launch_decoy()
 		"mine":
 			flight.mine_action()
 		"mining_pulse":
@@ -377,6 +424,10 @@ func _handle_action(action: String) -> void:
 		"frontier":
 			_hud.set_input_enabled(false)
 			_frontier.open(flight)
+			return
+		"recon":
+			_hud.set_input_enabled(false)
+			_recon.open(flight)
 			return
 		_:
 			return
@@ -482,9 +533,13 @@ func _deliver_notice() -> void:
 		var transit := flight.jump_progress_status()
 		trace_fields = {
 			"system_id": flight.system_id, "destination": transit.destination, "fare": transit.fare,
+			"emergency": transit.emergency, "requested": transit.requested,
 			"game_seconds": transit.duration, "arrival_epoch": transit.arrival_epoch,
 			"drive": flight.ship.drive_kind, "fuel_remaining": flight.ship.jump_fuel,
 		}
+	elif event == "emergency_jump_arrival":
+		trace_fields = {"system_id": flight.system_id, "orbit_time": flight.orbit_time,
+			"fault": flight.jump_drive_status().fault, "message": flight.status_message}
 	elif event == "reference_frame":
 		var frame := flight.frame_status()
 		trace_fields = {
@@ -510,21 +565,29 @@ func _deliver_notice() -> void:
 		"gear_deploy", "gear_retract", "gear_ready", "gear_stowed",
 		"service_heat_shield", "service_mining_laser", "service_fragment_collector",
 		"mining_pulse", "fragment_collected",
-		"jump_planned", "jump_committed", "jump_complete", "route_canceled",
+		"jump_planned", "jump_committed", "jump_complete", "emergency_jump_arrival", "jump_repaired",
+		"hyperspace_analyzer", "route_canceled",
 		"service_range_drive", "jump_drive_selected",
 		"service_combat_shield", "service_combat_ecm", "service_combat_focus", "service_combat_repair",
 		"combat_weapon_selected", "combat_missile", "combat_missile_hit", "combat_ecm",
+		"combat_missile_selected", "combat_player_missile", "combat_decoy", "combat_decoy_hit",
+		"service_combat_launcher", "service_combat_missile_dart", "service_combat_missile_lance", "service_combat_ecm_advanced", "service_combat_decoy",
+		"combat_lock", "combat_lock_clear", "service_radar_mapper",
 		"market_buy", "market_sell", "service_repair", "service_cargo", "hull_damage", "contract_leg",
 		"passenger_accepted", "passenger_overdue", "passenger_paid", "passenger_late", "passenger_canceled",
 		"passenger_debt_paid", "passenger_course",
 		"crew_hired", "crew_dismissed", "crew_payroll", "crew_arrears_paid", "ship_exchange",
 		"patrol_accepted", "patrol_engaged", "patrol_fire", "patrol_enemy_hit", "patrol_retreat", "patrol_victory", "patrol_paid",
 		"expedition_accepted", "expedition_survey", "expedition_report", "expedition_supply", "expedition_complete", "expedition_course",
+		"missing_accepted", "missing_clue", "missing_evidence", "missing_boarded", "missing_paid", "missing_expired",
+		"missing_disembarked", "missing_course",
+		"recon_camera_installed", "recon_accepted", "recon_captured", "recon_paid", "recon_expired", "recon_cancelled", "recon_course",
 		"war_declared", "war_round", "war_captured", "war_repulsed", "war_convoy_delivered", "war_convoy_intercepted",
 		"convoy_order_accepted", "convoy_order_escorted", "convoy_order_failed", "convoy_order_paid",
 		"convoy_order_fire", "convoy_order_enemy_hit",
 		"ambient_engaged", "ambient_fire", "ambient_enemy_hit", "ambient_victory",
 		"career_dispatch_accepted", "career_dispatch_paid", "career_dispatch_expired", "career_dispatch_course",
+		"career_order_accepted", "career_order_proved", "career_order_course", "career_order_paid", "career_order_expired", "career_order_removed",
 		"story_brief", "story_registry", "story_mirror", "story_collect_key", "story_submit", "story_course",
 		"flight_assist", "reference_frame", "time_paused", "time_resumed", "autopilot_equipment", "speed_hold_on", "speed_hold_off",
 		"survey_record", "galaxy_scan", "customs_inspection", "customs_paid",
@@ -735,6 +798,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		if event.physical_keycode == KEY_ESCAPE:
 			_close_frontier()
 		return
+	if _recon.is_open():
+		if event.physical_keycode == KEY_ESCAPE:
+			_close_recon()
+		return
 	if event.physical_keycode == KEY_F12:
 		_hud.toggle_navigation()
 		get_viewport().set_input_as_handled()
@@ -754,7 +821,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_T: "target", KEY_F: "autopilot", KEY_R: "throttle_up", KEY_V: "throttle_down",
 		KEY_ENTER: "dock", KEY_M: "contract", KEY_G: "mine", KEY_B: "sell_ore", KEY_F8: "report",
 		KEY_N: "map", KEY_J: "galaxy", KEY_K: "scoop", KEY_P: "services", KEY_O: "time", KEY_L: "market",
-		KEY_U: "patrol", KEY_X: "fire", KEY_I: "convoy", KEY_H: "flight_assist",
+		KEY_U: "patrol", KEY_X: "fire", KEY_I: "convoy", KEY_H: "flight_assist", KEY_Q: "recon",
+		KEY_Z: "missile_fire", KEY_BRACKETRIGHT: "missile_next", KEY_BRACKETLEFT: "decoy",
 		KEY_F1: "camera", KEY_F2: "settings", KEY_F3: "journal", KEY_F4: "frontier",
 		KEY_F5: "dock_sync", KEY_F6: "dock_clearance", KEY_F7: "frame", KEY_F9: "time_pause", KEY_F10: "speed_hold", KEY_F11: "voyages", KEY_Y: "gear", KEY_C: "fuel",
 	}
@@ -802,6 +870,8 @@ func _notification(what: int) -> void:
 			_close_journal()
 		elif _frontier.is_open():
 			_close_frontier()
+		elif _recon.is_open():
+			_close_recon()
 		elif _hud.close_navigation():
 			return
 		elif flight.departure_status().can_cancel:
@@ -997,15 +1067,29 @@ func _cancel_jump_route() -> void:
 		_galaxy.refresh()
 
 
-func _start_jump() -> void:
+func _start_jump(emergency := false) -> void:
 	if not _galaxy.is_open():
 		return
-	if flight.start_jump():
+	if flight.start_jump(emergency):
 		_close_galaxy()
 	else:
 		_galaxy.refresh()
 	_deliver_notice()
 	_update_display(0.0)
+
+
+func _target_hyperspace_trail() -> void:
+	if _galaxy.is_open() and flight.target_hyperspace_trail():
+		_close_galaxy()
+		_deliver_notice()
+		_update_display(0.0)
+
+
+func _analyze_hyperspace_trail(id: String) -> void:
+	if _galaxy.is_open():
+		flight.analyze_hyperspace_trail(id)
+		_galaxy.refresh()
+		_deliver_notice()
 
 
 func _close_galaxy() -> void:
@@ -1026,6 +1110,15 @@ func _select_weapon(weapon: String) -> void:
 	if not _services.is_open():
 		return
 	flight.select_weapon(weapon)
+	_deliver_notice()
+	_services.refresh()
+	_update_display(0.0)
+
+
+func _select_missile(slot: int) -> void:
+	if not _services.is_open():
+		return
+	flight.select_missile_slot(slot)
 	_deliver_notice()
 	_services.refresh()
 	_update_display(0.0)
@@ -1233,10 +1326,10 @@ func _follow_journal(kind: String) -> void:
 	_update_display(0.0)
 
 
-func _career_dispatch() -> void:
+func _career_dispatch(kind: String) -> void:
 	if not _journal.is_open():
 		return
-	flight.career_dispatch_action()
+	flight.career_dispatch_action(kind)
 	_deliver_notice()
 	_journal.refresh()
 	_update_display(0.0)
@@ -1281,6 +1374,34 @@ func _convoy_action(system: int, id: String) -> void:
 
 func _close_frontier() -> void:
 	_frontier.close()
+	_hud.set_input_enabled(true)
+
+
+func _search_action(action: String) -> void:
+	if not _frontier.is_open():
+		return
+	if flight.search_action(action) and action == "follow":
+		_close_frontier()
+	_deliver_notice()
+	_frontier.refresh()
+	_update_display(0.0)
+
+
+func _recon_action(action: String) -> void:
+	if not _recon.is_open():
+		return
+	var done := flight.recon_action(action)
+	var notice := flight.status_message if not flight.status_event.is_empty() else "Команда сейчас недоступна."
+	if done and action == "follow":
+		_close_recon()
+	else:
+		_recon.refresh(notice)
+	_deliver_notice()
+	_update_display(0.0)
+
+
+func _close_recon() -> void:
+	_recon.close()
 	_hud.set_input_enabled(true)
 
 

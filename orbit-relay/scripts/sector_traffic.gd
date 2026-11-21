@@ -110,7 +110,7 @@ static func _interstellar_contact(sim: RefCounted, service: Dictionary) -> Dicti
 	# Both visiting services have berths clear of the dock and the local shuttles.
 	var side := 1.0 if int(service.slot) % 2 == 0 else -1.0
 	var berth := Vector3(side * 72.0, 57.0, 48.0)
-	var jump := Vector3(side * 840.0, 325.0, 690.0)
+	var jump := _shuttle_jump_offset(int(service.slot))
 	var lane := jump - berth
 	var progress := float(service.local_progress)
 	var advance := float(service.local_speed_fraction)
@@ -140,6 +140,16 @@ static func _interstellar_contact(sim: RefCounted, service: Dictionary) -> Dicti
 		"position": sample.position, "velocity": sample.velocity, "forward": forward.normalized(), "hull": 100.0,
 		"freight": service.duplicate(true),
 	}
+
+
+static func hyperspace_echo_position(sim: RefCounted, port: int, slot: int) -> Vector3:
+	var at: Vector3 = sim.target_gate(port) + _shuttle_jump_offset(slot)
+	return clear_hulls(sim, at, sim.target_velocity(port)).position
+
+
+static func _shuttle_jump_offset(slot: int) -> Vector3:
+	var side := 1.0 if slot % 2 == 0 else -1.0
+	return Vector3(side * 840.0, 325.0, 690.0)
 
 
 static func convoy_contact(sim: RefCounted, id: String) -> Dictionary:

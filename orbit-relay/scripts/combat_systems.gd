@@ -1,7 +1,8 @@
 extends RefCounted
-## Ship combat equipment, energy and the single active hostile projectile.
+## Ship combat equipment, energy and local ordnance.
 
 const Catalog = preload("res://scripts/sector_catalog.gd")
+const Ordnance := preload("res://scripts/combat_ordnance.gd")
 
 const PULSE := "pulse"
 const FOCUS := "focus"
@@ -9,6 +10,7 @@ const ECM := "ecm"
 const SHIELD_COST := 120
 const FOCUS_COST := 170
 const ECM_COST := 90
+const ECM_ADVANCED_COST := 170
 const REPAIR_COST := 60
 const MAX_HEAT := 100.0
 const COOLING_RATE := 16.0
@@ -21,6 +23,8 @@ const PROJECTILE_LIFETIME := 6.0
 const PROJECTILE_COOLDOWN := 6.0
 const ECM_RANGE := 140.0
 const ECM_COOLDOWN := 3.0
+const ECM_ADVANCED_RANGE := 220.0
+const ECM_ADVANCED_COOLDOWN := 4.0
 
 const MAX_EPOCH := 3155760000.0
 const CLOCK_TOLERANCE := 0.000002
@@ -39,7 +43,9 @@ var heat := 0.0
 var shield_fitted := false
 var shield := 0.0
 var ecm_fitted := false
+var ecm_advanced := false
 var damaged := ""
+var ordnance := Ordnance.new()
 
 var _fire_ready_at := 0.0
 var _shield_recharge_at := 0.0
@@ -62,8 +68,15 @@ func service_offer(action: String, credits: int) -> Dictionary:
 		"combat_ecm":
 			cost = ECM_COST
 			installed = ecm_fitted
+		"combat_ecm_advanced":
+			cost = ECM_ADVANCED_COST
+			installed = ecm_advanced
+			if not ecm_fitted:
+				return {"allowed": false, "cost": cost, "installed": false, "reason": "Установите базовый модуль РЭБ."}
 		"combat_repair":
 			cost = REPAIR_COST if not damaged.is_empty() else 0
+		_:
+			return ordnance.offer(action, credits)
 	return {"allowed": cost > 0 and not installed and credits >= cost, "cost": cost, "installed": installed}
 
 
@@ -80,8 +93,12 @@ func buy(action: String, credits: int) -> int:
 			weapon = FOCUS
 		"combat_ecm":
 			ecm_fitted = true
+		"combat_ecm_advanced":
+			ecm_advanced = true
 		"combat_repair":
 			damaged = ""
+		_:
+			return ordnance.buy(action, credits)
 	return int(offer.cost)
 
 
@@ -146,7 +163,7 @@ func damage_module() -> String:
 	return damaged
 
 
-func incoming_shot(source: Vector3, ship_position: Vector3, system: int, epoch: float) -> bool:
+func incoming_shot(source: Vector3, ship_position: Vector3, system: int, epoch: float, hardened := false) -> bool:
 	if not _valid_epoch(epoch) or system < 0 or system >= Catalog.SYSTEM_COUNT:
 		return false
 	if not _valid_position(source) or not _valid_position(ship_position) or source.distance_squared_to(ship_position) <= 0.000001:
@@ -156,7 +173,7 @@ func incoming_shot(source: Vector3, ship_position: Vector3, system: int, epoch: 
 		return false
 	_projectile = {
 		"system": system, "position": source, "velocity": source.direction_to(ship_position) * PROJECTILE_SPEED,
-		"expires": epoch + PROJECTILE_LIFETIME,
+		"expires": epoch + PROJECTILE_LIFETIME, "hardened": hardened,
 	}
 	_projectile_ready_at = epoch + PROJECTILE_COOLDOWN
 	reset_salvos()
@@ -171,7 +188,11 @@ func projectile_status() -> Dictionary:
 	return _projectile.duplicate()
 
 
-func advance_projectile(epoch: float, delta: float) -> Dictionary:
+func has_active_ordnance() -> bool:
+	return not _projectile.is_empty() or not ordnance.missile.is_empty() or not ordnance.decoy.is_empty()
+
+
+func advance_projectile(epoch: float, delta: float, aim := Vector3.INF) -> Dictionary:
 	if _projectile.is_empty() or not _valid_epoch(epoch) or not is_finite(delta) or delta <= 0.0:
 		return {}
 	var earliest := float(_projectile.expires) - PROJECTILE_LIFETIME
@@ -182,16 +203,26 @@ func advance_projectile(epoch: float, delta: float) -> Dictionary:
 			clear_projectile()
 		return {}
 	var from: Vector3 = _projectile.position
-	var to: Vector3 = from + _projectile.velocity * (finish_at - start_at)
+	var duration := finish_at - start_at
+	if aim.is_finite():
+		_projectile.velocity = Ordnance.guide(_projectile.velocity, from.direction_to(aim), Ordnance.HOSTILE_TURN * duration)
+	var to: Vector3 = from + _projectile.velocity * duration
 	var system := int(_projectile.system)
 	_projectile.position = to
 	if epoch >= float(_projectile.expires):
 		clear_projectile()
-	return {"from": from, "to": to, "system": system}
+	return {"from": from, "to": to, "system": system,
+		"start": (start_at - (epoch - delta)) / delta, "finish": (finish_at - (epoch - delta)) / delta}
 
 
 func clear_projectile() -> void:
 	_projectile.clear()
+
+
+func clear_transients() -> void:
+	clear_projectile()
+	ordnance.missile.clear()
+	ordnance.decoy.clear()
 
 
 func ecm_denial(ship_position: Vector3, epoch: float) -> String:
@@ -203,8 +234,11 @@ func ecm_denial(ship_position: Vector3, epoch: float) -> String:
 		return "Нет ракеты для подавления."
 	if epoch + CLOCK_TOLERANCE < _ecm_ready_at:
 		return "Модуль РЭБ перезаряжается."
-	if ship_position.distance_squared_to(_projectile.position) > ECM_RANGE * ECM_RANGE:
-		return "Дождитесь сближения ракеты до 140 м."
+	if _projectile.hardened and not ecm_advanced:
+		return "Ракета защищена от базовых помех. Используйте ловушку или усиленную РЭБ."
+	var reach := ECM_ADVANCED_RANGE if ecm_advanced else ECM_RANGE
+	if ship_position.distance_squared_to(_projectile.position) > reach * reach:
+		return "Дождитесь сближения ракеты до %d м." % int(reach)
 	return ""
 
 
@@ -212,7 +246,7 @@ func use_ecm(ship_position: Vector3, epoch: float) -> bool:
 	if not ecm_denial(ship_position, epoch).is_empty():
 		return false
 	clear_projectile()
-	_ecm_ready_at = epoch + ECM_COOLDOWN
+	_ecm_ready_at = epoch + (ECM_ADVANCED_COOLDOWN if ecm_advanced else ECM_COOLDOWN)
 	return true
 
 
@@ -224,19 +258,21 @@ func snapshot() -> Dictionary:
 		encoded = {
 			"system": _projectile.system, "position": [position.x, position.y, position.z],
 			"velocity": [velocity.x, velocity.y, velocity.z], "expires": _projectile.expires,
+			"hardened": _projectile.hardened,
 		}
 	return {
 		"heat": heat, "shield": shield, "shield_fitted": shield_fitted, "ecm_fitted": ecm_fitted,
 		"focus_owned": focus_owned, "weapon": weapon, "damaged": damaged, "fire_ready_at": _fire_ready_at,
 		"shield_recharge_at": _shield_recharge_at, "ecm_ready_at": _ecm_ready_at,
 		"projectile_ready_at": _projectile_ready_at, "salvos": _salvos, "projectile": encoded,
+		"ecm_advanced": ecm_advanced, "ordnance": ordnance.snapshot(),
 	}
 
 
-func restore(raw: Variant, epoch: float, system: int) -> bool:
+func restore(raw: Variant, epoch: float, system: int, legacy := false) -> bool:
 	if not _valid_epoch(epoch) or system < 0 or system >= Catalog.SYSTEM_COUNT:
 		return false
-	if not raw is Dictionary or raw.size() != SAVE_FIELDS.size() or not raw.has_all(SAVE_FIELDS):
+	if not raw is Dictionary or raw.size() != SAVE_FIELDS.size() + (0 if legacy else 2) or not raw.has_all(SAVE_FIELDS):
 		return false
 	if not raw.shield_fitted is bool or not raw.ecm_fitted is bool or not raw.focus_owned is bool:
 		return false
@@ -246,11 +282,19 @@ func restore(raw: Variant, epoch: float, system: int) -> bool:
 		return false
 	if (raw.damaged == FOCUS and not raw.focus_owned) or (raw.damaged == ECM and not raw.ecm_fitted):
 		return false
+	var restored_ordnance := Ordnance.new()
+	var advanced := false
+	if not legacy:
+		if not raw.get("ecm_advanced") is bool or (raw.ecm_advanced and not raw.ecm_fitted):
+			return false
+		if not restored_ordnance.restore(raw.get("ordnance"), epoch, system):
+			return false
+		advanced = raw.ecm_advanced
 	var shield_limit := SHIELD_CAPACITY if raw.shield_fitted else 0.0
 	if not _number(raw.heat, 0.0, MAX_HEAT) or not _number(raw.shield, 0.0, shield_limit):
 		return false
 	var recharge_limit := SHIELD_RECHARGE_DELAY if raw.shield_fitted else 0.0
-	var ecm_limit := ECM_COOLDOWN if raw.ecm_fitted else 0.0
+	var ecm_limit := ECM_ADVANCED_COOLDOWN if advanced else (ECM_COOLDOWN if raw.ecm_fitted else 0.0)
 	if not _timestamp(raw.fire_ready_at, epoch, float(PROFILES[FOCUS].cooldown)):
 		return false
 	if not _timestamp(raw.shield_recharge_at, epoch, recharge_limit) or not _timestamp(raw.ecm_ready_at, epoch, ecm_limit):
@@ -261,13 +305,15 @@ func restore(raw: Variant, epoch: float, system: int) -> bool:
 		return false
 	var restored_projectile: Dictionary = {}
 	if not raw.projectile.is_empty():
-		restored_projectile = _restore_projectile(raw.projectile, epoch, system, float(raw.projectile_ready_at))
+		restored_projectile = _restore_projectile(raw.projectile, epoch, system, float(raw.projectile_ready_at), legacy)
 		if restored_projectile.is_empty():
 			return false
 	heat = float(raw.heat)
 	shield = float(raw.shield)
 	shield_fitted = raw.shield_fitted
 	ecm_fitted = raw.ecm_fitted
+	ecm_advanced = advanced
+	ordnance = restored_ordnance
 	focus_owned = raw.focus_owned
 	weapon = raw.weapon
 	damaged = raw.damaged
@@ -280,8 +326,10 @@ func restore(raw: Variant, epoch: float, system: int) -> bool:
 	return true
 
 
-static func _restore_projectile(raw: Dictionary, epoch: float, system: int, ready_at: float) -> Dictionary:
-	if raw.size() != PROJECTILE_FIELDS.size() or not raw.has_all(PROJECTILE_FIELDS):
+static func _restore_projectile(raw: Dictionary, epoch: float, system: int, ready_at: float, legacy: bool) -> Dictionary:
+	if raw.size() != PROJECTILE_FIELDS.size() + (0 if legacy else 1) or not raw.has_all(PROJECTILE_FIELDS):
+		return {}
+	if not legacy and not raw.get("hardened") is bool:
 		return {}
 	if not _integer(raw.system, system, system) or not _number(raw.expires, epoch, epoch + PROJECTILE_LIFETIME + CLOCK_TOLERANCE):
 		return {}
@@ -292,7 +340,8 @@ static func _restore_projectile(raw: Dictionary, epoch: float, system: int, read
 	var velocity := _decode_vector(raw.velocity, PROJECTILE_SPEED + 0.001)
 	if not position.is_finite() or not velocity.is_finite() or absf(velocity.length() - PROJECTILE_SPEED) > 0.001:
 		return {}
-	return {"system": system, "position": position, "velocity": velocity, "expires": expires}
+	return {"system": system, "position": position, "velocity": velocity, "expires": expires,
+		"hardened": false if legacy else raw.hardened}
 
 
 static func _decode_vector(raw: Variant, limit: float) -> Vector3:

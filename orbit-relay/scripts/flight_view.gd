@@ -195,6 +195,8 @@ var _mining_beam_halo: MeshInstance3D
 var _mining_impact: MeshInstance3D
 var _combat_projectile: Node3D
 var _combat_projectile_trail: MeshInstance3D
+var _player_missile: Node3D
+var _player_decoy: Node3D
 var _traffic: Node3D
 var _atmosphere: Node3D
 var _hyper_transit: HyperTransitOverlay
@@ -245,6 +247,7 @@ func build() -> void:
 	add_child(_mining_rig)
 	_build_mining_pulse()
 	_build_combat_projectile()
+	_build_player_ordnance()
 	_traffic = TrafficView.new()
 	add_child(_traffic)
 	_traffic.set_visual_profile(_visual_profile)
@@ -595,7 +598,9 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_sync_fragments(sim.local_fragments(), position_now, float(sim.orbit_time))
 	_sync_cargo_pods([] if transit else sim.local_cargo_pods(), position_now, epoch)
 	_sync_mining_pulse({} if transit else sim.orbital_mining_beam())
-	_sync_combat_projectile({} if transit or settled else sim.combat_status())
+	var combat_state: Dictionary = {} if transit or settled else sim.combat_status()
+	_sync_combat_projectile(combat_state)
+	_sync_player_ordnance(combat_state)
 	_traffic.sync(sim.traffic_contacts(), sim.combat_beams())
 	_atmosphere.sync(sim, camera, settled)
 	# Compatibility supports ordinary distance fog; keep it local and subtle.
@@ -814,6 +819,59 @@ func _sync_combat_projectile(status: Dictionary) -> void:
 	var exhaust_scale := clampf(velocity.length() / 48.0, 0.65, 1.7)
 	_combat_projectile_trail.scale.y = exhaust_scale
 	_combat_projectile_trail.position.z = 1.09 + 2.15 * exhaust_scale
+
+
+func _build_player_ordnance() -> void:
+	_player_missile = Node3D.new()
+	_player_missile.name = "PlayerMissile"
+	add_child(_player_missile)
+	var missile := CapsuleMesh.new()
+	missile.radius = 0.54
+	missile.height = 2.8
+	missile.radial_segments = 8
+	missile.rings = 4
+	var shell := _mesh(_player_missile, missile, _light(Color("#d7fbff")), Vector3.ZERO)
+	shell.rotation.x = PI * 0.5
+	var exhaust := _light(Color(0.24, 0.79, 1.0, 0.70))
+	exhaust.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	exhaust.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	_cylinder(_player_missile, exhaust, Vector3(0, 0, 4.2), 0.04, 0.90, 5.8, 8)
+	_player_missile.hide()
+
+	_player_decoy = Node3D.new()
+	_player_decoy.name = "PlayerDecoy"
+	add_child(_player_decoy)
+	var core := SphereMesh.new()
+	core.radius = 0.88
+	core.height = 1.76
+	core.radial_segments = 8
+	core.rings = 4
+	_mesh(_player_decoy, core, _light(Color("#ffe6a0")), Vector3.ZERO)
+	_ring(_player_decoy, _light(Color("#d09cfb")), Vector3.ZERO, 1.50, 0.19, 12)
+	_player_decoy.hide()
+
+
+func _sync_player_ordnance(status: Dictionary) -> void:
+	var launcher: Dictionary = status.get("missile", {})
+	var decoy: Dictionary = status.get("decoy", {})
+	_place_ordnance(_player_missile, launcher.get("projectile", {}))
+	_place_ordnance(_player_decoy, decoy if decoy.get("active", false) else {})
+
+
+func _place_ordnance(model: Node3D, record: Dictionary) -> void:
+	if record.is_empty():
+		model.hide()
+		return
+	var at: Vector3 = record.position
+	var velocity: Vector3 = record.velocity
+	if not at.is_finite() or not velocity.is_finite():
+		model.hide()
+		return
+	var direction := Vector3.FORWARD if velocity.is_zero_approx() else velocity.normalized()
+	var up := Vector3.RIGHT if absf(direction.y) > 0.97 else Vector3.UP
+	model.position = at
+	model.basis = Basis.looking_at(direction, up)
+	model.show()
 
 
 func _update_stellar_light(light: DirectionalLight3D, source: Vector3, observer: Vector3, strength: float) -> void:

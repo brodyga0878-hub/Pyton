@@ -3,6 +3,7 @@ extends CanvasLayer
 signal action_requested(action: String)
 signal frame_requested()
 signal navigation_requested(site: int, from_view: bool)
+signal combat_target_requested(id: String)
 
 const MiningRig := preload("res://scripts/mining_rig.gd")
 const Sector := preload("res://scripts/sector_catalog.gd")
@@ -10,6 +11,7 @@ const Ground := preload("res://scripts/ground_port.gd")
 const Patrol := preload("res://scripts/patrol_encounter.gd")
 const MissionCalendar := preload("res://scripts/mission_calendar.gd")
 const FlightCamera := preload("res://scripts/flight_camera.gd")
+const FlightScanner := preload("res://scripts/flight_scanner_view.gd")
 const INK := Color("eef8ff")
 const MUTED := Color("a7bac9")
 const CYAN := Color("8fe9db")
@@ -63,11 +65,16 @@ var _fuel_level: ProgressBar
 var _jump_fuel: Label
 var _pump_mode: Label
 var _combat_readout: VBoxContainer
+var _ordnance_tools: HBoxContainer
+var _missile_blocked := true
+var _missile_next_blocked := true
+var _decoy_blocked := true
 var _combat_weapon: Label
 var _combat_shield_status: Label
 var _combat_shield: ProgressBar
 var _combat_shield_fill: StyleBoxFlat
 var _combat_damage: Label
+var _combat_lock_readout: Label
 var _projectile_alert: Label
 var _thermal_panel: VBoxContainer
 var _entry_readout: Label
@@ -99,11 +106,24 @@ var _right_panel: PanelContainer
 var _throttle_controls: GridContainer
 var _port_tools: HBoxContainer
 var _navigation_drawer: PanelContainer
+var _navigation_switches: HBoxContainer
 var _navigation_list: ItemList
 var _navigation_corridor_enabled := false
 var _navigation_sites: Array[int] = []
 var _navigation_blockers: Array[Control] = []
 var _navigation_presses: Dictionary[int, NavigationPress] = {}
+var _scanner_panel: VBoxContainer
+var _scanner_radar: Control
+var _scanner_list: ItemList
+var _scanner_detail: Label
+var _scanner_rows: Array[Dictionary] = []
+var _scanner_ids: Array[String] = []
+var _scanner_focus := ""
+var _combat_lock := ""
+var _scanner_range := 1400.0
+var _mapper_fitted := false
+var _scanner_can_lock := false
+var _combat_lock_presses: Dictionary[int, String] = {}
 var _actions: Dictionary = {}
 var _touch_owner: Dictionary = {}
 var _steer_finger := -1
@@ -183,12 +203,13 @@ func build() -> void:
 	var course_card := route_stack.get_parent() as PanelContainer
 	var shortcuts := HBoxContainer.new()
 	shortcuts.add_theme_constant_override("separation", 8)
-	_pin(shortcuts, _safe, Vector2.ZERO, Rect2(26, 131, 407, 48))
+	_pin(shortcuts, _safe, Vector2.ZERO, Rect2(26, 131, 502, 48))
 	_button(shortcuts, "journal", "Журнал")
 	_button(shortcuts, "settings", "Настройки")
 	_button(shortcuts, "frontier", "Освоение")
 	_button(shortcuts, "navigation_toggle", "Цели")
-	for action: String in ["journal", "settings", "frontier", "navigation_toggle"]:
+	_button(shortcuts, "recon", "Съёмка")
+	for action: String in ["journal", "settings", "frontier", "navigation_toggle", "recon"]:
 		var button: Button = _actions[action]
 		button.custom_minimum_size.y = 48.0
 		button.add_theme_font_size_override("font_size", 16)
@@ -196,6 +217,7 @@ func build() -> void:
 	_actions["settings"].tooltip_text = "Графика и управление"
 	_actions["frontier"].tooltip_text = "Разведка, строительство и фракции"
 	_actions["navigation_toggle"].tooltip_text = "Цели и отображение объектов в полёте (F12)"
+	_actions["recon"].tooltip_text = "Бортовая камера и задания на съёмку (Q)"
 	course_card.resized.connect(func() -> void:
 		shortcuts.offset_top = course_card.position.y + course_card.size.y + 8.0
 		shortcuts.offset_bottom = shortcuts.offset_top + 48.0
@@ -371,6 +393,15 @@ func build() -> void:
 	ecm.add_theme_color_override("font_color", AMBER)
 	ecm.add_theme_stylebox_override("normal", _box(Color("443323"), AMBER, 9, 7.0))
 	ecm.hide()
+	_ordnance_tools = HBoxContainer.new()
+	_ordnance_tools.add_theme_constant_override("separation", 7)
+	right.add_child(_ordnance_tools)
+	_button(_ordnance_tools, "missile_next", "Место")
+	_button(_ordnance_tools, "missile_fire", "Пуск")
+	_button(_ordnance_tools, "decoy", "Ловушка")
+	for action: String in ["missile_next", "missile_fire", "decoy"]:
+		_actions[action].add_theme_font_size_override("font_size", 16)
+	_ordnance_tools.hide()
 	_orbital_mining_tools = HBoxContainer.new()
 	_orbital_mining_tools.add_theme_constant_override("separation", 7)
 	right.add_child(_orbital_mining_tools)
@@ -408,15 +439,17 @@ func _build_navigation_drawer() -> void:
 	var title := _label(header, 21, CYAN)
 	title.text = "Объекты системы"
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_button(header, "scanner_toggle", "Сканер")
 	_button(header, "navigation_close", "Закрыть")
 	_actions["navigation_close"].size_flags_horizontal = Control.SIZE_SHRINK_END
-	var switches := HBoxContainer.new()
-	switches.add_theme_constant_override("separation", 6)
-	stack.add_child(switches)
-	_button(switches, "object_labels", "")
-	_button(switches, "navigation_corridor", "")
-	_button(switches, "ship_markers", "")
-	for action: String in ["navigation_close", "object_labels", "navigation_corridor", "ship_markers"]:
+	_actions["scanner_toggle"].size_flags_horizontal = Control.SIZE_SHRINK_END
+	_navigation_switches = HBoxContainer.new()
+	_navigation_switches.add_theme_constant_override("separation", 6)
+	stack.add_child(_navigation_switches)
+	_button(_navigation_switches, "object_labels", "")
+	_button(_navigation_switches, "navigation_corridor", "")
+	_button(_navigation_switches, "ship_markers", "")
+	for action: String in ["navigation_close", "scanner_toggle", "object_labels", "navigation_corridor", "ship_markers"]:
 		_actions[action].add_theme_font_size_override("font_size", 16)
 		_actions[action].custom_minimum_size.y = 46.0
 	_actions["object_labels"].tooltip_text = "Показывать названия объектов и контактов поверх сцены"
@@ -430,7 +463,39 @@ func _build_navigation_drawer() -> void:
 	_navigation_list.add_theme_stylebox_override("panel", _box(Color("102730"), LINE, 8, 8.0))
 	_navigation_list.item_selected.connect(_select_navigation_row)
 	stack.add_child(_navigation_list)
+	_build_scanner(stack)
 	_navigation_drawer.hide()
+
+func _build_scanner(parent: VBoxContainer) -> void:
+	_scanner_panel = VBoxContainer.new()
+	_scanner_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_scanner_panel.add_theme_constant_override("separation", 5)
+	parent.add_child(_scanner_panel)
+	var readout := HBoxContainer.new()
+	readout.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_scanner_panel.add_child(readout)
+	_scanner_radar = FlightScanner.new()
+	_scanner_radar.custom_minimum_size = Vector2(160, 135)
+	readout.add_child(_scanner_radar)
+	_scanner_list = ItemList.new()
+	_scanner_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_scanner_list.add_theme_font_size_override("font_size", 16)
+	_scanner_list.add_theme_constant_override("v_separation", 14)
+	_scanner_list.add_theme_stylebox_override("panel", _box(Color("102730"), LINE, 8, 8.0))
+	_scanner_list.item_selected.connect(_select_scanner_row)
+	readout.add_child(_scanner_list)
+	_scanner_detail = _label(_scanner_panel, 15, MUTED)
+	_scanner_detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_scanner_detail.custom_minimum_size.y = 42
+	var actions := HBoxContainer.new()
+	actions.add_theme_constant_override("separation", 7)
+	_scanner_panel.add_child(actions)
+	_button(actions, "combat_lock", "Взять на прицел")
+	_button(actions, "combat_unlock", "Снять захват")
+	for action: String in ["combat_lock", "combat_unlock"]:
+		_actions[action].custom_minimum_size.y = 46.0
+		_actions[action].add_theme_font_size_override("font_size", 16)
+	_scanner_panel.hide()
 
 func _update_navigation_switches() -> void:
 	_actions["object_labels"].text = "Подписи вкл." if _marks.object_labels else "Подписи выкл."
@@ -456,6 +521,9 @@ func _build_combat_instrument(parent: VBoxContainer) -> void:
 	_combat_shield.add_theme_stylebox_override("fill", _combat_shield_fill)
 	_combat_readout.add_child(_combat_shield)
 	_combat_damage = _label(_combat_readout, 15, ALERT)
+	_combat_lock_readout = _label(parent, 15, ALERT)
+	_combat_lock_readout.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_combat_lock_readout.hide()
 	_projectile_alert = _label(_combat_readout, 16, ALERT)
 	_combat_readout.hide()
 
@@ -686,7 +754,8 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_sync_ambient(ambient)
 	var mission_fire := patrol_fight or bool(convoy.get("fire_visible", false))
 	var fire_button: Button = _actions["fire"]
-	fire_button.visible = not parked and not _jumping and (mission_fire or ambient.get("fire_visible", false))
+	fire_button.visible = (not parked and not _jumping
+		and (mission_fire or ambient.get("fire_visible", false) or not sim.combat_lock_id().is_empty()))
 	var fire: Dictionary = sim.fire_status() if fire_button.visible else {}
 	fire_button.tooltip_text = str(fire.get("reason", ""))
 	_fire_blocked = not fire.get("ok", false)
@@ -696,6 +765,8 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_sync_orbital_mining({} if parked or _jumping else sim.orbital_mining_status())
 	_right_panel.visible = not _departure_active
 	_right_panel.offset_top = -157.0 if docked else (-101.0 if landed else (-274.0 if flight_tools else -215.0))
+	if _ordnance_tools.visible:
+		_right_panel.offset_top -= 57.0
 	if _orbital_mining_tools.visible:
 		_right_panel.offset_top -= 57.0
 	_marks.flight = not parked and not _jump_transit
@@ -851,6 +922,7 @@ func _sync_combat(status: Dictionary) -> void:
 	ecm.visible = incoming
 	_ecm_blocked = not bool(status.get("ecm_ok", false))
 	ecm.tooltip_text = str(status.get("ecm_reason", "")) if _ecm_blocked else "Сбить приближающуюся ракету"
+	_sync_ordnance(status.get("missile", {}), status.get("decoy", {}))
 	if not _combat_readout.visible:
 		return
 	var heat := clampi(roundi(float(status.heat)), 0, 100)
@@ -1400,6 +1472,64 @@ func set_navigation_targets(sites: Array, selected: int) -> void:
 	elif not _navigation_list.is_selected(index):
 		_navigation_list.select(index)
 
+func scanner_is_open() -> bool:
+	return _navigation_drawer.visible and _scanner_panel.visible
+
+func set_combat_lock(id: String, caption: String, marker: Dictionary) -> void:
+	_combat_lock = id
+	_combat_lock_readout.text = "Захват · %s" % caption
+	_combat_lock_readout.visible = not id.is_empty()
+	_marks.combat_lock = marker
+	_marks.queue_redraw()
+
+func set_scanner_status(status: Dictionary) -> void:
+	_mapper_fitted = status.radar_mapper
+	_scanner_range = status.range
+	_scanner_rows = status.contacts
+	var ids: Array[String] = []
+	for row: Dictionary in _scanner_rows:
+		ids.append(row.id)
+	if ids != _scanner_ids:
+		_scanner_ids = ids
+		_scanner_list.clear()
+		for row: Dictionary in _scanner_rows:
+			_scanner_list.add_item(row.name)
+	if not _scanner_ids.has(_scanner_focus):
+		_scanner_focus = _combat_lock if _scanner_ids.has(_combat_lock) else ""
+	_refresh_scanner_selection()
+
+func _refresh_scanner_selection() -> void:
+	var index := _scanner_ids.find(_scanner_focus)
+	_scanner_can_lock = false
+	if index >= 0:
+		var contact := _scanner_rows[index]
+		_scanner_list.select(index)
+		_scanner_can_lock = contact.attackable and _scanner_focus != _combat_lock
+		var relative: Vector3 = contact.relative
+		_scanner_detail.text = "%d м · высота %+.0f м" % [roundi(contact.distance), relative.y]
+		if _mapper_fitted:
+			var names := {"raider": "Рейдер", "convoy": "Конвой", "trader": "Транспорт", "patrol": "Патруль"}
+			_scanner_detail.text += "\n%s · %.1f м/с · корпус %.0f%%" % [
+				names.get(contact.role, "Судно"), contact.relative_speed, contact.hull]
+		else:
+			_scanner_detail.text += "\nДосье доступно с радаром-картографом."
+	else:
+		_scanner_list.deselect_all()
+		_scanner_detail.text = "В пределах сканера нет кораблей." if _scanner_ids.is_empty() else "Выберите контакт в списке."
+	_scanner_radar.read_contacts(_scanner_rows, _scanner_range, _scanner_focus, _combat_lock)
+	_refresh_disabled_actions()
+
+func _select_scanner_row(index: int) -> void:
+	if scanner_is_open() and _input_enabled and index >= 0 and index < _scanner_ids.size():
+		_scanner_focus = _scanner_ids[index]
+		_refresh_scanner_selection()
+
+func _show_scanner(active: bool) -> void:
+	_scanner_panel.visible = active
+	_navigation_list.visible = not active
+	_navigation_switches.visible = not active
+	_actions["scanner_toggle"].text = "К целям" if active else "Сканер"
+
 func set_navigation_markers(markers: Array[Dictionary]) -> void:
 	var exclude: Array[Rect2] = []
 	for control: Control in _navigation_blockers:
@@ -1419,6 +1549,7 @@ func toggle_navigation() -> void:
 	if _navigation_drawer.visible:
 		close_navigation()
 	elif not _navigation_sites.is_empty():
+		_show_scanner(false)
 		_navigation_drawer.show()
 
 func close_navigation() -> bool:
@@ -1473,6 +1604,28 @@ func _place_touch_control(control: Control, placement: Rect2, starts_right: bool
 	control.offset_left = -placement.end.x if _touch_mirrored else placement.position.x
 	control.offset_right = -placement.position.x if _touch_mirrored else placement.end.x
 
+func _sync_ordnance(missile: Dictionary, decoy: Dictionary) -> void:
+	var next_button: Button = _actions["missile_next"]
+	var fire_button: Button = _actions["missile_fire"]
+	var decoy_button: Button = _actions["decoy"]
+	var armed := int(missile.get("slot", -1))
+	var loaded := int(missile.get("ammo", 0))
+	var count := int(decoy.get("count", 0))
+	fire_button.visible = bool(missile.get("fitted", false))
+	next_button.visible = fire_button.visible
+	decoy_button.visible = count > 0 or bool(decoy.get("active", false))
+	_ordnance_tools.visible = fire_button.visible or decoy_button.visible
+	_missile_next_blocked = int(missile.get("next_slot", -1)) < 0
+	_missile_blocked = not bool(missile.get("ready", false))
+	_decoy_blocked = not bool(decoy.get("ready", false))
+	next_button.text = "Место %d" % (armed + 1) if armed >= 0 else "Пусто"
+	next_button.tooltip_text = "Следующее заряженное место (])"
+	fire_button.text = "Пуск · %d" % loaded
+	fire_button.tooltip_text = str(missile.get("reason", "")) if _missile_blocked else "Пуск «%s» (Z)" % missile.name
+	decoy_button.text = "Ловушка · %d" % count
+	decoy_button.tooltip_text = str(decoy.get("reason", "")) if _decoy_blocked else "Выбросить ложную цель ([)"
+
+
 func _refresh_disabled_actions() -> void:
 	for action: String in _actions:
 		var button: Button = _actions[action]
@@ -1480,6 +1633,8 @@ func _refresh_disabled_actions() -> void:
 		blocked = blocked or (action == "scoop" and _scoop_blocked) or (action == "time" and _time_blocked)
 		blocked = blocked or (action == "patrol" and _patrol_blocked) or (action == "convoy" and _convoy_blocked) or (action == "fire" and _fire_blocked)
 		blocked = blocked or (action == "ecm" and (_ecm_blocked or _time_paused))
+		blocked = blocked or (action == "missile_next" and (_missile_next_blocked or _time_paused))
+		blocked = blocked or (action == "missile_fire" and _missile_blocked) or (action == "decoy" and _decoy_blocked)
 		blocked = blocked or (action == "rendezvous_finish" and _rendezvous_finish_blocked)
 		blocked = blocked or (action == "dock_sync" and _dock_sync_blocked)
 		blocked = blocked or (action == "dock_clearance" and _dock_clearance_blocked)
@@ -1488,6 +1643,8 @@ func _refresh_disabled_actions() -> void:
 		blocked = blocked or (action == "autopilot" and _autopilot_blocked)
 		blocked = blocked or (action == "speed_hold" and (_speed_hold_blocked or _time_paused))
 		blocked = blocked or (action == "navigation_toggle" and (_parked or _navigation_sites.is_empty()))
+		blocked = blocked or (action == "combat_lock" and not _scanner_can_lock)
+		blocked = blocked or (action == "combat_unlock" and _combat_lock.is_empty())
 		blocked = blocked or (RIG_ACTIONS.has(action) and not _rig_status.get(RIG_ACTIONS[action], false))
 		blocked = blocked or (ORBITAL_MINING_ACTIONS.has(action) and not _orbital_mining_status.get(ORBITAL_MINING_ACTIONS[action], false))
 		var manual_thrust := action in HOLD_ACTIONS or action in ["throttle_down", "throttle_up"]
@@ -1595,6 +1752,7 @@ func _notification(what: int) -> void:
 func _reset_controls() -> void:
 	_touch_owner.clear()
 	_navigation_presses.clear()
+	_combat_lock_presses.clear()
 	_steer_finger = -1
 	_bank_finger = -1
 	_mouse_pad = null
@@ -1622,6 +1780,8 @@ func _touch_begin(index: int, point: Vector2) -> bool:
 		var button: Button = _actions[action]
 		if not button.disabled and _hit(button, point):
 			_touch_owner[index] = action
+			if action == "combat_lock":
+				_combat_lock_presses[index] = _scanner_focus
 			if action in HOLD_ACTIONS:
 				_update_held()
 			else:
@@ -1637,6 +1797,8 @@ func _touch_end(index: int, point: Vector2, canceled: bool) -> bool:
 		return false
 	var action: String = _touch_owner[index]
 	_touch_owner.erase(index)
+	var selected_contact: String = _combat_lock_presses.get(index, "")
+	_combat_lock_presses.erase(index)
 	match action:
 		"steer":
 			_steer_finger = -1
@@ -1652,7 +1814,8 @@ func _touch_end(index: int, point: Vector2, canceled: bool) -> bool:
 			var button: Button = _actions[action]
 			if not _touch_owner.values().has(action):
 				button.self_modulate = Color.WHITE
-			if not canceled and not button.disabled and _hit(button, point):
+			var unchanged := action != "combat_lock" or selected_contact == _scanner_focus
+			if not canceled and unchanged and not button.disabled and _hit(button, point):
 				_commit_action(action)
 	return true
 
@@ -1662,14 +1825,21 @@ func _begin_navigation_press(index: int, point: Vector2, allow_drawer: bool) -> 
 	var from_view := not _hit(_navigation_drawer, point)
 	if not from_view and not allow_drawer:
 		return false
-	var site := _navigation_marker_at(point) if from_view else _navigation_row_at(point)
-	if from_view and site < 0:
+	var scanner := not from_view and scanner_is_open()
+	var site := _navigation_marker_at(point) if from_view else (-1 if scanner else _navigation_row_at(point))
+	var contact := _combat_marker_at(point) if from_view and site < 0 else ""
+	if from_view and site < 0 and contact.is_empty():
 		return false
 	var press := NavigationPress.new()
 	press.site = site
 	press.point = point
 	press.from_view = from_view
-	press.scroll_origin = _navigation_list.get_v_scroll_bar().value
+	press.scanner = scanner
+	if scanner:
+		press.contact = _scanner_row_at(point)
+	else:
+		press.contact = contact
+	press.scroll_origin = (_scanner_list if scanner else _navigation_list).get_v_scroll_bar().value
 	_navigation_presses[index] = press
 	return true
 
@@ -1678,14 +1848,23 @@ func _drag_navigation(index: int, point: Vector2) -> void:
 	var movement := point - press.point
 	press.dragged = press.dragged or movement.length() > NAV_DRAG_THRESHOLD
 	if press.dragged and not press.from_view:
-		_navigation_list.get_v_scroll_bar().value = press.scroll_origin - movement.y
+		var list := _scanner_list if press.scanner else _navigation_list
+		list.get_v_scroll_bar().value = press.scroll_origin - movement.y
 
 func _end_navigation_press(index: int, point: Vector2, canceled: bool) -> bool:
 	var press: NavigationPress = _navigation_presses.get(index)
 	if press == null:
 		return false
 	_navigation_presses.erase(index)
-	if not canceled and not press.dragged and not _parked and not _jumping and press.site >= 0:
+	if canceled or press.dragged or _parked or _jumping:
+		return true
+	if press.scanner:
+		if not press.contact.is_empty() and _scanner_row_at(point) == press.contact:
+			_select_scanner_row(_scanner_ids.find(press.contact))
+	elif press.from_view and not press.contact.is_empty():
+		if _combat_marker_at(point) == press.contact:
+			combat_target_requested.emit(press.contact)
+	elif press.site >= 0:
 		var current := _navigation_marker_at(point) if press.from_view else _navigation_row_at(point)
 		if current == press.site:
 			_request_navigation(press.site, press.from_view)
@@ -1697,11 +1876,23 @@ func _navigation_row_at(point: Vector2) -> int:
 	var index := _navigation_list.get_item_at_position(point - _navigation_list.get_global_rect().position, true)
 	return _navigation_sites[index] if index >= 0 and index < _navigation_sites.size() else -1
 
+func _scanner_row_at(point: Vector2) -> String:
+	if not _hit(_scanner_list, point):
+		return ""
+	var index := _scanner_list.get_item_at_position(point - _scanner_list.get_global_rect().position, true)
+	return _scanner_ids[index] if index >= 0 and index < _scanner_ids.size() else ""
+
 func _navigation_marker_at(point: Vector2) -> int:
+	return -1 if _world_marker_blocked(point) else _marks.navigation_at(point)
+
+func _combat_marker_at(point: Vector2) -> String:
+	return "" if _world_marker_blocked(point) else _marks.combat_pick_at(point)
+
+func _world_marker_blocked(point: Vector2) -> bool:
 	for control: Control in _navigation_blockers:
 		if _hit(control, point):
-			return -1
-	return _marks.navigation_at(point)
+			return true
+	return false
 
 func _update_held() -> void:
 	var touches := _touch_owner.values()
@@ -1733,6 +1924,12 @@ func _commit_action(action: String) -> void:
 		toggle_navigation()
 	elif action == "navigation_close":
 		close_navigation()
+	elif action == "scanner_toggle":
+		_show_scanner(not scanner_is_open())
+	elif action == "combat_lock":
+		combat_target_requested.emit(_scanner_focus)
+	elif action == "combat_unlock":
+		combat_target_requested.emit("")
 	elif action == "object_labels":
 		_marks.object_labels = not _marks.object_labels
 		_update_navigation_switches()
@@ -1868,6 +2065,8 @@ class NavigationPress extends RefCounted:
 	var site := -1
 	var point := Vector2.ZERO
 	var from_view := false
+	var scanner := false
+	var contact := ""
 	var dragged := false
 	var scroll_origin := 0.0
 
@@ -1882,8 +2081,10 @@ class FlightMarks extends Control:
 	var target_position := Vector2.ZERO
 	var object_labels := true
 	var ship_markers := true
+	var combat_lock: Dictionary = {}
 	var traffic: Array[Dictionary] = []
 	var navigation: Array[Dictionary] = []
+	var _visible_combat: Dictionary[String, Vector2] = {}
 	var _excluded: Array[Rect2] = []
 
 	func set_navigation(markers: Array[Dictionary], safe_area: Rect2, excluded: Array[Rect2]) -> void:
@@ -1911,6 +2112,17 @@ class FlightMarks extends Control:
 				return marker.id
 		return -1
 
+	func combat_pick_at(point: Vector2) -> String:
+		if not flight or not ship_markers:
+			return ""
+		for marker: Dictionary in traffic:
+			if not marker.get("lockable", false) or not _visible_combat.has(marker.id):
+				continue
+			var screen: Vector2 = marker.screen
+			if screen.distance_to(point) <= NAVIGATION_HIT_RADIUS and _visible_combat[marker.id].distance_to(point) <= NAVIGATION_HIT_RADIUS:
+				return marker.id
+		return ""
+
 	func _draw() -> void:
 		if not flight:
 			return
@@ -1919,6 +2131,7 @@ class FlightMarks extends Control:
 			for direction: Vector2 in [Vector2.UP, Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT]:
 				draw_line(center + direction * 13.0, center + direction * 23.0, Color(0.57, 0.92, 0.9, 0.65), 1.5, true)
 		_draw_navigation(_draw_traffic())
+		_draw_combat_lock()
 		if not target_visible:
 			return
 		var margin := Vector2(42, 112)
@@ -1932,6 +2145,16 @@ class FlightMarks extends Control:
 		var distance := 10.0
 		var vertices := PackedVector2Array([target + Vector2(0, -distance), target + Vector2(distance, 0), target + Vector2(0, distance), target + Vector2(-distance, 0), target + Vector2(0, -distance)])
 		draw_polyline(vertices, AMBER, 2.0, true)
+
+	func _draw_combat_lock() -> void:
+		if combat_lock.is_empty():
+			return
+		var at: Vector2 = combat_lock.screen
+		if not Rect2(Vector2(25, 118), size - Vector2(50, 243)).has_point(at):
+			return
+		draw_arc(at, 16.0, 0.0, TAU, 24, ALERT, 2.0, true)
+		for direction: Vector2 in [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]:
+			draw_line(at + direction * 12.0, at + direction * 22.0, ALERT, 1.6, true)
 
 	func _draw_navigation(occupied: Array[Rect2]) -> void:
 		var font := ThemeDB.fallback_font
@@ -1959,6 +2182,7 @@ class FlightMarks extends Control:
 
 	func _draw_traffic() -> Array[Rect2]:
 		var occupied: Array[Rect2] = []
+		_visible_combat.clear()
 		if not ship_markers:
 			return occupied
 		var safe := Rect2(Vector2(24, 142), (size - Vector2(48, 285)).max(Vector2.ONE))
@@ -1982,6 +2206,8 @@ class FlightMarks extends Control:
 			if occupied.any(func(box: Rect2) -> bool: return box.intersects(footprint)):
 				continue
 			occupied.append(footprint)
+			if contact.get("lockable", false):
+				_visible_combat[contact.id] = screen
 			if hostile:
 				var diamond := PackedVector2Array([
 					screen + Vector2(0, -11), screen + Vector2(9, 0), screen + Vector2(0, 11),

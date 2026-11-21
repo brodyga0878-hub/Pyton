@@ -27,17 +27,22 @@ const Customs = preload("res://scripts/customs.gd")
 const UnattendedMining = preload("res://scripts/unattended_mining.gd")
 const OrbitalMining = preload("res://scripts/orbital_mining.gd")
 const CargoPods = preload("res://scripts/cargo_pods.gd")
+const HyperspaceTrails = preload("res://scripts/hyperspace_trails.gd")
 const PortAccount = preload("res://scripts/port_account.gd")
 const CivicReputation = preload("res://scripts/civic_reputation.gd")
+const MissingPerson = preload("res://scripts/missing_person.gd")
 const MissionCalendar = preload("res://scripts/mission_calendar.gd")
 const CombatSystems = preload("res://scripts/combat_systems.gd")
+const CombatOrdnance := preload("res://scripts/combat_ordnance.gd")
+const CombatTargeting = preload("res://scripts/combat_targeting.gd")
 const Ground = preload("res://scripts/ground_port.gd")
 const SpeedHold = preload("res://scripts/speed_hold.gd")
 const CivilianTraffic = preload("res://scripts/civilian_traffic.gd")
 const PilotCareer = preload("res://scripts/pilot_career.gd")
 const BranchingStory = preload("res://scripts/branching_story.gd")
 const SectorNews = preload("res://scripts/sector_news.gd")
-const SAVE_SCHEMA := 49
+const Reconnaissance = preload("res://scripts/reconnaissance.gd")
+const SAVE_SCHEMA := 50
 const INTERRUPTED_LABELS := {
 	"autopilot": "автопилот", "rig_approach": "заход к буру", "orbit_maneuver": "орбитальный манёвр",
 	"rendezvous": "автоматическое сближение", "patrol_course": "наведение дозора",
@@ -68,6 +73,9 @@ const MASS_JUMP_PRICING := 1
 const SAVE_CLOCK_LIMIT := 3155760000.0
 const JUMP_BRAKE := 67.0
 const NAVIGATOR_JUMP_CHARGE := 2.2
+const EMERGENCY_HULL_LIMIT := 50.0
+const EMERGENCY_FAULT_LIMIT := 25.0
+const EMERGENCY_EXTRA_SECONDS := 12.0
 const JUMP_SPEED := 42.0
 const JUMP_CLEARANCE := 45.0
 const ARRIVAL_OFFSET := 90.0
@@ -168,10 +176,13 @@ var speed_hold := SpeedHold.new()
 var customs := Customs.new()
 var _port_account := PortAccount.new()
 var _civic := CivicReputation.new()
+var _missing_person := MissingPerson.new()
+var _reconnaissance := Reconnaissance.new()
 var remote_rig := UnattendedMining.new()
 var orbital_mining := OrbitalMining.new()
 var _cargo_pods := CargoPods.new()
 var combat := CombatSystems.new()
+var _targeting := CombatTargeting.new()
 var ambient := CivilianTraffic.new()
 var career := PilotCareer.new()
 var story := BranchingStory.new()
@@ -191,6 +202,10 @@ var _jump_charge_total := JUMP_CHARGE
 var _jump_transit_duration := 0.0
 var _jump_paid_fare := 0
 var _jump_paid_pricing := MASS_JUMP_PRICING
+var _jump_emergency := false
+var _jump_requested := -1
+var _hyperspace := HyperspaceTrails.new()
+var _tracked_hyperspace_id := ""
 var _jump_route: Array[int] = []
 var target := 1
 var planned_target := -1
@@ -319,7 +334,7 @@ func time_status() -> Dictionary:
 		return {"allowed": false, "reason": "Сближение с объектом" if not _rendezvous_holding else "Удержание позиции"}
 	if scooping:
 		return {"allowed": false, "reason": "Сбор топлива"}
-	if patrol.in_danger(self) or ambient.in_danger(self) or not combat.projectile_status().is_empty():
+	if patrol.in_danger(self) or ambient.in_danger(self) or combat.has_active_ordnance():
 		return {"allowed": false, "reason": "Боевой контакт"}
 	if convoy_course or convoy_order.in_danger(self):
 		return {"allowed": false, "reason": "Сближение с конвоем"}
@@ -967,6 +982,7 @@ func select_target(index: int) -> bool:
 	if jump_seconds_left > 0.0 or Catalog.system_of_site(index) != system_id or index == docked or index == landed_site or not _site_available(index, expedition):
 		return false
 	_cargo_pods.tracked = -1
+	_tracked_hyperspace_id = ""
 	if docked >= 0 or landed:
 		planned_target = index
 	else:
@@ -1098,6 +1114,7 @@ func set_autopilot(enabled: bool) -> void:
 	if not autopilot:
 		return
 	_cargo_pods.tracked = -1
+	_tracked_hyperspace_id = ""
 	_release_speed_hold(false)
 	for index: int in local_targets():
 		if Catalog.is_star(index):
@@ -1773,13 +1790,16 @@ func passenger_board() -> Array[Dictionary]:
 	var interstellar := _nearest_interstellar_port()
 	if interstellar >= 0:
 		offers.append(Passengers.offer(docked, interstellar))
+	var seats_available := int(current.capacity) - _missing_person.occupied_seats()
 	for offer in offers:
-		offer.available = not current.active and current.debt == 0 and offer.seats <= current.capacity
+		offer.available = not current.active and current.debt == 0 and offer.seats <= seats_available
 	return offers
 
 
 func passenger_status() -> Dictionary:
 	var status := passengers.status(orbit_time)
+	status.rescue_seats = _missing_person.occupied_seats()
+	status.free_seats = int(status.capacity) - int(status.seats) - int(status.rescue_seats)
 	var at_berth := station_services_available()
 	var at_origin: bool = status.active and docked == status.origin and not status.overdue
 	var at_destination: bool = status.active and docked == status.destination and not status.overdue
@@ -1866,6 +1886,53 @@ func passenger_follow() -> bool:
 	return selected
 
 
+func search_status() -> Dictionary:
+	var status := _missing_person.status(self)
+	if status.stage == "evacuate" and not station_services_available():
+		status.route_site = _nearest_passenger_berth()
+	var site := int(status.route_site)
+	status.can_follow = site >= 0 and site != docked and site != landed_site and jump_seconds_left <= 0.0 and not _departure_requested
+	return status
+
+
+func search_action(action: String) -> bool:
+	if action != "follow":
+		return _apply_service_result(_missing_person.act(action, self))
+	var status := search_status()
+	if not status.can_follow:
+		return false
+	var site := int(status.route_site)
+	var destination := Catalog.system_of_site(site)
+	var selected := select_target(site) if destination == system_id else plan_route(destination)
+	if selected:
+		_announce("missing_course", "Курс поискового рейса на «%s»." % target_name(site))
+	return selected
+
+
+func recon_status() -> Dictionary:
+	var status := _reconnaissance.status(self)
+	var site := _reconnaissance.course()
+	status.can_plot = site >= 0 and site != docked and jump_seconds_left <= 0.0 and not _departure_requested
+	return status
+
+
+func recon_action(action: String) -> bool:
+	if action == "follow":
+		if not recon_status().can_plot:
+			return false
+		var site := _reconnaissance.course()
+		var destination := Catalog.system_of_site(site)
+		var selected := select_target(site) if destination == system_id else plan_route(destination)
+		if selected:
+			_announce("recon_course", "Курс задания на съёмку к «%s»." % target_name(site))
+		return selected
+	var result := _reconnaissance.action(self, action)
+	if result.event == "recon_denied":
+		_announce(result.event, result.message)
+		return false
+	return _apply_service_result(result)
+
+
 func _apply_service_result(result: Dictionary) -> bool:
 	if result.is_empty() or not result.ok:
 		return false
@@ -1877,18 +1944,48 @@ func _apply_service_result(result: Dictionary) -> bool:
 func career_status() -> Dictionary:
 	var result := career.status()
 	var dispatch := career.dispatch_status(orbit_time)
+	var order := career.order_status(orbit_time)
 	var service := station_services_available()
 	var destination := int(dispatch.destination)
+	var issuer := factions.owner(system_id)
 	result.dispatch = dispatch
-	result.offer = career.dispatch_offer(factions.owner(system_id), docked, _default_port(docked), orbit_time) if service else {}
+	result.offer = career.dispatch_offer(issuer, docked, _default_port(docked), orbit_time) if service else {}
 	result.can_submit = service and dispatch.active and docked == destination
 	result.can_follow = dispatch.active and docked != destination and jump_seconds_left <= 0.0 and not _departure_requested
+	result.order = order
+	result.order_offers = {}
+	if service:
+		for kind: String in PilotCareer.ORDERS:
+			var site := _career_survey_site() if kind == "recon" else -1
+			result.order_offers[kind] = career.order_offer(kind, issuer, docked, site, orbit_time)
+	result.order_can_submit = order.active and order.proved and service and docked == int(order.origin) \
+		and issuer == int(order.issuer) and credits <= PilotCareer.MAX_BOUNTY_CREDITS - int(order.reward)
+	result.order_can_probe = _military_observation_ready(order)
+	var route := _order_route_target(order)
+	result.order_route = route
+	result.order_can_follow = route >= 0 and route != docked and jump_seconds_left <= 0.0 and not _departure_requested
+	result.wanted = _wanted_raider()
 	return result
 
 
-func career_dispatch_action() -> bool:
+func career_dispatch_action(kind := "dispatch") -> bool:
+	var order := career.order_status(orbit_time)
+	if order.active:
+		if kind != str(order.kind):
+			return false
+		if _military_observation_ready(order) and career.prove_order(kind, system_id, orbit_time):
+			_announce("career_order_proved", "Разведданные записаны. Вернитесь в порт с докладом.")
+			return true
+		var origin := int(order.origin)
+		if not station_services_available() or docked != origin or credits > PilotCareer.MAX_BOUNTY_CREDITS - int(order.reward):
+			return false
+		var withdrawal := career.cancel_lost_jurisdiction(factions.owner(system_id))
+		return _apply_service_result(withdrawal if not withdrawal.is_empty() else career.finish_order(docked, orbit_time))
 	if not station_services_available():
 		return false
+	if kind != "dispatch":
+		var site := _career_survey_site() if kind == "recon" else -1
+		return _apply_service_result(career.accept_order(kind, factions.owner(system_id), docked, site, orbit_time))
 	var dispatch := career.dispatch_status(orbit_time)
 	if dispatch.active:
 		return _apply_service_result(career.finish_dispatch(docked, orbit_time))
@@ -1897,14 +1994,49 @@ func career_dispatch_action() -> bool:
 
 func career_follow() -> bool:
 	var status := career_status()
-	if not status.can_follow:
+	if not status.can_follow and not status.order_can_follow:
 		return false
-	var destination := int(status.dispatch.destination)
+	var destination := int(status.order_route) if status.order.active else int(status.dispatch.destination)
 	var sector := Catalog.system_of_site(destination)
 	if not (select_target(destination) if sector == system_id else plan_route(sector)):
 		return false
-	_announce("career_dispatch_course", "Курс служебной депеши на «%s»." % target_name(destination))
+	_announce("career_order_course" if status.order.active else "career_dispatch_course",
+		"Служебный курс на «%s»." % target_name(destination))
 	return true
+
+
+func _career_survey_site() -> int:
+	for site: int in Catalog.mines_for(system_id):
+		if _site_available(site, expedition):
+			return site
+	return -1
+
+
+func _order_route_target(order: Dictionary) -> int:
+	if not order.active:
+		return -1
+	return int(order.site) if order.kind == "recon" and not order.proved else int(order.origin)
+
+
+func _military_observation_ready(order: Dictionary) -> bool:
+	if not order.active or order.kind != "recon" or order.proved or docked >= 0 or landed or jump_seconds_left > 0.0:
+		return false
+	var site := int(order.site)
+	if Catalog.system_of_site(site) != system_id or orbit_time >= float(order.deadline):
+		return false
+	var point := target_position(site)
+	var offset := point - position
+	var range_from_surface := offset.length() - float(Catalog.site(site).radius)
+	return range_from_surface >= 5.0 and range_from_surface <= 180.0 and speed_relative_to(site) <= 45.0 \
+		and forward().dot(offset.normalized()) >= 0.82
+
+
+func _wanted_raider() -> Dictionary:
+	var target := ambient_status()
+	if not target.hostile:
+		return {}
+	var reward := PilotCareer.bounty_offer(system_id, int(target.get("cycle", -1)), factions.owner(system_id))
+	return {"name": target.name, "id": target.id, "reward": reward} if reward > 0 else {}
 
 
 func story_status() -> Dictionary:
@@ -2134,7 +2266,14 @@ func traffic_contacts() -> Array[Dictionary]:
 			if contact.id == order.id:
 				contact.hull = order.enemy_hull
 				break
-	contacts.append_array(ambient.contacts(self))
+	var issuer := factions.owner(system_id)
+	for contact: Dictionary in ambient.contacts(self):
+		if contact.role == "raider":
+			var award := PilotCareer.bounty_offer(system_id, int(contact.cycle), issuer)
+			if award > 0:
+				contact.bounty = award
+				contact.name += " · в розыске"
+		contacts.append(contact)
 	return contacts
 
 
@@ -2145,6 +2284,41 @@ func combat_beams() -> Array[Dictionary]:
 	beams.append_array(convoy_order.beams())
 	beams.append_array(ambient.beams(self))
 	return beams
+
+
+func combat_lock_id() -> String:
+	_targeting.current(self)
+	return _targeting.lock_id
+
+
+func combat_lock_contact() -> Dictionary:
+	return _targeting.current(self)
+
+
+func combat_contact_for_weapon(id: String) -> Dictionary:
+	return {} if id.is_empty() else CombatTargeting.attackable(self).get(id, {})
+
+
+func combat_targetable_contacts() -> Dictionary:
+	return CombatTargeting.attackable(self)
+
+
+func select_combat_contact(id: String) -> bool:
+	if id.is_empty():
+		if combat_lock_id().is_empty():
+			return false
+		_targeting.lock_id = ""
+		_announce("combat_lock_clear", "Боевой захват снят.")
+		return true
+	if not _targeting.select(self, id):
+		return false
+	_announce("combat_lock", "Боевой захват · %s." % combat_contact_for_weapon(id).name)
+	return true
+
+
+func scanner_status(contacts: Array[Dictionary]) -> Dictionary:
+	return {"lock": combat_lock_id(), "radar_mapper": _targeting.mapper_fitted,
+		"range": CombatTargeting.SCANNER_RANGE, "contacts": _targeting.scanner(self, contacts)}
 
 
 func ambient_status() -> Dictionary:
@@ -2259,9 +2433,13 @@ func project_action() -> bool:
 
 
 func combat_equipment_status() -> Dictionary:
+	var ordnance := combat.ordnance
 	return {
 		"weapon": combat.weapon, "name": combat.profile().name, "shield_fitted": combat.shield_fitted,
 		"ecm_fitted": combat.ecm_fitted, "focus_owned": combat.focus_owned, "damaged": combat.damaged,
+		"ecm_advanced": combat.ecm_advanced, "launcher_fitted": ordnance.fitted, "decoy_count": ordnance.decoys,
+		"missile_type": ordnance.selected, "missile_ammo": ordnance.ammo_counts(),
+		"missile_slots": ordnance.slots.duplicate(), "missile_slot": ordnance.selected_slot,
 		"station": station_services_available(),
 	}
 
@@ -2273,29 +2451,146 @@ func select_weapon(id: String) -> bool:
 	return true
 
 
+func select_missile(id: String) -> bool:
+	if (not station_services_available() and _ordnance_blocked()) or not combat.ordnance.select(id):
+		return false
+	_announce_missile_selection()
+	return true
+
+
+func select_missile_slot(slot: int) -> bool:
+	if (not station_services_available() and _ordnance_blocked()) or not combat.ordnance.select_slot(slot):
+		return false
+	_announce_missile_selection()
+	return true
+
+
+func next_missile_slot() -> int:
+	var ordnance := combat.ordnance
+	for offset in range(1, ordnance.slots.size() + 1):
+		var slot := (ordnance.selected_slot + offset) % ordnance.slots.size()
+		if slot != ordnance.selected_slot and not ordnance.slots[slot].is_empty():
+			return slot
+	return -1
+
+
+func _announce_missile_selection() -> void:
+	var ordnance := combat.ordnance
+	_announce("combat_missile_selected", "Ракета «%s», направляющая %d." % [
+		CombatOrdnance.PROFILES[ordnance.selected].name, ordnance.selected_slot + 1])
+
+
+func missile_status(locked_contact_id := "") -> Dictionary:
+	var ordnance := combat.ordnance
+	var profile: Dictionary = CombatOrdnance.PROFILES[ordnance.selected]
+	var ammo := ordnance.slots.count(ordnance.selected)
+	var reason := ""
+	if _ordnance_blocked():
+		reason = "Ракеты доступны в открытом полёте."
+	elif not ordnance.fitted:
+		reason = "Установите пусковую раму в порту."
+	elif ammo <= 0:
+		reason = "Выбранные ракеты израсходованы."
+	elif not ordnance.missile.is_empty():
+		reason = "Предыдущая ракета ещё в полёте."
+	elif orbit_time + float(profile.life) > SAVE_CLOCK_LIMIT:
+		reason = "Достигнут предел игрового календаря."
+	else:
+		reason = _missile_target_denial(locked_contact_id, float(profile.range))
+	return {"fitted": ordnance.fitted, "selected": ordnance.selected, "name": profile.name, "slot": ordnance.selected_slot,
+		"ammo": ammo, "ready": reason.is_empty(), "reason": reason, "next_slot": next_missile_slot(),
+		"projectile": ordnance.missile.duplicate()}
+
+
+func _missile_target_denial(id: String, reach: float) -> String:
+	if id.is_empty() or id != combat_lock_id():
+		return "Захватите враждебный корабль."
+	var contact := combat_contact_for_weapon(id)
+	if contact.is_empty():
+		return "Боевой контакт потерян."
+	var offset: Vector3 = contact.position - position
+	if offset.length_squared() > reach * reach:
+		return "Сблизьтесь с целью до %d м." % int(reach)
+	if offset.length_squared() < 1.0 or forward().dot(offset.normalized()) < 0.0:
+		return "Поверните нос в сторону захваченной цели."
+	return "" if combat_line_clear(position, contact.position) else "Цель закрыта препятствием."
+
+
+func launch_missile(locked_contact_id: String) -> bool:
+	var status := missile_status(locked_contact_id)
+	if not status.ready or not combat.ordnance.launch(position, attitude(), system_id, locked_contact_id, orbit_time):
+		return false
+	reset_time_scale()
+	_announce("combat_player_missile", "Ракета «%s» запущена по захваченной цели." % status.name)
+	return true
+
+
+func decoy_status() -> Dictionary:
+	var ordnance := combat.ordnance
+	var active := not ordnance.decoy.is_empty()
+	var reason := ""
+	if _ordnance_blocked():
+		reason = "Ловушки доступны в открытом полёте."
+	elif active:
+		reason = "Предыдущая ловушка ещё работает."
+	elif ordnance.decoys <= 0:
+		reason = "Ловушек нет. Пополните запас в порту."
+	elif orbit_time + CombatOrdnance.DECOY_LIFETIME > SAVE_CLOCK_LIMIT:
+		reason = "Достигнут предел игрового календаря."
+	return {"count": ordnance.decoys, "ready": reason.is_empty(), "reason": reason, "active": active,
+		"position": ordnance.decoy.get("position", Vector3.ZERO), "velocity": ordnance.decoy.get("velocity", Vector3.ZERO)}
+
+
+func launch_decoy() -> bool:
+	if not decoy_status().ready:
+		return false
+	var incoming := combat.projectile_status()
+	var side := attitude().x
+	if not incoming.is_empty():
+		var approach := position.direction_to(incoming.position)
+		if not approach.is_zero_approx():
+			side = side.slide(approach)
+			if side.length_squared() <= 0.001:
+				side = attitude().y.slide(approach)
+			side = side.normalized()
+	if not combat.ordnance.launch_decoy(position, side, velocity, system_id, orbit_time):
+		return false
+	reset_time_scale()
+	_announce("combat_decoy", "Выпущена ложная цель.")
+	return true
+
+
+func _ordnance_blocked() -> bool:
+	return docked >= 0 or landed or jump_seconds_left > 0.0 or time_paused or ship.hull <= 1.0
+
+
 func combat_status() -> Dictionary:
 	var incoming := combat.projectile_status()
 	var active := not incoming.is_empty()
 	var parked := docked >= 0 or landed or jump_seconds_left > 0.0
 	var local_contact := patrol.in_danger(self) or convoy_order.in_danger(self) or ambient.in_danger(self)
 	var reason := combat.ecm_denial(position, orbit_time)
+	var missile := missile_status(combat_lock_id())
+	var decoy := decoy_status()
 	if parked:
 		reason = "Помехи доступны в открытом полёте"
 	return {
-		"visible": not parked and (local_contact or active or combat.heat > 0.01 or combat.shield_fitted),
+		"visible": not parked and (local_contact or active or combat.heat > 0.01 or combat.shield_fitted
+			or not missile.projectile.is_empty() or decoy.active),
 		"heat": combat.heat, "shield": combat.shield,
 		"shield_max": CombatSystems.SHIELD_CAPACITY if combat.shield_fitted else 0.0,
 		"weapon": combat.weapon, "name": combat.profile().name, "damaged": combat.damaged,
 		"projectile": active, "projectile_distance": position.distance_to(incoming.position) if active else -1.0,
 		"ecm_fitted": combat.ecm_fitted, "ecm_ok": reason.is_empty(), "ecm_reason": reason,
+		"ecm_advanced": combat.ecm_advanced, "incoming_hardened": incoming.get("hardened", false),
+		"missile": missile, "decoy": decoy,
 		"position": incoming.get("position", Vector3.ZERO), "velocity": incoming.get("velocity", Vector3.ZERO),
 		"fire_blocked": combat.fire_denial(orbit_time),
 	}
 
 
 func use_ecm() -> bool:
-	var status := combat_status()
-	if not status.ecm_ok or not combat.use_ecm(position, orbit_time):
+	if _ordnance_blocked() or not combat.use_ecm(position, orbit_time):
 		return false
 	reset_time_scale()
 	_announce("combat_ecm", "Радиопомехи сорвали подлёт ракеты.")
@@ -2304,13 +2599,19 @@ func use_ecm() -> bool:
 
 func fire_status() -> Dictionary:
 	var bonus := float(combat.profile().range_bonus)
-	var channel := _fire_channel()
+	var requested := _targeting.lock_id
+	var locked := _targeting.current(self)
+	if not requested.is_empty() and locked.is_empty():
+		return {"ok": false, "reason": "Боевой контакт потерян", "distance": -1.0, "channel": ""}
+	var channel: String = _fire_channel() if locked.is_empty() else locked.channel
 	var status := {}
 	match channel:
 		"convoy": status = convoy_order.fire_status(self, bonus)
 		"patrol": status = patrol.fire_status(self, bonus)
 		"ambient": status = ambient.fire_status(self, bonus)
 	status.channel = channel
+	if not locked.is_empty():
+		status.id = locked.id
 	if status.ok:
 		var reason := combat.fire_denial(orbit_time)
 		if not reason.is_empty():
@@ -2380,6 +2681,7 @@ func fire_action() -> bool:
 		"convoy": _apply_convoy_result(shot)
 		"patrol": _apply_patrol_result(shot)
 		"ambient": _apply_ambient_result(shot)
+	_targeting.current(self)
 	return shot.get("ok", false)
 
 
@@ -2387,8 +2689,18 @@ func _apply_ambient_result(result: Dictionary) -> void:
 	var event := str(result.get("event", ""))
 	if event.is_empty():
 		return
+	var message := str(result.get("message", ""))
 	if event == "ambient_victory":
-		career.note_ambient_victory()
+		var region := int(result.get("system", system_id))
+		var cycle := int(result.get("cycle", CivilianTraffic._cycle(region, orbit_time)))
+		var award := career.note_ambient_victory(region, cycle, factions.owner(region), PilotCareer.MAX_BOUNTY_CREDITS - credits)
+		if award.is_empty():
+			return
+		credits += int(award.paid)
+		if award.paid > 0:
+			message += " Премия за розыск %d кр." % int(award.paid)
+		if career.prove_order("intercept", region, orbit_time):
+			message += " Перехват подтверждён. Доложите в порту выдачи приказа."
 	if event == "ambient_engaged":
 		reset_time_scale()
 		if not patrol.in_danger(self) and not convoy_order.in_danger(self):
@@ -2396,7 +2708,7 @@ func _apply_ambient_result(result: Dictionary) -> void:
 	if result.has("damage"):
 		_apply_hostile_beam(event, result)
 	else:
-		_announce(event, str(result.get("message", "")))
+		_announce(event, message)
 
 
 func _apply_patrol_result(result: Dictionary) -> void:
@@ -2449,7 +2761,8 @@ func _apply_hostile_beam(event: String, result: Dictionary) -> void:
 		if remainder > 0.0:
 			message += " Корпус получил %.0f ед." % remainder
 	var source: Variant = result.get("source")
-	if source is Vector3 and combat.incoming_shot(source, position, system_id, orbit_time):
+	var hardened := event.begins_with("convoy_")
+	if source is Vector3 and combat.incoming_shot(source, position, system_id, orbit_time, hardened):
 		reset_time_scale()
 		_announce("combat_missile", message + " Противник выпустил ракету.")
 	else:
@@ -2457,16 +2770,31 @@ func _apply_hostile_beam(event: String, result: Dictionary) -> void:
 
 
 func _advance_combat_projectile(previous_ship: Vector3, delta: float) -> void:
-	var sweep := combat.advance_projectile(orbit_time, delta)
+	var decoy_sweep := combat.ordnance.advance_decoy(orbit_time, delta)
+	if not decoy_sweep.is_empty() and not combat_line_clear(decoy_sweep.from, decoy_sweep.to):
+		combat.ordnance.decoy.clear()
+		decoy_sweep.clear()
+	var incoming := combat.projectile_status()
+	var aim := position
+	var follows_decoy := not incoming.is_empty() and not decoy_sweep.is_empty() \
+		and Vector3(incoming.position).distance_squared_to(decoy_sweep.from) <= pow(CombatOrdnance.DECOY_PULL_RANGE, 2)
+	if follows_decoy:
+		aim = decoy_sweep.to
+	var sweep := combat.advance_projectile(orbit_time, delta, aim)
 	if sweep.is_empty():
 		return
 	if int(sweep.system) != system_id or not combat_line_clear(sweep.from, sweep.to):
 		combat.clear_projectile()
 		return
-	var relative_start: Vector3 = sweep.from - previous_ship
-	var relative_end: Vector3 = sweep.to - position
-	var nearest := Geometry3D.get_closest_point_to_segment(Vector3.ZERO, relative_start, relative_end)
-	if nearest.length_squared() > MISSILE_HIT_RADIUS * MISSILE_HIT_RADIUS:
+	var relative_start: Vector3 = sweep.from - previous_ship.lerp(position, sweep.start)
+	var relative_end: Vector3 = sweep.to - previous_ship.lerp(position, sweep.finish)
+	var impact := CombatOrdnance.contact_fraction(relative_start, relative_end, MISSILE_HIT_RADIUS)
+	if follows_decoy and _decoy_impact(sweep, decoy_sweep) < impact:
+		combat.clear_projectile()
+		combat.ordnance.decoy.clear()
+		_announce("combat_decoy_hit", "Входящая ракета поразила ложную цель.")
+		return
+	if not is_finite(impact):
 		return
 	combat.clear_projectile()
 	var remainder := combat.absorb_hit(MISSILE_DAMAGE, orbit_time)
@@ -2481,6 +2809,51 @@ func _advance_combat_projectile(previous_ship: Vector3, delta: float) -> void:
 	elif module == "ecm":
 		message += " Блок радиопомех отключён."
 	_announce("combat_missile_hit", message)
+
+
+static func _decoy_impact(projectile: Dictionary, lure: Dictionary) -> float:
+	var window_start := maxf(projectile.start, lure.start)
+	var window_end := minf(projectile.finish, lure.finish)
+	if window_end <= window_start:
+		return INF
+	var missile_span := float(projectile.finish) - float(projectile.start)
+	var decoy_span := float(lure.finish) - float(lure.start)
+	var first := (window_start - float(projectile.start)) / missile_span
+	var last := (window_end - float(projectile.start)) / missile_span
+	var from: Vector3 = projectile.from.lerp(projectile.to, first) - lure.from.lerp(lure.to, (window_start - lure.start) / decoy_span)
+	var to: Vector3 = projectile.from.lerp(projectile.to, last) - lure.from.lerp(lure.to, (window_end - lure.start) / decoy_span)
+	var impact := CombatOrdnance.contact_fraction(from, to, CombatOrdnance.DECOY_HIT_RADIUS)
+	return lerpf(first, last, impact) if is_finite(impact) else INF
+
+
+func _advance_player_missile(delta: float) -> void:
+	var missile := combat.ordnance.missile
+	if missile.is_empty():
+		return
+	var id: String = missile.target
+	var contact := combat_contact_for_weapon(id)
+	if int(missile.system) != system_id or contact.is_empty():
+		missile.clear()
+		return
+	var profile: Dictionary = CombatOrdnance.PROFILES[missile.type]
+	var sweep := combat.ordnance.advance_missile(orbit_time, delta, contact.position)
+	if sweep.is_empty():
+		return
+	if not combat_line_clear(sweep.from, sweep.to):
+		combat.ordnance.missile.clear()
+		return
+	var contact_position: Vector3 = contact.position
+	var contact_velocity: Vector3 = contact.velocity
+	var from: Vector3 = sweep.from - (contact_position - contact_velocity * delta * (1.0 - float(sweep.start)))
+	var to: Vector3 = sweep.to - (contact_position - contact_velocity * delta * (1.0 - float(sweep.finish)))
+	if not is_finite(CombatOrdnance.contact_fraction(from, to, CombatOrdnance.HIT_RADIUS)):
+		return
+	combat.ordnance.missile.clear()
+	var damage := float(profile.damage)
+	match str(contact.channel):
+		"patrol": _apply_patrol_result(patrol.missile_hit(self, id, damage))
+		"ambient": _apply_ambient_result(ambient.missile_hit(self, id, damage))
+		"convoy": _apply_convoy_result(convoy_order.missile_hit(self, id, damage))
 
 
 func combat_line_clear(start: Vector3, finish: Vector3) -> bool:
@@ -2630,6 +3003,15 @@ func collect_fragment() -> bool:
 
 
 func service_offer(action: String) -> Dictionary:
+	if action == "hyperspace_analyzer":
+		return {"cost": HyperspaceTrails.ANALYZER_COST, "installed": _hyperspace.installed,
+			"allowed": station_services_available() and not _hyperspace.installed and credits >= HyperspaceTrails.ANALYZER_COST}
+	if action == "jump_repair":
+		return {"cost": 0, "installed": not _hyperspace.drive_fault,
+			"allowed": station_services_available() and _hyperspace.drive_fault}
+	if action == "radar_mapper":
+		return {"cost": CombatTargeting.MAPPER_PRICE, "installed": _targeting.mapper_fitted,
+			"allowed": station_services_available() and not _targeting.mapper_fitted and credits >= CombatTargeting.MAPPER_PRICE}
 	var unit_price := repair_unit_price() if action == "repair" else refuel_unit_price()
 	var offer := combat.service_offer(action, credits) if action.begins_with("combat_") else ship.service_offer(action, unit_price, credits)
 	offer.allowed = offer.allowed and station_services_available()
@@ -2637,12 +3019,28 @@ func service_offer(action: String) -> Dictionary:
 
 
 func service_action(action: String) -> bool:
+	if action in ["hyperspace_analyzer", "jump_repair"]:
+		if not service_offer(action).allowed:
+			return false
+		if action == "hyperspace_analyzer":
+			credits -= HyperspaceTrails.ANALYZER_COST
+			_hyperspace.installed = true
+			_announce("hyperspace_analyzer", "Анализатор гиперпространственных следов установлен.")
+		else:
+			_hyperspace.drive_fault = false
+			_announce("jump_repaired", "Привод перезапущен и прошёл проверку. Прыжки доступны.")
+		return true
 	if action == "autopilot":
 		return autopilot_equipment_action()
 	if action in ["berth_pay", "berth_defer", "civic_donate"]:
 		return _port_account_action(action)
 	if not service_offer(action).allowed:
 		return false
+	if action == "radar_mapper":
+		credits -= CombatTargeting.MAPPER_PRICE
+		_targeting.mapper_fitted = true
+		_announce("service_radar_mapper", "Радар-картограф установлен.")
+		return true
 	var unit_price := repair_unit_price() if action == "repair" else refuel_unit_price()
 	var paid := combat.buy(action, credits) if action.begins_with("combat_") else ship.buy(action, unit_price, credits)
 	if paid <= 0:
@@ -2678,6 +3076,14 @@ func service_action(action: String) -> bool:
 			_announce("service_combat_shield", "Генератор щита установлен. Списано %d кр." % paid)
 		"combat_ecm":
 			_announce("service_combat_ecm", "Блок радиопомех установлен. Списано %d кр." % paid)
+		"combat_ecm_advanced":
+			_announce("service_combat_ecm_advanced", "Усилитель РЭБ установлен. Списано %d кр." % paid)
+		"combat_launcher":
+			_announce("service_combat_launcher", "Пусковая рама на четыре ракеты установлена. Списано %d кр." % paid)
+		"combat_missile_dart", "combat_missile_lance":
+			_announce("service_" + action, "Ракета размещена на пусковой раме. Списано %d кр." % paid)
+		"combat_decoy":
+			_announce("service_combat_decoy", "Ложная цель загружена. Списано %d кр." % paid)
 		"combat_focus":
 			_announce("service_combat_focus", "Лазер «Нить» установлен. Списано %d кр." % paid)
 		"combat_repair":
@@ -2895,6 +3301,7 @@ func target_cargo_pod(id := -1) -> bool:
 		var index := _cargo_pod_index(pods, int(status.id))
 		status = cargo_pod_status(int(pods[(index + 1) % pods.size()].id))
 	_cargo_pods.tracked = int(status.id)
+	_tracked_hyperspace_id = ""
 	_announce("cargo_pod_targeted", "Контейнер отмечен · %s." % str(status.name))
 	return true
 
@@ -3192,7 +3599,82 @@ func jump_drive_status() -> Dictionary:
 		"load": mining.ore_hold, "capacity": ship.cargo_capacity(), "jump_capacity": ship.jump_capacity(),
 		"mass_t": ship.flight_mass(mining.ore_hold), "dry_mass_t": ship.dry_mass(),
 		"range_ly": _generated_jump_range(ship.jump_fuel), "max_range_ly": _generated_jump_range(ship.jump_capacity()),
+		"analyzer": _hyperspace.installed, "fault": _hyperspace.drive_fault,
 	}
+
+
+func local_hyperspace_trails() -> Array[Dictionary]:
+	if _jump_transit_duration > 0.0:
+		return []
+	var trails := _hyperspace.local(system_id, orbit_time)
+	for echo: Dictionary in freight.hyperspace_windows(system_id, orbit_time):
+		if not station_operational(int(echo.port)):
+			continue
+		echo.position = Traffic.hyperspace_echo_position(self, int(echo.port), int(echo.slot))
+		echo.mass = ShipSystems.FREIGHTER_DRY_MASS + float(echo.cargo) * ShipSystems.CARGO_UNIT_MASS
+		trails.append(echo)
+	trails.sort_custom(func(left: Dictionary, right: Dictionary) -> bool:
+		return position.distance_squared_to(left.position) < position.distance_squared_to(right.position))
+	return trails
+
+
+func hyperspace_trail_status(id := "") -> Dictionary:
+	var trails := local_hyperspace_trails()
+	var preferred := _tracked_hyperspace_id if id.is_empty() else id
+	var selected: Dictionary = {}
+	for echo: Dictionary in trails:
+		if echo.id == preferred:
+			selected = echo
+			break
+	if selected.is_empty() and id.is_empty() and not trails.is_empty():
+		selected = trails.front()
+	var active := not selected.is_empty()
+	var at: Vector3 = selected.get("position", Vector3.ZERO)
+	var distance := position.distance_to(at) if active else -1.0
+	var reason := ""
+	if not active:
+		reason = "В этой системе нет активного следа."
+	elif not _hyperspace.installed:
+		reason = "Установите анализатор следов в порту."
+	elif distance > HyperspaceTrails.ANALYZER_RANGE:
+		reason = "Подойдите к следу на %d м." % int(HyperspaceTrails.ANALYZER_RANGE)
+	var readable := reason.is_empty()
+	var targetable := active and docked < 0 and not landed and not autopilot and jump_seconds_left <= 0.0
+	return {"active": active, "count": trails.size(), "id": str(selected.get("id", "")),
+		"position": at, "distance": distance, "installed": _hyperspace.installed, "reason": reason,
+		"tracking": active and selected.id == _tracked_hyperspace_id, "targetable": targetable,
+		"readable": readable, "kind": str(selected.kind) if readable else "",
+		"name": str(selected.name) if readable else "Гиперпространственный след",
+		"origin": int(selected.origin) if readable else -1, "destination": int(selected.destination) if readable else -1,
+		"mass": float(selected.mass) if readable else -1.0, "eta": float(selected.eta) if readable else -1.0,
+		"remaining": float(selected.get("remaining", 0.0))}
+
+
+func target_hyperspace_trail(id := "") -> bool:
+	var status := hyperspace_trail_status(id)
+	if not status.targetable:
+		return false
+	if id.is_empty() and status.tracking and int(status.count) > 1:
+		var candidates := local_hyperspace_trails()
+		for index in range(candidates.size()):
+			if candidates[index].id == status.id:
+				status = hyperspace_trail_status(str(candidates[(index + 1) % candidates.size()].id))
+				break
+	_tracked_hyperspace_id = str(status.id)
+	_cargo_pods.tracked = -1
+	_announce("hyperspace_trail_targeted", "Гиперпространственный след отмечен.")
+	return true
+
+
+func analyze_hyperspace_trail(id := "") -> bool:
+	var status := hyperspace_trail_status(id)
+	if not status.readable:
+		_announce("hyperspace_analysis_denied", status.reason)
+		return false
+	var origin := str(Catalog.system(int(status.origin)).name)
+	var destination := str(Catalog.system(int(status.destination)).name)
+	_announce("hyperspace_analyzed", "След %s → %s · %.1f т." % [origin, destination, status.mass])
+	return true
 
 
 func _generated_jump_range(reserve: float) -> float:
@@ -3229,9 +3711,18 @@ func jump_progress_status() -> Dictionary:
 	var time_left := jump_seconds_left if transit else maxf(0.0, jump_seconds_left - JUMP_TRANSIT_WALL)
 	var phase_length := JUMP_TRANSIT_WALL if transit else _jump_charge_total - JUMP_TRANSIT_WALL
 	var fare := _jump_paid_fare if transit else jump_tariff(system_id, jump_target)
+	var destination := jump_target
+	var requested := _jump_requested
+	if active and _jump_emergency:
+		var diverted := emergency_jump_status()
+		destination = int(diverted.destination)
+		requested = jump_target
+		fare = int(diverted.cost)
+		duration = float(diverted.duration)
 	return {
 		"phase": ("transit" if transit else "charge") if active else "idle", "active": active, "is_transit": transit,
-		"remaining": time_left, "duration": duration, "fare": fare, "destination": jump_target,
+		"remaining": time_left, "duration": duration, "fare": fare, "destination": destination,
+		"emergency": requested >= 0, "requested": requested,
 		"progress": clampf(1.0 - time_left / phase_length, 0.0, 1.0) if active else 0.0,
 		"arrival_epoch": orbit_time + duration + (0.0 if transit else time_left),
 	}
@@ -3308,23 +3799,27 @@ static func _known_systems(progress: RefCounted, atlas: RefCounted) -> Array[int
 	return systems
 
 
-func jump_status(destination: int) -> Dictionary:
+func jump_status(destination: int, emergency := false) -> Dictionary:
 	var cost := jump_tariff(system_id, destination) if system_known(destination) else 0
 	var reason := ""
 	var duration := jump_travel_seconds(system_id, destination)
+	if emergency and _jump_transit_duration <= 0.0:
+		duration += EMERGENCY_EXTRA_SECONDS
 	if _jump_transit_duration > 0.0:
 		reason = "Корабль в гиперпространстве"
 	elif cost == 0:
 		reason = "Выберите другую звёздную систему"
+	elif _hyperspace.drive_fault:
+		reason = "Привод заблокирован. Перезапустите его в порту."
 	elif docked >= 0 or landed:
 		reason = "Выйдите в открытый космос"
 	elif autopilot or scooping:
 		reason = "Отключите автопилот и сбор топлива"
 	elif Atmosphere.sample(self, position, velocity).inside:
 		reason = "Выйдите из атмосферы"
-	elif patrol.in_danger(self) or ambient.in_danger(self) or not combat.projectile_status().is_empty():
+	elif not combat.projectile_status().is_empty() or (not emergency and (patrol.in_danger(self) or ambient.in_danger(self))):
 		reason = "Выйдите из зоны боя"
-	elif convoy_order.in_danger(self):
+	elif not emergency and convoy_order.in_danger(self):
 		reason = "Отойдите от конвоя"
 	elif speed() > JUMP_SPEED:
 		reason = "Снизьте скорость до %d м/с" % int(JUMP_SPEED)
@@ -3346,6 +3841,41 @@ func jump_status(destination: int) -> Dictionary:
 	return {"ok": reason.is_empty(), "reason": "Можно зарядить прыжковый привод" if reason.is_empty() else reason, "cost": cost, "duration": duration}
 
 
+func emergency_jump_status(destination := -1) -> Dictionary:
+	var requested := jump_target if destination < 0 else destination
+	var result := {"ok": false, "reason": "", "cost": 0, "duration": 0.0,
+		"destination": -1, "requested": requested, "damage_eligible": ship.hull <= EMERGENCY_HULL_LIMIT,
+		"fault_risk": ship.hull <= EMERGENCY_FAULT_LIMIT}
+	if ship.hull > EMERGENCY_HULL_LIMIT:
+		result.reason = "Аварийный режим доступен при корпусе до %d%%." % int(EMERGENCY_HULL_LIMIT)
+	elif requested == system_id or not system_known(requested):
+		result.reason = "Проложите межзвёздный курс."
+	else:
+		var refuge := _emergency_refuge(system_id, requested, expedition, ship, mining.ore_hold, ship.jump_fuel)
+		if refuge < 0:
+			result.reason = "Нет достижимой станции для аварийного выхода."
+		else:
+			result.destination = refuge
+			result.merge(jump_status(refuge, true), true)
+	return result
+
+
+static func _emergency_refuge(origin: int, requested: int, progress: RefCounted, fitted: RefCounted,
+		payload: int, reserve: float) -> int:
+	var refuge := -1
+	var price := INF
+	for candidate in range(Catalog.AUTHORED_SYSTEM_COUNT):
+		if candidate in [origin, requested] or not progress.known(candidate):
+			continue
+		if candidate >= Catalog.CORE_SYSTEM_COUNT and not progress.commissioned(candidate):
+			continue
+		var fare: int = fitted.jump_tariff(Catalog.jump_cost(origin, candidate), payload, reserve)
+		if fare > 0 and fare <= reserve and fare < price:
+			refuge = candidate
+			price = fare
+	return refuge
+
+
 func _clear_during_charge(star: int, clearance: float) -> bool:
 	var duration := NAVIGATOR_JUMP_CHARGE if crew.active_role("navigator") else JUMP_CHARGE
 	var stop := speed() / JUMP_BRAKE
@@ -3365,16 +3895,19 @@ func _clear_during_charge(star: int, clearance: float) -> bool:
 	return true
 
 
-func start_jump() -> bool:
+func start_jump(emergency := false) -> bool:
 	if jump_seconds_left > 0.0:
 		return false
-	var status := jump_status(jump_target)
+	var status := emergency_jump_status() if emergency else jump_status(jump_target)
 	if not status.ok:
-		_announce("jump_denied", status.reason)
+		_announce("emergency_jump_denied" if emergency else "jump_denied", status.reason)
 		return false
 	reset_time_scale()
 	ambient.interrupt()
 	_cargo_pods.tracked = -1
+	_tracked_hyperspace_id = ""
+	_targeting.lock_id = ""
+	combat.clear_transients()
 	_release_speed_hold(false)
 	cancel_dock_sync()
 	dock_access.clear()
@@ -3388,7 +3921,9 @@ func start_jump() -> bool:
 	_command_gear(false)
 	_jump_charge_total = NAVIGATOR_JUMP_CHARGE if crew.active_role("navigator") else JUMP_CHARGE
 	jump_seconds_left = _jump_charge_total
-	_announce("jump_charging", "Прыжковый привод заряжается.")
+	_jump_emergency = emergency
+	var message := "Аварийный заряд · выход в систему «%s»." % Catalog.system(int(status.destination)).name if emergency else "Прыжковый привод заряжается."
+	_announce("emergency_jump_charging" if emergency else "jump_charging", message)
 	return true
 
 
@@ -3396,6 +3931,7 @@ func cancel_jump() -> bool:
 	if jump_seconds_left <= 0.0 or _jump_transit_duration > 0.0:
 		return false
 	jump_seconds_left = 0.0
+	_jump_emergency = false
 	_announce("jump_canceled", "Прыжок отменён. Топливо сохранено.")
 	return true
 
@@ -3408,7 +3944,7 @@ func _charge_jump(delta: float) -> void:
 		cancel_jump()
 		return
 	position = next
-	var status := jump_status(jump_target)
+	var status := emergency_jump_status() if _jump_emergency else jump_status(jump_target)
 	if not status.ok:
 		cancel_jump()
 		return
@@ -3419,6 +3955,13 @@ func _charge_jump(delta: float) -> void:
 	_jump_transit_duration = float(status.duration)
 	_jump_paid_fare = int(status.cost)
 	_jump_paid_pricing = MASS_JUMP_PRICING
+	if _jump_emergency:
+		_jump_requested = jump_target
+		jump_target = int(status.destination)
+		_jump_route.clear()
+	_jump_emergency = false
+	_hyperspace.record(HyperspaceTrails.DEPARTURE, system_id, jump_target, position,
+		ship.flight_mass(mining.ore_hold), orbit_time, orbit_time + _jump_transit_duration)
 	ship.jump_fuel -= _jump_paid_fare
 	velocity = Vector3.ZERO
 	_announce("jump_committed", "Переход в гиперпространство · %d ед. топлива." % _jump_paid_fare)
@@ -3429,15 +3972,19 @@ func _advance_jump_transit(delta: float) -> void:
 	if remaining > 0.000001:
 		jump_seconds_left = remaining
 		return
+	var mass := ship.flight_mass(mining.ore_hold, ship.jump_fuel + _jump_paid_fare)
+	var requested := _jump_requested
 	_advance_hyperspace_calendar(_jump_transit_duration)
 	jump_seconds_left = 0.0
 	_jump_transit_duration = 0.0
 	_jump_paid_fare = 0
 	_jump_paid_pricing = MASS_JUMP_PRICING
-	_finish_jump_arrival()
+	_jump_requested = -1
+	_finish_jump_arrival(mass, requested)
 
 
-func _finish_jump_arrival() -> void:
+func _finish_jump_arrival(mass: float, requested: int) -> void:
+	var origin := system_id
 	dock_access.clear()
 	system_id = jump_target
 	_mining_beam.clear()
@@ -3459,6 +4006,14 @@ func _finish_jump_arrival() -> void:
 	yaw = 0.0
 	pitch = 0.0
 	roll = 0.0
+	_hyperspace.record(HyperspaceTrails.RESIDUAL, origin, system_id, position, mass, orbit_time, orbit_time)
+	if requested >= 0:
+		_hyperspace.drive_fault = ship.hull <= EMERGENCY_FAULT_LIMIT
+		var emergency := "Аварийный выход · «%s» вместо «%s»." % [destination.name, Catalog.system(requested).name]
+		if _hyperspace.drive_fault:
+			emergency += " Привод заблокирован. Перезапустите его в порту."
+		_announce("emergency_jump_arrival", emergency)
+		return
 	var message := "Прыжок завершён. Система «%s»." % Catalog.system(system_id).name
 	if jump_target >= 0:
 		message += " Далее «%s»." % Catalog.system(jump_target).name
@@ -3466,7 +4021,8 @@ func _finish_jump_arrival() -> void:
 
 
 func _arrive(direction := Vector3.BACK) -> void:
-	combat.clear_projectile()
+	_targeting.lock_id = ""
+	combat.clear_transients()
 	ambient.interrupt()
 	_release_speed_hold(false)
 	if Catalog.is_mine_site(target):
@@ -3551,6 +4107,7 @@ func _departure_target(default_target: int) -> int:
 
 func _dock() -> void:
 	docked = target
+	_targeting.lock_id = ""
 	ambient.interrupt()
 	_release_speed_hold(false)
 	dock_access.settle(orbit_time)
@@ -3601,10 +4158,12 @@ func update(delta: float, steer: Vector2, bank: float, boost_requested: bool, br
 		if time_scale > 1 and not time_status().allowed:
 			reset_time_scale()
 		_step(interval * time_scale, steer, bank, boost_requested, brake, manual_input, traverse)
+	_targeting.current(self)
 
 
 func _fast_wait_stop_epoch() -> float:
-	var deadline := career.next_event_time()
+	var deadline := minf(career.next_event_time(), _missing_person.next_deadline())
+	deadline = minf(deadline, _reconnaissance.deadline())
 	var booking := passengers.status(orbit_time)
 	if booking.active and not booking.overdue:
 		deadline = minf(deadline, float(booking.deadline))
@@ -3635,6 +4194,7 @@ func _advance_fast_wait(real_delta: float) -> void:
 func _advance_background_clock(delta: float) -> void:
 	var previous := orbit_time
 	orbit_time += delta
+	_hyperspace.advance(orbit_time)
 	if docked >= 0:
 		var paid := _port_account.advance(docked, orbit_time, credits)
 		if paid >= 0:
@@ -3652,7 +4212,12 @@ func _advance_background_clock(delta: float) -> void:
 func _advance_mission_deadlines() -> void:
 	_apply_service_result(passengers.advance(orbit_time))
 	_apply_service_result(crew.advance(orbit_time, credits))
+	var military := career.order_status(orbit_time)
+	if military.active:
+		_apply_service_result(career.cancel_lost_jurisdiction(factions.owner(Catalog.system_of_site(int(military.origin)))))
 	_apply_service_result(career.advance(orbit_time))
+	_apply_service_result(_missing_person.advance(orbit_time))
+	_apply_service_result(_reconnaissance.advance(orbit_time))
 
 
 func _advance_front(epoch: float) -> void:
@@ -3807,6 +4372,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 	_apply_patrol_result(patrol.step(self, delta))
 	_apply_convoy_result(convoy_order.step(self, delta))
 	_apply_ambient_result(ambient.step(self, delta))
+	_advance_player_missile(delta)
 
 
 func _rendezvous_step(delta: float) -> void:
@@ -4423,6 +4989,8 @@ func snapshot() -> Dictionary:
 	if _jump_transit_duration > 0.0:
 		transit = {"remaining": jump_seconds_left, "duration": _jump_transit_duration,
 			"fare": _jump_paid_fare, "pricing": _jump_paid_pricing}
+		if _jump_requested >= 0:
+			transit["requested"] = _jump_requested
 	return {
 		"schema": SAVE_SCHEMA,
 		"position": [position.x, position.y, position.z],
@@ -4452,9 +5020,13 @@ func snapshot() -> Dictionary:
 		"crew": crew.snapshot(),
 		"cartography": cartography.snapshot(), "frame": frame.snapshot(), "customs": customs.snapshot(),
 		"port_account": _port_account.snapshot(), "civic": _civic.snapshot(),
+		"missing_person": _missing_person.snapshot(),
+		"reconnaissance": _reconnaissance.snapshot(),
 		"remote_rig": remote_rig.snapshot(), "orbital_mining": orbital_mining.snapshot(),
 		"cargo_pods": _cargo_pods.snapshot(),
+		"hyperspace": _hyperspace.snapshot(),
 		"combat": combat.snapshot(),
+		"targeting": _targeting.snapshot(self),
 		"ambient": ambient.snapshot(), "career": career.snapshot(),
 		"story": story.snapshot(), "news": news.snapshot(),
 		"speed_hold": speed_hold.snapshot(),
@@ -4639,6 +5211,9 @@ func restore(state: Dictionary) -> bool:
 	var known := _known_systems(restored_expedition, restored_cartography)
 	if restored_system not in known or (restored_jump >= 0 and restored_jump not in known):
 		return false
+	var restored_hyperspace := HyperspaceTrails.new()
+	if schema >= 50 and not restored_hyperspace.restore(state.get("hyperspace"), restored_epoch, known):
+		return false
 	var restored_cargo_pods := CargoPods.new()
 	if schema >= 48 and not restored_cargo_pods.restore(state.get("cargo_pods"), restored_epoch, restored_system, known, MAX_SAVED_SPEED + CargoPods.EJECT_SPEED):
 		return false
@@ -4705,6 +5280,16 @@ func restore(state: Dictionary) -> bool:
 	var restored_dock := int(state.docked)
 	var restored_port_account := PortAccount.new()
 	var restored_civic := CivicReputation.new()
+	var restored_reconnaissance := Reconnaissance.new()
+	if int(state.schema) >= 50 and not restored_reconnaissance.restore(state.get("reconnaissance"), restored_epoch):
+		return false
+	var restored_missing := MissingPerson.new()
+	if schema >= 50:
+		if not restored_missing.restore(state.get("missing_person"), restored_epoch, int(state.deliveries) >= 1):
+			return false
+		var restored_manifest := restored_passengers.status(restored_epoch)
+		if int(restored_manifest.seats) + restored_missing.occupied_seats() > int(restored_manifest.capacity):
+			return false
 	if schema >= 49:
 		var available_port := func(id: int) -> bool:
 			return Catalog.is_port(id) and _site_available(id, restored_expedition, restored_cartography)
@@ -4772,7 +5357,7 @@ func restore(state: Dictionary) -> bool:
 			restored_contract_issuer = restored_factions.owner(Catalog.system_of_site(origin))
 	else:
 		var career_state: Variant = state.get("career")
-		if not restored_career.restore(career_state, restored_epoch):
+		if not restored_career.restore(career_state, restored_epoch, schema < 50):
 			return false
 		if not _integer(state.get("contract_issuer"), -1, FactionFronts.FACTIONS.size() - 1):
 			return false
@@ -4786,6 +5371,10 @@ func restore(state: Dictionary) -> bool:
 			return false
 		var dispatch := restored_career.dispatch_status(restored_epoch)
 		if dispatch.active and (not _site_available(int(dispatch.origin), restored_expedition) or not _site_available(int(dispatch.destination), restored_expedition)):
+			return false
+		var military := restored_career.order_status(restored_epoch)
+		if military.active and (not _site_available(int(military.origin), restored_expedition)
+				or (military.kind == "recon" and not _site_available(int(military.site), restored_expedition))):
 			return false
 	var mining_count := Catalog.SITE_COUNT if pre_galaxy else site_count
 	if schema >= 2 and not restored_mining.restore(state.get("mining"), schema == 2, mining_count,
@@ -4883,12 +5472,20 @@ func restore(state: Dictionary) -> bool:
 			return false
 	var restored_transit: Variant = {} if pre_jump_drive else state.get("jump_transit")
 	var restored_pricing := MASS_JUMP_PRICING
+	var restored_requested := -1
 	if not restored_transit is Dictionary:
 		return false
 	if not restored_transit.is_empty():
 		var receipt_fields := ["remaining", "duration", "fare"]
 		if schema >= 49:
 			receipt_fields.append("pricing")
+		if schema >= 50 and restored_transit.has("requested"):
+			receipt_fields.append("requested")
+			if not _integer(restored_transit.requested, 0, systems - 1):
+				return false
+			restored_requested = int(restored_transit.requested)
+			if restored_requested in [restored_system, restored_jump] or restored_requested not in known or not restored_route.is_empty():
+				return false
 		if not restored_transit.has_all(receipt_fields) or restored_transit.size() != receipt_fields.size():
 			return false
 		if not _integer(restored_transit.get("pricing", LEGACY_JUMP_PRICING), LEGACY_JUMP_PRICING, MASS_JUMP_PRICING):
@@ -4901,8 +5498,15 @@ func restore(state: Dictionary) -> bool:
 		var fare := restored_ship.legacy_jump_tariff(base_fare) if restored_pricing == LEGACY_JUMP_PRICING \
 			else restored_ship.jump_tariff(base_fare, restored_mining.ore_hold, reserve_before_charge)
 		var duration := restored_ship.jump_duration(Catalog.jump_distance(restored_system, restored_jump), restored_mining.ore_hold)
-		if restored_dock >= 0 or restored_landing >= 0 or restored_departure or fare <= 0 or duration <= 0.0:
+		if restored_dock >= 0 or restored_landing >= 0 or restored_departure or restored_hyperspace.drive_fault or fare <= 0 or duration <= 0.0:
 			return false
+		if restored_requested >= 0:
+			if restored_pricing != MASS_JUMP_PRICING or restored_ship.hull > EMERGENCY_HULL_LIMIT:
+				return false
+			if _emergency_refuge(restored_system, restored_requested, restored_expedition, restored_ship,
+				restored_mining.ore_hold, reserve_before_charge) != restored_jump:
+				return false
+			duration += EMERGENCY_EXTRA_SECONDS
 		if not _number(restored_transit.remaining, 0.000001, JUMP_TRANSIT_WALL) or not _integer(restored_transit.fare, fare, fare):
 			return false
 		if not _number(restored_transit.duration, duration, duration) or restored_epoch + duration > SAVE_CLOCK_LIMIT:
@@ -4927,6 +5531,9 @@ func restore(state: Dictionary) -> bool:
 		if "unpaid_jump_charge" in interrupted and (restored_jump < 0 or not restored_transit.is_empty()):
 			return false
 	var restored_combat := CombatSystems.new()
+	var restored_targeting := CombatTargeting.new()
+	if schema >= 50 and not restored_targeting.restore(state.get("targeting")):
+		return false
 	var restored_ambient := CivilianTraffic.new()
 	if not pre_ambient_traffic:
 		var ambient_state: Variant = state.get("ambient")
@@ -4940,9 +5547,9 @@ func restore(state: Dictionary) -> bool:
 		return false
 	if restored_speed.enabled and (restored_dock >= 0 or restored_landing >= 0 or not restored_transit.is_empty() or float(state.throttle) != 0.0):
 		return false
-	if not pre_combat and not restored_combat.restore(state.get("combat"), restored_epoch, restored_system):
+	if not pre_combat and not restored_combat.restore(state.get("combat"), restored_epoch, restored_system, schema < 50):
 		return false
-	if not restored_combat.projectile_status().is_empty() and (restored_dock >= 0 or restored_landing >= 0 or not restored_transit.is_empty()):
+	if restored_combat.has_active_ordnance() and (restored_dock >= 0 or restored_landing >= 0 or not restored_transit.is_empty()):
 		return false
 	var restored_gear_command := restored_landing >= 0 or Ground.is_port(restored_dock)
 	var restored_gear := 1.0 if restored_gear_command else 0.0
@@ -5047,10 +5654,13 @@ func restore(state: Dictionary) -> bool:
 	customs = restored_customs
 	_port_account = restored_port_account
 	_civic = restored_civic
+	_missing_person = restored_missing
+	_reconnaissance = restored_reconnaissance
 	remote_rig = restored_remote_rig
 	orbital_mining = restored_orbital_mining
 	_cargo_pods = restored_cargo_pods
 	combat = restored_combat
+	_targeting = restored_targeting
 	ambient = restored_ambient
 	career = restored_career
 	story = restored_story
@@ -5068,6 +5678,10 @@ func restore(state: Dictionary) -> bool:
 	_jump_transit_duration = float(restored_transit.get("duration", 0.0))
 	_jump_paid_fare = int(restored_transit.get("fare", 0))
 	_jump_paid_pricing = restored_pricing
+	_jump_requested = restored_requested
+	_jump_emergency = false
+	_hyperspace = restored_hyperspace
+	_tracked_hyperspace_id = ""
 	target = int(state.target)
 	planned_target = restored_plan
 	credits = int(state.credits)
@@ -5086,6 +5700,7 @@ func restore(state: Dictionary) -> bool:
 			_hold_docked_pose()
 	elif landed:
 		_hold_landed_pose()
+	_targeting.current(self)
 	status_event = ""
 	status_message = ""
 	if not interrupted.is_empty():

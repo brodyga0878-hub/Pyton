@@ -174,7 +174,17 @@ func fire(sim: RefCounted, range_bonus := 0.0) -> Dictionary:
 	_shot_delay = PLAYER_DELAY
 	_player_flash = BEAM_DURATION
 	_player_beam = {"from": sim.position + sim.forward() * 2.5, "to": _enemy_position(sim), "hostile": false}
-	enemy_hull = maxf(0.0, enemy_hull - PLAYER_DAMAGE)
+	return _take_hit(sim, PLAYER_DAMAGE)
+
+
+func missile_hit(sim: RefCounted, id: String, damage: float) -> Dictionary:
+	if not in_danger(sim) or id != "raider-%d" % origin:
+		return {}
+	return _take_hit(sim, damage)
+
+
+func _take_hit(sim: RefCounted, damage: float) -> Dictionary:
+	enemy_hull = maxf(0.0, enemy_hull - damage)
 	if enemy_hull > 0.0:
 		return {"ok": true, "event": "patrol_fire", "message": "Попадание. Корпус рейдера %.0f%%." % enemy_hull}
 	phase = RETURN

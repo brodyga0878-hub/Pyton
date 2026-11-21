@@ -2,11 +2,13 @@ extends CanvasLayer
 
 signal project_requested()
 signal convoy_requested(system: int, id: String)
+signal search_requested(action: String)
 signal dismissed()
 
 const Sector = preload("res://scripts/sector_catalog.gd")
 const Economy = preload("res://scripts/port_economy.gd")
 const Factions = preload("res://scripts/faction_fronts.gd")
+const Calendar = preload("res://scripts/mission_calendar.gd")
 const INK := Color("edf7f9")
 const MUTED := Color("adc0c9")
 const MINT := Color("a4e9d6")
@@ -16,6 +18,8 @@ const BORDER := Color("355360")
 const STAGES := ["Принять заказ", "Обследовать систему", "Сдать отчёт", "Снабдить стройку"]
 const NEWS_LIMIT := 3
 const OFFER_LIMIT := 4
+
+enum Section { EXPEDITION, CONVOY, SEARCH }
 
 var _sim: RefCounted
 var _insets: MarginContainer
@@ -38,6 +42,17 @@ var _convoy_briefing: Label
 var _convoy_route: Button
 var _convoy_offers: Array = []
 var _offer_rows: Array[Dictionary] = []
+var _search_tab: Button
+var _search_panel: VBoxContainer
+var _search_title: Label
+var _search_detail: Label
+var _search_target: Label
+var _search_terms: Label
+var _search_deadline: Label
+var _search_passenger: Label
+var _search_action: Button
+var _search_pickup: Button
+var _search_route: Button
 var _close_button: Button
 var _systems: Array[Dictionary] = []
 var _convoy_panel: VBoxContainer
@@ -101,6 +116,7 @@ func refresh() -> void:
 	_location.text = "Система «%s»" % Sector.system(_sim.system_id).name
 	_refresh_project(status)
 	_refresh_convoy_orders()
+	_refresh_search()
 	_refresh_fronts(status)
 
 
@@ -120,30 +136,34 @@ func _build_project(body: HBoxContainer) -> void:
 	var tabs := HBoxContainer.new()
 	tabs.add_theme_constant_override("separation", 8)
 	card.add_child(tabs)
-	_project_tab = _tab(tabs, "Экспедиция", false)
-	_convoy_tab = _tab(tabs, "Заказы конвоев", true)
+	_project_tab = _tab(tabs, "Экспедиция", Section.EXPEDITION)
+	_convoy_tab = _tab(tabs, "Заказы конвоев", Section.CONVOY)
+	_search_tab = _tab(tabs, "Поиск", Section.SEARCH)
 	_project_panel = _column(card, 10)
 	_project_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_build_expedition(_project_panel)
 	_build_convoy_orders(card)
-	_show_section(false)
+	_build_search(card)
+	_show_section(Section.EXPEDITION)
 
 
-func _tab(parent: HBoxContainer, caption: String, convoy: bool) -> Button:
+func _tab(parent: HBoxContainer, caption: String, section: Section) -> Button:
 	var button := _button(parent, caption)
 	button.custom_minimum_size.y = 48.0
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.toggle_mode = true
-	button.pressed.connect(_show_section.bind(convoy))
+	button.pressed.connect(_show_section.bind(section))
 	_touch_buttons.append(button)
 	return button
 
 
-func _show_section(convoy: bool) -> void:
-	_project_tab.set_pressed_no_signal(not convoy)
-	_convoy_tab.set_pressed_no_signal(convoy)
-	_project_panel.visible = not convoy
-	_convoy_orders.visible = convoy
+func _show_section(section: Section) -> void:
+	_project_tab.set_pressed_no_signal(section == Section.EXPEDITION)
+	_convoy_tab.set_pressed_no_signal(section == Section.CONVOY)
+	_search_tab.set_pressed_no_signal(section == Section.SEARCH)
+	_project_panel.visible = section == Section.EXPEDITION
+	_convoy_orders.visible = section == Section.CONVOY
+	_search_panel.visible = section == Section.SEARCH
 	_touches.clear()
 
 
@@ -184,6 +204,55 @@ func _build_convoy_orders(card: VBoxContainer) -> void:
 	_convoy_route = _button(_convoy_orders, "")
 	_convoy_route.pressed.connect(_route_convoy)
 	_touch_buttons.append(_convoy_route)
+
+
+func _build_search(card: VBoxContainer) -> void:
+	_search_panel = _column(card, 9)
+	_search_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_search_title = _label(_search_panel, "", 27, INK)
+	_search_detail = _label(_search_panel, "", 18, INK)
+	_search_target = _label(_search_panel, "", 17, MINT)
+	_search_terms = _label(_search_panel, "", 17, MUTED)
+	_search_deadline = _label(_search_panel, "", 17, AMBER)
+	_search_passenger = _label(_search_panel, "", 16, MUTED)
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_search_panel.add_child(spacer)
+	_search_action = _button(_search_panel, "")
+	_search_action.pressed.connect(_request_search.bind("primary", _search_action))
+	_search_pickup = _button(_search_panel, "Принять на борт")
+	_search_pickup.pressed.connect(_request_search.bind("pickup", _search_pickup))
+	_search_route = _button(_search_panel, "Проложить курс")
+	_search_route.pressed.connect(_request_search.bind("follow", _search_route))
+	_touch_buttons.append_array([_search_action, _search_pickup, _search_route])
+
+
+func _refresh_search() -> void:
+	var status: Dictionary = _sim.search_status()
+	_search_title.text = str(status.title) if status.stage != "locked" else "Поисковые объявления"
+	_search_detail.text = str(status.detail)
+	var site := int(status.route_site)
+	_search_target.visible = site >= 0
+	if site >= 0:
+		_search_target.text = "%s · %s" % [Sector.system(Sector.system_of_site(site)).name, _sim.target_name(site)]
+	_search_terms.visible = status.stage in ["offer", "clue", "inspect", "report", "complete"]
+	_search_terms.text = "Выплачено %d кр." % int(status.paid) if int(status.paid) > 0 else "За сведения %d кр. · За возвращение +%d кр." % [int(status.reward), int(status.bonus)]
+	_search_deadline.visible = status.stage in ["clue", "inspect", "report"]
+	if _search_deadline.visible:
+		_search_deadline.text = "Сдать до %s" % Calendar.stamp(float(status.deadline))
+	_search_passenger.visible = status.aboard or status.show_pickup
+	if status.aboard:
+		_search_passenger.text = "%s на борту · занято одно место в каюте" % str(status.subject)
+	elif status.show_pickup:
+		_search_passenger.text = "В каюте есть место для инженера." if status.can_pickup else "Все места в каюте заняты. Можно передать сведения диспетчеру."
+	_search_action.visible = not str(status.action).is_empty()
+	_search_action.disabled = not status.can_act
+	_search_action.text = str(status.caption)
+	_search_pickup.visible = status.show_pickup
+	_search_pickup.disabled = not status.can_pickup
+	_search_route.visible = site >= 0
+	_search_route.disabled = not status.can_follow
 
 
 func _build_fronts(body: HBoxContainer) -> void:
@@ -396,6 +465,13 @@ func _route_convoy() -> void:
 	if is_open() and _convoy_route.is_visible_in_tree() and not _convoy_route.disabled:
 		_touches.clear()
 		convoy_requested.emit(-1, "")
+
+
+func _request_search(action: String, button: Button) -> void:
+	if not is_open() or not button.is_visible_in_tree() or button.disabled:
+		return
+	_touches.clear()
+	search_requested.emit(str(_sim.search_status().action) if action == "primary" else action)
 
 
 func _input(event: InputEvent) -> void:

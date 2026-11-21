@@ -11,6 +11,7 @@ signal fuel_module_removed(module: String)
 signal pump_mode_requested(mode: String)
 signal drive_selected(drive: String)
 signal weapon_selected(weapon: String)
+signal missile_selected(slot: int)
 signal dismissed()
 
 const TEXT := Color("e8f4fa")
@@ -25,13 +26,16 @@ const Factions := preload("res://scripts/faction_fronts.gd")
 const Calendar := preload("res://scripts/mission_calendar.gd")
 const EQUIPMENT_SERVICES := ["mining_laser", "fragment_collector", "hydrogen_scoop", "fuel_pump", "range_drive"]
 const DEFENSE_SERVICES := ["combat_shield", "combat_ecm", "combat_focus", "combat_repair"]
+const NAVIGATION_SERVICES := ["radar_mapper", "hyperspace_analyzer", "jump_repair"]
+const ORDNANCE_SERVICES := ["combat_launcher", "combat_missile_dart", "combat_missile_lance", "combat_ecm_advanced", "combat_decoy"]
+const MISSILE_LABELS := {"dart": "Дротик", "lance": "Копьё"}
 const FUEL_MODULES := {"hydrogen_scoop": "scoop", "fuel_pump": "pump"}
 const PUMP_MODES := {"off": "Выкл.", "reaction": "В реактивный", "jump": "В прыжковый"}
 const DRIVE_LABELS := {"standard": ShipSystems.STANDARD_DRIVE_NAME, "range": ShipSystems.RANGE_DRIVE_NAME}
 const WEAPON_LABELS := {"pulse": "Каскад", "focus": "Нить"}
 
 enum StationPage { SERVICES, CREW, YARD, CUSTOMS, MINING, BERTH }
-enum EquipmentPage { FLIGHT, DEFENSE, NAVIGATION }
+enum EquipmentPage { FLIGHT, DEFENSE, NAVIGATION, ORDNANCE }
 
 var _sim: RefCounted
 var _insets: MarginContainer
@@ -93,6 +97,9 @@ var _module_condition: Label
 var _weapon_buttons: Dictionary[String, Button] = {}
 var _navigation: VBoxContainer
 var _autopilot_button: Button
+var _ordnance: VBoxContainer
+var _rack_summary: Label
+var _missile_buttons: Array[Button] = []
 var _fuel_remove_buttons: Dictionary[String, Button] = {}
 var _drive_summary: Label
 var _drive_buttons: Dictionary[String, Button] = {}
@@ -204,6 +211,7 @@ func build() -> void:
 	_add_equipment_tab(equipment_tabs, "Добыча и полёт", EquipmentPage.FLIGHT)
 	_add_equipment_tab(equipment_tabs, "Оборона", EquipmentPage.DEFENSE)
 	_add_equipment_tab(equipment_tabs, "Навигация", EquipmentPage.NAVIGATION)
+	_add_equipment_tab(equipment_tabs, "Боезапас", EquipmentPage.ORDNANCE)
 	_mining = VBoxContainer.new()
 	_mining.add_theme_constant_override("separation", 8)
 	_equipment.add_child(_mining)
@@ -214,6 +222,7 @@ func build() -> void:
 	_build_drive_selection()
 	_build_defense()
 	_build_navigation()
+	_build_ordnance()
 	_transfers = VBoxContainer.new()
 	_transfers.add_theme_constant_override("separation", 8)
 	content.add_child(_transfers)
@@ -279,6 +288,7 @@ func refresh() -> void:
 					EquipmentPage.FLIGHT: _refresh_flight_equipment()
 					EquipmentPage.DEFENSE: _refresh_defense()
 					EquipmentPage.NAVIGATION: _refresh_navigation()
+					EquipmentPage.ORDNANCE: _refresh_ordnance()
 			_: _refresh_services()
 
 
@@ -292,7 +302,7 @@ func _refresh_services() -> void:
 	else:
 		_cargo_detail.text = "Ёмкость %d → %d ед." % [int(profile.cargo), int(profile.expanded_cargo)]
 	_refresh_service_buttons(_action_buttons.keys().filter(func(action: String) -> bool:
-		return action not in EQUIPMENT_SERVICES and action not in DEFENSE_SERVICES))
+		return action not in EQUIPMENT_SERVICES and action not in DEFENSE_SERVICES and action not in NAVIGATION_SERVICES and action not in ORDNANCE_SERVICES))
 
 
 func _refresh_flight_equipment() -> void:
@@ -340,6 +350,33 @@ func _refresh_navigation() -> void:
 	var equipment: Dictionary = _sim.autopilot_equipment_status()
 	_autopilot_button.disabled = not equipment.available
 	_autopilot_button.text = "Снять в отсек" if equipment.installed else "Установить"
+	_refresh_service_buttons(NAVIGATION_SERVICES)
+	var repair: Button = _action_buttons["jump_repair"]
+	repair.text = "Перезапустить" if not repair.disabled else "Привод исправен"
+
+
+func _refresh_ordnance() -> void:
+	_refresh_service_buttons(ORDNANCE_SERVICES)
+	var status: Dictionary = _sim.combat_equipment_status()
+	var ecm: Dictionary = _sim.service_offer("combat_ecm_advanced")
+	if ecm.has("reason"):
+		_action_buttons["combat_ecm_advanced"].text = "Нужен базовый РЭБ"
+	_rack_summary.text = "Места пусковой · Ложные цели %d / 4" % int(status.decoy_count)
+	for index in range(_missile_buttons.size()):
+		var kind: String = status.missile_slots[index]
+		var button := _missile_buttons[index]
+		var selected := index == int(status.missile_slot)
+		button.text = "%d · %s" % [index + 1, MISSILE_LABELS.get(kind, "Пусто")]
+		button.set_pressed_no_signal(selected)
+		button.disabled = selected or not status.station or kind.is_empty()
+		button.add_theme_color_override("font_disabled_color", MINT if selected else MUTED)
+	for action: String in ["combat_missile_dart", "combat_missile_lance", "combat_decoy"]:
+		var button: Button = _action_buttons[action]
+		var offer: Dictionary = _sim.service_offer(action)
+		if offer.installed:
+			button.text = "Нужна пусковая" if action != "combat_decoy" and not status.launcher_fitted else "Все места заняты"
+		elif offer.allowed:
+			button.text = "Купить · %d кр." % int(offer.cost)
 
 
 func _refresh_service_buttons(actions: Array) -> void:
@@ -403,6 +440,7 @@ func _show_page() -> void:
 	_mining.visible = _equipment_page == EquipmentPage.FLIGHT
 	_defense.visible = _equipment_page == EquipmentPage.DEFENSE
 	_navigation.visible = _equipment_page == EquipmentPage.NAVIGATION
+	_ordnance.visible = _equipment_page == EquipmentPage.ORDNANCE
 	for page: int in _equipment_tabs:
 		var tab := _equipment_tabs[page]
 		var selected := page == _equipment_page
@@ -857,7 +895,15 @@ func is_open() -> bool:
 
 func _request_service(action: String) -> void:
 	var page := StationPage.SERVICES
-	if action in EQUIPMENT_SERVICES:
+	if action in NAVIGATION_SERVICES:
+		page = StationPage.MINING
+		if _equipment_page != EquipmentPage.NAVIGATION:
+			return
+	elif action in ORDNANCE_SERVICES:
+		page = StationPage.MINING
+		if _equipment_page != EquipmentPage.ORDNANCE:
+			return
+	elif action in EQUIPMENT_SERVICES:
 		page = StationPage.MINING
 		if _equipment_page != EquipmentPage.FLIGHT:
 			return
@@ -1089,6 +1135,39 @@ func _build_navigation() -> void:
 	var row := _add_row(_navigation, "Бортовой автопилот", "Ведёт к цели, управляет стыковкой и посадкой")
 	_autopilot_button = row[1]
 	_autopilot_button.pressed.connect(_request_autopilot_equipment)
+	_add_service("radar_mapper", "Радар-картограф", "Досье выбранного корабля на бортовом сканере", _navigation)
+	_add_service("hyperspace_analyzer", "Анализатор следов", "Читает назначение и время перехода", _navigation)
+	_add_service("jump_repair", "Ремонт гиперпривода", "Восстанавливает привод после аварийного перехода", _navigation)
+
+
+func _build_ordnance() -> void:
+	_ordnance = VBoxContainer.new()
+	_ordnance.add_theme_constant_override("separation", 8)
+	_equipment.add_child(_ordnance)
+	_add_service("combat_launcher", "Ракетная пусковая", "Четыре места под ракеты двух типов", _ordnance)
+	_add_service("combat_missile_dart", "Ракета «Дротик»", "Быстрый манёвр по захваченной цели", _ordnance)
+	_add_service("combat_missile_lance", "Ракета «Копьё»", "Тяжёлая ракета с большей дальностью", _ordnance)
+	_add_service("combat_ecm_advanced", "Усиленные помехи", "Модернизация базового модуля", _ordnance)
+	_add_service("combat_decoy", "Ложная цель", "Уводит наведённую ракету в сторону", _ordnance)
+	_rack_summary = _label(_ordnance, "", 17, MINT)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	_ordnance.add_child(row)
+	_label(row, "Следующий пуск", 17, TEXT).size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	for index in range(4):
+		var button := _button(row)
+		button.toggle_mode = true
+		button.pressed.connect(_request_missile_selection.bind(index))
+		_missile_buttons.append(button)
+
+
+func _request_missile_selection(slot: int) -> void:
+	if not is_open() or _fuel_only or _station_page != StationPage.MINING or _equipment_page != EquipmentPage.ORDNANCE:
+		return
+	var button: Button = _missile_buttons[slot]
+	if not button.disabled:
+		_touches.clear()
+		missile_selected.emit(slot)
 
 
 func _build_pump_controls() -> void:
@@ -1189,6 +1268,7 @@ func _button_at(point: Vector2) -> Button:
 			EquipmentPage.FLIGHT: buttons += _fuel_remove_buttons.values() + _drive_buttons.values()
 			EquipmentPage.DEFENSE: buttons += _weapon_buttons.values()
 			EquipmentPage.NAVIGATION: buttons.append(_autopilot_button)
+			EquipmentPage.ORDNANCE: buttons += _missile_buttons
 	for button: Button in buttons:
 		if not button.disabled and button.is_visible_in_tree() and button.get_global_rect().has_point(point):
 			return button
