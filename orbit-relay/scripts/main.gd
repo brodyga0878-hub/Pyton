@@ -2,6 +2,7 @@ extends Node
 
 const Flight = preload("res://scripts/flight_sim.gd")
 const FlightView = preload("res://scripts/flight_view.gd")
+const FlightCamera = preload("res://scripts/flight_camera.gd")
 const FlightHUD = preload("res://scripts/flight_hud.gd")
 const SectorMap = preload("res://scripts/sector_map.gd")
 const GalaxyMap = preload("res://scripts/galaxy_map.gd")
@@ -19,6 +20,7 @@ const ANTIALIASING := [Viewport.MSAA_DISABLED, Viewport.MSAA_2X, Viewport.MSAA_4
 var flight := Flight.new()
 var presentation := DisplaySettings.new()
 var _view := FlightView.new()
+var _camera_mode := FlightCamera.Mode.EXTERIOR
 var _hud := FlightHUD.new()
 var _map := SectorMap.new()
 var _galaxy := GalaxyMap.new()
@@ -152,6 +154,20 @@ func _update_display(delta: float) -> void:
 	if hostile_marker:
 		marker = local_traffic.position
 	var instruments_visible := flight.docked < 0 and not flight.landed and not _overlay_open() and flight.jump_seconds_left <= 0.0
+	var forward_aim := _view.shows_forward_aim()
+	var bearing := ""
+	if instruments_visible and forward_aim and _camera_mode == FlightCamera.Mode.COCKPIT and flight.ship.autopilot_fitted:
+		var point := marker
+		var route_marker := not signal_selected and not project_marker and not convoy_marker and not rendezvous_marker and not fragment_marker and not hostile_marker
+		if route_marker and flight.docking_guidance().get("near", false):
+			point = flight.target_contact(flight.target)
+		var offset := point - flight.position
+		if offset.length_squared() >= 0.25:
+			var course := flight.attitude().transposed() * offset.normalized()
+			var azimuth := rad_to_deg(atan2(course.x, -course.z))
+			var elevation := rad_to_deg(asin(clampf(course.y, -1.0, 1.0)))
+			bearing = "Пеленг %+.0f° · угол %+.0f°" % [azimuth, elevation]
+	_hud.set_camera_view(_camera_mode, forward_aim, bearing)
 	var in_view := instruments_visible and not _view.camera.is_position_behind(marker)
 	if patrol_status.phase == Flight.Patrol.ENGAGED and patrol_status.same_system:
 		in_view = false
@@ -197,6 +213,11 @@ func _handle_action(action: String) -> void:
 			flight.set_flight_assist(not flight.flight_assist)
 		"frame":
 			flight.cycle_reference_frame()
+		"camera":
+			if flight.docked >= 0 or flight.landed:
+				return
+			_camera_mode = (_camera_mode + 1) % FlightCamera.MODE_NAMES.size()
+			_view.select_camera_mode(_camera_mode)
 		"speed_hold":
 			flight.toggle_speed_hold()
 		"orbit_cancel":
@@ -491,7 +512,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_ENTER: "dock", KEY_M: "contract", KEY_G: "mine", KEY_B: "sell_ore", KEY_F8: "report",
 		KEY_N: "map", KEY_J: "galaxy", KEY_K: "scoop", KEY_P: "services", KEY_O: "time", KEY_L: "market",
 		KEY_U: "patrol", KEY_X: "fire", KEY_I: "convoy", KEY_H: "flight_assist",
-		KEY_F2: "settings", KEY_F3: "journal", KEY_F4: "frontier",
+		KEY_F1: "camera", KEY_F2: "settings", KEY_F3: "journal", KEY_F4: "frontier",
 		KEY_F5: "dock_sync", KEY_F6: "dock_clearance", KEY_F7: "frame", KEY_F9: "time_pause", KEY_F10: "speed_hold", KEY_Y: "gear", KEY_C: "fuel",
 	}
 	if actions.has(event.physical_keycode):

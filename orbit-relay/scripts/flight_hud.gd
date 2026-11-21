@@ -8,6 +8,7 @@ const Sector := preload("res://scripts/sector_catalog.gd")
 const Ground := preload("res://scripts/ground_port.gd")
 const Patrol := preload("res://scripts/patrol_encounter.gd")
 const MissionCalendar := preload("res://scripts/mission_calendar.gd")
+const FlightCamera := preload("res://scripts/flight_camera.gd")
 const INK := Color("eef8ff")
 const MUTED := Color("a7bac9")
 const CYAN := Color("8fe9db")
@@ -19,6 +20,7 @@ const BACK := Color(0.024, 0.057, 0.081, 0.94)
 const LINE := Color(0.24, 0.43, 0.49, 0.58)
 const COURSE_PAD := Rect2(26, -170, 172, 144)
 const ROLL_PAD := Rect2(210, -108, 112, 82)
+const CAMERA_CONTROL := Rect2(210, -171, 112, 52)
 const FLIGHT_MODE_ROW := Rect2(26, -224, 350, 46)
 const TRANSLATION_ROW := Rect2(26, -279, 296, 46)
 const ACTION_COLUMN := Rect2(-340, -215, 314, 189)
@@ -38,6 +40,8 @@ var _marks: FlightMarks
 var _steer: SteeringPad
 var _bank: SteeringPad
 var _flight_modes: HBoxContainer
+var _camera_controls: HBoxContainer
+var _camera_instrument: Label
 var _translation_controls: HBoxContainer
 var _route: Label
 var _route_detail: Label
@@ -190,6 +194,8 @@ func build() -> void:
 	_telemetry = _label(instrument_stack, 17, INK)
 	_telemetry.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_condition = _label(instrument_stack, 16, INK)
+	_camera_instrument = _label(instrument_stack, 15, CYAN)
+	_camera_instrument.hide()
 	_fuel = _label(instrument_stack, 16, CYAN)
 	_fuel_level = ProgressBar.new()
 	_fuel_level.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -250,6 +256,11 @@ func build() -> void:
 	_bank.caption = "КРЕН"
 	_bank.horizontal = true
 	_pin(_bank, _safe, Vector2(0, 1), ROLL_PAD)
+	_camera_controls = HBoxContainer.new()
+	_pin(_camera_controls, _safe, Vector2(0, 1), CAMERA_CONTROL)
+	_button(_camera_controls, "camera", "Снаружи")
+	_actions["camera"].add_theme_font_size_override("font_size", 16)
+	_camera_controls.hide()
 	_build_flight_modes()
 
 	var center := _panel(_safe, Vector2(0.5, 1), Rect2(-258, -143, 503, 117))
@@ -568,6 +579,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_jump_transit = bool(jump.is_transit)
 	_steer.visible = not parked and not _jump_transit
 	_bank.visible = _steer.visible
+	_camera_controls.visible = _steer.visible
 	_flight_modes.visible = _steer.visible
 	_translation_controls.visible = _steer.visible and _translation_mode
 	var assist: Button = _actions["flight_assist"]
@@ -1296,6 +1308,15 @@ func set_target_marker(screen_position: Vector2, visible: bool) -> void:
 	_marks.target_visible = visible
 	_marks.queue_redraw()
 
+func set_camera_view(mode: int, shows_forward_aim: bool, bearing: String) -> void:
+	var button: Button = _actions["camera"]
+	button.text = FlightCamera.MODE_NAMES[mode]
+	var next_mode: String = FlightCamera.MODE_NAMES[(mode + 1) % FlightCamera.MODE_NAMES.size()]
+	button.tooltip_text = "Ракурс. Следующий вид «%s» (F1)" % next_mode
+	_marks.forward_aim = shows_forward_aim
+	_camera_instrument.text = bearing
+	_camera_instrument.visible = not bearing.is_empty()
+
 func set_traffic_markers(markers: Array[Dictionary]) -> void:
 	_marks.traffic = markers.duplicate()
 	_marks.traffic.sort_custom(func(left: Dictionary, right: Dictionary) -> bool:
@@ -1329,6 +1350,7 @@ func set_touch_preferences(sensitivity: int, mirrored: bool) -> void:
 func _apply_touch_layout() -> void:
 	_place_touch_control(_steer, COURSE_PAD, false)
 	_place_touch_control(_bank, ROLL_PAD, false)
+	_place_touch_control(_camera_controls, CAMERA_CONTROL, false)
 	_place_touch_control(_flight_modes, FLIGHT_MODE_ROW, false)
 	_place_touch_control(_translation_controls, TRANSLATION_ROW, false)
 	_place_touch_control(_right_panel, ACTION_COLUMN, true)
@@ -1656,6 +1678,7 @@ class FlightMarks extends Control:
 	const MAX_CONTACTS := 3
 
 	var flight := false
+	var forward_aim := true
 	var target_visible := false
 	var target_position := Vector2.ZERO
 	var traffic: Array[Dictionary] = []
@@ -1664,8 +1687,9 @@ class FlightMarks extends Control:
 		if not flight:
 			return
 		var center := size * 0.5
-		for direction: Vector2 in [Vector2.UP, Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT]:
-			draw_line(center + direction * 13.0, center + direction * 23.0, Color(0.57, 0.92, 0.9, 0.65), 1.5, true)
+		if forward_aim:
+			for direction: Vector2 in [Vector2.UP, Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT]:
+				draw_line(center + direction * 13.0, center + direction * 23.0, Color(0.57, 0.92, 0.9, 0.65), 1.5, true)
 		_draw_traffic()
 		if not target_visible:
 			return

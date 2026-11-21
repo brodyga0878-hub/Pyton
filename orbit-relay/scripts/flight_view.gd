@@ -11,6 +11,7 @@ const Ground = preload("res://scripts/ground_port.gd")
 const ShipSystems = preload("res://scripts/ship_systems.gd")
 const Terrain = preload("res://scripts/surface_terrain.gd")
 const AtmosphereView = preload("res://scripts/atmosphere_view.gd")
+const FlightCamera = preload("res://scripts/flight_camera.gd")
 const STAR_DISTANCE := 2700.0
 const STATION_RADIAL_SEGMENTS := 20
 const BACKDROP_ORBIT_SECONDS := 28800.0
@@ -118,7 +119,47 @@ class HyperTransitOverlay extends Control:
 		draw_multiline_colors(_trails, _trails_color, 2.8)
 		draw_multiline_colors(_highlights, _highlights_color, 1.6)
 
+class CockpitCanopy extends Control:
+	var _mix := 0.0
+
+	func _ready() -> void:
+		resized.connect(queue_redraw)
+
+	func sync(amount: float) -> void:
+		visible = amount > 0.001
+		if visible and not is_equal_approx(_mix, amount):
+			_mix = amount
+			queue_redraw()
+
+	func _draw() -> void:
+		var shell := Color(0.021, 0.037, 0.056, 0.94 * _mix)
+		var trim := Color(0.29, 0.45, 0.50, 0.78 * _mix)
+		var small_side := minf(size.x, size.y * 2.0)
+		var top_span := small_side * 0.116
+		var pillar := small_side * 0.035
+		for side in range(2):
+			var edge_x := 0.0 if side == 0 else size.x
+			var inward := 1.0 if side == 0 else -1.0
+			var shoulder := Vector2(edge_x + inward * pillar, size.y * 0.25)
+			var corner := Vector2(edge_x, size.y * 0.49)
+			var roof := Vector2(edge_x + inward * top_span, 0.0)
+			var bevel := Vector2(edge_x + inward * top_span * 0.66, size.y * 0.10)
+			draw_colored_polygon(PackedVector2Array([Vector2(edge_x, 0.0), roof, bevel, shoulder, corner]), shell)
+			draw_polyline(PackedVector2Array([roof, bevel, shoulder, corner]), trim, 2.0, true)
+		var nose := PackedVector2Array([
+			Vector2(0.0, size.y * 0.94), size * Vector2(0.24, 0.965), size * Vector2(0.45, 0.936),
+			size * Vector2(0.55, 0.936), size * Vector2(0.76, 0.965), size * Vector2(1.0, 0.94),
+		])
+		draw_polyline(nose, trim, 2.0, true)
+		nose.append(size)
+		nose.append(Vector2(0.0, size.y))
+		draw_colored_polygon(nose, shell)
+
 var camera: Camera3D
+var _camera_director := FlightCamera.new()
+var _preferred_camera_mode := FlightCamera.Mode.EXTERIOR
+var _exterior_position := Vector3.ZERO
+var _cockpit_canopy: CockpitCanopy
 var _ship: Node3D
 var _ship_hull_id := ShipSystems.STARTER_HULL
 var _landing_gear: Node3D
@@ -220,6 +261,11 @@ func build() -> void:
 	var transit_layer := CanvasLayer.new()
 	transit_layer.layer = 0
 	add_child(transit_layer)
+	_cockpit_canopy = CockpitCanopy.new()
+	_cockpit_canopy.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	transit_layer.add_child(_cockpit_canopy)
+	_cockpit_canopy.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_cockpit_canopy.hide()
 	_hyper_transit = HyperTransitOverlay.new()
 	_hyper_transit.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	transit_layer.add_child(_hyper_transit)
@@ -340,6 +386,17 @@ func set_visual_profile(profile: int) -> void:
 		_hyper_transit.set_profile(_visual_profile)
 
 
+func select_camera_mode(mode: int) -> bool:
+	if mode < 0 or mode >= FlightCamera.MODE_NAMES.size() or mode == _preferred_camera_mode:
+		return false
+	_preferred_camera_mode = mode
+	return true
+
+
+func shows_forward_aim() -> bool:
+	return _camera_director.shows_forward_aim()
+
+
 func sync(sim: RefCounted, delta: float) -> void:
 	if not is_instance_valid(camera):
 		build()
@@ -429,11 +486,12 @@ func sync(sim: RefCounted, delta: float) -> void:
 			desired = (position_now + departure_frame * departure_offset).lerp(desired, chase_weight)
 			var camera_rotation := departure_frame.get_rotation_quaternion().slerp(heading.get_rotation_quaternion(), chase_weight)
 			up = Basis(camera_rotation).y
-	var jump := delta <= 0.0 or not _last_position.is_finite()
-	if not jump:
-		jump = position_now.distance_squared_to(_last_position) > 144.0
+	var cut := not _last_position.is_finite()
+	if not cut:
+		cut = position_now.distance_squared_to(_last_position) > 144.0
+	var jump := delta <= 0.0 or cut
 	var blend := 1.0 - exp(-delta * 14.0)
-	var camera_start := camera.position
+	var camera_start := _exterior_position
 	if not jump and settled and berth == _last_berth:
 		if body_attached:
 			var ground_turn := ship_orientation * _last_landed_basis.transposed()
@@ -442,9 +500,9 @@ func sync(sim: RefCounted, delta: float) -> void:
 		else:
 			camera_start += position_now - _last_position
 	var chase_origin := desired if jump else camera_start.lerp(desired, blend)
-	camera.position = _surface_safe_camera(chase_origin, sim)
+	_exterior_position = _surface_safe_camera(chase_origin, sim)
 	if not settled:
-		var close_follow := smoothstep(0.0, 7.0, camera.position.distance_to(chase_origin))
+		var close_follow := smoothstep(0.0, 7.0, _exterior_position.distance_to(chase_origin))
 		focal_offset = focal_offset.lerp(Vector3(0.0, 0.4, -2.5), close_follow)
 	var focal_direction := heading * focal_offset
 	if chase_weight < 1.0:
@@ -452,12 +510,21 @@ func sync(sim: RefCounted, delta: float) -> void:
 		var dock_focus := GROUND_CAMERA_FOCUS if ground_departure else BERTH_CAMERA_FOCUS.lerp(Vector3(0.0, 0.0, -7.5), travel)
 		focal_direction = (departure_frame * dock_focus).lerp(focal_direction, chase_weight)
 	var look_target := position_now + focal_direction
-	var sight := (look_target - camera.position).normalized()
+	var sight := (look_target - _exterior_position).normalized()
 	var blended_up := _camera_up.lerp(up, blend).normalized()
 	_camera_up = up if jump or blended_up.is_zero_approx() else blended_up
 	if absf(sight.dot(_camera_up)) > 0.995:
 		_camera_up = up if absf(sight.dot(up)) < 0.995 else heading.x
-	camera.look_at(look_target, _camera_up)
+	var exterior := Transform3D(Basis.looking_at(sight, _camera_up), _exterior_position)
+	var freighter := hull_id == ShipSystems.FREIGHTER_HULL
+	# Keep the established framing during the automatic berth operation.
+	var forced_exterior := settled or transit
+	_camera_director.select(FlightCamera.Mode.EXTERIOR if forced_exterior else _preferred_camera_mode)
+	var shot_cut := cut or (forced_exterior and _camera_director.transitioning())
+	camera.transform = _camera_director.sample(_ship.transform, exterior, delta, freighter, shot_cut)
+	camera.fov = _camera_director.field_of_view
+	_ship.visible = _camera_director.shows_hull()
+	_cockpit_canopy.sync(_camera_director.cockpit_mix)
 	_stars.position = camera.position
 	for site_id: int in _stellar_views:
 		var star := _stellar_views[site_id]
@@ -502,7 +569,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 			and int(guidance.port) == site_id and bool(guidance.near) and bool(guidance.in_front)
 		_gate_materials[site_id].albedo_color = Color("#75eac0") if bool(guidance.get("ok", false)) else Color("#edb36c")
 	_sync_surface_guide(sim, settled)
-	_mining_rig.visible = rig_in_view or not rig_deployed
+	_mining_rig.visible = rig_in_view or (not rig_deployed and _ship.visible)
 	if rig_in_view:
 		var rig_pose: Transform3D = sim.remote_rig_transform()
 		var phase := MiningRig.DRILLING if bool(remote_rig.working) else MiningRig.READY
