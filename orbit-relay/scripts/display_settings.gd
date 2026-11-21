@@ -2,31 +2,44 @@ extends RefCounted
 ## The player's presentation choices are independent of the flight save.
 
 const SessionIO := preload("res://scripts/session_io.gd")
+const FlightAudio := preload("res://scripts/flight_audio.gd")
 const PATH := "user://presentation.json"
+const LEGACY_FIELDS := ["quality", "sensitivity", "layout"]
 const OPTIONS := {
 	"quality": ["Экономичный", "Сбалансированный", "Детальный"],
 	"sensitivity": ["Точно", "Обычно", "Быстро"],
 	"layout": ["Стандарт", "Действия слева"],
+	FlightAudio.VOLUME_KEY: FlightAudio.LEVEL_LABELS,
 }
 
 var quality := 1
 var sensitivity := 1
 var layout := 0
+var notification_volume := FlightAudio.DEFAULT_LEVEL
 
 
 func snapshot() -> Dictionary:
-	return {"quality": quality, "sensitivity": sensitivity, "layout": layout}
+	return {
+		"quality": quality, "sensitivity": sensitivity, "layout": layout,
+		FlightAudio.VOLUME_KEY: notification_volume,
+	}
 
 
 func restore(value: Variant) -> bool:
-	if not value is Dictionary or value.size() != OPTIONS.size():
+	if not value is Dictionary:
+		return false
+	var legacy: bool = value.size() == LEGACY_FIELDS.size() and value.has_all(LEGACY_FIELDS)
+	if not legacy and value.size() != OPTIONS.size():
 		return false
 	for field: String in OPTIONS:
+		if legacy and field == FlightAudio.VOLUME_KEY:
+			continue
 		if not _is_choice(field, value.get(field)):
 			return false
 	quality = int(value.quality)
 	sensitivity = int(value.sensitivity)
 	layout = int(value.layout)
+	notification_volume = int(value.get(FlightAudio.VOLUME_KEY, FlightAudio.DEFAULT_LEVEL))
 	return true
 
 

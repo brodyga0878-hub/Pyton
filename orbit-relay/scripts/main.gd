@@ -3,6 +3,7 @@ extends Node
 const Flight = preload("res://scripts/flight_sim.gd")
 const FlightView = preload("res://scripts/flight_view.gd")
 const FlightCamera = preload("res://scripts/flight_camera.gd")
+const FlightAudio = preload("res://scripts/flight_audio.gd")
 const FlightHUD = preload("res://scripts/flight_hud.gd")
 const SectorMap = preload("res://scripts/sector_map.gd")
 const GalaxyMap = preload("res://scripts/galaxy_map.gd")
@@ -20,6 +21,7 @@ const ANTIALIASING := [Viewport.MSAA_DISABLED, Viewport.MSAA_2X, Viewport.MSAA_4
 var flight := Flight.new()
 var presentation := DisplaySettings.new()
 var _view := FlightView.new()
+var _audio := FlightAudio.new()
 var _camera_mode := FlightCamera.Mode.EXTERIOR
 var _hud := FlightHUD.new()
 var _map := SectorMap.new()
@@ -44,6 +46,7 @@ func _ready() -> void:
 	var saved := SessionIO.load_state()
 	if not saved.is_empty():
 		_io.trace("load", {"accepted": flight.restore(saved)})
+	add_child(_audio)
 	add_child(_view)
 	_view.build()
 	add_child(_hud)
@@ -118,7 +121,13 @@ func _physics_process(delta: float) -> void:
 	if _overlay_open() or flight.time_paused:
 		return
 	flight.update(delta, _hud.move_input(), _hud.roll_input(), _hud.boost_held(), _hud.brake_held(), _hud.translation_input())
-	_deliver_notice()
+	if not flight.status_event.is_empty():
+		_deliver_notice()
+	else:
+		var caption := _audio.poll(flight)
+		if not caption.is_empty():
+			_hud.notify(caption)
+			_io.trace("flight_notification", {"message": caption, "orbit_time": flight.orbit_time})
 	_save_elapsed += delta
 	if _save_elapsed >= SAVE_INTERVAL:
 		_save()
@@ -416,6 +425,7 @@ func _deliver_notice() -> void:
 			"system_id": flight.system_id, "orbit_time": flight.orbit_time,
 		}
 	_io.trace(event, trace_fields)
+	_audio.notify(event, Time.get_ticks_msec(), flight.dock_access.port)
 	_hud.notify(flight.status_message)
 	flight.status_event = ""
 	if event in [
@@ -899,6 +909,7 @@ func _apply_presentation() -> void:
 		Engine.max_fps = presentation.fps_limit()
 	_view.set_visual_profile(presentation.quality)
 	_hud.set_touch_preferences(presentation.sensitivity, presentation.layout == 1)
+	_audio.set_level(presentation.notification_volume)
 
 
 func _change_preference(field: String, value: int) -> void:

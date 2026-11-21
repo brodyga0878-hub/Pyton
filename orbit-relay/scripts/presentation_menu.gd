@@ -12,6 +12,7 @@ const ROW_TITLES := {
 	"quality": "Графика",
 	"sensitivity": "Чувствительность",
 	"layout": "Сенсорная раскладка",
+	"notification_volume": "Громкость сигналов",
 }
 const ROW_HINTS := {
 	"quality": [
@@ -27,6 +28,12 @@ const ROW_HINTS := {
 	"layout": [
 		"Курс и крен слева. Тяга и действия справа.",
 		"Тяга и действия слева. Курс и крен справа.",
+	],
+	"notification_volume": [
+		"Только предупреждения на экране",
+		"Приглушённые сигналы полёта",
+		"Сигналы сближения, стыковки, перегрева и опасности",
+		"Повышенная громкость сигналов полёта",
 	],
 }
 
@@ -59,7 +66,7 @@ func build() -> void:
 	center.add_child(panel)
 
 	var content := VBoxContainer.new()
-	content.add_theme_constant_override("separation", 13)
+	content.add_theme_constant_override("separation", 10)
 	panel.add_child(content)
 	var header := HBoxContainer.new()
 	header.add_theme_constant_override("separation", 12)
@@ -110,10 +117,10 @@ func is_open() -> bool:
 
 func _add_choices(parent: Container, field: String) -> void:
 	var strip := PanelContainer.new()
-	strip.add_theme_stylebox_override("panel", _style(Color("10242e"), Color("263f4d"), 10, 14))
+	strip.add_theme_stylebox_override("panel", _style(Color("10242e"), Color("263f4d"), 10, 12))
 	parent.add_child(strip)
 	var group := VBoxContainer.new()
-	group.add_theme_constant_override("separation", 7)
+	group.add_theme_constant_override("separation", 6)
 	strip.add_child(group)
 	_label(group, ROW_TITLES[field], 21, TEXT)
 	var row := HBoxContainer.new()

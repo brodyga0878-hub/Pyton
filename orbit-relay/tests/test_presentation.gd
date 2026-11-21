@@ -8,7 +8,7 @@ const Catalog := preload("res://scripts/sector_catalog.gd")
 const Patrol := preload("res://scripts/patrol_encounter.gd")
 const Settings := preload("res://scripts/display_settings.gd")
 const SessionIO := preload("res://scripts/session_io.gd")
-const DEFAULTS := {"quality": 1, "sensitivity": 1, "layout": 0}
+const DEFAULTS := {"quality": 1, "sensitivity": 1, "layout": 0, "notification_volume": 2}
 
 var _viewport: SubViewport
 var _checks := 0
@@ -41,8 +41,9 @@ func _test_preferences() -> void:
 		"The economy preset caps rendering at 30 FPS")
 	_expect(settings.change("quality", 2) and settings.fps_limit() == 60,
 		"The detail preset caps rendering at 60 FPS")
-	_expect(settings.change("sensitivity", 0) and settings.change("layout", 1),
-		"The preference model accepts precise sensitivity and mirrored controls")
+	_expect(settings.change("sensitivity", 0) and settings.change("layout", 1)
+		and settings.change("notification_volume", 3),
+		"The preference model accepts precise sensitivity, mirrored controls and louder cues")
 	var changed := settings.snapshot()
 	for invalid: Variant in [null, [], {"quality": 2}, {"quality": 2, "sensitivity": 1, "layout": 1, "extra": 1},
 		{"quality": 3, "sensitivity": 1, "layout": 1}, {"quality": 0, "sensitivity": 1.25, "layout": 0},
@@ -51,16 +52,25 @@ func _test_preferences() -> void:
 			"Malformed preferences are rejected atomically")
 	_expect(not settings.change("unknown", 0) and not settings.change("quality", -1) and settings.snapshot() == changed,
 		"Invalid live selections leave all existing choices intact")
+	for malformed_volume: Variant in [-1, 4, true, 1.5, "2"]:
+		var invalid := changed.duplicate()
+		invalid.notification_volume = malformed_volume
+		_expect(not settings.restore(invalid) and settings.snapshot() == changed,
+			"Out-of-range, fractional and nonnumeric volume values are rejected atomically")
 	var path := "user://presentation-integration-%d.json" % OS.get_process_id()
 	var previous_flight := SessionIO.load_state()
 	_expect(settings.save_preferences(path) == OK, "Preferences write their own JSON file")
 	var reloaded := Settings.new()
 	_expect(reloaded.load_preferences(path) and reloaded.snapshot() == changed,
-		"A fresh preference object restores all three persisted choices")
+		"A fresh preference object restores all four persisted choices")
 	_expect(SessionIO.save_state({"quality": 0, "sensitivity": "fast", "layout": 0}, path) == OK,
 		"Write a valid JSON file with invalid preference values")
 	_expect(not reloaded.load_preferences(path) and reloaded.snapshot() == changed,
 		"An invalid on-disk preference record applies none of its values")
+	var legacy := {"quality": 0, "sensitivity": 2, "layout": 1}
+	_expect(SessionIO.save_state(legacy, path) == OK and reloaded.load_preferences(path)
+		and reloaded.snapshot() == {"quality": 0, "sensitivity": 2, "layout": 1, "notification_volume": 2},
+		"An exact older three-field file migrates with the normal notification level")
 	_expect(SessionIO.load_state() == previous_flight, "Preference I/O leaves the existing flight record untouched")
 	DirAccess.remove_absolute(path)
 	DirAccess.remove_absolute(path + ".previous")
@@ -96,8 +106,10 @@ func _test_settings_scene() -> void:
 		_expect(Engine.max_fps == 30, "The desktop-rendered economy preset actually applies the frame cap")
 	_tap(game._settings._choice_buttons["layout"][1], "Move the action column to the left using a real touch")
 	_tap(game._settings._choice_buttons["sensitivity"][0], "Select precise steering using a real touch")
+	_tap(game._settings._choice_buttons["notification_volume"][1], "Select quiet notification cues using a real touch")
 	var saved_settings: Dictionary = game.presentation.snapshot()
-	_expect(saved_settings == {"quality": 0, "sensitivity": 0, "layout": 1},
+	_expect(saved_settings == {"quality": 0, "sensitivity": 0, "layout": 1, "notification_volume": 1}
+		and game._audio.level == 1,
 		"The accepted choices are reflected in the running game")
 	_expect(SessionIO.load_state() == flight_before and not flight_before.has("quality"),
 		"Changing presentation leaves both in-progress flight values and the schema independent")
@@ -110,7 +122,8 @@ func _test_settings_scene() -> void:
 	game = _open_game()
 	await process_frame
 	_expect(game.presentation.snapshot() == saved_settings and game._view._visual_profile == 0
-		and _viewport.msaa_3d == Viewport.MSAA_DISABLED, "Reopening the application restores the saved view preset")
+		and _viewport.msaa_3d == Viewport.MSAA_DISABLED and game._audio.level == 1,
+		"Reopening the application restores the saved view preset and cue level")
 	var restored: Dictionary = JSON.parse_string(JSON.stringify(game.flight.snapshot()))
 	_expect(restored == flight_before and restored.schema == Flight.SAVE_SCHEMA,
 		"Cold start restores the unchanged docked flight alongside the preferences")
