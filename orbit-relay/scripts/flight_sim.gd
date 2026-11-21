@@ -33,7 +33,8 @@ const SpeedHold = preload("res://scripts/speed_hold.gd")
 const CivilianTraffic = preload("res://scripts/civilian_traffic.gd")
 const PilotCareer = preload("res://scripts/pilot_career.gd")
 const BranchingStory = preload("res://scripts/branching_story.gd")
-const SAVE_SCHEMA := 42
+const SectorNews = preload("res://scripts/sector_news.gd")
+const SAVE_SCHEMA := 43
 const REMOTE_RIG_ACCESS_DISTANCE := 20.0
 const MINING_PULSE_RANGE := 200.0
 const MINING_PULSE_FUEL := 0.4
@@ -155,6 +156,7 @@ var combat := CombatSystems.new()
 var ambient := CivilianTraffic.new()
 var career := PilotCareer.new()
 var story := BranchingStory.new()
+var news := SectorNews.new()
 var _mining_beam: Dictionary = {}
 var convoy_course := false
 var project_course := false
@@ -1802,6 +1804,7 @@ func story_action(action: String) -> bool:
 		return false
 	credits += int(receipt.credits)
 	career.note_story_result(receipt.trust)
+	_record_story_news(news, story.snapshot(), str(receipt.action))
 	_announce("story_" + str(receipt.action), receipt.message)
 	return true
 
@@ -1816,6 +1819,46 @@ func story_follow() -> bool:
 		return false
 	_announce("story_course", "Курс «Слепой поправки» на «%s»." % target_name(destination))
 	return true
+
+
+func news_archive(sector := -1, limit := 12) -> Array[Dictionary]:
+	var area := system_id if sector < 0 else sector
+	if not system_known(area):
+		return []
+	return news.archive(area, orbit_time, limit)
+
+
+func news_edition(sector: int, published_at: float) -> Dictionary:
+	var area := system_id if sector < 0 else sector
+	return news.edition(area, published_at, orbit_time) if system_known(area) else {}
+
+
+func news_article(id: String) -> Dictionary:
+	return news.article(id, orbit_time)
+
+
+static func _record_story_news(archive: SectorNews, branch: Dictionary, command: String) -> void:
+	match command:
+		BranchingStory.BRIEF:
+			if float(branch.briefed_at) >= 0.0:
+				archive.record("story-brief", "story_brief", Catalog.HOME_SYSTEM, branch.briefed_at,
+					"Диспетчеры обнаружили расхождение маячных координат у Сланца. Пилотов просят проверить расчёт курса.", "", "story")
+		BranchingStory.REGISTRY, BranchingStory.MIRROR:
+			if float(branch.chosen_at) >= 0.0:
+				var title: String = BranchingStory.BRANCHES[branch.branch].name
+				archive.record("story-choice", "story_choice", Catalog.HOME_SYSTEM, branch.chosen_at,
+					"Для проверки выбрали план «%s». Диспетчеры ожидают подтверждения." % title, "story-brief", "story")
+		BranchingStory.SUBMIT:
+			if float(branch.settled_at) >= 0.0:
+				var mirror: bool = branch.branch == BranchingStory.MIRROR
+				var region := Catalog.VELAR_SYSTEM if mirror else Catalog.HOME_SYSTEM
+				var headline := "story_mirror" if mirror else "story_registry"
+				archive.record("story-result", headline, region, branch.settled_at,
+					BranchingStory.BRANCHES[branch.branch].ending, "story-choice", "story")
+
+
+func _record_front_news(result: Dictionary, epoch: float) -> void:
+	news.record(result.news_id, result.event, result.news_system, epoch, result.message, result.news_related)
 
 
 func crew_status() -> Dictionary:
@@ -2055,6 +2098,12 @@ func project_action() -> bool:
 	var result := expedition.act(self)
 	if not result.get("ok", false):
 		return false
+	var region := int(status.system)
+	var prefix := "expedition-%d-" % region
+	match str(result.event):
+		"expedition_accepted": news.record(prefix + "opened", result.event, region, orbit_time, result.message)
+		"expedition_report": news.record(prefix + "survey", result.event, region, orbit_time, result.message, prefix + "opened")
+		"expedition_complete": news.record(prefix + "commission", result.event, region, orbit_time, result.message, prefix + "survey")
 	project_course = false
 	credits += int(result.get("credits", 0))
 	if result.has("commissioned"):
@@ -2235,6 +2284,8 @@ func _apply_convoy_result(result: Dictionary) -> void:
 		return
 	if event in ["convoy_order_escorted", "convoy_order_paid", "convoy_order_failed"]:
 		_stop_convoy_course()
+	if result.has("front_news"):
+		_record_front_news(result.front_news, orbit_time)
 	if event in ["convoy_order_paid", "convoy_order_failed"]:
 		career.note_convoy_result(convoy_order.faction, convoy_order.target_faction, convoy_order.kind, event == "convoy_order_paid")
 	credits += int(result.get("credits", 0))
@@ -3242,8 +3293,12 @@ func _advance_mission_deadlines() -> void:
 
 
 func _advance_front(epoch: float) -> void:
-	var result := factions.advance(epoch)
+	var due := factions.next_event_time()
+	if due > epoch:
+		return
+	var result := factions.advance(due)
 	if not result.is_empty():
+		_record_front_news(result, due)
 		_announce(result.event, result.message)
 
 
@@ -3975,7 +4030,7 @@ func snapshot() -> Dictionary:
 		"remote_rig": remote_rig.snapshot(), "orbital_mining": orbital_mining.snapshot(),
 		"combat": combat.snapshot(),
 		"ambient": ambient.snapshot(), "career": career.snapshot(),
-		"story": story.snapshot(),
+		"story": story.snapshot(), "news": news.snapshot(),
 		"speed_hold": speed_hold.snapshot(),
 	}
 
@@ -3984,6 +4039,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_news := schema < 43
 	var pre_story := schema < 42
 	var pre_career := schema < 41
 	var pre_ambient_traffic := schema < 40
@@ -4188,6 +4244,14 @@ func restore(state: Dictionary) -> bool:
 			var observed := restored_cartography.observation_time(BranchingStory.AUDIT_BODY)
 			if observed < 0.0 or observed > float(story_state.settled_at):
 				return false
+	var restored_news := SectorNews.new()
+	if pre_news:
+		var record := restored_story.snapshot()
+		_record_story_news(restored_news, record, BranchingStory.BRIEF)
+		_record_story_news(restored_news, record, str(record.branch))
+		_record_story_news(restored_news, record, BranchingStory.SUBMIT)
+	elif not restored_news.restore(state.get("news"), restored_epoch):
+		return false
 	var restored_position := Vector3(state.position[0], state.position[1], state.position[2])
 	var restored_velocity := Vector3(state.velocity[0], state.velocity[1], state.velocity[2])
 	var restored_dock := int(state.docked)
@@ -4482,6 +4546,7 @@ func restore(state: Dictionary) -> bool:
 	ambient = restored_ambient
 	career = restored_career
 	story = restored_story
+	news = restored_news
 	speed_hold = restored_speed
 	_mining_beam.clear()
 	star_heat = 0.0 if pre_thermal else float(state.star_heat)

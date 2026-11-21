@@ -8,6 +8,7 @@ signal dismissed()
 const Sector = preload("res://scripts/sector_catalog.gd")
 const Patrol = preload("res://scripts/patrol_encounter.gd")
 const MissionCalendar = preload("res://scripts/mission_calendar.gd")
+const NewsJournal = preload("res://scripts/news_journal.gd")
 const Story = preload("res://scripts/branching_story.gd")
 const INK := Color("edf7f9")
 const MUTED := Color("adc0c9")
@@ -21,7 +22,7 @@ const STORY_DATES := {
 	"chosen_at": "Принято решение", "briefed_at": "Получен запрос",
 }
 
-enum Page { WORK, PASSENGERS, RIG, CAREER, STORY }
+enum Page { WORK, PASSENGERS, RIG, CAREER, STORY, NEWS }
 
 var _sim: RefCounted
 var _insets: MarginContainer
@@ -46,11 +47,13 @@ var _passenger_page: HBoxContainer
 var _rig_page: HBoxContainer
 var _career_page: HBoxContainer
 var _story_page: HBoxContainer
+var _news_page: NewsJournal
 var _work_tab: Button
 var _passenger_tab: Button
 var _rig_tab: Button
 var _career_tab: Button
 var _story_tab: Button
+var _news_tab: Button
 var _rig_title: Label
 var _rig_location: Label
 var _rig_work: Label
@@ -123,7 +126,8 @@ func build() -> void:
 	_rig_tab = _button(tabs, "Бур")
 	_career_tab = _button(tabs, "Карьера")
 	_story_tab = _button(tabs, "Сюжет")
-	for tab: Button in [_work_tab, _passenger_tab, _rig_tab, _career_tab, _story_tab]:
+	_news_tab = _button(tabs, "Новости")
+	for tab: Button in [_work_tab, _passenger_tab, _rig_tab, _career_tab, _story_tab, _news_tab]:
 		tab.toggle_mode = true
 		tab.custom_minimum_size.x = 174.0
 	_work_tab.pressed.connect(_show_page.bind(Page.WORK))
@@ -131,6 +135,7 @@ func build() -> void:
 	_rig_tab.pressed.connect(_show_page.bind(Page.RIG))
 	_career_tab.pressed.connect(_show_page.bind(Page.CAREER))
 	_story_tab.pressed.connect(_show_page.bind(Page.STORY))
+	_news_tab.pressed.connect(_show_page.bind(Page.NEWS))
 	_rig_tab.hide()
 
 	_work_page = HBoxContainer.new()
@@ -156,6 +161,9 @@ func build() -> void:
 	_story_page.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	page.add_child(_story_page)
 	_build_story()
+	_news_page = NewsJournal.new()
+	page.add_child(_news_page)
+	_news_page.story_requested.connect(_show_page.bind(Page.STORY))
 	_show_page(Page.WORK)
 	get_viewport().size_changed.connect(_update_insets)
 	_update_insets()
@@ -188,10 +196,14 @@ func refresh() -> void:
 		_refresh_career()
 	if _story_page.visible:
 		_refresh_story()
+	if _news_page.visible:
+		_news_page.refresh(_sim)
 
 
 func close() -> void:
 	_touches.clear()
+	if is_instance_valid(_news_page):
+		_news_page.reset()
 	_sim = null
 	hide()
 
@@ -321,15 +333,19 @@ func _show_page(page: Page) -> void:
 	_rig_page.visible = page == Page.RIG
 	_career_page.visible = page == Page.CAREER
 	_story_page.visible = page == Page.STORY
+	_news_page.visible = page == Page.NEWS
 	_work_tab.set_pressed_no_signal(_work_page.visible)
 	_passenger_tab.set_pressed_no_signal(_passenger_page.visible)
 	_rig_tab.set_pressed_no_signal(_rig_page.visible)
 	_career_tab.set_pressed_no_signal(_career_page.visible)
 	_story_tab.set_pressed_no_signal(_story_page.visible)
+	_news_tab.set_pressed_no_signal(_news_page.visible)
 	if _career_page.visible and is_open():
 		_refresh_career()
 	if _story_page.visible and is_open():
 		_refresh_story()
+	if _news_page.visible and is_open():
+		_news_page.refresh(_sim)
 
 
 func _refresh_rig() -> void:
@@ -695,9 +711,11 @@ func _input(event: InputEvent) -> void:
 func _button_at(point: Vector2) -> Button:
 	if _close_button.get_global_rect().has_point(point):
 		return _close_button
-	for tab: Button in [_work_tab, _passenger_tab, _rig_tab, _career_tab, _story_tab]:
+	for tab: Button in [_work_tab, _passenger_tab, _rig_tab, _career_tab, _story_tab, _news_tab]:
 		if tab.is_visible_in_tree() and tab.get_global_rect().has_point(point):
 			return tab
+	if _news_page.visible:
+		return _news_page.button_at(point)
 	if _career_action.is_visible_in_tree() and not _career_action.disabled and _career_action.get_global_rect().has_point(point):
 		return _career_action
 	for option in _story_options:

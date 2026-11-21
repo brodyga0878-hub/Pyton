@@ -140,7 +140,7 @@ func advance(now: float) -> Dictionary:
 		_dispatch_convoys(frontier, system_id)
 		return _event("war_declared", "Фракция «%s» оспаривает контроль над системой «%s». Обе стороны отправили конвои." % [
 			faction_name(frontier.challenger), system,
-		])
+		], system_id, _campaign_news_key(system_id, int(frontier.campaign)), "expedition-%d-commission" % system_id)
 
 	var supply_bonus := _delivered_supply_bonus(frontier)
 	frontier.round += 1
@@ -150,7 +150,8 @@ func advance(now: float) -> Dictionary:
 		_dispatch_convoys(frontier, system_id)
 		return _event("war_round", "Фронт в системе «%s». Сила наступления %d%%, завершён раунд %d из %d. Вклад конвоев %+d п. п." % [
 			system, frontier.pressure, frontier.round, CAMPAIGN_ROUNDS, supply_bonus,
-		])
+		], system_id, "%s-round-%d" % [_campaign_news_key(system_id, int(frontier.campaign)), frontier.round],
+			_campaign_news_key(system_id, int(frontier.campaign)))
 
 	var captured: bool = frontier.pressure >= 55
 	if captured:
@@ -165,10 +166,10 @@ func advance(now: float) -> Dictionary:
 	if captured:
 		return _event("war_captured", "Контроль над системой «%s» перешёл к фракции «%s». Заключено перемирие. Вклад конвоев в решающем раунде %+d п. п." % [
 			system, faction_name(frontier.owner), supply_bonus,
-		])
+		], system_id, _campaign_news_key(system_id, int(frontier.campaign)) + "-outcome", _campaign_news_key(system_id, int(frontier.campaign)))
 	return _event("war_repulsed", "Фракция «%s» удержала систему «%s». Заключено перемирие. Вклад конвоев в решающем раунде %+d п. п." % [
 		faction_name(frontier.owner), system, supply_bonus,
-	])
+	], system_id, _campaign_news_key(system_id, int(frontier.campaign)) + "-outcome", _campaign_news_key(system_id, int(frontier.campaign)))
 
 
 func snapshot() -> Dictionary:
@@ -249,23 +250,25 @@ func _finish_convoy(convoy: Dictionary, system: int, delivered: bool) -> Diction
 	var faction: int = convoy.faction
 	var name := _system_name(system)
 	var cargo := "«%s», %d ед." % [str(convoy.shipment).to_lower(), convoy.units]
+	var key := "%s-arrival" % str(convoy.id)
+	var campaign := _campaign_news_key(system, int(_frontiers[FRONTIER_SYSTEMS.find(system)].campaign))
 	if delivered:
 		convoy.stage = "delivered"
 		if convoy.assistance == "escort":
 			return _event("war_convoy_delivered", "С вашей охраной конвой фракции «%s» доставил снабжение в систему «%s». Груз %s" % [
 				faction_name(faction), name, cargo,
-			])
+			], system, key, campaign)
 		return _event("war_convoy_delivered", "Конвой фракции «%s» доставил снабжение в систему «%s». Груз %s" % [
 			faction_name(faction), name, cargo,
-		])
+		], system, key, campaign)
 	convoy.stage = "intercepted"
 	if convoy.assistance == "intercept":
 		return _event("war_convoy_intercepted", "Вы сорвали поставку фракции «%s» в системе «%s». Потерян груз %s" % [
 			faction_name(faction), name, cargo,
-		])
+		], system, key, campaign)
 	return _event("war_convoy_intercepted", "Фракция «%s» перехватила конвой фракции «%s» в системе «%s». Потерян груз %s" % [
 		faction_name(1 - faction), faction_name(faction), name, cargo,
-	])
+	], system, key, campaign)
 
 
 static func _delivered_supply_bonus(frontier: Dictionary) -> int:
@@ -299,9 +302,13 @@ func _holdings(faction: int) -> int:
 	return total
 
 
-func _event(id: String, message: String) -> Dictionary:
+static func _campaign_news_key(system: int, campaign: int) -> String:
+	return "war-%d-%d" % [system, campaign]
+
+
+func _event(id: String, message: String, system: int, article: String, related: String) -> Dictionary:
 	_record(message)
-	return {"event": id, "message": message}
+	return {"event": id, "message": message, "news_system": system, "news_id": article, "news_related": related}
 
 
 func _record(message: String) -> void:

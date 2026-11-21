@@ -192,6 +192,7 @@ func fire(sim: RefCounted, range_bonus := 0.0) -> Dictionary:
 	if hull == 0.0:
 		var outcome := _pay(str(interdiction.message))
 		outcome.ok = true
+		outcome.front_news = interdiction
 		return outcome
 	return {"ok": true, "event": "convoy_order_fire", "message": "Попадание. Корпус конвоя %.0f%%." % hull}
 
