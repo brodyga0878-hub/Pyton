@@ -34,7 +34,7 @@ const CivilianTraffic = preload("res://scripts/civilian_traffic.gd")
 const PilotCareer = preload("res://scripts/pilot_career.gd")
 const BranchingStory = preload("res://scripts/branching_story.gd")
 const SectorNews = preload("res://scripts/sector_news.gd")
-const SAVE_SCHEMA := 44
+const SAVE_SCHEMA := 45
 const INTERRUPTED_LABELS := {
 	"autopilot": "автопилот", "rig_approach": "заход к буру", "orbit_maneuver": "орбитальный манёвр",
 	"rendezvous": "автоматическое сближение", "patrol_course": "наведение дозора",
@@ -482,12 +482,20 @@ func target_contact(index: int) -> Vector3:
 	return center + _approach_axis(index, orbit_time) * float(Catalog.site(index).pad_offset)
 
 
+func _surface_body(site: int) -> int:
+	return Ground.body(site) if Ground.is_port(site) else site
+
+
+func _surface_basis(site: int, epoch: float) -> Basis:
+	return Ground.basis(site, epoch) if Ground.is_port(site) else Terrain.spin_basis(site, epoch)
+
+
 func surface_velocity(site: int, at_point: Vector3) -> Vector3:
-	return target_velocity(site) + Terrain.spin_velocity(site, at_point - target_position(site))
+	return target_velocity(site) + Terrain.spin_velocity(_surface_body(site), at_point - target_position(site))
 
 
 func _reference_ground_weight(site: int) -> float:
-	if Terrain.spin_rate(site) <= 0.0:
+	if Terrain.spin_rate(_surface_body(site)) <= 0.0:
 		return 0.0
 	var altitude := position.distance_to(target_position(site)) - float(Catalog.site(site).radius)
 	return 1.0 - smoothstep(LANDING_GUIDE_HEIGHT - 20.0, LANDING_GUIDE_HEIGHT, altitude)
@@ -495,7 +503,7 @@ func _reference_ground_weight(site: int) -> float:
 
 func _reference_velocity(site: int) -> Vector3:
 	var drift := target_velocity(site)
-	return drift + Terrain.spin_velocity(site, position - target_position(site)) * _reference_ground_weight(site)
+	return drift + Terrain.spin_velocity(_surface_body(site), position - target_position(site)) * _reference_ground_weight(site)
 
 
 func intercept_time(index: int) -> float:
@@ -1053,6 +1061,11 @@ func set_autopilot(enabled: bool) -> void:
 		var center := target_position(index)
 		var offset := position - center
 		var near_distance := float(Catalog.site(index).radius) + 48.0
+		if index != target and Ground.is_port(index) and offset.length_squared() < 1600.0 and offset.dot(station_axis(index)) >= -0.8:
+			_departure_site = index
+			_departure_axis = station_axis(index)
+			_departure_leg = 1
+			break
 		if index != target and Catalog.is_mine_site(index) and offset.length_squared() < near_distance * near_distance and (Terrain.spin_rate(index) > 0.0 or offset.normalized().dot(Vector3.BACK) < 0.96):
 			_departure_site = index
 			_departure_axis = offset.normalized()
@@ -1132,7 +1145,8 @@ func docking_guidance() -> Dictionary:
 		"access": access, "cleared": access.ready, "crossed_hatch": crossed_hatch,
 		"axis_distance": axis_distance, "range": distance, "off_axis": off_axis, "lateral_error": off_axis.length(),
 		"closing_speed": -relative_velocity.dot(axis), "relative_speed": speed, "aim_error_deg": rad_to_deg(nose_error),
-		"roll_error_deg": rad_to_deg(bank_error), "spin_deg_sec": rad_to_deg(float(Catalog.site(target).spin)),
+		"roll_error_deg": rad_to_deg(bank_error),
+		"spin_deg_sec": rad_to_deg(Terrain.spin_rate(_surface_body(target)) if ground else float(Catalog.site(target).spin)),
 		"position_ok": position_ok, "speed_ok": speed_ok, "aim_ok": aim_ok, "roll_ok": roll_ok,
 		"sync_available": not ground and manual_flight and near and in_front and nose_error <= deg_to_rad(DOCK_SYNC_AIM),
 		"sync_active": dock_roll_sync == target, "reason": reason,
@@ -1263,7 +1277,7 @@ func _hold_departure_pose() -> void:
 	var rate := progress * (2.0 * a + 3.0 * b * progress) / DEPARTURE_SECONDS
 	var axis := station_axis(docked)
 	position = docking_position(docked) + axis * distance
-	velocity = target_velocity(docked) + axis * rate
+	velocity = surface_velocity(docked, position) + axis * rate
 	if Ground.is_port(docked):
 		var outside := Ground.basis(docked, orbit_time) * Basis(Vector3.UP, PI)
 		_set_orientation(outside.get_rotation_quaternion())
@@ -3220,7 +3234,7 @@ func _launch() -> void:
 		if _departure_requested:
 			roll = station_angle(origin)
 	throttle = 0.0
-	velocity = target_velocity(origin) + station_axis(origin) * DEPARTURE_SPEED
+	velocity = surface_velocity(origin, position) + station_axis(origin) * DEPARTURE_SPEED
 	target = _departure_target(_default_port(origin))
 	docked = -1
 	_departure_requested = false
@@ -3257,7 +3271,7 @@ func _dock() -> void:
 
 func _hold_docked_pose() -> void:
 	position = docking_position(docked)
-	velocity = Vector3.ZERO
+	velocity = target_velocity(docked) if Ground.is_port(docked) else Vector3.ZERO
 	if Ground.is_port(docked):
 		_set_orientation(Ground.basis(docked, orbit_time).get_rotation_quaternion())
 	else:
@@ -3418,7 +3432,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		position = next
 	else:
 		reset_time_scale()
-		var rotates := Terrain.spin_rate(obstacle) > 0.0
+		var rotates := Terrain.spin_rate(_surface_body(obstacle)) > 0.0
 		var impact_speed := velocity.distance_to(surface_velocity(obstacle, next)) if rotates else speed_relative_to(obstacle)
 		var damage := ship.apply_damage(clampf((impact_speed - IMPACT_DAMAGE_SPEED) * 0.32, 0.0, 45.0))
 		if damage > 0.0:
@@ -3431,9 +3445,9 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		if rotates:
 			if caught_by_motion:
 				var previous_center: Vector3 = Orbit.sample(obstacle, previous_orbit_time).position
-				var previous_frame := Terrain.spin_basis(obstacle, previous_orbit_time)
+				var previous_frame := _surface_basis(obstacle, previous_orbit_time)
 				var local := previous_frame.transposed() * (position - previous_center)
-				position = target_position(obstacle) + Terrain.spin_basis(obstacle, orbit_time) * local
+				position = target_position(obstacle) + _surface_basis(obstacle, orbit_time) * local
 				if _inside_hull(position, obstacle):
 					position = _outside_rotating_surface(position, obstacle, orbit_time)
 			velocity = surface_velocity(obstacle, position)
@@ -3617,7 +3631,11 @@ func _inside_hull(point: Vector3, index: int, epoch := -1.0, fixed_surface := fa
 	var center: Vector3 = target_position(index) if epoch < 0.0 else Orbit.sample(index, epoch).position
 	var relative := point - center
 	if Ground.is_port(index):
-		var orientation := Ground.basis(index, orbit_time if epoch < 0.0 else epoch)
+		var geometry_epoch := orbit_time if epoch < 0.0 else epoch
+		var orientation := Ground.basis(index, 0.0 if fixed_surface else geometry_epoch)
+		if fixed_surface:
+			var host: Vector3 = Orbit.sample(Ground.body(index), geometry_epoch).position
+			relative = point - (host + Ground.anchor_offset(index, 0.0))
 		return Ground.local_hull(index, orientation.transposed() * relative)
 	if Catalog.is_star(index):
 		var clearance := Catalog.stellar_clearance(index)
@@ -3673,6 +3691,13 @@ func _closed_hatch_between(from: Vector3, to: Vector3, previous_epoch: float) ->
 
 func _outside_rotating_surface(point: Vector3, site: int, epoch: float) -> Vector3:
 	var center: Vector3 = Orbit.sample(site, epoch).position
+	if Ground.is_port(site):
+		var platform := Ground.basis(site, epoch)
+		var local := platform.transposed() * (point - center)
+		var ceiling := Ground.HANGAR_TOP if Ground.is_hangar(site) else Ground.DECK_HEIGHT
+		local.z = maxf(local.z, ceiling + 0.5)
+		var repaired := center + platform * local
+		return center + platform.z * 12.0 if _inside_hull(repaired, Ground.body(site), epoch) else repaired
 	var outward := (point - center).normalized()
 	if outward.is_zero_approx():
 		outward = _surface_axis(site, epoch)
@@ -3700,7 +3725,7 @@ func _autopilot_step(delta: float) -> void:
 		landing_normal = surface_frame * Terrain.normal(target, remote_rig.direction)
 		var guide_up := Vector3.RIGHT if absf(outward.y) > 0.95 else Vector3.UP
 		surface_frame = Basis.looking_at(-outward, guide_up)
-	var rotates := Terrain.spin_rate(target) > 0.0
+	var rotates := Terrain.spin_rate(_surface_body(target)) > 0.0
 	var drift := surface_velocity(target, gate)
 	var relative := position - center
 	var approach_offset := surface_frame.transposed() * relative
@@ -3754,6 +3779,7 @@ func _autopilot_step(delta: float) -> void:
 		var side_clearance := maxf(84.0, target_radius + 42.0)
 		if ground and approach_offset.z < 34.0:
 			waypoint = center + landing_normal * 50.0
+			drift = surface_velocity(target, waypoint)
 			autopilot_phase = "Над посадочной площадкой"
 		elif not ground and approach_offset.z < front_clearance and absf(approach_offset.x) < side_clearance - 7.0:
 			var side := 1.0 if approach_offset.x >= 0.0 else -1.0
@@ -3774,6 +3800,9 @@ func _autopilot_step(delta: float) -> void:
 				var exit_point := departure + Vector3.BACK * forward_clearance
 				var side := 1.0 if center.x >= departure.x else -1.0
 				waypoint = exit_point if _departure_leg == 1 else exit_point + Vector3(side * maxf(83, departure_radius + 42.0), 0, 0)
+			elif Ground.is_port(_departure_site):
+				waypoint = departure + station_axis(_departure_site) * (departure_radius + 48.0)
+				drift = surface_velocity(_departure_site, waypoint)
 			else:
 				waypoint = departure + _departure_axis * (departure_radius * Terrain.MAX_RADIUS_FACTOR + 48.0)
 			autopilot_phase = "Выход из зоны объекта"
@@ -4075,6 +4104,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_lazur_spin := schema < 45
 	var pre_resume := schema < 44
 	var pre_news := schema < 43
 	var pre_story := schema < 42
@@ -4410,7 +4440,7 @@ func restore(state: Dictionary) -> bool:
 		var ground_velocity := Vector3.ZERO
 		if Terrain.spin_rate(restored_landing) > 0.0:
 			ground_velocity = orbit.velocity + Terrain.spin_velocity(restored_landing, offset)
-		if pre_rotation:
+		if pre_rotation or (pre_lazur_spin and restored_landing == Catalog.GROUND_BODY):
 			var old_contact: Vector3 = orbit.position + local_contact
 			if not restored_position.is_equal_approx(old_contact) or not restored_velocity.is_zero_approx():
 				return false
@@ -4549,13 +4579,17 @@ func restore(state: Dictionary) -> bool:
 		if Terrain.spin_rate(obstacle) > 0.0 and not _inside_hull(restored_position, obstacle, restored_epoch, true):
 			restored_position = _outside_rotating_surface(restored_position, obstacle, restored_epoch)
 			restored_velocity = Vector3.ZERO
-	# Old flights can occupy the new open pad deck or hangar shell before it existed.
-	if pre_ground_ports and restored_system == Catalog.VELAR_SYSTEM and restored_dock < 0 and restored_landing < 0:
-		var added_hull := _obstacle_at(restored_position, restored_system, restored_epoch, restored_expedition, restored_cartography)
-		if Ground.is_port(added_hull):
-			var anchor: Vector3 = Orbit.sample(added_hull, restored_epoch).position
-			restored_position = anchor + Ground.basis(added_hull, restored_epoch).z * 12.0
-			restored_velocity = Vector3.ZERO
+	# Keep a clear old position. Resolve only overlaps introduced by the new
+	# hardware or by the terrain and berths rotating into an existing flight.
+	if pre_lazur_spin and restored_system == Catalog.VELAR_SYSTEM and restored_dock < 0 and restored_landing < 0:
+		var overlap := _obstacle_at(restored_position, restored_system, restored_epoch, restored_expedition, restored_cartography)
+		if overlap == Catalog.GROUND_BODY or Ground.is_port(overlap):
+			if (Ground.is_port(overlap) and pre_ground_ports) or not _inside_hull(restored_position, overlap, restored_epoch, true):
+				restored_position = _outside_rotating_surface(restored_position, overlap, restored_epoch)
+				var remaining := _obstacle_at(restored_position, restored_system, restored_epoch, restored_expedition, restored_cartography)
+				if Ground.is_port(remaining):
+					restored_position = _outside_rotating_surface(restored_position, remaining, restored_epoch)
+				restored_velocity = Vector3.ZERO
 	var velocity_limit := MAX_SAVED_SPEED if schema >= 6 else MAX_SPEED * 1.56
 	if restored_velocity.length() > velocity_limit or (restored_dock < 0 and restored_landing < 0 and _blocked(restored_position, restored_system, restored_epoch, restored_expedition, restored_cartography)):
 		return false

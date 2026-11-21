@@ -4,6 +4,7 @@ const Fixture = preload("res://tests/flight_fixture.gd")
 
 const Flight = preload("res://scripts/flight_sim.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
+const Terrain = preload("res://scripts/surface_terrain.gd")
 const OrbitRelay = preload("res://main.tscn")
 const STEP := 1.0 / 60.0
 const HOME := Catalog.HOME_SYSTEM
@@ -302,6 +303,9 @@ func _parked(id: int) -> RefCounted:
 		state.landed_site = id
 		state.landing_direction = [0.0, 0.0, 1.0]
 		state.mining.site_id = id
+		if Terrain.spin_rate(id) > 0.0:
+			var drift := flight.surface_velocity(id, contact)
+			state.velocity = [drift.x, drift.y, drift.z]
 	if Catalog.is_mine_site(id) or id in [Catalog.GROUND_PAD, Catalog.GROUND_HANGAR]:
 		state.gear_extension = 1.0
 		state.gear_deployed = true

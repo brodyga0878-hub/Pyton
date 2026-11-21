@@ -9,6 +9,7 @@ const NORMAL_STEP := 0.0015
 const MINIMUM_NORMAL_COS := cos(deg_to_rad(MAX_LANDING_SLOPE))
 const DRILL_CLEARANCE := 1.05
 const DRILL_MAX_GROUND_DISTANCE_SQUARED := 100.0
+const LAZUR_SPIN_RATE := 0.025
 
 
 class Profile:
@@ -213,10 +214,10 @@ static func _build_profiles() -> Dictionary[int, Profile]:
 			var reach := sqrt(1.0 - elevation * elevation)
 			profile.crater_directions.append(Vector3(cos(angle) * reach, sin(angle) * reach, elevation))
 			profile.crater_widths.append(random.randf_range(0.12, 0.26))
-		if Catalog.is_generated_system(Catalog.system_of_site(id)):
+		if id == Catalog.GROUND_BODY or Catalog.is_generated_system(Catalog.system_of_site(id)):
 			# A separate seed keeps rotation independent of terrain sampling and its artwork.
 			random.seed = int(entry.seed) ^ 0x5E4F9B2D
-			profile.spin_rate = random.randf_range(0.025, 0.052)
+			profile.spin_rate = LAZUR_SPIN_RATE if id == Catalog.GROUND_BODY else random.randf_range(0.025, 0.052)
 			profile.spin_period = TAU / profile.spin_rate
 			var tilt := deg_to_rad(random.randf_range(6.0, 28.0))
 			var azimuth := random.randf_range(0.0, TAU)

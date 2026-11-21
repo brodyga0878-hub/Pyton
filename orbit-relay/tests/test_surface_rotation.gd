@@ -35,7 +35,7 @@ func _test_spin_geometry() -> void:
 	var count := 0
 	for site in range(Catalog.DESTINATION_COUNT):
 		var rate := Terrain.spin_rate(site)
-		var rotating := site >= Catalog.AUTHORED_DESTINATION_COUNT and Catalog.is_mine_site(site)
+		var rotating := site == Catalog.GROUND_BODY or (site >= Catalog.AUTHORED_DESTINATION_COUNT and Catalog.is_mine_site(site))
 		if not rotating:
 			_expect(rate == 0.0 and Terrain.spin_basis(site, 43.0) == Basis.IDENTITY
 				and Terrain.spin_velocity(site, Vector3.BACK * 150.0) == Vector3.ZERO,
@@ -57,7 +57,7 @@ func _test_spin_geometry() -> void:
 		_expect(spin_component.length() > 0.1 and absf(spin_component.dot(offset)) < 0.002
 			and spin_component.distance_to((after - before) / 0.1) < 0.003,
 			"Site %d has tangential ground velocity that agrees with numerical position change" % site)
-	_expect(count == 38, "All generated solid surfaces, including the binary planet and moon, rotate")
+	_expect(count == 39, "Lazur and all generated solid surfaces, including the binary planet and moon, rotate")
 
 
 func _fly_to_marked_pad() -> Flight:

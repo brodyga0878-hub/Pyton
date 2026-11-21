@@ -35,16 +35,18 @@ func _test_relative_geometry(site: int) -> void:
 	if not _expect(direction != Vector3.ZERO, "Site %d has sloped but landable off-pad terrain" % site):
 		return
 	var flight := _approach(site, direction, 8.0)
-	var normal := Terrain.normal(site, direction)
-	var tangent := Terrain.basis(site, direction).x
-	var site_velocity := flight.target_velocity(site)
+	var frame: Basis = Terrain.spin_basis(site, flight.orbit_time)
+	var ground := flight.target_position(site) + frame * Terrain.point(site, direction)
+	var normal := frame * Terrain.normal(site, direction)
+	var tangent := frame * Terrain.basis(site, direction).x
+	var site_velocity := flight.surface_velocity(site, ground)
 	flight.velocity = site_velocity - 2.0 * normal + 1.5 * tangent
 	var status := flight.surface_status()
 	_expect(status.guide and status.near and status.ok and not status.pad
 		and status.height_ok and status.speed_ok and status.slope_ok and status.aim_ok,
 		"Site %d reports a ready off-pad approach without changing the landing mode" % site)
 	_expect(status.direction.distance_to(direction) < 0.001 and status.surface_normal.distance_to(normal) < 0.001
-		and status.ground_point.distance_to(flight.target_position(site) + Terrain.point(site, direction)) < 0.004
+		and status.ground_point.distance_to(ground) < 0.004
 		and absf(status.altitude - 8.0) < 0.004 and status.aim_error_deg < 0.2,
 		"Site %d ground projection and nose angle use the actual terrain" % site)
 	_expect(site_velocity.length() > 0.01 and absf(status.descent_speed - 2.0) < 0.004
@@ -226,9 +228,12 @@ func _approach(site: int, direction: Vector3, height: float) -> Flight:
 	flight.freight.reset(EPOCH)
 	flight.docked = -1
 	flight.target = site
-	flight.position = flight.target_position(site) + Terrain.point(site, direction) + direction * height
-	flight.velocity = flight.target_velocity(site)
-	_aim(flight, -Terrain.normal(site, direction))
+	var frame: Basis = Terrain.spin_basis(site, EPOCH)
+	var center := flight.target_position(site)
+	var ground := center + frame * Terrain.point(site, direction)
+	flight.position = ground + frame * direction * height
+	flight.velocity = flight.surface_velocity(site, ground)
+	_aim(flight, -(frame * Terrain.normal(site, direction)))
 	flight.gear_extension = 1.0
 	flight.gear_deployed = true
 	return flight

@@ -212,6 +212,12 @@ static func _body_data(sim: RefCounted, site_id: int, site: Dictionary) -> Dicti
 	var radius: float = site.radius
 	var resource: String = site.get("resource", "")
 	var parent := Orbit.orbit_parent(site_id)
+	var host := int(site.get("ground_body", -1))
+	var spin := Terrain.spin_rate(site_id)
+	if host >= 0:
+		spin = Terrain.spin_rate(host)
+	elif Catalog.is_port(site_id):
+		spin = float(site.spin)
 	return {
 		"radius": radius, "period": Orbit.period(site_id),
 		"orbit_parent": parent,
@@ -222,7 +228,7 @@ static func _body_data(sim: RefCounted, site_id: int, site: Dictionary) -> Dicti
 		"atmosphere_density": float(atmosphere.get("density", 0.0)),
 		"resource": resource, "resource_name": Catalog.resource_name(resource) if not resource.is_empty() else "",
 		"reserve": sim.mining.reserve_at(site_id) if not resource.is_empty() else 0,
-		"spin": float(site.spin) if Catalog.is_port(site_id) else Terrain.spin_rate(site_id),
+		"spin": spin,
 	}
 
 

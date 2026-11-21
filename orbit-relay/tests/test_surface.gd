@@ -236,12 +236,13 @@ func _test_surface_cycle(site: int) -> void:
 		return
 	_tap(game, "dock", true, name)
 	var local_offset: Vector3 = Terrain.contact(site, direction)
+	var frame := Terrain.spin_basis(site, flight.orbit_time)
 	if not _expect(flight.landed_site == site and flight.landed_offpad()
-		and flight.position.distance_to(flight.target_position(site) + local_offset) < 0.01,
+		and flight.position.distance_to(flight.target_position(site) + frame * local_offset) < 0.01,
 		"%s lands at the chosen surface by touch" % name):
 		await _close_scene(game)
 		return
-	var landing_normal := Terrain.normal(site, direction)
+	var landing_normal := frame * Terrain.normal(site, direction)
 	_expect(flight.landed_basis().z.dot(landing_normal) > 0.9999 and flight.reference_site() == site,
 		"%s aligns with the local ground frame" % name)
 	var reserve := flight.mining.reserve_at(site)
@@ -293,16 +294,17 @@ func _test_surface_cycle(site: int) -> void:
 		"%s recovery loads one batch and depletes the matching stock once" % name)
 	game._update_display(0.0)
 	await process_frame
-	var body_velocity := flight.target_velocity(site)
+	var body_velocity := flight.surface_velocity(site, flight.position)
+	var launch_normal := flight.landed_basis().z
 	_tap(game, "dock", true, name)
 	var departure := flight.velocity - body_velocity
 	_expect(not flight.landed and flight.landing_direction == Vector3.ZERO and flight.target == next
-		and flight.ship.fuel == 0.0 and departure.dot(landing_normal) > 7.0
-		and departure.slide(landing_normal).length() < 0.05,
+		and flight.ship.fuel == 0.0 and departure.dot(launch_normal) > 7.0
+		and departure.slide(launch_normal).length() < 0.05,
 		"%s lifts by touch in the local outward direction with an empty tank" % name)
 	for _frame in range(40):
 		game._physics_process(STEP)
-	var clearance := flight.position - flight.target_position(site)
+	var clearance := Terrain.spin_basis(site, flight.orbit_time).transposed() * (flight.position - flight.target_position(site))
 	_expect(clearance.length() > Terrain.radius_at(site, clearance.normalized()) + 4.4
 		and flight.mining.cargo_amount(resource) == Rig.BATCH,
 		"%s can leave the actual terrain cleanly with the recovered cargo" % name)
@@ -329,9 +331,11 @@ func _approach(site: int, direction: Vector3, epoch := EPOCH) -> Flight:
 	flight.freight.reset(epoch)
 	flight.docked = -1
 	flight.target = site
-	flight.position = flight.target_position(site) + Terrain.contact(site, direction) + direction * 3.0
-	flight.velocity = flight.target_velocity(site)
-	_aim(flight, -Terrain.normal(site, direction))
+	var frame := Terrain.spin_basis(site, epoch)
+	var center := flight.target_position(site)
+	flight.position = center + frame * (Terrain.contact(site, direction) + direction * 3.0)
+	flight.velocity = flight.surface_velocity(site, center + frame * Terrain.point(site, direction))
+	_aim(flight, -(frame * Terrain.normal(site, direction)))
 	flight.gear_extension = 1.0
 	flight.gear_deployed = true
 	return flight

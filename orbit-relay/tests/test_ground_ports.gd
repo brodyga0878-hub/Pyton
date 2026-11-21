@@ -175,7 +175,7 @@ func _test_round_trip(ship: Flight) -> void:
 		"Open-pad takeoff immediately releases the ship along its armed route"):
 		return
 	var outward := ship.station_axis(PAD)
-	var relative := ship.velocity - ship.target_velocity(PAD)
+	var relative := ship.velocity - ship.surface_velocity(PAD, ship.position)
 	_expect(relative.dot(outward) > 5.0 and relative.slide(outward).length() < 0.08
 		and not ship.station_services_available() and not ship.market_trade("ice", "buy", 1),
 		"Takeoff follows the terrain normal with moving surface drift and disables station services")
@@ -219,7 +219,7 @@ func _test_hangar_departure(ship: Flight) -> void:
 	malformed.dock_access.port = PAD
 	_expect(not Flight.new().restore(malformed), "Crossing a hangar cannot be restored with a permit for the open pad")
 	if not _expect(Fixture.await_departure(restored) and restored.docked < 0 and restored.target == ORBITAL
-		and restored.velocity.is_equal_approx(restored.target_velocity(HANGAR) + restored.station_axis(HANGAR) * 6.0)
+		and restored.velocity.is_equal_approx(restored.surface_velocity(HANGAR, restored.position) + restored.station_axis(HANGAR) * 6.0)
 		and restored.ship.hull == ship.ship.hull,
 		"Continue the exact cold departure through the open hangar with no hull damage"):
 		return
@@ -256,7 +256,7 @@ func _autopilot_from_stop(ship: Flight, port: int) -> bool:
 func _place_on_axis(ship: Flight, port: int, altitude: float) -> Vector3:
 	var axis := ship.station_axis(port)
 	ship.position = ship.docking_position(port) + axis * altitude
-	ship.velocity = ship.target_velocity(port)
+	ship.velocity = ship.surface_velocity(port, ship.position)
 	ship.yaw = atan2(axis.x, axis.z)
 	ship.pitch = clampf(asin(-axis.y), -Flight.MAX_PITCH, Flight.MAX_PITCH)
 	ship.roll = ship.station_angle(port)

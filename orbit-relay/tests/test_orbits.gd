@@ -5,6 +5,7 @@ const Fixture = preload("res://tests/flight_fixture.gd")
 const Flight = preload("res://scripts/flight_sim.gd")
 const Orbit = preload("res://scripts/orbit_ephemeris.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
+const Terrain = preload("res://scripts/surface_terrain.gd")
 const Rig = preload("res://scripts/mining_rig.gd")
 const OrbitRelay = preload("res://main.tscn")
 const STEP := 1.0 / 60.0
@@ -100,22 +101,27 @@ func _test_moving_contacts() -> void:
 	var surface := _parked(10)
 	Fixture.launch(surface)
 	surface.select_target(MOON)
-	surface.position = surface.target_contact(MOON) + Vector3.BACK * 3.0
-	surface.yaw = 0.0
+	var moon_normal: Vector3 = Terrain.spin_basis(MOON, surface.orbit_time).z
+	var moon_ground := surface.target_position(MOON) + moon_normal * Terrain.radius_at(MOON, Vector3.BACK)
+	var moon_drift := surface.surface_velocity(MOON, moon_ground)
+	surface.position = surface.target_contact(MOON) + moon_normal * 3.0
+	surface.yaw = atan2(moon_normal.x, moon_normal.z)
+	surface.pitch = asin(-moon_normal.y)
 	surface.gear_extension = 1.0
 	surface.gear_deployed = true
-	surface.velocity = surface.target_velocity(MOON) + Vector3.FORWARD * 4.5
+	surface.velocity = moon_drift - moon_normal * 4.5
 	_expect(not surface.dock_action(), "Touchdown rejects excessive speed relative to the moon")
-	surface.velocity = surface.target_velocity(MOON) + Vector3.FORWARD * 2.0
+	surface.velocity = moon_drift - moon_normal * 2.0
 	_expect(surface.dock_action() and surface.landed_site == MOON, "A slow relative approach lands on the moving moon")
 	var before := surface.position
 	_step(surface, 4.0)
 	_expect(surface.position.distance_to(before) > 0.7 and surface.position == surface.target_contact(MOON)
 		and surface.reference_site() == MOON and is_zero_approx(surface.relative_speed()),
-		"The landed ship keeps contact on the translating surface")
-	var lunar_velocity := surface.target_velocity(MOON)
-	_expect(surface.dock_action() and surface.velocity.distance_to(lunar_velocity + Vector3.BACK * 9.0) < 0.02,
-		"Takeoff inherits the moving surface's orbital velocity")
+		"The landed ship keeps contact on the orbiting and rotating surface")
+	var lunar_velocity := surface.surface_velocity(MOON, surface.position)
+	var launch_normal := surface.landed_basis().z
+	_expect(surface.dock_action() and surface.velocity.distance_to(lunar_velocity + launch_normal * 9.0) < 0.02,
+		"Takeoff inherits the moving surface's orbital and axial velocity")
 
 
 func _test_time_flow() -> void:
@@ -330,8 +336,10 @@ func _parked(site: int, epoch := EPOCH) -> Flight:
 	var flight := Flight.new()
 	flight.freight.reset(epoch)
 	var state := flight.snapshot()
-	var center: Vector3 = Orbit.sample(site, epoch).position
-	var touch := center + Vector3.BACK * float(Catalog.site(site).pad_offset)
+	var site_orbit := Orbit.sample(site, epoch)
+	var frame := Terrain.spin_basis(site, epoch)
+	var offset := frame.z * float(Catalog.site(site).pad_offset)
+	var touch: Vector3 = site_orbit.position + offset
 	state.orbit_time = epoch
 	state.elapsed = epoch
 	state.position = [touch.x, touch.y, touch.z]
@@ -342,6 +350,9 @@ func _parked(site: int, epoch := EPOCH) -> Flight:
 		state.landed_site = site
 		state.landing_direction = [0.0, 0.0, 1.0]
 		state.mining.site_id = site
+		if Terrain.spin_rate(site) > 0.0:
+			var drift: Vector3 = site_orbit.velocity + Terrain.spin_velocity(site, offset)
+			state.velocity = [drift.x, drift.y, drift.z]
 	if Catalog.is_mine_site(site) or site in [Catalog.GROUND_PAD, Catalog.GROUND_HANGAR]:
 		state.gear_extension = 1.0
 		state.gear_deployed = true
