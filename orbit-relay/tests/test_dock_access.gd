@@ -183,6 +183,7 @@ func _test_save_and_reload() -> void:
 	legacy.ship.erase("pump_mode")
 	legacy.ship.erase("range_drive")
 	legacy.ship.erase("drive_kind")
+	legacy.ship.erase("autopilot_fitted")
 	legacy.mining.reserves.resize(Catalog.AUTHORED_DESTINATION_COUNT)
 	legacy.ship.erase("hull_id")
 	legacy.erase("dock_access")

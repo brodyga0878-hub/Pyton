@@ -172,8 +172,10 @@ func _handle_action(action: String) -> void:
 		var departure := flight.departure_status()
 		if departure.active and action != "time_pause" and (action != "dock" or not departure.can_cancel):
 			return
-	var near_target := flight.position.distance_to(flight.target_position(flight.target)) < maxf(150.0, float(Catalog.site(flight.target).radius) + Flight.FRAME_MARGIN)
+	var near_target := flight.nearby_pilot_target()
 	var throttle_step := 0.025 if near_target else 0.1
+	var speed_step := 2.0 if near_target else 10.0
+	var previous_speed := flight.speed_hold.snapshot()
 	match action:
 		"target":
 			flight.change_target()
@@ -189,6 +191,8 @@ func _handle_action(action: String) -> void:
 			flight.set_flight_assist(not flight.flight_assist)
 		"frame":
 			flight.cycle_reference_frame()
+		"speed_hold":
+			flight.toggle_speed_hold()
 		"orbit_cancel":
 			flight.cancel_orbit_maneuver()
 		"rendezvous_cancel":
@@ -196,9 +200,9 @@ func _handle_action(action: String) -> void:
 		"rendezvous_finish":
 			flight.finish_rendezvous()
 		"throttle_up":
-			flight.change_throttle(throttle_step)
+			flight.change_speed_pilot_control(throttle_step, speed_step)
 		"throttle_down":
-			flight.change_throttle(-throttle_step)
+			flight.change_speed_pilot_control(-throttle_step, -speed_step)
 		"dock":
 			flight.dock_action()
 		"contract":
@@ -274,8 +278,10 @@ func _handle_action(action: String) -> void:
 			return
 	if action in ["target", "autopilot", "throttle_up", "throttle_down"]:
 		_io.trace(action, {"target": flight.target, "autopilot": flight.autopilot, "throttle": flight.throttle})
+	var speed_changed: bool = flight.speed_hold.enabled != previous_speed.enabled or flight.speed_hold.setpoint != previous_speed.setpoint
+	var save_without_notice: bool = action == "target" or (speed_changed and flight.status_event.is_empty())
 	_deliver_notice()
-	if action == "target":
+	if save_without_notice:
 		_save()
 	_update_display(0.0)
 
@@ -295,6 +301,7 @@ func _deliver_notice() -> void:
 		"entry_heat": flight.entry_heat, "heat_shield": flight.ship.heat_shield,
 		"gear_extension": flight.gear_extension, "gear_deployed": flight.gear_deployed,
 		"flight_assist": flight.flight_assist,
+		"speed_hold": flight.speed_hold.snapshot(), "autopilot_fitted": flight.ship.autopilot_fitted,
 		"orbit_maneuver": flight.orbit_maneuver, "orbit_maneuver_focus": flight.orbit_maneuver_focus,
 		"rendezvous_active": flight.rendezvous_active,
 		"hull": flight.ship.hull, "contract_route": flight.contract_route_id, "contract_leg": flight.contract_leg,
@@ -410,7 +417,7 @@ func _deliver_notice() -> void:
 		"war_declared", "war_round", "war_captured", "war_repulsed", "war_convoy_delivered", "war_convoy_intercepted",
 		"convoy_order_accepted", "convoy_order_escorted", "convoy_order_failed", "convoy_order_paid",
 		"convoy_order_fire", "convoy_order_enemy_hit",
-		"flight_assist", "reference_frame", "time_paused", "time_resumed",
+		"flight_assist", "reference_frame", "time_paused", "time_resumed", "autopilot_equipment", "speed_hold_on", "speed_hold_off",
 		"survey_record", "galaxy_scan", "customs_inspection", "customs_paid",
 		"orbit_start", "orbit_complete", "orbit_abort", "orbit_cancel",
 		"rendezvous_start", "rendezvous_hold", "rendezvous_abort", "rendezvous_cancel", "rendezvous_finish",
@@ -476,7 +483,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_N: "map", KEY_J: "galaxy", KEY_K: "scoop", KEY_P: "services", KEY_O: "time", KEY_L: "market",
 		KEY_U: "patrol", KEY_X: "fire", KEY_I: "convoy", KEY_H: "flight_assist",
 		KEY_F2: "settings", KEY_F3: "journal", KEY_F4: "frontier",
-		KEY_F5: "dock_sync", KEY_F6: "dock_clearance", KEY_F7: "frame", KEY_F9: "time_pause", KEY_Y: "gear", KEY_C: "fuel",
+		KEY_F5: "dock_sync", KEY_F6: "dock_clearance", KEY_F7: "frame", KEY_F9: "time_pause", KEY_F10: "speed_hold", KEY_Y: "gear", KEY_C: "fuel",
 	}
 	if actions.has(event.physical_keycode):
 		_handle_action(actions[event.physical_keycode])

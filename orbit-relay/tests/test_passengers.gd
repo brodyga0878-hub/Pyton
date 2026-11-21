@@ -200,6 +200,7 @@ func _test_previous_schema() -> void:
 	previous.ship.erase("pump_mode")
 	previous.ship.erase("range_drive")
 	previous.ship.erase("drive_kind")
+	previous.ship.erase("autopilot_fitted")
 	previous.mining.reserves.resize(Catalog.AUTHORED_DESTINATION_COUNT)
 	previous.ship.erase("hull_id")
 	previous.erase("passengers")

@@ -86,6 +86,7 @@ func _test_offers_and_migration(campaign: Dictionary) -> void:
 	old.ship.erase("pump_mode")
 	old.ship.erase("range_drive")
 	old.ship.erase("drive_kind")
+	old.ship.erase("autopilot_fitted")
 	old.ship.erase("hull_id")
 	old.ship.erase("jump_fuel")
 	old.mining.cargo.erase("hydrogen")

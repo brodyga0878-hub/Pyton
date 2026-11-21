@@ -19,7 +19,7 @@ const BACK := Color(0.024, 0.057, 0.081, 0.94)
 const LINE := Color(0.24, 0.43, 0.49, 0.58)
 const COURSE_PAD := Rect2(26, -170, 172, 144)
 const ROLL_PAD := Rect2(210, -108, 112, 82)
-const FLIGHT_MODE_ROW := Rect2(26, -224, 296, 46)
+const FLIGHT_MODE_ROW := Rect2(26, -224, 350, 46)
 const TRANSLATION_ROW := Rect2(26, -279, 296, 46)
 const ACTION_COLUMN := Rect2(-340, -215, 314, 189)
 const TOUCH_GAINS := [0.72, 1.0, 1.36]
@@ -117,6 +117,8 @@ var _dock_sync_blocked := true
 var _dock_clearance_blocked := true
 var _gear_blocked := true
 var _frame_blocked := true
+var _autopilot_blocked := false
+var _speed_hold_blocked := true
 var _fire_blocked := false
 var _ecm_blocked := true
 var _jumping := false
@@ -523,12 +525,14 @@ func _build_flight_modes() -> void:
 	_button(_flight_modes, "frame", "Кадр")
 	_actions["frame"].custom_minimum_size.x = 66.0
 	_actions["frame"].tooltip_text = "Сменить систему отсчёта полёта (F7)"
+	_button(_flight_modes, "speed_hold", "Скорость")
+	_actions["speed_hold"].toggle_mode = true
 	_translation_controls = HBoxContainer.new()
 	_translation_controls.add_theme_constant_override("separation", 8)
 	_pin(_translation_controls, _safe, Vector2(0, 1), TRANSLATION_ROW)
 	_button(_translation_controls, "translation_forward", "Вперёд")
 	_button(_translation_controls, "translation_reverse", "Назад")
-	for action: String in ["translation_mode", "flight_assist", "frame", "translation_forward", "translation_reverse"]:
+	for action: String in ["translation_mode", "flight_assist", "frame", "speed_hold", "translation_forward", "translation_reverse"]:
 		var button: Button = _actions[action]
 		button.custom_minimum_size.y = 46.0
 		button.add_theme_font_size_override("font_size", 16)
@@ -569,6 +573,8 @@ func sync(sim: RefCounted, delta: float) -> void:
 		assist.add_theme_color_override("font_color", assist_color)
 	var frame: Dictionary = {} if parked else sim.frame_status()
 	_frame_blocked = not frame.get("available", false)
+	var speed_hold: Dictionary = {} if parked else sim.speed_hold_status()
+	_sync_speed_hold(speed_hold)
 	_throttle_controls.visible = not parked
 	_actions["target"].visible = not parked
 	_actions["services"].visible = port_services
@@ -667,7 +673,15 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_actions["scoop"].visible = not parked and (scoop_target or scoop_status.get("near", false) or sim.scooping)
 	_actions["scoop"].text = "Остановить" if sim.scooping else "Сбор H₂"
 	_actions["scoop"].tooltip_text = "Остановить сбор" if sim.scooping else str(scoop_status.get("reason", ""))
-	_actions["autopilot"].text = "Выкл. авто" if sim.autopilot else "Авто"
+	var autopilot: Button = _actions["autopilot"]
+	var equipment: Dictionary = sim.autopilot_equipment_status()
+	_autopilot_blocked = not bool(equipment.can_engage) and not sim.autopilot
+	if not equipment.installed:
+		autopilot.text = "Без авто"
+		autopilot.tooltip_text = "Автопилот не установлен. Оборудование доступно в сервисе порта."
+	else:
+		autopilot.text = "Выкл. авто" if sim.autopilot else "Авто"
+		autopilot.tooltip_text = "Отключить автопилот (F)" if sim.autopilot else "Включить автопилот (F)"
 	var itinerary: Dictionary = sim.contract_itinerary() if sim.contract_stage == 1 else {}
 	var transfer: bool = not itinerary.is_empty() and int(itinerary.leg) + 1 < itinerary.stops.size()
 	_actions["contract"].visible = port_services and (sim.contract_stage != 1 or sim.docked == sim.contract_destination)
@@ -702,7 +716,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 		if sim.contract_stage != 1 and patrol.get("phase") in [Patrol.OUTBOUND, Patrol.RETURN] and patrol_button.visible:
 			_guidance.text = str(patrol.get("reason", ""))
 	else:
-		_sync_flight(sim, scoop_status, itinerary, patrol, fire, convoy, rendezvous, entry_site, surface, frame, jump)
+		_sync_flight(sim, scoop_status, itinerary, patrol, fire, convoy, rendezvous, entry_site, surface, frame, jump, speed_hold)
 	_sync_passengers(sim)
 	_sync_thermal(stellar, entry, stellar_scoop, show_entry)
 	if _departure_blocked:
@@ -712,6 +726,21 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_notice_left -= delta
 		if _notice_left <= 0.0:
 			_notice_panel.hide()
+
+func _sync_speed_hold(status: Dictionary) -> void:
+	var enabled := bool(status.get("enabled", false))
+	_speed_hold_blocked = not bool(status.get("available", false)) and not enabled
+	var button: Button = _actions["speed_hold"]
+	button.set_pressed_no_signal(enabled)
+	var tint := CYAN if enabled else INK
+	if button.get_theme_color("font_color") != tint:
+		button.add_theme_color_override("font_color", tint)
+	button.tooltip_text = "Отключить удержание скорости (F10)" if enabled else "Удерживать скорость в выбранной системе отсчёта (F10)"
+	_actions["throttle_down"].text = "Скорость −" if enabled else "Тяга −"
+	_actions["throttle_up"].text = "Скорость +" if enabled else "Тяга +"
+	var step := int(status.get("step", 0))
+	_actions["throttle_down"].tooltip_text = "Уменьшить заданную скорость на %d м/с (V)" % step if enabled else "Уменьшить тягу (V)"
+	_actions["throttle_up"].tooltip_text = "Увеличить заданную скорость на %d м/с (R)" % step if enabled else "Увеличить тягу (R)"
 
 func _sync_combat(status: Dictionary) -> void:
 	var ecm: Button = _actions["ecm"]
@@ -1009,7 +1038,7 @@ func _sync_surface(sim: RefCounted, mining: RefCounted) -> void:
 			else:
 				_guidance.text = "Разверните добывающий модуль."
 
-func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictionary, patrol: Dictionary, fire: Dictionary, convoy: Dictionary, rendezvous: Dictionary, entry_site: int, surface: Dictionary, frame: Dictionary, jump: Dictionary) -> void:
+func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictionary, patrol: Dictionary, fire: Dictionary, convoy: Dictionary, rendezvous: Dictionary, entry_site: int, surface: Dictionary, frame: Dictionary, jump: Dictionary, speed_hold: Dictionary) -> void:
 	if _jumping:
 		_sync_jump(jump)
 		return
@@ -1033,7 +1062,12 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 	var reference: int = frame.reference
 	var entry_frame: bool = entry_site >= 0 and reference == entry_site and not frame.surface
 	_telemetry.text = "Тяга %d%%" % (sim.throttle * 100.0)
-	if not entry_frame:
+	var holding := bool(speed_hold.get("enabled", false))
+	if holding:
+		var actual := ("%+.1f" % snappedf(float(speed_hold.actual), 0.1)).replace(".", ",")
+		var setpoint := ("%+.1f" % snappedf(float(speed_hold.setpoint), 0.1)).replace(".", ",")
+		_telemetry.text = "Факт %s · Задано %s м/с" % [actual, setpoint]
+	elif not entry_frame:
 		var speed: float = frame.relative_speed
 		var speed_text := ("%.1f" % speed).replace(".", ",") if near_surface else "%d" % roundi(speed)
 		_telemetry.text = "Скорость %s м/с  ·  %s" % [speed_text, _telemetry.text]
@@ -1095,9 +1129,13 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 	elif sim.ship.fuel <= 0.0:
 		_guidance.text = "Резервная тяга. Откройте «Топливо» для перелива водорода."
 	elif not surface.is_empty():
-		_guidance.text = "Подойдите к поверхности вручную или включите «Авто» для захода на площадку."
+		_guidance.text = "Подойдите к поверхности вручную."
+		if not _autopilot_blocked:
+			_guidance.text += " Для захода на площадку можно включить «Авто»."
 	elif _translation_mode:
 		_guidance.text = "Круглая панель — сдвиг вбок и по высоте. «Вперёд» и «Назад» удерживайте."
+	elif holding:
+		_guidance.text = "Кнопки «Скорость ±» меняют задание. Тормоз отключает удержание."
 	else:
 		_guidance.text = "Курс и крен справа. Тяга и тормоз слева." if _touch_mirrored else "Курс и крен слева. Тяга и тормоз справа."
 	var frame_label := "Ручной кадр" if sim.orbit_maneuver or not rendezvous.is_empty() else "Кадр"
@@ -1282,6 +1320,8 @@ func _refresh_disabled_actions() -> void:
 		blocked = blocked or (action == "dock_clearance" and _dock_clearance_blocked)
 		blocked = blocked or (action == "gear" and _gear_blocked)
 		blocked = blocked or (action == "frame" and _frame_blocked)
+		blocked = blocked or (action == "autopilot" and _autopilot_blocked)
+		blocked = blocked or (action == "speed_hold" and (_speed_hold_blocked or _time_paused))
 		blocked = blocked or (RIG_ACTIONS.has(action) and not _rig_status.get(RIG_ACTIONS[action], false))
 		blocked = blocked or (ORBITAL_MINING_ACTIONS.has(action) and not _orbital_mining_status.get(ORBITAL_MINING_ACTIONS[action], false))
 		var manual_thrust := action in HOLD_ACTIONS or action in ["throttle_down", "throttle_up"]

@@ -153,6 +153,7 @@ func _test_previous_schema() -> void:
 	old.ship.erase("pump_mode")
 	old.ship.erase("range_drive")
 	old.ship.erase("drive_kind")
+	old.ship.erase("autopilot_fitted")
 	old.erase("customs")
 	old.mining.cargo.medical = 7
 	var migrated := Flight.new()

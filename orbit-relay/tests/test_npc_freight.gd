@@ -195,6 +195,7 @@ func _test_interval_and_migration() -> void:
 	old.ship.erase("pump_mode")
 	old.ship.erase("range_drive")
 	old.ship.erase("drive_kind")
+	old.ship.erase("autopilot_fitted")
 	old.ship.erase("hull_id")
 	old.ship.erase("jump_fuel")
 	old.mining.cargo.erase("hydrogen")

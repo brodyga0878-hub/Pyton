@@ -29,7 +29,8 @@ const OrbitalMining = preload("res://scripts/orbital_mining.gd")
 const MissionCalendar = preload("res://scripts/mission_calendar.gd")
 const CombatSystems = preload("res://scripts/combat_systems.gd")
 const Ground = preload("res://scripts/ground_port.gd")
-const SAVE_SCHEMA := 38
+const SpeedHold = preload("res://scripts/speed_hold.gd")
+const SAVE_SCHEMA := 39
 const REMOTE_RIG_ACCESS_DISTANCE := 20.0
 const MINING_PULSE_RANGE := 200.0
 const MINING_PULSE_FUEL := 0.4
@@ -143,6 +144,7 @@ var passengers := Passengers.new()
 var crew := Crew.new()
 var cartography := Cartography.new()
 var frame := FlightFrame.new()
+var speed_hold := SpeedHold.new()
 var customs := Customs.new()
 var remote_rig := UnattendedMining.new()
 var orbital_mining := OrbitalMining.new()
@@ -636,6 +638,7 @@ func start_rendezvous(site: int, gap := 150) -> bool:
 		return false
 	reset_time_scale()
 	set_autopilot(false)
+	_release_speed_hold(false)
 	select_target(site)
 	rendezvous_active = true
 	_rendezvous_site = site
@@ -682,6 +685,8 @@ func _rendezvous_block_reason(site: int, gap: int) -> String:
 		return "Выберите дистанцию ожидания"
 	if docked >= 0 or landed or jump_seconds_left > 0.0:
 		return "Выйдите в открытый космос"
+	if not ship.autopilot_fitted:
+		return "Автопилот снят. Его можно установить в порту."
 	if patrol.in_danger(self) or convoy_order.in_danger(self):
 		return "Отойдите от боевого контакта"
 	if ship.hull <= ShipSystems.MIN_HULL:
@@ -699,6 +704,7 @@ func start_orbit_maneuver(focus_id := -1) -> bool:
 	_orbit_normal = Navigation.orbit_normal(position - target_position(focus), velocity - target_velocity(focus), forward())
 	reset_time_scale()
 	set_autopilot(false)
+	_release_speed_hold(false)
 	flight_assist = false
 	throttle = 0.0
 	boost = false
@@ -757,6 +763,8 @@ func _orbit_speed_tolerance(focus: int, circular_speed: float) -> float:
 func _orbit_block_reason(focus: int, radius: float, relative_speed: float, band: Vector2, starting: bool) -> String:
 	if docked >= 0 or landed or jump_seconds_left > 0.0:
 		return "Выйдите в открытый космос"
+	if not ship.autopilot_fitted:
+		return "Автопилот снят. Его можно установить в порту."
 	if patrol.in_danger(self) or convoy_order.in_danger(self):
 		return "Отойдите от боевого контакта"
 	if band.x >= band.y:
@@ -919,16 +927,90 @@ func station_services_available() -> bool:
 	return not _departure_requested and station_operational(docked)
 
 
+func autopilot_equipment_status() -> Dictionary:
+	return {
+		"installed": ship.autopilot_fitted,
+		"available": station_services_available(),
+		"can_engage": ship.autopilot_fitted and _manual_speed_available(),
+	}
+
+
+func autopilot_equipment_action() -> bool:
+	if not station_services_available():
+		return false
+	var fitted := not ship.autopilot_fitted
+	ship.set_autopilot_fitted(fitted)
+	_announce("autopilot_equipment", "Автопилот установлен." if fitted else "Автопилот снят в отсек.")
+	return true
+
+
+func _manual_speed_available() -> bool:
+	return docked < 0 and not landed and jump_seconds_left <= 0.0
+
+
+func nearby_pilot_target() -> bool:
+	var radius := float(Catalog.site(target).radius)
+	return position.distance_to(target_position(target)) < maxf(150.0, radius + FRAME_MARGIN)
+
+
+func speed_hold_status() -> Dictionary:
+	var controls := frame_status()
+	return {
+		"available": _manual_speed_available(), "enabled": speed_hold.enabled,
+		"setpoint": speed_hold.setpoint, "name": controls.name,
+		"actual": SpeedHold.projected_speed(velocity, controls.velocity, forward()) if _manual_speed_available() else 0.0,
+		"step": 2.0 if nearby_pilot_target() else 10.0,
+	}
+
+
+func toggle_speed_hold() -> bool:
+	if not _manual_speed_available():
+		return false
+	reset_time_scale()
+	if speed_hold.enabled:
+		_release_speed_hold()
+	else:
+		set_autopilot(false)
+		throttle = 0.0
+		boost = false
+		speed_hold.set_enabled(true)
+		_announce("speed_hold_on", "Удержание продольной скорости включено.")
+	return true
+
+
+func adjust_speed_hold(amount: float) -> bool:
+	if not speed_hold.enabled or not _manual_speed_available() or not speed_hold.adjust(amount):
+		return false
+	reset_time_scale()
+	return true
+
+
+func change_speed_pilot_control(throttle_delta: float, speed_delta: float) -> void:
+	if speed_hold.enabled:
+		adjust_speed_hold(speed_delta)
+	else:
+		change_throttle(throttle_delta)
+
+
+func _release_speed_hold(notify := true) -> void:
+	if speed_hold.set_enabled(false) and notify:
+		_announce("speed_hold_off", "Удержание скорости выключено. Ручная тяга.")
+
+
 func change_throttle(amount: float) -> void:
 	if docked < 0 and not landed and _jump_transit_duration <= 0.0:
 		reset_time_scale()
 		cancel_jump()
+		_release_speed_hold()
 		if dock_roll_sync < 0:
 			set_autopilot(false)
 		throttle = clampf(throttle + amount, 0.0, 1.0)
 
 
 func set_autopilot(enabled: bool) -> void:
+	if enabled and not ship.autopilot_fitted:
+		_announce("autopilot_missing", "Автопилот снят. Его можно установить в порту.")
+		return
 	_rig_approach = false
 	cancel_dock_sync()
 	patrol_course = false
@@ -943,6 +1025,7 @@ func set_autopilot(enabled: bool) -> void:
 	autopilot_phase = "К створу" if autopilot else ""
 	if not autopilot:
 		return
+	_release_speed_hold(false)
 	for index: int in local_targets():
 		if Catalog.is_star(index):
 			continue
@@ -1418,7 +1501,7 @@ func track_remote_rig() -> bool:
 		return plan_route(int(status.system))
 	if not select_target(int(status.site)):
 		return false
-	if docked < 0:
+	if docked < 0 and ship.autopilot_fitted:
 		set_autopilot(true)
 		_rig_approach = true
 	_announce("remote_rig_route", "Курс к участку бурения на «%s»." % status.name)
@@ -1844,8 +1927,12 @@ func convoy_action(system := -1, id := "") -> bool:
 		return false
 	if not status.local:
 		return plan_jump(status.system)
+	if not ship.autopilot_fitted:
+		_announce("autopilot_missing", "Автопилот снят. Наводитесь на отметку конвоя вручную.")
+		return false
 	reset_time_scale()
 	set_autopilot(false)
+	_release_speed_hold(false)
 	convoy_course = true
 	_announce("convoy_order_course", "Проложен курс к конвою. «%s»." % status.name)
 	return true
@@ -1865,13 +1952,17 @@ func project_action() -> bool:
 		if status.route_system >= 0 and status.route_system != system_id:
 			return plan_jump(status.route_system)
 		if status.route_port >= 0 and select_target(status.route_port):
-			if docked < 0 and not landed:
+			if docked < 0 and not landed and ship.autopilot_fitted:
 				set_autopilot(true)
 			_announce("expedition_course", "Курс к порту заказчика.")
 			return true
 		if not status.can_follow:
 			return false
+		if not ship.autopilot_fitted:
+			_announce("autopilot_missing", "Автопилот снят. Наводитесь на отметку экспедиции вручную.")
+			return false
 		set_autopilot(false)
+		_release_speed_hold(false)
 		project_course = true
 		_announce("expedition_course", "Курс к цели экспедиции.")
 		return true
@@ -1963,10 +2054,16 @@ func patrol_action() -> bool:
 			_announce("patrol_accepted", "Дозор принят. После старта выберите «К сигналу».")
 	elif patrol.phase == Patrol.RETURN:
 		select_target(patrol.origin)
-		set_autopilot(true)
+		if ship.autopilot_fitted:
+			set_autopilot(true)
 	else:
+		if not ship.autopilot_fitted:
+			_announce("autopilot_missing", "Автопилот снят. Наводитесь на сигнал дозора вручную.")
+			return false
 		var follow := not patrol_course
 		set_autopilot(false)
+		if follow:
+			_release_speed_hold(false)
 		patrol_course = follow
 		if not follow:
 			throttle = 0.0
@@ -2222,6 +2319,8 @@ func service_offer(action: String) -> Dictionary:
 
 
 func service_action(action: String) -> bool:
+	if action == "autopilot":
+		return autopilot_equipment_action()
 	if not service_offer(action).allowed:
 		return false
 	var unit_price := repair_unit_price() if action == "repair" else refuel_unit_price()
@@ -2784,6 +2883,7 @@ func start_jump() -> bool:
 		_announce("jump_denied", status.reason)
 		return false
 	reset_time_scale()
+	_release_speed_hold(false)
 	cancel_dock_sync()
 	dock_access.clear()
 	patrol_course = false
@@ -2873,6 +2973,7 @@ func _finish_jump_arrival() -> void:
 
 func _arrive(direction := Vector3.BACK) -> void:
 	combat.clear_projectile()
+	_release_speed_hold(false)
 	if Catalog.is_mine_site(target):
 		mining.select_site(target)
 		landed_site = target
@@ -2954,6 +3055,7 @@ func _departure_target(default_target: int) -> int:
 
 func _dock() -> void:
 	docked = target
+	_release_speed_hold(false)
 	dock_access.settle(orbit_time)
 	gear_deployed = Ground.is_port(docked)
 	gear_extension = 1.0 if gear_deployed else 0.0
@@ -3150,6 +3252,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 				position += target_position(obstacle) - previous_center
 			velocity = target_velocity(obstacle) if caught_by_motion or shutter >= 0 else Vector3.ZERO
 		throttle = 0.0
+		_release_speed_hold(false)
 		set_autopilot(false)
 	_update_star_heat(delta)
 	_advance_fuel_pump(previous_orbit_time)
@@ -3251,10 +3354,14 @@ func _manual_step(delta: float, steer: Vector2, bank: float, boost_requested: bo
 	boost = boost_requested and not brake and had_fuel
 	var reference := reference_site()
 	var drift := _reference_velocity(reference) if reference >= 0 else Vector3.ZERO
+	if boost_requested or brake or not is_zero_approx(translation.z):
+		_release_speed_hold()
 	if brake:
 		throttle = 0.0
 		velocity = velocity.move_toward(drift, 67.0 * delta)
 		return 0.0
+	if speed_hold.enabled:
+		return _speed_hold_step(delta, drift, translation, had_fuel)
 	var thrust := 1.55 if boost else throttle
 	var local := Vector3(translation.x, translation.y, -translation.z - thrust)
 	var limit := 1.55 if boost else 1.0
@@ -3272,6 +3379,26 @@ func _manual_step(delta: float, steer: Vector2, bank: float, boost_requested: bo
 		var powered := (velocity + drive * drive_acceleration * delta).limit_length(powered_limit)
 		velocity = (powered + gravity_at(position) * delta).limit_length(MAX_SAVED_SPEED - 1.0)
 	return local.length()
+
+
+func _speed_hold_step(delta: float, drift: Vector3, translation: Vector3, had_fuel: bool) -> float:
+	var facing := forward()
+	var lateral := Vector2(translation.x, translation.y).limit_length()
+	var acceleration := 34.0 * ship.accel_factor() if had_fuel else 20.0
+	var speed_limit := _cruise_limit(MAX_SPEED)
+	if not lateral.is_zero_approx():
+		var lateral_motion := attitude() * Vector3(lateral.x, lateral.y, 0.0)
+		if flight_assist:
+			var actual := (velocity - drift).slide(facing)
+			velocity += actual.move_toward(lateral_motion * speed_limit, acceleration * lateral.length() * delta) - actual
+		else:
+			velocity += lateral_motion * acceleration * delta
+	if not flight_assist:
+		velocity += gravity_at(position) * delta
+	var authority := acceleration * sqrt(maxf(0.0, 1.0 - lateral.length_squared()))
+	var correction := speed_hold.speed_delta(velocity, drift, facing, authority, delta, speed_limit)
+	velocity = (velocity + facing * correction).limit_length(MAX_SAVED_SPEED - 1.0)
+	return Vector2(lateral.length(), absf(correction) / (acceleration * delta)).length()
 
 
 func _cruise_limit(speed_with_fuel: float) -> float:
@@ -3717,6 +3844,7 @@ func snapshot() -> Dictionary:
 		"cartography": cartography.snapshot(), "frame": frame.snapshot(), "customs": customs.snapshot(),
 		"remote_rig": remote_rig.snapshot(), "orbital_mining": orbital_mining.snapshot(),
 		"combat": combat.snapshot(),
+		"speed_hold": speed_hold.snapshot(),
 	}
 
 
@@ -3724,6 +3852,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_speed_hold := schema < 39
 	var pre_ground_ports := schema < 38
 	var pre_combat := schema < 37
 	var pre_jump_drive := schema < 36
@@ -3920,7 +4049,7 @@ func restore(state: Dictionary) -> bool:
 	var restored_patrol := Patrol.new()
 	var restored_landing := -1
 	var restored_plan := -1
-	if not pre_fuel and not restored_ship.restore(state.get("ship"), pre_economy, pre_heat_shield, pre_dual_fuel, pre_shipyard, pre_orbital_mining, pre_fuel_equipment, pre_jump_drive):
+	if not pre_fuel and not restored_ship.restore(state.get("ship"), pre_economy, pre_heat_shield, pre_dual_fuel, pre_shipyard, pre_orbital_mining, pre_fuel_equipment, pre_jump_drive, pre_speed_hold):
 		return false
 	var restored_route: Array[int] = []
 	if not pre_jump_route:
@@ -4062,6 +4191,11 @@ func restore(state: Dictionary) -> bool:
 		if restored_ship.jump_fuel + fare > restored_ship.jump_capacity() or not restored_velocity.is_zero_approx() or float(state.throttle) != 0.0:
 			return false
 	var restored_combat := CombatSystems.new()
+	var restored_speed := SpeedHold.new()
+	if not pre_speed_hold and not restored_speed.restore(state.get("speed_hold")):
+		return false
+	if restored_speed.enabled and (restored_dock >= 0 or restored_landing >= 0 or not restored_transit.is_empty() or float(state.throttle) != 0.0):
+		return false
 	if not pre_combat and not restored_combat.restore(state.get("combat"), restored_epoch, restored_system):
 		return false
 	if not restored_combat.projectile_status().is_empty() and (restored_dock >= 0 or restored_landing >= 0 or not restored_transit.is_empty()):
@@ -4160,6 +4294,7 @@ func restore(state: Dictionary) -> bool:
 	remote_rig = restored_remote_rig
 	orbital_mining = restored_orbital_mining
 	combat = restored_combat
+	speed_hold = restored_speed
 	_mining_beam.clear()
 	star_heat = 0.0 if pre_thermal else float(state.star_heat)
 	entry_heat = 0.0 if pre_entry else float(state.entry_heat)
