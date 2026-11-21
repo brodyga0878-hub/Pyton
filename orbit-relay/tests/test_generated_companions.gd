@@ -106,8 +106,9 @@ func _test_giant_flight() -> void:
 	var flight := _near_body(giant, 45.0, 140.0)
 	if not _expect(flight != null, "Seed a discovered gas-giant system"):
 		return
+	flight.system_id = Catalog.HOME_SYSTEM
 	flight.jump_target = Catalog.system_of_site(giant)
-	flight._finish_jump_arrival()
+	flight._finish_jump_arrival(flight.ship.flight_mass(flight.mining.ore_hold), -1)
 	if not _expect(flight.select_target(giant), "Select the generated gas giant from the normal system arrival"):
 		return
 	flight.set_autopilot(true)
