@@ -801,71 +801,122 @@ static func _style(fill: Color, border: Color, radius: int, padding: int) -> Sty
 
 
 class CommodityIcon extends Control:
-	## One 36-unit drawing grid serves the table and the order panel.
+	## A shared drawing grid keeps the three icon sizes recognizable by silhouette.
+
+	const GRID := 36.0
+	const INK := Color("08141d")
+	const METAL := Color("dbc18e")
 
 	var _commodity := ""
 	var _accent := Color.WHITE
 	var _tile := StyleBoxFlat.new()
 
 	func select(commodity: String, accent: Color) -> void:
-		if _commodity == commodity:
+		if _commodity == commodity and _accent == accent:
 			return
 		_commodity = commodity
 		_accent = accent
 		_tile.bg_color = Color("091720")
-		_tile.border_color = accent.lerp(Color("253946"), 0.70)
+		_tile.border_color = accent.lerp(Color("253946"), 0.64)
 		_tile.set_border_width_all(1)
 		_tile.set_corner_radius_all(7)
 		queue_redraw()
 
 	func _draw() -> void:
-		var scale_factor := minf(size.x, size.y) / 36.0
-		var scale_vector := Vector2.ONE * scale_factor
-		draw_set_transform((size - scale_vector * 36.0) * 0.5, 0.0, scale_vector)
-		draw_style_box(_tile, Rect2(0, 0, 36, 36))
-		var shadow := _accent.darkened(0.48)
-		var light := _accent.lightened(0.27)
+		var scale_vector := Vector2.ONE * (minf(size.x, size.y) / GRID)
+		draw_set_transform((size - scale_vector * GRID) * 0.5, 0.0, scale_vector)
+		draw_style_box(_tile, Rect2(0, 0, GRID, GRID))
 		match _commodity:
-			"ore":
-				_shape([Vector2(5, 23), Vector2(8, 17), Vector2(14, 16), Vector2(18, 23), Vector2(15, 29), Vector2(8, 28)], _accent)
-				_shape([Vector2(5, 23), Vector2(13, 25), Vector2(15, 29), Vector2(8, 28)], shadow)
-				_shape([Vector2(15, 20), Vector2(16, 11), Vector2(23, 7), Vector2(30, 12), Vector2(31, 21), Vector2(25, 27), Vector2(19, 25)], _accent)
-				_shape([Vector2(15, 20), Vector2(23, 17), Vector2(25, 27), Vector2(19, 25)], shadow)
-				_shape([Vector2(16, 11), Vector2(23, 7), Vector2(30, 12), Vector2(23, 17)], light)
-			"crystal":
-				_shape([Vector2(6, 24), Vector2(8, 16), Vector2(14, 19), Vector2(19, 28), Vector2(14, 30)], shadow)
-				_shape([Vector2(13, 24), Vector2(17, 10), Vector2(26, 5), Vector2(30, 13), Vector2(24, 28), Vector2(18, 31)], _accent)
-				_shape([Vector2(17, 10), Vector2(26, 5), Vector2(22, 16), Vector2(13, 24)], light)
-				_shape([Vector2(30, 13), Vector2(24, 28), Vector2(18, 31), Vector2(22, 16)], shadow)
-			"ice":
-				_shape([Vector2(7, 12), Vector2(18, 6), Vector2(29, 12), Vector2(29, 24), Vector2(18, 30), Vector2(7, 24)], _accent)
-				_shape([Vector2(7, 12), Vector2(18, 6), Vector2(29, 12), Vector2(18, 18)], light)
-				_shape([Vector2(18, 18), Vector2(29, 12), Vector2(29, 24), Vector2(18, 30)], shadow)
-				draw_line(Vector2(11, 17), Vector2(14, 23), light, 1.4, true)
-			"circuits":
-				for offset in [12, 18, 24]:
-					draw_line(Vector2(offset, 6), Vector2(offset, 30), light, 1.65, true)
-					draw_line(Vector2(6, offset), Vector2(30, offset), light, 1.65, true)
-				draw_rect(Rect2(9, 9, 18, 18), _accent)
-				draw_rect(Rect2(13, 13, 10, 10), shadow)
-				draw_rect(Rect2(16, 16, 4, 4), light)
-			"medical":
-				draw_polyline(PackedVector2Array([Vector2(13, 12), Vector2(13, 8), Vector2(23, 8), Vector2(23, 12)]), light, 1.5, true)
-				_shape([Vector2(5, 15), Vector2(8, 12), Vector2(28, 12), Vector2(31, 15), Vector2(31, 26), Vector2(28, 29), Vector2(8, 29), Vector2(5, 26)], _accent)
-				draw_rect(Rect2(7, 25, 22, 3), shadow)
-				draw_line(Vector2(18, 15), Vector2(18, 25), Color("482338"), 3.2, true)
-				draw_line(Vector2(13, 20), Vector2(23, 20), Color("482338"), 3.2, true)
-			Economy.HYDROGEN:
-				var ink := Color("23392f")
-				draw_rect(Rect2(15, 5, 8, 5), light)
-				_shape([Vector2(11, 12), Vector2(15, 9), Vector2(23, 9), Vector2(27, 12),
-					Vector2(27, 28), Vector2(24, 31), Vector2(14, 31), Vector2(11, 28)], _accent)
-				draw_rect(Rect2(24, 12, 3, 16), shadow)
-				draw_line(Vector2(14, 13), Vector2(14, 26), light, 1.2, true)
-				draw_line(Vector2(16, 15), Vector2(16, 23), ink, 1.5, true)
-				draw_line(Vector2(21, 15), Vector2(21, 23), ink, 1.5, true)
-				draw_line(Vector2(16, 19), Vector2(21, 19), ink, 1.5, true)
-				draw_line(Vector2(13, 27), Vector2(25, 27), shadow, 1.5, true)
+			"ore": _draw_ore()
+			"crystal": _draw_crystal()
+			"ice": _draw_ice()
+			"circuits": _draw_circuits()
+			"medical": _draw_medical()
+			Economy.HYDROGEN: _draw_hydrogen()
 
-	func _shape(points: Array[Vector2], color: Color) -> void:
-		draw_colored_polygon(PackedVector2Array(points), color)
+	func _draw_ore() -> void:
+		_facet([Vector2(4, 24), Vector2(8, 16), Vector2(14, 13), Vector2(19, 7), Vector2(27, 9),
+			Vector2(32, 16), Vector2(30, 25), Vector2(24, 30), Vector2(13, 30), Vector2(6, 28)], _accent.darkened(0.17))
+		_facet([Vector2(8, 16), Vector2(14, 13), Vector2(19, 7), Vector2(27, 9),
+			Vector2(24, 15), Vector2(16, 19), Vector2(11, 19)], _accent.lightened(0.27))
+		_facet([Vector2(24, 15), Vector2(27, 9), Vector2(32, 16), Vector2(30, 25),
+			Vector2(24, 30), Vector2(21, 23)], _accent.darkened(0.44))
+		_facet([Vector2(4, 24), Vector2(11, 19), Vector2(16, 19), Vector2(21, 23),
+			Vector2(24, 30), Vector2(13, 30), Vector2(6, 28)], _accent.darkened(0.27))
+		_edge([Vector2(8, 23), Vector2(14, 25), Vector2(19, 21), Vector2(22, 21), Vector2(26, 17)],
+			Color("ffe5a3"), 1.25)
+		_edge([Vector2(13, 16), Vector2(17, 14), Vector2(20, 14)], Color("fff0c2"))
+		draw_circle(Vector2(10.5, 26), 0.9, Color("ffdb91"), true, -1.0, true)
+
+	func _draw_crystal() -> void:
+		_facet([Vector2(5, 20), Vector2(9, 12), Vector2(15, 15), Vector2(19, 27),
+			Vector2(15, 31), Vector2(9, 28)], _accent.darkened(0.19))
+		_facet([Vector2(9, 12), Vector2(13, 19), Vector2(15, 31), Vector2(9, 28)], _accent.lightened(0.18))
+		_facet([Vector2(14, 23), Vector2(18, 10), Vector2(26, 4), Vector2(31, 10),
+			Vector2(29, 22), Vector2(23, 30), Vector2(17, 32)], _accent)
+		_facet([Vector2(18, 10), Vector2(26, 4), Vector2(23, 15), Vector2(14, 23)], _accent.lightened(0.46))
+		_facet([Vector2(26, 4), Vector2(31, 10), Vector2(29, 22), Vector2(23, 30),
+			Vector2(17, 32), Vector2(23, 15)], _accent.darkened(0.24))
+		_edge([Vector2(26, 6), Vector2(23, 15), Vector2(17, 29)], Color("ebdfff"))
+		_edge([Vector2(8, 20), Vector2(11, 24), Vector2(12, 27)], _accent.lightened(0.18))
+
+	func _draw_ice() -> void:
+		_facet([Vector2(5, 12), Vector2(18, 5), Vector2(31, 12), Vector2(31, 25),
+			Vector2(18, 32), Vector2(5, 25)], Color("439bc2"))
+		_facet([Vector2(5, 12), Vector2(18, 5), Vector2(31, 12), Vector2(18, 19)], _accent.lightened(0.48))
+		_facet([Vector2(5, 12), Vector2(18, 19), Vector2(18, 32), Vector2(5, 25)], _accent)
+		_facet([Vector2(18, 19), Vector2(31, 12), Vector2(31, 25), Vector2(18, 32)], Color("4286b8"))
+		_facet([Vector2(8, 17), Vector2(14, 20), Vector2(16, 27), Vector2(10, 24)], Color("74c5f0"))
+		_edge([Vector2(5, 12), Vector2(18, 19), Vector2(31, 12)], Color("e4f8ff"), 1.35)
+		_edge([Vector2(18, 19), Vector2(18, 30)], Color("b7ebff"))
+		_edge([Vector2(22, 18), Vector2(25, 20), Vector2(25, 24), Vector2(29, 25)], Color("a0e0fa"))
+
+	func _draw_circuits() -> void:
+		for offset: float in [11.0, 16.0, 21.0, 26.0]:
+			draw_line(Vector2(offset, 4.5), Vector2(offset, 31.5), METAL, 1.6, true)
+			draw_line(Vector2(4.5, offset), Vector2(31.5, offset), METAL, 1.6, true)
+		_facet([Vector2(10, 7), Vector2(27, 7), Vector2(29, 10), Vector2(29, 26),
+			Vector2(26, 29), Vector2(10, 29), Vector2(7, 26), Vector2(7, 10)], _accent.darkened(0.30))
+		_edge([Vector2(8, 25), Vector2(8, 11), Vector2(11, 8), Vector2(26, 8)], _accent.lightened(0.26))
+		draw_rect(Rect2(13, 13, 10, 10), Color("194653"))
+		draw_rect(Rect2(15, 15, 6, 6), _accent.lightened(0.19))
+		_edge([Vector2(10, 18), Vector2(13, 18)], _accent)
+		_edge([Vector2(18, 23), Vector2(18, 27), Vector2(24, 27)], _accent)
+		_edge([Vector2(22, 15), Vector2(25, 15), Vector2(25, 11)], _accent)
+		draw_circle(Vector2(24, 24), 1.1, METAL, true, -1.0, true)
+
+	func _draw_medical() -> void:
+		var hinge := _accent.darkened(0.48)
+		_edge([Vector2(12, 13), Vector2(12, 8), Vector2(15, 6.5), Vector2(21, 6.5),
+			Vector2(24, 8), Vector2(24, 13)], _accent.lightened(0.48), 2.0)
+		_facet([Vector2(5, 15), Vector2(8, 12), Vector2(28, 12), Vector2(31, 15), Vector2(31, 26),
+			Vector2(28, 30), Vector2(8, 30), Vector2(5, 26)], _accent)
+		_edge([Vector2(6, 15), Vector2(9, 13), Vector2(27, 13), Vector2(30, 15)], _accent.lightened(0.60))
+		_edge([Vector2(8, 26), Vector2(10, 28), Vector2(26, 28), Vector2(28, 26)], hinge, 1.5)
+		draw_rect(Rect2(7.5, 19, 2, 4.5), hinge)
+		draw_rect(Rect2(26.5, 19, 2, 4.5), hinge)
+		draw_rect(Rect2(13, 15, 10, 11), Color("673347"))
+		draw_rect(Rect2(17, 16.5, 2, 8), Color("fff1f4"))
+		draw_rect(Rect2(14.5, 19.5, 7, 2), Color("fff1f4"))
+
+	func _draw_hydrogen() -> void:
+		draw_rect(Rect2(14, 4, 8, 5.5), Color("dce6ca"))
+		_facet([Vector2(11, 12), Vector2(14, 9), Vector2(22, 9), Vector2(26, 12),
+			Vector2(26, 28), Vector2(23, 32), Vector2(14, 32), Vector2(11, 28)], _accent)
+		_facet([Vector2(22, 9), Vector2(26, 12), Vector2(26, 28), Vector2(23, 32), Vector2(22, 28)], _accent.darkened(0.40))
+		_edge([Vector2(12.5, 13), Vector2(14.5, 11), Vector2(20, 11)], _accent.lightened(0.55))
+		draw_rect(Rect2(13, 15, 9, 9), Color("466e51"))
+		_edge([Vector2(15.5, 16.5), Vector2(15.5, 22), Vector2(15.5, 19),
+			Vector2(20, 19), Vector2(20, 22), Vector2(20, 16.5)], Color("eaffd3"), 1.15)
+		draw_line(Vector2(12, 27.5), Vector2(25, 27.5), Color("3e634e"), 2.0, true)
+		_edge([Vector2(14, 30), Vector2(22, 30)], _accent.lightened(0.25))
+
+	func _facet(points: Array[Vector2], tint: Color) -> void:
+		var colors := PackedColorArray()
+		for point in points:
+			var shade := clampf((point.y - 5.0) / 26.0, 0.0, 1.0)
+			colors.append(tint.lightened(0.12).lerp(tint.lerp(INK, 0.19), shade))
+		draw_polygon(PackedVector2Array(points), colors)
+
+	func _edge(points: Array[Vector2], color: Color, width := 1.05) -> void:
+		draw_polyline(PackedVector2Array(points), color, width, true)
