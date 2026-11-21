@@ -26,6 +26,8 @@ func _run() -> void:
 	print("Dock departure integration: %d checks, %d failures" % [_checks, _failures.size()])
 	for failure: String in _failures:
 		printerr(failure)
+	# Let the headless mixer retire playback from the freed flight scene.
+	await create_timer(0.15).timeout
 	quit(0 if _failures.is_empty() else 1)
 
 
