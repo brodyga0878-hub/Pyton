@@ -11,23 +11,24 @@ const MAX_DEPTH = 12
 const MAX_NODES = 4096
 const MAX_SAFE_INTEGER = 9007199254740991
 
+enum LoadResult { NO_SAVE, PRIMARY, BACKUP, INVALID }
+
 var _started_msec := Time.get_ticks_msec()
 var _events: Array[String] = []
 
 
-static func save_state(state: Dictionary, path: String = SAVE_PATH) -> Error:
+static func save_state(state: Dictionary, path: String = SAVE_PATH, preserve_backup: bool = false) -> Error:
 	var bytes := _state_bytes(state)
 	if bytes.is_empty():
 		return ERR_INVALID_DATA
 
 	var destination := ProjectSettings.globalize_path(path)
-	var previous := _read_save(destination)
-	if not _parse_save(previous).is_empty():
-		# Only rotate in a valid copy. Preserve the last good backup if the
-		# current file was damaged before this save.
-		var backup_error := _replace_bytes(destination + ".previous", previous)
-		if backup_error != OK:
-			return backup_error
+	if not preserve_backup:
+		var previous := _read_save(destination)
+		if not _parse_save(previous).is_empty():
+			var backup_error := _replace_bytes(destination + ".previous", previous)
+			if backup_error != OK:
+				return backup_error
 	return _replace_bytes(destination, bytes)
 
 
@@ -37,6 +38,20 @@ static func load_state(path: String = SAVE_PATH) -> Dictionary:
 	if primary.is_empty():
 		return _parse_save(_read_save(destination + ".previous"))
 	return primary
+
+
+static func load_valid_state(path: String, validator: Callable) -> LoadResult:
+	var destination := ProjectSettings.globalize_path(path)
+	var primary := _parse_save(_read_save(destination))
+	if not primary.is_empty() and validator.call(primary):
+		return LoadResult.PRIMARY
+	var backup_path := destination + ".previous"
+	var backup := _parse_save(_read_save(backup_path))
+	if not backup.is_empty() and validator.call(backup):
+		return LoadResult.BACKUP
+	if FileAccess.file_exists(destination) or FileAccess.file_exists(backup_path):
+		return LoadResult.INVALID
+	return LoadResult.NO_SAVE
 
 
 func trace(event: String, fields: Dictionary = {}) -> void:

@@ -34,6 +34,7 @@ var _frontier := ExpansionBoard.new()
 var _io := SessionIO.new()
 var _save_elapsed := 0.0
 var _save_error_shown := false
+var _preserve_backup_on_next_save := false
 var _report: CenterContainer
 var _report_text: Label
 var _report_buttons: Array[Button] = []
@@ -43,9 +44,10 @@ var _report_sharing := false
 
 func _ready() -> void:
 	presentation.load_preferences()
-	var saved := SessionIO.load_state()
-	if not saved.is_empty():
-		_io.trace("load", {"accepted": flight.restore(saved)})
+	var loaded := SessionIO.load_valid_state(SessionIO.SAVE_PATH, flight.restore)
+	_preserve_backup_on_next_save = loaded == SessionIO.LoadResult.BACKUP
+	if loaded != SessionIO.LoadResult.NO_SAVE:
+		_io.trace("load", {"accepted": loaded != SessionIO.LoadResult.INVALID, "backup": _preserve_backup_on_next_save})
 	add_child(_audio)
 	add_child(_view)
 	_view.build()
@@ -106,7 +108,15 @@ func _ready() -> void:
 	_build_report_panel()
 	_apply_presentation()
 	_update_display(0.0)
+	var flight_notice := flight.status_message if not flight.status_event.is_empty() else ""
 	_deliver_notice()
+	if loaded == SessionIO.LoadResult.BACKUP:
+		var message := "Рейс восстановлен из резервной копии."
+		if not flight_notice.is_empty():
+			message += " " + flight_notice
+		_hud.notify(message)
+	elif loaded == SessionIO.LoadResult.INVALID:
+		_hud.notify("Сохранённый рейс недоступен. Начат новый рейс.")
 	_io.trace("session_started", {"system_id": flight.system_id, "docked": flight.docked, "deliveries": flight.deliveries, "presentation": presentation.snapshot()})
 
 
@@ -468,7 +478,9 @@ func _deliver_notice() -> void:
 
 func _save() -> void:
 	_save_elapsed = 0.0
-	var result := SessionIO.save_state(flight.snapshot())
+	var result := SessionIO.save_state(flight.snapshot(), SessionIO.SAVE_PATH, _preserve_backup_on_next_save)
+	if result == OK:
+		_preserve_backup_on_next_save = false
 	if result != OK and not _save_error_shown:
 		_hud.notify("Не удалось сохранить рейс.")
 		_io.trace("save_error", {"error": int(result)})
@@ -540,13 +552,14 @@ func _notification(what: int) -> void:
 		_report_sharing = false
 	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
 		var sharing_report := what == NOTIFICATION_APPLICATION_PAUSED and _report.visible and _report_sharing
+		# Preserve the interruption receipt before changing the live controls.
+		_save()
 		if not sharing_report:
 			flight.cancel_jump()
 			flight.cancel_orbit_maneuver()
 			flight.cancel_rendezvous()
 			flight.cancel_dock_sync()
 			flight.reset_time_scale()
-		_save()
 	elif what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		if _report.visible:
 			_close_report()
