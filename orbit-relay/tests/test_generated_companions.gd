@@ -103,11 +103,23 @@ func _test_lunar_flight() -> void:
 func _test_giant_flight() -> void:
 	var giant := FirstGiant
 	var flight := _near_body(giant, 45.0, 140.0)
-	if not _expect(flight != null and flight.select_target(giant), "Select the generated gas giant as a real receding target"):
+	if not _expect(flight != null, "Seed a discovered gas-giant system"):
+		return
+	flight.jump_target = Catalog.system_of_site(giant)
+	flight._finish_jump_arrival()
+	if not _expect(flight.select_target(giant), "Select the generated gas giant from the normal system arrival"):
+		return
+	flight.set_autopilot(true)
+	for _step in range(60 * 180):
+		if not flight.autopilot:
+			break
+		flight.update(Fixture.STEP, Vector2.ZERO, 0.0, false, false)
+	if not _expect(not flight.autopilot and flight.status_event == "gas_arrival" and flight.ship.hull == 100.0,
+		"The normal autopilot intercepts the moving giant and approaches its atmosphere without damage"):
 		return
 	var air := flight.atmosphere_status()
 	var collector := flight.scoop_status()
-	_expect(air.site == giant and air.inside and air.density > 0.0 and absf(float(air.altitude) - 45.0) < 0.001
+	_expect(air.site == giant and air.inside and air.density > 0.0 and absf(float(air.altitude) - 45.0) < 2.1
 		and collector.kind == "gas" and collector.ok and not flight.cycle_time_scale(),
 		"The flight uses the giant's atmosphere for pressure, time safety and co-moving scoop rules")
 	_expect(flight.survey_action(giant) and not flight.dock_action() and not flight.mine_action() and not flight.landed,

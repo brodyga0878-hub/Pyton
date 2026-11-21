@@ -48,6 +48,18 @@ func _run() -> void:
 	await process_frame
 	_expect(hud._navigation_drawer.visible and list.item_count == game.flight.local_targets().size(),
 		"The actual HUD touch shortcut opens the current-system list without requiring autopilot")
+	var previous_target: int = game.flight.target
+	var start := list.get_global_rect().get_center()
+	_touch(viewport, start, true, 1)
+	var scroll := InputEventScreenDrag.new()
+	scroll.index = 1
+	scroll.position = start - Vector2(0, 115)
+	viewport.push_input(scroll, true)
+	_touch(viewport, scroll.position, false, 1)
+	_expect(list.get_v_scroll_bar().value > 0.0 and game.flight.target == previous_target,
+		"A touch drag scrolls to additional rows without changing the route")
+	list.get_v_scroll_bar().value = 0.0
+	await process_frame
 	var row := list.get_item_rect(2).get_center() + list.get_global_rect().position
 	_tap(viewport, row, 1)
 	_expect(game.flight.target == hud._navigation_sites[2] and not hud._navigation_drawer.visible,

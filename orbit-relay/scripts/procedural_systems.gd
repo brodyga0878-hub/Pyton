@@ -164,7 +164,8 @@ static func _append_outer_giant(systems: Array[Dictionary], sites: Array[Diction
 		"name": "%s II" % system.name, "kind": "gas", "system_index": system_index,
 		"center": Vector3(star.center) + ray * orbital_radius, "orbit_parent": star_id,
 		"orbital_elements": Vector3(0.035, 360.0 * _sample(seed, 76), 12.0),
-		"radius": radius, "pad_offset": radius, "gate_offset": radius + 160.0,
+		# The usual approach contact is the skimming point, at the same altitude as Amber.
+		"radius": radius, "pad_offset": radius + 45.0, "gate_offset": radius + 160.0,
 		"accent": atmosphere.color, "atmosphere": atmosphere,
 	})
 	system.targets = system.targets + [id]

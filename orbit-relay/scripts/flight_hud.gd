@@ -681,7 +681,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	if _orbital_mining_tools.visible:
 		_right_panel.offset_top -= 57.0
 	_marks.flight = not parked and not _jump_transit
-	if not _marks.flight and _navigation_drawer.visible:
+	if (not _marks.flight or _jumping) and _navigation_drawer.visible:
 		close_navigation()
 	_marks.queue_redraw()
 	_sync_remote_rig(sim.remote_rig_status(), docked, landed)
@@ -1860,6 +1860,8 @@ class FlightMarks extends Control:
 		for marker: Dictionary in markers:
 			var screen: Vector2 = marker.screen
 			if not safe_area.has_point(screen) or _excluded.any(func(rect: Rect2) -> bool: return rect.grow(12.0).has_point(screen)):
+				continue
+			if target_visible and not marker.active and screen.distance_to(target_position) < NAVIGATION_HIT_RADIUS * 1.5:
 				continue
 			if navigation.any(func(other: Dictionary) -> bool: return screen.distance_to(other.screen) < NAVIGATION_HIT_RADIUS * 2.0):
 				continue
