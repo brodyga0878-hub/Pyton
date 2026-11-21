@@ -194,6 +194,22 @@ func snapshot() -> Dictionary:
 	return {"phase": phase, "origin": origin, "enemy_hull": enemy_hull, "encounter_time": _encounter_time, "completed": completed}
 
 
+func combat_clock() -> Dictionary:
+	return {"shot": _shot_delay, "attack": _attack_delay} if phase == ENGAGED else {}
+
+
+func restore_combat_clock(value: Variant) -> bool:
+	if not value is Dictionary:
+		return false
+	if phase != ENGAGED:
+		return value.is_empty()
+	if value.size() != 2 or not _number(value.get("shot"), 0.0, PLAYER_DELAY) or not _number(value.get("attack"), 0.0, FIRST_ATTACK_DELAY):
+		return false
+	_shot_delay = float(value.shot)
+	_attack_delay = float(value.attack)
+	return true
+
+
 func restore(value: Variant) -> bool:
 	if not value is Dictionary or value.size() != SAVE_FIELDS.size() or not value.has_all(SAVE_FIELDS):
 		return false

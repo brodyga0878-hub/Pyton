@@ -229,24 +229,28 @@ func _test_save_and_migration() -> void:
 	_step(flight, 1.0)
 	var saved := flight.snapshot()
 	var resumed := Flight.new()
-	_expect(resumed.restore(_round_trip(saved)) and resumed.snapshot() == saved and resumed.time_scale == 1
+	var cold_landing := saved.duplicate(true)
+	cold_landing.resume.interrupted = []
+	_expect(resumed.restore(_round_trip(saved)) and resumed.snapshot() == cold_landing and resumed.time_scale == 1
 		and resumed.orbit_time > 0.0 and resumed.position == resumed.target_contact(MOON)
 		and resumed.mining.phase == Rig.READY,
 		"A v6 landing restores orbital phase and mining without resuming acceleration")
 	var invalid := saved.duplicate(true)
 	invalid.orbit_time += EPOCH
-	_expect(not resumed.restore(invalid) and resumed.snapshot() == saved,
+	_expect(not resumed.restore(invalid) and resumed.snapshot() == cold_landing,
 		"Restore rejects a landing pose from another epoch without changing the live state")
 	invalid = saved.duplicate(true)
 	invalid.orbit_time = -1.0
-	_expect(not resumed.restore(invalid) and resumed.snapshot() == saved,
+	_expect(not resumed.restore(invalid) and resumed.snapshot() == cold_landing,
 		"A negative orbital epoch is rejected atomically")
 	var airborne := _clear_flight()
 	airborne.change_throttle(0.37)
 	airborne.cycle_time_scale()
 	_step(airborne, 2.0)
 	var cruise := airborne.snapshot()
-	_expect(resumed.restore(_round_trip(cruise)) and resumed.snapshot() == cruise and resumed.time_scale == 1,
+	var cold_cruise := cruise.duplicate(true)
+	cold_cruise.resume.interrupted = []
+	_expect(resumed.restore(_round_trip(cruise)) and resumed.snapshot() == cold_cruise and resumed.time_scale == 1,
 		"Cold restore in free flight retains inertial velocity, throttle, fuel and orbital positions")
 	_expect(resumed.target_position(1).distance_to(airborne.target_position(1)) < 0.001,
 		"The saved epoch reproduces the moving position of targets after a cold restart")

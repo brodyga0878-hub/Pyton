@@ -264,6 +264,9 @@ func _test_touch_board() -> void:
 			_expect(not flight.passenger_status().active and flight.credits == int(boarding.fare)
 				and int(flight.passenger_status().completed) == 1,
 				"The real discharge button settles the ticket and credits its remaining balance")
+	# Give the audio mixer time to release the stopped cockpit notification.
+	game._audio.set_level(0)
+	await create_timer(AudioServer.get_time_to_next_mix() + 0.025).timeout
 	viewport.queue_free()
 	await process_frame
 

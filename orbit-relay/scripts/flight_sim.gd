@@ -34,7 +34,15 @@ const CivilianTraffic = preload("res://scripts/civilian_traffic.gd")
 const PilotCareer = preload("res://scripts/pilot_career.gd")
 const BranchingStory = preload("res://scripts/branching_story.gd")
 const SectorNews = preload("res://scripts/sector_news.gd")
-const SAVE_SCHEMA := 43
+const SAVE_SCHEMA := 44
+const INTERRUPTED_LABELS := {
+	"autopilot": "автопилот", "rig_approach": "заход к буру", "orbit_maneuver": "орбитальный манёвр",
+	"rendezvous": "автоматическое сближение", "patrol_course": "наведение дозора",
+	"project_course": "наведение экспедиции", "convoy_course": "курс к конвою",
+	"dock_roll_sync": "синхронизация крена", "unpaid_jump_charge": "зарядка прыжкового привода",
+	"scoop": "сбор водорода", "time_scale": "ускорение времени",
+}
+const POWERED_ASSISTS := ["autopilot", "rig_approach", "orbit_maneuver", "rendezvous", "patrol_course", "project_course", "convoy_course"]
 const REMOTE_RIG_ACCESS_DISTANCE := 20.0
 const MINING_PULSE_RANGE := 200.0
 const MINING_PULSE_FUEL := 0.4
@@ -3994,9 +4002,36 @@ func _announce(event: String, message: String) -> void:
 	status_message = message
 
 
+func _interruptions_at_save() -> Array[String]:
+	var interrupted: Array[String] = []
+	if autopilot:
+		interrupted.append("rig_approach" if _rig_approach else "autopilot")
+	if orbit_maneuver:
+		interrupted.append("orbit_maneuver")
+	if rendezvous_active:
+		interrupted.append("rendezvous")
+	if patrol_course:
+		interrupted.append("patrol_course")
+	if project_course:
+		interrupted.append("project_course")
+	if convoy_course:
+		interrupted.append("convoy_course")
+	if dock_roll_sync >= 0:
+		interrupted.append("dock_roll_sync")
+	if jump_seconds_left > 0.0 and _jump_transit_duration <= 0.0:
+		interrupted.append("unpaid_jump_charge")
+	if scooping:
+		interrupted.append("scoop")
+	if time_scale > 1:
+		interrupted.append("time_scale")
+	return interrupted
+
+
 func snapshot() -> Dictionary:
 	var facing := _flight_orientation()
 	frame.reference_site(self)
+	var interrupted := _interruptions_at_save()
+	var powered := interrupted.any(func(mode: String) -> bool: return mode in POWERED_ASSISTS)
 	var transit := {}
 	if _jump_transit_duration > 0.0:
 		transit = {"remaining": jump_seconds_left, "duration": _jump_transit_duration, "fare": _jump_paid_fare}
@@ -4007,7 +4042,7 @@ func snapshot() -> Dictionary:
 		"yaw": yaw, "pitch": pitch, "roll": roll, "elapsed": elapsed,
 		"orientation": [facing.x, facing.y, facing.z, facing.w], "flight_assist": flight_assist,
 		"orbit_time": orbit_time, "time_paused": time_paused,
-		"throttle": 0.0 if orbit_maneuver or rendezvous_active else throttle, "docked": docked, "target": target,
+		"throttle": 0.0 if powered else throttle, "docked": docked, "target": target,
 		"dock_access": dock_access.snapshot(),
 		"departure_requested": _departure_requested, "departure_seconds": _departure_seconds,
 		"credits": credits, "deliveries": deliveries,
@@ -4032,6 +4067,7 @@ func snapshot() -> Dictionary:
 		"ambient": ambient.snapshot(), "career": career.snapshot(),
 		"story": story.snapshot(), "news": news.snapshot(),
 		"speed_hold": speed_hold.snapshot(),
+		"resume": {"interrupted": interrupted, "patrol_clock": patrol.combat_clock(), "convoy_clock": convoy_order.combat_clock()},
 	}
 
 
@@ -4039,6 +4075,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_resume := schema < 44
 	var pre_news := schema < 43
 	var pre_story := schema < 42
 	var pre_career := schema < 41
@@ -4431,6 +4468,23 @@ func restore(state: Dictionary) -> bool:
 			return false
 		if restored_ship.jump_fuel + fare > restored_ship.jump_capacity() or not restored_velocity.is_zero_approx() or float(state.throttle) != 0.0:
 			return false
+	var interrupted: Array[String] = []
+	if not pre_resume:
+		var resume: Variant = state.get("resume")
+		if not resume is Dictionary or resume.size() != 3 or not resume.get("interrupted") is Array:
+			return false
+		if not restored_patrol.restore_combat_clock(resume.get("patrol_clock")) or not restored_convoy_order.restore_combat_clock(resume.get("convoy_clock")):
+			return false
+		if resume.interrupted.size() > INTERRUPTED_LABELS.size():
+			return false
+		for mode: Variant in resume.interrupted:
+			if not mode is String or not INTERRUPTED_LABELS.has(mode) or mode in interrupted:
+				return false
+			if mode in POWERED_ASSISTS and float(state.throttle) != 0.0:
+				return false
+			interrupted.append(mode)
+		if "unpaid_jump_charge" in interrupted and (restored_jump < 0 or not restored_transit.is_empty()):
+			return false
 	var restored_combat := CombatSystems.new()
 	var restored_ambient := CivilianTraffic.new()
 	if not pre_ambient_traffic:
@@ -4577,6 +4631,13 @@ func restore(state: Dictionary) -> bool:
 			_hold_docked_pose()
 	elif landed:
 		_hold_landed_pose()
+	status_event = ""
+	status_message = ""
+	if not interrupted.is_empty():
+		var names := PackedStringArray()
+		for mode: String in interrupted:
+			names.append(str(INTERRUPTED_LABELS[mode]))
+		_announce("flight_restore_interruptions", "Временные режимы остановлены при загрузке (%s). Их можно включить снова." % ", ".join(names))
 	return true
 
 

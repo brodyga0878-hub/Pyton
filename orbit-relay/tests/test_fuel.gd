@@ -281,7 +281,10 @@ func _test_touch_route() -> void:
 	var restored: Dictionary = flight.snapshot()
 	var heat_preserved := is_equal_approx(restored.star_heat, active_save.star_heat)
 	restored.star_heat = active_save.star_heat
-	_expect(heat_preserved and restored == active_save and not flight.scooping and flight.scoop_status().ok
+	var cold_expected: Dictionary = active_save.duplicate(true)
+	cold_expected.resume.interrupted = []
+	_expect(heat_preserved and restored == cold_expected and "scoop" in active_save.resume.interrupted
+		and not flight.scooping and flight.scoop_status().ok
 		and flight.mining.cargo_amount(Economy.HYDROGEN) == 1 and is_zero_approx(flight.scoop_status().progress),
 		"Restart retains completed cargo canisters and shuts the scoop")
 	_tap(game._hud._actions.get("scoop"), "Touch reopens the scoop after a restart")

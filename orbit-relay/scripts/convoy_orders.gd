@@ -214,6 +214,22 @@ func snapshot() -> Dictionary:
 	}
 
 
+func combat_clock() -> Dictionary:
+	return {"shot": _shot_delay, "attack": _attack_delay} if phase == ACTIVE and kind == INTERCEPT else {}
+
+
+func restore_combat_clock(value: Variant) -> bool:
+	if not value is Dictionary:
+		return false
+	if phase != ACTIVE or kind != INTERCEPT:
+		return value.is_empty()
+	if value.size() != 2 or not _number(value.get("shot"), 0.0, PLAYER_DELAY) or not _number(value.get("attack"), 0.0, DEFENCE_DELAY):
+		return false
+	_shot_delay = float(value.shot)
+	_attack_delay = float(value.attack)
+	return true
+
+
 func restore(value: Variant, fronts: RefCounted, progress: RefCounted = null) -> bool:
 	if not value is Dictionary or value.size() != SAVE_FIELDS.size() or not value.has_all(SAVE_FIELDS):
 		return false

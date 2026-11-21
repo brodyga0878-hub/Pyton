@@ -69,8 +69,10 @@ func _test_midnight_and_freight() -> void:
 	_expect(cold.clock_status().paused and cold.orbit_time == MIDNIGHT - 0.25
 		and cold.freight.snapshot() == flight.freight.snapshot() and cold.market.snapshot() == flight.market.snapshot(),
 		"A paused disk load preserves the pending delivery and its warehouse balances")
+	var resumed_pause := paused.duplicate(true)
+	resumed_pause.resume.interrupted = []
 	_tick(cold, 86400.0)
-	_expect(cold.orbit_time == MIDNIGHT - 0.25 and cold.snapshot() == paused,
+	_expect(cold.orbit_time == MIDNIGHT - 0.25 and cold.snapshot() == resumed_pause,
 		"The paused cold state ignores a full day's worth of update calls")
 	if not _expect(cold.toggle_time_pause() and cold.status_event == "time_resumed" and _warp(cold),
 		"A cold paused pilot resumes and can select acceleration again"):

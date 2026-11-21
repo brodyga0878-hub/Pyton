@@ -238,6 +238,9 @@ func _touch(game: Node, action: String, enabled := true) -> void:
 
 
 func _close_scene(game: Node) -> void:
+	# Give the audio mixer time to release the stopped cockpit notification.
+	game._audio.set_level(0)
+	await create_timer(AudioServer.get_time_to_next_mix() + 0.025).timeout
 	game.queue_free()
 	await process_frame
 

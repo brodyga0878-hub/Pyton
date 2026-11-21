@@ -106,6 +106,7 @@ func _ready() -> void:
 	_build_report_panel()
 	_apply_presentation()
 	_update_display(0.0)
+	_deliver_notice()
 	_io.trace("session_started", {"system_id": flight.system_id, "docked": flight.docked, "deliveries": flight.deliveries, "presentation": presentation.snapshot()})
 
 

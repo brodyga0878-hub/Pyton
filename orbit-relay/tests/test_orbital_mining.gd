@@ -149,15 +149,16 @@ func _test_save_integrity(checkpoint: Dictionary) -> void:
 	var flight := Flight.new()
 	if not _expect(flight.restore(checkpoint), "Initialize an intact save used by the corruption checks"):
 		return
+	var intact := flight.snapshot()
 	var invalid := checkpoint.duplicate(true)
 	invalid.orbital_mining.fragments.append(invalid.orbital_mining.fragments.front().duplicate(true))
-	_expect(not flight.restore(invalid) and flight.snapshot() == checkpoint, "Reject duplicate escrow entries without changing the live flight")
+	_expect(not flight.restore(invalid) and flight.snapshot() == intact, "Reject duplicate escrow entries without changing the live flight")
 	invalid = checkpoint.duplicate(true)
 	invalid.orbital_mining.fragments[0].created = float(invalid.orbit_time) + 1.0
-	_expect(not flight.restore(invalid) and flight.snapshot() == checkpoint, "Reject loose ore created in the future")
+	_expect(not flight.restore(invalid) and flight.snapshot() == intact, "Reject loose ore created in the future")
 	invalid = checkpoint.duplicate(true)
 	invalid.mining.reserves[ASTEROID] = int(Catalog.site(ASTEROID).reserve)
-	_expect(not flight.restore(invalid) and flight.snapshot() == checkpoint, "Reject a loose fragment with no corresponding reserve debit")
+	_expect(not flight.restore(invalid) and flight.snapshot() == intact, "Reject a loose fragment with no corresponding reserve debit")
 
 
 func _test_interstellar(checkpoint: Dictionary) -> void:
