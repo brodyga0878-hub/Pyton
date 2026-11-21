@@ -156,7 +156,7 @@ func _build_expedition(card: VBoxContainer) -> void:
 		_steps.append(_status_row(stages, caption))
 	_supplies = _column(card, 3)
 	_label(_supplies, "Груз для следующей поставки", 17, MINT)
-	for good: String in Economy.GOODS:
+	for good: String in Economy.LEGACY_GOODS:
 		_materials.append(_label(_supplies, "", 17, INK))
 	var spacer := Control.new()
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -246,7 +246,7 @@ func _refresh_project(status: Dictionary) -> void:
 	var needs: Dictionary = status.needs
 	_supplies.visible = not needs.is_empty()
 	for index in range(_materials.size()):
-		var good: String = Economy.GOODS[index]
+		var good: String = Economy.LEGACY_GOODS[index]
 		var line := _materials[index]
 		var quantity := int(needs.get(good, 0))
 		line.visible = quantity > 0

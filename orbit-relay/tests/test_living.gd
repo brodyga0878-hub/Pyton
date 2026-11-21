@@ -309,7 +309,7 @@ func _jump_from_dock(flight: Flight, system: int) -> bool:
 			break
 		flight.update(STEP, Vector2.ZERO, 0.0, false, false)
 	var before: float = flight.ship.jump_fuel
-	var fare: int = Catalog.jump_cost(flight.system_id, system)
+	var fare: int = flight.jump_status(system).cost
 	if not flight.start_jump():
 		return false
 	_step(flight, 3.0)

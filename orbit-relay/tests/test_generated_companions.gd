@@ -144,6 +144,7 @@ func _test_legacy_restore() -> void:
 		return
 	var old := flight.snapshot()
 	old.schema = 47
+	Fixture.remove_expanded_market_from_legacy(old)
 	old.erase("cargo_pods")
 	old.mining.reserves.resize(FirstMoon)
 	old.frame.auto_site = -1

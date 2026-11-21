@@ -36,7 +36,7 @@ func _test_local_tariffs() -> void:
 		for port: int in Catalog.ports_for(system):
 			var flight := _at_port(port)
 			flight.credits = 2000
-			for good: String in Economy.GOODS:
+			for good: String in Economy.LEGACY_GOODS:
 				var buying := flight.market_quote(good, "buy", 1)
 				var selling := flight.market_quote(good, "sell", 1)
 				_expect(buying.ok and buying.cost == buying.unit and buying.stock > 0 and buying.owned == 0

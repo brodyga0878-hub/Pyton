@@ -22,6 +22,7 @@ const ShipSystems := preload("res://scripts/ship_systems.gd")
 const Crew := preload("res://scripts/crew.gd")
 const Economy := preload("res://scripts/port_economy.gd")
 const Factions := preload("res://scripts/faction_fronts.gd")
+const Calendar := preload("res://scripts/mission_calendar.gd")
 const EQUIPMENT_SERVICES := ["mining_laser", "fragment_collector", "hydrogen_scoop", "fuel_pump", "range_drive"]
 const DEFENSE_SERVICES := ["combat_shield", "combat_ecm", "combat_focus", "combat_repair"]
 const FUEL_MODULES := {"hydrogen_scoop": "scoop", "fuel_pump": "pump"}
@@ -29,7 +30,7 @@ const PUMP_MODES := {"off": "Выкл.", "reaction": "В реактивный", 
 const DRIVE_LABELS := {"standard": ShipSystems.STANDARD_DRIVE_NAME, "range": ShipSystems.RANGE_DRIVE_NAME}
 const WEAPON_LABELS := {"pulse": "Каскад", "focus": "Нить"}
 
-enum StationPage { SERVICES, CREW, YARD, CUSTOMS, MINING }
+enum StationPage { SERVICES, CREW, YARD, CUSTOMS, MINING, BERTH }
 enum EquipmentPage { FLIGHT, DEFENSE, NAVIGATION }
 
 var _sim: RefCounted
@@ -70,6 +71,17 @@ var _customs_pay: Button
 var _customs_receipt_title: Label
 var _customs_receipt: Label
 var _customs_other_debts: Label
+var _berth: VBoxContainer
+var _berth_toggle: Button
+var _berth_rates: Label
+var _berth_due: Label
+var _berth_pay: Button
+var _berth_defer: Button
+var _berth_receipt: Label
+var _berth_other_debts: Label
+var _civic_summary: Label
+var _civic_receipt: Label
+var _civic_donate: Button
 var _equipment: VBoxContainer
 var _equipment_tabs: Dictionary[int, Button] = {}
 var _equipment_page := EquipmentPage.FLIGHT
@@ -140,12 +152,14 @@ func build() -> void:
 	_yard_toggle.pressed.connect(_toggle_station_page.bind(StationPage.YARD))
 	_customs_toggle = _button(header)
 	_customs_toggle.pressed.connect(_toggle_station_page.bind(StationPage.CUSTOMS))
+	_berth_toggle = _button(header)
+	_berth_toggle.pressed.connect(_toggle_station_page.bind(StationPage.BERTH))
 	_mining_toggle = _button(header)
 	_mining_toggle.pressed.connect(_toggle_station_page.bind(StationPage.MINING))
 	_close_button = _button(header)
 	_close_button.text = "Закрыть"
 	_close_button.pressed.connect(func() -> void: dismissed.emit())
-	for button: Button in [_crew_toggle, _yard_toggle, _customs_toggle, _mining_toggle, _close_button]:
+	for button: Button in [_crew_toggle, _yard_toggle, _customs_toggle, _berth_toggle, _mining_toggle, _close_button]:
 		button.custom_minimum_size.x = 104.0
 
 	_port_details = HBoxContainer.new()
@@ -180,6 +194,7 @@ func build() -> void:
 	_build_crew(content)
 	_build_yard(content)
 	_build_customs(content)
+	_build_berth(content)
 	_equipment = VBoxContainer.new()
 	_equipment.add_theme_constant_override("separation", 8)
 	content.add_child(_equipment)
@@ -258,6 +273,7 @@ func refresh() -> void:
 			StationPage.CREW: _refresh_crew()
 			StationPage.YARD: _refresh_yard()
 			StationPage.CUSTOMS: _refresh_customs()
+			StationPage.BERTH: _refresh_berth()
 			StationPage.MINING:
 				match _equipment_page:
 					EquipmentPage.FLIGHT: _refresh_flight_equipment()
@@ -351,6 +367,7 @@ func _show_page() -> void:
 	var crew_open := not _fuel_only and _station_page == StationPage.CREW
 	var yard_open := not _fuel_only and _station_page == StationPage.YARD
 	var customs_open := not _fuel_only and _station_page == StationPage.CUSTOMS
+	var berth_open := not _fuel_only and _station_page == StationPage.BERTH
 	var mining_open := not _fuel_only and _station_page == StationPage.MINING
 	_title.text = "Портовые службы"
 	if _fuel_only:
@@ -361,6 +378,8 @@ func _show_page() -> void:
 		_title.text = "Верфь"
 	elif customs_open:
 		_title.text = "Таможня"
+	elif berth_open:
+		_title.text = "Портовый счёт"
 	elif mining_open:
 		_title.text = "Оснащение корабля"
 	_crew_toggle.text = "Сервис" if crew_open else "Экипаж"
@@ -369,14 +388,17 @@ func _show_page() -> void:
 	_yard_toggle.visible = not _fuel_only and _sim.shipyard_available()
 	_customs_toggle.text = "Сервис" if customs_open else "Таможня"
 	_customs_toggle.visible = not _fuel_only
+	_berth_toggle.text = "Сервис" if berth_open else "Сборы"
+	_berth_toggle.visible = not _fuel_only
 	_mining_toggle.text = "Сервис" if mining_open else "Оснащение"
 	_mining_toggle.visible = not _fuel_only
 	_port_details.visible = not _fuel_only
-	_gauges.visible = not (crew_open or yard_open or customs_open or mining_open)
+	_gauges.visible = not (crew_open or yard_open or customs_open or berth_open or mining_open)
 	_services.visible = not _fuel_only and _station_page == StationPage.SERVICES
 	_crew.visible = crew_open
 	_yard.visible = yard_open
 	_customs.visible = customs_open
+	_berth.visible = berth_open
 	_equipment.visible = mining_open
 	_mining.visible = _equipment_page == EquipmentPage.FLIGHT
 	_defense.visible = _equipment_page == EquipmentPage.DEFENSE
@@ -573,9 +595,12 @@ func _yard_card(parent: HBoxContainer, profile: Dictionary) -> Dictionary:
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var hold := _label(content, "", 17, MINT)
 	_label(content, "Специалисты для выхода · %d" % int(profile.crew_required), 17, TEXT)
-	var mobility := _label(content, "Скорость %d%% · Разгон %d%%\nРасход реактивного топлива %d%%" % [
-		roundi(float(profile.speed_factor) * 100.0), roundi(float(profile.accel_factor) * 100.0),
-		roundi(float(profile.burn_factor) * 100.0),
+	var positive: Vector3 = profile.thrust_positive
+	var negative: Vector3 = profile.thrust_negative
+	var mobility := _label(content, "Масса %d т · крен %d°/с\nТяга, кН · вперёд/назад %d/%d\nВлево/вправо %d/%d · вверх/вниз %d/%d" % [
+		roundi(float(profile.dry_mass)), roundi(rad_to_deg(float(profile.roll_rate))),
+		roundi(negative.z), roundi(positive.z), roundi(negative.x), roundi(positive.x),
+		roundi(positive.y), roundi(negative.y),
 	], 16, MUTED)
 	mobility.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var cost := _label(content, "", 17, TEXT)
@@ -693,6 +718,79 @@ func _request_customs_payment() -> void:
 	if is_open() and not _fuel_only and _station_page == StationPage.CUSTOMS and _sim.customs_status().can_pay:
 		_touches.clear()
 		customs_payment_requested.emit()
+
+
+func _build_berth(parent: VBoxContainer) -> void:
+	_berth = VBoxContainer.new()
+	_berth.add_theme_constant_override("separation", 8)
+	parent.add_child(_berth)
+	_berth_rates = _label(_berth, "", 19, MINT)
+	_berth_rates.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var settlement := _add_row(_berth, "Счёт этого порта", "")
+	_berth_due = settlement[0]
+	_berth_pay = settlement[1]
+	_berth_pay.pressed.connect(_request_berth_action.bind("berth_pay"))
+	_berth_defer = _button(_berth)
+	_berth_defer.text = "Запросить выход в долг"
+	_berth_defer.pressed.connect(_request_berth_action.bind("berth_defer"))
+	_berth_receipt = _label(_berth, "", 16, MUTED)
+	_berth_other_debts = _label(_berth, "", 16, AMBER)
+	_berth_other_debts.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_berth.add_child(HSeparator.new())
+	var donation := _add_row(_berth, "Фонд помощи экипажам", "")
+	_civic_summary = donation[0]
+	_civic_donate = donation[1]
+	_civic_donate.pressed.connect(_request_berth_action.bind("civic_donate"))
+	_civic_receipt = _label(_berth, "", 16, MUTED)
+	_berth.hide()
+
+
+func _refresh_berth() -> void:
+	var account: Dictionary = _sim.port_account_status()
+	var rate := int(account.per_day)
+	_berth_rates.text = "Швартовка и стоянка бесплатны."
+	if rate > 0:
+		_berth_rates.text = "Вход %d кр. · Стоянка %d кр. за сутки\nСледующий счёт %s" % [
+			int(account.entry), rate, Calendar.stamp(float(account.next_bill))]
+	var debt := int(account.debt)
+	_berth_due.text = "Задолженности нет."
+	if debt > 0:
+		var clearance := "Выход разрешён в долг" if account.overdue and account.cleared else "Выход закрыт" if account.overdue else "Отсрочка до %s" % Calendar.stamp(float(account.due))
+		_berth_due.text = "%d кр. к оплате · %s" % [debt, clearance]
+	var payment := mini(debt, int(_sim.credits))
+	_berth_pay.disabled = not account.can_pay
+	_berth_pay.text = "Внести %d кр." % payment if payment < debt else "Оплатить %d кр." % payment
+	if payment == 0:
+		_berth_pay.text = "Нет средств" if debt > 0 else "Оплата не нужна"
+	_berth_defer.visible = account.can_defer
+	var receipt: Dictionary = account.receipt
+	_berth_receipt.text = ""
+	if not receipt.is_empty():
+		var kind: String = {"entry": "Вход", "parking": "Стоянка", "payment": "Погашение счёта"}[receipt.kind]
+		_berth_receipt.text = "Квитанция · %s · %s · начислено %d кр., внесено %d кр." % [
+			Calendar.stamp(float(receipt.at)), kind, int(receipt.total), int(receipt.paid)]
+	_berth_receipt.visible = not receipt.is_empty()
+	var foreign := PackedStringArray()
+	for row: Dictionary in account.other_debts:
+		foreign.append("%s %d кр." % [_sim.target_name(int(row.port)), int(row.debt)])
+	_berth_other_debts.text = "Счета других портов оплачиваются на месте. %s" % " · ".join(foreign)
+	_berth_other_debts.visible = not foreign.is_empty()
+	var civic: Dictionary = _sim.civic_status()
+	_civic_summary.text = "Гражданская репутация %d / %d · Допуск к специальным курьерским рейсам" % [int(civic.score), int(civic.maximum)]
+	_civic_donate.text = "Пожертвовать %d кр. · +%d" % [int(civic.cost), int(civic.raise_by)] if int(civic.raise_by) > 0 else "Высшая репутация"
+	_civic_donate.disabled = not civic.can_donate
+	var contribution: Dictionary = civic.receipt
+	_civic_receipt.text = ""
+	if not contribution.is_empty():
+		_civic_receipt.text = "Всего передано %d кр. · Последний взнос: %s, %s" % [int(civic.donated),
+			_sim.target_name(int(contribution.port)), Calendar.stamp(float(contribution.at))]
+	_civic_receipt.visible = not contribution.is_empty()
+
+
+func _request_berth_action(action: String) -> void:
+	if is_open() and not _fuel_only and _station_page == StationPage.BERTH:
+		_touches.clear()
+		service_requested.emit(action)
 
 
 func _refresh_transfers() -> void:
@@ -1070,6 +1168,8 @@ func _button_at(point: Vector2) -> Button:
 		return _yard_toggle
 	if _customs_toggle.is_visible_in_tree() and _customs_toggle.get_global_rect().has_point(point):
 		return _customs_toggle
+	if _berth_toggle.is_visible_in_tree() and _berth_toggle.get_global_rect().has_point(point):
+		return _berth_toggle
 	if _mining_toggle.is_visible_in_tree() and _mining_toggle.get_global_rect().has_point(point):
 		return _mining_toggle
 	var buttons: Array = _action_buttons.values()
@@ -1081,6 +1181,8 @@ func _button_at(point: Vector2) -> Button:
 		buttons = _yard_rows.map(func(row: Dictionary) -> Button: return row.exchange)
 	elif _station_page == StationPage.CUSTOMS:
 		buttons = [_customs_pay]
+	elif _station_page == StationPage.BERTH:
+		buttons = [_berth_pay, _berth_defer, _civic_donate]
 	elif _station_page == StationPage.MINING:
 		buttons += _equipment_tabs.values()
 		match _equipment_page:

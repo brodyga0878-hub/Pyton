@@ -81,6 +81,7 @@ func _test_catalog() -> void:
 func _test_schema_45() -> void:
 	var old := Flight.new().snapshot()
 	old.schema = 45
+	Fixture.remove_expanded_market_from_legacy(old)
 	old.mining.reserves.resize(Catalog.PRE_EXPANDED_DESTINATION_COUNT)
 	var first := Catalog.AUTHORED_SYSTEM_COUNT
 	old.cartography.systems = [{"system": first, "epoch": 0.0}]

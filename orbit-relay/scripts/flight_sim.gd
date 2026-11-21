@@ -27,6 +27,8 @@ const Customs = preload("res://scripts/customs.gd")
 const UnattendedMining = preload("res://scripts/unattended_mining.gd")
 const OrbitalMining = preload("res://scripts/orbital_mining.gd")
 const CargoPods = preload("res://scripts/cargo_pods.gd")
+const PortAccount = preload("res://scripts/port_account.gd")
+const CivicReputation = preload("res://scripts/civic_reputation.gd")
 const MissionCalendar = preload("res://scripts/mission_calendar.gd")
 const CombatSystems = preload("res://scripts/combat_systems.gd")
 const Ground = preload("res://scripts/ground_port.gd")
@@ -35,7 +37,7 @@ const CivilianTraffic = preload("res://scripts/civilian_traffic.gd")
 const PilotCareer = preload("res://scripts/pilot_career.gd")
 const BranchingStory = preload("res://scripts/branching_story.gd")
 const SectorNews = preload("res://scripts/sector_news.gd")
-const SAVE_SCHEMA := 48
+const SAVE_SCHEMA := 49
 const INTERRUPTED_LABELS := {
 	"autopilot": "автопилот", "rig_approach": "заход к буру", "orbit_maneuver": "орбитальный манёвр",
 	"rendezvous": "автоматическое сближение", "patrol_course": "наведение дозора",
@@ -55,9 +57,14 @@ const MISSILE_DAMAGE := 28.0
 const MISSILE_HIT_RADIUS := 3.0
 const SHIPYARD_PORTS := [0, 10, Catalog.FRINGE_ARRIVAL_PORT]
 const TIME_SCALES := [1, 4, 16]
+const SETTLED_TIME_SCALES := [1, 4, 16, 64, 256]
+const FAST_WAIT_STEP := 4.0
+const FAST_WAIT_DEADLINE_MARGIN := 15.0
 const MAX_FLIGHT_STEP := 1.0 / 60.0
 const JUMP_CHARGE := 2.5
 const JUMP_TRANSIT_WALL := 0.45
+const LEGACY_JUMP_PRICING := 0
+const MASS_JUMP_PRICING := 1
 const SAVE_CLOCK_LIMIT := 3155760000.0
 const JUMP_BRAKE := 67.0
 const NAVIGATOR_JUMP_CHARGE := 2.2
@@ -77,7 +84,7 @@ const HEAT_DAMAGE_LIMIT := 85.0
 const MAX_STEER := 1.45
 const MAX_PITCH := PI * 0.5
 const LEGACY_MAX_PITCH := 1.42
-const MAX_ROLL := 1.9
+const MAX_ROLL := ShipSystems.COURIER_ROLL_RATE
 const DOCK_SPEED := 5.0
 const DOCK_ROLL_ERROR := 0.16
 const DOCK_AIM_ERROR := 0.15
@@ -159,6 +166,8 @@ var cartography := Cartography.new()
 var frame := FlightFrame.new()
 var speed_hold := SpeedHold.new()
 var customs := Customs.new()
+var _port_account := PortAccount.new()
+var _civic := CivicReputation.new()
 var remote_rig := UnattendedMining.new()
 var orbital_mining := OrbitalMining.new()
 var _cargo_pods := CargoPods.new()
@@ -181,6 +190,7 @@ var jump_seconds_left := 0.0
 var _jump_charge_total := JUMP_CHARGE
 var _jump_transit_duration := 0.0
 var _jump_paid_fare := 0
+var _jump_paid_pricing := MASS_JUMP_PRICING
 var _jump_route: Array[int] = []
 var target := 1
 var planned_target := -1
@@ -314,7 +324,8 @@ func time_status() -> Dictionary:
 	if convoy_course or convoy_order.in_danger(self):
 		return {"allowed": false, "reason": "Сближение с конвоем"}
 	if docked >= 0 or landed:
-		return {"allowed": true, "reason": ""}
+		var fast_available := orbit_time < _fast_wait_stop_epoch()
+		return {"allowed": true, "reason": "", "max_rate": SETTLED_TIME_SCALES[-1] if fast_available else TIME_SCALES[-1]}
 	if Atmosphere.sample(self, position, velocity).inside:
 		return {"allowed": false, "reason": "Полёт в атмосфере"}
 	if maxf(star_heat, entry_heat) >= HEAT_SCOOP_LIMIT:
@@ -323,7 +334,7 @@ func time_status() -> Dictionary:
 		var radius := Catalog.SCOOP_OUTER + STAR_WARP_MARGIN if Catalog.is_star(id) else float(Catalog.site(id).radius) + FRAME_MARGIN
 		if position.distance_squared_to(target_position(id)) <= radius * radius:
 			return {"allowed": false, "reason": "Рядом «%s»" % target_name(id)}
-	return {"allowed": true, "reason": ""}
+	return {"allowed": true, "reason": "", "max_rate": TIME_SCALES[-1]}
 
 
 func cycle_time_scale() -> bool:
@@ -334,7 +345,8 @@ func cycle_time_scale() -> bool:
 	if not availability.allowed:
 		_announce("time_denied", "Ускорение недоступно. %s." % availability.reason)
 		return false
-	time_scale = TIME_SCALES[(TIME_SCALES.find(time_scale) + 1) % TIME_SCALES.size()]
+	var rates := SETTLED_TIME_SCALES if int(availability.max_rate) > TIME_SCALES[-1] else TIME_SCALES
+	time_scale = rates[(rates.find(time_scale) + 1) % rates.size()]
 	_announce("time_scale", "Скорость времени ×%d." % time_scale)
 	return true
 
@@ -528,7 +540,8 @@ func roll_error(index: int) -> float:
 
 
 func _match_target_roll(delta: float) -> void:
-	var turn := clampf(roll_error(target), -MAX_ROLL * delta, MAX_ROLL * delta)
+	var limit := ship.roll_rate(mining.ore_hold) * delta
+	var turn := clampf(roll_error(target), -limit, limit)
 	roll = wrapf(roll + turn, -PI, PI)
 
 
@@ -549,7 +562,7 @@ func _flight_orientation() -> Quaternion:
 
 
 func _rotate_manual(steer: Vector2, bank: float, delta: float) -> void:
-	var rates := Vector3(steer.y * MAX_STEER, -steer.x * MAX_STEER, bank * MAX_ROLL)
+	var rates := Vector3(steer.y * MAX_STEER, -steer.x * MAX_STEER, bank * ship.roll_rate(mining.ore_hold))
 	var speed := rates.length()
 	if speed <= 0.000001:
 		return
@@ -860,7 +873,14 @@ func _current_contract() -> Array:
 
 
 func courier_offer() -> Dictionary:
-	return Economy.courier_at(docked)
+	var offer := Economy.courier_at(docked)
+	if offer.is_empty():
+		return offer
+	var required := int(CivicReputation.CONTRACT_REQUIREMENTS.get(offer.id, 0))
+	var score := _civic.reputation(deliveries)
+	offer.allowed = station_services_available() and score >= required
+	offer.access_hint = "Гражданская репутация %d / %d. Помогите фонду экипажей или завершите обычные рейсы." % [score, required] if score < required else ""
+	return offer
 
 
 func contract_itinerary() -> Dictionary:
@@ -875,6 +895,10 @@ func contract_itinerary() -> Dictionary:
 func accept_courier(route_id: String) -> bool:
 	var offer := courier_offer()
 	if offer.is_empty() or offer.id != route_id or contract_stage == 1:
+		return false
+	if not offer.allowed:
+		if not str(offer.access_hint).is_empty():
+			_announce("contract_reputation_denied", offer.access_hint)
 		return false
 	contract_origin = docked
 	_contract_issuer = factions.owner(system_id)
@@ -961,6 +985,18 @@ func select_target(index: int) -> bool:
 
 func station_services_available() -> bool:
 	return not _departure_requested and station_operational(docked)
+
+
+func port_account_status() -> Dictionary:
+	var account := _port_account.status(docked, orbit_time, credits)
+	var available := station_services_available()
+	account.can_pay = account.can_pay and available
+	account.can_defer = account.can_defer and available
+	return account
+
+
+func civic_status() -> Dictionary:
+	return _civic.status(deliveries, credits, station_services_available())
 
 
 func autopilot_equipment_status() -> Dictionary:
@@ -1147,6 +1183,7 @@ func docking_guidance() -> Dictionary:
 	var manual_flight := not (autopilot or orbit_maneuver or rendezvous_active or patrol_course or project_course or convoy_course)
 	return {
 		"near": near, "in_front": in_front, "port": target,
+		"port_tariff": PortAccount.TARIFFS.get(target, Vector2i.ZERO),
 		"ground": ground, "ground_hangar": hangar, "gear_ok": gear_ok,
 		"awaiting_gear": ground and access.ready and position_ok and crossed_hatch and speed_ok and aim_ok and not gear_ok,
 		"ok": access.ready and position_ok and crossed_hatch and speed_ok and aim_ok and roll_ok and gear_ok,
@@ -1201,12 +1238,15 @@ func dock_clearance_action() -> bool:
 func departure_status() -> Dictionary:
 	var required := ship.crew_required()
 	var hired: int = crew.status(orbit_time).count if docked >= 0 and required > 0 else 0
+	var cleared := _port_account.clearance(docked, orbit_time, credits)
 	var status := {"active": _departure_requested, "can_cancel": false, "phase": "idle",
 		"progress": 0.0, "wait": 0.0, "reason": "Запросите выход", "port": docked,
-		"can_request": docked >= 0 and not _departure_requested and hired >= required}
+		"can_request": docked >= 0 and not _departure_requested and hired >= required and cleared}
 	if not _departure_requested:
 		if docked >= 0 and hired < required:
 			status.reason = "Для выхода нужен экипаж: %d из %d. Откройте Сервис → Экипаж." % [hired, required]
+		elif docked >= 0 and not cleared:
+			status.reason = "Просрочен счёт этого порта. Откройте Сервис → Сборы."
 		elif Ground.is_port(docked) and not Ground.is_hangar(docked):
 			status.reason = "Можно взлететь с площадки"
 		return status
@@ -1238,7 +1278,7 @@ func _departure_action() -> bool:
 		return false
 	var status := departure_status()
 	if not status.can_request:
-		_announce("departure_crew_denied", status.reason)
+		_announce("departure_crew_denied" if _port_account.clearance(docked, orbit_time, credits) else "departure_charge_denied", status.reason)
 		return false
 	reset_time_scale()
 	if Ground.is_port(docked) and not Ground.is_hangar(docked):
@@ -1615,57 +1655,103 @@ func customs_pay() -> bool:
 
 func _inspect_docked_cargo() -> void:
 	var authority := factions.owner(system_id)
-	var good := "medical"
-	var excess := Customs.excess(authority, good, mining.cargo_amount(good))
-	if excess <= 0 or not mining.remove_cargo(good, excess):
-		return
-	var result := customs.record(authority, docked, good, excess, orbit_time)
-	if _apply_service_result(result):
-		career.note_customs_violation(authority)
-	else:
-		mining.insert_cargo(good, excess)
+	for good: String in Economy.ALLOWANCES:
+		var excess := Customs.excess(authority, good, mining.cargo_amount(good))
+		if excess > 0:
+			_confiscate_market_cargo(authority, good, excess, false)
 
 
-func market_quote(good: String, side: String, quantity: int) -> Dictionary:
-	var unit := market.trade_value(docked, good, side, 1)
-	var stock := market.stock(docked, good)
+func _confiscate_market_cargo(authority: int, good: String, quantity: int, hidden: bool) -> bool:
+	if not mining.remove_cargo(good, quantity):
+		return false
+	var result := customs.record(authority, docked, good, quantity, orbit_time)
+	if hidden and result.ok:
+		result.event = "market_contact_seized"
+		result.message = "Тайная сделка сорвана. " + str(result.message)
+	if not _apply_service_result(result):
+		mining.insert_cargo(good, quantity)
+		return false
+	career.note_customs_violation(authority)
+	return true
+
+
+func market_profile(port: int) -> Dictionary:
+	var region := Catalog.system_of_site(port)
+	if region < 0:
+		return {}
+	var control := factions.system_state(region)
+	var settlements := 0
+	for local_port: int in Catalog.ports_for(region):
+		if station_operational(local_port):
+			settlements += 1
+	return Economy.profile(port, int(control.owner), settlements, int(control.pressure), control.stage == "war")
+
+
+func market_contact() -> Dictionary:
+	return Economy.contact(docked, factions.owner(system_id)) if station_services_available() else {}
+
+
+func market_quote(good: String, side: String, quantity: int, hidden := false) -> Dictionary:
+	var local := market_profile(docked)
+	var owner := int(local.get("owner", -1))
+	var allowance := Customs.allowance(owner, good)
+	var listed := Economy.GOODS.has(good) and side in ["buy", "sell"] and not local.is_empty()
+	if listed:
+		listed = market_contact().get("goods", []).has(good) if hidden else allowance != 0
+	var unit := market.trade_value(docked, good, side, 1, local, hidden) if listed else 0
+	var stock := market.stock(docked, good, hidden)
 	var owned := mining.cargo_amount(good)
-	var cost := market.trade_value(docked, good, side, quantity) if quantity <= ship.cargo_capacity() else 0
+	var capacity := Economy.MAX_HIDDEN_STOCK if hidden else Economy.MAX_STOCK
+	var valid_quantity := quantity > 0 and quantity <= mini(ship.cargo_capacity(), capacity)
+	var cost := market.trade_value(docked, good, side, quantity, local, hidden) if listed and valid_quantity else 0
+	var intercepted_units := 0
+	if hidden and allowance >= 0 and valid_quantity:
+		if side == "buy":
+			intercepted_units = maxi(0, quantity - maxi(0, allowance - owned))
+		else:
+			intercepted_units = mini(quantity, maxi(0, owned - allowance))
+	var risk := mini(92, 13 + int(local.get("risk", 0)) * 6 + intercepted_units * 13) if intercepted_units > 0 else 0
 	var reason := ""
 	if not station_services_available():
 		reason = "Рынок доступен после швартовки"
-	elif unit <= 0 or cost <= 0:
+	elif not listed:
+		reason = "Контакт не торгует этим товаром" if hidden else "Запрещено правилами порта" if allowance == 0 else "Этот товар недоступен"
+	elif not valid_quantity or unit == 0:
 		reason = "Выберите товар и количество"
+	elif mining.phase != MiningRig.STOWED:
+		reason = "Сначала верните добывающий модуль"
 	elif side == "buy":
-		var allowance := Customs.allowance(factions.owner(system_id), good)
-		if allowance >= 0 and owned + quantity > allowance:
+		if not hidden and allowance >= 0 and owned + quantity > allowance:
 			reason = "Таможенный лимит на борту · %d ед." % allowance
 		elif stock < quantity:
-			reason = "В порту недостаточно товара"
+			reason = "У продавца недостаточно товара" if hidden else "В порту недостаточно товара"
 		elif mining.free_capacity() < quantity:
 			reason = "В трюме мало места"
 		elif credits < cost:
 			reason = "Недостаточно кредитов"
 	elif owned < quantity:
 		reason = "В трюме недостаточно товара"
-	elif quantity > Economy.MAX_STOCK - stock:
-		reason = "На складе порта не хватает места"
-	return {"ok": reason.is_empty(), "cost": cost, "unit": unit, "stock": stock, "owned": owned, "reason": reason}
+	elif quantity > capacity - stock:
+		reason = "Не хватает места на складе"
+	elif credits < -cost:
+		reason = "Недостаточно кредитов для утилизации"
+	var balance_change := -cost if side == "buy" else cost
+	if reason.is_empty() and balance_change > 1000000000 - credits:
+		reason = "Достигнут лимит кредитов"
+	return {"ok": reason.is_empty(), "listed": listed, "cost": cost, "unit": unit, "stock": stock,
+		"owned": owned, "reason": reason, "risk": risk, "seizable": intercepted_units, "allowance": allowance}
 
 
-func market_limit(good: String, side: String) -> int:
-	if not station_services_available() or Economy.price(docked, good, side) <= 0:
+func market_limit(good: String, side: String, hidden := false) -> int:
+	if not station_services_available() or not market_quote(good, side, 1, hidden).listed:
 		return 0
-	if side == "sell":
-		return mini(mining.cargo_amount(good), Economy.MAX_STOCK - market.stock(docked, good))
+	var stock := market.stock(docked, good, hidden)
+	var capacity := Economy.MAX_HIDDEN_STOCK if hidden else Economy.MAX_STOCK
+	var upper := mini(mining.cargo_amount(good), capacity - stock) if side == "sell" else mini(stock, mining.free_capacity())
 	var lower := 0
-	var upper := mini(market.stock(docked, good), mining.free_capacity())
-	var allowance := Customs.allowance(factions.owner(system_id), good)
-	if allowance >= 0:
-		upper = mini(upper, maxi(0, allowance - mining.cargo_amount(good)))
 	while lower < upper:
 		var count := ceili((lower + upper) * 0.5)
-		if market.trade_value(docked, good, side, count) <= credits:
+		if market_quote(good, side, count, hidden).ok:
 			lower = count
 		else:
 			upper = count - 1
@@ -1977,30 +2063,54 @@ func shipyard_swap(id: String) -> bool:
 	return true
 
 
-func market_trade(good: String, side: String, quantity: int) -> bool:
-	var quote := market_quote(good, side, quantity)
+func market_trade(good: String, side: String, quantity: int, hidden := false) -> bool:
+	var quote := market_quote(good, side, quantity, hidden)
 	if not quote.ok:
 		return false
+	if hidden and int(quote.risk) > 0:
+		var roll := posmod(hash([docked, good, side, quantity, int(quote.stock), floori(orbit_time / 30.0)]), 100)
+		if roll < int(quote.risk):
+			return _intercept_market_contact(good, side, int(quote.seizable))
 	if side == "buy":
 		if not mining.insert_cargo(good, quantity):
 			return false
-		if not market.change_stock(docked, good, -quantity):
+		if not market.change_stock(docked, good, -quantity, hidden):
 			mining.remove_cargo(good, quantity)
 			return false
-		credits -= quote.cost
-		_announce("market_buy", "Куплено %d ед. товара «%s» за %d кр." % [quantity, Economy.good_name(good), quote.cost])
+		credits -= int(quote.cost)
 	else:
-		if not _sell_market_cargo(good, quantity):
+		if not _sell_market_cargo(good, quantity, hidden):
 			return false
-		credits += quote.cost
-		_announce("market_sell", "Продано %d ед. товара «%s» за %d кр." % [quantity, Economy.good_name(good), quote.cost])
+		credits += int(quote.cost)
+	var message: String
+	var name := Economy.good_name(good)
+	if side == "buy":
+		message = "Куплено %d ед. товара «%s» за %d кр." % [quantity, name, quote.cost] if quote.cost > 0 else 			"Принято на вывоз: %s (%d ед.). Выплата %d кр." % [name, quantity, -quote.cost]
+	else:
+		message = "Продано %d ед. товара «%s» за %d кр." % [quantity, name, quote.cost] if quote.cost > 0 else 			"Принято на утилизацию: %s (%d ед.). Оплата %d кр." % [name, quantity, -quote.cost]
+	_announce(("market_contact_" if hidden else "market_") + side, message)
 	return true
 
 
-func _sell_market_cargo(good: String, quantity: int) -> bool:
+func _intercept_market_contact(good: String, side: String, quantity: int) -> bool:
+	var authority := factions.owner(system_id)
+	if side == "sell":
+		return _confiscate_market_cargo(authority, good, quantity, true)
+	var result := customs.record(authority, docked, good, quantity, orbit_time)
+	if not result.ok:
+		return false
+	market.change_stock(docked, good, -quantity, true)
+	result.event = "market_contact_seized"
+	result.message = "Тайная сделка сорвана. " + str(result.message)
+	_apply_service_result(result)
+	career.note_customs_violation(authority)
+	return true
+
+
+func _sell_market_cargo(good: String, quantity: int, hidden := false) -> bool:
 	if not mining.remove_cargo(good, quantity):
 		return false
-	if market.change_stock(docked, good, quantity):
+	if market.change_stock(docked, good, quantity, hidden):
 		return true
 	mining.insert_cargo(good, quantity)
 	return false
@@ -2529,6 +2639,8 @@ func service_offer(action: String) -> Dictionary:
 func service_action(action: String) -> bool:
 	if action == "autopilot":
 		return autopilot_equipment_action()
+	if action in ["berth_pay", "berth_defer", "civic_donate"]:
+		return _port_account_action(action)
 	if not service_offer(action).allowed:
 		return false
 	var unit_price := repair_unit_price() if action == "repair" else refuel_unit_price()
@@ -2571,6 +2683,31 @@ func service_action(action: String) -> bool:
 		"combat_repair":
 			_announce("service_combat_repair", "Выведенный из строя модуль восстановлен. Списано %d кр." % paid)
 	return true
+
+
+func _port_account_action(action: String) -> bool:
+	if not station_services_available():
+		return false
+	match action:
+		"berth_pay":
+			var payment := _port_account.pay(docked, orbit_time, credits)
+			if payment <= 0:
+				return false
+			credits -= payment
+			_announce("berth_payment", "В счёт порта «%s» внесено %d кр." % [target_name(docked), payment])
+			return true
+		"berth_defer":
+			if not _port_account.defer(docked, orbit_time, credits):
+				return false
+			_announce("berth_permit", "Порт разрешил выход в долг. Счёт остаётся к оплате в этом порту.")
+			return true
+		"civic_donate":
+			if not _civic.donate(docked, orbit_time, credits, deliveries):
+				return false
+			credits -= CivicReputation.COST
+			_announce("civic_donation", "Фонд помощи экипажам получил %d кр. Гражданская репутация: %d." % [CivicReputation.COST, _civic.reputation(deliveries)])
+			return true
+	return false
 
 
 func fuel_equipment_status() -> Dictionary:
@@ -3036,10 +3173,15 @@ func _collect_fuel(delta: float) -> void:
 
 
 func jump_tariff(origin: int, destination: int) -> int:
-	return ship.jump_tariff(Catalog.jump_cost(origin, destination))
+	if _jump_transit_duration > 0.0 and origin == system_id and destination == jump_target:
+		return _jump_paid_fare
+	var reserve: float = ship.jump_fuel if origin == system_id else ship.jump_capacity()
+	return ship.jump_tariff(Catalog.jump_cost(origin, destination), mining.ore_hold, reserve)
 
 
 func jump_travel_seconds(origin: int, destination: int) -> float:
+	if _jump_transit_duration > 0.0 and origin == system_id and destination == jump_target:
+		return _jump_transit_duration
 	return ship.jump_duration(Catalog.jump_distance(origin, destination), mining.ore_hold)
 
 
@@ -3048,7 +3190,14 @@ func jump_drive_status() -> Dictionary:
 		"id": ship.drive_kind, "name": ship.drive_name(), "have_range": ship.range_drive,
 		"can_select": station_services_available() and ship.range_drive,
 		"load": mining.ore_hold, "capacity": ship.cargo_capacity(), "jump_capacity": ship.jump_capacity(),
+		"mass_t": ship.flight_mass(mining.ore_hold), "dry_mass_t": ship.dry_mass(),
+		"range_ly": _generated_jump_range(ship.jump_fuel), "max_range_ly": _generated_jump_range(ship.jump_capacity()),
 	}
+
+
+func _generated_jump_range(reserve: float) -> float:
+	var base := ship.base_jump_budget(reserve, mining.ore_hold, reserve)
+	return maxf(0.0, (base - Catalog.GENERATED_JUMP_ENTRY) / Catalog.GENERATED_JUMP_PER_LIGHT_YEAR)
 
 
 func select_jump_drive(id: String) -> bool:
@@ -3100,11 +3249,21 @@ func plan_jump(destination: int) -> bool:
 func route_preview(goal: int) -> Dictionary:
 	var known := _known_systems(expedition, cartography)
 	var capacity := ship.jump_capacity()
-	var nearby := func(origin: int, budget: float) -> Array[int]: return Catalog.jump_candidates(origin, ship.base_jump_budget(budget))
-	var reachable_first_leg := GalacticRoute.plan(system_id, goal, known, capacity, ship.jump_fuel, jump_tariff, jump_travel_seconds, nearby)
+	var reachable_first_leg := _plot_route(goal, known, capacity, ship.jump_fuel)
 	if reachable_first_leg.available or ship.jump_fuel >= capacity:
 		return reachable_first_leg
-	return GalacticRoute.plan(system_id, goal, known, capacity, INF, jump_tariff, jump_travel_seconds, nearby)
+	return _plot_route(goal, known, capacity, capacity)
+
+
+func _plot_route(goal: int, known: Array[int], capacity: float, first_reserve: float) -> Dictionary:
+	var payload: int = mining.ore_hold
+	var tariff := func(origin: int, destination: int) -> int:
+		var reserve := first_reserve if origin == system_id else capacity
+		return ship.jump_tariff(Catalog.jump_cost(origin, destination), payload, reserve)
+	var nearby := func(origin: int, budget: float) -> Array[int]:
+		var reserve := first_reserve if origin == system_id else capacity
+		return Catalog.jump_candidates(origin, ship.base_jump_budget(budget, payload, reserve))
+	return GalacticRoute.plan(system_id, goal, known, capacity, first_reserve, tariff, jump_travel_seconds, nearby)
 
 
 func planned_route() -> Dictionary:
@@ -3169,6 +3328,8 @@ func jump_status(destination: int) -> Dictionary:
 		reason = "Отойдите от конвоя"
 	elif speed() > JUMP_SPEED:
 		reason = "Снизьте скорость до %d м/с" % int(JUMP_SPEED)
+	elif cost > ship.jump_capacity():
+		reason = "При такой массе топливо на переход не поместится в бак."
 	elif ship.jump_fuel < cost:
 		reason = "Нужно %d ед. в прыжковом запасе" % cost
 	elif orbit_time + duration + JUMP_CHARGE > SAVE_CLOCK_LIMIT:
@@ -3257,6 +3418,7 @@ func _charge_jump(delta: float) -> void:
 	jump_seconds_left = minf(jump_seconds_left, JUMP_TRANSIT_WALL)
 	_jump_transit_duration = float(status.duration)
 	_jump_paid_fare = int(status.cost)
+	_jump_paid_pricing = MASS_JUMP_PRICING
 	ship.jump_fuel -= _jump_paid_fare
 	velocity = Vector3.ZERO
 	_announce("jump_committed", "Переход в гиперпространство · %d ед. топлива." % _jump_paid_fare)
@@ -3271,6 +3433,7 @@ func _advance_jump_transit(delta: float) -> void:
 	jump_seconds_left = 0.0
 	_jump_transit_duration = 0.0
 	_jump_paid_fare = 0
+	_jump_paid_pricing = MASS_JUMP_PRICING
 	_finish_jump_arrival()
 
 
@@ -3355,6 +3518,7 @@ func _lift() -> void:
 
 func _launch() -> void:
 	var origin := docked
+	_port_account.leave()
 	reset_time_scale()
 	position = docking_position(origin) + station_axis(origin) * DEPARTURE_DISTANCE
 	if Ground.is_port(origin):
@@ -3398,7 +3562,12 @@ func _dock() -> void:
 	_reset_scoop()
 	_hold_docked_pose()
 	var arrival := "Посадка завершена. Порт" if Ground.is_port(docked) else "Швартовка завершена. Станция"
-	_announce("dock", "%s «%s»." % [arrival, target_name(docked)])
+	var message := "%s «%s»." % [arrival, target_name(docked)]
+	var paid := _port_account.arrive(docked, orbit_time, credits)
+	if PortAccount.TARIFFS.has(docked):
+		credits -= paid
+		message += " Сбор %d кр., списано %d кр." % [PortAccount.TARIFFS[docked].x, paid]
+	_announce("dock", message)
 	_inspect_docked_cargo()
 
 
@@ -3421,7 +3590,10 @@ func update(delta: float, steer: Vector2, bank: float, boost_requested: bool, br
 	if manual_input or (time_scale > 1 and not time_status().allowed):
 		reset_time_scale()
 	if (docked >= 0 and not _departure_requested) or landed:
-		_step(delta * time_scale, steer, bank, boost_requested, brake, manual_input, traverse)
+		if time_scale > TIME_SCALES[-1]:
+			_advance_fast_wait(delta)
+		else:
+			_step(delta * time_scale, steer, bank, boost_requested, brake, manual_input, traverse)
 		return
 	var steps := maxi(1, ceili(delta * time_scale / MAX_FLIGHT_STEP - 0.000001))
 	var interval := delta / steps
@@ -3431,15 +3603,50 @@ func update(delta: float, steer: Vector2, bank: float, boost_requested: bool, br
 		_step(interval * time_scale, steer, bank, boost_requested, brake, manual_input, traverse)
 
 
+func _fast_wait_stop_epoch() -> float:
+	var deadline := career.next_event_time()
+	var booking := passengers.status(orbit_time)
+	if booking.active and not booking.overdue:
+		deadline = minf(deadline, float(booking.deadline))
+	return minf(SAVE_CLOCK_LIMIT, deadline - FAST_WAIT_DEADLINE_MARGIN)
+
+
+func _advance_fast_wait(real_delta: float) -> void:
+	var stop_epoch := _fast_wait_stop_epoch()
+	var end_epoch := minf(orbit_time + real_delta * time_scale, stop_epoch)
+	while orbit_time < end_epoch:
+		var step := minf(end_epoch - orbit_time, FAST_WAIT_STEP)
+		_step(step, Vector2.ZERO, 0.0, false, false, false, Vector3.ZERO)
+		if time_scale <= TIME_SCALES[-1]:
+			return
+		var availability := time_status()
+		if not availability.allowed:
+			time_scale = 1
+			_announce("time_normal", "Время возвращено к ×1. %s." % availability.reason)
+			return
+	if orbit_time >= stop_epoch:
+		time_scale = 1
+		if stop_epoch == SAVE_CLOCK_LIMIT:
+			_announce("time_normal", "Достигнут предел игрового календаря.")
+		else:
+			_announce("time_normal", "Время возвращено к ×1 перед сроком задания.")
+
+
 func _advance_background_clock(delta: float) -> void:
 	var previous := orbit_time
 	orbit_time += delta
+	if docked >= 0:
+		var paid := _port_account.advance(docked, orbit_time, credits)
+		if paid >= 0:
+			credits -= paid
+			_announce("berth_bill", "Выставлен счёт за стоянку. Списано %d кр." % paid)
 	_cargo_pods.advance(orbit_time)
 	elapsed += delta
 	combat.advance_energy(previous, orbit_time)
 	if remote_rig.active():
 		remote_rig.advance(mining, orbit_time)
 	freight.advance(market, previous, orbit_time)
+	market.advance(previous, orbit_time, self)
 
 
 func _advance_mission_deadlines() -> void:
@@ -3696,45 +3903,60 @@ func _manual_step(delta: float, steer: Vector2, bank: float, boost_requested: bo
 	var drift := _reference_velocity(reference) if reference >= 0 else Vector3.ZERO
 	if boost_requested or brake or not is_zero_approx(translation.z):
 		_release_speed_hold()
+	var basis := attitude()
 	if brake:
 		throttle = 0.0
-		velocity = velocity.move_toward(drift, 67.0 * delta)
+		var drive_power := 1.0 if had_fuel else ShipSystems.RESERVE_THRUST_FRACTION
+		var emergency_duration := delta * JUMP_BRAKE / (34.0 * drive_power)
+		velocity += basis * _bounded_manual_impulse(basis.transposed() * (drift - velocity), emergency_duration)
 		return 0.0
 	if speed_hold.enabled:
-		return _speed_hold_step(delta, drift, translation, had_fuel)
+		return _speed_hold_step(delta, drift, translation, basis)
 	var thrust := 1.55 if boost else throttle
-	var local := Vector3(translation.x, translation.y, -translation.z - thrust)
 	var limit := 1.55 if boost else 1.0
-	var drive := attitude() * local.limit_length(limit)
-	var drive_acceleration := 34.0 * ship.accel_factor() if had_fuel else 20.0
+	var requested := Vector3(translation.x, translation.y, -translation.z - thrust)
+	var local := requested.limit_length(limit)
 	var drive_speed := _cruise_limit(MAX_SPEED)
 	if flight_assist:
-		var desired := drift + drive * drive_speed
+		var desired := drift + basis * local * drive_speed
 		if not had_fuel:
 			desired = desired.limit_length(RESERVE_SPEED)
-		velocity = velocity.move_toward(desired, drive_acceleration * delta)
+		velocity += basis * _bounded_manual_impulse(basis.transposed() * (desired - velocity), delta * limit)
 	else:
 		# The flight frame changes instruments and velocity assistance. Free coast is inertial.
 		var powered_limit := maxf(velocity.length(), drive_speed * limit)
-		var powered := (velocity + drive * drive_acceleration * delta).limit_length(powered_limit)
+		var impulse := local * ship.thrust_acceleration(local, mining.ore_hold) * delta
+		var powered := (velocity + basis * impulse).limit_length(powered_limit)
 		velocity = (powered + gravity_at(position) * delta).limit_length(MAX_SAVED_SPEED - 1.0)
-	return local.length()
+	return requested.length()
 
 
-func _speed_hold_step(delta: float, drift: Vector3, translation: Vector3, had_fuel: bool) -> float:
-	var facing := forward()
+func _bounded_manual_impulse(requested: Vector3, duration: float) -> Vector3:
+	if duration <= 0.0:
+		return Vector3.ZERO
+	var limits := ship.thrust_acceleration(requested, mining.ore_hold) * duration
+	return (requested / limits).limit_length() * limits
+
+
+func _speed_hold_step(delta: float, drift: Vector3, translation: Vector3, basis: Basis) -> float:
+	var facing := -basis.z
 	var lateral := Vector2(translation.x, translation.y).limit_length()
-	var acceleration := 34.0 * ship.accel_factor() if had_fuel else 20.0
 	var speed_limit := _cruise_limit(MAX_SPEED)
 	if not lateral.is_zero_approx():
-		var lateral_motion := attitude() * Vector3(lateral.x, lateral.y, 0.0)
+		var command := Vector3(lateral.x, lateral.y, 0.0)
 		if flight_assist:
-			var actual := (velocity - drift).slide(facing)
-			velocity += actual.move_toward(lateral_motion * speed_limit, acceleration * lateral.length() * delta) - actual
+			var actual := basis.transposed() * (velocity - drift)
+			var change := command * speed_limit - Vector3(actual.x, actual.y, 0.0)
+			velocity += basis * _bounded_manual_impulse(change, lateral.length() * delta)
 		else:
-			velocity += lateral_motion * acceleration * delta
+			velocity += basis * (command * ship.thrust_acceleration(command, mining.ore_hold) * delta)
 	if not flight_assist:
 		velocity += gravity_at(position) * delta
+	var reachable := minf(SpeedHold.LIMIT, speed_limit)
+	var wanted := clampf(speed_hold.setpoint, -reachable, reachable)
+	var projected := SpeedHold.projected_speed(velocity, drift, facing)
+	var direction := Vector3.FORWARD if wanted >= projected else Vector3.BACK
+	var acceleration := ship.thrust_acceleration(direction, mining.ore_hold).z
 	var authority := acceleration * sqrt(maxf(0.0, 1.0 - lateral.length_squared()))
 	var correction := speed_hold.speed_delta(velocity, drift, facing, authority, delta, speed_limit)
 	velocity = (velocity + facing * correction).limit_length(MAX_SAVED_SPEED - 1.0)
@@ -3746,7 +3968,7 @@ func _cruise_limit(speed_with_fuel: float) -> float:
 
 
 func _acceleration_limit(acceleration: float) -> float:
-	return acceleration * ship.accel_factor() if ship.fuel > 0.0 else acceleration
+	return acceleration * ship.thrust_acceleration(Vector3.FORWARD, mining.ore_hold).z / 34.0
 
 
 func _blocked(point: Vector3, sector_id := -1, epoch := -1.0, progress: RefCounted = null, atlas: RefCounted = null) -> bool:
@@ -4199,7 +4421,8 @@ func snapshot() -> Dictionary:
 	var powered := interrupted.any(func(mode: String) -> bool: return mode in POWERED_ASSISTS)
 	var transit := {}
 	if _jump_transit_duration > 0.0:
-		transit = {"remaining": jump_seconds_left, "duration": _jump_transit_duration, "fare": _jump_paid_fare}
+		transit = {"remaining": jump_seconds_left, "duration": _jump_transit_duration,
+			"fare": _jump_paid_fare, "pricing": _jump_paid_pricing}
 	return {
 		"schema": SAVE_SCHEMA,
 		"position": [position.x, position.y, position.z],
@@ -4219,6 +4442,7 @@ func snapshot() -> Dictionary:
 		"landing_direction": [landing_direction.x, landing_direction.y, landing_direction.z],
 		"gear_extension": gear_extension, "gear_deployed": gear_deployed,
 		"ship": ship.snapshot(), "market": market.snapshot(), "freight": freight.snapshot(),
+		"market_contacts": market.hidden_snapshot(),
 		"system_id": system_id, "jump_target": jump_target, "jump_route": _jump_route.duplicate(),
 		"jump_transit": transit,
 		"patrol": patrol.snapshot(), "star_heat": star_heat, "entry_heat": entry_heat,
@@ -4227,6 +4451,7 @@ func snapshot() -> Dictionary:
 		"passengers": passengers.snapshot(),
 		"crew": crew.snapshot(),
 		"cartography": cartography.snapshot(), "frame": frame.snapshot(), "customs": customs.snapshot(),
+		"port_account": _port_account.snapshot(), "civic": _civic.snapshot(),
 		"remote_rig": remote_rig.snapshot(), "orbital_mining": orbital_mining.snapshot(),
 		"cargo_pods": _cargo_pods.snapshot(),
 		"combat": combat.snapshot(),
@@ -4241,6 +4466,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_assortment := schema < 49
 	var pre_rich_systems := schema < 48
 	var pre_atlas := schema < 47
 	var pre_expanded_galaxy := schema < 46
@@ -4382,7 +4608,7 @@ func restore(state: Dictionary) -> bool:
 	var restored_cartography := Cartography.new()
 	var restored_frame := FlightFrame.new()
 	var restored_customs := Customs.new()
-	if not pre_customs and not restored_customs.restore(state.get("customs"), restored_epoch):
+	if not pre_customs and not restored_customs.restore(state.get("customs"), restored_epoch, pre_assortment):
 		return false
 	if not pre_expansion:
 		if not restored_expedition.restore(state.get("expedition")) or not restored_factions.restore(state.get("factions"), pre_thermal, pre_convoy_orders):
@@ -4477,6 +4703,16 @@ func restore(state: Dictionary) -> bool:
 	var restored_position := Vector3(state.position[0], state.position[1], state.position[2])
 	var restored_velocity := Vector3(state.velocity[0], state.velocity[1], state.velocity[2])
 	var restored_dock := int(state.docked)
+	var restored_port_account := PortAccount.new()
+	var restored_civic := CivicReputation.new()
+	if schema >= 49:
+		var available_port := func(id: int) -> bool:
+			return Catalog.is_port(id) and _site_available(id, restored_expedition, restored_cartography)
+		if not restored_port_account.restore(state.get("port_account"), restored_epoch, restored_dock, available_port) \
+				or not restored_civic.restore(state.get("civic"), restored_epoch, available_port):
+			return false
+	else:
+		restored_port_account.anchor(restored_dock, restored_epoch)
 	var restored_access := DockAccess.new()
 	var restored_mining := MiningRig.new()
 	var restored_ship := ShipSystems.new()
@@ -4499,10 +4735,15 @@ func restore(state: Dictionary) -> bool:
 		if not restored_route.is_empty():
 			var path: Array[int] = [restored_system]
 			path.append_array(restored_route)
-			var tariff := func(a: int, b: int) -> int: return restored_ship.jump_tariff(Catalog.jump_cost(a, b))
-			if restored_route[0] != restored_jump or not GalacticRoute.valid_path(path, known, restored_ship.jump_capacity(), tariff):
+			var tariff := func(a: int, b: int) -> int: return restored_ship.legacy_jump_tariff(Catalog.jump_cost(a, b))
+			var capacity := restored_ship.jump_capacity()
+			if schema >= 49:
+				tariff = func(a: int, b: int) -> int: return ShipSystems.minimum_jump_tariff(Catalog.jump_cost(a, b))
+				capacity = ShipSystems.BASE_CAPACITY + ShipSystems.EXTRA_CAPACITY
+			if restored_route[0] != restored_jump or not GalacticRoute.valid_path(path, known, capacity, tariff):
 				return false
-	if not pre_economy and not restored_market.restore(state.get("market"), pre_traffic, pre_expansion, pre_dual_fuel, pre_ground_ports):
+	if not pre_economy and not restored_market.restore(state.get("market"), pre_traffic, pre_expansion, pre_dual_fuel,
+			pre_ground_ports, pre_assortment, state.get("market_contacts")):
 		return false
 	if pre_freight:
 		restored_freight.reset(restored_epoch)
@@ -4547,7 +4788,8 @@ func restore(state: Dictionary) -> bool:
 		if dispatch.active and (not _site_available(int(dispatch.origin), restored_expedition) or not _site_available(int(dispatch.destination), restored_expedition)):
 			return false
 	var mining_count := Catalog.SITE_COUNT if pre_galaxy else site_count
-	if schema >= 2 and not restored_mining.restore(state.get("mining"), schema == 2, mining_count, restored_ship.cargo_capacity(), not pre_economy, pre_dual_fuel):
+	if schema >= 2 and not restored_mining.restore(state.get("mining"), schema == 2, mining_count,
+			restored_ship.cargo_capacity(), not pre_economy, pre_dual_fuel, pre_assortment):
 		return false
 	var restored_remote_rig := UnattendedMining.new()
 	if not pre_remote_rig:
@@ -4640,20 +4882,32 @@ func restore(state: Dictionary) -> bool:
 		if not permit.ready or permit.remaining + DockAccess.CLOCK_PRECISION < DEPARTURE_SECONDS - restored_departure_seconds:
 			return false
 	var restored_transit: Variant = {} if pre_jump_drive else state.get("jump_transit")
+	var restored_pricing := MASS_JUMP_PRICING
 	if not restored_transit is Dictionary:
 		return false
 	if not restored_transit.is_empty():
-		var fare := restored_ship.jump_tariff(Catalog.jump_cost(restored_system, restored_jump))
-		var duration := restored_ship.jump_duration(Catalog.jump_distance(restored_system, restored_jump), restored_mining.ore_hold)
-		if not restored_transit.has_all(["remaining", "duration", "fare"]) or restored_transit.size() != 3:
+		var receipt_fields := ["remaining", "duration", "fare"]
+		if schema >= 49:
+			receipt_fields.append("pricing")
+		if not restored_transit.has_all(receipt_fields) or restored_transit.size() != receipt_fields.size():
 			return false
+		if not _integer(restored_transit.get("pricing", LEGACY_JUMP_PRICING), LEGACY_JUMP_PRICING, MASS_JUMP_PRICING):
+			return false
+		restored_pricing = int(restored_transit.get("pricing", LEGACY_JUMP_PRICING))
+		if not _integer(restored_transit.fare, 1, int(restored_ship.jump_capacity())):
+			return false
+		var reserve_before_charge := restored_ship.jump_fuel + float(restored_transit.fare)
+		var base_fare := Catalog.jump_cost(restored_system, restored_jump)
+		var fare := restored_ship.legacy_jump_tariff(base_fare) if restored_pricing == LEGACY_JUMP_PRICING \
+			else restored_ship.jump_tariff(base_fare, restored_mining.ore_hold, reserve_before_charge)
+		var duration := restored_ship.jump_duration(Catalog.jump_distance(restored_system, restored_jump), restored_mining.ore_hold)
 		if restored_dock >= 0 or restored_landing >= 0 or restored_departure or fare <= 0 or duration <= 0.0:
 			return false
 		if not _number(restored_transit.remaining, 0.000001, JUMP_TRANSIT_WALL) or not _integer(restored_transit.fare, fare, fare):
 			return false
 		if not _number(restored_transit.duration, duration, duration) or restored_epoch + duration > SAVE_CLOCK_LIMIT:
 			return false
-		if restored_ship.jump_fuel + fare > restored_ship.jump_capacity() or not restored_velocity.is_zero_approx() or float(state.throttle) != 0.0:
+		if reserve_before_charge > restored_ship.jump_capacity() or not restored_velocity.is_zero_approx() or float(state.throttle) != 0.0:
 			return false
 	var interrupted: Array[String] = []
 	if not pre_resume:
@@ -4791,6 +5045,8 @@ func restore(state: Dictionary) -> bool:
 	cartography = restored_cartography
 	frame = restored_frame
 	customs = restored_customs
+	_port_account = restored_port_account
+	_civic = restored_civic
 	remote_rig = restored_remote_rig
 	orbital_mining = restored_orbital_mining
 	_cargo_pods = restored_cargo_pods
@@ -4811,6 +5067,7 @@ func restore(state: Dictionary) -> bool:
 	jump_seconds_left = float(restored_transit.get("remaining", 0.0))
 	_jump_transit_duration = float(restored_transit.get("duration", 0.0))
 	_jump_paid_fare = int(restored_transit.get("fare", 0))
+	_jump_paid_pricing = restored_pricing
 	target = int(state.target)
 	planned_target = restored_plan
 	credits = int(state.credits)

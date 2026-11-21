@@ -327,7 +327,7 @@ func _test_time_button() -> void:
 		key.physical_keycode = KEY_O
 		key.pressed = true
 		root.push_input(key)
-		_expect(game.flight.time_scale == 1, "The desktop O shortcut also cycles time acceleration")
+		_expect(game.flight.time_scale == 64, "The desktop O shortcut selects the first parked fast-wait rate")
 	game.queue_free()
 	await process_frame
 

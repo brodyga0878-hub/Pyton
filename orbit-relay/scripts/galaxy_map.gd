@@ -360,7 +360,10 @@ func refresh() -> void:
 	var jump_fuel: float = _flight.ship.jump_fuel
 	_fuel.text = "%s / %d ед." % [_decimal(jump_fuel), roundi(_chart.jump_capacity)]
 	_cost.text = "%d ед." % int(preview.fuel) if available else "—"
-	_drive.text = "%s · груз %d / %d" % [drive.name, int(drive.load), int(drive.capacity)]
+	_drive.text = "%s · %s т · до %s св. л." % [
+		drive.name, _decimal(float(drive.mass_t)), _decimal(float(drive.range_ly)),
+	]
+	_drive.tooltip_text = "Расчёт по текущей массе и запасу. При полном баке до %s св. л." % _decimal(float(drive.max_range_ly))
 	_refresh_travel_estimates(preview, available)
 	_itinerary.visible = available
 	_budget.visible = available
@@ -620,7 +623,7 @@ func _build_dossier(parent: Control) -> void:
 	_dossier_customs_rule = _dossier_text(_dossier_customs)
 	_dossier_customs_rule.add_theme_color_override("font_color", AMBER)
 	_dossier_customs.hide()
-	_label(trade, "Товары на складах", 17, MINT)
+	_label(trade, "Основные товары на складах", 17, MINT)
 	_dossier_stock = _dossier_text(trade)
 	_label(trade, "Импорт в пути", 17, MINT)
 	_dossier_imports = _dossier_text(trade)
@@ -645,12 +648,17 @@ func _refresh_dossier() -> void:
 		ports.append(str(Sector.site(port).name))
 	_dossier_ports.text = " · ".join(ports) if not ports.is_empty() else "Действующих портов нет."
 	var stock := PackedStringArray()
-	for good: String in Economy.GOODS:
+	for good: String in Economy.LEGACY_GOODS:
 		if system.goods.has(good):
 			stock.append("%s %d" % [Economy.good_name(good), int(system.goods[good])])
 	_dossier_stock.text = " · ".join(stock) if not stock.is_empty() else "Действующих портовых рынков нет."
 	_dossier_imports.text = _shipment_list(system.imports, "origin")
 	_dossier_exports.text = _shipment_list(system.exports, "destination")
+	var flows := _port_supply_flows(system.ports)
+	if not flows.imports.is_empty():
+		_dossier_imports.text += "\nПортам нужны: " + ", ".join(flows.imports)
+	if not flows.exports.is_empty():
+		_dossier_exports.text += "\nМестное производство: " + ", ".join(flows.exports)
 	var observations := PackedStringArray([
 		"Обследовано %d из %d." % [int(system.scan_count), int(system.target_count)]
 	])
@@ -667,17 +675,40 @@ func _dossier_customs_warning(system: Dictionary) -> String:
 	if not system.known or system.ports.is_empty():
 		return ""
 	var customs: Dictionary = _flight.customs_status(_candidate)
-	var allowance := int(customs.get("medical_allowance", -1))
-	if int(customs.get("authority", -1)) < 0 or allowance < 0:
+	var authority := int(customs.get("authority", -1))
+	if authority < 0:
 		return ""
-	var aboard := int(customs.get("medical_aboard", 0))
-	var excess := maxi(0, aboard - allowance)
-	var warning := "Таможня · %s\nДо %d ед. медикаментов для личного пользования.\nВ трюме %d ед." % [
-		customs.authority_name, allowance, aboard,
-	]
-	if excess > 0:
-		warning += " При стыковке изымут %d ед. и начислят штраф." % excess
-	return warning
+	var rules := PackedStringArray(["Таможня · %s" % customs.authority_name])
+	for good: String in Economy.ALLOWANCES:
+		var allowance := Economy.allowance(authority, good)
+		if allowance < 0:
+			continue
+		var aboard := int(_flight.mining.cargo_amount(good))
+		var rule := "%s: ввоз запрещён." % Economy.good_name(good) if allowance == 0 else \
+			"До %d ед. · %s." % [allowance, Economy.good_name(good)]
+		if aboard > allowance:
+			rule += " При стыковке изымут %d ед. и начислят штраф." % (aboard - allowance)
+		rules.append(rule)
+	return "\n".join(rules)
+
+
+func _port_supply_flows(ports: Array) -> Dictionary:
+	var supply := {}
+	for port: int in ports:
+		var local: Dictionary = _flight.market_profile(port)
+		for good: String in Economy.NEW_GOODS:
+			supply[good] = int(supply.get(good, 0)) + Economy.supply_flow(good, local)
+	var ranked := supply.keys()
+	var imports := PackedStringArray()
+	var exports := PackedStringArray()
+	ranked.sort_custom(func(a: String, b: String) -> bool:
+		return absi(int(supply[a])) > absi(int(supply[b])) if absi(int(supply[a])) != absi(int(supply[b])) else a < b)
+	for good: String in ranked:
+		if supply[good] < 0 and imports.size() < 3:
+			imports.append(Economy.good_name(good))
+		elif supply[good] > 0 and exports.size() < 3:
+			exports.append(Economy.good_name(good))
+	return {"imports": imports, "exports": exports}
 
 
 func _toggle_dossier() -> void:

@@ -130,8 +130,8 @@ func _test_jump_threshold(stellar: Dictionary, canisters: int) -> void:
 	_tick(flight, 1.0)
 	_expect(flight.ship.jump_fuel == 35.5 and flight.ship.fuel == 5.0 and flight.mining.cargo_amount(HYDROGEN) == canisters,
 		"With no selected fare and above 35 percent the jump pump consumes nothing")
-	if not _expect(flight.plan_jump(Catalog.FRINGE_SYSTEM) and flight.jump_status(Catalog.FRINGE_SYSTEM).cost == 36,
-		"Plot a genuine published fare one unit above the default reserve threshold"):
+	if not _expect(flight.plan_jump(Catalog.FRINGE_SYSTEM) and flight.jump_status(Catalog.FRINGE_SYSTEM).cost > 35.5,
+		"Plot a genuine mass-adjusted fare above the default reserve threshold"):
 		return
 	_tick(flight, 1.0)
 	_expect(flight.ship.jump_fuel == 45.5 and flight.ship.fuel == 5.0 and flight.mining.cargo_amount(HYDROGEN) == canisters - 1,
@@ -166,14 +166,18 @@ func _test_jump_charge_pause(stellar: Dictionary, canisters: int) -> void:
 	flight.yaw = atan2(-direction.x, -direction.z)
 	flight.pitch = asin(clampf(direction.y, -1.0, 1.0))
 	flight.change_throttle(0.18)
-	flight.ship.jump_fuel = 26.0
-	if not _expect(_advance(flight, func() -> bool: return flight.jump_status(Catalog.VELAR_SYSTEM).ok, 35.0)
-		and flight.set_fuel_pump_mode("jump") and flight.start_jump()
+	flight.ship.jump_fuel = float(flight.jump_status(Catalog.VELAR_SYSTEM).cost)
+	if not _expect(_advance(flight, func() -> bool: return flight.jump_status(Catalog.VELAR_SYSTEM).ok, 35.0),
+		"Clear the stellar band before charging"):
+		return
+	var fare := float(flight.jump_status(Catalog.VELAR_SYSTEM).cost)
+	flight.ship.jump_fuel = fare
+	if not _expect(flight.set_fuel_pump_mode("jump") and flight.start_jump()
 		and not flight.set_fuel_pump_mode("off") and not flight.fuel_equipment_status().can_set_mode,
 		"Clear the stellar band and charge immediately after selecting the pump for the low jump reserve"):
 		return
 	_tick(flight, 1.1)
-	_expect(flight.jump_seconds_left > 0.0 and flight.ship.jump_fuel == 26.0
+	_expect(flight.jump_seconds_left > 0.0 and flight.ship.jump_fuel == fare
 		and flight.mining.cargo_amount(HYDROGEN) == canisters,
 		"The pump holds its stock while the jump drive is charging across a whole second")
 	_expect(_advance(flight, func() -> bool: return flight.system_id == Catalog.VELAR_SYSTEM, 4.0)

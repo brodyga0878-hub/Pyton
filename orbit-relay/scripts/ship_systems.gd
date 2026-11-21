@@ -18,6 +18,19 @@ const RANGE_DRIVE_COST := 450
 const DRIVE_STANDARD := "standard"
 const DRIVE_RANGE := "range"
 const RANGE_TARIFF_FACTOR := 0.75
+const RANGE_MASS_SENSITIVITY := 0.82
+const STANDARD_MASS_SENSITIVITY := 1.0
+const COURIER_DRY_MASS := 50.0
+const COURIER_ROLL_RATE := 1.9
+const FREIGHTER_DRY_MASS := 64.0
+const FUEL_UNIT_MASS := 0.004
+const CARGO_UNIT_MASS := 0.28
+const TANK_HARDWARE_MASS := 0.9
+const SCOOP_MASS := 0.16
+const AUTOPILOT_MASS := 0.12
+const REFERENCE_MASS := COURIER_DRY_MASS + 2.0 * BASE_CAPACITY * FUEL_UNIT_MASS
+const RESERVE_THRUST_FRACTION := 20.0 / 34.0
+const TARIFF_TOLERANCE := 0.000000001
 const STANDARD_DRIVE_NAME := "Штатный"
 const RANGE_DRIVE_NAME := "Вектор"
 const PUMP_OFF := "off"
@@ -36,10 +49,14 @@ const HULLS := {
 	STARTER_HULL: {"id": STARTER_HULL, "name": "Курьер «Стриж»",
 		"description": "Курьерский корабль для одиночного пилота. Быстро меняет курс и скорость.",
 		"price": 1000, "cargo": BASE_CARGO_CAPACITY, "expanded_cargo": EXPANDED_CARGO_CAPACITY,
+		"dry_mass": COURIER_DRY_MASS, "roll_rate": COURIER_ROLL_RATE,
+		"thrust_positive": Vector3(1600.2, 1625.6, 1651.0), "thrust_negative": Vector3(1574.8, 1320.8, 1727.2),
 		"crew_required": 0, "speed_factor": 1.0, "accel_factor": 1.0, "burn_factor": 1.0},
 	FREIGHTER_HULL: {"id": FREIGHTER_HULL, "name": "Фрахтовик «Кедр»",
 		"description": "Фрахтовик с вместительным трюмом и местом специалиста. Медленнее разгоняется и расходует больше топлива.",
 		"price": 2200, "cargo": 44, "expanded_cargo": 60,
+		"dry_mass": FREIGHTER_DRY_MASS, "roll_rate": 1.35,
+		"thrust_positive": Vector3(1250.0, 1310.0, 1180.0), "thrust_negative": Vector3(1130.0, 1070.0, 1674.432),
 		"crew_required": 1, "speed_factor": 0.80, "accel_factor": 0.76, "burn_factor": 1.18},
 }
 const LEGACY_SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded"]
@@ -114,13 +131,33 @@ func select_drive(id: String) -> bool:
 	return true
 
 
-func jump_tariff(base: int) -> int:
+func legacy_jump_tariff(base: int) -> int:
 	return ceili(base * RANGE_TARIFF_FACTOR) if drive_kind == DRIVE_RANGE and base > 0 else base
 
 
-func base_jump_budget(fuel: float) -> int:
-	var units := floori(fuel)
-	return floori(units / RANGE_TARIFF_FACTOR) if drive_kind == DRIVE_RANGE else units
+func jump_tariff(base: int, payload: int, jump_reserve := -1.0) -> int:
+	if base <= 0:
+		return 0
+	return ceili(float(base) * _jump_mass_multiplier(payload, jump_reserve) - TARIFF_TOLERANCE)
+
+
+func base_jump_budget(budget: float, payload: int, jump_reserve := -1.0) -> int:
+	return floori((floorf(budget) + TARIFF_TOLERANCE) / _jump_mass_multiplier(payload, jump_reserve))
+
+
+func _jump_mass_multiplier(payload: int, jump_reserve: float) -> float:
+	var relative_mass := flight_mass(payload, jump_reserve) / REFERENCE_MASS
+	if drive_kind == DRIVE_RANGE:
+		return RANGE_TARIFF_FACTOR * (1.0 + (relative_mass - 1.0) * RANGE_MASS_SENSITIVITY)
+	return 1.0 + (relative_mass - 1.0) * STANDARD_MASS_SENSITIVITY
+
+
+static func minimum_jump_tariff(base: int) -> int:
+	# A saved itinerary can outlive a hull or load change. This lower bound
+	# rejects impossible legs while allowing a previously valid route to remain selected.
+	var lightest_mass := COURIER_DRY_MASS - SCOOP_MASS - AUTOPILOT_MASS
+	var relative_mass := lightest_mass / REFERENCE_MASS
+	return ceili(float(base) * RANGE_TARIFF_FACTOR * (1.0 + (relative_mass - 1.0) * RANGE_MASS_SENSITIVITY) - TARIFF_TOLERANCE)
 
 
 func jump_duration(distance: float, payload: int) -> float:
@@ -148,8 +185,39 @@ func speed_factor() -> float:
 	return float(HULLS[_hull_id].speed_factor)
 
 
-func accel_factor() -> float:
-	return float(HULLS[_hull_id].accel_factor)
+func dry_mass() -> float:
+	return float(HULLS[_hull_id].dry_mass)
+
+
+func flight_mass(payload: int, jump_reserve := -1.0) -> float:
+	var reserve := jump_fuel if jump_reserve < 0.0 else jump_reserve
+	var mass := dry_mass() + float(payload) * CARGO_UNIT_MASS + (fuel + reserve) * FUEL_UNIT_MASS
+	mass += TANK_HARDWARE_MASS if tank_upgraded else 0.0
+	mass += 0.45 if cargo_upgraded else 0.0
+	mass += 0.45 if heat_shield else 0.0
+	mass += 0.35 if range_drive else 0.0
+	mass += 0.2 if eco_upgraded else 0.0
+	mass += 0.15 if mining_laser else 0.0
+	mass += 0.16 if fragment_collector else 0.0
+	mass += 0.1 if fuel_pump else 0.0
+	mass -= SCOOP_MASS if not hydrogen_scoop else 0.0
+	mass -= AUTOPILOT_MASS if not autopilot_fitted else 0.0
+	return mass
+
+
+func thrust_acceleration(local_direction: Vector3, payload: int) -> Vector3:
+	var profile: Dictionary = HULLS[_hull_id]
+	var positive: Vector3 = profile.thrust_positive
+	var negative: Vector3 = profile.thrust_negative
+	var axes := Vector3(positive.x if local_direction.x >= 0.0 else negative.x,
+		positive.y if local_direction.y >= 0.0 else negative.y, positive.z if local_direction.z >= 0.0 else negative.z)
+	var power := 1.0 if fuel > 0.0 else RESERVE_THRUST_FRACTION
+	return axes * (power / flight_mass(payload))
+
+
+func roll_rate(payload: int) -> float:
+	var nominal_mass := dry_mass() + 2.0 * BASE_CAPACITY * FUEL_UNIT_MASS
+	return float(HULLS[_hull_id].roll_rate) * nominal_mass / flight_mass(payload)
 
 
 func trade_in_value() -> int:

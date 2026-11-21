@@ -4,6 +4,7 @@ const Catalog := preload("res://scripts/sector_catalog.gd")
 const Fixture := preload("res://tests/flight_fixture.gd")
 const Flight := preload("res://scripts/flight_sim.gd")
 const FlightAudio := preload("res://scripts/flight_audio.gd")
+const Music := preload("res://scripts/flight_music.gd")
 const OrbitRelay := preload("res://main.tscn")
 const Patrol := preload("res://scripts/patrol_encounter.gd")
 
@@ -19,10 +20,14 @@ func _initialize() -> void:
 
 func _run() -> void:
 	_test_audio_streams()
+	_test_effects()
+	_test_music()
 	_test_priority_and_mute()
 	_test_docking_notification_identity()
 	_test_closing_hysteresis()
 	await _test_game_notifications()
+	# Mixer retirement runs on its own clock after the test scenes are freed.
+	await create_timer(0.15).timeout
 	print("Flight audio integration: %d checks, %d failures" % [_checks, _failures.size()])
 	for failure: String in _failures:
 		printerr(failure)
@@ -71,6 +76,79 @@ func _test_priority_and_mute() -> void:
 		"Quiet and loud selections reach the actual Godot audio player")
 	_expect(not audio.notify("unmapped", 4700) and audio.notify("dock_ready", 4700) and sounded.back() == "dock"
 		and not audio.notify("dock_ready", 4750), "A confirmed event maps to one dock chime and its real cooldown")
+	audio.queue_free()
+
+
+func _test_effects() -> void:
+	var audio := _player()
+	var played: Array[String] = []
+	audio.effect_played.connect(func(cue: String): played.append(cue))
+	var signatures := {}
+	for cue: String in FlightAudio.EFFECT_NOTES:
+		var stream := audio.stream_for(cue)
+		var data := stream.data
+		var signature := hash(data)
+		var peak := 0
+		for index in range(0, data.size(), 2):
+			peak = maxi(peak, absi(data.decode_s16(index)))
+		_expect(not signatures.has(signature) and stream.get_length() > 0.11 and stream.get_length() < 0.80
+			and data.decode_s16(0) == 0 and data.decode_s16(data.size() - 2) == 0 and peak > 1000 and peak < 16000,
+			"An original, distinct and bounded effect waveform exists for %s" % cue)
+		signatures[signature] = cue
+	audio.set_level(0)
+	_expect(audio.notify("launch", 1000) and audio.notify("gear_deploy", 1003) and audio.notify("land", 1006)
+		and not audio.notify("land", 1010) and played == ["thrust", "gear", "touchdown"]
+		and audio._effect_players[0].playing and audio._effect_players[1].playing and audio._effect_players[2].playing,
+		"Authentic action events start multiple independent effect voices and suppress repeated pulses")
+	_expect(audio.set_effect_level(0) and not audio._effect_players.any(func(player: AudioStreamPlayer): return player.playing)
+		and not audio.notify("jump_charging", 1500) and not audio.set_effect_level(4),
+		"Muting the effects stops active voices and blocks subsequent events")
+	audio.set_level(2)
+	_expect(audio.notify("dock_ready", 1900) and audio._player.playing and played.size() == 3,
+		"The alert channel remains active with the effects muted")
+	audio.queue_free()
+
+
+func _test_music() -> void:
+	var audio := _player()
+	var music: Music = audio.music
+	var signatures := {}
+	for name: String in Music.TRACKS:
+		var stream := music.stream_for(name)
+		if not _expect(stream != null, "The packaged score loads for %s" % name):
+			continue
+		var signature := hash(stream.data)
+		_expect(stream.mix_rate == 24000 and stream.stereo and stream.loop_mode == AudioStreamWAV.LOOP_FORWARD
+			and stream.loop_begin == 0 and stream.loop_end > 0 and stream.get_length() >= 14.0
+			and stream.data.size() > 10000 and not signatures.has(signature),
+			"The %s score has unique stereo audio and is configured to loop" % name)
+		signatures[signature] = name
+	if signatures.size() < Music.TRACKS.size():
+		audio.queue_free()
+		return
+	var changes: Array[String] = []
+	music.track_changed.connect(func(name: String): changes.append(name))
+	music.advance("berth", Music.CROSSFADE_SECONDS)
+	music.advance("flight", Music.CROSSFADE_SECONDS * 0.25)
+	_expect(music._players.berth.playing and music._players.flight.playing
+		and is_equal_approx(music._gain.berth, 0.75) and is_equal_approx(music._gain.flight, 0.25),
+		"The incoming score replaces the departing score through a real two-player fade")
+	music.advance("flight", Music.CROSSFADE_SECONDS)
+	_expect(not music._players.berth.playing and music._players.flight.playing and changes == ["berth", "flight"],
+		"Returning update ticks preserve the active track and release the departed playback")
+	_expect(music.configure(0, Music.CONTEXTUAL) and not music._players.flight.playing
+		and not music.configure(1, 3), "Music mute stops playback and rejects an invalid mode")
+	music.advance("combat", 1.0)
+	_expect(changes == ["berth", "flight"], "A muted soundtrack allocates no playback for a new context")
+	music.configure(3, Music.CONTINUOUS)
+	music.advance("transit", Music.CROSSFADE_SECONDS)
+	_expect(music._players.flight.playing and music.track == "flight" and not music._players.has("transit")
+		and is_equal_approx(music._players.flight.volume_db, linear_to_db(float(Music.LEVEL_GAIN[3]))),
+		"Unmuting continuous mode plays the everyday score through changes in context on the chosen volume")
+	music.configure(1, Music.CONTEXTUAL)
+	music.advance("combat", Music.CROSSFADE_SECONDS)
+	_expect(music._players.combat.playing and changes == ["berth", "flight", "combat"],
+		"Restoring contextual music picks the score for the current situation")
 	audio.queue_free()
 
 
@@ -127,10 +205,29 @@ func _test_game_notifications() -> void:
 	var flight := Flight.new()
 	game.flight = flight
 	var sounded: Array[String] = []
+	var actions: Array[String] = []
 	game._audio.cue_played.connect(func(cue: String) -> void: sounded.append(cue))
+	game._audio.effect_played.connect(func(cue: String) -> void: actions.append(cue))
+	game._process(Music.CROSSFADE_SECONDS)
+	_expect(game._audio.music.track == "berth" and game._audio.music._players.berth.playing,
+		"The ordinary game score starts with the docked theme")
 	if not _expect(Fixture.depart(flight) and flight.select_target(0), "The actual scene begins a legitimate local docking approach"):
 		viewport.queue_free()
 		return
+	game._deliver_notice()
+	game._process(Music.CROSSFADE_SECONDS)
+	_expect("thrust" in actions and game._audio.music.track == "flight",
+		"The real departure emits a thruster effect and switches to the free-flight score")
+	flight.position = Vector3(0.0, 1300.0, 500.0)
+	flight.velocity = Vector3.ZERO
+	if not _expect(flight.plan_jump(Catalog.VELAR_SYSTEM) and flight.start_jump(), "Begin a legitimate interstellar charging sequence"):
+		viewport.queue_free()
+		return
+	game._deliver_notice()
+	game._process(Music.CROSSFADE_SECONDS)
+	_expect("charge" in actions and game._audio.music.track == "transit" and game._audio.music._players.transit.playing,
+		"The active jump sequence starts its charge effect and distinct transit score")
+	flight.cancel_jump()
 	flight.position = flight.docking_position(0) + Vector3.BACK * 25.0
 	flight.velocity = flight.target_velocity(0)
 	for _frame in range(ceili((Flight.DockAccess.CLOSING_SECONDS + STEP) / STEP)):
@@ -186,6 +283,9 @@ func _test_muted_patrol(game: Node, sounded: Array[String]) -> void:
 			break
 	_expect(flight.patrol.phase == Patrol.ENGAGED and sounded.size() == before and not game._audio._player.playing
 		and _caption(game).contains("Рейдер"), "A real combat event stays readable with audio disabled and emits no tone")
+	game._process(Music.CROSSFADE_SECONDS)
+	_expect(game._audio.music.track == "combat" and game._audio.music._players.combat.playing,
+		"An actual hostile patrol changes the score without unmuting its alert")
 
 
 func _test_muted_fallback(game: Node, sounded: Array[String]) -> void:

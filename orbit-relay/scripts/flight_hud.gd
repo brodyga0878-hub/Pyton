@@ -100,6 +100,7 @@ var _throttle_controls: GridContainer
 var _port_tools: HBoxContainer
 var _navigation_drawer: PanelContainer
 var _navigation_list: ItemList
+var _navigation_corridor_enabled := false
 var _navigation_sites: Array[int] = []
 var _navigation_blockers: Array[Control] = []
 var _navigation_presses: Dictionary[int, NavigationPress] = {}
@@ -194,7 +195,7 @@ func build() -> void:
 	_actions["journal"].tooltip_text = "Журнал заданий"
 	_actions["settings"].tooltip_text = "Графика и управление"
 	_actions["frontier"].tooltip_text = "Разведка, строительство и фракции"
-	_actions["navigation_toggle"].tooltip_text = "Объекты текущей системы и подписи в полёте (F12)"
+	_actions["navigation_toggle"].tooltip_text = "Цели и отображение объектов в полёте (F12)"
 	course_card.resized.connect(func() -> void:
 		shortcuts.offset_top = course_card.position.y + course_card.size.y + 8.0
 		shortcuts.offset_bottom = shortcuts.offset_top + 48.0
@@ -398,7 +399,7 @@ func build() -> void:
 	_apply_touch_layout()
 
 func _build_navigation_drawer() -> void:
-	var stack := _panel(_safe, Vector2(0.5, 0.5), Rect2(-240, -176, 480, 310))
+	var stack := _panel(_safe, Vector2(0.5, 0.5), Rect2(-240, -176, 480, 330))
 	_navigation_drawer = stack.get_parent() as PanelContainer
 	_navigation_drawer.mouse_filter = Control.MOUSE_FILTER_STOP
 	var header := HBoxContainer.new()
@@ -407,12 +408,21 @@ func _build_navigation_drawer() -> void:
 	var title := _label(header, 21, CYAN)
 	title.text = "Объекты системы"
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	for action: String in ["object_labels", "navigation_close"]:
-		_button(header, action, "Подписи вкл." if action == "object_labels" else "Закрыть")
+	_button(header, "navigation_close", "Закрыть")
+	_actions["navigation_close"].size_flags_horizontal = Control.SIZE_SHRINK_END
+	var switches := HBoxContainer.new()
+	switches.add_theme_constant_override("separation", 6)
+	stack.add_child(switches)
+	_button(switches, "object_labels", "")
+	_button(switches, "navigation_corridor", "")
+	_button(switches, "ship_markers", "")
+	for action: String in ["navigation_close", "object_labels", "navigation_corridor", "ship_markers"]:
 		_actions[action].add_theme_font_size_override("font_size", 16)
 		_actions[action].custom_minimum_size.y = 46.0
-		_actions[action].size_flags_horizontal = Control.SIZE_SHRINK_END
 	_actions["object_labels"].tooltip_text = "Показывать названия объектов и контактов поверх сцены"
+	_actions["navigation_corridor"].tooltip_text = "Показывать направляющие к выбранному объекту"
+	_actions["ship_markers"].tooltip_text = "Показывать метки кораблей фонового движения"
+	_update_navigation_switches()
 	_navigation_list = ItemList.new()
 	_navigation_list.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_navigation_list.add_theme_font_size_override("font_size", 18)
@@ -421,6 +431,11 @@ func _build_navigation_drawer() -> void:
 	_navigation_list.item_selected.connect(_select_navigation_row)
 	stack.add_child(_navigation_list)
 	_navigation_drawer.hide()
+
+func _update_navigation_switches() -> void:
+	_actions["object_labels"].text = "Подписи вкл." if _marks.object_labels else "Подписи выкл."
+	_actions["navigation_corridor"].text = "Коридор вкл." if _navigation_corridor_enabled else "Коридор выкл."
+	_actions["ship_markers"].text = "Корабли вкл." if _marks.ship_markers else "Корабли выкл."
 
 func _build_combat_instrument(parent: VBoxContainer) -> void:
 	_combat_readout = VBoxContainer.new()
@@ -508,6 +523,9 @@ func _sync_docking(status: Dictionary, automatic: bool) -> void:
 		_docking_ready.text = "Створ %s · Скорость %s · Крен %s · Курс %s" % ["✓" if status.position_ok else "—", "✓" if status.speed_ok else "—", "✓" if status.roll_ok else "—", "✓" if status.aim_ok else "—"]
 	_docking_access.visible = not ground or hangar
 	_docking_access.text = _dock_access_caption(access)
+	var tariff: Vector2i = status.get("port_tariff", Vector2i.ZERO)
+	if tariff.x > 0:
+		_docking_access.text += "\nСбор %d кр. · Стоянка %d кр./сутки" % [tariff.x, tariff.y]
 	_docking_access.add_theme_color_override("font_color", CYAN if status.get("cleared", false) else AMBER)
 	_actions["dock"].tooltip_text = str(status.get("reason", ""))
 	button.text = "Снять синхр." if synced else "Крен дока"
@@ -1055,7 +1073,7 @@ func _sync_clock(sim: RefCounted) -> void:
 	button.text = "%d×" % scale
 	_time_hint.visible = not paused and not _jumping and not status.allowed
 	_time_hint.text = "Ускорение недоступно. %s" % status.reason if _time_hint.visible else ""
-	button.tooltip_text = _time_hint.text if _time_hint.visible else "Сменить скорость игрового времени (O)"
+	button.tooltip_text = _time_hint.text if _time_hint.visible else "Сменить скорость игрового времени (O). Доступно до ×%d." % int(status.get("max_rate", 1))
 	if paused:
 		button.tooltip_text = "Продолжите игру для смены скорости"
 
@@ -1389,6 +1407,12 @@ func set_navigation_markers(markers: Array[Dictionary]) -> void:
 			exclude.append(control.get_global_rect())
 	_marks.set_navigation(markers, _safe.get_global_rect().grow(-20.0), exclude)
 
+func navigation_corridor_enabled() -> bool:
+	return _navigation_corridor_enabled
+
+func ship_markers_enabled() -> bool:
+	return _marks.ship_markers
+
 func toggle_navigation() -> void:
 	if not _input_enabled or _parked or _jumping:
 		return
@@ -1711,7 +1735,14 @@ func _commit_action(action: String) -> void:
 		close_navigation()
 	elif action == "object_labels":
 		_marks.object_labels = not _marks.object_labels
-		_actions["object_labels"].text = "Подписи вкл." if _marks.object_labels else "Подписи выкл."
+		_update_navigation_switches()
+		_marks.queue_redraw()
+	elif action == "navigation_corridor":
+		_navigation_corridor_enabled = not _navigation_corridor_enabled
+		_update_navigation_switches()
+	elif action == "ship_markers":
+		_marks.ship_markers = not _marks.ship_markers
+		_update_navigation_switches()
 		_marks.queue_redraw()
 	else:
 		if action == "flight_assist":
@@ -1850,6 +1881,7 @@ class FlightMarks extends Control:
 	var target_visible := false
 	var target_position := Vector2.ZERO
 	var object_labels := true
+	var ship_markers := true
 	var traffic: Array[Dictionary] = []
 	var navigation: Array[Dictionary] = []
 	var _excluded: Array[Rect2] = []
@@ -1926,9 +1958,11 @@ class FlightMarks extends Control:
 			draw_string(font, text_at, caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, color)
 
 	func _draw_traffic() -> Array[Rect2]:
+		var occupied: Array[Rect2] = []
+		if not ship_markers:
+			return occupied
 		var safe := Rect2(Vector2(24, 142), (size - Vector2(48, 285)).max(Vector2.ONE))
 		var font := ThemeDB.fallback_font
-		var occupied: Array[Rect2] = []
 		for contact: Dictionary in traffic:
 			var screen: Vector2 = contact.screen
 			if not safe.has_point(screen):

@@ -304,11 +304,11 @@ func _tick_until(flight: Flight, epoch: float, max_delta := 4.0) -> void:
 
 func _supplies(flight: Flight) -> Dictionary:
 	var totals := {}
-	for good in Economy.GOODS:
+	for good in Economy.LEGACY_GOODS:
 		totals[good] = 0
 	for system in range(Catalog.CORE_SYSTEM_COUNT):
 		for port in Catalog.ports_for(system):
-			for good in Economy.GOODS:
+			for good in Economy.LEGACY_GOODS:
 				totals[good] += flight.market.stock(port, good)
 		for service in flight.freight.services(system, flight.orbit_time):
 			if service.in_transit:

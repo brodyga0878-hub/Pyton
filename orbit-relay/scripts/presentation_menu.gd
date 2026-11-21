@@ -14,6 +14,9 @@ const ROW_TITLES := {
 	"sensitivity": "Чувствительность",
 	"layout": "Сенсорная раскладка",
 	"notification_volume": "Громкость сигналов",
+	"effects_volume": "Громкость эффектов",
+	"music_volume": "Громкость музыки",
+	"music_mode": "Режим музыки",
 	"invert_yaw": "Горизонтальная ось",
 	"invert_pitch": "Вертикальная ось",
 }
@@ -38,6 +41,9 @@ const ROW_HINTS := {
 		"Обычная громкость",
 		"Повышенная громкость",
 	],
+	"effects_volume": ["Звуки действий выключены", "Тихие звуки действий", "Обычная громкость", "Повышенная громкость"],
+	"music_volume": ["Музыка выключена", "Тихая музыка", "Обычная громкость", "Повышенная громкость"],
+	"music_mode": ["Музыка меняется при манёврах и в бою", "Мелодия свободного полёта звучит постоянно"],
 	"invert_yaw": ["Вправо — поворот вправо", "Вправо — поворот влево"],
 	"invert_pitch": ["Вверх — нос поднимается", "Вверх — нос опускается"],
 }
@@ -45,6 +51,8 @@ const ROW_HINTS := {
 var _settings: RefCounted
 var _insets: MarginContainer
 var _close_button: Button
+var _pages: Array[GridContainer] = []
+var _tabs: Array[Button] = []
 var _choice_buttons: Dictionary[String, Array] = {}
 var _descriptions: Dictionary[String, Label] = {}
 var _touches: Dictionary[int, Button] = {}
@@ -77,6 +85,13 @@ func build() -> void:
 	header.add_theme_constant_override("separation", 12)
 	content.add_child(header)
 	_label(header, "Настройки", 31, TEXT).size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var group := ButtonGroup.new()
+	for caption: String in ["Экран и управление", "Звук"]:
+		var tab := _button(header, caption)
+		tab.toggle_mode = true
+		tab.button_group = group
+		tab.pressed.connect(_select_page.bind(_tabs.size()))
+		_tabs.append(tab)
 	var voyages_button := _button(header, "Рейсы")
 	voyages_button.custom_minimum_size.x = 126
 	voyages_button.pressed.connect(func(): voyages_requested.emit())
@@ -84,13 +99,16 @@ func build() -> void:
 	_close_button.custom_minimum_size.x = 126
 	_close_button.pressed.connect(_request_close)
 
-	var grid := GridContainer.new()
-	grid.columns = 2
-	grid.add_theme_constant_override("h_separation", 10)
-	grid.add_theme_constant_override("v_separation", 6)
-	content.add_child(grid)
+	for page in range(_tabs.size()):
+		var grid := GridContainer.new()
+		grid.columns = 2
+		grid.add_theme_constant_override("h_separation", 10)
+		grid.add_theme_constant_override("v_separation", 6)
+		content.add_child(grid)
+		_pages.append(grid)
 	for field: String in Settings.OPTIONS:
-		_add_choices(grid, field)
+		_add_choices(_pages[1 if field in Settings.AUDIO_FIELDS else 0], field)
+	_select_page(0)
 	get_viewport().size_changed.connect(_update_insets)
 	_update_insets()
 	hide()
@@ -126,6 +144,13 @@ func close() -> void:
 
 func is_open() -> bool:
 	return _settings != null and visible
+
+
+func _select_page(index: int) -> void:
+	_touches.clear()
+	for page in range(_pages.size()):
+		_pages[page].visible = page == index
+		_tabs[page].set_pressed_no_signal(page == index)
 
 
 func _add_choices(parent: Container, field: String) -> void:

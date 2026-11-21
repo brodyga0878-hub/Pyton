@@ -351,4 +351,6 @@ func _legacy_market(flight: Flight) -> Dictionary:
 	stocks.erase(str(Catalog.GROUND_HANGAR))
 	for inventory: Dictionary in stocks.values():
 		inventory.erase("hydrogen")
+		for good: String in Economy.NEW_GOODS:
+			inventory.erase(good)
 	return stocks

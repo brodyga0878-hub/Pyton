@@ -163,7 +163,7 @@ func snapshot() -> Dictionary:
 
 
 func restore(value: Variant, legacy := false, reserve_slots := Catalog.DESTINATION_COUNT,
-		capacity := CAPACITY, market_cargo := false, pre_hydrogen := false) -> bool:
+		capacity := CAPACITY, market_cargo := false, pre_hydrogen := false, pre_assortment := false) -> bool:
 	if legacy and value is Dictionary and value.size() == LEGACY_SAVE_FIELDS.size() and value.has_all(LEGACY_SAVE_FIELDS):
 		value = _upgrade_legacy(value)
 	if not value is Dictionary or value.size() != SAVE_FIELDS.size() or not value.has_all(SAVE_FIELDS):
@@ -183,7 +183,10 @@ func restore(value: Variant, legacy := false, reserve_slots := Catalog.DESTINATI
 		return false
 	var cargo_fields := RESOURCES
 	if market_cargo:
-		cargo_fields = Economy.PRE_HYDROGEN_GOODS if pre_hydrogen else Economy.GOODS
+		if pre_hydrogen:
+			cargo_fields = Economy.PRE_HYDROGEN_GOODS
+		else:
+			cargo_fields = Economy.LEGACY_GOODS if pre_assortment else Economy.GOODS
 	if not value.cargo is Dictionary or value.cargo.size() != cargo_fields.size() or not value.cargo.has_all(cargo_fields):
 		return false
 	if not value.reserves is Array or value.reserves.size() != saved_count:

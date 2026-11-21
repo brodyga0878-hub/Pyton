@@ -3,9 +3,11 @@ extends RefCounted
 
 const SessionIO := preload("res://scripts/session_io.gd")
 const FlightAudio := preload("res://scripts/flight_audio.gd")
+const Music := preload("res://scripts/flight_music.gd")
 const PATH := "user://presentation.json"
 const LEGACY_FIELDS := ["quality", "sensitivity", "layout"]
 const PRE_INVERSION_FIELDS := ["quality", "sensitivity", "layout", FlightAudio.VOLUME_KEY]
+const PRE_AUDIO_MIX_FIELDS := ["quality", "sensitivity", "layout", FlightAudio.VOLUME_KEY, "invert_yaw", "invert_pitch"]
 const AXIS_CHOICES := ["Обычная", "Инверсия"]
 const OPTIONS := {
 	"quality": ["Экономичный", "Сбалансированный", "Детальный"],
@@ -14,7 +16,11 @@ const OPTIONS := {
 	FlightAudio.VOLUME_KEY: FlightAudio.LEVEL_LABELS,
 	"invert_yaw": AXIS_CHOICES,
 	"invert_pitch": AXIS_CHOICES,
+	FlightAudio.EFFECT_VOLUME_KEY: FlightAudio.LEVEL_LABELS,
+	Music.VOLUME_KEY: FlightAudio.LEVEL_LABELS,
+	Music.MODE_KEY: Music.MODE_LABELS,
 }
+const AUDIO_FIELDS := [FlightAudio.VOLUME_KEY, FlightAudio.EFFECT_VOLUME_KEY, Music.VOLUME_KEY, Music.MODE_KEY]
 
 var quality := 1
 var sensitivity := 1
@@ -22,6 +28,9 @@ var layout := 0
 var notification_volume := FlightAudio.DEFAULT_LEVEL
 var invert_yaw := 0
 var invert_pitch := 0
+var effects_volume := FlightAudio.DEFAULT_LEVEL
+var music_volume := Music.DEFAULT_LEVEL
+var music_mode := Music.CONTEXTUAL
 
 
 func snapshot() -> Dictionary:
@@ -29,6 +38,8 @@ func snapshot() -> Dictionary:
 		"quality": quality, "sensitivity": sensitivity, "layout": layout,
 		FlightAudio.VOLUME_KEY: notification_volume,
 		"invert_yaw": invert_yaw, "invert_pitch": invert_pitch,
+		FlightAudio.EFFECT_VOLUME_KEY: effects_volume,
+		Music.VOLUME_KEY: music_volume, Music.MODE_KEY: music_mode,
 	}
 
 
@@ -40,6 +51,8 @@ func restore(value: Variant) -> bool:
 		fields = LEGACY_FIELDS
 	elif value.size() == PRE_INVERSION_FIELDS.size():
 		fields = PRE_INVERSION_FIELDS
+	elif value.size() == PRE_AUDIO_MIX_FIELDS.size():
+		fields = PRE_AUDIO_MIX_FIELDS
 	if value.size() != fields.size():
 		return false
 	for field: String in fields:
@@ -51,6 +64,9 @@ func restore(value: Variant) -> bool:
 	notification_volume = int(value.get(FlightAudio.VOLUME_KEY, FlightAudio.DEFAULT_LEVEL))
 	invert_yaw = int(value.get("invert_yaw", 0))
 	invert_pitch = int(value.get("invert_pitch", 0))
+	effects_volume = int(value.get(FlightAudio.EFFECT_VOLUME_KEY, FlightAudio.DEFAULT_LEVEL))
+	music_volume = int(value.get(Music.VOLUME_KEY, Music.DEFAULT_LEVEL))
+	music_mode = int(value.get(Music.MODE_KEY, Music.CONTEXTUAL))
 	return true
 
 

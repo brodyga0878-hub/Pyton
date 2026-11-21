@@ -127,6 +127,7 @@ func _test_legacy_and_corrupt_saves() -> void:
 	var flight := _free_flight()
 	var legacy := flight.snapshot()
 	legacy.schema = 47
+	Fixture.remove_expanded_market_from_legacy(legacy)
 	legacy.erase("cargo_pods")
 	legacy.mining.reserves.resize(Catalog.PRE_RICH_SYSTEMS_DESTINATION_COUNT)
 	_expect(flight.restore(legacy) and flight.local_cargo_pods().is_empty() and flight.snapshot().schema == Flight.SAVE_SCHEMA,

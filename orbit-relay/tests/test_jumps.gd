@@ -224,11 +224,12 @@ func _test_touch_route() -> void:
 	await process_frame
 	_tap(chart._system_buttons.get(VELAR), "The destination is selected for departure")
 	var first_fare_fuel: float = flight.ship.jump_fuel
+	var first_fare: int = flight.jump_status(VELAR).cost
 	var first_reaction_fuel: float = flight.ship.fuel
 	_tap(chart._jump_button, "A touch starts outbound charging")
 	_expect(not chart.is_open() and flight.jump_seconds_left > 0.0, "Charging dismisses the map and allows the flight clock to advance")
 	_advance(game, func() -> bool: return flight.system_id == VELAR, 4.0)
-	if not _expect(flight.system_id == VELAR and flight.target == 10 and flight.ship.jump_fuel == first_fare_fuel - 26.0
+	if not _expect(flight.system_id == VELAR and flight.target == 10 and flight.ship.jump_fuel == first_fare_fuel - first_fare
 		and flight.ship.fuel == first_reaction_fuel
 		and flight.contract_stage == 1 and flight.contract_destination == 1 and flight.ship.capacity() == 150.0,
 		"The first jump charges one fare, selects the remote arrival port and preserves the freight and tank"):
@@ -273,9 +274,10 @@ func _test_touch_route() -> void:
 	_tap(chart._system_buttons.get(HOME), "A touch selects Гелион for return")
 	_tap(chart._plan_button, "A touch confirms the return plan")
 	var last_fare_fuel: float = flight.ship.jump_fuel
+	var last_fare: int = flight.jump_status(HOME).cost
 	_tap(chart._jump_button, "A touch starts return charging")
 	_advance(game, func() -> bool: return flight.system_id == HOME, 4.0)
-	_expect(flight.system_id == HOME and flight.target == 0 and flight.ship.jump_fuel == last_fare_fuel - 26.0
+	_expect(flight.system_id == HOME and flight.target == 0 and flight.ship.jump_fuel == last_fare_fuel - last_fare
 		and flight.contract_stage == 1 and flight.contract_destination == 1 and flight.credits == 520,
 		"The full touch round trip changes systems twice and charges only the jump fares")
 	_expect(flight.mining.snapshot() == mining_before and flight.mining.cargo_amount("ore") == 12,

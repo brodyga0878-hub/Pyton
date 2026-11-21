@@ -415,6 +415,7 @@ func _at_port(flight: Flight, port: int) -> Flight:
 		"landed_site": -1, "jump_target": -1, "planned_target": -1, "position": _coordinates(contact),
 		"velocity": [0.0, 0.0, 0.0], "throttle": 0.0}, true)
 	state.dock_access = Flight.DockAccess.new().snapshot()
+	state.port_account.visit = {}
 	_expect(other.restore(state), "Prepare a ship docked at port %d with the same progress" % port)
 	return other
 
@@ -422,13 +423,13 @@ func _at_port(flight: Flight, port: int) -> Flight:
 func _jump_to(flight: Flight, system: int) -> bool:
 	if (flight.docked >= 0 and not Fixture.launch(flight)) or not flight.plan_jump(system):
 		return false
-	var fare := Catalog.jump_cost(flight.system_id, system)
 	flight.change_throttle(0.18)
 	for _frame in range(roundi(30.0 / STEP)):
 		if flight.jump_status(system).ok:
 			break
 		_tick(flight)
 	var before := flight.ship.jump_fuel
+	var fare: int = flight.jump_status(system).cost
 	if not flight.start_jump():
 		return false
 	for _frame in range(roundi(3.0 / STEP)):

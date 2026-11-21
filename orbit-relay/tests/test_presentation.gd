@@ -10,7 +10,7 @@ const Settings := preload("res://scripts/display_settings.gd")
 const SessionIO := preload("res://scripts/session_io.gd")
 const DEFAULTS := {
 	"quality": 1, "sensitivity": 1, "layout": 0, "notification_volume": 2,
-	"invert_yaw": 0, "invert_pitch": 0,
+	"invert_yaw": 0, "invert_pitch": 0, "effects_volume": 2, "music_volume": 1, "music_mode": 0,
 }
 
 var _viewport: SubViewport
@@ -83,12 +83,21 @@ func _test_preferences() -> void:
 		"An invalid on-disk preference record applies none of its values")
 	var legacy := {"quality": 0, "sensitivity": 2, "layout": 1}
 	_expect(SessionIO.save_state(legacy, path) == OK and reloaded.load_preferences(path)
-		and reloaded.snapshot() == legacy.merged({"notification_volume": 2, "invert_yaw": 0, "invert_pitch": 0}),
+		and reloaded.snapshot() == DEFAULTS.merged(legacy, true),
 		"An older three-field file migrates with the normal axes and notification level")
 	var version_095 := legacy.merged({"notification_volume": 3})
 	_expect(SessionIO.save_state(version_095, path) == OK and reloaded.load_preferences(path)
-		and reloaded.snapshot() == version_095.merged({"invert_yaw": 0, "invert_pitch": 0}),
+		and reloaded.snapshot() == DEFAULTS.merged(version_095, true),
 		"A 0.95 preference file preserves existing choices and defaults both axes")
+	var version_096 := version_095.merged({"invert_yaw": 1, "invert_pitch": 1})
+	_expect(SessionIO.save_state(version_096, path) == OK and reloaded.load_preferences(path)
+		and reloaded.snapshot() == DEFAULTS.merged(version_096, true),
+		"A 0.96 preference file retains both inverted axes and supplies the new audio defaults")
+	for field: String in ["effects_volume", "music_volume", "music_mode"]:
+		var invalid := reloaded.snapshot()
+		invalid[field] = Settings.OPTIONS[field].size()
+		_expect(not reloaded.restore(invalid) and reloaded.snapshot() == DEFAULTS.merged(version_096, true),
+			"Reject an out-of-range audio setting without replacing the valid preferences")
 	_expect(SessionIO.load_state() == previous_flight, "Preference I/O leaves the existing flight record untouched")
 	DirAccess.remove_absolute(path)
 	DirAccess.remove_absolute(path + ".previous")
@@ -124,15 +133,23 @@ func _test_settings_scene() -> void:
 		_expect(Engine.max_fps == 30, "The desktop-rendered economy preset actually applies the frame cap")
 	_tap(game._settings._choice_buttons["layout"][1], "Move the action column to the left using a real touch")
 	_tap(game._settings._choice_buttons["sensitivity"][0], "Select precise steering using a real touch")
+	_tap(game._settings._tabs[1], "Open the independent audio controls by touch")
+	await process_frame
 	_tap(game._settings._choice_buttons["notification_volume"][1], "Select quiet notification cues using a real touch")
+	_tap(game._settings._choice_buttons["effects_volume"][0], "Mute flight effects using a real touch")
+	_tap(game._settings._choice_buttons["music_volume"][3], "Raise only the music level using a real touch")
+	_tap(game._settings._choice_buttons["music_mode"][1], "Select continuous free-flight music using a real touch")
+	_tap(game._settings._tabs[0], "Open the screen and pilot controls again")
+	await process_frame
 	_tap(game._settings._choice_buttons["invert_yaw"][1], "Toggle horizontal inversion using a real touch")
 	_expect(game.presentation.invert_yaw == 1 and game.presentation.invert_pitch == 0,
 		"Horizontal inversion remains independent in the settings scene")
 	_tap(game._settings._choice_buttons["invert_pitch"][1], "Toggle vertical inversion using a real touch")
 	var saved_settings: Dictionary = game.presentation.snapshot()
 	_expect(saved_settings == {"quality": 0, "sensitivity": 0, "layout": 1, "notification_volume": 1,
-		"invert_yaw": 1, "invert_pitch": 1}
-		and game._audio.level == 1,
+		"invert_yaw": 1, "invert_pitch": 1, "effects_volume": 0, "music_volume": 3, "music_mode": 1}
+		and game._audio.level == 1 and game._audio.effects_level == 0
+		and game._audio.music.level == 3 and game._audio.music.mode == 1,
 		"The accepted choices are reflected in the running game")
 	_expect(SessionIO.load_state() == flight_before and not flight_before.has("quality"),
 		"Changing presentation leaves both in-progress flight values and the schema independent")
@@ -145,8 +162,9 @@ func _test_settings_scene() -> void:
 	game = _open_game()
 	await process_frame
 	_expect(game.presentation.snapshot() == saved_settings and game._view._visual_profile == 0
-		and _viewport.msaa_3d == Viewport.MSAA_DISABLED and game._audio.level == 1,
-		"Reopening the application restores the saved view preset and cue level")
+		and _viewport.msaa_3d == Viewport.MSAA_DISABLED and game._audio.level == 1
+		and game._audio.effects_level == 0 and game._audio.music.level == 3 and game._audio.music.mode == 1,
+		"Reopening the application restores the display and all saved audio channel settings")
 	var restored: Dictionary = JSON.parse_string(JSON.stringify(game.flight.snapshot()))
 	_expect(restored == flight_before and restored.schema == Flight.SAVE_SCHEMA,
 		"Cold start restores the unchanged docked flight alongside the preferences")
@@ -204,11 +222,16 @@ func _test_pilot_axes_scene() -> void:
 	_tap(game._hud._actions.get("settings"), "Open settings in a compact landscape viewport")
 	await process_frame
 	var visible := _viewport.get_visible_rect().grow(0.5)
-	for button: Button in game._settings._buttons:
-		_expect(visible.encloses(button.get_global_rect()) and button.size.y >= 40.0,
-			"The compact settings screen fits the full touch target for %s" % button.text)
-	for hint: Label in game._settings._descriptions.values():
-		_expect(visible.encloses(hint.get_global_rect()), "The compact settings screen keeps each setting description visible")
+	for tab: int in [0, 1]:
+		_tap(game._settings._tabs[tab], "Open a compact tab through its actual touch button")
+		await process_frame
+		for button: Button in game._settings._buttons:
+			if button.is_visible_in_tree():
+				_expect(visible.encloses(button.get_global_rect()) and button.size.y >= 40.0,
+					"The compact settings screen fits the full touch target for %s" % button.text)
+		for hint: Label in game._settings._descriptions.values():
+			if hint.is_visible_in_tree():
+				_expect(visible.encloses(hint.get_global_rect()), "The compact settings screen keeps each setting description visible")
 	_tap(game._settings._close_button, "Close the compact settings sheet")
 	_viewport.size = Vector2i(1280, 720)
 	await process_frame

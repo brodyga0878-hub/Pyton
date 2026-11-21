@@ -133,13 +133,15 @@ func _test_change_of_authority() -> void:
 		and transfer.violations == 0, "A real faction takeover changes the rule but leaves currently berthed goods alone"):
 		return
 	var balance := flight.credits
+	var berth_fee := int(flight.port_account_status().entry)
 	if not _expect(Fixture.depart(flight) and _dock_at(flight, COLONY),
 		"Leave and dock again through the same operational station after the takeover"):
 		return
 	var imposed := flight.customs_status()
 	_expect(imposed.authority == LEAGUE and imposed.violations == 1 and imposed.medical_aboard == 4
-		and imposed.debt == 100 + 45 * 3 and imposed.notice.get("port") == COLONY and flight.credits == balance,
-		"The next physical inspection uses the live authority and records its own new debt")
+		and imposed.debt == 100 + 45 * 3 and imposed.notice.get("port") == COLONY
+		and int(flight.port_account_status().receipt.paid) == berth_fee and flight.credits == balance - berth_fee,
+		"A new inspection records its live-authority debt independently of the disclosed docking fee")
 
 
 func _test_previous_schema() -> void:

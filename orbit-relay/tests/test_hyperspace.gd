@@ -8,6 +8,7 @@ const Fronts := preload("res://scripts/faction_fronts.gd")
 const Fixture := preload("res://tests/flight_fixture.gd")
 const Flight := preload("res://scripts/flight_sim.gd")
 const Session := preload("res://scripts/session_io.gd")
+const ShipSystems := preload("res://scripts/ship_systems.gd")
 const HOME := Catalog.HOME_SYSTEM
 const STEP := Fixture.STEP
 const STANDARD_DRIVE := "standard"
@@ -47,8 +48,8 @@ func _test_quotes() -> void:
 		"A fresh pilot cannot select an unfitted drive or buy equipment without credits")
 	if _expect(flight.mining.insert_cargo("ore", flight.ship.cargo_capacity()), "Prepare a full commodity hold for the duration formula"):
 		var loaded := flight.jump_travel_seconds(HOME, destination)
-		_expect(flight.jump_tariff(HOME, destination) == base_cost and loaded == ceili((12.0 + 4.0 * distance) * 1.6)
-			and loaded > unloaded, "A fully loaded standard drive spends more game time without changing its fuel tariff")
+		_expect(flight.jump_tariff(HOME, destination) > base_cost and loaded == ceili((12.0 + 4.0 * distance) * 1.6)
+			and loaded > unloaded, "A fully loaded standard drive spends more fuel and game time")
 	_expect(flight.jump_tariff(HOME, HOME) == 0 and flight.jump_travel_seconds(HOME, HOME) == 0,
 		"A same-system leg has neither a fuel tariff nor a travel duration")
 
@@ -84,18 +85,20 @@ func _test_paid_transit(flight: Flight) -> void:
 	var destination := _farthest_known(flight)
 	var base := Catalog.jump_cost(HOME, destination)
 	var distance := Catalog.jump_distance(HOME, destination)
+	var mass_ratio := flight.ship.flight_mass(flight.mining.ore_hold) / ShipSystems.REFERENCE_MASS
 	var standard_seconds := ceili((12.0 + 4.0 * distance) *
 		(1.0 + 0.6 * float(flight.mining.ore_hold) / float(flight.ship.cargo_capacity())))
 	flight.select_jump_drive(STANDARD_DRIVE)
 	var standard := flight.route_preview(destination)
-	_expect(flight.jump_tariff(HOME, destination) == base and flight.jump_travel_seconds(HOME, destination) == standard_seconds
+	var standard_fare := ceili(base * mass_ratio)
+	_expect(flight.jump_tariff(HOME, destination) == standard_fare and flight.jump_travel_seconds(HOME, destination) == standard_seconds
 		and standard.available, "The equipped ship can still select the standard drive and quote the cargo-weighted leg")
 	flight.select_jump_drive(RANGE_DRIVE)
-	var fare := ceili(float(base) * 0.75)
+	var fare := ceili(float(base) * 0.75 * (1.0 + (mass_ratio - 1.0) * 0.82))
 	var travel := ceili((7.0 + 2.5 * distance) *
 		(1.0 + 0.6 * float(flight.mining.ore_hold) / float(flight.ship.cargo_capacity())))
 	if not _expect(flight.jump_tariff(HOME, destination) == fare and flight.jump_travel_seconds(HOME, destination) == travel
-		and fare < base and travel < standard_seconds, "The selected long-range drive quotes independently shorter travel and a smaller fare"):
+		and fare < standard_fare and travel < standard_seconds, "The selected long-range drive quotes independently shorter travel and a smaller fare"):
 		return
 	var route := flight.route_preview(destination)
 	if not _expect(route.available and route.path == [HOME, destination] and int(route.legs[0].fuel) == fare

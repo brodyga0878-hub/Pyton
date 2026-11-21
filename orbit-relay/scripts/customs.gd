@@ -4,9 +4,10 @@ extends RefCounted
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const Factions = preload("res://scripts/faction_fronts.gd")
 const ShipSystems = preload("res://scripts/ship_systems.gd")
+const Economy = preload("res://scripts/port_economy.gd")
 const VELAR_AUTHORITY := 1
 const MEDICAL_ALLOWANCE := 4
-const MAX_MEDICAL_EXCESS := ShipSystems.HULLS[ShipSystems.FREIGHTER_HULL].expanded_cargo - MEDICAL_ALLOWANCE
+const MAX_HOLD := ShipSystems.HULLS[ShipSystems.FREIGHTER_HULL].expanded_cargo
 const BASE_FINE := 100
 const UNIT_FINE := 45
 const MAX_DEBT := 1000000000
@@ -21,7 +22,7 @@ var _violations := 0
 
 
 static func allowance(authority: int, good: String) -> int:
-	return MEDICAL_ALLOWANCE if authority == VELAR_AUTHORITY and good == "medical" else -1
+	return Economy.allowance(authority, good)
 
 
 static func excess(authority: int, good: String, quantity: int) -> int:
@@ -42,8 +43,8 @@ func record(authority: int, port: int, good: String, quantity: int, epoch: float
 		"fine": fine, "epoch": epoch}
 	_violations += 1
 	return {"ok": true, "credits": 0, "event": "customs_inspection", "debt": _debts[authority],
-		"notice": _notice.duplicate(), "message": "%s изъяла медгрузы (%d ед.) и выписала штраф %d кр." % [
-			Factions.faction_name(authority), quantity, fine]}
+		"notice": _notice.duplicate(), "message": "Таможня «%s» изъяла: %s (%d ед.). Штраф %d кр." % [
+			Factions.faction_name(authority), Economy.good_name(good), quantity, fine]}
 
 
 func pay(authority: int, credits: int) -> Dictionary:
@@ -74,7 +75,7 @@ func snapshot() -> Dictionary:
 	return {"debts": _debts.duplicate(), "notice": _notice.duplicate(), "violations": _violations}
 
 
-func restore(raw: Variant, epoch: float) -> bool:
+func restore(raw: Variant, epoch: float, pre_assortment := false) -> bool:
 	if not raw is Dictionary or not _valid_epoch(epoch) or not _has_fields(raw, SAVE_FIELDS):
 		return false
 	if not raw.debts is Array or raw.debts.size() != Factions.FACTIONS.size():
@@ -84,16 +85,17 @@ func restore(raw: Variant, epoch: float) -> bool:
 	var violations := int(raw.violations)
 	var debts: Array[int] = []
 	for authority in range(Factions.FACTIONS.size()):
-		var maximum := MAX_DEBT if allowance(authority, "medical") >= 0 else 0
+		var maximum := 0 if pre_assortment and authority != VELAR_AUTHORITY else MAX_DEBT
 		if not _valid_integer(raw.debts[authority], 0, maximum):
 			return false
 		debts.append(int(raw.debts[authority]))
 	var notice: Dictionary = {}
 	if violations > 0:
-		notice = _restore_notice(raw.notice, epoch)
-		if notice.is_empty() or debts[VELAR_AUTHORITY] > _fine(MAX_MEDICAL_EXCESS) * (violations - 1) + int(notice.fine):
+		notice = _restore_notice(raw.notice, epoch, pre_assortment)
+		var max_seizure := MAX_HOLD - MEDICAL_ALLOWANCE if pre_assortment else MAX_HOLD
+		if notice.is_empty() or debts[0] + debts[1] > _fine(max_seizure) * (violations - 1) + int(notice.fine):
 			return false
-	elif not raw.notice.is_empty() or debts[VELAR_AUTHORITY] != 0:
+	elif not raw.notice.is_empty() or debts[0] + debts[1] != 0:
 		return false
 	_debts = debts
 	_notice = notice
@@ -101,14 +103,16 @@ func restore(raw: Variant, epoch: float) -> bool:
 	return true
 
 
-static func _restore_notice(raw: Dictionary, epoch: float) -> Dictionary:
+static func _restore_notice(raw: Dictionary, epoch: float, pre_assortment: bool) -> Dictionary:
 	if not _has_fields(raw, NOTICE_FIELDS):
 		return {}
 	if not _valid_integer(raw.authority, 0, Factions.FACTIONS.size() - 1):
 		return {}
 	if not _valid_integer(raw.port, 0, Catalog.DESTINATION_COUNT - 1) or not raw.good is String:
 		return {}
-	if not _valid_integer(raw.quantity, 1, MAX_MEDICAL_EXCESS):
+	if pre_assortment and raw.good != "medical":
+		return {}
+	if not _valid_integer(raw.quantity, 1, MAX_HOLD):
 		return {}
 	if not _valid_violation(int(raw.authority), int(raw.port), raw.good, int(raw.quantity)):
 		return {}
@@ -125,7 +129,8 @@ static func _restore_notice(raw: Dictionary, epoch: float) -> Dictionary:
 
 
 static func _valid_violation(authority: int, port: int, good: String, quantity: int) -> bool:
-	if allowance(authority, good) < 0 or quantity < 1 or quantity > MAX_MEDICAL_EXCESS or not Catalog.is_port(port):
+	var limit := allowance(authority, good)
+	if limit < 0 or quantity < 1 or quantity > MAX_HOLD - limit or not Catalog.is_port(port):
 		return false
 	var system := Catalog.system_of_site(port)
 	if system < Factions.CORE_OWNERS.size():

@@ -4,6 +4,7 @@ const Main := preload("res://main.tscn")
 const Flight := preload("res://scripts/flight_sim.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const GalaxyChart := preload("res://scripts/galaxy_chart.gd")
+const Fixture := preload("res://tests/flight_fixture.gd")
 
 var _canvas: SubViewport
 var _checks := 0
@@ -27,6 +28,7 @@ func _test_previous_atlas_area() -> void:
 	var last_known := Catalog.PRE_ATLAS_SYSTEM_COUNT - 1
 	var old := Flight.new().snapshot()
 	old.schema = 46
+	Fixture.remove_expanded_market_from_legacy(old)
 	old.mining.reserves.resize(prior_size)
 	old.cartography.systems = [{"system": last_known, "epoch": 0.0}]
 	var site: int = Catalog.mines_for(last_known)[0]

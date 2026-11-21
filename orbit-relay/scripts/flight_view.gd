@@ -203,6 +203,7 @@ var _surface_guide_paint: StandardMaterial3D
 var _surface_guide_site := -1
 var _surface_guide_point := Vector3.INF
 var _surface_guide_normal := Vector3.ZERO
+var _navigation_corridor: MeshInstance3D
 var _surface_views: Dictionary[int, Node3D] = {}
 var _stations: Dictionary[int, Node3D] = {}
 var _dock_hatches: Dictionary[int, DockHatch] = {}
@@ -253,6 +254,7 @@ func build() -> void:
 	_surface_guide_paint.cull_mode = BaseMaterial3D.CULL_DISABLED
 	_surface_guide = _mesh(self, ArrayMesh.new(), _surface_guide_paint, Vector3.ZERO)
 	_surface_guide.hide()
+	_build_navigation_corridor()
 	camera = Camera3D.new()
 	camera.fov = 67.0
 	camera.near = 0.2
@@ -394,6 +396,19 @@ func select_camera_mode(mode: int) -> bool:
 
 func shows_forward_aim() -> bool:
 	return _camera_director.shows_forward_aim()
+
+
+func set_navigation_corridor(guide: Dictionary) -> void:
+	_navigation_corridor.visible = not guide.is_empty()
+	if guide.is_empty():
+		return
+	var start: Vector3 = guide.start
+	var path: Vector3 = guide.end - start
+	var axis := path.normalized()
+	var up := Vector3.RIGHT if absf(axis.dot(Vector3.UP)) > 0.95 else Vector3.UP
+	var width: float = guide.half_width
+	var frame := Basis.looking_at(-axis, up).scaled_local(Vector3(width, width, path.length()))
+	_navigation_corridor.transform = Transform3D(frame, start)
 
 
 func sync(sim: RefCounted, delta: float) -> void:
@@ -1326,6 +1341,26 @@ func _build_approach(approach: Node3D) -> StandardMaterial3D:
 		markers.append([Vector3(0, width + 0.60, depth), Vector3(length * 0.70, stroke * 1.7, 0.002)])
 	_box_batch(approach, paint, markers)
 	return paint
+
+
+func _build_navigation_corridor() -> void:
+	var geometry := SurfaceTool.new()
+	geometry.begin(Mesh.PRIMITIVE_LINES)
+	for depth: float in [0.0, 0.20, 0.44, 0.72, 1.0]:
+		var span := lerpf(1.0, 0.66, depth)
+		var inside := span * 0.62
+		for x: float in [-1.0, 1.0]:
+			for y: float in [-1.0, 1.0]:
+				geometry.add_vertex(Vector3(x * inside, y * span, depth))
+				geometry.add_vertex(Vector3(x * span, y * span, depth))
+				geometry.add_vertex(Vector3(x * span, y * span, depth))
+				geometry.add_vertex(Vector3(x * span, y * inside, depth))
+	for x: float in [-1.0, 1.0]:
+		geometry.add_vertex(Vector3(x, -1.0, 0.0))
+		geometry.add_vertex(Vector3(x * 0.66, -0.66, 1.0))
+	_navigation_corridor = _mesh(self, geometry.commit(), _light(Color("#73c3be")), Vector3.ZERO)
+	_navigation_corridor.name = "NavigationCorridor"
+	_navigation_corridor.hide()
 
 
 func _sectioned_shell(parent: Node3D, paint: Material, sections: Array[Vector3], at := Vector3.ZERO) -> void:

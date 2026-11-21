@@ -137,7 +137,8 @@ func _test_frontier_flight() -> void:
 		and flight.scoop_status().ok and flight.scoop_action(),
 		"After lift-off, the local primary supports real safe-band hydrogen collection"):
 		return
-	var return_cost := Catalog.jump_cost(destination, HOME)
+	var return_cost := flight.ship.jump_tariff(Catalog.jump_cost(destination, HOME),
+		flight.mining.ore_hold, flight.ship.jump_capacity())
 	var needed_canisters := ceili(float(return_cost) / 10.0)
 	if not _expect(_advance(flight, func() -> bool: return flight.mining.cargo_amount(Economy.HYDROGEN) >= needed_canisters, 30.0)
 		and flight.scoop_action() and flight.fuel_transfer("jump") and flight.ship.jump_fuel >= return_cost,
@@ -156,8 +157,9 @@ func _test_frontier_flight() -> void:
 		"Cold restart preserves all discoveries, depleted reserves, cargo, orbit and usable return fuel"):
 		return
 	var usable_return_fuel := cold.ship.jump_fuel
+	var actual_fare := cold.jump_tariff(destination, HOME)
 	_expect(cold.plan_route(HOME) and _jump(cold, HOME, star)
-		and is_equal_approx(cold.ship.jump_fuel, usable_return_fuel - return_cost) and _approach(cold, 0) and cold.docked == 0
+		and is_equal_approx(cold.ship.jump_fuel, usable_return_fuel - actual_fare) and _approach(cold, 0) and cold.docked == 0
 		and cold.mining.cargo_amount(resource) == Rig.BATCH and cold.body_dossier(solid).known,
 		"Generated minerals and measurements survive the powered return jump and normal home docking")
 

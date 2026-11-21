@@ -10,6 +10,7 @@ var _failures: Array[String] = []
 
 class Sightline extends RefCounted:
 	var target := 2
+	var position := Vector3.ZERO
 	var positions := {0: Vector3(0, 0, -80), 2: Vector3(0, 0, -450)}
 
 	func target_position(site: int) -> Vector3:
@@ -81,11 +82,13 @@ func _run() -> void:
 	if _expect(not other.is_empty(), "Unlabeled non-active bodies still have visible selectable icons"):
 		await _test_marker_touch(viewport, game, other)
 
+	await _test_corridor(viewport, game)
 	var camera: Camera3D = game._view.camera
 	camera.global_transform = Transform3D.IDENTITY
 	_test_occlusion(camera)
 	viewport.queue_free()
-	await process_frame
+	# Allow the audio mixer to retire the departure cue before this short-lived test quits.
+	await create_timer(0.15).timeout
 	print("Cockpit navigation: %d checks, %d failures" % [_checks, _failures.size()])
 	for failure: String in _failures:
 		printerr(failure)
@@ -124,15 +127,75 @@ func _test_marker_touch(viewport: SubViewport, game: Node, mark: Dictionary) -> 
 	await process_frame
 
 
+func _test_corridor(viewport: SubViewport, game: Node) -> void:
+	var hud: CanvasLayer = game._hud
+	var corridor: MeshInstance3D = game._view._navigation_corridor
+	game.flight.select_target(2)
+	game.flight.ship.set_autopilot_fitted(true)
+	game.flight.set_autopilot(true)
+	game._update_display(0.0)
+	_expect(not corridor.visible and not hud.navigation_corridor_enabled(), "The general visual guide starts switched off")
+	_tap(viewport, hud._actions["navigation_toggle"].get_global_rect().get_center(), 1)
+	await process_frame
+	_tap(viewport, hud._actions["navigation_corridor"].get_global_rect().get_center(), 1)
+	game._update_display(0.0)
+	var center: Vector3 = game.flight.target_position(2)
+	var exit := corridor.transform * Vector3.BACK
+	_expect(corridor.is_visible_in_tree() and corridor.mesh.surface_get_primitive_type(0) == Mesh.PRIMITIVE_LINES
+		and not corridor.material_override.no_depth_test and exit.distance_to(center) > 65.0,
+		"The touch switch draws a depth-tested approach mesh ending outside the selected asteroid")
+	_expect(game.flight.autopilot and game.flight.target == 2 and not hud._marks.object_labels,
+		"Visual guidance leaves the active autopilot, target and label preference intact")
+
+	var world_traffic: int = game._view._traffic._ships.size()
+	_expect(world_traffic > 0 and not hud._marks.traffic.is_empty(),
+		"The live flight has NPC world actors and projected ship markers")
+	_tap(viewport, hud._actions["ship_markers"].get_global_rect().get_center(), 1)
+	game._update_display(0.0)
+	_expect(not hud.ship_markers_enabled() and hud._marks.traffic.is_empty() and corridor.visible
+		and game._view._traffic._ships.size() == world_traffic and not hud._marks.object_labels,
+		"The ship-marker switch filters only the passive HUD marks while the other display settings stay independent")
+	_tap(viewport, hud._actions["ship_markers"].get_global_rect().get_center(), 1)
+	_tap(viewport, hud._actions["navigation_close"].get_global_rect().get_center(), 1)
+	game.flight.position += Vector3(35, 65, 20)
+	game.flight.orbit_time += 4.0
+	game._update_display(0.0)
+	_expect(corridor.visible and not (corridor.transform * Vector3.BACK).is_equal_approx(exit)
+		and not hud._marks.traffic.is_empty(),
+		"The next scene update follows live relative motion and restores compatible ship markers")
+
+	game._handle_action("camera")
+	game._update_display(0.5)
+	_expect(not corridor.visible, "The previous guide disappears when the camera moves to the rear view")
+	game._handle_action("camera")
+	game._update_display(0.5)
+	_expect(corridor.visible, "The forward-facing external view also renders the guide")
+	game.flight.jump_target = 1
+	game.flight.jump_seconds_left = 0.5
+	game._update_display(0.0)
+	_expect(not corridor.visible, "Charging a jump clears the guide immediately")
+	game.flight.jump_seconds_left = 0.0
+	game.flight.set_autopilot(false)
+	game.flight.select_target(0)
+	game.flight.position = game.flight.docking_position(0) + game.flight.station_axis(0) * 95.0
+	game._update_display(0.5)
+	_expect(not corridor.visible and game._view._approaches[0].visible,
+		"Close station approach keeps the existing rotating dock geometry")
+
+
 func _test_occlusion(camera: Camera3D) -> void:
 	var scene := Sightline.new()
 	var sites := [0, 2]
 	var markers := CockpitContacts.project(scene, camera, sites)
 	_expect(markers.size() == 1 and markers[0].id == 0 and not CockpitContacts.is_visible(scene, camera, sites, 2),
 		"The near hull blocks projection and release validation of a body directly behind it")
+	_expect(CockpitContacts.approach_corridor(scene, camera, sites).is_empty(),
+		"A near hull also vetoes the visual route through the blocked line")
 	scene.positions[0] = Vector3(100, 0, -80)
 	_expect(CockpitContacts.is_visible(scene, camera, sites, 2),
 		"Moving the hull off the viewing ray restores the body marker")
+	_expect(not CockpitContacts.approach_corridor(scene, camera, sites).is_empty(),
+		"Clearing the route restores the standoff approach")
 	scene.positions[2] = Vector3(0, 0, 150)
 	_expect(not CockpitContacts.is_visible(scene, camera, sites, 2),
 		"A body behind the camera has no selectable projection")

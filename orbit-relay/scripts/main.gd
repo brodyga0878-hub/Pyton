@@ -143,6 +143,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	_audio.advance_music(flight if _flight_active else null, delta)
 	_update_display(delta)
 
 
@@ -216,14 +217,15 @@ func _update_display(delta: float) -> void:
 			bearing = "Пеленг %+.0f° · угол %+.0f°" % [azimuth, elevation]
 	_hud.set_camera_view(_camera_mode, forward_aim, bearing)
 	var in_view := instruments_visible and not _view.camera.is_position_behind(marker)
-	if patrol_status.phase == Flight.Patrol.ENGAGED and patrol_status.same_system:
+	var patrol_engaged: bool = patrol_status.phase == Flight.Patrol.ENGAGED and patrol_status.same_system
+	if patrol_engaged:
 		in_view = false
 	elif in_view and not flight.autopilot and not special_marker:
 		var surface := flight.surface_status()
 		in_view = not surface.near or surface.pad
 	_hud.set_target_marker(_view.camera.unproject_position(marker) if in_view else Vector2.ZERO, in_view)
 	var markers: Array[Dictionary] = []
-	if instruments_visible:
+	if instruments_visible and _hud.ship_markers_enabled():
 		for contact in flight.traffic_contacts():
 			var distance := flight.position.distance_to(contact.position)
 			if distance > 1100.0 or _view.camera.is_position_behind(contact.position):
@@ -236,6 +238,11 @@ func _update_display(delta: float) -> void:
 	if instruments_visible:
 		navigation_markers = CockpitContacts.project(flight, _view.camera, sites)
 	_hud.set_navigation_markers(navigation_markers)
+	var guide := {}
+	if instruments_visible and forward_aim and not patrol_engaged and not special_marker \
+			and not flight.orbit_maneuver and _hud.navigation_corridor_enabled():
+		guide = CockpitContacts.approach_corridor(flight, _view.camera, sites)
+	_view.set_navigation_corridor(guide)
 
 
 func _select_cockpit_target(site: int, from_view: bool) -> void:
@@ -497,6 +504,7 @@ func _deliver_notice() -> void:
 		"remote_rig_deployed", "remote_rig_unloaded", "remote_rig_retrieved", "remote_rig_route", "service_refuel", "service_tank", "service_eco",
 		"scoop_full", "scoop_stop", "star_arrival", "gas_arrival", "fuel_empty", "thermal_damage",
 		"fuel_transfer", "service_jump_refuel", "cargo_jettisoned", "cargo_pod_targeted", "cargo_pod_collected",
+		"berth_bill", "berth_payment", "berth_permit", "civic_donation",
 		"fuel_pump_mode", "fuel_pump_transfer", "fuel_module_removed", "service_hydrogen_scoop", "service_fuel_pump",
 		"atmosphere_enter", "atmosphere_exit", "atmosphere_damage",
 		"gear_deploy", "gear_retract", "gear_ready", "gear_stowed",
@@ -1118,9 +1126,12 @@ func _close_services() -> void:
 	_hud.set_input_enabled(true)
 
 
-func _market_trade(good: String, side: String, quantity: int) -> void:
-	if _market.is_open() and flight.market_trade(good, side, quantity):
+func _market_trade(good: String, side: String, quantity: int, hidden: bool) -> void:
+	if _market.is_open() and flight.market_trade(good, side, quantity, hidden):
+		_market.show_trade_receipt(flight.status_message)
 		_deliver_notice()
+		if hidden:
+			_save()
 		_update_display(0.0)
 	_market.refresh()
 
@@ -1159,6 +1170,8 @@ func _apply_presentation() -> void:
 	_view.set_visual_profile(presentation.quality)
 	_hud.set_touch_preferences(presentation.sensitivity, presentation.layout == 1)
 	_audio.set_level(presentation.notification_volume)
+	_audio.set_effect_level(presentation.effects_volume)
+	_audio.music.configure(presentation.music_volume, presentation.music_mode)
 
 
 func _change_preference(field: String, value: int) -> void:

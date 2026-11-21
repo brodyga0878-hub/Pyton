@@ -1,6 +1,6 @@
 extends CanvasLayer
 
-signal trade_requested(good: String, side: String, quantity: int)
+signal trade_requested(good: String, side: String, quantity: int, hidden: bool)
 signal courier_requested(route_id: String)
 signal passenger_requested(action: String, destination: int)
 signal dismissed()
@@ -18,6 +18,7 @@ const ACCENTS := {
 	"circuits": Color("84dacf"), "medical": Color("edaac0"),
 	Economy.HYDROGEN: Color("b5e597"),
 }
+const GROUP_ACCENTS := [MINT, Color("d9d096"), Color("e1a26f"), Color("a4acfa"), Color("edaaac"), Color("98b9a8")]
 const INTERSTELLAR_PHASES := {
 	"waiting": "Стоянка", "departure": "Отход от порта",
 	"hyperspace": "Гиперпереход", "arrival": "Заход в порт",
@@ -33,6 +34,7 @@ var _market_tab: Button
 var _courier_tab: Button
 var _passenger_tab: Button
 var _freight_tab: Button
+var _contact_tab: Button
 var _close_button: Button
 var _market_page: HBoxContainer
 var _courier_page: HBoxContainer
@@ -49,6 +51,13 @@ var _freight_drag_position := Vector2.ZERO
 var _goods_buttons: Dictionary[String, Button] = {}
 var _goods_labels: Dictionary[String, Array] = {}
 var _medical_name: Label
+var _group_name: Label
+var _previous_group: Button
+var _next_group: Button
+var _market_profile: Label
+var _trade_receipt: Label
+var _product_use: Label
+var _goods_names: Dictionary[String, Label] = {}
 var _customs_rule: Label
 var _selection_icon: CommodityIcon
 var _selection_title: Label
@@ -83,6 +92,8 @@ var _touches: Dictionary[int, Button] = {}
 var _buttons: Array[Button] = []
 var _selected_good := "ore"
 var _quantity := 1
+var _group := 0
+var _hidden_market := false
 
 
 func build() -> void:
@@ -111,13 +122,15 @@ func build() -> void:
 	_courier_tab = _button(tabs, "Рейсы", 44.0)
 	_passenger_tab = _button(tabs, "Пассажиры", 44.0)
 	_freight_tab = _button(tabs, "Снабжение", 44.0)
-	for tab in [_market_tab, _courier_tab, _passenger_tab, _freight_tab]:
+	_contact_tab = _button(tabs, "Контакты", 44.0)
+	for tab in [_market_tab, _courier_tab, _passenger_tab, _freight_tab, _contact_tab]:
 		tab.toggle_mode = true
 		tab.custom_minimum_size.x = 145.0
 	_market_tab.pressed.connect(_show_courier.bind(false))
 	_courier_tab.pressed.connect(_show_courier.bind(true))
 	_passenger_tab.pressed.connect(_show_page.bind("passenger"))
 	_freight_tab.pressed.connect(_show_page.bind("freight"))
+	_contact_tab.pressed.connect(_show_page.bind("contact"))
 	_market_page = _row(page, 16)
 	_courier_page = _row(page, 16)
 	_passenger_page = _row(page, 16)
@@ -140,6 +153,8 @@ func open(sim: RefCounted) -> void:
 	_sim = sim
 	_selected_good = "ore"
 	_quantity = 1
+	_group = 0
+	show_trade_receipt("")
 	show()
 	_show_courier(false)
 
@@ -155,6 +170,11 @@ func is_open() -> bool:
 	return _sim != null and visible
 
 
+func show_trade_receipt(message: String) -> void:
+	_trade_receipt.text = message
+	_trade_receipt.visible = not message.is_empty()
+
+
 func refresh() -> void:
 	if not is_open():
 		return
@@ -164,6 +184,7 @@ func refresh() -> void:
 	_station.text = _sim.target_name(_sim.docked)
 	_balance.text = "Баланс %d кр." % int(_sim.credits)
 	_hold.text = "Трюм %d / %d ед." % [int(_sim.mining.ore_hold), int(_sim.mining.cargo_capacity)]
+	_contact_tab.visible = not _sim.market_contact().is_empty()
 	if _freight_page.visible:
 		_refresh_freight()
 	elif _passenger_page.visible:
@@ -176,6 +197,16 @@ func refresh() -> void:
 
 func _build_market() -> void:
 	var table := _card(_market_page, 590.0, true)
+	var groups := _row(table, 8)
+	_previous_group = _button(groups, "‹", 42.0)
+	_previous_group.custom_minimum_size.x = 52.0
+	_previous_group.pressed.connect(_change_group.bind(-1))
+	_group_name = _label(groups, "", 18, TEXT)
+	_group_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_group_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_next_group = _button(groups, "›", 42.0)
+	_next_group.custom_minimum_size.x = 52.0
+	_next_group.pressed.connect(_change_group.bind(1))
 	var table_header := _row(table, 10)
 	var caption := _label(table_header, "Товар", 17, MUTED)
 	caption.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -183,7 +214,7 @@ func _build_market() -> void:
 		_table_cell(table_header, heading, 15, MUTED)
 	for value in Economy.GOODS:
 		var good := str(value)
-		var button := _button(table, "", 56.0)
+		var button := _button(table, "", 49.0)
 		button.toggle_mode = true
 		button.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		button.pressed.connect(_select_good.bind(good))
@@ -196,22 +227,31 @@ func _build_market() -> void:
 		cells.offset_left = 12.0
 		cells.offset_right = -4.0
 		var icon := _commodity_icon(cells, 34.0)
-		icon.select(good, ACCENTS[good])
-		var name := _label(cells, Economy.good_name(good), 21, TEXT)
+		icon.select(good, _good_accent(good))
+		var name := _label(cells, Economy.good_name(good), 18, TEXT)
 		name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		_goods_names[good] = name
 		if good == "medical":
 			_medical_name = name
 		_goods_labels[good] = [
 			_table_cell(cells, "", 19, TEXT), _table_cell(cells, "", 19, TEXT),
 			_table_cell(cells, "", 19, AMBER), _table_cell(cells, "", 19, MINT),
 		]
-	var prices := _label(table, "Цены зависят от запасов. Итог пересчитывается с количеством.", 14, MUTED)
-	prices.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_market_profile = _label(table, "", 14, MUTED)
+	_market_profile.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_trade_receipt = _label(table, "", 15, MINT)
+	_trade_receipt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_trade_receipt.hide()
 
 	var order := _card(_market_page, 377.0, false)
 	var selected := _row(order, 12)
 	_selection_icon = _commodity_icon(selected, 42.0)
-	_selection_title = _label(selected, "", 28, TEXT)
+	_selection_title = _label(selected, "", 24, TEXT)
+	_selection_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_selection_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_product_use = _label(order, "", 15, MUTED)
+	_product_use.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_customs_rule = _label(order, "", 16, AMBER)
 	_customs_rule.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_customs_rule.hide()
@@ -282,11 +322,14 @@ func _show_courier(show_courier: bool) -> void:
 func _show_page(page: String) -> void:
 	_touches.clear()
 	_freight_drag = -1
-	_market_page.visible = page == "market"
+	show_trade_receipt("")
+	_hidden_market = page == "contact"
+	_market_page.visible = page == "market" or _hidden_market
 	_courier_page.visible = page == "courier"
 	_passenger_page.visible = page == "passenger"
 	_freight_page.visible = page == "freight"
 	_market_tab.set_pressed_no_signal(page == "market")
+	_contact_tab.set_pressed_no_signal(_hidden_market)
 	_courier_tab.set_pressed_no_signal(page == "courier")
 	_passenger_tab.set_pressed_no_signal(page == "passenger")
 	_freight_tab.set_pressed_no_signal(page == "freight")
@@ -519,32 +562,65 @@ static func _eta(seconds: float) -> String:
 
 
 func _refresh_market() -> void:
+	var contact: Dictionary = _sim.market_contact()
+	var displayed: Array = contact.get("goods", []) if _hidden_market else Economy.goods_for_group(_group)
+	if displayed.is_empty():
+		_show_page("market")
+		return
+	if _selected_good not in displayed:
+		_selected_good = displayed[0]
+		_quantity = 1
+	_group_name.text = str(contact.name) if _hidden_market else "%s · %d/%d" % [Economy.GROUPS[_group], _group + 1, Economy.GROUPS.size()]
+	_previous_group.visible = not _hidden_market
+	_next_group.visible = not _hidden_market
+	_previous_group.disabled = _group == 0
+	_next_group.disabled = _group == Economy.GROUPS.size() - 1
+	var local: Dictionary = _sim.market_profile(int(_sim.docked))
+	_market_profile.text = "Отдельный склад. Сделки могут сорваться при проверке." if _hidden_market else \
+		"%s · склад и спрос меняют цену · риск %d" % [local.get("label", "Порт"), int(local.get("risk", 0))]
 	for good: String in _goods_buttons:
-		var buy: Dictionary = _sim.market_quote(good, "buy", 1)
-		var sell: Dictionary = _sim.market_quote(good, "sell", 1)
+		_goods_buttons[good].visible = good in displayed
+		if good not in displayed:
+			continue
+		var buy: Dictionary = _sim.market_quote(good, "buy", 1, _hidden_market)
+		var sell: Dictionary = _sim.market_quote(good, "sell", 1, _hidden_market)
 		var labels := _goods_labels[good]
-		labels[0].text = str(buy.stock)
+		labels[0].text = str(buy.stock) if buy.listed else "—"
 		labels[1].text = str(buy.owned)
-		labels[2].text = "%d кр." % int(buy.unit)
-		labels[3].text = "%d кр." % int(sell.unit)
+		labels[2].text = "%d кр." % int(buy.unit) if buy.listed else "—"
+		labels[3].text = "%d кр." % int(sell.unit) if sell.listed else "—"
+		_goods_names[good].add_theme_color_override("font_color", AMBER if int(buy.allowance) >= 0 else TEXT)
+		_goods_buttons[good].tooltip_text = "Лимит: %d ед. · в трюме %d" % [buy.allowance, buy.owned] if int(buy.allowance) >= 0 else ""
 		_goods_buttons[good].set_pressed_no_signal(good == _selected_good)
-	var capacity := int(_sim.mining.cargo_capacity)
+	var capacity := mini(int(_sim.mining.cargo_capacity), Economy.MAX_HIDDEN_STOCK) if _hidden_market else int(_sim.mining.cargo_capacity)
 	_quantity = clampi(_quantity, 1, capacity)
-	var buy: Dictionary = _sim.market_quote(_selected_good, "buy", _quantity)
-	var sell: Dictionary = _sim.market_quote(_selected_good, "sell", _quantity)
-	_selection_icon.select(_selected_good, ACCENTS[_selected_good])
+	var buy: Dictionary = _sim.market_quote(_selected_good, "buy", _quantity, _hidden_market)
+	var sell: Dictionary = _sim.market_quote(_selected_good, "sell", _quantity, _hidden_market)
+	_selection_icon.select(_selected_good, _good_accent(_selected_good))
 	_selection_title.text = Economy.good_name(_selected_good)
-	_refresh_customs()
+	_product_use.text = Economy.good_use(_selected_good)
+	_product_use.visible = not _product_use.text.is_empty()
+	_refresh_customs(buy, sell)
 	_quantity_label.text = "%d ед." % _quantity
 	_minus_button.disabled = _quantity <= 1
 	_plus_button.disabled = _quantity >= capacity
 	_buy_max_button.disabled = _limit("buy") < 1
 	_sell_max_button.disabled = _limit("sell") < 1
-	_quote(_buy_button, _buy_hint, "Купить", buy)
-	_quote(_sell_button, _sell_hint, "Продать", sell)
+	_quote(_buy_button, _buy_hint, "Принять за плату" if buy.cost < 0 else "Купить", buy)
+	_quote(_sell_button, _sell_hint, "Сдать на утилизацию" if sell.cost < 0 else "Продать", sell)
 
 
-func _refresh_customs() -> void:
+func _refresh_customs(buy: Dictionary, sell: Dictionary) -> void:
+	if _hidden_market:
+		_customs_rule.visible = true
+		_customs_rule.add_theme_color_override("font_color", AMBER)
+		_customs_rule.text = "Риск срыва · покупка %d%%, продажа %d%%. Излишек могут изъять и оштрафовать." % [buy.risk, sell.risk]
+		return
+	if _selected_good != "medical" and int(buy.allowance) >= 0:
+		_customs_rule.visible = true
+		_customs_rule.add_theme_color_override("font_color", AMBER)
+		_customs_rule.text = "Ввоз запрещён." if buy.allowance == 0 else "Лимит на борту · %d ед. В трюме %d ед." % [buy.allowance, buy.owned]
+		return
 	var customs: Dictionary = _sim.customs_status()
 	var authority := int(customs.get("authority", -1))
 	var allowance := int(customs.get("medical_allowance", -1))
@@ -590,12 +666,14 @@ func _refresh_courier() -> void:
 	_courier_title.text = str(route.title) if known else "Нет рейсов из этого порта"
 	_courier_cargo.text = "Груз · %s" % str(route.cargo) if known else ""
 	_courier_reward.text = "%s %d кр." % ["Выплачено" if completed else "Оплата", int(route.reward)] if known else ""
-	_courier_button.disabled = _sim.contract_stage == 1 or offer.is_empty()
+	_courier_button.disabled = _sim.contract_stage == 1 or offer.is_empty() or not offer.get("allowed", false)
 	_courier_button.text = "Рейс принят" if active else "Взять рейс"
 	if active:
 		_courier_hint.text = "Этап %d из %d. Отметьте прибытие на панели полёта." % [leg + 1, stops.size() - 1]
 	elif _sim.contract_stage == 1:
 		_courier_hint.text = "Сначала завершите текущую доставку."
+	elif not str(offer.get("access_hint", "")).is_empty():
+		_courier_hint.text = str(offer.access_hint)
 	elif known and not completed:
 		_courier_hint.text = "Оплата после последней остановки."
 	else:
@@ -604,12 +682,20 @@ func _refresh_courier() -> void:
 
 func _quote(button: Button, hint: Label, verb: String, quote: Dictionary) -> void:
 	button.disabled = not quote.ok
-	button.text = "%s · %d кр." % [verb, int(quote.cost)]
+	button.text = "%s · %d кр." % [verb, absi(int(quote.cost))] if quote.listed else verb
 	hint.text = str(quote.reason) if button.disabled else ""
 
 
 func _limit(side: String) -> int:
-	return int(_sim.market_limit(_selected_good, side))
+	return int(_sim.market_limit(_selected_good, side, _hidden_market))
+
+
+func _change_group(step: int) -> void:
+	if not is_open() or _hidden_market or not _market_page.visible:
+		return
+	_touches.clear()
+	_group = clampi(_group + step, 0, Economy.GROUPS.size() - 1)
+	refresh()
 
 
 func _select_good(good: String) -> void:
@@ -635,9 +721,14 @@ func _max_quantity(side: String) -> void:
 
 
 func _trade(side: String) -> void:
-	if is_open() and _sim.market_quote(_selected_good, side, _quantity).ok:
+	if is_open() and _sim.market_quote(_selected_good, side, _quantity, _hidden_market).ok:
 		_touches.clear()
-		trade_requested.emit(_selected_good, side, _quantity)
+		trade_requested.emit(_selected_good, side, _quantity, _hidden_market)
+
+
+static func _good_accent(good: String) -> Color:
+	var group := clampi(Economy.GOODS.find(good) / Economy.GROUP_SIZE, 0, GROUP_ACCENTS.size() - 1)
+	return ACCENTS.get(good, GROUP_ACCENTS[group])
 
 
 func _accept_courier() -> void:
@@ -833,6 +924,13 @@ class CommodityIcon extends Control:
 			"circuits": _draw_circuits()
 			"medical": _draw_medical()
 			Economy.HYDROGEN: _draw_hydrogen()
+			_: _draw_freight_box()
+
+	func _draw_freight_box() -> void:
+		draw_rect(Rect2(7, 10, 22, 17), _accent.darkened(0.48))
+		draw_rect(Rect2(7, 10, 22, 17), _accent, false, 1.2)
+		draw_rect(Rect2(14, 10, 8, 9), _accent)
+		draw_line(Vector2(10, 23), Vector2(16, 23), _accent.lightened(0.3), 1.5)
 
 	func _draw_ore() -> void:
 		_facet([Vector2(4, 24), Vector2(8, 16), Vector2(14, 13), Vector2(19, 7), Vector2(27, 9),
