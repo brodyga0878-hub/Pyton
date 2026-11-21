@@ -1,0 +1,293 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.84.0",
+  "source_commit": "8ee5b9c2315d78154404ce96fb3a4965ea59f8b8",
+  "content": {
+    "save_schema": 43,
+    "camera_modes": [
+      "Снаружи",
+      "Кабина",
+      "Назад"
+    ],
+    "camera_changes_do_not_change_inertial_flight": true,
+    "optional_cockpit_bearing": true,
+    "tested_acceptance_matrix": {
+      "checked": 42,
+      "partial": 1,
+      "open": 1
+    }
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 109,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.83.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 55,
+    "tested_on_device": false
+  },
+  "checks": {
+    "android_report_share": {
+      "failures": 0,
+      "checks": 76
+    },
+    "asteroid": {
+      "failures": 0,
+      "checks": 59
+    },
+    "atmosphere": {
+      "failures": 0,
+      "checks": 40
+    },
+    "binary_orbits": {
+      "failures": 0,
+      "checks": 55
+    },
+    "body_orbits": {
+      "failures": 0,
+      "checks": 42
+    },
+    "branching_story": {
+      "failures": 0,
+      "checks": 26
+    },
+    "calendar": {
+      "failures": 0,
+      "checks": 53
+    },
+    "cartography": {
+      "failures": 0,
+      "checks": 43
+    },
+    "civilian_traffic": {
+      "failures": 0,
+      "checks": 41
+    },
+    "combat_outfitting": {
+      "failures": 0,
+      "checks": 76
+    },
+    "convoys": {
+      "failures": 0,
+      "checks": 46
+    },
+    "crew": {
+      "failures": 0,
+      "checks": 45
+    },
+    "customs": {
+      "failures": 0,
+      "checks": 28
+    },
+    "departure": {
+      "failures": 0,
+      "checks": 32
+    },
+    "dock_access": {
+      "failures": 0,
+      "checks": 37
+    },
+    "docking": {
+      "failures": 0,
+      "checks": 76
+    },
+    "dual_fuel": {
+      "failures": 0,
+      "checks": 25
+    },
+    "economy": {
+      "failures": 0,
+      "checks": 155
+    },
+    "flight": {
+      "failures": 0
+    },
+    "flight_camera": {
+      "failures": 0,
+      "checks": 18
+    },
+    "frontier": {
+      "failures": 0,
+      "checks": 75
+    },
+    "frontier_freight": {
+      "failures": 0,
+      "checks": 33
+    },
+    "fuel": {
+      "failures": 0,
+      "checks": 76
+    },
+    "fuel_modules": {
+      "failures": 0,
+      "checks": 36
+    },
+    "galactic_routes": {
+      "failures": 0,
+      "checks": 59
+    },
+    "gear": {
+      "failures": 0,
+      "checks": 28
+    },
+    "ground_ports": {
+      "failures": 0,
+      "checks": 41
+    },
+    "heat_shield": {
+      "failures": 0,
+      "checks": 28
+    },
+    "hyperspace": {
+      "failures": 0,
+      "checks": 64
+    },
+    "jumps": {
+      "failures": 0,
+      "checks": 295
+    },
+    "living": {
+      "failures": 0,
+      "checks": 83
+    },
+    "material_maps": {
+      "failures": 0,
+      "checks": 33
+    },
+    "navigation": {
+      "failures": 0,
+      "checks": 49
+    },
+    "npc_freight": {
+      "failures": 0,
+      "checks": 48
+    },
+    "orbit_planning": {
+      "failures": 0,
+      "checks": 57
+    },
+    "orbital_mining": {
+      "failures": 0,
+      "checks": 34
+    },
+    "orbits": {
+      "failures": 0,
+      "checks": 561
+    },
+    "passengers": {
+      "failures": 0,
+      "checks": 50
+    },
+    "pilot_career": {
+      "failures": 0,
+      "checks": 44
+    },
+    "presentation": {
+      "failures": 0,
+      "checks": 81
+    },
+    "procedural_galaxy": {
+      "failures": 0,
+      "checks": 140
+    },
+    "reference_frames": {
+      "failures": 0,
+      "checks": 46
+    },
+    "remote_rig": {
+      "failures": 0,
+      "checks": 35
+    },
+    "rendezvous": {
+      "failures": 0,
+      "checks": 35
+    },
+    "report": {
+      "failures": 0,
+      "checks": 28
+    },
+    "scene": {
+      "failures": 0
+    },
+    "sector": {
+      "failures": 0,
+      "checks": 404
+    },
+    "sector_news": {
+      "failures": 0,
+      "checks": 30
+    },
+    "shipyard": {
+      "failures": 0,
+      "checks": 52
+    },
+    "speed_hold": {
+      "failures": 0,
+      "checks": 54
+    },
+    "surface": {
+      "failures": 0,
+      "checks": 381
+    },
+    "surface_guidance": {
+      "failures": 0,
+      "checks": 60
+    },
+    "surface_rotation": {
+      "failures": 0,
+      "checks": 156
+    },
+    "camera_director": {
+      "checks": 120,
+      "failures": 0
+    },
+    "previous_external_camera_equivalence": {
+      "checks": 2156,
+      "failures": 0
+    },
+    "camera_gl": {
+      "checks": 27,
+      "failures": 0,
+      "touch_interactions": 10,
+      "key_interactions": 1
+    },
+    "camera_neighboring_model_suites": {
+      "checks": 279,
+      "failures": 0
+    },
+    "actual_0_83_archives": {
+      "checks": 7,
+      "failures": 0
+    },
+    "exact_0_84_real_rolled_flight_and_dock": {
+      "checks": 43,
+      "failures": 0,
+      "touch_interactions": 17
+    }
+  },
+  "files": {
+    "01-camera-exterior.png": {
+      "bytes": 237145,
+      "sha256": "80456abd14632ab09eb4cd7acc87e2f1bcea1ba3ea06fc61d6613d551c9738ca"
+    },
+    "02-camera-cockpit.png": {
+      "bytes": 238569,
+      "sha256": "dd0e9e60b6ea9f142d727d9274ea9f29e0179ca5984738551b74afc7b9817918"
+    },
+    "03-camera-rear.png": {
+      "bytes": 135411,
+      "sha256": "013e1ebb8bea423258fe12f5a965b941d76c817f58fc03f4a9cf301aaf9bf0f5"
+    },
+    "OrbitRelay-0.84.0-arm64.apk": {
+      "bytes": 28898976,
+      "sha256": "a0b00c8a0a99811237110d2f2464b7503ea848bd57c999aa41bd046f1ebf3330"
+    },
+    "OrbitRelay-0.84.0-source.zip": {
+      "bytes": 2349120,
+      "sha256": "ee0deb36da4ff9d8d92dc3f74386e4e00fa61fa6730d58168a34024ad21d463a"
+    }
+  }
+}
