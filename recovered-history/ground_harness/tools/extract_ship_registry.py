@@ -4,8 +4,8 @@ Data only: no geometry interpreter, ship unlocks or simulation parameters are in
 """
 import argparse, hashlib, json, struct
 from pathlib import Path
-from extract_galaxy import EXPECTED
 
+EXPECTED = 'd919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72'
 DESCRIPTORS = 0xBA8FC
 NAMES = 0xBB044
 POOLS = 0xC8280

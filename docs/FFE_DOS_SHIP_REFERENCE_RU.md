@@ -2,7 +2,7 @@
 
 57 спецификаций моделей с индексами 15–71 и 19 массивов выбора повторно извлечены из пользовательского FIRSTENC.EXE. Новое извлечение совпало с прежним реестром. SHA‑256 EXE — `d919566140abfc298bc9929bc9141d92526586821f017be1336253a04bca1e72`. Ниже только идентификаторы, названия и отношения таблиц. [Извлекатель](../recovered-history/ground_harness/tools/extract_ship_registry.py#L46) · [Реестр](../data/ffe_ship_registry.json)
 
-В обычной генерации наличия F622 и F633 вызывают F634 с группами 0, 1 и 13. F635 меняет группы 0 и 1 по коду режима системы. Коды 0–3 дают пары 0–7. В объединении этих групп и 13 есть 45 уникальных моделей. Отдельно в таблице систем найден специальный режим 4, которому соответствуют группы 8 и 9 с таргоидными моделями. Это свидетельствует о наличии особых данных. Возможность покупки в действующем порту режима 4 и доступ по кампании требуют отдельной проверки.
+В обычной генерации наличия F622 и F633 вызывают F634 с группами 0, 1 и 13. F635 меняет группы 0 и 1 по коду принадлежности системы. Коды 0–3 дают пары 0–7. В объединении этих групп и 13 есть 45 уникальных моделей. Дополнительная сверка пути сделки в DOS-коде подтвердила весь штатный набор, включая Puma Clipper и Panther Clipper. При коде принадлежности 4 обычное меню услуг со ссылкой на верфь пропускается. [45 моделей штатной продажи и сюжетные исключения](FFE_DOS_SHIPYARDS_RU.md)
 
 Указание «обычные пулы» означает, что этот ID входит в один из входных списков генератора наличия. На реальные предложения влияют население, принадлежность порта и случайный выбор. F634 ограничивает один список 13 позициями. Попадание в пул само по себе не подтверждает прохождение всех условий покупки, экипажа или получения корпуса в кампании. [Заполнение верфи](https://github.com/videogamepreservation/jjffe/blob/7e540341d4e09aa3c92877b87d49e7f2c143ad8d/ffe.asm#L42833) · [Выбор модели](https://github.com/videogamepreservation/jjffe/blob/7e540341d4e09aa3c92877b87d49e7f2c143ad8d/ffe.asm#L43543) · [Сами пулы](https://github.com/videogamepreservation/jjffe/blob/7e540341d4e09aa3c92877b87d49e7f2c143ad8d/ffedat.asm#L9622)
 
@@ -69,3 +69,37 @@
 | 71 | Long-range Cruiser | — | 15 | 100 |
 
 Значение поля экипажа приведено из 24-байтной записи спецификации. Для сравнения с числом нанятых работников нужно учитывать правила допуска самой игры.
+
+## Сверка с присланным списком
+
+В присланном списке есть все 45 моделей штатной продажи. Среди именованных моделей из таблицы отсутствует **IMRA Command Ship** (ID 66). Именно `IMRA` записано в `FIRSTENC.EXE` по смещению `0xBB794`. В штатных пулах верфей этот корпус отсутствует. **Escape Capsule** присутствует в оригинале как отдельный объект с ID 14 и исходной строкой по смещению `0xBB42D`. [Индексы оригинальных моделей](https://github.com/videogamepreservation/jjffe/blob/7e540341d4e09aa3c92877b87d49e7f2c143ad8d/srctools/shipidx.txt)
+
+**Thargoid War Ship** написано в диалоге в три слова. Выдаваемая по сюжету модель имеет ID 52 и подпись `Unknown`. Остальные пять кораблей с подписью `Unknown` имеют ID 17, 49, 50, 51 и 63. Нумерация `Unknown Thargoid 1–5` и помета `Thargon` отсутствуют в подписях оригинала. По одному перечню нельзя установить, какой авторский номер соответствует какому ID. Модель **Thargoid Transporter** имеет отдельный ID 69. [Условия выдачи награды](FFE_DOS_SHIPYARDS_RU.md#сюжетные-корабли-и-вторичный-оборот)
+
+Название **The Mirage** не найдено ни в таблице имён, ни в текстовых строках 68 файлов проверенного DOS-архива. Связь с конкретным корпусом из оригинала не подтверждена.
+
+| В присланном списке | Точная подпись DOS |
+| --- | --- |
+| Cobra Mk 1 | Cobra Mk I |
+| Cobra Mk 3 | Cobra Mk III |
+| Eagle Long Range Fighter | Eagle long range fighter |
+| Eagle Mk 2 | Eagle Mk2 fighter |
+| Eagle Mk 3 | Eagle Mk3 fighter |
+| Falcon Attack Fighter | Falcon attack fighter |
+| GYR | Gyr attack fighter |
+| Harris Fighter | Harris fighter |
+| Hawk Airfighter | Hawk airfighter |
+| Kestrel Airfighter | Kestrel airfighter |
+| Merlin Attack Fighter | Merlin attack fighter |
+| Osprey Attack Fighter | Osprey attack fighter |
+| Osprey X | Osprey X attack fighter |
+| Saker Mk III | Saker III fighter |
+| Spar Attack Fighter | Spar attack fighter |
+| Viper Mk 2 | Viper Defence MkII |
+| Lion Transporter | Lion Transport |
+| Skeet Cruiser | Skeet cruiser |
+| Wyvern explorer | Wyvern Explorer |
+| Stowmaster | StowMaster Fighter |
+| Long Range Cruiser | Long-range Cruiser |
+
+В исходной строке `Harrier` после имени есть один пробел. Он сохранён в [машиночитаемом списке верфи](../data/ffe_dos_shipyard_catalog.csv).
