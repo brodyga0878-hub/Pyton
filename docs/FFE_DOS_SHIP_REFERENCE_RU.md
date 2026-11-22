@@ -103,3 +103,5 @@
 | Long Range Cruiser | Long-range Cruiser |
 
 В исходной строке `Harrier` после имени есть один пробел. Он сохранён в [машиночитаемом списке верфи](../data/ffe_dos_shipyard_catalog.csv).
+
+У корабельного оснащения собственный [реестр из 66 записей DOS](FFE_DOS_EQUIPMENT_RU.md).
