@@ -152,6 +152,22 @@ func step(sim: RefCounted, delta: float) -> Dictionary:
 	if not _is_active():
 		return {}
 	var convoy: Dictionary = sim.factions.convoy(system, convoy_id)
+	var outcome := _settle(convoy)
+	if phase != ACTIVE:
+		return outcome
+	var contact := Traffic.convoy_contact(sim, convoy_id) if sim.system_id == system and _airborne(sim) else {}
+	if kind == ESCORT:
+		return _escort(sim, contact, delta)
+	return _defend(sim, contact, delta)
+
+
+func settle_front(sim: RefCounted) -> Dictionary:
+	if not _is_active():
+		return {}
+	return _settle(sim.factions.convoy(system, convoy_id))
+
+
+func _settle(convoy: Dictionary) -> Dictionary:
 	if convoy.is_empty():
 		return _fail()
 	if phase == ESCORTED:
@@ -160,10 +176,7 @@ func step(sim: RefCounted, delta: float) -> Dictionary:
 		return {} if convoy.stage == "en_route" else _fail()
 	if convoy.stage != "en_route" or convoy.assistance != "none":
 		return _fail()
-	var contact := Traffic.convoy_contact(sim, convoy_id) if sim.system_id == system and _airborne(sim) else {}
-	if kind == ESCORT:
-		return _escort(sim, contact, delta)
-	return _defend(sim, contact, delta)
+	return {}
 
 
 func fire_status(sim: RefCounted, range_bonus := 0.0) -> Dictionary:

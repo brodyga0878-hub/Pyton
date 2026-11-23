@@ -88,11 +88,15 @@ func news() -> Array[String]:
 	return _news.duplicate()
 
 
+func can_commission(system: int, sponsor: int, now: float) -> bool:
+	return system in FRONTIER_SYSTEMS and sponsor >= 0 and sponsor < FACTIONS.size() \
+		and owner(system) < 0 and _number(now, 0.0, MAX_ORBIT_CLOCK)
+
+
 func commission(system: int, sponsor: int, now: float) -> bool:
-	var index := FRONTIER_SYSTEMS.find(system)
-	if index < 0 or sponsor < 0 or sponsor >= FACTIONS.size() or owner(system) >= 0 or not _number(now, 0.0, MAX_ORBIT_CLOCK):
+	if not can_commission(system, sponsor, now):
 		return false
-	var frontier := _frontiers[index]
+	var frontier := _frontiers[FRONTIER_SYSTEMS.find(system)]
 	frontier.owner = sponsor
 	frontier.stage = "peace"
 	frontier.next_at = now + FOUNDING_GRACE

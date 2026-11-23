@@ -22,7 +22,8 @@ const BORDER := Color("355360")
 const PATROL_STEPS := ["Найти источник сигнала", "Перехватить рейдера", "Вернуться с докладом"]
 const STORY_OPTION_COUNT := 4
 const STORY_DATES := {
-	"settled_at": "Завершено", "key_at": "Получен ключ",
+	"finished_at": "Кампания завершена", "verified_at": "Подтверждён замер",
+	"settled_at": "Передана первая сводка", "key_at": "Получен ключ",
 	"chosen_at": "Принято решение", "briefed_at": "Получен запрос",
 }
 
@@ -744,7 +745,7 @@ func _refresh_story() -> void:
 		var action: Dictionary = actions[index]
 		choice.button.text = str(action.name)
 		choice.button.set_meta("story_action", str(action.id))
-		choice.button.disabled = _sim.jump_seconds_left > 0.0
+		choice.button.disabled = _sim.jump_seconds_left > 0.0 or not bool(action.get("available", true))
 		choice.detail.text = str(action.detail)
 		choice.detail.visible = not choice.detail.text.is_empty()
 

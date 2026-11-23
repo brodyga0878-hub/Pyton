@@ -22,6 +22,7 @@ func _run() -> void:
 	_test_trade_guards()
 	_test_hull_and_hold()
 	_test_legacy_save()
+	_test_first_delivery_navigation()
 	_test_interstellar_courier()
 	await _test_touch_services()
 	await _test_touch_trade_and_courier()
@@ -195,6 +196,19 @@ func _test_legacy_save() -> void:
 			"An already accepted legacy contract still pays the same award exactly once")
 
 
+func _test_first_delivery_navigation() -> void:
+	var flight := Flight.new()
+	if not _expect(flight.select_target(Catalog.STAR_ID) and flight.contract_action()
+		and flight.contract_destination == 1 and flight.planned_target == 1,
+		"Accepting the first courier job replaces a conflicting predeparture course"):
+		return
+	if not _expect(Fixture.launch(flight) and flight.target == 1 and _fly_to(flight, 1),
+		"The ordinary first delivery follows its advertised course from launch through docking"):
+		return
+	_expect(flight.contract_action() and flight.deliveries == 1 and flight.story_status().stage == "offer"
+		and flight.status_message.contains("«Сюжет»"), "The first receipt points the pilot to the new story offer")
+
+
 func _test_interstellar_courier() -> void:
 	var flight := _at_port(3)
 	var route := flight.courier_offer()
@@ -202,9 +216,14 @@ func _test_interstellar_courier() -> void:
 		and flight.accept_courier(route.id) and not flight.accept_courier(route.id)
 		and not flight.contract_action(), "The interstellar courier accepts once and must begin at its source port"):
 		return
-	if not _expect(_fly_to(flight, 0) and flight.contract_action() and flight.contract_destination == 10
+	if not _expect(_fly_to(flight, 0) and flight.plan_route(Catalog.FRINGE_SYSTEM),
+		"The first local stop is dockable while a different galactic route is plotted"):
+		return
+	var previous_route: Array = flight.snapshot().jump_route
+	if not _expect(flight.contract_action() and flight.contract_destination == 10
+		and flight.planned_route().goal == Catalog.VELAR_SYSTEM
 		and flight.contract_itinerary().leg == 1 and flight.credits == 0 and flight.deliveries == 0,
-		"The first local stop marks progress without paying and selects the foreign stop"):
+		"The first local stop replaces the whole conflicting jump plan and selects the foreign stop without payment"):
 		return
 	var resumed := Flight.new()
 	if not _expect(resumed.restore(_round_trip(flight.snapshot())) and resumed.contract_itinerary().leg == 1
@@ -213,6 +232,16 @@ func _test_interstellar_courier() -> void:
 		return
 	var active := resumed.snapshot()
 	var invalid := active.duplicate(true)
+	invalid.jump_route = previous_route
+	_expect(not resumed.restore(invalid) and resumed.snapshot() == active,
+		"A current save with a conflicting jump plan is rejected without changing the active job")
+	var migrated := Flight.new()
+	invalid.schema = 54
+	invalid.erase("story_finale")
+	_expect(migrated.restore(invalid) and migrated.snapshot().jump_route.is_empty()
+		and migrated.jump_target == Catalog.VELAR_SYSTEM and migrated.contract_destination == 10,
+		"A pre-fix save at the previous stop restores the old contract course and drops the stale route")
+	invalid = active.duplicate(true)
 	invalid.contract_leg = 2
 	_expect(not resumed.restore(invalid) and resumed.snapshot() == active,
 		"A recorded next port must match its persisted courier leg")

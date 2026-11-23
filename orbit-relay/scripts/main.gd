@@ -141,6 +141,7 @@ func _ready() -> void:
 	add_child(_frontier)
 	_frontier.build()
 	_frontier.project_requested.connect(_project_action)
+	_frontier.supply_route_requested.connect(_project_action.bind(true))
 	_frontier.convoy_requested.connect(_convoy_action)
 	_frontier.search_requested.connect(_search_action)
 	_frontier.dismissed.connect(_close_frontier)
@@ -709,7 +710,7 @@ func _deliver_notice() -> void:
 		"ambient_engaged", "ambient_fire", "ambient_enemy_hit", "ambient_victory",
 		"career_dispatch_accepted", "career_dispatch_paid", "career_dispatch_expired", "career_dispatch_course",
 		"career_order_accepted", "career_order_proved", "career_order_course", "career_order_paid", "career_order_expired", "career_order_removed",
-		"story_brief", "story_registry", "story_mirror", "story_collect_key", "story_submit", "story_course",
+		"story_brief", "story_registry", "story_mirror", "story_collect_key", "story_submit", "story_verify", "story_finale", "story_course",
 		"flight_assist", "reference_frame", "time_paused", "time_resumed", "autopilot_equipment", "navigation_computer", "missile_telemetry", "speed_hold_on", "speed_hold_off",
 		"survey_record", "galaxy_scan", "customs_inspection", "customs_paid",
 		"orbit_start", "orbit_complete", "orbit_abort", "orbit_cancel",
@@ -1437,7 +1438,7 @@ func _follow_journal(kind: String) -> void:
 	if kind == "delivery" and flight.contract_stage == 1:
 		var port := flight.contract_destination
 		var system := Catalog.system_of_site(port)
-		selected = flight.select_target(port) if system == flight.system_id else flight.plan_jump(system)
+		selected = flight.contract_follow()
 		if selected and system == flight.system_id:
 			_hud.notify("Курс доставки. «%s»." % flight.target_name(port))
 	elif kind == "patrol":
@@ -1455,7 +1456,7 @@ func _follow_journal(kind: String) -> void:
 		selected = flight.career_follow()
 	elif kind == "story":
 		var status := flight.story_status()
-		if status.can_follow and status.stage == "observe" and int(status.target) == flight.landed_site:
+		if status.can_follow and status.stage in ["observe", "verify"] and int(status.target) == flight.landed_site:
 			_close_journal()
 			_hud.set_input_enabled(false)
 			_map.open_atlas(flight, int(status.target))
@@ -1495,10 +1496,11 @@ func _close_journal() -> void:
 	_hud.set_input_enabled(true)
 
 
-func _project_action() -> void:
+func _project_action(for_supplies := false) -> void:
 	if not _frontier.is_open():
 		return
-	if flight.project_action():
+	var handled := flight.project_supply_route() if for_supplies else flight.project_action()
+	if handled:
 		var routed := flight.status_event in ["expedition_course", "jump_planned"]
 		_deliver_notice()
 		if routed:

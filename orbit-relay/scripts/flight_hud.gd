@@ -912,7 +912,7 @@ func sync(sim: RefCounted, delta: float, aim_lock_available := false, forward_ai
 		autopilot.tooltip_text = "Отключить автопилот (F)" if sim.autopilot else "Включить автопилот (F)"
 	var itinerary: Dictionary = sim.contract_itinerary() if sim.contract_stage == 1 else {}
 	var transfer: bool = not itinerary.is_empty() and int(itinerary.leg) + 1 < itinerary.stops.size()
-	_actions["contract"].visible = port_services and (sim.contract_stage != 1 or sim.docked == sim.contract_destination)
+	_actions["contract"].visible = port_services and (sim.docked == sim.contract_destination if sim.contract_stage == 1 else sim.offer_destination() >= 0)
 	_actions["contract"].text = "Отметить этап" if transfer else ("Сдать груз" if sim.contract_stage == 1 else "Взять контракт")
 	var sale_quote: int = sim.raw_sale_quote() if port_services and mining.ore_hold > 0 else 0
 	_actions["sell_ore"].visible = sale_quote > 0
@@ -1297,10 +1297,13 @@ func _sync_port(sim: RefCounted, sale_quote: int, itinerary: Dictionary, transfe
 			_guidance.text = "Вылетите к месту доставки."
 			if sim.docked == sim.contract_destination:
 				_guidance.text = "Отметьте прибытие, чтобы продолжить рейс." if transfer else "Груз готов к сдаче."
-	else:
+	elif sim.offer_destination() >= 0:
 		var destination: String = sim.target_name(sim.offer_destination())
 		_route_detail.text = "%s → %s\nОплата %d кр." % [sim.contract_cargo(), destination, sim.contract_reward()]
-		_guidance.text = "Выберите пункт назначения на карте."
+		_guidance.text = "Возьмите контракт. После вылета можно включить «Авто»." if sim.deliveries == 0 else "Выберите пункт назначения на карте."
+	else:
+		_route_detail.text = "Новых доставок здесь нет."
+		_guidance.text = ""
 	var ready_to_deliver: bool = sim.contract_stage == 1 and sim.docked == sim.contract_destination
 	if sim.planned_target >= 0 and not ready_to_deliver:
 		_guidance.text = "После старта курс на «%s»." % sim.target_name(sim.planned_target)

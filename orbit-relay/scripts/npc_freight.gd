@@ -51,13 +51,17 @@ func reset(epoch := 0.0) -> void:
 	_refresh_schedule()
 
 
-func activate_frontier(system: int, epoch: float) -> bool:
+func can_activate_frontier(system: int, epoch: float) -> bool:
 	var slot := FRONTIER_SYSTEMS.find(system)
 	if slot < 0 or not _valid_epoch(epoch) or epoch < _seed_epoch or _frontier_epochs[slot] >= 0.0:
 		return false
-	if slot > 0 and (_frontier_epochs[slot - 1] < 0.0 or epoch < _frontier_epochs[slot - 1]):
+	return slot == 0 or (_frontier_epochs[slot - 1] >= 0.0 and epoch >= _frontier_epochs[slot - 1])
+
+
+func activate_frontier(system: int, epoch: float) -> bool:
+	if not can_activate_frontier(system, epoch):
 		return false
-	_frontier_epochs[slot] = epoch
+	_frontier_epochs[FRONTIER_SYSTEMS.find(system)] = epoch
 	_refresh_schedule()
 	return true
 

@@ -409,7 +409,7 @@ static func refuel_price(port_id: int) -> int:
 
 
 static func contract(origin: int, destination: int) -> Array:
-	return ROUTES[origin].get(destination, []) if is_port(origin) else []
+	return ROUTES.get(origin, {}).get(destination, [])
 
 
 static func first_contract_destination(origin: int) -> int:

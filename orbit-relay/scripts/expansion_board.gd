@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 signal project_requested()
+signal supply_route_requested()
 signal convoy_requested(system: int, id: String)
 signal search_requested(action: String)
 signal dismissed()
@@ -34,6 +35,7 @@ var _supplies: VBoxContainer
 var _materials: Array[Label] = []
 var _reason: Label
 var _project_button: Button
+var _supply_route_button: Button
 var _convoy_tab: Button
 var _convoy_orders: VBoxContainer
 var _convoy_title: Label
@@ -175,7 +177,7 @@ func _build_expedition(card: VBoxContainer) -> void:
 	for caption: String in STAGES:
 		_steps.append(_status_row(stages, caption))
 	_supplies = _column(card, 3)
-	_label(_supplies, "Груз для следующей поставки", 17, MINT)
+	_label(_supplies, "Груз на оставшиеся поставки", 17, MINT)
 	for good: String in Economy.LEGACY_GOODS:
 		_materials.append(_label(_supplies, "", 17, INK))
 	var spacer := Control.new()
@@ -183,9 +185,17 @@ func _build_expedition(card: VBoxContainer) -> void:
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	card.add_child(spacer)
 	_reason = _label(card, "", 18, INK)
-	_project_button = _button(card, "")
+	var actions := HBoxContainer.new()
+	actions.add_theme_constant_override("separation", 8)
+	card.add_child(actions)
+	_project_button = _button(actions, "")
+	_project_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_project_button.pressed.connect(_request_project)
 	_touch_buttons.append(_project_button)
+	_supply_route_button = _button(actions, "К заказчику за грузом")
+	_supply_route_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_supply_route_button.pressed.connect(_request_supply_route)
+	_touch_buttons.append(_supply_route_button)
 
 
 func _build_convoy_orders(card: VBoxContainer) -> void:
@@ -313,16 +323,20 @@ func _refresh_project(status: Dictionary) -> void:
 		row.name.modulate = Color.WHITE if active else MUTED
 		row.state.modulate = MINT if active else MUTED
 	var needs: Dictionary = status.needs
-	_supplies.visible = not needs.is_empty()
+	var totals: Dictionary = status.remaining_needs
+	_supplies.visible = not totals.is_empty()
 	for index in range(_materials.size()):
 		var good: String = Economy.LEGACY_GOODS[index]
 		var line := _materials[index]
-		var quantity := int(needs.get(good, 0))
+		var quantity := int(totals.get(good, 0))
 		line.visible = quantity > 0
 		if not line.visible:
 			continue
 		var owned: int = _sim.mining.cargo_amount(good)
 		line.text = "%s · %d из %d ед." % [Economy.good_name(good), owned, quantity]
+		var next := int(needs.get(good, 0))
+		if next < quantity:
+			line.text += " · сейчас %d" % next if next > 0 else " · следующая партия"
 		line.modulate = MINT if owned >= quantity else AMBER
 	_reason.text = str(status.reason)
 	if status.has_point and not status.can_act:
@@ -345,6 +359,8 @@ func _refresh_project(status: Dictionary) -> void:
 	_project_button.disabled = _sim.jump_seconds_left > 0.0 or not (
 		status.can_act or status.can_follow or can_plan_jump or can_plan_docking
 	)
+	_supply_route_button.visible = status.can_route_supply
+	_supply_route_button.tooltip_text = "Маршрут за грузом в порт «%s»" % _sim.target_name(sponsor_port) if status.can_route_supply else ""
 
 
 func _refresh_convoy_orders() -> void:
@@ -451,6 +467,12 @@ func _request_project() -> void:
 	if is_open() and _project_button.is_visible_in_tree() and not _project_button.disabled:
 		_touches.clear()
 		project_requested.emit()
+
+
+func _request_supply_route() -> void:
+	if is_open() and _supply_route_button.is_visible_in_tree() and not _supply_route_button.disabled:
+		_touches.clear()
+		supply_route_requested.emit()
 
 
 func _take_convoy(index: int) -> void:

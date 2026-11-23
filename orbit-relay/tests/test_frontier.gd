@@ -415,6 +415,7 @@ func _at_port(flight: Flight, port: int) -> Flight:
 		"landed_site": -1, "jump_target": -1, "planned_target": -1, "position": _coordinates(contact),
 		"velocity": [0.0, 0.0, 0.0], "throttle": 0.0}, true)
 	state.dock_access = Flight.DockAccess.new().snapshot()
+	state.jump_route = []
 	state.port_account.visit = {}
 	_expect(other.restore(state), "Prepare a ship docked at port %d with the same progress" % port)
 	return other

@@ -53,7 +53,7 @@ const StationHull := preload("res://scripts/station_hull.gd")
 const LawNetwork := preload("res://scripts/law_network.gd")
 const FlightRadio := preload("res://scripts/flight_radio.gd")
 const ShipHangar := preload("res://scripts/ship_hangar.gd")
-const SAVE_SCHEMA := 54
+const SAVE_SCHEMA := 55
 const INTERRUPTED_LABELS := {
 	"autopilot": "автопилот", "rig_approach": "заход к буру", "orbit_maneuver": "орбитальный манёвр",
 	"rendezvous": "автоматическое сближение", "patrol_course": "наведение дозора",
@@ -1053,7 +1053,18 @@ func _plan_contract_leg() -> void:
 		planned_target = contract_destination
 	else:
 		planned_target = -1
-		jump_target = destination_system
+		if not plan_route(destination_system):
+			_jump_route.clear()
+			jump_target = -1
+
+
+func contract_follow() -> bool:
+	if contract_stage != 1 or not station_operational(contract_destination):
+		return false
+	var destination_system := Catalog.system_of_site(contract_destination)
+	if destination_system == system_id:
+		return select_target(contract_destination)
+	return plan_route(destination_system)
 
 
 func contract_action() -> bool:
@@ -1071,23 +1082,28 @@ func contract_action() -> bool:
 				_announce("contract_leg", "Этап принят. Следующая остановка «%s»." % target_name(contract_destination))
 				return true
 		var reward := contract_reward()
+		if reward <= 0 or credits > 1000000000 - reward or deliveries >= 10000000:
+			return false
 		credits += reward
 		deliveries += 1
 		career.note_delivery(_contract_issuer)
 		_contract_issuer = -1
 		contract_stage = 2
-		_announce("delivery", "Груз принят. Начислено %d кр." % reward)
+		var message := "Груз принят. Начислено %d кр." % reward
+		if deliveries == 1 and story_status().stage == "offer":
+			message += " Открылась заявка в «Журнал» → «Сюжет»."
+		_announce("delivery", message)
 	else:
+		var destination := offer_destination()
+		if not station_operational(destination):
+			return false
 		contract_stage = 1
 		contract_route_id = ""
 		contract_leg = -1
 		contract_origin = docked
 		_contract_issuer = factions.owner(system_id)
-		contract_destination = offer_destination()
-		if Catalog.system_of_site(contract_destination) == system_id:
-			target = contract_destination
-		else:
-			_plan_contract_leg()
+		contract_destination = destination
+		_plan_contract_leg()
 		_announce("contract", "Груз на борту. Пункт назначения — %s." % target_name(contract_destination))
 	return true
 
@@ -2306,21 +2322,29 @@ func _wanted_raider() -> Dictionary:
 
 func story_status() -> Dictionary:
 	var berth := docked if station_services_available() else -1
-	var result := story.status(berth, deliveries, cartography.surveyed_sites())
+	var result := story.status(berth, deliveries, cartography.surveyed_sites(), landed_site if landed else -1)
 	result.merge(story.snapshot())
+	result.merge(story.finale_snapshot())
 	result.can_follow = result.can_follow and not _departure_requested and jump_seconds_left <= 0.0
+	for action: Dictionary in result.actions:
+		if credits > 1000000000 - story.reward_for(action.id):
+			action.available = false
+			action.detail = "На счёте недостаточно места для выплаты."
 	return result
 
 
 func story_action(action: String) -> bool:
-	if not station_services_available():
+	var berth := docked if station_services_available() else -1
+	var field := landed_site if landed else -1
+	var at_location := field >= 0 if action == BranchingStory.VERIFY else berth >= 0
+	if not at_location or jump_seconds_left > 0.0 or credits > 1000000000 - story.reward_for(action):
 		return false
-	var receipt := story.perform(action, docked, deliveries, cartography.surveyed_sites(), orbit_time)
+	var receipt := story.perform(action, berth, deliveries, cartography.surveyed_sites(), orbit_time, field)
 	if receipt.is_empty():
 		return false
 	credits += int(receipt.credits)
 	career.note_story_result(receipt.trust)
-	_record_story_news(news, story.snapshot(), str(receipt.action))
+	_record_story_news(news, story, str(receipt.action))
 	_announce("story_" + str(receipt.action), receipt.message)
 	return true
 
@@ -2377,7 +2401,8 @@ func subscribe_news(id: String) -> bool:
 	return true
 
 
-static func _record_story_news(archive: SectorNews, branch: Dictionary, command: String) -> void:
+static func _record_story_news(archive: SectorNews, ledger: BranchingStory, command: String) -> void:
+	var branch := ledger.snapshot()
 	match command:
 		BranchingStory.BRIEF:
 			if float(branch.briefed_at) >= 0.0:
@@ -2395,6 +2420,13 @@ static func _record_story_news(archive: SectorNews, branch: Dictionary, command:
 				var headline := "story_mirror" if mirror else "story_registry"
 				archive.record("story-result", headline, region, branch.settled_at,
 					BranchingStory.BRANCHES[branch.branch].ending, "story-choice", "story")
+		BranchingStory.FINALE:
+			var finished_at := float(ledger.finale_snapshot().finished_at)
+			if finished_at >= 0.0:
+				var path: Dictionary = BranchingStory.BRANCHES[branch.branch]
+				var kind := "story_mirror_finale" if branch.branch == BranchingStory.MIRROR else "story_registry_finale"
+				archive.record("story-finale", kind, Catalog.system_of_site(int(path.final_port)), finished_at,
+					path.conclusion, "story-result", "story")
 
 
 func _record_front_news(result: Dictionary, epoch: float) -> void:
@@ -2839,17 +2871,14 @@ func _stop_convoy_course() -> void:
 
 
 func project_action() -> bool:
-	if _departure_requested:
+	if _departure_requested or _escape.active or jump_seconds_left > 0.0:
 		return false
 	var status := frontier_status()
 	if not status.can_act:
 		if status.route_system >= 0 and status.route_system != system_id:
-			return plan_jump(status.route_system)
-		if status.route_port >= 0 and select_target(status.route_port):
-			if docked < 0 and not landed and ship.autopilot_fitted:
-				set_autopilot(true)
-			_announce("expedition_course", "Курс к порту заказчика.")
-			return true
+			return _plan_expedition_jump(status.route_system)
+		if status.route_port >= 0 and status.route_port != docked:
+			return _route_to_expedition_sponsor(status.route_port)
 		if not status.can_follow:
 			return false
 		if not ship.autopilot_fitted:
@@ -2875,9 +2904,35 @@ func project_action() -> bool:
 		factions.commission(result.commissioned, result.owner, orbit_time)
 		freight.activate_frontier(result.commissioned, orbit_time)
 	if result.has("planned_system"):
-		plan_jump(result.planned_system)
+		_plan_expedition_jump(result.planned_system)
 	_announce(result.event, result.message)
 	return true
+
+
+func project_supply_route() -> bool:
+	if _departure_requested or _escape.active or jump_seconds_left > 0.0:
+		return false
+	var status := frontier_status()
+	return status.can_route_supply and _route_to_expedition_sponsor(status.sponsor_port)
+
+
+func _route_to_expedition_sponsor(port: int) -> bool:
+	var destination := Catalog.system_of_site(port)
+	if destination != system_id:
+		return _plan_expedition_jump(destination)
+	if not select_target(port):
+		return false
+	if docked < 0 and not landed and ship.autopilot_fitted:
+		set_autopilot(true)
+	_announce("expedition_course", "Курс к порту заказчика.")
+	return true
+
+
+func _plan_expedition_jump(destination: int) -> bool:
+	var fare := jump_tariff(system_id, destination)
+	if fare > 0 and fare <= ship.active_jump_capacity():
+		return plan_jump(destination)
+	return plan_route(destination)
 
 
 func combat_equipment_status() -> Dictionary:
@@ -3140,7 +3195,7 @@ func _step_escape(delta: float) -> void:
 	var finish := _escape.pickup_at if _escape.port >= 0 else SAVE_CLOCK_LIMIT
 	var interval := minf(delta, finish - orbit_time)
 	if interval > 0.0:
-		_advance_background_clock(interval)
+		_advance_world_calendar(interval)
 		var limit := Vector3.ONE * EscapePod.WORLD_LIMIT
 		var next := (position + velocity * interval).clamp(-limit, limit)
 		if _blocked(next):
@@ -3150,7 +3205,6 @@ func _step_escape(delta: float) -> void:
 		else:
 			position = next
 			velocity *= exp(-0.24 * interval)
-		_advance_front(orbit_time)
 		_advance_mission_deadlines()
 		_apply_convoy_result(convoy_order.step(self, interval))
 	if _escape.port >= 0 and orbit_time >= _escape.pickup_at:
@@ -4791,7 +4845,7 @@ func _advance_jump_transit(delta: float) -> void:
 	var mass := ship.flight_mass(mining.ore_hold, ship.active_jump_fuel() + _jump_paid_fare,
 		ship.military_waste - ship.waste_for_jump(_jump_paid_fare))
 	var requested := _jump_requested
-	_advance_hyperspace_calendar(_jump_transit_duration)
+	_advance_world_calendar(_jump_transit_duration, true)
 	_maintenance.record_jump(orbit_time, requested >= 0)
 	jump_seconds_left = 0.0
 	_jump_transit_duration = 0.0
@@ -5081,32 +5135,37 @@ func _advance_mission_deadlines() -> void:
 		_apply_service_result(expiry)
 
 
-func _advance_front(epoch: float) -> void:
-	var due := factions.next_event_time()
-	if due > epoch:
-		return
-	var result := factions.advance(due)
-	if not result.is_empty():
-		_record_front_news(result, due)
-		_announce(result.event, result.message)
-
-
-func _advance_hyperspace_calendar(duration: float) -> void:
+func _advance_world_calendar(duration: float, in_hyperspace := false) -> void:
 	var arrival_epoch := orbit_time + duration
 	var due := factions.next_event_time()
+	# A station's market changes after each front event. Process the preceding
+	# deliveries and supply ticks before switching its risk or jurisdiction.
 	while due <= arrival_epoch:
 		var advance := maxf(0.0, due - orbit_time)
 		if advance > 0.0:
 			_advance_background_clock(advance)
-		_advance_front(due)
-		_advance_mission_deadlines()
-		_apply_convoy_result(convoy_order.step(self, advance))
+		# Older saves can retain an overdue frontier deadline. Reschedule that
+		# round at the saved clock instead of replaying elapsed campaigns.
+		var event_time := maxf(due, orbit_time)
+		var result := factions.advance(event_time)
+		if result.is_empty():
+			break
+		_record_front_news(result, event_time)
+		_announce(result.event, result.message)
+		if in_hyperspace:
+			_advance_mission_deadlines()
+			_apply_convoy_result(convoy_order.step(self, advance))
+		else:
+			# Resolve payment before a following round discards the old convoy.
+			# Physical escort and defence still advance in the flight step.
+			_apply_convoy_result(convoy_order.settle_front(self))
 		due = factions.next_event_time()
 	var remainder := maxf(0.0, arrival_epoch - orbit_time)
 	if remainder > 0.0:
 		_advance_background_clock(remainder)
-	_advance_mission_deadlines()
-	_apply_convoy_result(convoy_order.step(self, remainder))
+	if in_hyperspace:
+		_advance_mission_deadlines()
+		_apply_convoy_result(convoy_order.step(self, remainder))
 
 
 func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, brake: bool, manual_input: bool, translation: Vector3) -> void:
@@ -5117,7 +5176,7 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 		_advance_jump_transit(delta)
 		return
 	var previous_orbit_time := orbit_time
-	_advance_background_clock(delta)
+	_advance_world_calendar(delta)
 	if docked < 0 and not landed and dock_access.port == target:
 		var before := dock_access.status(target, previous_orbit_time)
 		var access := dock_access.status(target, orbit_time)
@@ -5125,7 +5184,6 @@ func _step(delta: float, steer: Vector2, bank: float, boost_requested: bool, bra
 			_announce("dock_ready", "Створ открыт. Допуск «%s» получен." % target_name(target))
 		elif before.ready and not access.ready:
 			_announce("dock_expired", "Окно швартовки закрыто. Запросите новый допуск.")
-	_advance_front(orbit_time)
 	_advance_mission_deadlines()
 	if docked >= 0:
 		if _departure_requested:
@@ -5951,7 +6009,7 @@ func snapshot() -> Dictionary:
 		"navigation_computer": navigation_computer_fitted,
 		"missile_telemetry": missile_telemetry_fitted,
 		"ambient": ambient.snapshot(), "career": career.snapshot(),
-		"story": story.snapshot(), "news": news.snapshot(), "periodicals": _periodicals.snapshot(),
+		"story": story.snapshot(), "story_finale": story.finale_snapshot(), "news": news.snapshot(), "periodicals": _periodicals.snapshot(),
 		"speed_hold": speed_hold.snapshot(),
 		"resume": {"interrupted": interrupted, "patrol_clock": patrol.combat_clock(), "convoy_clock": convoy_order.combat_clock()},
 	}
@@ -6189,7 +6247,8 @@ func restore(state: Dictionary) -> bool:
 	var restored_story := BranchingStory.new()
 	if not pre_story:
 		var story_state: Variant = state.get("story")
-		if not restored_story.restore(story_state, restored_epoch):
+		var finale: Variant = state.get("story_finale") if schema >= 55 else BranchingStory.EMPTY_FINALE
+		if not restored_story.restore(story_state, restored_epoch, finale):
 			return false
 		if story_state.entry == "freight" and int(state.deliveries) <= 0:
 			return false
@@ -6201,12 +6260,17 @@ func restore(state: Dictionary) -> bool:
 			var observed := restored_cartography.observation_time(BranchingStory.AUDIT_BODY)
 			if observed < 0.0 or observed > float(story_state.settled_at):
 				return false
+		var verified := float(finale.verified_at)
+		if verified >= 0.0:
+			var site := int(BranchingStory.BRANCHES[story_state.branch].verification_site)
+			var observed := restored_cartography.observation_time(site)
+			if observed < 0.0 or observed > verified:
+				return false
 	var restored_news := SectorNews.new()
 	if pre_news:
-		var record := restored_story.snapshot()
-		_record_story_news(restored_news, record, BranchingStory.BRIEF)
-		_record_story_news(restored_news, record, str(record.branch))
-		_record_story_news(restored_news, record, BranchingStory.SUBMIT)
+		_record_story_news(restored_news, restored_story, BranchingStory.BRIEF)
+		_record_story_news(restored_news, restored_story, str(restored_story.snapshot().branch))
+		_record_story_news(restored_news, restored_story, BranchingStory.SUBMIT)
 	elif not restored_news.restore(state.get("news"), restored_epoch):
 		return false
 	var restored_periodicals := Periodicals.new()
@@ -6286,8 +6350,15 @@ func restore(state: Dictionary) -> bool:
 			if schema >= 49:
 				tariff = func(a: int, b: int) -> int: return ShipSystems.minimum_jump_tariff(Catalog.jump_cost(a, b))
 				capacity = ShipSystems.BASE_CAPACITY + ShipSystems.EXTRA_CAPACITY
-			if restored_route[0] != restored_jump or not GalacticRoute.valid_path(path, known, capacity, tariff):
+			if not GalacticRoute.valid_path(path, known, capacity, tariff):
 				return false
+			if restored_route[0] != restored_jump:
+				var last_stop := origin if leg <= 0 else int(Economy.courier(route_id).stops[leg - 1])
+				# Older courier stages set the next jump without replacing an existing route.
+				if schema >= 55 or stage != 1 or int(state.docked) != last_stop \
+						or restored_jump != Catalog.system_of_site(destination) or restored_jump == restored_system:
+					return false
+				restored_route.clear()
 	if not pre_economy and not restored_market.restore(state.get("market"), pre_traffic, pre_expansion, pre_dual_fuel,
 			pre_ground_ports, pre_assortment, state.get("market_contacts")):
 		return false

@@ -19,6 +19,7 @@ const SERVICE_SPEED := 34.0
 const BUILD_APPROACH_OFFSET := 90.0
 const SURVEY_REWARDS := [520, 620]
 const CONSTRUCTION_REWARDS := [680, 880]
+const MAX_CREDITS := 1000000000
 const SUPPLIES := [
 	[{"ore": 6, "circuits": 2}, {"ore": 4, "crystal": 3}],
 	[{"ore": 8, "medical": 3}, {"crystal": 4, "circuits": 3}],
@@ -54,6 +55,7 @@ func status(sim: RefCounted) -> Dictionary:
 		"site": -1, "point": Vector3.ZERO, "has_point": false, "distance": -1.0,
 		"ready": false, "can_follow": false, "can_act": false,
 		"caption": "", "reason": "", "needs": {}, "missing": {},
+		"remaining_needs": {}, "can_route_supply": false,
 		"route_system": -1, "route_port": -1, "series_done": active < 0,
 	}
 	if phase == COMPLETE:
@@ -73,6 +75,9 @@ func status(sim: RefCounted) -> Dictionary:
 		result.can_act = sim.docked == port and sim.system_id == result.route_system and sim.station_operational(port)
 		result.caption = "Передать отчёт"
 		result.reason = "Вернитесь с отчётом в порт «%s»." % Catalog.site(port).name
+		if result.can_act and sim.credits > MAX_CREDITS - SURVEY_REWARDS[index]:
+			result.can_act = false
+			result.reason = "Освободите место на счёте для выплаты по отчёту."
 		if sim.system_id == system:
 			result.reason += " Для обратного прыжка соберите водород у звезды и перелейте его в прыжковый запас."
 		return result
@@ -91,6 +96,10 @@ func status(sim: RefCounted) -> Dictionary:
 		var needs: Dictionary = SUPPLIES[index][record.build_index]
 		result.needs = needs.duplicate()
 		result.missing = _missing_materials(sim, needs)
+		var remaining: Dictionary = _remaining_materials(index, int(record.build_index))
+		result.remaining_needs = remaining
+		result.can_route_supply = sim.docked != record.sponsor_port and sim.jump_seconds_left <= 0.0 \
+			and not _missing_materials(sim, remaining).is_empty()
 		result.caption = "Разгрузить"
 	result.site = site
 	result.route_system = system
@@ -128,6 +137,14 @@ func status(sim: RefCounted) -> Dictionary:
 		if not result.missing.is_empty():
 			result.reason = "В трюме не хватает материалов для этой поставки."
 			return result
+		if int(record.build_index) + 1 == BUILD_TOTAL:
+			if sim.credits > MAX_CREDITS - CONSTRUCTION_REWARDS[index]:
+				result.reason = "Освободите место на счёте для выплаты за станцию."
+				return result
+			if not sim.factions.can_commission(system, int(record.sponsor), sim.orbit_time) \
+					or not sim.freight.can_activate_frontier(system, sim.orbit_time):
+				result.reason = "Станция пока не может принять завершающую поставку."
+				return result
 	result.can_act = true
 	result.reason = "Доступно обследование тела «%s»." % Catalog.site(site).name if phase == SURVEY else "Материалы готовы к передаче."
 	return result
@@ -167,8 +184,6 @@ func act(sim: RefCounted) -> Dictionary:
 			}
 		BUILD:
 			var final_lot: bool = record.build_index + 1 == BUILD_TOTAL
-			if final_lot and sim.factions.owner(system) >= 0:
-				return {"ok": false}
 			if not _transfer_materials(sim, state.needs):
 				return {"ok": false}
 			record.build_index += 1
@@ -262,6 +277,15 @@ static func _missing_materials(sim: RefCounted, needs: Dictionary) -> Dictionary
 		if short > 0:
 			missing[good] = short
 	return missing
+
+
+static func _remaining_materials(project: int, first_lot: int) -> Dictionary:
+	var totals := {}
+	for index in range(first_lot, BUILD_TOTAL):
+		var lot: Dictionary = SUPPLIES[project][index]
+		for good: String in lot:
+			totals[good] = int(totals.get(good, 0)) + int(lot[good])
+	return totals
 
 
 static func _transfer_materials(sim: RefCounted, needs: Dictionary) -> bool:

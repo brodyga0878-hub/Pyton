@@ -26,6 +26,8 @@ const HEADLINES := {
 	"story_choice": "Началась проверка маячной поправки",
 	"story_registry": "Опасный коридор закрыт",
 	"story_mirror": "Работает резервный маршрут",
+	"story_registry_finale": "Открыт проверенный коридор",
+	"story_mirror_finale": "Резервный маршрут внесён в реестр",
 }
 
 var _reports := {}
