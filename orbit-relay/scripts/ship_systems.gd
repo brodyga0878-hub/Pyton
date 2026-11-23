@@ -66,33 +66,33 @@ const HULLS := {
 		"price": 1000, "cargo": BASE_CARGO_CAPACITY, "expanded_cargo": EXPANDED_CARGO_CAPACITY,
 		"dry_mass": COURIER_DRY_MASS, "roll_rate": COURIER_ROLL_RATE,
 		"thrust_positive": Vector3(1600.2, 1625.6, 1651.0), "thrust_negative": Vector3(1574.8, 1320.8, 1727.2),
-		"crew_required": 0, "speed_factor": 1.0, "accel_factor": 1.0, "burn_factor": 1.0},
+		"crew_required": 0, "missile_rails": 4, "speed_factor": 1.0, "accel_factor": 1.0, "burn_factor": 1.0},
 	FREIGHTER_HULL: {"id": FREIGHTER_HULL, "name": "Фрахтовик «Кедр»",
 		"description": "Фрахтовик с вместительным трюмом и местом специалиста. Медленнее разгоняется и расходует больше топлива.",
 		"price": 2200, "cargo": 44, "expanded_cargo": 60,
 		"dry_mass": FREIGHTER_DRY_MASS, "roll_rate": 1.35,
 		"thrust_positive": Vector3(1250.0, 1310.0, 1180.0), "thrust_negative": Vector3(1130.0, 1070.0, 1674.432),
-		"crew_required": 1, "speed_factor": 0.80, "accel_factor": 0.76, "burn_factor": 1.18},
+		"crew_required": 1, "missile_rails": 6, "speed_factor": 0.80, "accel_factor": 0.76, "burn_factor": 1.18},
 	SURVEY_HULL: {"id": SURVEY_HULL, "name": "Разведчик «Отклик»",
 		"description": "Лёгкий разведчик с быстрым разворотом и небольшим трюмом.",
 		"price": 1680, "cargo": 18, "expanded_cargo": 32, "dry_mass": 43.0, "roll_rate": 2.35,
 		"thrust_positive": Vector3(1780.0, 1560.0, 1840.0), "thrust_negative": Vector3(1650.0, 1420.0, 2110.0),
-		"crew_required": 0, "speed_factor": 1.12, "accel_factor": 1.16, "burn_factor": 0.92},
+		"crew_required": 0, "missile_rails": 4, "speed_factor": 1.12, "accel_factor": 1.16, "burn_factor": 0.92},
 	UTILITY_HULL: {"id": UTILITY_HULL, "name": "Буксир «Призма»",
 		"description": "Рабочий корабль с мощными боковыми двигателями. Нужен один специалист.",
 		"price": 2450, "cargo": 34, "expanded_cargo": 50, "dry_mass": 58.0, "roll_rate": 1.48,
 		"thrust_positive": Vector3(2690.0, 2850.0, 1540.0), "thrust_negative": Vector3(2710.0, 2600.0, 1630.0),
-		"crew_required": 1, "speed_factor": 0.89, "accel_factor": 0.81, "burn_factor": 1.08},
+		"crew_required": 1, "missile_rails": 4, "speed_factor": 0.89, "accel_factor": 0.81, "burn_factor": 1.08},
 	INTERCEPTOR_HULL: {"id": INTERCEPTOR_HULL, "name": "Перехватчик «Сокол»",
 		"description": "Перехватчик для одного пилота. Быстро разгоняется и разворачивается, но расходует больше топлива и берёт мало груза.",
 		"price": 2950, "cargo": 12, "expanded_cargo": 22, "dry_mass": 48.0, "roll_rate": 2.70,
 		"thrust_positive": Vector3(1620.0, 1750.0, 2020.0), "thrust_negative": Vector3(1550.0, 1490.0, 2670.0),
-		"crew_required": 0, "speed_factor": 1.23, "accel_factor": 1.29, "burn_factor": 1.32},
+		"crew_required": 0, "missile_rails": 6, "speed_factor": 1.23, "accel_factor": 1.29, "burn_factor": 1.32},
 	HAULER_HULL: {"id": HAULER_HULL, "name": "Тяжеловоз «Меридиан»",
 		"description": "Тяжеловоз с самым большим трюмом. Медленно меняет курс и требует двух специалистов.",
 		"price": 3820, "cargo": 58, "expanded_cargo": MAX_CARGO_CAPACITY, "dry_mass": 84.0, "roll_rate": 0.92,
 		"thrust_positive": Vector3(1500.0, 1770.0, 1910.0), "thrust_negative": Vector3(1440.0, 1560.0, 2170.0),
-		"crew_required": 2, "speed_factor": 0.73, "accel_factor": 0.68, "burn_factor": 1.37},
+		"crew_required": 2, "missile_rails": 8, "speed_factor": 0.73, "accel_factor": 0.68, "burn_factor": 1.37},
 }
 const LEGACY_SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded"]
 const PRE_SHIELD_SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded"]
@@ -141,6 +141,10 @@ static func profile(id: String) -> Dictionary:
 
 static func hull_ids() -> Array[String]:
 	return [STARTER_HULL, FREIGHTER_HULL, SURVEY_HULL, UTILITY_HULL, INTERCEPTOR_HULL, HAULER_HULL]
+
+
+static func missile_rails_for(id: String) -> int:
+	return HULLS[id].missile_rails if HULLS.has(id) else 0
 
 
 static func is_cargo_capacity(capacity: int) -> bool:

@@ -20,6 +20,8 @@ func _run() -> void:
 	_test_module_repair()
 	_test_drive_maintenance()
 	_test_npc_tactics()
+	_test_missile_defence()
+	_test_ambient_reacquisition()
 	for message: String in _failures:
 		printerr(message)
 	print("Maintenance and patrol tactics: %d checks, %d failures" % [_checks, _failures.size()])
@@ -111,11 +113,105 @@ func _test_npc_tactics() -> void:
 		"The damaged pursuer moves away in evasion instead of continuing its pursuit route")
 
 
-func _local_patrol(port: int) -> Flight:
+func _test_missile_defence() -> void:
+	for port: int in [int(Catalog.system(Catalog.VELAR_SYSTEM).arrival_port), Catalog.FRINGE_ARRIVAL_PORT]:
+		var pilot := _local_patrol(port, true)
+		if not _expect(pilot != null, "Reach each advanced profile after buying ammunition at the port"):
+			continue
+		var target := pilot.patrol.contacts(pilot)[0]
+		var control := Flight.new()
+		if not _expect(control.restore(_round_trip(pilot)) and pilot.select_combat_contact(target.id),
+			"The baseline and missile-run share the same active opponent before launch"):
+			continue
+		_aim(pilot, target.position)
+		if not _expect(pilot.launch_missile(target.id) and pilot.patrol_status().missile_defence,
+			"A live incoming projectile enters the opponent's reaction envelope"):
+			continue
+		var ordnance := pilot.combat.ordnance
+		_expect(ordnance.threatening_missile(pilot.orbit_time, pilot.system_id, "other", target.position, 205.0).is_empty()
+			and ordnance.threatening_missile(pilot.orbit_time, pilot.system_id + 1, target.id, target.position, 205.0).is_empty()
+			and ordnance.threatening_missile(pilot.orbit_time, pilot.system_id, target.id,
+				Vector3(ordnance.missile.position) - Vector3(ordnance.missile.velocity).normalized() * 10.0, 205.0).is_empty(),
+			"An unrelated, remote, or already passed projectile cannot trigger the defence")
+		pilot.patrol.restore_combat_clock({"shot": 0.0, "attack": 0.0})
+		control.patrol.restore_combat_clock({"shot": 0.0, "attack": 0.0})
+		_tick(pilot)
+		_tick(control)
+		var evasive := pilot.patrol.contacts(pilot)[0]
+		var ordinary := control.patrol.contacts(control)[0]
+		_expect(evasive.tactic == "evade" and evasive.missile_defence
+			and evasive.position.distance_to(ordinary.position) > 0.1
+			and evasive.velocity.distance_to(ordinary.velocity) > 5.0
+			and Vector3(evasive.forward).is_equal_approx(pilot.patrol._tactical_velocity.normalized())
+			and pilot.ship.hull == 100.0 and control.ship.hull < 100.0,
+			"The reacting opponent turns into its altered trajectory and defers a due shot")
+		var cold := Flight.new()
+		if not _expect(cold.restore(_round_trip(pilot)) and cold.patrol_status().missile_defence
+			and cold.patrol.combat_clock() == pilot.patrol.combat_clock(),
+			"A cold load retains the guided threat and the pending reacquisition delay"):
+			continue
+		_tick(pilot)
+		_tick(cold)
+		_expect(cold.patrol.contacts(cold)[0].position.is_equal_approx(pilot.patrol.contacts(pilot)[0].position)
+			and cold.combat.ordnance.snapshot() == pilot.combat.ordnance.snapshot(),
+			"The saved evasive path and projectile both continue deterministically")
+		_expect(_until(cold, func() -> bool: return cold.combat.ordnance.missile.is_empty(), 6.0)
+			and _until(cold, func() -> bool: return cold.ship.hull < 100.0, 3.1)
+			and not cold.patrol_status().missile_defence,
+			"The opponent resumes pressure after the projectile resolves")
+		_test_reaction_range(port, target.variant == Patrol.SKIRMISHER)
+
+
+func _test_reaction_range(port: int, reacts_early: bool) -> void:
+	var pilot := _local_patrol(port, true)
+	if not _expect(pilot != null, "Begin a second run to measure the profile's reaction distance"):
+		return
+	var target := pilot.patrol.contacts(pilot)[0]
+	pilot.position = target.position + Vector3.BACK * 180.0
+	_aim(pilot, target.position)
+	_expect(pilot.select_combat_contact(target.id) and pilot.launch_missile(target.id)
+		and pilot.patrol_status().missile_defence == reacts_early,
+		"The lighter skirmisher reacts to a distant missile before the larger pursuer would")
+
+
+func _test_ambient_reacquisition() -> void:
+	var pilot := Flight.new()
+	if not _expect(_fit_test_missile(pilot) and Fixture.launch(pilot), "Undock with ammunition for a local unscripted fight"):
+		return
+	pilot.update(40.3 - pilot.orbit_time, Vector2.ZERO, 0.0, false, false)
+	var target := pilot.ambient_status()
+	pilot.position = target.position + Vector3.BACK * 100.0
+	pilot.velocity = Vector3.ZERO
+	_tick(pilot)
+	target = pilot.ambient_status()
+	_aim(pilot, target.position)
+	if not _expect(target.danger and pilot.select_combat_contact(target.id) and pilot.launch_missile(target.id)
+		and pilot.ambient_status().missile_defence, "A scheduled raider recognizes the projectile aimed at its current raid"):
+		return
+	var due := pilot.ambient.snapshot()
+	due.next_attack = pilot.orbit_time + Fixture.STEP * 0.5
+	if not _expect(pilot.ambient.restore(due, pilot.orbit_time), "Reach the boundary of a due counterfire shot"):
+		return
+	_tick(pilot)
+	_expect(pilot.ship.hull == 100.0 and pilot.ambient.snapshot().next_attack > pilot.orbit_time + 0.8,
+		"The ambient raider postpones counterfire while the missile is closing")
+	var cold := Flight.new()
+	if not _expect(cold.restore(_round_trip(pilot)) and cold.ambient_status().missile_defence
+		and cold.ambient.snapshot().next_attack == pilot.ambient.snapshot().next_attack,
+		"The ambient defence delay can resume from existing save fields"):
+		return
+	_expect(_until(cold, func() -> bool: return cold.combat.ordnance.missile.is_empty(), 6.0)
+		and _until(cold, func() -> bool: return cold.ship.hull < 100.0, 3.1),
+		"An undestroyed raider resumes counterfire after the projectile resolves")
+
+
+func _local_patrol(port: int, with_missile := false) -> Flight:
 	var flight := Flight.new()
 	flight.system_id = Catalog.system_of_site(port)
 	flight.target = port
 	flight.docked = port
+	if with_missile and not _fit_test_missile(flight):
+		return null
 	if not flight.patrol_action() or not Fixture.launch(flight):
 		return null
 	flight.position = flight.patrol.signal_position(flight) + Vector3.BACK * 108.0
@@ -123,6 +219,21 @@ func _local_patrol(port: int) -> Flight:
 	for _frame in range(35):
 		flight.update(Fixture.STEP, Vector2.ZERO, 0.0, false, false)
 	return flight if flight.patrol.phase == Patrol.ENGAGED else null
+
+
+func _fit_test_missile(flight: Flight) -> bool:
+	flight.credits = 1000
+	return flight.service_action("combat_launcher") and flight.service_action("combat_missile_dart")
+
+
+func _aim(flight: Flight, point: Vector3) -> void:
+	var direction := flight.position.direction_to(point)
+	flight.yaw = atan2(-direction.x, -direction.z)
+	flight.pitch = asin(direction.y)
+
+
+func _tick(flight: Flight) -> void:
+	flight.update(Fixture.STEP, Vector2.ZERO, 0.0, false, false)
 
 
 func _round_trip(flight: Flight) -> Dictionary:

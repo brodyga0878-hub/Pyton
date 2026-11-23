@@ -3,6 +3,7 @@ extends RefCounted
 const DART := "dart"
 const LANCE := "lance"
 const SLOT_COUNT := 4
+const MAX_SLOT_COUNT := 8
 const DECOY_CAPACITY := 4
 const LAUNCHER_COST := 180
 const DECOY_COST := 28
@@ -67,12 +68,53 @@ func ammo_counts() -> Dictionary:
 	return {DART: slots.count(DART), LANCE: slots.count(LANCE)}
 
 
+func loaded_count() -> int:
+	return slots.size() - slots.count("")
+
+
+func can_resize_rack(capacity: int) -> bool:
+	return capacity >= SLOT_COUNT and capacity <= MAX_SLOT_COUNT and loaded_count() <= capacity \
+		and (capacity == slots.size() or missile.is_empty())
+
+
+func resize_rack(capacity: int) -> bool:
+	if not can_resize_rack(capacity):
+		return false
+	# Preserve the prefix rail positions. Move only occupied rails that the next hull lacks.
+	for index in range(capacity, slots.size()):
+		if slots[index].is_empty():
+			continue
+		var destination := slots.find("")
+		slots[destination] = slots[index]
+		if selected_slot == index:
+			selected_slot = destination
+	while slots.size() < capacity:
+		slots.append("")
+	slots.resize(capacity)
+	return true
+
+
+func selected_refund() -> int:
+	if selected_slot < 0:
+		return 0
+	return floori(float(PROFILES[selected].cost) * 0.5)
+
+
+func unload_selected() -> int:
+	var refund := selected_refund()
+	if refund == 0:
+		return 0
+	slots[selected_slot] = ""
+	selected_slot = slots.find(selected)
+	return refund
+
+
 func select(kind: String) -> bool:
 	return PROFILES.has(kind) and kind != selected and select_slot(slots.find(kind))
 
 
 func select_slot(slot: int) -> bool:
-	if slot < 0 or slot >= SLOT_COUNT or slot == selected_slot or slots[slot].is_empty():
+	if slot < 0 or slot >= slots.size() or slot == selected_slot or slots[slot].is_empty():
 		return false
 	selected_slot = slot
 	selected = slots[slot]
@@ -88,7 +130,7 @@ func launch(origin: Vector3, attitude: Basis, system: int, target: String, epoch
 		return false
 	var direction := -attitude.z.normalized()
 	var side := attitude.x.normalized()
-	var offset := (float(slot) - (SLOT_COUNT - 1) * 0.5) * 2.6
+	var offset := (float(slot) - (slots.size() - 1) * 0.5) * 2.6
 	var launch_position := origin + direction * 5.0 + side * offset
 	if not launch_position.is_finite() or direction.is_zero_approx():
 		return false
@@ -120,6 +162,15 @@ func advance_missile(epoch: float, delta: float, target: Vector3) -> Dictionary:
 	if epoch >= float(missile.expires):
 		missile.clear()
 	return sweep
+
+
+func threatening_missile(epoch: float, system: int, contact_id: String, position: Vector3, reaction_range: float) -> Dictionary:
+	if missile.is_empty() or missile.target != contact_id or int(missile.system) != system or float(missile.expires) <= epoch:
+		return {}
+	var separation: Vector3 = position - missile.position
+	if separation.length_squared() > reaction_range * reaction_range or separation.dot(missile.velocity) <= 0.0:
+		return {}
+	return missile
 
 
 func advance_decoy(epoch: float, delta: float) -> Dictionary:
@@ -177,21 +228,23 @@ func snapshot() -> Dictionary:
 		"missile": _encode(missile), "decoy": _encode(decoy)}
 
 
-func restore(raw: Variant, epoch: float, system: int) -> bool:
+func restore(raw: Variant, epoch: float, system: int, capacity := SLOT_COUNT, legacy_rack := false) -> bool:
 	if not raw is Dictionary or raw.size() != SAVE_FIELDS.size() or not raw.has_all(SAVE_FIELDS):
 		return false
 	if not raw.fitted is bool or not raw.selected is String or not PROFILES.has(raw.selected):
 		return false
 	if not raw.fitted and raw.selected != DART:
 		return false
-	if not raw.slots is Array or raw.slots.size() != SLOT_COUNT or not _integer(raw.decoys, 0, DECOY_CAPACITY):
+	var recorded_capacity := SLOT_COUNT if legacy_rack else capacity
+	if capacity < SLOT_COUNT or capacity > MAX_SLOT_COUNT or not raw.slots is Array \
+			or raw.slots.size() != recorded_capacity or not _integer(raw.decoys, 0, DECOY_CAPACITY):
 		return false
 	var restored_slots: Array[String] = []
 	for kind: Variant in raw.slots:
 		if not kind is String or (not kind.is_empty() and (not raw.fitted or not PROFILES.has(kind))):
 			return false
 		restored_slots.append(kind)
-	if not _integer(raw.selected_slot, -1, SLOT_COUNT - 1):
+	if not _integer(raw.selected_slot, -1, restored_slots.size() - 1):
 		return false
 	var slot := int(raw.selected_slot)
 	if (slot < 0 and restored_slots.has(raw.selected)) or (slot >= 0 and restored_slots[slot] != raw.selected):
@@ -206,7 +259,7 @@ func restore(raw: Variant, epoch: float, system: int) -> bool:
 		var kind: Variant = raw.missile.type
 		if not kind is String or not PROFILES.has(kind) or not _target_valid(raw.missile.target):
 			return false
-		if not _integer(raw.missile.slot, 0, SLOT_COUNT - 1) or not restored_slots[int(raw.missile.slot)].is_empty():
+		if not _integer(raw.missile.slot, 0, restored_slots.size() - 1) or not restored_slots[int(raw.missile.slot)].is_empty():
 			return false
 		var profile: Dictionary = PROFILES[kind]
 		restored_missile = _decode(raw.missile, epoch, system, float(profile.life), float(profile.speed) + 0.002)
@@ -223,6 +276,8 @@ func restore(raw: Variant, epoch: float, system: int) -> bool:
 	fitted = raw.fitted
 	selected = raw.selected
 	selected_slot = slot
+	while restored_slots.size() < capacity:
+		restored_slots.append("")
 	slots = restored_slots
 	decoys = int(raw.decoys)
 	missile = restored_missile

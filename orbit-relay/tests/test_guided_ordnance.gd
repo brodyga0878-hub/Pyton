@@ -8,6 +8,7 @@ const Fixture := preload("res://tests/flight_fixture.gd")
 const Ordnance := preload("res://scripts/combat_ordnance.gd")
 const Patrol := preload("res://scripts/patrol_encounter.gd")
 const Session := preload("res://scripts/session_io.gd")
+const Ships := preload("res://scripts/ship_systems.gd")
 const OPEN_SPACE := Vector3(2400, 8100, 8000)
 const STEP := Fixture.STEP
 
@@ -27,6 +28,7 @@ func _run() -> void:
 	root.add_child(viewport)
 	viewport.add_child(_view)
 	_test_player_rack()
+	_test_outer_rail_after_reload()
 	_test_hostile_guidance()
 	_test_countermeasures()
 	_test_legacy()
@@ -120,6 +122,49 @@ func _test_player_rack() -> void:
 	_view.sync(cold, 0.0)
 	_expect(not _view._player_missile.visible and _view.preferred_camera_mode() == Camera.Mode.EXTERIOR,
 		"The missile model and its camera disappear after the actual impact")
+
+
+func _test_outer_rail_after_reload() -> void:
+	var flight := Flight.new()
+	flight.credits = 10000
+	flight.update(5.0 * Flight.SHIPYARD_STOCK_SECONDS, Vector2.ZERO, 0.0, false, false)
+	if not _expect(flight.shipyard_swap(Ships.INTERCEPTOR_HULL) and flight.service_action("combat_launcher"),
+		"Fit a genuine interceptor through its rotating shipyard offer"):
+		return
+	var loaded := true
+	for _rail in range(6):
+		loaded = flight.service_action("combat_missile_dart") and loaded
+	if not _expect(loaded and flight.select_missile_slot(5) and flight.patrol_action() and Fixture.depart(flight),
+		"The sixth rail stays selected through actual departure with a patrol order"):
+		return
+	flight.position = flight.patrol.signal_position(flight)
+	flight.update(0.01, Vector2.ZERO, 0.0, false, false)
+	var contacts := flight.patrol.contacts(flight)
+	if not _expect(not contacts.is_empty(), "Reach the patrol area and pick a physical target"):
+		return
+	var contact := contacts[0]
+	var direction := flight.position.direction_to(contact.position)
+	flight.yaw = atan2(-direction.x, -direction.z)
+	flight.pitch = clampf(asin(direction.y), -Flight.MAX_PITCH, Flight.MAX_PITCH)
+	if not _expect(flight.select_combat_contact(contact.id) and flight.launch_missile(contact.id),
+		"The extra rail fires a regular physical missile"):
+		return
+	var live: Dictionary = flight.missile_status().projectile
+	var cold := _cold_load(flight)
+	if not _expect(cold != null, "Reload the active launch from a JSON checkpoint"):
+		return
+	var recovered: Dictionary = cold.missile_status().projectile
+	if not _expect(live.slot == 5 and not recovered.is_empty() and recovered.slot == live.slot
+		and recovered.type == live.type and recovered.system == live.system and recovered.target == live.target
+		and absf(float(recovered.expires) - float(live.expires)) < 0.000001
+		and Vector3(recovered.position).is_equal_approx(live.position) and Vector3(recovered.velocity).is_equal_approx(live.velocity)
+		and cold.combat_equipment_status().missile_slots == ["dart", "dart", "dart", "dart", "dart", ""],
+		"An airborne missile from the outer rail and its spent slot survive a JSON checkpoint"):
+		return
+	var invalid := cold.snapshot()
+	invalid.combat.ordnance.missile.slot = 6
+	_expect(not cold.restore(invalid) and cold.missile_status().projectile == recovered,
+		"A forged slot beyond the hull's real capacity is rejected without replacing the live projectile")
 
 
 func _test_hostile_guidance() -> void:

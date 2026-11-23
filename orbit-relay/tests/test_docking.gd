@@ -27,9 +27,13 @@ func _run() -> void:
 	_test_autodock(PORT)
 	_test_autodock(VELAR_PORT)
 	await _test_touch_controls()
+	for viewport_size: Vector2i in [Vector2i(1280, 720), Vector2i(1560, 720)]:
+		for mirrored: bool in [false, true]:
+			await _test_combat_approach_touch(viewport_size, mirrored)
 	print("Docking guidance integration: %d checks, %d failures" % [_checks, _failures.size()])
 	for failure: String in _failures:
 		printerr(failure)
+	await create_timer(0.15).timeout
 	quit(0 if _failures.is_empty() else 1)
 
 
@@ -292,6 +296,92 @@ func _test_touch_controls() -> void:
 		"The touch dock completes normally and clears the contextual helper and guidance")
 	viewport.queue_free()
 	await process_frame
+
+
+func _test_combat_approach_touch(viewport_size: Vector2i, mirrored: bool) -> void:
+	var viewport := SubViewport.new()
+	viewport.size = viewport_size
+	viewport.own_world_3d = true
+	root.add_child(viewport)
+	var game := OrbitRelay.instantiate()
+	viewport.add_child(game)
+	game.set_process(false)
+	game.set_physics_process(false)
+	game._hud.set_touch_preferences(1, mirrored)
+	var layout := "%s, mirror %s" % [viewport_size, mirrored]
+	var flight := _engaged_patrol(PORT)
+	if flight != null and _expect(flight.select_target(PORT), "Select the orbital port: %s" % layout):
+		_set_offset(flight, PORT, Vector3.BACK * 140.0)
+		flight.velocity = flight.target_velocity(PORT)
+		flight.yaw = 0.0
+		flight.pitch = 0.0
+		flight.roll = wrapf(flight.station_angle(PORT) + 0.9, -PI, PI)
+		game.flight = flight
+		game._update_display(0.0)
+		await process_frame
+		_expect(flight.patrol.in_danger(flight) and game._hud._actions["fire"].is_visible_in_tree()
+			and game._hud._docking_panel.is_visible_in_tree() and flight.docking_guidance().sync_available,
+			"Orbit approach instruments coexist with combat in %s" % layout)
+		_tap(viewport, game._hud._actions["dock_clearance"], "Request docking clearance in combat: %s" % layout)
+		_tap(viewport, game._hud._actions["dock_sync"], "Synchronize dock rotation in combat: %s" % layout)
+		_expect(flight.dock_access_status(PORT).phase == "queued" and flight.dock_roll_sync == PORT
+			and flight.patrol.in_danger(flight), "Both touch actions reach the simulator during combat: %s" % layout)
+		if _expect(_await_open(flight, PORT), "Clearance opens the orbital hatch in %s" % layout):
+			_set_offset(flight, PORT, Vector3.BACK * minf(5.0, DockAccess.HATCH_AXIS_OFFSET - 1.0))
+			flight.velocity = flight.target_velocity(PORT)
+			game._update_display(0.0)
+			await process_frame
+			_tap(viewport, game._hud._actions["dock"], "Capture the orbital dock in %s" % layout)
+			_expect(flight.docked == PORT and flight.station_services_available(),
+				"Combat approach returns the player safely to port services in %s" % layout)
+	flight = _engaged_patrol(VELAR_PORT)
+	if flight != null and _expect(flight.select_target(Catalog.GROUND_PAD), "Select the ground port: %s" % layout):
+		_place_ground_approach(flight)
+		game.flight = flight
+		game._update_display(0.0)
+		await process_frame
+		_expect(flight.patrol.in_danger(flight) and flight.docking_guidance().awaiting_gear
+			and game._hud._docking_panel.is_visible_in_tree() and game._hud._actions["fire"].is_visible_in_tree(),
+			"Ground approach instruments and combat remain visible with stowed gear: %s" % layout)
+		_tap(viewport, game._hud._actions["gear"], "Extend gear through the ground approach touch HUD: %s" % layout)
+		_expect(flight.gear_deployed and flight.docked < 0 and flight.patrol.in_danger(flight),
+			"Touch commands the actuator during combat before landing in %s" % layout)
+		for _step in range(ceili((Flight.GEAR_TRAVEL_SECONDS + STEP) / STEP)):
+			_tick(flight)
+		_place_ground_approach(flight)
+		game._update_display(0.0)
+		await process_frame
+		_tap(viewport, game._hud._actions["dock"], "Land at the open ground pad in %s" % layout)
+		_expect(flight.docked == Catalog.GROUND_PAD and flight.gear_status().locked,
+			"Ground touchdown through touch waits for locked gear in %s" % layout)
+	viewport.queue_free()
+	await process_frame
+
+
+func _engaged_patrol(port: int) -> Flight:
+	var flight := Flight.new()
+	var system := Catalog.system_of_site(port)
+	var berth := flight.docking_position(port)
+	var state := flight.snapshot()
+	state.merge({"system_id": system, "docked": port, "target": port,
+		"position": [berth.x, berth.y, berth.z]}, true)
+	if not _expect(flight.restore(state) and flight.patrol_action() and Fixture.launch(flight),
+		"Load a locally accepted patrol and enter flight near port %d" % port):
+		return null
+	flight.position = flight.patrol.signal_position(flight)
+	flight.velocity = flight.target_velocity(port)
+	_tick(flight)
+	return flight if _expect(flight.patrol.in_danger(flight), "Activate a live local raider") else null
+
+
+func _place_ground_approach(flight: Flight) -> void:
+	var port := Catalog.GROUND_PAD
+	var axis := flight.station_axis(port)
+	flight.position = flight.docking_position(port) + axis * 2.5
+	flight.velocity = flight.surface_velocity(port, flight.position)
+	flight.yaw = atan2(axis.x, axis.z)
+	flight.pitch = clampf(asin(-axis.y), -Flight.MAX_PITCH, Flight.MAX_PITCH)
+	flight.roll = flight.station_angle(port)
 
 
 func _station_departure(port: int) -> Flight:

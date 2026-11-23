@@ -30,7 +30,7 @@ const TRANSLATION_ROW := Rect2(26, -279, 296, 46)
 const ACTION_COLUMN := Rect2(-340, -215, 314, 189)
 const TOUCH_GAINS := [0.72, 1.0, 1.36]
 const CONTACT_NOTICE_DISTANCE := 1100.0
-const HOLD_ACTIONS := ["boost", "brake", "translation_forward", "translation_reverse"]
+const HOLD_ACTIONS := ["boost", "brake", "translation_forward", "translation_reverse", "fire"]
 const MARK_PRIORITY := {"raider": 0, "convoy": 1}
 const NAV_DRAG_THRESHOLD := 12.0
 const NAV_MOUSE := -2
@@ -172,7 +172,7 @@ var _gear_blocked := true
 var _frame_blocked := true
 var _autopilot_blocked := false
 var _speed_hold_blocked := true
-var _fire_blocked := false
+var _fire_held := false
 var _ecm_blocked := true
 var _jumping := false
 var _jump_transit := false
@@ -753,7 +753,7 @@ func _build_flight_modes() -> void:
 	_flight_modes.hide()
 	_update_translation_mode()
 
-func sync(sim: RefCounted, delta: float, aim_lock_available := false) -> void:
+func sync(sim: RefCounted, delta: float, aim_lock_available := false, forward_aim := true) -> void:
 	var docked: bool = sim.docked >= 0
 	var landed: bool = sim.landed_site >= 0
 	var parked := docked or landed
@@ -823,11 +823,12 @@ func sync(sim: RefCounted, delta: float, aim_lock_available := false) -> void:
 	_sync_ambient(ambient)
 	var mission_fire := patrol_fight or bool(convoy.get("fire_visible", false))
 	var fire_button: Button = _actions["fire"]
-	fire_button.visible = (not parked and not _jumping
+	fire_button.visible = (forward_aim and not parked and not _jumping
 		and (mission_fire or ambient.get("fire_visible", false) or not sim.combat_lock_id().is_empty()))
 	var fire: Dictionary = sim.fire_status() if fire_button.visible else {}
-	fire_button.tooltip_text = str(fire.get("reason", ""))
-	_fire_blocked = not fire.get("ok", false)
+	fire_button.tooltip_text = "Удерживайте для огня · X — одиночный выстрел" if fire.get("ok", false) else str(fire.get("reason", ""))
+	if not fire_button.visible and _fire_held:
+		release_fire()
 	var aim_lock: Button = _actions["aim_lock"]
 	aim_lock.visible = aim_lock_available and _input_enabled and not parked and not _jumping
 	_sync_combat({} if parked or _jumping else sim.combat_status())
@@ -915,7 +916,8 @@ func sync(sim: RefCounted, delta: float, aim_lock_available := false) -> void:
 	_actions["contract"].text = "Отметить этап" if transfer else ("Сдать груз" if sim.contract_stage == 1 else "Взять контракт")
 	var sale_quote: int = sim.raw_sale_quote() if port_services and mining.ore_hold > 0 else 0
 	_actions["sell_ore"].visible = sale_quote > 0
-	var dock_approach: bool = not parked and not _jumping and not approach_active and not mission_fire and convoy.is_empty() and not sim.patrol_course and not sim.project_course and not sim.convoy_course
+	var dock_approach: bool = not parked and not _jumping and not approach_active \
+		and not sim.patrol_course and not sim.project_course and not sim.convoy_course
 	var manual_approach: bool = dock_approach and not sim.autopilot
 	var surface: Dictionary = sim.surface_status() if not parked and Sector.is_mine_site(sim.target) else {}
 	var gear: Dictionary = sim.gear_status()
@@ -1388,7 +1390,7 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 	if not fire.is_empty() and not ambient_fire and convoy.is_empty():
 		_route.text = "Дозор  /  Рейдер"
 		_route_detail.text = "Дистанция %d м · корпус %d%%" % [roundi(fire.get("distance", 0.0)), ceili(patrol.get("enemy_hull", 0.0))]
-		_guidance.text = "Цель в прицеле. Нажмите «Огонь»." if fire.ok else str(fire.get("reason", ""))
+		_guidance.text = "Цель в прицеле. Удерживайте «Огонь»." if fire.ok else str(fire.get("reason", ""))
 	elif sim.orbit_maneuver:
 		_sync_orbit_flight(sim.orbit_status(), sim.throttle)
 	elif not rendezvous.is_empty():
@@ -1437,7 +1439,7 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 		if not _autopilot_blocked:
 			_guidance.text += " Для захода на площадку можно включить «Авто»."
 	elif ambient_fire:
-		_guidance.text = "Рейдер в прицеле. Нажмите «Огонь»." if fire.ok else str(fire.get("reason", ""))
+		_guidance.text = "Рейдер в прицеле. Удерживайте «Огонь»." if fire.ok else str(fire.get("reason", ""))
 	elif _translation_mode:
 		_guidance.text = "Круглая панель — сдвиг вбок и по высоте. «Вперёд» и «Назад» удерживайте."
 	elif holding:
@@ -1553,7 +1555,7 @@ func _sync_convoy_flight(convoy: Dictionary, fire: Dictionary) -> void:
 		_route_detail.text += "Корпус цели %d%%" % ceili(convoy.enemy_hull)
 	_guidance.text = str(convoy.reason)
 	if not fire.is_empty():
-		_guidance.text = "Цель в прицеле. Нажмите «Огонь»." if fire.ok else str(fire.get("reason", convoy.reason))
+		_guidance.text = "Цель в прицеле. Удерживайте «Огонь»." if fire.ok else str(fire.get("reason", convoy.reason))
 
 func _delivery_system(sim: RefCounted) -> String:
 	var destination_system := Sector.system_of_site(sim.contract_destination)
@@ -1801,7 +1803,7 @@ func _refresh_disabled_actions() -> void:
 		var button: Button = _actions[action]
 		var blocked := (action == "dock" and (_lift_blocked or _departure_blocked)) or (action == "mine" and _mining_blocked)
 		blocked = blocked or (action == "scoop" and _scoop_blocked) or (action == "time" and _time_blocked)
-		blocked = blocked or (action == "patrol" and _patrol_blocked) or (action == "convoy" and _convoy_blocked) or (action == "fire" and _fire_blocked)
+		blocked = blocked or (action == "patrol" and _patrol_blocked) or (action == "convoy" and _convoy_blocked)
 		blocked = blocked or (action == "ecm" and (_ecm_blocked or _time_paused))
 		blocked = blocked or (action == "missile_next" and (_missile_next_blocked or _time_paused))
 		blocked = blocked or (action == "missile_fire" and _missile_blocked) or (action == "decoy" and _decoy_blocked)
@@ -1822,11 +1824,11 @@ func _refresh_disabled_actions() -> void:
 		blocked = blocked or (RIG_ACTIONS.has(action) and not _rig_status.get(RIG_ACTIONS[action], false))
 		blocked = blocked or (PROCESSOR_ACTIONS.has(action) and not _processor_status.get(PROCESSOR_ACTIONS[action], false))
 		blocked = blocked or (ORBITAL_MINING_ACTIONS.has(action) and not _orbital_mining_status.get(ORBITAL_MINING_ACTIONS[action], false))
-		var manual_thrust := action in HOLD_ACTIONS or action in ["throttle_down", "throttle_up"]
+		var manual_action := action in HOLD_ACTIONS or action in ["throttle_down", "throttle_up"]
 		var charge_control := action in ["throttle_down", "throttle_up", "boost", "brake"] and not _jump_transit
 		var during_jump := _jumping and action != "time_pause" and not charge_control
 		var during_departure := _departure_active and action != "time_pause" and (action != "dock" or not _departure_can_cancel)
-		button.disabled = not _input_enabled or blocked or during_jump or during_departure or (_time_paused and manual_thrust)
+		button.disabled = not _input_enabled or blocked or during_jump or during_departure or (_time_paused and manual_action)
 
 func move_input() -> Vector2:
 	if _parked or _in_escape or _jump_transit or _time_paused or not _input_enabled:
@@ -1859,6 +1861,17 @@ func boost_held() -> bool:
 
 func brake_held() -> bool:
 	return not _parked and not _in_escape and not _jump_transit and not _time_paused and _input_enabled and (_brake or Input.is_physical_key_pressed(KEY_SPACE))
+
+func fire_held() -> bool:
+	var button: Button = _actions["fire"]
+	return _fire_held and not button.disabled and button.is_visible_in_tree()
+
+func release_fire() -> void:
+	for pointer: int in _touch_owner.keys():
+		if _touch_owner[pointer] == "fire":
+			_touch_owner.erase(pointer)
+	_mouse_held.erase("fire")
+	_update_held()
 
 func _key(primary: Key, alternate: Key) -> bool:
 	return Input.is_physical_key_pressed(primary) or Input.is_physical_key_pressed(alternate)
@@ -1894,6 +1907,8 @@ func _input(event: InputEvent) -> void:
 			_bank.update_point(event.position)
 		elif _navigation_presses.has(event.index):
 			_drag_navigation(event.index, event.position)
+		elif _touch_owner[event.index] == "fire" and not _hit(_actions["fire"], event.position):
+			_touch_end(event.index, event.position, true)
 		get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
@@ -1921,7 +1936,7 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and is_instance_valid(_hud):
+	if what in [NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_APPLICATION_PAUSED] and is_instance_valid(_hud):
 		_reset_controls()
 
 func _reset_controls() -> void:
@@ -1958,7 +1973,7 @@ func _touch_begin(index: int, point: Vector2) -> bool:
 			if action in ["combat_lock", "comms_contact"]:
 				_contact_action_presses[index] = _scanner_focus
 			if action in HOLD_ACTIONS:
-				_update_held()
+				_update_held(true)
 			else:
 				button.self_modulate = CYAN
 			return true
@@ -1981,7 +1996,7 @@ func _touch_end(index: int, point: Vector2, canceled: bool) -> bool:
 		"bank":
 			_bank_finger = -1
 			_bank.reset()
-		"boost", "brake", "translation_forward", "translation_reverse":
+		"boost", "brake", "translation_forward", "translation_reverse", "fire":
 			_update_held()
 		"navigation_press":
 			_end_navigation_press(index, point, canceled)
@@ -2069,24 +2084,29 @@ func _world_marker_blocked(point: Vector2) -> bool:
 			return true
 	return false
 
-func _update_held() -> void:
+func _update_held(entered_press := false) -> void:
 	var touches := _touch_owner.values()
+	var was_firing := _fire_held
 	_boost = "boost" in touches or _mouse_held.has("boost")
 	_brake = "brake" in touches or _mouse_held.has("brake")
+	_fire_held = "fire" in touches or _mouse_held.has("fire")
 	var forward := "translation_forward" in touches or _mouse_held.has("translation_forward")
 	var reverse := "translation_reverse" in touches or _mouse_held.has("translation_reverse")
 	_translation_depth = float(forward) - float(reverse)
 	_actions["boost"].self_modulate = CYAN if _boost else Color.WHITE
 	_actions["brake"].self_modulate = AMBER if _brake else Color.WHITE
+	_actions["fire"].self_modulate = Color("ffb5a5") if _fire_held else Color.WHITE
 	_actions["translation_forward"].self_modulate = CYAN if forward else Color.WHITE
 	_actions["translation_reverse"].self_modulate = CYAN if reverse else Color.WHITE
+	if entered_press and _fire_held and not was_firing:
+		action_requested.emit("fire_hold")
 
 func _set_mouse_hold(action: String, active: bool) -> void:
 	if active:
 		_mouse_held[action] = true
 	else:
 		_mouse_held.erase(action)
-	_update_held()
+	_update_held(active)
 
 func _commit_action(action: String) -> void:
 	if action == "translation_mode":

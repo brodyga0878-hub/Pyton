@@ -17,6 +17,7 @@ const MESSAGES := {
 	"AIM_LOCK": ["Захват", "Lock"],
 	"AIM_LOCK_TOOLTIP": ["Захватить корабль у прицела (.)", "Lock a ship near the reticle (.)"],
 	"AIM_LOCK_EMPTY": ["Подведите прицел к доступной цели.", "Bring the reticle onto a lockable target."],
+	"COMBAT_EVASIVE": ["уклоняется", "evading"],
 	"NAV_TITLE": ["Объекты системы", "System objects"],
 	"NAV_SHORTCUT": ["Цели", "Targets"],
 	"NAV_CLOSE": ["Закрыть", "Close"],

@@ -284,7 +284,8 @@ func snapshot() -> Dictionary:
 	}
 
 
-func restore(raw: Variant, epoch: float, system: int, legacy := false, pre_pulse := false) -> bool:
+func restore(raw: Variant, epoch: float, system: int, legacy := false, pre_pulse := false,
+		rack_capacity := Ordnance.SLOT_COUNT, legacy_rack := false) -> bool:
 	if not _valid_epoch(epoch) or system < 0 or system >= Catalog.SYSTEM_COUNT:
 		return false
 	var extra_fields := 0 if legacy else (2 if pre_pulse else 3)
@@ -305,11 +306,13 @@ func restore(raw: Variant, epoch: float, system: int, legacy := false, pre_pulse
 	if not legacy:
 		if not raw.get("ecm_advanced") is bool or (raw.ecm_advanced and not raw.ecm_fitted):
 			return false
-		if not restored_ordnance.restore(raw.get("ordnance"), epoch, system):
+		if not restored_ordnance.restore(raw.get("ordnance"), epoch, system, rack_capacity, legacy_rack):
 			return false
 		if not pre_pulse and not restored_pulse.restore(raw.get("energy_pulse"), epoch, system):
 			return false
 		advanced = raw.ecm_advanced
+	elif not restored_ordnance.resize_rack(rack_capacity):
+		return false
 	if raw.damaged == LAUNCHER_MODULE and not restored_ordnance.fitted:
 		return false
 	if raw.damaged == PULSE_MODULE and restored_pulse.count == 0:

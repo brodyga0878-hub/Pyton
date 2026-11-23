@@ -51,6 +51,7 @@ var _voyage_picker: FileDialog
 var _flight_active := false
 var _io := SessionIO.new()
 var _save_elapsed := 0.0
+var _held_fire_lock := ""
 var _save_error_shown := false
 var _preserve_backup_on_next_save := false
 var _report: CenterContainer
@@ -190,6 +191,11 @@ func _physics_process(delta: float) -> void:
 		return
 	var steering := presentation.pilot_steering(_hud.move_input())
 	flight.update(delta, steering, _hud.roll_input(), _hud.boost_held(), _hud.brake_held(), _hud.translation_input())
+	if _hud.fire_held():
+		if not _view.shows_forward_aim() or flight.combat_lock_id() != _held_fire_lock:
+			_hud.release_fire()
+		elif flight.status_event.is_empty() and flight.combat.fire_denial(flight.orbit_time).is_empty():
+			flight.fire_action()
 	if not flight.status_event.is_empty():
 		_deliver_notice()
 	else:
@@ -217,7 +223,7 @@ func _update_display(delta: float) -> void:
 				if flight.position.distance_squared_to(contact.position) <= scanner_range * scanner_range:
 					aim_lock_available = true
 					break
-	_hud.sync(flight, delta, aim_lock_available)
+	_hud.sync(flight, delta, aim_lock_available, forward_aim)
 	var combat_lock := flight.combat_lock_contact()
 	var final_approach := flight.autopilot and flight.autopilot_phase in ["Стыковка", "Посадка", "Выпуск шасси", "Вход в зону сбора"]
 	var marker := flight.target_contact(flight.target) if final_approach else flight.target_gate(flight.target)
@@ -282,7 +288,10 @@ func _update_display(delta: float) -> void:
 		var contact_position: Vector3 = combat_lock.position
 		if not _view.camera.is_position_behind(contact_position) and flight.combat_line_clear(_view.camera.global_position, contact_position):
 			active_mark.screen = _view.camera.unproject_position(contact_position)
-	_hud.set_combat_lock(str(combat_lock.get("id", "")), str(combat_lock.get("name", "")), active_mark)
+	var lock_caption := str(combat_lock.get("name", ""))
+	if combat_lock.get("missile_defence", false):
+		lock_caption += " · " + FlightText.text("COMBAT_EVASIVE")
+	_hud.set_combat_lock(str(combat_lock.get("id", "")), lock_caption, active_mark)
 	var markers: Array[Dictionary] = []
 	var contacts: Array[Dictionary] = []
 	if instruments_visible and (_hud.ship_markers_enabled() or _hud.scanner_is_open()):
@@ -429,7 +438,11 @@ func _handle_action(action: String) -> void:
 			flight.patrol_action()
 		"convoy":
 			flight.convoy_action()
-		"fire":
+		"fire", "fire_hold":
+			if action == "fire_hold":
+				if not _view.shows_forward_aim():
+					return
+				_held_fire_lock = flight.combat_lock_id()
 			flight.fire_action()
 		"aim_lock":
 			if flight.docked >= 0 or flight.landed or not _view.shows_forward_aim():
@@ -672,7 +685,7 @@ func _deliver_notice() -> void:
 		"service_combat_shield", "service_combat_ecm", "service_combat_focus", "service_combat_repair",
 		"combat_weapon_selected", "combat_missile", "combat_missile_hit", "combat_ecm",
 		"combat_missile_selected", "combat_player_missile", "combat_decoy", "combat_decoy_hit",
-		"service_combat_launcher", "service_combat_missile_dart", "service_combat_missile_lance", "service_combat_ecm_advanced", "service_combat_decoy",
+		"service_combat_launcher", "service_combat_missile_dart", "service_combat_missile_lance", "service_missile_unloaded", "service_combat_ecm_advanced", "service_combat_decoy",
 		"combat_lock", "combat_lock_clear", "service_radar_mapper",
 		"market_buy", "market_sell", "service_repair", "service_cargo", "hull_damage", "contract_leg",
 		"passenger_accepted", "passenger_overdue", "passenger_paid", "passenger_late", "passenger_canceled",

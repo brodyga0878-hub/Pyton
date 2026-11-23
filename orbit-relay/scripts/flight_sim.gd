@@ -53,7 +53,7 @@ const StationHull := preload("res://scripts/station_hull.gd")
 const LawNetwork := preload("res://scripts/law_network.gd")
 const FlightRadio := preload("res://scripts/flight_radio.gd")
 const ShipHangar := preload("res://scripts/ship_hangar.gd")
-const SAVE_SCHEMA := 53
+const SAVE_SCHEMA := 54
 const INTERRUPTED_LABELS := {
 	"autopilot": "автопилот", "rig_approach": "заход к буру", "orbit_maneuver": "орбитальный манёвр",
 	"rendezvous": "автоматическое сближение", "patrol_course": "наведение дозора",
@@ -2496,7 +2496,7 @@ func shipyard_offer(id: String) -> Dictionary:
 	elif id not in _shipyard_stock():
 		reason = "Этого корпуса нет в текущем предложении верфи"
 	else:
-		reason = _yard_cargo_denial(offer.cargo_capacity)
+		reason = _yard_load_denial(id)
 	offer.reason = reason
 	offer.purchase_reason = reason
 	offer.purchase_cost = int(offer.price)
@@ -2514,18 +2514,31 @@ func shipyard_offer(id: String) -> Dictionary:
 	return offer
 
 
-func _yard_cargo_denial(capacity: int) -> String:
-	if mining.phase != MiningRig.STOWED or mining.ore_hold > capacity:
+func _yard_load_denial(hull_id: String) -> String:
+	if mining.phase != MiningRig.STOWED or mining.ore_hold > ship.cargo_capacity_for(hull_id):
 		return "Освободите место в трюме, чтобы груз поместился"
+	var rails := ShipSystems.missile_rails_for(hull_id)
+	if combat.ordnance.loaded_count() > rails:
+		return "Сдайте в «Боезапасе» лишние ракеты. В новом корпусе %d мест" % rails
+	if not combat.ordnance.can_resize_rack(rails):
+		return "Дождитесь завершения полёта выпущенной ракеты"
 	return ""
+
+
+func _activate_yard_hull(id: String) -> bool:
+	var rails := ShipSystems.missile_rails_for(id)
+	if not combat.ordnance.can_resize_rack(rails) or not ship.swap_hull(id):
+		return false
+	combat.ordnance.resize_rack(rails)
+	mining.cargo_capacity = ship.cargo_capacity()
+	return true
 
 
 func shipyard_swap(id: String) -> bool:
 	var offer := shipyard_offer(id)
-	if offer.is_empty() or not offer.available or not ship.swap_hull(id):
+	if offer.is_empty() or not offer.available or not _activate_yard_hull(id):
 		return false
 	credits -= int(offer.net_cost)
-	mining.cargo_capacity = ship.cargo_capacity()
 	_announce("ship_exchange", "Обмен завершён. Корабль %s." % offer.name)
 	return true
 
@@ -2552,13 +2565,13 @@ func _stored_hull_offer(record: Dictionary) -> Dictionary:
 	var switch_reason := reason
 	var sale_reason := reason
 	if reason.is_empty():
-		switch_reason = _yard_cargo_denial(ship.cargo_capacity_for(hull_id))
+		switch_reason = _yard_load_denial(hull_id)
 		if switch_reason.is_empty() and not _ship_hangar.can_replace():
 			switch_reason = "Исчерпан журнал мест хранения"
 		if price > 1000000000 - credits:
 			sale_reason = "Для выплаты нужен запас по балансу"
 	return {
-		"id": ShipHangar.key(record.slot), "hull": hull_id, "name": name, "port": berth,
+		"id": ShipHangar.key(record.slot), "hull": hull_id, "name": name, "port": berth, "missile_rails": ShipSystems.missile_rails_for(hull_id),
 		"condition": float(record.condition), "sell_price": price,
 		"can_switch": switch_reason.is_empty(), "switch_reason": switch_reason,
 		"can_sell": sale_reason.is_empty(), "sell_reason": sale_reason,
@@ -2575,12 +2588,11 @@ func shipyard_action(action: String, id: String) -> bool:
 	if action == "switch" and offer.can_switch:
 		var former_hull := ship.hull_id
 		var former_condition := ship.hull
-		if former_hull != offer.hull and not ship.swap_hull(offer.hull):
+		if former_hull != offer.hull and not _activate_yard_hull(offer.hull):
 			return false
 		ship.hull = float(record.condition)
 		_ship_hangar.release(id)
 		_ship_hangar.park(former_hull, former_condition, docked)
-		mining.cargo_capacity = ship.cargo_capacity()
 		_announce("ship_switched", "Активный корабль · %s. Прежний корпус оставлен в ангаре." % offer.name)
 		return true
 	if action == "sell" and offer.can_sell:
@@ -2597,11 +2609,10 @@ func _purchase_hull(id: String) -> bool:
 		return false
 	var former_hull := ship.hull_id
 	var former_condition := ship.hull
-	if not ship.swap_hull(id):
+	if not _activate_yard_hull(id):
 		return false
 	_ship_hangar.park(former_hull, former_condition, docked)
 	credits -= int(offer.purchase_cost)
-	mining.cargo_capacity = ship.cargo_capacity()
 	_announce("ship_purchased", "Куплен %s за %d кр. Прежний корпус оставлен в ангаре." % [offer.name, int(offer.purchase_cost)])
 	return true
 
@@ -2877,6 +2888,7 @@ func combat_equipment_status() -> Dictionary:
 		"ecm_advanced": combat.ecm_advanced, "launcher_fitted": ordnance.fitted, "decoy_count": ordnance.decoys,
 		"missile_type": ordnance.selected, "missile_ammo": ordnance.ammo_counts(),
 		"missile_slots": ordnance.slots.duplicate(), "missile_slot": ordnance.selected_slot,
+		"missile_loaded": ordnance.loaded_count(),
 		"energy_pulse_count": combat.pulse.count,
 		"station": station_services_available(),
 	}
@@ -3256,6 +3268,8 @@ func use_ecm() -> bool:
 
 
 func fire_status() -> Dictionary:
+	if _ordnance_blocked() or _escape.active:
+		return {"ok": false, "reason": "Огонь доступен в открытом полёте.", "distance": -1.0, "channel": ""}
 	var bonus := float(combat.profile().range_bonus)
 	var requested := _targeting.lock_id
 	var locked := _targeting.current(self)
@@ -3707,6 +3721,10 @@ func maintenance_status() -> Dictionary:
 
 
 func service_offer(action: String) -> Dictionary:
+	if action == "combat_unload_missile":
+		var refund := combat.ordnance.selected_refund()
+		return {"cost": refund, "installed": false,
+			"allowed": refund > 0 and credits <= 1000000000 - refund and station_services_available()}
 	if action in ["combat_maintenance", "combat_auto_repair"]:
 		var maintenance_offer := _maintenance.offer(action, credits)
 		maintenance_offer.allowed = maintenance_offer.allowed and station_services_available()
@@ -3741,6 +3759,13 @@ func service_offer(action: String) -> Dictionary:
 
 
 func service_action(action: String) -> bool:
+	if action == "combat_unload_missile":
+		if not service_offer(action).allowed:
+			return false
+		var refund := combat.ordnance.unload_selected()
+		credits += refund
+		_announce("service_missile_unloaded", "Ракета сдана. Получено %d кр." % refund)
+		return true
 	if action in ["combat_maintenance", "combat_auto_repair"]:
 		if not service_offer(action).allowed:
 			return false
@@ -3843,7 +3868,7 @@ func service_action(action: String) -> bool:
 		"combat_ecm_advanced":
 			_announce("service_combat_ecm_advanced", "Усилитель РЭБ установлен. Списано %d кр." % paid)
 		"combat_launcher":
-			_announce("service_combat_launcher", "Пусковая рама на четыре ракеты установлена. Списано %d кр." % paid)
+			_announce("service_combat_launcher", "Пусковая рама установлена. Мест: %d. Списано %d кр." % [combat.ordnance.slots.size(), paid])
 		"combat_missile_dart", "combat_missile_lance":
 			_announce("service_" + action, "Ракета размещена на пусковой раме. Списано %d кр." % paid)
 		"combat_decoy":
@@ -6504,7 +6529,12 @@ func restore(state: Dictionary) -> bool:
 		return false
 	if restored_speed.enabled and (restored_dock >= 0 or restored_landing >= 0 or not restored_transit.is_empty() or float(state.throttle) != 0.0):
 		return false
-	if not pre_combat and not restored_combat.restore(state.get("combat"), restored_epoch, restored_system, schema < 50, schema < 51):
+	var rack_capacity := ShipSystems.missile_rails_for(restored_ship.hull_id)
+	if pre_combat:
+		if not restored_combat.ordnance.resize_rack(rack_capacity):
+			return false
+	elif not restored_combat.restore(state.get("combat"), restored_epoch, restored_system, schema < 50, schema < 51,
+			rack_capacity, schema < 54):
 		return false
 	if restored_combat.has_active_ordnance() and (restored_escape.active or restored_dock >= 0 or restored_landing >= 0 or not restored_transit.is_empty()):
 		return false

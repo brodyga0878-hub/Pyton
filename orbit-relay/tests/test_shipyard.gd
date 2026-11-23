@@ -5,6 +5,7 @@ const Fixture := preload("res://tests/flight_fixture.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const Customs := preload("res://scripts/customs.gd")
 const ShipSystems := preload("res://scripts/ship_systems.gd")
+const PortServices := preload("res://scripts/port_services.gd")
 const SessionIO := preload("res://scripts/session_io.gd")
 const Main := preload("res://main.tscn")
 const COURIER := ShipSystems.STARTER_HULL
@@ -25,6 +26,7 @@ func _run() -> void:
 	_test_licenses_and_quotes()
 	_test_rotating_stock()
 	_test_featured_hulls()
+	_test_hull_ratings()
 	_test_upgrade_and_travel()
 	_test_flight_characteristics()
 	_test_previous_schema()
@@ -111,6 +113,26 @@ func _test_rotating_stock() -> void:
 		and restored.ship.thrust_acceleration(Vector3.RIGHT, 0).x > scout_side,
 		"The working tug trades turn speed for stronger side thrust and a wider hold with a crew requirement")
 	_expect(not restored.dock_action() and restored.docked == 0, "A tug without its required crew cannot depart")
+
+
+func _test_hull_ratings() -> void:
+	var available := {COURIER: [0.0, 4], FREIGHTER: [0.0, 6], ShipSystems.SURVEY_HULL: [2.0, 4],
+		ShipSystems.UTILITY_HULL: [4.0, 4], ShipSystems.INTERCEPTOR_HULL: [5.0, 6], ShipSystems.HAULER_HULL: [8.0, 8]}
+	for hull: String in available:
+		var flight := Flight.new()
+		flight.credits = 10000
+		var rails: int = available[hull][1]
+		flight.update(float(available[hull][0]) * Flight.SHIPYARD_STOCK_SECONDS, Vector2.ZERO, 0.0, false, false)
+		if not _expect(int(flight.shipyard_offer(hull).missile_rails) == rails
+			and (hull == COURIER or flight.shipyard_swap(hull)) and flight.service_action("combat_launcher"),
+			"The active yard correctly quotes and fits the rack of %s" % hull):
+			continue
+		var full := true
+		for _rail in range(rails):
+			full = flight.service_action("combat_missile_dart") and full
+		_expect(full and flight.combat_equipment_status().missile_slots.size() == rails
+			and flight.combat_equipment_status().missile_loaded == rails and not flight.service_action("combat_missile_dart"),
+			"The rack for %s accepts exactly its listed number of missiles" % hull)
 
 
 func _test_featured_hulls() -> void:
@@ -328,6 +350,28 @@ func _test_yard_touch() -> void:
 			fits = fits and viewport.get_visible_rect().grow(0.5).encloses(row.exchange.get_global_rect())
 	_expect(featured == [COURIER, ShipSystems.INTERCEPTOR_HULL] and fits,
 		"The expanded catalogue uses only the two current yard cards and both stay in the landscape viewport")
+	_tap(viewport, services._mining_toggle, "Open the ship refit controls through touch")
+	await process_frame
+	_tap(viewport, services._equipment_tabs[PortServices.EquipmentPage.ORDNANCE], "Open the ordnance tab through touch")
+	await process_frame
+	_tap(viewport, services._action_buttons["combat_launcher"], "Fit the six-rail launcher through its actual button")
+	await process_frame
+	for _rail in range(6):
+		flight.service_action("combat_missile_dart")
+	services.refresh()
+	await process_frame
+	var outer_rail: Button = services._missile_buttons[5]
+	var unload: Button = services._action_buttons["combat_unload_missile"]
+	var screen := viewport.get_visible_rect().grow(0.5)
+	_expect(screen.encloses(outer_rail.get_global_rect()) and screen.encloses(unload.get_global_rect())
+		and not services._missile_buttons[6].visible, "The outer launch rail and return button fit the touch display")
+	_tap(viewport, outer_rail, "Select the sixth rail on a real ship with old four-rail equipment")
+	await process_frame
+	var balance := flight.credits
+	_tap(viewport, unload, "Return only the selected missile at the station")
+	await process_frame
+	_expect(flight.combat_equipment_status().missile_slots == ["dart", "dart", "dart", "dart", "dart", ""]
+		and flight.credits == balance + 22, "Returning the selected outer missile through touch credits the real port account")
 	viewport.queue_free()
 	await process_frame
 

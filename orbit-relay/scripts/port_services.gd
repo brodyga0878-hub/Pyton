@@ -32,6 +32,7 @@ const DEFENSE_SERVICES := ["combat_shield", "combat_ecm", "combat_focus", "comba
 const RIG_SERVICES := ["buy_rig", "sell_rig"]
 const NAVIGATION_SERVICES := ["navigation_computer", "missile_telemetry", "radar_mapper", "hyperspace_analyzer", "jump_repair"]
 const ORDNANCE_SERVICES := ["combat_launcher", "combat_missile_dart", "combat_missile_lance", "combat_ecm_advanced", "combat_decoy"]
+const CombatOrdnance := preload("res://scripts/combat_ordnance.gd")
 const MISSILE_LABELS := {"dart": "Дротик", "lance": "Копьё"}
 const FUEL_MODULES := {"hydrogen_scoop": "scoop", "fuel_pump": "pump"}
 const PUMP_MODES := {"off": "Выкл.", "reaction": "В реактивный", "jump": "В прыжковый"}
@@ -469,10 +470,20 @@ func _refresh_ordnance() -> void:
 	var ecm: Dictionary = _sim.service_offer("combat_ecm_advanced")
 	if ecm.has("reason"):
 		_action_buttons["combat_ecm_advanced"].text = "Нужен базовый РЭБ"
-	_rack_summary.text = "Места пусковой · Ложные цели %d / 4" % int(status.decoy_count)
+	var rail_count: int = status.missile_slots.size()
+	_rack_summary.text = "Ракеты %d / %d · Ложные цели %d / %d" % [
+		int(status.missile_loaded), rail_count, int(status.decoy_count), CombatOrdnance.DECOY_CAPACITY]
+	var unload: Dictionary = _sim.service_offer("combat_unload_missile")
+	var unload_button: Button = _action_buttons["combat_unload_missile"]
+	unload_button.disabled = not unload.allowed
+	unload_button.text = "Сдать · +%d кр." % int(unload.cost) if unload.cost > 0 else "Выберите ракету"
+	unload_button.tooltip_text = "Для выплаты нужен запас по балансу" if status.station and unload.cost > 0 and not unload.allowed else ""
 	for index in range(_missile_buttons.size()):
-		var kind: String = status.missile_slots[index]
 		var button := _missile_buttons[index]
+		button.visible = index < rail_count
+		if not button.visible:
+			continue
+		var kind: String = status.missile_slots[index]
 		var selected := index == int(status.missile_slot)
 		button.text = "%d · %s" % [index + 1, MISSILE_LABELS.get(kind, "Пусто")]
 		button.set_pressed_no_signal(selected)
@@ -814,6 +825,7 @@ func _refresh_yard_offers() -> void:
 			row.hold.text = "Трюм %d ед. · с расширением %d" % [int(offer.cargo), int(offer.expanded_cargo)]
 			if _sim.ship.cargo_upgraded:
 				row.hold.text = "Трюм %d ед. с установленным расширением" % int(offer.cargo_capacity)
+			row.hold.text += " · Ракетных мест %d" % int(offer.missile_rails)
 			row.hold.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			var installed := bool(offer.installed)
 			var net := int(offer.net_cost)
@@ -961,7 +973,7 @@ func _refresh_yard_hangar() -> void:
 			continue
 		row.title.text = str(record.name)
 		row.location.text = "Порт · %s" % _sim.target_name(int(record.port))
-		row.condition.text = "Состояние корпуса · %.0f%%" % float(record.condition)
+		row.condition.text = "Состояние корпуса %.0f%% · Ракетных мест %d" % [float(record.condition), int(record.missile_rails)]
 		row.switch.disabled = not bool(record.can_switch)
 		row.sell.disabled = not bool(record.can_sell)
 		row.sell.text = "Продать · %d кр." % int(record.sell_price)
@@ -1256,7 +1268,7 @@ func _request_service(action: String) -> void:
 		page = StationPage.MINING
 		if _equipment_page != EquipmentPage.NAVIGATION:
 			return
-	elif action in ORDNANCE_SERVICES:
+	elif action in ORDNANCE_SERVICES or action == "combat_unload_missile":
 		page = StationPage.MINING
 		if _equipment_page != EquipmentPage.ORDNANCE:
 			return
@@ -1509,18 +1521,30 @@ func _build_ordnance() -> void:
 	_ordnance = VBoxContainer.new()
 	_ordnance.add_theme_constant_override("separation", 8)
 	_equipment.add_child(_ordnance)
-	_add_service("combat_launcher", "Ракетная пусковая", "Четыре места под ракеты двух типов", _ordnance)
-	_add_service("combat_missile_dart", "Ракета «Дротик»", "Быстрый манёвр по захваченной цели", _ordnance)
-	_add_service("combat_missile_lance", "Ракета «Копьё»", "Тяжёлая ракета с большей дальностью", _ordnance)
-	_add_service("combat_ecm_advanced", "Усиленные помехи", "Модернизация базового модуля", _ordnance)
-	_add_service("combat_decoy", "Ложная цель", "Уводит наведённую ракету в сторону", _ordnance)
+	var supplies := HBoxContainer.new()
+	supplies.add_theme_constant_override("separation", 8)
+	_ordnance.add_child(supplies)
+	var missiles := VBoxContainer.new()
+	missiles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	supplies.add_child(missiles)
+	var defense := VBoxContainer.new()
+	defense.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	supplies.add_child(defense)
+	_add_service("combat_launcher", "Ракетная пусковая", "Число направляющих зависит от корпуса", missiles)
+	_add_service("combat_missile_dart", "Ракета «Дротик»", "Быстрый манёвр по захваченной цели", missiles)
+	_add_service("combat_missile_lance", "Ракета «Копьё»", "Тяжёлая ракета с большей дальностью", missiles)
+	_add_service("combat_ecm_advanced", "Усиленные помехи", "Модернизация базового модуля", defense)
+	_add_service("combat_decoy", "Ложная цель", "Уводит наведённую ракету в сторону", defense)
+	_add_service("combat_unload_missile", "Возврат ракеты", "Порт принимает выбранную ракету за половину цены покупки", defense)
 	_rack_summary = _label(_ordnance, "", 17, MINT)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
-	_ordnance.add_child(row)
-	_label(row, "Следующий пуск", 17, TEXT).size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	for index in range(4):
-		var button := _button(row)
+	var rails := GridContainer.new()
+	rails.columns = 4
+	rails.add_theme_constant_override("h_separation", 8)
+	rails.add_theme_constant_override("v_separation", 8)
+	_ordnance.add_child(rails)
+	for index in range(CombatOrdnance.MAX_SLOT_COUNT):
+		var button := _button(rails)
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.toggle_mode = true
 		button.pressed.connect(_request_missile_selection.bind(index))
 		_missile_buttons.append(button)
@@ -1530,7 +1554,7 @@ func _request_missile_selection(slot: int) -> void:
 	if not is_open() or _fuel_only or _station_page != StationPage.MINING or _equipment_page != EquipmentPage.ORDNANCE:
 		return
 	var button: Button = _missile_buttons[slot]
-	if not button.disabled:
+	if button.is_visible_in_tree() and not button.disabled:
 		_touches.clear()
 		missile_selected.emit(slot)
 

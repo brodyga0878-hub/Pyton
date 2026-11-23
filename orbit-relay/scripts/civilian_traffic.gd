@@ -17,6 +17,8 @@ const THREAT_RANGE := 224.0
 const AIM_COSINE := cos(deg_to_rad(24.0))
 const FIRST_ATTACK_DELAY := 3.0
 const ATTACK_DELAY := 2.8
+const MISSILE_DEFENCE_RANGE := 145.0
+const REACQUIRE_DELAY := 0.9
 const BEAM_DURATION := 0.18
 const RAIDER_HULL := 100.0
 const SHOT_DAMAGE := 24.0
@@ -97,7 +99,7 @@ func contacts(sim: RefCounted) -> Array[Dictionary]:
 
 func status(sim: RefCounted) -> Dictionary:
 	var empty := {"phase": "clear", "hostile": false, "danger": false, "id": "", "name": "",
-		"position": Vector3.ZERO, "velocity": Vector3.ZERO, "hull": 0.0, "distance": -1.0}
+		"position": Vector3.ZERO, "velocity": Vector3.ZERO, "hull": 0.0, "distance": -1.0, "missile_defence": false}
 	var port := _anchor(sim)
 	if port < 0:
 		return empty
@@ -111,6 +113,8 @@ func status(sim: RefCounted) -> Dictionary:
 	var at: Vector3 = raider.position
 	raider.distance = at.distance_to(sim.position)
 	raider.danger = raider.phase == "attack" and raider.distance <= THREAT_RANGE and _airborne(sim)
+	raider.missile_defence = raider.danger and not sim.combat.ordnance.threatening_missile(epoch, sim.system_id,
+		raider.id, at, MISSILE_DEFENCE_RANGE).is_empty()
 	if raider.danger:
 		raider.forward = at.direction_to(sim.position)
 	return raider
@@ -198,6 +202,9 @@ func step(sim: RefCounted, delta: float) -> Dictionary:
 		_engaged_cycle = cycle
 		_next_attack = epoch + FIRST_ATTACK_DELAY
 		return {"event": "ambient_engaged", "message": "Рейдер взял ваш корабль на прицел."}
+	if target.missile_defence:
+		_next_attack = maxf(_next_attack, epoch + REACQUIRE_DELAY)
+		return {}
 	if epoch < _next_attack:
 		return {}
 	_next_attack = epoch + ATTACK_DELAY

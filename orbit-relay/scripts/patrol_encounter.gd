@@ -27,9 +27,11 @@ const LOADOUTS := {
 	CLASSIC: {"name": "Рейдер «Шип»", "weapon": "Импульсный лазер", "rate": 0.72, "cadence": ENEMY_DELAY,
 		"orbit": Vector3(34.0, 14.0, 35.0), "speed": 0.0, "damage": 0.0, "hardened": false},
 	PURSUER: {"name": "Перехватчик «Гранит»", "weapon": "Тяжёлый излучатель", "rate": 0.83, "cadence": 2.7,
-		"orbit": Vector3(26.0, 12.0, 28.0), "speed": 42.0, "damage": 3.0, "hardened": true},
+		"orbit": Vector3(26.0, 12.0, 28.0), "speed": 42.0, "damage": 3.0, "hardened": true,
+		"reaction_range": 150.0, "break_depth": 105.0, "break_side": 42.0, "reacquire": 0.8},
 	SKIRMISHER: {"name": "Маневровый рейдер «Зигзаг»", "weapon": "Скоростной излучатель", "rate": 1.02, "cadence": 1.8,
-		"orbit": Vector3(45.0, 21.0, 42.0), "speed": 37.0, "damage": -1.0, "hardened": false},
+		"orbit": Vector3(45.0, 21.0, 42.0), "speed": 37.0, "damage": -1.0, "hardened": false,
+		"reaction_range": 205.0, "break_depth": 62.0, "break_side": -109.0, "reacquire": 0.55},
 }
 const MAX_TACTICAL_OFFSET := 160.0
 const MAX_TACTICAL_SPEED := 43.0
@@ -117,6 +119,7 @@ func status(sim: RefCounted) -> Dictionary:
 		"caption": caption, "reason": reason, "point": point, "same_system": local,
 		"distance": sim.position.distance_to(point) if local else -1.0,
 		"enemy_hull": enemy_hull, "reward": _reward(), "tactic": _mode, "variant": _variant,
+		"missile_defence": phase == ENGAGED and local and in_flight and not _threatening_missile(sim, point).is_empty(),
 	}
 
 
@@ -129,11 +132,14 @@ func contacts(sim: RefCounted) -> Array[Dictionary]:
 		return []
 	var at := _enemy_position(sim)
 	var profile: Dictionary = LOADOUTS[_variant]
+	var defending := not _threatening_missile(sim, at).is_empty()
+	var facing := _tactical_velocity.normalized() if defending and _tactical_velocity.length_squared() > 1.0 else at.direction_to(sim.position)
 	return [{
 		"id": "raider-%d" % origin, "name": profile.name, "role": "raider",
 		"position": at, "velocity": _enemy_velocity(sim), "hull": enemy_hull,
-		"forward": at.direction_to(sim.position), "tactic": _mode, "weapon": profile.weapon,
+		"forward": facing, "tactic": _mode, "weapon": profile.weapon,
 		"variant": _variant, "hardened_missiles": profile.hardened,
+		"missile_defence": defending,
 	}]
 
 
@@ -157,15 +163,18 @@ func step(sim: RefCounted, delta: float) -> Dictionary:
 	if distance > RETREAT_RANGE or sim.ship.hull <= 1.0:
 		return _retreat()
 	_encounter_time += delta
-	_advance_tactics(sim, delta)
+	var breaking := _advance_tactics(sim, delta)
 	_attack_delay -= delta
+	var profile: Dictionary = LOADOUTS[_variant]
+	if breaking:
+		_attack_delay = maxf(_attack_delay, float(profile.reacquire))
+		return {}
 	if _attack_delay > 0.0:
 		return {}
 	var source := _enemy_position(sim)
 	if source.distance_to(sim.position) > BEAM_RANGE or not sim.combat_line_clear(source, sim.position):
 		_attack_delay = 0.25
 		return {}
-	var profile: Dictionary = LOADOUTS[_variant]
 	_attack_delay = float(profile.cadence)
 	_enemy_flash = BEAM_DURATION
 	_enemy_beam = {"from": source, "to": sim.position, "hostile": true}
@@ -342,25 +351,44 @@ func _reset_tactics() -> void:
 	_tactical_velocity = Vector3.ZERO
 
 
-func _advance_tactics(sim: RefCounted, delta: float) -> void:
+func _threatening_missile(sim: RefCounted, position: Vector3) -> Dictionary:
+	if _variant == CLASSIC or sim.combat.ordnance.missile.is_empty():
+		return {}
+	return sim.combat.ordnance.threatening_missile(sim.orbit_time, sim.system_id, "raider-%d" % origin,
+		position, LOADOUTS[_variant].reaction_range)
+
+
+func _advance_tactics(sim: RefCounted, delta: float) -> bool:
 	if _variant == CLASSIC:
-		return
-	var offset: Vector3 = sim.position - signal_position(sim)
+		return false
+	var profile: Dictionary = LOADOUTS[_variant]
+	var anchor := _signal_pose(sim)
+	var offset: Vector3 = sim.position - anchor.position
 	var toward := offset.normalized()
 	var flank := toward.cross(Vector3.UP).normalized()
 	var destination := Vector3.ZERO
-	if enemy_hull <= 40.0:
+	var incoming: Dictionary = {}
+	if not sim.combat.ordnance.missile.is_empty():
+		incoming = _threatening_missile(sim, _enemy_position(sim))
+	if not incoming.is_empty():
+		_mode = "evade"
+		var heading: Vector3 = Vector3(incoming.velocity).normalized()
+		var slip := heading.cross(Vector3.UP if absf(heading.y) < 0.95 else Vector3.RIGHT).normalized()
+		destination = heading * float(profile.break_depth) + slip * float(profile.break_side)
+	elif enemy_hull <= 40.0:
 		_mode = "evade"
 		destination = -toward * 125.0 + flank * (36.0 * sin(_encounter_time * 0.85))
 	elif _variant == PURSUER:
 		_mode = "pursuit"
-		destination = (offset * 0.58).limit_length(125.0)
+		var drift: Vector3 = sim.velocity - anchor.velocity
+		destination = (offset * 0.58 + drift.limit_length(85.0) * 0.6).limit_length(125.0)
 	else:
 		_mode = "strafe"
 		destination = toward * 42.0 + flank * (77.0 * sin(_encounter_time * 0.72))
 	var before := _tactical_offset
-	_tactical_offset = _tactical_offset.move_toward(destination, float(LOADOUTS[_variant].speed) * delta)
+	_tactical_offset = _tactical_offset.move_toward(destination, float(profile.speed) * delta)
 	_tactical_velocity = (_tactical_offset - before) / delta
+	return not incoming.is_empty()
 
 
 static func _read_vector(raw: Variant, limit: float) -> Vector3:

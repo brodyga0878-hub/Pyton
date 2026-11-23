@@ -18,6 +18,7 @@ func _run() -> void:
 	_test_purchase_and_sale()
 	_test_hangar_capacity()
 	_test_locality()
+	_test_rack_transfer()
 	print("Ship hangar ownership: %d checks, %d failures" % [_checks, _failures.size()])
 	for failure: String in _failures:
 		printerr(failure)
@@ -43,6 +44,7 @@ func _test_purchase_and_sale() -> void:
 		and flight.credits == credits - 2200 and flight.ship.hull_id == Shell.FREIGHTER_HULL,
 		"Full purchase activates the new hull and charges exactly its full price"):
 		return
+	gear.ordnance.slots.append_array(["", ""])
 	_check(flight.ship.hull == 100.0 and flight.ship.fuel == 42.0 and flight.mining.ore_hold == 2
 		and flight.ship.cargo_capacity() == 44 and flight.combat.snapshot() == gear and flight.crew.snapshot() == crew,
 		"Shipborne fittings, crew, fuel and payload transfer once without either loss or duplication")
@@ -72,6 +74,7 @@ func _test_purchase_and_sale() -> void:
 	var older := valid.duplicate(true)
 	older.schema = 51
 	older.erase("ship_hangar")
+	older.combat.ordnance.slots.resize(4)
 	var migrated := Flight.new()
 	_check(migrated.restore(older) and migrated.shipyard_storage().is_empty()
 		and migrated.ship.hull_id == cold.ship.hull_id and migrated.crew.snapshot() == cold.crew.snapshot(),
@@ -111,6 +114,52 @@ func _test_hangar_capacity() -> void:
 	receipt = flight.shipyard_storage()[0].id
 	_check(not flight.shipyard_action("sell", receipt) and flight.credits == 1000000000 and flight.shipyard_storage().size() == 5,
 		"Selling does not produce a balance outside the save limits")
+
+
+func _test_rack_transfer() -> void:
+	var flight := Flight.new()
+	flight.credits = 10000
+	if not _check(flight.shipyard_action("purchase", Shell.FREIGHTER_HULL) and flight.service_action("combat_launcher"),
+		"Use a licensed yard and the usual equipment service to fit a six-rail freighter"):
+		return
+	var receipt: String = flight.shipyard_storage()[0].id
+	for missile: String in ["dart", "lance", "lance", "dart", "lance", "dart"]:
+		_check(flight.service_action("combat_missile_" + missile), "The freighter can load each of its six rails")
+	if not _check(flight.select_missile_slot(5) and not flight.service_action("combat_missile_dart")
+		and flight.combat_equipment_status().missile_loaded == 6, "The extra rail is selectable and the shop forbids overfilling"):
+		return
+	var saved := flight.snapshot()
+	var smaller := flight.shipyard_offer(Shell.STARTER_HULL)
+	_check(not smaller.available and not smaller.purchase_ok and not flight.shipyard_storage()[0].can_switch
+		and "Боезапасе" in smaller.reason and not flight.shipyard_swap(Shell.STARTER_HULL)
+		and not flight.shipyard_action("purchase", Shell.STARTER_HULL) and not flight.shipyard_action("switch", receipt)
+		and flight.snapshot() == saved, "All three hull transactions decline an oversized rack atomically and explain the refit")
+	var cold := Flight.new()
+	_check(cold.restore(JSON.parse_string(JSON.stringify(saved))) and cold.snapshot() == saved,
+		"Current saves retain six rails with their exact selection and fit contract")
+	var invalid := saved.duplicate(true)
+	invalid.combat.ordnance.slots.resize(4)
+	invalid.combat.ordnance.selected_slot = 3
+	_check(not cold.restore(invalid) and cold.snapshot() == saved,
+		"A current schema cannot substitute an older four-rail record or partially restore it")
+	invalid.schema = 53
+	_check(cold.restore(JSON.parse_string(JSON.stringify(invalid)))
+		and cold.combat_equipment_status().missile_slots == ["dart", "lance", "lance", "dart", "", ""]
+		and cold.combat_equipment_status().missile_slot == 3,
+		"An earlier four-rail freighter record grows two empty rails without changing ammo or its selection")
+	flight.credits = 1000000000
+	var at_limit := flight.snapshot()
+	_check(not flight.service_action("combat_unload_missile") and flight.snapshot() == at_limit,
+		"The refund cannot overflow the valid balance or consume an unsold missile")
+	flight.credits = 5000
+	_check(flight.select_missile_slot(0) and flight.service_action("combat_unload_missile")
+		and flight.select_missile_slot(1) and flight.service_action("combat_unload_missile")
+		and flight.credits == 5061 and flight.select_missile_slot(5),
+		"The supply desk refunds only the selected two missiles at half price")
+	_check(flight.shipyard_action("switch", receipt) and flight.ship.hull_id == Shell.STARTER_HULL
+		and flight.combat_equipment_status().launcher_fitted and flight.combat_equipment_status().missile_slot == 1
+		and flight.combat_equipment_status().missile_slots == ["lance", "dart", "lance", "dart"],
+		"An allowed refit transfers loaded overflow rails into vacant positions and tracks the selected missile")
 
 
 func _test_locality() -> void:
