@@ -84,7 +84,7 @@ func restore(raw: Variant, epoch: float, rig: RefCounted) -> bool:
 		return true
 	if raw.size() != SAVE_FIELDS.size() or not raw.has_all(SAVE_FIELDS) or rig.phase != MiningRig.STOWED:
 		return false
-	if not _integer(raw.site_id, 0, Catalog.DESTINATION_COUNT - 1):
+	if not _integer(raw.site_id, 0, Catalog.SITE_ID_LIMIT - 1):
 		return false
 	var restored_site := int(raw.site_id)
 	var encoded: Variant = raw.direction

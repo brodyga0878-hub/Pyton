@@ -102,7 +102,7 @@ static func forecast(sim: RefCounted, horizon := 180.0, focus_id := -1) -> Dicti
 	var epoch: float = sim.orbit_time
 	var position: Vector3 = sim.position
 	var velocity: Vector3 = sim.velocity
-	if system < 0 or system >= Catalog.SYSTEM_COUNT or not is_finite(epoch) \
+	if not Catalog.is_system_id(system) or not is_finite(epoch) \
 			or not position.is_finite() or not velocity.is_finite() or not is_finite(horizon) \
 			or horizon <= 0.0 or sim.docked >= 0 or sim.landed or sim.jump_seconds_left > 0.0:
 		return result

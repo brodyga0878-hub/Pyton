@@ -88,9 +88,10 @@ func _test_frontier_flight() -> void:
 		and not flight.route_preview(FIRST_GENERATED).available and not flight.plan_jump(FIRST_GENERATED)
 		and not flight.body_dossier(Catalog.star_for(FIRST_GENERATED)).known,
 		"Unseen systems cannot reveal local data or be targeted by a jump")
+	var live := Catalog.generated_systems_near(HOME, Catalog.GENERATED_SCAN_RANGE, true)
 	var scan := flight.galaxy_scan_status()
 	if not _expect(not expected.is_empty() and expected.size() < Catalog.SYSTEM_COUNT - FIRST_GENERATED
-		and scan.allowed and scan.unseen_count == expected.size() and scan.range == Catalog.GENERATED_SCAN_RANGE
+		and scan.allowed and scan.unseen_count == live.size() and scan.range == Catalog.GENERATED_SCAN_RANGE
 		and flight.scan_galaxy() and flight.status_event == "galaxy_scan",
 		"The normal scanner discovers exactly the hidden systems in the current scan radius"):
 		return
@@ -221,9 +222,10 @@ func _test_scan_touch() -> void:
 	_tap(viewport, chart._scan_button, "Use the real galactic scanner button by touch")
 	await process_frame
 	var stored := SessionIO.load_state()
+	var cold := Flight.new()
 	_expect(chart.is_open() and chart._scan_button.disabled and count > 0 and chart._system_buttons.has(FIRST_GENERATED)
 		and flight.system_known(FIRST_GENERATED) and int(chart._last_scan_count) == count
-		and stored.get("cartography", {}).get("systems", []).size() == count,
+		and cold.restore(stored) and cold.cartography.discovered_systems().size() == count,
 		"New galactic coordinates are saved immediately, and the player remains on the map with the result")
 	await _test_catalog_pages(viewport, chart)
 	viewport.queue_free()

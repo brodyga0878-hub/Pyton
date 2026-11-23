@@ -213,7 +213,7 @@ static func _key(value: Variant, empty_allowed := false) -> bool:
 
 
 static func _valid_system(system: int) -> bool:
-	return system >= -1 and system < Catalog.SYSTEM_COUNT
+	return system == -1 or Catalog.is_system_id(system)
 
 
 static func _valid_epoch(epoch: Variant) -> bool:

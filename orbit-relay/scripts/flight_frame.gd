@@ -107,7 +107,7 @@ func _auto_reference(sim: RefCounted, available: Array) -> int:
 
 
 static func _allowed_site(id: int, allowed: Array) -> bool:
-	return id >= 0 and id < Catalog.DESTINATION_COUNT and id in allowed
+	return Catalog.is_site_id(id) and id in allowed
 
 
 static func _auto_eligible(id: int) -> bool:
@@ -116,4 +116,5 @@ static func _auto_eligible(id: int) -> bool:
 
 static func _valid_number(raw: Variant, minimum: int) -> bool:
 	return (raw is int or raw is float) and is_finite(raw) and raw == floorf(raw) \
-		and raw >= minimum and raw < Catalog.DESTINATION_COUNT
+		and raw >= minimum and raw < Catalog.SITE_ID_LIMIT \
+		and (raw < 0 or Catalog.is_site_id(int(raw)))

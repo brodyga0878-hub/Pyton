@@ -85,7 +85,7 @@ func neighbors_to_discover(system_id: int) -> Array[int]:
 	var neighbors: Array[int] = []
 	if Catalog.system(system_id).is_empty() or (Catalog.is_generated_system(system_id) and not discovered(system_id)):
 		return neighbors
-	for candidate: int in Catalog.generated_systems_near(system_id, Catalog.GENERATED_SCAN_RANGE):
+	for candidate: int in Catalog.generated_systems_near(system_id, Catalog.GENERATED_SCAN_RANGE, true):
 		if not discovered(candidate):
 			neighbors.append(candidate)
 	return neighbors
@@ -137,14 +137,33 @@ func snapshot() -> Dictionary:
 	for site_id in surveyed_sites():
 		scans.append({"site": site_id, "epoch": _records[site_id]})
 	var systems: Array[Dictionary] = []
+	var sectors: Dictionary[float, Array] = {}
 	for system_id: int in discovered_systems():
-		systems.append({"system": system_id, "epoch": _discovered[system_id]})
-	return {"scans": scans, "systems": systems}
+		var epoch := _discovered[system_id]
+		if Catalog.is_extended_system(system_id):
+			if not sectors.has(epoch):
+				sectors[epoch] = []
+			sectors[epoch].append(system_id)
+		else:
+			systems.append({"system": system_id, "epoch": epoch})
+	var result := {"scans": scans, "systems": systems}
+	if not sectors.is_empty():
+		# Many neighboring stars share one radio-scan time. Store it once per group.
+		var epochs := sectors.keys()
+		epochs.sort()
+		var records: Array[Array] = []
+		for epoch: float in epochs:
+			records.append([epoch, sectors[epoch]])
+		result["sector_systems"] = records
+	return result
 
 
 func restore(raw: Variant, epoch: float, pre_procedural := false, system_limit := Catalog.SYSTEM_COUNT,
-		site_limit := Catalog.DESTINATION_COUNT) -> bool:
-	if not _valid_epoch(epoch, MAX_EPOCH) or not raw is Dictionary or raw.size() != (1 if pre_procedural else 2):
+		site_limit := Catalog.DESTINATION_COUNT, allow_extended := true) -> bool:
+	if not _valid_epoch(epoch, MAX_EPOCH) or not raw is Dictionary:
+		return false
+	var has_sectors: bool = raw.has("sector_systems")
+	if (has_sectors and (not allow_extended or pre_procedural)) or raw.size() != (1 if pre_procedural else (3 if has_sectors else 2)):
 		return false
 	var surveyed_systems: Dictionary[int, float] = {}
 	if not pre_procedural:
@@ -159,15 +178,18 @@ func restore(raw: Variant, epoch: float, pre_procedural := false, system_limit :
 				return false
 			previous = int(item.system)
 			surveyed_systems[previous] = float(item.epoch)
+	if has_sectors and not _restore_sector_systems(raw.sector_systems, epoch, surveyed_systems):
+		return false
 	var scans: Variant = raw.get("scans")
-	if not scans is Array or scans.size() > site_limit:
+	var active_site_limit := Catalog.SITE_ID_LIMIT if allow_extended and not pre_procedural else site_limit
+	if not scans is Array or scans.size() > active_site_limit:
 		return false
 	var restored: Dictionary[int, float] = {}
 	var previous_site := -1
 	for scan: Variant in scans:
 		if not scan is Dictionary or scan.size() != 2 or not scan.has_all(["site", "epoch"]):
 			return false
-		if not _valid_sorted_id(scan.site, previous_site, site_limit) or not _valid_epoch(scan.epoch, epoch):
+		if not _valid_sorted_id(scan.site, previous_site, active_site_limit) or not _valid_epoch(scan.epoch, epoch):
 			return false
 		var site_id := int(scan.site)
 		if Catalog.site(site_id).is_empty():
@@ -179,6 +201,26 @@ func restore(raw: Variant, epoch: float, pre_procedural := false, system_limit :
 		previous_site = site_id
 	_records = restored
 	_discovered = surveyed_systems
+	return true
+
+
+static func _restore_sector_systems(raw: Variant, epoch: float, surveyed: Dictionary[int, float]) -> bool:
+	if not raw is Array or raw.is_empty():
+		return false
+	var previous_epoch := -1.0
+	for group: Variant in raw:
+		if not group is Array or group.size() != 2 or not _valid_epoch(group[0], epoch):
+			return false
+		var scan_epoch := float(group[0])
+		if scan_epoch <= previous_epoch or not group[1] is Array or group[1].is_empty():
+			return false
+		var previous := Catalog.SYSTEM_COUNT - 1
+		for id: Variant in group[1]:
+			if not _valid_sorted_id(id, previous, Catalog.SYSTEM_ID_LIMIT) or surveyed.has(int(id)):
+				return false
+			previous = int(id)
+			surveyed[previous] = scan_epoch
+		previous_epoch = scan_epoch
 	return true
 
 

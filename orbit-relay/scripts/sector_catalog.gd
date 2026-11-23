@@ -2,6 +2,7 @@ extends RefCounted
 ## Stable site IDs are used by navigation, visuals and saved flights.
 
 const ProceduralSystems = preload("res://scripts/procedural_systems.gd")
+const StreamedGalaxy := preload("res://scripts/streamed_galaxy.gd")
 const SECTOR_SIZE := ProceduralSystems.SECTOR_SIZE
 const GENERATED_SCAN_RANGE := 10.5
 const GENERATED_JUMP_ENTRY := 5.0
@@ -43,6 +44,14 @@ const PRE_ATLAS_DESTINATION_COUNT := PRE_EXPANDED_DESTINATION_COUNT + Procedural
 const PRE_RICH_SYSTEMS_DESTINATION_COUNT := PRE_ATLAS_DESTINATION_COUNT + ProceduralSystems.OUTER_SYSTEM_COUNT * ProceduralSystems.TARGETS_PER_SYSTEM
 const PRE_REACH_DESTINATION_COUNT := PRE_RICH_SYSTEMS_DESTINATION_COUNT + ProceduralSystems.MOON_COUNT + ProceduralSystems.GAS_GIANT_COUNT
 const DESTINATION_COUNT := PRE_REACH_DESTINATION_COUNT + ProceduralSystems.REACH_SITE_COUNT
+const GALAXY_SYSTEM_COUNT := SYSTEM_COUNT + StreamedGalaxy.SYSTEMS
+const SYSTEM_ID_LIMIT := GALAXY_SYSTEM_COUNT
+const SITE_ID_LIMIT := DESTINATION_COUNT + StreamedGalaxy.SYSTEMS * StreamedGalaxy.SITES_PER_SYSTEM
+const GALAXY_BOUNDS := StreamedGalaxy.BOUNDS
+const GALAXY_CENTER_SECTOR := StreamedGalaxy.CORE_SECTOR
+const GALAXY_CENTER_SYSTEM := SYSTEM_COUNT
+const MAX_CACHED_STREAMED_SYSTEMS := 128
+const MAX_STREAMED_QUERY_LY := 64.0
 const GROUND_BODY := 12
 const VELAR_STAR_ID := 14
 const TERRACE_ID := PRE_SURFACE_DESTINATION_COUNT
@@ -188,11 +197,15 @@ static var _frontier := ProceduralSystems.build_frontier(PRE_EXPANDED_DESTINATIO
 static var _outer := ProceduralSystems.build_outer(PRE_ATLAS_DESTINATION_COUNT, _frontier.systems)
 static var _reach := ProceduralSystems.build_reach(PRE_REACH_DESTINATION_COUNT, _outer.systems)
 static var _generated_index := _index_generated_systems()
+static var _streamed: Dictionary[int, Dictionary] = {}
 
 
 static func site(id: int) -> Dictionary:
-	if id < 0 or id >= DESTINATION_COUNT:
+	if not is_site_id(id):
 		return {}
+	if id >= DESTINATION_COUNT:
+		var entry := _streamed_for(system_of_site(id))
+		return entry.sites[(id - DESTINATION_COUNT) % StreamedGalaxy.SITES_PER_SYSTEM]
 	if id >= PRE_REACH_DESTINATION_COUNT:
 		return _reach.sites[id - PRE_REACH_DESTINATION_COUNT]
 	if id >= PRE_ATLAS_DESTINATION_COUNT:
@@ -207,8 +220,10 @@ static func site(id: int) -> Dictionary:
 
 
 static func system(id: int) -> Dictionary:
-	if id < 0 or id >= SYSTEM_COUNT:
+	if not is_system_id(id):
 		return {}
+	if is_extended_system(id):
+		return _streamed_for(id).system
 	if id >= PRE_REACH_SYSTEM_COUNT:
 		return _reach.systems[id - PRE_REACH_SYSTEM_COUNT]
 	if id >= PRE_ATLAS_SYSTEM_COUNT:
@@ -221,10 +236,37 @@ static func system(id: int) -> Dictionary:
 
 
 static func is_generated_system(id: int) -> bool:
-	return id >= AUTHORED_SYSTEM_COUNT and id < SYSTEM_COUNT
+	return id >= AUTHORED_SYSTEM_COUNT and id < SYSTEM_ID_LIMIT
+
+
+static func is_system_id(id: int) -> bool:
+	return id >= 0 and id < SYSTEM_ID_LIMIT
+
+
+static func is_site_id(id: int) -> bool:
+	return id >= 0 and id < SITE_ID_LIMIT
+
+
+static func is_extended_system(id: int) -> bool:
+	return id >= SYSTEM_COUNT and id < SYSTEM_ID_LIMIT
+
+
+static func _streamed_for(id: int) -> Dictionary:
+	if _streamed.has(id):
+		return _streamed[id]
+	if _streamed.size() >= MAX_CACHED_STREAMED_SYSTEMS:
+		_streamed.erase(_streamed.keys()[0])
+	var ordinal := id - SYSTEM_COUNT
+	var entry := StreamedGalaxy.build_system(ordinal, DESTINATION_COUNT + ordinal * StreamedGalaxy.SITES_PER_SYSTEM)
+	_streamed[id] = entry
+	return entry
 
 
 static func system_position3(id: int) -> Vector3:
+	if is_extended_system(id):
+		var ordinal := id - SYSTEM_COUNT
+		var address := StreamedGalaxy.address(ordinal)
+		return StreamedGalaxy.position_at(ordinal, Vector2i(address.x, address.y), address.z)
 	var entry := system(id)
 	if is_generated_system(id):
 		return entry.position_3d
@@ -233,13 +275,30 @@ static func system_position3(id: int) -> Vector3:
 
 
 static func sector_coordinates(id: int) -> Vector2i:
+	if is_extended_system(id):
+		var address := StreamedGalaxy.address(id - SYSTEM_COUNT)
+		return Vector2i(address.x, address.y)
 	var position := system_position3(id)
 	return Vector2i(floori(position.x / SECTOR_SIZE), floori(position.y / SECTOR_SIZE))
 
 
-static func generated_systems_near(system_id: int, radius: float) -> Array[int]:
+static func sector_system_ids(coordinates: Vector2i) -> Array[int]:
+	var result: Array[int] = []
+	result.append_array(_generated_index.authored.get(coordinates, []))
+	result.append_array(_generated_index.sectors.get(coordinates, []))
+	for ordinal: int in StreamedGalaxy.sector_ordinals(coordinates):
+		result.append(SYSTEM_COUNT + ordinal)
+	return result
+
+
+static func galaxy_sector_count(coordinates: Vector2i) -> int:
+	return StreamedGalaxy.sector_count(coordinates) + _generated_index.authored.get(coordinates, []).size() \
+		+ _generated_index.sectors.get(coordinates, []).size()
+
+
+static func generated_systems_near(system_id: int, radius: float, include_extension := false) -> Array[int]:
 	var found: Array[int] = []
-	if system_id < 0 or system_id >= SYSTEM_COUNT or not is_finite(radius) or radius <= 0.0:
+	if not is_system_id(system_id) or not is_finite(radius) or radius <= 0.0:
 		return found
 	var position := system_position3(system_id)
 	var plane := Vector2(position.x, position.y)
@@ -253,12 +312,38 @@ static func generated_systems_near(system_id: int, radius: float) -> Array[int]:
 			for candidate: int in sectors.get(Vector2i(x, y), []):
 				if candidate != system_id and position.distance_to(system_position3(candidate)) <= radius:
 					found.append(candidate)
+	if include_extension or is_extended_system(system_id):
+		# The extension only streams local searches. Chart density uses sector counts.
+		_append_streamed_near(found, system_id, position, minf(radius, MAX_STREAMED_QUERY_LY))
 	found.sort()
 	return found
 
 
+static func _append_streamed_near(found: Array[int], origin: int, position: Vector3, radius: float) -> void:
+	var plane := Vector2(position.x, position.y)
+	var extent := Vector2.ONE * radius
+	var first := Vector2i(((plane - extent) / SECTOR_SIZE).floor().max(Vector2(GALAXY_BOUNDS.position)))
+	var last := Vector2i(((plane + extent) / SECTOR_SIZE).floor().min(Vector2(GALAXY_BOUNDS.end - Vector2i.ONE)))
+	var radius_squared := radius * radius
+	for y in range(first.y, last.y + 1):
+		for x in range(first.x, last.x + 1):
+			var sector := Vector2i(x, y)
+			var slot := 0
+			for ordinal: int in StreamedGalaxy.sector_ordinals(sector):
+				var id := SYSTEM_COUNT + ordinal
+				if id != origin and position.distance_squared_to(StreamedGalaxy.position_at(ordinal, sector, slot)) <= radius_squared:
+					found.append(id)
+				slot += 1
+
+
 static func _index_generated_systems() -> Dictionary:
 	var sectors := {}
+	var authored := {}
+	for id in range(AUTHORED_SYSTEM_COUNT):
+		var sector := sector_coordinates(id)
+		if not authored.has(sector):
+			authored[sector] = []
+		authored[sector].append(id)
 	var first := Vector2i.ZERO
 	var last := Vector2i.ZERO
 	for id in range(AUTHORED_SYSTEM_COUNT, SYSTEM_COUNT):
@@ -268,12 +353,15 @@ static func _index_generated_systems() -> Dictionary:
 		if not sectors.has(sector):
 			sectors[sector] = []
 		sectors[sector].append(id)
-	return {"sectors": sectors, "bounds": Rect2i(first, last - first + Vector2i.ONE)}
+	return {"sectors": sectors, "authored": authored, "bounds": Rect2i(first, last - first + Vector2i.ONE)}
 
 
 static func system_of_site(id: int) -> int:
-	if id < 0 or id >= DESTINATION_COUNT:
+	if not is_site_id(id):
 		return -1
+	if id >= DESTINATION_COUNT:
+		@warning_ignore("integer_division")
+		return SYSTEM_COUNT + (id - DESTINATION_COUNT) / StreamedGalaxy.SITES_PER_SYSTEM
 	if id >= PRE_REACH_DESTINATION_COUNT:
 		return PRE_REACH_SYSTEM_COUNT + int(_reach.owners[id - PRE_REACH_DESTINATION_COUNT])
 	if id >= PRE_RICH_SYSTEMS_DESTINATION_COUNT:
@@ -340,19 +428,19 @@ static func stellar_heat(system_id: int) -> float:
 
 
 static func jump_cost(origin: int, destination: int) -> int:
-	if origin == destination or origin < 0 or origin >= SYSTEM_COUNT or destination < 0 or destination >= SYSTEM_COUNT:
+	if origin == destination or not is_system_id(origin) or not is_system_id(destination):
 		return 0
 	if origin < AUTHORED_SYSTEM_COUNT and destination < AUTHORED_SYSTEM_COUNT:
 		return JUMP_COSTS[origin][destination]
 	return ceili(jump_distance(origin, destination) * GENERATED_JUMP_PER_LIGHT_YEAR + GENERATED_JUMP_ENTRY)
 
 
-static func jump_candidates(origin: int, base_budget: int) -> Array[int]:
+static func jump_candidates(origin: int, base_budget: int, include_extension := false) -> Array[int]:
 	# Keep the authored fare table eligible even when its fares differ from the distance formula.
 	var distance := (base_budget - GENERATED_JUMP_ENTRY) / GENERATED_JUMP_PER_LIGHT_YEAR
 	var candidates: Array[int] = []
 	if distance >= 0.0:
-		candidates = generated_systems_near(origin, distance + 0.00001)
+		candidates = generated_systems_near(origin, distance + 0.00001, include_extension)
 	for id in range(AUTHORED_SYSTEM_COUNT):
 		if id != origin:
 			candidates.append(id)
@@ -360,7 +448,7 @@ static func jump_candidates(origin: int, base_budget: int) -> Array[int]:
 
 
 static func jump_distance(origin: int, destination: int) -> float:
-	if origin == destination or origin < 0 or origin >= SYSTEM_COUNT or destination < 0 or destination >= SYSTEM_COUNT:
+	if origin == destination or not is_system_id(origin) or not is_system_id(destination):
 		return 0.0
 	if is_generated_system(origin) or is_generated_system(destination):
 		return system_position3(origin).distance_to(system_position3(destination))

@@ -33,7 +33,7 @@ static func gravity_parameter(site_id: int) -> float:
 
 static func acceleration(sim: RefCounted, point: Vector3) -> Vector3:
 	var system: int = sim.system_id
-	if system < 0 or system >= Catalog.SYSTEM_COUNT:
+	if not Catalog.is_system_id(system):
 		return Vector3.ZERO
 	var total := Vector3.ZERO
 	for source: Attractor in _sources_for(system):
@@ -42,7 +42,7 @@ static func acceleration(sim: RefCounted, point: Vector3) -> Vector3:
 
 
 static func acceleration_at_epoch(system: int, point: Vector3, epoch: float) -> Vector3:
-	if system < 0 or system >= Catalog.SYSTEM_COUNT:
+	if not Catalog.is_system_id(system):
 		return Vector3.ZERO
 	var total := Vector3.ZERO
 	for source: Attractor in _sources_for(system):

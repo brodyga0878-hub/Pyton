@@ -59,7 +59,7 @@ static var _tracks: Dictionary[int, Track] = {}
 
 
 static func sample(site_id: int, seconds: float) -> Dictionary:
-	if site_id < 0 or site_id >= Catalog.DESTINATION_COUNT:
+	if not Catalog.is_site_id(site_id):
 		return {"position": Vector3.ZERO, "velocity": Vector3.ZERO}
 	if Ground.is_port(site_id):
 		var host := Ground.body(site_id)
@@ -94,11 +94,11 @@ static func sample(site_id: int, seconds: float) -> Dictionary:
 static func orbit_parent(site_id: int) -> int:
 	if Ground.is_port(site_id):
 		return Ground.body(site_id)
-	return _track_for(site_id).parent if site_id >= 0 and site_id < Catalog.DESTINATION_COUNT else -1
+	return _track_for(site_id).parent if Catalog.is_site_id(site_id) else -1
 
 
 static func orbit_points(site_id: int, epoch := 0.0) -> PackedVector3Array:
-	if site_id < 0 or site_id >= Catalog.DESTINATION_COUNT:
+	if not Catalog.is_site_id(site_id):
 		return PackedVector3Array()
 	var track := _track_for(site_id)
 	if track.period > 0.0 and track.points.is_empty():
@@ -116,11 +116,11 @@ static func orbit_points(site_id: int, epoch := 0.0) -> PackedVector3Array:
 static func period(site_id: int) -> float:
 	if Ground.is_port(site_id):
 		return period(Ground.body(site_id))
-	return _track_for(site_id).period if site_id >= 0 and site_id < Catalog.DESTINATION_COUNT else 0.0
+	return _track_for(site_id).period if Catalog.is_site_id(site_id) else 0.0
 
 
 static func extrema(site_id: int) -> Vector2:
-	if site_id < 0 or site_id >= Catalog.DESTINATION_COUNT or Ground.is_port(site_id):
+	if not Catalog.is_site_id(site_id) or Ground.is_port(site_id):
 		return Vector2.ZERO
 	var track := _track_for(site_id)
 	if track.period <= 0.0:

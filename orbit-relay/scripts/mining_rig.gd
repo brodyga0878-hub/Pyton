@@ -34,11 +34,12 @@ var ore_hold: int:
 		return _hold_size(_cargo)
 var reserve: int:
 	get:
-		return _reserves[_site_id]
+		return reserve_at(_site_id)
 
 var _site_id := FIRST_MINE_SITE
 var _cargo: Dictionary = _empty_cargo()
 var _reserves: Array[int] = _initial_reserves()
+var _sector_reserves: Dictionary[String, int] = {}
 
 
 func select_site(id: int) -> bool:
@@ -49,15 +50,29 @@ func select_site(id: int) -> bool:
 
 
 func reserve_at(id: int) -> int:
-	return _reserves[id] if id >= 0 and id < _reserves.size() else 0
+	if id >= 0 and id < _reserves.size():
+		return _reserves[id]
+	var key := str(id)
+	if _sector_reserves.has(key):
+		return _sector_reserves[key]
+	return int(Catalog.site(id).get("reserve", 0))
 
 
 func extract_remote(site: int, amount: int) -> int:
 	if phase != STOWED or amount <= 0 or not Catalog.is_mine_site(site):
 		return 0
-	var extracted := mini(amount, _reserves[site])
-	_reserves[site] -= extracted
+	var remaining := reserve_at(site)
+	var extracted := mini(amount, remaining)
+	if extracted > 0:
+		_set_reserve(site, remaining - extracted)
 	return extracted
+
+
+func _set_reserve(id: int, remaining: int) -> void:
+	if id < _reserves.size():
+		_reserves[id] = remaining
+	else:
+		_sector_reserves[str(id)] = remaining
 
 
 func cargo_amount(resource: String) -> int:
@@ -120,7 +135,7 @@ func update(delta: float) -> String:
 				var resource: String = Catalog.site(_site_id).resource
 				phase = STOWED
 				_cargo[resource] += pending_ore
-				_reserves[_site_id] -= pending_ore
+				_set_reserve(_site_id, reserve - pending_ore)
 				pending_ore = 0
 				return "mining_loaded"
 	return ""
@@ -152,7 +167,7 @@ func progress() -> float:
 
 
 func snapshot() -> Dictionary:
-	return {
+	var state := {
 		"site_id": _site_id,
 		"phase": phase,
 		"phase_seconds": phase_seconds,
@@ -160,13 +175,20 @@ func snapshot() -> Dictionary:
 		"reserves": _reserves.duplicate(),
 		"pending_ore": pending_ore,
 	}
+	if not _sector_reserves.is_empty():
+		state["sector_reserves"] = _sector_reserves.duplicate()
+	return state
 
 
 func restore(value: Variant, legacy := false, reserve_slots := Catalog.DESTINATION_COUNT,
-		capacity := CAPACITY, market_cargo := false, pre_hydrogen := false, pre_assortment := false) -> bool:
+		capacity := CAPACITY, market_cargo := false, pre_hydrogen := false, pre_assortment := false,
+		allow_extended := false) -> bool:
 	if legacy and value is Dictionary and value.size() == LEGACY_SAVE_FIELDS.size() and value.has_all(LEGACY_SAVE_FIELDS):
 		value = _upgrade_legacy(value)
-	if not value is Dictionary or value.size() != SAVE_FIELDS.size() or not value.has_all(SAVE_FIELDS):
+	if not value is Dictionary or not value.has_all(SAVE_FIELDS):
+		return false
+	var has_sector_reserves: bool = value.has("sector_reserves")
+	if value.size() != SAVE_FIELDS.size() + int(has_sector_reserves) or (has_sector_reserves and not allow_extended):
 		return false
 	if not _integer_in_range(value.phase, STOWED, RETURNING):
 		return false
@@ -175,7 +197,8 @@ func restore(value: Variant, legacy := false, reserve_slots := Catalog.DESTINATI
 		return false
 	if not ShipSystems.is_cargo_capacity(capacity):
 		return false
-	if not _integer_in_range(value.site_id, 0, saved_count - 1) or not Catalog.is_mine_site(int(value.site_id)):
+	var highest_site := Catalog.SITE_ID_LIMIT - 1 if allow_extended else saved_count - 1
+	if not _integer_in_range(value.site_id, 0, highest_site) or not Catalog.is_mine_site(int(value.site_id)):
 		return false
 	if not _integer_in_range(value.pending_ore, 0, BATCH):
 		return false
@@ -213,6 +236,21 @@ func restore(value: Variant, legacy := false, reserve_slots := Catalog.DESTINATI
 		restored_reserves[id] = remaining
 		if not market_cargo and Catalog.is_mine_site(id):
 			extracted[deposit.resource] += initial_reserve - remaining
+	var sector_reserves: Dictionary[String, int] = {}
+	if has_sector_reserves:
+		if not value.sector_reserves is Dictionary:
+			return false
+		for key: Variant in value.sector_reserves:
+			if not key is String or not key.is_valid_int():
+				return false
+			var id := int(key)
+			if key != str(id) or id < Catalog.DESTINATION_COUNT or not Catalog.is_mine_site(id):
+				return false
+			var deposit := Catalog.site(id)
+			var remaining: Variant = value.sector_reserves[key]
+			if not _integer_in_range(remaining, 0, int(deposit.reserve) - 1):
+				return false
+			sector_reserves[key] = int(remaining)
 	var restored_cargo := _empty_cargo()
 	for good: String in cargo_fields:
 		var limit := capacity if market_cargo else mini(capacity, int(extracted[good]))
@@ -222,7 +260,12 @@ func restore(value: Variant, legacy := false, reserve_slots := Catalog.DESTINATI
 	var restored_hold := _hold_size(restored_cargo)
 	if restored_hold > capacity:
 		return false
-	var batch := _next_batch(capacity - restored_hold, restored_reserves[restored_site])
+	var remaining: int
+	if restored_site < restored_reserves.size():
+		remaining = restored_reserves[restored_site]
+	else:
+		remaining = int(sector_reserves.get(str(restored_site), Catalog.site(restored_site).reserve))
+	var batch := _next_batch(capacity - restored_hold, remaining)
 	if restored_phase != STOWED and batch == 0:
 		return false
 	var expected_pending := batch if restored_phase in [READY, RETURNING] else 0
@@ -234,6 +277,7 @@ func restore(value: Variant, legacy := false, reserve_slots := Catalog.DESTINATI
 	phase_seconds = restored_seconds
 	_cargo = restored_cargo
 	_reserves = restored_reserves
+	_sector_reserves = sector_reserves
 	pending_ore = restored_pending
 	cargo_capacity = capacity
 	return true

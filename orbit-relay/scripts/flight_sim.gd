@@ -53,7 +53,7 @@ const StationHull := preload("res://scripts/station_hull.gd")
 const LawNetwork := preload("res://scripts/law_network.gd")
 const FlightRadio := preload("res://scripts/flight_radio.gd")
 const ShipHangar := preload("res://scripts/ship_hangar.gd")
-const SAVE_SCHEMA := 55
+const SAVE_SCHEMA := 56
 const INTERRUPTED_LABELS := {
 	"autopilot": "автопилот", "rig_approach": "заход к буру", "orbit_maneuver": "орбитальный манёвр",
 	"rendezvous": "автоматическое сближение", "patrol_course": "наведение дозора",
@@ -4609,12 +4609,13 @@ func route_preview(goal: int) -> Dictionary:
 func _plot_route(goal: int, known: Array[int], capacity: float, first_reserve: float, first_waste: int) -> Dictionary:
 	var payload: int = mining.ore_hold
 	var later_waste := 0 if ship.drive_kind == ShipSystems.DRIVE_MILITARY else -1
+	var include_extension := not known.is_empty() and Catalog.is_extended_system(known.back())
 	var tariff := func(origin: int, destination: int) -> int:
 		var reserve := first_reserve if origin == system_id else capacity
 		return ship.jump_tariff(Catalog.jump_cost(origin, destination), payload, reserve, first_waste if origin == system_id else later_waste)
 	var nearby := func(origin: int, budget: float) -> Array[int]:
 		var reserve := first_reserve if origin == system_id else capacity
-		return Catalog.jump_candidates(origin, ship.base_jump_budget(budget, payload, reserve, first_waste if origin == system_id else later_waste))
+		return Catalog.jump_candidates(origin, ship.base_jump_budget(budget, payload, reserve, first_waste if origin == system_id else later_waste), include_extension)
 	return GalacticRoute.plan(system_id, goal, known, capacity, minf(first_reserve, ship.waste_budget(first_waste)), tariff, jump_travel_seconds, nearby)
 
 
@@ -6049,6 +6050,7 @@ func restore(state: Dictionary) -> bool:
 	if not _integer(state.get("schema"), 1, SAVE_SCHEMA):
 		return false
 	var schema := int(state.schema)
+	var pre_extended := schema < 56
 	var pre_reach := schema < 51
 	if schema >= 51 and not state.get("navigation_computer") is bool:
 		return false
@@ -6129,7 +6131,8 @@ func restore(state: Dictionary) -> bool:
 			systems = Catalog.AUTHORED_SYSTEM_COUNT
 		if pre_expansion:
 			systems = Catalog.PRE_TRAFFIC_SYSTEM_COUNT if pre_traffic else Catalog.CORE_SYSTEM_COUNT
-		if not _integer(state.get("system_id"), 0, systems - 1) or not _integer(state.get("jump_target"), -1, systems - 1):
+		var system_limit := systems if pre_extended else Catalog.SYSTEM_ID_LIMIT
+		if not _integer(state.get("system_id"), 0, system_limit - 1) or not _integer(state.get("jump_target"), -1, system_limit - 1):
 			return false
 		restored_system = int(state.system_id)
 		restored_jump = int(state.jump_target)
@@ -6187,12 +6190,13 @@ func restore(state: Dictionary) -> bool:
 		site_count = Catalog.PRE_SURFACE_DESTINATION_COUNT
 	if pre_galaxy:
 		site_count = schema + 1 if pre_sector else (Catalog.SITE_COUNT if pre_fuel else Catalog.TARGET_COUNT)
+	var site_limit := site_count if pre_extended else Catalog.SITE_ID_LIMIT
 	for field in ["docked", "contract_origin", "contract_destination"]:
 		if not _integer(state.get(field), -1, site_count - 1):
 			return false
 		if int(state[field]) >= 0 and not Catalog.is_port(int(state[field])):
 			return false
-	if not _integer(state.get("target"), 0, site_count - 1) or not _integer(state.get("contract_stage"), 0, 2):
+	if not _integer(state.get("target"), 0, site_limit - 1) or not _integer(state.get("contract_stage"), 0, 2):
 		return false
 	var restored_expedition := Expedition.new()
 	var restored_factions := FactionFronts.new()
@@ -6225,7 +6229,7 @@ func restore(state: Dictionary) -> bool:
 			if not _site_available(member.origin, restored_expedition):
 				return false
 	if not pre_cartography:
-		if not restored_cartography.restore(state.get("cartography"), restored_epoch, pre_procedural, systems, site_count):
+		if not restored_cartography.restore(state.get("cartography"), restored_epoch, pre_procedural, systems, site_count, not pre_extended):
 			return false
 		for site: int in restored_cartography.surveyed_sites():
 			if not _site_available(site, restored_expedition, restored_cartography):
@@ -6241,7 +6245,7 @@ func restore(state: Dictionary) -> bool:
 		return false
 	if not pre_frames:
 		var frame_sites := Catalog.targets_for(restored_system).filter(
-			func(id: int) -> bool: return id < site_count and _site_available(id, restored_expedition, restored_cartography))
+			func(id: int) -> bool: return id < site_limit and _site_available(id, restored_expedition, restored_cartography))
 		if not restored_frame.restore(state.get("frame"), frame_sites):
 			return false
 	if not _site_available(int(state.target), restored_expedition, restored_cartography):
@@ -6364,12 +6368,13 @@ func restore(state: Dictionary) -> bool:
 	if (restored_ship.hull == 0.0) != restored_escape.active:
 		return false
 	var restored_route: Array[int] = []
+	var system_limit := systems if pre_extended else Catalog.SYSTEM_ID_LIMIT
 	if not pre_jump_route:
 		var remaining: Variant = state.get("jump_route")
-		if not remaining is Array or remaining.size() >= systems:
+		if not remaining is Array or remaining.size() >= known.size():
 			return false
 		for system: Variant in remaining:
-			if not _integer(system, 0, systems - 1):
+			if not _integer(system, 0, system_limit - 1):
 				return false
 			restored_route.append(int(system))
 		if not restored_route.is_empty():
@@ -6440,11 +6445,18 @@ func restore(state: Dictionary) -> bool:
 			return false
 	var mining_count := Catalog.SITE_COUNT if pre_galaxy else site_count
 	if schema >= 2 and not restored_mining.restore(state.get("mining"), schema == 2, mining_count,
-			restored_ship.cargo_capacity(), not pre_economy, pre_dual_fuel, pre_assortment):
+			restored_ship.cargo_capacity(), not pre_economy, pre_dual_fuel, pre_assortment, not pre_extended):
 		return false
+	if not pre_extended:
+		if (restored_mining.site_id >= Catalog.DESTINATION_COUNT
+				and not _site_available(restored_mining.site_id, restored_expedition, restored_cartography)):
+			return false
+		for address: String in state.mining.get("sector_reserves", {}):
+			if not _site_available(int(address), restored_expedition, restored_cartography):
+				return false
 	var restored_processor := SurfaceProcessor.new()
 	if schema >= 51:
-		if not restored_processor.restore(state.get("surface_processor"), restored_epoch, site_count):
+		if not restored_processor.restore(state.get("surface_processor"), restored_epoch, site_limit):
 			return false
 		if restored_processor.active() and not _site_available(restored_processor.site, restored_expedition, restored_cartography):
 			return false
@@ -6454,12 +6466,12 @@ func restore(state: Dictionary) -> bool:
 			return false
 		if restored_remote_rig.active():
 			var rig_site := restored_remote_rig.site_id
-			if rig_site >= site_count or not _site_available(rig_site, restored_expedition, restored_cartography):
+			if rig_site >= site_limit or not _site_available(rig_site, restored_expedition, restored_cartography):
 				return false
 	var restored_rig_fleet := RigFleet.new()
 	var rig_fleet_data: Variant = state.get("rig_fleet") if schema >= 51 else {"selected": 0, "extra": []}
 	if not restored_rig_fleet.restore(rig_fleet_data, restored_remote_rig, restored_epoch, restored_mining,
-		func(site: int) -> bool: return site < site_count and _site_available(site, restored_expedition, restored_cartography)):
+		func(site: int) -> bool: return site < site_limit and _site_available(site, restored_expedition, restored_cartography)):
 		return false
 	var restored_orbital_mining := OrbitalMining.new()
 	if not pre_orbital_mining:
@@ -6475,7 +6487,7 @@ func restore(state: Dictionary) -> bool:
 		if state.landed:
 			restored_landing = ASTEROID_TARGET
 	elif not pre_sector:
-		if not _integer(state.get("landed_site"), -1, site_count - 1) or not _integer(state.get("planned_target"), -1, site_count - 1):
+		if not _integer(state.get("landed_site"), -1, site_limit - 1) or not _integer(state.get("planned_target"), -1, site_limit - 1):
 			return false
 		restored_landing = int(state.landed_site)
 		restored_plan = int(state.planned_target)
@@ -6554,7 +6566,7 @@ func restore(state: Dictionary) -> bool:
 			receipt_fields.append("pricing")
 		if schema >= 50 and restored_transit.has("requested"):
 			receipt_fields.append("requested")
-			if not _integer(restored_transit.requested, 0, systems - 1):
+			if not _integer(restored_transit.requested, 0, system_limit - 1):
 				return false
 			restored_requested = int(restored_transit.requested)
 			if restored_requested in [restored_system, restored_jump] or restored_requested not in known or not restored_route.is_empty():

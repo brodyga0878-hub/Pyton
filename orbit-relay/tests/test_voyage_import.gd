@@ -76,7 +76,7 @@ func _test_invalid_reports() -> void:
 	_check_archive("non-UTF8 state", metadata, PackedByteArray([0x7b, 0xc0, 0x7d]), "", {}, ERR_INVALID_DATA)
 	_check_archive("malformed state", metadata, "[1, 2, 3]".to_utf8_buffer(), "", {}, ERR_INVALID_DATA)
 	_check_archive("oversized expanded state", metadata, " ".repeat(SessionIO.MAX_STATE_BYTES + 1).to_utf8_buffer(),
-		"", {}, ERR_INVALID_DATA)
+		"", {}, ERR_FILE_CORRUPT)
 	var bad_crc := _directory.path_join("altered crc.zip")
 	if _expect(_create_zip(bad_crc, metadata, valid_state, "", {}) and _alter_crc(bad_crc, "flight.json"),
 		"Create a ZIP with valid JSON bytes and bad CRC headers"):

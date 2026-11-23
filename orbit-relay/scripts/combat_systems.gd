@@ -178,7 +178,7 @@ func damage_module() -> String:
 
 
 func incoming_shot(source: Vector3, ship_position: Vector3, system: int, epoch: float, hardened := false) -> bool:
-	if not _valid_epoch(epoch) or system < 0 or system >= Catalog.SYSTEM_COUNT:
+	if not _valid_epoch(epoch) or not Catalog.is_system_id(system):
 		return false
 	if not _valid_position(source) or not _valid_position(ship_position) or source.distance_squared_to(ship_position) <= 0.000001:
 		return false
@@ -286,7 +286,7 @@ func snapshot() -> Dictionary:
 
 func restore(raw: Variant, epoch: float, system: int, legacy := false, pre_pulse := false,
 		rack_capacity := Ordnance.SLOT_COUNT, legacy_rack := false) -> bool:
-	if not _valid_epoch(epoch) or system < 0 or system >= Catalog.SYSTEM_COUNT:
+	if not _valid_epoch(epoch) or not Catalog.is_system_id(system):
 		return false
 	var extra_fields := 0 if legacy else (2 if pre_pulse else 3)
 	if not raw is Dictionary or raw.size() != SAVE_FIELDS.size() + extra_fields or not raw.has_all(SAVE_FIELDS):

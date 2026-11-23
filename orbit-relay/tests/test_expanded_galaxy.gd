@@ -2,6 +2,7 @@ extends SceneTree
 
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const Orbit := preload("res://scripts/orbit_ephemeris.gd")
+const Gravity := preload("res://scripts/orbital_dynamics.gd")
 const Flight := preload("res://scripts/flight_sim.gd")
 const Fixture := preload("res://tests/flight_fixture.gd")
 const Session := preload("res://scripts/session_io.gd")
@@ -21,6 +22,9 @@ func _run() -> void:
 	_test_catalog()
 	_test_schema_45()
 	_test_round_trip()
+	_test_coordinate_catalog()
+	_test_center_corridor()
+	_test_streamed_round_trip()
 	for failure: String in _failures:
 		printerr(failure)
 	print("Expanded galaxy integration: %d checks, %d failures" % [_checks, _failures.size()])
@@ -152,6 +156,115 @@ func _test_round_trip() -> void:
 	_expect(cold.system_id == HOME and return_legs >= 3 and _approach(cold, 0) and cold.docked == 0
 		and cold.mining.cargo_amount(resource) == Rig.BATCH and cold.ship.hull == 100.0,
 		"Return from the new frontier to the original dock with surveyed minerals and full hull")
+
+
+func _test_coordinate_catalog() -> void:
+	var center := Catalog.GALAXY_CENTER_SECTOR
+	var center_id := Catalog.GALAXY_CENTER_SYSTEM
+	var last := Catalog.GALAXY_BOUNDS.end - Vector2i.ONE
+	_expect(Catalog.SYSTEM_ID_LIMIT == 513933476 and Catalog.sector_coordinates(center_id) == center
+		and Catalog.is_extended_system(center_id) and Catalog.system(center_id).name == "Сердцевина",
+		"The same-scale extension has a stable address for its own central system")
+	var core_count := Catalog.galaxy_sector_count(center)
+	var rim_count := Catalog.galaxy_sector_count(last)
+	_expect(core_count > rim_count and rim_count > 0 and Catalog.galaxy_sector_count(last + Vector2i.ONE) == 0,
+		"The density decreases towards the outskirts and ends at the address boundary")
+	var sectors := [center, Vector2i.ZERO, last, Catalog.GALAXY_BOUNDS.position]
+	for sector: Vector2i in sectors:
+		var systems := Catalog.sector_system_ids(sector)
+		var streamed := systems.filter(func(id: int) -> bool: return Catalog.is_extended_system(id))
+		if not _expect(systems.size() == Catalog.galaxy_sector_count(sector) and not streamed.is_empty(),
+			"Each requested sector matches its density count"):
+			continue
+		var id := int(streamed.back())
+		var targets := Catalog.targets_for(id)
+		_expect(Catalog.sector_coordinates(id) == sector and targets.size() == 3 and Catalog.ports_for(id).is_empty()
+			and targets.all(func(site: int) -> bool: return Catalog.is_site_id(site) and Catalog.system_of_site(site) == id),
+			"Streamed targets have stable IDs and owners including near the edge")
+	_expect(not Catalog.is_system_id(Catalog.SYSTEM_ID_LIMIT) and not Catalog.is_site_id(Catalog.SITE_ID_LIMIT),
+		"Coordinates beyond the address limits cannot enter saves or routes")
+
+
+func _test_center_corridor() -> void:
+	var pilot := Flight.new()
+	var center := Catalog.GALAXY_CENTER_SECTOR
+	var previous := HOME
+	var coordinates := Vector2i.ZERO
+	while true:
+		var systems := Catalog.sector_system_ids(coordinates)
+		var streamed := systems.filter(func(id: int) -> bool: return Catalog.is_extended_system(id))
+		if streamed.is_empty():
+			_expect(false, "Every step towards the core has a generated sector anchor")
+			return
+		var anchor := int(streamed.front())
+		var neighbors := Catalog.generated_systems_near(previous, Catalog.GENERATED_SCAN_RANGE, true)
+		if anchor not in neighbors or pilot.jump_tariff(previous, anchor) > pilot.ship.active_jump_capacity():
+			_expect(false, "Core path crosses the ordinary radio or fuel limits at %s" % coordinates)
+			return
+		previous = anchor
+		if coordinates == center:
+			break
+		if coordinates.x != center.x:
+			coordinates.x += signi(center.x - coordinates.x)
+		else:
+			coordinates.y += signi(center.y - coordinates.y)
+	_expect(previous == Catalog.GALAXY_CENTER_SYSTEM,
+		"The core is reachable from the starter route by ordinary scans and attainable jump legs")
+
+
+func _test_streamed_round_trip() -> void:
+	var flight := Flight.new()
+	if not _expect(Fixture.depart(flight) and flight.scan_galaxy(),
+		"Discover coordinate-addressed systems from the ordinary starter departure"):
+		return
+	var destination := _nearest_streamed(flight)
+	if not _expect(destination >= 0 and flight.plan_jump(destination) and _travel(flight, destination, 0),
+		"Physically jump from the original world into the streamed catalogue"):
+		return
+	var planet: int = Catalog.mines_for(destination)[0]
+	var resource: String = Catalog.site(planet).resource
+	var reserve := flight.mining.reserve_at(planet)
+	var world := Orbit.sample(planet, flight.orbit_time)
+	_expect(Orbit.period(planet) > 0.0 and not Vector3(world.velocity).is_zero_approx()
+		and not Gravity.acceleration(flight, flight.position).is_zero_approx(),
+		"The streamed system has its own moving targets and gravitational field")
+	if not _expect(_approach(flight, planet) and flight.landed_site == planet and flight.survey_action(planet)
+		and flight.mine_action() and _advance(flight, func() -> bool: return flight.mining.phase == Rig.READY, 25.0)
+		and flight.mine_action() and _advance(flight, func() -> bool: return flight.mining.phase == Rig.STOWED, 6.0),
+		"Survey, land and mine a body whose ID is outside the legacy reserve array"):
+		return
+	var save_path := "user://coordinate-galaxy-route.json"
+	var state := flight.snapshot()
+	var cold := Flight.new()
+	if not _expect(state.mining.reserves.size() == Catalog.DESTINATION_COUNT
+		and state.mining.get("sector_reserves", {}).size() == 1
+		and Session.save_state(state, save_path) == OK and cold.restore(Session.load_state(save_path)),
+		"The save stores a sparse deposit change and reloads through the ordinary session reader"):
+		return
+	_expect(cold.system_id == destination and cold.landed_site == planet and cold.body_dossier(planet).known
+		and cold.mining.reserve_at(planet) == reserve - Rig.BATCH and cold.mining.cargo_amount(resource) == Rig.BATCH,
+		"Cold loading preserves the same generated body, survey, hold and remaining ore")
+	var forged := state.duplicate(true)
+	forged.mining.sector_reserves[str(planet)] = reserve + 1
+	_expect(not cold.restore(forged) and cold.mining.reserve_at(planet) == reserve - Rig.BATCH,
+		"A forged sparse reserve is rejected before replacing the active flight")
+	if not _expect(cold.plan_route(HOME) and cold.dock_action(), "Plan a normal return to the old world and lift off"):
+		return
+	_expect(_travel(cold, HOME, planet) and _approach(cold, 0) and cold.docked == 0,
+		"Return from the coordinate sector to the original dock")
+
+
+func _nearest_streamed(flight: Flight) -> int:
+	var closest := -1
+	var distance := INF
+	for id: int in flight.known_systems():
+		if not Catalog.is_extended_system(id):
+			continue
+		var gap := Catalog.jump_distance(flight.system_id, id)
+		if gap < distance and flight.jump_tariff(flight.system_id, id) <= flight.ship.jump_fuel:
+			closest = id
+			distance = gap
+	return closest
 
 
 func _travel(flight: Flight, destination: int, nearest_site: int) -> bool:

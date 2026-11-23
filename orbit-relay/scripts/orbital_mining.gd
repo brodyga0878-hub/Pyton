@@ -87,7 +87,7 @@ func restore(raw: Variant, epoch: float, rig: RefCounted, stored_by_site := {}) 
 	if not _number(raw.get("ready_at"), 0.0, epoch + PULSE_SECONDS + CLOCK_TOLERANCE):
 		return false
 	var encoded: Variant = raw.get("fragments")
-	if not encoded is Array or encoded.size() > Catalog.DESTINATION_COUNT:
+	if not encoded is Array:
 		return false
 	var restored: Dictionary[int, Dictionary] = {}
 	var times: Array[float] = []
@@ -95,7 +95,7 @@ func restore(raw: Variant, epoch: float, rig: RefCounted, stored_by_site := {}) 
 	for fragment: Variant in encoded:
 		if not fragment is Dictionary or fragment.size() != FRAGMENT_FIELDS.size() or not fragment.has_all(FRAGMENT_FIELDS):
 			return false
-		if not _integer(fragment.site, 0, Catalog.DESTINATION_COUNT - 1):
+		if not _integer(fragment.site, 0, Catalog.SITE_ID_LIMIT - 1):
 			return false
 		var site := int(fragment.site)
 		if restored.has(site) or not supports_site(site):

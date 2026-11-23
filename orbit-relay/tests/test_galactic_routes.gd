@@ -69,9 +69,11 @@ func _test_planner() -> void:
 		and not Route.plan(HOME, LIMIT, woven_known, 100.0, 25.99).available,
 		"Current fuel constrains the first departure while each later leg can use a full tank")
 	var low_id: Array[int] = [HOME, VELAR, LIMIT]
-	var high_id: Array[int] = [HOME, HEATHER, LIMIT]
-	_expect(Route._better({"path": low_id, "fuel": 66}, {"path": high_id, "fuel": 66})
-		and not Route._better({"path": high_id, "fuel": 66}, {"path": low_id, "fuel": 66}),
+	var equal_fare := func(origin: int, destination: int) -> int:
+		if (origin == HOME and destination in [VELAR, HEATHER]) or (origin in [VELAR, HEATHER] and destination == LIMIT):
+			return 33
+		return 0
+	_expect(Route.plan(HOME, LIMIT, woven_known, 50.0, INF, equal_fare).path == low_id,
 		"Equal-cost equal-length labels resolve deterministically by their system ID sequence")
 	var reversed_known: Array[int] = [HOME, VELAR, HEATHER, FRINGE, LIMIT]
 	_expect(Route.plan(HOME, LIMIT, reversed_known, 50.0) == intermediate,

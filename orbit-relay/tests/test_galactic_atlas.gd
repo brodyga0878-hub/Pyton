@@ -92,10 +92,20 @@ func _test_map_ui() -> void:
 	_expect(pilot.planned_route().goal == Catalog.VELAR_SYSTEM, "Create a real planned route before changing views")
 	_tap(map._atlas_button)
 	await process_frame
-	_expect(map._atlas and map._atlas_button.button_pressed and map._scope_label.text.contains(str(Catalog.SYSTEM_COUNT))
+	_expect(map._atlas and map._atlas_button.button_pressed
+		and map._scope_label.text.replace(" ", "").contains(str(Catalog.GALAXY_SYSTEM_COUNT))
 		and map._drag_button.disabled
-		and chart._systems.size() == 3 and chart._points.size() == 3 and not map._system_buttons.has(Catalog.SYSTEM_COUNT - 1),
+		and chart._systems.size() == 3 and chart._points.size() == 3 and chart._atlas_signals.is_empty()
+		and not map._system_buttons.has(Catalog.SYSTEM_COUNT - 1),
 		"Atlas reveals whole-catalog density without revealing undiscovered destinations or expanding the known list")
+	_tap(map._core_button)
+	await process_frame
+	_expect(chart.atlas_is_local() and chart.atlas_center_sector() == Catalog.GALAXY_CENTER_SECTOR
+		and chart._atlas_sector_rect.get_area() <= GalaxyChart.MAX_ATLAS_SECTORS and not chart._atlas_signals.is_empty(),
+		"Core control zooms the atlased survey to the real core and only loads a bounded sector window")
+	_expect(chart._atlas_signals.has(Catalog.GALAXY_CENTER_SYSTEM) and not chart._points.has(Catalog.GALAXY_CENTER_SYSTEM)
+		and chart.system_at(chart.size * 0.5) == -1 and pilot.snapshot() == before,
+		"Unexplored core signals cannot be selected for a jump and navigation view does not change the live flight")
 	_tap(map._atlas_button)
 	await process_frame
 	var first: Vector2 = chart.marker_position(Catalog.HOME_SYSTEM)
@@ -170,6 +180,24 @@ func _test_map_ui() -> void:
 		and map._dossier_archive_text.text.count("\n\n") == 1 and map._dossier_pages[2].is_visible_in_tree(),
 		"Open the authored archive of another known system using the actual touch controls")
 	_expect(pilot.snapshot() == before, "Exploring each map view leaves the flight, fuel, discoveries and planned route intact")
+	_tap(map._dossier_button)
+	_tap(map._directory_button)
+	_tap(map._scope_button)
+	_tap(map._projection_button)
+	_tap(map._scan_button)
+	await process_frame
+	var streamed: Array[int] = pilot.known_systems().filter(func(id: int) -> bool:
+		return Catalog.is_extended_system(id) and pilot.route_preview(id).available)
+	if _expect(not streamed.is_empty(), "Radio scan makes a streamed system available through the flight map"):
+		var target := streamed[0]
+		var marker: Vector2 = chart.get_global_transform_with_canvas() * chart.marker_position(target)
+		_send(marker, true, 48)
+		_send(marker, false, 48)
+		_expect(map._candidate == target and map._destination.text == Catalog.system(target).name,
+			"An opened streamed system is selectable by touching its own marker")
+		_tap(map._plan_button)
+		_expect(pilot.planned_route().goal == target,
+			"The standard route action saves the streamed destination")
 	_canvas.queue_free()
 	await process_frame
 

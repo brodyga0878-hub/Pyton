@@ -1,5 +1,5 @@
 extends Control
-## Projects catalog coordinates and displays discovered systems, routes and source density.
+## Projects discoveries and routes over a sampled atlas and nearby sectors.
 
 signal rotation_availability_changed(available: bool)
 
@@ -12,8 +12,10 @@ const BORDER := Color("365561")
 const FIELD := Color("081622")
 const MIN_ZOOM := 1.0
 const MAX_ZOOM := 32.0
-const DENSITY_SIDE := 224
-const DENSITY_RADIUS := 6
+const MAX_ATLAS_ZOOM := 65536.0
+const ATLAS_DENSITY_SIDE := 160
+const MAX_ATLAS_SECTORS := 48
+const CORE_VIEW_SPAN := 34.0
 const MAX_LABELS := 24
 const ROTATION_RADIANS_PER_PIXEL := 0.009
 
@@ -27,7 +29,7 @@ var jump_tariff: Callable
 var planned_path: Array[int] = []
 var preview_path: Array[int] = []
 var contested: Array[int] = []
-var _known_systems: Array[int] = []
+var _known_systems: Dictionary[int, bool] = {}
 var _systems: Array[int] = []
 var _positions: Dictionary[int, Vector3] = {}
 var _points: Dictionary[int, Vector2] = {}
@@ -43,15 +45,19 @@ var _atlas := false
 var _label_boxes: Array[Rect2] = []
 var _detailed := false
 var _elevation := false
+var _atlas_sector_rect := Rect2i()
+var _atlas_signals: Dictionary[int, Vector2] = {}
 
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	resized.connect(queue_redraw)
+	resized.connect(_atlas_view_changed)
 
 
 func set_systems(known: Array[int], systems: Array[int], focus: int, elevation: bool) -> void:
-	_known_systems = known
+	_known_systems.clear()
+	for id in known:
+		_known_systems[id] = true
 	_systems = systems
 	var context_changed := focus != _focus or elevation != _elevation
 	_focus = focus
@@ -73,7 +79,7 @@ func set_systems(known: Array[int], systems: Array[int], focus: int, elevation: 
 	elif _zoom != MIN_ZOOM or not _view_offset.is_zero_approx():
 		_view_offset = _bound_offset(_view_offset + former_center - _center)
 	_update_points()
-	queue_redraw()
+	_atlas_view_changed()
 
 
 func set_atlas(active: bool) -> void:
@@ -91,14 +97,14 @@ func reset_view() -> void:
 	_orbit_angles = Vector2.ZERO
 	_zoom = MIN_ZOOM
 	_update_points()
-	queue_redraw()
+	_atlas_view_changed()
 
 
 func pan_by(pixel_delta: Vector2) -> void:
 	if not pixel_delta.is_finite():
 		return
 	_view_offset = _bound_offset(_view_offset - pixel_delta / _pixels_per_light_year())
-	queue_redraw()
+	_atlas_view_changed()
 
 
 func rotate_by(pixel_delta: Vector2) -> void:
@@ -139,18 +145,68 @@ func zoom_by(factor: float, anchor: Vector2) -> void:
 	if not is_finite(factor) or factor <= 0.0 or not anchor.is_finite():
 		return
 	var before := _pixels_per_light_year()
-	_zoom = clampf(_zoom * factor, MIN_ZOOM, MAX_ZOOM)
+	var step := pow(factor, 3.0) if _atlas and before < 1.0 else factor
+	_zoom = clampf(_zoom * step, MIN_ZOOM, _zoom_limit())
 	var after := _pixels_per_light_year()
 	_view_offset = _bound_offset(_view_offset + (anchor - size * 0.5) * (1.0 / before - 1.0 / after))
-	queue_redraw()
+	_atlas_view_changed()
 
 
 func can_zoom_in() -> bool:
-	return _zoom < MAX_ZOOM
+	return _zoom < _zoom_limit()
 
 
 func can_zoom_out() -> bool:
 	return _zoom > MIN_ZOOM
+
+
+func _zoom_limit() -> float:
+	return MAX_ATLAS_ZOOM if _atlas else MAX_ZOOM
+
+
+func focus_atlas_core() -> void:
+	if not _atlas:
+		return
+	var pixels_at_fit := _pixels_per_light_year() / _zoom
+	var target_pixels := maxf(size.x, size.y) / CORE_VIEW_SPAN
+	_zoom = clampf(target_pixels / pixels_at_fit, MIN_ZOOM, MAX_ATLAS_ZOOM)
+	_view_offset = _bound_offset(_atlas_core() - _center)
+	_atlas_view_changed()
+
+
+func atlas_center_sector() -> Vector2i:
+	return Vector2i(((_center + _view_offset) / Sector.SECTOR_SIZE).floor())
+
+
+func atlas_is_local() -> bool:
+	return _atlas_sector_rect.has_area()
+
+
+func _atlas_view_changed() -> void:
+	var visible := _visible_atlas_sectors()
+	if visible != _atlas_sector_rect:
+		_atlas_sector_rect = visible
+		_atlas_signals.clear()
+		for y in range(visible.position.y, visible.end.y):
+			for x in range(visible.position.x, visible.end.x):
+				for id in Sector.sector_system_ids(Vector2i(x, y)):
+					_atlas_signals[id] = _project(id, false)
+	queue_redraw()
+
+
+func _visible_atlas_sectors() -> Rect2i:
+	if not _atlas or _elevation or size.x < 64.0 or size.y < 64.0:
+		return Rect2i()
+	var center := _center + _view_offset
+	var half_span := size * 0.5 / _pixels_per_light_year()
+	var first := Vector2i(((center - half_span) / Sector.SECTOR_SIZE).floor())
+	var last := Vector2i(((center + half_span) / Sector.SECTOR_SIZE).floor())
+	var visible := Rect2i(first, last - first + Vector2i.ONE).intersection(Sector.GALAXY_BOUNDS)
+	return visible if visible.get_area() <= MAX_ATLAS_SECTORS else Rect2i()
+
+
+func _atlas_core() -> Vector2:
+	return _project(Sector.GALAXY_CENTER_SYSTEM, _elevation)
 
 
 func _bound_offset(offset: Vector2) -> Vector2:
@@ -215,7 +271,7 @@ func system_at(point: Vector2) -> int:
 	var nearest := -1
 	var pick_radius := 40.0 if _detailed else 30.0
 	var limit := pick_radius * pick_radius
-	for id in _systems:
+	for id in _marker_ids():
 		var marker := marker_position(id)
 		if not visible_bounds.has_point(marker):
 			continue
@@ -224,6 +280,23 @@ func system_at(point: Vector2) -> int:
 			nearest = id
 			limit = distance
 	return nearest
+
+
+func _marker_ids() -> Array[int]:
+	if not _atlas or (not atlas_is_local() and _systems.size() <= Sector.SYSTEM_COUNT):
+		return _systems
+	var markers: Array[int] = []
+	if atlas_is_local():
+		for id: int in _atlas_signals:
+			if _known_systems.has(id):
+				markers.append(id)
+		return markers
+	# Density stays readable after thousands of discoveries. Show the
+	# navigation anchors at galaxy scale and individual stars at sector scale.
+	for id: int in [current, candidate, planned]:
+		if _known_systems.has(id) and id not in markers:
+			markers.append(id)
+	return markers
 
 
 func _pixels_per_light_year() -> float:
@@ -237,7 +310,11 @@ func _draw() -> void:
 	var bounds := Rect2(Vector2.ZERO, size)
 	draw_rect(bounds, FIELD)
 	if _atlas:
-		_draw_density(bounds)
+		if atlas_is_local():
+			_draw_atlas_sectors(bounds)
+		else:
+			_draw_density(bounds)
+		_draw_atlas_core(bounds)
 	elif _detailed:
 		_draw_sector_border()
 	var active := _route_path(planned_path, planned)
@@ -248,7 +325,7 @@ func _draw() -> void:
 	_draw_routes(active, preview)
 	var visible_ids: Array[int] = []
 	var visible_bounds := bounds.grow(-3.0)
-	for id: int in _systems:
+	for id: int in _marker_ids():
 		if not visible_bounds.has_point(marker_position(id)):
 			continue
 		visible_ids.append(id)
@@ -291,36 +368,64 @@ func _draw_density(bounds: Rect2) -> void:
 static func _density_layer(elevation: bool) -> Dictionary:
 	if _density_by_projection.has(elevation):
 		return _density_by_projection[elevation]
-	var positions := PackedVector2Array()
-	var low := Vector2(INF, INF)
-	var high := Vector2(-INF, -INF)
-	for id in range(Sector.SYSTEM_COUNT):
-		var position := _project(id, elevation)
-		positions.append(position)
-		low = low.min(position)
-		high = high.max(position)
-	var span := (high - low).max(Vector2.ONE)
-	var world := Rect2(low, span).grow(maxf(8.0, maxf(span.x, span.y) * 0.06))
-	var densities := PackedFloat32Array()
-	densities.resize(DENSITY_SIDE * DENSITY_SIDE)
-	# A short kernel around each real system makes the distribution readable at atlas scale.
-	for position in positions:
-		var center := Vector2i((position - world.position) * (DENSITY_SIDE - 1) / world.size)
-		for py in range(maxi(center.y - DENSITY_RADIUS, 0), mini(center.y + DENSITY_RADIUS + 1, DENSITY_SIDE)):
-			for px in range(maxi(center.x - DENSITY_RADIUS, 0), mini(center.x + DENSITY_RADIUS + 1, DENSITY_SIDE)):
-				var distance := Vector2i(px, py).distance_squared_to(center)
-				var weight := maxf(0.0, 1.0 - distance / float(DENSITY_RADIUS * DENSITY_RADIUS))
-				densities[py * DENSITY_SIDE + px] += weight * weight * weight
-	var image := Image.create_empty(DENSITY_SIDE, DENSITY_SIDE, false, Image.FORMAT_RGBA8)
-	for y in range(DENSITY_SIDE):
-		for x in range(DENSITY_SIDE):
-			var strength := 1.0 - exp(-densities[y * DENSITY_SIDE + x] * 0.24)
-			var tint := Color("17546b").lerp(Color("69cfbf"), strength * strength)
-			tint.a = strength * 0.82
+	var sectors := Sector.GALAXY_BOUNDS
+	var world := Rect2(Vector2(sectors.position) * Sector.SECTOR_SIZE, Vector2(sectors.size) * Sector.SECTOR_SIZE)
+	if elevation:
+		world.position.y = -Sector.SECTOR_SIZE * 0.5
+		world.size.y = Sector.SECTOR_SIZE
+	var height := 1 if elevation else ATLAS_DENSITY_SIDE
+	var samples := PackedInt32Array()
+	samples.resize(ATLAS_DENSITY_SIDE * height)
+	for y in range(height):
+		var sy := Sector.GALAXY_CENTER_SECTOR.y if elevation else sectors.position.y + floori((y + 0.5) * sectors.size.y / height)
+		for x in range(ATLAS_DENSITY_SIDE):
+			var sx := sectors.position.x + floori((x + 0.5) * sectors.size.x / ATLAS_DENSITY_SIDE)
+			samples[y * ATLAS_DENSITY_SIDE + x] = Sector.galaxy_sector_count(Vector2i(sx, sy))
+	var image := Image.create_empty(ATLAS_DENSITY_SIDE, height, false, Image.FORMAT_RGBA8)
+	for y in range(height):
+		for x in range(ATLAS_DENSITY_SIDE):
+			var row := y * ATLAS_DENSITY_SIDE
+			var count := (samples[row + x] * 4.0 + samples[row + maxi(0, x - 1)]
+				+ samples[row + mini(ATLAS_DENSITY_SIDE - 1, x + 1)]
+				+ samples[maxi(0, y - 1) * ATLAS_DENSITY_SIDE + x]
+				+ samples[mini(height - 1, y + 1) * ATLAS_DENSITY_SIDE + x]) / 8.0
+			var strength := clampf((count - 4.0) / 10.0, 0.0, 1.0)
+			# A stable stipple texture distinguishes a sampled field from selectable stars.
+			var noise := fposmod(sin(x * 127.1 + y * 311.7) * 43758.5453, 1.0)
+			var fleck := pow(noise, 10.0) * lerpf(0.10, 0.68, strength)
+			var tint := Color("152a41").lerp(Color("2b646e"), strength * 0.64)
+			tint = tint.lerp(Color("a4ded1"), fleck)
+			tint.a = lerpf(0.46, 0.84, strength * 0.45 + fleck * 0.55)
 			image.set_pixel(x, y, tint)
 	var density := {"bounds": world, "texture": ImageTexture.create_from_image(image)}
 	_density_by_projection[elevation] = density
 	return density
+
+
+func _draw_atlas_sectors(bounds: Rect2) -> void:
+	var sector_size := Vector2.ONE * Sector.SECTOR_SIZE * _pixels_per_light_year()
+	for y in range(_atlas_sector_rect.position.y, _atlas_sector_rect.end.y):
+		for x in range(_atlas_sector_rect.position.x, _atlas_sector_rect.end.x):
+			var corner := _project_to_view(Vector2(x, y) * Sector.SECTOR_SIZE)
+			draw_rect(Rect2(corner, sector_size).intersection(bounds), Color(BORDER, 0.55), false, 1.0)
+	for id in _atlas_signals:
+		if _known_systems.has(id):
+			continue
+		var point := _project_to_view(_atlas_signals[id])
+		if bounds.grow(-3.0).has_point(point):
+			draw_circle(point, 2.3, Color(MUTED, 0.48), true, -1.0, true)
+
+
+func _draw_atlas_core(bounds: Rect2) -> void:
+	var point := _project_to_view(_atlas_core())
+	if not bounds.grow(-16.0).has_point(point):
+		return
+	draw_arc(point, 12.0, 0.0, TAU, 28, AMBER, 1.5, true)
+	var caption := "Ядро"
+	var font := ThemeDB.fallback_font
+	var width := font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1.0, 14).x
+	var origin := Vector2(clampf(point.x + 19.0, 8.0, size.x - width - 8.0), point.y - 13.0)
+	draw_string(font, origin, caption, HORIZONTAL_ALIGNMENT_LEFT, -1.0, 14, AMBER)
 
 
 func _draw_sector_border() -> void:
@@ -343,14 +448,14 @@ func _route_path(requested: Array[int], fallback: int) -> Array[int]:
 		path = [current, fallback]
 	if path.size() < 2 or path.size() > _known_systems.size() or path[0] != current:
 		return []
-	var visited: Array[int] = []
+	var visited: Dictionary[int, bool] = {}
 	for step in range(path.size()):
 		var id := path[step]
 		if not _known_systems.has(id) or visited.has(id):
 			return []
 		if step > 0 and not _leg_reachable(path[step - 1], id):
 			return []
-		visited.append(id)
+		visited[id] = true
 	return path
 
 
@@ -375,7 +480,8 @@ func _draw_routes(active: Array[int], preview: Array[int]) -> void:
 
 
 func _leg_points(a: int, b: int, shift := 0.0) -> PackedVector2Array:
-	if not _systems.has(a) or not _systems.has(b) or not _leg_reachable(a, b):
+	var listed := _known_systems.has(a) and _known_systems.has(b) if _atlas else _systems.has(a) and _systems.has(b)
+	if not listed or not _leg_reachable(a, b):
 		return PackedVector2Array()
 	var origin := marker_position(a)
 	var end := marker_position(b)

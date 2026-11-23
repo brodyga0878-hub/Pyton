@@ -62,6 +62,7 @@ var _atlas_button: Button
 var _projection_button: Button
 var _drag_button: Button
 var _ship_button: Button
+var _core_button: Button
 var _zoom_in_button: Button
 var _zoom_out_button: Button
 var _scan_button: Button
@@ -286,10 +287,14 @@ func _build_chart(parent: HBoxContainer) -> void:
 	_drag_button.custom_minimum_size.x = 108
 	_drag_button.toggle_mode = true
 	_drag_button.pressed.connect(_toggle_drag_mode)
+	_core_button = _button(scope, "К ядру", 44)
+	_core_button.tooltip_text = "Показать ядро на атласе. Для полёта открывайте соседние системы радиосканом."
+	_core_button.pressed.connect(_go_to_core)
 	_chart = GalaxyChart.new()
 	_chart.rotation_availability_changed.connect(_set_rotation_available)
 	_chart.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	column.add_child(_chart)
+	_chart.resized.connect(_refresh_atlas_caption)
 	_set_rotation_available(true)
 	_scan_label = _label(column, "", 14, MUTED)
 	_scan_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -556,18 +561,34 @@ func _refresh_catalog(current: int, goal: int, planned: int) -> void:
 	_scope_button.text = "Обзор" if _sector_focus >= 0 else "Сектор"
 	_atlas_button.set_pressed_no_signal(_atlas)
 	_projection_button.text = "Вид X/Z" if _elevation else "Вид X/Y"
+	_chart.set_atlas(_atlas)
+	_chart.set_systems(_known, scoped, _sector_focus, _elevation)
+	_scope_label.tooltip_text = ""
 	if _sector_focus >= 0:
 		var sector := Sector.sector_coordinates(_sector_focus)
 		_scope_label.text = "Сектор %d / %d · %d × %d св. л. в X/Y · Известно систем: %d" % [
 			sector.x, sector.y, int(Sector.SECTOR_SIZE), int(Sector.SECTOR_SIZE), scoped.size()
 		]
 	elif _atlas:
-		_scope_label.text = "Атлас плотности · Систем в каталоге: %d · Открыто: %d" % [Sector.SYSTEM_COUNT, scoped.size()]
+		_refresh_atlas_caption()
 	else:
 		_scope_label.text = "Обзор · Известно систем: %d" % scoped.size()
-	_chart.set_atlas(_atlas)
-	_chart.set_systems(_known, scoped, _sector_focus, _elevation)
 	_update_zoom_buttons()
+
+
+func _refresh_atlas_caption() -> void:
+	if not _atlas:
+		return
+	if _chart.atlas_is_local():
+		var sector := _chart.atlas_center_sector()
+		_scope_label.text = "Локальный атлас · Сектор %d / %d" % [sector.x, sector.y]
+		_scope_label.tooltip_text = "Серые точки показывают звёздные сигналы. Открытые системы отмечены цветом."
+	else:
+		var count := str(Sector.GALAXY_SYSTEM_COUNT)
+		for index in range(count.length() - 3, 0, -3):
+			count = count.insert(index, " ")
+		_scope_label.text = "Атлас плотности · Систем: %s · Открыто: %d" % [count, _known.size()]
+		_scope_label.tooltip_text = "Приблизьте атлас, чтобы увидеть звёздные сигналы в отдельных секторах."
 
 
 func _refresh_scanner() -> void:
@@ -633,10 +654,25 @@ func _go_to_ship() -> void:
 		_select_system(_sector_focus)
 
 
+func _go_to_core() -> void:
+	if not is_open():
+		return
+	_clear_touches()
+	_atlas = true
+	_sector_focus = -1
+	_elevation = false
+	_page_for_candidate()
+	refresh()
+	_chart.focus_atlas_core()
+	_refresh_atlas_caption()
+	_update_zoom_buttons()
+
+
 func _zoom_chart(factor: float, anchor := Vector2.INF) -> void:
 	if is_open():
 		_clear_touches()
 		_chart.zoom_by(factor, anchor if anchor.is_finite() else _chart.size * 0.5)
+		_refresh_atlas_caption()
 		_update_zoom_buttons()
 
 
@@ -1062,6 +1098,7 @@ func _move_chart_gesture(point: Vector2) -> void:
 		_chart.rotate_by(delta)
 	else:
 		_chart.pan_by(delta)
+		_refresh_atlas_caption()
 	_chart_last_point = local
 
 
@@ -1092,7 +1129,7 @@ func _button_at(point: Vector2) -> Button:
 	for button: Button in [
 		_plan_button, _cancel_route_button, _jump_button, _emergency_button, _echo_track, _echo_analyze,
 		_dossier_button, _close_button,
-		_scope_button, _atlas_button, _projection_button, _drag_button, _ship_button, _zoom_in_button, _zoom_out_button,
+		_scope_button, _atlas_button, _projection_button, _drag_button, _ship_button, _core_button, _zoom_in_button, _zoom_out_button,
 		_scan_button, _previous_page_button, _next_page_button, _directory_button
 	]:
 		if button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(point):
