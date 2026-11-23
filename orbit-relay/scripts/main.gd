@@ -24,6 +24,7 @@ const VoyageLibrary = preload("res://scripts/voyage_library.gd")
 const VoyageImport = preload("res://scripts/voyage_import.gd")
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const SAVE_INTERVAL := 8.0
+const AIM_LOCK_RADIUS_FRACTION := 0.085
 const ANTIALIASING := [Viewport.MSAA_DISABLED, Viewport.MSAA_2X, Viewport.MSAA_4X]
 const REPORT_JOURNAL_ONLY := "В ZIP только журнал и сведения о версии. Состояние рейса недоступно."
 
@@ -204,7 +205,19 @@ func _physics_process(delta: float) -> void:
 func _update_display(delta: float) -> void:
 	_view.sync(flight, delta)
 	_camera_mode = _view.preferred_camera_mode()
-	_hud.sync(flight, delta)
+	var instruments_visible := flight.docked < 0 and not flight.landed and not _overlay_open() and flight.jump_seconds_left <= 0.0
+	var forward_aim := _view.shows_forward_aim()
+	var targetable := {}
+	var aim_lock_available := false
+	if instruments_visible and (forward_aim or _hud.ship_markers_enabled()):
+		targetable = flight.combat_targetable_contacts()
+		if forward_aim:
+			var scanner_range: float = Flight.CombatTargeting.SCANNER_RANGE
+			for contact: Dictionary in targetable.values():
+				if flight.position.distance_squared_to(contact.position) <= scanner_range * scanner_range:
+					aim_lock_available = true
+					break
+	_hud.sync(flight, delta, aim_lock_available)
 	var combat_lock := flight.combat_lock_contact()
 	var final_approach := flight.autopilot and flight.autopilot_phase in ["Стыковка", "Посадка", "Выпуск шасси", "Вход в зону сбора"]
 	var marker := flight.target_contact(flight.target) if final_approach else flight.target_gate(flight.target)
@@ -244,8 +257,6 @@ func _update_display(delta: float) -> void:
 	if not operation.is_empty():
 		marker = operation.position
 	var special_marker := signal_selected or project_marker or convoy_marker or rendezvous_marker or fragment_marker or hostile_marker or cargo_marker or echo_marker or not operation.is_empty()
-	var instruments_visible := flight.docked < 0 and not flight.landed and not _overlay_open() and flight.jump_seconds_left <= 0.0
-	var forward_aim := _view.shows_forward_aim()
 	var bearing := ""
 	if instruments_visible and forward_aim and _camera_mode == FlightCamera.Mode.COCKPIT and flight.navigation_computer_fitted:
 		var point := marker
@@ -277,7 +288,6 @@ func _update_display(delta: float) -> void:
 	if instruments_visible and (_hud.ship_markers_enabled() or _hud.scanner_is_open()):
 		contacts = flight.traffic_contacts()
 	if instruments_visible and _hud.ship_markers_enabled():
-		var targetable := flight.combat_targetable_contacts()
 		for contact: Dictionary in contacts:
 			var distance := flight.position.distance_to(contact.position)
 			if distance > 1100.0 or _view.camera.is_position_behind(contact.position):
@@ -325,6 +335,34 @@ func _select_cockpit_contact(id: String) -> void:
 		return
 	_deliver_notice()
 	_update_display(0.0)
+
+
+func _aim_lock_contact_id() -> String:
+	var camera: Camera3D = _view.camera
+	var viewport_rect := camera.get_viewport().get_visible_rect()
+	var center := viewport_rect.get_center()
+	var reticle_radius := viewport_rect.size.y * AIM_LOCK_RADIUS_FRACTION
+	var best_screen_distance := reticle_radius * reticle_radius
+	var best_camera_distance := INF
+	var best_id := ""
+	var nose := flight.forward()
+	for contact: Dictionary in flight.combat_targetable_contacts().values():
+		var at: Vector3 = contact.position
+		if (at - flight.position).dot(nose) <= 0.0 or camera.is_position_behind(at):
+			continue
+		var screen_distance := center.distance_squared_to(camera.unproject_position(at))
+		if screen_distance > best_screen_distance:
+			continue
+		var camera_distance := camera.global_position.distance_squared_to(at)
+		if screen_distance == best_screen_distance and (camera_distance > best_camera_distance \
+				or (camera_distance == best_camera_distance and str(contact.id) >= best_id)):
+			continue
+		if not Flight.CombatTargeting.can_lock(flight, contact) or not flight.combat_line_clear(camera.global_position, at):
+			continue
+		best_id = contact.id
+		best_screen_distance = screen_distance
+		best_camera_distance = camera_distance
+	return best_id
 
 
 func _handle_action(action: String) -> void:
@@ -393,6 +431,15 @@ func _handle_action(action: String) -> void:
 			flight.convoy_action()
 		"fire":
 			flight.fire_action()
+		"aim_lock":
+			if flight.docked >= 0 or flight.landed or not _view.shows_forward_aim():
+				return
+			var id := _aim_lock_contact_id()
+			if id.is_empty():
+				_hud.notify(FlightText.text("AIM_LOCK_EMPTY"))
+			elif id != flight.combat_lock_id():
+				_select_cockpit_contact(id)
+			return
 		"ecm":
 			flight.use_ecm()
 		"missile_next":
@@ -892,6 +939,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_N: "map", KEY_J: "galaxy", KEY_K: "scoop", KEY_P: "services", KEY_O: "time", KEY_L: "market",
 		KEY_U: "patrol", KEY_X: "fire", KEY_I: "convoy", KEY_H: "flight_assist", KEY_Q: "recon",
 		KEY_Z: "missile_fire", KEY_BRACKETRIGHT: "missile_next", KEY_BRACKETLEFT: "decoy",
+		KEY_PERIOD: "aim_lock",
 		KEY_SEMICOLON: "operations", KEY_BACKSLASH: "comms",
 		KEY_F1: "camera", KEY_F2: "settings", KEY_F3: "journal", KEY_F4: "frontier",
 		KEY_F5: "dock_sync", KEY_F6: "dock_clearance", KEY_F7: "frame", KEY_F9: "time_pause", KEY_F10: "speed_hold", KEY_F11: "voyages", KEY_Y: "gear", KEY_C: "fuel",

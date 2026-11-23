@@ -117,6 +117,7 @@ var _operation_progress: ProgressBar
 var _right_panel: PanelContainer
 var _throttle_controls: GridContainer
 var _port_tools: HBoxContainer
+var _combat_tools: HBoxContainer
 var _navigation_drawer: PanelContainer
 var _navigation_switches: HBoxContainer
 var _navigation_cameras: HBoxContainer
@@ -412,14 +413,23 @@ func build() -> void:
 	_button(_port_tools, "rendezvous_finish", "К швартовке")
 	_actions["rendezvous_finish"].add_theme_color_override("font_color", CYAN)
 	_actions["rendezvous_finish"].hide()
-	_button(_port_tools, "fire", "Огонь")
+	_combat_tools = HBoxContainer.new()
+	_combat_tools.add_theme_constant_override("separation", 7)
+	right.add_child(_combat_tools)
+	_button(_combat_tools, "aim_lock", Text.text("AIM_LOCK"))
+	var aim_lock: Button = _actions["aim_lock"]
+	aim_lock.add_theme_font_size_override("font_size", 16)
+	aim_lock.add_theme_color_override("font_color", CYAN)
+	aim_lock.tooltip_text = Text.text("AIM_LOCK_TOOLTIP")
+	aim_lock.hide()
+	_button(_combat_tools, "fire", "Огонь")
 	var fire_button: Button = _actions["fire"]
 	fire_button.size_flags_stretch_ratio = 1.35
 	fire_button.add_theme_color_override("font_color", ALERT)
 	fire_button.add_theme_stylebox_override("normal", _box(Color("482b32"), ALERT, 9, 7.0))
 	fire_button.add_theme_stylebox_override("hover", _box(Color("633c45"), ALERT, 9, 7.0))
 	fire_button.add_theme_stylebox_override("pressed", _box(Color("78505a"), ALERT, 9, 7.0))
-	_button(_port_tools, "ecm", "РЭБ")
+	_button(_combat_tools, "ecm", "РЭБ")
 	var ecm: Button = _actions["ecm"]
 	ecm.add_theme_color_override("font_color", AMBER)
 	ecm.add_theme_stylebox_override("normal", _box(Color("443323"), AMBER, 9, 7.0))
@@ -743,7 +753,7 @@ func _build_flight_modes() -> void:
 	_flight_modes.hide()
 	_update_translation_mode()
 
-func sync(sim: RefCounted, delta: float) -> void:
+func sync(sim: RefCounted, delta: float, aim_lock_available := false) -> void:
 	var docked: bool = sim.docked >= 0
 	var landed: bool = sim.landed_site >= 0
 	var parked := docked or landed
@@ -818,12 +828,17 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var fire: Dictionary = sim.fire_status() if fire_button.visible else {}
 	fire_button.tooltip_text = str(fire.get("reason", ""))
 	_fire_blocked = not fire.get("ok", false)
+	var aim_lock: Button = _actions["aim_lock"]
+	aim_lock.visible = aim_lock_available and _input_enabled and not parked and not _jumping
 	_sync_combat({} if parked or _jumping else sim.combat_status())
-	var flight_tools: bool = patrol_button.visible or convoy_button.visible or fire_button.visible or _actions["ecm"].visible or approach_active
-	_port_tools.visible = port_services or flight_tools
+	_port_tools.visible = port_services or patrol_button.visible or convoy_button.visible or approach_active
+	_combat_tools.visible = aim_lock.visible or fire_button.visible or _actions["ecm"].visible
+	var flight_tools := _port_tools.visible or _combat_tools.visible
 	_sync_orbital_mining({} if parked or _jumping else sim.orbital_mining_status())
 	_right_panel.visible = not _departure_active
 	_right_panel.offset_top = -157.0 if docked else (-101.0 if landed else (-274.0 if flight_tools else -215.0))
+	if _port_tools.visible and _combat_tools.visible:
+		_right_panel.offset_top -= 57.0
 	if _ordnance_tools.visible:
 		_right_panel.offset_top -= 57.0
 	if _orbital_mining_tools.visible:
@@ -960,7 +975,9 @@ func _sync_escape(status: Dictionary) -> void:
 		_flight_modes.hide()
 		_translation_controls.hide()
 		_throttle_controls.hide()
+		_actions["aim_lock"].hide()
 		_port_tools.hide()
+		_combat_tools.hide()
 		_ordnance_tools.hide()
 		_orbital_mining_tools.hide()
 		_docking_panel.hide()
@@ -1670,6 +1687,8 @@ func _refresh_navigation_language() -> void:
 func apply_interface_language() -> void:
 	_refresh_navigation_language()
 	_update_navigation_switches()
+	_actions["aim_lock"].text = Text.text("AIM_LOCK")
+	_actions["aim_lock"].tooltip_text = Text.text("AIM_LOCK_TOOLTIP")
 	_actions["comms"].text = Text.text("LINK_SHORTCUT")
 	_actions["comms_contact"].text = Text.text("LINK_SHORTCUT")
 	_show_scanner(_scanner_panel.visible)
@@ -1718,6 +1737,7 @@ func set_input_enabled(enabled: bool) -> void:
 	if not enabled:
 		_reset_controls()
 		close_navigation()
+		_actions["aim_lock"].hide()
 		_docking_panel.hide()
 		_surface_panel.hide()
 		_actions["dock_sync"].hide()

@@ -16,9 +16,12 @@ func _initialize() -> void:
 func _run() -> void:
 	_test_lock_model()
 	await _test_scanner_touch()
+	await _test_aim_lock_touch()
 	print("Combat scanner: %d checks, %d failures" % [_checks, _failures.size()])
 	for failure: String in _failures:
 		printerr(failure)
+	# Allow stopped scene audio to retire before headless shutdown.
+	await create_timer(0.15).timeout
 	quit(0 if _failures.is_empty() else 1)
 
 
@@ -147,6 +150,84 @@ func _test_scanner_touch() -> void:
 		game._update_display(0.0)
 		_touch(viewport, on_screen, false)
 		_expect(game.flight.combat_lock_id().is_empty(), "A ship disappearing before marker release cannot acquire another target")
+	viewport.queue_free()
+	await process_frame
+
+
+func _test_aim_lock_touch() -> void:
+	var viewport := SubViewport.new()
+	viewport.size = Vector2i(1280, 720)
+	viewport.own_world_3d = true
+	root.add_child(viewport)
+	var game := Game.instantiate()
+	viewport.add_child(game)
+	game.set_process(false)
+	game.set_physics_process(false)
+	game.flight = Flight.new()
+	var flight: Flight = game.flight
+	var hud: CanvasLayer = game._hud
+	game._update_display(0.0)
+	await process_frame
+	var button: Button = hud._actions.get("aim_lock")
+	if not _expect(is_instance_valid(button) and not button.is_visible_in_tree(),
+		"Quick lock stays out of the docked touch controls"):
+		viewport.queue_free()
+		await process_frame
+		return
+
+	Fixture.launch(flight)
+	var raid := _place_near_raid(flight)
+	var attack_id: String = raid.id
+	var nav := flight.target
+	var credits := flight.credits
+	var combat := flight.combat.snapshot()
+	game._handle_action("camera")
+	hud._marks.ship_markers = false
+	game._update_display(0.5)
+	await process_frame
+
+	_expect(button.is_visible_in_tree() and not button.disabled,
+		"An in-range hostile offers a one-touch quick lock with ship labels hidden")
+	_expect(Rect2(Vector2.ZERO, Vector2(viewport.size)).encloses(button.get_global_rect()),
+		"Quick lock fits the landscape viewport next to the combat controls")
+	var touch_point := button.get_global_rect().get_center()
+	_touch(viewport, touch_point, true)
+	flight.yaw += PI * 0.25
+	game._update_display(0.0)
+	_touch(viewport, touch_point, false)
+	_expect(flight.combat_lock_id().is_empty(),
+		"Turning away between touch and release does not acquire a stale target")
+
+	_aim(flight, raid.position)
+	game._update_display(0.0)
+	await process_frame
+	_tap(viewport, button)
+	_expect(flight.combat_lock_id() == attack_id and flight.target == nav and hud._combat_lock_readout.visible,
+		"One touch acquires the hostile in the reticle without changing the route")
+	_expect(flight.credits == credits and flight.combat.snapshot() == combat and flight.ambient_status().hull == raid.hull,
+		"Quick lock consumes no funds or ammo and does not fire at the target")
+
+	flight.yaw += PI * 0.25
+	game._update_display(0.0)
+	game._handle_action("aim_lock")
+	_expect(flight.combat_lock_id() == attack_id and flight.target == nav,
+		"Requesting lock on an empty reticle keeps the previous valid lock and route")
+
+	flight.select_combat_contact("")
+	_aim(flight, raid.position)
+	game._update_display(0.0)
+	var period := InputEventKey.new()
+	period.pressed = true
+	period.physical_keycode = KEY_PERIOD
+	viewport.push_input(period, true)
+	_expect(flight.combat_lock_id() == attack_id, "The period key uses the same forward targeting rule")
+
+	flight.select_combat_contact("")
+	game._handle_action("camera")
+	game._update_display(0.5)
+	game._handle_action("aim_lock")
+	_expect(not button.is_visible_in_tree() and flight.combat_lock_id().is_empty(),
+		"The rear camera offers no quick lock and the direct action acquires nothing")
 	viewport.queue_free()
 	await process_frame
 

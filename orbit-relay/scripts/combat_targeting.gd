@@ -50,12 +50,15 @@ func current(sim: RefCounted) -> Dictionary:
 
 func select(sim: RefCounted, id: String) -> bool:
 	var contact: Dictionary = attackable(sim).get(id, {})
-	if contact.is_empty() or sim.position.distance_squared_to(contact.position) > SCANNER_RANGE * SCANNER_RANGE:
-		return false
-	if not sim.combat_line_clear(sim.position, contact.position):
+	if not can_lock(sim, contact):
 		return false
 	lock_id = id
 	return true
+
+
+static func can_lock(sim: RefCounted, contact: Dictionary) -> bool:
+	return not contact.is_empty() and sim.position.distance_squared_to(contact.position) <= SCANNER_RANGE * SCANNER_RANGE \
+		and sim.combat_line_clear(sim.position, contact.position)
 
 
 func scanner(sim: RefCounted, contacts: Array[Dictionary]) -> Array[Dictionary]:
