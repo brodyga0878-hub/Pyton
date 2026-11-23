@@ -1,0 +1,90 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.107.0",
+  "source_commit": "2de1aef6b819c1a1fbafc5f02926e26d48fc38df",
+  "apk_runtime_source_commit": "2de1aef6b819c1a1fbafc5f02926e26d48fc38df",
+  "content": {
+    "systems": 513933476,
+    "preserved_systems": 1024,
+    "preserved_local_destinations": 3197,
+    "sector_grid": [
+      8192,
+      8192
+    ],
+    "sector_width_ly": 8,
+    "core_system": "Сердцевина",
+    "core_sector": [
+      128,
+      -48
+    ],
+    "save_schema": 56,
+    "max_state_bytes": 4194304
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 132,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.106.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 89,
+    "tested_on_device": false
+  },
+  "checks": {
+    "source_zip_headless": {
+      "suites": 95,
+      "assertions": 29035,
+      "failures": 0
+    },
+    "apk_resources_godot_desktop": {
+      "assets_verified": 208,
+      "assertions": 7261,
+      "failures": 0,
+      "suites": {
+        "expanded_galaxy": 6285,
+        "galactic_atlas": 48,
+        "galactic_routes": 59,
+        "reach_catalog": 743,
+        "save_backup": 46,
+        "scene": null,
+        "sector_voyage": 11,
+        "voyage_import": 40,
+        "voyage_upgrade": 29
+      },
+      "runtime_upgrades": {
+        "0.106.0": 17
+      },
+      "legacy_catalog_sha256": "11316513b8b0d62da200aa4d4a64caeecf755161e4e048c467a1bf282c41d580",
+      "center_anchor_route_topology_legs": 177,
+      "synthetic_corner_scan_save": {
+        "discoveries": 307709,
+        "survey_json_bytes": 3151692
+      },
+      "capture_resolution": [
+        1280,
+        720
+      ],
+      "capture_renderer": "OpenGL Compatibility (Mesa llvmpipe)"
+    }
+  },
+  "files": {
+    "OrbitRelay-0.107.0-arm64.apk": {
+      "bytes": 35975199,
+      "sha256": "cc8b2cb1f49055ed9b96e56eb5ec7342ab7c82659bf0fbca0804a24413f8c34a"
+    },
+    "OrbitRelay-0.107.0-source.zip": {
+      "bytes": 14064037,
+      "sha256": "f0dbfcb3e523fb4272de9a8c3e009296b5e1ebeea01edea41c48614466caf79d"
+    },
+    "atlas-core.png": {
+      "bytes": 117698,
+      "sha256": "39c29bf349ffd96459b1e4618cc99011b78f429de4f85fbb5e9d9b31d411ab5a"
+    },
+    "atlas.png": {
+      "bytes": 242098,
+      "sha256": "3a5de9922fab951859abc8ffb03af09689ce18bb047922eb001da9795c3ba64c"
+    }
+  }
+}
