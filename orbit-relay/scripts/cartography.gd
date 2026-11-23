@@ -198,15 +198,15 @@ static func _scan_reason(sim: RefCounted, status: Dictionary) -> String:
 	if status.known:
 		return "Наблюдение сохранено."
 	if not status.in_system:
-		return "Прибудьте в систему для наблюдения."
+		return "Перейдите в систему объекта, чтобы записать наблюдение."
 	if sim.jump_seconds_left > 0.0:
 		return "Дождитесь завершения прыжка."
 	if sim.docked >= 0 and sim.departure_status().active:
 		return "Дождитесь выхода из дока."
 	if sim.docked >= 0 or sim.landed_site >= 0:
-		return "" if status.site in [sim.docked, sim.landed_site] else "Выйдите в полёт к выбранному объекту."
+		return "" if status.site in [sim.docked, sim.landed_site] else "Выйдите в полёт и сблизьтесь с выбранным объектом."
 	if status.range > status.scan_limit:
-		return "Подойдите к объекту на %d м от центра." % roundi(status.scan_limit)
+		return "Сблизьтесь с объектом. Для сканирования до его центра должно быть не более %d м." % roundi(status.scan_limit)
 	if status.relative_speed > SCAN_SPEED_LIMIT:
 		return "Снизьте относительную скорость до %d м/с." % SCAN_SPEED_LIMIT
 	return ""

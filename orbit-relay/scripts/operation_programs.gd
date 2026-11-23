@@ -14,29 +14,29 @@ const PROGRAMS := {
 	"signal": {
 		"title": "Сигнал подо льдом", "issuer": HOME, "reward": 510, "limit": 1500.0,
 		"nodes": {
-			"offer": {"text": "После первой доставки диспетчер поручит проверить источник на Сланце.",
+			"offer": {"text": "Диспетчер Маяка-7 просит проверить подлёдный сигнал на Сланце. Задание доступно после первой доставки.",
 				"actions": [["accept", "Принять экспедицию", "issue_unlocked", "scan"]]},
-			"scan": {"text": "Обследуйте Сланец, чтобы получить новый замер подлёдного сигнала.", "site": SLATE,
+			"scan": {"text": "Подойдите к Сланцу и нажмите «Выполнить замер», чтобы записать подлёдный сигнал.", "site": SLATE,
 				"actions": [["survey", "Выполнить замер", "survey", "choice"]]},
-			"choice": {"text": "Передайте сведения научной станции или портовой службе. Пункт сдачи зависит от решения.",
+			"choice": {"text": "Кому передать данные? Исследователи ждут в порту «Створ», портовая служба — на Маяке-7.",
 				"actions": [["research", "Научной станции", "free", "research"], ["safety", "Портовой службе", "free", "safety"]]},
-			"research": {"text": "Привезите подлёдное наблюдение на Створ.", "site": VELAR_PORT,
-				"actions": [["report", "Передать научный архив", "at_site", "done_research"]]},
-			"safety": {"text": "Привезите подлёдное наблюдение в Маяк-7.", "site": HOME,
-				"actions": [["report", "Передать сообщение в порт", "at_site", "done_safety"]]},
+			"research": {"text": "Доставьте запись подлёдного сигнала исследователям в порту «Створ».", "site": VELAR_PORT,
+				"actions": [["report", "Сдать запись исследователям", "at_site", "done_research"]]},
+			"safety": {"text": "Доставьте запись подлёдного сигнала портовой службе Маяка-7.", "site": HOME,
+				"actions": [["report", "Сдать запись портовой службе", "at_site", "done_safety"]]},
 			"done_research": {"text": "Подлёдный сигнал внесён в научный каталог Створа."},
-			"done_safety": {"text": "Маяк-7 перевёл район подлёдных помех в режим наблюдения."},
+			"done_safety": {"text": "Портовая служба Маяка-7 взяла район подлёдного сигнала под наблюдение."},
 		},
 	},
 	"courier": {
 		"title": "Красный коршун · РК-408", "issuer": HOME, "reward": 740, "limit": 960.0,
 		"nodes": {
-			"offer": {"text": "Разведка выдала номер и расписание вооружённого курьера в Веларе.",
+			"offer": {"text": "Разведка выяснила, когда вооружённый курьер РК-408 пройдёт через систему «Велар». Его нужно перехватить.",
 				"actions": [["accept", "Принять срочный перехват", "issue", "intercept"]]},
-			"intercept": {"text": "Найдите РК-408 у Просеки. Борт входит в зону через 35 с и покидает её через 6 мин после принятия заказа.", "site": RELAY_ANCHOR},
-			"report": {"text": "РК-408 перехвачен. Вернитесь на Маяк-7 с отметкой о цели.", "site": HOME,
+			"intercept": {"text": "Перехватите РК-408 у Просеки. После принятия заказа судно появится через 35 с, а через 6 мин покинет район.", "site": RELAY_ANCHOR},
+			"report": {"text": "РК-408 перехвачен. Сдайте отчёт на Маяке-7.", "site": HOME,
 				"actions": [["report", "Сдать отчёт о перехвате", "at_site", "done"]]},
-			"done": {"text": "Оплаченный перехват РК-408 внесён в архив."},
+			"done": {"text": "Отчёт о перехвате РК-408 принят. Награда выплачена."},
 		},
 	},
 	"relay": {
@@ -45,11 +45,11 @@ const PROGRAMS := {
 			"offer": {"text": "Веларская лига предлагает вывести из строя нелегальный передатчик возле Просеки.",
 				"actions": [["buy", "Установить глушитель · 120 кр.", "buy_tool", "offer"],
 					["accept", "Принять задание", "issue_tool", "neutralize"]]},
-			"neutralize": {"text": "Подойдите к установке. Глушитель работает в пределах 180 м, при прямой видимости и наведении носом.", "site": RELAY_ANCHOR,
+			"neutralize": {"text": "Подойдите к передатчику на расстояние до 180 м и наведите на него нос. Для работы глушителя нужна прямая видимость.", "site": RELAY_ANCHOR,
 				"actions": [["disable", "Заглушить установку", "can_disrupt", "report"]]},
-			"report": {"text": "Передатчик отключён. Вернитесь с записью на Створ.", "site": VELAR_PORT,
+			"report": {"text": "Передатчик отключён. Сдайте запись в порту «Створ».", "site": VELAR_PORT,
 				"actions": [["report", "Сдать запись об отключении", "at_site", "done"]]},
-			"done": {"text": "Маяк Лиги регистрирует чистый эфир, награда выплачена."},
+			"done": {"text": "Помехи исчезли. Веларская лига приняла запись и выплатила награду."},
 		},
 	},
 }
@@ -176,10 +176,10 @@ func relay(sim: RefCounted) -> Dictionary:
 func disruption_hint(sim: RefCounted) -> String:
 	var contact := relay(sim)
 	if not _disruptor or contact.is_empty() or sim.docked >= 0 or sim.landed or sim.jump_seconds_left > 0.0:
-		return "Глушитель доступен в открытом полёте возле установки."
+		return "Выйдите в открытый космос и подойдите к передатчику, чтобы включить глушитель."
 	var offset: Vector3 = contact.position - sim.position
 	if offset.length() > 180.0 or offset.length() < 1.0:
-		return "Дистанция до установки %.0f м. Подойдите до 180 м." % offset.length()
+		return "До передатчика %.0f м. Держитесь на расстоянии 1–180 м." % offset.length()
 	if sim.forward().dot(offset.normalized()) < 0.94:
 		return "Наведите нос корабля на отметку установки."
 	if not sim.combat_line_clear(sim.position, contact.position):
@@ -195,7 +195,7 @@ func hit_courier(sim: RefCounted, id: String, damage: float) -> Dictionary:
 	record.hull = maxf(0.0, float(record.hull) - damage)
 	record.changed = sim.orbit_time
 	if record.hull > 0.0:
-		return _result("operation_hit", "РК-408 получил урон. Корпус %.0f%%." % (float(record.hull) / COURIER_HULL * 100.0))
+		return _result("operation_hit", "Попадание по РК-408. Целостность корпуса %.0f%%." % (float(record.hull) / COURIER_HULL * 100.0))
 	record.stage = "report"
 	return _result("operation_intercepted", "РК-408 перехвачен. Вернитесь с докладом на Маяк-7.")
 

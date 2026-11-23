@@ -4,6 +4,7 @@ extends RefCounted
 const Catalog = preload("res://scripts/sector_catalog.gd")
 const Factions = preload("res://scripts/faction_fronts.gd")
 const MiningRig = preload("res://scripts/mining_rig.gd")
+const ShipSystems = preload("res://scripts/ship_systems.gd")
 
 const LOCKED := 0
 const SURVEY := 1
@@ -64,9 +65,9 @@ func status(sim: RefCounted) -> Dictionary:
 	if phase == LOCKED:
 		result.caption = "Принять заказ"
 		result.can_act = _eligible_sponsor(sim)
-		result.reason = "Следующий сектор откроется после принятия заказа."
+		result.reason = "Примите заказ, чтобы открыть систему на карте и начать разведку."
 		if not result.can_act:
-			result.reason = "Примите заказ в действующем порту одной из фракций."
+			result.reason = "Заказы на разведку выдают в действующих портах фракций."
 		return result
 	if phase == REPORT:
 		var port: int = record.sponsor_port
@@ -74,12 +75,12 @@ func status(sim: RefCounted) -> Dictionary:
 		result.route_system = Catalog.system_of_site(port)
 		result.can_act = sim.docked == port and sim.system_id == result.route_system and sim.station_operational(port)
 		result.caption = "Передать отчёт"
-		result.reason = "Вернитесь с отчётом в порт «%s»." % Catalog.site(port).name
+		result.reason = "Сдайте отчёт заказчику в порту «%s»." % Catalog.site(port).name
 		if result.can_act and sim.credits > MAX_CREDITS - SURVEY_REWARDS[index]:
 			result.can_act = false
 			result.reason = "Освободите место на счёте для выплаты по отчёту."
-		if sim.system_id == system:
-			result.reason += " Для обратного прыжка соберите водород у звезды и перелейте его в прыжковый запас."
+		if sim.system_id == system and sim.ship.active_jump_fuel() < sim.jump_tariff(system, result.route_system):
+			result.reason += " " + _refuel_hint(sim)
 		return result
 	var area := Catalog.system(system)
 	var site := -1
@@ -106,9 +107,11 @@ func status(sim: RefCounted) -> Dictionary:
 	if sim.system_id != system:
 		result.reason = "Выполните прыжок в систему «%s»." % area.name
 		if phase == SURVEY:
-			result.reason += " Действующего порта там пока нет."
+			result.reason += " В системе пока нет порта. Возьмите топливо на обратный путь."
+			if sim.ship.drive_kind != ShipSystems.DRIVE_MILITARY:
+				result.reason += " Сборщик позволит пополнить запас водорода у звезды."
 		elif sim.ship.active_jump_fuel() < sim.jump_tariff(sim.system_id, system):
-			result.reason += " Водород можно собрать у местной звезды и перелить в прыжковый запас."
+			result.reason += " " + _refuel_hint(sim)
 		return result
 	var point: Vector3 = sim.target_gate(site)
 	if phase == BUILD:
@@ -118,16 +121,17 @@ func status(sim: RefCounted) -> Dictionary:
 	var distance: float = sim.position.distance_to(point)
 	result.distance = distance
 	if not _airborne(sim):
-		result.reason = "Выйдите в открытый космос, чтобы продолжить."
+		result.reason = "Выйдите в открытый космос. Разведка и разгрузка проходят в полёте."
 		return result
 	var range := SURVEY_RANGE if phase == SURVEY else SUPPLY_RANGE
 	if distance > range:
 		result.can_follow = true
-		result.reason = "Сблизьтесь с целью обследования." if phase == SURVEY else "Подойдите к стройплощадке."
+		result.reason = "Сблизьтесь с точкой обследования на расстояние до %d м." % int(SURVEY_RANGE) if phase == SURVEY \
+			else "Сблизьтесь с точкой разгрузки на расстояние до %d м." % int(SUPPLY_RANGE)
 		return result
 	if sim.speed_relative_to(site) > SERVICE_SPEED:
 		result.can_follow = true
-		result.reason = "Снизьте относительную скорость до %d м/с." % int(SERVICE_SPEED)
+		result.reason = "Снизьте скорость относительно цели до %d м/с." % int(SERVICE_SPEED)
 		return result
 	result.ready = true
 	if phase == BUILD:
@@ -135,7 +139,7 @@ func status(sim: RefCounted) -> Dictionary:
 			result.reason = "Верните добывающий модуль на борт перед разгрузкой."
 			return result
 		if not result.missing.is_empty():
-			result.reason = "В трюме не хватает материалов для этой поставки."
+			result.reason = "Сверьте список поставки и пополните недостающие материалы в порту заказчика."
 			return result
 		if int(record.build_index) + 1 == BUILD_TOTAL:
 			if sim.credits > MAX_CREDITS - CONSTRUCTION_REWARDS[index]:
@@ -146,8 +150,17 @@ func status(sim: RefCounted) -> Dictionary:
 				result.reason = "Станция пока не может принять завершающую поставку."
 				return result
 	result.can_act = true
-	result.reason = "Доступно обследование тела «%s»." % Catalog.site(site).name if phase == SURVEY else "Материалы готовы к передаче."
+	result.reason = "Нажмите «Обследовать», чтобы записать данные об объекте «%s»." % Catalog.site(site).name if phase == SURVEY \
+		else "Нажмите «Разгрузить», чтобы передать материалы для станции."
 	return result
+
+
+func _refuel_hint(sim: RefCounted) -> String:
+	if sim.ship.drive_kind == ShipSystems.DRIVE_MILITARY:
+		return "«Арсенал» заправляется военным топливом в порту."
+	if sim.ship.hydrogen_scoop:
+		return "Соберите водород у звезды и пополните прыжковый бак через меню «Топливо»."
+	return "Заправьте прыжковый бак в порту или установите сборщик водорода."
 
 
 func act(sim: RefCounted) -> Dictionary:
@@ -165,7 +178,7 @@ func act(sim: RefCounted) -> Dictionary:
 			record.phase = SURVEY
 			return {
 				"ok": true, "event": "expedition_accepted", "planned_system": system,
-				"message": "Система «%s» добавлена на карту. Обследуйте два небесных тела." % name,
+				"message": "Система «%s» нанесена на карту. Обследуйте два объекта по списку экспедиции." % name,
 			}
 		SURVEY:
 			record.scan_index += 1
@@ -173,14 +186,14 @@ func act(sim: RefCounted) -> Dictionary:
 				record.phase = REPORT
 				return {
 					"ok": true, "event": "expedition_survey", "planned_system": Catalog.system_of_site(record.sponsor_port),
-					"message": "Обследование завершено. Передайте отчёт в порт «%s»." % Catalog.site(record.sponsor_port).name,
+					"message": "Обследование завершено. Сдайте отчёт в порту «%s»." % Catalog.site(record.sponsor_port).name,
 				}
-			return {"ok": true, "event": "expedition_survey", "message": "Данные получены. Обследуйте следующее тело."}
+			return {"ok": true, "event": "expedition_survey", "message": "Данные записаны. Выберите следующую цель на вкладке «Экспедиция»."}
 		REPORT:
 			record.phase = BUILD
 			return {
 				"ok": true, "event": "expedition_report", "planned_system": system, "credits": SURVEY_REWARDS[index],
-				"message": "Отчёт принят. Оплата %d кр. Доставьте материалы для станции." % SURVEY_REWARDS[index],
+				"message": "Отчёт принят. Начислено %d кр. Доставьте к месту стройки две партии материалов." % SURVEY_REWARDS[index],
 			}
 		BUILD:
 			var final_lot: bool = record.build_index + 1 == BUILD_TOTAL
@@ -192,9 +205,11 @@ func act(sim: RefCounted) -> Dictionary:
 				return {
 					"ok": true, "event": "expedition_complete", "commissioned": system,
 					"owner": int(record.sponsor), "credits": CONSTRUCTION_REWARDS[index],
-					"message": "Станция в системе «%s» введена в строй. Оплата %d кр." % [name, CONSTRUCTION_REWARDS[index]],
+					"message": "Станция введена в строй. Систему «%s» теперь контролирует фракция «%s». Начислено %d кр." % [
+						name, Factions.faction_name(record.sponsor), CONSTRUCTION_REWARDS[index],
+					],
 				}
-			return {"ok": true, "event": "expedition_supply", "message": "Первая партия доставлена. Проверьте состав следующей поставки."}
+			return {"ok": true, "event": "expedition_supply", "message": "Первая партия принята. Состав второй партии указан на вкладке «Экспедиция»."}
 	return {"ok": false}
 
 

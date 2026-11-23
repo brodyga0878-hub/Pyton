@@ -90,7 +90,7 @@ func refresh(message := "") -> void:
 	if info.active:
 		var seconds := ceili(float(info.remaining))
 		_title.text = "Съёмка «%s»" % info.target_name
-		_detail.text = "Сдача в «%s» · осталось %d мин %02d с\nЛучший снимок %d / 100 · требуется %d · награда %d кр." % [
+		_detail.text = "Сдача в порту «%s» · осталось %d мин %02d с\nЛучший снимок %d из 100 · минимум %d · награда %d кр." % [
 			info.issuer_name, floori(seconds / 60.0), seconds % 60, info.score, info.minimum_score, info.reward,
 		]
 		if info.can_report:
@@ -100,7 +100,7 @@ func refresh(message := "") -> void:
 		_detail.text = "Основная награда %d кр. Премия зависит от качества снимка." % info.reward
 	else:
 		_title.text = "Бортовая камера установлена" if info.fitted else "Бортовая камера не установлена"
-		_detail.text = "Заказы на съёмку выдают в «Маяке-7» и на станции «Створ»."
+		_detail.text = "Заказы на съёмку выдают на Маяке-7 и в порту «Створ»."
 	if not message.is_empty():
 		_result.text = message
 

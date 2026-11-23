@@ -10,6 +10,7 @@ signal rig_selected(slot: int)
 signal dismissed()
 
 const Sector = preload("res://scripts/sector_catalog.gd")
+const Ground = preload("res://scripts/ground_port.gd")
 const Patrol = preload("res://scripts/patrol_encounter.gd")
 const MissionCalendar = preload("res://scripts/mission_calendar.gd")
 const NewsJournal = preload("res://scripts/news_journal.gd")
@@ -23,7 +24,7 @@ const PATROL_STEPS := ["Найти источник сигнала", "Перех
 const STORY_OPTION_COUNT := 4
 const STORY_DATES := {
 	"finished_at": "Кампания завершена", "verified_at": "Подтверждён замер",
-	"settled_at": "Передана первая сводка", "key_at": "Получен ключ",
+	"settled_at": "Переданы первые данные", "key_at": "Получен ключ",
 	"chosen_at": "Принято решение", "briefed_at": "Получен запрос",
 }
 
@@ -437,7 +438,7 @@ func _refresh_delivery() -> void:
 	var title := "Доставка"
 	var step := "Завершено доставок · %d" % _sim.deliveries
 	var cargo := ""
-	var next := "Действующих доставок нет. Контракт можно взять в порту."
+	var next := "Чтобы начать доставку, нажмите «Взять контракт» на панели полёта в порту."
 	var origin := -1
 	var stops: Array = []
 	var leg := -1
@@ -456,14 +457,15 @@ func _refresh_delivery() -> void:
 		var destination_system := Sector.system_of_site(destination)
 		var port: String = _sim.target_name(destination)
 		if _sim.docked == destination:
-			var command := "Отметить этап" if leg + 1 < stops.size() else "Сдать груз"
-			next = "Нажмите «%s» на панели полёта." % command
-		elif destination_system != _sim.system_id:
-			next = "Прыгните в систему «%s» и прибудьте в порт «%s»." % [Sector.system(destination_system).name, port]
-			follow_caption = "Проложить прыжок"
+			next = "На панели полёта нажмите «Отметить этап», чтобы продолжить рейс." if leg + 1 < stops.size() \
+				else "На панели полёта нажмите «Сдать груз», чтобы получить оплату."
 		else:
-			next = "Состыкуйтесь в порту «%s»." % port
-			follow_caption = "Курс к порту"
+			next = "Выполните посадку в порту «%s»." % port if Ground.is_port(destination) else "Пришвартуйтесь в порту «%s»." % port
+			if destination_system != _sim.system_id:
+				next = "Прыгните в систему «%s». %s" % [Sector.system(destination_system).name, next]
+				follow_caption = "Проложить прыжок"
+			else:
+				follow_caption = "Курс к порту"
 	_delivery_title.text = title
 	_delivery_step.text = step
 	_delivery_cargo.text = cargo
@@ -500,7 +502,7 @@ func _refresh_patrol() -> void:
 		_patrol_tags[i].text = "Сейчас" if phase == step else ("Пройдено" if phase > step else "")
 	if not active:
 		_patrol_step.text = "Завершено дозоров · %d" % _sim.patrol.completed
-		_patrol_next.text = "Действующего дозора нет. Его можно принять в порту."
+		_patrol_next.text = "Чтобы взять задание на перехват, нажмите «Дозор» в порту."
 		_follow("patrol", "")
 		return
 	var system_name: String = Sector.system(Sector.system_of_site(status.origin)).name
@@ -515,13 +517,13 @@ func _refresh_patrol() -> void:
 			if status.available and not _sim.patrol_course:
 				follow_caption = "К сигналу"
 			elif _sim.patrol_course:
-				instruction = "Курс к сигналу уже включён."
+				instruction = "Корабль идёт к источнику сигнала."
 		Patrol.ENGAGED:
 			_patrol_step.text = "Перехват · Корпус рейдера %.0f%%" % status.enemy_hull
 			if status.available and not _sim.patrol_course:
 				follow_caption = "Навести на рейдера"
 			elif _sim.patrol_course:
-				instruction = "Прицел включён. Следите за дальностью огня."
+				instruction = "Наведение включено. Проверьте дальность перед выстрелом."
 		Patrol.RETURN:
 			_patrol_step.text = "Возвращение с докладом"
 			if _sim.docked == status.origin:
@@ -549,7 +551,7 @@ func _refresh_passengers() -> void:
 		_passenger_status.visible = debt > 0
 		_passenger_status.text = "Долг по авансу · %d кр." % debt
 		_passenger_status.add_theme_color_override("font_color", AMBER)
-		_passenger_next.text = "Откройте «Биржа» → «Пассажиры» в порту."
+		_passenger_next.text = "Пассажирские рейсы доступны в порту на вкладке «Пассажиры» биржи."
 		if debt > 0:
 			_passenger_next.text = "Погасите долг на бирже во вкладке «Пассажиры», чтобы брать новые рейсы."
 		_follow("passenger", "")
@@ -589,12 +591,12 @@ func _refresh_passengers() -> void:
 					]
 				caption = "К ближайшему порту" if system == _sim.system_id else "Проложить прыжок"
 	elif status.can_discharge and not status.canceling:
-		_passenger_next.text = "Порт назначения достигнут. Высадите пассажиров на бирже."
+		_passenger_next.text = "Вы в порту назначения. На бирже откройте вкладку «Пассажиры» и нажмите «Высадить пассажиров»."
 	elif arrival_system != _sim.system_id:
-		_passenger_next.text = "Прыгните в систему «%s» и состыкуйтесь в порту назначения." % Sector.system(arrival_system).name
+		_passenger_next.text = "Прыгните в систему «%s» и доставьте пассажиров в порт назначения." % Sector.system(arrival_system).name
 		caption = "Проложить прыжок"
 	else:
-		_passenger_next.text = "Состыкуйтесь в порту назначения."
+		_passenger_next.text = "Выполните посадку в порту назначения." if Ground.is_port(destination) else "Пришвартуйтесь в порту назначения."
 		caption = "Курс к порту"
 	_follow("passenger", caption if status.can_follow else "")
 
@@ -646,7 +648,7 @@ func _refresh_career() -> void:
 			_dispatch_time.text = "Срок · %s · %d с" % [MissionCalendar.stamp(float(dispatch.deadline)), remaining]
 			_dispatch_time.add_theme_color_override("font_color", AMBER if remaining <= 60 else MUTED)
 		else:
-			_dispatch_time.text = "Срок после приёма · %d с" % int(dispatch.duration)
+			_dispatch_time.text = "На доставку · %d с" % int(dispatch.duration)
 			_dispatch_time.add_theme_color_override("font_color", MUTED)
 
 	var allowed: bool = dispatch.get("allowed", false)
@@ -657,7 +659,7 @@ func _refresh_career() -> void:
 	if active and not status.can_submit:
 		_dispatch_hint.text = "Сдайте депешу в порту назначения."
 	elif not active and not allowed:
-		_dispatch_hint.text = dispatch.get("reason", "Пришвартуйтесь в порту фракции, чтобы взять депешу.")
+		_dispatch_hint.text = dispatch.get("reason", "Войдите в порт фракции, чтобы взять депешу.")
 	_dispatch_hint.visible = not _dispatch_hint.text.is_empty()
 	var route_caption := "Курс к порту" if Sector.system_of_site(destination) == _sim.system_id else "Проложить прыжок"
 	_follow("career", route_caption if active and status.can_follow else "")
@@ -677,7 +679,7 @@ func _refresh_military_order(status: Dictionary, factions: Array) -> void:
 	_dispatch_time.visible = not order.is_empty()
 	if _dispatch_route.visible:
 		var objective: String = _sim.target_name(int(order.site)) if reconnaissance and int(order.site) >= 0 else "Рейдер местного маршрута"
-		_dispatch_route.text = "Вернитесь в «%s»." % _sim.target_name(origin) if proved else objective
+		_dispatch_route.text = "Вернитесь в порт «%s»." % _sim.target_name(origin) if proved else objective
 	if _dispatch_sponsor.visible:
 		_dispatch_sponsor.text = "%s · %d кр." % [factions[issuer].name, int(order.reward)]
 	if _dispatch_time.visible:
@@ -686,17 +688,17 @@ func _refresh_military_order(status: Dictionary, factions: Array) -> void:
 			_dispatch_time.text = "Срок · %s · %d с" % [MissionCalendar.stamp(float(order.deadline)), left]
 			_dispatch_time.add_theme_color_override("font_color", AMBER if left <= 60 else MUTED)
 		else:
-			_dispatch_time.text = "Срок после приёма · %d с" % int(order.duration)
+			_dispatch_time.text = "На выполнение · %d с" % int(order.duration)
 			_dispatch_time.add_theme_color_override("font_color", MUTED)
 	_career_action.visible = not order.is_empty() and (not active or proved or reconnaissance)
 	_career_action.text = ("Сдать доклад" if proved else "Записать разведданные") if active else "Принять приказ"
 	_career_action.disabled = _sim.jump_seconds_left > 0.0 or not (status.order_can_submit or status.order_can_probe if active else allowed)
 	if not active and not allowed:
-		_dispatch_hint.text = str(order.get("reason", "Пришвартуйтесь в порту фракции."))
+		_dispatch_hint.text = str(order.get("reason", "Примите приказ в порту фракции."))
 	elif proved:
-		_dispatch_hint.text = "Доклад принимают в порту выдачи приказа."
+		_dispatch_hint.text = "Сдайте доклад в том же порту, где приняли приказ."
 	elif reconnaissance:
-		_dispatch_hint.text = "Наведите нос на объект, сблизьтесь до 180 м от поверхности и снизьте относительную скорость до 45 м/с."
+		_dispatch_hint.text = "Наведите нос на цель. Держитесь в 5–180 м от поверхности при относительной скорости до 45 м/с."
 	else:
 		_dispatch_hint.text = "Перехватите рейдера в этой системе. Его можно выбрать в списке целей."
 	_dispatch_hint.visible = true

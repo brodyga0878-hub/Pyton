@@ -37,6 +37,8 @@ const HATCH_LEAF_RADIUS := DockAccess.HATCH_RADIUS + 0.12
 const HATCH_HALF_DEPTH := 0.10
 
 static var _panel_shader: Shader
+static var _solar_shader: Shader
+static var _glass_shader: Shader
 static var _paint_panel_data: Texture2D
 static var _brushed_panel_data: Texture2D
 static var _hatch_panel_geometry: ArrayMesh
@@ -183,6 +185,8 @@ var _stellar_views: Dictionary[int, Node3D] = {}
 var _companion_id := -1
 var _backdrop_planet: Node3D
 var _backdrop_material: ShaderMaterial
+var _backdrop_halo_material: ShaderMaterial
+var _backdrop_ring_material: ShaderMaterial
 var _backdrop_orbit_offset := Vector3.ZERO
 var _backdrop_orbit_axis := Vector3.UP
 var _mining_rig: Node3D
@@ -235,16 +239,20 @@ func build() -> void:
 	_lighting = Environment.new()
 	_lighting.background_mode = Environment.BG_COLOR
 	_lighting.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	_lighting.ambient_light_energy = 0.53
+	_lighting.ambient_light_energy = 0.44
 	space.environment = _lighting
 	add_child(space)
 
 	_sunlight = DirectionalLight3D.new()
 	_sunlight.light_energy = 1.22
+	_sunlight.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
+	_sunlight.directional_shadow_split_1 = 0.22
+	_sunlight.directional_shadow_blend_splits = true
+	_sunlight.directional_shadow_max_distance = 96.0
+	_sunlight.shadow_normal_bias = 0.85
 	add_child(_sunlight)
 	_fill = DirectionalLight3D.new()
-	_fill.rotation_degrees = Vector3(16.0, 145.0, 0.0)
-	_fill.light_energy = 0.39
+	_fill.light_energy = 0.0
 	add_child(_fill)
 
 	_build_ship_model(_ship_hull_id)
@@ -305,6 +313,8 @@ func _load_sector(id: int) -> void:
 	_gas_giant_id = Catalog.gas_giant_for(id)
 	_backdrop_planet = null
 	_backdrop_material = null
+	_backdrop_halo_material = null
+	_backdrop_ring_material = null
 	var local_stars := Catalog.stars_for(id)
 	_companion_id = int(local_stars[1]) if local_stars.size() > 1 else -1
 	_last_position = Vector3.INF
@@ -313,16 +323,15 @@ func _load_sector(id: int) -> void:
 	var cool := id == Catalog.VELAR_SYSTEM
 	var fringe := id == Catalog.FRINGE_SYSTEM
 	_lighting.background_color = Color("#07091a") if cool else Color("#050910")
-	_lighting.ambient_light_color = Color("#8eaae5") if cool else Color("#99b8d0")
+	_lighting.ambient_light_color = Color("#a0b7e1") if cool else Color("#a6bbc9")
 	_sunlight.light_color = Color("#b6dbff") if cool else Color("#ffefd9")
-	_fill.rotation_degrees = Vector3(16.0, 145.0, 0.0)
-	_fill.light_color = Color("#c8a6ee") if cool else Color("#84c8ff")
-	_fill.light_energy = 0.39
+	_fill.light_specular = 1.0 if _companion_id >= 0 else 0.30
 	if fringe:
 		_lighting.background_color = Color("#091511")
-		_lighting.ambient_light_color = Color("#8da99a")
+		_lighting.ambient_light_color = Color("#a1b9ad")
 		_sunlight.light_color = Color("#ffe3ad")
-		_fill.light_color = Color("#81cdb0")
+	if Catalog.is_generated_system(id):
+		_sunlight.light_color = Color.WHITE.lerp(Catalog.site(_star_id).accent, 0.50)
 
 	_sector = Node3D.new()
 	add_child(_sector)
@@ -371,6 +380,8 @@ func _load_sector(id: int) -> void:
 
 func set_visual_profile(profile: int) -> void:
 	_visual_profile = clampi(profile, 0, 2)
+	if is_instance_valid(_sunlight):
+		_sunlight.shadow_enabled = _visual_profile == 2
 	for fittings in [_ship_fittings, _sector_fittings]:
 		for item: Node3D in fittings:
 			item.visible = _visual_profile >= int(item.get_meta("minimum_profile"))
@@ -586,13 +597,18 @@ func sync(sim: RefCounted, delta: float) -> void:
 		_update_stellar_light(_fill, _stellar_views[_companion_id].position, position_now, 0.65)
 	if _gas_giant_id >= 0:
 		_backdrop_planet.position = sim.target_position(_gas_giant_id)
-		var light_direction := (_star.position - _backdrop_planet.position).normalized()
-		_backdrop_material.set_shader_parameter("light_direction", light_direction)
 	elif _backdrop_planet != null:
 		var backdrop_phase := TAU * fposmod(float(sim.orbit_time), BACKDROP_ORBIT_SECONDS) / BACKDROP_ORBIT_SECONDS
 		_backdrop_planet.position = _star.position + _backdrop_orbit_offset.rotated(_backdrop_orbit_axis, backdrop_phase)
-	if _visual_profile > 0 and _backdrop_material != null:
-		_backdrop_material.set_shader_parameter("weather_phase", fposmod(float(sim.orbit_time), CLOUD_CYCLE_SECONDS) / CLOUD_CYCLE_SECONDS)
+	if _backdrop_material != null:
+		var light_direction := _backdrop_planet.position.direction_to(_star.position)
+		for paint: ShaderMaterial in [_backdrop_material, _backdrop_halo_material, _backdrop_ring_material]:
+			if paint != null:
+				paint.set_shader_parameter("light_direction", light_direction)
+		if _visual_profile > 0:
+			_backdrop_material.set_shader_parameter("weather_phase", fposmod(epoch, CLOUD_CYCLE_SECONDS) / CLOUD_CYCLE_SECONDS)
+	if _companion_id < 0:
+		_update_reflected_light(position_now)
 	_last_position = position_now
 	_last_berth = berth
 	_last_landed_basis = ship_orientation if body_attached else Basis.IDENTITY
@@ -642,9 +658,11 @@ func sync(sim: RefCounted, delta: float) -> void:
 	var haze: Dictionary = _atmosphere.local_haze()
 	_lighting.fog_enabled = bool(haze.get("inside", false))
 	if _lighting.fog_enabled:
-		_lighting.fog_light_color = haze.color
-		_lighting.fog_light_energy = 0.48
-		_lighting.fog_density = float(haze.density) * 0.0015
+		var daylight := float(haze.daylight)
+		var twilight := float(haze.twilight)
+		_lighting.fog_light_color = haze.color.lerp(Color("#e39b72"), twilight * 0.45)
+		_lighting.fog_light_energy = 0.12 + daylight * 0.43 + twilight * 0.13
+		_lighting.fog_density = float(haze.density) * 0.0018
 		_lighting.fog_sky_affect = 0.0
 
 
@@ -998,10 +1016,52 @@ func _update_stellar_light(light: DirectionalLight3D, source: Vector3, observer:
 	var light_travel := observer - source
 	var distance_squared := light_travel.length_squared()
 	if distance_squared > 1.0:
-		var incoming := light_travel.normalized()
-		var up := Vector3.BACK if absf(incoming.y) > 0.96 else Vector3.UP
-		light.basis = Basis.looking_at(incoming, up)
+		_aim_light(light, light_travel.normalized())
 	light.light_energy = strength * lerpf(0.25, 1.0, 1.0 / (1.0 + distance_squared / 2250000.0))
+
+
+func _update_reflected_light(observer: Vector3) -> void:
+	var travel := Vector3.ZERO
+	var tint := Vector3.ZERO
+	var flux := 0.0
+	for site_id: int in _surface_views:
+		var body := _surface_views[site_id]
+		var site := Catalog.site(site_id)
+		var incoming := body.position.direction_to(observer)
+		var bounce := _reflected_fraction(observer, body.position, float(site.radius), incoming)
+		var color: Color = site.surface_color
+		# The bluest ice has a higher albedo than dust and basalt.
+		bounce *= 0.52 if site.resource == "ice" else 0.32
+		travel += incoming * bounce
+		tint += Vector3(color.r, color.g, color.b) * bounce
+		flux += bounce
+	if _gas_giant_id >= 0:
+		var site := Catalog.site(_gas_giant_id)
+		var incoming := _backdrop_planet.position.direction_to(observer)
+		var bounce := _reflected_fraction(observer, _backdrop_planet.position, float(site.radius), incoming) * 0.36
+		travel += incoming * bounce
+		tint += Vector3(0.92, 0.73, 0.56) * bounce
+		flux += bounce
+	_fill.light_energy = minf(travel.length() * _sunlight.light_energy, 0.45)
+	if flux > 0.0001 and not travel.is_zero_approx():
+		tint /= flux
+		_fill.light_color = _sunlight.light_color.lerp(Color(tint.x, tint.y, tint.z), 0.6)
+		_aim_light(_fill, travel.normalized())
+
+
+func _reflected_fraction(observer: Vector3, center: Vector3, radius: float, incoming: Vector3) -> float:
+	var coverage := radius * radius / maxf(center.distance_squared_to(observer), radius * radius)
+	if coverage <= 0.006:
+		return 0.0
+	# Lambert sphere phase, scaled by the apparent area of the reflector.
+	var mu := clampf(incoming.dot(center.direction_to(_star.position)), -1.0, 1.0)
+	var phase := (sqrt(1.0 - mu * mu) + (PI - acos(mu)) * mu) / PI
+	return coverage * phase * smoothstep(0.006, 0.025, coverage)
+
+
+func _aim_light(light: DirectionalLight3D, incoming: Vector3) -> void:
+	var up := Vector3.BACK if absf(incoming.y) > 0.96 else Vector3.UP
+	light.basis = Basis.looking_at(incoming, up)
 
 
 func _sync_landing_gear(progress: float) -> void:
@@ -1104,9 +1164,15 @@ func _mesh(parent: Node3D, primitive: Mesh, paint: Material, at: Vector3) -> Mes
 	item.mesh = primitive
 	item.material_override = paint
 	item.position = at
-	item.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	item.cast_shadow = _opaque_shadow_mode(paint)
 	parent.add_child(item)
 	return item
+
+
+func _opaque_shadow_mode(paint: Material) -> GeometryInstance3D.ShadowCastingSetting:
+	if paint is ShaderMaterial and (paint.shader == _panel_shader or paint.shader == _solar_shader):
+		return GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	return GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 
 func _surface(color: Color, metallic := 0.25, roughness := 0.65) -> StandardMaterial3D:
@@ -1134,36 +1200,71 @@ uniform sampler2D panel_data : filter_linear_mipmap, repeat_enable;
 uniform vec2 panel_repeat = vec2(2.0, 2.0);
 uniform float rough_center = 0.52;
 uniform float bump_depth = 0.003;
+uniform bool brushed = false;
+
+// The covered fraction of a pixel, even when a joint is thinner than one pixel.
+float joint_coverage(float distance, float radius, float pixel) {
+	float half_pixel = max(pixel * 0.5, 0.0001);
+	return clamp((radius - distance + half_pixel) / (2.0 * half_pixel), 0.0, 1.0)
+		- clamp((-radius - distance + half_pixel) / (2.0 * half_pixel), 0.0, 1.0);
+}
 
 void fragment() {
 	vec3 surface = paint.rgb;
 	float micro_roughness = rough;
 	float surface_metal = metal;
+	float occlusion = 1.0;
 	if (finish_quality > 0) {
 		vec2 cell = UV * seams;
-		vec2 edge = 0.5 - abs(fract(cell) - 0.5);
+		vec2 panel = fract(cell);
+		vec2 edge = min(panel, 1.0 - panel);
 		float spacing = min(edge.x, edge.y);
-		float pixel = max(fwidth(cell.x), fwidth(cell.y));
-		float fade = 1.0 - smoothstep(0.09, 0.37, pixel);
-		float seam = (1.0 - smoothstep(0.014, 0.042 + pixel * 0.45, spacing)) * fade;
-		float ridge = (1.0 - smoothstep(0.006, 0.021 + pixel * 0.45, abs(spacing - 0.060))) * fade;
-		float variation = sin(dot(floor(cell), vec2(7.1, 5.3))) * 0.063 * fade;
-		surface *= 1.0 + variation + ridge * 0.12 - seam * 0.36;
-		micro_roughness += seam * 0.17 - ridge * 0.08;
+		vec2 pixel = fwidth(cell);
+		float projected = max(pixel.x, pixel.y);
+		float fade = 1.0 - smoothstep(0.10, 0.55, projected);
+		float seam = max(joint_coverage(edge.x, 0.020, pixel.x), joint_coverage(edge.y, 0.020, pixel.y)) * fade;
+		float bevel = joint_coverage(spacing - 0.040, 0.014, projected) * fade;
+		float variation = sin(dot(floor(cell), vec2(7.1, 5.3))) * 0.069 * fade;
+		float seat = 0.0;
+		float head = 0.0;
+		if (finish_quality > 1) {
+			// Recessed fasteners sit along one shoulder of each panel.
+			vec2 offset = (vec2(panel.x - 0.09, edge.y - 0.16)) * vec2(1.05, 1.34);
+			float fastener = length(offset);
+			float resolved = 1.0 - smoothstep(0.025, 0.093, projected);
+			seat = joint_coverage(fastener, 0.035, projected) * resolved;
+			head = joint_coverage(fastener, 0.021, projected) * seat;
+			// The slot is faded with the head so it cannot become a flashing pixel.
+			head *= 1.0 - joint_coverage(offset.y - offset.x * 0.34, 0.004, projected) * 0.56;
+		}
+		surface *= 1.0 + variation + bevel * 0.12;
+		occlusion = 1.0 - seam * 0.38 - seat * 0.24 + head * 0.18;
+		surface *= 1.0 - seam * 0.27 - seat * 0.25;
+		micro_roughness += seam * 0.17 - bevel * 0.08;
 		// The economy profile never enters this branch or samples a map.
-		vec3 detail = texture(panel_data, UV * panel_repeat).rgb;
+		vec2 detail_uv = UV * panel_repeat;
+		vec3 detail = texture(panel_data, detail_uv).rgb;
 		float fidelity = finish_quality > 1 ? 1.0 : 0.62;
 		float wear = (detail.r - 0.5) * fidelity;
-		float abrasion = (1.0 - smoothstep(0.36, 0.50, detail.r * 0.56 + detail.g * 0.44)) * fidelity;
-		float bare = abrasion * (0.33 + ridge * 0.27);
-		surface *= 1.0 + wear * 0.47;
-		surface = mix(surface, mix(surface * 0.64, vec3(0.33, 0.39, 0.42), 0.43), bare);
-		micro_roughness += (detail.b - rough_center) * fidelity * 0.45 - bare * 0.11;
-		surface_metal = mix(metal, max(metal, 0.60), bare);
+		surface *= 1.0 + wear * (brushed ? 0.63 : 0.52);
+		if (!brushed) {
+			float abrasion = (1.0 - smoothstep(0.35, 0.49, detail.r * 0.44 + detail.g * 0.56)) * fidelity;
+			float exposed = abrasion * (0.36 + bevel * 0.31);
+			surface = mix(surface, mix(surface * 0.65, vec3(0.38, 0.41, 0.44), 0.58), exposed);
+			surface_metal = mix(metal, 0.76, exposed);
+			micro_roughness -= exposed * 0.12;
+		}
+		surface = mix(surface, vec3(0.42, 0.46, 0.48), head * 0.39);
+		surface_metal = mix(surface_metal, 0.74, head * 0.58);
+		micro_roughness += (detail.b - rough_center) * fidelity * 0.53;
+		// When the mip chain averages the relief, broaden its unresolved highlight.
+		vec2 texel_span = fwidth(detail_uv) * vec2(textureSize(panel_data, 0));
+		float unresolved = smoothstep(1.0, 14.0, max(texel_span.x, texel_span.y));
+		micro_roughness += unresolved * (brushed ? 0.11 : 0.065);
 		if (finish_quality > 1) {
 			// Surface-gradient bump also works on the custom hull, which has
 			// UVs and normals but no tangent stream. One filtered sample only.
-			float height = detail.g - 0.5 + ridge * 0.042 - seam * 0.08;
+			float height = (detail.g - 0.5) * (1.0 - unresolved * 0.75) + bevel * 0.044 - seam * 0.09 - seat * 0.045;
 			vec3 n = normalize(NORMAL);
 			vec3 sx = dFdx(VERTEX);
 			vec3 sy = dFdy(VERTEX);
@@ -1182,8 +1283,9 @@ void fragment() {
 	}
 	ALBEDO = surface;
 	METALLIC = surface_metal;
-	ROUGHNESS = clamp(micro_roughness, 0.16, 0.96);
+	ROUGHNESS = clamp(micro_roughness, 0.21, 0.96);
 	SPECULAR = base_specular;
+	AO = occlusion;
 }
 """
 	var finish := ShaderMaterial.new()
@@ -1199,6 +1301,7 @@ void fragment() {
 		_brushed_panel_data = load("res://assets/materials/metal_brushed.png") as Texture2D
 	var brushed := metallic >= 0.45 or roughness >= 0.65
 	finish.set_shader_parameter("panel_data", _brushed_panel_data if brushed else _paint_panel_data)
+	finish.set_shader_parameter("brushed", brushed)
 	finish.set_shader_parameter("panel_repeat", Vector2(2.0, 3.0) if ship else Vector2(3.0, 2.0))
 	finish.set_shader_parameter("rough_center", 0.32 if brushed else 0.52)
 	finish.set_shader_parameter("bump_depth", 0.0045 if ship else 0.014)
@@ -1207,6 +1310,71 @@ void fragment() {
 	else:
 		_sector_finishes.append(finish)
 	return finish
+
+
+func _solar_cells() -> ShaderMaterial:
+	if _solar_shader == null:
+		_solar_shader = Shader.new()
+		_solar_shader.code = """
+shader_type spatial;
+render_mode diffuse_burley;
+
+void fragment() {
+	// BoxMesh packs its six faces into a three-by-two UV atlas.
+	vec2 atlas = UV * vec2(3.0, 2.0);
+	vec2 face = fract(atlas);
+	vec2 edge = min(face, 1.0 - face);
+	float rim = 1.0 - smoothstep(0.020, 0.037 + max(fwidth(atlas.x), fwidth(atlas.y)), min(edge.x, edge.y));
+	vec2 rows = atlas * vec2(14.0, 8.0);
+	vec2 tile = fract(rows);
+	vec2 gap = min(tile, 1.0 - tile);
+	vec2 pixel = max(fwidth(rows), vec2(0.0001));
+	vec2 insulation = (1.0 - smoothstep(vec2(0.028), vec2(0.07) + pixel * 0.4, gap))
+		* (1.0 - smoothstep(vec2(0.1), vec2(0.49), pixel));
+	float grid = max(insulation.x, insulation.y);
+	float lattice = sin(dot(floor(rows), vec2(0.83, 2.07))) * (1.0 - smoothstep(0.06, 0.37, max(pixel.x, pixel.y)));
+	float traces = (1.0 - smoothstep(0.010, 0.029 + pixel.x * 0.4, abs(tile.x - 0.50)))
+		* (1.0 - smoothstep(0.030, 0.17, pixel.x));
+	float bevel = max(grid, rim);
+	vec3 silicon = mix(vec3(0.065, 0.135, 0.244), vec3(0.104, 0.224, 0.333), 0.5 + lattice * 0.5);
+	ALBEDO = mix(mix(silicon, vec3(0.34, 0.44, 0.49), traces * 0.32), vec3(0.12, 0.14, 0.16), bevel);
+	METALLIC = mix(0.29, 0.56, bevel);
+	ROUGHNESS = mix(0.31, 0.63, bevel);
+	SPECULAR = 0.48;
+}
+"""
+	var cells := ShaderMaterial.new()
+	cells.shader = _solar_shader
+	return cells
+
+
+func _canopy_glass(tint: Color) -> ShaderMaterial:
+	if _glass_shader == null:
+		_glass_shader = Shader.new()
+		_glass_shader.code = """
+shader_type spatial;
+render_mode diffuse_burley;
+uniform vec4 tint : source_color;
+
+void fragment() {
+	vec3 normal = normalize(NORMAL);
+	vec3 view = normalize(VIEW);
+	float grazing = 1.0 - clamp(dot(normal, view), 0.0, 1.0);
+	float fresnel = grazing * grazing * grazing * grazing * grazing;
+	vec3 reflection = mat3(INV_VIEW_MATRIX) * reflect(-view, normal);
+	// A faint broad reflection stays fixed in space as the ship turns.
+	float scattered_light = smoothstep(-0.42, 0.32, reflection.y);
+	ALBEDO = tint.rgb * 0.71;
+	METALLIC = 0.0;
+	ROUGHNESS = mix(0.23, 0.31, fresnel);
+	SPECULAR = 0.53;
+	EMISSION = tint.rgb * 0.028 + vec3(0.16, 0.25, 0.35) * scattered_light * (0.026 + fresnel * 0.28);
+}
+"""
+	var glass := ShaderMaterial.new()
+	glass.shader = _glass_shader
+	glass.set_shader_parameter("tint", tint)
+	return glass
 
 
 func _fitting(parent: Node3D, minimum: int) -> Node3D:
@@ -1243,7 +1411,7 @@ func _box_batch(parent: Node3D, paint: Material, shapes: Array) -> MultiMesh:
 		batch.set_instance_transform(index, Transform3D(axes.scaled_local(size), shape[0]))
 	var instance := MultiMeshInstance3D.new()
 	instance.multimesh = batch
-	instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	instance.cast_shadow = _opaque_shadow_mode(paint)
 	parent.add_child(instance)
 	return batch
 
@@ -1265,7 +1433,7 @@ func _ring(parent: Node3D, paint: Material, at: Vector3, radius: float, thicknes
 	ring.inner_radius = radius - thickness * 0.5
 	ring.outer_radius = radius + thickness * 0.5
 	ring.rings = segments
-	ring.ring_segments = 6
+	ring.ring_segments = 8
 	var item := _mesh(parent, ring, paint, at)
 	item.rotation.x = PI * 0.5
 
@@ -1274,14 +1442,13 @@ func _build_station(station: Node3D, index: int, accent: Color) -> void:
 	var primary := Color("#8c9bab") if index == 0 else Color("#969692").lerp(accent, 0.16)
 	var ceramic := _panel_finish(primary, 0.28, 0.56, Vector2(5, 3))
 	var graphite := _panel_finish(Color("#2a3b49"), 0.51, 0.68, Vector2(4, 2))
-	var panels := _panel_finish(Color("#234a68") if index == 0 else Color("#483d4d").lerp(accent, 0.15), 0.35, 0.50, Vector2(4, 3))
 	var glow := _light(accent)
-	_cylinder(station, ceramic, Vector3(0, 0, -4), 7.4, 9.1, 8.8, 24)
-	_cylinder(station, graphite, Vector3(0, 0, 0.45), 6.9, 7.5, 1.4, 24)
-	_cylinder(station, _light(Color("#080f19")), Vector3(0, 0, 1.25), 5.14, 5.14, 0.13, 22)
-	_ring(station, ceramic, Vector3(0, 0, 1.65), 5.9, 1.0, 36)
-	_ring(station, glow, Vector3(0, 0, 1.95), 5.8, 0.16, 36)
-	_ring(station, graphite, Vector3(0, 0, -6.65), 8.0, 0.7, 36)
+	_cylinder(station, ceramic, Vector3(0, 0, -4), 7.4, 9.1, 8.8, 48)
+	_cylinder(station, graphite, Vector3(0, 0, 0.45), 6.9, 7.5, 1.4, 48)
+	_cylinder(station, _light(Color("#080f19")), Vector3(0, 0, 1.25), 5.14, 5.14, 0.13, 48)
+	_ring(station, ceramic, Vector3(0, 0, 1.65), 5.9, 1.0, 56)
+	_ring(station, glow, Vector3(0, 0, 1.95), 5.8, 0.16, 56)
+	_ring(station, graphite, Vector3(0, 0, -6.65), 8.0, 0.7, 56)
 	_build_dock_fittings(station, ceramic, graphite, glow)
 	if index in [3, 10]:
 		_build_ring_station(station, glow)
@@ -1320,7 +1487,8 @@ func _build_station(station: Node3D, index: int, accent: Color) -> void:
 		var radial := Vector3(cos(angle), sin(angle), 0.0)
 		stripes.append([radial * 7.38 + Vector3(0, 0, -1.38), Vector3(0.17, 1.2, 0.75), angle])
 	_box_batch(station, ceramic, struts)
-	_box_batch(station, panels, plates)
+	if not plates.is_empty():
+		_box_batch(station, _solar_cells(), plates)
 	_box_batch(station, graphite, stripes)
 	_box_batch(station, glow, lamps)
 
@@ -1422,8 +1590,8 @@ func _build_dock_hatch(station: Node3D, ground := false) -> DockHatch:
 	var steel := _surface(Color("#526878"), 0.46, 0.49)
 	var dark := _surface(Color("#23323f"), 0.51, 0.60)
 	var stripe := _light(Color("#efb881"))
-	_ring(hatch, dark, Vector3(0, 0, -0.10), 5.30, 1.20, 32)
-	_ring(hatch, steel, Vector3(0, 0, 0.32), 5.00, 0.64, 32)
+	_ring(hatch, dark, Vector3(0, 0, -0.10), 5.30, 1.20, 56)
+	_ring(hatch, steel, Vector3(0, 0, 0.32), 5.00, 0.64, 56)
 	var supports: Array = []
 	var signals: Array = []
 	for quarter in range(4):
@@ -1479,9 +1647,9 @@ func _hatch_sector_mesh() -> ArrayMesh:
 func _build_ring_station(station: Node3D, glow: StandardMaterial3D) -> void:
 	var pale := _panel_finish(Color("#8498b6"), 0.36, 0.58, Vector2(12, 2))
 	var shade := _panel_finish(Color("#35425a"), 0.38, 0.72, Vector2(8, 3))
-	_ring(station, shade, Vector3(0, 0, -4.8), 17.9, 2.7, 44)
-	_ring(station, pale, Vector3(0, 0, -3.1), 17.9, 1.3, 44)
-	_ring(station, glow, Vector3(0, 0, -2.35), 17.8, 0.16, 44)
+	_ring(station, shade, Vector3(0, 0, -4.8), 17.9, 2.7, 72)
+	_ring(station, pale, Vector3(0, 0, -3.1), 17.9, 1.3, 72)
+	_ring(station, glow, Vector3(0, 0, -2.35), 17.8, 0.16, 72)
 	var pylons: Array = []
 	var lamps: Array = []
 	var radiators: Array = []
@@ -1647,10 +1815,7 @@ func _build_ship() -> void:
 	var bare_metal := _panel_finish(Color("#778b96"), 0.61, 0.32, Vector2(4, 2), true, 0.5)
 	var ice := _light(Color("#8df8e6"))
 	var warm := _light(Color("#fbb768"))
-	var canopy := _surface(Color("#214f70"), 0.38, 0.18)
-	canopy.emission_enabled = true
-	canopy.emission = Color("#16415c")
-	canopy.emission_energy_multiplier = 0.26
+	var canopy := _canopy_glass(Color("#214f70"))
 	_sectioned_shell(_ship, shell, [
 		Vector3(-1.58, 0.16, 0.12), Vector3(-1.43, 0.30, 0.21), Vector3(-0.48, 0.55, 0.39),
 		Vector3(0.19, 0.59, 0.42), Vector3(1.18, 0.62, 0.50), Vector3(1.44, 0.56, 0.44),
@@ -1701,7 +1866,7 @@ func _build_ship() -> void:
 	_box_batch(detail, warm, service_slots)
 	_ring(trim, graphite, Vector3(0, 0.02, 1.77), 0.47, 0.045, 30)
 	_build_ship_gear(shell, graphite)
-	_build_ship_jet(Vector3(0, 0.02, 2.33))
+	_build_ship_jet(Vector3(0, 0.02, 1.81))
 
 
 func _build_freighter() -> void:
@@ -1712,10 +1877,7 @@ func _build_freighter() -> void:
 	var steel := _panel_finish(Color("#81949b"), 0.62, 0.34, Vector2(5, 2), true)
 	var exhaust := _light(Color("#9af7ed"))
 	var caution := _light(Color("#ffd182"))
-	var glass := _surface(Color("#244d65"), 0.36, 0.16)
-	glass.emission_enabled = true
-	glass.emission = Color("#183b52")
-	glass.emission_energy_multiplier = 0.29
+	var glass := _canopy_glass(Color("#244d65"))
 	_sectioned_shell(_ship, frame, [
 		Vector3(-2.32, 0.30, 0.14), Vector3(-1.72, 0.61, 0.33), Vector3(-1.03, 0.81, 0.49),
 		Vector3(1.64, 0.88, 0.49), Vector3(2.13, 0.69, 0.43),
@@ -1771,14 +1933,14 @@ func _build_freighter() -> void:
 	_box_batch(trim, caution, lamps)
 	_box_batch(_fitting(_ship, 2), steel, fins)
 	_build_ship_gear(shell, frame)
-	_build_ship_jet(Vector3(0, -0.18, 2.95), 0.44)
+	_build_ship_jet(Vector3(0, -0.18, 2.47), 0.44)
 
 
 func _build_interceptor() -> void:
 	var ceramic := _panel_finish(Color("a45159"), 0.37, 0.38, Vector2(6, 2), true)
 	var frame := _panel_finish(Color("253741"), 0.58, 0.55, Vector2(4, 2), true)
 	var tips := _panel_finish(Color("d5a763"), 0.48, 0.42, Vector2(4, 1), true)
-	var canopy := _surface(Color("31546e"), 0.44, 0.19)
+	var canopy := _canopy_glass(Color("31546e"))
 	var engine := _light(Color("a2daff"))
 	_sectioned_shell(_ship, ceramic, [Vector3(-2.1, 0.13, 0.08), Vector3(-1.3, 0.32, 0.24),
 		Vector3(0.25, 0.55, 0.34), Vector3(1.62, 0.43, 0.27)])
@@ -1799,7 +1961,7 @@ func _build_interceptor() -> void:
 	_box_batch(_ship, tips, trims)
 	_box_batch(_fitting(_ship, 1), engine, [[Vector3(0, 0.32, 1.48), Vector3(0.32, 0.04, 0.11)]])
 	_build_ship_gear(ceramic, frame)
-	_build_ship_jet(Vector3(0.59, -0.15, 2.44), 0.19, true)
+	_build_ship_jet(Vector3(0.59, -0.15, 1.95), 0.19, true)
 
 
 func _build_hauler() -> void:
@@ -1807,7 +1969,7 @@ func _build_hauler() -> void:
 	var frame := _panel_finish(Color("354647"), 0.59, 0.55, Vector2(4, 2), true)
 	var crates := _panel_finish(Color("829365"), 0.34, 0.61, Vector2(5, 3), true)
 	var girders := _panel_finish(Color("b09b62"), 0.52, 0.39, Vector2(5, 2), true)
-	var canopy := _surface(Color("285872"), 0.39, 0.18)
+	var canopy := _canopy_glass(Color("285872"))
 	var engine := _light(Color("8cddca"))
 	_sectioned_shell(_ship, frame, [Vector3(-2.91, 0.48, 0.23), Vector3(-2.40, 0.67, 0.36),
 		Vector3(2.46, 0.67, 0.36), Vector3(2.87, 0.54, 0.35)], Vector3(0, -0.18, 0))
@@ -1833,7 +1995,7 @@ func _build_hauler() -> void:
 	_box_batch(_ship, girders, braces)
 	_box_batch(_fitting(_ship, 1), engine, lamps)
 	_build_ship_gear(ceramic, frame)
-	_build_ship_jet(Vector3(1.9, -0.30, 3.60), 0.37, true)
+	_build_ship_jet(Vector3(1.9, -0.30, 3.09), 0.37, true)
 
 
 func _build_ship_gear(shell: Material, graphite: Material) -> void:
@@ -1857,34 +2019,44 @@ func _build_ship_gear(shell: Material, graphite: Material) -> void:
 
 
 func _build_ship_jet(at: Vector3, radius := 0.35, mirrored := false) -> void:
-	var flow := Shader.new()
-	flow.code = """
+	if _jet_material == null:
+		var flow := Shader.new()
+		flow.code = """
 shader_type spatial;
 render_mode unshaded, blend_add, depth_draw_never, cull_disabled;
 uniform float pulse = 0.6;
-varying float tail;
+varying float along_flow;
 void vertex() {
-	tail = 1.0 - clamp(VERTEX.y / 1.6 + 0.5, 0.0, 1.0);
+	// Anchor the plume at the nozzle when local Y is scaled with throttle.
+	VERTEX.y += 0.8;
+	along_flow = clamp(VERTEX.y / 1.6, 0.0, 1.0);
 }
 void fragment() {
-	ALBEDO = mix(vec3(0.16, 0.56, 0.83), vec3(0.55, 0.94, 1.0), tail);
-	ALPHA = pulse * tail * tail;
+	float falloff = exp(-along_flow * 3.4) * (1.0 - smoothstep(0.72, 1.0, along_flow));
+	float limb = smoothstep(0.02, 0.82, abs(dot(normalize(NORMAL), normalize(VIEW))));
+	float ignition = smoothstep(0.0, 0.045, along_flow);
+	float core = exp(-along_flow * 7.0);
+	ALBEDO = mix(vec3(0.10, 0.44, 0.94), vec3(0.72, 0.96, 1.0), core);
+	ALPHA = pulse * falloff * ignition * mix(0.12 * core, 1.0, limb) * 0.62;
 }
 """
-	_jet_material = ShaderMaterial.new()
-	_jet_material.shader = flow
+		_jet_material = ShaderMaterial.new()
+		_jet_material.shader = flow
 	var flare := CylinderMesh.new()
-	flare.top_radius = 0.05
+	flare.top_radius = radius * 0.15
 	flare.bottom_radius = radius
 	flare.height = 1.6
-	flare.radial_segments = 10
+	flare.radial_segments = 24
 	flare.rings = 1
+	flare.cap_bottom = false
+	flare.cap_top = false
 	var placements: Array[Vector3] = [at]
 	if mirrored:
 		placements.append(Vector3(-at.x, at.y, at.z))
 	for position_at: Vector3 in placements:
 		var jet := _mesh(_ship, flare, _jet_material, position_at)
 		jet.rotation.x = PI * 0.5
+		jet.extra_cull_margin = 0.8
 		_jets.append(jet)
 
 
@@ -1893,6 +2065,7 @@ func _build_stars(cool: bool, fringe: bool) -> void:
 	generator.seed = 86507 if fringe else (64871 if cool else 22361)
 	var mesh := SurfaceTool.new()
 	mesh.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var coords := [Vector2(1, 0.5), Vector2(0.5, 1), Vector2(0, 0.5), Vector2(0.5, 0)]
 	for index in range(1730):
 		var vertical := generator.randf_range(-1.0, 1.0)
 		var longitude := generator.randf_range(0.0, TAU)
@@ -1900,7 +2073,7 @@ func _build_stars(cool: bool, fringe: bool) -> void:
 		var direction := Vector3(cos(longitude) * equator, vertical, sin(longitude) * equator)
 		var horizontal := direction.cross(Vector3.UP).normalized()
 		var upright := direction.cross(horizontal).normalized()
-		var size := generator.randf_range(1.17, 3.0)
+		var size := generator.randf_range(1.95, 4.9)
 		var amount := generator.randf_range(0.25, 0.72)
 		if index % 43 == 0:
 			size *= 1.75
@@ -1915,10 +2088,30 @@ func _build_stars(cool: bool, fringe: bool) -> void:
 		]
 		for corner in [0, 1, 2, 0, 2, 3]:
 			mesh.set_color(tint)
+			mesh.set_uv(coords[corner])
 			mesh.add_vertex(vertices[corner])
-	var paint := _light(Color.WHITE)
-	paint.vertex_color_use_as_albedo = true
-	paint.cull_mode = BaseMaterial3D.CULL_DISABLED
+	var shader := Shader.new()
+	shader.code = """
+shader_type spatial;
+render_mode unshaded, cull_disabled, depth_draw_never;
+void vertex() {
+	POSITION = PROJECTION_MATRIX * MODELVIEW_MATRIX * vec4(VERTEX, 1.0);
+	// Render the starfield behind physical bodies at any world distance.
+#if CURRENT_RENDERER == RENDERER_COMPATIBILITY
+	POSITION.z = -0.999999 * POSITION.w;
+#else
+	POSITION.z = 0.0000005 * POSITION.w;
+#endif
+}
+void fragment() {
+	float radius = length((UV - 0.5) * 2.0);
+	ALBEDO = COLOR.rgb;
+	ALPHA = exp(-radius * radius * 4.0) * (1.0 - smoothstep(0.30, 0.69, radius));
+}
+"""
+	var paint := ShaderMaterial.new()
+	paint.shader = shader
+	paint.render_priority = -100
 	_stars = _mesh(_sector, mesh.commit(), paint, Vector3.ZERO)
 
 
@@ -1941,14 +2134,15 @@ func _build_gas_giant(cool: bool, fringe: bool) -> void:
 	var sphere := SphereMesh.new()
 	sphere.radius = float(Catalog.site(_gas_giant_id).radius) if physical else 870.0
 	sphere.height = sphere.radius * 2.0
-	sphere.radial_segments = 56
-	sphere.rings = 26
+	sphere.radial_segments = 72
+	sphere.rings = 36
 	var shader := Shader.new()
 	shader.code = """
 shader_type spatial;
 render_mode unshaded;
 uniform bool cool = false;
 uniform bool fringe = false;
+uniform bool physical_atmosphere = false;
 uniform sampler2D cloud_detail : repeat_enable, filter_linear_mipmap_anisotropic;
 uniform int cloud_quality = 1;
 uniform float weather_phase = 0.0;
@@ -1975,7 +2169,7 @@ void fragment() {
 		bands_uv += vec2(p.y * 0.12, sin(p.x * 6.0 + p.z * 7.0) * 0.18);
 		vec3 storm = texture(cloud_detail, bands_uv).rgb;
 		float fold = storm.r * 0.61 + storm.g * 0.39;
-		warp += (storm.g - 0.5) * 2.34 * polar_fade;
+		warp += (storm.g - 0.5) * 2.72 * polar_fade;
 		breakup = (fold - 0.5) * 0.32 * polar_fade;
 		wisps = smoothstep(0.48, 0.66, storm.b + (fold - 0.5) * 0.17) * polar_fade * 0.24;
 		cloud_shadow = (1.0 - smoothstep(0.33, 0.53, fold)) * polar_fade;
@@ -1987,55 +2181,69 @@ void fragment() {
 		}
 	}
 	float ribbons = sin(latitude * 26.0 + warp);
-	float details = sin(latitude * 112.0 + sin(p.x * 25.0) * 1.5) * 0.1;
+	float shear = latitude * 112.0 + sin(p.x * 25.0) * 1.5 + warp * 1.7;
+	float details = sin(shear) * (1.0 - smoothstep(0.55, 3.0, fwidth(shear))) * 0.13;
 	float m = smoothstep(-0.86, 0.87, ribbons * 0.60 + details + sin(latitude * 8.0) * 0.34 + breakup);
 	vec3 low = cool ? vec3(0.13, 0.20, 0.46) : vec3(0.09, 0.27, 0.37);
-	vec3 high = cool ? vec3(0.44, 0.68, 0.71) : vec3(0.65, 0.43, 0.30);
+	vec3 high = cool ? vec3(0.48, 0.67, 0.76) : vec3(0.77, 0.58, 0.40);
 	if (fringe) {
 		low = vec3(0.09, 0.24, 0.18);
 		high = vec3(0.78, 0.60, 0.34);
 	}
 	vec3 bands = mix(low, high, m);
 	bands = mix(bands, high * vec3(1.16, 1.12, 1.07), wisps * (0.38 + 0.62 * m));
-	bands *= 1.0 - cloud_shadow * 0.18;
-	float day = smoothstep(-0.23, 0.89, dot(p, normalize(light_direction)));
-	float rim = pow(1.0 - clamp(dot(normalize(NORMAL), VIEW), 0.0, 1.0), 4.0);
+	bands *= 1.0 - cloud_shadow * 0.24;
+	float solar_altitude = dot(p, light_direction);
+	float sunlit = smoothstep(-0.12, 0.13, solar_altitude);
+	float day = sunlit * (0.26 + 0.74 * sqrt(max(0.0, solar_altitude)));
+	float view_angle = clamp(dot(normalize(NORMAL), VIEW), 0.0, 1.0);
+	float rim = pow(1.0 - view_angle, 3.4);
 	vec3 haze = fringe ? vec3(0.56, 0.63, 0.28) : (cool ? vec3(0.26, 0.44, 0.70) : vec3(0.17, 0.36, 0.44));
-	ALBEDO = bands * (0.105 + day * 0.75) + rim * haze * (0.15 + day * 0.75);
+	float twilight = sunlit * (1.0 - smoothstep(0.05, 0.48, solar_altitude));
+	vec3 limb = haze * (0.045 + 0.68 * day) + vec3(0.68, 0.32, 0.15) * twilight * 0.35;
+	vec3 clouds = bands * (0.038 + day * 1.10);
+	ALBEDO = physical_atmosphere ? clouds * (1.0 - rim * 0.16)
+		: mix(clouds, limb, rim * 0.72) + limb * rim * 0.27;
 }
 """
 	_backdrop_material = ShaderMaterial.new()
 	_backdrop_material.shader = shader
 	_backdrop_material.set_shader_parameter("cool", cool)
 	_backdrop_material.set_shader_parameter("fringe", fringe)
-	_backdrop_material.set_shader_parameter("light_direction", Vector3(0.65, 0.54, 0.63) if cool else Vector3(-0.6, 0.46, 0.72))
+	_backdrop_material.set_shader_parameter("physical_atmosphere", physical)
 	_backdrop_material.set_shader_parameter("cloud_detail", preload("res://assets/materials/cloud_bands.png"))
 	_mesh(_backdrop_planet, sphere, _backdrop_material, Vector3.ZERO)
 	if physical:
-		# The live atmosphere is rendered at the density and size used in flight.
+		# The live atmosphere provides the limb independently of the clouds.
 		return
 	var air := SphereMesh.new()
 	air.radius = 894.0
 	air.height = 1788.0
-	air.radial_segments = 48
-	air.rings = 22
+	air.radial_segments = sphere.radial_segments
+	air.rings = sphere.rings
 	var halo := Shader.new()
 	halo.code = """
 shader_type spatial;
 render_mode unshaded, blend_add, depth_draw_never;
 uniform bool cool = false;
 uniform bool fringe = false;
+uniform vec3 light_direction = vec3(0.0, 1.0, 0.0);
+varying vec3 surface_point;
+void vertex() {
+	surface_point = normalize(VERTEX);
+}
 void fragment() {
 	float rim = 1.0 - clamp(dot(normalize(NORMAL), VIEW), 0.0, 1.0);
+	float sunlit = smoothstep(-0.32, 0.38, dot(normalize(surface_point), light_direction));
 	ALBEDO = fringe ? vec3(0.55, 0.76, 0.48) : (cool ? vec3(0.36, 0.59, 0.91) : vec3(0.22, 0.46, 0.58));
-	ALPHA = smoothstep(0.54, 0.80, rim) * (1.0 - smoothstep(0.83, 1.0, rim)) * 0.38;
+	ALPHA = smoothstep(0.51, 0.78, rim) * (1.0 - smoothstep(0.82, 1.0, rim)) * (0.018 + sunlit * 0.31);
 }
 """
-	var air_material := ShaderMaterial.new()
-	air_material.shader = halo
-	air_material.set_shader_parameter("cool", cool)
-	air_material.set_shader_parameter("fringe", fringe)
-	_mesh(_fitting(_backdrop_planet, 1), air, air_material, Vector3.ZERO)
+	_backdrop_halo_material = ShaderMaterial.new()
+	_backdrop_halo_material.shader = halo
+	_backdrop_halo_material.set_shader_parameter("cool", cool)
+	_backdrop_halo_material.set_shader_parameter("fringe", fringe)
+	_mesh(_fitting(_backdrop_planet, 1), air, _backdrop_halo_material, Vector3.ZERO)
 	if cool:
 		_build_planet_ring()
 
@@ -2047,21 +2255,31 @@ func _build_planet_ring() -> void:
 	shader.code = """
 shader_type spatial;
 render_mode unshaded, blend_mix, cull_disabled, depth_draw_never;
+uniform vec3 light_direction = vec3(0.0, 1.0, 0.0);
+varying vec3 ring_plane;
+void vertex() {
+	ring_plane = normalize(MODEL_MATRIX[0].xyz) * VERTEX.x + normalize(MODEL_MATRIX[1].xyz) * VERTEX.y;
+}
 void fragment() {
 	vec2 radial = UV * 2.0 - 1.0;
 	float radius = length(radial);
-	if (radius < 0.63 || radius > 0.988) {
+	if (radius < 0.62 || radius > 0.998) {
 		discard;
 	}
-	float rim = smoothstep(0.63, 0.69, radius) * (1.0 - smoothstep(0.955, 0.988, radius));
-	float bands = 0.61 + 0.22 * sin(radius * 155.0) + 0.16 * sin(radius * 423.0);
-	float gap = smoothstep(0.005, 0.024, abs(radius - 0.833));
-	float light = 0.52 + 0.43 * smoothstep(-0.8, 0.92, radial.x - radial.y * 0.4);
+	float pixel = fwidth(radius);
+	float rim = smoothstep(0.63 - pixel, 0.69, radius) * (1.0 - smoothstep(0.955, 0.988 + pixel, radius));
+	float fine_bands = sin(radius * 423.0) * (1.0 - smoothstep(0.5, 2.8, pixel * 423.0));
+	float bands = 0.61 + 0.22 * sin(radius * 155.0) * (1.0 - smoothstep(0.5, 2.8, pixel * 155.0)) + 0.16 * fine_bands;
+	float gap = smoothstep(0.005, 0.024 + pixel, abs(radius - 0.833));
+	// In the projected cylinder behind the planet, the rings lie in its shadow.
+	float clearance = length(cross(ring_plane, light_direction)) / 870.0;
+	float shadow = smoothstep(0.96, 1.10, clearance);
+	float light = dot(ring_plane, light_direction) > 0.0 ? 1.0 : 0.21 + shadow * 0.79;
 	ALBEDO = mix(vec3(0.42, 0.42, 0.67), vec3(0.56, 0.78, 0.87), bands) * light;
 	ALPHA = bands * rim * gap * 0.55;
 }
 """
-	var paint := ShaderMaterial.new()
-	paint.shader = shader
-	var ring := _mesh(_backdrop_planet, disc, paint, Vector3.ZERO)
+	_backdrop_ring_material = ShaderMaterial.new()
+	_backdrop_ring_material.shader = shader
+	var ring := _mesh(_backdrop_planet, disc, _backdrop_ring_material, Vector3.ZERO)
 	ring.basis = Basis(Vector3.FORWARD, -0.37) * Basis(Vector3.RIGHT, 1.12)

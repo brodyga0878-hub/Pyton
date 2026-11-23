@@ -30,33 +30,35 @@ func status(sim: RefCounted) -> Dictionary:
 	if _closed_at >= 0.0 and not _expired:
 		view.stage = "complete"
 		view.paid = REWARD + (RESCUE_BONUS if _boarded_at >= 0.0 else 0)
-		view.detail = "Ива передана диспетчеру вместе с записью приюта." if _boarded_at >= 0.0 else "Диспетчер получил координаты приюта и отправил дежурный бот."
+		view.detail = "Ива в безопасности. Диспетчер получил запись с аварийного маяка." if _boarded_at >= 0.0 \
+			else "Диспетчер получил координаты укрытия и отправил спасательный катер."
 		return view
 	if _deadline_reached(sim.orbit_time):
 		view.stage = "expired"
-		view.detail = "Срок объявления истёк. Вознаграждение закрыто."
+		view.detail = "Срок поискового заказа истёк. Награда больше недоступна."
 		if occupied_seats() > 0:
-			_set_objective(view, "evacuate", "Срок выплаты истёк. Ива на борту. Передайте её дежурному любого действующего порта.",
+			_set_objective(view, "evacuate", "Срок заказа истёк. Ива на борту. Передайте её дежурному в любом действующем порту.",
 				-1, "disembark", "Высадить инженера", port >= 0)
 		return view
 	if _accepted_at < 0.0:
 		if sim.deliveries < 1:
-			view.detail = "Завершите первую грузовую доставку, чтобы получить объявление на Маяке‑7."
+			view.detail = "Сдайте груз по первому контракту, чтобы получить поисковое объявление на Маяке‑7."
 		elif sim.orbit_time + TIME_LIMIT > Calendar.MAX_EPOCH:
-			view.detail = "До конца игрового календаря осталось меньше срока поиска."
+			view.detail = "До конца бортового календаря осталось слишком мало времени для нового поиска."
 		else:
-			_set_objective(view, "offer", "Маяк‑7 ищет инженера Иву Севрину. Она пропала после вылета из порта Створ.",
-				ISSUER, "accept", "Взять поиск", port == ISSUER)
+			_set_objective(view, "offer", "Маяк‑7 ищет инженера Иву Севрину. Она пропала после вылета из порта «Створ».",
+				ISSUER, "accept", "Начать поиск", port == ISSUER)
 	elif _clue_at < 0.0:
-		_set_objective(view, "clue", "Сверьте номер пропавшего катера в журнале вылетов порта Створ.",
+		_set_objective(view, "clue", "Найдите номер пропавшего катера в журнале вылетов порта «Створ».",
 			REGISTRY, "clue", "Проверить журнал вылетов", port == REGISTRY)
 	elif _evidence_at < 0.0:
-		_set_objective(view, "inspect", "В журнале указан посадочный маяк Террасы. Сядьте на Террасу и проверьте аварийный сигнал.",
+		_set_objective(view, "inspect", "Катер ушёл к Террасе. Выполните посадку на Террасе и проверьте аварийный сигнал.",
 			SEARCH_SITE, "inspect", "Проверить сигнал", sim.landed_site == SEARCH_SITE)
 	else:
 		var landed: bool = sim.landed_site == SEARCH_SITE
 		var aboard := occupied_seats() > 0
-		var detail := "Ива на борту. Доставьте её и запись приюта на Маяк‑7." if aboard else "Координаты приюта записаны. Передайте их диспетчеру Маяка‑7."
+		var detail := "Ива на борту. Доставьте её и запись сигнала на Маяк‑7." if aboard \
+			else "Координаты укрытия записаны. Передайте их диспетчеру Маяка‑7."
 		_set_objective(view, "report", detail, ISSUER, "submit", "Сдать отчёт", port == ISSUER)
 		view.show_pickup = landed and not aboard
 		if view.show_pickup:
@@ -76,17 +78,17 @@ func act(action: String, sim: RefCounted) -> Dictionary:
 	match action:
 		"accept":
 			_accepted_at = now
-			return _result("missing_accepted", "Поиск принят. Первая зацепка в порту Створ (Велар).")
+			return _result("missing_accepted", "Заказ принят. Проверьте журнал вылетов в порту «Створ» в системе «Велар».")
 		"clue":
 			_clue_at = now
 			return _result("missing_clue", "Журнал Створа указывает на аварийный маяк на Террасе.")
 		"inspect":
 			_evidence_at = now
-			return _result("missing_evidence", "Инженер найдена в приюте. Координаты записаны. Ива сможет лететь с вами, если есть место.")
+			return _result("missing_evidence", "Ива найдена в укрытии. Координаты записаны. Если в каюте есть свободное место, возьмите её на борт.")
 		"submit":
 			_closed_at = now
 			var paid := REWARD + (RESCUE_BONUS if _boarded_at >= 0.0 else 0)
-			return _result("missing_paid", "Поиск закрыт. Маяк‑7 выплатил %d кр." % paid, paid)
+			return _result("missing_paid", "Поиск завершён. Маяк‑7 выплатил %d кр." % paid, paid)
 		"disembark":
 			_expired = true
 			_closed_at = now

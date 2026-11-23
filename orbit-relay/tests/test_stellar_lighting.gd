@@ -45,6 +45,26 @@ func _run() -> void:
 		var star := flight.target_position(Catalog.VELAR_STAR_ID)
 		_check(view._star.position == star and _directed_to_ship(view._sunlight, star, flight.position),
 			"At Terrace epoch %.0f the light follows the blue star, distinct from the terrestrial body" % epoch)
+		var backdrop_sun := view._backdrop_planet.position.direction_to(star)
+		_check(view._backdrop_material.get_shader_parameter("light_direction").is_equal_approx(backdrop_sun)
+			and view._backdrop_halo_material.get_shader_parameter("light_direction").is_equal_approx(backdrop_sun)
+			and view._backdrop_ring_material.get_shader_parameter("light_direction").is_equal_approx(backdrop_sun),
+			"Planet, atmosphere and ring shadow follow the same star at epoch %.0f" % epoch)
+	var terrace := flight.target_position(Catalog.TERRACE_ID)
+	var terrace_sun := terrace.direction_to(flight.target_position(Catalog.VELAR_STAR_ID))
+	var terrace_radius := float(Catalog.site(Catalog.TERRACE_ID).radius)
+	flight.position = terrace + terrace_sun * (terrace_radius + 26.0)
+	view.sync(flight, 0.0)
+	var reflected_day := view._fill.light_energy
+	var haze_day := view._lighting.fog_light_energy
+	_check(reflected_day > 0.1 and _directed_to_ship(view._fill, terrace, flight.position)
+		and view._lighting.fog_enabled,
+		"The lit planet supplies local reflected light and the camera is still inside the air")
+	flight.position = terrace - terrace_sun * (terrace_radius + 26.0)
+	view.sync(flight, 0.0)
+	_check(view._fill.light_energy < reflected_day * 0.20 and view._lighting.fog_enabled
+		and view._lighting.fog_light_energy < haze_day * 0.5,
+		"On the same planet's dark side both reflected light and atmospheric haze lose their daylight")
 
 	flight.system_id = Catalog.BINARY_SYSTEM
 	flight.target = Catalog.BINARY_MOON

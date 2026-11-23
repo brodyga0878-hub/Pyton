@@ -99,27 +99,27 @@ func status(sim: RefCounted) -> Dictionary:
 	var distance: float = sim.position.distance_to(point) if has_point else -1.0
 	var ready := phase == ACTIVE and local and has_point and _airborne(sim)
 	var can_fire := ready and kind == INTERCEPT
-	var reason := "Возьмите заказ в порту фракции во время войны."
+	var reason := "Заказы на конвои выдают в портах воюющих фракций."
 	match phase:
 		ACTIVE:
 			if not local:
-				reason = "Летите в систему «%s», пока конвой в пути." % Catalog.system(system).name
+				reason = "Прыгните в систему «%s», пока конвой в пути." % Catalog.system(system).name
 			elif not _airborne(sim):
 				reason = "Выйдите в открытый космос и направьтесь к конвою."
 			elif sim.ship.hull <= 1.0:
 				reason = "Для продолжения восстановите корпус в порту."
 			elif kind == ESCORT:
-				reason = "Держитесь в пределах %d м от конвоя. Относительная скорость до %d м/с." % [
+				reason = "Держитесь в пределах %d м от конвоя при относительной скорости до %d м/с." % [
 					int(ESCORT_RANGE), int(ESCORT_SPEED),
 				]
 			else:
-				reason = "Наведитесь на конвой и откройте огонь в пределах %d м." % int(BEAM_RANGE)
+				reason = "Сблизьтесь с конвоем до %d м, наведитесь на цель и откройте огонь." % int(BEAM_RANGE)
 		ESCORTED:
 			reason = "Конвой под защитой. Дождитесь доставки груза."
 		SUCCEEDED:
 			reason = "Заказ выполнен. Получено %d кр." % _reward(kind)
 		FAILED:
-			reason = "Рейс конвоя завершён. Заказ закрыт."
+			reason = "Конвой закончил рейс до выполнения заказа."
 	return {
 		"phase": phase, "active": active, "system": system, "id": convoy_id, "kind": kind, "faction": faction,
 		"target_faction": target_faction, "port": port, "deadline": deadline,

@@ -16,7 +16,7 @@ const MINT := Color("a4e9d6")
 const AMBER := Color("f0c59a")
 const ALERT := Color("ffa79e")
 const BORDER := Color("355360")
-const STAGES := ["Принять заказ", "Обследовать систему", "Сдать отчёт", "Снабдить стройку"]
+const STAGES := ["Принять заказ", "Обследовать систему", "Сдать отчёт", "Доставить материалы"]
 const NEWS_LIMIT := 3
 const OFFER_LIMIT := 4
 
@@ -177,7 +177,7 @@ func _build_expedition(card: VBoxContainer) -> void:
 	for caption: String in STAGES:
 		_steps.append(_status_row(stages, caption))
 	_supplies = _column(card, 3)
-	_label(_supplies, "Груз на оставшиеся поставки", 17, MINT)
+	_label(_supplies, "Материалы для оставшихся поставок", 17, MINT)
 	for good: String in Economy.LEGACY_GOODS:
 		_materials.append(_label(_supplies, "", 17, INK))
 	var spacer := Control.new()
@@ -295,11 +295,11 @@ func _refresh_project(status: Dictionary) -> void:
 	var sponsor_port: int = status.sponsor_port
 	var known: bool = system >= 0 and _sim.system_known(system)
 	var series_done: bool = status.series_done
-	_project_title.text = "Экспедиция в «%s»" % Sector.system(system).name if known else "Пограничная экспедиция"
+	_project_title.text = "Экспедиция в систему «%s»" % Sector.system(system).name if known else "Пограничная экспедиция"
 	if series_done:
 		_project_title.text = "Станции введены в строй"
 	_issuer.visible = not series_done
-	_issuer.text = "Заказчик появится после принятия заказа."
+	_issuer.text = "Экспедицию финансирует фракция порта, где вы примете заказ."
 	if sponsor >= 0 and sponsor_port >= 0:
 		_issuer.text = "%s · «%s»" % [Factions.faction_name(sponsor), _sim.target_name(sponsor_port)]
 	elif status.can_act and _sim.docked >= 0:
@@ -336,12 +336,12 @@ func _refresh_project(status: Dictionary) -> void:
 		line.text = "%s · %d из %d ед." % [Economy.good_name(good), owned, quantity]
 		var next := int(needs.get(good, 0))
 		if next < quantity:
-			line.text += " · сейчас %d" % next if next > 0 else " · следующая партия"
+			line.text += " · в текущую партию %d" % next if next > 0 else " · в следующую партию"
 		line.modulate = MINT if owned >= quantity else AMBER
 	_reason.text = str(status.reason)
 	if status.has_point and not status.can_act:
 		var distance := float(status.distance)
-		var distance_text := "%.1f км" % (distance / 1000.0) if distance >= 1000.0 else "%d м" % roundi(distance)
+		var distance_text := ("%.1f км" % (distance / 1000.0)).replace(".", ",") if distance >= 1000.0 else "%d м" % roundi(distance)
 		_reason.text += "\n«%s» · %s" % [_sim.target_name(status.site), distance_text]
 	_project_button.visible = not series_done
 	var route_system := int(status.route_system)
@@ -388,9 +388,9 @@ func _refresh_convoy_orders() -> void:
 		if finished:
 			_convoy_info.text = str(mission.reason)
 		if _sim.docked < 0:
-			_convoy_briefing.text = "Пришвартуйтесь к действующему порту, чтобы принять заказ фракции."
+			_convoy_briefing.text = "Заказ фракции можно принять в действующем порту."
 		elif _convoy_offers.is_empty():
-			_convoy_briefing.text = "В этом порту сейчас нет заказов. Они появляются, пока на рубежах идут боевые поставки."
+			_convoy_briefing.text = "В этом порту пока нет заказов. Фракции выдают их, когда конвои везут снабжение к рубежу."
 		else:
 			var sponsor: Dictionary = _convoy_offers[0]
 			_convoy_briefing.text = "%s · «%s»" % [Factions.faction_name(sponsor.faction), _sim.target_name(sponsor.port)]

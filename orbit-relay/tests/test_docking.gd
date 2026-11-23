@@ -27,7 +27,7 @@ func _run() -> void:
 	_test_autodock(PORT)
 	_test_autodock(VELAR_PORT)
 	await _test_touch_controls()
-	for viewport_size: Vector2i in [Vector2i(1280, 720), Vector2i(1560, 720)]:
+	for viewport_size: Vector2i in [Vector2i(1280, 720), Vector2i(1440, 720), Vector2i(1560, 720)]:
 		for mirrored: bool in [false, true]:
 			await _test_combat_approach_touch(viewport_size, mirrored)
 	print("Docking guidance integration: %d checks, %d failures" % [_checks, _failures.size()])
@@ -322,6 +322,10 @@ func _test_combat_approach_touch(viewport_size: Vector2i, mirrored: bool) -> voi
 		_expect(flight.patrol.in_danger(flight) and game._hud._actions["fire"].is_visible_in_tree()
 			and game._hud._docking_panel.is_visible_in_tree() and flight.docking_guidance().sync_available,
 			"Orbit approach instruments coexist with combat in %s" % layout)
+		var approach_rect: Rect2 = game._hud._docking_panel.get_global_rect()
+		var shortcuts: Rect2 = game._hud._shortcuts.get_global_rect()
+		_expect(not approach_rect.intersects(shortcuts) and viewport.get_visible_rect().encloses(shortcuts),
+			"All cockpit shortcuts fit beside the orbital approach readout in %s" % layout)
 		_tap(viewport, game._hud._actions["dock_clearance"], "Request docking clearance in combat: %s" % layout)
 		_tap(viewport, game._hud._actions["dock_sync"], "Synchronize dock rotation in combat: %s" % layout)
 		_expect(flight.dock_access_status(PORT).phase == "queued" and flight.dock_roll_sync == PORT
@@ -343,6 +347,10 @@ func _test_combat_approach_touch(viewport_size: Vector2i, mirrored: bool) -> voi
 		_expect(flight.patrol.in_danger(flight) and flight.docking_guidance().awaiting_gear
 			and game._hud._docking_panel.is_visible_in_tree() and game._hud._actions["fire"].is_visible_in_tree(),
 			"Ground approach instruments and combat remain visible with stowed gear: %s" % layout)
+		var approach_rect: Rect2 = game._hud._docking_panel.get_global_rect()
+		var shortcuts: Rect2 = game._hud._shortcuts.get_global_rect()
+		_expect(not approach_rect.intersects(shortcuts) and viewport.get_visible_rect().encloses(shortcuts),
+			"All cockpit shortcuts fit beside the ground approach readout in %s" % layout)
 		_tap(viewport, game._hud._actions["gear"], "Extend gear through the ground approach touch HUD: %s" % layout)
 		_expect(flight.gear_deployed and flight.docked < 0 and flight.patrol.in_danger(flight),
 			"Touch commands the actuator during combat before landing in %s" % layout)

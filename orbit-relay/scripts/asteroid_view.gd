@@ -138,8 +138,11 @@ vec3 triplanar_data(vec3 p, vec3 weights) {
 		+ texture(surface_detail, p.xy).rgb * weights.z;
 }
 float strata_mask(float bedding, float rough, float width) {
-	float ripple = abs(sin(bedding + rough));
-	return 1.0 - smoothstep(width, width + 0.15 + fwidth(ripple), ripple);
+	float phase = bedding + rough;
+	float pixel = fwidth(phase);
+	float ripple = abs(sin(phase));
+	float line = 1.0 - smoothstep(width, width + 0.15 + pixel * 0.4, ripple);
+	return line * (1.0 - smoothstep(0.45, 2.5, pixel));
 }
 vec3 relief_normal(vec3 position, vec3 n, float height) {
 	// Bound subpixel slopes at grazing angles without changing model geometry.
@@ -155,16 +158,23 @@ vec3 relief_normal(vec3 position, vec3 n, float height) {
 }
 void fragment() {
 	vec3 p = rock;
-	float bedding = dot(p, vec3(0.21, 0.72, 0.34));
-	float sediment = sin(bedding * 0.24 + sin(p.x * 0.18) * 0.98);
-	float strata = sin(bedding + sediment * 1.77);
-	float broad = 0.40 + bands_strength * (0.23 * sediment + 0.10 * strata);
-	vec3 stone = mix(rock_color.rgb, seam_color.rgb, broad);
+	vec3 radial = normalize(p);
+	vec3 local_normal = normalize(rock_normal);
+	float slope = 1.0 - clamp(dot(radial, local_normal), 0.0, 1.0);
+	float exposed = smoothstep(0.018, 0.18, slope);
+	float bedding = dot(p, vec3(0.21, 0.72, 0.34)) + sin(p.x * 0.18 + p.z * 0.055) * 1.4;
+	float sediment = sin(bedding * 0.18 + sin(p.z * 0.071) * 0.63);
+	float strata_phase = bedding + sediment * 1.77;
+	float strata = sin(strata_phase) * (1.0 - smoothstep(0.60, 2.8, fwidth(strata_phase)));
+	float provinces = sin(radial.z * 8.1 + radial.x * 4.7) * cos(radial.y * 7.0 - radial.x * 2.8);
+	float basin = smoothstep(-0.52, 0.32, provinces);
+	float broad = 0.25 + basin * 0.26 + bands_strength * (0.13 * sediment + exposed * 0.13 * strata);
+	vec3 stone = mix(rock_color.rgb, seam_color.rgb, broad) * (0.86 + basin * 0.19);
 	float roughness = mix(0.90, 0.71, ice_fraction);
 	float sheen = 0.5;
 	if (profile > 0) {
 		// Stable model-local projection has no spherical UV seam or world-space crawl.
-		vec3 weights = abs(normalize(rock_normal));
+		vec3 weights = abs(local_normal);
 		weights *= weights;
 		weights *= weights;
 		weights /= max(weights.x + weights.y + weights.z, 0.00001);
@@ -172,22 +182,23 @@ void fragment() {
 		float grains = detail.r;
 		float fault = detail.g;
 		float layer_breaks = smoothstep(0.30, 0.77, grains * 0.57 + fault * 0.43);
+		layer_breaks *= mix(0.48, 1.0, exposed);
 		float lamina = strata_mask(bedding * 1.27, fault * 12.0 + grains * 1.4 + sediment * 0.73, 0.09) * layer_breaks;
 		float crevice = 1.0 - smoothstep(0.36, 0.51, fault);
-		float mineral = smoothstep(0.48, 0.71, grains + fault * 0.11);
-		float frost = ice_fraction * smoothstep(0.48, 0.70, grains) * crevice;
-		float relief = (fault - 0.5) * 0.24 + lamina * bands_strength * 0.044;
-		stone *= 1.0 + (grains - 0.5) * 0.81 - crevice * 0.10;
+		float mineral = smoothstep(0.43, 0.67, grains + fault * 0.08 + basin * 0.08);
+		float frost = ice_fraction * smoothstep(0.48, 0.71, grains + (1.0 - exposed) * 0.07) * crevice;
+		float relief = (fault - 0.5) * (0.19 + exposed * 0.11) + lamina * bands_strength * 0.047;
+		stone *= 1.0 + (grains - 0.5) * 0.77 - crevice * (0.09 + exposed * 0.08);
 		stone = mix(stone, stone * vec3(0.71, 0.75, 0.82), mineral * terrain_regions);
 		stone = mix(stone, seam_color.rgb * 1.06, lamina * bands_strength * 0.24);
 		stone = mix(stone, seam_color.rgb * vec3(0.96, 1.07, 1.12), frost * 0.70);
-		roughness = mix(roughness, detail.b, 0.64) - frost * 0.22;
+		roughness = mix(roughness, detail.b, 0.55) + crevice * 0.09 - frost * 0.26;
 		sheen = mix(0.35, 0.49 + frost * 0.15, ice_fraction);
 		if (profile == 2) {
-			float resolution = 1.0 - smoothstep(0.22, 1.1, length(fwidth(p * 0.73)));
+			float resolution = 1.0 - smoothstep(0.17, 0.89, length(fwidth(p * 0.73)));
 			vec3 fine = triplanar_data(p * 0.73 + detail_offset.zxy + vec3(0.19, 0.37, 0.61), weights);
-			stone *= 1.0 + resolution * (fine.r - 0.5) * 0.32;
-			relief += resolution * (fine.g - 0.5) * 0.052;
+			stone *= 1.0 + resolution * (fine.r - 0.5) * 0.38;
+			relief += resolution * (fine.g - 0.5) * mix(0.066, 0.041, frost);
 			roughness += resolution * (fine.b - 0.5) * 0.09;
 		}
 		NORMAL = relief_normal(VERTEX, normalize(NORMAL), relief);

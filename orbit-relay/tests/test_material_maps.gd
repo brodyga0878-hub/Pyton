@@ -120,6 +120,8 @@ func _test_live_materials() -> void:
 		_expect(view._visual_profile == quality and gas.get_shader_parameter("cloud_quality") == quality
 			and finishes_correct and surface_correct,
 			"The live quality preset %d reaches terrain, equipment and clouds together" % quality)
+		_expect(view._sunlight.shadow_enabled == (quality == 2) and not view._fill.shadow_enabled,
+			"Only detail enables local shadows from the main star")
 	_expect(terrain_mesh.mesh == baseline_mesh and game.flight.target_contact(2) == saved_contact
 		and game.flight.snapshot() == flight_before,
 		"Selecting packed-material detail does not alter the surface mesh, flight geometry or saved simulation")

@@ -14,14 +14,17 @@ const FlightCamera := preload("res://scripts/flight_camera.gd")
 const Text := preload("res://scripts/flight_text.gd")
 const FlightScanner := preload("res://scripts/flight_scanner_view.gd")
 const INK := Color("eef8ff")
-const MUTED := Color("a7bac9")
+const MUTED := Color("b2c8d3")
 const CYAN := Color("8fe9db")
 const AMBER := Color("ffd396")
 const ALERT := Color("ff978c")
 const ALLY := Color("90c6ff")
 const CONVOY := Color("ffd081")
-const BACK := Color(0.024, 0.057, 0.081, 0.94)
-const LINE := Color(0.24, 0.43, 0.49, 0.58)
+const BACK := Color(0.024, 0.051, 0.073, 0.96)
+const LINE := Color(0.27, 0.45, 0.52, 0.72)
+const COURSE_CARD := Rect2(26, 24, 407, 99)
+const SHORTCUT_BAR := Rect2(26, 131, 502, 48)
+const HUD_GAP := 8.0
 const COURSE_PAD := Rect2(26, -170, 172, 144)
 const ROLL_PAD := Rect2(210, -108, 112, 82)
 const CAMERA_CONTROL := Rect2(210, -171, 112, 52)
@@ -52,6 +55,8 @@ var _flight_modes: HBoxContainer
 var _camera_controls: HBoxContainer
 var _camera_instrument: Label
 var _translation_controls: HBoxContainer
+var _course_card: PanelContainer
+var _shortcuts: GridContainer
 var _route: Label
 var _route_detail: Label
 var _passenger_route: Label
@@ -65,11 +70,21 @@ var _orbital_mining_status: Dictionary = {}
 var _processor_status: Dictionary = {}
 var _processor_readout: HBoxContainer
 var _processor_summary: Label
+var _motion_readout: HBoxContainer
+var _speed_caption: Label
+var _speed_value: Label
+var _thrust_caption: Label
+var _thrust_value: Label
 var _telemetry: Label
 var _condition: Label
+var _drive_tank_caption: Label
 var _fuel: Label
 var _fuel_level: ProgressBar
+var _fuel_fill: StyleBoxFlat
+var _jump_tank_caption: Label
 var _jump_fuel: Label
+var _jump_fuel_level: ProgressBar
+var _jump_fuel_fill: StyleBoxFlat
 var _pump_mode: Label
 var _combat_readout: VBoxContainer
 var _ordnance_tools: HBoxContainer
@@ -195,8 +210,10 @@ func build() -> void:
 	_hud.add_child(_safe)
 	_safe.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
-	var route_stack := _panel(_safe, Vector2.ZERO, Rect2(26, 24, 407, 99))
+	var route_stack := _panel(_safe, Vector2.ZERO, COURSE_CARD)
+	_course_card = route_stack.get_parent() as PanelContainer
 	_route = _label(route_stack, 23, CYAN)
+	_route.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_route_detail = _label(route_stack, 17, INK)
 	_route_detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_passenger_route = _label(route_stack, 16, CYAN)
@@ -226,46 +243,56 @@ func build() -> void:
 	_orbital_mining_readout = _label(route_stack, 16, CYAN)
 	_orbital_mining_readout.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_orbital_mining_readout.hide()
-	var course_card := route_stack.get_parent() as PanelContainer
-	var shortcuts := HBoxContainer.new()
-	shortcuts.add_theme_constant_override("separation", 8)
-	_pin(shortcuts, _safe, Vector2.ZERO, Rect2(26, 131, 502, 48))
-	_button(shortcuts, "journal", "Журнал")
-	_button(shortcuts, "settings", "Настройки")
-	_button(shortcuts, "frontier", "Освоение")
-	_button(shortcuts, "navigation_toggle", Text.text("NAV_SHORTCUT"))
-	_button(shortcuts, "recon", "Съёмка")
-	_button(shortcuts, "comms", Text.text("LINK_SHORTCUT"))
+	_shortcuts = GridContainer.new()
+	_shortcuts.columns = 6
+	_shortcuts.add_theme_constant_override("h_separation", int(HUD_GAP))
+	_shortcuts.add_theme_constant_override("v_separation", int(HUD_GAP))
+	_pin(_shortcuts, _safe, Vector2.ZERO, SHORTCUT_BAR)
+	_button(_shortcuts, "journal", "Журнал")
+	_button(_shortcuts, "settings", "Настройки")
+	_button(_shortcuts, "frontier", "Освоение")
+	_button(_shortcuts, "navigation_toggle", Text.text("NAV_SHORTCUT"))
+	_button(_shortcuts, "recon", "Съёмка")
+	_button(_shortcuts, "comms", Text.text("LINK_SHORTCUT"))
 	for action: String in ["journal", "settings", "frontier", "navigation_toggle", "recon", "comms"]:
 		var button: Button = _actions[action]
-		button.custom_minimum_size.y = 48.0
+		button.custom_minimum_size.y = SHORTCUT_BAR.size.y
 		button.add_theme_font_size_override("font_size", 16)
 	_actions["journal"].tooltip_text = "Журнал заданий"
 	_actions["settings"].tooltip_text = "Графика и управление"
 	_actions["frontier"].tooltip_text = "Разведка, строительство и фракции"
 	_actions["navigation_toggle"].tooltip_text = "Цели и отображение объектов в полёте (F12)"
 	_actions["recon"].tooltip_text = "Бортовая камера и задания на съёмку (Q)"
-	course_card.resized.connect(func() -> void:
-		shortcuts.offset_top = course_card.position.y + course_card.size.y + 8.0
-		shortcuts.offset_bottom = shortcuts.offset_top + 48.0
-	)
-	var instrument_stack := _panel(_safe, Vector2(1, 0), Rect2(-310, 24, 284, 159))
+	var instrument_stack := _panel(_safe, Vector2(1, 0), Rect2(-332, 24, 306, 159))
 	instrument_stack.alignment = BoxContainer.ALIGNMENT_CENTER
-	_telemetry = _label(instrument_stack, 17, INK)
+	var instrument_card := instrument_stack.get_parent() as PanelContainer
+	var instrument_skin := _box(BACK, LINE, 13, 10.0)
+	instrument_skin.set_border_width(SIDE_TOP, 2)
+	instrument_card.add_theme_stylebox_override("panel", instrument_skin)
+	_motion_readout = _instrument_row(instrument_stack)
+	var speed_column := _instrument_column(_motion_readout)
+	_speed_caption = _label(speed_column, 15, MUTED)
+	_speed_value = _label(speed_column, 24, INK)
+	var thrust_column := _instrument_column(_motion_readout)
+	_thrust_caption = _label(thrust_column, 15, MUTED)
+	_thrust_value = _label(thrust_column, 24, CYAN)
+	_motion_readout.hide()
+	_telemetry = _label(instrument_stack, 16, MUTED)
 	_telemetry.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_condition = _label(instrument_stack, 16, INK)
 	_camera_instrument = _label(instrument_stack, 15, CYAN)
 	_camera_instrument.hide()
-	_fuel = _label(instrument_stack, 16, CYAN)
-	_fuel_level = ProgressBar.new()
-	_fuel_level.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_fuel_level.step = 0.0
-	_fuel_level.show_percentage = false
-	_fuel_level.custom_minimum_size.y = 7.0
-	_fuel_level.add_theme_stylebox_override("background", _box(Color("12313d"), LINE, 4, 0.0))
-	_fuel_level.add_theme_stylebox_override("fill", _box(CYAN, CYAN, 4, 0.0))
-	instrument_stack.add_child(_fuel_level)
-	_jump_fuel = _label(instrument_stack, 16, CYAN)
+	var fuel_row := _instrument_row(instrument_stack)
+	var drive_tank := _instrument_column(fuel_row)
+	_drive_tank_caption = _label(drive_tank, 15, MUTED)
+	_fuel = _label(drive_tank, 17, INK)
+	_fuel_fill = _box(CYAN, CYAN, 4, 0.0)
+	_fuel_level = _instrument_gauge(drive_tank, _fuel_fill)
+	var jump_tank := _instrument_column(fuel_row)
+	_jump_tank_caption = _label(jump_tank, 15, MUTED)
+	_jump_fuel = _label(jump_tank, 17, INK)
+	_jump_fuel_fill = _box(CYAN, CYAN, 4, 0.0)
+	_jump_fuel_level = _instrument_gauge(jump_tank, _jump_fuel_fill)
 	_pump_mode = _label(instrument_stack, 15, CYAN)
 	_pump_mode.hide()
 	_build_combat_instrument(instrument_stack)
@@ -276,17 +303,10 @@ func build() -> void:
 	_entry_readout = _label(_thermal_panel, 15, INK)
 	_entry_readout.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_entry_readout.hide()
-	_thermal_label = _label(_thermal_panel, 16, CYAN)
+	_thermal_label = _label(_thermal_panel, 17, CYAN)
 	_thermal_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_thermal_level = ProgressBar.new()
-	_thermal_level.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_thermal_level.step = 0.0
-	_thermal_level.show_percentage = false
-	_thermal_level.custom_minimum_size.y = 7.0
-	_thermal_level.add_theme_stylebox_override("background", _box(Color("12313d"), LINE, 4, 0.0))
 	_thermal_fill = _box(CYAN, CYAN, 4, 0.0)
-	_thermal_level.add_theme_stylebox_override("fill", _thermal_fill)
-	_thermal_panel.add_child(_thermal_level)
+	_thermal_level = _instrument_gauge(_thermal_panel, _thermal_fill)
 	_thermal_panel.hide()
 	var clock_row := HBoxContainer.new()
 	clock_row.add_theme_constant_override("separation", 5)
@@ -471,13 +491,60 @@ func build() -> void:
 	_build_navigation_drawer()
 	_build_rescue_panel()
 	_navigation_blockers.assign([
-		course_card, shortcuts, instrument_stack.get_parent(), _steer, _bank, _camera_controls,
+		_course_card, _shortcuts, instrument_card, _steer, _bank, _camera_controls,
 		_flight_modes, _translation_controls, _commands_panel, _right_panel, _notice_panel,
 		_docking_panel, _surface_panel, _navigation_drawer, _rescue_panel,
 	])
 	get_viewport().size_changed.connect(_update_safe_area)
+	_course_card.resized.connect(_place_shortcuts)
+	_safe.resized.connect(_place_shortcuts)
 	_update_safe_area()
+	_place_shortcuts()
 	_apply_touch_layout()
+
+func _instrument_row(parent: VBoxContainer) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_theme_constant_override("separation", 12)
+	parent.add_child(row)
+	return row
+
+func _instrument_column(parent: HBoxContainer) -> VBoxContainer:
+	var column := VBoxContainer.new()
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	column.add_theme_constant_override("separation", 2)
+	parent.add_child(column)
+	return column
+
+func _instrument_gauge(parent: VBoxContainer, fill: StyleBoxFlat) -> ProgressBar:
+	var gauge := ProgressBar.new()
+	gauge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	gauge.step = 0.0
+	gauge.show_percentage = false
+	gauge.custom_minimum_size.y = 7.0
+	gauge.add_theme_stylebox_override("background", _box(Color("12313d"), LINE, 4, 0.0))
+	gauge.add_theme_stylebox_override("fill", fill)
+	parent.add_child(gauge)
+	return gauge
+
+func _place_shortcuts() -> void:
+	var approach := _docking_panel if _docking_panel.visible else _surface_panel
+	var width := SHORTCUT_BAR.size.x
+	var stacked := false
+	if approach.visible:
+		var single_row := HUD_GAP * (_shortcuts.get_child_count() - 1)
+		for button: Button in _shortcuts.get_children():
+			single_row += button.get_combined_minimum_size().x
+		var available := maxf(0.0, approach.position.x - SHORTCUT_BAR.position.x - HUD_GAP)
+		stacked = available < maxf(width, single_row)
+		width = minf(width, available)
+	_course_card.offset_right = COURSE_CARD.position.x + minf(COURSE_CARD.size.x, width)
+	_shortcuts.columns = 3 if stacked else 6
+	_shortcuts.offset_right = SHORTCUT_BAR.position.x + width
+	_shortcuts.offset_top = _course_card.position.y + _course_card.size.y + HUD_GAP
+	var height := SHORTCUT_BAR.size.y * 2.0 + HUD_GAP if stacked else SHORTCUT_BAR.size.y
+	_shortcuts.offset_bottom = _shortcuts.offset_top + height
 
 func _build_rescue_panel() -> void:
 	var body := _panel(_safe, Vector2(0.5, 0.5), Rect2(-222, -108, 444, 164))
@@ -576,34 +643,28 @@ func _build_combat_instrument(parent: VBoxContainer) -> void:
 	_combat_readout.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_combat_readout.add_theme_constant_override("separation", 3)
 	parent.add_child(_combat_readout)
+	_projectile_alert = _label(_combat_readout, 18, ALERT)
+	_projectile_alert.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_combat_weapon = _label(_combat_readout, 15, INK)
 	_combat_weapon.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_combat_shield_status = _label(_combat_readout, 15, CYAN)
-	_combat_shield = ProgressBar.new()
-	_combat_shield.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_combat_shield.max_value = 1.0
-	_combat_shield.step = 0.0
-	_combat_shield.show_percentage = false
-	_combat_shield.custom_minimum_size.y = 6.0
-	_combat_shield.add_theme_stylebox_override("background", _box(Color("12313d"), LINE, 4, 0.0))
 	_combat_shield_fill = _box(CYAN, CYAN, 4, 0.0)
-	_combat_shield.add_theme_stylebox_override("fill", _combat_shield_fill)
-	_combat_readout.add_child(_combat_shield)
+	_combat_shield = _instrument_gauge(_combat_readout, _combat_shield_fill)
+	_combat_shield.max_value = 1.0
 	_combat_damage = _label(_combat_readout, 15, ALERT)
 	_combat_lock_readout = _label(parent, 15, ALERT)
 	_combat_lock_readout.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_combat_lock_readout.hide()
-	_projectile_alert = _label(_combat_readout, 16, ALERT)
 	_combat_readout.hide()
 
 func _build_docking_instrument() -> void:
 	var readout := _panel(_safe, Vector2(0.5, 0), Rect2(-196, 24, 392, 148))
 	_docking_panel = readout.get_parent() as PanelContainer
-	_docking_status = _label(readout, 18, CYAN)
-	_docking_position = _label(readout, 16, INK)
-	_docking_motion = _label(readout, 16, INK)
+	_docking_status = _label(readout, 20, CYAN)
+	_docking_position = _label(readout, 17, INK)
+	_docking_motion = _label(readout, 17, INK)
 	_docking_roll = _label(readout, 16, AMBER)
-	_docking_ready = _label(readout, 14, MUTED)
+	_docking_ready = _label(readout, 15, MUTED)
 	_docking_access = _label(readout, 16, AMBER)
 	for label in [_docking_status, _docking_position, _docking_motion, _docking_roll, _docking_ready, _docking_access]:
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -645,14 +706,15 @@ func _sync_docking(status: Dictionary, automatic: bool) -> void:
 		_docking_status.text = "Створ с обратной стороны"
 	_docking_status.add_theme_color_override("font_color", CYAN if ready else AMBER)
 	var axis_label := "Над палубой" if ground else "По оси"
-	_docking_position.text = "%s %.1f м · Вбок %.1f м" % [axis_label, float(status.axis_distance), float(status.lateral_error)]
+	_docking_position.text = ("%s %.1f м · вбок %.1f м" % [axis_label, float(status.axis_distance), float(status.lateral_error)]).replace(".", ",")
 	_docking_position.add_theme_color_override("font_color", CYAN if status.position_ok else INK)
 	var closing_speed := float(status.closing_speed)
 	if absf(closing_speed) < 0.05:
 		closing_speed = 0.0
-	_docking_motion.text = "Сближение %+.1f · Отн. %.1f м/с" % [closing_speed, float(status.relative_speed)]
+	_docking_motion.text = ("Сближение %+.1f · скорость %.1f м/с" % [closing_speed, float(status.relative_speed)]).replace(".", ",")
 	_docking_motion.add_theme_color_override("font_color", CYAN if status.speed_ok else AMBER)
-	_docking_roll.text = "Отклонение от вертикали %.1f°" % float(status.aim_error_deg) if ground else "Крен %+.1f° · Курс %.1f°%s" % [float(status.roll_error_deg), float(status.aim_error_deg), " · синхр." if synced else ""]
+	var alignment := "Отклонение от вертикали %.1f°" % float(status.aim_error_deg) if ground else "Крен %+.1f° · курс %.1f°" % [float(status.roll_error_deg), float(status.aim_error_deg)]
+	_docking_roll.text = alignment.replace(".", ",") + (" · синхр." if synced else "")
 	_docking_roll.add_theme_color_override("font_color", CYAN if status.roll_ok and status.aim_ok else AMBER)
 	if ground:
 		_docking_ready.text = "Палуба %s · Скорость %s · Ориентация %s · Шасси %s" % ["✓" if status.position_ok else "—", "✓" if status.speed_ok else "—", "✓" if status.roll_ok and status.aim_ok else "—", "✓" if status.get("gear_ok", false) else "—"]
@@ -684,11 +746,11 @@ func _dock_access_caption(access: Dictionary) -> String:
 func _build_surface_instrument() -> void:
 	var readout := _panel(_safe, Vector2(0.5, 0), Rect2(-196, 24, 392, 148))
 	_surface_panel = readout.get_parent() as PanelContainer
-	_surface_status = _label(readout, 18, CYAN)
-	_surface_height = _label(readout, 16, INK)
-	_surface_motion = _label(readout, 16, INK)
+	_surface_status = _label(readout, 20, CYAN)
+	_surface_height = _label(readout, 17, INK)
+	_surface_motion = _label(readout, 17, INK)
 	_surface_alignment = _label(readout, 16, INK)
-	_surface_ready = _label(readout, 14, MUTED)
+	_surface_ready = _label(readout, 15, MUTED)
 	_surface_gear = _label(readout, 15, AMBER)
 	for label in [_surface_status, _surface_height, _surface_motion, _surface_alignment, _surface_ready, _surface_gear]:
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -702,14 +764,14 @@ func _sync_surface_guidance(status: Dictionary, gear: Dictionary) -> void:
 	var ready := bool(status.ok)
 	_surface_status.text = "Можно садиться" if ready else "Посадка на площадку" if status.pad else "Посадка вне площадки"
 	_surface_status.add_theme_color_override("font_color", CYAN if ready else AMBER)
-	_surface_height.text = "Высота %.1f м · Уклон %.1f°" % [float(status.altitude), float(status.slope)]
+	_surface_height.text = ("Высота %.1f м · уклон %.1f°" % [float(status.altitude), float(status.slope)]).replace(".", ",")
 	_surface_height.add_theme_color_override("font_color", CYAN if status.height_ok and status.slope_ok else AMBER)
 	var descent_speed := float(status.descent_speed)
 	if absf(descent_speed) < 0.05:
 		descent_speed = 0.0
-	_surface_motion.text = "Снижение %+.1f · Снос %.1f м/с" % [descent_speed, float(status.drift_speed)]
+	_surface_motion.text = ("Снижение %+.1f · снос %.1f м/с" % [descent_speed, float(status.drift_speed)]).replace(".", ",")
 	_surface_motion.add_theme_color_override("font_color", CYAN if status.speed_ok else AMBER)
-	_surface_alignment.text = "Скорость %.1f м/с · Нос %.1f°" % [float(status.relative_speed), float(status.aim_error_deg)]
+	_surface_alignment.text = ("Скорость %.1f м/с · нос %.1f°" % [float(status.relative_speed), float(status.aim_error_deg)]).replace(".", ",")
 	_surface_alignment.add_theme_color_override("font_color", CYAN if status.aim_ok else AMBER)
 	_surface_ready.text = "Высота %s · Скорость %s · Уклон %s · Нос %s" % ["✓" if status.height_ok else "—", "✓" if status.speed_ok else "—", "✓" if status.slope_ok else "—", "✓" if status.aim_ok else "—"]
 	_surface_gear.text = str(gear.text)
@@ -734,7 +796,7 @@ func _build_flight_modes() -> void:
 	_pin(_flight_modes, _safe, Vector2(0, 1), FLIGHT_MODE_ROW)
 	_button(_flight_modes, "translation_mode", "Курс")
 	_button(_flight_modes, "flight_assist", "Стабилизация")
-	_button(_flight_modes, "frame", "Кадр")
+	_button(_flight_modes, "frame", "Отсчёт")
 	_actions["frame"].custom_minimum_size.x = 66.0
 	_actions["frame"].tooltip_text = "Сменить систему отсчёта полёта (F7)"
 	_button(_flight_modes, "speed_hold", "Скорость")
@@ -927,6 +989,8 @@ func sync(sim: RefCounted, delta: float, aim_lock_available := false, forward_ai
 	var ground_approach := bool(docking.get("ground", false)) and bool(docking.get("near", false))
 	_sync_gear(gear, not parked and not _jumping and (ground_approach or surface.get("near", false) or gear.progress > 0.0 or gear.deployed))
 	_sync_escape(sim.escape_status())
+	_place_shortcuts()
+	_motion_readout.visible = not parked and not _jumping and not _in_escape
 	_sync_clock(sim)
 	_refresh_disabled_actions()
 	_sync_fuel(sim.ship)
@@ -1163,25 +1227,28 @@ func _sync_departure(sim: RefCounted, departure: Dictionary) -> void:
 
 func _sync_fuel(ship: RefCounted) -> void:
 	var capacity: float = ship.capacity()
-	var empty: bool = ship.fuel <= 0.0
-	_fuel.text = "Тяга %s / %.0f ед." % [("%.1f" % ship.fuel).replace(".", ","), capacity]
-	if empty:
-		_fuel.text += " · резерв"
-	var color := AMBER if empty else CYAN
-	if _fuel.get_theme_color("font_color") != color:
-		_fuel.add_theme_color_override("font_color", color)
-	_fuel_level.max_value = capacity
-	_fuel_level.value = ship.fuel
+	_drive_tank_caption.text = "Резерв тяги" if ship.fuel <= 0.0 else "Бак тяги"
+	_fuel.text = ("%.1f / %.0f" % [ship.fuel, capacity]).replace(".", ",") + " ед."
+	_sync_tank_gauge(_fuel, _fuel_level, _fuel_fill, ship.fuel, capacity)
 	var jump_reserve: float = ship.active_jump_fuel()
-	var jump_name := "Военный бак" if ship.drive_kind == "military" else "Прыжки"
-	_jump_fuel.text = "%s %s / %.0f ед." % [jump_name, ("%.1f" % jump_reserve).replace(".", ","), ship.active_jump_capacity()]
-	var jump_color := AMBER if jump_reserve <= 0.0 else CYAN
-	if _jump_fuel.get_theme_color("font_color") != jump_color:
-		_jump_fuel.add_theme_color_override("font_color", jump_color)
+	var jump_capacity: float = ship.active_jump_capacity()
+	_jump_tank_caption.text = "Военный бак" if ship.drive_kind == "military" else "Прыжковый бак"
+	_jump_fuel.text = ("%.1f / %.0f" % [jump_reserve, jump_capacity]).replace(".", ",") + " ед."
+	_sync_tank_gauge(_jump_fuel, _jump_fuel_level, _jump_fuel_fill, jump_reserve, jump_capacity)
 	var pump_mode := str(ship.pump_mode)
 	_pump_mode.visible = ship.fuel_pump and pump_mode != "off"
 	if _pump_mode.visible:
 		_pump_mode.text = "Автоперекачка · реактивный бак" if pump_mode == "reaction" else "Автоперекачка · прыжковый бак"
+
+func _sync_tank_gauge(label: Label, gauge: ProgressBar, fill: StyleBoxFlat, amount: float, capacity: float) -> void:
+	gauge.max_value = maxf(1.0, capacity)
+	gauge.value = amount
+	var low := amount <= capacity * 0.15
+	var fill_color := AMBER if low else CYAN
+	if fill.bg_color != fill_color:
+		fill.bg_color = fill_color
+		fill.border_color = fill_color
+		label.add_theme_color_override("font_color", fill_color if low else INK)
 
 func _sync_condition(hull: float, cargo: int, capacity: int) -> void:
 	_condition.text = "Корпус %d%% · Трюм %d / %d ед." % [roundi(hull), cargo, capacity]
@@ -1199,9 +1266,10 @@ func _sync_thermal(stellar: Dictionary, entry: Dictionary, scooping: bool, atmos
 	_thermal_panel.visible = status.get("visible", false)
 	_entry_readout.visible = atmosphere and (entry.near or entry.inside)
 	if _entry_readout.visible:
-		_entry_readout.text = ("%s · высота %.1f м\nОтн. %.1f · верт. %+.1f м/с" % [
-			entry.name, entry.altitude, entry.relative_speed, entry.vertical_speed,
-		]).replace(".", ",")
+		_entry_readout.text = "%s · высота %s м\nСкорость %s · вертикальная %s м/с" % [
+			entry.name, ("%.1f" % entry.altitude).replace(".", ","),
+			("%.1f" % entry.relative_speed).replace(".", ","), ("%+.1f" % entry.vertical_speed).replace(".", ","),
+		]
 		if entry.inside and entry.get("shielded", false):
 			_entry_readout.text += "\nТеплозащита · −%d%% нагрузки" % int(entry.heat_reduction)
 	var guidance_color := INK
@@ -1369,25 +1437,24 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 			_route_detail.text += " (%s)" % remote_system
 	var reference: int = frame.reference
 	var entry_frame: bool = entry_site >= 0 and reference == entry_site and not frame.surface
-	_telemetry.text = "Тяга %d%%" % (sim.throttle * 100.0)
+	_telemetry.text = ""
 	var holding := bool(speed_hold.get("enabled", false))
 	if holding:
-		var actual := ("%+.1f" % snappedf(float(speed_hold.actual), 0.1)).replace(".", ",")
-		var setpoint := ("%+.1f" % snappedf(float(speed_hold.setpoint), 0.1)).replace(".", ",")
-		_telemetry.text = "Факт %s · Задано %s м/с" % [actual, setpoint]
-	elif not entry_frame:
-		var speed: float = frame.relative_speed
-		var speed_text := ("%.1f" % speed).replace(".", ",") if near_surface else "%d" % roundi(speed)
-		_telemetry.text = "Скорость %s м/с  ·  %s" % [speed_text, _telemetry.text]
-	if aimed_at_port and not Ground.is_port(sim.target):
-		_telemetry.text += "\nКрен к порту %+.0f°" % rad_to_deg(sim.roll_error(sim.target))
+		_speed_caption.text = "Факт. скорость"
+		_speed_value.text = ("%+.1f м/с" % snappedf(float(speed_hold.actual), 0.1)).replace(".", ",")
+		_thrust_caption.text = "Задано"
+		_thrust_value.text = ("%+.1f м/с" % snappedf(float(speed_hold.setpoint), 0.1)).replace(".", ",")
+	else:
+		_sync_motion_values(float(frame.relative_speed), sim.throttle, near_surface or entry_frame)
+	if aimed_at_port and not Ground.is_port(sim.target) and not _docking_panel.visible:
+		_telemetry.text = "Крен к порту %+.0f°" % rad_to_deg(sim.roll_error(sim.target))
 	elif near_surface:
 		if not _surface_panel.visible:
 			if entry_frame:
-				_telemetry.text += " · Уклон %.0f°" % surface.slope
+				_telemetry.text = "Уклон %.0f°" % surface.slope
 			else:
 				var altitude := ("%.1f" % maxf(0.0, float(surface.altitude))).replace(".", ",")
-				_telemetry.text += "\nВысота %s м · уклон %.0f°" % [altitude, surface.slope]
+				_telemetry.text = "Высота %s м · уклон %.0f°" % [altitude, surface.slope]
 		_actions["dock"].tooltip_text = str(surface.reason)
 	var ambient_fire := str(fire.get("channel", "")) == "ambient"
 	if not fire.is_empty() and not ambient_fire and convoy.is_empty():
@@ -1449,8 +1516,10 @@ func _sync_flight(sim: RefCounted, scoop_status: Dictionary, itinerary: Dictiona
 		_guidance.text = "Кнопки «Скорость ±» меняют задание. Тормоз отключает удержание."
 	else:
 		_guidance.text = "Курс и крен справа. Тяга и тормоз слева." if _touch_mirrored else "Курс и крен слева. Тяга и тормоз справа."
-	var frame_label := "Ручной кадр" if sim.orbit_maneuver or not rendezvous.is_empty() else "Кадр"
-	_telemetry.text += "\n%s: %s" % [frame_label, _frame_caption(frame)]
+	if not _telemetry.text.is_empty():
+		_telemetry.text += "\n"
+	var frame_label := "Ручной отсчёт" if sim.orbit_maneuver or not rendezvous.is_empty() else "Отсчёт"
+	_telemetry.text += "%s · %s" % [frame_label, _frame_caption(frame)]
 
 func _sync_jump(jump: Dictionary) -> void:
 	var destination := str(Sector.system(int(jump.destination)).name)
@@ -1539,8 +1608,14 @@ func _sync_rendezvous_flight(status: Dictionary, throttle: float) -> void:
 		_guidance.text = "Точка ожидания удерживается. Для захода нажмите «%s»." % _rendezvous_finish_caption(status.kind)
 
 func _sync_relative_motion(label: String, speed: float, throttle: float) -> void:
-	var relative := ("%.1f" % speed).replace(".", ",")
-	_telemetry.text = "Скорость %s м/с  ·  Тяга %d%%\nОтносительно «%s»" % [relative, throttle * 100.0, label]
+	_sync_motion_values(speed, throttle, true)
+	_telemetry.text = "Относительно «%s»" % label
+
+func _sync_motion_values(speed: float, throttle: float, precise: bool) -> void:
+	_speed_caption.text = "Скорость"
+	_speed_value.text = ("%.1f м/с" % speed).replace(".", ",") if precise else "%d м/с" % roundi(speed)
+	_thrust_caption.text = "Тяга"
+	_thrust_value.text = "%d%%" % (throttle * 100.0)
 
 static func _rendezvous_finish_caption(kind: String) -> String:
 	return "К швартовке" if kind == "port" else "К посадке"
@@ -2280,6 +2355,7 @@ class FlightMarks extends Control:
 	const MAX_CONTACTS := 3
 	const MAX_NAVIGATION_MARKERS := 6
 	const NAVIGATION_HIT_RADIUS := 22.0
+	const SIGHT_EDGE := Color(0.015, 0.035, 0.052, 0.9)
 
 	var flight := false
 	var forward_aim := true
@@ -2335,7 +2411,10 @@ class FlightMarks extends Control:
 		var center := size * 0.5
 		if forward_aim:
 			for direction: Vector2 in [Vector2.UP, Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT]:
-				draw_line(center + direction * 13.0, center + direction * 23.0, Color(0.57, 0.92, 0.9, 0.65), 1.5, true)
+				var start := center + direction * 13.0
+				var end := center + direction * 23.0
+				draw_line(start, end, SIGHT_EDGE, 4.0, true)
+				draw_line(start, end, CYAN, 1.5, true)
 		_draw_navigation(_draw_traffic())
 		_draw_combat_lock()
 		if not target_visible:
@@ -2347,9 +2426,12 @@ class FlightMarks extends Control:
 			var side := direction.orthogonal()
 			var arrow := PackedVector2Array([target + direction * 13.0, target - direction * 8.0 + side * 7.0, target - direction * 8.0 - side * 7.0])
 			draw_colored_polygon(arrow, AMBER)
+			arrow.append(arrow[0])
+			draw_polyline(arrow, SIGHT_EDGE, 1.8, true)
 			return
 		var distance := 10.0
 		var vertices := PackedVector2Array([target + Vector2(0, -distance), target + Vector2(distance, 0), target + Vector2(0, distance), target + Vector2(-distance, 0), target + Vector2(0, -distance)])
+		draw_polyline(vertices, SIGHT_EDGE, 4.5, true)
 		draw_polyline(vertices, AMBER, 2.0, true)
 
 	func _draw_combat_lock() -> void:
@@ -2358,9 +2440,13 @@ class FlightMarks extends Control:
 		var at: Vector2 = combat_lock.screen
 		if not Rect2(Vector2(25, 118), size - Vector2(50, 243)).has_point(at):
 			return
-		draw_arc(at, 16.0, 0.0, TAU, 24, ALERT, 2.0, true)
+		draw_arc(at, 16.0, 0.0, TAU, 32, SIGHT_EDGE, 4.5, true)
+		draw_arc(at, 16.0, 0.0, TAU, 32, ALERT, 2.0, true)
 		for direction: Vector2 in [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]:
-			draw_line(at + direction * 12.0, at + direction * 22.0, ALERT, 1.6, true)
+			var start := at + direction * 12.0
+			var end := at + direction * 22.0
+			draw_line(start, end, SIGHT_EDGE, 4.0, true)
+			draw_line(start, end, ALERT, 1.6, true)
 
 	func _draw_navigation(occupied: Array[Rect2]) -> void:
 		var font := ThemeDB.fallback_font
@@ -2407,7 +2493,10 @@ class FlightMarks extends Control:
 			var text_at := Vector2(clampf(screen.x - width * 0.5, 20.0, maxf(20.0, size.x - width - 20.0)), screen.y + 27.0)
 			var label_box := Rect2(text_at - Vector2(6, 15), Vector2(width + 12, 21))
 			var footprint := Rect2(screen - Vector2(12, 12), Vector2(24, 24))
-			if object_labels:
+			if _excluded.any(func(box: Rect2) -> bool: return box.intersects(footprint)):
+				continue
+			var show_caption := object_labels and not _excluded.any(func(box: Rect2) -> bool: return box.intersects(label_box))
+			if show_caption:
 				footprint = label_box.merge(footprint)
 			if occupied.any(func(box: Rect2) -> bool: return box.intersects(footprint)):
 				continue
@@ -2427,7 +2516,7 @@ class FlightMarks extends Control:
 				draw_rect(Rect2(screen - Vector2(5, 4), Vector2(10, 8)), color, false, 1.4)
 			else:
 				draw_arc(screen, 7.0, 0.0, TAU, 20, color, 1.4, true)
-			if object_labels:
+			if show_caption:
 				draw_rect(label_box, BACK)
 				draw_string(font, text_at, caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, color)
 			if occupied.size() >= MAX_CONTACTS:

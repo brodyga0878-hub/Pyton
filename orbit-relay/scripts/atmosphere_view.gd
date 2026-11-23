@@ -42,12 +42,14 @@ func setup(system_id: int) -> void:
 			continue
 		var planet: Dictionary = Catalog.site(site_id)
 		var mesh := SphereMesh.new()
-		mesh.radius = float(planet.radius) + float(profile.height)
+		# The thin visible scattering layer is denser than the full flight atmosphere.
+		var scattering_height := float(profile.height) * (0.52 if Catalog.is_gas_giant(site_id) else 0.80)
+		mesh.radius = float(planet.radius) + scattering_height
 		mesh.height = mesh.radius * 2.0
 		var paint := ShaderMaterial.new()
 		paint.shader = _atmosphere_shader()
 		paint.set_shader_parameter("body_radius", float(planet.radius))
-		paint.set_shader_parameter("air_height", float(profile.height))
+		paint.set_shader_parameter("air_height", scattering_height)
 		paint.set_shader_parameter("air_density", float(profile.density))
 		paint.set_shader_parameter("air_color", profile.color)
 		var shell := MeshInstance3D.new()
@@ -78,19 +80,25 @@ func set_visual_profile(profile: int) -> void:
 
 func sync(sim: RefCounted, camera: Camera3D, settled: bool) -> void:
 	setup(int(sim.system_id))
-	var star: Vector3 = sim.target_position(Catalog.star_for(int(sim.system_id)))
+	var star_id := Catalog.star_for(int(sim.system_id))
+	var star: Vector3 = sim.target_position(star_id)
+	var star_radius := float(Catalog.site(star_id).radius)
 	for site_id: int in _shells:
 		var shell: MeshInstance3D = _shells[site_id]
 		shell.position = sim.target_position(site_id)
-		var profile: Dictionary = Atmosphere.profile(site_id)
-		var outer := float(Catalog.site(site_id).radius) + float(profile.height)
+		var outer := _shell_meshes[site_id].radius
 		var paint: ShaderMaterial = _shell_paints[site_id]
 		paint.set_shader_parameter("body_center", shell.global_position)
 		paint.set_shader_parameter("sun_direction", (star - shell.position).normalized())
+		paint.set_shader_parameter("sun_half_width", clampf(star_radius / maxf(1.0, star.distance_to(shell.position)), 0.018, 0.16))
 		paint.set_shader_parameter("inside_volume", camera.global_position.distance_squared_to(shell.global_position) < outer * outer)
-		paint.set_shader_parameter("time_now", fposmod(float(sim.elapsed), 2048.0))
 	var status: Dictionary = sim.atmosphere_status()
 	_camera_haze = Atmosphere.sample(sim, camera.global_position, sim.velocity)
+	if bool(_camera_haze.inside):
+		var center: Vector3 = sim.target_position(int(_camera_haze.site))
+		var sun_elevation := center.direction_to(camera.global_position).dot(center.direction_to(star))
+		_camera_haze["daylight"] = smoothstep(-0.15, 0.37, sun_elevation)
+		_camera_haze["twilight"] = smoothstep(-0.24, -0.03, sun_elevation) * (1.0 - smoothstep(0.02, 0.42, sun_elevation))
 	_entry_strength = 0.0
 	var inside := bool(status.get("inside", false))
 	var speed := float(status.get("relative_speed", 0.0))
@@ -139,7 +147,7 @@ uniform float air_height = 30.0;
 uniform float air_density = 1.0;
 uniform bool inside_volume = false;
 uniform int profile = 1;
-uniform float time_now = 0.0;
+uniform float sun_half_width = 0.06;
 varying vec3 world_point;
 void vertex() {
 	world_point = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
@@ -165,37 +173,39 @@ void fragment() {
 	float optical = 0.0;
 	float daylight = 0.0;
 	float low_haze = 0.0;
+	float twilight = 0.0;
 	float steps = profile == 0 ? 3.0 : (profile == 1 ? 5.0 : 7.0);
 	for (int i = 0; i < 7; i++) {
 		if (float(i) >= steps) break;
 		vec3 point = origin + ray * (start + span * (float(i) + 0.5) / steps);
-		float altitude = max(0.0, length(point) - body_radius);
+		float radius = max(length(point), body_radius);
+		float altitude = radius - body_radius;
 		float depth = clamp((air_height - altitude) / max(1.0, air_height), 0.0, 1.0);
 		float density = depth * depth;
+		float solar_elevation = dot(point, sun_direction) / radius;
+		// High air can catch the sun after the ground below has set.
+		float ground_ratio = body_radius / radius;
+		float horizon = -sqrt(max(0.0, 1.0 - ground_ratio * ground_ratio));
+		float sunlit = smoothstep(horizon - sun_half_width, horizon + sun_half_width, solar_elevation);
+		sunlit *= mix(0.38, 1.0, smoothstep(-0.25, 0.42, solar_elevation));
 		optical += density;
-		low_haze += density * density;
-		daylight += density * smoothstep(-0.24, 0.50, dot(normalize(point), sun_direction));
+		daylight += density * sunlit;
+		low_haze += density * density * sunlit;
+		twilight += density * sunlit * (1.0 - smoothstep(-0.08, 0.28, solar_elevation));
 	}
-	float light = daylight / max(optical, 0.0001);
-	float haze_fraction = low_haze / max(optical, 0.0001);
-	optical *= span / (steps * max(1.0, air_height));
-	float opacity = min(0.48, 1.0 - exp(-optical * air_density * 0.46));
+	float column = max(optical, 0.0001);
+	float light = daylight / column;
+	float twilight_fraction = twilight / column;
+	float haze_fraction = low_haze / column;
+	float transmittance = exp(-optical * span * air_density * 0.57 / (steps * max(1.0, air_height)));
 	float view_sun = dot(ray, sun_direction);
-	float phase = 0.72 + 0.28 * view_sun * view_sun;
-	vec3 color = air_color.rgb * (0.18 + light * 0.82) * phase;
-	float sunset = (1.0 - abs(light * 2.0 - 1.0)) * max(0.0, dot(ray, sun_direction));
-	// Dense lower air scatters more forward light than the upper limb.
-	float forward_glow = pow(max(0.0, view_sun), 6.0) * haze_fraction * light;
-	float haze_mix = clamp(sunset * (0.17 + haze_fraction * 0.21) + forward_glow * 0.22, 0.0, 0.45);
-	color = mix(color, vec3(0.98, 0.63, 0.37), haze_mix);
-	opacity = min(0.48, opacity + forward_glow * opacity * 0.18);
-	if (profile > 0) {
-		vec3 p = normalize(origin + ray * (start + span * 0.5));
-		float strands = sin(p.x * 39.0 + p.z * 25.0 + sin(p.y * 31.0) * 1.8 + time_now * 0.018);
-		color *= 1.0 + strands * 0.018;
-	}
-	ALBEDO = color;
-	ALPHA = opacity;
+	float rayleigh = 0.72 + 0.28 * view_sun * view_sun;
+	float forward_glow = pow(max(0.0, view_sun), 5.0) * haze_fraction;
+	vec3 sky_light = air_color.rgb * (0.13 + light * 0.87) * rayleigh;
+	vec3 warm_haze = vec3(0.94, 0.55, 0.31) * (0.68 + 0.32 * forward_glow);
+	ALBEDO = mix(sky_light, warm_haze, twilight_fraction * (0.39 + 0.21 * forward_glow))
+		+ air_color.rgb * forward_glow * 0.24;
+	ALPHA = min(0.43, (1.0 - transmittance) * (0.10 + light * 0.90 + forward_glow * 0.15));
 }
 """
 	return _air_shader

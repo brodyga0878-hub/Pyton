@@ -136,6 +136,12 @@ func _test_touch_cycle() -> void:
 	_expect(game._hud._surface_panel.is_visible_in_tree() and not flight.surface_status().speed_ok
 		and "Скорость —" in game._hud._surface_ready.text,
 		"The first displayed approach detects dangerous sideways motion from the saved flight")
+	var approach_rect: Rect2 = game._hud._surface_panel.get_global_rect()
+	var shortcuts: Rect2 = game._hud._shortcuts.get_global_rect()
+	_expect(not approach_rect.intersects(shortcuts) and game.get_viewport().get_visible_rect().encloses(shortcuts),
+		"All cockpit shortcuts remain visible beside the off-pad approach readout")
+	_expect(game._hud._drive_tank_caption.text == "Резерв тяги" and game._hud._fuel_level.value == 0.0
+		and game._hud._fuel.text.begins_with("0,0 / "), "The reserve warning retains the numeric tank reading")
 	_expect(game._hud._surface_gear.text == "Шасси убрано" and not game._view._landing_gear.visible,
 		"The retracted gear matches the instrument and is hidden on the ship")
 	_touch(game._hud._actions["dock"])

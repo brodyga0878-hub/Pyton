@@ -185,7 +185,7 @@ func _test_actual_board(pilot: Flight) -> void:
 	var board: Node = game._frontier
 	_tap(viewport, board._search_tab)
 	await process_frame
-	_expect(board.is_open() and board._search_action.is_visible_in_tree() and "Взять поиск" in board._search_action.text,
+	_expect(board.is_open() and board._search_action.is_visible_in_tree() and board._search_action.text == "Начать поиск",
 		"The normal flight shortcut opens Освоение → Поиск with a real touchable notice")
 	_tap(viewport, board._search_action)
 	await process_frame

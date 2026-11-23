@@ -188,9 +188,24 @@ def brushed_metal(rng):
     fine_scuff = scratches(rng, 185, -0.053, (0.010, 0.051), (0.00043, 0.00103), 0.38)
     lips = np.maximum(0.0, np.roll(scuff, 1, axis=0) - scuff)
     dust = noise(rng, U, V, 332)
-    tone = centered(0.28 * fine + 0.155 * broad - 0.19 * scuff - 0.067 * fine_scuff + 0.10 * lips + 0.032 * dust)
-    height = centered(0.29 * fine + 0.086 * broad - 0.19 * scuff - 0.079 * fine_scuff + 0.039 * lips + 0.026 * dust)
-    roughness = 0.34 + 0.12 * broad + 0.10 * fine + 0.22 * scuff + 0.15 * fine_scuff - 0.085 * lips
+    # The brushed tracks vary with overlapping tool passes and oxide patches.
+    passes = noise(rng, U, flow, 6, 37)
+    satin = smooth((0.27 + 0.44 * passes + 0.32 * broad) / 0.56)
+    oxide = smooth((broad + 0.28 * noise(rng, U, V, 39) - 0.17) / 0.48)
+    grind = scratches(rng, 44, 0.022, (0.049, 0.176), (0.0016, 0.0038), 0.094)
+    tracks = fine * (0.70 + 0.36 * satin)
+    tone = centered(
+        0.33 * tracks + 0.14 * broad + 0.059 * satin - 0.13 * oxide - 0.16 * scuff
+        - 0.06 * fine_scuff - 0.12 * grind + 0.10 * lips + 0.032 * dust
+    )
+    height = centered(
+        0.28 * tracks + 0.075 * broad - 0.17 * scuff - 0.077 * fine_scuff
+        - 0.13 * grind + 0.039 * lips + 0.026 * dust
+    )
+    roughness = (
+        0.38 + 0.072 * broad + 0.095 * tracks + 0.19 * scuff + 0.12 * fine_scuff
+        + 0.14 * grind + 0.16 * oxide - 0.10 * satin - 0.065 * lips
+    )
     return tone, height, roughness
 
 
@@ -210,14 +225,21 @@ def painted_metal(rng):
     scrape = scratches(rng, 82, -0.25)
     scars = scratches(rng, 117, 0.20, (0.012, 0.070), (0.00051, 0.00138), 0.65)
     skim = noise(rng, u, v, 23, 263)
+    impacts, impact_rims = surface_marks(rng, 47, (0.0048, 0.022), (0.75, 0.97), 0.24)
+    faded_paint = smooth((0.31 + patch + 0.18 * noise(rng, u, v, 31)) / 0.68)
     tone = centered(
-        0.18 * orange_peel + 0.20 * patch + 0.025 * pigment - 0.26 * chip
-        + 0.17 * rim - 0.13 * scrape - 0.061 * scars + 0.073 * skim * chip
+        0.17 * orange_peel + 0.15 * patch + 0.025 * pigment - 0.26 * chip
+        + 0.13 * rim - 0.13 * scrape - 0.061 * scars + 0.073 * skim * chip
+        + 0.092 * faded_paint - 0.22 * impacts + 0.094 * impact_rims
     )
     height = centered(
-        0.15 * orange_peel + 0.085 * patch - 0.235 * chip + 0.075 * rim - 0.13 * scrape - 0.067 * scars
+        0.15 * orange_peel + 0.085 * patch - 0.235 * chip + 0.075 * rim
+        - 0.13 * scrape - 0.067 * scars - 0.28 * impacts + 0.050 * impact_rims
     )
-    roughness = 0.53 + 0.12 * patch + 0.095 * orange_peel - 0.27 * chip + 0.13 * rim         + 0.22 * scrape + 0.10 * scars
+    roughness = (
+        0.49 + 0.13 * faded_paint + 0.095 * orange_peel - 0.23 * chip + 0.13 * rim
+        + 0.22 * scrape + 0.10 * scars + 0.19 * impact_rims - 0.12 * impacts
+    )
     return tone, height, roughness
 
 

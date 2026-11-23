@@ -187,15 +187,15 @@ func order_offer(kind: String, issuer: int, origin: int, site: int, epoch: float
 	var rule: Dictionary = ORDERS[kind]
 	var reason := ""
 	if not _valid_faction(issuer) or not _valid_order_route(kind, origin, site):
-		reason = "В этом порту нет подходящей цели для приказа."
+		reason = "В этой системе сейчас нет цели для задания."
 	elif not _dispatch.is_empty() or not _order.is_empty():
 		reason = "Сначала завершите принятый приказ."
 	elif _trust[issuer] <= STANDING_SUSPENSION:
-		reason = "Служба приостановлена из-за низкого доверия."
+		reason = "Фракция отстранила вас от службы из-за низкого доверия."
 	elif _service[issuer] < int(rule.service):
-		reason = "Нужен ранг «%s»." % SERVICE_TITLES[_rank(int(rule.service), SERVICE_THRESHOLDS)]
+		reason = "Нужен ранг «%s» у этой фракции." % SERVICE_TITLES[_rank(int(rule.service), SERVICE_THRESHOLDS)]
 	elif _trust[issuer] < int(rule.trust):
-		reason = "Нужно доверие от %d." % int(rule.trust)
+		reason = "Требуется доверие фракции не ниже %d." % int(rule.trust)
 	elif not _valid_epoch(epoch) or epoch > MAX_EPOCH - float(rule.duration):
 		reason = "Невозможно назначить срок операции."
 	return {"kind": kind, "name": rule.name, "origin": origin, "issuer": issuer, "site": site,
@@ -237,7 +237,7 @@ func finish_order(port: int, epoch: float) -> Dictionary:
 	if not expiry.is_empty():
 		return expiry
 	if port != int(_order.origin) or float(_order.proof_at) < 0.0 or epoch < float(_order.proof_at):
-		return _rejected("Завершите операцию и вернитесь с докладом.")
+		return _rejected("Выполните приказ и сдайте доклад в порту, где его приняли.")
 	var issuer: int = _order.issuer
 	var rule: Dictionary = ORDERS[_order.kind]
 	var prior_grade := _service_grade(issuer)
@@ -272,7 +272,7 @@ func advance(epoch: float) -> Dictionary:
 			_order.clear()
 			_service[war_issuer] = maxi(0, _service[war_issuer] - 2)
 			_change_trust(war_issuer, -2)
-			return _result("career_order_expired", "Срок приказа истёк. Выслуга и доверие снижены.")
+			return _result("career_order_expired", "Срок приказа истёк. Фракция сняла очки выслуги и доверия.")
 		return {}
 	if _dispatch.is_empty() or epoch < float(_dispatch.deadline):
 		return {}
@@ -349,11 +349,11 @@ func restore(raw: Variant, epoch: float, legacy := false) -> bool:
 
 func _dispatch_requirement(issuer: int) -> String:
 	if _trust[issuer] <= STANDING_SUSPENSION:
-		return "Служба приостановлена из-за низкого доверия."
+		return "Фракция отстранила вас от службы из-за низкого доверия."
 	if _service[issuer] < DISPATCH_SERVICE:
 		return "Нужен служебный ранг «%s»." % SERVICE_TITLES[1]
 	if _trust[issuer] < DISPATCH_TRUST:
-		return "Нужно доверие не ниже %d." % DISPATCH_TRUST
+		return "Требуется доверие фракции не ниже %d." % DISPATCH_TRUST
 	return ""
 
 

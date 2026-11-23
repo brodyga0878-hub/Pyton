@@ -70,7 +70,7 @@ func action(sim: RefCounted, command: String) -> Dictionary:
 			if score > int(state.score):
 				_photo = {"at": sim.orbit_time, "distance": exposure.distance, "angle": exposure.angle,
 					"speed": exposure.speed, "score": score}
-			return _result("recon_captured", "Снимок принят камерой. Качество %d / 100. Лучший результат %d." % [score, maxi(score, int(state.score))])
+			return _result("recon_captured", "Снимок сделан. Качество %d из 100. Лучший результат %d." % [score, maxi(score, int(state.score))])
 		"report":
 			if state.can_report and sim.credits <= 1000000000 - int(state.reward):
 				_completed.append(_issuer)
@@ -80,7 +80,7 @@ func action(sim: RefCounted, command: String) -> Dictionary:
 		"cancel":
 			if state.can_cancel:
 				_clear_order()
-				return _result("recon_cancelled", "Заказ отменён. Материалы сняты с учёта.")
+				return _result("recon_cancelled", "Заказ отменён. Снимок больше не числится в заказе.")
 	return _result("recon_denied", "Команда недоступна в текущем состоянии рейса.")
 
 
@@ -139,7 +139,7 @@ func _measure(sim: RefCounted, target: int) -> Dictionary:
 	if sim.orbit_time >= deadline():
 		return {"ok": false, "reason": "Срок съёмки истёк."}
 	if sim.docked >= 0 or sim.landed or sim.jump_seconds_left > 0.0:
-		return {"ok": false, "reason": "Камера готова только в свободном полёте."}
+		return {"ok": false, "reason": "Съёмка доступна после выхода из дока, взлёта или завершения прыжка."}
 	if Catalog.system_of_site(target) != sim.system_id:
 		return {"ok": false, "reason": "Сначала войдите в систему цели."}
 	var offset: Vector3 = sim.target_position(target) - sim.position
@@ -150,7 +150,7 @@ func _measure(sim: RefCounted, target: int) -> Dictionary:
 	var sight: Vector3 = sim.attitude() * Vector3.FORWARD
 	var angle := rad_to_deg(sight.angle_to(offset))
 	if angle > MAX_ANGLE:
-		return {"ok": false, "reason": "Наведите нос на цель с отклонением до 18°."}
+		return {"ok": false, "reason": "Наведите нос на цель. Допустимое отклонение до 18°."}
 	var speed: float = sim.speed_relative_to(target)
 	if speed > MAX_SPEED:
 		return {"ok": false, "reason": "Снизьте скорость относительно цели до 40 м/с."}

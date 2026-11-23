@@ -525,7 +525,7 @@ func survey_action(site: int) -> bool:
 	var scan := body_dossier(site)
 	if not scan.can_scan or not cartography.record(site, orbit_time):
 		return false
-	_announce("survey_record", "Данные «%s» записаны в атлас." % target_name(site))
+	_announce("survey_record", "Наблюдение объекта «%s» записано в атлас." % target_name(site))
 	return true
 
 
@@ -1042,7 +1042,7 @@ func accept_courier(route_id: String) -> bool:
 	contract_leg = 0
 	contract_destination = offer.stops[0]
 	_plan_contract_leg()
-	_announce("contract", "Курьерский рейс. Первая остановка «%s»." % target_name(contract_destination))
+	_announce("contract", "Курьерский рейс принят. Первая остановка в порту «%s»." % target_name(contract_destination))
 	return true
 
 
@@ -1079,7 +1079,7 @@ func contract_action() -> bool:
 				contract_leg += 1
 				contract_destination = stops[contract_leg]
 				_plan_contract_leg()
-				_announce("contract_leg", "Этап принят. Следующая остановка «%s»." % target_name(contract_destination))
+				_announce("contract_leg", "Прибытие подтверждено. Следуйте в порт «%s»." % target_name(contract_destination))
 				return true
 		var reward := contract_reward()
 		if reward <= 0 or credits > 1000000000 - reward or deliveries >= 10000000:
@@ -1091,7 +1091,7 @@ func contract_action() -> bool:
 		contract_stage = 2
 		var message := "Груз принят. Начислено %d кр." % reward
 		if deliveries == 1 and story_status().stage == "offer":
-			message += " Открылась заявка в «Журнал» → «Сюжет»."
+			message += " Новое поручение доступно в журнале на вкладке «Сюжет»."
 		_announce("delivery", message)
 	else:
 		var destination := offer_destination()
@@ -1104,7 +1104,7 @@ func contract_action() -> bool:
 		_contract_issuer = factions.owner(system_id)
 		contract_destination = destination
 		_plan_contract_leg()
-		_announce("contract", "Груз на борту. Пункт назначения — %s." % target_name(contract_destination))
+		_announce("contract", "Груз на борту. Доставьте его в порт «%s»." % target_name(contract_destination))
 	return true
 
 
@@ -2255,7 +2255,7 @@ func career_dispatch_action(kind := "dispatch") -> bool:
 		if kind != str(order.kind):
 			return false
 		if _military_observation_ready(order) and career.prove_order(kind, system_id, orbit_time):
-			_announce("career_order_proved", "Разведданные записаны. Вернитесь в порт с докладом.")
+			_announce("career_order_proved", "Разведданные записаны. Сдайте доклад в порту «%s»." % target_name(int(order.origin)))
 			return true
 		var origin := int(order.origin)
 		if not station_services_available() or docked != origin or credits > PilotCareer.MAX_BOUNTY_CREDITS - int(order.reward):
