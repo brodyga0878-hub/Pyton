@@ -50,7 +50,7 @@
       "kvm_available": false,
       "guest_apk_sha256_matches": true,
       "guest_data_available_gib": 5.5,
-      "installed_release_confirmed": false,
+      "installed_release_confirmed": true,
       "native_report_export_exercised": false,
       "attempts": {
         "0.107.0": {
@@ -61,10 +61,27 @@
         "0.108.0": {
           "pm_install_staged_file": "timed_out_after_180_seconds",
           "subprocess_exit": 124,
-          "app_error_reported": false
+          "app_error_reported": false,
+          "post_timeout_confirmation": "Installed base.apk appeared and dumpsys verified versionName, versionCode and primaryCpuAbi."
         }
       },
-      "environment_error": "Stock Android processes reported DeadSystemException and the guest Package Manager process restarted during installation attempts."
+      "environment_error": "Stock Android processes reported DeadSystemException and the guest Package Manager process restarted during installation attempts.",
+      "installed_apk_primary_abi": "arm64-v8a",
+      "installed_version_code": 133,
+      "installed_version_name": "0.108.0",
+      "fresh_install_confirmed": true,
+      "native_upgrade_from_0_107_0_confirmed": false,
+      "independent_no_code_apk_check": "CLI timed out after 90 seconds; pm path did not show the control package.",
+      "launch_intent_accepted": true,
+      "game_ui_verified": false,
+      "launch_observation": {
+        "launch_intent_accepted": true,
+        "system_ui_anr_observed": true,
+        "game_ui_observed": false,
+        "retry_after_system_dialog_dismissed": "Android home screen remained visible"
+      },
+      "recovery_observation": "Wait dismissed the stock Android ANR; a second launch intent was accepted, but the captured foreground remained the Android home screen.",
+      "app_crash_confirmed": false
     }
   },
   "checks": {
