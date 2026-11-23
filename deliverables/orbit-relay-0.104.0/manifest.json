@@ -1,0 +1,66 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.104.0",
+  "source_commit": "f87945df2b9db112cc4eba26e2046088daab38a0",
+  "apk_runtime_source_commit": "9faccae7024b7316ed861ec58e8a22e3ebafe1a4",
+  "content": {
+    "save_schema": 55,
+    "campaign_finales": [
+      "registry",
+      "mirror"
+    ],
+    "validated_frontier_commissions": [
+      "heather",
+      "limit"
+    ],
+    "commission_keeps_original_sponsor": true,
+    "ordered_faction_calendar": true,
+    "recovers_legacy_conflicting_courier_route": true
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 129,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.103.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 88,
+    "tested_on_device": false
+  },
+  "checks": {
+    "source_zip_headless": {
+      "suites": 93,
+      "assertions": 28792,
+      "failures": 0
+    },
+    "apk_resources_godot_desktop": {
+      "assets_verified": 206,
+      "assertions": 970,
+      "failures": 0,
+      "suites": {
+        "voyage-registry": 157,
+        "voyage-mirror": 164,
+        "economy": 161,
+        "branching_story": 42,
+        "frontier_voyage": 17,
+        "frontier_calendar": 24,
+        "sector": 405
+      },
+      "scene_smoke_passed": true,
+      "migrated_v0103_campaign_saves": 4,
+      "recovered_v0103_courier_route_saves": 1
+    }
+  },
+  "files": {
+    "OrbitRelay-0.104.0-arm64.apk": {
+      "bytes": 35946362,
+      "sha256": "df593b58c7bbc5b5f05b68514e298a18db191ebd6af8fd3d52c1cc68289d8038"
+    },
+    "OrbitRelay-0.104.0-source.zip": {
+      "bytes": 14009362,
+      "sha256": "d989ae37822ab14d3fc2d9372404deb111847403474f8de4fbada09865fa38e4"
+    }
+  }
+}
