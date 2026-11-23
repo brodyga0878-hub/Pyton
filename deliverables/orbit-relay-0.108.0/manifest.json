@@ -1,0 +1,143 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.108.0",
+  "status": "release_candidate",
+  "source_commit": "b8e2e3cbef12eb87b5513bc24855c16f09487c1e",
+  "apk_runtime_source_commit": "b8e2e3cbef12eb87b5513bc24855c16f09487c1e",
+  "content": {
+    "systems": 513933476,
+    "save_schema": 56,
+    "report_actions": [
+      "flight",
+      "pause",
+      "departure",
+      "hyperspace",
+      "voyage_menu"
+    ],
+    "report_state_preference": [
+      "live",
+      "autosave",
+      "backup"
+    ],
+    "report_journal_events": 48
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 133,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "debuggable": false,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.107.0",
+    "zip_alignment_16k_verified": true,
+    "native_elf_load_alignment_bytes": {
+      "lib/arm64-v8a/libc++_shared.so": 16384,
+      "lib/arm64-v8a/libgodot_android.so": 16384
+    },
+    "compiled_scripts": 89,
+    "tested_on_device": false,
+    "emulator": {
+      "official_emulator_version": "37.3.10",
+      "verified_system_image": "system-images;android-30;google_apis;x86_64;r16",
+      "android_release": "11",
+      "api_level": 30,
+      "native_bridge": "libndk_translation.so",
+      "arm64_v8a_in_guest_abi_list": true,
+      "cpu": "TCG",
+      "graphics": "SwiftShader OpenGL ES 3.0",
+      "boot_completed": true,
+      "kvm_available": false,
+      "guest_apk_sha256_matches": true,
+      "guest_data_available_gib": 5.5,
+      "installed_release_confirmed": false,
+      "native_report_export_exercised": false,
+      "attempts": {
+        "0.107.0": {
+          "adb_install_no_streaming": "timed_out_after_100_seconds",
+          "pm_install_staged_file": "stock_framework_exception",
+          "framework_exception": "StorageManagerService.allocateBytes: null android.content.pm.PackageManagerInternal calling freeStorage"
+        },
+        "0.108.0": {
+          "pm_install_staged_file": "timed_out_after_180_seconds",
+          "subprocess_exit": 124,
+          "app_error_reported": false
+        }
+      },
+      "environment_error": "Stock Android processes reported DeadSystemException and the guest Package Manager process restarted during installation attempts."
+    }
+  },
+  "checks": {
+    "source_zip_headless": {
+      "suites": 95,
+      "assertions": 29097,
+      "failures": 0
+    },
+    "android_provider_packaging": {
+      "tests": 11,
+      "failures": 0
+    },
+    "apk_resources_godot_desktop": {
+      "assets_verified": 208,
+      "assertions": 7504,
+      "failures": 0,
+      "suites": {
+        "android_report_share": 79,
+        "report": 91,
+        "voyage_entry": 63,
+        "voyage_import": 40,
+        "save_backup": 46,
+        "campaign_registry": 157,
+        "campaign_mirror": 164,
+        "frontier_voyage": 17,
+        "touch_combat": 114,
+        "docking": 196,
+        "surface_guidance": 62,
+        "expanded_galaxy": 6285,
+        "galactic_atlas": 56,
+        "galactic_routes": 59,
+        "sector_voyage": 11,
+        "hyperspace": 64,
+        "core_expedition": null
+      },
+      "runtime_upgrades": {
+        "0.107.0": 17
+      },
+      "report_after_host_process_termination": true,
+      "report_zip_from_real_cockpit_touch": true,
+      "full_core_expedition": {
+        "flown_jumps": 177,
+        "reloaded_checkpoints": 5,
+        "discovered_systems": 6868
+      },
+      "large_report_round_trip": {
+        "synthetic_known_systems": 307712,
+        "state_json_bytes": 2954916,
+        "zip_bytes": 579254
+      },
+      "capture_resolution": [
+        1544,
+        720
+      ],
+      "capture_renderer": "OpenGL Compatibility (Mesa llvmpipe)"
+    }
+  },
+  "files": {
+    "OrbitRelay-0.108.0-arm64.apk": {
+      "bytes": 35979295,
+      "sha256": "e428f47f28233030f6f7d35c5dc7a82b840d474112ebe5320be7e53b2cf9f69d"
+    },
+    "OrbitRelay-0.108.0-source.zip": {
+      "bytes": 14067790,
+      "sha256": "ec87e8e49abf98d7182983899d465fd4638fa1e86fd0e006e1365f3ccd476284"
+    },
+    "report-button.png": {
+      "bytes": 276626,
+      "sha256": "2529afa88eb41bbf49e640d4017a988c560ec6138963228a991af5fc7ea00f24"
+    },
+    "report.png": {
+      "bytes": 119787,
+      "sha256": "e9c08ace71d7bda5c37285db36914d2b5dbe65811eed78b54948f2f96d3cbb80"
+    }
+  }
+}
