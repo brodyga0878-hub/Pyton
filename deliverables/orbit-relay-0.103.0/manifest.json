@@ -1,0 +1,80 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.103.0",
+  "source_commit": "ab462ef5084cc35e3fdba8592053e5713e0e7946",
+  "content": {
+    "save_schema": 54,
+    "hold_to_fire": true,
+    "approach_controls_available_during_combat": true,
+    "hull_missile_rails": {
+      "courier": 4,
+      "freighter": 6,
+      "surveyor": 4,
+      "utility": 4,
+      "interceptor": 6,
+      "hauler": 8
+    },
+    "evading_patrol_archetypes": 2,
+    "ambient_attack_deferral": true
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 128,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.102.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 88,
+    "tested_on_device": false
+  },
+  "checks": {
+    "source_zip_headless": {
+      "suites": 90,
+      "assertions": 28571,
+      "failures": 0
+    },
+    "apk_resources_godot_desktop": {
+      "assets_verified": 206,
+      "assertions": 564,
+      "failures": 0,
+      "suites": {
+        "touch_combat": 114,
+        "docking": 148,
+        "guided_ordnance": 50,
+        "shipyard": 105,
+        "ship_hangar": 39,
+        "maintenance_tactics": 41,
+        "combat_survival": 30,
+        "flight_camera": 37
+      },
+      "migrated_v0102_saves": 6,
+      "touch_resolutions": [
+        [
+          1280,
+          720
+        ],
+        [
+          1544,
+          720
+        ],
+        [
+          1560,
+          720
+        ]
+      ],
+      "mirrored_layouts": true
+    }
+  },
+  "files": {
+    "OrbitRelay-0.103.0-arm64.apk": {
+      "bytes": 35938170,
+      "sha256": "05e89c3ac209a3a0874f7905da20d80332f30a51639807d34ed3ed7b1ae77f6c"
+    },
+    "OrbitRelay-0.103.0-source.zip": {
+      "bytes": 13993688,
+      "sha256": "23a69dbb9c67c5c90c1953ffe817cc31df3a860f72a9e9fe58b28aa00fbea356"
+    }
+  }
+}
