@@ -1,0 +1,87 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.106.0",
+  "source_commit": "b550b16c596c81c76f0cc773da3b92529e0b2597",
+  "apk_runtime_source_commit": "b550b16c596c81c76f0cc773da3b92529e0b2597",
+  "content": {
+    "save_schema": 55,
+    "release_block": "saves_diagnostics",
+    "remaining_release_blocks": [
+      "android_device_acceptance_release"
+    ]
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 131,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.105.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 88,
+    "tested_on_device": false
+  },
+  "checks": {
+    "source_zip_headless": {
+      "suites": 94,
+      "assertions": 28921,
+      "failures": 0
+    },
+    "apk_resources_godot_desktop": {
+      "assets_verified": 206,
+      "assertions": 670,
+      "failures": 0,
+      "suites": {
+        "android_report_share": 79,
+        "docking": 196,
+        "presentation": 180,
+        "report": 37,
+        "save_backup": 46,
+        "voyage_entry": 63,
+        "voyage_import": 40,
+        "voyage_upgrade": 29
+      },
+      "runtime_upgrades": {
+        "0.104.0": 17,
+        "0.105.0": 17
+      },
+      "long_voyage_in_game_hours_after_arrival": 8,
+      "continues_after_host_process_kill_at_background_checkpoint": true,
+      "imported_0_105_0_off_station_diagnostic_zip": true,
+      "android_system_picker_tested_on_device": false
+    },
+    "dock_reference": {
+      "station": "Маяк-7",
+      "opening_diameter_m": 8.8,
+      "ship_wingspan_m": 3.58,
+      "ship_to_hatch_m": 5.0,
+      "ship_to_station_center_m": 19.0,
+      "capture_resolution": [
+        1440,
+        720
+      ],
+      "renderer": "OpenGL Compatibility",
+      "exterior_aperture_height_pixels": 304,
+      "cockpit_aperture_height_pixels_before_clipping": 1002
+    }
+  },
+  "files": {
+    "OrbitRelay-0.106.0-arm64.apk": {
+      "bytes": 35958650,
+      "sha256": "cbda5e7f71b8e665d18ba66765ed75939bc279532b4df30e7c9abbbe6e0b0177"
+    },
+    "OrbitRelay-0.106.0-source.zip": {
+      "bytes": 14052951,
+      "sha256": "494171f79c189bfab9fd9f28b292587d19420f221c62d81c44fbb31dfed978ca"
+    },
+    "dock-approach-cockpit.png": {
+      "bytes": 362874,
+      "sha256": "82acbb0625f18610574d4e81a0c08bbea9c3a3be3307d76f3631fb7e04956958"
+    },
+    "dock-approach-exterior.png": {
+      "bytes": 314387,
+      "sha256": "c68e8040e413e924b4f3359be54f27ae3279e95d031b5dea13c99dc4649b5e15"
+    }
+  }
+}
