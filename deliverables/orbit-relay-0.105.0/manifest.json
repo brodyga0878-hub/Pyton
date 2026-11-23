@@ -1,0 +1,103 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.105.0",
+  "source_commit": "e2fea9776ddcb70a2dc332e8b507c541c3fe0bd1",
+  "apk_runtime_source_commit": "e2fea9776ddcb70a2dc332e8b507c541c3fe0bd1",
+  "content": {
+    "save_schema": 55,
+    "release_block": "graphics_russian_interface",
+    "visual_profiles": [
+      "economy",
+      "balanced",
+      "detail"
+    ],
+    "detail_profile": {
+      "msaa_samples": 4,
+      "local_stellar_shadows": true
+    },
+    "remaining_release_blocks": [
+      "saves_diagnostics",
+      "android_device_acceptance_release"
+    ]
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 130,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.104.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 88,
+    "tested_on_device": false
+  },
+  "checks": {
+    "source_zip_headless": {
+      "suites": 93,
+      "assertions": 28851,
+      "failures": 0
+    },
+    "apk_resources_godot_desktop": {
+      "assets_verified": 206,
+      "assertions": 549,
+      "failures": 0,
+      "suites": {
+        "atmosphere": 40,
+        "branching_story": 42,
+        "docking": 196,
+        "frontier_voyage": 17,
+        "presentation": 178,
+        "stellar_lighting": 14,
+        "surface_guidance": 62
+      },
+      "scene_smoke_passed": true
+    },
+    "apk_resources_rendered": {
+      "renderer": "OpenGL Compatibility",
+      "adapter": "Mesa llvmpipe",
+      "resolution": [
+        1440,
+        720
+      ],
+      "profiles": [
+        0,
+        1,
+        2
+      ],
+      "scenes_per_profile": 5,
+      "published_profile": 2,
+      "script_or_shader_errors": 0
+    }
+  },
+  "files": {
+    "01-mayak.png": {
+      "bytes": 262672,
+      "sha256": "67db310e6b3f184cbbb2461858a796c6f9d8913b2476f83c659f9904e75f0525"
+    },
+    "02-strizh.png": {
+      "bytes": 290424,
+      "sha256": "7047cae1aad978e65a53b826d9b0596b6daeb182ca7cfce2a4c658cb60667c92"
+    },
+    "03-ice.png": {
+      "bytes": 390379,
+      "sha256": "cd9b844bd5668d560ccd860a0e9b45a8456ecf344a81d2af777855a2dcab1d61"
+    },
+    "04-amber.png": {
+      "bytes": 294536,
+      "sha256": "d1c52f44d989a831d1af84d518149059433c0242ef107b25c6c943c284c3c5a8"
+    },
+    "05-journal.png": {
+      "bytes": 70485,
+      "sha256": "6ee6917e2f8c190b34567b44bdfe9c01cd5cd96f9d04829ceaaeb9b8ef990bf9"
+    },
+    "OrbitRelay-0.105.0-arm64.apk": {
+      "bytes": 35958650,
+      "sha256": "ac7a48e535890a42cdaf7feb34f4d96758ba40c11e250b24e587123ed8d21bc1"
+    },
+    "OrbitRelay-0.105.0-source.zip": {
+      "bytes": 14046110,
+      "sha256": "3d940f519426c434b06abf529f45b7c84a8845f36ecea176719534a02abdf62d"
+    }
+  }
+}
