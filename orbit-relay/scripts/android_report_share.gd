@@ -222,75 +222,94 @@ static func _report(local_path: String) -> Dictionary:
 		return _error("report_size_invalid", path)
 	var bytes := file.get_buffer(length)
 	file.close()
-	if bytes.size() != length or not _zip_policy(bytes):
+	if bytes.size() != length:
+		return _error("report_zip_invalid", path)
+	var sizes := _zip_entry_sizes(bytes)
+	if sizes.is_empty():
 		return _error("report_zip_invalid", path)
 	var archive := ZIPReader.new()
 	if archive.open(path) != OK:
 		return _error("report_zip_invalid", path)
-	var metadata: Variant = JSON.parse_string(archive.read_file("report.json").get_string_from_utf8())
-	var events := archive.read_file("events.jsonl").get_string_from_utf8()
-	var names := archive.get_files()
+	var metadata_bytes := archive.read_file("report.json", true)
+	var event_bytes := archive.read_file("events.jsonl", true)
+	var has_state := sizes.has("flight.json")
+	var state_bytes := archive.read_file("flight.json", true) if has_state else PackedByteArray()
+	archive.close()
+	if metadata_bytes.size() != sizes["report.json"] or event_bytes.size() != sizes["events.jsonl"] \
+		or (has_state and state_bytes.size() != sizes["flight.json"]):
+		return _error("report_zip_invalid", path)
+	var metadata: Variant = JSON.parse_string(metadata_bytes.get_string_from_utf8())
 	var valid: bool = metadata is Dictionary and metadata.get("game") == "Орбитальный рейс" and metadata.get("includes_flight_state") is bool and metadata.get("event_count") is float
 	if valid:
-		var lines := events.strip_edges().split("\n", false)
-		valid = int(metadata.event_count) == lines.size() and lines.size() <= 48 and bool(metadata.includes_flight_state) == names.has("flight.json")
+		var lines := event_bytes.get_string_from_utf8().split("\n", false)
+		valid = metadata.event_count == lines.size() and lines.size() <= 48 and bool(metadata.includes_flight_state) == has_state
 		for line: String in lines:
 			if not JSON.parse_string(line) is Dictionary:
 				valid = false
-		if names.has("flight.json") and not JSON.parse_string(archive.read_file("flight.json").get_string_from_utf8()) is Dictionary:
-			valid = false
-	archive.close()
+	if has_state and not JSON.parse_string(state_bytes.get_string_from_utf8()) is Dictionary:
+		valid = false
 	if not valid:
 		return _error("not_game_report", path)
 	return {"ok": true, "path": path, "file": path.get_file(), "bytes": bytes}
 
 
-static func _zip_policy(bytes: PackedByteArray) -> bool:
+static func _zip_entry_sizes(bytes: PackedByteArray) -> Dictionary:
 	# Bound expanded data before ZIPReader allocates it; accept this game's
 	# three canonical entries only, not arbitrary private files or ZIP bombs.
-	if bytes.decode_u32(0) != 0x04034b50:
-		return false
+	if bytes.size() < 22 or bytes.size() > MAX_ZIP_BYTES or bytes.decode_u32(0) != 0x04034b50:
+		return {}
 	var end := -1
 	for i in range(bytes.size() - 22, maxi(-1, bytes.size() - 65558), -1):
 		if bytes.decode_u32(i) == 0x06054b50 and i + 22 + bytes.decode_u16(i + 20) == bytes.size():
 			end = i
 			break
 	if end < 0 or bytes.decode_u16(end + 4) != 0 or bytes.decode_u16(end + 6) != 0:
-		return false
+		return {}
 	var count := int(bytes.decode_u16(end + 10))
 	if count < 2 or count > 3 or bytes.decode_u16(end + 8) != count:
-		return false
+		return {}
 	var offset := int(bytes.decode_u32(end + 16))
 	var central_size := int(bytes.decode_u32(end + 12))
 	if offset < 0 or offset + central_size != end:
-		return false
+		return {}
 	var position := offset
-	var names: Dictionary = {}
+	var sizes: Dictionary = {}
 	var expanded := 0
 	for entry in range(count):
 		if position + 46 > end or bytes.decode_u32(position) != 0x02014b50:
-			return false
+			return {}
 		var flags := bytes.decode_u16(position + 8)
 		var method := bytes.decode_u16(position + 10)
+		var crc := bytes.decode_u32(position + 16)
 		var compressed := int(bytes.decode_u32(position + 20))
 		var size := int(bytes.decode_u32(position + 24))
 		var name_length := int(bytes.decode_u16(position + 28))
 		var next := position + 46 + name_length + bytes.decode_u16(position + 30) + bytes.decode_u16(position + 32)
 		if flags & 1 or method not in [0, 8] or size > MAX_ENTRY_BYTES or next > end or bytes.decode_u16(position + 34) != 0:
-			return false
-		var name := bytes.slice(position + 46, position + 46 + name_length).get_string_from_utf8()
-		if name not in ALLOWED_ENTRIES or names.has(name):
-			return false
+			return {}
+		var name_bytes := bytes.slice(position + 46, position + 46 + name_length)
+		var name := name_bytes.get_string_from_ascii()
+		if name not in ALLOWED_ENTRIES or sizes.has(name) or name.to_ascii_buffer() != name_bytes or (size == 0 and crc != 0):
+			return {}
 		var local := int(bytes.decode_u32(position + 42))
 		if local < 0 or local + 30 > offset or bytes.decode_u32(local) != 0x04034b50:
-			return false
-		var payload := local + 30 + bytes.decode_u16(local + 26) + bytes.decode_u16(local + 28)
-		if payload + compressed > offset:
-			return false
-		names[name] = true
+			return {}
+		var local_name_end := local + 30 + bytes.decode_u16(local + 26)
+		var payload := local_name_end + bytes.decode_u16(local + 28)
+		if payload + compressed > offset or bytes.slice(local + 30, local_name_end) != name_bytes:
+			return {}
+		if bytes.decode_u16(local + 6) != flags or bytes.decode_u16(local + 8) != method:
+			return {}
+		# If a data descriptor follows the entry, only the directory has sizes.
+		if not (flags & 8) and (bytes.decode_u32(local + 14) != crc \
+			or bytes.decode_u32(local + 18) != compressed or bytes.decode_u32(local + 22) != size):
+			return {}
+		sizes[name] = size
 		expanded += size
 		position = next
-	return position == end and expanded <= MAX_TOTAL_BYTES and names.has("report.json") and names.has("events.jsonl")
+	if position != end or expanded > MAX_TOTAL_BYTES or not sizes.has("report.json") or not sizes.has("events.jsonl"):
+		return {}
+	return sizes
 
 
 static func _platform(platform: Variant) -> Variant:

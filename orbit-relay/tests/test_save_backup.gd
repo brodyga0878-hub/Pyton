@@ -29,7 +29,10 @@ func _run() -> void:
 		_remove(MAIN_SAVE)
 		_remove(BACKUP)
 		await _test_pause_notification()
+		await _test_autopilot_background()
+		await _test_scoop_background()
 		await _test_jump_notifications()
+		await _test_paid_jump_background()
 		_restore_original_files(original)
 	for path: String in [_archive, _archive + ".previous"]:
 		_remove(path)
@@ -99,6 +102,7 @@ func _test_main_recovery() -> void:
 	_expect(not game._preserve_backup_on_next_save and Session.load_valid_state(MAIN_SAVE, first.restore) == Session.LoadResult.PRIMARY
 		and first.credits == 277 and FileAccess.get_file_as_bytes(BACKUP) == original_backup,
 		"Saving recovered progress first repairs the primary without copying corruption over the good backup")
+	game.notification(Node.NOTIFICATION_APPLICATION_RESUMED)
 	game.flight.credits = 301
 	game.notification(Node.NOTIFICATION_APPLICATION_PAUSED)
 	var rotated := Flight.new()
@@ -136,6 +140,18 @@ func _test_pause_notification() -> void:
 		var stored := Session.load_state()
 		_expect(pilot.time_scale == 1 and stored.get("resume", {}).get("interrupted") == ["time_scale"],
 			"Application pause resets warm acceleration and records the interruption for a cold start")
+		var checkpoint := FileAccess.get_file_as_bytes(MAIN_SAVE)
+		var previous := FileAccess.get_file_as_bytes(BACKUP) if FileAccess.file_exists(BACKUP) else PackedByteArray()
+		game.notification(Node.NOTIFICATION_APPLICATION_FOCUS_IN)
+		game._physics_process(0.25)
+		game.notification(Node.NOTIFICATION_APPLICATION_PAUSED)
+		_expect(pilot.orbit_time == epoch and FileAccess.get_file_as_bytes(MAIN_SAVE) == checkpoint
+			and (FileAccess.get_file_as_bytes(BACKUP) if FileAccess.file_exists(BACKUP) else PackedByteArray()) == previous,
+			"Focus gain before resume and a duplicate pause neither advance the world nor rotate the checkpoint")
+		game.notification(Node.NOTIFICATION_APPLICATION_RESUMED)
+		game._physics_process(0.25)
+		_expect(is_equal_approx(pilot.orbit_time, epoch + 0.25) and pilot.time_scale == 1,
+			"An actual resume continues warm time at normal speed without catching up the interval in the background")
 		game.queue_free()
 		await process_frame
 		var cold := _boot()
@@ -148,9 +164,78 @@ func _test_pause_notification() -> void:
 	await process_frame
 
 
+func _test_autopilot_background() -> void:
+	var game := _boot()
+	var pilot := Flight.new()
+	game.flight = pilot
+	if not _expect(Fixture.depart(pilot) and pilot.select_target(1), "Prepare an airborne ship and a real port for autopilot"):
+		game.queue_free()
+		await process_frame
+		return
+	pilot.set_autopilot(true)
+	pilot.throttle = 0.54
+	pilot.boost = true
+	game._update_display(0.0)
+	await process_frame
+	var viewport := game.get_viewport()
+	var point: Vector2 = game._hud._steer.get_global_rect().get_center() + Vector2(23.0, 4.0)
+	_touch(viewport, point, true)
+	_expect(pilot.autopilot and not game._hud.move_input().is_zero_approx(), "A real held steering gesture exists before the app loses focus")
+	var epoch := pilot.orbit_time
+	var position := pilot.position
+	game.propagate_notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
+	game.propagate_notification(Node.NOTIFICATION_APPLICATION_PAUSED)
+	game._physics_process(0.25)
+	var stored := Session.load_single_state(MAIN_SAVE)
+	var cold := Flight.new()
+	_expect(cold.restore(stored) and stored.resume.interrupted == ["autopilot"] and not cold.autopilot
+		and cold.throttle == 0.0 and cold.position.is_equal_approx(position) and cold.orbit_time == epoch,
+		"The background checkpoint contains the cold-start autopilot receipt and no continuing burn")
+	_expect(not pilot.autopilot and not pilot.boost and pilot.throttle == 0.0 and pilot.position == position and pilot.orbit_time == epoch
+		and game._hud.move_input().is_zero_approx(),
+		"The warm flight clears its powered assist and held steering without moving in the background")
+	_touch(viewport, point, true)
+	game.propagate_notification(Node.NOTIFICATION_APPLICATION_FOCUS_IN)
+	game.propagate_notification(Node.NOTIFICATION_APPLICATION_RESUMED)
+	_touch(viewport, point, false)
+	_expect(game._hud.move_input().is_zero_approx() and "автопилот" in game._hud._notice.text,
+		"Return drops stale touches and explains the stopped autopilot")
+	_touch(viewport, point, true)
+	_expect(not game._hud.move_input().is_zero_approx(), "Fresh steering presses are accepted after resume")
+	_touch(viewport, point, false)
+	game.queue_free()
+	await process_frame
+
+
+func _test_scoop_background() -> void:
+	var game := _boot()
+	var pilot := Flight.new()
+	game.flight = pilot
+	if not _expect(Fixture.depart(pilot) and pilot.select_target(Catalog.STAR_ID), "Prepare a real hydrogen collection flight"):
+		game.queue_free()
+		await process_frame
+		return
+	pilot.position = pilot.target_position(Catalog.STAR_ID) + Vector3.BACK * 310.0
+	pilot.velocity = pilot.target_velocity(Catalog.STAR_ID)
+	pilot.yaw = PI
+	pilot.pitch = 0.0
+	if _expect(pilot.scoop_action() and pilot.scooping, "Open the scoop using its normal band and speed checks"):
+		var cargo := pilot.mining.cargo_amount("hydrogen")
+		var heat := pilot.star_heat
+		game.propagate_notification(Node.NOTIFICATION_APPLICATION_PAUSED)
+		game._physics_process(0.5)
+		var stored := Session.load_single_state(MAIN_SAVE)
+		_expect(not pilot.scooping and pilot.mining.cargo_amount("hydrogen") == cargo and pilot.star_heat == heat
+			and "scoop" in stored.get("resume", {}).get("interrupted", []),
+			"Backgrounding closes intake and stops heat and hydrogen generation while retaining the cold resume receipt")
+	game.queue_free()
+	await process_frame
+
+
 func _test_jump_notifications() -> void:
 	var game := _boot()
-	var pilot: Flight = game.flight
+	var pilot := Flight.new()
+	game.flight = pilot
 	var destination := Catalog.VELAR_SYSTEM
 	if not _expect(_start_charge(pilot, destination), "Start a real unpaid charge after departing and clearing the station"):
 		game.queue_free()
@@ -158,23 +243,38 @@ func _test_jump_notifications() -> void:
 		return
 	var fuel := pilot.ship.jump_fuel
 	var seconds := pilot.jump_seconds_left
+	var backup := FileAccess.get_file_as_bytes(BACKUP)
+	game._open_voyages()
+	game.notification(Node.NOTIFICATION_APPLICATION_PAUSED)
+	game._physics_process(0.25)
+	_expect(game._voyages.is_open() and pilot.jump_seconds_left == seconds
+		and FileAccess.get_file_as_bytes(BACKUP) == backup,
+		"A suspend while the voyages screen awaits a choice keeps the warm charge and previous backup")
+	game.notification(Node.NOTIFICATION_APPLICATION_RESUMED)
+	game._close_voyages()
 	game._open_report()
 	# Simulate only the platform boundary after Android opens the native chooser.
 	game._report_sharing = true
 	game.notification(Node.NOTIFICATION_APPLICATION_PAUSED)
 	var sharing_save := Session.load_state()
 	_expect(game._report.visible and game._report_sharing and pilot.jump_seconds_left == seconds
-		and pilot.ship.jump_fuel == fuel and sharing_save.get("resume", {}).get("interrupted") == ["unpaid_jump_charge"],
+		and pilot.ship.jump_fuel == fuel and sharing_save.get("resume", {}).get("interrupted") == ["unpaid_jump_charge"]
+		and FileAccess.get_file_as_bytes(BACKUP) == backup,
 		"Pausing for the report chooser preserves the running charge and still saves its cold state")
 	game.notification(Node.NOTIFICATION_APPLICATION_RESUMED)
 	_expect(not game._report_sharing and pilot.jump_seconds_left == seconds,
 		"Closing the system chooser clears the share guard without canceling the warm charge")
 	game._close_report()
-	game.notification(Node.NOTIFICATION_WM_CLOSE_REQUEST)
+	game.notification(Node.NOTIFICATION_APPLICATION_PAUSED)
 	var closed_save := Session.load_state()
 	_expect(pilot.jump_seconds_left == 0.0 and pilot.ship.jump_fuel == fuel
 		and closed_save.get("resume", {}).get("interrupted") == ["unpaid_jump_charge"],
-		"A real close notification cancels the unpaid warm charge after saving the interruption")
+		"An ordinary suspend cancels the unpaid warm charge after saving the interruption")
+	var saved_bytes := FileAccess.get_file_as_bytes(MAIN_SAVE)
+	var backup_bytes := FileAccess.get_file_as_bytes(BACKUP)
+	game.notification(Node.NOTIFICATION_WM_CLOSE_REQUEST)
+	_expect(FileAccess.get_file_as_bytes(MAIN_SAVE) == saved_bytes and FileAccess.get_file_as_bytes(BACKUP) == backup_bytes,
+		"Closing while suspended keeps the earlier interruption receipt and backup")
 	game.queue_free()
 	await process_frame
 	var cold := _boot()
@@ -183,6 +283,54 @@ func _test_jump_notifications() -> void:
 		"A cold boot retains the planned destination and full fare reserve and explains the cleared charge")
 	cold.queue_free()
 	await process_frame
+
+
+func _test_paid_jump_background() -> void:
+	var game := _boot()
+	var pilot := Flight.new()
+	game.flight = pilot
+	var destination := Catalog.VELAR_SYSTEM
+	var initial_fuel := pilot.ship.jump_fuel
+	if not _expect(_start_charge(pilot, destination), "Prepare the next real jump for a paid-transit suspend test"):
+		game.queue_free()
+		await process_frame
+		return
+	for _frame: int in range(ceili(Flight.JUMP_CHARGE / Fixture.STEP)):
+		pilot.update(Fixture.STEP, Vector2.ZERO, 0.0, false, false)
+		if pilot.jump_progress_status().phase == "transit":
+			break
+	if _expect(pilot.jump_progress_status().phase == "transit" and pilot.ship.jump_fuel < initial_fuel and pilot.toggle_time_pause(),
+		"Commit the fare once and deliberately pause the calendar during real transit"):
+		var ticket := pilot.snapshot()
+		game.propagate_notification(Node.NOTIFICATION_APPLICATION_PAUSED)
+		game._physics_process(1.0)
+		game.propagate_notification(Node.NOTIFICATION_APPLICATION_RESUMED)
+		game._physics_process(1.0)
+		_expect(pilot.snapshot() == ticket and pilot.time_paused,
+			"Application resumption preserves manual calendar pause and the paid ticket")
+		var cold := Flight.new()
+		var checkpoint := Session.load_single_state(MAIN_SAVE)
+		_expect(cold.restore(checkpoint) and cold.time_paused and cold.jump_progress_status().phase == "transit"
+			and cold.jump_seconds_left == pilot.jump_seconds_left and cold.ship.jump_fuel == pilot.ship.jump_fuel,
+			"A cold scene can read the same paid ticket and pause after an OS interruption")
+		var paid_fuel := pilot.ship.jump_fuel
+		pilot.toggle_time_pause()
+		for _frame: int in range(ceili(Flight.JUMP_TRANSIT_WALL / Fixture.STEP) + 1):
+			game._physics_process(Fixture.STEP)
+			if pilot.system_id == destination:
+				break
+		_expect(pilot.system_id == destination and pilot.ship.jump_fuel == paid_fuel and pilot.jump_seconds_left == 0.0,
+			"Manual unpause completes the warm transit once without charging a second fare")
+	game.queue_free()
+	await process_frame
+
+
+func _touch(viewport: Viewport, point: Vector2, pressed: bool) -> void:
+	var event := InputEventScreenTouch.new()
+	event.index = 5
+	event.position = point
+	event.pressed = pressed
+	viewport.push_input(event, true)
 
 
 func _start_charge(pilot: Flight, destination: int) -> bool:

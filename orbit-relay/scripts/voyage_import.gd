@@ -22,9 +22,9 @@ static func load_report(path: String, validator: Callable) -> Error:
 		return ERR_FILE_CORRUPT
 	var bytes := source.get_buffer(length)
 	source.close()
-	if bytes.size() != length or not ReportShare._zip_policy(bytes):
+	if bytes.size() != length:
 		return ERR_FILE_CORRUPT
-	var sizes := _entry_sizes(bytes)
+	var sizes := ReportShare._zip_entry_sizes(bytes)
 	if sizes.is_empty():
 		return ERR_FILE_CORRUPT
 	for name: String in sizes:
@@ -46,35 +46,6 @@ static func load_report(path: String, validator: Callable) -> Error:
 	var result := _read_report(staged_path, sizes, validator)
 	staged = null
 	return result
-
-
-static func _entry_sizes(bytes: PackedByteArray) -> Dictionary:
-	# The shared ZIP policy has already checked record bounds and entry count.
-	var end := -1
-	for cursor in range(bytes.size() - 22, maxi(-1, bytes.size() - 65558), -1):
-		if bytes.decode_u32(cursor) == 0x06054b50 and cursor + 22 + bytes.decode_u16(cursor + 20) == bytes.size():
-			end = cursor
-			break
-	if end < 0:
-		return {}
-	var central := int(bytes.decode_u32(end + 16))
-	var sizes := {}
-	for entry in range(bytes.decode_u16(end + 10)):
-		var name_length := bytes.decode_u16(central + 28)
-		var name_bytes := bytes.slice(central + 46, central + 46 + name_length)
-		var name := name_bytes.get_string_from_ascii()
-		var local := int(bytes.decode_u32(central + 42))
-		var local_length := bytes.decode_u16(local + 26)
-		var size := int(bytes.decode_u32(central + 24))
-		if not ENTRY_LIMITS.has(name) or name.to_ascii_buffer() != name_bytes:
-			return {}
-		if bytes.slice(local + 30, local + 30 + local_length) != name_bytes:
-			return {}
-		if size == 0 and bytes.decode_u32(central + 16) != 0:
-			return {}
-		sizes[name] = size
-		central += 46 + name_length + bytes.decode_u16(central + 30) + bytes.decode_u16(central + 32)
-	return sizes
 
 
 static func _read_report(path: String, sizes: Dictionary, validator: Callable) -> Error:

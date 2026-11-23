@@ -5957,11 +5957,36 @@ func _interruptions_at_save() -> Array[String]:
 	return interrupted
 
 
+func interrupt_for_background() -> void:
+	var interrupted := _interruptions_at_save()
+	boost = false
+	if interrupted.is_empty():
+		return
+	if _has_powered_assist(interrupted):
+		throttle = 0.0
+	set_autopilot(false)
+	cancel_jump()
+	_reset_scoop()
+	reset_time_scale()
+	_announce("flight_background_interruptions", "После возврата остановлены временные режимы (%s). Их можно включить снова." % _interruption_names(interrupted))
+
+
+static func _has_powered_assist(interrupted: Array[String]) -> bool:
+	return interrupted.any(func(mode: String) -> bool: return mode in POWERED_ASSISTS)
+
+
+static func _interruption_names(interrupted: Array[String]) -> String:
+	var names := PackedStringArray()
+	for mode: String in interrupted:
+		names.append(str(INTERRUPTED_LABELS[mode]))
+	return ", ".join(names)
+
+
 func snapshot() -> Dictionary:
 	var facing := _flight_orientation()
 	frame.reference_site(self)
 	var interrupted := _interruptions_at_save()
-	var powered := interrupted.any(func(mode: String) -> bool: return mode in POWERED_ASSISTS)
+	var powered := _has_powered_assist(interrupted)
 	var transit := {}
 	if _jump_transit_duration > 0.0:
 		transit = {"remaining": jump_seconds_left, "duration": _jump_transit_duration,
@@ -6788,10 +6813,7 @@ func restore(state: Dictionary) -> bool:
 	status_event = ""
 	status_message = ""
 	if not interrupted.is_empty():
-		var names := PackedStringArray()
-		for mode: String in interrupted:
-			names.append(str(INTERRUPTED_LABELS[mode]))
-		_announce("flight_restore_interruptions", "Временные режимы остановлены при загрузке (%s). Их можно включить снова." % ", ".join(names))
+		_announce("flight_restore_interruptions", "Временные режимы остановлены при загрузке (%s). Их можно включить снова." % _interruption_names(interrupted))
 	return true
 
 

@@ -181,6 +181,11 @@ func run() -> void:
 	var inconsistent := path("mismatch")
 	archive(inconsistent, {"game": "Орбитальный рейс", "event_count": 2, "includes_flight_state": false})
 	native = Platform.new(); check(not Share.publish(inconsistent, native).ok and native.calls.is_empty(), "inconsistent report metadata rejected")
+	var fractional := path("fractional-count")
+	archive(fractional, {"game": "Орбитальный рейс", "event_count": 0.5, "includes_flight_state": false})
+	native = Platform.new()
+	check(not Share.publish(fractional, native).ok and native.calls.is_empty(),
+		"A fractional count cannot pass as an empty journal before Android handoff")
 	var grown := path("large-state")
 	archive(grown, {"game": "Орбитальный рейс", "event_count": 0, "includes_flight_state": true}, "", {"flight.json": JSON.stringify({"future_campaign_fixture": "a".repeat(100000)})})
 	native = Platform.new(); check(Share.publish(grown, native).ok, "future valid-shaped campaign fixture above64KiB remains supported")

@@ -821,18 +821,18 @@ func sync(sim: RefCounted, delta: float, aim_lock_available := false, forward_ai
 	var parked := docked or landed
 	var departure: Dictionary = sim.departure_status()
 	if not _departure_active and departure.active:
-		_reset_controls()
+		clear_held_input()
 	_departure_active = departure.active
 	_departure_can_cancel = departure.can_cancel
 	_departure_blocked = docked and not _departure_active and not bool(departure.get("can_request", true))
 	var port_services: bool = sim.station_services_available()
 	var patrol: Dictionary = sim.patrol_status()
 	if not _parked and parked:
-		_reset_controls()
+		clear_held_input()
 	_parked = parked
 	var jump: Dictionary = sim.jump_progress_status()
 	if bool(jump.is_transit) and not _jump_transit:
-		_reset_controls()
+		clear_held_input()
 	_jumping = bool(jump.active)
 	_jump_transit = bool(jump.is_transit)
 	_steer.visible = not parked and not _jump_transit
@@ -1024,7 +1024,7 @@ func sync(sim: RefCounted, delta: float, aim_lock_available := false, forward_ai
 func _sync_escape(status: Dictionary) -> void:
 	var active: bool = status.active
 	if active and not _in_escape:
-		_reset_controls()
+		clear_held_input()
 		close_navigation()
 	_in_escape = active
 	var eject: Button = _actions["rescue_eject"]
@@ -1331,7 +1331,7 @@ func _sync_clock(sim: RefCounted) -> void:
 	var paused := bool(calendar.paused)
 	if _time_paused != paused:
 		_time_paused = paused
-		_reset_controls()
+		clear_held_input()
 		_clock.add_theme_color_override("font_color", AMBER if paused else MUTED)
 	_clock.text = "%s\n%s" % [calendar.date, calendar.clock]
 	var status: Dictionary = sim.time_status()
@@ -1815,7 +1815,7 @@ func set_input_enabled(enabled: bool) -> void:
 	if not is_instance_valid(_hud):
 		return
 	if not enabled:
-		_reset_controls()
+		clear_held_input()
 		close_navigation()
 		_actions["aim_lock"].hide()
 		_docking_panel.hide()
@@ -1831,7 +1831,7 @@ func set_touch_preferences(sensitivity: int, mirrored: bool) -> void:
 		return
 	_touch_mirrored = mirrored
 	if is_instance_valid(_hud):
-		_reset_controls()
+		clear_held_input()
 		_apply_touch_layout()
 
 func _apply_touch_layout() -> void:
@@ -2015,9 +2015,9 @@ func _input(event: InputEvent) -> void:
 
 func _notification(what: int) -> void:
 	if what in [NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_APPLICATION_PAUSED] and is_instance_valid(_hud):
-		_reset_controls()
+		clear_held_input()
 
-func _reset_controls() -> void:
+func clear_held_input() -> void:
 	_touch_owner.clear()
 	_navigation_presses.clear()
 	_contact_action_presses.clear()
@@ -2189,7 +2189,7 @@ func _set_mouse_hold(action: String, active: bool) -> void:
 func _commit_action(action: String) -> void:
 	if action == "translation_mode":
 		_translation_mode = not _translation_mode
-		_reset_controls()
+		clear_held_input()
 		_update_translation_mode()
 	elif action == "frame":
 		frame_requested.emit()
@@ -2224,7 +2224,7 @@ func _commit_action(action: String) -> void:
 		_marks.queue_redraw()
 	else:
 		if action == "flight_assist":
-			_reset_controls()
+			clear_held_input()
 		action_requested.emit(action)
 
 func _update_translation_mode() -> void:

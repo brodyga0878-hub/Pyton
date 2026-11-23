@@ -49,6 +49,8 @@ var _comms := FlightCommsView.new()
 var _voyages := VoyageMenu.new()
 var _voyage_picker: FileDialog
 var _flight_active := false
+var _application_paused := false
+var _foreground_process_mode := Node.PROCESS_MODE_INHERIT
 var _io := SessionIO.new()
 var _save_elapsed := 0.0
 var _held_fire_lock := ""
@@ -179,6 +181,8 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if _application_paused:
+		return
 	_audio.advance_music(flight if _flight_active else null, delta)
 	_update_display(delta)
 
@@ -188,7 +192,7 @@ func _overlay_open() -> bool:
 
 
 func _physics_process(delta: float) -> void:
-	if not _flight_active or _overlay_open() or flight.time_paused:
+	if _application_paused or not _flight_active or _overlay_open() or flight.time_paused:
 		return
 	var steering := presentation.pilot_steering(_hud.move_input())
 	flight.update(delta, steering, _hud.roll_input(), _hud.boost_held(), _hud.brake_held(), _hud.translation_input())
@@ -376,7 +380,7 @@ func _aim_lock_contact_id() -> String:
 
 
 func _handle_action(action: String) -> void:
-	if not _flight_active or _overlay_open():
+	if _application_paused or not _flight_active or _overlay_open():
 		return
 	if action == "voyages":
 		_open_voyages()
@@ -882,7 +886,7 @@ func _import_voyage_file(path: String) -> void:
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
-	if not event is InputEventKey or not event.pressed or event.echo:
+	if _application_paused or not event is InputEventKey or not event.pressed or event.echo:
 		return
 	if _voyages.is_open():
 		if event.physical_keycode == KEY_ESCAPE:
@@ -966,24 +970,33 @@ func _unhandled_key_input(event: InputEvent) -> void:
 func _notification(what: int) -> void:
 	if not is_node_ready():
 		return
-	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_APPLICATION_PAUSED:
-		_report_touches.clear()
-	if what == NOTIFICATION_APPLICATION_FOCUS_IN or what == NOTIFICATION_APPLICATION_RESUMED:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		_clear_interrupted_input()
+	elif what == NOTIFICATION_APPLICATION_FOCUS_IN and not _application_paused:
 		_report_sharing = false
-	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
-		if _voyages.is_open():
-			_save(true)
+	elif what == NOTIFICATION_APPLICATION_PAUSED:
+		if _application_paused:
 			return
-		var sharing_report := what == NOTIFICATION_APPLICATION_PAUSED and _report.visible and _report_sharing
-		# Preserve the interruption receipt before changing the live controls.
-		_save()
-		if not sharing_report:
-			flight.cancel_jump()
-			flight.cancel_orbit_maneuver()
-			flight.cancel_rendezvous()
-			flight.cancel_dock_sync()
-			flight.reset_time_scale()
+		_application_paused = true
+		_foreground_process_mode = process_mode
+		process_mode = Node.PROCESS_MODE_DISABLED
+		_clear_interrupted_input()
+		_checkpoint_lifecycle("application_paused", _voyages.is_open() or (_report.visible and _report_sharing))
+	elif what == NOTIFICATION_APPLICATION_RESUMED:
+		_report_sharing = false
+		if _application_paused:
+			_application_paused = false
+			process_mode = _foreground_process_mode
+			if _flight_active:
+				_io.trace("application_resumed", {"orbit_time": flight.orbit_time})
+				_deliver_notice()
+			_update_display(0.0)
+	elif what == NOTIFICATION_WM_CLOSE_REQUEST and not _application_paused:
+		_clear_interrupted_input()
+		_checkpoint_lifecycle("application_close", _voyages.is_open())
 	elif what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		if _application_paused:
+			return
 		if _voyages.is_open():
 			_voyages.handle_back()
 		elif _report.visible:
@@ -1017,6 +1030,22 @@ func _notification(what: int) -> void:
 		else:
 			_save()
 			get_tree().quit()
+
+
+func _clear_interrupted_input() -> void:
+	_report_touches.clear()
+	_held_fire_lock = ""
+	_hud.clear_held_input()
+
+
+func _checkpoint_lifecycle(event: String, keep_warm: bool) -> void:
+	if not _flight_active:
+		return
+	_io.trace(event, {"orbit_time": flight.orbit_time, "system_overlay": keep_warm})
+	# Store the interruption receipt before clearing transient assistance.
+	_save(keep_warm)
+	if not keep_warm:
+		flight.interrupt_for_background()
 
 
 func _build_report_panel() -> void:
@@ -1089,6 +1118,9 @@ func _add_report_button(parent: Container, caption: String, action: Callable) ->
 
 
 func _input(event: InputEvent) -> void:
+	if _application_paused:
+		get_viewport().set_input_as_handled()
+		return
 	if _report == null or not _report.visible:
 		return
 	if event is InputEventScreenTouch:

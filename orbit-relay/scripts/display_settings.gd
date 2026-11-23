@@ -47,6 +47,22 @@ func snapshot() -> Dictionary:
 
 
 func restore(value: Variant) -> bool:
+	if not _valid_snapshot(value):
+		return false
+	quality = int(value.quality)
+	sensitivity = int(value.sensitivity)
+	layout = int(value.layout)
+	notification_volume = int(value.get(FlightAudio.VOLUME_KEY, FlightAudio.DEFAULT_LEVEL))
+	invert_yaw = int(value.get("invert_yaw", 0))
+	invert_pitch = int(value.get("invert_pitch", 0))
+	effects_volume = int(value.get(FlightAudio.EFFECT_VOLUME_KEY, FlightAudio.DEFAULT_LEVEL))
+	music_volume = int(value.get(Music.VOLUME_KEY, Music.DEFAULT_LEVEL))
+	music_mode = int(value.get(Music.MODE_KEY, Music.CONTEXTUAL))
+	language = int(value.get("language", 0))
+	return true
+
+
+static func _valid_snapshot(value: Variant) -> bool:
 	if not value is Dictionary:
 		return false
 	var fields := OPTIONS.keys()
@@ -63,16 +79,6 @@ func restore(value: Variant) -> bool:
 	for field: String in fields:
 		if not _is_choice(field, value.get(field)):
 			return false
-	quality = int(value.quality)
-	sensitivity = int(value.sensitivity)
-	layout = int(value.layout)
-	notification_volume = int(value.get(FlightAudio.VOLUME_KEY, FlightAudio.DEFAULT_LEVEL))
-	invert_yaw = int(value.get("invert_yaw", 0))
-	invert_pitch = int(value.get("invert_pitch", 0))
-	effects_volume = int(value.get(FlightAudio.EFFECT_VOLUME_KEY, FlightAudio.DEFAULT_LEVEL))
-	music_volume = int(value.get(Music.VOLUME_KEY, Music.DEFAULT_LEVEL))
-	music_mode = int(value.get(Music.MODE_KEY, Music.CONTEXTUAL))
-	language = int(value.get("language", 0))
 	return true
 
 
@@ -85,11 +91,13 @@ func change(field: String, value: int) -> bool:
 
 
 func load_preferences(path: String = PATH) -> bool:
-	return restore(SessionIO.load_state(path))
+	var result := SessionIO.load_valid_state(path, restore)
+	return result == SessionIO.LoadResult.PRIMARY or result == SessionIO.LoadResult.BACKUP
 
 
 func save_preferences(path: String = PATH) -> Error:
-	return SessionIO.save_state(snapshot(), path)
+	var preserve_backup := not _valid_snapshot(SessionIO.load_single_state(path))
+	return SessionIO.save_state(snapshot(), path, preserve_backup)
 
 
 func fps_limit() -> int:

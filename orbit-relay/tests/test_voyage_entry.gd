@@ -5,6 +5,15 @@ const Flight := preload("res://scripts/flight_sim.gd")
 const Session := preload("res://scripts/session_io.gd")
 const Library := preload("res://scripts/voyage_library.gd")
 
+class ReportDestination extends Session:
+	var path: String
+
+	func _init(destination: String) -> void:
+		path = destination
+
+	func export_report(state: Dictionary, destination: String = "") -> Dictionary:
+		return super.export_report(state, path if destination.is_empty() else destination)
+
 var _checks := 0
 var _failures: Array[String] = []
 var _viewport: SubViewport
@@ -48,6 +57,7 @@ func _test_start_and_slots() -> void:
 	_expect(menu.is_open() and menu._actions["continue"].disabled and menu._actions["recover"].disabled
 		and not game._flight_active and not FileAccess.file_exists(Session.SAVE_PATH),
 		"A clean launch freezes the scene and creates no save before an explicit choice")
+	game._notification(Node.NOTIFICATION_APPLICATION_RESUMED)
 	await _tap(menu._actions["new"])
 	_expect(game._flight_active and not menu.is_open() and FileAccess.file_exists(Session.SAVE_PATH)
 		and game._hud._input_enabled, "A new flight writes its own starting state and activates the real cockpit")
@@ -144,6 +154,7 @@ func _test_continue_and_restore() -> void:
 	_expect(menu._actions["continue"].disabled and not menu._actions["recover"].disabled
 		and FileAccess.get_file_as_string(Session.SAVE_PATH) == "{damaged",
 		"A damaged primary remains untouched on the start screen and only valid reserve recovery is offered")
+	game._notification(Node.NOTIFICATION_APPLICATION_RESUMED)
 	await _tap(menu._actions["recover"])
 	var recovered := Flight.new()
 	_expect(game.flight.credits == 617 and not menu.is_open()
@@ -155,24 +166,76 @@ func _test_continue_and_restore() -> void:
 
 
 func _test_report_restore() -> void:
-	var incoming := Flight.new()
-	incoming.credits = 912
 	var report_path := "user://voyage-test-report.zip"
-	_expect(Session.new().export_report(incoming.snapshot(), report_path).ok, "Prepare a genuine diagnostic ZIP")
 	var game := _game()
 	var menu: CanvasLayer = game._voyages
 	await process_frame
-	await _tap(menu._actions["import"])
-	await _tap(menu._accept)
-	if _expect(game._voyage_picker != null, "The menu opens the configured file chooser after confirmation"):
-		game._voyage_picker.hide()
-		game._voyage_picker.file_selected.emit(ProjectSettings.globalize_path(report_path))
-		var preserved := Flight.new()
-		_expect(game._flight_active and game.flight.credits == 912 and not menu.is_open()
-			and preserved.restore(Session.load_single_state(Session.BACKUP_PATH)) and preserved.credits == 617,
-			"Selecting a ZIP through the chooser callback restores it and keeps the previous valid flight")
+	await _tap(menu._actions["continue"])
+	game.flight.credits = 912
+	_expect(game.flight.contract_action(), "Accept a tracked delivery before taking the diagnostic snapshot")
+	game._io = ReportDestination.new(report_path)
+	game._io.trace("voyage_test_report")
+	game._update_display(0.0)
+	await _tap(game._hud._actions["report"])
+	var saved_flight: Dictionary = game.flight.snapshot()
+	await _tap(game._report_buttons[0])
+	var report_bytes := FileAccess.get_file_as_bytes(report_path)
+	_expect(not report_bytes.is_empty() and report_path.get_file() in game._report_text.text,
+		"The HUD creates a diagnostic ZIP with the active contract and accessible filename")
+	await _tap(game._report_buttons.back())
+	game.flight.credits = 678
+	var outgoing: Dictionary = game.flight.snapshot()
+	var primary_before := FileAccess.get_file_as_bytes(Session.SAVE_PATH)
+	var backup_before := FileAccess.get_file_as_bytes(Session.BACKUP_PATH)
+	game._handle_action("voyages")
+	await process_frame
+
+	var journal_path := "user://voyage-test-no-flight.zip"
+	var journal := Session.new().export_report({}, journal_path)
+	_expect(journal.ok and not journal.includes_flight_state, "Create a journal-only report")
+	await _choose_report(game, journal_path)
+	_expect(menu.is_open() and "только журнал" in menu._status.text and game.flight.snapshot() == outgoing,
+		"The chooser explains how to recover from a journal-only ZIP without switching flights")
+	var broken_path := "user://voyage-test-broken.zip"
+	var broken := FileAccess.open(broken_path, FileAccess.WRITE)
+	if _expect(broken != null, "Create a truncated copy of the actual report"):
+		broken.store_buffer(report_bytes.slice(0, report_bytes.size() / 2))
+		broken.close()
+		await _choose_report(game, broken_path)
+		_expect(menu.is_open() and "Не удалось прочитать" in menu._status.text and game.flight.snapshot() == outgoing,
+			"Selecting a damaged archive leaves the live voyage available")
+	_expect(FileAccess.get_file_as_bytes(Session.SAVE_PATH) == primary_before
+		and FileAccess.get_file_as_bytes(Session.BACKUP_PATH) == backup_before,
+		"Failed imports keep the primary and backup identical on disk")
+
+	await _choose_report(game, report_path, true)
+	var preserved := Flight.new()
+	_expect(game._flight_active and game.flight.snapshot() == saved_flight and not menu.is_open()
+		and preserved.restore(Session.load_single_state(Session.BACKUP_PATH)) and preserved.snapshot() == outgoing
+		and FileAccess.get_file_as_bytes(report_path) == report_bytes,
+		"Import restores the diagnostic snapshot and backs up the outgoing live voyage")
 	game.queue_free()
 	await process_frame
+	game = _game()
+	await _tap(game._voyages._actions["continue"])
+	_expect(game._flight_active and game.flight.snapshot() == saved_flight and game._hud._input_enabled,
+		"Continue from a cold start resumes the last restored flight and its active delivery")
+	game.queue_free()
+	await process_frame
+	for path: String in [report_path, journal_path, broken_path]:
+		DirAccess.remove_absolute(path)
+
+
+func _choose_report(game: Node, path: String, app_paused := false) -> void:
+	await _tap(game._voyages._actions["import"])
+	await _tap(game._voyages._accept)
+	if _expect(game._voyage_picker != null, "The menu opens the configured file chooser after confirmation"):
+		game._voyage_picker.hide()
+		if app_paused:
+			game._notification(Node.NOTIFICATION_APPLICATION_PAUSED)
+		game._voyage_picker.file_selected.emit(ProjectSettings.globalize_path(path))
+		if app_paused:
+			game._notification(Node.NOTIFICATION_APPLICATION_RESUMED)
 
 
 func _tap(button: Button) -> void:

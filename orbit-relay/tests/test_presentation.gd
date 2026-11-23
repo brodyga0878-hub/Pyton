@@ -80,10 +80,17 @@ func _test_preferences() -> void:
 	var reloaded := Settings.new()
 	_expect(reloaded.load_preferences(path) and reloaded.snapshot() == changed,
 		"A fresh preference object restores all choices including both axes")
+	var valid_bytes := FileAccess.get_file_as_bytes(path)
 	_expect(SessionIO.save_state({"quality": 0, "sensitivity": "fast", "layout": 0}, path) == OK,
 		"Write a valid JSON file with invalid preference values")
-	_expect(not reloaded.load_preferences(path) and reloaded.snapshot() == changed,
-		"An invalid on-disk preference record applies none of its values")
+	var recovered := Settings.new()
+	_expect(recovered.load_preferences(path) and recovered.snapshot() == changed,
+		"Cold preferences skip an invalid primary and restore every choice from the last backup")
+	_expect(recovered.change("quality", 1) and recovered.save_preferences(path) == OK
+		and FileAccess.get_file_as_bytes(path + ".previous") == valid_bytes,
+		"Repairing the primary leaves the valid prior file in the backup")
+	_expect(reloaded.load_preferences(path) and reloaded.snapshot() == changed.merged({"quality": 1}, true),
+		"A subsequent cold load uses the repaired primary")
 	var legacy := {"quality": 0, "sensitivity": 2, "layout": 1}
 	_expect(SessionIO.save_state(legacy, path) == OK and reloaded.load_preferences(path)
 		and reloaded.snapshot() == DEFAULTS.merged(legacy, true),
