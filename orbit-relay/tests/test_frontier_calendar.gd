@@ -163,6 +163,13 @@ func _test_escort_across_boundaries(flight: Flight) -> void:
 	_tick(resumed, 1.0)
 	_expect(resumed.convoy_status().phase == "succeeded" and resumed.credits == balance + int(offer.reward),
 		"Further ticks cannot pay the concluded escort again")
+	var capped := Flight.new()
+	if _expect(capped.restore(Session.load_state(saved)), "Restore a second copy of the same escort"):
+		capped.credits = 999999995
+		_tick(capped, round_end - capped.orbit_time + 0.5)
+		var confirmed := Flight.new()
+		_expect(capped.credits == 1000000000 and capped.convoy_status().phase == "succeeded"
+			and confirmed.restore(capped.snapshot()), "Automatic escort payout near the account ceiling keeps a valid completed voyage")
 
 
 func _jump_to_heather(flight: Flight) -> bool:

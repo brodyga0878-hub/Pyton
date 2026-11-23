@@ -3493,11 +3493,16 @@ func _apply_convoy_result(result: Dictionary) -> void:
 		_record_front_news(result.front_news, orbit_time)
 	if event in ["convoy_order_paid", "convoy_order_failed"]:
 		career.note_convoy_result(convoy_order.faction, convoy_order.target_faction, convoy_order.kind, event == "convoy_order_paid")
-	credits += int(result.get("credits", 0))
+	var reward := int(result.get("credits", 0))
+	var paid := mini(reward, 1000000000 - credits)
+	credits += paid
 	if result.get("damage", 0.0) > 0.0:
 		_apply_hostile_beam(event, result)
 	else:
-		_announce(event, str(result.get("message", "")))
+		var message := str(result.get("message", ""))
+		if paid < reward:
+			message = "Заказ конвоя завершён. Начислено %d кр. Баланс достиг предела." % paid
+		_announce(event, message)
 
 
 func _apply_hostile_beam(event: String, result: Dictionary) -> void:
