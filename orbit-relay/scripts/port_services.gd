@@ -30,7 +30,7 @@ const EQUIPMENT_SERVICES := ["mining_laser", "fragment_collector", "hydrogen_sco
 const MILITARY_SERVICES := ["military_drive", "military_refuel", "military_waste"]
 const DEFENSE_SERVICES := ["combat_shield", "combat_ecm", "combat_focus", "combat_repair", "combat_energy_pulse", "combat_maintenance", "combat_auto_repair"]
 const RIG_SERVICES := ["buy_rig", "sell_rig"]
-const NAVIGATION_SERVICES := ["navigation_computer", "radar_mapper", "hyperspace_analyzer", "jump_repair"]
+const NAVIGATION_SERVICES := ["navigation_computer", "missile_telemetry", "radar_mapper", "hyperspace_analyzer", "jump_repair"]
 const ORDNANCE_SERVICES := ["combat_launcher", "combat_missile_dart", "combat_missile_lance", "combat_ecm_advanced", "combat_decoy"]
 const MISSILE_LABELS := {"dart": "Дротик", "lance": "Копьё"}
 const FUEL_MODULES := {"hydrogen_scoop": "scoop", "fuel_pump": "pump"}
@@ -457,6 +457,8 @@ func _refresh_navigation() -> void:
 	_refresh_service_buttons(NAVIGATION_SERVICES)
 	var computer: Dictionary = _sim.navigation_computer_status()
 	_action_buttons["navigation_computer"].text = "Снять в отсек" if computer.installed else "Установить"
+	var telemetry: Dictionary = _sim.missile_telemetry_status()
+	_action_buttons["missile_telemetry"].text = "Снять в отсек" if telemetry.installed else "Установить"
 	var repair: Button = _action_buttons["jump_repair"]
 	repair.text = "Перезапустить" if not repair.disabled else "Привод исправен"
 
@@ -1496,7 +1498,8 @@ func _build_navigation() -> void:
 	var row := _add_row(_navigation, "Бортовой автопилот", "Ведёт к цели, управляет стыковкой и посадкой")
 	_autopilot_button = row[1]
 	_autopilot_button.pressed.connect(_request_autopilot_equipment)
-	_add_service("navigation_computer", "Навигационный компьютер", "Список целей, пеленг и ракетная камера", _navigation)
+	_add_service("navigation_computer", "Навигационный компьютер", "Список целей и пеленг", _navigation)
+	_add_service("missile_telemetry", "Ракетная телеметрия", "Камера выпущенной ракеты, пока она в полёте", _navigation)
 	_add_service("radar_mapper", "Радар-картограф", "Досье выбранного корабля на бортовом сканере", _navigation)
 	_add_service("hyperspace_analyzer", "Анализатор следов", "Читает назначение и время перехода", _navigation)
 	_add_service("jump_repair", "Ремонт гиперпривода", "Восстанавливает привод после аварийного перехода", _navigation)

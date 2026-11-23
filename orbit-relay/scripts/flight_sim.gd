@@ -53,7 +53,7 @@ const StationHull := preload("res://scripts/station_hull.gd")
 const LawNetwork := preload("res://scripts/law_network.gd")
 const FlightRadio := preload("res://scripts/flight_radio.gd")
 const ShipHangar := preload("res://scripts/ship_hangar.gd")
-const SAVE_SCHEMA := 52
+const SAVE_SCHEMA := 53
 const INTERRUPTED_LABELS := {
 	"autopilot": "автопилот", "rig_approach": "заход к буру", "orbit_maneuver": "орбитальный манёвр",
 	"rendezvous": "автоматическое сближение", "patrol_course": "наведение дозора",
@@ -210,6 +210,7 @@ var _targeting := CombatTargeting.new()
 var _law := LawNetwork.new()
 var _comms_receipt := ""
 var navigation_computer_fitted := true
+var missile_telemetry_fitted := true
 var ambient := CivilianTraffic.new()
 var career := PilotCareer.new()
 var story := BranchingStory.new()
@@ -1147,8 +1148,12 @@ func navigation_computer_status() -> Dictionary:
 	return {"installed": navigation_computer_fitted, "available": station_services_available()}
 
 
+func missile_telemetry_status() -> Dictionary:
+	return {"installed": missile_telemetry_fitted, "available": station_services_available()}
+
+
 func missile_camera_record() -> Dictionary:
-	return combat.ordnance.missile if navigation_computer_fitted and docked < 0 and not landed and jump_seconds_left <= 0.0 else {}
+	return combat.ordnance.missile if missile_telemetry_fitted and docked < 0 and not landed and jump_seconds_left <= 0.0 else {}
 
 
 func _toggle_navigation_computer() -> bool:
@@ -3715,6 +3720,8 @@ func service_offer(action: String) -> Dictionary:
 			and credits <= 1000000000 - RigFleet.RESALE and station_services_available(), "installed": false}
 	if action == "navigation_computer":
 		return {"cost": 0, "installed": navigation_computer_fitted, "allowed": station_services_available()}
+	if action == "missile_telemetry":
+		return {"cost": 0, "installed": missile_telemetry_fitted, "allowed": station_services_available()}
 	if action == "surface_processor":
 		return {"cost": SurfaceProcessor.PRICE, "installed": _processor.installed,
 			"allowed": station_services_available() and not _processor.installed and credits >= SurfaceProcessor.PRICE}
@@ -3759,6 +3766,12 @@ func service_action(action: String) -> bool:
 		return true
 	if action == "navigation_computer":
 		return _toggle_navigation_computer()
+	if action == "missile_telemetry":
+		if not station_services_available():
+			return false
+		missile_telemetry_fitted = not missile_telemetry_fitted
+		_announce("missile_telemetry", "Ракетная телеметрия установлена." if missile_telemetry_fitted else "Ракетная телеметрия снята.")
+		return true
 	if action in ["hyperspace_analyzer", "jump_repair"]:
 		if not service_offer(action).allowed:
 			return false
@@ -5911,6 +5924,7 @@ func snapshot() -> Dictionary:
 		"targeting": _targeting.snapshot(self),
 		"law": _law.snapshot(),
 		"navigation_computer": navigation_computer_fitted,
+		"missile_telemetry": missile_telemetry_fitted,
 		"ambient": ambient.snapshot(), "career": career.snapshot(),
 		"story": story.snapshot(), "news": news.snapshot(), "periodicals": _periodicals.snapshot(),
 		"speed_hold": speed_hold.snapshot(),
@@ -5926,6 +5940,9 @@ func restore(state: Dictionary) -> bool:
 	if schema >= 51 and not state.get("navigation_computer") is bool:
 		return false
 	var restored_navigation_computer := true if schema < 51 else bool(state.navigation_computer)
+	if schema >= 53 and not state.get("missile_telemetry") is bool:
+		return false
+	var restored_missile_telemetry := restored_navigation_computer if schema < 53 else bool(state.missile_telemetry)
 	var pre_assortment := schema < 49
 	var pre_rich_systems := schema < 48
 	var pre_atlas := schema < 47
@@ -6620,6 +6637,7 @@ func restore(state: Dictionary) -> bool:
 	_law = restored_law
 	_comms_receipt = ""
 	navigation_computer_fitted = restored_navigation_computer
+	missile_telemetry_fitted = restored_missile_telemetry
 	ambient = restored_ambient
 	career = restored_career
 	story = restored_story

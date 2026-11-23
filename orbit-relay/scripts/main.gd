@@ -650,7 +650,7 @@ func _deliver_notice() -> void:
 		"career_dispatch_accepted", "career_dispatch_paid", "career_dispatch_expired", "career_dispatch_course",
 		"career_order_accepted", "career_order_proved", "career_order_course", "career_order_paid", "career_order_expired", "career_order_removed",
 		"story_brief", "story_registry", "story_mirror", "story_collect_key", "story_submit", "story_course",
-		"flight_assist", "reference_frame", "time_paused", "time_resumed", "autopilot_equipment", "navigation_computer", "speed_hold_on", "speed_hold_off",
+		"flight_assist", "reference_frame", "time_paused", "time_resumed", "autopilot_equipment", "navigation_computer", "missile_telemetry", "speed_hold_on", "speed_hold_off",
 		"survey_record", "galaxy_scan", "customs_inspection", "customs_paid",
 		"orbit_start", "orbit_complete", "orbit_abort", "orbit_cancel",
 		"rendezvous_start", "rendezvous_hold", "rendezvous_abort", "rendezvous_cancel", "rendezvous_finish",

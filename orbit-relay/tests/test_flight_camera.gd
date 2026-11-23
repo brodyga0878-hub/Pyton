@@ -22,6 +22,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	_test_camera_geometry()
+	_test_telemetry_equipment()
 	_viewport = SubViewport.new()
 	_viewport.size = TEST_SIZE
 	_viewport.own_world_3d = true
@@ -141,6 +142,10 @@ func _test_real_views() -> void:
 	_press_camera_shortcut()
 	game._update_display(TRANSITION)
 	_test_unfitted_camera(game)
+	await _test_telemetry_camera(game)
+	game._audio.set_level(0)
+	game._audio.set_effect_level(0)
+	await create_timer(AudioServer.get_time_to_next_mix() + 0.025).timeout
 	game.queue_free()
 	await process_frame
 
@@ -173,6 +178,89 @@ func _test_unfitted_camera(game: Node) -> void:
 	_expect(not game._hud._navigation_list.visible and game._hud._navigation_hint.visible
 		and pilot.target == before_target, "The onboard list is gated at the interface and command handler")
 	game._hud.close_navigation()
+
+
+func _test_telemetry_equipment() -> void:
+	var pilot := Flight.new()
+	var credits := pilot.credits
+	var initial := pilot.service_offer("missile_telemetry")
+	_expect(initial.allowed and initial.installed and initial.cost == 0 and pilot.missile_telemetry_fitted,
+		"A new pilot can stow the fitted telemetry module without a payment")
+	_expect(pilot.service_action("missile_telemetry") and not pilot.missile_telemetry_fitted
+		and pilot.navigation_computer_fitted and pilot.credits == credits,
+		"Removing telemetry leaves navigation and the account intact")
+	_expect(pilot.service_action("navigation_computer") and pilot.service_action("missile_telemetry")
+		and pilot.missile_telemetry_fitted and not pilot.navigation_computer_fitted and pilot.credits == credits,
+		"The two modules can also be configured as active telemetry and stowed navigation")
+	var baseline := pilot.snapshot()
+	var restored := Flight.new()
+	_expect(restored.restore(baseline) and restored.missile_telemetry_fitted and not restored.navigation_computer_fitted,
+		"A new simulator restores the independent equipment settings")
+	var stable := restored.snapshot()
+	var invalid := baseline.duplicate(true)
+	invalid.missile_telemetry = 1
+	_expect(not restored.restore(invalid) and restored.snapshot() == stable,
+		"The current save schema rejects a non-boolean telemetry flag without changing the flight")
+	invalid.erase("missile_telemetry")
+	_expect(not restored.restore(invalid) and restored.snapshot() == stable,
+		"The current save schema requires a telemetry flag")
+	for legacy_schema: int in [51, 52]:
+		var legacy := baseline.duplicate(true)
+		legacy.schema = legacy_schema
+		legacy.erase("missile_telemetry")
+		if legacy_schema == 51:
+			legacy.erase("ship_hangar")
+		for installed: bool in [false, true]:
+			legacy.navigation_computer = installed
+			_expect(restored.restore(legacy) and restored.missile_telemetry_fitted == installed
+				and restored.navigation_computer_fitted == installed,
+				"Schema %d migrates telemetry from the previous camera gate (%s)" % [legacy_schema, str(installed)])
+
+
+func _test_telemetry_camera(game: Node) -> void:
+	var enabled := Flight.new()
+	if not _expect(enabled.service_action("navigation_computer") and _launch_test_missile(enabled),
+		"Undock and launch a live projectile with telemetry fitted and navigation stowed"):
+		return
+	_expect(not enabled.service_offer("missile_telemetry").allowed and not enabled.service_action("missile_telemetry")
+		and enabled.missile_telemetry_fitted, "The module can only be configured at a port")
+	game.flight = enabled
+	game._update_display(TRANSITION)
+	game._hud.toggle_navigation()
+	await process_frame
+	var missile_button: Button = game._hud._actions["camera_missile"]
+	if not _expect(not enabled.missile_camera_record().is_empty() and missile_button.is_visible_in_tree()
+		and not missile_button.disabled and not game._hud._navigation_list.visible,
+		"The live telemetry view remains usable with the onboard target list unavailable"):
+		return
+	_tap(missile_button)
+	game._update_display(TRANSITION)
+	_expect(game._camera_mode == Camera.Mode.MISSILE and not game._view.shows_forward_aim(),
+		"The touch control follows the live projectile without a navigation module")
+	var disabled := Flight.new()
+	if not _expect(disabled.service_action("missile_telemetry") and _launch_test_missile(disabled),
+		"Undock and launch a live projectile with navigation fitted and telemetry stowed"):
+		return
+	game.flight = disabled
+	game._update_display(TRANSITION)
+	_expect(not disabled.missile_status().projectile.is_empty() and disabled.missile_camera_record().is_empty()
+		and missile_button.disabled and game._camera_mode == Camera.Mode.EXTERIOR,
+		"Stowed telemetry blocks the feed and resets the view while the projectile remains active")
+	game._hud.close_navigation()
+
+
+func _launch_test_missile(pilot: Flight) -> bool:
+	pilot.credits = 1000
+	if not (pilot.service_action("combat_launcher") and pilot.service_action("combat_missile_dart")
+		and pilot.patrol_action() and Fixture.depart(pilot) and pilot.patrol_action()):
+		return false
+	for _step in range(ceili(50.0 / Fixture.STEP)):
+		if pilot.patrol.phase == Flight.Patrol.ENGAGED:
+			var contact := pilot.patrol.contacts(pilot)[0]
+			_aim(pilot, contact.position)
+			return pilot.select_combat_contact(contact.id) and pilot.launch_missile(contact.id)
+		pilot.update(Fixture.STEP, Vector2.ZERO, 0.0, false, false)
+	return false
 
 
 func _relative_camera(game: Node) -> Transform3D:

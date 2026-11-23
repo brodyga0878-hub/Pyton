@@ -13,7 +13,7 @@ const MESSAGES := {
 	"CAMERA_OBSERVER": ["Обзор", "Observer"],
 	"CAMERA_MISSILE": ["Ракета", "Missile"],
 	"CAMERA_NEXT": ["Следующий ракурс «%s» (F1)", "Next camera: %s (F1)"],
-	"CAMERA_LOCK_REQUIRED": ["Нужны навигационный компьютер и активная ракета", "Requires a navigation computer and an active missile"],
+	"CAMERA_LOCK_REQUIRED": ["Нужны ракетная телеметрия и активная ракета", "Requires missile telemetry and an active missile"],
 	"NAV_TITLE": ["Объекты системы", "System objects"],
 	"NAV_SHORTCUT": ["Цели", "Targets"],
 	"NAV_CLOSE": ["Закрыть", "Close"],
