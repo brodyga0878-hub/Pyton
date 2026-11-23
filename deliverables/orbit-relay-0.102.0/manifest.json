@@ -1,0 +1,55 @@
+{
+  "name": "Орбитальный рейс",
+  "version": "0.102.0",
+  "source_commit": "0789d10af45949880be64baea1d2078b62d71415",
+  "content": {
+    "save_schema": 53,
+    "reticle_combat_lock": true
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 127,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.101.0",
+    "zip_alignment_16k_verified": true,
+    "compiled_scripts": 88,
+    "tested_on_device": false
+  },
+  "checks": {
+    "source_zip_headless": {
+      "suites": 89,
+      "assertions": 28318,
+      "failures": 0
+    },
+    "apk_resources_godot_desktop": {
+      "assets_verified": 206,
+      "combat_scanner_checks": 30,
+      "hud_layout_checks": 32,
+      "camera_checks": 37,
+      "failures": 0,
+      "touch_resolutions": [
+        [
+          1280,
+          720
+        ],
+        [
+          1560,
+          720
+        ]
+      ]
+    }
+  },
+  "files": {
+    "OrbitRelay-0.102.0-arm64.apk": {
+      "bytes": 35934074,
+      "sha256": "2399984e17843d62ea10dfe755c46e2478b00d8c64ede9589331d3fd90f4e5d5"
+    },
+    "OrbitRelay-0.102.0-source.zip": {
+      "bytes": 13982074,
+      "sha256": "991bcc72f5bcf1a8e7bfa1f3d98812f90ed5ab36b68f37d0b36b19f7708c80dd"
+    }
+  }
+}
