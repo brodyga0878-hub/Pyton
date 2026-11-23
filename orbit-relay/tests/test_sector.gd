@@ -219,6 +219,8 @@ func _test_touch_map() -> void:
 	await process_frame
 	_tap(game._hud._actions.get("contract"), "Accept freight on the ground")
 	await process_frame
+	var contract_course: int = game.flight.planned_target
+	_expect(contract_course == game.flight.contract_destination, "Accepting freight sets its departure course")
 	_tap(game._hud._actions.get("map"), "Open the sector map")
 	await process_frame
 	var map: Node = game._map
@@ -236,8 +238,8 @@ func _test_touch_map() -> void:
 	await process_frame
 	_tap(map._close_button, "Cancel the preview")
 	await process_frame
-	_expect(not map.is_open() and game.flight.planned_target == -1,
-		"Closing the map discards the unconfirmed destination")
+	_expect(not map.is_open() and game.flight.planned_target == contract_course,
+		"Closing the map discards the preview and keeps the confirmed departure course")
 	_tap(game._hud._actions.get("map"), "Reopen the sector map")
 	await process_frame
 	var chart: Control = map._chart

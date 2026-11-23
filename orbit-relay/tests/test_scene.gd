@@ -50,6 +50,8 @@ func _run() -> void:
 	_check(int(SessionIO.load_state().get("docked", -2)) == -1, "Normal launch writes a resumable save")
 	game.queue_free()
 	await process_frame
+	# Let the audio mixer retire the stopped scene playback before shutdown.
+	await create_timer(0.15).timeout
 	print("Scene integration: %d failures" % failures.size())
 	for message in failures:
 		printerr(message)
