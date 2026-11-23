@@ -191,8 +191,7 @@ func _test_report_restore() -> void:
 	await process_frame
 
 	var journal_path := "user://voyage-test-no-flight.zip"
-	var journal := Session.new().export_report({}, journal_path)
-	_expect(journal.ok and not journal.includes_flight_state, "Create a journal-only report")
+	_expect(_write_journal_only_report(journal_path), "Create a received journal-only ZIP alongside the active voyage")
 	await _choose_report(game, journal_path)
 	_expect(menu.is_open() and "только журнал" in menu._status.text and game.flight.snapshot() == outgoing,
 		"The chooser explains how to recover from a journal-only ZIP without switching flights")
@@ -224,6 +223,16 @@ func _test_report_restore() -> void:
 	await process_frame
 	for path: String in [report_path, journal_path, broken_path]:
 		DirAccess.remove_absolute(path)
+
+
+func _write_journal_only_report(path: String) -> bool:
+	var zip := ZIPPacker.new()
+	if zip.open(path) != OK:
+		return false
+	var metadata := {"game": "Орбитальный рейс", "event_count": 0, "includes_flight_state": false}
+	var success := zip.start_file("report.json") == OK and zip.write_file(JSON.stringify(metadata).to_utf8_buffer()) == OK \
+		and zip.close_file() == OK and zip.start_file("events.jsonl") == OK and zip.close_file() == OK
+	return zip.close() == OK and success
 
 
 func _choose_report(game: Node, path: String, app_paused := false) -> void:

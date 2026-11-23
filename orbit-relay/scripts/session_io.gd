@@ -1,13 +1,17 @@
 extends RefCounted
 
 const AndroidReportShare = preload("res://scripts/android_report_share.gd")
+const Flight := preload("res://scripts/flight_sim.gd")
 const SAVE_PATH = "user://flight.json"
 const BACKUP_PATH = SAVE_PATH + ".previous"
 const REPORT_DIR = "user://reports"
+const EVENTS_PATH = "user://report-events.jsonl"
 const DOWNLOAD_SUBDIR = "OrbitalRelay"
 const MAX_STATE_BYTES = 4 * 1024 * 1024
 const MAX_EVENT_BYTES = 768
 const MAX_EVENTS = 48
+const MAX_JOURNAL_BYTES = MAX_EVENTS * (MAX_EVENT_BYTES + 1)
+const EVENT_WRITE_INTERVAL_MS = 2000
 const MAX_DEPTH = 12
 const MAX_EVENT_NODES = 64
 const MAX_SAFE_INTEGER = 9007199254740991
@@ -16,6 +20,23 @@ enum LoadResult { NO_SAVE, PRIMARY, BACKUP, INVALID }
 
 var _started_msec := Time.get_ticks_msec()
 var _events: Array[String] = []
+var _persist_events: bool
+var _events_dirty := false
+var _last_event_write_msec := -EVENT_WRITE_INTERVAL_MS
+
+
+func _init(persist_events: bool = false) -> void:
+	_persist_events = persist_events
+	if not _persist_events:
+		return
+	var bytes := _read_bounded(ProjectSettings.globalize_path(EVENTS_PATH), MAX_JOURNAL_BYTES)
+	if bytes.is_empty() or not _valid_utf8(bytes):
+		return
+	for line: String in bytes.get_string_from_utf8().split("\n", false):
+		var encoded := line.to_utf8_buffer()
+		if encoded.size() <= MAX_EVENT_BYTES and _parse_save(encoded).get("event") is String:
+			_events.append(line)
+	_events = _events.slice(maxi(0, _events.size() - MAX_EVENTS))
 
 
 static func save_state(state: Dictionary, path: String = SAVE_PATH, preserve_backup: bool = false) -> Error:
@@ -25,7 +46,7 @@ static func save_state(state: Dictionary, path: String = SAVE_PATH, preserve_bac
 
 	var destination := ProjectSettings.globalize_path(path)
 	if not preserve_backup:
-		var previous := _read_save(destination)
+		var previous := _read_bounded(destination)
 		if not _parse_save(previous).is_empty():
 			var backup_error := _replace_bytes(destination + ".previous", previous)
 			if backup_error != OK:
@@ -41,16 +62,16 @@ static func load_state(path: String = SAVE_PATH) -> Dictionary:
 
 
 static func load_single_state(path: String) -> Dictionary:
-	return _parse_save(_read_save(ProjectSettings.globalize_path(path)))
+	return _parse_save(_read_bounded(ProjectSettings.globalize_path(path)))
 
 
 static func load_valid_state(path: String, validator: Callable) -> LoadResult:
 	var destination := ProjectSettings.globalize_path(path)
-	var primary := _parse_save(_read_save(destination))
+	var primary := _parse_save(_read_bounded(destination))
 	if not primary.is_empty() and validator.call(primary):
 		return LoadResult.PRIMARY
 	var backup_path := destination + ".previous"
-	var backup := _parse_save(_read_save(backup_path))
+	var backup := _parse_save(_read_bounded(backup_path))
 	if not backup.is_empty() and validator.call(backup):
 		return LoadResult.BACKUP
 	if FileAccess.file_exists(destination) or FileAccess.file_exists(backup_path):
@@ -59,9 +80,11 @@ static func load_valid_state(path: String, validator: Callable) -> LoadResult:
 
 
 func trace(event: String, fields: Dictionary = {}) -> void:
+	var recorded_msec := Time.get_ticks_msec()
 	var entry := {
-		"elapsed_ms": Time.get_ticks_msec() - _started_msec,
+		"elapsed_ms": recorded_msec - _started_msec,
 		"event": event.left(80),
+		"recorded_utc": Time.get_datetime_string_from_system(true),
 	}
 	if _is_plain_json(fields, 0, [MAX_EVENT_NODES]):
 		entry["fields"] = fields
@@ -72,10 +95,22 @@ func trace(event: String, fields: Dictionary = {}) -> void:
 	_events.append(line)
 	if _events.size() > MAX_EVENTS:
 		_events.pop_front()
+	if _persist_events:
+		_events_dirty = true
+		if recorded_msec - _last_event_write_msec >= EVENT_WRITE_INTERVAL_MS:
+			flush_events()
 
 
-static func can_archive_flight(state: Dictionary) -> bool:
-	return not _state_bytes(state).is_empty()
+func flush_events() -> void:
+	if not _events_dirty:
+		return
+	_last_event_write_msec = Time.get_ticks_msec()
+	var data := ("\n".join(_events) + "\n").to_utf8_buffer()
+	_events_dirty = _replace_bytes(ProjectSettings.globalize_path(EVENTS_PATH), data) != OK
+
+
+static func report_flight_source(state: Dictionary) -> String:
+	return _report_flight(state).source
 
 
 func export_report(state: Dictionary, path: String = "") -> Dictionary:
@@ -86,11 +121,11 @@ func export_report(state: Dictionary, path: String = "") -> Dictionary:
 		path = _desktop_download_path(fallback_path)
 
 	var destination := ProjectSettings.globalize_path(path)
-	var state_bytes := _state_bytes(state)
-	var result := _write_report_archive(destination, state_bytes)
+	var capture := _report_flight(state)
+	var result := _write_report_archive(destination, capture)
 	if result != OK and not fallback_path.is_empty() and fallback_path != path:
 		destination = ProjectSettings.globalize_path(fallback_path)
-		result = _write_report_archive(destination, state_bytes)
+		result = _write_report_archive(destination, capture)
 	if result != OK:
 		return _report_error(result)
 
@@ -100,7 +135,8 @@ func export_report(state: Dictionary, path: String = "") -> Dictionary:
 		"file": destination.get_file(),
 		"public_downloads": false,
 		"clipboard_copied": false,
-		"includes_flight_state": not state_bytes.is_empty(),
+		"includes_flight_state": capture.source != "none",
+		"flight_state_source": capture.source,
 	}
 	if android_download:
 		var published := AndroidReportShare.publish(destination)
@@ -110,7 +146,7 @@ func export_report(state: Dictionary, path: String = "") -> Dictionary:
 			response["public_downloads"] = true
 			DirAccess.remove_absolute(destination)
 		else:
-			response["clipboard_copied"] = copy_report_text(state)
+			response["clipboard_copied"] = _copy_report_to_clipboard(capture)
 	return response
 
 
@@ -121,8 +157,8 @@ func share_report(state: Dictionary) -> Dictionary:
 			"reason": "Системное меню «Поделиться» доступно на Android.",
 		}
 	var destination := ProjectSettings.globalize_path(_next_report_path())
-	var state_bytes := _state_bytes(state)
-	var result := _write_report_archive(destination, state_bytes)
+	var capture := _report_flight(state)
+	var result := _write_report_archive(destination, capture)
 	if result != OK:
 		return _report_error(result)
 	var handoff := AndroidReportShare.share(destination)
@@ -134,7 +170,8 @@ func share_report(state: Dictionary) -> Dictionary:
 		"file": handoff.get("file", destination.get_file()),
 		"public_downloads": handoff.get("public_downloads", false),
 		"reason": handoff.get("reason", ""),
-		"includes_flight_state": not state_bytes.is_empty(),
+		"includes_flight_state": capture.source != "none",
+		"flight_state_source": capture.source,
 	}
 
 
@@ -143,7 +180,7 @@ static func _next_report_path() -> String:
 	return REPORT_DIR.path_join("orbital-relay-%s-%d.zip" % [stamp, Time.get_ticks_usec()])
 
 
-func _write_report_archive(destination: String, state_bytes: PackedByteArray) -> Error:
+func _write_report_archive(destination: String, capture: Dictionary) -> Error:
 	var directory_error := DirAccess.make_dir_recursive_absolute(destination.get_base_dir())
 	if directory_error != OK:
 		return directory_error
@@ -154,7 +191,8 @@ func _write_report_archive(destination: String, state_bytes: PackedByteArray) ->
 	if result != OK:
 		DirAccess.remove_absolute(temporary)
 		return result
-	var summary := _report_summary(not state_bytes.is_empty())
+	var state_bytes: PackedByteArray = capture.bytes
+	var summary := _report_summary(capture.source)
 	result = _pack(zip, "report.json", JSON.stringify(summary, "\t", true, true).to_utf8_buffer())
 	if result == OK:
 		var log := "\n".join(_events)
@@ -174,10 +212,14 @@ func _write_report_archive(destination: String, state_bytes: PackedByteArray) ->
 
 
 func copy_report_text(state: Dictionary) -> bool:
+	return _copy_report_to_clipboard(_report_flight(state))
+
+
+func _copy_report_to_clipboard(capture: Dictionary) -> bool:
 	if not DisplayServer.has_feature(DisplayServer.FEATURE_CLIPBOARD):
 		return false
-	var state_bytes := _state_bytes(state)
-	var text := JSON.stringify(_report_summary(not state_bytes.is_empty()))
+	var state_bytes: PackedByteArray = capture.bytes
+	var text := JSON.stringify(_report_summary(capture.source))
 	if not state_bytes.is_empty():
 		text += "\n" + state_bytes.get_string_from_utf8()
 	# Keep the recent journal tail for the clipboard fallback.
@@ -187,7 +229,7 @@ func copy_report_text(state: Dictionary) -> bool:
 	return true
 
 
-func _report_summary(includes_state: bool) -> Dictionary:
+func _report_summary(flight_state_source: String) -> Dictionary:
 	return {
 		"game": "Орбитальный рейс",
 		"version": str(ProjectSettings.get_setting("application/config/version", "")),
@@ -195,8 +237,27 @@ func _report_summary(includes_state: bool) -> Dictionary:
 		"platform": OS.get_name(),
 		"exported_utc": Time.get_datetime_string_from_system(true),
 		"event_count": _events.size(),
-		"includes_flight_state": includes_state,
+		"includes_flight_state": flight_state_source != "none",
+		"flight_state_source": flight_state_source,
 	}
+
+
+static func _report_flight(state: Dictionary) -> Dictionary:
+	var candidate := Flight.new()
+	var current := _state_bytes(state)
+	if _restorable_flight(current, candidate):
+		return {"bytes": current, "source": "live"}
+	for source: String in ["autosave", "backup"]:
+		var path := SAVE_PATH if source == "autosave" else BACKUP_PATH
+		var saved := _read_bounded(ProjectSettings.globalize_path(path))
+		if _restorable_flight(saved, candidate):
+			return {"bytes": saved, "source": source}
+	return {"bytes": PackedByteArray(), "source": "none"}
+
+
+static func _restorable_flight(bytes: PackedByteArray, candidate: Flight) -> bool:
+	var parsed := _parse_save(bytes)
+	return not parsed.is_empty() and candidate.restore(parsed)
 
 
 static func _is_plain_json(value: Variant, depth: int, remaining: Array) -> bool:
@@ -237,12 +298,12 @@ static func _state_bytes(state: Dictionary) -> PackedByteArray:
 	return bytes if bytes.size() <= MAX_STATE_BYTES else PackedByteArray()
 
 
-static func _read_save(path: String) -> PackedByteArray:
+static func _read_bounded(path: String, limit: int = MAX_STATE_BYTES) -> PackedByteArray:
 	var file := FileAccess.open(path, FileAccess.READ)
 	if file == null:
 		return PackedByteArray()
 	var length := file.get_length()
-	if length < 2 or length > MAX_STATE_BYTES:
+	if length < 2 or length > limit:
 		return PackedByteArray()
 	var bytes := file.get_buffer(length)
 	if bytes.size() != length:

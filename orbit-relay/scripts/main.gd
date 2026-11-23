@@ -26,6 +26,7 @@ const Catalog = preload("res://scripts/sector_catalog.gd")
 const SAVE_INTERVAL := 8.0
 const AIM_LOCK_RADIUS_FRACTION := 0.085
 const ANTIALIASING := [Viewport.MSAA_DISABLED, Viewport.MSAA_2X, Viewport.MSAA_4X]
+const REPORT_WITH_FLIGHT := "В ZIP входят состояние рейса, журнал событий и сведения о версии."
 const REPORT_JOURNAL_ONLY := "В ZIP только журнал и сведения о версии. Состояние рейса недоступно."
 
 @export var show_voyage_menu_on_launch := false
@@ -51,7 +52,7 @@ var _voyage_picker: FileDialog
 var _flight_active := false
 var _application_paused := false
 var _foreground_process_mode := Node.PROCESS_MODE_INHERIT
-var _io := SessionIO.new()
+var _io := SessionIO.new(true)
 var _save_elapsed := 0.0
 var _held_fire_lock := ""
 var _save_error_shown := false
@@ -61,12 +62,14 @@ var _report_text: Label
 var _report_buttons: Array[Button] = []
 var _report_touches: Dictionary[int, Button] = {}
 var _report_sharing := false
+var _report_return_to_voyages := false
 
 
 func _ready() -> void:
 	presentation.load_preferences()
 	FlightText.set_language(presentation.language)
 	_flight_active = not show_voyage_menu_on_launch
+	_io.trace("application_started", {"voyage_selection": show_voyage_menu_on_launch})
 	var loaded := SessionIO.LoadResult.NO_SAVE
 	if _flight_active:
 		loaded = SessionIO.load_valid_state(SessionIO.SAVE_PATH, flight.restore)
@@ -385,7 +388,10 @@ func _handle_action(action: String) -> void:
 	if action == "voyages":
 		_open_voyages()
 		return
-	if flight.escape_status().active and action not in ["rescue_signal", "time_pause", "report", "settings", "camera"]:
+	if action == "report":
+		_open_report()
+		return
+	if flight.escape_status().active and action not in ["rescue_signal", "time_pause", "settings", "camera"]:
 		return
 	if flight.jump_seconds_left > 0.0 and action not in ["throttle_up", "throttle_down", "time_pause"]:
 		return
@@ -517,9 +523,6 @@ func _handle_action(action: String) -> void:
 		"galaxy":
 			_hud.set_input_enabled(false)
 			_galaxy.open(flight)
-			return
-		"report":
-			_open_report()
 			return
 		"settings":
 			_hud.set_input_enabled(false)
@@ -734,6 +737,7 @@ func _save(keep_backup: bool = false) -> void:
 		_hud.notify("Не удалось сохранить рейс.")
 		_io.trace("save_error", {"error": int(result)})
 	_save_error_shown = result != OK
+	_io.flush_events()
 
 
 func _open_voyages_from_settings() -> void:
@@ -803,6 +807,8 @@ func _voyage_action(action: String, slot_id: String, slot_name: String) -> void:
 			_show_voyage_library_result(VoyageLibrary.delete_slot(slot_id), "Именная копия удалена.")
 		"import":
 			_open_voyage_file()
+		"report":
+			_open_report()
 
 
 func _close_voyages() -> void:
@@ -836,7 +842,8 @@ func _activate_voyage(candidate: Flight, message: String) -> void:
 	_flight_active = true
 	_save_elapsed = 0.0
 	_save_error_shown = false
-	_io = SessionIO.new()
+	_io.flush_events()
+	_io = SessionIO.new(true)
 	_camera_mode = FlightCamera.Mode.EXTERIOR
 	_view.select_camera_mode(_camera_mode)
 	_close_voyages()
@@ -891,6 +898,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if _voyages.is_open():
 		if event.physical_keycode == KEY_ESCAPE:
 			_voyages.handle_back()
+		elif event.physical_keycode == KEY_F8:
+			_open_report()
 		return
 	if _report.visible:
 		if event.physical_keycode == KEY_ESCAPE:
@@ -981,7 +990,7 @@ func _notification(what: int) -> void:
 		_foreground_process_mode = process_mode
 		process_mode = Node.PROCESS_MODE_DISABLED
 		_clear_interrupted_input()
-		_checkpoint_lifecycle("application_paused", _voyages.is_open() or (_report.visible and _report_sharing))
+		_checkpoint_lifecycle("application_paused", _voyages.is_open() or _report_return_to_voyages or _report_sharing)
 	elif what == NOTIFICATION_APPLICATION_RESUMED:
 		_report_sharing = false
 		if _application_paused:
@@ -993,7 +1002,7 @@ func _notification(what: int) -> void:
 			_update_display(0.0)
 	elif what == NOTIFICATION_WM_CLOSE_REQUEST and not _application_paused:
 		_clear_interrupted_input()
-		_checkpoint_lifecycle("application_close", _voyages.is_open())
+		_checkpoint_lifecycle("application_close", _voyages.is_open() or _report_return_to_voyages)
 	elif what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		if _application_paused:
 			return
@@ -1040,6 +1049,8 @@ func _clear_interrupted_input() -> void:
 
 func _checkpoint_lifecycle(event: String, keep_warm: bool) -> void:
 	if not _flight_active:
+		_io.trace(event, {"flight_active": false})
+		_io.flush_events()
 		return
 	_io.trace(event, {"orbit_time": flight.orbit_time, "system_overlay": keep_warm})
 	# Store the interruption receipt before clearing transient assistance.
@@ -1079,7 +1090,7 @@ func _build_report_panel() -> void:
 	contents.add_theme_constant_override("separation", 12)
 	panel.add_child(contents)
 	var title := Label.new()
-	title.text = "Отчёт о рейсе"
+	title.text = "Отчёт об ошибке"
 	title.add_theme_font_size_override("font_size", 28)
 	contents.add_child(title)
 	_report_text = Label.new()
@@ -1094,12 +1105,13 @@ func _build_report_panel() -> void:
 		grid.add_theme_constant_override("h_separation", 10)
 		grid.add_theme_constant_override("v_separation", 10)
 		buttons = grid
-		_add_report_button(buttons, "Поделиться ZIP", _share_report)
 	else:
 		buttons = HBoxContainer.new()
 		buttons.add_theme_constant_override("separation", 10)
 	contents.add_child(buttons)
 	_add_report_button(buttons, "Сохранить ZIP", _export_report)
+	if OS.has_feature("android"):
+		_add_report_button(buttons, "Поделиться ZIP", _share_report)
 	_add_report_button(buttons, "Копировать текст", _copy_report)
 	_add_report_button(buttons, "Закрыть", _close_report)
 	_report.hide()
@@ -1146,15 +1158,32 @@ static func _report_button_hit(button: Button, position: Vector2) -> bool:
 
 
 func _open_report() -> void:
+	if _report.visible:
+		return
+	_report_return_to_voyages = _voyages.is_open()
+	if _report_return_to_voyages:
+		_voyages.hide()
 	_hud.set_input_enabled(false)
 	_report_touches.clear()
-	if SessionIO.can_archive_flight(flight.snapshot()):
-		_report_text.text = "В ZIP входят версия игры, состояние рейса и последние события."
-	else:
-		_report_text.text = REPORT_JOURNAL_ONLY
+	_report_text.text = _report_scope(SessionIO.report_flight_source(_report_snapshot()))
 	if OS.has_feature("android"):
-		_report_text.text += "\nПри отправке вы выбираете приложение и получателя."
+		_report_text.text += "\nСохраните ZIP, чтобы прикрепить его к сообщению, или откройте системное меню «Поделиться ZIP»."
 	_report.show()
+
+
+func _report_snapshot() -> Dictionary:
+	return flight.snapshot() if _flight_active else {}
+
+
+static func _report_scope(source: String) -> String:
+	match source:
+		"live":
+			return REPORT_WITH_FLIGHT
+		"autosave":
+			return "В ZIP входят состояние рейса из автосохранения, журнал событий и сведения о версии."
+		"backup":
+			return "В ZIP входят состояние рейса из резервной копии, журнал событий и сведения о версии."
+	return REPORT_JOURNAL_ONLY
 
 
 func _select_destination(site_id: int) -> void:
@@ -1664,19 +1693,23 @@ func _close_report() -> void:
 	_report_touches.clear()
 	_report_sharing = false
 	_report.hide()
-	_hud.set_input_enabled(true)
+	if _report_return_to_voyages:
+		_report_return_to_voyages = false
+		_voyages.show()
+	else:
+		_hud.set_input_enabled(true)
 
 
 func _export_report() -> void:
 	_report_touches.clear()
-	var result := _io.export_report(flight.snapshot())
+	var result := _io.export_report(_report_snapshot())
 	if not result.ok:
-		_report_text.text = "Не удалось записать архив. Можно скопировать текст отчёта."
+		_report_text.text = "Не удалось записать ZIP. Повторите сохранение или скопируйте текст отчёта."
 		return
 	if result.get("public_downloads", false):
-		_report_text.text = "ZIP сохранён в «Загрузках».\n%s" % result.path
+		_report_text.text = "ZIP в «Загрузки → OrbitalRelay». Прикрепите файл к сообщению.\n%s" % result.file
 	elif OS.has_feature("android"):
-		_report_text.text = "ZIP сохранён в памяти игры. Используйте «Поделиться ZIP»."
+		_report_text.text = "ZIP сохранён в папке игры. Для отправки откройте «Поделиться ZIP»."
 		_report_text.text += " Текст отчёта скопирован." if result.get("clipboard_copied", false) else " Можно скопировать текст."
 	else:
 		_report_text.text = "ZIP сохранён.\n%s" % result.path
@@ -1691,27 +1724,28 @@ func _share_report() -> void:
 		_report_text.text = "На этом устройстве можно сохранить ZIP или скопировать текст."
 		return
 	_report_sharing = true
-	var result := _io.share_report(flight.snapshot())
+	var result := _io.share_report(_report_snapshot())
 	if result.get("shared", false):
-		_report_text.text = "Игра открыла системное меню отправки ZIP."
+		_report_text.text = "Открыто меню Android. Выберите приложение для передачи ZIP."
+		_report_text.text += "\nДля прикрепления файла к сообщению можно вернуться и нажать «Сохранить ZIP»."
 		_show_report_scope(result)
 		return
 	_report_sharing = false
 	if not result.ok:
-		_report_text.text = "Не удалось подготовить ZIP. Можно скопировать текст отчёта."
+		_report_text.text = "Не удалось подготовить ZIP. Попробуйте «Сохранить ZIP» или скопируйте текст отчёта."
 	elif result.get("public_downloads", false):
-		_report_text.text = "Меню отправки недоступно. Передайте ZIP из «Загрузок».\n%s" % result.path
+		_report_text.text = "Меню отправки недоступно. Прикрепите файл из «Загрузки → OrbitalRelay».\n%s" % result.file
 	else:
-		_report_text.text = "Меню отправки недоступно. ZIP сохранён в памяти игры. Попробуйте «Сохранить ZIP» или скопируйте текст."
+		_report_text.text = "Меню отправки недоступно. ZIP сохранён в папке игры. Попробуйте «Сохранить ZIP» или скопируйте текст."
 	if result.ok:
 		_show_report_scope(result)
 
 
 func _show_report_scope(result: Dictionary) -> void:
-	if not result.includes_flight_state:
-		_report_text.text += "\n" + REPORT_JOURNAL_ONLY
+	_report_text.text += "\n" + _report_scope(str(result.flight_state_source))
 
 
 func _copy_report() -> void:
 	_report_touches.clear()
-	_report_text.text = "Текст отчёта скопирован." if _io.copy_report_text(flight.snapshot()) else "Буфер обмена сейчас недоступен."
+	_report_text.text = "Текст отчёта скопирован. Для отправки файла нажмите «Сохранить ZIP»." \
+		if _io.copy_report_text(_report_snapshot()) else "Буфер обмена сейчас недоступен."

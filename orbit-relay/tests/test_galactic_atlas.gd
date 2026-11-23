@@ -4,6 +4,7 @@ const Main := preload("res://main.tscn")
 const Flight := preload("res://scripts/flight_sim.gd")
 const Catalog := preload("res://scripts/sector_catalog.gd")
 const GalaxyChart := preload("res://scripts/galaxy_chart.gd")
+const GalaxyMap := preload("res://scripts/galaxy_map.gd")
 const Fixture := preload("res://tests/flight_fixture.gd")
 
 var _canvas: SubViewport
@@ -18,6 +19,7 @@ func _initialize() -> void:
 func _run() -> void:
 	_test_previous_atlas_area()
 	_test_spatial_projection()
+	await _test_large_discovery_atlas()
 	await _test_map_ui()
 	print("Galactic atlas integration: %d checks, %d failures" % [_checks, _failures])
 	quit(0 if _failures == 0 else 1)
@@ -65,6 +67,63 @@ func _test_spatial_projection() -> void:
 		and is_equal_approx(across.y, -separation.z * chart._pixels_per_light_year()),
 		"A quarter-turn reveals the catalogued height while preserving the horizontal separation")
 	chart.free()
+
+
+func _test_large_discovery_atlas() -> void:
+	# A supported-size long-voyage save is an explicit stress fixture. Its
+	# discoveries do not assert that this entire journey has been flown here.
+	var pilot := Flight.new()
+	var payload := pilot.snapshot()
+	var discoveries: Array[int] = []
+	for id in range(Catalog.SYSTEM_COUNT, Catalog.SYSTEM_COUNT + 20000):
+		discoveries.append(id)
+	payload.cartography["sector_systems"] = [[0.0, discoveries]]
+	if not _expect(pilot.restore(payload), "A valid schema56 long-survey fixture loads all20,000 discoveries"):
+		return
+	var before := pilot.snapshot()
+	var map := GalaxyMap.new()
+	root.add_child(map)
+	map.open(pilot)
+	await process_frame
+	_expect(map._atlas and map._known.size() == discoveries.size() + 3
+		and map._chart._systems.size() == map._known.size()
+		and map._chart._positions.is_empty() and map._chart._points.size() <= 3,
+		"A large catalogue opens on density while retaining every known ID without eagerly projecting every star")
+	var last: int = discoveries.back()
+	map._select_system(last)
+	_expect(map._candidate == last and map._system_buttons.has(last)
+		and map._chart._points.has(last) and map._known.size() == discoveries.size() + 3,
+		"The full paginated catalogue still selects a distant discovery and projects its actual navigation anchor")
+	var chart: GalaxyChart = map._chart
+	map._select_system(Catalog.GALAXY_CENTER_SYSTEM)
+	chart.focus_atlas_core()
+	var core_point := chart.marker_position(Catalog.GALAXY_CENTER_SYSTEM)
+	_expect(chart.atlas_is_local() and chart._atlas_sector_rect.get_area() <= GalaxyChart.MAX_ATLAS_SECTORS
+		and chart._points.size() <= chart._atlas_signals.size() + 3
+		and chart.system_at(core_point) == Catalog.GALAXY_CENTER_SYSTEM,
+		"A discovered core star remains selectable through the bounded visible-sector cache")
+	var prior_points := chart._points.duplicate()
+	map.refresh()
+	_expect(chart._positions.is_empty() and chart._points == prior_points
+		and chart._known_systems.size() == discoveries.size() + 3 and chart.atlas_is_local(),
+		"Refreshing the unchanged long survey retains its local view without rebuilding a full coordinate table")
+	var hidden_route_node: int = discoveries[1000]
+	var projected: Vector2 = chart.marker_position(hidden_route_node)
+	_expect(projected.is_equal_approx(chart._project_to_view(GalaxyChart._project(hidden_route_node, false)))
+		and chart._points.size() <= chart._atlas_signals.size() + 4,
+		"An off-window route node is projected from its real coordinates instead of falling back to the atlas centre")
+	map._toggle_scope()
+	var expected: Array[int] = []
+	for id: int in Catalog.sector_system_ids(Catalog.GALAXY_CENTER_SECTOR):
+		if pilot.system_known(id):
+			expected.append(id)
+	expected.sort()
+	_expect(not map._atlas and map._chart._systems == expected
+		and map._chart._positions.size() == expected.size() and not expected.is_empty(),
+		"The traditional local sector keeps every discovered member with its ordinary coordinate projection")
+	_expect(pilot.snapshot() == before, "Density browsing, picking and paging a large map cannot change the player's voyage")
+	map.queue_free()
+	await process_frame
 
 
 func _test_map_ui() -> void:

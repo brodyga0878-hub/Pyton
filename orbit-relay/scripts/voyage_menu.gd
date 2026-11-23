@@ -65,6 +65,7 @@ func build() -> void:
 	content.add_child(header)
 	_heading = _label(header, "Рейсы", 32, TEXT)
 	_heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_add_action(header, "report", "Отчёт").custom_minimum_size.x = 112
 	_add_action(header, "close", "Закрыть").custom_minimum_size.x = 112
 
 	var body := HBoxContainer.new()
@@ -226,6 +227,7 @@ func _sync() -> void:
 	_heading.text = "Орбитальный рейс" if _startup else "Рейсы"
 	_actions["close"].visible = not _startup
 	_actions["close"].disabled = pending
+	_actions["report"].disabled = pending
 	_actions["continue"].disabled = pending or (_startup and not _primary_available)
 	_actions["new"].disabled = pending
 	_actions["recover"].disabled = pending or not _backup_available

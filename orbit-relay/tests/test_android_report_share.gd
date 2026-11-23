@@ -2,6 +2,7 @@ extends SceneTree
 
 const Share = preload("res://scripts/android_report_share.gd")
 const SessionIO = preload("res://scripts/session_io.gd")
+const Flight = preload("res://scripts/flight_sim.gd")
 var failures: Array[String] = []
 var checks := 0
 var files: Array[String] = []
@@ -128,8 +129,8 @@ func run() -> void:
 	_test_sticky_java_exception()
 	var source := path("source")
 	var producer := SessionIO.new(); producer.trace("actual-production", {"step": 1})
-	var generated := producer.export_report({"fuel": 8, "docked": -1}, source)
-	check(generated.ok, "actual SessionIO producer creates private report")
+	var generated := producer.export_report(Flight.new().snapshot(), source)
+	check(generated.ok and generated.includes_flight_state, "actual SessionIO producer creates private report with a valid flight")
 	var bytes := FileAccess.get_file_as_bytes(source)
 	var native := Platform.new()
 	var result := Share.publish(source, native)

@@ -30,7 +30,9 @@ var planned_path: Array[int] = []
 var preview_path: Array[int] = []
 var contested: Array[int] = []
 var _known_systems: Dictionary[int, bool] = {}
+var _known_ids: Array[int] = []
 var _systems: Array[int] = []
+var _positions_are_sparse := false
 var _positions: Dictionary[int, Vector3] = {}
 var _points: Dictionary[int, Vector2] = {}
 var _center := Vector2.ZERO
@@ -55,17 +57,26 @@ func _ready() -> void:
 
 
 func set_systems(known: Array[int], systems: Array[int], focus: int, elevation: bool) -> void:
-	_known_systems.clear()
-	for id in known:
-		_known_systems[id] = true
-	_systems = systems
+	if known != _known_ids:
+		_known_ids.assign(known)
+		_known_systems.clear()
+		for id in known:
+			_known_systems[id] = true
+	var systems_changed := systems != _systems
+	if systems_changed:
+		_systems.assign(systems)
 	var context_changed := focus != _focus or elevation != _elevation
 	_focus = focus
 	_detailed = focus >= 0
 	_elevation = elevation
-	_positions.clear()
-	for id in _systems:
-		_positions[id] = Sector.system_position3(id)
+	var positions_changed := systems_changed or _positions_are_sparse != _sparse_atlas()
+	if positions_changed:
+		_rebuild_positions()
+	if not positions_changed and not context_changed:
+		if _sparse_atlas():
+			_update_points()
+		_atlas_view_changed()
+		return
 	var former_center := _center
 	var former_origin := _origin
 	_update_frame()
@@ -86,9 +97,22 @@ func set_atlas(active: bool) -> void:
 	if _atlas == active:
 		return
 	_atlas = active
+	_rebuild_positions()
 	_update_frame()
 	reset_view()
 	rotation_availability_changed.emit(not _atlas)
+
+
+func _sparse_atlas() -> bool:
+	return _atlas and _systems.size() > Sector.SYSTEM_COUNT
+
+
+func _rebuild_positions() -> void:
+	_positions_are_sparse = _sparse_atlas()
+	_positions.clear()
+	if not _positions_are_sparse:
+		for id in _systems:
+			_positions[id] = Sector.system_position3(id)
 
 
 func reset_view() -> void:
@@ -127,6 +151,14 @@ func _view_basis() -> Basis:
 
 func _update_points() -> void:
 	_points.clear()
+	if _sparse_atlas():
+		for id: int in [current, candidate, planned]:
+			if _known_systems.has(id):
+				_points[id] = _project(id, _elevation)
+		for id: int in _atlas_signals:
+			if _known_systems.has(id):
+				_points[id] = _atlas_signals[id]
+		return
 	if _orbit_angles.is_zero_approx():
 		for id in _systems:
 			_points[id] = _map_plane(_positions[id], _elevation)
@@ -191,6 +223,8 @@ func _atlas_view_changed() -> void:
 			for x in range(visible.position.x, visible.end.x):
 				for id in Sector.sector_system_ids(Vector2i(x, y)):
 					_atlas_signals[id] = _project(id, false)
+		if _sparse_atlas():
+			_update_points()
 	queue_redraw()
 
 
@@ -246,6 +280,10 @@ func _update_frame() -> void:
 
 
 func marker_position(id: int) -> Vector2:
+	# Route nodes can be outside the bounded visible-sector cache. Project them
+	# on demand; never replace a known route endpoint with the atlas centre.
+	if _sparse_atlas() and _known_systems.has(id) and not _points.has(id):
+		_points[id] = _project(id, _elevation)
 	return _project_to_view(_points.get(id, _center))
 
 

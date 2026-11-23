@@ -6,7 +6,7 @@ const ReportShare := preload("res://scripts/android_report_share.gd")
 const SessionIO := preload("res://scripts/session_io.gd")
 const ENTRY_LIMITS := {
 	"report.json": 4096,
-	"events.jsonl": SessionIO.MAX_EVENTS * (SessionIO.MAX_EVENT_BYTES + 1),
+	"events.jsonl": SessionIO.MAX_JOURNAL_BYTES,
 	"flight.json": SessionIO.MAX_STATE_BYTES,
 }
 

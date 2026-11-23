@@ -16,6 +16,7 @@ const Economy := preload("res://scripts/port_economy.gd")
 const MissionCalendar := preload("res://scripts/mission_calendar.gd")
 const SystemDossier := preload("res://scripts/system_dossier.gd")
 const NamedSystems := preload("res://scripts/named_systems.gd")
+const FactionFronts := preload("res://scripts/faction_fronts.gd")
 const TEXT := Color("e8f4fa")
 const MUTED := Color("a5bac7")
 const MINT := Color("9debd7")
@@ -110,6 +111,7 @@ var _elevation := false
 var _system_page := 0
 var _last_scan_count := 0
 var _known: Array[int] = []
+var _known_lookup: Dictionary[int, bool] = {}
 
 
 func build() -> void:
@@ -347,6 +349,9 @@ func open(sim: RefCounted) -> void:
 	_chart.reset_view()
 	_last_scan_count = 0
 	_collect_known_systems()
+	# A large survey opens on its bounded density/sector atlas. The catalogue
+	# still contains every discovery and the traditional view stays selectable.
+	_atlas = _known.size() > Sector.SYSTEM_COUNT
 	_page_for_candidate()
 	_clear_touches()
 	_route_scroll.scroll_vertical = 0
@@ -383,7 +388,10 @@ func refresh() -> void:
 	_chart.planned_path.assign(plan.path if has_plan else [])
 	_chart.preview_path.assign(preview.path if available and not is_planned else [])
 	_current.text = "Система «%s»" % Sector.system(current).name
-	var contested: Array[int] = _known.filter(func(id: int) -> bool: return _flight.factions.system_state(id).stage == "war")
+	var contested: Array[int] = []
+	for id: int in FactionFronts.FRONTIER_SYSTEMS:
+		if _known_lookup.has(id) and _flight.factions.system_state(id).stage == "war":
+			contested.append(id)
 	_refresh_catalog(current, goal, planned)
 	_refresh_scanner()
 	_chart.contested = contested
@@ -505,14 +513,25 @@ func _refresh_hyperspace_echo() -> void:
 
 
 func _collect_known_systems() -> void:
-	_known = _flight.known_systems()
+	var discovered: Array[int] = _flight.known_systems()
+	if discovered == _known:
+		return
+	_known = discovered
+	_known_lookup.clear()
+	for id in _known:
+		_known_lookup[id] = true
 
 
 func _scope_systems() -> Array[int]:
 	if _sector_focus < 0:
 		return _known
 	var coordinates := Sector.sector_coordinates(_sector_focus)
-	return _known.filter(func(id: int) -> bool: return Sector.sector_coordinates(id) == coordinates)
+	var systems: Array[int] = []
+	for id: int in Sector.sector_system_ids(coordinates):
+		if _known_lookup.has(id):
+			systems.append(id)
+	systems.sort()
+	return systems
 
 
 func _page_for_candidate() -> void:
@@ -521,7 +540,14 @@ func _page_for_candidate() -> void:
 
 
 func _listed_systems() -> Array[int]:
-	return _known.filter(func(id: int) -> bool: return id in NamedSystems.IDS) if _directory else _scope_systems()
+	if not _directory:
+		return _scope_systems()
+	var systems: Array[int] = []
+	for id: int in NamedSystems.IDS:
+		if _known_lookup.has(id):
+			systems.append(id)
+	systems.sort()
+	return systems
 
 
 func _refresh_catalog(current: int, goal: int, planned: int) -> void:

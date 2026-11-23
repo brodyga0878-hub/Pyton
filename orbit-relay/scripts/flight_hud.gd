@@ -23,7 +23,7 @@ const CONVOY := Color("ffd081")
 const BACK := Color(0.024, 0.051, 0.073, 0.96)
 const LINE := Color(0.27, 0.45, 0.52, 0.72)
 const COURSE_CARD := Rect2(26, 24, 407, 99)
-const SHORTCUT_BAR := Rect2(26, 131, 502, 48)
+const SHORTCUT_BAR := Rect2(26, 131, 584, 48)
 const HUD_GAP := 8.0
 const COURSE_PAD := Rect2(26, -170, 172, 144)
 const ROLL_PAD := Rect2(210, -108, 112, 82)
@@ -244,23 +244,26 @@ func build() -> void:
 	_orbital_mining_readout.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_orbital_mining_readout.hide()
 	_shortcuts = GridContainer.new()
-	_shortcuts.columns = 6
+	_shortcuts.columns = 7
 	_shortcuts.add_theme_constant_override("h_separation", int(HUD_GAP))
 	_shortcuts.add_theme_constant_override("v_separation", int(HUD_GAP))
 	_pin(_shortcuts, _safe, Vector2.ZERO, SHORTCUT_BAR)
 	_button(_shortcuts, "journal", "Журнал")
 	_button(_shortcuts, "settings", "Настройки")
 	_button(_shortcuts, "frontier", "Освоение")
+	_button(_shortcuts, "report", "Отчёт")
 	_button(_shortcuts, "navigation_toggle", Text.text("NAV_SHORTCUT"))
 	_button(_shortcuts, "recon", "Съёмка")
 	_button(_shortcuts, "comms", Text.text("LINK_SHORTCUT"))
-	for action: String in ["journal", "settings", "frontier", "navigation_toggle", "recon", "comms"]:
+	for action: String in ["journal", "settings", "frontier", "report", "navigation_toggle", "recon", "comms"]:
 		var button: Button = _actions[action]
 		button.custom_minimum_size.y = SHORTCUT_BAR.size.y
 		button.add_theme_font_size_override("font_size", 16)
 	_actions["journal"].tooltip_text = "Журнал заданий"
 	_actions["settings"].tooltip_text = "Графика и управление"
 	_actions["frontier"].tooltip_text = "Разведка, строительство и фракции"
+	_actions["report"].tooltip_text = "Сохранить журнал и состояние рейса в ZIP (F8)"
+	_actions["report"].add_theme_color_override("font_color", CYAN)
 	_actions["navigation_toggle"].tooltip_text = "Цели и отображение объектов в полёте (F12)"
 	_actions["recon"].tooltip_text = "Бортовая камера и задания на съёмку (Q)"
 	var instrument_stack := _panel(_safe, Vector2(1, 0), Rect2(-332, 24, 306, 159))
@@ -406,8 +409,7 @@ func build() -> void:
 	_button(utilities, "map", "Карта")
 	_button(utilities, "galaxy", "Галактика")
 	_button(utilities, "fuel", "Топливо")
-	_button(utilities, "report", "Отчёт")
-	for action: String in ["map", "galaxy", "fuel", "report"]:
+	for action: String in ["map", "galaxy", "fuel"]:
 		var utility: Button = _actions[action]
 		utility.add_theme_font_size_override("font_size", 16)
 		for state: String in ["normal", "hover", "pressed"]:
@@ -479,7 +481,6 @@ func build() -> void:
 	_orbital_mining_tools.hide()
 	_actions["map"].tooltip_text = "Карта звёздной системы"
 	_actions["galaxy"].tooltip_text = "Карта галактики"
-	_actions["report"].tooltip_text = "Отчёт об ошибке"
 	_actions["market"].tooltip_text = "Рынок и курьерские рейсы"
 
 	var notice_stack := _panel(_safe, Vector2(0.5, 1), Rect2(-243, -199, 486, 46))
@@ -540,7 +541,7 @@ func _place_shortcuts() -> void:
 		stacked = available < maxf(width, single_row)
 		width = minf(width, available)
 	_course_card.offset_right = COURSE_CARD.position.x + minf(COURSE_CARD.size.x, width)
-	_shortcuts.columns = 3 if stacked else 6
+	_shortcuts.columns = 4 if stacked else _shortcuts.get_child_count()
 	_shortcuts.offset_right = SHORTCUT_BAR.position.x + width
 	_shortcuts.offset_top = _course_card.position.y + _course_card.size.y + HUD_GAP
 	var height := SHORTCUT_BAR.size.y * 2.0 + HUD_GAP if stacked else SHORTCUT_BAR.size.y
@@ -1904,8 +1905,8 @@ func _refresh_disabled_actions() -> void:
 		blocked = blocked or (ORBITAL_MINING_ACTIONS.has(action) and not _orbital_mining_status.get(ORBITAL_MINING_ACTIONS[action], false))
 		var manual_action := action in HOLD_ACTIONS or action in ["throttle_down", "throttle_up"]
 		var charge_control := action in ["throttle_down", "throttle_up", "boost", "brake"] and not _jump_transit
-		var during_jump := _jumping and action != "time_pause" and not charge_control
-		var during_departure := _departure_active and action != "time_pause" and (action != "dock" or not _departure_can_cancel)
+		var during_jump := _jumping and action not in ["time_pause", "report"] and not charge_control
+		var during_departure := _departure_active and action not in ["time_pause", "report"] and (action != "dock" or not _departure_can_cancel)
 		button.disabled = not _input_enabled or blocked or during_jump or during_departure or (_time_paused and manual_action)
 
 func move_input() -> Vector2:
