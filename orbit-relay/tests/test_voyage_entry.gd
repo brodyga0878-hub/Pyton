@@ -54,9 +54,9 @@ func _test_start_and_slots() -> void:
 	await process_frame
 	game._physics_process(90.0)
 	game._notification(Node.NOTIFICATION_APPLICATION_PAUSED)
-	_expect(menu.is_open() and menu._actions["continue"].disabled and menu._actions["recover"].disabled
+	_expect(menu.is_open() and menu._heading.text == "Elite" and menu._actions["continue"].disabled and menu._actions["recover"].disabled
 		and not game._flight_active and not FileAccess.file_exists(Session.SAVE_PATH),
-		"A clean launch freezes the scene and creates no save before an explicit choice")
+		"A clean launch displays Elite and freezes the scene until the player starts a voyage")
 	game._notification(Node.NOTIFICATION_APPLICATION_RESUMED)
 	await _tap(menu._actions["new"])
 	_expect(game._flight_active and not menu.is_open() and FileAccess.file_exists(Session.SAVE_PATH)

@@ -3,6 +3,7 @@ extends RefCounted
 ## `shared` means the system chooser opened, never that a recipient received it.
 
 const MIME := "application/zip"
+const REPORT_GAME_ID := "Орбитальный рейс"
 const DOWNLOAD_DIRECTORY := "Download/OrbitalRelay/"
 const MAX_ZIP_BYTES := 8 * 1024 * 1024
 const MAX_ENTRY_BYTES := 4 * 1024 * 1024
@@ -239,7 +240,7 @@ static func _report(local_path: String) -> Dictionary:
 		or (has_state and state_bytes.size() != sizes["flight.json"]):
 		return _error("report_zip_invalid", path)
 	var metadata: Variant = JSON.parse_string(metadata_bytes.get_string_from_utf8())
-	var valid: bool = metadata is Dictionary and metadata.get("game") == "Орбитальный рейс" and metadata.get("includes_flight_state") is bool and metadata.get("event_count") is float
+	var valid: bool = metadata is Dictionary and metadata.get("game") == REPORT_GAME_ID and metadata.get("includes_flight_state") is bool and metadata.get("event_count") is float
 	if valid:
 		var lines := event_bytes.get_string_from_utf8().split("\n", false)
 		valid = metadata.event_count == lines.size() and lines.size() <= 48 and bool(metadata.includes_flight_state) == has_state

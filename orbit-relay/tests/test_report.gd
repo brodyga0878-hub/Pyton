@@ -81,13 +81,13 @@ func _test_archive() -> void:
 	files.sort()
 	_expect(files == ["events.jsonl", "flight.json", "report.json"], "The export contains exactly the three documented report entries")
 	var report := _dictionary(contents.get("report.json", ""))
-	_expect(report.get("game") == str(ProjectSettings.get_setting("application/config/name"))
+	_expect(report.get("game") == "Орбитальный рейс" and report.get("title") == "Elite"
 		and report.get("version") == str(ProjectSettings.get_setting("application/config/version"))
 		and report.get("platform") == OS.get_name()
 		and not str(report.get("godot_version", "")).is_empty() and not str(report.get("exported_utc", "")).is_empty()
 		and report.get("event_count") == SessionIO.MAX_EVENTS and report.get("includes_flight_state", false)
 		and report.get("flight_state_source") == "live",
-		"Metadata reports the actual game version, engine, platform and bounded event count")
+		"Metadata reports the new title and version, preserves the ZIP identifier, and records the engine and event count")
 	var archived_state := _dictionary(contents.get("flight.json", ""))
 	var restored := Flight.new()
 	_expect(archived_state == _json(snapshot) and restored.restore(archived_state) and restored.credits == 714,

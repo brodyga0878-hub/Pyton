@@ -2,8 +2,12 @@ config_version=5
 
 [application]
 
-config/name="Орбитальный рейс"
-config/version="0.108.0"
+config/name="Elite"
+config/version="0.109.0"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="godot/app_userdata/Орбитальный рейс"
+config/custom_user_dir_name.macos="Godot/app_userdata/Орбитальный рейс"
+config/custom_user_dir_name.windows="Godot/app_userdata/Орбитальный рейс"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.png"
 config/quit_on_go_back=false

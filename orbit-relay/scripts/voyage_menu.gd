@@ -224,7 +224,7 @@ func _build_action_details(parent: VBoxContainer) -> void:
 func _sync() -> void:
 	var pending := not _pending_action.is_empty()
 	var selected := _slot_names.has(_selected_slot)
-	_heading.text = "Орбитальный рейс" if _startup else "Рейсы"
+	_heading.text = str(ProjectSettings.get_setting("application/config/name")) if _startup else "Рейсы"
 	_actions["close"].visible = not _startup
 	_actions["close"].disabled = pending
 	_actions["report"].disabled = pending

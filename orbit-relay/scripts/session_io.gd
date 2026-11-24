@@ -231,7 +231,8 @@ func _copy_report_to_clipboard(capture: Dictionary) -> bool:
 
 func _report_summary(flight_state_source: String) -> Dictionary:
 	return {
-		"game": "Орбитальный рейс",
+		"game": AndroidReportShare.REPORT_GAME_ID,
+		"title": str(ProjectSettings.get_setting("application/config/name", "")),
 		"version": str(ProjectSettings.get_setting("application/config/version", "")),
 		"godot_version": Engine.get_version_info().get("string", ""),
 		"platform": OS.get_name(),

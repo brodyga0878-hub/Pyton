@@ -62,7 +62,7 @@ static func _read_report(path: String, sizes: Dictionary, validator: Callable) -
 		return ERR_FILE_CORRUPT
 	var metadata := SessionIO._parse_save(metadata_bytes)
 	var includes_state: Variant = metadata.get("includes_flight_state")
-	if metadata.get("game") != "Орбитальный рейс" or not includes_state is bool or includes_state != has_state:
+	if metadata.get("game") != ReportShare.REPORT_GAME_ID or not includes_state is bool or includes_state != has_state:
 		return ERR_INVALID_DATA
 	if not _valid_journal(journal_bytes, metadata.get("event_count")):
 		return ERR_INVALID_DATA
