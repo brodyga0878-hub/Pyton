@@ -1,0 +1,75 @@
+{
+  "name": "Elite",
+  "previous_name": "Орбитальный рейс",
+  "version": "0.109.0",
+  "status": "release_candidate",
+  "source_commit": "040d79453534a13324a95230eaa429f828d28356",
+  "comparison": "orbit-relay/ELITE_DOS_COMPARISON_RU.md",
+  "content": {
+    "save_schema": 56,
+    "systems": 513933476
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 134,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.108.0",
+    "zip_alignment_16k_verified": true,
+    "native_elf_load_alignment_bytes": {
+      "lib/arm64-v8a/libc++_shared.so": 16384,
+      "lib/arm64-v8a/libgodot_android.so": 16384
+    },
+    "tested_on_device": false,
+    "compiled_scripts": 89
+  },
+  "checks": {
+    "source_zip_headless": {
+      "suites": 95,
+      "assertions": 29097,
+      "failures": 0
+    },
+    "apk_resources_godot_desktop": {
+      "assets_verified": 208,
+      "changed_assets_from_0_108_0": [
+        "assets/.godot/exported/133200997/export-3070c538c03ee49b7677ff960a3f5195-main.scn",
+        "assets/.godot/exported/133200997/export-5c12d16ccb8594e490b40754d8459260-voyage_start.scn",
+        "assets/.godot/uid_cache.bin",
+        "assets/assets.sparsepck",
+        "assets/icon.png.import",
+        "assets/project.binary",
+        "assets/scripts/android_report_share.gdc",
+        "assets/scripts/session_io.gdc",
+        "assets/scripts/voyage_import.gdc",
+        "assets/scripts/voyage_menu.gdc"
+      ],
+      "suite_checks": {
+        "android_report_share": 79,
+        "report": 91,
+        "voyage_entry": 63,
+        "voyage_import": 40,
+        "save_backup": 46
+      },
+      "failures": 0,
+      "runtime_upgrades": {
+        "0.108.0": 17
+      },
+      "startup_title": "Elite",
+      "verified_existing_linux_user_directory": true,
+      "restored_0_108_0_autosave_reserve_slot_and_preferences": true,
+      "report_zip_import_in_both_versions": true
+    }
+  },
+  "files": {
+    "Elite-0.109.0-arm64.apk": {
+      "bytes": 35979295,
+      "sha256": "7921258358473e35abb9e78d0c54ae1e75f4a2b0991ede39d0528ee394f0a09b"
+    },
+    "Elite-0.109.0-source.zip": {
+      "bytes": 14069524,
+      "sha256": "b56daca0216b5e434216d998a963c23009f740fec4ce4ef5cafc9b27eb174040"
+    }
+  }
+}
