@@ -1,0 +1,103 @@
+{
+  "name": "Elite",
+  "version": "0.110.0",
+  "status": "release_candidate",
+  "source_commit": "590b186d0da95d97aeb33d26323f54b02d085c92",
+  "content": {
+    "save_schema": 56,
+    "preserved_systems": 513933476,
+    "total_navigational_records": 513937857,
+    "astronomical_catalogue": "HYG v4.1",
+    "astronomical_stellar_records_besides_sol": 4380,
+    "records_within_100_ly": 4059,
+    "farther_named_records": 321,
+    "astronomical_virtual_galactic_centre_distance_ly": 26700,
+    "sol": {
+      "site_id_start": 1541800553,
+      "system_id": 513933476,
+      "objects": 40,
+      "planets": 8,
+      "dwarf_planets": 5,
+      "moons": 25,
+      "comets": 1,
+      "scene_units_per_au": 2000.0,
+      "elements": "Approximate J2000 mean two-body orbits"
+    }
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 135,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.109.0",
+    "zip_alignment_16k_verified": true,
+    "native_elf_load_alignment_bytes": {
+      "lib/arm64-v8a/libc++_shared.so": 16384,
+      "lib/arm64-v8a/libgodot_android.so": 16384
+    },
+    "tested_on_device": false,
+    "compiled_scripts": 92
+  },
+  "checks": {
+    "source_zip_headless": {
+      "suites": 99,
+      "assertions": 69212,
+      "failures": 0
+    },
+    "stellar_import_from_pinned_source": {
+      "checks": 6,
+      "failures": 0
+    },
+    "apk_resources_godot_desktop": {
+      "assets_verified": 216,
+      "assertions": 46641,
+      "suites": {
+        "solar_voyage": 16,
+        "astronomical_ephemeris": 526,
+        "physical_dossier": 101,
+        "stellar_catalog": 39432,
+        "galactic_atlas": 77,
+        "galactic_routes": 59,
+        "expanded_galaxy": 6285,
+        "report": 91,
+        "atmosphere": 40,
+        "stellar_lighting": 14
+      },
+      "failures": 0,
+      "runtime_upgrades": {
+        "0.109.0": 17
+      },
+      "solar_visual_and_atmosphere_checks": 114,
+      "legacy_catalog_sha256": "11316513b8b0d62da200aa4d4a64caeecf755161e4e048c467a1bf282c41d580",
+      "capture_resolution": [
+        1544,
+        720
+      ],
+      "capture_renderer": "OpenGL Compatibility (Mesa llvmpipe)"
+    }
+  },
+  "files": {
+    "Elite-0.110.0-arm64.apk": {
+      "bytes": 36922060,
+      "sha256": "37712d8787881cd57e0db62c5b7fe47a14b4321ae201a4a3be425a47e3266c3f"
+    },
+    "Elite-0.110.0-source.zip": {
+      "bytes": 14610421,
+      "sha256": "400684ba35a5e59bf6290f2b51cb41febc38baebad3f56c724609b48cc1c80a6"
+    },
+    "above-earth.png": {
+      "bytes": 216534,
+      "sha256": "ee7955bd72db1e8294763da1769e2674ab8a89b19a67124941bad653fc9401ba"
+    },
+    "milky-way.png": {
+      "bytes": 206968,
+      "sha256": "b65fa36df5df5d05bfcdecf4402ba712005770f7fd2163ed663d3160c82e5efa"
+    },
+    "solar-system.png": {
+      "bytes": 163316,
+      "sha256": "fe07bd1386b9b297f40342e42c8f1293feeefc749a5a18a4011cdc6a6c6632e2"
+    }
+  }
+}
