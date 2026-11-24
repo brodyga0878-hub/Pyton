@@ -21,6 +21,7 @@ func _run() -> void:
 	_test_spatial_projection()
 	await _test_large_discovery_atlas()
 	await _test_map_ui()
+	await _test_astronomical_chart()
 	print("Galactic atlas integration: %d checks, %d failures" % [_checks, _failures])
 	quit(0 if _failures == 0 else 1)
 
@@ -257,6 +258,87 @@ func _test_map_ui() -> void:
 		_tap(map._plan_button)
 		_expect(pilot.planned_route().goal == target,
 			"The standard route action saves the streamed destination")
+	_canvas.queue_free()
+	await process_frame
+
+
+func _test_astronomical_chart() -> void:
+	_canvas = SubViewport.new()
+	_canvas.size = Vector2i(1280, 720)
+	_canvas.own_world_3d = true
+	root.add_child(_canvas)
+	var game := Main.instantiate()
+	_canvas.add_child(game)
+	game.set_process(false)
+	game.set_physics_process(false)
+	game._audio.set_level(0)
+	var pilot := Flight.new()
+	game.flight = pilot
+	game._update_display(0.0)
+	await process_frame
+	_tap(game._hud._actions["galaxy"])
+	await process_frame
+	var map: GalaxyMap = game._galaxy
+	var chart: GalaxyChart = map._chart
+	_tap(map._system_buttons[Catalog.VELAR_SYSTEM])
+	_tap(map._plan_button)
+	var before := pilot.snapshot()
+	_tap(map._astronomy_button)
+	await process_frame
+	var solar := Catalog.SOLAR_SYSTEM
+	var astronomy := Catalog.astronomical_system_ids()
+	_expect(map._astronomy and map._astronomy_button.button_pressed and not map._atlas
+		and astronomy.size() > 100 and chart._systems == astronomy and chart._atlas_signals.is_empty()
+		and map._candidate == solar and map._plan_button.disabled and not pilot.system_known(solar)
+		and map._coordinates.text == "X 0,0   Y 0,0   Z 0,0 св. л.",
+		"Open Solar neighbourhood by touch using only measured positions without granting a jump target")
+	var unknown := -1
+	var chart_bounds := Rect2(Vector2.ZERO, chart.size).grow(-20.0)
+	for id: int in astronomy:
+		var marker := chart.marker_position(id)
+		if id != solar and not pilot.system_known(id) and chart_bounds.has_point(marker) and chart.system_at(marker) == id:
+			unknown = id
+			break
+	if _expect(unknown >= 0, "There are independently selectable catalog stars near the solar focus"):
+		var at := chart.get_global_transform_with_canvas() * chart.marker_position(unknown)
+		_send(at, true, 61)
+		_send(at, false, 61)
+		_expect(map._candidate == unknown and map._destination.text == str(Catalog.system(unknown).name)
+			and map._plan_button.disabled and pilot.snapshot() == before,
+			"Reading a measured star shows its catalog name without changing the planned campaign route")
+	_tap(map._core_button)
+	await process_frame
+	var center := chart._project_to_view(GalaxyChart._map_plane(Catalog.GALACTIC_CENTER_LY, false))
+	var shown_distance := center.distance_to(chart.marker_position(solar)) / chart._pixels_per_light_year()
+	_expect(chart.showing_milky_way_center() and chart_bounds.has_point(center) and chart.system_at(center) < 0
+		and is_equal_approx(shown_distance, 26700.0)
+		and pilot.snapshot() == before,
+		"The physical Milky Way centre is projected at scale and cannot be picked as a destination")
+	_tap(map._astronomy_button)
+	_expect(not map._astronomy and map._candidate == Catalog.VELAR_SYSTEM and pilot.snapshot() == before,
+		"Leaving astronomy restores the previous campaign selection and route")
+	_tap(map._sun_button)
+	_expect(map._candidate == solar and not chart.showing_milky_way_center()
+		and chart.marker_position(solar).distance_to(chart.size * 0.5) < 1.0
+		and is_equal_approx(minf(chart.size.x, chart.size.y) / chart._pixels_per_light_year(), GalaxyChart.SOLAR_VIEW_SPAN)
+		and Catalog.jump_distance(map._listed_systems()[1], solar) < 5.0,
+		"The Sun shortcut returns to a centered map of nearby measured stars")
+	_tap(map._scan_button)
+	if _expect(pilot.system_known(solar) and not map._plan_button.disabled, "A real in-range radio scan opens the route to the Sun"):
+		_tap(map._plan_button)
+		_tap(map._atlas_button)
+		_expect(map._atlas and not map._astronomy and map._candidate == solar and pilot.planned_route().goal == solar,
+			"The standard atlas can replace the measured view while retaining the normal route to Sol")
+	_tap(map._close_button)
+	pilot = Flight.new()
+	pilot.start_solar_voyage()
+	game.flight = pilot
+	game._update_display(0.0)
+	await process_frame
+	_tap(game._hud._actions["galaxy"])
+	await process_frame
+	_expect(map._astronomy and map._candidate == solar and map._current.text.contains(str(Catalog.system(solar).name)),
+		"Opening the navigator on a real Solar voyage defaults to the astronomy view")
 	_canvas.queue_free()
 	await process_frame
 

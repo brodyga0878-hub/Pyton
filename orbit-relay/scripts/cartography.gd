@@ -36,6 +36,10 @@ func body_status(sim: RefCounted, site_id: int) -> Dictionary:
 	status.name = site.name
 	status.kind = site.kind
 	status.known = _records.has(site_id)
+	var physical := Dossier.body_astronomy(site_id)
+	var catalog_known := float(physical.get("radius_km", 0.0)) > 0.0 or float(physical.get("mass_kg", 0.0)) > 0.0
+	if catalog_known:
+		status["catalog_known"] = true
 	status.in_system = system_id == sim.system_id
 	status.scan_limit = float(site.radius) + SCAN_CLEARANCE
 	if status.in_system:
@@ -44,6 +48,10 @@ func body_status(sim: RefCounted, site_id: int) -> Dictionary:
 	if status.known:
 		status.recorded_at = _records[site_id]
 		status.data = _body_data(sim, site_id, site, status.recorded_at)
+	elif catalog_known:
+		# Public astronomical facts do not grant a personal observation, scan
+		# reward or saved survey record. The old visibility rules still apply.
+		status.data = _body_data(sim, site_id, site, float(sim.orbit_time))
 	status.reason = _scan_reason(sim, status)
 	status.can_scan = status.reason.is_empty()
 	if status.can_scan:
@@ -75,6 +83,13 @@ func discovered(system_id: int) -> bool:
 	return _discovered.has(system_id)
 
 
+func mark_discovered(system_id: int, epoch: float) -> bool:
+	if not Catalog.is_generated_system(system_id) or not _valid_epoch(epoch, MAX_EPOCH) or discovered(system_id):
+		return false
+	_discovered[system_id] = epoch
+	return true
+
+
 func discovered_systems() -> Array[int]:
 	var systems := _discovered.keys()
 	systems.sort()
@@ -85,8 +100,9 @@ func neighbors_to_discover(system_id: int) -> Array[int]:
 	var neighbors: Array[int] = []
 	if Catalog.system(system_id).is_empty() or (Catalog.is_generated_system(system_id) and not discovered(system_id)):
 		return neighbors
+	var astronomy := Catalog.is_astronomical_system(system_id)
 	for candidate: int in Catalog.generated_systems_near(system_id, Catalog.GENERATED_SCAN_RANGE, true):
-		if not discovered(candidate):
+		if not discovered(candidate) and (not astronomy or Catalog.is_astronomical_system(candidate)):
 			neighbors.append(candidate)
 	return neighbors
 
@@ -140,7 +156,7 @@ func snapshot() -> Dictionary:
 	var sectors: Dictionary[float, Array] = {}
 	for system_id: int in discovered_systems():
 		var epoch := _discovered[system_id]
-		if Catalog.is_extended_system(system_id):
+		if system_id >= Catalog.SYSTEM_COUNT:
 			if not sectors.has(epoch):
 				sectors[epoch] = []
 			sectors[epoch].append(system_id)
@@ -285,6 +301,62 @@ static func _body_data(sim: RefCounted, site_id: int, site: Dictionary, epoch: f
 		"spin": spin, "spin_period": TAU / absf(spin) if spin != 0.0 else 0.0,
 	}
 	data.merge(_orbit_data(site_id, host))
+	return physical_body_data(data, site)
+
+
+static func physical_body_data(model_data: Dictionary, site: Dictionary) -> Dictionary:
+	var metadata := Dossier.physical_metadata(site.get("astronomy", {}))
+	if metadata.is_empty():
+		return model_data
+	var data := model_data.duplicate(true)
+	var fields: Array[String] = []
+	var radius_km := float(metadata.get("radius_km", 0.0))
+	var mass := float(metadata.get("mass_kg", 0.0))
+	if radius_km > 0.0:
+		data.radius = radius_km * 1000.0
+		data.diameter = radius_km * 2000.0
+		fields.append_array(["radius", "diameter"])
+	if mass > 0.0:
+		data.mass_kg = mass
+		data.gravity_parameter = GRAVITATIONAL_CONSTANT * mass
+		fields.append_array(["mass_kg", "gravity_parameter"])
+		if radius_km > 0.0:
+			data.gravity = float(data.gravity_parameter) / pow(radius_km * 1000.0, 2.0)
+			fields.append("gravity")
+	var days := float(metadata.get("period_days", 0.0))
+	if days > 0.0:
+		data.period = days * 86400.0
+		fields.append("period")
+	var orbit: Variant = site.get("astronomical_orbit", {})
+	var semimajor_km := float(metadata.get("semimajor_km", 0.0))
+	if semimajor_km > 0.0:
+		data["semimajor"] = semimajor_km * 1000.0
+		fields.append("semimajor")
+		if orbit is Dictionary and Orbit._finite_number(orbit.get("eccentricity")):
+			var eccentricity := float(orbit.eccentricity)
+			if eccentricity >= 0.0 and eccentricity < 1.0:
+				data.periapsis = semimajor_km * 1000.0 * (1.0 - eccentricity)
+				data.apoapsis = semimajor_km * 1000.0 * (1.0 + eccentricity)
+				data["eccentricity"] = eccentricity
+				fields.append_array(["periapsis", "apoapsis", "eccentricity"])
+	var temperature := float(metadata.get("temperature_k", 0.0))
+	# An invented gameplay equilibrium estimate is not a measured catalog
+	# temperature. Leave this quantity unavailable when no real value is given.
+	data.temperature_k = temperature
+	if temperature > 0.0:
+		fields.append("temperature_k")
+	var rotation := float(metadata.get("rotation_period_days", 0.0))
+	if rotation != 0.0:
+		data.spin_period = absf(rotation) * 86400.0
+		data.spin = TAU / (rotation * 86400.0)
+		fields.append_array(["spin", "spin_period"])
+	data["astronomy"] = metadata
+	data["physical_fields"] = fields
+	data["physical_catalog"] = not fields.is_empty()
+	data["physical_type"] = str(metadata.get("type", ""))
+	data["astronomy_epoch"] = str(metadata.get("epoch", ""))
+	data["scale_notice"] = str(metadata.get("scale_notice", "Справочные величины приведены в физических единицах. Размеры и расстояния в полёте имеют условный масштаб."))
+	data["ephemeris_notice"] = str(metadata.get("ephemeris_notice", ""))
 	return data
 
 

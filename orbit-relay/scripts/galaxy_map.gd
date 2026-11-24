@@ -60,6 +60,9 @@ var _close_button: Button
 var _dossier_button: Button
 var _scope_button: Button
 var _atlas_button: Button
+var _astronomy_button: Button
+var _sun_button: Button
+var _mode_label: Label
 var _projection_button: Button
 var _drag_button: Button
 var _ship_button: Button
@@ -106,12 +109,16 @@ var _flight: RefCounted
 var _candidate := -1
 var _sector_focus := -1
 var _atlas := false
+var _astronomy := false
+var _campaign_candidate := -1
+var _campaign_atlas := false
 var _directory := false
 var _elevation := false
 var _system_page := 0
 var _last_scan_count := 0
 var _known: Array[int] = []
 var _known_lookup: Dictionary[int, bool] = {}
+var _astronomy_by_distance: Array[int] = []
 
 
 func build() -> void:
@@ -247,6 +254,20 @@ func _build_chart(parent: HBoxContainer) -> void:
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	column.add_theme_constant_override("separation", 7)
 	parent.add_child(column)
+	var modes := HBoxContainer.new()
+	modes.add_theme_constant_override("separation", 7)
+	column.add_child(modes)
+	_astronomy_button = _button(modes, "Млечный Путь", 44)
+	_astronomy_button.toggle_mode = true
+	_astronomy_button.tooltip_text = "Переключить карту кампании и астрономический каталог окрестностей Солнца"
+	_astronomy_button.pressed.connect(_toggle_astronomy)
+	_sun_button = _button(modes, "Солнце", 44)
+	_sun_button.tooltip_text = "Показать Солнце и соседние звёзды каталога HYG"
+	_sun_button.pressed.connect(_focus_astronomy.bind(Sector.SOLAR_SYSTEM))
+	_mode_label = _label(modes, "", 15, MUTED)
+	_mode_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_mode_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_mode_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	var tools := HBoxContainer.new()
 	tools.add_theme_constant_override("separation", 7)
 	column.add_child(tools)
@@ -345,6 +366,9 @@ func open(sim: RefCounted) -> void:
 	_candidate = int(route.goal) if route.get("available", false) else int(sim.system_id)
 	_sector_focus = -1
 	_atlas = false
+	_astronomy = false
+	_campaign_candidate = -1
+	_campaign_atlas = false
 	_directory = false
 	_chart.reset_view()
 	_last_scan_count = 0
@@ -357,7 +381,10 @@ func open(sim: RefCounted) -> void:
 	_route_scroll.scroll_vertical = 0
 	_show_dossier(false)
 	show()
-	refresh()
+	if Sector.is_astronomical_system(int(sim.system_id)) and Sector.is_astronomical_system(_candidate):
+		_focus_astronomy(_candidate)
+	else:
+		refresh()
 
 
 func refresh() -> void:
@@ -370,14 +397,20 @@ func refresh() -> void:
 	var planned: int = int(plan.next) if has_plan else -1
 	var goal: int = int(plan.goal) if has_plan else -1
 	_collect_known_systems()
-	if not _flight.system_known(_candidate):
+	if _astronomy and not Sector.is_astronomical_system(_candidate):
+		_candidate = current if Sector.is_astronomical_system(current) else Sector.SOLAR_SYSTEM
+		_page_for_candidate()
+	elif not _astronomy and not _flight.system_known(_candidate):
 		_candidate = current
 		_page_for_candidate()
+	var known: bool = _flight.system_known(_candidate)
 	var selected := Sector.system(_candidate)
 	var is_current := _candidate == current
 	var is_planned := _candidate == goal
 	# A committed route remains exact after refuelling or equipment changes.
-	var preview: Dictionary = plan if is_planned else _flight.route_preview(_candidate)
+	var preview: Dictionary = plan if is_planned else {}
+	if known and not is_planned:
+		preview = _flight.route_preview(_candidate)
 	var available: bool = preview.get("available", false) and not preview.get("legs", []).is_empty()
 	var drive: Dictionary = _flight.jump_drive_status()
 	_chart.current = current
@@ -399,8 +432,12 @@ func refresh() -> void:
 
 	_destination.text = str(selected.name)
 	var position := Sector.system_position3(_candidate)
+	if _astronomy:
+		position -= Sector.system_position3(Sector.SOLAR_SYSTEM)
+		_affiliation.text = "Расстояние от Солнца · %s св. л." % _decimal(position.length())
+	else:
+		_affiliation.text = _flight.system_faction_name(_candidate)
 	_coordinates.text = "X %s   Y %s   Z %s св. л." % [_decimal(position.x), _decimal(position.y), _decimal(position.z)]
-	_affiliation.text = _flight.system_faction_name(_candidate)
 	if contested.has(_candidate):
 		_affiliation.text += " · Оспаривается"
 	var frontier: Dictionary = _flight.frontier_status()
@@ -437,7 +474,7 @@ func refresh() -> void:
 		var route_balance := "После всего пути: %s ед." % _decimal(after_route) if after_route >= 0.0 else "На весь путь не хватает: %s ед." % _decimal(-after_route)
 		_budget.text = "Далее %s: %d ед. · %s\n%s" % [Sector.system(int(preview.next)).name, int(first.fuel), first_balance, route_balance]
 		_budget.add_theme_color_override("font_color", MINT if after_route >= 0.0 else AMBER)
-	_plan_button.disabled = is_current or is_planned or not available or charging
+	_plan_button.disabled = not known or is_current or is_planned or not available or charging
 	_plan_button.text = "Сохранён" if is_planned else "Проложить"
 	_cancel_route_button.disabled = not has_plan or charging
 	var status: Dictionary = _flight.jump_status(planned) if has_plan else {}
@@ -454,6 +491,8 @@ func refresh() -> void:
 			hint = "Проложите маршрут. Каждый прыжок запускается вручную."
 	if charging:
 		hint = "Идёт межзвёздный переход." if _flight.jump_progress_status().is_transit else "Идёт зарядка прыжкового привода."
+	elif _astronomy and not known:
+		hint = "Координаты есть в каталоге. Радиоскан рядом с кораблём открывает системы для маршрута."
 	_status.text = hint
 	_status.add_theme_color_override("font_color", MINT if not _jump_button.disabled else MUTED if is_current else AMBER)
 	if _dossier_scroll.visible:
@@ -523,6 +562,8 @@ func _collect_known_systems() -> void:
 
 
 func _scope_systems() -> Array[int]:
+	if _astronomy:
+		return Sector.astronomical_system_ids() if _sector_focus < 0 else Sector.astronomical_sector_system_ids(Sector.sector_coordinates(_sector_focus))
 	if _sector_focus < 0:
 		return _known
 	var coordinates := Sector.sector_coordinates(_sector_focus)
@@ -540,7 +581,17 @@ func _page_for_candidate() -> void:
 
 
 func _listed_systems() -> Array[int]:
-	if not _directory:
+	if _astronomy and _sector_focus < 0:
+		if _astronomy_by_distance.is_empty():
+			var solar := Sector.system_position3(Sector.SOLAR_SYSTEM)
+			var distances: Dictionary[int, float] = {}
+			_astronomy_by_distance.assign(Sector.astronomical_system_ids())
+			for id in _astronomy_by_distance:
+				distances[id] = Sector.system_position3(id).distance_squared_to(solar)
+			_astronomy_by_distance.sort_custom(func(a: int, b: int) -> bool:
+				return a < b if distances[a] == distances[b] else distances[a] < distances[b])
+		return _astronomy_by_distance
+	if _astronomy or not _directory:
 		return _scope_systems()
 	var systems: Array[int] = []
 	for id: int in NamedSystems.IDS:
@@ -576,21 +627,32 @@ func _refresh_catalog(current: int, goal: int, planned: int) -> void:
 			suffix = " · Цель"
 		elif id == planned:
 			suffix = " · Далее"
+		elif _astronomy and not _known_lookup.has(id):
+			suffix = " · каталог"
 		button.text = str(Sector.system(id).name) + suffix
 		button.set_pressed_no_signal(id == _candidate)
 	_previous_page_button.disabled = _system_page == 0
 	_next_page_button.disabled = _system_page + 1 >= pages
 	_page_label.text = "%d–%d из %d" % [first + 1, last, systems.size()]
 	_directory_button.set_pressed_no_signal(_directory)
+	_directory_button.visible = not _astronomy
 	_directory_button.text = "Все" if _directory else "Именные"
 	_directory_button.tooltip_text = "Показать все открытые системы" if _directory else "Открыть справочник известных именных систем"
 	_scope_button.text = "Обзор" if _sector_focus >= 0 else "Сектор"
 	_atlas_button.set_pressed_no_signal(_atlas)
+	_astronomy_button.set_pressed_no_signal(_astronomy)
+	_mode_label.text = "Окрестности Солнца · звёздный каталог HYG" if _astronomy else "Мир кампании"
+	_mode_label.tooltip_text = "Положения и имена звёзд из HYG. Планетные орбиты и полёт моделируются игрой." if _astronomy else "Карта маршрутов и систем кампании. Откройте «Млечный Путь» для звёздного каталога."
+	_core_button.text = "К центру" if _astronomy else "К ядру"
+	_core_button.tooltip_text = "Показать положение центра Млечного Пути относительно Солнца" if _astronomy else "Показать ядро мира кампании на атласе"
 	_projection_button.text = "Вид X/Z" if _elevation else "Вид X/Y"
 	_chart.set_atlas(_atlas)
+	_chart.set_astronomy(_astronomy)
 	_chart.set_systems(_known, scoped, _sector_focus, _elevation)
 	_scope_label.tooltip_text = ""
-	if _sector_focus >= 0:
+	if _astronomy:
+		_refresh_astronomy_caption()
+	elif _sector_focus >= 0:
 		var sector := Sector.sector_coordinates(_sector_focus)
 		_scope_label.text = "Сектор %d / %d · %d × %d св. л. в X/Y · Известно систем: %d" % [
 			sector.x, sector.y, int(Sector.SECTOR_SIZE), int(Sector.SECTOR_SIZE), scoped.size()
@@ -600,6 +662,16 @@ func _refresh_catalog(current: int, goal: int, planned: int) -> void:
 	else:
 		_scope_label.text = "Обзор · Известно систем: %d" % scoped.size()
 	_update_zoom_buttons()
+
+
+func _refresh_astronomy_caption() -> void:
+	if _chart.showing_milky_way_center():
+		var distance := Sector.GALACTIC_CENTER_LY.distance_to(Sector.system_position3(Sector.SOLAR_SYSTEM))
+		_scope_label.text = "Солнце → центр Млечного Пути · ≈ %d св. л." % roundi(distance)
+		_scope_label.tooltip_text = "Центр показан как астрономический ориентир. Кнопка «Солнце» возвращает местную карту."
+	else:
+		_scope_label.text = "Звёзды каталога: %d" % _scope_systems().size()
+		_scope_label.tooltip_text = "Вы можете посмотреть координаты всех звёзд. Маршрут строится по открытым системам."
 
 
 func _refresh_atlas_caption() -> void:
@@ -634,15 +706,61 @@ func _toggle_scope() -> void:
 		_sector_focus = _candidate if _sector_focus < 0 else -1
 		_page_for_candidate()
 		refresh()
+		if _chart.showing_milky_way_center():
+			_chart.focus_astronomy(_candidate)
+			_refresh_astronomy_caption()
+			_update_zoom_buttons()
 
 
 func _toggle_atlas() -> void:
 	if is_open():
 		_clear_touches()
-		_atlas = not _atlas
+		var was_astronomy := _astronomy
+		_leave_astronomy()
+		_atlas = was_astronomy or not _atlas
 		_sector_focus = -1
 		_page_for_candidate()
 		refresh()
+
+
+func _toggle_astronomy() -> void:
+	if not is_open():
+		return
+	if _astronomy:
+		_leave_astronomy()
+		_page_for_candidate()
+		_clear_touches()
+		refresh()
+	else:
+		_focus_astronomy(_candidate if Sector.is_astronomical_system(_candidate) else Sector.SOLAR_SYSTEM)
+
+
+func _focus_astronomy(id: int) -> void:
+	if not is_open():
+		return
+	if not _astronomy:
+		_campaign_candidate = _candidate
+		_campaign_atlas = _atlas
+	_astronomy = true
+	_atlas = false
+	_directory = false
+	_sector_focus = -1
+	_elevation = false
+	_select_system(id)
+	_chart.focus_astronomy(id)
+	_refresh_astronomy_caption()
+	_update_zoom_buttons()
+
+
+func _leave_astronomy() -> void:
+	if not _astronomy:
+		return
+	_astronomy = false
+	_atlas = _campaign_atlas
+	_sector_focus = -1
+	var route: Dictionary = _flight.planned_route()
+	if not route.get("available", false) or int(route.goal) != _candidate:
+		_candidate = _campaign_candidate if _flight.system_known(_campaign_candidate) else int(_flight.system_id)
 
 
 func _toggle_projection() -> void:
@@ -674,6 +792,10 @@ func _set_rotation_available(available: bool) -> void:
 
 func _go_to_ship() -> void:
 	if is_open():
+		if _astronomy and Sector.is_astronomical_system(int(_flight.system_id)):
+			_focus_astronomy(int(_flight.system_id))
+			return
+		_leave_astronomy()
 		_atlas = false
 		_chart.reset_view()
 		_sector_focus = int(_flight.system_id)
@@ -684,6 +806,15 @@ func _go_to_core() -> void:
 	if not is_open():
 		return
 	_clear_touches()
+	if _astronomy:
+		_sector_focus = -1
+		_elevation = false
+		_page_for_candidate()
+		refresh()
+		_chart.show_milky_way_center()
+		_refresh_astronomy_caption()
+		_update_zoom_buttons()
+		return
 	_atlas = true
 	_sector_focus = -1
 	_elevation = false
@@ -978,7 +1109,7 @@ func _select_listed_system(button: Button) -> void:
 
 
 func _select_system(id: int) -> void:
-	if is_open() and _flight.system_known(id):
+	if is_open() and (Sector.is_astronomical_system(id) if _astronomy else _flight.system_known(id)):
 		if _candidate != id:
 			_emergency_armed = false
 			_dossier_scroll.scroll_vertical = 0
@@ -990,7 +1121,7 @@ func _select_system(id: int) -> void:
 
 
 func _plan_route() -> void:
-	if is_open() and not _plan_button.disabled:
+	if is_open() and not _plan_button.disabled and _flight.system_known(_candidate):
 		_clear_touches()
 		destination_selected.emit(_candidate)
 
@@ -1036,6 +1167,8 @@ func _cancel_route() -> void:
 	if is_open() and not _cancel_route_button.disabled:
 		_clear_touches()
 		_candidate = int(_flight.system_id)
+		if _astronomy and not Sector.is_astronomical_system(_candidate):
+			_candidate = Sector.SOLAR_SYSTEM
 		if _sector_focus >= 0:
 			_sector_focus = _candidate
 		_page_for_candidate()
@@ -1155,7 +1288,8 @@ func _button_at(point: Vector2) -> Button:
 	for button: Button in [
 		_plan_button, _cancel_route_button, _jump_button, _emergency_button, _echo_track, _echo_analyze,
 		_dossier_button, _close_button,
-		_scope_button, _atlas_button, _projection_button, _drag_button, _ship_button, _core_button, _zoom_in_button, _zoom_out_button,
+		_scope_button, _atlas_button, _astronomy_button, _sun_button, _projection_button, _drag_button, _ship_button, _core_button,
+		_zoom_in_button, _zoom_out_button,
 		_scan_button, _previous_page_button, _next_page_button, _directory_button
 	]:
 		if button.is_visible_in_tree() and not button.disabled and button.get_global_rect().has_point(point):

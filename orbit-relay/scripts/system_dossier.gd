@@ -29,7 +29,16 @@ static func read(sim: RefCounted, system_id: int) -> Dictionary:
 	if not dossier.known:
 		return dossier
 	dossier.stars = _stars(system_id)
-	dossier.archive = Named.ARCHIVE.get(system_id, [])
+	var system := Catalog.system(system_id)
+	dossier.archive = system.get("archive", Named.ARCHIVE.get(system_id, []))
+	var astronomy := physical_metadata(system.get("astronomy", {}))
+	for field: String in ["scale_notice", "ephemeris_notice"]:
+		if system.has(field) or astronomy.has(field):
+			dossier[field] = str(system.get(field, astronomy.get(field, "")))
+	if not astronomy.is_empty():
+		dossier["astronomy"] = astronomy
+		if dossier.archive.is_empty():
+			dossier.archive = _astronomical_archive(astronomy)
 	dossier.population_range = Named.population(dossier.ports)
 	var local_profile: Array = CORE_PROFILES.get(system_id, [])
 	if not local_profile.is_empty():
@@ -48,14 +57,45 @@ static func read(sim: RefCounted, system_id: int) -> Dictionary:
 	return dossier
 
 
+static func _astronomical_archive(astronomy: Dictionary) -> Array[String]:
+	var result: Array[String] = ["Открытые астрономические данные"]
+	if astronomy.has("epoch"):
+		result.append("Эпоха каталога: " + str(astronomy.epoch))
+	for field: String in ["scale_notice", "ephemeris_notice"]:
+		if not str(astronomy.get(field, "")).is_empty():
+			result.append(str(astronomy[field]))
+	var sources := PackedStringArray()
+	if astronomy.get("sources") is Array:
+		for source: Variant in astronomy.sources:
+			if source is String and not source.is_empty():
+				sources.append(source)
+	if not str(astronomy.get("source_url", "")).is_empty():
+		sources.append(str(astronomy.source_url))
+	if not sources.is_empty():
+		result.append("Источники:\n" + "\n".join(sources))
+	if not str(astronomy.get("license", "")).is_empty():
+		result.append("Лицензия источника: " + str(astronomy.license) + "\n" + str(astronomy.get("license_url", "")))
+	return result
+
+
 static func _stars(system_id: int) -> Array[Dictionary]:
 	var stars: Array[Dictionary] = []
 	for id: int in Catalog.stars_for(system_id):
-		stars.append({"name": Catalog.site(id).name, "spectral_class": stellar_class(id)})
+		var row := {"name": Catalog.site(id).name, "spectral_class": stellar_class(id)}
+		var physical := body_astronomy(id)
+		if not physical.is_empty():
+			row["astronomy"] = physical
+		stars.append(row)
 	return stars
 
 
 static func stellar_class(site_id: int) -> String:
+	var physical := body_astronomy(site_id)
+	if not str(physical.get("spectral_class", "")).is_empty():
+		return str(physical.spectral_class)
+	if Catalog.is_astronomical_system(Catalog.system_of_site(site_id)):
+		# An absent public spectrum must not inherit a procedural colour class.
+		return ""
 	if AUTHORED_SPECTRA.has(site_id):
 		return AUTHORED_SPECTRA[site_id]
 	var star := Catalog.site(site_id)
@@ -68,7 +108,32 @@ static func stellar_class(site_id: int) -> String:
 
 
 static func stellar_temperature(site_id: int) -> float:
+	var physical := body_astronomy(site_id)
+	if float(physical.get("temperature_k", 0.0)) > 0.0:
+		return float(physical.temperature_k)
+	if Catalog.is_astronomical_system(Catalog.system_of_site(site_id)):
+		return 0.0
 	return STELLAR_TEMPERATURES.get(stellar_class(site_id), 0.0)
+
+
+static func body_astronomy(site_id: int) -> Dictionary:
+	return physical_metadata(Catalog.site(site_id).get("astronomy", {}))
+
+
+static func physical_metadata(raw: Variant) -> Dictionary:
+	if not raw is Dictionary:
+		return {}
+	var result: Dictionary = raw.duplicate(true)
+	for field: String in ["radius_km", "mass_kg", "semimajor_km", "period_days", "temperature_k", "rotation_period_days"]:
+		if not result.has(field):
+			continue
+		var value: Variant = result[field]
+		if not (value is float or value is int) or not is_finite(float(value)) or (field != "rotation_period_days" and float(value) < 0.0):
+			result.erase(field)
+	for field: String in ["type", "spectral_class", "epoch", "scale_notice", "ephemeris_notice"]:
+		if result.has(field) and not result[field] is String:
+			result.erase(field)
+	return result
 
 
 static func _authority(control: Dictionary, faction: String) -> String:

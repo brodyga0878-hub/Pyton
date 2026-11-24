@@ -783,6 +783,10 @@ func _voyage_action(action: String, slot_id: String, slot_name: String) -> void:
 					_voyages.notify("Автосохранение недоступно.")
 		"new":
 			_replace_voyage(Flight.new(), "Начат новый рейс.")
+		"new_solar":
+			var candidate := Flight.new()
+			candidate.start_solar_voyage()
+			_replace_voyage(candidate, "Начат рейс в Солнечной системе, рядом с Землёй.")
 		"recover":
 			var candidate := _read_voyage(SessionIO.BACKUP_PATH)
 			if candidate == null:

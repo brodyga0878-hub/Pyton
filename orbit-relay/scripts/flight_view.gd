@@ -187,6 +187,7 @@ var _backdrop_planet: Node3D
 var _backdrop_material: ShaderMaterial
 var _backdrop_halo_material: ShaderMaterial
 var _backdrop_ring_material: ShaderMaterial
+var _gas_giant_views: Dictionary[int, Dictionary] = {}
 var _backdrop_orbit_offset := Vector3.ZERO
 var _backdrop_orbit_axis := Vector3.UP
 var _mining_rig: Node3D
@@ -304,6 +305,7 @@ func _load_sector(id: int) -> void:
 	_gate_materials.clear()
 	_surface_views.clear()
 	_stellar_views.clear()
+	_gas_giant_views.clear()
 	_fragment_views.clear()
 	_cargo_pod_views.clear()
 	_sector_fittings.clear()
@@ -311,6 +313,7 @@ func _load_sector(id: int) -> void:
 	_system_id = id
 	_star_id = Catalog.star_for(id)
 	_gas_giant_id = Catalog.gas_giant_for(id)
+	camera.far = 400000.0 if id == Catalog.SOLAR_SYSTEM else 8000.0
 	_backdrop_planet = null
 	_backdrop_material = null
 	_backdrop_halo_material = null
@@ -336,8 +339,15 @@ func _load_sector(id: int) -> void:
 	_sector = Node3D.new()
 	add_child(_sector)
 	_build_stars(cool, fringe)
-	if _companion_id < 0 or _gas_giant_id >= 0:
-		_build_gas_giant(cool, fringe)
+	if id == Catalog.SOLAR_SYSTEM:
+		for site_id: int in Catalog.gas_giants_for(id):
+			_gas_giant_views[site_id] = _build_gas_giant(false, false, site_id)
+		_set_backdrop(_gas_giant_views.get(_gas_giant_id, {}))
+	elif not Catalog.is_astronomical_system(id) and (_companion_id < 0 or _gas_giant_id >= 0):
+		var giant := _build_gas_giant(cool, fringe, _gas_giant_id)
+		_set_backdrop(giant)
+		if _gas_giant_id >= 0:
+			_gas_giant_views[_gas_giant_id] = giant
 	for site_id: int in local_stars:
 		var site := Catalog.site(site_id)
 		var star := StarView.new()
@@ -394,6 +404,8 @@ func set_visual_profile(profile: int) -> void:
 		_mining_beam_halo.visible = _visual_profile > 0
 	if _backdrop_material != null:
 		_backdrop_material.set_shader_parameter("cloud_quality", _visual_profile)
+	for giant: Dictionary in _gas_giant_views.values():
+		giant.material.set_shader_parameter("cloud_quality", _visual_profile)
 	# A profile also applies to every newly loaded surface, star and NPC.
 	for body: Node3D in _surface_views.values():
 		body.set_visual_profile(_visual_profile)
@@ -595,18 +607,15 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_update_stellar_light(_sunlight, _star.position, position_now, primary_strength)
 	if _companion_id >= 0:
 		_update_stellar_light(_fill, _stellar_views[_companion_id].position, position_now, 0.65)
-	if _gas_giant_id >= 0:
-		_backdrop_planet.position = sim.target_position(_gas_giant_id)
-	elif _backdrop_planet != null:
+	for site_id: int in _gas_giant_views:
+		var giant := _gas_giant_views[site_id]
+		giant.planet.position = sim.target_position(site_id)
+		_sync_gas_lighting(giant, epoch)
+	if _gas_giant_id < 0 and _backdrop_planet != null:
 		var backdrop_phase := TAU * fposmod(float(sim.orbit_time), BACKDROP_ORBIT_SECONDS) / BACKDROP_ORBIT_SECONDS
 		_backdrop_planet.position = _star.position + _backdrop_orbit_offset.rotated(_backdrop_orbit_axis, backdrop_phase)
-	if _backdrop_material != null:
-		var light_direction := _backdrop_planet.position.direction_to(_star.position)
-		for paint: ShaderMaterial in [_backdrop_material, _backdrop_halo_material, _backdrop_ring_material]:
-			if paint != null:
-				paint.set_shader_parameter("light_direction", light_direction)
-		if _visual_profile > 0:
-			_backdrop_material.set_shader_parameter("weather_phase", fposmod(epoch, CLOUD_CYCLE_SECONDS) / CLOUD_CYCLE_SECONDS)
+		_sync_gas_lighting({"planet": _backdrop_planet, "material": _backdrop_material,
+			"halo": _backdrop_halo_material, "ring": _backdrop_ring_material}, epoch)
 	if _companion_id < 0:
 		_update_reflected_light(position_now)
 	_last_position = position_now
@@ -1035,12 +1044,14 @@ func _update_reflected_light(observer: Vector3) -> void:
 		travel += incoming * bounce
 		tint += Vector3(color.r, color.g, color.b) * bounce
 		flux += bounce
-	if _gas_giant_id >= 0:
-		var site := Catalog.site(_gas_giant_id)
-		var incoming := _backdrop_planet.position.direction_to(observer)
-		var bounce := _reflected_fraction(observer, _backdrop_planet.position, float(site.radius), incoming) * 0.36
+	for site_id: int in _gas_giant_views:
+		var site := Catalog.site(site_id)
+		var planet: Node3D = _gas_giant_views[site_id].planet
+		var incoming := planet.position.direction_to(observer)
+		var bounce := _reflected_fraction(observer, planet.position, float(site.radius), incoming) * 0.36
 		travel += incoming * bounce
-		tint += Vector3(0.92, 0.73, 0.56) * bounce
+		var color: Color = site.accent if _system_id == Catalog.SOLAR_SYSTEM else Color(0.92, 0.73, 0.56)
+		tint += Vector3(color.r, color.g, color.b) * bounce
 		flux += bounce
 	_fill.light_energy = minf(travel.length() * _sunlight.light_energy, 0.45)
 	if flux > 0.0001 and not travel.is_zero_approx():
@@ -1149,10 +1160,10 @@ func _surface_safe_camera(at: Vector3, sim: RefCounted) -> Vector3:
 		var threshold := Terrain.radius_at(site_id, local_direction) + CAMERA_SURFACE_CLEARANCE
 		if relative.length_squared() < threshold * threshold:
 			at = center + direction * threshold
-	if _gas_giant_id >= 0:
-		var center: Vector3 = sim.target_position(_gas_giant_id)
+	for site_id: int in _gas_giant_views:
+		var center: Vector3 = sim.target_position(site_id)
 		var offset := at - center
-		var limit := float(Catalog.site(_gas_giant_id).radius) + CAMERA_SURFACE_CLEARANCE
+		var limit := float(Catalog.site(site_id).radius) + CAMERA_SURFACE_CLEARANCE
 		if offset.length_squared() < limit * limit:
 			var outward := Vector3.BACK if offset.is_zero_approx() else offset.normalized()
 			at = center + outward * limit
@@ -2115,11 +2126,29 @@ void fragment() {
 	_stars = _mesh(_sector, mesh.commit(), paint, Vector3.ZERO)
 
 
-func _build_gas_giant(cool: bool, fringe: bool) -> void:
-	_backdrop_planet = Node3D.new()
-	_sector.add_child(_backdrop_planet)
-	var physical := _gas_giant_id >= 0
-	_backdrop_planet.name = "GasGiant_%d" % _gas_giant_id if physical else "DistantGasGiant"
+func _set_backdrop(giant: Dictionary) -> void:
+	# Preserve the primary view references used by existing camera/material tools.
+	_backdrop_planet = giant.get("planet")
+	_backdrop_material = giant.get("material")
+	_backdrop_halo_material = giant.get("halo")
+	_backdrop_ring_material = giant.get("ring")
+
+
+func _sync_gas_lighting(giant: Dictionary, epoch: float) -> void:
+	var planet: Node3D = giant.planet
+	var light_direction := planet.position.direction_to(_star.position)
+	for paint: ShaderMaterial in [giant.material, giant.halo, giant.ring]:
+		if paint != null:
+			paint.set_shader_parameter("light_direction", light_direction)
+	if _visual_profile > 0:
+		giant.material.set_shader_parameter("weather_phase", fposmod(epoch, CLOUD_CYCLE_SECONDS) / CLOUD_CYCLE_SECONDS)
+
+
+func _build_gas_giant(cool: bool, fringe: bool, site_id: int) -> Dictionary:
+	var planet := Node3D.new()
+	_sector.add_child(planet)
+	var physical := site_id >= 0
+	planet.name = "GasGiant_%d" % site_id if physical else "DistantGasGiant"
 	if not physical:
 		var display_scale := 1.65 if cool else 1.0
 		var initial_center := Vector3(1125, -330, -3370) if cool else Vector3(-1450, -475, -2900)
@@ -2127,12 +2156,12 @@ func _build_gas_giant(cool: bool, fringe: bool) -> void:
 			display_scale = 1.18
 			initial_center = Vector3(1480, -620, -2570)
 		var star_center: Vector3 = Catalog.site(_star_id).center
-		_backdrop_planet.scale = Vector3.ONE * display_scale
+		planet.scale = Vector3.ONE * display_scale
 		_backdrop_orbit_offset = initial_center * display_scale - star_center
 		_backdrop_orbit_axis = _backdrop_orbit_offset.cross(Vector3.UP).normalized()
 
 	var sphere := SphereMesh.new()
-	sphere.radius = float(Catalog.site(_gas_giant_id).radius) if physical else 870.0
+	sphere.radius = float(Catalog.site(site_id).radius) if physical else 870.0
 	sphere.height = sphere.radius * 2.0
 	sphere.radial_segments = 72
 	sphere.rings = 36
@@ -2143,6 +2172,9 @@ render_mode unshaded;
 uniform bool cool = false;
 uniform bool fringe = false;
 uniform bool physical_atmosphere = false;
+uniform bool custom_palette = false;
+uniform vec3 palette_low : source_color = vec3(0.09, 0.27, 0.37);
+uniform vec3 palette_high : source_color = vec3(0.77, 0.58, 0.40);
 uniform sampler2D cloud_detail : repeat_enable, filter_linear_mipmap_anisotropic;
 uniform int cloud_quality = 1;
 uniform float weather_phase = 0.0;
@@ -2190,6 +2222,10 @@ void fragment() {
 		low = vec3(0.09, 0.24, 0.18);
 		high = vec3(0.78, 0.60, 0.34);
 	}
+	if (custom_palette) {
+		low = palette_low;
+		high = palette_high;
+	}
 	vec3 bands = mix(low, high, m);
 	bands = mix(bands, high * vec3(1.16, 1.12, 1.07), wisps * (0.38 + 0.62 * m));
 	bands *= 1.0 - cloud_shadow * 0.24;
@@ -2206,16 +2242,25 @@ void fragment() {
 		: mix(clouds, limb, rim * 0.72) + limb * rim * 0.27;
 }
 """
-	_backdrop_material = ShaderMaterial.new()
-	_backdrop_material.shader = shader
-	_backdrop_material.set_shader_parameter("cool", cool)
-	_backdrop_material.set_shader_parameter("fringe", fringe)
-	_backdrop_material.set_shader_parameter("physical_atmosphere", physical)
-	_backdrop_material.set_shader_parameter("cloud_detail", preload("res://assets/materials/cloud_bands.png"))
-	_mesh(_backdrop_planet, sphere, _backdrop_material, Vector3.ZERO)
+	var material := ShaderMaterial.new()
+	material.shader = shader
+	material.set_shader_parameter("cool", cool)
+	material.set_shader_parameter("fringe", fringe)
+	material.set_shader_parameter("physical_atmosphere", physical)
+	material.set_shader_parameter("cloud_detail", preload("res://assets/materials/cloud_bands.png"))
+	if physical and Catalog.system_of_site(site_id) == Catalog.SOLAR_SYSTEM:
+		var site := Catalog.site(site_id)
+		var accent: Color = site.accent
+		material.set_shader_parameter("custom_palette", true)
+		material.set_shader_parameter("palette_low", site.get("gas_palette_low", accent.darkened(0.48)))
+		material.set_shader_parameter("palette_high", site.get("gas_palette_high", accent.lightened(0.22)))
+	_mesh(planet, sphere, material, Vector3.ZERO)
+	var giant := {"planet": planet, "material": material, "halo": null, "ring": null}
 	if physical:
 		# The live atmosphere provides the limb independently of the clouds.
-		return
+		if Catalog.site(site_id).get("rings", false):
+			giant.ring = _build_planet_ring(planet, sphere.radius, true)
+		return giant
 	var air := SphereMesh.new()
 	air.radius = 894.0
 	air.height = 1788.0
@@ -2239,23 +2284,27 @@ void fragment() {
 	ALPHA = smoothstep(0.51, 0.78, rim) * (1.0 - smoothstep(0.82, 1.0, rim)) * (0.018 + sunlit * 0.31);
 }
 """
-	_backdrop_halo_material = ShaderMaterial.new()
-	_backdrop_halo_material.shader = halo
-	_backdrop_halo_material.set_shader_parameter("cool", cool)
-	_backdrop_halo_material.set_shader_parameter("fringe", fringe)
-	_mesh(_fitting(_backdrop_planet, 1), air, _backdrop_halo_material, Vector3.ZERO)
+	var halo_material := ShaderMaterial.new()
+	halo_material.shader = halo
+	halo_material.set_shader_parameter("cool", cool)
+	halo_material.set_shader_parameter("fringe", fringe)
+	_mesh(_fitting(planet, 1), air, halo_material, Vector3.ZERO)
+	giant.halo = halo_material
 	if cool:
-		_build_planet_ring()
+		giant.ring = _build_planet_ring(planet)
+	return giant
 
 
-func _build_planet_ring() -> void:
+func _build_planet_ring(planet: Node3D, body_radius := 870.0, solar := false) -> ShaderMaterial:
 	var disc := QuadMesh.new()
-	disc.size = Vector2(3210.0, 3210.0)
+	disc.size = Vector2.ONE * (body_radius * 4.6 if solar else 3210.0)
 	var shader := Shader.new()
 	shader.code = """
 shader_type spatial;
 render_mode unshaded, blend_mix, cull_disabled, depth_draw_never;
 uniform vec3 light_direction = vec3(0.0, 1.0, 0.0);
+uniform float body_radius = 870.0;
+uniform bool warm_palette = false;
 varying vec3 ring_plane;
 void vertex() {
 	ring_plane = normalize(MODEL_MATRIX[0].xyz) * VERTEX.x + normalize(MODEL_MATRIX[1].xyz) * VERTEX.y;
@@ -2272,14 +2321,19 @@ void fragment() {
 	float bands = 0.61 + 0.22 * sin(radius * 155.0) * (1.0 - smoothstep(0.5, 2.8, pixel * 155.0)) + 0.16 * fine_bands;
 	float gap = smoothstep(0.005, 0.024 + pixel, abs(radius - 0.833));
 	// In the projected cylinder behind the planet, the rings lie in its shadow.
-	float clearance = length(cross(ring_plane, light_direction)) / 870.0;
+	float clearance = length(cross(ring_plane, light_direction)) / body_radius;
 	float shadow = smoothstep(0.96, 1.10, clearance);
 	float light = dot(ring_plane, light_direction) > 0.0 ? 1.0 : 0.21 + shadow * 0.79;
-	ALBEDO = mix(vec3(0.42, 0.42, 0.67), vec3(0.56, 0.78, 0.87), bands) * light;
+	vec3 low = warm_palette ? vec3(0.43, 0.36, 0.26) : vec3(0.42, 0.42, 0.67);
+	vec3 high = warm_palette ? vec3(0.91, 0.82, 0.63) : vec3(0.56, 0.78, 0.87);
+	ALBEDO = mix(low, high, bands) * light;
 	ALPHA = bands * rim * gap * 0.55;
 }
 """
-	_backdrop_ring_material = ShaderMaterial.new()
-	_backdrop_ring_material.shader = shader
-	var ring := _mesh(_backdrop_planet, disc, _backdrop_ring_material, Vector3.ZERO)
+	var material := ShaderMaterial.new()
+	material.shader = shader
+	material.set_shader_parameter("body_radius", body_radius)
+	material.set_shader_parameter("warm_palette", solar)
+	var ring := _mesh(planet, disc, material, Vector3.ZERO)
 	ring.basis = Basis(Vector3.FORWARD, -0.37) * Basis(Vector3.RIGHT, 1.12)
+	return material

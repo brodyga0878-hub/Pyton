@@ -42,6 +42,7 @@ const RENDEZVOUS_METRICS := [
 const SURVEY_METRICS := [
 	["radius", "Радиус модели"],
 	["diameter", "Диаметр модели"],
+	["physical_type", "Тип объекта"],
 	["mass_kg", "Гравитационная масса модели"],
 	["temperature_k", "Оценка температуры"],
 	["gravity", "Притяжение на радиусе"],
@@ -50,6 +51,9 @@ const SURVEY_METRICS := [
 	["associated_ports", "Действующие порты"],
 	["orbit_reference", "Центр орбиты"],
 	["period", "Период обращения"],
+	["semimajor", "Большая полуось"],
+	["eccentricity", "Эксцентриситет"],
+	["astronomy_epoch", "Эпоха элементов"],
 	["periapsis", "Перицентр"],
 	["apoapsis", "Апоцентр"],
 	["spin_period", "Период вращения"],
@@ -88,6 +92,7 @@ var _survey_scroll: ScrollContainer
 var _survey_scale: Label
 var _survey_note: Label
 var _survey_values: Dictionary[String, Label] = {}
+var _survey_captions: Dictionary[String, Label] = {}
 var _survey_status: Dictionary = {}
 var _scan_button: Button
 var _rendezvous_gap_buttons: Dictionary[int, Button] = {}
@@ -353,6 +358,7 @@ func _build_survey_panel(parent: PanelContainer) -> void:
 		caption.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		caption.size_flags_stretch_ratio = 0.90
 		caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_survey_captions[metric[0]] = caption
 		var value := _label(row, "", 16, TEXT)
 		value.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		value.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -645,11 +651,14 @@ func refresh_survey() -> void:
 		return
 	_survey_status = _flight.body_dossier(_candidate)
 	var known := bool(_survey_status.get("known", false))
+	var catalog_known := bool(_survey_status.get("catalog_known", false))
 	var can_scan := bool(_survey_status.get("can_scan", false))
 	var range_to_center := float(_survey_status.get("range", -1.0))
 	var relative_speed := float(_survey_status.get("relative_speed", -1.0))
 	_survey_target.text = str(_survey_status.get("name", "Цель не выбрана"))
 	_survey_state.text = "Наблюдение сохранено" if known else "Данных наблюдения пока нет"
+	if catalog_known and not known:
+		_survey_state.text = "Каталожные данные · личное наблюдение не записано"
 	if not known and can_scan:
 		_survey_state.text = "Сканирование доступно"
 	_survey_state.add_theme_color_override("font_color", MINT if known or can_scan else MUTED)
@@ -666,17 +675,35 @@ func refresh_survey() -> void:
 	_survey_note.visible = not _survey_note.text.is_empty()
 	_scan_button.visible = not known
 	_scan_button.disabled = not can_scan
-	_show_survey_values(_survey_status.get("data", {}) if known else {})
+	_show_survey_values(_survey_status.get("data", {}) if known or catalog_known else {})
 
 
 func _show_survey_values(data: Dictionary) -> void:
 	_survey_scale.visible = not data.is_empty()
-	for key: String in ["radius", "diameter", "periapsis", "apoapsis"]:
+	_survey_scale.text = "Размеры, время и гравитация в масштабе модели."
+	for metric: Array in SURVEY_METRICS:
+		_survey_captions[metric[0]].text = str(metric[1])
+	var physical: Array = data.get("physical_fields", [])
+	if data.get("physical_catalog", false):
+		_survey_scale.text = str(data.get("scale_notice", "Справочные данные приведены в физических единицах."))
+		var notice := str(data.get("ephemeris_notice", ""))
+		if not notice.is_empty():
+			_survey_scale.text += "\n" + notice
+		var names := {"radius": "Справочный радиус", "diameter": "Справочный диаметр", "mass_kg": "Масса", "gravity": "Притяжение GM/R²", "gravity_parameter": "Физический параметр GM", "temperature_k": "Температура из каталога"}
+		for key: String in names:
+			if key in physical:
+				_survey_captions[key].text = str(names[key])
+		if not "spin_period" in physical:
+			_survey_captions.spin_period.text = "Период вращения модели"
+			_survey_captions.spin.text = "Угловая скорость модели"
+		_survey_captions.atmosphere_height.text = "Атмосферный слой модели"
+		_survey_captions.contact.text = "Касание грунта в модели"
+	for key: String in ["radius", "diameter", "periapsis", "apoapsis", "semimajor"]:
 		var distance := float(data.get(key, 0.0))
 		_set_survey_value(key, _distance_label(distance).replace(".", ",") if distance > 0.0 else "")
 	for key: String in ["period", "spin_period"]:
 		var seconds := float(data.get(key, 0.0))
-		_set_survey_value(key, _duration_label(seconds) if seconds > 0.0 else "")
+		_set_survey_value(key, (_physical_duration_label(seconds) if key in physical else _duration_label(seconds)) if seconds > 0.0 else "")
 	var surface := str(data.get("surface_class", ""))
 	var link := str(data.get("ground_reference", ""))
 	var center := str(data.get("orbit_reference", ""))
@@ -684,7 +711,12 @@ func _show_survey_values(data: Dictionary) -> void:
 	var temperature := float(data.get("temperature_k", 0.0))
 	_set_survey_value("mass_kg", _mass_survey(float(data.get("mass_kg", 0.0))))
 	_set_survey_value("temperature_k", "%d К · %s" % [roundi(temperature),
-		"фотосфера по классу звезды" if surface == "star" else "равновесная в модели"] if temperature > 0.0 else "")
+		"справочное значение" if "temperature_k" in physical else ("фотосфера по классу звезды" if surface == "star" else "равновесная в модели")] if temperature > 0.0 else "")
+	var types := {"star": "Звезда", "planet": "Планета", "terrestrial_planet": "Планета земной группы", "gas_giant": "Газовый гигант", "ice_giant": "Ледяной гигант", "dwarf_planet": "Карликовая планета", "moon": "Естественный спутник", "comet": "Комета"}
+	var body_type := str(data.get("physical_type", ""))
+	_set_survey_value("physical_type", str(types.get(body_type, body_type)))
+	_set_survey_value("astronomy_epoch", str(data.get("astronomy_epoch", "")))
+	_set_survey_value("eccentricity", ("%.6f" % float(data.eccentricity)).replace(".", ",") if data.has("eccentricity") else "")
 	_set_survey_value("ground_reference", link)
 	var port_names := PackedStringArray()
 	for port: int in data.get("associated_ports", []):
@@ -692,6 +724,9 @@ func _show_survey_values(data: Dictionary) -> void:
 	_set_survey_value("associated_ports", " · ".join(port_names))
 	_set_survey_value("orbit_reference", center if not center.is_empty() or surface != "star" else "Неподвижна в системе")
 	_gravity_survey(surface, mu, float(data.get("gravity", 0.0)))
+	if "gravity_parameter" in physical and mu > 0.0:
+		var exponent := floori(log(mu) / log(10.0))
+		_set_survey_value("gravity_parameter", "%s × 10^%d м³/с²" % [("%.4f" % (mu / pow(10.0, exponent))).replace(".", ","), exponent])
 	var spin := float(data.get("spin", 0.0))
 	_set_survey_value("spin", _number_label(rad_to_deg(spin), "°/с", true) if spin != 0.0 else "")
 	_set_survey_value("surface", _surface_survey(surface, spin))
@@ -1036,6 +1071,14 @@ static func _duration_label(seconds: float) -> String:
 	return "%d мин %02d с" % [floori(whole / 60.0), whole % 60] if whole >= 60 else "%d с" % whole
 
 
+static func _physical_duration_label(seconds: float) -> String:
+	if seconds >= 2.0 * 365.25 * 86400.0:
+		return ("%.3f" % (seconds / (365.25 * 86400.0))).replace(".", ",") + " г."
+	if seconds >= 86400.0:
+		return ("%.3f сут" % (seconds / 86400.0)).replace(".", ",")
+	return _duration_label(seconds)
+
+
 static func _label(parent: Container, caption: String, font_size: int, tint: Color) -> Label:
 	var label := Label.new()
 	label.text = caption
@@ -1133,7 +1176,7 @@ class SectorChart extends Control:
 		var positions: Array[Vector3] = centers.values()
 		if side:
 			positions.append(ship_position)
-		if side or center_of_mass.is_finite():
+		if side or center_of_mass.is_finite() or (selected_site >= 0 and Sector.is_astronomical_system(Sector.system_of_site(selected_site))):
 			for orbit_point: Vector3 in orbit:
 				positions.append(orbit_point)
 		for points: PackedVector3Array in stellar_orbits.values():

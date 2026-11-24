@@ -29,7 +29,7 @@ static func profile(site: int) -> Dictionary:
 
 
 static func sample(sim: RefCounted, point: Vector3, velocity: Vector3) -> Dictionary:
-	var site := _site_for_system(sim.system_id)
+	var site := _site_for_point(sim.system_id, point, 0.0, sim)
 	if site < 0 or not point.is_finite() or not velocity.is_finite():
 		return {
 			"site": -1, "inside": false, "near": false, "density": 0.0, "altitude": -1.0,
@@ -64,8 +64,10 @@ static func drag(velocity: Vector3, drift: Vector3, density: float, delta: float
 
 
 static func drag_at_epoch(system: int, point: Vector3, velocity: Vector3, epoch: float, delta: float) -> Vector3:
-	var site := _site_for_system(system)
-	if site < 0 or not point.is_finite() or not is_finite(epoch):
+	if not point.is_finite() or not is_finite(epoch):
+		return velocity
+	var site := _site_for_point(system, point, epoch)
+	if site < 0:
 		return velocity
 	var state := Orbit.sample(site, epoch)
 	var radial := point - Vector3(state.position)
@@ -95,6 +97,28 @@ static func _depth(altitude: float, height: float) -> float:
 
 static func _site_for_system(system: int) -> int:
 	return _system_sites.get(system, -1)
+
+
+static func _site_for_point(system: int, point: Vector3, epoch: float, sim: RefCounted = null) -> int:
+	if system != Catalog.SOLAR_SYSTEM:
+		return _site_for_system(system)
+	if not point.is_finite():
+		return -1
+	# A multi-planet system has no single global atmosphere. Compare shell
+	# heights at the queried position, including the forecast's moving epoch.
+	var nearest := -1
+	var nearest_height := INF
+	for site: int in Catalog.system(system).get("atmospheric_sites", []):
+		var layer := profile(site)
+		var height := float(layer.get("height", 0.0))
+		if height <= 0.0:
+			continue
+		var center: Vector3 = sim.target_position(site) if sim != null else Orbit.sample(site, epoch).position
+		var normalized_height := (point.distance_to(center) - float(Catalog.site(site).radius)) / height
+		if normalized_height < nearest_height:
+			nearest = site
+			nearest_height = normalized_height
+	return nearest
 
 
 static func _build_system_sites() -> Dictionary[int, int]:

@@ -42,6 +42,8 @@ const ELEMENTS := {
 
 class Track:
 	var parent := -1
+	var astronomical := false
+	var semimajor := 0.0
 	var epoch: Vector3
 	var focus: Vector3
 	var major_axis: Vector3
@@ -69,6 +71,13 @@ static func sample(site_id: int, seconds: float) -> Dictionary:
 	var track := _track_for(site_id)
 	if track.period <= 0.0:
 		return {"position": track.epoch, "velocity": Vector3.ZERO}
+	if track.astronomical:
+		var state := _astronomical_state(track, seconds)
+		if track.parent >= 0:
+			var parent := sample(track.parent, seconds if is_finite(seconds) else 0.0)
+			state.position += parent.position
+			state.velocity += parent.velocity
+		return state
 	var eccentric_angle := track.eccentric_at_epoch
 	if seconds != 0.0 and is_finite(seconds):
 		var mean := wrapf(track.mean_at_epoch + track.mean_motion * fposmod(seconds, track.period), -PI, PI)
@@ -125,6 +134,8 @@ static func extrema(site_id: int) -> Vector2:
 	var track := _track_for(site_id)
 	if track.period <= 0.0:
 		return Vector2.ZERO
+	if track.astronomical:
+		return Vector2(track.semimajor * (1.0 - track.eccentricity), track.semimajor * (1.0 + track.eccentricity))
 	return Vector2(1.0 - track.eccentricity, 1.0 + track.eccentricity) * track.major_axis.length()
 
 
@@ -159,6 +170,8 @@ static func _build_track(site_id: int) -> Track:
 	var site := Catalog.site(site_id)
 	var system_id := Catalog.system_of_site(site_id)
 	var system := Catalog.system(system_id)
+	if site.get("astronomical_orbit") is Dictionary:
+		return _build_astronomical_track(site_id, site, system)
 	if system.has("barycenter"):
 		return _build_binary_track(site, system)
 	var track := Track.new()
@@ -190,6 +203,145 @@ static func _build_track(site_id: int) -> Track:
 	track.mean_motion = sqrt(mu / (semi_major * semi_major * semi_major))
 	track.period = TAU / track.mean_motion
 	return track
+
+
+static func _finite_number(value: Variant) -> bool:
+	return (value is float or value is int) and is_finite(float(value))
+
+
+static func _kepler_difference(angle: float) -> float:
+	# E - sin(E) loses its small cubic term near periapsis. Its Taylor form
+	# keeps the safeguarded solve useful for eccentricities close to one.
+	if absf(angle) >= 0.01:
+		return angle - sin(angle)
+	var square := angle * angle
+	return angle * square / 6.0 * (1.0 - square / 20.0 + square * square / 840.0 - square * square * square / 60480.0)
+
+
+static func _normalized_angle(angle: float) -> float:
+	# fmod preserves tiny anomalies instead of adding/subtracting PI first.
+	var value := fmod(angle, TAU)
+	return value - TAU if value > PI else value + TAU if value < -PI else value
+
+
+static func solve_eccentric_anomaly(mean: float, eccentricity: float) -> float:
+	if not is_finite(mean) or not is_finite(eccentricity) or eccentricity < 0.0 or eccentricity >= 1.0:
+		return NAN
+	mean = _normalized_angle(mean)
+	if eccentricity == 0.0 or mean == 0.0:
+		return mean
+	var low := -PI
+	var high := PI
+	var angle := mean
+	if eccentricity >= 0.8:
+		# Near periapsis, seed with the smaller linear/cubic solution. This also
+		# resolves tiny means at e -> 1 without spending the budget bisecting PI.
+		angle = signf(mean) * minf(PI, minf(absf(mean) / (1.0 - eccentricity), pow(6.0 * absf(mean) / eccentricity, 1.0 / 3.0)))
+	for iteration in range(80):
+		var error := (1.0 - eccentricity) * angle + eccentricity * _kepler_difference(angle) - mean
+		if error == 0.0:
+			return angle
+		if error > 0.0:
+			high = angle
+		else:
+			low = angle
+		var half_sine := sin(angle * 0.5)
+		var slope := (1.0 - eccentricity) + 2.0 * eccentricity * half_sine * half_sine
+		var candidate := angle - error / slope
+		if not is_finite(candidate) or candidate <= low or candidate >= high:
+			candidate = low + (high - low) * 0.5
+		if candidate == angle:
+			return angle
+		angle = candidate
+	return angle
+
+
+static func _track_from_astronomical_elements(elements: Dictionary, focus := Vector3.ZERO) -> Track:
+	var result := Track.new()
+	result.epoch = focus
+	for field: String in ["semimajor", "eccentricity", "inclination", "ascending_node", "argument_of_periapsis", "mean_anomaly", "period"]:
+		if not _finite_number(elements.get(field)):
+			return result
+	var major := float(elements.semimajor)
+	var eccentricity := float(elements.eccentricity)
+	var seconds := float(elements.period)
+	if major <= 0.0 or eccentricity < 0.0 or eccentricity >= 1.0 or seconds <= 0.0 or not focus.is_finite():
+		return result
+	var motion := TAU / seconds
+	if not is_finite(motion) or motion <= 0.0:
+		return result
+	var maximum_speed := major * motion * sqrt((1.0 + eccentricity) / (1.0 - eccentricity))
+	if not (Vector3.ONE * major * 2.0).is_finite() or not (Vector3.ONE * maximum_speed).is_finite():
+		return result
+	var inclination := deg_to_rad(fposmod(float(elements.inclination), 360.0))
+	var node := deg_to_rad(fposmod(float(elements.ascending_node), 360.0))
+	var periapsis := deg_to_rad(fposmod(float(elements.argument_of_periapsis), 360.0))
+	var cn := cos(node)
+	var sn := sin(node)
+	var cp := cos(periapsis)
+	var sp := sin(periapsis)
+	var ci := cos(inclination)
+	var si := sin(inclination)
+	# Classical J2000 ecliptic XYZ is represented as scene (X, Z, -Y).
+	# This is a proper rotation: +Y is the scene's ecliptic north pole.
+	var p := Vector3(cn * cp - sn * sp * ci, sp * si, -(sn * cp + cn * sp * ci))
+	var q := Vector3(-cn * sp - sn * cp * ci, cp * si, -(-sn * sp + cn * cp * ci))
+	result.major_axis = p * major
+	result.minor_axis = q * (major * sqrt((1.0 - eccentricity) * (1.0 + eccentricity)))
+	if not result.major_axis.is_finite() or not result.minor_axis.is_finite():
+		return Track.new()
+	result.focus = focus
+	result.eccentricity = eccentricity
+	result.semimajor = major
+	result.mean_at_epoch = _normalized_angle(deg_to_rad(fmod(float(elements.mean_anomaly), 360.0)))
+	result.eccentric_at_epoch = solve_eccentric_anomaly(result.mean_at_epoch, eccentricity)
+	result.mean_motion = motion
+	result.period = seconds
+	result.astronomical = true
+	result.epoch = _position(result, sin(result.eccentric_at_epoch), cos(result.eccentric_at_epoch))
+	if not result.epoch.is_finite() or not _astronomical_state(result, 0.0).velocity.is_finite():
+		return Track.new()
+	return result
+
+
+static func _build_astronomical_track(site_id: int, site: Dictionary, _system: Dictionary) -> Track:
+	var parent := int(site.get("orbit_parent", -1))
+	if parent >= 0:
+		# A supplied catalog graph must terminate inside this same system.
+		var ancestors := {}
+		ancestors[site_id] = true
+		var cursor := parent
+		for depth in range(64):
+			if ancestors.has(cursor) or not Catalog.is_site_id(cursor) or Catalog.system_of_site(cursor) != Catalog.system_of_site(site_id):
+				return Track.new()
+			ancestors[cursor] = true
+			cursor = int(Catalog.site(cursor).get("orbit_parent", -1))
+			if cursor < 0:
+				break
+		if cursor >= 0:
+			return Track.new()
+	var focus := Vector3.ZERO if parent >= 0 else Vector3(Catalog.site(Catalog.star_for(Catalog.system_of_site(site_id))).center)
+	var track := _track_from_astronomical_elements(site.astronomical_orbit, focus)
+	track.parent = parent if track.astronomical else -1
+	return track
+
+
+static func _astronomical_state(track: Track, seconds: float) -> Dictionary:
+	var elapsed := seconds if is_finite(seconds) else 0.0
+	var mean := _normalized_angle(track.mean_at_epoch + track.mean_motion * fposmod(elapsed, track.period))
+	var angle := track.eccentric_at_epoch if elapsed == 0.0 else solve_eccentric_anomaly(mean, track.eccentricity)
+	var sine := sin(angle)
+	var cosine := cos(angle)
+	var half_sine := sin(angle * 0.5)
+	var rate := track.mean_motion / ((1.0 - track.eccentricity) + 2.0 * track.eccentricity * half_sine * half_sine)
+	return {"position": _position(track, sine, cosine), "velocity": (track.minor_axis * cosine - track.major_axis * sine) * rate}
+
+
+static func sample_elements(elements: Dictionary, seconds := 0.0) -> Dictionary:
+	# Public pure boundary for catalog/audit callers. Invalid or parabolic and
+	# hyperbolic elements are unavailable, never a fabricated circular orbit.
+	var track := _track_from_astronomical_elements(elements)
+	return _astronomical_state(track, seconds) if track.astronomical else {}
 
 
 static func _build_binary_track(site: Dictionary, system: Dictionary) -> Track:

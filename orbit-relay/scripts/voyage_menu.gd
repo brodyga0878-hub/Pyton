@@ -163,7 +163,8 @@ func _build_session_actions(parent: HBoxContainer) -> void:
 	parent.add_child(group)
 	_label(group, "Текущий рейс", 22, MUTED)
 	_add_action(group, "continue", "Продолжить")
-	_add_action(group, "new", "Новый рейс")
+	_add_action(group, "new_solar", "Рейс у Земли").tooltip_text = "Начать рядом с Землёй в Солнечной системе."
+	_add_action(group, "new", "Новый рейс · кампания")
 	_add_action(group, "recover", "Восстановить резерв")
 	_add_action(group, "import", "Загрузить файл")
 
@@ -230,6 +231,7 @@ func _sync() -> void:
 	_actions["report"].disabled = pending
 	_actions["continue"].disabled = pending or (_startup and not _primary_available)
 	_actions["new"].disabled = pending
+	_actions["new_solar"].disabled = pending
 	_actions["recover"].disabled = pending or not _backup_available
 	_actions["import"].disabled = pending
 	_actions["create"].disabled = _startup or _slot_names.size() >= Library.MAX_SLOTS
@@ -261,11 +263,12 @@ func _request_action(action: String) -> void:
 	notify("")
 	var name: String = _slot_names.get(_selected_slot, "")
 	match action:
-		"new":
+		"new", "new_solar":
 			if _startup and not _primary_available and not _backup_available:
 				_emit_action(action)
 			else:
-				_begin_pending(action, "", CHANGE_NOTICE, "Начать новый рейс")
+				var label := "Начать у Земли" if action == "new_solar" else "Начать новый рейс"
+				_begin_pending(action, "", CHANGE_NOTICE, label)
 		"recover":
 			if _startup and not _primary_available:
 				_emit_action(action)

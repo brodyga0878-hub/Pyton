@@ -16,6 +16,7 @@ const MAX_ATLAS_ZOOM := 65536.0
 const ATLAS_DENSITY_SIDE := 160
 const MAX_ATLAS_SECTORS := 48
 const CORE_VIEW_SPAN := 34.0
+const SOLAR_VIEW_SPAN := 28.0
 const MAX_LABELS := 24
 const ROTATION_RADIANS_PER_PIXEL := 0.009
 
@@ -44,6 +45,9 @@ var _orbit_angles := Vector2.ZERO
 var _zoom := MIN_ZOOM
 var _focus := -1
 var _atlas := false
+var _astronomy := false
+var _galactic_scale := false
+var _pending_astronomy_focus := -1
 var _label_boxes: Array[Rect2] = []
 var _detailed := false
 var _elevation := false
@@ -101,6 +105,45 @@ func set_atlas(active: bool) -> void:
 	_update_frame()
 	reset_view()
 	rotation_availability_changed.emit(not _atlas)
+
+
+func set_astronomy(active: bool) -> void:
+	if _astronomy == active:
+		return
+	_astronomy = active
+	_galactic_scale = false
+	_pending_astronomy_focus = -1
+	_update_frame()
+	reset_view()
+
+
+func focus_astronomy(id: int) -> void:
+	_pending_astronomy_focus = -1
+	if not _astronomy or not _positions.has(id):
+		return
+	if size.x < 64.0 or size.y < 64.0:
+		_pending_astronomy_focus = id
+		return
+	_galactic_scale = false
+	_update_frame()
+	reset_view()
+	var target_pixels := minf(size.x, size.y) / SOLAR_VIEW_SPAN
+	_zoom = clampf(target_pixels / _pixels_per_light_year(), MIN_ZOOM, _zoom_limit())
+	_view_offset = _bound_offset(_points[id] - _center)
+	_atlas_view_changed()
+
+
+func show_milky_way_center() -> void:
+	if not _astronomy:
+		return
+	_pending_astronomy_focus = -1
+	_galactic_scale = true
+	_update_frame()
+	reset_view()
+
+
+func showing_milky_way_center() -> bool:
+	return _astronomy and _galactic_scale
 
 
 func _sparse_atlas() -> bool:
@@ -193,7 +236,7 @@ func can_zoom_out() -> bool:
 
 
 func _zoom_limit() -> float:
-	return MAX_ATLAS_ZOOM if _atlas else MAX_ZOOM
+	return MAX_ATLAS_ZOOM if _atlas or _astronomy else MAX_ZOOM
 
 
 func focus_atlas_core() -> void:
@@ -215,6 +258,9 @@ func atlas_is_local() -> bool:
 
 
 func _atlas_view_changed() -> void:
+	if _pending_astronomy_focus >= 0 and size.x >= 64.0 and size.y >= 64.0:
+		focus_astronomy(_pending_astronomy_focus)
+		return
 	var visible := _visible_atlas_sectors()
 	if visible != _atlas_sector_rect:
 		_atlas_sector_rect = visible
@@ -266,7 +312,11 @@ func _update_frame() -> void:
 	for point in _positions.values():
 		low = low.min(point)
 		high = high.max(point)
-	if _detailed:
+	if showing_milky_way_center():
+		var solar := Sector.system_position3(Sector.SOLAR_SYSTEM)
+		low = solar.min(Sector.GALACTIC_CENTER_LY)
+		high = solar.max(Sector.GALACTIC_CENTER_LY)
+	elif _detailed:
 		var corner := Vector2(Sector.sector_coordinates(_focus)) * Sector.SECTOR_SIZE
 		low.x = corner.x
 		high.x = corner.x + Sector.SECTOR_SIZE
@@ -282,8 +332,9 @@ func _update_frame() -> void:
 func marker_position(id: int) -> Vector2:
 	# Route nodes can be outside the bounded visible-sector cache. Project them
 	# on demand; never replace a known route endpoint with the atlas centre.
-	if _sparse_atlas() and _known_systems.has(id) and not _points.has(id):
-		_points[id] = _project(id, _elevation)
+	if (_sparse_atlas() or _astronomy) and _known_systems.has(id) and not _points.has(id):
+		var coordinates := Sector.system_position3(id)
+		_points[id] = _map_plane(coordinates, _elevation) if _orbit_angles.is_zero_approx() else _project_orbit(coordinates, _view_basis())
 	return _project_to_view(_points.get(id, _center))
 
 
@@ -307,7 +358,7 @@ func system_at(point: Vector2) -> int:
 		return -1
 	var visible_bounds := bounds.grow(-3.0)
 	var nearest := -1
-	var pick_radius := 40.0 if _detailed else 30.0
+	var pick_radius := 18.0 if _astronomy else (40.0 if _detailed else 30.0)
 	var limit := pick_radius * pick_radius
 	for id in _marker_ids():
 		var marker := marker_position(id)
@@ -321,6 +372,8 @@ func system_at(point: Vector2) -> int:
 
 
 func _marker_ids() -> Array[int]:
+	if showing_milky_way_center():
+		return [Sector.SOLAR_SYSTEM]
 	if not _atlas or (not atlas_is_local() and _systems.size() <= Sector.SYSTEM_COUNT):
 		return _systems
 	var markers: Array[int] = []
@@ -353,6 +406,8 @@ func _draw() -> void:
 		else:
 			_draw_density(bounds)
 		_draw_atlas_core(bounds)
+	elif showing_milky_way_center():
+		_draw_milky_way_center(bounds)
 	elif _detailed:
 		_draw_sector_border()
 	var active := _route_path(planned_path, planned)
@@ -364,9 +419,14 @@ func _draw() -> void:
 	var visible_ids: Array[int] = []
 	var visible_bounds := bounds.grow(-3.0)
 	for id: int in _marker_ids():
-		if not visible_bounds.has_point(marker_position(id)):
+		var point := marker_position(id)
+		if not visible_bounds.has_point(point):
+			continue
+		if _astronomy and not _known_systems.has(id) and id != candidate and id != Sector.SOLAR_SYSTEM:
+			draw_circle(point, 1.6, Color(MUTED, 0.56), true, -1.0, true)
 			continue
 		visible_ids.append(id)
+	for id in visible_ids:
 		_draw_marker(id, active)
 	_label_boxes.clear()
 	# Route endpoints receive space before optional intermediate captions.
@@ -456,10 +516,19 @@ func _draw_atlas_sectors(bounds: Rect2) -> void:
 
 func _draw_atlas_core(bounds: Rect2) -> void:
 	var point := _project_to_view(_atlas_core())
+	_draw_core_marker(point, "Ядро", bounds)
+
+
+func _draw_milky_way_center(bounds: Rect2) -> void:
+	var coordinates := Sector.GALACTIC_CENTER_LY
+	var point := _map_plane(coordinates, _elevation) if _orbit_angles.is_zero_approx() else _project_orbit(coordinates, _view_basis())
+	_draw_core_marker(_project_to_view(point), "Центр Млечного Пути", bounds)
+
+
+func _draw_core_marker(point: Vector2, caption: String, bounds: Rect2) -> void:
 	if not bounds.grow(-16.0).has_point(point):
 		return
 	draw_arc(point, 12.0, 0.0, TAU, 28, AMBER, 1.5, true)
-	var caption := "Ядро"
 	var font := ThemeDB.fallback_font
 	var width := font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1.0, 14).x
 	var origin := Vector2(clampf(point.x + 19.0, 8.0, size.x - width - 8.0), point.y - 13.0)
@@ -505,7 +574,7 @@ func _has_edge(path: Array[int], a: int, b: int) -> bool:
 
 
 func _draw_routes(active: Array[int], preview: Array[int]) -> void:
-	if not _atlas and _systems.has(current) and (_detailed or _systems.size() <= 32):
+	if not _atlas and not _astronomy and _systems.has(current) and (_detailed or _systems.size() <= 32):
 		for id in _systems:
 			if not _leg_reachable(current, id) or _has_edge(active, current, id) or _has_edge(preview, current, id):
 				continue
@@ -518,7 +587,7 @@ func _draw_routes(active: Array[int], preview: Array[int]) -> void:
 
 
 func _leg_points(a: int, b: int, shift := 0.0) -> PackedVector2Array:
-	var listed := _known_systems.has(a) and _known_systems.has(b) if _atlas else _systems.has(a) and _systems.has(b)
+	var listed := _known_systems.has(a) and _known_systems.has(b) if _atlas or _astronomy else _systems.has(a) and _systems.has(b)
 	if not listed or not _leg_reachable(a, b):
 		return PackedVector2Array()
 	var origin := marker_position(a)

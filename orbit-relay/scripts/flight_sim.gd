@@ -276,6 +276,18 @@ var _rendezvous_holding := false
 var _entry_site := -1
 
 
+func start_solar_voyage() -> void:
+	system_id = Catalog.SOLAR_SYSTEM
+	cartography.mark_discovered(system_id, orbit_time)
+	docked = -1
+	_port_account.leave()
+	target = Catalog.SOLAR_EARTH
+	var earth := Catalog.site(target)
+	var orbit := Orbit.sample(target, orbit_time)
+	position = orbit.position + Vector3.BACK * (float(earth.radius) + 290.0)
+	velocity = orbit.velocity
+
+
 func speed() -> float:
 	return velocity.length()
 
@@ -4208,8 +4220,7 @@ func _scoop_site() -> int:
 		return _scoop_body
 	if is_scoop_site(target):
 		return target
-	var giant := Catalog.gas_giant_for(system_id)
-	if giant >= 0:
+	for giant: int in Catalog.gas_giants_for(system_id):
 		var near_radius := float(Catalog.site(giant).radius) + GAS_SCOOP_MAX_ALTITUDE + 120.0
 		if position.distance_squared_to(target_position(giant)) <= near_radius * near_radius:
 			return giant
@@ -4598,6 +4609,8 @@ func plan_jump(destination: int) -> bool:
 
 func route_preview(goal: int) -> Dictionary:
 	var known := _known_systems(expedition, cartography)
+	if Catalog.is_astronomical_system(system_id) and Catalog.is_astronomical_system(goal):
+		known = known.filter(Catalog.is_astronomical_system)
 	var capacity := ship.active_jump_capacity()
 	var reserve := ship.active_jump_fuel()
 	var reachable_first_leg := _plot_route(goal, known, capacity, reserve, -1)
@@ -4609,7 +4622,7 @@ func route_preview(goal: int) -> Dictionary:
 func _plot_route(goal: int, known: Array[int], capacity: float, first_reserve: float, first_waste: int) -> Dictionary:
 	var payload: int = mining.ore_hold
 	var later_waste := 0 if ship.drive_kind == ShipSystems.DRIVE_MILITARY else -1
-	var include_extension := not known.is_empty() and Catalog.is_extended_system(known.back())
+	var include_extension: bool = not known.is_empty() and known.back() >= Catalog.SYSTEM_COUNT
 	var tariff := func(origin: int, destination: int) -> int:
 		var reserve := first_reserve if origin == system_id else capacity
 		return ship.jump_tariff(Catalog.jump_cost(origin, destination), payload, reserve, first_waste if origin == system_id else later_waste)

@@ -3,6 +3,8 @@ extends RefCounted
 
 const ProceduralSystems = preload("res://scripts/procedural_systems.gd")
 const StreamedGalaxy := preload("res://scripts/streamed_galaxy.gd")
+const Solar := preload("res://scripts/solar_system.gd")
+const StellarCatalog := preload("res://scripts/stellar_catalog.gd")
 const SECTOR_SIZE := ProceduralSystems.SECTOR_SIZE
 const GENERATED_SCAN_RANGE := 10.5
 const GENERATED_JUMP_ENTRY := 5.0
@@ -44,9 +46,17 @@ const PRE_ATLAS_DESTINATION_COUNT := PRE_EXPANDED_DESTINATION_COUNT + Procedural
 const PRE_RICH_SYSTEMS_DESTINATION_COUNT := PRE_ATLAS_DESTINATION_COUNT + ProceduralSystems.OUTER_SYSTEM_COUNT * ProceduralSystems.TARGETS_PER_SYSTEM
 const PRE_REACH_DESTINATION_COUNT := PRE_RICH_SYSTEMS_DESTINATION_COUNT + ProceduralSystems.MOON_COUNT + ProceduralSystems.GAS_GIANT_COUNT
 const DESTINATION_COUNT := PRE_REACH_DESTINATION_COUNT + ProceduralSystems.REACH_SITE_COUNT
-const GALAXY_SYSTEM_COUNT := SYSTEM_COUNT + StreamedGalaxy.SYSTEMS
+const STREAMED_SYSTEM_LIMIT := SYSTEM_COUNT + StreamedGalaxy.SYSTEMS
+const STREAMED_SITE_LIMIT := DESTINATION_COUNT + StreamedGalaxy.SYSTEMS * StreamedGalaxy.SITES_PER_SYSTEM
+const SOLAR_SYSTEM := STREAMED_SYSTEM_LIMIT
+const SOLAR_EARTH := STREAMED_SITE_LIMIT + Solar.EARTH_INDEX
+const SOLAR_POSITION_LY := Vector3(0.0, -5.0, 0.0)
+const GALACTIC_CENTER_LY := SOLAR_POSITION_LY + Vector3(26700.0, 0.0, 0.0)
+const FIRST_ASTRONOMICAL_STAR := SOLAR_SYSTEM + 1
+const FIRST_ASTRONOMICAL_STAR_SITE := STREAMED_SITE_LIMIT + Solar.SITE_COUNT
+const GALAXY_SYSTEM_COUNT := FIRST_ASTRONOMICAL_STAR + StellarCatalog.COUNT
 const SYSTEM_ID_LIMIT := GALAXY_SYSTEM_COUNT
-const SITE_ID_LIMIT := DESTINATION_COUNT + StreamedGalaxy.SYSTEMS * StreamedGalaxy.SITES_PER_SYSTEM
+const SITE_ID_LIMIT := FIRST_ASTRONOMICAL_STAR_SITE + StellarCatalog.COUNT
 const GALAXY_BOUNDS := StreamedGalaxy.BOUNDS
 const GALAXY_CENTER_SECTOR := StreamedGalaxy.CORE_SECTOR
 const GALAXY_CENTER_SYSTEM := SYSTEM_COUNT
@@ -198,11 +208,16 @@ static var _outer := ProceduralSystems.build_outer(PRE_ATLAS_DESTINATION_COUNT, 
 static var _reach := ProceduralSystems.build_reach(PRE_REACH_DESTINATION_COUNT, _outer.systems)
 static var _generated_index := _index_generated_systems()
 static var _streamed: Dictionary[int, Dictionary] = {}
+static var _solar := Solar.build(STREAMED_SITE_LIMIT, SOLAR_POSITION_LY)
+static var _astronomical_index := _index_astronomical_systems()
 
 
 static func site(id: int) -> Dictionary:
 	if not is_site_id(id):
 		return {}
+	if id >= STREAMED_SITE_LIMIT:
+		var astronomy := _astronomical_entry(system_of_site(id))
+		return astronomy.sites[id - STREAMED_SITE_LIMIT if id < FIRST_ASTRONOMICAL_STAR_SITE else 0]
 	if id >= DESTINATION_COUNT:
 		var entry := _streamed_for(system_of_site(id))
 		return entry.sites[(id - DESTINATION_COUNT) % StreamedGalaxy.SITES_PER_SYSTEM]
@@ -222,6 +237,8 @@ static func site(id: int) -> Dictionary:
 static func system(id: int) -> Dictionary:
 	if not is_system_id(id):
 		return {}
+	if is_astronomical_system(id):
+		return _astronomical_entry(id).system
 	if is_extended_system(id):
 		return _streamed_for(id).system
 	if id >= PRE_REACH_SYSTEM_COUNT:
@@ -248,7 +265,27 @@ static func is_site_id(id: int) -> bool:
 
 
 static func is_extended_system(id: int) -> bool:
-	return id >= SYSTEM_COUNT and id < SYSTEM_ID_LIMIT
+	return id >= SYSTEM_COUNT and id < STREAMED_SYSTEM_LIMIT
+
+
+static func is_astronomical_system(id: int) -> bool:
+	return id >= SOLAR_SYSTEM and id < SYSTEM_ID_LIMIT
+
+
+static func astronomical_system_ids() -> Array[int]:
+	return _astronomical_index.ids
+
+
+static func astronomical_sector_system_ids(coordinates: Vector2i) -> Array[int]:
+	var ids: Array[int] = []
+	ids.assign(_astronomical_index.sectors.get(coordinates, []))
+	return ids
+
+
+static func _astronomical_entry(id: int) -> Dictionary:
+	if id == SOLAR_SYSTEM:
+		return _solar
+	return _streamed_for(id)
 
 
 static func _streamed_for(id: int) -> Dictionary:
@@ -256,13 +293,22 @@ static func _streamed_for(id: int) -> Dictionary:
 		return _streamed[id]
 	if _streamed.size() >= MAX_CACHED_STREAMED_SYSTEMS:
 		_streamed.erase(_streamed.keys()[0])
-	var ordinal := id - SYSTEM_COUNT
-	var entry := StreamedGalaxy.build_system(ordinal, DESTINATION_COUNT + ordinal * StreamedGalaxy.SITES_PER_SYSTEM)
+	var entry: Dictionary
+	if is_astronomical_system(id):
+		var index := id - FIRST_ASTRONOMICAL_STAR
+		entry = StellarCatalog.build(index, FIRST_ASTRONOMICAL_STAR_SITE + index, system_position3(id))
+	else:
+		var ordinal := id - SYSTEM_COUNT
+		entry = StreamedGalaxy.build_system(ordinal, DESTINATION_COUNT + ordinal * StreamedGalaxy.SITES_PER_SYSTEM)
 	_streamed[id] = entry
 	return entry
 
 
 static func system_position3(id: int) -> Vector3:
+	if id == SOLAR_SYSTEM:
+		return SOLAR_POSITION_LY
+	if is_astronomical_system(id):
+		return SOLAR_POSITION_LY + StellarCatalog.position_at(id - FIRST_ASTRONOMICAL_STAR)
 	if is_extended_system(id):
 		var ordinal := id - SYSTEM_COUNT
 		var address := StreamedGalaxy.address(ordinal)
@@ -288,12 +334,13 @@ static func sector_system_ids(coordinates: Vector2i) -> Array[int]:
 	result.append_array(_generated_index.sectors.get(coordinates, []))
 	for ordinal: int in StreamedGalaxy.sector_ordinals(coordinates):
 		result.append(SYSTEM_COUNT + ordinal)
+	result.append_array(astronomical_sector_system_ids(coordinates))
 	return result
 
 
 static func galaxy_sector_count(coordinates: Vector2i) -> int:
 	return StreamedGalaxy.sector_count(coordinates) + _generated_index.authored.get(coordinates, []).size() \
-		+ _generated_index.sectors.get(coordinates, []).size()
+		+ _generated_index.sectors.get(coordinates, []).size() + _astronomical_index.sectors.get(coordinates, []).size()
 
 
 static func generated_systems_near(system_id: int, radius: float, include_extension := false) -> Array[int]:
@@ -312,11 +359,38 @@ static func generated_systems_near(system_id: int, radius: float, include_extens
 			for candidate: int in sectors.get(Vector2i(x, y), []):
 				if candidate != system_id and position.distance_to(system_position3(candidate)) <= radius:
 					found.append(candidate)
-	if include_extension or is_extended_system(system_id):
+	if include_extension or is_extended_system(system_id) or is_astronomical_system(system_id):
 		# The extension only streams local searches. Chart density uses sector counts.
-		_append_streamed_near(found, system_id, position, minf(radius, MAX_STREAMED_QUERY_LY))
+		var query_radius := minf(radius, MAX_STREAMED_QUERY_LY)
+		_append_streamed_near(found, system_id, position, query_radius)
+		_append_astronomical_near(found, system_id, position, query_radius)
 	found.sort()
 	return found
+
+
+static func _append_astronomical_near(found: Array[int], origin: int, position: Vector3, radius: float) -> void:
+	var plane := Vector2(position.x, position.y)
+	var extent := Vector2.ONE * radius
+	var first := Vector2i(((plane - extent) / SECTOR_SIZE).floor())
+	var last := Vector2i(((plane + extent) / SECTOR_SIZE).floor())
+	for y in range(first.y, last.y + 1):
+		for x in range(first.x, last.x + 1):
+			for id: int in _astronomical_index.sectors.get(Vector2i(x, y), []):
+				if id != origin and position.distance_squared_to(system_position3(id)) <= radius * radius:
+					found.append(id)
+
+
+static func _index_astronomical_systems() -> Dictionary:
+	var ids: Array[int] = []
+	var sectors := {}
+	for id in range(SOLAR_SYSTEM, SYSTEM_ID_LIMIT):
+		ids.append(id)
+		var sector := sector_coordinates(id)
+		if not sectors.has(sector):
+			sectors[sector] = []
+		sectors[sector].append(id)
+	ids.make_read_only()
+	return {"ids": ids, "sectors": sectors}
 
 
 static func _append_streamed_near(found: Array[int], origin: int, position: Vector3, radius: float) -> void:
@@ -359,6 +433,10 @@ static func _index_generated_systems() -> Dictionary:
 static func system_of_site(id: int) -> int:
 	if not is_site_id(id):
 		return -1
+	if id >= FIRST_ASTRONOMICAL_STAR_SITE:
+		return FIRST_ASTRONOMICAL_STAR + id - FIRST_ASTRONOMICAL_STAR_SITE
+	if id >= STREAMED_SITE_LIMIT:
+		return SOLAR_SYSTEM
 	if id >= DESTINATION_COUNT:
 		@warning_ignore("integer_division")
 		return SYSTEM_COUNT + (id - DESTINATION_COUNT) / StreamedGalaxy.SITES_PER_SYSTEM
@@ -421,6 +499,12 @@ static func stellar_clearance(site_id: int) -> float:
 
 static func gas_giant_for(system_id: int) -> int:
 	return system(system_id).get("gas_giant", -1)
+
+
+static func gas_giants_for(system_id: int) -> Array:
+	var entry := system(system_id)
+	var primary := int(entry.get("gas_giant", -1))
+	return entry.get("gas_giants", [primary] if primary >= 0 else [])
 
 
 static func stellar_heat(system_id: int) -> float:

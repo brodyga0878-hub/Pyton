@@ -162,7 +162,7 @@ func _test_coordinate_catalog() -> void:
 	var center := Catalog.GALAXY_CENTER_SECTOR
 	var center_id := Catalog.GALAXY_CENTER_SYSTEM
 	var last := Catalog.GALAXY_BOUNDS.end - Vector2i.ONE
-	_expect(Catalog.SYSTEM_ID_LIMIT == 513933476 and Catalog.sector_coordinates(center_id) == center
+	_expect(Catalog.STREAMED_SYSTEM_LIMIT == 513933476 and Catalog.sector_coordinates(center_id) == center
 		and Catalog.is_extended_system(center_id) and Catalog.system(center_id).name == "Сердцевина",
 		"The same-scale extension has a stable address for its own central system")
 	var core_count := Catalog.galaxy_sector_count(center)
