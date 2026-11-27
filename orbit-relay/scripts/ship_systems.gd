@@ -58,6 +58,9 @@ const SURVEY_HULL := "surveyor"
 const UTILITY_HULL := "utility"
 const INTERCEPTOR_HULL := "interceptor"
 const HAULER_HULL := "hauler"
+const EXPLORER_HULL := "horizon"
+const MINER_HULL := "quartz"
+const ESCORT_HULL := "bastion"
 const MAX_CARGO_CAPACITY := 80
 const TRADE_IN_PERCENT := 68
 const HULLS := {
@@ -68,31 +71,59 @@ const HULLS := {
 		"thrust_positive": Vector3(1600.2, 1625.6, 1651.0), "thrust_negative": Vector3(1574.8, 1320.8, 1727.2),
 		"crew_required": 0, "missile_rails": 4, "speed_factor": 1.0, "accel_factor": 1.0, "burn_factor": 1.0},
 	FREIGHTER_HULL: {"id": FREIGHTER_HULL, "name": "Фрахтовик «Кедр»",
+		"model": "freighter", "wide_camera": true,
 		"description": "Фрахтовик с вместительным трюмом и местом специалиста. Медленнее разгоняется и расходует больше топлива.",
 		"price": 2200, "cargo": 44, "expanded_cargo": 60,
 		"dry_mass": FREIGHTER_DRY_MASS, "roll_rate": 1.35,
 		"thrust_positive": Vector3(1250.0, 1310.0, 1180.0), "thrust_negative": Vector3(1130.0, 1070.0, 1674.432),
 		"crew_required": 1, "missile_rails": 6, "speed_factor": 0.80, "accel_factor": 0.76, "burn_factor": 1.18},
 	SURVEY_HULL: {"id": SURVEY_HULL, "name": "Разведчик «Отклик»",
+		"model": "survey",
 		"description": "Лёгкий разведчик с быстрым разворотом и небольшим трюмом.",
 		"price": 1680, "cargo": 18, "expanded_cargo": 32, "dry_mass": 43.0, "roll_rate": 2.35,
 		"thrust_positive": Vector3(1780.0, 1560.0, 1840.0), "thrust_negative": Vector3(1650.0, 1420.0, 2110.0),
 		"crew_required": 0, "missile_rails": 4, "speed_factor": 1.12, "accel_factor": 1.16, "burn_factor": 0.92},
 	UTILITY_HULL: {"id": UTILITY_HULL, "name": "Буксир «Призма»",
+		"model": "utility", "wide_camera": true,
 		"description": "Рабочий корабль с мощными боковыми двигателями. Нужен один специалист.",
 		"price": 2450, "cargo": 34, "expanded_cargo": 50, "dry_mass": 58.0, "roll_rate": 1.48,
 		"thrust_positive": Vector3(2690.0, 2850.0, 1540.0), "thrust_negative": Vector3(2710.0, 2600.0, 1630.0),
 		"crew_required": 1, "missile_rails": 4, "speed_factor": 0.89, "accel_factor": 0.81, "burn_factor": 1.08},
 	INTERCEPTOR_HULL: {"id": INTERCEPTOR_HULL, "name": "Перехватчик «Сокол»",
+		"model": "interceptor",
 		"description": "Перехватчик для одного пилота. Быстро разгоняется и разворачивается, но расходует больше топлива и берёт мало груза.",
 		"price": 2950, "cargo": 12, "expanded_cargo": 22, "dry_mass": 48.0, "roll_rate": 2.70,
 		"thrust_positive": Vector3(1620.0, 1750.0, 2020.0), "thrust_negative": Vector3(1550.0, 1490.0, 2670.0),
 		"crew_required": 0, "missile_rails": 6, "speed_factor": 1.23, "accel_factor": 1.29, "burn_factor": 1.32},
 	HAULER_HULL: {"id": HAULER_HULL, "name": "Тяжеловоз «Меридиан»",
+		"model": "hauler", "wide_camera": true, "chase": Vector3(0.0, 4.0, 13.0),
 		"description": "Тяжеловоз с самым большим трюмом. Медленно меняет курс и требует двух специалистов.",
 		"price": 3820, "cargo": 58, "expanded_cargo": MAX_CARGO_CAPACITY, "dry_mass": 84.0, "roll_rate": 0.92,
 		"thrust_positive": Vector3(1500.0, 1770.0, 1910.0), "thrust_negative": Vector3(1440.0, 1560.0, 2170.0),
 		"crew_required": 2, "missile_rails": 8, "speed_factor": 0.73, "accel_factor": 0.68, "burn_factor": 1.37},
+	EXPLORER_HULL: {"id": EXPLORER_HULL, "name": "Дальник «Горизонт»",
+		"description": "Лёгкий корабль для дальних перелётов. Держит хороший прыжковый радиус с небольшим грузом.",
+		"price": 2750, "cargo": 16, "expanded_cargo": 28, "dry_mass": 35.0, "roll_rate": 1.92,
+		"thrust_positive": Vector3(1240.0, 1280.0, 1440.0), "thrust_negative": Vector3(1190.0, 1140.0, 1540.0),
+		"crew_required": 0, "missile_rails": 4, "speed_factor": 1.06, "accel_factor": 0.97, "burn_factor": 0.87,
+		"model": "specialist", "model_name": "HorizonHull", "paint": Color("#468e8c"),
+		"body": Vector3(0.53, 0.37, 2.15), "engines": Vector3(1.25, 0.08, 1.40), "pod": Vector2(0.26, 0.22)},
+	MINER_HULL: {"id": MINER_HULL, "name": "Шахтёр «Кварц»",
+		"description": "Широкий корпус с сильной боковой тягой и вместительным трюмом для работы у месторождений.",
+		"price": 3260, "cargo": 46, "expanded_cargo": 62, "dry_mass": 66.0, "roll_rate": 1.19,
+		"thrust_positive": Vector3(3440.0, 2920.0, 1360.0), "thrust_negative": Vector3(3310.0, 2610.0, 1770.0),
+		"crew_required": 1, "missile_rails": 4, "speed_factor": 0.83, "accel_factor": 0.84, "burn_factor": 1.12,
+		"model": "specialist", "model_name": "QuartzHull", "paint": Color("#bf843f"), "wide_camera": true,
+		"chase": Vector3(0.0, 3.8, 12.4),
+		"body": Vector3(0.86, 0.62, 1.58), "engines": Vector3(2.03, -0.31, 0.94), "pod": Vector2(0.58, 0.43)},
+	ESCORT_HULL: {"id": ESCORT_HULL, "name": "Эскортник «Бастион»",
+		"description": "Корабль охранения с восемью ракетными местами. Быстро набирает ход, но уступает перехватчику в крене.",
+		"price": 3680, "cargo": 22, "expanded_cargo": 36, "dry_mass": 60.0, "roll_rate": 1.90,
+		"thrust_positive": Vector3(1960.0, 1810.0, 1780.0), "thrust_negative": Vector3(1820.0, 1590.0, 3030.0),
+		"crew_required": 1, "missile_rails": 8, "speed_factor": 1.14, "accel_factor": 1.13, "burn_factor": 1.27,
+		"model": "specialist", "model_name": "BastionHull", "paint": Color("#844a51"), "wide_camera": true,
+		"chase": Vector3(0.0, 3.6, 11.6),
+		"body": Vector3(1.01, 0.43, 1.94), "engines": Vector3(1.65, 0.16, 1.58), "pod": Vector2(0.38, 0.27)},
 }
 const LEGACY_SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded"]
 const PRE_SHIELD_SAVE_FIELDS := ["fuel", "tank_upgraded", "eco_upgraded", "hull", "cargo_upgraded"]
@@ -140,7 +171,9 @@ static func profile(id: String) -> Dictionary:
 
 
 static func hull_ids() -> Array[String]:
-	return [STARTER_HULL, FREIGHTER_HULL, SURVEY_HULL, UTILITY_HULL, INTERCEPTOR_HULL, HAULER_HULL]
+	var ids: Array[String] = []
+	ids.assign(HULLS.keys())
+	return ids
 
 
 static func missile_rails_for(id: String) -> int:

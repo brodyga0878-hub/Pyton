@@ -39,6 +39,7 @@ const PUMP_MODES := {"off": "Выкл.", "reaction": "В реактивный", 
 const DRIVE_LABELS := {"standard": ShipSystems.STANDARD_DRIVE_NAME, "range": ShipSystems.RANGE_DRIVE_NAME,
 	"military": ShipSystems.MILITARY_DRIVE_NAME}
 const WEAPON_LABELS := {"pulse": "Каскад", "focus": "Нить"}
+const YARD_OFFER_SLOTS := 2
 const STORED_HULLS_PER_PAGE := 2
 
 enum StationPage { SERVICES, CREW, YARD, CUSTOMS, MINING, BERTH }
@@ -744,9 +745,8 @@ func _build_yard(parent: VBoxContainer) -> void:
 	var hulls := HBoxContainer.new()
 	hulls.add_theme_constant_override("separation", 12)
 	_yard_offers.add_child(hulls)
-	for id: String in ShipSystems.hull_ids():
-		var row := _yard_card(hulls, ShipSystems.profile(id))
-		_yard_rows.append(row)
+	for _slot in range(YARD_OFFER_SLOTS):
+		_yard_rows.append(_yard_card(hulls))
 	_yard_stock_hint = _label(_yard_offers, "", 16, MINT)
 	var terms := _label(_yard_offers,
 		"При покупке старый корпус остаётся в ангаре этого порта. Оборудование, топливо, экипаж, пассажиры и груз переходят на выбранный корабль.",
@@ -756,7 +756,7 @@ func _build_yard(parent: VBoxContainer) -> void:
 	_yard.hide()
 
 
-func _yard_card(parent: HBoxContainer, profile: Dictionary) -> Dictionary:
+func _yard_card(parent: HBoxContainer) -> Dictionary:
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size.x = 338.0
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -765,28 +765,27 @@ func _yard_card(parent: HBoxContainer, profile: Dictionary) -> Dictionary:
 	var content := VBoxContainer.new()
 	content.add_theme_constant_override("separation", 8)
 	panel.add_child(content)
-	_label(content, str(profile.name), 24, TEXT)
-	var description := _label(content, str(profile.description), 16, MUTED)
+	var title := _label(content, "", 24, TEXT)
+	var description := _label(content, "", 16, MUTED)
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var hold := _label(content, "", 17, MINT)
-	_label(content, "Специалисты для выхода · %d" % int(profile.crew_required), 17, TEXT)
-	var positive: Vector3 = profile.thrust_positive
-	var negative: Vector3 = profile.thrust_negative
-	var mobility := _label(content, "Масса %d т · крен %d°/с\nТяга, кН · вперёд/назад %d/%d\nВлево/вправо %d/%d · вверх/вниз %d/%d" % [
-		roundi(float(profile.dry_mass)), roundi(rad_to_deg(float(profile.roll_rate))),
-		roundi(negative.z), roundi(positive.z), roundi(negative.x), roundi(positive.x),
-		roundi(positive.y), roundi(negative.y),
-	], 16, MUTED)
+	hold.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var crew := _label(content, "", 17, TEXT)
+	var mobility := _label(content, "", 16, MUTED)
 	mobility.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var cost := _label(content, "", 17, TEXT)
+	cost.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var reason := _label(content, "", 16, AMBER)
 	reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var exchange := _button(content)
-	exchange.pressed.connect(_request_yard_exchange.bind(str(profile.id)))
 	var purchase := _button(content)
-	purchase.pressed.connect(_request_yard_purchase.bind(str(profile.id)))
-	return {"id": str(profile.id), "panel": panel, "hold": hold, "cost": cost, "reason": reason,
+	var row := {"id": "", "panel": panel, "title": title, "description": description,
+		"hold": hold, "crew": crew, "mobility": mobility, "cost": cost, "reason": reason,
 		"exchange": exchange, "purchase": purchase}
+	exchange.pressed.connect(func() -> void: _request_yard_exchange(str(row.id)))
+	purchase.pressed.connect(func() -> void: _request_yard_purchase(str(row.id)))
+	panel.hide()
+	return row
 
 
 func _refresh_yard() -> void:
@@ -815,38 +814,56 @@ func _select_yard_page(page: YardPage) -> void:
 func _refresh_yard_offers() -> void:
 	var offers: Array[Dictionary] = _sim.shipyard_offers()
 	_yard_stock_hint.text = "Обновление предложения · %s." % Calendar.stamp(float(_sim.shipyard_restock_time()))
-	for row in _yard_rows:
-		row.panel.hide()
-	for offer in offers:
-		for row in _yard_rows:
-			if row.id != offer.id:
-				continue
-			row.panel.show()
-			row.hold.text = "Трюм %d ед. · с расширением %d" % [int(offer.cargo), int(offer.expanded_cargo)]
-			if _sim.ship.cargo_upgraded:
-				row.hold.text = "Трюм %d ед. с установленным расширением" % int(offer.cargo_capacity)
-			row.hold.text += " · Ракетных мест %d" % int(offer.missile_rails)
-			row.hold.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			var installed := bool(offer.installed)
-			var net := int(offer.net_cost)
-			row.cost.text = "Цена %d кр." % int(offer.price)
-			if not installed:
-				row.cost.text += " · Зачёт %d кр." % int(offer.trade_in)
-			row.cost.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			var exchange_reason := "" if installed or offer.available else str(offer.reason)
-			var purchase_reason := "" if installed or offer.purchase_ok else str(offer.purchase_reason)
-			_update_yard_reason(row.reason, exchange_reason, purchase_reason, "Обмен", "Покупка")
-			row.exchange.disabled = installed or not bool(offer.available)
-			row.purchase.visible = not installed or bool(offer.purchase_ok)
-			row.purchase.disabled = not bool(offer.purchase_ok)
-			row.purchase.text = "Купить за %d кр." % int(offer.purchase_cost)
-			if installed:
-				row.exchange.text = "Ваш корабль"
-			elif net >= 0:
-				row.exchange.text = "Обменять · доплата %d кр." % net
-			else:
-				row.exchange.text = "Обменять · к получению %d кр." % -net
-			break
+	for slot in range(_yard_rows.size()):
+		var row := _yard_rows[slot]
+		var offer := offers[slot] if slot < offers.size() else {}
+		var hull_id := str(offer.get("id", ""))
+		if row.id != hull_id:
+			for finger: int in _touches.keys():
+				if _touches[finger] == row.exchange or _touches[finger] == row.purchase:
+					_touches.erase(finger)
+			# Disabling also cancels a mouse or keyboard press on a rebound button.
+			row.exchange.disabled = true
+			row.purchase.disabled = true
+			row.id = hull_id
+		row.panel.visible = not offer.is_empty()
+		if not offer.is_empty():
+			_update_yard_card(row, offer)
+
+
+func _update_yard_card(row: Dictionary, offer: Dictionary) -> void:
+	row.title.text = str(offer.name)
+	row.description.text = str(offer.description)
+	row.crew.text = "Специалисты для выхода · %d" % int(offer.crew_required)
+	var positive: Vector3 = offer.thrust_positive
+	var negative: Vector3 = offer.thrust_negative
+	row.mobility.text = "Масса %d т · крен %d°/с\nТяга, кН · вперёд/назад %d/%d\nВлево/вправо %d/%d · вверх/вниз %d/%d" % [
+		roundi(float(offer.dry_mass)), roundi(rad_to_deg(float(offer.roll_rate))),
+		roundi(negative.z), roundi(positive.z), roundi(negative.x), roundi(positive.x),
+		roundi(positive.y), roundi(negative.y),
+	]
+	row.hold.text = "Трюм %d ед. · с расширением %d" % [int(offer.cargo), int(offer.expanded_cargo)]
+	if _sim.ship.cargo_upgraded:
+		row.hold.text = "Трюм %d ед. с установленным расширением" % int(offer.cargo_capacity)
+	row.hold.text += " · Ракетных мест %d" % int(offer.missile_rails)
+	var installed := bool(offer.installed)
+	var net := int(offer.net_cost)
+	row.cost.text = "Цена %d кр." % int(offer.price)
+	if not installed:
+		row.cost.text += " · Зачёт %d кр." % int(offer.trade_in)
+	var exchange_reason := "" if installed or offer.available else str(offer.reason)
+	var purchase_reason := "" if installed or offer.purchase_ok else str(offer.purchase_reason)
+	_update_yard_reason(row.reason, exchange_reason, purchase_reason, "Обмен", "Покупка")
+	row.exchange.disabled = installed or not bool(offer.available)
+	row.purchase.visible = not installed or bool(offer.purchase_ok)
+	row.purchase.disabled = not bool(offer.purchase_ok)
+	row.purchase.text = "Купить за %d кр." % int(offer.purchase_cost)
+	if installed:
+		row.exchange.text = "Ваш корабль"
+	elif net >= 0:
+		row.exchange.text = "Обменять · доплата %d кр." % net
+	else:
+		row.exchange.text = "Обменять · к получению %d кр." % -net
 
 
 func _request_yard_exchange(id: String) -> void:

@@ -459,6 +459,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	_traffic.visible = not transit
 	_atmosphere.visible = not transit
 	var hull_id := str(sim.ship.hull_id)
+	var hull_profile: Dictionary = ShipSystems.HULLS.get(hull_id, {})
 	if hull_id != _ship_hull_id:
 		_build_ship_model(hull_id)
 		set_visual_profile(_visual_profile)
@@ -510,8 +511,8 @@ func sync(sim: RefCounted, delta: float) -> void:
 
 	var camera_offset := BERTH_CAMERA_OFFSET if docked else Vector3(0.0, 3.4, 10.5)
 	var focal_offset := BERTH_CAMERA_FOCUS if docked else Vector3(0.0, 2.0, -30.0)
-	if not settled and hull_id == ShipSystems.HAULER_HULL:
-		camera_offset = Vector3(0.0, 4.0, 13.0)
+	if not settled:
+		camera_offset = hull_profile.get("chase", camera_offset)
 	var up := heading.y
 	if ground_berth:
 		camera_offset = GROUND_CAMERA_OFFSET
@@ -572,7 +573,7 @@ func sync(sim: RefCounted, delta: float) -> void:
 	if absf(sight.dot(_camera_up)) > 0.995:
 		_camera_up = up if absf(sight.dot(up)) < 0.995 else heading.x
 	var exterior := Transform3D(Basis.looking_at(sight, _camera_up), _exterior_position)
-	var freighter := hull_id in [ShipSystems.FREIGHTER_HULL, ShipSystems.UTILITY_HULL, ShipSystems.HAULER_HULL]
+	var freighter := bool(hull_profile.get("wide_camera", false))
 	# Keep the established framing during the automatic berth operation.
 	var forced_exterior := settled or transit or in_escape
 	var previous_mode: int = _camera_director.mode
@@ -1785,10 +1786,12 @@ func _build_ship_model(hull_id: String) -> void:
 	_ship_hull_id = hull_id
 	_ship = Node3D.new()
 	add_child(_ship)
-	if hull_id == ShipSystems.FREIGHTER_HULL:
+	var profile: Dictionary = ShipSystems.HULLS.get(hull_id, {})
+	var model: String = profile.get("model", "courier")
+	if model == "freighter":
 		_ship.name = "FreighterHull"
 		_build_freighter()
-	elif hull_id == ShipSystems.UTILITY_HULL:
+	elif model == "utility":
 		_ship.name = "UtilityHull"
 		_build_freighter()
 		_apply_hull_proportions(Vector3(1.06, 0.82, 0.86))
@@ -1796,21 +1799,65 @@ func _build_ship_model(hull_id: String) -> void:
 		for side: float in [-1.0, 1.0]:
 			_sectioned_shell(_ship, thruster, [Vector3(-0.36, 0.20, 0.13), Vector3(0.25, 0.36, 0.25),
 				Vector3(1.12, 0.31, 0.22)], Vector3(side * 2.05, 0.10, 0.22))
-	elif hull_id == ShipSystems.SURVEY_HULL:
+	elif model == "survey":
 		_ship.name = "SurveyHull"
 		_build_ship()
 		_apply_hull_proportions(Vector3(0.74, 0.88, 1.12))
 		var scanner := _panel_finish(Color("7ad6cf"), 0.56, 0.43, Vector2(3.0, 2.0), true)
 		_sectioned_shell(_ship, scanner, [Vector3(-0.55, 0.12, 0.07), Vector3(-0.08, 0.19, 0.16),
 			Vector3(0.38, 0.17, 0.11)], Vector3(0.0, 0.74, 0.0))
-	elif hull_id == ShipSystems.INTERCEPTOR_HULL:
+	elif model == "interceptor":
 		_ship.name = "InterceptorHull"
 		_build_interceptor()
-	elif hull_id == ShipSystems.HAULER_HULL:
+	elif model == "hauler":
 		_ship.name = "HaulerHull"
 		_build_hauler()
+	elif model == "specialist":
+		_build_specialist_hull(profile)
 	else:
 		_build_ship()
+
+
+func _build_specialist_hull(profile: Dictionary) -> void:
+	_ship.name = str(profile.model_name)
+	var size: Vector3 = profile.body
+	var engine: Vector3 = profile.engines
+	var pod: Vector2 = profile.pod
+	var shell := _panel_finish(profile.paint, 0.42, 0.49, Vector2(6, 3), true)
+	var frame := _panel_finish(Color("#364955"), 0.56, 0.52, Vector2(4, 2), true)
+	var trim := _panel_finish(Color("#99a9b3"), 0.68, 0.32, Vector2(3, 2), true)
+	var glass := _canopy_glass(Color("#244d65"))
+	var glow := _light(Color("#8df8e6"))
+	_sectioned_shell(_ship, shell, [
+		Vector3(-size.z, size.x * 0.28, size.y * 0.33),
+		Vector3(-0.61 * size.z, size.x * 0.81, size.y * 0.82),
+		Vector3(0.28 * size.z, size.x, size.y),
+		Vector3(0.82 * size.z, size.x * 0.85, size.y * 0.76),
+	])
+	_sectioned_shell(_ship, glass, [
+		Vector3(-size.z * 0.85, size.x * 0.26, 0.05),
+		Vector3(-size.z * 0.48, size.x * 0.57, 0.18),
+		Vector3(-size.z * 0.16, size.x * 0.46, 0.15),
+	], Vector3(0, size.y * 0.57, 0))
+	var spars: Array = []
+	var lights: Array = []
+	for side: float in [-1.0, 1.0]:
+		var center := Vector3(side * engine.x, engine.y, engine.z - 0.59)
+		_sectioned_shell(_ship, frame, [
+			Vector3(-0.87, pod.x * 0.53, pod.y * 0.51),
+			Vector3(-0.49, pod.x, pod.y), Vector3(0.55, pod.x * 0.84, pod.y * 0.91),
+		], center)
+		var span := engine.x - size.x * 0.71
+		spars.append([Vector3(side * (engine.x - span * 0.5), engine.y * 0.54, engine.z - 0.78),
+			Vector3(span + 0.4, 0.15 + pod.y * 0.21, 0.72), side * 0.13])
+		var nozzle := Vector3(center.x, center.y, engine.z)
+		_cylinder(_ship, trim, nozzle, pod.x * 0.59, pod.x * 0.72, 0.19, 16)
+		_cylinder(_ship, glow, nozzle + Vector3(0, 0, 0.14), pod.x * 0.43, pod.x * 0.46, 0.08, 16)
+		lights.append([center + Vector3(0, pod.y * 0.78, -0.34), Vector3(0.11, 0.032, 0.49)])
+	_box_batch(_ship, frame, spars)
+	_box_batch(_ship, glow, lights)
+	_build_ship_gear(shell, frame)
+	_build_ship_jet(engine + Vector3(0, 0, 0.2), pod.x * 0.7, true)
 
 
 func _apply_hull_proportions(factors: Vector3) -> void:

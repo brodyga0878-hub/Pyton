@@ -3,7 +3,7 @@ config_version=5
 [application]
 
 config/name="Elite"
-config/version="0.110.0"
+config/version="0.111.0"
 config/use_custom_user_dir=true
 config/custom_user_dir_name="godot/app_userdata/Орбитальный рейс"
 config/custom_user_dir_name.macos="Godot/app_userdata/Орбитальный рейс"

@@ -70,10 +70,26 @@ func _test_yard(viewport: SubViewport, game: YardGame, yard: Services) -> void:
 		return
 	_expect(flight.shipyard_action("purchase", ShipSystems.STARTER_HULL), "Park another hull through the same yard rules")
 	_tap(viewport, yard._yard_tabs[Services.YardPage.OFFERS])
+	await process_frame
+	var previous := _offer(yard, ShipSystems.FREIGHTER_HULL)
+	if not _expect(yard._yard_rows.size() == 2 and not previous.is_empty() and not previous.purchase.disabled,
+		"The shipyard retains two live offer cards regardless of the registry size"):
+		return
+	_touch(viewport, previous.purchase.get_global_rect().get_center(), true)
+	_expect(yard._touches.get(4) == previous.purchase, "The finger holds the freighter's actual purchase button")
 	_go_to_stock_shift(flight, Flight.SHIPYARD_FEATURES_START)
 	yard.refresh()
 	await process_frame
-	_tap(viewport, _offer(yard, ShipSystems.INTERCEPTOR_HULL).purchase)
+	var featured := _offer(yard, ShipSystems.INTERCEPTOR_HULL)
+	if not _expect(not featured.is_empty() and featured.purchase == previous.purchase
+		and featured.title.text == str(ShipSystems.profile(ShipSystems.INTERCEPTOR_HULL).name),
+		"The featured model updates the same physical offer card and refreshes its title"):
+		return
+	var before_release := flight.snapshot()
+	_touch(viewport, featured.purchase.get_global_rect().get_center(), false)
+	_expect(flight.snapshot() == before_release,
+		"A finger held before the restock cannot buy the new model on release")
+	_tap(viewport, featured.purchase)
 	if not _expect(flight.ship.hull_id == ShipSystems.INTERCEPTOR_HULL and game._view._ship.name == "InterceptorHull"
 		and _paired_exhaust(game._view, 1.18), "The featured interceptor is actually installed and has its own twin-engine model"):
 		return
@@ -176,11 +192,15 @@ func _inside(viewport: SubViewport, button: Button) -> bool:
 func _tap(viewport: SubViewport, button: Button) -> void:
 	var position := button.get_global_rect().get_center()
 	for pressed: bool in [true, false]:
-		var touch := InputEventScreenTouch.new()
-		touch.index = 4
-		touch.position = position
-		touch.pressed = pressed
-		viewport.push_input(touch, true)
+		_touch(viewport, position, pressed)
+
+
+func _touch(viewport: SubViewport, position: Vector2, pressed: bool) -> void:
+	var touch := InputEventScreenTouch.new()
+	touch.index = 4
+	touch.position = position
+	touch.pressed = pressed
+	viewport.push_input(touch, true)
 
 
 func _expect(condition: bool, description: String) -> bool:

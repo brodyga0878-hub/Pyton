@@ -26,6 +26,7 @@ func _run() -> void:
 	_test_licenses_and_quotes()
 	_test_rotating_stock()
 	_test_featured_hulls()
+	_test_specialty_hulls()
 	_test_hull_ratings()
 	_test_upgrade_and_travel()
 	_test_flight_characteristics()
@@ -89,7 +90,7 @@ func _test_rotating_stock() -> void:
 	flight.credits = 7000
 	var survey := ShipSystems.SURVEY_HULL
 	var tug := ShipSystems.UTILITY_HULL
-	_expect(ShipSystems.hull_ids().size() == 6 and not flight.shipyard_swap(survey)
+	_expect(ShipSystems.hull_ids().size() == 9 and not flight.shipyard_swap(survey)
 		and not flight.shipyard_swap(tug) and flight.credits == 7000,
 		"The wider hull catalogue does not let a pilot buy what this shift has not listed")
 	flight.update(Flight.SHIPYARD_STOCK_SECONDS * 2.0, Vector2.ZERO, 0.0, false, false)
@@ -113,6 +114,43 @@ func _test_rotating_stock() -> void:
 		and restored.ship.thrust_acceleration(Vector3.RIGHT, 0).x > scout_side,
 		"The working tug trades turn speed for stronger side thrust and a wider hold with a crew requirement")
 	_expect(not restored.dock_action() and restored.docked == 0, "A tug without its required crew cannot depart")
+
+
+func _test_specialty_hulls() -> void:
+	var stock := {0: ShipSystems.EXPLORER_HULL, 10: ShipSystems.MINER_HULL,
+		Catalog.FRINGE_ARRIVAL_PORT: ShipSystems.ESCORT_HULL}
+	for berth: int in stock:
+		var pilot := _at_port(berth)
+		var hull: String = stock[berth]
+		if not _expect(pilot != null and not pilot.shipyard_offer(hull).available,
+			"The specialty hull is unavailable until the right rotation"):
+			continue
+		pilot.credits = 16000
+		pilot.update(6.0 * Flight.SHIPYARD_STOCK_SECONDS, Vector2.ZERO, 0.0, false, false)
+		var quote := pilot.shipyard_offers()[1]
+		if not _expect(quote.id == hull and quote.purchase_ok and pilot.shipyard_action("purchase", hull)
+			and pilot.credits == 16000 - int(quote.price) and pilot.shipyard_storage().size() == 1,
+			"Purchase %s for the public offer and retain the outgoing hull" % hull):
+			continue
+		_expect(pilot.ship.hull_id == hull and pilot.service_action("combat_launcher")
+			and pilot.combat_equipment_status().missile_slots.size() == int(quote.missile_rails),
+			"The fitted rack follows the usable purchased hull's rating")
+		if int(quote.crew_required) > 0:
+			var applicants := pilot.crew_candidates()
+			_expect(not pilot.dock_action() and not applicants.is_empty() and pilot.crew_hire(int(applicants[0].id)),
+				"A specialist hull requires an actual hired crew member before launch")
+		var cold := Flight.new()
+		if not _expect(cold.restore(JSON.parse_string(JSON.stringify(pilot.snapshot()))) and Fixture.depart(cold)
+			and cold.ship.hull_id == hull and cold.select_target(berth),
+			"Cold load restores the purchased hull and allows a normal departure"):
+			continue
+		cold.set_autopilot(true)
+		for _frame in range(90 * 60):
+			if cold.docked == berth or not cold.autopilot:
+				break
+			_tick(cold)
+		_expect(cold.docked == berth and cold.ship.hull == 100.0 and cold.shipyard_storage().size() == 1,
+			"%s can return through a normal physical docking approach" % hull)
 
 
 func _test_hull_ratings() -> void:

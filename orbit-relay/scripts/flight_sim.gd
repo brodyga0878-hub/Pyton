@@ -75,6 +75,10 @@ const SHIPYARD_PORTS := [0, 10, Catalog.FRINGE_ARRIVAL_PORT]
 const SHIPYARD_STOCK_SECONDS := 600.0
 const SHIPYARD_FEATURES_START := 5
 const SHIPYARD_FEATURES_PERIOD := 8
+const SHIPYARD_SPECIALTY_STOCK := {
+	0: ShipSystems.EXPLORER_HULL, 10: ShipSystems.MINER_HULL,
+	Catalog.FRINGE_ARRIVAL_PORT: ShipSystems.ESCORT_HULL,
+}
 const TIME_SCALES := [1, 4, 16]
 const SETTLED_TIME_SCALES := [1, 4, 16, 64, 256]
 const COAST_TIME_SCALES := [1, 4, 16, 64]
@@ -2503,6 +2507,8 @@ func _shipyard_stock() -> Array[String]:
 	var exploration_yard := docked in [0, 10, Catalog.HEATHER_PORT]
 	if shift >= SHIPYARD_FEATURES_START:
 		var featured := (shift - SHIPYARD_FEATURES_START) % SHIPYARD_FEATURES_PERIOD
+		if featured == 1 and SHIPYARD_SPECIALTY_STOCK.has(docked):
+			return [ShipSystems.STARTER_HULL, SHIPYARD_SPECIALTY_STOCK[docked]]
 		if featured == 0 or featured == 3:
 			var interceptor := exploration_yard == (featured == 0)
 			return [ShipSystems.STARTER_HULL, ShipSystems.INTERCEPTOR_HULL if interceptor else ShipSystems.HAULER_HULL]
