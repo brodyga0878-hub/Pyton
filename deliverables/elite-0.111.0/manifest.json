@@ -1,0 +1,122 @@
+{
+  "name": "Elite",
+  "version": "0.111.0",
+  "status": "release_candidate",
+  "source_commit": "399014a6f8288fcb0ecc58c8320b51d1559e64db",
+  "source_archive_files": 239,
+  "content": {
+    "save_schema": 56,
+    "playable_hull_count": 9,
+    "simultaneous_shipyard_offers": 2,
+    "new_hulls": {
+      "horizon": {
+        "title": "Горизонт",
+        "port": "Маяк-7",
+        "role": "exploration"
+      },
+      "quartz": {
+        "title": "Кварц",
+        "port": "Створ",
+        "role": "mining"
+      },
+      "bastion": {
+        "title": "Бастион",
+        "port": "Рубеж",
+        "role": "escort"
+      }
+    },
+    "first_specialty_rotation_game_minutes": 60,
+    "specialty_rotation_period_game_minutes": 80
+  },
+  "android": {
+    "package": "org.orbitrelay.game",
+    "version_code": 136,
+    "abi": "arm64-v8a",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "certificate_sha256": "16f47f20a2d2aca3de1fe893ddfa01e90acf2d6b98b32ca772bb914c9ee21e25",
+    "test_signature_matches": "0.110.0",
+    "zip_alignment_16k_verified": true,
+    "native_elf_load_alignment_bytes": {
+      "lib/arm64-v8a/libc++_shared.so": 16384,
+      "lib/arm64-v8a/libgodot_android.so": 16384
+    },
+    "tested_on_device": false,
+    "compiled_scripts": 92
+  },
+  "checks": {
+    "source_zip_headless": {
+      "suites": 99,
+      "assertions_reported": 69254,
+      "suites_reporting_pass_without_assertion_count": [
+        "test_flight",
+        "test_scene"
+      ],
+      "failures": 0
+    },
+    "provider_packaging": {
+      "tests": 11,
+      "failures": 0
+    },
+    "apk_resources_godot_desktop": {
+      "assets_verified": 216,
+      "assertions": 564,
+      "suites": {
+        "shipyard": 122,
+        "yard_hangar_view": 20,
+        "ship_hangar": 39,
+        "mass_and_thrust": 89,
+        "flight_camera": 37,
+        "material_maps": 42,
+        "solar_voyage": 16,
+        "report": 91,
+        "android_report_share": 79,
+        "voyage_upgrade": 29
+      },
+      "material_checks_reference_original_source_pngs": true,
+      "runtime_upgrade": {
+        "from_version": "0.110.0",
+        "checkpoint_checks": 13,
+        "resumed_checks": 17
+      },
+      "failures": 0,
+      "visual_capture": {
+        "source": "Signed Elite 0.111.0 APK game resources",
+        "renderer": "Godot 4.6.3 OpenGL Compatibility, Mesa llvmpipe on Linux",
+        "resolution": [
+          1440,
+          720
+        ],
+        "phone_capture": false,
+        "hulls": [
+          "horizon",
+          "quartz",
+          "bastion"
+        ],
+        "check": "All were purchased, restored from serialized state, crewed when required, flown about 760 m from their berth at 100% hull, and fit fully in the chase-camera frame.",
+        "published_frames": {
+          "horizon-flight.png": "Normal chase camera with HUD",
+          "bastion-detail.png": "Closer capture camera angle with HUD hidden"
+        }
+      }
+    }
+  },
+  "files": {
+    "Elite-0.111.0-arm64.apk": {
+      "bytes": 36926156,
+      "sha256": "3bb159cfd7f6008091612298c48927d9285fbf3f5f18131deb121ede089c6513"
+    },
+    "Elite-0.111.0-source.zip": {
+      "bytes": 14616950,
+      "sha256": "e201c285ce495b0252e7a1744e09b1152a5be7ba512f57b3047b87a1c28db23c"
+    },
+    "bastion-detail.png": {
+      "bytes": 924238,
+      "sha256": "d8d0b70b8e3ee3df7d1641d53d03e3f4e057b5e0a523b22e49adfb71aa7484e9"
+    },
+    "horizon-flight.png": {
+      "bytes": 164869,
+      "sha256": "2b08cec64ad1ec0dd9523c7d296db1bb50f5e21020c2e7f421f2ad066d494009"
+    }
+  }
+}
